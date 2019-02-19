@@ -113,7 +113,7 @@ describe( 'persistence', () => {
 		} );
 	} );
 
-	it( 'should defer to default initialState if mismatch of object-like (persisted object-like)', () => {
+	it( 'should defer to persisted state if mismatch of object-like (persisted object-like)', () => {
 		registry = createRegistry().use( plugin, {
 			storage: {
 				getItem: () => JSON.stringify( { test: { persisted: true } } ),
@@ -123,32 +123,32 @@ describe( 'persistence', () => {
 
 		registry.registerStore( 'test', {
 			persist: true,
-			reducer: ( state = 'initial' ) => state,
+			reducer: ( state = null ) => state,
 			selectors: {
 				getState: ( state ) => state,
 			},
 		} );
 
-		expect( registry.select( 'test' ).getState() ).toBe( 'initial' );
+		expect( registry.select( 'test' ).getState() ).toEqual( { persisted: true } );
 	} );
 
-	it( 'should defer to default initialState if mismatch of object-like (initial object-like)', () => {
+	it( 'should defer to persisted state if mismatch of object-like (initial object-like)', () => {
 		registry = createRegistry().use( plugin, {
 			storage: {
-				getItem: () => JSON.stringify( { test: 'persisted' } ),
+				getItem: () => JSON.stringify( { test: null } ),
 				setItem() {},
 			},
 		} );
 
 		registry.registerStore( 'test', {
 			persist: true,
-			reducer: ( state = { initial: true } ) => state,
+			reducer: ( state = {} ) => state,
 			selectors: {
 				getState: ( state ) => state,
 			},
 		} );
 
-		expect( registry.select( 'test' ).getState() ).toEqual( { initial: true } );
+		expect( registry.select( 'test' ).getState() ).toBe( null );
 	} );
 
 	it( 'should be reasonably tolerant to a non-object persisted state', () => {

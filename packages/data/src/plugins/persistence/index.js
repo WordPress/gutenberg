@@ -171,18 +171,17 @@ export default function( registry, pluginOptions ) {
 					type: '@@WP/PERSISTENCE_RESTORE',
 				} );
 
-				// If there is a mismatch in object-likeness of either default
-				// initial or persisted state, defer to default implementation.
-				// Otherwise, consume from persistence, with assurance that for
-				// an object-like states:
-				// - Other keys are left intact when persisting only a subset
-				//   subset of keys.
-				// - New keys in what would otherwise be used as initial state
-				//   are deeply merged as base for persisted value.
-				if ( isPlainObject( initialState ) === isPlainObject( persistedState ) ) {
-					initialState = isPlainObject( initialState ) ?
-						merge( {}, initialState, persistedState ) :
-						persistedState;
+				if ( isPlainObject( initialState ) && isPlainObject( persistedState ) ) {
+					// If state is an object, ensure that:
+					// - Other keys are left intact when persisting only a
+					//   subset of keys.
+					// - New keys in what would otherwise be used as initial
+					//   state are deeply merged as base for persisted value.
+					initialState = merge( {}, initialState, persistedState );
+				} else {
+					// If there is a mismatch in object-likeness of default
+					// initial or persisted state, defer to persisted value.
+					initialState = persistedState;
 				}
 
 				options = { ...options, initialState };
