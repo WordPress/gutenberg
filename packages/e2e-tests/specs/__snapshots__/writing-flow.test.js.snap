@@ -24,14 +24,6 @@ exports[`adding blocks Should navigate inner blocks with arrow keys 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks should clean TinyMCE content 1`] = `""`;
-
-exports[`adding blocks should clean TinyMCE content 2`] = `
-"<!-- wp:paragraph -->
-<p><strong>Inside</strong></p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`adding blocks should create valid paragraph blocks when rapidly pressing Enter 1`] = `
 "<!-- wp:paragraph -->
 <p></p>
@@ -119,6 +111,18 @@ exports[`adding blocks should navigate around inline boundaries 1`] = `
 
 <!-- wp:paragraph -->
 <p>BeforeThird</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should navigate around nested inline boundaries 1`] = `
+"<!-- wp:paragraph -->
+<p><strong><em>1</em> <em>2</em></strong></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should navigate around nested inline boundaries 2`] = `
+"<!-- wp:paragraph -->
+<p>a<strong>b<em>c1d</em>e f<em>g2h</em>i</strong>j</p>
 <!-- /wp:paragraph -->"
 `;
 

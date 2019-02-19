@@ -28,7 +28,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 			// Async control routine awaits resolution.
 			routine.then( yieldNext, yieldError );
 		} else {
-			next( routine );
+			yieldNext( routine );
 		}
 		return true;
 	} );

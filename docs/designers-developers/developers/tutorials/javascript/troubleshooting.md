@@ -16,7 +16,7 @@ If you are not seeing your changes, check that your JavaScript file is being enq
 
 If you do not see the file being loaded, doublecheck the enqueue function is correct. You can also check your server logs to see if there is an error messages.
 
-## Confirm all dependencies are loaded
+## Confirm All Dependencies Are Loaded
 
 The console log will show an error if a dependency your JavaScript code uses has not been declared and loaded in the browser. In the example, if `myguten.js` script is enqueued without declaring the `wp-blocks` dependency, the console log will show:
 

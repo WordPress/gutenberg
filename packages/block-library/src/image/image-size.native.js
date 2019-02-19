@@ -4,8 +4,8 @@
 import { Component } from '@wordpress/element';
 
 /**
-* External dependencies
-*/
+ * External dependencies
+ */
 import { View, Image } from 'react-native';
 
 /**

@@ -1,5 +1,5 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import classnames from 'classnames';
 
@@ -98,7 +98,7 @@ class BlockDropZone extends Component {
 
 		if ( ! isBlockDropType( type ) ||
 			isSameBlock( srcClientId, dstClientId ) ||
-			isSrcBlockAnAncestorOfDstBlock( srcClientId, dstClientId ) ) {
+			isSrcBlockAnAncestorOfDstBlock( srcClientId, dstClientId || dstRootClientId ) ) {
 			return;
 		}
 

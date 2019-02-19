@@ -1,5 +1,5 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
 import { extend, pick, isString, isEqual, forEach, isNumber } from 'lodash';
 import memize from 'memize';

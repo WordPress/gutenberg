@@ -25,8 +25,8 @@ import { getQueriedItems } from './queried-data';
  *
  * @return {boolean} Whether a request is in progress for an embed preview.
  */
-export const isRequestingEmbedPreview = createRegistrySelector( ( registry ) => ( state, url ) => {
-	return registry.select( 'core/data' ).isResolving( REDUCER_KEY, 'getEmbedPreview', [ url ] );
+export const isRequestingEmbedPreview = createRegistrySelector( ( select ) => ( state, url ) => {
+	return select( 'core/data' ).isResolving( REDUCER_KEY, 'getEmbedPreview', [ url ] );
 } );
 
 /**

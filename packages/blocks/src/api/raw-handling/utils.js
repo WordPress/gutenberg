@@ -7,11 +7,11 @@ import { mapValues, mergeWith, includes, noop } from 'lodash';
  * WordPress dependencies
  */
 import { unwrap, insertAfter, remove } from '@wordpress/dom';
-import { hasBlockSupport } from '..';
 
 /**
  * Internal dependencies
  */
+import { hasBlockSupport } from '..';
 import { isPhrasingContent } from './phrasing-content';
 
 /**
@@ -203,7 +203,9 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 					} );
 
 					// Strip invalid classes.
-					if ( node.classList.length ) {
+					// In jsdom-jscore, 'node.classList' can be undefined.
+					// TODO: Explore patching this in jsdom-jscore.
+					if ( node.classList && node.classList.length ) {
 						const mattchers = classes.map( ( item ) => {
 							if ( typeof item === 'string' ) {
 								return ( className ) => className === item;
