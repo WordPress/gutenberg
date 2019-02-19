@@ -98,7 +98,7 @@ class BlockDropZone extends Component {
 
 		if ( ! isBlockDropType( type ) ||
 			isSameBlock( srcClientId, dstClientId ) ||
-			isSrcBlockAnAncestorOfDstBlock( srcClientId, dstRootClientId ) ) {
+			isSrcBlockAnAncestorOfDstBlock( srcClientId, dstClientId || dstRootClientId ) ) {
 			return;
 		}
 
