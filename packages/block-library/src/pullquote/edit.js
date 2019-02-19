@@ -66,7 +66,7 @@ class PullQuoteEdit extends Component {
 		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
 
 		const figureStyles = isSolidColorStyle ?
-			{ backgroundColor: mainColor.class ? undefined : mainColor.color } :
+			{ backgroundColor: mainColor.color } :
 			{ borderColor: mainColor.color };
 
 		const figureClasses = classnames( className, {
@@ -75,13 +75,13 @@ class PullQuoteEdit extends Component {
 		} );
 
 		const blockquoteStyles = {
-			color: textColor.class ? undefined : textColor.color,
+			color: textColor.color,
 		};
 
-		const blockquoteClasses = textColor.color && classnames( {
-			'has-text-color': textColor.color,
-			[ textColor.class ]: textColor.class,
-		} );
+		const blockquoteClasses = textColor.color && classnames(
+			'has-text-color',
+			{ [ textColor.class ]: textColor.class }
+		);
 
 		return (
 			<Fragment>

@@ -137,7 +137,7 @@ class MediaTextEdit extends Component {
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 		const style = {
 			gridTemplateColumns: 'right' === mediaPosition ? `auto ${ widthString }` : `${ widthString } auto`,
-			backgroundColor: backgroundColor.class ? undefined : backgroundColor.color,
+			backgroundColor: backgroundColor.color,
 		};
 		const colorSettings = [ {
 			value: backgroundColor.color,
