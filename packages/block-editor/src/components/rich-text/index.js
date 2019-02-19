@@ -177,10 +177,10 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { formats, text } = this.formatToValue( this.props.value );
+		const { formats, lineFormats, objects, text } = this.formatToValue( this.props.value );
 		const { start, end, selectedFormat } = this.state;
 
-		return { formats, text, start, end, selectedFormat };
+		return { formats, lineFormats, objects, text, start, end, selectedFormat };
 	}
 
 	createRecord() {
@@ -394,7 +394,7 @@ export class RichText extends Component {
 		}
 
 		let { selectedFormat } = this.state;
-		const { formats, text, start, end } = this.createRecord();
+		const { formats, lineFormats, objects, text, start, end } = this.createRecord();
 
 		if ( this.formatPlaceholder ) {
 			formats[ this.state.start ] = formats[ this.state.start ] || [];
@@ -411,12 +411,13 @@ export class RichText extends Component {
 			}
 
 			source = source.slice( 0, selectedFormat );
+
 			formats[ this.state.start ] = source;
 		} else {
 			delete formats[ this.state.start ];
 		}
 
-		const change = { formats, text, start, end, selectedFormat };
+		const change = { formats, lineFormats, objects, text, start, end, selectedFormat };
 
 		this.onChange( change, {
 			withoutHistory: true,
