@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, View, KeyboardAvoidingView, Platform, PanResponder } from 'react-native';
+import { Text, View, KeyboardAvoidingView, Platform, PanResponder, Dimensions } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
 
@@ -125,6 +125,11 @@ class BottomSheet extends Component {
 	}
 }
 
+function getWidth() {
+	return Math.min( Dimensions.get( 'window' ).width, styles.background.maxWidth )
+}
+
+BottomSheet.getWidth = getWidth;
 BottomSheet.Button = Button;
 BottomSheet.Cell = Cell;
 BottomSheet.PickerCell = PickerCell;
