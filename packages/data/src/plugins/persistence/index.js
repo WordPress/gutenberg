@@ -181,13 +181,7 @@ export default function( registry, pluginOptions ) {
 					);
 				}
 
-				// Since it's otherwise not possible to assign an initial state
-				// to use for the store, emulate the behavior by assigning a
-				// higher-order reducer to use the persisted state as initial.
-				options = {
-					...options,
-					initialState,
-				};
+				options = { ...options, initialState };
 			}
 
 			const store = registry.registerStore( reducerKey, options );
