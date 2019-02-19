@@ -28,7 +28,7 @@ type PropsType = {
 	isReplacement: boolean,
 	onValueSelected: ( itemValue: string ) => void,
 	onDismiss: () => void,
-	safeAreaBottomInset: number,
+	addExtraBottomPadding: boolean,
 };
 
 export default class BlockPicker extends Component<PropsType> {
@@ -94,7 +94,3 @@ export default class BlockPicker extends Component<PropsType> {
 		return Math.floor( containerTotalWidth / itemTotalWidth );
 	}
 }
-
-BlockPicker.defaultProps = {
-	safeAreaBottomInset: 0,
-};
