@@ -61,17 +61,15 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 						className="components-color-palette__custom-color"
 						contentClassName="components-color-palette__picker"
 						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Tooltip text={ customColorPickerLabel }>
-								<Button
-									type="button"
-									aria-expanded={ isOpen }
-									onClick={ onToggle }
-									aria-label={ customColorPickerLabel }
-									isLink
-								>
-									{ __( 'Custom Color' ) }
-								</Button>
-							</Tooltip>
+							<Button
+								type="button"
+								aria-expanded={ isOpen }
+								onClick={ onToggle }
+								aria-label={ customColorPickerLabel }
+								isLink
+							>
+								{ __( 'Custom Color' ) }
+							</Button>
 						) }
 						renderContent={ () => (
 							<ColorPicker
