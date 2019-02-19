@@ -7,7 +7,7 @@
 * External dependencies
 */
 import React from 'react';
-import { FlatList, Text, TouchableHighlight, View, Dimensions } from 'react-native';
+import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 
 /**
 * WordPress dependencies
@@ -36,13 +36,13 @@ export default class BlockPicker extends Component<PropsType> {
 
 	render() {
 		const numberOfColumns = this.calculateNumberOfColumns();
-		const paddingBottom = this.paddingBottom();
+		const bottomPadding = this.props.addExtraBottomPadding && styles.contentBottomPadding;
 
 		return (
 			<BottomSheet
 				isVisible={ true }
 				onClose={ this.props.onDismiss }
-				contentStyle={ styles.content }
+				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
 			>
 				<FlatList
@@ -51,6 +51,9 @@ export default class BlockPicker extends Component<PropsType> {
 					keyboardShouldPersistTaps="always"
 					numColumns={ numberOfColumns }
 					data={ this.availableBlockTypes }
+					ItemSeparatorComponent={ () =>
+						<View style={ styles.rowSeparator } />
+					}
 					keyExtractor={ ( item ) => item.name }
 					renderItem={ ( { item } ) =>
 						<TouchableHighlight
@@ -71,13 +74,6 @@ export default class BlockPicker extends Component<PropsType> {
 				/>
 			</BottomSheet>
 		);
-	}
-
-	paddingBottom() {
-		if ( this.props.safeAreaBottomInset > 0 ) {
-			return this.props.safeAreaBottomInset - styles.modalItem.paddingBottom;
-		}
-		return styles.content.paddingBottom;
 	}
 
 	iconWithUpdatedFillColor( color: string, icon: SVG ) {
