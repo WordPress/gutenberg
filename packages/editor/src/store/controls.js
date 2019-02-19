@@ -6,24 +6,24 @@ import { createRegistryControl } from '@wordpress/data';
 /**
  * Calls a selector using the current state.
  *
- * @param {string} storeKey     Store key.
+ * @param {string} storeName    Store name.
  * @param {string} selectorName Selector name.
  * @param  {Array} args         Selector arguments.
  *
  * @return {Object} control descriptor.
  */
-export function select( storeKey, selectorName, ...args ) {
+export function select( storeName, selectorName, ...args ) {
 	return {
 		type: 'SELECT',
-		storeKey,
+		storeName,
 		selectorName,
 		args,
 	};
 }
 
 const controls = {
-	SELECT: createRegistryControl( ( registry ) => ( { storeKey, selectorName, args } ) => {
-		return registry.select( storeKey )[ selectorName ]( ...args );
+	SELECT: createRegistryControl( ( registry ) => ( { storeName, selectorName, args } ) => {
+		return registry.select( storeName )[ selectorName ]( ...args );
 	} ),
 };
 
