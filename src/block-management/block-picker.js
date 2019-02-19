@@ -42,7 +42,7 @@ export default class BlockPicker extends Component<PropsType> {
 			<BottomSheet
 				isVisible={ true }
 				onClose={ this.props.onDismiss }
-				contentStyle={ { paddingLeft: 0, paddingRight: 0 } }
+				contentStyle={ styles.content }
 				hideHeader
 			>
 				<FlatList
@@ -77,7 +77,7 @@ export default class BlockPicker extends Component<PropsType> {
 		if ( this.props.safeAreaBottomInset > 0 ) {
 			return this.props.safeAreaBottomInset - styles.modalItem.paddingBottom;
 		}
-		return styles.modalContent.paddingBottom;
+		return styles.content.paddingBottom;
 	}
 
 	iconWithUpdatedFillColor( color: string, icon: SVG ) {
@@ -89,12 +89,12 @@ export default class BlockPicker extends Component<PropsType> {
 	}
 
 	calculateNumberOfColumns() {
-		const windowWidth = Math.min(Dimensions.get( 'window' ).width, 512 );
+		const bottomSheetWidth = BottomSheet.getWidth();
 		const { paddingLeft: itemPaddingLeft, paddingRight: itemPaddingRight } = styles.modalItem;
-		const { paddingLeft: containerPaddingLeft, paddingRight: containerPaddingRight } = styles.modalContent;
+		const { paddingLeft: containerPaddingLeft, paddingRight: containerPaddingRight } = styles.content;
 		const { width: itemWidth } = styles.modalIconWrapper;
 		const itemTotalWidth = itemWidth + itemPaddingLeft + itemPaddingRight;
-		const containerTotalWidth = windowWidth - ( containerPaddingLeft + containerPaddingRight );
+		const containerTotalWidth = bottomSheetWidth - ( containerPaddingLeft + containerPaddingRight );
 		return Math.floor( containerTotalWidth / itemTotalWidth );
 	}
 }

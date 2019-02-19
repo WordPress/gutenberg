@@ -3,35 +3,14 @@
 @import '../variables.scss';
 @import './colors.scss';
 
-.shortLineStyle {
-	border-top-color: #e9eff3;
-	border-top-width: 4px;
-	border-radius: 4px 4px 4px 4px;
-	margin-bottom: 8px;
-	margin-top: 0px;
-	vertical-align: top;
-	width: 36px;
-	height: 4px;
-	align-self: center;
-}
-
-.bottomModal {
-	justify-content: flex-end;
-	margin: 0px;
-}
-
 .touchableArea {
 	border-radius: 8px 8px 8px 8px;
 }
 
-.modalContent {
+.content {
 	padding: 6px 0px 12px 0px;
 	align-items: center;
 	justify-content: space-evenly;	
-	border-radius: 10px 10px 0px 0px;
-	border-color: #e0e1e2;
-	border-width: 1px;
-	background-color: white;
 }
 
 .modalItem {	
