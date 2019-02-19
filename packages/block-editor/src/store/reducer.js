@@ -141,7 +141,65 @@ function getMutateSafeObject( original, working ) {
 }
 
 /**
- * Higher-order reducer targeting the combined editor reducer, augmenting
+ * Returns true if the two object arguments have the same keys, or false
+ * otherwise.
+ *
+ * @param {Object} a First object.
+ * @param {Object} b Second object.
+ *
+ * @return {boolean} Whether the two objects have the same keys.
+ */
+export function hasSameKeys( a, b ) {
+	return isEqual( Object.keys( a ), Object.keys( b ) );
+}
+
+/**
+ * Returns true if, given the currently dispatching action and the previously
+ * dispatched action, the two actions are updating the same block attribute, or
+ * false otherwise.
+ *
+ * @param {Object} action     Currently dispatching action.
+ * @param {Object} lastAction Previously dispatched action.
+ *
+ * @return {boolean} Whether actions are updating the same block attribute.
+ */
+export function isUpdatingSameBlockAttribute( action, lastAction ) {
+	return (
+		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+		action.clientId === lastAction.clientId &&
+		hasSameKeys( action.attributes, lastAction.attributes )
+	);
+}
+
+/**
+ * Higher-order reducer intended to augment the blocks reducer, assigning an
+ * `isPersistentChange` property value corresponding to whether a change in
+ * state can be considered as persistent. All changes are considered persistent
+ * except when updating the same block attribute as in the previous action.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+function withPersistentBlockChange( reducer ) {
+	let lastAction;
+
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
+		if ( state !== nextState ) {
+			nextState.isPersistentChange = (
+				! isUpdatingSameBlockAttribute( action, lastAction )
+			);
+		}
+
+		lastAction = action;
+
+		return nextState;
+	};
+}
+
+/**
+ * Higher-order reducer targeting the combined blocks reducer, augmenting
  * block client IDs in remove action to include cascade of inner blocks.
  *
  * @param {Function} reducer Original reducer function.
@@ -235,8 +293,7 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 };
 
 /**
- * Reducer returning the editor post state, including blocks parsed from
- * current HTML markup.
+ * Reducer returning the blocks state.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -248,6 +305,7 @@ export const blocks = flow(
 	withInnerBlocksRemoveCascade,
 	withBlockReset,
 	withSaveReusableBlock,
+	withPersistentBlockChange,
 )( {
 	byClientId( state = {}, action ) {
 		switch ( action.type ) {

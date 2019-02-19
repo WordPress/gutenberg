@@ -17,6 +17,8 @@ import {
  * Internal dependencies
  */
 import {
+	hasSameKeys,
+	isUpdatingSameBlockAttribute,
 	blocks,
 	isTyping,
 	isCaretWithinFormattedText,
@@ -29,6 +31,94 @@ import {
 } from '../reducer';
 
 describe( 'state', () => {
+	describe( 'hasSameKeys()', () => {
+		it( 'returns false if two objects do not have the same keys', () => {
+			const a = { foo: 10 };
+			const b = { bar: 10 };
+
+			expect( hasSameKeys( a, b ) ).toBe( false );
+		} );
+
+		it( 'returns false if two objects have the same keys', () => {
+			const a = { foo: 10 };
+			const b = { foo: 20 };
+
+			expect( hasSameKeys( a, b ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isUpdatingSameBlockAttribute()', () => {
+		it( 'should return false if not updating block attributes', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not updating the same block', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not updating the same block attributes', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					bar: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating the same block attributes', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'blocks()', () => {
 		beforeAll( () => {
 			registerBlockType( 'core/test-block', {
@@ -43,11 +133,15 @@ describe( 'state', () => {
 			unregisterBlockType( 'core/test-block' );
 		} );
 
-		it( 'should return empty edits, blocks by default', () => {
+		it( 'should return empty byClientId, attributes, order by default', () => {
 			const state = blocks( undefined, {} );
 
-			expect( state.byClientId ).toEqual( {} );
-			expect( state.order ).toEqual( {} );
+			expect( state ).toEqual( {
+				byClientId: {},
+				attributes: {},
+				order: {},
+				isPersistentChange: true,
+			} );
 		} );
 
 		it( 'should key by reset blocks clientId', () => {
@@ -919,6 +1013,53 @@ describe( 'state', () => {
 					} );
 
 					expect( state.attributes ).toBe( state.attributes );
+				} );
+			} );
+
+			describe( 'isPersistentChange', () => {
+				it( 'should consider any non-exempt block change as persistent', () => {
+					const original = deepFreeze( blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [],
+					} ) );
+
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.isPersistentChange ).toBe( true );
+				} );
+
+				it( 'should consider same block attribute update as exempt', () => {
+					const original = deepFreeze( blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ {
+							clientId: 'kumquat',
+							attributes: {},
+							innerBlocks: [],
+						} ],
+					} ) );
+					let state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: false,
+						},
+					} );
+
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.isPersistentChange ).toBe( false );
 				} );
 			} );
 		} );

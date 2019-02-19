@@ -1347,6 +1347,19 @@ export function getEditorSettings( state ) {
 }
 
 /**
+ * Returns true if the most recent block change is be considered persistent, or
+ * false otherwise. A persistent change is one committed by BlockEditorProvider
+ * via its `onChange` callback, in addition to `onInput`.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {boolean} Whether the most recent block change was persistent.
+ */
+export function isLastBlockChangePersistent( state ) {
+	return state.blocks.isPersistentChange;
+}
+
+/**
  * Returns the value of a post meta from the editor settings.
  *
  * @param {Object} state Global application state.
