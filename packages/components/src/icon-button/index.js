@@ -45,7 +45,7 @@ class IconButton extends Component {
 
 		let element = (
 			<Button aria-label={ label } { ...additionalProps } className={ classes }>
-				{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } color={ additionalProps.color } /> : icon }
+				{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } style={ additionalProps.style } /> : icon }
 				{ children }
 			</Button>
 		);
