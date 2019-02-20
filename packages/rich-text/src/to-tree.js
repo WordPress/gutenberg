@@ -124,6 +124,15 @@ export function toTree( {
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
+		const shouldInsertPadding = isEditableTree && (
+			// Pad the line if the line is empty.
+			! lastCharacter ||
+			lastCharacter === LINE_SEPARATOR ||
+			// Pad the line if the previous character is a line break, otherwise
+			// the line break won't be visible.
+			lastCharacter === '\n'
+		);
+
 		let characterFormats = formats[ i ];
 
 		// Set multiline tags in queue for building the tree.
@@ -144,21 +153,15 @@ export function toTree( {
 
 		let pointer = getLastChild( tree );
 
-		if ( isEditableTree && character === LINE_SEPARATOR ) {
+		if ( shouldInsertPadding && character === LINE_SEPARATOR ) {
 			let node = pointer;
 
 			while ( ! isText( node ) ) {
 				node = getLastChild( node );
 			}
 
-			if (
-				! lastCharacter ||
-				lastCharacter === LINE_SEPARATOR ||
-				lastCharacter === '\n'
-			) {
-				append( getParent( node ), padding );
-				append( getParent( node ), '' );
-			}
+			append( getParent( node ), padding );
+			append( getParent( node ), '' );
 		}
 
 		// Set selection for the start of line.
@@ -257,11 +260,7 @@ export function toTree( {
 			onEndIndex( tree, pointer );
 		}
 
-		if ( i === text.length && isEditableTree && (
-			! lastCharacter ||
-			lastCharacter === LINE_SEPARATOR ||
-			lastCharacter === '\n'
-		) ) {
+		if ( shouldInsertPadding && i === text.length ) {
 			append( getParent( pointer ), padding );
 		}
 
