@@ -51,8 +51,11 @@
 	}
 
 	&__settings {
-		padding: 7px 8px;
+		padding: $panel-padding;
 		border-top: $border-width solid $light-gray-500;
-		padding-top: 7px + $border-width;
+
+		.components-base-control:last-child .components-base-control__field {
+			margin-bottom: 0;
+		}
 	}
 }
