@@ -67,6 +67,19 @@ export const toBooleanAttributeMatcher = ( matcher ) => flow( [
 ] );
 
 /**
+ * Higher-order hpq matcher which enhances an attribute matcher to return a
+ * number.
+ *
+ * @param {Function} matcher Original hpq matcher.
+ *
+ * @return {Function} Enhanced hpq matcher.
+ */
+export const toNumberAttributeMatcher = ( matcher ) => flow( [
+	matcher,
+	( value ) => Number( value ) || 0,
+] );
+
+/**
  * Returns true if value is of the given JSON schema type, or false otherwise.
  *
  * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
@@ -189,8 +202,15 @@ export function matcherFromSource( sourceConfig ) {
 	switch ( sourceConfig.source ) {
 		case 'attribute':
 			let matcher = attr( sourceConfig.selector, sourceConfig.attribute );
-			if ( sourceConfig.type === 'boolean' ) {
-				matcher = toBooleanAttributeMatcher( matcher );
+
+			switch ( sourceConfig.type ) {
+				case 'boolean':
+					matcher = toBooleanAttributeMatcher( matcher );
+					break;
+				case 'integer':
+				case 'number':
+					matcher = toNumberAttributeMatcher( matcher );
+					break;
 			}
 
 			return matcher;
