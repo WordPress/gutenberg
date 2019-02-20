@@ -56,8 +56,8 @@ class PostTitle extends Component {
 				} ] }
 				fontSize={ 24 }
 				fontWeight={ 'bold' }
-				onChange={ ( event ) => {
-					this.props.onUpdate( event.content );
+				onChange={ ( value ) => {
+					this.props.onUpdate( value );
 				} }
 				onContentSizeChange={ ( event ) => {
 					this.setState( { aztecHeight: event.aztecHeight } );
