@@ -44,6 +44,13 @@ export default function( babel ) {
 		visitor: {
 			JSXElement( path, state ) {
 				state.hasJSX = true;
+				if ( state.hasUndeclaredScopeVariable ) {
+					return;
+				}
+
+				const { scopeVariable } = getOptions( state );
+
+				state.hasUndeclaredScopeVariable = ! path.scope.hasBinding( scopeVariable );
 			},
 			ImportDeclaration( path, state ) {
 				if ( state.hasImportedScopeVariable ) {
@@ -69,18 +76,9 @@ export default function( babel ) {
 					}
 				} );
 			},
-			VariableDeclaration( path, state ) {
-				if ( state.hasDeclaredScopeVariable ) {
-					return;
-				}
-
-				const { scopeVariable } = getOptions( state );
-
-				state.hasDeclaredScopeVariable = ! path.scope.parent && path.scope.hasOwnBinding( scopeVariable );
-			},
 			Program: {
 				exit( path, state ) {
-					if ( ! state.hasJSX || state.hasImportedScopeVariable || state.hasDeclaredScopeVariable ) {
+					if ( ! state.hasJSX || state.hasImportedScopeVariable || ! state.hasUndeclaredScopeVariable ) {
 						return;
 					}
 
