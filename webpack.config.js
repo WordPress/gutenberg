@@ -48,7 +48,6 @@ const gutenbergPackages = Object.keys( dependencies )
 const externals = {
 	react: 'React',
 	'react-dom': 'ReactDOM',
-	tinymce: 'tinymce',
 	moment: 'moment',
 	jquery: 'jQuery',
 	lodash: 'lodash',
