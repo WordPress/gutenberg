@@ -33,7 +33,8 @@ export class Input extends Component {
 		onChange( {
 			source,
 			state: 'commit',
-			[ valueKey ]: value,
+			value,
+			valueKey,
 		} );
 	}
 
@@ -43,13 +44,15 @@ export class Input extends Component {
 			onChange( {
 				source,
 				state: 'commit',
-				[ valueKey ]: value,
+				value,
+				valueKey,
 			} );
 		} else {
 			onChange( {
 				source,
 				state: 'draft',
-				[ valueKey ]: value,
+				value,
+				valueKey,
 			} );
 		}
 	}
@@ -62,7 +65,8 @@ export class Input extends Component {
 		onChange( {
 			source,
 			state: 'commit',
-			[ valueKey ]: value,
+			value,
+			valueKey,
 		} );
 	}
 
@@ -93,13 +97,8 @@ export class Inputs extends Component {
 
 		this.toggleViews = this.toggleViews.bind( this );
 		this.resetDraftValues = this.resetDraftValues.bind( this );
-		this.handleHEXChange = this.handleHEXChange.bind( this );
-		this.handleRChange = this.handleRChange.bind( this );
-		this.handleGChange = this.handleGChange.bind( this );
-		this.handleBChange = this.handleBChange.bind( this );
-		this.handleHChange = this.handleHChange.bind( this );
-		this.handleSChange = this.handleSChange.bind( this );
-		this.handleLChange = this.handleLChange.bind( this );
+		this.handleChange = this.handleChange.bind( this );
+		this.normalizeValue = this.normalizeValue.bind( this );
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -137,88 +136,25 @@ export class Inputs extends Component {
 		} );
 	}
 
-	handleHEXChange( data ) {
-		this.props.onChange( {
-			source: data.source,
-			state: data.state,
-			hex: data.hex,
-		} );
-	}
-
-	handleRChange( data ) {
-		this.props.onChange( {
-			source: data.source,
-			state: data.state,
-			r: data.r,
-			g: this.props.rgb.g,
-			b: this.props.rgb.b,
-		} );
-	}
-
-	handleGChange( data ) {
-		this.props.onChange( {
-			source: data.source,
-			state: data.state,
-			r: this.props.rgb.r,
-			g: data.g,
-			b: this.props.rgb.b,
-		} );
-	}
-
-	handleBChange( data ) {
-		this.props.onChange( {
-			source: data.source,
-			state: data.state,
-			r: this.props.rgb.r,
-			g: this.props.rgb.g,
-			b: data.b,
-		} );
-	}
-
-	handleAChange( data ) {
-		if ( data.a < 0 ) {
-			data.a = 0;
-		} else if ( data.a > 1 ) {
-			data.a = 1;
+	normalizeValue( valueKey, value ) {
+		if ( valueKey !== 'a' ) {
+			return value;
 		}
 
-		this.props.onChange( {
-			source: data.source,
-			state: data.state,
-			h: this.props.hsl.h,
-			s: this.props.hsl.s,
-			l: this.props.hsl.l,
-			a: Math.round( data.a * 100 ) / 100,
-		} );
+		if ( value > 0 ) {
+			return 0;
+		} else if ( value > 1 ) {
+			return 1;
+		}
+		return Math.round( value * 100 ) / 100;
 	}
 
-	handleHChange( data ) {
+	handleChange( { source, state, value, valueKey } ) {
 		this.props.onChange( {
-			source: data.source,
-			state: data.state,
-			h: data.h,
-			s: this.props.hsl.s,
-			l: this.props.hsl.l,
-		} );
-	}
-
-	handleSChange( data ) {
-		this.props.onChange( {
-			source: data.source,
-			state: data.state,
-			h: this.props.hsl.h,
-			s: data.s,
-			l: this.props.hsl.l,
-		} );
-	}
-
-	handleLChange( data ) {
-		this.props.onChange( {
-			source: data.source,
-			state: data.state,
-			h: this.props.hsl.h,
-			s: this.props.hsl.s,
-			l: data.l,
+			source,
+			state,
+			valueKey,
+			value: this.normalizeValue( valueKey, value ),
 		} );
 	}
 
@@ -232,7 +168,7 @@ export class Inputs extends Component {
 						label={ __( 'Color value in hexadecimal' ) }
 						valueKey="hex"
 						value={ this.props.hex }
-						onChange={ this.handleHEXChange }
+						onChange={ this.handleChange }
 					/>
 				</div>
 			);
@@ -248,7 +184,7 @@ export class Inputs extends Component {
 							label="r"
 							valueKey="r"
 							value={ this.props.rgb.r }
-							onChange={ this.handleRChange }
+							onChange={ this.handleChange }
 							type="number"
 							min="0"
 							max="255"
@@ -258,7 +194,7 @@ export class Inputs extends Component {
 							label="g"
 							valueKey="g"
 							value={ this.props.rgb.g }
-							onChange={ this.handleGChange }
+							onChange={ this.handleChange }
 							type="number"
 							min="0"
 							max="255"
@@ -268,7 +204,7 @@ export class Inputs extends Component {
 							label="b"
 							valueKey="b"
 							value={ this.props.rgb.b }
-							onChange={ this.handleBChange }
+							onChange={ this.handleChange }
 							type="number"
 							min="0"
 							max="255"
@@ -279,7 +215,7 @@ export class Inputs extends Component {
 								label="a"
 								valueKey="a"
 								value={ this.props.rgb.a }
-								onChange={ this.handleAChange }
+								onChange={ this.handleChange }
 								type="number"
 								min="0"
 								max="1"
@@ -301,7 +237,7 @@ export class Inputs extends Component {
 							label="h"
 							valueKey="h"
 							value={ this.props.hsl.h }
-							onChange={ this.handleHChange }
+							onChange={ this.handleChange }
 							type="number"
 							min="0"
 							max="359"
@@ -311,7 +247,7 @@ export class Inputs extends Component {
 							label="s"
 							valueKey="s"
 							value={ this.props.hsl.s }
-							onChange={ this.handleSChange }
+							onChange={ this.handleChange }
 							type="number"
 							min="0"
 							max="100"
@@ -321,7 +257,7 @@ export class Inputs extends Component {
 							label="l"
 							valueKey="l"
 							value={ this.props.hsl.l }
-							onChange={ this.handleLChange }
+							onChange={ this.handleChange }
 							type="number"
 							min="0"
 							max="100"
@@ -332,7 +268,7 @@ export class Inputs extends Component {
 								label="a"
 								valueKey="a"
 								value={ this.props.hsl.a }
-								onChange={ this.handleAChange }
+								onChange={ this.handleChange }
 								type="number"
 								min="0"
 								max="1"
