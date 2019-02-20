@@ -749,6 +749,20 @@ Returns the editor settings.
 
 The editor settings object.
 
+### isLastBlockChangePersistent
+
+Returns true if the most recent block change is be considered persistent, or
+false otherwise. A persistent change is one committed by BlockEditorProvider
+via its `onChange` callback, in addition to `onInput`.
+
+*Parameters*
+
+ * state: Block editor state.
+
+*Returns*
+
+Whether the most recent block change was persistent.
+
 ## Actions
 
 ### resetBlocks
