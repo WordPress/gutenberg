@@ -29,11 +29,13 @@ class PostTitle extends Component {
 
 	onSelect() {
 		this.setState( { isSelected: true } );
+		this.props.onFocusStatusChange( true )
 		this.props.clearSelectedBlock();
 	}
 
 	onUnselect() {
 		this.setState( { isSelected: false } );
+		this.props.onFocusStatusChange( false );
 	}
 
 	render() {
