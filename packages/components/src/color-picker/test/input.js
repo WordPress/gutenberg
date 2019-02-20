@@ -1,6 +1,17 @@
+/**
+ * External dependencies
+ */
 import TestRenderer from 'react-test-renderer';
-import { Input } from '../inputs';
+
+/**
+ * WordPress dependencies
+ */
 import { DOWN, ENTER, SPACE, UP } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import { Input } from '../inputs';
 
 describe( 'Input ', () => {
 	describe( 'calls onChange prop with commit state', () => {
