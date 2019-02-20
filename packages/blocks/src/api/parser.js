@@ -39,10 +39,11 @@ const STRING_SOURCES = new Set( [
 
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
- * or false depending on whether the original matcher returns undefined. This
- * is useful for boolean attributes (e.g. disabled) whose attribute values may
- * be technically falsey (empty string), though their mere presence should be
- * enough to infer as true.
+ * or false depending on whether the original matcher returns undefined or the
+ * "false" string. This is useful for boolean attributes (e.g. disabled) whose
+ * attribute values may be technically falsey (empty string), though their
+ * mere presence should be enough to infer as true. It's also useful for those
+ * boolean attributes whose value is either "true" or "false".
  *
  * @param {Function} matcher Original hpq matcher.
  *
@@ -63,7 +64,7 @@ export const toBooleanAttributeMatcher = ( matcher ) => flow( [
 	// <input disabled="disabled">
 	// - Value:       `'disabled'`
 	// - Transformed: `true`
-	( value ) => value !== undefined,
+	( value ) => value !== undefined && value !== 'false',
 ] );
 
 /**
