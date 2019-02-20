@@ -366,7 +366,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		if ( event ) {
+		if ( event && event.nativeEvent.inputType ) {
 			const { inputType } = event.nativeEvent;
 
 			// The browser formatted something or tried to insert HTML.
