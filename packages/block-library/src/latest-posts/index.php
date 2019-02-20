@@ -35,8 +35,15 @@ function render_block_core_latest_posts( $attributes ) {
 		if ( ! $title ) {
 			$title = __( '(Untitled)' );
 		}
+
+		$list_items_markup .= "<li>\n";
+
+		if( isset( $attributes['displayPostFeaturedImage'] ) && $attributes['displayPostFeaturedImage']) {
+			$list_items_markup .= get_the_post_thumbnail( $post_id, 'medium', array( 'class' => 'wp-block-latest-posts__post-featured-image' ) );
+		}
+
 		$list_items_markup .= sprintf(
-			'<li><a href="%1$s">%2$s</a>',
+			'<a href="%1$s">%2$s</a>',
 			esc_url( get_permalink( $post_id ) ),
 			esc_html( $title )
 		);
@@ -107,6 +114,10 @@ function register_block_core_latest_posts() {
 				'postsToShow'     => array(
 					'type'    => 'number',
 					'default' => 5,
+				),
+				'displayPostFeaturedImage' => array(
+					'type'    => 'boolean',
+					'default' => false,
 				),
 				'displayPostDate' => array(
 					'type'    => 'boolean',

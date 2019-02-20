@@ -78,7 +78,7 @@ class LatestPostsEdit extends Component {
 	render() {
 		const { attributes, setAttributes, latestPosts } = this.props;
 		const { categoriesList } = this.state;
-		const { displayPostDate, displayPostAuthor, align, postLayout, columns, order, orderBy, categories, postsToShow } = attributes;
+		const { displayPostFeaturedImage, displayPostDate, displayPostAuthor, align, postLayout, columns, order, orderBy, categories, postsToShow } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -95,6 +95,14 @@ class LatestPostsEdit extends Component {
 							max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
 						/>
 					}
+				</PanelBody>
+
+				<PanelBody title={ __( 'Featured Image Settings' ) }>
+					<ToggleControl
+						label={ __( 'Featured image' ) }
+						checked={ displayPostFeaturedImage }
+						onChange={ ( value ) => this.updateAttribute( 'displayPostFeaturedImage', value ) }
+					/>
 				</PanelBody>
 
 				<PanelBody title={ __( 'Post Meta Settings' ) }>
@@ -189,6 +197,13 @@ class LatestPostsEdit extends Component {
 				>
 					{ displayPosts.map( ( post, i ) =>
 						<li key={ i }>
+							{ displayPostFeaturedImage && post._embedded[ 'wp:featuredmedia' ] &&
+								<img
+									alt={ post._embedded[ 'wp:featuredmedia' ][ 0 ].title.rendered }
+									src={ post._embedded[ 'wp:featuredmedia' ][ 0 ].source_url }
+									className="wp-block-latest-posts__post-featured-image"
+								/>
+							}
 							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
 							{ displayPostDate && post.date_gmt &&
 								<time dateTime={ format( 'c', post.date_gmt ) } className="wp-block-latest-posts__post-date">
