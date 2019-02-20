@@ -8,7 +8,7 @@ import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 
-const minHeight = 53;
+const minHeight = 30;
 
 class PostTitle extends Component {
 	constructor() {
