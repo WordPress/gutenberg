@@ -36,6 +36,7 @@ export const settings = {
 	attributes: {
 		backgroundColor: {
 			type: 'string',
+			default: 'primary',
 		},
 		hasPadding: {
 			type: 'boolean',
