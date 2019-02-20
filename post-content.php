@@ -180,5 +180,5 @@ https://vimeo.com/22439234
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"center"} -->
-<p style="text-align:center"><img draggable="false" class="emoji" alt="👋" src="https://s.w.org/images/core/emoji/2.3/svg/1f44b.svg" /></p>
+<p style="text-align:center">👋</p>
 <!-- /wp:paragraph -->
