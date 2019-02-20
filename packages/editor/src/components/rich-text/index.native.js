@@ -500,6 +500,7 @@ export class RichText extends Component {
 						}
 					} }
 					text={ { text: html, eventCount: this.lastEventCount } }
+					selection={ { selectionStart: this.state.start, selectionEnd: this.state.end, eventCount: this.lastEventCount } }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'editor-rich-text' ].textDecorationColor }
 					onChange={ this.onChange }
