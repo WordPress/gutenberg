@@ -29,22 +29,25 @@ export class Input extends Component {
 	}
 
 	handleBlur() {
-		const { value, valueKey, onChange } = this.props;
+		const { value, valueKey, onChange, source } = this.props;
 		onChange( {
+			source,
 			state: 'commit',
 			[ valueKey ]: value,
 		} );
 	}
 
 	handleChange( value ) {
-		const { valueKey, onChange } = this.props;
+		const { valueKey, onChange, source } = this.props;
 		if ( value.length > 4 && isValidHex( value ) ) {
 			onChange( {
+				source,
 				state: 'commit',
 				[ valueKey ]: value,
 			} );
 		} else {
 			onChange( {
+				source,
 				state: 'draft',
 				[ valueKey ]: value,
 			} );
@@ -55,8 +58,9 @@ export class Input extends Component {
 		if ( keyCode !== ENTER && keyCode !== UP && keyCode !== DOWN ) {
 			return;
 		}
-		const { value, valueKey, onChange } = this.props;
+		const { value, valueKey, onChange, source } = this.props;
 		onChange( {
+			source,
 			state: 'commit',
 			[ valueKey ]: value,
 		} );
@@ -72,7 +76,7 @@ export class Input extends Component {
 				onChange={ ( newValue ) => this.handleChange( newValue ) }
 				onBlur={ this.handleBlur }
 				onKeyDown={ this.handleKeyDown }
-				{ ...omit( props, [ 'onChange', 'valueKey' ] ) }
+				{ ...omit( props, [ 'onChange', 'valueKey', 'source' ] ) }
 			/>
 		);
 	}
@@ -135,39 +139,39 @@ export class Inputs extends Component {
 
 	handleHEXChange( data ) {
 		this.props.onChange( {
-			hex: data.hex,
-			source: 'hex',
+			source: data.source,
 			state: data.state,
+			hex: data.hex,
 		} );
 	}
 
 	handleRChange( data ) {
 		this.props.onChange( {
+			source: data.source,
+			state: data.state,
 			r: data.r,
 			g: this.props.rgb.g,
 			b: this.props.rgb.b,
-			source: 'rgb',
-			state: data.state,
 		} );
 	}
 
 	handleGChange( data ) {
 		this.props.onChange( {
+			source: data.source,
+			state: data.state,
 			r: this.props.rgb.r,
 			g: data.g,
 			b: this.props.rgb.b,
-			source: 'rgb',
-			state: data.state,
 		} );
 	}
 
 	handleBChange( data ) {
 		this.props.onChange( {
+			source: data.source,
+			state: data.state,
 			r: this.props.rgb.r,
 			g: this.props.rgb.g,
 			b: data.b,
-			source: 'rgb',
-			state: data.state,
 		} );
 	}
 
@@ -179,42 +183,42 @@ export class Inputs extends Component {
 		}
 
 		this.props.onChange( {
+			source: data.source,
+			state: data.state,
 			h: this.props.hsl.h,
 			s: this.props.hsl.s,
 			l: this.props.hsl.l,
 			a: Math.round( data.a * 100 ) / 100,
-			source: 'rgb',
-			state: data.state,
 		} );
 	}
 
 	handleHChange( data ) {
 		this.props.onChange( {
+			source: data.source,
+			state: data.state,
 			h: data.h,
 			s: this.props.hsl.s,
 			l: this.props.hsl.l,
-			source: 'hsl',
-			state: data.state,
 		} );
 	}
 
 	handleSChange( data ) {
 		this.props.onChange( {
+			source: data.source,
+			state: data.state,
 			h: this.props.hsl.h,
 			s: data.s,
 			l: this.props.hsl.l,
-			source: 'hsl',
-			state: data.state,
 		} );
 	}
 
 	handleLChange( data ) {
 		this.props.onChange( {
+			source: data.source,
+			state: data.state,
 			h: this.props.hsl.h,
 			s: this.props.hsl.s,
 			l: data.l,
-			source: 'hsl',
-			state: data.state,
 		} );
 	}
 
@@ -224,6 +228,7 @@ export class Inputs extends Component {
 			return (
 				<div className="components-color-picker__inputs-fields">
 					<Input
+						source={ this.state.view }
 						label={ __( 'Color value in hexadecimal' ) }
 						valueKey="hex"
 						value={ this.props.hex }
@@ -239,6 +244,7 @@ export class Inputs extends Component {
 					</legend>
 					<div className="components-color-picker__inputs-fields">
 						<Input
+							source={ this.state.view }
 							label="r"
 							valueKey="r"
 							value={ this.props.rgb.r }
@@ -248,6 +254,7 @@ export class Inputs extends Component {
 							max="255"
 						/>
 						<Input
+							source={ this.state.view }
 							label="g"
 							valueKey="g"
 							value={ this.props.rgb.g }
@@ -257,6 +264,7 @@ export class Inputs extends Component {
 							max="255"
 						/>
 						<Input
+							source={ this.state.view }
 							label="b"
 							valueKey="b"
 							value={ this.props.rgb.b }
@@ -267,6 +275,7 @@ export class Inputs extends Component {
 						/>
 						{ disableAlpha ? null : (
 							<Input
+								source={ this.state.view }
 								label="a"
 								valueKey="a"
 								value={ this.props.rgb.a }
@@ -288,6 +297,7 @@ export class Inputs extends Component {
 					</legend>
 					<div className="components-color-picker__inputs-fields">
 						<Input
+							source={ this.state.view }
 							label="h"
 							valueKey="h"
 							value={ this.props.hsl.h }
@@ -297,6 +307,7 @@ export class Inputs extends Component {
 							max="359"
 						/>
 						<Input
+							source={ this.state.view }
 							label="s"
 							valueKey="s"
 							value={ this.props.hsl.s }
@@ -306,6 +317,7 @@ export class Inputs extends Component {
 							max="100"
 						/>
 						<Input
+							source={ this.state.view }
 							label="l"
 							valueKey="l"
 							value={ this.props.hsl.l }
@@ -316,6 +328,7 @@ export class Inputs extends Component {
 						/>
 						{ disableAlpha ? null : (
 							<Input
+								source={ this.state.view }
 								label="a"
 								valueKey="a"
 								value={ this.props.hsl.a }
