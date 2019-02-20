@@ -42,7 +42,7 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
           className="screen-reader-text"
           id="color-picker-saturation-2"
         >
-          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to increase saturation, and right to decrease saturation.
+          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
         </div>
       </div>
     </div>
@@ -215,7 +215,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
           className="screen-reader-text"
           id="color-picker-saturation-4"
         >
-          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to increase saturation, and right to decrease saturation.
+          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
         </div>
       </div>
     </div>
@@ -388,7 +388,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
           className="screen-reader-text"
           id="color-picker-saturation-5"
         >
-          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to increase saturation, and right to decrease saturation.
+          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
         </div>
       </div>
     </div>
@@ -561,7 +561,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
           className="screen-reader-text"
           id="color-picker-saturation-3"
         >
-          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to increase saturation, and right to decrease saturation.
+          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
         </div>
       </div>
     </div>
@@ -734,7 +734,7 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
           className="screen-reader-text"
           id="color-picker-saturation-1"
         >
-          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to increase saturation, and right to decrease saturation.
+          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
         </div>
       </div>
     </div>
@@ -907,7 +907,7 @@ exports[`ColorPicker should render color picker 1`] = `
           className="screen-reader-text"
           id="color-picker-saturation-0"
         >
-          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to increase saturation, and right to decrease saturation.
+          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
         </div>
       </div>
     </div>

@@ -19,6 +19,7 @@ describe( 'Input ', () => {
 			const onChange = jest.fn();
 			const testInstance = TestRenderer.create(
 				<Input
+					source="rgb"
 					label={ 'Color value in hexadecimal' }
 					valueKey="hex"
 					value={ '#fff' }
@@ -28,8 +29,10 @@ describe( 'Input ', () => {
 			testInstance.findByType( 'input' ).props.onKeyDown( { keyCode: ENTER } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
+				source: 'rgb',
 				state: 'commit',
-				hex: '#fff',
+				value: '#fff',
+				valueKey: 'hex',
 			} );
 		} );
 
@@ -37,6 +40,7 @@ describe( 'Input ', () => {
 			const onChange = jest.fn();
 			const testInstance = TestRenderer.create(
 				<Input
+					source="rgb"
 					label={ 'Color value in hexadecimal' }
 					valueKey="hex"
 					value={ '#fff' }
@@ -46,8 +50,10 @@ describe( 'Input ', () => {
 			testInstance.findByType( 'input' ).props.onKeyDown( { keyCode: UP } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
+				source: 'rgb',
 				state: 'commit',
-				hex: '#fff',
+				value: '#fff',
+				valueKey: 'hex',
 			} );
 		} );
 
@@ -55,6 +61,7 @@ describe( 'Input ', () => {
 			const onChange = jest.fn();
 			const testInstance = TestRenderer.create(
 				<Input
+					source="rgb"
 					label={ 'Color value in hexadecimal' }
 					valueKey="hex"
 					value={ '#fff' }
@@ -64,8 +71,10 @@ describe( 'Input ', () => {
 			testInstance.findByType( 'input' ).props.onKeyDown( { keyCode: DOWN } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
+				source: 'rgb',
 				state: 'commit',
-				hex: '#fff',
+				value: '#fff',
+				valueKey: 'hex',
 			} );
 		} );
 
@@ -73,6 +82,7 @@ describe( 'Input ', () => {
 			const onChange = jest.fn();
 			const testInstance = TestRenderer.create(
 				<Input
+					source="rgb"
 					label={ 'Color value in hexadecimal' }
 					valueKey="hex"
 					value={ '#fff' }
@@ -82,8 +92,10 @@ describe( 'Input ', () => {
 			testInstance.findByType( 'input' ).props.onChange( { target: { value: '#aaaaaa' } } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
+				source: 'rgb',
 				state: 'commit',
-				hex: '#aaaaaa',
+				value: '#aaaaaa',
+				valueKey: 'hex',
 			} );
 		} );
 
@@ -91,6 +103,7 @@ describe( 'Input ', () => {
 			const onChange = jest.fn();
 			const testInstance = TestRenderer.create(
 				<Input
+					source="rgb"
 					label={ 'Color value in hexadecimal' }
 					valueKey="hex"
 					value={ '#fff' }
@@ -100,8 +113,10 @@ describe( 'Input ', () => {
 			testInstance.findByType( 'input' ).props.onBlur();
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
+				source: 'rgb',
 				state: 'commit',
-				hex: '#fff',
+				value: '#fff',
+				valueKey: 'hex',
 			} );
 		} );
 	} );
@@ -111,6 +126,7 @@ describe( 'Input ', () => {
 			const onChange = jest.fn();
 			const testInstance = TestRenderer.create(
 				<Input
+					source="rgb"
 					label={ 'Color value in hexadecimal' }
 					valueKey="hex"
 					value={ '#fff' }
@@ -120,8 +136,10 @@ describe( 'Input ', () => {
 			testInstance.findByType( 'input' ).props.onChange( { target: { value: '#aaaaa' } } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
+				source: 'rgb',
 				state: 'draft',
-				hex: '#aaaaa',
+				value: '#aaaaa',
+				valueKey: 'hex',
 			} );
 		} );
 	} );
