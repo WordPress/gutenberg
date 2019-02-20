@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { Switch } from 'react-native';
+import { Switch, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -128,7 +128,7 @@ class ModalLinkUI extends Component {
 						autoCorrect={ false }
 						textContentType="URL"
 						onChangeValue={ this.onChangeInputValue }
-						autoFocus
+						autoFocus={ Platform.OS === 'ios' }
 					/>
 				/* eslint-enable jsx-a11y/no-autofocus */ }
 				<BottomSheet.Cell
