@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/editor';
-import { BaseControl, PanelBody, ResizableBox, G, SVG, Path } from '@wordpress/components';
+import { PanelBody, ResizableBox, NumberControl, G, SVG, Path } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 
 export const name = 'core/spacer';
@@ -68,20 +68,18 @@ export const settings = {
 					/>
 					<InspectorControls>
 						<PanelBody title={ __( 'Spacer Settings' ) }>
-							<BaseControl label={ __( 'Height in pixels' ) } id={ id }>
-								<input
-									type="number"
-									id={ id }
-									onChange={ ( event ) => {
-										setAttributes( {
-											height: parseInt( event.target.value, 10 ),
-										} );
-									} }
-									value={ height }
-									min="20"
-									step="10"
-								/>
-							</BaseControl>
+							<NumberControl
+								id={ id }
+								onChange={ ( onChange ) => {
+									setAttributes( {
+										height: parseInt( onChange, 10 ),
+									} );
+								} }
+								label={ __( 'Height in pixels' ) }
+								value={ height }
+								min="20"
+								step="10"
+							/>
 						</PanelBody>
 					</InspectorControls>
 				</Fragment>
