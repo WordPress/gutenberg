@@ -86,9 +86,7 @@ export const settings = {
 			[ `are-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
 		} );
 
-		const onChange = ( alignment ) => {
-			setAttributes( { verticalAlignment: alignment } );
-		};
+		const onChange = ( alignment ) => setAttributes( { verticalAlignment: alignment } );
 
 		return (
 			<Fragment>
