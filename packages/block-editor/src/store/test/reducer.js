@@ -50,12 +50,28 @@ describe( 'state', () => {
 	describe( 'isUpdatingSameBlockAttribute()', () => {
 		it( 'should return false if not updating block attributes', () => {
 			const action = {
-				type: 'EDIT_POST',
-				edits: {},
+				type: 'SELECT_BLOCK',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			};
 			const previousAction = {
-				type: 'EDIT_POST',
-				edits: {},
+				type: 'SELECT_BLOCK',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if last action was not updating block attributes', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'SELECT_BLOCK',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			};
 
 			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
