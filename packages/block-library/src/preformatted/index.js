@@ -68,7 +68,7 @@ export const settings = {
 		return (
 			<RichText
 				tagName="pre"
-				value={ content }
+				value={ content.replace( /\n/g, '<br>' ) }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
 						content: nextContent,
