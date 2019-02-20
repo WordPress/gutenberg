@@ -125,7 +125,7 @@ class ParagraphEdit extends Component {
 					onContentSizeChange={ ( event ) => {
 						this.setState( { aztecHeight: event.aztecHeight } );
 					} }
-					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+					placeholder={ placeholder || __( 'Start writing…' ) }
 				/>
 			</View>
 		);
