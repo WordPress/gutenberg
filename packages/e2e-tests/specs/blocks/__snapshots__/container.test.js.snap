@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Container can be created by using the block inserter 1`] = `
+"<!-- wp:container -->
+<div class=\\"wp-block-container has-primary-background-color has-background\\"><!-- wp:paragraph -->
+<p>Container block</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:container -->"
+`;
