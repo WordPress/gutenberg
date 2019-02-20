@@ -49,8 +49,10 @@ The granular rulesets will not define any environment globals. As such, if they 
 
 Rule|Description
 ---|---
-[no-unused-vars-before-return](/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)|Disallow assigning variable values if unused before a return
 [dependency-group](/packages/eslint-plugin/docs/rules/dependency-group.md)|Enforce dependencies docblocks formatting
+[gutenberg-phase](docs/rules/gutenberg-phase.md)|Governs the use of the `process.env.GUTENBERG_PHASE` constant
+[no-unused-vars-before-return](/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)|Disallow assigning variable values if unused before a return
+[valid-sprintf](/packages/eslint-plugin/docs/rules/valid-sprintf.md)|Disallow assigning variable values if unused before a return
 
 ### Legacy
 

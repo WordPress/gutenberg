@@ -5,7 +5,7 @@ import {
 	activatePlugin,
 	createNewPost,
 	deactivatePlugin,
-	findSidebarPanelWithTitle,
+	findSidebarPanelToggleButtonWithTitle,
 	insertBlock,
 	openDocumentSettingsSidebar,
 	publishPost,
@@ -98,7 +98,7 @@ describe( 'Meta boxes', () => {
 
 		// Open the excerpt panel
 		await openDocumentSettingsSidebar();
-		const excerptButton = await findSidebarPanelWithTitle( 'Excerpt' );
+		const excerptButton = await findSidebarPanelToggleButtonWithTitle( 'Excerpt' );
 		if ( excerptButton ) {
 			await excerptButton.click( 'button' );
 		}

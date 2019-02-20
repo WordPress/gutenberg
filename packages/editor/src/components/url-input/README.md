@@ -131,6 +131,10 @@ Renders the URL input field used by the `URLInputButton` component. It can be us
 
 If you are not conditionally rendering this component set this property to `false`.
 
+### `className: String`
+
+*Optional.* Adds and optional class to the parent `div` that wraps the URLInput field and popover
+
 ## Example
 
 {% codetabs %}

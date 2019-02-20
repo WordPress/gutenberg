@@ -8,7 +8,7 @@ import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 
-const minHeight = 53;
+const minHeight = 30;
 
 class PostTitle extends Component {
 	constructor() {
@@ -48,7 +48,6 @@ class PostTitle extends Component {
 		return (
 			<RichText
 				tagName={ 'p' }
-				rootTagsToEliminate={ [ 'strong' ] }
 				onFocus={ this.onSelect }
 				onBlur={ this.props.onBlur } // always assign onBlur as a props
 				multiline={ false }
@@ -66,6 +65,7 @@ class PostTitle extends Component {
 				placeholder={ decodedPlaceholder }
 				value={ title }
 				onSplit={ this.props.onEnterPress }
+				setRef={ this.props.setRef }
 			>
 			</RichText>
 		);

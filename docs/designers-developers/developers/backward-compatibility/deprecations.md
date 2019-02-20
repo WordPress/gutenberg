@@ -7,6 +7,8 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 - The PHP function `gutenberg_redirect_to_classic_editor_when_saving_posts` has been removed.
 - The PHP function `gutenberg_revisions_link_to_editor` has been removed.
 - The PHP function `gutenberg_remember_classic_editor_when_saving_posts` has been removed.
+- The PHP function `gutenberg_can_edit_post_type` has been removed. Use [`use_block_editor_for_post_type`](https://developer.wordpress.org/reference/functions/use_block_editor_for_post_type/) instead.
+- The PHP function `gutenberg_can_edit_post` has been removed. Use [`use_block_editor_for_post`](https://developer.wordpress.org/reference/functions/use_block_editor_for_post/) instead.
 
 ## 5.2.0
 

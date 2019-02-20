@@ -1,5 +1,5 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import { castArray } from 'lodash';
 
@@ -7,6 +7,11 @@ import { castArray } from 'lodash';
  * WordPress dependencies
  */
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { select } from './controls';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
@@ -170,6 +175,38 @@ export function selectBlock( clientId, initialPosition = null ) {
 		initialPosition,
 		clientId,
 	};
+}
+
+/**
+ * Yields action objects used in signalling that the block preceding the given
+ * clientId should be selected.
+ *
+ * @param {string} clientId Block client ID.
+ */
+export function* selectPreviousBlock( clientId ) {
+	const previousBlockClientId = yield select(
+		'core/editor',
+		'getPreviousBlockClientId',
+		clientId
+	);
+
+	yield selectBlock( previousBlockClientId, -1 );
+}
+
+/**
+ * Yields action objects used in signalling that the block following the given
+ * clientId should be selected.
+ *
+ * @param {string} clientId Block client ID.
+ */
+export function* selectNextBlock( clientId ) {
+	const nextBlockClientId = yield select(
+		'core/editor',
+		'getNextBlockClientId',
+		clientId
+	);
+
+	yield selectBlock( nextBlockClientId );
 }
 
 export function startMultiSelect() {
@@ -477,20 +514,23 @@ export function createUndoLevel() {
 }
 
 /**
- * Returns an action object used in signalling that the blocks corresponding to
+ * Yields action objects used in signalling that the blocks corresponding to
  * the set of specified client IDs are to be removed.
  *
  * @param {string|string[]} clientIds      Client IDs of blocks to remove.
  * @param {boolean}         selectPrevious True if the previous block should be
  *                                         selected when a block is removed.
- *
- * @return {Object} Action object.
  */
-export function removeBlocks( clientIds, selectPrevious = true ) {
-	return {
+export function* removeBlocks( clientIds, selectPrevious = true ) {
+	clientIds = castArray( clientIds );
+
+	if ( selectPrevious ) {
+		yield selectPreviousBlock( clientIds[ 0 ] );
+	}
+
+	yield {
 		type: 'REMOVE_BLOCKS',
-		clientIds: castArray( clientIds ),
-		selectPrevious,
+		clientIds,
 	};
 }
 
