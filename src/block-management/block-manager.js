@@ -184,7 +184,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					} }
 					title={ this.props.title }
 					onUpdate={ this.props.setTitleAction }
-					placeholder={ 'Add a Title' } />
+					placeholder={ __( 'Add title' ) } />
 			</View>
 		);
 	}
