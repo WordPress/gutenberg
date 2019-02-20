@@ -68,11 +68,11 @@ export default class ColorPicker extends Component {
 			draftRgb: colors.rgb,
 			draftHsl: colors.hsl,
 		};
-		this.handleChange = this.handleChange.bind( this );
+		this.commitValues = this.commitValues.bind( this );
 		this.handleInputChange = this.handleInputChange.bind( this );
 	}
 
-	handleChange( data ) {
+	commitValues( data ) {
 		const { oldHue, onChangeComplete = noop } = this.props;
 		const isValid = ! isValueEmpty( data ) && isValidColor( data );
 		if ( isValid ) {
@@ -96,7 +96,7 @@ export default class ColorPicker extends Component {
 				draftRgb: this.state.rgb,
 			} );
 		} else if ( data.state === 'commit' ) {
-			this.handleChange( data );
+			this.commitValues( data );
 		} else if ( data.state === 'draft' ) {
 			if ( data.source === 'hex' ) {
 				this.setState( {
@@ -147,7 +147,7 @@ export default class ColorPicker extends Component {
 					<Saturation
 						hsl={ hsl }
 						hsv={ hsv }
-						onChange={ this.handleChange }
+						onChange={ this.commitValues }
 					/>
 				</div>
 
@@ -163,12 +163,12 @@ export default class ColorPicker extends Component {
 						</div>
 
 						<div className="components-color-picker__toggles">
-							<Hue hsl={ hsl } onChange={ this.handleChange } />
+							<Hue hsl={ hsl } onChange={ this.commitValues } />
 							{ disableAlpha ? null : (
 								<Alpha
 									rgb={ rgb }
 									hsl={ hsl }
-									onChange={ this.handleChange }
+									onChange={ this.commitValues }
 								/>
 							) }
 						</div>
