@@ -51,7 +51,7 @@ export class BlockToolbar extends Component<PropsType> {
 							label={ __( 'Add block' ) }
 							icon="plus-alt"
 							onClick={ onInsertClick }
-							extraProps={ styles.addBlockButton }
+							extraProps={ { style: styles.addBlockButton } }
 						/>
 						<ToolbarButton
 							label={ __( 'Undo' ) }
