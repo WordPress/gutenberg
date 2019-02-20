@@ -132,7 +132,9 @@ exports[`recordToDom should filter format boundary attributes 1`] = `
 exports[`recordToDom should handle br 1`] = `
 <body>
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
   <br
     data-rich-text-padding="true"
@@ -146,7 +148,9 @@ exports[`recordToDom should handle br with formatting 1`] = `
     data-rich-text-format-boundary="true"
   >
     
-    <br />
+    <br
+      data-rich-text-line-break="true"
+    />
     
   </em>
   
@@ -159,7 +163,9 @@ exports[`recordToDom should handle br with formatting 1`] = `
 exports[`recordToDom should handle br with text 1`] = `
 <body>
   te
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   st
 </body>
 `;
@@ -167,9 +173,13 @@ exports[`recordToDom should handle br with text 1`] = `
 exports[`recordToDom should handle double br 1`] = `
 <body>
   a
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   b
 </body>
 `;
@@ -303,9 +313,13 @@ exports[`recordToDom should handle nested empty list value 1`] = `
 exports[`recordToDom should handle selection before br 1`] = `
 <body>
   a
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   b
 </body>
 `;

@@ -108,6 +108,7 @@ export function create( {
 	range,
 	multilineTag,
 	multilineWrapperTags,
+	isEditableTree,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -128,6 +129,7 @@ export function create( {
 		return createFromElement( {
 			element,
 			range,
+			isEditableTree,
 		} );
 	}
 
@@ -136,6 +138,7 @@ export function create( {
 		range,
 		multilineTag,
 		multilineWrapperTags,
+		isEditableTree,
 	} );
 }
 
@@ -257,6 +260,7 @@ function createFromElement( {
 	multilineTag,
 	multilineWrapperTags,
 	currentWrapperTags = [],
+	isEditableTree,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -291,7 +295,10 @@ function createFromElement( {
 			continue;
 		}
 
-		if ( node.getAttribute( 'data-rich-text-padding' ) ) {
+		if (
+			node.getAttribute( 'data-rich-text-padding' ) ||
+			( isEditableTree && type === 'br' && ! node.getAttribute( 'data-rich-text-line-break' ) )
+		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
 		}
@@ -433,30 +440,13 @@ function createFromMultilineElement( {
 			continue;
 		}
 
-		let value = createFromElement( {
+		const value = createFromElement( {
 			element: node,
 			range,
 			multilineTag,
 			multilineWrapperTags,
 			currentWrapperTags,
 		} );
-
-		// If a line consists of one single line break (invisible), consider the
-		// line empty, wether this is the browser's doing or not.
-		if ( value.text === '\n' ) {
-			const start = value.start;
-			const end = value.end;
-
-			value = createEmptyValue();
-
-			if ( start !== undefined ) {
-				value.start = 0;
-			}
-
-			if ( end !== undefined ) {
-				value.end = 0;
-			}
-		}
 
 		// Multiline value text should be separated by a double line break.
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
@@ -495,7 +485,7 @@ function getAttributes( { element } ) {
 	for ( let i = 0; i < length; i++ ) {
 		const { name, value } = element.attributes[ i ];
 
-		if ( name === 'data-rich-text-format-boundary' ) {
+		if ( name.indexOf( 'data-rich-text-' ) === 0 ) {
 			continue;
 		}
 

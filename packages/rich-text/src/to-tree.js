@@ -242,7 +242,13 @@ export function toTree( {
 
 		if ( character !== OBJECT_REPLACEMENT_CHARACTER ) {
 			if ( character === '\n' ) {
-				pointer = append( getParent( pointer ), { type: 'br', object: true } );
+				pointer = append( getParent( pointer ), {
+					type: 'br',
+					attributes: isEditableTree ? {
+						'data-rich-text-line-break': 'true',
+					} : undefined,
+					object: true,
+				} );
 				// Ensure pointer is text node.
 				pointer = append( getParent( pointer ), '' );
 			} else if ( ! isText( pointer ) ) {
