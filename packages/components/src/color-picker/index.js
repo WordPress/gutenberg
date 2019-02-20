@@ -129,12 +129,16 @@ export default class ColorPicker extends Component {
 	}
 
 	handleInputChange( data ) {
-		if ( data.state === 'reset' ) {
-			this.resetDraftValues();
-		} else if ( data.state === 'commit' ) {
-			this.commitValues( data );
-		} else if ( data.state === 'draft' ) {
-			this.setDraftValues( data );
+		switch ( data.state ) {
+			case 'reset':
+				this.resetDraftValues();
+				break;
+			case 'commit':
+				this.commitValues( data );
+				break;
+			case 'draft':
+				this.setDraftValues( data );
+				break;
 		}
 	}
 
