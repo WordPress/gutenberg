@@ -7,11 +7,6 @@ import {
 } from '@wordpress/editor';
 
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * Given an HTML string for a deprecated columns inner block, returns the
  * column index to which the migrated inner block should be assigned. Returns
  * undefined if the inner block was not assigned to a column.
@@ -92,15 +87,10 @@ export default [
 			];
 		},
 		save( { attributes } ) {
-			const { columns, verticalAlignment } = attributes;
-
-			const wrapperClasses = classnames( {
-				[ `has-${ columns }-columns` ]: true,
-				[ `is-aligned-${ verticalAlignment }` ]: true,
-			} );
+			const { columns } = attributes;
 
 			return (
-				<div className={ wrapperClasses }>
+				<div className={ `has-${ columns }-columns` }>
 					<InnerBlocks.Content />
 				</div>
 			);
