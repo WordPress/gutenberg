@@ -57,7 +57,7 @@ Example:
 /**
  * External dependencies
  */
-import TinyMCE from 'tinymce';
+import moment from 'moment';
 ```
 
 #### WordPress Dependencies
@@ -142,7 +142,7 @@ const name = 'Matt';
 
 // Bad:
 const pet = 'Matt\'s dog';
-// Also bad (not using an apostrophe): 
+// Also bad (not using an apostrophe):
 const pet = "Matt's dog";
 // Good:
 const pet = 'Matt’s dog';
