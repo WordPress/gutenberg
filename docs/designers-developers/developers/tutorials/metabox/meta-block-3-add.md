@@ -16,22 +16,22 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 ( function( wp ) {
 	var el = wp.element.createElement;
 	var registerBlockType = wp.blocks.registerBlockType;
-	var TextField = wp.components.TextControl;
+	var TextControl = wp.components.TextControl;
 
-	registerBlockType("myguten/meta-block", {
-		title: "Meta Block",
-		icon: "smiley",
-		category: "common",
+	registerBlockType( 'myguten/meta-block', {
+		title: 'Meta Block',
+		icon: 'smiley',
+		category: 'common',
 
 		attributes: {
 			blockValue: {
-				type: "string",
-				source: "meta",
-				meta: "myguten_meta_block_field"
+				type: 'string',
+				source: 'meta',
+				meta: 'myguten_meta_block_field'
 			}
 		},
 
-		edit: function(props) {
+		edit: function( props ) {
 			var className = props.className;
 			var setAttributes = props.setAttributes;
 
@@ -39,11 +39,11 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 				setAttributes({ blockValue });
 			}
 
-		return el(
-				"div",
+			return el(
+				'div',
 				{ className: className },
-				el( TextField, {
-					label: "Meta Block Field",
+				el( TextControl, {
+					label: 'Meta Block Field',
 					value: props.attributes.blockValue,
 					onChange: updateBlockValue
 				} )
@@ -55,38 +55,38 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 		save: function() {
 			return null;
 		}
-	});
-})( window.wp );
+	} );
+} )( window.wp );
 ```
 {% ESNext %}
 ```jsx
 const { registerBlockType } = wp.blocks;
-const TextField = wp.components.TextControl;
+const { TextControl } = wp.components;
 
-registerBlockType("myguten/meta-block", {
-	title: "Meta Block",
-	icon: "smiley",
-	category: "common",
+registerBlockType( 'myguten/meta-block', {
+	title: 'Meta Block',
+	icon: 'smiley',
+	category: 'common',
 
 	attributes: {
 		blockValue: {
-			type: "string",
-			source: "meta",
-			meta: "myguten_meta_block_field"
-		}
+			type: 'string',
+			source: 'meta',
+			meta: 'myguten_meta_block_field',
+		},
 	},
 
 	edit( { className, setAttributes, attributes } ) {
 
 		function updateBlockValue( blockValue ) {
-			setAttributes({ blockValue });
+			setAttributes( { blockValue } );
 		}
 
 		return (
 			<div className={ className }>
-				<TextField
+				<TextControl
 					label="Meta Block Field"
-					value={ attributes }
+					value={ attributes.blockValue }
 					onChange={ updateBlockValue }
 				/>
 			</div>
@@ -98,7 +98,7 @@ registerBlockType("myguten/meta-block", {
 	save() {
 		return null;
 	}
-});
+} );
 ```
 {% end %}
 
