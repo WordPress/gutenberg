@@ -77,7 +77,26 @@ export const toBooleanAttributeMatcher = ( matcher ) => flow( [
  */
 export const toNumberAttributeMatcher = ( matcher ) => flow( [
 	matcher,
-	( value ) => Number( value ) || 0,
+	// <input>
+	// - Value: `undefined`
+	// - Transformed: `undefined`
+	//
+	// <input data-number>
+	// - Value: `''`
+	// - Transformed: `undefined`
+	//
+	// <input data-number="10">
+	// - Value: `'10'`
+	// - Transformed: `10`
+	//
+	// <input data-number="2.5">
+	// - Value: `'2.5'`
+	// - Transformed: `2.5`
+	//
+	// <input data-number="not-a-number">
+	// - Value: `'not-a-number'`
+	// - Transformed: `undefined`
+	( value ) => isNaN( Number( value ) ) ? undefined : Number( value ),
 ] );
 
 /**

@@ -290,7 +290,26 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'getBlockAttributes()', () => {
-		it( 'should reject the value with a wrong type', () => {
+		it( 'should reject a number attribute with a wrong value', () => {
+			const blockType = {
+				attributes: {
+					number: {
+						type: 'number',
+						source: 'attribute',
+						attribute: 'data-number',
+						selector: 'div',
+					},
+				},
+			};
+
+			const innerHTML = '<div data-number="not-a-number">Ribs</div>';
+
+			expect( getBlockAttributes( blockType, innerHTML, {} ) ).toEqual( {
+				number: undefined,
+			} );
+		} );
+
+		it( 'should accept a number value as an HTML attribute', () => {
 			const blockType = {
 				attributes: {
 					number: {
@@ -305,7 +324,7 @@ describe( 'block parser', () => {
 			const innerHTML = '<div data-number="10">Ribs</div>';
 
 			expect( getBlockAttributes( blockType, innerHTML, {} ) ).toEqual( {
-				number: undefined,
+				number: 10,
 			} );
 		} );
 
