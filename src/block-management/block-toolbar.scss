@@ -1,3 +1,5 @@
+@import './colors.scss';
+
 .container {
     height: 44;
     flex-direction: row;
@@ -17,4 +19,8 @@
     width: 44;
     justify-content: center;
     align-items: center;
+}
+
+.addBlockButton {
+    color: $blue-wordpress;
 }
