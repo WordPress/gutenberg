@@ -188,6 +188,11 @@ body.block-editor-page {
 		}
 	}
 
+	input[type="number"] {
+		padding-left: 4px;
+		padding-right: 4px;
+	}
+
 	select {
 		padding: 2px;
 

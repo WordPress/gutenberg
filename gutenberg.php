@@ -76,6 +76,15 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
+	add_submenu_page(
+		'gutenberg',
+		__( 'Widgets (beta)', 'gutenberg' ),
+		__( 'Widgets (beta)', 'gutenberg' ),
+		'edit_theme_options',
+		'gutenberg-widgets',
+		'the_gutenberg_widgets'
+	);
+
 	if ( current_user_can( 'edit_posts' ) ) {
 		$submenu['gutenberg'][] = array(
 			__( 'Support', 'gutenberg' ),

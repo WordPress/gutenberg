@@ -67,6 +67,7 @@ class ImageEdit extends React.Component {
 		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
@@ -106,7 +107,7 @@ class ImageEdit extends React.Component {
 
 		switch ( payload.state ) {
 			case MEDIA_UPLOAD_STATE_UPLOADING:
-				this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
+				this.updateMediaProgress( payload );
 				break;
 			case MEDIA_UPLOAD_STATE_SUCCEEDED:
 				this.finishMediaUploadWithSuccess( payload );
@@ -117,6 +118,14 @@ class ImageEdit extends React.Component {
 			case MEDIA_UPLOAD_STATE_RESET:
 				this.mediaUploadStateReset( payload );
 				break;
+		}
+	}
+
+	updateMediaProgress( payload ) {
+		const { setAttributes } = this.props;
+		this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
+		if ( payload.mediaUrl !== undefined ) {
+			setAttributes( { url: payload.mediaUrl } );
 		}
 	}
 
@@ -144,6 +153,10 @@ class ImageEdit extends React.Component {
 	}
 
 	addMediaUploadListener() {
+		//if we already have a subscription not worth doing it again
+		if ( this.subscriptionParentMediaUpload ) {
+			return;
+		}
 		this.subscriptionParentMediaUpload = subscribeMediaUpload( ( payload ) => {
 			this.mediaUpload( payload );
 		} );
@@ -180,9 +193,9 @@ class ImageEdit extends React.Component {
 
 	getMediaOptionsItems() {
 		return [
-			{ icon: 'wordpress-alt', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
+			{ icon: 'format-image', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
 			{ icon: 'camera', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO, label: __( 'Take a Photo' ) },
-			{ icon: 'format-image', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
+			{ icon: 'wordpress-alt', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
 		];
 	}
 
@@ -260,12 +273,13 @@ class ImageEdit extends React.Component {
 					label={ __( 'Alt Text' ) }
 					value={ alt || '' }
 					valuePlaceholder={ __( 'None' ) }
+					separatorType={ 'fullWidth' }
 					onChangeValue={ this.updateAlt }
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Clear All Settings' ) }
 					labelStyle={ styles.clearSettingsButton }
-					drawSeparator={ false }
+					separatorType={ 'none' }
 					onPress={ this.onClearSettings }
 				/>
 			</BottomSheet>
@@ -325,6 +339,14 @@ class ImageEdit extends React.Component {
 								imageWidthWithinContainer,
 								imageHeightWithinContainer,
 							} = sizes;
+
+							if ( imageWidthWithinContainer === undefined ) {
+								return (
+									<View style={ styles.imageContainer } >
+										<Dashicon icon={ 'format-image' } size={ 300 } />
+									</View>
+								);
+							}
 
 							let finalHeight = imageHeightWithinContainer;
 							if ( height > 0 && height < imageHeightWithinContainer ) {

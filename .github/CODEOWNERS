@@ -18,6 +18,9 @@
 /packages/list-reusable-blocks                  @youknowriad @aduth @noisysocks
 /packages/shortcode                             @youknowriad @aduth
 
+# Widgets
+/packages/edit-widgets                          @youknowriad
+
 # Tooling
 /bin                                            @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
@@ -67,8 +70,8 @@
 
 # Rich Text
 /packages/format-library                        @youknowriad @gziolo @aduth @iseulde @jorgefilipecosta
-/packages/rich-text                             @youknowriad @gziolo @aduth @iseulde @jorgefilipecosta
-/packages/editor/src/components/rich-text       @youknowriad @gziolo @aduth @iseulde @jorgefilipecosta
+/packages/rich-text                             @youknowriad @aduth @iseulde @jorgefilipecosta
+/packages/editor/src/components/rich-text       @youknowriad @aduth @iseulde @jorgefilipecosta
 
 # PHP
 /lib                                            @youknowriad @gziolo @aduth
