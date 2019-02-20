@@ -2,15 +2,14 @@
  * External dependencies
  */
 import React from 'react';
-import { Switch, Text, TextInput, View } from 'react-native';
-import Modal from 'react-native-modal';
+import { Switch } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { URLInput, BottomSheet } from '@wordpress/editor';
+import { BottomSheet } from '@wordpress/editor';
 import { prependHTTP } from '@wordpress/url';
 import {
 	withSpokenMessages,
@@ -28,12 +27,11 @@ import {
  * Internal dependencies
  */
 import { createLinkFormat, isValidHref } from './utils';
-import Button from './button';
 
 import styles from './modal.scss';
 
 class ModalLinkUI extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 
 		this.submitLink = this.submitLink.bind( this );
@@ -54,11 +52,11 @@ class ModalLinkUI extends Component {
 			return;
 		}
 
-		this.setState({
+		this.setState( {
 			inputValue: this.props.activeAttributes.url || '',
 			text: getTextContent( slice( this.props.value ) ),
 			opensInNewWindow: false,
-		})
+		} );
 	}
 
 	onChangeInputValue( inputValue ) {
@@ -120,17 +118,19 @@ class ModalLinkUI extends Component {
 				onClose={ this.submitLink }
 				hideHeader
 			>
-				<BottomSheet.Cell
-					icon={ 'admin-links' }
-					label={ __( 'URL' ) }
-					value={ this.state.inputValue }
-					placeholder={ __( 'Add URL' ) }
-					autoCapitalize="none"
-					autoCorrect={ false }
-					textContentType="URL"
-					onChangeValue={ this.onChangeInputValue }
-					autoFocus
-				/>
+				{ /* eslint-disable jsx-a11y/no-autofocus */
+					<BottomSheet.Cell
+						icon={ 'admin-links' }
+						label={ __( 'URL' ) }
+						value={ this.state.inputValue }
+						placeholder={ __( 'Add URL' ) }
+						autoCapitalize="none"
+						autoCorrect={ false }
+						textContentType="URL"
+						onChangeValue={ this.onChangeInputValue }
+						autoFocus
+					/>
+				/* eslint-enable jsx-a11y/no-autofocus */ }
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
 					label={ __( 'Link Text' ) }
