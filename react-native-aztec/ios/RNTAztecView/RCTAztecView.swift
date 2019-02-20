@@ -258,8 +258,11 @@ class RCTAztecView: Aztec.TextView {
         
         if let selectedTextRange = selectedTextRange {
             let caretEndRect = caretRect(for: selectedTextRange.end)
-            result["selectionEndCaretX"] = caretEndRect.origin.x
-            result["selectionEndCaretY"] = caretEndRect.origin.y
+            // Sergio Estevao: Sometimes the carectRect can be invalid so we need to check before sending this to JS.
+            if !(caretEndRect.isInfinite || caretEndRect.isEmpty || caretEndRect.isNull) {
+                result["selectionEndCaretX"] = caretEndRect.origin.x
+                result["selectionEndCaretY"] = caretEndRect.origin.y
+            }
         }
 
         return result
