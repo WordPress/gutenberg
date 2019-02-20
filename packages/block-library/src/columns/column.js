@@ -9,12 +9,7 @@ import { isNil } from 'lodash';
  */
 import { Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InnerBlocks, BlockControls } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import VAlignToolbar from './VAlignToolbar';
+import { InnerBlocks, BlockControls, BlockVerticalAlignmentToolbar } from '@wordpress/block-editor';
 
 export const name = 'core/column';
 
@@ -49,22 +44,14 @@ export const settings = {
 			[ `is-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
 		} );
 
-		const onSelection = ( alignment ) => {
-			// If the current alignment is selected again we can assume it is an attempt to toggle
-			// the alignment value "off" for that setting so we reset alignment state to null
-			if ( alignment === verticalAlignment ) {
-				alignment = null;
-			}
-
-			setAttributes( { verticalAlignment: alignment } );
-		};
+		const onChange = ( alignment ) => setAttributes( { verticalAlignment: alignment } );
 
 		return (
 			<div className={ classes }>
 				<BlockControls>
-					<VAlignToolbar
-						onSelection={ onSelection }
-						alignment={ verticalAlignment }
+					<BlockVerticalAlignmentToolbar
+						onChange={ onChange }
+						value={ verticalAlignment }
 					/>
 				</BlockControls>
 				<InnerBlocks templateLock={ false } />

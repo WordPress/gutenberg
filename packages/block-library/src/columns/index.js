@@ -21,12 +21,12 @@ import {
 	InspectorControls,
 	InnerBlocks,
 	BlockControls,
+	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import VAlignToolbar from './VAlignToolbar';
 import deprecated from './deprecated';
 
 /**
@@ -86,13 +86,7 @@ export const settings = {
 			[ `are-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
 		} );
 
-		const onSelection = ( alignment ) => {
-			// If the current alignment is selected again we can assume it is an attempt to toggle
-			// the alignment value "off" for that setting so we reset alignment state to null
-			if ( alignment === attributes.verticalAlignment ) {
-				alignment = null;
-			}
-
+		const onChange = ( alignment ) => {
 			setAttributes( { verticalAlignment: alignment } );
 		};
 
@@ -115,9 +109,9 @@ export const settings = {
 					</PanelBody>
 				</InspectorControls>
 				<BlockControls>
-					<VAlignToolbar
-						onSelection={ onSelection }
-						alignment={ verticalAlignment }
+					<BlockVerticalAlignmentToolbar
+						onChange={ onChange }
+						value={ verticalAlignment }
 					/>
 				</BlockControls>
 				<div className={ classes }>
