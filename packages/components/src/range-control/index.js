@@ -89,10 +89,9 @@ function RangeControl( {
 				max={ max }
 				{ ...props } />
 			{ afterIcon && <Dashicon icon={ afterIcon } /> }
-
 			<NumberControl
 				className="components-range-control__number"
-				onChange={ onChangeValue }
+				onChange={ onChange }
 				aria-label={ label }
 				value={ currentInputValue }
 				min={ min }

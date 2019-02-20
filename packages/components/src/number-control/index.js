@@ -18,11 +18,13 @@ function NumberControl( {
 	label,
 	value,
 	instanceId,
+	id = `inspector-number-control-${ instanceId }`,
 	onChange,
 	help,
+	numberUnit,
 	...props
 } ) {
-	const id = `inspector-number-control-${ instanceId }`;
+	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 
 	return (
 		<BaseControl
@@ -35,11 +37,15 @@ function NumberControl( {
 				className="components-number-control__input"
 				id={ id }
 				type="number"
-				onChange={ onChange }
-				aria-label={ label }
+				onChange={ onChangeValue }
 				value={ value }
+				aria-label={ id ? undefined : label }
 				{ ...props }
 			/>
+
+			{ numberUnit && (
+				<span className="components-number-control__unit">{ numberUnit }</span>
+			) }
 		</BaseControl>
 	);
 }

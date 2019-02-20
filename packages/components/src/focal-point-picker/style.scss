@@ -59,6 +59,8 @@
 .components-focal-point-picker_position-display-container {
 	margin: 1em 0;
 	display: flex;
+	justify-content: space-around;
+	text-align: center;
 
 	.components-base-control__field {
 		margin: 0 1em 0 0;

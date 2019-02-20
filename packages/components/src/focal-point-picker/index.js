@@ -118,11 +118,11 @@ export class FocalPointPicker extends Component {
 	fractionToPercentage( fraction ) {
 		return Math.round( fraction * 100 );
 	}
-	horizontalPositionChanged( event ) {
-		this.positionChangeFromTextControl( 'x', event.target.value );
+	horizontalPositionChanged( value ) {
+		this.positionChangeFromTextControl( 'x', value );
 	}
-	verticalPositionChanged( event ) {
-		this.positionChangeFromTextControl( 'y', event.target.value );
+	verticalPositionChanged( value ) {
+		this.positionChangeFromTextControl( 'y', value );
 	}
 	positionChangeFromTextControl( axis, value ) {
 		const { onChange } = this.props;
@@ -176,8 +176,6 @@ export class FocalPointPicker extends Component {
 			isDragging ? 'is-dragging' : null
 		);
 		const id = `inspector-focal-point-picker-control-${ instanceId }`;
-		const horizontalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
-		const verticalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
 		return (
 			<BaseControl label={ label } id={ id } help={ help } className={ className }>
 				<div className="components-focal-point-picker-wrapper">
@@ -218,32 +216,24 @@ export class FocalPointPicker extends Component {
 					</div>
 				</div>
 				<div className="components-focal-point-picker_position-display-container">
-					<BaseControl label={ __( 'Horizontal Pos.' ) }>
-						<NumberControl
-							className="components-focal-point-control__number"
-							id={ horizontalPositionId }
-							max={ TEXTCONTROL_MAX }
-							min={ TEXTCONTROL_MIN }
-							aria-label={ label }
-							value={ this.fractionToPercentage( percentages.x ) }
-							onChange={ this.horizontalPositionChanged }
-						/>
-
-						<span>%</span>
-					</BaseControl>
-					<BaseControl label={ __( 'Vertical Pos.' ) }>
-						<NumberControl
-							className="components-focal-point-control__number"
-							id={ verticalPositionId }
-							max={ TEXTCONTROL_MAX }
-							min={ TEXTCONTROL_MIN }
-							aria-label={ label }
-							value={ this.fractionToPercentage( percentages.y ) }
-							onChange={ this.verticalPositionChanged }
-						/>
-
-						<span>%</span>
-					</BaseControl>
+					<NumberControl
+						label={ __( 'Horizontal Pos.' ) }
+						className="components-focal-point-control__number"
+						max={ TEXTCONTROL_MAX }
+						min={ TEXTCONTROL_MIN }
+						onChange={ this.horizontalPositionChanged }
+						value={ this.fractionToPercentage( percentages.x ) }
+						numberUnit="%"
+					/>
+					<NumberControl
+						label={ __( 'Vertical Pos.' ) }
+						className="components-focal-point-control__number"
+						max={ TEXTCONTROL_MAX }
+						min={ TEXTCONTROL_MIN }
+						onChange={ this.verticalPositionChanged }
+						value={ this.fractionToPercentage( percentages.y ) }
+						numberUnit="%"
+					/>
 				</div>
 			</BaseControl>
 		);

@@ -1,8 +1,8 @@
-input.components-number-control__input {
+.components-number-control__input[type="number"] {
 	display: inline-block;
-	font-weight: 500;
 	height: 30px;
-	width: 54px;
+	width: 100%;
+	max-width: 54px;
 }
 
 .components-number-control.components-number-control.components-number-control.components-number-control.components-number-control {
@@ -13,6 +13,7 @@ input.components-number-control__input {
 	margin: 0;
 }
 
-.components-number-control {
-	display: inline-flex;
+.components-number-control__unit {
+	display: inline-block;
+	margin-left: 2px;
 }

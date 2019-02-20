@@ -30,14 +30,6 @@ function FontSizePicker( {
 	if ( disableCustomFontSizes && ! fontSizes.length ) {
 		return null;
 	}
-	const onChangeValue = ( event ) => {
-		const newValue = event.target.value;
-		if ( newValue === '' ) {
-			onChange( undefined );
-			return;
-		}
-		onChange( Number( newValue ) );
-	};
 
 	const currentFont = fontSizes.find( ( font ) => font.size === value );
 	const currentFontSizeName = ( currentFont && currentFont.name ) || ( ! value && _x( 'Normal', 'font size name' ) ) || _x( 'Custom', 'font size name' );
@@ -90,10 +82,9 @@ function FontSizePicker( {
 				}
 				{ ( ! withSlider && ! disableCustomFontSizes ) &&
 					<NumberControl
-						className="components-font-size-control__number"
 						aria-label={ __( 'Custom font size' ) }
 						value={ value || '' }
-						onChange={ onChangeValue }
+						onChange={ onChange }
 					/>
 				}
 				<Button
