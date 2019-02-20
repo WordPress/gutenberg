@@ -69,6 +69,21 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
 const { getSelection } = window;
 
+/**
+ * All inserting input types that would insert HTML into the DOM.
+ *
+ * @see  https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
+ *
+ * @type {Set}
+ */
+const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
+	'insertParagraph',
+	'insertOrderedList',
+	'insertUnorderedList',
+	'insertHorizontalRule',
+	'insertLink',
+] );
+
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
 		super( ...arguments );
@@ -354,12 +369,12 @@ export class RichText extends Component {
 		if ( event ) {
 			const { inputType } = event.nativeEvent;
 
-			// The browser formatted something or tried to insert a list.
+			// The browser formatted something or tried to insert HTML.
 			// Overwrite it. It will be handled later by the format library if
 			// needed.
 			if (
 				inputType.indexOf( 'format' ) === 0 ||
-				( inputType.indexOf( 'insert' ) === 0 && inputType !== 'insertText' )
+				INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType )
 			) {
 				this.applyRecord( this.getRecord() );
 				return;
@@ -1150,4 +1165,4 @@ export default RichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { RichTextInserterItem } from './inserter-list-item';
-export { RichTextInputEvent } from './input-event';
+export { UnstableRichTextInputEvent } from './input-event';
