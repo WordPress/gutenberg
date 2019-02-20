@@ -1,15 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG } from '@wordpress/components';
+import { Path, SVG, TextControl, Popover, IconButton, PositionedAtSelection } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { insertObject } from '@wordpress/rich-text';
 import { MediaUpload, RichTextInserterItem, MediaUploadCheck } from '@wordpress/editor';
+import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
+
+const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 export const image = {
 	name,
@@ -27,11 +30,44 @@ export const image = {
 	edit: class ImageEdit extends Component {
 		constructor() {
 			super( ...arguments );
+			this.onChange = this.onChange.bind( this );
+			this.onKeyDown = this.onKeyDown.bind( this );
 			this.openModal = this.openModal.bind( this );
 			this.closeModal = this.closeModal.bind( this );
 			this.state = {
 				modal: false,
 			};
+		}
+
+		static getDerivedStateFromProps( props, state ) {
+			const { activeAttributes: { style } } = props;
+
+			if ( style === state.previousStyle ) {
+				return null;
+			}
+
+			if ( ! style ) {
+				return {
+					width: undefined,
+					previousStyle: style,
+				};
+			}
+
+			return {
+				width: style.replace( /\D/g, '' ),
+				previousStyle: style,
+			};
+		}
+
+		onChange( width ) {
+			this.setState( { width } );
+		}
+
+		onKeyDown( event ) {
+			if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
+				// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
+				event.stopPropagation();
+			}
 		}
 
 		openModal() {
@@ -43,7 +79,11 @@ export const image = {
 		}
 
 		render() {
-			const { value, onChange } = this.props;
+			const { value, onChange, isActive, activeAttributes } = this.props;
+			const { style } = activeAttributes;
+			// Rerender PositionedAtSelection when the selection changes or when
+			// the width changes.
+			const key = value.start + style;
 
 			return (
 				<MediaUploadCheck>
@@ -73,6 +113,50 @@ export const image = {
 							return null;
 						} }
 					/> }
+					{ isActive && <PositionedAtSelection key={ key }>
+						<Popover
+							position="bottom center"
+							focusOnMount={ false }
+						>
+							{ // Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */ }
+							<form
+								className="editor-format-toolbar__image-container-content"
+								onKeyPress={ stopKeyPropagation }
+								onKeyDown={ this.onKeyDown }
+								onSubmit={ ( event ) => {
+									const newFormats = value.formats.slice( 0 );
+
+									newFormats[ value.start ] = [ {
+										type: name,
+										object: true,
+										attributes: {
+											...activeAttributes,
+											style: `width: ${ this.state.width }px;`,
+										},
+									} ];
+
+									onChange( {
+										...value,
+										formats: newFormats,
+									} );
+
+									event.preventDefault();
+								} }
+							>
+								<TextControl
+									className="editor-format-toolbar__image-container-value"
+									type="number"
+									label={ __( 'Width' ) }
+									value={ this.state.width }
+									min={ 1 }
+									onChange={ this.onChange }
+								/>
+								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+							</form>
+							{ /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */ }
+						</Popover>
+					</PositionedAtSelection> }
 				</MediaUploadCheck>
 			);
 		}

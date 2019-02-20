@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "5.0.0",
+	"version": "5.1.0",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -10,6 +10,9 @@
 		"WordPress",
 		"editor"
 	],
+	"config": {
+		"GUTENBERG_PHASE": 2
+	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
@@ -29,6 +32,7 @@
 		"@wordpress/dom": "file:packages/dom",
 		"@wordpress/dom-ready": "file:packages/dom-ready",
 		"@wordpress/edit-post": "file:packages/edit-post",
+		"@wordpress/edit-widgets": "file:packages/edit-widgets",
 		"@wordpress/editor": "file:packages/editor",
 		"@wordpress/element": "file:packages/element",
 		"@wordpress/escape-html": "file:packages/escape-html",
@@ -52,10 +56,10 @@
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
-		"@babel/core": "7.0.0",
-		"@babel/plugin-syntax-jsx": "7.0.0",
-		"@babel/runtime-corejs2": "7.0.0",
-		"@babel/traverse": "7.0.0",
+		"@babel/core": "7.2.2",
+		"@babel/plugin-syntax-jsx": "7.2.0",
+		"@babel/runtime-corejs2": "7.3.1",
+		"@babel/traverse": "7.2.3",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
@@ -71,7 +75,7 @@
 		"@wordpress/npm-package-json-lint-config": "file:packages/npm-package-json-lint-config",
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
-		"babel-loader": "8.0.0",
+		"babel-loader": "8.0.5",
 		"benchmark": "2.1.4",
 		"browserslist": "4.4.1",
 		"chalk": "2.4.1",
@@ -92,9 +96,9 @@
 		"is-equal-shallow": "0.1.3",
 		"is-plain-obj": "1.1.0",
 		"jsdom": "11.12.0",
-		"lerna": "3.4.3",
+		"lerna": "3.11.1",
 		"lint-staged": "7.3.0",
-		"lodash": "4.17.10",
+		"lodash": "4.17.11",
 		"mkdirp": "0.5.1",
 		"node-sass": "4.11.0",
 		"node-watch": "0.6.0",
@@ -113,6 +117,7 @@
 		"sprintf-js": "1.1.1",
 		"stylelint-config-wordpress": "13.1.0",
 		"uuid": "3.3.2",
+		"webpack": "4.8.3",
 		"webpack-bundle-analyzer": "3.0.2",
 		"webpack-livereload-plugin": "2.1.1",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
@@ -158,7 +163,7 @@
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
 		"docs:build": "node docs/tool",
-		"fixtures:clean": "rimraf \"test/integration/full-content/fixtures/*.+(json|serialized.html)\"",
+		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:server-registered": "docker-compose run -w /var/www/html/wp-content/plugins/gutenberg --rm wordpress ./bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",

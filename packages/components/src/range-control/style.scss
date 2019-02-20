@@ -20,10 +20,6 @@
 		margin-left: 0;
 		flex: 1;
 	}
-
-	&__number {
-		margin-left: $grid-size;
-	}
 }
 
 // creating mixin because we can't do multiline variables, and we can't comma-group the selectors for styling the range slider
@@ -119,4 +115,11 @@
 		color: transparent;
 		@include range-track();
 	}
+}
+
+.components-range-control__number {
+	display: inline-block;
+	margin-left: $grid-size;
+	font-weight: 500;
+	width: 54px;
 }

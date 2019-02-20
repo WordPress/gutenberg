@@ -39,7 +39,6 @@ export const F10 = 121;
 
 export const ALT = 'alt';
 export const CTRL = 'ctrl';
-// Understood in both Mousetrap and TinyMCE.
 export const COMMAND = 'meta';
 export const SHIFT = 'shift';
 
