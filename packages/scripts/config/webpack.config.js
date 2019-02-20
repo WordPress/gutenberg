@@ -92,12 +92,12 @@ const config = {
 		],
 	},
 	plugins: [
-		// GUTENBERG_BUNDLE_ANALYZER global variable enables utility that represents bundle content
+		// WP_BUNDLE_ANALYZER global variable enables utility that represents bundle content
 		// as convenient interactive zoomable treemap.
-		process.env.GUTENBERG_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-		// GUTENBERG_LIVE_RELOAD_PORT global variable changes port on which live reload works
+		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload works
 		// when running watch mode.
-		! isProduction && new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ),
+		! isProduction && new LiveReloadPlugin( { port: process.env.WP_LIVE_RELOAD_PORT || 35729 } ),
 	].filter( Boolean ),
 	stats: {
 		children: false,
@@ -105,9 +105,9 @@ const config = {
 };
 
 if ( ! isProduction ) {
-	// GUTENBERG_DEVTOOL global variable controls how source maps are generated.
+	// WP_DEVTOOL global variable controls how source maps are generated.
 	// See: https://webpack.js.org/configuration/devtool/#devtool.
-	config.devtool = process.env.GUTENBERG_DEVTOOL || 'source-map';
+	config.devtool = process.env.WP_DEVTOOL || 'source-map';
 }
 
 module.exports = config;
