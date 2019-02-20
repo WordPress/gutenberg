@@ -20,14 +20,14 @@ import {
 } from '@wordpress/editor';
 
 function ContainerEdit( { className, setBackgroundColor, backgroundColor, setAttributes, attributes } ) {
-	const { isWithoutPadding } = attributes;
+	const { isWithPadding } = attributes;
 
 	const styles = {
 		backgroundColor: backgroundColor.color,
 	};
 
 	const classes = classnames( className, backgroundColor.class, {
-		'is-without-padding': isWithoutPadding,
+		'is-with-padding': isWithPadding,
 	} );
 
 	return (
@@ -45,9 +45,9 @@ function ContainerEdit( { className, setBackgroundColor, backgroundColor, setAtt
 				/>
 				<PanelBody title={ __( 'Container Padding' ) }>
 					<ToggleControl
-						label={ isWithoutPadding ? __( 'No Padding' ) : __( 'Default Padding' ) }
-						onChange={ ( value ) => setAttributes( { isWithoutPadding: value } ) }
-						checked={ isWithoutPadding }
+						label={ isWithPadding ? __( 'Use default padding' ) : __( 'Use no padding' ) }
+						onChange={ ( value ) => setAttributes( { isWithPadding: value } ) }
+						checked={ isWithPadding }
 					/>
 				</PanelBody>
 			</InspectorControls>
