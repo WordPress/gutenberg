@@ -56,7 +56,7 @@ function IconButton( props, ref ) {
 			className={ classes }
 			ref={ ref }
 		>
-			{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } /> : icon }
+			{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } color={ additionalProps.iconColor } /> : icon }
 			{ children }
 		</Button>
 	);
