@@ -10,7 +10,7 @@ import Modal from 'react-native-modal';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { URLInput } from '@wordpress/editor';
+import { URLInput, BottomSheet } from '@wordpress/editor';
 import { prependHTTP } from '@wordpress/url';
 import {
 	withSpokenMessages,
@@ -43,10 +43,22 @@ class ModalLinkUI extends Component {
 		this.removeLink = this.removeLink.bind( this );
 
 		this.state = {
-			inputValue: props.activeAttributes.url || '',
-			text: getTextContent( slice( props.value ) ),
+			inputValue: '',
+			text: '',
 			opensInNewWindow: false,
 		};
+	}
+
+	componentDidUpdate( oldProps ) {
+		if ( oldProps === this.props ) {
+			return;
+		}
+
+		this.setState({
+			inputValue: this.props.activeAttributes.url || '',
+			text: getTextContent( slice( this.props.value ) ),
+			opensInNewWindow: false,
+		})
 	}
 
 	onChangeInputValue( inputValue ) {
@@ -103,37 +115,46 @@ class ModalLinkUI extends Component {
 		const { isVisible } = this.props;
 
 		return (
-			<Modal
+			<BottomSheet
 				isVisible={ isVisible }
-				style={ styles.bottomModal }
-				animationInTiming={ 500 }
-				animationOutTiming={ 500 }
-				backdropTransitionInTiming={ 500 }
-				backdropTransitionOutTiming={ 500 }
-				onBackdropPress={ this.props.onClose }
-				onSwipe={ this.props.onClose }
-				swipeDirection="down"
-				avoidKeyboard={ true }
+				onClose={ this.submitLink }
+				hideHeader
 			>
-				<View style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }>
-					<View style={ styles.dragIndicator } />
-					<View style={ styles.head }>
-						<Button onClick={ this.removeLink }>
-							<Text style={ { ...styles.buttonText, color: 'red' } }>
-								{ __( 'Remove' ) }
-							</Text>
-						</Button>
-						<Text style={ styles.title }>
-							{ __( 'Link Settings' ) }
-						</Text>
-						<Button onClick={ this.submitLink }>
-							<Text style={ { ...styles.buttonText, color: '#0087be' } } >
-								{ __( 'Done' ) }
-							</Text>
-						</Button>
-					</View>
-					<View style={ styles.separator } />
-					<View style={ styles.inlineInput }>
+					<BottomSheet.Cell
+						icon={ 'admin-links' }
+						label={ __( 'URL' ) }
+						value={ this.state.inputValue }
+						placeholder={ __( 'Add URL' ) }
+						autoCapitalize="none"
+						autoCorrect={ false }
+						textContentType="URL"
+						autoFocus={ true }
+						onChangeValue={ this.onChangeInputValue }
+					/>
+					<BottomSheet.Cell
+						icon={ 'editor-textcolor' }
+						label={ __( 'Link Text' ) }
+						value={ this.state.text }
+						placeholder={ __( 'Add Link Text' ) }
+						onChangeValue={ this.onChangeText }
+					/>
+					<BottomSheet.Cell
+						icon={ 'external' }
+						label={ __( 'Open in New Tab' ) }
+						value={ '' }
+					>
+						<Switch
+							value={ this.state.opensInNewWindow }
+							onValueChange={ this.onChangeOpensInNewWindow }
+						/>
+					</BottomSheet.Cell>
+					<BottomSheet.Cell
+						label={ __( 'Remove Link' ) }
+						labelStyle={ styles.clearLinkButton }
+						separatorType={ 'none' }
+						onPress={ this.removeLink }
+					/>
+					{/* <View style={ styles.inlineInput }>
 						<Text style={ styles.inlineInputLabel }>
 							{ __( 'URL' ) }
 						</Text>
@@ -143,8 +164,8 @@ class ModalLinkUI extends Component {
 							onChange={ this.onChangeInputValue }
 						/>
 					</View>
-					<View style={ styles.separator } />
-					<View style={ styles.inlineInput }>
+					<View style={ styles.separator } /> */}
+					{/* <View style={ styles.inlineInput }>
 						<Text style={ styles.inlineInputLabel }>
 							{ __( 'Link Text' ) }
 						</Text>
@@ -154,8 +175,8 @@ class ModalLinkUI extends Component {
 							onChangeText={ this.onChangeText }
 						/>
 					</View>
-					<View style={ styles.separator } />
-					<View style={ styles.inlineInput }>
+					<View style={ styles.separator } /> */}
+					{/* <View style={ styles.inlineInput }>
 						<Text style={ styles.inlineInputLabel }>
 							{ __( 'Open in a new window' ) }
 						</Text>
@@ -165,9 +186,8 @@ class ModalLinkUI extends Component {
 								onValueChange={ this.onChangeOpensInNewWindow }
 							/>
 						</View>
-					</View>
-				</View>
-			</Modal>
+					</View> */}
+			</BottomSheet>
 		);
 	}
 }
