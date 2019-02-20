@@ -1,5 +1,7 @@
 .wp-block-container {
-	&.has-padding {
-		padding: 0 2rem;
+	padding: 1rem 2rem;
+
+	&.is-without-padding {
+		padding: 0;
 	}
 }
