@@ -137,10 +137,13 @@ export class RichText extends Component {
 
 	setRef( node ) {
 		if ( node ) {
-			const computedStyle = getComputedStyle( node );
+			if ( process.env.NODE_ENV === 'development' ) {
+				const computedStyle = getComputedStyle( node );
 
-			if ( computedStyle.display === 'inline' ) {
-				window.console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
+				if ( computedStyle.display === 'inline' ) {
+					// eslint-disable-next-line no-console
+					console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
+				}
 			}
 
 			this.editableRef = node;
