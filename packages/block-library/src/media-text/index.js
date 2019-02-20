@@ -66,6 +66,9 @@ const blockAttributes = {
 		type: 'boolean',
 		default: false,
 	},
+	verticalAlignment: {
+		type: 'string',
+	},
 };
 
 export const settings = {
@@ -156,6 +159,7 @@ export const settings = {
 			mediaUrl,
 			mediaWidth,
 			mediaId,
+			verticalAlignment,
 		} = attributes;
 		const mediaTypeRenders = {
 			image: () => <img src={ mediaUrl } alt={ mediaAlt } className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null } />,
@@ -166,6 +170,7 @@ export const settings = {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			[ backgroundClass ]: backgroundClass,
 			'is-stacked-on-mobile': isStackedOnMobile,
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		} );
 
 		let gridTemplateColumns;

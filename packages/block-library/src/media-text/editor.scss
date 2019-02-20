@@ -2,6 +2,7 @@
 	grid-template-areas:
 		"media-text-media media-text-content"
 		"resizer resizer";
+	align-items: center;
 }
 
 .wp-block-media-text.has-media-on-the-right {
@@ -10,13 +11,24 @@
 		"resizer resizer";
 }
 
+.wp-block-media-text.is-vertically-aligned-top {
+	align-items: start;
+}
+
+.wp-block-media-text.is-vertically-aligned-center {
+	align-items: center;
+}
+
+.wp-block-media-text.is-vertically-aligned-bottom {
+	align-items: end;
+}
+
 .wp-block-media-text .__resizable_base__ {
 	grid-area: resizer;
 }
 
 .wp-block-media-text .editor-media-container__resizer {
 	grid-area: media-text-media;
-	align-self: center;
 	// The resizer sets a inline width but as we are using a grid layout,
 	// we set the width on container.
 	width: 100% !important;
@@ -62,4 +74,3 @@ figure.block-library-media-text__media-container {
 		}
 	}
 }
-
