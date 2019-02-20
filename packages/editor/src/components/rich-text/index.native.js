@@ -568,4 +568,4 @@ RichTextContainer.Content.defaultProps = {
 export default RichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { RichTextInputEvent } from './input-event';
+export { UnstableRichTextInputEvent } from './input-event';
