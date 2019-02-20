@@ -69,6 +69,8 @@ export default class ColorPicker extends Component {
 			draftHsl: colors.hsl,
 		};
 		this.commitValues = this.commitValues.bind( this );
+		this.setDraftValues = this.setDraftValues.bind( this );
+		this.resetDraftValues = this.resetDraftValues.bind( this );
 		this.handleInputChange = this.handleInputChange.bind( this );
 	}
 
@@ -88,21 +90,22 @@ export default class ColorPicker extends Component {
 		}
 	}
 
-	handleInputChange( data ) {
-		if ( data.state === 'reset' ) {
-			this.setState( {
-				draftHex: this.state.hex,
-				draftHsl: this.state.hsl,
-				draftRgb: this.state.rgb,
-			} );
-		} else if ( data.state === 'commit' ) {
-			this.commitValues( data );
-		} else if ( data.state === 'draft' ) {
-			if ( data.source === 'hex' ) {
+	resetDraftValues() {
+		this.setState( {
+			draftHex: this.state.hex,
+			draftHsl: this.state.hsl,
+			draftRgb: this.state.rgb,
+		} );
+	}
+
+	setDraftValues( data ) {
+		switch ( data.source ) {
+			case 'hex':
 				this.setState( {
 					draftHex: toLowerCase( data.hex ),
 				} );
-			} else if ( data.source === 'rgb' ) {
+				break;
+			case 'rgb':
 				this.setState( {
 					draftRgb: {
 						r: data.r,
@@ -111,7 +114,8 @@ export default class ColorPicker extends Component {
 						a: data.a,
 					},
 				} );
-			} else if ( data.source === 'hsl' ) {
+				break;
+			case 'hsl':
 				this.setState( {
 					draftHsl: {
 						h: data.h,
@@ -120,7 +124,17 @@ export default class ColorPicker extends Component {
 						a: data.a,
 					},
 				} );
-			}
+				break;
+		}
+	}
+
+	handleInputChange( data ) {
+		if ( data.state === 'reset' ) {
+			this.resetDraftValues();
+		} else if ( data.state === 'commit' ) {
+			this.commitValues( data );
+		} else if ( data.state === 'draft' ) {
+			this.setDraftValues( data );
 		}
 	}
 
