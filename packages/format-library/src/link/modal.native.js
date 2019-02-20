@@ -120,73 +120,40 @@ class ModalLinkUI extends Component {
 				onClose={ this.submitLink }
 				hideHeader
 			>
-					<BottomSheet.Cell
-						icon={ 'admin-links' }
-						label={ __( 'URL' ) }
-						value={ this.state.inputValue }
-						placeholder={ __( 'Add URL' ) }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						textContentType="URL"
-						autoFocus={ true }
-						onChangeValue={ this.onChangeInputValue }
+				<BottomSheet.Cell
+					icon={ 'admin-links' }
+					label={ __( 'URL' ) }
+					value={ this.state.inputValue }
+					placeholder={ __( 'Add URL' ) }
+					autoCapitalize="none"
+					autoCorrect={ false }
+					textContentType="URL"
+					onChangeValue={ this.onChangeInputValue }
+					autoFocus
+				/>
+				<BottomSheet.Cell
+					icon={ 'editor-textcolor' }
+					label={ __( 'Link Text' ) }
+					value={ this.state.text }
+					placeholder={ __( 'Add Link Text' ) }
+					onChangeValue={ this.onChangeText }
+				/>
+				<BottomSheet.Cell
+					icon={ 'external' }
+					label={ __( 'Open in New Tab' ) }
+					value={ '' }
+				>
+					<Switch
+						value={ this.state.opensInNewWindow }
+						onValueChange={ this.onChangeOpensInNewWindow }
 					/>
-					<BottomSheet.Cell
-						icon={ 'editor-textcolor' }
-						label={ __( 'Link Text' ) }
-						value={ this.state.text }
-						placeholder={ __( 'Add Link Text' ) }
-						onChangeValue={ this.onChangeText }
-					/>
-					<BottomSheet.Cell
-						icon={ 'external' }
-						label={ __( 'Open in New Tab' ) }
-						value={ '' }
-					>
-						<Switch
-							value={ this.state.opensInNewWindow }
-							onValueChange={ this.onChangeOpensInNewWindow }
-						/>
-					</BottomSheet.Cell>
-					<BottomSheet.Cell
-						label={ __( 'Remove Link' ) }
-						labelStyle={ styles.clearLinkButton }
-						separatorType={ 'none' }
-						onPress={ this.removeLink }
-					/>
-					{/* <View style={ styles.inlineInput }>
-						<Text style={ styles.inlineInputLabel }>
-							{ __( 'URL' ) }
-						</Text>
-						<URLInput
-							style={ styles.inlineInputValue }
-							value={ this.state.inputValue }
-							onChange={ this.onChangeInputValue }
-						/>
-					</View>
-					<View style={ styles.separator } /> */}
-					{/* <View style={ styles.inlineInput }>
-						<Text style={ styles.inlineInputLabel }>
-							{ __( 'Link Text' ) }
-						</Text>
-						<TextInput
-							style={ styles.inlineInputValue }
-							value={ this.state.text }
-							onChangeText={ this.onChangeText }
-						/>
-					</View>
-					<View style={ styles.separator } /> */}
-					{/* <View style={ styles.inlineInput }>
-						<Text style={ styles.inlineInputLabel }>
-							{ __( 'Open in a new window' ) }
-						</Text>
-						<View style={ { ...styles.inlineInputValue, ...styles.inlineInputValueSwitch, alignItems: 'flex-end' } }>
-							<Switch
-								value={ this.state.opensInNewWindow }
-								onValueChange={ this.onChangeOpensInNewWindow }
-							/>
-						</View>
-					</View> */}
+				</BottomSheet.Cell>
+				<BottomSheet.Cell
+					label={ __( 'Remove Link' ) }
+					labelStyle={ styles.clearLinkButton }
+					separatorType={ 'none' }
+					onPress={ this.removeLink }
+				/>
 			</BottomSheet>
 		);
 	}
