@@ -1,10 +1,10 @@
 /**
  * External dependencies
  */
+const { DefinePlugin } = require( 'webpack' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const postcss = require( 'postcss' );
-
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
 
@@ -41,6 +41,11 @@ config.output = {
 };
 
 config.plugins.push(
+	new DefinePlugin( {
+		// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
+		// eslint-disable-next-line @wordpress/gutenberg-phase
+		'process.env.GUTENBERG_PHASE': JSON.stringify( parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1 ),
+	} ),
 	// Create RTL files with a -rtl suffix
 	new WebpackRTLPlugin( {
 		suffix: '-rtl',
