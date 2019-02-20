@@ -103,6 +103,7 @@
 		"node-watch": "0.6.0",
 		"pegjs": "0.10.0",
 		"phpegjs": "1.0.0-beta7",
+		"postcss": "7.0.13",
 		"react-dom": "16.6.3",
 		"react-test-renderer": "16.6.3",
 		"redux": "4.0.0",
@@ -115,6 +116,7 @@
 		"sprintf-js": "1.1.1",
 		"stylelint-config-wordpress": "13.1.0",
 		"uuid": "3.3.2",
+		"webpack": "4.8.3",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
 	},
 	"npmPackageJsonLintConfig": {
