@@ -1,6 +1,7 @@
 // @format
 
 @import "variables.scss";
+@import "colors.scss";
 
 .blockHolder {
 	flex: 1 1 auto;
@@ -12,7 +13,7 @@
 }
 
 .textView {
-	color: #87a6bc;
+	color: $gray;
 	font-size: 16px;
 	font-family: $default-regular-font;
 }
