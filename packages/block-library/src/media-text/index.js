@@ -175,6 +175,7 @@ export const settings = {
 		const style = {
 			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 			gridTemplateColumns,
+			'--media-text__media-width': mediaWidth !== DEFAULT_MEDIA_WIDTH ? `${ mediaWidth }%` : undefined,
 		};
 		return (
 			<div className={ className } style={ style }>
