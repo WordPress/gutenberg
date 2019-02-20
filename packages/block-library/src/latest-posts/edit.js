@@ -43,7 +43,7 @@ class LatestPostsEdit extends Component {
 		this.state = {
 			categoriesList: [],
 		};
-		this.toggleDisplayPostDate = this.toggleDisplayPostDate.bind( this );
+		this.updateAttribute = this.updateAttribute.bind( this );
 	}
 
 	componentWillMount() {
@@ -69,17 +69,16 @@ class LatestPostsEdit extends Component {
 		this.isStillMounted = false;
 	}
 
-	toggleDisplayPostDate() {
-		const { displayPostDate } = this.props.attributes;
+	updateAttribute( name, value ) {
 		const { setAttributes } = this.props;
 
-		setAttributes( { displayPostDate: ! displayPostDate } );
+		setAttributes( { [ name ]: value } );
 	}
 
 	render() {
 		const { attributes, setAttributes, latestPosts } = this.props;
 		const { categoriesList } = this.state;
-		const { displayPostDate, align, postLayout, columns, order, orderBy, categories, postsToShow } = attributes;
+		const { displayPostDate, displayPostAuthor, align, postLayout, columns, order, orderBy, categories, postsToShow } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -102,7 +101,12 @@ class LatestPostsEdit extends Component {
 					<ToggleControl
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
-						onChange={ this.toggleDisplayPostDate }
+						onChange={ ( value ) => this.updateAttribute( 'displayPostDate', value ) }
+					/>
+					<ToggleControl
+						label={ __( 'Display post author' ) }
+						checked={ displayPostAuthor }
+						onChange={ ( value ) => this.updateAttribute( 'displayPostAuthor', value ) }
 					/>
 				</PanelBody>
 
@@ -191,6 +195,13 @@ class LatestPostsEdit extends Component {
 									{ dateI18n( dateFormat, post.date_gmt ) }
 								</time>
 							}
+
+							{ displayPostAuthor &&
+								<span className="wp-block-latest-posts__post-author">
+									{ __( 'by' ) } { post._embedded.author[ 0 ].name }
+								</span>
+							}
+
 						</li>
 					) }
 				</ul>
@@ -207,6 +218,7 @@ export default withSelect( ( select, props ) => {
 		order,
 		orderby: orderBy,
 		per_page: postsToShow,
+		_embed: 1,
 	}, ( value ) => ! isUndefined( value ) );
 	return {
 		latestPosts: getEntityRecords( 'postType', 'post', latestPostsQuery ),

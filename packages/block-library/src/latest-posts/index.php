@@ -49,6 +49,14 @@ function render_block_core_latest_posts( $attributes ) {
 			);
 		}
 
+		if( isset( $attributes['displayPostAuthor'] ) && $attributes['displayPostAuthor']) {
+			$list_items_markup .= sprintf(
+				'<span class="wp-block-latest-posts__post-author">%1$s %2$s</span>',
+				__( 'by' ),
+				esc_html( get_the_author( $post_id ) )
+			);
+		}
+
 		$list_items_markup .= "</li>\n";
 	}
 
@@ -101,6 +109,10 @@ function register_block_core_latest_posts() {
 					'default' => 5,
 				),
 				'displayPostDate' => array(
+					'type'    => 'boolean',
+					'default' => false,
+				),
+				'displayPostAuthor' => array(
 					'type'    => 'boolean',
 					'default' => false,
 				),
