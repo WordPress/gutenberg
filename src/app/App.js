@@ -33,20 +33,18 @@ export default class AppProvider extends React.Component<PropsType> {
 	}
 
 	setLocale( locale: ?string ) {
-		const translationsFromParentApp = this.props.translations || {};
+		const translationsFromParentApp = this.props.translations;
 		let gutenbergTranslations = getTranslation( locale );
 		if ( locale && ! gutenbergTranslations ) {
 			// Try stripping out the regional
-			const language = locale.replace( /[-_][A-Za-z]+$/, '' );
-			if ( language !== locale ) {
-				gutenbergTranslations = getTranslation( language );
-			}
+			locale = locale.replace( /[-_][A-Za-z]+$/, '' );
+			gutenbergTranslations = getTranslation( locale );
 		}
-		const translations = Object.assign( {}, translationsFromParentApp, gutenbergTranslations );
+		const translations = Object.assign( {}, gutenbergTranslations, translationsFromParentApp );
 		// eslint-disable-next-line no-console
 		console.log( 'locale', locale, translations );
 		// Only change the locale if it's supported by gutenberg
-		if ( gutenbergTranslations ) {
+		if ( gutenbergTranslations || translationsFromParentApp ) {
 			setLocaleData( translations );
 		}
 	}
