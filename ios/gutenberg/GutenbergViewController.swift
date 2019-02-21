@@ -118,7 +118,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 extension GutenbergViewController: GutenbergBridgeDataSource {
     
     func gutenbergLocale() -> String? {
-        return "en"
+        return Locale.preferredLanguages.first ?? "en"
     }
     
     func gutenbergTranslations() -> [String : [String]]? {
