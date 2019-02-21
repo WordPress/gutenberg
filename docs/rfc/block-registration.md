@@ -10,7 +10,7 @@ In more practical terms, an implementation should fulfill requirements that...
   * Building REST APIs to fetch the available block types
   * Building REST APIs to fetch block objects from posts
 * This API should be backward compatible with what we have at the moment.
-* It should be possible to statically analyze a block type in order to support advanced use-cases required by one of the [9 projects](https://make.wordpress.org/core/2018/12/08/9-priorities-for-2019/) for 2019 in Wordpress: "Building a WordPress.org directory for discovering blocks, and a way to seamlessly install them."
+* It should be possible to statically analyze a block type in order to support advanced use-cases required by one of the [9 projects](https://make.wordpress.org/core/2018/12/08/9-priorities-for-2019/) for 2019 in WordPress: "Building a WordPress.org directory for discovering blocks, and a way to seamlessly install them."
 * It should not require a build tool compilation step (e.g. Babel, Webpack) to author code which would be referenced in a block type definition.
 * There should allow the potential to dynamically load ("lazy-load") block types, or parts of block type definitions.
 
