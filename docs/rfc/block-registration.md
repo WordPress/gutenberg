@@ -7,8 +7,8 @@ Behind any block type registration is some abstract concept of a unit of content
 In more practical terms, an implementation should fulfill requirements that...
 
 * A block type registration should be declarative and context-agnostic. Any runtime (PHP, JS, or other) should be able to interpret the basics of a block type (see "Block API" in the sections below) and should be able to fetch or retrieve the definitions of the context-specific implementation details. The following things should be made possible:
-  * Building REST APIs to fetch the available block types
-  * Building REST APIs to fetch block objects from posts
+  * Fetching the available block types through REST APIs.
+  * Fetching block objects from posts through REST APIs.
 * This API should be backward compatible with what we have at the moment.
 * It should be possible to statically analyze a block type in order to support advanced use-cases required by one of the [9 projects](https://make.wordpress.org/core/2018/12/08/9-priorities-for-2019/) for 2019 in WordPress: "Building a WordPress.org directory for discovering blocks, and a way to seamlessly install them.". The block directory should not need to parse JavaScript or PHP files to retrieve their definitions similar to how it happens for plugins as of today.
 
