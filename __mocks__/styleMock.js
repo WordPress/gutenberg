@@ -28,4 +28,7 @@ module.exports = {
 	addBlockButton: {
 		color: '',
 	},
+	blockHolderFocused: {
+		borderColor: 'gray',
+	},
 };

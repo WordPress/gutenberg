@@ -1,4 +1,5 @@
 import Aztec
+import CoreServices
 import Foundation
 import UIKit
 
@@ -8,6 +9,7 @@ class RCTAztecView: Aztec.TextView {
     @objc var onEnter: RCTBubblingEventBlock? = nil
     @objc var onFocus: RCTBubblingEventBlock? = nil
     @objc var onBlur: RCTBubblingEventBlock? = nil
+    @objc var onPaste: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
     @objc var onSelectionChange: RCTBubblingEventBlock? = nil
     @objc var blockType: NSDictionary? = nil {
@@ -71,6 +73,8 @@ class RCTAztecView: Aztec.TextView {
             constant: leftTextInset
         )
     }()
+
+    private var isInsertingDictationResult = false
     
     // MARK: - Font
     
@@ -107,6 +111,9 @@ class RCTAztecView: Aztec.TextView {
 
     func commonInit() {
         delegate = self
+        textContainerInset = .zero
+        contentInset = .zero
+        textContainer.lineFragmentPadding = 0        
         addPlaceholder()
     }
 
@@ -148,6 +155,40 @@ class RCTAztecView: Aztec.TextView {
         onContentSizeChange(body)
     }
     
+    // MARK: - Paste handling
+    
+    private func html(from pasteboard: UIPasteboard) -> String? {
+        guard let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String) else {
+            return nil
+        }
+        
+        return String(data: data, encoding: .utf8)
+    }
+    
+    private func text(from pasteboard: UIPasteboard) -> String? {
+        guard let data = pasteboard.data(forPasteboardType: kUTTypePlainText as String) else {
+            return nil
+        }
+        
+        return String(data: data, encoding: .utf8)
+    }
+    
+    override func paste(_ sender: Any?) {
+        let start = selectedRange.location
+        let end = selectedRange.location + selectedRange.length
+        
+        let pasteboard = UIPasteboard.general
+        let text = self.text(from: pasteboard) ?? ""
+        let html = self.html(from: pasteboard) ?? ""
+        
+        onPaste?([
+            "currentContent": getHTML(),
+            "selectionStart": start,
+            "selectionEnd": end,
+            "pastedText": text,
+            "pastedHtml": html])
+    }
+    
     // MARK: - Edits
     
     open override func insertText(_ text: String) {
@@ -158,7 +199,7 @@ class RCTAztecView: Aztec.TextView {
         super.insertText(text)
         updatePlaceholderVisibility()
     }
-    
+
     open override func deleteBackward() {
         guard !interceptBackspace() else {
             return
@@ -167,7 +208,19 @@ class RCTAztecView: Aztec.TextView {
         super.deleteBackward()
         updatePlaceholderVisibility()
     }
-    
+
+    // MARK: - Dictation
+
+    override func dictationRecordingDidEnd() {
+        isInsertingDictationResult = true
+    }
+
+    public override func insertDictationResult(_ dictationResult: [UIDictationPhrase]) {
+        let text = dictationResult.reduce("") { $0 + $1.text }
+        insertText(text)
+        isInsertingDictationResult = false
+    }
+
     // MARK: - Custom Edit Intercepts
     
     private func interceptEnter(_ text: String) -> Bool {
@@ -222,8 +275,11 @@ class RCTAztecView: Aztec.TextView {
         
         if let selectedTextRange = selectedTextRange {
             let caretEndRect = caretRect(for: selectedTextRange.end)
-            result["selectionEndCaretX"] = caretEndRect.origin.x
-            result["selectionEndCaretY"] = caretEndRect.origin.y
+            // Sergio Estevao: Sometimes the carectRect can be invalid so we need to check before sending this to JS.
+            if !(caretEndRect.isInfinite || caretEndRect.isEmpty || caretEndRect.isNull) {
+                result["selectionEndCaretX"] = caretEndRect.origin.x
+                result["selectionEndCaretY"] = caretEndRect.origin.y
+            }
         }
 
         return result
@@ -236,7 +292,7 @@ class RCTAztecView: Aztec.TextView {
         guard contents["eventCount"] == nil else {
             return
         }
-        
+
         let html = contents["text"] as? String ?? ""
 
         setHTML(html)
@@ -401,8 +457,17 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textViewDidChange(_ textView: UITextView) {
+
+        guard isInsertingDictationResult == false else {
+            // If a dictation start with an empty UITextView,
+            // the dictation engine refreshes the TextView with an empty string when the dictation finishes.
+            // This avoid propagating that unwanted empty string to RN. (Solving #606)
+            return
+        }
+
         forceTypingAttributesIfNeeded()
         propagateContentChanges()
+        updatePlaceholderVisibility()
         //Necessary to send height information to JS after pasting text.
         textView.setNeedsLayout()
     }
