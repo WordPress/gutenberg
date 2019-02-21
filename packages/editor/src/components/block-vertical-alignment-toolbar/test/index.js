@@ -20,11 +20,11 @@ describe( 'BlockVerticalAlignmentToolbar', () => {
 		onChange.mockClear();
 	} );
 
-	test( 'should match snapshot', () => {
+	it( 'should match snapshot', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	test( 'should call onChange with undefined, when the control is already active', () => {
+	it( 'should call onChange with undefined, when the control is already active', () => {
 		const activeControl = controls.find( ( { _id } ) => _id === alignment );
 		activeControl.onClick();
 
@@ -33,7 +33,7 @@ describe( 'BlockVerticalAlignmentToolbar', () => {
 		expect( onChange ).toHaveBeenCalledWith( undefined );
 	} );
 
-	test( 'should call onChange with alignment value when the control is inactive', () => {
+	it( 'should call onChange with alignment value when the control is inactive', () => {
 		const inactiveCenterControl = controls.find( ( { _id } ) => _id === 'center' );
 
 		inactiveCenterControl.onClick();
