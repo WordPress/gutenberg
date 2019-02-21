@@ -186,11 +186,17 @@ function withPersistentBlockChange( reducer ) {
 	let lastAction;
 
 	return ( state, action ) => {
-		const nextState = reducer( state, action );
-		if ( state !== nextState ) {
-			nextState.isPersistentChange = (
-				! isUpdatingSameBlockAttribute( action, lastAction )
-			);
+		let nextState = reducer( state, action );
+		const isExplicitPersistentChange = action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT';
+
+		if ( state !== nextState || isExplicitPersistentChange ) {
+			nextState = {
+				...nextState,
+				isPersistentChange: (
+					isExplicitPersistentChange ||
+					! isUpdatingSameBlockAttribute( action, lastAction )
+				),
+			};
 		}
 
 		lastAction = action;

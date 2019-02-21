@@ -532,3 +532,13 @@ export function __unstableSaveReusableBlock( id, updatedId ) {
 		updatedId,
 	};
 }
+
+/**
+ * Returns an action object used in signalling that the last block change should be marked explicitely as persistent.
+ *
+ * @return {Object} Action object.
+ */
+export function markLastChangeAsPersistent() {
+	return { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' };
+}
+
