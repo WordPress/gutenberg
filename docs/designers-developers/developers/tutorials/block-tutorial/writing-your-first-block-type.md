@@ -13,13 +13,13 @@ While the block's editor behaviors are implemented in JavaScript, you'll need to
 
 function gutenberg_boilerplate_block() {
 	wp_register_script(
-		'gutenberg-boilerplate-es5-step01',
-		plugins_url( 'step-01/block.js', __FILE__ ),
+		'gutenberg-examples-01-basic',
+		plugins_url( '01-basic/block.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element' )
 	);
 
-	register_block_type( 'gutenberg-boilerplate-es5/hello-world-step-01', array(
-		'editor_script' => 'gutenberg-boilerplate-es5-step01',
+	register_block_type( 'gutenberg-examples/01-basic', array(
+		'editor_script' => 'gutenberg-examples-01-basic',
 	) );
 }
 add_action( 'init', 'gutenberg_boilerplate_block' );
@@ -43,7 +43,7 @@ var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
 	blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
-registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-01', {
+registerBlockType( 'gutenberg-examples/01-basic', {
 	title: 'Hello World (Step 1)',
 
 	icon: 'universal-access-alt',
@@ -64,7 +64,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-01', {
 const { registerBlockType } = wp.blocks;
 const blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
-registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-01', {
+registerBlockType( 'gutenberg-examples/01-basic-esnext', {
 	title: 'Hello World (Step 1)',
 
 	icon: 'universal-access-alt',
