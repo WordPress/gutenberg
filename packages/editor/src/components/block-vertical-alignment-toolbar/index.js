@@ -22,12 +22,12 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 	center: {
 		_id: 'center',
 		icon: alignCenter,
-		title: _x( 'Verticaly Align Middle', 'Block vertical alignment setting' ),
+		title: _x( 'Vertically Align Middle', 'Block vertical alignment setting' ),
 	},
 	bottom: {
 		_id: 'bottom',
 		icon: alignBottom,
-		title: _x( 'Verticaly Align Bottom', 'Block vertical alignment setting' ),
+		title: _x( 'Vertically Align Bottom', 'Block vertical alignment setting' ),
 	},
 };
 
