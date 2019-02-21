@@ -81,8 +81,8 @@ export const settings = {
 
 	edit( { attributes, setAttributes, className } ) {
 		const { columns, verticalAlignment } = attributes;
-		const classes = classnames( className, {
-			[ `has-${ columns }-columns` ]: true,
+
+		const classes = classnames( className, `has-${ columns }-columns`, {
 			[ `are-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
 		} );
 
@@ -125,8 +125,7 @@ export const settings = {
 	save( { attributes } ) {
 		const { columns, verticalAlignment } = attributes;
 
-		const wrapperClasses = classnames( {
-			[ `has-${ columns }-columns` ]: true,
+		const wrapperClasses = classnames( `has-${ columns }-columns`, {
 			[ `are-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
 		} );
 

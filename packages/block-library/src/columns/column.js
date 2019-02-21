@@ -39,8 +39,7 @@ export const settings = {
 	edit( { attributes, setAttributes } ) {
 		const { verticalAlignment } = attributes;
 
-		const classes = classnames( {
-			'block-core-columns': true,
+		const classes = classnames( 'block-core-columns', {
 			[ `is-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
 		} );
 
