@@ -60,8 +60,9 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 ```
 {% ESNext %}
 ```jsx
-import { registerBlockType } from '@wordpress/blocks';
-import { TextControl } from '@wordpress/components';
+
+var registerBlockType = wp.blocks.registerBlockType;
+var TextControl = wp.components.TextControl;
 
 registerBlockType( 'myguten/meta-block', {
 	title: 'Meta Block',
