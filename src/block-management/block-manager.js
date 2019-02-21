@@ -171,16 +171,11 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	renderHeader() {
-		const focusTitle = this.props.title === '' && this.props.blockCount === 0;
-
 		return (
 			<View style={ styles.titleContainer }>
 				<PostTitle
 					setRef={ ( ref ) => {
-						if ( focusTitle && ref ) {
-							ref.focus();
-							this.titleViewRef = ref;
-						}
+						this.titleViewRef = ref;
 					} }
 					title={ this.props.title }
 					onUpdate={ this.props.setTitleAction }
