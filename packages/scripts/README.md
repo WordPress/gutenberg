@@ -220,6 +220,48 @@ This is how you execute those scripts using the presented setup:
 
 ## Webpack config
 
-The `build` and `start` commands.
+The `build` and `start` commands use [Webpack](https://webpack.js.org/) behind the scenes. Webpack is a tool that helps you transform your code into something else. For example: it can take code written in ESNext and output ES5 compatible code that is minified for production.
+
+### Default Webpack config
+
+`@wordpress/scripts` bundles the default Webpack config used as a base by the WordPress editor. These are the defaults:
+
+- [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
+- [Output](https://webpack.js.org/configuration/output): `build/index.js`
+- [Externals](https://webpack.js.org/configuration/externals). These are the transformations done to imports:
+
+Package | Input syntax | Output
+--- | --- | ---
+React | `import x from React;` | `var x = this.wp.react.x;`
+ReactDOM | `import x from ReactDOM;` | `var x = this.wp.react-dom.x;`
+moment | `import x from moment;` | `var x = this.wp.moment.x;`
+jQuery | `import x from jQuery;` | `var x = this.wp.jQuery.x;`
+lodash | `import x from lodash;` | `var x = this.wp.lodash.x;`
+lodash-es | `import x from lodash-es;` | `var x = this.wp.lodash-es.x;`
+Any WordPress package | `import x from '@wordpress/packageName` | `var x = this.wp.package-name.x`
+
+### Provide your own Webpack config
+
+Should there be any situation where you want to provide your own Webpack config, you can do so. The `build` and `start` commands will use your provided file when:
+
+- the command receives a `--config` argument. Example: `wp-scripts build --config my-own-webpack-config.js`.
+- there is a file called `webpack.config.js` or `webpack.config.babel.js` in the top-level directory of your package (at the same level than your `package.json`).
+
+### Extend the default config
+
+The `build` and `start` commands will detect if you provided a Webpack config, as explained in the previous section. You can still use the default and extend it so you don't have to craft your own solution if you only want to tweak the default.
+
+Let's say that you want Webpack to take as input a file named `my-plugin.js`. This is how you'd do it:
+
+* Create a file called `webpack.config.js` at the top-level directory of your package.
+* Fill it with the following contents:
+
+```js
+const config = require( '@wordpress/scripts/config/webpack.config.js' );
+module.exports = Object.assign( {}, config, {
+	// your tweaks here
+	entry: 'my-plugin.js',
+} );
+```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
