@@ -3,8 +3,16 @@
 @import '../variables.scss';
 
 .htmlView {
+	//font-family: $default-monospace-font;
+	background-color: white;
+	padding-left: 8;
+	padding-right: 8;
+	padding-top: 8;
+	padding-bottom: 8;
+}
+
+.htmlViewTitle {
 	font-family: $default-monospace-font;
-	flex: 1;
 	background-color: white;
 	padding-left: 8;
 	padding-right: 8;

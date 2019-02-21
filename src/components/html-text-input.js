@@ -3,8 +3,13 @@
  * @flow
  */
 
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 import React from 'react';
-import { Platform, TextInput, View } from 'react-native';
+import { Platform, TextInput, ScrollView } from 'react-native';
 import styles from './html-text-input.scss';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
@@ -16,7 +21,9 @@ import { withInstanceId, compose } from '@wordpress/compose';
 type PropsType = {
 	onChange: string => mixed,
 	onPersist: string => mixed,
+	setTitleAction: string => void,
 	value: string,
+	title: string,
 	parentHeight: number,
 };
 
@@ -74,19 +81,28 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 	render() {
 		return (
 			<KeyboardAvoidingView style={ styles.container } parentHeight={ this.props.parentHeight }>
-				<View style={ { flex: 1 } } >
+				<ScrollView style={ { flex: 1 } } >
+					<TextInput
+						autoCorrect={ false }
+						textAlignVertical="center"
+						numberOfLines={ 1 }
+						style={ styles.htmlViewTitle }
+						value={ this.props.title }
+						placeholder={ __( 'Add title' ) }
+						onChangeText={ this.props.setTitleAction }
+					/>
 					<TextInput
 						autoCorrect={ false }
 						ref={ ( textInput ) => this.textInput = textInput }
 						textAlignVertical="top"
 						multiline
-						numberOfLines={ 0 }
 						style={ styles.htmlView }
 						value={ this.state.value }
 						onChangeText={ this.edit }
 						onBlur={ this.stopEditing }
+						placeholder={ __( 'Start writing…' ) }
 					/>
-				</View>
+				</ScrollView>
 			</KeyboardAvoidingView>
 		);
 	}
