@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isNil } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -40,7 +39,7 @@ export const settings = {
 		const { verticalAlignment } = attributes;
 
 		const classes = classnames( 'block-core-columns', {
-			[ `is-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		} );
 
 		const onChange = ( alignment ) => setAttributes( { verticalAlignment: alignment } );
@@ -60,7 +59,7 @@ export const settings = {
 	save( { attributes } ) {
 		const { verticalAlignment } = attributes;
 		const wrapperClasses = classnames( {
-			[ `is-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		} );
 
 		return (

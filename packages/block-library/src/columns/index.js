@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times, isNil } from 'lodash';
+import { times } from 'lodash';
 import classnames from 'classnames';
 import memoize from 'memize';
 
@@ -83,7 +83,7 @@ export const settings = {
 		const { columns, verticalAlignment } = attributes;
 
 		const classes = classnames( className, `has-${ columns }-columns`, {
-			[ `are-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
+			[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		} );
 
 		const onChange = ( alignment ) => setAttributes( { verticalAlignment: alignment } );
@@ -126,7 +126,7 @@ export const settings = {
 		const { columns, verticalAlignment } = attributes;
 
 		const wrapperClasses = classnames( `has-${ columns }-columns`, {
-			[ `are-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
+			[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		} );
 
 		return (
