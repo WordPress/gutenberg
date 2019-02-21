@@ -68,6 +68,11 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		return <pre><code>{ attributes.content }</code></pre>;
+		let content = attributes.content || '';
+		// Escaping &.
+		content = content.replace( /&/g, '&amp;' );
+		// Preventing shortcodes from running.
+		content = content.replace( /\[/g, '&#91;' );
+		return <pre><code>{ content }</code></pre>;
 	},
 };
