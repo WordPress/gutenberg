@@ -8,7 +8,7 @@ import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 
-const minHeight = 53;
+const minHeight = 30;
 
 class PostTitle extends Component {
 	constructor() {
@@ -58,8 +58,8 @@ class PostTitle extends Component {
 				} ] }
 				fontSize={ 24 }
 				fontWeight={ 'bold' }
-				onChange={ ( event ) => {
-					this.props.onUpdate( event.content );
+				onChange={ ( value ) => {
+					this.props.onUpdate( value );
 				} }
 				onContentSizeChange={ ( event ) => {
 					this.setState( { aztecHeight: event.aztecHeight } );

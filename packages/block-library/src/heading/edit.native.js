@@ -21,7 +21,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 import './editor.scss';
 
-const minHeight = 50;
+const minHeight = 24;
 
 class HeadingEdit extends Component {
 	constructor( props ) {

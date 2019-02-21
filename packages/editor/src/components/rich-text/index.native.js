@@ -12,14 +12,19 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { BlockFormatControls } from '@wordpress/editor';
 import { withSelect } from '@wordpress/data';
 import {
+	applyFormat,
 	getActiveFormat,
 	isEmpty,
 	create,
 	split,
 	toHTMLString,
+	insert,
+	isCollapsed,
 } from '@wordpress/rich-text';
+import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
-import { children } from '@wordpress/blocks';
+import { pasteHandler, children } from '@wordpress/blocks';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -50,6 +55,7 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
+		this.onPaste = this.onPaste.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
@@ -84,25 +90,15 @@ export class RichText extends Component {
 	 * handler.
 	 *
 	 */
-	splitContent( htmlText, start, end ) {
+	splitContent( currentRecord, blocks = [], isPasted = false ) {
 		const { onSplit } = this.props;
 
 		if ( ! onSplit ) {
 			return;
 		}
 
-		const record = create( {
-			html: htmlText,
-			range: null,
-			multilineTag: false,
-			removeNode: null,
-			unwrapNode: null,
-			removeAttribute: null,
-			filterString: null,
-		} );
-
 		// TODO : Fix the index position in AztecNative for Android
-		let [ before, after ] = split( { start, end, ...record } );
+		let [ before, after ] = split( currentRecord );
 
 		// In case split occurs at the trailing or leading edge of the field,
 		// assume that the before/after values respectively reflect the current
@@ -110,9 +106,16 @@ export class RichText extends Component {
 		// determine whether the before/after value has changed using a trivial
 		//  strict equality operation.
 		if ( isEmpty( after ) ) {
-			before = record;
+			before = currentRecord;
 		} else if ( isEmpty( before ) ) {
-			after = record;
+			after = currentRecord;
+		}
+
+		// If pasting and the split would result in no content other than the
+		// pasted blocks, remove the before and after blocks.
+		if ( isPasted ) {
+			before = isEmpty( before ) ? null : before;
+			after = isEmpty( after ) ? null : after;
 		}
 
 		if ( before ) {
@@ -129,7 +132,7 @@ export class RichText extends Component {
 		// always update when provided with new content.
 		this.lastEventCount = undefined;
 
-		onSplit( before, after );
+		onSplit( before, after, ...blocks );
 	}
 
 	valueToFormat( { formats, text } ) {
@@ -225,7 +228,12 @@ export class RichText extends Component {
 			return;
 		}
 
-		this.splitContent( unescapeSpaces( event.nativeEvent.text ), event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
+		const currentRecord = this.createRecord( {
+			...event.nativeEvent,
+			currentContent: unescapeSpaces( event.nativeEvent.text ),
+		} );
+
+		this.splitContent( currentRecord );
 	}
 
 	// eslint-disable-next-line no-unused-vars
@@ -250,6 +258,85 @@ export class RichText extends Component {
 		// causing destruction of two fields (merge, then removed merged).
 		if ( onRemove && empty && isReverse ) {
 			onRemove( ! isReverse );
+		}
+	}
+
+	/**
+	 * Handles a paste event from the native Aztec Wrapper.
+	 *
+	 * @param {PasteEvent} event The paste event which wraps `nativeEvent`.
+	 */
+	onPaste( event ) {
+		const isPasted = true;
+		const { onSplit } = this.props;
+
+		const { pastedText, pastedHtml } = event.nativeEvent;
+		const currentRecord = this.createRecord( event.nativeEvent );
+
+		event.preventDefault();
+
+		// There is a selection, check if a URL is pasted.
+		if ( ! isCollapsed( currentRecord ) ) {
+			const trimmedText = ( pastedHtml || pastedText ).replace( /<[^>]+>/g, '' )
+				.trim();
+
+			// A URL was pasted, turn the selection into a link
+			if ( isURL( trimmedText ) ) {
+				const linkedRecord = applyFormat( currentRecord, {
+					type: 'a',
+					attributes: {
+						href: decodeEntities( trimmedText ),
+					},
+				} );
+				this.lastContent = this.valueToFormat( linkedRecord );
+				this.props.onChange( {
+					content: this.lastContent,
+				} );
+
+				// Allows us to ask for this information when we get a report.
+				window.console.log( 'Created link:\n\n', trimmedText );
+
+				return;
+			}
+		}
+
+		const shouldReplace = this.props.onReplace && this.isEmpty();
+
+		let mode = 'INLINE';
+
+		if ( shouldReplace ) {
+			mode = 'BLOCKS';
+		} else if ( onSplit ) {
+			mode = 'AUTO';
+		}
+
+		const pastedContent = pasteHandler( {
+			HTML: pastedHtml,
+			plainText: pastedText,
+			mode,
+			tagName: this.props.tagName,
+			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
+		} );
+
+		if ( typeof pastedContent === 'string' ) {
+			const recordToInsert = create( { html: pastedContent } );
+			const insertedContent = insert( currentRecord, recordToInsert );
+			const newContent = this.valueToFormat( insertedContent );
+			this.lastEventCount = undefined;
+			this.lastContent = newContent;
+			this.props.onChange( {
+				content: this.lastContent,
+			} );
+		} else if ( onSplit ) {
+			if ( ! pastedContent.length ) {
+				return;
+			}
+
+			if ( shouldReplace ) {
+				this.props.onReplace( pastedContent );
+			} else {
+				this.splitContent( currentRecord, pastedContent, isPasted );
+			}
 		}
 	}
 
@@ -281,6 +368,36 @@ export class RichText extends Component {
 
 	isEmpty() {
 		return isEmpty( this.formatToValue( this.props.value ) );
+	}
+
+	/**
+	 * Creates a RichText value "record" from native content and selection
+	 * information
+	 *
+	 * @param {string} currentContent The content (usually an HTML string) from
+	 *                                the native component.
+	 * @param {number}    selectionStart The start of the selection.
+	 * @param {number}      selectionEnd The end of the selection (same as start if
+	 *                                cursor instead of selection).
+	 *
+   * @return {Object} A RichText value with formats and selection.
+	 */
+	createRecord( { currentContent, selectionStart, selectionEnd } ) {
+		// strip outer <p> tags
+		const innerContent = this.removeRootTagsProduceByAztec( currentContent );
+
+		// create record (with selection) from current contents
+		const currentRecord = {
+			start: selectionStart,
+			end: selectionEnd,
+			...create( {
+				html: innerContent,
+				range: null,
+				multilineTag: false,
+			} ),
+		};
+
+		return currentRecord;
 	}
 
 	formatToValue( value ) {
@@ -384,12 +501,13 @@ export class RichText extends Component {
 					} }
 					text={ { text: html, eventCount: this.lastEventCount } }
 					placeholder={ this.props.placeholder }
-					placeholderTextColor={ this.props.placeholderTextColor || 'lightgrey' }
+					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'editor-rich-text' ].textDecorationColor }
 					onChange={ this.onChange }
 					onFocus={ this.props.onFocus }
 					onBlur={ this.props.onBlur }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
+					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
@@ -450,4 +568,4 @@ RichTextContainer.Content.defaultProps = {
 export default RichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { RichTextInputEvent } from './input-event';
+export { UnstableRichTextInputEvent } from './input-event';
