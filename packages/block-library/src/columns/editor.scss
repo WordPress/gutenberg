@@ -45,19 +45,15 @@
 		@include break-medium() {
 			flex-wrap: nowrap;
 		}
-
+		// Set full heights on Columns to enable vertical alignment preview
+		> [data-type="core/column"],
+		> [data-type="core/column"] > .editor-block-list__block-edit,
+		> [data-type="core/column"] > .editor-block-list__block-edit > div[data-block],
+		> [data-type="core/column"] > .editor-block-list__block-edit .block-core-columns {
+			@include flex-full-height();
+		}
 		// Adjust the individual column block.
 		> [data-type="core/column"] {
-			@include flex-full-height();
-			// Enable vertical alignment preview
-			> .editor-block-list__block-edit {
-				@include flex-full-height();
-				> div[data-block],
-				.block-core-columns {
-					@include flex-full-height();
-				}
-			}
-
 			// Remove Block "padding" so individual Column is flush with parent Columns
 			> .block-editor-block-list__block-edit::before {
 				left: 0;
