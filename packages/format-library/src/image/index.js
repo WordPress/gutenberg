@@ -1,12 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG, TextControl, Popover, IconButton, PositionedAtSelection } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import {
+	Path,
+	SVG,
+	TextControl,
+	Popover,
+	IconButton,
+	PositionedAtSelection,
+	withSpokenMessages,
+	KeyboardShortcuts,
+} from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { Component, createRef } from '@wordpress/element';
 import { insertObject } from '@wordpress/rich-text';
 import { MediaUpload, RichTextInserterItem, MediaUploadCheck } from '@wordpress/editor';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import {
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN,
+	BACKSPACE,
+	ENTER,
+	rawShortcut,
+	displayShortcut,
+} from '@wordpress/keycodes';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -27,13 +45,15 @@ export const image = {
 		url: 'src',
 		alt: 'alt',
 	},
-	edit: class ImageEdit extends Component {
+	edit: withSpokenMessages( class ImageEdit extends Component {
 		constructor() {
 			super( ...arguments );
 			this.onChange = this.onChange.bind( this );
 			this.onKeyDown = this.onKeyDown.bind( this );
 			this.openModal = this.openModal.bind( this );
 			this.closeModal = this.closeModal.bind( this );
+			this.onShortcut = this.onShortcut.bind( this );
+			this.input = createRef();
 			this.state = {
 				modal: false,
 			};
@@ -78,6 +98,25 @@ export const image = {
 			this.setState( { modal: false } );
 		}
 
+		onShortcut() {
+			this.input.current.contentNode.current.focus();
+		}
+
+		componentDidUpdate( prevProps ) {
+			const { isActive, speak } = this.props;
+
+			if ( isActive !== prevProps.isActive ) {
+				if ( isActive ) {
+					speak( sprintf(
+						__( 'Inline image selected. Press %s to focus the contextual toolbar.' ),
+						displayShortcut.primary( 'f6' )
+					), 'assertive' );
+				} else {
+					speak( __( 'Inline image deselected.' ), 'assertive' );
+				}
+			}
+		}
+
 		render() {
 			const { value, onChange, isActive, activeAttributes } = this.props;
 			const { style } = activeAttributes;
@@ -87,6 +126,9 @@ export const image = {
 
 			return (
 				<MediaUploadCheck>
+					<KeyboardShortcuts bindGlobal shortcuts={ {
+						[ rawShortcut.primary( 'f6' ) ]: this.onShortcut,
+					} } />
 					<RichTextInserterItem
 						name={ name }
 						icon={ <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M4 16h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2zM4 5h10v9H4V5zm14 9v2h4v-2h-4zM2 20h20v-2H2v2zm6.4-8.8L7 9.4 5 12h8l-2.6-3.4-2 2.6z" /></SVG> }
@@ -115,6 +157,7 @@ export const image = {
 					/> }
 					{ isActive && <PositionedAtSelection key={ key }>
 						<Popover
+							ref={ this.input }
 							position="bottom center"
 							focusOnMount={ false }
 						>
@@ -160,5 +203,5 @@ export const image = {
 				</MediaUploadCheck>
 			);
 		}
-	},
+	} ),
 };
