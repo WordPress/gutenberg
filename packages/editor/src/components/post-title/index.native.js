@@ -30,8 +30,8 @@ class PostTitle extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.onRef ) {
-			this.props.onRef( this );
+		if ( this.props.ref ) {
+			this.props.ref( this );
 		}
 	}
 
