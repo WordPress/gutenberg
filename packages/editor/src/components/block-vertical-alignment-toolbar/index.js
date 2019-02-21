@@ -10,12 +10,8 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { alignTop, alignCenter, alignBottom } from './icons';
-
-/**
- * Internal dependencies
- */
 import { withBlockEditContext } from '../block-edit/context';
+import { alignTop, alignCenter, alignBottom } from './icons';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	top: {
