@@ -3,7 +3,7 @@
  */
 import { withSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
-import { getActiveFormat } from '@wordpress/rich-text';
+import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
 
 const FormatEdit = ( { formatTypes, onChange, value } ) => {
 	return (
@@ -15,13 +15,20 @@ const FormatEdit = ( { formatTypes, onChange, value } ) => {
 
 				const activeFormat = getActiveFormat( value, name );
 				const isActive = activeFormat !== undefined;
-				const activeAttributes = isActive ? activeFormat.attributes || {} : {};
+				const activeObject = getActiveObject( value );
+				const isObjectActive = activeObject !== undefined;
 
 				return (
 					<Edit
 						key={ name }
 						isActive={ isActive }
-						activeAttributes={ activeAttributes }
+						activeAttributes={
+							isActive ? activeFormat.attributes || {} : {}
+						}
+						isObjectActive={ isObjectActive }
+						objectAttributes={
+							isObjectActive ? activeObject.attributes || {} : {}
+						}
 						value={ value }
 						onChange={ onChange }
 					/>

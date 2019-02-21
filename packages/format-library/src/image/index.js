@@ -40,7 +40,7 @@ export const image = {
 		}
 
 		static getDerivedStateFromProps( props, state ) {
-			const { activeAttributes: { style } } = props;
+			const { objectAttributes: { style } } = props;
 
 			if ( style === state.previousStyle ) {
 				return null;
@@ -79,8 +79,8 @@ export const image = {
 		}
 
 		render() {
-			const { value, onChange, isActive, activeAttributes } = this.props;
-			const { style } = activeAttributes;
+			const { value, onChange, isObjectActive, objectAttributes } = this.props;
+			const { style } = objectAttributes;
 			// Rerender PositionedAtSelection when the selection changes or when
 			// the width changes.
 			const key = value.start + style;
@@ -113,7 +113,7 @@ export const image = {
 							return null;
 						} }
 					/> }
-					{ isActive && <PositionedAtSelection key={ key }>
+					{ isObjectActive && <PositionedAtSelection key={ key }>
 						<Popover
 							position="bottom center"
 							focusOnMount={ false }
@@ -125,20 +125,19 @@ export const image = {
 								onKeyPress={ stopKeyPropagation }
 								onKeyDown={ this.onKeyDown }
 								onSubmit={ ( event ) => {
-									const newFormats = value.formats.slice( 0 );
+									const newObjects = value.objects.slice();
 
-									newFormats[ value.start ] = [ {
+									newObjects[ value.start ] = {
 										type: name,
-										object: true,
 										attributes: {
-											...activeAttributes,
+											...objectAttributes,
 											style: `width: ${ this.state.width }px;`,
 										},
-									} ];
+									};
 
 									onChange( {
 										...value,
-										formats: newFormats,
+										objects: newObjects,
 									} );
 
 									event.preventDefault();
