@@ -2,7 +2,7 @@
  * External dependencies
  */
 
-import { find } from 'lodash';
+import { find, reject } from 'lodash';
 
 /**
  * Internal dependencies
@@ -35,16 +35,26 @@ export function removeFormat(
 	if ( startIndex === endIndex ) {
 		const format = find( newFormats[ startIndex ], { type: formatType } );
 
-		while ( find( newFormats[ startIndex ], format ) ) {
-			filterFormats( newFormats, startIndex, formatType );
-			startIndex--;
-		}
+		if ( format ) {
+			while ( find( newFormats[ startIndex ], format ) ) {
+				filterFormats( newFormats, startIndex, formatType );
+				startIndex--;
+			}
 
-		endIndex++;
-
-		while ( find( newFormats[ endIndex ], format ) ) {
-			filterFormats( newFormats, endIndex, formatType );
 			endIndex++;
+
+			while ( find( newFormats[ endIndex ], format ) ) {
+				filterFormats( newFormats, endIndex, formatType );
+				endIndex++;
+			}
+		} else {
+			return {
+				...value,
+				formatPlaceholder: reject(
+					newFormats[ startIndex - 1 ] || [],
+					{ type: formatType }
+				),
+			};
 		}
 	} else {
 		for ( let i = startIndex; i < endIndex; i++ ) {

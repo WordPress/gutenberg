@@ -52,11 +52,10 @@ export function applyFormat(
 		// with the format applied.
 		} else {
 			const previousFormat = newFormats[ startIndex - 1 ] || [];
-			const hasType = find( previousFormat, { type: format.type } );
 
 			return {
 				...value,
-				formatPlaceholder: hasType ? undefined : format,
+				formatPlaceholder: [ ...previousFormat, format ],
 			};
 		}
 	} else {

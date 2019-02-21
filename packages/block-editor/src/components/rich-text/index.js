@@ -397,9 +397,13 @@ export class RichText extends Component {
 		const { formats, lineFormats, objects, text, start, end } = this.createRecord();
 
 		if ( this.formatPlaceholder ) {
-			formats[ this.state.start ] = formats[ this.state.start ] || [];
-			formats[ this.state.start ].push( this.formatPlaceholder );
-			selectedFormat = formats[ this.state.start ].length;
+			selectedFormat = this.formatPlaceholder.length;
+
+			if ( selectedFormat ) {
+				formats[ this.state.start ] = this.formatPlaceholder;
+			} else {
+				delete formats[ this.state.start ];
+			}
 		} else if ( selectedFormat ) {
 			const formatsBefore = formats[ start - 1 ] || [];
 			const formatsAfter = formats[ start ] || [];
