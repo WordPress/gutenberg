@@ -31,7 +31,6 @@ const withRegistry = createHigherOrderComponent(
 class BlockEditorProvider extends Component {
 	componentDidMount() {
 		this.props.updateEditorSettings( this.props.settings );
-		this.isSyncingIncomingValue = true;
 		this.props.resetBlocks( this.props.value );
 		this.attachChangeObserver( this.props.registry );
 	}
