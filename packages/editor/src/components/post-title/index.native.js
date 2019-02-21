@@ -71,6 +71,7 @@ class PostTitle extends Component {
 			<View style={ [ styles.titleContainer, borderStyle, { borderColor } ] }>
 				<RichText
 					tagName={ 'p' }
+					rootTagsToEliminate={ [ 'strong' ] }
 					onFocus={ this.onSelect }
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }
