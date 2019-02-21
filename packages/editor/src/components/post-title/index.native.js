@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { View } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -8,8 +13,9 @@ import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 
-import { View } from 'react-native';
-
+/**
+ * Internal dependencies
+ */
 import styles from './style.scss';
 
 const minHeight = 30;
@@ -30,8 +36,8 @@ class PostTitle extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.ref ) {
-			this.props.ref( this );
+		if ( this.props.innerRef ) {
+			this.props.innerRef( this );
 		}
 	}
 
