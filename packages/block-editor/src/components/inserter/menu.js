@@ -360,21 +360,30 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
 		const {
 			getInserterItems,
 			getBlockName,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
 		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
 		} = select( 'core/blocks' );
 
-		const rootBlockName = getBlockName( rootClientId );
+		let destinationRootClientId = rootClientId;
+		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
+			const end = getBlockSelectionEnd();
+			if ( end ) {
+				destinationRootClientId = getBlockRootClientId( end ) || undefined;
+			}
+		}
+		const destinationRootBlockName = getBlockName( destinationRootClientId );
 
 		return {
-			rootChildBlocks: getChildBlockNames( rootBlockName ),
-			items: getInserterItems( rootClientId ),
-			rootClientId,
+			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
+			items: getInserterItems( destinationRootClientId ),
+			destinationRootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
@@ -393,45 +402,34 @@ export default compose(
 		// Since it's a function only called when the event handlers are called,
 		// it's fine to extract it.
 		// eslint-disable-next-line no-restricted-syntax
-		function getInsertionPoint() {
+		function getInsertionIndex() {
 			const {
 				getBlockIndex,
-				getBlockRootClientId,
 				getBlockSelectionEnd,
 				getBlockOrder,
 			} = select( 'core/block-editor' );
-			const { clientId, rootClientId, isAppender } = ownProps;
+			const { clientId, destinationRootClientId, isAppender } = ownProps;
 
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
-				return {
-					index: getBlockIndex( clientId, rootClientId ),
-					rootClientId,
-				};
+				return getBlockIndex( clientId, destinationRootClientId );
 			}
 
 			// If there a selected block, we insert after the selected block.
 			const end = getBlockSelectionEnd();
 			if ( ! isAppender && end ) {
-				const selectedBlockRootClientId = getBlockRootClientId( end ) || undefined;
-				return {
-					index: getBlockIndex( end, selectedBlockRootClientId ) + 1,
-					rootClientId: selectedBlockRootClientId,
-				};
+				return getBlockIndex( end, destinationRootClientId ) + 1;
 			}
 
 			// Otherwise, we insert at the end of the current rootClientId
-			return {
-				index: getBlockOrder( rootClientId ).length,
-				rootClientId,
-			};
+			return getBlockOrder( destinationRootClientId ).length;
 		}
 
 		return {
 			fetchReusableBlocks,
 			showInsertionPoint() {
-				const { index, rootClientId } = getInsertionPoint();
-				showInsertionPoint( rootClientId, index );
+				const index = getInsertionIndex();
+				showInsertionPoint( ownProps.destinationRootClientId, index );
 			},
 			hideInsertionPoint,
 			onSelect( item ) {
@@ -449,8 +447,11 @@ export default compose(
 				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
-					const { index, rootClientId } = getInsertionPoint();
-					insertBlock( insertedBlock, index, rootClientId );
+					insertBlock(
+						insertedBlock,
+						getInsertionIndex(),
+						ownProps.destinationRootClientId
+					);
 				}
 
 				ownProps.onSelect();
