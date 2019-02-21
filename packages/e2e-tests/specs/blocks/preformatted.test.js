@@ -28,6 +28,7 @@ describe( 'Preformatted', () => {
 		// Once it's edited, it should be saved as BR tags.
 		await page.keyboard.type( '0' );
 		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Escape' );
 		await page.waitForSelector( 'button[aria-label="More options"]' );
 		await page.click( 'button[aria-label="More options"]' );
 		await clickButton( 'Edit as HTML' );
