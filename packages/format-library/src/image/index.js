@@ -109,7 +109,7 @@ export const image = {
 				if ( isActive ) {
 					speak( sprintf(
 						__( 'Inline image selected. Press %s to focus the contextual toolbar.' ),
-						displayShortcut.primary( 'f6' )
+						displayShortcut.primary( 'f9' )
 					), 'assertive' );
 				} else {
 					speak( __( 'Inline image deselected.' ), 'assertive' );
@@ -127,7 +127,7 @@ export const image = {
 			return (
 				<MediaUploadCheck>
 					<KeyboardShortcuts bindGlobal shortcuts={ {
-						[ rawShortcut.primary( 'f6' ) ]: this.onShortcut,
+						[ rawShortcut.primary( 'f9' ) ]: this.onShortcut,
 					} } />
 					<RichTextInserterItem
 						name={ name }
