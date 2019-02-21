@@ -39,7 +39,7 @@ export default class AppProvider extends React.Component<PropsType> {
 		let gutenbergTranslations = getTranslation( locale );
 		if ( locale && ! gutenbergTranslations ) {
 			// Try stripping out the regional
-			const language = locale.replace( /[-_][A-Za-z]+$/ , '' );
+			const language = locale.replace( /[-_][A-Za-z]+$/, '' );
 			if ( language !== locale ) {
 				gutenbergTranslations = getTranslation( language );
 			}
