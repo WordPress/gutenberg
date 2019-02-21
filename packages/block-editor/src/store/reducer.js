@@ -167,6 +167,7 @@ export function hasSameKeys( a, b ) {
 export function isUpdatingSameBlockAttribute( action, lastAction ) {
 	return (
 		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+		lastAction !== undefined &&
 		lastAction.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
 		action.clientId === lastAction.clientId &&
 		hasSameKeys( action.attributes, lastAction.attributes )

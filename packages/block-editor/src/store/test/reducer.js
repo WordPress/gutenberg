@@ -115,6 +115,19 @@ describe( 'state', () => {
 			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
 		} );
 
+		it( 'should return false if no previous action', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = undefined;
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
 		it( 'should return true if updating the same block attributes', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
