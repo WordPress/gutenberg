@@ -41,7 +41,7 @@ const relativeToAbsolute = ( basePath, relativePath ) => {
 };
 
 const getIRFromRelativePath = ( rootDir, basePath ) => ( relativePath ) => {
-	if ( ! relativePath.startsWith( './' ) ) {
+	if ( ! relativePath.startsWith( '.' ) ) {
 		return [];
 	}
 	const absolutePath = relativeToAbsolute( basePath, relativePath );
