@@ -38,7 +38,7 @@ _Example:_
 
 ### `build`
 
-Builds the code to the designated `build` folder in the configuration file. It correctly bundles code in production mode and optimizes the build for the best performance. Your code is ready to be deployed. It uses [Webpack](https://webpack.js.org/) behind the scenes and you still need to provide your own config as described in the [documentation](https://webpack.js.org/concepts/configuration/).
+Transforms your code according the configuration provided so it's ready for production and optimized for the best performance. It uses [Webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the "Webpack config" section.
 
 _Example:_
 
@@ -51,8 +51,8 @@ _Example:_
 ```
 
 This is how you execute the script with presented setup:
-* `npm run build` - builds the code for production.
 
+* `npm run build` - builds the code for production.
 
 ### `check-engines`
 
@@ -69,6 +69,7 @@ _Example:_
 ```
 
 This is how you execute the script with presented setup:
+
 * `npm run check-engines` - checks installed version of `node` and `npm`.
 
 ### `check-licenses`
@@ -107,6 +108,7 @@ _Example:_
 ```
 
 This is how you execute the script with presented setup:
+
 * `npm run lint:js` - lints JavaScript files in the entire project's directories.
 
 ### `lint-pkg-json`
@@ -124,6 +126,7 @@ _Example:_
 ```
 
 This is how you execute those scripts using the presented setup:
+
 * `npm run lint:pkg-json` - lints `package.json` file in the project's root folder.
 
 ### `lint-style`
@@ -141,11 +144,12 @@ _Example:_
 ```
 
 This is how you execute the script with presented setup:
+
 * `npm run lint:css` - lints CSS files in the whole project's directory.
 
 ### `start`
 
-Builds the code for development to the designated `build` folder in the configuration file. The script will automatically rebuild if you make changes to the code. You will see the build errors in the console. It uses [Webpack](https://webpack.js.org/) behind the scenes and you still need to provide your own config as described in the [documentation](https://webpack.js.org/concepts/configuration/).
+Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. It uses [Webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the "Webpack config" section.
 
 _Example:_
 
@@ -158,6 +162,7 @@ _Example:_
 ```
 
 This is how you execute the script with presented setup:
+
 * `npm start` - starts the build for development.
 
 ### `test-e2e`
@@ -180,6 +185,7 @@ _Example:_
 ```
 
 This is how you execute those scripts using the presented setup:
+
 * `npm run test:e2e` - runs all unit tests.
 * `npm run test:e2e:help` - prints all available options to configure unit tests runner.
 
@@ -207,8 +213,13 @@ _Example:_
 ```
 
 This is how you execute those scripts using the presented setup:
+
 * `npm run test:unit` - runs all unit tests.
 * `npm run test:unit:help` - prints all available options to configure unit tests runner.
 * `npm run test:unit:watch` - runs all unit tests in the watch mode.
+
+## Webpack config
+
+The `build` and `start` commands.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
