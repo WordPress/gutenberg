@@ -1045,6 +1045,6 @@ in order to switch its temporary id with the real id.
  * id: Reusable block's id.
  * updatedId: Updated block's id.
 
-### markLastChangeAsPersistent
+### __unstableMarkLastChangeAsPersistent
 
 Returns an action object used in signalling that the last block change should be marked explicitely as persistent.

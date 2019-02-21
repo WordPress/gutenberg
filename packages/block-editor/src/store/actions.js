@@ -538,7 +538,7 @@ export function __unstableSaveReusableBlock( id, updatedId ) {
  *
  * @return {Object} Action object.
  */
-export function markLastChangeAsPersistent() {
+export function __unstableMarkLastChangeAsPersistent() {
 	return { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' };
 }
 

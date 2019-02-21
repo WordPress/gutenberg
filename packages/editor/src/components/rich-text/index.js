@@ -1102,13 +1102,13 @@ const RichTextContainer = compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
-			markLastChangeAsPersistent,
+			__unstableMarkLastChangeAsPersistent,
 			enterFormattedText,
 			exitFormattedText,
 		} = dispatch( 'core/block-editor' );
 
 		return {
-			onCreateUndoLevel: markLastChangeAsPersistent,
+			onCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
 			onEnterFormattedText: enterFormattedText,
 			onExitFormattedText: exitFormattedText,
 		};
