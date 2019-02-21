@@ -40,11 +40,12 @@ export function BlockVerticalAlignmentToolbar( { isCollapsed, value, onChange, c
 	}
 
 	const activeAlignment = BLOCK_ALIGNMENTS_CONTROLS[ value ];
+	const defaultAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	return (
 		<Toolbar
 			isCollapsed={ isCollapsed }
-			icon={ activeAlignment ? activeAlignment.icon : BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ].icon }
+			icon={ activeAlignment ? activeAlignment.icon : defaultAlignmentControl.icon }
 			label={ _x( 'Change Alignment', 'Block vertical alignment setting label' ) }
 			controls={
 				controls.map( ( control ) => {
