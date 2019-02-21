@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { compact, last, has } from 'lodash';
+import { compact, has } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,11 +29,8 @@ import {
 } from './actions';
 import {
 	getBlock,
-	getBlockRootClientId,
 	getBlocks,
 	getBlockCount,
-	getPreviousBlockClientId,
-	getSelectedBlockClientId,
 	getSelectedBlockCount,
 	getTemplate,
 	getTemplateLock,
@@ -83,43 +80,6 @@ export function validateBlocksToTemplate( action, store ) {
 	// Update if validity has changed.
 	if ( isBlocksValidToTemplate !== isValidTemplate( state ) ) {
 		return setTemplateValidity( isBlocksValidToTemplate );
-	}
-}
-
-/**
- * Effect handler which will return a block select action to select the block
- * occurring before the selected block in the previous state, unless it is the
- * same block or the action includes a falsey `selectPrevious` option flag.
- *
- * @param {Object} action Action which had initiated the effect handler.
- * @param {Object} store  Store instance.
- *
- * @return {?Object} Block select action to select previous, if applicable.
- */
-export function selectPreviousBlock( action, store ) {
-	// if the action says previous block should not be selected don't do anything.
-	if ( ! action.selectPrevious ) {
-		return;
-	}
-
-	const firstRemovedBlockClientId = action.clientIds[ 0 ];
-	const state = store.getState();
-	const selectedBlockClientId = getSelectedBlockClientId( state );
-
-	// recreate the state before the block was removed.
-	const previousState = { ...state, editor: { present: last( state.editor.past ) } };
-
-	// rootClientId of the removed block.
-	const rootClientId = getBlockRootClientId( previousState, firstRemovedBlockClientId );
-
-	// Client ID of the block that was before the removed block or the
-	// rootClientId if the removed block was first amongst its siblings.
-	const blockClientIdToSelect = getPreviousBlockClientId( previousState, firstRemovedBlockClientId ) || rootClientId;
-
-	// Dispatch select block action if the currently selected block
-	// is not already the block we want to be selected.
-	if ( blockClientIdToSelect !== selectedBlockClientId ) {
-		return selectBlock( blockClientIdToSelect, -1 );
 	}
 }
 
@@ -258,7 +218,6 @@ export default {
 	CONVERT_BLOCK_TO_STATIC: convertBlockToStatic,
 	CONVERT_BLOCK_TO_REUSABLE: convertBlockToReusable,
 	REMOVE_BLOCKS: [
-		selectPreviousBlock,
 		ensureDefaultBlock,
 	],
 	REPLACE_BLOCKS: [
