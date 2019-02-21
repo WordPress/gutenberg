@@ -9,6 +9,7 @@ import {
 	omit,
 	without,
 	mapValues,
+	keys,
 	isEqual,
 	isEmpty,
 } from 'lodash';
@@ -150,7 +151,7 @@ function getMutateSafeObject( original, working ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( Object.keys( a ), Object.keys( b ) );
+	return isEqual( keys( a ), keys( b ) );
 }
 
 /**
