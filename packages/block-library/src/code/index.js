@@ -73,6 +73,8 @@ export const settings = {
 		content = content.replace( /&/g, '&amp;' );
 		// Preventing shortcodes from running.
 		content = content.replace( /\[/g, '&#91;' );
+		// Preventing isolated URLs from becoming an embed.
+		content = content.replace( /\//g, '&#47;' );
 		return <pre><code>{ content }</code></pre>;
 	},
 };
