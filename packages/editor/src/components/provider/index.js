@@ -86,7 +86,7 @@ class EditorProvider extends Component {
 			meta,
 			onMetaChange,
 			reusableBlocks,
-			createUndoLevel,
+			resetEditorBlocksWithoutUndoLevel,
 		} = this.props;
 
 		if ( ! isReady ) {
@@ -100,8 +100,8 @@ class EditorProvider extends Component {
 		return (
 			<BlockEditorProvider
 				value={ blocks }
-				onInput={ resetEditorBlocks }
-				onChange={ createUndoLevel }
+				onInput={ resetEditorBlocksWithoutUndoLevel }
+				onChange={ resetEditorBlocks }
 				settings={ editorSettings }
 			>
 				{ children }
@@ -131,7 +131,6 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			editPost,
-			createUndoLevel,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
@@ -140,7 +139,9 @@ export default compose( [
 			updatePostLock,
 			createWarningNotice,
 			resetEditorBlocks,
-			createUndoLevel,
+			resetEditorBlocksWithoutUndoLevel( blocks ) {
+				resetEditorBlocks( blocks, false );
+			},
 			onMetaChange( meta ) {
 				editPost( { meta } );
 			},

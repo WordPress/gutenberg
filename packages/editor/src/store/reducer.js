@@ -103,6 +103,10 @@ export function isUpdatingSamePostProperty( action, previousAction ) {
  * @return {boolean} Whether to overwrite present state.
  */
 export function shouldOverwriteState( action, previousAction ) {
+	if ( action.type === 'RESET_EDITOR_BLOCKS' ) {
+		return ! action.shouldCreateUndoLevel;
+	}
+
 	if ( ! previousAction || action.type !== previousAction.type ) {
 		return false;
 	}
@@ -133,10 +137,6 @@ export const editor = flow( [
 			'RECEIVE_BLOCKS',
 			'RESET_POST',
 			'UPDATE_POST',
-
-			// Blocks history is managed by explicit createUndoLevel actions
-			// occurring via the rendered BlockEditor's onChange callback.
-			'RESET_EDITOR_BLOCKS',
 		],
 		shouldOverwriteState,
 	} ),

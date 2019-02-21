@@ -33,10 +33,11 @@ class BlockEditorProvider extends Component {
 			this.isSyncingBlockValue = false;
 		} else if ( blocks !== prevProps.blocks ) {
 			this.isSyncingBlockValue = true;
-			onInput( blocks );
 
 			if ( isLastBlockChangePersistent ) {
 				onChange( blocks );
+			} else {
+				onInput( blocks );
 			}
 		} else if ( value !== prevProps.value ) {
 			this.isSyncingBlockValue = true;
