@@ -909,4 +909,4 @@ Returns an action object used to signal that the blocks have been updated.
 *Parameters*
 
  * blocks: Block Array.
- * shouldCreateUndoLevel: Create Undo Level
+ * options: Optional options.

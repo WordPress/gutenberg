@@ -140,7 +140,9 @@ export default compose( [
 			createWarningNotice,
 			resetEditorBlocks,
 			resetEditorBlocksWithoutUndoLevel( blocks ) {
-				resetEditorBlocks( blocks, false );
+				resetEditorBlocks( blocks, {
+					__unstableShouldCreateUndoLevel: false,
+				} );
 			},
 			onMetaChange( meta ) {
 				editPost( { meta } );

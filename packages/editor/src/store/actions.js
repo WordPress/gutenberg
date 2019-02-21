@@ -344,16 +344,16 @@ export function unlockPostSaving( lockName ) {
 /**
  * Returns an action object used to signal that the blocks have been updated.
  *
- * @param  {Array}   blocks Block Array.
- * @param  {boolean} shouldCreateUndoLevel Create Undo Level
+ * @param {Array}   blocks  Block Array.
+ * @param {?Object} options Optional options.
  *
  * @return {Object} Action object
  */
-export function resetEditorBlocks( blocks, shouldCreateUndoLevel = true ) {
+export function resetEditorBlocks( blocks, options = {} ) {
 	return {
 		type: 'RESET_EDITOR_BLOCKS',
 		blocks,
-		shouldCreateUndoLevel,
+		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
 	};
 }
 
