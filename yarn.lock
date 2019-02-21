@@ -5153,9 +5153,9 @@ jsc-android@224109.x.x:
   resolved "https://registry.yarnpkg.com/jsc-android/-/jsc-android-224109.1.0.tgz#9749ec92f1e284b3c09befe7c47cc6e60b1f0cdf"
   integrity sha512-mhALFynePc/wJsUt9BJuH13mSK/dGWtBO/pcYwVV1I0A7iduyqy3fSoAt1b0yI+/B3TzlGyue/gqjPxsqG1HRQ==
 
-"jsdom-jscore@git+https://github.com/iamcco/jsdom-jscore-rn.git#6eac88dd5d5e7c21ce6382abde7dbc376d7f7f59":
+"jsdom-jscore@git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800":
   version "0.1.7"
-  resolved "git+https://github.com/iamcco/jsdom-jscore-rn.git#6eac88dd5d5e7c21ce6382abde7dbc376d7f7f59"
+  resolved "git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800"
   dependencies:
     htmlparser2-without-node-native "^3.9.2"
     querystring "^0.2.0"
