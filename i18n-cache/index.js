@@ -15,6 +15,7 @@ const supportedLocales = [
 	'en-au', // English (Australia)
 	'en-ca', // English (Canada)
 	'en-gb', // English (UK)
+	'el', // Greek
 	'es', // Spanish
 	'fr', // French
 	'he', // Hebrew
