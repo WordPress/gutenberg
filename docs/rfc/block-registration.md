@@ -10,9 +10,11 @@ In more practical terms, an implementation should fulfill requirements that...
   * Building REST APIs to fetch the available block types
   * Building REST APIs to fetch block objects from posts
 * This API should be backward compatible with what we have at the moment.
-* It should be possible to statically analyze a block type in order to support advanced use-cases required by one of the [9 projects](https://make.wordpress.org/core/2018/12/08/9-priorities-for-2019/) for 2019 in WordPress: "Building a WordPress.org directory for discovering blocks, and a way to seamlessly install them."
+* It should be possible to statically analyze a block type in order to support advanced use-cases required by one of the [9 projects](https://make.wordpress.org/core/2018/12/08/9-priorities-for-2019/) for 2019 in WordPress: "Building a WordPress.org directory for discovering blocks, and a way to seamlessly install them.". The block directory should not need to parse JavaScript or PHP files to retrieve their definitions similar to how it happens for plugins as of today.
+
+It can statically analyze the files of any plugin to retrieve blocks and their properties.
 * It should not require a build tool compilation step (e.g. Babel, Webpack) to author code which would be referenced in a block type definition.
-* There should allow the potential to dynamically load ("lazy-load") block types, or parts of block type definitions.
+* There should allow the potential to dynamically load ("lazy-load") block types, or parts of block type definitions. It practical terms, it means that the editor should be able to be loaded without enqueuing all the assets (scripts and styles) of all block types. What it needs is the basic metadata (`title`, `description`, `category`, `icon`, etc...) to start with. It should be fine to defer loading all other code (`edit`, `save`, `transforms`, and other JavaScript implementations) until it is explicitly used (inserted into the post content).
 
 ## References
 
