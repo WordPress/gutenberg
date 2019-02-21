@@ -148,6 +148,9 @@ export const editor = flow( [
 	} )( ( state = { value: [] }, action ) => {
 		switch ( action.type ) {
 			case 'RESET_EDITOR_BLOCKS':
+				if ( action.blocks === state.value ) {
+					return state;
+				}
 				return { value: action.blocks };
 		}
 

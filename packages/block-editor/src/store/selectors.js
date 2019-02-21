@@ -219,7 +219,11 @@ export const getBlocks = createSelector(
 			( clientId ) => getBlock( state, clientId )
 		);
 	},
-	( state ) => [ state.blocks ]
+	( state ) => [
+		state.blocks.byClientId,
+		state.blocks.order,
+		state.blocks.attributes,
+	]
 );
 
 /**
@@ -296,7 +300,9 @@ export const getBlocksByClientId = createSelector(
 	),
 	( state ) => [
 		getPostMeta( state ),
-		state.blocks,
+		state.blocks.byClientId,
+		state.blocks.order,
+		state.blocks.attributes,
 	]
 );
 
@@ -612,7 +618,9 @@ export const getMultiSelectedBlocks = createSelector(
 	},
 	( state ) => [
 		...getMultiSelectedBlockClientIds.getDependants( state ),
-		state.blocks,
+		state.blocks.byClientId,
+		state.blocks.order,
+		state.blocks.attributes,
 		getPostMeta( state ),
 	]
 );
