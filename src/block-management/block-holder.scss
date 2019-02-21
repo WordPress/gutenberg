@@ -32,28 +32,20 @@
 
 .unsupportedBlock {
 	background-color: #e9eff3; // grey lighten 30 
-	padding-top: 8;
-	padding-bottom: 8;
-	padding-left: 8;
-	padding-right: 8;
+	height: 122px;
+	align-items: center;
+	justify-content: center;
 }
 
 .unsupportedBlockImagePlaceholder {
-	margin: auto;
-	text-align: center;
-	background-color: #4f748e; // dark grey
 	width: 20;
 	height: 20;
-	margin-top: 24;
-	margin-bottom: 8;
+	margin-bottom: 6px;
 }
 
 .unsupportedBlockMessage {
-	text-align: center;
 	color: #4f748e; // grey darken 20
-	padding-top: 24;
-	padding-bottom: 24;
-	font-size: 16px;
+	font-size: 14px;
 	font-family: $default-regular-font;
 }
 
