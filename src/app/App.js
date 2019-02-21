@@ -1,8 +1,6 @@
 /** @flow
  * @format */
 
-import '../globals';
-
 import React from 'react';
 
 // Gutenberg imports
