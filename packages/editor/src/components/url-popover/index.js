@@ -54,7 +54,7 @@ class URLPopover extends Component {
 					{ !! renderSettings && (
 						<IconButton
 							className="editor-url-popover__settings-toggle"
-							icon="ellipsis"
+							icon="arrow-down-alt2"
 							label={ __( 'Link Settings' ) }
 							onClick={ this.toggleSettingsVisibility }
 							aria-expanded={ isSettingsExpanded }

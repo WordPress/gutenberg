@@ -32,4 +32,3 @@ if ( hasWebpackConfig ) {
 	console.log( 'Webpack config file is missing.' );
 	process.exit( 1 );
 }
-

@@ -6,7 +6,8 @@ import path from 'path';
 /**
  * WordPress dependencies
  */
-import { jsTester, phpTester } from '@wordpress/block-serialization-spec-parser';
+// eslint-disable-next-line no-restricted-syntax
+import { jsTester, phpTester } from '@wordpress/block-serialization-spec-parser/shared-tests';
 
 /**
  * Internal dependencies

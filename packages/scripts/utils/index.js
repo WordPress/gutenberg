@@ -18,8 +18,12 @@ const {
 const {
 	hasPackageProp,
 } = require( './package' );
+const {
+	camelCaseDash,
+} = require( './string' );
 
 module.exports = {
+	camelCaseDash,
 	fromConfigRoot,
 	getCliArg,
 	getCliArgs,

@@ -35,6 +35,7 @@
 		"@wordpress/eslint-plugin": "file:../eslint-plugin",
 		"@wordpress/jest-preset-default": "file:../jest-preset-default",
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
+		"babel-loader": "^8.0.5",
 		"chalk": "^2.4.1",
 		"check-node-version": "^3.1.1",
 		"cross-spawn": "^5.1.0",
@@ -45,10 +46,13 @@
 		"puppeteer": "1.6.1",
 		"read-pkg-up": "^1.0.1",
 		"resolve-bin": "^0.4.0",
+		"source-map-loader": "^0.2.4",
 		"stylelint": "^9.10.1",
 		"stylelint-config-wordpress": "^13.1.0",
 		"webpack": "4.8.3",
-		"webpack-cli": "^3.1.2"
+		"webpack-bundle-analyzer": "^3.0.3",
+		"webpack-cli": "^3.1.2",
+		"webpack-livereload-plugin": "^2.2.0"
 	},
 	"publishConfig": {
 		"access": "public"

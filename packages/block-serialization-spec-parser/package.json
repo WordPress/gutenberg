@@ -18,12 +18,16 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"main": "parser.js",
+	"dependencies": {
+		"pegjs": "^0.10.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
 		"build": "concurrently \"npm run build:js\" \"npm run build:php\"",
-		"build:js": "pegjs --format umd -o ./parser.js ./grammar.pegjs",
+		"build:js": "pegjs --format commonjs -o ./parser.js ./grammar.pegjs",
 		"build:php": "node bin/create-php-parser.js"
 	}
 }
