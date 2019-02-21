@@ -1560,6 +1560,24 @@ reflects a reverse selection.
  * initialPosition: Optional initial position. Pass as -1 to
                                  reflect reverse selection.
 
+### selectPreviousBlock
+
+Yields action objects used in signalling that the block preceding the given
+clientId should be selected.
+
+*Parameters*
+
+ * clientId: Block client ID.
+
+### selectNextBlock
+
+Yields action objects used in signalling that the block following the given
+clientId should be selected.
+
+*Parameters*
+
+ * clientId: Block client ID.
+
 ### toggleSelection
 
 Returns an action object that enables or disables block selection.
@@ -1703,7 +1721,7 @@ be created.
 
 ### removeBlocks
 
-Returns an action object used in signalling that the blocks corresponding to
+Yields action objects used in signalling that the blocks corresponding to
 the set of specified client IDs are to be removed.
 
 *Parameters*

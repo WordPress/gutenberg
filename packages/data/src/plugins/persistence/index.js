@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow } from 'lodash';
+import { flow, merge, isPlainObject } from 'lodash';
 
 /**
  * Internal dependencies
@@ -33,20 +33,6 @@ const DEFAULT_STORAGE = defaultStorage;
  * @type {string}
  */
 const DEFAULT_STORAGE_KEY = 'WP_DATA';
-
-/**
- * Higher-order reducer to provides an initial value when state is undefined.
- *
- * @param {Function} reducer      Original reducer.
- * @param {*}        initialState Value to use as initial state.
- *
- * @return {Function} Enhanced reducer.
- */
-export function withInitialState( reducer, initialState ) {
-	return ( state = initialState, action ) => {
-		return reducer( state, action );
-	};
-}
 
 /**
  * Higher-order reducer which invokes the original reducer only if state is
@@ -178,12 +164,28 @@ export default function( registry, pluginOptions ) {
 				return registry.registerStore( reducerKey, options );
 			}
 
-			const initialState = persistence.get()[ reducerKey ];
+			// Load from persistence to use as initial state.
+			const persistedState = persistence.get()[ reducerKey ];
+			if ( persistedState !== undefined ) {
+				let initialState = options.reducer( undefined, {
+					type: '@@WP/PERSISTENCE_RESTORE',
+				} );
 
-			options = {
-				...options,
-				reducer: withInitialState( options.reducer, initialState ),
-			};
+				if ( isPlainObject( initialState ) && isPlainObject( persistedState ) ) {
+					// If state is an object, ensure that:
+					// - Other keys are left intact when persisting only a
+					//   subset of keys.
+					// - New keys in what would otherwise be used as initial
+					//   state are deeply merged as base for persisted value.
+					initialState = merge( {}, initialState, persistedState );
+				} else {
+					// If there is a mismatch in object-likeness of default
+					// initial or persisted state, defer to persisted value.
+					initialState = persistedState;
+				}
+
+				options = { ...options, initialState };
+			}
 
 			const store = registry.registerStore( reducerKey, options );
 
