@@ -60,14 +60,15 @@ class PostTitle extends Component {
 			placeholder,
 			style,
 			title,
+			focusedBorderColor,
+			borderStyle,
 		} = this.props;
 
 		const decodedPlaceholder = decodeEntities( placeholder );
-		const focusedStyle = this.props.focusedStyle;
-		const borderColor = this.state.isSelected ? focusedStyle.borderColor : 'transparent';
+		const borderColor = this.state.isSelected ? focusedBorderColor : 'transparent';
 
 		return (
-			<View style={ [ styles.titleContainer, focusedStyle, { borderColor } ] }>
+			<View style={ [ styles.titleContainer, borderStyle, { borderColor } ] }>
 				<RichText
 					tagName={ 'p' }
 					onFocus={ this.onSelect }
