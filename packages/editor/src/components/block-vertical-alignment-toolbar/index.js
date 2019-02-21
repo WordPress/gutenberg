@@ -10,7 +10,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { valignTop, valignCenter, valignBottom } from './icons';
+import { alignTop, alignCenter, alignBottom } from './icons';
 
 /**
  * Internal dependencies
@@ -20,17 +20,17 @@ import { withBlockEditContext } from '../block-edit/context';
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	top: {
 		_id: 'top',
-		icon: valignTop,
+		icon: alignTop,
 		title: _x( 'Vertically Align Top', 'Block vertical alignment setting' ),
 	},
 	center: {
 		_id: 'center',
-		icon: valignCenter,
+		icon: alignCenter,
 		title: _x( 'Verticaly Align Middle', 'Block vertical alignment setting' ),
 	},
 	bottom: {
 		_id: 'bottom',
-		icon: valignBottom,
+		icon: alignBottom,
 		title: _x( 'Verticaly Align Bottom', 'Block vertical alignment setting' ),
 	},
 };
