@@ -65,7 +65,6 @@ export class PostTextEditor extends Component {
 	render() {
 		const { value } = this.state;
 		const { instanceId } = this.props;
-
 		return (
 			<Fragment>
 				<label htmlFor={ `post-content-${ instanceId }` } className="screen-reader-text">
@@ -94,14 +93,13 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks, resetBlocks } = dispatch( 'core/editor' );
+		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
 		return {
 			onChange( content ) {
 				editPost( { content } );
 			},
 			onPersist( content ) {
 				const blocks = parse( content );
-				resetBlocks( blocks );
 				resetEditorBlocks( blocks );
 			},
 		};
