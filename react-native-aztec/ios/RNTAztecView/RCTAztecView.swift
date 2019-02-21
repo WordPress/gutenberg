@@ -73,6 +73,8 @@ class RCTAztecView: Aztec.TextView {
             constant: leftTextInset
         )
     }()
+
+    private var isInsertingDictationResult = false
     
     // MARK: - Font
     
@@ -197,7 +199,7 @@ class RCTAztecView: Aztec.TextView {
         super.insertText(text)
         updatePlaceholderVisibility()
     }
-    
+
     open override func deleteBackward() {
         guard !interceptBackspace() else {
             return
@@ -206,7 +208,19 @@ class RCTAztecView: Aztec.TextView {
         super.deleteBackward()
         updatePlaceholderVisibility()
     }
-    
+
+    // MARK: - Dictation
+
+    override func dictationRecordingDidEnd() {
+        isInsertingDictationResult = true
+    }
+
+    public override func insertDictationResult(_ dictationResult: [UIDictationPhrase]) {
+        let text = dictationResult.reduce("") { $0 + $1.text }
+        insertText(text)
+        isInsertingDictationResult = false
+    }
+
     // MARK: - Custom Edit Intercepts
     
     private func interceptEnter(_ text: String) -> Bool {
@@ -278,7 +292,7 @@ class RCTAztecView: Aztec.TextView {
         guard contents["eventCount"] == nil else {
             return
         }
-        
+
         let html = contents["text"] as? String ?? ""
 
         setHTML(html)
@@ -443,8 +457,17 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textViewDidChange(_ textView: UITextView) {
+
+        guard isInsertingDictationResult == false else {
+            // If a dictation start with an empty UITextView,
+            // the dictation engine refreshes the TextView with an empty string when the dictation finishes.
+            // This avoid propagating that unwanted empty string to RN. (Solving #606)
+            return
+        }
+
         forceTypingAttributesIfNeeded()
         propagateContentChanges()
+        updatePlaceholderVisibility()
         //Necessary to send height information to JS after pasting text.
         textView.setNeedsLayout()
     }
