@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { compose } from '@wordpress/compose';
 import {
 	Path,
 	SVG,
@@ -68,13 +69,24 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		let content = attributes.content || '';
-		// Escaping &.
-		content = content.replace( /&/g, '&amp;' );
-		// Preventing shortcodes from running.
-		content = content.replace( /\[/g, '&#91;' );
-		// Preventing isolated URLs from becoming an embed.
-		content = content.replace( /\//g, '&#47;' );
+		const content = compose(
+			escapeOpeningSquareBrackets,
+			escapeProtocolInIsolatedUrls
+		)( escapeAmpersands( attributes.content || '' ) );
 		return <pre><code>{ content }</code></pre>;
 	},
 };
+
+function escapeAmpersands( content ) {
+	return content.replace( /&/g, '&amp;' );
+}
+
+function escapeOpeningSquareBrackets( content ) {
+	// This replicates the escaping of HTML tags, where
+	// a tag like <strong> becomes &lt;strong>
+	return content.replace( /\[/g, '&#91;' );
+}
+
+function escapeProtocolInIsolatedUrls( content ) {
+	return content.replace( /(^[^.]^https?:)\/\/([^\s]+$[^.]$)/m, '$1&#47;&#47;$2' );
+}
