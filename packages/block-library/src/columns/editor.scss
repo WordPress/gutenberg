@@ -110,29 +110,21 @@
 
 /**
  * Vertical Alignment Preview
+ * note: specificity is important here to ensure individual
+ * * columns alignment is prioritised over parent column alignment
+ *
  */
-.are-vertically-aligned-top .block-core-columns {
-	justify-content: flex-start;
-}
-
-.are-vertically-aligned-center .block-core-columns {
-	justify-content: center;
-}
-
-.are-vertically-aligned-bottom .block-core-columns {
-	justify-content: flex-end;
-}
-
-// Specificity is important to ensure individual columns alignment
-// is prioritised over parent column alignment
+.are-vertically-aligned-top .block-core-columns,
 div.block-core-columns.is-vertically-aligned-top {
 	justify-content: flex-start;
 }
 
+.are-vertically-aligned-center .block-core-columns,
 div.block-core-columns.is-vertically-aligned-center {
 	justify-content: center;
 }
 
+.are-vertically-aligned-bottom .block-core-columns,
 div.block-core-columns.is-vertically-aligned-bottom {
 	justify-content: flex-end;
 }
