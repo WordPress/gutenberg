@@ -21,13 +21,12 @@ import styles from './style.scss';
 const minHeight = 30;
 
 class PostTitle extends Component {
-	titleViewRef: Object;
-
 	constructor() {
 		super( ...arguments );
 
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
+		this.titleViewRef = null;
 
 		this.state = {
 			isSelected: false,
