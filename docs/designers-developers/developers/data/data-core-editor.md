@@ -749,6 +749,41 @@ post has been received, by initialization or autosave.
 
  * post: Autosave post object.
 
+### __experimentalRequestPostUpdateStart
+
+Optimistic action for dispatching that a post update request has started.
+
+*Parameters*
+
+ * options: null
+
+### __experimentalRequestPostUpdateSuccess
+
+Optimistic action for indicating that the request post update has completed
+successfully.
+
+*Parameters*
+
+ * previousPost: The previous post prior to update.
+ * post: The new post after update
+ * isRevision: Whether the post is a revision or not.
+ * options: Options passed through from the original action
+dispatch.
+ * postType: The post type object.
+
+### __experimentalRequestPostUpdateFailure
+
+Optimistic action for indicating that the request post update has completed
+with a failure.
+
+*Parameters*
+
+ * post: The post that failed updating.
+ * edits: The fields that were being updated.
+ * error: The error from the failed call.
+ * options: Options passed through from the original action
+dispatch.
+
 ### updatePost
 
 Returns an action object used in signalling that a patch of updates for the
@@ -775,18 +810,34 @@ been edited.
 
  * edits: Post attributes to edit.
 
-### savePost
+### __experimentalOptimisticUpdatePost
 
-Returns an action object to save the post.
+Returns action object produced by the updatePost creator augmented by
+an optimist option that signals optimistically applying updates.
 
 *Parameters*
 
- * options: Options for the save.
- * options.isAutosave: Perform an autosave if true.
+ * edits: Updated post fields.
+
+### savePost
+
+Action generator for saving the current post in the editor.
+
+*Parameters*
+
+ * options: null
+
+### refreshPost
+
+Action generator for handling refreshing the current post.
+
+### trashPost
+
+Action generator for trashing the current post in the editor.
 
 ### autosave
 
-Returns an action object used in signalling that the post should autosave.
+Action generator used in signalling that the post should autosave.
 
 *Parameters*
 
