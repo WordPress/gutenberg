@@ -2,13 +2,17 @@
 
 import renderer from 'react-test-renderer';
 
-import { registerApp } from '..';
+import { registerApp, RootComponent } from '..';
 import App from './App';
 import BlockHolder from '../block-management/block-holder';
 import { dispatch, select } from '@wordpress/data';
 
 describe( 'App', () => {
 	beforeAll( registerApp );
+	beforeAll( () => {
+		// Instantiate root component so Gutenberg gets set up
+		new RootComponent( {} );
+	} );
 
 	it( 'renders without crashing', () => {
 		const app = renderer.create( <App /> );

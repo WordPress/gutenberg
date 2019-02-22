@@ -61,7 +61,7 @@ const setupLocale = ( locale, extraTranslations ) => {
 	}
 };
 
-class RootComponent extends React.Component {
+export class RootComponent extends React.Component {
 	constructor( props ) {
 		super( props );
 		setupLocale( props.locale, props.translations );
