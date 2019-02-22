@@ -93,5 +93,5 @@ function escapeOpeningSquareBrackets( content ) {
 }
 
 function escapeProtocolInIsolatedUrls( content ) {
-	return content.replace( /(^[^.]^https?:)\/\/([^\s]+$[^.]$)/m, '$1&#47;&#47;$2' );
+	return content.replace( /^(\s*https?:)\/\/([^\s<>"]+\s*)$/m, '$1&#47;&#47;$2' );
 }
