@@ -67,7 +67,7 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
  * Browser dependencies
  */
 
-const { getSelection } = window;
+const { getSelection, getComputedStyle } = window;
 
 /**
  * All inserting input types that would insert HTML into the DOM.
@@ -151,7 +151,20 @@ export class RichText extends Component {
 	}
 
 	setRef( node ) {
-		this.editableRef = node;
+		if ( node ) {
+			if ( process.env.NODE_ENV === 'development' ) {
+				const computedStyle = getComputedStyle( node );
+
+				if ( computedStyle.display === 'inline' ) {
+					// eslint-disable-next-line no-console
+					console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
+				}
+			}
+
+			this.editableRef = node;
+		} else {
+			delete this.editableRef;
+		}
 	}
 
 	setFocusedElement() {
