@@ -1,5 +1,5 @@
 // External dependencies
-import { AppRegistry, I18nManager } from 'react-native';
+import { AppRegistry, I18nManager, YellowBox } from 'react-native';
 import React from 'react';
 
 // Setting up environment
@@ -81,6 +81,8 @@ class RootComponent extends React.Component {
 }
 
 export function registerApp() {
-	// Making sure the environment is set up before loading any Component
+	// Disable require circle warnings showing up in the app (they will still be visible in the console)
+	YellowBox.ignoreWarnings( [ 'Require cycle:' ] );
+
 	AppRegistry.registerComponent( 'gutenberg', () => RootComponent );
 }
