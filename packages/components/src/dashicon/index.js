@@ -27,7 +27,7 @@ export default class Dashicon extends Component {
 	}
 
 	render() {
-		const { icon, size = 20, style, color } = this.props;
+		const { icon, size = 20, ...extraProps } = this.props;
 		let path;
 
 		switch ( icon ) {
@@ -913,8 +913,7 @@ export default class Dashicon extends Component {
 				width={ size }
 				height={ size }
 				viewBox="0 0 20 20"
-				style={ style }
-				{ ...color && { color } }
+				{ ...extraProps }
 			>
 				<Path d={ path } />
 			</SVG>
