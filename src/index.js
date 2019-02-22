@@ -64,9 +64,8 @@ const setupLocale = ( locale, extraTranslations ) => {
 export class RootComponent extends React.Component {
 	constructor( props ) {
 		super( props );
+		setupApp();
 		setupLocale( props.locale, props.translations );
-		gutenbergSetup();
-		editorSetup();
 	}
 
 	render() {
@@ -85,4 +84,9 @@ export function registerApp() {
 	YellowBox.ignoreWarnings( [ 'Require cycle:' ] );
 
 	AppRegistry.registerComponent( 'gutenberg', () => RootComponent );
+}
+
+export function setupApp() {
+	gutenbergSetup();
+	editorSetup();
 }
