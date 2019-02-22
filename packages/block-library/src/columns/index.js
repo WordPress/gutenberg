@@ -9,6 +9,7 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
 import {
 	PanelBody,
 	RangeControl,
@@ -22,7 +23,10 @@ import {
 	InnerBlocks,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
+
 } from '@wordpress/block-editor';
+
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -53,6 +57,97 @@ const getColumnsTemplate = memoize( ( columns ) => {
 
 export const name = 'core/columns';
 
+function ColumnsEdit( { attributes, setAttributes, className, childColumns, updateChildColumnsAlignment } ) {
+	const { columns, verticalAlignment } = attributes;
+
+	// Do any of the child column have a valign setting that is different to what is currently
+	// set on this parent Columns Block?
+	const childColumnHasOveride = !! childColumns.find( ( childColumn ) => childColumn.attributes.verticalAlignment !== verticalAlignment );
+
+	// If we have an overide then remove the setting on the parent so that the toolbar
+	// no longer displays an alignment. This is inline with behaviour of user land editing
+	// tools such as MS Word...etc
+	if ( childColumnHasOveride ) {
+		setAttributes( { verticalAlignment: null } );
+	}
+
+	const classes = classnames( className, `has-${ columns }-columns`, {
+		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+	} );
+
+	const onChange = ( alignment ) => {
+		// Update self...
+		setAttributes( { verticalAlignment: alignment } );
+
+		// Update all the (immediate) child Column Blocks
+		updateChildColumnsAlignment( alignment );
+	};
+
+	return (
+		<Fragment>
+			<InspectorControls>
+				<PanelBody>
+					<RangeControl
+						label={ __( 'Columns' ) }
+						value={ columns }
+						onChange={ ( nextColumns ) => {
+							setAttributes( {
+								columns: nextColumns,
+							} );
+						} }
+						min={ 2 }
+						max={ 6 }
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<BlockControls>
+				<BlockVerticalAlignmentToolbar
+					onChange={ onChange }
+					value={ verticalAlignment }
+				/>
+			</BlockControls>
+			<div className={ classes }>
+				<InnerBlocks
+					template={ getColumnsTemplate( columns ) }
+					templateLock="all"
+					allowedBlocks={ ALLOWED_BLOCKS } />
+			</div>
+		</Fragment>
+	);
+}
+
+const EnhancedColumnsEdit = compose(
+	/**
+	 * Selects the child column Blocks for this parent Column
+	 */
+	withSelect( ( select, { clientId } ) => {
+		const { getBlocksByClientId } = select( 'core/editor' );
+
+		return {
+			childColumns: getBlocksByClientId( clientId )[ 0 ].innerBlocks,
+		};
+	} ),
+	withDispatch( ( dispatch, { childColumns } ) => {
+		return {
+			/**
+			 * Update all child column Blocks with a new
+			 * vertical alignment setting based on whatever
+			 * alignment is passed in. This allows change to parent
+			 * to overide anything set on a individual column basis
+			 *
+			 * @param  {string} alignment the vertical alignment setting
+			 */
+			updateChildColumnsAlignment( alignment ) {
+				childColumns.forEach( ( childColumn ) => {
+					dispatch( 'core/editor' ).updateBlockAttributes( childColumn.clientId, {
+						verticalAlignment: alignment,
+					} );
+				} );
+			},
+		};
+	} ),
+)( ColumnsEdit );
+
 export const settings = {
 	title: __( 'Columns' ),
 
@@ -68,6 +163,9 @@ export const settings = {
 		verticalAlignment: {
 			type: 'string',
 		},
+		childColumnHasVerticalAlignmentOveride: {
+			type: 'bool',
+		},
 	},
 
 	description: __( 'Add a block that displays content in multiple columns, then add whatever content blocks you’d like.' ),
@@ -79,48 +177,7 @@ export const settings = {
 
 	deprecated,
 
-	edit( { attributes, setAttributes, className } ) {
-		const { columns, verticalAlignment } = attributes;
-
-		const classes = classnames( className, `has-${ columns }-columns`, {
-			[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		} );
-
-		const onChange = ( alignment ) => setAttributes( { verticalAlignment: alignment } );
-
-		return (
-			<Fragment>
-				<InspectorControls>
-					<PanelBody>
-						<RangeControl
-							label={ __( 'Columns' ) }
-							value={ columns }
-							onChange={ ( nextColumns ) => {
-								setAttributes( {
-									columns: nextColumns,
-								} );
-							} }
-							min={ 2 }
-							max={ 6 }
-							required
-						/>
-					</PanelBody>
-				</InspectorControls>
-				<BlockControls>
-					<BlockVerticalAlignmentToolbar
-						onChange={ onChange }
-						value={ verticalAlignment }
-					/>
-				</BlockControls>
-				<div className={ classes }>
-					<InnerBlocks
-						template={ getColumnsTemplate( columns ) }
-						templateLock="all"
-						allowedBlocks={ ALLOWED_BLOCKS } />
-				</div>
-			</Fragment>
-		);
-	},
+	edit: EnhancedColumnsEdit,
 
 	save( { attributes } ) {
 		const { columns, verticalAlignment } = attributes;
@@ -136,3 +193,4 @@ export const settings = {
 		);
 	},
 };
+
