@@ -693,7 +693,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		mergeBlocks,
 		replaceBlocks,
 		toggleSelection,
-		getBlockSelectionStart,
 	} = dispatch( 'core/block-editor' );
 
 	return {
@@ -757,6 +756,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			if ( ! ownProps.isSelectionEnabled ) {
 				return;
 			}
+
+			const {
+				getBlockSelectionStart,
+			} = select( 'core/block-editor' );
 
 			if ( getBlockSelectionStart() ) {
 				multiSelect( getBlockSelectionStart(), ownProps.clientId );
