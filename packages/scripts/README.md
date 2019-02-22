@@ -226,9 +226,9 @@ The `build` and `start` commands use [Webpack](https://webpack.js.org/) behind t
 
 `@wordpress/scripts` bundles the default Webpack config used as a base by the WordPress editor. These are the defaults:
 
-- [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
-- [Output](https://webpack.js.org/configuration/output): `build/index.js`
-- [Externals](https://webpack.js.org/configuration/externals). These are the transformations done to imports:
+* [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
+* [Output](https://webpack.js.org/configuration/output): `build/index.js`
+* [Externals](https://webpack.js.org/configuration/externals). These are the transformations done to imports:
 
 Package | Input syntax | Output
 --- | --- | ---
@@ -244,8 +244,8 @@ Any WordPress package | `import x from '@wordpress/packageName` | `var x = this.
 
 Should there be any situation where you want to provide your own Webpack config, you can do so. The `build` and `start` commands will use your provided file when:
 
-- the command receives a `--config` argument. Example: `wp-scripts build --config my-own-webpack-config.js`.
-- there is a file called `webpack.config.js` or `webpack.config.babel.js` in the top-level directory of your package (at the same level than your `package.json`).
+* the command receives a `--config` argument. Example: `wp-scripts build --config my-own-webpack-config.js`.
+* there is a file called `webpack.config.js` or `webpack.config.babel.js` in the top-level directory of your package (at the same level than your `package.json`).
 
 ### Extend the default config
 
@@ -258,9 +258,13 @@ Let's say that you want Webpack to take as input a file named `my-plugin.js`. Th
 
 ```js
 const config = require( '@wordpress/scripts/config/webpack.config.js' );
-module.exports = Object.assign( {}, config, {
-	// your tweaks here
+module.exports = {
+	...config,
 	entry: 'my-plugin.js',
+	plugins: [
+		...config.plugins,
+		// add your own plugin after the default ones
+	],
 } );
 ```
 
