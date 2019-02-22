@@ -64,7 +64,7 @@ registerBlockType( 'gutenberg-examples/01-basic', {
 const { registerBlockType } = wp.blocks;
 const blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
-registerBlockType( 'gutenberg-examples/01-basic-esnext', {
+registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 	title: 'Hello World (Step 1)',
 
 	icon: 'universal-access-alt',
