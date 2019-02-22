@@ -44,6 +44,13 @@ export default function( babel ) {
 		visitor: {
 			JSXElement( path, state ) {
 				state.hasJSX = true;
+				if ( state.hasUndeclaredScopeVariable ) {
+					return;
+				}
+
+				const { scopeVariable } = getOptions( state );
+
+				state.hasUndeclaredScopeVariable = ! path.scope.hasBinding( scopeVariable );
 			},
 			ImportDeclaration( path, state ) {
 				if ( state.hasImportedScopeVariable ) {
@@ -71,7 +78,7 @@ export default function( babel ) {
 			},
 			Program: {
 				exit( path, state ) {
-					if ( ! state.hasJSX || state.hasImportedScopeVariable ) {
+					if ( ! state.hasJSX || state.hasImportedScopeVariable || ! state.hasUndeclaredScopeVariable ) {
 						return;
 					}
 
