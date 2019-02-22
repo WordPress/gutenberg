@@ -44,6 +44,15 @@ return array(
 	),
 	'wp-block-serialization-default-parser' => array(),
 	'wp-block-serialization-spec-parser'    => array(),
+	'wp-block-editor'                       => array(
+		'lodash',
+		'wp-blocks',
+		'wp-compose',
+		'wp-components',
+		'wp-data',
+		'wp-element',
+		'wp-i18n',
+	),
 	'wp-blocks'                             => array(
 		'lodash',
 		'wp-autop',
@@ -138,6 +147,7 @@ return array(
 		'wp-a11y',
 		'wp-api-fetch',
 		'wp-blob',
+		'wp-block-editor',
 		'wp-blocks',
 		'wp-components',
 		'wp-compose',

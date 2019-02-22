@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, merge, isPlainObject } from 'lodash';
+import { flow, merge, isPlainObject, omit } from 'lodash';
 
 /**
  * Internal dependencies
@@ -115,7 +115,7 @@ export function createPersistenceInterface( options ) {
  *
  * @return {WPDataPlugin} Data plugin.
  */
-export default function( registry, pluginOptions ) {
+const persistencePlugin = function( registry, pluginOptions ) {
 	const persistence = createPersistenceInterface( pluginOptions );
 
 	/**
@@ -201,4 +201,31 @@ export default function( registry, pluginOptions ) {
 			return store;
 		},
 	};
-}
+};
+
+/**
+ * Deprecated: Remove this function once WordPress 5.3 is released.
+ */
+
+persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
+	const persistence = createPersistenceInterface( pluginOptions );
+
+	// Preferences migration to introduce the block editor module
+	const persistedState = persistence.get();
+	const coreEditorState = persistedState[ 'core/editor' ];
+	if ( coreEditorState && coreEditorState.preferences && coreEditorState.preferences.insertUsage ) {
+		const blockEditorState = {
+			preferences: {
+				insertUsage: coreEditorState.preferences.insertUsage,
+			},
+		};
+
+		persistence.set( 'core/editor', {
+			...coreEditorState,
+			preferences: omit( coreEditorState.preferences, [ 'insertUsage' ] ),
+		} );
+		persistence.set( 'core/block-editor', blockEditorState );
+	}
+};
+
+export default persistencePlugin;
