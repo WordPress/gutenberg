@@ -4,26 +4,26 @@
 import { createRegistryControl } from '@wordpress/data';
 
 /**
- * Calls a selector using the current state.
+ * Dispatches an action.
  *
- * @param {string} storeName    Store name.
- * @param {string} selectorName Selector name.
- * @param  {Array} args         Selector arguments.
+ * @param {string} storeKey   Store key.
+ * @param {string} actionName Action name.
+ * @param  {Array} args       Action arguments.
  *
  * @return {Object} control descriptor.
  */
-export function select( storeName, selectorName, ...args ) {
+export function dispatch( storeKey, actionName, ...args ) {
 	return {
-		type: 'SELECT',
-		storeName,
-		selectorName,
+		type: 'DISPATCH',
+		storeKey,
+		actionName,
 		args,
 	};
 }
 
 const controls = {
-	SELECT: createRegistryControl( ( registry ) => ( { storeName, selectorName, args } ) => {
-		return registry.select( storeName )[ selectorName ]( ...args );
+	DISPATCH: createRegistryControl( ( registry ) => ( { storeKey, actionName, args } ) => {
+		return registry.dispatch( storeKey )[ actionName ]( ...args );
 	} ),
 };
 

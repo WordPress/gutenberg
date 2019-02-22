@@ -205,6 +205,7 @@ function gutenberg_register_scripts_and_styles() {
 				'	wp.data',
 				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } )',
 				'		.use( wp.data.plugins.controls );',
+				'	wp.data.plugins.persistence.__unstableMigrate( { storageKey: storageKey } );',
 				'} )()',
 			)
 		)
