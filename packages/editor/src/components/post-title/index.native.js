@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { View } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -8,6 +13,11 @@ import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import styles from './style.scss';
+
 const minHeight = 30;
 
 class PostTitle extends Component {
@@ -16,6 +26,7 @@ class PostTitle extends Component {
 
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
+		this.titleViewRef = null;
 
 		this.state = {
 			isSelected: false,
@@ -23,8 +34,21 @@ class PostTitle extends Component {
 		};
 	}
 
+	componentDidMount() {
+		if ( this.props.innerRef ) {
+			this.props.innerRef( this );
+		}
+	}
+
 	handleFocusOutside() {
 		this.onUnselect();
+	}
+
+	focus() {
+		if ( this.titleViewRef ) {
+			this.titleViewRef.focus();
+			this.setState( { isSelected: true } );
+		}
 	}
 
 	onSelect() {
@@ -41,33 +65,41 @@ class PostTitle extends Component {
 			placeholder,
 			style,
 			title,
+			focusedBorderColor,
+			borderStyle,
 		} = this.props;
 
 		const decodedPlaceholder = decodeEntities( placeholder );
+		const borderColor = this.state.isSelected ? focusedBorderColor : 'transparent';
 
 		return (
-			<RichText
-				tagName={ 'p' }
-				onFocus={ this.onSelect }
-				onBlur={ this.props.onBlur } // always assign onBlur as a props
-				multiline={ false }
-				style={ [ style, {
-					minHeight: Math.max( minHeight, this.state.aztecHeight ),
-				} ] }
-				fontSize={ 24 }
-				fontWeight={ 'bold' }
-				onChange={ ( event ) => {
-					this.props.onUpdate( event.content );
-				} }
-				onContentSizeChange={ ( event ) => {
-					this.setState( { aztecHeight: event.aztecHeight } );
-				} }
-				placeholder={ decodedPlaceholder }
-				value={ title }
-				onSplit={ this.props.onEnterPress }
-				setRef={ this.props.setRef }
-			>
-			</RichText>
+			<View style={ [ styles.titleContainer, borderStyle, { borderColor } ] }>
+				<RichText
+					tagName={ 'p' }
+					rootTagsToEliminate={ [ 'strong' ] }
+					onFocus={ this.onSelect }
+					onBlur={ this.props.onBlur } // always assign onBlur as a props
+					multiline={ false }
+					style={ [ style, {
+						minHeight: Math.max( minHeight, this.state.aztecHeight ),
+					} ] }
+					fontSize={ 24 }
+					fontWeight={ 'bold' }
+					onChange={ ( value ) => {
+						this.props.onUpdate( value );
+					} }
+					onContentSizeChange={ ( event ) => {
+						this.setState( { aztecHeight: event.aztecHeight } );
+					} }
+					placeholder={ decodedPlaceholder }
+					value={ title }
+					onSplit={ this.props.onEnterPress }
+					setRef={ ( ref ) => {
+						this.titleViewRef = ref;
+					} }
+				>
+				</RichText>
+			</View>
 		);
 	}
 }
