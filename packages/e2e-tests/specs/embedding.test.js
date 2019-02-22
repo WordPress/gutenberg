@@ -40,6 +40,24 @@ const MOCK_EMBED_VIDEO_SUCCESS_RESPONSE = {
 	version: '1.0',
 };
 
+const MOCK_EMBED_AUDIO_SUCCESS_RESPONSE = {
+	url: 'https://soundcloud.com/a-boogie-wit-da-hoodie/swervin',
+	html: '<iframe width="16" height="9"></iframe>',
+	type: 'audio',
+	provider_name: 'SoundCloud',
+	provider_url: 'https://soundcloud.com',
+	version: '1.0',
+};
+
+const MOCK_EMBED_IMAGE_SUCCESS_RESPONSE = {
+	url: 'https://www.instagram.com/p/BtNsR8HFRif/',
+	html: '<iframe width="16" height="9"></iframe>',
+	type: 'video',
+	provider_name: 'Instagram',
+	provider_url: 'https://www.instagram.com',
+	version: '1.0',
+};
+
 const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
 	url: 'https://twitter.com/thatbunty',
 	html: false,
@@ -73,6 +91,14 @@ const MOCK_RESPONSES = [
 	{
 		match: createEmbeddingMatcher( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' ),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_VIDEO_SUCCESS_RESPONSE ),
+	},
+	{
+		match: createEmbeddingMatcher( 'https://soundcloud.com/a-boogie-wit-da-hoodie/swervin' ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_AUDIO_SUCCESS_RESPONSE ),
+	},
+	{
+		match: createEmbeddingMatcher( 'https://www.instagram.com/p/BtNsR8HFRif/' ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_IMAGE_SUCCESS_RESPONSE ),
 	},
 	{
 		match: createEmbeddingMatcher( 'https://cloudup.com/cQFlxqtY4ob' ),
@@ -223,7 +249,7 @@ describe( 'Embedding content', () => {
 		await page.keyboard.type( '/video' );
 		await page.keyboard.press( 'Enter' );
 		await page.click( '.editor-media-placeholder__url-input-container button' );
-		await page.keyboard.type( 'https://www.youtube.com/watch?v=DQuhA5ZCV9M' );
+		await page.keyboard.type( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( '.wp-block-embed-youtube' );
 	} );
