@@ -28,12 +28,10 @@ npm install @wordpress/jest-preset-default --save-dev
 * `modulePaths` - the root dir of the project is used as a location to search when resolving modules.
 * `setupFiles` - runs code before each test which sets up global variables required in the testing environment.
 * `setupFilesAfterEnv` - runs code which adds improved support for `Console` object and `React` components to the testing framework before each test.
+* `snapshotSerializers` - makes it possible to use snapshot tests on `Enzyme` wrappers.
 * `testMatch`- includes `/test/` subfolder in the glob patterns Jest uses to detect test files. It detects only test files containing `.js` extension.
 * `timers` - use of [fake timers](https://jestjs.io/docs/en/timer-mocks.html) for functions such as `setTimeout` is enabled.
-* `transform` - adds support for [PEG.js]( https://github.com/pegjs/pegjs#javascript-api) transformed necessary for WordPress blocks. It also keeps the default [babel-jest](https://github.com/facebook/jest/tree/master/packages/babel-jest) transformer.
+* `transform` - keeps the default [babel-jest](https://github.com/facebook/jest/tree/master/packages/babel-jest) transformer.
 * `verbose` - each individual test won't be reported during the run.
-
-// Your code goes here
-```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

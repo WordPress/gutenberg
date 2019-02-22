@@ -19,7 +19,7 @@ The simplest setup is to use Jest's `setupFilesAfterEnv` config option:
 ```js
 "jest": {
   "setupFilesAfterEnv": [
-    "./node_modules/@wordpress/jest-puppeteer-axe/build/index.js"
+    "@wordpress/jest-puppeteer-axe"
   ]
 },
 ```

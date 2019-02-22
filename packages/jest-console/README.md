@@ -25,7 +25,7 @@ The simplest setup is to use Jest's `setupFilesAfterEnv` config option:
 ```js
 "jest": {
   "setupFilesAfterEnv": [
-    "./node_modules/@wordpress/jest-console/build/index.js"
+    "@wordpress/jest-console"
   ]
 },
 ```
