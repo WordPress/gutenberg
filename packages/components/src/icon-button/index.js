@@ -20,7 +20,7 @@ import Dashicon from '../dashicon';
 // is common to apply a ref to the button element (only supported in class)
 class IconButton extends Component {
 	render() {
-		const { icon, children, label, className, tooltip, shortcut, labelPosition, ...additionalProps } = this.props;
+		const { icon, children, label, className, tooltip, shortcut, labelPosition, iconProps, ...additionalProps } = this.props;
 		const { 'aria-pressed': ariaPressed } = this.props;
 		const classes = classnames( 'components-icon-button', className, {
 			'has-text': children,
@@ -45,7 +45,7 @@ class IconButton extends Component {
 
 		let element = (
 			<Button aria-label={ label } { ...additionalProps } className={ classes }>
-				{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } { ...additionalProps } /> : icon }
+				{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } { ...iconProps } /> : icon }
 				{ children }
 			</Button>
 		);
