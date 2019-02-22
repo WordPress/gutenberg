@@ -182,6 +182,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return (
 			<View style={ { flex: 1 } } >
 				<KeyboardAwareFlatList
+					testID="block-list"
 					innerRef={ this.scrollViewInnerRef }
 					blockToolbarHeight={ toolbarStyles.container.height }
 					innerToolbarHeight={ inlineToolbarStyles.toolbar.height }
@@ -244,10 +245,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	renderItem( value: { item: string, index: number } ) {
 		const clientId = value.item;
 		const testID = this.props.getBlockName(clientId) + '-' + clientId;
-		console.log("Test ID:", testID);
-		debugger;
 
-	
 		return (
 			<View testID={testID}>
 				<BlockHolder
