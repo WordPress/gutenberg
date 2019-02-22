@@ -1,51 +1,56 @@
 /** @flow
  * @format */
 
+import { I18nManager } from 'react-native';
 import React from 'react';
 
 // Gutenberg imports
-import { setLocaleData } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
+import * as data from '@wordpress/data';
+import { registerCoreBlocks } from '@wordpress/block-library';
+import { registerBlockType, setUnregisteredTypeHandlerName, unregisterBlockType } from '@wordpress/blocks';
+import '@wordpress/format-library';
 
 import AppContainer from './AppContainer';
 import initialHtml from './initial-html';
-
-import { getTranslation } from '../../i18n-cache';
+import * as UnsupportedBlock from '../block-types/unsupported-block';
 
 type PropsType = {
 	initialData: string,
 	initialHtmlModeEnabled: boolean,
 	initialTitle: string,
-	locale: string,
-	translations: mixed,
 };
 
 export default class AppProvider extends React.Component<PropsType> {
 	constructor( props: PropsType ) {
 		super( props );
-
-		this.setLocale( props.locale );
+		this.gutenbergSetup();
+		this.editorSetup();
 	}
 
-	componentDidUpdate( prevProps: PropsType ) {
-		if ( prevProps.locale !== this.props.locale ) {
-			this.setLocale( this.props.locale );
-		}
+	gutenbergSetup() {
+		I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
+
+		// wp-api-fetch
+		apiFetch.use( apiFetch.createRootURLMiddleware( 'https://public-api.wordpress.com/' ) );
+
+		// wp-data
+		const userId = 1;
+		const storageKey = 'WP_DATA_USER_' + userId;
+		data.use( data.plugins.persistence, { storageKey: storageKey } );
+		data.use( data.plugins.controls );
 	}
 
-	setLocale( locale: ?string ) {
-		const translationsFromParentApp = this.props.translations;
-		let gutenbergTranslations = getTranslation( locale );
-		if ( locale && ! gutenbergTranslations ) {
-			// Try stripping out the regional
-			locale = locale.replace( /[-_][A-Za-z]+$/, '' );
-			gutenbergTranslations = getTranslation( locale );
-		}
-		const translations = Object.assign( {}, gutenbergTranslations, translationsFromParentApp );
-		// eslint-disable-next-line no-console
-		console.log( 'locale', locale, translations );
-		// Only change the locale if it's supported by gutenberg
-		if ( gutenbergTranslations || translationsFromParentApp ) {
-			setLocaleData( translations );
+	editorSetup() {
+		// register and setup blocks
+		registerCoreBlocks();
+		registerBlockType( UnsupportedBlock.name, UnsupportedBlock.settings );
+		setUnregisteredTypeHandlerName( UnsupportedBlock.name );
+
+		// disable Code and More blocks for release
+		if ( ! __DEV__ ) {
+			unregisterBlockType( 'core/code' );
+			unregisterBlockType( 'core/more' );
 		}
 	}
 

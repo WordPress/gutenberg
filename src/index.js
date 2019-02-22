@@ -1,51 +1,48 @@
 // External dependencies
-import { AppRegistry, I18nManager } from 'react-native';
+import { AppRegistry } from 'react-native';
+import React from 'react';
 
 // Setting up environment
 import './globals';
 
-const gutenbergSetup = () => {
-	const apiFetch = require( '@wordpress/api-fetch' ).default;
-	const wpData = require( '@wordpress/data' );
-
-	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
-
-	// wp-api-fetch
-	apiFetch.use( apiFetch.createRootURLMiddleware( 'https://public-api.wordpress.com/' ) );
-
-	// wp-data
-	const userId = 1;
-	const storageKey = 'WP_DATA_USER_' + userId;
-	wpData.use( wpData.plugins.persistence, { storageKey: storageKey } );
-	wpData.use( wpData.plugins.controls );
-};
-
-const editorSetup = () => {
-	require( '@wordpress/format-library' );
-	const wpBlockLibrary = require( '@wordpress/block-library' );
-	const wpBlocks = require( '@wordpress/blocks' );
-	const registerCoreBlocks = wpBlockLibrary.registerCoreBlocks;
-	const registerBlockType = wpBlocks.registerBlockType;
-	const setUnregisteredTypeHandlerName = wpBlocks.setUnregisteredTypeHandlerName;
-	const unregisterBlockType = wpBlocks.unregisterBlockType;
-	const UnsupportedBlock = require( './block-types/unsupported-block' );
-
-	// register and setup blocks
-	registerCoreBlocks();
-	registerBlockType( UnsupportedBlock.name, UnsupportedBlock.settings );
-	setUnregisteredTypeHandlerName( UnsupportedBlock.name );
-
-	// disable Code and More blocks for release
-	if ( ! __DEV__ ) {
-		unregisterBlockType( 'core/code' );
-		unregisterBlockType( 'core/more' );
+class RootComponent extends React.Component {
+	constructor( props ) {
+		super( props );
+		this.setupLocale();
 	}
-};
 
-export function setupApp() {
-	gutenbergSetup();
-	editorSetup();
+	setupLocale() {
+		const translationsFromParentApp = this.props.translations;
+		let locale = this.props.locale;
 
+		const setLocaleData = require( '@wordpress/i18n' ).setLocaleData;
+		const getTranslation = require( '../i18n-cache' ).getTranslation;
+
+		let gutenbergTranslations = getTranslation( locale );
+		if ( locale && ! gutenbergTranslations ) {
+			// Try stripping out the regional
+			locale = locale.replace( /[-_][A-Za-z]+$/, '' );
+			gutenbergTranslations = getTranslation( locale );
+		}
+		const translations = Object.assign( {}, gutenbergTranslations, translationsFromParentApp );
+		// eslint-disable-next-line no-console
+		console.log( 'locale', locale, translations );
+		// Only change the locale if it's supported by gutenberg
+		if ( gutenbergTranslations || translationsFromParentApp ) {
+			setLocaleData( translations );
+		}
+	}
+
+	render() {
+		const App = require( './app/App' ).default;
+		const initialProps = this.props;
+		return (
+			<App { ...this.props } />
+		);
+	}
+}
+
+export function registerApp() {
 	// Making sure the environment is set up before loading any Component
-	AppRegistry.registerComponent( 'gutenberg', () => require( './app/App' ).default );
+	AppRegistry.registerComponent( 'gutenberg', () => RootComponent );
 }
