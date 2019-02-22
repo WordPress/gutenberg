@@ -169,11 +169,11 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	const {
 		insertDefaultBlock,
 		clearSelectedBlock,
-		undo,
-		redo,
 	} = dispatch( 'core/block-editor' );
 	const {
 		editPost,
+		undo,
+		redo,
 	} = dispatch( 'core/editor' );
 
 	return {
