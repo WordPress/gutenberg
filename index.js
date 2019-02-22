@@ -1,6 +1,6 @@
 /** @flow
  * @format */
 
-import { setupApp } from './src';
+import { registerApp } from './src';
 
-setupApp();
+registerApp();
