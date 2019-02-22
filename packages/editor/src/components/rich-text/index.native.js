@@ -289,9 +289,8 @@ export class RichText extends Component {
 					},
 				} );
 				this.lastContent = this.valueToFormat( linkedRecord );
-				this.props.onChange( {
-					content: this.lastContent,
-				} );
+				this.lastEventCount = undefined;
+				this.props.onChange( this.lastContent );
 
 				// Allows us to ask for this information when we get a report.
 				window.console.log( 'Created link:\n\n', trimmedText );
@@ -324,9 +323,7 @@ export class RichText extends Component {
 			const newContent = this.valueToFormat( insertedContent );
 			this.lastEventCount = undefined;
 			this.lastContent = newContent;
-			this.props.onChange( {
-				content: this.lastContent,
-			} );
+			this.props.onChange( this.lastContent );
 		} else if ( onSplit ) {
 			if ( ! pastedContent.length ) {
 				return;

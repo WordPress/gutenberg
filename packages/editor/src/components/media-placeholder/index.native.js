@@ -18,7 +18,7 @@ function MediaPlaceholder( props ) {
 	return (
 		<TouchableWithoutFeedback onPress={ props.onMediaOptionsPressed }>
 			<View style={ styles.emptyStateContainer }>
-				<Dashicon icon={ 'format-image' } />
+				<Dashicon ariaPressed={ 'dashicons-format-image' } icon={ 'format-image' } />
 				<Text style={ styles.emptyStateTitle }>
 					{ __( 'Image' ) }
 				</Text>
