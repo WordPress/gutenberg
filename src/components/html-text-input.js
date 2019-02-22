@@ -96,11 +96,15 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 						ref={ ( textInput ) => this.textInput = textInput }
 						textAlignVertical="top"
 						multiline
-						style={ styles.htmlView }
+						style={ { ...styles.htmlView, height: this.state.contentHeight + 16 } }
 						value={ this.state.value }
 						onChangeText={ this.edit }
 						onBlur={ this.stopEditing }
 						placeholder={ __( 'Start writing…' ) }
+						scrollEnabled={ false }
+						onContentSizeChange={ ( event ) => {
+							this.setState( { contentHeight: event.nativeEvent.contentSize.height } );
+						} }
 					/>
 				</ScrollView>
 			</KeyboardAvoidingView>
