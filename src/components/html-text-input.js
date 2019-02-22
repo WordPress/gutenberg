@@ -30,6 +30,7 @@ type PropsType = {
 type StateType = {
 	isDirty: boolean,
 	value: string,
+	contentHeight: number,
 };
 
 export class HTMLInputView extends React.Component<PropsType, StateType> {
@@ -47,6 +48,7 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 		this.state = {
 			isDirty: false,
 			value: '',
+			contentHeight: 0,
 		};
 	}
 
