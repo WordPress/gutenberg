@@ -289,6 +289,7 @@ export class RichText extends Component {
 					},
 				} );
 				this.lastContent = this.valueToFormat( linkedRecord );
+				this.lastEventCount = undefined;
 				this.props.onChange( this.lastContent );
 
 				// Allows us to ask for this information when we get a report.
