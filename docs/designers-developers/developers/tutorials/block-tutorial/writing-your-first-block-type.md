@@ -18,7 +18,7 @@ function gutenberg_boilerplate_block() {
 		array( 'wp-blocks', 'wp-element' )
 	);
 
-	register_block_type( 'gutenberg-examples/01-basic', array(
+	register_block_type( 'gutenberg-examples/example-01-basic', array(
 		'editor_script' => 'gutenberg-examples-01-basic',
 	) );
 }
