@@ -13,7 +13,7 @@ const config = {
 	app: '/Users/javon/Projects/gutenberg-mobile/ios/build/Build/Products/Debug-iphonesimulator/gutenberg.app', // relative to root of project
 };
 
-describe( 'Sample Gutenerg tests', () => {
+describe( 'Gutenberg Editor tests', () => {
 	let driver;
 
 	beforeEach( async () => {
@@ -27,7 +27,7 @@ describe( 'Sample Gutenerg tests', () => {
 		await driver.quit();
 	} );
 
-	it( 'should have an Aztec view', async () => {
+	it( 'should be able to see editor', async () => {
 		expect( await driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
 	} );
 } );
