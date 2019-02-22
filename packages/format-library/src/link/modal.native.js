@@ -2,15 +2,14 @@
  * External dependencies
  */
 import React from 'react';
-import { Switch, Text, TextInput, View } from 'react-native';
-import Modal from 'react-native-modal';
+import { Switch, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { URLInput } from '@wordpress/editor';
+import { BottomSheet } from '@wordpress/editor';
 import { prependHTTP } from '@wordpress/url';
 import {
 	withSpokenMessages,
@@ -28,12 +27,11 @@ import {
  * Internal dependencies
  */
 import { createLinkFormat, isValidHref } from './utils';
-import Button from './button';
 
 import styles from './modal.scss';
 
 class ModalLinkUI extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 
 		this.submitLink = this.submitLink.bind( this );
@@ -43,10 +41,22 @@ class ModalLinkUI extends Component {
 		this.removeLink = this.removeLink.bind( this );
 
 		this.state = {
-			inputValue: props.activeAttributes.url || '',
-			text: getTextContent( slice( props.value ) ),
+			inputValue: '',
+			text: '',
 			opensInNewWindow: false,
 		};
+	}
+
+	componentDidUpdate( oldProps ) {
+		if ( oldProps === this.props ) {
+			return;
+		}
+
+		this.setState( {
+			inputValue: this.props.activeAttributes.url || '',
+			text: getTextContent( slice( this.props.value ) ),
+			opensInNewWindow: false,
+		} );
 	}
 
 	onChangeInputValue( inputValue ) {
@@ -103,71 +113,48 @@ class ModalLinkUI extends Component {
 		const { isVisible } = this.props;
 
 		return (
-			<Modal
+			<BottomSheet
 				isVisible={ isVisible }
-				style={ styles.bottomModal }
-				animationInTiming={ 500 }
-				animationOutTiming={ 500 }
-				backdropTransitionInTiming={ 500 }
-				backdropTransitionOutTiming={ 500 }
-				onBackdropPress={ this.props.onClose }
-				onSwipe={ this.props.onClose }
-				swipeDirection="down"
-				avoidKeyboard={ true }
+				onClose={ this.submitLink }
+				hideHeader
 			>
-				<View style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }>
-					<View style={ styles.dragIndicator } />
-					<View style={ styles.head }>
-						<Button onClick={ this.removeLink }>
-							<Text style={ { ...styles.buttonText, color: 'red' } }>
-								{ __( 'Remove' ) }
-							</Text>
-						</Button>
-						<Text style={ styles.title }>
-							{ __( 'Link Settings' ) }
-						</Text>
-						<Button onClick={ this.submitLink }>
-							<Text style={ { ...styles.buttonText, color: '#0087be' } } >
-								{ __( 'Done' ) }
-							</Text>
-						</Button>
-					</View>
-					<View style={ styles.separator } />
-					<View style={ styles.inlineInput }>
-						<Text style={ styles.inlineInputLabel }>
-							{ __( 'URL' ) }
-						</Text>
-						<URLInput
-							style={ styles.inlineInputValue }
-							value={ this.state.inputValue }
-							onChange={ this.onChangeInputValue }
-						/>
-					</View>
-					<View style={ styles.separator } />
-					<View style={ styles.inlineInput }>
-						<Text style={ styles.inlineInputLabel }>
-							{ __( 'Link Text' ) }
-						</Text>
-						<TextInput
-							style={ styles.inlineInputValue }
-							value={ this.state.text }
-							onChangeText={ this.onChangeText }
-						/>
-					</View>
-					<View style={ styles.separator } />
-					<View style={ styles.inlineInput }>
-						<Text style={ styles.inlineInputLabel }>
-							{ __( 'Open in a new window' ) }
-						</Text>
-						<View style={ { ...styles.inlineInputValue, ...styles.inlineInputValueSwitch, alignItems: 'flex-end' } }>
-							<Switch
-								value={ this.state.opensInNewWindow }
-								onValueChange={ this.onChangeOpensInNewWindow }
-							/>
-						</View>
-					</View>
-				</View>
-			</Modal>
+				{ /* eslint-disable jsx-a11y/no-autofocus */
+					<BottomSheet.Cell
+						icon={ 'admin-links' }
+						label={ __( 'URL' ) }
+						value={ this.state.inputValue }
+						placeholder={ __( 'Add URL' ) }
+						autoCapitalize="none"
+						autoCorrect={ false }
+						textContentType="URL"
+						onChangeValue={ this.onChangeInputValue }
+						autoFocus={ Platform.OS === 'ios' }
+					/>
+				/* eslint-enable jsx-a11y/no-autofocus */ }
+				<BottomSheet.Cell
+					icon={ 'editor-textcolor' }
+					label={ __( 'Link Text' ) }
+					value={ this.state.text }
+					placeholder={ __( 'Add Link Text' ) }
+					onChangeValue={ this.onChangeText }
+				/>
+				<BottomSheet.Cell
+					icon={ 'external' }
+					label={ __( 'Open in New Tab' ) }
+					value={ '' }
+				>
+					<Switch
+						value={ this.state.opensInNewWindow }
+						onValueChange={ this.onChangeOpensInNewWindow }
+					/>
+				</BottomSheet.Cell>
+				<BottomSheet.Cell
+					label={ __( 'Remove Link' ) }
+					labelStyle={ styles.clearLinkButton }
+					separatorType={ 'none' }
+					onPress={ this.removeLink }
+				/>
+			</BottomSheet>
 		);
 	}
 }
