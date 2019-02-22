@@ -1,12 +1,29 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray, pick } from 'lodash';
+import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
  * Internal dependencies
  */
-import { dispatch } from './controls';
+import {
+	dispatch,
+	select,
+	resolveSelect,
+	apiFetch,
+} from './controls';
+import {
+	MODULE_KEY,
+	POST_UPDATE_TRANSACTION_ID,
+	SAVE_POST_NOTICE_ID,
+	TRASH_POST_NOTICE_ID,
+} from './constants';
+import {
+	getNotificationArgumentsForSaveSuccess,
+	getNotificationArgumentsForSaveFail,
+	getNotificationArgumentsForTrashFail,
+} from './utils/notice-builder';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
@@ -44,59 +61,92 @@ export function resetPost( post ) {
 
 /**
  * Returns an action object used in signalling that the latest autosave of the
- * specified client ID has been selected, optionally accepting a position
- * value reflecting its selection directionality. An initialPosition of -1
- * reflects a reverse selection.
+ * post has been received, by initialization or autosave.
  *
- * @param {string}  clientId        Block client ID.
- * @param {?number} initialPosition Optional initial position. Pass as -1 to
- *                                  reflect reverse selection.
- *
- * @return {Object} Action object.
- */
-export function selectBlock( clientId, initialPosition = null ) {
-	return {
-		type: 'SELECT_BLOCK',
-		initialPosition,
-		clientId,
-	};
-}
-
-export function startMultiSelect() {
-	return {
-		type: 'START_MULTI_SELECT',
-	};
-}
-
-export function stopMultiSelect() {
-	return {
-		type: 'STOP_MULTI_SELECT',
-	};
-}
-
-export function multiSelect( start, end ) {
-	return {
-		type: 'MULTI_SELECT',
-		start,
-		end,
-	};
-}
-
-export function clearSelectedBlock() {
-	return {
-		type: 'CLEAR_SELECTED_BLOCK',
-	};
-}
-
-/**
- * Returns an action object that enables or disables block selection.
- *
+ * @param {Object} post Autosave post object.
  * @return {Object} Action object.
  */
 export function resetAutosave( post ) {
 	return {
 		type: 'RESET_AUTOSAVE',
 		post,
+	};
+}
+
+/**
+ * Optimistic action for dispatching that a post update request has started.
+ *
+ * @param {Object} options
+ * @return {Object} An action object
+ */
+export function __experimentalRequestPostUpdateStart( options = {} ) {
+	return {
+		type: 'REQUEST_POST_UPDATE_START',
+		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
+		options,
+	};
+}
+
+/**
+ * Optimistic action for indicating that the request post update has completed
+ * successfully.
+ *
+ * @param {Object} previousPost The previous post prior to update.
+ * @param {Object} post	The new post after update
+ * @param {boolean} isRevision Whether the post is a revision or not.
+ * @param {Object} options Options passed through from the original action
+ * dispatch.
+ * @param {Object} postType The post type object.
+ * @return {Object} Action object.
+ */
+export function __experimentalRequestPostUpdateSuccess( {
+	previousPost,
+	post,
+	isRevision,
+	options,
+	postType,
+} ) {
+	return {
+		type: 'REQUEST_POST_UPDATE_SUCCESS',
+		previousPost,
+		post,
+		optimist: {
+			// Note: REVERT is not a failure case here. Rather, it
+			// is simply reversing the assumption that the updates
+			// were applied to the post proper, such that the post
+			// treated as having unsaved changes.
+			type: isRevision ? REVERT : COMMIT,
+			id: POST_UPDATE_TRANSACTION_ID,
+		},
+		options,
+		postType,
+	};
+}
+
+/**
+ * Optimistic action for indicating that the request post update has completed
+ * with a failure.
+ *
+ * @param {Object} post The post that failed updating.
+ * @param {Object} edits The fields that were being updated.
+ * @param {*} error  The error from the failed call.
+ * @param {Object} options  Options passed through from the original action
+ * dispatch.
+ * @return {Object} An action object
+ */
+export function __experimentalRequestPostUpdateFailure( {
+	post,
+	edits,
+	error,
+	options,
+} ) {
+	return {
+		type: 'REQUEST_POST_UPDATE_FAILURE',
+		optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+		post,
+		edits,
+		error,
+		options,
 	};
 }
 
@@ -145,41 +195,276 @@ export function editPost( edits ) {
 }
 
 /**
- * Returns an action object to save the post.
+ * Returns action object produced by the updatePost creator augmented by
+ * an optimist option that signals optimistically applying updates.
  *
- * @param {Object}  options          Options for the save.
- * @param {boolean} options.isAutosave Perform an autosave if true.
- *
+ * @param {Object} edits  Updated post fields.
  * @return {Object} Action object.
  */
-export function savePost( options = {} ) {
+export function __experimentalOptimisticUpdatePost( edits ) {
 	return {
-		type: 'REQUEST_POST_UPDATE',
-		options,
-	};
-}
-
-export function refreshPost() {
-	return {
-		type: 'REFRESH_POST',
-	};
-}
-
-export function trashPost( postId, postType ) {
-	return {
-		type: 'TRASH_POST',
+		...updatePost( edits ),
+		optimist: { id: POST_UPDATE_TRANSACTION_ID },
 	};
 }
 
 /**
- * Returns an action object used in signalling that the post should autosave.
+ * Action generator for saving the current post in the editor.
+ *
+ * @param {Object} options
+ */
+export function* savePost( options = {} ) {
+	const isEditedPostSaveable = yield select(
+		MODULE_KEY,
+		'isEditedPostSaveable'
+	);
+	if ( ! isEditedPostSaveable ) {
+		return;
+	}
+	let edits = yield select(
+		MODULE_KEY,
+		'getPostEdits'
+	);
+	const isAutosave = !! options.isAutosave;
+
+	if ( isAutosave ) {
+		edits = pick( edits, [ 'title', 'content', 'excerpt' ] );
+	}
+
+	const isEditedPostNew = yield select(
+		MODULE_KEY,
+		'isEditedPostNew',
+	);
+
+	// New posts (with auto-draft status) must be explicitly assigned draft
+	// status if there is not already a status assigned in edits (publish).
+	// Otherwise, they are wrongly left as auto-draft. Status is not always
+	// respected for autosaves, so it cannot simply be included in the pick
+	// above. This behavior relies on an assumption that an auto-draft post
+	// would never be saved by anyone other than the owner of the post, per
+	// logic within autosaves REST controller to save status field only for
+	// draft/auto-draft by current user.
+	//
+	// See: https://core.trac.wordpress.org/ticket/43316#comment:88
+	// See: https://core.trac.wordpress.org/ticket/43316#comment:89
+	if ( isEditedPostNew ) {
+		edits = { status: 'draft', ...edits };
+	}
+
+	const post = yield select(
+		MODULE_KEY,
+		'getCurrentPost'
+	);
+
+	const editedPostContent = yield select(
+		MODULE_KEY,
+		'getEditedPostContent'
+	);
+
+	let toSend = {
+		...edits,
+		content: editedPostContent,
+		id: post.id,
+	};
+
+	const currentPostType = yield select(
+		MODULE_KEY,
+		'getCurrentPostType'
+	);
+
+	const postType = yield resolveSelect(
+		'core',
+		'getPostType',
+		currentPostType
+	);
+
+	yield dispatch(
+		MODULE_KEY,
+		'__experimentalRequestPostUpdateStart',
+		options,
+	);
+
+	// Optimistically apply updates under the assumption that the post
+	// will be updated. See below logic in success resolution for revert
+	// if the autosave is applied as a revision.
+	yield dispatch(
+		MODULE_KEY,
+		'__experimentalOptimisticUpdatePost',
+		toSend
+	);
+
+	let path = `/wp/v2/${ postType.rest_base }/${ post.id }`;
+	let method = 'PUT';
+	if ( isAutosave ) {
+		const autoSavePost = yield select(
+			MODULE_KEY,
+			'getAutosave',
+		);
+		// Ensure autosaves contain all expected fields, using autosave or
+		// post values as fallback if not otherwise included in edits.
+		toSend = {
+			...pick( post, [ 'title', 'content', 'excerpt' ] ),
+			...autoSavePost,
+			...toSend,
+		};
+		path += '/autosaves';
+		method = 'POST';
+	} else {
+		yield dispatch(
+			'core/notices',
+			'removeNotice',
+			SAVE_POST_NOTICE_ID,
+		);
+		yield dispatch(
+			'core/notices',
+			'removeNotice',
+			'autosave-exists',
+		);
+	}
+
+	try {
+		const newPost = yield apiFetch( {
+			path,
+			method,
+			data: toSend,
+		} );
+		const resetAction = isAutosave ? 'resetAutosave' : 'resetPost';
+
+		yield dispatch( MODULE_KEY, resetAction, newPost );
+
+		yield dispatch(
+			MODULE_KEY,
+			'__experimentalRequestPostUpdateSuccess',
+			{
+				previousPost: post,
+				post: newPost,
+				options,
+				postType,
+				// An autosave may be processed by the server as a regular save
+				// when its update is requested by the author and the post was
+				// draft or auto-draft.
+				isRevision: newPost.id !== post.id,
+			}
+		);
+
+		const notifySuccessArgs = getNotificationArgumentsForSaveSuccess( {
+			previousPost: post,
+			post: newPost,
+			postType,
+			options,
+		} );
+		if ( notifySuccessArgs.length > 0 ) {
+			yield dispatch(
+				'core/notices',
+				'createSuccessNotice',
+				...notifySuccessArgs
+			);
+		}
+	} catch ( error ) {
+		yield dispatch(
+			MODULE_KEY,
+			'__experimentalRequestPostUpdateFailure',
+			{ post, edits, error, options }
+		);
+		const notifyFailArgs = getNotificationArgumentsForSaveFail( {
+			post,
+			edits,
+			error,
+		} );
+		if ( notifyFailArgs.length > 0 ) {
+			yield dispatch(
+				'core/notices',
+				'createErrorNotice',
+				...notifyFailArgs
+			);
+		}
+	}
+}
+
+/**
+ * Action generator for handling refreshing the current post.
+ */
+export function* refreshPost() {
+	const post = yield select(
+		MODULE_KEY,
+		'getCurrentPost'
+	);
+	const postTypeSlug = yield select(
+		MODULE_KEY,
+		'getCurrentPostType'
+	);
+	const postType = yield resolveSelect(
+		'core',
+		'getPostType',
+		postTypeSlug
+	);
+	const newPost = yield apiFetch(
+		{
+			// Timestamp arg allows caller to bypass browser caching, which is
+			// expected for this specific function.
+			path: `/wp/v2/${ postType.rest_base }/${ post.id }?context=edit&_timestamp=${ Date.now() }`,
+		}
+	);
+	yield dispatch(
+		MODULE_KEY,
+		'resetPost',
+		newPost
+	);
+}
+
+/**
+ * Action generator for trashing the current post in the editor.
+ */
+export function* trashPost() {
+	const postTypeSlug = yield select(
+		MODULE_KEY,
+		'getCurrentPostType'
+	);
+	const postType = yield resolveSelect(
+		'core',
+		'getPostType',
+		postTypeSlug
+	);
+	yield dispatch(
+		'core/notices',
+		'removeNotice',
+		TRASH_POST_NOTICE_ID
+	);
+	try {
+		const post = yield select(
+			MODULE_KEY,
+			'getCurrentPost'
+		);
+		yield apiFetch(
+			{
+				path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
+				method: 'DELETE',
+			}
+		);
+
+		// TODO: This should be an updatePost action (updating subsets of post
+		// properties), but right now editPost is tied with change detection.
+		yield dispatch(
+			MODULE_KEY,
+			'resetPost',
+			{ ...post, status: 'trash' }
+		);
+	} catch ( error ) {
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			...getNotificationArgumentsForTrashFail( { error } ),
+		);
+	}
+}
+
+/**
+ * Action generator used in signalling that the post should autosave.
  *
  * @param {Object?} options Extra flags to identify the autosave.
- *
- * @return {Object} Action object.
  */
-export function autosave( options ) {
-	return savePost( { isAutosave: true, ...options } );
+export function* autosave( options ) {
+	yield* generatorActions.savePost( { isAutosave: true, ...options } );
 }
 
 /**
@@ -437,3 +722,12 @@ export const exitFormattedText = getBlockEditorAction( 'exitFormattedText' );
 export const insertDefaultBlock = getBlockEditorAction( 'insertDefaultBlock' );
 export const updateBlockListSettings = getBlockEditorAction( 'updateBlockListSettings' );
 export const updateEditorSettings = getBlockEditorAction( 'updateEditorSettings' );
+
+// default export of generator actions.
+const generatorActions = {
+	savePost,
+	autosave,
+	trashPost,
+	refreshPost,
+};
+export default generatorActions;

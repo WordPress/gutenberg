@@ -9,7 +9,7 @@ import {
 import {
 	SAVE_POST_NOTICE_ID,
 	TRASH_POST_NOTICE_ID,
-} from '../../../constants';
+} from '../../constants';
 
 describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 	const postType = {

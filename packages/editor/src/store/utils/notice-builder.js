@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../../constants';
+import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../constants';
 
 /**
  * External dependencies
