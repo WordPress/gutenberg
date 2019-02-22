@@ -7,8 +7,13 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.Selection;
+import android.text.Spannable;
 import android.text.TextWatcher;
+import android.text.method.ArrowKeyMovementMethod;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
@@ -79,6 +84,8 @@ public class ReactAztecText extends AztecText {
         // Needed on rotation and multiple Aztec instances to avoid losing the exact care position.
         setFocusOnVisible(false);
 
+        forceCaretAtStartOnTakeFocus();
+
         this.setAztecKeyListener(new ReactAztecText.OnAztecKeyListener() {
             @Override
             public boolean onEnterKey() {
@@ -105,6 +112,27 @@ public class ReactAztecText extends AztecText {
             }
         });
         this.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+    }
+
+    private void forceCaretAtStartOnTakeFocus() {
+        // set a custom ArrowKeyMovementMethod: sets caret to the start of the text instead of the default (end of text)
+        // Fixes https://github.com/wordpress-mobile/gutenberg-mobile/issues/602
+        // onTakeFocus adapted from the Android source code at:
+        //  https://android.googlesource.com/platform/frameworks/base/+/refs/heads/pie-release/core/java/android/text/method/ArrowKeyMovementMethod.java#316
+        setMovementMethod(new ArrowKeyMovementMethod() {
+            @Override
+            public void onTakeFocus(TextView view, Spannable text, int dir) {
+                if ((dir & (View.FOCUS_FORWARD | View.FOCUS_DOWN)) != 0) {
+                    if (view.getLayout() == null) {
+                        // This shouldn't be null, but do something sensible if it is.
+                        Selection.setSelection(text, 0); // <-- setting caret to start of text
+                    }
+                } else {
+                    Selection.setSelection(text, text.length());  // <-- same as original Android implementation. Not sure if we should change this too
+                }
+            }
+        });
+
     }
 
     @Override
