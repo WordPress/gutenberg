@@ -2,13 +2,13 @@
 
 import renderer from 'react-test-renderer';
 
-import { setupApp } from '..';
+import { registerApp } from '..';
 import App from './App';
 import BlockHolder from '../block-management/block-holder';
 import { dispatch, select } from '@wordpress/data';
 
 describe( 'App', () => {
-	beforeAll( setupApp );
+	beforeAll( registerApp );
 
 	it( 'renders without crashing', () => {
 		const app = renderer.create( <App /> );
