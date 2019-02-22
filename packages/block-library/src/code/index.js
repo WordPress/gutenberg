@@ -1,9 +1,13 @@
 /**
+ * External dependencies
+ */
+import { flow } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { compose } from '@wordpress/compose';
 import {
 	Path,
 	SVG,
@@ -69,10 +73,11 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const content = compose(
+		const content = flow(
+			escapeAmpersands,
 			escapeOpeningSquareBrackets,
 			escapeProtocolInIsolatedUrls
-		)( escapeAmpersands( attributes.content || '' ) );
+		)( attributes.content || '' );
 		return <pre><code>{ content }</code></pre>;
 	},
 };
