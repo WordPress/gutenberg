@@ -7,22 +7,6 @@
 	flex: 1 1 auto;
 }
 
-.blockHolderFocusedSemiBordered {
-	border-color: $gray-lighten-30;
-	border-top-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 0;
-	border-right-width: 0;
-}
-
-.blockHolderFocusedFullBordered {
-	border-color: $gray-lighten-30;
-	border-top-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-right-width: 1px;
-}
-
 .blockContainer {
 	background-color: white;
 	padding-left: 16;
