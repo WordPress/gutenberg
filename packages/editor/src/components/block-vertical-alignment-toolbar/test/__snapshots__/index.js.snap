@@ -7,9 +7,9 @@ exports[`BlockVerticalAlignmentToolbar should match snapshot 1`] = `
       Object {
         "_id": "top",
         "icon": <SVG
-          height="24"
+          height="20"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <Path
@@ -27,9 +27,9 @@ exports[`BlockVerticalAlignmentToolbar should match snapshot 1`] = `
       Object {
         "_id": "center",
         "icon": <SVG
-          height="24"
+          height="20"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <Path
@@ -42,14 +42,14 @@ exports[`BlockVerticalAlignmentToolbar should match snapshot 1`] = `
         </SVG>,
         "isActive": false,
         "onClick": [Function],
-        "title": "Verticaly Align Middle",
+        "title": "Vertically Align Middle",
       },
       Object {
         "_id": "bottom",
         "icon": <SVG
-          height="24"
+          height="20"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <Path
@@ -62,15 +62,15 @@ exports[`BlockVerticalAlignmentToolbar should match snapshot 1`] = `
         </SVG>,
         "isActive": false,
         "onClick": [Function],
-        "title": "Verticaly Align Bottom",
+        "title": "Vertically Align Bottom",
       },
     ]
   }
   icon={
     <SVG
-      height="24"
+      height="20"
       viewBox="0 0 24 24"
-      width="24"
+      width="20"
       xmlns="http://www.w3.org/2000/svg"
     >
       <Path
