@@ -82,16 +82,49 @@ export const settings = {
 	},
 };
 
+/**
+ * Returns the given content with all its ampersand characters converted
+ * into their HTML entity counterpart (i.e. & => &amp;)
+ *
+ * @param {string}  content The content of a code block.
+ * @return {string} The given content with its ampersands converted into
+ *                  their HTML entity counterpart (i.e. & => &amp;)
+ */
 function escapeAmpersands( content ) {
 	return content.replace( /&/g, '&amp;' );
 }
 
+/**
+ * Returns the given content with all opening shortcode characters converted
+ * into their HTML entity counterpart (i.e. [ => &#91;). For instance, a
+ * shortcode like [embed] becomes &#91;embed]
+ *
+ * This function replicates the escaping of HTML tags, where a tag like
+ * <strong> becomes &lt;strong>.
+ *
+ * @param {string}  content The content of a code block.
+ * @return {string} The given content with its opening shortcode characters
+ *                  converted into their HTML entity counterpart
+ *                  (i.e. [ => &#91;)
+ */
 function escapeOpeningSquareBrackets( content ) {
-	// This replicates the escaping of HTML tags, where
-	// a tag like <strong> becomes &lt;strong>
 	return content.replace( /\[/g, '&#91;' );
 }
 
+/**
+ * Converts the first two forward slashes of any isolated URL into their HTML
+ * counterparts (i.e. // => &#47;&#47;). For instance, https://youtube.com/watch?x
+ * becomes https:&#47;&#47;youtube.com/watch?x.
+ *
+ * An isolated URL is a URL that sits in its own line, surrounded only by spacing
+ * characters.
+ *
+ * See wp-includes/class-wp-embed.php:387 (function autoembed)
+ *
+ * @param {string}  content The content of a code block.
+ * @return {string} The given content with its ampersands converted into
+ *                  their HTML entity counterpart (i.e. & => &amp;)
+ */
 function escapeProtocolInIsolatedUrls( content ) {
 	return content.replace( /^(\s*https?:)\/\/([^\s<>"]+\s*)$/m, '$1&#47;&#47;$2' );
 }
