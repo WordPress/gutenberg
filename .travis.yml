@@ -21,6 +21,7 @@ cache:
 branches:
   only:
     - master
+    - rnmobile/release-v1.0
 
 before_install:
   - nvm install
