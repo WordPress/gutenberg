@@ -186,29 +186,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         view.setIsSettingTextFromJS(false);
     }
 
-    @ReactProp(name = "selection")
-    public void setSelection(ReactAztecText view, ReadableMap inputMap) {
-        if (shouldIgnoreCall(view, inputMap)) {
-            return;
-        }
-
-        int selectionStart = inputMap.getInt("selectionStart");
-        int selectionEnd = inputMap.getInt("selectionEnd");
-        view.setSelection(selectionStart, selectionEnd);
-    }
-
-    private boolean shouldIgnoreCall(ReactAztecText view, ReadableMap inputMap) {
-        if (!inputMap.hasKey("eventCount") ) {
-            return false;
-        } else {
-            // Don't think there is necessity of this branch, but justin case we want to
-            // force a 2nd setSelection from JS side to Native, just set a high eventCount
-            int eventCount = inputMap.getInt("eventCount");
-
-            return view.mNativeEventCount >= eventCount;
-        }
-    }
-
     @ReactProp(name = "activeFormats", defaultBoolean = false)
     public void setActiveFormats(final ReactAztecText view, @Nullable ReadableArray activeFormats) {
         if (activeFormats != null) {
