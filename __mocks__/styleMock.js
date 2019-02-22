@@ -25,4 +25,7 @@ module.exports = {
 	'editor-plain-text': {
 		fontFamily: 'serif',
 	},
+	blockHolderFocused: {
+		borderColor: 'gray',
+	},
 };
