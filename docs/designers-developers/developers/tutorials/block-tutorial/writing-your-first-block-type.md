@@ -43,7 +43,7 @@ var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
 	blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
-registerBlockType( 'gutenberg-examples/01-basic', {
+	register_block_type( 'gutenberg-examples/example-01-basic', array(
 	title: 'Hello World (Step 1)',
 
 	icon: 'universal-access-alt',
