@@ -693,7 +693,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		removeBlock,
 		mergeBlocks,
 		replaceBlocks,
-		editPost,
 		toggleSelection,
 	} = dispatch( 'core/editor' );
 
@@ -749,8 +748,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		onReplace( blocks ) {
 			replaceBlocks( [ ownProps.clientId ], blocks );
 		},
-		onMetaChange( meta ) {
-			editPost( { meta } );
+		onMetaChange( updatedMeta ) {
+			const { getEditorSettings } = select( 'core/editor' );
+			const onChangeMeta = getEditorSettings().__experimentalMetaSource.onChange;
+			onChangeMeta( updatedMeta );
 		},
 		onShiftSelection() {
 			if ( ! ownProps.isSelectionEnabled ) {
