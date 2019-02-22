@@ -42,6 +42,27 @@ const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
 };
 
+/**
+ * Calls {@link pasteHandler} with a fallback to plain text when HTML processing
+ * results in errors
+ *
+ * @param {Object}  [options]     The options to pass to {@link pasteHandler}
+ *
+ * @return {Array|string}         A list of blocks or a string, depending on
+ *                                `handlerMode`.
+ */
+const saferPasteHandler = ( options ) => {
+	try {
+		return pasteHandler( options );
+	} catch ( error ) {
+		window.console.log( 'Pasting HTML failed:', error );
+		window.console.log( 'HTML:', options.HTML );
+		window.console.log( 'Falling back to plain text.' );
+		// fallback to plain text
+		return pasteHandler( { ...options, HTML: '' } );
+	}
+};
+
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
@@ -308,7 +329,7 @@ export class RichText extends Component {
 			mode = 'AUTO';
 		}
 
-		const pastedContent = pasteHandler( {
+		const pastedContent = saferPasteHandler( {
 			HTML: pastedHtml,
 			plainText: pastedText,
 			mode,
