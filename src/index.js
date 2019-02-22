@@ -65,7 +65,7 @@ export class RootComponent extends React.Component {
 	constructor( props ) {
 		super( props );
 		setupLocale( props.locale, props.translations );
-		setupApp();
+		bootstrapEditor();
 	}
 
 	render() {
@@ -86,7 +86,7 @@ export function registerApp() {
 	AppRegistry.registerComponent( 'gutenberg', () => RootComponent );
 }
 
-export function setupApp() {
+export function bootstrapEditor() {
 	gutenbergSetup();
 	editorSetup();
 }
