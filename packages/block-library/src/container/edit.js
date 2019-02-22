@@ -9,26 +9,18 @@ import classnames from 'classnames';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
-	PanelBody,
-	ToggleControl,
-} from '@wordpress/components';
-import {
 	InspectorControls,
 	InnerBlocks,
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/editor';
 
-function ContainerEdit( { className, setBackgroundColor, backgroundColor, setAttributes, attributes } ) {
-	const { isWithPadding } = attributes;
-
+function ContainerEdit( { className, setBackgroundColor, backgroundColor } ) {
 	const styles = {
 		backgroundColor: backgroundColor.color,
 	};
 
-	const classes = classnames( className, backgroundColor.class, {
-		'is-with-padding': isWithPadding,
-	} );
+	const classes = classnames( className, backgroundColor.class );
 
 	return (
 		<Fragment>
@@ -43,13 +35,6 @@ function ContainerEdit( { className, setBackgroundColor, backgroundColor, setAtt
 						},
 					] }
 				/>
-				<PanelBody title={ __( 'Container Padding' ) }>
-					<ToggleControl
-						label={ isWithPadding ? __( 'Use default padding' ) : __( 'Use no padding' ) }
-						onChange={ ( value ) => setAttributes( { isWithPadding: value } ) }
-						checked={ isWithPadding }
-					/>
-				</PanelBody>
 			</InspectorControls>
 			<div className={ classes } style={ styles }>
 				<InnerBlocks />

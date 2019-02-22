@@ -38,21 +38,16 @@ export const settings = {
 			type: 'string',
 			default: 'primary',
 		},
-		isWithPadding: {
-			type: 'boolean',
-			default: true,
-		},
 	},
 
 	edit,
 
 	save( { attributes } ) {
-		const { backgroundColor, customBackgroundColor, isWithPadding } = attributes;
+		const { backgroundColor, customBackgroundColor } = attributes;
 
 		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 		const className = classnames( backgroundClass, {
 			'has-background': backgroundColor || customBackgroundColor,
-			'is-with-padding': isWithPadding,
 		} );
 
 		const styles = {
