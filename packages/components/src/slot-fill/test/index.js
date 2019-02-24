@@ -16,13 +16,13 @@ describe( 'createSlotFill', () => {
 		const wrapper = shallow( <MySlotFill.Fill /> );
 
 		expect( wrapper.type() ).toBe( Fill );
-		expect( wrapper ).toHaveProp( 'name', SLOT_NAME );
+		expect( wrapper.prop( 'name' ) ).toBe( SLOT_NAME );
 	} );
 
 	test( 'should match snapshot for Slot', () => {
 		const wrapper = shallow( <MySlotFill.Slot /> );
 
 		expect( wrapper.type() ).toBe( Slot );
-		expect( wrapper ).toHaveProp( 'name', SLOT_NAME );
+		expect( wrapper.prop( 'name' ) ).toBe( SLOT_NAME );
 	} );
 } );
