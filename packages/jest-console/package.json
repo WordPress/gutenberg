@@ -26,11 +26,11 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.3.1",
-		"jest-matcher-utils": "^23.6.0",
+		"jest-matcher-utils": "^24.0.0",
 		"lodash": "^4.17.11"
 	},
 	"peerDependencies": {
-		"jest": ">=22"
+		"jest": ">=24"
 	},
 	"publishConfig": {
 		"access": "public"

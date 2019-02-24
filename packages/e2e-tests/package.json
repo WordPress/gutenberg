@@ -21,11 +21,10 @@
 		"@wordpress/e2e-test-utils": "file:../e2e-test-utils",
 		"@wordpress/jest-console": "file:../jest-console",
 		"@wordpress/scripts": "file:../scripts",
-		"expect-puppeteer": "^3.2.0",
 		"lodash": "^4.17.11"
 	},
 	"peerDependencies": {
-		"jest": ">=23",
+		"jest": ">=24",
 		"puppeteer": ">=1.6"
 	},
 	"publishConfig": {
