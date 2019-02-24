@@ -18,8 +18,6 @@ import { withInstanceId, compose } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const minHeight = 30;
-
 class PostTitle extends Component {
 	constructor() {
 		super( ...arguments );
@@ -71,6 +69,8 @@ class PostTitle extends Component {
 
 		const decodedPlaceholder = decodeEntities( placeholder );
 		const borderColor = this.state.isSelected ? focusedBorderColor : 'transparent';
+
+		const minHeight = styles.blockText.minHeight;
 
 		return (
 			<View style={ [ styles.titleContainer, borderStyle, { borderColor } ] }>

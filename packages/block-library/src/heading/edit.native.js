@@ -19,9 +19,7 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import './editor.scss';
-
-const minHeight = 24;
+import styles from './style.scss';
 
 class HeadingEdit extends Component {
 	constructor( props ) {
@@ -47,6 +45,9 @@ class HeadingEdit extends Component {
 		} = attributes;
 
 		const tagName = 'h' + level;
+
+		const minHeight = styles.blockText.minHeight;
+
 		return (
 			<View>
 				<BlockControls>
