@@ -79,8 +79,8 @@
 # Documentation
 /docs                                           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
 
-# Styles (Unowned)
-*.scss                                          @ghost @chrisvanpatten
+# Styles
+*.scss                                          @chrisvanpatten
 
 # Native (Unowned)
 *.native.js                                     @ghost
