@@ -14,6 +14,7 @@ const inject = require( 'mdast-util-inject' );
  */
 const engine = require( './engine' );
 const formatter = require( './formatter' );
+const embed = require( './embed' );
 
 /**
  * Helpers functions.
@@ -85,19 +86,25 @@ const optionator = require( 'optionator' )( {
 	options: [ {
 		option: 'formatter',
 		type: 'String',
-		description: 'A custom function to format the generated documentation.',
+		description: 'A custom function to format the generated documentation. By default, a Markdown formatter will be used.',
 	}, {
 		option: 'output',
 		type: 'String',
-		description: 'Output file to will contain the API documentation.',
+		description: 'Output file to contain the API documentation.',
 	}, {
 		option: 'ignore',
 		type: 'RegExp',
 		description: 'A regular expression used to ignore symbols whose name match it.',
 	}, {
-		option: 'append',
+		option: 'to-section',
 		type: 'String',
-		description: 'Markdown section title to append documentation to.',
+		description: 'Append generated documentation to this section in the Markdown output. To be used by the default Markdown formatter.',
+		dependsOn: 'output',
+	}, {
+		option: 'to-token',
+		type: 'Boolean',
+		description: 'Embed generated documentation within this token in the Markdown output. To be used by the default Markdown formatter.',
+		dependsOn: 'output',
 	}, {
 		option: 'debug',
 		type: 'Boolean',
@@ -145,7 +152,7 @@ if ( result === undefined ) {
 	process.exit( 0 );
 }
 
-// wrap the inject utility as an remark plugin
+// wrap the inject utility as a remark plugin
 const appendContents = ( { heading, newContents } ) => {
 	return function transform( targetAst, file, next ) {
 		if ( ! inject( heading, targetAst, newContents ) ) {
@@ -155,12 +162,34 @@ const appendContents = ( { heading, newContents } ) => {
 	};
 };
 
-if ( options.append ) {
+// wrap the embed utility as a remark plugin
+const embedContents = ( { newContents } ) => {
+	return function transform( targetAst, file, next ) {
+		if ( ! embed( targetAst, newContents ) ) {
+			return next( new Error( `Token not found.` ) );
+		}
+		next();
+	};
+};
+
+if ( options.toSection ) {
 	const currentReadmeFile = fs.readFileSync( options.output, 'utf8' );
 	const contentsAST = unified().use( remarkParser ).parse( formatter( processDir, doc, filteredIr, null ) );
 	remark()
 		.use( { settings: { commonmark: true } } )
-		.use( appendContents, { heading: options.append, newContents: contentsAST } )
+		.use( appendContents, { heading: options.toSection, newContents: contentsAST } )
+		.process( currentReadmeFile, function( err, file ) {
+			if ( err ) {
+				throw err;
+			}
+			fs.writeFileSync( doc, file );
+		} );
+} else if ( options.toToken ) {
+	const currentReadmeFile = fs.readFileSync( options.output, 'utf8' );
+	const contentsAST = unified().use( remarkParser ).parse( formatter( processDir, doc, filteredIr, null ) );
+	remark()
+		.use( { settings: { commonmark: true } } )
+		.use( embedContents, { newContents: contentsAST } )
 		.process( currentReadmeFile, function( err, file ) {
 			if ( err ) {
 				throw err;
