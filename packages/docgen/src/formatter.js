@@ -3,11 +3,6 @@
  */
 const path = require( 'path' );
 
-/**
- * Internal dependencies
- */
-const getType = require( './get-type-as-string' );
-
 const getTagsByName = ( tags, ...names ) => tags.filter( ( tag ) => names.some( ( name ) => name === tag.title ) );
 
 const cleanSpaces = ( paragraph ) =>
@@ -100,19 +95,19 @@ module.exports = function( rootDir, docPath, symbols, headingTitle ) {
 			formatTag(
 				'Type',
 				getTagsByName( symbol.tags, 'type' ),
-				( tag ) => `\n\`${ getType( tag ) }\` ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n\`${ tag.type }\` ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Parameters',
 				getTagsByName( symbol.tags, 'param' ),
-				( tag ) => `\n- **${ tag.name }** \`${ getType( tag ) }\`: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- **${ tag.name }** \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Returns',
 				getTagsByName( symbol.tags, 'return' ),
-				( tag ) => `\n\`${ getType( tag ) }\` ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n\`${ tag.type }\` ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			docs.push( '\n' );

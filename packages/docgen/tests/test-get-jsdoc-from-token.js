@@ -37,19 +37,13 @@ test( 'JSDoc - extracts description and tags', function( t ) {
 				{
 					title: 'param',
 					description: 'The first param to add.',
-					type: {
-						type: 'NameExpression',
-						name: 'number',
-					},
+					type: 'number',
 					name: 'firstParam',
 				},
 				{
 					title: 'param',
 					description: 'The second param to add.',
-					type: {
-						type: 'NameExpression',
-						name: 'number',
-					},
+					type: 'number',
 					name: 'secondParam',
 				},
 				{
@@ -59,10 +53,7 @@ test( 'JSDoc - extracts description and tags', function( t ) {
 				{
 					title: 'return',
 					description: 'The result of adding the two params.',
-					type: {
-						type: 'NameExpression',
-						name: 'number',
-					},
+					type: 'number',
 				},
 			],
 		}
@@ -80,10 +71,7 @@ test( 'JSDoc - extracts description and tags', function( t ) {
 				{
 					title: 'type',
 					description: null,
-					type: {
-						type: 'NameExpression',
-						name: 'number',
-					},
+					type: 'number',
 				},
 			],
 		}

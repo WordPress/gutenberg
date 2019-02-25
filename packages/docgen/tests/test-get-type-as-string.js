@@ -8,7 +8,7 @@ const test = require( 'tape' );
  */
 const getType = require( '../src/get-type-as-string' );
 
-test( 'getType from NameExpression', ( t ) => {
+test( 'JSDoc - getType from NameExpression', ( t ) => {
 	const type = getType( {
 		title: 'param',
 		description: 'description',
@@ -22,7 +22,7 @@ test( 'getType from NameExpression', ( t ) => {
 	t.end();
 } );
 
-test( 'getType from AllLiteral', ( t ) => {
+test( 'JSDoc - getType from AllLiteral', ( t ) => {
 	const type = getType( {
 		title: 'param',
 		description: 'description',
@@ -35,7 +35,7 @@ test( 'getType from AllLiteral', ( t ) => {
 	t.end();
 } );
 
-test( 'getType with applications', ( t ) => {
+test( 'JSDoc - getType with applications', ( t ) => {
 	const type = getType( {
 		title: 'param',
 		description: 'description',
@@ -61,7 +61,7 @@ test( 'getType with applications', ( t ) => {
 	t.end();
 } );
 
-test( 'getType from NullableType', ( t ) => {
+test( 'JSDoc - getType from NullableType', ( t ) => {
 	const type = getType( {
 		title: 'param',
 		description: 'description',
@@ -79,7 +79,7 @@ test( 'getType from NullableType', ( t ) => {
 	t.end();
 } );
 
-test( 'getType from RestType', ( t ) => {
+test( 'JSDoc - getType from RestType', ( t ) => {
 	const type = getType( {
 		title: 'param',
 		description: 'description',
@@ -96,7 +96,7 @@ test( 'getType from RestType', ( t ) => {
 	t.end();
 } );
 
-test( 'getType from RestType with UnionType', ( t ) => {
+test( 'JSDoc - getType from RestType with UnionType', ( t ) => {
 	const type = getType( {
 		title: 'param',
 		description: 'description',
