@@ -104,7 +104,7 @@ export function isUpdatingSamePostProperty( action, previousAction ) {
  */
 export function shouldOverwriteState( action, previousAction ) {
 	if ( action.type === 'RESET_EDITOR_BLOCKS' ) {
-		return ! action.shouldCreateUndoLevel;
+		return true;
 	}
 
 	if ( ! previousAction || action.type !== previousAction.type ) {
@@ -148,9 +148,6 @@ export const editor = flow( [
 	} )( ( state = { value: [] }, action ) => {
 		switch ( action.type ) {
 			case 'RESET_EDITOR_BLOCKS':
-				if ( action.blocks === state.value ) {
-					return state;
-				}
 				return { value: action.blocks };
 		}
 
