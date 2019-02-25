@@ -53,10 +53,16 @@ const formatDescription = ( description, docs ) => {
 	docs.push( description );
 };
 
-module.exports = function( rootDir, docPath, symbols, headingTitle ) {
+const getHeading = ( index, text ) => {
+	return '#'.repeat( index ) + ' ' + text;
+};
+
+module.exports = function( rootDir, docPath, symbols, headingTitle, headingStartIndex ) {
 	const docs = [ ];
+	let headingIndex = headingStartIndex || 1;
 	if ( headingTitle ) {
-		docs.push( `# ${ headingTitle }` );
+		docs.push( getHeading( headingIndex, `${ headingTitle }` ) );
+		headingIndex++;
 	}
 	docs.push( '\n' );
 	docs.push( '\n' );
@@ -81,7 +87,7 @@ module.exports = function( rootDir, docPath, symbols, headingTitle ) {
 				path.basename( symbol.path ),
 			);
 			const symbolPathWithLines = `${ symbolPath }#L${ symbol.lineStart }-L${ symbol.lineEnd }`;
-			docs.push( `## ${ symbol.name }` );
+			docs.push( getHeading( headingIndex, `${ symbol.name }` ) );
 			docs.push( `\n\n[${ symbolPathWithLines }](${ symbolPathWithLines })` );
 			formatDeprecated( getTagsByName( symbol.tags, 'deprecated' ), docs );
 			formatDescription( symbol.description, docs );
