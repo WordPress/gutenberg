@@ -408,3 +408,93 @@ test( 'IR - JSDoc in module dependency through import (named export)', function(
 	);
 	t.end();
 } );
+
+test( 'IR - tags are extracted properly', function( t ) {
+	const tokensFn = fs.readFileSync(
+		path.join( __dirname, './fixtures/tags-function-exports.json' ),
+		'utf-8'
+	);
+	t.deepEqual(
+		getIntermediateRepresentation( null, JSON.parse( tokensFn ) ),
+		[ {
+			path: null,
+			name: 'sum',
+			description: 'A function that adds two parameters.',
+			tags: [
+				{
+					title: 'deprecated',
+					description: 'Use native addition instead.',
+				},
+				{
+					title: 'since',
+					description: 'v2',
+				},
+				{
+					title: 'see',
+					description: 'addition',
+				},
+				{
+					title: 'link',
+					description: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators',
+				},
+				{
+					title: 'param',
+					description: 'The first param to add.',
+					type: {
+						type: 'NameExpression',
+						name: 'number',
+					},
+					name: 'firstParam',
+				},
+				{
+					title: 'param',
+					description: 'The second param to add.',
+					type: {
+						type: 'NameExpression',
+						name: 'number',
+					},
+					name: 'secondParam',
+				},
+				{
+					title: 'example',
+					description: '```js\nconst addResult = sum( 1, 3 );\nconsole.log( addResult ); // will yield 4\n```',
+				},
+				{
+					title: 'return',
+					description: 'The result of adding the two params.',
+					type: {
+						type: 'NameExpression',
+						name: 'number',
+					},
+				},
+			],
+			lineStart: 22,
+			lineEnd: 24,
+		} ]
+	);
+	const tokensVar = fs.readFileSync(
+		path.join( __dirname, './fixtures/tags-variable-exports.json' ),
+		'utf-8'
+	);
+	t.deepEqual(
+		getIntermediateRepresentation( null, JSON.parse( tokensVar ) ),
+		[ {
+			path: null,
+			name: 'THE_MEANING',
+			description: 'Constant to document the meaning of life,\nthe universe and everything else.',
+			tags: [
+				{
+					title: 'type',
+					description: null,
+					type: {
+						type: 'NameExpression',
+						name: 'number',
+					},
+				},
+			],
+			lineStart: 7,
+			lineEnd: 7,
+		} ]
+	);
+	t.end();
+} );
