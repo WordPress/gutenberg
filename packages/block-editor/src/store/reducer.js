@@ -187,15 +187,30 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 
+	/**
+	 * Set of action types for which a blocks state change should be considered
+	 * non-persistent.
+	 *
+	 * @type {Set}
+	 */
+	const IGNORED_ACTION_TYPES = new Set( [
+		'RECEIVE_BLOCKS',
+	] );
+
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
+
 		const isExplicitPersistentChange = action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT';
 
 		if ( state !== nextState || isExplicitPersistentChange ) {
+			// Some state changes should not be considered persistent, namely
+			// those which are not a direct result of user interaction.
+			const isPersistentStateChange = ! IGNORED_ACTION_TYPES.has( action.type );
+
 			nextState = {
 				...nextState,
-				isPersistentChange: (
-					isExplicitPersistentChange ||
+				isPersistentChange: isExplicitPersistentChange || (
+					isPersistentStateChange &&
 					! isUpdatingSameBlockAttribute( action, lastAction )
 				),
 			};

@@ -1090,6 +1090,19 @@ describe( 'state', () => {
 
 					expect( state.isPersistentChange ).toBe( false );
 				} );
+
+				it( 'should not consider received blocks as persistent change', () => {
+					const state = blocks( undefined, {
+						type: 'RECEIVE_BLOCKS',
+						blocks: [ {
+							clientId: 'kumquat',
+							attributes: {},
+							innerBlocks: [],
+						} ],
+					} );
+
+					expect( state.isPersistentChange ).toBe( false );
+				} );
 			} );
 		} );
 	} );
