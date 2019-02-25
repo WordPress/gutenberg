@@ -6,7 +6,7 @@ import { transformSync } from '@babel/core';
 /**
  * Internal dependencies
  */
-import plugin from '../src';
+import plugin from '../';
 
 describe( 'babel-plugin-import-jsx-pragma', () => {
 	function getTransformedCode( source, options = {} ) {
