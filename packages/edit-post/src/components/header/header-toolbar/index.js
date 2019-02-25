@@ -21,7 +21,7 @@ import {
  */
 import FullscreenModeClose from '../fullscreen-mode-close';
 
-function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter } ) {
+function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isTextModeEnabled } ) {
 	const toolbarAriaLabel = hasFixedToolbar ?
 		/* translators: accessibility text for the editor toolbar when Top Toolbar is on */
 		__( 'Document and block tools' ) :
@@ -42,8 +42,8 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter } ) {
 			</div>
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
-			<TableOfContents />
-			<BlockNavigationDropdown />
+			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
+			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
 			{ hasFixedToolbar && isLargeViewport && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar />
@@ -58,6 +58,7 @@ export default compose( [
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		// This setting (richEditingEnabled) should not live in the block editor's setting.
 		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/block-editor' ).getEditorSettings().richEditingEnabled,
+		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
 	} ) ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( HeaderToolbar );
