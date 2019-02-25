@@ -19,11 +19,13 @@ const MenuIcon = (
 );
 
 function BlockNavigationDropdown( { hasBlocks, isTextModeEnabled } ) {
+	const isEnabled = hasBlocks && ! isTextModeEnabled;
+
 	return	(
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Fragment>
-					{ hasBlocks && ! isTextModeEnabled && <KeyboardShortcuts
+					{ isEnabled && <KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
 							[ rawShortcut.access( 'o' ) ]: onToggle,
@@ -33,11 +35,11 @@ function BlockNavigationDropdown( { hasBlocks, isTextModeEnabled } ) {
 					<IconButton
 						icon={ MenuIcon }
 						aria-expanded={ isOpen }
-						onClick={ hasBlocks ? onToggle : undefined }
+						onClick={ isEnabled ? onToggle : undefined }
 						label={ __( 'Block Navigation' ) }
 						className="editor-block-navigation"
 						shortcut={ displayShortcut.access( 'o' ) }
-						disabled={ ! hasBlocks || isTextModeEnabled }
+						aria-disabled={ ! isEnabled }
 					/>
 				</Fragment>
 			) }
