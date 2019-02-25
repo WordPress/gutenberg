@@ -718,6 +718,18 @@ Is the editor ready
 
 is Ready.
 
+### getEditorSettings
+
+Returns the post editor settings.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+The editor settings object.
+
 ## Actions
 
 ### setupEditor
@@ -968,3 +980,11 @@ Returns an action object used to signal that the blocks have been updated.
 
  * blocks: Block Array.
  * options: Optional options.
+
+### updateEditorSettings
+
+Returns an action object used in signalling that the post editor settings have been updated.
+
+*Parameters*
+
+ * settings: Updated settings

@@ -503,15 +503,15 @@ export function updateBlockListSettings( clientId, settings ) {
 }
 
 /*
- * Returns an action object used in signalling that the editor settings have been updated.
+ * Returns an action object used in signalling that the block editor settings have been updated.
  *
  * @param {Object} settings Updated settings
  *
  * @return {Object} Action object
  */
-export function updateEditorSettings( settings ) {
+export function updateSettings( settings ) {
 	return {
-		type: 'UPDATE_EDITOR_SETTINGS',
+		type: 'UPDATE_SETTINGS',
 		settings,
 	};
 }

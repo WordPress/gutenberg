@@ -64,6 +64,8 @@ class EditorProvider extends Component {
 	}
 
 	componentDidMount() {
+		this.props.updateEditorSettings( this.props.settings );
+
 		if ( ! this.props.settings.styles ) {
 			return;
 		}
@@ -77,6 +79,12 @@ class EditorProvider extends Component {
 				document.body.appendChild( node );
 			}
 		} );
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.settings !== prevProps.settings ) {
+			this.props.updateEditorSettings( this.props.settings );
+		}
 	}
 
 	render() {
@@ -134,6 +142,7 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			editPost,
+			updateEditorSettings,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
@@ -142,6 +151,7 @@ export default compose( [
 			updatePostLock,
 			createWarningNotice,
 			resetEditorBlocks,
+			updateEditorSettings,
 			resetEditorBlocksWithoutUndoLevel( blocks ) {
 				resetEditorBlocks( blocks, {
 					__unstableShouldCreateUndoLevel: false,
