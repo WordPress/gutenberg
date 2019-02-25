@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 const postcss = require( 'postcss' );
 
 module.exports = postcss.plugin( 'postcss-themes', function( options ) {
