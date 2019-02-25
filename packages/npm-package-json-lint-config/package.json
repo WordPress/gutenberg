@@ -18,6 +18,9 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=8"
+	},
 	"main": "index.js",
 	"peerDependencies": {
 		"npm-package-json-lint": ">=3.3.1"

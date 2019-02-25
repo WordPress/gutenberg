@@ -26,15 +26,12 @@ const DEFAULT_OPTIONS = {
  *
  * @return {Object} Babel transform plugin.
  */
-export default function( babel ) {
+module.exports = function( babel ) {
 	const { types: t } = babel;
 
 	function getOptions( state ) {
 		if ( ! state._options ) {
-			state._options = {
-				...DEFAULT_OPTIONS,
-				...state.opts,
-			};
+			state._options = Object.assign( {}, DEFAULT_OPTIONS, state.opts );
 		}
 
 		return state._options;
@@ -106,4 +103,4 @@ export default function( babel ) {
 			},
 		},
 	};
-}
+};
