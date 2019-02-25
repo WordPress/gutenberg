@@ -15,11 +15,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
 
-require dirname( __FILE__ ) . '/meta-box-partial-page.php';
-require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/client-assets.php';
-require dirname( __FILE__ ) . '/compat.php';
-require dirname( __FILE__ ) . '/plugin-compat.php';
 require dirname( __FILE__ ) . '/i18n.php';
 require dirname( __FILE__ ) . '/register.php';
 require dirname( __FILE__ ) . '/demo.php';
