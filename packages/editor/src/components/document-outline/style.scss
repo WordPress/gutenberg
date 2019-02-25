@@ -46,6 +46,10 @@
 	color: $dark-gray-800;
 	text-align: left;
 
+	&:disabled {
+		cursor: default;
+	}
+
 	&:focus {
 		@include button-style__focus-active;
 	}
