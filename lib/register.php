@@ -33,6 +33,7 @@ function gutenberg_collect_meta_box_data() {
 function gutenberg_can_edit_post( $post ) {
 	_deprecated_function( __FUNCTION__, '5.1.0', 'use_block_editor_for_post' );
 
+	require_once ABSPATH . 'wp-admin/includes/post.php';
 	return use_block_editor_for_post( $post );
 }
 
@@ -51,6 +52,7 @@ function gutenberg_can_edit_post( $post ) {
 function gutenberg_can_edit_post_type( $post_type ) {
 	_deprecated_function( __FUNCTION__, '5.1.0', 'use_block_editor_for_post_type' );
 
+	require_once ABSPATH . 'wp-admin/includes/post.php';
 	return use_block_editor_for_post_type( $post_type );
 }
 
