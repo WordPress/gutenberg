@@ -37,6 +37,7 @@ class ErrorBoundary extends Component {
 			// used here because it (a) reduces the chance of data loss in the
 			// case of additional errors by performing a direct retrieval and
 			// (b) avoids the performance cost associated with unnecessary
+			// content serialization throughout the lifetime of a non-erroring
 			// application.
 			return select( 'core/editor' ).getEditedPostContent();
 		} catch ( error ) {}
