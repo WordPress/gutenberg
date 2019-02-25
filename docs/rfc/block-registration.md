@@ -67,7 +67,13 @@ To register a new block type, start by creating a `block.json` file. This file:
 	"icon": "star",
 	"description": "Shows warning, error or success notices  ...",
 	"keywords": [ "alert", "message" ],
-	"attributes": {  /* Block attributes definition */ },
+	"attributes": {
+		"message": {
+			"type": "string",
+			"source": "html",
+			"selector": ".meessage"
+		}
+	},
 	"edit": "blocks/notice-edit.js",
 	"save": "blocks/notice-save.js",
 }
@@ -151,14 +157,14 @@ An implementation should expect and tolerate unknown categories, providing some 
 
 ```json
 {
-	"slug": "star", // Dashicon slug, serve as a fallback if non-js contexts. 
-	"src": "./my-file.js", // Path to a JavaScript file containing the block's icon property
+	"slug": "star",
+	"src": "./my-file.js",
 	"foreground": "#000000",
 	"background": "#FFFFFF",
 }
 ```
 
-An icon property should be specified to make it easier to identify a block. These can be any of WordPress' Dashicons, or a custom svg element.
+An icon property should be specified to make it easier to identify a block. These can be any of WordPress' Dashicons (slug serving also as a fallback if non-js contexts), and a path to a JavaScript file containing the block's icon property custom SVG element.
 
 Besides the dashicon or the source of the SVG element, the icon object can contain background and foreground colors, this colors will appear with the icon when they are applicable e.g.: in the inserter.
 
