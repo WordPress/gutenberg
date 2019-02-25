@@ -187,6 +187,12 @@
 		color: $dark-gray-800;
 	}
 
+	// Prevent toolbar clipping on heading style in RTL languages
+	.mce-rtl .mce-flow-layout-item.mce-last {
+		margin-right: 0;
+		margin-left: 8px;
+	}
+
 	// Prevent i tags in buttons from picking up theme editor styles.
 	.mce-btn i {
 		font-style: normal;
