@@ -386,7 +386,6 @@ export default compose(
 				getBlockOrder,
 			} = select( 'core/block-editor' );
 			const { clientId, rootClientId, isAppender } = ownProps;
-
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
 				return {
@@ -401,6 +400,7 @@ export default compose(
 				const selectedBlockRootClientId = getBlockRootClientId( end ) || undefined;
 				return {
 					index: getBlockIndex( end, selectedBlockRootClientId ) + 1,
+					isInsertingAfterSelectedBlock: true,
 					rootClientId: selectedBlockRootClientId,
 				};
 			}
@@ -431,13 +431,21 @@ export default compose(
 				const { name, initialAttributes } = item;
 				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );
-				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+				const {
+					index,
+					isInsertingAfterSelectedBlock,
+					rootClientId,
+				} = getInsertionPoint();
+				if (
+					! isAppender &&
+					isInsertingAfterSelectedBlock &&
+					selectedBlock &&
+					isUnmodifiedDefaultBlock( selectedBlock )
+				) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
-					const { index, rootClientId } = getInsertionPoint();
 					insertBlock( insertedBlock, index, rootClientId );
 				}
-
 				ownProps.onSelect();
 			},
 		};
