@@ -64,7 +64,7 @@ const computeOutlineHeadings = ( blocks = [], path = [] ) => {
 
 const isEmptyHeading = ( heading ) => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupported, isTextModeEnabled } ) => {
+export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupported, hasOutlineItemsDisabled } ) => {
 	const headings = computeOutlineHeadings( blocks );
 
 	if ( headings.length < 1 ) {
@@ -96,7 +96,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 						level={ __( 'Title' ) }
 						isValid
 						onClick={ focusTitle }
-						isDisabled={ isTextModeEnabled }
+						isDisabled={ hasOutlineItemsDisabled }
 					>
 						{ title }
 					</DocumentOutlineItem>
@@ -121,7 +121,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 							isValid={ isValid }
 							onClick={ () => onSelectHeading( item.clientId ) }
 							path={ item.path }
-							isDisabled={ isTextModeEnabled }
+							isDisabled={ hasOutlineItemsDisabled }
 						>
 							{ item.isEmpty ?
 								emptyHeadingContent :
@@ -150,7 +150,6 @@ export default compose(
 			title: getEditedPostAttribute( 'title' ),
 			blocks: getBlocks(),
 			isTitleSupported: get( postType, [ 'supports', 'title' ], false ),
-			isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

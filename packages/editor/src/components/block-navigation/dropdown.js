@@ -18,8 +18,8 @@ const MenuIcon = (
 	</SVG>
 );
 
-function BlockNavigationDropdown( { hasBlocks, isTextModeEnabled } ) {
-	const isEnabled = hasBlocks && ! isTextModeEnabled;
+function BlockNavigationDropdown( { hasBlocks, isDisabled } ) {
+	const isEnabled = hasBlocks && ! isDisabled;
 
 	return	(
 		<Dropdown
@@ -53,6 +53,5 @@ function BlockNavigationDropdown( { hasBlocks, isTextModeEnabled } ) {
 export default withSelect( ( select ) => {
 	return {
 		hasBlocks: !! select( 'core/block-editor' ).getBlockCount(),
-		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
 	};
 } )( BlockNavigationDropdown );
