@@ -175,7 +175,7 @@ export class BlockSwitcher extends Component {
 
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlocksByClientId, getBlockRootClientId, getInserterItems } = select( 'core/editor' );
+		const { getBlocksByClientId, getBlockRootClientId, getInserterItems } = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
 		const rootClientId = getBlockRootClientId( first( castArray( clientIds ) ) );
 		const blocks = getBlocksByClientId( clientIds );
@@ -189,7 +189,7 @@ export default compose(
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onTransform( blocks, name ) {
-			dispatch( 'core/editor' ).replaceBlocks(
+			dispatch( 'core/block-editor' ).replaceBlocks(
 				ownProps.clientIds,
 				switchToBlockType( blocks, name )
 			);

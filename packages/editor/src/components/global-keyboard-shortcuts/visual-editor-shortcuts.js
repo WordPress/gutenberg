@@ -146,7 +146,7 @@ const EnhancedVisualEditorGlobalKeyboardShortcuts = compose( [
 			getBlockRootClientId,
 			getTemplateLock,
 			getSelectedBlockClientId,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectedBlockClientIds = selectedBlockClientId ? [ selectedBlockClientId ] : getMultiSelectedBlockClientIds();
 
@@ -161,12 +161,16 @@ const EnhancedVisualEditorGlobalKeyboardShortcuts = compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
+		// This component should probably be split into to
+		// A block editor specific one and a post editor one.
 		const {
 			clearSelectedBlock,
 			multiSelect,
+			removeBlocks,
+		} = dispatch( 'core/block-editor' );
+		const {
 			redo,
 			undo,
-			removeBlocks,
 		} = dispatch( 'core/editor' );
 
 		return {

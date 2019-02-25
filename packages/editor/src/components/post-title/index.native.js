@@ -106,11 +106,14 @@ class PostTitle extends Component {
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
 	const {
-		insertDefaultBlock,
-		clearSelectedBlock,
 		undo,
 		redo,
 	} = dispatch( 'core/editor' );
+
+	const {
+		insertDefaultBlock,
+		clearSelectedBlock,
+	} = dispatch( 'core/block-editor' );
 
 	return {
 		onEnterPress() {

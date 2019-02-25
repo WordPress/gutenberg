@@ -259,7 +259,7 @@ const ParagraphEdit = compose( [
 	withFontSizes( 'fontSize' ),
 	applyFallbackStyles,
 	withSelect( ( select ) => {
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getEditorSettings } = select( 'core/block-editor' );
 
 		return {
 			isRTL: getEditorSettings().isRTL,

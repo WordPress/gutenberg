@@ -50,7 +50,7 @@ function BlockNavigationDropdown( { hasBlocks, isTextModeEnabled } ) {
 
 export default withSelect( ( select ) => {
 	return {
-		hasBlocks: !! select( 'core/editor' ).getBlockCount(),
+		hasBlocks: !! select( 'core/block-editor' ).getBlockCount(),
 		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
 	};
 } )( BlockNavigationDropdown );

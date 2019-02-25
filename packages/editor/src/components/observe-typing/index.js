@@ -201,14 +201,14 @@ class ObserveTyping extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isTyping } = select( 'core/editor' );
+		const { isTyping } = select( 'core/block-editor' );
 
 		return {
 			isTyping: isTyping(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { startTyping, stopTyping } = dispatch( 'core/editor' );
+		const { startTyping, stopTyping } = dispatch( 'core/block-editor' );
 
 		return {
 			onStartTyping: startTyping,

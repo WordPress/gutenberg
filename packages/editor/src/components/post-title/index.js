@@ -149,7 +149,8 @@ class PostTitle extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute, getEditorSettings, isCleanNewPost } = select( 'core/editor' );
+	const { getEditedPostAttribute, isCleanNewPost } = select( 'core/editor' );
+	const { getEditorSettings } = select( 'core/block-editor' );
 	const { getPostType } = select( 'core' );
 	const postType = getPostType( getEditedPostAttribute( 'type' ) );
 	const { titlePlaceholder, focusMode, hasFixedToolbar } = getEditorSettings();
@@ -167,8 +168,10 @@ const applyWithSelect = withSelect( ( select ) => {
 const applyWithDispatch = withDispatch( ( dispatch ) => {
 	const {
 		insertDefaultBlock,
-		editPost,
 		clearSelectedBlock,
+	} = dispatch( 'core/block-editor' );
+	const {
+		editPost,
 		undo,
 		redo,
 	} = dispatch( 'core/editor' );

@@ -43,7 +43,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 }
 
 const edit = withDispatch( ( dispatch, { clientId, attributes } ) => {
-	const { replaceBlock } = dispatch( 'core/editor' );
+	const { replaceBlock } = dispatch( 'core/block-editor' );
 	return {
 		convertToHTML() {
 			replaceBlock( clientId, createBlock( 'core/html', {
