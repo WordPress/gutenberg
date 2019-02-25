@@ -140,7 +140,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getBlocks } = select( 'core/editor' );
+		const { getEditedPostAttribute, getBlocks } = select( 'core/block-editor' );
 		const { getPostType } = select( 'core' );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
@@ -151,7 +151,7 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { selectBlock } = dispatch( 'core/editor' );
+		const { selectBlock } = dispatch( 'core/block-editor' );
 		return {
 			onSelect: selectBlock,
 		};

@@ -103,8 +103,13 @@ class Inserter extends Component {
 export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
-			getEditedPostAttribute,
 			hasInserterItems,
+		} = select( 'core/block-editor' );
+
+		// The title should be removed from the inserter
+		// or replaced by a prop passed to the inserter.
+		const {
+			getEditedPostAttribute,
 		} = select( 'core/editor' );
 
 		return {

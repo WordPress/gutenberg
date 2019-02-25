@@ -47,7 +47,7 @@ export default withSelect( ( select ) => {
 		getBlockMode,
 		getMultiSelectedBlockClientIds,
 		isBlockValid,
-	} = select( 'core/editor' );
+	} = select( 'core/block-editor' );
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const blockClientIds = selectedBlockClientId ?
 		[ selectedBlockClientId ] :

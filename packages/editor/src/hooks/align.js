@@ -168,7 +168,7 @@ export const withDataAlign = createHigherOrderComponent(
 	compose( [
 		withSelect(
 			( select ) => {
-				const { getEditorSettings } = select( 'core/editor' );
+				const { getEditorSettings } = select( 'core/block-editor' );
 				return {
 					hasWideEnabled: !! getEditorSettings().alignWide,
 				};

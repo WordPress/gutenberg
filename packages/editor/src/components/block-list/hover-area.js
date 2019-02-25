@@ -76,7 +76,7 @@ class HoverArea extends Component {
 
 export default withSelect( ( select ) => {
 	return {
-		isRTL: select( 'core/editor' ).getEditorSettings().isRTL,
+		isRTL: select( 'core/block-editor' ).getEditorSettings().isRTL,
 	};
 } )( HoverArea );
 

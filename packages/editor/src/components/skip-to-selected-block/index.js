@@ -26,6 +26,6 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 
 export default withSelect( ( select ) => {
 	return {
-		selectedBlockClientId: select( 'core/editor' ).getBlockSelectionStart(),
+		selectedBlockClientId: select( 'core/block-editor' ).getBlockSelectionStart(),
 	};
 } )( SkipToSelectedBlock );

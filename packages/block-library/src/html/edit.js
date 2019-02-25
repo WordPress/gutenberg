@@ -87,7 +87,7 @@ class HTMLEdit extends Component {
 	}
 }
 export default withSelect( ( select ) => {
-	const { getEditorSettings } = select( 'core/editor' );
+	const { getEditorSettings } = select( 'core/block-editor' );
 	return {
 		styles: getEditorSettings().styles,
 	};

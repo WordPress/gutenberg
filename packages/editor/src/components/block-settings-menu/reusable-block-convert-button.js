@@ -52,6 +52,8 @@ export default compose( [
 		const {
 			getBlocksByClientId,
 			canInsertBlockType,
+		} = select( 'core/block-editor' );
+		const {
 			__experimentalGetReusableBlock: getReusableBlock,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );

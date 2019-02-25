@@ -85,7 +85,7 @@ export default withSelect( ( select, { clientId, rootClientId } ) => {
 		getBlockIndex,
 		getBlockInsertionPoint,
 		isBlockInsertionPointVisible,
-	} = select( 'core/editor' );
+	} = select( 'core/block-editor' );
 	const blockIndex = getBlockIndex( clientId, rootClientId );
 	const insertionPoint = getBlockInsertionPoint();
 	const showInsertionPoint = (
