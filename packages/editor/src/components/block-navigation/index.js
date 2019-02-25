@@ -40,10 +40,9 @@ function BlockNavigationList( {
 						<div className="editor-block-navigation__item">
 							<Button
 								className={ classnames( 'editor-block-navigation__item-button', {
-									'is-selected': block.clientId === selectedBlockClientId,
+									'is-selected': isSelected,
 								} ) }
 								onClick={ () => selectBlock( block.clientId ) }
-								isSelected={ isSelected }
 							>
 								<BlockIcon icon={ blockType.icon } showColors />
 								{ blockType.title }
