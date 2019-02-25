@@ -14,7 +14,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 module.exports = {
 	verbose: true,
 	preset: 'react-native',
-	testRegex: '__device-tests__/.*\\.(js|jsx)$',
+	testRegex: '__device-tests__/.*\\.test\\.(js|jsx)$',
 	// setupFiles: [ './jest/setup.js' ],
 	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [
