@@ -198,7 +198,7 @@ For major WordPress releases, the last Gutenberg plugin release is merged into `
 
 ### Minor WordPress Releases
 
-For minor releases, the critical fixes targeted for this WordPress Minor release should be cherry-picked onto the `g-minor` branch one by one in their chronological order.
+For minor releases, the critical fixes targeted for this WordPress Minor release should be cherry-picked into the `g-minor` branch one by one in their chronological order.
 
 ### Releasing the WordPress packages
 
