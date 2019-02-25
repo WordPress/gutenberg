@@ -36,7 +36,7 @@ const withCustomColorPalette = ( colorsArray ) => createHigherOrderComponent( ( 
  * @return {function} The higher order component.
  */
 const withEditorColorPalette = () => withSelect( ( select ) => {
-	const settings = select( 'core/editor' ).getEditorSettings();
+	const settings = select( 'core/block-editor' ).getEditorSettings();
 	return {
 		colors: get( settings, [ 'colors' ], DEFAULT_COLORS ),
 	};

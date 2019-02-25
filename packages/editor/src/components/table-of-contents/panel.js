@@ -57,7 +57,7 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks } 
 }
 
 export default withSelect( ( select ) => {
-	const { getGlobalBlockCount } = select( 'core/editor' );
+	const { getGlobalBlockCount } = select( 'core/block-editor' );
 	return {
 		headingCount: getGlobalBlockCount( 'core/heading' ),
 		paragraphCount: getGlobalBlockCount( 'core/paragraph' ),

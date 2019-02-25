@@ -35,7 +35,7 @@ export default compose( [
 			getBlocksByClientId,
 			getTemplateLock,
 			getBlockRootClientId,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
 
 		const blocks = getBlocksByClientId( props.clientIds );
 		const canDuplicate = every( blocks, ( block ) => {
@@ -65,7 +65,7 @@ export default compose( [
 			multiSelect,
 			removeBlocks,
 			insertDefaultBlock,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			onDuplicate() {
@@ -73,7 +73,7 @@ export default compose( [
 					return;
 				}
 
-				const { getBlockIndex } = select( 'core/editor' );
+				const { getBlockIndex } = select( 'core/block-editor' );
 				const lastSelectedIndex = getBlockIndex( last( castArray( clientIds ) ), rootClientId );
 				const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 				insertBlocks(
@@ -95,14 +95,14 @@ export default compose( [
 			},
 			onInsertBefore() {
 				if ( ! isLocked ) {
-					const { getBlockIndex } = select( 'core/editor' );
+					const { getBlockIndex } = select( 'core/block-editor' );
 					const firstSelectedIndex = getBlockIndex( first( castArray( clientIds ) ), rootClientId );
 					insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
 				}
 			},
 			onInsertAfter() {
 				if ( ! isLocked ) {
-					const { getBlockIndex } = select( 'core/editor' );
+					const { getBlockIndex } = select( 'core/block-editor' );
 					const lastSelectedIndex = getBlockIndex( last( castArray( clientIds ) ), rootClientId );
 					insertDefaultBlock( {}, rootClientId, lastSelectedIndex + 1 );
 				}

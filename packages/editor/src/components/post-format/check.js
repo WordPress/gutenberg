@@ -15,7 +15,8 @@ function PostFormatCheck( { disablePostFormats, ...props } ) {
 
 export default withSelect(
 	( select ) => {
-		const editorSettings = select( 'core/editor' ).getEditorSettings();
+		// This setting should not live in the block-editor's store.
+		const editorSettings = select( 'core/block-editor' ).getEditorSettings();
 		return {
 			disablePostFormats: editorSettings.disablePostFormats,
 		};

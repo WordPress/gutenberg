@@ -41,7 +41,7 @@ export default withSelect( ( select, { clientId } ) => {
 		isMultiSelecting,
 		getBlockIndex,
 		getBlockCount,
-	} = select( 'core/editor' );
+	} = select( 'core/block-editor' );
 	const clientIds = getMultiSelectedBlockClientIds();
 	const firstIndex = getBlockIndex( first( clientIds ), clientId );
 	const lastIndex = getBlockIndex( last( clientIds ), clientId );

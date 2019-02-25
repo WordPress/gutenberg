@@ -110,7 +110,7 @@ export default compose(
 			getBlockHierarchyRootClientId,
 			getBlock,
 			getBlocks,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			rootBlocks: getBlocks(),
@@ -121,7 +121,7 @@ export default compose(
 	withDispatch( ( dispatch, { onSelect = noop } ) => {
 		return {
 			selectBlock( clientId ) {
-				dispatch( 'core/editor' ).selectBlock( clientId );
+				dispatch( 'core/block-editor' ).selectBlock( clientId );
 				onSelect( clientId );
 			},
 		};
