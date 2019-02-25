@@ -1,3 +1,8 @@
 .wp-block-container {
 	padding: 1rem 2rem;
+
+	&.has-background {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
 }
