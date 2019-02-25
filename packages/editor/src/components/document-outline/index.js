@@ -142,7 +142,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getBlocks } = select( 'core/block-editor' );
+		const { getEditedPostAttribute, getBlocks } = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
