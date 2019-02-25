@@ -86,7 +86,7 @@ class CategoriesEdit extends Component {
 
 		return (
 			<li key={ category.id }>
-				<a href={ category.link } target="_blank">{ this.renderCategoryName( category ) }</a>
+				<a href={ category.link } target="_blank" rel="noreferrer noopener">{ this.renderCategoryName( category ) }</a>
 				{ showPostCounts &&
 					<span className="wp-block-categories__post-count">
 						{ ' ' }({ category.count })

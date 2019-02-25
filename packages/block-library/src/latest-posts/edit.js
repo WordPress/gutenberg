@@ -178,7 +178,7 @@ class LatestPostsEdit extends Component {
 						const titleTrimmed = post.title.rendered.trim();
 						return (
 							<li key={ i }>
-								<a href={ post.link } target="_blank">
+								<a href={ post.link } target="_blank" rel="noreferrer noopener">
 									{ titleTrimmed ? (
 										<RawHTML>
 											{ titleTrimmed }
