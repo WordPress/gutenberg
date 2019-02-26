@@ -20,7 +20,6 @@ const jest = require( 'jest' );
 const {
 	fromConfigRoot,
 	getCliArgs,
-	getCliArg,
 	hasCliArg,
 	hasProjectFile,
 	hasJestConfig,
