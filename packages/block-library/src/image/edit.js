@@ -38,8 +38,6 @@ import {
 	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUpload,
-	MediaUploadCheck,
 	RichText,
 } from '@wordpress/block-editor';
 import { mediaUpload } from '@wordpress/editor';
@@ -375,39 +373,18 @@ class ImageEdit extends Component {
 		const isExternal = isExternalImage( id, url );
 
 		let toolbarEditButton;
+
 		if ( url ) {
-			if ( isExternal ) {
-				toolbarEditButton = (
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit image' ) }
-							onClick={ this.toggleIsEditing }
-							icon="edit"
-						/>
-					</Toolbar>
-				);
-			} else {
-				toolbarEditButton = (
-					<MediaUploadCheck>
-						<Toolbar>
-							<MediaUpload
-								onSelect={ this.onSelectImage }
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								value={ id }
-								render={ ( { open } ) => (
-									<IconButton
-										className="components-toolbar__control"
-										label={ __( 'Edit image' ) }
-										icon="edit"
-										onClick={ open }
-									/>
-								) }
-							/>
-						</Toolbar>
-					</MediaUploadCheck>
-				);
-			}
+			toolbarEditButton = (
+				<Toolbar>
+					<IconButton
+						className="components-icon-button components-toolbar__control"
+						label={ __( 'Edit image' ) }
+						onClick={ this.toggleIsEditing }
+						icon={ ( url && ! isEditing ) ? 'format-image' : 'dismiss' }
+					/>
+				</Toolbar>
+			);
 		}
 
 		const controls = (
@@ -430,6 +407,7 @@ class ImageEdit extends Component {
 						className={ className }
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
+						onDoubleClick={ this.toggleIsEditing }
 						notices={ noticeUI }
 						onError={ this.onUploadError }
 						accept="image/*"
@@ -594,7 +572,7 @@ class ImageEdit extends Component {
 								// should direct focus to block.
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 								<Fragment>
-									<img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } onError={ () => this.onImageError( url ) } />
+									<img src={ url } alt={ defaultedAlt } onDoubleClick={ this.toggleIsEditing } onClick={ this.onImageClick } onError={ () => this.onImageError( url ) } />
 									{ isBlobURL( url ) && <Spinner /> }
 								</Fragment>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */

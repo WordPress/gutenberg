@@ -154,6 +154,7 @@ export class MediaPlaceholder extends Component {
 			icon,
 			isAppender,
 			labels = {},
+			onDoubleClick,
 			notices,
 			onSelectURL,
 			mediaUpload,
@@ -212,6 +213,7 @@ export class MediaPlaceholder extends Component {
 				className={ placeholderClassName }
 				notices={ notices }
 				onClick={ onClick }
+				onDoubleClick={ onDoubleClick }
 			>
 				{ content }
 			</Placeholder>
