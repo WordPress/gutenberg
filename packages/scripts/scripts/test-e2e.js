@@ -20,6 +20,7 @@ const jest = require( 'jest' );
 const {
 	fromConfigRoot,
 	getCliArgs,
+	getCliArg,
 	hasCliArg,
 	hasProjectFile,
 	hasJestConfig,
@@ -41,5 +42,10 @@ const hasRunInBand = hasCliArg( '--runInBand' ) ||
 const runInBand = ! hasRunInBand ?
 	[ '--runInBand' ] :
 	[];
+
+if ( hasCliArg( 'interactive' ) ) {
+	process.env.PUPPETEER_HEADLESS = false;
+	process.env.PUPPETEER_SLOWMO = 80;
+}
 
 jest.run( [ ...config, ...runInBand, ...getCliArgs() ] );
