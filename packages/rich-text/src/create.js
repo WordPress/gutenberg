@@ -10,7 +10,7 @@ import { select } from '@wordpress/data';
 import { isEmpty } from './is-empty';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
-import { concatPair } from './concat';
+import { mergePair } from './concat';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
@@ -322,7 +322,7 @@ function createFromElement( {
 
 		if ( type === 'br' ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
-			concatPair( accumulator, create( { text: '\n' } ) );
+			mergePair( accumulator, create( { text: '\n' } ) );
 			continue;
 		}
 
@@ -345,7 +345,7 @@ function createFromElement( {
 			} );
 
 			accumulateSelection( accumulator, node, range, value );
-			concatPair( accumulator, value );
+			mergePair( accumulator, value );
 			continue;
 		}
 
@@ -365,7 +365,7 @@ function createFromElement( {
 		}
 
 		if ( format.attributes && value.text.length === 0 ) {
-			concatPair( accumulator, {
+			mergePair( accumulator, {
 				formats: [ , ],
 				lines: [ , ],
 				objects: [ format ],
@@ -374,7 +374,7 @@ function createFromElement( {
 			continue;
 		}
 
-		concatPair( accumulator, {
+		mergePair( accumulator, {
 			...value,
 			formats: Array.from( value.formats, ( formats ) =>
 				formats ? [ format, ...formats ] : [ format ]
@@ -436,16 +436,16 @@ function createFromMultilineElement( {
 
 		// Multiline value text should be separated by a line separator.
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
-			const formats = currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ];
-
-			accumulator.formats.length += 1;
-			accumulator.lines = accumulator.lines.concat( formats );
-			accumulator.objects.length += 1;
-			accumulator.text += LINE_SEPARATOR;
+			mergePair( accumulator, {
+				formats: [ , ],
+				lines: currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ],
+				objects: [ , ],
+				text: LINE_SEPARATOR,
+			} );
 		}
 
 		accumulateSelection( accumulator, node, range, value );
-		concatPair( accumulator, value );
+		mergePair( accumulator, value );
 	}
 
 	return accumulator;

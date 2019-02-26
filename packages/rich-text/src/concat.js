@@ -14,7 +14,7 @@ import { create } from './create';
  *
  * @return {Object} `a`, mutated.
  */
-export function concatPair( a, b ) {
+export function mergePair( a, b ) {
 	a.formats = a.formats.concat( b.formats );
 	a.lines = a.lines.concat( b.lines );
 	a.objects = a.objects.concat( b.objects );
@@ -32,5 +32,5 @@ export function concatPair( a, b ) {
  * @return {Object} A new value combining all given records.
  */
 export function concat( ...values ) {
-	return normaliseFormats( values.reduce( concatPair, create() ) );
+	return normaliseFormats( values.reduce( mergePair, create() ) );
 }
