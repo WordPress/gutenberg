@@ -117,65 +117,305 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'replaceBlock', () => {
-		it( 'should return the REPLACE_BLOCKS action', () => {
+		it( 'should yield the REPLACE_BLOCKS action if the new block can be inserted in the destination root block', () => {
 			const block = {
 				clientId: 'ribs',
+				name: 'core/test-block',
 			};
 
-			expect( replaceBlock( [ 'chicken' ], block ) ).toEqual( {
+			const replaceBlockGenerator = replaceBlock( 'chicken', block );
+			expect(
+				replaceBlockGenerator.next().value,
+			).toEqual( {
+				args: [ 'chicken' ],
+				selectorName: 'getBlockRootClientId',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next().value,
+			).toEqual( {
+				args: [ 'core/test-block', undefined ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next( true ).value,
+			).toEqual( {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [ block ],
 				time: expect.any( Number ),
+			} );
+
+			expect(
+				replaceBlockGenerator.next().value,
+			).toEqual( {
+				args: [],
+				selectorName: 'getBlockCount',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next( 1 ),
+			).toEqual( {
+				value: undefined,
+				done: true,
 			} );
 		} );
 	} );
 
 	describe( 'replaceBlocks', () => {
-		it( 'should return the REPLACE_BLOCKS action', () => {
+		it( 'should not yield the REPLACE_BLOCKS action if the replacement is not possible', () => {
 			const blocks = [ {
 				clientId: 'ribs',
+				name: 'core/test-ribs',
+			}, {
+				clientId: 'chicken',
+				name: 'core/test-chicken',
 			} ];
 
-			expect( replaceBlocks( [ 'chicken' ], blocks ) ).toEqual( {
+			const replaceBlockGenerator = replaceBlocks( [ 'chicken' ], blocks );
+			expect(
+				replaceBlockGenerator.next().value,
+			).toEqual( {
+				args: [ 'chicken' ],
+				selectorName: 'getBlockRootClientId',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next().value,
+			).toEqual( {
+				args: [ 'core/test-ribs', undefined ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next( true ).value,
+			).toEqual( {
+				args: [ 'core/test-chicken', undefined ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next( false ),
+			).toEqual( {
+				value: undefined,
+				done: true,
+			} );
+		} );
+
+		it( 'should yield the REPLACE_BLOCKS action if the replacement is possible', () => {
+			const blocks = [ {
+				clientId: 'ribs',
+				name: 'core/test-ribs',
+			}, {
+				clientId: 'chicken',
+				name: 'core/test-chicken',
+			} ];
+
+			const replaceBlockGenerator = replaceBlocks( [ 'chicken' ], blocks );
+			expect(
+				replaceBlockGenerator.next().value,
+			).toEqual( {
+				args: [ 'chicken' ],
+				selectorName: 'getBlockRootClientId',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next().value,
+			).toEqual( {
+				args: [ 'core/test-ribs', undefined ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next( true ).value,
+			).toEqual( {
+				args: [ 'core/test-chicken', undefined ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next( true ).value,
+			).toEqual( {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks,
 				time: expect.any( Number ),
 			} );
+
+			expect(
+				replaceBlockGenerator.next().value,
+			).toEqual( {
+				args: [],
+				selectorName: 'getBlockCount',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next( 1 ),
+			).toEqual( {
+				value: undefined,
+				done: true,
+			} );
 		} );
 	} );
 
 	describe( 'insertBlock', () => {
-		it( 'should return the INSERT_BLOCKS action', () => {
+		it( 'should yield the INSERT_BLOCKS action', () => {
 			const block = {
 				clientId: 'ribs',
+				name: 'core/test-block',
 			};
 			const index = 5;
-			expect( insertBlock( block, index, 'testclientid' ) ).toEqual( {
-				type: 'INSERT_BLOCKS',
-				blocks: [ block ],
-				index,
-				rootClientId: 'testclientid',
-				time: expect.any( Number ),
-				updateSelection: true,
+
+			const inserBlockGenerator = insertBlock( block, index, 'testclientid', true );
+			expect(
+				inserBlockGenerator.next().value
+			).toEqual( {
+				args: [ 'core/test-block', 'testclientid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				inserBlockGenerator.next( true ),
+			).toEqual( {
+				done: true,
+				value: {
+					type: 'INSERT_BLOCKS',
+					blocks: [ block ],
+					index,
+					rootClientId: 'testclientid',
+					time: expect.any( Number ),
+					updateSelection: true,
+				},
 			} );
 		} );
 	} );
 
 	describe( 'insertBlocks', () => {
-		it( 'should return the INSERT_BLOCKS action', () => {
-			const blocks = [ {
+		it( 'should filter the allowed blocks in INSERT_BLOCKS action', () => {
+			const ribsBlock = {
 				clientId: 'ribs',
-			} ];
-			const index = 3;
-			expect( insertBlocks( blocks, index, 'testclientid' ) ).toEqual( {
-				type: 'INSERT_BLOCKS',
-				blocks,
-				index,
-				rootClientId: 'testclientid',
-				time: expect.any( Number ),
-				updateSelection: true,
+				name: 'core/test-ribs',
+			};
+			const chickenBlock = {
+				clientId: 'chicken',
+				name: 'core/test-chicken',
+			};
+			const chickenRibsBlock = {
+				clientId: 'chicken-ribs',
+				name: 'core/test-chicken-ribs',
+			};
+			const blocks = [
+				ribsBlock,
+				chickenBlock,
+				chickenRibsBlock,
+			];
+
+			const inserBlockGenerator = insertBlocks( blocks, 5, 'testrootid', false );
+
+			expect(
+				inserBlockGenerator.next().value
+			).toEqual( {
+				args: [ 'core/test-ribs', 'testrootid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				inserBlockGenerator.next( true ).value
+			).toEqual( {
+				args: [ 'core/test-chicken', 'testrootid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				inserBlockGenerator.next( false ).value,
+			).toEqual( {
+				args: [ 'core/test-chicken-ribs', 'testrootid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				inserBlockGenerator.next( true ),
+			).toEqual( {
+				done: true,
+				value: {
+					type: 'INSERT_BLOCKS',
+					blocks: [ ribsBlock, chickenRibsBlock ],
+					index: 5,
+					rootClientId: 'testrootid',
+					time: expect.any( Number ),
+					updateSelection: false,
+				},
+			} );
+		} );
+
+		it( 'does not yield INSERT_BLOCKS action if all the blocks are impossible to insert', () => {
+			const ribsBlock = {
+				clientId: 'ribs',
+				name: 'core/test-ribs',
+			};
+			const chickenBlock = {
+				clientId: 'chicken',
+				name: 'core/test-chicken',
+			};
+			const blocks = [
+				ribsBlock,
+				chickenBlock,
+			];
+
+			const inserBlockGenerator = insertBlocks( blocks, 5, 'testrootid', false );
+
+			expect(
+				inserBlockGenerator.next().value
+			).toEqual( {
+				args: [ 'core/test-ribs', 'testrootid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				inserBlockGenerator.next( false ).value,
+			).toEqual( {
+				args: [ 'core/test-chicken', 'testrootid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				inserBlockGenerator.next( false ),
+			).toEqual( {
+				done: true,
+				value: undefined,
 			} );
 		} );
 	} );
