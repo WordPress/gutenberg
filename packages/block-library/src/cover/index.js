@@ -12,7 +12,8 @@ import {
 	InnerBlocks,
 	RichText,
 	getColorClassName,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**

@@ -27,6 +27,8 @@ import {
 	RichText,
 	BlockControls,
 	InspectorControls,
+} from '@wordpress/block-editor';
+import {
 	BottomSheet,
 	Picker,
 } from '@wordpress/editor';

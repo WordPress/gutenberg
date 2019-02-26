@@ -28,7 +28,7 @@ To make sure the current user has Upload permissions, you need to wrap the Media
 
 ```jsx
 import { Button } from '@wordpress/components';
-import { MediaUpload, MediaUploadCheck } from '@wordpress/editor';
+import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 

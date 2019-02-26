@@ -12,7 +12,7 @@ import {
 	getBlockType,
 	registerBlockType,
 } from '@wordpress/blocks';
-import { BlockEdit } from '@wordpress/editor';
+import { BlockEdit } from '@wordpress/block-editor';
 
 export const blockEditRender = ( name, settings ) => {
 	if ( ! getBlockType( name ) ) {

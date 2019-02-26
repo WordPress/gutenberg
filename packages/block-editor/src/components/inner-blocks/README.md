@@ -11,7 +11,7 @@ In a block's `edit` implementation, render `InnerBlocks`. Then, in the `save` im
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
-import { InnerBlocks } from '@wordpress/editor';
+import { InnerBlocks } from '@wordpress/block-editor';
 
 registerBlockType( 'my-plugin/my-block', {
 	// ...

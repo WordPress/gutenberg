@@ -9,11 +9,13 @@ import { __ } from '@wordpress/i18n';
 import {
 	Inserter,
 	BlockToolbar,
+	NavigableToolbar,
+	BlockNavigationDropdown,
+} from '@wordpress/block-editor';
+import {
 	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
-	NavigableToolbar,
-	BlockNavigationDropdown,
 } from '@wordpress/editor';
 
 /**
