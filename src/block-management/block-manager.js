@@ -203,7 +203,8 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 				onUpdate={ this.props.setTitleAction }
 				placeholder={ __( 'Add title' ) }
 				borderStyle={ this.blockHolderBorderStyle() }
-				focusedBorderColor={ styles.blockHolderFocused.borderColor } />
+				focusedBorderColor={ styles.blockHolderFocused.borderColor } 
+				accessibilityLabel="post-title"/>
 		);
 	}
 
@@ -280,13 +281,12 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 
 		return (
-			<View 
-				accessibile={true}
-				accessibilityLabel={testID}>
+			<View >
 				<BlockHolder
 					key={ clientId }
 					showTitle={ false }
 					clientId={ clientId }
+					testID= { testID }
 					rootClientId={ this.props.rootClientId }
 					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 					borderStyle={ this.blockHolderBorderStyle() }

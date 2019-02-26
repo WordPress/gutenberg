@@ -75,10 +75,10 @@ describe( 'Gutenberg Editor tests', () => {
 			accessibilityIdKey = 'content-desc';
 		}
 		const blockName = 'core/paragraph';
-		const blockLocator = "//*[contains(@"+ accessibilityIdKey+", '"+ blockName +"')]"
+		const blockLocator = "//*[starts-with(@"+ accessibilityIdKey+", '"+ blockName +"')]"
 		let paragraphBlocks = await driver.elementsByXPath(blockLocator);
 		
-		console.log(paragraphBlocks);
+		console.log(paragraphBlocks.length);
 
 		var currentBlocks = new Set([]);
 
@@ -116,14 +116,22 @@ describe( 'Gutenberg Editor tests', () => {
 		return await getNewParagraphBlock();
 	}
 
+	const typeString = async (element, str) => {
+		console.log("Type String")
+
+		for (var i = 0; i < str.length; i++) {
+			await element.type(str.charAt(i));
+		  }
+	}
+
 	it( 'should be able to see editor', async () => {
 		var newParagraphBlock = await addParagraphBlock();
-		console.log("Block added");
-		console.log(await newParagraphBlock.getAttribute("name"))
 
-		var newParagraphBlock = await addParagraphBlock();
-		console.log("Block added");
-		console.log(await newParagraphBlock.getAttribute("name"))
+		await newParagraphBlock.click();
+		await newParagraphBlock.clear();
+		await typeString(newParagraphBlock, "Hello Gutenberg!");
+		// await newParagraphBlock.type("Hello Gutenberg!");
+
 		expect( await driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
 	} );
 } );
