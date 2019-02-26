@@ -399,12 +399,12 @@ export class RichText extends Component {
 		if ( this.formatPlaceholder ) {
 			selectedFormat = this.formatPlaceholder.length;
 
-			if ( selectedFormat ) {
+			if ( selectedFormat > 0 ) {
 				formats[ this.state.start ] = this.formatPlaceholder;
 			} else {
 				delete formats[ this.state.start ];
 			}
-		} else if ( selectedFormat ) {
+		} else if ( selectedFormat > 0 ) {
 			const formatsBefore = formats[ start - 1 ] || [];
 			const formatsAfter = formats[ start ] || [];
 
