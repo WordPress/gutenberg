@@ -4,17 +4,12 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const { last } = require( 'lodash' );
-const remark = require( 'remark' );
-const unified = require( 'unified' );
-const remarkParser = require( 'remark-parse' );
-const inject = require( 'mdast-util-inject' );
 
 /**
  * Internal dependencies
  */
 const engine = require( './engine' );
-const formatter = require( './formatter' );
-const embed = require( './embed' );
+const defaultMarkdownFormatter = require( './markdown' );
 
 /**
  * Helpers functions.
@@ -68,7 +63,8 @@ const processFile = ( rootDir, inputFile ) => {
 const runCustomFormatter = ( customFormatterFile, rootDir, doc, symbols, headingTitle ) => {
 	try {
 		const customFormatter = require( customFormatterFile );
-		return customFormatter( rootDir, doc, symbols, headingTitle );
+		const output = customFormatter( rootDir, doc, symbols, headingTitle );
+		fs.writeFileSync( doc, output );
 	} catch ( e ) {
 		process.stdout.write( `\n${ e }` );
 		process.stdout.write( '\n\n' );
@@ -152,56 +148,10 @@ if ( result === undefined ) {
 	process.exit( 0 );
 }
 
-// wrap the inject utility as a remark plugin
-const appendContents = ( { heading, newContents } ) => {
-	return function transform( targetAst, file, next ) {
-		if ( ! inject( heading, targetAst, newContents ) ) {
-			return next( new Error( `Heading ${ heading } not found.` ) );
-		}
-		next();
-	};
-};
-
-// wrap the embed utility as a remark plugin
-const embedContents = ( { newContents } ) => {
-	return function transform( targetAst, file, next ) {
-		if ( ! embed( targetAst, newContents ) ) {
-			return next( new Error( `Token not found.` ) );
-		}
-		next();
-	};
-};
-
-if ( options.toSection ) {
-	const currentReadmeFile = fs.readFileSync( options.output, 'utf8' );
-	const contentsAST = unified().use( remarkParser ).parse( formatter( processDir, doc, filteredIr, null ) );
-	remark()
-		.use( { settings: { commonmark: true } } )
-		.use( appendContents, { heading: options.toSection, newContents: contentsAST } )
-		.process( currentReadmeFile, function( err, file ) {
-			if ( err ) {
-				throw err;
-			}
-			fs.writeFileSync( doc, file );
-		} );
-} else if ( options.toToken ) {
-	const currentReadmeFile = fs.readFileSync( options.output, 'utf8' );
-	const contentsAST = unified().use( remarkParser ).parse( formatter( processDir, doc, filteredIr, null ) );
-	remark()
-		.use( { settings: { commonmark: true } } )
-		.use( embedContents, { newContents: contentsAST } )
-		.process( currentReadmeFile, function( err, file ) {
-			if ( err ) {
-				throw err;
-			}
-			fs.writeFileSync( doc, file );
-		} );
+if ( options.formatter ) {
+	runCustomFormatter( path.join( processDir, options.formatter ), processDir, doc, filteredIr, 'API' );
 } else {
-	const outputContents = options.formatter ?
-		runCustomFormatter( path.join( processDir, options.formatter ), processDir, doc, filteredIr, 'API' ) :
-		formatter( processDir, doc, filteredIr, 'API' );
-
-	fs.writeFileSync( doc, outputContents );
+	defaultMarkdownFormatter( options, processDir, doc, filteredIr, 'API' );
 }
 
 if ( debugMode ) {

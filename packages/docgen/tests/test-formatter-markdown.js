@@ -6,7 +6,7 @@ const test = require( 'tape' );
 /**
  * Internal dependencies.
  */
-const formatter = require( '../src/formatter' );
+const formatter = require( '../src/markdown/formatter' );
 
 test( 'Formatter - returns markdown', ( t ) => {
 	const docPath = process.cwd();
