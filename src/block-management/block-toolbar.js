@@ -38,28 +38,38 @@ export class BlockToolbar extends Component<PropsType> {
 		} = this.props;
 
 		return (
-			<View style={ styles.container }>
+			<View style={ styles.container } accessible={false} accessibilityLabel=" VIew Add block">
 				<ScrollView
+					accessible={ false }
+					accessibilityLabel="Scrollview Add block"
 					horizontal={ true }
 					showsHorizontalScrollIndicator={ false }
 					keyboardShouldPersistTaps={ 'always' }
 					alwaysBounceHorizontal={ false }
 				>
-					<Toolbar>
+					<Toolbar accessible={ true }
+					accessibilityLabel={"Toolbar Add block"}>
 						<ToolbarButton
-							label={ __( 'Add block' ) }
+							title={ __( 'Add block' ) }
 							icon="insert"
+							accessible={true}
+							accessibilityLabel={"Add block"}
+							testID="Add block"
 							onClick={ onInsertClick }
 						/>
 						<ToolbarButton
-							label={ __( 'Undo' ) }
+							title={ __( 'Undo' ) }
 							icon="undo"
+							accessible={true}
+							accessibilityLabel="Add block"
 							isDisabled={ ! hasUndo }
 							onClick={ undo }
 						/>
 						<ToolbarButton
-							label={ __( 'Redo' ) }
+							title={ __( 'Redo' ) }
 							icon="redo"
+							accessible={true}
+							accessibilityLabel="Add block"
 							isDisabled={ ! hasRedo }
 							onClick={ redo }
 						/>

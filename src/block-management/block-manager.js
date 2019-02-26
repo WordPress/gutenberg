@@ -247,8 +247,11 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		const clientId = value.item;
 		const testID = this.props.getBlockName(clientId) + '-' + clientId;
 
+
 		return (
-			<View testID={testID}>
+			<View 
+				accessibile={true}
+				accessibilityLabel={testID}>
 				<BlockHolder
 					key={ clientId }
 					showTitle={ false }

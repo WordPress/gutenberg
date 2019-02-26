@@ -3,7 +3,7 @@
 import React from 'react';
 
 import AppContainer from './AppContainer';
-import initialHtml from './initial-html';
+import initialHtml from './initial-e2e-html';
 
 type PropsType = {
 	initialData: string,
@@ -20,6 +20,7 @@ const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled }: Pro
 		initialTitle = 'Welcome to Gutenberg!';
 	}
 
+	initialData="";
 	return (
 		<AppContainer
 			initialHtml={ initialData }
