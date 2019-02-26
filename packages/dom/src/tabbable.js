@@ -51,7 +51,7 @@ function createStatefulCollapseRadioGroup() {
 		const { nodeName, type, checked, name } = element;
 
 		// For all non-radio tabbables, construct to array by concatenating.
-		if ( nodeName !== 'INPUT' || type !== 'radio' ) {
+		if ( nodeName !== 'INPUT' || type !== 'radio' || ! name ) {
 			return result.concat( element );
 		}
 

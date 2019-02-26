@@ -104,5 +104,29 @@ describe( 'tabbable', () => {
 				thirdRadio,
 			] );
 		} );
+
+		it( 'not consolidate unnamed radio inputs', () => {
+			const node = createElement( 'div' );
+			const firstRadio = createElement( 'input' );
+			firstRadio.type = 'radio';
+			firstRadio.value = 'firstRadio';
+			const text = createElement( 'input' );
+			text.type = 'text';
+			text.name = 'b';
+			const secondRadio = createElement( 'input' );
+			secondRadio.type = 'radio';
+			secondRadio.value = 'secondRadio';
+			node.appendChild( firstRadio );
+			node.appendChild( text );
+			node.appendChild( secondRadio );
+
+			const tabbables = find( node );
+
+			expect( tabbables ).toEqual( [
+				firstRadio,
+				text,
+				secondRadio,
+			] );
+		} );
 	} );
 } );
