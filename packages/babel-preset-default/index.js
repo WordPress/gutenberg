@@ -28,7 +28,6 @@ module.exports = function( api ) {
 			} ],
 			'@babel/plugin-proposal-async-generator-functions',
 			! isTestEnv && [ '@babel/plugin-transform-runtime', {
-				corejs: false, // We polyfill so we don't need core-js.
 				helpers: true,
 				regenerator: false, // We polyfill so we don't need regenerator.
 				useESModules: false,
