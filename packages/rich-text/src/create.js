@@ -25,7 +25,7 @@ const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 function createEmptyValue() {
 	return {
 		formats: [],
-		lineFormats: [],
+		lines: [],
 		objects: [],
 		text: '',
 	};
@@ -126,7 +126,7 @@ export function create( {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
 			formats: Array( text.length ),
-			lineFormats: Array( text.length ),
+			lines: Array( text.length ),
 			objects: Array( text.length ),
 			text,
 		};
@@ -302,7 +302,7 @@ function createFromElement( {
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
 			accumulator.formats.length += text.length;
-			accumulator.lineFormats.length += text.length;
+			accumulator.lines.length += text.length;
 			accumulator.objects.length += text.length;
 			accumulator.text += text;
 			continue;
@@ -367,7 +367,7 @@ function createFromElement( {
 		if ( format.attributes && value.text.length === 0 ) {
 			concatPair( accumulator, {
 				formats: [ , ],
-				lineFormats: [ , ],
+				lines: [ , ],
 				objects: [ format ],
 				text: OBJECT_REPLACEMENT_CHARACTER,
 			} );
@@ -439,7 +439,7 @@ function createFromMultilineElement( {
 			const formats = currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ];
 
 			accumulator.formats.length += 1;
-			accumulator.lineFormats = accumulator.lineFormats.concat( formats );
+			accumulator.lines = accumulator.lines.concat( formats );
 			accumulator.objects.length += 1;
 			accumulator.text += LINE_SEPARATOR;
 		}

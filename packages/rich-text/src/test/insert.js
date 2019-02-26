@@ -17,7 +17,7 @@ describe( 'insert', () => {
 	it( 'should delete and insert', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			lineFormats: [],
+			lines: [],
 			objects: [],
 			text: 'one two three',
 			start: 6,
@@ -25,13 +25,13 @@ describe( 'insert', () => {
 		};
 		const toInsert = {
 			formats: [ [ strong ] ],
-			lineFormats: [],
+			lines: [],
 			objects: [],
 			text: 'a',
 		};
 		const expected = {
 			formats: [ , , [ strong ], [ em ], , , , , , , ],
-			lineFormats: [],
+			lines: [],
 			objects: [],
 			text: 'onao three',
 			start: 3,
@@ -47,7 +47,7 @@ describe( 'insert', () => {
 	it( 'should insert line break with selection', () => {
 		const record = {
 			formats: [ , , ],
-			lineFormats: [],
+			lines: [],
 			objects: [],
 			text: 'tt',
 			start: 1,
@@ -55,13 +55,13 @@ describe( 'insert', () => {
 		};
 		const toInsert = {
 			formats: [ , ],
-			lineFormats: [],
+			lines: [],
 			objects: [],
 			text: '\n',
 		};
 		const expected = {
 			formats: [ , , , ],
-			lineFormats: [],
+			lines: [],
 			objects: [],
 			text: 't\nt',
 			start: 2,

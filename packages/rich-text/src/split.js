@@ -15,7 +15,7 @@ import { replace } from './replace';
  *
  * @return {Array} An array of new values.
  */
-export function split( { formats, lineFormats, objects, text, start, end }, string ) {
+export function split( { formats, lines, objects, text, start, end }, string ) {
 	if ( typeof string !== 'string' ) {
 		return splitAtSelection( ...arguments );
 	}
@@ -26,7 +26,7 @@ export function split( { formats, lineFormats, objects, text, start, end }, stri
 		const startIndex = nextStart;
 		const value = {
 			formats: formats.slice( startIndex, startIndex + substring.length ),
-			lineFormats: lineFormats.slice( startIndex, startIndex + substring.length ),
+			lines: lines.slice( startIndex, startIndex + substring.length ),
 			objects: objects.slice( startIndex, startIndex + substring.length ),
 			text: substring,
 		};
@@ -52,19 +52,19 @@ export function split( { formats, lineFormats, objects, text, start, end }, stri
 }
 
 function splitAtSelection(
-	{ formats, lineFormats, objects, text, start, end },
+	{ formats, lines, objects, text, start, end },
 	startIndex = start,
 	endIndex = end
 ) {
 	const before = {
 		formats: formats.slice( 0, startIndex ),
-		lineFormats: lineFormats.slice( 0, startIndex ),
+		lines: lines.slice( 0, startIndex ),
 		objects: objects.slice( 0, startIndex ),
 		text: text.slice( 0, startIndex ),
 	};
 	const after = {
 		formats: formats.slice( endIndex ),
-		lineFormats: lineFormats.slice( endIndex ),
+		lines: lines.slice( endIndex ),
 		objects: objects.slice( endIndex ),
 		text: text.slice( endIndex ),
 		start: 0,

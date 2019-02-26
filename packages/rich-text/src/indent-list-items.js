@@ -14,8 +14,8 @@ import { getLineIndex } from './get-line-index';
  *
  * @return {boolean} The line index.
  */
-function getTargetLevelLineIndex( { text, lineFormats }, lineIndex ) {
-	const startFormats = lineFormats[ lineIndex ] || [];
+function getTargetLevelLineIndex( { text, lines }, lineIndex ) {
+	const startFormats = lines[ lineIndex ] || [];
 
 	let index = lineIndex;
 
@@ -24,7 +24,7 @@ function getTargetLevelLineIndex( { text, lineFormats }, lineIndex ) {
 			continue;
 		}
 
-		const formatsAtIndex = lineFormats[ index ] || [];
+		const formatsAtIndex = lines[ index ] || [];
 
 		// Return the first line index that is one level higher. If the level is
 		// lower or equal, there is no result.
@@ -52,10 +52,10 @@ export function indentListItems( value, rootFormat ) {
 		return value;
 	}
 
-	const { text, lineFormats, end } = value;
+	const { text, lines, end } = value;
 	const previousLineIndex = getLineIndex( value, lineIndex );
-	const formatsAtLineIndex = lineFormats[ lineIndex ] || [];
-	const formatsAtPreviousLineIndex = lineFormats[ previousLineIndex ] || [];
+	const formatsAtLineIndex = lines[ lineIndex ] || [];
+	const formatsAtPreviousLineIndex = lines[ previousLineIndex ] || [];
 
 	// The the indentation of the current line is greater than previous line,
 	// then the line cannot be furter indented.
@@ -63,7 +63,7 @@ export function indentListItems( value, rootFormat ) {
 		return value;
 	}
 
-	const newFormats = lineFormats.slice();
+	const newLines = lines.slice();
 	const targetLevelLineIndex = getTargetLevelLineIndex( value, lineIndex );
 
 	for ( let index = lineIndex; index < end; index++ ) {
@@ -74,23 +74,23 @@ export function indentListItems( value, rootFormat ) {
 		// Get the previous list, and if there's a child list, take over the
 		// formats. If not, duplicate the last level and create a new level.
 		if ( targetLevelLineIndex ) {
-			const targetFormats = lineFormats[ targetLevelLineIndex ] || [];
-			newFormats[ index ] = targetFormats.concat(
-				( newFormats[ index ] || [] ).slice( targetFormats.length - 1 )
+			const targetFormats = lines[ targetLevelLineIndex ] || [];
+			newLines[ index ] = targetFormats.concat(
+				( newLines[ index ] || [] ).slice( targetFormats.length - 1 )
 			);
 		} else {
-			const targetFormats = lineFormats[ previousLineIndex ] || [];
+			const targetFormats = lines[ previousLineIndex ] || [];
 			const lastformat = targetFormats[ targetFormats.length - 1 ] || rootFormat;
 
-			newFormats[ index ] = targetFormats.concat(
+			newLines[ index ] = targetFormats.concat(
 				[ lastformat ],
-				( newFormats[ index ] || [] ).slice( targetFormats.length )
+				( newLines[ index ] || [] ).slice( targetFormats.length )
 			);
 		}
 	}
 
 	return normaliseFormats( {
 		...value,
-		lineFormats: newFormats,
+		lines: newLines,
 	} );
 }

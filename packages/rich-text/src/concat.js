@@ -16,7 +16,7 @@ import { create } from './create';
  */
 export function concatPair( a, b ) {
 	a.formats = a.formats.concat( b.formats );
-	a.lineFormats = a.lineFormats.concat( b.lineFormats );
+	a.lines = a.lines.concat( b.lines );
 	a.objects = a.objects.concat( b.objects );
 	a.text += b.text;
 

@@ -16,13 +16,13 @@ describe( 'slice', () => {
 	it( 'should slice', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			lineFormats: [ , , , , , , , , , , , , , ],
+			lines: [ , , , , , , , , , , , , , ],
 			objects: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 		};
 		const expected = {
 			formats: [ , [ em ], [ em ] ],
-			lineFormats: [ , , , ],
+			lines: [ , , , ],
 			objects: [ , , , ],
 			text: ' tw',
 		};
@@ -36,7 +36,7 @@ describe( 'slice', () => {
 	it( 'should slice record', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			lineFormats: [ , , , , , , , , , , , , , ],
+			lines: [ , , , , , , , , , , , , , ],
 			objects: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 3,
@@ -44,7 +44,7 @@ describe( 'slice', () => {
 		};
 		const expected = {
 			formats: [ , [ em ], [ em ] ],
-			lineFormats: [ , , , ],
+			lines: [ , , , ],
 			objects: [ , , , ],
 			text: ' tw',
 		};

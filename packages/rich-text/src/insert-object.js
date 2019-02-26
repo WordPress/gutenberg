@@ -26,7 +26,7 @@ export function insertObject(
 ) {
 	const valueToInsert = {
 		formats: [ , ],
-		lineFormats: [ , ],
+		lines: [ , ],
 		objects: [ formatToInsert ],
 		text: OBJECT_REPLACEMENT_CHARACTER,
 	};

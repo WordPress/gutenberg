@@ -16,7 +16,7 @@ describe( 'join', () => {
 		' ',
 		{
 			formats: [ , ],
-			lineFormats: [ , ],
+			lines: [ , ],
 			objects: [ , ],
 			text: ' ',
 		},
@@ -26,19 +26,19 @@ describe( 'join', () => {
 		it( 'should join records with string separator', () => {
 			const one = {
 				formats: [ , , [ em ] ],
-				lineFormats: [ , , , ],
+				lines: [ , , , ],
 				objects: [ , , , ],
 				text: 'one',
 			};
 			const two = {
 				formats: [ [ em ], , , ],
-				lineFormats: [ , , , ],
+				lines: [ , , , ],
 				objects: [ , , , ],
 				text: 'two',
 			};
 			const three = {
 				formats: [ , , [ em ], , [ em ], , , ],
-				lineFormats: [ , , , , , , , ],
+				lines: [ , , , , , , , ],
 				objects: [ , , , , , , , ],
 				text: 'one two',
 			};

@@ -16,7 +16,7 @@ describe( 'replace', () => {
 	it( 'should replace string to string', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			lineFormats: [ , , , , , , , , , , , , , ],
+			lines: [ , , , , , , , , , , , , , ],
 			objects: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 6,
@@ -24,7 +24,7 @@ describe( 'replace', () => {
 		};
 		const expected = {
 			formats: [ , , , , [ em ], , , , , , , ],
-			lineFormats: [ , , , , , , , , , , , ],
+			lines: [ , , , , , , , , , , , ],
 			objects: [ , , , , , , , , , , , ],
 			text: 'one 2 three',
 			start: 5,
@@ -40,7 +40,7 @@ describe( 'replace', () => {
 	it( 'should replace string to record', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			lineFormats: [ , , , , , , , , , , , , , ],
+			lines: [ , , , , , , , , , , , , , ],
 			objects: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 6,
@@ -48,13 +48,13 @@ describe( 'replace', () => {
 		};
 		const replacement = {
 			formats: [ , ],
-			lineFormats: [ , ],
+			lines: [ , ],
 			objects: [ , ],
 			text: '2',
 		};
 		const expected = {
 			formats: [ , , , , , , , , , , , ],
-			lineFormats: [ , , , , , , , , , , , ],
+			lines: [ , , , , , , , , , , , ],
 			objects: [ , , , , , , , , , , , ],
 			text: 'one 2 three',
 			start: 5,
@@ -70,7 +70,7 @@ describe( 'replace', () => {
 	it( 'should replace string to function', () => {
 		const record = {
 			formats: [ , , , , , , , , , , , , ],
-			lineFormats: [ , , , , , , , , , , , , ],
+			lines: [ , , , , , , , , , , , , ],
 			objects: [ , , , , , , , , , , , , ],
 			text: 'abc12345#$*%',
 			start: 6,
@@ -78,7 +78,7 @@ describe( 'replace', () => {
 		};
 		const expected = {
 			formats: [ , , , , , , , , , , , , , , , , , , ],
-			lineFormats: [ , , , , , , , , , , , , , , , , , , ],
+			lines: [ , , , , , , , , , , , , , , , , , , ],
 			objects: [ , , , , , , , , , , , , , , , , , , ],
 			text: 'abc - 12345 - #$*%',
 			start: 18,
