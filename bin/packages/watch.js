@@ -2,6 +2,7 @@
  * External dependencies
  */
 const fs = require( 'fs' );
+const watch = require( 'node-watch' );
 const { execSync } = require( 'child_process' );
 const path = require( 'path' );
 const chalk = require( 'chalk' );
@@ -33,14 +34,13 @@ getPackages().forEach( ( p ) => {
 	const srcDir = path.resolve( p, 'src' );
 	try {
 		fs.accessSync( srcDir, fs.F_OK );
-		fs.watch( path.resolve( p, 'src' ), { recursive: true }, ( event, filename ) => {
-			const filePath = path.resolve( srcDir, filename );
-
+		watch( path.resolve( p, 'src' ), { recursive: true }, ( event, filename ) => {
 			if ( ! isSourceFile( filename ) ) {
 				return;
 			}
 
-			if ( ( event === 'change' || event === 'rename' ) && exists( filePath ) ) {
+			const filePath = path.resolve( srcDir, filename );
+			if ( ( event === 'update' ) && exists( filePath ) ) {
 				// eslint-disable-next-line no-console
 				console.log( chalk.green( '->' ), `${ event }: ${ filename }` );
 				rebuild( filePath );

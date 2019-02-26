@@ -7,7 +7,7 @@ import {
 	PostTitle,
 	WritingFlow,
 	ObserveTyping,
-	EditorGlobalKeyboardShortcuts,
+	VisualEditorGlobalKeyboardShortcuts,
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
 	_BlockSettingsMenuFirstItem,
@@ -23,7 +23,7 @@ import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-se
 function VisualEditor() {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
-			<EditorGlobalKeyboardShortcuts />
+			<VisualEditorGlobalKeyboardShortcuts />
 			<CopyHandler />
 			<MultiSelectScrollIntoView />
 			<WritingFlow>

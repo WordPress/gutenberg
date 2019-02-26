@@ -34,10 +34,11 @@ export function MetaBoxesSection( { areCustomFieldsRegistered, metaBoxes, ...sec
 }
 
 export default withSelect( ( select ) => {
-	const { getEditorSettings } = select( 'core/editor' );
+	const { getEditorSettings } = select( 'core/block-editor' );
 	const { getAllMetaBoxes } = select( 'core/edit-post' );
 
 	return {
+		// This setting should not live in the block editor's store.
 		areCustomFieldsRegistered: getEditorSettings().enableCustomFields !== undefined,
 		metaBoxes: getAllMetaBoxes(),
 	};

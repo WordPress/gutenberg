@@ -16,7 +16,6 @@ return array(
 		'wp-rich-text',
 	),
 	'wp-api-fetch'                          => array(
-		'wp-hooks',
 		'wp-i18n',
 		'wp-url',
 	),
@@ -28,6 +27,7 @@ return array(
 		'wp-api-fetch',
 		'wp-autop',
 		'wp-blob',
+		'wp-block-editor',
 		'wp-blocks',
 		'wp-components',
 		'wp-compose',
@@ -45,6 +45,15 @@ return array(
 	),
 	'wp-block-serialization-default-parser' => array(),
 	'wp-block-serialization-spec-parser'    => array(),
+	'wp-block-editor'                       => array(
+		'lodash',
+		'wp-blocks',
+		'wp-compose',
+		'wp-components',
+		'wp-data',
+		'wp-element',
+		'wp-i18n',
+	),
 	'wp-blocks'                             => array(
 		'lodash',
 		'wp-autop',
@@ -84,6 +93,7 @@ return array(
 		'lodash',
 		'wp-api-fetch',
 		'wp-data',
+		'wp-deprecated',
 		'wp-url',
 	),
 	'wp-data'                               => array(
@@ -91,6 +101,7 @@ return array(
 		'wp-compose',
 		'wp-element',
 		'wp-is-shallow-equal',
+		'wp-priority-queue',
 		'wp-redux-routine',
 	),
 	'wp-date'                               => array(
@@ -101,7 +112,6 @@ return array(
 	),
 	'wp-dom'                                => array(
 		'lodash',
-		'wp-tinymce',
 	),
 	'wp-dom-ready'                          => array(),
 	'wp-edit-post'                          => array(
@@ -112,6 +122,7 @@ return array(
 		'media-views',
 		'wp-a11y',
 		'wp-api-fetch',
+		'wp-block-editor',
 		'wp-block-library',
 		'wp-blocks',
 		'wp-components',
@@ -130,13 +141,15 @@ return array(
 		'wp-url',
 		'wp-viewport',
 	),
+	'wp-edit-widgets'                       => array(
+		'wp-element',
+	),
 	'wp-editor'                             => array(
-		'jquery',
 		'lodash',
-		'wp-tinymce-lists',
 		'wp-a11y',
 		'wp-api-fetch',
 		'wp-blob',
+		'wp-block-editor',
 		'wp-blocks',
 		'wp-components',
 		'wp-compose',
@@ -154,7 +167,6 @@ return array(
 		'wp-notices',
 		'wp-nux',
 		'wp-rich-text',
-		'wp-tinymce',
 		'wp-token-list',
 		'wp-url',
 		'wp-viewport',
@@ -169,7 +181,6 @@ return array(
 	'wp-escape-html'                        => array(),
 	'wp-format-library'                     => array(
 		'wp-components',
-		'wp-dom',
 		'wp-editor',
 		'wp-element',
 		'wp-i18n',
@@ -212,6 +223,7 @@ return array(
 		'wp-element',
 		'wp-hooks',
 	),
+	'wp-priority-queue'                     => array(),
 	'wp-redux-routine'                      => array(),
 	'wp-rich-text'                          => array(
 		'lodash',

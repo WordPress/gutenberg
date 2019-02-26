@@ -1,5 +1,5 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import classnames from 'classnames';
 
@@ -55,8 +55,9 @@ class BlockDropZone extends Component {
 	}
 
 	getInsertIndex( position ) {
-		const { index } = this.props;
-		if ( index !== undefined ) {
+		const { clientId, rootClientId, getBlockIndex } = this.props;
+		if ( clientId !== undefined ) {
+			const index = getBlockIndex( clientId, rootClientId );
 			return position.y === 'top' ? index : index + 1;
 		}
 	}
@@ -83,7 +84,7 @@ class BlockDropZone extends Component {
 	}
 
 	onDrop( event, position ) {
-		const { rootClientId: dstRootClientId, clientId: dstClientId, index: dstIndex, getClientIdsOfDescendants } = this.props;
+		const { rootClientId: dstRootClientId, clientId: dstClientId, getClientIdsOfDescendants, getBlockIndex } = this.props;
 		const { srcRootClientId, srcClientId, srcIndex, type } = parseDropEvent( event );
 
 		const isBlockDropType = ( dropType ) => dropType === 'block';
@@ -97,10 +98,11 @@ class BlockDropZone extends Component {
 
 		if ( ! isBlockDropType( type ) ||
 			isSameBlock( srcClientId, dstClientId ) ||
-			isSrcBlockAnAncestorOfDstBlock( srcClientId, dstClientId ) ) {
+			isSrcBlockAnAncestorOfDstBlock( srcClientId, dstClientId || dstRootClientId ) ) {
 			return;
 		}
 
+		const dstIndex = dstClientId ? getBlockIndex( dstClientId, dstRootClientId ) : undefined;
 		const positionIndex = this.getInsertIndex( position );
 		// If the block is kept at the same level and moved downwards,
 		// subtract to account for blocks shifting upward to occupy its old position.
@@ -136,7 +138,7 @@ export default compose(
 			insertBlocks,
 			updateBlockAttributes,
 			moveBlockToPosition,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			insertBlocks( blocks, index ) {
@@ -154,10 +156,11 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { rootClientId } ) => {
-		const { getClientIdsOfDescendants, getTemplateLock } = select( 'core/editor' );
+		const { getClientIdsOfDescendants, getTemplateLock, getBlockIndex } = select( 'core/block-editor' );
 		return {
 			isLocked: !! getTemplateLock( rootClientId ),
 			getClientIdsOfDescendants,
+			getBlockIndex,
 		};
 	} ),
 	withFilters( 'editor.BlockDropZone' )

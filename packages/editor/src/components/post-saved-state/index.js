@@ -57,7 +57,6 @@ export class PostSavedState extends Component {
 			isLargeViewport,
 		} = this.props;
 		const { forceSavedMessage } = this.state;
-		const hasPublishAction = get( post, [ '_links', 'wp:action-publish' ], false );
 		if ( isSaving ) {
 			// TODO: Classes generation should be common across all return
 			// paths of this function, including proper naming convention for
@@ -93,6 +92,7 @@ export class PostSavedState extends Component {
 
 		// Once the post has been submitted for review this button
 		// is not needed for the contributor role.
+		const hasPublishAction = get( post, [ '_links', 'wp:action-publish' ], false );
 		if ( ! hasPublishAction && isPending ) {
 			return null;
 		}

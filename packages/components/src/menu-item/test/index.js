@@ -61,7 +61,6 @@ describe( 'MenuItem', () => {
 			</MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-label' ) ).not.toBeUndefined();
 		expect( wrapper ).toMatchSnapshot();
 	} );
 

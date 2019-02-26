@@ -1,6 +1,6 @@
 # Block Serialization Spec Parser
 
-This library contains the grammar file (`grammar.pegjs`) for WordPress posts which is a block serialization [_specification_](../../docs/grammar.md) which is used to generate the actual _parser_ which is also bundled in this package.
+This library contains the grammar file (`grammar.pegjs`) for WordPress posts which is a block serialization [_specification_](/docs/contributors/grammar.md) which is used to generate the actual _parser_ which is also bundled in this package.
 
 PEG parser generators are available in many languages, though different libraries may require some translation of this grammar into their syntax. For more information see:
 

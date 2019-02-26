@@ -35,7 +35,7 @@ export function MenuGroup( {
 			{ label &&
 				<div className="components-menu-group__label" id={ labelId }>{ label }</div>
 			}
-			<NavigableMenu orientation="vertical" aria-labelledby={ labelId }>
+			<NavigableMenu orientation="vertical" aria-labelledby={ label ? labelId : null }>
 				{ children }
 			</NavigableMenu>
 		</div>

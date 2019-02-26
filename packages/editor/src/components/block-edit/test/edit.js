@@ -42,7 +42,7 @@ describe( 'Edit', () => {
 
 		const wrapper = shallow( <Edit name="core/test-block" /> );
 
-		expect( wrapper.find( edit ) ).toExist();
+		expect( wrapper.exists( edit ) ).toBe( true );
 	} );
 
 	it( 'should use save implementation of block as fallback', () => {
@@ -55,7 +55,7 @@ describe( 'Edit', () => {
 
 		const wrapper = shallow( <Edit name="core/test-block" /> );
 
-		expect( wrapper.find( save ) ).toExist();
+		expect( wrapper.exists( save ) ).toBe( true );
 	} );
 
 	it( 'should combine the default class name with a custom one', () => {
@@ -74,6 +74,7 @@ describe( 'Edit', () => {
 			<Edit name="core/test-block" attributes={ attributes } />
 		);
 
-		expect( wrapper.find( edit ) ).toHaveClassName( 'wp-block-test-block my-class' );
+		expect( wrapper.find( edit ).hasClass( 'wp-block-test-block' ) ).toBe( true );
+		expect( wrapper.find( edit ).hasClass( 'my-class' ) ).toBe( true );
 	} );
 } );

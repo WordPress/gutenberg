@@ -30,7 +30,7 @@ export function applyFormat(
 ) {
 	const newFormats = formats.slice( 0 );
 
-	// The selection is collpased.
+	// The selection is collapsed.
 	if ( startIndex === endIndex ) {
 		const startFormat = find( newFormats[ startIndex ], { type: format.type } );
 
@@ -59,10 +59,7 @@ export function applyFormat(
 				text,
 				start,
 				end,
-				formatPlaceholder: {
-					index: startIndex,
-					format: hasType ? undefined : format,
-				},
+				formatPlaceholder: hasType ? undefined : format,
 			};
 		}
 	} else {

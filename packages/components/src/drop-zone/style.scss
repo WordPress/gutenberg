@@ -19,10 +19,6 @@
 
 	&.is-dragging-over-element {
 		background-color: rgba($blue-dark-900, 0.8);
-
-		.components-drop-zone__content {
-			display: block;
-		}
 	}
 }
 
@@ -37,7 +33,6 @@
 	text-align: center;
 	color: $white;
 	transition: transform 0.2s ease-in-out;
-	display: none;
 }
 
 .components-drop-zone.is-dragging-over-element .components-drop-zone__content {

@@ -2,21 +2,22 @@
 
 .block-library-more__container {
 	align-items: center;
-	padding-left: 4;
-	padding-right: 4;
-	padding-top: 4;
-	padding-bottom: 4;
-}
-
-.block-library-more__sub-container {
-	align-items: center;
+	padding: 4px;
 	flex-direction: row;
 }
 
-.block-library-more__left-marker {
-	padding-right: 4;
+.block-library-more__line {
+	background-color: #555d66;
+	height: 2;
+	flex: 1;
 }
 
-.block-library-more__right-marker {
-	padding-left: 4;
+.block-library-more__text {
+	text-decoration-style: solid;
+	flex: 0;
+	width: 200;
+	text-align: center;
+	margin-left: 15;
+	margin-right: 15;
+	margin-bottom: 5;
 }

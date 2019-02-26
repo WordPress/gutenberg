@@ -18,25 +18,28 @@ const MenuIcon = (
 	</SVG>
 );
 
-function BlockNavigationDropdown( { hasBlocks } ) {
+function BlockNavigationDropdown( { hasBlocks, isDisabled } ) {
+	const isEnabled = hasBlocks && ! isDisabled;
+
 	return	(
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Fragment>
-					<KeyboardShortcuts
+					{ isEnabled && <KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
 							[ rawShortcut.access( 'o' ) ]: onToggle,
 						} }
 					/>
+					}
 					<IconButton
 						icon={ MenuIcon }
 						aria-expanded={ isOpen }
-						onClick={ hasBlocks ? onToggle : undefined }
+						onClick={ isEnabled ? onToggle : undefined }
 						label={ __( 'Block Navigation' ) }
 						className="editor-block-navigation"
 						shortcut={ displayShortcut.access( 'o' ) }
-						aria-disabled={ ! hasBlocks }
+						aria-disabled={ ! isEnabled }
 					/>
 				</Fragment>
 			) }
@@ -49,6 +52,6 @@ function BlockNavigationDropdown( { hasBlocks } ) {
 
 export default withSelect( ( select ) => {
 	return {
-		hasBlocks: !! select( 'core/editor' ).getBlockCount(),
+		hasBlocks: !! select( 'core/block-editor' ).getBlockCount(),
 	};
 } )( BlockNavigationDropdown );

@@ -6,12 +6,13 @@
 	},
 	"preset": "@wordpress/jest-preset-default",
 	"setupFiles": [
-		"core-js/fn/symbol/async-iterator"
+		"core-js/fn/symbol/async-iterator",
+		"<rootDir>/test/unit/config/gutenberg-phase.js"
 	],
 	"testURL": "http://localhost",
 	"testPathIgnorePatterns": [
 		"/node_modules/",
-		"/test/e2e",
+		"/packages/e2e-tests",
 		"<rootDir>/.*/build/",
 		"<rootDir>/.*/build-module/"
 	],

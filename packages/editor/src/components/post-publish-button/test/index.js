@@ -103,7 +103,10 @@ describe( 'PostPublishButton', () => {
 				<PostPublishButton
 					hasPublishAction={ false }
 					onStatusChange={ onStatusChange }
-					onSave={ onSave } />
+					onSave={ onSave }
+					isSaveable={ true }
+					isPublishable={ true }
+				/>
 			);
 
 			wrapper.simulate( 'click' );
@@ -119,7 +122,9 @@ describe( 'PostPublishButton', () => {
 					hasPublishAction={ true }
 					onStatusChange={ onStatusChange }
 					onSave={ onSave }
-					isBeingScheduled />
+					isBeingScheduled
+					isSaveable={ true }
+					isPublishable={ true } />
 			);
 
 			wrapper.simulate( 'click' );
@@ -135,7 +140,9 @@ describe( 'PostPublishButton', () => {
 					hasPublishAction={ true }
 					onStatusChange={ onStatusChange }
 					onSave={ onSave }
-					visibility="private" />
+					visibility="private"
+					isSaveable={ true }
+					isPublishable={ true } />
 			);
 
 			wrapper.simulate( 'click' );
@@ -150,7 +157,9 @@ describe( 'PostPublishButton', () => {
 				<PostPublishButton
 					hasPublishAction={ true }
 					onStatusChange={ onStatusChange }
-					onSave={ onSave } />
+					onSave={ onSave }
+					isSaveable={ true }
+					isPublishable={ true } />
 			);
 
 			wrapper.simulate( 'click' );
@@ -167,7 +176,9 @@ describe( 'PostPublishButton', () => {
 				<PostPublishButton
 					hasPublishAction={ true }
 					onStatusChange={ onStatusChange }
-					onSave={ onSave } />
+					onSave={ onSave }
+					isSaveable={ true }
+					isPublishable={ true } />
 			);
 
 			wrapper.simulate( 'click' );

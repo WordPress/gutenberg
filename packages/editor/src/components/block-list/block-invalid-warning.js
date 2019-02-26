@@ -36,11 +36,12 @@ export class BlockInvalidWarning extends Component {
 	}
 
 	render() {
-		const { convertToHTML, convertToBlocks, convertToClassic, block } = this.props;
+		const { convertToHTML, convertToBlocks, convertToClassic, attemptBlockRecovery, block } = this.props;
 		const hasHTMLBlock = !! getBlockType( 'core/html' );
 		const { compare } = this.state;
 		const hiddenActions = [
 			{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
+			{ title: __( 'Attempt Block Recovery' ), onClick: attemptBlockRecovery },
 		];
 
 		if ( compare ) {
@@ -96,13 +97,14 @@ const blockToHTML = ( block ) => createBlock( 'core/html', {
 const blockToBlocks = ( block ) => rawHandler( {
 	HTML: block.originalContent,
 } );
+const recoverBlock = ( { name, attributes, innerBlocks } ) => createBlock( name, attributes, innerBlocks );
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => ( {
-		block: select( 'core/editor' ).getBlock( clientId ),
+		block: select( 'core/block-editor' ).getBlock( clientId ),
 	} ) ),
 	withDispatch( ( dispatch, { block } ) => {
-		const { replaceBlock } = dispatch( 'core/editor' );
+		const { replaceBlock } = dispatch( 'core/block-editor' );
 
 		return {
 			convertToClassic() {
@@ -113,6 +115,9 @@ export default compose( [
 			},
 			convertToBlocks() {
 				replaceBlock( block.clientId, blockToBlocks( block ) );
+			},
+			attemptBlockRecovery() {
+				replaceBlock( block.clientId, recoverBlock( block ) );
 			},
 		};
 	} ),

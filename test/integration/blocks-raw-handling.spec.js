@@ -122,12 +122,92 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should correctly handle quotes with one paragraphs and no citation', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><p>chicken</p></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>chicken</p></blockquote>' );
+		expect( console ).toHaveLogged();
+	} );
+	it( 'should correctly handle quotes with multiple paragraphs and no citation', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><p>chicken</p><p>ribs</p></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>chicken</p><p>ribs</p></blockquote>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should correctly handle quotes with paragraph and citation at the end', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><p>chicken</p><cite>ribs</cite></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>chicken</p><cite>ribs</cite></blockquote>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should handle a citation before the content', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><cite>ribs</cite><p>ribs</p></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>ribs</p><cite>ribs</cite></blockquote>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should handle a citation in the middle of the content', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><p>chicken</p><cite>ribs</cite><p>ribs</p></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>chicken</p><p>ribs</p><cite>ribs</cite></blockquote>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should correctly handle quotes with only a citation', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><cite>ribs</cite></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p></p><cite>ribs</cite></blockquote>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should convert to paragraph quotes with more than one cite', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><cite>ribs</cite><cite>ribs</cite></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<p>ribsribs</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should convert to paragraph quotes with more than one cite and at least one paragraph', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><p>chicken</p><cite>ribs</cite><cite>ribs</cite></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<p>chickenribsribs</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
 	describe( 'pasteHandler', () => {
 		[
 			'plain',
 			'classic',
 			'apple',
 			'google-docs',
+			'google-docs-table',
 			'ms-word',
 			'ms-word-styled',
 			'ms-word-online',
@@ -155,11 +235,26 @@ describe( 'Blocks raw handling', () => {
 			} );
 		} );
 	} );
+} );
 
-	describe( 'rawHandler', () => {
-		it( 'should convert HTML post to blocks with minimal content changes', () => {
-			const HTML = readFile( path.join( __dirname, 'fixtures/wordpress-convert.html' ) );
-			expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
-		} );
+describe( 'rawHandler', () => {
+	it( 'should convert HTML post to blocks with minimal content changes', () => {
+		const HTML = readFile( path.join( __dirname, 'fixtures/wordpress-convert.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should convert a caption shortcode', () => {
+		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should convert a caption shortcode with link', () => {
+		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption-with-link.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should convert a caption shortcode with caption', () => {
+		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption-with-caption-link.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 } );

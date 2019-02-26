@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.0.4",
+	"version": "9.0.11",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -11,7 +11,8 @@
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/editor/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git"
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/editor"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -20,10 +21,11 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0",
+		"@babel/runtime": "^7.3.1",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
+		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
@@ -47,8 +49,7 @@
 		"classnames": "^2.2.5",
 		"dom-scroll-into-view": "^1.2.1",
 		"inherits": "^2.0.3",
-		"jquery": "^3.3.1",
-		"lodash": "^4.17.10",
+		"lodash": "^4.17.11",
 		"memize": "^1.0.5",
 		"react-autosize-textarea": "^3.0.2",
 		"redux-multi": "^0.1.12",
@@ -56,14 +57,7 @@
 		"refx": "^3.0.0",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
-		"tinymce": "^4.7.2",
 		"traverse": "^0.6.6"
-	},
-	"devDependencies": {
-		"deep-freeze": "^0.0.1",
-		"enzyme": "^3.7.0",
-		"react-dom": "^16.6.3",
-		"react-test-renderer": "^16.6.3"
 	},
 	"publishConfig": {
 		"access": "public"

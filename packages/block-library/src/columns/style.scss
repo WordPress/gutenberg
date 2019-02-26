@@ -10,17 +10,11 @@
 }
 
 .wp-block-column {
-	flex: 1;
+	flex-grow: 1;
 	margin-bottom: 1em;
 
 	// Responsiveness: Show at most one columns on mobile.
 	flex-basis: 100%;
-
-	// Beyond mobile, allow 2 columns.
-	@include break-small() {
-		flex-basis: 50%;
-		flex-grow: 0;
-	}
 
 	// Prevent the columns from growing wider than their distributed sizes.
 	min-width: 0;
@@ -29,22 +23,24 @@
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
 
-	// Add space between columns. Themes can customize this if they wish to work differently.
-	// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 	@include break-small() {
-		&:nth-child(odd) {
-			margin-right: $grid-size-large * 2;
-		}
+
+		// Beyond mobile, allow 2 columns.
+		flex-basis: calc(50% - #{$grid-size-large});
+		flex-grow: 0;
+
+		// Add space between the 2 columns. Themes can customize this if they wish to work differently.
+		// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 		&:nth-child(even) {
 			margin-left: $grid-size-large * 2;
 		}
+	}
 
+	@include break-medium() {
+
+		// When columns are in a single row, add space before all except the first.
 		&:not(:first-child) {
 			margin-left: $grid-size-large * 2;
-		}
-
-		&:not(:last-child) {
-			margin-right: $grid-size-large * 2;
 		}
 	}
 }

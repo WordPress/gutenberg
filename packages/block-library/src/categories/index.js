@@ -21,9 +21,6 @@ export const settings = {
 	category: 'widgets',
 
 	attributes: {
-		align: {
-			type: 'string',
-		},
 		displayAsDropdown: {
 			type: 'boolean',
 			default: false,
@@ -39,14 +36,9 @@ export const settings = {
 	},
 
 	supports: {
+		align: true,
+		alignWide: false,
 		html: false,
-	},
-
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( [ 'left', 'center', 'right', 'full' ].includes( align ) ) {
-			return { 'data-align': align };
-		}
 	},
 
 	edit,

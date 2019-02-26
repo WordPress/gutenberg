@@ -49,16 +49,15 @@ const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 export const requestPostUpdate = async ( action, store ) => {
 	const { dispatch, getState } = store;
 	const state = getState();
-	const post = getCurrentPost( state );
-	const isAutosave = !! action.options.isAutosave;
 
 	// Prevent save if not saveable.
-	// We don't check for dirtiness here as this can be overriden in the UI.
+	// We don't check for dirtiness here as this can be overridden in the UI.
 	if ( ! isEditedPostSaveable( state ) ) {
 		return;
 	}
 
 	let edits = getPostEdits( state );
+	const isAutosave = !! action.options.isAutosave;
 	if ( isAutosave ) {
 		edits = pick( edits, [ 'title', 'content', 'excerpt' ] );
 	}
@@ -77,6 +76,8 @@ export const requestPostUpdate = async ( action, store ) => {
 	if ( isEditedPostNew( state ) ) {
 		edits = { status: 'draft', ...edits };
 	}
+
+	const post = getCurrentPost( state );
 
 	let toSend = {
 		...edits,

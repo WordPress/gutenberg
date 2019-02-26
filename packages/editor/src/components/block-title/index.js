@@ -32,7 +32,7 @@ export function BlockTitle( { name } ) {
 }
 
 export default withSelect( ( select, ownProps ) => {
-	const { getBlockName } = select( 'core/editor' );
+	const { getBlockName } = select( 'core/block-editor' );
 	const { clientId } = ownProps;
 
 	return {

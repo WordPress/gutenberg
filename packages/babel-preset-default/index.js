@@ -15,6 +15,14 @@ module.exports = function( api ) {
 		].filter( Boolean ),
 		plugins: [
 			'@babel/plugin-proposal-object-rest-spread',
+			[
+				'@wordpress/babel-plugin-import-jsx-pragma',
+				{
+					scopeVariable: 'createElement',
+					source: '@wordpress/element',
+					isDefault: false,
+				},
+			],
 			[ '@babel/plugin-transform-react-jsx', {
 				pragma: 'createElement',
 			} ],

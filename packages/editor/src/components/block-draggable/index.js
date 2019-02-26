@@ -22,8 +22,8 @@ const BlockDraggable = ( { children, clientId, rootClientId, blockElementId, ind
 			{
 				( { onDraggableStart, onDraggableEnd } ) => {
 					return children( {
-						onDraggableStart: onDraggableStart,
-						onDraggableEnd: onDraggableEnd,
+						onDraggableStart,
+						onDraggableEnd,
 					} );
 				}
 			}
@@ -32,9 +32,10 @@ const BlockDraggable = ( { children, clientId, rootClientId, blockElementId, ind
 };
 
 export default withSelect( ( select, { clientId } ) => {
-	const { getBlockIndex, getBlockRootClientId } = select( 'core/editor' );
+	const { getBlockIndex, getBlockRootClientId } = select( 'core/block-editor' );
+	const rootClientId = getBlockRootClientId( clientId );
 	return {
-		index: getBlockIndex( clientId ),
-		rootClientId: getBlockRootClientId( clientId ),
+		index: getBlockIndex( clientId, rootClientId ),
+		rootClientId,
 	};
 } )( BlockDraggable );

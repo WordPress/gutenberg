@@ -25,6 +25,7 @@ import SidebarHeader from '../sidebar-header';
 function PluginSidebar( props ) {
 	const {
 		children,
+		className,
 		icon,
 		isActive,
 		isPinnable = true,
@@ -66,7 +67,7 @@ function PluginSidebar( props ) {
 						/>
 					) }
 				</SidebarHeader>
-				<Panel>
+				<Panel className={ className }>
 					{ children }
 				</Panel>
 			</Sidebar>

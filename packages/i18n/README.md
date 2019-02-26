@@ -27,7 +27,7 @@ Note that you will not need to specify [domain](https://codex.wordpress.org/I18n
 
 ## Build
 
-You can use the [WordPress i18n babel plugin](../babel-plugin-makepot/README.md) to generate a `.pot` file containing all your localized strings.
+You can use the [WordPress i18n babel plugin](/packages/babel-plugin-makepot/README.md) to generate a `.pot` file containing all your localized strings.
 
 The package also includes a `pot-to-php` script used to generate a php files containing the messages listed in a `.pot` file. This is useful to trick WordPress.org translation strings discovery since at the moment, WordPress.org is not capable of parsing strings directly from JavaScript files.
 

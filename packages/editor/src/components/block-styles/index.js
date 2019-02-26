@@ -11,6 +11,8 @@ import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
 import { ENTER, SPACE } from '@wordpress/keycodes';
+import { _x } from '@wordpress/i18n';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -68,6 +70,7 @@ function BlockStyles( {
 	onChangeClassName,
 	name,
 	attributes,
+	type,
 	onSwitch = noop,
 	onHoverClassName = noop,
 } ) {
@@ -75,10 +78,22 @@ function BlockStyles( {
 		return null;
 	}
 
+	if ( ! type.styles && ! find( styles, 'isDefault' ) ) {
+		styles = [
+			{
+				name: 'default',
+				label: _x( 'Default', 'block style' ),
+				isDefault: true,
+			},
+			...styles,
+		];
+	}
+
 	const activeStyle = getActiveStyle( styles, className );
 	function updateClassName( style ) {
 		const updatedClassName = replaceActiveStyle( className, activeStyle, style );
 		onChangeClassName( updatedClassName );
+		onHoverClassName( null );
 		onSwitch();
 	}
 
@@ -128,21 +143,23 @@ function BlockStyles( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlock } = select( 'core/editor' );
+		const { getBlock } = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
 		const block = getBlock( clientId );
+		const blockType = getBlockType( block.name );
 
 		return {
 			name: block.name,
 			attributes: block.attributes,
 			className: block.attributes.className || '',
 			styles: getBlockStyles( block.name ),
+			type: blockType,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
 		return {
 			onChangeClassName( newClassName ) {
-				dispatch( 'core/editor' ).updateBlockAttributes( clientId, {
+				dispatch( 'core/block-editor' ).updateBlockAttributes( clientId, {
 					className: newClassName,
 				} );
 			},

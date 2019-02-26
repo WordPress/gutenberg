@@ -1,3 +1,4 @@
 module.exports = {
-	parser: 'babel-eslint',
+	root: true,
+	extends: [ 'plugin:@wordpress/eslint-plugin/recommended' ],
 };

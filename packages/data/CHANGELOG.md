@@ -1,4 +1,21 @@
-## 4.1.0 (Unreleased)
+## 4.3.0 (Unreleased)
+
+### Enhancements
+
+- The `registerStore` function now accepts an optional `initialState` option value.
+
+### Bug Fix
+
+- Resolves issue in the persistence plugin where passing `persist` as an array of reducer keys would wrongly replace state values for the unpersisted reducer keys.
+- Restores a behavior in the persistence plugin where a default state provided as an object will be deeply merged as a base for the persisted value. This allows for a developer to include additional new keys in a persisted value default in future iterations of their store.
+
+## 4.2.0 (2019-01-03)
+
+### Enhancements
+
+- Optimized performance of selector execution (~511% improvement)
+
+## 4.1.0 (2018-12-12)
 
 ### New Feature
 

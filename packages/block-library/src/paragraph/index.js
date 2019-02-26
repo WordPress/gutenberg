@@ -174,9 +174,9 @@ export const settings = {
 					'has-drop-cap': dropCap,
 				} );
 				const styles = {
-					backgroundColor: backgroundColor,
+					backgroundColor,
 					color: textColor,
-					fontSize: fontSize,
+					fontSize,
 					textAlign: align,
 				};
 

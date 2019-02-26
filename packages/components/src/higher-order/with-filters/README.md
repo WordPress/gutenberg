@@ -14,7 +14,7 @@ const MyComponent = ( { title } ) => <h1>{ title }</h1>;
 
 const ComponentToAppend = () => <div>Appended component</div>;
 
-function withComponentApended( FilteredComponent ) {
+function withComponentAppended( FilteredComponent ) {
 	return ( props ) => (
 		<Fragment>
 			<FilteredComponent { ...props } />
@@ -26,7 +26,7 @@ function withComponentApended( FilteredComponent ) {
 addFilter(
 	'MyHookName',
 	'my-plugin/with-component-appended',
-	withComponentApended
+	withComponentAppended
 );
 
 const MyComponentWithFilters = withFilters( 'MyHookName' )( MyComponent );
@@ -44,22 +44,22 @@ const MyComponent = ( { hint, title } ) => (
 	<Fragment>
 		<h1>{ title }</h1>
 		<p>{ hint }</p>
-	</Fragment> 
+	</Fragment>
 );
 
-function withHintOverriden( FilteredComponent ) {
+function withHintOverridden( FilteredComponent ) {
 	return ( props ) => (
 		<FilteredComponent
 			{ ...props }
-			hint="Overriden hint"
+			hint="Overridden hint"
 		/>
 	);
  }
 
 addFilter(
 	'MyHookName',
-	'my-plugin/with-hint-overriden',
-	withHintOverriden
+	'my-plugin/with-hint-overridden',
+	withHintOverridden
 );
 
 const MyComponentWithFilters = withFilters( 'MyHookName' )( MyComponent );

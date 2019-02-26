@@ -6,29 +6,35 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
+import {
+	getBlobByURL,
+	isBlobURL,
+	revokeBlobURL,
+} from '@wordpress/blob';
 import {
 	ClipboardButton,
 	IconButton,
 	Toolbar,
 	withNotices,
 } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { Component, Fragment } from '@wordpress/element';
 import {
-	MediaUpload,
-	MediaPlaceholder,
-	MediaUploadCheck,
 	BlockControls,
+	BlockIcon,
+	MediaUpload,
+	MediaUploadCheck,
+	MediaPlaceholder,
 	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
-import { compose } from '@wordpress/compose';
+import { Component, Fragment } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import icon from './icon';
 import FileBlockInspector from './inspector';
 
 class FileEdit extends Component {
@@ -136,7 +142,7 @@ class FileEdit extends Component {
 		if ( ! href || hasError ) {
 			return (
 				<MediaPlaceholder
-					icon="media-default"
+					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
 						title: __( 'File' ),
 						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
@@ -184,9 +190,9 @@ class FileEdit extends Component {
 					</MediaUploadCheck>
 				</BlockControls>
 				<div className={ classes }>
-					<div className={ `${ className }__content-wrapper` }>
+					<div className={ 'wp-block-file__content-wrapper' }>
 						<RichText
-							wrapperClassName={ `${ className }__textlink` }
+							wrapperClassName={ 'wp-block-file__textlink' }
 							tagName="div" // must be block-level or else cursor disappears
 							value={ fileName }
 							placeholder={ __( 'Write file name…' ) }
@@ -195,11 +201,11 @@ class FileEdit extends Component {
 							onChange={ ( text ) => setAttributes( { fileName: text } ) }
 						/>
 						{ showDownloadButton &&
-							<div className={ `${ className }__button-richtext-wrapper` }>
+							<div className={ 'wp-block-file__button-richtext-wrapper' }>
 								{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
 								<RichText
 									tagName="div" // must be block-level or else cursor disappears
-									className={ `${ className }__button` }
+									className={ 'wp-block-file__button' }
 									value={ downloadButtonText }
 									formattingControls={ [] } // disable controls
 									placeholder={ __( 'Add text…' ) }
@@ -213,9 +219,10 @@ class FileEdit extends Component {
 						<ClipboardButton
 							isDefault
 							text={ href }
-							className={ `${ className }__copy-url-button` }
+							className={ 'wp-block-file__copy-url-button' }
 							onCopy={ this.confirmCopyURL }
 							onFinishCopy={ this.resetCopyConfirmation }
+							disabled={ isBlobURL( href ) }
 						>
 							{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
 						</ClipboardButton>

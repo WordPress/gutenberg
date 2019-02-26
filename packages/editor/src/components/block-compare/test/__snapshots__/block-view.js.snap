@@ -7,11 +7,11 @@ exports[`BlockView should match snapshot 1`] = `
   <div
     className="editor-block-compare__content"
   >
-    <h1
+    <h2
       className="editor-block-compare__heading"
     >
       title
-    </h1>
+    </h2>
     <div
       className="editor-block-compare__html"
     >

@@ -1,13 +1,17 @@
 ---
-name: Question
-about: Questions or 'how to' about Gutenberg
+name: Help Request
+about: Please post help requests or ‘how to’ questions in support channels first
 
 ---
 
-If you have a question you have a few places that you can ask this:
+Search first! Your issue may have already been reported.
 
-- Support Forums: https://wordpress.org/support/plugin/gutenberg
-- Handbook: https://wordpress.org/gutenberg/handbook
-- https://chat.wordpress.org #core-editor
+For general help requests, please post in the support forum at https://wordpress.org/support/forum/how-to-and-troubleshooting/.
 
-If you are unable to ask in those places you can ask here, however you will get faster responses through those recommended places.
+Technical help requests have their own section of the support forum at https://wordpress.org/support/forum/wp-advanced/. 
+
+You may also ask for technical support at https://wordpress.stackexchange.com/.
+
+Please make sure you have checked the Handbook at https://wordpress.org/gutenberg/handbook before asking your question.
+
+Thank you!

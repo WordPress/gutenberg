@@ -1,4 +1,4 @@
-# Gutenberg Design Principles & Vision
+# Design Principles & Vision
 
 This is a living document that outlines the design principles and patterns of the editor interface. Its aim is to explain the background of the design, inform future improvements, and help people design great blocks.
 
@@ -46,7 +46,7 @@ Gutenberg wants to make it easier to author rich content. This means ensuring go
 
 The initial phase of Gutenberg as described in the kickoff goal is primarily limited to the content area (specifically `post_content`) of posts and pages. Within those confines, we are embracing the web as a vertical river of content by appending blocks sequentially, then adding layout options to each block.
 
-That said, there isn’t any fixed limit to the kind of layouts Gutenberg will be able to create. It’s very possible for Gutenberg to grow beyond the confines of post and page content, to include the whole page — one could think of a theme template as a comma separated list of blocks, like this:
+That said, there isn’t any fixed limit to the kind of layouts Gutenberg will be able to create. It’s very possible for Gutenberg to grow beyond the confines of post and page content, to include the whole page — one could think of a theme template as a comma-separated list of blocks, like this:
 
 ```js
 {

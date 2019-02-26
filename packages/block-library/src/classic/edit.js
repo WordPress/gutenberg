@@ -78,6 +78,7 @@ export default class ClassicEdit extends Component {
 	onSetup( editor ) {
 		const { attributes: { content }, setAttributes } = this.props;
 		const { ref } = this;
+		let bookmark;
 
 		this.editor = editor;
 
@@ -86,10 +87,23 @@ export default class ClassicEdit extends Component {
 		}
 
 		editor.on( 'blur', () => {
+			bookmark = editor.selection.getBookmark( 2, true );
+
 			setAttributes( {
 				content: editor.getContent(),
 			} );
+
+			editor.once( 'focus', () => {
+				if ( bookmark ) {
+					editor.selection.moveToBookmark( bookmark );
+				}
+			} );
+
 			return false;
+		} );
+
+		editor.on( 'mousedown touchstart', () => {
+			bookmark = null;
 		} );
 
 		editor.on( 'keydown', ( event ) => {
@@ -114,7 +128,7 @@ export default class ClassicEdit extends Component {
 		editor.addButton( 'kitchensink', {
 			tooltip: _x( 'More', 'button to expand options' ),
 			icon: 'dashicon dashicons-editor-kitchensink',
-			onClick: function() {
+			onClick() {
 				const button = this;
 				const active = ! button.active();
 

@@ -67,5 +67,34 @@ describe( 'block helpers', () => {
 
 			expect( isUnmodifiedDefaultBlock( block ) ).toBe( false );
 		} );
+
+		it( 'should invalidate cache if the default block name changed', () => {
+			registerBlockType( 'core/test-block1', {
+				attributes: {
+					includesDefault1: {
+						type: 'boolean',
+						default: true,
+					},
+				},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+			} );
+			registerBlockType( 'core/test-block2', {
+				attributes: {
+					includesDefault2: {
+						type: 'boolean',
+						default: true,
+					},
+				},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+			} );
+			setDefaultBlockName( 'core/test-block1' );
+			isUnmodifiedDefaultBlock( createBlock( 'core/test-block1' ) );
+			setDefaultBlockName( 'core/test-block2' );
+			expect( isUnmodifiedDefaultBlock( createBlock( 'core/test-block2' ) ) ).toBe( true );
+		} );
 	} );
 } );

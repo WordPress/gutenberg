@@ -75,6 +75,12 @@
 		right: 20px;
 		z-index: z-index(".edit-post-meta-boxes-area .spinner");
 	}
+
+	// Hide disabled meta boxes using CSS so that we don't interfere with plugins
+	// that modify `element.style.display` on the meta box.
+	.is-hidden {
+		display: none;
+	}
 }
 
 .edit-post-meta-boxes-area__clear {

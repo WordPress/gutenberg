@@ -116,10 +116,9 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	if ( isEmpty( blocks ) ) {
 		return false;
 	}
-	const isMultiBlock = blocks.length > 1;
-	const sourceBlock = first( blocks );
 
 	// If multiple blocks are selected, only multi block transforms are allowed.
+	const isMultiBlock = blocks.length > 1;
 	const isValidForMultiBlocks = ! isMultiBlock || transform.isMultiBlock;
 	if ( ! isValidForMultiBlocks ) {
 		return false;
@@ -132,6 +131,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	}
 
 	// Check if the transform's block name matches the source block only if this is a transform 'from'.
+	const sourceBlock = first( blocks );
 	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1;
 	if ( ! hasMatchingName ) {
 		return false;
@@ -346,9 +346,12 @@ export function switchToBlockType( blocks, name ) {
 
 	let transformationResults;
 	if ( transformation.isMultiBlock ) {
-		transformationResults = transformation.transform( blocksArray.map( ( currentBlock ) => currentBlock.attributes ) );
+		transformationResults = transformation.transform(
+			blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
+			blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks )
+		);
 	} else {
-		transformationResults = transformation.transform( firstBlock.attributes );
+		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks );
 	}
 
 	// Ensure that the transformation function returned an object or an array

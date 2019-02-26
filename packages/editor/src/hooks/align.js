@@ -168,7 +168,7 @@ export const withDataAlign = createHigherOrderComponent(
 	compose( [
 		withSelect(
 			( select ) => {
-				const { getEditorSettings } = select( 'core/editor' );
+				const { getEditorSettings } = select( 'core/block-editor' );
 				return {
 					hasWideEnabled: !! getEditorSettings().alignWide,
 				};
@@ -206,7 +206,7 @@ export function addAssignedAlign( props, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/align/addAttribute', addAttribute );
-addFilter( 'editor.__experimentalBlockListBlock', 'core/editor/align/with-data-align', withDataAlign );
+addFilter( 'editor.BlockListBlock', 'core/editor/align/with-data-align', withDataAlign );
 addFilter( 'editor.BlockEdit', 'core/editor/align/with-toolbar-controls', withToolbarControls );
 addFilter( 'blocks.getSaveContent.extraProps', 'core/align/addAssignedAlign', addAssignedAlign );
 

@@ -33,10 +33,6 @@ define( 'GUTENBERG_LOAD_VENDOR_SCRIPTS', false );
  */
 function _manually_load_plugin() {
 	require dirname( dirname( __FILE__ ) ) . '/lib/load.php';
-
-	// Require dummy block type class for testing.
-	require_once dirname( __FILE__ ) . '/class-wp-dummy-block-type.php';
-	require_once dirname( __FILE__ ) . '/class-wp-rest-dummy-search-handler.php';
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 

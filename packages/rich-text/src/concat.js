@@ -8,7 +8,7 @@ import { normaliseFormats } from './normalise-formats';
  * Combine all Rich Text values into one. This is similar to
  * `String.prototype.concat`.
  *
- * @param {...[object]} values An array of all values to combine.
+ * @param {...Object} values Objects to combine.
  *
  * @return {Object} A new value combining all given records.
  */

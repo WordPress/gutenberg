@@ -77,7 +77,7 @@ class PreserveScrollInReorder extends Component {
 
 export default withSelect( ( select ) => {
 	return {
-		blockOrder: select( 'core/editor' ).getBlockOrder(),
-		selectionStart: select( 'core/editor' ).getBlockSelectionStart(),
+		blockOrder: select( 'core/block-editor' ).getBlockOrder(),
+		selectionStart: select( 'core/block-editor' ).getBlockSelectionStart(),
 	};
 } )( PreserveScrollInReorder );

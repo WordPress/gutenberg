@@ -43,7 +43,7 @@ const enhance = compose(
 
 		// Otherwise, only pass `originalBlockClientId` if it refers to a different
 		// block from the current one.
-		const blocks = select( 'core/editor' ).getBlocks();
+		const blocks = select( 'core/block-editor' ).getBlocks();
 		const firstOfSameType = find( blocks, ( { name } ) => block.name === name );
 		const isInvalid = firstOfSameType && firstOfSameType.clientId !== block.clientId;
 		return {
@@ -51,7 +51,7 @@ const enhance = compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { originalBlockClientId } ) => ( {
-		selectFirst: () => dispatch( 'core/editor' ).selectBlock( originalBlockClientId ),
+		selectFirst: () => dispatch( 'core/block-editor' ).selectBlock( originalBlockClientId ),
 	} ) ),
 );
 

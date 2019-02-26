@@ -25,12 +25,15 @@
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 
-	<file>./bin</file>
-	<file>./packages/block-library/src</file>
-	<file>./lib</file>
-	<exclude-pattern>./lib/parser.php</exclude-pattern>
-	<file>./phpunit</file>
-	<file>gutenberg.php</file>
+	<file>.</file>
+
+	<!-- Exclude 3rd party libraries -->
+	<exclude-pattern>./node_modules</exclude-pattern>
+	<exclude-pattern>./vendor</exclude-pattern>
+
+	<!-- Exclude generated files -->
+	<exclude-pattern>./languages/gutenberg-translations.php</exclude-pattern>
+	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
 
 	<rule ref="PHPCompatibility.PHP.NewKeywords.t_namespaceFound">
 		<exclude-pattern>lib/class-wp-rest-block-renderer-controller.php</exclude-pattern>
@@ -65,5 +68,20 @@
 	</rule>
 	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
 		<exclude-pattern>phpunit/*</exclude-pattern>
+	</rule>
+
+	<!-- Ignore snake case error in parser -->
+	<rule ref="WordPress.NamingConventions.ValidVariableName.NotSnakeCase">
+		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar">
+		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.ValidVariableName.MemberNotSnakeCase">
+		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
+	</rule>
+	<!-- Ignore filename error since it requires WP core build process change -->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
 	</rule>
 </ruleset>

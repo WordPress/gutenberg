@@ -1,3 +1,15 @@
+## 3.0.0 (Unreleased)
+
+## Breaking Change
+
+- A `parser.js` file generated from the PEGJS grammar is now outputted in commonjs format.
+
+## New Feature
+
+- A `parser.php` file generated from the PEGJS grammar is now added upon installation.
+
+## 2.0.2 (2018-12-12)
+
 ## 2.0.1 (2018-11-30)
 
 ## 2.0.0 (2018-11-12)

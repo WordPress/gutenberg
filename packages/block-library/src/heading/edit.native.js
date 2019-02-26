@@ -14,14 +14,14 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { RichText, BlockControls } from '@wordpress/editor';
-import { parse, createBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 
-const minHeight = 50;
+const minHeight = 24;
 
 class HeadingEdit extends Component {
 	constructor( props ) {
@@ -58,17 +58,11 @@ class HeadingEdit extends Component {
 					isSelected={ this.props.isSelected }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
+					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					style={ {
 						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
-					onChange={ ( event ) => {
-						// Create a React Tree from the new HTML
-						const newParaBlock = parse( `<!-- wp:heading {"level":${ level }} --><${ tagName }>${ event.content }</${ tagName }><!-- /wp:heading -->` )[ 0 ];
-						setAttributes( {
-							...this.props.attributes,
-							content: newParaBlock.attributes.content,
-						} );
-					} }
+					onChange={ ( value ) => setAttributes( { content: value } ) }
 					onMerge={ mergeBlocks }
 					onSplit={
 						insertBlocksAfter ?

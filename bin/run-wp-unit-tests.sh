@@ -21,16 +21,6 @@ fi
 
 npm run build || exit 1
 
-# Make sure phpegjs parser is up to date
-node bin/create-php-parser.js || exit 1
-if ! git diff --quiet --exit-code lib/parser.php; then
-	echo 'ERROR: The PEG parser has been updated, but the generated PHP version'
-	echo '       (lib/parser.php) has not.  Run `bin/create-php-parser.js` and'
-	echo '       commit the resulting changes to resolve this.'
-	sleep .2 # Otherwise Travis doesn't want to print the whole message
-	exit 1
-fi
-
 echo Running with the following versions:
 if [[ $DOCKER = "true" ]]; then
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm wordpress_phpunit php -v
@@ -39,9 +29,6 @@ else
 	php -v
 	phpunit --version
 fi
-
-# Check parser syntax
-php lib/parser.php || exit 1
 
 # Run PHPUnit tests
 if [[ $DOCKER = "true" ]]; then

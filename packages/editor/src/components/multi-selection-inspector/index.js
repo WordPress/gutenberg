@@ -11,7 +11,7 @@ import {
 } from '@wordpress/components';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import BlockIcon from '../block-icon';
 
@@ -42,7 +42,7 @@ function MultiSelectionInspector( { blocks } ) {
 }
 
 export default withSelect( ( select ) => {
-	const { getMultiSelectedBlocks } = select( 'core/editor' );
+	const { getMultiSelectedBlocks } = select( 'core/block-editor' );
 	return {
 		blocks: getMultiSelectedBlocks(),
 	};

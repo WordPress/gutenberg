@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Blocks raw handling rawHandler should convert HTML post to blocks with minimal content changes 1`] = `
+exports[`rawHandler should convert HTML post to blocks with minimal content changes 1`] = `
 "<!-- wp:heading -->
 <h2>Howdy</h2>
 <!-- /wp:heading -->
@@ -53,4 +53,22 @@ exports[`Blocks raw handling rawHandler should convert HTML post to blocks with 
 <!-- wp:html -->
 <blockquote><h1>Heading</h1><p>Text.</p></blockquote>
 <!-- /wp:html -->"
+`;
+
+exports[`rawHandler should convert a caption shortcode 1`] = `
+"<!-- wp:image {\\"id\\":122,\\"align\\":\\"none\\",\\"className\\":\\"size-medium wp-image-122\\"} -->
+<figure class=\\"wp-block-image alignnone size-medium wp-image-122\\"><img src=\\"image.png\\" alt=\\"\\" class=\\"wp-image-122\\"/><figcaption>test</figcaption></figure>
+<!-- /wp:image -->"
+`;
+
+exports[`rawHandler should convert a caption shortcode with caption 1`] = `
+"<!-- wp:image {\\"id\\":122,\\"align\\":\\"none\\",\\"className\\":\\"size-medium wp-image-122\\"} -->
+<figure class=\\"wp-block-image alignnone size-medium wp-image-122\\"><img src=\\"image.png\\" alt=\\"\\" class=\\"wp-image-122\\"/><figcaption><a href=\\"https://w.org\\">test</a></figcaption></figure>
+<!-- /wp:image -->"
+`;
+
+exports[`rawHandler should convert a caption shortcode with link 1`] = `
+"<!-- wp:image {\\"id\\":754,\\"align\\":\\"none\\"} -->
+<figure class=\\"wp-block-image alignnone\\"><a href=\\"http://build.wordpress-develop.test/wp-content/uploads/2011/07/100_5478.jpg\\"><img src=\\"http://build.wordpress-develop.test/wp-content/uploads/2011/07/100_5478.jpg?w=604\\" alt=\\"Bell on Wharf\\" class=\\"wp-image-754\\"/></a><figcaption>Bell on wharf in San Francisco</figcaption></figure>
+<!-- /wp:image -->"
 `;

@@ -9,6 +9,11 @@
 	// Instagram widgets have a min-width of 326px, so go a bit beyond that.
 	@include break-small() {
 		min-width: 360px;
+
+		// The placeholder should not have this min-width.
+		&.components-placeholder {
+			min-width: 0;
+		}
 	}
 
 	&.is-loading {
@@ -25,4 +30,18 @@
 			font-size: $default-font-size;
 		}
 	}
+
+	// Stops long URLs from breaking out of the no preview available screen
+	.components-placeholder__error {
+		word-break: break-word;
+	}
+}
+
+.block-library-embed__interactive-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	opacity: 0;
 }

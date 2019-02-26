@@ -1,5 +1,5 @@
 
-# The Gutenberg block grammar
+# Block Grammar
 
 <dl><dt></dt><dd><pre><header>Block_List</header>  = $(!Block .)* (Block $(!Block .)*)* $(.*)</pre></dd><dt></dt><dd><pre><header>Block</header>  = Block_Void
   / Block_Balanced</pre></dd><dt></dt><dd><pre><header>Block_Void</header>  = "&lt;!--" __ "wp:" Block_Name __ (Block_Attributes __)? "/-->"</pre></dd><dt></dt><dd><pre><header>Block_Balanced</header>  = Block_Start (Block / $(!Block_End .))* Block_End</pre></dd><dt></dt><dd><pre><header>Block_Start</header>  = "&lt;!--" __ "wp:" Block_Name __ (Block_Attributes __)? "-->"</pre></dd><dt></dt><dd><pre><header>Block_End</header>  = "&lt;!--" __ "/wp:" Block_Name __ "-->"</pre></dd><dt></dt><dd><pre><header>Block_Name</header>  = Namespaced_Block_Name

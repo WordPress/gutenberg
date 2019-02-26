@@ -7,7 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Fragment, Component } from '@wordpress/element';
-import { InspectorControls, BlockControls, RichText } from '@wordpress/editor';
+import {
+	InspectorControls,
+	BlockControls,
+	RichText,
+	PanelColorSettings,
+	createCustomColorsHOC,
+} from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
@@ -30,7 +36,32 @@ import {
 	deleteColumn,
 } from './state';
 
-export default class TableEdit extends Component {
+const BACKGROUND_COLORS = [
+	{
+		color: '#f3f4f5',
+		name: 'Subtle light gray',
+		slug: 'subtle-light-gray',
+	},
+	{
+		color: '#e9fbe5',
+		name: 'Subtle pale green',
+		slug: 'subtle-pale-green',
+	},
+	{
+		color: '#e7f5fe',
+		name: 'Subtle pale blue',
+		slug: 'subtle-pale-blue',
+	},
+	{
+		color: '#fcf0ef',
+		name: 'Subtle pale pink',
+		slug: 'subtle-pale-pink',
+	},
+];
+
+const withCustomBackgroundColors = createCustomColorsHOC( BACKGROUND_COLORS );
+
+export class TableEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -314,7 +345,7 @@ export default class TableEdit extends Component {
 
 		return (
 			<Tag>
-				{ rows.map( ( { cells }, rowIndex ) =>
+				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
 						{ cells.map( ( { content, tag: CellTag }, columnIndex ) => {
 							const isSelected = selectedCell && (
@@ -329,12 +360,13 @@ export default class TableEdit extends Component {
 								columnIndex,
 							};
 
-							const classes = classnames( {
-								'is-selected': isSelected,
-							} );
+							const cellClasses = classnames( { 'is-selected': isSelected } );
 
 							return (
-								<CellTag key={ columnIndex } className={ classes }>
+								<CellTag
+									key={ columnIndex }
+									className={ cellClasses }
+								>
 									<RichText
 										className="wp-block-table__cell-content"
 										value={ content }
@@ -345,7 +377,7 @@ export default class TableEdit extends Component {
 							);
 						} ) }
 					</tr>
-				) }
+				) ) }
 			</Tag>
 		);
 	}
@@ -360,7 +392,12 @@ export default class TableEdit extends Component {
 	}
 
 	render() {
-		const { attributes, className } = this.props;
+		const {
+			attributes,
+			className,
+			backgroundColor,
+			setBackgroundColor,
+		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const { hasFixedLayout, head, body, foot } = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
@@ -388,8 +425,9 @@ export default class TableEdit extends Component {
 			);
 		}
 
-		const classes = classnames( className, {
+		const classes = classnames( className, backgroundColor.class, {
 			'has-fixed-layout': hasFixedLayout,
+			'has-background': !! backgroundColor.color,
 		} );
 
 		return (
@@ -398,7 +436,7 @@ export default class TableEdit extends Component {
 					<Toolbar>
 						<DropdownMenu
 							icon="editor-table"
-							label={ __( 'Edit Table' ) }
+							label={ __( 'Edit table' ) }
 							controls={ this.getTableControls() }
 						/>
 					</Toolbar>
@@ -411,6 +449,19 @@ export default class TableEdit extends Component {
 							onChange={ this.onChangeFixedLayout }
 						/>
 					</PanelBody>
+					<PanelColorSettings
+						title={ __( 'Color Settings' ) }
+						initialOpen={ false }
+						colorSettings={ [
+							{
+								value: backgroundColor.color,
+								onChange: setBackgroundColor,
+								label: __( 'Background Color' ),
+								disableCustomColors: true,
+								colors: BACKGROUND_COLORS,
+							},
+						] }
+					/>
 				</InspectorControls>
 				<table className={ classes }>
 					<Section type="head" rows={ head } />
@@ -421,3 +472,5 @@ export default class TableEdit extends Component {
 		);
 	}
 }
+
+export default withCustomBackgroundColors( 'backgroundColor' )( TableEdit );

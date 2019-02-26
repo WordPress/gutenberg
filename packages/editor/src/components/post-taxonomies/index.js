@@ -1,5 +1,5 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import { filter, identity, includes } from 'lodash';
 

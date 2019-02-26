@@ -10,14 +10,7 @@ const babel = require( '@babel/core' );
 const { options: babelDefaultConfig } = babel.loadPartialConfig( {
 	configFile: '@wordpress/babel-preset-default',
 } );
-const plugins = babelDefaultConfig.plugins;
-if ( ! process.env.SKIP_JSX_PRAGMA_TRANSFORM ) {
-	plugins.push( [ '@wordpress/babel-plugin-import-jsx-pragma', {
-		scopeVariable: 'createElement',
-		source: '@wordpress/element',
-		isDefault: false,
-	} ] );
-}
+const { plugins, presets } = babelDefaultConfig;
 
 const overrideOptions = ( target, targetName, options ) => {
 	if ( get( target, [ 'file', 'request' ] ) === targetName ) {
@@ -37,7 +30,7 @@ const babelConfigs = {
 		{
 			plugins,
 			presets: map(
-				babelDefaultConfig.presets,
+				presets,
 				( preset ) => overrideOptions( preset, '@babel/preset-env', {
 					modules: 'commonjs',
 				} )
@@ -55,7 +48,7 @@ const babelConfigs = {
 				} )
 			),
 			presets: map(
-				babelDefaultConfig.presets,
+				presets,
 				( preset ) => overrideOptions( preset, '@babel/preset-env', {
 					modules: false,
 				} )

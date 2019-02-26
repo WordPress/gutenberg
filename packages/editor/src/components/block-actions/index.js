@@ -33,10 +33,9 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const {
 			getBlocksByClientId,
-			getBlockIndex,
 			getTemplateLock,
 			getBlockRootClientId,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
 
 		const blocks = getBlocksByClientId( props.clientIds );
 		const canDuplicate = every( blocks, ( block ) => {
@@ -45,8 +44,6 @@ export default compose( [
 		const rootClientId = getBlockRootClientId( props.clientIds[ 0 ] );
 
 		return {
-			firstSelectedIndex: getBlockIndex( first( castArray( props.clientIds ) ), rootClientId ),
-			lastSelectedIndex: getBlockIndex( last( castArray( props.clientIds ) ), rootClientId ),
 			isLocked: !! getTemplateLock( rootClientId ),
 			blocks,
 			canDuplicate,
@@ -54,13 +51,11 @@ export default compose( [
 			extraProps: props,
 		};
 	} ),
-	withDispatch( ( dispatch, props ) => {
+	withDispatch( ( dispatch, props, { select } ) => {
 		const {
 			clientIds,
 			rootClientId,
 			blocks,
-			firstSelectedIndex,
-			lastSelectedIndex,
 			isLocked,
 			canDuplicate,
 		} = props;
@@ -70,7 +65,7 @@ export default compose( [
 			multiSelect,
 			removeBlocks,
 			insertDefaultBlock,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			onDuplicate() {
@@ -78,6 +73,8 @@ export default compose( [
 					return;
 				}
 
+				const { getBlockIndex } = select( 'core/block-editor' );
+				const lastSelectedIndex = getBlockIndex( last( castArray( clientIds ) ), rootClientId );
 				const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 				insertBlocks(
 					clonedBlocks,
@@ -98,11 +95,15 @@ export default compose( [
 			},
 			onInsertBefore() {
 				if ( ! isLocked ) {
+					const { getBlockIndex } = select( 'core/block-editor' );
+					const firstSelectedIndex = getBlockIndex( first( castArray( clientIds ) ), rootClientId );
 					insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
 				}
 			},
 			onInsertAfter() {
 				if ( ! isLocked ) {
+					const { getBlockIndex } = select( 'core/block-editor' );
+					const lastSelectedIndex = getBlockIndex( last( castArray( clientIds ) ), rootClientId );
 					insertDefaultBlock( {}, rootClientId, lastSelectedIndex + 1 );
 				}
 			},

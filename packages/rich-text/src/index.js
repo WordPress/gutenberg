@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import './store';
 
 export { applyFormat } from './apply-format';
@@ -16,6 +19,7 @@ export { removeFormat } from './remove-format';
 export { remove } from './remove';
 export { replace } from './replace';
 export { insert } from './insert';
+export { insertLineBreak } from './insert-line-break';
 export { insertLineSeparator } from './insert-line-separator';
 export { insertObject } from './insert-object';
 export { slice } from './slice';
@@ -25,3 +29,6 @@ export { toHTMLString } from './to-html-string';
 export { toggleFormat } from './toggle-format';
 export { LINE_SEPARATOR } from './special-characters';
 export { unregisterFormatType } from './unregister-format-type';
+export { indentListItems } from './indent-list-items';
+export { outdentListItems } from './outdent-list-items';
+export { changeListType } from './change-list-type';
