@@ -102,6 +102,27 @@ function toFormat( { type, attributes } ) {
  * `multilineTag` will be separated by two newlines. The optional functions can
  * be used to filter out content.
  *
+ * A value will have the following shape, which you are strongly encouraged not
+ * to modify without the use of helper functions:
+ *
+ * ```js
+ * {
+ *   text: string,
+ *   formats: Array,
+ *   objects: Array,
+ *   lines: Array,
+ *   ?start: number,
+ *   ?end: number,
+ * }
+ * ```
+ *
+ * As you can see, text and formatting are separated. `text` holds the text,
+ * including any replacement characters for objects and lines. `formats`,
+ * `objects` and `lines` are all sparse arrays of the same length as `text`. It
+ * holds information about the formatting at the relevant text indices. Finally
+ * `start` and `end` state which text indices are selected. They are only
+ * provided if a `Range` was given.
+ *
  * @param {Object}  [$1]                      Optional named arguments.
  * @param {Element} [$1.element]              Element to create value from.
  * @param {string}  [$1.text]                 Text to create value from.
