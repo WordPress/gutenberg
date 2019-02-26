@@ -55,6 +55,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
+    @objc
+    func editorDidMount(_ hasUnsupportedBlocks: Bool) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidMount(hasUnsupportedBlocks: hasUnsupportedBlocks)
+        }
+    }
+
     override public func startObserving() {
         super.startObserving()
         hasObservers = true
@@ -87,7 +94,8 @@ extension RNReactNativeGutenbergBridge {
             Gutenberg.EventName.toggleHTMLMode,
             Gutenberg.EventName.setTitle,
             Gutenberg.EventName.updateHtml,
-            Gutenberg.EventName.mediaUpload
+            Gutenberg.EventName.mediaUpload,
+            Gutenberg.EventName.setFocusOnTitle,
         ]
     }
 

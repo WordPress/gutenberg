@@ -1,4 +1,5 @@
 import Aztec
+import CoreServices
 import Foundation
 import UIKit
 
@@ -8,16 +9,23 @@ class RCTAztecView: Aztec.TextView {
     @objc var onEnter: RCTBubblingEventBlock? = nil
     @objc var onFocus: RCTBubblingEventBlock? = nil
     @objc var onBlur: RCTBubblingEventBlock? = nil
+    @objc var onPaste: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
     @objc var onSelectionChange: RCTBubblingEventBlock? = nil
-    @objc var onActiveFormatsChange: RCTBubblingEventBlock? = nil
-    @objc var onActiveFormatAttributesChange: RCTBubblingEventBlock? = nil
     @objc var blockType: NSDictionary? = nil {
         didSet {
             guard let block = blockType, let tag = block["tag"] as? String else {
                 return
             }
             blockModel = BlockModel(tag: tag)
+        }
+    }
+    @objc var activeFormats: NSSet? = nil {
+        didSet {
+            let currentTypingAttributes = formattingIdentifiersForTypingAttributes()
+            for (key, value) in formatStringMap where currentTypingAttributes.contains(key) != activeFormats?.contains(value) {
+                toggleFormat(format: value)
+            }
         }
     }
 
@@ -29,10 +37,44 @@ class RCTAztecView: Aztec.TextView {
 
     private var previousContentSize: CGSize = .zero
 
+    var leftTextInset: CGFloat {
+        return contentInset.left + textContainerInset.left + textContainer.lineFragmentPadding
+    }
+
+    var leftTextInsetInRTLLayout: CGFloat {
+        return bounds.width - leftTextInset
+    }
+
+    var hasRTLLayout: Bool {
+        return reactLayoutDirection == .rightToLeft
+    }
+
     private lazy var placeholderLabel: UILabel = {
         let label = UILabel(frame: .zero)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = .natural
+        label.font = font
         return label
     }()
+
+    // RCTScrollViews are flipped horizontally on RTL. This messes up competelly horizontal layout contraints
+    // on views inserted after the transformation.
+    var placeholderPreferedHorizontalAnchor: NSLayoutXAxisAnchor {
+        return hasRTLLayout ? placeholderLabel.rightAnchor : placeholderLabel.leftAnchor
+    }
+
+    // This constraint is created from the prefered horizontal anchor (analog to "leading")
+    // but appending it always to left of its super view (Aztec).
+    // This partially fixes the position issue originated from fliping the scroll view.
+    // fixLabelPositionForRTLLayout() fixes the rest.
+    private lazy var placeholderHorizontalConstraint: NSLayoutConstraint = {
+        return placeholderPreferedHorizontalAnchor.constraint(
+            equalTo: leftAnchor,
+            constant: leftTextInset
+        )
+    }()
+
+    private var isInsertingDictationResult = false
     
     // MARK: - Font
     
@@ -69,21 +111,34 @@ class RCTAztecView: Aztec.TextView {
 
     func commonInit() {
         delegate = self
+        textContainerInset = .zero
+        contentInset = .zero
+        textContainer.lineFragmentPadding = 0        
+        addPlaceholder()
+    }
+
+    func addPlaceholder() {
         addSubview(placeholderLabel)
-        placeholderLabel.textAlignment = .natural
-        placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
-        placeholderLabel.font = font
         NSLayoutConstraint.activate([
-            placeholderLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: contentInset.left + textContainerInset.left + textContainer.lineFragmentPadding),
+            placeholderHorizontalConstraint,
             placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: contentInset.top + textContainerInset.top)
-            ])
+        ])
     }
 
     // MARK - View Height: Match to content height
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
+        fixLabelPositionForRTLLayout()
         updateContentSizeInRN()
+    }
+
+    private func fixLabelPositionForRTLLayout() {
+        if hasRTLLayout {
+            // RCTScrollViews are flipped horizontally on RTL layout.
+            // This fixes the position of the label after "fixing" (partially) the constraints.
+            placeholderHorizontalConstraint.constant = leftTextInsetInRTLLayout
+        }
     }
 
     func updateContentSizeInRN() {
@@ -100,6 +155,40 @@ class RCTAztecView: Aztec.TextView {
         onContentSizeChange(body)
     }
     
+    // MARK: - Paste handling
+    
+    private func html(from pasteboard: UIPasteboard) -> String? {
+        guard let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String) else {
+            return nil
+        }
+        
+        return String(data: data, encoding: .utf8)
+    }
+    
+    private func text(from pasteboard: UIPasteboard) -> String? {
+        guard let data = pasteboard.data(forPasteboardType: kUTTypePlainText as String) else {
+            return nil
+        }
+        
+        return String(data: data, encoding: .utf8)
+    }
+    
+    override func paste(_ sender: Any?) {
+        let start = selectedRange.location
+        let end = selectedRange.location + selectedRange.length
+        
+        let pasteboard = UIPasteboard.general
+        let text = self.text(from: pasteboard) ?? ""
+        let html = self.html(from: pasteboard) ?? ""
+        
+        onPaste?([
+            "currentContent": getHTML(),
+            "selectionStart": start,
+            "selectionEnd": end,
+            "pastedText": text,
+            "pastedHtml": html])
+    }
+    
     // MARK: - Edits
     
     open override func insertText(_ text: String) {
@@ -110,7 +199,7 @@ class RCTAztecView: Aztec.TextView {
         super.insertText(text)
         updatePlaceholderVisibility()
     }
-    
+
     open override func deleteBackward() {
         guard !interceptBackspace() else {
             return
@@ -119,7 +208,19 @@ class RCTAztecView: Aztec.TextView {
         super.deleteBackward()
         updatePlaceholderVisibility()
     }
-    
+
+    // MARK: - Dictation
+
+    override func dictationRecordingDidEnd() {
+        isInsertingDictationResult = true
+    }
+
+    public override func insertDictationResult(_ dictationResult: [UIDictationPhrase]) {
+        let text = dictationResult.reduce("") { $0 + $1.text }
+        insertText(text)
+        isInsertingDictationResult = false
+    }
+
     // MARK: - Custom Edit Intercepts
     
     private func interceptEnter(_ text: String) -> Bool {
@@ -174,8 +275,11 @@ class RCTAztecView: Aztec.TextView {
         
         if let selectedTextRange = selectedTextRange {
             let caretEndRect = caretRect(for: selectedTextRange.end)
-            result["selectionEndCaretX"] = caretEndRect.origin.x
-            result["selectionEndCaretY"] = caretEndRect.origin.y
+            // Sergio Estevao: Sometimes the carectRect can be invalid so we need to check before sending this to JS.
+            if !(caretEndRect.isInfinite || caretEndRect.isEmpty || caretEndRect.isNull) {
+                result["selectionEndCaretX"] = caretEndRect.origin.x
+                result["selectionEndCaretY"] = caretEndRect.origin.y
+            }
         }
 
         return result
@@ -188,7 +292,7 @@ class RCTAztecView: Aztec.TextView {
         guard contents["eventCount"] == nil else {
             return
         }
-        
+
         let html = contents["text"] as? String ?? ""
 
         setHTML(html)
@@ -311,42 +415,14 @@ class RCTAztecView: Aztec.TextView {
 
     // MARK: - Formatting interface
 
-    @objc func apply(format: String) {
+    @objc func toggleFormat(format: String) {
+        let emptyRange = NSRange(location: selectedRange.location, length: 0)
         switch format {
-        case "bold": toggleBold(range: selectedRange)
-        case "italic": toggleItalic(range: selectedRange)
-        case "strikethrough": toggleStrikethrough(range: selectedRange)
+        case "bold": toggleBold(range: emptyRange)
+        case "italic": toggleItalic(range: emptyRange)
+        case "strikethrough": toggleStrikethrough(range: emptyRange)
         default: print("Format not recognized")
         }
-    }
-
-    @objc
-    func setLink(with url: String, and title: String?) {
-        guard let url = URL(string: url) else {
-            return
-        }
-        if let title = title {
-            setLink(url, title: title, inRange: selectedRange)
-        } else {
-            setLink(url, inRange: selectedRange)
-        }
-    }
-
-    @objc
-    func removeLink() {
-        guard let expandedRange = linkFullRange(forRange: selectedRange) else {
-            return
-        }
-        removeLink(inRange: expandedRange)
-    }
-
-    func linkAttributes() -> [String: Any] {
-        var attributes: [String: Any] = ["isActive": false]
-        if let expandedRange = linkFullRange(forRange: selectedRange) {
-            attributes["url"] = linkURL(forRange: expandedRange)?.absoluteString ?? ""
-            attributes["isActive"] = true
-        }
-        return attributes
     }
 
     func forceTypingAttributesIfNeeded() {
@@ -364,27 +440,6 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
-    func propagateFormatChanges() {
-        guard let onActiveFormatsChange = onActiveFormatsChange else {
-            return
-        }
-        let identifiers: Set<FormattingIdentifier>
-        if selectedRange.length > 0 {
-            identifiers = formattingIdentifiersSpanningRange(selectedRange)
-        } else {
-            identifiers = formattingIdentifiersForTypingAttributes()
-        }
-        let formats = identifiers.compactMap { formatStringMap[$0] }
-        onActiveFormatsChange(["formats": formats])
-    }
-
-    func propagateAttributesChanges() {
-        let attributes: [String: [String: Any]] = [
-            "link": linkAttributes()
-        ]
-        onActiveFormatAttributesChange?(["attributes": attributes])
-    }
-
     func propagateSelectionChanges() {
         guard let onSelectionChange = onSelectionChange else {
             return
@@ -398,15 +453,21 @@ class RCTAztecView: Aztec.TextView {
 extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
-        propagateAttributesChanges()
-        propagateFormatChanges()
         propagateSelectionChanges()
     }
 
     func textViewDidChange(_ textView: UITextView) {
+
+        guard isInsertingDictationResult == false else {
+            // If a dictation start with an empty UITextView,
+            // the dictation engine refreshes the TextView with an empty string when the dictation finishes.
+            // This avoid propagating that unwanted empty string to RN. (Solving #606)
+            return
+        }
+
         forceTypingAttributesIfNeeded()
-        propagateFormatChanges()
         propagateContentChanges()
+        updatePlaceholderVisibility()
         //Necessary to send height information to JS after pasting text.
         textView.setNeedsLayout()
     }

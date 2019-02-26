@@ -5,20 +5,28 @@ import wd from 'wd';
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 const APPIUM_SERVER_ADDRESS = 'localhost';
 const APPIUM_SERVER_PORT = 4723;
-// const config = {
-// 	platformName: 'iOS',
-// 	platformVersion: 12.1,
-// 	deviceName: 'iPhone XR',
-// 	automationName: 'XCUITest',
-// 	app: '/Users/javon/Projects/gutenberg-mobile/ios/build/Build/Products/Debug-iphonesimulator/gutenberg.app', // relative to root of project
-// };
 
-const config = {
-	platformName: 'android',
-	deviceName: 'Android Emulator',
-	automationName: 'UiAutomator2',
-	app: '/Users/javon/Projects/gutenberg-mobile/android/app/build/outputs/apk/debug/app-debug.apk',
-};
+const defaultPlatform = 'android';
+const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
+
+var config;
+
+if(rnPlatform === 'android' ) {
+	config = {
+		platformName: 'android',
+		deviceName: 'Android Emulator',
+		automationName: 'UiAutomator2',
+		app: '/Users/javon/Projects/gutenberg-mobile/android/app/build/outputs/apk/debug/app-debug.apk',
+	};
+} else {
+	config = {
+		platformName: 'iOS',
+		platformVersion: 12.1,
+		deviceName: 'iPhone XR',
+		automationName: 'XCUITest',
+		app: '/Users/javon/Projects/gutenberg-mobile/ios/build/Build/Products/Debug-iphonesimulator/gutenberg.app', // relative to root of project
+	};
+}
 
 Set.prototype.difference = function(nextSet) 
 { 
@@ -62,15 +70,20 @@ describe( 'Gutenberg Editor tests', () => {
 		console.log("getParagraphBlocks");
 	
 		await driver.sleep(2000);
-		// @content-desc
+		var accessibilityIdKey = 'name';
+		if(rnPlatform === 'android' ) {
+			accessibilityIdKey = 'content-desc';
+		}
 		const blockName = 'core/paragraph';
-		const blockLocator = "//*[contains(@name, '"+ blockName +"')]"
+		const blockLocator = "//*[contains(@"+ accessibilityIdKey+", '"+ blockName +"')]"
 		let paragraphBlocks = await driver.elementsByXPath(blockLocator);
+		
+		console.log(paragraphBlocks);
 
 		var currentBlocks = new Set([]);
 
 		for (const paragraphBlock of paragraphBlocks) {
-			const elementID = await paragraphBlock.getAttribute("name");
+			const elementID = await paragraphBlock.getAttribute(accessibilityIdKey);
 			currentBlocks.add(elementID);
 		}
 

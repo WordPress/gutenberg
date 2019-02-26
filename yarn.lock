@@ -5249,9 +5249,9 @@ jsc-android@224109.x.x:
   resolved "https://registry.yarnpkg.com/jsc-android/-/jsc-android-224109.1.0.tgz#9749ec92f1e284b3c09befe7c47cc6e60b1f0cdf"
   integrity sha512-mhALFynePc/wJsUt9BJuH13mSK/dGWtBO/pcYwVV1I0A7iduyqy3fSoAt1b0yI+/B3TzlGyue/gqjPxsqG1HRQ==
 
-"jsdom-jscore@git+https://github.com/iamcco/jsdom-jscore-rn.git#6eac88dd5d5e7c21ce6382abde7dbc376d7f7f59":
+"jsdom-jscore@git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800":
   version "0.1.7"
-  resolved "git+https://github.com/iamcco/jsdom-jscore-rn.git#6eac88dd5d5e7c21ce6382abde7dbc376d7f7f59"
+  resolved "git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800"
   dependencies:
     htmlparser2-without-node-native "^3.9.2"
     querystring "^0.2.0"
@@ -6297,7 +6297,7 @@ node-fetch@^1.0.1:
     encoding "^0.1.11"
     is-stream "^1.0.1"
 
-node-fetch@^2.2.0:
+node-fetch@^2.2.0, node-fetch@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.3.0.tgz#1a1d940bbfb916a1d3e0219f037e89e71f8c5fa5"
   integrity sha512-MOd8pV3fxENbryESLgVIeaGKrdl+uaYhCSSVkjeOb/31/njTpcis5aWfdqgNlHIrKOLRbMnfPINPOML2CIFeXA==
@@ -8324,6 +8324,13 @@ shortid@^2.2.6:
   integrity sha512-4UnZgr9gDdA1kaKj/38IiudfC3KHKhDc1zi/HSxd9FQDR0VLwH3/y79tZJLsVYPsJgIjeHjqIWaWVRJUj9qZOQ==
   dependencies:
     nanoid "^2.0.0"
+
+showdown@^1.8.6:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/showdown/-/showdown-1.9.0.tgz#d49d2a0b6db21b7c2e96ef855f7b3b2a28ef46f4"
+  integrity sha512-x7xDCRIaOlicbC57nMhGfKamu+ghwsdVkHMttyn+DelwzuHOx4OHCVL/UW/2QOLH7BxfCcCCVVUix3boKXJKXQ==
+  dependencies:
+    yargs "^10.0.3"
 
 sigmund@^1.0.1:
   version "1.0.1"

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout.LayoutParams;
@@ -46,6 +47,7 @@ public class WPAndroidGlueCode {
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachQueryListener mOnReattachQueryListener;
+    private OnEditorMountListener mOnEditorMountListener;
 
     private String mContentHtml = "";
     private boolean mContentInitialized;
@@ -59,6 +61,8 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
     private static final String PROP_NAME_INITIAL_TITLE = "initialTitle";
     private static final String PROP_NAME_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled";
+    private static final String PROP_NAME_LOCALE = "locale";
+    private static final String PROP_NAME_TRANSLATIONS = "translations";
 
     public void onCreate(Context context) {
         SoLoader.init(context, /* native exopackage */ false);
@@ -86,6 +90,10 @@ public class WPAndroidGlueCode {
 
     public interface OnReattachQueryListener {
         void onQueryCurrentProgressForUploadingMedia();
+    }
+
+    public interface OnEditorMountListener {
+        void onEditorDidMount(boolean hasUnsupportedBlocks);
     }
 
     protected List<ReactPackage> getPackages() {
@@ -133,6 +141,14 @@ public class WPAndroidGlueCode {
             public void requestImageUploadCancelDialog(int mediaId) {
                 mOnMediaLibraryButtonListener.onCancelUploadForMediaClicked(mediaId);
             }
+
+            @Override
+            public void editorDidMount(boolean hasUnsupportedBlocks) {
+                mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
+                if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
+                    setFocusOnTitle();
+                }
+            }
         });
         return Arrays.asList(
                 new MainReactPackage(),
@@ -144,7 +160,7 @@ public class WPAndroidGlueCode {
 
     public void onCreateView(Context initContext, boolean htmlModeEnabled,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             boolean isNewPost) {
+                             boolean isNewPost, String localeString, Bundle translations) {
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
 
         ReactInstanceManagerBuilder builder =
@@ -171,7 +187,8 @@ public class WPAndroidGlueCode {
         initialProps.putString(PROP_NAME_INITIAL_DATA, "");
         initialProps.putString(PROP_NAME_INITIAL_TITLE, "");
         initialProps.putBoolean(PROP_NAME_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled);
-
+        initialProps.putString(PROP_NAME_LOCALE, localeString);
+        initialProps.putBundle(PROP_NAME_TRANSLATIONS, translations);
 
         // The string here (e.g. "MyReactNativeApp") has to match
         // the string in AppRegistry.registerComponent() in index.js
@@ -179,12 +196,14 @@ public class WPAndroidGlueCode {
     }
 
     public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                                  OnReattachQueryListener onReattachQueryListener) {
+                                  OnReattachQueryListener onReattachQueryListener,
+                                  OnEditorMountListener onEditorMountListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
         mOnReattachQueryListener = onReattachQueryListener;
+        mOnEditorMountListener = onEditorMountListener;
 
         if (mReactRootView.getParent() != null) {
             ((ViewGroup) mReactRootView.getParent()).removeView(mReactRootView);
@@ -253,6 +272,10 @@ public class WPAndroidGlueCode {
 
     public void showDevOptionsDialog() {
         mReactInstanceManager.showDevOptionsDialog();
+    }
+
+    public void setFocusOnTitle() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setFocusOnTitleInJS();
     }
 
     public void setTitle(String title) {

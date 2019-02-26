@@ -46,6 +46,7 @@ export class BlockToolbar extends Component<PropsType> {
 					showsHorizontalScrollIndicator={ false }
 					keyboardShouldPersistTaps={ 'always' }
 					alwaysBounceHorizontal={ false }
+					contentContainerStyle={ styles.scrollableContent }
 				>
 					<Toolbar accessible={ true }
 					accessibilityLabel={"Toolbar Add block"}>

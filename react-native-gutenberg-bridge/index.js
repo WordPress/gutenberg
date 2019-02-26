@@ -28,6 +28,10 @@ export function subscribeParentToggleHTMLMode( callback ) {
 	return gutenbergBridgeEvents.addListener( 'toggleHTMLMode', callback );
 }
 
+export function subscribeSetFocusOnTitle( callback ) {
+	return gutenbergBridgeEvents.addListener( 'setFocusOnTitle', callback );
+}
+
 export function subscribeSetTitle( callback ) {
 	return gutenbergBridgeEvents.addListener( 'setTitle', callback );
 }

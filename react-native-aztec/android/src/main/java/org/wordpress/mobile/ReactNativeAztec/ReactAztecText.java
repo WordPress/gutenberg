@@ -1,12 +1,19 @@
 package org.wordpress.mobile.ReactNativeAztec;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.Selection;
+import android.text.Spannable;
 import android.text.TextWatcher;
+import android.text.method.ArrowKeyMovementMethod;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
@@ -26,6 +33,12 @@ import org.wordpress.aztec.plugins.IToolbarButton;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
+
+import static android.content.ClipData.*;
 
 public class ReactAztecText extends AztecText {
 
@@ -49,8 +62,20 @@ public class ReactAztecText extends AztecText {
     String lastSentFormattingOptionsEventString = "";
     boolean shouldHandleOnEnter = false;
     boolean shouldHandleOnBackspace = false;
+    boolean shouldHandleOnPaste = false;
     boolean shouldHandleOnSelectionChange = false;
     boolean shouldHandleActiveFormatsChange = false;
+
+    private static final HashMap<ITextFormat, String> typingFormatsMap = new HashMap<ITextFormat, String>() {
+        {
+            put(AztecTextFormat.FORMAT_BOLD, "bold");
+            put(AztecTextFormat.FORMAT_STRONG, "bold");
+            put(AztecTextFormat.FORMAT_EMPHASIS, "italic");
+            put(AztecTextFormat.FORMAT_ITALIC, "italic");
+            put(AztecTextFormat.FORMAT_CITE, "italic");
+            put(AztecTextFormat.FORMAT_STRIKETHROUGH, "strikethrough");
+        }
+    };
 
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
@@ -58,6 +83,8 @@ public class ReactAztecText extends AztecText {
         // don't auto-focus when Aztec becomes visible.
         // Needed on rotation and multiple Aztec instances to avoid losing the exact care position.
         setFocusOnVisible(false);
+
+        forceCaretAtStartOnTakeFocus();
 
         this.setAztecKeyListener(new ReactAztecText.OnAztecKeyListener() {
             @Override
@@ -87,6 +114,27 @@ public class ReactAztecText extends AztecText {
         this.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
     }
 
+    private void forceCaretAtStartOnTakeFocus() {
+        // set a custom ArrowKeyMovementMethod: sets caret to the start of the text instead of the default (end of text)
+        // Fixes https://github.com/wordpress-mobile/gutenberg-mobile/issues/602
+        // onTakeFocus adapted from the Android source code at:
+        //  https://android.googlesource.com/platform/frameworks/base/+/refs/heads/pie-release/core/java/android/text/method/ArrowKeyMovementMethod.java#316
+        setMovementMethod(new ArrowKeyMovementMethod() {
+            @Override
+            public void onTakeFocus(TextView view, Spannable text, int dir) {
+                if ((dir & (View.FOCUS_FORWARD | View.FOCUS_DOWN)) != 0) {
+                    if (view.getLayout() == null) {
+                        // This shouldn't be null, but do something sensible if it is.
+                        Selection.setSelection(text, 0); // <-- setting caret to start of text
+                    }
+                } else {
+                    Selection.setSelection(text, text.length());  // <-- same as original Android implementation. Not sure if we should change this too
+                }
+            }
+        });
+
+    }
+
     @Override
     public void refreshText() {
         super.refreshText();
@@ -98,6 +146,20 @@ public class ReactAztecText extends AztecText {
         if (plugin instanceof IToolbarButton && getToolbar() != null ) {
             getToolbar().addButton((IToolbarButton)plugin);
         }
+    }
+
+    @Override
+    public boolean onTextContextMenuItem(int id) {
+        if (shouldHandleOnPaste) {
+            switch (id) {
+                case android.R.id.paste:
+                    return onPaste(false);
+                case android.R.id.pasteAsPlainText:
+                    return onPaste(true);
+            }
+        }
+
+        return super.onTextContextMenuItem(id);
     }
 
     // VisibleForTesting from {@link TextInputEventsTestCase}.
@@ -232,7 +294,7 @@ public class ReactAztecText extends AztecText {
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
-                new ReactAztecSelectionChangeEvent(getId(), content, selStart, selEnd)
+                new ReactAztecSelectionChangeEvent(getId(), content, selStart, selEnd, incrementAndGetEventCounter())
         );
     }
 
@@ -296,7 +358,7 @@ public class ReactAztecText extends AztecText {
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
-                new ReactAztecEnterEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
+                new ReactAztecEnterEvent(getId(), content, cursorPositionStart, cursorPositionEnd, incrementAndGetEventCounter())
         );
         return true;
     }
@@ -321,66 +383,71 @@ public class ReactAztecText extends AztecText {
         return true;
     }
 
-    public void applyFormat(String format) {
-        ArrayList<ITextFormat> newFormats = new ArrayList<>();
-        switch (format) {
-            case ("bold"):
-            case ("strong"):
-                newFormats.add(AztecTextFormat.FORMAT_STRONG);
-                newFormats.add(AztecTextFormat.FORMAT_BOLD);
-            break;
-            case ("italic"):
-                newFormats.add(AztecTextFormat.FORMAT_ITALIC);
-                newFormats.add(AztecTextFormat.FORMAT_CITE);
-            break;
-            case ("strikethrough"):
-                newFormats.add(AztecTextFormat.FORMAT_STRIKETHROUGH);
-            break;
-        }
+    /**
+     * Handle paste action by retrieving clipboard contents and dispatching a
+     * {@link ReactAztecPasteEvent} with the data
+     *
+     * @param   isPastedAsPlainText boolean indicating whether the paste action chosen was
+     *                         "PASTE AS PLAIN TEXT"
+     *
+     * @return  boolean to indicate that the action was handled (always true)
+     */
+    private boolean onPaste(boolean isPastedAsPlainText) {
+        ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(
+                Context.CLIPBOARD_SERVICE);
 
-        if (newFormats.size() == 0) {
-            return;
-        }
+        StringBuilder text = new StringBuilder();
+        StringBuilder html = new StringBuilder();
 
-        if (!isTextSelected()) {
-            final ArrayList<ITextFormat> newStylesList = getNewStylesList(newFormats);
-            setSelectedStyles(newStylesList);
-            // Update the toolbar state
-            updateToolbarButtons(newStylesList);
-        } else {
-            toggleFormatting(newFormats.get(0));
-            // Update the toolbar state
-            updateToolbarButtons(getSelectionStart(), getSelectionEnd());
-        }
+        if (clipboardManager != null && clipboardManager.hasPrimaryClip()) {
+            ClipData clipData = clipboardManager.getPrimaryClip();
+            int itemCount = clipData.getItemCount();
 
-        // emit onChange because the underlying HTML has changed applying the style
-        ReactContext reactContext = (ReactContext) getContext();
-        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-        eventDispatcher.dispatchEvent(
-                new ReactTextChangedEvent(
-                        getId(),
-                        toHtml(false),
-                        incrementAndGetEventCounter())
-        );
-    }
-
-    // Removes all formats in the list but if none found, applies the first one
-    private ArrayList<ITextFormat> getNewStylesList(ArrayList<ITextFormat> newFormats) {
-        ArrayList<ITextFormat> textFormats = new ArrayList<>();
-        textFormats.addAll(getSelectedStyles());
-        boolean wasRemoved = false;
-        for (ITextFormat newFormat : newFormats) {
-            if (textFormats.contains(newFormat)) {
-                wasRemoved = true;
-                textFormats.remove(newFormat);
+            for (int i = 0; i < itemCount; i++) {
+                Item item = clipData.getItemAt(i);
+                text.append(item.coerceToText(getContext()));
+                if (!isPastedAsPlainText) {
+                    html.append(item.coerceToHtmlText(getContext()));
+                }
             }
         }
 
-        if (!wasRemoved) {
-            textFormats.add(newFormats.get(0));
-        }
+        // temporarily disable listener during call to toHtml()
+        disableTextChangedListener();
+        String content = toHtml(false);
+        int cursorPositionStart = getSelectionStart();
+        int cursorPositionEnd = getSelectionEnd();
+        enableTextChangedListener();
+        ReactContext reactContext = (ReactContext) getContext();
+        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class)
+                .getEventDispatcher();
+        eventDispatcher.dispatchEvent(new ReactAztecPasteEvent(getId(), content,
+                cursorPositionStart, cursorPositionEnd, text.toString(), html.toString())
+        );
+        return true;
+    }
 
-        return textFormats;
+    public void setActiveFormats(Iterable<String> newFormats) {
+        Set<ITextFormat> selectedStylesSet = new HashSet<>(getSelectedStyles());
+        Set<ITextFormat> newFormatsSet = new HashSet<>();
+        for (String newFormat : newFormats) {
+            switch (newFormat) {
+                case "bold":
+                    newFormatsSet.add(AztecTextFormat.FORMAT_STRONG);
+                    break;
+                case "italic":
+                    newFormatsSet.add(AztecTextFormat.FORMAT_EMPHASIS);
+                    break;
+                case "strikethrough":
+                    newFormatsSet.add(AztecTextFormat.FORMAT_STRIKETHROUGH);
+                    break;
+            }
+        }
+        selectedStylesSet.removeAll(typingFormatsMap.keySet());
+        selectedStylesSet.addAll(newFormatsSet);
+        ArrayList<ITextFormat> newStylesList = new ArrayList<>(selectedStylesSet);
+        setSelectedStyles(newStylesList);
+        updateToolbarButtons(newStylesList);
     }
 
     /**

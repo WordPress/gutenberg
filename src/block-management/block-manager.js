@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import React from 'react';
 import { identity } from 'lodash';
 
-import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView } from 'react-native';
+import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView, Dimensions } from 'react-native';
 import BlockHolder from './block-holder';
 import type { BlockType } from '../store/types';
 import styles from './block-manager.scss';
@@ -29,7 +29,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { DefaultBlockAppender, PostTitle } from '@wordpress/editor';
-import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
+import { sendNativeEditorDidLayout, subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
 
 type PropsType = {
 	rootClientId: ?string,
@@ -53,10 +53,13 @@ type StateType = {
 	isKeyboardVisible: boolean,
 	rootViewHeight: number;
 	safeAreaBottomInset: number;
+	isFullyBordered: boolean;
 };
 
 export class BlockManager extends React.Component<PropsType, StateType> {
 	scrollViewRef: Object;
+	postTitleRef: ?Object;
+	subscriptionParentSetFocusOnTitle: ?Object;
 
 	constructor( props: PropsType ) {
 		super( props );
@@ -72,12 +75,14 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		( this: any ).keyboardDidHide = this.keyboardDidHide.bind( this );
 		( this: any ).onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		( this: any ).scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
+		( this: any ).onContentViewLayout = this.onContentViewLayout.bind( this );
 
 		this.state = {
 			blockTypePickerVisible: false,
 			isKeyboardVisible: false,
 			rootViewHeight: 0,
 			safeAreaBottomInset: 0,
+			isFullyBordered: false,
 		};
 		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
 	}
@@ -129,16 +134,37 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		} );
 	}
 
+	onContentViewLayout = ( event: LayoutChangeEvent ) => {
+		const { width: fullWidth } = Dimensions.get( 'window' );
+		const { width } = event.nativeEvent.layout;
+		const isFullyBordered = fullWidth > width + 1; //+1 is for not letting fraction differences effect the result on Android
+		if ( isFullyBordered !== this.state.isFullyBordered ) {
+			this.setState( { ...this.state, isFullyBordered } );
+		}
+	}
+
+	blockHolderBorderStyle() {
+		return this.state.isFullyBordered ? styles.blockHolderFullBordered : styles.blockHolderSemiBordered;
+	}
+
 	componentDidMount() {
 		Keyboard.addListener( 'keyboardDidShow', this.keyboardDidShow );
 		Keyboard.addListener( 'keyboardDidHide', this.keyboardDidHide );
 		SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle( ( ) => {
+			if ( this.postTitleRef ) {
+				this.postTitleRef.focus();
+			}
+		} );
 	}
 
 	componentWillUnmount() {
 		Keyboard.removeListener( 'keyboardDidShow', this.keyboardDidShow );
 		Keyboard.removeListener( 'keyboardDidHide', this.keyboardDidHide );
 		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		if ( this.subscriptionParentSetFocusOnTitle ) {
+			this.subscriptionParentSetFocusOnTitle.remove();
+		}
 	}
 
 	keyboardDidShow() {
@@ -169,18 +195,21 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderHeader() {
 		return (
-			<View style={ styles.titleContainer }>
-				<PostTitle
-					title={ this.props.title }
-					onUpdate={ this.props.setTitleAction }
-					placeholder={ 'Add a Title' } />
-			</View>
+			<PostTitle
+				innerRef={ ( ref ) => {
+					this.postTitleRef = ref;
+				} }
+				title={ this.props.title }
+				onUpdate={ this.props.setTitleAction }
+				placeholder={ __( 'Add title' ) }
+				borderStyle={ this.blockHolderBorderStyle() }
+				focusedBorderColor={ styles.blockHolderFocused.borderColor } />
 		);
 	}
 
 	renderList() {
 		return (
-			<View style={ { flex: 1 } } >
+			<View style={ { flex: 1 } } onLayout={ this.onContentViewLayout }>
 				<KeyboardAwareFlatList
 					testID="block-list"
 					accessibilityLabel="block-list"
@@ -192,6 +221,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					keyboardShouldPersistTaps="always"
 					style={ styles.list }
 					data={ this.props.blockClientIds }
+					extraData={ [ this.state.isFullyBordered ] }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
@@ -230,6 +260,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 						onDismiss={ () => this.showBlockTypePicker( false ) }
 						onValueSelected={ this.onBlockTypeSelected }
 						isReplacement={ this.isReplaceable( this.props.selectedBlock ) }
+						addExtraBottomPadding={ this.state.safeAreaBottomInset === 0 }
 					/>
 				) }
 			</SafeAreaView>
@@ -258,6 +289,8 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					clientId={ clientId }
 					rootClientId={ this.props.rootClientId }
 					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
+					borderStyle={ this.blockHolderBorderStyle() }
+					focusedBorderColor={ styles.blockHolderFocused.borderColor }
 				/>
 				{ this.state.blockTypePickerVisible && this.props.isBlockSelected( clientId ) && (
 					<View style={ styles.containerStyleAddHere } >

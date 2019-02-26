@@ -36,7 +36,11 @@ class GutenbergViewController: UIViewController {
 extension GutenbergViewController: GutenbergBridgeDelegate {
 
     func gutenbergDidLoad() {
-        
+        gutenberg.setFocusOnTitle()
+    }
+
+    func gutenbergDidMount(hasUnsupportedBlocks: Bool) {
+        print("gutenbergDidMount(hasUnsupportedBlocks: \(hasUnsupportedBlocks))")
     }
 
     func gutenbergDidProvideHTML(title: String, html: String, changed: Bool) {
@@ -112,6 +116,15 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
+    
+    func gutenbergLocale() -> String? {
+        return Locale.preferredLanguages.first ?? "en"
+    }
+    
+    func gutenbergTranslations() -> [String : [String]]? {
+        return nil
+    }
+    
     func gutenbergInitialContent() -> String? {
         return nil
     }
