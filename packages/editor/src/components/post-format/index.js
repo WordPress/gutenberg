@@ -6,7 +6,7 @@ import { find, get, includes, union } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Button, SelectControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
@@ -57,7 +57,7 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFor
 					<div className="editor-post-format__suggestion">
 						{ __( 'Suggestion:' ) }{ ' ' }
 						<Button isLink onClick={ () => onUpdatePostFormat( suggestion.id ) }>
-							{ suggestion.caption }
+							{ sprintf( 'Apply the "%s" format', suggestion.caption ) }
 						</Button>
 					</div>
 				) }
