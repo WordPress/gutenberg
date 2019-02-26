@@ -139,21 +139,6 @@ function gutenberg_register_scripts_and_styles() {
 	global $wp_scripts;
 
 	gutenberg_register_vendor_scripts();
-
-	wp_add_inline_script(
-		'wp-polyfill',
-		wp_get_script_polyfill(
-			$wp_scripts,
-			array(
-				'\'fetch\' in window' => 'wp-polyfill-fetch',
-				'document.contains'   => 'wp-polyfill-node-contains',
-				'window.FormData && window.FormData.prototype.keys' => 'wp-polyfill-formdata',
-				'Element.prototype.matches && Element.prototype.closest' => 'wp-polyfill-element-closest',
-			),
-			'after'
-		)
-	);
-
 	gutenberg_register_packages_scripts();
 
 	// Inline scripts.
@@ -240,33 +225,6 @@ function gutenberg_register_scripts_and_styles() {
 					'timezone' => array(
 						'offset' => get_option( 'gmt_offset', 0 ),
 						'string' => get_option( 'timezone_string', 'UTC' ),
-					),
-				)
-			)
-		),
-		'after'
-	);
-	wp_add_inline_script(
-		'moment',
-		sprintf(
-			"moment.locale( '%s', %s );",
-			get_user_locale(),
-			wp_json_encode(
-				array(
-					'months'         => array_values( $wp_locale->month ),
-					'monthsShort'    => array_values( $wp_locale->month_abbrev ),
-					'weekdays'       => array_values( $wp_locale->weekday ),
-					'weekdaysShort'  => array_values( $wp_locale->weekday_abbrev ),
-					'week'           => array(
-						'dow' => (int) get_option( 'start_of_week', 0 ),
-					),
-					'longDateFormat' => array(
-						'LT'   => get_option( 'time_format', __( 'g:i a', 'default' ) ),
-						'LTS'  => null,
-						'L'    => null,
-						'LL'   => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
-						'LLL'  => __( 'F j, Y g:i a', 'default' ),
-						'LLLL' => null,
 					),
 				)
 			)
@@ -534,52 +492,10 @@ function gutenberg_preload_api_request( $memo, $path ) {
  * @since 0.1.0
  */
 function gutenberg_register_vendor_scripts() {
-	$suffix = SCRIPT_DEBUG ? '' : '.min';
-
-	// Vendor Scripts.
-	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
-
-	gutenberg_register_vendor_script(
-		'react',
-		'https://unpkg.com/react@16.6.3/umd/react' . $react_suffix . '.js',
-		array( 'wp-polyfill' )
-	);
-	gutenberg_register_vendor_script(
-		'react-dom',
-		'https://unpkg.com/react-dom@16.6.3/umd/react-dom' . $react_suffix . '.js',
-		array( 'react' )
-	);
-	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
-	gutenberg_register_vendor_script(
-		'moment',
-		'https://unpkg.com/moment@2.22.1/' . $moment_script,
-		array()
-	);
-	gutenberg_register_vendor_script(
-		'lodash',
-		'https://unpkg.com/lodash@4.17.11/lodash' . $suffix . '.js'
-	);
-	wp_add_inline_script( 'lodash', 'window.lodash = _.noConflict();' );
-	gutenberg_register_vendor_script(
-		'wp-polyfill-fetch',
-		'https://unpkg.com/whatwg-fetch@3.0.0/dist/fetch.umd.js'
-	);
-	gutenberg_register_vendor_script(
-		'wp-polyfill-formdata',
-		'https://unpkg.com/formdata-polyfill@3.0.9/formdata.min.js'
-	);
-	gutenberg_register_vendor_script(
-		'wp-polyfill-node-contains',
-		'https://unpkg.com/polyfill-library@3.26.0-0/polyfills/Node/prototype/contains/polyfill.js'
-	);
-	gutenberg_register_vendor_script(
-		'wp-polyfill-element-closest',
-		'https://unpkg.com/element-closest@2.0.2/element-closest.js'
-	);
-	gutenberg_register_vendor_script(
-		'wp-polyfill',
-		'https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill' . $suffix . '.js'
-	);
+	/*
+	 * This function is kept as an empty stub, in case Gutenberg should need to
+	 * explicitly provide a version newer than that provided by core.
+	 */
 }
 
 /**
