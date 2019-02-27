@@ -40,42 +40,16 @@ module.exports = function( babel ) {
 	return {
 		visitor: {
 			JSXElement( path, state ) {
-				state.hasJSX = true;
 				if ( state.hasUndeclaredScopeVariable ) {
 					return;
 				}
 
 				const { scopeVariable } = getOptions( state );
-
 				state.hasUndeclaredScopeVariable = ! path.scope.hasBinding( scopeVariable );
-			},
-			ImportDeclaration( path, state ) {
-				if ( state.hasImportedScopeVariable ) {
-					return;
-				}
-
-				const { scopeVariable, isDefault } = getOptions( state );
-
-				// Test that at least one import specifier exists matching the
-				// scope variable name. The module source is not verified since
-				// we must avoid introducing a conflicting import name, even if
-				// the scope variable is referenced from a different source.
-				state.hasImportedScopeVariable = path.node.specifiers.some( ( specifier ) => {
-					switch ( specifier.type ) {
-						case 'ImportSpecifier':
-							return (
-								! isDefault &&
-								specifier.imported.name === scopeVariable
-							);
-
-						case 'ImportDefaultSpecifier':
-							return isDefault;
-					}
-				} );
 			},
 			Program: {
 				exit( path, state ) {
-					if ( ! state.hasJSX || state.hasImportedScopeVariable || ! state.hasUndeclaredScopeVariable ) {
+					if ( ! state.hasUndeclaredScopeVariable ) {
 						return;
 					}
 
