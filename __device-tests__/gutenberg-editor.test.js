@@ -11,6 +11,11 @@ const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
 
 var config;
 
+var accessibilityIdKey = 'name';
+if(rnPlatform === 'android' ) {
+	accessibilityIdKey = 'content-desc';
+}
+
 if(rnPlatform === 'android' ) {
 	config = {
 		platformName: 'android',
@@ -67,18 +72,12 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	const getNewParagraphBlock = async () => {
-		console.log("getParagraphBlocks");
+		console.log("getNewParagraphBlock");
 	
 		await driver.sleep(2000);
-		var accessibilityIdKey = 'name';
-		if(rnPlatform === 'android' ) {
-			accessibilityIdKey = 'content-desc';
-		}
 		const blockName = 'core/paragraph';
 		const blockLocator = "//*[starts-with(@"+ accessibilityIdKey+", '"+ blockName +"')]"
 		let paragraphBlocks = await driver.elementsByXPath(blockLocator);
-		
-		console.log(paragraphBlocks.length);
 
 		var currentBlocks = new Set([]);
 
@@ -88,18 +87,28 @@ describe( 'Gutenberg Editor tests', () => {
 		}
 
 		var newBlocks = currentBlocks.difference(blocks[blockName]);
-		console.log("New", newBlocks);
-		console.log("Current", currentBlocks);
 		if(newBlocks.size === 0) {
 			newBlocks = blocks[blockName].difference(currentBlocks);
 		}
-		console.log("Newnew", newBlocks);
 
 		var newElementAccessibilityId = newBlocks.values().next().value;
-		console.log("Accessibility ID:", newElementAccessibilityId);
 		const newElement = await driver.elementByAccessibilityId(newElementAccessibilityId);
 		blocks[blockName] = currentBlocks;
 		return newElement;
+	}
+
+	const getNewParagraphBlockTextView = async (newParagraphBlock) => {
+		console.log("getNewParagraphBlocktextTextView");
+	
+
+		await driver.sleep(2000);
+		var textViewElement = 'XCUIElementTypeTextView';
+		if(rnPlatform === 'android') {
+			textViewElement = 'android.widget.EditText';
+		}
+		let newParagraphBlockId = await newParagraphBlock.getAttribute(accessibilityIdKey);
+		const blockLocator = "//*[starts-with(@"+ accessibilityIdKey+", '"+ newParagraphBlockId +"')]//" + textViewElement;
+		return await driver.elementByXPath(blockLocator);
 	}
 
 	const addParagraphBlock = async () => {
@@ -116,21 +125,18 @@ describe( 'Gutenberg Editor tests', () => {
 		return await getNewParagraphBlock();
 	}
 
-	const typeString = async (element, str) => {
-		console.log("Type String")
-
-		for (var i = 0; i < str.length; i++) {
-			await element.type(str.charAt(i));
-		  }
+	const typeString = async (element, str) => { // Problem with Appium type function needing to be cleared after first attempt
+		await element.clear();
+		await element.type(str);
+		await element.clear();
+		await element.type(str);
 	}
 
 	it( 'should be able to see editor', async () => {
 		var newParagraphBlock = await addParagraphBlock();
 
-		await newParagraphBlock.click();
-		await newParagraphBlock.clear();
-		await typeString(newParagraphBlock, "Hello Gutenberg!");
-		// await newParagraphBlock.type("Hello Gutenberg!");
+		let newParagraphBlockTextView = await getNewParagraphBlockTextView(newParagraphBlock);
+		newParagraphBlockTextView.type("Hello Gutenberg!");
 
 		expect( await driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
 	} );
