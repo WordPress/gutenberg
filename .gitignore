@@ -95,3 +95,6 @@ buck-out/
 !.vscode/extensions.json
 
 *.pot
+
+# e2e output log
+appium-out.log

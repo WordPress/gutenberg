@@ -33,7 +33,7 @@ if(rnPlatform === 'android' ) {
 		appActivity: 'com.gutenberg.MainActivity',
 		noReset: false,
 		fullReset: true,
-		app: '/Users/javon/Projects/gutenberg-mobile/android/app/build/outputs/apk/debug/app-debug.apk',
+		app: './android/app/build/outputs/apk/debug/app-debug.apk', // relative to root of project
 	};
 } else {
 	config = {
@@ -41,7 +41,7 @@ if(rnPlatform === 'android' ) {
 		platformVersion: 12.1,
 		deviceName: 'iPhone XR',
 		automationName: 'XCUITest',
-		app: '/Users/javon/Projects/gutenberg-mobile/ios/build/Build/Products/Debug-iphonesimulator/gutenberg.app', // relative to root of project
+		app: './ios/build/Build/Products/Debug-iphonesimulator/gutenberg.app', // relative to root of project
 	};
 }
 
