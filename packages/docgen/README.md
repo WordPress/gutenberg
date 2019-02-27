@@ -21,7 +21,7 @@ npm install @wordpress/docgen --save-dev
 npx docgen <entry-point.js>
 ```
 
-This command will generate a file named `entry-point-api.md` containing all the exports and its JSDoc comments.
+This command will generate a file named `entry-point-api.md` containing all the exports and their JSDoc comments.
 
 ### CLI options
 
