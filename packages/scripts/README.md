@@ -257,15 +257,15 @@ Let's say that you want Webpack to take as input a file named `my-plugin.js`. Th
 * Fill it with the following contents:
 
 ```js
-const config = require( '@wordpress/scripts/config/webpack.config.js' );
+const defaultConfig = require( '@wordpress/scripts/config/webpack.config.js' );
 module.exports = {
-	...config,
-	entry: 'my-plugin.js',
+	...defaultConfig,
+	entry: './my-plugin.js',
 	plugins: [
-		...config.plugins,
+		...defaultConfig.plugins,
 		// add your own plugin after the default ones
 	],
-} );
+};
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
