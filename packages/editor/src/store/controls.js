@@ -4,6 +4,13 @@
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistryControl } from '@wordpress/data';
 
+/**
+ * Dispatches a control action for triggering an api fetch call.
+ *
+ * @param {Object} request Arguments for the fetch request.
+ *
+ * @return {Object} control descriptor.
+ */
 export function apiFetch( request ) {
 	return {
 		type: 'API_FETCH',
@@ -11,6 +18,15 @@ export function apiFetch( request ) {
 	};
 }
 
+/**
+ * Dispatches a control action for triggering a registry select.
+ *
+ * @param {string} storeKey
+ * @param {string} selectorName
+ * @param {Array}  args Arguments for the select.
+ *
+ * @return {Object} control descriptor.
+ */
 export function select( storeKey, selectorName, ...args ) {
 	return {
 		type: 'SELECT',
@@ -20,6 +36,16 @@ export function select( storeKey, selectorName, ...args ) {
 	};
 }
 
+/**
+ * Dispatches a control action for triggering a registry select that has a
+ * resolver.
+ *
+ * @param {string} 	storeKey
+ * @param {string} 	selectorName
+ * @param {Array} 	args  Arguments for the select.
+ *
+ * @return {Object} control descriptor.
+ */
 export function resolveSelect( storeKey, selectorName, ...args ) {
 	return {
 		type: 'RESOLVE_SELECT',
@@ -29,6 +55,15 @@ export function resolveSelect( storeKey, selectorName, ...args ) {
 	};
 }
 
+/**
+ * Dispatches a control action for triggering a registry dispatch.
+ *
+ * @param {string} storeKey
+ * @param {string} actionName
+ * @param {Array} args  Arguments for the dispatch action.
+ *
+ * @return {Object}  control descriptor.
+ */
 export function dispatch( storeKey, actionName, ...args ) {
 	return {
 		type: 'DISPATCH',
