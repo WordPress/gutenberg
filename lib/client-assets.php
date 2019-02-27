@@ -93,9 +93,60 @@ function gutenberg_override_script( $handle, $src, $deps = array(), $ver = false
 	 * See: https://core.trac.wordpress.org/ticket/46089
 	 */
 	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
-		wp_set_script_translations( $handle, 'gutenberg' );
+		wp_set_script_translations( $handle );
 	}
 }
+
+/**
+ * Filters the default translation file load behavior to load the Gutenberg
+ * plugin translation file, if available.
+ *
+ * @param string|false $file   Path to the translation file to load. False if
+ *                             there isn't one.
+ * @param string       $handle Name of the script to register a translation
+ *                             domain to.
+ *
+ * @return string|false Filtered path to the Gutenberg translation file, if
+ *                      available.
+ */
+function gutenberg_override_translation_file( $file, $handle ) {
+	if ( ! $file ) {
+		return $file;
+	}
+
+	// Only override script handles generated from the Gutenberg plugin.
+	$packages_dependencies = include dirname( __FILE__ ) . '/packages-dependencies.php';
+	if ( ! isset( $packages_dependencies[ $handle ] ) ) {
+		return $file;
+	}
+
+	/*
+	 * The default file will be in the plugins language directory, omitting the
+	 * domain since Gutenberg assigns the script translations as the default.
+	 *
+	 * Example: /www/wp-content/languages/plugins/de_DE-07d88e6a803e01276b9bfcc1203e862e.json
+	 *
+	 * The logic of `load_script_textdomain` is such that it will assume to
+	 * search in the plugins language directory, since the assigned source of
+	 * the overridden Gutenberg script originates in the plugins directory.
+	 *
+	 * The plugin translation files each begin with the slug of the plugin, so
+	 * it's a simple matter of prepending the Gutenberg plugin slug.
+	 */
+	$path_parts              = pathinfo( $file );
+	$plugin_translation_file = (
+		$path_parts['dirname'] .
+		'/gutenberg-' .
+		$path_parts['basename']
+	);
+
+	if ( ! is_readable( $plugin_translation_file ) ) {
+		return $file;
+	}
+
+	return $plugin_translation_file;
+}
+add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
 
 /**
  * Registers a style according to `wp_register_style`. Honors this request by
