@@ -51,10 +51,11 @@ Rule|Description|Recommended
 ---|---|---
 [dependency-group](/packages/eslint-plugin/docs/rules/dependency-group.md)|Enforce dependencies docblocks formatting|✓
 [gutenberg-phase](docs/rules/gutenberg-phase.md)|Governs the use of the `process.env.GUTENBERG_PHASE` constant|✓
+[no-base-control-with-label-without-id](/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)| Disallow the usage of BaseControl component with a label prop set but omitting the id property|✓
 [no-unused-vars-before-return](/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)|Disallow assigning variable values if unused before a return|✓
+[package-side-effects](/packages/eslint-plugin/docs/rules/package-side-effects.md)|Enforce the `package.json` sideEffects property|
 [react-no-unsafe-timeout](/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)|Disallow unsafe `setTimeout` in component|
 [valid-sprintf](/packages/eslint-plugin/docs/rules/valid-sprintf.md)|Enforce valid sprintf usage|✓
-[no-base-control-with-label-without-id](/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)| Disallow the usage of BaseControl component with a label prop set but omitting the id property|✓
 
 ### Legacy
 
