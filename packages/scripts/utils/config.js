@@ -22,10 +22,8 @@ const hasWebpackConfig = () => hasCliArg( '--config' ) ||
 	hasProjectFile( 'webpack.config.babel.js' );
 
 const getWebpackArgs = ( additionalArgs = [] ) => {
-	const webpackArgs = [];
-	if ( hasWebpackConfig() ) {
-		webpackArgs.push( ...getCliArgs() );
-	} else {
+	const webpackArgs = [ ...getCliArgs() ];
+	if ( ! hasWebpackConfig() ) {
 		webpackArgs.push( ...[ '--config', fromConfigRoot( 'webpack.config.js' ) ] );
 	}
 	webpackArgs.push( ...additionalArgs );
