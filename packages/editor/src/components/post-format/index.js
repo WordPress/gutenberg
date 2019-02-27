@@ -57,7 +57,11 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFor
 					<div className="editor-post-format__suggestion">
 						{ __( 'Suggestion:' ) }{ ' ' }
 						<Button isLink onClick={ () => onUpdatePostFormat( suggestion.id ) }>
-							{ sprintf( 'Apply the "%s" format', suggestion.caption ) }
+							{ sprintf(
+								/* translators: %s: post format */
+								__( 'Apply the "%s" format.' ),
+								suggestion.caption
+							) }
 						</Button>
 					</div>
 				) }
