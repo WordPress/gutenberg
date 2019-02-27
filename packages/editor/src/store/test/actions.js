@@ -6,30 +6,7 @@ import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 /**
  * Internal dependencies
  */
-import generatorActions, {
-	__experimentalFetchReusableBlocks as fetchReusableBlocks,
-	__experimentalSaveReusableBlock as saveReusableBlock,
-	__experimentalDeleteReusableBlock as deleteReusableBlock,
-	__experimentalConvertBlockToStatic as convertBlockToStatic,
-	__experimentalConvertBlockToReusable as convertBlockToReusable,
-	__experimentalRequestPostUpdateStart as requestPostUpdateStart,
-	__experimentalRequestPostUpdateSuccess as requestPostUpdateSuccess,
-	__experimentalRequestPostUpdateFailure as requestPostUpdateFailure,
-	__experimentalOptimisticUpdatePost as optimisticUpdatePost,
-	setupEditor,
-	resetPost,
-	resetAutosave,
-	updatePost,
-	lockPostSaving,
-	unlockPostSaving,
-	editPost,
-	savePost,
-	autosave,
-	refreshPost,
-	trashPost,
-	redo,
-	undo,
-} from '../actions.js';
+import generatorActions, * as actions from '../actions';
 import { select, dispatch, apiFetch, resolveSelect } from '../controls';
 import {
 	MODULE_KEY,
@@ -146,7 +123,7 @@ describe( 'Post generator actions', () => {
 			);
 		} );
 		const editedPostContent = 'to infinity and beyond';
-		const reset = ( isAutosaving ) => fulfillment = savePost(
+		const reset = ( isAutosaving ) => fulfillment = actions.savePost(
 			{ isAutosave: isAutosaving }
 		);
 		const rewind = ( isAutosaving, isNewPost ) => {
@@ -519,7 +496,7 @@ describe( 'Post generator actions', () => {
 		afterAll( () => savePostSpy.mockRestore() );
 		// autosave is mostly covered by `savePost` tests so just test the correct call
 		it( 'calls savePost with the correct arguments', () => {
-			const fulfillment = autosave();
+			const fulfillment = actions.autosave();
 			fulfillment.next();
 			expect( savePostSpy ).toHaveBeenCalled();
 			expect( savePostSpy ).toHaveBeenCalledWith( { isAutosave: true } );
@@ -528,7 +505,7 @@ describe( 'Post generator actions', () => {
 	describe( 'trashPost()', () => {
 		let fulfillment;
 		const currentPost = { id: 10, content: 'foo', status: 'publish' };
-		const reset = () => fulfillment = trashPost();
+		const reset = () => fulfillment = actions.trashPost();
 		const rewind = () => {
 			reset();
 			fulfillment.next();
@@ -608,7 +585,7 @@ describe( 'Post generator actions', () => {
 	describe( 'refreshPost()', () => {
 		let fulfillment;
 		const currentPost = { id: 10, content: 'foo' };
-		const reset = () => fulfillment = refreshPost();
+		const reset = () => fulfillment = actions.refreshPost();
 		it( 'yields expected action for selecting the currentPost', () => {
 			reset();
 			const { value } = fulfillment.next();
@@ -656,7 +633,7 @@ describe( 'actions', () => {
 	describe( 'setupEditor', () => {
 		it( 'should return the SETUP_EDITOR action', () => {
 			const post = {};
-			const result = setupEditor( post );
+			const result = actions.setupEditor( post );
 			expect( result ).toEqual( {
 				type: 'SETUP_EDITOR',
 				post,
@@ -667,7 +644,7 @@ describe( 'actions', () => {
 	describe( 'resetPost', () => {
 		it( 'should return the RESET_POST action', () => {
 			const post = {};
-			const result = resetPost( post );
+			const result = actions.resetPost( post );
 			expect( result ).toEqual( {
 				type: 'RESET_POST',
 				post,
@@ -678,7 +655,7 @@ describe( 'actions', () => {
 	describe( 'resetAutosave', () => {
 		it( 'should return the RESET_AUTOSAVE action', () => {
 			const post = {};
-			const result = resetAutosave( post );
+			const result = actions.resetAutosave( post );
 			expect( result ).toEqual( {
 				type: 'RESET_AUTOSAVE',
 				post,
@@ -688,7 +665,7 @@ describe( 'actions', () => {
 
 	describe( 'requestPostUpdateStart', () => {
 		it( 'should return the REQUEST_POST_UPDATE_START action', () => {
-			const result = requestPostUpdateStart();
+			const result = actions.__experimentalRequestPostUpdateStart();
 			expect( result ).toEqual( {
 				type: 'REQUEST_POST_UPDATE_START',
 				optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
@@ -705,7 +682,7 @@ describe( 'actions', () => {
 				options: {},
 				postType: 'post',
 			};
-			const result = requestPostUpdateSuccess( {
+			const result = actions.__experimentalRequestPostUpdateSuccess( {
 				...testActionData,
 				isRevision: false,
 			} );
@@ -725,7 +702,9 @@ describe( 'actions', () => {
 				edits: {},
 				error: {},
 			};
-			const result = requestPostUpdateFailure( testActionData );
+			const result = actions.__experimentalRequestPostUpdateFailure(
+				testActionData
+			);
 			expect( result ).toEqual( {
 				...testActionData,
 				type: 'REQUEST_POST_UPDATE_FAILURE',
@@ -737,7 +716,7 @@ describe( 'actions', () => {
 	describe( 'updatePost', () => {
 		it( 'should return the UPDATE_POST action', () => {
 			const edits = {};
-			const result = updatePost( edits );
+			const result = actions.updatePost( edits );
 			expect( result ).toEqual( {
 				type: 'UPDATE_POST',
 				edits,
@@ -748,7 +727,7 @@ describe( 'actions', () => {
 	describe( 'editPost', () => {
 		it( 'should return EDIT_POST action', () => {
 			const edits = { format: 'sample' };
-			expect( editPost( edits ) ).toEqual( {
+			expect( actions.editPost( edits ) ).toEqual( {
 				type: 'EDIT_POST',
 				edits,
 			} );
@@ -758,7 +737,7 @@ describe( 'actions', () => {
 	describe( 'optimisticUpdatePost', () => {
 		it( 'should return the UPDATE_POST action with optimist property', () => {
 			const edits = {};
-			const result = optimisticUpdatePost( edits );
+			const result = actions.__experimentalOptimisticUpdatePost( edits );
 			expect( result ).toEqual( {
 				type: 'UPDATE_POST',
 				edits,
@@ -769,7 +748,7 @@ describe( 'actions', () => {
 
 	describe( 'redo', () => {
 		it( 'should return REDO action', () => {
-			expect( redo() ).toEqual( {
+			expect( actions.redo() ).toEqual( {
 				type: 'REDO',
 			} );
 		} );
@@ -777,7 +756,7 @@ describe( 'actions', () => {
 
 	describe( 'undo', () => {
 		it( 'should return UNDO action', () => {
-			expect( undo() ).toEqual( {
+			expect( actions.undo() ).toEqual( {
 				type: 'UNDO',
 			} );
 		} );
@@ -785,13 +764,13 @@ describe( 'actions', () => {
 
 	describe( 'fetchReusableBlocks', () => {
 		it( 'should return the FETCH_REUSABLE_BLOCKS action', () => {
-			expect( fetchReusableBlocks() ).toEqual( {
+			expect( actions.__experimentalFetchReusableBlocks() ).toEqual( {
 				type: 'FETCH_REUSABLE_BLOCKS',
 			} );
 		} );
 
 		it( 'should take an optional id argument', () => {
-			expect( fetchReusableBlocks( 123 ) ).toEqual( {
+			expect( actions.__experimentalFetchReusableBlocks( 123 ) ).toEqual( {
 				type: 'FETCH_REUSABLE_BLOCKS',
 				id: 123,
 			} );
@@ -800,7 +779,7 @@ describe( 'actions', () => {
 
 	describe( 'saveReusableBlock', () => {
 		it( 'should return the SAVE_REUSABLE_BLOCK action', () => {
-			expect( saveReusableBlock( 123 ) ).toEqual( {
+			expect( actions.__experimentalSaveReusableBlock( 123 ) ).toEqual( {
 				type: 'SAVE_REUSABLE_BLOCK',
 				id: 123,
 			} );
@@ -809,7 +788,7 @@ describe( 'actions', () => {
 
 	describe( 'deleteReusableBlock', () => {
 		it( 'should return the DELETE_REUSABLE_BLOCK action', () => {
-			expect( deleteReusableBlock( 123 ) ).toEqual( {
+			expect( actions.__experimentalDeleteReusableBlock( 123 ) ).toEqual( {
 				type: 'DELETE_REUSABLE_BLOCK',
 				id: 123,
 			} );
@@ -819,7 +798,7 @@ describe( 'actions', () => {
 	describe( 'convertBlockToStatic', () => {
 		it( 'should return the CONVERT_BLOCK_TO_STATIC action', () => {
 			const clientId = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( convertBlockToStatic( clientId ) ).toEqual( {
+			expect( actions.__experimentalConvertBlockToStatic( clientId ) ).toEqual( {
 				type: 'CONVERT_BLOCK_TO_STATIC',
 				clientId,
 			} );
@@ -829,7 +808,7 @@ describe( 'actions', () => {
 	describe( 'convertBlockToReusable', () => {
 		it( 'should return the CONVERT_BLOCK_TO_REUSABLE action', () => {
 			const clientId = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( convertBlockToReusable( clientId ) ).toEqual( {
+			expect( actions.__experimentalConvertBlockToReusable( clientId ) ).toEqual( {
 				type: 'CONVERT_BLOCK_TO_REUSABLE',
 				clientIds: [ clientId ],
 			} );
@@ -838,7 +817,7 @@ describe( 'actions', () => {
 
 	describe( 'lockPostSaving', () => {
 		it( 'should return the LOCK_POST_SAVING action', () => {
-			const result = lockPostSaving( 'test' );
+			const result = actions.lockPostSaving( 'test' );
 			expect( result ).toEqual( {
 				type: 'LOCK_POST_SAVING',
 				lockName: 'test',
@@ -848,7 +827,7 @@ describe( 'actions', () => {
 
 	describe( 'unlockPostSaving', () => {
 		it( 'should return the UNLOCK_POST_SAVING action', () => {
-			const result = unlockPostSaving( 'test' );
+			const result = actions.unlockPostSaving( 'test' );
 			expect( result ).toEqual( {
 				type: 'UNLOCK_POST_SAVING',
 				lockName: 'test',
