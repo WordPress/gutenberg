@@ -27,6 +27,7 @@
 
 		@include break-small() {
 			border-width: $border-width;
+			border-left-width: 0;
 		}
 
 		// Match h1 heading.

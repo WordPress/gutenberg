@@ -12,8 +12,7 @@
 	}
 
 	// Show a left border on the parent container.
-	border-left: $border-width solid $dark-opacity-500;
-	box-shadow: ($border-width * -2) 0 0 0 $dark-opacity-500;
+	box-shadow: ($border-width * -3) 0 0 0 $dark-opacity-500;
 
 	// The component is born with a border, but we only need some of them.
 	.components-toolbar {

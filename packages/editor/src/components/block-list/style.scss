@@ -906,7 +906,7 @@
 
 		// This prevents floats from messing up the position of the block toolbar on floats-adjacent blocks when selected.
 		position: absolute;
-		left: 0;
+		left: $border-width;
 	}
 }
 
