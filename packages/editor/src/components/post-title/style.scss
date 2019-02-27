@@ -16,7 +16,7 @@
 		font-family: $editor-font;
 		line-height: $default-line-height;
 		color: $dark-gray-900;
-		transition: border 0.1s ease-out;
+		transition: border 0.1s ease-out, box-shadow 0.1s linear;
 		padding: #{ $block-padding + 5px } $block-padding;
 		word-break: keep-all;
 
@@ -51,16 +51,18 @@
 		&.is-selected .editor-post-title__input {
 			// use opacity to work in various editor styles
 			border-color: $dark-opacity-light-500;
+			box-shadow: ($border-width * -3) 0 0 0 $dark-opacity-500;
 
 			.is-dark-theme & {
 				border-color: $light-opacity-light-500;
+				box-shadow: ($border-width * -3) 0 0 0 $light-opacity-600;
 			}
 		}
 	}
 
-	&:not(.is-focus-mode):not(.has-fixed-toolbar) {
+	&:not(.is-focus-mode):not(.has-fixed-toolbar):not(.is-selected) {
 		.editor-post-title__input:hover {
-			border-color: theme(outlines);
+			box-shadow: ($border-width * -3) 0 0 0 theme(outlines);
 		}
 	}
 
