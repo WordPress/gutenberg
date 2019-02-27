@@ -36,5 +36,4 @@ module.exports = {
 	getWebpackArgs,
 	hasBabelConfig,
 	hasJestConfig,
-	hasWebpackConfig,
 };
