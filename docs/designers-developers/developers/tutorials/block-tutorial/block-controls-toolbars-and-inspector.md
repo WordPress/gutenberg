@@ -336,7 +336,6 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 						{
 							key: "editable",
 							tagName: "p",
-							className: className,
 							onChange: onChangeContent,
 							value: content
 						}
@@ -536,7 +535,6 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 				<RichText
 					key="editable"
 					tagName="p"
-					className={ className }
 					onChange={ onChangeContent }
 					value={ content }
 				/>
