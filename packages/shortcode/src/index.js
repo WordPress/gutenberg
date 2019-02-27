@@ -287,6 +287,7 @@ const shortcode = extend( function( options ) {
 	fromMatch,
 } );
 
+// eslint-disable-next-line @wordpress/package-side-effects
 extend( shortcode.prototype, {
 
 	/**
