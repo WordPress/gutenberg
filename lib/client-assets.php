@@ -185,7 +185,16 @@ function gutenberg_register_scripts_and_styles() {
 	// introduction of the block editor.
 	wp_add_inline_script(
 		'wp-data',
-		'wp.data.plugins.persistence.__unstableMigrate( { storageKey: storageKey } );'
+		implode(
+			"\n",
+			array(
+				'( function() {',
+				'	var userId = ' . get_current_user_ID() . ';',
+				'	var storageKey = "WP_DATA_USER_" + userId;',
+				'	wp.data.plugins.persistence.__unstableMigrate( { storageKey: storageKey } );',
+				'} )()',
+			)
+		)
 	);
 
 	// Editor Styles.
