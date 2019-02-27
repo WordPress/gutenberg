@@ -16,7 +16,7 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
@@ -26,7 +26,6 @@ import { withSelect } from '@wordpress/data';
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
-import { mediaUpload } from '../../utils/';
 
 const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 	<URLPopover onClose={ onClose }>
@@ -104,7 +103,7 @@ export class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { onSelect, multiple, onError, allowedTypes } = this.props;
+		const { onSelect, multiple, onError, allowedTypes, mediaUpload } = this.props;
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		mediaUpload( {
 			allowedTypes,
@@ -136,6 +135,7 @@ export class MediaPlaceholder extends Component {
 			notices,
 			allowedTypes = [],
 			hasUploadPermissions,
+			mediaUpload,
 		} = this.props;
 
 		const {
@@ -202,19 +202,23 @@ export class MediaPlaceholder extends Component {
 				notices={ notices }
 			>
 				<MediaUploadCheck>
-					<DropZone
-						onFilesDrop={ this.onFilesUpload }
-						onHTMLDrop={ onHTMLDrop }
-					/>
-					<FormFileUpload
-						isLarge
-						className="editor-media-placeholder__button"
-						onChange={ this.onUpload }
-						accept={ accept }
-						multiple={ multiple }
-					>
-						{ __( 'Upload' ) }
-					</FormFileUpload>
+					{ !! mediaUpload && (
+						<Fragment>
+							<DropZone
+								onFilesDrop={ this.onFilesUpload }
+								onHTMLDrop={ onHTMLDrop }
+							/>
+							<FormFileUpload
+								isLarge
+								className="editor-media-placeholder__button"
+								onChange={ this.onUpload }
+								accept={ accept }
+								multiple={ multiple }
+							>
+								{ __( 'Upload' ) }
+							</FormFileUpload>
+						</Fragment>
+					) }
 					<MediaUpload
 						gallery={ multiple && this.onlyAllowsImages() }
 						multiple={ multiple }
@@ -259,9 +263,11 @@ export class MediaPlaceholder extends Component {
 
 const applyWithSelect = withSelect( ( select ) => {
 	const { canUser } = select( 'core' );
+	const { getEditorSettings } = select( 'core/block-editor' );
 
 	return {
 		hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
+		mediaUpload: getEditorSettings().__experimentalMediaUpload,
 	};
 } );
 
