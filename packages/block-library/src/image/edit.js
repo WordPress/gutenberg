@@ -46,6 +46,7 @@ import { Component, Fragment } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -356,6 +357,7 @@ class ImageEdit extends Component {
 			noticeUI,
 			toggleSelection,
 			isRTL,
+			insertBlocksAfter,
 		} = this.props;
 		const {
 			url,
@@ -693,6 +695,7 @@ class ImageEdit extends Component {
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							isSelected={ this.state.captionFocused }
 							inlineToolbar
+							onEnterAtEnd={ () => insertBlocksAfter( createBlock( 'core/paragraph' ) ) }
 						/>
 					) }
 				</figure>

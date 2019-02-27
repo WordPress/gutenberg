@@ -645,15 +645,21 @@ export class RichText extends Component {
 				}
 			}
 
-			if ( this.multilineTag ) {
-				if ( event.shiftKey ) {
-					this.onChange( insertLineBreak( record ) );
-				} else if ( this.onSplit && isEmptyLine( record ) ) {
+			if ( event.shiftKey ) {
+				this.onChange( insertLineBreak( record ) );
+			} else if ( this.multilineTag ) {
+				if ( this.onSplit && isEmptyLine( record ) ) {
 					this.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
 					this.onChange( insertLineSeparator( record ) );
 				}
-			} else if ( event.shiftKey || ! this.onSplit ) {
+			} else if (
+				this.props.onEnterAtEnd &&
+				isCollapsed( record ) &&
+				record.text.length === record.start
+			) {
+				this.props.onEnterAtEnd();
+			} else if ( ! this.onSplit ) {
 				this.onChange( insertLineBreak( record ) );
 			} else {
 				this.splitContent();
