@@ -764,12 +764,13 @@ successfully.
 
 *Parameters*
 
- * previousPost: The previous post prior to update.
- * post: The new post after update
- * isRevision: Whether the post is a revision or not.
- * options: Options passed through from the original action
-dispatch.
- * postType: The post type object.
+ * data: The data for the action.
+ * data.previousPost: The previous post prior to update.
+ * data.post: The new post after update
+ * data.isRevision: Whether the post is a revision or not.
+ * data.options: Options passed through from the original
+																			action dispatch.
+ * data.postType: The post type object.
 
 ### __experimentalRequestPostUpdateFailure
 
@@ -778,11 +779,12 @@ with a failure.
 
 *Parameters*
 
- * post: The post that failed updating.
- * edits: The fields that were being updated.
- * error: The error from the failed call.
- * options: Options passed through from the original action
-dispatch.
+ * data: The data for the action
+ * data.post: The post that failed updating.
+ * data.edits: The fields that were being updated.
+ * data.error: The error from the failed call.
+ * data.options: Options passed through from the original
+																action dispatch.
 
 ### updatePost
 
@@ -795,7 +797,8 @@ latest version of the post have been received.
 
 ### setupEditorState
 
-Returns an action object used to setup the editor state when first opening an editor.
+Returns an action object used to setup the editor state when first opening
+an editor.
 
 *Parameters*
 
@@ -915,7 +918,8 @@ to be updated.
 
 ### __experimentalConvertBlockToStatic
 
-Returns an action object used to convert a reusable block into a static block.
+Returns an action object used to convert a reusable block into a static
+block.
 
 *Parameters*
 
@@ -923,7 +927,8 @@ Returns an action object used to convert a reusable block into a static block.
 
 ### __experimentalConvertBlockToReusable
 
-Returns an action object used to convert a static block into a reusable block.
+Returns an action object used to convert a static block into a reusable
+block.
 
 *Parameters*
 
@@ -931,11 +936,13 @@ Returns an action object used to convert a static block into a reusable block.
 
 ### enablePublishSidebar
 
-Returns an action object used in signalling that the user has enabled the publish sidebar.
+Returns an action object used in signalling that the user has enabled the
+publish sidebar.
 
 ### disablePublishSidebar
 
-Returns an action object used in signalling that the user has disabled the publish sidebar.
+Returns an action object used in signalling that the user has disabled the
+publish sidebar.
 
 ### lockPostSaving
 
