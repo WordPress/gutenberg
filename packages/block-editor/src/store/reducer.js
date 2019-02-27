@@ -12,6 +12,7 @@ import {
 	keys,
 	isEqual,
 	isEmpty,
+	get,
 } from 'lodash';
 
 /**
@@ -187,20 +188,51 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 
+	/**
+	 * Set of action types for which a blocks state change should be considered
+	 * non-persistent.
+	 *
+	 * @type {Set}
+	 */
+	const IGNORED_ACTION_TYPES = new Set( [
+		'RECEIVE_BLOCKS',
+	] );
+
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
+
 		const isExplicitPersistentChange = action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT';
 
-		if ( state !== nextState || isExplicitPersistentChange ) {
-			nextState = {
+		// Defer to previous state value (or default) unless changing or
+		// explicitly marking as persistent.
+		if ( state === nextState && ! isExplicitPersistentChange ) {
+			return {
 				...nextState,
-				isPersistentChange: (
-					isExplicitPersistentChange ||
-					! isUpdatingSameBlockAttribute( action, lastAction )
-				),
+				isPersistentChange: get( state, [ 'isPersistentChange' ], true ),
 			};
 		}
 
+		// Some state changes should not be considered persistent, namely those
+		// which are not a direct result of user interaction.
+		const isIgnoredActionType = IGNORED_ACTION_TYPES.has( action.type );
+		if ( isIgnoredActionType ) {
+			return {
+				...nextState,
+				isPersistentChange: false,
+			};
+		}
+
+		nextState = {
+			...nextState,
+			isPersistentChange: (
+				isExplicitPersistentChange ||
+				! isUpdatingSameBlockAttribute( action, lastAction )
+			),
+		};
+
+		// In comparing against the previous action, consider only those which
+		// would have qualified as one which would have been ignored or not
+		// have resulted in a changed state.
 		lastAction = action;
 
 		return nextState;

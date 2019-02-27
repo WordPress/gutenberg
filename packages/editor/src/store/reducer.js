@@ -134,7 +134,6 @@ export const editor = flow( [
 	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
 		ignoreTypes: [
-			'RECEIVE_BLOCKS',
 			'RESET_POST',
 			'UPDATE_POST',
 		],
