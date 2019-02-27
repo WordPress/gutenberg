@@ -116,7 +116,8 @@
 			content: "";
 			position: absolute;
 			outline: $border-width solid transparent;
-			transition: outline 0.1s linear;
+			box-shadow: none;
+			transition: outline 0.1s linear, box-shadow 0.1s linear;
 			pointer-events: none;
 
 			// Go edge-to-edge on mobile.
@@ -131,15 +132,17 @@
 	&.is-selected > .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
 		outline: $border-width solid $dark-opacity-light-500;
+		box-shadow: ($border-width * -3) 0 0 0 $dark-opacity-500;
 
 		.is-dark-theme & {
 			outline-color: $light-opacity-light-500;
+			box-shadow: ($border-width * -3) 0 0 0 $light-opacity-600;
 		}
 	}
 
 	// Hover style.
 	&.is-hovered > .editor-block-list__block-edit::before {
-		outline: $border-width solid theme(outlines);
+		box-shadow: ($border-width * -3) 0 0 0 theme(outlines);
 	}
 
 	// Spotlight mode.

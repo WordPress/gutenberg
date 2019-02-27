@@ -4,6 +4,7 @@
 	width: 100%;
 	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
+	transition: border-color 0.1s linear, box-shadow 0.1s linear;
 
 	// Allow overflow on desktop.
 	@include break-small() {
@@ -11,7 +12,8 @@
 	}
 
 	// Show a left border on the parent container.
-	border-left: $border-width solid $light-gray-500;
+	border-left: $border-width solid $dark-opacity-500;
+	box-shadow: ($border-width * -2) 0 0 0 $dark-opacity-500;
 
 	// The component is born with a border, but we only need some of them.
 	.components-toolbar {
