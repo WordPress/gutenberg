@@ -31,8 +31,9 @@ This command will generate a file named `entry-point-api.md` containing all the 
   * *symbols* `(Array)`: the symbols found.
 * **--ignore** `(RegExp)`: A regular expression used to ignore symbols whose name match it.
 * **--output** `(String)`: Output file that will contain the API documentation.
+* **--to-section** `(String)`: Append generated documentation to this section in the Markdown output. To be used by the default Markdown formatter. Depends on `--output` and bypasses the custom `--formatter` passed, if any.
+* **--to-token**: Embed generated documentation within this token in the Markdown output. To be used by the default Markdown formatter.Depends on `--output` and bypasses the custom `--formatter` passed, if any.
 * **--debug**: Run in debug mode, which outputs some intermediate files useful for debugging
-* **--append** `(String)`: Title of the Markdown section to append the generated documentation to. It takes precedence over and bypasses the *--formatter* option.
 
 ## Examples
 
