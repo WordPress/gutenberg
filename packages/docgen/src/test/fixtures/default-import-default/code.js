@@ -1,6 +1,6 @@
 /**
  * Internal dependencies
  */
-import fnDeclaration from './default-import-default-module';
+import fnDeclaration from './module-code';
 
 export default fnDeclaration;
