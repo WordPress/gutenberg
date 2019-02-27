@@ -247,25 +247,4 @@ Should there be any situation where you want to provide your own Webpack config,
 * the command receives a `--config` argument. Example: `wp-scripts build --config my-own-webpack-config.js`.
 * there is a file called `webpack.config.js` or `webpack.config.babel.js` in the top-level directory of your package (at the same level than your `package.json`).
 
-### Extend the default config
-
-The `build` and `start` commands will detect if you provided a Webpack config, as explained in the previous section. You can still use the default and extend it so you don't have to craft your own solution if you only want to tweak the default.
-
-Let's say that you want Webpack to take as input a file named `my-plugin.js`. This is how you'd do it:
-
-* Create a file called `webpack.config.js` at the top-level directory of your package.
-* Fill it with the following contents:
-
-```js
-const defaultConfig = require( '@wordpress/scripts/config/webpack.config.js' );
-module.exports = {
-	...defaultConfig,
-	entry: './my-plugin.js',
-	plugins: [
-		...defaultConfig.plugins,
-		// add your own plugin after the default ones
-	],
-};
-```
-
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
