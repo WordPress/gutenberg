@@ -186,7 +186,7 @@ If you don't have access to [make.wordpress.org/core](https://make.wordpress.org
 
 ## Packages Releases and WordPress Core Updates
 
-The Gutenberg repository mirrors the WordPress SVN repository in terms of branching for each SVN branch, a corresponding Gutenberg `wp/*` branch is created:
+The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wordpress.org/core/handbook/about/release-cycle/) in terms of branching for each SVN branch, a corresponding Gutenberg `wp/*` branch is created:
 
  - The `wp/trunk` branch contains all the packages that are published and used in the `trunk` branch of WordPress.
  - A Gutenberg branch targetting a specific WordPress release and its minors is created (example `wp/5.2`) based on the `wp/trunk` Gutenberg branch when the WordPress `trunk` branch is marked as "feature-freezed". (This usually happens when the first `beta` of the next WordPress major version is released).
