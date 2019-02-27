@@ -1046,6 +1046,12 @@ describe( 'state', () => {
 			} );
 
 			describe( 'isPersistentChange', () => {
+				it( 'should default a changing state to true', () => {
+					const state = deepFreeze( blocks( undefined, {} ) );
+
+					expect( state.isPersistentChange ).toBe( true );
+				} );
+
 				it( 'should consider any non-exempt block change as persistent', () => {
 					const original = deepFreeze( blocks( undefined, {
 						type: 'RESET_BLOCKS',
@@ -1063,8 +1069,8 @@ describe( 'state', () => {
 					expect( state.isPersistentChange ).toBe( true );
 				} );
 
-				it( 'should consider same block attribute update as exempt', () => {
-					const original = deepFreeze( blocks( undefined, {
+				it( 'should consider any non-exempt block change as persistent across unchanging actions', () => {
+					let original = deepFreeze( blocks( undefined, {
 						type: 'RESET_BLOCKS',
 						blocks: [ {
 							clientId: 'kumquat',
@@ -1072,7 +1078,17 @@ describe( 'state', () => {
 							innerBlocks: [],
 						} ],
 					} ) );
-					let state = blocks( original, {
+					original = blocks( original, {
+						type: 'NOOP',
+					} );
+					original = blocks( original, {
+						// While RECEIVE_BLOCKS changes state, it's considered
+						// as ignored, confirmed by this test.
+						type: 'RECEIVE_BLOCKS',
+						blocks: [],
+					} );
+
+					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
 						clientId: 'kumquat',
 						attributes: {
@@ -1080,12 +1096,76 @@ describe( 'state', () => {
 						},
 					} );
 
-					state = blocks( state, {
+					expect( state.isPersistentChange ).toBe( true );
+				} );
+
+				it( 'should consider same block attribute update as exempt', () => {
+					let original = deepFreeze( blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ {
+							clientId: 'kumquat',
+							attributes: {},
+							innerBlocks: [],
+						} ],
+					} ) );
+					original = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: false,
+						},
+					} );
+
+					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
 						clientId: 'kumquat',
 						attributes: {
 							updated: true,
 						},
+					} );
+
+					expect( state.isPersistentChange ).toBe( false );
+				} );
+
+				it( 'should flag an explicitly marked persistent change', () => {
+					let original = deepFreeze( blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ {
+							clientId: 'kumquat',
+							attributes: {},
+							innerBlocks: [],
+						} ],
+					} ) );
+					original = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: false,
+						},
+					} );
+					original = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					const state = blocks( original, {
+						type: 'MARK_LAST_CHANGE_AS_PERSISTENT',
+					} );
+
+					expect( state.isPersistentChange ).toBe( true );
+				} );
+
+				it( 'should not consider received blocks as persistent change', () => {
+					const state = blocks( undefined, {
+						type: 'RECEIVE_BLOCKS',
+						blocks: [ {
+							clientId: 'kumquat',
+							attributes: {},
+							innerBlocks: [],
+						} ],
 					} );
 
 					expect( state.isPersistentChange ).toBe( false );
