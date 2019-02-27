@@ -21,11 +21,9 @@
 		"docgen": "./bin/cli.js"
 	},
 	"dependencies": {
-		"optionator": "0.8.2"
-	},
-	"devDependencies": {
 		"mdast-util-inject": "1.1.0",
-		"remark": "9.0.0",
+		"optionator": "0.8.2",
+		"remark": "10.0.1",
 		"remark-parse": "6.0.3",
 		"unified": "7.1.0"
 	},
