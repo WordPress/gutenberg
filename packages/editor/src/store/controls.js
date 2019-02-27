@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { default as triggerFetch } from '@wordpress/api-fetch';
+import triggerFetch from '@wordpress/api-fetch';
 import { createRegistryControl } from '@wordpress/data';
 
 export function apiFetch( request ) {
