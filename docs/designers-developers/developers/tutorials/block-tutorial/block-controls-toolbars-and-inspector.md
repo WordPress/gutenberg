@@ -185,8 +185,12 @@ var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
 	RichText = wp.editor.RichText,
 	InspectorControls = wp.editor.InspectorControls,
-	AlignmentToolbar = wp.editor.AlignmentToolbar;
-
+	CheckboxControl = wp.components.CheckboxControl,
+	RadioControl = wp.components.RadioControl,
+	TextControl = wp.components.TextControl,
+	ToggleControl = wp.components.ToggleControl,
+	SelectControl = wp.components.SelectControl;
+  
 registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 	title: 'Hello World (Step 4)',
 
@@ -200,63 +204,205 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 			source: 'html',
 			selector: 'p',
 		},
-		alignment: {
+		checkboxField: {
+			type: 'boolean',
+			default: true,
+		},
+		radioField: {
+			type: 'string',
+			default: 'yes',
+		},
+		textField: {
+			type: 'string',
+		},
+		toggleField: {
+			type: 'boolean',
+		},
+		selectField: {
 			type: 'string',
 		},
 	},
 
 	edit: function( props ) {
 		var content = props.attributes.content,
-			alignment = props.attributes.alignment;
+			props.attributes.checkboxField,
+			props.attributes.radioField,
+			props.attributes.textField,
+			props.attributes.toggleField,
+			props.attributes.selectField;
 
 		function onChangeContent( newContent ) {
 			props.setAttributes( { content: newContent } );
 		}
 
-		function onChangeAlignment( newAlignment ) {
-			props.setAttributes( { alignment: newAlignment } );
+		function onChangeCheckboxField( newValue ) {
+			props.setAttributes( { checkboxField: newValue } );
 		}
 
+		function onChangeRadioField( newValue ) {
+			props.setAttributes( { radioField: newValue } );
+		}
+
+		function onChangeTextField( newValue ) {
+			props.setAttributes( { textField: newValue } );
+		}
+
+		function onChangeToggleField( newValue ) {
+			props.setAttributes( { toggleField: newValue } );
+		}
+
+		function onChangeSelectField( newValue ) {
+			props.setAttributes( { selectField: newValue } );
+		}
+
+
 		return (
-			el(
-				Fragment,
-				null,
 				el(
-					InspectorControls,
-					null,
+					Fragment, 
+					null, 
 					el(
-						AlignmentToolbar,
+						InspectorControls, 
+						null, 
+						el(
+							CheckboxControl, 
+							{
+								heading: "Checkbox Field",
+								label: "Tick Me",
+								help: "Additional help text",
+								checked: checkboxField,
+								onChange: onChangeCheckboxField
+							}
+						), 
+						el(
+							RadioControl, 
+							{
+								label: "Radio Field",
+								selected: radioField,
+								options: [
+									{
+										label: "Yes",
+										value: "yes"
+									}, 
+									{
+										label: "No",
+										value: "no"
+									}
+								],
+								onChange: onChangeRadioControl
+							}
+						), 
+						el(
+							TextControl, 
+							{
+								label: "Text Field",
+								help: "Additional help text",
+								value: textField,
+								onChange: onChangeTextField
+							}
+						), 
+						el(
+							ToggleControl, 
+							{
+								label: "Toggle Field",
+								checked: toggleField,
+								onChange: onToggleField
+							}
+						), 
+						el(
+							SelectControl, 
+							{
+								label: "Select Control",
+								value: selectControl,
+								options: [
+									{
+										value: "a",
+										label: "Option A"
+									}, 
+									{
+										value: "b",
+										label: "Option B"
+									}, 
+									{
+										value: "c",
+										label: "Option C"
+									}
+								],
+								onChange: onChangeSelectControl
+							}
+						)
+					), 
+					el(
+						RichText, 
 						{
-							value: alignment,
-							onChange: onChangeAlignment,
+							key: "editable",
+							tagName: "p",
+							className: className,
+							onChange: onChangeContent,
+							value: content
 						}
 					)
-				),
-				el(
-					RichText,
-					{
-						key: 'editable',
-						tagName: 'p',
-						className: props.className,
-						style: { textAlign: alignment },
-						onChange: onChangeContent,
-						value: content,
-					}
 				)
-			)
 		);
 	},
 
 	save: function( props ) {
 		var content = props.attributes.content,
-			alignment = props.attributes.alignment;
+			props.attributes.checkboxField,
+			props.attributes.radioField,
+			props.attributes.textField,
+			props.attributes.toggleField,
+			props.attributes.selectField;
 
-		return el( RichText.Content, {
-			tagName: 'p',
-			className: props.className,
-			style: { textAlign: alignment },
-			value: content
-		} );
+		return el(
+					"div", 
+					null, 
+					el(
+						RichText.Content, 
+						{
+							value: content,
+							tagName: "p"
+						}
+					), 
+					el(
+						"h2", 
+						null, 
+						"Inspector Control Fields"
+					), 
+					el(
+						"ul", 
+						null, 
+						el(
+							"li", 
+							null, 
+							"Checkbox Field: ", 
+							checkboxField
+						), 
+						el(
+							"li", 
+							null, 
+							"Radio Field: ", 
+							radioField
+						), 
+						el(
+							"li", 
+							null, 
+							"Text Field: ", 
+							textField
+						), 
+						el(
+							"li", 
+							null, 
+							"Toggle Field: ", 
+							toggleField
+						), 
+						el(
+							"li", 
+							null, 
+							"Select Field: ", 
+							selectField
+						)
+					)
+				);
 	},
 } );
 ```
@@ -265,9 +411,15 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 const { registerBlockType } = wp.blocks;
 const { Fragment } = wp.element;
 const {
+  CheckboxControl,
+  RadioControl,
+  TextControl,
+  ToggleControl,
+  SelectControl
+} = wp.components;
+const {
 	RichText
 	InspectorControls,
-	AlignmentToolbar,
 } = wp.editor;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
@@ -283,35 +435,108 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 			source: 'html',
 			selector: 'p',
 		},
-		alignment: {
+		checkboxField: {
+			type: 'boolean',
+			default: true,
+		},
+		radioField: {
+			type: 'string',
+			default: 'yes',
+		},
+		textField: {
+			type: 'string',
+		},
+		toggleField: {
+			type: 'boolean',
+		},
+		selectField: {
 			type: 'string',
 		},
 	},
 
-	edit( { attributes, className, setAttributes } ) {
-		const { content, alignment } = attributes;
+	edit( { attributes, setAttributes } ) {
+		const { content, checkboxField, radioField, textField, toggleField, selectField } = attributes;
 
 		function onChangeContent( newContent ) {
 			setAttributes( { content: newContent } );
 		}
 
-		function onChangeAlignment( newAlignment ) {
-			setAttributes( { alignment: newAlignment } );
+		function onChangeCheckboxField( newValue ) {
+			setAttributes( { checkboxField: newValue } );
+		}
+
+		function onChangeRadioField( newValue ) {
+			setAttributes( { radioField: newValue } );
+		}
+
+		function onChangeTextField( newValue ) {
+			setAttributes( { textField: newValue } );
+		}
+
+		function onChangeToggleField( newValue ) {
+			setAttributes( { toggleField: newValue } );
+		}
+
+		function onChangeSelectField( newValue ) {
+			setAttributes( { selectField: newValue } );
 		}
 
 		return (
 			<Fragment>
 				<InspectorControls>
-					<AlignmentToolbar
-						value={ alignment }
-						onChange={ onChangeAlignment }
+
+					<CheckboxControl
+						heading="Checkbox Field"
+						label="Tick Me"
+						help="Additional help text"
+						checked={ checkboxField }
+						onChange={ onChangeCheckboxField }
 					/>
+
+					<RadioControl
+						label="Radio Field"
+						selected={ radioField }
+						options={ 
+							[
+								{ label: "Yes", value: "yes" },
+								{ label: "No", value: "no" }
+							] 
+						}
+						onChange={ onChangeRadioControl }
+					/>
+
+					<TextControl
+						label="Text Field"
+						help="Additional help text"
+						value={ textField }
+						onChange={ onChangeTextField }
+					/>
+
+					<ToggleControl
+						label="Toggle Field"
+						checked={ toggleField }
+						onChange={ onToggleField }
+					/>
+
+					<SelectControl
+						label="Select Control"
+						value={ selectControl }
+						options={
+							[
+								{ value: "a", label: "Option A" },
+								{ value: "b", label: "Option B" },
+								{ value: "c", label: "Option C" }
+							]
+						}
+						onChange={ onChangeSelectControl }
+					/>
+
 				</InspectorControls>
+
 				<RichText
 					key="editable"
 					tagName="p"
 					className={ className }
-					style={ { textAlign: alignment } }
 					onChange={ onChangeContent }
 					value={ content }
 				/>
@@ -320,14 +545,24 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	},
 
 	save( { attributes } ) {
-		const { content, alignment } = attributes;
+		const { content, checkboxField, radioField, textField, toggleField, selectField } = attributes;
 
 		return (
-			<RichText.Content
-				style={ { textAlign: alignment } }
-				value={ content }
-				tagName="p"
-			/>
+			<div>
+				<RichText.Content
+					value={ content }
+					tagName="p"
+				/>
+
+				<h2>Inspector Control Fields</h2>
+				<ul>
+					<li>Checkbox Field: {checkboxField}</li>
+					<li>Radio Field: {radioField}</li>
+					<li>Text Field: {textField}</li>
+					<li>Toggle Field: {toggleField}</li>
+					<li>Select Field: {selectField}</li>
+				</ul>
+			</div>
 		);
 	},
 } );
