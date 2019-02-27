@@ -18,7 +18,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"bin": {
-		"docgen": "./src/cli.js"
+		"docgen": "./bin/cli.js"
 	},
 	"dependencies": {
 		"optionator": "0.8.2"
