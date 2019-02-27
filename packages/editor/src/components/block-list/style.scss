@@ -920,9 +920,9 @@
 	line-height: 1;
 	z-index: z-index(".editor-block-list__breadcrumb");
 
-	// Position in the top right of the border.
-	right: -$block-padding;
-	top: -$block-padding - $border-width;
+	// Position in the top left of the border.
+	left: -$block-padding - ($border-width * 3);
+	top: (($block-padding * -2) - ($border-width * 3));
 
 	.components-toolbar {
 		padding: 0;
