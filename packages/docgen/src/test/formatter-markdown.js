@@ -6,7 +6,7 @@ const formatter = require( '../markdown/formatter' );
 describe( 'Formatter', () => {
 	it( 'returns markdown', () => {
 		const rootDir = '/home/my-path';
-		const docPath = 'docs';
+		const docPath = '/home/my-path/docs';
 		const docs = formatter( rootDir, docPath + '-api.md', [ {
 			path: docPath + '-code.js',
 			description: 'My declaration example.',
@@ -28,7 +28,7 @@ describe( 'Formatter', () => {
 			lineEnd: 2,
 		} ], 'API docs' );
 		expect( docs ).toBe(
-			'# API docs\n\n## myDeclaration\n\n[../../../my-path/docs-code.js#L1-L2](../../../my-path/docs-code.js#L1-L2)\n\nMy declaration example.\n\n**Parameters**\n\n- **firstParam** `number`: First declaration parameter.\n\n**Returns**\n\n`number` The result of the declaration.\n'
+			'# API docs\n\n## myDeclaration\n\n[home/my-path/docs-code.js#L1-L2](home/my-path/docs-code.js#L1-L2)\n\nMy declaration example.\n\n**Parameters**\n\n- **firstParam** `number`: First declaration parameter.\n\n**Returns**\n\n`number` The result of the declaration.\n'
 		);
 	} );
 } );
