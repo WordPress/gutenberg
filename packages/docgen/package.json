@@ -24,23 +24,12 @@
 		"optionator": "0.8.2"
 	},
 	"devDependencies": {
-		"faucet": "0.0.1",
 		"mdast-util-inject": "1.1.0",
 		"remark": "9.0.0",
 		"remark-parse": "6.0.3",
-		"tape": "4.9.2",
 		"unified": "7.1.0"
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"scripts": {
-		"test": "tape tests/test-*.js | faucet",
-		"test:engine": "tape tests/test-engine.js | faucet",
-		"test:formatter": "tape tests/test-formatter-markdown.js | faucet",
-		"test:get-export-entries": "tape tests/test-get-export-entries.js | faucet",
-		"test:get-jsdoc-from-token": "tape tests/test-get-jsdoc-from-token.js | faucet",
-		"test:get-intermediate-representation": "tape tests/test-get-intermediate-representation.js | faucet",
-		"test:get-type-as-string": "tape tests/test-get-type-as-string.js | faucet"
 	}
 }
