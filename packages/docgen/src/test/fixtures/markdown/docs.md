@@ -8,7 +8,7 @@ This is some package docs.
 
 ### sum
 
-[markdown-code.js#L22-L24](markdown-code.js#L22-L24)
+[code.js#L22-L24](code.js#L22-L24)
 
 > **Deprecated** Use native addition instead.
 

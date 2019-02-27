@@ -17,8 +17,8 @@ const appendOrEmbedContents = ( { options, newContents } ) => {
 	return function transform( targetAst, file, next ) {
 		if ( options.toSection && ! inject( options.toSection, targetAst, newContents ) ) {
 			return next( new Error( `Heading ${ options.toSection } not found.` ) );
-		} else if ( options.toToken && ! embed( targetAst, newContents ) ) {
-			return next( new Error( `Token not found.` ) );
+		} else if ( options.toToken && ! embed( options.useToken, targetAst, newContents ) ) {
+			return next( new Error( `Start and/or end tokens for ${ options.useToken } not found.` ) );
 		}
 		next();
 	};
