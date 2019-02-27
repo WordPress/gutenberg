@@ -20,14 +20,16 @@ const getHeadingIndex = ( ast, index ) => {
 const embed = function( token, targetAst, newContentAst ) {
 	let headingIndex = -1;
 
+	const START_TOKEN = `<!-- START TOKEN(${ token }) -->`;
+	const END_TOKEN = `<!-- END TOKEN(${ token }) -->`;
 	const startIndex = targetAst.children.findIndex(
-		( node ) => node.type === 'html' && node.value === `<!-- START TOKEN(${ token }) -->`
+		( node ) => node.type === 'html' && node.value === START_TOKEN
 	);
 	if ( startIndex === -1 ) {
 		return false;
 	}
 	const endIndex = targetAst.children.findIndex(
-		( node ) => node.type === 'html' && node.value === `<!-- END TOKEN(${ token }) -->`
+		( node ) => node.type === 'html' && node.value === END_TOKEN
 	);
 	if ( endIndex === -1 ) {
 		return false;
