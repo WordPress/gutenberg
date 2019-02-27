@@ -46,7 +46,14 @@ export function createRegistry( storeConfigs = {} ) {
 	 * Global listener called for each store's update.
 	 */
 	function globalListener() {
-		listeners.forEach( ( listener ) => listener() );
+		listeners.forEach( ( listener ) => {
+			try {
+				listener();
+			} catch ( error ) {
+				// eslint-disable-next-line no-console
+				console.error( error );
+			}
+		} );
 	}
 
 	/**
