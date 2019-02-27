@@ -1,15 +1,23 @@
 /** @format */
 
 import wd from 'wd';
+import child_process from 'child_process';
+import fs from 'fs';
+var out = fs.openSync('./appium-out.log', 'a');
+var err = fs.openSync('./appium-out.log', 'a');
+
+const timer = ms => new Promise( res => setTimeout(res, ms));
+
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 const APPIUM_SERVER_ADDRESS = 'localhost';
-const APPIUM_SERVER_PORT = 4723;
+const APPIUM_SERVER_PORT = 4728;
 
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
 
 var config;
+var appium;
 
 var accessibilityIdKey = 'name';
 if(rnPlatform === 'android' ) {
@@ -21,6 +29,10 @@ if(rnPlatform === 'android' ) {
 		platformName: 'android',
 		deviceName: 'Android Emulator',
 		automationName: 'UiAutomator2',
+		appPackage: 'com.gutenberg',
+		appActivity: 'com.gutenberg.MainActivity',
+		noReset: false,
+		fullReset: true,
 		app: '/Users/javon/Projects/gutenberg-mobile/android/app/build/outputs/apk/debug/app-debug.apk',
 	};
 } else {
@@ -56,6 +68,28 @@ describe( 'Gutenberg Editor tests', () => {
 	var blocks={
 		'core/paragraph': new Set([])
 	};
+
+	const setupAppium = async function(){
+		console.log("Waiting for Appium server to finish booting");
+		var spawn = child_process.spawn;
+		appium = spawn('appium', ['-p', ''+APPIUM_SERVER_PORT],{
+			detached: true, stdio: [ 'ignore', out, err ]
+			
+		});
+		console.log("Spawned child PID is " + appium.pid);
+		await timer(5000);
+		console.log("booted");
+	};
+
+	beforeAll( async() => {
+		console.log("Setting up appium");
+		await setupAppium();
+	});
+
+	afterAll( async() => {
+		console.log("Killing Appium process");
+		appium.kill('SIGINT');
+	});
 
 	beforeEach( async () => {
 		driver = wd.promiseChainRemote( APPIUM_SERVER_ADDRESS, APPIUM_SERVER_PORT );
@@ -95,7 +129,7 @@ describe( 'Gutenberg Editor tests', () => {
 		const newElement = await driver.elementByAccessibilityId(newElementAccessibilityId);
 		blocks[blockName] = currentBlocks;
 		return newElement;
-	}
+	};
 
 	const getNewParagraphBlockTextView = async (newParagraphBlock) => {
 		console.log("getNewParagraphBlocktextTextView");
@@ -109,7 +143,7 @@ describe( 'Gutenberg Editor tests', () => {
 		let newParagraphBlockId = await newParagraphBlock.getAttribute(accessibilityIdKey);
 		const blockLocator = "//*[starts-with(@"+ accessibilityIdKey+", '"+ newParagraphBlockId +"')]//" + textViewElement;
 		return await driver.elementByXPath(blockLocator);
-	}
+	};
 
 	const addParagraphBlock = async () => {
 		console.log("Add a block");
@@ -123,20 +157,21 @@ describe( 'Gutenberg Editor tests', () => {
 		paragraphBlockButton.click();
 
 		return await getNewParagraphBlock();
-	}
+	};
 
 	const typeString = async (element, str) => { // Problem with Appium type function needing to be cleared after first attempt
 		await element.clear();
 		await element.type(str);
 		await element.clear();
 		await element.type(str);
-	}
+	};
 
 	it( 'should be able to see editor', async () => {
 		var newParagraphBlock = await addParagraphBlock();
 
 		let newParagraphBlockTextView = await getNewParagraphBlockTextView(newParagraphBlock);
-		newParagraphBlockTextView.type("Hello Gutenberg!");
+		await newParagraphBlockTextView.click();
+		await newParagraphBlockTextView.type("Hello Gutenberg!");
 
 		expect( await driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
 	} );
