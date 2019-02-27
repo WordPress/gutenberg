@@ -17,6 +17,8 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import transformStyles from '../../editor-styles';
+import { mediaUpload } from '../../utils';
+
 class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -57,6 +59,7 @@ class EditorProvider extends Component {
 				onChange: onMetaChange,
 			},
 			__experimentalReusableBlocks: reusableBlocks,
+			__experimentalMediaUpload: mediaUpload,
 		};
 	}
 
