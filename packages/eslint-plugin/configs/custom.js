@@ -7,6 +7,7 @@ module.exports = {
 		'@wordpress/gutenberg-phase': 'error',
 		'@wordpress/no-unused-vars-before-return': 'error',
 		'@wordpress/valid-sprintf': 'error',
+		'@wordpress/no-base-control-with-label-without-id': 'error',
 		'no-restricted-syntax': [
 			'error',
 			{
@@ -23,6 +24,14 @@ module.exports = {
 			},
 		],
 	},
+	overrides: [
+		{
+			files: [ '*.native.js' ],
+			rules: {
+				'@wordpress/no-base-control-with-label-without-id': 'off',
+			},
+		},
+	],
 	settings: {
 		react: {
 			version: '16.6',
