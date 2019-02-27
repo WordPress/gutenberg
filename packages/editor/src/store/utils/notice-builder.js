@@ -17,8 +17,9 @@ import { get, includes } from 'lodash';
  * Builds the arguments for a success notification dispatch.
  *
  * @param {Object} data Incoming data to build the arguments from.
- * @return {Array}  Arguments for dispatch. An empty array signals no
- * notification should be sent.
+ *
+ * @return {Array} Arguments for dispatch. An empty array signals no
+ * 								 notification should be sent.
  */
 export function getNotificationArgumentsForSaveSuccess( data ) {
 	const { previousPost, post, postType } = data;
@@ -77,8 +78,9 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
  * Builds the fail notification arguments for dispatch.
  *
  * @param {Object} data Incoming data to build the arguments with.
+ *
  * @return {Array} Arguments for dispatch. An empty array signals no
- * notification should be sent.
+ * 								 notification should be sent.
  */
 export function getNotificationArgumentsForSaveFail( data ) {
 	const { post, edits, error } = data;
@@ -105,9 +107,10 @@ export function getNotificationArgumentsForSaveFail( data ) {
 }
 
 /**
- * Builds the trash fail notifiation arguments for dispatch.
+ * Builds the trash fail notification arguments for dispatch.
  *
  * @param {Object} data
+ *
  * @return {Array} Arguments for dispatch.
  */
 export function getNotificationArgumentsForTrashFail( data ) {
