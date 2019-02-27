@@ -22,6 +22,7 @@ import { RawHTML } from '@wordpress/element';
  */
 import * as selectors from '../selectors';
 import { PREFERENCES_DEFAULTS } from '../defaults';
+import { POST_UPDATE_TRANSACTION_ID } from '../constants';
 
 const {
 	hasEditorUndo,
@@ -64,7 +65,6 @@ const {
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
 	isPublishSidebarEnabled,
-	POST_UPDATE_TRANSACTION_ID,
 	isPermalinkEditable,
 	getPermalink,
 	getPermalinkParts,
