@@ -42,7 +42,7 @@ This command will generate a file named `entry-point-api.md` containing all the 
 
 ### Default export
 
-Entry point:
+Entry point `index.js`:
 
 ```js
 /**
@@ -57,7 +57,7 @@ export default function addition( term1, term2 ) {
 }
 ```
 
-Output:
+Output of `npx docgen index.js` would be `index-api.js`:
 
 ```markdown
 # API
@@ -80,7 +80,7 @@ Adds two numbers.
 
 ### Named export
 
-Entry point:
+Entry point `index.js`:
 
 ```js
 /**
@@ -110,7 +110,7 @@ function count( term1, term2 ) {
 export { count, addition };
 ```
 
-Output:
+Output of `npx docgen index.js` would be `index-api.js`:
 
 ```markdown
 # API
@@ -150,7 +150,7 @@ Adds two numbers.
 
 ### Namespace export
 
-Let the entry point be:
+Let the entry point be `index.js`:
 
 ```js
 export * from './count';
@@ -197,7 +197,7 @@ export function addition( term1, term2 ) {
 }
 ```
 
-Output would be:
+Output of `npx docgen index.js` would be `index-api.js`:
 
 ````markdown
 # API
