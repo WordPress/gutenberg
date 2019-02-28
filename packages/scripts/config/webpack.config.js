@@ -76,7 +76,7 @@ const babelLoader = hasBabelConfig() ? {
 	use: {
 		loader: require.resolve( 'babel-loader' ),
 		options: {
-			presets: [ '@wordpress/babel-preset-default' ],
+			presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
 		},
 	},
 };
