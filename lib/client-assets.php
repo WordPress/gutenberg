@@ -93,7 +93,7 @@ function gutenberg_override_script( $handle, $src, $deps = array(), $ver = false
 	 * See: https://core.trac.wordpress.org/ticket/46089
 	 */
 	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
-		wp_set_script_translations( $handle );
+		wp_set_script_translations( $handle, 'default' );
 	}
 }
 
