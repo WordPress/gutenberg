@@ -267,11 +267,10 @@ class RCTAztecView: Aztec.TextView {
             (start, end) = (end, start)
         }
         
-        var result: [String : Any] = [
-            "text": getHTML(),
-            "selectionStart": start,
-            "selectionEnd": end
-        ]
+        var result: [AnyHashable : Any] = packForRN(getHTML(), withName: "text")
+
+        result["selectionStart"] = start
+        result["selectionEnd"] = end
         
         if let selectedTextRange = selectedTextRange {
             let caretEndRect = caretRect(for: selectedTextRange.end)
