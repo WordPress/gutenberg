@@ -71,20 +71,6 @@ const MyFormToggle = withState( {
 
 The component accepts the following props:
 
-#### label
-
-If this property is added, a label will be generated using label property as the content.
-
-- Type: `String`
-- Required: No
-
-#### help
-
-If this property is added, a help text will be generated using help property as the content.
-
-- Type: `String` | `Function`
-- Required: No
-
 #### checked
 
 If checked is true the toggle will be checked. If checked is false the toggle will be unchecked.

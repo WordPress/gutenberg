@@ -8,8 +8,6 @@ import { shallow } from 'enzyme';
  */
 import IconButton from '../';
 
-jest.mock( '../../button' );
-
 describe( 'IconButton', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an top level element with only a class property', () => {
@@ -30,7 +28,7 @@ describe( 'IconButton', () => {
 
 		it( 'should add an aria-label when the label property is used', () => {
 			const iconButton = shallow( <IconButton label="WordPress">WordPress</IconButton> );
-			expect( iconButton.name() ).toBe( 'Button' );
+			expect( iconButton.name() ).toBe( 'ForwardRef(Button)' );
 			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 
@@ -38,7 +36,7 @@ describe( 'IconButton', () => {
 			const iconButton = shallow( <IconButton label="WordPress" /> );
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
-			expect( iconButton.find( 'Button' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
+			expect( iconButton.find( 'ForwardRef(Button)' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 
 		it( 'should support explicit aria-label override', () => {
@@ -60,12 +58,12 @@ describe( 'IconButton', () => {
 			const iconButton = shallow( <IconButton label="WordPress" tooltip="Custom" /> );
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'Custom' );
-			expect( iconButton.find( 'Button' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
+			expect( iconButton.find( 'ForwardRef(Button)' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 
 		it( 'should allow tooltip disable', () => {
 			const iconButton = shallow( <IconButton label="WordPress" tooltip={ false } /> );
-			expect( iconButton.name() ).toBe( 'Button' );
+			expect( iconButton.name() ).toBe( 'ForwardRef(Button)' );
 			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 

@@ -74,7 +74,7 @@ export function DefaultBlockAppender( {
 export default compose(
 	withState( { hovered: false } ),
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getBlockName, isBlockValid, getEditorSettings, getTemplateLock } = select( 'core/editor' );
+		const { getBlockCount, getBlockName, isBlockValid, getEditorSettings, getTemplateLock } = select( 'core/block-editor' );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
 		const isLastBlockDefault = getBlockName( ownProps.lastBlockClientId ) === getDefaultBlockName();
@@ -92,7 +92,7 @@ export default compose(
 		const {
 			insertDefaultBlock,
 			startTyping,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			onAppend() {

@@ -78,7 +78,8 @@ function Layout( {
 				aria-label={ __( 'Editor content' ) }
 				tabIndex="-1"
 			>
-				<EditorNotices />
+				<EditorNotices dismissible={ false } className="is-pinned" />
+				<EditorNotices dismissible={ true } />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
 				<KeyboardShortcutHelpModal />
@@ -136,7 +137,7 @@ export default compose(
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+		isRichEditingEnabled: select( 'core/block-editor' ).getEditorSettings().richEditingEnabled,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );

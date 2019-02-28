@@ -33,7 +33,8 @@ export function PageTemplate( { availableTemplates, selectedTemplate, onUpdate }
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getEditorSettings } = select( 'core/block-editor' );
 		const { availableTemplates } = getEditorSettings();
 		return {
 			selectedTemplate: getEditedPostAttribute( 'template' ),

@@ -1,11 +1,11 @@
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import BlockSwitcher from '../block-switcher';
 import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
@@ -47,7 +47,7 @@ export default withSelect( ( select ) => {
 		getBlockMode,
 		getMultiSelectedBlockClientIds,
 		isBlockValid,
-	} = select( 'core/editor' );
+	} = select( 'core/block-editor' );
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const blockClientIds = selectedBlockClientId ?
 		[ selectedBlockClientId ] :

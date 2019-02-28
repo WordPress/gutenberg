@@ -13,7 +13,8 @@
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/is-shallow-equal/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git"
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/is-shallow-equal"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -24,7 +25,7 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0"
+		"@babel/runtime": "^7.3.1"
 	},
 	"publishConfig": {
 		"access": "public"

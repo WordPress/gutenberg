@@ -108,6 +108,12 @@
 		"parent": "developers"
 	},
 	{
+		"title": "Feature Flags",
+		"slug": "feature-flags",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/feature-flags.md",
+		"parent": "developers"
+	},
+	{
 		"title": "Data Module Reference",
 		"slug": "data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/README.md",
@@ -552,6 +558,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/block-editor",
+		"slug": "packages-block-editor",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/block-editor/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/block-library",
 		"slug": "packages-block-library",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/block-library/README.md",
@@ -651,6 +663,12 @@
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/edit-post/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/edit-widgets",
+		"slug": "packages-edit-widgets",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/edit-widgets/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1236,7 +1254,13 @@
 		"parent": "data"
 	},
 	{
-		"title": "The Editor’s Data",
+		"title": "The Block Editor’s Data",
+		"slug": "data-core-block-editor",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-block-editor.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Post Editor’s Data",
 		"slug": "data-core-editor",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-editor.md",
 		"parent": "data"

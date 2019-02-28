@@ -33,6 +33,7 @@ import {
 	toHTMLString,
 	getTextContent,
 	insert,
+	insertLineBreak,
 	insertLineSeparator,
 	isEmptyLine,
 	unstableToDom,
@@ -66,7 +67,22 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
  * Browser dependencies
  */
 
-const { getSelection } = window;
+const { getSelection, getComputedStyle } = window;
+
+/**
+ * All inserting input types that would insert HTML into the DOM.
+ *
+ * @see  https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
+ *
+ * @type {Set}
+ */
+const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
+	'insertParagraph',
+	'insertOrderedList',
+	'insertUnorderedList',
+	'insertHorizontalRule',
+	'insertLink',
+] );
 
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
@@ -110,6 +126,7 @@ export class RichText extends Component {
 		this.setRef = this.setRef.bind( this );
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
+		this.onPointerDown = this.onPointerDown.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
@@ -134,7 +151,20 @@ export class RichText extends Component {
 	}
 
 	setRef( node ) {
-		this.editableRef = node;
+		if ( node ) {
+			if ( process.env.NODE_ENV === 'development' ) {
+				const computedStyle = getComputedStyle( node );
+
+				if ( computedStyle.display === 'inline' ) {
+					// eslint-disable-next-line no-console
+					console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
+				}
+			}
+
+			this.editableRef = node;
+		} else {
+			delete this.editableRef;
+		}
 	}
 
 	setFocusedElement() {
@@ -156,7 +186,8 @@ export class RichText extends Component {
 	}
 
 	createRecord() {
-		const range = getSelection().getRangeAt( 0 );
+		const selection = getSelection();
+		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
 		return create( {
 			element: this.editableRef,
@@ -167,13 +198,14 @@ export class RichText extends Component {
 		} );
 	}
 
-	applyRecord( record ) {
+	applyRecord( record, { domOnly } = {} ) {
 		apply( {
 			value: record,
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
+			__unstableDomOnly: domOnly,
 		} );
 	}
 
@@ -343,8 +375,23 @@ export class RichText extends Component {
 		// (CJK), do not trigger a change if characters are being composed.
 		// Browsers setting `isComposing` to `true` will usually emit a final
 		// `input` event when the characters are composed.
-		if ( event.nativeEvent.isComposing ) {
+		if ( event && event.nativeEvent.isComposing ) {
 			return;
+		}
+
+		if ( event && event.nativeEvent.inputType ) {
+			const { inputType } = event.nativeEvent;
+
+			// The browser formatted something or tried to insert HTML.
+			// Overwrite it. It will be handled later by the format library if
+			// needed.
+			if (
+				inputType.indexOf( 'format' ) === 0 ||
+				INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType )
+			) {
+				this.applyRecord( this.getRecord() );
+				return;
+			}
 		}
 
 		let { selectedFormat } = this.state;
@@ -385,7 +432,7 @@ export class RichText extends Component {
 	onCompositionEnd() {
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
-		this.onChange( this.createRecord() );
+		this.onInput();
 	}
 
 	/**
@@ -419,7 +466,7 @@ export class RichText extends Component {
 			}
 
 			this.setState( { start, end, selectedFormat } );
-			this.applyRecord( { ...value, selectedFormat } );
+			this.applyRecord( { ...value, selectedFormat }, { domOnly: true } );
 
 			delete this.formatPlaceholder;
 		}
@@ -599,27 +646,15 @@ export class RichText extends Component {
 			}
 
 			if ( this.multilineTag ) {
-				if ( this.onSplit && isEmptyLine( record ) ) {
+				if ( event.shiftKey ) {
+					this.onChange( insertLineBreak( record ) );
+				} else if ( this.onSplit && isEmptyLine( record ) ) {
 					this.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
 					this.onChange( insertLineSeparator( record ) );
 				}
 			} else if ( event.shiftKey || ! this.onSplit ) {
-				const text = getTextContent( record );
-				const length = text.length;
-				let toInsert = '\n';
-
-				// If the caret is at the end of the text, and there is no
-				// trailing line break or no text at all, we have to insert two
-				// line breaks in order to create a new line visually and place
-				// the caret there.
-				if ( record.end === length && (
-					text.charAt( length - 1 ) !== '\n' || length === 0
-				) ) {
-					toInsert = '\n\n';
-				}
-
-				this.onChange( insert( record, toInsert ) );
+				this.onChange( insertLineBreak( record ) );
 			} else {
 				this.splitContent();
 			}
@@ -750,6 +785,32 @@ export class RichText extends Component {
 		}
 
 		this.onSplit( before, after, ...blocks );
+	}
+
+	/**
+	 * Select object when they are clicked. The browser will not set any
+	 * selection when clicking e.g. an image.
+	 *
+	 * @param  {SyntheticEvent} event Synthetic mousedown or touchstart event.
+	 */
+	onPointerDown( event ) {
+		const { target } = event;
+
+		// If the child element has no text content, it must be an object.
+		if ( target === this.editableRef || target.textContent ) {
+			return;
+		}
+
+		const { parentNode } = target;
+		const index = Array.from( parentNode.childNodes ).indexOf( target );
+		const range = target.ownerDocument.createRange();
+		const selection = getSelection();
+
+		range.setStart( target.parentNode, index );
+		range.setEnd( target.parentNode, index + 1 );
+
+		selection.removeAllRanges();
+		selection.addRange( range );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -988,6 +1049,8 @@ export class RichText extends Component {
 								onKeyDown={ this.onKeyDown }
 								onFocus={ this.onFocus }
 								onBlur={ this.onBlur }
+								onMouseDown={ this.onPointerDown }
+								onTouchStart={ this.onPointerDown }
 								multilineTag={ this.multilineTag }
 								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
@@ -1041,7 +1104,9 @@ const RichTextContainer = compose( [
 		};
 	} ),
 	withSelect( ( select ) => {
-		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText } = select( 'core/editor' );
+		// This should probably be moved to the block editor settings.
+		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
+		const { isCaretWithinFormattedText } = select( 'core/block-editor' );
 		const { getFormatTypes } = select( 'core/rich-text' );
 
 		return {
@@ -1052,17 +1117,13 @@ const RichTextContainer = compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
-			createUndoLevel,
-			redo,
-			undo,
+			__unstableMarkLastChangeAsPersistent,
 			enterFormattedText,
 			exitFormattedText,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 
 		return {
-			onCreateUndoLevel: createUndoLevel,
-			onRedo: redo,
-			onUndo: undo,
+			onCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
 			onEnterFormattedText: enterFormattedText,
 			onExitFormattedText: exitFormattedText,
 		};
@@ -1115,3 +1176,4 @@ export default RichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { RichTextInserterItem } from './inserter-list-item';
+export { UnstableRichTextInputEvent } from './input-event';

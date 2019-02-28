@@ -214,7 +214,6 @@ class PostLockedModal extends Component {
 export default compose(
 	withSelect( ( select ) => {
 		const {
-			getEditorSettings,
 			isPostLocked,
 			isPostLockTakeover,
 			getPostLockUser,
@@ -222,12 +221,16 @@ export default compose(
 			getActivePostLock,
 			getEditedPostAttribute,
 		} = select( 'core/editor' );
+		const {
+			getEditorSettings,
+		} = select( 'core/block-editor' );
 		const { getPostType } = select( 'core' );
 		return {
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
 			user: getPostLockUser(),
 			postId: getCurrentPostId(),
+			// This setting should not live in the block-editor's store.
 			postLockUtils: getEditorSettings().postLockUtils,
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),

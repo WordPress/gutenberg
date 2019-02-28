@@ -49,7 +49,7 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 
 export default compose(
 	withSelect( ( select, { rootClientId } ) => {
-		const { getInserterItems, getTemplateLock } = select( 'core/editor' );
+		const { getInserterItems, getTemplateLock } = select( 'core/block-editor' );
 		return {
 			items: getInserterItems( rootClientId ),
 			isLocked: !! getTemplateLock( rootClientId ),
@@ -62,9 +62,9 @@ export default compose(
 			onInsert( { name, initialAttributes } ) {
 				const block = createBlock( name, initialAttributes );
 				if ( clientId ) {
-					dispatch( 'core/editor' ).replaceBlocks( clientId, block );
+					dispatch( 'core/block-editor' ).replaceBlocks( clientId, block );
 				} else {
-					dispatch( 'core/editor' ).insertBlock( block, undefined, rootClientId );
+					dispatch( 'core/block-editor' ).insertBlock( block, undefined, rootClientId );
 				}
 			},
 		};

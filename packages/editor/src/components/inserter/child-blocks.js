@@ -32,7 +32,7 @@ export default compose(
 		} = select( 'core/blocks' );
 		const {
 			getBlockName,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
 		const rootBlockName = getBlockName( rootClientId );
 		const rootBlockType = getBlockType( rootBlockName );
 		return {

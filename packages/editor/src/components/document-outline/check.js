@@ -19,5 +19,5 @@ function DocumentOutlineCheck( { blocks, children } ) {
 }
 
 export default withSelect( ( select ) => ( {
-	blocks: select( 'core/editor' ).getBlocks(),
+	blocks: select( 'core/block-editor' ).getBlocks(),
 } ) )( DocumentOutlineCheck );

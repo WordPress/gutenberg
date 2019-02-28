@@ -19,7 +19,7 @@ export function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockClien
 
 export default withSelect(
 	( select ) => {
-		const selectedBlockClientIds = select( 'core/editor' ).getMultiSelectedBlockClientIds();
+		const selectedBlockClientIds = select( 'core/block-editor' ).getMultiSelectedBlockClientIds();
 		return {
 			isMultiBlockSelection: selectedBlockClientIds.length > 1,
 			selectedBlockClientIds,
