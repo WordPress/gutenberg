@@ -27,18 +27,12 @@ import { createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import { PREFERENCES_DEFAULTS } from './defaults';
-import { EDIT_MERGE_PROPERTIES } from './constants';
-
-/***
- * Module constants
- */
-export const POST_UPDATE_TRANSACTION_ID = 'post-update';
-const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
-export const INSERTER_UTILITY_HIGH = 3;
-export const INSERTER_UTILITY_MEDIUM = 2;
-export const INSERTER_UTILITY_LOW = 1;
-export const INSERTER_UTILITY_NONE = 0;
-const ONE_MINUTE_IN_MS = 60 * 1000;
+import {
+	EDIT_MERGE_PROPERTIES,
+	POST_UPDATE_TRANSACTION_ID,
+	PERMALINK_POSTNAME_REGEX,
+	ONE_MINUTE_IN_MS,
+} from './constants';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -124,7 +118,7 @@ export function isEditedPostDirty( state ) {
 		return true;
 	}
 
-	// Edits and change detectiona are reset at the start of a save, but a post
+	// Edits and change detection are reset at the start of a save, but a post
 	// is still considered dirty until the point at which the save completes.
 	// Because the save is performed optimistically, the prior states are held
 	// until committed. These can be referenced to determine whether there's a
@@ -264,7 +258,7 @@ export function getCurrentPostAttribute( state, attributeName ) {
 
 /**
  * Returns a single attribute of the post being edited, preferring the unsaved
- * edit if one exists, but mergiging with the attribute value for the last known
+ * edit if one exists, but merging with the attribute value for the last known
  * saved state of the post (this is needed for some nested attributes like meta).
  *
  * @param {Object} state         Global application state.
