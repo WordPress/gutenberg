@@ -15,11 +15,11 @@ exports[`DotTip should render correctly 1`] = `
     It looks like you’re writing a letter. Would you like help?
   </p>
   <p>
-    <Button
+    <ForwardRef(Button)
       isLink={true}
     >
       Got it
-    </Button>
+    </ForwardRef(Button)>
   </p>
   <IconButton
     className="nux-dot-tip__disable"
