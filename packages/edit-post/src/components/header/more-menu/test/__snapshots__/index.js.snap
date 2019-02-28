@@ -12,54 +12,52 @@ exports[`MoreMenu should match snapshot 1`] = `
     <div
       className="edit-post-more-menu"
     >
-      <IconButton
+      <ForwardRef(IconButton)
         aria-expanded={false}
         icon="ellipsis"
         label="Show more tools & options"
         labelPosition="bottom"
         onClick={[Function]}
       >
-        <Tooltip
-          position="bottom"
-          text="Show more tools & options"
+        <IconButton
+          aria-expanded={false}
+          forwardedRef={null}
+          icon="ellipsis"
+          label="Show more tools & options"
+          labelPosition="bottom"
+          onClick={[Function]}
         >
-          <ForwardRef(Button)
-            aria-expanded={false}
-            aria-label="Show more tools & options"
-            className="components-icon-button"
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
+          <Tooltip
+            position="bottom"
+            text="Show more tools & options"
           >
-            <button
+            <ForwardRef(Button)
               aria-expanded={false}
               aria-label="Show more tools & options"
-              className="components-button components-icon-button"
+              className="components-icon-button"
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
-              type="button"
             >
-              <Dashicon
-                icon="ellipsis"
-                key="0,0"
+              <button
+                aria-expanded={false}
+                aria-label="Show more tools & options"
+                className="components-button components-icon-button"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                type="button"
               >
-                <SVG
-                  aria-hidden={true}
-                  className="dashicon dashicons-ellipsis"
-                  focusable="false"
-                  height={20}
-                  role="img"
-                  viewBox="0 0 20 20"
-                  width={20}
-                  xmlns="http://www.w3.org/2000/svg"
+                <Dashicon
+                  icon="ellipsis"
+                  key="0,0"
                 >
-                  <svg
-                    aria-hidden="true"
+                  <SVG
+                    aria-hidden={true}
                     className="dashicon dashicons-ellipsis"
                     focusable="false"
                     height={20}
@@ -68,20 +66,31 @@ exports[`MoreMenu should match snapshot 1`] = `
                     width={20}
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <Path
-                      d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    <svg
+                      aria-hidden="true"
+                      className="dashicon dashicons-ellipsis"
+                      focusable="false"
+                      height={20}
+                      role="img"
+                      viewBox="0 0 20 20"
+                      width={20}
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      <path
+                      <Path
                         d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                      />
-                    </Path>
-                  </svg>
-                </SVG>
-              </Dashicon>
-            </button>
-          </ForwardRef(Button)>
-        </Tooltip>
-      </IconButton>
+                      >
+                        <path
+                          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                        />
+                      </Path>
+                    </svg>
+                  </SVG>
+                </Dashicon>
+              </button>
+            </ForwardRef(Button)>
+          </Tooltip>
+        </IconButton>
+      </ForwardRef(IconButton)>
     </div>
   </Dropdown>
 </MoreMenu>

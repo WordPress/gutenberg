@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import IconButton from '../';
+import { IconButton } from '../';
 
 describe( 'IconButton', () => {
 	describe( 'basic rendering', () => {

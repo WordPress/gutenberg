@@ -7,7 +7,7 @@ import { isArray, isString } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,9 +18,19 @@ import Dashicon from '../dashicon';
 
 // This is intentionally a Component class, not a function component because it
 // is common to apply a ref to the button element (only supported in class)
-class IconButton extends Component {
+export class IconButton extends Component {
 	render() {
-		const { icon, children, label, className, tooltip, shortcut, labelPosition, ...additionalProps } = this.props;
+		const {
+			icon,
+			children,
+			label,
+			className,
+			tooltip,
+			shortcut,
+			labelPosition,
+			forwardedRef,
+			...additionalProps
+		} = this.props;
 		const { 'aria-pressed': ariaPressed } = this.props;
 		const classes = classnames( 'components-icon-button', className, {
 			'has-text': children,
@@ -44,7 +54,12 @@ class IconButton extends Component {
 		);
 
 		let element = (
-			<Button aria-label={ label } { ...additionalProps } className={ classes }>
+			<Button
+				aria-label={ label }
+				{ ...additionalProps }
+				className={ classes }
+				ref={ forwardedRef }
+			>
 				{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } /> : icon }
 				{ children }
 			</Button>
@@ -62,4 +77,9 @@ class IconButton extends Component {
 	}
 }
 
-export default IconButton;
+const forwardedIconButton = ( props, ref ) => {
+	return <IconButton { ...props } forwardedRef={ ref } />;
+};
+forwardedIconButton.displayName = 'IconButton';
+
+export default forwardRef( forwardedIconButton );
