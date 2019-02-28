@@ -472,7 +472,11 @@ export function* trashPost() {
  * @param {Object?} options Extra flags to identify the autosave.
  */
 export function* autosave( options ) {
-	yield* generatorActions.savePost( { isAutosave: true, ...options } );
+	yield dispatch(
+		STORE_KEY,
+		'savePost',
+		{ isAutosave: true, ...options }
+	);
 }
 
 /**
@@ -734,12 +738,3 @@ export const exitFormattedText = getBlockEditorAction( 'exitFormattedText' );
 export const insertDefaultBlock = getBlockEditorAction( 'insertDefaultBlock' );
 export const updateBlockListSettings = getBlockEditorAction( 'updateBlockListSettings' );
 export const updateEditorSettings = getBlockEditorAction( 'updateEditorSettings' );
-
-// default export of generator actions.
-const generatorActions = {
-	savePost,
-	autosave,
-	trashPost,
-	refreshPost,
-};
-export default generatorActions;

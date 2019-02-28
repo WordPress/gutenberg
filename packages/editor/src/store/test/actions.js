@@ -6,7 +6,7 @@ import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 /**
  * Internal dependencies
  */
-import generatorActions, * as actions from '../actions';
+import * as actions from '../actions';
 import { select, dispatch, apiFetch, resolveSelect } from '../controls';
 import {
 	STORE_KEY,
@@ -491,15 +491,11 @@ describe( 'Post generator actions', () => {
 		} );
 	} );
 	describe( 'autosave()', () => {
-		let savePostSpy;
-		beforeAll( () => savePostSpy = jest.spyOn( generatorActions, 'savePost' ) );
-		afterAll( () => savePostSpy.mockRestore() );
-		// autosave is mostly covered by `savePost` tests so just test the correct call
-		it( 'calls savePost with the correct arguments', () => {
+		it( 'dispatches savePost with the correct arguments', () => {
 			const fulfillment = actions.autosave();
-			fulfillment.next();
-			expect( savePostSpy ).toHaveBeenCalled();
-			expect( savePostSpy ).toHaveBeenCalledWith( { isAutosave: true } );
+			const { value } = fulfillment.next();
+			expect( value.actionName ).toBe( 'savePost' );
+			expect( value.args ).toEqual( [ { isAutosave: true } ] );
 		} );
 	} );
 	describe( 'trashPost()', () => {
