@@ -87,7 +87,7 @@ export default compose(
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 	} ) ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
-		const { getBlockSelectionStart } = select( 'core/editor' );
+		const { getBlockSelectionStart } = select( 'core/block-editor' );
 		const { openGeneralSidebar, closeGeneralSidebar } = dispatch( 'core/edit-post' );
 
 		return {

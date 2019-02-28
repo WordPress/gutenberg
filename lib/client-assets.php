@@ -35,35 +35,6 @@ function gutenberg_url( $path ) {
 }
 
 /**
- * Returns contents of an inline script used in appending polyfill scripts for
- * browsers which fail the provided tests. The provided array is a mapping from
- * a condition to verify feature support to its polyfill script handle.
- *
- * @param array $tests Features to detect.
- * @return string Conditional polyfill inline script.
- */
-function gutenberg_get_script_polyfill( $tests ) {
-	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_get_script_polyfill' );
-
-	global $wp_scripts;
-	return wp_get_script_polyfill( $wp_scripts, $tests );
-}
-
-if ( ! function_exists( 'register_tinymce_scripts' ) ) {
-	/**
-	 * Registers the main TinyMCE scripts.
-	 *
-	 * @deprecated 5.0.0 wp_register_tinymce_scripts
-	 */
-	function register_tinymce_scripts() {
-		_deprecated_function( __FUNCTION__, '5.0.0', 'wp_register_tinymce_scripts' );
-
-		global $wp_scripts;
-		return wp_register_tinymce_scripts( $wp_scripts );
-	}
-}
-
-/**
  * Registers a script according to `wp_register_script`. Honors this request by
  * deregistering any script by the same handler before registration.
  *
@@ -139,21 +110,6 @@ function gutenberg_register_scripts_and_styles() {
 	global $wp_scripts;
 
 	gutenberg_register_vendor_scripts();
-
-	wp_add_inline_script(
-		'wp-polyfill',
-		wp_get_script_polyfill(
-			$wp_scripts,
-			array(
-				'\'fetch\' in window' => 'wp-polyfill-fetch',
-				'document.contains'   => 'wp-polyfill-node-contains',
-				'window.FormData && window.FormData.prototype.keys' => 'wp-polyfill-formdata',
-				'Element.prototype.matches && Element.prototype.closest' => 'wp-polyfill-element-closest',
-			),
-			'after'
-		)
-	);
-
 	gutenberg_register_packages_scripts();
 
 	// Inline scripts.
@@ -205,6 +161,7 @@ function gutenberg_register_scripts_and_styles() {
 				'	wp.data',
 				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } )',
 				'		.use( wp.data.plugins.controls );',
+				'	wp.data.plugins.persistence.__unstableMigrate( { storageKey: storageKey } );',
 				'} )()',
 			)
 		)
@@ -239,33 +196,6 @@ function gutenberg_register_scripts_and_styles() {
 					'timezone' => array(
 						'offset' => get_option( 'gmt_offset', 0 ),
 						'string' => get_option( 'timezone_string', 'UTC' ),
-					),
-				)
-			)
-		),
-		'after'
-	);
-	wp_add_inline_script(
-		'moment',
-		sprintf(
-			"moment.locale( '%s', %s );",
-			get_user_locale(),
-			wp_json_encode(
-				array(
-					'months'         => array_values( $wp_locale->month ),
-					'monthsShort'    => array_values( $wp_locale->month_abbrev ),
-					'weekdays'       => array_values( $wp_locale->weekday ),
-					'weekdaysShort'  => array_values( $wp_locale->weekday_abbrev ),
-					'week'           => array(
-						'dow' => (int) get_option( 'start_of_week', 0 ),
-					),
-					'longDateFormat' => array(
-						'LT'   => get_option( 'time_format', __( 'g:i a', 'default' ) ),
-						'LTS'  => null,
-						'L'    => null,
-						'LL'   => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
-						'LLL'  => __( 'F j, Y g:i a', 'default' ),
-						'LLLL' => null,
 					),
 				)
 			)
@@ -507,23 +437,6 @@ add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 
 /**
- * Append result of internal request to REST API for purpose of preloading
- * data to be attached to the page. Expected to be called in the context of
- * `array_reduce`.
- *
- * @deprecated 5.0.0 rest_preload_api_request
- *
- * @param  array  $memo Reduce accumulator.
- * @param  string $path REST API path to preload.
- * @return array        Modified reduce accumulator.
- */
-function gutenberg_preload_api_request( $memo, $path ) {
-	_deprecated_function( __FUNCTION__, '5.0.0', 'rest_preload_api_request' );
-
-	return rest_preload_api_request( $memo, $path );
-}
-
-/**
  * Registers vendor JavaScript files to be used as dependencies of the editor
  * and plugins.
  *
@@ -533,52 +446,10 @@ function gutenberg_preload_api_request( $memo, $path ) {
  * @since 0.1.0
  */
 function gutenberg_register_vendor_scripts() {
-	$suffix = SCRIPT_DEBUG ? '' : '.min';
-
-	// Vendor Scripts.
-	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
-
-	gutenberg_register_vendor_script(
-		'react',
-		'https://unpkg.com/react@16.6.3/umd/react' . $react_suffix . '.js',
-		array( 'wp-polyfill' )
-	);
-	gutenberg_register_vendor_script(
-		'react-dom',
-		'https://unpkg.com/react-dom@16.6.3/umd/react-dom' . $react_suffix . '.js',
-		array( 'react' )
-	);
-	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
-	gutenberg_register_vendor_script(
-		'moment',
-		'https://unpkg.com/moment@2.22.1/' . $moment_script,
-		array()
-	);
-	gutenberg_register_vendor_script(
-		'lodash',
-		'https://unpkg.com/lodash@4.17.11/lodash' . $suffix . '.js'
-	);
-	wp_add_inline_script( 'lodash', 'window.lodash = _.noConflict();' );
-	gutenberg_register_vendor_script(
-		'wp-polyfill-fetch',
-		'https://unpkg.com/whatwg-fetch@3.0.0/dist/fetch.umd.js'
-	);
-	gutenberg_register_vendor_script(
-		'wp-polyfill-formdata',
-		'https://unpkg.com/formdata-polyfill@3.0.9/formdata.min.js'
-	);
-	gutenberg_register_vendor_script(
-		'wp-polyfill-node-contains',
-		'https://unpkg.com/polyfill-library@3.26.0-0/polyfills/Node/prototype/contains/polyfill.js'
-	);
-	gutenberg_register_vendor_script(
-		'wp-polyfill-element-closest',
-		'https://unpkg.com/element-closest@2.0.2/element-closest.js'
-	);
-	gutenberg_register_vendor_script(
-		'wp-polyfill',
-		'https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill' . $suffix . '.js'
-	);
+	/*
+	 * This function is kept as an empty stub, in case Gutenberg should need to
+	 * explicitly provide a version newer than that provided by core.
+	 */
 }
 
 /**
@@ -681,51 +552,6 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 }
 
 /**
- * Prepares server-registered blocks for JavaScript, returning an associative
- * array of registered block data keyed by block name. Data includes properties
- * of a block relevant for client registration.
- *
- * @deprecated 5.0.0 get_block_editor_server_block_settings
- *
- * @return array An associative array of registered block data.
- */
-function gutenberg_prepare_blocks_for_js() {
-	_deprecated_function( __FUNCTION__, '5.0.0', 'get_block_editor_server_block_settings' );
-
-	return get_block_editor_server_block_settings();
-}
-
-/**
- * Handles the enqueueing of block scripts and styles that are common to both
- * the editor and the front-end.
- *
- * Note: This function must remain *before*
- * `gutenberg_editor_scripts_and_styles` so that editor-specific stylesheets
- * are loaded last.
- *
- * @since 0.4.0
- * @deprecated 5.0.0 wp_common_block_scripts_and_styles
- */
-function gutenberg_common_scripts_and_styles() {
-	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_common_block_scripts_and_styles' );
-
-	wp_common_block_scripts_and_styles();
-}
-
-/**
- * Enqueues registered block scripts and styles, depending on current rendered
- * context (only enqueuing editor scripts while in context of the editor).
- *
- * @since 2.0.0
- * @deprecated 5.0.0 wp_enqueue_registered_block_scripts_and_styles
- */
-function gutenberg_enqueue_registered_block_scripts_and_styles() {
-	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_enqueue_registered_block_scripts_and_styles' );
-
-	wp_enqueue_registered_block_scripts_and_styles();
-}
-
-/**
  * Assigns a default editor template with a default block by post format, if
  * not otherwise assigned for a new post of type "post".
  *
@@ -792,21 +618,6 @@ function gutenberg_get_autosave_newer_than_post_save( $post ) {
 	wp_delete_post_revision( $autosave->ID );
 
 	return false;
-}
-
-/**
- * Returns all the block categories.
- *
- * @since 2.2.0
- * @deprecated 5.0.0 get_block_categories
- *
- * @param  WP_Post $post Post object.
- * @return Object[] Block categories.
- */
-function gutenberg_get_block_categories( $post ) {
-	_deprecated_function( __FUNCTION__, '5.0.0', 'get_block_categories' );
-
-	return get_block_categories( $post );
 }
 
 /**
@@ -1280,13 +1091,4 @@ JS;
 	 * @since 0.4.0
 	 */
 	do_action( 'enqueue_block_editor_assets' );
-}
-
-/**
- * Enqueue the reusable blocks listing page's script
- *
- * @deprecated 5.0.0
- */
-function gutenberg_load_list_reusable_blocks() {
-	_deprecated_function( __FUNCTION__, '5.0.0' );
 }

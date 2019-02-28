@@ -12,7 +12,7 @@ import BlockConvertButton from './block-convert-button';
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {
-		const block = select( 'core/editor' ).getBlock( clientId );
+		const block = select( 'core/block-editor' ).getBlock( clientId );
 
 		return {
 			block,
@@ -20,7 +20,7 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { block } ) => ( {
-		onClick: () => dispatch( 'core/editor' ).replaceBlocks(
+		onClick: () => dispatch( 'core/block-editor' ).replaceBlocks(
 			block.clientId,
 			rawHandler( { HTML: getBlockContent( block ) } ),
 		),

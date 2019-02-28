@@ -64,7 +64,7 @@ const computeOutlineHeadings = ( blocks = [], path = [] ) => {
 
 const isEmptyHeading = ( heading ) => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupported } ) => {
+export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupported, hasOutlineItemsDisabled } ) => {
 	const headings = computeOutlineHeadings( blocks );
 
 	if ( headings.length < 1 ) {
@@ -88,6 +88,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 						isValid
 						onSelect={ onSelect }
 						href={ `#${ titleNode.id }` }
+						isDisabled={ hasOutlineItemsDisabled }
 					>
 						{ title }
 					</DocumentOutlineItem>
@@ -111,8 +112,9 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 							level={ `H${ item.level }` }
 							isValid={ isValid }
 							path={ item.path }
-							onSelect={ onSelect }
+							isDisabled={ hasOutlineItemsDisabled }
 							href={ `#block-${ item.clientId }` }
+							onSelect={ onSelect }
 						>
 							{ item.isEmpty ?
 								emptyHeadingContent :
@@ -133,7 +135,8 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getBlocks } = select( 'core/editor' );
+		const { getBlocks } = select( 'core/block-editor' );
+		const { getEditedPostAttribute } = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 

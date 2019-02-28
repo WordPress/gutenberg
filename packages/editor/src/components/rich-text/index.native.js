@@ -42,6 +42,27 @@ const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
 };
 
+/**
+ * Calls {@link pasteHandler} with a fallback to plain text when HTML processing
+ * results in errors
+ *
+ * @param {Object}  [options]     The options to pass to {@link pasteHandler}
+ *
+ * @return {Array|string}         A list of blocks or a string, depending on
+ *                                `handlerMode`.
+ */
+const saferPasteHandler = ( options ) => {
+	try {
+		return pasteHandler( options );
+	} catch ( error ) {
+		window.console.log( 'Pasting HTML failed:', error );
+		window.console.log( 'HTML:', options.HTML );
+		window.console.log( 'Falling back to plain text.' );
+		// fallback to plain text
+		return pasteHandler( { ...options, HTML: '' } );
+	}
+};
+
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
@@ -289,9 +310,8 @@ export class RichText extends Component {
 					},
 				} );
 				this.lastContent = this.valueToFormat( linkedRecord );
-				this.props.onChange( {
-					content: this.lastContent,
-				} );
+				this.lastEventCount = undefined;
+				this.props.onChange( this.lastContent );
 
 				// Allows us to ask for this information when we get a report.
 				window.console.log( 'Created link:\n\n', trimmedText );
@@ -310,7 +330,7 @@ export class RichText extends Component {
 			mode = 'AUTO';
 		}
 
-		const pastedContent = pasteHandler( {
+		const pastedContent = saferPasteHandler( {
 			HTML: pastedHtml,
 			plainText: pastedText,
 			mode,
@@ -324,9 +344,7 @@ export class RichText extends Component {
 			const newContent = this.valueToFormat( insertedContent );
 			this.lastEventCount = undefined;
 			this.lastContent = newContent;
-			this.props.onChange( {
-				content: this.lastContent,
-			} );
+			this.props.onChange( this.lastContent );
 		} else if ( onSplit ) {
 			if ( ! pastedContent.length ) {
 				return;
@@ -568,4 +586,4 @@ RichTextContainer.Content.defaultProps = {
 export default RichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { RichTextInputEvent } from './input-event';
+export { UnstableRichTextInputEvent } from './input-event';

@@ -3,7 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 
-export class RichTextInputEvent extends Component {
+export class UnstableRichTextInputEvent extends Component {
 	render() {
 		return null;
 	}

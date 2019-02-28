@@ -2,7 +2,7 @@
 
 This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
-To release Gutenberg, you need commit access to the [WordPress.org plugin repository]. 🙂
+To release Gutenberg, you need commit access to the [WordPress.org plugin repository][plugin repository]. 🙂
 
 ## Plugin Releases
 
@@ -192,22 +192,23 @@ WordPress Core Updates are based on the `g-minor` branch. Releasing packages in 
 
 For major WordPress releases, the last Gutenberg plugin release is merged into `g-minor`. This involves the following steps:
 
-1. Checkout the last published Gutenberg's release branch `git checkout release/x.x`
+1. Check out the last published Gutenberg release branch `git checkout release/x.x`
 2. Create a Pull Request from this branch into `g-minor`.
 3. Merge the branch.
 
 ### Minor WordPress Releases
 
-For minor releases, the critical fixes targetted for this WordPress Minor release should be cherry-picked into the `g-minor` branch one by one in their chronological order.
+For minor releases, the critical fixes targeted for this WordPress Minor release should be cherry-picked into the `g-minor` branch one by one in their chronological order.
 
 ### Releasing the WordPress packages
 
-1. Checkout the `g-minor` branch.
-2. Run [the package release process](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#releasing-packages)
-3. Update the `CHANGELOG` files of the published packages with the new released versions and commit to the `g-minor` branch.
+1. Check out the `g-minor` branch.
+2. Run the [package release process].
+3. Update the `CHANGELOG.md` files of the published packages with the new released versions and commit to the `g-minor` branch.
 
 ---------
 
 Ta-da! 🎉
 
 [plugin repository]: https://plugins.trac.wordpress.org/browser/gutenberg/
+[package release process]: https://github.com/WordPress/gutenberg/blob/master/packages/README.md#releasing-packages

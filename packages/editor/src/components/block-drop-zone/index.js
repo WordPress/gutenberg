@@ -138,7 +138,7 @@ export default compose(
 			insertBlocks,
 			updateBlockAttributes,
 			moveBlockToPosition,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			insertBlocks( blocks, index ) {
@@ -156,7 +156,7 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { rootClientId } ) => {
-		const { getClientIdsOfDescendants, getTemplateLock, getBlockIndex } = select( 'core/editor' );
+		const { getClientIdsOfDescendants, getTemplateLock, getBlockIndex } = select( 'core/block-editor' );
 		return {
 			isLocked: !! getTemplateLock( rootClientId ),
 			getClientIdsOfDescendants,

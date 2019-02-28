@@ -75,9 +75,9 @@ export default compose(
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	withSelect( ( select, { clientId, isLargeViewport, isCollapsed } ) => {
-		const { getBlockRootClientId, getEditorSettings } = select( 'core/editor' );
+		const { getBlockRootClientId, getEditorSettings } = select( 'core/block-editor' );
 		return {
-			wideControlsEnabled: select( 'core/editor' ).getEditorSettings().alignWide,
+			wideControlsEnabled: select( 'core/block-editor' ).getEditorSettings().alignWide,
 			isCollapsed: isCollapsed || ! isLargeViewport || (
 				! getEditorSettings().hasFixedToolbar &&
 				getBlockRootClientId( clientId )

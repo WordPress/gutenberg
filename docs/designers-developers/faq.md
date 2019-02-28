@@ -365,8 +365,7 @@ var blocks = wp.blocks.parse( postContent );
 In PHP:
 
 ```php
-$blocks = gutenberg_parse_blocks( $post_content ); // plugin
-$blocks = parse_blocks( $post_content ); // WordPress 5.0
+$blocks = parse_blocks( $post_content );
 ```
 
 ## Why should I start using this once released?

@@ -16,10 +16,10 @@ import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
 
 export default class Cell extends Component {
-	constructor() {
+	constructor( props ) {
 		super( ...arguments );
 		this.state = {
-			isEditingValue: false,
+			isEditingValue: props.autoFocus || false,
 		};
 	}
 
@@ -53,7 +53,7 @@ export default class Cell extends Component {
 
 		const onCellPress = () => {
 			if ( isValueEditable ) {
-				this.setState( { isEditingValue: true } );
+				startEditing();
 			} else if ( onPress !== undefined ) {
 				onPress();
 			}
@@ -61,6 +61,12 @@ export default class Cell extends Component {
 
 		const finishEditing = () => {
 			this.setState( { isEditingValue: false } );
+		};
+
+		const startEditing = () => {
+			if ( this.state.isEditingValue === false ) {
+				this.setState( { isEditingValue: true } );
+			}
 		};
 
 		const separatorStyle = () => {
@@ -97,6 +103,7 @@ export default class Cell extends Component {
 					onChangeText={ onChangeValue }
 					editable={ isValueEditable }
 					pointerEvents={ this.state.isEditingValue ? 'auto' : 'none' }
+					onFocus={ startEditing }
 					onBlur={ finishEditing }
 					{ ...valueProps }
 				/>

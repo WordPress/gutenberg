@@ -26,15 +26,12 @@ const DEFAULT_OPTIONS = {
  *
  * @return {Object} Babel transform plugin.
  */
-export default function( babel ) {
+module.exports = function( babel ) {
 	const { types: t } = babel;
 
 	function getOptions( state ) {
 		if ( ! state._options ) {
-			state._options = {
-				...DEFAULT_OPTIONS,
-				...state.opts,
-			};
+			state._options = Object.assign( {}, DEFAULT_OPTIONS, state.opts );
 		}
 
 		return state._options;
@@ -43,35 +40,16 @@ export default function( babel ) {
 	return {
 		visitor: {
 			JSXElement( path, state ) {
-				state.hasJSX = true;
-			},
-			ImportDeclaration( path, state ) {
-				if ( state.hasImportedScopeVariable ) {
+				if ( state.hasUndeclaredScopeVariable ) {
 					return;
 				}
 
-				const { scopeVariable, isDefault } = getOptions( state );
-
-				// Test that at least one import specifier exists matching the
-				// scope variable name. The module source is not verified since
-				// we must avoid introducing a conflicting import name, even if
-				// the scope variable is referenced from a different source.
-				state.hasImportedScopeVariable = path.node.specifiers.some( ( specifier ) => {
-					switch ( specifier.type ) {
-						case 'ImportSpecifier':
-							return (
-								! isDefault &&
-								specifier.imported.name === scopeVariable
-							);
-
-						case 'ImportDefaultSpecifier':
-							return isDefault;
-					}
-				} );
+				const { scopeVariable } = getOptions( state );
+				state.hasUndeclaredScopeVariable = ! path.scope.hasBinding( scopeVariable );
 			},
 			Program: {
 				exit( path, state ) {
-					if ( ! state.hasJSX || state.hasImportedScopeVariable ) {
+					if ( ! state.hasUndeclaredScopeVariable ) {
 						return;
 					}
 
@@ -99,4 +77,4 @@ export default function( babel ) {
 			},
 		},
 	};
-}
+};

@@ -124,7 +124,7 @@ class ImageEdit extends React.Component {
 	updateMediaProgress( payload ) {
 		const { setAttributes } = this.props;
 		this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
-		if ( payload.mediaUrl !== undefined ) {
+		if ( payload.mediaUrl ) {
 			setAttributes( { url: payload.mediaUrl } );
 		}
 	}

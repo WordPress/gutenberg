@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import memize from 'memize';
+
+/**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
 import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
-import { StrictMode } from '@wordpress/element';
+import { StrictMode, Component } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
 
 /**
@@ -12,41 +17,61 @@ import { KeyboardShortcuts } from '@wordpress/components';
 import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
 
-function Editor( {
-	settings,
-	hasFixedToolbar,
-	focusMode,
-	post,
-	initialEdits,
-	onError,
-	...props
-} ) {
-	if ( ! post ) {
-		return null;
+class Editor extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.getEditorSettings = memize( this.getEditorSettings, {
+			maxSize: 1,
+		} );
 	}
 
-	const editorSettings = {
-		...settings,
-		hasFixedToolbar,
-		focusMode,
-	};
+	getEditorSettings( settings, hasFixedToolbar, focusMode ) {
+		return {
+			...settings,
+			hasFixedToolbar,
+			focusMode,
+		};
+	}
 
-	return (
-		<StrictMode>
-			<EditorProvider
-				settings={ editorSettings }
-				post={ post }
-				initialEdits={ initialEdits }
-				{ ...props }
-			>
-				<ErrorBoundary onError={ onError }>
-					<Layout />
-					<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
-				</ErrorBoundary>
-				<PostLockedModal />
-			</EditorProvider>
-		</StrictMode>
-	);
+	render() {
+		const {
+			settings,
+			hasFixedToolbar,
+			focusMode,
+			post,
+			initialEdits,
+			onError,
+			...props
+		} = this.props;
+
+		if ( ! post ) {
+			return null;
+		}
+
+		const editorSettings = {
+			...settings,
+			hasFixedToolbar,
+			focusMode,
+		};
+
+		return (
+			<StrictMode>
+				<EditorProvider
+					settings={ editorSettings }
+					post={ post }
+					initialEdits={ initialEdits }
+					{ ...props }
+				>
+					<ErrorBoundary onError={ onError }>
+						<Layout />
+						<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
+					</ErrorBoundary>
+					<PostLockedModal />
+				</EditorProvider>
+			</StrictMode>
+		);
+	}
 }
 
 export default withSelect( ( select, { postId, postType } ) => ( {

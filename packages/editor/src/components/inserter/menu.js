@@ -349,7 +349,7 @@ export default compose(
 		const {
 			getInserterItems,
 			getBlockName,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
 		} = select( 'core/blocks' );
@@ -364,9 +364,13 @@ export default compose(
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
-			__experimentalFetchReusableBlocks: fetchReusableBlocks,
 			showInsertionPoint,
 			hideInsertionPoint,
+		} = dispatch( 'core/block-editor' );
+
+		// This should be an external action provided in the editor settings.
+		const {
+			__experimentalFetchReusableBlocks: fetchReusableBlocks,
 		} = dispatch( 'core/editor' );
 
 		// To avoid duplication, getInsertionPoint is extracted and used in two event handlers
@@ -380,7 +384,7 @@ export default compose(
 				getBlockRootClientId,
 				getBlockSelectionEnd,
 				getBlockOrder,
-			} = select( 'core/editor' );
+			} = select( 'core/block-editor' );
 			const { clientId, rootClientId, isAppender } = ownProps;
 
 			// If the clientId is defined, we insert at the position of the block.
@@ -419,10 +423,10 @@ export default compose(
 				const {
 					replaceBlocks,
 					insertBlock,
-				} = dispatch( 'core/editor' );
+				} = dispatch( 'core/block-editor' );
 				const {
 					getSelectedBlock,
-				} = select( 'core/editor' );
+				} = select( 'core/block-editor' );
 				const { isAppender } = ownProps;
 				const { name, initialAttributes } = item;
 				const selectedBlock = getSelectedBlock();

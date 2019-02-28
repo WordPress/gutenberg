@@ -15,7 +15,7 @@ import { withDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { shortcuts } from '../global-keyboard-shortcuts/visual-editor-shortcuts';
+import { shortcuts } from '../global-keyboard-shortcuts/block-editor-shortcuts';
 import BlockActions from '../block-actions';
 import BlockModeToggle from './block-mode-toggle';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
@@ -137,7 +137,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 }
 
 export default withDispatch( ( dispatch ) => {
-	const { selectBlock } = dispatch( 'core/editor' );
+	const { selectBlock } = dispatch( 'core/block-editor' );
 
 	return {
 		onSelect( clientId ) {
