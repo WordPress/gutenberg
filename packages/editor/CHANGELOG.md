@@ -18,6 +18,7 @@
 - Removed `jQuery` dependency.
 - Removed `TinyMCE` dependency.
 - RichText: improve format boundaries.
+- Refactor all post effects to action-generators using controls ([#13716](https://github.com/WordPress/gutenberg/pull/13716))
 
 ## 9.0.7 (2019-01-03)
 
