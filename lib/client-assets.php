@@ -36,7 +36,9 @@ function gutenberg_url( $path ) {
 
 /**
  * Registers a script according to `wp_register_script`. Honors this request by
- * deregistering any script by the same handler before registration.
+ * reassigning internal dependency properties of any script handle already
+ * registered by that name. It does not deregister the original script, to
+ * avoid losing inline scripts which may have been attached.
  *
  * @since 4.1.0
  *
@@ -51,8 +53,36 @@ function gutenberg_url( $path ) {
  *                                    Default 'false'.
  */
 function gutenberg_override_script( $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
-	wp_deregister_script( $handle );
-	wp_register_script( $handle, $src, $deps, $ver, $in_footer );
+	global $wp_scripts;
+
+	$script = $wp_scripts->query( $handle, 'registered' );
+	if ( $script ) {
+		/*
+		 * In many ways, this is a reimplementation of `wp_register_script` but
+		 * bypassing consideration of whether a script by the given handle had
+		 * already been registered.
+		 */
+
+		// See: `_WP_Dependency::__construct` .
+		$script->src  = $src;
+		$script->deps = $deps;
+		$script->ver  = $ver;
+
+		/*
+		 * The script's `group` designation is an indication of whether it is
+		 * to be printed in the header or footer. The behavior here defers to
+		 * the arguments as passed. Specifically, group data is not assigned
+		 * for a script unless it is designated to be printed in the footer.
+		 */
+
+		// See: `wp_register_script` .
+		unset( $script->extra['group'] );
+		if ( $in_footer ) {
+			$script->add_data( 'group', 1 );
+		}
+	} else {
+		wp_register_script( $handle, $src, $deps, $ver, $in_footer );
+	}
 }
 
 /**
@@ -112,7 +142,15 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_register_vendor_scripts();
 	gutenberg_register_packages_scripts();
 
-	// Inline scripts.
+	// Add nonce middleware which accounts for the absence of the heartbeat
+	// listener. This relies on API Fetch implementation running middlewares in
+	// order of last added, and that the original nonce middleware would defer
+	// to an X-WP-Nonce header already being present. This inline script should
+	// be removed once the following Core ticket is resolved in assigning the
+	// nonce received from heartbeat to the created middleware.
+	//
+	// See: https://core.trac.wordpress.org/ticket/46107 .
+	// See: https://github.com/WordPress/gutenberg/pull/13451 .
 	global $wp_scripts;
 	if ( isset( $wp_scripts->registered['wp-api-fetch'] ) ) {
 		$wp_scripts->registered['wp-api-fetch']->deps[] = 'wp-hooks';
@@ -135,21 +173,16 @@ function gutenberg_register_scripts_and_styles() {
 					'			}',
 					'		}',
 					'	)',
-					'} )()',
+					'} )();',
 				)
 			),
 			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' )
 		),
 		'after'
 	);
-	wp_add_inline_script(
-		'wp-api-fetch',
-		sprintf(
-			'wp.apiFetch.use( wp.apiFetch.createRootURLMiddleware( "%s" ) );',
-			esc_url_raw( get_rest_url() )
-		),
-		'after'
-	);
+
+	// TEMPORARY: Core does not (yet) provide persistence migration from the
+	// introduction of the block editor.
 	wp_add_inline_script(
 		'wp-data',
 		implode(
@@ -158,160 +191,11 @@ function gutenberg_register_scripts_and_styles() {
 				'( function() {',
 				'	var userId = ' . get_current_user_ID() . ';',
 				'	var storageKey = "WP_DATA_USER_" + userId;',
-				'	wp.data',
-				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } )',
-				'		.use( wp.data.plugins.controls );',
 				'	wp.data.plugins.persistence.__unstableMigrate( { storageKey: storageKey } );',
 				'} )()',
 			)
 		)
 	);
-	global $wp_locale;
-	wp_add_inline_script(
-		'wp-date',
-		sprintf(
-			'wp.date.setSettings( %s );',
-			wp_json_encode(
-				array(
-					'l10n'     => array(
-						'locale'        => get_user_locale(),
-						'months'        => array_values( $wp_locale->month ),
-						'monthsShort'   => array_values( $wp_locale->month_abbrev ),
-						'weekdays'      => array_values( $wp_locale->weekday ),
-						'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
-						'meridiem'      => (object) $wp_locale->meridiem,
-						'relative'      => array(
-							/* translators: %s: duration */
-							'future' => __( '%s from now', 'default' ),
-							/* translators: %s: duration */
-							'past'   => __( '%s ago', 'default' ),
-						),
-					),
-					'formats'  => array(
-						'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
-						'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
-						'datetime'            => __( 'F j, Y g:i a', 'default' ),
-						'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
-					),
-					'timezone' => array(
-						'offset' => get_option( 'gmt_offset', 0 ),
-						'string' => get_option( 'timezone_string', 'UTC' ),
-					),
-				)
-			)
-		),
-		'after'
-	);
-	// Loading the old editor and its config to ensure the classic block works as expected.
-	wp_add_inline_script(
-		'editor',
-		'window.wp.oldEditor = window.wp.editor;',
-		'after'
-	);
-
-	$tinymce_plugins = array(
-		'charmap',
-		'colorpicker',
-		'hr',
-		'lists',
-		'media',
-		'paste',
-		'tabfocus',
-		'textcolor',
-		'fullscreen',
-		'wordpress',
-		'wpautoresize',
-		'wpeditimage',
-		'wpemoji',
-		'wpgallery',
-		'wplink',
-		'wpdialogs',
-		'wptextpattern',
-		'wpview',
-	);
-	$tinymce_plugins = apply_filters( 'tiny_mce_plugins', $tinymce_plugins, 'classic-block' );
-	$tinymce_plugins = array_unique( $tinymce_plugins );
-
-	$toolbar1 = array(
-		'formatselect',
-		'bold',
-		'italic',
-		'bullist',
-		'numlist',
-		'blockquote',
-		'alignleft',
-		'aligncenter',
-		'alignright',
-		'link',
-		'unlink',
-		'wp_more',
-		'spellchecker',
-		'wp_add_media',
-		'kitchensink',
-	);
-	$toolbar1 = apply_filters( 'mce_buttons', $toolbar1, 'classic-block' );
-
-	$toolbar2 = array(
-		'strikethrough',
-		'hr',
-		'forecolor',
-		'pastetext',
-		'removeformat',
-		'charmap',
-		'outdent',
-		'indent',
-		'undo',
-		'redo',
-		'wp_help',
-	);
-	$toolbar2 = apply_filters( 'mce_buttons_2', $toolbar2, 'classic-block' );
-
-	$toolbar3 = apply_filters( 'mce_buttons_3', array(), 'classic-block' );
-	$toolbar4 = apply_filters( 'mce_buttons_4', array(), 'classic-block' );
-
-	$external_plugins = apply_filters( 'mce_external_plugins', array(), 'classic-block' );
-
-	$tinymce_settings = array(
-		'plugins'              => implode( ',', $tinymce_plugins ),
-		'toolbar1'             => implode( ',', $toolbar1 ),
-		'toolbar2'             => implode( ',', $toolbar2 ),
-		'toolbar3'             => implode( ',', $toolbar3 ),
-		'toolbar4'             => implode( ',', $toolbar4 ),
-		'external_plugins'     => wp_json_encode( $external_plugins ),
-		'classic_block_editor' => true,
-	);
-	$tinymce_settings = apply_filters( 'tiny_mce_before_init', $tinymce_settings, 'classic-block' );
-
-	// Do "by hand" translation from PHP array to js object.
-	// Prevents breakage in some custom settings.
-	$init_obj = '';
-	foreach ( $tinymce_settings as $key => $value ) {
-		if ( is_bool( $value ) ) {
-			$val       = $value ? 'true' : 'false';
-			$init_obj .= $key . ':' . $val . ',';
-			continue;
-		} elseif ( ! empty( $value ) && is_string( $value ) && (
-			( '{' == $value{0} && '}' == $value{strlen( $value ) - 1} ) ||
-			( '[' == $value{0} && ']' == $value{strlen( $value ) - 1} ) ||
-			preg_match( '/^\(?function ?\(/', $value ) ) ) {
-
-			$init_obj .= $key . ':' . $value . ',';
-			continue;
-		}
-		$init_obj .= $key . ':"' . $value . '",';
-	}
-
-	$init_obj = '{' . trim( $init_obj, ' ,' ) . '}';
-
-	$script = 'window.wpEditorL10n = {
-		tinymce: {
-			baseURL: ' . wp_json_encode( includes_url( 'js/tinymce' ) ) . ',
-			suffix: ' . ( SCRIPT_DEBUG ? '""' : '".min"' ) . ',
-			settings: ' . $init_obj . ',
-		}
-	}';
-
-	wp_add_inline_script( 'wp-block-library', $script, 'before' );
 
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backward compatibility.
@@ -1073,6 +957,7 @@ JS;
 			'post' => $post->ID,
 		)
 	);
+	wp_tinymce_inline_scripts();
 	wp_enqueue_editor();
 
 	/**
