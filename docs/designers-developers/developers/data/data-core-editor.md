@@ -769,7 +769,7 @@ successfully.
  * data.post: The new post after update
  * data.isRevision: Whether the post is a revision or not.
  * data.options: Options passed through from the original
-																			action dispatch.
+                                     action dispatch.
  * data.postType: The post type object.
 
 ### __experimentalRequestPostUpdateFailure
@@ -784,7 +784,7 @@ with a failure.
  * data.edits: The fields that were being updated.
  * data.error: The error from the failed call.
  * data.options: Options passed through from the original
-																action dispatch.
+                               action dispatch.
 
 ### updatePost
 
