@@ -80,16 +80,11 @@ class PostTitle extends Component {
 					onFocus={ this.onSelect }
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }
-					style={ [ style, {
-						minHeight: Math.max( minHeight, this.state.aztecHeight ),
-					} ] }
+					style={ { ...style, minHeight } }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
-					} }
-					onContentSizeChange={ ( event ) => {
-						this.setState( { aztecHeight: event.aztecHeight } );
 					} }
 					placeholder={ decodedPlaceholder }
 					value={ title }

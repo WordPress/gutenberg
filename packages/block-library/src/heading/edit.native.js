@@ -36,6 +36,7 @@ class HeadingEdit extends Component {
 			setAttributes,
 			mergeBlocks,
 			insertBlocksAfter,
+			style,
 		} = this.props;
 
 		const {
@@ -57,12 +58,10 @@ class HeadingEdit extends Component {
 					tagName={ tagName }
 					value={ content }
 					isSelected={ this.props.isSelected }
+					style={ { ...style, minHeight } }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
-					style={ {
-						minHeight: Math.max( minHeight, this.state.aztecHeight ),
-					} }
 					onChange={ ( value ) => setAttributes( { content: value } ) }
 					onMerge={ mergeBlocks }
 					onSplit={
@@ -76,9 +75,6 @@ class HeadingEdit extends Component {
 							} :
 							undefined
 					}
-					onContentSizeChange={ ( event ) => {
-						this.setState( { aztecHeight: event.aztecHeight } );
-					} }
 					placeholder={ placeholder || __( 'Write heading…' ) }
 				/>
 			</View>
