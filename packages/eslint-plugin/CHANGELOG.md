@@ -3,6 +3,7 @@
 ### Breaking Changes
 
 - The `esnext` and `recommended` rulesets now enforce [`object-shorthand`](https://eslint.org/docs/rules/object-shorthand)
+- The `es5` and `recommended` rulesets now enforce [`array-callback-return`](https://eslint.org/docs/rules/array-callback-return)
 
 ### New Features
 
