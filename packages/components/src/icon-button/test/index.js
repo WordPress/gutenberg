@@ -2,11 +2,17 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
+
+/**
+ * WordPress dependencies
+ */
+import { createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { IconButton } from '../';
+import IconButton from '../';
 
 describe( 'IconButton', () => {
 	describe( 'basic rendering', () => {
@@ -71,6 +77,13 @@ describe( 'IconButton', () => {
 			const iconButton = shallow( <IconButton label="WordPress" children={ [] } /> );
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
+		} );
+
+		it( 'forwards ref', () => {
+			const ref = createRef();
+
+			TestUtils.renderIntoDocument( <IconButton ref={ ref } /> );
+			expect( ref.current.type ).toBe( 'button' );
 		} );
 	} );
 } );
