@@ -5,17 +5,12 @@ import { View } from 'react-native';
 import Hr from 'react-native-hr';
 
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
-import styles from './editor.scss';
+import styles from './style.scss';
 
-export default function NextPageEdit( { attributes } ) {
-	const { customText = __( 'Page break' ) } = attributes;
+export default function Separator( props ) {
+	const { customText } = props;
 
 	return (
 		<View style={ styles[ 'block-library-nextpage__container' ] }>
