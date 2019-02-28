@@ -22,14 +22,6 @@ import { createBlock } from '@wordpress/blocks';
 import styles from './style.scss';
 
 class HeadingEdit extends Component {
-	constructor( props ) {
-		super( props );
-
-		this.state = {
-			aztecHeight: 0,
-		};
-	}
-
 	render() {
 		const {
 			attributes,
