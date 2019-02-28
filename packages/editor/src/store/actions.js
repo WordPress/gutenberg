@@ -131,7 +131,7 @@ export function __experimentalRequestPostUpdateSuccess( {
  * Optimistic action for indicating that the request post update has completed
  * with a failure.
  *
- * @param	{Object}  data          The data for the action
+ * @param {Object}  data          The data for the action
  * @param {Object}  data.post     The post that failed updating.
  * @param {Object}  data.edits    The fields that were being updated.
  * @param {*}       data.error    The error from the failed call.
