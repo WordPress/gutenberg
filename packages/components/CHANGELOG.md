@@ -1,8 +1,9 @@
-## 7.2.1 (Unreleased)
+## 7.3.0 (Unreleased)
 
 ### New Features
 
 - Added a new `render` property to `FormFileUpload` component. Allowing users of the component to custom the UI for their needs.
+- Added a new `BaseControl.VisualLabel` component.
 
 ### Bug fixes
 
