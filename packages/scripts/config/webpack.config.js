@@ -8,7 +8,7 @@ const path = require( 'path' );
 /**
  * Internal dependencies
  */
-const { camelCaseDash } = require( '../utils' );
+const { camelCaseDash, hasBabelConfig } = require( '../utils' );
 
 /**
  * Converts @wordpress/* string request into request object.
@@ -66,6 +66,21 @@ const externals = [
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
+const babelLoader = hasBabelConfig() ? {
+	test: /\.js$/,
+	exclude: /node_modules/,
+	use: require.resolve( 'babel-loader' ),
+} : {
+	test: /\.js$/,
+	exclude: /node_modules/,
+	use: {
+		loader: require.resolve( 'babel-loader' ),
+		options: {
+			presets: [ '@wordpress/babel-preset-default' ],
+		},
+	},
+};
+
 const config = {
 	mode,
 	entry: {
@@ -88,11 +103,7 @@ const config = {
 				use: require.resolve( 'source-map-loader' ),
 				enforce: 'pre',
 			},
-			{
-				test: /\.js$/,
-				exclude: /node_modules/,
-				use: require.resolve( 'babel-loader' ),
-			},
+			babelLoader,
 		],
 	},
 	plugins: [
