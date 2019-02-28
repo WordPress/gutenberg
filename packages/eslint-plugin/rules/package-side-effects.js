@@ -39,6 +39,16 @@ module.exports = {
 		}
 
 		return {
+			ImportDeclaration( node ) {
+				if ( node.specifiers && node.specifiers.length ) {
+					return;
+				}
+
+				context.report(
+					node,
+					`Import of module may introduce package level side-effects. Consider adding '${ relativeFilePath }' to the package's package.json sideEffect property.`
+				);
+			},
 			ExpressionStatement( node ) {
 				// Only lint function calls.
 				if ( node.expression && node.expression.type !== 'CallExpression' ) {

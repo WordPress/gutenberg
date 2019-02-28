@@ -12,7 +12,12 @@ Examples of **incorrect** code for this rule:
 
 `src/index.js`
 ```js
+// Module imports can introduce side effects.
+import 'module-with-side-effects';
+
+// Function calls can introduce side effects when the return value is not used.
 window.addEventListener( 'resize', handleResize );
+registerStore( store );
 ```
 
 `package.json`
@@ -28,7 +33,12 @@ Examples of **correct** code for this rule:
 
 `src/index.js`
 ```js
+// Module imports can introduce side effects.
+import 'module-with-side-effects';
+
+// Function calls can introduce side effects when the return value is not used.
 window.addEventListener( 'resize', handleResize );
+registerStore( store );
 ```
 
 `package.json`
