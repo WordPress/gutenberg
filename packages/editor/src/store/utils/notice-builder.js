@@ -19,7 +19,7 @@ import { get, includes } from 'lodash';
  * @param {Object} data Incoming data to build the arguments from.
  *
  * @return {Array} Arguments for dispatch. An empty array signals no
- * 								 notification should be sent.
+ *                 notification should be sent.
  */
 export function getNotificationArgumentsForSaveSuccess( data ) {
 	const { previousPost, post, postType } = data;
@@ -80,7 +80,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
  * @param {Object} data Incoming data to build the arguments with.
  *
  * @return {Array} Arguments for dispatch. An empty array signals no
- * 								 notification should be sent.
+ *                 notification should be sent.
  */
 export function getNotificationArgumentsForSaveFail( data ) {
 	const { post, edits, error } = data;

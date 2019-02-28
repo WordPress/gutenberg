@@ -92,15 +92,16 @@ export function __experimentalRequestPostUpdateStart( options = {} ) {
 /**
  * Optimistic action for indicating that the request post update has completed
  * successfully.
- * @param {Object}	data								The data for the action.
- * @param {Object} 	data.previousPost 	The previous post prior to update.
- * @param {Object} 	data.post						The new post after update
- * @param {boolean} data.isRevision 		Whether the post is a revision or not.
- * @param {Object} 	data.options 				Options passed through from the original
- * 																			action dispatch.
- * @param {Object} 	data.postType 			The post type object.
  *
- * @return {Object} Action object.
+ * @param {Object}  data                The data for the action.
+ * @param {Object}  data.previousPost   The previous post prior to update.
+ * @param {Object}  data.post           The new post after update
+ * @param {boolean} data.isRevision     Whether the post is a revision or not.
+ * @param {Object}  data.options        Options passed through from the original
+ *                                      action dispatch.
+ * @param {Object}  data.postType       The post type object.
+ *
+ * @return {Object}	Action object.
  */
 export function __experimentalRequestPostUpdateSuccess( {
 	previousPost,
@@ -130,12 +131,12 @@ export function __experimentalRequestPostUpdateSuccess( {
  * Optimistic action for indicating that the request post update has completed
  * with a failure.
  *
- * @param	{Object}	data					The data for the action
- * @param {Object} 	data.post 		The post that failed updating.
- * @param {Object} 	data.edits 		The fields that were being updated.
- * @param {*}				data.error 		The error from the failed call.
- * @param {Object} 	data.options	Options passed through from the original
- * 																action dispatch.
+ * @param	{Object}  data          The data for the action
+ * @param {Object}  data.post     The post that failed updating.
+ * @param {Object}  data.edits    The fields that were being updated.
+ * @param {*}       data.error    The error from the failed call.
+ * @param {Object}  data.options  Options passed through from the original
+ *                                action dispatch.
  * @return {Object} An action object
  */
 export function __experimentalRequestPostUpdateFailure( {

@@ -118,7 +118,7 @@ export function isEditedPostDirty( state ) {
 		return true;
 	}
 
-	// Edits and change detectiona are reset at the start of a save, but a post
+	// Edits and change detection are reset at the start of a save, but a post
 	// is still considered dirty until the point at which the save completes.
 	// Because the save is performed optimistically, the prior states are held
 	// until committed. These can be referenced to determine whether there's a
@@ -258,7 +258,7 @@ export function getCurrentPostAttribute( state, attributeName ) {
 
 /**
  * Returns a single attribute of the post being edited, preferring the unsaved
- * edit if one exists, but mergiging with the attribute value for the last known
+ * edit if one exists, but merging with the attribute value for the last known
  * saved state of the post (this is needed for some nested attributes like meta).
  *
  * @param {Object} state         Global application state.

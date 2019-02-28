@@ -40,9 +40,9 @@ export function select( storeKey, selectorName, ...args ) {
  * Dispatches a control action for triggering a registry select that has a
  * resolver.
  *
- * @param {string} 	storeKey
- * @param {string} 	selectorName
- * @param {Array} 	args  Arguments for the select.
+ * @param {string}  storeKey
+ * @param {string}  selectorName
+ * @param {Array}   args  Arguments for the select.
  *
  * @return {Object} control descriptor.
  */
