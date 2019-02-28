@@ -86,7 +86,7 @@ export const settings = {
 				transform: ( files ) => {
 					const blocks = [];
 
-					files.map( ( file ) => {
+					files.forEach( ( file ) => {
 						const blobURL = createBlobURL( file );
 
 						// File will be uploaded in componentDidMount()
