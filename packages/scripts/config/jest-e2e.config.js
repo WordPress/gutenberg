@@ -19,7 +19,7 @@ const jestE2EConfig = {
 
 if ( ! hasBabelConfig() ) {
 	jestE2EConfig.transform = {
-		'^.+\\.jsx?$': path.join( __dirname, 'babel-transform' ),
+		'^.+\\.[jt]sx?$': path.join( __dirname, 'babel-transform' ),
 	};
 }
 

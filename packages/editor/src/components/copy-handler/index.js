@@ -37,8 +37,8 @@ export default compose( [
 			getMultiSelectedBlockClientIds,
 			getSelectedBlockClientId,
 			hasMultiSelection,
-		} = select( 'core/editor' );
-		const { removeBlocks } = dispatch( 'core/editor' );
+		} = select( 'core/block-editor' );
+		const { removeBlocks } = dispatch( 'core/block-editor' );
 
 		const onCopy = ( event ) => {
 			const selectedBlockClientIds = getSelectedBlockClientId() ?

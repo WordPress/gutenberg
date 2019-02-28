@@ -107,17 +107,15 @@ export const link = {
 
 			return (
 				<Fragment>
-					{ this.state.addingLink &&
-						<ModalLinkUI
-							isVisible
-							isActive={ isActive }
-							activeAttributes={ activeAttributes }
-							onClose={ this.stopAddingLink }
-							onChange={ onChange }
-							onRemove={ this.onRemoveFormat }
-							value={ linkSelection }
-						/>
-					}
+					<ModalLinkUI
+						isVisible={ this.state.addingLink }
+						isActive={ isActive }
+						activeAttributes={ activeAttributes }
+						onClose={ this.stopAddingLink }
+						onChange={ onChange }
+						onRemove={ this.onRemoveFormat }
+						value={ linkSelection }
+					/>
 					<RichTextToolbarButton
 						name="link"
 						icon="admin-links"

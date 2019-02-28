@@ -101,10 +101,10 @@ const recoverBlock = ( { name, attributes, innerBlocks } ) => createBlock( name,
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => ( {
-		block: select( 'core/editor' ).getBlock( clientId ),
+		block: select( 'core/block-editor' ).getBlock( clientId ),
 	} ) ),
 	withDispatch( ( dispatch, { block } ) => {
-		const { replaceBlock } = dispatch( 'core/editor' );
+		const { replaceBlock } = dispatch( 'core/block-editor' );
 
 		return {
 			convertToClassic() {

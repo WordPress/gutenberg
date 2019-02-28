@@ -16,7 +16,12 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
         "calls": Array [
           Array [],
         ],
-        "results": undefined,
+        "results": Array [
+          Object {
+            "type": "return",
+            "value": undefined,
+          },
+        ],
       }
     }
     readOnly={true}

@@ -12,10 +12,14 @@
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/npm-package-json-lint-config/README.md",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/WordPress/gutenberg.git"
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/npm-package-json-lint-config"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=8"
 	},
 	"main": "index.js",
 	"peerDependencies": {

@@ -58,7 +58,7 @@ class MultiSelectScrollIntoView extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const { getLastMultiSelectedBlockClientId } = select( 'core/editor' );
+	const { getLastMultiSelectedBlockClientId } = select( 'core/block-editor' );
 
 	return {
 		extentClientId: getLastMultiSelectedBlockClientId(),
