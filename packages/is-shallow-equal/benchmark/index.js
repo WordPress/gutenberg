@@ -1,5 +1,7 @@
 'use strict';
 
+/* eslint-disable @wordpress/package-side-effects */
+
 const Benchmark = require( 'benchmark' );
 
 const suite = new Benchmark.Suite;

@@ -28,7 +28,7 @@ function Compiler( options ) {
 /**
  * Inherit from `Base.prototype`.
  */
-
+// eslint-disable-next-line @wordpress/package-side-effects
 inherits( Compiler, Base );
 
 /**

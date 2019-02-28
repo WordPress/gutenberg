@@ -32,5 +32,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"sideEffects": [
+		"src/store/index.js"
+	]
 }

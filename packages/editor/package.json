@@ -54,5 +54,14 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"sideEffects": [
+		"src/hooks/align.js",
+		"src/hooks/anchor.js",
+		"src/hooks/custom-class-name.js",
+		"src/hooks/custom-class-name.native.js",
+		"src/hooks/default-autocompleters.js",
+		"src/hooks/generated-class-name.js",
+		"src/store/index.js"
+	]
 }

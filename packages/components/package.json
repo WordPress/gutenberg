@@ -50,5 +50,6 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"sideEffects": false
 }

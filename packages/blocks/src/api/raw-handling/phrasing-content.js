@@ -21,6 +21,7 @@ const phrasingContentSchema = {
 // Recursion is needed.
 // Possible: strong > em > strong.
 // Impossible: strong > strong.
+// eslint-disable-next-line @wordpress/package-side-effects
 [ 'strong', 'em', 's', 'del', 'ins', 'a', 'code', 'abbr', 'sub', 'sup' ].forEach( ( tag ) => {
 	phrasingContentSchema[ tag ].children = omit( phrasingContentSchema, tag );
 } );

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable @wordpress/package-side-effects */
 
 const gettextParser = require( 'gettext-parser' );
 const { isEmpty } = require( 'lodash' );

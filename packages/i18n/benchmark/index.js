@@ -1,3 +1,5 @@
+/* eslint-disable @wordpress/package-side-effects */
+
 const Benchmark = require( 'benchmark' );
 const { __ } = require( '../' );
 

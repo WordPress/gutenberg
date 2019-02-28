@@ -45,5 +45,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"sideEffects": [
+		"src/index.native.js"
+	]
 }
