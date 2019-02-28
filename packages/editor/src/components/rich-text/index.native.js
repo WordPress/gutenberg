@@ -500,6 +500,10 @@ export class RichText extends Component {
 			html = '';
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
+		let minHeight = 0;
+		if ( style && style.minHeight ) {
+			minHeight = style.minHeight;
+		}
 
 		return (
 			<View>
@@ -518,7 +522,7 @@ export class RichText extends Component {
 					} }
 					style={ {
 						...style,
-						minHeight: Math.max( style.minHeight, this.state.height ),
+						minHeight: Math.max( minHeight, this.state.height ),
 					} }
 					text={ { text: html, eventCount: this.lastEventCount } }
 					placeholder={ this.props.placeholder }

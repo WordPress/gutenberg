@@ -14,7 +14,6 @@ import { RichText } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
 
 const name = 'core/paragraph';
 
@@ -95,8 +94,6 @@ class ParagraphEdit extends Component {
 			content,
 		} = attributes;
 
-		const minHeight = styles.blockText.minHeight;
-
 		return (
 			<View>
 				<RichText
@@ -106,7 +103,7 @@ class ParagraphEdit extends Component {
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
-					style={ { ...style, minHeight } }
+					style={ style }
 					onChange={ ( nextContent ) => {
 						setAttributes( {
 							content: nextContent,
