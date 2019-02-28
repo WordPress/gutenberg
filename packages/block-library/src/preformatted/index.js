@@ -1,5 +1,5 @@
 /**
- * WordPress
+ * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
@@ -68,7 +68,7 @@ export const settings = {
 		return (
 			<RichText
 				tagName="pre"
-				value={ content }
+				value={ content.replace( /\n/g, '<br>' ) }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
 						content: nextContent,

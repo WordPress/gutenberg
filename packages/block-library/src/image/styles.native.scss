@@ -1,3 +1,7 @@
+// @format
+
+@import "variables.scss";
+
 .imageContainer {
 	flex: 1;
 	justify-content: center;
@@ -16,6 +20,10 @@
 	align-items: center;
 }
 
-.resetSettingsButton {
+.caption-text {
+	font-family: $default-regular-font;
+}
+
+.clearSettingsButton {
 	color: $alert-red;
 }

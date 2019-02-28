@@ -12,7 +12,7 @@ import Fill from '../fill';
 import Provider from '../context';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 

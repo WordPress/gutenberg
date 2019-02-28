@@ -102,7 +102,6 @@ return array(
 	),
 	'wp-dom'                                => array(
 		'lodash',
-		'wp-tinymce',
 	),
 	'wp-dom-ready'                          => array(),
 	'wp-edit-post'                          => array(
@@ -131,6 +130,9 @@ return array(
 		'wp-url',
 		'wp-viewport',
 	),
+	'wp-edit-widgets'                       => array(
+		'wp-element',
+	),
 	'wp-editor'                             => array(
 		'lodash',
 		'wp-a11y',
@@ -153,7 +155,6 @@ return array(
 		'wp-notices',
 		'wp-nux',
 		'wp-rich-text',
-		'wp-tinymce',
 		'wp-token-list',
 		'wp-url',
 		'wp-viewport',
@@ -168,7 +169,6 @@ return array(
 	'wp-escape-html'                        => array(),
 	'wp-format-library'                     => array(
 		'wp-components',
-		'wp-dom',
 		'wp-editor',
 		'wp-element',
 		'wp-i18n',

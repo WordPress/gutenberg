@@ -6,13 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import {
 	ExternalLink,
 	IconButton,
 	ToggleControl,
 	withSpokenMessages,
+	PositionedAtSelection,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
@@ -29,39 +30,9 @@ import { URLInput, URLPopover } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import PositionedAtSelection from './positioned-at-selection';
-import { isValidHref } from './utils';
+import { createLinkFormat, isValidHref } from './utils';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
-
-/**
- * Generates the format object that will be applied to the link text.
- *
- * @param {string}  url              The href of the link.
- * @param {boolean} opensInNewWindow Whether this link will open in a new window.
- * @param {Object}  text             The text that is being hyperlinked.
- *
- * @return {Object} The final format object.
- */
-function createLinkFormat( { url, opensInNewWindow, text } ) {
-	const format = {
-		type: 'core/link',
-		attributes: {
-			url,
-		},
-	};
-
-	if ( opensInNewWindow ) {
-		// translators: accessibility label for external links, where the argument is the link text
-		const label = sprintf( __( '%s (opens in a new tab)' ), text );
-
-		format.attributes.target = '_blank';
-		format.attributes.rel = 'noreferrer noopener';
-		format.attributes[ 'aria-label' ] = label;
-	}
-
-	return format;
-}
 
 function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;

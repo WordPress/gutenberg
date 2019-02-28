@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 5.0.0-rc.1
+ * Version: 5.1.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -31,21 +31,11 @@ function the_gutenberg_project() {
 	<noscript>
 		<div class="error" style="position:absolute;top:32px;z-index:40"><p>
 		<?php
-		// Using Gutenberg as Plugin.
-		if ( is_plugin_active( 'gutenberg/gutenberg.php' ) ) {
-			$current_url = esc_url( add_query_arg( 'classic-editor', true, $_SERVER['REQUEST_URI'] ) );
-			printf(
-				// Translators: link is to current page specify classic editor.
-				__( 'The Block Editor requires JavaScript. You can use the <a href="%s">Classic Editor</a>.', 'gutenberg' ),
-				$current_url
-			);
-		} else { // Using Gutenberg in Core.
-			printf(
-				/* translators: %s: https://wordpress.org/plugins/classic-editor/ */
-				__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
-				__( 'https://wordpress.org/plugins/classic-editor/', 'gutenberg' )
-			);
-		}
+		printf(
+			/* translators: %s: https://wordpress.org/plugins/classic-editor/ */
+			__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
+			__( 'https://wordpress.org/plugins/classic-editor/', 'gutenberg' )
+		);
 		?>
 		</p></div>
 	</noscript>
@@ -84,6 +74,15 @@ function gutenberg_menu() {
 		__( 'Demo', 'gutenberg' ),
 		'edit_posts',
 		'gutenberg'
+	);
+
+	add_submenu_page(
+		'gutenberg',
+		__( 'Widgets (beta)', 'gutenberg' ),
+		__( 'Widgets (beta)', 'gutenberg' ),
+		'edit_theme_options',
+		'gutenberg-widgets',
+		'the_gutenberg_widgets'
 	);
 
 	if ( current_user_can( 'edit_posts' ) ) {
@@ -128,11 +127,7 @@ function is_gutenberg_page() {
 		return false;
 	}
 
-	if ( isset( $_GET['classic-editor'] ) ) {
-		return false;
-	}
-
-	if ( ! gutenberg_can_edit_post( $post ) ) {
+	if ( ! use_block_editor_for_post( $post ) ) {
 		return false;
 	}
 

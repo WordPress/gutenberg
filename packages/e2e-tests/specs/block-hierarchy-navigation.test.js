@@ -10,7 +10,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 async function openBlockNavigator() {
-	return pressKeyWithModifier( 'access', 'o' );
+	await pressKeyWithModifier( 'access', 'o' );
 }
 
 describe( 'Navigating the block hierarchy', () => {

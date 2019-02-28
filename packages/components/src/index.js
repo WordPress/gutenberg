@@ -1,6 +1,7 @@
 // Components
 export * from './primitives';
 // eslint-disable-next-line camelcase
+export { default as Animate } from './animate';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
@@ -42,6 +43,7 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
+export { default as PositionedAtSelection } from './positioned-at-selection';
 export { default as QueryControls } from './query-controls';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';

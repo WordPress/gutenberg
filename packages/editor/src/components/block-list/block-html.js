@@ -1,12 +1,12 @@
 
 /**
- * External Dependencies
+ * External dependencies
  */
 import TextareaAutosize from 'react-autosize-textarea';
 import { isEqual } from 'lodash';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';

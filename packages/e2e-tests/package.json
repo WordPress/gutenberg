@@ -22,7 +22,7 @@
 		"@wordpress/jest-console": "file:../jest-console",
 		"@wordpress/scripts": "file:../scripts",
 		"expect-puppeteer": "^3.2.0",
-		"lodash": "^4.17.10"
+		"lodash": "^4.17.11"
 	},
 	"peerDependencies": {
 		"jest": ">=23",

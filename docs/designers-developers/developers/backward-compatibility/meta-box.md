@@ -17,9 +17,7 @@ add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 );
 ```
 
-WordPress will fall back to the Classic editor, where the meta box will continue working as before.
-
-Explicitly setting `__block_editor_compatible_meta_box` to `true` will cause WordPress to stay in Gutenberg (assuming another meta box doesn't cause a fallback).
+WordPress won't show the meta box but a message saying that it isn't compatible with the block editor, including a link to the Classic Editor plugin. By default, `__block_editor_compatible_meta_box` is `true`.
 
 After a meta box is converted to a block, it can be declared as existing for backward compatibility:
 
@@ -32,17 +30,17 @@ add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 );
 ```
 
-When Gutenberg is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the Classic editor, should some other meta box cause a fallback.
+When Gutenberg is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the Classic editor.
 
 ### Meta Box Data Collection
 
 On each Gutenberg page load, we register an action that collects the meta box data to determine if an area is empty. The original global state is reset upon collection of meta box data.
 
-See `lib/register.php gutenberg_trick_plugins_into_registering_meta_boxes()`
+See [`register_and_do_post_meta_boxes`](https://developer.wordpress.org/reference/functions/register_and_do_post_meta_boxes/).
 
-`gutenberg_collect_meta_box_data()` is hooked in later on `admin_head`. It will run through the functions and hooks that `post.php` runs to register meta boxes; namely `add_meta_boxes`, `add_meta_boxes_{$post->post_type}`, and `do_meta_boxes`.
+It will run through the functions and hooks that `post.php` runs to register meta boxes; namely `add_meta_boxes`, `add_meta_boxes_{$post->post_type}`, and `do_meta_boxes`.
 
-A copy of the global `$wp_meta_boxes` is made then filtered through `apply_filters( 'filter_gutenberg_meta_boxes', $_meta_boxes_copy );`, which will strip out any core meta boxes, standard custom taxonomy meta boxes, and any meta boxes that have declared themselves as only existing for backward compatibility purposes.
+Meta boxes are filtered to strip out any core meta boxes, standard custom taxonomy meta boxes, and any meta boxes that have declared themselves as only existing for backward compatibility purposes.
 
 Then each location for this particular type of meta box is checked for whether it is active. If it is not empty a value of true is stored, if it is empty a value of false is stored. This meta box location data is then dispatched by the editor Redux store in `INITIALIZE_META_BOX_STATE`.
 
@@ -63,13 +61,9 @@ When the post is updated, only meta box areas that are active will be submitted.
 
 When the meta box area is saving, we display an updating overlay, to prevent users from changing the form values while a save is in progress.
 
-After the new block editor is made into the default editor, it will be necessary to provide the classic-editor flag to access the meta box partial page.
+An example save url would look like:
 
-`gutenberg_meta_box_save()` saves meta box changes. A `meta_box` request parameter should be present and should match one of `'advanced'`, `'normal'`, or `'side'`. This value will determine which meta box area is served.
-
-So an example url would look like:
-
-`mysite.com/wp-admin/post.php?post=1&action=edit&meta_box=$location&classic-editor`
+`mysite.com/wp-admin/post.php?post=1&action=edit&meta-box-loader=1`
 
 This url is automatically passed into React via a `_wpMetaBoxUrl` global variable.
 
