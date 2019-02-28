@@ -11,9 +11,9 @@ import applyMiddlewares from './middlewares';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import controls from './controls';
-import { MODULE_KEY } from './constants';
+import { STORE_KEY } from './constants';
 
-const store = registerStore( MODULE_KEY, {
+const store = registerStore( STORE_KEY, {
 	reducer,
 	selectors,
 	actions,

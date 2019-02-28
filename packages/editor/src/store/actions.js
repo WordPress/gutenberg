@@ -14,7 +14,7 @@ import {
 	apiFetch,
 } from './controls';
 import {
-	MODULE_KEY,
+	STORE_KEY,
 	POST_UPDATE_TRANSACTION_ID,
 	SAVE_POST_NOTICE_ID,
 	TRASH_POST_NOTICE_ID,
@@ -222,14 +222,14 @@ export function __experimentalOptimisticUpdatePost( edits ) {
  */
 export function* savePost( options = {} ) {
 	const isEditedPostSaveable = yield select(
-		MODULE_KEY,
+		STORE_KEY,
 		'isEditedPostSaveable'
 	);
 	if ( ! isEditedPostSaveable ) {
 		return;
 	}
 	let edits = yield select(
-		MODULE_KEY,
+		STORE_KEY,
 		'getPostEdits'
 	);
 	const isAutosave = !! options.isAutosave;
@@ -239,7 +239,7 @@ export function* savePost( options = {} ) {
 	}
 
 	const isEditedPostNew = yield select(
-		MODULE_KEY,
+		STORE_KEY,
 		'isEditedPostNew',
 	);
 
@@ -259,12 +259,12 @@ export function* savePost( options = {} ) {
 	}
 
 	const post = yield select(
-		MODULE_KEY,
+		STORE_KEY,
 		'getCurrentPost'
 	);
 
 	const editedPostContent = yield select(
-		MODULE_KEY,
+		STORE_KEY,
 		'getEditedPostContent'
 	);
 
@@ -275,7 +275,7 @@ export function* savePost( options = {} ) {
 	};
 
 	const currentPostType = yield select(
-		MODULE_KEY,
+		STORE_KEY,
 		'getCurrentPostType'
 	);
 
@@ -286,7 +286,7 @@ export function* savePost( options = {} ) {
 	);
 
 	yield dispatch(
-		MODULE_KEY,
+		STORE_KEY,
 		'__experimentalRequestPostUpdateStart',
 		options,
 	);
@@ -295,7 +295,7 @@ export function* savePost( options = {} ) {
 	// will be updated. See below logic in success resolution for revert
 	// if the autosave is applied as a revision.
 	yield dispatch(
-		MODULE_KEY,
+		STORE_KEY,
 		'__experimentalOptimisticUpdatePost',
 		toSend
 	);
@@ -304,7 +304,7 @@ export function* savePost( options = {} ) {
 	let method = 'PUT';
 	if ( isAutosave ) {
 		const autoSavePost = yield select(
-			MODULE_KEY,
+			STORE_KEY,
 			'getAutosave',
 		);
 		// Ensure autosaves contain all expected fields, using autosave or
@@ -337,10 +337,10 @@ export function* savePost( options = {} ) {
 		} );
 		const resetAction = isAutosave ? 'resetAutosave' : 'resetPost';
 
-		yield dispatch( MODULE_KEY, resetAction, newPost );
+		yield dispatch( STORE_KEY, resetAction, newPost );
 
 		yield dispatch(
-			MODULE_KEY,
+			STORE_KEY,
 			'__experimentalRequestPostUpdateSuccess',
 			{
 				previousPost: post,
@@ -369,7 +369,7 @@ export function* savePost( options = {} ) {
 		}
 	} catch ( error ) {
 		yield dispatch(
-			MODULE_KEY,
+			STORE_KEY,
 			'__experimentalRequestPostUpdateFailure',
 			{ post, edits, error, options }
 		);
@@ -393,11 +393,11 @@ export function* savePost( options = {} ) {
  */
 export function* refreshPost() {
 	const post = yield select(
-		MODULE_KEY,
+		STORE_KEY,
 		'getCurrentPost'
 	);
 	const postTypeSlug = yield select(
-		MODULE_KEY,
+		STORE_KEY,
 		'getCurrentPostType'
 	);
 	const postType = yield resolveSelect(
@@ -414,7 +414,7 @@ export function* refreshPost() {
 		}
 	);
 	yield dispatch(
-		MODULE_KEY,
+		STORE_KEY,
 		'resetPost',
 		newPost
 	);
@@ -425,7 +425,7 @@ export function* refreshPost() {
  */
 export function* trashPost() {
 	const postTypeSlug = yield select(
-		MODULE_KEY,
+		STORE_KEY,
 		'getCurrentPostType'
 	);
 	const postType = yield resolveSelect(
@@ -440,7 +440,7 @@ export function* trashPost() {
 	);
 	try {
 		const post = yield select(
-			MODULE_KEY,
+			STORE_KEY,
 			'getCurrentPost'
 		);
 		yield apiFetch(
@@ -453,7 +453,7 @@ export function* trashPost() {
 		// TODO: This should be an updatePost action (updating subsets of post
 		// properties), but right now editPost is tied with change detection.
 		yield dispatch(
-			MODULE_KEY,
+			STORE_KEY,
 			'resetPost',
 			{ ...post, status: 'trash' }
 		);

@@ -9,7 +9,7 @@ import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 import generatorActions, * as actions from '../actions';
 import { select, dispatch, apiFetch, resolveSelect } from '../controls';
 import {
-	MODULE_KEY,
+	STORE_KEY,
 	SAVE_POST_NOTICE_ID,
 	TRASH_POST_NOTICE_ID,
 	POST_UPDATE_TRANSACTION_ID,
@@ -152,7 +152,7 @@ describe( 'Post generator actions', () => {
 					reset( isAutosave );
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
-						select( MODULE_KEY, 'isEditedPostSaveable' )
+						select( STORE_KEY, 'isEditedPostSaveable' )
 					);
 				},
 			],
@@ -162,7 +162,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next( true );
 					expect( value ).toEqual(
-						select( MODULE_KEY, 'getPostEdits' )
+						select( STORE_KEY, 'getPostEdits' )
 					);
 				},
 			],
@@ -172,7 +172,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next( edits() );
 					expect( value ).toEqual(
-						select( MODULE_KEY, 'isEditedPostNew' )
+						select( STORE_KEY, 'isEditedPostNew' )
 					);
 				},
 			],
@@ -182,7 +182,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next( isEditedPostNew );
 					expect( value ).toEqual(
-						select( MODULE_KEY, 'getCurrentPost' )
+						select( STORE_KEY, 'getCurrentPost' )
 					);
 				},
 			],
@@ -192,7 +192,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next( currentPost() );
 					expect( value ).toEqual(
-						select( MODULE_KEY, 'getEditedPostContent' )
+						select( STORE_KEY, 'getEditedPostContent' )
 					);
 				},
 			],
@@ -202,7 +202,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next( editedPostContent );
 					expect( value ).toEqual(
-						select( MODULE_KEY, 'getCurrentPostType' )
+						select( STORE_KEY, 'getCurrentPostType' )
 					);
 				},
 			],
@@ -223,7 +223,7 @@ describe( 'Post generator actions', () => {
 					const { value } = fulfillment.next( postType );
 					expect( value ).toEqual(
 						dispatch(
-							MODULE_KEY,
+							STORE_KEY,
 							'__experimentalRequestPostUpdateStart',
 							{ isAutosave }
 						)
@@ -237,7 +237,7 @@ describe( 'Post generator actions', () => {
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
 						dispatch(
-							MODULE_KEY,
+							STORE_KEY,
 							'__experimentalOptimisticUpdatePost',
 							editPostToSendOptimistic()
 						)
@@ -279,7 +279,7 @@ describe( 'Post generator actions', () => {
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
 						select(
-							MODULE_KEY,
+							STORE_KEY,
 							'getAutosave'
 						)
 					);
@@ -301,7 +301,7 @@ describe( 'Post generator actions', () => {
 					}
 					expect( value ).toEqual(
 						dispatch(
-							MODULE_KEY,
+							STORE_KEY,
 							'__experimentalRequestPostUpdateFailure',
 							{
 								post: currentPost(),
@@ -359,7 +359,7 @@ describe( 'Post generator actions', () => {
 					const { value } = fulfillment.next( savedPost() );
 					expect( value ).toEqual(
 						dispatch(
-							MODULE_KEY,
+							STORE_KEY,
 							isAutosave ? 'resetAutosave' : 'resetPost',
 							savedPost()
 						)
@@ -372,7 +372,7 @@ describe( 'Post generator actions', () => {
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
 						dispatch(
-							MODULE_KEY,
+							STORE_KEY,
 							'__experimentalRequestPostUpdateSuccess',
 							{
 								previousPost: currentPost(),
@@ -428,7 +428,7 @@ describe( 'Post generator actions', () => {
 				reset( false );
 				const { value } = fulfillment.next();
 				expect( value ).toEqual(
-					select( MODULE_KEY, 'isEditedPostSaveable' )
+					select( STORE_KEY, 'isEditedPostSaveable' )
 				);
 			} );
 			it( 'if edited post is not saveable then bails', () => {
@@ -518,7 +518,7 @@ describe( 'Post generator actions', () => {
 				reset();
 				const { value } = fulfillment.next();
 				expect( value ).toEqual( select(
-					MODULE_KEY,
+					STORE_KEY,
 					'getCurrentPostType',
 				) );
 			}
@@ -543,7 +543,7 @@ describe( 'Post generator actions', () => {
 		it( 'yields expected action for selecting the currentPost', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual( select(
-				MODULE_KEY,
+				STORE_KEY,
 				'getCurrentPost'
 			) );
 		} );
@@ -575,7 +575,7 @@ describe( 'Post generator actions', () => {
 			it( 'yields expected dispatch action for resetting the post', () => {
 				const { value } = fulfillment.next();
 				expect( value ).toEqual( dispatch(
-					MODULE_KEY,
+					STORE_KEY,
 					'resetPost',
 					{ ...currentPost, status: 'trash' }
 				) );
@@ -590,14 +590,14 @@ describe( 'Post generator actions', () => {
 			reset();
 			const { value } = fulfillment.next();
 			expect( value ).toEqual( select(
-				MODULE_KEY,
+				STORE_KEY,
 				'getCurrentPost',
 			) );
 		} );
 		it( 'yields expected action for selecting the current post type', () => {
 			const { value } = fulfillment.next( currentPost );
 			expect( value ).toEqual( select(
-				MODULE_KEY,
+				STORE_KEY,
 				'getCurrentPostType'
 			) );
 		} );
@@ -621,7 +621,7 @@ describe( 'Post generator actions', () => {
 		it( 'yields expected action for dispatching the reset of the post', () => {
 			const { value } = fulfillment.next( currentPost );
 			expect( value ).toEqual( dispatch(
-				MODULE_KEY,
+				STORE_KEY,
 				'resetPost',
 				currentPost
 			) );
