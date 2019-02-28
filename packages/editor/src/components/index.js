@@ -61,3 +61,5 @@ export { default as WordCount } from './word-count';
 
 // State Related Components
 export { default as EditorProvider } from './provider';
+
+export * from './deprecated';
