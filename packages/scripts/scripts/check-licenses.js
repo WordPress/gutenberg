@@ -258,6 +258,7 @@ modules.forEach( ( path ) => {
 					}, stringDetectedType );
 				}, detectedType );
 			}
+			return detectedType;
 		}, false );
 	}
 
