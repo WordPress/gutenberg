@@ -172,7 +172,7 @@ class MediaUpload extends Component {
 		}
 		if ( ! this.props.gallery ) {
 			const selection = this.frame.state().get( 'selection' );
-			castArray( this.props.value ).map( ( id ) => {
+			castArray( this.props.value ).forEach( ( id ) => {
 				selection.add( wp.media.attachment( id ) );
 			} );
 		}
