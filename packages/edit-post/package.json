@@ -50,7 +50,9 @@
 	},
 	"sideEffects": [
 		"src/hooks/components/index.js",
+		"src/hooks/index.js",
 		"src/hooks/validate-multiple-use/index.js",
+		"src/index.js",
 		"src/plugins/index.js",
 		"src/store/index.js"
 	]

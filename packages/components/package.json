@@ -51,5 +51,8 @@
 	"publishConfig": {
 		"access": "public"
 	},
-	"sideEffects": false
+	"sideEffects": [
+		"src/date-time/index.js",
+		"src/keyboard-shortcuts/index.js"
+	]
 }

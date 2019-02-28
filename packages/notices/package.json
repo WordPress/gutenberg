@@ -29,5 +29,7 @@
 	"publishConfig": {
 		"access": "public"
 	},
-	"sideEffects": false
+	"sideEffects": [
+		"src/index.js"
+	]
 }

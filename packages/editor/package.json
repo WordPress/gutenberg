@@ -62,6 +62,10 @@
 		"src/hooks/custom-class-name.native.js",
 		"src/hooks/default-autocompleters.js",
 		"src/hooks/generated-class-name.js",
+		"src/hooks/index.js",
+		"src/hooks/index.native.js",
+		"src/index.js",
+		"src/index.native.js",
 		"src/store/index.js"
 	]
 }
