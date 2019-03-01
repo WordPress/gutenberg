@@ -37,9 +37,9 @@ describe( 'BlockMover', () => {
 			const moveDown = blockMover.childAt( 2 );
 			const moveUpDesc = blockMover.childAt( 3 );
 			const moveDownDesc = blockMover.childAt( 4 );
-			expect( moveUp.type().name ).toBe( 'IconButton' );
+			expect( moveUp.name() ).toBe( 'ForwardRef(IconButton)' );
 			expect( drag.type().name ).toBe( 'IconDragHandle' );
-			expect( moveDown.type().name ).toBe( 'IconButton' );
+			expect( moveDown.name() ).toBe( 'ForwardRef(IconButton)' );
 			expect( moveUp.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',
 				onClick: undefined,
