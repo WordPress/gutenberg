@@ -28,7 +28,6 @@ import {
 	updateBlockListSettings,
 	__internalRemoveBlocksPure,
 } from '../actions';
-
 import { select, dispatch } from '../controls';
 
 describe( 'actions', () => {
