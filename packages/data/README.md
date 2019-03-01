@@ -102,12 +102,12 @@ registerStore( 'my-shop', {
 
 The return value of `registerStore` is a [Redux-like store object](https://redux.js.org/docs/basics/Store.html) with the following methods:
 
-- `store.getState()`: Returns the state value of the registered reducer
-   - _Redux parallel:_ [`getState`](https://redux.js.org/api-reference/store#getState)
-- `store.subscribe( listener: Function )`: Registers a function called any time the value of state changes.
-   - _Redux parallel:_ [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
-- `store.dispatch( action: Object )`: Given an action object, calls the registered reducer and updates the state value.
-   - _Redux parallel:_ [`dispatch`](https://redux.js.org/api-reference/store#dispatch(action))
+-   `store.getState()`: Returns the state value of the registered reducer
+    -   _Redux parallel:_ [`getState`](https://redux.js.org/api-reference/store#getState)
+-   `store.subscribe( listener: Function )`: Registers a function called any time the value of state changes.
+    -   _Redux parallel:_ [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
+-   `store.dispatch( action: Object )`: Given an action object, calls the registered reducer and updates the state value.
+    -   _Redux parallel:_ [`dispatch`](https://redux.js.org/api-reference/store#dispatch(action))
 
 ## Options
 
@@ -317,19 +317,19 @@ const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
 //  <SaleButton>Start Sale!</SaleButton>
 ```
 
-*Note:* It is important that the `mapDispatchToProps` function always returns an object with the same keys. For example, it should not contain conditions under which a different value would be returned.
+_Note:_ It is important that the `mapDispatchToProps` function always returns an object with the same keys. For example, it should not contain conditions under which a different value would be returned.
 
 ## Generic Stores
 
 The `@wordpress/data` module offers a more advanced and generic interface for the purposes of integrating other data systems and situations where more direct control over a data system is needed. In this case, a data store will need to be implemented outside of `@wordpress/data` and then plugged in via three functions:
 
-- `getSelectors()`: Returns an object of selector functions, pre-mapped to the store.
-- `getActions()`: Returns an object of action functions, pre-mapped to the store.
-- `subscribe( listener: Function )`: Registers a function called any time the value of state changes.
-   - Behaves as Redux [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
-   with the following differences:
-      - Doesn't have to implement an unsubscribe, since the registry never uses it.
-	  - Only has to support one listener (the registry).
+-   `getSelectors()`: Returns an object of selector functions, pre-mapped to the store.
+-   `getActions()`: Returns an object of action functions, pre-mapped to the store.
+-   `subscribe( listener: Function )`: Registers a function called any time the value of state changes.
+    -   Behaves as Redux [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
+        with the following differences:
+        -   Doesn't have to implement an unsubscribe, since the registry never uses it.
+            			  \- Only has to support one listener (the registry).
 
 By implementing the above interface for your custom store, you gain the benefits of using the registry and the `withSelect` and `withDispatch` higher order components in your application code. This provides seamless integration with existing and alternative data systems.
 
@@ -405,7 +405,6 @@ function createCustomStore() {
 registry.registerGenericStore( 'custom-data', createCustomStore() );
 ```
 
-
 ## Comparison with Redux
 
 The data module shares many of the same [core principles](https://redux.js.org/introduction/three-principles) and [API method naming](https://redux.js.org/api-reference) of [Redux](https://redux.js.org/). In fact, it is implemented atop Redux. Where it differs is in establishing a modularization pattern for creating separate but interdependent stores, and in codifying conventions such as selector functions as the primary entry point for data access.
@@ -414,11 +413,160 @@ The [higher-order components](#higher-order-components) were created to compleme
 
 Specific implementation differences from Redux and React Redux:
 
-- In Redux, a `subscribe` listener is called on every dispatch, regardless of whether the value of state has changed.
-   - In `@wordpress/data`, a subscriber is only called when state has changed.
-- In React Redux, a `mapStateToProps` function must return an object.
-   - In `@wordpress/data`, a `withSelect` mapping function can return `undefined` if it has no props to inject.
-- In React Redux, the `mapDispatchToProps` argument can be defined as an object or a function.
-   - In `@wordpress/data`, the `withDispatch` higher-order component creator must be passed a function.
+-   In Redux, a `subscribe` listener is called on every dispatch, regardless of whether the value of state has changed.
+    -   In `@wordpress/data`, a subscriber is only called when state has changed.
+-   In React Redux, a `mapStateToProps` function must return an object.
+    -   In `@wordpress/data`, a `withSelect` mapping function can return `undefined` if it has no props to inject.
+-   In React Redux, the `mapDispatchToProps` argument can be defined as an object or a function.
+    -   In `@wordpress/data`, the `withDispatch` higher-order component creator must be passed a function.
+
+## API
+
+<!-- START TOKEN(Autogenerated API docs) -->
+
+### combineReducers
+
+[src/index.js#L30-L30](src/index.js#L30-L30)
+
+The combineReducers helper function turns an object whose values are different
+reducing functions into a single reducing function you can pass to registerReducer.
+
+**Parameters**
+
+-   **reducers** `Object`: An object whose values correspond to different reducing functions that need to be combined into one.
+
+**Returns**
+
+`Function` A reducer that invokes every reducer inside the reducers object, and constructs a state object with the same shape.
+
+### createRegistry
+
+[src/index.js#L16-L16](src/index.js#L16-L16)
+
+Creates a new store registry, given an optional object of initial store
+configurations.
+
+**Parameters**
+
+-   **storeConfigs** `Object`: Initial store configurations.
+
+**Returns**
+
+`WPDataRegistry` Data registry.
+
+### createRegistryControl
+
+[src/index.js#L18-L18](src/index.js#L18-L18)
+
+Mark a control as a registry control.
+
+**Parameters**
+
+-   **registryControl** `function`: Function receiving a registry object and returning a control.
+
+**Returns**
+
+`function` marked registry control.
+
+### createRegistrySelector
+
+[src/index.js#L18-L18](src/index.js#L18-L18)
+
+Mark a selector as a registry selector.
+
+**Parameters**
+
+-   **registrySelector** `function`: Function receiving a registry object and returning a state selector.
+
+**Returns**
+
+`function` marked registry selector.
+
+### dispatch
+
+[src/index.js#L33-L33](src/index.js#L33-L33)
+
+Undocumented declaration.
+
+### plugins
+
+[src/index.js#L17-L17](src/index.js#L17-L17)
+
+Undocumented declaration.
+
+### registerGenericStore
+
+[src/index.js#L35-L35](src/index.js#L35-L35)
+
+Undocumented declaration.
+
+### registerStore
+
+[src/index.js#L36-L36](src/index.js#L36-L36)
+
+Undocumented declaration.
+
+### RegistryConsumer
+
+[src/index.js#L14-L14](src/index.js#L14-L14)
+
+Undocumented declaration.
+
+### RegistryProvider
+
+[src/index.js#L14-L14](src/index.js#L14-L14)
+
+Undocumented declaration.
+
+### select
+
+[src/index.js#L32-L32](src/index.js#L32-L32)
+
+Undocumented declaration.
+
+### subscribe
+
+[src/index.js#L34-L34](src/index.js#L34-L34)
+
+Undocumented declaration.
+
+### use
+
+[src/index.js#L37-L37](src/index.js#L37-L37)
+
+Undocumented declaration.
+
+### withDispatch
+
+[src/index.js#L13-L13](src/index.js#L13-L13)
+
+Higher-order component used to add dispatch props using registered action
+creators.
+
+**Parameters**
+
+-   **mapDispatchToProps** `Object`: Object of prop names where value is a dispatch-bound action creator, or a function to be called with with the component's props and returning an action creator.
+
+**Returns**
+
+`Component` Enhanced component with merged dispatcher props.
+
+### withSelect
+
+[src/index.js#L12-L12](src/index.js#L12-L12)
+
+Higher-order component used to inject state-derived props using registered
+selectors.
+
+**Parameters**
+
+-   **mapSelectToProps** `Function`: Function called on every state change, expected to return object of props to merge with the component's own props.
+
+**Returns**
+
+`Component` Enhanced component with merged state data props.
+
+
+<!-- END TOKEN(Autogenerated API docs) -->
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
