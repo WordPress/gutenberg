@@ -296,7 +296,7 @@
 		// Position toolbar better on mobile.
 		.editor-block-contextual-toolbar {
 			width: auto;
-			border-bottom: $border-width solid $light-gray-500;
+			border-bottom: $border-width solid $dark-opacity-200;
 			bottom: auto;
 		}
 	}
@@ -806,7 +806,7 @@
 			border-top: none;
 			.components-toolbar {
 				border-top: $border-width solid $light-gray-500;
-				border-bottom: $border-width solid $light-gray-500;
+				border-bottom: $border-width solid $dark-opacity-200;
 			}
 		}
 	}
