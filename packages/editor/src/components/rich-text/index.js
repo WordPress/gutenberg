@@ -573,13 +573,14 @@ export class RichText extends Component {
 	/**
 	 * Handles a keydown event.
 	 *
-	 * @param {KeyboardEvent} event The keydown event.
+	 * @param {SyntheticEvent} event A synthetic keyboard event.
 	 */
 	onKeyDown( event ) {
-		const { keyCode, shiftKey, altKey, metaKey } = event;
+		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
 		if (
-			! shiftKey && ! altKey && ! metaKey &&
+			// Only override left and right keys without modifiers pressed.
+			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
 			( keyCode === LEFT || keyCode === RIGHT )
 		) {
 			this.handleHorizontalNavigation( event );
@@ -661,6 +662,13 @@ export class RichText extends Component {
 		}
 	}
 
+	/**
+	 * Handles horizontal keyboard navigation when no modifiers are pressed. The
+	 * navigation is handled separately to move correctly around format
+	 * boundaries.
+	 *
+	 * @param  {SyntheticEvent} event A synthetic keyboard event.
+	 */
 	handleHorizontalNavigation( event ) {
 		const value = this.createRecord();
 		const { formats, text, start, end } = value;
