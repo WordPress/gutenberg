@@ -5,6 +5,7 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	createNewPost,
+	isInDefaultBlock,
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
@@ -107,5 +108,26 @@ describe( 'block deletion -', () => {
 			await page.keyboard.type( ' - caret was here' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
+	} );
+} );
+
+describe( 'deleting all blocks', () => {
+	it( 'results in the default block getting selected', async () => {
+		await createNewPost();
+		await clickBlockAppender();
+		await page.keyboard.type( 'Paragraph' );
+
+		await page.keyboard.press( 'Escape' );
+
+		await clickOnBlockSettingsMenuItem( 'Remove Block' );
+
+		// There is a default block:
+		expect( await page.$$( '.editor-block-list__block' ) ).toHaveLength( 1 );
+
+		// But the effective saved content is still empty:
+		expect( await getEditedPostContent() ).toBe( '' );
+
+		// And focus is retained:
+		expect( await isInDefaultBlock() ).toBe( true );
 	} );
 } );
