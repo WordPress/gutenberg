@@ -34,6 +34,7 @@ Example:
 {% codetabs %}
 
 {% ES5 %}
+
 ```js
 var __ = wp.i18n.__;
 var PluginBlockSettingsMenuItem = wp.editPost.PluginBlockSettingsMenuItem;
@@ -56,6 +57,7 @@ function MyPluginBlockSettingsMenuItem() {
 ```
 
 {% ESNext %}
+
 ```jsx
 import { __ } from wp.i18n;
 import { PluginBlockSettingsMenuItem } from wp.editPost;
@@ -81,31 +83,31 @@ const MyPluginBlockSettingsMenuItem = () => (
 
 An array containing a whitelist of block names for which the item should be shown. If this prop is not present the item will be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the whitelist.
 
-- Type: `Array`
-- Required: No
-- Default: Menu item is shown for any block
+-   Type: `Array`
+-   Required: No
+-   Default: Menu item is shown for any block
 
 ##### icon
 
 The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 
-- Type: `String` | `Element`
-- Required: No
-- Default: Menu item wil be rendered without icon
+-   Type: `String` \| `Element`
+-   Required: No
+-   Default: Menu item wil be rendered without icon
 
 ##### label
 
 A string containing the menu item text.
 
-- Type: `String`
-- Required: Yes
+-   Type: `String`
+-   Required: Yes
 
 ##### onClick
 
 The callback function to be executed when the user clicks the menu item.
 
-- Type: `function`
-- Required: Yes
+-   Type: `function`
+-   Required: Yes
 
 ### `PluginSidebar`
 
@@ -122,6 +124,7 @@ _Example:_
 {% codetabs %}
 
 {% ES5 %}
+
 ```js
 var __ = wp.i18n.__;
 var el = wp.element.createElement;
@@ -147,6 +150,7 @@ function MyPluginSidebar() {
 ```
 
 {% ESNext %}
+
 ```jsx
 const { __ } = wp.i18n;
 const { PanelBody } = wp.components;
@@ -164,6 +168,7 @@ const MyPluginSidebar = () => (
 	</PluginSidebar>
 );
 ```
+
 {% end %}
 
 #### Props
@@ -172,38 +177,38 @@ const MyPluginSidebar = () => (
 
 A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
 
-- Type: `String`
-- Required: Yes
+-   Type: `String`
+-   Required: Yes
 
 ##### className
 
 An optional class name added to the sidebar body.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ##### title
 
 Title displayed at the top of the sidebar.
 
-- Type: `String`
-- Required: Yes
+-   Type: `String`
+-   Required: Yes
 
 ##### isPinnable
 
 Whether to allow to pin sidebar to toolbar.
 
-- Type: `Boolean`
-- Required: No
-- Default: `true`
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
 
 ##### icon
 
 The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
 
-- Type: `String` | `Element`
-- Required: No
-- Default: _inherits from the plugin_
+-   Type: `String` \| `Element`
+-   Required: No
+-   Default: _inherits from the plugin_
 
 ### `PluginMoreMenuItem`
 
@@ -215,6 +220,7 @@ _Example:_
 {% codetabs %}
 
 {% ES5 %}
+
 ```js
 var __ = wp.i18n.__;
 var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
@@ -236,6 +242,7 @@ function MyButtonMoreMenuItem() {
 ```
 
 {% ESNext %}
+
 ```jsx
 const { __ } = wp.i18n;
 const { PluginMoreMenuItem } = wp.editPost;
@@ -253,6 +260,7 @@ const MyButtonMoreMenuItem = () => (
 	</PluginMoreMenuItem>
 );
 ```
+
 {% end %}
 
 #### Props
@@ -263,24 +271,24 @@ const MyButtonMoreMenuItem = () => (
 
 When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ##### icon
 
 The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 
-- Type: `String` | `Element`
-- Required: No
-- Default: _inherits from the plugin_
+-   Type: `String` \| `Element`
+-   Required: No
+-   Default: _inherits from the plugin_
 
 ##### onClick
 
 The callback function to be executed when the user clicks the menu item.
 
-- Type: `function`
-- Required: No
-- Default: _function which does nothing_
+-   Type: `function`
+-   Required: No
+-   Default: _function which does nothing_
 
 ### `PluginSidebarMoreMenuItem`
 
@@ -292,6 +300,7 @@ _Example:_
 {% codetabs %}
 
 {% ES5 %}
+
 ```js
 var __ = wp.i18n.__;
 var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
@@ -309,6 +318,7 @@ function MySidebarMoreMenuItem() {
 ```
 
 {% ESNext %}
+
 ```jsx
 const { __ } = wp.i18n;
 const { PluginSidebarMoreMenuItem } = wp.editPost;
@@ -322,6 +332,7 @@ const MySidebarMoreMenuItem = () => (
 	</PluginSidebarMoreMenuItem>
 );
 ```
+
 {% end %}
 
 #### Props
@@ -330,17 +341,16 @@ const MySidebarMoreMenuItem = () => (
 
 A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
 
-- Type: `String`
-- Required: Yes
+-   Type: `String`
+-   Required: Yes
 
 ##### icon
 
 The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 
-- Type: `String` | `Element`
-- Required: No
-- Default: _inherits from the plugin_
-
+-   Type: `String` \| `Element`
+-   Required: No
+-   Default: _inherits from the plugin_
 
 ### `PluginPostStatusInfo`
 
@@ -352,6 +362,7 @@ _Example:_
 {% codetabs %}
 
 {% ES5 %}
+
 ```js
 var __ = wp.i18n.__;
 var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
@@ -368,6 +379,7 @@ function MyPluginPostStatusInfo() {
 ```
 
 {% ESNext %}
+
 ```jsx
 const { __ } = wp.i18n;
 const { PluginPostStatusInfo } = wp.editPost;
@@ -380,6 +392,7 @@ const MyPluginPostStatusInfo = () => (
 	</PluginPostStatusInfo>
 );
 ```
+
 {% end %}
 
 #### Props
@@ -388,8 +401,8 @@ const MyPluginPostStatusInfo = () => (
 
 An optional class name added to the row.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ### `PluginPrePublishPanel`
 
@@ -400,6 +413,7 @@ _Example:_
 {% codetabs %}
 
 {% ES5 %}
+
 ```js
 var __ = wp.i18n.__;
 var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
@@ -418,6 +432,7 @@ function MyPluginPrePublishPanel() {
 ```
 
 {% ESNext %}
+
 ```jsx
 const { __ } = wp.i18n;
 const { PluginPrePublishPanel } = wp.editPost;
@@ -432,6 +447,7 @@ const MyPluginPrePublishPanel = () => (
 	</PluginPrePublishPanel>
 );
 ```
+
 {% end %}
 
 #### Props
@@ -440,24 +456,23 @@ const MyPluginPrePublishPanel = () => (
 
 An optional class name added to the panel.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ##### title
 
 Title displayed at the top of the panel.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ##### initialOpen
 
 Whether to have the panel initially opened. When no title is provided it is always opened.
 
-- Type: `Boolean`
-- Required: No
-- Default: `false`
-
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ### `PluginPostPublishPanel`
 
@@ -468,6 +483,7 @@ _Example:_
 {% codetabs %}
 
 {% ES5 %}
+
 ```js
 var __ = wp.i18n.__;
 var PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
@@ -486,6 +502,7 @@ function MyPluginPostPublishPanel() {
 ```
 
 {% ESNext %}
+
 ```jsx
 const { __ } = wp.i18n;
 const { PluginPostPublishPanel } = wp.editPost;
@@ -500,6 +517,7 @@ const MyPluginPostPublishPanel = () => (
 	</PluginPostPublishPanel>
 );
 ```
+
 {% end %}
 
 #### Props
@@ -508,23 +526,104 @@ const MyPluginPostPublishPanel = () => (
 
 An optional class name added to the panel.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ##### title
 
 Title displayed at the top of the panel.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ##### initialOpen
 
 Whether to have the panel initially opened. When no title is provided it is always opened.
 
-- Type: `Boolean`
-- Required: No
-- Default: `false`
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
+## API
+
+<!-- START TOKEN(Autogenerated API docs) -->
+
+### initializeEditor
+
+[src/index.js#L66-L96](src/index.js#L66-L96)
+
+Initializes and returns an instance of Editor.
+
+The return value of this function is not necessary if we change where we
+call initializeEditor(). This is due to metaBox timing.
+
+**Parameters**
+
+-   **id** `string`: Unique identifier for editor instance.
+-   **postType** `Object`: Post type of the post to edit.
+-   **postId** `Object`: ID of the post to edit.
+-   **settings** `?Object`: Editor settings object.
+-   **initialEdits** `Object`: Programmatic edits to apply initially, to be considered as non-user-initiated (bypass for unsaved changes prompt).
+
+### PluginBlockSettingsMenuItem
+
+[src/index.js#L98-L98](src/index.js#L98-L98)
+
+Undocumented declaration.
+
+### PluginMoreMenuItem
+
+[src/index.js#L99-L99](src/index.js#L99-L99)
+
+Undocumented declaration.
+
+### PluginPostPublishPanel
+
+[src/index.js#L100-L100](src/index.js#L100-L100)
+
+Undocumented declaration.
+
+### PluginPostStatusInfo
+
+[src/index.js#L101-L101](src/index.js#L101-L101)
+
+Undocumented declaration.
+
+### PluginPrePublishPanel
+
+[src/index.js#L102-L102](src/index.js#L102-L102)
+
+Undocumented declaration.
+
+### PluginSidebar
+
+[src/index.js#L103-L103](src/index.js#L103-L103)
+
+Undocumented declaration.
+
+### PluginSidebarMoreMenuItem
+
+[src/index.js#L104-L104](src/index.js#L104-L104)
+
+Undocumented declaration.
+
+### reinitializeEditor
+
+[src/index.js#L35-L50](src/index.js#L35-L50)
+
+Reinitializes the editor after the user chooses to reboot the editor after
+an unhandled error occurs, replacing previously mounted editor element using
+an initial state from prior to the crash.
+
+**Parameters**
+
+-   **postType** `Object`: Post type of the post to edit.
+-   **postId** `Object`: ID of the post to edit.
+-   **target** `Element`: DOM node in which editor is rendered.
+-   **settings** `?Object`: Editor settings object.
+-   **initialEdits** `Object`: Programmatic edits to apply initially, to be considered as non-user-initiated (bypass for unsaved changes prompt).
+
+
+<!-- END TOKEN(Autogenerated API docs) -->
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

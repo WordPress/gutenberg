@@ -1,0 +1,4 @@
+# Undocumented exports
+
+initializeEditor
+reinitializeEditor
