@@ -1,0 +1,64 @@
+version: 2.1
+
+commands:
+  yarn-install:
+    steps:
+      - restore_cache:
+          name: Restore Yarn Cache
+          keys:
+            - yarn-{{ checksum "yarn.lock" }}
+      - run:
+          name: Yarn Install
+          command: yarn install --frozen-lockfile
+      - save_cache:
+          name: Save Yarn Cache
+          key: yarn-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+
+jobs:
+  checks:
+    parameters:
+      platform:
+        type: string
+        default: ""
+      check-tests:
+        type: boolean
+        default: false
+      check-correctness:
+        type: boolean
+        default: false
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - run:
+          name: Checkout Gutenberg
+          command: |
+            git submodule init
+            git submodule update --recursive
+      - yarn-install
+      - run:
+          name: Set Environment Variables
+          command: |
+            echo 'export CHECK_CORRECTNESS=<<parameters.check-correctness>>' >> $BASH_ENV
+            echo 'export CHECK_TESTS=<<parameters.check-tests>>' >> $BASH_ENV
+            echo 'export TEST_RN_PLATFORM=<<parameters.platform>>' >> $BASH_ENV
+      - run:
+          name: Run Checks
+          command: bin/ci-checks-js.sh
+
+workflows:
+  gutenberg-mobile:
+    jobs:
+      - checks:
+          name: Check Correctness
+          check-correctness: true
+      - checks:
+          name: Test iOS
+          platform: ios
+          check-tests: true
+      - checks:
+          name: Test Android
+          platform: android
+          check-tests: true
