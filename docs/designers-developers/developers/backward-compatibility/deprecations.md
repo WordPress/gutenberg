@@ -2,6 +2,12 @@
 
 The Gutenberg project's deprecation policy is intended to support backward compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 5.4.0
+
+- The PHP function `gutenberg_load_plugin_textdomain` has been removed.
+- The PHP function `gutenberg_get_jed_locale_data` has been removed.
+- The PHP function `gutenberg_load_locale_data` has been removed.
+
 ## 5.3.0
 
 - The PHP function `gutenberg_redirect_to_classic_editor_when_saving_posts` has been removed.

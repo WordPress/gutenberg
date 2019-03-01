@@ -83,7 +83,70 @@ function gutenberg_override_script( $handle, $src, $deps = array(), $ver = false
 	} else {
 		wp_register_script( $handle, $src, $deps, $ver, $in_footer );
 	}
+
+	/*
+	 * `WP_Dependencies::set_translations` will fall over on itself if setting
+	 * translations on the `wp-i18n` handle, since it internally adds `wp-i18n`
+	 * as a dependency of itself, exhausting memory. The same applies for the
+	 * polyfill script, which is a dependency _of_ `wp-i18n`.
+	 *
+	 * See: https://core.trac.wordpress.org/ticket/46089
+	 */
+	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
+		wp_set_script_translations( $handle, 'default' );
+	}
 }
+
+/**
+ * Filters the default translation file load behavior to load the Gutenberg
+ * plugin translation file, if available.
+ *
+ * @param string|false $file   Path to the translation file to load. False if
+ *                             there isn't one.
+ * @param string       $handle Name of the script to register a translation
+ *                             domain to.
+ *
+ * @return string|false Filtered path to the Gutenberg translation file, if
+ *                      available.
+ */
+function gutenberg_override_translation_file( $file, $handle ) {
+	if ( ! $file ) {
+		return $file;
+	}
+
+	// Only override script handles generated from the Gutenberg plugin.
+	$packages_dependencies = include dirname( __FILE__ ) . '/packages-dependencies.php';
+	if ( ! isset( $packages_dependencies[ $handle ] ) ) {
+		return $file;
+	}
+
+	/*
+	 * The default file will be in the plugins language directory, omitting the
+	 * domain since Gutenberg assigns the script translations as the default.
+	 *
+	 * Example: /www/wp-content/languages/plugins/de_DE-07d88e6a803e01276b9bfcc1203e862e.json
+	 *
+	 * The logic of `load_script_textdomain` is such that it will assume to
+	 * search in the plugins language directory, since the assigned source of
+	 * the overridden Gutenberg script originates in the plugins directory.
+	 *
+	 * The plugin translation files each begin with the slug of the plugin, so
+	 * it's a simple matter of prepending the Gutenberg plugin slug.
+	 */
+	$path_parts              = pathinfo( $file );
+	$plugin_translation_file = (
+		$path_parts['dirname'] .
+		'/gutenberg-' .
+		$path_parts['basename']
+	);
+
+	if ( ! is_readable( $plugin_translation_file ) ) {
+		return $file;
+	}
+
+	return $plugin_translation_file;
+}
+add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
 
 /**
  * Registers a style according to `wp_register_style`. Honors this request by
@@ -485,14 +548,11 @@ function gutenberg_get_autosave_newer_than_post_save( $post ) {
 
 /**
  * Loads Gutenberg Locale Data.
+ *
+ * @deprecated 5.2.0
  */
 function gutenberg_load_locale_data() {
-	// Prepare Jed locale data.
-	$locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
-	wp_add_inline_script(
-		'wp-i18n',
-		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
-	);
+	_deprecated_function( __FUNCTION__, '5.2.0' );
 }
 
 /**
@@ -679,8 +739,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	} else {
 		$initial_edits = null;
 	}
-
-	gutenberg_load_locale_data();
 
 	// Preload server-registered block schemas.
 	wp_add_inline_script(
