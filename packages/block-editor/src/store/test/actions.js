@@ -12,7 +12,6 @@ import {
 	updateBlockAttributes,
 	updateBlock,
 	selectBlock,
-	selectPreviousBlock,
 	startMultiSelect,
 	stopMultiSelect,
 	multiSelect,
@@ -27,7 +26,10 @@ import {
 	removeBlock,
 	toggleBlockMode,
 	updateBlockListSettings,
+	__internalRemoveBlocksPure,
 } from '../actions';
+
+import { select, dispatch } from '../controls';
 
 describe( 'actions', () => {
 	describe( 'resetBlocks', () => {
@@ -205,6 +207,21 @@ describe( 'actions', () => {
 		} );
 	} );
 
+	describe( '__internalRemoveBlocksPure', () => {
+		it( 'should return REMOVE_BLOCKS action', () => {
+			const clientIds = [ 'myclientid' ];
+
+			const action = __internalRemoveBlocksPure( clientIds );
+
+			expect( action ).toEqual(
+				{
+					type: 'REMOVE_BLOCKS',
+					clientIds,
+				},
+			);
+		} );
+	} );
+
 	describe( 'removeBlocks', () => {
 		it( 'should return REMOVE_BLOCKS action', () => {
 			const clientId = 'clientId';
@@ -213,11 +230,20 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlocks( clientIds ) );
 
 			expect( actions ).toEqual( [
-				selectPreviousBlock( clientId ),
-				{
-					type: 'REMOVE_BLOCKS',
-					clientIds,
-				},
+				dispatch(
+					'core/block-editor',
+					'selectPreviousBlock',
+					clientId
+				),
+				dispatch(
+					'core/block-editor',
+					'__internalRemoveBlocksPure',
+					[ clientId ],
+				),
+				select(
+					'core/block-editor',
+					'getBlockCount',
+				),
 			] );
 		} );
 	} );
@@ -229,24 +255,38 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlock( clientId ) );
 
 			expect( actions ).toEqual( [
-				selectPreviousBlock( clientId ),
-				{
-					type: 'REMOVE_BLOCKS',
-					clientIds: [ clientId ],
-				},
+				dispatch(
+					'core/block-editor',
+					'selectPreviousBlock',
+					clientId
+				),
+				dispatch(
+					'core/block-editor',
+					'__internalRemoveBlocksPure',
+					[ clientId ],
+				),
+				select(
+					'core/block-editor',
+					'getBlockCount',
+				),
 			] );
 		} );
 
-		it( 'should return REMOVE_BLOCKS action, opting out of remove previous', () => {
+		it( 'should return REMOVE_BLOCKS action, opting out of select previous', () => {
 			const clientId = 'myclientid';
 
 			const actions = Array.from( removeBlock( clientId, false ) );
 
 			expect( actions ).toEqual( [
-				{
-					type: 'REMOVE_BLOCKS',
-					clientIds: [ clientId ],
-				},
+				dispatch(
+					'core/block-editor',
+					'__internalRemoveBlocksPure',
+					[ clientId ],
+				),
+				select(
+					'core/block-editor',
+					'getBlockCount',
+				),
 			] );
 		} );
 	} );

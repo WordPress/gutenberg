@@ -958,6 +958,16 @@ Returns an action object used in signalling that two blocks should be merged
  * firstBlockClientId: Client ID of the first block to merge.
  * secondBlockClientId: Client ID of the second block to merge.
 
+### __internalRemoveBlocksPure
+
+Returns action objects used in signalling that the blocks corresponding to
+the set of specified client IDs are to be removed.
+This action does not trigger any required side effects and it is not recommended for public usage.
+
+*Parameters*
+
+ * clientIds: Client IDs of blocks to remove.
+
 ### removeBlocks
 
 Yields action objects used in signalling that the blocks corresponding to

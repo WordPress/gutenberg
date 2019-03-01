@@ -11,7 +11,7 @@ import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { select } from './controls';
+import { select, dispatch } from './controls';
 
 /**
  * Returns an action object used in signalling that blocks state should be
@@ -375,6 +375,23 @@ export function mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 }
 
 /**
+ * Returns action objects used in signalling that the blocks corresponding to
+ * the set of specified client IDs are to be removed.
+ * This action does not trigger any required side effects and it is not recommended for public usage.
+ *
+ * @param {string|string[]} clientIds      Client IDs of blocks to remove.
+ *
+ * @return {Object} Action object.
+ *
+ */
+export function __internalRemoveBlocksPure( clientIds ) {
+	return {
+		type: 'REMOVE_BLOCKS',
+		clientIds,
+	};
+}
+
+/**
  * Yields action objects used in signalling that the blocks corresponding to
  * the set of specified client IDs are to be removed.
  *
@@ -386,13 +403,26 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 	clientIds = castArray( clientIds );
 
 	if ( selectPrevious ) {
-		yield selectPreviousBlock( clientIds[ 0 ] );
+		yield dispatch(
+			'core/block-editor',
+			'selectPreviousBlock',
+			clientIds[ 0 ]
+		);
 	}
 
-	yield {
-		type: 'REMOVE_BLOCKS',
+	yield dispatch(
+		'core/block-editor',
+		'__internalRemoveBlocksPure',
 		clientIds,
-	};
+	);
+
+	const count = yield select(
+		'core/block-editor',
+		'getBlockCount',
+	);
+	if ( count === 0 ) {
+		yield insertDefaultBlock();
+	}
 }
 
 /**
