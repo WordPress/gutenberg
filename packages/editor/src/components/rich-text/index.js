@@ -576,10 +576,10 @@ export class RichText extends Component {
 	 * @param {KeyboardEvent} event The keydown event.
 	 */
 	onKeyDown( event ) {
-		const { keyCode, shiftKey, altKey, metaKey, crtlKey } = event;
+		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
 		if (
-			! shiftKey && ! altKey && ! metaKey && ! crtlKey &&
+			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
 			( keyCode === LEFT || keyCode === RIGHT )
 		) {
 			this.handleHorizontalNavigation( event );
