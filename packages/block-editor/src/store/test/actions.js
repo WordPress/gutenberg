@@ -12,6 +12,7 @@ import {
 	updateBlockAttributes,
 	updateBlock,
 	selectBlock,
+	selectPreviousBlock,
 	startMultiSelect,
 	stopMultiSelect,
 	multiSelect,
@@ -26,9 +27,8 @@ import {
 	removeBlock,
 	toggleBlockMode,
 	updateBlockListSettings,
-	__internalRemoveBlocksPure,
 } from '../actions';
-import { select, dispatch } from '../controls';
+import { select } from '../controls';
 
 describe( 'actions', () => {
 	describe( 'resetBlocks', () => {
@@ -206,21 +206,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( '__internalRemoveBlocksPure', () => {
-		it( 'should return REMOVE_BLOCKS action', () => {
-			const clientIds = [ 'myclientid' ];
-
-			const action = __internalRemoveBlocksPure( clientIds );
-
-			expect( action ).toEqual(
-				{
-					type: 'REMOVE_BLOCKS',
-					clientIds,
-				},
-			);
-		} );
-	} );
-
 	describe( 'removeBlocks', () => {
 		it( 'should return REMOVE_BLOCKS action', () => {
 			const clientId = 'clientId';
@@ -229,16 +214,11 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlocks( clientIds ) );
 
 			expect( actions ).toEqual( [
-				dispatch(
-					'core/block-editor',
-					'selectPreviousBlock',
-					clientId
-				),
-				dispatch(
-					'core/block-editor',
-					'__internalRemoveBlocksPure',
-					[ clientId ],
-				),
+				selectPreviousBlock( clientId ),
+				{
+					type: 'REMOVE_BLOCKS',
+					clientIds,
+				},
 				select(
 					'core/block-editor',
 					'getBlockCount',
@@ -254,16 +234,11 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlock( clientId ) );
 
 			expect( actions ).toEqual( [
-				dispatch(
-					'core/block-editor',
-					'selectPreviousBlock',
-					clientId
-				),
-				dispatch(
-					'core/block-editor',
-					'__internalRemoveBlocksPure',
-					[ clientId ],
-				),
+				selectPreviousBlock( clientId ),
+				{
+					type: 'REMOVE_BLOCKS',
+					clientIds: [ clientId ],
+				},
 				select(
 					'core/block-editor',
 					'getBlockCount',
@@ -277,11 +252,10 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlock( clientId, false ) );
 
 			expect( actions ).toEqual( [
-				dispatch(
-					'core/block-editor',
-					'__internalRemoveBlocksPure',
-					[ clientId ],
-				),
+				{
+					type: 'REMOVE_BLOCKS',
+					clientIds: [ clientId ],
+				},
 				select(
 					'core/block-editor',
 					'getBlockCount',
