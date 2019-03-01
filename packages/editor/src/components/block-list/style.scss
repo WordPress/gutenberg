@@ -139,7 +139,7 @@
 
 	// Hover style.
 	&.is-hovered > .editor-block-list__block-edit::before {
-		outline: $border-width solid theme(outlines);
+		box-shadow: -$border-width 0 0 0 $dark-gray-300;
 	}
 
 	// Spotlight mode.
@@ -917,9 +917,9 @@
 	line-height: 1;
 	z-index: z-index(".editor-block-list__breadcrumb");
 
-	// Position in the top right of the border.
-	right: -$block-padding;
-	top: -$block-padding - $border-width;
+	// Position to the top left of the border.
+	left: -$block-padding - $border-width;
+	top: ($block-padding * -2) - ($border-width * 5);
 
 	.components-toolbar {
 		padding: 0;
@@ -929,7 +929,7 @@
 		font-family: $default-font;
 		font-size: 11px;
 		padding: 4px 4px;
-		background: theme(outlines);
+		background: $dark-gray-300;
 		color: $white;
 
 		// Animate in
