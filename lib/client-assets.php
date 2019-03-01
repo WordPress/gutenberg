@@ -200,27 +200,6 @@ function gutenberg_register_scripts_and_styles() {
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backward compatibility.
 	gutenberg_override_style( 'wp-blocks', false );
-	$fonts_url = '';
-
-	/*
-	 * Translators: Use this to specify the proper Google Font name and variants
-	 * to load that is supported by your language. Do not translate.
-	 * Set to 'off' to disable loading.
-	 */
-	$font_family = _x( 'Noto Serif:400,400i,700,700i', 'Google Font Name and Variants', 'gutenberg' );
-	if ( 'off' !== $font_family ) {
-		$query_args = array(
-			'family' => urlencode( $font_family ),
-		);
-		$fonts_url  = esc_url_raw( add_query_arg( $query_args, 'https://fonts.googleapis.com/css' ) );
-	}
-
-	gutenberg_override_style(
-		'wp-editor-font',
-		$fonts_url,
-		array(),
-		null
-	);
 
 	gutenberg_override_style(
 		'wp-editor',
