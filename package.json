@@ -131,6 +131,7 @@
 				}
 			],
 			"require-publishConfig": "error",
+			"require-repository-directory": "off",
 			"valid-values-author": [
 				"error",
 				[
