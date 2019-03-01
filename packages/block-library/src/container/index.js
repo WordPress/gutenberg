@@ -26,6 +26,8 @@ export const settings = {
 
 	description: __( 'A container for other blocks.' ),
 
+	keywords: [ __( 'container' ), __( 'section' ), __( 'wrapper' ) ],
+
 	supports: {
 		align: [ 'wide', 'full' ],
 		anchor: true,
