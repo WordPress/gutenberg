@@ -2,7 +2,7 @@
 
 ### New Feature
 
-- The `npm-package-json-lint` peer dependency has been updated from requiring `^3.3.1` to requiring `^3.6.0`, adding [a rule which enforces the presence of the `repository.directory` field](https://github.com/tclindner/npm-package-json-lint/pull/106)
+- The `npm-package-json-lint` peer dependency has been updated from requiring `^3.3.1` to requiring `^3.6.0`, adding [a rule which enforces the presence of the `repository.directory` field](https://github.com/tclindner/npm-package-json-lint/pull/106) [#14200](https://github.com/WordPress/gutenberg/pull/14200)
 
 ## 1.1.3 (2018-09-05)
 
