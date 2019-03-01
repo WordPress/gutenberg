@@ -25,7 +25,13 @@
 		"moment": "^2.22.1",
 		"moment-timezone": "^0.5.16"
 	},
+	"devDependencies": {
+		"@wordpress/docgen": "file:../docgen"
+	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"docs:generate": "docgen ./src/index.js --output ./README.md --to-token"
 	}
 }
