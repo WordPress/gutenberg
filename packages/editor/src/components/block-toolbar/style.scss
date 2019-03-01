@@ -5,13 +5,30 @@
 	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
 
-	// Allow overflow on desktop.
 	@include break-small() {
-		overflow: inherit;
-	}
 
-	// Show a left border on the parent container.
-	border-left: $border-width solid $light-gray-500;
+		// Allow overflow on desktop.
+		overflow: inherit;
+
+		// Show a left border on the parent container.
+		border-left: $border-width solid $dark-opacity-200;
+
+		// Use a lighter left border when the fixed toolbar is active.
+		.has-fixed-toolbar & {
+			border-left: $border-width solid $light-gray-500;
+		}
+
+		// Use a darker border on the right edge of the toolbar.
+		> *:last-child .components-toolbar {
+			box-shadow: none;
+			border-right: $border-width solid $dark-opacity-200;
+
+			// If fixed toolbar is active, use a light border.
+			.has-fixed-toolbar & {
+				border-right: $border-width solid $light-gray-500;
+			}
+		}
+	}
 
 	// The component is born with a border, but we only need some of them.
 	.components-toolbar {
@@ -20,6 +37,11 @@
 		border-bottom: $border-width solid $light-gray-500;
 
 		// Add a right border to show as separator in the block toolbar.
-		border-right: $border-width solid $light-gray-500;
+		box-shadow: inset (-$border-width) 0 0 0 $light-gray-500;
+
+		// Add a tiny right margin to house the inset border above.
+		> *:last-child {
+			margin-right: $border-width;
+		}
 	}
 }

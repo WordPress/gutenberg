@@ -595,7 +595,7 @@
 		margin-top: $block-toolbar-height;
 		margin-right: -$block-padding;
 		margin-left: -$block-padding;
-		border-top: $border-width solid $light-gray-500;
+		border-top: $border-width solid $dark-opacity-200;
 		height: $block-toolbar-height;
 
 		@include break-small() {
@@ -796,7 +796,7 @@
 		right: -$block-padding;
 
 		// Paint the borders on the toolbar itself on mobile.
-		border-top: $border-width solid $light-gray-500;
+		border-top: $border-width solid $dark-opacity-200;
 		.components-toolbar {
 			border-top: none;
 			border-bottom: none;
@@ -805,7 +805,7 @@
 		@include break-small() {
 			border-top: none;
 			.components-toolbar {
-				border-top: $border-width solid $light-gray-500;
+				border-top: $border-width solid $dark-opacity-200;
 				border-bottom: $border-width solid $dark-opacity-200;
 			}
 		}
