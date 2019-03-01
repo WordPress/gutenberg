@@ -299,7 +299,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_style(
 		'wp-block-library',
 		gutenberg_url( 'build/block-library/style.css' ),
-		current_theme_supports( 'wp-block-styles' ) ? array( 'wp-block-library-theme' ) : array(),
+		array(),
 		filemtime( gutenberg_dir_path() . 'build/block-library/style.css' )
 	);
 	wp_style_add_data( 'wp-block-library', 'rtl', 'replace' );
