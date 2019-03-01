@@ -213,13 +213,17 @@
 		}
 	}
 
-	&.has-warning:not(.is-hovered) .editor-block-list__block-edit::before {
+	&.has-warning:not(.is-hovered):not(.is-selected) .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
 		outline-color: $dark-opacity-light-500;
 
 		.is-dark-theme & {
 			outline-color: $light-opacity-light-500;
 		}
+	}
+
+	&.has-warning.is-hovered .editor-block-list__block-edit::before {
+		outline: $border-width solid $dark-opacity-light-500;
 	}
 
 	&.has-warning .editor-block-list__block-edit::after {

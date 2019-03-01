@@ -13,6 +13,24 @@
 		background-color: transparent;
 	}
 
+	.has-warning.is-hovered & {
+		// Use opacity to work in various editor styles.
+		border-left-color: $dark-opacity-200;
+
+		.is-dark-theme & {
+			border-left-color: $light-opacity-300;
+		}
+	}
+
+	.has-warning.is-selected & {
+		// Use opacity to work in various editor styles.
+		border-color: $dark-opacity-200;
+
+		.is-dark-theme & {
+			border-color: $light-opacity-300;
+		}
+	}
+
 	.editor-warning__message {
 		line-height: $default-line-height;
 		font-family: $default-font;
