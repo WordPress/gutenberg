@@ -97,8 +97,6 @@ status "Installing dependencies... 📦"
 npm install
 status "Generating build... 👷‍♀️"
 npm run build
-status "Generating PHP file for wordpress.org to parse translations... 👷‍♂️"
-npx pot-to-php ./languages/gutenberg.pot ./languages/gutenberg-translations.php gutenberg
 
 # Temporarily modify `gutenberg.php` with production constants defined. Use a
 # temp file because `bin/generate-gutenberg-php.php` reads from `gutenberg.php`
@@ -118,8 +116,6 @@ zip -r gutenberg.zip \
 	post-content.php \
 	$vendor_scripts \
 	$build_files \
-	languages/gutenberg.pot \
-	languages/gutenberg-translations.php \
 	README.md
 
 # Reset `gutenberg.php`.
