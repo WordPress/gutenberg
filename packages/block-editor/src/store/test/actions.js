@@ -28,6 +28,7 @@ import {
 	toggleBlockMode,
 	updateBlockListSettings,
 } from '../actions';
+import { select } from '../controls';
 
 describe( 'actions', () => {
 	describe( 'resetBlocks', () => {
@@ -218,6 +219,10 @@ describe( 'actions', () => {
 					type: 'REMOVE_BLOCKS',
 					clientIds,
 				},
+				select(
+					'core/block-editor',
+					'getBlockCount',
+				),
 			] );
 		} );
 	} );
@@ -234,10 +239,14 @@ describe( 'actions', () => {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				},
+				select(
+					'core/block-editor',
+					'getBlockCount',
+				),
 			] );
 		} );
 
-		it( 'should return REMOVE_BLOCKS action, opting out of remove previous', () => {
+		it( 'should return REMOVE_BLOCKS action, opting out of select previous', () => {
 			const clientId = 'myclientid';
 
 			const actions = Array.from( removeBlock( clientId, false ) );
@@ -247,6 +256,10 @@ describe( 'actions', () => {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				},
+				select(
+					'core/block-editor',
+					'getBlockCount',
+				),
 			] );
 		} );
 	} );
