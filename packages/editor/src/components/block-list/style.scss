@@ -159,7 +159,7 @@
 
 	// Hover style.
 	&.is-hovered > .editor-block-list__block-edit::before {
-		box-shadow: ($border-width * -3) 0 0 0 theme(outlines);
+		box-shadow: ($border-width * -3) 0 0 0 $light-gray-500;
 	}
 
 	// Spotlight mode.
@@ -952,8 +952,8 @@
 		font-family: $default-font;
 		font-size: 11px;
 		padding: 4px 4px;
-		background: theme(outlines);
-		color: $white;
+		background: $light-gray-500;
+		color: $dark-gray-900;
 
 		// Animate in
 		.editor-block-list__block:hover & {
