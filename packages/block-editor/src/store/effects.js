@@ -127,9 +127,6 @@ export default {
 	RESET_BLOCKS: [
 		validateBlocksToTemplate,
 	],
-	REMOVE_BLOCKS: [
-		ensureDefaultBlock,
-	],
 	REPLACE_BLOCKS: [
 		ensureDefaultBlock,
 	],

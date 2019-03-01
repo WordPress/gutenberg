@@ -393,6 +393,17 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 		type: 'REMOVE_BLOCKS',
 		clientIds,
 	};
+
+	const count = yield select(
+		'core/block-editor',
+		'getBlockCount',
+	);
+
+	// To avoid a focus loss when removing the last block, assure there is
+	// always a default block if the last of the blocks have been removed.
+	if ( count === 0 ) {
+		yield insertDefaultBlock();
+	}
 }
 
 /**
