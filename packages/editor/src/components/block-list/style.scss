@@ -389,9 +389,9 @@
 			float: left;
 		}
 
-		// Position hover label on the right
+		// Position hover label on the left
 		> .editor-block-list__breadcrumb {
-			right: -$border-width;
+			left: -$border-width;
 		}
 
 		// Hide mover until wide breakpoints, or it might be covered by toolbar
@@ -424,9 +424,9 @@
 
 	// Full-wide
 	&[data-align="full"] {
-		// Position hover label on the right for the top level block.
+		// Position hover label on the left for the top level block.
 		> .editor-block-list__block-edit > .editor-block-list__breadcrumb {
-			right: 0;
+			left: 0;
 		}
 
 		// Compensate for main container padding and subtract border.
