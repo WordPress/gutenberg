@@ -25,7 +25,13 @@
 		"lodash": "^4.17.11",
 		"memize": "^1.0.5"
 	},
+	"devDependencies": {
+		"@wordpress/docgen": "file:../docgen"
+	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"docs:generate": "docgen ./src/index.js --output ./README.md --to-token"
 	}
 }
