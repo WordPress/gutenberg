@@ -33,11 +33,17 @@
 		"lodash": "^4.17.11",
 		"node-fetch": "^1.7.3"
 	},
+	"devDependencies": {
+		"@wordpress/docgen": "file:../docgen"
+	},
 	"peerDependencies": {
 		"jest": ">=24",
 		"puppeteer": ">=1.6"
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"docs:generate": "docgen ./src/index.js --output ./README.md --to-token"
 	}
 }
