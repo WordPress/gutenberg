@@ -50,17 +50,17 @@
 	&:not(.is-focus-mode) {
 		&.is-selected .editor-post-title__input {
 			// use opacity to work in various editor styles
-			border-color: $dark-opacity-light-500;
+			border-color: $dark-opacity-200;
 
 			.is-dark-theme & {
-				border-color: $light-opacity-light-500;
+				border-color: $light-opacity-300;
 			}
 		}
 	}
 
-	&:not(.is-focus-mode):not(.has-fixed-toolbar) {
+	&:not(.is-focus-mode):not(.has-fixed-toolbar):not(.is-selected) {
 		.editor-post-title__input:hover {
-			border-color: theme(outlines);
+			box-shadow: -$border-width 0 0 0 $dark-gray-300;
 		}
 	}
 
