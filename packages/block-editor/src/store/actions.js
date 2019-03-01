@@ -107,7 +107,7 @@ export function selectBlock( clientId, initialPosition = null ) {
  */
 export function* selectPreviousBlock( clientId ) {
 	const previousBlockClientId = yield select(
-		'core/editor',
+		'core/block-editor',
 		'getPreviousBlockClientId',
 		clientId
 	);
@@ -123,7 +123,7 @@ export function* selectPreviousBlock( clientId ) {
  */
 export function* selectNextBlock( clientId ) {
 	const nextBlockClientId = yield select(
-		'core/editor',
+		'core/block-editor',
 		'getNextBlockClientId',
 		clientId
 	);
