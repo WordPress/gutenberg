@@ -2,13 +2,13 @@
 
 Notices are informational UI displayed near the top of admin pages. WordPress core, themes, and plugins all use notices to indicate the result of an action, or to draw the user's attention to necessary information.
 
-In the Classic Editor, notices hooked onto the `admin_notices` action can render whatever HTML they'd like. In the Block Editor, notices are restricted to a more formal API.
+In the classic editor, notices hooked onto the `admin_notices` action can render whatever HTML they'd like. In the Block Editor, notices are restricted to a more formal API.
 
-## Notices in the Classic Editor
+## Notices in the classic editor
 
-In the Classic Editor, here's an example of the "Post draft updated" notice:
+In the classic editor, here's an example of the "Post draft updated" notice:
 
-![Post draft updated in the Classic Editor](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/notices/classic-editor-notice.png)
+![Post draft updated in the classic editor](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/notices/classic-editor-notice.png)
 
 Producing an equivalent "Post draft updated" notice would require code like this:
 
