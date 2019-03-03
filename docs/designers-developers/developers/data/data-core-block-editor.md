@@ -1,4 +1,4 @@
-# **core/block-editor**: The Block Editor’s Data
+# **core/block-editor**: The block editor’s data
 
 ## Selectors
 
