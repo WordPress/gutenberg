@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flowRight } from 'lodash';
+import { flowRight, omit, has } from 'lodash';
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
@@ -37,8 +37,37 @@ const isResolved = flowRight( [
 			return nextState;
 		}
 	}
-
 	return state;
 } );
 
-export default isResolved;
+/**
+ * Reducer function returning next state for selector resolution, object form:
+ *
+ *   reducerKey -> selectorName -> EquivalentKeyMap<Array, boolean>
+ *
+ * @param {Object} state   Current state.
+ * @param {Object} action  Dispatched action.
+ *
+ * @return {Object} Next state.
+ */
+const topLevelIsResolved = ( state = {}, action ) => {
+	switch ( action.type ) {
+		case 'INVALIDATE_RESOLUTION_FOR_STORE':
+			return has( state, action.reducerKey ) ?
+				omit( state, action.reducerKey ) :
+				state;
+		case 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR':
+			return has( state, [ action.reducerKey, action.selectorName ] ) ?
+				{
+					...state,
+					[ action.reducerKey ]: omit(
+						state[ action.reducerKey ],
+						action.selectorName
+					),
+				} :
+				state;
+	}
+	return isResolved( state, action );
+};
+
+export default topLevelIsResolved;
