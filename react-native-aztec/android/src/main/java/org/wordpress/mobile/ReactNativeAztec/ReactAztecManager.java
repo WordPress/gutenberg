@@ -132,6 +132,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onBackspace")))
                 .put(
+                        "topTextInputPaste",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onPaste")))
+                .put(
                         "topFocus",
                         MapBuilder.of(
                                 "phasedRegistrationNames",
@@ -384,6 +389,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     @ReactProp(name = "onBackspace", defaultBoolean = false)
     public void setOnBackspaceHandling(final ReactAztecText view, boolean onBackspaceHandling) {
         view.shouldHandleOnBackspace = onBackspaceHandling;
+    }
+
+    @ReactProp(name = "onPaste", defaultBoolean = false)
+    public void setOnPasteHandling(final ReactAztecText view, boolean onPasteHandling) {
+        view.shouldHandleOnPaste = onPasteHandling;
     }
 
     @Override

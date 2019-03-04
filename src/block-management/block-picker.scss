@@ -1,76 +1,60 @@
 /** @format */
 
-@import '../variables.scss';
-
-.title {
-	font-family: $default-monospace-font;
-	font-size: 16px;
-	font-weight: bold;
-	margin-bottom: 8px;
-}
-
-.lineStyle {
-	border-bottom-color: lightgray;
-	border-bottom-width: 1px;
-	width: 100%;
-}
-
-.shortLineStyle {
-	border-bottom-color: lightgray;
-	border-bottom-width: 2px;
-	margin-bottom: 8px;
-	width: 40px;
-}
-
-.bottomModal {
-	justify-content: flex-end;
-	margin: 0px;
-}
+@import 'variables.scss';
+@import 'colors.scss';
 
 .touchableArea {
-	border-radius: 4px 4px 4px 4px;
+	border-radius: 8px 8px 8px 8px;
 }
 
-.modalContent {
-	background-color: white;
-	padding-top: 8;
-	padding-bottom: 8;
-	justify-content: center;
+.content {
+	padding: 0 0 0 0;
 	align-items: center;
-	border-radius: 10px 10px 0px 0px;
-	border-color: grey;
-	border-width: 1px;
+	justify-content: space-evenly;	
+}
+
+.contentBottomPadding {
+	padding-bottom: 20px;
+}
+
+.rowSeparator {
+	height: 12px;
 }
 
 .modalItem {	
-	flex: 1 1 auto;
-	margin: 5px;
-	width: 100px;
-	align-self: stretch;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding-left: 8;
+	padding-right: 8;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.modalIconWrapper {
+	width: 104px;
+	height: 64px;
+	background-color: $gray-light; //#f3f6f8
+	border-radius: 8px 8px 8px 8px;
 	justify-content: center;
 	align-items: center;
 }
 
 .modalIcon {
-	flex: 1 1 auto;
-	background-color: lightgray;
-	padding-left: 8;
-	padding-right: 8;
-	padding-top: 8;
-	padding-bottom: 8;
-	margin: 4px;
-	width: 72px;
-	height: 48px;
+	width: 32px;
+	height: 32px;
 	justify-content: center;
 	align-items: center;
-	border-radius: 4px 4px 4px 4px;
+	fill: $gray-dark;
 }
 
 .modalItemLabel {
 	background-color: transparent;
 	padding-left: 2;
 	padding-right: 2;
-	padding-top: 2;
-	padding-bottom: 2;
+	padding-top: 4;
+	padding-bottom: 0;
 	justify-content: center;
+	font-size: 12;
+	color: $gray-dark;
 }
