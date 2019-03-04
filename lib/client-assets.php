@@ -760,15 +760,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_localize_script( 'wp-editor', '_wpMetaBoxUrl', $meta_box_url );
 
 	// Initialize the editor.
-	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
-	$align_wide              = get_theme_support( 'align-wide' );
-	$color_palette           = current( (array) get_theme_support( 'editor-color-palette' ) );
-	$font_sizes              = current( (array) get_theme_support( 'editor-font-sizes' ) );
-
-	if ( ! empty( $gutenberg_theme_support ) ) {
-		wp_enqueue_script( 'wp-deprecated' );
-		wp_add_inline_script( 'wp-deprecated', 'wp.deprecated( "`gutenberg` theme support", { plugin: "Gutenberg", version: "5.2", alternative: "`align-wide` theme support" } );' );
-	}
+	$align_wide    = get_theme_support( 'align-wide' );
+	$color_palette = current( (array) get_theme_support( 'editor-color-palette' ) );
+	$font_sizes    = current( (array) get_theme_support( 'editor-font-sizes' ) );
 
 	/**
 	 * Filters the allowed block types for the editor, defaulting to true (all
@@ -879,7 +873,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	$editor_settings = array(
-		'alignWide'              => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
+		'alignWide'              => $align_wide,
 		'availableTemplates'     => $available_templates,
 		'allowedBlockTypes'      => $allowed_block_types,
 		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
@@ -952,28 +946,12 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$editor_settings = apply_filters( 'block_editor_settings', $editor_settings, $post );
 
 	$init_script = <<<JS
-	( function() {
-		window._wpLoadBlockEditor = new Promise( function( resolve ) {
-			wp.domReady( function() {
-				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
-			} );
+( function() {
+	window._wpLoadBlockEditor = new Promise( function( resolve ) {
+		wp.domReady( function() {
+			resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
 		} );
-
-		Object.defineProperty( window, '_wpLoadGutenbergEditor', {
-			get: function() {
-				// TODO: Hello future maintainer. In removing this deprecation,
-				// ensure also to check whether `wp-editor`'s dependencies in
-				// `package-dependencies.php` still require `wp-deprecated`.
-				wp.deprecated( '`window._wpLoadGutenbergEditor`', {
-					plugin: 'Gutenberg',
-					version: '5.2',
-					alternative: '`window._wpLoadBlockEditor`',
-					hint: 'This is a private API, not intended for public use. It may be removed in the future.'
-				} );
-
-				return window._wpLoadBlockEditor;
-			}
-		} );
+	} );
 } )();
 JS;
 
