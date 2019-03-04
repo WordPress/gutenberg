@@ -16,11 +16,6 @@ import { Component } from '@wordpress/element';
 import { RichText, BlockControls } from '@wordpress/editor';
 import { createBlock } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import styles from './style.scss';
-
 class HeadingEdit extends Component {
 	render() {
 		const {
@@ -39,8 +34,6 @@ class HeadingEdit extends Component {
 
 		const tagName = 'h' + level;
 
-		const minHeight = styles.blockText.minHeight;
-
 		return (
 			<View>
 				<BlockControls>
@@ -50,7 +43,7 @@ class HeadingEdit extends Component {
 					tagName={ tagName }
 					value={ content }
 					isSelected={ this.props.isSelected }
-					style={ { ...style, minHeight } }
+					style={ style }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
