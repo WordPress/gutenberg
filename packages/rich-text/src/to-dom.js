@@ -169,7 +169,6 @@ export function toDom( {
  * @param {HTMLElement} $1.current The live root node to apply the element tree to.
  * @param {?string}      $1.multilineTag Multiline tag.
  * @param {?Array}       $1.multilineWrapperTags Tags where lines can be found if nesting is possible.
- * @param {?Array}       $1.prepareEditableTree Functions to prepare the editable tree.
  */
 export function apply( {
 	value,

@@ -31,7 +31,6 @@ text separated by two new lines will be wrapped in an `Element` of that type.
 -   **$1.current** `HTMLElement`: The live root node to apply the element tree to.
 -   **$1.multilineTag** `?string`: Multiline tag.
 -   **$1.multilineWrapperTags** `?Array`: Tags where lines can be found if nesting is possible.
--   **$1.prepareEditableTree** `?Array`: Functions to prepare the editable tree.
 
 ### applyFormat
 
