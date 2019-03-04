@@ -34,7 +34,7 @@ function the_gutenberg_project() {
 		<?php
 		printf(
 			/* translators: %s: https://wordpress.org/plugins/classic-editor/ */
-			__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
+			__( 'The block editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
 			__( 'https://wordpress.org/plugins/classic-editor/', 'gutenberg' )
 		);
 		?>
