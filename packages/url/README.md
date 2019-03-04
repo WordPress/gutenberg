@@ -18,11 +18,17 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### addQueryArgs
 
-[src/index.js#L172-L194](src/index.js#L172-L194)
+[src/index.js#L242-L264](src/index.js#L242-L264)
 
 Appends arguments as querystring to the provided URL. If the URL already
 includes query arguments, the arguments are merged with (and take precedent
 over) the existing set.
+
+**Usage**
+
+```js
+const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://google.com/?q=test
+```
 
 **Parameters**
 
@@ -35,9 +41,15 @@ over) the existing set.
 
 ### filterURLForDisplay
 
-[src/index.js#L279-L289](src/index.js#L279-L289)
+[src/index.js#L379-L389](src/index.js#L379-L389)
 
 Returns a URL for display.
+
+**Usage**
+
+```js
+const displayUrl = filterURLForDisplay( 'https://www.wordpress.org/gutenberg/' ); // wordpress.org/gutenberg
+```
 
 **Parameters**
 
@@ -49,9 +61,16 @@ Returns a URL for display.
 
 ### getAuthority
 
-[src/index.js#L56-L61](src/index.js#L56-L61)
+[src/index.js#L79-L84](src/index.js#L79-L84)
 
 Returns the authority part of the URL.
+
+**Usage**
+
+```js
+const authority1 = getAuthority( 'https://wordpress.org/help/' ); // 'wordpress.org'
+const authority2 = getAuthority( 'https://localhost:8080/test/' ); // 'localhost:8080'
+```
 
 **Parameters**
 
@@ -63,9 +82,16 @@ Returns the authority part of the URL.
 
 ### getFragment
 
-[src/index.js#L140-L145](src/index.js#L140-L145)
+[src/index.js#L199-L204](src/index.js#L199-L204)
 
 Returns the fragment part of the URL.
+
+**Usage**
+
+```js
+const fragment1 = getFragment( 'http://localhost:8080/this/is/a/test?query=true#fragment' ); // '#fragment'
+const fragment2 = getFragment( 'https://wordpress.org#another-fragment?query=true' ); // '#another-fragment'
+```
 
 **Parameters**
 
@@ -77,9 +103,16 @@ Returns the fragment part of the URL.
 
 ### getPath
 
-[src/index.js#L84-L89](src/index.js#L84-L89)
+[src/index.js#L119-L124](src/index.js#L119-L124)
 
 Returns the path part of the URL.
+
+**Usage**
+
+```js
+const path1 = getPath( 'http://localhost:8080/this/is/a/test?query=true' ); // 'this/is/a/test'
+const path2 = getPath( 'https://wordpress.org/help/faq/' ); // 'help/faq'
+```
 
 **Parameters**
 
@@ -91,9 +124,16 @@ Returns the path part of the URL.
 
 ### getProtocol
 
-[src/index.js#L28-L33](src/index.js#L28-L33)
+[src/index.js#L39-L44](src/index.js#L39-L44)
 
 Returns the protocol part of the URL.
+
+**Usage**
+
+```js
+const protocol1 = getProtocol( 'tel:012345678' ); // 'tel:'
+const protocol2 = getProtocol( 'https://wordpress.org' ); // 'https:'
+```
 
 **Parameters**
 
@@ -105,9 +145,15 @@ Returns the protocol part of the URL.
 
 ### getQueryArg
 
-[src/index.js#L204-L209](src/index.js#L204-L209)
+[src/index.js#L279-L284](src/index.js#L279-L284)
 
 Returns a single query argument of the url
+
+**Usage**
+
+```js
+const foo = getQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'foo' ); // bar
+```
 
 **Parameters**
 
@@ -120,9 +166,16 @@ Returns a single query argument of the url
 
 ### getQueryString
 
-[src/index.js#L112-L117](src/index.js#L112-L117)
+[src/index.js#L159-L164](src/index.js#L159-L164)
 
 Returns the query string part of the URL.
+
+**Usage**
+
+```js
+const queryString1 = getQueryString( 'http://localhost:8080/this/is/a/test?query=true#fragment' ); // 'query=true'
+const queryString2 = getQueryString( 'https://wordpress.org#fragment?query=false&search=hello' ); // 'query=false&search=hello'
+```
 
 **Parameters**
 
@@ -134,9 +187,15 @@ Returns the query string part of the URL.
 
 ### hasQueryArg
 
-[src/index.js#L219-L221](src/index.js#L219-L221)
+[src/index.js#L299-L301](src/index.js#L299-L301)
 
 Determines whether the URL contains a given query arg.
+
+**Usage**
+
+```js
+const hasBar = hasQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'bar' ); // true
+```
 
 **Parameters**
 
@@ -149,9 +208,15 @@ Determines whether the URL contains a given query arg.
 
 ### isURL
 
-[src/index.js#L17-L19](src/index.js#L17-L19)
+[src/index.js#L22-L24](src/index.js#L22-L24)
 
 Determines whether the given string looks like a URL.
+
+**Usage**
+
+```js
+const isURL = isURL( 'https://wordpress.org' ); // true
+```
 
 **Parameters**
 
@@ -163,9 +228,16 @@ Determines whether the given string looks like a URL.
 
 ### isValidAuthority
 
-[src/index.js#L70-L75](src/index.js#L70-L75)
+[src/index.js#L99-L104](src/index.js#L99-L104)
 
 Checks for invalid characters within the provided authority.
+
+**Usage**
+
+```js
+const isValid = isValidAuthority( 'wordpress.org' ); // true
+const isNotValid = isValidAuthority( 'wordpress#org' ); // false
+```
 
 **Parameters**
 
@@ -177,9 +249,16 @@ Checks for invalid characters within the provided authority.
 
 ### isValidFragment
 
-[src/index.js#L154-L159](src/index.js#L154-L159)
+[src/index.js#L219-L224](src/index.js#L219-L224)
 
 Checks for invalid characters within the provided fragment.
+
+**Usage**
+
+```js
+const isValid = isValidFragment( '#valid-fragment' ); // true
+const isNotValid = isValidFragment( '#invalid-#fragment' ); // false
+```
 
 **Parameters**
 
@@ -191,9 +270,16 @@ Checks for invalid characters within the provided fragment.
 
 ### isValidPath
 
-[src/index.js#L98-L103](src/index.js#L98-L103)
+[src/index.js#L139-L144](src/index.js#L139-L144)
 
 Checks for invalid characters within the provided path.
+
+**Usage**
+
+```js
+const isValid = isValidPath( 'test/path/' ); // true
+const isNotValid = isValidPath( '/invalid?test/path/' ); // false
+```
 
 **Parameters**
 
@@ -205,9 +291,16 @@ Checks for invalid characters within the provided path.
 
 ### isValidProtocol
 
-[src/index.js#L42-L47](src/index.js#L42-L47)
+[src/index.js#L59-L64](src/index.js#L59-L64)
 
 Tests if a url protocol is valid.
+
+**Usage**
+
+```js
+const isValid = isValidProtocol( 'https:' ); // true
+const isNotValid = isValidProtocol( 'https :' ); // false
+```
 
 **Parameters**
 
@@ -219,9 +312,16 @@ Tests if a url protocol is valid.
 
 ### isValidQueryString
 
-[src/index.js#L126-L131](src/index.js#L126-L131)
+[src/index.js#L179-L184](src/index.js#L179-L184)
 
 Checks for invalid characters within the provided query string.
+
+**Usage**
+
+```js
+const isValid = isValidQueryString( 'query=true&another=false' ); // true
+const isNotValid = isValidQueryString( 'query=true?another=false' ); // false
+```
 
 **Parameters**
 
@@ -233,9 +333,15 @@ Checks for invalid characters within the provided query string.
 
 ### prependHTTP
 
-[src/index.js#L248-L254](src/index.js#L248-L254)
+[src/index.js#L338-L344](src/index.js#L338-L344)
 
 Prepends "http\://" to a url, if it looks like something that is meant to be a TLD.
+
+**Usage**
+
+```js
+const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
+```
 
 **Parameters**
 
@@ -247,9 +353,15 @@ Prepends "http\://" to a url, if it looks like something that is meant to be a T
 
 ### removeQueryArgs
 
-[src/index.js#L231-L239](src/index.js#L231-L239)
+[src/index.js#L316-L324](src/index.js#L316-L324)
 
 Removes arguments from the query string of the url
+
+**Usage**
+
+```js
+const newUrl = removeQueryArgs( 'https://wordpress.org?foo=bar&bar=baz&baz=foobar', 'foo', 'bar' ); // https://wordpress.org?baz=foobar
+```
 
 **Parameters**
 
@@ -262,10 +374,16 @@ Removes arguments from the query string of the url
 
 ### safeDecodeURI
 
-[src/index.js#L264-L270](src/index.js#L264-L270)
+[src/index.js#L359-L365](src/index.js#L359-L365)
 
 Safely decodes a URI with `decodeURI`. Returns the URI unmodified if
 `decodeURI` throws an error.
+
+**Usage**
+
+```js
+const badUri = safeDecodeURI( '%z' ); // does not throw an Error, simply returns '%z'
+```
 
 **Parameters**
 
@@ -277,7 +395,7 @@ Safely decodes a URI with `decodeURI`. Returns the URI unmodified if
 
 ### safeDecodeURIComponent
 
-[src/index.js#L299-L305](src/index.js#L299-L305)
+[src/index.js#L399-L405](src/index.js#L399-L405)
 
 Safely decodes a URI component with `decodeURIComponent`. Returns the URI component unmodified if
 `decodeURIComponent` throws an error.
