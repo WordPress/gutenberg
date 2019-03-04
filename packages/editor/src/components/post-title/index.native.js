@@ -28,7 +28,6 @@ class PostTitle extends Component {
 
 		this.state = {
 			isSelected: false,
-			aztecHeight: 0,
 		};
 	}
 
@@ -70,8 +69,6 @@ class PostTitle extends Component {
 		const decodedPlaceholder = decodeEntities( placeholder );
 		const borderColor = this.state.isSelected ? focusedBorderColor : 'transparent';
 
-		const minHeight = styles.blockText.minHeight;
-
 		return (
 			<View style={ [ styles.titleContainer, borderStyle, { borderColor } ] }>
 				<RichText
@@ -80,7 +77,7 @@ class PostTitle extends Component {
 					onFocus={ this.onSelect }
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }
-					style={ { ...style, minHeight } }
+					style={ style }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
 					onChange={ ( value ) => {
