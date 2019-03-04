@@ -24,7 +24,7 @@ export function insert(
 	startIndex = value.start,
 	endIndex = value.end
 ) {
-	const { formats, lines, objects, text } = value;
+	const { formats, replacements, text } = value;
 
 	if ( typeof valueToInsert === 'string' ) {
 		valueToInsert = create( { text: valueToInsert } );
@@ -34,8 +34,7 @@ export function insert(
 
 	return normaliseFormats( {
 		formats: formats.slice( 0, startIndex ).concat( valueToInsert.formats, formats.slice( endIndex ) ),
-		lines: lines.slice( 0, startIndex ).concat( valueToInsert.lines, lines.slice( endIndex ) ),
-		objects: objects.slice( 0, startIndex ).concat( valueToInsert.objects, objects.slice( endIndex ) ),
+		replacements: replacements.slice( 0, startIndex ).concat( valueToInsert.replacements, replacements.slice( endIndex ) ),
 		text: text.slice( 0, startIndex ) + valueToInsert.text + text.slice( endIndex ),
 		start: index,
 		end: index,

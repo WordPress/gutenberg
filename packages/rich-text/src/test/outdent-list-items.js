@@ -17,8 +17,7 @@ describe( 'outdentListItems', () => {
 	it( 'should not outdent only item', () => {
 		const record = {
 			formats: [ , ],
-			lines: [ , ],
-			objects: [ , ],
+			replacements: [ , ],
 			text: '1',
 			start: 1,
 			end: 1,
@@ -27,7 +26,7 @@ describe( 'outdentListItems', () => {
 
 		expect( result ).toEqual( record );
 		expect( result ).toBe( record );
-		expect( getSparseArrayLength( result.lines ) ).toBe( 0 );
+		expect( getSparseArrayLength( result.replacements ) ).toBe( 0 );
 	} );
 
 	it( 'should indent', () => {
@@ -35,21 +34,20 @@ describe( 'outdentListItems', () => {
 		const text = `1${ LINE_SEPARATOR }`;
 		const record = {
 			formats: Array( text.length ),
-			lines: [ , [ ul ] ],
-			objects: Array( text.length ),
+			replacements: [ , [ ul ] ],
 			text,
 			start: 2,
 			end: 2,
 		};
 		const expected = {
 			...record,
-			lines: [ , , ],
+			replacements: [ , , ],
 		};
 		const result = outdentListItems( deepFreeze( record ) );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.lines ) ).toBe( 0 );
+		expect( getSparseArrayLength( result.replacements ) ).toBe( 0 );
 	} );
 
 	it( 'should outdent two levels deep', () => {
@@ -57,21 +55,20 @@ describe( 'outdentListItems', () => {
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
 			formats: Array( text.length ),
-			lines: [ , [ ul ], , [ ul, ul ], , ],
-			objects: Array( text.length ),
+			replacements: [ , [ ul ], , [ ul, ul ], , ],
 			text,
 			start: 5,
 			end: 5,
 		};
 		const expected = {
 			...record,
-			lines: [ , [ ul ], , [ ul ], , ],
+			replacements: [ , [ ul ], , [ ul ], , ],
 		};
 		const result = outdentListItems( deepFreeze( record ) );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.lines ) ).toBe( 2 );
+		expect( getSparseArrayLength( result.replacements ) ).toBe( 2 );
 	} );
 
 	it( 'should outdent with multiple lines selected', () => {
@@ -79,21 +76,20 @@ describe( 'outdentListItems', () => {
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
 			formats: Array( text.length ),
-			lines: [ , [ ul ], , [ ul, ul ], , ],
-			objects: Array( text.length ),
+			replacements: [ , [ ul ], , [ ul, ul ], , ],
 			text,
 			start: 2,
 			end: 5,
 		};
 		const expected = {
 			...record,
-			lines: [ , , , [ ul ], , ],
+			replacements: [ , , , [ ul ], , ],
 		};
 		const result = outdentListItems( deepFreeze( record ) );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.lines ) ).toBe( 1 );
+		expect( getSparseArrayLength( result.replacements ) ).toBe( 1 );
 	} );
 
 	it( 'should outdent list item with children', () => {
@@ -101,21 +97,20 @@ describe( 'outdentListItems', () => {
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4`;
 		const record = {
 			formats: Array( text.length ),
-			lines: [ , [ ul ], , [ ul, ul ], , [ ul, ul ], , ],
-			objects: Array( text.length ),
+			replacements: [ , [ ul ], , [ ul, ul ], , [ ul, ul ], , ],
 			text,
 			start: 2,
 			end: 2,
 		};
 		const expected = {
 			...record,
-			lines: [ , , , [ ul ], , [ ul ], , ],
+			replacements: [ , , , [ ul ], , [ ul ], , ],
 		};
 		const result = outdentListItems( deepFreeze( record ) );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.lines ) ).toBe( 2 );
+		expect( getSparseArrayLength( result.replacements ) ).toBe( 2 );
 	} );
 
 	it( 'should outdent list based on parent list', () => {
@@ -123,21 +118,20 @@ describe( 'outdentListItems', () => {
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4`;
 		const record = {
 			formats: Array( text.length ),
-			lines: [ , [ ul ], , [ ul, ul ], , [ ul ], , ],
-			objects: Array( text.length ),
+			replacements: [ , [ ul ], , [ ul, ul ], , [ ul ], , ],
 			text,
 			start: 6,
 			end: 6,
 		};
 		const expected = {
 			...record,
-			lines: [ , [ ul ], , [ ul, ul ], , , , ],
+			replacements: [ , [ ul ], , [ ul, ul ], , , , ],
 		};
 		const result = outdentListItems( deepFreeze( record ) );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.lines ) ).toBe( 2 );
+		expect( getSparseArrayLength( result.replacements ) ).toBe( 2 );
 	} );
 
 	it( 'should outdent when a selected item is at level 0', () => {
@@ -145,20 +139,19 @@ describe( 'outdentListItems', () => {
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
 			formats: Array( text.length ),
-			lines: [ , [ ul ], , , , ],
-			objects: Array( text.length ),
+			replacements: [ , [ ul ], , , , ],
 			text,
 			start: 2,
 			end: 5,
 		};
 		const expected = {
 			...record,
-			lines: [ , , , , , ],
+			replacements: [ , , , , , ],
 		};
 		const result = outdentListItems( deepFreeze( record ) );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.lines ) ).toBe( 0 );
+		expect( getSparseArrayLength( result.replacements ) ).toBe( 0 );
 	} );
 } );

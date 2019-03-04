@@ -14,7 +14,7 @@ export function slice(
 	startIndex = value.start,
 	endIndex = value.end
 ) {
-	const { formats, lines, objects, text } = value;
+	const { formats, replacements, text } = value;
 
 	if ( startIndex === undefined || endIndex === undefined ) {
 		return { ...value };
@@ -22,8 +22,7 @@ export function slice(
 
 	return {
 		formats: formats.slice( startIndex, endIndex ),
-		lines: lines.slice( startIndex, endIndex ),
-		objects: objects.slice( startIndex, endIndex ),
+		replacements: replacements.slice( startIndex, endIndex ),
 		text: text.slice( startIndex, endIndex ),
 	};
 }

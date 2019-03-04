@@ -16,16 +16,14 @@ describe( 'replace', () => {
 	it( 'should replace string to string', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			lines: [ , , , , , , , , , , , , , ],
-			objects: [ , , , , , , , , , , , , , ],
+			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 6,
 			end: 6,
 		};
 		const expected = {
 			formats: [ , , , , [ em ], , , , , , , ],
-			lines: [ , , , , , , , , , , , ],
-			objects: [ , , , , , , , , , , , ],
+			replacements: [ , , , , , , , , , , , ],
 			text: 'one 2 three',
 			start: 5,
 			end: 5,
@@ -40,22 +38,19 @@ describe( 'replace', () => {
 	it( 'should replace string to record', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			lines: [ , , , , , , , , , , , , , ],
-			objects: [ , , , , , , , , , , , , , ],
+			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 6,
 			end: 6,
 		};
 		const replacement = {
 			formats: [ , ],
-			lines: [ , ],
-			objects: [ , ],
+			replacements: [ , ],
 			text: '2',
 		};
 		const expected = {
 			formats: [ , , , , , , , , , , , ],
-			lines: [ , , , , , , , , , , , ],
-			objects: [ , , , , , , , , , , , ],
+			replacements: [ , , , , , , , , , , , ],
 			text: 'one 2 three',
 			start: 5,
 			end: 5,
@@ -70,16 +65,14 @@ describe( 'replace', () => {
 	it( 'should replace string to function', () => {
 		const record = {
 			formats: [ , , , , , , , , , , , , ],
-			lines: [ , , , , , , , , , , , , ],
-			objects: [ , , , , , , , , , , , , ],
+			replacements: [ , , , , , , , , , , , , ],
 			text: 'abc12345#$*%',
 			start: 6,
 			end: 6,
 		};
 		const expected = {
 			formats: [ , , , , , , , , , , , , , , , , , , ],
-			lines: [ , , , , , , , , , , , , , , , , , , ],
-			objects: [ , , , , , , , , , , , , , , , , , , ],
+			replacements: [ , , , , , , , , , , , , , , , , , , ],
 			text: 'abc - 12345 - #$*%',
 			start: 18,
 			end: 18,

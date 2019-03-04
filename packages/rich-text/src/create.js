@@ -25,8 +25,7 @@ const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 function createEmptyValue() {
 	return {
 		formats: [],
-		lines: [],
-		objects: [],
+		replacements: [],
 		text: '',
 	};
 }
@@ -109,8 +108,7 @@ function toFormat( { type, attributes } ) {
  * {
  *   text: string,
  *   formats: Array,
- *   objects: Array,
- *   lines: Array,
+ *   replacements: Array,
  *   ?start: number,
  *   ?end: number,
  * }
@@ -147,8 +145,7 @@ export function create( {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
 			formats: Array( text.length ),
-			lines: Array( text.length ),
-			objects: Array( text.length ),
+			replacements: Array( text.length ),
 			text,
 		};
 	}
@@ -323,8 +320,7 @@ function createFromElement( {
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
 			accumulator.formats.length += text.length;
-			accumulator.lines.length += text.length;
-			accumulator.objects.length += text.length;
+			accumulator.replacements.length += text.length;
 			accumulator.text += text;
 			continue;
 		}
@@ -388,8 +384,7 @@ function createFromElement( {
 		if ( format.attributes && value.text.length === 0 ) {
 			mergePair( accumulator, {
 				formats: [ , ],
-				lines: [ , ],
-				objects: [ format ],
+				replacements: [ format ],
 				text: OBJECT_REPLACEMENT_CHARACTER,
 			} );
 			continue;
@@ -459,8 +454,7 @@ function createFromMultilineElement( {
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
 			mergePair( accumulator, {
 				formats: [ , ],
-				lines: currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ],
-				objects: [ , ],
+				replacements: currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ],
 				text: LINE_SEPARATOR,
 			} );
 		}

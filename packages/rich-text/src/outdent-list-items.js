@@ -16,16 +16,16 @@ import { getLastChildIndex } from './get-last-child-index';
  * @return {Object} The changed value.
  */
 export function outdentListItems( value ) {
-	const { text, lines, start, end } = value;
+	const { text, replacements, start, end } = value;
 	const startingLineIndex = getLineIndex( value, start );
 
 	// Return early if the starting line index cannot be further outdented.
-	if ( lines[ startingLineIndex ] === undefined ) {
+	if ( replacements[ startingLineIndex ] === undefined ) {
 		return value;
 	}
 
-	const newLines = lines.slice( 0 );
-	const parentFormats = lines[ getParentLineIndex( value, startingLineIndex ) ] || [];
+	const newFormats = replacements.slice( 0 );
+	const parentFormats = replacements[ getParentLineIndex( value, startingLineIndex ) ] || [];
 	const endingLineIndex = getLineIndex( value, end );
 	const lastChildIndex = getLastChildIndex( value, endingLineIndex );
 
@@ -39,20 +39,20 @@ export function outdentListItems( value ) {
 		}
 
 		// In the case of level 0, the formats at the index are undefined.
-		const currentFormats = newLines[ index ] || [];
+		const currentFormats = newFormats[ index ] || [];
 
 		// Omit the indentation level where the selection starts.
-		newLines[ index ] = parentFormats.concat(
+		newFormats[ index ] = parentFormats.concat(
 			currentFormats.slice( parentFormats.length + 1 )
 		);
 
-		if ( newLines[ index ].length === 0 ) {
-			delete newLines[ index ];
+		if ( newFormats[ index ].length === 0 ) {
+			delete newFormats[ index ];
 		}
 	}
 
 	return normaliseFormats( {
 		...value,
-		lines: newLines,
+		replacements: newFormats,
 	} );
 }

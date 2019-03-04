@@ -16,20 +16,17 @@ describe( 'concat', () => {
 	it( 'should merge records', () => {
 		const one = {
 			formats: [ , , [ em ] ],
-			lines: [ , , , ],
-			objects: [ , , , ],
+			replacements: [ , , , ],
 			text: 'one',
 		};
 		const two = {
 			formats: [ [ em ], , , ],
-			lines: [ , , , ],
-			objects: [ , , , ],
+			replacements: [ , , , ],
 			text: 'two',
 		};
 		const three = {
 			formats: [ , , [ em ], [ em ], , , ],
-			lines: [ , , , , , , ],
-			objects: [ , , , , , , ],
+			replacements: [ , , , , , , ],
 			text: 'onetwo',
 		};
 

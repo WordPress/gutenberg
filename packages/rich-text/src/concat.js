@@ -16,8 +16,7 @@ import { create } from './create';
  */
 export function mergePair( a, b ) {
 	a.formats = a.formats.concat( b.formats );
-	a.lines = a.lines.concat( b.lines );
-	a.objects = a.objects.concat( b.objects );
+	a.replacements = a.replacements.concat( b.replacements );
 	a.text += b.text;
 
 	return a;

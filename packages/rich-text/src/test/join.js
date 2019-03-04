@@ -16,8 +16,7 @@ describe( 'join', () => {
 		' ',
 		{
 			formats: [ , ],
-			lines: [ , ],
-			objects: [ , ],
+			replacements: [ , ],
 			text: ' ',
 		},
 	];
@@ -26,20 +25,17 @@ describe( 'join', () => {
 		it( 'should join records with string separator', () => {
 			const one = {
 				formats: [ , , [ em ] ],
-				lines: [ , , , ],
-				objects: [ , , , ],
+				replacements: [ , , , ],
 				text: 'one',
 			};
 			const two = {
 				formats: [ [ em ], , , ],
-				lines: [ , , , ],
-				objects: [ , , , ],
+				replacements: [ , , , ],
 				text: 'two',
 			};
 			const three = {
 				formats: [ , , [ em ], , [ em ], , , ],
-				lines: [ , , , , , , , ],
-				objects: [ , , , , , , , ],
+				replacements: [ , , , , , , , ],
 				text: 'one two',
 			};
 			const result = join( [ deepFreeze( one ), deepFreeze( two ) ], separator );

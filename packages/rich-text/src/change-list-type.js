@@ -20,14 +20,14 @@ import { getParentLineIndex } from './get-parent-line-index';
  * @return {Object} The changed value.
  */
 export function changeListType( value, newFormat ) {
-	const { text, lines, start, end } = value;
+	const { text, replacements, start, end } = value;
 	const startingLineIndex = getLineIndex( value, start );
-	const startlines = lines[ startingLineIndex ] || [];
-	const endlines = lines[ getLineIndex( value, end ) ] || [];
+	const startLineFormats = replacements[ startingLineIndex ] || [];
+	const endLineFormats = replacements[ getLineIndex( value, end ) ] || [];
 	const startIndex = getParentLineIndex( value, startingLineIndex );
-	const newLines = lines.slice();
-	const startCount = startlines.length - 1;
-	const endCount = endlines.length - 1;
+	const newReplacements = replacements.slice();
+	const startCount = startLineFormats.length - 1;
+	const endCount = endLineFormats.length - 1;
 
 	let changed;
 
@@ -36,16 +36,16 @@ export function changeListType( value, newFormat ) {
 			continue;
 		}
 
-		if ( ( newLines[ index ] || [] ).length <= startCount ) {
+		if ( ( newReplacements[ index ] || [] ).length <= startCount ) {
 			break;
 		}
 
-		if ( ! newLines[ index ] ) {
+		if ( ! newReplacements[ index ] ) {
 			continue;
 		}
 
 		changed = true;
-		newLines[ index ] = newLines[ index ].map( ( format, i ) => {
+		newReplacements[ index ] = newReplacements[ index ].map( ( format, i ) => {
 			return i < startCount || i > endCount ? format : newFormat;
 		} );
 	}
@@ -56,6 +56,6 @@ export function changeListType( value, newFormat ) {
 
 	return normaliseFormats( {
 		...value,
-		lines: newLines,
+		replacements: newReplacements,
 	} );
 }
