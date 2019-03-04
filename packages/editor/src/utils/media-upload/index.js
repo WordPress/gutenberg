@@ -33,10 +33,7 @@ export default function( {
 	onError = noop,
 	onFileChange,
 } ) {
-	const { getCurrentPostId } = select( 'core/editor' );
-	const { getEditorSettings } = select( 'core/block-editor' );
-
-	// These settings should not live in the block editor's store.
+	const { getCurrentPostId, getEditorSettings } = select( 'core/editor' );
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	maxUploadFileSize = maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 

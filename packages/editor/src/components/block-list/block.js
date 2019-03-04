@@ -633,14 +633,14 @@ const applyWithSelect = withSelect(
 			getBlockMode,
 			isSelectionEnabled,
 			getSelectedBlocksInitialCaretPosition,
-			getEditorSettings,
+			getSettings,
 			hasSelectedInnerBlock,
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
-		const { hasFixedToolbar, focusMode } = getEditorSettings();
+		const { hasFixedToolbar, focusMode } = getSettings();
 		const templateLock = getTemplateLock( rootClientId );
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
@@ -748,8 +748,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			replaceBlocks( [ ownProps.clientId ], blocks );
 		},
 		onMetaChange( updatedMeta ) {
-			const { getEditorSettings } = select( 'core/block-editor' );
-			const onChangeMeta = getEditorSettings().__experimentalMetaSource.onChange;
+			const { getSettings } = select( 'core/block-editor' );
+			const onChangeMeta = getSettings().__experimentalMetaSource.onChange;
 			onChangeMeta( updatedMeta );
 		},
 		onShiftSelection() {

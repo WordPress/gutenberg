@@ -137,7 +137,7 @@ export default compose(
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		isRichEditingEnabled: select( 'core/block-editor' ).getEditorSettings().richEditingEnabled,
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
