@@ -15,21 +15,14 @@ import {
 	metaBoxLocations,
 	removedPanels,
 } from '../reducer';
+import { PREFERENCES_DEFAULTS } from '../defaults';
 
 describe( 'state', () => {
 	describe( 'preferences()', () => {
 		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 
-			expect( state ).toEqual( {
-				editorMode: 'visual',
-				isGeneralSidebarDismissed: false,
-				panels: {
-					'post-status': { opened: true },
-				},
-				features: { fixedToolbar: false },
-				pinnedPluginItems: {},
-			} );
+			expect( state ).toEqual( PREFERENCES_DEFAULTS );
 		} );
 
 		it( 'should set the general sidebar dismissed', () => {
