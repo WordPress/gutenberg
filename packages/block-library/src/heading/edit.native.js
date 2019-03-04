@@ -16,26 +16,14 @@ import { Component } from '@wordpress/element';
 import { RichText, BlockControls } from '@wordpress/editor';
 import { createBlock } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import styles from './style.scss';
-
 class HeadingEdit extends Component {
-	constructor( props ) {
-		super( props );
-
-		this.state = {
-			aztecHeight: 0,
-		};
-	}
-
 	render() {
 		const {
 			attributes,
 			setAttributes,
 			mergeBlocks,
 			insertBlocksAfter,
+			style,
 		} = this.props;
 
 		const {
@@ -46,8 +34,6 @@ class HeadingEdit extends Component {
 
 		const tagName = 'h' + level;
 
-		const minHeight = styles.blockText.minHeight;
-
 		return (
 			<View>
 				<BlockControls>
@@ -57,12 +43,10 @@ class HeadingEdit extends Component {
 					tagName={ tagName }
 					value={ content }
 					isSelected={ this.props.isSelected }
+					style={ style }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
-					style={ {
-						minHeight: Math.max( minHeight, this.state.aztecHeight ),
-					} }
 					onChange={ ( value ) => setAttributes( { content: value } ) }
 					onMerge={ mergeBlocks }
 					onSplit={
@@ -76,9 +60,6 @@ class HeadingEdit extends Component {
 							} :
 							undefined
 					}
-					onContentSizeChange={ ( event ) => {
-						this.setState( { aztecHeight: event.aztecHeight } );
-					} }
 					placeholder={ placeholder || __( 'Write heading…' ) }
 				/>
 			</View>
