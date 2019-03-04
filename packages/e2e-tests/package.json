@@ -25,6 +25,7 @@
 		"@wordpress/e2e-test-utils": "file:../e2e-test-utils",
 		"@wordpress/jest-console": "file:../jest-console",
 		"@wordpress/scripts": "file:../scripts",
+		"expect-puppeteer": "^4.0.0",
 		"lodash": "^4.17.11"
 	},
 	"peerDependencies": {
