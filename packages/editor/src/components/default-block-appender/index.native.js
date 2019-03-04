@@ -26,7 +26,7 @@ export function DefaultBlockAppender( {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Start writing or press \u2295 to add content' );
+	const value = decodeEntities( placeholder ) || __( 'Start writing…' );
 
 	return (
 		<TouchableWithoutFeedback

@@ -124,7 +124,7 @@ class ImageEdit extends React.Component {
 	updateMediaProgress( payload ) {
 		const { setAttributes } = this.props;
 		this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
-		if ( payload.mediaUrl !== undefined ) {
+		if ( payload.mediaUrl ) {
 			setAttributes( { url: payload.mediaUrl } );
 		}
 	}
@@ -340,14 +340,6 @@ class ImageEdit extends React.Component {
 								imageHeightWithinContainer,
 							} = sizes;
 
-							if ( imageWidthWithinContainer === undefined ) {
-								return (
-									<View style={ styles.imageContainer } >
-										<Dashicon icon={ 'format-image' } size={ 300 } />
-									</View>
-								);
-							}
-
 							let finalHeight = imageHeightWithinContainer;
 							if ( height > 0 && height < imageHeightWithinContainer ) {
 								finalHeight = height;
@@ -362,6 +354,9 @@ class ImageEdit extends React.Component {
 								<View style={ { flex: 1 } } >
 									{ getInspectorControls() }
 									{ getMediaOptions() }
+									{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
+										<Dashicon icon={ 'format-image' } size={ 300 } />
+									</View> }
 									<ImageBackground
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
