@@ -9,7 +9,7 @@ export default withSelect(
 		const {
 			disableCustomFontSizes,
 			fontSizes,
-		} = select( 'core/block-editor' ).getEditorSettings();
+		} = select( 'core/block-editor' ).getSettings();
 
 		return {
 			disableCustomFontSizes,

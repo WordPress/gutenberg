@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, pick } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -53,7 +53,22 @@ class EditorProvider extends Component {
 
 	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks ) {
 		return {
-			...settings,
+			...pick( settings, [
+				'alignWide',
+				'colors',
+				'disableCustomColors',
+				'fontSizes',
+				'disableCustomFontSizes',
+				'imageSizes',
+				'maxWidth',
+				'blockTypes',
+				'hasFixedToolbar',
+				'focusMode',
+				'styles',
+				'isRTL',
+				'bodyPlaceholder',
+				'titlePlaceholder',
+			] ),
 			__experimentalMetaSource: {
 				value: meta,
 				onChange: onMetaChange,
@@ -64,6 +79,8 @@ class EditorProvider extends Component {
 	}
 
 	componentDidMount() {
+		this.props.updateEditorSettings( this.props.settings );
+
 		if ( ! this.props.settings.styles ) {
 			return;
 		}
@@ -77,6 +94,12 @@ class EditorProvider extends Component {
 				document.body.appendChild( node );
 			}
 		} );
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.settings !== prevProps.settings ) {
+			this.props.updateEditorSettings( this.props.settings );
+		}
 	}
 
 	render() {
@@ -134,6 +157,7 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			editPost,
+			updateEditorSettings,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
@@ -142,6 +166,7 @@ export default compose( [
 			updatePostLock,
 			createWarningNotice,
 			resetEditorBlocks,
+			updateEditorSettings,
 			resetEditorBlocksWithoutUndoLevel( blocks ) {
 				resetEditorBlocks( blocks, {
 					__unstableShouldCreateUndoLevel: false,
