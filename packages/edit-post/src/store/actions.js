@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { castArray } from 'lodash';
+
+/**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
  * @param {string} name Sidebar name to be opened.
@@ -157,6 +162,36 @@ export function togglePinnedPluginItem( pluginName ) {
 	return {
 		type: 'TOGGLE_PINNED_PLUGIN_ITEM',
 		pluginName,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that block types by the given
+ * name(s) should be disabled.
+ *
+ * @param {string[]} blockNames Names of block types to disable.
+ *
+ * @return {Object} Action object.
+ */
+export function disableBlockTypes( blockNames ) {
+	return {
+		type: 'DISABLE_BLOCK_TYPES',
+		blockNames: castArray( blockNames ),
+	};
+}
+
+/**
+ * Returns an action object used in signalling that block types by the given
+ * name(s) should be enabled.
+ *
+ * @param {string[]} blockNames Names of block types to enable.
+ *
+ * @return {Object} Action object.
+ */
+export function enableBlockTypes( blockNames ) {
+	return {
+		type: 'ENABLE_BLOCK_TYPES',
+		blockNames: castArray( blockNames ),
 	};
 }
 

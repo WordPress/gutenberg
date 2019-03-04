@@ -339,6 +339,24 @@ Returns an action object used to toggle a plugin name flag.
 
  * pluginName: Plugin name.
 
+### disableBlockTypes
+
+Returns an action object used in signalling that block types by the given
+name(s) should be disabled.
+
+*Parameters*
+
+ * blockNames: Names of block types to disable.
+
+### enableBlockTypes
+
+Returns an action object used in signalling that block types by the given
+name(s) should be enabled.
+
+*Parameters*
+
+ * blockNames: Names of block types to enable.
+
 ### setAvailableMetaBoxesPerLocation
 
 Returns an action object used in signaling

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, flow } from 'lodash';
+import { get, includes, flow, without, union } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -116,6 +116,17 @@ export const preferences = flow( [
 				[ action.pluginName ]: ! get( state, [ action.pluginName ], true ),
 			};
 		}
+		return state;
+	},
+	disabledBlockTypes( state, action ) {
+		switch ( action.type ) {
+			case 'ENABLE_BLOCK_TYPES':
+				return without( state, ...action.blockNames );
+
+			case 'DISABLE_BLOCK_TYPES':
+				return union( state, action.blockNames );
+		}
+
 		return state;
 	},
 } );

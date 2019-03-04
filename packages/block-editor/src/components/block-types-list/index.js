@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
@@ -19,7 +24,10 @@ function BlockTypesList( { items, onSelect, onHover = () => {}, children } ) {
 			{ items && items.map( ( item ) =>
 				<InserterListItem
 					key={ item.id }
-					className={ getBlockMenuDefaultClassName( item.id ) }
+					className={ classnames( [
+						getBlockMenuDefaultClassName( item.id ),
+						item.className,
+					] ) }
 					icon={ item.icon }
 					hasChildBlocksWithInserterSupport={
 						item.hasChildBlocksWithInserterSupport

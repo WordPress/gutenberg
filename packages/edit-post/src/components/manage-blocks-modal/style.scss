@@ -1,0 +1,43 @@
+.edit-post-manage-blocks-modal {
+	@include break-small() {
+		width: 640px;
+		height: calc(100% - #{ $header-height } - #{ $header-height });
+	}
+}
+
+.edit-post-manage-blocks-modal .components-modal__content {
+	padding-bottom: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.edit-post-manage-blocks-modal .components-modal__header {
+	flex-shrink: 0;
+	margin-bottom: 0;
+}
+
+.edit-post-manage-blocks-modal__content {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.components-modal__content input[type="search"].edit-post-manage-blocks-modal__search {
+	display: block;
+	width: 100%;
+	margin: $grid-size-large 0;
+	padding: 11px $grid-size-large;
+	border-radius: $radius-round-rectangle;
+}
+
+.edit-post-manage-blocks-modal__results {
+	height: 100%;
+	overflow: auto;
+	margin-left: #{ -1 * $grid-size-large };
+	margin-right: #{ -1 * $grid-size-large };
+}
+
+.edit-post-manage-blocks-modal__block-type.is-inactive {
+	@include block-style__disabled();
+	cursor: pointer;
+}
