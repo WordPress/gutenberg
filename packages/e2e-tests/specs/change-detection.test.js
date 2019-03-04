@@ -18,9 +18,9 @@ describe( 'Change detection', () => {
 		await createNewPost();
 	} );
 
-	afterEach( () => {
+	afterEach( async () => {
 		if ( handleInterceptedRequest ) {
-			releaseSaveIntercept();
+			await releaseSaveIntercept();
 		}
 	} );
 

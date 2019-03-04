@@ -37,6 +37,6 @@ describe( 'Managing reusable blocks', () => {
 		await visitAdminPage( 'edit.php', 'post_type=wp_block' );
 
 		// The reusable block has been imported
-		page.waitForXPath( 'div[@class="post_title"][contains(text(), "Greeting")]' );
+		await page.waitForXPath( 'div[@class="post_title"][contains(text(), "Greeting")]' );
 	} );
 } );
