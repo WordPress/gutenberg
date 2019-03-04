@@ -71,12 +71,6 @@
 	overflow: hidden;
 	position: relative;
 	white-space: nowrap;
-
-	&::after {
-		@include long-content-fade($size: 20%, $edge: 1px);
-		right: 0;
-		right: 0;
-	}
 	text-align: left;
 }
 
@@ -140,9 +134,15 @@
 }
 
 /* rtl:begin:ignore */
+.editor-post-permalink__link {
+	text-align: left;
+}
 .editor-post-permalink__editor-container,
 .editor-post-permalink__link {
 	direction: ltr;
+}
+.editor-post-permalink__link::after {
+	@include long-content-fade($direction:right, $size: 20%, $edge: 0);
 }
 /* rtl:end:ignore */
 
