@@ -1,6 +1,6 @@
-## 1.1.4 (2019-03-01)
+## 1.1.4 (Unreleased)
 
-### New Feature
+### Internal
 
 - Updated `npm-package-json-lint` dependency [#14200](https://github.com/WordPress/gutenberg/pull/14200)
 
