@@ -40,7 +40,7 @@ export const image = {
 		}
 
 		static getDerivedStateFromProps( props, state ) {
-			const { objectAttributes: { style } } = props;
+			const { activeObjectAttributes: { style } } = props;
 
 			if ( style === state.previousStyle ) {
 				return null;
@@ -79,8 +79,8 @@ export const image = {
 		}
 
 		render() {
-			const { value, onChange, isObjectActive, objectAttributes } = this.props;
-			const { style } = objectAttributes;
+			const { value, onChange, isObjectActive, activeObjectAttributes } = this.props;
+			const { style } = activeObjectAttributes;
 			// Rerender PositionedAtSelection when the selection changes or when
 			// the width changes.
 			const key = value.start + style;
@@ -125,19 +125,19 @@ export const image = {
 								onKeyPress={ stopKeyPropagation }
 								onKeyDown={ this.onKeyDown }
 								onSubmit={ ( event ) => {
-									const newObjects = value.objects.slice();
+									const newReplacements = value.replacements.slice();
 
-									newObjects[ value.start ] = {
+									newReplacements[ value.start ] = {
 										type: name,
 										attributes: {
-											...objectAttributes,
+											...activeObjectAttributes,
 											style: `width: ${ this.state.width }px;`,
 										},
 									};
 
 									onChange( {
 										...value,
-										objects: newObjects,
+										replacements: newReplacements,
 									} );
 
 									event.preventDefault();

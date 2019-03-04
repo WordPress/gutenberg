@@ -26,7 +26,7 @@ const FormatEdit = ( { formatTypes, onChange, value } ) => {
 							isActive ? activeFormat.attributes || {} : {}
 						}
 						isObjectActive={ isObjectActive }
-						objectAttributes={
+						activeObjectAttributes={
 							isObjectActive ? activeObject.attributes || {} : {}
 						}
 						value={ value }
