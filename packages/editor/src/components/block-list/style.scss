@@ -116,7 +116,7 @@
 			content: "";
 			position: absolute;
 			outline: $border-width solid transparent;
-			transition: outline 0.1s linear;
+			transition: outline 0.1s linear, box-shadow 0.15s linear;
 			pointer-events: none;
 
 			// Go edge-to-edge on mobile.
