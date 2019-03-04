@@ -203,7 +203,10 @@
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
-			"npm run docs:build"
+			"node ./docs/tool"
+		],
+		"packages/**/*.js": [
+			"node ./bin/update-readmes"
 		]
 	}
 }
