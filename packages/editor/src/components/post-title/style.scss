@@ -16,7 +16,7 @@
 		font-family: $editor-font;
 		line-height: $default-line-height;
 		color: $dark-gray-900;
-		transition: border 0.1s ease-out;
+		transition: border 0.1s ease-out, box-shadow, 0.15s ease-out;
 		padding: #{ $block-padding + 5px } $block-padding;
 		word-break: keep-all;
 
