@@ -186,7 +186,7 @@
 		"parent": "javascript"
 	},
 	{
-		"title": "Extending the block editor",
+		"title": "Extending the Block Editor",
 		"slug": "extending-the-block-editor",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/extending-the-block-editor.md",
 		"parent": "javascript"

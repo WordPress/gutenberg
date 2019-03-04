@@ -35,7 +35,7 @@ add_action( 'admin_notices', 'myguten_admin_notice' );
 
 Importantly, the `admin_notices` hook allows a developer to render whatever HTML they'd like. One advantage is that the developer has a great amount of flexibility. The key disadvantage is that arbitrary HTML makes future iterations on notices more difficult, if not possible, because the iterations need to accommodate for arbitrary HTML. This is why the block editor has a formal API.
 
-## Notices in the block editor
+## Notices in the Block Editor
 
 In the block editor, here's an example of the "Post published" notice:
 

@@ -1,4 +1,4 @@
-# Block editor
+# Block Editor
 
 Generic block editor module.
 
