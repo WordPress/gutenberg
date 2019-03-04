@@ -25,5 +25,11 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"devDependencies": {
+		"@wordpress/docgen": "file:../docgen"
+	},
+	"scripts": {
+		"docs:generate": "docgen ./src/index.js --output ./README.md --to-token"
 	}
 }
