@@ -7,5 +7,5 @@ declare -a packages=(
 
 for package in "${packages[@]}"
 do
-	npx docgen packages/${package}/src/index.js --output packages/${package}/README.md --to-token;
+	npx docgen packages/${package}/src/index.js --output packages/${package}/README.md --to-token --ignore ^unstable;
 done
