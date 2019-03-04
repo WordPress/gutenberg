@@ -4,7 +4,7 @@ Notices are informational UI displayed near the top of admin pages. WordPress co
 
 In the classic editor, notices hooked onto the `admin_notices` action can render whatever HTML they'd like. In the Block Editor, notices are restricted to a more formal API.
 
-## Notices in the classic editor
+## Notices in the Classic Editor
 
 In the classic editor, here's an example of the "Post draft updated" notice:
 
