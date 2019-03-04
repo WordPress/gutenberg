@@ -4,8 +4,8 @@
  * `String.prototype.slice`.
  *
  * @param {Object} value       Value to modify.
- * @param {number} startIndex  Start index.
- * @param {number} endIndex    End index.
+ * @param {?number} startIndex  Start index.
+ * @param {?number} endIndex    End index.
  *
  * @return {Object} A new extracted value.
  */

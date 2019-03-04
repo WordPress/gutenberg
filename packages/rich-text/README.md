@@ -26,9 +26,12 @@ text separated by two new lines will be wrapped in an `Element` of that type.
 
 **Parameters**
 
--   **value** `Object`: Value to apply.
--   **current** `HTMLElement`: The live root node to apply the element tree to.
--   **multilineTag** `string`: Multiline tag.
+-   **$1** `Object`: Named arguments.
+-   **$1.value** `Object`: Value to apply.
+-   **$1.current** `HTMLElement`: The live root node to apply the element tree to.
+-   **$1.multilineTag** `?string`: Multiline tag.
+-   **$1.multilineWrapperTags** `?Array`: Tags where lines can be found if nesting is possible.
+-   **$1.prepareEditableTree** `?Array`: Functions to prepare the editable tree.
 
 ### applyFormat
 
@@ -42,8 +45,8 @@ provided.
 
 -   **value** `Object`: Value to modify.
 -   **format** `Object`: Format to apply.
--   **startIndex** `number`: Start index.
--   **endIndex** `number`: End index.
+-   **startIndex** `?number`: Start index.
+-   **endIndex** `?number`: End index.
 
 **Returns**
 
@@ -215,9 +218,9 @@ none are provided.
 **Parameters**
 
 -   **value** `Object`: Value to modify.
--   **valueToInsert** `string`: Value to insert.
--   **startIndex** `number`: Start index.
--   **endIndex** `number`: End index.
+-   **valueToInsert** `(Object|string)`: Value to insert.
+-   **startIndex** `?number`: Start index.
+-   **endIndex** `?number`: End index.
 
 **Returns**
 
@@ -333,7 +336,7 @@ string. This is similar to `Array.prototype.join`.
 **Parameters**
 
 -   **values** `Array`: An array of values to join.
--   **separator** `(string|Object)`: Separator string or value.
+-   **separator** `?(string|Object)`: Separator string or value.
 
 **Returns**
 
@@ -385,8 +388,8 @@ Remove content from a Rich Text value between the given `startIndex` and
 **Parameters**
 
 -   **value** `Object`: Value to modify.
--   **startIndex** `number`: Start index.
--   **endIndex** `number`: End index.
+-   **startIndex** `?number`: Start index.
+-   **endIndex** `?number`: End index.
 
 **Returns**
 
@@ -404,8 +407,8 @@ selection if none are provided.
 
 -   **value** `Object`: Value to modify.
 -   **formatType** `string`: Format type to remove.
--   **startIndex** `number`: Start index.
--   **endIndex** `number`: End index.
+-   **startIndex** `?number`: Start index.
+-   **endIndex** `?number`: End index.
 
 **Returns**
 
@@ -439,8 +442,8 @@ retrieved from the selection if none are provided. This is similar to
 **Parameters**
 
 -   **value** `Object`: Value to modify.
--   **startIndex** `number`: Start index.
--   **endIndex** `number`: End index.
+-   **startIndex** `?number`: Start index.
+-   **endIndex** `?number`: End index.
 
 **Returns**
 
@@ -457,8 +460,8 @@ Indices are retrieved from the selection if none are provided.
 **Parameters**
 
 -   **value** `Object`: Value to modify.
--   **string** `(number|string)`: Start index, or string at which to split.
--   **end** `number`: End index.
+-   **string** `?(number|string)`: Start index, or string at which to split.
+-   **endStr** `?number`: End index.
 
 **Returns**
 
@@ -490,8 +493,8 @@ provided, text separated by a line separator will be wrapped in it.
 
 -   **$1** `Object`: Named argements.
 -   **$1.value** `Object`: Rich text value.
--   **$1.multilineTag** `string`: Multiline tag.
--   **$1.multilineWrapperTags** `Array`: Tags where lines can be found if nesting is possible.
+-   **$1.multilineTag** `?string`: Multiline tag.
+-   **$1.multilineWrapperTags** `?Array`: Tags where lines can be found if nesting is possible.
 
 **Returns**
 

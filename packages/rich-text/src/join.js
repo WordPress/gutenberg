@@ -11,7 +11,7 @@ import { normaliseFormats } from './normalise-formats';
  * string. This is similar to `Array.prototype.join`.
  *
  * @param {Array}         values    An array of values to join.
- * @param {string|Object} separator Separator string or value.
+ * @param {?(string|Object)} separator Separator string or value.
  *
  * @return {Object} A new combined value.
  */

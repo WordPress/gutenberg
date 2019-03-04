@@ -12,9 +12,9 @@ import { normaliseFormats } from './normalise-formats';
  * none are provided.
  *
  * @param {Object} value         Value to modify.
- * @param {string} valueToInsert Value to insert.
- * @param {number} startIndex    Start index.
- * @param {number} endIndex      End index.
+ * @param {Object|string} valueToInsert Value to insert.
+ * @param {?number} startIndex    Start index.
+ * @param {?number} endIndex      End index.
  *
  * @return {Object} A new value with the value inserted.
  */

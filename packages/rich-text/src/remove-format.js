@@ -17,8 +17,8 @@ import { normaliseFormats } from './normalise-formats';
  *
  * @param {Object} value      Value to modify.
  * @param {string} formatType Format type to remove.
- * @param {number} startIndex Start index.
- * @param {number} endIndex   End index.
+ * @param {?number} startIndex Start index.
+ * @param {?number} endIndex   End index.
  *
  * @return {Object} A new value with the format applied.
  */

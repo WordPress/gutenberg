@@ -10,8 +10,8 @@ import { replace } from './replace';
  * Indices are retrieved from the selection if none are provided.
  *
  * @param {Object}        value   Value to modify.
- * @param {number|string} string  Start index, or string at which to split.
- * @param {number}        end     End index.
+ * @param {?(number|string)} string  Start index, or string at which to split.
+ * @param {?number}        endStr     End index.
  *
  * @return {Array} An array of new values.
  */
