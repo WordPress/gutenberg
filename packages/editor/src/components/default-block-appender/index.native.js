@@ -49,10 +49,10 @@ export function DefaultBlockAppender( {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getEditorSettings, getTemplateLock } = select( 'core/block-editor' );
+		const { getBlockCount, getSettings, getTemplateLock } = select( 'core/block-editor' );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const { bodyPlaceholder } = getEditorSettings();
+		const { bodyPlaceholder } = getSettings();
 
 		return {
 			isVisible: isEmpty,

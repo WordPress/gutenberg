@@ -38,7 +38,7 @@ export default ( ...fontSizeNames ) => {
 	return createHigherOrderComponent(
 		compose( [
 			withSelect( ( select ) => {
-				const { fontSizes } = select( 'core/block-editor' ).getEditorSettings();
+				const { fontSizes } = select( 'core/block-editor' ).getSettings();
 				return {
 					fontSizes,
 				};

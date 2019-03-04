@@ -57,7 +57,7 @@ export default compose( [
 	withSelect( ( select ) => ( {
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		// This setting (richEditingEnabled) should not live in the block editor's setting.
-		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/block-editor' ).getEditorSettings().richEditingEnabled,
+		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
 	} ) ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
