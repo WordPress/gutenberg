@@ -1034,7 +1034,7 @@ const canInsertBlockTypeUnmemoized = ( state, blockName, rootClientId = null ) =
 		return false;
 	}
 
-	const { allowedBlockTypes } = getEditorSettings( state );
+	const { allowedBlockTypes } = getSettings( state );
 
 	const isBlockAllowedInEditor = checkAllowList( allowedBlockTypes, blockName, true );
 	if ( ! isBlockAllowedInEditor ) {
@@ -1350,7 +1350,7 @@ export function getBlockListSettings( state, clientId ) {
  *
  * @return {Object} The editor settings object.
  */
-export function getEditorSettings( state ) {
+export function getSettings( state ) {
 	return state.settings;
 }
 

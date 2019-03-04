@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "5.1.1",
+	"version": "5.2.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -132,6 +132,7 @@
 				}
 			],
 			"require-publishConfig": "error",
+			"require-repository-directory": "error",
 			"valid-values-author": [
 				"error",
 				[

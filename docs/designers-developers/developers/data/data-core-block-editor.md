@@ -737,7 +737,7 @@ Returns the Block List settings of a block, if any exist.
 
 Block settings of the block if set.
 
-### getEditorSettings
+### getSettings
 
 Returns the editor settings.
 
@@ -1027,9 +1027,9 @@ Returns an action object that changes the nested settings of a given block.
                          being received.
  * settings: Object with the new settings for the nested block.
 
-### updateEditorSettings
+### updateSettings
 
-Returns an action object used in signalling that the editor settings have been updated.
+Returns an action object used in signalling that the block editor settings have been updated.
 
 *Parameters*
 

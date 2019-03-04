@@ -55,7 +55,7 @@ class EditorModeKeyboardShortcuts extends Component {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isRichEditingEnabled: select( 'core/block-editor' ).getEditorSettings().richEditingEnabled,
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		mode: select( 'core/edit-post' ).getEditorMode(),
 		isEditorSidebarOpen: select( 'core/edit-post' ).isEditorSidebarOpened(),
 	} ) ),

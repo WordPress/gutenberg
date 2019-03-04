@@ -1084,6 +1084,17 @@ export function __unstableIsEditorReady( state ) {
 	return state.isReady;
 }
 
+/**
+ * Returns the post editor settings.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The editor settings object.
+ */
+export function getEditorSettings( state ) {
+	return state.editorSettings;
+}
+
 /*
  * Backward compatibility
  */
@@ -1146,5 +1157,4 @@ export const getTemplateLock = getBlockEditorSelector( 'getTemplateLock' );
 export const canInsertBlockType = getBlockEditorSelector( 'canInsertBlockType' );
 export const getInserterItems = getBlockEditorSelector( 'getInserterItems' );
 export const hasInserterItems = getBlockEditorSelector( 'hasInserterItems' );
-export const getEditorSettings = getBlockEditorSelector( 'getEditorSettings' );
 export const getBlockListSettings = getBlockEditorSelector( 'getBlockListSettings' );
