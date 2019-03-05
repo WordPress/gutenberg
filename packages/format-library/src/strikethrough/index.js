@@ -24,7 +24,6 @@ export const strikethrough = {
 					onUse={ onToggle }
 				/>
 				<RichTextToolbarButton
-					name="strikethrough"
 					icon="editor-strikethrough"
 					title={ __( 'Strikethrough' ) }
 					onClick={ onToggle }

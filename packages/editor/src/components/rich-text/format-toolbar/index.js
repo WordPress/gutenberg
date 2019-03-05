@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-import { Toolbar, Slot } from '@wordpress/components';
+import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
 
 const FormatToolbar = ( { controls } ) => {
 	return (
@@ -11,7 +11,15 @@ const FormatToolbar = ( { controls } ) => {
 				{ controls.map( ( format ) =>
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
 				) }
-				<Slot name="RichText.ToolbarControls" />
+				<Slot name="RichText.ToolbarControls">
+					{ ( fills ) =>
+						<DropdownMenu
+							icon={ false }
+							position="bottom left"
+							controls={ fills.map( ( [ { props } ] ) => props ) }
+						/>
+					}
+				</Slot>
 			</Toolbar>
 		</div>
 	);
