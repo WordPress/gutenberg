@@ -10,7 +10,7 @@ import {
 	slice,
 } from '@wordpress/rich-text';
 
-export function getPatterns( { onReplace, valueToFormat, onCreateUndoLevel, onChange } ) {
+export function getPatterns( { onReplace, valueToFormat } ) {
 	const prefixTransforms = getBlockTransforms( 'from' )
 		.filter( ( { type } ) => type === 'prefix' );
 
@@ -40,7 +40,6 @@ export function getPatterns( { onReplace, valueToFormat, onCreateUndoLevel, onCh
 			const content = valueToFormat( slice( record, start, text.length ) );
 			const block = transformation.transform( content );
 
-			onCreateUndoLevel();
 			onReplace( [ block ] );
 
 			return record;
@@ -69,8 +68,6 @@ export function getPatterns( { onReplace, valueToFormat, onCreateUndoLevel, onCh
 			if ( startIndex === endIndex ) {
 				return record;
 			}
-
-			onChange( record );
 
 			record = remove( record, startIndex, startIndex + 1 );
 			record = remove( record, endIndex, endIndex + 1 );
