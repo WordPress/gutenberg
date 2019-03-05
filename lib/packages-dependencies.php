@@ -64,6 +64,7 @@ return array(
 		'wp-token-list',
 		'wp-url',
 		'wp-viewport',
+		'wp-wordcount',
 	),
 	'wp-blocks'                             => array(
 		'lodash',
