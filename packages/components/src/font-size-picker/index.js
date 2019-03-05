@@ -91,6 +91,7 @@ function FontSizePicker( {
 					<input
 						className="components-range-control__number"
 						type="number"
+						min="9"
 						onChange={ onChangeValue }
 						aria-label={ __( 'Custom font size' ) }
 						value={ value || '' }
