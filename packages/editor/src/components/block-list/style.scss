@@ -309,7 +309,13 @@
 		.editor-block-contextual-toolbar {
 			width: auto;
 			border-bottom: $border-width solid $dark-opacity-200;
+			border-left: $border-width solid $dark-opacity-200;
 			bottom: auto;
+
+			> .editor-block-toolbar > *:last-child .components-toolbar {
+				box-shadow: none;
+				border-right: $border-width solid $dark-opacity-200;
+			}
 		}
 	}
 
