@@ -444,9 +444,9 @@
 
 	// Full-wide
 	&[data-align="full"] {
-		// Position hover label on the right for the top level block.
+		// Position hover label on the left for the top level block.
 		> .editor-block-list__block-edit > .editor-block-list__breadcrumb {
-			right: 0;
+			left: 0;
 		}
 
 		// Compensate for main container padding and subtract border.
