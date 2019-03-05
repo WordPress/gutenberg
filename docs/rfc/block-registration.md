@@ -326,7 +326,11 @@ See the [Transforms](https://wordpress.org/gutenberg/handbook/designers-develope
 * Property: `deprecated`
 
 ```json
-{ "deprecated": [ { attributes: {}, save: "my-deprecated-save.js", supports: {} } ] }
+{ "deprecated": [ {
+	"attributes": {},
+	"save": "my-deprecated-save.js",
+	"supports": {}
+} ] }
 ```
 
 This property contains the definition of the deprecated versions of the block type. It is used to ensure that old blocks with old markup are not considered invalid.
