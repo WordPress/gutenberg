@@ -28,7 +28,7 @@ const packages = [
 	//'priority-queue',
 	//'redux-routine',
 	'rich-text',
-	//'shortcode',
+	'shortcode',
 	//'url',
 	//'viewport',
 	//'wordcount',
