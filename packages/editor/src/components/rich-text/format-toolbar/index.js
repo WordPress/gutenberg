@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+
+import { orderBy } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 
@@ -16,7 +22,7 @@ const FormatToolbar = ( { controls } ) => {
 						<DropdownMenu
 							icon={ false }
 							position="bottom left"
-							controls={ fills.map( ( [ { props } ] ) => props ) }
+							controls={ orderBy( fills.map( ( [ { props } ] ) => props ), 'title' ) }
 						/>
 					}
 				</Slot>
