@@ -6,10 +6,11 @@ import { last } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { Button, Icon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,12 +24,13 @@ function BlockListAppender( {
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
+	disableDefaultInserter,
 } ) {
 	if ( isLocked ) {
 		return null;
 	}
 
-	if ( canInsertDefaultBlock ) {
+	if ( ! disableDefaultInserter && canInsertDefaultBlock ) {
 		return (
 			<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
 				<DefaultBlockAppender
@@ -44,15 +46,18 @@ function BlockListAppender( {
 			<Inserter
 				rootClientId={ rootClientId }
 				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
-					<IconButton
-						label={ __( 'Add block' ) }
-						icon="insert"
-						onClick={ onToggle }
-						className="block-list-appender__toggle"
-						aria-haspopup="true"
-						aria-expanded={ isOpen }
-						disabled={ disabled }
-					/>
+					<Fragment>
+						<Button
+							className="block-list-appender__toggle"
+							onClick={ onToggle }
+							aria-expanded={ isOpen }
+							disabled={ disabled }
+						>
+							<Icon icon="insert" />
+							<span>{ __( 'Add a Block' ) }</span>
+						</Button>
+
+					</Fragment>
 				) }
 				isAppender
 			/>

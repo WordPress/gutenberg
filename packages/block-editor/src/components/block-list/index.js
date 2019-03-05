@@ -222,7 +222,7 @@ class BlockList extends Component {
 						</AsyncModeProvider>
 					);
 				} ) }
-				<BlockListAppender rootClientId={ rootClientId } />
+				<BlockListAppender rootClientId={ rootClientId } disableDefaultInserter={ this.props.disableDefaultInserter } />
 			</div>
 		);
 	}
@@ -243,8 +243,14 @@ export default compose( [
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
+			getBlock,
 		} = select( 'core/block-editor' );
+
 		const { rootClientId } = ownProps;
+
+		const block = getBlock( rootClientId );
+
+		const hasChildBlocks = block ? !! block.innerBlocks.length : true;
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
@@ -255,6 +261,7 @@ export default compose( [
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
+			disableDefaultInserter: ! hasChildBlocks,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
