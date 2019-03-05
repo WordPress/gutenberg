@@ -16,6 +16,8 @@ import { Component } from '@wordpress/element';
 import { RichText, BlockControls } from '@wordpress/editor';
 import { createBlock } from '@wordpress/blocks';
 
+const name = 'core/heading';
+
 /**
  * Internal dependencies
  */
