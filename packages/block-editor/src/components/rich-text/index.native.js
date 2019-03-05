@@ -584,11 +584,22 @@ const RichTextContainer = compose( [
 	} ),
 ] )( RichText );
 
-RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
+RichTextContainer.Content = ( { value, format, tagName: Tag, multiline, ...props } ) => {
 	let content;
+	let html = value;
+	let MultilineTag;
+
+	if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
+		MultilineTag = multiline === true ? 'p' : multiline;
+	}
+
+	if ( ! html && MultilineTag ) {
+		html = `<${ MultilineTag }></${ MultilineTag }>`;
+	}
+
 	switch ( format ) {
 		case 'string':
-			content = <RawHTML>{ value }</RawHTML>;
+			content = <RawHTML>{ html }</RawHTML>;
 			break;
 	}
 
