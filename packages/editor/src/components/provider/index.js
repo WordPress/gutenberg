@@ -61,7 +61,7 @@ class EditorProvider extends Component {
 				'disableCustomFontSizes',
 				'imageSizes',
 				'maxWidth',
-				'blockTypes',
+				'allowedBlockTypes',
 				'hasFixedToolbar',
 				'focusMode',
 				'styles',

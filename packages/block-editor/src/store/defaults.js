@@ -17,7 +17,7 @@ export const PREFERENCES_DEFAULTS = {
  *  disableCustomFontSizes boolean        Whether or not the custom font sizes are disabled
  *  imageSizes             Array          Available image sizes
  *  maxWidth               number         Max width to constraint resizing
- *  blockTypes             boolean|Array  Allowed block types
+ *  allowedBlockTypes      boolean|Array  Allowed block types
  *  hasFixedToolbar        boolean        Whether or not the editor toolbar is fixed
  *  focusMode              boolean        Whether the focus mode is enabled or not
  *  styles                 Array          Editor Styles
