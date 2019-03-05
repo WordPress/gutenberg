@@ -134,19 +134,19 @@
 		> .editor-block-list__block-edit::before {
 			// Use opacity to work in various editor styles.
 			outline: $border-width solid $dark-opacity-light-500;
-			box-shadow: inset ($border-width * 3) 0 0 0 $dark-opacity-500;
+			box-shadow: inset $block-left-border-width 0 0 0 $dark-opacity-500;
 
 			.is-dark-theme & {
 				outline-color: $light-opacity-light-500;
-				box-shadow: inset ($border-width * 3) 0 0 0 $light-opacity-600;
+				box-shadow: inset $block-left-border-width 0 0 0 $light-opacity-600;
 			}
 
 			// Switch to outset borders on larger screens.
 			@include break-small() {
-				box-shadow: ($border-width * -3) 0 0 0 $dark-opacity-500;
+				box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-500;
 
 				.is-dark-theme & {
-					box-shadow: ($border-width * -3) 0 0 0 $light-opacity-600;
+					box-shadow: -$block-left-border-width 0 0 0 $light-opacity-600;
 				}
 			}
 		}
@@ -159,7 +159,7 @@
 
 	// Hover style.
 	&.is-hovered > .editor-block-list__block-edit::before {
-		box-shadow: ($border-width * -3) 0 0 0 $light-gray-500;
+		box-shadow: -$block-left-border-width 0 0 0 $light-gray-500;
 	}
 
 	// Spotlight mode.
@@ -941,8 +941,8 @@
 	z-index: z-index(".editor-block-list__breadcrumb");
 
 	// Position in the top left of the border.
-	left: -$block-padding - ($border-width * 3);
-	top: (($block-padding * -2) - ($border-width * 3));
+	left: -$block-padding - $block-left-border-width;
+	top: (($block-padding * -2) - $block-left-border-width);
 
 	.components-toolbar {
 		padding: 0;

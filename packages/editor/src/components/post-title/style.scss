@@ -52,19 +52,19 @@
 		&.is-selected .editor-post-title__input {
 			// use opacity to work in various editor styles.
 			border-color: $dark-opacity-light-500;
-			box-shadow: inset ($border-width * 3) 0 0 0 $dark-opacity-500;
+			box-shadow: inset $block-left-border-width 0 0 0 $dark-opacity-500;
 
 			.is-dark-theme & {
 				border-color: $light-opacity-light-500;
-				box-shadow: inset ($border-width * 3) 0 0 0 $light-opacity-600;
+				box-shadow: inset $block-left-border-width 0 0 0 $light-opacity-600;
 			}
 
 			// Switch to outset borders on larger screens.
 			@include break-small() {
-				box-shadow: ($border-width * -3) 0 0 0 $dark-opacity-500;
+				box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-500;
 
 				.is-dark-theme & {
-					box-shadow: ($border-width * -3) 0 0 0 $light-opacity-600;
+					box-shadow: -$block-left-border-width 0 0 0 $light-opacity-600;
 				}
 			}
 		}
@@ -72,7 +72,7 @@
 
 	&:not(.is-focus-mode):not(.has-fixed-toolbar):not(.is-selected) {
 		.editor-post-title__input:hover {
-			box-shadow: ($border-width * -3) 0 0 0 $light-gray-500;
+			box-shadow: -$block-left-border-width 0 0 0 $light-gray-500;
 		}
 	}
 
