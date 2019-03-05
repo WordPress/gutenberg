@@ -28,11 +28,11 @@ const relativeToAbsolute = ( basePath, relativePath ) => {
 	if ( fs.existsSync( targetFile ) ) {
 		return targetFile;
 	}
-	process.stdout.write( '\nRelative path does not exists.' );
-	process.stdout.write( '\n' );
-	process.stdout.write( `\nBase: ${ basePath }` );
-	process.stdout.write( `\nRelative: ${ relativePath }` );
-	process.stdout.write( '\n\n' );
+	process.stderr.write( '\nRelative path does not exists.' );
+	process.stderr.write( '\n' );
+	process.stderr.write( `\nBase: ${ basePath }` );
+	process.stderr.write( `\nRelative: ${ relativePath }` );
+	process.stderr.write( '\n\n' );
 	process.exit( 1 );
 };
 
@@ -54,8 +54,8 @@ const processFile = ( rootDir, inputFile ) => {
 		currentFileStack.pop( inputFile );
 		return result;
 	} catch ( e ) {
-		process.stdout.write( `\n${ e }` );
-		process.stdout.write( '\n\n' );
+		process.stderr.write( `\n${ e }` );
+		process.stderr.write( '\n\n' );
 		process.exit( 1 );
 	}
 };
@@ -66,8 +66,8 @@ const runCustomFormatter = ( customFormatterFile, rootDir, doc, symbols, heading
 		const output = customFormatter( rootDir, doc, symbols, headingTitle );
 		fs.writeFileSync( doc, output );
 	} catch ( e ) {
-		process.stdout.write( `\n${ e }` );
-		process.stdout.write( '\n\n' );
+		process.stderr.write( `\n${ e }` );
+		process.stderr.write( '\n\n' );
 		process.exit( 1 );
 	}
 	return 'custom formatter';
@@ -80,9 +80,9 @@ module.exports = function( sourceFile, options ) {
 	// Input: process CLI args, prepare files, etc
 	const processDir = process.cwd();
 	if ( sourceFile === undefined ) {
-		process.stdout.write( '\n' );
-		process.stdout.write( 'No source file provided' );
-		process.stdout.write( '\n\n' );
+		process.stderr.write( '\n' );
+		process.stderr.write( 'No source file provided' );
+		process.stderr.write( '\n\n' );
 		process.exit( 1 );
 	}
 	sourceFile = path.join( processDir, sourceFile );
@@ -123,4 +123,6 @@ module.exports = function( sourceFile, options ) {
 		fs.writeFileSync( tokens, JSON.stringify( result.tokens ) );
 		fs.writeFileSync( ast, JSON.stringify( result.ast ) );
 	}
+
+	process.exit( 0 );
 };
