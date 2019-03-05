@@ -108,9 +108,16 @@ export class RichText extends Component {
 	 */
 	getRecord() {
 		const { formatPlaceholder, start, end } = this.state;
+
+		var value = this.props.value === undefined ? null : this.props.value;
+
 		// Since we get the text selection from Aztec we need to be in sync with the HTML `value`
 		// Removing leading white spaces using `trim()` should make sure this is the case.
-		const { formats, text } = this.formatToValue( this.props.value === undefined ? undefined : this.props.value.trimLeft() );
+		if (typeof value === 'string' || value instanceof String) {
+			value = value.trimLeft();
+		}
+
+		const { formats, text } = this.formatToValue( value );
 
 		return { formats, formatPlaceholder, text, start, end };
 	}
