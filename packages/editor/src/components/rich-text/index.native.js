@@ -86,6 +86,7 @@ export class RichText extends Component {
 			start: 0,
 			end: 0,
 			formatPlaceholder: null,
+			height: 0,
 		};
 	}
 
@@ -243,9 +244,7 @@ export class RichText extends Component {
 
 	onContentSizeChange( contentSize ) {
 		const contentHeight = contentSize.height;
-		this.props.onContentSizeChange( {
-			aztecHeight: contentHeight,
-		} );
+		this.setState( { height: contentHeight } );
 	}
 
 	// eslint-disable-next-line no-unused-vars
@@ -508,6 +507,10 @@ export class RichText extends Component {
 			html = '';
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
+		let minHeight = 0;
+		if ( style && style.minHeight ) {
+			minHeight = style.minHeight;
+		}
 
 		return (
 			<View>
@@ -523,6 +526,10 @@ export class RichText extends Component {
 						if ( this.props.setRef ) {
 							this.props.setRef( ref );
 						}
+					} }
+					style={ {
+						...style,
+						minHeight: Math.max( minHeight, this.state.height ),
 					} }
 					text={ { text: html, eventCount: this.lastEventCount } }
 					placeholder={ this.props.placeholder }
@@ -541,7 +548,6 @@ export class RichText extends Component {
 					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
-					style={ style }
 					fontFamily={ this.props.fontFamily || styles[ 'editor-rich-text' ].fontFamily }
 					fontSize={ this.props.fontSize }
 					fontWeight={ this.props.fontWeight }
