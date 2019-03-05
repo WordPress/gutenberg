@@ -340,6 +340,6 @@
 
 @mixin reduce-motion {
 	@media (prefers-reduced-motion: reduce) {
-		animation: none;
+		animation-duration: 1ms !important;
 	}
 }
