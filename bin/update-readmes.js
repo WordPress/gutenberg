@@ -27,21 +27,36 @@ const packages = [
 	//'plugins',
 	//'priority-queue',
 	//'redux-routine',
-	//'rich-text',
+	'rich-text',
 	//'shortcode',
 	//'url',
 	//'viewport',
 	//'wordcount',
 ];
 
-let aggregatedExitCode = 0;
-packages.forEach( ( packageName ) => {
-	const args = [
+const getArgsForPackage = ( packageName ) => {
+	const defaultArgs = [
 		`packages/${ packageName }/src/index.js`,
 		`--output packages/${ packageName }/README.md`,
 		'--to-token',
 		'--ignore "unstable|experimental"',
 	];
+
+	const argsForPackage = {
+		'rich-text': [
+			`packages/${ packageName }/src/index.js`,
+			`--output packages/${ packageName }/README.md`,
+			'--to-token',
+			'--ignore "unstable|experimental|^apply$|^changeListType$"',
+		],
+	};
+
+	return argsForPackage[ packageName ] || defaultArgs;
+};
+
+let aggregatedExitCode = 0;
+packages.forEach( ( packageName ) => {
+	const args = getArgsForPackage( packageName );
 	const pathToDocGen = path.join( __dirname, '..', 'node_modules', '.bin', 'docgen' );
 	const { status, stderr } = childProcess.spawnSync(
 		pathToDocGen,
