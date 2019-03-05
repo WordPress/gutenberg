@@ -31,6 +31,7 @@
 .components-animate__slide-in {
 	animation: components-animate__slide-in-animation 0.1s cubic-bezier(0, 0, 0.2, 1);
 	animation-fill-mode: forwards;
+	@include reduce-motion;
 
 	&.is-from-left {
 		transform: translateX(+100%);
