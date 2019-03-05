@@ -1,19 +1,17 @@
 {
-	"name": "core/archives",
-	"title": "Archives",
+	"name": "core/categories",
+	"title": "Categories",
 	"category": "widgets",
 	"icon": {
 		"src": "./icon.js"
 	},
-	"description": "Display a monthly archive of your posts.",
+	"description": "Display a list of all categories.",
 	"attributes": {
-		"align": {
-			"type": "string"
-		},
-		"className": {
-			"type": "string"
-		},
 		"displayAsDropdown": {
+			"type": "boolean",
+			"default": false
+		},
+		"showHierarchy": {
 			"type": "boolean",
 			"default": false
 		},

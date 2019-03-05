@@ -1,0 +1,28 @@
+{
+	"name": "core/calendar",
+	"title": "Calendar",
+	"category": "widgets",
+	"icon": {
+		"slug": "calendar"
+	},
+	"description": "A calendar of your site’s posts.",
+	"keywords": [ "posts", "archive" ],
+	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"className": {
+			"type": "string"
+		},
+		"month": {
+			"type": "integer"
+		},
+		"year": {
+			"type": "integer"
+		}
+	},
+	"edit": "./edit.js",
+	"supports": {
+		"align": true
+	}
+}
