@@ -117,28 +117,12 @@ function render_block_core_archives( $attributes ) {
 }
 
 /**
- * Register archives block.
+ * Registers `core/archives` block.
  */
 function register_block_core_archives() {
-	register_block_type(
-		'core/archives',
+	register_block_type_from_metadata(
+		dirname( __FILE__ ),
 		array(
-			'attributes'      => array(
-				'align'             => array(
-					'type' => 'string',
-				),
-				'className'         => array(
-					'type' => 'string',
-				),
-				'displayAsDropdown' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'showPostCounts'    => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-			),
 			'render_callback' => 'render_block_core_archives',
 		)
 	);

@@ -1,0 +1,29 @@
+{
+	"name": "core/archives",
+	"title": "Archives",
+	"category": "widgets",
+	"icon": "./icon.js",
+	"description": "Display a monthly archive of your posts.",
+	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"className": {
+			"type": "string"
+		},
+		"displayAsDropdown": {
+			"type": "boolean",
+			"default": false
+		},
+		"showPostCounts": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"edit": "./edit.js",
+	"supports": {
+		"align": true,
+		"alignWide": false,
+		"html": false
+	}
+}

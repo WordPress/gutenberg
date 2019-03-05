@@ -1,0 +1,17 @@
+{
+	"name": "core/block",
+	"title": "Reusable Block",
+	"category": "reusable",
+	"description": "Create content, and save it for you and other contributors to reuse across your site. Update the block, and the changes apply everywhere it’s used.",
+	"attributes": {
+		"ref": {
+			"type": "number"
+		}
+	},
+	"edit": "./edit.js",
+	"supports": {
+		"customClassName": false,
+		"html": false,
+		"inserter": false
+	}
+}
