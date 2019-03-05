@@ -64,7 +64,9 @@ To register a new block type, start by creating a `block.json` file. This file:
 	"name": "my-plugin/notice",
 	"title": "Notice",
 	"category": "common",
-	"icon": "star",
+	"icon": {
+		"slug": "star",
+	}
 	"description": "Shows warning, error or success notices  ...",
 	"keywords": [ "alert", "message" ],
 	"attributes": {
@@ -156,12 +158,12 @@ An implementation should expect and tolerate unknown categories, providing some 
 * Property: `icon`
 
 ```json
-{
+{ "icon": {
 	"slug": "star",
 	"src": "./my-file.js",
 	"foreground": "#000000",
 	"background": "#FFFFFF",
-}
+} }
 ```
 
 An icon property should be specified to make it easier to identify a block. These can be any of WordPress' Dashicons (slug serving also as a fallback if non-js contexts), and a path to a JavaScript file containing the block's icon property custom SVG element.
