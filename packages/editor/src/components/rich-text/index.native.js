@@ -32,6 +32,7 @@ import { isURL } from '@wordpress/url';
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
+import { ListEdit } from './list-edit';
 
 import styles from './style.scss';
 
@@ -499,6 +500,7 @@ export class RichText extends Component {
 			style,
 			formattingControls,
 			isSelected,
+			onTagNameChange,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -517,6 +519,14 @@ export class RichText extends Component {
 
 		return (
 			<View>
+				{ isSelected && this.multilineTag === 'li' && (
+					<ListEdit
+						onTagNameChange={ onTagNameChange }
+						tagName={ tagName }
+						value={ record }
+						onChange={ this.onFormatChange }
+					/>
+				) }
 				{ isSelected && (
 					<BlockFormatControls>
 						<FormatToolbar controls={ formattingControls } />
