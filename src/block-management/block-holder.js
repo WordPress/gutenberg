@@ -152,6 +152,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				insertBlocksAfter={ this.insertBlocksAfter }
 				mergeBlocks={ this.mergeBlocks }
 				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
+				clientId={ this.props.clientId }
 			/>
 		);
 	}
@@ -208,6 +209,7 @@ export default compose( [
 			isLastBlock,
 			isSelected,
 			name,
+			clientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
