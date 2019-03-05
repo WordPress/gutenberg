@@ -7,6 +7,12 @@
 	},
 	"description": "Display a list of all categories.",
 	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"className": {
+			"type": "string"
+		},
 		"displayAsDropdown": {
 			"type": "boolean",
 			"default": false

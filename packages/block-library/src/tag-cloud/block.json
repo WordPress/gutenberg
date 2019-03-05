@@ -1,0 +1,30 @@
+{
+	"name": "core/tag-cloud",
+	"title": "Tag Cloud",
+	"category": "widgets",
+	"icon": {
+		"slug": "tag"
+	},
+	"description": "A cloud of your most used tags.",
+	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"className": {
+			"type": "string"
+		},
+		"taxonomy": {
+			"type": "string",
+			"default": "post_tag"
+		},
+		"showTagCounts": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"edit": "./edit.js",
+	"supports": {
+		"align": true,
+		"html": false
+	}
+}

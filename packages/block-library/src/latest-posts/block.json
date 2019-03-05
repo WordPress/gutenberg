@@ -1,0 +1,50 @@
+{
+	"name": "core/latest-posts",
+	"title": "Latest Posts",
+	"category": "widgets",
+	"icon": {
+		"src": "./icon.js"
+	},
+	"description": "Display a list of your most recent posts.",
+	"keywords": [ "recent posts" ],
+	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"className": {
+			"type": "string"
+		},
+		"categories": {
+			"type": "string"
+		},
+		"postsToShow": {
+			"type": "number",
+			"default": 5
+		},
+		"displayPostDate": {
+			"type": "boolean",
+			"default": false
+		},
+		"postLayout": {
+			"type": "string",
+			"default": "list"
+		},
+		"columns": {
+			"type": "number",
+			"default": 3
+		},
+		"order": {
+			"type": "string",
+			"default": "desc"
+		},
+		"orderBy": {
+			"type": "string",
+			"default": "date"
+		}
+	},
+	"edit": "./edit.js",
+	"supports": {
+		"align": true,
+		"html": false
+	}
+}

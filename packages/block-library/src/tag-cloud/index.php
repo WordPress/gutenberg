@@ -44,25 +44,10 @@ function render_block_core_tag_cloud( $attributes ) {
  * Registers the `core/tag-cloud` block on server.
  */
 function register_block_core_tag_cloud() {
-	register_block_type(
-		'core/tag-cloud',
+	register_block_type_from_metadata(
+		dirname( __FILE__ ),
 		array(
-			'attributes'      => array(
-				'taxonomy'      => array(
-					'type'    => 'string',
-					'default' => 'post_tag',
-				),
-				'className'     => array(
-					'type' => 'string',
-				),
-				'showTagCounts' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'align'         => array(
-					'type' => 'string',
-				),
-			),
+
 			'render_callback' => 'render_block_core_tag_cloud',
 		)
 	);

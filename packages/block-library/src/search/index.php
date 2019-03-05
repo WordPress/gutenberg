@@ -56,8 +56,8 @@ function render_block_core_search( $attributes ) {
  * Registers the `core/search` block on the server.
  */
 function register_block_core_search() {
-	register_block_type(
-		'core/search',
+	register_block_type_from_metadata(
+		dirname( __FILE__ ),
 		array(
 			'attributes'      => array(
 				'label'       => array(

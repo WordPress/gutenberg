@@ -1,0 +1,41 @@
+{
+	"name": "core/latest-comments",
+	"title": "Latest Comments",
+	"category": "widgets",
+	"icon": {
+		"src": "./icon.js"
+	},
+	"description": "Display a list of your most recent comments.",
+	"keywords": [ "recent comments" ],
+	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"className": {
+			"type": "string"
+		},
+		"commentsToShow": {
+			"type": "number",
+			"default": 5,
+			"minimum": 1,
+			"maximum": 100
+		},
+		"displayAvatar": {
+			"type": "boolean",
+			"default": true
+		},
+		"displayDate": {
+			"type": "boolean",
+			"default": true
+		},
+		"displayExcerpt": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"edit": "./edit.js",
+	"supports": {
+		"align": true,
+		"html": false
+	}
+}

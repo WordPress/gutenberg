@@ -11,8 +11,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
-	BlockAlignmentToolbar,
-	BlockControls,
 	ServerSideRender,
 } from '@wordpress/editor';
 
@@ -53,17 +51,12 @@ class LatestComments extends Component {
 		};
 	}
 
-	setAlignment( align ) {
-		this.props.setAttributes( { align } );
-	}
-
 	setCommentsToShow( commentsToShow ) {
 		this.props.setAttributes( { commentsToShow } );
 	}
 
 	render() {
 		const {
-			align,
 			commentsToShow,
 			displayAvatar,
 			displayDate,
@@ -72,12 +65,6 @@ class LatestComments extends Component {
 
 		return (
 			<Fragment>
-				<BlockControls>
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ this.setAlignment }
-					/>
-				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Latest Comments Settings' ) }>
 						<ToggleControl

@@ -93,42 +93,10 @@ function render_block_core_rss( $attributes ) {
  * Registers the `core/rss` block on server.
  */
 function register_block_core_rss() {
-	register_block_type( 'core/rss',
+	register_block_type_from_metadata(
+		dirname( __FILE__ ),
 		array(
-			'attributes'      => array(
-				'columns'        => array(
-					'type'    => 'number',
-					'default' => 2,
-				),
-				'blockLayout'    => array(
-					'type'    => 'string',
-					'default' => 'list',
-				),
-				'feedURL'        => array(
-					'type'    => 'string',
-					'default' => '',
-				),
-				'itemsToShow'    => array(
-					'type'    => 'number',
-					'default' => 5,
-				),
-				'displayExcerpt' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'displayAuthor'  => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'displayDate'    => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'excerptLength'  => array(
-					'type'    => 'number',
-					'default' => 55,
-				),
-			),
+
 			'render_callback' => 'render_block_core_rss',
 		)
 	);
