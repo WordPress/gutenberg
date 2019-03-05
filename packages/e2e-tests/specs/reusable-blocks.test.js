@@ -34,9 +34,8 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 
-		// Trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		// Press escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 
 		// Convert block to a reusable block
 		await page.waitForSelector( 'button[aria-label="More options"]' );
@@ -81,9 +80,8 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 
-		// Trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		// Press escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 
 		// Convert block to a reusable block
 		await page.waitForSelector( 'button[aria-label="More options"]' );
@@ -221,10 +219,6 @@ describe( 'Reusable Blocks', () => {
 		// Select all the blocks
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
-
-		// Trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
 
 		// Convert block to a reusable block
 		await page.waitForSelector( 'button[aria-label="More options"]' );
