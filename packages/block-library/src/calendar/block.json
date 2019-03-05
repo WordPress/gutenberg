@@ -21,8 +21,9 @@
 			"type": "integer"
 		}
 	},
-	"edit": "./edit.js",
+	"edit": "edit.js",
 	"supports": {
 		"align": true
-	}
+	},
+	"renderCallback": "index.php"
 }

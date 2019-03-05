@@ -12,7 +12,7 @@
  *
  * @return string Returns the block content with received rss items.
  */
-function render_block_core_rss( $attributes ) {
+function gutenberg_render_block_core_rss( $attributes ) {
 	$rss = fetch_feed( $attributes['feedURL'] );
 
 	if ( is_wp_error( $rss ) ) {
@@ -88,18 +88,3 @@ function render_block_core_rss( $attributes ) {
 
 	return $list_items_markup;
 }
-
-/**
- * Registers the `core/rss` block on server.
- */
-function register_block_core_rss() {
-	register_block_type_from_metadata(
-		dirname( __FILE__ ),
-		array(
-
-			'render_callback' => 'render_block_core_rss',
-		)
-	);
-}
-
-add_action( 'init', 'register_block_core_rss' );

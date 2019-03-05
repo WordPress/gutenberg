@@ -25,7 +25,7 @@
  * @param int|WP_Post $post Optional. Post ID or WP_Post object. Default is global $post.
  * @return string The post title if set; "(no title)" if no title is set.
  */
-function wp_latest_comments_draft_or_post_title( $post = 0 ) {
+function gutenberg_latest_comments_draft_or_post_title( $post = 0 ) {
 	$title = get_the_title( $post );
 	if ( empty( $title ) ) {
 		$title = __( '(no title)' );
@@ -40,7 +40,7 @@ function wp_latest_comments_draft_or_post_title( $post = 0 ) {
  *
  * @return string Returns the post content with latest comments added.
  */
-function render_block_core_latest_comments( $attributes = array() ) {
+function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 	// This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php.
 	$comments = get_comments(
 		apply_filters(
@@ -92,7 +92,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 
 			// `_draft_or_post_title` calls `esc_html()` so we don't need to wrap that call in
 			// `esc_html`.
-			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . wp_latest_comments_draft_or_post_title( $comment->comment_post_ID ) . '</a>';
+			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . gutenberg_latest_comments_draft_or_post_title( $comment->comment_post_ID ) . '</a>';
 
 			$list_items_markup .= sprintf(
 				/* translators: 1: author name (inside <a> or <span> tag, based on if they have a URL), 2: post title related to this comment */
@@ -149,17 +149,3 @@ function render_block_core_latest_comments( $attributes = array() ) {
 
 	return $block_content;
 }
-
-/**
- * Registers the `core/latest-comments` block on server.
- */
-function register_block_core_latest_comments() {
-	register_block_type_from_metadata(
-		dirname( __FILE__ ),
-		array(
-			'render_callback' => 'render_block_core_latest_comments',
-		)
-	);
-}
-
-add_action( 'init', 'register_block_core_latest_comments' );

@@ -2,9 +2,7 @@
 	"name": "core/tag-cloud",
 	"title": "Tag Cloud",
 	"category": "widgets",
-	"icon": {
-		"slug": "tag"
-	},
+	"icon": "tag",
 	"description": "A cloud of your most used tags.",
 	"attributes": {
 		"align": {
@@ -22,9 +20,10 @@
 			"default": false
 		}
 	},
-	"edit": "./edit.js",
+	"edit": "edit.js",
 	"supports": {
 		"align": true,
 		"html": false
-	}
+	},
+	"renderCallback": "index.php"
 }

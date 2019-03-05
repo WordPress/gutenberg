@@ -3,7 +3,7 @@
 	"title": "Latest Comments",
 	"category": "widgets",
 	"icon": {
-		"src": "./icon.js"
+		"src": "icon.js"
 	},
 	"description": "Display a list of your most recent comments.",
 	"keywords": [ "recent comments" ],
@@ -33,9 +33,10 @@
 			"default": true
 		}
 	},
-	"edit": "./edit.js",
+	"edit": "edit.js",
 	"supports": {
 		"align": true,
 		"html": false
-	}
+	},
+	"renderCallback": "index.php"
 }

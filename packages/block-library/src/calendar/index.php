@@ -12,7 +12,7 @@
  *
  * @return string Returns the block content.
  */
-function render_block_core_calendar( $attributes ) {
+function gutenberg_render_block_core_calendar( $attributes ) {
 	global $monthnum, $year;
 
 	$previous_monthnum = $monthnum;
@@ -45,17 +45,3 @@ function render_block_core_calendar( $attributes ) {
 	// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 	$year = $previous_year;
 }
-
-/**
- * Registers the `core/calendar` block on server.
- */
-function register_block_core_calendar() {
-	register_block_type_from_metadata(
-		dirname( __FILE__ ),
-		array(
-			'render_callback' => 'render_block_core_calendar',
-		)
-	);
-}
-
-add_action( 'init', 'register_block_core_calendar' );

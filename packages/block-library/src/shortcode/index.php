@@ -21,8 +21,8 @@ function render_block_core_shortcode( $attributes, $content ) {
  * Registers the `core/shortcode` block on server.
  */
 function register_block_core_shortcode() {
-	register_block_type_from_metadata(
-		dirname( __FILE__ ),
+	register_block_type(
+		'core/shortcode',
 		array(
 			'render_callback' => 'render_block_core_shortcode',
 		)

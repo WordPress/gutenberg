@@ -12,7 +12,7 @@
  *
  * @return string Rendered HTML of the referenced block.
  */
-function render_block_core_block( $attributes ) {
+function gutenberg_render_block_core_block( $attributes ) {
 	if ( empty( $attributes['ref'] ) ) {
 		return '';
 	}
@@ -28,17 +28,3 @@ function render_block_core_block( $attributes ) {
 
 	return do_blocks( $reusable_block->post_content );
 }
-
-/**
- * Registers `core/block` block.
- */
-function register_block_core_block() {
-	register_block_type_from_metadata(
-		dirname( __FILE__ ),
-		array(
-			'render_callback' => 'render_block_core_block',
-		)
-	);
-}
-
-add_action( 'init', 'register_block_core_block' );

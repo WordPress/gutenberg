@@ -2,9 +2,7 @@
 	"name": "core/rss",
 	"title": "RSS",
 	"category": "widgets",
-	"icon": {
-		"slug": "rss"
-	},
+	"icon": "rss",
 	"description": "Display entries from any RSS or Atom feed.",
 	"keywords": [ "atom", "feed" ],
 	"attributes": {
@@ -44,8 +42,9 @@
 			"default": 55
 		}
 	},
-	"edit": "./edit.js",
+	"edit": "edit.js",
 	"supports": {
 		"html": false
-	}
+	},
+	"renderCallback": "index.php"
 }

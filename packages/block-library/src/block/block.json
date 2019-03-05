@@ -8,10 +8,11 @@
 			"type": "number"
 		}
 	},
-	"edit": "./edit.js",
+	"edit": "edit.js",
 	"supports": {
 		"customClassName": false,
 		"html": false,
 		"inserter": false
-	}
+	},
+	"renderCallback": "index.php"
 }

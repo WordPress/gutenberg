@@ -14,7 +14,7 @@
  *
  * @return string Returns the post content with archives added.
  */
-function render_block_core_archives( $attributes ) {
+function gutenberg_render_block_core_archives( $attributes ) {
 	$show_post_count = ! empty( $attributes['showPostCounts'] );
 
 	$class = 'wp-block-archives';
@@ -115,17 +115,3 @@ function render_block_core_archives( $attributes ) {
 
 	return $block_content;
 }
-
-/**
- * Registers `core/archives` block.
- */
-function register_block_core_archives() {
-	register_block_type_from_metadata(
-		dirname( __FILE__ ),
-		array(
-			'render_callback' => 'render_block_core_archives',
-		)
-	);
-}
-
-add_action( 'init', 'register_block_core_archives' );

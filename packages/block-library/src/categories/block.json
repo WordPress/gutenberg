@@ -3,7 +3,7 @@
 	"title": "Categories",
 	"category": "widgets",
 	"icon": {
-		"src": "./icon.js"
+		"src": "icon.js"
 	},
 	"description": "Display a list of all categories.",
 	"attributes": {
@@ -26,10 +26,11 @@
 			"default": false
 		}
 	},
-	"edit": "./edit.js",
+	"edit": "edit.js",
 	"supports": {
 		"align": true,
 		"alignWide": false,
 		"html": false
-	}
+	},
+	"renderCallback": "index.php"
 }

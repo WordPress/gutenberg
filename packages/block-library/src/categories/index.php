@@ -12,7 +12,7 @@
  *
  * @return string Returns the categories list/dropdown markup.
  */
-function render_block_core_categories( $attributes ) {
+function gutenberg_render_block_core_categories( $attributes ) {
 	static $block_id = 0;
 	$block_id++;
 
@@ -33,7 +33,7 @@ function render_block_core_categories( $attributes ) {
 		$type                     = 'dropdown';
 
 		if ( ! is_admin() ) {
-			$wrapper_markup .= build_dropdown_script_block_core_categories( $id );
+			$wrapper_markup .= gutenberg_build_dropdown_script_block_core_categories( $id );
 		}
 	} else {
 		$wrapper_markup = '<ul class="%1$s">%2$s</ul>';
@@ -67,7 +67,7 @@ function render_block_core_categories( $attributes ) {
  *
  * @return string Returns the dropdown onChange redirection script.
  */
-function build_dropdown_script_block_core_categories( $dropdown_id ) {
+function gutenberg_build_dropdown_script_block_core_categories( $dropdown_id ) {
 	ob_start();
 	?>
 	<script type='text/javascript'>
@@ -86,17 +86,3 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	<?php
 	return ob_get_clean();
 }
-
-/**
- * Registers the `core/categories` block on server.
- */
-function register_block_core_categories() {
-	register_block_type_from_metadata(
-		dirname( __FILE__ ),
-		array(
-			'render_callback' => 'render_block_core_categories',
-		)
-	);
-}
-
-add_action( 'init', 'register_block_core_categories' );

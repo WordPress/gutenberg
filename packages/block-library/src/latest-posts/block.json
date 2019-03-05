@@ -3,7 +3,7 @@
 	"title": "Latest Posts",
 	"category": "widgets",
 	"icon": {
-		"src": "./icon.js"
+		"src": "icon.js"
 	},
 	"description": "Display a list of your most recent posts.",
 	"keywords": [ "recent posts" ],
@@ -42,9 +42,10 @@
 			"default": "date"
 		}
 	},
-	"edit": "./edit.js",
+	"edit": "edit.js",
 	"supports": {
 		"align": true,
 		"html": false
-	}
+	},
+	"renderCallback": "index.php"
 }

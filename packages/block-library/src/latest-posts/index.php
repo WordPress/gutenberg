@@ -12,7 +12,7 @@
  *
  * @return string Returns the post content with latest posts added.
  */
-function render_block_core_latest_posts( $attributes ) {
+function gutenberg_render_block_core_latest_posts( $attributes ) {
 	$args = array(
 		'posts_per_page'   => $attributes['postsToShow'],
 		'post_status'      => 'publish',
@@ -80,17 +80,3 @@ function render_block_core_latest_posts( $attributes ) {
 
 	return $block_content;
 }
-
-/**
- * Registers the `core/latest-posts` block on server.
- */
-function register_block_core_latest_posts() {
-	register_block_type_from_metadata(
-		dirname( __FILE__ ),
-		array(
-			'render_callback' => 'render_block_core_latest_posts',
-		)
-	);
-}
-
-add_action( 'init', 'register_block_core_latest_posts' );
