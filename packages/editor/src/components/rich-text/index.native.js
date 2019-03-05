@@ -31,6 +31,7 @@ import { isURL } from '@wordpress/url';
  */
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
+import { withBlockEditContext } from '../block-edit/context';
 
 import styles from './style.scss';
 
@@ -564,6 +565,28 @@ const RichTextContainer = compose( [
 
 		return {
 			formatTypes: getFormatTypes(),
+		};
+	} ),
+	withBlockEditContext( ( context, ownProps ) => {
+		// When explicitly set as not selected, do nothing.
+		if ( ownProps.isSelected === false ) {
+			return {
+				clientId: context.clientId,
+			};
+		}
+		// When explicitly set as selected, use the value stored in the context instead.
+		if ( ownProps.isSelected === true ) {
+			return {
+				isSelected: context.isSelected,
+				clientId: context.clientId,
+			};
+		}
+
+		// Ensures that only one RichText component can be focused.
+		return {
+			clientId: context.clientId,
+			isSelected: context.isSelected,
+			onFocus: context.onFocus,
 		};
 	} ),
 ] )( RichText );
