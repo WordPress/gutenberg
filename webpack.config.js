@@ -127,7 +127,16 @@ module.exports = {
 								new RegExp( functionName, 'g' ),
 								( match ) => 'gutenberg_' + match.replace( /^wp_/, '' )
 							);
-						}, content );
+						}, content )
+						// The core blocks override procedure takes place in
+						// the init action default priority to ensure that core
+						// blocks would have been registered already. Since the
+						// blocks implementations occur at the default priority
+						// and due to WordPress hooks behavior not considering
+						// mutations to the same priority during another's
+						// callback, the Gutenberg build blocks are modified
+						// to occur at a later priority.
+						.replace( /(add_action\(\s*'init',\s*'register_block_[^']+'(?!,))/, '$1, 20' );
 				},
 			},
 		] ),
