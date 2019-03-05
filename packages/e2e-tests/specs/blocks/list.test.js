@@ -126,8 +126,8 @@ describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		// Pointer device is needed. Shift+Tab won't focus the toolbar.
 		// To do: fix so Shift+Tab works.
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		// Press escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 		await page.click( 'button[aria-label="Indent list item"]' );
 		await page.keyboard.type( 'two' );
 		await transformBlockTo( 'Paragraph' );
@@ -200,8 +200,8 @@ describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		// Pointer device is needed. Shift+Tab won't focus the toolbar.
 		// To do: fix so Shift+Tab works.
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		// Press escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 		await page.click( 'button[aria-label="Indent list item"]' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'Enter' );
@@ -235,8 +235,8 @@ describe( 'List', () => {
 
 		// Pointer device is needed. Shift+Tab won't focus the toolbar.
 		// To do: fix so Shift+Tab works.
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		// Press escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 
 		await page.click( 'button[aria-label="Convert to ordered list"]' );
 
