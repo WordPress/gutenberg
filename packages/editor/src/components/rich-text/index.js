@@ -193,6 +193,7 @@ export class RichText extends Component {
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
+			__unstableIsEditableTree: true,
 		} );
 	}
 

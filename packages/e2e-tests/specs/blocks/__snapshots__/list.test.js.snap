@@ -146,13 +146,13 @@ exports[`List should indent and outdent level 2 3`] = `
 
 exports[`List should insert a line break on shift+enter 1`] = `
 "<!-- wp:list -->
-<ul><li>a<br><br></li></ul>
+<ul><li>a<br></li></ul>
 <!-- /wp:list -->"
 `;
 
 exports[`List should insert a line break on shift+enter in a non trailing list item 1`] = `
 "<!-- wp:list -->
-<ul><li>a</li><li>b<br><br></li><li>c</li></ul>
+<ul><li>a</li><li>b<br></li><li>c</li></ul>
 <!-- /wp:list -->"
 `;
 
