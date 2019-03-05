@@ -79,7 +79,7 @@ const BlockInspector = ( { selectedBlockClientId, selectedBlockName, blockType, 
 
 export default withSelect(
 	( select ) => {
-		const { getSelectedBlockClientId, getSelectedBlockCount, getBlockName } = select( 'core/editor' );
+		const { getSelectedBlockClientId, getSelectedBlockCount, getBlockName } = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectedBlockName = selectedBlockClientId && getBlockName( selectedBlockClientId );

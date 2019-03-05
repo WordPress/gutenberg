@@ -31,12 +31,9 @@ export function ReusableBlockDeleteButton( { isVisible, isDisabled, onDelete } )
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlock,
-			__experimentalGetReusableBlock: getReusableBlock,
-		} = select( 'core/editor' );
+		const { getBlock } = select( 'core/block-editor' );
 		const { canUser } = select( 'core' );
-
+		const { __experimentalGetReusableBlock: getReusableBlock } = select( 'core/editor' );
 		const block = getBlock( clientId );
 
 		const reusableBlock = block && isReusableBlock( block ) ?
@@ -52,7 +49,7 @@ export default compose( [
 		const {
 			__experimentalDeleteReusableBlock: deleteReusableBlock,
 		} = dispatch( 'core/editor' );
-		const { getBlock } = select( 'core/editor' );
+		const { getBlock } = select( 'core/block-editor' );
 
 		return {
 			onDelete() {

@@ -72,7 +72,7 @@ exports[`adding blocks should create valid paragraph blocks when rapidly pressin
 
 exports[`adding blocks should insert line break at end 1`] = `
 "<!-- wp:paragraph -->
-<p>a<br><br></p>
+<p>a<br></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -90,7 +90,7 @@ exports[`adding blocks should insert line break at start 1`] = `
 
 exports[`adding blocks should insert line break in empty container 1`] = `
 "<!-- wp:paragraph -->
-<p><br><br></p>
+<p><br></p>
 <!-- /wp:paragraph -->"
 `;
 

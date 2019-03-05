@@ -13,7 +13,7 @@ import { withSelect } from '@wordpress/data';
 export default createHigherOrderComponent(
 	withSelect(
 		( select, ownProps ) => {
-			const settings = select( 'core/editor' ).getEditorSettings();
+			const settings = select( 'core/block-editor' ).getSettings();
 			const colors = ownProps.colors === undefined ?
 				settings.colors : ownProps.colors;
 

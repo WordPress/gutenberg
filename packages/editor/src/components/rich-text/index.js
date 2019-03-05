@@ -67,7 +67,7 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
  * Browser dependencies
  */
 
-const { getSelection } = window;
+const { getSelection, getComputedStyle } = window;
 
 /**
  * All inserting input types that would insert HTML into the DOM.
@@ -133,9 +133,7 @@ export class RichText extends Component {
 		this.savedContent = value;
 		this.patterns = getPatterns( {
 			onReplace,
-			onCreateUndoLevel: this.onCreateUndoLevel,
 			valueToFormat: this.valueToFormat,
-			onChange: this.onChange,
 		} );
 		this.enterPatterns = getBlockTransforms( 'from' )
 			.filter( ( { type } ) => type === 'enter' );
@@ -151,7 +149,20 @@ export class RichText extends Component {
 	}
 
 	setRef( node ) {
-		this.editableRef = node;
+		if ( node ) {
+			if ( process.env.NODE_ENV === 'development' ) {
+				const computedStyle = getComputedStyle( node );
+
+				if ( computedStyle.display === 'inline' ) {
+					// eslint-disable-next-line no-console
+					console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
+				}
+			}
+
+			this.editableRef = node;
+		} else {
+			delete this.editableRef;
+		}
 	}
 
 	setFocusedElement() {
@@ -182,6 +193,7 @@ export class RichText extends Component {
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
+			__unstableIsEditableTree: true,
 		} );
 	}
 
@@ -366,7 +378,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		if ( event ) {
+		if ( event && event.nativeEvent.inputType ) {
 			const { inputType } = event.nativeEvent;
 
 			// The browser formatted something or tried to insert HTML.
@@ -382,10 +394,7 @@ export class RichText extends Component {
 		}
 
 		let { selectedFormat } = this.state;
-		const { formats, text, start, end } = this.patterns.reduce(
-			( accumlator, transform ) => transform( accumlator ),
-			this.createRecord()
-		);
+		const { formats, text, start, end } = this.createRecord();
 
 		if ( this.formatPlaceholder ) {
 			formats[ this.state.start ] = formats[ this.state.start ] || [];
@@ -407,9 +416,21 @@ export class RichText extends Component {
 			delete formats[ this.state.start ];
 		}
 
-		this.onChange( { formats, text, start, end, selectedFormat }, {
+		const change = { formats, text, start, end, selectedFormat };
+
+		this.onChange( change, {
 			withoutHistory: true,
 		} );
+
+		const transformed = this.patterns.reduce(
+			( accumlator, transform ) => transform( accumlator ),
+			change
+		);
+
+		if ( transformed !== change ) {
+			this.onCreateUndoLevel();
+			this.onChange( { ...transformed, selectedFormat } );
+		}
 
 		// Create an undo level when input stops for over a second.
 		this.props.clearTimeout( this.onInput.timeout );
@@ -560,13 +581,14 @@ export class RichText extends Component {
 	/**
 	 * Handles a keydown event.
 	 *
-	 * @param {KeyboardEvent} event The keydown event.
+	 * @param {SyntheticEvent} event A synthetic keyboard event.
 	 */
 	onKeyDown( event ) {
-		const { keyCode, shiftKey, altKey, metaKey } = event;
+		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
 		if (
-			! shiftKey && ! altKey && ! metaKey &&
+			// Only override left and right keys without modifiers pressed.
+			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
 			( keyCode === LEFT || keyCode === RIGHT )
 		) {
 			this.handleHorizontalNavigation( event );
@@ -648,6 +670,13 @@ export class RichText extends Component {
 		}
 	}
 
+	/**
+	 * Handles horizontal keyboard navigation when no modifiers are pressed. The
+	 * navigation is handled separately to move correctly around format
+	 * boundaries.
+	 *
+	 * @param  {SyntheticEvent} event A synthetic keyboard event.
+	 */
 	handleHorizontalNavigation( event ) {
 		const value = this.createRecord();
 		const { formats, text, start, end } = value;
@@ -1091,7 +1120,9 @@ const RichTextContainer = compose( [
 		};
 	} ),
 	withSelect( ( select ) => {
-		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText } = select( 'core/editor' );
+		// This should probably be moved to the block editor settings.
+		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
+		const { isCaretWithinFormattedText } = select( 'core/block-editor' );
 		const { getFormatTypes } = select( 'core/rich-text' );
 
 		return {
@@ -1102,17 +1133,13 @@ const RichTextContainer = compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
-			createUndoLevel,
-			redo,
-			undo,
+			__unstableMarkLastChangeAsPersistent,
 			enterFormattedText,
 			exitFormattedText,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 
 		return {
-			onCreateUndoLevel: createUndoLevel,
-			onRedo: redo,
-			onUndo: undo,
+			onCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
 			onEnterFormattedText: enterFormattedText,
 			onExitFormattedText: exitFormattedText,
 		};

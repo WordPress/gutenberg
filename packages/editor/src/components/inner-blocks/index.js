@@ -132,7 +132,7 @@ InnerBlocks = compose( [
 			getBlockListSettings,
 			getBlockRootClientId,
 			getTemplateLock,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 		const rootClientId = getBlockRootClientId( clientId );
 		return {
@@ -147,7 +147,7 @@ InnerBlocks = compose( [
 			replaceBlocks,
 			insertBlocks,
 			updateBlockListSettings,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 		const { block, clientId, templateInsertUpdatesSelection = true } = ownProps;
 
 		return {

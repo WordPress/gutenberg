@@ -153,7 +153,7 @@ describe( 'Taxonomies', () => {
 		await page.reload();
 
 		// Wait for the tags to load.
-		page.waitForSelector( '.components-form-token-field__token' );
+		await page.waitForSelector( '.components-form-token-field__token' );
 
 		tags = await getCurrentTags();
 

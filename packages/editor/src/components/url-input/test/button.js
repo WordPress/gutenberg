@@ -12,7 +12,7 @@ import URLInput from '../';
 import URLInputButton from '../button';
 
 describe( 'URLInputButton', () => {
-	const clickEditLink = ( wrapper ) => wrapper.find( 'IconButton.components-toolbar__control' ).simulate( 'click' );
+	const clickEditLink = ( wrapper ) => wrapper.find( 'ForwardRef(IconButton).components-toolbar__control' ).simulate( 'click' );
 
 	it( 'should have a valid class name in the wrapper tag', () => {
 		const wrapper = shallow( <URLInputButton /> );
@@ -20,11 +20,11 @@ describe( 'URLInputButton', () => {
 	} );
 	it( 'should not have is-active class when url prop not defined', () => {
 		const wrapper = shallow( <URLInputButton /> );
-		expect( wrapper.find( 'IconButton' ).hasClass( 'is-active' ) ).toBe( false );
+		expect( wrapper.find( 'ForwardRef(IconButton)' ).hasClass( 'is-active' ) ).toBe( false );
 	} );
 	it( 'should have is-active class name if url prop defined', () => {
 		const wrapper = shallow( <URLInputButton url="https://example.com" /> );
-		expect( wrapper.find( 'IconButton' ).hasClass( 'is-active' ) ).toBe( true );
+		expect( wrapper.find( 'ForwardRef(IconButton)' ).hasClass( 'is-active' ) ).toBe( true );
 	} );
 	it( 'should have hidden form by default', () => {
 		const wrapper = shallow( <URLInputButton /> );

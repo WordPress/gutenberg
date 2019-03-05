@@ -117,7 +117,7 @@ export class BlockMover extends Component {
 
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlock, getBlockIndex, getTemplateLock, getBlockRootClientId } = select( 'core/editor' );
+		const { getBlock, getBlockIndex, getTemplateLock, getBlockRootClientId } = select( 'core/block-editor' );
 		const firstClientId = first( castArray( clientIds ) );
 		const block = getBlock( firstClientId );
 		const rootClientId = getBlockRootClientId( first( castArray( clientIds ) ) );
@@ -130,7 +130,7 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
-		const { moveBlocksDown, moveBlocksUp } = dispatch( 'core/editor' );
+		const { moveBlocksDown, moveBlocksUp } = dispatch( 'core/block-editor' );
 		return {
 			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
 			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),

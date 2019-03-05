@@ -35,7 +35,7 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false 
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlock, getBlockMode } = select( 'core/editor' );
+		const { getBlock, getBlockMode } = select( 'core/block-editor' );
 		const block = getBlock( clientId );
 
 		return {
@@ -45,7 +45,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, { onToggle = noop, clientId } ) => ( {
 		onToggleMode() {
-			dispatch( 'core/editor' ).toggleBlockMode( clientId );
+			dispatch( 'core/block-editor' ).toggleBlockMode( clientId );
 			onToggle();
 		},
 	} ) ),

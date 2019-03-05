@@ -68,7 +68,7 @@ export class BlockBreadcrumb extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getBlockRootClientId } = select( 'core/editor' );
+		const { getBlockRootClientId } = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 
 		return {

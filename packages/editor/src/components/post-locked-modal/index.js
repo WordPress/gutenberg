@@ -214,13 +214,13 @@ class PostLockedModal extends Component {
 export default compose(
 	withSelect( ( select ) => {
 		const {
-			getEditorSettings,
 			isPostLocked,
 			isPostLockTakeover,
 			getPostLockUser,
 			getCurrentPostId,
 			getActivePostLock,
 			getEditedPostAttribute,
+			getEditorSettings,
 		} = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 		return {
