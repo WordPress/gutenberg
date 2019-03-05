@@ -13,9 +13,8 @@ describe( 'adding blocks', () => {
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'Quote content' );
 
-		// we need to trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		// Press escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 
 		// Use a different style variation
 		await page.waitForSelector( 'button[aria-label="Change block type"]' );
