@@ -108,7 +108,7 @@ export function create( {
 	range,
 	multilineTag,
 	multilineWrapperTags,
-	isEditableTree,
+	__unstableIsEditableTree: isEditableTree,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
