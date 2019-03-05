@@ -66,7 +66,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 	"category": "common",
 	"icon": {
 		"slug": "star",
-	}
+	},
 	"description": "Shows warning, error or success notices  ...",
 	"keywords": [ "alert", "message" ],
 	"attributes": {
