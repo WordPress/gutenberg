@@ -20,99 +20,95 @@ import {
  * and a TextField on Autofocus (situation present on Links UI)
  */
 class KeyboardAvoidingView extends React.Component {
-    constructor() {
-        super( ...arguments );
+	static defaultProps = {
+		enabled: true,
+		keyboardVerticalOffset: 0,
+	};
 
-        this._onKeyboardChange = this._onKeyboardChange.bind( this );
-        this._subscriptions = [];
+	_subscriptions = [];
 
-        this.state = {
-            bottom: 0,
-        };
-    }
+	state = {
+		bottom: 0,
+	};
 
-    _relativeKeyboardHeight( keyboardFrame ) {
-        if ( ! keyboardFrame ) {
-            return 0;
-        }
+	_relativeKeyboardHeight( keyboardFrame ) {
+		if ( ! keyboardFrame ) {
+			return 0;
+		}
 
-        const {
-            keyboardVerticalOffset = 0,
-        } = this.props;
+		const windowHeight = Dimensions.get( 'window' ).height;
+		const keyboardY = keyboardFrame.screenY - this.props.keyboardVerticalOffset;
 
-        const windowHeight = Dimensions.get( 'window' ).height;
-        const keyboardY = keyboardFrame.screenY - keyboardVerticalOffset;
+		const final = Math.max( windowHeight - keyboardY, 0 );
+		return final;
+	}
 
-        const final = Math.max( windowHeight - keyboardY, 0 );
-        return final;
-    }
+	/**
+	 * @param {Object} event Keyboard event.
+	 */
+	_onKeyboardChange = ( event ) => {
+		if ( event === null ) {
+			this.setState( { bottom: 0 } );
+			return;
+		}
 
-    /**
-     * @param {Object} event Keyboard event.
-     */
-    _onKeyboardChange( event ) {
-        if ( event === null ) {
-            this.setState( { bottom: 0 } );
-            return;
-        }
+		const { duration, easing, endCoordinates } = event;
+		const height = this._relativeKeyboardHeight( endCoordinates );
 
-        const { duration, easing, endCoordinates } = event;
-        const height = this._relativeKeyboardHeight( endCoordinates );
+		if ( this.state.bottom === height ) {
+			return;
+		}
 
-        if ( this.state.bottom === height ) {
-            return;
-        }
+		if ( duration && easing ) {
+			LayoutAnimation.configureNext( {
+				duration,
+				update: {
+					duration,
+					type: LayoutAnimation.Types[ easing ] || 'keyboard',
+				},
+			} );
+		}
+		this.setState( { bottom: height } );
+	};
 
-        if ( duration && easing ) {
-            LayoutAnimation.configureNext( {
-                duration,
-                update: {
-                    duration,
-                    type: LayoutAnimation.Types[ easing ] || 'keyboard',
-                },
-            } );
-        }
-        this.setState( { bottom: height } );
-    }
+	componentDidMount() {
+		if ( Platform.OS === 'ios' ) {
+			this._subscriptions = [
+				Keyboard.addListener( 'keyboardWillChangeFrame', this._onKeyboardChange ),
+			];
+		}
+	}
 
-    componentDidMount() {
-        if ( Platform.OS === 'ios' ) {
-            this._subscriptions = [
-                Keyboard.addListener( 'keyboardWillChangeFrame', this._onKeyboardChange ),
-            ];
-        }
-    }
+	componentWillUnmount() {
+		this._subscriptions.forEach( ( subscription ) => {
+			subscription.remove();
+		} );
+	}
 
-    componentWillUnmount() {
-        this._subscriptions.forEach( ( subscription ) => {
-            subscription.remove();
-        } );
-    }
+	render() {
+		const {
+			children,
+			enabled,
+			keyboardVerticalOffset, // eslint-disable-line no-unused-vars
+			style,
+			...props
+		} = this.props;
 
-    render() {
-        const {
-            children,
-            enabled = true,
-            keyboardVerticalOffset, // eslint-disable-line no-unused-vars
-            style,
-            ...props
-        } = this.props;
+		let finalStyle = style;
+		if ( Platform.OS === 'ios' ) {
+			const bottomHeight = enabled ? this.state.bottom : 0;
+			finalStyle = StyleSheet.compose( style, { paddingBottom: bottomHeight } );
+		}
 
-        let finalStyle = style;
-        if ( Platform.OS === 'ios' ) {
-            const bottomHeight = enabled ? this.state.bottom : 0;
-            finalStyle = StyleSheet.compose( style, { paddingBottom: bottomHeight } );
-        }
-
-        return (
-            <View
-                style={ finalStyle }
-                { ...props }
-            >
-                { children }
-            </View>
-        );
-    }
+		return (
+			<View
+				style={ finalStyle }
+				{ ...props }
+			>
+				{ children }
+			</View>
+		);
+	}
 }
 
 export default KeyboardAvoidingView;
