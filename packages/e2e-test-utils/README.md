@@ -32,7 +32,7 @@ Verifies if publish checks are enabled.
 
 **Returns**
 
-`boolean` Boolean which represents the state of prepublish checks.
+`boolean`: Boolean which represents the state of prepublish checks.
 
 ### clearLocalStorage
 
@@ -88,7 +88,7 @@ Creates a function to determine if a request is embedding a certain URL.
 
 **Returns**
 
-`function` Function that determines if a request is for the embed API, embedding a specific URL.
+`function`: Function that determines if a request is for the embed API, embedding a specific URL.
 
 ### createJSONResponse
 
@@ -102,7 +102,7 @@ Respond to a request with a JSON response.
 
 **Returns**
 
-`Promise` Promise that responds to a request with the mock JSON response.
+`Promise`: Promise that responds to a request with the mock JSON response.
 
 ### createNewPost
 
@@ -127,7 +127,7 @@ Creates new URL by parsing base URL, WPPath and query string.
 
 **Returns**
 
-`string` String which represents full URL.
+`string`: String which represents full URL.
 
 ### createURLMatcher
 
@@ -141,7 +141,7 @@ Creates a function to determine if a request is calling a URL with the substring
 
 **Returns**
 
-`function` Function that determines if a request's URL contains substring.
+`function`: Function that determines if a request's URL contains substring.
 
 ### deactivatePlugin
 
@@ -180,7 +180,7 @@ Verifies that the edit post sidebar is opened, and if it is not, opens it.
 
 **Returns**
 
-`Promise` Promise resolving once the edit post sidebar is opened.
+`Promise`: Promise resolving once the edit post sidebar is opened.
 
 ### findSidebarPanelToggleButtonWithTitle
 
@@ -194,7 +194,7 @@ Finds a sidebar panel with the provided title.
 
 **Returns**
 
-`?ElementHandle` Object that represents an in-page DOM element.
+`?ElementHandle`: Object that represents an in-page DOM element.
 
 ### findSidebarPanelWithTitle
 
@@ -208,7 +208,7 @@ Finds the button responsible for toggling the sidebar panel with the provided ti
 
 **Returns**
 
-`?ElementHandle` Object that represents an in-page DOM element.
+`?ElementHandle`: Object that represents an in-page DOM element.
 
 ### getAllBlocks
 
@@ -218,7 +218,7 @@ Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/ed
 
 **Returns**
 
-`Promise` Promise resolving with an array containing all blocks in the document.
+`Promise`: Promise resolving with an array containing all blocks in the document.
 
 ### getAvailableBlockTransforms
 
@@ -229,7 +229,7 @@ that the current selected block can be transformed into.
 
 **Returns**
 
-`Promise` Promise resolving with an array containing all possible block transforms
+`Promise`: Promise resolving with an array containing all possible block transforms
 
 ### getEditedPostContent
 
@@ -239,7 +239,7 @@ Returns a promise which resolves with the edited post content (HTML string).
 
 **Returns**
 
-`Promise` Promise resolving with post content markup.
+`Promise`: Promise resolving with post content markup.
 
 ### hasBlockSwitcher
 
@@ -249,7 +249,7 @@ Returns a boolean indicating if the current selected block has a block switcher 
 
 **Returns**
 
-`Promise` Promise resolving with a boolean.
+`Promise`: Promise resolving with a boolean.
 
 ### insertBlock
 
@@ -287,7 +287,7 @@ Checks if current URL is a WordPress path.
 
 **Returns**
 
-`boolean` Boolean represents whether current URL is or not a WordPress path.
+`boolean`: Boolean represents whether current URL is or not a WordPress path.
 
 ### loginUser
 
@@ -315,7 +315,7 @@ deserialised JSON response for the request.
 
 **Returns**
 
-`Promise` Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
+`Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
 
 ### observeFocusLoss
 
@@ -349,7 +349,7 @@ Presses the given keyboard key a number of times in sequence.
 
 **Returns**
 
-`Promise` Promise resolving when key presses complete.
+`Promise`: Promise resolving when key presses complete.
 
 ### pressKeyWithModifier
 
@@ -372,7 +372,7 @@ is displayed).
 
 **Returns**
 
-`Promise` Promise resolving when publish is complete.
+`Promise`: Promise resolving when publish is complete.
 
 ### publishPostWithPrePublishChecksDisabled
 
@@ -383,7 +383,7 @@ resolving once the request is complete (once a notice is displayed).
 
 **Returns**
 
-`Promise` Promise resolving when publish is complete.
+`Promise`: Promise resolving when publish is complete.
 
 ### saveDraft
 
@@ -394,7 +394,7 @@ Saves the post as a draft, resolving once the request is complete (once the
 
 **Returns**
 
-`Promise` Promise resolving when draft save is complete.
+`Promise`: Promise resolving when draft save is complete.
 
 ### searchForBlock
 
@@ -438,7 +438,7 @@ Sets code editor content
 
 **Returns**
 
-`Promise` Promise resolving with an array containing all blocks in the document.
+`Promise`: Promise resolving with an array containing all blocks in the document.
 
 ### setUpResponseMocking
 
