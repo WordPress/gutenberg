@@ -113,7 +113,7 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 			formatTag(
 				'Returns',
 				getTagsByName( symbol.tags, 'return' ),
-				( tag ) => `\n\`${ tag.type }\` ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n\`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			docs.push( '\n' );

@@ -41,4 +41,4 @@ const optionator = require( 'optionator' )( {
 } );
 
 const options = optionator.parseArgv( process.argv );
-docgen( options._[ 0 ], options );
+process.exit( docgen( options._[ 0 ], options ) );
