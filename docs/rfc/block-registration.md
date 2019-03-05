@@ -64,9 +64,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 	"name": "my-plugin/notice",
 	"title": "Notice",
 	"category": "common",
-	"icon": {
-		"slug": "star",
-	},
+	"icon": "star",
 	"description": "Shows warning, error or success notices  ...",
 	"keywords": [ "alert", "message" ],
 	"attributes": {
@@ -87,7 +85,7 @@ This section describes all the properties that can be added to the `block.json` 
 
 ### Name
 
-* Type: string
+* Type: `string`
 * Required
 * Localized: No
 * Property: `name`
@@ -114,7 +112,7 @@ blocks[ 'core/heading' ].icon = // SVG element of the icon.
 
 ### Title
 
-* Type: string
+* Type: `string`
 * Required
 * Localized: Yes
 * Property: `title`
@@ -127,7 +125,7 @@ This is the display title for your block, which can be translated with our trans
 
 ### Category
 
-* Type: string
+* Type: `string`
 * Required
 * Localized: No
 * Property: `category`
@@ -152,11 +150,14 @@ An implementation should expect and tolerate unknown categories, providing some 
 
 ### Icon
 
-* Type: object
+* Type: `string`|`object`
 * Optional
 * Localized: No
 * Property: `icon`
 
+```json
+{ "icon": "smile" }
+```
 ```json
 { "icon": {
 	"slug": "star",
@@ -175,7 +176,7 @@ Besides the dashicon or the source of the SVG element, the icon object can conta
 
 ### Description
 
-* Type: string
+* Type: `string`
 * Optional
 * Localized: Yes
 * Property: `description`
@@ -188,7 +189,7 @@ This is a short description for your block, which can be translated with our tra
 
 ### Keywords
 
-* Type: string[]
+* Type: `string[]`
 * Optional
 * Localized: Yes
 * Property: `keywords`
@@ -201,7 +202,7 @@ Sometimes a block could have aliases that help users discover it while searching
 
 ### Attributes
 
-* Type: object
+* Type: `object`
 * Optional
 * Localized: No
 * Property: `attributes`
@@ -230,7 +231,7 @@ See the [the attributes documentation](https://wordpress.org/gutenberg/handbook/
 
 ### Edit
 
-* Type: string (`WPDefinedPropertyFile`)
+* Type: `string` (`WPDefinedPropertyFile`)
 * Optional
 * Localized: No
 * Property: `edit`
@@ -251,7 +252,7 @@ _TBD: Describe the resolution behavior by file extension, and consider further e
 
 ### Save
 
-* Type: string (`WPDefinedPropertyFile`)
+* Type: `string` (`WPDefinedPropertyFile`)
 * Optional
 * Localized: No
 * Property: `save`
@@ -268,7 +269,7 @@ If omitted, the implementation should fall back to one as if it were defined as 
 
 ### Render Callback
 
-* Type: string (`WPDefinedPropertyFile`)
+* Type: `string` (`WPDefinedPropertyFile`)
 * Optional
 * Localized: No
 * Property: `renderCallback`
@@ -283,7 +284,7 @@ See the [dynamic blocks documentation](https://wordpress.org/gutenberg/handbook/
 
 ### Styles Variations
 
-*   Type: array
+*   Type: `array`
 *   Optional
 *   Localized: No
 *   Property: `styleVariations`
@@ -304,7 +305,7 @@ Plugins and Themes can also register [custom block style](https://wordpress.org/
 
 ### Transforms
 
-* Type: string
+* Type: `string`
 * Optional
 * Localized: No
 * Property: `transforms`
@@ -319,13 +320,13 @@ See the [Transforms](https://wordpress.org/gutenberg/handbook/designers-develope
 
 ### Deprecated versions
 
-* Type: object[]
+* Type: `object[]`
 * Optional
 * Localized: No
 * Property: `deprecated`
 
 ```json
-{ "deprecated": [ { attributes, save, supports } ] }
+{ "deprecated": [ { attributes: {}, save: "my-deprecated-save.js", supports: {} } ] }
 ```
 
 This property contains the definition of the deprecated versions of the block type. It is used to ensure that old blocks with old markup are not considered invalid.
@@ -334,7 +335,7 @@ See the [Deprecated Blocks](https://wordpress.org/gutenberg/handbook/designers-d
 
 ### Supports
 
-* Type: object
+* Type: `object`
 * Optional
 * Localized: No
 * Property: `supports`
@@ -345,7 +346,7 @@ See the [block supports](https://wordpress.org/gutenberg/handbook/designers-deve
 
 ### Stylesheets
 
-* Type: object
+* Type: `object`
 * Optional
 * Localized: No
 * Property: `stylesheets`
