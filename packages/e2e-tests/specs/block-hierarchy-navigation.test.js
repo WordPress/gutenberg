@@ -31,10 +31,10 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Tweak the columns count.
 		await page.focus( '.edit-post-settings-sidebar__panel-block .components-range-control__number[aria-label="Columns"]' );
-		page.keyboard.down( 'Shift' );
-		page.keyboard.press( 'ArrowLeft' );
-		page.keyboard.up( 'Shift' );
-		page.keyboard.type( '3' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.type( '3' );
 
 		// Navigate to the last column block.
 		await page.click( '[aria-label="Block Navigation"]' );
