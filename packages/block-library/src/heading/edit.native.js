@@ -24,6 +24,13 @@ const name = 'core/heading';
 import styles from './style.scss';
 
 class HeadingEdit extends Component {
+	constructor( props ) {
+		super( props );
+
+		this.splitBlock = this.splitBlock.bind( this );
+	}
+
+
 	/**
 	 * Split handler for RichText value, namely when content is pasted or the
 	 * user presses the Enter key.
