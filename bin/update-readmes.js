@@ -35,23 +35,22 @@ const packages = [
 ];
 
 const getArgsForPackage = ( packageName ) => {
-	const defaultArgs = [
-		`packages/${ packageName }/src/index.js`,
-		`--output packages/${ packageName }/README.md`,
-		'--to-token',
-		'--ignore "unstable|experimental"',
-	];
-
-	const argsForPackage = {
-		'rich-text': [
-			`packages/${ packageName }/src/index.js`,
-			`--output packages/${ packageName }/README.md`,
-			'--to-token',
-			'--ignore "unstable|experimental|^apply$|^changeListType$"',
-		],
-	};
-
-	return argsForPackage[ packageName ] || defaultArgs;
+	switch ( packageName ) {
+		case 'rich-text':
+			return [
+				`packages/${ packageName }/src/index.js`,
+				`--output packages/${ packageName }/README.md`,
+				'--to-token',
+				'--ignore "unstable|experimental|^apply$|^changeListType$"',
+			];
+		default:
+			return [
+				`packages/${ packageName }/src/index.js`,
+				`--output packages/${ packageName }/README.md`,
+				'--to-token',
+				'--ignore "unstable|experimental"',
+			];
+	}
 };
 
 let aggregatedExitCode = 0;
