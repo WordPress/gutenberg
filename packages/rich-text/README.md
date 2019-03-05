@@ -33,7 +33,7 @@ provided.
 
 **Returns**
 
-`Object` A new value with the format applied.
+`Object`: A new value with the format applied.
 
 ### charAt
 
@@ -49,7 +49,7 @@ character was found.
 
 **Returns**
 
-`?string` A one character long string, or undefined.
+`?string`: A one character long string, or undefined.
 
 ### concat
 
@@ -64,7 +64,7 @@ Combine all Rich Text values into one. This is similar to
 
 **Returns**
 
-`Object` A new value combining all given records.
+`Object`: A new value combining all given records.
 
 ### create
 
@@ -89,7 +89,7 @@ be used to filter out content.
 
 **Returns**
 
-`Object` A rich text value.
+`Object`: A rich text value.
 
 ### getActiveFormat
 
@@ -107,7 +107,7 @@ is no format at the selection.
 
 **Returns**
 
-`?Object` Active format object of the specified type, or undefined.
+`?Object`: Active format object of the specified type, or undefined.
 
 ### getSelectionEnd
 
@@ -123,7 +123,7 @@ index.
 
 **Returns**
 
-`?number` Index where the selection ends.
+`?number`: Index where the selection ends.
 
 ### getSelectionStart
 
@@ -139,7 +139,7 @@ index.
 
 **Returns**
 
-`?number` Index where the selection starts.
+`?number`: Index where the selection starts.
 
 ### getTextContent
 
@@ -154,7 +154,7 @@ Get the textual content of a Rich Text value. This is similar to
 
 **Returns**
 
-`string` The text content.
+`string`: The text content.
 
 ### indentListItems
 
@@ -169,7 +169,7 @@ Indents any selected list items if possible.
 
 **Returns**
 
-`Object` The changed value.
+`Object`: The changed value.
 
 ### insert
 
@@ -189,14 +189,13 @@ none are provided.
 
 **Returns**
 
-`Object` A new value with the value inserted.
+`Object`: A new value with the value inserted.
 
 ### insertLineBreak
 
 [src/index.js#L22-L22](src/index.js#L22-L22)
 
-Inserts a line break at the given or selected position. Inserts two line
-breaks if at the end of a line.
+Inserts a line break at the given or selected position.
 
 **Parameters**
 
@@ -204,7 +203,7 @@ breaks if at the end of a line.
 
 **Returns**
 
-`Object` The value with the line break(s) inserted.
+`Object`: The value with the line break inserted.
 
 ### insertLineSeparator
 
@@ -222,7 +221,7 @@ removed. Indices are retrieved from the selection if none are provided.
 
 **Returns**
 
-`Object` A new value with the value inserted.
+`Object`: A new value with the value inserted.
 
 ### insertObject
 
@@ -241,7 +240,7 @@ removed. Indices are retrieved from the selection if none are provided.
 
 **Returns**
 
-`Object` A new value with the object inserted.
+`Object`: A new value with the object inserted.
 
 ### isCollapsed
 
@@ -258,7 +257,7 @@ is no selection, `undefined` will be returned. This is similar to
 
 **Returns**
 
-`?boolean` True if the selection is collapsed, false if not, undefined if there is no selection.
+`?boolean`: True if the selection is collapsed, false if not, undefined if there is no selection.
 
 ### isEmpty
 
@@ -273,7 +272,7 @@ objects (such as images).
 
 **Returns**
 
-`boolean` True if the value is empty, false if not.
+`boolean`: True if the value is empty, false if not.
 
 ### isEmptyLine
 
@@ -288,7 +287,7 @@ multiline value.
 
 **Returns**
 
-`boolean` True if the line is empty, false if not.
+`boolean`: True if the line is empty, false if not.
 
 ### join
 
@@ -305,7 +304,7 @@ string. This is similar to `Array.prototype.join`.
 
 **Returns**
 
-`Object` A new combined value.
+`Object`: A new combined value.
 
 ### LINE_SEPARATOR
 
@@ -325,7 +324,7 @@ Outdents any selected list items if possible.
 
 **Returns**
 
-`Object` The changed value.
+`Object`: The changed value.
 
 ### registerFormatType
 
@@ -341,7 +340,7 @@ behavior.
 
 **Returns**
 
-`?WPFormat` The format, if it has been successfully registered; otherwise `undefined`.
+`?WPFormat`: The format, if it has been successfully registered; otherwise `undefined`.
 
 ### remove
 
@@ -358,7 +357,7 @@ Remove content from a Rich Text value between the given `startIndex` and
 
 **Returns**
 
-`Object` A new value with the content removed.
+`Object`: A new value with the content removed.
 
 ### removeFormat
 
@@ -377,7 +376,7 @@ selection if none are provided.
 
 **Returns**
 
-`Object` A new value with the format applied.
+`Object`: A new value with the format applied.
 
 ### replace
 
@@ -394,7 +393,7 @@ is similar to `String.prototype.replace`.
 
 **Returns**
 
-`Object` A new value with replacements applied.
+`Object`: A new value with replacements applied.
 
 ### slice
 
@@ -412,7 +411,7 @@ retrieved from the selection if none are provided. This is similar to
 
 **Returns**
 
-`Object` A new extracted value.
+`Object`: A new extracted value.
 
 ### split
 
@@ -430,7 +429,7 @@ Indices are retrieved from the selection if none are provided.
 
 **Returns**
 
-`Array` An array of new values.
+`Array`: An array of new values.
 
 ### toggleFormat
 
@@ -445,7 +444,7 @@ Toggles a format object to a Rich Text value at the current selection.
 
 **Returns**
 
-`Object` A new value with the format applied or removed.
+`Object`: A new value with the format applied or removed.
 
 ### toHTMLString
 
@@ -463,7 +462,7 @@ provided, text separated by a line separator will be wrapped in it.
 
 **Returns**
 
-`string` HTML string.
+`string`: HTML string.
 
 ### unregisterFormatType
 
@@ -477,7 +476,7 @@ Unregisters a format.
 
 **Returns**
 
-`?WPFormat` The previous format value, if it has been successfully unregistered; otherwise `undefined`.
+`?WPFormat`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->
