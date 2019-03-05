@@ -962,11 +962,15 @@
 		}
 	}
 
-	// Position the breadcrumb closer on mobile.
-	[data-align="left"] &,
+	// Remove negative left breadcrumb position for left aligned blocks.
+	[data-align="left"] & {
+		left: 0;
+	}
+
+	// Right-align the breadcrumb for right-aligned blocks.
 	[data-align="right"] & {
+		left: auto;
 		right: 0;
-		top: 0;
 	}
 }
 
