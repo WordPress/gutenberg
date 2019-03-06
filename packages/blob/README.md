@@ -26,7 +26,7 @@ Create a blob URL from a file.
 
 **Returns**
 
-`string` The blob URL.
+`string`: The blob URL.
 
 ### getBlobByURL
 
@@ -42,7 +42,7 @@ Retrieve a file based on a blob URL. The file must have been created by
 
 **Returns**
 
-`?File` The file for the blob URL.
+`?File`: The file for the blob URL.
 
 ### isBlobURL
 
@@ -56,7 +56,7 @@ Check whether a url is a blob url.
 
 **Returns**
 
-`boolean` Is the url a blob url?
+`boolean`: Is the url a blob url?
 
 ### revokeBlobURL
 
