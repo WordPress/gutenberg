@@ -14,7 +14,7 @@ const packages = [
 	'compose',
 	//'data',
 	//'date',
-	//'deprecated',
+	'deprecated',
 	'dom',
 	'dom-ready',
 	'e2e-test-utils',
