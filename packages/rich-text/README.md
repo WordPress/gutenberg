@@ -109,38 +109,6 @@ is no format at the selection.
 
 `?Object`: Active format object of the specified type, or undefined.
 
-### getSelectionEnd
-
-[src/index.js#L11-L11](src/index.js#L11-L11)
-
-Gets the end index of the current selection, or returns `undefined` if no
-selection exists. The selection ends right before the character at this
-index.
-
-**Parameters**
-
--   **value** `Object`: Value to get the selection from.
-
-**Returns**
-
-`?number`: Index where the selection ends.
-
-### getSelectionStart
-
-[src/index.js#L12-L12](src/index.js#L12-L12)
-
-Gets the start index of the current selection, or returns `undefined` if no
-selection exists. The selection starts right before the character at this
-index.
-
-**Parameters**
-
--   **value** `Object`: Value to get the selection from.
-
-**Returns**
-
-`?number`: Index where the selection starts.
-
 ### getTextContent
 
 [src/index.js#L13-L13](src/index.js#L13-L13)
@@ -190,20 +158,6 @@ none are provided.
 **Returns**
 
 `Object`: A new value with the value inserted.
-
-### insertLineBreak
-
-[src/index.js#L22-L22](src/index.js#L22-L22)
-
-Inserts a line break at the given or selected position.
-
-**Parameters**
-
--   **value** `Object`: Value to modify.
-
-**Returns**
-
-`Object`: The value with the line break inserted.
 
 ### insertLineSeparator
 
