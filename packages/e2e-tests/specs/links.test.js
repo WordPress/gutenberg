@@ -3,6 +3,7 @@
  */
 import {
 	clickBlockAppender,
+	clickBlockToolbarButton,
 	getEditedPostContent,
 	createNewPost,
 	pressKeyWithModifier,
@@ -219,10 +220,7 @@ describe( 'Links', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Text' );
 
-		// Press escape to show the block toolbar
-		await page.keyboard.press( 'Escape' );
-		await page.waitForSelector( 'button[aria-label="Link"]' );
-		await page.click( 'button[aria-label="Link"]' );
+		await clickBlockToolbarButton( 'Link' );
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );

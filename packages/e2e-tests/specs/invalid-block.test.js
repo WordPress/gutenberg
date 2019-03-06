@@ -4,6 +4,7 @@
 import {
 	createNewPost,
 	clickBlockAppender,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'invalid blocks', () => {
@@ -16,10 +17,7 @@ describe( 'invalid blocks', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'hello' );
 
-		// Press escape to show the block toolbar
-		await page.keyboard.press( 'Escape' );
-		// Click the 'more options'
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 
 		// Change to HTML mode and close the options
 		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );

@@ -4,6 +4,7 @@
 import {
 	insertBlock,
 	createNewPost,
+	clickBlockToolbarButton,
 	pressKeyWithModifier,
 	searchForBlock,
 	getEditedPostContent,
@@ -34,12 +35,8 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 
-		// Press escape to show the block toolbar
-		await page.keyboard.press( 'Escape' );
+		await clickBlockToolbarButton( 'More options' );
 
-		// Convert block to a reusable block
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
@@ -80,12 +77,8 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 
-		// Press escape to show the block toolbar
-		await page.keyboard.press( 'Escape' );
+		await clickBlockToolbarButton( 'More options' );
 
-		// Convert block to a reusable block
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
