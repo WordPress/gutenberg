@@ -6,6 +6,7 @@ const childProcess = require( 'child_process' );
 const packages = [
 	'e2e-test-utils',
 	'element',
+	'escape-html',
 ];
 
 let aggregatedExitCode = 0;
@@ -14,6 +15,7 @@ packages.forEach( ( packageName ) => {
 		`packages/${ packageName }/src/index.js`,
 		`--output packages/${ packageName }/README.md`,
 		'--to-token',
+		'--ignore "unstable|experimental"',
 	];
 	const pathToDocGen = path.join( __dirname, '..', 'node_modules', '.bin', 'docgen' );
 	const { status, stderr } = childProcess.spawnSync(
