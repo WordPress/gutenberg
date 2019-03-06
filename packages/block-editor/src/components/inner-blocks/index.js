@@ -149,7 +149,7 @@ InnerBlocks = compose( [
 			block,
 			blockListSettings: getBlockListSettings( clientId ),
 			parentLock: getTemplateLock( rootClientId ),
-			hasChildBlocks: !! block.innerBlocks.length,
+			hasChildBlocks: !! ( block && block.innerBlocks.length ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
