@@ -5,7 +5,7 @@ const childProcess = require( 'child_process' );
 
 const packages = [
 	'a11y',
-	//'autop',
+	'autop',
 	'blob',
 	//'block-editor',
 	'block-library',
