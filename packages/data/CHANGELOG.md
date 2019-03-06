@@ -1,4 +1,4 @@
-## 4.3.0 (Unreleased)
+## 4.3.0 (2019-03-06)
 
 ### Enhancements
 

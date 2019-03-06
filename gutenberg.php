@@ -3,8 +3,9 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 5.1.1
+ * Version: 5.2.0
  * Author: Gutenberg Team
+ * Text Domain: gutenberg
  *
  * @package gutenberg
  */
@@ -33,7 +34,7 @@ function the_gutenberg_project() {
 		<?php
 		printf(
 			/* translators: %s: https://wordpress.org/plugins/classic-editor/ */
-			__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
+			__( 'The block editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
 			__( 'https://wordpress.org/plugins/classic-editor/', 'gutenberg' )
 		);
 		?>

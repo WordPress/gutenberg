@@ -51,6 +51,14 @@ const externals = [
 		jquery: 'jQuery',
 		lodash: 'lodash',
 		'lodash-es': 'lodash',
+
+		// Distributed NPM packages may depend on Babel's runtime regenerator.
+		// In a WordPress context, the regenerator is assigned to the global
+		// scope via the `wp-polyfill` script. It is reassigned here as an
+		// externals to reduce the size of generated bundles.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/13890
+		'@babel/runtime/regenerator': 'regeneratorRuntime',
 	},
 	wordpressExternals,
 ];

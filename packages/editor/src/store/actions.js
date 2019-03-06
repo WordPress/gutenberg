@@ -699,6 +699,20 @@ export function resetEditorBlocks( blocks, options = {} ) {
 	};
 }
 
+/*
+ * Returns an action object used in signalling that the post editor settings have been updated.
+ *
+ * @param {Object} settings Updated settings
+ *
+ * @return {Object} Action object
+ */
+export function updateEditorSettings( settings ) {
+	return {
+		type: 'UPDATE_EDITOR_SETTINGS',
+		settings,
+	};
+}
+
 /**
  * Backward compatibility
  */
@@ -737,4 +751,3 @@ export const enterFormattedText = getBlockEditorAction( 'enterFormattedText' );
 export const exitFormattedText = getBlockEditorAction( 'exitFormattedText' );
 export const insertDefaultBlock = getBlockEditorAction( 'insertDefaultBlock' );
 export const updateBlockListSettings = getBlockEditorAction( 'updateBlockListSettings' );
-export const updateEditorSettings = getBlockEditorAction( 'updateEditorSettings' );

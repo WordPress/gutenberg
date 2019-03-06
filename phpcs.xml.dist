@@ -32,7 +32,6 @@
 	<exclude-pattern>./vendor</exclude-pattern>
 
 	<!-- Exclude generated files -->
-	<exclude-pattern>./languages/gutenberg-translations.php</exclude-pattern>
 	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
 
 	<rule ref="PHPCompatibility.PHP.NewKeywords.t_namespaceFound">

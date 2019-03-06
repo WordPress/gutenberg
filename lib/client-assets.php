@@ -83,7 +83,70 @@ function gutenberg_override_script( $handle, $src, $deps = array(), $ver = false
 	} else {
 		wp_register_script( $handle, $src, $deps, $ver, $in_footer );
 	}
+
+	/*
+	 * `WP_Dependencies::set_translations` will fall over on itself if setting
+	 * translations on the `wp-i18n` handle, since it internally adds `wp-i18n`
+	 * as a dependency of itself, exhausting memory. The same applies for the
+	 * polyfill script, which is a dependency _of_ `wp-i18n`.
+	 *
+	 * See: https://core.trac.wordpress.org/ticket/46089
+	 */
+	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
+		wp_set_script_translations( $handle, 'default' );
+	}
 }
+
+/**
+ * Filters the default translation file load behavior to load the Gutenberg
+ * plugin translation file, if available.
+ *
+ * @param string|false $file   Path to the translation file to load. False if
+ *                             there isn't one.
+ * @param string       $handle Name of the script to register a translation
+ *                             domain to.
+ *
+ * @return string|false Filtered path to the Gutenberg translation file, if
+ *                      available.
+ */
+function gutenberg_override_translation_file( $file, $handle ) {
+	if ( ! $file ) {
+		return $file;
+	}
+
+	// Only override script handles generated from the Gutenberg plugin.
+	$packages_dependencies = include dirname( __FILE__ ) . '/packages-dependencies.php';
+	if ( ! isset( $packages_dependencies[ $handle ] ) ) {
+		return $file;
+	}
+
+	/*
+	 * The default file will be in the plugins language directory, omitting the
+	 * domain since Gutenberg assigns the script translations as the default.
+	 *
+	 * Example: /www/wp-content/languages/plugins/de_DE-07d88e6a803e01276b9bfcc1203e862e.json
+	 *
+	 * The logic of `load_script_textdomain` is such that it will assume to
+	 * search in the plugins language directory, since the assigned source of
+	 * the overridden Gutenberg script originates in the plugins directory.
+	 *
+	 * The plugin translation files each begin with the slug of the plugin, so
+	 * it's a simple matter of prepending the Gutenberg plugin slug.
+	 */
+	$path_parts              = pathinfo( $file );
+	$plugin_translation_file = (
+		$path_parts['dirname'] .
+		'/gutenberg-' .
+		$path_parts['basename']
+	);
+
+	if ( ! is_readable( $plugin_translation_file ) ) {
+		return $file;
+	}
+
+	return $plugin_translation_file;
+}
+add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
 
 /**
  * Registers a style according to `wp_register_style`. Honors this request by
@@ -200,27 +263,6 @@ function gutenberg_register_scripts_and_styles() {
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backward compatibility.
 	gutenberg_override_style( 'wp-blocks', false );
-	$fonts_url = '';
-
-	/*
-	 * Translators: Use this to specify the proper Google Font name and variants
-	 * to load that is supported by your language. Do not translate.
-	 * Set to 'off' to disable loading.
-	 */
-	$font_family = _x( 'Noto Serif:400,400i,700,700i', 'Google Font Name and Variants', 'gutenberg' );
-	if ( 'off' !== $font_family ) {
-		$query_args = array(
-			'family' => urlencode( $font_family ),
-		);
-		$fonts_url  = esc_url_raw( add_query_arg( $query_args, 'https://fonts.googleapis.com/css' ) );
-	}
-
-	gutenberg_override_style(
-		'wp-editor-font',
-		$fonts_url,
-		array(),
-		null
-	);
 
 	gutenberg_override_style(
 		'wp-editor',
@@ -506,14 +548,11 @@ function gutenberg_get_autosave_newer_than_post_save( $post ) {
 
 /**
  * Loads Gutenberg Locale Data.
+ *
+ * @deprecated 5.2.0
  */
 function gutenberg_load_locale_data() {
-	// Prepare Jed locale data.
-	$locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
-	wp_add_inline_script(
-		'wp-i18n',
-		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
-	);
+	_deprecated_function( __FUNCTION__, '5.2.0' );
 }
 
 /**
@@ -701,8 +740,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$initial_edits = null;
 	}
 
-	gutenberg_load_locale_data();
-
 	// Preload server-registered block schemas.
 	wp_add_inline_script(
 		'wp-blocks',
@@ -723,15 +760,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_localize_script( 'wp-editor', '_wpMetaBoxUrl', $meta_box_url );
 
 	// Initialize the editor.
-	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
-	$align_wide              = get_theme_support( 'align-wide' );
-	$color_palette           = current( (array) get_theme_support( 'editor-color-palette' ) );
-	$font_sizes              = current( (array) get_theme_support( 'editor-font-sizes' ) );
-
-	if ( ! empty( $gutenberg_theme_support ) ) {
-		wp_enqueue_script( 'wp-deprecated' );
-		wp_add_inline_script( 'wp-deprecated', 'wp.deprecated( "`gutenberg` theme support", { plugin: "Gutenberg", version: "5.2", alternative: "`align-wide` theme support" } );' );
-	}
+	$align_wide    = get_theme_support( 'align-wide' );
+	$color_palette = current( (array) get_theme_support( 'editor-color-palette' ) );
+	$font_sizes    = current( (array) get_theme_support( 'editor-font-sizes' ) );
 
 	/**
 	 * Filters the allowed block types for the editor, defaulting to true (all
@@ -842,7 +873,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	$editor_settings = array(
-		'alignWide'              => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
+		'alignWide'              => $align_wide,
 		'availableTemplates'     => $available_templates,
 		'allowedBlockTypes'      => $allowed_block_types,
 		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
@@ -915,28 +946,12 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$editor_settings = apply_filters( 'block_editor_settings', $editor_settings, $post );
 
 	$init_script = <<<JS
-	( function() {
-		window._wpLoadBlockEditor = new Promise( function( resolve ) {
-			wp.domReady( function() {
-				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
-			} );
+( function() {
+	window._wpLoadBlockEditor = new Promise( function( resolve ) {
+		wp.domReady( function() {
+			resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
 		} );
-
-		Object.defineProperty( window, '_wpLoadGutenbergEditor', {
-			get: function() {
-				// TODO: Hello future maintainer. In removing this deprecation,
-				// ensure also to check whether `wp-editor`'s dependencies in
-				// `package-dependencies.php` still require `wp-deprecated`.
-				wp.deprecated( '`window._wpLoadGutenbergEditor`', {
-					plugin: 'Gutenberg',
-					version: '5.2',
-					alternative: '`window._wpLoadBlockEditor`',
-					hint: 'This is a private API, not intended for public use. It may be removed in the future.'
-				} );
-
-				return window._wpLoadBlockEditor;
-			}
-		} );
+	} );
 } )();
 JS;
 

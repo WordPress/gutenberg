@@ -74,12 +74,12 @@ export function DefaultBlockAppender( {
 export default compose(
 	withState( { hovered: false } ),
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getBlockName, isBlockValid, getEditorSettings, getTemplateLock } = select( 'core/block-editor' );
+		const { getBlockCount, getBlockName, isBlockValid, getSettings, getTemplateLock } = select( 'core/block-editor' );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
 		const isLastBlockDefault = getBlockName( ownProps.lastBlockClientId ) === getDefaultBlockName();
 		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
-		const { bodyPlaceholder } = getEditorSettings();
+		const { bodyPlaceholder } = getSettings();
 
 		return {
 			isVisible: isEmpty || ! isLastBlockDefault || ! isLastBlockValid,

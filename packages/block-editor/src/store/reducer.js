@@ -26,7 +26,7 @@ import { isReusableBlock } from '@wordpress/blocks';
  */
 import {
 	PREFERENCES_DEFAULTS,
-	EDITOR_SETTINGS_DEFAULTS,
+	SETTINGS_DEFAULTS,
 } from './defaults';
 import { insertAt, moveTo } from './array';
 
@@ -830,9 +830,9 @@ export function template( state = { isValid: true }, action ) {
  *
  * @return {Object} Updated state.
  */
-export function settings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
+export function settings( state = SETTINGS_DEFAULTS, action ) {
 	switch ( action.type ) {
-		case 'UPDATE_EDITOR_SETTINGS':
+		case 'UPDATE_SETTINGS':
 			return {
 				...state,
 				...action.settings,
