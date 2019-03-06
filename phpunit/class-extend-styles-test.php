@@ -68,7 +68,7 @@ class Extend_Styles_Test extends WP_UnitTestCase {
 			// Ensure directory exists before writing style contents, since
 			// it's likely if this is reached there's no build directory.
 			if ( ! is_dir( dirname( $path ) ) ) {
-				mkdir( $path, 0777, true );
+				mkdir( dirname( $path ), 0777, true );
 			}
 
 			$this->style_contents = '';
