@@ -112,3 +112,8 @@ Template locking allows locking the `InnerBlocks` area for the current template.
 If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.
 
 If the block is a top level block: the locking of the Custom Post Type is used.
+
+### `useBlockAppenderPlaceholder`
+* **Type:** `Boolean`
+
+Determines whether or not to display the `BlockListAppender` button as a placeholder when there are no child Blocks assigned to the `InnerBlocks`. This is as opposed to the default behaviour of inserting a `paragraph` Block automatically.
