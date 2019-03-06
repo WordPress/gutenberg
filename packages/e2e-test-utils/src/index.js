@@ -2,6 +2,7 @@ export { activatePlugin } from './activate-plugin';
 export { arePrePublishChecksEnabled } from './are-pre-publish-checks-enabled';
 export { clearLocalStorage } from './clear-local-storage';
 export { clickBlockAppender } from './click-block-appender';
+export { clickBlockToolbarButton } from './click-block-toolbar-button';
 export { clickButton } from './click-button';
 export { clickOnCloseModalButton } from './click-on-close-modal-button';
 export { clickOnMoreMenuItem } from './click-on-more-menu-item';
