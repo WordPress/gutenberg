@@ -112,9 +112,9 @@ const MyButtonMoreMenuItem = () => (
 
 -   **props** `Object`: Component properties.
 -   **props.href** `[string]`: When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
--   **icon** `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
--   **onClick** `[Function]`: The callback function to be executed when the user clicks the menu item.
--   **other** `[...*]`: Any additional props are passed through to the underlying [MenuItem](/packages/components/src/menu-item/README.md) component.
+-   **props.icon** `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
+-   **props.onClick** `[Function]`: The callback function to be executed when the user clicks the menu item.
+-   **props.other** `[...*]`: Any additional props are passed through to the underlying [MenuItem](/packages/components/src/menu-item/README.md) component.
 
 **Returns**
 
@@ -264,7 +264,7 @@ const MyPluginSidebar = () => (
 -   **props.className** `[string]`: An optional class name added to the sidebar body.
 -   **props.title** `string`: Title displayed at the top of the sidebar.
 -   **props.isPinnable** `[boolean]`: Whether to allow to pin sidebar to toolbar.
--   **icon** `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   **props.icon** `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
 
 **Returns**
 
@@ -297,8 +297,8 @@ const MySidebarMoreMenuItem = () => (
 **Parameters**
 
 -   **props** `Object`: Component props.
--   **target** `string`: A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
--   **icon** `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
+-   **props.target** `string`: A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
+-   **props.icon** `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 
 **Returns**
 
