@@ -31,7 +31,7 @@ fi
 if [[ $DOCKER = "true" ]]; then
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm composer run-script lint
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm wordpress_phpunit phpunit
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm wordpress_phpunit -e WP_MULTISITE=1 phpunit
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -e WP_MULTISITE=1 wordpress_phpunit phpunit
 else
 	phpunit || exit 1
 	WP_MULTISITE=1 phpunit || exit 1
