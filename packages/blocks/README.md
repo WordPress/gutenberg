@@ -197,7 +197,7 @@ new attributes and/or replacing its inner blocks.
 
 **Returns**
 
-`Object` A cloned block.
+`Object`: A cloned block.
 
 ### createBlock
 
@@ -213,7 +213,7 @@ Returns a block object given its type and attributes.
 
 **Returns**
 
-`Object` Block object.
+`Object`: Block object.
 
 ### doBlocksMatchTemplate
 
@@ -228,7 +228,7 @@ Checks whether a list of blocks matches a template by comparing the block names.
 
 **Returns**
 
-`boolean` Whether the list of blocks matches a templates
+`boolean`: Whether the list of blocks matches a templates
 
 ### findTransform
 
@@ -247,7 +247,7 @@ falsey value for all entries.
 
 **Returns**
 
-`?Object` Highest-priority transform candidate.
+`?Object`: Highest-priority transform candidate.
 
 ### getBlockAttributes
 
@@ -263,7 +263,7 @@ Returns the block attributes of a registered block node given its type.
 
 **Returns**
 
-`Object` All block attributes.
+`Object`: All block attributes.
 
 ### getBlockContent
 
@@ -277,7 +277,7 @@ Given a block object, returns the Block's Inner HTML markup.
 
 **Returns**
 
-`string` HTML.
+`string`: HTML.
 
 ### getBlockDefaultClassName
 
@@ -291,7 +291,7 @@ Returns the block's default classname from its name.
 
 **Returns**
 
-`string` The block's default class.
+`string`: The block's default class.
 
 ### getBlockMenuDefaultClassName
 
@@ -305,7 +305,7 @@ Returns the block's default menu item classname from its name.
 
 **Returns**
 
-`string` The block's default menu item class.
+`string`: The block's default menu item class.
 
 ### getBlockSupport
 
@@ -321,7 +321,7 @@ Returns the block support value for a feature, if defined.
 
 **Returns**
 
-`?*` Block support value
+`?*`: Block support value
 
 ### getBlockTransforms
 
@@ -339,7 +339,7 @@ transform object includes `blockName` as a property.
 
 **Returns**
 
-`Array` Block transforms for direction.
+`Array`: Block transforms for direction.
 
 ### getBlockType
 
@@ -353,7 +353,7 @@ Returns a registered block type.
 
 **Returns**
 
-`?Object` Block type.
+`?Object`: Block type.
 
 ### getBlockTypes
 
@@ -363,7 +363,7 @@ Returns all registered blocks.
 
 **Returns**
 
-`Array` Block settings.
+`Array`: Block settings.
 
 ### getCategories
 
@@ -373,7 +373,7 @@ Returns all the block categories.
 
 **Returns**
 
-`Array<Object>` Block categories.
+`Array<Object>`: Block categories.
 
 ### getChildBlockNames
 
@@ -387,7 +387,7 @@ Returns an array with the child blocks of a given block.
 
 **Returns**
 
-`Array` Array of child block names.
+`Array`: Array of child block names.
 
 ### getDefaultBlockName
 
@@ -397,7 +397,7 @@ Retrieves the default block name.
 
 **Returns**
 
-`?string` Block name.
+`?string`: Block name.
 
 ### getFreeformContentHandlerName
 
@@ -408,7 +408,7 @@ handler has been defined.
 
 **Returns**
 
-`?string` Blog name.
+`?string`: Blog name.
 
 ### getPhrasingContentSchema
 
@@ -422,7 +422,7 @@ Get schema of possible paths for phrasing content.
 
 **Returns**
 
-`Object` Schema.
+`Object`: Schema.
 
 ### getPossibleBlockTransformations
 
@@ -437,7 +437,7 @@ can be transformed into.
 
 **Returns**
 
-`Array` Block types that the blocks argument can be transformed to.
+`Array`: Block types that the blocks argument can be transformed to.
 
 ### getSaveContent
 
@@ -454,7 +454,7 @@ static markup to be saved.
 
 **Returns**
 
-`string` Save content.
+`string`: Save content.
 
 ### getSaveElement
 
@@ -471,7 +471,7 @@ enhanced element to be saved or string when raw HTML expected.
 
 **Returns**
 
-`(Object|string)` Save element or raw HTML string.
+`(Object|string)`: Save element or raw HTML string.
 
 ### getUnregisteredTypeHandlerName
 
@@ -482,7 +482,7 @@ handler has been defined.
 
 **Returns**
 
-`?string` Blog name.
+`?string`: Blog name.
 
 ### hasBlockSupport
 
@@ -498,7 +498,7 @@ Returns true if the block defines support for a feature, or false otherwise.
 
 **Returns**
 
-`boolean` Whether block supports feature.
+`boolean`: Whether block supports feature.
 
 ### hasChildBlocks
 
@@ -512,7 +512,7 @@ Returns a boolean indicating if a block has child blocks or not.
 
 **Returns**
 
-`boolean` True if a block contains child blocks and false otherwise.
+`boolean`: True if a block contains child blocks and false otherwise.
 
 ### hasChildBlocksWithInserterSupport
 
@@ -526,7 +526,7 @@ Returns a boolean indicating if a block has at least one child block with insert
 
 **Returns**
 
-`boolean` True if a block contains at least one child blocks with inserter support and false otherwise.
+`boolean`: True if a block contains at least one child blocks with inserter support and false otherwise.
 
 ### isReusableBlock
 
@@ -542,7 +542,7 @@ API.
 
 **Returns**
 
-`boolean` Whether the given block is a reusable block.
+`boolean`: Whether the given block is a reusable block.
 
 ### isUnmodifiedDefaultBlock
 
@@ -558,7 +558,7 @@ which means the block is unmodified.
 
 **Returns**
 
-`boolean` Whether the block is an unmodified default block
+`boolean`: Whether the block is an unmodified default block
 
 ### isValidBlockContent
 
@@ -578,7 +578,7 @@ Logs to console in development environments when invalid.
 
 **Returns**
 
-`boolean` Whether block is valid.
+`boolean`: Whether block is valid.
 
 ### isValidIcon
 
@@ -592,7 +592,7 @@ Function that checks if the parameter is a valid icon.
 
 **Returns**
 
-`boolean` True if the parameter is a valid icon and false otherwise.
+`boolean`: True if the parameter is a valid icon and false otherwise.
 
 ### node
 
@@ -614,7 +614,7 @@ in the codebase.
 
 **Returns**
 
-`Object` Object describing the icon.
+`Object`: Object describing the icon.
 
 ### parse
 
@@ -628,7 +628,7 @@ Parses the post content with a PegJS grammar and returns a list of blocks.
 
 **Returns**
 
-`Array` Block list.
+`Array`: Block list.
 
 ### parseWithAttributeSchema
 
@@ -644,7 +644,7 @@ value depending on its source.
 
 **Returns**
 
-`*` Attribute value.
+`*`: Attribute value.
 
 ### pasteHandler
 
@@ -662,7 +662,7 @@ Converts an HTML string to known blocks. Strips everything else.
 
 **Returns**
 
-`(Array|string)` A list of blocks or a string, depending on `handlerMode`.
+`(Array|string)`: A list of blocks or a string, depending on `handlerMode`.
 
 ### rawHandler
 
@@ -676,7 +676,7 @@ Converts an HTML string to known blocks.
 
 **Returns**
 
-`Array` A list of blocks.
+`Array`: A list of blocks.
 
 ### registerBlockStyle
 
@@ -704,7 +704,7 @@ editor interface where blocks are implemented.
 
 **Returns**
 
-`?WPBlock` The block, if it has been successfully registered; otherwise `undefined`.
+`?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
 
 ### serialize
 
@@ -718,7 +718,7 @@ Takes a block or set of blocks and returns the serialized post content.
 
 **Returns**
 
-`string` The post content.
+`string`: The post content.
 
 ### setCategories
 
@@ -773,7 +773,7 @@ Switch one or more blocks into one or more blocks of the new block type.
 
 **Returns**
 
-`Array` Array of blocks.
+`Array`: Array of blocks.
 
 ### synchronizeBlocksWithTemplate
 
@@ -793,7 +793,7 @@ Extra blocks not present in the template are removed.
 
 **Returns**
 
-`Array` Updated Block list.
+`Array`: Updated Block list.
 
 ### unregisterBlockStyle
 
@@ -818,17 +818,7 @@ Unregisters a block.
 
 **Returns**
 
-`?WPBlock` The previous block value, if it has been successfully unregistered; otherwise `undefined`.
-
-### unstable\_\_bootstrapServerSideBlockDefinitions
-
-[src/index.js#L16-L16](src/index.js#L16-L16)
-
-Set the server side block definition of blocks.
-
-**Parameters**
-
--   **definitions** `Object`: Server-side block definitions
+`?WPBlock`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
 
 ### updateCategory
 
@@ -850,7 +840,7 @@ wrapped component.
 
 **Returns**
 
-`Component` Enhanced component with injected BlockContent as prop.
+`Component`: Enhanced component with injected BlockContent as prop.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->
