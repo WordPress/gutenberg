@@ -109,27 +109,27 @@ The return value of `registerStore` is a [Redux-like store object](https://redux
 -   `store.dispatch( action: Object )`: Given an action object, calls the registered reducer and updates the state value.
     -   _Redux parallel:_ [`dispatch`](https://redux.js.org/api-reference/store#dispatch(action))
 
-## Options
+### Options
 
-### `reducer`
+#### `reducer`
 
 A [**reducer**](https://redux.js.org/docs/basics/Reducers.html) is a function accepting the previous `state` and `action` as arguments and returns an updated `state` value.
 
-### `actions`
+#### `actions`
 
 The **`actions`** object should describe all [action creators](https://redux.js.org/glossary#action-creator) available for your store. An action creator is a function that optionally accepts arguments and returns an action object to dispatch to the registered reducer. _Dispatching actions is the primary mechanism for making changes to your state._
 
-### `selectors`
+#### `selectors`
 
 The **`selectors`** object includes a set of functions for accessing and deriving state values. A selector is a function which accepts state and optional arguments and returns some value from state. _Calling selectors is the primary mechanism for retrieving data from your state_, and serve as a useful abstraction over the raw data which is typically more susceptible to change and less readily usable as a [normalized object](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape#designing-a-normalized-state).
 
-### `resolvers`
+#### `resolvers`
 
 A **resolver** is a side-effect for a selector. If your selector result may need to be fulfilled from an external source, you can define a resolver such that the first time the selector is called, the fulfillment behavior is effected.
 
 The `resolvers` option should be passed as an object where each key is the name of the selector to act upon, the value a function which receives the same arguments passed to the selector, excluding the state argument. It can then dispatch as necessary to fulfill the requirements of the selector, taking advantage of the fact that most data consumers will subscribe to subsequent state changes (by `subscribe` or `withSelect`).
 
-### `controls`
+#### `controls`
 
 _**Note:** Controls are an opt-in feature, enabled via `use` (the [Plugins API](/packages/data/src/plugins/README.md))._
 
@@ -139,185 +139,9 @@ The `controls` option should be passed as an object where each key is the name o
 
 Refer to the [documentation of `@wordpress/redux-routine`](/packages/redux-routine/README.md) for more information.
 
-### `initialState`
+#### `initialState`
 
 An optional preloaded initial state for the store. You may use this to restore some serialized state value or a state generated server-side.
-
-## Data Access and Manipulation
-
-It is very rare that you should access store methods directly. Instead, the following suite of functions and higher-order components is provided for the most common data access and manipulation needs.
-
-### Data API
-
-The top-level API of `@wordpress/data` includes a number of functions which allow immediate access to select from and dispatch to a registered store. These are most useful in low-level code where a selector or action dispatch is called a single time or at known intervals. For displaying data in a user interface, you should use [higher-order components](#higher-order-components) instead.
-
-#### `select( storeName: string ): Object`
-
-Given the name of a registered store, returns an object of the store's selectors. The selector functions are been pre-bound to pass the current state automatically. As a consumer, you need only pass arguments of the selector, if applicable.
-
-_Example:_
-
-```js
-const { select } = wp.data;
-
-select( 'my-shop' ).getPrice( 'hammer' );
-```
-
-#### `dispatch( storeName: string ): Object`
-
-Given the name of a registered store, returns an object of the store's action creators. Calling an action creator will cause it to be dispatched, updating the state value accordingly.
-
-_Example:_
-
-```js
-const { dispatch } = wp.data;
-
-dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
-```
-
-#### `subscribe(): Function`
-
-Given a listener function, the function will be called any time the state value of one of the registered stores has changed. This function returns a `unsubscribe` function used to stop the subscription.
-
-_Example:_
-
-```js
-const { subscribe } = wp.data;
-
-const unsubscribe = subscribe( () => {
-	// You could use this opportunity to test whether the derived result of a
-	// selector has subsequently changed as the result of a state update.
-} );
-
-// Later, if necessary...
-unsubscribe();
-```
-
-### Helpers
-
-#### `combineReducers( reducers: Object ): Function`
-
-As your app grows more complex, you'll want to split your reducing function into separate functions, each managing independent parts of the state. The `combineReducers` helper function turns an object whose values are different reducing functions into a single reducing function you can pass to `registerStore`.
-
-_Example:_
-
-```js
-const { combineReducers, registerStore } = wp.data;
-
-const prices = ( state = {}, action ) => {
-	return action.type === 'SET_PRICE' ?
-		{
-			...state,
-			[ action.item ]: action.price,
-		} :
-		state;
-};
-
-const discountPercent = ( state = 0, action ) => {
-	return action.type === 'START_SALE' ?
-		action.discountPercent :
-		state;
-};
-
-registerStore( 'my-shop', {
-	reducer: combineReducers( {
-		prices,
-		discountPercent,
-	} ),
-} );
-```
-
-### Higher-Order Components
-
-A higher-order component is a function which accepts a [component](/packages/element/README.md) and returns a new, enhanced component. A stateful user interface should respond to changes in the underlying state and updates its displayed element accordingly. WordPress uses higher-order components both as a means to separate the purely visual aspects of an interface from its data backing, and to ensure that the data is kept in-sync with the stores.
-
-#### `withSelect( mapSelectToProps: Function ): Function`
-
-Use `withSelect` to inject state-derived props into a component. Passed a function which returns an object mapping prop names to the subscribed data source, a higher-order component function is returned. The higher-order component can be used to enhance a presentational component, updating it automatically when state changes. The mapping function is passed the [`select` function](#select), the props passed to the original component and the `registry` object.
-
-_Example:_
-
-```js
-function PriceDisplay( { price, currency } ) {
-	return new Intl.NumberFormat( 'en-US', {
-		style: 'currency',
-		currency,
-	} ).format( price );
-}
-
-const { withSelect } = wp.data;
-
-const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
-	const { getPrice } = select( 'my-shop' );
-	const { currency } = ownProps;
-
-	return {
-		price: getPrice( 'hammer', currency ),
-	};
-} )( PriceDisplay );
-
-// Rendered in the application:
-//
-//  <HammerPriceDisplay currency="USD" />
-```
-
-In the above example, when `HammerPriceDisplay` is rendered into an application, it will pass the price into the underlying `PriceDisplay` component and update automatically if the price of a hammer ever changes in the store.
-
-#### `withDispatch( mapDispatchToProps: Function ): Function`
-
-Use `withDispatch` to inject dispatching action props into your component. Passed a function which returns an object mapping prop names to action dispatchers, a higher-order component function is returned. The higher-order component can be used to enhance a component. For example, you can define callback behaviors as props for responding to user interactions. The mapping function is passed the [`dispatch` function](#dispatch), the props passed to the original component and the `registry` object.
-
-```jsx
-function Button( { onClick, children } ) {
-	return <button type="button" onClick={ onClick }>{ children }</button>;
-}
-
-const { withDispatch } = wp.data;
-
-const SaleButton = withDispatch( ( dispatch, ownProps ) => {
-	const { startSale } = dispatch( 'my-shop' );
-	const { discountPercent } = ownProps;
-
-	return {
-		onClick() {
-			startSale( discountPercent );
-		},
-	};
-} )( Button );
-
-// Rendered in the application:
-//
-//  <SaleButton discountPercent="20">Start Sale!</SaleButton>
-```
-
-In the majority of cases, it will be sufficient to use only two first params passed to `mapDispatchToProps` as illustrated in the previous example. However, there might be some very advanced use cases where using the `registry` object might be used as a tool to optimize the performance of your component. Using `select` function from the registry might be useful when you need to fetch some dynamic data from the store at the time when the event is fired, but at the same time, you never use it to render your component. In such scenario, you can avoid using the `withSelect` higher order component to compute such prop, which might lead to unnecessary re-renders of you component caused by its frequent value change. Keep in mind, that `mapDispatchToProps` must return an object with functions only. 
-
-```jsx
-function Button( { onClick, children } ) {
-	return <button type="button" onClick={ onClick }>{ children }</button>;
-}
-
-const { withDispatch } = wp.data;
-
-const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
-	// Stock number changes frequently.
-	const { getStockNumber } = select( 'my-shop' );
-	const { startSale } = dispatch( 'my-shop' );
-	
-	return {
-		onClick() {
-			const dicountPercent = getStockNumber() > 50 ? 10 : 20;
-			startSale( discountPercent );
-		},
-	};
-} )( Button );
-
-// Rendered in the application:
-//
-//  <SaleButton>Start Sale!</SaleButton>
-```
-
-_Note:_ It is important that the `mapDispatchToProps` function always returns an object with the same keys. For example, it should not contain conditions under which a different value would be returned.
 
 ## Generic Stores
 
@@ -422,14 +246,44 @@ Specific implementation differences from Redux and React Redux:
 
 ## API
 
+It is very rare that you should access store methods directly. Instead, the following suite of functions and higher-order components is provided for the most common data access and manipulation needs.
+
 <!-- START TOKEN(Autogenerated API docs) -->
 
 ### combineReducers
 
-[src/index.js#L30-L30](src/index.js#L30-L30)
+[src/index.js#L57-L57](src/index.js#L57-L57)
 
 The combineReducers helper function turns an object whose values are different
 reducing functions into a single reducing function you can pass to registerReducer.
+
+**Usage**
+
+```js
+const { combineReducers, registerStore } = wp.data;
+
+const prices = ( state = {}, action ) => {
+	return action.type === 'SET_PRICE' ?
+		{
+			...state,
+			[ action.item ]: action.price,
+		} :
+		state;
+};
+
+const discountPercent = ( state = 0, action ) => {
+	return action.type === 'START_SALE' ?
+		action.discountPercent :
+		state;
+};
+
+registerStore( 'my-shop', {
+	reducer: combineReducers( {
+		prices,
+		discountPercent,
+	} ),
+} );
+```
 
 **Parameters**
 
@@ -484,9 +338,25 @@ Mark a selector as a registry selector.
 
 ### dispatch
 
-[src/index.js#L33-L33](src/index.js#L33-L33)
+[src/index.js#L88-L88](src/index.js#L88-L88)
 
-Undocumented declaration.
+Given the name of a registered store, returns an object of the store's action creators. Calling an action creator will cause it to be dispatched, updating the state value accordingly.
+
+**Usage**
+
+```js
+const { dispatch } = wp.data;
+
+dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
+```
+
+**Parameters**
+
+-   **name** `string`: Store name
+
+**Returns**
+
+`Object`: Object containing the action creators.
 
 ### plugins
 
@@ -496,13 +366,13 @@ Undocumented declaration.
 
 ### registerGenericStore
 
-[src/index.js#L35-L35](src/index.js#L35-L35)
+[src/index.js#L109-L109](src/index.js#L109-L109)
 
 Undocumented declaration.
 
 ### registerStore
 
-[src/index.js#L36-L36](src/index.js#L36-L36)
+[src/index.js#L110-L110](src/index.js#L110-L110)
 
 Undocumented declaration.
 
@@ -520,19 +390,53 @@ Undocumented declaration.
 
 ### select
 
-[src/index.js#L32-L32](src/index.js#L32-L32)
+[src/index.js#L73-L73](src/index.js#L73-L73)
 
-Undocumented declaration.
+Given the name of a registered store, returns an object of the store's selectors. The selector functions are been pre-bound to pass the current state automatically. As a consumer, you need only pass arguments of the selector, if applicable.
+
+**Usage**
+
+```js
+const { select } = wp.data;
+
+select( 'my-shop' ).getPrice( 'hammer' );
+```
+
+**Parameters**
+
+-   **name** `string`: Store name
+
+**Returns**
+
+`Object`: Object containing the store's selectors.
 
 ### subscribe
 
-[src/index.js#L34-L34](src/index.js#L34-L34)
+[src/index.js#L108-L108](src/index.js#L108-L108)
 
-Undocumented declaration.
+Given a listener function, the function will be called any time the state value of one of the registered stores has changed. This function returns a `unsubscribe` function used to stop the subscription.
+
+**Usage**
+
+```js
+const { subscribe } = wp.data;
+
+const unsubscribe = subscribe( () => {
+	// You could use this opportunity to test whether the derived result of a
+	// selector has subsequently changed as the result of a state update.
+} );
+
+// Later, if necessary...
+unsubscribe();
+```
+
+**Parameters**
+
+-   **listener** `Function`: Callback function.
 
 ### use
 
-[src/index.js#L37-L37](src/index.js#L37-L37)
+[src/index.js#L111-L111](src/index.js#L111-L111)
 
 Undocumented declaration.
 
@@ -540,8 +444,61 @@ Undocumented declaration.
 
 [src/index.js#L13-L13](src/index.js#L13-L13)
 
-Higher-order component used to add dispatch props using registered action
-creators.
+Higher-order component used to add dispatch props using registered action creators.
+
+**Usage**
+
+```jsx
+function Button( { onClick, children } ) {
+	return <button type="button" onClick={ onClick }>{ children }</button>;
+}
+
+const { withDispatch } = wp.data;
+
+const SaleButton = withDispatch( ( dispatch, ownProps ) => {
+	const { startSale } = dispatch( 'my-shop' );
+	const { discountPercent } = ownProps;
+
+	return {
+		onClick() {
+			startSale( discountPercent );
+		},
+	};
+} )( Button );
+
+// Rendered in the application:
+//
+//  <SaleButton discountPercent="20">Start Sale!</SaleButton>
+```
+
+In the majority of cases, it will be sufficient to use only two first params passed to `mapDispatchToProps` as illustrated in the previous example. However, there might be some very advanced use cases where using the `registry` object might be used as a tool to optimize the performance of your component. Using `select` function from the registry might be useful when you need to fetch some dynamic data from the store at the time when the event is fired, but at the same time, you never use it to render your component. In such scenario, you can avoid using the `withSelect` higher order component to compute such prop, which might lead to unnecessary re-renders of you component caused by its frequent value change. Keep in mind, that `mapDispatchToProps` must return an object with functions only.
+
+```jsx
+function Button( { onClick, children } ) {
+	return <button type="button" onClick={ onClick }>{ children }</button>;
+}
+
+const { withDispatch } = wp.data;
+
+const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
+	// Stock number changes frequently.
+	const { getStockNumber } = select( 'my-shop' );
+	const { startSale } = dispatch( 'my-shop' );
+
+	return {
+		onClick() {
+			const dicountPercent = getStockNumber() > 50 ? 10 : 20;
+			startSale( discountPercent );
+		},
+	};
+} )( Button );
+
+// Rendered in the application:
+//
+//  <SaleButton>Start Sale!</SaleButton>
+```
+
+_Note:_ It is important that the `mapDispatchToProps` function always returns an object with the same keys. For example, it should not contain conditions under which a different value would be returned.
 
 **Parameters**
 
@@ -557,6 +514,34 @@ creators.
 
 Higher-order component used to inject state-derived props using registered
 selectors.
+
+**Usage**
+
+```js
+function PriceDisplay( { price, currency } ) {
+	return new Intl.NumberFormat( 'en-US', {
+		style: 'currency',
+		currency,
+	} ).format( price );
+}
+
+const { withSelect } = wp.data;
+
+const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
+	const { getPrice } = select( 'my-shop' );
+	const { currency } = ownProps;
+
+	return {
+		price: getPrice( 'hammer', currency ),
+	};
+} )( PriceDisplay );
+
+// Rendered in the application:
+//
+//  <HammerPriceDisplay currency="USD" />
+```
+
+In the above example, when `HammerPriceDisplay` is rendered into an application, it will pass the price into the underlying `PriceDisplay` component and update automatically if the price of a hammer ever changes in the store.
 
 **Parameters**
 
