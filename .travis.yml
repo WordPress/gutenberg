@@ -34,6 +34,7 @@ jobs:
       install:
         - npm ci
       script:
+        - npm run build
         - $( npm bin )/concurrently --kill-others-on-fail \
           "npm run lint" \
           "npm run check-local-changes" \
