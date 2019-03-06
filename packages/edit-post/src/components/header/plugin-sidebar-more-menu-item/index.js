@@ -21,6 +21,32 @@ const PluginSidebarMoreMenuItem = ( { children, icon, isSelected, onClick } ) =>
 	</PluginMoreMenuItem>
 );
 
+/**
+ * Renders a menu item in `Plugins` group in `More Menu` drop down,
+ * and can be used to activate the corresponding `PluginSidebar` component.
+ * The text within the component appears as the menu item label.
+ *
+ * @param {Object} props Component props.
+ * @param {string} target A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
+ * @param {string|Element} [icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
+ *
+ * @example
+ * ```jsx
+ * const { __ } = wp.i18n;
+ * const { PluginSidebarMoreMenuItem } = wp.editPost;
+ *
+ * const MySidebarMoreMenuItem = () => (
+ * 	<PluginSidebarMoreMenuItem
+ * 		target="my-sidebar"
+ * 		icon="smiley"
+ * 	>
+ * 		{ __( 'My sidebar title' ) }
+ * 	</PluginSidebarMoreMenuItem>
+ * );
+ * ```
+ *
+ * @return {WPElement} The element to be rendered.
+ */
 export default compose(
 	withPluginContext( ( context, ownProps ) => {
 		return {

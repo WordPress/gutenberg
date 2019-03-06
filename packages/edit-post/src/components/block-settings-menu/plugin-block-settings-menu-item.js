@@ -30,6 +30,35 @@ const isEverySelectedBlockAllowed = ( selected, allowed ) => difference( selecte
 const shouldRenderItem = ( selectedBlockNames, allowedBlockNames ) => ! Array.isArray( allowedBlockNames ) ||
 	isEverySelectedBlockAllowed( selectedBlockNames, allowedBlockNames );
 
+/**
+ * Renders a new item in the block settings menu.
+ *
+ * @param {Object} props Component props.
+ * @param {Array} [props.allowedBlockNames] An array containing a list of block names for which the item should be shown. If not present, it'll be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the whitelist.
+ * @param {string|Element} [props.icon] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
+ * @param {string} props.label The menu item text.
+ * @param {Function} props.onClick Callback function to be executed when the user click the menu item.
+ *
+ * @example
+ * ```jsx
+ * import { __ } from wp.i18n;
+ * import { PluginBlockSettingsMenuItem } from wp.editPost;
+ *
+ * const doOnClick = ( ) => {
+ *     // To be called when the user clicks the menu item.
+ * };
+ *
+ * const MyPluginBlockSettingsMenuItem = () => (
+ *     <PluginBlockSettingsMenuItem
+ * 		allowedBlockNames=[ 'core/paragraph' ]
+ * 		icon='dashicon-name'
+ * 		label=__( 'Menu item text' )
+ * 		onClick={ doOnClick } />
+ * );
+ * ```
+ *
+ * @return {WPElement} The WPElement to be rendered.
+ */
 const PluginBlockSettingsMenuItem = ( { allowedBlocks, icon, label, onClick, small, role } ) => (
 	<PluginBlockSettingsMenuGroup>
 		{ ( { selectedBlocks, onClose } ) => {
