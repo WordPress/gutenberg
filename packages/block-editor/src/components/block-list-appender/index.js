@@ -54,7 +54,7 @@ function BlockListAppender( {
 							disabled={ disabled }
 						>
 							<Icon icon="insert" />
-							<span>{ __( 'Add a Block' ) }</span>
+							<span>{ __( 'Add Block' ) }</span>
 						</Button>
 
 					</Fragment>
