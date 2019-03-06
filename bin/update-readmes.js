@@ -25,7 +25,7 @@ const packages = [
 	//'i18n',
 	//'keycodes',
 	//'plugins',
-	//'priority-queue',
+	'priority-queue',
 	//'redux-routine',
 	//'rich-text',
 	//'shortcode',
