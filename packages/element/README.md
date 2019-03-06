@@ -82,7 +82,7 @@ This assumes that you will import the `createElement` function in any file where
 
 [src/index.js#L1-L1](src/index.js#L1-L1)
 
-Undocumented declaration.
+Object that provides utilities for dealing with React children.
 
 ### cloneElement
 
@@ -287,7 +287,7 @@ Serializes a React element to string.
 
 [src/index.js#L1-L1](src/index.js#L1-L1)
 
-Undocumented declaration.
+Component that activates additional checks and warnings for its descendants.
 
 ### switchChildrenNodeName
 
