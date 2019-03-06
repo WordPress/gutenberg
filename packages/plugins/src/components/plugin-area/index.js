@@ -18,6 +18,18 @@ import { getPlugins } from '../../api';
 /**
  * A component that renders all plugin fills in a hidden div.
  *
+ * @example
+ * ```js
+ * const { PluginArea } = wp.plugins;
+ *
+ * const Layout = () => (
+ * 	<div>
+ * 		Content of the page
+ * 		<PluginArea />
+ * 	</div>
+ * );
+ * ```
+ *
  * @return {WPElement} Plugin area.
  */
 class PluginArea extends Component {

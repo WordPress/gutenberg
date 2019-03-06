@@ -46,6 +46,19 @@ Returns all registered plugins.
 
 A component that renders all plugin fills in a hidden div.
 
+**Usage**
+
+```js
+const { PluginArea } = wp.plugins;
+
+const Layout = () => (
+	<div>
+		Content of the page
+		<PluginArea />
+	</div>
+);
+```
+
 **Returns**
 
 `WPElement`: Plugin area.
