@@ -1,0 +1,24 @@
+{
+	"name": "core/shortcode",
+	"title": "Shortcode",
+	"category": "widgets",
+	"icon": {
+		"src": "icon.js"
+	},
+	"description": "Insert additional custom elements with a WordPress shortcode.",
+	"attributes": {
+		"text": {
+			"type": "string",
+			"source": "html"
+		}
+	},
+	"edit": "edit.js",
+	"save": "save.js",
+	"transforms": "transforms.js",
+	"supports": {
+		"customClassName": false,
+		"className": false,
+		"html": false
+	},
+	"renderCallback": "index.php"
+}

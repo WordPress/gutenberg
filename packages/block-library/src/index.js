@@ -44,7 +44,7 @@ import * as pullquote from './pullquote';
 // import * as rss from './rss';
 import * as search from './search';
 import * as separator from './separator';
-import * as shortcode from './shortcode';
+// import * as shortcode from './shortcode';
 import * as spacer from './spacer';
 import * as subhead from './subhead';
 import * as table from './table';
@@ -68,7 +68,7 @@ export const registerCoreBlocks = () => {
 		quote,
 
 		// Register all remaining core blocks.
-		shortcode,
+		// shortcode,
 		// archives,
 		audio,
 		button,
