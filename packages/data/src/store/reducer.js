@@ -10,7 +10,8 @@ import EquivalentKeyMap from 'equivalent-key-map';
 import { onSubKey } from './utils';
 
 /**
- * Reducer function returning next state for selector resolution, object form:
+ * Reducer function returning next state for selector resolution of
+ * subkeys, object form:
  *
  *  reducerKey -> selectorName -> EquivalentKeyMap<Array,boolean>
  *
@@ -19,7 +20,7 @@ import { onSubKey } from './utils';
  *
  * @returns {Object} Next state.
  */
-const isResolved = flowRight( [
+const subKeysIsResolved = flowRight( [
 	onSubKey( 'reducerKey' ),
 	onSubKey( 'selectorName' ),
 ] )( ( state = new EquivalentKeyMap(), action ) => {
@@ -50,7 +51,7 @@ const isResolved = flowRight( [
  *
  * @return {Object} Next state.
  */
-const topLevelIsResolved = ( state = {}, action ) => {
+const isResolved = ( state = {}, action ) => {
 	switch ( action.type ) {
 		case 'INVALIDATE_RESOLUTION_FOR_STORE':
 			return has( state, action.reducerKey ) ?
@@ -66,8 +67,12 @@ const topLevelIsResolved = ( state = {}, action ) => {
 					),
 				} :
 				state;
+		case 'START_RESOLUTION':
+		case 'FINISH_RESOLUTION':
+		case 'INVALIDATE_RESOLUTION':
+			return subKeysIsResolved( state, action );
 	}
-	return isResolved( state, action );
+	return state;
 };
 
-export default topLevelIsResolved;
+export default isResolved;
