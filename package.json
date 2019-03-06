@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "5.1.1",
+	"version": "5.2.0",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -66,6 +66,7 @@
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
 		"@wordpress/browserslist-config": "file:packages/browserslist-config",
 		"@wordpress/custom-templated-path-webpack-plugin": "file:packages/custom-templated-path-webpack-plugin",
+		"@wordpress/docgen": "file:packages/docgen",
 		"@wordpress/e2e-test-utils": "file:packages/e2e-test-utils",
 		"@wordpress/e2e-tests": "file:packages/e2e-tests",
 		"@wordpress/eslint-plugin": "file:packages/eslint-plugin",
@@ -131,6 +132,7 @@
 				}
 			],
 			"require-publishConfig": "error",
+			"require-repository-directory": "error",
 			"valid-values-author": [
 				"error",
 				[
@@ -160,7 +162,7 @@
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
-		"docs:build": "node docs/tool",
+		"docs:build": "node ./docs/tool && node ./bin/update-readmes",
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:server-registered": "docker-compose run -w /var/www/html/wp-content/plugins/gutenberg --rm wordpress ./bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
@@ -201,7 +203,10 @@
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
-			"npm run docs:build"
+			"node ./docs/tool"
+		],
+		"packages/**/*.js": [
+			"node ./bin/update-readmes"
 		]
 	}
 }

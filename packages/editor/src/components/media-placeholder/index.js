@@ -263,11 +263,11 @@ export class MediaPlaceholder extends Component {
 
 const applyWithSelect = withSelect( ( select ) => {
 	const { canUser } = select( 'core' );
-	const { getEditorSettings } = select( 'core/block-editor' );
+	const { getSettings } = select( 'core/block-editor' );
 
 	return {
 		hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
-		mediaUpload: getEditorSettings().__experimentalMediaUpload,
+		mediaUpload: getSettings().__experimentalMediaUpload,
 	};
 } );
 

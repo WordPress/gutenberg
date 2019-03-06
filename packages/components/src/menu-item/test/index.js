@@ -9,8 +9,6 @@ import { noop } from 'lodash';
  */
 import { MenuItem } from '../';
 
-jest.mock( '../../button' );
-
 describe( 'MenuItem', () => {
 	it( 'should match snapshot when only label provided', () => {
 		const wrapper = shallow(

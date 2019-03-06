@@ -16,8 +16,9 @@ describe( 'invalid blocks', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'hello' );
 
+		// Press escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 		// Click the 'more options'
-		await page.mouse.move( 200, 300, { steps: 10 } );
 		await page.click( 'button[aria-label="More options"]' );
 
 		// Change to HTML mode and close the options
