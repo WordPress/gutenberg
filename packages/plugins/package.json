@@ -26,13 +26,7 @@
 		"@wordpress/hooks": "file:../hooks",
 		"lodash": "^4.17.11"
 	},
-	"devDependencies": {
-		"@wordpress/docgen": "file:../docgen"
-	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"scripts": {
-		"docs:generate": "docgen ./src/index.js --output ./README.md --to-token"
 	}
 }
