@@ -24,13 +24,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.3.1"
 	},
-	"devDependencies": {
-		"@wordpress/docgen": "file:../docgen"
-	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"scripts": {
-		"docs:generate": "docgen ./src/index.js --output ./README.md --to-token"
 	}
 }

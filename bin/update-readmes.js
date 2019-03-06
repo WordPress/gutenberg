@@ -21,7 +21,7 @@ const packages = [
 	//'edit-post',
 	'element',
 	'escape-html',
-	//'html-entities',
+	'html-entities',
 	//'i18n',
 	//'keycodes',
 	//'plugins',
