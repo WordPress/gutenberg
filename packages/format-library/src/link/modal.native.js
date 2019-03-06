@@ -133,9 +133,9 @@ class ModalLinkUI extends Component {
 						label={ __( 'URL' ) }
 						value={ this.state.inputValue }
 						placeholder={ __( 'Add URL' ) }
-						autoCapitalize="none"
+						autoCapitalize='none'
 						autoCorrect={ false }
-						textContentType="URL"
+						keyboardType='url'
 						onChangeValue={ this.onChangeInputValue }
 						autoFocus={ Platform.OS === 'ios' }
 					/>
