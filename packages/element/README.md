@@ -97,7 +97,7 @@ Creates a copy of an element with extended props.
 
 **Returns**
 
-`WPElement` Cloned element.
+`WPElement`: Cloned element.
 
 ### Component
 
@@ -117,7 +117,7 @@ Concatenate two or more React children objects.
 
 **Returns**
 
-`Array` The concatenated value.
+`Array`: The concatenated value.
 
 ### createContext
 
@@ -131,7 +131,7 @@ Creates a context object containing two components: a provider and consumer.
 
 **Returns**
 
-`Object` Context object.
+`Object`: Context object.
 
 ### createElement
 
@@ -148,7 +148,7 @@ another function which itself returns an element.
 
 **Returns**
 
-`WPElement` Element.
+`WPElement`: Element.
 
 ### createPortal
 
@@ -175,7 +175,7 @@ type of element rendered with the ref attribute.
 
 **Returns**
 
-`Object` Ref object.
+`Object`: Ref object.
 
 ### findDOMNode
 
@@ -203,7 +203,7 @@ component which forwards its ref.
 
 **Returns**
 
-`WPComponent` Enhanced component.
+`WPComponent`: Enhanced component.
 
 ### Fragment
 
@@ -223,7 +223,7 @@ Checks if the provided WP element is empty.
 
 **Returns**
 
-`boolean` True when an element is considered empty.
+`boolean`: True when an element is considered empty.
 
 ### isValidElement
 
@@ -237,7 +237,7 @@ Checks if an object is a valid WPElement
 
 **Returns**
 
-`boolean` true if objectToTest is a valid WPElement and false otherwise.
+`boolean`: true if objectToTest is a valid WPElement and false otherwise.
 
 ### RawHTML
 
@@ -254,7 +254,7 @@ aside from `children` are passed.
 
 **Returns**
 
-`WPElement` Dangerously-rendering element.
+`WPElement`: Dangerously-rendering element.
 
 ### render
 
@@ -281,7 +281,7 @@ Serializes a React element to string.
 
 **Returns**
 
-`string` Serialized element.
+`string`: Serialized element.
 
 ### StrictMode
 
@@ -302,7 +302,7 @@ Switches the nodeName of all the elements in the children object.
 
 **Returns**
 
-`?Object` The updated children object.
+`?Object`: The updated children object.
 
 ### unmountComponentAtNode
 
