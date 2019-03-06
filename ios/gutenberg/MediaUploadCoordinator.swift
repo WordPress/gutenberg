@@ -62,7 +62,7 @@ class MediaUploadCoordinator: NSObject {
     } else if progress.fractionCompleted >= 1 {
       timer.invalidate()
       if successfull {
-        gutenberg.mediaUploadUpdate(id: mediaID, state: .failed, progress: 1, url: mediaURL, serverID: 123)
+        gutenberg.mediaUploadUpdate(id: mediaID, state: .succeeded, progress: 1, url: mediaURL, serverID: 123)
         activeUploads[mediaID] = nil
       } else {
         progress.setUserInfoObject("Network upload failed", forKey: .mediaError)

@@ -6,30 +6,12 @@ public class RCTAztecViewManager: RCTViewManager {
 
     public var attachmentDelegate: Aztec.TextViewAttachmentDelegate?
     public var imageProvider: Aztec.TextViewAttachmentImageProvider?
+    public lazy var unsupportedHTMLImageProvider = {
+        Aztec.HTMLAttachmentRenderer(font: defaultFont)
+    }()
 
     public override static func requiresMainQueueSetup() -> Bool {
         return true
-    }
-
-    @objc
-    func applyFormat(_ node: NSNumber, format: String) {
-        executeBlock({ (aztecView) in
-            aztecView.apply(format: format)
-        }, onNode: node)
-    }
-
-    @objc
-    func removeLink(_ node: NSNumber) {
-        executeBlock({ (aztecView) in
-            aztecView.removeLink()
-        }, onNode: node)
-    }
-
-    @objc
-    func setLink(_ node: NSNumber, url: String, title: String?) {
-        executeBlock({ (aztecView) in
-            aztecView.setLink(with: url, and: title)
-        }, onNode: node)
     }
 
     @objc
@@ -42,9 +24,12 @@ public class RCTAztecViewManager: RCTViewManager {
         view.isScrollEnabled = false
 
         view.textAttachmentDelegate = attachmentDelegate
+        
         if let imageProvider = imageProvider {
             view.registerAttachmentImageProvider(imageProvider)
         }
+        
+        view.registerAttachmentImageProvider(unsupportedHTMLImageProvider)
 
         return view
     }
