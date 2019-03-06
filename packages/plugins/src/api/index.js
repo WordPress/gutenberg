@@ -106,6 +106,12 @@ export function registerPlugin( name, settings ) {
  *
  * @param {string} name Plugin name.
  *
+ * @example
+ * ```js
+ * const { unregisterPlugin } = wp.plugins;
+ * unregisterPlugin( 'plugin-name' );
+ * ```
+ *
  * @return {?WPPlugin} The previous plugin settings object, if it has been
  *                     successfully unregistered; otherwise `undefined`.
  */

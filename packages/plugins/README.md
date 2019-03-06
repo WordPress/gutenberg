@@ -102,6 +102,13 @@ registerPlugin( 'plugin-name', {
 
 Unregisters a plugin by name.
 
+**Usage**
+
+```js
+const { unregisterPlugin } = wp.plugins;
+unregisterPlugin( 'plugin-name' );
+```
+
 **Parameters**
 
 -   **name** `string`: Plugin name.
