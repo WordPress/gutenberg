@@ -65,6 +65,10 @@ class Extend_Styles_Test extends WP_UnitTestCase {
 				$this->original_file = $path . '.bak';
 			}
 		} elseif ( $should_exist ) {
+			if ( ! is_dir( dirname( $path ) ) ) {
+				mkdir( $path );
+			}
+
 			$this->style_contents = '';
 			file_put_contents( $path, $this->style_contents );
 			$this->original_file = null;
