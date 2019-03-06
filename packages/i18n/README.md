@@ -69,7 +69,7 @@ original format string is returned.
 **Parameters**
 
 -   **format** `string`: The format of the string to generate.
--   **args** `Array<string>`: Arguments to apply to the format.
+-   **args** `...string`: Arguments to apply to the format.
 
 **Returns**
 
