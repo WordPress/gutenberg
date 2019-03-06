@@ -22,7 +22,7 @@ const packages = [
 	'element',
 	'escape-html',
 	'html-entities',
-	//'i18n',
+	'i18n',
 	'keycodes',
 	//'plugins',
 	//'priority-queue',
