@@ -730,7 +730,7 @@
 
 	// Hide both the button until hovered.
 	opacity: 0;
-	transition: opacity 0.1s linear 0.1s;
+	transition: opacity 0.1s linear;
 
 	&:hover,
 	&.is-visible {
