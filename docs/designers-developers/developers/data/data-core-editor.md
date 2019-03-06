@@ -200,7 +200,7 @@ null if there is no autosave for the post.
 
 *Deprecated*
 
-Deprecated since 5.0. Callers should use the `getAutosave( postType, postId )` selector from the
+Deprecated since 5.3. Callers should use the `getAutosave( postType, postId )` selector from the
             '@wordpress/core-data' package and access properties on the returned autosave object
             using getPostRawValue.
 
@@ -323,7 +323,7 @@ autosave).
 
 *Deprecated*
 
-Deprecated since 5.0. Callers should use the `getAutosave( postType, postId )`
+Deprecated since 5.3. Callers should use the `getAutosave( postType, postId )`
 			   selector from the '@wordpress/core-data' package.
 
 *Parameters*
@@ -340,7 +340,7 @@ Returns the true if there is an existing autosave, otherwise false.
 
 *Deprecated*
 
-Deprecated since 5.0. Callers should use the `getAutosave( postType, postId )` selector
+Deprecated since 5.3. Callers should use the `getAutosave( postType, postId )` selector
             from the '@wordpress/core-data' package and check for a truthy value.
 
 *Parameters*
@@ -776,7 +776,7 @@ post has been received, by initialization or autosave.
 
 *Deprecated*
 
-Deprecated since 5.0. Callers should use the `receiveAutosave( postId, autosave )`
+Deprecated since 5.3. Callers should use the `receiveAutosave( postId, autosave )`
 			   selector from the '@wordpress/core-data' package.
 
 *Parameters*

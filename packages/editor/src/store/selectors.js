@@ -326,7 +326,7 @@ export function getEditedPostAttribute( state, attributeName ) {
  * Returns an attribute value of the current autosave revision for a post, or
  * null if there is no autosave for the post.
  *
- * @deprecated since 5.0. Callers should use the `getAutosave( postType, postId )` selector from the
+ * @deprecated since 5.3. Callers should use the `getAutosave( postType, postId )` selector from the
  *             '@wordpress/core-data' package and access properties on the returned autosave object
  *             using getPostRawValue.
  *
@@ -563,7 +563,7 @@ export const isEditedPostAutosaveable = createRegistrySelector( ( select ) => fu
  * has yet to be autosaved, or has been saved or published since the last
  * autosave).
  *
- * @deprecated since 5.0. Callers should use the `getAutosave( postType, postId )`
+ * @deprecated since 5.3. Callers should use the `getAutosave( postType, postId )`
  * 			   selector from the '@wordpress/core-data' package.
  *
  * @param {Object} state Editor state.
@@ -585,7 +585,7 @@ export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
 /**
  * Returns the true if there is an existing autosave, otherwise false.
  *
- * @deprecated since 5.0. Callers should use the `getAutosave( postType, postId )` selector
+ * @deprecated since 5.3. Callers should use the `getAutosave( postType, postId )` selector
  *             from the '@wordpress/core-data' package and check for a truthy value.
  *
  * @param {Object} state Global application state.
