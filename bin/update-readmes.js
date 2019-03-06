@@ -11,7 +11,7 @@ const packages = [
 	//'block-library',
 	//'block-serialization-default-parser',
 	//'blocks',
-	//'compose',
+	'compose',
 	//'data',
 	//'date',
 	//'deprecated',
