@@ -107,6 +107,22 @@ export const dispatch = defaultRegistry.dispatch;
  * ```
  */
 export const subscribe = defaultRegistry.subscribe;
+
+/**
+* Registers a generic store.
+*
+* @param {string} key    Store registry key.
+* @param {Object} config Configuration (getSelectors, getActions, subscribe).
+*/
 export const registerGenericStore = defaultRegistry.registerGenericStore;
+
+/**
+ * Registers a standard `@wordpress/data` store.
+ *
+ * @param {string} reducerKey Reducer key.
+ * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
+ *
+ * @return {Object} Registered store object.
+ */
 export const registerStore = defaultRegistry.registerStore;
 export const use = defaultRegistry.use;

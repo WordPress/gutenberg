@@ -366,15 +366,29 @@ Undocumented declaration.
 
 ### registerGenericStore
 
-[src/index.js#L109-L109](src/index.js#L109-L109)
+[src/index.js#L116-L116](src/index.js#L116-L116)
 
-Undocumented declaration.
+Registers a generic store.
+
+**Parameters**
+
+-   **key** `string`: Store registry key.
+-   **config** `Object`: Configuration (getSelectors, getActions, subscribe).
 
 ### registerStore
 
-[src/index.js#L110-L110](src/index.js#L110-L110)
+[src/index.js#L126-L126](src/index.js#L126-L126)
 
-Undocumented declaration.
+Registers a standard `@wordpress/data` store.
+
+**Parameters**
+
+-   **reducerKey** `string`: Reducer key.
+-   **options** `Object`: Store description (reducer, actions, selectors, resolvers).
+
+**Returns**
+
+`Object`: Registered store object.
 
 ### RegistryConsumer
 
@@ -436,7 +450,7 @@ unsubscribe();
 
 ### use
 
-[src/index.js#L111-L111](src/index.js#L111-L111)
+[src/index.js#L127-L127](src/index.js#L127-L127)
 
 Undocumented declaration.
 
