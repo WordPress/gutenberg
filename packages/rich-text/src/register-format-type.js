@@ -139,7 +139,7 @@ export function registerFormatType( name, settings ) {
 	} );
 
 	if (
-		settings.__experimentalGetPropsForEditableTreePreparation
+		settings.__experimentalCreatePrepareEditableTree
 	) {
 		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
 			let Component = OriginalComponent;
@@ -193,8 +193,10 @@ export function registerFormatType( name, settings ) {
 				};
 			}
 
-			const hocs = [
-				withSelect( ( sel, { clientId, identifier } ) => ( {
+			const hocs = [];
+
+			if ( settings.__experimentalGetPropsForEditableTreePreparation ) {
+				hocs.push( withSelect( ( sel, { clientId, identifier } ) => ( {
 					[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation(
 						sel,
 						{
@@ -202,8 +204,8 @@ export function registerFormatType( name, settings ) {
 							blockClientId: clientId,
 						}
 					),
-				} ) ),
-			];
+				} ) ) );
+			}
 
 			if ( settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
 				hocs.push( withDispatch( ( disp, { clientId, identifier } ) => {
