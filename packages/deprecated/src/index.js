@@ -21,6 +21,20 @@ export const logged = Object.create( null );
  * @param {?string} options.plugin      Plugin name if it's a plugin feature
  * @param {?string} options.link        Link to documentation
  * @param {?string} options.hint        Additional message to help transition away from the deprecated feature.
+ *
+ * @example
+ * ```js
+ * import deprecated from '@wordpress/deprecated';
+ *
+ * deprecated( 'Eating meat', {
+ * 	version: 'the future',
+ * 	alternative: 'vegetables',
+ * 	plugin: 'the earth',
+ * 	hint: 'You may find it beneficial to transition gradually.',
+ * } );
+ *
+ * // Logs: 'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
+ * ```
  */
 export default function deprecated( feature, options = {} ) {
 	const {
