@@ -26,7 +26,7 @@ Get the rectangle for the selection in a container.
 
 **Returns**
 
-`?DOMRect` The rectangle.
+`?DOMRect`: The rectangle.
 
 ### documentHasSelection
 
@@ -37,7 +37,7 @@ This checks both for focus in an input field and general text selection.
 
 **Returns**
 
-`boolean` True if there is selection, false if not.
+`boolean`: True if there is selection, false if not.
 
 ### focus
 
@@ -63,7 +63,7 @@ limited to HTMLElement and accepts any Node (e.g. Node.TEXT_NODE).
 
 **Returns**
 
-`?Node` Offset parent.
+`?Node`: Offset parent.
 
 ### getRectangleFromRange
 
@@ -77,7 +77,7 @@ Get the rectangle of a given Range.
 
 **Returns**
 
-`DOMRect` The rectangle.
+`DOMRect`: The rectangle.
 
 ### getScrollContainer
 
@@ -91,7 +91,7 @@ Given a DOM node, finds the closest scrollable container node.
 
 **Returns**
 
-`?Element` Scrollable container node, if found.
+`?Element`: Scrollable container node, if found.
 
 ### insertAfter
 
@@ -107,7 +107,7 @@ the latter.
 
 **Returns**
 
-`void` 
+`void`: 
 
 ### isEntirelySelected
 
@@ -122,7 +122,7 @@ Returns true if there is no possibility of selection.
 
 **Returns**
 
-`boolean` True if entirely selected, false if not.
+`boolean`: True if entirely selected, false if not.
 
 ### isHorizontalEdge
 
@@ -137,7 +137,7 @@ Check whether the selection is horizontally at the edge of the container.
 
 **Returns**
 
-`boolean` True if at the horizontal edge, false if not.
+`boolean`: True if at the horizontal edge, false if not.
 
 ### isTextField
 
@@ -154,7 +154,7 @@ See: <https://html.spec.whatwg.org/#textFieldSelection>
 
 **Returns**
 
-`boolean` True if the element is an text field, false if not.
+`boolean`: True if the element is an text field, false if not.
 
 ### isVerticalEdge
 
@@ -169,7 +169,7 @@ Check whether the selection is vertically at the edge of the container.
 
 **Returns**
 
-`boolean` True if at the edge, false if not.
+`boolean`: True if at the edge, false if not.
 
 ### placeCaretAtHorizontalEdge
 
@@ -207,7 +207,7 @@ Given a DOM node, removes it from the DOM.
 
 **Returns**
 
-`void` 
+`void`: 
 
 ### replace
 
@@ -222,7 +222,7 @@ Given two DOM nodes, replaces the former with the latter in the DOM.
 
 **Returns**
 
-`void` 
+`void`: 
 
 ### replaceTag
 
@@ -237,7 +237,7 @@ Replaces the given node with a new node with the given tag name.
 
 **Returns**
 
-`Element` The new node.
+`Element`: The new node.
 
 ### unwrap
 
@@ -251,7 +251,7 @@ Unwrap the given node. This means any child nodes are moved to the parent.
 
 **Returns**
 
-`void` 
+`void`: 
 
 ### wrap
 
