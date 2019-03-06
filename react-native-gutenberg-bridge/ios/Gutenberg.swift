@@ -108,9 +108,8 @@ extension Gutenberg: RCTBridgeDelegate {
     public func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {
         let aztecManager = RCTAztecViewManager()
         aztecManager.attachmentDelegate = dataSource.aztecAttachmentDelegate()
-        var modules:[RCTBridgeModule] = [bridgeModule, aztecManager]
-        modules.append(contentsOf: extraModules)
-        return modules
+        let baseModules:[RCTBridgeModule] = [bridgeModule, aztecManager]
+        return baseModules + extraModules
     }
 }
 
