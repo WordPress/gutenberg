@@ -111,7 +111,7 @@ class ModalLinkUI extends Component {
 	}
 
 	onDismiss() {
-		if( this.state.inputValue === '') {
+		if ( this.state.inputValue === '' ) {
 			this.removeLink();
 		} else {
 			this.submitLink();
@@ -133,9 +133,9 @@ class ModalLinkUI extends Component {
 						label={ __( 'URL' ) }
 						value={ this.state.inputValue }
 						placeholder={ __( 'Add URL' ) }
-						autoCapitalize='none'
+						autoCapitalize="none"
 						autoCorrect={ false }
-						keyboardType='url'
+						keyboardType="url"
 						onChangeValue={ this.onChangeInputValue }
 						autoFocus={ Platform.OS === 'ios' }
 					/>
