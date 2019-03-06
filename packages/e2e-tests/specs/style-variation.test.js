@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost, insertBlock, getEditedPostContent } from '@wordpress/e2e-test-utils';
+import {
+	createNewPost,
+	clickBlockToolbarButton,
+	insertBlock,
+	getEditedPostContent,
+} from '@wordpress/e2e-test-utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
@@ -13,12 +18,8 @@ describe( 'adding blocks', () => {
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'Quote content' );
 
-		// Press escape to show the block toolbar
-		await page.keyboard.press( 'Escape' );
+		await clickBlockToolbarButton( 'Change block type' );
 
-		// Use a different style variation
-		await page.waitForSelector( 'button[aria-label="Change block type"]' );
-		await page.click( 'button[aria-label="Change block type"]' );
 		const styleVariations = await page.$$( '.editor-block-styles__item' );
 		await styleVariations[ 1 ].click();
 
