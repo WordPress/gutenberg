@@ -1,0 +1,24 @@
+{
+	"name": "core/search",
+	"title": "Search",
+	"category": "widgets",
+	"icon": "search",
+	"description": "Help visitors find your content.",
+	"keywords": [ "find" ],
+	"attributes": {
+		"label": {
+			"type": "string",
+			"default": "Search"
+		},
+		"placeholder": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonText": {
+			"type": "string",
+			"default": "Search"
+		}
+	},
+	"edit": "edit.js",
+	"renderCallback": "index.php"
+}

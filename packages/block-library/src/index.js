@@ -42,7 +42,7 @@ import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 // import * as reusableBlock from './block';
 // import * as rss from './rss';
-import * as search from './search';
+// import * as search from './search';
 import * as separator from './separator';
 // import * as shortcode from './shortcode';
 import * as spacer from './spacer';
@@ -93,7 +93,7 @@ export const registerCoreBlocks = () => {
 		preformatted,
 		pullquote,
 		// rss,
-		search,
+		// search,
 		separator,
 		// reusableBlock,
 		spacer,

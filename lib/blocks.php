@@ -50,6 +50,8 @@ function gutenberg_override_core_blocks() {
 		'latest-comments',
 		'latest-posts',
 		'rss',
+		'search',
+		'shortcode',
 		'tag-cloud'
 	);
 
