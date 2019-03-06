@@ -56,12 +56,41 @@ A component that renders all plugin fills in a hidden div.
 
 Registers a plugin to the editor.
 
+**Usage**
+
+```js
+const { Fragment } = wp.element;
+const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
+const { registerPlugin } = wp.plugins;
+
+const Component = () => (
+	<Fragment>
+		<PluginSidebarMoreMenuItem
+			target="sidebar-name"
+		>
+			My Sidebar
+		</PluginSidebarMoreMenuItem>
+		<PluginSidebar
+			name="sidebar-name"
+			title="My Sidebar"
+		>
+			Content of the sidebar
+		</PluginSidebar>
+	</Fragment>
+);
+
+registerPlugin( 'plugin-name', {
+	icon: 'smiley',
+	render: Component,
+} );
+```
+
 **Parameters**
 
--   **name** `string`: The name of the plugin.
+-   **name** `string`: A string identifying the plugin. Must be unique across all registered plugins.
 -   **settings** `Object`: The settings for this plugin.
--   **settings.render** `Function`: The function that renders the plugin.
--   **settings.icon** `(string|WPElement|Function)`: An icon to be shown in the UI.
+-   **settings.icon** `(string|WPElement|Function)`: An icon to be shown in the UI. It can be a slug of the Dashicon, or an element (or function returning an element) if you choose to render your own SVG.
+-   **settings.render** `Function`: A component containing the UI elements to be rendered.
 
 **Returns**
 
