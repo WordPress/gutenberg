@@ -16,7 +16,7 @@ const packages = [
 	//'date',
 	//'deprecated',
 	'dom',
-	//'dom-ready',
+	'dom-ready',
 	'e2e-test-utils',
 	//'edit-post',
 	'element',
