@@ -39,6 +39,7 @@ class ModalLinkUI extends Component {
 		this.onChangeText = this.onChangeText.bind( this );
 		this.onChangeOpensInNewWindow = this.onChangeOpensInNewWindow.bind( this );
 		this.removeLink = this.removeLink.bind( this );
+		this.onDismiss = this.onDismiss.bind( this );
 
 		this.state = {
 			inputValue: '',
@@ -109,13 +110,21 @@ class ModalLinkUI extends Component {
 		this.props.onClose();
 	}
 
+	onDismiss() {
+		if( this.state.inputValue === '') {
+			this.removeLink();
+		} else {
+			this.submitLink();
+		}
+	}
+
 	render() {
 		const { isVisible } = this.props;
 
 		return (
 			<BottomSheet
 				isVisible={ isVisible }
-				onClose={ this.submitLink }
+				onClose={ this.onDismiss }
 				hideHeader
 			>
 				{ /* eslint-disable jsx-a11y/no-autofocus */
