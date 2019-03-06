@@ -5,6 +5,7 @@ const childProcess = require( 'child_process' );
 
 const packages = [
 	'e2e-test-utils',
+	'element',
 ];
 
 let aggregatedExitCode = 0;
