@@ -54,7 +54,7 @@ const topLevelIsResolved = ( state = {}, action ) => {
 	switch ( action.type ) {
 		case 'INVALIDATE_RESOLUTION_FOR_STORE':
 			return has( state, action.reducerKey ) ?
-				omit( state, action.reducerKey ) :
+				omit( state, [ action.reducerKey ] ) :
 				state;
 		case 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR':
 			return has( state, [ action.reducerKey, action.selectorName ] ) ?
@@ -62,7 +62,7 @@ const topLevelIsResolved = ( state = {}, action ) => {
 					...state,
 					[ action.reducerKey ]: omit(
 						state[ action.reducerKey ],
-						action.selectorName
+						[ action.selectorName ]
 					),
 				} :
 				state;
