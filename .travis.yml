@@ -34,9 +34,11 @@ jobs:
       install:
         - npm ci
       script:
-        - npm run lint
-        - npm run check-local-changes
-        - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+        - $( npm bin )/concurrently --kill-others-on-fail \
+          "npm run lint" \
+          "npm run check-local-changes" \
+          "npm run check-licenses" \
+          "npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory=\"$HOME/.jest-cache\""
 
     - name: PHP unit tests (Docker)
       env: WP_VERSION=latest DOCKER=true
