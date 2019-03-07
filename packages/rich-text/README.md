@@ -128,24 +128,6 @@ none are provided.
 
 `Object`: A new value with the value inserted.
 
-### insertLineSeparator
-
-[src/index.js#L23-L23](src/index.js#L23-L23)
-
-Insert a line break character into a Rich Text value at the given
-`startIndex`. Any content between `startIndex` and `endIndex` will be
-removed. Indices are retrieved from the selection if none are provided.
-
-**Parameters**
-
--   **value** `Object`: Value to modify.
--   **startIndex** `[number]`: Start index.
--   **endIndex** `[number]`: End index.
-
-**Returns**
-
-`Object`: A new value with the value inserted.
-
 ### insertObject
 
 [src/index.js#L24-L24](src/index.js#L24-L24)
@@ -197,21 +179,6 @@ objects (such as images).
 
 `boolean`: True if the value is empty, false if not.
 
-### isEmptyLine
-
-[src/index.js#L15-L15](src/index.js#L15-L15)
-
-Check if the current collapsed selection is on an empty line in case of a
-multiline value.
-
-**Parameters**
-
--   **value** `Object`: Value te check.
-
-**Returns**
-
-`boolean`: True if the line is empty, false if not.
-
 ### join
 
 [src/index.js#L16-L16](src/index.js#L16-L16)
@@ -228,12 +195,6 @@ string. This is similar to `Array.prototype.join`.
 **Returns**
 
 `Object`: A new combined value.
-
-### LINE_SEPARATOR
-
-[src/index.js#L30-L30](src/index.js#L30-L30)
-
-Line separator character.
 
 ### registerFormatType
 
