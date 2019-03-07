@@ -337,6 +337,7 @@ function createFromElement( {
 				multilineTag,
 				multilineWrapperTags,
 				currentWrapperTags: [ ...currentWrapperTags, format ],
+				isEditableTree,
 			} );
 			format = undefined;
 		} else {
@@ -345,6 +346,7 @@ function createFromElement( {
 				range,
 				multilineTag,
 				multilineWrapperTags,
+				isEditableTree,
 			} );
 		}
 
@@ -423,6 +425,7 @@ function createFromMultilineElement( {
 	multilineTag,
 	multilineWrapperTags,
 	currentWrapperTags = [],
+	isEditableTree,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -446,6 +449,7 @@ function createFromMultilineElement( {
 			multilineTag,
 			multilineWrapperTags,
 			currentWrapperTags,
+			isEditableTree,
 		} );
 
 		// Multiline value text should be separated by a double line break.
