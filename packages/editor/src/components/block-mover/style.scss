@@ -43,7 +43,8 @@
 	}
 
 	// Nested movers have a background, so don't invert the colors there.
-	.is-dark-theme .wp-block .wp-block & {
+	.is-dark-theme .wp-block .wp-block &,
+	.wp-block .is-dark-theme .wp-block & {
 		color: $dark-opacity-300;
 	}
 
@@ -79,7 +80,8 @@
 		}
 
 		// Nested movers have a background, so don't invert the colors there.
-		.is-dark-theme .wp-block .wp-block & {
+		.is-dark-theme .wp-block .wp-block &,
+		.wp-block .is-dark-theme .wp-block & {
 			color: $dark-opacity-500;
 		}
 	}

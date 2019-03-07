@@ -11,9 +11,9 @@ import { LINE_SEPARATOR } from './special-characters';
  * `startIndex`. Any content between `startIndex` and `endIndex` will be
  * removed. Indices are retrieved from the selection if none are provided.
  *
- * @param {Object} value         Value to modify.
- * @param {number} startIndex    Start index.
- * @param {number} endIndex      End index.
+ * @param {Object} value        Value to modify.
+ * @param {number} [startIndex] Start index.
+ * @param {number} [endIndex]   End index.
  *
  * @return {Object} A new value with the value inserted.
  */
