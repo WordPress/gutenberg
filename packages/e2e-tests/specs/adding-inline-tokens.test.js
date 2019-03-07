@@ -13,6 +13,7 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	createNewPost,
+	clickBlockToolbarButton,
 	clickButton,
 } from '@wordpress/e2e-test-utils';
 
@@ -26,8 +27,7 @@ describe( 'adding inline tokens', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'a ' );
 
-		await page.keyboard.press( 'Escape' );
-		await page.click( '[aria-label="More Rich Text Controls"]' );
+		await clickBlockToolbarButton( 'More Rich Text Controls' );
 		await clickButton( 'Inline Image' );
 
 		// Wait for media modal to appear and upload image.
