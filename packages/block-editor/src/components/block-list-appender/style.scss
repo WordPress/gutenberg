@@ -13,7 +13,8 @@
 	color: $dark-gray-500;
 	background: $dark-opacity-light-200;
 
-	&:hover {
+	&:hover,
+	&:focus {
 		outline: $border-width dashed $dark-gray-500;
 	}
 
@@ -29,7 +30,8 @@
 	background: $light-opacity-light-200;
 	color: $light-gray-100;
 
-	&:hover {
+	&:hover,
+	&:focus {
 		outline: $border-width dashed $white;
 	}
 }
