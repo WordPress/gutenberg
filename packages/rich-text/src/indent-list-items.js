@@ -40,7 +40,7 @@ function getTargetLevelLineIndex( { text, formats }, lineIndex ) {
  * Indents any selected list items if possible.
  *
  * @param {Object} value      Value to change.
- * @param {Object} rootFormat
+ * @param {Object} rootFormat Root format.
  *
  * @return {Object} The changed value.
  */
