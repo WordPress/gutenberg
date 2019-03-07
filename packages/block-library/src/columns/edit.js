@@ -38,30 +38,16 @@ import { getColumnsTemplate } from './utils';
 */
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
-export const ColumnsEdit = function( { attributes, setAttributes, className, childColumns, updateChildColumnsAlignment } ) {
+export const ColumnsEdit = function( { attributes, setAttributes, className, updateAlignment } ) {
 	const { columns, verticalAlignment } = attributes;
-
-	// Do any of the child column have a valign setting that is different to what is currently
-	// set on this parent Columns Block?
-	const childColumnHasOveride = !! childColumns.find( ( childColumn ) => childColumn.attributes.verticalAlignment !== verticalAlignment );
-
-	// If we have an overide then remove the setting on the parent so that the toolbar
-	// no longer displays an alignment. This is inline with behaviour of user land editing
-	// tools such as MS Word...etc
-	if ( childColumnHasOveride ) {
-		setAttributes( { verticalAlignment: null } );
-	}
 
 	const classes = classnames( className, `has-${ columns }-columns`, {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
 	const onChange = ( alignment ) => {
-		// Update self...
-		setAttributes( { verticalAlignment: alignment } );
-
 		// Update all the (immediate) child Column Blocks
-		updateChildColumnsAlignment( alignment );
+		updateAlignment( alignment );
 	};
 
 	return (
@@ -108,7 +94,7 @@ export default compose(
 			childColumns: getBlocksByClientId( clientId )[ 0 ].innerBlocks,
 		};
 	} ),
-	withDispatch( ( dispatch, { childColumns } ) => {
+	withDispatch( ( dispatch, { clientId, childColumns } ) => {
 		return {
 			/**
 			 * Update all child column Blocks with a new
@@ -118,7 +104,13 @@ export default compose(
 			 *
 			 * @param  {string} alignment the vertical alignment setting
 			 */
-			updateChildColumnsAlignment( alignment ) {
+			updateAlignment( alignment ) {
+				// Update self...
+				dispatch( 'core/editor' ).updateBlockAttributes( clientId, {
+					verticalAlignment: alignment,
+				} );
+
+				// Update all child Column Blocks to match
 				childColumns.forEach( ( childColumn ) => {
 					dispatch( 'core/editor' ).updateBlockAttributes( childColumn.clientId, {
 						verticalAlignment: alignment,
