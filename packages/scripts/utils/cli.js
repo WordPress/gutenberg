@@ -25,9 +25,17 @@ const getCliArg = ( arg ) => {
 };
 
 const cleanUpArgs = ( prefixes ) => {
-	return getCliArgs().filter( ( arg ) => {
-		return ! prefixes.some( ( prefix ) => arg.startsWith( prefix ) );
-	} );
+	const cliArgs = getCliArgs();
+	for ( let i = 0; i < cliArgs.length; i++ ) {
+		const cliArg = cliArgs[ i ];
+		const name = cliArg.split( '=' )[ 0 ];
+		for ( const prefix of prefixes ) {
+			if ( name.indexOf( prefix ) !== -1 ) {
+				cliArgs.splice( i, 1 );
+			}
+		}
+	}
+	return cliArgs;
 };
 
 const hasCliArg = ( arg ) => getCliArg( arg ) !== undefined;
