@@ -34,7 +34,8 @@ describe( 'BlockVerticalAlignmentToolbar', () => {
 	} );
 
 	it( 'should call onChange with alignment value when the control is inactive', () => {
-		const inactiveCenterControl = controls.find( ( { title } ) => title.toLowerCase().includes( 'middle' ) ); // note "middle" alias for "center"
+		// note "middle" alias for "center"
+		const inactiveCenterControl = controls.find( ( { title } ) => title.toLowerCase().includes( 'middle' ) );
 
 		inactiveCenterControl.onClick();
 
