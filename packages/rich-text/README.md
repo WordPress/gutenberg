@@ -124,21 +124,6 @@ Get the textual content of a Rich Text value. This is similar to
 
 `string`: The text content.
 
-### indentListItems
-
-[src/index.js#L32-L32](src/index.js#L32-L32)
-
-Indents any selected list items if possible.
-
-**Parameters**
-
--   **value** `Object`: Value to change.
--   **rootFormat** `Object`: 
-
-**Returns**
-
-`Object`: The changed value.
-
 ### insert
 
 [src/index.js#L21-L21](src/index.js#L21-L21)
@@ -265,20 +250,6 @@ string. This is similar to `Array.prototype.join`.
 [src/index.js#L30-L30](src/index.js#L30-L30)
 
 Undocumented declaration.
-
-### outdentListItems
-
-[src/index.js#L33-L33](src/index.js#L33-L33)
-
-Outdents any selected list items if possible.
-
-**Parameters**
-
--   **value** `Object`: Value to change.
-
-**Returns**
-
-`Object`: The changed value.
 
 ### registerFormatType
 
