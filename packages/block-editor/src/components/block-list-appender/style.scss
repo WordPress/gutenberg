@@ -24,8 +24,7 @@
 	}
 }
 
-// Cater for dark themes
-// https://wordpress.org/gutenberg/handbook/designers-developers/developers/themes/theme-support/#dark-backgrounds
+// Use opacity to work in various editor styles
 .is-dark-theme .block-list-appender__toggle {
 	background: $light-opacity-light-200;
 	color: $light-gray-100;
