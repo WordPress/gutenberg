@@ -11,7 +11,7 @@
 	outline: $border-width dashed $dark-gray-150;
 	width: 100%;
 	color: $dark-gray-500;
-	background-color: rgba(139, 139, 150, 0.1);
+	background: $dark-opacity-light-200;
 
 	&:hover {
 		outline: $border-width dashed $dark-gray-500;
@@ -20,5 +20,16 @@
 	> span {
 		margin-top: 1em;
 		font-weight: bold;
+	}
+}
+
+// Cater for dark themes
+// https://wordpress.org/gutenberg/handbook/designers-developers/developers/themes/theme-support/#dark-backgrounds
+.is-dark-theme .block-list-appender__toggle {
+	background: $light-opacity-light-200;
+	color: $light-gray-100;
+
+	&:hover {
+		outline: $border-width dashed $white;
 	}
 }
