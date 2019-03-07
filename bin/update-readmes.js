@@ -4,7 +4,7 @@ const path = require( 'path' );
 const childProcess = require( 'child_process' );
 
 const packages = [
-	//'a11y',
+	'a11y',
 	//'autop',
 	//'blob',
 	//'block-editor',
