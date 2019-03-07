@@ -74,6 +74,10 @@ class RCTAztecView: Aztec.TextView {
         )
     }()
 
+    /// If a dictation start with an empty UITextView,
+    /// the dictation engine refreshes the TextView with an empty string when the dictation finishes.
+    /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
+    /// on `textViewDidChange` and `textViewDidChangeSelection`
     private var isInsertingDictationResult = false
     
     // MARK: - Font
@@ -452,15 +456,15 @@ class RCTAztecView: Aztec.TextView {
 extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
+        guard isInsertingDictationResult == false else {
+            return
+        }
+
         propagateSelectionChanges()
     }
 
     func textViewDidChange(_ textView: UITextView) {
-
         guard isInsertingDictationResult == false else {
-            // If a dictation start with an empty UITextView,
-            // the dictation engine refreshes the TextView with an empty string when the dictation finishes.
-            // This avoid propagating that unwanted empty string to RN. (Solving #606)
             return
         }
 
