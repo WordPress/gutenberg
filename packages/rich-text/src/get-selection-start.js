@@ -5,7 +5,7 @@
  *
  * @param {Object} value Value to get the selection from.
  *
- * @return {?number} Index where the selection starts.
+ * @return {number|undefined} Index where the selection starts.
  */
 export function getSelectionStart( { start } ) {
 	return start;

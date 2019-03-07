@@ -10,8 +10,8 @@ import { normaliseFormats } from './normalise-formats';
  * `separator`, which can be a Rich Text value, HTML string, or plain text
  * string. This is similar to `Array.prototype.join`.
  *
- * @param {Array}         values    An array of values to join.
- * @param {?(string|Object)} separator Separator string or value.
+ * @param {Array<Object>} values      An array of values to join.
+ * @param {string|Object} [separator] Separator string or value.
  *
  * @return {Object} A new combined value.
  */
