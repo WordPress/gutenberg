@@ -3,6 +3,7 @@
  */
 import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
+import { indexOf } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -69,6 +70,10 @@ const gutenbergFormatNamesToAztec = {
 	'core/strikethrough': 'strikethrough',
 };
 
+const headingTags = [
+	'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+];
+
 export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
@@ -98,11 +103,11 @@ export class RichText extends Component {
 	getRecord() {
 		const { formatPlaceholder, start, end } = this.state;
 
-		var value = this.props.value === undefined ? null : this.props.value;
+		let value = this.props.value === undefined ? null : this.props.value;
 
 		// Since we get the text selection from Aztec we need to be in sync with the HTML `value`
 		// Removing leading white spaces using `trim()` should make sure this is the case.
-		if (typeof value === 'string' || value instanceof String) {
+		if ( typeof value === 'string' || value instanceof String ) {
 			value = value.trimLeft();
 		}
 
@@ -503,8 +508,21 @@ export class RichText extends Component {
 		const value = this.valueToFormat( record );
 		let html = `<${ tagName }>${ value }</${ tagName }>`;
 		// We need to check if the value is undefined or empty, and then assign it properly otherwise the placeholder is not visible
+
 		if ( value === undefined || value === '' ) {
-			html = '';
+			// PR for placeholder fix https://github.com/WordPress/gutenberg/pull/13699/
+			// has introduced heading issue on Android https://github.com/wordpress-mobile/gutenberg-mobile/issues/627
+			// ( If a new heading block is created on Android device
+			// it will be without default formatting ( <h2> currently ) ) .
+			// Fix for heading issue is to skip reset of html variable if tag is heading and platform is Android.
+			// This fix will intentionally introduce original issue with placeholder (on Android)
+			// which has lower priority then heading issue .
+			// New issue is raised : https://github.com/wordpress-mobile/gutenberg-mobile/issues/707
+			const index = indexOf( headingTags, tagName );
+			if ( this.isIOS || index === -1 ) {
+				html = '';
+			}
+
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
 		let minHeight = 0;
