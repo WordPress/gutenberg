@@ -68,8 +68,7 @@ to modify without the use of helper functions:
 {
   text: string,
   formats: Array,
-  objects: Array,
-  lines: Array,
+  replacements: Array,
   ?start: number,
   ?end: number,
 }
