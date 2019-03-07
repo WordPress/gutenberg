@@ -24,10 +24,12 @@
 	},
 	"files": [
 		"build",
-		"build-module"
+		"build-module",
+		"types.d.ts"
 	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"types": "types.d.ts",
 	"dependencies": {
 		"@babel/runtime": "^7.3.1",
 		"jest-matcher-utils": "^24.0.0",
