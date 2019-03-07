@@ -41,7 +41,7 @@ const getArgsForPackage = ( packageName ) => {
 				`packages/${ packageName }/src/index.js`,
 				`--output packages/${ packageName }/README.md`,
 				'--to-token',
-				'--ignore "unstable|experimental|^apply$|^changeListType$|^chartAt$|^getSelectionStart$|^getSelectionEnd$|^indentListItems$|^insertLineBreak$|^outdentListItems$"',
+				'--ignore "unstable|experimental|^apply$|^changeListType$|^charAt$|^getSelectionStart$|^getSelectionEnd$|^indentListItems$|^insertLineBreak$|^outdentListItems$"',
 			];
 		default:
 			return [
