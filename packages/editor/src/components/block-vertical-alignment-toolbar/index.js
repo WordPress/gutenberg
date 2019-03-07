@@ -15,17 +15,14 @@ import { alignTop, alignCenter, alignBottom } from './icons';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	top: {
-		_id: 'top',
 		icon: alignTop,
 		title: _x( 'Vertically Align Top', 'Block vertical alignment setting' ),
 	},
 	center: {
-		_id: 'center',
 		icon: alignCenter,
 		title: _x( 'Vertically Align Middle', 'Block vertical alignment setting' ),
 	},
 	bottom: {
-		_id: 'bottom',
 		icon: alignBottom,
 		title: _x( 'Vertically Align Bottom', 'Block vertical alignment setting' ),
 	},

@@ -25,7 +25,7 @@ describe( 'BlockVerticalAlignmentToolbar', () => {
 	} );
 
 	it( 'should call onChange with undefined, when the control is already active', () => {
-		const activeControl = controls.find( ( { _id } ) => _id === alignment );
+		const activeControl = controls.find( ( { title } ) => title.toLowerCase().includes( alignment ) );
 		activeControl.onClick();
 
 		expect( activeControl.isActive ).toBe( true );
@@ -34,7 +34,7 @@ describe( 'BlockVerticalAlignmentToolbar', () => {
 	} );
 
 	it( 'should call onChange with alignment value when the control is inactive', () => {
-		const inactiveCenterControl = controls.find( ( { _id } ) => _id === 'center' );
+		const inactiveCenterControl = controls.find( ( { title } ) => title.toLowerCase().includes( 'middle' ) ); // note "middle" alias for "center"
 
 		inactiveCenterControl.onClick();
 
