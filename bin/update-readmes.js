@@ -7,7 +7,7 @@ const packages = [
 	'a11y',
 	'autop',
 	'blob',
-	//'block-editor',
+	'block-editor',
 	'block-library',
 	//'block-serialization-default-parser',
 	//'blocks',
