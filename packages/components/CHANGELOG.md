@@ -14,6 +14,7 @@
 
 - Resolves a conflict where two instance of Slot would produce an inconsistent or duplicated rendering output.
 - Allow years between 0 and 1970 in DateTime component.
+- Fix a bug that made `RangeControl` not work as expected with float values; Started relying on the browser validations instead of our own.
 
 ### New Feature
 
