@@ -33,7 +33,13 @@ module.exports = {
 
 		return {
 			ImportDeclaration( node ) {
+				// Only lint imports that don't specify variable names.
 				if ( node.specifiers && node.specifiers.length ) {
+					return;
+				}
+
+				// Ignore stylesheet imports.
+				if ( /\.scss$/.test( node.source.value ) ) {
 					return;
 				}
 
