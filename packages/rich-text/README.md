@@ -233,7 +233,7 @@ string. This is similar to `Array.prototype.join`.
 
 [src/index.js#L30-L30](src/index.js#L30-L30)
 
-Keycode for line separator.
+Line separator character.
 
 ### registerFormatType
 
