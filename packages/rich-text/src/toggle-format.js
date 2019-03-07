@@ -9,8 +9,8 @@ import { applyFormat } from './apply-format';
 /**
  * Toggles a format object to a Rich Text value at the current selection.
  *
- * @param {Object} value      Value to modify.
- * @param {Object} format     Format to apply or remove.
+ * @param {Object} value  Value to modify.
+ * @param {Object} format Format to apply or remove.
  *
  * @return {Object} A new value with the format applied or removed.
  */
