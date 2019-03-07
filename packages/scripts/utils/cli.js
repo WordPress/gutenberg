@@ -25,7 +25,7 @@ const getCliArg = ( arg ) => {
 };
 
 const cleanUpArgs = ( prefixes ) => {
-	return getCliArgs().filter( ( arg ) =>  {
+	return getCliArgs().filter( ( arg ) => {
 		return ! prefixes.some( ( prefix ) => arg.startsWith( prefix ) );
 	} );
 };
