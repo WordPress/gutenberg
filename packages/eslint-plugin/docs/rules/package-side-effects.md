@@ -10,7 +10,7 @@ This linter rule enforces this by detecting package-level side effects and check
 
 Examples of **incorrect** code for this rule:
 
-`src/index.js`
+This example shows side effects introduced in a file `src/index.js`.
 ```js
 // Module imports can introduce side effects.
 import 'module-with-side-effects';
@@ -19,29 +19,10 @@ import 'module-with-side-effects';
 window.addEventListener( 'resize', handleResize );
 registerStore( store );
 ```
-
-`package.json`
-```json
-{
-	// ...
-	"sideEffects": false,
-}
-```
-
 
 Examples of **correct** code for this rule:
 
-`src/index.js`
-```js
-// Module imports can introduce side effects.
-import 'module-with-side-effects';
-
-// Function calls can introduce side effects when the return value is not used.
-window.addEventListener( 'resize', handleResize );
-registerStore( store );
-```
-
-`package.json`
+Adding the `src/index.js` file to the `package.json` resolves the issue.
 ```json
 {
 	// ...
