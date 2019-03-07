@@ -4,17 +4,10 @@
 import {
 	createNewPost,
 	insertBlock,
-	pressKeyWithModifier,
+	navigateToContentEditorTop,
+	tabThroughBlockMoverControl,
+	tabThroughBlockToolbar,
 } from '@wordpress/e2e-test-utils';
-
-const navigateToContentEditorTop = async () => {
-	// Use 'Ctrl+`' to return to the top of the editor
-	await pressKeyWithModifier( 'ctrl', '`' );
-	await pressKeyWithModifier( 'ctrl', '`' );
-
-	// Tab into the Title block
-	await page.keyboard.press( 'Tab' );
-};
 
 const tabThroughParagraphBlock = async ( paragraphText ) => {
 	// Tab to the next paragraph block
@@ -48,39 +41,6 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 		() => document.activeElement.innerHTML
 	);
 	await expect( paragraphEditableContent ).toBe( paragraphText );
-};
-
-const tabThroughBlockMoverControl = async () => {
-	// Tab to focus on the 'move up' control
-	await page.keyboard.press( 'Tab' );
-	const isFocusedMoveUpControl = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'editor-block-mover__control' )
-	);
-	await expect( isFocusedMoveUpControl ).toBe( true );
-
-	// Tab to focus on the 'move down' control
-	await page.keyboard.press( 'Tab' );
-	const isFocusedMoveDownControl = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'editor-block-mover__control' )
-	);
-	await expect( isFocusedMoveDownControl ).toBe( true );
-};
-
-const tabThroughBlockToolbar = async () => {
-	const blockToolbarButtons = await page.evaluate( () => {
-		// return an array with the classNames of the block toolbar's buttons
-		return [].slice.call(
-			document.querySelectorAll( '.editor-block-contextual-toolbar button' )
-		).map( ( elem ) => elem.className );
-	} );
-
-	for ( const buttonClassName of blockToolbarButtons ) {
-		await page.keyboard.press( 'Tab' );
-		const focusedBlockToolBarButton = await page.evaluate( () =>
-			document.activeElement.className
-		);
-		await expect( focusedBlockToolBarButton ).toEqual( buttonClassName );
-	}
 };
 
 describe( 'Order of block keyboard navigation', () => {
