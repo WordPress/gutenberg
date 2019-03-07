@@ -3,7 +3,6 @@
  */
 import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
-import { indexOf } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -69,10 +68,6 @@ const gutenbergFormatNamesToAztec = {
 	'core/italic': 'italic',
 	'core/strikethrough': 'strikethrough',
 };
-
-const headingTags = [
-	'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-];
 
 export class RichText extends Component {
 	constructor() {
@@ -501,6 +496,7 @@ export class RichText extends Component {
 			style,
 			formattingControls,
 			isSelected,
+			sendEmptyTag,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -518,8 +514,7 @@ export class RichText extends Component {
 			// This fix will intentionally introduce original issue with placeholder (on Android)
 			// which has lower priority then heading issue .
 			// New issue is raised : https://github.com/wordpress-mobile/gutenberg-mobile/issues/707
-			const index = indexOf( headingTags, tagName );
-			if ( this.isIOS || index === -1 ) {
+			if ( ! sendEmptyTag ) {
 				html = '';
 			}
 
