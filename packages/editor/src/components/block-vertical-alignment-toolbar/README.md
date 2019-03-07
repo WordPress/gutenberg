@@ -45,7 +45,7 @@ registerBlockType( 'my-plugin/my-block', {
 						value={ verticalAlignment }
 					/>
 				</BlockControls>
-				<div className={ className }>
+				<div>
 					// your Block here
 				</div>
 			</Fragment>
