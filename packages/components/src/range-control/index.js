@@ -48,7 +48,10 @@ function RangeControl( {
 
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
-		const newNumericValue = parseInt( newValue, 10 );
+		let newNumericValue = parseInt( newValue, 10 );
+		if ( props.step !== undefined && props.step < 1 ) {
+			newNumericValue = parseFloat( newValue );
+		}
 		// If the input value is invalid temporarily save it to the state,
 		// without calling on change.
 		if (
