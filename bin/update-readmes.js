@@ -8,7 +8,7 @@ const packages = [
 	//'autop',
 	'blob',
 	//'block-editor',
-	//'block-library',
+	'block-library',
 	//'block-serialization-default-parser',
 	//'blocks',
 	//'compose',
