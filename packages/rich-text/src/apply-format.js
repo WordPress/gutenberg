@@ -15,10 +15,10 @@ import { normaliseFormats } from './normalise-formats';
  * given `endIndex`. Indices are retrieved from the selection if none are
  * provided.
  *
- * @param {Object} value      Value to modify.
- * @param {Object} format     Format to apply.
- * @param {number} startIndex Start index.
- * @param {number} endIndex   End index.
+ * @param {Object} value        Value to modify.
+ * @param {Object} format       Format to apply.
+ * @param {number} [startIndex] Start index.
+ * @param {number} [endIndex]   End index.
  *
  * @return {Object} A new value with the format applied.
  */

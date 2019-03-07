@@ -27,21 +27,35 @@ const packages = [
 	//'plugins',
 	//'priority-queue',
 	//'redux-routine',
-	//'rich-text',
+	'rich-text',
 	//'shortcode',
 	//'url',
 	//'viewport',
 	//'wordcount',
 ];
 
+const getArgsForPackage = ( packageName ) => {
+	switch ( packageName ) {
+		case 'rich-text':
+			return [
+				`packages/${ packageName }/src/index.js`,
+				`--output packages/${ packageName }/README.md`,
+				'--to-token',
+				'--ignore "unstable|experimental|^apply$|^changeListType$|^charAt$|^getSelectionStart$|^getSelectionEnd$|^indentListItems$|^insertLineBreak$|^insertLineSeparator$|^isEmptyLine$|^LINE_SEPARATOR$|^outdentListItems$"',
+			];
+		default:
+			return [
+				`packages/${ packageName }/src/index.js`,
+				`--output packages/${ packageName }/README.md`,
+				'--to-token',
+				'--ignore "unstable|experimental"',
+			];
+	}
+};
+
 let aggregatedExitCode = 0;
 packages.forEach( ( packageName ) => {
-	const args = [
-		`packages/${ packageName }/src/index.js`,
-		`--output packages/${ packageName }/README.md`,
-		'--to-token',
-		'--ignore "unstable|experimental"',
-	];
+	const args = getArgsForPackage( packageName );
 	const pathToDocGen = path.join( __dirname, '..', 'node_modules', '.bin', 'docgen' );
 	const { status, stderr } = childProcess.spawnSync(
 		pathToDocGen,
