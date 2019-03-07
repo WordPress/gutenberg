@@ -2,7 +2,6 @@
 
 Internationalization utilities for client-side localization. See [How to Internationalize Your Plugin](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/) for server-side documentation.
 
-
 ## Installation
 
 Install the module:
