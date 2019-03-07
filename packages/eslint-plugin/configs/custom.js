@@ -32,6 +32,12 @@ module.exports = {
 				'@wordpress/no-base-control-with-label-without-id': 'off',
 			},
 		},
+		{
+			files: [ '**/test/*.js', '**/benchmark/*.js' ],
+			rules: {
+				'@wordpress/package-side-effects': 'off',
+			}
+		}
 	],
 	settings: {
 		react: {

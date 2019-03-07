@@ -1,3 +1,5 @@
+/* eslint-disable @wordpress/package-side-effects */
+
 /**
  * Internal dependencies
  */

@@ -7,13 +7,6 @@ module.exports = {
 	},
 	create( context ) {
 		const filename = context.getFilename();
-
-		// Don't lint files in the test folder (otherwise `describe` is flagged).
-		// TODO - accept a list of file or function names to ignore as a configuration option.
-		if ( filename.includes( '/test/' ) ) {
-			return {};
-		}
-
 		const { pkg: packageJson, path: packageJsonPath } = readPkgUp.sync( { cwd: filename } );
 
 		// Unable to find a package.json, so don't lint this file.
