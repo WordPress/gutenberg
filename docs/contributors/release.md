@@ -200,7 +200,7 @@ For each Gutenberg plugin release, WordPress trunk should be synchronized with t
 1. Ensure the WordPress `trunk` branch is open for enhancements. 
 2. Check out the last published Gutenberg release branch `git checkout release/x.x`
 3. Create a Pull Request from this branch targetting `wp/trunk`.
-4. Merge the Pull Request.
+4. Merge the Pull Request using the "Rebase and Merge" button to keep the history of the commits.
 
 Now, the branch is ready to be used to publish the npm packages.
 
@@ -222,7 +222,7 @@ The following workflow is needed when bug fixes or security releases need to be 
 1. Cherry-pick
 2. Check out the last published Gutenberg release branch `git checkout release/x.x`
 3. Create a Pull Request from this branch targetting the WordPress related major branch (Example `wp/5.2`).
-4. Merge the Pull Request.
+4. Merge the Pull Request using the "Rebase and Merge" button to keep the history of the commits.
 
 Now, the branch is ready to be used to publish the npm packages.
 
