@@ -11,7 +11,7 @@ matrix:
       cache:
         yarn: true
       script:
-        - ./.travis/travis-checks-js.sh
+        - bin/ci-checks-js.sh
     - language: node_js
       node_js: 8
       env:
@@ -21,7 +21,7 @@ matrix:
       cache:
         yarn: true
       script:
-        - ./.travis/travis-checks-js.sh
+        - bin/ci-checks-js.sh
     - language: node_js
       node_js: 8
       env:
@@ -31,4 +31,4 @@ matrix:
       cache:
         yarn: true
       script:
-        - ./.travis/travis-checks-js.sh
+        - bin/ci-checks-js.sh
