@@ -18,18 +18,12 @@ import { createBlock } from '@wordpress/blocks';
 
 const name = 'core/heading';
 
-/**
- * Internal dependencies
- */
-import styles from './style.scss';
-
 class HeadingEdit extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.splitBlock = this.splitBlock.bind( this );
 	}
-
 
 	/**
 	 * Split handler for RichText value, namely when content is pasted or the
@@ -79,7 +73,6 @@ class HeadingEdit extends Component {
 			attributes,
 			setAttributes,
 			mergeBlocks,
-			insertBlocksAfter,
 			style,
 		} = this.props;
 
