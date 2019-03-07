@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 const path = require( 'path' );
-const childProcess = require( 'child_process' );
+const { promisify } = require( 'util' );
+const spawn = promisify( require( 'child_process' ).spawn );
 
 const packages = [
 	'a11y',
@@ -53,19 +54,18 @@ const getArgsForPackage = ( packageName ) => {
 	}
 };
 
-let aggregatedExitCode = 0;
-packages.forEach( ( packageName ) => {
+Promise.all( packages.map( async ( packageName ) => {
 	const args = getArgsForPackage( packageName );
 	const pathToDocGen = path.join( __dirname, '..', 'node_modules', '.bin', 'docgen' );
-	const { status, stderr } = childProcess.spawnSync(
+	const { status, stderr } = await spawn(
 		pathToDocGen,
 		args,
 		{ shell: true },
 	);
 	if ( status !== 0 ) {
-		aggregatedExitCode = status;
-		process.stderr.write( `${ stderr }\n` );
+		throw stderr.toString();
 	}
+} ) ).catch( ( error ) => {
+	process.stderr.write( `${ error }\n` );
+	process.exit( 1 );
 } );
-
-process.exit( aggregatedExitCode );
