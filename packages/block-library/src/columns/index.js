@@ -40,9 +40,6 @@ export const settings = {
 		verticalAlignment: {
 			type: 'string',
 		},
-		childColumnHasVerticalAlignmentOveride: {
-			type: 'bool',
-		},
 	},
 
 	description: __( 'Add a block that displays content in multiple columns, then add whatever content blocks you’d like.' ),
