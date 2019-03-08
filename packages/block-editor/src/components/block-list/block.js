@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { KeyboardShortcuts, withFilters } from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -569,25 +569,22 @@ export class BlockListBlock extends Component {
 										focusOnMount={ this.isForcingContextualToolbar }
 									/>
 								) }
-								{ ! shouldShowContextualToolbar &&
-									isSelected &&
-									! hasFixedToolbar &&
-									! isEmptyDefaultBlock && (
-									<KeyboardShortcuts
-										bindGlobal
-										eventName="keydown"
-										shortcuts={ {
-											'alt+f10': this.forceFocusedContextualToolbar,
-										} }
-									/>
-								) }
 								<IgnoreNestedEvents
 									ref={ this.bindBlockNode }
 									onDragStart={ this.preventDrag }
 									onMouseDown={ this.onPointerDown }
 									data-block={ clientId }
 								>
-									<NavigableToolbar.KeybindScope scopeId={ 'block-' + clientId }>
+									<NavigableToolbar.KeybindScope
+										onFocusToolbar={
+											! shouldShowContextualToolbar &&
+											isSelected &&
+											! hasFixedToolbar &&
+											! isEmptyDefaultBlock &&
+											this.forceFocusedContextualToolbar
+										}
+										scopeId={ 'block-' + clientId }
+									>
 										<BlockCrashBoundary onError={ this.onBlockError }>
 											{ isValid && blockEdit }
 											{ isValid && mode === 'html' && (

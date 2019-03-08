@@ -116,6 +116,10 @@ NavigableToolbar.KeybindScope = class extends Component {
 		if ( toolbar ) {
 			toolbar.focusToolbar();
 		}
+
+		if ( this.props.onFocusToolbar ) {
+			this.props.onFocusToolbar();
+		}
 	}
 
 	render() {
