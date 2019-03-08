@@ -118,12 +118,12 @@ export const preferences = flow( [
 		}
 		return state;
 	},
-	disabledBlockTypes( state, action ) {
+	hiddenBlockTypes( state, action ) {
 		switch ( action.type ) {
-			case 'ENABLE_BLOCK_TYPES':
+			case 'SHOW_BLOCK_TYPES':
 				return without( state, ...action.blockNames );
 
-			case 'DISABLE_BLOCK_TYPES':
+			case 'HIDE_BLOCK_TYPES':
 				return union( state, action.blockNames );
 		}
 

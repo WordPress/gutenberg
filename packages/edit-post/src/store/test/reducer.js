@@ -217,18 +217,18 @@ describe( 'state', () => {
 			} );
 		} );
 
-		describe( 'disabledBlockTypes', () => {
+		describe( 'hiddenBlockTypes', () => {
 			it( 'concatenates unique names on disable', () => {
 				const original = deepFreeze( {
-					disabledBlockTypes: [ 'a', 'b' ],
+					hiddenBlockTypes: [ 'a', 'b' ],
 				} );
 
 				const state = preferences( original, {
-					type: 'DISABLE_BLOCK_TYPES',
+					type: 'HIDE_BLOCK_TYPES',
 					blockNames: [ 'b', 'c' ],
 				} );
 
-				expect( state.disabledBlockTypes ).toEqual( [
+				expect( state.hiddenBlockTypes ).toEqual( [
 					'a',
 					'b',
 					'c',
@@ -237,15 +237,15 @@ describe( 'state', () => {
 
 			it( 'omits present names by enable', () => {
 				const original = deepFreeze( {
-					disabledBlockTypes: [ 'a', 'b' ],
+					hiddenBlockTypes: [ 'a', 'b' ],
 				} );
 
 				const state = preferences( original, {
-					type: 'ENABLE_BLOCK_TYPES',
+					type: 'SHOW_BLOCK_TYPES',
 					blockNames: [ 'b', 'c' ],
 				} );
 
-				expect( state.disabledBlockTypes ).toEqual( [
+				expect( state.hiddenBlockTypes ).toEqual( [
 					'a',
 				] );
 			} );

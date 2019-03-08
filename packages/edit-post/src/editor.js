@@ -31,7 +31,7 @@ class Editor extends Component {
 		settings,
 		hasFixedToolbar,
 		focusMode,
-		disabledBlockTypes,
+		hiddenBlockTypes,
 		blockTypes,
 	) {
 		settings = {
@@ -40,8 +40,8 @@ class Editor extends Component {
 			focusMode,
 		};
 
-		// Omit disabled block types if exists and non-empty.
-		if ( size( disabledBlockTypes ) > 0 ) {
+		// Omit hidden block types if exists and non-empty.
+		if ( size( hiddenBlockTypes ) > 0 ) {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
@@ -53,7 +53,7 @@ class Editor extends Component {
 
 			settings.allowedBlockTypes = without(
 				defaultAllowedBlockTypes,
-				...disabledBlockTypes,
+				...hiddenBlockTypes,
 			);
 		}
 
@@ -68,7 +68,7 @@ class Editor extends Component {
 			post,
 			initialEdits,
 			onError,
-			disabledBlockTypes,
+			hiddenBlockTypes,
 			blockTypes,
 			...props
 		} = this.props;
@@ -81,7 +81,7 @@ class Editor extends Component {
 			settings,
 			hasFixedToolbar,
 			focusMode,
-			disabledBlockTypes,
+			hiddenBlockTypes,
 			blockTypes,
 		);
 
@@ -113,7 +113,7 @@ export default withSelect( ( select, { postId, postType } ) => {
 		hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 		focusMode: isFeatureActive( 'focusMode' ),
 		post: getEntityRecord( 'postType', postType, postId ),
-		disabledBlockTypes: getPreference( 'disabledBlockTypes' ),
+		hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
 		blockTypes: getBlockTypes(),
 	};
 } )( Editor );

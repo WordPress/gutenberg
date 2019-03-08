@@ -37,7 +37,7 @@
 	margin-right: #{ -1 * $grid-size-large };
 }
 
-.edit-post-manage-blocks-modal__block-type.is-inactive {
+.edit-post-manage-blocks-modal__block-type.is-hidden {
 	@include block-style__disabled();
 	cursor: pointer;
 }

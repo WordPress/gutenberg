@@ -68,9 +68,9 @@ function BlockManager( {
 	instanceId,
 	categories,
 	blockTypes,
-	disabledBlockTypes,
-	enableBlockTypes,
-	disableBlockTypes,
+	hiddenBlockTypes,
+	showBlockTypes,
+	hideBlockTypes,
 	search,
 	setState,
 } ) {
@@ -81,7 +81,7 @@ function BlockManager( {
 		category: blockType.category,
 		hasChildBlocksWithInserterSupport: false,
 		className: classnames( 'edit-post-manage-blocks-modal__block-type', {
-			'is-inactive': includes( disabledBlockTypes, blockType.name ),
+			'is-hidden': includes( hiddenBlockTypes, blockType.name ),
 		} ),
 	} ) );
 
@@ -123,16 +123,16 @@ function BlockManager( {
 						return null;
 					}
 
-					const isAllDisabled = categoryBlockItems.every( ( blockItem ) => {
-						return disabledBlockTypes.includes( blockItem.id );
+					const isAllHidden = categoryBlockItems.every( ( blockItem ) => {
+						return hiddenBlockTypes.includes( blockItem.id );
 					} );
 
-					const toggleAllDisabled = ( isToBeDisabled ) => {
+					const toggleAllHidden = ( isToBeDisabled ) => {
 						const blockNames = map( categoryBlockItems, 'id' );
 						if ( isToBeDisabled ) {
-							disableBlockTypes( blockNames );
+							hideBlockTypes( blockNames );
 						} else {
-							enableBlockTypes( blockNames );
+							showBlockTypes( blockNames );
 						}
 					};
 
@@ -143,16 +143,16 @@ function BlockManager( {
 							icon={ category.icon }
 						>
 							<ToggleControl
-								label={ __( 'Disable all' ) }
-								checked={ isAllDisabled }
-								onChange={ toggleAllDisabled }
+								label={ __( 'Hide all' ) }
+								checked={ isAllHidden }
+								onChange={ toggleAllHidden }
 							/>
 							<BlockTypesList
 								items={ categoryBlockItems }
 								onSelect={ ( item ) => (
-									includes( disabledBlockTypes, item.id ) ?
-										enableBlockTypes( item.id ) :
-										disableBlockTypes( item.id )
+									includes( hiddenBlockTypes, item.id ) ?
+										showBlockTypes( item.id ) :
+										hideBlockTypes( item.id )
 								) }
 							/>
 						</PanelBody>
@@ -176,18 +176,18 @@ export default compose( [
 		return {
 			blockTypes: getBlockTypes(),
 			categories: getCategories(),
-			disabledBlockTypes: getPreference( 'disabledBlockTypes' ),
+			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
-			enableBlockTypes,
-			disableBlockTypes,
+			showBlockTypes,
+			hideBlockTypes,
 		} = dispatch( 'core/edit-post' );
 
 		return {
-			enableBlockTypes,
-			disableBlockTypes,
+			showBlockTypes,
+			hideBlockTypes,
 		};
 	} ),
 ] )( BlockManager );
