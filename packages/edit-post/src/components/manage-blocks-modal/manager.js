@@ -143,7 +143,7 @@ function BlockManager( {
 							icon={ category.icon }
 						>
 							<ToggleControl
-								label={ __( 'Hide all' ) }
+								label={ __( 'Hide all blocks' ) }
 								checked={ isAllHidden }
 								onChange={ toggleAllHidden }
 							/>
