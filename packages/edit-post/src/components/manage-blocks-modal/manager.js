@@ -65,7 +65,6 @@ class BlockManager extends Component {
 			icon: blockType.icon,
 			title: blockType.title,
 			category: blockType.category,
-			hasChildBlocksWithInserterSupport: false,
 		} ) );
 
 		return (
