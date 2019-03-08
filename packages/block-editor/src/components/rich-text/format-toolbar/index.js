@@ -11,9 +11,18 @@ import { orderBy } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+
+import NavigableToolbar from '../../navigable-toolbar';
+
 const FormatToolbar = ( { controls } ) => {
 	return (
-		<div className="editor-format-toolbar">
+		<NavigableToolbar
+			scopeId="block-editor-format-toolbar"
+			className="editor-format-toolbar"
+		>
 			<Toolbar>
 				{ controls.map( ( format ) =>
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
@@ -29,7 +38,7 @@ const FormatToolbar = ( { controls } ) => {
 					}
 				</Slot>
 			</Toolbar>
-		</div>
+		</NavigableToolbar>
 	);
 };
 

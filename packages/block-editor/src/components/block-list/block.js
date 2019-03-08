@@ -7,7 +7,7 @@ import { get, reduce, size, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component, Fragment, createRef } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
@@ -45,6 +45,7 @@ import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
+import NavigableToolbar from '../navigable-toolbar';
 import Inserter from '../inserter';
 import HoverArea from './hover-area';
 import { isInsideRootBlock } from '../../utils/dom';
@@ -77,6 +78,8 @@ export class BlockListBlock extends Component {
 			isHovered: false,
 		};
 		this.isForcingContextualToolbar = false;
+
+		this.multiSelectTarget = createRef();
 	}
 
 	componentDidMount() {
@@ -103,7 +106,7 @@ export class BlockListBlock extends Component {
 		// This ensures that it is not possible to continue editing the initially selected block
 		// when a multi-selection is triggered.
 		if ( this.props.isFirstMultiSelected && ! prevProps.isFirstMultiSelected ) {
-			this.wrapperNode.focus();
+			this.multiSelectTarget.current.focus();
 		}
 	}
 
@@ -520,7 +523,19 @@ export class BlockListBlock extends Component {
 								rootClientId={ rootClientId }
 							/>
 							{ isFirstMultiSelected && (
-								<BlockMultiControls rootClientId={ rootClientId } />
+								<Fragment>
+									<NavigableToolbar.KeybindScope
+										scopeId={ 'block-' + clientId }
+									>
+										<div
+											tabIndex={ -1 }
+											ref={ this.multiSelectTarget }
+										/>
+									</NavigableToolbar.KeybindScope>
+									<BlockMultiControls
+										rootClientId={ rootClientId }
+									/>
+								</Fragment>
 							) }
 							<div className="editor-block-list__block-edit">
 								{ shouldRenderMovers && (
@@ -572,25 +587,27 @@ export class BlockListBlock extends Component {
 									onMouseDown={ this.onPointerDown }
 									data-block={ clientId }
 								>
-									<BlockCrashBoundary onError={ this.onBlockError }>
-										{ isValid && blockEdit }
-										{ isValid && mode === 'html' && (
-											<BlockHtml clientId={ clientId } />
+									<NavigableToolbar.KeybindScope scopeId={ 'block-' + clientId }>
+										<BlockCrashBoundary onError={ this.onBlockError }>
+											{ isValid && blockEdit }
+											{ isValid && mode === 'html' && (
+												<BlockHtml clientId={ clientId } />
+											) }
+											{ ! isValid && [
+												<BlockInvalidWarning
+													key="invalid-warning"
+													clientId={ clientId }
+												/>,
+												<div key="invalid-preview">
+													{ getSaveElement( blockType, attributes ) }
+												</div>,
+											] }
+										</BlockCrashBoundary>
+										{ shouldShowMobileToolbar && (
+											<BlockMobileToolbar clientId={ clientId } />
 										) }
-										{ ! isValid && [
-											<BlockInvalidWarning
-												key="invalid-warning"
-												clientId={ clientId }
-											/>,
-											<div key="invalid-preview">
-												{ getSaveElement( blockType, attributes ) }
-											</div>,
-										] }
-									</BlockCrashBoundary>
-									{ shouldShowMobileToolbar && (
-										<BlockMobileToolbar clientId={ clientId } />
-									) }
-									{ !! error && <BlockCrashWarning /> }
+										{ !! error && <BlockCrashWarning /> }
+									</NavigableToolbar.KeybindScope>
 								</IgnoreNestedEvents>
 							</div>
 							{ showEmptyBlockSideInserter && (

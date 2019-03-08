@@ -55,6 +55,7 @@ import deprecated from '@wordpress/deprecated';
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatEdit from './format-edit';
+import NavigableToolbar from '../navigable-toolbar';
 import FormatToolbar from './format-toolbar';
 import Editable from './editable';
 import { pickAriaProps } from './aria';
@@ -1044,8 +1045,8 @@ export class RichText extends Component {
 					record={ record }
 					onChange={ this.onChange }
 				>
-					{ ( { listBoxId, activeId } ) => (
-						<Fragment>
+					{ ( { listBoxId, activeId } ) => {
+						let field = (
 							<Editable
 								tagName={ Tagname }
 								style={ style }
@@ -1071,17 +1072,36 @@ export class RichText extends Component {
 								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
 							/>
-							{ isPlaceholderVisible &&
-								<Tagname
-									className={ classnames( 'editor-rich-text__editable', className ) }
-									style={ style }
-								>
-									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
-								</Tagname>
-							}
-							{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
-						</Fragment>
-					) }
+						);
+
+						if ( isSelected && inlineToolbar ) {
+							field = (
+								<NavigableToolbar.KeybindScope scopeId="block-editor-format-toolbar">
+									{ field }
+								</NavigableToolbar.KeybindScope>
+							);
+						}
+
+						return (
+							<Fragment>
+								{ field }
+								{ isPlaceholderVisible &&
+									<Tagname
+										className={ classnames( 'editor-rich-text__editable', className ) }
+										style={ style }
+									>
+										{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
+									</Tagname>
+								}
+								{ isSelected && (
+									<FormatEdit
+										value={ record }
+										onChange={ this.onChange }
+									/>
+								) }
+							</Fragment>
+						);
+					} }
 				</Autocomplete>
 				{ isSelected && <RemoveBrowserShortcuts /> }
 			</div>

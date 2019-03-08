@@ -34,6 +34,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isText
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
+			scopeId="edit-post-header"
 		>
 			<FullscreenModeClose />
 			<div>

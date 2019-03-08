@@ -24,6 +24,18 @@ class NavigableToolbar extends Component {
 		this.toolbar = createRef();
 	}
 
+	componentDidMount() {
+		NavigableToolbar.registry.set( this.props.scopeId, this );
+
+		if ( this.props.focusOnMount ) {
+			this.focusToolbar();
+		}
+	}
+
+	componentWillUnmount() {
+		NavigableToolbar.registry.delete( this.props.scopeId );
+	}
+
 	/**
 	 * Shifts focus to the first tabbable element within the toolbar container,
 	 * if one exists.
@@ -58,14 +70,18 @@ class NavigableToolbar extends Component {
 		}
 	}
 
-	componentDidMount() {
-		if ( this.props.focusOnMount ) {
-			this.focusToolbar();
-		}
-	}
-
 	render() {
-		const { children, ...props } = this.props;
+		const {
+			children,
+			// Disable reason: NavigableMenu will pass through props received
+			// to its rendered element. Avoid including NavigableToolbar's
+			// `scopeId` in destructured props.
+			/* eslint-disable no-unused-vars */
+			scopeId,
+			/* eslint-enable no-unused-vars */
+			...props
+		} = this.props;
+
 		return (
 			<NavigableMenu
 				orientation="horizontal"
@@ -76,18 +92,45 @@ class NavigableToolbar extends Component {
 					'focusOnMount',
 				] ) }
 			>
-				<KeyboardShortcuts
-					bindGlobal
-					// Use the same event that TinyMCE uses in the Classic block for its own `alt+f10` shortcut.
-					eventName="keydown"
-					shortcuts={ {
-						'alt+f10': this.focusToolbar,
-					} }
-				/>
 				{ children }
 			</NavigableMenu>
 		);
 	}
 }
+
+NavigableToolbar.registry = new Map;
+
+NavigableToolbar.KeybindScope = class extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.focusToolbar = this.focusToolbar.bind( this );
+	}
+
+	/**
+	 * Invokes `focusToolbar` on the `NavigableToolbar` instance corresponding
+	 * to the scope's own `scopeId` prop, if one exists.
+	 */
+	focusToolbar() {
+		const toolbar = NavigableToolbar.registry.get( this.props.scopeId );
+		if ( toolbar ) {
+			toolbar.focusToolbar();
+		}
+	}
+
+	render() {
+		return (
+			<KeyboardShortcuts
+				bindGlobal
+				ignoreChildHandled
+				eventName="keydown"
+				shortcuts={ {
+					'alt+f10': this.focusToolbar,
+				} }
+				{ ...omit( this.props, [ 'scopeId' ] ) }
+			/>
+		);
+	}
+};
 
 export default NavigableToolbar;
