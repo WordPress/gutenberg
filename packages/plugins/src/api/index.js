@@ -26,7 +26,42 @@ const plugins = {};
  * or an element (or function returning an element) if you choose to render your own SVG.
  * @param {Function}                  settings.render A component containing the UI elements to be rendered.
  *
- * @example
+ * @example <caption>ES5</caption>
+ * ```js
+ * var el = wp.element.createElement;
+ * var Fragment = wp.element.Fragment;
+ * var PluginSidebar = wp.editPost.PluginSidebar;
+ * var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+ * var registerPlugin = wp.plugins.registerPlugin;
+ *
+ * function Component() {
+ * 	return el(
+ * 		Fragment,
+ * 		{},
+ * 		el(
+ * 			PluginSidebarMoreMenuItem,
+ * 			{
+ * 				target: 'sidebar-name',
+ * 			},
+ * 			'My Sidebar'
+ * 		),
+ * 		el(
+ * 			PluginSidebar,
+ * 			{
+ * 				name: 'sidebar-name',
+ * 				title: 'My Sidebar',
+ * 			},
+ * 			'Content of the sidebar'
+ * 		)
+ * 	);
+ * }
+ * registerPlugin( 'plugin-name', {
+ * 	icon: 'smiley',
+ * 	render: Component,
+ * } );
+ * ```
+ *
+ * @example <caption>ESNext</caption>
  * ```js
  * const { Fragment } = wp.element;
  * const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
@@ -106,7 +141,14 @@ export function registerPlugin( name, settings ) {
  *
  * @param {string} name Plugin name.
  *
- * @example
+ * @example <caption>ES5</caption>
+ * ```js
+ * var unregisterPlugin = wp.plugins.unregisterPlugin;
+ *
+ * unregisterPlugin( 'plugin-name' );
+ * ```
+ *
+ * @example <caption>ESNext</caption>
  * ```js
  * const { unregisterPlugin } = wp.plugins;
  * unregisterPlugin( 'plugin-name' );

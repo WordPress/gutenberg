@@ -49,6 +49,20 @@ A component that renders all plugin fills in a hidden div.
 **Usage**
 
 ```js
+var el = wp.element.createElement;
+var PluginArea = wp.plugins.PluginArea;
+
+function Layout() {
+	return el(
+		'div',
+		{},
+		'Content of the page',
+		PluginArea
+	);
+}
+```
+
+```js
 const { PluginArea } = wp.plugins;
 
 const Layout = () => (
@@ -70,6 +84,40 @@ const Layout = () => (
 Registers a plugin to the editor.
 
 **Usage**
+
+```js
+var el = wp.element.createElement;
+var Fragment = wp.element.Fragment;
+var PluginSidebar = wp.editPost.PluginSidebar;
+var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+var registerPlugin = wp.plugins.registerPlugin;
+
+function Component() {
+	return el(
+		Fragment,
+		{},
+		el(
+			PluginSidebarMoreMenuItem,
+			{
+				target: 'sidebar-name',
+			},
+			'My Sidebar'
+		),
+		el(
+			PluginSidebar,
+			{
+				name: 'sidebar-name',
+				title: 'My Sidebar',
+			},
+			'Content of the sidebar'
+		)
+	);
+}
+registerPlugin( 'plugin-name', {
+	icon: 'smiley',
+	render: Component,
+} );
+```
 
 ```js
 const { Fragment } = wp.element;
@@ -116,6 +164,12 @@ registerPlugin( 'plugin-name', {
 Unregisters a plugin by name.
 
 **Usage**
+
+```js
+var unregisterPlugin = wp.plugins.unregisterPlugin;
+
+unregisterPlugin( 'plugin-name' );
+```
 
 ```js
 const { unregisterPlugin } = wp.plugins;
