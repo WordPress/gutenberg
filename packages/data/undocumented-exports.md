@@ -1,9 +1,0 @@
-# Undocumented exports
-
-createRegistry
-createRegistryControl
-createRegistrySelector
-plugins
-RegistryConsumer
-RegistryProvider
-use
