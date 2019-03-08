@@ -21,7 +21,7 @@ import {
 	receiveAutosave,
 } from './actions';
 import { getKindEntities } from './entities';
-import { apiFetch, select } from './controls';
+import { apiFetch, resolveSelect } from './controls';
 
 /**
  * Requests authors from the REST API.
@@ -178,8 +178,8 @@ export function* canUser( action, resource, id ) {
  * @param {number} postId   The id of the parent post.
  */
 export function* getAutosave( postType, postId ) {
-	const { baseURL } = yield select( 'getEntity', 'postType', postType );
-	const autosaveResponse = yield apiFetch( { path: `${ baseURL }/${ postId }/autosaves?context=edit` } );
+	const { rest_base: restBase } = yield resolveSelect( 'getPostType', postType );
+	const autosaveResponse = yield apiFetch( { path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit` } );
 
 	if ( autosaveResponse && autosaveResponse[ 0 ] ) {
 		yield receiveAutosave( postId, autosaveResponse[ 0 ] );
