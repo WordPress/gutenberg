@@ -23,7 +23,7 @@ describe( 'CSS selector wrap', () => {
 
 	it( 'should ignore selectors', () => {
 		const callback = wrap( '.my-namespace', 'body' );
-		const input = `h1, :root, body { color: red; }`;
+		const input = `h1, body { color: red; }`;
 		const output = traverse( input, callback );
 
 		expect( output ).toMatchSnapshot();
@@ -31,7 +31,7 @@ describe( 'CSS selector wrap', () => {
 
 	it( 'should replace root tags', () => {
 		const callback = wrap( '.my-namespace' );
-		const input = `body, h1 { color: red; }`;
+		const input = `body, :root, h1 { color: red; }`;
 		const output = traverse( input, callback );
 
 		expect( output ).toMatchSnapshot();
@@ -56,17 +56,6 @@ describe( 'CSS selector wrap', () => {
 		@font-face {
 			font-family: myFirstFont;
 			src: url(sansation_light.woff);
-		}`;
-		const output = traverse( input, callback );
-
-		expect( output ).toMatchSnapshot();
-	} );
-
-	it( 'should replace :root selectors', () => {
-		const callback = wrap( '.my-namespace' );
-		const input = `
-		:root {
-			--my-color: #ff0000;
 		}`;
 		const output = traverse( input, callback );
 
