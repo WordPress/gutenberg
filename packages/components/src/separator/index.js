@@ -1,6 +1,10 @@
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
 
 export default function Separator( props ) {
-	const { customText, editable, onChange, onKeyDown } = props;
+	const { customText, editable, onChange, onKeyDown, className } = props;
 	const inputLength = customText.length + 1;
 
 	const staticLabel = (
@@ -19,7 +23,7 @@ export default function Separator( props ) {
 	const label = ( editable ? editableLabel : staticLabel );
 
 	return (
-		<div className="components-separator">
+		<div className={ classnames( 'components-separator', className ) }>
 			{ customText && label }
 		</div>
 	);

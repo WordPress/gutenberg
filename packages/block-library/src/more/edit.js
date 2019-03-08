@@ -66,14 +66,13 @@ export default class MoreEdit extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<div className="wp-block-more">
-					<Separator
-						editable={ true }
-						customText={ value }
-						onChange={ this.onChangeInput }
-						onKeyDown={ this.onKeyDown }
-					/>
-				</div>
+				<Separator
+					className="wp-block-more"
+					editable={ true }
+					customText={ value }
+					onChange={ this.onChangeInput }
+					onKeyDown={ this.onKeyDown }
+				/>
 			</Fragment>
 		);
 	}
