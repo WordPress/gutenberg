@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import { PanelBody, Separator, ToggleControl } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/editor';
 import { ENTER } from '@wordpress/keycodes';
@@ -53,7 +53,6 @@ export default class MoreEdit extends Component {
 		const toggleHideExcerpt = () => setAttributes( { noTeaser: ! noTeaser } );
 		const { defaultText } = this.state;
 		const value = customText !== undefined ? customText : defaultText;
-		const inputLength = value.length + 1;
 
 		return (
 			<Fragment>
@@ -68,10 +67,9 @@ export default class MoreEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				<div className="wp-block-more">
-					<input
-						type="text"
-						value={ value }
-						size={ inputLength }
+					<Separator
+						editable={ true }
+						customText={ value }
 						onChange={ this.onChangeInput }
 						onKeyDown={ this.onKeyDown }
 					/>

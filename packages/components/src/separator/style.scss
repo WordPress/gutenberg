@@ -4,7 +4,7 @@
 	white-space: nowrap;
 
 	// Label
-	> span {
+	.components-separator__label {
 		font-size: $default-font-size;
 		position: relative;
 		display: inline-block;
@@ -16,6 +16,19 @@
 		background: $white;
 		padding: 6px 8px;
 		height: $icon-button-size-small;
+	}
+
+	// Editable Label
+	input[type="text"].components-separator__label {
+		border: none;
+		box-shadow: none;
+		white-space: nowrap;
+		text-align: center;
+		margin: 0;
+
+		&:focus {
+			box-shadow: none;
+		}
 	}
 
 	// Dashed line
