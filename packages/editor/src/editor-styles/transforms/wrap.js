@@ -19,8 +19,14 @@ const wrap = ( namespace, ignore = [] ) => ( node ) => {
 			return namespace + ' ' + selector;
 		}}
 
+		// If explicity :root selector namespace with pseudo to respect original specificity intended on namespace.
+		if ( ':root' === selector.trim() ) {
+			// We use an invalid negation to inherit the negation's :pseudo specificity weight applied on namespace.
+			return selector.replace( ':root', `${ namespace }:not(EDITOR_STYLES)` );
+		}
+
 		// HTML and Body elements cannot be contained within our container so lets extract their styles.
-		return selector.replace( /^(body|html|:root)/, namespace );
+		return selector.replace( /^(body|html)/, namespace );
 	};
 
 	if ( node.type === 'rule' ) {
