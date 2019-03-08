@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { filter, get, includes, map, some } from 'lodash';
+import { filter, get, includes, map, some, flow, deburr } from 'lodash';
 
 /**
  * Returns all the available block types.
@@ -16,6 +16,56 @@ export const getBlockTypes = createSelector(
 	( state ) => [
 		state.blockTypes,
 	]
+);
+
+/**
+ * Returns block types matching a given search term.
+ *
+ * @param {Object} state      Blocks state.
+ * @param {string} searchTerm Search term by which to filter.
+ *
+ * @return {Object[]} Filtered block types.
+ */
+export const getBlockTypesBySearchTerm = createSelector(
+	( state, searchTerm ) => {
+		const getNormalizedSearchTerm = flow( [
+			// Disregard diacritics.
+			//  Input: "média"
+			deburr,
+
+			// Lowercase.
+			//  Input: "MEDIA"
+			( term ) => term.toLowerCase(),
+
+			// Strip leading and trailing whitespace.
+			//  Input: " media "
+			( term ) => term.trim(),
+		] );
+
+		const normalizedSearchTerm = getNormalizedSearchTerm( searchTerm );
+
+		const isSearchMatch = flow( [
+			getNormalizedSearchTerm,
+			( normalizedCandidate ) => includes(
+				normalizedCandidate,
+				normalizedSearchTerm
+			),
+		] );
+
+		/**
+		 * Filters an item list given a search term.
+		 *
+		 * @param {Object[]} items Set of inserter items to search within.
+		 *
+		 * @return {Object[]} Filtered item list.
+		 */
+		return getBlockTypes( state ).filter( ( item ) => (
+			isSearchMatch( item.title ) ||
+			some( item.keywords, isSearchMatch ) ||
+			isSearchMatch( item.category )
+		) );
+	},
+	( state ) => getBlockTypes.getDependants( state ),
 );
 
 /**

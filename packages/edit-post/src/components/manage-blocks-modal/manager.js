@@ -1,69 +1,18 @@
 /**
  * External dependencies
  */
-import { filter, includes, map, find, some, deburr, without } from 'lodash';
+import { filter, includes, map, without } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, withState } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { TextControl, ToggleControl, PanelBody } from '@wordpress/components';
 import { __experimentalBlockTypesList as BlockTypesList } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Filters an item list given a search term.
- *
- * @param {Object[]} items      Set of inserter items to search within.
- * @param {Object[]} categories Set of categories to search within.
- * @param {string}   searchTerm Search term.
- *
- * @return {Object[]} Filtered item list.
- */
-export const searchItems = ( items, categories, searchTerm ) => {
-	const normalizedSearchTerm = normalizeTerm( searchTerm );
-	const matchSearch = ( string ) => normalizeTerm( string ).includes( normalizedSearchTerm );
-
-	return items.filter( ( item ) => {
-		const itemCategory = find( categories, { slug: item.category } );
-
-		return (
-			matchSearch( item.title ) ||
-			some( item.keywords, matchSearch ) ||
-			( itemCategory && matchSearch( itemCategory.title ) )
-		);
-	} );
-};
-
-/**
- * Converts the search term into a normalized term.
- *
- * @param {string} term The search term to normalize.
- *
- * @return {string} The normalized search term.
- */
-export const normalizeTerm = ( term ) => {
-	// Disregard diacritics.
-	//  Input: "média"
-	term = deburr( term );
-
-	// Accommodate leading slash, matching autocomplete expectations.
-	//  Input: "/media"
-	term = term.replace( /^\//, '' );
-
-	// Lowercase.
-	//  Input: "MEDIA"
-	term = term.toLowerCase();
-
-	// Strip leading and trailing whitespace.
-	//  Input: " media "
-	term = term.trim();
-
-	return term;
-};
 
 class BlockManager extends Component {
 	constructor() {
@@ -73,7 +22,6 @@ class BlockManager extends Component {
 		this.setSearch = this.setSearch.bind( this );
 
 		this.state = {
-			search: '',
 			openPanels: [],
 		};
 	}
@@ -99,7 +47,7 @@ class BlockManager extends Component {
 	 * @param {string} search Search term.
 	 */
 	setSearch( search ) {
-		this.setState( { search } );
+		this.props.setState( { search } );
 	}
 
 	render() {
@@ -109,11 +57,9 @@ class BlockManager extends Component {
 			hiddenBlockTypes,
 			showBlockTypes,
 			hideBlockTypes,
-		} = this.props;
-		const {
 			search,
-			openPanels,
-		} = this.state;
+		} = this.props;
+		const { openPanels } = this.state;
 
 		const blockItems = blockTypes.map( ( blockType ) => ( {
 			id: blockType.name,
@@ -126,10 +72,6 @@ class BlockManager extends Component {
 			} ),
 		} ) );
 
-		const filteredBlockItems = search ?
-			searchItems( blockItems, categories, search ) :
-			blockItems;
-
 		return (
 			<div className="edit-post-manage-blocks-modal__content">
 				<TextControl
@@ -141,7 +83,7 @@ class BlockManager extends Component {
 				/>
 				<div className="edit-post-manage-blocks-modal__results">
 					{ categories.map( ( category ) => {
-						const categoryBlockItems = filter( filteredBlockItems, {
+						const categoryBlockItems = filter( blockItems, {
 							category: category.slug,
 						} );
 
@@ -193,12 +135,17 @@ class BlockManager extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
-		const { getBlockTypes, getCategories } = select( 'core/blocks' );
+	withState( { search: '' } ),
+	withSelect( ( select, ownProps ) => {
+		const {
+			getBlockTypesBySearchTerm,
+			getCategories,
+		} = select( 'core/blocks' );
 		const { getPreference } = select( 'core/edit-post' );
+		const { search } = ownProps;
 
 		return {
-			blockTypes: getBlockTypes(),
+			blockTypes: getBlockTypesBySearchTerm( search ),
 			categories: getCategories(),
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
 		};
