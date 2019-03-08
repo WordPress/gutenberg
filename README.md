@@ -1,7 +1,5 @@
 # Mobile Gutenberg
 
-Note: The project is at an early stage phase, it's not yet ready for integration.
-
 This is the mobile version of [Gutenberg](https://github.com/WordPress/gutenberg), targeting Android and iOS. It's a React Native library bootstrapped by CRNA and now ejected.
 
 ## Getting Started
