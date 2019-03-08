@@ -15,7 +15,7 @@ import {
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/editor';
+import { InspectorControls } from '@wordpress/block-editor';
 
 class TagCloudEdit extends Component {
 	constructor() {

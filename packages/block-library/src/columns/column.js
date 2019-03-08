@@ -3,7 +3,7 @@
  */
 import { Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InnerBlocks } from '@wordpress/editor';
+import { InnerBlocks } from '@wordpress/block-editor';
 
 export const name = 'core/column';
 

@@ -80,7 +80,7 @@ exports[`block deletion - deleting the third block using the Remove Block shortc
 <!-- /wp:paragraph -->"
 `;
 
-exports[`block deletion - deleting third third and fourth blocks using backspace with multi-block selection results in two remaining blocks and positions the caret at the end of the second block 1`] = `
+exports[`block deletion - deleting the third and fourth blocks using backspace with multi-block selection results in two remaining blocks and positions the caret at the end of the second block 1`] = `
 "<!-- wp:paragraph -->
 <p>First paragraph</p>
 <!-- /wp:paragraph -->
@@ -90,7 +90,7 @@ exports[`block deletion - deleting third third and fourth blocks using backspace
 <!-- /wp:paragraph -->"
 `;
 
-exports[`block deletion - deleting third third and fourth blocks using backspace with multi-block selection results in two remaining blocks and positions the caret at the end of the second block 2`] = `
+exports[`block deletion - deleting the third and fourth blocks using backspace with multi-block selection results in two remaining blocks and positions the caret at the end of the second block 2`] = `
 "<!-- wp:paragraph -->
 <p>First paragraph</p>
 <!-- /wp:paragraph -->

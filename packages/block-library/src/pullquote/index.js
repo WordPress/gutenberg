@@ -12,7 +12,7 @@ import {
 	getColorClassName,
 	RichText,
 	getColorObjectByAttributeValues,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import {
 	select,
 } from '@wordpress/data';

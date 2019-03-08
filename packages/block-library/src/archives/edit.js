@@ -8,16 +8,12 @@ import {
 	Disabled,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
-	ServerSideRender,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
+import { ServerSideRender } from '@wordpress/editor';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
 	const { align, showPostCounts, displayAsDropdown } = attributes;

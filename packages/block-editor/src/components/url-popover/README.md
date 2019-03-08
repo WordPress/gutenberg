@@ -10,7 +10,7 @@ The component will be rendered adjacent to its parent.
 ```jsx
 import { Fragment } from '@wordpress/elements';
 import { ToggleControl, IconButton, Button } from '@wordpress/components';
-import { URLPopover } from '@wordpress/editor';
+import { URLPopover } from '@wordpress/block-editor';
 
 class MyURLPopover extends Component {
 	constructor() {

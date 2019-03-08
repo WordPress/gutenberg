@@ -12,7 +12,7 @@ import {
 	InnerBlocks,
 	RichText,
 	getColorClassName,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**

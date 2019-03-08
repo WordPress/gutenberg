@@ -16,7 +16,7 @@ import classnames from 'classnames/dedupe';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
-import { RichText, BlockIcon } from '@wordpress/editor';
+import { RichText, BlockIcon } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 
 /**
