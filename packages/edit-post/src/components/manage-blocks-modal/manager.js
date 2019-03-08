@@ -89,11 +89,6 @@ function BlockManager( {
 		searchItems( blockItems, categories, search ) :
 		blockItems;
 
-	// Disable reason (no-autofocus): The block manager is a modal display, not
-	// one which is always visible, and one which already incurs this behavior
-	// of autoFocus via Popover's focusOnMount.
-
-	/* eslint-disable jsx-a11y/no-autofocus */
 	return (
 		<div className="edit-post-manage-blocks-modal__content">
 			<label
@@ -111,7 +106,6 @@ function BlockManager( {
 				onInput={
 					( event ) => setState( { search: event.target.value } )
 				}
-				autoFocus
 			/>
 			<div className="edit-post-manage-blocks-modal__results">
 				{ categories.map( ( category ) => {
@@ -161,7 +155,6 @@ function BlockManager( {
 			</div>
 		</div>
 	);
-	/* eslint-enable jsx-a11y/no-autofocus */
 }
 
 export default compose( [
