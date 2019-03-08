@@ -149,6 +149,7 @@ export const ListEdit = ( {
 					{
 						icon: 'editor-outdent',
 						title: __( 'Outdent list item' ),
+						shortcut: '⌫',
 						onClick: () => {
 							onChange( outdentListItems( value ) );
 						},
@@ -156,6 +157,7 @@ export const ListEdit = ( {
 					{
 						icon: 'editor-indent',
 						title: __( 'Indent list item' ),
+						shortcut: '␣',
 						onClick: () => {
 							onChange( indentListItems( value, { type: tagName } ) );
 						},
