@@ -13,7 +13,6 @@ import {
 	RichText,
 	getColorClassName,
 } from '@wordpress/block-editor';
-import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
