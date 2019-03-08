@@ -55,6 +55,7 @@ class EditorProvider extends Component {
 		return {
 			...pick( settings, [
 				'alignWide',
+				'availableLegacyWidgets',
 				'colors',
 				'disableCustomColors',
 				'fontSizes',
@@ -63,6 +64,7 @@ class EditorProvider extends Component {
 				'maxWidth',
 				'allowedBlockTypes',
 				'hasFixedToolbar',
+				'hasPermissionsToManageWidgets',
 				'focusMode',
 				'styles',
 				'isRTL',

@@ -18,7 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### registerCoreBlocks
 
-[src/index.js#L69-L130](src/index.js#L69-L130)
+[src/index.js#L70-L132](src/index.js#L70-L132)
 
 Function to register core blocks provided by the block editor.
 
