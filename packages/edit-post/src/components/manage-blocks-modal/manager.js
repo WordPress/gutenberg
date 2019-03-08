@@ -85,7 +85,12 @@ class BlockManager extends Component {
 					onChange={ this.setSearch }
 					className="edit-post-manage-blocks-modal__search"
 				/>
-				<div className="edit-post-manage-blocks-modal__results">
+				<div
+					tabIndex="0"
+					role="region"
+					aria-label={ __( 'Available block types' ) }
+					className="edit-post-manage-blocks-modal__results"
+				>
 					{ categories.map( ( category ) => (
 						<BlockManagerCategory
 							key={ category.slug }
