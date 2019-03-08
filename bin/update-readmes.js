@@ -14,7 +14,7 @@ const packages = [
 	'blocks',
 	'compose',
 	//'data',
-	//'date',
+	'date',
 	'deprecated',
 	'dom',
 	'dom-ready',
