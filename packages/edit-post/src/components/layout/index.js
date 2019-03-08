@@ -73,11 +73,11 @@ function Layout( {
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
-			<Header />
 			<NavigableToolbar.KeybindScope
 				scopeId="edit-post-header"
 				className="edit-post-layout__navigable-toolbar-scope"
 			>
+				<Header />
 				<div
 					className="edit-post-layout__content"
 					role="region"

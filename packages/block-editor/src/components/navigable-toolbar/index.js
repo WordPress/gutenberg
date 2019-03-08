@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { cond, matchesProperty, omit } from 'lodash';
+import { cond, matchesProperty, omit, last, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ class NavigableToolbar extends Component {
 
 		this.focusToolbar = this.focusToolbar.bind( this );
 		this.restoreFocus = this.restoreFocus.bind( this );
+		this.resetNavigableStack = this.resetNavigableStack.bind( this );
 
 		this.switchOnKeyDown = cond( [
 			[ matchesProperty( [ 'keyCode' ], ESCAPE ), this.restoreFocus ],
@@ -48,24 +49,45 @@ class NavigableToolbar extends Component {
 
 		// Track the original active element prior to shifting focus, so that
 		// focus can be returned if the user presses Escape while in toolbar.
-		//
-		// [TODO]: Currently, to support "stepping down" through multiple
-		// navigable toolbars, the assigned value is only cleared after
-		// pressing Escape. If the user manually shifts focus away and later
-		// returns to press Escape, it will still (wrongly) use the earlier-
-		// assigned value.
-		this.activeElementBeforeFocus = document.activeElement;
+		// Avoid if toolbar was focused as a result of `restoreFocus` popping
+		// the stack, as otherwise it will record the wrong original active
+		// element (the one from the prior toolbar) or will cause focus to
+		// become stuck within the toolbar (the toolbar will repeatedly add
+		// itself to the stack).
+		if ( ! includes( NavigableToolbar.stack, this ) ) {
+			this.activeElementBeforeFocus = document.activeElement;
+			NavigableToolbar.stack.push( this );
+		}
 
 		tabbables[ 0 ].focus();
 	}
 
 	/**
-	 * Restores focus to the active element at the time focus was
+	 * Restores focus to the toolbar or active element at the time focus was
 	 * programattically shifted to the toolbar, if one exists.
 	 */
 	restoreFocus() {
-		if ( this.activeElementBeforeFocus ) {
+		NavigableToolbar.stack.pop();
+
+		if ( NavigableToolbar.stack.length ) {
+			last( NavigableToolbar.stack ).focusToolbar();
+		} else if ( this.activeElementBeforeFocus ) {
 			this.activeElementBeforeFocus.focus();
+			delete this.activeElementBeforeFocus;
+		}
+	}
+
+	/**
+	 * Resets the navigable toolbar context stack upon user focus shifting
+	 * elsewhere in the application.
+	 */
+	resetNavigableStack() {
+		// If blur occurs by result of pressing Escape, the instance will have
+		// already been removed from the stack via `Array#pop`. Thus, the
+		// condition here will be satisfied only in the case that focus shifts
+		// as the result of another user interaction.
+		if ( last( NavigableToolbar.stack ) === this ) {
+			NavigableToolbar.stack = [];
 			delete this.activeElementBeforeFocus;
 		}
 	}
@@ -91,6 +113,7 @@ class NavigableToolbar extends Component {
 				{ ...omit( props, [
 					'focusOnMount',
 				] ) }
+				onBlur={ this.resetNavigableStack }
 			>
 				{ children }
 			</NavigableMenu>
@@ -98,6 +121,20 @@ class NavigableToolbar extends Component {
 	}
 }
 
+/**
+ * An array of NavigableToolbar instances representing the current stack of
+ * focus history, used in traversing backwards through focused toolbars as a
+ * user presses Escape.
+ *
+ * @type {Array}
+ */
+NavigableToolbar.stack = [];
+
+/**
+ * Map of NavigableToolbar instances, keyed by scopeId.
+ *
+ * @type {Map}
+ */
 NavigableToolbar.registry = new Map;
 
 NavigableToolbar.KeybindScope = class extends Component {
