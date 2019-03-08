@@ -25,7 +25,7 @@ const packages = [
 	'html-entities',
 	'i18n',
 	'keycodes',
-	//'plugins',
+	'plugins',
 	'priority-queue',
 	'redux-routine',
 	'rich-text',
