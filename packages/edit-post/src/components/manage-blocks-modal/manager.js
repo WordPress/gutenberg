@@ -1,14 +1,15 @@
 /**
  * External dependencies
  */
-import { filter, includes, map, find, some, deburr } from 'lodash';
+import { filter, includes, map, find, some, deburr, without } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, withInstanceId, withState } from '@wordpress/compose';
+import { compose, withInstanceId } from '@wordpress/compose';
+import { Component } from '@wordpress/element';
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import { __experimentalBlockTypesList as BlockTypesList } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -64,104 +65,143 @@ export const normalizeTerm = ( term ) => {
 	return term;
 };
 
-function BlockManager( {
-	instanceId,
-	categories,
-	blockTypes,
-	hiddenBlockTypes,
-	showBlockTypes,
-	hideBlockTypes,
-	search,
-	setState,
-} ) {
-	const blockItems = blockTypes.map( ( blockType ) => ( {
-		id: blockType.name,
-		icon: blockType.icon,
-		title: blockType.title,
-		category: blockType.category,
-		hasChildBlocksWithInserterSupport: false,
-		className: classnames( 'edit-post-manage-blocks-modal__block-type', {
-			'is-hidden': includes( hiddenBlockTypes, blockType.name ),
-		} ),
-	} ) );
+class BlockManager extends Component {
+	constructor() {
+		super( ...arguments );
 
-	const filteredBlockItems = search ?
-		searchItems( blockItems, categories, search ) :
-		blockItems;
+		this.togglePanel = this.togglePanel.bind( this );
+		this.setSearch = this.setSearch.bind( this );
 
-	return (
-		<div className="edit-post-manage-blocks-modal__content">
-			<label
-				htmlFor={ `edit-post-manage-blocks-modal__search-${ instanceId }` }
-				className="screen-reader-text"
-			>
-				{ __( 'Search for a block' ) }
-			</label>
-			<input
-				id={ `edit-post-manage-blocks-modal__search-${ instanceId }` }
-				type="search"
-				placeholder={ __( 'Search for a block' ) }
-				className="edit-post-manage-blocks-modal__search"
-				value={ search }
-				onInput={
-					( event ) => setState( { search: event.target.value } )
-				}
-			/>
-			<div className="edit-post-manage-blocks-modal__results">
-				{ categories.map( ( category ) => {
-					const categoryBlockItems = filter( filteredBlockItems, {
-						category: category.slug,
-					} );
+		this.state = {
+			search: '',
+			openPanels: [],
+		};
+	}
 
-					if ( ! categoryBlockItems.length ) {
-						return null;
-					}
+	/**
+	 * Given a category slug, toggles its results panel as opened or closed.
+	 *
+	 * @param {string} category Category slug
+	 */
+	togglePanel( category ) {
+		let { openPanels } = this.state;
 
-					const isAllHidden = categoryBlockItems.every( ( blockItem ) => {
-						return hiddenBlockTypes.includes( blockItem.id );
-					} );
+		openPanels = openPanels.includes( category ) ?
+			without( openPanels.category ) :
+			openPanels.concat( category );
 
-					const toggleAllHidden = ( isToBeDisabled ) => {
-						const blockNames = map( categoryBlockItems, 'id' );
-						if ( isToBeDisabled ) {
-							hideBlockTypes( blockNames );
-						} else {
-							showBlockTypes( blockNames );
+		this.setState( { openPanels } );
+	}
+
+	/**
+	 * Filters the results panel in response to an InputEvent.
+	 *
+	 * @param {SyntheticEvent} event Synthetic input event.
+	 */
+	setSearch( event ) {
+		this.setState( { search: event.target.value } );
+	}
+
+	render() {
+		const {
+			instanceId,
+			categories,
+			blockTypes,
+			hiddenBlockTypes,
+			showBlockTypes,
+			hideBlockTypes,
+		} = this.props;
+		const {
+			search,
+			openPanels,
+		} = this.state;
+
+		const blockItems = blockTypes.map( ( blockType ) => ( {
+			id: blockType.name,
+			icon: blockType.icon,
+			title: blockType.title,
+			category: blockType.category,
+			hasChildBlocksWithInserterSupport: false,
+			className: classnames( 'edit-post-manage-blocks-modal__block-type', {
+				'is-hidden': includes( hiddenBlockTypes, blockType.name ),
+			} ),
+		} ) );
+
+		const filteredBlockItems = search ?
+			searchItems( blockItems, categories, search ) :
+			blockItems;
+
+		return (
+			<div className="edit-post-manage-blocks-modal__content">
+				<label
+					htmlFor={ `edit-post-manage-blocks-modal__search-${ instanceId }` }
+					className="screen-reader-text"
+				>
+					{ __( 'Search for a block' ) }
+				</label>
+				<input
+					id={ `edit-post-manage-blocks-modal__search-${ instanceId }` }
+					type="search"
+					placeholder={ __( 'Search for a block' ) }
+					className="edit-post-manage-blocks-modal__search"
+					value={ search }
+					onInput={ this.setSearch }
+				/>
+				<div className="edit-post-manage-blocks-modal__results">
+					{ categories.map( ( category ) => {
+						const categoryBlockItems = filter( filteredBlockItems, {
+							category: category.slug,
+						} );
+
+						if ( ! categoryBlockItems.length ) {
+							return null;
 						}
-					};
 
-					return (
-						<PanelBody
-							key={ category.slug }
-							title={ category.title }
-							icon={ category.icon }
-						>
-							<ToggleControl
-								label={ __( 'Hide all blocks' ) }
-								checked={ isAllHidden }
-								onChange={ toggleAllHidden }
-							/>
-							<BlockTypesList
-								items={ categoryBlockItems }
-								onSelect={ ( item ) => (
-									includes( hiddenBlockTypes, item.id ) ?
-										showBlockTypes( item.id ) :
-										hideBlockTypes( item.id )
-								) }
-							/>
-						</PanelBody>
-					);
-				} ) }
+						const isAllHidden = categoryBlockItems.every( ( blockItem ) => {
+							return hiddenBlockTypes.includes( blockItem.id );
+						} );
+
+						const toggleAllHidden = ( isToBeDisabled ) => {
+							const blockNames = map( categoryBlockItems, 'id' );
+							if ( isToBeDisabled ) {
+								hideBlockTypes( blockNames );
+							} else {
+								showBlockTypes( blockNames );
+							}
+						};
+
+						return (
+							<PanelBody
+								key={ category.slug }
+								title={ category.title }
+								icon={ category.icon }
+								opened={ !! search || openPanels.includes( category.slug ) }
+								onToggle={ this.togglePanel.bind( this, category.slug ) }
+							>
+								<ToggleControl
+									label={ __( 'Hide all blocks' ) }
+									checked={ isAllHidden }
+									onChange={ toggleAllHidden }
+								/>
+								<BlockTypesList
+									items={ categoryBlockItems }
+									onSelect={ ( item ) => (
+										includes( hiddenBlockTypes, item.id ) ?
+											showBlockTypes( item.id ) :
+											hideBlockTypes( item.id )
+									) }
+								/>
+							</PanelBody>
+						);
+					} ) }
+				</div>
 			</div>
-		</div>
-	);
+		);
+	}
 }
 
 export default compose( [
 	withInstanceId,
-	withState( {
-		search: '',
-	} ),
 	withSelect( ( select ) => {
 		const { getBlockTypes, getCategories } = select( 'core/blocks' );
 		const { getPreference } = select( 'core/edit-post' );
