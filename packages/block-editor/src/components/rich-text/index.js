@@ -19,7 +19,7 @@ import memize from 'memize';
 import { Component, Fragment, RawHTML } from '@wordpress/element';
 import { isHorizontalEdge } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -44,6 +44,7 @@ import {
 	isCollapsed,
 	LINE_SEPARATOR,
 	charAt,
+	indentListItems,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
@@ -599,8 +600,23 @@ export class RichText extends Component {
 			this.handleHorizontalNavigation( event );
 		}
 
+		if ( keyCode === SPACE && this.multilineTag === 'li' ) {
+			const value = this.createRecord();
+
+			if ( isCollapsed( value ) ) {
+				const { text, start } = value;
+				const characterBefore = text[ start - 1 ];
+
+				if ( ! characterBefore || characterBefore === LINE_SEPARATOR ) {
+					this.onChange( indentListItems( value, { type: this.props.tagName } ) );
+					event.preventDefault();
+				}
+			}
+		}
+
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			const value = this.createRecord();
+			const { formats } = value;
 			const start = getSelectionStart( value );
 			const end = getSelectionEnd( value );
 
@@ -615,22 +631,45 @@ export class RichText extends Component {
 				let newValue;
 
 				if ( keyCode === BACKSPACE ) {
-					if ( charAt( value, start - 1 ) === LINE_SEPARATOR ) {
-						newValue = remove(
-							value,
-							// Only remove the line if the selection is
-							// collapsed.
-							isCollapsed( value ) ? start - 1 : start,
-							end
-						);
+					const index = start - 1;
+
+					if ( charAt( value, index ) === LINE_SEPARATOR ) {
+						if ( isCollapsed( value ) && formats[ index ] && formats[ index ].length ) {
+							const newFormats = formats.slice();
+
+							newFormats[ index ] = formats[ index ].slice( 0, -1 );
+							newValue = {
+								...value,
+								formats: newFormats,
+							};
+						} else {
+							newValue = remove(
+								value,
+								// Only remove the line if the selection is
+								// collapsed.
+								isCollapsed( value ) ? start - 1 : start,
+								end
+							);
+						}
 					}
 				} else if ( charAt( value, end ) === LINE_SEPARATOR ) {
-					newValue = remove(
-						value,
-						start,
-						// Only remove the line if the selection is collapsed.
-						isCollapsed( value ) ? end + 1 : end,
-					);
+					if ( isCollapsed( value ) && formats[ end ] && formats[ end ].length ) {
+						const newFormats = formats.slice();
+
+						newFormats[ end ] = formats[ end ].slice( 0, -1 );
+						newValue = {
+							...value,
+							formats: newFormats,
+						};
+					} else {
+						newValue = remove(
+							value,
+							start,
+							// Only remove the line if the selection is
+							// collapsed.
+							isCollapsed( value ) ? end + 1 : end,
+						);
+					}
 				}
 
 				if ( newValue ) {
