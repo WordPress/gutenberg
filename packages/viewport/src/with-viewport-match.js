@@ -14,9 +14,21 @@ import { withSelect } from '@wordpress/data';
  * the given prop names, where the value passed to the underlying component is
  * the result of the query assigned as the object's value.
  *
+ * @see isViewportMatch
+ *
  * @param {Object} queries  Object of prop name to viewport query.
  *
- * @see isViewportMatch
+ * @example
+ *
+ * ```jsx
+ * function MyComponent( { isMobile } ) {
+ * 	return (
+ * 		<div>Currently: { isMobile ? 'Mobile' : 'Not Mobile' }</div>
+ * 	);
+ * }
+ *
+ * MyComponent = withViewportMatch( { isMobile: '< small' } )( MyComponent );
+ * ```
  *
  * @return {Function} Higher-order component.
  */
