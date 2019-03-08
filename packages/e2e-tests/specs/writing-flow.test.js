@@ -7,6 +7,7 @@ import {
 	createNewPost,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding blocks', () => {
@@ -205,6 +206,13 @@ describe( 'adding blocks', () => {
 	it( 'should insert line break in empty container', async () => {
 		await clickBlockAppender();
 		await pressKeyWithModifier( 'shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not create extra line breaks in multiline value', async () => {
+		await insertBlock( 'Quote' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Backspace' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
