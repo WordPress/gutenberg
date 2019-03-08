@@ -43,6 +43,7 @@ function BlockManagerCategory( {
 				label={ __( 'Hide all blocks' ) }
 				checked={ isAllHidden }
 				onChange={ toggleAllHidden }
+				className="edit-post-manage-blocks-modal__hide-all"
 			/>
 			<BlockTypesList
 				items={ blockItems }
