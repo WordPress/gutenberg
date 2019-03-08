@@ -1,8 +1,15 @@
 /**
+ * External dependencies
+ */
+
+import { orderBy } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 
-import { Toolbar, Slot } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
 
 const FormatToolbar = ( { controls } ) => {
 	return (
@@ -11,7 +18,16 @@ const FormatToolbar = ( { controls } ) => {
 				{ controls.map( ( format ) =>
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
 				) }
-				<Slot name="RichText.ToolbarControls" />
+				<Slot name="RichText.ToolbarControls">
+					{ ( fills ) => fills.length &&
+						<DropdownMenu
+							icon={ false }
+							position="bottom left"
+							label={ __( 'More Rich Text Controls' ) }
+							controls={ orderBy( fills.map( ( [ { props } ] ) => props ), 'title' ) }
+						/>
+					}
+				</Slot>
 			</Toolbar>
 		</div>
 	);
