@@ -26,7 +26,7 @@ const { PlainText } = wp.editor;
 
 All the packages are also available on [npm](https://www.npmjs.com/org/wordpress) if you want to bundle them in your code.
 
-Using the same `PlainText` example, you would install the editor module with npm:
+Using the same `PlainText` example, you would install the block editor module with npm:
 
 ```bash
 npm install @wordpress/block-editor --save
