@@ -54,6 +54,7 @@ class RCTAztecView: Aztec.TextView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .natural
         label.font = font
+
         return label
     }()
 
@@ -409,10 +410,10 @@ class RCTAztecView: Aztec.TextView {
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {
-        let oldFont = font(from: typingAttributesSwifted)
+        let oldFont = font(from: typingAttributes)
         let newFont = applyFontConstraints(to: oldFont)
         
-        typingAttributesSwifted[.font] = newFont
+        typingAttributes[.font] = newFont
         placeholderLabel.font = newFont
     }
 
