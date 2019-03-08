@@ -40,7 +40,6 @@ import { addQueryArgs } from '@wordpress/url';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
-import InserterInlineElements from './inline-elements';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -290,8 +289,6 @@ export class InserterMenu extends Component {
 							<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					}
-
-					<InserterInlineElements filterValue={ filterValue } />
 
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];

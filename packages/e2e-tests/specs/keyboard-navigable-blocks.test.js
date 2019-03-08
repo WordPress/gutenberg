@@ -120,19 +120,19 @@ const tabThroughBlockToolbar = async () => {
 
 	// Tab to focus on the 'Strikethrough' formatting button
 	await page.keyboard.press( 'Tab' );
-	const isFocusedStrikethroughFormattingButton = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'components-toolbar__control' )
+	const isFocusedMoreFormattingDropdown = await page.evaluate( () =>
+		document.activeElement.classList.contains( 'components-dropdown-menu__toggle' )
 	);
-	await expect( isFocusedStrikethroughFormattingButton ).toBe( true );
+	await expect( isFocusedMoreFormattingDropdown ).toBe( true );
 
 	// Tab to focus on the 'More formatting' dropdown toggle
 	await page.keyboard.press( 'Tab' );
-	const isFocusedMoreFormattingDropdown = await page.evaluate( () =>
+	const isFocusedBlockSettingsDropdown = await page.evaluate( () =>
 		document.activeElement.classList.contains(
 			'editor-block-settings-menu__toggle'
 		)
 	);
-	await expect( isFocusedMoreFormattingDropdown ).toBe( true );
+	await expect( isFocusedBlockSettingsDropdown ).toBe( true );
 };
 
 describe( 'Order of block keyboard navigation', () => {
