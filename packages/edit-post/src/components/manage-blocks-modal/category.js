@@ -11,7 +11,7 @@ import { compose } from '@wordpress/compose';
 import { cloneElement, Children } from '@wordpress/element';
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import { __experimentalBlockTypesList as BlockTypesList } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 function BlockManagerCategory( {
 	category,
@@ -57,15 +57,7 @@ function BlockManagerCategory( {
 					const child = Children.only( children );
 					return cloneElement( child, {
 						'aria-pressed': isHidden,
-						// Disable reason: [TODO]: valid-sprintf implementation
-						// currently does not handle valid ternary expressions.
-						// eslint-disable-next-line @wordpress/valid-sprintf
-						'aria-label': sprintf(
-							isHidden ?
-								__( 'Show block: %s' ) :
-								__( 'Hide block: %s' ),
-							item.title
-						),
+						'aria-label': __( 'Hide block: %s' ),
 						'data-hidden': isHidden ? __( 'Hidden' ) : undefined,
 					} );
 				} }
