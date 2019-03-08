@@ -9,7 +9,7 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

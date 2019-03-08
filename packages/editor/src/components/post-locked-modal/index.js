@@ -220,17 +220,14 @@ export default compose(
 			getCurrentPostId,
 			getActivePostLock,
 			getEditedPostAttribute,
-		} = select( 'core/editor' );
-		const {
 			getEditorSettings,
-		} = select( 'core/block-editor' );
+		} = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 		return {
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
 			user: getPostLockUser(),
 			postId: getCurrentPostId(),
-			// This setting should not live in the block-editor's store.
 			postLockUtils: getEditorSettings().postLockUtils,
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),

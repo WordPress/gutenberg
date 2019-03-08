@@ -322,7 +322,7 @@ We realize it's a big change. We also think there will be many new opportunities
 
 There is a “Classic” block, which is virtually the same as the current editor, except in block form.
 
-There is also the [Classic Editor Plugin](https://wordpress.org/plugins/classic-editor/) which restores the previous editor, see the plugin for more information. The WordPress Core team has committed to supporting the Classic Editor Plugin [until December 2021](https://make.wordpress.org/core/2018/11/07/classic-editor-plugin-support-window/).
+There is also the [Classic Editor plugin](https://wordpress.org/plugins/classic-editor/) which restores the previous editor, see the plugin for more information. The WordPress Core team has committed to supporting the Classic Editor plugin [until December 2021](https://make.wordpress.org/core/2018/11/07/classic-editor-plugin-support-window/).
 
 
 ## How will custom TinyMCE buttons work in Gutenberg?

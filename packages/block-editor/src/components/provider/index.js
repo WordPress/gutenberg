@@ -30,7 +30,7 @@ const withRegistry = createHigherOrderComponent(
 
 class BlockEditorProvider extends Component {
 	componentDidMount() {
-		this.props.updateEditorSettings( this.props.settings );
+		this.props.updateSettings( this.props.settings );
 		this.props.resetBlocks( this.props.value );
 		this.attachChangeObserver( this.props.registry );
 	}
@@ -38,14 +38,14 @@ class BlockEditorProvider extends Component {
 	componentDidUpdate( prevProps ) {
 		const {
 			settings,
-			updateEditorSettings,
+			updateSettings,
 			value,
 			resetBlocks,
 			registry,
 		} = this.props;
 
 		if ( settings !== prevProps.settings ) {
-			updateEditorSettings( settings );
+			updateSettings( settings );
 		}
 
 		if ( registry !== prevProps.registry ) {
@@ -139,12 +139,12 @@ class BlockEditorProvider extends Component {
 export default compose( [
 	withDispatch( ( dispatch ) => {
 		const {
-			updateEditorSettings,
+			updateSettings,
 			resetBlocks,
 		} = dispatch( 'core/block-editor' );
 
 		return {
-			updateEditorSettings,
+			updateSettings,
 			resetBlocks,
 		};
 	} ),

@@ -89,14 +89,14 @@ function toFormat( { type, attributes } ) {
  * `multilineTag` will be separated by two newlines. The optional functions can
  * be used to filter out content.
  *
- * @param {?Object}   $1                      Optional named argements.
- * @param {?Element}  $1.element              Element to create value from.
- * @param {?string}   $1.text                 Text to create value from.
- * @param {?string}   $1.html                 HTML to create value from.
- * @param {?Range}    $1.range                Range to create value from.
- * @param {?string}   $1.multilineTag         Multiline tag if the structure is
+ * @param {Object}  [$1]                      Optional named arguments.
+ * @param {Element} [$1.element]              Element to create value from.
+ * @param {string}  [$1.text]                 Text to create value from.
+ * @param {string}  [$1.html]                 HTML to create value from.
+ * @param {Range}   [$1.range]                Range to create value from.
+ * @param {string}  [$1.multilineTag]         Multiline tag if the structure is
  *                                            multiline.
- * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
+ * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
  *                                            nesting is possible.
  *
  * @return {Object} A rich text value.
@@ -108,6 +108,7 @@ export function create( {
 	range,
 	multilineTag,
 	multilineWrapperTags,
+	__unstableIsEditableTree: isEditableTree,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -128,6 +129,7 @@ export function create( {
 		return createFromElement( {
 			element,
 			range,
+			isEditableTree,
 		} );
 	}
 
@@ -136,6 +138,7 @@ export function create( {
 		range,
 		multilineTag,
 		multilineWrapperTags,
+		isEditableTree,
 	} );
 }
 
@@ -257,6 +260,7 @@ function createFromElement( {
 	multilineTag,
 	multilineWrapperTags,
 	currentWrapperTags = [],
+	isEditableTree,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -291,7 +295,10 @@ function createFromElement( {
 			continue;
 		}
 
-		if ( node.getAttribute( 'data-rich-text-padding' ) ) {
+		if (
+			node.getAttribute( 'data-rich-text-padding' ) ||
+			( isEditableTree && type === 'br' && ! node.getAttribute( 'data-rich-text-line-break' ) )
+		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
 		}
@@ -330,6 +337,7 @@ function createFromElement( {
 				multilineTag,
 				multilineWrapperTags,
 				currentWrapperTags: [ ...currentWrapperTags, format ],
+				isEditableTree,
 			} );
 			format = undefined;
 		} else {
@@ -338,6 +346,7 @@ function createFromElement( {
 				range,
 				multilineTag,
 				multilineWrapperTags,
+				isEditableTree,
 			} );
 		}
 
@@ -416,6 +425,7 @@ function createFromMultilineElement( {
 	multilineTag,
 	multilineWrapperTags,
 	currentWrapperTags = [],
+	isEditableTree,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -433,30 +443,14 @@ function createFromMultilineElement( {
 			continue;
 		}
 
-		let value = createFromElement( {
+		const value = createFromElement( {
 			element: node,
 			range,
 			multilineTag,
 			multilineWrapperTags,
 			currentWrapperTags,
+			isEditableTree,
 		} );
-
-		// If a line consists of one single line break (invisible), consider the
-		// line empty, wether this is the browser's doing or not.
-		if ( value.text === '\n' ) {
-			const start = value.start;
-			const end = value.end;
-
-			value = createEmptyValue();
-
-			if ( start !== undefined ) {
-				value.start = 0;
-			}
-
-			if ( end !== undefined ) {
-				value.end = 0;
-			}
-		}
 
 		// Multiline value text should be separated by a double line break.
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
@@ -495,7 +489,7 @@ function getAttributes( { element } ) {
 	for ( let i = 0; i < length; i++ ) {
 		const { name, value } = element.attributes[ i ];
 
-		if ( name === 'data-rich-text-format-boundary' ) {
+		if ( name.indexOf( 'data-rich-text-' ) === 0 ) {
 			continue;
 		}
 

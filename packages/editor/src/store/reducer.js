@@ -24,6 +24,7 @@ import { addQueryArgs } from '@wordpress/url';
 import {
 	PREFERENCES_DEFAULTS,
 	INITIAL_EDITS_DEFAULTS,
+	EDITOR_SETTINGS_DEFAULTS,
 } from './defaults';
 import { EDIT_MERGE_PROPERTIES } from './constants';
 import withChangeDetection from '../utils/with-change-detection';
@@ -825,6 +826,26 @@ export function isReady( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the post editor setting.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_EDITOR_SETTINGS':
+			return {
+				...state,
+				...action.settings,
+			};
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	initialEdits,
@@ -838,4 +859,5 @@ export default optimist( combineReducers( {
 	previewLink,
 	postSavingLock,
 	isReady,
+	editorSettings,
 } ) );

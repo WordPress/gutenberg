@@ -3,6 +3,7 @@
  */
 import {
 	clickBlockAppender,
+	clickBlockToolbarButton,
 	getEditedPostContent,
 	createNewPost,
 	pressKeyWithModifier,
@@ -22,11 +23,6 @@ describe( 'Links', () => {
 
 	const waitForAutoFocus = async () => {
 		await page.waitForFunction( () => !! document.activeElement.closest( '.editor-url-input' ) );
-	};
-
-	const moveMouse = async () => {
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
 	};
 
 	it( 'can be created by selecting text and clicking Link', async () => {
@@ -82,8 +78,8 @@ describe( 'Links', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg: ' );
 
-		// Trigger isTyping = false
-		await moveMouse();
+		// Press escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
@@ -224,10 +220,7 @@ describe( 'Links', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Text' );
 
-		// we need to trigger isTyping = false
-		await moveMouse();
-		await page.waitForSelector( 'button[aria-label="Link"]' );
-		await page.click( 'button[aria-label="Link"]' );
+		await clickBlockToolbarButton( 'Link' );
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
@@ -245,7 +238,8 @@ describe( 'Links', () => {
 		// Make a collapsed selection inside the link
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowRight' );
-		await moveMouse();
+		// Press escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 		await page.click( 'button[aria-label="Edit"]' );
 		await waitForAutoFocus();
 		await page.keyboard.type( '/handbook' );

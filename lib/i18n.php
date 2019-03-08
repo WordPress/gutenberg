@@ -13,12 +13,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Returns Jed-formatted localization data.
  *
  * @since 0.1.0
+ * @deprecated 5.2.0
  *
  * @param  string $domain Translation domain.
  *
  * @return array
  */
 function gutenberg_get_jed_locale_data( $domain ) {
+	_deprecated_function( __FUNCTION__, '5.2.0' );
+
 	$translations = get_translations_for_domain( $domain );
 
 	$locale = array(
@@ -43,12 +46,8 @@ function gutenberg_get_jed_locale_data( $domain ) {
  * Load plugin text domain for translations.
  *
  * @since 0.1.0
+ * @deprecated 5.2.0
  */
 function gutenberg_load_plugin_textdomain() {
-	load_plugin_textdomain(
-		'gutenberg',
-		false,
-		plugin_basename( gutenberg_dir_path() ) . '/languages/'
-	);
+	_deprecated_function( __FUNCTION__, '5.2.0' );
 }
-add_action( 'plugins_loaded', 'gutenberg_load_plugin_textdomain' );
