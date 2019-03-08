@@ -102,17 +102,40 @@ mkdir languages
 wp i18n make-pot ./ languages/myguten.pot
 ```
 
-This will create the file `myguten.pot` which contains all the translatable strings from your project. A single entry in this POT file might look like this:
+This will create the file `myguten.pot` which contains all the translatable strings from your project.
 
 ```
+msgid ""
+msgstr ""
+"Project-Id-Version: Scratch Plugin\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/scratch\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2019-03-08T11:26:56-08:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.1.0\n"
+"X-Domain: myguten\n"
+
+#. Plugin Name of the plugin
+msgid "Scratch Plugin"
+msgstr ""
+
 #: block.js:6
 msgid "Simple Block"
+msgstr ""
+
+#: block.js:13
+#: block.js:21
+msgid "Hello World"
 msgstr ""
 ```
 
 Here, `msgid` is the string to be translated, and `msgstr` is the actual translation. In the POT file, `msgstr` will always be empty.
 
-This POT file can then be used as the template for new translations. You should copy the file using the language code you are going to translate, this example will use the Esperanto (eo) language:
+This POT file can then be used as the template for new translations. You should **copy the file** using the language code you are going to translate, this example will use the Esperanto (eo) language:
 
 ```
 cp myguten.pot myguten-eo.po
@@ -120,14 +143,40 @@ cp myguten.pot myguten-eo.po
 
 For this simple example, you can simply edit the `.po` file in your editor and add the translation to all the `msgstr` sets. For a larger, more complex set of translation, the [Glotpress](https://glotpress.blog/) and [poedit](https://poedit.net/) tools exist to help.
 
+You need also to add the `Language: eo` parameter. Here is full `myguten-eo.po` translated file
+
 ```
+# Copyright (C) 2019
+# This file is distributed under the same license as the Scratch Plugin plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Scratch Plugin\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/scratch\n"
+"Last-Translator: Marcus Kazmierczak <marcus@mkaz.com>\n"
+"Language-Team: Esperanto <marcus@mkaz.com>\n"
+"Language: eo\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2019-02-18T07:20:46-08:00\n"
+"PO-Revision-Date: 2019-02-18 08:16-0800\n"
+"X-Generator: Poedit 2.2.1\n"
+"X-Domain: myguten\n"
+
+#. Plugin Name of the plugin
+msgid "Scratch Plugin"
+msgstr "Scratch kromprogrameto"
+
 #: block.js:6
 msgid "Simple Block"
 msgstr "Simpla bloko"
+
+#: block.js:13 block.js:21
+msgid "Hello World"
+msgstr "Saltuon mundo"
 ```
 
-
-The last step to create the translation file is to convert the `myguten-eo.po` to the JSON format needed. For this, you use the [po2json utility](https://github.com/mikeedwards/po2json) which you can install using npm. It might be easiest to install globally using: `npm install -g po2json`. Once installed, use the following command to convert to JED format:
+The last step to create the translation file is to convert the `myguten-eo.po` to the JSON format needed. For this, you can use the [po2json utility](https://github.com/mikeedwards/po2json) which you install using npm. It might be easiest to install globally using: `npm install -g po2json`. Once installed, use the following command to convert to JED format:
 
 ```
 po2json myguten-eo.po myguten-eo.json -f jed
