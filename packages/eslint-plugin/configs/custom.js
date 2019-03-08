@@ -23,4 +23,9 @@ module.exports = {
 			},
 		],
 	},
+	settings: {
+		react: {
+			version: '16.6',
+		},
+	},
 };
