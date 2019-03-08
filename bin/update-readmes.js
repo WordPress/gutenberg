@@ -11,7 +11,7 @@ const packages = [
 	'block-editor',
 	'block-library',
 	//'block-serialization-default-parser',
-	//'blocks',
+	'blocks',
 	'compose',
 	//'data',
 	//'date',
