@@ -31,7 +31,7 @@ const packages = [
 	'rich-text',
 	'shortcode',
 	//'url',
-	//'viewport',
+	'viewport',
 	//'wordcount',
 ];
 
