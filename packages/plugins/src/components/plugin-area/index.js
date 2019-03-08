@@ -20,6 +20,7 @@ import { getPlugins } from '../../api';
  *
  * @example <caption>ES5</caption>
  * ```js
+ * // Using ES5 syntax
  * var el = wp.element.createElement;
  * var PluginArea = wp.plugins.PluginArea;
  *
@@ -35,6 +36,7 @@ import { getPlugins } from '../../api';
  *
  * @example <caption>ESNext</caption>
  * ```js
+ * // Using ESNext syntax
  * const { PluginArea } = wp.plugins;
  *
  * const Layout = () => (

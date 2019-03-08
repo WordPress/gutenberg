@@ -49,6 +49,7 @@ A component that renders all plugin fills in a hidden div.
 **Usage**
 
 ```js
+// Using ES5 syntax
 var el = wp.element.createElement;
 var PluginArea = wp.plugins.PluginArea;
 
@@ -63,6 +64,7 @@ function Layout() {
 ```
 
 ```js
+// Using ESNext syntax
 const { PluginArea } = wp.plugins;
 
 const Layout = () => (
@@ -86,6 +88,7 @@ Registers a plugin to the editor.
 **Usage**
 
 ```js
+// Using ES5 syntax
 var el = wp.element.createElement;
 var Fragment = wp.element.Fragment;
 var PluginSidebar = wp.editPost.PluginSidebar;
@@ -120,6 +123,7 @@ registerPlugin( 'plugin-name', {
 ```
 
 ```js
+// Using ESNext syntax
 const { Fragment } = wp.element;
 const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
 const { registerPlugin } = wp.plugins;
@@ -166,12 +170,14 @@ Unregisters a plugin by name.
 **Usage**
 
 ```js
+// Using ES5 syntax
 var unregisterPlugin = wp.plugins.unregisterPlugin;
 
 unregisterPlugin( 'plugin-name' );
 ```
 
 ```js
+// Using ESNext syntax
 const { unregisterPlugin } = wp.plugins;
 unregisterPlugin( 'plugin-name' );
 ```

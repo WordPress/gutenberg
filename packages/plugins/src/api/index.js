@@ -28,6 +28,7 @@ const plugins = {};
  *
  * @example <caption>ES5</caption>
  * ```js
+ * // Using ES5 syntax
  * var el = wp.element.createElement;
  * var Fragment = wp.element.Fragment;
  * var PluginSidebar = wp.editPost.PluginSidebar;
@@ -63,6 +64,7 @@ const plugins = {};
  *
  * @example <caption>ESNext</caption>
  * ```js
+ * // Using ESNext syntax
  * const { Fragment } = wp.element;
  * const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
  * const { registerPlugin } = wp.plugins;
@@ -143,6 +145,7 @@ export function registerPlugin( name, settings ) {
  *
  * @example <caption>ES5</caption>
  * ```js
+ * // Using ES5 syntax
  * var unregisterPlugin = wp.plugins.unregisterPlugin;
  *
  * unregisterPlugin( 'plugin-name' );
@@ -150,6 +153,7 @@ export function registerPlugin( name, settings ) {
  *
  * @example <caption>ESNext</caption>
  * ```js
+ * // Using ESNext syntax
  * const { unregisterPlugin } = wp.plugins;
  * unregisterPlugin( 'plugin-name' );
  * ```
