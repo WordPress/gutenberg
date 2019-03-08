@@ -182,6 +182,32 @@ The last step to create the translation file is to convert the `myguten-eo.po` t
 po2json myguten-eo.po myguten-eo.json -f jed
 ```
 
+This will generate the JSON file `myguten-eo.json` which looks like:
+
+```json
+{
+  "domain": "messages",
+  "locale_data": {
+    "messages": {
+      "": {
+        "domain": "messages",
+        "lang": "eo"
+      },
+      "Scratch Plugin": [
+        "Scratch kromprogrameto"
+      ],
+      "Simple Block": [
+        "Simpla bloko"
+      ],
+      "Hello World": [
+        "Saltuon mundo"
+      ]
+    }
+  }
+}
+```
+
+
 ### Load Translation File
 
 The final part is to tell WordPress where it can look to find the translation file. The `wp_set_script_translations` function accepts an optional third argument that is the path it will first check for translations. For example:
