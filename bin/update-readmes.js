@@ -30,7 +30,7 @@ const packages = [
 	//'redux-routine',
 	'rich-text',
 	'shortcode',
-	//'url',
+	'url',
 	'viewport',
 	//'wordcount',
 ];
