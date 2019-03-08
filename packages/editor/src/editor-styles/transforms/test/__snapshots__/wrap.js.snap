@@ -17,8 +17,15 @@ opacity: 0;
 
 exports[`CSS selector wrap should ignore selectors 1`] = `
 ".my-namespace h1,
+.my-namespace:not(EDITOR_STYLES),
 body {
 color: red;
+}"
+`;
+
+exports[`CSS selector wrap should replace :root selectors 1`] = `
+".my-namespace:not(EDITOR_STYLES) {
+--my-color: #ff0000;
 }"
 `;
 
@@ -39,11 +46,5 @@ color: red;
 exports[`CSS selector wrap should wrap regular selectors 1`] = `
 ".my-namespace h1 {
 color: red;
-}"
-`;
-
-exports[`CSS selector wrap should replace :root selectors 1`] = `
-".my-namespace {
---my-color: #ff0000;
 }"
 `;
