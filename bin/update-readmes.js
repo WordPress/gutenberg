@@ -32,7 +32,7 @@ const packages = [
 	'shortcode',
 	'url',
 	'viewport',
-	//'wordcount',
+	'wordcount',
 ];
 
 const getArgsForPackage = ( packageName ) => {
