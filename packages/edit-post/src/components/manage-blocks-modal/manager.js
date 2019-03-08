@@ -2,14 +2,13 @@
  * External dependencies
  */
 import { filter, includes, map, without } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, withState } from '@wordpress/compose';
-import { Component } from '@wordpress/element';
+import { Component, cloneElement, Children } from '@wordpress/element';
 import { TextControl, ToggleControl, PanelBody } from '@wordpress/components';
 import { __experimentalBlockTypesList as BlockTypesList } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -67,9 +66,6 @@ class BlockManager extends Component {
 			title: blockType.title,
 			category: blockType.category,
 			hasChildBlocksWithInserterSupport: false,
-			className: classnames( 'edit-post-manage-blocks-modal__block-type', {
-				'is-hidden': includes( hiddenBlockTypes, blockType.name ),
-			} ),
 		} ) );
 
 		return (
@@ -124,6 +120,17 @@ class BlockManager extends Component {
 											showBlockTypes( item.id ) :
 											hideBlockTypes( item.id )
 									) }
+									renderItem={ ( { children, item } ) => {
+										const isHidden = includes( hiddenBlockTypes, item.id );
+										if ( ! isHidden ) {
+											return children;
+										}
+
+										const child = Children.only( children );
+										return cloneElement( child, {
+											'data-hidden': __( 'Hidden' ),
+										} );
+									} }
 								/>
 							</PanelBody>
 						);

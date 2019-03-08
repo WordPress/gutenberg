@@ -44,9 +44,19 @@
 	overflow: auto;
 	margin-left: #{ -1 * $grid-size-large };
 	margin-right: #{ -1 * $grid-size-large };
-}
 
-.edit-post-manage-blocks-modal__block-type.is-hidden {
-	@include block-style__disabled();
-	cursor: pointer;
+	.editor-block-types-list__item[data-hidden] {
+		position: relative;
+		background-color: $light-gray-200;
+
+		&::after {
+			content: attr(data-hidden);
+			position: absolute;
+			top: 0;
+			right: 0;
+			background-color: $blue-medium-500;
+			color: $white;
+			padding: 0 $grid-size-small;
+		}
+	}
 }
