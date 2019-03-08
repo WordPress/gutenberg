@@ -138,7 +138,11 @@ export class RichText extends Component {
 		this.enterPatterns = getBlockTransforms( 'from' )
 			.filter( ( { type } ) => type === 'enter' );
 
-		this.state = {};
+		this.state = {
+			start: undefined,
+			end: undefined,
+			selectedFormat: undefined,
+		};
 
 		this.usedDeprecatedChildrenSource = Array.isArray( value );
 		this.lastHistoryValue = value;
@@ -362,6 +366,12 @@ export class RichText extends Component {
 
 	onBlur() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+
+		this.setState( {
+			start: undefined,
+			end: undefined,
+			selectedFormat: undefined,
+		} );
 	}
 
 	/**
