@@ -1,17 +1,21 @@
 /**
  * External dependencies
  */
-import { filter, includes, map, without } from 'lodash';
+import { filter, without } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import { compose, withState } from '@wordpress/compose';
-import { Component, cloneElement, Children } from '@wordpress/element';
-import { TextControl, ToggleControl, PanelBody } from '@wordpress/components';
-import { __experimentalBlockTypesList as BlockTypesList } from '@wordpress/block-editor';
+import { Component } from '@wordpress/element';
+import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import BlockManagerCategory from './category';
 
 class BlockManager extends Component {
 	constructor() {
@@ -54,8 +58,6 @@ class BlockManager extends Component {
 			categories,
 			blockTypes,
 			hiddenBlockTypes,
-			showBlockTypes,
-			hideBlockTypes,
 			search,
 		} = this.props;
 		const { openPanels } = this.state;
@@ -77,63 +79,21 @@ class BlockManager extends Component {
 					className="edit-post-manage-blocks-modal__search"
 				/>
 				<div className="edit-post-manage-blocks-modal__results">
-					{ categories.map( ( category ) => {
-						const categoryBlockItems = filter( blockItems, {
-							category: category.slug,
-						} );
-
-						if ( ! categoryBlockItems.length ) {
-							return null;
-						}
-
-						const isAllHidden = categoryBlockItems.every( ( blockItem ) => {
-							return hiddenBlockTypes.includes( blockItem.id );
-						} );
-
-						const toggleAllHidden = ( isToBeDisabled ) => {
-							const blockNames = map( categoryBlockItems, 'id' );
-							if ( isToBeDisabled ) {
-								hideBlockTypes( blockNames );
-							} else {
-								showBlockTypes( blockNames );
-							}
-						};
-
-						return (
-							<PanelBody
-								key={ category.slug }
-								title={ category.title }
-								icon={ category.icon }
-								opened={ !! search || openPanels.includes( category.slug ) }
-								onToggle={ this.togglePanel.bind( this, category.slug ) }
-							>
-								<ToggleControl
-									label={ __( 'Hide all blocks' ) }
-									checked={ isAllHidden }
-									onChange={ toggleAllHidden }
-								/>
-								<BlockTypesList
-									items={ categoryBlockItems }
-									onSelect={ ( item ) => (
-										includes( hiddenBlockTypes, item.id ) ?
-											showBlockTypes( item.id ) :
-											hideBlockTypes( item.id )
-									) }
-									renderItem={ ( { children, item } ) => {
-										const isHidden = includes( hiddenBlockTypes, item.id );
-										if ( ! isHidden ) {
-											return children;
-										}
-
-										const child = Children.only( children );
-										return cloneElement( child, {
-											'data-hidden': __( 'Hidden' ),
-										} );
-									} }
-								/>
-							</PanelBody>
-						);
-					} ) }
+					{ categories.map( ( category ) => (
+						<BlockManagerCategory
+							key={ category.slug }
+							category={ category }
+							blockItems={ filter( blockItems, {
+								category: category.slug,
+							} ) }
+							hiddenBlockTypes={ hiddenBlockTypes }
+							opened={ (
+								!! search ||
+								openPanels.includes( category.slug )
+							) }
+							onToggle={ this.togglePanel.bind( this, category.slug ) }
+						/>
+					) ) }
 				</div>
 			</div>
 		);
@@ -154,17 +114,6 @@ export default compose( [
 			blockTypes: getBlockTypesBySearchTerm( search ),
 			categories: getCategories(),
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const {
-			showBlockTypes,
-			hideBlockTypes,
-		} = dispatch( 'core/edit-post' );
-
-		return {
-			showBlockTypes,
-			hideBlockTypes,
 		};
 	} ),
 ] )( BlockManager );
