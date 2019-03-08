@@ -179,6 +179,7 @@ unregisterPlugin( 'plugin-name' );
 ```js
 // Using ESNext syntax
 const { unregisterPlugin } = wp.plugins;
+
 unregisterPlugin( 'plugin-name' );
 ```
 
