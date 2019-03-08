@@ -122,6 +122,9 @@ describe( 'selectors', () => {
 			category: 'common',
 			title: 'Test Freeform Content Handler',
 			icon: 'test',
+			supports: {
+				className: false,
+			},
 			attributes: {
 				content: {
 					type: 'string',

@@ -15,7 +15,7 @@ import { withDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { shortcuts } from '../global-keyboard-shortcuts/block-editor-shortcuts';
+import { shortcuts } from '../block-editor-keyboard-shortcuts';
 import BlockActions from '../block-actions';
 import BlockModeToggle from './block-mode-toggle';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
