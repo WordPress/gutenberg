@@ -345,12 +345,6 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-### RichTextInserterItem
-
-[src/index.js#L15-L15](src/index.js#L15-L15)
-
-Undocumented declaration.
-
 ### RichTextShortcut
 
 [src/index.js#L15-L15](src/index.js#L15-L15)
