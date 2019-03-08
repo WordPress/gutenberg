@@ -7,7 +7,7 @@ import { filter, without } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { compose, withState } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -25,6 +25,7 @@ class BlockManager extends Component {
 		this.setSearch = this.setSearch.bind( this );
 
 		this.state = {
+			search: '',
 			openPanels: [],
 		};
 	}
@@ -50,7 +51,7 @@ class BlockManager extends Component {
 	 * @param {string} search Search term.
 	 */
 	setSearch( search ) {
-		this.props.setState( { search } );
+		this.setState( { search } );
 	}
 
 	render() {
@@ -58,16 +59,22 @@ class BlockManager extends Component {
 			categories,
 			blockTypes,
 			hiddenBlockTypes,
-			search,
+			hasBlockSupport,
+			isMatchingSearchTerm,
 		} = this.props;
-		const { openPanels } = this.state;
+		const { search, openPanels } = this.state;
 
-		const blockItems = blockTypes.map( ( blockType ) => ( {
-			id: blockType.name,
-			icon: blockType.icon,
-			title: blockType.title,
-			category: blockType.category,
-		} ) );
+		const blockItems = blockTypes
+			.filter( ( blockType ) => (
+				hasBlockSupport( blockType, 'inserter', true ) &&
+				( ! search || isMatchingSearchTerm( blockType, search ) )
+			) )
+			.map( ( blockType ) => ( {
+				id: blockType.name,
+				icon: blockType.icon,
+				title: blockType.title,
+				category: blockType.category,
+			} ) );
 
 		return (
 			<div className="edit-post-manage-blocks-modal__content">
@@ -101,19 +108,21 @@ class BlockManager extends Component {
 }
 
 export default compose( [
-	withState( { search: '' } ),
-	withSelect( ( select, ownProps ) => {
+	withSelect( ( select ) => {
 		const {
-			getBlockTypesBySearchTerm,
+			getBlockTypes,
 			getCategories,
+			hasBlockSupport,
+			isMatchingSearchTerm,
 		} = select( 'core/blocks' );
 		const { getPreference } = select( 'core/edit-post' );
-		const { search } = ownProps;
 
 		return {
-			blockTypes: getBlockTypesBySearchTerm( search ),
+			blockTypes: getBlockTypes(),
 			categories: getCategories(),
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+			hasBlockSupport,
+			isMatchingSearchTerm,
 		};
 	} ),
 ] )( BlockManager );
