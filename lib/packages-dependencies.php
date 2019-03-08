@@ -52,6 +52,7 @@ return array(
 		'wp-blocks',
 		'wp-compose',
 		'wp-components',
+		'wp-core-data',
 		'wp-data',
 		'wp-dom',
 		'wp-element',
