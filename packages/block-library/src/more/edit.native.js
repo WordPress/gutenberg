@@ -16,7 +16,7 @@ import {
 /**
  * Internal dependencies
  */
-import { PlainText } from '@wordpress/editor';
+import { PlainText } from '@wordpress/block-editor';
 import styles from './editor.scss';
 
 export default class MoreEdit extends Component {

@@ -90,7 +90,7 @@ describe( 'block deletion -', () => {
 		} );
 	} );
 
-	describe( 'deleting third third and fourth blocks using backspace with multi-block selection', () => {
+	describe( 'deleting the third and fourth blocks using backspace with multi-block selection', () => {
 		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
 			// Add a third paragraph for this test.
 			await page.keyboard.type( 'Third paragraph' );

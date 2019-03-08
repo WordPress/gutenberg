@@ -5,11 +5,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, ClipboardButton } from '@wordpress/components';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { Warning } from '../';
+import { Warning } from '@wordpress/block-editor';
 
 class ErrorBoundary extends Component {
 	constructor() {

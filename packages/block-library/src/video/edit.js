@@ -21,8 +21,8 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 	RichText,
-	mediaUpload,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
+import { mediaUpload } from '@wordpress/editor';
 import { Component, Fragment, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 

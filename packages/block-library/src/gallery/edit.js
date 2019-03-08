@@ -24,8 +24,8 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	InspectorControls,
-	mediaUpload,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
+import { mediaUpload } from '@wordpress/editor';
 import { Component, Fragment } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 

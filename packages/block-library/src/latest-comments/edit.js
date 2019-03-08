@@ -13,8 +13,8 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
-	ServerSideRender,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
+import { ServerSideRender } from '@wordpress/editor';
 
 /**
  * Minimum number of comments a user can show using this block.

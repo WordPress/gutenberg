@@ -11,13 +11,12 @@ import { applyFilters } from '@wordpress/hooks';
 import { Button, Spinner, ResponsiveWrapper, withFilters } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import PostFeaturedImageCheck from './check';
-import MediaUpload from '../media-upload';
-import MediaUploadCheck from '../media-upload/check';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 

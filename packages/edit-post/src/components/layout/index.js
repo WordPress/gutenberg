@@ -8,12 +8,12 @@ import classnames from 'classnames';
  */
 import { Button, Popover, ScrollLock, navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { PreserveScrollInReorder } from '@wordpress/block-editor';
 import {
 	AutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
-	PreserveScrollInReorder,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';

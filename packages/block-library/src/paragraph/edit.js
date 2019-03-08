@@ -27,7 +27,7 @@ import {
 	PanelColorSettings,
 	RichText,
 	withFontSizes,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';

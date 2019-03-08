@@ -9,7 +9,7 @@ import { View, Platform } from 'react-native';
  */
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { BlockFormatControls } from '@wordpress/editor';
+import { BlockFormatControls } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 import {
 	applyFormat,

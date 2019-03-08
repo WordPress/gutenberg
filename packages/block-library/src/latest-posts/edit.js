@@ -29,7 +29,7 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 
 /**
