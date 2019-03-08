@@ -8,9 +8,9 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, withInstanceId } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
-import { ToggleControl, PanelBody } from '@wordpress/components';
+import { TextControl, ToggleControl, PanelBody } from '@wordpress/components';
 import { __experimentalBlockTypesList as BlockTypesList } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -94,17 +94,16 @@ class BlockManager extends Component {
 	}
 
 	/**
-	 * Filters the results panel in response to an InputEvent.
+	 * Sets the search term by which to filter results.
 	 *
-	 * @param {SyntheticEvent} event Synthetic input event.
+	 * @param {string} search Search term.
 	 */
-	setSearch( event ) {
-		this.setState( { search: event.target.value } );
+	setSearch( search ) {
+		this.setState( { search } );
 	}
 
 	render() {
 		const {
-			instanceId,
 			categories,
 			blockTypes,
 			hiddenBlockTypes,
@@ -133,19 +132,12 @@ class BlockManager extends Component {
 
 		return (
 			<div className="edit-post-manage-blocks-modal__content">
-				<label
-					htmlFor={ `edit-post-manage-blocks-modal__search-${ instanceId }` }
-					className="screen-reader-text"
-				>
-					{ __( 'Search for a block' ) }
-				</label>
-				<input
-					id={ `edit-post-manage-blocks-modal__search-${ instanceId }` }
+				<TextControl
 					type="search"
-					placeholder={ __( 'Search for a block' ) }
-					className="edit-post-manage-blocks-modal__search"
+					label={ __( 'Search for a block' ) }
 					value={ search }
-					onInput={ this.setSearch }
+					onChange={ this.setSearch }
+					className="edit-post-manage-blocks-modal__search"
 				/>
 				<div className="edit-post-manage-blocks-modal__results">
 					{ categories.map( ( category ) => {
@@ -201,7 +193,6 @@ class BlockManager extends Component {
 }
 
 export default compose( [
-	withInstanceId,
 	withSelect( ( select ) => {
 		const { getBlockTypes, getCategories } = select( 'core/blocks' );
 		const { getPreference } = select( 'core/edit-post' );
