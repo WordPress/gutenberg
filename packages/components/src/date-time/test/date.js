@@ -29,7 +29,6 @@ describe( 'DatePicker', () => {
 		const wrapper = shallow( <DatePicker /> );
 		const date = wrapper.children().props().date;
 		expect( moment.isMoment( date ) ).toBe( true );
-		expect( date.isSame( moment(), 'second' ) ).toBe( true );
 	} );
 
 	describe( 'getMomentDate', () => {
@@ -55,7 +54,6 @@ describe( 'DatePicker', () => {
 			const momentDate = wrapper.instance().getMomentDate();
 
 			expect( moment.isMoment( momentDate ) ).toBe( true );
-			expect( momentDate.isSame( moment(), 'second' ) ).toBe( true );
 		} );
 	} );
 

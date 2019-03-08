@@ -26,28 +26,8 @@ import {
 	convertBlockToStatic,
 	receiveReusableBlocks,
 } from './effects/reusable-blocks';
-import {
-	requestPostUpdate,
-	requestPostUpdateSuccess,
-	requestPostUpdateFailure,
-	trashPost,
-	trashPostFailure,
-	refreshPost,
-} from './effects/posts';
 
 export default {
-	REQUEST_POST_UPDATE: ( action, store ) => {
-		requestPostUpdate( action, store );
-	},
-	REQUEST_POST_UPDATE_SUCCESS: requestPostUpdateSuccess,
-	REQUEST_POST_UPDATE_FAILURE: requestPostUpdateFailure,
-	TRASH_POST: ( action, store ) => {
-		trashPost( action, store );
-	},
-	TRASH_POST_FAILURE: trashPostFailure,
-	REFRESH_POST: ( action, store ) => {
-		refreshPost( action, store );
-	},
 	SETUP_EDITOR( action ) {
 		const { post, edits, template } = action;
 

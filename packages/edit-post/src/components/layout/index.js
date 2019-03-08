@@ -8,12 +8,12 @@ import classnames from 'classnames';
  */
 import { Button, Popover, ScrollLock, navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { PreserveScrollInReorder } from '@wordpress/block-editor';
 import {
 	AutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
-	PreserveScrollInReorder,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
@@ -137,7 +137,7 @@ export default compose(
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		isRichEditingEnabled: select( 'core/block-editor' ).getEditorSettings().richEditingEnabled,
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );

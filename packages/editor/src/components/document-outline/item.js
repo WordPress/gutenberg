@@ -4,9 +4,9 @@
 import classnames from 'classnames';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import BlockTitle from '../block-title';
+import { BlockTitle } from '@wordpress/block-editor';
 
 const TableOfContentsItem = ( {
 	children,

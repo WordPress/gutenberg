@@ -18,7 +18,7 @@ import { createRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import actions, {
-	updateEditorSettings,
+	updateSettings,
 	mergeBlocks,
 	replaceBlocks,
 	resetBlocks,
@@ -234,7 +234,7 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should return undefined if invalid but unlocked', () => {
-			store.dispatch( updateEditorSettings( {
+			store.dispatch( updateSettings( {
 				template: [
 					[ 'core/foo', {} ],
 				],
@@ -248,7 +248,7 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should return undefined if locked and valid', () => {
-			store.dispatch( updateEditorSettings( {
+			store.dispatch( updateSettings( {
 				template: [
 					[ 'core/test-block' ],
 				],
@@ -263,7 +263,7 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should return validity set action if invalid on default state', () => {
-			store.dispatch( updateEditorSettings( {
+			store.dispatch( updateSettings( {
 				template: [
 					[ 'core/foo' ],
 				],

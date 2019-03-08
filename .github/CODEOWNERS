@@ -23,11 +23,12 @@
 
 # Tooling
 /bin                                            @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/babel-plugin-makepot                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/babel-preset-default                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/babel-preset-default                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/browserslist-config                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/custom-templated-path-webpack-plugin  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/docgen                                @nosolosw @mkaz
 /packages/e2e-test-utils                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @talldan
 /packages/eslint-plugin                         @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw

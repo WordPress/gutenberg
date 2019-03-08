@@ -49,7 +49,7 @@ function ModeSwitcher( { onSwitch, mode } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isRichEditingEnabled: select( 'core/block-editor' ).getEditorSettings().richEditingEnabled,
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		mode: select( 'core/edit-post' ).getEditorMode(),
 	} ) ),
 	ifCondition( ( { isRichEditingEnabled } ) => isRichEditingEnabled ),

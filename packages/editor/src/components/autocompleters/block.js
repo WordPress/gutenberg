@@ -3,11 +3,7 @@
  */
 import { select } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import BlockIcon from '../block-icon';
+import { BlockIcon } from '@wordpress/block-editor';
 
 /**
  * Returns the client ID of the parent where a newly inserted block would be

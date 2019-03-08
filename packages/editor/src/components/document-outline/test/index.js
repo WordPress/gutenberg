@@ -13,7 +13,9 @@ import { createBlock, registerBlockType, unregisterBlockType } from '@wordpress/
  */
 import { DocumentOutline } from '../';
 
-jest.mock( '../../block-title', () => () => 'Block Title' );
+jest.mock( '@wordpress/block-editor', () => ( {
+	BlockTitle: () => 'Block Title',
+} ) );
 
 describe( 'DocumentOutline', () => {
 	let paragraph, headingH1, headingParent, headingChild, nestedHeading;

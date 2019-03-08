@@ -13,7 +13,7 @@ import classnames from 'classnames/dedupe';
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 const embedAttributes = {

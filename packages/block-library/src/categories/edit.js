@@ -9,7 +9,7 @@ import { times, unescape } from 'lodash';
 import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { InspectorControls } from '@wordpress/editor';
+import { InspectorControls } from '@wordpress/block-editor';
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -86,7 +86,7 @@ class CategoriesEdit extends Component {
 
 		return (
 			<li key={ category.id }>
-				<a href={ category.link } target="_blank">{ this.renderCategoryName( category ) }</a>
+				<a href={ category.link } target="_blank" rel="noreferrer noopener">{ this.renderCategoryName( category ) }</a>
 				{ showPostCounts &&
 					<span className="wp-block-categories__post-count">
 						{ ' ' }({ category.count })

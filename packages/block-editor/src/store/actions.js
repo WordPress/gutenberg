@@ -107,7 +107,7 @@ export function selectBlock( clientId, initialPosition = null ) {
  */
 export function* selectPreviousBlock( clientId ) {
 	const previousBlockClientId = yield select(
-		'core/editor',
+		'core/block-editor',
 		'getPreviousBlockClientId',
 		clientId
 	);
@@ -123,7 +123,7 @@ export function* selectPreviousBlock( clientId ) {
  */
 export function* selectNextBlock( clientId ) {
 	const nextBlockClientId = yield select(
-		'core/editor',
+		'core/block-editor',
 		'getNextBlockClientId',
 		clientId
 	);
@@ -393,6 +393,17 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 		type: 'REMOVE_BLOCKS',
 		clientIds,
 	};
+
+	const count = yield select(
+		'core/block-editor',
+		'getBlockCount',
+	);
+
+	// To avoid a focus loss when removing the last block, assure there is
+	// always a default block if the last of the blocks have been removed.
+	if ( count === 0 ) {
+		yield insertDefaultBlock();
+	}
 }
 
 /**
@@ -503,15 +514,15 @@ export function updateBlockListSettings( clientId, settings ) {
 }
 
 /*
- * Returns an action object used in signalling that the editor settings have been updated.
+ * Returns an action object used in signalling that the block editor settings have been updated.
  *
  * @param {Object} settings Updated settings
  *
  * @return {Object} Action object
  */
-export function updateEditorSettings( settings ) {
+export function updateSettings( settings ) {
 	return {
-		type: 'UPDATE_EDITOR_SETTINGS',
+		type: 'UPDATE_SETTINGS',
 		settings,
 	};
 }

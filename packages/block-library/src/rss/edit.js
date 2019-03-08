@@ -17,7 +17,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InspectorControls,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
