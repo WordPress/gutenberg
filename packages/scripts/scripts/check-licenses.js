@@ -78,6 +78,7 @@ const otherOssLicenses = [
 	'Apache 2.0',
 	'Apache License, Version 2.0',
 	'Apache version 2.0',
+	'CC-BY-3.0',
 ];
 
 const licenses = [
