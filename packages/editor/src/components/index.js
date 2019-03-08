@@ -22,7 +22,6 @@ export {
 	default as RichText,
 	RichTextShortcut,
 	RichTextToolbarButton,
-	RichTextInserterItem,
 	UnstableRichTextInputEvent,
 } from './rich-text';
 export { default as ServerSideRender } from './server-side-render';
