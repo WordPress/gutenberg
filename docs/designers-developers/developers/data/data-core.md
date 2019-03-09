@@ -12,6 +12,17 @@ otherwise.
  * state: Data state.
  * url: URL the preview would be for.
 
+### isResolving
+
+Returns true if resolution has been triggered but has not yet completed for a given reducer key, selector name, and arguments set, or false otherwise
+
+*Parameters*
+
+ * state: Data state.
+ * reducerKey: Registered store reducer key.
+ * selectorName: Selector name.
+ * args: Arguments passed to selector
+
 ### getAuthors
 
 Returns all available authors.
