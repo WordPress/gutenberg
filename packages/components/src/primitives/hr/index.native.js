@@ -1,6 +1,19 @@
 /**
  * External dependencies
  */
-import Hr from 'react-native-hr';
+import ReactNativeHr from 'react-native-hr';
 
-export { Hr };
+export const Hr = ( originalProps ) => {
+	const props = {
+		...originalProps,
+		lineStyle: {
+			backgroundColor: '#555d66',
+			height: 2,
+			...originalProps.lineStyle,
+		},
+	};
+
+	return (
+		<ReactNativeHr { ...props } />
+	);
+};
