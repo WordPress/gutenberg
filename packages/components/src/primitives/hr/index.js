@@ -1,0 +1,1 @@
+export const Hr = 'hr';
