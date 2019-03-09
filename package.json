@@ -175,7 +175,6 @@
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
 		"package-plugin": "./bin/build-plugin-zip.sh",
-		"postinstall": "npm run check-licenses && npm run build:packages",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"precommit": "lint-staged",
 		"publish:check": "npm run build:packages && lerna updated",
