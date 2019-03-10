@@ -123,6 +123,19 @@ function getFirstAnchorAttributeFormHTML( html, attributeName ) {
 	}
 }
 
+export function stripFirstImage( attributes, { shortcode } ) {
+	const { body } = document.implementation.createHTMLDocument( '' );
+
+	body.innerHTML = shortcode.content;
+
+	const firstImage = body.querySelector( 'img' );
+	if ( firstImage ) {
+		firstImage.parentNode.removeChild( firstImage );
+	}
+
+	return body.innerHTML.trim();
+}
+
 export const settings = {
 	title: __( 'Image' ),
 
@@ -196,14 +209,7 @@ export const settings = {
 						selector: 'img',
 					},
 					caption: {
-						shortcode: ( attributes, { shortcode } ) => {
-							const { body } = document.implementation.createHTMLDocument( '' );
-
-							body.innerHTML = shortcode.content;
-							body.removeChild( body.firstElementChild );
-
-							return body.innerHTML.trim();
-						},
+						shortcode: stripFirstImage,
 					},
 					href: {
 						shortcode: ( attributes, { shortcode } ) => {
