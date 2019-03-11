@@ -5,7 +5,7 @@ import Aztec
 
 class GutenbergViewController: UIViewController {
 
-    fileprivate lazy var gutenberg = Gutenberg(dataSource: self)
+    fileprivate lazy var gutenberg = Gutenberg(dataSource: self, extraModules: [CustomImageLoader()])
     fileprivate var htmlMode = false
     fileprivate var mediaPickCoordinator: MediaPickCoordinator?
     fileprivate lazy var mediaUploadCoordinator: MediaUploadCoordinator = {

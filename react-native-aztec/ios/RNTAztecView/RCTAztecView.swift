@@ -54,6 +54,7 @@ class RCTAztecView: Aztec.TextView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .natural
         label.font = font
+
         return label
     }()
 
@@ -74,6 +75,10 @@ class RCTAztecView: Aztec.TextView {
         )
     }()
 
+    /// If a dictation start with an empty UITextView,
+    /// the dictation engine refreshes the TextView with an empty string when the dictation finishes.
+    /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
+    /// on `textViewDidChange` and `textViewDidChangeSelection`
     private var isInsertingDictationResult = false
     
     // MARK: - Font
@@ -405,10 +410,10 @@ class RCTAztecView: Aztec.TextView {
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {
-        let oldFont = font(from: typingAttributesSwifted)
+        let oldFont = font(from: typingAttributes)
         let newFont = applyFontConstraints(to: oldFont)
         
-        typingAttributesSwifted[.font] = newFont
+        typingAttributes[.font] = newFont
         placeholderLabel.font = newFont
     }
 
@@ -452,15 +457,15 @@ class RCTAztecView: Aztec.TextView {
 extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
+        guard isInsertingDictationResult == false else {
+            return
+        }
+
         propagateSelectionChanges()
     }
 
     func textViewDidChange(_ textView: UITextView) {
-
         guard isInsertingDictationResult == false else {
-            // If a dictation start with an empty UITextView,
-            // the dictation engine refreshes the TextView with an empty string when the dictation finishes.
-            // This avoid propagating that unwanted empty string to RN. (Solving #606)
             return
         }
 
