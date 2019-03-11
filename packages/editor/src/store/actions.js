@@ -800,19 +800,19 @@ export function __experimentalDeleteReusableBlock( id ) {
 }
 
 /**
- * Returns an action object used in signalling that a reusable block's title is
+ * Returns an action object used in signalling that a reusable block is
  * to be updated.
  *
- * @param {number} id    The ID of the reusable block to update.
- * @param {string} title The new title.
+ * @param {number} id      The ID of the reusable block to update.
+ * @param {Object} changes The changes to apply.
  *
  * @return {Object} Action object.
  */
-export function __experimentalUpdateReusableBlockTitle( id, title ) {
+export function __experimentalUpdateReusableBlock( id, changes ) {
 	return {
-		type: 'UPDATE_REUSABLE_BLOCK_TITLE',
+		type: 'UPDATE_REUSABLE_BLOCK',
 		id,
-		title,
+		changes,
 	};
 }
 

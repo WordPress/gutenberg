@@ -9,6 +9,8 @@ import {
 	mapValues,
 	keys,
 	isEqual,
+	map,
+	keyBy,
 } from 'lodash';
 
 /**
@@ -416,33 +418,26 @@ export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RECEIVE_REUSABLE_BLOCKS': {
-				return reduce( action.results, ( nextState, result ) => {
-					const { id, title } = result.reusableBlock;
-					const { clientId } = result.parsedBlock;
-
-					const value = { clientId, title };
-
-					if ( ! isEqual( nextState[ id ], value ) ) {
-						nextState = getMutateSafeObject( state, nextState );
-						nextState[ id ] = value;
-					}
-
-					return nextState;
-				}, state );
+				return {
+					...state,
+					...map(
+						keyBy( action.results, 'id' ),
+						( block ) => ( {
+							...block,
+							content: block.content.raw,
+							title: block.title.raw,
+						} )
+					),
+				};
 			}
 
-			case 'UPDATE_REUSABLE_BLOCK_TITLE': {
-				const { id, title } = action;
-
-				if ( ! state[ id ] || state[ id ].title === title ) {
-					return state;
-				}
-
+			case 'UPDATE_REUSABLE_BLOCK': {
+				const { id, changes } = action;
 				return {
 					...state,
 					[ id ]: {
 						...state[ id ],
-						title,
+						...changes,
 					},
 				};
 			}
@@ -458,7 +453,10 @@ export const reusableBlocks = combineReducers( {
 				const value = state[ id ];
 				return {
 					...omit( state, id ),
-					[ updatedId ]: value,
+					[ updatedId ]: {
+						...value,
+						id: updatedId,
+					},
 				};
 			}
 
