@@ -19,7 +19,7 @@ const packages = [
 	'dom',
 	'dom-ready',
 	'e2e-test-utils',
-	//'edit-post',
+	'edit-post',
 	'element',
 	'escape-html',
 	'html-entities',
