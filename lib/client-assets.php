@@ -265,9 +265,17 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_style( 'wp-blocks', false );
 
 	gutenberg_override_style(
+		'wp-block-editor',
+		gutenberg_url( 'build/block-editor/style.css' ),
+		array( 'wp-components', 'wp-editor-font' ),
+		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
+	);
+	wp_style_add_data( 'wp-block-editor', 'rtl', 'replace' );
+
+	gutenberg_override_style(
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-editor-font', 'wp-nux' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-nux' ),
 		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
 	);
 	wp_style_add_data( 'wp-editor', 'rtl', 'replace' );
@@ -275,7 +283,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_style(
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-nux' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-nux' ),
 		filemtime( gutenberg_dir_path() . 'build/edit-post/style.css' )
 	);
 	wp_style_add_data( 'wp-edit-post', 'rtl', 'replace' );
@@ -299,7 +307,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_style(
 		'wp-format-library',
 		gutenberg_url( 'build/format-library/style.css' ),
-		array(),
+		array( 'wp-block-editor', 'wp-components' ),
 		filemtime( gutenberg_dir_path() . 'build/format-library/style.css' )
 	);
 	wp_style_add_data( 'wp-format-library', 'rtl', 'replace' );
@@ -872,26 +880,75 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		);
 	}
 
+	/**
+	 * Start: Include for phase 2
+	 */
+
+	/**
+	 * Todo: The hardcoded array should be replaced with a mechanisms that allows core blocks
+	 * and third party blocks to specify they already have equivalent blocks, and maybe even allow them
+	 * to have a migration function.
+	 */
+	$core_widgets = array( 'WP_Widget_Pages', 'WP_Widget_Calendar', 'WP_Widget_Archives', 'WP_Widget_Media_Audio', 'WP_Widget_Media_Image', 'WP_Widget_Media_Gallery', 'WP_Widget_Media_Video', 'WP_Widget_Meta', 'WP_Widget_Search', 'WP_Widget_Text', 'WP_Widget_Categories', 'WP_Widget_Recent_Posts', 'WP_Widget_Recent_Comments', 'WP_Widget_RSS', 'WP_Widget_Tag_Cloud', 'WP_Nav_Menu_Widget', 'WP_Widget_Custom_HTML' );
+
+	$has_permissions_to_manage_widgets = current_user_can( 'edit_theme_options' );
+	$available_legacy_widgets          = array();
+	global $wp_widget_factory, $wp_registered_widgets;
+	foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
+		if ( ! in_array( $class, $core_widgets ) ) {
+			$available_legacy_widgets[ $class ] = array(
+				'name'             => html_entity_decode( $widget_obj->name ),
+				'description'      => html_entity_decode( $widget_obj->widget_options['description'] ),
+				'isCallbackWidget' => false,
+			);
+		}
+	}
+	foreach ( $wp_registered_widgets as $widget_id => $widget_obj ) {
+		if (
+			is_array( $widget_obj['callback'] ) &&
+			isset( $widget_obj['callback'][0] ) &&
+			( $widget_obj['callback'][0] instanceof WP_Widget )
+		) {
+			continue;
+		}
+		$available_legacy_widgets[ $widget_id ] = array(
+			'name'             => html_entity_decode( $widget_obj['name'] ),
+			'description'      => null,
+			'isCallbackWidget' => true,
+		);
+	}
+	/**
+	 * End: Include for phase 2
+	 */
+
 	$editor_settings = array(
-		'alignWide'              => $align_wide,
-		'availableTemplates'     => $available_templates,
-		'allowedBlockTypes'      => $allowed_block_types,
-		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
-		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
-		'disablePostFormats'     => ! current_theme_supports( 'post-formats' ),
-		'titlePlaceholder'       => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
-		'bodyPlaceholder'        => apply_filters( 'write_your_story', __( 'Start writing or type / to choose a block', 'gutenberg' ), $post ),
-		'isRTL'                  => is_rtl(),
-		'autosaveInterval'       => 10,
-		'maxUploadFileSize'      => $max_upload_size,
-		'allowedMimeTypes'       => get_allowed_mime_types(),
-		'styles'                 => $styles,
-		'imageSizes'             => gutenberg_get_available_image_sizes(),
-		'richEditingEnabled'     => user_can_richedit(),
+		'alignWide'                     => $align_wide,
+		'availableTemplates'            => $available_templates,
+		/**
+		* Start: Include for phase 2
+		*/
+		'hasPermissionsToManageWidgets' => $has_permissions_to_manage_widgets,
+		'availableLegacyWidgets'        => $available_legacy_widgets,
+		/**
+		* End: Include for phase 2
+		*/
+		'allowedBlockTypes'             => $allowed_block_types,
+		'disableCustomColors'           => get_theme_support( 'disable-custom-colors' ),
+		'disableCustomFontSizes'        => get_theme_support( 'disable-custom-font-sizes' ),
+		'disablePostFormats'            => ! current_theme_supports( 'post-formats' ),
+		'titlePlaceholder'              => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
+		'bodyPlaceholder'               => apply_filters( 'write_your_story', __( 'Start writing or type / to choose a block', 'gutenberg' ), $post ),
+		'isRTL'                         => is_rtl(),
+		'autosaveInterval'              => 10,
+		'maxUploadFileSize'             => $max_upload_size,
+		'allowedMimeTypes'              => get_allowed_mime_types(),
+		'styles'                        => $styles,
+		'imageSizes'                    => gutenberg_get_available_image_sizes(),
+		'richEditingEnabled'            => user_can_richedit(),
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
-		'postLock'               => $lock_details,
-		'postLockUtils'          => array(
+		'postLock'                      => $lock_details,
+		'postLockUtils'                 => array(
 			'nonce'       => wp_create_nonce( 'lock-post_' . $post->ID ),
 			'unlockNonce' => wp_create_nonce( 'update-post_' . $post->ID ),
 			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
@@ -899,7 +956,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 		// Whether or not to load the 'postcustom' meta box is stored as a user meta
 		// field so that we're not always loading its assets.
-		'enableCustomFields'     => (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true ),
+		'enableCustomFields'            => (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true ),
 	);
 
 	$post_autosave = gutenberg_get_autosave_newer_than_post_save( $post );

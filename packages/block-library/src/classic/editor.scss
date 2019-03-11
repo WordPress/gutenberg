@@ -109,12 +109,15 @@
 
 	.wp-more-tag {
 		width: 96%;
-		height: 0;
+		height: 20px;
 		display: block;
 		margin: 15px auto;
 		outline: 0;
 		cursor: default;
-		border: 2px dashed rgb(186, 186, 186);
+		background-image: url(/wp-includes/js/tinymce/skins/wordpress/images/more-2x.png);
+		background-size: 1900px 20px;
+		background-repeat: no-repeat;
+		background-position: center;
 	}
 
 	/**
@@ -185,6 +188,12 @@
 	.mce-btn.mce-active i,
 	.mce-btn.mce-active:hover i {
 		color: $dark-gray-800;
+	}
+
+	// Prevent toolbar clipping on heading style in RTL languages
+	.mce-rtl .mce-flow-layout-item.mce-last {
+		margin-right: 0;
+		margin-left: 8px;
 	}
 
 	// Prevent i tags in buttons from picking up theme editor styles.

@@ -7,11 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import BlockTitle from '../block-title';
+import { BlockTitle } from '@wordpress/block-editor';
 
 const TableOfContentsItem = ( {
 	children,

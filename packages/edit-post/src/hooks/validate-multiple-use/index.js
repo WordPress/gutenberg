@@ -15,7 +15,7 @@ import {
 } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { Warning } from '@wordpress/editor';
+import { Warning } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';

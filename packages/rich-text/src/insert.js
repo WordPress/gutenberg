@@ -11,10 +11,10 @@ import { normaliseFormats } from './normalise-formats';
  * and `endIndex` will be removed. Indices are retrieved from the selection if
  * none are provided.
  *
- * @param {Object} value         Value to modify.
- * @param {string} valueToInsert Value to insert.
- * @param {number} startIndex    Start index.
- * @param {number} endIndex      End index.
+ * @param {Object}        value         Value to modify.
+ * @param {Object|string} valueToInsert Value to insert.
+ * @param {number}        [startIndex]  Start index.
+ * @param {number}        [endIndex]    End index.
  *
  * @return {Object} A new value with the value inserted.
  */

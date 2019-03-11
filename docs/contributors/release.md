@@ -87,7 +87,7 @@ If a bug is found in a release candidate and a fix is committed to `master`, we 
 5. Tag the RC version. `git tag vx.x.0-rc.2` from the release branch.
 6. Push the tag `git push --tags`.
 7. Merge the version bump pull request and avoid removing the release branch.
-8. Follow the steps in [build the plugin](#build-the-plugin) and [publish the release on GitHub](#publish-the-release-on-github). 
+8. Follow the steps in [build the plugin](#build-the-plugin) and [publish the release on GitHub](#publish-the-release-on-github).
 
 You can copy the existing changelog from the previous release candidate. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7) and the call for testing post.
 
@@ -144,11 +144,11 @@ Creating a release involves:
 
 You'll need to use Subversion to publish the plugin to WordPress.org.
 
-1. Do an SVN checkout of `https://wordpress.org/plugins/gutenberg/`:
-  * If this is your first checkout, run: `svn checkout https://plugins.svn.wordpress.org/gutenberg`
+1. Do an SVN checkout of `https://wordpress.org/plugins/gutenberg/trunk`:
+  * If this is your first checkout, run: `svn checkout https://plugins.svn.wordpress.org/gutenberg/trunk`
   * If you already have a copy, run: `svn up`
-2. Delete the contents of `trunk` except for the `readme.txt` and `changelog.txt` files (these files don’t exist in the `git` repo, only in Subversion).
-3. Extract the contents of the zip file to `trunk`.
+2. Delete the contents except for the `readme.txt` and `changelog.txt` files (these files don’t exist in the `git` repo, only in Subversion).
+3. Extract the contents of the zip file.
 4. Edit `readme.txt`, replacing the changelog for the previous version with the current release's changelog.
 5. Add the changelog for the current release to `changelog.txt`.
 6. Add new files/remove deleted files from the repository:
@@ -158,17 +158,16 @@ svn st | grep '^\?' | awk '{print $2}' | xargs svn add
 # Delete old files:
 svn st | grep '^!' | awk '{print $2}' | xargs svn rm
 ```
-7. Commit the new version to `trunk`:
+7. Commit the new version:
 ```bash
-# Replace vX.X.X with your version:
-svn ci -m "Committing Gutenberg version vX.X.X"
+# Replace X.X.X with your version:
+svn ci -m "Committing Gutenberg version X.X.X"
 ```
-8. Tag the new version. Make sure you're in the root directory of `gutenberg`, then run:
+8. Tag the new version:
 ```bash
-svn cp trunk tags/X.X.X
-svn ci -m "Tagging Gutenberg version X.X.X"
+svn cp https://plugins.svn.wordpress.org/gutenberg/trunk https://plugins.svn.wordpress.org/gutenberg/tags/X.X.X -m "Tagging Gutenberg version X.X.X"
 ```
-9. Edit `trunk/readme.txt` to point to the new tag. The **Stable version** header in `readme.txt` should be updated to match the new release version number. After updating and committing that, the new version should be released:
+9. Edit `readme.txt` to point to the new tag. The **Stable version** header in `readme.txt` should be updated to match the new release version number. After updating and committing that, the new version should be released:
 ```bash
 svn ci -m "Releasing Gutenberg version X.X.X"
 ```
@@ -200,7 +199,7 @@ For each Gutenberg plugin release, WordPress trunk should be synchronized with t
 1. Ensure the WordPress `trunk` branch is open for enhancements. 
 2. Check out the last published Gutenberg release branch `git checkout release/x.x`
 3. Create a Pull Request from this branch targetting `wp/trunk`.
-4. Merge the Pull Request.
+4. Merge the Pull Request using the "Rebase and Merge" button to keep the history of the commits.
 
 Now, the branch is ready to be used to publish the npm packages.
 
@@ -222,7 +221,7 @@ The following workflow is needed when bug fixes or security releases need to be 
 1. Cherry-pick
 2. Check out the last published Gutenberg release branch `git checkout release/x.x`
 3. Create a Pull Request from this branch targetting the WordPress related major branch (Example `wp/5.2`).
-4. Merge the Pull Request.
+4. Merge the Pull Request using the "Rebase and Merge" button to keep the history of the commits.
 
 Now, the branch is ready to be used to publish the npm packages.
 
