@@ -185,5 +185,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		parent.subscribe( globalListener );
 	}
 
+	if ( parent ) {
+		parent.subscribe( globalListener );
+	}
+
 	return withPlugins( registry );
 }
