@@ -13,8 +13,12 @@ import {
 } from 'react-native';
 import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
 
+/**
+ * WordPress dependencies
+ */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { addFilter, removeFilter, hasFilter } from '@wordpress/hooks';
 
 import type { BlockType } from '../store/types';
 
@@ -61,6 +65,10 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		};
 	}
 
+	componentWillUnmount() {
+		this.removeOnRemoveBlockCheckUploadFilter();
+	}
+
 	onFocus = ( event: NativeSyntheticEvent<NativeTouchEvent> ) => {
 		if ( event ) {
 			// == Hack for the Alpha ==
@@ -75,6 +83,24 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		this.props.onSelect( this.props.clientId );
 	};
 
+	onRemoveBlockCheckUpload( mediaId, isUploading ) {
+		if ( isUploading ) {
+			console.log( " about to send cancel signal for mediaId: " + mediaId );
+			// TODO here we will be being passed the mediaId of the Image component being unmounted so, safe to issue the cancel signal
+			// through the bridge.
+		}
+
+		// now remove the filter as it won't be needed anymore
+		this.removeOnRemoveBlockCheckUploadFilter();
+	}
+
+	removeOnRemoveBlockCheckUploadFilter() {
+		// remove filter if still registered
+		if ( hasFilter( 'blocks.onRemoveBlockCheckUpload' ) ) {
+			removeFilter( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks' );
+		}
+	}
+	
 	onInlineToolbarButtonPressed = ( button: number ) => {
 		switch ( button ) {
 			case InlineToolbarActions.UP:
@@ -84,6 +110,9 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				this.props.moveBlockDown();
 				break;
 			case InlineToolbarActions.DELETE:
+				// adding a filter that will exist for as long as it takes for the block to be removed and the component unmounted
+				// using a namespace that is only valid for the current block id
+				addFilter( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks', this.onRemoveBlockCheckUpload );
 				this.props.removeBlock();
 				break;
 		}
