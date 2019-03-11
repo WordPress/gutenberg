@@ -125,7 +125,8 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		} else {
 			const name = this.props.getBlockName( previousBlockClientId );
 			const blockType = getBlockType( name );
-			// Only focus the previous block if it's not mergeable
+			// The default implementation does only focus the previous block if it's not mergeable
+			// We don't want to move the focus for now, just keep for and caret at the beginning of the current block.
 			if ( ! blockType.merge ) {
 				return;
 			}
