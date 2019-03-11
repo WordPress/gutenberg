@@ -14,6 +14,7 @@ import {
 	orderBy,
 	reduce,
 	some,
+	find,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -24,6 +25,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
+	parse,
 } from '@wordpress/blocks';
 
 // Module constants
@@ -1125,7 +1127,8 @@ const canIncludeReusableBlockInInserter = ( state, reusableBlock, rootClientId )
 		return false;
 	}
 
-	const referencedBlockName = getBlockName( state, reusableBlock.clientId );
+	const referencedBlocks = __experimentalGetParsedReusableBlock( state, reusableBlock.id );
+	const referencedBlockName = referencedBlocks ? referencedBlocks[ 0 ].name : null;
 	if ( ! referencedBlockName ) {
 		return false;
 	}
@@ -1246,7 +1249,8 @@ export const getInserterItems = createSelector(
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
 			const id = `core/block/${ reusableBlock.id }`;
 
-			const referencedBlockName = getBlockName( state, reusableBlock.clientId );
+			const referencedBlocks = __experimentalGetParsedReusableBlock( state, reusableBlock.id );
+			const referencedBlockName = referencedBlocks[ 0 ].name;
 			const referencedBlockType = getBlockType( referencedBlockName );
 
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
@@ -1362,6 +1366,31 @@ export function getSettings( state ) {
 export function isLastBlockChangePersistent( state ) {
 	return state.blocks.isPersistentChange;
 }
+
+/**
+ * Returns the parsed block saved as shared block with the given ID.
+ *
+ * @param {Object}        state Global application state.
+ * @param {number|string} ref   The shared block's ID.
+ *
+ * @return {Object} The parsed block.
+ */
+export const __experimentalGetParsedReusableBlock = createSelector(
+	( state, ref ) => {
+		const reusableBlock = find(
+			getReusableBlocks( state ),
+			( block ) => block.id === ref
+		);
+		if ( ! reusableBlock ) {
+			return null;
+		}
+
+		return parse( reusableBlock.content );
+	},
+	( state ) => [
+		getReusableBlocks( state ),
+	],
+);
 
 /**
  * Returns true if the most recent block change is be considered ignored, or
