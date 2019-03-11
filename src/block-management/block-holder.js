@@ -21,6 +21,7 @@ import type { BlockType } from '../store/types';
 import styles from './block-holder.scss';
 
 // Gutenberg imports
+import { getBlockType } from '@wordpress/blocks';
 import { BlockEdit } from '@wordpress/editor';
 
 import TextInputState from 'react-native/lib/TextInputState';
@@ -36,6 +37,7 @@ type PropsType = BlockType & {
 	focusedBorderColor: string,
 	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
 	getPreviousBlockClientId: ( clientId: string ) => string,
+	getBlockName: ( clientId: string ) => string,
 	getNextBlockClientId: ( clientId: string ) => string,
 	onChange: ( attributes: mixed ) => void,
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
@@ -121,6 +123,13 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		if ( forward ) {
 			mergeBlocks( clientId, nextBlockClientId );
 		} else {
+			const name = this.props.getBlockName( previousBlockClientId );
+			const blockType = getBlockType( name );
+			// Only focus the previous block if it's not mergeable
+			if ( ! blockType.merge ) {
+				return;
+			}
+
 			mergeBlocks( previousBlockClientId, clientId );
 		}
 	};
@@ -202,6 +211,7 @@ export default compose( [
 		return {
 			attributes,
 			getBlockIndex,
+			getBlockName,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
 			isFirstBlock,
