@@ -38,7 +38,7 @@ _Example:_
 
 ### `build`
 
-Transforms your code according the configuration provided so it's ready for production and optimized for the best performance. It uses [Webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the "Webpack config" section.
+Transforms your code according the configuration provided so it's ready for production and optimized for the best performance. It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the "webpack config" section.
 
 _Example:_
 
@@ -149,7 +149,7 @@ This is how you execute the script with presented setup:
 
 ### `start`
 
-Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. It uses [Webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the "Webpack config" section.
+Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the "webpack config" section.
 
 _Example:_
 
@@ -218,13 +218,13 @@ This is how you execute those scripts using the presented setup:
 * `npm run test:unit:help` - prints all available options to configure unit tests runner.
 * `npm run test:unit:watch` - runs all unit tests in the watch mode.
 
-## Webpack config
+## webpack config
 
-The `build` and `start` commands use [Webpack](https://webpack.js.org/) behind the scenes. Webpack is a tool that helps you transform your code into something else. For example: it can take code written in ESNext and output ES5 compatible code that is minified for production.
+The `build` and `start` commands use [webpack](https://webpack.js.org/) behind the scenes. webpack is a tool that helps you transform your code into something else. For example: it can take code written in ESNext and output ES5 compatible code that is minified for production.
 
-### Default Webpack config
+### Default webpack config
 
-`@wordpress/scripts` bundles the default Webpack config used as a base by the WordPress editor. These are the defaults:
+`@wordpress/scripts` bundles the default webpack config used as a base by the WordPress editor. These are the defaults:
 
 * [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
 * [Output](https://webpack.js.org/configuration/output): `build/index.js`
@@ -240,9 +240,9 @@ lodash | `import x from lodash;` | `var x = window.lodash.x;`
 lodash-es | `import x from lodash-es;` | `var x = window.lodash.x;`
 WordPress packages | `import x from '@wordpress/package-name` | `var x = window.wp.packageName.x`
 
-### Provide your own Webpack config
+### Provide your own webpack config
 
-Should there be any situation where you want to provide your own Webpack config, you can do so. The `build` and `start` commands will use your provided file when:
+Should there be any situation where you want to provide your own webpack config, you can do so. The `build` and `start` commands will use your provided file when:
 
 * the command receives a `--config` argument. Example: `wp-scripts build --config my-own-webpack-config.js`.
 * there is a file called `webpack.config.js` or `webpack.config.babel.js` in the top-level directory of your package (at the same level than your `package.json`).
