@@ -28,7 +28,8 @@ import SafeArea from 'react-native-safe-area';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { DefaultBlockAppender, PostTitle } from '@wordpress/editor';
+import { PostTitle } from '@wordpress/editor';
+import { DefaultBlockAppender } from '@wordpress/block-editor';
 import { sendNativeEditorDidLayout, subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
 
 type PropsType = {
@@ -307,7 +308,7 @@ export default compose( [
 			getSelectedBlockClientId,
 			isBlockSelected,
 			getBlockMode,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
@@ -326,7 +327,7 @@ export default compose( [
 			insertBlock,
 			replaceBlock,
 			selectBlock,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			insertBlock,

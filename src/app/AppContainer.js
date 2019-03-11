@@ -108,11 +108,13 @@ class AppContainer extends React.Component<PropsType> {
 export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
-			getBlocks,
-			getBlockMode,
 			getEditedPostContent,
 			getEditedPostAttribute,
 		} = select( 'core/editor' );
+		const {
+			getBlocks,
+			getBlockMode,
+		} = select( 'core/block-editor' );
 
 		return {
 			getBlocks,
@@ -124,10 +126,12 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const {
 			editPost,
-			resetBlocks,
 			setupEditor,
-			toggleBlockMode,
 		} = dispatch( 'core/editor' );
+		const {
+			resetBlocks,
+			toggleBlockMode,
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			editTitle( title ) {
