@@ -170,6 +170,25 @@ export class InserterMenu extends Component {
 		};
 	}
 
+	filterOpenPanels( filterValue, itemsPerCategory, filteredItems, reusableItems ) {
+		if ( filterValue === this.state.filterValue ) {
+			return this.state.openPanels;
+		}
+		if ( ! filterValue ) {
+			return [ 'suggested' ];
+		}
+		let openPanels = [];
+		if ( reusableItems.length > 0 ) {
+			openPanels.push( 'reusable' );
+		}
+		if ( filteredItems.length > 0 ) {
+			openPanels = openPanels.concat(
+				Object.keys( itemsPerCategory )
+			);
+		}
+		return openPanels;
+	}
+
 	filter( filterValue = '' ) {
 		const { debouncedSpeak, items, rootChildBlocks } = this.props;
 		const filteredItems = searchItems( items, filterValue );
@@ -193,23 +212,6 @@ export class InserterMenu extends Component {
 			( itemList ) => groupBy( itemList, 'category' )
 		)( filteredItems );
 
-		let openPanels = this.state.openPanels;
-		if ( filterValue !== this.state.filterValue ) {
-			if ( ! filterValue ) {
-				openPanels = [ 'suggested' ];
-			} else {
-				openPanels = [];
-				if ( reusableItems.length ) {
-					openPanels.push( 'reusable' );
-				}
-				if ( filteredItems.length ) {
-					openPanels = openPanels.concat(
-						Object.keys( itemsPerCategory )
-					);
-				}
-			}
-		}
-
 		this.setState( {
 			hoveredItem: null,
 			childItems,
@@ -217,7 +219,12 @@ export class InserterMenu extends Component {
 			suggestedItems,
 			reusableItems,
 			itemsPerCategory,
-			openPanels,
+			openPanels: this.filterOpenPanels(
+				filterValue,
+				itemsPerCategory,
+				filteredItems,
+				reusableItems
+			),
 		} );
 
 		const resultCount = Object.keys( itemsPerCategory ).reduce( ( accumulator, currentCategorySlug ) => {
@@ -241,7 +248,14 @@ export class InserterMenu extends Component {
 
 	render() {
 		const { instanceId, onSelect, rootClientId } = this.props;
-		const { childItems, filterValue, hoveredItem, suggestedItems, reusableItems, itemsPerCategory, openPanels } = this.state;
+		const {
+			childItems,
+			hoveredItem,
+			itemsPerCategory,
+			openPanels,
+			reusableItems,
+			suggestedItems,
+		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
