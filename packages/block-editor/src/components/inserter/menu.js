@@ -170,6 +170,25 @@ export class InserterMenu extends Component {
 		};
 	}
 
+	filterOpenPanels( filterValue, itemsPerCategory, filteredItems, reusableItems ) {
+		if ( filterValue === this.state.filterValue ) {
+			return this.state.openPanels;
+		}
+		if ( ! filterValue ) {
+			return [ 'suggested' ];
+		}
+		let openPanels = [];
+		if ( reusableItems.length > 0 ) {
+			openPanels.push( 'reusable' );
+		}
+		if ( filteredItems.length > 0 ) {
+			openPanels = openPanels.concat(
+				Object.keys( itemsPerCategory )
+			);
+		}
+		return openPanels;
+	}
+
 	filter( filterValue = '' ) {
 		const { debouncedSpeak, items, rootChildBlocks } = this.props;
 		const filteredItems = searchItems( items, filterValue );
@@ -193,18 +212,6 @@ export class InserterMenu extends Component {
 			( itemList ) => groupBy( itemList, 'category' )
 		)( filteredItems );
 
-		let openPanels = this.state.openPanels;
-		if ( filterValue !== this.state.filterValue ) {
-			if ( ! filterValue ) {
-				openPanels = [ 'suggested' ];
-			} else if ( reusableItems.length ) {
-				openPanels = [ 'reusable' ];
-			} else if ( filteredItems.length ) {
-				const firstCategory = find( getCategories(), ( { slug } ) => itemsPerCategory[ slug ] && itemsPerCategory[ slug ].length );
-				openPanels = [ firstCategory.slug ];
-			}
-		}
-
 		this.setState( {
 			hoveredItem: null,
 			childItems,
@@ -212,7 +219,12 @@ export class InserterMenu extends Component {
 			suggestedItems,
 			reusableItems,
 			itemsPerCategory,
-			openPanels,
+			openPanels: this.filterOpenPanels(
+				filterValue,
+				itemsPerCategory,
+				filteredItems,
+				reusableItems
+			),
 		} );
 
 		const resultCount = Object.keys( itemsPerCategory ).reduce( ( accumulator, currentCategorySlug ) => {
@@ -236,9 +248,15 @@ export class InserterMenu extends Component {
 
 	render() {
 		const { instanceId, onSelect, rootClientId } = this.props;
-		const { childItems, filterValue, hoveredItem, suggestedItems, reusableItems, itemsPerCategory, openPanels } = this.state;
+		const {
+			childItems,
+			hoveredItem,
+			itemsPerCategory,
+			openPanels,
+			reusableItems,
+			suggestedItems,
+		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
-		const isSearching = !! filterValue;
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of autoFocus via
@@ -300,7 +318,7 @@ export class InserterMenu extends Component {
 								key={ category.slug }
 								title={ category.title }
 								icon={ category.icon }
-								opened={ isSearching || isPanelOpen( category.slug ) }
+								opened={ isPanelOpen( category.slug ) }
 								onToggle={ this.onTogglePanel( category.slug ) }
 								ref={ this.bindPanel( category.slug ) }
 							>
