@@ -8,6 +8,8 @@ import {
 	pressKeyWithModifier,
 	pressKeyTimes,
 	getEditedPostContent,
+	selectAllBlocks,
+	__unstableSelectAll,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Multi-block selection', () => {
@@ -74,7 +76,11 @@ describe( 'Multi-block selection', () => {
 
 		// Select all via double shortcut.
 		await page.click( firstBlockSelector );
-		await pressKeyWithModifier( 'primary', 'a' );
+		// NOTE: `__unstableSelectAll` is used for cross-platform compatibility
+		// alternative to Cmd+A. The second issuance of the key combination is
+		// handled internerally by the block editor's KeyboardShortcuts utility
+		// and is not subject to the same buggy emulation.
+		await __unstableSelectAll();
 		await pressKeyWithModifier( 'primary', 'a' );
 		await expectMultiSelected( blocks, true );
 	} );
@@ -126,10 +132,7 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( 'Second Paragraph' );
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Third Paragraph' );
-
-		// Multiselect via keyboard.
-		await pressKeyWithModifier( 'primary', 'a' );
-		await pressKeyWithModifier( 'primary', 'a' );
+		await selectAllBlocks();
 
 		// TODO: It would be great to do this test by spying on `wp.a11y.speak`,
 		// but it's very difficult to do that because `wp.a11y` has

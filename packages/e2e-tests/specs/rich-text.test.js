@@ -7,6 +7,7 @@ import {
 	insertBlock,
 	clickBlockAppender,
 	pressKeyWithModifier,
+	__unstableSelectAll,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
@@ -30,7 +31,7 @@ describe( 'RichText', () => {
 	it( 'should apply formatting with access shortcut', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
-		await pressKeyWithModifier( 'primary', 'a' );
+		await __unstableSelectAll();
 		await pressKeyWithModifier( 'access', 'd' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -39,7 +40,7 @@ describe( 'RichText', () => {
 	it( 'should apply formatting with primary shortcut', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
-		await pressKeyWithModifier( 'primary', 'a' );
+		await __unstableSelectAll();
 		await pressKeyWithModifier( 'primary', 'b' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

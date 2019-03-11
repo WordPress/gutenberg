@@ -1,3 +1,4 @@
+export { __unstableSelectAll } from './select-all';
 export { activatePlugin } from './activate-plugin';
 export { arePrePublishChecksEnabled } from './are-pre-publish-checks-enabled';
 export { clearLocalStorage } from './clear-local-storage';
@@ -37,6 +38,7 @@ export { publishPost } from './publish-post';
 export { publishPostWithPrePublishChecksDisabled } from './publish-post-with-pre-publish-checks-disabled';
 export { saveDraft } from './save-draft';
 export { searchForBlock } from './search-for-block';
+export { selectAllBlocks } from './select-all-blocks';
 export { selectBlockByClientId } from './select-block-by-client-id';
 export { setBrowserViewport } from './set-browser-viewport';
 export { setPostContent } from './set-post-content';

@@ -7,6 +7,7 @@ import {
 	getEditedPostContent,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	__unstableSelectAll,
 } from '@wordpress/e2e-test-utils';
 
 async function openBlockNavigator() {
@@ -98,11 +99,8 @@ describe( 'Navigating the block hierarchy', () => {
 		await openBlockNavigator();
 		await page.keyboard.press( 'Space' );
 
-		// Replace its content
-		// note Cmd/Ctrl + A doesn't work on Mac with Pupetter right now
-		// https://github.com/GoogleChrome/puppeteer/issues/1313
-		await pressKeyTimes( 'ArrowRight', textString.length );
-		await pressKeyTimes( 'Backspace', textString.length );
+		// Replace its content.
+		await __unstableSelectAll();
 		await page.keyboard.type( 'and I say hello' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

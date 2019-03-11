@@ -377,6 +377,14 @@ _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
 
+<a name="selectAllBlocks" href="#selectAllBlocks">#</a> **selectAllBlocks**
+
+Selects all blocks present in the block editor.
+
+_Returns_
+
+-   `Promise`: Promise resolving once active element selected.
+
 <a name="selectBlockByClientId" href="#selectBlockByClientId">#</a> **selectBlockByClientId**
 
 Given the clientId of a block, selects the block on the editor.
