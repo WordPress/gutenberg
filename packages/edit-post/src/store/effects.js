@@ -119,7 +119,7 @@ const effects = {
 	SWITCH_MODE( action ) {
 		// Unselect blocks when we switch to the code editor.
 		if ( action.mode !== 'visual' ) {
-			dispatch( 'core/editor' ).clearSelectedBlock();
+			dispatch( 'core/block-editor' ).clearSelectedBlock();
 		}
 
 		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
@@ -128,7 +128,7 @@ const effects = {
 	INIT( _, store ) {
 		// Select the block settings tab when the selected block changes
 		subscribe( onChangeListener(
-			() => !! select( 'core/editor' ).getBlockSelectionStart(),
+			() => !! select( 'core/block-editor' ).getBlockSelectionStart(),
 			( hasBlockSelection ) => {
 				if ( ! select( 'core/edit-post' ).isEditorSidebarOpened() ) {
 					return;

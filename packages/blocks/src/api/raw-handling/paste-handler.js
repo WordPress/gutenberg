@@ -22,6 +22,7 @@ import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
 import markdownConverter from './markdown-converter';
 import iframeRemover from './iframe-remover';
+import googleDocsUIDRemover from './google-docs-uid-remover';
 import { getPhrasingContentSchema } from './phrasing-content';
 import {
 	deepFilterHTML,
@@ -43,7 +44,7 @@ const { console } = window;
  * @return {string} HTML only containing phrasing content.
  */
 function filterInlineHTML( HTML ) {
-	HTML = deepFilterHTML( HTML, [ phrasingContentReducer ] );
+	HTML = deepFilterHTML( HTML, [ googleDocsUIDRemover, phrasingContentReducer ] );
 	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema(), { inline: true } );
 
 	// Allows us to ask for this information when we get a report.
@@ -191,6 +192,7 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		}
 
 		const filters = [
+			googleDocsUIDRemover,
 			msListConverter,
 			headRemover,
 			listReducer,

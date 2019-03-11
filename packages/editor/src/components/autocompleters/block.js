@@ -3,11 +3,7 @@
  */
 import { select } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import BlockIcon from '../block-icon';
+import { BlockIcon } from '@wordpress/block-editor';
 
 /**
  * Returns the client ID of the parent where a newly inserted block would be
@@ -17,7 +13,7 @@ import BlockIcon from '../block-icon';
  *                  be placed.
  */
 function defaultGetBlockInsertionParentClientId() {
-	return select( 'core/editor' ).getBlockInsertionPoint().rootClientId;
+	return select( 'core/block-editor' ).getBlockInsertionPoint().rootClientId;
 }
 
 /**
@@ -30,7 +26,7 @@ function defaultGetBlockInsertionParentClientId() {
  *                                      parent.
  */
 function defaultGetInserterItems( rootClientId ) {
-	return select( 'core/editor' ).getInserterItems( rootClientId );
+	return select( 'core/block-editor' ).getInserterItems( rootClientId );
 }
 
 /**
@@ -40,7 +36,7 @@ function defaultGetInserterItems( rootClientId ) {
  *                   block is selected.
  */
 function defaultGetSelectedBlockName() {
-	const { getSelectedBlockClientId, getBlockName } = select( 'core/editor' );
+	const { getSelectedBlockClientId, getBlockName } = select( 'core/block-editor' );
 	const selectedBlockClientId = getSelectedBlockClientId();
 	return selectedBlockClientId ? getBlockName( selectedBlockClientId ) : null;
 }

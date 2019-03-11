@@ -12,7 +12,7 @@ import {
 	getPhrasingContentSchema,
 	getBlockAttributes,
 } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 import { replace, join, split, create, toHTMLString, LINE_SEPARATOR } from '@wordpress/rich-text';
 import { G, Path, SVG } from '@wordpress/components';
 

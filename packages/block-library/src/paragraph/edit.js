@@ -27,7 +27,7 @@ import {
 	PanelColorSettings,
 	RichText,
 	withFontSizes,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -259,10 +259,10 @@ const ParagraphEdit = compose( [
 	withFontSizes( 'fontSize' ),
 	applyFallbackStyles,
 	withSelect( ( select ) => {
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getSettings } = select( 'core/block-editor' );
 
 		return {
-			isRTL: getEditorSettings().isRTL,
+			isRTL: getSettings().isRTL,
 		};
 	} ),
 ] )( ParagraphBlock );

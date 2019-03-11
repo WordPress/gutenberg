@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
+import '@wordpress/block-editor';
+import '@wordpress/editor';
 import {
 	registerBlockType,
 	setDefaultBlockName,
@@ -32,6 +34,7 @@ import * as html from './html';
 import * as mediaText from './media-text';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
+import * as legacyWidget from './legacy-widget';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -54,6 +57,16 @@ import * as tagCloud from './tag-cloud';
 
 import * as classic from './classic';
 
+/**
+ * Function to register core blocks provided by the block editor.
+ *
+ * @example
+ * ```js
+ * import { registerCoreBlocks } from '@wordpress/block-library';
+ *
+ * registerCoreBlocks();
+ * ```
+ */
 export const registerCoreBlocks = () => {
 	[
 		// Common blocks are grouped at the top to prioritize their display
@@ -85,6 +98,7 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		latestComments,
 		latestPosts,
+		process.env.GUTENBERG_PHASE === 2 ? legacyWidget : null,
 		missing,
 		more,
 		nextpage,

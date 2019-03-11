@@ -2,17 +2,19 @@
  * WordPress dependencies
  */
 import {
-	BlockList,
-	CopyHandler,
 	PostTitle,
+	VisualEditorGlobalKeyboardShortcuts,
+} from '@wordpress/editor';
+import {
 	WritingFlow,
 	ObserveTyping,
-	VisualEditorGlobalKeyboardShortcuts,
+	BlockList,
+	CopyHandler,
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
 	_BlockSettingsMenuFirstItem,
 	_BlockSettingsMenuPluginsExtension,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

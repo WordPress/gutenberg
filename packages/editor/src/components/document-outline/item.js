@@ -7,17 +7,14 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import BlockTitle from '../block-title';
+import { BlockTitle } from '@wordpress/block-editor';
 
 const TableOfContentsItem = ( {
 	children,
 	isValid,
 	level,
 	onClick,
+	isDisabled,
 	path = [],
 } ) => (
 	<li
@@ -31,7 +28,8 @@ const TableOfContentsItem = ( {
 	>
 		<button
 			className="document-outline__button"
-			onClick={ onClick }
+			onClick={ isDisabled ? undefined : onClick }
+			disabled={ isDisabled }
 		>
 			<span className="document-outline__emdash" aria-hidden="true"></span>
 			{
@@ -49,7 +47,7 @@ const TableOfContentsItem = ( {
 			<span className="document-outline__item-content">
 				{ children }
 			</span>
-			<span className="screen-reader-text">{ __( '(Click to focus this heading)' ) }</span>
+			{ ! isDisabled && <span className="screen-reader-text">{ __( '(Click to focus this heading)' ) }</span> }
 		</button>
 	</li>
 );
