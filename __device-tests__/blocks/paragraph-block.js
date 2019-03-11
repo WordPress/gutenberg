@@ -18,8 +18,6 @@ export default class ParagraphBlock extends Block {
 
 	// Finds the wd element for new block that was added and sets the element attribute on this object
 	async setupElement() {
-		console.log( 'getNewParagraphBlock' );
-		console.log( `Accessibility: ${ this.accessibilityIdKey }` );
 		await this.driver.sleep( 2000 );
 		const blockLocator = `//*[starts-with(@${ this.accessibilityIdKey }, '${ this.blockName }')]`;
 		const paragraphBlocks = await this.driver.elementsByXPath( blockLocator );
@@ -46,8 +44,6 @@ export default class ParagraphBlock extends Block {
 	// gets the TextView wd element for this paragraph block and sets it to
 	// the textViewElement attribute for this object
 	async setupTextView() {
-		console.log( 'getParagraphBlocktextTextView' );
-
 		await this.driver.sleep( 2000 );
 		let textViewElement = 'XCUIElementTypeTextView';
 		if ( this.rnPlatform === 'android' ) {

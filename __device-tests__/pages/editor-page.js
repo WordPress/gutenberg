@@ -14,7 +14,6 @@ export default class EditorPage {
 
 	async addNewBlock( block ) {
 		const blockName = block.name;
-		console.log( `Add a new ${ blockName } block` );
 
 		// Click add button
 		const addButton = await this.driver.elementByAccessibilityId( 'Add block' );
