@@ -121,6 +121,9 @@
 			transition: border-color 0.1s linear, box-shadow 0.1s linear;
 			pointer-events: none;
 
+			// Include a transparent outline for Windows High Contrast mode.
+			outline: $border-width solid transparent;
+
 			// Go edge-to-edge on mobile.
 			right: -$block-padding;
 			left: -$block-padding;

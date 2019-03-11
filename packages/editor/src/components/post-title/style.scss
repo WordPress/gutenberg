@@ -25,6 +25,9 @@
 		border-left-width: 0;
 		border-right-width: 0;
 
+		// Include transparent outline for Windows High Contrast mode.
+		outline: $border-width solid transparent;
+
 		@include break-small() {
 			border-width: $border-width;
 			border-left-width: 0;
