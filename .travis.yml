@@ -65,7 +65,7 @@ jobs:
         - ./bin/run-wp-unit-tests.sh
 
     - name: E2E tests (Admin with plugins) (1/2)
-      env: WP_VERSION=latest POPULAR_PLUGINS=true WP_DEBUG=true WP_DEBUG_DISPLAY=true SCRIPT_DEBUG=true
+      env: WP_VERSION=latest POPULAR_PLUGINS=true
       install:
         - ./bin/setup-local-env.sh
       script:
