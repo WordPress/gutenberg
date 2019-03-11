@@ -18,8 +18,8 @@ describe( 'App', () => {
 
 	it( 'renders without crashing with a block focused', () => {
 		const app = renderer.create( <App /> );
-		const blocks = select( 'core/editor' ).getBlocks();
-		dispatch( 'core/editor' ).selectBlock( blocks[ 0 ].clientId );
+		const blocks = select( 'core/block-editor' ).getBlocks();
+		dispatch( 'core/block-editor' ).selectBlock( blocks[ 0 ].clientId );
 		const rendered = app.toJSON();
 		expect( rendered ).toBeTruthy();
 	} );
