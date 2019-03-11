@@ -13,7 +13,7 @@ import {
 	BlockControls,
 	AlignmentToolbar,
 	RichText,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { join, split, create, toHTMLString } from '@wordpress/rich-text';
 import { Path, SVG } from '@wordpress/components';
 
@@ -186,21 +186,27 @@ export const settings = {
 					}
 
 					const pieces = split( create( { html: value, multilineTag: 'p' } ), '\u2028' );
+
+					const headingBlock = createBlock( 'core/heading', {
+						content: toHTMLString( { value: pieces[ 0 ] } ),
+					} );
+
+					if ( ! citation && pieces.length === 1 ) {
+						return headingBlock;
+					}
+
 					const quotePieces = pieces.slice( 1 );
 
-					return [
-						createBlock( 'core/heading', {
-							content: toHTMLString( { value: pieces[ 0 ] } ),
+					const quoteBlock = createBlock( 'core/quote', {
+						...attrs,
+						citation,
+						value: toHTMLString( {
+							value: quotePieces.length ? join( pieces.slice( 1 ), '\u2028' ) : create(),
+							multilineTag: 'p',
 						} ),
-						createBlock( 'core/quote', {
-							...attrs,
-							citation,
-							value: toHTMLString( {
-								value: quotePieces.length ? join( pieces.slice( 1 ), '\u2028' ) : create(),
-								multilineTag: 'p',
-							} ),
-						} ),
-					];
+					} );
+
+					return [ headingBlock, quoteBlock ];
 				},
 			},
 

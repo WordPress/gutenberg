@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/editor';
+import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor';
 
 const name = 'core/strikethrough';
 
@@ -24,7 +24,6 @@ export const strikethrough = {
 					onUse={ onToggle }
 				/>
 				<RichTextToolbarButton
-					name="strikethrough"
 					icon="editor-strikethrough"
 					title={ __( 'Strikethrough' ) }
 					onClick={ onToggle }

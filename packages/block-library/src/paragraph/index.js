@@ -15,7 +15,7 @@ import {
 	getColorClassName,
 	getFontSizeClass,
 	RichText,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import {
 	Path,

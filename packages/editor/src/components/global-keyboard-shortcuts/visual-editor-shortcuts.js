@@ -6,12 +6,12 @@ import { KeyboardShortcuts } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 import { rawShortcut } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import SaveShortcut from './save-shortcut';
-import BlockEditorKeyboardShortcuts from './block-editor-shortcuts';
 
 class VisualEditorGlobalKeyboardShortcuts extends Component {
 	constructor() {

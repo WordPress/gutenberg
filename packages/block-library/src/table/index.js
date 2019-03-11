@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { __, _x } from '@wordpress/i18n';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import { G, Path, SVG } from '@wordpress/components';
-import { RichText, getColorClassName } from '@wordpress/editor';
+import { RichText, getColorClassName } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
