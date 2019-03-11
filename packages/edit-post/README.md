@@ -52,7 +52,30 @@ Renders a new item in the block settings menu.
 
 **Usage**
 
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var PluginBlockSettingsMenuItem = wp.editPost.PluginBlockSettingsMenuItem;
+
+function doOnClick(){
+	// To be called when the user clicks the menu item.
+}
+
+function MyPluginBlockSettingsMenuItem() {
+	return wp.element.createElement(
+		PluginBlockSettingsMenuItem,
+		{
+			allowedBlockNames: [ 'core/paragraph' ],
+			icon: 'dashicon-name',
+			label: __( 'Menu item text' ),
+			onClick: doOnClick,
+		}
+	);
+}
+```
+
 ```jsx
+// Using ESNext syntax
 import { __ } from wp.i18n;
 import { PluginBlockSettingsMenuItem } from wp.editPost;
 
@@ -90,7 +113,29 @@ The text within the component appears as the menu item label.
 
 **Usage**
 
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
+
+function onButtonClick() {
+	alert( 'Button clicked.' );
+}
+
+function MyButtonMoreMenuItem() {
+	return wp.element.createElement(
+		PluginMoreMenuItem,
+		{
+			icon: 'smiley',
+			onClick: onButtonClick
+		},
+		__( 'My button title' )
+	)
+}
+```
+
 ```jsx
+// Using ESNext syntax
 const { __ } = wp.i18n;
 const { PluginMoreMenuItem } = wp.editPost;
 
@@ -129,7 +174,26 @@ Renders provided content to the post-publish panel in the publish flow
 
 **Usage**
 
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
+
+function MyPluginPostPublishPanel() {
+	return wp.element.createElement(
+		PluginPostPublishPanel,
+		{
+			className: 'my-plugin-post-publish-panel',
+			title: __( 'My panel title' ),
+			initialOpen: true,
+		},
+		__( 'My panel content' )
+	);
+}
+```
+
 ```jsx
+// Using ESNext syntax
 const { __ } = wp.i18n;
 const { PluginPostPublishPanel } = wp.editPost;
 
@@ -165,7 +229,24 @@ and not its location, which may change in future iterations.
 
 **Usage**
 
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
+
+function MyPluginPostStatusInfo() {
+	return wp.element.createElement(
+		PluginPostStatusInfo,
+		{
+			className: 'my-plugin-post-status-info',
+		},
+		__( 'My post status info' )
+	)
+}
+```
+
 ```jsx
+// Using ESNext syntax
 const { __ } = wp.i18n;
 const { PluginPostStatusInfo } = wp.editPost;
 
@@ -196,7 +277,26 @@ Renders provided content to the pre-publish side panel in the publish flow
 
 **Usage**
 
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
+
+function MyPluginPrePublishPanel() {
+	return wp.element.createElement(
+		PluginPrePublishPanel,
+		{
+			className: 'my-plugin-pre-publish-panel',
+			title: __( 'My panel title' ),
+			initialOpen: true,
+		},
+		__( 'My panel content' )
+	);
+}
+```
+
 ```jsx
+// Using ESNext syntax
 const { __ } = wp.i18n;
 const { PluginPrePublishPanel } = wp.editPost;
 
@@ -239,7 +339,32 @@ wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-na
 
 **Usage**
 
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var el = wp.element.createElement;
+var PanelBody = wp.components.PanelBody;
+var PluginSidebar = wp.editPost.PluginSidebar;
+
+function MyPluginSidebar() {
+	return el(
+			PluginSidebar,
+			{
+				name: 'my-sidebar',
+				title: 'My sidebar title',
+				icon: 'smiley',
+			},
+			el(
+				PanelBody,
+				{},
+				__( 'My sidebar content' )
+			)
+	);
+}
+```
+
 ```jsx
+// Using ESNext syntax
 const { __ } = wp.i18n;
 const { PanelBody } = wp.components;
 const { PluginSidebar } = wp.editPost;
@@ -280,7 +405,25 @@ The text within the component appears as the menu item label.
 
 **Usage**
 
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+
+function MySidebarMoreMenuItem() {
+	return wp.element.createElement(
+		PluginSidebarMoreMenuItem,
+		{
+			target: 'my-sidebar',
+			icon: 'smiley',
+		},
+		__( 'My sidebar title' )
+	)
+}
+```
+
 ```jsx
+// Using ESNext syntax
 const { __ } = wp.i18n;
 const { PluginSidebarMoreMenuItem } = wp.editPost;
 

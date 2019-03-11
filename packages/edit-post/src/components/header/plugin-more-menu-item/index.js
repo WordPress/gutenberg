@@ -36,8 +36,31 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  * @param {Function} [props.onClick=noop] The callback function to be executed when the user clicks the menu item.
  * @param {...*} [props.other] Any additional props are passed through to the underlying [MenuItem](/packages/components/src/menu-item/README.md) component.
  *
- * @example
+ * @example <caption>ES5</caption>
+ * ```js
+ * // Using ES5 syntax
+ * var __ = wp.i18n.__;
+ * var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
+ *
+ * function onButtonClick() {
+ * 	alert( 'Button clicked.' );
+ * }
+ *
+ * function MyButtonMoreMenuItem() {
+ * 	return wp.element.createElement(
+ * 		PluginMoreMenuItem,
+ * 		{
+ * 			icon: 'smiley',
+ * 			onClick: onButtonClick
+ * 		},
+ * 		__( 'My button title' )
+ * 	)
+ * }
+ * ```
+ *
+ * @example <caption>ESNext</caption>
  * ```jsx
+ * // Using ESNext syntax
  * const { __ } = wp.i18n;
  * const { PluginMoreMenuItem } = wp.editPost;
  *

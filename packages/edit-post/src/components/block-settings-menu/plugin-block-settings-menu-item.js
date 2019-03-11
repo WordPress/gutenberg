@@ -39,8 +39,32 @@ const shouldRenderItem = ( selectedBlockNames, allowedBlockNames ) => ! Array.is
  * @param {string} props.label The menu item text.
  * @param {Function} props.onClick Callback function to be executed when the user click the menu item.
  *
- * @example
+ * @example <caption>ES5</caption>
+ * ```js
+ * // Using ES5 syntax
+ * var __ = wp.i18n.__;
+ * var PluginBlockSettingsMenuItem = wp.editPost.PluginBlockSettingsMenuItem;
+ *
+ * function doOnClick(){
+ * 	// To be called when the user clicks the menu item.
+ * }
+ *
+ * function MyPluginBlockSettingsMenuItem() {
+ * 	return wp.element.createElement(
+ * 		PluginBlockSettingsMenuItem,
+ * 		{
+ * 			allowedBlockNames: [ 'core/paragraph' ],
+ * 			icon: 'dashicon-name',
+ * 			label: __( 'Menu item text' ),
+ * 			onClick: doOnClick,
+ * 		}
+ * 	);
+ * }
+ * ```
+ *
+ * @example <caption>ESNext</caption>
  * ```jsx
+ * // Using ESNext syntax
  * import { __ } from wp.i18n;
  * import { PluginBlockSettingsMenuItem } from wp.editPost;
  *

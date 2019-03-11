@@ -14,8 +14,28 @@ const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
  * @param {string} [props.title] Title displayed at the top of the panel.
  * @param {boolean} [props.initialOpen=false] Whether to have the panel initially opened. When no title is provided it is always opened.
  *
- * @example
+ * @example <caption>ES5</caption>
+ * ```js
+ * // Using ES5 syntax
+ * var __ = wp.i18n.__;
+ * var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
+ *
+ * function MyPluginPrePublishPanel() {
+ * 	return wp.element.createElement(
+ * 		PluginPrePublishPanel,
+ * 		{
+ * 			className: 'my-plugin-pre-publish-panel',
+ * 			title: __( 'My panel title' ),
+ * 			initialOpen: true,
+ * 		},
+ * 		__( 'My panel content' )
+ * 	);
+ * }
+ * ```
+ *
+ * @example <caption>ESNext</caption>
  * ```jsx
+ * // Using ESNext syntax
  * const { __ } = wp.i18n;
  * const { PluginPrePublishPanel } = wp.editPost;
  *

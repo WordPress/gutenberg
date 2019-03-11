@@ -85,8 +85,34 @@ function PluginSidebar( props ) {
  * @param {boolean} [props.isPinnable=true] Whether to allow to pin sidebar to toolbar.
  * @param {string|Element} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
- * @example
+ * @example <caption>ES5</caption>
+ * ```js
+ * // Using ES5 syntax
+ * var __ = wp.i18n.__;
+ * var el = wp.element.createElement;
+ * var PanelBody = wp.components.PanelBody;
+ * var PluginSidebar = wp.editPost.PluginSidebar;
+ *
+ * function MyPluginSidebar() {
+ * 	return el(
+ * 			PluginSidebar,
+ * 			{
+ * 				name: 'my-sidebar',
+ * 				title: 'My sidebar title',
+ * 				icon: 'smiley',
+ * 			},
+ * 			el(
+ * 				PanelBody,
+ * 				{},
+ * 				__( 'My sidebar content' )
+ * 			)
+ * 	);
+ * }
+ * ```
+ *
+ * @example <caption>ESNext</caption>
  * ```jsx
+ * // Using ESNext syntax
  * const { __ } = wp.i18n;
  * const { PanelBody } = wp.components;
  * const { PluginSidebar } = wp.editPost;
