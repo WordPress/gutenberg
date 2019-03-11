@@ -11,7 +11,6 @@ import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
-	requestImageUploadCancel,
 } from 'react-native-gutenberg-bridge';
 
 /**
