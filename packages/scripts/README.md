@@ -228,17 +228,17 @@ The `build` and `start` commands use [Webpack](https://webpack.js.org/) behind t
 
 * [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
 * [Output](https://webpack.js.org/configuration/output): `build/index.js`
-* [Externals](https://webpack.js.org/configuration/externals). These are the transformations done to imports:
+* [Externals](https://webpack.js.org/configuration/externals). These are libraries that are to be found in the global scope:
 
 Package | Input syntax | Output
 --- | --- | ---
-React | `import x from React;` | `var x = this.wp.react.x;`
-ReactDOM | `import x from ReactDOM;` | `var x = this.wp.react-dom.x;`
-moment | `import x from moment;` | `var x = this.wp.moment.x;`
-jQuery | `import x from jQuery;` | `var x = this.wp.jQuery.x;`
-lodash | `import x from lodash;` | `var x = this.wp.lodash.x;`
-lodash-es | `import x from lodash-es;` | `var x = this.wp.lodash-es.x;`
-Any WordPress package | `import x from '@wordpress/packageName` | `var x = this.wp.package-name.x`
+React | `import x from React;` | `var x = window.React.x;`
+ReactDOM | `import x from ReactDOM;` | `var x = window.ReactDOM.x;`
+moment | `import x from moment;` | `var x = window.moment.x;`
+jQuery | `import x from jQuery;` | `var x = window.jQuery.x;`
+lodash | `import x from lodash;` | `var x = window.lodash.x;`
+lodash-es | `import x from lodash-es;` | `var x = window.lodash.x;`
+WordPress packages | `import x from '@wordpress/package-name` | `var x = window.wp.packageName.x`
 
 ### Provide your own Webpack config
 
