@@ -3,6 +3,7 @@
 import wd from 'wd';
 import child_process from 'child_process';
 import fs from 'fs';
+import EditorPage from './pages/editor-page';
 var out = fs.openSync('./appium-out.log', 'a');
 var err = fs.openSync('./appium-out.log', 'a');
 
@@ -154,19 +155,20 @@ describe( 'Gutenberg Editor tests', () => {
 
 		// Click paragraph block 
 		let paragraphBlockButton = await driver.elementByAccessibilityId('Paragraph');
-		paragraphBlockButton.click();
+		await paragraphBlockButton.click();
 
 		return await getNewParagraphBlock();
 	};
 
-	const typeString = async (element, str) => { // Problem with Appium type function needing to be cleared after first attempt
+	const typeString = async (element, str) => { // iOS: Problem with Appium type function needing to be cleared after first attempt
 		await element.clear();
 		await element.type(str);
 		await element.clear();
 		await element.type(str);
 	};
 
-	it( 'should be able to see editor', async () => {
+	it( 'should be able to add a new block', async () => {
+		const editorPage = new EditorPage.Expect(driver);
 		var newParagraphBlock = await addParagraphBlock();
 
 		let newParagraphBlockTextView = await getNewParagraphBlockTextView(newParagraphBlock);

@@ -112,7 +112,7 @@ This project is set up to use [jest](https://facebook.github.io/jest/) for tests
 This repository uses appium to run UI tests. The tests live in `__device-tests__` and are written using Appium to run tests against simulators and real devices. To run these you'll need to check off a few things: 
 
 * For now you'll need run `yarn start`, and then either `yarn ios` or `yarn android` at least once before trying to run the tests on the respective platform
-* [Appium cli](https://github.com/appium/appium) installed and available globally, I'd also recommend using [appium doctor](https://github.com/appium/appium-doctor) to ensure everything's good to go. You don't have to worry about starting the server yourself, the tests handle starting the server on port 4728, just be sure that the port is free or feel free to change the port number in the test file. 
+* [Appium cli](https://github.com/appium/appium/blob/master/docs/en/about-appium/getting-started.md) installed and available globally, I'd also recommend using [appium doctor](https://github.com/appium/appium-doctor) to ensure all of appium's dependencies are good to go. You don't have to worry about starting the server yourself, the tests handle starting the server on port 4728, just be sure that the port is free or feel free to change the port number in the test file. 
 * For iOS a simulator should automatically launch but for Android you'll need to have an emulator fired up and running.
 
 After those are checked off to run the UI tests on ios run 
