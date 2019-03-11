@@ -8,20 +8,48 @@ import { partial } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
+import {
+	withSelect,
+	withDispatch,
+	RegistryProvider,
+	RegistryConsumer,
+	createRegistry,
+} from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEditorProvider } from '@wordpress/block-editor';
-import { compose } from '@wordpress/compose';
+import { BlockEditorProvider, BlockList, storeConfig } from '@wordpress/block-editor';
+import { compose, createHigherOrderComponent } from '@wordpress/compose';
+import { parse, serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import ReusableBlockEditPanel from './edit-panel';
 import ReusableBlockIndicator from './indicator';
-import { parse, serialize } from 'path';
+
+/**
+ * Higher-order component which renders the original component with the current
+ * registry context passed as its `registry` prop.
+ *
+ * @param {WPComponent} OriginalComponent Original component.
+ *
+ * @return {WPComponent} Enhanced component.
+ */
+const withRegistry = createHigherOrderComponent(
+	( OriginalComponent ) => ( props ) => (
+		<RegistryConsumer>
+			{ ( registry ) => (
+				<OriginalComponent
+					{ ...props }
+					registry={ registry }
+				/>
+			) }
+		</RegistryConsumer>
+	),
+	'withRegistry'
+);
 
 class ReusableBlockEdit extends Component {
-	constructor( { reusableBlock } ) {
+	constructor( { reusableBlock, registry } ) {
 		super( ...arguments );
 
 		this.startEditing = this.startEditing.bind( this );
@@ -30,12 +58,12 @@ class ReusableBlockEdit extends Component {
 		this.setTitle = this.setTitle.bind( this );
 		this.save = this.save.bind( this );
 
-		if ( reusableBlock && reusableBlock.isTemporary ) {
+		if ( reusableBlock ) {
 			// Start in edit mode when we're working with a newly created reusable block
 			this.state = {
-				isEditing: true,
+				isEditing: reusableBlock.isTemporary,
 				title: reusableBlock.title,
-				blocks: [],
+				blocks: parse( reusableBlock.content ),
 			};
 		} else {
 			// Start in preview mode when we're working with an existing reusable block
@@ -45,6 +73,8 @@ class ReusableBlockEdit extends Component {
 				blocks: [],
 			};
 		}
+
+		this.registry = createRegistry( { 'core/block-editor': storeConfig }, registry );
 	}
 
 	componentDidMount() {
@@ -53,9 +83,17 @@ class ReusableBlockEdit extends Component {
 		}
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.reusableBlock !== this.props.reusableBlock && this.state.title === null ) {
+			this.setState( {
+				title: this.props.reusableBlock.title,
+				blocks: parse( this.props.reusableBlock.content ),
+			} );
+		}
+	}
+
 	startEditing() {
 		const { reusableBlock } = this.props;
-
 		this.setState( {
 			isEditing: true,
 			title: reusableBlock.title,
@@ -102,14 +140,16 @@ class ReusableBlockEdit extends Component {
 		}
 
 		let element = (
-			<BlockEditorProvider
-				settings={ settings }
-				value={ blocks }
-				onChange={ this.setBlocks }
-				onInput={ this.setBlocks }
-			>
-				<div>test sdfsdf sdf sdf</div>
-			</BlockEditorProvider>
+			<RegistryProvider value={ this.registry }>
+				<BlockEditorProvider
+					settings={ settings }
+					value={ blocks }
+					onChange={ this.setBlocks }
+					onInput={ this.setBlocks }
+				>
+					<BlockList />
+				</BlockEditorProvider>
+			</RegistryProvider>
 		);
 
 		if ( ! isEditing ) {
@@ -175,4 +215,5 @@ export default compose( [
 			onSave: partial( saveReusableBlock, ref ),
 		};
 	} ),
+	withRegistry,
 ] )( ReusableBlockEdit );

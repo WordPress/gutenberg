@@ -66,7 +66,11 @@ export const fetchReusableBlocks = async ( action, store ) => {
 				return null;
 			}
 
-			return post;
+			return {
+				...post,
+				content: post.content.raw,
+				title: post.title.raw,
+			};
 		} ) );
 
 		if ( results.length ) {
@@ -217,9 +221,9 @@ export const convertBlockToReusable = ( action, store ) => {
 		content: serialize( select( 'core/block-editor' ).getBlocksByClientId( action.clientIds ) ),
 	};
 
-	dispatch( receiveReusableBlocksAction( [ {
+	dispatch( receiveReusableBlocksAction( [
 		reusableBlock,
-	} ] ) );
+	] ) );
 	dispatch( saveReusableBlock( reusableBlock.id ) );
 
 	dataDispatch( 'core/block-editor' ).replaceBlocks(
