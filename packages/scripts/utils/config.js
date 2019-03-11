@@ -24,7 +24,7 @@ const hasWebpackConfig = () => hasCliArg( '--config' ) ||
 const getWebpackArgs = ( additionalArgs = [] ) => {
 	const webpackArgs = getCliArgs();
 	if ( ! hasWebpackConfig() ) {
-		webpackArgs.push( ...[ '--config', fromConfigRoot( 'webpack.config.js' ) ] );
+		webpackArgs.push( '--config', fromConfigRoot( 'webpack.config.js' ) );
 	}
 	webpackArgs.push( ...additionalArgs );
 	return webpackArgs;
