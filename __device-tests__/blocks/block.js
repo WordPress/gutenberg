@@ -16,7 +16,8 @@ Set.prototype.difference = function( nextSet ) {
 };
 
 export default class Block {
-	constructor() {
+	constructor( driver ) {
+		this.driver = driver;
 		this.accessibilityIdKey = 'name';
 		this.defaultPlatform = 'android';
 
@@ -31,11 +32,10 @@ export default class Block {
 			await element.clear();
 			return await element.type( str );
 		}
-		// iOS: Problem with Appium type function needing to be cleared after first attempt
-		// Requiring me to do a little hacking to get it work
-		await element.clear();
-		await element.type( ' '.repeat( str.length * 2 ) );
-		await element.clear();
-		return await element.type( str );
+		// iOS: Problem with Appium type function Requiring me to do a little hacking to get it work,
+		// as a result typing on iOS will be slower
+		for ( let i = 0; i < str.length; i++ ) {
+			await element.type( str.charAt( i ) );
+		}
 	}
 }

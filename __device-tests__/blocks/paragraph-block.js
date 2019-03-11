@@ -4,7 +4,7 @@ export default class ParagraphBlock extends Block {
 	static blocks = new Set( [] );
 
 	constructor( driver, name = 'Unsupported Block' ) {
-		super();
+		super( driver );
 		this.driver = driver;
 		this.name = name; // name in block picker list
 		this.element = null;
@@ -64,5 +64,10 @@ export default class ParagraphBlock extends Block {
 
 	async sendText( str ) {
 		return await this.typeString( this.textViewElement, str );
+	}
+
+	async getText() {
+		const text = await this.textViewElement.text();
+		return text.toString().trim();
 	}
 }

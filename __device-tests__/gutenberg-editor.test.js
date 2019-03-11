@@ -103,11 +103,11 @@ describe( 'Gutenberg Editor tests', () => {
 		await driver.quit();
 	} );
 
-	it( 'should be able to add a new block', async () => {
+	it( 'should be able to add a new Paragraph block', async () => {
 		const editorPage = await EditorPage.Expect( driver );
 		const paragraphBlock = await editorPage.addNewBlock( new ParagraphBlock( driver, 'Paragraph' ) );
 		await paragraphBlock.sendText( 'Hello Gutenberg!' );
 
-		expect( await driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
+		expect( await paragraphBlock.getText() ).toBe( 'Hello Gutenberg!' );
 	} );
 } );
