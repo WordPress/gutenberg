@@ -141,7 +141,7 @@ This POT file can then be used as the template for new translations. You should 
 cp myguten.pot myguten-eo.po
 ```
 
-For this simple example, you can simply edit the `.po` file in your editor and add the translation to all the `msgstr` sets. For a larger, more complex set of translation, the [Glotpress](https://glotpress.blog/) and [poedit](https://poedit.net/) tools exist to help.
+For this simple example, you can simply edit the `.po` file in your editor and add the translation to all the `msgstr` sets. For a larger, more complex set of translation, the [GlotPress](https://glotpress.blog/) and [Poedit](https://poedit.net/) tools exist to help.
 
 You need also to add the `Language: eo` parameter. Here is full `myguten-eo.po` translated file
 
