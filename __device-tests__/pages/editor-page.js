@@ -1,27 +1,30 @@
+/** @flow
+ * @format */
+
 export default class EditorPage {
-    constructor( driver ) {
-        this.driver = driver;
-    }
+	constructor( driver ) {
+		this.driver = driver;
+	}
 
-    static async Expect( driver ) {
-        const page = new this(driver);
-        await driver.hasElementByAccessibilityId( 'block-list' );
-        return page;
-    }
+	static async Expect( driver ): EditorPage {
+		const page = new this( driver );
+		expect( await driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
+		return page;
+	}
 
-    static async addNewBlock( block ) {
-        const blockName = block.name;
-        console.log(`Add a new ${blockName} block`);
+	async addNewBlock( block ) {
+		const blockName = block.name;
+		console.log( `Add a new ${ blockName } block` );
 
 		// Click add button
-		let addButton = await driver.elementByAccessibilityId('Add block');
+		const addButton = await this.driver.elementByAccessibilityId( 'Add block' );
 		await addButton.click();
 
-		// Click on block 
-		let blockButton = await driver.elementByAccessibilityId(blockName);
-        await blockButton.click();
-        await block.setup();
+		// Click on block
+		const blockButton = await this.driver.elementByAccessibilityId( blockName );
+		await blockButton.click();
+		await block.setup();
 
 		return block;
-    }
+	}
 }
