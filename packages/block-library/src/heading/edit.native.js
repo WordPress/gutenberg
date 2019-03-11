@@ -6,7 +6,7 @@ import HeadingToolbar from './heading-toolbar';
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -18,18 +18,13 @@ import { createBlock } from '@wordpress/blocks';
 
 const name = 'core/heading';
 
-/**
- * Internal dependencies
- */
-import styles from './style.scss';
-
 class HeadingEdit extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.splitBlock = this.splitBlock.bind( this );
+		this.isAndroid = Platform.OS === 'android';
 	}
-
 
 	/**
 	 * Split handler for RichText value, namely when content is pasted or the
@@ -79,7 +74,6 @@ class HeadingEdit extends Component {
 			attributes,
 			setAttributes,
 			mergeBlocks,
-			insertBlocksAfter,
 			style,
 		} = this.props;
 
@@ -108,6 +102,9 @@ class HeadingEdit extends Component {
 					onMerge={ mergeBlocks }
 					onSplit={ this.splitBlock }
 					placeholder={ placeholder || __( 'Write heading…' ) }
+					// Fix for heading issue on Android https://github.com/wordpress-mobile/gutenberg-mobile/issues/627
+					// Intentionally introduces missing pleceholder issue on Android https://github.com/wordpress-mobile/gutenberg-mobile/issues/707
+					sendEmptyTag={ this.isAndroid }
 				/>
 			</View>
 		);
