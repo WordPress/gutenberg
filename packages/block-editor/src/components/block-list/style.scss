@@ -11,7 +11,7 @@
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {
 		.editor-block-list__block-edit::before {
-			outline: none;
+			border: none;
 		}
 
 		> .editor-block-list__block-edit > * {
@@ -105,7 +105,7 @@
 	}
 
 	/**
-	 * Block outline layout
+	 * Block border layout
 	 */
 
 	.editor-block-list__block-edit {
@@ -115,9 +115,10 @@
 			z-index: z-index(".editor-block-list__block-edit::before");
 			content: "";
 			position: absolute;
-			outline: $border-width solid transparent;
+			border: $border-width solid transparent;
+			border-left: none;
 			box-shadow: none;
-			transition: outline 0.1s linear, box-shadow 0.1s linear;
+			transition: border-color 0.1s linear, box-shadow 0.1s linear;
 			pointer-events: none;
 
 			// Go edge-to-edge on mobile.
@@ -133,20 +134,20 @@
 
 		> .editor-block-list__block-edit::before {
 			// Use opacity to work in various editor styles.
-			outline: $border-width solid $dark-opacity-light-800;
-			box-shadow: inset $block-left-border-width 0 0 0 $dark-opacity-500;
+			border-color: $dark-opacity-light-800;
+			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
 
 			.is-dark-theme & {
-				outline-color: $light-opacity-light-800;
-				box-shadow: inset $block-left-border-width 0 0 0 $light-opacity-600;
+				border-color: $light-opacity-light-800;
+				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
 			}
 
 			// Switch to outset borders on larger screens.
 			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-500;
+				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
 
 				.is-dark-theme & {
-					box-shadow: -$block-left-border-width 0 0 0 $light-opacity-600;
+					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
 				}
 			}
 		}
@@ -235,10 +236,10 @@
 
 	&.has-warning:not(.is-hovered) .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
-		outline-color: $dark-opacity-light-800;
+		border-color: $dark-opacity-light-800;
 
 		.is-dark-theme & {
-			outline-color: $light-opacity-light-800;
+			border-color: $light-opacity-light-800;
 		}
 	}
 
@@ -281,10 +282,10 @@
 	// Reusable blocks
 	&.is-reusable > .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
-		outline: $border-width dashed $dark-opacity-light-800;
+		border: $border-width dashed $dark-opacity-light-800;
 
 		.is-dark-theme & {
-			outline-color: $light-opacity-light-800;
+			border-color: $light-opacity-light-800;
 		}
 	}
 
@@ -298,7 +299,7 @@
 		// When images are floated, the block itself should collapse to zero height.
 		height: 0;
 
-		// Hide block outline when an image is floated.
+		// Hide block border when an image is floated.
 		.editor-block-list__block-edit {
 			&::before {
 				content: none;
@@ -927,6 +928,7 @@
 		// This prevents floats from messing up the position of the block toolbar on floats-adjacent blocks when selected.
 		position: absolute;
 		left: $border-width;
+		top: $border-width;
 	}
 }
 
