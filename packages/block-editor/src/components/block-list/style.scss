@@ -133,11 +133,11 @@
 
 		> .editor-block-list__block-edit::before {
 			// Use opacity to work in various editor styles.
-			outline: $border-width solid $dark-opacity-light-500;
+			outline: $border-width solid $dark-opacity-light-800;
 			box-shadow: inset $block-left-border-width 0 0 0 $dark-opacity-500;
 
 			.is-dark-theme & {
-				outline-color: $light-opacity-light-500;
+				outline-color: $light-opacity-light-800;
 				box-shadow: inset $block-left-border-width 0 0 0 $light-opacity-600;
 			}
 
@@ -235,10 +235,10 @@
 
 	&.has-warning:not(.is-hovered) .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
-		outline-color: $dark-opacity-light-500;
+		outline-color: $dark-opacity-light-800;
 
 		.is-dark-theme & {
-			outline-color: $light-opacity-light-500;
+			outline-color: $light-opacity-light-800;
 		}
 	}
 
@@ -281,10 +281,10 @@
 	// Reusable blocks
 	&.is-reusable > .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
-		outline: $border-width dashed $dark-opacity-light-500;
+		outline: $border-width dashed $dark-opacity-light-800;
 
 		.is-dark-theme & {
-			outline-color: $light-opacity-light-500;
+			outline-color: $light-opacity-light-800;
 		}
 	}
 
@@ -819,7 +819,7 @@
 		right: -$block-padding;
 
 		// Paint the borders on the toolbar itself on mobile.
-		border-top: $border-width solid $light-gray-500;
+		border-top: $border-width solid $light-gray-800;
 		.components-toolbar {
 			border-top: none;
 			border-bottom: none;
@@ -828,8 +828,8 @@
 		@include break-small() {
 			border-top: none;
 			.components-toolbar {
-				border-top: $border-width solid $light-gray-500;
-				border-bottom: $border-width solid $light-gray-500;
+				border-top: $border-width solid $light-gray-800;
+				border-bottom: $border-width solid $light-gray-800;
 			}
 		}
 	}
