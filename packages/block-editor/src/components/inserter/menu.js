@@ -397,7 +397,7 @@ export default compose(
 			__experimentalFetchReusableBlocks: fetchReusableBlocks,
 		} = dispatch( 'core/editor' );
 
-		// To avoid duplication, getInsertionPoint is extracted and used in two event handlers
+		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
 		// This breaks the withDispatch not containing any logic rule.
 		// Since it's a function only called when the event handlers are called,
 		// it's fine to extract it.
