@@ -66,6 +66,8 @@ public class ReactAztecText extends AztecText {
     boolean shouldHandleOnSelectionChange = false;
     boolean shouldHandleActiveFormatsChange = false;
 
+    String tagName = "";
+
     private static final HashMap<ITextFormat, String> typingFormatsMap = new HashMap<ITextFormat, String>() {
         {
             put(AztecTextFormat.FORMAT_BOLD, "bold");
@@ -239,6 +241,14 @@ public class ReactAztecText extends AztecText {
             );
         }
         setIntrinsicContentSize();
+    }
+
+    public void setTagName(@Nullable String tagName) {
+        this.tagName = tagName;
+    }
+
+    public String getTagName() {
+        return this.tagName;
     }
 
     private void updateToolbarButtons(int selStart, int selEnd) {

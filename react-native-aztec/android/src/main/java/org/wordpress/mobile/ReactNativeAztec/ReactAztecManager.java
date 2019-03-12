@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
@@ -293,6 +294,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         view.setTextColor(newColor);
     }
 
+    @ReactProp(name = "tagName")
+    public void setTagName(ReactAztecText view, @Nullable String tagName) {
+        view.setTagName(tagName);
+    }
+
     @ReactProp(name = "placeholder")
     public void setPlaceholder(ReactAztecText view, @Nullable String placeholder) {
         view.setHint(placeholder);
@@ -480,13 +486,14 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                 return;
             }
 
+            int currentEventCount = mEditText.incrementAndGetEventCounter();
             // The event that contains the event counter and updates it must be sent first.
             // TODO: t7936714 merge these events
             mEventDispatcher.dispatchEvent(
                     new ReactTextChangedEvent(
                             mEditText.getId(),
                             mEditText.toHtml(false),
-                            mEditText.incrementAndGetEventCounter()));
+                            currentEventCount));
 
             mEventDispatcher.dispatchEvent(
                     new ReactTextInputEvent(
@@ -495,6 +502,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                             oldText,
                             start,
                             start + before));
+
+            // Add the outer tags when the field was started empty, and only the first time the user types in it.
+            if (mPreviousText.length() == 0 && currentEventCount == 1 && !TextUtils.isEmpty(mEditText.getTagName())) {
+                mEditText.fromHtml('<' + mEditText.getTagName() + '>' + newText + "</" + mEditText.getTagName() + '>', false);
+            }
         }
 
         @Override
