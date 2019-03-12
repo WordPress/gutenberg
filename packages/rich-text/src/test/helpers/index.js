@@ -698,6 +698,7 @@ export const specWithRegistration = [
 		html: '<a class="custom-format">a</a>',
 		value: {
 			formats: [ , ],
+			replacements: [ , ],
 			text: 'a',
 		},
 		noToHTMLString: true,
@@ -720,6 +721,7 @@ export const specWithRegistration = [
 				attributes: {},
 				unregisteredAttributes: {},
 			} ] ],
+			replacements: [ , ],
 			text: 'a',
 		},
 	},

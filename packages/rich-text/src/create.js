@@ -7,7 +7,6 @@ import { select } from '@wordpress/data';
  * Internal dependencies
  */
 
-import { isEmpty } from './is-empty';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
@@ -376,26 +375,24 @@ function createFromElement( {
 
 		accumulateSelection( accumulator, node, range, value );
 
-		// Don't apply the element as formatting if it has no content.
-		if ( isEmpty( value ) && ! format.attributes ) {
-			continue;
-		}
-
-		if ( format.attributes && value.text.length === 0 ) {
+		if ( ! format ) {
+			mergePair( accumulator, value );
+		} else if ( value.text.length === 0 ) {
+			if ( format.attributes ) {
+				mergePair( accumulator, {
+					formats: [ , ],
+					replacements: [ format ],
+					text: OBJECT_REPLACEMENT_CHARACTER,
+				} );
+			}
+		} else {
 			mergePair( accumulator, {
-				formats: [ , ],
-				replacements: [ format ],
-				text: OBJECT_REPLACEMENT_CHARACTER,
+				...value,
+				formats: Array.from( value.formats, ( formats ) =>
+					formats ? [ format, ...formats ] : [ format ]
+				),
 			} );
-			continue;
 		}
-
-		mergePair( accumulator, {
-			...value,
-			formats: Array.from( value.formats, ( formats ) =>
-				formats ? [ format, ...formats ] : [ format ]
-			),
-		} );
 	}
 
 	return accumulator;
