@@ -129,11 +129,6 @@
 			left: -$block-padding;
 			top: -$block-padding;
 			bottom: -$block-padding;
-
-			// Position this above the dark border of parent blocks.
-			.editor-inner-blocks & {
-				z-index: z-index(".editor-inner-blocks .editor-block-list__block-edit::before");
-			}
 		}
 	}
 
@@ -967,7 +962,7 @@
 		}
 	}
 
-	// Position this above the dark border of parent blocks.
+	// Position this above the toolbar of parent blocks.
 	.editor-inner-blocks & {
 		z-index: z-index(".editor-inner-blocks .editor-block-list__breadcrumb");
 	}
