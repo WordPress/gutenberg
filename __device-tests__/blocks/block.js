@@ -25,7 +25,9 @@ export default class Block {
 	}
 
 	setDifference( set1: Set<string>, set2: Set<string> ) {
-		const differenceSet = new Set<string>();
+		// FLow complaining about type annotation on Set class here but Set<string>(); doesn't resolve
+		// $FlowFixMe
+		const differenceSet = new Set();
 
 		for ( const elem of set1 ) {
 			// if the value[i] is not present

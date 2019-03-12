@@ -5,7 +5,7 @@ import Block from './block';
 import wd from 'wd';
 
 export default class ParagraphBlock extends Block {
-	static blocks = new Set<string[]>( [] );
+	static blocks: Set<string>;
 	textViewElement: wd.PromiseChainWebdriver.Element;
 
 	constructor( driver: wd.PromiseChainWebdriver, name: string = 'Unsupported Block' ) {

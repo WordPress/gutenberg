@@ -1,19 +1,19 @@
-/** @flow
- * @format */
+/**
+ * @flow
+ * @format
+ * */
 import wd from 'wd';
 import Block from '../blocks/block';
 
 export default class EditorPage {
 	driver: wd.PromiseChainWebdriver;
-
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
 	}
 
-	static async Expect( driver: wd.PromiseChainWebdriver ) {
-		const page = new this( driver );
+	async expect( driver: wd.PromiseChainWebdriver ) {
 		expect( await driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
-		return page;
+		return this;
 	}
 
 	async addNewBlock( block: Block ) {

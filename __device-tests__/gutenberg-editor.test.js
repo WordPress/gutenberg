@@ -1,5 +1,6 @@
-/** @flow
- * @format */
+/**
+ * @format
+ * */
 
 import wd from 'wd';
 import child_process from 'child_process';
@@ -79,7 +80,7 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	it( 'should be able to add a new Paragraph block', async () => {
-		const editorPage = await EditorPage.Expect( driver );
+		const editorPage = new EditorPage( driver ).expect( );
 		const paragraphBlock = await editorPage.addNewBlock( new ParagraphBlock( driver, 'Paragraph' ) );
 		await paragraphBlock.sendText( 'Hello Gutenberg!' );
 
