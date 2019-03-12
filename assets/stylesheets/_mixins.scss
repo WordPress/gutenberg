@@ -310,17 +310,11 @@
  * Styles that are reused verbatim in a few places
  */
 
-// These are base styles for all captions.
-@mixin caption-style() {
-	margin-top: 0.5em;
-	margin-bottom: 1em;
-	text-align: center;
-}
-
 // These are additional styles for all captions, when the theme opts in to block styles.
 @mixin caption-style-theme() {
 	color: $dark-gray-500;
 	font-size: $default-font-size;
+	text-align: center;
 }
 
 @mixin dropdown-arrow() {
