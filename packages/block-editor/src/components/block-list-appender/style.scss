@@ -11,7 +11,7 @@
 	outline: $border-width dashed $dark-gray-150;
 	width: 100%;
 	color: $dark-gray-500;
-	background: $dark-opacity-light-200;
+	background: $dark-opacity-light-100;
 
 	&:hover,
 	&:focus {
@@ -26,7 +26,7 @@
 
 // Use opacity to work in various editor styles
 .is-dark-theme .block-list-appender__toggle {
-	background: $light-opacity-light-200;
+	background: $light-opacity-light-100;
 	color: $light-gray-100;
 
 	&:hover,
