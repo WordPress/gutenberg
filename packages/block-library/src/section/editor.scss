@@ -1,0 +1,12 @@
+
+// These padding rules are similar to those defined in the columns block and ensure that
+// block mover controls are on-screen when the block is full-width.
+.editor-block-list__block[data-align="full"] .wp-block-section > .editor-inner-blocks {
+	padding-left: $block-padding;
+	padding-right: $block-padding;
+
+	@include break-small() {
+		padding-left: $block-padding + $block-side-ui-width + $block-side-ui-clearance + $block-side-ui-clearance;
+		padding-right: $block-padding + $block-side-ui-width + $block-side-ui-clearance + $block-side-ui-clearance;
+	}
+}
