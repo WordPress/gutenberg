@@ -17,3 +17,6 @@ export { default as URLInput } from './url-input';
 
 // Content Related Components
 export { default as DefaultBlockAppender } from './default-block-appender';
+
+// State Related Components
+export { default as BlockEditorProvider } from './provider';
