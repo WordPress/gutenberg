@@ -15,6 +15,7 @@ import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView, Dimensions } fro
 import BlockHolder from './block-holder';
 import type { BlockType } from '../store/types';
 import styles from './block-manager.scss';
+import blockHolderStyles from './block-holder.scss';
 import inlineToolbarStyles from './inline-toolbar/style.scss';
 import toolbarStyles from './block-toolbar.scss';
 import BlockPicker from './block-picker';
@@ -182,7 +183,14 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderDefaultBlockAppender() {
 		return (
-			<DefaultBlockAppender rootClientId={ this.props.rootClientId } />
+			<DefaultBlockAppender
+				rootClientId={ this.props.rootClientId }
+				containerStyle={ [
+					blockHolderStyles.blockContainerFocused,
+					this.blockHolderBorderStyle(),
+					{ borderColor: 'transparent' },
+				] }
+			/>
 		);
 	}
 
