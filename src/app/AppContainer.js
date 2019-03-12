@@ -38,7 +38,6 @@ type PropsType = {
 	mode: string,
 	post: ?mixed,
 	getEditedPostContent: () => string,
-	settings: ?mixed,
 	switchMode: string => mixed,
 };
 
@@ -142,36 +141,12 @@ class AppContainer extends React.Component<PropsType> {
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
 	}
 
-	getBlockEditorSettings( settings ) {
-		return {
-			...pick( settings, [
-				'alignWide',
-				'availableLegacyWidgets',
-				'colors',
-				'disableCustomColors',
-				'fontSizes',
-				'disableCustomFontSizes',
-				'imageSizes',
-				'maxWidth',
-				'allowedBlockTypes',
-				'hasFixedToolbar',
-				'hasPermissionsToManageWidgets',
-				'focusMode',
-				'styles',
-				'isRTL',
-				'bodyPlaceholder',
-				'titlePlaceholder',
-			] ),
-		};
-	}
-
 	render() {
 		const {
 			blocks,
 			editTitle,
 			isReady,
 			mode,
-			settings,
 			resetEditorBlocks,
 			resetEditorBlocksWithoutUndoLevel,
 			title,
@@ -181,14 +156,12 @@ class AppContainer extends React.Component<PropsType> {
 			return null;
 		}
 
-		const editorSettings = this.getBlockEditorSettings( settings );
-
 		return (
 			<BlockEditorProvider
 				value={ blocks }
 				onInput={ resetEditorBlocksWithoutUndoLevel }
 				onChange={ resetEditorBlocks }
-				settings={ editorSettings }
+				settings={ null }
 			>
 				<BlockManager
 					title={ title }
