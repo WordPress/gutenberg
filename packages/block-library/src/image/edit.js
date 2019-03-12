@@ -142,6 +142,30 @@ export class ImageEdit extends Component {
 				} );
 			}
 		}
+
+		// Try to figure out right values for LinkDestination and href if
+		// user has changed the default linkDestination value (none) and
+		// the user edits a post created with a different linkDestination
+		// default value.
+		if ( !this.state.isEditing ) {
+			if (
+				attributes.href &&
+				attributes.linkDestination === LINK_DESTINATION_NONE
+			) {
+				if ( attributes.href === attributes.url ) {
+					attributes.linkDestination = LINK_DESTINATION_MEDIA;
+				} else if ( attributes.href.indexOf( 'attachment' ) ) {
+					attributes.linkDestination = LINK_DESTINATION_ATTACHMENT;
+				} else {
+					attributes.linkDestination = LINK_DESTINATION_CUSTOM;
+				}
+			} else if (
+				!attributes.href &&
+				attributes.linkDestination !== LINK_DESTINATION_NONE
+			) {
+				attributes.linkDestination = LINK_DESTINATION_NONE;
+			}
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -177,9 +201,14 @@ export class ImageEdit extends Component {
 			return;
 		}
 
-		const { id, url, alt, caption, linkDestination } = this.props.attributes;
-
+		const { id, url, alt, caption } = this.props.attributes;
+		
 		let mediaAttributes = pickRelevantMediaFiles( media );
+		const linkAttributes = this.buildLinkAttributes(
+			this.props.attributes.linkDestination,
+			{ ...this.props.attributes, ...mediaAttributes },
+			null
+		);
 
 		// If the current image is temporary but an alt or caption text was meanwhile written by the user,
 		// make sure the text is not overwritten.
@@ -220,7 +249,39 @@ export class ImageEdit extends Component {
 		this.props.setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
+			...linkAttributes,
+			width: undefined,
+			height: undefined
 		} );
+
+		this.setState( {
+			isEditing: false,
+		} );
+	}
+
+	onSetLinkDestination( value ) {
+		this.props.setAttributes(
+			this.buildLinkAttributes(value, this.props.attributes, this.props.image)
+		);
+	}
+
+	buildLinkAttributes(value, attributes, image) {
+		let href;
+
+		if ( value === LINK_DESTINATION_NONE ) {
+			href = undefined;
+		} else if ( value === LINK_DESTINATION_MEDIA ) {
+			href = ( image && image.source_url ) || attributes.url;
+		} else if ( value === LINK_DESTINATION_ATTACHMENT ) {
+			href = image && image.link;
+		} else {
+			href = attributes.href;
+		}
+
+		return {
+			linkDestination: value,
+			href,
+		};
 	}
 
 	onSelectURL( newURL ) {
