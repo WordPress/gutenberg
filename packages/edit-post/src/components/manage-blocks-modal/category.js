@@ -1,68 +1,54 @@
 /**
  * External dependencies
  */
-import { includes, map } from 'lodash';
+import { without, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { cloneElement, Children } from '@wordpress/element';
-import { ToggleControl, PanelBody } from '@wordpress/components';
-import { __experimentalBlockTypesList as BlockTypesList } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import BlockManagerHideAll from './hide-all';
+import BlockTypesChecklist from './checklist';
 
 function BlockManagerCategory( {
 	category,
-	blockItems,
+	blockTypes,
 	hiddenBlockTypes,
-	opened,
-	onToggle,
-	showBlockTypes,
-	hideBlockTypes,
+	toggleVisible,
 	toggleAllHidden,
 } ) {
-	if ( ! blockItems.length ) {
+	if ( ! blockTypes.length ) {
 		return null;
 	}
 
-	const isAllHidden = blockItems.every( ( blockItem ) => {
-		return hiddenBlockTypes.includes( blockItem.id );
-	} );
+	const checkedBlockNames = without(
+		map( blockTypes, 'name' ),
+		...hiddenBlockTypes
+	);
 
 	return (
-		<PanelBody
-			key={ category.slug }
-			title={ category.title }
-			icon={ category.icon }
-			opened={ opened }
-			onToggle={ onToggle }
-		>
-			<ToggleControl
-				label={ __( 'Hide all blocks' ) }
-				checked={ isAllHidden }
-				onChange={ toggleAllHidden }
-				className="edit-post-manage-blocks-modal__hide-all"
+		<section className="edit-post-manage-blocks-modal__category">
+			<header className="edit-post-manage-blocks-modal__category-header">
+				<h2 className="edit-post-manage-blocks-modal__category-title">
+					{ category.title }
+				</h2>
+				<BlockManagerHideAll
+					category={ category }
+					checked={ ! checkedBlockNames.length }
+					onChange={ toggleAllHidden }
+				/>
+			</header>
+			<BlockTypesChecklist
+				blockTypes={ blockTypes }
+				value={ checkedBlockNames }
+				onItemChange={ toggleVisible }
 			/>
-			<BlockTypesList
-				items={ blockItems }
-				onSelect={ ( item ) => (
-					includes( hiddenBlockTypes, item.id ) ?
-						showBlockTypes( item.id ) :
-						hideBlockTypes( item.id )
-				) }
-				renderItem={ ( { children, item } ) => {
-					const isHidden = includes( hiddenBlockTypes, item.id );
-					const child = Children.only( children );
-					return cloneElement( child, {
-						'aria-pressed': isHidden,
-						'aria-label': __( 'Hide block: %s' ),
-						'data-hidden': isHidden ? __( 'Hidden' ) : undefined,
-					} );
-				} }
-			/>
-		</PanelBody>
+		</section>
 	);
 }
 
@@ -75,18 +61,22 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { blockItems } = ownProps;
 		const {
 			showBlockTypes,
 			hideBlockTypes,
 		} = dispatch( 'core/edit-post' );
 
 		return {
-			showBlockTypes,
-			hideBlockTypes,
-			toggleAllHidden( isToBeDisabled ) {
-				const blockNames = map( blockItems, 'id' );
-				if ( isToBeDisabled ) {
+			toggleVisible( blockName, nextIsChecked ) {
+				if ( nextIsChecked ) {
+					showBlockTypes( blockName );
+				} else {
+					hideBlockTypes( blockName );
+				}
+			},
+			toggleAllHidden( nextIsChecked ) {
+				const blockNames = map( ownProps.blockTypes, 'name' );
+				if ( nextIsChecked ) {
 					hideBlockTypes( blockNames );
 				} else {
 					showBlockTypes( blockNames );

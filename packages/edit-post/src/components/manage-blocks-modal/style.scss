@@ -1,6 +1,5 @@
 .edit-post-manage-blocks-modal {
 	@include break-small() {
-		width: 485px;
 		height: calc(100% - #{ $header-height } - #{ $header-height });
 	}
 }
@@ -14,10 +13,6 @@
 .edit-post-manage-blocks-modal .components-modal__header {
 	flex-shrink: 0;
 	margin-bottom: 0;
-}
-
-.edit-post-manage-blocks-modal__hide-all .components-base-control__field {
-	margin-top: $grid-size-small * 3;
 }
 
 .edit-post-manage-blocks-modal__content {
@@ -49,24 +44,69 @@
 	}
 }
 
+.edit-post-manage-blocks-modal__category {
+	margin: 0 0 2rem 0;
+}
+
+.edit-post-manage-blocks-modal__category-header {
+	position: sticky;
+	top: -1px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background-color: $white;
+}
+
+.edit-post-manage-blocks-modal__category-title {
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+
+.edit-post-manage-blocks-modal__hide-all {
+	display: flex;
+	align-items: center;
+}
+
+.edit-post-manage-blocks-modal__hide-all-label {
+	margin-right: $grid-size;
+}
+
+.edit-post-manage-blocks-modal__checklist {
+	margin-top: 0;
+}
+
+.edit-post-manage-blocks-modal__checklist-item {
+	margin-bottom: 0;
+	border-top: 1px solid $light-gray-500;
+
+	&:last-child {
+		border-bottom: 1px solid $light-gray-500;
+	}
+
+	.components-base-control__field {
+		align-items: center;
+		display: flex;
+		margin: 0;
+	}
+
+	.components-checkbox-control__label {
+		display: flex;
+		align-items: center;
+		flex-grow: 1;
+		padding: 0.6rem 0 0.6rem 10px;
+	}
+
+	.editor-block-icon {
+		margin-right: 10px;
+	}
+}
+
 .edit-post-manage-blocks-modal__results {
 	height: 100%;
 	overflow: auto;
 	margin-left: -1 * $grid-size-large;
 	margin-right: -1 * $grid-size-large;
-
-	.editor-block-types-list__item[data-hidden] {
-		position: relative;
-		background-color: $light-gray-200;
-
-		&::after {
-			content: attr(data-hidden);
-			position: absolute;
-			top: 0;
-			right: 0;
-			background-color: $blue-medium-500;
-			color: $white;
-			padding: 0 $grid-size-small;
-		}
-	}
+	padding-left: $grid-size-large;
+	padding-right: $grid-size-large;
+	border-top: $border-width solid $light-gray-500;
 }
