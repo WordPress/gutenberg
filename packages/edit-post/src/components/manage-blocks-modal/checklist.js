@@ -27,6 +27,7 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 						) }
 						checked={ value.includes( blockType.name ) }
 						onChange={ partial( onItemChange, blockType.name ) }
+						mirror
 					/>
 				</li>
 			) ) }
