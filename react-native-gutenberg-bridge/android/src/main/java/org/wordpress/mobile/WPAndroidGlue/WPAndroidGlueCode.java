@@ -145,7 +145,6 @@ public class WPAndroidGlueCode {
 
             @Override
             public void requestImageUploadCancel(int mediaId) {
-                // TODO here request host app to cancel any progressing uploads if any.
                 mOnMediaLibraryButtonListener.onCancelUploadForMediaDueToDeletedBlock(mediaId);
             }
 
