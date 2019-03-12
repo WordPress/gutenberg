@@ -18,7 +18,7 @@ import {
 	receiveThemeSupports,
 	receiveEmbedPreview,
 	receiveUserPermission,
-	receiveAutosave,
+	receiveAutosaves,
 } from './actions';
 import { getKindEntities } from './entities';
 import { apiFetch, resolveSelect } from './controls';
@@ -177,11 +177,11 @@ export function* canUser( action, resource, id ) {
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
  */
-export function* getAutosave( postType, postId ) {
+export function* getAutosaves( postType, postId ) {
 	const { rest_base: restBase } = yield resolveSelect( 'getPostType', postType );
-	const autosaveResponse = yield apiFetch( { path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit` } );
+	const autosaves = yield apiFetch( { path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit` } );
 
-	if ( autosaveResponse && autosaveResponse[ 0 ] ) {
-		yield receiveAutosave( postId, autosaveResponse[ 0 ] );
+	if ( autosaves && autosaves.length ) {
+		yield receiveAutosaves( postId, autosaves );
 	}
 }

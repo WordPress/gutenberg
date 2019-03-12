@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { getEntityRecord, getEntityRecords, getEmbedPreview, canUser, getAutosave } from '../resolvers';
-import { receiveEntityRecords, receiveEmbedPreview, receiveUserPermission, receiveAutosave } from '../actions';
+import { getEntityRecord, getEntityRecords, getEmbedPreview, canUser, getAutosaves } from '../resolvers';
+import { receiveEntityRecords, receiveEmbedPreview, receiveUserPermission, receiveAutosaves } from '../actions';
 import { apiFetch } from '../controls';
 
 describe( 'getEntityRecord', () => {
@@ -160,19 +160,19 @@ describe( 'canUser', () => {
 	} );
 } );
 
-describe( 'getAutosave', () => {
+describe( 'getAutosaves', () => {
 	const SUCCESSFUL_RESPONSE = [ {
 		title: 'test title',
 		excerpt: 'test excerpt',
 		content: 'test content',
 	} ];
 
-	it( 'yields with fetched autosave post', async () => {
+	it( 'yields with fetched autosaves', async () => {
 		const postType = 'post';
 		const postId = 1;
-		const baseURL = '/wp/v2/posts';
-		const postEntity = { name: 'post', kind: 'postType', baseURL };
-		const fulfillment = getAutosave( postType, postId );
+		const restBase = 'posts';
+		const postEntity = { rest_base: restBase };
+		const fulfillment = getAutosaves( postType, postId );
 
 		// Trigger generator
 		fulfillment.next();
@@ -180,27 +180,27 @@ describe( 'getAutosave', () => {
 		// Trigger generator with the postEntity and assert that correct path is formed
 		// in the apiFetch request.
 		const { value: apiFetchAction } = fulfillment.next( postEntity );
-		expect( apiFetchAction.request ).toEqual( { path: `${ baseURL }/${ postId }/autosaves?context=edit` } );
+		expect( apiFetchAction.request ).toEqual( { path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit` } );
 
 		// Provide apiFetch response and trigger Action
 		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) ).value;
-		expect( received ).toEqual( receiveAutosave( 1, SUCCESSFUL_RESPONSE[ 0 ] ) );
+		expect( received ).toEqual( receiveAutosaves( 1, SUCCESSFUL_RESPONSE ) );
 	} );
 
-	it( 'yields undefined if no autosave exists for the post', async () => {
+	it( ' yields undefined if no autosaves exist for the post', async () => {
 		const postType = 'post';
 		const postId = 1;
-		const baseURL = '/wp/v2/posts';
-		const entities = { name: 'post', kind: 'postType', baseURL };
-		const fulfillment = getAutosave( postType, postId );
+		const restBase = 'posts';
+		const postEntity = { rest_base: restBase };
+		const fulfillment = getAutosaves( postType, postId );
 
 		// Trigger generator
 		fulfillment.next();
 
 		// Trigger generator with the postEntity and assert that correct path is formed
 		// in the apiFetch request.
-		const { value: apiFetchAction } = fulfillment.next( entities );
-		expect( apiFetchAction.request ).toEqual( { path: `${ baseURL }/${ postId }/autosaves?context=edit` } );
+		const { value: apiFetchAction } = fulfillment.next( postEntity );
+		expect( apiFetchAction.request ).toEqual( { path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit` } );
 
 		// Provide apiFetch response and trigger Action
 		const received = ( await fulfillment.next( [] ) ).value;

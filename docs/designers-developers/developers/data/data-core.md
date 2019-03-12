@@ -183,13 +183,15 @@ Whether or not the user can perform the action,
 
 ### getAutosave
 
-Returns the latest autosave that is a child of the provided post id, if one exists.
+Returns the latest autosave that is a child of the provided post id for the
+author, if one exists.
 
 *Parameters*
 
  * state: State tree.
  * postType: The type of the parent post.
  * postId: The id of the parent post.
+ * author: The author of the autosave.
 
 *Returns*
 

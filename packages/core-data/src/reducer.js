@@ -248,12 +248,12 @@ export function userPermissions( state = {}, action ) {
  */
 export function autosaves( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_AUTOSAVE':
-			const { postId, autosave } = action;
+		case 'RECEIVE_AUTOSAVES':
+			const { postId, autosaves: autosavesData } = action;
 
 			return {
-				[ postId ]: autosave,
 				...state,
+				[ postId ]: autosavesData,
 			};
 	}
 

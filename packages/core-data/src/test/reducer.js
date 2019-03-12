@@ -148,8 +148,8 @@ describe( 'autosaves', () => {
 		expect( state ).toEqual( {} );
 	} );
 
-	it( 'returns the current state with the new autosave merged in, keyed by its parent post id', () => {
-		const existingAutosave = {
+	it( 'returns the current state with the new autosaves merged in, keyed by the parent post id', () => {
+		const existingAutosaves = [ {
 			title: {
 				raw: 'Some',
 			},
@@ -160,9 +160,9 @@ describe( 'autosaves', () => {
 				raw: 'autosave',
 			},
 			status: 'publish',
-		};
+		} ];
 
-		const newAutosave = {
+		const newAutosaves = [ {
 			title: {
 				raw: 'The Title',
 			},
@@ -173,17 +173,55 @@ describe( 'autosaves', () => {
 				raw: 'The Excerpt',
 			},
 			status: 'draft',
-		};
+		} ];
 
-		const state = autosaves( { 1: existingAutosave }, {
-			type: 'RECEIVE_AUTOSAVE',
+		const state = autosaves( { 1: existingAutosaves }, {
+			type: 'RECEIVE_AUTOSAVES',
 			postId: 2,
-			autosave: newAutosave,
+			autosaves: newAutosaves,
 		} );
 
 		expect( state ).toEqual( {
-			1: existingAutosave,
-			2: newAutosave,
+			1: existingAutosaves,
+			2: newAutosaves,
+		} );
+	} );
+
+	it( 'overwrites any existing state if new autosaves are received with the same post id', () => {
+		const existingAutosaves = [ {
+			title: {
+				raw: 'Some',
+			},
+			content: {
+				raw: 'other',
+			},
+			excerpt: {
+				raw: 'autosave',
+			},
+			status: 'publish',
+		} ];
+
+		const newAutosaves = [ {
+			title: {
+				raw: 'The Title',
+			},
+			content: {
+				raw: 'The Content',
+			},
+			excerpt: {
+				raw: 'The Excerpt',
+			},
+			status: 'draft',
+		} ];
+
+		const state = autosaves( { 1: existingAutosaves }, {
+			type: 'RECEIVE_AUTOSAVES',
+			postId: 1,
+			autosaves: newAutosaves,
+		} );
+
+		expect( state ).toEqual( {
+			1: newAutosaves,
 		} );
 	} );
 } );

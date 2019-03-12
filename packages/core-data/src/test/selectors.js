@@ -12,7 +12,7 @@ import {
 	getEmbedPreview,
 	isPreviewEmbedFallback,
 	canUser,
-	getAutosave,
+	getAutosaves,
 } from '../selectors';
 
 describe( 'getEntityRecord', () => {
@@ -147,34 +147,34 @@ describe( 'canUser', () => {
 	} );
 } );
 
-describe( 'getAutosave', () => {
-	it( 'returns undefined for the provided post id if no autosave exists for it in state', () => {
+describe( 'getAutosaves', () => {
+	it( 'returns undefined for the provided post id if no autosaves exist for it in state', () => {
 		const postType = 'post';
 		const postId = 2;
-		const autosave = { title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } };
+		const autosaves = [ { title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } } ];
 		const state = {
 			autosaves: {
-				1: autosave,
+				1: autosaves,
 			},
 		};
 
-		const result = getAutosave( state, postType, postId );
+		const result = getAutosaves( state, postType, postId );
 
 		expect( result ).toBeUndefined();
 	} );
 
-	it( 'returns the autosave for the provided post id, if it exists in state', () => {
+	it( 'returns the autosaves for the provided post id when they exist in state', () => {
 		const postType = 'post';
 		const postId = 1;
-		const autosave = { title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } };
+		const autosaves = [ { title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } } ];
 		const state = {
 			autosaves: {
-				[ postId ]: autosave,
+				1: autosaves,
 			},
 		};
 
-		const result = getAutosave( state, postType, postId );
+		const result = getAutosaves( state, postType, postId );
 
-		expect( result ).toEqual( autosave );
+		expect( result ).toEqual( autosaves );
 	} );
 } );

@@ -204,15 +204,17 @@ export function canUser( state, action, resource, id ) {
 }
 
 /**
- * Returns the latest autosave that is a child of the provided post id, if one exists.
+ * Returns the latest autosaves for the post.
+ *
+ * The backend stores one autosave per user per post.
  *
  * @param {Object} state    State tree.
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
  *
- * @return {?Object} The autosave object, or undefined if there is none.
+ * @return {?Object} An array of autosaves for the post, or undefined if there is none.
  */
-export function getAutosave( state, postType, postId ) {
+export function getAutosaves( state, postType, postId ) {
 	return state.autosaves[ postId ];
 }
 
@@ -226,5 +228,5 @@ export function getAutosave( state, postType, postId ) {
  * @return {boolean} True if the REST request was completed. False otherwise.
  */
 export const hasFetchedAutosave = createRegistrySelector( ( select ) => ( state, postType, postId ) => {
-	return select( 'core/data' ).hasFinishedResolution( REDUCER_KEY, 'getAutosave', [ postType, postId ] );
+	return select( 'core/data' ).hasFinishedResolution( REDUCER_KEY, 'getAutosaves', [ postType, postId ] );
 } );
