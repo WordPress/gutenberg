@@ -25,7 +25,9 @@ class LegacyWidgetEditHandler extends Component {
 
 	componentDidMount() {
 		this.isStillMounted = true;
-		this.requestWidgetUpdater();
+		this.requestWidgetUpdater( undefined, ( response ) => {
+			this.props.onInstanceChange( null, !! response.form );
+		} );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -33,7 +35,9 @@ class LegacyWidgetEditHandler extends Component {
 			prevProps.instance !== this.props.instance &&
 			this.instanceUpdating !== this.props.instance
 		) {
-			this.requestWidgetUpdater();
+			this.requestWidgetUpdater( undefined, ( response ) => {
+				this.props.onInstanceChange( null, !! response.form );
+			} );
 		}
 		if ( this.instanceUpdating === this.props.instance ) {
 			this.instanceUpdating = null;
@@ -81,12 +85,12 @@ class LegacyWidgetEditHandler extends Component {
 	onInstanceChange( instanceChanges ) {
 		this.requestWidgetUpdater( instanceChanges, ( response ) => {
 			this.instanceUpdating = response.instance;
-			this.props.onInstanceChange( response.instance );
+			this.props.onInstanceChange( response.instance, !! response.form );
 		} );
 	}
 
 	requestWidgetUpdater( instanceChanges, callback ) {
-		const { identifier, instanceId, instance } = this.props;
+		const { identifier, instanceId, instance, isCallbackWidget } = this.props;
 		if ( ! identifier ) {
 			return;
 		}
@@ -98,6 +102,7 @@ class LegacyWidgetEditHandler extends Component {
 				instance,
 				// use negative ids to make sure the id does not exist on the database.
 				id_to_use: instanceId * -1,
+				is_callback_widget: isCallbackWidget,
 				instance_changes: instanceChanges,
 			},
 			method: 'POST',

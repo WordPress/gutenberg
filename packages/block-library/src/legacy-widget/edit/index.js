@@ -33,6 +33,7 @@ class LegacyWidgetEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
+			hasEditForm: true,
 			isPreview: false,
 		};
 		this.switchToEdit = this.switchToEdit.bind( this );
@@ -47,7 +48,7 @@ class LegacyWidgetEdit extends Component {
 			hasPermissionsToManageWidgets,
 			setAttributes,
 		} = this.props;
-		const { isPreview } = this.state;
+		const { isPreview, hasEditForm } = this.state;
 		const { identifier, isCallbackWidget } = attributes;
 		const widgetObject = identifier && availableLegacyWidgets[ identifier ];
 		if ( ! widgetObject ) {
@@ -115,8 +116,8 @@ class LegacyWidgetEdit extends Component {
 							icon="update"
 						>
 						</IconButton>
-						{ ! isCallbackWidget && (
-							<>
+						{ hasEditForm && (
+							<Fragment>
 								<Button
 									className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
 									onClick={ this.switchToEdit }
@@ -129,26 +130,34 @@ class LegacyWidgetEdit extends Component {
 								>
 									<span>{ __( 'Preview' ) }</span>
 								</Button>
-							</>
+							</Fragment>
 						) }
 					</Toolbar>
 				</BlockControls>
 				{ inspectorControls }
-				{ ! isCallbackWidget && (
+				{ hasEditForm && (
 					<LegacyWidgetEditHandler
 						isVisible={ ! isPreview }
 						identifier={ attributes.identifier }
 						instance={ attributes.instance }
+						isCallbackWidget={ isCallbackWidget }
 						onInstanceChange={
-							( newInstance ) => {
-								this.props.setAttributes( {
-									instance: newInstance,
-								} );
+							( newInstance, newHasEditForm ) => {
+								if ( newInstance ) {
+									this.props.setAttributes( {
+										instance: newInstance,
+									} );
+								}
+								if ( newHasEditForm !== this.hasEditForm ) {
+									this.setState( {
+										hasEditForm: newHasEditForm,
+									} );
+								}
 							}
 						}
 					/>
 				) }
-				{ ( isPreview || isCallbackWidget ) && this.renderWidgetPreview() }
+				{ ( isPreview || ! hasEditForm ) && this.renderWidgetPreview() }
 			</>
 		);
 	}
@@ -158,6 +167,9 @@ class LegacyWidgetEdit extends Component {
 		this.props.setAttributes( {
 			instance: {},
 			identifier: undefined,
+		} );
+		this.setState( {
+			hasEditForm: true,
 		} );
 	}
 

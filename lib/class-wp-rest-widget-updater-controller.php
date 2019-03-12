@@ -34,13 +34,18 @@ class WP_REST_Widget_Updater_Controller extends WP_REST_Controller {
 	public function register_routes() {
 			register_rest_route(
 				$this->namespace,
-				// Regex representing a PHP class extracted from http://php.net/manual/en/language.oop5.basic.php.
-				'/' . $this->rest_base . '/(?P<identifier>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/',
+				'/' . $this->rest_base . '/(?P<identifier>[\w-_]+)/',
 				array(
 					'args' => array(
-						'identifier' => array(
+						'identifier'         => array(
 							'description' => __( 'Class name of the widget.', 'gutenberg' ),
 							'type'        => 'string',
+							'required'    => true,
+						),
+						'is_callback_widget' => array(
+							'description' => __( 'Flag indicating if the widget is registered using register_sidebar_widget or is a subclass of WP_Widget.', 'gutenberg' ),
+							'type'        => 'boolean',
+							'default'     => false,
 						),
 					),
 					array(
@@ -76,53 +81,110 @@ class WP_REST_Widget_Updater_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Returns the new widget instance and the form that represents it.
+	 * Checks if the widget being referenced is valid.
 	 *
 	 * @since 5.2.0
-	 * @access public
+	 * @param string  $identifier         Widget id for callback widgets or widget class name for class widgets.
+	 * @param boolean $is_callback_widget If true the widget is a back widget if false the widget is a class widget.
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 * @return boolean True if the widget being referenced exists and false otherwise.
 	 */
-	public function compute_new_widget( $request ) {
-		$url_params = $request->get_url_params();
-
-		$widget = $request->get_param( 'identifier' );
-
+	private function is_valid_widget( $identifier, $is_callback_widget ) {
+		if ( $is_callback_widget ) {
+			global $wp_registered_widgets;
+			return isset( $wp_registered_widgets[ $identifier ] );
+		}
 		global $wp_widget_factory;
+		return isset( $wp_widget_factory->widgets[ $identifier ] ) &&
+			( $wp_widget_factory->widgets[ $identifier ] instanceof WP_Widget );
+	}
 
+	/**
+	 * Computes an array with instance changes cleaned of widget specific prefixes and sufixes.
+	 *
+	 * @since 5.7.0
+	 * @param string $id_base          Widget ID Base.
+	 * @param string $id               Widget instance identifier.
+	 * @param array  $instance_changes Array with the form values being being changed.
+	 *
+	 * @return array An array based on $instance_changes whose keys have the widget specific sufixes and prefixes removed.
+	 */
+	private function parse_instance_changes( $id_base, $id, $instance_changes ) {
+		$instance_changes_parsed = array();
+		$start_position          = strlen( 'widget-' . $id_base . '[' . $id . '][' );
+		foreach ( $instance_changes as $key => $value ) {
+			$key_parsed                             = substr( $key, $start_position, -1 );
+			$instance_changes_parsed[ $key_parsed ] = $value;
+		}
+		return $instance_changes_parsed;
+	}
+
+	/**
+	 * Returns the bew callback widget form.
+	 *
+	 * @since 5.7.0
+	 * @param string $identifier       Widget id for callback widgets or widget class name for class widgets.
+	 * @param array  $instance_changes Array with the form values being being changed.
+	 *
+	 * @return WP_REST_Response Response object.
+	 */
+	private function compute_new_widget_handle_callback_widgets( $identifier, $instance_changes ) {
+		global $wp_registered_widget_controls;
+		$form = '';
 		if (
-			null === $widget ||
-			! isset( $wp_widget_factory->widgets[ $widget ] ) ||
-			! ( $wp_widget_factory->widgets[ $widget ] instanceof WP_Widget )
+			isset( $wp_registered_widget_controls[ $identifier ]['callback'] ) &&
+			is_callable( $wp_registered_widget_controls[ $identifier ]['callback'] )
 		) {
-			return new WP_Error(
-				'widget_invalid',
-				__( 'Invalid widget.', 'gutenberg' ),
-				array(
-					'status' => 404,
-				)
-			);
+			$control = $wp_registered_widget_controls[ $identifier ];
+			$_POST   = array_merge( $_POST, $instance_changes );
+			ob_start();
+			call_user_func_array( $control['callback'], $control['params'] );
+			$form = ob_get_clean();
 		}
 
-		$widget_obj = $wp_widget_factory->widgets[ $widget ];
+		return rest_ensure_response(
+			array(
+				'instance' => array(),
+				'form'     => $form,
+				'id_base'  => $identifier,
+				'id'       => $identifier,
+			)
+		);
+	}
 
-		$instance = $request->get_param( 'instance' );
+	/**
+	 * Returns the new class widget instance and the form that represents it.
+	 *
+	 * @since 5.7.0
+	 * @access public
+	 *
+	 * @param string $identifier       Widget id for callback widgets or widget class name for class widgets.
+	 * @param array  $instance         Previous widget instance.
+	 * @param array  $instance_changes Array with the form values being being changed.
+	 * @param string $id_to_use        Identifier of the specific widget instance.
+	 * @return WP_REST_Response Response object on success, or WP_Error object on failure.
+	 */
+	private function compute_new_widget_handle_class_widgets( $identifier, $instance, $instance_changes, $id_to_use ) {
 		if ( null === $instance ) {
 			$instance = array();
 		}
-		$id_to_use = $request->get_param( 'id_to_use' );
 		if ( null === $id_to_use ) {
 			$id_to_use = -1;
 		}
 
+		global $wp_widget_factory;
+		$widget_obj = $wp_widget_factory->widgets[ $identifier ];
+
 		$widget_obj->_set( $id_to_use );
+		$id_base = $widget_obj->id_base;
+		$id      = $widget_obj->id;
 		ob_start();
 
-		$instance_changes = $request->get_param( 'instance_changes' );
 		if ( null !== $instance_changes ) {
-			$old_instance = $instance;
-			$instance     = $widget_obj->update( $instance_changes, $old_instance );
+			$instance_changes = $this->parse_instance_changes( $id_base, $id_to_use, $instance_changes );
+			$old_instance     = $instance;
+			$instance         = $widget_obj->update( $instance_changes, $old_instance );
+
 			/**
 			 * Filters a widget's settings before saving.
 			 *
@@ -166,10 +228,7 @@ class WP_REST_Widget_Updater_Controller extends WP_REST_Controller {
 			 */
 			do_action_ref_array( 'in_widget_form', array( &$widget_obj, &$return, $instance ) );
 		}
-
-		$id_base = $widget_obj->id_base;
-		$id      = $widget_obj->id;
-		$form    = ob_get_clean();
+		$form = ob_get_clean();
 
 		return rest_ensure_response(
 			array(
@@ -178,6 +237,43 @@ class WP_REST_Widget_Updater_Controller extends WP_REST_Controller {
 				'id_base'  => $id_base,
 				'id'       => $id,
 			)
+		);
+	}
+
+	/**
+	 * Returns the new widget instance and the form that represents it.
+	 *
+	 * @since 5.7.0
+	 * @access public
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function compute_new_widget( $request ) {
+		$identifier         = $request->get_param( 'identifier' );
+		$is_callback_widget = $request->get_param( 'is_callback_widget' );
+
+		if ( ! $this->is_valid_widget( $identifier, $is_callback_widget ) ) {
+			return new WP_Error(
+				'widget_invalid',
+				__( 'Invalid widget.', 'gutenberg' ),
+				array(
+					'status' => 404,
+				)
+			);
+		}
+
+		if ( $is_callback_widget ) {
+			return $this->compute_new_widget_handle_callback_widgets(
+				$identifier,
+				$request->get_param( 'instance_changes' )
+			);
+		}
+		return $this->compute_new_widget_handle_class_widgets(
+			$identifier,
+			$request->get_param( 'instance' ),
+			$request->get_param( 'instance_changes' ),
+			$request->get_param( 'id_to_use' )
 		);
 	}
 }

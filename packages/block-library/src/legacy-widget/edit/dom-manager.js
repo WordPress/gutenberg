@@ -110,28 +110,24 @@ class LegacyWidgetEditDomManager extends Component {
 
 	retrieveUpdatedInstance() {
 		if ( this.formRef.current ) {
-			const { idBase, widgetNumber } = this.props;
 			const form = this.formRef.current;
 			const formData = new window.FormData( form );
 			const updatedInstance = {};
-			const keyPrefixLength = `widget-${ idBase }[${ widgetNumber }][`.length;
-			const keySuffixLength = `]`.length;
-			for ( const rawKey of formData.keys() ) {
+			for ( const key of formData.keys() ) {
 				// This fields are added to the form because the widget JavaScript code may use this values.
 				// They are not relevant for the update mechanism.
 				if ( includes(
 					[ 'widget-id', 'id_base', 'widget_number', 'multi_number', 'add_new' ],
-					rawKey,
+					key,
 				) ) {
 					continue;
 				}
-				const keyParsed = rawKey.substring( keyPrefixLength, rawKey.length - keySuffixLength );
 
-				const value = formData.getAll( rawKey );
+				const value = formData.getAll( key );
 				if ( value.length > 1 ) {
-					updatedInstance[ keyParsed ] = value;
+					updatedInstance[ key ] = value;
 				} else {
-					updatedInstance[ keyParsed ] = value[ 0 ];
+					updatedInstance[ key ] = value[ 0 ];
 				}
 			}
 			return updatedInstance;
