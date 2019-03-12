@@ -128,3 +128,11 @@ div.block-core-columns.is-vertically-aligned-center {
 div.block-core-columns.is-vertically-aligned-bottom {
 	justify-content: flex-end;
 }
+
+
+/**
+ * Fixes single Column breadcrumb to RHS of Block boundary
+ */
+[data-type="core/column"] > .editor-block-list__block-edit > .editor-block-list__breadcrumb {
+	right: 0;
+}
