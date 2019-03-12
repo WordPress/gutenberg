@@ -502,6 +502,7 @@ export class RichText extends Component {
 			style,
 			formattingControls,
 			isSelected,
+			sendEmptyTag,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -509,11 +510,23 @@ export class RichText extends Component {
 		const value = this.valueToFormat( record );
 		let html = `<${ tagName }>${ value }</${ tagName }>`;
 		// We need to check if the value is undefined or empty, and then assign it properly otherwise the placeholder is not visible
+
 		if ( value === undefined || value === '' ) {
-			html = '';
+			// PR for placeholder fix https://github.com/WordPress/gutenberg/pull/13699/
+			// has introduced heading issue on Android https://github.com/wordpress-mobile/gutenberg-mobile/issues/627
+			// ( If a new heading block is created on Android device
+			// it will be without default formatting ( <h2> currently ) ) .
+			// Fix for heading issue is to skip reset of html variable if tag is heading and platform is Android.
+			// This fix will intentionally introduce original issue with placeholder (on Android)
+			// which has lower priority then heading issue .
+			// New issue is raised : https://github.com/wordpress-mobile/gutenberg-mobile/issues/707
+			if ( ! sendEmptyTag ) {
+				html = '';
+			}
+
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
-		let minHeight = 0;
+		let minHeight = styles[ 'editor-rich-text' ].minHeight;
 		if ( style && style.minHeight ) {
 			minHeight = style.minHeight;
 		}
