@@ -159,11 +159,6 @@
 				}
 			}
 		}
-
-		// Prevent inset borders from overlapping full-bleed block content.
-		&[data-align="full"] > .editor-block-list__block-edit::before {
-			box-shadow: none;
-		}
 	}
 
 	// Hover style.
