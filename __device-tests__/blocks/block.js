@@ -1,22 +1,19 @@
-Set.prototype.difference = function( nextSet ) {
-	// creating new set to store difference
-	const differenceSet = new Set();
+/** @flow
+ * @format */
 
-	// iterate over the values
-	for ( const elem of this ) {
-		// if the value[i] is not present
-		// in nextSet add to the differenceSet
-		if ( ! nextSet.has( elem ) ) {
-			differenceSet.add( elem );
-		}
-	}
-
-	// returns values of differenceSet
-	return differenceSet;
-};
+import wd from 'wd';
 
 export default class Block {
-	constructor( driver ) {
+	driver: wd.PromiseChainWebdriver;
+	rnPlatform: string;
+	accessibilityIdKey: string;
+	name: string;
+	blockName: string;
+	defaultPlatform: string;
+	element: wd.PromiseChainWebdriver.Element;
+	accessibilityId: string;
+
+	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
 		this.accessibilityIdKey = 'name';
 		this.defaultPlatform = 'android';
@@ -27,7 +24,56 @@ export default class Block {
 		}
 	}
 
-	async typeString( element, str ) {
+	setDifference( set1: Set<string>, set2: Set<string> ) {
+		const differenceSet = new Set<string>();
+
+		for ( const elem of set1 ) {
+			// if the value[i] is not present
+			// in nextSet add to the differenceSet
+			if ( ! set2.has( elem ) ) {
+				differenceSet.add( elem );
+			}
+		}
+
+		// returns values of differenceSet
+		return differenceSet;
+	}
+
+	async setup() {
+		throw 'Unimplemented setup function for this block';
+	}
+
+	async getAttribute( attributeName: string ) {
+		return await this.element.getAttribute( attributeName );
+	}
+
+	// Finds the wd element for new block that was added and sets the element attribute on this object
+	async setupElement( blockName: string, blocks: Set<string> ) {
+		await this.driver.sleep( 2000 );
+		const blockLocator = `//*[starts-with(@${ this.accessibilityIdKey }, '${ blockName }')]`;
+		const paragraphBlocks = await this.driver.elementsByXPath( blockLocator );
+
+		const currentBlocks = new Set( [] );
+
+		for ( const paragraphBlock of paragraphBlocks ) {
+			const elementID = await paragraphBlock.getAttribute( this.accessibilityIdKey );
+			currentBlocks.add( elementID );
+		}
+
+		let newBlocks = this.setDifference( currentBlocks, blocks );
+
+		if ( newBlocks.size === 0 ) {
+			newBlocks = this.setDifference( blocks, currentBlocks );
+		}
+
+		const newElementAccessibilityId = newBlocks.values().next().value;
+		this.element = await this.driver.elementByAccessibilityId( newElementAccessibilityId );
+		this.accessibilityId = await this.getAttribute( this.accessibilityIdKey );
+
+		return blocks;
+	}
+
+	async typeString( element: wd.PromiseChainWebdriver.Element, str: string ) {
 		if ( this.rnPlatform === 'android' ) {
 			await element.clear();
 			return await element.type( str );

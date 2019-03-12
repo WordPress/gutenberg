@@ -1,44 +1,18 @@
+/** @flow
+ * @format */
+
 import Block from './block';
+import wd from 'wd';
 
 export default class ParagraphBlock extends Block {
-	static blocks = new Set( [] );
+	static blocks = new Set<string[]>( [] );
+	textViewElement: wd.PromiseChainWebdriver.Element;
 
-	constructor( driver, name = 'Unsupported Block' ) {
+	constructor( driver: wd.PromiseChainWebdriver, name: string = 'Unsupported Block' ) {
 		super( driver );
 		this.driver = driver;
 		this.name = name; // name in block picker list
-		this.element = null;
 		this.blockName = 'core/paragraph';
-		this.accessibilityId = null; // Block accessibility ID
-	}
-
-	async getAttribute( attributeName ) {
-		return await this.element.getAttribute( attributeName );
-	}
-
-	// Finds the wd element for new block that was added and sets the element attribute on this object
-	async setupElement() {
-		await this.driver.sleep( 2000 );
-		const blockLocator = `//*[starts-with(@${ this.accessibilityIdKey }, '${ this.blockName }')]`;
-		const paragraphBlocks = await this.driver.elementsByXPath( blockLocator );
-
-		const currentBlocks = new Set( [] );
-
-		for ( const paragraphBlock of paragraphBlocks ) {
-			const elementID = await paragraphBlock.getAttribute( this.accessibilityIdKey );
-			currentBlocks.add( elementID );
-		}
-
-		let newBlocks = currentBlocks.difference( ParagraphBlock.blocks );
-		if ( newBlocks.size === 0 ) {
-			newBlocks = ParagraphBlock.blocks.difference( currentBlocks );
-		}
-
-		const newElementAccessibilityId = newBlocks.values().next().value;
-		const newElement = await this.driver.elementByAccessibilityId( newElementAccessibilityId );
-		ParagraphBlock.blocks = currentBlocks;
-		this.element = newElement;
-		this.accessibilityId = await this.getAttribute( this.accessibilityIdKey );
 	}
 
 	// gets the TextView wd element for this paragraph block and sets it to
@@ -54,11 +28,11 @@ export default class ParagraphBlock extends Block {
 	}
 
 	async setup() {
-		await this.setupElement();
+		await this.setupElement( this.blockName, ParagraphBlock.blocks );
 		await this.setupTextView();
 	}
 
-	async sendText( str ) {
+	async sendText( str: string ) {
 		return await this.typeString( this.textViewElement, str );
 	}
 

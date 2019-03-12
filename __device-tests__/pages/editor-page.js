@@ -1,18 +1,22 @@
 /** @flow
  * @format */
+import wd from 'wd';
+import Block from '../blocks/block';
 
 export default class EditorPage {
-	constructor( driver ) {
+	driver: wd.PromiseChainWebdriver;
+
+	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
 	}
 
-	static async Expect( driver ): EditorPage {
+	static async Expect( driver: wd.PromiseChainWebdriver ) {
 		const page = new this( driver );
 		expect( await driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
 		return page;
 	}
 
-	async addNewBlock( block ) {
+	async addNewBlock( block: Block ) {
 		const blockName = block.name;
 
 		// Click add button

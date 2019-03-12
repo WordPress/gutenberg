@@ -21,11 +21,6 @@ const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
 let config;
 let appium;
 
-let accessibilityIdKey = 'name';
-if ( rnPlatform === 'android' ) {
-	accessibilityIdKey = 'content-desc';
-}
-
 if ( rnPlatform === 'android' ) {
 	config = {
 		platformName: 'android',
@@ -47,28 +42,8 @@ if ( rnPlatform === 'android' ) {
 	};
 }
 
-Set.prototype.difference = function( nextSet ) {
-	// creating new set to store differnce
-	const differenceSet = new Set();
-
-	// iterate over the values
-	for ( const elem of this ) {
-		// if the value[i] is not present
-		// in nextSet add to the differenceSet
-		if ( ! nextSet.has( elem ) ) {
-			differenceSet.add( elem );
-		}
-	}
-
-	// returns values of differenceSet
-	return differenceSet;
-};
-
 describe( 'Gutenberg Editor tests', () => {
 	let driver;
-	const blocks = {
-		'core/paragraph': new Set( [] ),
-	};
 
 	const setupAppium = async function() {
 		const spawn = child_process.spawn;
