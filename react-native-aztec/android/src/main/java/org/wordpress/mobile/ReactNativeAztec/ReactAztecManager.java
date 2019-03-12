@@ -294,9 +294,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         view.setTextColor(newColor);
     }
 
-    @ReactProp(name = "tagName")
-    public void setTagName(ReactAztecText view, @Nullable String tagName) {
-        view.setTagName(tagName);
+    @ReactProp(name = "blockType")
+    public void setBlockType(ReactAztecText view, ReadableMap inputMap) {
+        if (inputMap.hasKey("tag")) {
+            view.setTagName(inputMap.getString("tag"));
+        }
     }
 
     @ReactProp(name = "placeholder")
