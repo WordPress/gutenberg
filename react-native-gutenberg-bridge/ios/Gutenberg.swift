@@ -9,6 +9,9 @@ import RNTAztecView
 
 @objc
 public class Gutenberg: NSObject {
+
+    private var extraModules: [RCTBridgeModule];
+
     public lazy var rootView: UIView = {
         return RCTRootView(bridge: bridge, moduleName: "gutenberg", initialProperties: initialProps)
     }()
@@ -55,8 +58,9 @@ public class Gutenberg: NSObject {
         return initialProps
     }
 
-    public init(dataSource: GutenbergBridgeDataSource) {
+    public init(dataSource: GutenbergBridgeDataSource, extraModules: [RCTBridgeModule] = []) {
         self.dataSource = dataSource
+        self.extraModules = extraModules
     }
 
     public func invalidate() {
@@ -104,8 +108,8 @@ extension Gutenberg: RCTBridgeDelegate {
     public func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {
         let aztecManager = RCTAztecViewManager()
         aztecManager.attachmentDelegate = dataSource.aztecAttachmentDelegate()
-
-        return [bridgeModule, aztecManager]
+        let baseModules:[RCTBridgeModule] = [bridgeModule, aztecManager]
+        return baseModules + extraModules
     }
 }
 

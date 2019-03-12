@@ -8,6 +8,8 @@ const fetch = require( 'node-fetch' );
 const supportedLocales = [
 	'ar', // Arabic
 	'bg', // Bulgarian
+	'bo', // Tibetan
+	'ca', // Catalan
 	'cs', // Czech
 	'cy', // Welsh
 	'da', // Danish
@@ -15,9 +17,16 @@ const supportedLocales = [
 	'en-au', // English (Australia)
 	'en-ca', // English (Canada)
 	'en-gb', // English (UK)
+	'en-nz', // English (New Zealand)
+	'en-za', // English (South Africa)
 	'el', // Greek
 	'es', // Spanish
+	'es-ar', // Spanish (Argentina)
+	'es-cl', // Spanish (Chile)
+	'es-cr', // Spanish (Costa Rica)
+	'fa', // Persian
 	'fr', // French
+	'gl', // Galician
 	'he', // Hebrew
 	'hr', // Croatian
 	'hu', // Hungarian
@@ -25,9 +34,11 @@ const supportedLocales = [
 	'is', // Icelandic
 	'it', // Italian
 	'ja', // Japanese
+	'ka', // Georgian
 	'ko', // Korean
 	'nb', // Norwegian (Bokmål)
 	'nl', // Dutch
+	'nl-be', // Dutch (Belgium)
 	'pl', // Polish
 	'pt', // Portuguese
 	'pt-br', // Portuguese (Brazil)
@@ -35,14 +46,18 @@ const supportedLocales = [
 	'ru', // Russian
 	'sk', // Slovak
 	'sq', // Albanian
+	'sr', // Serbian
 	'sv', // Swedish
 	'th', // Thai
 	'tr', // Turkish
+	'uk', // Ukrainian
+	'ur', // Urdu
+	'vi', // Vietnamese
 	'zh-cn', // Chinese (China)
 	'zh-tw', // Chinese (Taiwan)
 ];
 
-const getLanguageUrl = ( locale ) => `https://widgets.wp.com/languages/gutenberg/${ locale }.json`;
+const getLanguageUrl = ( locale ) => `https://translate.wordpress.org/projects/wp-plugins/gutenberg/dev/${ locale }/default/export-translations\?format\=json`;
 const getTranslationFilePath = ( locale ) => `./data/${ locale }.json`;
 
 const getTranslation = ( locale ) => require( getTranslationFilePath( locale ) );

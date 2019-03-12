@@ -14,12 +14,13 @@ struct HeadingBlockFormatHandler: BlockFormatHandler {
     }
 
     func forceTypingFormat(on textView: RCTAztecView) {
-        var attributes = textView.typingAttributesSwifted
+        var attributes = textView.typingAttributes
 
-        attributes = paragraphFormatter.remove(from: attributes)
-        attributes = headerFormatter.apply(to: attributes, andStore: nil)
 
-        textView.typingAttributesSwifted = attributes
+        attributes = paragraphFormatter.remove(from: textView.typingAttributes)
+        attributes = headerFormatter.apply(to: textView.typingAttributes, andStore: nil)
+
+        textView.typingAttributes = attributes
     }
 
     private static func headerLevel(from levelString: String) -> Header.HeaderType? {
