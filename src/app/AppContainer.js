@@ -3,8 +3,13 @@
 
 import React from 'react';
 import type { EmitterSubscription } from 'react-native';
+import RNReactNativeGutenbergBridge, {
+	subscribeParentGetHtml,
+	subscribeParentToggleHTMLMode,
+	subscribeSetTitle,
+	subscribeUpdateHtml,
+} from 'react-native-gutenberg-bridge';
 import { isEmpty, pick } from 'lodash';
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -79,19 +84,19 @@ class AppContainer extends React.Component<PropsType> {
 		const hasUnsupportedBlocks = ! isEmpty( blocks.filter( ( { name } ) => name === UnsupportedBlock.name ) );
 		RNReactNativeGutenbergBridge.editorDidMount( hasUnsupportedBlocks );
 
-		this.subscriptionParentGetHtml = RNReactNativeGutenbergBridge.subscribeParentGetHtml( () => {
+		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
 			this.serializeToNativeAction();
 		} );
 
-		this.subscriptionParentToggleHTMLMode = RNReactNativeGutenbergBridge.subscribeParentToggleHTMLMode( () => {
+		this.subscriptionParentToggleHTMLMode = subscribeParentToggleHTMLMode( () => {
 			this.toggleMode();
 		} );
 
-		this.subscriptionParentSetTitle = RNReactNativeGutenbergBridge.subscribeSetTitle( ( payload ) => {
+		this.subscriptionParentSetTitle = subscribeSetTitle( ( payload ) => {
 			this.props.editTitle( payload.title );
 		} );
 
-		this.subscriptionParentUpdateHtml = RNReactNativeGutenbergBridge.subscribeUpdateHtml( ( payload ) => {
+		this.subscriptionParentUpdateHtml = subscribeUpdateHtml( ( payload ) => {
 			this.updateHtmlAction( payload.html );
 		} );
 	}
