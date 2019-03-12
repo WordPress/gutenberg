@@ -614,7 +614,7 @@
 		margin-top: $block-toolbar-height;
 		margin-right: -$block-padding;
 		margin-left: -$block-padding;
-		border-top: $border-width solid $light-gray-500;
+		border-top: $border-width solid $light-gray-800;
 		height: $block-toolbar-height;
 
 		@include break-small() {
