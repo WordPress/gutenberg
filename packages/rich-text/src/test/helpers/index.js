@@ -650,4 +650,42 @@ export const specWithRegistration = [
 			text: 'a',
 		},
 	},
+	{
+		description: 'should not create format if editable tree only',
+		formatName: 'my-plugin/link',
+		formatType: {
+			title: 'Custom Link',
+			tagName: 'a',
+			className: 'custom-format',
+			edit() {},
+			__experimentalCreatePrepareEditableTree() {},
+		},
+		html: '<a class="custom-format">a</a>',
+		value: {
+			formats: [ , ],
+			text: 'a',
+		},
+		noToHTMLString: true,
+	},
+	{
+		description: 'should create format if editable tree only but changes need to be recorded',
+		formatName: 'my-plugin/link',
+		formatType: {
+			title: 'Custom Link',
+			tagName: 'a',
+			className: 'custom-format',
+			edit() {},
+			__experimentalCreatePrepareEditableTree() {},
+			__experimentalCreateOnChangeEditableValue() {},
+		},
+		html: '<a class="custom-format">a</a>',
+		value: {
+			formats: [ [ {
+				type: 'my-plugin/link',
+				attributes: {},
+				unregisteredAttributes: {},
+			} ] ],
+			text: 'a',
+		},
+	},
 ];
