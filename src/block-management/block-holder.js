@@ -166,17 +166,17 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	render() {
-		const { isSelected, borderStyle, focusedBorderColor, clientId } = this.props;
+		const { isSelected, borderStyle, focusedBorderColor } = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
 		return (
-			<TouchableWithoutFeedback accessible={false} accessibilityLabel="block-container" onPress={ this.onFocus } >
+			<TouchableWithoutFeedback accessible={ false } accessibilityLabel="block-container" onPress={ this.onFocus } >
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
-					<View 
-					accessibile={true}
-					accessibilityLabel={this.props.testID} style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>{ this.getBlockForType() }</View>
+					<View
+						accessibile={ true }
+						accessibilityLabel={ this.props.testID } style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>{ this.getBlockForType() }</View>
 					{ this.renderToolbar() }
 				</View>
 			</TouchableWithoutFeedback>

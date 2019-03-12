@@ -24,8 +24,8 @@ export default class AppProvider extends React.Component<PropsType> {
 			initialTitle = 'Welcome to Gutenberg!';
 		}
 
-		initialData="";
-		
+		initialData = '';
+
 		return (
 			<AppContainer
 				initialHtml={ initialData }

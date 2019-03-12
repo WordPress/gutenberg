@@ -3,7 +3,7 @@
  * */
 
 import wd from 'wd';
-import child_process from 'child_process';
+import { child_process as childProcess } from 'child_process';
 import fs from 'fs';
 import EditorPage from './pages/editor-page';
 import ParagraphBlock from './blocks/paragraph-block';
@@ -47,7 +47,7 @@ describe( 'Gutenberg Editor tests', () => {
 	let driver;
 
 	const setupAppium = async function() {
-		const spawn = child_process.spawn;
+		const spawn = childProcess.spawn;
 		appium = spawn( 'appium', [ '-p', '' + APPIUM_SERVER_PORT ], {
 			detached: true, stdio: [ 'ignore', out, err ],
 
@@ -56,12 +56,10 @@ describe( 'Gutenberg Editor tests', () => {
 	};
 
 	beforeAll( async () => {
-		console.log( 'Setting up appium' );
 		await setupAppium();
 	} );
 
 	afterAll( async () => {
-		console.log( 'Killing Appium process' );
 		appium.kill( 'SIGINT' );
 	} );
 

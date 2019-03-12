@@ -96,15 +96,9 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	onBlockTypeSelected( itemValue: string ) {
 		this.setState( { blockTypePickerVisible: false } );
 
-		console.log("Item added ");
-		console.log(itemValue);
-		
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue );
 
-		console.log("Block added");
-		console.log(newBlock);
-		debugger;
 		// now determine whether we need to replace the currently selected block (if it's empty)
 		// or just add a new block as usual
 		if ( this.isReplaceable( this.props.selectedBlock ) ) {
@@ -203,8 +197,8 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 				onUpdate={ this.props.setTitleAction }
 				placeholder={ __( 'Add title' ) }
 				borderStyle={ this.blockHolderBorderStyle() }
-				focusedBorderColor={ styles.blockHolderFocused.borderColor } 
-				accessibilityLabel="post-title"/>
+				focusedBorderColor={ styles.blockHolderFocused.borderColor }
+				accessibilityLabel="post-title" />
 		);
 	}
 
@@ -277,8 +271,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderItem( value: { item: string, index: number } ) {
 		const clientId = value.item;
-		const testID = this.props.getBlockName(clientId) + '-' + clientId;
-
+		const testID = this.props.getBlockName( clientId ) + '-' + clientId;
 
 		return (
 			<View >
@@ -286,7 +279,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					key={ clientId }
 					showTitle={ false }
 					clientId={ clientId }
-					testID= { testID }
+					testID={ testID }
 					rootClientId={ this.props.rootClientId }
 					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 					borderStyle={ this.blockHolderBorderStyle() }

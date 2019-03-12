@@ -38,7 +38,7 @@ export class BlockToolbar extends Component<PropsType> {
 		} = this.props;
 
 		return (
-			<View style={ styles.container } accessible={false} accessibilityLabel=" VIew Add block">
+			<View style={ styles.container } accessible={ false } accessibilityLabel=" VIew Add block">
 				<ScrollView
 					accessible={ false }
 					accessibilityLabel="Scrollview Add block"
@@ -49,19 +49,19 @@ export class BlockToolbar extends Component<PropsType> {
 					contentContainerStyle={ styles.scrollableContent }
 				>
 					<Toolbar accessible={ true }
-					accessibilityLabel={"Toolbar Add block"}>
+						accessibilityLabel={ 'Toolbar Add block' }>
 						<ToolbarButton
 							title={ __( 'Add block' ) }
 							icon="insert"
-							accessible={true}
-							accessibilityLabel={"Add block"}
+							accessible={ true }
+							accessibilityLabel={ 'Add block' }
 							testID="Add block"
 							onClick={ onInsertClick }
 						/>
 						<ToolbarButton
 							title={ __( 'Undo' ) }
 							icon="undo"
-							accessible={true}
+							accessible={ true }
 							accessibilityLabel="Add block"
 							isDisabled={ ! hasUndo }
 							onClick={ undo }
@@ -69,7 +69,7 @@ export class BlockToolbar extends Component<PropsType> {
 						<ToolbarButton
 							title={ __( 'Redo' ) }
 							icon="redo"
-							accessible={true}
+							accessible={ true }
 							accessibilityLabel="Add block"
 							isDisabled={ ! hasRedo }
 							onClick={ redo }
