@@ -83,7 +83,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	};
 
 	onRemoveBlockCheckUpload = ( mediaId: number, isUploading: boolean ) => {
-		if ( isUploading && mediaId) {
+		if ( isUploading && mediaId ) {
 			// here we will be being passed the mediaId of the Image component being unmounted so, safe to issue the cancel signal
 			// through the bridge.
 			requestImageUploadCancel( mediaId );
