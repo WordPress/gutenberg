@@ -116,7 +116,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	onSafeAreaInsetsUpdate( result: Object ) {
 		const { safeAreaInsets } = result;
-		if ( this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
+		if ( this._isMounted && this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
 			this.setState( { ...this.state, safeAreaBottomInset: safeAreaInsets.bottom } );
 		}
 	}
@@ -142,6 +142,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	componentDidMount() {
+		this._isMounted = true;
 		Keyboard.addListener( 'keyboardDidShow', this.keyboardDidShow );
 		Keyboard.addListener( 'keyboardDidHide', this.keyboardDidHide );
 		SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
@@ -159,6 +160,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		if ( this.subscriptionParentSetFocusOnTitle ) {
 			this.subscriptionParentSetFocusOnTitle.remove();
 		}
+		this._isMounted = false;
 	}
 
 	keyboardDidShow() {
