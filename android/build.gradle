@@ -1,23 +1,18 @@
 buildscript {
     ext {
-        gradlePluginVersion = '3.1.0'
-        kotlinVersion = '1.2.31'
-        supportLibVersion = '27.1.1'
-        tagSoupVersion = '1.2.1'
-        glideVersion = '3.7.0'
-        picassoVersion = '2.5.2'
-        robolectricVersion = '3.5.1'
-        jUnitVersion = '4.12'
-        jSoupVersion = '1.10.3'
+        gradlePluginVersion = '3.3.1'
+        kotlinVersion = '1.3.0'
+        buildToolsVersion = "28.0.3"
+        minSdkVersion = 21
+        compileSdkVersion = 28
+        targetSdkVersion = 28
+        supportLibVersion = '28.0.0'
         wordpressUtilsVersion = '1.22'
-        espressoVersion = '3.0.1'
     }
-
     repositories {
         google()
         jcenter()
     }
-
     dependencies {
         classpath "com.android.tools.build:gradle:$gradlePluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
@@ -35,10 +30,6 @@ allprojects {
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"
-        }
-        maven {
-           // Local Maven repo containing AARs with JSC library built for Android
-           url "$rootDir/../node_modules/jsc-android/dist"
         }
     }
 }
