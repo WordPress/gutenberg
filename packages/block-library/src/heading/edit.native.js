@@ -23,7 +23,6 @@ class HeadingEdit extends Component {
 		super( props );
 
 		this.splitBlock = this.splitBlock.bind( this );
-		this.isAndroid = Platform.OS === 'android';
 	}
 
 	/**
@@ -102,9 +101,6 @@ class HeadingEdit extends Component {
 					onMerge={ mergeBlocks }
 					onSplit={ this.splitBlock }
 					placeholder={ placeholder || __( 'Write heading…' ) }
-					// Fix for heading issue on Android https://github.com/wordpress-mobile/gutenberg-mobile/issues/627
-					// Intentionally introduces missing pleceholder issue on Android https://github.com/wordpress-mobile/gutenberg-mobile/issues/707
-					sendEmptyTag={ this.isAndroid }
 				/>
 			</View>
 		);
