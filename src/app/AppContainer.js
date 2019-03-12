@@ -129,7 +129,7 @@ class AppContainer extends React.Component<PropsType> {
 
 		this.lastTitle = title;
 		this.lastHtml = html;
-	};
+	}
 
 	updateHtmlAction( html: string = '' ) {
 		const parsed = parse( html );
