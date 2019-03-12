@@ -5,18 +5,18 @@ import { withInstanceId } from '@wordpress/compose';
 import { FormToggle } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-function BlockManagerHideAll( { instanceId, category, checked, onChange } ) {
-	const id = 'edit-post-manage-blocks-modal__hide-all-' + instanceId;
+function BlockManagerShowAll( { instanceId, category, checked, onChange } ) {
+	const id = 'edit-post-manage-blocks-modal__show-all-' + instanceId;
 
 	return (
-		<div className="edit-post-manage-blocks-modal__hide-all">
+		<div className="edit-post-manage-blocks-modal__show-all">
 			<label
 				htmlFor={ id }
-				className="edit-post-manage-blocks-modal__hide-all-label"
+				className="edit-post-manage-blocks-modal__show-all-label"
 			>
 				{
 					/* translators: Checkbox toggle label */
-					__( 'Hide all' )
+					__( 'Show section' )
 				}
 			</label>
 			<FormToggle
@@ -25,7 +25,7 @@ function BlockManagerHideAll( { instanceId, category, checked, onChange } ) {
 				onChange={ ( event ) => onChange( event.target.checked ) }
 				aria-label={ sprintf(
 					/* translators: Block Visibility accessible checkbox toggle label */
-					__( 'Hide all blocks in category: %s' ),
+					__( 'Show all blocks in section: %s' ),
 					category.title
 				) }
 			/>
@@ -33,4 +33,4 @@ function BlockManagerHideAll( { instanceId, category, checked, onChange } ) {
 	);
 }
 
-export default withInstanceId( BlockManagerHideAll );
+export default withInstanceId( BlockManagerShowAll );

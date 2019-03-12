@@ -12,7 +12,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import BlockManagerHideAll from './hide-all';
+import BlockManagerShowAll from './show-all';
 import BlockTypesChecklist from './checklist';
 
 function BlockManagerCategory( {
@@ -20,7 +20,7 @@ function BlockManagerCategory( {
 	blockTypes,
 	hiddenBlockTypes,
 	toggleVisible,
-	toggleAllHidden,
+	toggleAllVisible,
 } ) {
 	if ( ! blockTypes.length ) {
 		return null;
@@ -37,10 +37,10 @@ function BlockManagerCategory( {
 				<h2 className="edit-post-manage-blocks-modal__category-title">
 					{ category.title }
 				</h2>
-				<BlockManagerHideAll
+				<BlockManagerShowAll
 					category={ category }
-					checked={ ! checkedBlockNames.length }
-					onChange={ toggleAllHidden }
+					checked={ checkedBlockNames.length > 0 }
+					onChange={ toggleAllVisible }
 				/>
 			</header>
 			<BlockTypesChecklist
@@ -74,12 +74,12 @@ export default compose( [
 					hideBlockTypes( blockName );
 				}
 			},
-			toggleAllHidden( nextIsChecked ) {
+			toggleAllVisible( nextIsChecked ) {
 				const blockNames = map( ownProps.blockTypes, 'name' );
 				if ( nextIsChecked ) {
-					hideBlockTypes( blockNames );
-				} else {
 					showBlockTypes( blockNames );
+				} else {
+					hideBlockTypes( blockNames );
 				}
 			},
 		};
