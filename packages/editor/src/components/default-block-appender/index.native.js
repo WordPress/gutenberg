@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { TouchableWithoutFeedback, View } from 'react-native';
 
 /**
  * WordPress dependencies
