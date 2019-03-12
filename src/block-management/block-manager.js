@@ -307,8 +307,8 @@ export default compose( [
 			getSelectedBlock,
 			getSelectedBlockClientId,
 			isBlockSelected,
-			getBlockMode,
 		} = select( 'core/block-editor' );
+
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
@@ -318,7 +318,6 @@ export default compose( [
 			selectedBlock: getSelectedBlock(),
 			selectedBlockClientId,
 			selectedBlockOrder: getBlockIndex( selectedBlockClientId ),
-			showHtml: getBlockMode() === 'html',
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
