@@ -73,13 +73,13 @@ class AppContainer extends React.Component<PropsType> {
 		this.lastHtml = serialize( parse( props.initialHtml ) );
 		this.lastTitle = props.initialTitle;
 
-		if ( props.initialHtmlModeEnabled && props.mode === 'text' ) {
+		if ( props.initialHtmlModeEnabled && props.mode === 'visual' ) {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
 			this.toggleMode();
 		}
 	}
 
-	componentDidMount = () => {
+	componentDidMount() {
 		const blocks = this.props.blocks;
 		const hasUnsupportedBlocks = ! isEmpty( blocks.filter( ( { name } ) => name === UnsupportedBlock.name ) );
 		RNReactNativeGutenbergBridge.editorDidMount( hasUnsupportedBlocks );
@@ -116,7 +116,7 @@ class AppContainer extends React.Component<PropsType> {
 		}
 	}
 
-	serializeToNativeAction = () => {
+	serializeToNativeAction() {
 		if ( this.props.mode === 'text' ) {
 			this.updateHtmlAction( this.props.getEditedPostContent() );
 		}
@@ -132,10 +132,10 @@ class AppContainer extends React.Component<PropsType> {
 		this.lastHtml = html;
 	};
 
-	updateHtmlAction = ( html: string = '' ) => {
+	updateHtmlAction( html: string = '' ) {
 		const parsed = parse( html );
 		this.props.resetEditorBlocksWithoutUndoLevel( parsed );
-	};
+	}
 
 	toggleMode() {
 		const { mode, switchMode } = this.props;
