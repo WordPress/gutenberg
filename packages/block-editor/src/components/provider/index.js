@@ -3,30 +3,8 @@
  */
 import { Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
-import { withDispatch, RegistryConsumer } from '@wordpress/data';
-import { createHigherOrderComponent, compose } from '@wordpress/compose';
-
-/**
- * Higher-order component which renders the original component with the current
- * registry context passed as its `registry` prop.
- *
- * @param {WPComponent} OriginalComponent Original component.
- *
- * @return {WPComponent} Enhanced component.
- */
-const withRegistry = createHigherOrderComponent(
-	( OriginalComponent ) => ( props ) => (
-		<RegistryConsumer>
-			{ ( registry ) => (
-				<OriginalComponent
-					{ ...props }
-					registry={ registry }
-				/>
-			) }
-		</RegistryConsumer>
-	),
-	'withRegistry'
-);
+import { withDispatch, withRegistry } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 class BlockEditorProvider extends Component {
 	componentDidMount() {
