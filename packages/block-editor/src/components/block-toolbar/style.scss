@@ -28,4 +28,14 @@
 		// Add a right border to show as separator in the block toolbar.
 		border-right: $border-width solid $light-gray-800;
 	}
+
+	// Add a left border and adjust the color for Top Toolbar mode.
+	.has-fixed-toolbar & {
+		box-shadow: none;
+		border-left: $border-width solid $light-gray-500;
+
+		.components-toolbar {
+			border-color: $light-gray-500;
+		}
+	}
 }
