@@ -91,6 +91,11 @@ class BlockManager extends Component {
 					aria-label={ __( 'Available block types' ) }
 					className="edit-post-manage-blocks-modal__results"
 				>
+					{ blockItems.length === 0 && (
+						<p className="edit-post-manage-blocks-modal__no-results">
+							{ __( 'No blocks found.' ) }
+						</p>
+					) }
 					{ categories.map( ( category ) => (
 						<BlockManagerCategory
 							key={ category.slug }
