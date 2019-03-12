@@ -18,8 +18,6 @@ import { withDispatch } from '@wordpress/data';
 import { shortcuts } from '../block-editor-keyboard-shortcuts';
 import BlockActions from '../block-actions';
 import BlockModeToggle from './block-mode-toggle';
-import ReusableBlockConvertButton from './reusable-block-convert-button';
-import ReusableBlockDeleteButton from './reusable-block-delete-button';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
 import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
@@ -106,18 +104,8 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 									onToggle={ onClose }
 								/>
 							) }
-							<ReusableBlockConvertButton
-								clientIds={ clientIds }
-								onToggle={ onClose }
-							/>
 							<_BlockSettingsMenuPluginsExtension.Slot fillProps={ { clientIds, onClose } } />
 							<div className="editor-block-settings-menu__separator block-editor-block-settings-menu__separator" />
-							{ count === 1 && (
-								<ReusableBlockDeleteButton
-									clientId={ firstBlockClientId }
-									onToggle={ onClose }
-								/>
-							) }
 							{ ! isLocked && (
 								<MenuItem
 									className="editor-block-settings-menu__control block-editor-block-settings-menu__control"

@@ -21,6 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import transformStyles from '../../editor-styles';
 import { mediaUpload } from '../../utils';
+import ReusableBlocksButtons from '../reusable-blocks-buttons';
 
 const fetchLinkSuggestions = async ( search ) => {
 	const posts = await apiFetch( {
@@ -154,6 +155,7 @@ class EditorProvider extends Component {
 				settings={ editorSettings }
 			>
 				{ children }
+				<ReusableBlocksButtons />
 			</BlockEditorProvider>
 		);
 	}
