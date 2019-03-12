@@ -3,21 +3,16 @@
 
 import React from 'react';
 import type { EmitterSubscription } from 'react-native';
-import {
-	subscribeParentGetHtml,
-	subscribeParentToggleHTMLMode,
-	subscribeSetTitle,
-	subscribeUpdateHtml,
-} from 'react-native-gutenberg-bridge';
 import { isEmpty, pick } from 'lodash';
+import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
+
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 import { BlockEditorProvider } from '@wordpress/block-editor';
+import { UnsupportedBlock } from '@wordpress/editor';
 
 import type { BlockType } from '../store/types';
-import { UnsupportedBlock } from '@wordpress/editor';
 
 import BlockManager from '../block-management/block-manager';
 
@@ -34,10 +29,15 @@ type PropsType = {
 	setupEditor: ( mixed, ?mixed ) => mixed,
 	toggleEditorMode: ?string => mixed,
 	blocks: Array<BlockType>,
+	isReady: boolean,
+	mode: string,
 	post: ?mixed,
+	getEditedPostContent: () => string,
+	settings: ?mixed,
+	switchMode: string => mixed,
 };
 
-/**
+/*
  * This container combines features similar to the following components on Gutenberg:
  * - `gutenberg/packages/editor/src/components/provider/index.js`
  * - `gutenberg/packages/edit-post/src/components/layout/index.js`
@@ -79,19 +79,19 @@ class AppContainer extends React.Component<PropsType> {
 		const hasUnsupportedBlocks = ! isEmpty( blocks.filter( ( { name } ) => name === UnsupportedBlock.name ) );
 		RNReactNativeGutenbergBridge.editorDidMount( hasUnsupportedBlocks );
 
-		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
+		this.subscriptionParentGetHtml = RNReactNativeGutenbergBridge.subscribeParentGetHtml( () => {
 			this.serializeToNativeAction();
 		} );
 
-		this.subscriptionParentToggleHTMLMode = subscribeParentToggleHTMLMode( () => {
+		this.subscriptionParentToggleHTMLMode = RNReactNativeGutenbergBridge.subscribeParentToggleHTMLMode( () => {
 			this.toggleMode();
 		} );
 
-		this.subscriptionParentSetTitle = subscribeSetTitle( ( payload ) => {
+		this.subscriptionParentSetTitle = RNReactNativeGutenbergBridge.subscribeSetTitle( ( payload ) => {
 			this.props.editTitle( payload.title );
 		} );
 
-		this.subscriptionParentUpdateHtml = subscribeUpdateHtml( ( payload ) => {
+		this.subscriptionParentUpdateHtml = RNReactNativeGutenbergBridge.subscribeUpdateHtml( ( payload ) => {
 			this.updateHtmlAction( payload.html );
 		} );
 	}
@@ -156,7 +156,7 @@ class AppContainer extends React.Component<PropsType> {
 				'isRTL',
 				'bodyPlaceholder',
 				'titlePlaceholder',
-			] )
+			] ),
 		};
 	}
 
@@ -169,7 +169,7 @@ class AppContainer extends React.Component<PropsType> {
 			settings,
 			resetEditorBlocks,
 			resetEditorBlocksWithoutUndoLevel,
-			title
+			title,
 		} = this.props;
 
 		if ( ! isReady ) {
