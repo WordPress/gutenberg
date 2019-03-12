@@ -94,7 +94,7 @@ class ModalLinkUI extends Component {
 			onChange( { ...newAttributes, needsSelectionUpdate: true } );
 		} else { // transform selected text into link
 			const newAttributes = applyFormat( value, [ ...placeholderFormats, format ] );
-			onChange( { ...newAttributes, start: newAttributes.end, needsSelectionUpdate: true } ); //put caret at the end of the link
+			onChange( { ...newAttributes, needsSelectionUpdate: true } );
 		}
 
 		if ( ! isValidHref( url ) ) {
