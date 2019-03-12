@@ -60,6 +60,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	scrollViewRef: Object;
 	postTitleRef: ?Object;
 	subscriptionParentSetFocusOnTitle: ?Object;
+	_isMounted: boolean;
 
 	constructor( props: PropsType ) {
 		super( props );

@@ -9,7 +9,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeSetTitle,
 	subscribeUpdateHtml,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty, pick } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
