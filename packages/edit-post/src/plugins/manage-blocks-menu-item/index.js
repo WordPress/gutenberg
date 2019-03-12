@@ -18,7 +18,7 @@ export function ManageBlocksMenuItem( { onSelect, openModal } ) {
 				() => openModal( 'edit-post/manage-blocks' ),
 			] ) }
 		>
-			{ __( 'Manage Blocks' ) }
+			{ __( 'Manage Block Visibility' ) }
 		</MenuItem>
 	);
 }
