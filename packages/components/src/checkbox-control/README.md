@@ -66,3 +66,12 @@ A function that receives the checked state (boolean) as input.
 
 - Type: `function`
 - Required: Yes
+
+### mirror
+
+Optional boolean value to reverse the order of the label, input pair. By default, the checkbox is shown first.
+
+- Type: `boolean`
+- Required: No
+- Default: `false`
+

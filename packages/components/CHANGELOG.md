@@ -1,3 +1,9 @@
+## 7.2.0 (Unreleased)
+
+### New Features
+
+- The `<CheckboxControl>` component now accepts an optional `mirror` prop.
+
 ## 7.1.0 (2019-03-06)
 
 ### New Features
