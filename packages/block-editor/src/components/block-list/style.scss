@@ -129,6 +129,11 @@
 			left: -$block-padding;
 			top: -$block-padding;
 			bottom: -$block-padding;
+
+			// Position this above the dark border of parent blocks.
+			.editor-inner-blocks & {
+				z-index: z-index(".editor-inner-blocks .editor-block-list__block-edit::before");
+			}
 		}
 	}
 
@@ -965,6 +970,11 @@
 			opacity: 0;
 			@include edit-post__fade-in-animation(60ms, 0.5s);
 		}
+	}
+
+	// Position this above the dark border of parent blocks.
+	.editor-inner-blocks & {
+		z-index: z-index(".editor-inner-blocks .editor-block-list__breadcrumb");
 	}
 
 	// Remove negative left breadcrumb position for left aligned blocks.
