@@ -51,9 +51,9 @@ type PropsType = {
 type StateType = {
 	blockTypePickerVisible: boolean,
 	isKeyboardVisible: boolean,
-	rootViewHeight: number;
-	safeAreaBottomInset: number;
-	isFullyBordered: boolean;
+	rootViewHeight: number,
+	safeAreaBottomInset: number,
+	isFullyBordered: boolean,
 };
 
 export class BlockManager extends React.Component<PropsType, StateType> {
@@ -128,7 +128,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		} );
 	}
 
-	onContentViewLayout = ( event: LayoutChangeEvent ) => {
+	onContentViewLayout( event: LayoutChangeEvent ) {
 		const { width: fullWidth } = Dimensions.get( 'window' );
 		const { width } = event.nativeEvent.layout;
 		const isFullyBordered = fullWidth > width + 1; //+1 is for not letting fraction differences effect the result on Android
@@ -169,7 +169,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		this.setState( { isKeyboardVisible: false } );
 	}
 
-	onCaretVerticalPositionChange = ( targetId: number, caretY: number, previousCaretY: ?number ) => {
+	onCaretVerticalPositionChange( targetId: number, caretY: number, previousCaretY: ?number ) {
 		handleCaretVerticalPositionChange( this.scrollViewRef, targetId, caretY, previousCaretY );
 	}
 
