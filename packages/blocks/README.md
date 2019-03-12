@@ -574,7 +574,7 @@ Logs to console in development environments when invalid.
 
 -   **blockTypeOrName** `(string|Object)`: Block type.
 -   **attributes** `Object`: Parsed block attributes.
--   **innerHTML** `string`: Original block content.
+-   **originalBlockContent** `string`: Original block content.
 
 **Returns**
 
