@@ -11,13 +11,13 @@ import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import {
 	withSelect,
 	withDispatch,
+	withRegistry,
 	RegistryProvider,
-	RegistryConsumer,
 	createRegistry,
 } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEditorProvider, BlockList, storeConfig } from '@wordpress/block-editor';
-import { compose, createHigherOrderComponent } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { parse, serialize } from '@wordpress/blocks';
 
 /**
@@ -25,28 +25,6 @@ import { parse, serialize } from '@wordpress/blocks';
  */
 import ReusableBlockEditPanel from './edit-panel';
 import ReusableBlockIndicator from './indicator';
-
-/**
- * Higher-order component which renders the original component with the current
- * registry context passed as its `registry` prop.
- *
- * @param {WPComponent} OriginalComponent Original component.
- *
- * @return {WPComponent} Enhanced component.
- */
-const withRegistry = createHigherOrderComponent(
-	( OriginalComponent ) => ( props ) => (
-		<RegistryConsumer>
-			{ ( registry ) => (
-				<OriginalComponent
-					{ ...props }
-					registry={ registry }
-				/>
-			) }
-		</RegistryConsumer>
-	),
-	'withRegistry'
-);
 
 class ReusableBlockEdit extends Component {
 	constructor( { reusableBlock, registry } ) {
