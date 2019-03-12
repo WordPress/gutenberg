@@ -315,7 +315,7 @@
 		// Position toolbar better on mobile.
 		.editor-block-contextual-toolbar {
 			width: auto;
-			border-bottom: $border-width solid $light-gray-500;
+			border-bottom: $border-width solid $light-gray-800;
 			bottom: auto;
 		}
 	}
@@ -833,11 +833,25 @@
 		}
 	}
 
-	// Floated items have special needs for the contextual toolbar position.
+	// Floated items have special needs for the contextual toolbar position + the thicker left border.
 	&[data-align="left"] .editor-block-contextual-toolbar,
 	&[data-align="right"] .editor-block-contextual-toolbar {
 		margin-bottom: $border-width;
 		margin-top: -$block-toolbar-height;
+
+		// Display the box-shadow on the parent element.
+		box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
+		.is-dark-theme & {
+			box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
+		}
+
+		@include break-small() {
+			box-shadow: none;
+		}
+
+		.editor-block-toolbar {
+			border-left: none;
+		}
 	}
 
 	// Make block toolbar full width on mobile.
