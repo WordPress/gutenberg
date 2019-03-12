@@ -1,18 +1,47 @@
 module.exports = function( api ) {
 	const isTestEnv = api.env() === 'test';
 
+	const getPresetEnv = () => {
+		const opts = {};
+
+		if ( isTestEnv ) {
+			opts.useBuiltIns = 'usage';
+		} else {
+			opts.modules = false;
+			opts.targets = {
+				browsers: require( 'extends @wordpress/browserslist-config' ),
+			};
+		}
+
+		// console.log( 'editor build ', process.env.WP_EDITOR_BUILD );
+		if ( process.env.WP_EDITOR_BUILD === 'main' ) {
+			opts.modules = 'commonjs';
+		} else if ( process.env.WP_EDITOR_BUILD === 'module' ) {
+			opts.modules = false;
+		}
+
+		return [ require.resolve( '@babel/preset-env' ), opts ];
+	};
+
+	const maybeGetPluginTransformRuntime = () => {
+		if ( isTestEnv ) {
+			return undefined;
+		}
+
+		const opts = {
+			helpers: true,
+			useESModules: false,
+		};
+
+		if ( process.env.WP_EDITOR_BUILD === 'module' ) {
+			opts.useESModules = true;
+		}
+
+		return [ require.resolve( '@babel/plugin-transform-runtime' ), opts ];
+	};
+
 	return {
-		presets: [
-			! isTestEnv && [ require.resolve( '@babel/preset-env' ), {
-				modules: false,
-				targets: {
-					browsers: require( '@wordpress/browserslist-config' ),
-				},
-			} ],
-			isTestEnv && [ require.resolve( '@babel/preset-env' ), {
-				useBuiltIns: 'usage',
-			} ],
-		].filter( Boolean ),
+		presets: [ getPresetEnv() ],
 		plugins: [
 			require.resolve( '@babel/plugin-proposal-object-rest-spread' ),
 			[
@@ -27,10 +56,7 @@ module.exports = function( api ) {
 				pragma: 'createElement',
 			} ],
 			require.resolve( '@babel/plugin-proposal-async-generator-functions' ),
-			! isTestEnv && [ require.resolve( '@babel/plugin-transform-runtime' ), {
-				helpers: true,
-				useESModules: false,
-			} ],
+			maybeGetPluginTransformRuntime(),
 		].filter( Boolean ),
 	};
 };
