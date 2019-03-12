@@ -34,12 +34,10 @@ export function DefaultBlockAppender( {
 		<TouchableWithoutFeedback
 			onPress={ onAppend }
 		>
-			<View style={ styles.blockHolder } pointerEvents="box-only">
-				<View style={ containerStyle }>
-					<RichText
-						placeholder={ value }
-					/>
-				</View>
+			<View style={ [ styles.blockHolder, containerStyle ] } pointerEvents="box-only">
+				<RichText
+					placeholder={ value }
+				/>
 			</View>
 		</TouchableWithoutFeedback>
 	);
