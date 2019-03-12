@@ -2,7 +2,7 @@
 
 ### New Features
 
-- `ToggleControl` now accepts a `className` prop to merge with its default-assigned classname.
+- `ToggleControl` now accepts a `className` prop to merge with its default-assigned class name.
 
 ## 7.1.0 (2019-03-06)
 
