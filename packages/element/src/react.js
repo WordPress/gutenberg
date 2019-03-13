@@ -12,6 +12,16 @@ import {
 	Fragment,
 	isValidElement,
 	StrictMode,
+	useState,
+	useEffect,
+	useContext,
+	useReducer,
+	useCallback,
+	useMemo,
+	useRef,
+	useImperativeHandle,
+	useLayoutEffect,
+	useDebugValue,
 } from 'react';
 import { isString } from 'lodash';
 
@@ -98,6 +108,22 @@ export { isValidElement };
  * Component that activates additional checks and warnings for its descendants.
  */
 export { StrictMode };
+
+/**
+ * Make React Hooks available
+ */
+export {
+	useCallback,
+	useContext,
+	useDebugValue,
+	useEffect,
+	useImperativeHandle,
+	useLayoutEffect,
+	useMemo,
+	useReducer,
+	useRef,
+	useState,
+};
 
 /**
  * Concatenate two or more React children objects.
