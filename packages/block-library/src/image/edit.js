@@ -147,7 +147,7 @@ export class ImageEdit extends Component {
 		// user has changed the default linkDestination value (none) and
 		// the user edits a post created with a different linkDestination
 		// default value.
-		if ( !this.state.isEditing ) {
+		if ( ! this.state.isEditing ) {
 			if (
 				attributes.href &&
 				attributes.linkDestination === LINK_DESTINATION_NONE
@@ -160,7 +160,7 @@ export class ImageEdit extends Component {
 					attributes.linkDestination = LINK_DESTINATION_CUSTOM;
 				}
 			} else if (
-				!attributes.href &&
+				! attributes.href &&
 				attributes.linkDestination !== LINK_DESTINATION_NONE
 			) {
 				attributes.linkDestination = LINK_DESTINATION_NONE;
@@ -251,7 +251,7 @@ export class ImageEdit extends Component {
 			...additionalAttributes,
 			...linkAttributes,
 			width: undefined,
-			height: undefined
+			height: undefined,
 		} );
 
 		this.setState( {
@@ -261,11 +261,11 @@ export class ImageEdit extends Component {
 
 	onSetLinkDestination( value ) {
 		this.props.setAttributes(
-			this.buildLinkAttributes(value, this.props.attributes, this.props.image)
+			this.buildLinkAttributes( value, this.props.attributes, this.props.image )
 		);
 	}
 
-	buildLinkAttributes(value, attributes, image) {
+	buildLinkAttributes( value, attributes, image ) {
 		let href;
 
 		if ( value === LINK_DESTINATION_NONE ) {
