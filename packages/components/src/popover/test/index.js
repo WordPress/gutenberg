@@ -10,6 +10,14 @@ import { noop } from 'lodash';
  */
 import Popover from '../';
 
+/**
+ * Explain why here.
+ */
+const { SELECTOR: mockSELECTOR } = require.requireActual( '../../../../dom/src/focusable' );
+jest.mock( '../../../../dom/src/focusable', () => ( {
+	find: ( context ) => [ ...context.querySelectorAll( mockSELECTOR ) ],
+} ) );
+
 describe( 'Popover', () => {
 	describe( '#componentDidUpdate()', () => {
 		let wrapper;
@@ -86,6 +94,48 @@ describe( 'Popover', () => {
 
 			setTimeout( () => {
 				expect( document.activeElement ).toBe( activeElement );
+				done();
+			} );
+
+			jest.runAllTimers();
+		} );
+
+		it( 'should focus the first focusable element by default', ( done ) => {
+			wrapper = TestUtils.renderIntoDocument(
+				<Popover>
+					<div>
+						<button>One</button>
+						<button>Two</button>
+						<button>Three</button>
+						<button>Four</button>
+						<button>Five</button>
+					</div>
+				</Popover>
+			);
+
+			setTimeout( () => {
+				expect( 'One' ).toBe( document.activeElement.textContent );
+				done();
+			} );
+
+			jest.runAllTimers();
+		} );
+
+		it( 'should allow an index to be passed to focusOnMount to select the focused element', ( done ) => {
+			wrapper = TestUtils.renderIntoDocument(
+				<Popover focusOnMount={ 2 } >
+					<div>
+						<button>One</button>
+						<button>Two</button>
+						<button>Three</button>
+						<button>Four</button>
+						<button>Five</button>
+					</div>
+				</Popover>
+			);
+
+			setTimeout( () => {
+				expect( 'Three' ).toBe( document.activeElement.textContent );
 				done();
 			} );
 

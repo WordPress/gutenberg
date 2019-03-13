@@ -17,7 +17,7 @@
  *  - https://w3c.github.io/html/editing.html#data-model
  */
 
-const SELECTOR = [
+export const SELECTOR = [
 	'[tabindex]',
 	'a[href]',
 	'button:not([disabled])',

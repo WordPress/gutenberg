@@ -169,23 +169,22 @@ class Popover extends Component {
 			return;
 		}
 
-		if ( focusOnMount === 'firstElement' ) {
-			// Find first tabbable node within content and shift focus, falling
-			// back to the popover panel itself.
-			const firstTabbable = focus.tabbable.find( this.contentNode.current )[ 0 ];
-
-			if ( firstTabbable ) {
-				firstTabbable.focus();
-			} else {
-				this.contentNode.current.focus();
-			}
+		if ( focusOnMount === 'container' ) {
+			// Focus the popover panel itself so items in the popover are easily
+			// accessed via keyboard navigation.
+			this.contentNode.current.focus();
 
 			return;
 		}
 
-		if ( focusOnMount === 'container' ) {
-			// Focus the popover panel itself so items in the popover are easily
-			// accessed via keyboard navigation.
+		// Find the specified tabbable node within content and shift focus, falling
+		// back to the popover panel itself.
+		const tabbableIndex = 'firstElement' === focusOnMount ? 0 : focusOnMount;
+		const tabbable = focus.tabbable.find( this.contentNode.current )[ tabbableIndex ];
+
+		if ( tabbable ) {
+			tabbable.focus();
+		} else {
 			this.contentNode.current.focus();
 		}
 	}
