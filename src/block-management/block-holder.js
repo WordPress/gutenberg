@@ -12,13 +12,17 @@ import {
 	NativeTouchEvent,
 } from 'react-native';
 import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
+import {
+	requestImageUploadCancel,
+} from 'react-native-gutenberg-bridge';
+
 
 /**
  * WordPress dependencies
  */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { addFilter, removeFilter, hasFilter } from '@wordpress/hooks';
+import { addAction, removeAction, hasAction } from '@wordpress/hooks';
 
 import type { BlockType } from '../store/types';
 
@@ -79,13 +83,12 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		this.props.onSelect( this.props.clientId );
 	};
 
-	onRemoveBlockCheckUpload() {
-		if ( hasFilter( 'blocks.onRemoveBlockCheckUpload' ) ) {
-			// now remove the filter as it's  a one-shot use and won't be needed anymore
-			removeFilter( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks' );
-			return true;
+	onRemoveBlockCheckUpload = ( mediaId: number ) => {
+		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) ) {
+			// now remove the action as it's  a one-shot use and won't be needed anymore
+			removeAction( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks' );
+			requestImageUploadCancel( mediaId );
 		}
-		return false;
 	}
 
 	onInlineToolbarButtonPressed = ( button: number ) => {
@@ -97,9 +100,9 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				this.props.moveBlockDown();
 				break;
 			case InlineToolbarActions.DELETE:
-				// adding a filter that will exist for as long as it takes for the block to be removed and the component unmounted
-				// this acts as a flag for the code using the filter to know of its existence
-				addFilter( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks', this.onRemoveBlockCheckUpload );
+				// adding a action that will exist for as long as it takes for the block to be removed and the component unmounted
+				// this acts as a flag for the code using the action to know of its existence
+				addAction( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks', this.onRemoveBlockCheckUpload );
 				this.props.removeBlock();
 				break;
 		}
