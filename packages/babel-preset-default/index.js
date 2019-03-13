@@ -1,5 +1,21 @@
 module.exports = function( api ) {
+	let wpBuildOpts = {};
 	const isTestEnv = api.env() === 'test';
+
+	// Because we serve a different preset depending
+	// on the caller options, we need to tell the cache
+	// when it needs updating. Otherwise, it won't be
+	// recalculated for different builds.
+	api.cache.using( () => wpBuildOpts.name );
+
+	api.caller( ( caller ) => {
+		if ( caller && (
+			caller.name === 'WP_BUILD_MAIN' ||
+			caller.name === 'WP_BUILD_MODULE'
+		) ) {
+			wpBuildOpts = { ...caller };
+		}
+	} );
 
 	const getPresetEnv = () => {
 		const opts = {};
@@ -13,11 +29,11 @@ module.exports = function( api ) {
 			};
 		}
 
-		// console.log( 'editor build ', process.env.WP_EDITOR_BUILD );
-		if ( process.env.WP_EDITOR_BUILD === 'main' ) {
-			opts.modules = 'commonjs';
-		} else if ( process.env.WP_EDITOR_BUILD === 'module' ) {
-			opts.modules = false;
+		if (
+			wpBuildOpts.name === 'WP_BUILD_MAIN' ||
+			wpBuildOpts.name === 'WP_BUILD_MODULE'
+		) {
+			opts.modules = wpBuildOpts.modules;
 		}
 
 		return [ require.resolve( '@babel/preset-env' ), opts ];
@@ -33,8 +49,8 @@ module.exports = function( api ) {
 			useESModules: false,
 		};
 
-		if ( process.env.WP_EDITOR_BUILD === 'module' ) {
-			opts.useESModules = true;
+		if ( wpBuildOpts.name === 'WP_BUILD_MODULE' ) {
+			opts.useESModules = wpBuildOpts.useESModules;
 		}
 
 		return [ require.resolve( '@babel/plugin-transform-runtime' ), opts ];
