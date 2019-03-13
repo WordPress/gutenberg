@@ -126,9 +126,6 @@ export { Suspense };
 
 /**
  * Make React Hooks available
- *
- * @param {function} loadFunction A function that must call a dynamic import(). This must return a Promise which
- *                                resolves to a module with a default export containing a React component.
  */
 export {
 	useCallback,
