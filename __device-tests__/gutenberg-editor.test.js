@@ -85,13 +85,6 @@ describe( 'Gutenberg Editor tests', () => {
 		await setupDriver();
 	} );
 
-	afterAll( async () => {
-		await rename( 'src/app/initial-html.js', 'src/app/initial-device-tests-html.js' );
-		await rename( 'src/app/initial-html.tmp.js', 'src/app/initial-html.js' );
-		await driver.quit();
-		await appium.kill( 'SIGINT' );
-	} );
-
 	it( 'should be able to see visual editor', async () => {
 		editorPage = new EditorPage( driver );
 		await editorPage.expect();
@@ -103,5 +96,12 @@ describe( 'Gutenberg Editor tests', () => {
 		await paragraphBlock.sendText( 'Hello Gutenberg!' );
 
 		expect( await paragraphBlock.getText() ).toBe( 'Hello Gutenberg!' );
+	} );
+
+	afterAll( async () => {
+		await rename( 'src/app/initial-html.js', 'src/app/initial-device-tests-html.js' );
+		await rename( 'src/app/initial-html.tmp.js', 'src/app/initial-html.js' );
+		await driver.quit();
+		await appium.kill( 'SIGINT' );
 	} );
 } );
