@@ -6,6 +6,11 @@ import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch, withRegistry } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import InspectorControls from '../inspector-controls';
+
 class BlockEditorProvider extends Component {
 	componentDidMount() {
 		this.props.updateSettings( this.props.settings );
@@ -107,7 +112,9 @@ class BlockEditorProvider extends Component {
 		return (
 			<SlotFillProvider>
 				<DropZoneProvider>
-					{ children }
+					<InspectorControls.Provider>
+						{ children }
+					</InspectorControls.Provider>
 				</DropZoneProvider>
 			</SlotFillProvider>
 		);

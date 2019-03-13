@@ -63,6 +63,7 @@ export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
+export { createConstrainedSlotFill } from './slot-fill-constrained';
 
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
