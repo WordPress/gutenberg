@@ -3,7 +3,6 @@
  */
 
 import { LINE_SEPARATOR } from './special-characters';
-import { normaliseFormats } from './normalise-formats';
 import { getLineIndex } from './get-line-index';
 import { getParentLineIndex } from './get-parent-line-index';
 import { getLastChildIndex } from './get-last-child-index';
@@ -51,8 +50,8 @@ export function outdentListItems( value ) {
 		}
 	}
 
-	return normaliseFormats( {
+	return {
 		...value,
 		replacements: newFormats,
-	} );
+	};
 }

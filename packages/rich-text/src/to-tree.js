@@ -138,8 +138,7 @@ export function toTree( {
 		if ( multilineTag ) {
 			if ( character === LINE_SEPARATOR ) {
 				characterFormats = lastSeparatorFormats = ( replacements[ i ] || [] ).reduce( ( accumulator, format ) => {
-					accumulator.push( format );
-					accumulator.push( multilineFormat );
+					accumulator.push( format, multilineFormat );
 					return accumulator;
 				}, [ multilineFormat ] );
 			} else {

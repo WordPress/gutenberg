@@ -3,7 +3,6 @@
  */
 
 import { LINE_SEPARATOR } from './special-characters';
-import { normaliseFormats } from './normalise-formats';
 import { getLineIndex } from './get-line-index';
 import { getParentLineIndex } from './get-parent-line-index';
 
@@ -54,8 +53,8 @@ export function changeListType( value, newFormat ) {
 		return value;
 	}
 
-	return normaliseFormats( {
+	return {
 		...value,
 		replacements: newReplacements,
-	} );
+	};
 }

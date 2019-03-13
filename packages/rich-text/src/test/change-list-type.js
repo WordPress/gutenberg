@@ -17,7 +17,6 @@ describe( 'changeListType', () => {
 
 	it( 'should only change list type if list item is indented', () => {
 		const record = {
-			formats: [],
 			replacements: [ , ],
 			text: '1',
 			start: 1,
@@ -32,7 +31,6 @@ describe( 'changeListType', () => {
 
 	it( 'should change list type', () => {
 		const record = {
-			formats: [],
 			replacements: [ , [ ul ] ],
 			text: `1${ LINE_SEPARATOR }`,
 			start: 2,
@@ -54,7 +52,6 @@ describe( 'changeListType', () => {
 		const text = `a${ LINE_SEPARATOR }1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }i${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4${ LINE_SEPARATOR }b`;
 
 		const record = {
-			formats: [],
 			replacements: [ , [ ul ], , [ ul ], , [ ul, ul ], , [ ul ], , [ ul ], , , , [ ul ], , ],
 			text,
 			start: 4,

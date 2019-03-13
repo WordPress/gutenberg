@@ -3,7 +3,6 @@
  */
 
 import { LINE_SEPARATOR } from './special-characters';
-import { normaliseFormats } from './normalise-formats';
 import { getLineIndex } from './get-line-index';
 
 /**
@@ -89,8 +88,8 @@ export function indentListItems( value, rootFormat ) {
 		}
 	}
 
-	return normaliseFormats( {
+	return {
 		...value,
 		replacements: newFormats,
-	} );
+	};
 }

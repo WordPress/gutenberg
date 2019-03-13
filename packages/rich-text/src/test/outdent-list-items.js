@@ -16,7 +16,6 @@ describe( 'outdentListItems', () => {
 
 	it( 'should not outdent only item', () => {
 		const record = {
-			formats: [ , ],
 			replacements: [ , ],
 			text: '1',
 			start: 1,
@@ -33,7 +32,6 @@ describe( 'outdentListItems', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }`;
 		const record = {
-			formats: Array( text.length ),
 			replacements: [ , [ ul ] ],
 			text,
 			start: 2,
@@ -54,7 +52,6 @@ describe( 'outdentListItems', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
-			formats: Array( text.length ),
 			replacements: [ , [ ul ], , [ ul, ul ], , ],
 			text,
 			start: 5,
@@ -75,7 +72,6 @@ describe( 'outdentListItems', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
-			formats: Array( text.length ),
 			replacements: [ , [ ul ], , [ ul, ul ], , ],
 			text,
 			start: 2,
@@ -96,7 +92,6 @@ describe( 'outdentListItems', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4`;
 		const record = {
-			formats: Array( text.length ),
 			replacements: [ , [ ul ], , [ ul, ul ], , [ ul, ul ], , ],
 			text,
 			start: 2,
@@ -117,7 +112,6 @@ describe( 'outdentListItems', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4`;
 		const record = {
-			formats: Array( text.length ),
 			replacements: [ , [ ul ], , [ ul, ul ], , [ ul ], , ],
 			text,
 			start: 6,
@@ -138,7 +132,6 @@ describe( 'outdentListItems', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
-			formats: Array( text.length ),
 			replacements: [ , [ ul ], , , , ],
 			text,
 			start: 2,

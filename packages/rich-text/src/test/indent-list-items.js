@@ -17,7 +17,6 @@ describe( 'indentListItems', () => {
 
 	it( 'should not indent only item', () => {
 		const record = {
-			formats: [ , ],
 			replacements: [ , ],
 			text: '1',
 			start: 1,
@@ -34,7 +33,6 @@ describe( 'indentListItems', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }`;
 		const record = {
-			formats: [ , , ],
 			replacements: [ , , ],
 			text,
 			start: 2,
@@ -53,7 +51,6 @@ describe( 'indentListItems', () => {
 
 	it( 'should not indent without target list', () => {
 		const record = {
-			formats: [ , , ],
 			replacements: [ , [ ul ] ],
 			text: `1${ LINE_SEPARATOR }`,
 			start: 2,
@@ -70,7 +67,6 @@ describe( 'indentListItems', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }${ LINE_SEPARATOR }`;
 		const record = {
-			formats: [ , , , ],
 			replacements: [ , [ ol ], , ],
 			text,
 			start: 3,
@@ -91,7 +87,6 @@ describe( 'indentListItems', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
-			formats: [ , , , , , ],
 			replacements: [ , [ ul ], , [ ul ], , ],
 			text,
 			start: 5,
@@ -112,7 +107,6 @@ describe( 'indentListItems', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
-			formats: [ , , , , , ],
 			replacements: [ , , , [ ul ], , ],
 			text,
 			start: 2,
@@ -133,7 +127,6 @@ describe( 'indentListItems', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4`;
 		const record = {
-			formats: Array( text.length ),
 			replacements: [ , [ ul ], , [ ul, ul ], , , , ],
 			text,
 			start: 6,
