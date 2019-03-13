@@ -600,6 +600,8 @@ export class RichText extends Component {
 			this.handleHorizontalNavigation( event );
 		}
 
+		// Use the space key in list items (at the start of an item) to indent
+		// the list item.
 		if ( keyCode === SPACE && this.multilineTag === 'li' ) {
 			const value = this.createRecord();
 
@@ -607,6 +609,7 @@ export class RichText extends Component {
 				const { text, start } = value;
 				const characterBefore = text[ start - 1 ];
 
+				// The caret must be at the start of a line.
 				if ( ! characterBefore || characterBefore === LINE_SEPARATOR ) {
 					this.onChange( indentListItems( value, { type: this.props.tagName } ) );
 					event.preventDefault();
@@ -634,7 +637,11 @@ export class RichText extends Component {
 					const index = start - 1;
 
 					if ( charAt( value, index ) === LINE_SEPARATOR ) {
-						if ( isCollapsed( value ) && formats[ index ] && formats[ index ].length ) {
+						const collapsed = isCollapsed( value );
+
+						// If the line separator that is about te be removed
+						// contains wrappers, remove the wrappers first.
+						if ( collapsed && formats[ index ] && formats[ index ].length ) {
 							const newFormats = formats.slice();
 
 							newFormats[ index ] = formats[ index ].slice( 0, -1 );
@@ -646,14 +653,18 @@ export class RichText extends Component {
 							newValue = remove(
 								value,
 								// Only remove the line if the selection is
-								// collapsed.
-								isCollapsed( value ) ? start - 1 : start,
+								// collapsed, otherwise remove the selection.
+								collapsed ? start - 1 : start,
 								end
 							);
 						}
 					}
 				} else if ( charAt( value, end ) === LINE_SEPARATOR ) {
-					if ( isCollapsed( value ) && formats[ end ] && formats[ end ].length ) {
+					const collapsed = isCollapsed( value );
+
+					// If the line separator that is about te be removed
+					// contains wrappers, remove the wrappers first.
+					if ( collapsed && formats[ end ] && formats[ end ].length ) {
 						const newFormats = formats.slice();
 
 						newFormats[ end ] = formats[ end ].slice( 0, -1 );
@@ -666,8 +677,8 @@ export class RichText extends Component {
 							value,
 							start,
 							// Only remove the line if the selection is
-							// collapsed.
-							isCollapsed( value ) ? end + 1 : end,
+							// collapsed, otherwise remove the selection.
+							collapsed ? end + 1 : end,
 						);
 					}
 				}
