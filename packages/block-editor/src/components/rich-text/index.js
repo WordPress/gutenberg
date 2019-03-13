@@ -941,7 +941,6 @@ export class RichText extends Component {
 		return unstableToDom( {
 			value,
 			multilineTag: this.multilineTag,
-			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
 		} ).body.innerHTML;
 	}
@@ -980,7 +979,6 @@ export class RichText extends Component {
 			return children.fromDOM( unstableToDom( {
 				value,
 				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
 				isEditableTree: false,
 			} ).body.childNodes );
 		}
