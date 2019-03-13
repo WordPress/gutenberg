@@ -304,4 +304,46 @@ describe( 'List', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should create and remove indented list with keyboard only', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '* 1' ); // Should be at level 0.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' a' ); // Should be at level 1.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' i' ); // Should be at level 2.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' ); // Should remove list.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// That's 9 key presses to create the list, and 9 key presses to remove
+		// the list. ;)
+	} );
 } );
