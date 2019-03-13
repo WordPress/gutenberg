@@ -1,4 +1,5 @@
 /** @format */
+/* eslint no-console: 0 */
 
 import { NativeModules } from 'react-native';
 
