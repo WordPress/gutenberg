@@ -5492,10 +5492,10 @@ jsbn@~0.1.0:
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
   integrity sha1-peZUwuWi3rXyAdls77yoDA7y9RM=
 
-jsc-android@224109.x.x:
-  version "224109.1.0"
-  resolved "https://registry.yarnpkg.com/jsc-android/-/jsc-android-224109.1.0.tgz#9749ec92f1e284b3c09befe7c47cc6e60b1f0cdf"
-  integrity sha512-mhALFynePc/wJsUt9BJuH13mSK/dGWtBO/pcYwVV1I0A7iduyqy3fSoAt1b0yI+/B3TzlGyue/gqjPxsqG1HRQ==
+jsc-android@236355.x.x:
+  version "236355.1.1"
+  resolved "https://registry.yarnpkg.com/jsc-android/-/jsc-android-236355.1.1.tgz#43e153b722e3c60dd0595be4e7430baf65e67c9c"
+  integrity sha512-2py4f0McZIl/oH6AzPj1Ebutc58fyeLvwq6gyVYp1RsWr4qeLNHAPfW3kmfeVMz44oUBJMQ0lECZg9n4KBhHbQ==
 
 "jsdom-jscore@git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800":
   version "0.1.7"
