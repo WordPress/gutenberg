@@ -1,18 +1,18 @@
 module.exports = function( api ) {
 	let wpBuildOpts = {};
 	const isTestEnv = api.env() === 'test';
+	const isWPBuild = ( name ) => [ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
+		( buildName ) => name === buildName
+	);
 
 	// Because we serve a different preset depending
 	// on the caller options, we need to tell the cache
 	// when it needs updating. Otherwise, it won't be
 	// recalculated for different builds.
-	api.cache.using( () => wpBuildOpts.name );
+	api.cache.using( () => isWPBuild( wpBuildOpts.name ) );
 
 	api.caller( ( caller ) => {
-		if ( caller && (
-			caller.name === 'WP_BUILD_MAIN' ||
-			caller.name === 'WP_BUILD_MODULE'
-		) ) {
+		if ( caller && isWPBuild( caller.name ) ) {
 			wpBuildOpts = { ...caller };
 		}
 	} );
@@ -29,10 +29,7 @@ module.exports = function( api ) {
 			};
 		}
 
-		if (
-			wpBuildOpts.name === 'WP_BUILD_MAIN' ||
-			wpBuildOpts.name === 'WP_BUILD_MODULE'
-		) {
+		if ( isWPBuild( wpBuildOpts.name ) ) {
 			opts.modules = wpBuildOpts.modules;
 		}
 
