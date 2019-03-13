@@ -207,7 +207,11 @@
 	}
 
 	.editor-block-list__block-edit::before {
-		outline: $border-width solid #e2e4e7;
+		transition: border-color 0.1s linear, box-shadow 0.1s linear;
+		border: $border-width solid $light-gray-800;
+
+		// Windows High Contrast mode will show this outline.
+		outline: $border-width solid transparent;
 	}
 
 	// Don't show block type label for classic block
@@ -228,6 +232,8 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	z-index: z-index(".block-library-classic__toolbar");
 	top: $block-padding;
 	transform: translateY(-$block-padding);
+	border: $border-width solid $light-gray-800;
+	border-bottom: none;
 
 	// On mobile, toolbars go edge to edge.
 	padding: 0 $block-padding;
@@ -295,6 +301,7 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 
 			.editor-block-toolbar {
 				border: none;
+				box-shadow: none;
 
 				// Match the TinyMCE "mobile" breakpoint buttons alignment.
 				margin-top: 3px;
