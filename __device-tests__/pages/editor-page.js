@@ -11,8 +11,8 @@ export default class EditorPage {
 		this.driver = driver;
 	}
 
-	async expect( driver: wd.PromiseChainWebdriver ) {
-		expect( await driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
+	async expect( ) {
+		expect( await this.driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
 		return this;
 	}
 

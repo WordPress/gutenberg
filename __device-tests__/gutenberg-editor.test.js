@@ -3,7 +3,7 @@
  * */
 
 import wd from 'wd';
-import { child_process as childProcess } from 'child_process';
+import childProcess from 'child_process';
 import fs from 'fs';
 import EditorPage from './pages/editor-page';
 import ParagraphBlock from './blocks/paragraph-block';
@@ -18,6 +18,7 @@ const APPIUM_SERVER_PORT = 4728;
 
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
+const spawn = childProcess.spawn;
 
 let config;
 let appium;
@@ -46,9 +47,21 @@ if ( rnPlatform === 'android' ) {
 describe( 'Gutenberg Editor tests', () => {
 	let driver;
 
+	const rename = async ( path, newPath ) => {
+		await fs.rename( path, newPath, ( error ) => {
+			if ( error ) {
+				throw error;
+			}
+		} );
+	};
+
+	const setupData = async function() {
+		await rename( 'src/app/initial-html.js', 'src/app/initial-html.tmp.js' );
+		await rename( 'src/app/initial-device-tests-html.js', 'src/app/initial-html.js' );
+	};
+
 	const setupAppium = async function() {
-		const spawn = childProcess.spawn;
-		appium = spawn( 'appium', [ '-p', '' + APPIUM_SERVER_PORT ], {
+		appium = await spawn( 'appium', [ '-p', '' + APPIUM_SERVER_PORT ], {
 			detached: true, stdio: [ 'ignore', out, err ],
 
 		} );
@@ -57,10 +70,13 @@ describe( 'Gutenberg Editor tests', () => {
 
 	beforeAll( async () => {
 		await setupAppium();
+		await setupData();
 	} );
 
 	afterAll( async () => {
-		appium.kill( 'SIGINT' );
+		await rename( 'src/app/initial-html.js', 'src/app/initial-device-tests-html.js' );
+		await rename( 'src/app/initial-html.tmp.js', 'src/app/initial-html.js' );
+		await appium.kill( 'SIGINT' );
 	} );
 
 	beforeEach( async () => {
@@ -78,8 +94,10 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	it( 'should be able to add a new Paragraph block', async () => {
-		const editorPage = new EditorPage( driver ).expect( );
-		const paragraphBlock = await editorPage.addNewBlock( new ParagraphBlock( driver, 'Paragraph' ) );
+		let editorPage = new EditorPage( driver );
+		editorPage = await editorPage.expect();
+		let paragraphBlock = new ParagraphBlock( driver, 'Paragraph' );
+		paragraphBlock = await editorPage.addNewBlock( paragraphBlock );
 		await paragraphBlock.sendText( 'Hello Gutenberg!' );
 
 		expect( await paragraphBlock.getText() ).toBe( 'Hello Gutenberg!' );

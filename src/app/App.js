@@ -4,7 +4,7 @@
 import React from 'react';
 
 import AppContainer from './AppContainer';
-import initialHtml from './initial-e2e-html';
+import initialHtml from './initial-html';
 
 type PropsType = {
 	initialData: string,
@@ -23,8 +23,6 @@ export default class AppProvider extends React.Component<PropsType> {
 		if ( initialTitle === undefined ) {
 			initialTitle = 'Welcome to Gutenberg!';
 		}
-
-		initialData = '';
 
 		return (
 			<AppContainer

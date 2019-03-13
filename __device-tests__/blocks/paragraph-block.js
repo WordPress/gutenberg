@@ -5,7 +5,9 @@ import Block from './block';
 import wd from 'wd';
 
 export default class ParagraphBlock extends Block {
-	static blocks: Set<string>;
+	// FLow complaining about type annotation on Set class here but Set<string>(); doesn't resolve
+	// $FlowFixMe
+	static blocks = new Set();
 	textViewElement: wd.PromiseChainWebdriver.Element;
 
 	constructor( driver: wd.PromiseChainWebdriver, name: string = 'Unsupported Block' ) {
