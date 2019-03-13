@@ -79,7 +79,7 @@ Alternatively, you can use your own local WordPress environment and clone this r
 
 Next, open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Then you can type `npm run dev` in your terminal or command prompt to keep the plugin building in the background as you work on it.
 
-WordPress comes with specific [debug systems](https://codex.wordpress.org/Debugging_in_WordPress) designed to simplify the process as well as standardize code across the core, plugins and themes. It is possible to use environment variables (`WP_DEBUG`, `WP_DEBUG_DISPLAY` and `SCRIPT_DEBUG`) to update site's config constants located in `wp-config.php` file. They can be updated at any time by running the following command:
+WordPress comes with specific [debug systems](https://codex.wordpress.org/Debugging_in_WordPress) designed to simplify the process as well as standardize code across core, plugins and themes. It is possible to use environment variables (`WP_DEBUG`, `WP_DEBUG_DISPLAY` and `SCRIPT_DEBUG`) to update a site's configuration constants located in `wp-config.php` file. They can be updated at any time by running the following command:
 ```
 SCRIPT_DEBUG=true WP_DEBUG=true WP_DEBUG_DISPLAY=true ./bin/setup-local-env.sh
 ```
