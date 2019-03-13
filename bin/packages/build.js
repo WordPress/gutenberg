@@ -166,7 +166,7 @@ function buildJsFileFor( file, silent, environment ) {
 	const destPath = getBuildPath( file, buildDir );
 	const babelOptions = getBabelConfig( environment );
 	babelOptions.sourceMaps = true;
-	babelOptions.sourceFileName = file;
+	babelOptions.sourceFileName = file.replace( PACKAGES_DIR, '@wordpress' );
 
 	mkdirp.sync( path.dirname( destPath ) );
 	const transformed = babel.transformFileSync( file, babelOptions );
