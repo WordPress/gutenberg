@@ -3,9 +3,9 @@
  */
 import { withInstanceId } from '@wordpress/compose';
 import { FormToggle } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
-function BlockManagerShowAll( { instanceId, category, checked, onChange } ) {
+function BlockManagerShowAll( { instanceId, checked, onChange } ) {
 	const id = 'edit-post-manage-blocks-modal__show-all-' + instanceId;
 
 	return (
@@ -23,11 +23,6 @@ function BlockManagerShowAll( { instanceId, category, checked, onChange } ) {
 				id={ id }
 				checked={ checked }
 				onChange={ ( event ) => onChange( event.target.checked ) }
-				aria-label={ sprintf(
-					/* translators: Block Visibility accessible checkbox toggle label */
-					__( 'Show all blocks in section: %s' ),
-					category.title
-				) }
 			/>
 		</div>
 	);
