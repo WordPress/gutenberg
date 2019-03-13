@@ -27,7 +27,6 @@ import * as categories from './categories';
 import * as code from './code';
 import * as columns from './columns';
 import * as column from './columns/column';
-import * as container from './container';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
@@ -45,6 +44,7 @@ import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
 import * as rss from './rss';
 import * as search from './search';
+import * as section from './section';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
@@ -89,7 +89,6 @@ export const registerCoreBlocks = () => {
 		code,
 		columns,
 		column,
-		container,
 		cover,
 		embed,
 		...embed.common,
@@ -108,6 +107,7 @@ export const registerCoreBlocks = () => {
 		pullquote,
 		rss,
 		search,
+		section,
 		separator,
 		reusableBlock,
 		spacer,

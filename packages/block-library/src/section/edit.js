@@ -15,7 +15,7 @@ import {
 	withColors,
 } from '@wordpress/editor';
 
-function ContainerEdit( { className, setBackgroundColor, backgroundColor } ) {
+function SectionEdit( { className, setBackgroundColor, backgroundColor } ) {
 	const styles = {
 		backgroundColor: backgroundColor.color,
 	};
@@ -43,4 +43,4 @@ function ContainerEdit( { className, setBackgroundColor, backgroundColor } ) {
 	);
 }
 
-export default withColors( 'backgroundColor' )( ContainerEdit );
+export default withColors( 'backgroundColor' )( SectionEdit );
