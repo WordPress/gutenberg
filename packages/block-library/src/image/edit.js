@@ -273,7 +273,7 @@ export class ImageEdit extends Component {
 		} else if ( value === LINK_DESTINATION_MEDIA ) {
 			href = ( image && image.source_url ) || attributes.url;
 		} else if ( value === LINK_DESTINATION_ATTACHMENT ) {
-			href = image && image.link;
+			href = ( image && image.link ) || attributes.link;
 		} else {
 			href = attributes.href;
 		}
@@ -285,13 +285,21 @@ export class ImageEdit extends Component {
 	}
 
 	onSelectURL( newURL ) {
-		const { url } = this.props.attributes;
+		const { url, linkDestination } = this.props.attributes;
+		let newLinkDestination = linkDestination;
+
+		// Images from URL doesn't have an attachment link
+		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
+			newLinkDestination = LINK_DESTINATION_NONE;
+		}
 
 		if ( newURL !== url ) {
 			this.props.setAttributes( {
 				url: newURL,
+				href: linkDestination === LINK_DESTINATION_MEDIA ? newURL : null,
 				id: undefined,
 				sizeSlug: DEFAULT_SIZE_SLUG,
+				linkDestination: newLinkDestination,
 			} );
 		}
 	}
