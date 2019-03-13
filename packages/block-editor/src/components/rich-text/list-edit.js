@@ -3,7 +3,7 @@
  */
 
 import { Toolbar } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import {
 	indentListItems,
@@ -149,7 +149,7 @@ export const ListEdit = ( {
 					{
 						icon: 'editor-outdent',
 						title: __( 'Outdent list item' ),
-						shortcut: '⌫',
+						shortcut: _x( 'Backspace', 'keyboard key' ),
 						onClick: () => {
 							onChange( outdentListItems( value ) );
 						},
@@ -157,7 +157,7 @@ export const ListEdit = ( {
 					{
 						icon: 'editor-indent',
 						title: __( 'Indent list item' ),
-						shortcut: '␣',
+						shortcut: _x( 'Space', 'keyboard key' ),
 						onClick: () => {
 							onChange( indentListItems( value, { type: tagName } ) );
 						},
