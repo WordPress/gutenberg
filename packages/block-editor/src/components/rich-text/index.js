@@ -177,10 +177,10 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { formats, text } = this.formatToValue( this.props.value );
+		const { formats, replacements, text } = this.formatToValue( this.props.value );
 		const { start, end, selectedFormat } = this.state;
 
-		return { formats, text, start, end, selectedFormat };
+		return { formats, replacements, text, start, end, selectedFormat };
 	}
 
 	createRecord() {
@@ -394,13 +394,17 @@ export class RichText extends Component {
 		}
 
 		let { selectedFormat } = this.state;
-		const { formats, text, start, end } = this.createRecord();
+		const { formats, replacements, text, start, end } = this.createRecord();
 
 		if ( this.formatPlaceholder ) {
-			formats[ this.state.start ] = formats[ this.state.start ] || [];
-			formats[ this.state.start ].push( this.formatPlaceholder );
-			selectedFormat = formats[ this.state.start ].length;
-		} else if ( selectedFormat ) {
+			selectedFormat = this.formatPlaceholder.length;
+
+			if ( selectedFormat > 0 ) {
+				formats[ this.state.start ] = this.formatPlaceholder;
+			} else {
+				delete formats[ this.state.start ];
+			}
+		} else if ( selectedFormat > 0 ) {
 			const formatsBefore = formats[ start - 1 ] || [];
 			const formatsAfter = formats[ start ] || [];
 
@@ -411,12 +415,13 @@ export class RichText extends Component {
 			}
 
 			source = source.slice( 0, selectedFormat );
+
 			formats[ this.state.start ] = source;
 		} else {
 			delete formats[ this.state.start ];
 		}
 
-		const change = { formats, text, start, end, selectedFormat };
+		const change = { formats, replacements, text, start, end, selectedFormat };
 
 		this.onChange( change, {
 			withoutHistory: true,
@@ -936,7 +941,6 @@ export class RichText extends Component {
 		return unstableToDom( {
 			value,
 			multilineTag: this.multilineTag,
-			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
 		} ).body.innerHTML;
 	}
@@ -975,7 +979,6 @@ export class RichText extends Component {
 			return children.fromDOM( unstableToDom( {
 				value,
 				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
 				isEditableTree: false,
 			} ).body.childNodes );
 		}
@@ -984,7 +987,6 @@ export class RichText extends Component {
 			return toHTMLString( {
 				value,
 				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
