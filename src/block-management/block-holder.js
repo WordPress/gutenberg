@@ -16,7 +16,6 @@ import {
 	requestImageUploadCancel,
 } from 'react-native-gutenberg-bridge';
 
-
 /**
  * WordPress dependencies
  */
