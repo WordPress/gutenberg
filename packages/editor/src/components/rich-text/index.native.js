@@ -198,6 +198,12 @@ export class RichText extends Component {
 		} );
 		if ( newContent && newContent !== this.props.value ) {
 			this.props.onChange( newContent );
+			if ( record.needsSelectionUpdate && record.start && record.end ) {
+				this.setState( { start: record.start, end: record.end } );
+			}
+			this.setState( {
+				needsSelectionUpdate: record.needsSelectionUpdate,
+			} );
 		} else {
 			// make sure the component rerenders without refreshing the text on gutenberg
 			// (this can trigger other events that might update the active formats on aztec)
@@ -525,6 +531,8 @@ export class RichText extends Component {
 			minHeight = style.minHeight;
 		}
 
+		const selection = this.state.needsSelectionUpdate ? { start: this.state.start, end: this.state.end } : null;
+
 		return (
 			<View>
 				{ isSelected && (
@@ -544,7 +552,7 @@ export class RichText extends Component {
 						...style,
 						minHeight: Math.max( minHeight, this.state.height ),
 					} }
-					text={ { text: html, eventCount: this.lastEventCount } }
+					text={ { text: html, eventCount: this.lastEventCount, selection } }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'editor-rich-text' ].textDecorationColor }
 					onChange={ this.onChange }
