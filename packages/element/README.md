@@ -239,6 +239,16 @@ Checks if an object is a valid WPElement
 
 `boolean`: true if objectToTest is a valid WPElement and false otherwise.
 
+### lazy
+
+[src/index.js#L1-L1](src/index.js#L1-L1)
+
+The React.lazy function lets you render a dynamic import as a regular component.
+
+**Parameters**
+
+-   **loadFunction** `function`: A function that must call a dynamic import(). This must return a Promise which resolves to a module with a default export containing a React component.
+
 ### RawHTML
 
 [src/index.js#L5-L5](src/index.js#L5-L5)
@@ -288,6 +298,12 @@ Serializes a React element to string.
 [src/index.js#L1-L1](src/index.js#L1-L1)
 
 Component that activates additional checks and warnings for its descendants.
+
+### Suspense
+
+[src/index.js#L1-L1](src/index.js#L1-L1)
+
+Component to do code-splitting by wrapping a dynamic import.
 
 ### switchChildrenNodeName
 

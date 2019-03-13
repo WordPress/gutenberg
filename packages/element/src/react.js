@@ -12,6 +12,8 @@ import {
 	Fragment,
 	isValidElement,
 	StrictMode,
+	lazy,
+	Suspense,
 } from 'react';
 import { isString } from 'lodash';
 
@@ -98,6 +100,19 @@ export { isValidElement };
  * Component that activates additional checks and warnings for its descendants.
  */
 export { StrictMode };
+
+/**
+ * The React.lazy function lets you render a dynamic import as a regular component.
+ *
+ * @param {function} loadFunction A function that must call a dynamic import(). This must return a Promise which
+ *                                resolves to a module with a default export containing a React component.
+ */
+export { lazy };
+
+/**
+ * Component to do code-splitting by wrapping a dynamic import.
+ */
+export { Suspense };
 
 /**
  * Concatenate two or more React children objects.
