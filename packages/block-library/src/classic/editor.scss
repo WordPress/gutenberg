@@ -180,7 +180,7 @@
 	}
 }
 
-.editor-block-list__layout .editor-block-list__block[data-type="core/freeform"] {
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/freeform"] {
 
 	// Not sure why this is necessary, there seems to be a skin file that overrides this upstream.
 	.mce-btn.mce-active button,
@@ -206,17 +206,17 @@
 		padding: 1px 3px;
 	}
 
-	.editor-block-list__block-edit::before {
+	.block-editor-block-list__block-edit::before {
 		outline: $border-width solid #e2e4e7;
 	}
 
 	// Don't show block type label for classic block
-	&.is-hovered .editor-block-list__breadcrumb {
+	&.is-hovered .block-editor-block-list__breadcrumb {
 		display: none;
 	}
 }
 
-div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
+div[data-type="core/freeform"] .block-editor-block-contextual-toolbar + div {
 	margin-top: 0;
 	padding-top: 0;
 }
@@ -283,17 +283,17 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 // We don't want the ellipsis to overlap the classic toolbar, which it will due to position sticky.
 // So we move it to the right, and make room for it.
 @include break-small() {
-	.editor-block-list__block[data-type="core/freeform"] {
-		.editor-block-switcher__no-switcher-icon {
+	.block-editor-block-list__block[data-type="core/freeform"] {
+		.block-editor-block-switcher__no-switcher-icon {
 			display: none;
 		}
-		.editor-block-contextual-toolbar {
+		.block-editor-block-contextual-toolbar {
 			float: right;
 			margin-right: $icon-button-size - $block-padding + $border-width;
 			transform: translateY(-#{ $block-padding - $border-width });
 			top: $block-padding;
 
-			.editor-block-toolbar {
+			.block-editor-block-toolbar {
 				border: none;
 
 				// Match the TinyMCE "mobile" breakpoint buttons alignment.

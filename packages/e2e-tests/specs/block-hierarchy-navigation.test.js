@@ -26,7 +26,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the columns blocks.
 		await page.click( '[aria-label="Block Navigation"]' );
-		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-navigation__item') and contains(text(), 'Columns')]" ) )[ 0 ];
+		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]" ) )[ 0 ];
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
@@ -39,7 +39,7 @@ describe( 'Navigating the block hierarchy', () => {
 		// Navigate to the last column block.
 		await page.click( '[aria-label="Block Navigation"]' );
 		const lastColumnsBlockMenuItem = ( await page.$x(
-			"//button[contains(@class,'editor-block-navigation__item') and contains(text(), 'Column')]"
+			"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
 		) )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
 

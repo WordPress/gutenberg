@@ -23,10 +23,10 @@ exports[`PanelColorSettings matches the snapshot 1`] = `
 
 exports[`PanelColorSettings matches the snapshot 2`] = `
 <ForwardRef(PanelBody)
-  className="editor-panel-color-settings"
+  className="editor-panel-color-settings block-editor-panel-color-settings"
   title={
     <span
-      className="editor-panel-color-settings__panel-title"
+      className="editor-panel-color-settings__panel-title block-editor-panel-color-settings__panel-title"
     >
       Test Title
       <ColorIndicator
@@ -88,10 +88,10 @@ exports[`PanelColorSettings should render a color panel if at least one setting 
 
 exports[`PanelColorSettings should render a color panel if at least one setting specifies some colors to choose 2`] = `
 <ForwardRef(PanelBody)
-  className="editor-panel-color-settings"
+  className="editor-panel-color-settings block-editor-panel-color-settings"
   title={
     <span
-      className="editor-panel-color-settings__panel-title"
+      className="editor-panel-color-settings__panel-title block-editor-panel-color-settings__panel-title"
     >
       Test Title
       <ColorIndicator
@@ -157,10 +157,10 @@ exports[`PanelColorSettings should render a color panel if at least one setting 
 
 exports[`PanelColorSettings should render a color panel if at least one setting supports custom colors 2`] = `
 <ForwardRef(PanelBody)
-  className="editor-panel-color-settings"
+  className="editor-panel-color-settings block-editor-panel-color-settings"
   title={
     <span
-      className="editor-panel-color-settings__panel-title"
+      className="editor-panel-color-settings__panel-title block-editor-panel-color-settings__panel-title"
     >
       Test Title
       <ColorIndicator

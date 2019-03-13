@@ -1060,7 +1060,7 @@ export class RichText extends Component {
 		const MultilineTag = this.multilineTag;
 		const ariaProps = pickAriaProps( this.props );
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
-		const classes = classnames( wrapperClassName, 'editor-rich-text' );
+		const classes = classnames( wrapperClassName, 'editor-rich-text block-editor-rich-text' );
 		const record = this.getRecord();
 
 		return (
@@ -1081,7 +1081,7 @@ export class RichText extends Component {
 					</BlockFormatControls>
 				) }
 				{ isSelected && inlineToolbar && (
-					<IsolatedEventContainer className="editor-rich-text__inline-toolbar">
+					<IsolatedEventContainer className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar">
 						<FormatToolbar controls={ formattingControls } />
 					</IsolatedEventContainer>
 				) }
@@ -1120,7 +1120,7 @@ export class RichText extends Component {
 							/>
 							{ isPlaceholderVisible &&
 								<Tagname
-									className={ classnames( 'editor-rich-text__editable', className ) }
+									className={ classnames( 'editor-rich-text__editable block-editor-rich-text__editable', className ) }
 									style={ style }
 								>
 									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }

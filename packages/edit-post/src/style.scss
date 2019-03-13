@@ -151,7 +151,7 @@ body.block-editor-page {
 .editor-post-permalink,
 .edit-post-sidebar,
 .editor-post-publish-panel,
-.editor-block-list__block,
+.block-editor-block-list__block,
 .components-popover,
 .components-modal__content {
 	.input-control, // Upstream name is `.regular-text`.
@@ -246,7 +246,7 @@ body.block-editor-page {
 
 // Placeholder colors
 .editor-post-title,
-.editor-block-list__block {
+.block-editor-block-list__block {
 	input,
 	textarea {
 		// Use opacity to work in various editor styles.

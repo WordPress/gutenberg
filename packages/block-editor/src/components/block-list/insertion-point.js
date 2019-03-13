@@ -51,9 +51,9 @@ class BlockInsertionPoint extends Component {
 		} = this.props;
 
 		return (
-			<div className="editor-block-list__insertion-point">
+			<div className="editor-block-list__insertion-point block-editor-block-list__insertion-point">
 				{ showInsertionPoint && (
-					<div className="editor-block-list__insertion-point-indicator" />
+					<div className="editor-block-list__insertion-point-indicator block-editor-block-list__insertion-point-indicator" />
 				) }
 				<div
 					onFocus={ this.onFocusInserter }
@@ -66,7 +66,7 @@ class BlockInsertionPoint extends Component {
 					// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 					tabIndex={ -1 }
 					className={
-						classnames( 'editor-block-list__insertion-point-inserter', {
+						classnames( 'editor-block-list__insertion-point-inserter block-editor-block-list__insertion-point-inserter', {
 							'is-visible': isInserterFocused,
 						} )
 					}

@@ -6,5 +6,5 @@
 export const hasBlockSwitcher = async () => {
 	return page.evaluate( ( blockSwitcherSelector ) => {
 		return !! document.querySelector( blockSwitcherSelector );
-	}, '.editor-block-toolbar .editor-block-switcher' );
+	}, '.block-editor-block-toolbar .block-editor-block-switcher' );
 };

@@ -1,10 +1,10 @@
 
-.editor-rich-text {
+.block-editor-rich-text {
 	// This is needed to position the formatting toolbar.
 	position: relative;
 }
 
-.editor-rich-text__editable {
+.block-editor-rich-text__editable {
 	margin: 0;
 	position: relative;
 	// In HTML, leading and trailing spaces are not visible, and multiple spaces
@@ -84,7 +84,7 @@
 	}
 
 	// Placeholder text.
-	& + .editor-rich-text__editable {
+	& + .block-editor-rich-text__editable {
 		pointer-events: none;
 
 		// Use opacity to work in various editor styles.
@@ -97,12 +97,12 @@
 
 	// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
 	// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
-	&[data-is-placeholder-visible="true"] + figcaption.editor-rich-text__editable {
+	&[data-is-placeholder-visible="true"] + figcaption.block-editor-rich-text__editable {
 		opacity: 0.8;
 	}
 }
 
-.editor-rich-text__inline-toolbar {
+.block-editor-rich-text__inline-toolbar {
 	display: flex;
 	justify-content: center;
 	position: absolute;

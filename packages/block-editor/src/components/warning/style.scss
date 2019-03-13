@@ -1,4 +1,4 @@
-.editor-warning {
+.block-editor-warning {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -13,13 +13,13 @@
 		background-color: transparent;
 	}
 
-	.editor-warning__message {
+	.block-editor-warning__message {
 		line-height: $default-line-height;
 		font-family: $default-font;
 		font-size: $default-font-size;
 	}
 
-	.editor-warning__contents {
+	.block-editor-warning__contents {
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
@@ -28,16 +28,16 @@
 		width: 100%;
 	}
 
-	.editor-warning__actions {
+	.block-editor-warning__actions {
 		display: flex;
 	}
 
-	.editor-warning__action {
+	.block-editor-warning__action {
 		margin: 0 6px 0 0;
 	}
 }
 
-.editor-warning__secondary {
+.block-editor-warning__secondary {
 	margin: 3px 0 0 -4px;
 
 	// the padding and margin of the more menu is intentionally non-standard

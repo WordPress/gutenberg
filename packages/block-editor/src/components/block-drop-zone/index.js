@@ -120,7 +120,7 @@ class BlockDropZone extends Component {
 		return (
 			<MediaUploadCheck>
 				<DropZone
-					className={ classnames( 'editor-block-drop-zone', {
+					className={ classnames( 'editor-block-drop-zone block-editor-block-drop-zone', {
 						'is-appender': isAppender,
 					} ) }
 					onFilesDrop={ this.onFilesDrop }

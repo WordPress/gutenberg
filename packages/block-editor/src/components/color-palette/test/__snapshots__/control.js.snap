@@ -2,7 +2,7 @@
 
 exports[`ColorPaletteControl matches the snapshot 1`] = `
 <BaseControl
-  className="editor-color-palette-control"
+  className="editor-color-palette-control block-editor-color-palette-control"
   label={
     <React.Fragment>
       Test Color
@@ -14,7 +14,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   }
 >
   <WithColorContext(ColorPalette)
-    className="editor-color-palette-control__color-palette"
+    className="editor-color-palette-control__color-palette block-editor-color-palette-control__color-palette"
     colors={
       Array [
         Object {

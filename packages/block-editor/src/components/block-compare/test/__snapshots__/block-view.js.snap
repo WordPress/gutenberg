@@ -5,26 +5,26 @@ exports[`BlockView should match snapshot 1`] = `
   className="class"
 >
   <div
-    className="editor-block-compare__content"
+    className="editor-block-compare__content block-editor-block-compare__content"
   >
     <h2
-      className="editor-block-compare__heading"
+      className="editor-block-compare__heading block-editor-block-compare__heading"
     >
       title
     </h2>
     <div
-      className="editor-block-compare__html"
+      className="editor-block-compare__html block-editor-block-compare__html"
     >
       raw
     </div>
     <div
-      className="editor-block-compare__preview edit-post-visual-editor"
+      className="editor-block-compare__preview block-editor-block-compare__preview edit-post-visual-editor"
     >
       render
     </div>
   </div>
   <div
-    className="editor-block-compare__action"
+    className="editor-block-compare__action block-editor-block-compare__action"
   >
     <ForwardRef(Button)
       isLarge={true}

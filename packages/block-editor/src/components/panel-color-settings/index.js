@@ -88,10 +88,8 @@ export const PanelColorSettings = ifCondition( hasColorsToChoose )(
 		title,
 		...props
 	} ) => {
-		const className = 'editor-panel-color-settings';
-
 		const titleElement = (
-			<span className={ `${ className }__panel-title` }>
+			<span className="editor-panel-color-settings__panel-title block-editor-panel-color-settings__panel-title">
 				{ title }
 				{ renderColorIndicators( colorSettings, colors ) }
 			</span>
@@ -99,7 +97,7 @@ export const PanelColorSettings = ifCondition( hasColorsToChoose )(
 
 		return (
 			<PanelBody
-				className={ className }
+				className="editor-panel-color-settings block-editor-panel-color-settings"
 				title={ titleElement }
 				{ ...props }
 			>
