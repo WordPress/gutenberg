@@ -54,15 +54,14 @@ export class BlockToolbar extends Component<PropsType> {
 							title={ __( 'Add block' ) }
 							icon="insert"
 							accessible={ true }
-							accessibilityLabel={ 'Add block' }
-							testID="Add block"
+							testID={ 'Add block' }
 							onClick={ onInsertClick }
 						/>
 						<ToolbarButton
 							title={ __( 'Undo' ) }
 							icon="undo"
 							accessible={ true }
-							accessibilityLabel="Add block"
+							testID={ 'Undo' }
 							isDisabled={ ! hasUndo }
 							onClick={ undo }
 						/>
@@ -70,7 +69,7 @@ export class BlockToolbar extends Component<PropsType> {
 							title={ __( 'Redo' ) }
 							icon="redo"
 							accessible={ true }
-							accessibilityLabel="Add block"
+							testID={ 'Redo' }
 							isDisabled={ ! hasRedo }
 							onClick={ redo }
 						/>
