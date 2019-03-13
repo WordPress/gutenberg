@@ -131,6 +131,7 @@
 					"requireEndingPeriod": true
 				}
 			],
+			"require-module": "error",
 			"require-publishConfig": "error",
 			"require-repository-directory": "error",
 			"valid-values-author": [
