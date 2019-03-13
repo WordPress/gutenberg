@@ -7,7 +7,7 @@ import { without, map } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,6 +16,7 @@ import BlockManagerShowAll from './show-all';
 import BlockTypesChecklist from './checklist';
 
 function BlockManagerCategory( {
+	instanceId,
 	category,
 	blockTypes,
 	hiddenBlockTypes,
@@ -31,28 +32,37 @@ function BlockManagerCategory( {
 		...hiddenBlockTypes
 	);
 
+	const titleId = 'edit-post-manage-blocks-modal__category-title-' + instanceId;
+
 	return (
-		<section className="edit-post-manage-blocks-modal__category">
-			<header className="edit-post-manage-blocks-modal__category-header">
-				<h2 className="edit-post-manage-blocks-modal__category-title">
+		<div
+			role="group"
+			aria-labelledby={ titleId }
+			className="edit-post-manage-blocks-modal__category"
+		>
+			<div className="edit-post-manage-blocks-modal__category-header">
+				<h2
+					id={ titleId }
+					className="edit-post-manage-blocks-modal__category-title"
+				>
 					{ category.title }
 				</h2>
 				<BlockManagerShowAll
-					category={ category }
 					checked={ checkedBlockNames.length > 0 }
 					onChange={ toggleAllVisible }
 				/>
-			</header>
+			</div>
 			<BlockTypesChecklist
 				blockTypes={ blockTypes }
 				value={ checkedBlockNames }
 				onItemChange={ toggleVisible }
 			/>
-		</section>
+		</div>
 	);
 }
 
 export default compose( [
+	withInstanceId,
 	withSelect( ( select ) => {
 		const { getPreference } = select( 'core/edit-post' );
 
