@@ -66,6 +66,9 @@ public class ReactAztecText extends AztecText {
     boolean shouldHandleOnSelectionChange = false;
     boolean shouldHandleActiveFormatsChange = false;
 
+    // This optional variable holds the outer HTML tag that will be added to the text when the user start typing in it
+    // This is required to keep placeholder text working, and start typing with styled text.
+    // Ref: https://github.com/wordpress-mobile/gutenberg-mobile/issues/707
     String tagName = "";
 
     private static final HashMap<ITextFormat, String> typingFormatsMap = new HashMap<ITextFormat, String>() {
