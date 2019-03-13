@@ -37,13 +37,10 @@ import {
 	insertLineSeparator,
 	isEmptyLine,
 	unstableToDom,
-	getSelectionStart,
-	getSelectionEnd,
 	remove,
 	removeFormat,
 	isCollapsed,
 	LINE_SEPARATOR,
-	charAt,
 	indentListItems,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -619,9 +616,7 @@ export class RichText extends Component {
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			const value = this.createRecord();
-			const { formats } = value;
-			const start = getSelectionStart( value );
-			const end = getSelectionEnd( value );
+			const { replacements, text, start, end } = value;
 
 			// Always handle full content deletion ourselves.
 			if ( start === 0 && end !== 0 && end === value.text.length ) {
@@ -636,18 +631,18 @@ export class RichText extends Component {
 				if ( keyCode === BACKSPACE ) {
 					const index = start - 1;
 
-					if ( charAt( value, index ) === LINE_SEPARATOR ) {
+					if ( text[ index ] === LINE_SEPARATOR ) {
 						const collapsed = isCollapsed( value );
 
 						// If the line separator that is about te be removed
 						// contains wrappers, remove the wrappers first.
-						if ( collapsed && formats[ index ] && formats[ index ].length ) {
-							const newFormats = formats.slice();
+						if ( collapsed && replacements[ index ] && replacements[ index ].length ) {
+							const newReplacements = replacements.slice();
 
-							newFormats[ index ] = formats[ index ].slice( 0, -1 );
+							newReplacements[ index ] = replacements[ index ].slice( 0, -1 );
 							newValue = {
 								...value,
-								formats: newFormats,
+								replacements: newReplacements,
 							};
 						} else {
 							newValue = remove(
@@ -659,18 +654,18 @@ export class RichText extends Component {
 							);
 						}
 					}
-				} else if ( charAt( value, end ) === LINE_SEPARATOR ) {
+				} else if ( text[ end ] === LINE_SEPARATOR ) {
 					const collapsed = isCollapsed( value );
 
 					// If the line separator that is about te be removed
 					// contains wrappers, remove the wrappers first.
-					if ( collapsed && formats[ end ] && formats[ end ].length ) {
-						const newFormats = formats.slice();
+					if ( collapsed && replacements[ end ] && replacements[ end ].length ) {
+						const newReplacements = replacements.slice();
 
-						newFormats[ end ] = formats[ end ].slice( 0, -1 );
+						newReplacements[ end ] = replacements[ end ].slice( 0, -1 );
 						newValue = {
 							...value,
-							formats: newFormats,
+							replacements: newReplacements,
 						};
 					} else {
 						newValue = remove(
