@@ -380,10 +380,21 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 
  * @since 0.1.0
  */
 function gutenberg_register_vendor_scripts() {
-	/*
-	 * This function is kept as an empty stub, in case Gutenberg should need to
-	 * explicitly provide a version newer than that provided by core.
-	 */
+	$suffix = SCRIPT_DEBUG ? '' : '.min';
+
+	// Vendor Scripts.
+	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
+
+	gutenberg_register_vendor_script(
+		'react',
+		'https://unpkg.com/react@16.8.4/umd/react' . $react_suffix . '.js',
+		array( 'wp-polyfill' )
+	);
+	gutenberg_register_vendor_script(
+		'react-dom',
+		'https://unpkg.com/react-dom@16.8.4/umd/react-dom' . $react_suffix . '.js',
+		array( 'react' )
+	);
 }
 
 /**
