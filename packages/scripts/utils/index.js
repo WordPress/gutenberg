@@ -8,6 +8,7 @@ const {
 	spawnScript,
 } = require( './cli' );
 const {
+	getWebpackArgs,
 	hasBabelConfig,
 	hasJestConfig,
 } = require( './config' );
@@ -27,6 +28,7 @@ module.exports = {
 	fromConfigRoot,
 	getCliArg,
 	getCliArgs,
+	getWebpackArgs,
 	hasBabelConfig,
 	hasCliArg,
 	hasJestConfig,

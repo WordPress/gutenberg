@@ -122,7 +122,6 @@ function prepareFormats( prepareEditableTree = [], value ) {
 export function toDom( {
 	value,
 	multilineTag,
-	multilineWrapperTags,
 	prepareEditableTree,
 	isEditableTree = true,
 } ) {
@@ -135,7 +134,6 @@ export function toDom( {
 			formats: prepareFormats( prepareEditableTree, value ),
 		},
 		multilineTag,
-		multilineWrapperTags,
 		createEmpty,
 		append,
 		getLastChild,
@@ -174,7 +172,6 @@ export function apply( {
 	value,
 	current,
 	multilineTag,
-	multilineWrapperTags,
 	prepareEditableTree,
 	__unstableDomOnly,
 } ) {
@@ -182,7 +179,6 @@ export function apply( {
 	const { body, selection } = toDom( {
 		value,
 		multilineTag,
-		multilineWrapperTags,
 		prepareEditableTree,
 	} );
 

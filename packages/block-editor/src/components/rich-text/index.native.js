@@ -106,9 +106,9 @@ export class RichText extends Component {
 			value = value.trimLeft();
 		}
 
-		const { formats, text } = this.formatToValue( value );
+		const { formats, replacements, text } = this.formatToValue( value );
 
-		return { formats, formatPlaceholder, text, start, end };
+		return { formats, replacements, formatPlaceholder, text, start, end };
 	}
 
 	/*
@@ -164,13 +164,12 @@ export class RichText extends Component {
 		onSplit( before, after, ...blocks );
 	}
 
-	valueToFormat( { formats, text } ) {
-		const value = toHTMLString( {
-			value: { formats, text },
-			multilineTag: this.multilineTag,
-		} );
+	valueToFormat( value ) {
 		// remove the outer root tags
-		return this.removeRootTagsProduceByAztec( value );
+		return this.removeRootTagsProduceByAztec( toHTMLString( {
+			value,
+			multilineTag: this.multilineTag,
+		} ) );
 	}
 
 	getActiveFormatNames( record ) {

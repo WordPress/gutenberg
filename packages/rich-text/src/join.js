@@ -20,8 +20,9 @@ export function join( values, separator = '' ) {
 		separator = create( { text: separator } );
 	}
 
-	return normaliseFormats( values.reduce( ( accumlator, { formats, text } ) => ( {
-		text: accumlator.text + separator.text + text,
+	return normaliseFormats( values.reduce( ( accumlator, { formats, replacements, text } ) => ( {
 		formats: accumlator.formats.concat( separator.formats, formats ),
+		replacements: accumlator.replacements.concat( separator.replacements, replacements ),
+		text: accumlator.text + separator.text + text,
 	} ) ) );
 }
