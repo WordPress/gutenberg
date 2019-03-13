@@ -12,9 +12,6 @@ import {
 	NativeTouchEvent,
 } from 'react-native';
 import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
-import {
-	requestImageUploadCancel,
-} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -82,17 +79,13 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		this.props.onSelect( this.props.clientId );
 	};
 
-	onRemoveBlockCheckUpload = ( mediaId: number, isUploading: boolean ) => {
-		if ( isUploading && mediaId ) {
-			// here we will be being passed the mediaId of the Image component being unmounted so, safe to issue the cancel signal
-			// through the bridge.
-			requestImageUploadCancel( mediaId );
-		}
-
-		// now remove the filter as it won't be needed anymore
+	onRemoveBlockCheckUpload() {
 		if ( hasFilter( 'blocks.onRemoveBlockCheckUpload' ) ) {
+			// now remove the filter as it's  a one-shot use and won't be needed anymore
 			removeFilter( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks' );
+			return true;
 		}
+		return false;
 	}
 
 	onInlineToolbarButtonPressed = ( button: number ) => {
@@ -105,7 +98,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				break;
 			case InlineToolbarActions.DELETE:
 				// adding a filter that will exist for as long as it takes for the block to be removed and the component unmounted
-				// using a namespace that is only valid for the current block id
+				// this acts as a flag for the code using the filter to know of its existence
 				addFilter( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks', this.onRemoveBlockCheckUpload );
 				this.props.removeBlock();
 				break;
