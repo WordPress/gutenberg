@@ -18,127 +18,127 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### AlignmentToolbar
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### Autocomplete
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockAlignmentToolbar
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockControls
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockEdit
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockEditorKeyboardShortcuts
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockEditorProvider
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockFormatControls
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockIcon
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockInspector
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockList
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockMover
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockNavigationDropdown
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockSelectionClearer
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockSettingsMenu
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockTitle
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### BlockToolbar
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### ColorPalette
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### ContrastChecker
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### CopyHandler
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### createCustomColorsHOC
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 A higher-order component factory for creating a 'withCustomColors' HOC, which handles color logic
 for class generation color value, retrieval and color attribute setting.
@@ -167,19 +167,19 @@ export default compose(
 
 ### DefaultBlockAppender
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### FontSizePicker
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### getColorClassName
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns a class based on the context a color is being used and its slug.
 
@@ -194,7 +194,7 @@ Returns a class based on the context a color is being used and its slug.
 
 ### getColorObjectByAttributeValues
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Provided an array of color objects as set by the theme or by the editor defaults,
 and the values of the defined color or custom color returns a color object describing the color.
@@ -211,7 +211,7 @@ and the values of the defined color or custom color returns a color object descr
 
 ### getColorObjectByColorValue
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Provided an array of color objects as set by the theme or by the editor defaults, and a color value returns the color object matching that value or undefined.
 
@@ -226,7 +226,7 @@ Provided an array of color objects as set by the theme or by the editor defaults
 
 ### getFontSize
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
 	If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
@@ -243,7 +243,7 @@ Returns the font size object based on an array of named font sizes and the named
 
 ### getFontSizeClass
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns a class based on fontSizeName.
 
@@ -257,109 +257,109 @@ Returns a class based on fontSizeName.
 
 ### InnerBlocks
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### Inserter
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### InspectorAdvancedControls
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### InspectorControls
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### MediaPlaceholder
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### MediaUpload
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### MediaUploadCheck
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### MultiBlocksSwitcher
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### MultiSelectScrollIntoView
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### NavigableToolbar
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### ObserveTyping
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### PanelColorSettings
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### PlainText
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### PreserveScrollInReorder
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### RichText
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### RichTextShortcut
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### RichTextToolbarButton
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### SETTINGS_DEFAULTS
 
-[src/index.js#L19-L19](src/index.js#L19-L19)
+[src/index.js#L18-L18](src/index.js#L18-L18)
 
 The default editor settings
 
@@ -382,49 +382,49 @@ The default editor settings
 
 ### SkipToSelectedBlock
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### UnstableRichTextInputEvent
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### URLInput
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### URLInputButton
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### URLPopover
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### Warning
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### withColorContext
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### withColors
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 A higher-order component, which handles color logic for class generation color value, retrieval and color attribute setting.
 
@@ -449,7 +449,7 @@ export default compose(
 
 ### withFontSizes
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Higher-order component, which handles font size logic for class generation,
 font size value retrieval, and font size change handling.
@@ -464,19 +464,19 @@ font size value retrieval, and font size change handling.
 
 ### WritingFlow
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### \_BlockSettingsMenuFirstItem
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
 ### \_BlockSettingsMenuPluginsExtension
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L16-L16](src/index.js#L16-L16)
 
 Undocumented declaration.
 
