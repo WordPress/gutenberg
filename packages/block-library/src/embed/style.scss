@@ -11,7 +11,7 @@
 .wp-block-embed {
 	// The embed block is in a `figure` element, and many themes zero this out.
 	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
-	margin-bottom: 1em;
+	margin-bottom: $default-block-margin;
 }
 
 .wp-embed-responsive {

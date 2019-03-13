@@ -63,9 +63,10 @@
 	margin-left: auto;
 	margin-right: auto;
 
-	// Space title similarly to other blocks.
-	// This uses negative margins so as to not affect the default block margins.
-	margin-bottom: -$block-padding - $block-spacing - $border-width - $border-width;
+	// Apply default block margin below the post title.
+	// This ensures the first block on the page is almost in a good position.
+	// This rule can be retired once the title becomes an actual block.
+	margin-bottom: ($block-padding * 2) + $block-spacing; // This matches 2em in the vanilla style.
 
 	// Stack borders.
 	> div {

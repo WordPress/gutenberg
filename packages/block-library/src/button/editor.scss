@@ -10,12 +10,15 @@
 }
 
 .wp-block-button {
-	display: inline-block;
-	margin-bottom: 0;
 	position: relative;
 
 	[contenteditable] {
 		cursor: text;
+	}
+
+	// Don't let placeholder expand parent width.
+	.block-editor-rich-text {
+		display: inline-block;
 	}
 
 	// Make placeholder text white unless custom colors or outline versions are chosen.

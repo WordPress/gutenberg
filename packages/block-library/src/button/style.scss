@@ -2,7 +2,7 @@ $blocks-button__height: 56px;
 
 .wp-block-button {
 	color: $white;
-	margin-bottom: 1.5em;
+	margin-bottom: $default-block-margin;
 
 	&.aligncenter {
 		text-align: center;

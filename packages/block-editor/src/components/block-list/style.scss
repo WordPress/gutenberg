@@ -56,15 +56,6 @@
 		margin-left: -$block-padding;
 		margin-right: -$block-padding;
 	}
-
-	// Space every block, and the default appender, using margins.
-	// This allows margins to collapse, which gives a better representation of how it looks on the frontend.
-	.block-editor-default-block-appender > .block-editor-default-block-appender__content,
-	> .block-editor-block-list__block > .block-editor-block-list__block-edit,
-	> .block-editor-block-list__layout > .block-editor-block-list__block > .block-editor-block-list__block-edit {
-		margin-top: $block-padding * 2 + $block-spacing;
-		margin-bottom: $block-padding * 2 + $block-spacing;
-	}
 }
 
 .block-editor-block-list__layout .block-editor-block-list__block {
