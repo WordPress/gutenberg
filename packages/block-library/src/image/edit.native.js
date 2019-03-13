@@ -11,7 +11,6 @@ import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
-	requestImageUploadCancel,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -33,7 +32,7 @@ import {
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
-import { applyFilters } from '@wordpress/hooks';
+import { doAction, hasAction } from '@wordpress/hooks';
 
 
 /**
@@ -88,9 +87,9 @@ class ImageEdit extends React.Component {
 	}
 
 	componentWillUnmount() {
-		// this filter will only exist if the user pressed the trash button on the block holder
-		if ( applyFilters( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
-			requestImageUploadCancel( this.props.attributes.id );
+		// this action will only exist if the user pressed the trash button on the block holder
+		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
+			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id )
 		}
 		this.removeMediaUploadListener();
 	}
