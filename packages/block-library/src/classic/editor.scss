@@ -295,7 +295,7 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 		}
 		.editor-block-contextual-toolbar {
 			float: right;
-			margin-right: $icon-button-size - $block-padding + $border-width;
+			margin-right: $icon-button-size - $block-padding + ($border-width * 3);
 			transform: translateY(-#{ $block-padding - $border-width });
 			top: $block-padding;
 
@@ -315,6 +315,10 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 					border-left: 1px solid $light-gray-500;
 					margin-top: $grid-size-small;
 					margin-bottom: $grid-size-small;
+				}
+
+				.components-toolbar__control.components-button:hover {
+					background-color: transparent;
 				}
 			}
 
