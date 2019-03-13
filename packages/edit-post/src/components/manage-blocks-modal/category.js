@@ -48,7 +48,7 @@ function BlockManagerCategory( {
 					{ category.title }
 				</h2>
 				<BlockManagerShowAll
-					checked={ checkedBlockNames.length === blockTypes.length }
+					checked={ checkedBlockNames.length > 0 }
 					onChange={ toggleAllVisible }
 				/>
 			</div>
