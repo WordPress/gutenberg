@@ -62,6 +62,41 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
+    @objc
+    func debug(_ message: String) {
+        DispatchQueue.main.async {
+            self.delegate?.debug(message: message)
+        }
+    }
+
+    @objc
+    func info(_ message: String) {
+        DispatchQueue.main.async {
+            self.delegate?.info(message: message)
+        }
+    }
+
+    @objc
+    func log(_ message: String) {
+        DispatchQueue.main.async {
+            self.delegate?.log(message: message)
+        }
+    }
+
+    @objc
+    func warn(_ message: String) {
+        DispatchQueue.main.async {
+            self.delegate?.warn(message: message)
+        }
+    }
+
+    @objc
+    func error(_ message: String) {
+        DispatchQueue.main.async {
+            self.delegate?.error(message: message)
+        }
+    }
+
     override public func startObserving() {
         super.startObserving()
         hasObservers = true

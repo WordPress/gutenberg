@@ -113,6 +113,26 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         alertController.popoverPresentationController?.permittedArrowDirections = .any
         present(alertController, animated: true, completion: nil)
     }
+
+    func debug(message: String) {
+        print("Debug: \(message)")
+    }
+
+    func info(message: String) {
+        print("Info: \(message)")
+    }
+    
+    func log(message: String) {
+        print("Log: \(message)")
+    }
+    
+    func warn(message: String) {
+        print("Warn: \(message)")
+    }
+    
+    func error(message: String) {
+        print("Error: \(message)")
+    }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
