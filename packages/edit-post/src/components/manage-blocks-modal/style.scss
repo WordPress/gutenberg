@@ -88,10 +88,10 @@
 		align-items: center;
 		display: flex;
 		margin: 0;
+	}
 
-		input[type="checkbox"] {
-			margin-right: 0;
-		}
+	.components-modal__content & input[type="checkbox"] {
+		margin-right: 0;
 	}
 
 	.components-checkbox-control__label {
