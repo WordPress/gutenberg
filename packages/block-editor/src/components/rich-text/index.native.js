@@ -98,9 +98,9 @@ export class RichText extends Component {
 		const { formatPlaceholder, start, end } = this.state;
 		// Since we get the text selection from Aztec we need to be in sync with the HTML `value`
 		// Removing leading white spaces using `trim()` should make sure this is the case.
-		const { formats, text } = this.formatToValue( this.props.value === undefined ? undefined : this.props.value.trimLeft() );
+		const { formats, replacements, text } = this.formatToValue( this.props.value === undefined ? undefined : this.props.value.trimLeft() );
 
-		return { formats, formatPlaceholder, text, start, end };
+		return { formats, replacements, formatPlaceholder, text, start, end };
 	}
 
 	/*
@@ -156,13 +156,12 @@ export class RichText extends Component {
 		onSplit( before, after, ...blocks );
 	}
 
-	valueToFormat( { formats, text } ) {
-		const value = toHTMLString( {
-			value: { formats, text },
-			multilineTag: this.multilineTag,
-		} );
+	valueToFormat( value ) {
 		// remove the outer root tags
-		return this.removeRootTagsProduceByAztec( value );
+		return this.removeRootTagsProduceByAztec( toHTMLString( {
+			value,
+			multilineTag: this.multilineTag,
+		} ) );
 	}
 
 	getActiveFormatNames( record ) {
