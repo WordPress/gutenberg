@@ -3,31 +3,31 @@ module.exports = function( api ) {
 
 	return {
 		presets: [
-			! isTestEnv && [ '@babel/preset-env', {
+			! isTestEnv && [ require.resolve( '@babel/preset-env' ), {
 				modules: false,
 				targets: {
-					browsers: [ 'extends @wordpress/browserslist-config' ],
+					browsers: require( '@wordpress/browserslist-config' ),
 				},
 			} ],
-			isTestEnv && [ '@babel/preset-env', {
+			isTestEnv && [ require.resolve( '@babel/preset-env' ), {
 				useBuiltIns: 'usage',
 			} ],
 		].filter( Boolean ),
 		plugins: [
-			'@babel/plugin-proposal-object-rest-spread',
+			require.resolve( '@babel/plugin-proposal-object-rest-spread' ),
 			[
-				'@wordpress/babel-plugin-import-jsx-pragma',
+				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
 				{
 					scopeVariable: 'createElement',
 					source: '@wordpress/element',
 					isDefault: false,
 				},
 			],
-			[ '@babel/plugin-transform-react-jsx', {
+			[ require.resolve( '@babel/plugin-transform-react-jsx' ), {
 				pragma: 'createElement',
 			} ],
-			'@babel/plugin-proposal-async-generator-functions',
-			! isTestEnv && [ '@babel/plugin-transform-runtime', {
+			require.resolve( '@babel/plugin-proposal-async-generator-functions' ),
+			! isTestEnv && [ require.resolve( '@babel/plugin-transform-runtime' ), {
 				helpers: true,
 				useESModules: false,
 			} ],
