@@ -46,6 +46,7 @@ if ( rnPlatform === 'android' ) {
 
 describe( 'Gutenberg Editor tests', () => {
 	let driver;
+	let editorPage;
 
 	const rename = async ( path, newPath ) => {
 		await fs.rename( path, newPath, ( error ) => {
@@ -55,12 +56,12 @@ describe( 'Gutenberg Editor tests', () => {
 		} );
 	};
 
-	const setupData = async function() {
+	const setupData = async () => {
 		await rename( 'src/app/initial-html.js', 'src/app/initial-html.tmp.js' );
 		await rename( 'src/app/initial-device-tests-html.js', 'src/app/initial-html.js' );
 	};
 
-	const setupAppium = async function() {
+	const setupAppium = async () => {
 		appium = await spawn( 'appium', [ '-p', '' + APPIUM_SERVER_PORT ], {
 			detached: true, stdio: [ 'ignore', out, err ],
 
@@ -68,18 +69,7 @@ describe( 'Gutenberg Editor tests', () => {
 		await timer( 5000 );
 	};
 
-	beforeAll( async () => {
-		await setupAppium();
-		await setupData();
-	} );
-
-	afterAll( async () => {
-		await rename( 'src/app/initial-html.js', 'src/app/initial-device-tests-html.js' );
-		await rename( 'src/app/initial-html.tmp.js', 'src/app/initial-html.js' );
-		await appium.kill( 'SIGINT' );
-	} );
-
-	beforeEach( async () => {
+	const setupDriver = async () => {
 		driver = wd.promiseChainRemote( APPIUM_SERVER_ADDRESS, APPIUM_SERVER_PORT );
 
 		await driver.init( config );
@@ -87,15 +77,27 @@ describe( 'Gutenberg Editor tests', () => {
 		await driver.sleep( 10000 ); // wait for app to load
 
 		await driver.setImplicitWaitTimeout( 2000 );
+	};
+
+	beforeAll( async () => {
+		await setupAppium();
+		await setupData();
+		await setupDriver();
 	} );
 
-	afterEach( async () => {
+	afterAll( async () => {
+		await rename( 'src/app/initial-html.js', 'src/app/initial-device-tests-html.js' );
+		await rename( 'src/app/initial-html.tmp.js', 'src/app/initial-html.js' );
 		await driver.quit();
+		await appium.kill( 'SIGINT' );
+	} );
+
+	it( 'should be able to see visual editor', async () => {
+		editorPage = new EditorPage( driver );
+		await editorPage.expect();
 	} );
 
 	it( 'should be able to add a new Paragraph block', async () => {
-		let editorPage = new EditorPage( driver );
-		editorPage = await editorPage.expect();
 		let paragraphBlock = new ParagraphBlock( driver, 'Paragraph' );
 		paragraphBlock = await editorPage.addNewBlock( paragraphBlock );
 		await paragraphBlock.sendText( 'Hello Gutenberg!' );
