@@ -12,6 +12,16 @@ import {
 	Fragment,
 	isValidElement,
 	StrictMode,
+	useState,
+	useEffect,
+	useContext,
+	useReducer,
+	useCallback,
+	useMemo,
+	useRef,
+	useImperativeHandle,
+	useLayoutEffect,
+	useDebugValue,
 	lazy,
 	Suspense,
 } from 'react';
@@ -113,6 +123,25 @@ export { lazy };
  * Component to do code-splitting by wrapping a dynamic import.
  */
 export { Suspense };
+
+/**
+ * Make React Hooks available
+ *
+ * @param {function} loadFunction A function that must call a dynamic import(). This must return a Promise which
+ *                                resolves to a module with a default export containing a React component.
+ */
+export {
+	useCallback,
+	useContext,
+	useDebugValue,
+	useEffect,
+	useImperativeHandle,
+	useLayoutEffect,
+	useMemo,
+	useReducer,
+	useRef,
+	useState,
+};
 
 /**
  * Concatenate two or more React children objects.
