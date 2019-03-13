@@ -14,10 +14,7 @@ import { applyFormat } from './apply-format';
  *
  * @return {Object} A new value with the format applied or removed.
  */
-export function toggleFormat(
-	value,
-	format
-) {
+export function toggleFormat( value, format ) {
 	if ( getActiveFormat( value, format.type ) ) {
 		return removeFormat( value, format.type );
 	}
