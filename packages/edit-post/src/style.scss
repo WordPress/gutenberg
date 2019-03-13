@@ -68,8 +68,8 @@ body.block-editor-page {
 }
 
 .block-editor__container {
-	// on mobile the main content area has to scroll
-	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	// On mobile the main content area has to scroll, otherwise you can invoke
+	// the overscroll bounce on the non-scrolling container, for a bad experience.
 	@include break-small {
 		position: absolute;
 		top: 0;
@@ -79,7 +79,7 @@ body.block-editor-page {
 		min-height: calc(100vh - #{ $admin-bar-height-big });
 	}
 
-	// The WP header height changes at this breakpoint
+	// The WP header height changes at this breakpoint.
 	@include break-medium {
 		min-height: calc(100vh - #{ $admin-bar-height });
 
@@ -102,7 +102,8 @@ body.block-editor-page {
 	}
 }
 
-// These are default editor styles in case the theme doesn't provide them.
+
+// These are default block editor styles in case the theme doesn't provide them.
 .wp-block {
 	max-width: $content-width;
 

@@ -33,11 +33,3 @@ ul ul,
 ol ul {
 	list-style-type: circle;
 }
-
-// Supply caption styles even if the theme hasn't opted in.
-// Reason being: the figcaption element is not likely to be styled in the majority of existing themes,
-// so we supply the styles so as to not appear broken or unstyled in those themes.
-figcaption {
-	margin-top: 0.5em;
-	margin-bottom: 1em;
-}
