@@ -1,6 +1,14 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
-public interface GutenbergBridgeJS2Parent {
+interface GutenbergBridgeLogger {
+    void debug(String message);
+    void info(String message);
+    void log(String message);
+    void warn(String message);
+    void error(String message);
+}
+
+public interface GutenbergBridgeJS2Parent extends GutenbergBridgeLogger {
     void responseHtml(String title, String html, boolean changed);
 
     void editorDidMount(boolean hasUnsupportedBlocks);
@@ -20,7 +28,7 @@ public interface GutenbergBridgeJS2Parent {
     void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback);
 
     void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback);
-    
+
     void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback);
 
     void mediaUploadSync(MediaUploadCallback mediaUploadCallback);

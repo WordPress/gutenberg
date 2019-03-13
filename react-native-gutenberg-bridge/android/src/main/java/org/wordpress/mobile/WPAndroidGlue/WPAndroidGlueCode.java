@@ -25,6 +25,7 @@ import com.facebook.soloader.SoLoader;
 import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
 import com.horcrux.svg.SvgPackage;
 
+import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
@@ -148,6 +149,31 @@ public class WPAndroidGlueCode {
                 if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
                     setFocusOnTitle();
                 }
+            }
+
+            @Override
+            public void debug(String message) {
+                AppLog.d(AppLog.T.EDITOR, message);
+            }
+
+            @Override
+            public void info(String message) {
+                AppLog.i(AppLog.T.EDITOR, message);
+            }
+
+            @Override
+            public void log(String message) {
+                AppLog.v(AppLog.T.EDITOR, message);
+            }
+
+            @Override
+            public void warn(String message) {
+                AppLog.w(AppLog.T.EDITOR, message);
+            }
+
+            @Override
+            public void error(String message) {
+                AppLog.e(AppLog.T.EDITOR, message);
             }
         });
         return Arrays.asList(

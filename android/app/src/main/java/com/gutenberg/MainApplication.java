@@ -57,6 +57,21 @@ public class MainApplication extends Application implements ReactApplication {
 
                 @Override
                 public void editorDidMount(boolean hasUnsupportedBlocks) {}
+
+                @Override
+                public void debug(String message) {}
+
+                @Override
+                public void info(String message) {}
+
+                @Override
+                public void log(String message) {}
+
+                @Override
+                public void warn(String message) {}
+
+                @Override
+                public void error(String message) {}
             })
       );
     }

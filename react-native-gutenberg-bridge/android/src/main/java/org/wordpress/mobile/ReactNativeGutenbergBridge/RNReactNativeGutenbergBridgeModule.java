@@ -116,6 +116,31 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         mGutenbergBridgeJS2Parent.requestImageUploadCancelDialog(mediaId);
     }
 
+    @ReactMethod
+    public void debug(String message) {
+        mGutenbergBridgeJS2Parent.debug(message);
+    }
+
+    @ReactMethod
+    public void info(String message) {
+        mGutenbergBridgeJS2Parent.info(message);
+    }
+
+    @ReactMethod
+    public void log(String message) {
+        mGutenbergBridgeJS2Parent.log(message);
+    }
+
+    @ReactMethod
+    public void warn(String message) {
+        mGutenbergBridgeJS2Parent.warn(message);
+    }
+
+    @ReactMethod
+    public void error(String message) {
+        mGutenbergBridgeJS2Parent.error(message);
+    }
+
     private MediaSelectedCallback getNewMediaSelectedCallback(final Callback jsCallback) {
         return new MediaSelectedCallback() {
             @Override public void onMediaSelected(int mediaId, String mediaUrl) {
