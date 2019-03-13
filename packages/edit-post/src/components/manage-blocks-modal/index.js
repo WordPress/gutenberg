@@ -26,7 +26,7 @@ export function ManageBlocksModal( { isActive, closeModal } ) {
 	return (
 		<Modal
 			className="edit-post-manage-blocks-modal"
-			title={ __( 'Manage Block Visibility' ) }
+			title={ __( 'Block Manager' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ closeModal }
 		>
