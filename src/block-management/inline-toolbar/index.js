@@ -6,7 +6,7 @@ import { View } from 'react-native';
 import InlineToolbarActions from './actions';
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/editor';
+import { InspectorControls } from '@wordpress/block-editor';
 
 type PropsType = {
 	clientId: string,

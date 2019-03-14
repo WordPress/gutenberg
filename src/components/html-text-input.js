@@ -127,7 +127,8 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetBlocks } = dispatch( 'core/editor' );
+		const { resetBlocks } = dispatch( 'core/block-editor' );
+		const { editPost } = dispatch( 'core/editor' );
 		return {
 			onChange( content ) {
 				editPost( { content } );

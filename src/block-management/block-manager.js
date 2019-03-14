@@ -29,7 +29,8 @@ import SafeArea from 'react-native-safe-area';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { DefaultBlockAppender, PostTitle } from '@wordpress/editor';
+import { PostTitle } from '@wordpress/editor';
+import { DefaultBlockAppender } from '@wordpress/block-editor';
 import { sendNativeEditorDidLayout, subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
 
 type PropsType = {
@@ -51,15 +52,16 @@ type PropsType = {
 type StateType = {
 	blockTypePickerVisible: boolean,
 	isKeyboardVisible: boolean,
-	rootViewHeight: number;
-	safeAreaBottomInset: number;
-	isFullyBordered: boolean;
+	rootViewHeight: number,
+	safeAreaBottomInset: number,
+	isFullyBordered: boolean,
 };
 
 export class BlockManager extends React.Component<PropsType, StateType> {
 	scrollViewRef: Object;
 	postTitleRef: ?Object;
 	subscriptionParentSetFocusOnTitle: ?Object;
+	_isMounted: boolean;
 
 	constructor( props: PropsType ) {
 		super( props );
@@ -116,7 +118,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	onSafeAreaInsetsUpdate( result: Object ) {
 		const { safeAreaInsets } = result;
-		if ( this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
+		if ( this._isMounted && this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
 			this.setState( { ...this.state, safeAreaBottomInset: safeAreaInsets.bottom } );
 		}
 	}
@@ -128,7 +130,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		} );
 	}
 
-	onContentViewLayout = ( event: LayoutChangeEvent ) => {
+	onContentViewLayout( event: LayoutChangeEvent ) {
 		const { width: fullWidth } = Dimensions.get( 'window' );
 		const { width } = event.nativeEvent.layout;
 		const isFullyBordered = fullWidth > width + 1; //+1 is for not letting fraction differences effect the result on Android
@@ -142,6 +144,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	componentDidMount() {
+		this._isMounted = true;
 		Keyboard.addListener( 'keyboardDidShow', this.keyboardDidShow );
 		Keyboard.addListener( 'keyboardDidHide', this.keyboardDidHide );
 		SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
@@ -159,6 +162,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		if ( this.subscriptionParentSetFocusOnTitle ) {
 			this.subscriptionParentSetFocusOnTitle.remove();
 		}
+		this._isMounted = false;
 	}
 
 	keyboardDidShow() {
@@ -169,7 +173,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		this.setState( { isKeyboardVisible: false } );
 	}
 
-	onCaretVerticalPositionChange = ( targetId: number, caretY: number, previousCaretY: ?number ) => {
+	onCaretVerticalPositionChange( targetId: number, caretY: number, previousCaretY: ?number ) {
 		handleCaretVerticalPositionChange( this.scrollViewRef, targetId, caretY, previousCaretY );
 	}
 
@@ -314,8 +318,8 @@ export default compose( [
 			getSelectedBlock,
 			getSelectedBlockClientId,
 			isBlockSelected,
-			getBlockMode,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
+
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
@@ -325,7 +329,6 @@ export default compose( [
 			selectedBlock: getSelectedBlock(),
 			selectedBlockClientId,
 			selectedBlockOrder: getBlockIndex( selectedBlockClientId ),
-			showHtml: getBlockMode() === 'html',
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -334,7 +337,7 @@ export default compose( [
 			insertBlock,
 			replaceBlock,
 			selectBlock,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			insertBlock,
