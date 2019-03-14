@@ -86,68 +86,19 @@ Also, if you look at package.json file it will include a new section:
 
 ```json
 "dependencies": {
-	"webpack": "4.29.0"
+	"@wordpress/scripts": "3.1.0"
 }
 ```
 
 ## Webpack & Babel
 
-Next, we will configure webpack to process the `block.js` file and run babel to transform the JSX within it.
+The @wordpress/scripts package handles the default configuration for Webpack and Babel. You need to add the following packages
 
-Create the file `webpack.config.js`
-
-```js
-// sets mode webpack runs under
-const NODE_ENV = process.env.NODE_ENV || 'development';
-
-module.exports = {
-	mode: NODE_ENV,
-
-	// entry is the source script
-	entry: './block.js',
-
-	// output is where to write the built file
-	output: {
-		path: __dirname,
-		filename: 'block.build.js',
-	},
-	module: {
-		// the list of rules used to process files
-		// this looks for .js files, exclude files
-		// in node_modules directory, and uses the
-		// babel-loader to process
-		rules: [
-			{
-				test: /.js$/,
-				exclude: /node_modules/,
-				loader: 'babel-loader',
-			},
-		],
-	},
-};
+```
+npm install --save-dev webpack webpack-cli @wordpress/babel-preset-default babel-plugin-transform-react-jsx
 ```
 
-Next, you need to install babel, the webpack loader, and the JSX plugin using:
-
-`npm install --save-dev --save-exact babel-loader @babel/core @babel/plugin-transform-react-jsx`
-
-You configure babel by creating a `.babelrc` file:
-
-```json
-{
-	"plugins": [
-		[ "@babel/plugin-transform-react-jsx", {
-			"pragma": "wp.element.createElement"
-		} ]
-	]
-}
-```
-
-This pragma setting instructs Babel that any JSX syntax such as `<Hello />` should be transformed into `wp.element.createElement( Hello )`. The name of the setting (`transform-react-jsx`) is derived from the fact that it overrides the default assumption to transform to `React.createElement( Hello )`.
-
-With both configs in place, you can now run webpack.
-
-First you need a basic block.js to build. Create `block.js` with the following content:
+The scripts package expects the source file to compile to be found at `src/index.js` and will output to `build/index.js`. So create a basic block to build. Create a file at `src/index.js` with the following content:
 
 ```js
 const { registerBlockType } = wp.blocks;
@@ -169,71 +120,47 @@ To configure npm to run a script, you use the scripts section in `package.json` 
 
 ```json
   "scripts": {
-    "build": "webpack"
+    "build": "wp-scripts build"
   },
 ```
 
 You can then run the build using: `npm run build`.
 
-After the build finishes, you will see the built file created at `block.build.js`.
+After the build finishes, you will see the built file created at `build/index.js`.
 
 ## Finishing Touches
 
 ### Development Mode
 
-The basics are in place to build. You might have noticed the webpack.config.js sets a default mode of "development". Webpack can also run in a "production" mode, which shrinks the code down so it downloads faster, but makes it difficult to read.
+The **build** command in @wordpress/scripts runs in a production mode which shrinks the code down so it downloads faster, but makes it difficult to read. You can use the **start** command which runs a development mode that does not shrink the code, and additionally continues a running process to watch the source file for more changes and rebuilt as you develop.
 
-The mode is setup so it can be configured using environment variables, which can be added in the scripts section of `package.json`.
+The start command can be added to the same scripts section of `package.json`.
 
 ```json
   "scripts": {
-    "dev": "webpack --watch",
-    "build": "cross-env NODE_ENV=production webpack"
+    "start": "wp-scripts start",
+    "build": "wp-scripts build"
   },
 ```
 
-This sets the environment variables, but different environments handle these settings in different ways. Using the `cross-env` helper module can help to handle this. Be sure to install the `cross-env` package using `npm install --save-dev --save-exact cross-env`.
-
-Additionally, webpack has a `--watch` flag that will keep the process running, watching for any changes to the `block.js` file and re-building as changes occur. This is useful during development, when you might have a lot of changes in progress.
-
-You can start the watcher by running `npm run dev` in a terminal. You can then edit away in your text editor; after each save, webpack will automatically build. You can then use the familiar edit/save/reload development process.
+Now, when you run `npm run start` a watcher will run in the terminal. You can then edit away in your text editor; after each save, it will automatically build. You can then use the familiar edit/save/reload development process.
 
 **Note:** keep an eye on your terminal for any errors. If you make a typo or syntax error, the build will fail and the error will be in the terminal.
 
-### Babel Browser Targeting
-
-Babel has the ability to build JavaScript using rules that target certain browsers and versions. By setting a reasonable set of modern browsers, Babel can optimize the JavaScript it generates.
-
-WordPress has a preset default you can use to target the minimum supported browsers by WordPress.
-
-Install the module using: `npm install --save-dev --save-exact @wordpress/babel-preset-default`
-
-You then update `.babelrc` by adding a "presets" section:
-
-```
-{
-	"presets": [ "@wordpress/babel-preset-default" ],
-	"plugins": [
-		[ "@babel/plugin-transform-react-jsx", {
-			"pragma": "wp.element.createElement"
-		} ]
-	]
-}
-```
 
 ### Source Control
 
 Because a typical `node_modules` folder will contain thousands of files that change with every software update, you should exclude `node_modules/` from your source control. If you ever start from a fresh clone, simply run `npm install` in the same folder your `package.json` is located to pull your required packages.
 
-Likewise, you do not need to include `node_modules` or any of the above configuration files in your plugin because they will be bundled inside the file that webpack builds. **Be sure to enqueue the `block.build.js` file** in your plugin PHP. This is the only JavaScript file needed for your block to run.
+Likewise, you do not need to include `node_modules` or any of the above configuration files in your plugin because they will be bundled inside the file that webpack builds. **Be sure to enqueue the `build/index.js` file** in your plugin PHP. This is the only JavaScript file needed for your block to run.
 
 ## Summary
 
-Yes, the initial setup is rather tedious, and there are a number of different tools and configs to learn. However, as the quick start alluded to, copying an existing config is the typical way most people start.
+Yes, the initial setup is a bit more involved, but once in place adds additional features which are usually worth the trade off.
 
 With a setup in place, the standard workflow is:
 
 - Install dependencies: `npm install`
-- Start development builds: `npm run dev`
+- Start development builds: `npm run start`
 - Develop. Test. Repeat.
 - Create production build: `npm run build`
