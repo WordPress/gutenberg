@@ -1,19 +1,17 @@
 module.exports = function( api ) {
 	let wpBuildOpts = {};
-	const isWPBuild = ( name ) => {
-		const result = [ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
-			( buildName ) => name === buildName
-		);
-		return result;
-	};
+	const isWPBuild = ( name ) => [ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
+		( buildName ) => name === buildName
+	);
 
 	const isTestEnv = api.env() === 'test';
 
 	api.caller( ( caller ) => {
 		if ( caller && isWPBuild( caller.name ) ) {
 			wpBuildOpts = { ...caller };
+			return caller.name;
 		}
-		return caller.name;
+		return undefined;
 	} );
 
 	const getPresetEnv = () => {
