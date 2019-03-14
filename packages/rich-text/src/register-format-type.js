@@ -26,11 +26,15 @@ const EMPTY_ARRAY = [];
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
- * @param {string} name     Format name.
- * @param {Object} settings Format settings.
+ * @param {string}   name                 Format name.
+ * @param {Object}   settings             Format settings.
+ * @param {string}   settings.tagName     The HTML tag this format will wrap the selection with.
+ * @param {string}   [settings.className] A class to match the format.
+ * @param {string}   settings.title       Name of the format.
+ * @param {Function} settings.edit        Should return a component for the user to interact with the new registered format.
  *
- * @return {?WPFormat} The format, if it has been successfully registered;
- *                     otherwise `undefined`.
+ * @return {WPFormat|undefined} The format, if it has been successfully registered;
+ *                              otherwise `undefined`.
  */
 export function registerFormatType( name, settings ) {
 	settings = {
@@ -139,7 +143,7 @@ export function registerFormatType( name, settings ) {
 	} );
 
 	if (
-		settings.__experimentalGetPropsForEditableTreePreparation
+		settings.__experimentalCreatePrepareEditableTree
 	) {
 		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
 			let Component = OriginalComponent;
@@ -193,8 +197,10 @@ export function registerFormatType( name, settings ) {
 				};
 			}
 
-			const hocs = [
-				withSelect( ( sel, { clientId, identifier } ) => ( {
+			const hocs = [];
+
+			if ( settings.__experimentalGetPropsForEditableTreePreparation ) {
+				hocs.push( withSelect( ( sel, { clientId, identifier } ) => ( {
 					[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation(
 						sel,
 						{
@@ -202,8 +208,8 @@ export function registerFormatType( name, settings ) {
 							blockClientId: clientId,
 						}
 					),
-				} ) ),
-			];
+				} ) ) );
+			}
 
 			if ( settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
 				hocs.push( withDispatch( ( disp, { clientId, identifier } ) => {

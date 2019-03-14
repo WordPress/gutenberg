@@ -15,7 +15,7 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	InspectorControls,
 	InnerBlocks,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
 /**
  * Allowed blocks constant is passed to InnerBlocks precisely as specified here.

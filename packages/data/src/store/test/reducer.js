@@ -93,4 +93,53 @@ describe( 'reducer', () => {
 		expect( state.test.getFoo.get( [ 'post' ] ) ).toBe( false );
 		expect( state.test.getFoo.get( [ 'block' ] ) ).toBe( true );
 	} );
+
+	it( 'should remove invalidation for store level and leave others ' +
+		'intact', () => {
+		const original = reducer( undefined, {
+			type: 'FINISH_RESOLUTION',
+			reducerKey: 'testA',
+			selectorName: 'getFoo',
+			args: [ 'post' ],
+		} );
+		let state = reducer( deepFreeze( original ), {
+			type: 'FINISH_RESOLUTION',
+			reducerKey: 'testB',
+			selectorName: 'getBar',
+			args: [ 'postBar' ],
+		} );
+		state = reducer( deepFreeze( state ), {
+			type: 'INVALIDATE_RESOLUTION_FOR_STORE',
+			reducerKey: 'testA',
+		} );
+
+		expect( state.testA ).toBeUndefined();
+		// { testB: { getBar: EquivalentKeyMap( [] => false ) } }
+		expect( state.testB.getBar.get( [ 'postBar' ] ) ).toBe( false );
+	} );
+
+	it( 'should remove invalidation for store and selector name level and ' +
+		'leave other selectors at store level intact', () => {
+		const original = reducer( undefined, {
+			type: 'FINISH_RESOLUTION',
+			reducerKey: 'test',
+			selectorName: 'getFoo',
+			args: [ 'post' ],
+		} );
+		let state = reducer( deepFreeze( original ), {
+			type: 'FINISH_RESOLUTION',
+			reducerKey: 'test',
+			selectorName: 'getBar',
+			args: [ 'postBar' ],
+		} );
+		state = reducer( deepFreeze( state ), {
+			type: 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR',
+			reducerKey: 'test',
+			selectorName: 'getBar',
+		} );
+
+		expect( state.test.getBar ).toBeUndefined();
+		// { test: { getFoo: EquivalentKeyMap( [] => false ) } }
+		expect( state.test.getFoo.get( [ 'post' ] ) ).toBe( false );
+	} );
 } );

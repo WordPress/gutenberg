@@ -117,6 +117,13 @@ function replaceInHtmlTags( haystack, replacePairs ) {
  * @param  {string}    text The text which has to be formatted.
  * @param  {boolean}   br   Optional. If set, will convert all remaining line-
  *                          breaks after paragraphing. Default true.
+ *
+ * @example
+ *```js
+ * import { autop } from '@wordpress/autop';
+ * autop( 'my text' ); // "<p>my text</p>"
+ * ```
+ *
  * @return {string}         Text which has been converted into paragraph tags.
  */
 export function autop( text, br = true ) {
@@ -284,6 +291,13 @@ export function autop( text, br = true ) {
  * Unifies whitespace. Indents `<li>`, `<dt>` and `<dd>` for better readability.
  *
  * @param  {string} html The content from the editor.
+ *
+ * @example
+ * ```js
+ * import { removep } from '@wordpress/autop';
+ * removep( '<p>my text</p>' ); // "my text"
+ * ```
+ *
  * @return {string}      The content with stripped paragraph tags.
  */
 export function removep( html ) {

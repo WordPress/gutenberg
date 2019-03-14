@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flowRight } from 'lodash';
+import { flowRight, omit, has } from 'lodash';
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
@@ -10,7 +10,8 @@ import EquivalentKeyMap from 'equivalent-key-map';
 import { onSubKey } from './utils';
 
 /**
- * Reducer function returning next state for selector resolution, object form:
+ * Reducer function returning next state for selector resolution of
+ * subkeys, object form:
  *
  *  reducerKey -> selectorName -> EquivalentKeyMap<Array,boolean>
  *
@@ -19,7 +20,7 @@ import { onSubKey } from './utils';
  *
  * @returns {Object} Next state.
  */
-const isResolved = flowRight( [
+const subKeysIsResolved = flowRight( [
 	onSubKey( 'reducerKey' ),
 	onSubKey( 'selectorName' ),
 ] )( ( state = new EquivalentKeyMap(), action ) => {
@@ -37,8 +38,41 @@ const isResolved = flowRight( [
 			return nextState;
 		}
 	}
-
 	return state;
 } );
+
+/**
+ * Reducer function returning next state for selector resolution, object form:
+ *
+ *   reducerKey -> selectorName -> EquivalentKeyMap<Array, boolean>
+ *
+ * @param {Object} state   Current state.
+ * @param {Object} action  Dispatched action.
+ *
+ * @return {Object} Next state.
+ */
+const isResolved = ( state = {}, action ) => {
+	switch ( action.type ) {
+		case 'INVALIDATE_RESOLUTION_FOR_STORE':
+			return has( state, action.reducerKey ) ?
+				omit( state, [ action.reducerKey ] ) :
+				state;
+		case 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR':
+			return has( state, [ action.reducerKey, action.selectorName ] ) ?
+				{
+					...state,
+					[ action.reducerKey ]: omit(
+						state[ action.reducerKey ],
+						[ action.selectorName ]
+					),
+				} :
+				state;
+		case 'START_RESOLUTION':
+		case 'FINISH_RESOLUTION':
+		case 'INVALIDATE_RESOLUTION':
+			return subKeysIsResolved( state, action );
+	}
+	return state;
+};
 
 export default isResolved;

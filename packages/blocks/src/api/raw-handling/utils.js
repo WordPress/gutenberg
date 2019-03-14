@@ -185,11 +185,17 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
 		) {
 			if ( node.nodeType === ELEMENT_NODE ) {
-				const { attributes = [], classes = [], children, require = [] } = schema[ tag ];
+				const {
+					attributes = [],
+					classes = [],
+					children,
+					require = [],
+					allowEmpty,
+				} = schema[ tag ];
 
 				// If the node is empty and it's supposed to have children,
 				// remove the node.
-				if ( isEmpty( node ) && children ) {
+				if ( children && ! allowEmpty && isEmpty( node ) ) {
 					remove( node );
 					return;
 				}

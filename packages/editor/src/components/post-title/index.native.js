@@ -7,7 +7,7 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
@@ -98,11 +98,14 @@ class PostTitle extends Component {
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
 	const {
-		insertDefaultBlock,
-		clearSelectedBlock,
 		undo,
 		redo,
 	} = dispatch( 'core/editor' );
+
+	const {
+		insertDefaultBlock,
+		clearSelectedBlock,
+	} = dispatch( 'core/block-editor' );
 
 	return {
 		onEnterPress() {

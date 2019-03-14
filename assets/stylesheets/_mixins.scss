@@ -195,8 +195,8 @@
 
 @mixin square-style__focus() {
 	color: $dark-gray-900;
-	outline: 1px solid $dark-gray-300;
-	box-shadow: none;
+	outline-offset: -1px;
+	outline: 1px dotted $dark-gray-500;
 }
 
 // Menu items.
