@@ -33,7 +33,6 @@ function BlockManagerCategory( {
 	);
 
 	const titleId = 'edit-post-manage-blocks-modal__category-title-' + instanceId;
-	const toggleId = 'edit-post-manage-blocks-modal__category-toggle-' + instanceId;
 
 	const isAllChecked = checkedBlockNames.length === blockTypes.length;
 
@@ -53,7 +52,6 @@ function BlockManagerCategory( {
 			className="edit-post-manage-blocks-modal__category"
 		>
 			<CheckboxControl
-				id={ toggleId }
 				checked={ isAllChecked }
 				onChange={ toggleAllVisible }
 				className="edit-post-manage-blocks-modal__category-title"
