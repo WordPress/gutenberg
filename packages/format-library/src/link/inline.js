@@ -25,7 +25,7 @@ import {
 	getTextContent,
 	slice,
 } from '@wordpress/rich-text';
-import { URLInput, URLPopover } from '@wordpress/editor';
+import { URLInput, URLPopover } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

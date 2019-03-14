@@ -64,7 +64,7 @@ export default compose( [
 			dispatch( 'core/edit-post' ).switchEditorMode( mode );
 		},
 		openSidebar() {
-			const { getBlockSelectionStart } = select( 'core/editor' );
+			const { getBlockSelectionStart } = select( 'core/block-editor' );
 			const sidebarToOpen = getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document';
 			dispatch( 'core/edit-post' ).openGeneralSidebar( sidebarToOpen );
 		},

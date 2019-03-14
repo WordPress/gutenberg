@@ -19,7 +19,7 @@ import { getActiveFormats } from './get-active-formats';
  * @param {Object} value      Value to inspect.
  * @param {string} formatType Format type to look for.
  *
- * @return {?Object} Active format object of the specified type, or undefined.
+ * @return {Object|undefined} Active format object of the specified type, or undefined.
  */
 export function getActiveFormat( value, formatType ) {
 	return find( getActiveFormats( value ), { type: formatType } );

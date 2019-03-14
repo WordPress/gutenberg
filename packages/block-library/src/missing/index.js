@@ -6,7 +6,7 @@ import { RawHTML, Fragment } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { getBlockType, createBlock } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
-import { Warning } from '@wordpress/editor';
+import { Warning } from '@wordpress/block-editor';
 
 function MissingBlockWarning( { attributes, convertToHTML } ) {
 	const { originalName, originalUndelimitedContent } = attributes;
@@ -43,7 +43,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 }
 
 const edit = withDispatch( ( dispatch, { clientId, attributes } ) => {
-	const { replaceBlock } = dispatch( 'core/editor' );
+	const { replaceBlock } = dispatch( 'core/block-editor' );
 	return {
 		convertToHTML() {
 			replaceBlock( clientId, createBlock( 'core/html', {

@@ -9,7 +9,7 @@ import {
 	RichText,
 	BlockControls,
 	AlignmentToolbar,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { SVG, Path } from '@wordpress/components';
 
 export const name = 'core/subhead';

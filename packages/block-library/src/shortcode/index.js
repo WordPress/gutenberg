@@ -5,7 +5,7 @@ import { removep, autop } from '@wordpress/autop';
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Dashicon, SVG, Path } from '@wordpress/components';
-import { PlainText } from '@wordpress/editor';
+import { PlainText } from '@wordpress/block-editor';
 import { withInstanceId } from '@wordpress/compose';
 
 export const name = 'core/shortcode';

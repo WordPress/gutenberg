@@ -15,7 +15,7 @@ import {
 	getColorClassName,
 	getFontSizeClass,
 	RichText,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import {
 	Path,
@@ -212,7 +212,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: attributes.content + attributesToMerge.content,
+			content: ( attributes.content || '' ) + ( attributesToMerge.content || '' ),
 		};
 	},
 

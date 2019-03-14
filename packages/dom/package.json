@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dom",
-	"version": "2.0.8",
+	"version": "2.1.0",
 	"description": "DOM utilities module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -12,7 +12,8 @@
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/dom/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git"
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/dom"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
