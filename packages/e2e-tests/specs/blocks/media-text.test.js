@@ -16,7 +16,7 @@ describe( 'Media Text', () => {
 
 	it( 'restricts blocks that can be inserted', async () => {
 		await insertBlock( 'Media & Text' );
-		await page.click( '.wp-block-media-text .editor-rich-text' );
+		await page.click( '.wp-block-media-text .block-editor-rich-text' );
 		await openGlobalBlockInserter();
 		await openAllBlockInserterCategories();
 		expect( await getAllBlockInserterItemTitles() ).toMatchSnapshot();

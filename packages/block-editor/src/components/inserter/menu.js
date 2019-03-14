@@ -266,24 +266,24 @@ export class InserterMenu extends Component {
 		/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 		return (
 			<div
-				className="editor-inserter__menu"
+				className="editor-inserter__menu block-editor-inserter__menu"
 				onKeyPress={ stopKeyPropagation }
 				onKeyDown={ this.onKeyDown }
 			>
-				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
+				<label htmlFor={ `block-editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search for a block' ) }
 				</label>
 				<input
-					id={ `editor-inserter__search-${ instanceId }` }
+					id={ `block-editor-inserter__search-${ instanceId }` }
 					type="search"
 					placeholder={ __( 'Search for a block' ) }
-					className="editor-inserter__search"
+					className="editor-inserter__search block-editor-inserter__search"
 					autoFocus
 					onChange={ this.onChangeSearchInput }
 				/>
 
 				<div
-					className="editor-inserter__results"
+					className="editor-inserter__results block-editor-inserter__results"
 					ref={ this.inserterResults }
 					tabIndex="0"
 					role="region"
@@ -329,7 +329,7 @@ export class InserterMenu extends Component {
 
 					{ !! reusableItems.length && (
 						<PanelBody
-							className="editor-inserter__reusable-blocks-panel"
+							className="editor-inserter__reusable-blocks-panel block-editor-inserter__reusable-blocks-panel"
 							title={ __( 'Reusable' ) }
 							opened={ isPanelOpen( 'reusable' ) }
 							onToggle={ this.onTogglePanel( 'reusable' ) }
@@ -338,7 +338,7 @@ export class InserterMenu extends Component {
 						>
 							<BlockTypesList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
 							<a
-								className="editor-inserter__manage-reusable-blocks"
+								className="editor-inserter__manage-reusable-blocks block-editor-inserter__manage-reusable-blocks"
 								href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 							>
 								{ __( 'Manage All Reusable Blocks' ) }
@@ -346,7 +346,7 @@ export class InserterMenu extends Component {
 						</PanelBody>
 					) }
 					{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
-						<p className="editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+						<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
 					) }
 				</div>
 

@@ -16,7 +16,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 	it( 'should switch between visual and HTML modes', async () => {
 		// This block should be in "visual" mode by default.
-		let visualBlock = await page.$$( '.editor-block-list__layout .editor-block-list__block .editor-rich-text' );
+		let visualBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
 
 		// Move the mouse to show the block toolbar
@@ -29,7 +29,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await changeModeButton.click();
 
 		// Wait for the block to be converted to HTML editing mode.
-		const htmlBlock = await page.$$( '.editor-block-list__layout .editor-block-list__block .editor-block-list__block-html-textarea' );
+		const htmlBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea' );
 		expect( htmlBlock ).toHaveLength( 1 );
 
 		// Move the mouse to show the block toolbar
@@ -42,7 +42,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await changeModeButton.click();
 
 		// This block should be in "visual" mode by default.
-		visualBlock = await page.$$( '.editor-block-list__layout .editor-block-list__block .editor-rich-text' );
+		visualBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
 	} );
 
@@ -73,7 +73,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await changeModeButton.click();
 
 		// Make sure the paragraph content is rendered as expected.
-		let htmlBlockContent = await page.$eval( '.editor-block-list__layout .editor-block-list__block .editor-block-list__block-html-textarea', ( node ) => node.textContent );
+		let htmlBlockContent = await page.$eval( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea', ( node ) => node.textContent );
 		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
 
 		// Change the font size using the sidebar.
@@ -82,14 +82,14 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await changeSizeButton.click();
 
 		// Make sure the HTML content updated.
-		htmlBlockContent = await page.$eval( '.editor-block-list__layout .editor-block-list__block .editor-block-list__block-html-textarea', ( node ) => node.textContent );
+		htmlBlockContent = await page.$eval( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea', ( node ) => node.textContent );
 		expect( htmlBlockContent ).toEqual( '<p class="has-large-font-size">Hello world!</p>' );
 	} );
 
 	it( 'the code editor should unselect blocks and disable the inserter', async () => {
 		// The paragraph block should be selected
 		const title = await page.$eval(
-			'.editor-block-inspector__card-title',
+			'.block-editor-block-inspector__card-title',
 			( element ) => element.innerText
 		);
 		expect( title ).toBe( 'Paragraph' );
@@ -107,11 +107,11 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// No block is selected
 		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
-		const noBlocksElement = await page.$( '.editor-block-inspector__no-blocks' );
+		const noBlocksElement = await page.$( '.block-editor-block-inspector__no-blocks' );
 		expect( noBlocksElement ).not.toBeNull();
 
 		// The inserter is disabled
-		const disabledInserter = await page.$( '.editor-inserter > button:disabled' );
+		const disabledInserter = await page.$( '.block-editor-inserter > button:disabled' );
 		expect( disabledInserter ).not.toBeNull();
 	} );
 } );

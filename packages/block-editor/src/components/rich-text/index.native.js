@@ -518,7 +518,7 @@ export class RichText extends Component {
 					} }
 					text={ { text: html, eventCount: this.lastEventCount } }
 					placeholder={ this.props.placeholder }
-					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'editor-rich-text' ].textDecorationColor }
+					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].textDecorationColor }
 					onChange={ this.onChange }
 					onFocus={ this.props.onFocus }
 					onBlur={ this.props.onBlur }
@@ -534,7 +534,7 @@ export class RichText extends Component {
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
-					fontFamily={ this.props.fontFamily || styles[ 'editor-rich-text' ].fontFamily }
+					fontFamily={ this.props.fontFamily || styles[ 'block-editor-rich-text' ].fontFamily }
 					fontSize={ this.props.fontSize }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }

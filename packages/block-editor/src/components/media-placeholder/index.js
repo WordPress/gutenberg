@@ -30,11 +30,11 @@ import URLPopover from '../url-popover';
 const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 	<URLPopover onClose={ onClose }>
 		<form
-			className="editor-media-placeholder__url-input-form"
+			className="editor-media-placeholder__url-input-form block-editor-media-placeholder__url-input-form"
 			onSubmit={ onSubmit }
 		>
 			<input
-				className="editor-media-placeholder__url-input-field"
+				className="editor-media-placeholder__url-input-field block-editor-media-placeholder__url-input-field"
 				type="url"
 				aria-label={ __( 'URL' ) }
 				placeholder={ __( 'Paste or type URL' ) }
@@ -42,7 +42,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 				value={ src }
 			/>
 			<IconButton
-				className="editor-media-placeholder__url-input-submit-button"
+				className="editor-media-placeholder__url-input-submit-button block-editor-media-placeholder__url-input-submit-button"
 				icon="editor-break"
 				label={ __( 'Apply' ) }
 				type="submit"
@@ -198,7 +198,7 @@ export class MediaPlaceholder extends Component {
 				icon={ icon }
 				label={ title }
 				instructions={ instructions }
-				className={ classnames( 'editor-media-placeholder', className ) }
+				className={ classnames( 'editor-media-placeholder block-editor-media-placeholder', className ) }
 				notices={ notices }
 			>
 				<MediaUploadCheck>
@@ -210,7 +210,7 @@ export class MediaPlaceholder extends Component {
 							/>
 							<FormFileUpload
 								isLarge
-								className="editor-media-placeholder__button"
+								className="editor-media-placeholder__button block-editor-media-placeholder__button"
 								onChange={ this.onUpload }
 								accept={ accept }
 								multiple={ multiple }
@@ -228,7 +228,7 @@ export class MediaPlaceholder extends Component {
 						render={ ( { open } ) => (
 							<Button
 								isLarge
-								className="editor-media-placeholder__button"
+								className="editor-media-placeholder__button block-editor-media-placeholder__button"
 								onClick={ open }
 							>
 								{ __( 'Media Library' ) }
@@ -237,9 +237,9 @@ export class MediaPlaceholder extends Component {
 					/>
 				</MediaUploadCheck>
 				{ onSelectURL && (
-					<div className="editor-media-placeholder__url-input-container">
+					<div className="editor-media-placeholder__url-input-container block-editor-media-placeholder__url-input-container">
 						<Button
-							className="editor-media-placeholder__button"
+							className="editor-media-placeholder__button block-editor-media-placeholder__button"
 							onClick={ this.openURLInput }
 							isToggled={ isURLInputVisible }
 							isLarge

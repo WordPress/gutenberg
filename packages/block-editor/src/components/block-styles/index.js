@@ -98,14 +98,14 @@ function BlockStyles( {
 	}
 
 	return (
-		<div className="editor-block-styles">
+		<div className="editor-block-styles block-editor-block-styles">
 			{ styles.map( ( style ) => {
 				const styleClassName = replaceActiveStyle( className, activeStyle, style );
 				return (
 					<div
 						key={ style.name }
 						className={ classnames(
-							'editor-block-styles__item', {
+							'editor-block-styles__item block-editor-block-styles__item', {
 								'is-active': activeStyle === style,
 							}
 						) }
@@ -122,7 +122,7 @@ function BlockStyles( {
 						tabIndex="0"
 						aria-label={ style.label || style.name }
 					>
-						<div className="editor-block-styles__item-preview">
+						<div className="editor-block-styles__item-preview block-editor-block-styles__item-preview">
 							<BlockPreviewContent
 								name={ name }
 								attributes={ {
@@ -131,7 +131,7 @@ function BlockStyles( {
 								} }
 							/>
 						</div>
-						<div className="editor-block-styles__item-label">
+						<div className="editor-block-styles__item-label block-editor-block-styles__item-label">
 							{ style.label || style.name }
 						</div>
 					</div>

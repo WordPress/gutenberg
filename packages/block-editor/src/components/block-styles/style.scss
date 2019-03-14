@@ -1,10 +1,10 @@
-.editor-block-styles {
+.block-editor-block-styles {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
 }
 
-.editor-block-styles__item {
+.block-editor-block-styles__item {
 	width: calc(50% - #{ $grid-size-small });
 	margin: $grid-size-small 0;
 	flex-shrink: 0;
@@ -27,7 +27,7 @@
 	}
 }
 
-.editor-block-styles__item-preview {
+.block-editor-block-styles__item-preview {
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
 	border: 1px solid rgba($dark-gray-900, 0.2);
 	overflow: hidden;
@@ -39,7 +39,7 @@
 	background: $white;
 
 	// Actual preview contents.
-	.editor-block-preview__content {
+	.block-editor-block-preview__content {
 		transform: scale(0.7);
 		transform-origin: center center;
 		width: 100%;
@@ -52,7 +52,7 @@
 	}
 }
 
-.editor-block-styles__item-label {
+.block-editor-block-styles__item-label {
 	text-align: center;
 	padding: 4px 2px;
 }

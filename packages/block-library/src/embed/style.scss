@@ -1,6 +1,6 @@
 // Apply max-width to floated items that have no intrinsic width
-.editor-block-list__block[data-type="core/embed"][data-align="left"] .editor-block-list__block-edit,
-.editor-block-list__block[data-type="core/embed"][data-align="right"] .editor-block-list__block-edit,
+.block-editor-block-list__block[data-type="core/embed"][data-align="left"] .block-editor-block-list__block-edit,
+.block-editor-block-list__block[data-type="core/embed"][data-align="right"] .block-editor-block-list__block-edit,
 .wp-block-embed.alignleft,
 .wp-block-embed.alignright {
 	// Instagram widgets have a min-width of 326px, so go a bit beyond that.

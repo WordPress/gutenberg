@@ -13,7 +13,7 @@ import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
 
 const FormatToolbar = ( { controls } ) => {
 	return (
-		<div className="editor-format-toolbar">
+		<div className="editor-format-toolbar block-editor-format-toolbar">
 			<Toolbar>
 				{ controls.map( ( format ) =>
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
