@@ -6,7 +6,6 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -28,6 +27,7 @@ import {
 	EnablePanelOption,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
+import MoreMenuModal from '../header/more-menu/modal';
 
 const MODAL_NAME = 'edit-post/options';
 
@@ -37,7 +37,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 	}
 
 	return (
-		<Modal
+		<MoreMenuModal
 			className="edit-post-options-modal"
 			title={ __( 'Options' ) }
 			closeLabel={ __( 'Close' ) }
@@ -73,7 +73,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 				</PageAttributesCheck>
 			</Section>
 			<MetaBoxesSection title={ __( 'Advanced Panels' ) } />
-		</Modal>
+		</MoreMenuModal>
 	);
 }
 

@@ -7,7 +7,7 @@ import { castArray } from 'lodash';
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
-import { Modal, KeyboardShortcuts } from '@wordpress/components';
+import { KeyboardShortcuts } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { rawShortcut } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -17,6 +17,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import shortcutConfig from './config';
+import MoreMenuModal from '../header/more-menu/modal';
 
 const MODAL_NAME = 'edit-post/keyboard-shortcut-help';
 
@@ -78,7 +79,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 				} }
 			/>
 			{ isModalActive && (
-				<Modal
+				<MoreMenuModal
 					className="edit-post-keyboard-shortcut-help"
 					title={ __( 'Keyboard Shortcuts' ) }
 					closeLabel={ __( 'Close' ) }
@@ -87,7 +88,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 					{ shortcutConfig.map( ( config, index ) => (
 						<ShortcutSection key={ index } { ...config } />
 					) ) }
-				</Modal>
+				</MoreMenuModal>
 			) }
 		</Fragment>
 	);
