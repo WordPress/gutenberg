@@ -64,6 +64,8 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     private static final String TAG = "ReactAztecText";
 
+    private static final String BLOCK_TYPE_TAG_KEY = "tag";
+
     public ReactAztecManager() {
         initializeFocusAndBlurCommandCodes();
     }
@@ -305,8 +307,8 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     @ReactProp(name = "blockType")
     public void setBlockType(ReactAztecText view, ReadableMap inputMap) {
-        if (inputMap.hasKey("tag")) {
-            view.setTagName(inputMap.getString("tag"));
+        if (inputMap.hasKey(BLOCK_TYPE_TAG_KEY)) {
+            view.setTagName(inputMap.getString(BLOCK_TYPE_TAG_KEY));
         }
     }
 
