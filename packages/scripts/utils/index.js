@@ -8,6 +8,7 @@ const {
 	spawnScript,
 } = require( './cli' );
 const {
+	getWebpackArgs,
 	hasBabelConfig,
 	hasJestConfig,
 } = require( './config' );
@@ -18,11 +19,16 @@ const {
 const {
 	hasPackageProp,
 } = require( './package' );
+const {
+	camelCaseDash,
+} = require( './string' );
 
 module.exports = {
+	camelCaseDash,
 	fromConfigRoot,
 	getCliArg,
 	getCliArgs,
+	getWebpackArgs,
 	hasBabelConfig,
 	hasCliArg,
 	hasJestConfig,

@@ -1,8 +1,10 @@
-## 4.3.0 (Unreleased)
+## 4.3.0 (2019-03-06)
 
 ### Enhancements
 
 - The `registerStore` function now accepts an optional `initialState` option value.
+- Introduce new `invalidateResolutionForStore` dispatch action for signalling to invalidate the resolution cache for an entire given store.
+- Introduce new `invalidateResolutionForStoreSelector` dispatch action for signalling to invalidate the resolution cache for a store selector (and all variations of arguments on that selector).
 
 ### Bug Fix
 

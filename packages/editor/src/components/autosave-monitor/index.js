@@ -62,12 +62,11 @@ export default compose( [
 		const {
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
-			getEditorSettings,
 			getReferenceByDistinctEdits,
 			isAutosavingPost,
 		} = select( 'core/editor' );
 
-		const { autosaveInterval } = getEditorSettings();
+		const { autosaveInterval } = select( 'core/editor' ).getEditorSettings();
 
 		return {
 			isDirty: isEditedPostDirty(),

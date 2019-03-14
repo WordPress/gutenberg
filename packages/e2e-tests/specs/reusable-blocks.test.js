@@ -4,6 +4,7 @@
 import {
 	insertBlock,
 	createNewPost,
+	clickBlockToolbarButton,
 	pressKeyWithModifier,
 	searchForBlock,
 	getEditedPostContent,
@@ -34,13 +35,8 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 
-		// Trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		await clickBlockToolbarButton( 'More options' );
 
-		// Convert block to a reusable block
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
@@ -81,13 +77,8 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 
-		// Trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		await clickBlockToolbarButton( 'More options' );
 
-		// Convert block to a reusable block
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
@@ -221,10 +212,6 @@ describe( 'Reusable Blocks', () => {
 		// Select all the blocks
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
-
-		// Trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
 
 		// Convert block to a reusable block
 		await page.waitForSelector( 'button[aria-label="More options"]' );

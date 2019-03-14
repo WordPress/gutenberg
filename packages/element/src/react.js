@@ -15,6 +15,9 @@ import {
 } from 'react';
 import { isString } from 'lodash';
 
+/**
+ * Object that provides utilities for dealing with React children.
+ */
 export { Children };
 
 /**
@@ -91,6 +94,9 @@ export { Fragment };
  */
 export { isValidElement };
 
+/**
+ * Component that activates additional checks and warnings for its descendants.
+ */
 export { StrictMode };
 
 /**
