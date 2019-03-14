@@ -41,7 +41,14 @@ const WrappedSidebar = compose(
 		isActive: select( 'core/edit-post' ).getActiveGeneralSidebarName() === name,
 	} ) ),
 	ifCondition( ( { isActive } ) => isActive ),
-	withFocusReturn,
+	withFocusReturn( {
+		onFocusLoss() {
+			const button = document.querySelector( '.edit-post-header__settings [aria-label="Settings"]' );
+			if ( button ) {
+				button.focus();
+			}
+		},
+	} ),
 )( Sidebar );
 
 WrappedSidebar.Slot = Slot;
