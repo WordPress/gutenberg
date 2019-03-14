@@ -49,7 +49,7 @@ class RCTAztecView: Aztec.TextView {
         return reactLayoutDirection == .rightToLeft
     }
 
-    private lazy var placeholderLabel: UILabel = {
+    private(set) lazy var placeholderLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .natural
