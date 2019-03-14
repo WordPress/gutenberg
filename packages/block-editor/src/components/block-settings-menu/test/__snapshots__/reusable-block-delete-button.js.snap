@@ -2,7 +2,7 @@
 
 exports[`ReusableBlockDeleteButton matches the snapshot 1`] = `
 <WithInstanceId(MenuItem)
-  className="editor-block-settings-menu__control"
+  className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
   disabled={false}
   icon="no"
   onClick={[Function]}

@@ -30,7 +30,7 @@ describe( 'block toolbar', () => {
 		) );
 
 		const isInBlockToolbar = () => page.evaluate( () => (
-			!! document.activeElement.closest( '.editor-block-toolbar' )
+			!! document.activeElement.closest( '.block-editor-block-toolbar' )
 		) );
 
 		describe( label, () => {

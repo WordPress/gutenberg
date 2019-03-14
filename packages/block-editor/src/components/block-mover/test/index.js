@@ -30,7 +30,7 @@ describe( 'BlockMover', () => {
 					firstIndex={ 0 }
 					instanceId={ 1 } />
 			);
-			expect( blockMover.hasClass( 'editor-block-mover' ) ).toBe( true );
+			expect( blockMover.hasClass( 'block-editor-block-mover' ) ).toBe( true );
 
 			const moveUp = blockMover.childAt( 0 );
 			const drag = blockMover.childAt( 1 );
@@ -41,24 +41,24 @@ describe( 'BlockMover', () => {
 			expect( drag.type().name ).toBe( 'IconDragHandle' );
 			expect( moveDown.name() ).toBe( 'ForwardRef(IconButton)' );
 			expect( moveUp.props() ).toMatchObject( {
-				className: 'editor-block-mover__control',
+				className: 'editor-block-mover__control block-editor-block-mover__control',
 				onClick: undefined,
 				label: 'Move up',
 				icon: upArrow,
 				'aria-disabled': undefined,
-				'aria-describedby': 'editor-block-mover__up-description-1',
+				'aria-describedby': 'block-editor-block-mover__up-description-1',
 			} );
 			expect( drag.props() ).toMatchObject( {
-				className: 'editor-block-mover__control',
+				className: 'editor-block-mover__control block-editor-block-mover__control',
 				icon: dragHandle,
 			} );
 			expect( moveDown.props() ).toMatchObject( {
-				className: 'editor-block-mover__control',
+				className: 'editor-block-mover__control block-editor-block-mover__control',
 				onClick: undefined,
 				label: 'Move down',
 				icon: downArrow,
 				'aria-disabled': undefined,
-				'aria-describedby': 'editor-block-mover__down-description-1',
+				'aria-describedby': 'block-editor-block-mover__down-description-1',
 			} );
 			expect( moveUpDesc.text() ).toBe( 'Move 2 blocks from position 1 up by one place' );
 			expect( moveDownDesc.text() ).toBe( 'Move 2 blocks from position 1 down by one place' );

@@ -12,7 +12,7 @@ export default function BlockConvertButton( { shouldRender, onClick, small } ) {
 	const label = __( 'Convert to Blocks' );
 	return (
 		<MenuItem
-			className="editor-block-settings-menu__control"
+			className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 			onClick={ onClick }
 			icon="screenoptions"
 			label={ small ? label : undefined }

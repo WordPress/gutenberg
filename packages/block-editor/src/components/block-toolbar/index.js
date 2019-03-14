@@ -20,7 +20,7 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 
 	if ( blockClientIds.length > 1 ) {
 		return (
-			<div className="editor-block-toolbar">
+			<div className="editor-block-toolbar block-editor-block-toolbar">
 				<MultiBlocksSwitcher />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
@@ -28,7 +28,7 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 	}
 
 	return (
-		<div className="editor-block-toolbar">
+		<div className="editor-block-toolbar block-editor-block-toolbar">
 			{ mode === 'visual' && isValid && (
 				<Fragment>
 					<BlockSwitcher clientIds={ blockClientIds } />

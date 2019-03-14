@@ -231,7 +231,7 @@ class URLInput extends Component {
 		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<div className={ classnames( 'editor-url-input', className ) }>
+			<div className={ classnames( 'editor-url-input block-editor-url-input', className ) }>
 				<input
 					autoFocus={ autoFocus }
 					type="text"
@@ -245,8 +245,8 @@ class URLInput extends Component {
 					role="combobox"
 					aria-expanded={ showSuggestions }
 					aria-autocomplete="list"
-					aria-owns={ `editor-url-input-suggestions-${ instanceId }` }
-					aria-activedescendant={ selectedSuggestion !== null ? `editor-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
+					aria-owns={ `block-editor-url-input-suggestions-${ instanceId }` }
+					aria-activedescendant={ selectedSuggestion !== null ? `block-editor-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
 					ref={ this.inputRef }
 				/>
 
@@ -255,7 +255,7 @@ class URLInput extends Component {
 				{ showSuggestions && !! posts.length &&
 					<Popover position="bottom" noArrow focusOnMount={ false }>
 						<div
-							className="editor-url-input__suggestions"
+							className="editor-url-input__suggestions block-editor-url-input__suggestions"
 							id={ `editor-url-input-suggestions-${ instanceId }` }
 							ref={ this.autocompleteRef }
 							role="listbox"
@@ -265,9 +265,9 @@ class URLInput extends Component {
 									key={ post.id }
 									role="option"
 									tabIndex="-1"
-									id={ `editor-url-input-suggestion-${ instanceId }-${ index }` }
+									id={ `block-editor-url-input-suggestion-${ instanceId }-${ index }` }
 									ref={ this.bindSuggestionNode( index ) }
-									className={ classnames( 'editor-url-input__suggestion', {
+									className={ classnames( 'editor-url-input__suggestion block-editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
 									onClick={ () => this.handleOnClick( post ) }

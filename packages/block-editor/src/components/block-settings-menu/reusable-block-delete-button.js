@@ -19,7 +19,7 @@ export function ReusableBlockDeleteButton( { isVisible, isDisabled, onDelete } )
 
 	return (
 		<MenuItem
-			className="editor-block-settings-menu__control"
+			className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 			icon="no"
 			disabled={ isDisabled }
 			onClick={ () => onDelete() }

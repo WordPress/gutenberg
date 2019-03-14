@@ -18,7 +18,7 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen } ) => (
 		label={ __( 'Add block' ) }
 		labelPosition="bottom"
 		onClick={ onToggle }
-		className="editor-inserter__toggle"
+		className="editor-inserter__toggle block-editor-inserter__toggle"
 		aria-haspopup="true"
 		aria-expanded={ isOpen }
 		disabled={ disabled }
@@ -87,8 +87,8 @@ class Inserter extends Component {
 
 		return (
 			<Dropdown
-				className="editor-inserter"
-				contentClassName="editor-inserter__popover"
+				className="editor-inserter block-editor-inserter"
+				contentClassName="editor-inserter__popover block-editor-inserter__popover"
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile

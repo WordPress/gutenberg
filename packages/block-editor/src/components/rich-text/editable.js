@@ -83,7 +83,7 @@ function applyInternetExplorerInputFix( editorNode ) {
 }
 
 const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
-const CLASS_NAME = 'editor-rich-text__editable';
+const CLASS_NAME = 'editor-rich-text__editable block-editor-rich-text__editable';
 
 /**
  * Whether or not the user agent is Internet Explorer.
