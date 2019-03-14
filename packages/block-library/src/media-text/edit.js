@@ -23,6 +23,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	ExternalLink,
+	FocalPointPicker,
 } from '@wordpress/components';
 /**
  * Internal dependencies
@@ -99,7 +100,7 @@ class MediaTextEdit extends Component {
 
 	renderMediaArea() {
 		const { attributes } = this.props;
-		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth } = attributes;
+		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth, imageFill, focalPoint } = attributes;
 
 		return (
 			<MediaContainer
@@ -107,7 +108,7 @@ class MediaTextEdit extends Component {
 				onSelectMedia={ this.onSelectMedia }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
-				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth } }
+				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint } }
 			/>
 		);
 	}
@@ -128,6 +129,9 @@ class MediaTextEdit extends Component {
 			mediaType,
 			mediaWidth,
 			verticalAlignment,
+			mediaUrl,
+			imageFill,
+			focalPoint,
 		} = attributes;
 		const temporaryMediaWidth = this.state.mediaWidth;
 		const classNames = classnames( className, {
@@ -136,6 +140,7 @@ class MediaTextEdit extends Component {
 			[ backgroundColor.class ]: backgroundColor.class,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+			'is-image-fill': imageFill,
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 		const style = {
@@ -173,6 +178,19 @@ class MediaTextEdit extends Component {
 						isStackedOnMobile: ! isStackedOnMobile,
 					} ) }
 				/>
+				{ mediaType === 'image' && ( <ToggleControl
+					label={ __( 'Let image fill the entire column' ) }
+					checked={ imageFill }
+					onChange={ () => setAttributes( {
+						imageFill: ! imageFill,
+					} ) }
+				/> ) }
+				{ imageFill && ( <FocalPointPicker
+					label={ __( 'Focal Point Picker' ) }
+					url={ mediaUrl }
+					value={ focalPoint }
+					onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
+				/> ) }
 				{ mediaType === 'image' && ( <TextareaControl
 					label={ __( 'Alt Text (Alternative Text)' ) }
 					value={ mediaAlt }

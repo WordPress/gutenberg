@@ -41,6 +41,17 @@
 	vertical-align: middle;
 }
 
+.wp-block-media-text figure > div {
+	width: 100%;
+	height: 100%;
+	min-height: 250px;
+	background-size: cover;
+}
+
+.wp-block-media-text.is-image-fill .wp-block-media-text__media {
+	height: 100%;
+}
+
 /*
 * Here we here not able to use a mobile first CSS approach.
 * Custom widths are set using inline styles, and on mobile,

@@ -19,8 +19,10 @@ import { __ } from '@wordpress/i18n';
  */
 import edit from './edit';
 import icon from './icon';
+import deprecated from './deprecated';
+import { imageFillStyles } from './media-container';
 
-const DEFAULT_MEDIA_WIDTH = 50;
+export const DEFAULT_MEDIA_WIDTH = 50;
 
 export const name = 'core/media-text';
 
@@ -51,9 +53,6 @@ const blockAttributes = {
 	},
 	mediaUrl: {
 		type: 'string',
-		source: 'attribute',
-		selector: 'figure video,figure img',
-		attribute: 'src',
 	},
 	mediaType: {
 		type: 'string',
@@ -68,6 +67,13 @@ const blockAttributes = {
 	},
 	verticalAlignment: {
 		type: 'string',
+	},
+	imageFill: {
+		type: 'boolean',
+		default: false,
+	},
+	focalPoint: {
+		type: 'object',
 	},
 };
 
@@ -160,9 +166,14 @@ export const settings = {
 			mediaWidth,
 			mediaId,
 			verticalAlignment,
+			imageFill,
+			focalPoint,
 		} = attributes;
+		const imageFillStyle = imageFillStyles( mediaUrl, focalPoint );
 		const mediaTypeRenders = {
-			image: () => <img src={ mediaUrl } alt={ mediaAlt } className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null } />,
+			image: () => imageFill ?
+				<div style={ imageFillStyle } ></div> :
+				<img src={ mediaUrl } alt={ mediaAlt } className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null } />,
 			video: () => <video controls src={ mediaUrl } />,
 		};
 		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
@@ -171,6 +182,7 @@ export const settings = {
 			[ backgroundClass ]: backgroundClass,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+			'is-image-fill': imageFill,
 		} );
 
 		let gridTemplateColumns;
@@ -193,50 +205,5 @@ export const settings = {
 		);
 	},
 
-	deprecated: [
-		{
-			attributes: blockAttributes,
-			save( { attributes } ) {
-				const {
-					backgroundColor,
-					customBackgroundColor,
-					isStackedOnMobile,
-					mediaAlt,
-					mediaPosition,
-					mediaType,
-					mediaUrl,
-					mediaWidth,
-				} = attributes;
-				const mediaTypeRenders = {
-					image: () => <img src={ mediaUrl } alt={ mediaAlt } />,
-					video: () => <video controls src={ mediaUrl } />,
-				};
-				const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-				const className = classnames( {
-					'has-media-on-the-right': 'right' === mediaPosition,
-					[ backgroundClass ]: backgroundClass,
-					'is-stacked-on-mobile': isStackedOnMobile,
-				} );
-
-				let gridTemplateColumns;
-				if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
-					gridTemplateColumns = 'right' === mediaPosition ? `auto ${ mediaWidth }%` : `${ mediaWidth }% auto`;
-				}
-				const style = {
-					backgroundColor: backgroundClass ? undefined : customBackgroundColor,
-					gridTemplateColumns,
-				};
-				return (
-					<div className={ className } style={ style }>
-						<figure className="wp-block-media-text__media" >
-							{ ( mediaTypeRenders[ mediaType ] || noop )() }
-						</figure>
-						<div className="wp-block-media-text__content">
-							<InnerBlocks.Content />
-						</div>
-					</div>
-				);
-			},
-		},
-	],
+	deprecated,
 };
