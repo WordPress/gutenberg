@@ -92,13 +92,7 @@ Also, if you look at package.json file it will include a new section:
 
 ## Webpack & Babel
 
-The `@wordpress/scripts` package handles the default configuration for Webpack and Babel. You need to add the following packages:
-
-```
-npm install --save-dev webpack webpack-cli @wordpress/babel-preset-default babel-plugin-transform-react-jsx
-```
-
-The scripts package expects the source file to compile to be found at `src/index.js`, and will save the compiled output to `build/index.js`.
+The `@wordpress/scripts` package handles the dependencies and default configuration for Webpack and Babel. The scripts package expects the source file to compile to be found at `src/index.js`, and will save the compiled output to `build/index.js`.
 
 With that in mind, let's set up a basic block. Create a file at `src/index.js` with the following content:
 
