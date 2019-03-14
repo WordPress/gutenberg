@@ -114,24 +114,19 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         present(alertController, animated: true, completion: nil)
     }
 
-    func debug(message: String) {
-        print("Debug: \(message)")
-    }
-
-    func info(message: String) {
-        print("Info: \(message)")
-    }
-    
-    func log(message: String) {
-        print("Log: \(message)")
-    }
-    
-    func warn(message: String) {
-        print("Warn: \(message)")
-    }
-    
-    func error(message: String) {
-        print("Error: \(message)")
+    func nativeLoggingHook(message: String, logLevel: Int) {
+        switch logLevel {
+        case 0:
+            print("Debug: \(message)")
+        case 1:
+            print("Info: \(message)")
+        case 2:
+            print("Warn: \(message)")
+        case 3:
+            print("Error: \(message)")
+        default:
+            break
+        }
     }
 }
 

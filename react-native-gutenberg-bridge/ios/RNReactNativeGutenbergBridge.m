@@ -9,10 +9,6 @@ RCT_EXTERN_METHOD(requestImageFailedRetryDialog:(int)mediaID)
 RCT_EXTERN_METHOD(requestImageUploadCancelDialog:(int)mediaID)
 RCT_EXTERN_METHOD(editorDidLayout)
 RCT_EXTERN_METHOD(editorDidMount:(BOOL)hasUnsupportedBlocks)
-RCT_EXTERN_METHOD(debug:(NSString *)message)
-RCT_EXTERN_METHOD(info:(NSString *)message)
-RCT_EXTERN_METHOD(log:(NSString *)message)
-RCT_EXTERN_METHOD(warn:(NSString *)message)
-RCT_EXTERN_METHOD(error:(NSString *)message)
+RCT_EXTERN_METHOD(nativeLoggingHook:(NSString *)message logLevel:(int)logLevel)
 
 @end

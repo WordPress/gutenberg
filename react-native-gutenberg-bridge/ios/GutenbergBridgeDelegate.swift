@@ -6,29 +6,7 @@ public enum MediaPickerSource: String {
     case deviceCamera = "DEVICE_CAMERA"
 }
 
-public protocol GutenbergBridgeLogger {
-    /// Outputs a message to the standard output at the "debug" log level.
-    ///
-    func debug(message: String)
-
-    /// Outputs a message to the standard output at the "info" log level.
-    ///
-    func info(message: String)
-
-    /// Outputs a message to the standard output at the "log" log level.
-    ///
-    func log(message: String)
-
-    /// Outputs a message to the standard output at the "warn" log level.
-    ///
-    func warn(message: String)
-
-    /// Outputs a message to the standard output at the "error" log level.
-    ///
-    func error(message: String)
-}
-
-public protocol GutenbergBridgeDelegate: class, GutenbergBridgeLogger {
+public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that Gutenberg had returned the requested HTML content.
     /// You can request HTML content by calling `requestHTML()` on a Gutenberg bridge instance.
     ///
@@ -67,6 +45,10 @@ public protocol GutenbergBridgeDelegate: class, GutenbergBridgeLogger {
     /// Tells the delegate that the editor view has completed the initial render.
     ///
     func gutenbergDidMount(hasUnsupportedBlocks: Bool)
+
+    /// Tells the delegate that logger method is called.
+    ///
+    func nativeLoggingHook(message: String, logLevel: Int)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
