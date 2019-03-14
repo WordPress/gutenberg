@@ -66,7 +66,11 @@ const externals = [
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
-const getBabelLoaderOptions = () => hasBabelConfig() ? {} : { presets: [ require.resolve( '@wordpress/babel-preset-default' ) ] };
+const getBabelLoaderOptions = () => hasBabelConfig() ? {} : {
+	babelrc: false,
+	configFile: false,
+	presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+};
 
 const config = {
 	mode,
