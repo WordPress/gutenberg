@@ -12,7 +12,7 @@ There are different tools that can perform this transformation or build step, bu
 
 [Webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to Webpack to transform both ESNext and JSX to JavaScript.
 
-The @wordpress/scripts package abstracts these libraries away to standardize and simplify development, so you won't need to handle the details for configuring those libraries.
+The `@wordpress/scripts` package abstracts these libraries away to standardize and simplify development, so you won't need to handle the details for configuring those libraries.
 
 ## Quick Start
 
@@ -80,7 +80,7 @@ The next step is to install the packages required. You can install packages usin
 
 Run `npm install --save-dev --save-exact @wordpress/scripts`
 
-After installing, a `node_modules` directory is created with the modules and its dependencies.
+After installing, a `node_modules` directory is created with the modules and their dependencies.
 
 Also, if you look at package.json file it will include a new section:
 
@@ -92,13 +92,15 @@ Also, if you look at package.json file it will include a new section:
 
 ## Webpack & Babel
 
-The @wordpress/scripts package handles the default configuration for Webpack and Babel. You need to add the following packages
+The `@wordpress/scripts` package handles the default configuration for Webpack and Babel. You need to add the following packages:
 
 ```
 npm install --save-dev webpack webpack-cli @wordpress/babel-preset-default babel-plugin-transform-react-jsx
 ```
 
-The scripts package expects the source file to compile to be found at `src/index.js` and will output to `build/index.js`. So create a basic block to build. Create a file at `src/index.js` with the following content:
+The scripts package expects the source file to compile to be found at `src/index.js`, and will save the compiled output to `build/index.js`.
+
+With that in mind, let's set up a basic block. Create a file at `src/index.js` with the following content:
 
 ```js
 const { registerBlockType } = wp.blocks;
@@ -132,9 +134,9 @@ After the build finishes, you will see the built file created at `build/index.js
 
 ### Development Mode
 
-The **build** command in @wordpress/scripts runs in a production mode which shrinks the code down so it downloads faster, but makes it difficult to read. You can use the **start** command which runs a development mode that does not shrink the code, and additionally continues a running process to watch the source file for more changes and rebuilt as you develop.
+The **build** command in `@wordpress/scripts` runs in a "production" mode. This shrinks the code down so it downloads faster, but makes it difficult to read in the process. You can use the **start** command which runs a development mode that does not shrink the code, and additionally continues a running process to watch the source file for more changes and rebuild as you develop.
 
-The start command can be added to the same scripts section of `package.json`.
+The start command can be added to the same scripts section of `package.json`:
 
 ```json
   "scripts": {
@@ -156,7 +158,7 @@ Likewise, you do not need to include `node_modules` or any of the above configur
 
 ## Summary
 
-Yes, the initial setup is a bit more involved, but once in place adds additional features which are usually worth the trade off.
+Yes, the initial setup is a bit more involved, but the additional features and benefits are usually worth the trade off in setup time.
 
 With a setup in place, the standard workflow is:
 
