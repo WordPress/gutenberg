@@ -8,9 +8,11 @@ Most browsers can not interpret or run ESNext and JSX syntaxes, so we use a tran
 
 There are a few reasons to use ESNext and the extra step. First, it makes for simpler code that is easier to read and write. Using a transformation step allows for tools to optimize the code to work on the widest variety of browsers. Also, by using a build step you can organize your code into smaller modules and files that can be bundled together into a single download.
 
-There are many tools that can perform this transformation or build step, but in this tutorial we will focus on Webpack and Babel.
+There are different tools that can perform this transformation or build step, but WordPress uses Webpack and Babel.
 
 [Webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to Webpack to transform both ESNext and JSX to JavaScript.
+
+The @wordpress/scripts package abstracts these libraries away to standardize and simplify development, so you won't need to handle the details for configuring those libraries.
 
 ## Quick Start
 
@@ -76,9 +78,9 @@ Is this OK? (yes) yes
 
 The next step is to install the packages required. You can install packages using the npm command `npm install`. If you pass the `--save-dev` parameter, npm will write the package as a dev dependency in the package.json file. The `--save-exact` parameter instructs npm to save an exact version of a dependency, not a range of valid versions. See [npm install documentation](https://docs.npmjs.com/cli/install) for more details.
 
-Run `npm install --save-dev --save-exact webpack webpack-cli`
+Run `npm install --save-dev --save-exact @wordpress/scripts`
 
-After installing, a `node_modules` directory is created with the webpack module and its dependencies.
+After installing, a `node_modules` directory is created with the modules and its dependencies.
 
 Also, if you look at package.json file it will include a new section:
 
