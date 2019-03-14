@@ -13,16 +13,16 @@ import { withInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import ModalFrame from './frame';
-import ModalHeader from './header';
+import DialogFrame from './frame';
+import DialogHeader from './header';
 import * as ariaHelper from './aria-helper';
 import IsolatedEventContainer from '../isolated-event-container';
 
-// Used to count the number of open modals.
+// Used to count the number of open dialogs.
 let parentElement,
-	openModalCount = 0;
+	openDialogCount = 0;
 
-class Modal extends Component {
+class Dialog extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -30,40 +30,40 @@ class Modal extends Component {
 	}
 
 	/**
-	 * Appends the modal's node to the DOM, so the portal can render the
-	 * modal in it. Also calls the openFirstModal when this is the first modal to be
+	 * Appends the dialog's node to the DOM, so the portal can render the
+	 * dialog in it. Also calls the openFirstDialog when this is the first dialog to be
 	 * opened.
 	 */
 	componentDidMount() {
-		openModalCount++;
+		openDialogCount++;
 
-		if ( openModalCount === 1 ) {
-			this.openFirstModal();
+		if ( openDialogCount === 1 ) {
+			this.openFirstDialog();
 		}
 	}
 
 	/**
-	 * Removes the modal's node from the DOM. Also calls closeLastModal when this is
-	 * the last modal to be closed.
+	 * Removes the dialog's node from the DOM. Also calls closeLastDialog when this is
+	 * the last dialog to be closed.
 	 */
 	componentWillUnmount() {
-		openModalCount--;
+		openDialogCount--;
 
-		if ( openModalCount === 0 ) {
-			this.closeLastModal();
+		if ( openDialogCount === 0 ) {
+			this.closeLastDialog();
 		}
 
 		this.cleanDOM();
 	}
 
 	/**
-	 * Prepares the DOM for the modals to be rendered.
+	 * Prepares the DOM for the dialogs to be rendered.
 	 *
-	 * Every modal is mounted in a separate div appended to a parent div
+	 * Every dialog is mounted in a separate div appended to a parent div
 	 * that is appended to the document body.
 	 *
 	 * The parent div will be created if it does not yet exist, and the
-	 * separate div for this specific modal will be appended to that.
+	 * separate div for this specific dialog will be appended to that.
 	 */
 	prepareDOM() {
 		if ( ! parentElement ) {
@@ -75,37 +75,37 @@ class Modal extends Component {
 	}
 
 	/**
-	 * Removes the specific mounting point for this modal from the DOM.
+	 * Removes the specific mounting point for this dialog from the DOM.
 	 */
 	cleanDOM() {
 		parentElement.removeChild( this.node );
 	}
 
 	/**
-	 * Prepares the DOM for this modal and any additional modal to be mounted.
+	 * Prepares the DOM for this dialog and any additional dialog to be mounted.
 	 *
-	 * It appends an additional div to the body for the modals to be rendered in,
+	 * It appends an additional div to the body for the dialogs to be rendered in,
 	 * it hides any other elements from screen-readers and adds an additional class
-	 * to the body to prevent scrolling while the modal is open.
+	 * to the body to prevent scrolling while the dialog is open.
 	 */
-	openFirstModal() {
+	openFirstDialog() {
 		ariaHelper.hideApp( parentElement );
 		document.body.classList.add( this.props.bodyOpenClassName );
 	}
 
 	/**
-	 * Cleans up the DOM after the last modal is closed and makes the app available
+	 * Cleans up the DOM after the last dialog is closed and makes the app available
 	 * for screen-readers again.
 	 */
-	closeLastModal() {
+	closeLastDialog() {
 		document.body.classList.remove( this.props.bodyOpenClassName );
 		ariaHelper.showApp();
 	}
 
 	/**
-	 * Renders the modal.
+	 * Renders the dialog.
 	 *
-	 * @return {WPElement} The modal element.
+	 * @return {WPElement} The dialog element.
 	 */
 	render() {
 		const {
@@ -122,18 +122,18 @@ class Modal extends Component {
 			...otherProps
 		} = this.props;
 
-		const headingId = aria.labelledby || `components-modal-header-${ instanceId }`;
+		const headingId = aria.labelledby || `components-dialog-header-${ instanceId }`;
 
 		// Disable reason: this stops mouse events from triggering tooltips and
-		// other elements underneath the modal overlay.
+		// other elements underneath the dialog overlay.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return createPortal(
 			<IsolatedEventContainer
-				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
+				className={ classnames( 'components-dialog__screen-overlay', overlayClassName ) }
 			>
-				<ModalFrame
+				<DialogFrame
 					className={ classnames(
-						'components-modal__frame',
+						'components-dialog__frame',
 						className
 					) }
 					onRequestClose={ onRequestClose }
@@ -143,8 +143,8 @@ class Modal extends Component {
 					} }
 					{ ...otherProps }
 				>
-					<div className={ 'components-modal__content' } tabIndex="0">
-						<ModalHeader
+					<div className={ 'components-dialog__content' } tabIndex="0">
+						<DialogHeader
 							closeLabel={ closeButtonLabel }
 							headingId={ headingId }
 							icon={ icon }
@@ -154,7 +154,7 @@ class Modal extends Component {
 						/>
 						{ children }
 					</div>
-				</ModalFrame>
+				</DialogFrame>
 			</IsolatedEventContainer>,
 			this.node
 		);
@@ -162,8 +162,8 @@ class Modal extends Component {
 	}
 }
 
-Modal.defaultProps = {
-	bodyOpenClassName: 'modal-open',
+Dialog.defaultProps = {
+	bodyOpenClassName: 'dialog-open',
 	role: 'dialog',
 	title: null,
 	onRequestClose: noop,
@@ -178,4 +178,4 @@ Modal.defaultProps = {
 	},
 };
 
-export default withInstanceId( Modal );
+export default withInstanceId( Dialog );

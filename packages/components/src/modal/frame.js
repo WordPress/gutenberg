@@ -17,7 +17,7 @@ import clickOutside from 'react-click-outside';
 import withFocusReturn from '../higher-order/with-focus-return';
 import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 
-class ModalFrame extends Component {
+class DialogFrame extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -48,7 +48,7 @@ class ModalFrame extends Component {
 	}
 
 	/**
-	 * Callback function called when clicked outside the modal.
+	 * Callback function called when clicked outside the dialog.
 	 *
 	 * @param {Object} event Mouse click event.
 	 */
@@ -96,9 +96,9 @@ class ModalFrame extends Component {
 	}
 
 	/**
-	 * Renders the modal frame element.
+	 * Renders the dialog frame element.
 	 *
-	 * @return {WPElement} The modal frame element.
+	 * @return {WPElement} The dialog frame element.
 	 */
 	render() {
 		const {
@@ -137,4 +137,4 @@ export default compose( [
 	withGlobalEvents( {
 		keydown: 'handleKeyDown',
 	} ),
-] )( ModalFrame );
+] )( DialogFrame );
