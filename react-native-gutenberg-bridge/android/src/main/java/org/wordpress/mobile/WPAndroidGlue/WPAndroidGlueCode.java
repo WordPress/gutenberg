@@ -152,28 +152,21 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void debug(String message) {
-                AppLog.d(AppLog.T.EDITOR, message);
-            }
-
-            @Override
-            public void info(String message) {
-                AppLog.i(AppLog.T.EDITOR, message);
-            }
-
-            @Override
-            public void log(String message) {
-                AppLog.v(AppLog.T.EDITOR, message);
-            }
-
-            @Override
-            public void warn(String message) {
-                AppLog.w(AppLog.T.EDITOR, message);
-            }
-
-            @Override
-            public void error(String message) {
-                AppLog.e(AppLog.T.EDITOR, message);
+            public void nativeLoggingHook(String message, int logLevel) {
+                switch (logLevel) {
+                    case 0:
+                        AppLog.d(AppLog.T.EDITOR, message);
+                        break;
+                    case 1:
+                        AppLog.i(AppLog.T.EDITOR, message);
+                        break;
+                    case 2:
+                        AppLog.w(AppLog.T.EDITOR, message);
+                        break;
+                    case 3:
+                        AppLog.e(AppLog.T.EDITOR, message);
+                        break;
+                }
             }
         });
         return Arrays.asList(

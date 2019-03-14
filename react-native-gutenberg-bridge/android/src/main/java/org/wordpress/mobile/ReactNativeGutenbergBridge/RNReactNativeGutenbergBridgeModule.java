@@ -117,28 +117,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void debug(String message) {
-        mGutenbergBridgeJS2Parent.debug(message);
-    }
-
-    @ReactMethod
-    public void info(String message) {
-        mGutenbergBridgeJS2Parent.info(message);
-    }
-
-    @ReactMethod
-    public void log(String message) {
-        mGutenbergBridgeJS2Parent.log(message);
-    }
-
-    @ReactMethod
-    public void warn(String message) {
-        mGutenbergBridgeJS2Parent.warn(message);
-    }
-
-    @ReactMethod
-    public void error(String message) {
-        mGutenbergBridgeJS2Parent.error(message);
+    public void nativeLoggingHook(String message, int logLevel) {
+        mGutenbergBridgeJS2Parent.nativeLoggingHook(message, logLevel);
     }
 
     private MediaSelectedCallback getNewMediaSelectedCallback(final Callback jsCallback) {

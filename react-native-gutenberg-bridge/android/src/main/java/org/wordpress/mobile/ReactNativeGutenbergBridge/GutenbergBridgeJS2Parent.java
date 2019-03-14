@@ -1,14 +1,6 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
-interface GutenbergBridgeLogger {
-    void debug(String message);
-    void info(String message);
-    void log(String message);
-    void warn(String message);
-    void error(String message);
-}
-
-public interface GutenbergBridgeJS2Parent extends GutenbergBridgeLogger {
+public interface GutenbergBridgeJS2Parent {
     void responseHtml(String title, String html, boolean changed);
 
     void editorDidMount(boolean hasUnsupportedBlocks);
@@ -36,4 +28,6 @@ public interface GutenbergBridgeJS2Parent extends GutenbergBridgeLogger {
     void requestImageFailedRetryDialog(int mediaId);
 
     void requestImageUploadCancelDialog(int mediaId);
+
+    void nativeLoggingHook(String message, int logLevel);
 }
