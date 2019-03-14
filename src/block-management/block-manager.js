@@ -206,7 +206,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return (
 			<View style={ { flex: 1 } } onLayout={ this.onContentViewLayout }>
 				<KeyboardAwareFlatList
-					testID="block-list"
 					accessibilityLabel="block-list"
 					innerRef={ this.scrollViewInnerRef }
 					blockToolbarHeight={ toolbarStyles.container.height }
