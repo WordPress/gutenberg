@@ -19,6 +19,7 @@ import {
 	isOfTypes,
 	isValidByType,
 	isValidByEnum,
+	serializeBlockNode,
 } from '../parser';
 import {
 	registerBlockType,
@@ -754,6 +755,84 @@ describe( 'block parser', () => {
 			expect( block.isValid ).toBe( true );
 			expect( console ).toHaveErrored();
 			expect( console ).toHaveWarned();
+		} );
+	} );
+
+	describe( 'serializeBlockNode', () => {
+		it( 'reserializes block nodes', () => {
+			const expected = `<!-- wp:columns -->
+<div class="wp-block-columns has-2-columns">
+<!-- wp:column -->
+<div class="wp-block-column">
+<!-- wp:paragraph -->
+<p>A</p>
+<!-- /wp:paragraph -->
+</div>
+<!-- /wp:column -->
+<!-- wp:column -->
+<div class="wp-block-column">
+<!-- wp:list -->
+<ul><li>B</li><li>C</li></ul>
+<!-- /wp:list -->
+</div>
+<!-- /wp:column -->
+</div>
+<!-- /wp:columns -->`;
+			const input = {
+				blockName: 'core/columns',
+				attrs: {},
+				innerBlocks: [
+					{
+						blockName: 'core/column',
+						attrs: {},
+						innerBlocks: [
+							{
+								blockName: 'core/paragraph',
+								attrs: {},
+								innerBlocks: [],
+								innerHTML: '<p>A</p>',
+								innerContent: [ '<p>A</p>' ],
+							},
+						],
+						innerHTML: '<div class="wp-block-column"></div>',
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
+					},
+					{
+						blockName: 'core/column',
+						attrs: {},
+						innerBlocks: [
+							{
+								blockName: 'core/list',
+								attrs: {},
+								innerBlocks: [],
+								innerHTML: '<ul><li>B</li><li>C</li></ul>',
+								innerContent: [ '<ul><li>B</li><li>C</li></ul>' ],
+							},
+						],
+						innerHTML: '<div class="wp-block-column"></div>',
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
+					},
+				],
+				innerHTML: '<div class="wp-block-columns has-2-columns"></div>',
+				innerContent: [
+					'<div class="wp-block-columns has-2-columns">',
+					null,
+					'',
+					null,
+					'</div>',
+				],
+			};
+			const actual = serializeBlockNode( input );
+
+			expect( actual ).toEqual( expected );
 		} );
 	} );
 
