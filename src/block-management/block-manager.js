@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import React from 'react';
 import { identity } from 'lodash';
 
-import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView, Dimensions } from 'react-native';
+import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView, Dimensions, Platform } from 'react-native';
 import BlockHolder from './block-holder';
 import type { BlockType } from '../store/types';
 import styles from './block-manager.scss';
@@ -204,6 +204,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return (
 			<View style={ { flex: 1 } } onLayout={ this.onContentViewLayout }>
 				<KeyboardAwareFlatList
+					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					innerRef={ this.scrollViewInnerRef }
 					blockToolbarHeight={ toolbarStyles.container.height }
 					innerToolbarHeight={ inlineToolbarStyles.toolbar.height }
