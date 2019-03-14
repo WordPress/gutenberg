@@ -149,7 +149,7 @@ This is how you execute the script with presented setup:
 
 ### `start`
 
-Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the "webpack config" section.
+Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [webpack config](#webpack-config) section.
 
 _Example:_
 
