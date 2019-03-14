@@ -92,17 +92,20 @@ fi
 
 # Configure site constants.
 echo -e $(status_message "Configuring site constants...")
-if [ ! -z "$WP_DEBUG" ]; then
+WP_DEBUG_CURRENT=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm -u 33 $CLI config get --type=constant --format=json WP_DEBUG)
+if [ $WP_DEBUG != $WP_DEBUG_CURRENT ]; then
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI config set WP_DEBUG $WP_DEBUG --raw --type=constant --quiet
 	WP_DEBUG_RESULT=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm -u 33 $CLI config get --type=constant --format=json WP_DEBUG)
 	echo -e $(status_message "WP_DEBUG: $WP_DEBUG_RESULT...")
 fi
-if [ ! -z "$WP_DEBUG_DISPLAY" ]; then
+WP_DEBUG_DISPLAY_CURRENT=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm -u 33 $CLI config get --type=constant --format=json WP_DEBUG_DISPLAY)
+if [ $WP_DEBUG_DISPLAY != $WP_DEBUG_DISPLAY_CURRENT ]; then
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI config set WP_DEBUG_DISPLAY $WP_DEBUG_DISPLAY --raw --type=constant --quiet
 	WP_DEBUG_DISPLAY_RESULT=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm -u 33 $CLI config get --type=constant --format=json WP_DEBUG_DISPLAY)
 	echo -e $(status_message "WP_DEBUG_DISPLAY: $WP_DEBUG_DISPLAY_RESULT...")
 fi
-if [ ! -z "$SCRIPT_DEBUG" ]; then
+SCRIPT_DEBUG_CURRENT=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm -u 33 $CLI config get --type=constant --format=json SCRIPT_DEBUG)
+if [ $SCRIPT_DEBUG != $SCRIPT_DEBUG_CURRENT ]; then
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI config set SCRIPT_DEBUG $SCRIPT_DEBUG --raw --type=constant --quiet
 	SCRIPT_DEBUG_RESULT=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm -u 33 $CLI config get --type=constant --format=json SCRIPT_DEBUG)
 	echo -e $(status_message "SCRIPT_DEBUG: $SCRIPT_DEBUG_RESULT...")
