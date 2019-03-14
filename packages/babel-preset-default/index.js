@@ -1,19 +1,19 @@
 module.exports = function( api ) {
 	let wpBuildOpts = {};
-	const isTestEnv = api.env() === 'test';
-	const isWPBuild = ( name ) => [ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
-		( buildName ) => name === buildName
-	);
+	const isWPBuild = ( name ) => {
+		const result = [ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
+			( buildName ) => name === buildName
+		);
+		return result;
+	};
 
-	// We serve a different preset depending on the caller options.
-	// We need to tell the cache that it needs updating, otherwise,
-	// the preset won't be recalculated for different builds.
-	api.cache.using( () => isWPBuild( wpBuildOpts.name ) );
+	const isTestEnv = api.env() === 'test';
 
 	api.caller( ( caller ) => {
 		if ( caller && isWPBuild( caller.name ) ) {
 			wpBuildOpts = { ...caller };
 		}
+		return caller.name;
 	} );
 
 	const getPresetEnv = () => {
