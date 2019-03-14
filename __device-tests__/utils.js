@@ -31,13 +31,6 @@ if ( rnPlatform === 'android' ) {
 		automationName: 'XCUITest',
 		app: './ios/build/Build/Products/Debug-iphonesimulator/gutenberg.app', // relative to root of project
 	};
-	// config = {
-	// 	platformName: 'iOS',
-	// 	platformVersion: 12.1,
-	// 	deviceName: 'iPhone XR',
-	// 	automationName: 'XCUITest',
-	// 	app: 'sauce-storage:Gutenberg', // relative to root of project
-	// };
 }
 
 const rename = async ( path, newPath ) => {
