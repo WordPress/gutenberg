@@ -16,6 +16,8 @@ import { Component } from '@wordpress/element';
 import { RichText, BlockControls } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
+import styles from './editor.scss';
+
 const name = 'core/heading';
 
 class HeadingEdit extends Component {
@@ -23,7 +25,6 @@ class HeadingEdit extends Component {
 		super( props );
 
 		this.splitBlock = this.splitBlock.bind( this );
-		this.isAndroid = Platform.OS === 'android';
 	}
 
 	/**
@@ -94,7 +95,10 @@ class HeadingEdit extends Component {
 					tagName={ tagName }
 					value={ content }
 					isSelected={ this.props.isSelected }
-					style={ style }
+					style={ {
+						...style,
+						minHeight: styles['wp-block-heading'].minHeight,
+					} }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
@@ -102,9 +106,6 @@ class HeadingEdit extends Component {
 					onMerge={ mergeBlocks }
 					onSplit={ this.splitBlock }
 					placeholder={ placeholder || __( 'Write heading…' ) }
-					// Fix for heading issue on Android https://github.com/wordpress-mobile/gutenberg-mobile/issues/627
-					// Intentionally introduces missing pleceholder issue on Android https://github.com/wordpress-mobile/gutenberg-mobile/issues/707
-					sendEmptyTag={ this.isAndroid }
 				/>
 			</View>
 		);
