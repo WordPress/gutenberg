@@ -7,9 +7,7 @@
 	font-size: $default-font-size;
 	height: 40px;
 	white-space: nowrap;
-
-	// Use opacity to work in various editor styles.
-	border: $border-width solid $dark-opacity-light-800;
+	border: $border-width solid $light-gray-800;
 	background-clip: padding-box;
 
 	// Show a thick left border to match the left border on the title field.
