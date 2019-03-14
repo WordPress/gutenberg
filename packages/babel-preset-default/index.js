@@ -5,10 +5,9 @@ module.exports = function( api ) {
 		( buildName ) => name === buildName
 	);
 
-	// Because we serve a different preset depending
-	// on the caller options, we need to tell the cache
-	// when it needs updating. Otherwise, it won't be
-	// recalculated for different builds.
+	// We serve a different preset depending on the caller options.
+	// We need to tell the cache that it needs updating, otherwise,
+	// the preset won't be recalculated for different builds.
 	api.cache.using( () => isWPBuild( wpBuildOpts.name ) );
 
 	api.caller( ( caller ) => {
