@@ -36,6 +36,7 @@ exports[`recordToDom should create a value with formatting with attributes 1`] =
 
 exports[`recordToDom should create a value with image object 1`] = `
 <body>
+  
   <img
     src=""
   />
@@ -45,7 +46,10 @@ exports[`recordToDom should create a value with image object 1`] = `
 
 exports[`recordToDom should create a value with image object and formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
+    
     <img
       src=""
     />
@@ -57,7 +61,10 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
+    
     <img
       src=""
     />

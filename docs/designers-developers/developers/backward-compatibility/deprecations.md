@@ -2,6 +2,17 @@
 
 The Gutenberg project's deprecation policy is intended to support backward compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 5.5.0
+
+- The PHP function `gutenberg_init` has been removed.
+- The PHP function `is_gutenberg_page` has been removed. Use [`WP_Screen::is_block_editor`](https://developer.wordpress.org/reference/classes/wp_screen/is_block_editor/) instead.
+- The PHP function `the_gutenberg_project` has been removed.
+- The PHP function `gutenberg_default_post_format_template` has been removed.
+- The PHP function `gutenberg_get_available_image_sizes` has been removed.
+- The PHP function `gutenberg_get_autosave_newer_than_post_save` has been removed.
+- The PHP function `gutenberg_default_post_format_template` has been removed.
+- The PHP function `gutenberg_editor_scripts_and_styles` has been removed.
+
 ## 5.4.0
 
 - The PHP function `gutenberg_load_plugin_textdomain` has been removed.

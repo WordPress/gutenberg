@@ -11,7 +11,7 @@ const name = 'core/strikethrough';
 export const strikethrough = {
 	name,
 	title: __( 'Strikethrough' ),
-	tagName: 'del',
+	tagName: 's',
 	className: null,
 	edit( { isActive, value, onChange } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );

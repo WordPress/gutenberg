@@ -18,6 +18,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"main": "build/index.js",
+	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.3.1",

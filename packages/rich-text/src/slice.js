@@ -10,16 +10,19 @@
  * @return {Object} A new extracted value.
  */
 export function slice(
-	{ formats, text, start, end },
-	startIndex = start,
-	endIndex = end
+	value,
+	startIndex = value.start,
+	endIndex = value.end
 ) {
+	const { formats, replacements, text } = value;
+
 	if ( startIndex === undefined || endIndex === undefined ) {
-		return { formats, text };
+		return { ...value };
 	}
 
 	return {
 		formats: formats.slice( startIndex, endIndex ),
+		replacements: replacements.slice( startIndex, endIndex ),
 		text: text.slice( startIndex, endIndex ),
 	};
 }

@@ -19,7 +19,7 @@ import memize from 'memize';
 import { Component, Fragment, RawHTML } from '@wordpress/element';
 import { isHorizontalEdge } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -37,13 +37,11 @@ import {
 	insertLineSeparator,
 	isEmptyLine,
 	unstableToDom,
-	getSelectionStart,
-	getSelectionEnd,
 	remove,
 	removeFormat,
 	isCollapsed,
 	LINE_SEPARATOR,
-	charAt,
+	indentListItems,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
@@ -177,10 +175,10 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { formats, text } = this.formatToValue( this.props.value );
+		const { formats, replacements, text } = this.formatToValue( this.props.value );
 		const { start, end, selectedFormat } = this.state;
 
-		return { formats, text, start, end, selectedFormat };
+		return { formats, replacements, text, start, end, selectedFormat };
 	}
 
 	createRecord() {
@@ -394,13 +392,17 @@ export class RichText extends Component {
 		}
 
 		let { selectedFormat } = this.state;
-		const { formats, text, start, end } = this.createRecord();
+		const { formats, replacements, text, start, end } = this.createRecord();
 
 		if ( this.formatPlaceholder ) {
-			formats[ this.state.start ] = formats[ this.state.start ] || [];
-			formats[ this.state.start ].push( this.formatPlaceholder );
-			selectedFormat = formats[ this.state.start ].length;
-		} else if ( selectedFormat ) {
+			selectedFormat = this.formatPlaceholder.length;
+
+			if ( selectedFormat > 0 ) {
+				formats[ this.state.start ] = this.formatPlaceholder;
+			} else {
+				delete formats[ this.state.start ];
+			}
+		} else if ( selectedFormat > 0 ) {
 			const formatsBefore = formats[ start - 1 ] || [];
 			const formatsAfter = formats[ start ] || [];
 
@@ -411,12 +413,13 @@ export class RichText extends Component {
 			}
 
 			source = source.slice( 0, selectedFormat );
+
 			formats[ this.state.start ] = source;
 		} else {
 			delete formats[ this.state.start ];
 		}
 
-		const change = { formats, text, start, end, selectedFormat };
+		const change = { formats, replacements, text, start, end, selectedFormat };
 
 		this.onChange( change, {
 			withoutHistory: true,
@@ -594,10 +597,26 @@ export class RichText extends Component {
 			this.handleHorizontalNavigation( event );
 		}
 
+		// Use the space key in list items (at the start of an item) to indent
+		// the list item.
+		if ( keyCode === SPACE && this.multilineTag === 'li' ) {
+			const value = this.createRecord();
+
+			if ( isCollapsed( value ) ) {
+				const { text, start } = value;
+				const characterBefore = text[ start - 1 ];
+
+				// The caret must be at the start of a line.
+				if ( ! characterBefore || characterBefore === LINE_SEPARATOR ) {
+					this.onChange( indentListItems( value, { type: this.props.tagName } ) );
+					event.preventDefault();
+				}
+			}
+		}
+
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			const value = this.createRecord();
-			const start = getSelectionStart( value );
-			const end = getSelectionEnd( value );
+			const { replacements, text, start, end } = value;
 
 			// Always handle full content deletion ourselves.
 			if ( start === 0 && end !== 0 && end === value.text.length ) {
@@ -610,22 +629,53 @@ export class RichText extends Component {
 				let newValue;
 
 				if ( keyCode === BACKSPACE ) {
-					if ( charAt( value, start - 1 ) === LINE_SEPARATOR ) {
+					const index = start - 1;
+
+					if ( text[ index ] === LINE_SEPARATOR ) {
+						const collapsed = isCollapsed( value );
+
+						// If the line separator that is about te be removed
+						// contains wrappers, remove the wrappers first.
+						if ( collapsed && replacements[ index ] && replacements[ index ].length ) {
+							const newReplacements = replacements.slice();
+
+							newReplacements[ index ] = replacements[ index ].slice( 0, -1 );
+							newValue = {
+								...value,
+								replacements: newReplacements,
+							};
+						} else {
+							newValue = remove(
+								value,
+								// Only remove the line if the selection is
+								// collapsed, otherwise remove the selection.
+								collapsed ? start - 1 : start,
+								end
+							);
+						}
+					}
+				} else if ( text[ end ] === LINE_SEPARATOR ) {
+					const collapsed = isCollapsed( value );
+
+					// If the line separator that is about te be removed
+					// contains wrappers, remove the wrappers first.
+					if ( collapsed && replacements[ end ] && replacements[ end ].length ) {
+						const newReplacements = replacements.slice();
+
+						newReplacements[ end ] = replacements[ end ].slice( 0, -1 );
+						newValue = {
+							...value,
+							replacements: newReplacements,
+						};
+					} else {
 						newValue = remove(
 							value,
+							start,
 							// Only remove the line if the selection is
-							// collapsed.
-							isCollapsed( value ) ? start - 1 : start,
-							end
+							// collapsed, otherwise remove the selection.
+							collapsed ? end + 1 : end,
 						);
 					}
-				} else if ( charAt( value, end ) === LINE_SEPARATOR ) {
-					newValue = remove(
-						value,
-						start,
-						// Only remove the line if the selection is collapsed.
-						isCollapsed( value ) ? end + 1 : end,
-					);
 				}
 
 				if ( newValue ) {
@@ -936,7 +986,6 @@ export class RichText extends Component {
 		return unstableToDom( {
 			value,
 			multilineTag: this.multilineTag,
-			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
 		} ).body.innerHTML;
 	}
@@ -975,7 +1024,6 @@ export class RichText extends Component {
 			return children.fromDOM( unstableToDom( {
 				value,
 				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
 				isEditableTree: false,
 			} ).body.childNodes );
 		}
@@ -984,7 +1032,6 @@ export class RichText extends Component {
 			return toHTMLString( {
 				value,
 				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 

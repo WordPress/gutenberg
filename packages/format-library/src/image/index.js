@@ -40,7 +40,7 @@ export const image = {
 		}
 
 		static getDerivedStateFromProps( props, state ) {
-			const { activeAttributes: { style } } = props;
+			const { activeObjectAttributes: { style } } = props;
 
 			if ( style === state.previousStyle ) {
 				return null;
@@ -79,8 +79,8 @@ export const image = {
 		}
 
 		render() {
-			const { value, onChange, isActive, activeAttributes } = this.props;
-			const { style } = activeAttributes;
+			const { value, onChange, isObjectActive, activeObjectAttributes } = this.props;
+			const { style } = activeObjectAttributes;
 			// Rerender PositionedAtSelection when the selection changes or when
 			// the width changes.
 			const key = value.start + style;
@@ -91,7 +91,7 @@ export const image = {
 						icon={ <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M4 16h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2zM4 5h10v9H4V5zm14 9v2h4v-2h-4zM2 20h20v-2H2v2zm6.4-8.8L7 9.4 5 12h8l-2.6-3.4-2 2.6z" /></SVG> }
 						title={ __( 'Inline Image' ) }
 						onClick={ this.openModal }
-						isActive={ isActive }
+						isActive={ isObjectActive }
 					/>
 					{ this.state.modal && <MediaUpload
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -113,7 +113,7 @@ export const image = {
 							return null;
 						} }
 					/> }
-					{ isActive && <PositionedAtSelection key={ key }>
+					{ isObjectActive && <PositionedAtSelection key={ key }>
 						<Popover
 							position="bottom center"
 							focusOnMount={ false }
@@ -125,20 +125,19 @@ export const image = {
 								onKeyPress={ stopKeyPropagation }
 								onKeyDown={ this.onKeyDown }
 								onSubmit={ ( event ) => {
-									const newFormats = value.formats.slice( 0 );
+									const newReplacements = value.replacements.slice();
 
-									newFormats[ value.start ] = [ {
+									newReplacements[ value.start ] = {
 										type: name,
-										object: true,
 										attributes: {
-											...activeAttributes,
+											...activeObjectAttributes,
 											style: `width: ${ this.state.width }px;`,
 										},
-									} ];
+									};
 
 									onChange( {
 										...value,
-										formats: newFormats,
+										replacements: newReplacements,
 									} );
 
 									event.preventDefault();

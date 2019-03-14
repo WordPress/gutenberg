@@ -28,6 +28,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
+		"@babel/runtime": "^7.3.1",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/url": "file:../url",
 		"lodash": "^4.17.11",

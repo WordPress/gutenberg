@@ -1,3 +1,9 @@
+## 3.1.0 (unreleased)
+
+## New features
+
+- The `build` and `start` commands will use a default webpack config if none is provided.
+
 ## 3.0.0 (2019-03-06)
 
 ### Breaking Changes
