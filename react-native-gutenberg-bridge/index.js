@@ -8,10 +8,10 @@ const isIOS = Platform.OS === 'ios';
 const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
 
 // Leverages existing console polyfill from react-native which is a global function called
-// `nativeLoggingHook` that takes two parameters, a message and a log level. 
+// `nativeLoggingHook` that takes two parameters, a message and a log level.
 global.nativeLoggingHook = function( message, logLevel ) {
 	RNReactNativeGutenbergBridge.nativeLoggingHook( message, logLevel );
-}
+};
 
 // Send messages
 
