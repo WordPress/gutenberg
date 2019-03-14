@@ -31,7 +31,7 @@
     "eslint-plugin-react": "^7.7.0",
     "eslint-plugin-react-native": "^3.2.1",
     "eslint-plugin-wordpress": "git+https://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#1774343f6226052a46b081e01db3fca8793cc9f1",
-    "flow-bin": "0.67.1",
+    "flow-bin": "0.92.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.1.0",
     "metro-react-native-babel-preset": "^0.52.0",
