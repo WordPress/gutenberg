@@ -16,6 +16,8 @@ import { Component } from '@wordpress/element';
 import { RichText, BlockControls } from '@wordpress/editor';
 import { createBlock } from '@wordpress/blocks';
 
+import styles from './editor.scss';
+
 const name = 'core/heading';
 
 class HeadingEdit extends Component {
@@ -93,7 +95,10 @@ class HeadingEdit extends Component {
 					tagName={ tagName }
 					value={ content }
 					isSelected={ this.props.isSelected }
-					style={ style }
+					style={ {
+						...style,
+						minHeight: styles['wp-block-heading'].minHeight,
+					} }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
