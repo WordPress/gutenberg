@@ -21,7 +21,6 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.views.textinput.ContentSizeWatcher;
-import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
@@ -35,7 +34,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.HashMap;
 
 import static android.content.ClipData.*;
@@ -69,7 +67,7 @@ public class ReactAztecText extends AztecText {
     // This optional variable holds the outer HTML tag that will be added to the text when the user start typing in it
     // This is required to keep placeholder text working, and start typing with styled text.
     // Ref: https://github.com/wordpress-mobile/gutenberg-mobile/issues/707
-    String tagName = "";
+    private String mTagName = "";
 
     private static final HashMap<ITextFormat, String> typingFormatsMap = new HashMap<ITextFormat, String>() {
         {
@@ -247,11 +245,11 @@ public class ReactAztecText extends AztecText {
     }
 
     public void setTagName(@Nullable String tagName) {
-        this.tagName = tagName;
+        this.mTagName = tagName;
     }
 
     public String getTagName() {
-        return this.tagName;
+        return this.mTagName;
     }
 
     private void updateToolbarButtons(int selStart, int selEnd) {
