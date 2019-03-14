@@ -231,8 +231,12 @@ body.block-editor-page {
 
 		&:checked::before,
 		&[aria-checked="mixed"]::before {
-			margin: -4px 0 0 -5px;
+			margin: -3px -5px;
 			color: $white;
+
+			@include break-medium() {
+				margin: -4px 0 0 -5px;
+			}
 		}
 
 		&[aria-checked="mixed"] {
@@ -248,11 +252,16 @@ body.block-editor-page {
 				vertical-align: middle;
 				width: 16px;
 				/* stylelint-disable */
-				font: normal 21px/1 dashicons;
+				font: normal 30px/1 dashicons;
 				/* stylelint-enable */
 				speak: none;
 				-webkit-font-smoothing: antialiased;
 				-moz-osx-font-smoothing: grayscale;
+
+				@include break-medium() {
+					float: none;
+					font-size: 21px;
+				}
 			}
 
 			&:focus {
