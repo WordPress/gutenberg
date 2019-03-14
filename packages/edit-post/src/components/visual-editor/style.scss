@@ -7,7 +7,7 @@
 	}
 }
 
-.edit-post-visual-editor .editor-writing-flow__click-redirect {
+.edit-post-visual-editor .block-editor-writing-flow__click-redirect {
 	// Collapse to minimum height of 50px, to fully occupy editor bottom pad.
 	height: 50px;
 	width: 100%;
@@ -16,21 +16,21 @@
 }
 
 // The base width of blocks
-.edit-post-visual-editor .editor-block-list__block {
+.edit-post-visual-editor .block-editor-block-list__block {
 	margin-left: auto;
 	margin-right: auto;
 
 	@include break-small() {
 		// Compensate for side UI width.
-		.editor-block-list__block-edit {
+		.block-editor-block-list__block-edit {
 			margin-left: -$block-side-ui-width;
 			margin-right: -$block-side-ui-width;
 		}
 
 		// Center the block toolbar on wide and full-wide blocks.
 		// Use specific selector to not affect nested block toolbars.
-		&[data-align="wide"] > .editor-block-list__block-edit > .editor-block-contextual-toolbar,
-		&[data-align="full"] > .editor-block-list__block-edit > .editor-block-contextual-toolbar {
+		&[data-align="wide"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar,
+		&[data-align="full"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar {
 			width: calc(100% + #{ $block-padding * 2 + $border-width * 2 }); // Matches the negative margins applied to parent blocks.
 			height: 0; // This collapses the container to an invisible element without margin.
 			text-align: center;
@@ -40,7 +40,7 @@
 			// Pairs with relative rule on line 49.
 			float: left;
 
-			.editor-block-toolbar {
+			.block-editor-block-toolbar {
 				max-width: $content-width;
 				width: 100%;
 
@@ -51,7 +51,7 @@
 		}
 
 		// The centering math is simpler for a fullwide block, which doesn't have any block padding.
-		&[data-align="full"] > .editor-block-list__block-edit > .editor-block-contextual-toolbar {
+		&[data-align="full"] > .block-editor-block-list__block-edit > .editor-block-contextual-toolbar {
 			width: 100%;
 			margin-left: 0;
 			margin-right: 0;
@@ -91,18 +91,18 @@
 
 .edit-post-visual-editor {
 	// If the first block is floated, it needs top margin, unlike the rule in line 69.
-	.editor-block-list__layout > .editor-block-list__block[data-align="left"]:first-child,
-	.editor-block-list__layout > .editor-block-list__block[data-align="right"]:first-child {
+	.block-editor-block-list__layout > .block-editor-block-list__block[data-align="left"]:first-child,
+	.block-editor-block-list__layout > .block-editor-block-list__block[data-align="right"]:first-child {
 		margin-top: $block-padding + $block-spacing + $border-width + $border-width + $block-padding;
 	}
 
-	.editor-default-block-appender {
+	.block-editor-default-block-appender {
 		// Default to centered and content-width, like blocks
 		margin-left: auto;
 		margin-right: auto;
 		position: relative;
 
-		&[data-root-client-id=""] .editor-default-block-appender__content:hover {
+		&[data-root-client-id=""] .block-editor-default-block-appender__content:hover {
 			// Outline on root-level default block appender is redundant with the
 			// WritingFlow click redirector.
 			outline: 1px solid transparent;
@@ -110,8 +110,8 @@
 	}
 
 	// Ensure that the height of the first appender, and the one between blocks, is the same as text.
-	.editor-block-list__block[data-type="core/paragraph"] p[data-is-placeholder-visible="true"] + p,
-	.editor-default-block-appender__content {
+	.block-editor-block-list__block[data-type="core/paragraph"] p[data-is-placeholder-visible="true"] + p,
+	.block-editor-default-block-appender__content {
 		min-height: $empty-paragraph-height / 2;
 		line-height: $editor-line-height;
 	}

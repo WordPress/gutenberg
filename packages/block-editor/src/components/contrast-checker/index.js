@@ -35,7 +35,7 @@ function ContrastChecker( {
 		__( 'This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.' ) :
 		__( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' );
 	return (
-		<div className="editor-contrast-checker">
+		<div className="editor-contrast-checker block-editor-contrast-checker">
 			<Notice status="warning" isDismissible={ false }>
 				{ msg }
 			</Notice>

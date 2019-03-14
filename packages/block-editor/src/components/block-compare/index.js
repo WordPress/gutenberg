@@ -23,8 +23,8 @@ class BlockCompare extends Component {
 
 		return difference.map( ( item, pos ) => {
 			const classes = classnames( {
-				'editor-block-compare__added': item.added,
-				'editor-block-compare__removed': item.removed,
+				'editor-block-compare__added block-editor-block-compare__added': item.added,
+				'editor-block-compare__removed block-editor-block-compare__removed': item.removed,
 			} );
 
 			return <span key={ pos } className={ classes }>{ item.value }</span>;
@@ -59,10 +59,10 @@ class BlockCompare extends Component {
 		const difference = this.getDifference( original.rawContent, converted.rawContent );
 
 		return (
-			<div className="editor-block-compare__wrapper">
+			<div className="editor-block-compare__wrapper block-editor-block-compare__wrapper">
 				<BlockView
 					title={ __( 'Current' ) }
-					className="editor-block-compare__current"
+					className="editor-block-compare__current block-editor-block-compare__current"
 					action={ onKeep }
 					actionText={ __( 'Convert to HTML' ) }
 					rawContent={ original.rawContent }
@@ -71,7 +71,7 @@ class BlockCompare extends Component {
 
 				<BlockView
 					title={ __( 'After Conversion' ) }
-					className="editor-block-compare__converted"
+					className="editor-block-compare__converted block-editor-block-compare__converted"
 					action={ onConvert }
 					actionText={ convertButtonText }
 					rawContent={ difference }

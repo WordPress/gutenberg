@@ -1,7 +1,7 @@
-.editor-default-block-appender {
+.block-editor-default-block-appender {
 	clear: both; // The appender doesn't scale well to sit next to floats, so clear them.
 
-	textarea.editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
+	textarea.block-editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
 		font-family: $editor-font;
 		font-size: $editor-font-size; // It should match the default paragraph size.
 		border: none;
@@ -27,17 +27,17 @@
 	}
 
 	// Don't show the inserter until mousing over.
-	.editor-inserter__toggle:not([aria-expanded="true"]) {
+	.block-editor-inserter__toggle:not([aria-expanded="true"]) {
 		opacity: 0;
 		transition: opacity 0.2s;
 	}
 
 	&:hover {
-		.editor-inserter-with-shortcuts {
+		.block-editor-inserter-with-shortcuts {
 			@include edit-post__fade-in-animation;
 		}
 
-		.editor-inserter__toggle {
+		.block-editor-inserter__toggle {
 			opacity: 1;
 		}
 	}
@@ -49,9 +49,9 @@
 }
 
 // Quick shortcuts, left and right.
-.editor-block-list__empty-block-inserter, // Empty paragraph
-.editor-default-block-appender .editor-inserter, // Empty appender
-.editor-inserter-with-shortcuts { // Right side quick shortcuts
+.block-editor-block-list__empty-block-inserter, // Empty paragraph
+.block-editor-default-block-appender .block-editor-inserter, // Empty appender
+.block-editor-inserter-with-shortcuts { // Right side quick shortcuts
 	position: absolute;
 	top: 0;
 
@@ -63,7 +63,7 @@
 		padding: 0;
 	}
 
-	.editor-block-icon {
+	.block-editor-block-icon {
 		margin: auto;
 	}
 
@@ -72,14 +72,14 @@
 		margin: auto;
 	}
 
-	.editor-inserter__toggle {
+	.block-editor-inserter__toggle {
 		margin-right: 0;
 	}
 }
 
 // Left side.
-.editor-block-list__empty-block-inserter,
-.editor-default-block-appender .editor-inserter {
+.block-editor-block-list__empty-block-inserter,
+.block-editor-default-block-appender .block-editor-inserter {
 	right: $grid-size; // Show to the right on mobile.
 
 	@include break-small {
@@ -91,7 +91,7 @@
 		display: none;
 	}
 
-	.editor-inserter__toggle {
+	.block-editor-inserter__toggle {
 		border-radius: 50%;
 		width: $block-side-ui-width;
 		height: $block-side-ui-width;
@@ -109,11 +109,11 @@
 
 // Quick block insertion icons on the right side.
 // Needs specificity to styles from the component itself.
-.editor-block-list__side-inserter .editor-inserter-with-shortcuts,
-.editor-default-block-appender .editor-inserter-with-shortcuts {
+.block-editor-block-list__side-inserter .block-editor-inserter-with-shortcuts,
+.block-editor-default-block-appender .block-editor-inserter-with-shortcuts {
 	right: $block-padding;
 	display: none; // Don't show on mobile.
-	z-index: z-index(".editor-inserter-with-shortcuts"); // Elevate above the sibling inserter.
+	z-index: z-index(".block-editor-inserter-with-shortcuts"); // Elevate above the sibling inserter.
 
 	@include break-small {
 		right: 0;

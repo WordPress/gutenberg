@@ -61,7 +61,7 @@ describe( 'Reusable Blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
@@ -95,7 +95,7 @@ describe( 'Reusable Blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that it is untitled
@@ -132,7 +132,7 @@ describe( 'Reusable Blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
@@ -144,7 +144,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Check that its content is up to date
 		const text = await page.$eval(
-			'.editor-block-list__block[data-type="core/block"] .editor-rich-text',
+			'.block-editor-block-list__block[data-type="core/block"] .block-editor-rich-text',
 			( element ) => element.innerText
 		);
 		expect( text ).toMatch( 'Oh! Hello there!' );
@@ -162,12 +162,12 @@ describe( 'Reusable Blocks', () => {
 		await convertButton.click();
 
 		// Check that we have a paragraph block on the page
-		const block = await page.$( '.editor-block-list__block[data-type="core/paragraph"]' );
+		const block = await page.$( '.block-editor-block-list__block[data-type="core/paragraph"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that its content is up to date
 		const text = await page.$eval(
-			'.editor-block-list__block[data-type="core/paragraph"] .editor-rich-text',
+			'.block-editor-block-list__block[data-type="core/paragraph"] .block-editor-rich-text',
 			( element ) => element.innerText
 		);
 		expect( text ).toMatch( 'Oh! Hello there!' );
@@ -195,7 +195,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Check that we couldn't find it
 		const items = await page.$$(
-			'.editor-block-types-list__item[aria-label="Surprised greeting block"]'
+			'.block-editor-block-types-list__item[aria-label="Surprised greeting block"]'
 		);
 		expect( items ).toHaveLength( 0 );
 	} );
@@ -240,7 +240,7 @@ describe( 'Reusable Blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed

@@ -3,37 +3,37 @@
 // value is designed to work with).
 
 $z-layers: (
-	".editor-block-list__block-edit::before": 0,
-	".editor-block-switcher__arrow": 1,
-	".editor-block-list__block {core/image aligned wide or fullwide}": 20,
+	".block-editor-block-list__block-edit::before": 0,
+	".block-editor-block-switcher__arrow": 1,
+	".block-editor-block-list__block {core/image aligned wide or fullwide}": 20,
 	".block-library-classic__toolbar": 10,
-	".editor-block-list__layout .reusable-block-indicator": 1,
-	".editor-block-list__breadcrumb": 2,
+	".block-editor-block-list__layout .reusable-block-indicator": 1,
+	".block-editor-block-list__breadcrumb": 2,
 	".components-form-toggle__input": 1,
 	".components-panel__header.edit-post-sidebar__panel-tabs": -1,
 	".edit-post-sidebar .components-panel": -2,
-	".editor-inserter__tabs": 1,
-	".editor-inserter__tab.is-active": 1,
+	".block-editor-inserter__tabs": 1,
+	".block-editor-inserter__tab.is-active": 1,
 	".components-panel__header": 1,
 	".components-modal__header": 10,
 	".edit-post-meta-boxes-area.is-loading::before": 1,
 	".edit-post-meta-boxes-area .spinner": 5,
-	".editor-block-contextual-toolbar": 21,
+	".block-editor-block-contextual-toolbar": 21,
 	".components-popover__close": 5,
-	".editor-block-list__insertion-point": 6,
-	".editor-inserter-with-shortcuts": 5,
-	".editor-warning": 5,
+	".block-editor-block-list__insertion-point": 6,
+	".block-editor-inserter-with-shortcuts": 5,
+	".block-editor-warning": 5,
 	".block-library-gallery-item__inline-menu": 20,
-	".editor-url-input__suggestions": 30,
+	".block-editor-url-input__suggestions": 30,
 	".edit-post-header": 30,
-	".block-library-button__inline-link .editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
+	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".block-library-image__resize-handlers": 1, // Resize handlers above sibling inserter
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
 
 	// Side UI active buttons
-	".editor-block-mover__control": 1,
+	".block-editor-block-mover__control": 1,
 
 	// Active pill button
 	".components-button.is-button {:focus or .is-primary}": 1,
@@ -43,7 +43,7 @@ $z-layers: (
 
 	// Should have higher index than the inset/underlay used for dragging
 	".components-placeholder__fieldset": 1,
-	".editor-block-list__block-edit .reusable-block-edit-panel *": 1,
+	".block-editor-block-list__block-edit .reusable-block-edit-panel *": 1,
 
 	// Show drop zone above most standard content, but below any overlays
 	".components-drop-zone": 100,
@@ -51,14 +51,14 @@ $z-layers: (
 
 	// The block mover, particularly in nested contexts,
 	// should overlap most block content.
-	".editor-block-list__block.is-{selected,hovered} .editor-block-mover": 80,
+	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 80,
 
 	// The block mover for floats should overlap the controls of adjacent blocks.
-	".editor-block-list__block {core/image aligned left or right}": 81,
+	".block-editor-block-list__block {core/image aligned left or right}": 81,
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
-	".editor-inner-blocks__small-screen-overlay:after": 120,
+	".block-editor-inner-blocks__small-screen-overlay:after": 120,
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
