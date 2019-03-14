@@ -24,7 +24,7 @@ module.exports = function( api ) {
 		} else {
 			opts.modules = false;
 			opts.targets = {
-				browsers: require( 'extends @wordpress/browserslist-config' ),
+				browsers: require( '@wordpress/browserslist-config' ),
 			};
 		}
 
