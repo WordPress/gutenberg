@@ -8,11 +8,11 @@ import { without, map } from 'lodash';
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, withInstanceId } from '@wordpress/compose';
+import { CheckboxControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import BlockManagerShowAll from './show-all';
 import BlockTypesChecklist from './checklist';
 
 function BlockManagerCategory( {
@@ -33,6 +33,18 @@ function BlockManagerCategory( {
 	);
 
 	const titleId = 'edit-post-manage-blocks-modal__category-title-' + instanceId;
+	const toggleId = 'edit-post-manage-blocks-modal__category-toggle-' + instanceId;
+
+	const isAllChecked = checkedBlockNames.length === blockTypes.length;
+
+	let ariaChecked;
+	if ( isAllChecked ) {
+		ariaChecked = 'true';
+	} else if ( checkedBlockNames.length > 0 ) {
+		ariaChecked = 'mixed';
+	} else {
+		ariaChecked = 'false';
+	}
 
 	return (
 		<div
@@ -40,18 +52,14 @@ function BlockManagerCategory( {
 			aria-labelledby={ titleId }
 			className="edit-post-manage-blocks-modal__category"
 		>
-			<div className="edit-post-manage-blocks-modal__category-header">
-				<h2
-					id={ titleId }
-					className="edit-post-manage-blocks-modal__category-title"
-				>
-					{ category.title }
-				</h2>
-				<BlockManagerShowAll
-					checked={ checkedBlockNames.length > 0 }
-					onChange={ toggleAllVisible }
-				/>
-			</div>
+			<CheckboxControl
+				id={ toggleId }
+				checked={ isAllChecked }
+				onChange={ toggleAllVisible }
+				className="edit-post-manage-blocks-modal__category-title"
+				aria-checked={ ariaChecked }
+				label={ <span id={ titleId }>{ category.title }</span> }
+			/>
 			<BlockTypesChecklist
 				blockTypes={ blockTypes }
 				value={ checkedBlockNames }

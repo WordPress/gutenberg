@@ -21,13 +21,12 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 					<CheckboxControl
 						label={ (
 							<Fragment>
-								<BlockIcon icon={ blockType.icon } />
 								{ blockType.title }
+								<BlockIcon icon={ blockType.icon } />
 							</Fragment>
 						) }
 						checked={ value.includes( blockType.name ) }
 						onChange={ partial( onItemChange, blockType.name ) }
-						mirror
 					/>
 				</li>
 			) ) }

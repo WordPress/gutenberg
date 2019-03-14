@@ -229,9 +229,35 @@ body.block-editor-page {
 	input[type="checkbox"] {
 		border-radius: $radius-round-rectangle / 2;
 
-		&:checked::before {
+		&:checked::before,
+		&[aria-checked="mixed"]::before {
 			margin: -4px 0 0 -5px;
 			color: $white;
+		}
+
+		&[aria-checked="mixed"] {
+			background: theme(toggle);
+			border-color: theme(toggle);
+
+			&::before {
+				// Inherited from `forms.css`.
+				// See: https://github.com/WordPress/wordpress-develop/tree/5.1.1/src/wp-admin/css/forms.css#L122-L132
+				content: "\f460";
+				float: left;
+				display: inline-block;
+				vertical-align: middle;
+				width: 16px;
+				/* stylelint-disable */
+				font: normal 21px/1 dashicons;
+				/* stylelint-enable */
+				speak: none;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+
+			&:focus {
+				box-shadow: 0 0 0 2px $dark-gray-500;
+			}
 		}
 	}
 

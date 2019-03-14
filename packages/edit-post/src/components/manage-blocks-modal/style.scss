@@ -49,26 +49,23 @@
 	margin: 0 0 2rem 0;
 }
 
-.edit-post-manage-blocks-modal__category-header {
-	position: sticky;
-	top: -1px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	background-color: $white;
-}
-
 .edit-post-manage-blocks-modal__category-title {
-	font-size: 0.9rem;
-	font-weight: 600;
+	position: sticky;
+	top: 0;
+	padding: $panel-padding 0;
+	background-color: $white;
+
+	.components-base-control__field {
+		margin-bottom: 0;
+	}
+
+	.components-checkbox-control__label {
+		font-size: 0.9rem;
+		font-weight: 600;
+	}
 }
 
 .edit-post-manage-blocks-modal__show-all {
-	display: flex;
-	align-items: center;
-}
-
-.edit-post-manage-blocks-modal__show-all-label {
 	margin-right: $grid-size;
 }
 
@@ -78,6 +75,7 @@
 
 .edit-post-manage-blocks-modal__checklist-item {
 	margin-bottom: 0;
+	padding-left: $grid-size-large;
 	border-top: 1px solid $light-gray-500;
 
 	&:last-child {
@@ -91,14 +89,15 @@
 	}
 
 	.components-modal__content & input[type="checkbox"] {
-		margin-right: 0;
+		margin: 0 $grid-size;
 	}
 
 	.components-checkbox-control__label {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		flex-grow: 1;
-		padding: 0.6rem 10px 0.6rem 0;
+		padding: 0.6rem 0 0.6rem 10px;
 	}
 
 	.editor-block-icon {
