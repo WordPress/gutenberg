@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Popover, ScrollLock, navigateRegions } from '@wordpress/components';
+import {
+	Button,
+	Popover,
+	ScrollLock,
+	FocusReturnProvider,
+	navigateRegions,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { PreserveScrollInReorder } from '@wordpress/block-editor';
 import {
@@ -66,67 +72,78 @@ function Layout( {
 		tabIndex: -1,
 	};
 	return (
-		<div className={ className }>
-			<FullscreenMode />
-			<BrowserURL />
-			<UnsavedChangesWarning />
-			<AutosaveMonitor />
-			<Header />
-			<div
-				className="edit-post-layout__content"
-				role="region"
-				/* translators: accessibility text for the content landmark region. */
-				aria-label={ __( 'Editor content' ) }
-				tabIndex="-1"
-			>
-				<EditorNotices dismissible={ false } className="is-pinned" />
-				<EditorNotices dismissible={ true } />
-				<PreserveScrollInReorder />
-				<EditorModeKeyboardShortcuts />
-				<KeyboardShortcutHelpModal />
-				<ManageBlocksModal />
-				<OptionsModal />
-				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
-				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
-				<div className="edit-post-layout__metaboxes">
-					<MetaBoxes location="normal" />
-				</div>
-				<div className="edit-post-layout__metaboxes">
-					<MetaBoxes location="advanced" />
-				</div>
-			</div>
-			{ publishSidebarOpened ? (
-				<PostPublishPanel
-					{ ...publishLandmarkProps }
-					onClose={ closePublishSidebar }
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-					PrePublishExtension={ PluginPrePublishPanel.Slot }
-					PostPublishExtension={ PluginPostPublishPanel.Slot }
-				/>
-			) : (
-				<Fragment>
-					<div className="edit-post-toggle-publish-panel" { ...publishLandmarkProps }>
-						<Button
-							isDefault
-							type="button"
-							className="edit-post-toggle-publish-panel__button"
-							onClick={ togglePublishSidebar }
-							aria-expanded={ false }
-						>
-							{ __( 'Open publish panel' ) }
-						</Button>
-					</div>
-					<SettingsSidebar />
-					<Sidebar.Slot />
-					{
-						isMobileViewport && sidebarIsOpened && <ScrollLock />
+		<FocusReturnProvider
+			value={ {
+				onFocusLoss() {
+					const layout = document.querySelector( '.edit-post-header' );
+					if ( layout ) {
+						layout.focus();
 					}
-				</Fragment>
-			) }
-			<Popover.Slot />
-			<PluginArea />
-		</div>
+				},
+			} }
+		>
+			<div className={ className }>
+				<FullscreenMode />
+				<BrowserURL />
+				<UnsavedChangesWarning />
+				<AutosaveMonitor />
+				<Header />
+				<div
+					className="edit-post-layout__content"
+					role="region"
+					/* translators: accessibility text for the content landmark region. */
+					aria-label={ __( 'Editor content' ) }
+					tabIndex="-1"
+				>
+					<EditorNotices dismissible={ false } className="is-pinned" />
+					<EditorNotices dismissible={ true } />
+					<PreserveScrollInReorder />
+					<EditorModeKeyboardShortcuts />
+					<KeyboardShortcutHelpModal />
+					<ManageBlocksModal />
+					<OptionsModal />
+					{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
+					{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
+					<div className="edit-post-layout__metaboxes">
+						<MetaBoxes location="normal" />
+					</div>
+					<div className="edit-post-layout__metaboxes">
+						<MetaBoxes location="advanced" />
+					</div>
+				</div>
+				{ publishSidebarOpened ? (
+					<PostPublishPanel
+						{ ...publishLandmarkProps }
+						onClose={ closePublishSidebar }
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+						PrePublishExtension={ PluginPrePublishPanel.Slot }
+						PostPublishExtension={ PluginPostPublishPanel.Slot }
+					/>
+				) : (
+					<Fragment>
+						<div className="edit-post-toggle-publish-panel" { ...publishLandmarkProps }>
+							<Button
+								isDefault
+								type="button"
+								className="edit-post-toggle-publish-panel__button"
+								onClick={ togglePublishSidebar }
+								aria-expanded={ false }
+							>
+								{ __( 'Open publish panel' ) }
+							</Button>
+						</div>
+						<SettingsSidebar />
+						<Sidebar.Slot />
+						{
+							isMobileViewport && sidebarIsOpened && <ScrollLock />
+						}
+					</Fragment>
+				) }
+				<Popover.Slot />
+				<PluginArea />
+			</div>
+		</FocusReturnProvider>
 	);
 }
 
