@@ -66,20 +66,7 @@ const externals = [
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
-const babelLoader = hasBabelConfig() ? {
-	test: /\.js$/,
-	exclude: /node_modules/,
-	use: require.resolve( 'babel-loader' ),
-} : {
-	test: /\.js$/,
-	exclude: /node_modules/,
-	use: {
-		loader: require.resolve( 'babel-loader' ),
-		options: {
-			presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
-		},
-	},
-};
+const getBabelLoaderOptions = () => hasBabelConfig() ? {} : { presets: [ require.resolve( '@wordpress/babel-preset-default' ) ] };
 
 const config = {
 	mode,
@@ -103,7 +90,14 @@ const config = {
 				use: require.resolve( 'source-map-loader' ),
 				enforce: 'pre',
 			},
-			babelLoader,
+			{
+				test: /\.js$/,
+				exclude: /node_modules/,
+				use: {
+					loader: require.resolve( 'babel-loader' ),
+					options: getBabelLoaderOptions(),
+				},
+			},
 		],
 	},
 	plugins: [
