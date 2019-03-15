@@ -1,8 +1,7 @@
 .block-editor-block-list__layout .reusable-block-indicator {
 	background: $white;
-	border-left: $border-width dashed $light-gray-500;
+	border: $border-width dashed $light-gray-500;
 	color: $dark-gray-500;
-	border-bottom: $border-width dashed $light-gray-500;
 	top: -$block-padding;
 	height: 30px;
 	padding: $grid-size-small;
