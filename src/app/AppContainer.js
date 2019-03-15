@@ -2,35 +2,57 @@
  * @format */
 
 import React from 'react';
+import type { EmitterSubscription } from 'react-native';
+import RNReactNativeGutenbergBridge, {
+	subscribeParentGetHtml,
+	subscribeParentToggleHTMLMode,
+	subscribeSetTitle,
+	subscribeUpdateHtml,
+} from 'react-native-gutenberg-bridge';
 import { isEmpty } from 'lodash';
+
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
+import { BlockEditorProvider } from '@wordpress/block-editor';
+import { UnsupportedBlock } from '@wordpress/editor';
 
-import MainApp from './MainApp';
 import type { BlockType } from '../store/types';
-import { name as unsupportedBlockName } from '../block-types/unsupported-block';
+
+import BlockManager from '../block-management/block-manager';
 
 type PropsType = {
-	rootClientId: ?string,
 	initialHtmlModeEnabled: boolean,
-	showHtml: boolean,
+	editorMode: string,
 	editedPostContent: string,
 	title: string,
 	initialTitle: string,
 	initialHtml: string,
 	editTitle: string => mixed,
-	resetBlocks: Array<BlockType> => mixed,
+	resetEditorBlocks: Array<BlockType> => mixed,
+	resetEditorBlocksWithoutUndoLevel: Array<BlockType> => mixed,
 	setupEditor: ( mixed, ?mixed ) => mixed,
-	toggleBlockMode: ?string => mixed,
-	getBlocks: () => Array<BlockType>,
+	toggleEditorMode: ?string => mixed,
+	blocks: Array<BlockType>,
+	isReady: boolean,
+	mode: string,
 	post: ?mixed,
+	getEditedPostContent: () => string,
+	switchMode: string => mixed,
 };
 
+/*
+ * This container combines features similar to the following components on Gutenberg:
+ * - `gutenberg/packages/editor/src/components/provider/index.js`
+ * - `gutenberg/packages/edit-post/src/components/layout/index.js`
+ */
 class AppContainer extends React.Component<PropsType> {
 	lastHtml: ?string;
 	lastTitle: ?string;
+	subscriptionParentGetHtml: ?EmitterSubscription;
+	subscriptionParentToggleHTMLMode: ?EmitterSubscription;
+	subscriptionParentSetTitle: ?EmitterSubscription;
+	subscriptionParentUpdateHtml: ?EmitterSubscription;
 
 	constructor( props: PropsType ) {
 		super( props );
@@ -50,24 +72,55 @@ class AppContainer extends React.Component<PropsType> {
 		this.lastHtml = serialize( parse( props.initialHtml ) );
 		this.lastTitle = props.initialTitle;
 
-		if ( props.initialHtmlModeEnabled && ! props.showHtml ) {
+		if ( props.initialHtmlModeEnabled && props.mode === 'visual' ) {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
-			this.toggleHtmlModeAction();
+			this.toggleMode();
 		}
 	}
 
-	componentDidMount = () => {
-		const blocks = this.props.getBlocks();
-		const hasUnsupportedBlocks = ! isEmpty( blocks.filter( ( { name } ) => name === unsupportedBlockName ) );
+	componentDidMount() {
+		const blocks = this.props.blocks;
+		const hasUnsupportedBlocks = ! isEmpty( blocks.filter( ( { name } ) => name === UnsupportedBlock.name ) );
 		RNReactNativeGutenbergBridge.editorDidMount( hasUnsupportedBlocks );
+
+		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
+			this.serializeToNativeAction();
+		} );
+
+		this.subscriptionParentToggleHTMLMode = subscribeParentToggleHTMLMode( () => {
+			this.toggleMode();
+		} );
+
+		this.subscriptionParentSetTitle = subscribeSetTitle( ( payload ) => {
+			this.props.editTitle( payload.title );
+		} );
+
+		this.subscriptionParentUpdateHtml = subscribeUpdateHtml( ( payload ) => {
+			this.updateHtmlAction( payload.html );
+		} );
 	}
 
-	serializeToNativeAction = () => {
-		if ( this.props.showHtml ) {
-			this.updateHtmlAction( this.props.editedPostContent );
+	componentWillUnmount() {
+		if ( this.subscriptionParentGetHtml ) {
+			this.subscriptionParentGetHtml.remove();
+		}
+		if ( this.subscriptionParentToggleHTMLMode ) {
+			this.subscriptionParentToggleHTMLMode.remove();
+		}
+		if ( this.subscriptionParentSetTitle ) {
+			this.subscriptionParentSetTitle.remove();
+		}
+		if ( this.subscriptionParentUpdateHtml ) {
+			this.subscriptionParentUpdateHtml.remove();
+		}
+	}
+
+	serializeToNativeAction() {
+		if ( this.props.mode === 'text' ) {
+			this.updateHtmlAction( this.props.getEditedPostContent() );
 		}
 
-		const html = serialize( this.props.getBlocks() );
+		const html = serialize( this.props.blocks );
 		const title = this.props.title;
 
 		const hasChanges = title !== this.lastTitle || html !== this.lastHtml;
@@ -76,66 +129,94 @@ class AppContainer extends React.Component<PropsType> {
 
 		this.lastTitle = title;
 		this.lastHtml = html;
-	};
+	}
 
-	toggleHtmlModeAction = () => {
-		this.props.toggleBlockMode( this.props.rootClientId );
-	};
-
-	setTitleAction = ( title: string ) => {
-		this.props.editTitle( title );
-	};
-
-	updateHtmlAction = ( html: string = '' ) => {
+	updateHtmlAction( html: string = '' ) {
 		const parsed = parse( html );
-		this.props.resetBlocks( parsed );
-	};
+		this.props.resetEditorBlocksWithoutUndoLevel( parsed );
+	}
+
+	toggleMode() {
+		const { mode, switchMode } = this.props;
+		switchMode( mode === 'visual' ? 'text' : 'visual' );
+	}
 
 	render() {
+		const {
+			blocks,
+			editTitle,
+			isReady,
+			mode,
+			resetEditorBlocks,
+			resetEditorBlocksWithoutUndoLevel,
+			title,
+		} = this.props;
+
+		if ( ! isReady ) {
+			return null;
+		}
+
 		return (
-			<MainApp
-				rootClientId={ this.props.rootClientId }
-				serializeToNativeAction={ this.serializeToNativeAction }
-				toggleHtmlModeAction={ this.toggleHtmlModeAction }
-				setTitleAction={ this.setTitleAction }
-				updateHtmlAction={ this.updateHtmlAction }
-				title={ this.props.title }
-			/>
+			<BlockEditorProvider
+				value={ blocks }
+				onInput={ resetEditorBlocksWithoutUndoLevel }
+				onChange={ resetEditorBlocks }
+				settings={ null }
+			>
+				<BlockManager
+					title={ title }
+					setTitleAction={ editTitle }
+					showHtml={ mode === 'text' }
+				/>
+			</BlockEditorProvider>
 		);
 	}
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select ) => {
 		const {
-			getBlocks,
-			getBlockMode,
-			getEditedPostContent,
+			__unstableIsEditorReady: isEditorReady,
+			getEditorBlocks,
 			getEditedPostAttribute,
+			getEditedPostContent,
 		} = select( 'core/editor' );
+		const {
+			getEditorMode,
+		} = select( 'core/edit-post' );
 
 		return {
-			getBlocks,
-			showHtml: getBlockMode( rootClientId ) === 'html',
-			editedPostContent: getEditedPostContent(),
+			isReady: isEditorReady(),
+			blocks: getEditorBlocks(),
+			mode: getEditorMode(),
 			title: getEditedPostAttribute( 'title' ),
+			getEditedPostContent,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
 			editPost,
-			resetBlocks,
 			setupEditor,
-			toggleBlockMode,
+			resetEditorBlocks,
 		} = dispatch( 'core/editor' );
+		const {
+			switchEditorMode,
+		} = dispatch( 'core/edit-post' );
 
 		return {
 			editTitle( title ) {
-				editPost( { title: title } );
+				editPost( { title } );
 			},
-			resetBlocks,
+			resetEditorBlocks,
+			resetEditorBlocksWithoutUndoLevel( blocks ) {
+				resetEditorBlocks( blocks, {
+					__unstableShouldCreateUndoLevel: false,
+				} );
+			},
 			setupEditor,
-			toggleBlockMode,
+			switchMode( mode ) {
+				switchEditorMode( mode );
+			},
 		};
 	} ),
 ] )( AppContainer );

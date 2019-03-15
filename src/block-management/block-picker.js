@@ -13,7 +13,7 @@ import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 * WordPress dependencies
 */
 import { SVG } from '@wordpress/components';
-import { BottomSheet } from '@wordpress/editor';
+import { BottomSheet, UnsupportedBlock } from '@wordpress/editor';
 import { Component } from '@wordpress/element';
 import { getBlockTypes } from '@wordpress/blocks';
 
@@ -21,7 +21,6 @@ import { getBlockTypes } from '@wordpress/blocks';
 * Internal dependencies
 */
 import styles from './block-picker.scss';
-import { name as unsupportedBlockName } from '../block-types/unsupported-block';
 
 type PropsType = {
 	style?: StyleSheet,
@@ -32,7 +31,7 @@ type PropsType = {
 };
 
 export default class BlockPicker extends Component<PropsType> {
-	availableBlockTypes = getBlockTypes().filter( ( { name } ) => name !== unsupportedBlockName );
+	availableBlockTypes = getBlockTypes().filter( ( { name } ) => name !== UnsupportedBlock.name );
 
 	render() {
 		const numberOfColumns = this.calculateNumberOfColumns();
