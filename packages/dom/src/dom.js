@@ -180,8 +180,14 @@ export function isVerticalEdge( container, isReverse ) {
 		return false;
 	}
 
-	const buffer = rangeRect.height / 2;
 	const editableRect = container.getBoundingClientRect();
+
+	// Calculate a buffer that is half the line height. In some browsers, the
+	// selection rectangle may not fill the entire height of the line, so we add
+	// half the line height to the selection rectangle to ensure that it is well
+	// over its line boundary.
+	const { lineHeight } = window.getComputedStyle( container );
+	const buffer = parseInt( lineHeight, 10 ) / 2;
 
 	// Too low.
 	if ( isReverse && rangeRect.top - buffer > editableRect.top ) {
