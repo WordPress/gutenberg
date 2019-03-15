@@ -46,13 +46,20 @@ import Saturation from './saturation';
 import { colorToState, simpleCheckForValidColor, isValidHex } from './utils';
 
 const toLowerCase = ( value ) => String( value ).toLowerCase();
-const isValueEmpty = ( data ) => ( data.source === 'hex' && ! data.hex ) ||
-	( data.source === 'hsl' && ( ! data.h || ! data.s || ! data.l ) ) ||
-	( data.source === 'rgb' && (
+const isValueEmpty = ( data ) => {
+	if ( data.source === 'hex' && ! data.hex ) {
+		return true;
+	} else if ( data.source === 'hsl' && ( ! data.h || ! data.s || ! data.l ) ) {
+		return true;
+	} else if ( data.source === 'rgb' && (
 		( ! data.r || ! data.g || ! data.b ) &&
 		( ! data.h || ! data.s || ! data.v || ! data.a ) &&
 		( ! data.h || ! data.s || ! data.l || ! data.a )
-	) );
+	) ) {
+		return true;
+	}
+	return false;
+};
 const isValidColor = ( colors ) => colors.hex ?
 	isValidHex( colors.hex ) :
 	simpleCheckForValidColor( colors );
@@ -117,10 +124,6 @@ export default class ColorPicker extends Component {
 	commitValues( data ) {
 		const { oldHue, onChangeComplete = noop } = this.props;
 
-		if ( isValueEmpty( data ) ) {
-			return;
-		}
-
 		if ( isValidColor( data ) ) {
 			const colors = colorToState( data, data.h || oldHue );
 			this.setState( {
@@ -162,7 +165,10 @@ export default class ColorPicker extends Component {
 				this.resetDraftValues();
 				break;
 			case 'commit':
-				this.commitValues( dataToColors( this.state, data ) );
+				const colors = dataToColors( this.state, data );
+				if ( ! isValueEmpty( colors ) ) {
+					this.commitValues( colors );
+				}
 				break;
 			case 'draft':
 				this.setDraftValues( dataToColors( this.state, data ) );
