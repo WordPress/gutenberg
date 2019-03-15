@@ -373,6 +373,8 @@ export class RichText extends Component {
 		// Browsers setting `isComposing` to `true` will usually emit a final
 		// `input` event when the characters are composed.
 		if ( event && event.nativeEvent.isComposing ) {
+			// Also don't update any selection.
+			document.removeEventListener( 'selectionchange', this.onSelectionChange );
 			return;
 		}
 
@@ -444,6 +446,8 @@ export class RichText extends Component {
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
 		this.onInput();
+		// Tracking selection changes can be resumed.
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	/**
@@ -1114,8 +1118,6 @@ export class RichText extends Component {
 								onBlur={ this.onBlur }
 								onMouseDown={ this.onPointerDown }
 								onTouchStart={ this.onPointerDown }
-								multilineTag={ this.multilineTag }
-								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
 							/>
 							{ isPlaceholderVisible &&

@@ -13,7 +13,7 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { diffAriaProps, pickAriaProps } from './aria';
+import { diffAriaProps } from './aria';
 
 /**
  * Browser dependencies
@@ -137,10 +137,7 @@ export default class Editable extends Component {
 
 	bindEditorNode( editorNode ) {
 		this.editorNode = editorNode;
-
-		if ( this.props.setRef ) {
-			this.props.setRef( editorNode );
-		}
+		this.props.setRef( editorNode );
 
 		if ( IS_IE ) {
 			if ( editorNode ) {
@@ -154,7 +151,6 @@ export default class Editable extends Component {
 	}
 
 	render() {
-		const ariaProps = pickAriaProps( this.props );
 		const {
 			tagName = 'div',
 			style,
@@ -162,21 +158,14 @@ export default class Editable extends Component {
 			valueToEditableHTML,
 			className,
 			isPlaceholderVisible,
-			onPaste,
-			onInput,
-			onKeyDown,
-			onCompositionEnd,
-			onFocus,
-			onBlur,
-			onMouseDown,
-			onTouchStart,
+			...remainingProps
 		} = this.props;
 
-		ariaProps.role = 'textbox';
-		ariaProps[ 'aria-multiline' ] = true;
+		delete remainingProps.setRef;
 
 		return createElement( tagName, {
-			...ariaProps,
+			role: 'textbox',
+			'aria-multiline': true,
 			className: classnames( className, CLASS_NAME ),
 			contentEditable: true,
 			[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
@@ -184,14 +173,7 @@ export default class Editable extends Component {
 			style,
 			suppressContentEditableWarning: true,
 			dangerouslySetInnerHTML: { __html: valueToEditableHTML( record ) },
-			onPaste,
-			onInput,
-			onFocus,
-			onBlur,
-			onKeyDown,
-			onCompositionEnd,
-			onMouseDown,
-			onTouchStart,
+			...remainingProps,
 		} );
 	}
 }
