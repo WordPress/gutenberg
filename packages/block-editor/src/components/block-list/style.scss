@@ -159,6 +159,10 @@
 	// Hover style.
 	&.is-hovered > .block-editor-block-list__block-edit::before {
 		box-shadow: -$block-left-border-width 0 0 0 $light-gray-500;
+
+		.is-dark-theme & {
+			box-shadow: -$block-left-border-width 0 0 0 $dark-gray-600;
+		}
 	}
 
 	// Spotlight mode.
@@ -982,13 +986,17 @@
 	.components-toolbar {
 		padding: 0;
 		border: none;
-		background: transparent;
 		line-height: 1;
 		font-family: $default-font;
 		font-size: 11px;
 		padding: 4px 4px;
 		background: $light-gray-500;
 		color: $dark-gray-900;
+
+		.is-dark-theme & {
+			background: $dark-gray-600;
+			color: $white;
+		}
 
 		// Animate in
 		.block-editor-block-list__block:hover & {
