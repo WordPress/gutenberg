@@ -64,9 +64,8 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
     @objc
     func nativeLoggingHook(_ message: String, logLevel: Int) {
-        DispatchQueue.main.async {
-            self.delegate?.nativeLoggingHook(message: message, logLevel: logLevel)
-        }
+        guard let logLevel = LogLevel.init(rawValue: logLevel) else { return }
+        delegate?.nativeLoggingHook(message: message, logLevel: logLevel)
     }
 
     override public func startObserving() {
