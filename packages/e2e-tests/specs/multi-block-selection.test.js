@@ -165,4 +165,19 @@ describe( 'Multi-block selection', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should use selection direction to determine vertical edge', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'ArrowDown' );
+
+		// Should type at the end of the paragraph.
+		await page.keyboard.type( '.' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
