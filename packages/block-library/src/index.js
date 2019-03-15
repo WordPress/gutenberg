@@ -107,7 +107,7 @@ export const registerCoreBlocks = () => {
 		pullquote,
 		rss,
 		search,
-		section,
+		process.env.GUTENBERG_PHASE === 2 ? section : null,
 		separator,
 		reusableBlock,
 		spacer,
