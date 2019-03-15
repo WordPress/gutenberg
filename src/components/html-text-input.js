@@ -83,7 +83,9 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 	render() {
 		return (
 			<KeyboardAvoidingView style={ styles.container } parentHeight={ this.props.parentHeight }>
-				<ScrollView style={ { flex: 1 } } >
+				<ScrollView
+					style={ { flex: 1 } }
+					keyboardDismissMode="interactive" >
 					<TextInput
 						autoCorrect={ false }
 						textAlignVertical="center"
@@ -125,7 +127,8 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetBlocks } = dispatch( 'core/editor' );
+		const { resetBlocks } = dispatch( 'core/block-editor' );
+		const { editPost } = dispatch( 'core/editor' );
 		return {
 			onChange( content ) {
 				editPost( { content } );

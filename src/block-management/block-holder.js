@@ -28,7 +28,7 @@ import type { BlockType } from '../store/types';
 import styles from './block-holder.scss';
 
 // Gutenberg imports
-import { BlockEdit } from '@wordpress/editor';
+import { BlockEdit } from '@wordpress/block-editor';
 
 import TextInputState from 'react-native/lib/TextInputState';
 
@@ -209,7 +209,7 @@ export default compose( [
 			getPreviousBlockClientId,
 			getNextBlockClientId,
 			isBlockSelected,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
 		const name = getBlockName( clientId );
 		const attributes = getBlockAttributes( clientId );
 		const order = getBlockIndex( clientId, rootClientId );
@@ -239,7 +239,7 @@ export default compose( [
 			replaceBlocks,
 			selectBlock,
 			updateBlockAttributes,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			mergeBlocks,

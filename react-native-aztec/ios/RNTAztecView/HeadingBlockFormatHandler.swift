@@ -16,11 +16,13 @@ struct HeadingBlockFormatHandler: BlockFormatHandler {
     func forceTypingFormat(on textView: RCTAztecView) {
         var attributes = textView.typingAttributes
 
-
         attributes = paragraphFormatter.remove(from: textView.typingAttributes)
         attributes = headerFormatter.apply(to: textView.typingAttributes, andStore: nil)
 
         textView.typingAttributes = attributes
+        if let font = attributes[.font] as? UIFont {
+            textView.placeholderLabel.font = font
+        }
     }
 
     private static func headerLevel(from levelString: String) -> Header.HeaderType? {
