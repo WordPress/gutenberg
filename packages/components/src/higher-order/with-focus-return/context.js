@@ -40,10 +40,12 @@ class FocusReturnProvider extends Component {
 	}
 
 	render() {
+		const { children, className } = this.props;
+
 		return (
 			<Provider value={ this.state }>
-				<div onFocus={ this.onFocus }>
-					{ this.props.children }
+				<div onFocus={ this.onFocus } className={ className }>
+					{ children }
 				</div>
 			</Provider>
 		);
