@@ -20,10 +20,10 @@ const jest = require( 'jest' );
 const {
 	fromConfigRoot,
 	getCliArg,
+	getCliArgs,
 	hasCliArg,
 	hasProjectFile,
 	hasJestConfig,
-	cleanUpArgs,
 } = require( '../utils' );
 
 // Provides a default config path for Puppeteer when jest-puppeteer.config.js
@@ -46,8 +46,8 @@ const runInBand = ! hasRunInBand ?
 const cleanUpPrefixes = [ '--puppeteer-' ];
 
 if ( hasCliArg( '--puppeteer-interactive' ) ) {
-	process.env.PUPPETEER_HEADLESS = false;
+	process.env.PUPPETEER_HEADLESS = 'false';
 	process.env.PUPPETEER_SLOWMO = getCliArg( '--puppeteer-slowmo' ) || 80;
 }
 
-jest.run( [ ...config, ...runInBand, ...cleanUpArgs( cleanUpPrefixes ) ] );
+jest.run( [ ...config, ...runInBand, ...getCliArgs( cleanUpPrefixes ) ] );
