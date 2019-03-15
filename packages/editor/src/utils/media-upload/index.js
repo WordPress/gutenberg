@@ -33,10 +33,7 @@ export default function( {
 	onError = noop,
 	onFileChange,
 } ) {
-	const {
-		getCurrentPostId,
-		getEditorSettings,
-	} = select( 'core/editor' );
+	const { getCurrentPostId, getEditorSettings } = select( 'core/editor' );
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	maxUploadFileSize = maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 

@@ -15,4 +15,4 @@ function enqueue_disable_animations_stylesheet() {
 	wp_add_inline_style( 'wp-components', $custom_css );
 }
 
-add_action( 'enqueue_block_editor_assets', 'enqueue_disable_animations_stylesheet' );
+add_action( 'admin_enqueue_scripts', 'enqueue_disable_animations_stylesheet' );

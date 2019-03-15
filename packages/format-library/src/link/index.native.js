@@ -9,7 +9,7 @@ import { find } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { withSpokenMessages } from '@wordpress/components';
-import { RichTextToolbarButton } from '@wordpress/editor';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	applyFormat,
 	getActiveFormat,

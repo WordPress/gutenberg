@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
-import { InspectorControls } from '@wordpress/editor';
+import { InspectorControls } from '@wordpress/block-editor';
 import { ENTER } from '@wordpress/keycodes';
 import {
 	getDefaultBlockName,

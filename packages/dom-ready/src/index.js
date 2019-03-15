@@ -3,6 +3,15 @@
  *
  * @param {Function} callback A function to execute after the DOM is ready.
  *
+ * @example
+ * ```js
+ * import domReady from '@wordpress/dom-ready';
+ *
+ * domReady( function() {
+ * 	//do something after DOM loads.
+ * } );
+ * ```
+ *
  * @return {void}
  */
 const domReady = function( callback ) {

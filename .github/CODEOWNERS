@@ -23,11 +23,12 @@
 
 # Tooling
 /bin                                            @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/babel-plugin-makepot                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/babel-preset-default                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/babel-preset-default                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/browserslist-config                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/custom-templated-path-webpack-plugin  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/docgen                                @nosolosw @mkaz
 /packages/e2e-test-utils                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @talldan
 /packages/eslint-plugin                         @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
@@ -40,12 +41,12 @@
 /packages/scripts                               @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw @mkaz
 
 # UI Components
-/packages/components                            @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
-/packages/compose                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
-/packages/element                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
-/packages/notices                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
-/packages/nux                                   @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
-/packages/viewport                              @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/components                            @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks @chrisvanpatten
+/packages/compose                               @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/element                               @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/notices                               @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/nux                                   @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/viewport                              @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
 
 # Utilities
 /packages/a11y                                  @youknowriad @gziolo @aduth
@@ -79,8 +80,8 @@
 # Documentation
 /docs                                           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
 
-# Styles (Unowned)
-*.scss                                          @ghost
+# Styles
+*.scss                                          @chrisvanpatten
 
 # Native (Unowned)
 *.native.js                                     @ghost

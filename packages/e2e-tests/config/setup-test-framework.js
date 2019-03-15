@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import 'expect-puppeteer';
 import { get } from 'lodash';
 
 /**
@@ -14,6 +13,8 @@ import {
 	setBrowserViewport,
 	visitAdminPage,
 	activatePlugin,
+	switchUserToAdmin,
+	switchUserToTest,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -55,6 +56,7 @@ async function setupBrowser() {
  * @return {Promise} Promise resolving once posts have been trashed.
  */
 async function trashExistingPosts() {
+	await switchUserToAdmin();
 	// Visit `/wp-admin/edit.php` so we can see a list of posts and delete them.
 	await visitAdminPage( 'edit.php' );
 
@@ -71,9 +73,10 @@ async function trashExistingPosts() {
 	await page.select( '#bulk-action-selector-top', 'trash' );
 	// Submit the form to send all draft/scheduled/published posts to the trash.
 	await page.click( '#doaction' );
-	return page.waitForXPath(
+	await page.waitForXPath(
 		'//*[contains(@class, "updated notice")]/p[contains(text(), "moved to the Trash.")]'
 	);
+	await switchUserToTest();
 }
 
 /**
