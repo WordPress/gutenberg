@@ -1,6 +1,5 @@
 import ModalLinkUI from '../../gutenberg/packages/format-library/src/link/modal.native.js'
 import { shallow } from 'enzyme';
-import sinon from 'sinon';
 
 describe( 'LinksUI', () => {
 	it( 'LinksUI renders', () => {
