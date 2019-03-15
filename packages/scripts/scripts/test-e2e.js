@@ -19,6 +19,7 @@ const jest = require( 'jest' );
  */
 const {
 	fromConfigRoot,
+	getCliArg,
 	getCliArgs,
 	hasCliArg,
 	hasProjectFile,
@@ -42,4 +43,11 @@ const runInBand = ! hasRunInBand ?
 	[ '--runInBand' ] :
 	[];
 
-jest.run( [ ...config, ...runInBand, ...getCliArgs() ] );
+const cleanUpPrefixes = [ '--puppeteer-' ];
+
+if ( hasCliArg( '--puppeteer-interactive' ) ) {
+	process.env.PUPPETEER_HEADLESS = 'false';
+	process.env.PUPPETEER_SLOWMO = getCliArg( '--puppeteer-slowmo' ) || 80;
+}
+
+jest.run( [ ...config, ...runInBand, ...getCliArgs( cleanUpPrefixes ) ] );
