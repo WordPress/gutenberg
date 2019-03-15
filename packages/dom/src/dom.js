@@ -169,7 +169,18 @@ export function isVerticalEdge( container, isReverse ) {
 	}
 
 	const selection = window.getSelection();
+
+	// Only consider the selection at the edge if the direction is towards the
+	// edge.
+	if (
+		! selection.isCollapsed &&
+		isSelectionForward( selection ) === isReverse
+	) {
+		return false;
+	}
+
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+
 	if ( ! range ) {
 		return false;
 	}
