@@ -21,6 +21,7 @@ import type { BlockType } from '../store/types';
 import styles from './block-holder.scss';
 
 // Gutenberg imports
+import { getBlockType } from '@wordpress/blocks';
 import { BlockEdit } from '@wordpress/block-editor';
 
 import TextInputState from 'react-native/lib/TextInputState';
@@ -37,6 +38,7 @@ type PropsType = BlockType & {
 	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
 	getPreviousBlockClientId: ( clientId: string ) => string,
 	getNextBlockClientId: ( clientId: string ) => string,
+	getBlockName: ( clientId: string ) => string,
 	onChange: ( attributes: mixed ) => void,
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
 	onCaretVerticalPositionChange: ( targetId: number, caretY: number, previousCaretY: ?number ) => void,
@@ -121,6 +123,13 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		if ( forward ) {
 			mergeBlocks( clientId, nextBlockClientId );
 		} else {
+			const name = this.props.getBlockName( previousBlockClientId );
+			const blockType = getBlockType( name );
+			// The default implementation does only focus the previous block if it's not mergeable
+			// We don't want to move the focus for now, just keep for and caret at the beginning of the current block.
+			if ( ! blockType.merge ) {
+				return;
+			}
 			mergeBlocks( previousBlockClientId, clientId );
 		}
 	};
@@ -202,6 +211,7 @@ export default compose( [
 		return {
 			attributes,
 			getBlockIndex,
+			getBlockName,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
 			isFirstBlock,
