@@ -50,7 +50,7 @@ npm init
 package name: (myguten-block) myguten-block
 version: (1.0.0)
 description: Test block
-entry point: (index.js) block.js
+entry point: (index.js) build/index.js
 test command:
 git repository:
 keywords:
