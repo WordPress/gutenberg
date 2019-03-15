@@ -217,6 +217,18 @@ export function getRectangleFromRange( range ) {
 		return range.getBoundingClientRect();
 	}
 
+	const { startContainer } = range;
+
+	// Correct invalid "BR" ranges. The cannot contain any children.
+	if ( startContainer.nodeName === 'BR' ) {
+		const { parentNode } = startContainer;
+		const index = Array.from( parentNode.childNodes ).indexOf( startContainer );
+
+		range = document.createRange();
+		range.setStart( parentNode, index );
+		range.setEnd( parentNode, index );
+	}
+
 	let rect = range.getClientRects()[ 0 ];
 
 	// If the collapsed range starts (and therefore ends) at an element node,
