@@ -1,4 +1,5 @@
-import renderer from 'react-test-renderer';
+import { shallow } from 'enzyme';
+
 import Paragraph from '../../gutenberg/packages/block-library/src/paragraph/edit.native.js';
 
 import { createBlock } from '@wordpress/blocks';
@@ -9,7 +10,7 @@ let insertBlocksAfter = jest.fn();
 let setAttributes = jest.fn();
 
 const getTestComponentWithContent = ( content ) => {
-	return renderer.create(
+	return shallow(
 		<Paragraph
 			attributes={ { content } }
 			setAttributes={ setAttributes }
@@ -20,7 +21,7 @@ const getTestComponentWithContent = ( content ) => {
 };
 
 const getTestInstanceWithContent = ( content ) => {
-	return getTestComponentWithContent( content ).root.instance;
+	return getTestComponentWithContent( content ).instance();
 };
 
 describe( 'Paragraph block', () => {
@@ -32,9 +33,7 @@ describe( 'Paragraph block', () => {
 
 	it( 'renders without crashing', () => {
 		const component = getTestComponentWithContent( '' );
-		const rendered = component.toJSON();
-
-		expect( rendered ).toBeTruthy();
+		expect( component.exists() ).toBe( true );
 	} );
 
 	it( 'split empty block', () => {
