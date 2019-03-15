@@ -2,6 +2,7 @@
  * External dependencies
  */
 import memize from 'memize';
+import { size, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,12 +27,37 @@ class Editor extends Component {
 		} );
 	}
 
-	getEditorSettings( settings, hasFixedToolbar, focusMode ) {
-		return {
+	getEditorSettings(
+		settings,
+		hasFixedToolbar,
+		focusMode,
+		hiddenBlockTypes,
+		blockTypes,
+	) {
+		settings = {
 			...settings,
 			hasFixedToolbar,
 			focusMode,
 		};
+
+		// Omit hidden block types if exists and non-empty.
+		if ( size( hiddenBlockTypes ) > 0 ) {
+			// Defer to passed setting for `allowedBlockTypes` if provided as
+			// anything other than `true` (where `true` is equivalent to allow
+			// all block types).
+			const defaultAllowedBlockTypes = (
+				true === settings.allowedBlockTypes ?
+					map( blockTypes, 'name' ) :
+					( settings.allowedBlockTypes || [] )
+			);
+
+			settings.allowedBlockTypes = without(
+				defaultAllowedBlockTypes,
+				...hiddenBlockTypes,
+			);
+		}
+
+		return settings;
 	}
 
 	render() {
@@ -42,6 +68,8 @@ class Editor extends Component {
 			post,
 			initialEdits,
 			onError,
+			hiddenBlockTypes,
+			blockTypes,
 			...props
 		} = this.props;
 
@@ -49,11 +77,13 @@ class Editor extends Component {
 			return null;
 		}
 
-		const editorSettings = {
-			...settings,
+		const editorSettings = this.getEditorSettings(
+			settings,
 			hasFixedToolbar,
 			focusMode,
-		};
+			hiddenBlockTypes,
+			blockTypes,
+		);
 
 		return (
 			<StrictMode>
@@ -74,8 +104,16 @@ class Editor extends Component {
 	}
 }
 
-export default withSelect( ( select, { postId, postType } ) => ( {
-	hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-	focusMode: select( 'core/edit-post' ).isFeatureActive( 'focusMode' ),
-	post: select( 'core' ).getEntityRecord( 'postType', postType, postId ),
-} ) )( Editor );
+export default withSelect( ( select, { postId, postType } ) => {
+	const { isFeatureActive, getPreference } = select( 'core/edit-post' );
+	const { getEntityRecord } = select( 'core' );
+	const { getBlockTypes } = select( 'core/blocks' );
+
+	return {
+		hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+		focusMode: isFeatureActive( 'focusMode' ),
+		post: getEntityRecord( 'postType', postType, postId ),
+		hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+		blockTypes: getBlockTypes(),
+	};
+} )( Editor );

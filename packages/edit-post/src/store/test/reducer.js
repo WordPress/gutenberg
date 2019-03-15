@@ -15,21 +15,14 @@ import {
 	metaBoxLocations,
 	removedPanels,
 } from '../reducer';
+import { PREFERENCES_DEFAULTS } from '../defaults';
 
 describe( 'state', () => {
 	describe( 'preferences()', () => {
 		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 
-			expect( state ).toEqual( {
-				editorMode: 'visual',
-				isGeneralSidebarDismissed: false,
-				panels: {
-					'post-status': { opened: true },
-				},
-				features: { fixedToolbar: false },
-				pinnedPluginItems: {},
-			} );
+			expect( state ).toEqual( PREFERENCES_DEFAULTS );
 		} );
 
 		it( 'should set the general sidebar dismissed', () => {
@@ -221,6 +214,40 @@ describe( 'state', () => {
 				} );
 
 				expect( state.pinnedPluginItems[ 'foo/disabled' ] ).toBe( true );
+			} );
+		} );
+
+		describe( 'hiddenBlockTypes', () => {
+			it( 'concatenates unique names on disable', () => {
+				const original = deepFreeze( {
+					hiddenBlockTypes: [ 'a', 'b' ],
+				} );
+
+				const state = preferences( original, {
+					type: 'HIDE_BLOCK_TYPES',
+					blockNames: [ 'b', 'c' ],
+				} );
+
+				expect( state.hiddenBlockTypes ).toEqual( [
+					'a',
+					'b',
+					'c',
+				] );
+			} );
+
+			it( 'omits present names by enable', () => {
+				const original = deepFreeze( {
+					hiddenBlockTypes: [ 'a', 'b' ],
+				} );
+
+				const state = preferences( original, {
+					type: 'SHOW_BLOCK_TYPES',
+					blockNames: [ 'b', 'c' ],
+				} );
+
+				expect( state.hiddenBlockTypes ).toEqual( [
+					'a',
+				] );
 			} );
 		} );
 	} );
