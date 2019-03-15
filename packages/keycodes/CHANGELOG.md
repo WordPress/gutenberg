@@ -1,3 +1,7 @@
+## 2.2.0 (Unreleased)
+
+- Added keycodes for HOME and END keys.
+
 ## 2.0.5 (2018-11-21)
 
 ## 2.0.4 (2018-11-20)
