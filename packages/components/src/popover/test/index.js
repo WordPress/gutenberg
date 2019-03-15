@@ -11,7 +11,11 @@ import { noop } from 'lodash';
 import Popover from '../';
 
 /**
- * Explain why here.
+ * The @wordpress/dom focusable's find function needs to be mocked because
+ * `TestUtils.renderIntoDocument` does not actually render into a document.
+ * This causes problems with a check for an element's offset width and height to
+ * determine if the element is visible. So here we simply return all found
+ * elements.
  */
 const { SELECTOR: mockSELECTOR } = require.requireActual( '../../../../dom/src/focusable' );
 jest.mock( '../../../../dom/src/focusable', () => ( {
