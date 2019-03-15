@@ -17,7 +17,7 @@ import {
 	placeCaretAtVerticalEdge,
 	isEntirelySelected,
 } from '@wordpress/dom';
-import { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, HOME, END, isKeyboardEvent } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -273,11 +273,11 @@ class WritingFlow extends Component {
 			return;
 		}
 
-		if ( metaKey ) {
-			if ( isUp ) {
+		if ( metaKey || ctrlKey ) {
+			if ( ( metaKey && isUp ) || ( ctrlKey && keyCode === HOME ) ) {
 				onSelectBlock( blocks[ 0 ] );
 				event.preventDefault();
-			} else if ( isDown ) {
+			} else if ( ( metaKey && isDown ) || ( ctrlKey && keyCode === END ) ) {
 				onSelectBlock( blocks[ blocks.length - 1 ], -1 );
 				event.preventDefault();
 			}
