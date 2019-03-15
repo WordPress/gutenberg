@@ -1,17 +1,17 @@
-.editor-media-placeholder__url-input-container {
+.block-editor-media-placeholder__url-input-container {
 	width: 100%;
 
 	// Reset the margin to ensure the url popover is adjacent to the button.
-	.editor-media-placeholder__button {
+	.block-editor-media-placeholder__button {
 		margin-bottom: 0;
 	}
 }
 
-.editor-media-placeholder__url-input-form {
+.block-editor-media-placeholder__url-input-form {
 	display: flex;
 
 	// Selector requires a lot of specificity to override base styles.
-	input[type="url"].editor-media-placeholder__url-input-field {
+	input[type="url"].block-editor-media-placeholder__url-input-field {
 		width: 100%;
 		@include break-small() {
 			width: 300px;
@@ -25,11 +25,11 @@
 	}
 }
 
-.editor-media-placeholder__url-input-submit-button {
+.block-editor-media-placeholder__url-input-submit-button {
 	flex-shrink: 1;
 }
 
-.editor-media-placeholder__button {
+.block-editor-media-placeholder__button {
 	margin-bottom: 0.5rem;
 
 	.dashicon {
@@ -42,6 +42,6 @@
 	}
 }
 
-.components-form-file-upload .editor-media-placeholder__button {
+.components-form-file-upload .block-editor-media-placeholder__button {
 	margin-right: $grid-size-small;
 }

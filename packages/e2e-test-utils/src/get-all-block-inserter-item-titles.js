@@ -12,7 +12,7 @@ export async function getAllBlockInserterItemTitles() {
 	const inserterItemTitles = await page.evaluate( () => {
 		return Array.from(
 			document.querySelectorAll(
-				'.editor-inserter__results .editor-block-types-list__item-title'
+				'.block-editor-inserter__results .block-editor-block-types-list__item-title'
 			)
 		).map(
 			( inserterItem ) => {

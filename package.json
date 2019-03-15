@@ -152,7 +152,7 @@
 	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
-		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module ./packages/*/build-style",
+		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module ./packages/*/build-style ./packages/*/node_modules",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
 		"build:packages": "node ./bin/packages/build.js",
 		"build": "npm run build:packages && wp-scripts build",
@@ -186,7 +186,7 @@
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-php": "npm run lint-php && npm run test-unit-php",
-		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
+		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
 		"test-unit:update": "npm run test-unit -- --updateSnapshot",
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",

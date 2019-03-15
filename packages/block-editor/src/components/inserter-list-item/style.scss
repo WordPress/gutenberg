@@ -1,11 +1,11 @@
-.editor-block-types-list__list-item {
+.block-editor-block-types-list__list-item {
 	display: block;
 	width: 33.33%;
 	padding: 0 4px;
 	margin: 0 0 12px;
 }
 
-.editor-block-types-list__item {
+.block-editor-block-types-list__item {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
@@ -43,8 +43,8 @@
 		}
 
 		&:hover {
-			.editor-block-types-list__item-icon,
-			.editor-block-types-list__item-title {
+			.block-editor-block-types-list__item-icon,
+			.block-editor-block-types-list__item-title {
 				color: currentColor;
 			}
 		}
@@ -58,21 +58,21 @@
 			outline: none;
 			@include block-style__focus-active();
 
-			.editor-block-types-list__item-icon,
-			.editor-block-types-list__item-title {
+			.block-editor-block-types-list__item-icon,
+			.block-editor-block-types-list__item-title {
 				color: currentColor;
 			}
 		}
 	}
 }
 
-.editor-block-types-list__item-icon {
+.block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
 	border-radius: $radius-round-rectangle;
 	color: $dark-gray-500;
 	transition: all 0.05s ease-in-out;
 
-	.editor-block-icon {
+	.block-editor-block-icon {
 		margin-left: auto;
 		margin-right: auto;
 	}
@@ -82,12 +82,12 @@
 	}
 }
 
-.editor-block-types-list__item-title {
+.block-editor-block-types-list__item-title {
 	padding: 4px 2px 8px;
 }
 
-.editor-block-types-list__item-has-children {
-	.editor-block-types-list__item-icon {
+.block-editor-block-types-list__item-has-children {
+	.block-editor-block-types-list__item-icon {
 		background: $white;
 		margin-right: 3px;
 		margin-bottom: 6px;
@@ -99,7 +99,7 @@
 	}
 
 	// Show a "stacked card" below an item that has children.
-	.editor-block-types-list__item-icon-stack {
+	.block-editor-block-types-list__item-icon-stack {
 		display: block;
 		background: $white;
 		box-shadow: 0 0 0 1px $light-gray-500;

@@ -26,7 +26,7 @@ export default function BlockIcon( { icon, showColors = false, className } ) {
 		<span
 			style={ style }
 			className={ classnames(
-				'editor-block-icon',
+				'editor-block-icon block-editor-block-icon',
 				className,
 				{ 'has-colors': showColors }
 			) }

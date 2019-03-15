@@ -7,6 +7,7 @@ const { hasPackageProp } = require( './package' );
 
 const hasBabelConfig = () =>
 	hasProjectFile( '.babelrc' ) ||
+	hasProjectFile( '.babelrc.js' ) ||
 	hasProjectFile( 'babel.config.js' ) ||
 	hasPackageProp( 'babel' );
 

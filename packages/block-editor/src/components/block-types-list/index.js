@@ -15,7 +15,7 @@ function BlockTypesList( { items, onSelect, onHover = () => {}, children } ) {
 		 * Safari+VoiceOver won't announce the list otherwise.
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
-		<ul role="list" className="editor-block-types-list">
+		<ul role="list" className="editor-block-types-list block-editor-block-types-list">
 			{ items && items.map( ( item ) =>
 				<InserterListItem
 					key={ item.id }

@@ -7,7 +7,7 @@ import classnames from 'classnames';
 function PlainText( { onChange, className, ...props } ) {
 	return (
 		<TextareaAutosize
-			className={ classnames( 'editor-plain-text', className ) }
+			className={ classnames( 'editor-plain-text block-editor-plain-text', className ) }
 			onChange={ ( event ) => onChange( event.target.value ) }
 			{ ...props }
 		/>

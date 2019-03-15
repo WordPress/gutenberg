@@ -324,7 +324,7 @@ class WritingFlow extends Component {
 		// bubbling events from children to determine focus transition intents.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div className="editor-writing-flow">
+			<div className="editor-writing-flow block-editor-writing-flow">
 				<div
 					ref={ this.bindContainer }
 					onKeyDown={ this.onKeyDown }
@@ -336,7 +336,7 @@ class WritingFlow extends Component {
 					aria-hidden
 					tabIndex={ -1 }
 					onClick={ this.focusLastTextField }
-					className="wp-block editor-writing-flow__click-redirect"
+					className="wp-block editor-writing-flow__click-redirect block-editor-writing-flow__click-redirect"
 				/>
 			</div>
 		);
