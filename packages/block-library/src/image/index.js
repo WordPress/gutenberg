@@ -128,9 +128,15 @@ export function stripFirstImage( attributes, { shortcode } ) {
 
 	body.innerHTML = shortcode.content;
 
-	const firstImage = body.querySelector( 'img' );
-	if ( firstImage ) {
-		firstImage.parentNode.removeChild( firstImage );
+	let nodeToRemove = body.querySelector( 'img' );
+
+	// if an image has parents, find the topmost node to remove
+	while ( nodeToRemove && nodeToRemove.parentNode && nodeToRemove.parentNode !== body ) {
+		nodeToRemove = nodeToRemove.parentNode;
+	}
+
+	if ( nodeToRemove ) {
+		nodeToRemove.parentNode.removeChild( nodeToRemove );
 	}
 
 	return body.innerHTML.trim();

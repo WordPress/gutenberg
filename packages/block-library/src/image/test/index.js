@@ -25,4 +25,8 @@ describe( 'stripFirstImage', () => {
 	test( 'should strip out only the first of many images', () => {
 		expect( stripFirstImage( {}, { shortcode: { content: '<img><img>' } } ) ).toEqual( '<img>' );
 	} );
+
+	test( 'should strip out the first image and its wrapping parents', () => {
+		expect( stripFirstImage( {}, { shortcode: { content: '<p><a><img></a></p><p><img></p>' } } ) ).toEqual( '<p><img></p>' );
+	} );
 } );
