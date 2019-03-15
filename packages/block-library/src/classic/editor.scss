@@ -207,7 +207,16 @@
 	}
 
 	.block-editor-block-list__block-edit::before {
-		outline: $border-width solid #e2e4e7;
+		transition: border-color 0.1s linear, box-shadow 0.1s linear;
+		border: $border-width solid $light-gray-500;
+
+		// Windows High Contrast mode will show this outline.
+		outline: $border-width solid transparent;
+	}
+
+	&.is-selected .block-editor-block-list__block-edit::before {
+		border-color: $light-gray-800;
+		border-left-color: transparent;
 	}
 
 	// Don't show block type label for classic block
@@ -228,9 +237,16 @@ div[data-type="core/freeform"] .block-editor-block-contextual-toolbar + div {
 	z-index: z-index(".block-library-classic__toolbar");
 	top: $block-padding;
 	transform: translateY(-$block-padding);
+	border: $border-width solid $light-gray-500;
+	border-bottom: none;
 
 	// On mobile, toolbars go edge to edge.
 	padding: 0 $block-padding;
+
+	.is-selected & {
+		border-color: $light-gray-800;
+		border-left-color: transparent;
+	}
 
 	@include break-small() {
 		padding: 0;
@@ -289,12 +305,13 @@ div[data-type="core/freeform"] .block-editor-block-contextual-toolbar + div {
 		}
 		.block-editor-block-contextual-toolbar {
 			float: right;
-			margin-right: $icon-button-size - $block-padding + $border-width;
+			margin-right: $icon-button-size - $block-padding + ($border-width * 3);
 			transform: translateY(-#{ $block-padding - $border-width });
 			top: $block-padding;
 
 			.block-editor-block-toolbar {
 				border: none;
+				box-shadow: none;
 
 				// Match the TinyMCE "mobile" breakpoint buttons alignment.
 				margin-top: 3px;
@@ -308,6 +325,10 @@ div[data-type="core/freeform"] .block-editor-block-contextual-toolbar + div {
 					border-left: 1px solid $light-gray-500;
 					margin-top: $grid-size-small;
 					margin-bottom: $grid-size-small;
+				}
+
+				.components-toolbar__control.components-button:hover {
+					background-color: transparent;
 				}
 			}
 

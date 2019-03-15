@@ -7,10 +7,20 @@
 	font-size: $default-font-size;
 	height: 40px;
 	white-space: nowrap;
-
-	// Use opacity to work in various editor styles.
-	border: $border-width solid $dark-opacity-light-500;
+	border: $border-width solid $light-gray-800;
 	background-clip: padding-box;
+
+	// Show a thick left border to match the left border on the title field.
+	border-left: 0;
+	box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
+
+	// Use a lighter border for dark themes.
+	.is-dark-theme & {
+		box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
+	}
+
+	// Include transparent outline for Windows High Contrast mode.
+	outline: $border-width solid transparent;
 
 	// Put toolbar snugly to edge on mobile.
 	margin-left: -$block-padding - $border-width; // This hides the border off the edge of the screen.
