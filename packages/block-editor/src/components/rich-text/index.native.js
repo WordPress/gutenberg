@@ -560,6 +560,7 @@ export class RichText extends Component {
 					fontSize={ this.props.fontSize }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
+					disableEditingMenu={ this.props.disableEditingMenu }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>
