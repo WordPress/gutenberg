@@ -50,6 +50,6 @@ module.exports = {
 		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|react-clone-referenced-element))',
 	],
 	snapshotSerializers: [
-		"enzyme-to-json/serializer"
+		'enzyme-to-json/serializer',
 	],
 };

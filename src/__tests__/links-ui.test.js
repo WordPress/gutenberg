@@ -1,60 +1,60 @@
-import ModalLinkUI from '../../gutenberg/packages/format-library/src/link/modal.native.js'
+import ModalLinkUI from '../../gutenberg/packages/format-library/src/link/modal.native.js';
 import { shallow } from 'enzyme';
 
 describe( 'LinksUI', () => {
 	it( 'LinksUI renders', () => {
-        const wrapper = shallow(
-            <ModalLinkUI />
-        );
+		const wrapper = shallow(
+			<ModalLinkUI />
+		);
 		expect( wrapper ).toBeTruthy();
-    } );
-    
-    it( 'Links are removed when no text is in the URL field', () => {
-        // Given
-        const onRemove = jest.fn();
-        const wrapper = shallow(
-            <ModalLinkUI
-                onRemove={ onRemove }
-                onClose={ jest.fn() }
-            />
-        ).dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
+	} );
 
-        // When
+	it( 'Links are removed when no text is in the URL field', () => {
+		// Given
+		const onRemove = jest.fn();
+		const wrapper = shallow(
+			<ModalLinkUI
+				onRemove={ onRemove }
+				onClose={ jest.fn() }
+			/>
+		).dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
 
-        // Close the BottomSheet
-        const bottomSheet = wrapper.find('BottomSheet').first();
-        bottomSheet.simulate('close');
+		// When
 
-        // Then
+		// Close the BottomSheet
+		const bottomSheet = wrapper.find( 'BottomSheet' ).first();
+		bottomSheet.simulate( 'close' );
 
-        expect( onRemove ).toHaveBeenCalledTimes( 1 );
-    })
+		// Then
 
-    it( 'Links are saved when URL field has content', () => {
-        // Given
-        const onRemove = jest.fn();
-        const wrapper = shallow(
-            <ModalLinkUI
-                onRemove={ onRemove }
-                onClose={ jest.fn() }
-            />
-        ).dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
-        
-        // Mock `submitLink` for simplicity (we don't want to test submitLink itself here)
-        wrapper.instance().submitLink = jest.fn();
+		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+	} );
 
-        // When
+	it( 'Links are saved when URL field has content', () => {
+		// Given
+		const onRemove = jest.fn();
+		const wrapper = shallow(
+			<ModalLinkUI
+				onRemove={ onRemove }
+				onClose={ jest.fn() }
+			/>
+		).dive(); // -> dive() removes the HOC layer that was blocking access to ModalLinkUI
 
-        // Simulate user typing on the URL Cell.
-        const bottomSheet = wrapper.find('BottomSheet').first();
-        const cell = bottomSheet.find('Cell').first();
-        cell.simulate('changeValue', "wordpress.com");
+		// Mock `submitLink` for simplicity (we don't want to test submitLink itself here)
+		wrapper.instance().submitLink = jest.fn();
 
-        // Close the BottomSheet
-        bottomSheet.simulate('close');
+		// When
 
-        // Then
-        expect( onRemove ).toHaveBeenCalledTimes( 0 );
-        expect( wrapper.instance().submitLink ).toHaveBeenCalledTimes( 1 );
-    })
+		// Simulate user typing on the URL Cell.
+		const bottomSheet = wrapper.find( 'BottomSheet' ).first();
+		const cell = bottomSheet.find( 'Cell' ).first();
+		cell.simulate( 'changeValue', 'wordpress.com' );
+
+		// Close the BottomSheet
+		bottomSheet.simulate( 'close' );
+
+		// Then
+		expect( onRemove ).toHaveBeenCalledTimes( 0 );
+		expect( wrapper.instance().submitLink ).toHaveBeenCalledTimes( 1 );
+	} );
 } );
