@@ -180,8 +180,9 @@ export function isVerticalEdge( container, isReverse ) {
 		return false;
 	}
 
-	const buffer = rangeRect.height / 2;
 	const editableRect = container.getBoundingClientRect();
+	const { lineHeight } = window.getComputedStyle( container );
+	const buffer = parseInt( lineHeight, 10 ) / 2;
 
 	// Too low.
 	if ( isReverse && rangeRect.top - buffer > editableRect.top ) {
