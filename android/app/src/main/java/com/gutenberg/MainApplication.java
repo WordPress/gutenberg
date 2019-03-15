@@ -57,7 +57,7 @@ public class MainApplication extends Application implements ReactApplication {
                 public void editorDidMount(boolean hasUnsupportedBlocks) {}
 
                 @Override
-                public void nativeLoggingHook(String message, int logLevel) {}
+                public void nativeLoggingHook(String message, LogLevel logLevel) {}
             })
       );
     }

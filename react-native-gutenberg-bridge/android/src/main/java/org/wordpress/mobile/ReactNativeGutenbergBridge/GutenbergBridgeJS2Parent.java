@@ -17,6 +17,28 @@ public interface GutenbergBridgeJS2Parent {
         void onMediaFileUploadFailed(int mediaId);
     }
 
+    enum LogLevel {
+        TRACE(0),
+        INFO(1),
+        WARN(2),
+        ERROR(3);
+
+        private final int id;
+
+        LogLevel(int id) {
+            this.id = id;
+        }
+
+        public static LogLevel valueOf(int id) {
+            for (LogLevel num : values()) {
+                if (num.id == id) {
+                    return num;
+                }
+            }
+            return null;
+        }
+    }
+
     void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback);
 
     void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback);
@@ -29,5 +51,5 @@ public interface GutenbergBridgeJS2Parent {
 
     void requestImageUploadCancelDialog(int mediaId);
 
-    void nativeLoggingHook(String message, int logLevel);
+    void nativeLoggingHook(String message, LogLevel logLevel);
 }
