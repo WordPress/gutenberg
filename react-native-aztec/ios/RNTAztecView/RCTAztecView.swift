@@ -49,7 +49,7 @@ class RCTAztecView: Aztec.TextView {
         return reactLayoutDirection == .rightToLeft
     }
 
-    private lazy var placeholderLabel: UILabel = {
+    private(set) lazy var placeholderLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .natural
@@ -302,6 +302,11 @@ class RCTAztecView: Aztec.TextView {
         setHTML(html)
         updatePlaceholderVisibility()
         refreshFont()
+        if let selection = contents["selection"] as? NSDictionary,
+            let start = selection["start"] as? NSNumber,
+            let end = selection["end"]  as? NSNumber {
+            setSelection(start: start, end: end)
+        }
     }
 
     // MARK: - Placeholder
@@ -325,6 +330,13 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
+    func setSelection(start: NSNumber, end: NSNumber) {        
+        if let startPosition = position(from: beginningOfDocument, offset: start.intValue),
+            let endPosition = position(from: beginningOfDocument, offset: end.intValue) {
+            selectedTextRange = textRange(from: startPosition, to: endPosition)
+        }
+    }
+    
     func updatePlaceholderVisibility() {
         placeholderLabel.isHidden = !self.text.isEmpty
     }
