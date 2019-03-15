@@ -4,6 +4,7 @@
 import { createElement } from '@wordpress/element';
 import jsdom from 'jsdom-jscore';
 import jsdomLevel1Core from 'jsdom-jscore/lib/jsdom/level1/core';
+import { nativeLoggingHook } from 'react-native-gutenberg-bridge';
 
 // Import for side-effects: Patches for jsdom-jscore, details commented in file.
 import './jsdom-patches';
@@ -35,3 +36,6 @@ if ( ! global.window.matchMedia ) {
 		removeListener: () => {},
 	} );
 }
+
+// Leverages existing console polyfill from react-native
+global.nativeLoggingHook = nativeLoggingHook;
