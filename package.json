@@ -62,6 +62,7 @@
     "install:wpcli": "(test -x bin/wp-cli.phar || curl -Ls https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o bin/wp-cli.phar && chmod +x bin/wp-cli.phar) && bin/wp-cli.phar --info",
     "prewp": "yarn install:wpcli",
     "wp": "php -d memory_limit=512M bin/wp-cli.phar",
+    "premakepot": "yarn makepot:gutenberg",
     "makepot": "bash -c \"xgettext -f <( find . -path './src/*.js' ! -path 'node_modules' -print ) --from-code=UTF-8 -k__ -k_n -k_x -k_nx -x ./gutenberg.pot -o ./gutenberg-mobile.pot\"",
     "makepot:gutenberg": "yarn clean:gutenberg && yarn wp i18n make-pot ./gutenberg --ignore-domain gutenberg.pot",
     "android": "react-native run-android",
