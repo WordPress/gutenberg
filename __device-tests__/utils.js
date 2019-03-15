@@ -4,8 +4,10 @@ import fs from 'fs';
 
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
+const sauceUsername = process.env.SAUCE_USERNAME;
+const sauceAccessKey = process.env.SAUCE_ACCESS_KEY;
 const spawn = childProcess.spawn;
-const APPIUM_SERVER_ADDRESS = 'localhost';
+const APPIUM_SERVER_ADDRESS = `https://${sauceUsername}:${sauceAccessKey}@ondemand.saucelabs.com:443/wd/hub`;
 const APPIUM_SERVER_PORT = 4728;
 
 const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
@@ -24,12 +26,14 @@ if ( rnPlatform === 'android' ) {
 		app: './android/app/build/outputs/apk/debug/app-debug.apk', // relative to root of project
 	};
 } else {
-	config = {
-		platformName: 'iOS',
-		platformVersion: 12.1,
-		deviceName: 'iPhone XR',
-		automationName: 'XCUITest',
-		app: './ios/build/Build/Products/Debug-iphonesimulator/gutenberg.app', // relative to root of project
+	// config = {
+	// 	platformName: 'iOS',
+	// 	platformVersion: 12.1,
+	// 	deviceName: 'iPhone XR',
+	// 	automationName: 'XCUITest',
+	// 	app: './ios/build/Build/Products/Debug-iphonesimulator/gutenberg.app', // relative to root of project
+	// };
+	config = { browserName: '', platformName: 'iOS', platformVersion: '12.0', deviceName: 'iPhone XR', os: 'iOS', deviceOrientation: 'portrait', automationName: 'XCUITest', appiumVersion: '1.9.1', app: 'sauce-storage:Gutenberg.app.zip', // relative to root of project
 	};
 }
 
@@ -44,11 +48,15 @@ const rename = async ( path, newPath ) => {
 const setupDriver = async () => {
 	const driver = wd.promiseChainRemote( APPIUM_SERVER_ADDRESS, APPIUM_SERVER_PORT );
 
-	await driver.init( config );
-	await driver.status();
+	await driver.init(config);
+	await timer(10000);
+	const status = await driver.status();
+	console.log("status");
+	console.log(status);
 	await driver.sleep( 10000 ); // wait for app to load
 
 	await driver.setImplicitWaitTimeout( 2000 );
+	await timer(3000);
 	return driver;
 };
 
