@@ -17,7 +17,6 @@ import ModalFrame from './frame';
 import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
 import IsolatedEventContainer from '../isolated-event-container';
-import { Provider as FocusReturnProvider } from '../higher-order/with-focus-return';
 
 // Used to count the number of open modals.
 let parentElement,
@@ -120,7 +119,6 @@ class Modal extends Component {
 			aria,
 			instanceId,
 			isDismissable,
-			onFocusLoss,
 			...otherProps
 		} = this.props;
 
@@ -129,7 +127,7 @@ class Modal extends Component {
 		// Disable reason: this stops mouse events from triggering tooltips and
 		// other elements underneath the modal overlay.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		let element = (
+		return createPortal(
 			<IsolatedEventContainer
 				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
 			>
@@ -157,19 +155,10 @@ class Modal extends Component {
 						{ children }
 					</div>
 				</ModalFrame>
-			</IsolatedEventContainer>
+			</IsolatedEventContainer>,
+			this.node
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
-
-		if ( onFocusLoss ) {
-			element = (
-				<FocusReturnProvider value={ { onFocusLoss } }>
-					{ element }
-				</FocusReturnProvider>
-			);
-		}
-
-		return createPortal( element, this.node );
 	}
 }
 

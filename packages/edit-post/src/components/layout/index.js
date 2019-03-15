@@ -72,16 +72,7 @@ function Layout( {
 		tabIndex: -1,
 	};
 	return (
-		<FocusReturnProvider
-			value={ {
-				onFocusLoss() {
-					const layout = document.querySelector( '.edit-post-header' );
-					if ( layout ) {
-						layout.focus();
-					}
-				},
-			} }
-		>
+		<FocusReturnProvider>
 			<div className={ className }>
 				<FullscreenMode />
 				<BrowserURL />

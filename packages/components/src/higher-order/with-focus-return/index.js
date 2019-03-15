@@ -1,15 +1,18 @@
 /**
+ * External dependencies
+ */
+import { stubTrue } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { Component, createContext } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
-const { Provider, Consumer } = createContext( {
-	onFocusLoss: () => {},
-} );
-
-Provider.displayName = 'FocusReturnProvider';
-Consumer.displayName = 'FocusReturnConsumer';
+/**
+ * Internal dependencies
+ */
+import Provider, { Consumer } from './context';
 
 /**
  * Returns true if the given object is component-like. An object is component-
@@ -23,18 +26,6 @@ function isComponentLike( object ) {
 	return (
 		object instanceof Component ||
 		typeof object === 'function'
-	);
-}
-
-/**
- * Returns true if there is a focused element, or false otherwise.
- *
- * @return {boolean} Whether focused element exists.
- */
-function hasFocusedElement() {
-	return (
-		null !== document.activeElement &&
-		document.body !== document.activeElement
 	);
 }
 
@@ -58,6 +49,8 @@ function withFocusReturn( options ) {
 		return withFocusReturn( {} )( options );
 	}
 
+	const { onFocusReturn = stubTrue } = options;
+
 	return function( WrappedComponent ) {
 		class FocusReturn extends Component {
 			constructor() {
@@ -69,18 +62,33 @@ function withFocusReturn( options ) {
 			}
 
 			componentWillUnmount() {
-				const { onFocusLoss = this.props.onFocusLoss } = options;
 				const { activeElementOnMount, isFocused } = this;
 
-				if ( activeElementOnMount && ( isFocused || ! hasFocusedElement() ) ) {
-					activeElementOnMount.focus();
+				if ( ! isFocused ) {
+					return;
 				}
 
-				setTimeout( () => {
-					if ( ! hasFocusedElement() ) {
-						onFocusLoss();
+				// Defer to the component's own explicit focus return behavior,
+				// if specified. The function should return `false` to prevent
+				// the default behavior otherwise occurring here. This allows
+				// for support that the `onFocusReturn` decides to allow the
+				// default behavior to occur under some conditions.
+				if ( onFocusReturn() === false ) {
+					return;
+				}
+
+				const stack = [
+					...this.props.focusHistory,
+					activeElementOnMount,
+				];
+
+				let candidate;
+				while ( ( candidate = stack.pop() ) ) {
+					if ( document.body.contains( candidate ) ) {
+						candidate.focus();
+						return;
 					}
-				}, 0 );
+				}
 			}
 
 			render() {
@@ -104,4 +112,4 @@ function withFocusReturn( options ) {
 }
 
 export default createHigherOrderComponent( withFocusReturn, 'withFocusReturn' );
-export { Provider, Consumer };
+export { Provider };

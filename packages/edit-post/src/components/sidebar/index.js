@@ -31,10 +31,11 @@ function Sidebar( { children, label, className } ) {
 }
 
 Sidebar = withFocusReturn( {
-	onFocusLoss() {
+	onFocusReturn() {
 		const button = document.querySelector( '.edit-post-header__settings [aria-label="Settings"]' );
 		if ( button ) {
 			button.focus();
+			return false;
 		}
 	},
 } )( Sidebar );

@@ -70,18 +70,5 @@ describe( 'withFocusReturn()', () => {
 			mountedComposite.unmount();
 			expect( document.activeElement ).toBe( switchFocusTo );
 		} );
-
-		it( 'should return focus to element associated with HOC', () => {
-			const mountedComposite = renderer.create( <Composite /> );
-			expect( getInstance( mountedComposite ).activeElementOnMount ).toBe( activeElement );
-
-			// Change activeElement.
-			document.activeElement.blur();
-			expect( document.activeElement ).toBe( document.body );
-
-			// Should return to the activeElement saved with this component.
-			mountedComposite.unmount();
-			expect( document.activeElement ).toBe( activeElement );
-		} );
 	} );
 } );
