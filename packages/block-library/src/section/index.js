@@ -39,6 +39,9 @@ export const settings = {
 		backgroundColor: {
 			type: 'string',
 		},
+		customBackgroundColor: {
+			type: 'string',
+		},
 	},
 
 	edit,
