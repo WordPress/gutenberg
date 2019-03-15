@@ -28,6 +28,11 @@ class RCTAztecView: Aztec.TextView {
             }
         }
     }
+    @objc var disableEditingMenu: Bool = false {
+        didSet {
+            allowsEditingTextAttributes = !disableEditingMenu
+        }
+    }
 
     var blockModel = BlockModel(tag: "") {
         didSet {

@@ -23,24 +23,9 @@ const gutenbergSetup = () => {
 
 const editorSetup = () => {
 	require( '@wordpress/format-library' );
-	const wpBlockLibrary = require( '@wordpress/block-library' );
-	const wpBlocks = require( '@wordpress/blocks' );
-	const registerCoreBlocks = wpBlockLibrary.registerCoreBlocks;
-	const registerBlockType = wpBlocks.registerBlockType;
-	const setUnregisteredTypeHandlerName = wpBlocks.setUnregisteredTypeHandlerName;
-	const unregisterBlockType = wpBlocks.unregisterBlockType;
-	const UnsupportedBlock = require( './block-types/unsupported-block' );
+	const editPost = require( '@wordpress/edit-post' );
 
-	// register and setup blocks
-	registerCoreBlocks();
-	registerBlockType( UnsupportedBlock.name, UnsupportedBlock.settings );
-	setUnregisteredTypeHandlerName( UnsupportedBlock.name );
-
-	// disable Code and More blocks for release
-	if ( ! __DEV__ ) {
-		unregisterBlockType( 'core/code' );
-		unregisterBlockType( 'core/more' );
-	}
+	editPost.initializeEditor();
 };
 
 const setupLocale = ( locale, extraTranslations ) => {
