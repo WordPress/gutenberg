@@ -1,6 +1,6 @@
 # MenuGroup
 
-`MenuGroup` is a component which wraps a series of related `MenuItem` components into a common section.
+`MenuGroup` wraps a series of related `MenuItem` components into a common section.
 
 ![MenuGroup Example](https://wordpress.org/gutenberg/files/2019/03/MenuGroup.png)
 
