@@ -59,14 +59,15 @@ import { CheckboxControl } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
 const MyCheckboxControl = withState( {
-isChecked: true,
+	isChecked: true,
 } )( ( { isChecked, setState } ) => ( 
-heading="User"
-label="Is author"
-help="Is the user a author or not?"
-checked={ isChecked }
-onChange={ ( isChecked ) => { setState( { isChecked } ) } }
-/>
+	<CheckboxControl
+		heading="User"
+		label="Is author"
+		help="Is the user a author or not?"
+		checked={ isChecked }
+		onChange={ ( isChecked ) => { setState( { isChecked } ) } }
+	/>
 ) );
 ```
 
