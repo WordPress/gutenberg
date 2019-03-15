@@ -75,7 +75,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 		}
 	},
 	"edit": "blocks/notice-edit.js",
-	"save": "blocks/notice-save.js",
+	"save": "blocks/notice-save.js"
 }
 ```
 
@@ -163,7 +163,7 @@ An implementation should expect and tolerate unknown categories, providing some 
 	"slug": "star",
 	"src": "./my-file.js",
 	"foreground": "#000000",
-	"background": "#FFFFFF",
+	"background": "#FFFFFF"
 } }
 ```
 
@@ -209,7 +209,7 @@ Sometimes a block could have aliases that help users discover it while searching
 
 ```json
 { 
-    "attributes": {
+	"attributes": {
 		"cover": {
 			"type": "string",
 			"source": "attribute",
@@ -291,11 +291,10 @@ See the [dynamic blocks documentation](https://wordpress.org/gutenberg/handbook/
 
 ```json
 { 
-    "styleVariations": 
-        [ 
-			{ "name": "default", "label": "Default", "isDefault": true }, 
-			{ "name": "other", "label": "Other" }
-		]
+	"styleVariations": [ 
+		{ "name": "default", "label": "Default", "isDefault": true }, 
+		{ "name": "other", "label": "Other" }
+	]
 }
 ```
 
