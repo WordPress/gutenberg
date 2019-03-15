@@ -38,7 +38,7 @@ _Example:_
 
 ### `build`
 
-Transforms your code according the configuration provided so it's ready for production and optimized for the best performance. It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the "webpack config" section.
+Transforms your code according the configuration provided so it's ready for production and optimized for the best performance. It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [webpack config](#webpack-config) section.
 
 _Example:_
 
@@ -149,7 +149,7 @@ This is how you execute the script with presented setup:
 
 ### `start`
 
-Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the "webpack config" section.
+Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [webpack config](#webpack-config) section.
 
 _Example:_
 
@@ -170,7 +170,7 @@ This is how you execute the script with presented setup:
 Launches the End-To-End (E2E) test runner. It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as presented below) to view all of the available options.
 
 Writing tests can be done using Puppeteer API:
- 
+
 > [Puppeteer](https://pptr.dev/) is a Node library which provides a high-level API to control Chrome or Chromium over the [DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/). Puppeteer runs [headless](https://developers.google.com/web/updates/2017/04/headless-chrome) by default, but can be configured to run full (non-headless) Chrome or Chromium.
 
 _Example:_
@@ -196,7 +196,7 @@ We enforce that all tests run serially in the current process using [--runInBand
 
 ### `test-unit-js`
 
-_Alias_: `test-unit-jest` 
+_Alias_: `test-unit-jest`
 
 Launches the unit test runner. It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test-unit-js --help` or `npm run test:unit:help` (as presented below) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration).
 
