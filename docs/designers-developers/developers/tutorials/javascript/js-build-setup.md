@@ -104,12 +104,8 @@ registerBlockType( 'myguten/test-block', {
 	title: 'Basic Example',
 	icon: 'smiley',
 	category: 'layout',
-	edit() {
-		return <div>Hola, mundo!</div>;
-	},
-	save() {
-		return <div>Hola, mundo!</div>;
-	},
+	edit: () => <div>Hola, mundo!</div>,
+	save: () => <div>Hola, mundo!</div>,
 } );
 ```
 
