@@ -86,69 +86,57 @@ export function isHorizontalEdge( container, isReverse ) {
 
 	const selection = window.getSelection();
 
-	// Create copy of range for setting selection to find effective offset.
-	const range = selection.getRangeAt( 0 ).cloneRange();
-
-	// Collapse in direction of selection.
-	if ( ! selection.isCollapsed ) {
-		range.collapse( ! isSelectionForward( selection ) );
-	}
-
-	let node = range.startContainer;
-
-	let extentOffset;
-	if ( isReverse ) {
-		// When in reverse, range node should be first.
-		extentOffset = 0;
-	} else if ( node.nodeValue ) {
-		// Otherwise, vary by node type. A text node has no children. Its range
-		// offset reflects its position in nodeValue.
-		//
-		// "If the startContainer is a Node of type Text, Comment, or
-		// CDATASection, then the offset is the number of characters from the
-		// start of the startContainer to the boundary point of the Range."
-		//
-		// See: https://developer.mozilla.org/en-US/docs/Web/API/Range/startOffset
-		// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue
-		extentOffset = node.nodeValue.length;
-	} else {
-		// "For other Node types, the startOffset is the number of child nodes
-		// between the start of the startContainer and the boundary point of
-		// the Range."
-		//
-		// See: https://developer.mozilla.org/en-US/docs/Web/API/Range/startOffset
-		extentOffset = node.childNodes.length;
-	}
-
-	// Offset of range should be at expected extent.
-	const position = isReverse ? 'start' : 'end';
-	const offset = range[ `${ position }Offset` ];
-	if ( offset !== extentOffset ) {
+	// Only consider the selection at the edge if the direction is towards the
+	// edge.
+	if (
+		! selection.isCollapsed &&
+		isSelectionForward( selection ) === isReverse
+	) {
 		return false;
 	}
 
-	// If confirmed to be at extent, traverse up through DOM, verifying that
-	// the node is at first or last child for reverse or forward respectively
-	// (ignoring empty text nodes). Continue until container is reached.
-	const order = isReverse ? 'previous' : 'next';
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
-	while ( node !== container ) {
-		let next = node[ `${ order }Sibling` ];
-
-		// Skip over empty text nodes.
-		while ( next && next.nodeType === TEXT_NODE && next.data === '' ) {
-			next = next[ `${ order }Sibling` ];
-		}
-
-		if ( next ) {
-			return false;
-		}
-
-		node = node.parentNode;
+	if ( ! range ) {
+		return false;
 	}
 
-	// If reached, range is assumed to be at edge.
-	return true;
+	const rangeRect = getRectangleFromRange( range.cloneRange() );
+
+	if ( ! rangeRect ) {
+		return false;
+	}
+
+	const containerRect = container.getBoundingClientRect();
+
+	// Calculate a buffer that is half the line height. In some browsers, the
+	// selection rectangle may not fill the entire height of the line, so we add
+	// half the line height to the selection rectangle to ensure that it is well
+	// over its line boundary.
+	const { lineHeight, paddingLeft } = window.getComputedStyle( container );
+	const buffer = parseInt( lineHeight, 10 ) / 2;
+	const padding = parseInt( paddingLeft, 10 );
+
+	if ( isReverse ) {
+		return (
+			Math.round( containerRect.left + padding ) === Math.round( rangeRect.left ) &&
+			containerRect.top > rangeRect.top - buffer
+		);
+	}
+
+	if ( containerRect.bottom < rangeRect.bottom + buffer ) {
+		const testRange = hiddenCaretRangeFromPoint(
+			document,
+			containerRect.right - 1,
+			containerRect.bottom - buffer,
+			container
+		);
+		const testRect = getRectangleFromRange( testRange );
+
+		return Math.round( testRect.right ) === Math.round( rangeRect.right );
+	}
+
+	return false;
 }
 
 /**
