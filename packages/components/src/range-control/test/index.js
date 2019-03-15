@@ -267,7 +267,7 @@ describe( 'RangeControl', () => {
 				}
 			);
 
-			expect( onChange ).toHaveBeenCalled();
+			expect( onChange ).toHaveBeenCalledWith( -50 );
 		} );
 		it( 'takes into account the step starting from min', () => {
 			const onChange = jest.fn();
@@ -304,7 +304,7 @@ describe( 'RangeControl', () => {
 				}
 			);
 
-			expect( onChange ).toHaveBeenCalled();
+			expect( onChange ).toHaveBeenCalledWith( 0.225 );
 		} );
 	} );
 } );

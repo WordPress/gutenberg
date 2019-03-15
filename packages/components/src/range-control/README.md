@@ -186,11 +186,11 @@ The maximum value accepted. If higher values are inserted onChange will not be c
 
 #### required
 
-If true having the input field empty is invalid if false having the input field empty is valid.
+If true having the input field empty is invalid. If false having the input field empty is valid.
 
 - Type: `Boolean`
 - Required: Yes
-- Default: true
+- Default: false
 
 ## Related components
 

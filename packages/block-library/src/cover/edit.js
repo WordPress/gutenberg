@@ -214,6 +214,7 @@ class CoverEdit extends Component {
 									min={ 0 }
 									max={ 100 }
 									step={ 10 }
+									required
 								/>
 							</PanelColorSettings>
 						</PanelBody>

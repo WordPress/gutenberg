@@ -30,7 +30,7 @@ function RangeControl( {
 	min,
 	max,
 	setState,
-	required = true,
+	required = false,
 	...props
 } ) {
 	const id = `inspector-range-control-${ instanceId }`;
@@ -60,7 +60,10 @@ function RangeControl( {
 		// The input is valid, reset the local state property used to temporaly save the value,
 		// and call onChange with the new value as a number.
 		resetCurrentInput();
-		onChange( parseFloat( newValue ) );
+		onChange( ( newValue === undefined || newValue === '' ) ?
+			newValue :
+			parseFloat( newValue )
+		);
 	};
 	const initialSliderValue = isFinite( currentInputValue ) ?
 		currentInputValue :
