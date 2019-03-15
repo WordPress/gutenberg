@@ -30,6 +30,7 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
+import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
 import MetaBoxes from '../meta-boxes';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -83,6 +84,7 @@ function Layout( {
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
 				<KeyboardShortcutHelpModal />
+				<ManageBlocksModal />
 				<OptionsModal />
 				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
 				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
