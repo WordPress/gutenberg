@@ -103,8 +103,16 @@ class ParagraphBlock extends Component {
 
 		if ( after !== null ) {
 			// Append "After" content as a new paragraph block to the end of
-			// any other blocks being inserted after the current paragraph.
-			blocks.push( createBlock( name, { content: after } ) );
+			// any other blocks being inserted after the current paragraph
+			if ( after.length ) {
+				// If "After" has content, keep the new block styling same as current one.
+				const newBlockAttributes = attributes;
+				newBlockAttributes.content = after;
+				blocks.push( createBlock( name, newBlockAttributes ) );
+			} else {
+				// Otherwise, add a default block
+				blocks.push( createBlock( name ) );
+			}
 		}
 
 		if ( blocks.length && insertBlocksAfter ) {
