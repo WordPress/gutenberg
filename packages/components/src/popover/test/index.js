@@ -141,6 +141,27 @@ describe( 'Popover', () => {
 
 			jest.runAllTimers();
 		} );
+
+		it( 'should allow an index value of zero to be passed to focusOnMount to focus the first element', ( done ) => {
+			wrapper = TestUtils.renderIntoDocument(
+				<Popover focusOnMount={ 0 } >
+					<div>
+						<button>One</button>
+						<button>Two</button>
+						<button>Three</button>
+						<button>Four</button>
+						<button>Five</button>
+					</div>
+				</Popover>
+			);
+
+			setTimeout( () => {
+				expect( 'One' ).toBe( document.activeElement.textContent );
+				done();
+			} );
+
+			jest.runAllTimers();
+		} );
 	} );
 
 	describe( '#render()', () => {

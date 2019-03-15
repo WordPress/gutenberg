@@ -165,7 +165,7 @@ class Popover extends Component {
 	focus() {
 		const { focusOnMount } = this.props;
 
-		if ( ! focusOnMount || ! this.contentNode.current ) {
+		if ( false === focusOnMount || ! this.contentNode.current ) {
 			return;
 		}
 
@@ -349,9 +349,9 @@ class Popover extends Component {
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 
-		// Apply focus to element as long as focusOnMount is truthy; false is
+		// Apply focus to element as long as focusOnMount is not false; false is
 		// the only "disabled" value.
-		if ( focusOnMount ) {
+		if ( false !== focusOnMount ) {
 			content = <FocusManaged>{ content }</FocusManaged>;
 		}
 
