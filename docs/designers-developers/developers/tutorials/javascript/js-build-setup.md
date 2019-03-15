@@ -40,6 +40,7 @@ To start a new node project, first create a directory to work in.
 
 ```
 mkdir myguten-block
+cd myguten-block
 ```
 
 You create a new package.json running `npm init` in your terminal.  This will walk you through creating your package.json file:
