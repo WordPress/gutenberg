@@ -220,9 +220,14 @@ class WritingFlow extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { hasMultiSelection, onMultiSelect, blocks } = this.props;
+		const {
+			hasMultiSelection,
+			onMultiSelect,
+			blocks,
+			onSelectBlock,
+		} = this.props;
 
-		const { keyCode, target } = event;
+		const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } = event;
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
 		const isLeft = keyCode === LEFT;
@@ -231,8 +236,7 @@ class WritingFlow extends Component {
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
 		const isNav = isHorizontal || isVertical;
-		const isShift = event.shiftKey;
-		const hasModifier = isShift || event.ctrlKey || event.altKey || event.metaKey;
+		const hasModifier = shiftKey || ctrlKey || altKey || metaKey;
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
 		// This logic inside this condition needs to be checked before
@@ -269,6 +273,18 @@ class WritingFlow extends Component {
 			return;
 		}
 
+		if ( metaKey ) {
+			if ( isUp ) {
+				onSelectBlock( blocks[ 0 ] );
+				event.preventDefault();
+			} else if ( isDown ) {
+				onSelectBlock( blocks[ blocks.length - 1 ], -1 );
+				event.preventDefault();
+			}
+
+			return;
+		}
+
 		// Abort if our current target is not a candidate for navigation (e.g.
 		// preserve native input behaviors).
 		if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
@@ -281,7 +297,7 @@ class WritingFlow extends Component {
 			this.verticalRect = computeCaretRect( target );
 		}
 
-		if ( isShift && ( hasMultiSelection || (
+		if ( shiftKey && ( hasMultiSelection || (
 			this.isTabbableEdge( target, isReverse ) &&
 			isNavEdge( target, isReverse )
 		) ) ) {
