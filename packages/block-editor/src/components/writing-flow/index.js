@@ -220,7 +220,13 @@ class WritingFlow extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { hasMultiSelection, onMultiSelect, blocks } = this.props;
+		const {
+			hasMultiSelection,
+			onMultiSelect,
+			blocks,
+			selectionBeforeEndClientId,
+			selectionAfterEndClientId,
+		} = this.props;
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -281,13 +287,24 @@ class WritingFlow extends Component {
 			this.verticalRect = computeCaretRect( target );
 		}
 
-		if ( isShift && ( hasMultiSelection || (
-			this.isTabbableEdge( target, isReverse ) &&
-			isNavEdge( target, isReverse )
-		) ) ) {
-			// Shift key is down, and there is multi selection or we're at the end of the current block.
-			this.expandSelection( isReverse );
-			event.preventDefault();
+		if ( isShift ) {
+			if (
+				(
+					// Ensure that there is a target block.
+					( isReverse && selectionBeforeEndClientId ) ||
+					( ! isReverse && selectionAfterEndClientId )
+				) && (
+					hasMultiSelection || (
+						this.isTabbableEdge( target, isReverse ) &&
+						isNavEdge( target, isReverse )
+					)
+				)
+			) {
+				// Shift key is down, and there is multi selection or we're at
+				// the end of the current block.
+				this.expandSelection( isReverse );
+				event.preventDefault();
+			}
 		} else if ( hasMultiSelection ) {
 			// Moving from block multi-selection to single block selection
 			this.moveSelection( isReverse );
