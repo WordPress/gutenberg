@@ -92,3 +92,7 @@ workflows:
           name: Test iOS on Device
           platform: ios
           testEnv: sauce
+      - device-checks:
+          name: Test Android on Device
+          platform: android
+          testEnv: sauce
