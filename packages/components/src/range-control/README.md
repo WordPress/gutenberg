@@ -184,14 +184,6 @@ The maximum value accepted. If higher values are inserted onChange will not be c
 - Type: `Number`
 - Required: No
 
-#### required
-
-If true having the input field empty is invalid. If false having the input field empty is valid.
-
-- Type: `Boolean`
-- Required: Yes
-- Default: false
-
 ## Related components
 
 - To collect a numerical input in a text field, use the `TextControl` component.

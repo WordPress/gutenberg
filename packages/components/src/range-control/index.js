@@ -30,7 +30,6 @@ function RangeControl( {
 	min,
 	max,
 	setState,
-	required = false,
 	...props
 } ) {
 	const id = `inspector-range-control-${ instanceId }`;
@@ -60,8 +59,8 @@ function RangeControl( {
 		// The input is valid, reset the local state property used to temporaly save the value,
 		// and call onChange with the new value as a number.
 		resetCurrentInput();
-		onChange( ( newValue === undefined || newValue === '' ) ?
-			newValue :
+		onChange( ( newValue === '' ) ?
+			undefined :
 			parseFloat( newValue )
 		);
 	};
@@ -81,7 +80,6 @@ function RangeControl( {
 				className="components-range-control__slider"
 				id={ id }
 				type="range"
-				required={ required }
 				value={ initialSliderValue }
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? id + '__help' : undefined }
@@ -92,7 +90,6 @@ function RangeControl( {
 			<input
 				className="components-range-control__number"
 				type="number"
-				required={ required }
 				onChange={ onChangeValue }
 				aria-label={ label }
 				value={ currentInputValue }
