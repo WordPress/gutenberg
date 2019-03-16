@@ -1,3 +1,13 @@
+## 7.2.0 (Unreleased)
+
+### Improvements
+
+- Make `RangeControl` validation rely on the `checkValidity` provided by the browsers instead of using our own validation.
+
+### Bug Fixes
+
+- Fix a problem that made `RangeControl` not work as expected with float values.
+
 ## 7.1.0 (2019-03-06)
 
 ### New Features
