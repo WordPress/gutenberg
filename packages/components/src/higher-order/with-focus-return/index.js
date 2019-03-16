@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { stubTrue } from 'lodash';
+import { stubTrue, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,8 @@ function withFocusReturn( options ) {
 	// Normalize as overloaded form `withFocusReturn( options )( Component )`
 	// or as `withFocusReturn( Component )`.
 	if ( isComponentLike( options ) ) {
-		return withFocusReturn( {} )( options );
+		const WrappedComponent = options;
+		return withFocusReturn( {} )( WrappedComponent );
 	}
 
 	const { onFocusReturn = stubTrue } = options;
@@ -56,13 +57,21 @@ function withFocusReturn( options ) {
 			constructor() {
 				super( ...arguments );
 
-				this.setIsFocusedTrue = () => this.isFocused = true;
-				this.setIsFocusedFalse = () => this.isFocused = false;
+				this.ownFocusedElements = new Set;
 				this.activeElementOnMount = document.activeElement;
+				this.setIsFocusedFalse = () => this.isFocused = false;
+				this.setIsFocusedTrue = ( event ) => {
+					this.ownFocusedElements.add( event.target );
+					this.isFocused = true;
+				};
 			}
 
 			componentWillUnmount() {
-				const { activeElementOnMount, isFocused } = this;
+				const {
+					activeElementOnMount,
+					isFocused,
+					ownFocusedElements,
+				} = this;
 
 				if ( ! isFocused ) {
 					return;
@@ -78,7 +87,10 @@ function withFocusReturn( options ) {
 				}
 
 				const stack = [
-					...this.props.focusHistory,
+					...without(
+						this.props.focusHistory,
+						...ownFocusedElements
+					),
 					activeElementOnMount,
 				];
 
