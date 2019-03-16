@@ -95,7 +95,7 @@ export class BlockSwitcher extends Component {
 					};
 					const label = (
 						1 === blocks.length ?
-							__( 'Change block type or style' ) :
+							__( 'Change block type' ) :
 							sprintf(
 								_n(
 									'Change type of %d block',
