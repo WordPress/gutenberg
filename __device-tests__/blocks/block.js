@@ -2,25 +2,25 @@
  * @format */
 
 import wd from 'wd';
+import { isAndroid } from '../helpers/utils';
 
 export default class Block {
 	driver: wd.PromiseChainWebdriver;
-	rnPlatform: string;
 	accessibilityIdKey: string;
 	name: string;
 	blockName: string;
-	defaultPlatform: string;
 	element: wd.PromiseChainWebdriver.Element;
 	accessibilityId: string;
+	accessibilityIdXPathAttrib: string;
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
 		this.accessibilityIdKey = 'name';
-		this.defaultPlatform = 'android';
+		this.accessibilityIdXPathAttrib = 'name';
 
-		this.rnPlatform = process.env.TEST_RN_PLATFORM || this.defaultPlatform;
-		if ( this.rnPlatform === 'android' ) {
-			this.accessibilityIdKey = 'content-desc';
+		if ( isAndroid() ) {
+			this.accessibilityIdXPathAttrib = 'content-desc';
+			this.accessibilityIdKey = 'contentDescription';
 		}
 	}
 
@@ -52,7 +52,7 @@ export default class Block {
 	// Finds the wd element for new block that was added and sets the element attribute on this object
 	async setupElement( blockName: string, blocks: Set<string> ) {
 		await this.driver.sleep( 2000 );
-		const blockLocator = `//*[starts-with(@${ this.accessibilityIdKey }, '${ blockName }')]`;
+		const blockLocator = `//*[starts-with(@${ this.accessibilityIdXPathAttrib }, '${ blockName }')]`;
 		const paragraphBlocks = await this.driver.elementsByXPath( blockLocator );
 
 		const currentBlocks = new Set( [] );
@@ -76,8 +76,8 @@ export default class Block {
 	}
 
 	async typeString( element: wd.PromiseChainWebdriver.Element, str: string ) {
-		if ( this.rnPlatform === 'android' ) {
-			await element.clear();
+		await element.clear();
+		if ( isAndroid() ) {
 			return await element.type( str );
 		}
 		// iOS: Problem with Appium type function Requiring me to do a little hacking to get it work,

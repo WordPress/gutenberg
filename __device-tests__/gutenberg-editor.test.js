@@ -4,7 +4,7 @@
 
 import EditorPage from './pages/editor-page';
 import ParagraphBlock from './blocks/paragraph-block';
-import { rename, setupAppium, setupDriver } from './utils';
+import { rename, setupAppium, setupDriver, isLocalEnvironment, timer } from './helpers/utils';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
@@ -12,6 +12,18 @@ describe( 'Gutenberg Editor tests', () => {
 	let appium;
 	let driver;
 	let editorPage;
+	let allPassed = true;
+
+	// Use reporter for setting status for saucelabs Job
+	if ( ! isLocalEnvironment() ) {
+		const reporter = {
+			specDone: async ( result ) => {
+				allPassed = allPassed && result.status !== 'failed';
+			},
+		};
+
+		jasmine.getEnv().addReporter( reporter );
+	}
 
 	const setupData = async () => {
 		await rename( 'src/app/initial-html.js', 'src/app/initial-html.tmp.js' );
@@ -19,11 +31,12 @@ describe( 'Gutenberg Editor tests', () => {
 	};
 
 	beforeAll( async () => {
-		await setupData();
-		// appium = await setupAppium();
-		console.log("Got here");
+		if ( isLocalEnvironment() ) {
+			await setupData();
+			appium = await setupAppium();
+		}
+
 		driver = await setupDriver();
-		console.log("driver setup fail");
 	} );
 
 	it( 'should be able to see visual editor', async () => {
@@ -35,14 +48,18 @@ describe( 'Gutenberg Editor tests', () => {
 		let paragraphBlock = new ParagraphBlock( driver, 'Paragraph' );
 		paragraphBlock = await editorPage.addNewBlock( paragraphBlock );
 		await paragraphBlock.sendText( 'Hello Gutenberg!' );
-
+		await timer( 3000 );
 		expect( await paragraphBlock.getText() ).toBe( 'Hello Gutenberg!' );
 	} );
 
 	afterAll( async () => {
-		await rename( 'src/app/initial-html.js', 'src/app/initial-device-tests-html.js' );
-		await rename( 'src/app/initial-html.tmp.js', 'src/app/initial-html.js' );
 		await driver.quit();
-		// await appium.kill( 'SIGINT' );
+		if ( isLocalEnvironment() ) {
+			await rename( 'src/app/initial-html.js', 'src/app/initial-device-tests-html.js' );
+			await rename( 'src/app/initial-html.tmp.js', 'src/app/initial-html.js' );
+			await appium.kill( 'SIGINT' );
+		} else {
+			driver.sauceJobStatus( allPassed );
+		}
 	} );
 } );

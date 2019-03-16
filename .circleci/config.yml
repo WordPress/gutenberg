@@ -47,6 +47,25 @@ jobs:
       - run:
           name: Run Checks
           command: bin/ci-checks-js.sh
+  device-checks:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - run:
+          name: Checkout Gutenberg
+          command: |
+            git submodule init
+            git submodule update --recursive
+      - yarn-install
+      - run:
+          name: Set Environment Variables
+          command: |
+            echo 'export TEST_RN_PLATFORM=<<parameters.platform>>' >> $BASH_ENV
+            echo 'export TEST_ENV=<<parameters.testEnv>>' >> $BASH_ENV
+      - run:
+          name: Run Device Tests
+          command: yarn test:ui
 
 workflows:
   gutenberg-mobile:
@@ -62,3 +81,7 @@ workflows:
           name: Test Android
           platform: android
           check-tests: true
+      - device-checks:
+          name: Test iOS on Device
+          platform: ios
+          testEnv: sauce

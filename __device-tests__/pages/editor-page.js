@@ -23,7 +23,7 @@ export default class EditorPage {
 		const addButton = await this.driver.elementByAccessibilityId( 'Add block' );
 		await addButton.click();
 
-		// Click on block
+		// Click on block of choice
 		const blockButton = await this.driver.elementByAccessibilityId( blockName );
 		await blockButton.click();
 		await block.setup();

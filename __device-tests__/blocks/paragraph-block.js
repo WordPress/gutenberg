@@ -3,6 +3,7 @@
 
 import Block from './block';
 import wd from 'wd';
+import { isAndroid } from '../helpers/utils';
 
 export default class ParagraphBlock extends Block {
 	// FLow complaining about type annotation on Set class here but Set<string>(); doesn't resolve
@@ -22,10 +23,10 @@ export default class ParagraphBlock extends Block {
 	async setupTextView() {
 		await this.driver.sleep( 2000 );
 		let textViewElement = 'XCUIElementTypeTextView';
-		if ( this.rnPlatform === 'android' ) {
+		if ( isAndroid() ) {
 			textViewElement = 'android.widget.EditText';
 		}
-		const blockLocator = '//*[starts-with(@' + this.accessibilityIdKey + ", '" + this.accessibilityId + "')]//" + textViewElement;
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ this.accessibilityId }"]//${ textViewElement }`;
 		this.textViewElement = await this.driver.elementByXPath( blockLocator );
 	}
 
