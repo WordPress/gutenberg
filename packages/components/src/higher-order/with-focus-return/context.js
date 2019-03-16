@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { uniq } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component, createContext } from '@wordpress/element';
@@ -31,10 +36,20 @@ class FocusReturnProvider extends Component {
 
 	onFocus( event ) {
 		const { focusHistory } = this.state;
-		const nextFocusHistory = [
-			...focusHistory,
-			event.target,
-		].slice( -1 * MAX_STACK_LENGTH );
+
+		// Push the focused element to the history stack, keeping only unique
+		// members but preferring the _last_ occurrence of any duplicates.
+		// Lodash's `uniq` behavior favors the first occurrence, so the array
+		// is temporarily reversed prior to it being called upon. Uniqueness
+		// helps avoid situations where, such as in a constrained tabbing area,
+		// the user changes focus enough within a transient element that the
+		// stack may otherwise only consist of members pending destruction, at
+		// which point focus might have been lost.
+		const nextFocusHistory = uniq(
+			[ ...focusHistory, event.target ]
+				.slice( -1 * MAX_STACK_LENGTH )
+				.reverse()
+		).reverse();
 
 		this.setState( { focusHistory: nextFocusHistory } );
 	}
