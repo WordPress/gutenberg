@@ -172,6 +172,7 @@ export const settings = {
 							} }
 							min={ 2 }
 							max={ 6 }
+							required
 						/>
 					</PanelBody>
 				</InspectorControls>
