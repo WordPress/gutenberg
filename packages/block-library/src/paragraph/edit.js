@@ -105,7 +105,7 @@ class ParagraphBlock extends Component {
 			// Append "After" content as a new paragraph block to the end of
 			// any other blocks being inserted after the current paragraph
 			if ( after.length ) {
-				// If "After" has content, keep the new block styling same as current one.
+				// If after has content, keep the new block styling same as current one.
 				const newBlockAttributes = attributes;
 				newBlockAttributes.content = after;
 				blocks.push( createBlock( name, newBlockAttributes ) );
@@ -123,6 +123,9 @@ class ParagraphBlock extends Component {
 		if ( before === null ) {
 			// If before content is omitted, treat as intent to delete block.
 			onReplace( [] );
+		} else if ( before.length === 0 ) {
+			// If before has not content, replace by a default block.
+			onReplace( [ createBlock( name ) ] );
 		} else if ( content !== before ) {
 			// Only update content if it has in-fact changed. In case that user
 			// has created a new paragraph at end of an existing one, the value
