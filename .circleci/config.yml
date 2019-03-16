@@ -48,6 +48,13 @@ jobs:
           name: Run Checks
           command: bin/ci-checks-js.sh
   device-checks:
+    parameters:
+      platform:
+        type: string
+        default: ""
+      testEnv:
+        type: string
+        default: ""
     docker:
       - image: circleci/node:8
     steps:
