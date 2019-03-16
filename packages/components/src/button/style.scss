@@ -60,6 +60,15 @@
 			text-shadow: 0 1px 0 #fff;
 			transform: none;
 		}
+
+		&.is-busy,
+		&.is-busy:disabled,
+		&.is-busy[aria-disabled="true"] {
+			animation: components-button__busy-animation 2500ms infinite linear;
+			background-size: 100px 100%;
+			background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px);
+			opacity: 1;
+		}
 	}
 
 	&.is-primary {
