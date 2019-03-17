@@ -65,6 +65,7 @@ const isLocalEnvironment = () => {
 	return testEnvironment.toLowerCase() === 'local';
 };
 
+// Initialises the driver and desired capabilities for appium
 const setupDriver = async () => {
 	const serverConfig = isLocalEnvironment() ? serverCofigs.local : serverCofigs.sauce;
 	const driver = wd.promiseChainRemote( serverConfig );
@@ -104,6 +105,7 @@ const setupDriver = async () => {
 	return driver;
 };
 
+// Spawns an appium process in the background
 const setupAppium = async () => {
 	const out = fs.openSync( './appium-out.log', 'a' );
 	const err = fs.openSync( './appium-out.log', 'a' );
@@ -112,6 +114,8 @@ const setupAppium = async () => {
 		detached: true, stdio: [ 'ignore', out, err ],
 
 	} );
+
+	// Wait a little for server to fire up
 	await timer( 5000 );
 	return appium;
 };
