@@ -3,7 +3,7 @@
  * */
 
 import EditorPage from './pages/editor-page';
-import ParagraphBlock from './blocks/paragraph-block';
+import ParagraphBlockInteraction from './blocks/paragraph-block-interaction';
 import { rename, setupAppium, setupDriver, isLocalEnvironment, timer } from './helpers/utils';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
@@ -45,11 +45,11 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	it( 'should be able to add a new Paragraph block', async () => {
-		let paragraphBlock = new ParagraphBlock( driver, 'Paragraph' );
-		paragraphBlock = await editorPage.addNewBlock( paragraphBlock );
-		await paragraphBlock.sendText( 'Hello Gutenberg!' );
+		let paragraphBlockInteraction = new ParagraphBlockInteraction( driver, 'Paragraph' );
+		paragraphBlockInteraction = await editorPage.addNewBlock( paragraphBlockInteraction );
+		await paragraphBlockInteraction.sendText( 'Hello Gutenberg!' );
 		await timer( 3000 );
-		expect( await paragraphBlock.getText() ).toBe( 'Hello Gutenberg!' );
+		expect( await paragraphBlockInteraction.getText() ).toBe( 'Hello Gutenberg!' );
 	} );
 
 	afterAll( async () => {

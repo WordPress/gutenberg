@@ -1,3 +1,8 @@
+/**
+ * @flow
+ * @format
+ * */
+
 import childProcess from 'child_process';
 import wd from 'wd';
 import fs from 'fs';
@@ -32,6 +37,23 @@ const rename = async ( path, newPath ) => {
 			throw error;
 		}
 	} );
+};
+
+const setDifference = ( set1: Set<string>, set2: Set<string> ) => {
+	// FLow complaining about type annotation on Set class here but Set<string>(); doesn't resolve
+	// $FlowFixMe
+	const differenceSet = new Set();
+
+	for ( const elem of set1 ) {
+		// if the value[i] is not present
+		// in nextSet add to the differenceSet
+		if ( ! set2.has( elem ) ) {
+			differenceSet.add( elem );
+		}
+	}
+
+	// returns values of differenceSet
+	return differenceSet;
 };
 
 const isAndroid = () => {
@@ -100,4 +122,5 @@ module.exports = {
 	rename,
 	isLocalEnvironment,
 	isAndroid,
+	setDifference,
 };

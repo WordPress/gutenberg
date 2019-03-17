@@ -3,7 +3,7 @@
  * @format
  * */
 import wd from 'wd';
-import Block from '../blocks/block';
+import BlockInteraction from '../blocks/block-interaction';
 
 export default class EditorPage {
 	driver: wd.PromiseChainWebdriver;
@@ -16,7 +16,7 @@ export default class EditorPage {
 		return this;
 	}
 
-	async addNewBlock( block: Block ) {
+	async addNewBlock( block: BlockInteraction ) {
 		const blockName = block.name;
 
 		// Click add button

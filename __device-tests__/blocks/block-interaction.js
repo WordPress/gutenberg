@@ -2,9 +2,9 @@
  * @format */
 
 import wd from 'wd';
-import { isAndroid } from '../helpers/utils';
+import { isAndroid, setDifference } from '../helpers/utils';
 
-export default class Block {
+export default class BlockInteraction {
 	driver: wd.PromiseChainWebdriver;
 	accessibilityIdKey: string;
 	name: string;
@@ -22,23 +22,6 @@ export default class Block {
 			this.accessibilityIdXPathAttrib = 'content-desc';
 			this.accessibilityIdKey = 'contentDescription';
 		}
-	}
-
-	setDifference( set1: Set<string>, set2: Set<string> ) {
-		// FLow complaining about type annotation on Set class here but Set<string>(); doesn't resolve
-		// $FlowFixMe
-		const differenceSet = new Set();
-
-		for ( const elem of set1 ) {
-			// if the value[i] is not present
-			// in nextSet add to the differenceSet
-			if ( ! set2.has( elem ) ) {
-				differenceSet.add( elem );
-			}
-		}
-
-		// returns values of differenceSet
-		return differenceSet;
 	}
 
 	async setup() {
@@ -62,10 +45,10 @@ export default class Block {
 			currentBlocks.add( elementID );
 		}
 
-		let newBlocks = this.setDifference( currentBlocks, blocks );
+		let newBlocks = setDifference( currentBlocks, blocks );
 
 		if ( newBlocks.size === 0 ) {
-			newBlocks = this.setDifference( blocks, currentBlocks );
+			newBlocks = setDifference( blocks, currentBlocks );
 		}
 
 		const newElementAccessibilityId = newBlocks.values().next().value;

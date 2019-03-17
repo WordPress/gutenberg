@@ -5,7 +5,7 @@ import Block from './block';
 import wd from 'wd';
 import { isAndroid } from '../helpers/utils';
 
-export default class ParagraphBlock extends Block {
+export default class ParagraphBlockInteraction extends Block {
 	// FLow complaining about type annotation on Set class here but Set<string>(); doesn't resolve
 	// $FlowFixMe
 	static blocks = new Set();
