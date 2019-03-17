@@ -4,6 +4,7 @@
 import wd from 'wd';
 import { isAndroid, setDifference } from '../helpers/utils';
 
+// Common code across used to interact with all blocks
 export default class BlockInteraction {
 	driver: wd.PromiseChainWebdriver;
 	accessibilityIdKey: string;
@@ -24,6 +25,9 @@ export default class BlockInteraction {
 		}
 	}
 
+	// Each subclass must include a method to do the following:
+	// * Initialise the element and accessibilityId(By calling this.setupElement in most cases)
+	// * Initialise any elements specific to interactions with that block
 	async setup() {
 		throw 'Unimplemented setup function for this block';
 	}

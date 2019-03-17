@@ -31,7 +31,7 @@ export default class ParagraphBlockInteraction extends Block {
 	}
 
 	async setup() {
-		await this.setupElement( this.blockName, ParagraphBlock.blocks );
+		await this.setupElement( this.blockName, ParagraphBlockInteraction.blocks );
 		await this.setupTextView();
 	}
 
