@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, isEqual, map } from 'lodash';
+import { pick, isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -144,20 +144,14 @@ InnerBlocks = compose( [
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
-			replaceBlocks,
-			insertBlocks,
+			replaceInnerBlocks,
 			updateBlockListSettings,
 		} = dispatch( 'core/block-editor' );
 		const { block, clientId, templateInsertUpdatesSelection = true } = ownProps;
 
 		return {
 			replaceInnerBlocks( blocks ) {
-				const clientIds = map( block.innerBlocks, 'clientId' );
-				if ( clientIds.length ) {
-					replaceBlocks( clientIds, blocks );
-				} else {
-					insertBlocks( blocks, undefined, clientId, templateInsertUpdatesSelection );
-				}
+				replaceInnerBlocks( clientId, blocks, block.innerBlocks.length === 0 && templateInsertUpdatesSelection );
 			},
 			updateNestedSettings( settings ) {
 				dispatch( updateBlockListSettings( clientId, settings ) );

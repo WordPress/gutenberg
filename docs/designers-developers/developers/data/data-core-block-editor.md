@@ -980,6 +980,17 @@ specified client ID is to be removed.
  * selectPrevious: True if the previous block should be
                                 selected when a block is removed.
 
+### replaceInnerBlocks
+
+Returns an action object used in signalling that the inner blocks with the
+specified client ID should be replaced.
+
+*Parameters*
+
+ * rootClientId: Client ID of the block whose InnerBlocks will re replaced.
+ * blocks: Block objects to insert as new InnerBlocks
+ * updateSelection: If true block selection will be updated. If false, block selection will not change. Defaults to true.
+
 ### toggleBlockMode
 
 Returns an action object used to toggle the block editing mode between
