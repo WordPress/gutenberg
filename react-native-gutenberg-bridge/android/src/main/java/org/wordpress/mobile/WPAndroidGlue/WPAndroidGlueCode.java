@@ -52,7 +52,6 @@ public class WPAndroidGlueCode {
 
     private String mContentHtml = "";
     private boolean mContentInitialized;
-    private boolean mContentInitializedIsEmpty;
     private String mMediaUrlToAddAfterMounting;
     private int mMediaIdToAddAfterMounting;
     private String mTitle = "";
@@ -302,7 +301,6 @@ public class WPAndroidGlueCode {
 
     public void setContent(String postContent) {
         mContentInitialized = true;
-        mContentInitializedIsEmpty = TextUtils.isEmpty(postContent);
         mContentHtml = postContent;
         setContent(mTitle, mContentHtml);
     }
@@ -415,10 +413,8 @@ public class WPAndroidGlueCode {
             mPendingMediaSelectedCallback.onMediaSelected(mediaId, mediaUrl);
             mPendingMediaSelectedCallback = null;
         } else {
-            // we can assume we're being passed a new image from share intent as there was no content on Editor init
-            if (mContentInitializedIsEmpty) {
-                sendOrDeferAppendMediaSignal(mediaId, mediaUrl);
-            }
+            // we can assume we're being passed a new image from share intent as there was no selectMedia callback
+            sendOrDeferAppendMediaSignal(mediaId, mediaUrl);
         }
     }
 
@@ -430,10 +426,8 @@ public class WPAndroidGlueCode {
        if (isMediaUploadCallbackRegistered()) {
            mPendingMediaUploadCallback.onUploadMediaFileSelected(mediaId, mediaUri);
        } else {
-           // we can assume we're being passed a new image from share intent as there was no content on Editor init
-           if (mContentInitializedIsEmpty) {
-               sendOrDeferAppendMediaSignal(mediaId, mediaUri);
-           }
+           // we can assume we're being passed a new image from share intent as there was no selectMedia callback
+           sendOrDeferAppendMediaSignal(mediaId, mediaUri);
        }
     }
 
