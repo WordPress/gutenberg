@@ -298,6 +298,38 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 
 /**
  * Higher-order reducer which targets the combined blocks reducer and handles
+ * the `REPLACE_INNER_BLOCKS` action. When dispatched, this action the state should become equivalent
+ * to the execution of a `REMOVE_BLOCKS` action containing all the child's of the root block followed by
+ * the execution of `INSERT_BLOCKS` with the new blocks.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
+	if ( action.type !== 'REPLACE_INNER_BLOCKS' ) {
+		return reducer( state, action );
+	}
+	let stateAfterBlocksRemoval = state;
+	if ( state.order[ action.rootClientId ] ) {
+		stateAfterBlocksRemoval = reducer( stateAfterBlocksRemoval, {
+			type: 'REMOVE_BLOCKS',
+			clientIds: state.order[ action.rootClientId ],
+		} );
+	}
+	let stateAfterInsert = stateAfterBlocksRemoval;
+	if ( action.blocks.length ) {
+		stateAfterInsert = reducer( stateAfterInsert, {
+			...action,
+			type: 'INSERT_BLOCKS',
+			index: 0,
+		} );
+	}
+	return stateAfterInsert;
+};
+
+/**
+ * Higher-order reducer which targets the combined blocks reducer and handles
  * the `SAVE_REUSABLE_BLOCK_SUCCESS` action. This action can't be handled by
  * regular reducers and needs a higher-order reducer since it needs access to
  * both `byClientId` and `attributes` simultaneously.
@@ -344,6 +376,7 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 export const blocks = flow(
 	combineReducers,
 	withInnerBlocksRemoveCascade,
+	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
 	withBlockReset,
 	withSaveReusableBlock,
 	withPersistentBlockChange,
@@ -713,6 +746,7 @@ export function blockSelection( state = {
 				end: action.clientId,
 				initialPosition: action.initialPosition,
 			};
+		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
 		case 'INSERT_BLOCKS': {
 			if ( action.updateSelection ) {
 				return {

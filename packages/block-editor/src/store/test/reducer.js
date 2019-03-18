@@ -162,6 +162,348 @@ describe( 'state', () => {
 			unregisterBlockType( 'core/test-block' );
 		} );
 
+		describe( 'replace inner blocks', () => {
+			beforeAll( () => {
+				registerBlockType( 'core/test-parent-block', {
+					save: noop,
+					edit: noop,
+					category: 'common',
+					title: 'test parent block',
+				} );
+				registerBlockType( 'core/test-child-block', {
+					save: noop,
+					edit: noop,
+					category: 'common',
+					title: 'test child block 1',
+					attributes: {
+						attr: {
+							type: 'boolean',
+						},
+						attr2: {
+							type: 'string',
+						},
+					},
+				} );
+			} );
+
+			afterAll( () => {
+				unregisterBlockType( 'core/test-parent-block' );
+				unregisterBlockType( 'core/test-child-block' );
+			} );
+			it( 'can replace a child block', () => {
+				const existingState = deepFreeze( {
+					byClientId: {
+						clicken: {
+							clientId: 'chicken',
+							name: 'core/test-parent-block',
+							isValid: true,
+						},
+						'clicken-child': {
+							clientId: 'chicken-child',
+							name: 'core/test-child-block',
+							isValid: true,
+						},
+					},
+					attributes: {
+						clicken: {},
+						'clicken-child': {
+							attr: true,
+						},
+					},
+					order: {
+						'': [ 'clicken' ],
+						clicken: [ 'clicken-child' ],
+						'clicken-child': [],
+					},
+				} );
+
+				const newChildBlock = createBlock( 'core/test-child-block', {
+					attr: false,
+					attr2: 'perfect',
+				} );
+
+				const { clientId: newChildBlockId } = newChildBlock;
+
+				const action = {
+					type: 'REPLACE_INNER_BLOCKS',
+					rootClientId: 'clicken',
+					blocks: [ newChildBlock ],
+				};
+
+				const state = blocks( existingState, action );
+
+				expect( state ).toEqual( {
+					isPersistentChange: expect.anything(),
+					byClientId: {
+						clicken: {
+							clientId: 'chicken',
+							name: 'core/test-parent-block',
+							isValid: true,
+						},
+						[ newChildBlockId ]: {
+							clientId: newChildBlockId,
+							name: 'core/test-child-block',
+							isValid: true,
+						},
+					},
+					attributes: {
+						clicken: {},
+						[ newChildBlockId ]: {
+							attr: false,
+							attr2: 'perfect',
+						},
+					},
+					order: {
+						'': [ 'clicken' ],
+						clicken: [ newChildBlockId ],
+						[ newChildBlockId ]: [],
+					},
+				} );
+			} );
+
+			it( 'can insert a child block', () => {
+				const existingState = deepFreeze( {
+					byClientId: {
+						clicken: {
+							clientId: 'chicken',
+							name: 'core/test-parent-block',
+							isValid: true,
+						},
+					},
+					attributes: {
+						clicken: {},
+					},
+					order: {
+						'': [ 'clicken' ],
+						clicken: [],
+					},
+				} );
+
+				const newChildBlock = createBlock( 'core/test-child-block', {
+					attr: false,
+					attr2: 'perfect',
+				} );
+
+				const { clientId: newChildBlockId } = newChildBlock;
+
+				const action = {
+					type: 'REPLACE_INNER_BLOCKS',
+					rootClientId: 'clicken',
+					blocks: [ newChildBlock ],
+				};
+
+				const state = blocks( existingState, action );
+
+				expect( state ).toEqual( {
+					isPersistentChange: expect.anything(),
+					byClientId: {
+						clicken: {
+							clientId: 'chicken',
+							name: 'core/test-parent-block',
+							isValid: true,
+						},
+						[ newChildBlockId ]: {
+							clientId: newChildBlockId,
+							name: 'core/test-child-block',
+							isValid: true,
+						},
+					},
+					attributes: {
+						clicken: {},
+						[ newChildBlockId ]: {
+							attr: false,
+							attr2: 'perfect',
+						},
+					},
+					order: {
+						'': [ 'clicken' ],
+						clicken: [ newChildBlockId ],
+						[ newChildBlockId ]: [],
+					},
+				} );
+			} );
+
+			it( 'can replace multiple child blocks', () => {
+				const existingState = deepFreeze( {
+					byClientId: {
+						clicken: {
+							clientId: 'chicken',
+							name: 'core/test-parent-block',
+							isValid: true,
+						},
+						'clicken-child': {
+							clientId: 'chicken-child',
+							name: 'core/test-child-block',
+							isValid: true,
+						},
+						'clicken-child-2': {
+							clientId: 'chicken-child',
+							name: 'core/test-child-block',
+							isValid: true,
+						},
+					},
+					attributes: {
+						clicken: {},
+						'clicken-child': {
+							attr: true,
+						},
+						'clicken-child-2': {
+							attr2: 'ok',
+						},
+					},
+					order: {
+						'': [ 'clicken' ],
+						clicken: [ 'clicken-child', 'clicken-child-2' ],
+						'clicken-child': [],
+						'clicken-child-2': [],
+					},
+				} );
+
+				const newChildBlock1 = createBlock( 'core/test-child-block', {
+					attr: false,
+					attr2: 'perfect',
+				} );
+
+				const newChildBlock2 = createBlock( 'core/test-child-block', {
+					attr: true,
+					attr2: 'not-perfect',
+				} );
+
+				const newChildBlock3 = createBlock( 'core/test-child-block', {
+					attr2: 'hello',
+				} );
+
+				const { clientId: newChildBlockId1 } = newChildBlock1;
+				const { clientId: newChildBlockId2 } = newChildBlock2;
+				const { clientId: newChildBlockId3 } = newChildBlock3;
+
+				const action = {
+					type: 'REPLACE_INNER_BLOCKS',
+					rootClientId: 'clicken',
+					blocks: [ newChildBlock1, newChildBlock2, newChildBlock3 ],
+				};
+
+				const state = blocks( existingState, action );
+
+				expect( state ).toEqual( {
+					isPersistentChange: expect.anything(),
+					byClientId: {
+						clicken: {
+							clientId: 'chicken',
+							name: 'core/test-parent-block',
+							isValid: true,
+						},
+						[ newChildBlockId1 ]: {
+							clientId: newChildBlockId1,
+							name: 'core/test-child-block',
+							isValid: true,
+						},
+						[ newChildBlockId2 ]: {
+							clientId: newChildBlockId2,
+							name: 'core/test-child-block',
+							isValid: true,
+						},
+						[ newChildBlockId3 ]: {
+							clientId: newChildBlockId3,
+							name: 'core/test-child-block',
+							isValid: true,
+						},
+					},
+					attributes: {
+						clicken: {},
+						[ newChildBlockId1 ]: {
+							attr: false,
+							attr2: 'perfect',
+						},
+						[ newChildBlockId2 ]: {
+							attr: true,
+							attr2: 'not-perfect',
+						},
+						[ newChildBlockId3 ]: {
+							attr2: 'hello',
+						},
+					},
+					order: {
+						'': [ 'clicken' ],
+						clicken: [ newChildBlockId1, newChildBlockId2, newChildBlockId3 ],
+						[ newChildBlockId1 ]: [],
+						[ newChildBlockId2 ]: [],
+						[ newChildBlockId3 ]: [],
+					},
+				} );
+			} );
+
+			it( 'can replace a child block that has other children', () => {
+				const existingState = deepFreeze( {
+					byClientId: {
+						clicken: {
+							clientId: 'chicken',
+							name: 'core/test-parent-block',
+							isValid: true,
+						},
+						'clicken-child': {
+							clientId: 'chicken-child',
+							name: 'core/test-child-block',
+							isValid: true,
+						},
+						'clicken-grand-child': {
+							clientId: 'chicken-child',
+							name: 'core/test-block',
+							isValid: true,
+						},
+					},
+					attributes: {
+						clicken: {},
+						'clicken-child': {},
+						'clicken-grand-child': {},
+					},
+					order: {
+						'': [ 'clicken' ],
+						clicken: [ 'clicken-child' ],
+						'clicken-child': [ 'clicken-grand-child' ],
+						'clicken-grand-child': [],
+					},
+				} );
+
+				const newChildBlock = createBlock( 'core/test-block' );
+
+				const { clientId: newChildBlockId } = newChildBlock;
+
+				const action = {
+					type: 'REPLACE_INNER_BLOCKS',
+					rootClientId: 'clicken',
+					blocks: [ newChildBlock ],
+				};
+
+				const state = blocks( existingState, action );
+
+				expect( state ).toEqual( {
+					isPersistentChange: expect.anything(),
+					byClientId: {
+						clicken: {
+							clientId: 'chicken',
+							name: 'core/test-parent-block',
+							isValid: true,
+						},
+						[ newChildBlockId ]: {
+							clientId: newChildBlockId,
+							name: 'core/test-block',
+							isValid: true,
+						},
+					},
+					attributes: {
+						clicken: {},
+						[ newChildBlockId ]: {},
+					},
+					order: {
+						'': [ 'clicken' ],
+						clicken: [ newChildBlockId ],
+						[ newChildBlockId ]: [],
+					},
+				} );
+			} );
+		} );
+
 		it( 'should return empty byClientId, attributes, order by default', () => {
 			const state = blocks( undefined, {} );
 
@@ -1558,6 +1900,55 @@ describe( 'state', () => {
 			const state = blockSelection( original, {
 				type: 'REMOVE_BLOCKS',
 				clientIds: [ 'ribs' ],
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
+		it( 'should update the selection on inner blocks replace if updateSelection is true', () => {
+			const original = deepFreeze( {
+				start: 'chicken',
+				end: 'chicken',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+			const newBlock = {
+				name: 'core/test-block',
+				clientId: 'another-block',
+			};
+
+			const state = blockSelection( original, {
+				type: 'REPLACE_INNER_BLOCKS',
+				blocks: [ newBlock ],
+				rootClientId: 'parent',
+				updateSelection: true,
+			} );
+
+			expect( state ).toEqual( {
+				start: 'another-block',
+				end: 'another-block',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+		} );
+
+		it( 'should not update the selection on inner blocks replace if updateSelection is false', () => {
+			const original = deepFreeze( {
+				start: 'chicken',
+				end: 'chicken',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+			const newBlock = {
+				name: 'core/test-block',
+				clientId: 'another-block',
+			};
+
+			const state = blockSelection( original, {
+				type: 'REPLACE_INNER_BLOCKS',
+				blocks: [ newBlock ],
+				rootClientId: 'parent',
+				updateSelection: false,
 			} );
 
 			expect( state ).toBe( original );
