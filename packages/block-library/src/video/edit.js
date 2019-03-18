@@ -202,7 +202,7 @@ class VideoEdit extends Component {
 							checked={ controls }
 						/>
 						<ToggleControl
-							label={ __( 'Playsinline' ) }
+							label={ __( 'Play inline' ) }
 							onChange={ this.toggleAttribute( 'playsinline' ) }
 							checked={ playsinline }
 						/>
