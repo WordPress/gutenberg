@@ -54,6 +54,12 @@ This is how you execute the script with presented setup:
 
 * `npm run build` - builds the code for production.
 
+_Options_:
+
+- `--WP_BUNDLE_ANALYZER` : This flag is used to enables utility that represents bundle content as convenient interactive zoomable treemap.
+- `--WP_LIVE_RELOAD_PORT` : When present, the port on which live reload works when running watch mode will be changed. An example usage would be `npx wp-scripts build --WP_LIVE_RELOAD_PORT=1234`.
+- `--WP_DEVTOOL` : A development tool is designated to control how source maps are generated. More information can be found [here](https://webpack.js.org/configuration/devtool/#devtool).
+
 ### `check-engines`
 
 Checks if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code. It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version).
@@ -170,7 +176,7 @@ This is how you execute the script with presented setup:
 Launches the End-To-End (E2E) test runner. It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as presented below) to view all of the available options.
 
 Writing tests can be done using Puppeteer API:
- 
+
 > [Puppeteer](https://pptr.dev/) is a Node library which provides a high-level API to control Chrome or Chromium over the [DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/). Puppeteer runs [headless](https://developers.google.com/web/updates/2017/04/headless-chrome) by default, but can be configured to run full (non-headless) Chrome or Chromium.
 
 _Example:_
@@ -196,7 +202,7 @@ We enforce that all tests run serially in the current process using [--runInBand
 
 ### `test-unit-js`
 
-_Alias_: `test-unit-jest` 
+_Alias_: `test-unit-jest`
 
 Launches the unit test runner. It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test-unit-js --help` or `npm run test:unit:help` (as presented below) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration).
 
