@@ -48,9 +48,13 @@ public class WPAndroidGlueCode {
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachQueryListener mOnReattachQueryListener;
     private OnEditorMountListener mOnEditorMountListener;
+    private boolean mEditorIsMounted = false;
 
     private String mContentHtml = "";
     private boolean mContentInitialized;
+    private boolean mContentInitializedIsEmpty;
+    private String mMediaUrlToAddAfterMounting;
+    private int mMediaIdToAddAfterMounting;
     private String mTitle = "";
     private boolean mTitleInitialized;
     private boolean mContentChanged;
@@ -145,8 +149,15 @@ public class WPAndroidGlueCode {
             @Override
             public void editorDidMount(boolean hasUnsupportedBlocks) {
                 mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
+                mEditorIsMounted = true;
                 if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
                     setFocusOnTitle();
+                    // send signal to Editor to create a new image block and pass the media URL, start uploading, etc
+                    // use mMediaUrlToAddAfterMounting
+                    if (!TextUtils.isEmpty(mMediaUrlToAddAfterMounting) && mMediaIdToAddAfterMounting > 0) {
+                        // send signal to JS
+                        appendNewImageBlock(mMediaIdToAddAfterMounting, mMediaUrlToAddAfterMounting);
+                    }
                 }
             }
         });
@@ -278,6 +289,11 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setFocusOnTitleInJS();
     }
 
+    public void appendNewImageBlock(int mediaId, String mediaUri) {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
+                                            .appendNewImageBlock(mediaId, mediaUri);
+    }
+
     public void setTitle(String title) {
         mTitleInitialized = true;
         mTitle = title;
@@ -286,6 +302,7 @@ public class WPAndroidGlueCode {
 
     public void setContent(String postContent) {
         mContentInitialized = true;
+        mContentInitializedIsEmpty = TextUtils.isEmpty(postContent);
         mContentHtml = postContent;
         setContent(mTitle, mContentHtml);
     }
@@ -397,6 +414,11 @@ public class WPAndroidGlueCode {
         if (mPendingMediaSelectedCallback != null) {
             mPendingMediaSelectedCallback.onMediaSelected(mediaId, mediaUrl);
             mPendingMediaSelectedCallback = null;
+        } else {
+            // we can assume we're being passed a new image from share intent as there was no content on Editor init
+            if (mContentInitializedIsEmpty) {
+                sendOrDeferAppendMediaSignal(mediaId, mediaUrl);
+            }
         }
     }
 
@@ -407,7 +429,26 @@ public class WPAndroidGlueCode {
     public void appendUploadMediaFile(final int mediaId, final String mediaUri) {
        if (isMediaUploadCallbackRegistered()) {
            mPendingMediaUploadCallback.onUploadMediaFileSelected(mediaId, mediaUri);
+       } else {
+           // we can assume we're being passed a new image from share intent as there was no content on Editor init
+           if (mContentInitializedIsEmpty) {
+               sendOrDeferAppendMediaSignal(mediaId, mediaUri);
+           }
        }
+    }
+
+    private void sendOrDeferAppendMediaSignal(int mediaId, final String mediaUri) {
+        // if editor is mounted, let's append the media file
+        if (mEditorIsMounted) {
+            if (!TextUtils.isEmpty(mediaUri) && mediaId > 0) {
+                // send signal to JS
+                appendNewImageBlock(mediaId, mediaUri);
+            }
+        } else {
+            // save the URL, we'll add it once Editor is mounted
+            mMediaUrlToAddAfterMounting = mediaUri;
+            mMediaIdToAddAfterMounting = mediaId;
+        }
     }
 
     public void mediaFileUploadProgress(final int mediaId, final float progress) {
