@@ -218,13 +218,13 @@ This is how you execute those scripts using the presented setup:
 * `npm run test:unit:help` - prints all available options to configure unit tests runner.
 * `npm run test:unit:watch` - runs all unit tests in the watch mode.
 
-## Advanced usage
+## Advanced Usage
 
-
+### Webpack config
 
 The `build` and `start` commands use [webpack](https://webpack.js.org/) behind the scenes. webpack is a tool that helps you transform your code into something else. For example: it can take code written in ESNext and output ES5 compatible code that is minified for production.
 
-### Default webpack config
+#### Default webpack config
 
 `@wordpress/scripts` bundles the default webpack config used as a base by the WordPress editor. These are the defaults:
 
@@ -242,7 +242,7 @@ lodash | `import x from lodash;` | `var x = window.lodash.x;`
 lodash-es | `import x from lodash-es;` | `var x = window.lodash.x;`
 WordPress packages | `import x from '@wordpress/package-name` | `var x = window.wp.packageName.x`
 
-### Provide your own webpack config
+#### Provide your own webpack config
 
 Should there be any situation where you want to provide your own webpack config, you can do so. The `build` and `start` commands will use your provided file when:
 
