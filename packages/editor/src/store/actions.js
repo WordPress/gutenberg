@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, pick } from 'lodash';
+import { castArray, pick, has, compact, map, uniqueId } from 'lodash';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
@@ -18,6 +18,7 @@ import {
 	POST_UPDATE_TRANSACTION_ID,
 	SAVE_POST_NOTICE_ID,
 	TRASH_POST_NOTICE_ID,
+	REUSABLE_BLOCK_NOTICE_ID,
 } from './constants';
 import {
 	getNotificationArgumentsForSaveSuccess,
@@ -26,22 +27,64 @@ import {
 } from './utils/notice-builder';
 
 /**
- * Returns an action object used in signalling that editor has initialized with
+ * WordPress dependencies
+ */
+import {
+	parse,
+	serialize,
+	createBlock,
+	isReusableBlock,
+	cloneBlock,
+	synchronizeBlocksWithTemplate,
+} from '@wordpress/blocks';
+import { getPostRawValue } from './reducer';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
  * @param {Object} post      Post object.
  * @param {Object} edits     Initial edited attributes object.
  * @param {Array?} template  Block Template.
- *
- * @return {Object} Action object.
  */
-export function setupEditor( post, edits, template ) {
-	return {
+export function* setupEditor( post, edits, template ) {
+	yield {
 		type: 'SETUP_EDITOR',
 		post,
 		edits,
 		template,
 	};
+
+	// In order to ensure maximum of a single parse during setup, edits are
+	// included as part of editor setup action. Assume edited content as
+	// canonical if provided, falling back to post.
+	let content;
+	if ( has( edits, [ 'content' ] ) ) {
+		content = edits.content;
+	} else {
+		content = post.content.raw;
+	}
+
+	let blocks = parse( content );
+
+	// Apply a template for new posts only, if exists.
+	const isNewPost = post.status === 'auto-draft';
+	if ( isNewPost && template ) {
+		blocks = synchronizeBlocksWithTemplate( blocks, template );
+	}
+
+	yield dispatch(
+		STORE_KEY,
+		'resetEditorBlocks',
+		blocks
+	);
+
+	yield dispatch(
+		STORE_KEY,
+		'setupEditorState',
+		post
+	);
 }
 
 /**
@@ -523,65 +566,240 @@ export function updatePostLock( lock ) {
 }
 
 /**
- * Returns an action object used to fetch a single reusable block or all
+ * Returns an action generator used to fetch a single reusable block or all
  * reusable blocks from the REST API into the store.
  *
  * @param {?string} id If given, only a single reusable block with this ID will
  *                     be fetched.
- *
- * @return {Object} Action object.
  */
-export function __experimentalFetchReusableBlocks( id ) {
-	return {
+export function* __experimentalFetchReusableBlocks( id ) {
+	yield {
 		type: 'FETCH_REUSABLE_BLOCKS',
 		id,
 	};
+	// TODO: these are potentially undefined, this fix is in place
+	// until there is a filter to not use reusable blocks if undefined
+	const postType = yield apiFetch( { path: '/wp/v2/types/wp_block' } );
+	if ( ! postType ) {
+		return;
+	}
+
+	try {
+		let posts;
+
+		if ( id ) {
+			posts = [ yield apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }` } ) ];
+		} else {
+			posts = yield apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
+		}
+
+		const results = compact( map( posts, ( post ) => {
+			if ( post.status !== 'publish' || post.content.protected ) {
+				return null;
+			}
+
+			const parsedBlocks = parse( post.content.raw );
+			return {
+				reusableBlock: {
+					id: post.id,
+					title: getPostRawValue( post.title ),
+				},
+				parsedBlock: parsedBlocks.length === 1 ?
+					parsedBlocks[ 0 ] :
+					createBlock( 'core/template', {}, parsedBlocks ),
+			};
+		} ) );
+
+		if ( results.length ) {
+			yield dispatch(
+				STORE_KEY,
+				'__experimentalReceiveReusableBlocks',
+				results
+			);
+		}
+
+		yield {
+			type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+			id,
+		};
+	} catch ( error ) {
+		yield {
+			type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+			id,
+			error,
+		};
+	}
 }
 
 /**
- * Returns an action object used in signalling that reusable blocks have been
+ * Returns an action generator used in signalling that reusable blocks have been
  * received. `results` is an array of objects containing:
  *  - `reusableBlock` - Details about how the reusable block is persisted.
  *  - `parsedBlock` - The original block.
  *
  * @param {Object[]} results Reusable blocks received.
- *
- * @return {Object} Action object.
  */
-export function __experimentalReceiveReusableBlocks( results ) {
-	return {
+export function* __experimentalReceiveReusableBlocks( results ) {
+	yield {
 		type: 'RECEIVE_REUSABLE_BLOCKS',
 		results,
 	};
+	yield dispatch(
+		'core/block-editor',
+		'receiveBlocks',
+		map( results, 'parsedBlock' )
+	);
 }
 
 /**
- * Returns an action object used to save a reusable block that's in the store to
+ * Returns an action generator used to save a reusable block that's in the store to
  * the REST API.
  *
  * @param {Object} id The ID of the reusable block to save.
- *
- * @return {Object} Action object.
  */
-export function __experimentalSaveReusableBlock( id ) {
-	return {
+export function* __experimentalSaveReusableBlock( id ) {
+	yield {
 		type: 'SAVE_REUSABLE_BLOCK',
 		id,
 	};
+	// TODO: these are potentially undefined, this fix is in place
+	// until there is a filter to not use reusable blocks if undefined
+	const postType = yield apiFetch( { path: '/wp/v2/types/wp_block' } );
+	if ( ! postType ) {
+		return;
+	}
+	const { clientId, title, isTemporary } = yield select(
+		STORE_KEY,
+		'__experimentalGetReusableBlock',
+		id
+	);
+	const reusableBlock = yield select(
+		'core/block-editor',
+		'getBlock',
+		clientId
+	);
+	const content = serialize( reusableBlock.name === 'core/template' ?
+		reusableBlock.innerBlocks :
+		reusableBlock );
+	const data = isTemporary ?
+		{ title, content, status: 'publish' } :
+		{ id, title, content, status: 'publish' };
+	const path = isTemporary ?
+		`/wp/v2/${ postType.rest_base }` :
+		`/wp/v2/${ postType.rest_base }/${ id }`;
+	const method = isTemporary ? 'POST' : 'PUT';
+
+	try {
+		const updatedReusableBlock = yield apiFetch( { path, data, method } );
+		yield {
+			type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+			updatedId: updatedReusableBlock.id,
+			id,
+		};
+		const message = isTemporary ?
+			__( 'Block created.' ) :
+			__( 'Block updated.' );
+		yield dispatch(
+			'core/notices',
+			'createSuccessNotice',
+			message,
+			{ id: REUSABLE_BLOCK_NOTICE_ID }
+		);
+		yield dispatch(
+			'core/block-editor',
+			'__unstableSaveReusableBlock',
+			id,
+			updatedReusableBlock.id
+		);
+	} catch ( error ) {
+		yield { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id };
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			error.message,
+			{ id: REUSABLE_BLOCK_NOTICE_ID }
+		);
+	}
 }
 
 /**
- * Returns an action object used to delete a reusable block via the REST API.
+ * Returns an action generator used to delete a reusable block via the REST API.
  *
  * @param {number} id The ID of the reusable block to delete.
- *
- * @return {Object} Action object.
  */
-export function __experimentalDeleteReusableBlock( id ) {
-	return {
-		type: 'DELETE_REUSABLE_BLOCK',
+export function* __experimentalDeleteReusableBlock( id ) {
+	// TODO: these are potentially undefined, this fix is in place
+	// until there is a filter to not use reusable blocks if undefined
+	const postType = yield apiFetch( { path: '/wp/v2/types/wp_block' } );
+	if ( ! postType ) {
+		return;
+	}
+
+	// Don't allow a reusable block with a temporary ID to be deleted
+	const reusableBlock = yield select(
+		STORE_KEY,
+		'__experimentalGetReusableBlock',
+		id
+	);
+	if ( ! reusableBlock || reusableBlock.isTemporary ) {
+		return;
+	}
+
+	// Remove any other blocks that reference this reusable block
+	const allBlocks = yield select( 'core/block-editor', 'getBlocks' );
+	const associatedBlocks = allBlocks.filter(
+		( block ) => isReusableBlock( block ) && block.attributes.ref === id
+	);
+	const associatedBlockClientIds = associatedBlocks.map(
+		( block ) => block.clientId
+	);
+
+	const transactionId = uniqueId();
+
+	yield {
+		type: 'REMOVE_REUSABLE_BLOCK',
 		id,
+		optimist: { type: BEGIN, id: transactionId },
 	};
+
+	yield dispatch(
+		'core/block-editor',
+		'removeBlocks',
+		[
+			...associatedBlockClientIds,
+			reusableBlock.clientId,
+		]
+	);
+
+	try {
+		yield apiFetch( {
+			path: `/wp/v2/${ postType.rest_base }/${ id }`,
+			method: 'DELETE',
+		} );
+		yield {
+			type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
+			id,
+			optimist: { type: COMMIT, id: transactionId },
+		};
+
+		yield dispatch(
+			'core/notices',
+			'createSuccessNotice',
+			__( 'Block deleted.' ),
+			{ id: REUSABLE_BLOCK_NOTICE_ID }
+		);
+	} catch ( error ) {
+		yield {
+			type: 'DELETE_REUSABLE_BLOCK_FAILURE',
+			id,
+			optimist: { type: REVERT, id: transactionId },
+		};
+		yield dispatch(
+			'core/notices',
+			error.message,
+			{ id: REUSABLE_BLOCK_NOTICE_ID }
+		);
+	}
 }
 
 /**
@@ -602,33 +820,110 @@ export function __experimentalUpdateReusableBlockTitle( id, title ) {
 }
 
 /**
- * Returns an action object used to convert a reusable block into a static
+ * Returns an action generator used to convert a reusable block into a static
  * block.
  *
  * @param {string} clientId The client ID of the block to attach.
- *
- * @return {Object} Action object.
  */
-export function __experimentalConvertBlockToStatic( clientId ) {
-	return {
-		type: 'CONVERT_BLOCK_TO_STATIC',
-		clientId,
-	};
+export function* __experimentalConvertBlockToStatic( clientId ) {
+	const oldBlock = yield select(
+		'core/block-editor',
+		'getBlock',
+		clientId
+	);
+	const reusableBlock = yield select(
+		STORE_KEY,
+		'__experimentalGetReusableBlock',
+		oldBlock.attributes.ref
+	);
+	const referencedBlock = yield select(
+		'core/block-editor',
+		'getBlock',
+		reusableBlock.clientId
+	);
+	let newBlocks;
+	if ( referencedBlock.name === 'core/template' ) {
+		newBlocks = referencedBlock.innerBlocks.map(
+			( innerBlock ) => cloneBlock( innerBlock )
+		);
+	} else {
+		newBlocks = [ cloneBlock( referencedBlock ) ];
+	}
+	yield dispatch(
+		'core/block-editor',
+		'replaceBlocks',
+		oldBlock.clientId,
+		newBlocks
+	);
 }
 
 /**
- * Returns an action object used to convert a static block into a reusable
+ * Returns an action generator used to convert a static block into a reusable
  * block.
  *
  * @param {string} clientIds The client IDs of the block to detach.
- *
- * @return {Object} Action object.
  */
-export function __experimentalConvertBlockToReusable( clientIds ) {
-	return {
-		type: 'CONVERT_BLOCK_TO_REUSABLE',
-		clientIds: castArray( clientIds ),
+export function* __experimentalConvertBlockToReusable( clientIds ) {
+	let parsedBlock;
+	clientIds = castArray( clientIds );
+	if ( clientIds.length === 1 ) {
+		parsedBlock = yield select(
+			'core/block-editor',
+			'getBlock',
+			clientIds[ 0 ]
+		);
+	} else {
+		const blocks = yield select(
+			'core/block-editor',
+			'getBlocksByClientId',
+			clientIds
+		);
+		parsedBlock = createBlock(
+			'core/template',
+			{},
+			blocks
+		);
+
+		// This shouldn't be necessary but at the moment
+		// we expect the content of the shared blocks to live in the blocks state.
+		yield dispatch(
+			'core/block-editor',
+			'receiveBlocks',
+			[ parsedBlock ]
+		);
+	}
+
+	const reusableBlock = {
+		id: uniqueId( 'reusable' ),
+		clientId: parsedBlock.clientId,
+		title: __( 'Untitled Reusable Block' ),
 	};
+
+	yield dispatch(
+		STORE_KEY,
+		'__experimentalReceiveReusableBlocks',
+		[ { reusableBlock, parsedBlock } ]
+	);
+
+	yield dispatch(
+		'core/block-editor',
+		'replaceBlocks',
+		clientIds,
+		createBlock( 'core/block', { ref: reusableBlock.id } )
+	);
+
+	// Re-add the original block to the store, since replaceBlock() will have removed it
+	yield dispatch(
+		'core/block-editor',
+		'receiveBlocks',
+		[ parsedBlock ]
+	);
+
+	yield dispatch(
+		STORE_KEY,
+		'__experimentalSaveReusableBlock',
+		reusableBlock.id
+	);
 }
 
 /**

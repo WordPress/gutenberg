@@ -19,3 +19,5 @@ export const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 export const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 export const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 export const ONE_MINUTE_IN_MS = 60 * 1000;
+
+export const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
