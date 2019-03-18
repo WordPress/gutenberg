@@ -72,7 +72,7 @@ jobs:
             echo 'export TEST_ENV=<<parameters.testEnv>>' >> $BASH_ENV
       - run:
           name: Run Device Tests
-          command: yarn test:ui
+          command: yarn device-tests
 
 workflows:
   gutenberg-mobile:
