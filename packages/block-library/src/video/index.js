@@ -150,7 +150,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { autoplay, caption, controls, loop, muted, poster, preload, src } = attributes;
+		const { autoplay, caption, controls, loop, muted, poster, preload, src, playsinline } = attributes;
 		return (
 			<figure>
 				{ src && (
@@ -162,6 +162,7 @@ export const settings = {
 						poster={ poster }
 						preload={ preload !== 'metadata' ? preload : undefined }
 						src={ src }
+						playsInline={ playsinline }
 					/>
 				) }
 				{ ! RichText.isEmpty( caption ) && (
