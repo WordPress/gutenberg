@@ -15,6 +15,12 @@ commands:
           key: yarn-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
+  react-native-install:
+    steps:
+    - run:
+        name: Install command line tools
+        command: |
+          npm install -g react-native-cli
   build-android:
     steps:
       - run:
@@ -70,6 +76,7 @@ jobs:
             git submodule init
             git submodule update --recursive
       - yarn-install
+      - react-native-install
       - run:
           name: Set Environment Variables
           command: |
@@ -94,6 +101,7 @@ jobs:
           git submodule init
           git submodule update --recursive
     - yarn-install
+    - react-native-install
     - run:
         name: Set Environment Variables
         command: |
