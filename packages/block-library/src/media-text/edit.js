@@ -17,7 +17,9 @@ import {
 } from '@wordpress/block-editor';
 import { Component, Fragment } from '@wordpress/element';
 import {
+	Button,
 	PanelBody,
+	RangeControl,
 	TextareaControl,
 	ToggleControl,
 	Toolbar,
@@ -178,6 +180,16 @@ class MediaTextEdit extends Component {
 			<Fragment>
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
+					<PanelBody title={ __( 'Layout' ) }>
+						<RangeControl
+							label={ __( 'Media width' ) }
+							value={ temporaryMediaWidth || mediaWidth }
+							onChange={ this.commitWidthChange }
+						/>
+						<Button isSmall onClick={ () => setAttributes( { mediaWidth: 38 } ) }>Golden ratio small</Button>
+						<Button isSmall onClick={ () => setAttributes( { mediaWidth: 50 } ) }>Half and half</Button>
+						<Button isSmall onClick={ () => setAttributes( { mediaWidth: 62 } ) }>Golden ratio big</Button>
+					</PanelBody>
 					<PanelColorSettings
 						title={ __( 'Color Settings' ) }
 						initialOpen={ false }
