@@ -67,7 +67,7 @@ jobs:
           command: bin/ci-checks-js.sh
   android-device-checks:
     docker:
-    - image: circleci/android:api-28-node8-alpha
+    - image: circleci/android:api-27-node8-alpha
     steps:
       - checkout
       - run:
