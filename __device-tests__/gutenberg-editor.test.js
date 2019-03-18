@@ -4,7 +4,7 @@
 
 import EditorPage from './pages/editor-page';
 import ParagraphBlockInteraction from './blocks/paragraph-block-interaction';
-import { rename, setupAppium, setupDriver, isLocalEnvironment, timer } from './helpers/utils';
+import { setupAppium, setupDriver, isLocalEnvironment, timer } from './helpers/utils';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
@@ -25,14 +25,8 @@ describe( 'Gutenberg Editor tests', () => {
 		jasmine.getEnv().addReporter( reporter );
 	}
 
-	const setupData = async () => {
-		await rename( 'src/app/initial-html.js', 'src/app/initial-html.tmp.js' );
-		await rename( 'src/app/initial-device-tests-html.js', 'src/app/initial-html.js' );
-	};
-
 	beforeAll( async () => {
 		if ( isLocalEnvironment() ) {
-			await setupData();
 			appium = await setupAppium();
 		}
 
@@ -55,8 +49,6 @@ describe( 'Gutenberg Editor tests', () => {
 	afterAll( async () => {
 		await driver.quit();
 		if ( isLocalEnvironment() ) {
-			await rename( 'src/app/initial-html.js', 'src/app/initial-device-tests-html.js' );
-			await rename( 'src/app/initial-html.tmp.js', 'src/app/initial-html.js' );
 			await appium.kill( 'SIGINT' );
 		} else {
 			driver.sauceJobStatus( allPassed );
