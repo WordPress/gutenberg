@@ -85,7 +85,7 @@ function render_block_core_rss( $attributes ) {
 		$class .= ' is-grid columns-' . $attributes['columns'];
 	}
 
-	if ( isset( $attributes['className'] ) ) {
+	if ( ! empty( $attributes['className'] ) ) {
 		$class .= ' ' . $attributes['className'];
 	}
 
