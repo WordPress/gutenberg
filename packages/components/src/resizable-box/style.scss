@@ -5,12 +5,6 @@
 	.components-resizable-box__container.is-selected & {
 		display: block;
 	}
-
-	// The handle is a pseudo-element and will sit inside this larger
-	// container size.
-	width: $resize-handler-container-size;
-	height: $resize-handler-container-size;
-	padding: $grid-size-small;
 }
 
 // This is the "visible" resize handle.
@@ -23,21 +17,30 @@
 	border-radius: 50%;
 	background: theme(primary);
 	cursor: inherit;
+	position: absolute;
+	top: calc(50% - #{$resize-handler-size / 2});
+	right: calc(50% - #{$resize-handler-size / 2});
 }
 
 /*!rtl:begin:ignore*/
+.components-resizable-box__handle-right,
+.components-resizable-box__handle-left {
+	top: 0;
+	height: 100%;
+	width: $resize-handler-container-size;
+}
+
 .components-resizable-box__handle-right {
-	top: calc(50% - #{$resize-handler-container-size / 2});
 	right: calc(#{$resize-handler-container-size / 2} * -1);
+}
+
+.components-resizable-box__handle-left {
+	left: calc(#{$resize-handler-container-size / 2} * -1);
 }
 
 .components-resizable-box__handle-bottom {
 	bottom: calc(#{$resize-handler-container-size / 2} * -1);
-	left: calc(50% - #{$resize-handler-container-size / 2});
-}
-
-.components-resizable-box__handle-left {
-	top: calc(50% - #{$resize-handler-container-size / 2});
-	left: calc(#{$resize-handler-container-size / 2} * -1);
+	width: 100%;
+	height: $resize-handler-container-size;
 }
 /*!rtl:end:ignore*/
