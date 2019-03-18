@@ -333,3 +333,13 @@
 	// icon standards.
 	margin-right: 2px;
 }
+
+/**
+ * Allows users to opt-out of animations via OS-level preferences.
+ */
+
+@mixin reduce-motion {
+	@media (prefers-reduced-motion: reduce) {
+		animation-duration: 1ms !important;
+	}
+}
