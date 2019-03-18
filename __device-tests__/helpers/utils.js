@@ -32,14 +32,6 @@ const localAppiumPort = 4728; // Port to spawn appium process for local runs
 // $FlowFixMe
 const timer = ( ms: number ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
-const rename = async ( path: string, newPath: string ) => {
-	await fs.rename( path, newPath, ( error ) => {
-		if ( error ) {
-			throw error;
-		}
-	} );
-};
-
 const setDifference = ( set1: Set<string>, set2: Set<string> ) => {
 	// FLow complaining about type annotation on Set class here but Set<string>(); doesn't resolve
 	// $FlowFixMe
@@ -124,7 +116,6 @@ module.exports = {
 	timer,
 	setupAppium,
 	setupDriver,
-	rename,
 	isLocalEnvironment,
 	isAndroid,
 	setDifference,
