@@ -17,32 +17,45 @@ const { Fill, Slot } = createSlotFill( 'Sidebar' );
  *
  * @return {Object} The rendered sidebar.
  */
-const Sidebar = ( { children, label } ) => {
+function Sidebar( { children, label, className } ) {
+	return (
+		<div
+			className={ classnames( 'edit-post-sidebar', className ) }
+			role="region"
+			aria-label={ label }
+			tabIndex="-1"
+		>
+			{ children }
+		</div>
+	);
+}
+
+Sidebar = withFocusReturn( {
+	onFocusReturn() {
+		const button = document.querySelector( '.edit-post-header__settings [aria-label="Settings"]' );
+		if ( button ) {
+			button.focus();
+			return false;
+		}
+	},
+} )( Sidebar );
+
+function AnimatedSidebarFill( props ) {
 	return (
 		<Fill>
 			<Animate type="slide-in" options={ { origin: 'left' } }>
-				{ ( { className } ) => (
-					<div
-						className={ classnames( 'edit-post-sidebar', className ) }
-						role="region"
-						aria-label={ label }
-						tabIndex="-1"
-					>
-						{ children }
-					</div>
-				) }
+				{ () => <Sidebar { ...props } /> }
 			</Animate>
 		</Fill>
 	);
-};
+}
 
 const WrappedSidebar = compose(
 	withSelect( ( select, { name } ) => ( {
 		isActive: select( 'core/edit-post' ).getActiveGeneralSidebarName() === name,
 	} ) ),
 	ifCondition( ( { isActive } ) => isActive ),
-	withFocusReturn,
-)( Sidebar );
+)( AnimatedSidebarFill );
 
 WrappedSidebar.Slot = Slot;
 
