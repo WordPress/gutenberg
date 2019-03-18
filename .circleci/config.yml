@@ -15,6 +15,18 @@ commands:
           key: yarn-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
+  build-android:
+    steps:
+      - bundle-android:
+          name: Bundle Debug android
+          command: |
+            react-native bundle --reset-cache --dev=false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug
+      - gradle-build:
+          name: Gradle assemble debug android apk
+          command: |
+            cd android
+            ./gradlew clean
+            ./gradlew assembleDebug
 
 jobs:
   checks:
@@ -47,14 +59,7 @@ jobs:
       - run:
           name: Run Checks
           command: bin/ci-checks-js.sh
-  device-checks:
-    parameters:
-      platform:
-        type: string
-        default: ""
-      testEnv:
-        type: string
-        default: ""
+  android-device-checks:
     docker:
       - image: circleci/node:8
     steps:
@@ -68,11 +73,40 @@ jobs:
       - run:
           name: Set Environment Variables
           command: |
-            echo 'export TEST_RN_PLATFORM=<<parameters.platform>>' >> $BASH_ENV
-            echo 'export TEST_ENV=<<parameters.testEnv>>' >> $BASH_ENV
+            echo 'export TEST_RN_PLATFORM=android' >> $BASH_ENV
+            echo 'export TEST_ENV=sauce' >> $BASH_ENV
+      - build-android
+      - sauce-upload:
+          name: Upload apk to sauce labs
+          command: |
+            curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
       - run:
           name: Run Device Tests
           command: yarn device-tests
+  ios-device-checks:
+    docker:
+    - image: circleci/node:8
+    steps:
+    - checkout
+    - run:
+        name: Checkout Gutenberg
+        command: |
+          git submodule init
+          git submodule update --recursive
+    - yarn-install
+    - run:
+        name: Set Environment Variables
+        command: |
+          echo 'export TEST_RN_PLATFORM=ios' >> $BASH_ENV
+          echo 'export TEST_ENV=sauce' >> $BASH_ENV
+    - build-android
+    - sauce-upload:
+        name: Upload apk to sauce labs
+        command: |
+          curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
+    - run:
+        name: Run Device Tests
+        command: yarn device-tests
 
 workflows:
   gutenberg-mobile:
@@ -88,11 +122,7 @@ workflows:
           name: Test Android
           platform: android
           check-tests: true
-      - device-checks:
+      - ios-device-checks:
           name: Test iOS on Device
-          platform: ios
-          testEnv: sauce
-      - device-checks:
+      - android-device-checks:
           name: Test Android on Device
-          platform: android
-          testEnv: sauce
