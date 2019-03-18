@@ -1,6 +1,6 @@
 # Scripts
 
-Collection of reusable scripts for WordPress development.
+Collection of reusable scripts for WordPress development. This package also comes with a recommended configuration for every tool integrated to make the process seamless.
 
 Command-line interfaces help to turn working with an app into a pleasant experience, but it is still not enough to keep it easy to maintain in the long run. Developers are left on their own to keep all configurations and dependent tools up to date. This problem multiplies when they own more than one project which shares the same setup. Fortunately, there is a pattern that can simplify maintainers life – reusable scripts. This idea boils down to moving all the necessary configurations and scripts to one single tool dependency. In most cases, it should be possible to accomplish all tasks using the default settings, but some customization is allowed, too. With all that in place updating all projects should become a very straightforward task.
 
@@ -23,11 +23,13 @@ _Example:_
 ```json
 {
 	"scripts": {
+		"build": "wp-scripts run build",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses --production",
 		"lint:css": "wp-scripts lint-style '**/*.css'",
 		"lint:js": "wp-scripts lint-js .",
 		"lint:pkg-json": "wp-scripts lint-pkg-json .",
+		"start": "wp-scripts start",
 		"test:e2e": "wp-scripts test-e2e",
 		"test:unit": "wp-scripts test-unit-js"
 	}
@@ -38,7 +40,7 @@ _Example:_
 
 ### `build`
 
-Transforms your code according the configuration provided so it's ready for production and optimized for the best performance. It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [webpack config](#webpack-config) section.
+Transforms your code according the configuration provided so it's ready for production and optimized for the best performance. The entry point for your project's code should be located inside `src/index.js` file. The output generated will be written to `build/index.js` file. It's similar to [start](#start) script which is better suited for development phase.
 
 _Example:_
 
@@ -53,6 +55,10 @@ _Example:_
 This is how you execute the script with presented setup:
 
 * `npm run build` - builds the code for production.
+
+#### Advanced information
+
+This script uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [webpack config](#webpack-config) section.
 
 ### `check-engines`
 
@@ -149,7 +155,7 @@ This is how you execute the script with presented setup:
 
 ### `start`
 
-Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [webpack config](#webpack-config) section.
+Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. The entry point for your project's code should be located inside `src/index.js` file. The output generated will be written to `build/index.js` file. It's similar to [build](#build) script which is better suited for production usage purpose.
 
 _Example:_
 
@@ -164,6 +170,10 @@ _Example:_
 This is how you execute the script with presented setup:
 
 * `npm start` - starts the build for development.
+
+#### Advanced information
+
+It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [webpack config](#webpack-config) section.
 
 ### `test-e2e`
 
