@@ -1932,7 +1932,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should not update the selection on innerblocks replace if updateSelection is false', () => {
+		it( 'should not update the selection on inner blocks replace if updateSelection is false', () => {
 			const original = deepFreeze( {
 				start: 'chicken',
 				end: 'chicken',
