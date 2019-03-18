@@ -23,10 +23,10 @@ commands:
           npm install react-native-cli
   build-android:
     steps:
-#      - run:
-#          name: Bundle Debug android
-#          command: |
-#            node_modules/.bin/react-native bundle --reset-cache --dev=false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug
+      - run:
+          name: Bundle Debug android
+          command: |
+            node_modules/.bin/react-native bundle --reset-cache --dev=false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug
       - run:
           name: Gradle assemble debug android apk
           command: |
@@ -82,6 +82,7 @@ jobs:
             echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
             sudo apt-get update && sudo apt-get install --no-install-recommends yarn
       - yarn-install
+      - react-native-install
       - run:
           name: Set Environment Variables
           command: |
