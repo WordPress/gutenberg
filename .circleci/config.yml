@@ -23,10 +23,10 @@ commands:
           npm install react-native-cli
   build-android:
     steps:
-      - run:
-          name: Bundle Debug android
-          command: |
-            node_modules/.bin/react-native bundle --reset-cache --dev=false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug
+#      - run:
+#          name: Bundle Debug android
+#          command: |
+#            node_modules/.bin/react-native bundle --reset-cache --dev=false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug
       - run:
           name: Gradle assemble debug android apk
           command: |
@@ -91,8 +91,8 @@ jobs:
           name: Run Device Tests
           command: yarn device-tests
   ios-device-checks:
-    docker:
-    - image: circleci/node:8
+    macos:
+    - xcode: "10.2"
     steps:
     - checkout
     - run:
