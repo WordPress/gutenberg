@@ -10,7 +10,7 @@ There are a few reasons to use ESNext and the extra step. First, it makes for si
 
 There are different tools that can perform this transformation or build step, but WordPress uses webpack and Babel.
 
-[webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to webpack to transform both ESNext and JSX to JavaScript.
+[webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript, creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to webpack to transform both ESNext and JSX to JavaScript.
 
 The [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) package abstracts these libraries away to standardize and simplify development, so you won't need to handle the details for configuring those libraries.
 
