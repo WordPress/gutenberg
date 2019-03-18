@@ -373,6 +373,8 @@ export class RichText extends Component {
 		// Browsers setting `isComposing` to `true` will usually emit a final
 		// `input` event when the characters are composed.
 		if ( event && event.nativeEvent.isComposing ) {
+			// Also don't update any selection.
+			document.removeEventListener( 'selectionchange', this.onSelectionChange );
 			return;
 		}
 
@@ -444,6 +446,8 @@ export class RichText extends Component {
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
 		this.onInput();
+		// Tracking selection changes can be resumed.
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	/**
@@ -1060,7 +1064,7 @@ export class RichText extends Component {
 		const MultilineTag = this.multilineTag;
 		const ariaProps = pickAriaProps( this.props );
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
-		const classes = classnames( wrapperClassName, 'editor-rich-text' );
+		const classes = classnames( wrapperClassName, 'editor-rich-text block-editor-rich-text' );
 		const record = this.getRecord();
 
 		return (
@@ -1081,7 +1085,7 @@ export class RichText extends Component {
 					</BlockFormatControls>
 				) }
 				{ isSelected && inlineToolbar && (
-					<IsolatedEventContainer className="editor-rich-text__inline-toolbar">
+					<IsolatedEventContainer className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar">
 						<FormatToolbar controls={ formattingControls } />
 					</IsolatedEventContainer>
 				) }
@@ -1114,13 +1118,11 @@ export class RichText extends Component {
 								onBlur={ this.onBlur }
 								onMouseDown={ this.onPointerDown }
 								onTouchStart={ this.onPointerDown }
-								multilineTag={ this.multilineTag }
-								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
 							/>
 							{ isPlaceholderVisible &&
 								<Tagname
-									className={ classnames( 'editor-rich-text__editable', className ) }
+									className={ classnames( 'editor-rich-text__editable block-editor-rich-text__editable', className ) }
 									style={ style }
 								>
 									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }

@@ -12,7 +12,7 @@
 	}
 
 	// Hide table of contents and block navigation on mobile.
-	.editor-block-navigation,
+	.block-editor-block-navigation,
 	.table-of-contents {
 		display: none;
 
@@ -33,7 +33,7 @@
 	min-height: $block-toolbar-height;
 	border-bottom: $border-width solid $light-gray-500;
 
-	.editor-block-toolbar .components-toolbar {
+	.block-editor-block-toolbar .components-toolbar {
 		border-top: none;
 		border-bottom: none;
 	}
@@ -63,11 +63,11 @@
 			right: auto;
 		}
 
-		.editor-block-toolbar {
+		.block-editor-block-toolbar {
 			margin: -($grid-size + $border-width) 0;
 		}
 
-		.editor-block-toolbar .components-toolbar {
+		.block-editor-block-toolbar .components-toolbar {
 			padding: ($grid-size + $border-width + $border-width) $grid-size-small ($grid-size + $border-width);
 		}
 	}

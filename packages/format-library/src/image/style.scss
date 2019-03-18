@@ -1,4 +1,4 @@
-.editor-format-toolbar__image-container-content {
+.block-editor-format-toolbar__image-container-content {
 	display: flex;
 
 	.components-icon-button {
@@ -7,7 +7,7 @@
 	}
 }
 
-.editor-format-toolbar__image-container-value {
+.block-editor-format-toolbar__image-container-value {
 	margin: $grid-size - $border-width;
 	flex-grow: 1;
 	flex-shrink: 1;

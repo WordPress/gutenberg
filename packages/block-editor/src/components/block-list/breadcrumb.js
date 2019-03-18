@@ -51,12 +51,12 @@ export class BlockBreadcrumb extends Component {
 		const { clientId, rootClientId } = this.props;
 
 		return (
-			<div className={ 'editor-block-list__breadcrumb' }>
+			<div className={ 'editor-block-list__breadcrumb block-editor-block-list__breadcrumb' }>
 				<Toolbar>
 					{ rootClientId && (
 						<Fragment>
 							<BlockTitle clientId={ rootClientId } />
-							<span className="editor-block-list__descendant-arrow" />
+							<span className="editor-block-list__descendant-arrow block-editor-block-list__descendant-arrow" />
 						</Fragment>
 					) }
 					<BlockTitle clientId={ clientId } />

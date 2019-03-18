@@ -6,19 +6,19 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
 >
   <ul>
     <TableOfContentsItem
+      href="#block-clientId_0"
       isValid={true}
       key="0"
       level="H2"
-      onClick={[Function]}
       path={Array []}
     >
       Heading parent
     </TableOfContentsItem>
     <TableOfContentsItem
+      href="#block-clientId_1"
       isValid={true}
       key="1"
       level="H3"
-      onClick={[Function]}
       path={Array []}
     >
       Heading child
@@ -33,10 +33,10 @@ exports[`DocumentOutline header blocks present should render warnings for multip
 >
   <ul>
     <TableOfContentsItem
+      href="#block-clientId_0"
       isValid={false}
       key="0"
       level="H1"
-      onClick={[Function]}
       path={Array []}
     >
       Heading 1
@@ -50,10 +50,10 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       </em>
     </TableOfContentsItem>
     <TableOfContentsItem
+      href="#block-clientId_2"
       isValid={false}
       key="1"
       level="H1"
-      onClick={[Function]}
       path={Array []}
     >
       Heading 1

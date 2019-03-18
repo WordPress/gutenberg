@@ -1,4 +1,4 @@
-.editor-inserter-with-shortcuts {
+.block-editor-inserter-with-shortcuts {
 	display: flex;
 	align-items: center;
 
@@ -12,7 +12,7 @@
 	}
 }
 
-.editor-inserter-with-shortcuts__block {
+.block-editor-inserter-with-shortcuts__block {
 	margin-right: $block-spacing;
 	width: $icon-button-size;
 	height: $icon-button-size;

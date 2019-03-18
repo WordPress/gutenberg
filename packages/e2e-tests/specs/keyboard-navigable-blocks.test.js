@@ -29,7 +29,7 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	// Tab causes 'add block' button to receive focus
 	await page.keyboard.press( 'Tab' );
 	const isFocusedParagraphInserterToggle = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'editor-inserter__toggle' )
+		document.activeElement.classList.contains( 'block-editor-inserter__toggle' )
 	);
 	await expect( isFocusedParagraphInserterToggle ).toBe( true );
 
@@ -54,14 +54,14 @@ const tabThroughBlockMoverControl = async () => {
 	// Tab to focus on the 'move up' control
 	await page.keyboard.press( 'Tab' );
 	const isFocusedMoveUpControl = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'editor-block-mover__control' )
+		document.activeElement.classList.contains( 'block-editor-block-mover__control' )
 	);
 	await expect( isFocusedMoveUpControl ).toBe( true );
 
 	// Tab to focus on the 'move down' control
 	await page.keyboard.press( 'Tab' );
 	const isFocusedMoveDownControl = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'editor-block-mover__control' )
+		document.activeElement.classList.contains( 'block-editor-block-mover__control' )
 	);
 	await expect( isFocusedMoveDownControl ).toBe( true );
 };
@@ -71,7 +71,7 @@ const tabThroughBlockToolbar = async () => {
 	await page.keyboard.press( 'Tab' );
 	const isFocusedBlockSwitcherControl = await page.evaluate( () =>
 		document.activeElement.classList.contains(
-			'editor-block-switcher__toggle'
+			'block-editor-block-switcher__toggle'
 		)
 	);
 	await expect( isFocusedBlockSwitcherControl ).toBe( true );
@@ -129,7 +129,7 @@ const tabThroughBlockToolbar = async () => {
 	await page.keyboard.press( 'Tab' );
 	const isFocusedBlockSettingsDropdown = await page.evaluate( () =>
 		document.activeElement.classList.contains(
-			'editor-block-settings-menu__toggle'
+			'block-editor-block-settings-menu__toggle'
 		)
 	);
 	await expect( isFocusedBlockSettingsDropdown ).toBe( true );

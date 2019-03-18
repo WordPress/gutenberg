@@ -34,10 +34,10 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 		<BlockActions clientIds={ clientIds }>
 			{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, canDuplicate, isLocked } ) => (
 				<Dropdown
-					contentClassName="editor-block-settings-menu__popover"
+					contentClassName="editor-block-settings-menu__popover block-editor-block-settings-menu__popover"
 					position="bottom right"
 					renderToggle={ ( { onToggle, isOpen } ) => {
-						const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
+						const toggleClassname = classnames( 'editor-block-settings-menu__toggle block-editor-block-settings-menu__toggle', {
 							'is-opened': isOpen,
 						} );
 						const label = isOpen ? __( 'Hide options' ) : __( 'More options' );
@@ -58,7 +58,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 						);
 					} }
 					renderContent={ ( { onClose } ) => (
-						<NavigableMenu className="editor-block-settings-menu__content">
+						<NavigableMenu className="editor-block-settings-menu__content block-editor-block-settings-menu__content">
 							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
 							{ count === 1 && (
 								<BlockUnknownConvertButton
@@ -72,7 +72,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 							) }
 							{ ! isLocked && canDuplicate && (
 								<MenuItem
-									className="editor-block-settings-menu__control"
+									className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 									onClick={ onDuplicate }
 									icon="admin-page"
 									shortcut={ shortcuts.duplicate.display }
@@ -83,7 +83,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 							{ ! isLocked && (
 								<Fragment>
 									<MenuItem
-										className="editor-block-settings-menu__control"
+										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 										onClick={ onInsertBefore }
 										icon="insert-before"
 										shortcut={ shortcuts.insertBefore.display }
@@ -91,7 +91,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 										{ __( 'Insert Before' ) }
 									</MenuItem>
 									<MenuItem
-										className="editor-block-settings-menu__control"
+										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 										onClick={ onInsertAfter }
 										icon="insert-after"
 										shortcut={ shortcuts.insertAfter.display }
@@ -111,7 +111,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 								onToggle={ onClose }
 							/>
 							<_BlockSettingsMenuPluginsExtension.Slot fillProps={ { clientIds, onClose } } />
-							<div className="editor-block-settings-menu__separator" />
+							<div className="editor-block-settings-menu__separator block-editor-block-settings-menu__separator" />
 							{ count === 1 && (
 								<ReusableBlockDeleteButton
 									clientId={ firstBlockClientId }
@@ -120,7 +120,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 							) }
 							{ ! isLocked && (
 								<MenuItem
-									className="editor-block-settings-menu__control"
+									className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 									onClick={ onRemove }
 									icon="trash"
 									shortcut={ shortcuts.removeBlock.display }

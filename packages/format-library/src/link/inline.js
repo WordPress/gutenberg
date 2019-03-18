@@ -42,7 +42,7 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 	<form
-		className="editor-format-toolbar__link-container-content"
+		className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 		onKeyPress={ stopKeyPropagation }
 		onKeyDown={ onKeyDown }
 		onSubmit={ submitLink }
@@ -59,7 +59,7 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 
 const LinkViewerUrl = ( { url } ) => {
 	const prependedURL = prependHTTP( url );
-	const linkClassName = classnames( 'editor-format-toolbar__link-container-value', {
+	const linkClassName = classnames( 'editor-format-toolbar__link-container-value block-editor-format-toolbar__link-container-value', {
 		'has-invalid-link': ! isValidHref( prependedURL ),
 	} );
 
@@ -82,7 +82,7 @@ const LinkViewer = ( { url, editLink } ) => {
 		// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		<div
-			className="editor-format-toolbar__link-container-content"
+			className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 			onKeyPress={ stopKeyPropagation }
 		>
 			<LinkViewerUrl url={ url } />

@@ -6,6 +6,7 @@ const {
 	getCliArgs,
 	hasCliArg,
 	spawnScript,
+	cleanUpArgs,
 } = require( './cli' );
 const {
 	getWebpackArgs,
@@ -35,4 +36,5 @@ module.exports = {
 	hasPackageProp,
 	hasProjectFile,
 	spawnScript,
+	cleanUpArgs,
 };

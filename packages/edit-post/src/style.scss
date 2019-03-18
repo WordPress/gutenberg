@@ -6,6 +6,7 @@
 @import "./components/header/pinned-plugins/style.scss";
 @import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/layout/style.scss";
+@import "./components/manage-blocks-modal/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/last-revision/style.scss";
@@ -151,7 +152,7 @@ body.block-editor-page {
 .editor-post-permalink,
 .edit-post-sidebar,
 .editor-post-publish-panel,
-.editor-block-list__block,
+.block-editor-block-list__block,
 .components-popover,
 .components-modal__content {
 	.input-control, // Upstream name is `.regular-text`.
@@ -228,9 +229,44 @@ body.block-editor-page {
 	input[type="checkbox"] {
 		border-radius: $radius-round-rectangle / 2;
 
-		&:checked::before {
-			margin: -4px 0 0 -5px;
+		&:checked::before,
+		&[aria-checked="mixed"]::before {
+			margin: -3px -5px;
 			color: $white;
+
+			@include break-medium() {
+				margin: -4px 0 0 -5px;
+			}
+		}
+
+		&[aria-checked="mixed"] {
+			background: theme(toggle);
+			border-color: theme(toggle);
+
+			&::before {
+				// Inherited from `forms.css`.
+				// See: https://github.com/WordPress/wordpress-develop/tree/5.1.1/src/wp-admin/css/forms.css#L122-L132
+				content: "\f460";
+				float: left;
+				display: inline-block;
+				vertical-align: middle;
+				width: 16px;
+				/* stylelint-disable */
+				font: normal 30px/1 dashicons;
+				/* stylelint-enable */
+				speak: none;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+
+				@include break-medium() {
+					float: none;
+					font-size: 21px;
+				}
+			}
+
+			&:focus {
+				box-shadow: 0 0 0 2px $dark-gray-500;
+			}
 		}
 	}
 
@@ -246,7 +282,7 @@ body.block-editor-page {
 
 // Placeholder colors
 .editor-post-title,
-.editor-block-list__block {
+.block-editor-block-list__block {
 	input,
 	textarea {
 		// Use opacity to work in various editor styles.

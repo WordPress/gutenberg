@@ -1,4 +1,4 @@
-.editor-block-inspector__no-blocks {
+.block-editor-block-inspector__no-blocks {
 	display: block;
 	font-size: $default-font-size;
 	background: $white;
@@ -7,14 +7,14 @@
 }
 
 
-.editor-block-inspector__card {
+.block-editor-block-inspector__card {
 	display: flex;
 	align-items: flex-start;
 	margin: -16px;
 	padding: 16px;
 }
 
-.editor-block-inspector__card-icon {
+.block-editor-block-inspector__card-icon {
 	border: $border-width solid $light-gray-700;
 	padding: 7px;
 	margin-right: 10px;
@@ -22,20 +22,20 @@
 	width: 36px;
 }
 
-.editor-block-inspector__card-content {
+.block-editor-block-inspector__card-content {
 	flex-grow: 1;
 }
 
-.editor-block-inspector__card-title {
+.block-editor-block-inspector__card-title {
 	font-weight: 500;
 	margin-bottom: 5px;
 }
 
-.editor-block-inspector__card-description {
+.block-editor-block-inspector__card-description {
 	font-size: $default-font-size;
 }
 
-.editor-block-inspector__card .editor-block-icon {
+.block-editor-block-inspector__card .block-editor-block-icon {
 	margin-left: -2px;
 	margin-right: 10px;
 	padding: 0 3px;

@@ -53,7 +53,7 @@ export function DefaultBlockAppender( {
 	return (
 		<div
 			data-root-client-id={ rootClientId || '' }
-			className="wp-block editor-default-block-appender"
+			className="wp-block editor-default-block-appender block-editor-default-block-appender"
 			onMouseEnter={ () => setState( { hovered: true } ) }
 			onMouseLeave={ () => setState( { hovered: false } ) }
 		>
@@ -61,7 +61,7 @@ export function DefaultBlockAppender( {
 			<TextareaAutosize
 				role="button"
 				aria-label={ __( 'Add block' ) }
-				className="editor-default-block-appender__content"
+				className="editor-default-block-appender__content block-editor-default-block-appender__content"
 				readOnly
 				onFocus={ onAppend }
 				value={ showPrompt ? value : '' }

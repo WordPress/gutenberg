@@ -34,16 +34,16 @@ const BlockInspector = ( { selectedBlockClientId, selectedBlockName, blockType, 
 	 * because we want the user to focus on the unregistered block warning, not block settings.
 	 */
 	if ( ! blockType || ! selectedBlockClientId || isSelectedBlockUnregistered ) {
-		return <span className="editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
+		return <span className="editor-block-inspector__no-blocks block-editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
 	}
 
 	return (
 		<Fragment>
-			<div className="editor-block-inspector__card">
+			<div className="editor-block-inspector__card block-editor-block-inspector__card">
 				<BlockIcon icon={ blockType.icon } showColors />
-				<div className="editor-block-inspector__card-content">
-					<div className="editor-block-inspector__card-title">{ blockType.title }</div>
-					<div className="editor-block-inspector__card-description">{ blockType.description }</div>
+				<div className="editor-block-inspector__card-content block-editor-block-inspector__card-content">
+					<div className="editor-block-inspector__card-title block-editor-block-inspector__card-title">{ blockType.title }</div>
+					<div className="editor-block-inspector__card-description block-editor-block-inspector__card-description">{ blockType.description }</div>
 				</div>
 			</div>
 			{ hasBlockStyles && (
@@ -63,7 +63,7 @@ const BlockInspector = ( { selectedBlockClientId, selectedBlockName, blockType, 
 				<InspectorAdvancedControls.Slot>
 					{ ( fills ) => ! isEmpty( fills ) && (
 						<PanelBody
-							className="editor-block-inspector__advanced"
+							className="editor-block-inspector__advanced block-editor-block-inspector__advanced"
 							title={ __( 'Advanced' ) }
 							initialOpen={ false }
 						>
