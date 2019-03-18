@@ -162,7 +162,7 @@ describe( 'state', () => {
 			unregisterBlockType( 'core/test-block' );
 		} );
 
-		describe( 'replace innerblocks', () => {
+		describe( 'replace inner blocks', () => {
 			beforeAll( () => {
 				registerBlockType( 'core/test-parent-block', {
 					save: noop,
