@@ -169,16 +169,6 @@ export function isVerticalEdge( container, isReverse ) {
 	}
 
 	const selection = window.getSelection();
-
-	// Only consider the selection at the edge if the direction is towards the
-	// edge.
-	if (
-		! selection.isCollapsed &&
-		isSelectionForward( selection ) === isReverse
-	) {
-		return false;
-	}
-
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {
@@ -191,14 +181,25 @@ export function isVerticalEdge( container, isReverse ) {
 		return false;
 	}
 
-	const editableRect = container.getBoundingClientRect();
-
 	// Calculate a buffer that is half the line height. In some browsers, the
 	// selection rectangle may not fill the entire height of the line, so we add
 	// half the line height to the selection rectangle to ensure that it is well
 	// over its line boundary.
-	const { lineHeight } = window.getComputedStyle( container );
-	const buffer = parseInt( lineHeight, 10 ) / 2;
+	const computedStyle = window.getComputedStyle( container );
+	const lineHeight = parseInt( computedStyle.lineHeight, 10 );
+
+	// Only consider the multiline selection at the edge if the direction is
+	// towards the edge.
+	if (
+		! selection.isCollapsed &&
+		rangeRect.height > lineHeight &&
+		isSelectionForward( selection ) === isReverse
+	) {
+		return false;
+	}
+
+	const editableRect = container.getBoundingClientRect();
+	const buffer = lineHeight / 2;
 
 	// Too low.
 	if ( isReverse && rangeRect.top - buffer > editableRect.top ) {
