@@ -58,11 +58,11 @@ This is how you execute the script with presented setup:
 
 #### Advanced information
 
-This script uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [webpack config](#webpack-config) section.
+This script uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-engines`
 
-Checks if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code. It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version).
+Checks if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code.
 
 _Example:_
 
@@ -77,6 +77,10 @@ _Example:_
 This is how you execute the script with presented setup:
 
 * `npm run check-engines` - checks installed version of `node` and `npm`.
+
+#### Advanced information
+
+It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-licenses`
 
@@ -101,7 +105,7 @@ _Flags_:
 
 ### `lint-js`
 
-Helps enforce coding style guidelines for your JavaScript files. It uses [eslint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. You can override default rules with your own as described in [eslint docs](https://eslint.org/docs/rules/).
+Helps enforce coding style guidelines for your JavaScript files.
 
 _Example:_
 
@@ -117,9 +121,13 @@ This is how you execute the script with presented setup:
 
 * `npm run lint:js` - lints JavaScript files in the entire project's directories.
 
+#### Advanced information
+
+It uses [eslint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. You can override default rules with your own as described in [eslint docs](https://eslint.org/docs/rules/). Learn more in the [Advanced Usage](#advanced-usage) section.
+
 ### `lint-pkg-json`
 
-Helps enforce standards for your package.json files. It uses [npm-package-json-lint](https://www.npmjs.com/package/npm-package-json-lint) with the set of recommended rules defined in [@wordpress/npm-package-json-lint-config](https://www.npmjs.com/package/@wordpress/npm-package-json-lint-config) npm package. You can override default rules with your own as described in [npm-package-json-lint wiki](https://github.com/tclindner/npm-package-json-lint/wiki).
+Helps enforce standards for your `package.json` files.
 
 _Example:_
 
@@ -135,9 +143,13 @@ This is how you execute those scripts using the presented setup:
 
 * `npm run lint:pkg-json` - lints `package.json` file in the project's root folder.
 
+#### Advanced information
+
+It uses [npm-package-json-lint](https://www.npmjs.com/package/npm-package-json-lint) with the set of recommended rules defined in [@wordpress/npm-package-json-lint-config](https://www.npmjs.com/package/@wordpress/npm-package-json-lint-config) npm package. You can override default rules with your own as described in [npm-package-json-lint wiki](https://github.com/tclindner/npm-package-json-lint/wiki). Learn more in the [Advanced Usage](#advanced-usage) section.
+
 ### `lint-style`
 
-Helps enforce coding style guidelines for your style files. It uses [stylelint](https://github.com/stylelint/stylelint) with the [stylelint-config-wordpress](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress) configuration per the [WordPress CSS Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://github.com/stylelint/stylelint/docs/user-guide.md).
+Helps enforce coding style guidelines for your style files.
 
 _Example:_
 
@@ -152,6 +164,10 @@ _Example:_
 This is how you execute the script with presented setup:
 
 * `npm run lint:css` - lints CSS files in the whole project's directory.
+
+#### Advanced information
+
+It uses [stylelint](https://github.com/stylelint/stylelint) with the [stylelint-config-wordpress](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress) configuration per the [WordPress CSS Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://github.com/stylelint/stylelint/docs/user-guide.md). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `start`
 
@@ -173,13 +189,13 @@ This is how you execute the script with presented setup:
 
 #### Advanced information
 
-It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [webpack config](#webpack-config) section.
+It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `test-e2e`
 
-Launches the End-To-End (E2E) test runner. It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as presented below) to view all of the available options.
+Launches the End-To-End (E2E) test runner. Writing tests can be done using [Jest API](https://jestjs.io/docs/en/api) in combination with [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md):
 
-Writing tests can be done using Puppeteer API:
+> [Jest](https://jestjs.io/) is a delightful JavaScript Testing Framework with a focus on simplicity.
 
 > [Puppeteer](https://pptr.dev/) is a Node library which provides a high-level API to control Chrome or Chromium over the [DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/). Puppeteer runs [headless](https://developers.google.com/web/updates/2017/04/headless-chrome) by default, but can be configured to run full (non-headless) Chrome or Chromium.
 
@@ -204,11 +220,15 @@ This script automatically detects the best config to start Puppeteer but sometim
 
 We enforce that all tests run serially in the current process using [--runInBand](https://jestjs.io/docs/en/cli#runinband) Jest CLI option to avoid conflicts between tests caused by the fact that they share the same WordPress instance.
 
+#### Advanced information
+
+It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as presented earlier) to view all of the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
+
 ### `test-unit-js`
 
 _Alias_: `test-unit-jest`
 
-Launches the unit test runner. It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test-unit-js --help` or `npm run test:unit:help` (as presented below) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration).
+Launches the unit test runner. Writing tests can be done using [Jest API](https://jestjs.io/docs/en/api).
 
 _Example:_
 
@@ -228,7 +248,13 @@ This is how you execute those scripts using the presented setup:
 * `npm run test:unit:help` - prints all available options to configure unit tests runner.
 * `npm run test:unit:watch` - runs all unit tests in the watch mode.
 
+#### Advanced information
+
+It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test-unit-js --help` or `npm run test:unit:help` (as presented earlier) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
+
 ## Advanced Usage
+
+In general, this package should be used with the set of recommended config files. While it is possible to override every single config file provided, if you have to do it, it means that your use case is more complex than anticipated. If that happens, it would be better to avoid using the whole abstraction layer and setup your project with full control over tooling used.
 
 ### Webpack config
 
