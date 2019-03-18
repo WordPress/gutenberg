@@ -1905,7 +1905,7 @@ describe( 'state', () => {
 			expect( state ).toBe( original );
 		} );
 
-		it( 'should update the selection on innerblocks replace if updateSelection is true', () => {
+		it( 'should update the selection on inner blocks replace if updateSelection is true', () => {
 			const original = deepFreeze( {
 				start: 'chicken',
 				end: 'chicken',
