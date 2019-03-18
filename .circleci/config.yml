@@ -17,11 +17,11 @@ commands:
             - ~/.cache/yarn
   build-android:
     steps:
-      - bundle-android:
+      - run:
           name: Bundle Debug android
           command: |
             react-native bundle --reset-cache --dev=false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug
-      - gradle-build:
+      - run:
           name: Gradle assemble debug android apk
           command: |
             cd android
