@@ -20,13 +20,13 @@ commands:
     - run:
         name: Install command line tools
         command: |
-          npm install -g react-native-cli
+          npm install react-native-cli
   build-android:
     steps:
       - run:
           name: Bundle Debug android
           command: |
-            react-native bundle --reset-cache --dev=false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug
+            node_modules/.bin/react-native bundle --reset-cache --dev=false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug
       - run:
           name: Gradle assemble debug android apk
           command: |
