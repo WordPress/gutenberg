@@ -1,3 +1,9 @@
+## 9.1.1 (Unreleased)
+
+### Internal
+
+- Refactor all reusable blocks and editor effects to action-generators using controls ([#14491](https://github.com/WordPress/gutenberg/pull/14491))
+
 ## 9.1.0 (2019-03-06)
 
 ### New Features
