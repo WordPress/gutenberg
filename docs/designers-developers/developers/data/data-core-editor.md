@@ -734,7 +734,7 @@ The editor settings object.
 
 ### setupEditor
 
-Returns an action object used in signalling that editor has initialized with
+Returns an action generator used in signalling that editor has initialized with
 the specified post object and editor settings.
 
 *Parameters*
@@ -882,7 +882,7 @@ Returns an action object used to lock the editor.
 
 ### __experimentalFetchReusableBlocks
 
-Returns an action object used to fetch a single reusable block or all
+Returns an action generator used to fetch a single reusable block or all
 reusable blocks from the REST API into the store.
 
 *Parameters*
@@ -892,7 +892,7 @@ reusable blocks from the REST API into the store.
 
 ### __experimentalReceiveReusableBlocks
 
-Returns an action object used in signalling that reusable blocks have been
+Returns an action generator used in signalling that reusable blocks have been
 received. `results` is an array of objects containing:
  - `reusableBlock` - Details about how the reusable block is persisted.
  - `parsedBlock` - The original block.
@@ -903,7 +903,7 @@ received. `results` is an array of objects containing:
 
 ### __experimentalSaveReusableBlock
 
-Returns an action object used to save a reusable block that's in the store to
+Returns an action generator used to save a reusable block that's in the store to
 the REST API.
 
 *Parameters*
@@ -912,7 +912,7 @@ the REST API.
 
 ### __experimentalDeleteReusableBlock
 
-Returns an action object used to delete a reusable block via the REST API.
+Returns an action generator used to delete a reusable block via the REST API.
 
 *Parameters*
 
@@ -930,7 +930,7 @@ to be updated.
 
 ### __experimentalConvertBlockToStatic
 
-Returns an action object used to convert a reusable block into a static
+Returns an action generator used to convert a reusable block into a static
 block.
 
 *Parameters*
@@ -939,7 +939,7 @@ block.
 
 ### __experimentalConvertBlockToReusable
 
-Returns an action object used to convert a static block into a reusable
+Returns an action generator used to convert a static block into a reusable
 block.
 
 *Parameters*
