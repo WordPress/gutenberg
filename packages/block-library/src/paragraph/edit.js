@@ -108,7 +108,7 @@ class ParagraphBlock extends Component {
 				// If after has content, keep the new block styling same as current one.
 				const newBlockAttributes = {
 					...attributes,
-					content: after
+					content: after,
 				};
 				blocks.push( createBlock( name, newBlockAttributes ) );
 			} else {
