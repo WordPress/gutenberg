@@ -83,7 +83,7 @@ class Inserter extends Component {
 	}
 
 	render() {
-		const { position, title } = this.props;
+		const { position } = this.props;
 
 		return (
 			<Dropdown
@@ -92,7 +92,6 @@ class Inserter extends Component {
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile
-				headerTitle={ title }
 				renderToggle={ this.renderToggle }
 				renderContent={ this.renderContent }
 			/>
@@ -102,18 +101,9 @@ class Inserter extends Component {
 
 export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
-		const {
-			hasInserterItems,
-		} = select( 'core/block-editor' );
-
-		// The title should be removed from the inserter
-		// or replaced by a prop passed to the inserter.
-		const {
-			getEditedPostAttribute,
-		} = select( 'core/editor' );
+		const { hasInserterItems } = select( 'core/block-editor' );
 
 		return {
-			title: getEditedPostAttribute( 'title' ),
 			hasItems: hasInserterItems( rootClientId ),
 		};
 	} ),
