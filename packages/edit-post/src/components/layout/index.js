@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Popover, ScrollLock, navigateRegions } from '@wordpress/components';
+import {
+	Button,
+	Popover,
+	ScrollLock,
+	FocusReturnProvider,
+	navigateRegions,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { PreserveScrollInReorder } from '@wordpress/block-editor';
 import {
@@ -66,7 +72,7 @@ function Layout( {
 		tabIndex: -1,
 	};
 	return (
-		<div className={ className }>
+		<FocusReturnProvider className={ className }>
 			<FullscreenMode />
 			<BrowserURL />
 			<UnsavedChangesWarning />
@@ -126,7 +132,7 @@ function Layout( {
 			) }
 			<Popover.Slot />
 			<PluginArea />
-		</div>
+		</FocusReturnProvider>
 	);
 }
 
