@@ -78,6 +78,12 @@ export const settings = {
 			selector: 'video',
 			attribute: 'src',
 		},
+		playsinline: {
+			type: 'boolean',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'playsinline',
+		},
 	},
 
 	transforms: {
