@@ -80,6 +80,7 @@ module.exports = {
 			'dom-ready',
 			'redux-routine',
 			'token-list',
+			'shortcode',
 		].map( camelCaseDash ) ),
 		new CopyWebpackPlugin(
 			gutenbergPackages.map( ( packageName ) => ( {
