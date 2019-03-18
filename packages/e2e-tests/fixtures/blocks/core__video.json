@@ -9,6 +9,7 @@
             "controls": true,
             "loop": false,
             "muted": false,
+            "playsinline": false,
             "preload": "metadata",
             "src": "https://awesome-fake.video/file.mp4"
         },
