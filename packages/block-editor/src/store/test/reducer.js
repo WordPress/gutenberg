@@ -433,7 +433,7 @@ describe( 'state', () => {
 				} );
 			} );
 
-			it( 'can replace a child block that has other childs', () => {
+			it( 'can replace a child block that has other children', () => {
 				const existingState = deepFreeze( {
 					byClientId: {
 						clicken: {
