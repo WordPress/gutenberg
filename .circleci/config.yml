@@ -75,8 +75,6 @@ jobs:
           command: |
             git submodule init
             git submodule update --recursive
-      - yarn-install
-      - react-native-install
       - run:
           name: Set Environment Variables
           command: |
