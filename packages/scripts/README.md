@@ -1,6 +1,6 @@
 # Scripts
 
-Collection of reusable scripts for WordPress development. This package also comes with a recommended configuration for every tool integrated to make the process seamless.
+Collection of reusable scripts for WordPress development. For convenience, every tool provided in this package comes with a recommended configuration.
 
 Command-line interfaces help to turn working with an app into a pleasant experience, but it is still not enough to keep it easy to maintain in the long run. Developers are left on their own to keep all configurations and dependent tools up to date. This problem multiplies when they own more than one project which shares the same setup. Fortunately, there is a pattern that can simplify maintainers life – reusable scripts. This idea boils down to moving all the necessary configurations and scripts to one single tool dependency. In most cases, it should be possible to accomplish all tasks using the default settings, but some customization is allowed, too. With all that in place updating all projects should become a very straightforward task.
 
@@ -36,13 +36,13 @@ _Example:_
 }
 ```
 
-It might be also a good idea to get familiar with the [JavaScript Build Setup tutorial](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation how to use [build](#build) and [start](#start) scripts.
+It might also be a good idea to get familiar with the [JavaScript Build Setup tutorial](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
 
 ## Available Scripts
 
 ### `build`
 
-Transforms your code according the configuration provided so it's ready for production and optimized for the best performance. The entry point for your project's code should be located inside `src/index.js` file. The output generated will be written to `build/index.js` file. It's similar to [start](#start) script which is better suited for development phase.
+Transforms your code according the configuration provided so it's ready for production and optimized for the best performance. The entry point for your project's code should be located in `src/index.js`. The output generated will be written to `build/index.js`. This script exits after producing a single build. For incremental builds, better suited for development, see the [start](#start) script.
 
 _Example:_
 
@@ -60,7 +60,7 @@ This is how you execute the script with presented setup:
 
 #### Advanced information
 
-This script uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
+This script uses [webpack](https://webpack.js.org/) behind the scenes. It'll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-engines`
 
@@ -173,7 +173,7 @@ It uses [stylelint](https://github.com/stylelint/stylelint) with the [stylelint-
 
 ### `start`
 
-Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. The entry point for your project's code should be located inside `src/index.js` file. The output generated will be written to `build/index.js` file. It's similar to [build](#build) script which is better suited for production usage purpose.
+Transforms your code according the configuration provided so it's ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console. The entry point for your project's code should be located in `src/index.js`. The output generated will be written to `build/index.js`. For single builds, better suited for production, see the [build](#build) script.
 
 _Example:_
 
@@ -191,11 +191,11 @@ This is how you execute the script with presented setup:
 
 #### Advanced information
 
-It uses [webpack](https://webpack.js.org/) behind the scenes. It'll lookup for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config bundled within `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
+This script uses [webpack](https://webpack.js.org/) behind the scenes. It'll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `test-e2e`
 
-Launches the End-To-End (E2E) test runner. Writing tests can be done using [Jest API](https://jestjs.io/docs/en/api) in combination with [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md):
+Launches the End-To-End (E2E) test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api) in combination with the [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md):
 
 > [Jest](https://jestjs.io/) is a delightful JavaScript Testing Framework with a focus on simplicity.
 
@@ -224,13 +224,13 @@ We enforce that all tests run serially in the current process using [--runInBand
 
 #### Advanced information
 
-It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as presented earlier) to view all of the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as mentioned above) to view all of the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `test-unit-js`
 
 _Alias_: `test-unit-jest`
 
-Launches the unit test runner. Writing tests can be done using [Jest API](https://jestjs.io/docs/en/api).
+Launches the unit test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api).
 
 _Example:_
 
@@ -252,11 +252,11 @@ This is how you execute those scripts using the presented setup:
 
 #### Advanced information
 
-It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test-unit-js --help` or `npm run test:unit:help` (as presented earlier) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:unit --help` or `npm run test:unit:help` (as mentioned above) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ## Advanced Usage
 
-In general, this package should be used with the set of recommended config files. While it is possible to override every single config file provided, if you have to do it, it means that your use case is more complex than anticipated. If that happens, it would be better to avoid using the whole abstraction layer and setup your project with full control over tooling used.
+In general, this package should be used with the set of recommended config files. While it is possible to override every single config file provided, if you have to do it, it means that your use case is more complex than anticipated. If that happens, it would be better to avoid using the whole abstraction layer and set up your project with full control over tooling used.
 
 ### Webpack config
 
