@@ -1,6 +1,6 @@
 # JavaScript Build Setup
 
-This page covers how to set up your development environment to use the ESNext syntax. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short) or that includes a custom syntax such as [JSX](https://reactjs.org/docs/introducing-jsx.html).
+This page covers how to set up your development environment to use the ESNext and [JSX](https://reactjs.org/docs/introducing-jsx.html) syntaxes. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short). JSX is a custom syntax extension to JavaScript which helps you to describe what the UI should look like.
 
 This documentation covers development for your plugin to work with Gutenberg. If you want to setup a development environment for developing Gutenberg itself, see the [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) documentation.
 
@@ -8,9 +8,9 @@ Most browsers can not interpret or run ESNext and JSX syntaxes, so we use a tran
 
 There are a few reasons to use ESNext and the extra step. First, it makes for simpler code that is easier to read and write. Using a transformation step allows for tools to optimize the code to work on the widest variety of browsers. Also, by using a build step you can organize your code into smaller modules and files that can be bundled together into a single download.
 
-There are different tools that can perform this transformation or build step, but WordPress uses Webpack and Babel.
+There are different tools that can perform this transformation or build step, but WordPress uses webpack and Babel.
 
-[Webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to Webpack to transform both ESNext and JSX to JavaScript.
+[webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to webpack to transform both ESNext and JSX to JavaScript.
 
 The [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) package abstracts these libraries away to standardize and simplify development, so you won't need to handle the details for configuring those libraries.
 
@@ -20,7 +20,7 @@ For a quick start, you can use one of the examples from the [Gutenberg Examples 
 
 ## Setup
 
-Both Webpack and Babel are tools written in JavaScript and run using [Node.js](https://nodejs.org/) (node). Node.js is a runtime environment for JavaScript outside of a browser. Simply put, node allows you to run JavaScript code on the command-line.
+Both webpack and Babel are tools written in JavaScript and run using [Node.js](https://nodejs.org/) (node). Node.js is a runtime environment for JavaScript outside of a browser. Simply put, node allows you to run JavaScript code on the command-line.
 
 First, you need to set up node for your development environment. The steps required change depending on your operating system, but if you have a package manager installed, setup can be as straightforward as:
 
@@ -93,7 +93,7 @@ Also, if you look at package.json file it will include a new section:
 
 ## Webpack & Babel
 
-The `@wordpress/scripts` package handles the dependencies and default configuration for Webpack and Babel. The scripts package expects the source file to compile to be found at `src/index.js`, and will save the compiled output to `build/index.js`.
+The `@wordpress/scripts` package handles the dependencies and default configuration for webpack and Babel. The scripts package expects the source file to compile to be found at `src/index.js`, and will save the compiled output to `build/index.js`.
 
 With that in mind, let's set up a basic block. Create a file at `src/index.js` with the following content:
 
@@ -136,7 +136,7 @@ The start command can be added to the same scripts section of `package.json`:
   },
 ```
 
-Now, when you run `npm run start` a watcher will run in the terminal. You can then edit away in your text editor; after each save, it will automatically build. You can then use the familiar edit/save/reload development process.
+Now, when you run `npm start` a watcher will run in the terminal. You can then edit away in your text editor; after each save, it will automatically build. You can then use the familiar edit/save/reload development process.
 
 **Note:** keep an eye on your terminal for any errors. If you make a typo or syntax error, the build will fail and the error will be in the terminal.
 
@@ -154,6 +154,6 @@ Yes, the initial setup is a bit more involved, but the additional features and b
 With a setup in place, the standard workflow is:
 
 - Install dependencies: `npm install`
-- Start development builds: `npm run start`
+- Start development builds: `npm start`
 - Develop. Test. Repeat.
 - Create production build: `npm run build`
