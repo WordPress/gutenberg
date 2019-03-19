@@ -132,7 +132,7 @@ jobs:
           curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
     - run:
         name: Run Device Tests
-        command: TEST_RN_PLATFORM=ios TEST_ENV=sauce sudo yarn device-tests
+        command: yarn device-tests
 
 workflows:
   gutenberg-mobile:
