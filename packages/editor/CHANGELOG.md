@@ -4,7 +4,6 @@
 
 - Added `createCustomColorsHOC` for creating a higher order `withCustomColors` component.
 - Added a new `TextEditorGlobalKeyboardShortcuts` component.
-- Added `BlockVerticalAlignmentToolbar` for adding a vertical alignment toolbar to Blocks.
 
 ### Deprecations
 
