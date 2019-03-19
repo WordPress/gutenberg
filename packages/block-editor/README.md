@@ -118,6 +118,12 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### BlockVerticalAlignmentToolbar
+
+[src/index.js#L15-L15](src/index.js#L15-L15)
+
+Undocumented declaration.
+
 ### ColorPalette
 
 [src/index.js#L15-L15](src/index.js#L15-L15)
