@@ -1,6 +1,6 @@
 # Notice
 
-A notice is used to communicate a prominent message to the user.
+Use Notices to communicate prominent messages to the user.
 
 ![Notice component](https://make.wordpress.org/design/files/2019/03/Notice-Screenshot-alt.png)
 
@@ -12,9 +12,9 @@ A notice is used to communicate a prominent message to the user.
 
 ## Design guidelines
 
-A notice displays a succinct message, and offers actions the user can take, like viewing a published post or updating a setting. It requires a user action to be dismissed.
+A Notice displays a succinct message. It can also offer the user options, like viewing a published post or updating a setting, and requires a user action to be dismissed.
 
-Notices communicate messages that are important but don’t *require* user action — a user can keep using the product even if they don’t choose to act on the message. They are less interruptive than a Modal.
+Use Notices to communicate things that are important but don’t necessarily require action — a user can keep using the product even if they don’t choose to act on a Notice. They are less interruptive than a Modal.
 
 ### Anatomy
 
@@ -27,7 +27,7 @@ Notices communicate messages that are important but don’t *require* user actio
 
 ### Usage
 
-Notices display at the top of the screen, below any toolbars anchored to the top of  the page. They’re persistent and non-modal. Since they don’t overlay the content, users can ignore them, dismiss them, or choose interact with them at any time.
+Notices display at the top of the screen, below any toolbars anchored to the top of the page. They’re persistent and non-modal. Since they don’t overlay the content, users can ignore or dismiss them, and choose when to interact with them.
 
 ![](https://make.wordpress.org/design/files/2019/03/Notice-States.png)
 
@@ -44,32 +44,32 @@ If an icon is included in the Notice, it should be color-coded to match the Noti
 ![A success Notice for updating a post](https://make.wordpress.org/design/files/2019/03/Notice-Do-1-alt.png)
 
 **Do**
-Use a Notice when you want to communicate a message of medium importance. 
+Do use a Notice when you want to communicate a message of medium importance.
 
 ![A Notice that requires an immediate action](https://make.wordpress.org/design/files/2019/03/Notice-Dont-1-alt.png)
 
 **Don’t**
-Don't use a Notice for a message that is important for the user to read and act upon immediately. Use a Modal instead.
+Don't use a Notice for a message that requires immediate attention and action from the user. Use a Modal for this instead.
 
 ![A success Notice for publishing a post](https://make.wordpress.org/design/files/2019/03/Notice-Do-2-alt.png)
 
 **Do**
-Show a Notice at the top of the screen, below any toolbars.
+Do display Notices at the top of the screen, below any toolbars.
 
 ![A success Notice on top of the editor toolbar](https://make.wordpress.org/design/files/2019/03/Notice-Dont-2-alt.png)
 
 **Don’t**
-Don't show notices on top of toolbars.
+Don't show Notices on top of toolbars.
 
 ![An error Notice using red](https://make.wordpress.org/design/files/2019/03/Notice-Do-3-alt.png)
 
 **Do**
-Use color to indicate the type of message being communicated.
+Do use color to indicate the type of message being communicated.
 
 ![An error Notice using purple](https://make.wordpress.org/design/files/2019/03/Notice-Dont-3-alt.png)
 
 **Don’t**
-Don't apply colors other than those for Warnings, Success, or Errors.
+Don't apply any colors other than those for Warnings, Success, or Errors.
 
 ## Development guidelines
 
