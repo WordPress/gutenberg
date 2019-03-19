@@ -114,6 +114,15 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         present(alertController, animated: true, completion: nil)
     }
 
+    /// Tells the delegate that an image block requested for the upload cancelation.
+    ///
+    func gutenbergDidRequestMediaUploadCancelation(for mediaID: Int32) {
+        guard let progress = mediaUploadCoordinator.progressForUpload(mediaID: mediaID) else {
+            return
+        }
+        progress.cancel()
+    }
+
     func nativeLoggingHook(message: String, logLevel: LogLevel) {
         switch logLevel {
         case .trace:

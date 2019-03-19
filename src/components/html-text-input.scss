@@ -1,14 +1,13 @@
 /** @format */
 
-@import '../variables.scss';
+$title-height: 32;
 
 .htmlView {
 	font-family: $default-monospace-font;
 	background-color: white;
 	padding-left: 8;
 	padding-right: 8;
-	padding-top: 8;
-	padding-bottom: 8;
+	padding-bottom: $title-height + 8;
 }
 
 .htmlViewTitle {
@@ -18,6 +17,8 @@
 	padding-right: 8;
 	padding-top: 8;
 	padding-bottom: 8;
+	height: $title-height;
+	
 }
 
 .container {

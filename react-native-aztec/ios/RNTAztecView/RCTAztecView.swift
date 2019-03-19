@@ -28,6 +28,11 @@ class RCTAztecView: Aztec.TextView {
             }
         }
     }
+    @objc var disableEditingMenu: Bool = false {
+        didSet {
+            allowsEditingTextAttributes = !disableEditingMenu
+        }
+    }
 
     var blockModel = BlockModel(tag: "") {
         didSet {
@@ -49,7 +54,7 @@ class RCTAztecView: Aztec.TextView {
         return reactLayoutDirection == .rightToLeft
     }
 
-    private lazy var placeholderLabel: UILabel = {
+    private(set) lazy var placeholderLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .natural

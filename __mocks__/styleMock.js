@@ -28,4 +28,7 @@ module.exports = {
 	blockHolderFocused: {
 		borderColor: 'gray',
 	},
+	'wp-block-heading': {
+		minHeight: 60,
+	},
 };

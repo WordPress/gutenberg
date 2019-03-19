@@ -51,5 +51,7 @@ public interface GutenbergBridgeJS2Parent {
 
     void requestImageUploadCancelDialog(int mediaId);
 
+    void requestImageUploadCancel(int mediaId);
+
     void nativeLoggingHook(String message, LogLevel logLevel);
 }

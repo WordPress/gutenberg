@@ -49,6 +49,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func requestImageUploadCancel(_ mediaID: Int32) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaUploadCancelation(for: mediaID)
+        }
+    }
+
+    @objc
     func editorDidLayout() {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidLayout()
