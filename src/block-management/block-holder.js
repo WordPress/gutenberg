@@ -3,6 +3,9 @@
 * @flow
 */
 
+/**
+ * External dependencies
+ */
 import React from 'react';
 import {
 	View,
@@ -11,20 +14,22 @@ import {
 	NativeSyntheticEvent,
 	NativeTouchEvent,
 } from 'react-native';
-import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
+import TextInputState from 'react-native/lib/TextInputState';
 
+/**
+ * WordPress dependencies
+ */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-
-import type { BlockType } from '../store/types';
-
-import styles from './block-holder.scss';
-
-// Gutenberg imports
 import { getBlockType } from '@wordpress/blocks';
 import { BlockEdit } from '@wordpress/block-editor';
 
-import TextInputState from 'react-native/lib/TextInputState';
+/**
+ * Internal dependencies
+ */
+import type { BlockType } from '../store/types';
+import styles from './block-holder.scss';
+import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
 
 type PropsType = BlockType & {
 	clientId: string,

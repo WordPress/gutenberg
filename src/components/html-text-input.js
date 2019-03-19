@@ -4,19 +4,24 @@
  */
 
 /**
+ * External dependencies
+ */
+import React from 'react';
+import { Platform, TextInput, ScrollView } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
-import React from 'react';
-import { Platform, TextInput, ScrollView } from 'react-native';
-import styles from './html-text-input.scss';
-import KeyboardAvoidingView from './keyboard-avoiding-view';
-
-// Gutenberg imports
 import { parse } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import styles from './html-text-input.scss';
+import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 type PropsType = {
 	onChange: string => mixed,

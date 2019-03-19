@@ -1,5 +1,6 @@
 ; ignore the submodules
 gutenberg
+symlinked-packages
 symlinked-packages-in-parent
 react-native-aztec
 bundle

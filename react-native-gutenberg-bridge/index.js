@@ -1,5 +1,8 @@
 /** @format */
 
+/**
+ * External dependencies
+ */
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
 const { RNReactNativeGutenbergBridge } = NativeModules;

@@ -90,13 +90,14 @@ const fetchTranslations = () => {
 		const translationFilePromises = fetchedTranslations.map( ( languageResult ) => {
 			return new Promise( ( resolve, reject ) => {
 				const translationRelativePath = getTranslationFilePath( languageResult.locale );
-				const translationAbsolutePath = path.resolve( __dirname, translationRelativePath );
 
 				if ( languageResult.inCache ) {
 					languageResult.path = translationRelativePath;
 					resolve( translationRelativePath );
 					return;
 				}
+
+				const translationAbsolutePath = path.resolve( __dirname, translationRelativePath );
 
 				fs.writeFile( translationAbsolutePath, JSON.stringify( languageResult.response ), 'utf8', ( err ) => {
 					if ( err ) {

@@ -1,6 +1,9 @@
 /** @flow
  * @format */
 
+/**
+ * External dependencies
+ */
 import React from 'react';
 import type { EmitterSubscription } from 'react-native';
 import RNReactNativeGutenbergBridge, {
@@ -11,14 +14,19 @@ import RNReactNativeGutenbergBridge, {
 } from 'react-native-gutenberg-bridge';
 import { isEmpty } from 'lodash';
 
+/**
+ * WordPress dependencies
+ */
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { UnsupportedBlock } from '@wordpress/editor';
 
+/**
+ * Internal dependencies
+ */
 import type { BlockType } from '../store/types';
-
 import BlockManager from '../block-management/block-manager';
 
 type PropsType = {

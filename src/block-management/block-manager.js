@@ -4,14 +4,26 @@
  */
 
 /**
+ * External dependencies
+ */
+import React from 'react';
+import { identity } from 'lodash';
+import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView, Dimensions, Platform } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { PostTitle } from '@wordpress/editor';
+import { DefaultBlockAppender } from '@wordpress/block-editor';
+import { sendNativeEditorDidLayout, subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
 
-import React from 'react';
-import { identity } from 'lodash';
-
-import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView, Dimensions, Platform } from 'react-native';
+/**
+ * Internal dependencies
+ */
 import BlockHolder from './block-holder';
 import type { BlockType } from '../store/types';
 import styles from './block-manager.scss';
@@ -24,14 +36,6 @@ import BlockToolbar from './block-toolbar';
 import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 import { KeyboardAwareFlatList, handleCaretVerticalPositionChange } from '../components/keyboard-aware-flat-list';
 import SafeArea from 'react-native-safe-area';
-
-// Gutenberg imports
-import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { PostTitle } from '@wordpress/editor';
-import { DefaultBlockAppender } from '@wordpress/block-editor';
-import { sendNativeEditorDidLayout, subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
 
 type PropsType = {
 	rootClientId: ?string,

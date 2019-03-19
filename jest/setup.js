@@ -20,7 +20,7 @@ jest.mock( 'react-native-safe-area', () => {
 				accept( { safeAreaInsets: { bottom: 34 } } );
 			} );
 		},
-		addEventListener: addEventListener,
+		addEventListener,
 		removeEventListener: jest.fn(),
 	};
 } );
