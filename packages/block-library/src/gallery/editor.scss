@@ -82,10 +82,6 @@ ul.wp-block-gallery li {
 		a {
 			color: $white;
 		}
-
-		&:focus a[data-rich-text-format-boundary] {
-			color: rgba(0, 0, 0, 0.2);
-		}
 	}
 }
 
