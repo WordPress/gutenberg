@@ -119,7 +119,6 @@ jobs:
     - run:
         name: Yarn install
         command: |
-          brew upgrade yarn
           yarn install
     - react-native-install
     - run:
