@@ -44,10 +44,6 @@ export function subscribeMediaUpload( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaUpload', callback );
 }
 
-export function subscribeMediaAppend( callback ) {
-	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
-}
-
 export function requestMediaPickFromMediaLibrary( callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'SITE_MEDIA_LIBRARY', callback );
 }
