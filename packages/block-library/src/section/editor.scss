@@ -67,8 +67,8 @@ $block-name: "section";
 	// Standard
 	.wp-block:not([data-align="wide"]):not([data-align="full"]) {
 		@include break-wide() {
-			padding-left: 42px;
-			padding-right: 45px;
+			padding-left: $block-padding*3;
+			padding-right: $block-padding*3;
 		}
 
 		@include break-xlarge() {
