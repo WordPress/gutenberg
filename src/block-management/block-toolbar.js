@@ -48,19 +48,19 @@ export class BlockToolbar extends Component<PropsType> {
 					alwaysBounceHorizontal={ false }
 					contentContainerStyle={ styles.scrollableContent }
 				>
-					<Toolbar accessible={ true }
+					<Toolbar accessible={ false }
 						accessibilityLabel={ 'Toolbar Add block' }>
 						<ToolbarButton
 							title={ __( 'Add block' ) }
 							icon="insert"
-							accessible={ true }
+							accessible={ false }
 							accessibilityLabel={ __( 'Add block' ) }
 							onClick={ onInsertClick }
 						/>
 						<ToolbarButton
 							title={ __( 'Undo' ) }
 							icon="undo"
-							accessible={ true }
+							accessible={ false }
 							accessibilityLabel={ __( 'Undo' ) }
 							isDisabled={ ! hasUndo }
 							onClick={ undo }
@@ -68,7 +68,7 @@ export class BlockToolbar extends Component<PropsType> {
 						<ToolbarButton
 							title={ __( 'Redo' ) }
 							icon="redo"
-							accessible={ true }
+							accessible={ false }
 							accessibilityLabel={ __( 'Redo' ) }
 							isDisabled={ ! hasRedo }
 							onClick={ redo }
