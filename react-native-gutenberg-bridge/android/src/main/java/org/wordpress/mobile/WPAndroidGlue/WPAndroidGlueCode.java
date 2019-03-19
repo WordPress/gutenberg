@@ -48,7 +48,7 @@ public class WPAndroidGlueCode {
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachQueryListener mOnReattachQueryListener;
     private OnEditorMountListener mOnEditorMountListener;
-    private boolean mEditorIsMounted = false;
+    private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
     private boolean mContentInitialized;
@@ -148,7 +148,7 @@ public class WPAndroidGlueCode {
             @Override
             public void editorDidMount(boolean hasUnsupportedBlocks) {
                 mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
-                mEditorIsMounted = true;
+                mIsEditorMounted = true;
                 if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
                     setFocusOnTitle();
                     // send signal to Editor to create a new image block and pass the media URL, start uploading, etc
@@ -433,7 +433,7 @@ public class WPAndroidGlueCode {
 
     private void sendOrDeferAppendMediaSignal(int mediaId, final String mediaUri) {
         // if editor is mounted, let's append the media file
-        if (mEditorIsMounted) {
+        if (mIsEditorMounted) {
             if (!TextUtils.isEmpty(mediaUri) && mediaId > 0) {
                 // send signal to JS
                 appendNewImageBlock(mediaId, mediaUri);
