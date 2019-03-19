@@ -165,7 +165,7 @@ function register_block_core_latest_comments() {
 						'center',
 						'right',
 						'wide',
-						'full'
+						'full',
 					),
 				),
 				'className'      => array(
