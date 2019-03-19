@@ -21,14 +21,12 @@ commands:
         name: Install command line tools
         command: |
           sudo npm install -g react-native-cli
-  load-device-tests-html:
-    - run:
-        name: Change initial HTML file
-        command: |
-          cp ./bin/tmp/initial-device-tests-html.js ./src/app/initial-html.js
   build-android:
     steps:
-      - load-device-tests-html
+      - run:
+          name: Change initial HTML file
+          command: |
+            cp ./bin/tmp/initial-device-tests-html.js ./src/app/initial-html.js
       - run:
           name: Bundle Debug android
           command: |
@@ -42,7 +40,10 @@ commands:
             ./gradlew assembleDebug
   build-ios:
     steps:
-    - load-device-tests-html
+    - run:
+        name: Change initial HTML file
+        command: |
+          cp ./bin/tmp/initial-device-tests-html.js ./src/app/initial-html.js
     - run:
         name: Bundle Debug iOS
         command: |
