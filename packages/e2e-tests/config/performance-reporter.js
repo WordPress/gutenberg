@@ -1,4 +1,4 @@
-const { readFileSync } = require( 'fs' );
+const { readFileSync, existsSync } = require( 'fs' );
 
 function average( array ) {
 	return array.reduce( ( a, b ) => a + b ) / array.length;
@@ -6,7 +6,13 @@ function average( array ) {
 
 class PerformanceReporter {
 	onRunComplete() {
-		const results = readFileSync( __dirname + '/../specs/results.json', 'utf8' );
+		const path = __dirname + '/../specs/results.json';
+
+		if ( ! existsSync( path ) ) {
+			return;
+		}
+
+		const results = readFileSync( path, 'utf8' );
 		const { load, domcontentloaded, type } = JSON.parse( results );
 
 		// eslint-disable-next-line no-console

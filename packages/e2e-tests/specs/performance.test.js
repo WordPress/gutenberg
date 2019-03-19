@@ -14,7 +14,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Performance', async () => {
-	it( '1000 paragraphs', async () => {
+	it.skip( '1000 paragraphs', async () => {
 		await createNewPost();
 		await page.evaluate( () => {
 			const { createBlock } = window.wp.blocks;
@@ -46,13 +46,6 @@ describe( 'Performance', async () => {
 		}
 
 		await insertBlock( 'Paragraph' );
-
-		const keyTimes = [];
-
-		await page.evaluate( ( _keyTimes ) => {
-			document.addEventListener( 'keydown', () => _keyTimes.push( new Date() ) );
-			document.addEventListener( 'keyup', () => _keyTimes[ _keyTimes.length - 1 ] = new Date() - _keyTimes[ _keyTimes.length - 1 ] );
-		}, keyTimes );
 
 		i = 200;
 
