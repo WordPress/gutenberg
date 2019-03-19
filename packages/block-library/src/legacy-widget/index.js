@@ -25,9 +25,4 @@ export const settings = {
 	},
 
 	edit,
-
-	save() {
-		// Handled by PHP.
-		return null;
-	},
 };
