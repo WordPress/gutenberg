@@ -68,4 +68,8 @@ export function requestImageUploadCancelDialog( mediaId ) {
 	return RNReactNativeGutenbergBridge.requestImageUploadCancelDialog( mediaId );
 }
 
+export function requestImageUploadCancel( mediaId ) {
+	return RNReactNativeGutenbergBridge.requestImageUploadCancel( mediaId );
+}
+
 export default RNReactNativeGutenbergBridge;
