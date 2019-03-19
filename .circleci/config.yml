@@ -119,8 +119,8 @@ jobs:
     - run:
         name: Yarn install
         command: |
-          sudo npm -g install yarn
-          sudo yarn install
+          sudo chown -R $USER:$GROUP ~/.config
+          yarn install
     - react-native-install
     - run:
         name: Set Environment Variables
