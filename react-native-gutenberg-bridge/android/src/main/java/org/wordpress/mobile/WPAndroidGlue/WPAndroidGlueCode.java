@@ -33,7 +33,11 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBri
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -44,13 +48,16 @@ public class WPAndroidGlueCode {
     private RNReactNativeGutenbergBridgePackage mRnReactNativeGutenbergBridgePackage;
     private MediaSelectedCallback mPendingMediaSelectedCallback;
     private MediaUploadCallback mPendingMediaUploadCallback;
+    private boolean mMediaPickedByUserOnBlock;
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachQueryListener mOnReattachQueryListener;
     private OnEditorMountListener mOnEditorMountListener;
+    private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
     private boolean mContentInitialized;
+    private HashMap<Integer, String> mMediaToAddAfterMounting = new HashMap<>();
     private String mTitle = "";
     private boolean mTitleInitialized;
     private boolean mContentChanged;
@@ -111,18 +118,21 @@ public class WPAndroidGlueCode {
 
             @Override
             public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback) {
+                mMediaPickedByUserOnBlock = true;
                 mPendingMediaSelectedCallback = mediaSelectedCallback;
                 mOnMediaLibraryButtonListener.onMediaLibraryButtonClicked();
             }
 
             @Override
             public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback) {
+                mMediaPickedByUserOnBlock = true;
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 mOnMediaLibraryButtonListener.onUploadMediaButtonClicked();
             }
 
             @Override
             public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {
+                mMediaPickedByUserOnBlock = true;
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 mOnMediaLibraryButtonListener.onCapturePhotoButtonClicked();
             }
@@ -151,8 +161,12 @@ public class WPAndroidGlueCode {
             @Override
             public void editorDidMount(boolean hasUnsupportedBlocks) {
                 mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
+                mIsEditorMounted = true;
                 if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
                     setFocusOnTitle();
+                    // send signal to Editor to create a new image block and pass the media URL, start uploading, etc
+                    // use mMediaUrlToAddAfterMounting
+                    dispatchOneMediaToAddAtATimeIfAvailable();
                 }
             }
         });
@@ -284,6 +298,11 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setFocusOnTitleInJS();
     }
 
+    public void appendNewImageBlock(int mediaId, String mediaUri) {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
+                                            .appendNewImageBlock(mediaId, mediaUri);
+    }
+
     public void setTitle(String title) {
         mTitleInitialized = true;
         mTitle = title;
@@ -400,9 +419,13 @@ public class WPAndroidGlueCode {
     }
 
     public void appendMediaFile(int mediaId, final String mediaUrl) {
-        if (mPendingMediaSelectedCallback != null) {
+        if (mPendingMediaSelectedCallback != null && mMediaPickedByUserOnBlock) {
+            mMediaPickedByUserOnBlock = false;
             mPendingMediaSelectedCallback.onMediaSelected(mediaId, mediaUrl);
             mPendingMediaSelectedCallback = null;
+        } else {
+            // we can assume we're being passed a new image from share intent as there was no selectMedia callback
+            sendOrDeferAppendMediaSignal(mediaId, mediaUrl);
         }
     }
 
@@ -411,9 +434,42 @@ public class WPAndroidGlueCode {
     }
 
     public void appendUploadMediaFile(final int mediaId, final String mediaUri) {
-       if (isMediaUploadCallbackRegistered()) {
+       if (isMediaUploadCallbackRegistered() && mMediaPickedByUserOnBlock) {
+           mMediaPickedByUserOnBlock = false;
            mPendingMediaUploadCallback.onUploadMediaFileSelected(mediaId, mediaUri);
+       } else {
+           // we can assume we're being passed a new image from share intent as there was no selectMedia callback
+           sendOrDeferAppendMediaSignal(mediaId, mediaUri);
        }
+    }
+
+    private void sendOrDeferAppendMediaSignal(int mediaId, final String mediaUri) {
+        // if editor is mounted, let's append the media file
+        if (mIsEditorMounted) {
+            if (!TextUtils.isEmpty(mediaUri) && mediaId > 0) {
+                // send signal to JS
+                appendNewImageBlock(mediaId, mediaUri);
+            }
+        } else {
+            // save the URL, we'll add it once Editor is mounted
+            synchronized (WPAndroidGlueCode.this) {
+                mMediaToAddAfterMounting.put(mediaId, mediaUri);
+            }
+        }
+    }
+
+    private synchronized void dispatchOneMediaToAddAtATimeIfAvailable() {
+        Iterator<Entry<Integer, String>> iter = mMediaToAddAfterMounting.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Integer, String> entry = iter.next();
+            Integer mediaId = entry.getKey();
+            String mediaUrl = entry.getValue();
+            if (!TextUtils.isEmpty(mediaUrl) && mediaId > 0) {
+                // send signal to JS
+                appendNewImageBlock(mediaId, mediaUrl);
+                iter.remove();
+            }
+        }
     }
 
     public void mediaFileUploadProgress(final int mediaId, final float progress) {
