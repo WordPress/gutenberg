@@ -57,10 +57,6 @@ jobs:
             git submodule update --recursive
       - yarn-install
       - run:
-          name: Add is-directory module
-          command: |
-            yarn add is-directory
-      - run:
           name: Set Environment Variables
           command: |
             echo 'export CHECK_CORRECTNESS=<<parameters.check-correctness>>' >> $BASH_ENV
@@ -86,6 +82,10 @@ jobs:
             echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
             sudo apt-get update && sudo apt-get install --no-install-recommends yarn
       - yarn-install
+      - run:
+          name: Add is-directory module
+          command: |
+            yarn add is-directory
       - react-native-install
       - run:
           name: Set Environment Variables
