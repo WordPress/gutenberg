@@ -26,8 +26,8 @@ commands:
       - run:
           name: Bundle Debug android
           command: |
-            mkdir -p ./android/app/build/intermediates/assets/debug/ && mkdir -p ./android/app/build/intermediates/res/merged/
-            react-native bundle --reset-cache --dev=false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug
+            mkdir -p android/app/src/main/assets
+            react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
       - run:
           name: Gradle assemble debug android apk
           command: |
@@ -96,7 +96,7 @@ jobs:
             curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
       - run:
           name: Run Device Tests
-          command: yarn device-tests
+          command: yarn test:ui:android
   ios-device-checks:
     docker:
       - image: circleci/node:8
