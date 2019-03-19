@@ -4,7 +4,7 @@
 import { createBlock } from '@wordpress/blocks';
 import {
 	InnerBlocks,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
 /**
  * Given an HTML string for a deprecated columns inner block, returns the

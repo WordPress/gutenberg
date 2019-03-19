@@ -18,8 +18,7 @@ import {
 	InnerBlocks,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
-
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**

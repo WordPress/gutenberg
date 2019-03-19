@@ -16,7 +16,7 @@ import { Fragment } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
 registerBlockType( 'my-plugin/my-block', {
 	// ...
