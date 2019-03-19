@@ -57,6 +57,10 @@ jobs:
             git submodule update --recursive
       - yarn-install
       - run:
+          name: Add is-directory module
+          command: |
+            yarn add is-directory
+      - run:
           name: Set Environment Variables
           command: |
             echo 'export CHECK_CORRECTNESS=<<parameters.check-correctness>>' >> $BASH_ENV
