@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, pick } from 'lodash';
+import { castArray, pick, has } from 'lodash';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
@@ -26,22 +26,58 @@ import {
 } from './utils/notice-builder';
 
 /**
- * Returns an action object used in signalling that editor has initialized with
+ * WordPress dependencies
+ */
+import {
+	parse,
+	synchronizeBlocksWithTemplate,
+} from '@wordpress/blocks';
+
+/**
+ * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
  * @param {Object} post      Post object.
  * @param {Object} edits     Initial edited attributes object.
  * @param {Array?} template  Block Template.
- *
- * @return {Object} Action object.
  */
-export function setupEditor( post, edits, template ) {
-	return {
+export function* setupEditor( post, edits, template ) {
+	yield {
 		type: 'SETUP_EDITOR',
 		post,
 		edits,
 		template,
 	};
+
+	// In order to ensure maximum of a single parse during setup, edits are
+	// included as part of editor setup action. Assume edited content as
+	// canonical if provided, falling back to post.
+	let content;
+	if ( has( edits, [ 'content' ] ) ) {
+		content = edits.content;
+	} else {
+		content = post.content.raw;
+	}
+
+	let blocks = parse( content );
+
+	// Apply a template for new posts only, if exists.
+	const isNewPost = post.status === 'auto-draft';
+	if ( isNewPost && template ) {
+		blocks = synchronizeBlocksWithTemplate( blocks, template );
+	}
+
+	yield dispatch(
+		STORE_KEY,
+		'resetEditorBlocks',
+		blocks
+	);
+
+	yield dispatch(
+		STORE_KEY,
+		'setupEditorState',
+		post
+	);
 }
 
 /**

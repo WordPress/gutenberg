@@ -625,15 +625,39 @@ describe( 'Post generator actions', () => {
 	} );
 } );
 
-describe( 'actions', () => {
-	describe( 'setupEditor', () => {
-		it( 'should return the SETUP_EDITOR action', () => {
-			const post = {};
-			const result = actions.setupEditor( post );
-			expect( result ).toEqual( {
-				type: 'SETUP_EDITOR',
+describe( 'Editor actions', () => {
+	describe( 'setupEditor()', () => {
+		let fulfillment;
+		const reset = ( post, edits, template ) => fulfillment = actions
+			.setupEditor(
 				post,
+				edits,
+				template,
+			);
+		it( 'should yield the SETUP_EDITOR action', () => {
+			reset( { content: { raw: '' }, status: 'publish' } );
+			const { value } = fulfillment.next();
+			expect( value ).toEqual( {
+				type: 'SETUP_EDITOR',
+				post: { content: { raw: '' }, status: 'publish' },
 			} );
+		} );
+		it( 'should yield dispatch action for resetEditorBlocks', () => {
+			const { value } = fulfillment.next();
+			expect( value.type ).toBe( 'DISPATCH' );
+			expect( value.storeKey ).toBe( STORE_KEY );
+			expect( value.actionName ).toBe( 'resetEditorBlocks' );
+			expect( value.args ).toEqual( [ [] ] );
+		} );
+		it( 'should yield dispatch action for setupEditorState', () => {
+			const { value } = fulfillment.next();
+			expect( value ).toEqual(
+				dispatch(
+					STORE_KEY,
+					'setupEditorState',
+					{ content: { raw: '' }, status: 'publish' }
+				)
+			);
 		} );
 	} );
 
