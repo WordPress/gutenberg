@@ -122,7 +122,6 @@ jobs:
         command: |
           echo 'export TEST_RN_PLATFORM=ios' >> $BASH_ENV
           echo 'export TEST_ENV=sauce' >> $BASH_ENV
-    - build-android
     - run:
         name: Upload apk to sauce labs
         command: |
