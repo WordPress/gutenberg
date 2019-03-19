@@ -119,6 +119,7 @@ jobs:
     - run:
         name: Yarn install
         command: |
+          sudo npm -g install yarn
           yarn install
     - react-native-install
     - run:
