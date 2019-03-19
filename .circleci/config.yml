@@ -118,7 +118,9 @@ jobs:
           git submodule update --recursive
     - run:
         name: Yarn install
-        command: yarn install
+        command: |
+          brew install yarn --ignore-dependencies
+          yarn install
     - react-native-install
     - run:
         name: Set Environment Variables
