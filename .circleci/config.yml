@@ -20,7 +20,7 @@ commands:
     - run:
         name: Install command line tools
         command: |
-          npm install -g react-native-cli
+          sudo npm install -g react-native-cli
   build-android:
     steps:
       - run:
