@@ -13,7 +13,7 @@
 
 ### Anatomy
 
-A Panel consists of a single continuous column of subdivisions that contain items of content.
+A Panel is a single section of content that can be expanded or collapsed as needed.
 
 ![Panel anatomy](https://make.wordpress.org/design/files/2019/03/panel-anatomy.png)
 
