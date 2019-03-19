@@ -230,6 +230,7 @@ export function* replaceBlocks( clientIds, blocks ) {
 		first( clientIds )
 	);
 	// Replace is valid if the new blocks can be inserted in the root block
+	// or if we had a block of the same type in the position of the block being replaced.
 	for ( let index = 0; index < blocks.length; index++ ) {
 		const block = blocks[ index ];
 		const canInsertBlock = yield select(
@@ -239,7 +240,12 @@ export function* replaceBlocks( clientIds, blocks ) {
 			rootClientId
 		);
 		if ( ! canInsertBlock ) {
-			return;
+			const clientIdToReplace = clientIds[ index ];
+			const nameOfBlockToReplace = clientIdToReplace &&
+				( yield select( 'core/block-editor', 'getBlockName', clientIdToReplace ) );
+			if ( ! nameOfBlockToReplace || ( nameOfBlockToReplace !== block.name ) ) {
+				return;
+			}
 		}
 	}
 	yield {
