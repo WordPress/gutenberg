@@ -26,6 +26,7 @@ export function getEmbedEditComponent( options ) {
 		inspector: InspectorControls,
 		preview: previewTransform = ( fetchedPreview ) => fetchedPreview,
 	} = options;
+
 	return class extends Component {
 		constructor() {
 			super( ...arguments );

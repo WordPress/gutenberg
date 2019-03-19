@@ -28,8 +28,9 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
-export const common = [
+const commonSettings = [
 	{
 		name: 'core-embed/twitter',
 		settings: {
@@ -123,7 +124,7 @@ export const common = [
 	},
 ];
 
-export const others = [
+const othersSettings = [
 	{
 		name: 'core-embed/animoto',
 		settings: {
@@ -383,3 +384,6 @@ export const others = [
 		],
 	},
 ];
+
+export const common = applyFilters( 'blockLibrary.Embed.commonSettings', commonSettings );
+export const others = applyFilters( 'blockLibrary.Embed.othersSettings', othersSettings );

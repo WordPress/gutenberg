@@ -31,16 +31,27 @@ export const matchesPatterns = ( url, patterns = [] ) => {
 
 /**
  * Finds the block name that should be used for the URL, based on the
- * structure of the URL.
+ * structure of the URL and optionally the current block.
+ *
+ * If the current block is one of the matching blocks, the current block is
+ * returned.
  *
  * @param {string}  url The URL to test.
+ * @param {string}  currentBlockName The name of the currently active embed block, optional.
  * @return {string} The name of the block that should be used for this URL, e.g. core-embed/twitter
  */
-export const findBlock = ( url ) => {
+export const findBlock = ( url, currentBlockName = '' ) => {
+	const matchingBlocks = [];
 	for ( const block of [ ...common, ...others ] ) {
 		if ( matchesPatterns( url, block.patterns ) ) {
-			return block.name;
+			matchingBlocks.push( block.name );
 		}
+	}
+	if ( includes( matchingBlocks, currentBlockName ) ) {
+		return currentBlockName;
+	}
+	if ( matchingBlocks.length > 0 ) {
+		return matchingBlocks[ 0 ];
 	}
 	return DEFAULT_EMBED_BLOCK;
 };
@@ -79,7 +90,7 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 		return;
 	}
 
-	const matchingBlock = findBlock( url );
+	const matchingBlock = findBlock( url, props.name );
 
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.

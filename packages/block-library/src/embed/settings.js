@@ -3,7 +3,11 @@
  */
 import { getEmbedEditComponent } from './edit';
 import { getEmbedSaveComponent } from './save';
-import { getEmbedDeprecatedMigrations } from './deprecated';
+
+/**
+ * External dependencies
+ */
+import classnames from 'classnames/dedupe';
 
 /**
  * WordPress dependencies
@@ -11,6 +15,7 @@ import { getEmbedDeprecatedMigrations } from './deprecated';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { RichText } from '@wordpress/editor';
 
 const embedAttributes = {
 	url: {
@@ -37,6 +42,31 @@ const embedAttributes = {
 	},
 };
 
+const deprecated = [
+	{
+		attributes: embedAttributes,
+		save( { attributes } ) {
+			const { url, caption, type, providerNameSlug } = attributes;
+
+			if ( ! url ) {
+				return null;
+			}
+
+			const embedClassName = classnames( 'wp-block-embed', {
+				[ `is-type-${ type }` ]: type,
+				[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
+			} );
+
+			return (
+				<figure className={ embedClassName }>
+					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+				</figure>
+			);
+		},
+	},
+];
+
 export function getEmbedBlockSettings( options ) {
 	const {
 		title,
@@ -50,7 +80,6 @@ export function getEmbedBlockSettings( options ) {
 	const blockDescription = description || __( 'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.' );
 	const edit = getEmbedEditComponent( options );
 	const save = getEmbedSaveComponent( options );
-	const deprecated = getEmbedDeprecatedMigrations( embedAttributes, options );
 
 	return {
 		title,
