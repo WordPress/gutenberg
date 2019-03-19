@@ -1,3 +1,9 @@
+## 9.1.1 (Unreleased)
+
+### Internal
+
+- Refactor setupEditor effects to action-generator using controls ([#14513](https://github.com/WordPress/gutenberg/pull/14513))
+
 ## 9.1.0 (2019-03-06)
 
 ### New Features
