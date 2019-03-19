@@ -11,7 +11,8 @@ import '@wordpress/viewport';
  */
 import './store';
 import './hooks';
+import { SETTINGS_DEFAULTS } from './store/defaults';
 
 export * from './components';
 
-export { SETTINGS_DEFAULTS } from './store/defaults';
+export { SETTINGS_DEFAULTS };
