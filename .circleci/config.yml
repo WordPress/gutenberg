@@ -26,7 +26,7 @@ commands:
       - run:
           name: Bundle Debug android
           command: |
-            mkdir ./android/app/build/intermediates/assets/debug/ && ./android/app/build/intermediates/res/merged/
+            mkdir -p ./android/app/build/intermediates/assets/debug/ && mkdir -p ./android/app/build/intermediates/res/merged/
             react-native bundle --reset-cache --dev=false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug
       - run:
           name: Gradle assemble debug android apk
