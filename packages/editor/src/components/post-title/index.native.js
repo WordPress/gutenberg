@@ -51,7 +51,9 @@ class PostTitle extends Component {
 	onSelect() {
 		this.setState( { isSelected: true } );
 		this.props.clearSelectedBlock();
-		this.props.onFocus && this.props.onFocus();
+		if ( this.props.onFocus ) {
+			this.props.onFocus();
+		}
 	}
 
 	onUnselect() {
