@@ -302,10 +302,33 @@ export class RichText extends Component {
 		const isPasted = true;
 		const { onSplit } = this.props;
 
-		const { pastedText, pastedHtml } = event.nativeEvent;
+		const { pastedText, pastedHtml, files } = event.nativeEvent;
 		const currentRecord = this.createRecord( event.nativeEvent );
 
 		event.preventDefault();
+
+		// Only process file if no HTML is present.
+		// Note: a pasted file may have the URL as plain text.
+		const file = files[ 0 ];
+		if ( file ) {
+			const content = pasteHandler( {
+				HTML: `<img src="${ file }">`,
+				mode: 'BLOCKS',
+				tagName: this.props.tagName,
+			} );
+			const shouldReplace = this.props.onReplace && this.isEmpty();
+
+			// Allows us to ask for this information when we get a report.
+			window.console.log( 'Received item:\n\n', file );
+
+			if ( shouldReplace ) {
+				this.props.onReplace( content );
+			} else {
+				this.splitContent( currentRecord, content, isPasted );
+			}
+
+			return;
+		}
 
 		// There is a selection, check if a URL is pasted.
 		if ( ! isCollapsed( currentRecord ) ) {
@@ -512,7 +535,7 @@ export class RichText extends Component {
 			html = '';
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
-		
+
 		let minHeight = styles[ 'editor-rich-text' ].minHeight;
 		if ( style && style.minHeight ) {
 			minHeight = style.minHeight;
