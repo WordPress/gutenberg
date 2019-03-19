@@ -48,10 +48,11 @@ describe( 'Gutenberg Editor tests', () => {
 
 	afterAll( async () => {
 		if ( isLocalEnvironment() ) {
+			await driver.quit();
 			await appium.kill( 'SIGINT' );
 		} else {
 			driver.sauceJobStatus( allPassed );
+			await driver.quit();
 		}
-		await driver.quit();
 	} );
 } );
