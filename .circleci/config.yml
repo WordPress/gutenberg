@@ -114,7 +114,7 @@ jobs:
           command: yarn device-tests
   ios-device-checks:
     macos:
-      xcode: "10.2"
+      xcode: "10.0"
     steps:
     - checkout
     - run:
