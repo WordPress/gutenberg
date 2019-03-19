@@ -48,7 +48,7 @@ public class WPAndroidGlueCode {
     private RNReactNativeGutenbergBridgePackage mRnReactNativeGutenbergBridgePackage;
     private MediaSelectedCallback mPendingMediaSelectedCallback;
     private MediaUploadCallback mPendingMediaUploadCallback;
-    private boolean mUploadCallbackSetFromSync;
+    private boolean mMediaPickedByUserOnBlock;
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachQueryListener mOnReattachQueryListener;
@@ -117,18 +117,21 @@ public class WPAndroidGlueCode {
 
             @Override
             public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback) {
+                mMediaPickedByUserOnBlock = true;
                 mPendingMediaSelectedCallback = mediaSelectedCallback;
                 mOnMediaLibraryButtonListener.onMediaLibraryButtonClicked();
             }
 
             @Override
             public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback) {
+                mMediaPickedByUserOnBlock = true;
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 mOnMediaLibraryButtonListener.onUploadMediaButtonClicked();
             }
 
             @Override
             public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {
+                mMediaPickedByUserOnBlock = true;
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 mOnMediaLibraryButtonListener.onCapturePhotoButtonClicked();
             }
@@ -136,7 +139,6 @@ public class WPAndroidGlueCode {
             @Override
             public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
-                mUploadCallbackSetFromSync = true;
                 mOnReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
             }
 
@@ -411,7 +413,8 @@ public class WPAndroidGlueCode {
     }
 
     public void appendMediaFile(int mediaId, final String mediaUrl) {
-        if (mPendingMediaSelectedCallback != null) {
+        if (mPendingMediaSelectedCallback != null && mMediaPickedByUserOnBlock) {
+            mMediaPickedByUserOnBlock = false;
             mPendingMediaSelectedCallback.onMediaSelected(mediaId, mediaUrl);
             mPendingMediaSelectedCallback = null;
         } else {
@@ -425,7 +428,8 @@ public class WPAndroidGlueCode {
     }
 
     public void appendUploadMediaFile(final int mediaId, final String mediaUri) {
-       if (isMediaUploadCallbackRegistered() && !mUploadCallbackSetFromSync) {
+       if (isMediaUploadCallbackRegistered() && mMediaPickedByUserOnBlock) {
+           mMediaPickedByUserOnBlock = false;
            mPendingMediaUploadCallback.onUploadMediaFileSelected(mediaId, mediaUri);
        } else {
            // we can assume we're being passed a new image from share intent as there was no selectMedia callback
