@@ -136,7 +136,7 @@ module.exports = {
 						// mutations to the same priority during another's
 						// callback, the Gutenberg build blocks are modified
 						// to occur at a later priority.
-						.replace( /(add_action\(\s*'init',\s*'register_block_[^']+'(?!,))/, '$1, 20' );
+						.replace( /(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/, '$1, 20' );
 				},
 			},
 		] ),
