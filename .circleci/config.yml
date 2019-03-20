@@ -119,13 +119,12 @@ jobs:
         command: |
           git submodule init
           git submodule update --recursive
-    - run: |
-        sudo chown -R $USER:$GROUP ~/.yarn
-        sudo chown -R $USER:$GROUP ~/.config
     - run:
         name: Yarn install
         command: |
           yarn install
+    - run: |
+        sudo chown -R $USER:$GROUP ~/.config
     - react-native-install
     - run:
         name: Set Environment Variables
