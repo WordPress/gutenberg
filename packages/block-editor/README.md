@@ -1,6 +1,6 @@
 # Block Editor
 
-Generic Block Editor Module.
+Generic block editor module.
 
 ## Installation
 
