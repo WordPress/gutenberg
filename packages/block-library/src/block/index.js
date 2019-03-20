@@ -30,6 +30,4 @@ export const settings = {
 	},
 
 	edit,
-
-	save: () => null,
 };
