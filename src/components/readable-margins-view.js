@@ -5,6 +5,7 @@
 
 import * as React from 'react';
 import { View } from 'react-native';
+import styles from './readable-margins-view.scss'
 
 type PropsType = {
 	children?: React.Node,
@@ -19,11 +20,11 @@ export default class ReadableMarginsView extends React.Component<PropsType, Stat
 		const { children } = this.props;
 
 		return (
-			// <View style={{flex: 1, alignContent: "center"}}>
-				<View style={ {marginLeft: 200, marginRight: 200} }>
+			<View style={ styles.container } >
+				<View style={ styles.centeredContent } >
 					{ children }
 				</View>
-			// </View>
+			</View>
 		);
 	}
 }
