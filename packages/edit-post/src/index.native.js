@@ -2,10 +2,8 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/block-editor';
-import { UnsupportedBlock } from '@wordpress/editor';
 import '@wordpress/notices';
-import { registerCoreBlocks } from '@wordpress/block-library';
+import { registerCoreBlocks, UnsupportedBlock } from '@wordpress/block-library';
 import { registerBlockType, setUnregisteredTypeHandlerName, unregisterBlockType } from '@wordpress/blocks';
 
 /**

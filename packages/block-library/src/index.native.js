@@ -49,53 +49,59 @@ import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
 
-export const coreBlocks = [
-			// Common blocks are grouped at the top to prioritize their display
-		// in various contexts — like the inserter and auto-complete components.
-		paragraph,
-		image,
-		heading,
-		gallery,
-		list,
-		quote,
+import * as UnsupportedBlock from './mobile/unsupported-block';
+export { UnsupportedBlock };
 
-		// Register all remaining core blocks.
-		shortcode,
-		archives,
-		audio,
-		button,
-		calendar,
-		categories,
-		code,
-		columns,
-		column,
-		cover,
-		embed,
-		...embed.common,
-		...embed.others,
-		file,
-		html,
-		mediaText,
-		latestComments,
-		latestPosts,
-		missing,
-		more,
-		nextpage,
-		preformatted,
-		pullquote,
-		rss,
-		search,
-		separator,
-		reusableBlock,
-		spacer,
-		subhead,
-		table,
-		tagCloud,
-		template,
-		textColumns,
-		verse,
-		video,
-].reduce( ( memo, block ) => { memo[block.name] = block; return memo; }, {} );
+export const coreBlocks = [
+	// Common blocks are grouped at the top to prioritize their display
+	// in various contexts — like the inserter and auto-complete components.
+	paragraph,
+	image,
+	heading,
+	gallery,
+	list,
+	quote,
+
+	// Register all remaining core blocks.
+	shortcode,
+	archives,
+	audio,
+	button,
+	calendar,
+	categories,
+	code,
+	columns,
+	column,
+	cover,
+	embed,
+	...embed.common,
+	...embed.others,
+	file,
+	html,
+	mediaText,
+	latestComments,
+	latestPosts,
+	missing,
+	more,
+	nextpage,
+	preformatted,
+	pullquote,
+	rss,
+	search,
+	separator,
+	reusableBlock,
+	spacer,
+	subhead,
+	table,
+	tagCloud,
+	template,
+	textColumns,
+	verse,
+	video,
+].reduce( ( memo, block ) => {
+	memo[ block.name ] = block;
+	return memo;
+}, {} );
 
 export const registerCoreBlocks = () => {
 	[

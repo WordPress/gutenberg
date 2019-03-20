@@ -21,7 +21,7 @@ export const settings = {
 	category: 'formatting',
 
 	attributes: {
-		originalname: {
+		originalName: {
 			type: 'string',
 		},
 		content: {
