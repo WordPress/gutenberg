@@ -5,6 +5,8 @@
 import { Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	indentListItems,
+	outdentListItems,
 	changeListType,
 } from '@wordpress/rich-text';
 
@@ -69,6 +71,20 @@ export const ListEdit = ( {
 						if ( isListRootSelected() ) {
 							onTagNameChange( 'ol' );
 						}
+					},
+				},
+				{
+					icon: 'editor-outdent',
+					title: __( 'Outdent list item' ),
+					onClick: () => {
+						onChange( outdentListItems( value ) );
+					},
+				},
+				{
+					icon: 'editor-indent',
+					title: __( 'Indent list item' ),
+					onClick: () => {
+						onChange( indentListItems( value, { type: tagName } ) );
 					},
 				},
 			].filter( Boolean ) }
