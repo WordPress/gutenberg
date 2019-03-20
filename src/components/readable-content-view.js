@@ -24,7 +24,7 @@ const ReadableContentView = ( props: PropsType ) => {
 const isContentMaxWidth = (): boolean => {
 	const { width } = Dimensions.get( 'window' );
 	return width > styles.centeredContent.maxWidth;
-}
+};
 
 ReadableContentView.isContentMaxWidth = isContentMaxWidth;
 export default ReadableContentView;

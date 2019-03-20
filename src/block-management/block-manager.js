@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import React from 'react';
 import { identity } from 'lodash';
 
-import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView, Dimensions, Platform } from 'react-native';
+import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView, Platform } from 'react-native';
 import BlockHolder from './block-holder';
 import type { BlockType } from '../store/types';
 import styles from './block-manager.scss';
