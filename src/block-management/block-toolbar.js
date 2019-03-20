@@ -8,7 +8,7 @@ import { View, ScrollView, Keyboard } from 'react-native';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
-import { BlockFormatControls, BlockControls } from '@wordpress/editor';
+import { BlockFormatControls, BlockControls } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 import styles from './block-toolbar.scss';

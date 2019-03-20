@@ -86,6 +86,7 @@ public class WPAndroidGlueCode {
         void onCapturePhotoButtonClicked();
         void onRetryUploadForMediaClicked(int mediaId);
         void onCancelUploadForMediaClicked(int mediaId);
+        void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
     }
 
     public interface OnReattachQueryListener {
@@ -140,6 +141,11 @@ public class WPAndroidGlueCode {
             @Override
             public void requestImageUploadCancelDialog(int mediaId) {
                 mOnMediaLibraryButtonListener.onCancelUploadForMediaClicked(mediaId);
+            }
+
+            @Override
+            public void requestImageUploadCancel(int mediaId) {
+                mOnMediaLibraryButtonListener.onCancelUploadForMediaDueToDeletedBlock(mediaId);
             }
 
             @Override

@@ -12,16 +12,24 @@ import {
 	NativeTouchEvent,
 } from 'react-native';
 import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
+import {
+	requestImageUploadCancel,
+} from 'react-native-gutenberg-bridge';
 
+/**
+ * WordPress dependencies
+ */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { addAction, removeAction, hasAction } from '@wordpress/hooks';
 
 import type { BlockType } from '../store/types';
 
 import styles from './block-holder.scss';
 
 // Gutenberg imports
-import { BlockEdit } from '@wordpress/editor';
+import { getBlockType } from '@wordpress/blocks';
+import { BlockEdit } from '@wordpress/block-editor';
 
 import TextInputState from 'react-native/lib/TextInputState';
 
@@ -37,6 +45,7 @@ type PropsType = BlockType & {
 	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
 	getPreviousBlockClientId: ( clientId: string ) => string,
 	getNextBlockClientId: ( clientId: string ) => string,
+	getBlockName: ( clientId: string ) => string,
 	onChange: ( attributes: mixed ) => void,
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
 	onCaretVerticalPositionChange: ( targetId: number, caretY: number, previousCaretY: ?number ) => void,
@@ -75,6 +84,14 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		this.props.onSelect( this.props.clientId );
 	};
 
+	onRemoveBlockCheckUpload = ( mediaId: number ) => {
+		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) ) {
+			// now remove the action as it's  a one-shot use and won't be needed anymore
+			removeAction( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks' );
+			requestImageUploadCancel( mediaId );
+		}
+	}
+
 	onInlineToolbarButtonPressed = ( button: number ) => {
 		switch ( button ) {
 			case InlineToolbarActions.UP:
@@ -84,6 +101,9 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				this.props.moveBlockDown();
 				break;
 			case InlineToolbarActions.DELETE:
+				// adding a action that will exist for as long as it takes for the block to be removed and the component unmounted
+				// this acts as a flag for the code using the action to know of its existence
+				addAction( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks', this.onRemoveBlockCheckUpload );
 				this.props.removeBlock();
 				break;
 		}
@@ -121,6 +141,13 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		if ( forward ) {
 			mergeBlocks( clientId, nextBlockClientId );
 		} else {
+			const name = this.props.getBlockName( previousBlockClientId );
+			const blockType = getBlockType( name );
+			// The default implementation does only focus the previous block if it's not mergeable
+			// We don't want to move the focus for now, just keep for and caret at the beginning of the current block.
+			if ( ! blockType.merge ) {
+				return;
+			}
 			mergeBlocks( previousBlockClientId, clientId );
 		}
 	};
@@ -191,7 +218,7 @@ export default compose( [
 			getPreviousBlockClientId,
 			getNextBlockClientId,
 			isBlockSelected,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
 		const name = getBlockName( clientId );
 		const attributes = getBlockAttributes( clientId );
 		const order = getBlockIndex( clientId, rootClientId );
@@ -202,6 +229,7 @@ export default compose( [
 		return {
 			attributes,
 			getBlockIndex,
+			getBlockName,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
 			isFirstBlock,
@@ -221,7 +249,7 @@ export default compose( [
 			replaceBlocks,
 			selectBlock,
 			updateBlockAttributes,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/block-editor' );
 
 		return {
 			mergeBlocks,

@@ -1,6 +1,5 @@
 /** @format */
 
-@import 'colors.scss';
 @import 'block-styles.scss';
 
 .blockHolder {
@@ -28,25 +27,6 @@
 	padding-left: 8;
 	padding-top: 4;
 	padding-bottom: 4;
-}
-
-.unsupportedBlock {
-	background-color: #e9eff3; // grey lighten 30 
-	height: 122px;
-	align-items: center;
-	justify-content: center;
-}
-
-.unsupportedBlockImagePlaceholder {
-	width: 20;
-	height: 20;
-	margin-bottom: 6px;
-}
-
-.unsupportedBlockMessage {
-	color: #4f748e; // grey darken 20
-	font-size: 14px;
-	font-family: $default-regular-font;
 }
 
 .aztec_container {

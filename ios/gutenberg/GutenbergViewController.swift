@@ -5,7 +5,7 @@ import Aztec
 
 class GutenbergViewController: UIViewController {
 
-    fileprivate lazy var gutenberg = Gutenberg(dataSource: self)
+    fileprivate lazy var gutenberg = Gutenberg(dataSource: self, extraModules: [CustomImageLoader()])
     fileprivate var htmlMode = false
     fileprivate var mediaPickCoordinator: MediaPickCoordinator?
     fileprivate lazy var mediaUploadCoordinator: MediaUploadCoordinator = {
@@ -112,6 +112,15 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         alertController.popoverPresentationController?.sourceRect = view.frame
         alertController.popoverPresentationController?.permittedArrowDirections = .any
         present(alertController, animated: true, completion: nil)
+    }
+
+    /// Tells the delegate that an image block requested for the upload cancelation.
+    ///
+    func gutenbergDidRequestMediaUploadCancelation(for mediaID: Int32) {
+        guard let progress = mediaUploadCoordinator.progressForUpload(mediaID: mediaID) else {
+            return
+        }
+        progress.cancel()
     }
 }
 

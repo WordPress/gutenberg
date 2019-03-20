@@ -28,6 +28,11 @@ class RCTAztecView: Aztec.TextView {
             }
         }
     }
+    @objc var disableEditingMenu: Bool = false {
+        didSet {
+            allowsEditingTextAttributes = !disableEditingMenu
+        }
+    }
 
     var blockModel = BlockModel(tag: "") {
         didSet {
@@ -49,11 +54,12 @@ class RCTAztecView: Aztec.TextView {
         return reactLayoutDirection == .rightToLeft
     }
 
-    private lazy var placeholderLabel: UILabel = {
+    private(set) lazy var placeholderLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .natural
         label.font = font
+
         return label
     }()
 
@@ -74,6 +80,10 @@ class RCTAztecView: Aztec.TextView {
         )
     }()
 
+    /// If a dictation start with an empty UITextView,
+    /// the dictation engine refreshes the TextView with an empty string when the dictation finishes.
+    /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
+    /// on `textViewDidChange` and `textViewDidChangeSelection`
     private var isInsertingDictationResult = false
     
     // MARK: - Font
@@ -267,16 +277,15 @@ class RCTAztecView: Aztec.TextView {
             (start, end) = (end, start)
         }
         
-        var result: [String : Any] = [
-            "text": getHTML(),
-            "selectionStart": start,
-            "selectionEnd": end
-        ]
+        var result: [AnyHashable : Any] = packForRN(getHTML(), withName: "text")
+
+        result["selectionStart"] = start
+        result["selectionEnd"] = end
         
         if let selectedTextRange = selectedTextRange {
             let caretEndRect = caretRect(for: selectedTextRange.end)
             // Sergio Estevao: Sometimes the carectRect can be invalid so we need to check before sending this to JS.
-            if !(caretEndRect.isInfinite || caretEndRect.isEmpty || caretEndRect.isNull) {
+            if !(caretEndRect.isInfinite || caretEndRect.isNull) {
                 result["selectionEndCaretX"] = caretEndRect.origin.x
                 result["selectionEndCaretY"] = caretEndRect.origin.y
             }
@@ -298,6 +307,11 @@ class RCTAztecView: Aztec.TextView {
         setHTML(html)
         updatePlaceholderVisibility()
         refreshFont()
+        if let selection = contents["selection"] as? NSDictionary,
+            let start = selection["start"] as? NSNumber,
+            let end = selection["end"]  as? NSNumber {
+            setSelection(start: start, end: end)
+        }
     }
 
     // MARK: - Placeholder
@@ -321,6 +335,13 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
+    func setSelection(start: NSNumber, end: NSNumber) {        
+        if let startPosition = position(from: beginningOfDocument, offset: start.intValue),
+            let endPosition = position(from: beginningOfDocument, offset: end.intValue) {
+            selectedTextRange = textRange(from: startPosition, to: endPosition)
+        }
+    }
+    
     func updatePlaceholderVisibility() {
         placeholderLabel.isHidden = !self.text.isEmpty
     }
@@ -406,10 +427,10 @@ class RCTAztecView: Aztec.TextView {
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {
-        let oldFont = font(from: typingAttributesSwifted)
+        let oldFont = font(from: typingAttributes)
         let newFont = applyFontConstraints(to: oldFont)
         
-        typingAttributesSwifted[.font] = newFont
+        typingAttributes[.font] = newFont
         placeholderLabel.font = newFont
     }
 
@@ -453,15 +474,15 @@ class RCTAztecView: Aztec.TextView {
 extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
+        guard isInsertingDictationResult == false else {
+            return
+        }
+
         propagateSelectionChanges()
     }
 
     func textViewDidChange(_ textView: UITextView) {
-
         guard isInsertingDictationResult == false else {
-            // If a dictation start with an empty UITextView,
-            // the dictation engine refreshes the TextView with an empty string when the dictation finishes.
-            // This avoid propagating that unwanted empty string to RN. (Solving #606)
             return
         }
 
