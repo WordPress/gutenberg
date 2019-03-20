@@ -113,30 +113,31 @@ export function isHorizontalEdge( container, isReverse ) {
 	// selection rectangle may not fill the entire height of the line, so we add
 	// half the line height to the selection rectangle to ensure that it is well
 	// over its line boundary.
-	const { lineHeight, paddingLeft } = window.getComputedStyle( container );
+	const { lineHeight } = window.getComputedStyle( container );
 	const buffer = 3 * parseInt( lineHeight, 10 ) / 4;
-	const padding = parseInt( paddingLeft, 10 );
 
-	if ( isReverse ) {
-		return (
-			Math.round( containerRect.left + padding ) === Math.round( rangeRect.left ) &&
-			containerRect.top > rangeRect.top - buffer
-		);
+	const verticalEdge = isReverse ?
+		containerRect.top > rangeRect.top - buffer :
+		containerRect.bottom < rangeRect.bottom + buffer;
+
+	if ( ! verticalEdge ) {
+		return false;
 	}
 
-	if ( containerRect.bottom < rangeRect.bottom + buffer ) {
-		const testRange = hiddenCaretRangeFromPoint(
-			document,
-			containerRect.right - 1,
-			containerRect.bottom - buffer,
-			container
-		);
-		const testRect = getRectangleFromRange( testRange );
+	const x = isReverse ? containerRect.left + 1 : containerRect.right - 1;
+	const y = isReverse ?
+		containerRect.top + buffer :
+		containerRect.bottom - buffer;
+	const testRange = hiddenCaretRangeFromPoint( document, x, y, container );
 
-		return Math.round( testRect.right ) === Math.round( rangeRect.right );
+	if ( ! testRange ) {
+		return false;
 	}
 
-	return false;
+	const side = isReverse ? 'left' : 'right';
+	const testRect = getRectangleFromRange( testRange );
+
+	return Math.round( testRect[ side ] ) === Math.round( rangeRect[ side ] );
 }
 
 /**
