@@ -133,10 +133,10 @@ jobs:
         name: Run metro
         background: true
         command: |
-          yarn start
+          sudo yarn start
     - run:
         name: Yarn ios
-        command: yarn ios
+        command: sudo yarn ios
     - build-ios
     - run:
         name: Zip up .app file
