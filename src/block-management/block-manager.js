@@ -24,6 +24,7 @@ import BlockToolbar from './block-toolbar';
 import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 import { KeyboardAwareFlatList, handleCaretVerticalPositionChange } from '../components/keyboard-aware-flat-list';
 import SafeArea from 'react-native-safe-area';
+import ReadableMarginsView from '../components/readable-margins-view';
 
 // Gutenberg imports
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -200,15 +201,18 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderHeader() {
 		return (
-			<PostTitle
-				innerRef={ ( ref ) => {
-					this.postTitleRef = ref;
-				} }
-				title={ this.props.title }
-				onUpdate={ this.props.setTitleAction }
-				placeholder={ __( 'Add title' ) }
-				borderStyle={ this.blockHolderBorderStyle() }
-				focusedBorderColor={ styles.blockHolderFocused.borderColor } />
+			<ReadableMarginsView>
+				<PostTitle
+					innerRef={ ( ref ) => {
+						this.postTitleRef = ref;
+					} }
+					title={ this.props.title }
+					onUpdate={ this.props.setTitleAction }
+					placeholder={ __( 'Add title' ) }
+					borderStyle={ this.blockHolderBorderStyle() }
+					focusedBorderColor={ styles.blockHolderFocused.borderColor }
+				/>
+			</ReadableMarginsView>
 		);
 	}
 
@@ -282,7 +286,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		const clientId = value.item;
 
 		return (
-			<View>
+			<ReadableMarginsView>
 				<BlockHolder
 					key={ clientId }
 					showTitle={ false }
@@ -299,7 +303,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 						<View style={ styles.lineStyleAddHere }></View>
 					</View>
 				) }
-			</View>
+			</ReadableMarginsView>
 		);
 	}
 
