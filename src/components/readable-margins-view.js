@@ -5,7 +5,7 @@
 
 import * as React from 'react';
 import { View } from 'react-native';
-import styles from './readable-margins-view.scss'
+import styles from './readable-margins-view.scss';
 
 type PropsType = {
 	children?: React.Node,

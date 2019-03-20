@@ -188,14 +188,16 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderDefaultBlockAppender() {
 		return (
-			<DefaultBlockAppender
-				rootClientId={ this.props.rootClientId }
-				containerStyle={ [
-					blockHolderStyles.blockContainerFocused,
-					this.blockHolderBorderStyle(),
-					{ borderColor: 'transparent' },
-				] }
-			/>
+			<ReadableMarginsView>
+				<DefaultBlockAppender
+					rootClientId={ this.props.rootClientId }
+					containerStyle={ [
+						blockHolderStyles.blockContainerFocused,
+						this.blockHolderBorderStyle(),
+						{ borderColor: 'transparent' },
+					] }
+				/>
+			</ReadableMarginsView>
 		);
 	}
 
