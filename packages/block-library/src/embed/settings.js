@@ -67,6 +67,26 @@ const deprecated = [
 	},
 ];
 
+const getPreview = ( options, embedPreview, ownProps ) => {
+	if ( options.preview ) {
+		// We have a custom preview, so pass it the response from oembed and the attributes
+		// and use whatever it returns.
+		return options.preview( embedPreview, ownProps.attributes );
+	}
+
+	return embedPreview;
+};
+
+const getFetching = ( options, url, requestingEmbedPreview ) => {
+	if ( options.requesting ) {
+		// To support custom previews that use a rendering API endpoint, `options.requesting`
+		// should return if the API request is in progress.
+		return options.requesting( url );
+	}
+
+	return requestingEmbedPreview;
+};
+
 export function getEmbedBlockSettings( options ) {
 	const {
 		title,
@@ -106,21 +126,8 @@ export function getEmbedBlockSettings( options ) {
 				let fetching = false;
 
 				if ( undefined !== url ) {
-					if ( options.preview ) {
-						// We have a custom preview, so pass it the response from oembed and the attributes
-						// and use whatever it returns.
-						preview = options.preview( getEmbedPreview( url ), ownProps.attributes );
-					} else {
-						preview = getEmbedPreview( url );
-					}
-
-					if ( options.requesting ) {
-						// To support custom previews that use a rendering API endpoint, `options.requesting`
-						// should return if the API request is in progress.
-						fetching = options.requesting( url );
-					} else {
-						fetching = isRequestingEmbedPreview( url );
-					}
+					preview = getPreview( options, getEmbedPreview( url ), ownProps );
+					fetching = getFetching( options, url, isRequestingEmbedPreview( url ) );
 				}
 
 				const previewIsFallback = undefined !== url && isPreviewEmbedFallback( url );

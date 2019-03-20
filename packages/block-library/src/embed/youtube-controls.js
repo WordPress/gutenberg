@@ -15,8 +15,11 @@ export const YouTubeInspectorControls = class extends Component {
 	constructor() {
 		super( ...arguments );
 		const { extraOptions = {} } = this.props.attributes;
-		this.setAttributes = this.setAttributes.bind( this );
-		this.commitAttributes = debounce( this.props.setAttributes, 1000 );
+		this.setExtraOptions = this.setExtraOptions.bind( this );
+		this.commitExtraOptions = debounce( this.props.setAttributes, 1000 );
+		this.onChangeAutoplay = this.onChangeAutoplay.bind( this );
+		this.onChangeRelated = this.onChangeRelated.bind( this );
+		this.onChangeStart = this.onChangeStart.bind( this );
 		this.state = {
 			autoplay: extraOptions.autoplay || false,
 			start: extraOptions.start || 0,
@@ -24,23 +27,26 @@ export const YouTubeInspectorControls = class extends Component {
 		};
 	}
 
-	setAttributes( attributes ) {
+	setExtraOptions( attributes ) {
 		const { extraOptions = {} } = this.props.attributes;
 		this.setState( attributes );
-		this.commitAttributes( { extraOptions: { ...extraOptions, ...attributes } } );
+		this.commitExtraOptions( { extraOptions: { ...extraOptions, ...attributes } } );
+	}
+
+	onChangeAutoplay( value ) {
+		this.setExtraOptions( { autoplay: value } );
+	}
+
+	onChangeRelated( value ) {
+		this.setExtraOptions( { relatedOnlyFromChannel: value } );
+	}
+
+	onChangeStart( value ) {
+		this.setExtraOptions( { start: value } );
 	}
 
 	render() {
 		const { autoplay, start, relatedOnlyFromChannel } = this.state;
-		const onChangeAutoplay = ( value ) => {
-			this.setAttributes( { autoplay: value } );
-		};
-		const onChangeRelated = ( value ) => {
-			this.setAttributes( { relatedOnlyFromChannel: value } );
-		};
-		const onChangeStart = ( value ) => {
-			this.setAttributes( { start: value } );
-		};
 
 		return (
 			<InspectorControls>
@@ -48,17 +54,17 @@ export const YouTubeInspectorControls = class extends Component {
 					<ToggleControl
 						label={ __( 'Only show related videos from the same channel' ) }
 						checked={ relatedOnlyFromChannel }
-						onChange={ onChangeRelated }
+						onChange={ this.onChangeRelated }
 					/>
 					<ToggleControl
 						label={ __( 'Autoplay' ) }
 						checked={ autoplay }
-						onChange={ onChangeAutoplay }
+						onChange={ this.onChangeAutoplay }
 					/>
 					<TextControl
 						type="number"
 						value={ start }
-						onChange={ onChangeStart }
+						onChange={ this.onChangeStart }
 						label={ __( 'Start time (seconds)' ) }
 					/>
 				</PanelBody>
