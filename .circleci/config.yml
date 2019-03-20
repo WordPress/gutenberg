@@ -47,12 +47,11 @@ commands:
     - run:
         name: Bundle iOS
         command: |
-          mkdir -p android/app/src/main/assets
           react-native bundle --reset-cache --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios'
     - run:
         name: Generate .app file
         command:  |
-          react-native run-ios --configuration Release
+          react-native run-ios --configuration Debug
 
 jobs:
   checks:
