@@ -58,7 +58,9 @@ export { createRegistrySelector, createRegistryControl } from './factory';
 export { combineReducers };
 
 /**
- * Given the name of a registered store, returns an object of the store's selectors. The selector functions are been pre-bound to pass the current state automatically. As a consumer, you need only pass arguments of the selector, if applicable.
+ * Given the name of a registered store, returns an object of the store's selectors.
+ * The selector functions are been pre-bound to pass the current state automatically.
+ * As a consumer, you need only pass arguments of the selector, if applicable.
  *
  * @param {string} name Store name
  *
@@ -74,7 +76,8 @@ export { combineReducers };
 export const select = defaultRegistry.select;
 
 /**
- * Given the name of a registered store, returns an object of the store's action creators. Calling an action creator will cause it to be dispatched, updating the state value accordingly.
+ * Given the name of a registered store, returns an object of the store's action creators.
+ * Calling an action creator will cause it to be dispatched, updating the state value accordingly.
  *
  * @param {string} name Store name
  *
@@ -89,7 +92,9 @@ export const select = defaultRegistry.select;
 export const dispatch = defaultRegistry.dispatch;
 
 /**
- * Given a listener function, the function will be called any time the state value of one of the registered stores has changed. This function returns a `unsubscribe` function used to stop the subscription.
+ * Given a listener function, the function will be called any time the state value
+ * of one of the registered stores has changed. This function returns a `unsubscribe`
+ * function used to stop the subscription.
  *
  * @param {Function} listener Callback function.
  *
