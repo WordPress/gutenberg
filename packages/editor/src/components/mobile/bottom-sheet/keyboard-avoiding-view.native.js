@@ -20,16 +20,15 @@ import {
  * and a TextField on Autofocus (situation present on Links UI)
  */
 class KeyboardAvoidingView extends React.Component {
-	static defaultProps = {
-		enabled: true,
-		keyboardVerticalOffset: 0,
-	};
+	constructor() {
+		super( ...arguments );
 
-	_subscriptions = [];
-
-	state = {
-		bottom: 0,
-	};
+		this._onKeyboardChange = this._onKeyboardChange.bind( this );
+		this._subscriptions = [];
+		this.state = {
+			bottom: 0,
+		};
+	}
 
 	_relativeKeyboardHeight( keyboardFrame ) {
 		if ( ! keyboardFrame ) {
@@ -46,7 +45,7 @@ class KeyboardAvoidingView extends React.Component {
 	/**
 	 * @param {Object} event Keyboard event.
 	 */
-	_onKeyboardChange = ( event ) => {
+	_onKeyboardChange( event ) {
 		if ( event === null ) {
 			this.setState( { bottom: 0 } );
 			return;
@@ -69,7 +68,7 @@ class KeyboardAvoidingView extends React.Component {
 			} );
 		}
 		this.setState( { bottom: height } );
-	};
+	}
 
 	componentDidMount() {
 		if ( Platform.OS === 'ios' ) {
@@ -110,5 +109,10 @@ class KeyboardAvoidingView extends React.Component {
 		);
 	}
 }
+
+KeyboardAvoidingView.defaultProps = {
+	enabled: true,
+	keyboardVerticalOffset: 0,
+};
 
 export default KeyboardAvoidingView;

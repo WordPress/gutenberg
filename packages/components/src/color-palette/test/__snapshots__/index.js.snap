@@ -180,7 +180,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
   <div
     className="components-color-palette__custom-clear-wrapper"
   >
-    <Button
+    <ForwardRef(Button)
       className="components-color-palette__clear"
       isDefault={true}
       isSmall={true}
@@ -188,7 +188,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
       type="button"
     >
       Clear
-    </Button>
+    </ForwardRef(Button)>
   </div>
 </div>
 `;
@@ -272,7 +272,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
       renderContent={[Function]}
       renderToggle={[Function]}
     />
-    <Button
+    <ForwardRef(Button)
       className="components-color-palette__clear"
       isDefault={true}
       isSmall={true}
@@ -280,7 +280,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
       type="button"
     >
       Clear
-    </Button>
+    </ForwardRef(Button)>
   </div>
 </div>
 `;

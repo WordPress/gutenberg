@@ -25,8 +25,13 @@ module.exports = {
 			selectors: [ path.resolve( root, 'packages/blocks/src/store/selectors.js' ) ],
 			actions: [ path.resolve( root, 'packages/blocks/src/store/actions.js' ) ],
 		},
+		'core/block-editor': {
+			title: 'The Block Editor’s Data',
+			selectors: [ path.resolve( root, 'packages/block-editor/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/block-editor/src/store/actions.js' ) ],
+		},
 		'core/editor': {
-			title: 'The Editor’s Data',
+			title: 'The Post Editor’s Data',
 			selectors: [ path.resolve( root, 'packages/editor/src/store/selectors.js' ) ],
 			actions: [ path.resolve( root, 'packages/editor/src/store/actions.js' ) ],
 		},

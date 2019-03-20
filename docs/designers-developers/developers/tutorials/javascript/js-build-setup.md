@@ -127,7 +127,7 @@ module.exports = {
 
 Next, you need to install babel, the webpack loader, and the JSX plugin using:
 
-> npm install --save-dev --save-exact babel-loader @babel/core @babel/plugin-transform-react-jsx
+`npm install --save-dev --save-exact babel-loader @babel/core @babel/plugin-transform-react-jsx`
 
 You configure babel by creating a `.babelrc` file:
 

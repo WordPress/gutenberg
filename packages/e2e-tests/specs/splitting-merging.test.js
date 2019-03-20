@@ -4,6 +4,7 @@
 import {
 	createNewPost,
 	insertBlock,
+	isInDefaultBlock,
 	getEditedPostContent,
 	pressKeyTimes,
 	pressKeyWithModifier,
@@ -199,15 +200,6 @@ describe( 'splitting and merging blocks', () => {
 		expect( await getEditedPostContent() ).toBe( '' );
 
 		// And focus is retained:
-		const isInDefaultBlock = await page.evaluate( () => {
-			const activeBlockName = document.activeElement
-				.closest( '[data-type]' )
-				.getAttribute( 'data-type' );
-			const defaultBlockName = window.wp.blocks.getDefaultBlockName();
-
-			return activeBlockName === defaultBlockName;
-		} );
-
-		expect( isInDefaultBlock ).toBe( true );
+		expect( await isInDefaultBlock() ).toBe( true );
 	} );
 } );
