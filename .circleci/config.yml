@@ -51,7 +51,7 @@ commands:
     - run:
         name: Generate .app file
         command:  |
-          react-native run-ios --configuration Debug
+          react-native run-ios --configuration Release
 
 jobs:
   checks:
