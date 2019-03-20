@@ -1,4 +1,4 @@
-## 7.2.0 (Unreleased)
+## 7.2.0 (2019-03-20)
 
 ### Improvements
 
