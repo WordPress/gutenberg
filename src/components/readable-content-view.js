@@ -11,20 +11,14 @@ type PropsType = {
 	children?: React.Node,
 };
 
-type StateType = {
-
+const ReadableContentView = ( props: PropsType ) => {
+	return (
+		<View style={ styles.container } >
+			<View style={ styles.centeredContent } >
+				{ props.children }
+			</View>
+		</View>
+	);
 };
 
-export default class ReadableContentView extends React.Component<PropsType, StateType> {
-	render() {
-		const { children } = this.props;
-
-		return (
-			<View style={ styles.container } >
-				<View style={ styles.centeredContent } >
-					{ children }
-				</View>
-			</View>
-		);
-	}
-}
+export default ReadableContentView;
