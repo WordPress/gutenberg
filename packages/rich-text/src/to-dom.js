@@ -142,11 +142,11 @@ export function toDom( {
 		getText,
 		remove,
 		appendText,
-		onStartIndex( body, pointer ) {
-			startPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
+		onStartIndex( body, pointer, length ) {
+			startPath = createPathToNode( pointer, body, [ length ] );
 		},
-		onEndIndex( body, pointer ) {
-			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
+		onEndIndex( body, pointer, length ) {
+			endPath = createPathToNode( pointer, body, [ length ] );
 		},
 		isEditableTree,
 	} );

@@ -88,6 +88,26 @@ const padding = {
 	object: true,
 };
 
+function isFormatsEqual( a, b ) {
+	// Both are undefined, so equal.
+	if ( a === b ) {
+		return true;
+	}
+
+	// One is undefined, so not equal.
+	if ( ! a || ! b ) {
+		return false;
+	}
+
+	// Not of equal length, so not equal.
+	if ( a.length !== b.length ) {
+		return false;
+	}
+
+	// If every format is equal, formats is equal.
+	return a.every( ( format, index ) => format === b[ index ] );
+}
+
 export function toTree( {
 	value,
 	multilineTag,
@@ -112,6 +132,8 @@ export function toTree( {
 	let lastSeparatorFormats;
 	let lastCharacterFormats;
 	let lastCharacter;
+	let textStartIndex;
+	let textEndIndex;
 
 	// If we're building a multiline tree, start off with a multiline element.
 	if ( multilineTag ) {
@@ -168,11 +190,11 @@ export function toTree( {
 			}
 
 			if ( onStartIndex && start === i ) {
-				onStartIndex( tree, node );
+				onStartIndex( tree, node, 0 );
 			}
 
 			if ( onEndIndex && end === i ) {
-				onEndIndex( tree, node );
+				onEndIndex( tree, node, 0 );
 			}
 		}
 
@@ -225,11 +247,11 @@ export function toTree( {
 		// If there is selection at 0, handle it before characters are inserted.
 		if ( i === 0 ) {
 			if ( onStartIndex && start === 0 ) {
-				onStartIndex( tree, pointer );
+				onStartIndex( tree, pointer, 0 );
 			}
 
 			if ( onEndIndex && end === 0 ) {
-				onEndIndex( tree, pointer );
+				onEndIndex( tree, pointer, 0 );
 			}
 		}
 
@@ -250,18 +272,49 @@ export function toTree( {
 			} );
 			// Ensure pointer is text node.
 			pointer = append( getParent( pointer ), '' );
-		} else if ( ! isText( pointer ) ) {
-			pointer = append( getParent( pointer ), character );
 		} else {
-			appendText( pointer, character );
+			if ( ! isText( pointer ) ) {
+				pointer = append( getParent( pointer ), '' );
+			}
+
+			if ( textStartIndex === undefined ) {
+				textStartIndex = i;
+				textEndIndex = i;
+			} else {
+				textEndIndex = i;
+			}
 		}
 
 		if ( onStartIndex && start === i + 1 ) {
-			onStartIndex( tree, pointer );
+			const length =
+				pointer.nodeValue.length +
+				textEndIndex - textStartIndex + 1 || 0;
+			onStartIndex( tree, pointer, length );
 		}
 
 		if ( onEndIndex && end === i + 1 ) {
-			onEndIndex( tree, pointer );
+			const length =
+				pointer.nodeValue.length +
+				textEndIndex - textStartIndex + 1 || 0;
+			onEndIndex( tree, pointer, length );
+		}
+
+		const nextCharacter = text[ i + 1 ];
+
+		if (
+			nextCharacter === LINE_SEPARATOR ||
+			nextCharacter === OBJECT_REPLACEMENT_CHARACTER ||
+			nextCharacter === '\n' ||
+			! nextCharacter ||
+			! isFormatsEqual( characterFormats, formats[ i + 1 ] )
+		) {
+			appendText(
+				pointer,
+				text.slice( textStartIndex, textEndIndex + 1 )
+			);
+
+			textStartIndex = undefined;
+			textEndIndex = undefined;
 		}
 
 		if ( shouldInsertPadding && i === text.length ) {
