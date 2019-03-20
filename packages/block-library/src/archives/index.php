@@ -126,6 +126,7 @@ function register_block_core_archives() {
 			'attributes'      => array(
 				'align'             => array(
 					'type' => 'string',
+					'enum' => array( 'left', 'center', 'right' ),
 				),
 				'className'         => array(
 					'type' => 'string',
