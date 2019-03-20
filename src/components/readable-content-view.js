@@ -5,7 +5,7 @@
 
 import * as React from 'react';
 import { View } from 'react-native';
-import styles from './readable-margins-view.scss';
+import styles from './readable-content-view.scss';
 
 type PropsType = {
 	children?: React.Node,
@@ -15,7 +15,7 @@ type StateType = {
 
 };
 
-export default class ReadableMarginsView extends React.Component<PropsType, StateType> {
+export default class ReadableContentView extends React.Component<PropsType, StateType> {
 	render() {
 		const { children } = this.props;
 

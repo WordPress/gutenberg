@@ -24,7 +24,7 @@ import BlockToolbar from './block-toolbar';
 import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 import { KeyboardAwareFlatList, handleCaretVerticalPositionChange } from '../components/keyboard-aware-flat-list';
 import SafeArea from 'react-native-safe-area';
-import ReadableMarginsView from '../components/readable-margins-view';
+import ReadableContentView from '../components/readable-content-view';
 
 // Gutenberg imports
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -188,7 +188,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderDefaultBlockAppender() {
 		return (
-			<ReadableMarginsView>
+			<ReadableContentView>
 				<DefaultBlockAppender
 					rootClientId={ this.props.rootClientId }
 					containerStyle={ [
@@ -197,13 +197,13 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 						{ borderColor: 'transparent' },
 					] }
 				/>
-			</ReadableMarginsView>
+			</ReadableContentView>
 		);
 	}
 
 	renderHeader() {
 		return (
-			<ReadableMarginsView>
+			<ReadableContentView>
 				<PostTitle
 					innerRef={ ( ref ) => {
 						this.postTitleRef = ref;
@@ -214,7 +214,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					borderStyle={ this.blockHolderBorderStyle() }
 					focusedBorderColor={ styles.blockHolderFocused.borderColor }
 				/>
-			</ReadableMarginsView>
+			</ReadableContentView>
 		);
 	}
 
@@ -288,7 +288,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		const clientId = value.item;
 
 		return (
-			<ReadableMarginsView>
+			<ReadableContentView>
 				<BlockHolder
 					key={ clientId }
 					showTitle={ false }
@@ -305,7 +305,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 						<View style={ styles.lineStyleAddHere }></View>
 					</View>
 				) }
-			</ReadableMarginsView>
+			</ReadableContentView>
 		);
 	}
 
