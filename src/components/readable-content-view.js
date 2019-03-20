@@ -4,7 +4,7 @@
  */
 
 import * as React from 'react';
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 import styles from './readable-content-view.scss';
 
 type PropsType = {
@@ -21,4 +21,10 @@ const ReadableContentView = ( props: PropsType ) => {
 	);
 };
 
+const isContentMaxWidth = (): boolean => {
+	const { width } = Dimensions.get( 'window' );
+	return width > styles.centeredContent.maxWidth;
+}
+
+ReadableContentView.isContentMaxWidth = isContentMaxWidth;
 export default ReadableContentView;

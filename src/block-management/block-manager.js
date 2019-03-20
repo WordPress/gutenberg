@@ -78,7 +78,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		( this: any ).keyboardDidHide = this.keyboardDidHide.bind( this );
 		( this: any ).onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		( this: any ).scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
-		( this: any ).onContentViewLayout = this.onContentViewLayout.bind( this );
 
 		this.state = {
 			blockTypePickerVisible: false,
@@ -125,18 +124,21 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	onRootViewLayout( event: LayoutChangeEvent ) {
+		this.setHeightState( event );
+		this.setBorderStyleState();
+	}
+
+	setHeightState( event: LayoutChangeEvent ) {
 		const { height } = event.nativeEvent.layout;
 		this.setState( { rootViewHeight: height }, () => {
 			sendNativeEditorDidLayout();
 		} );
 	}
 
-	onContentViewLayout( event: LayoutChangeEvent ) {
-		const { width: fullWidth } = Dimensions.get( 'window' );
-		const { width } = event.nativeEvent.layout;
-		const isFullyBordered = fullWidth > width + 1; //+1 is for not letting fraction differences effect the result on Android
+	setBorderStyleState() {
+		const isFullyBordered = ReadableContentView.isContentMaxWidth();
 		if ( isFullyBordered !== this.state.isFullyBordered ) {
-			this.setState( { ...this.state, isFullyBordered } );
+			this.setState( { isFullyBordered } );
 		}
 	}
 
@@ -220,7 +222,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderList() {
 		return (
-			<View style={ { flex: 1 } } onLayout={ this.onContentViewLayout }>
+			<View style={ { flex: 1 } } >
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					innerRef={ this.scrollViewInnerRef }
