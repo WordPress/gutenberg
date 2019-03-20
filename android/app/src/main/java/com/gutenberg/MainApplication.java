@@ -4,6 +4,8 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.horcrux.svg.SvgPackage;
+
+import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -60,7 +62,22 @@ public class MainApplication extends Application implements ReactApplication {
                 public void editorDidMount(boolean hasUnsupportedBlocks) {}
 
                 @Override
-                public void nativeLoggingHook(String message, LogLevel logLevel) {}
+                public void nativeLoggingHook(String message, LogLevel logLevel) {
+                    switch (logLevel) {
+                        case TRACE:
+                            AppLog.d(AppLog.T.EDITOR, message);
+                            break;
+                        case INFO:
+                            AppLog.i(AppLog.T.EDITOR, message);
+                            break;
+                        case WARN:
+                            AppLog.w(AppLog.T.EDITOR, message);
+                            break;
+                        case ERROR:
+                            AppLog.e(AppLog.T.EDITOR, message);
+                            break;
+                    }
+                }
             })
       );
     }
