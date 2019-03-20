@@ -30,7 +30,7 @@ module.exports = {
 };
 ```
 
-_Note:_ `@wordpress/babel-plugin-import-jsx-pragma` is now included in `@wordpress/babel-preset-default` (default preset for WordPress development). If you are using it, you shouldn't need to include this plugin anymore in your Babel config. 
+_Note:_ `@wordpress/babel-plugin-import-jsx-pragma` is included in `@wordpress/babel-preset-default` (default preset for WordPress development) starting from `v4.0.0`. If you are using this preset, you shouldn't include this plugin in your Babel config. 
 
 ## Options
 
