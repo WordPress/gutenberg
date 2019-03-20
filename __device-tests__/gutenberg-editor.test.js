@@ -47,6 +47,9 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	afterAll( async () => {
+		if ( driver === undefined ) {
+			return process.exit( 1 );
+		}
 		if ( isLocalEnvironment() ) {
 			await driver.quit();
 			await appium.kill( 'SIGINT' );
