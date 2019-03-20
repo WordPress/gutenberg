@@ -119,10 +119,13 @@ jobs:
         command: |
           git submodule init
           git submodule update --recursive
+    - run: |
+        sudo chown -R $USER:$GROUP ~/.yarn
+        sudo chown -R $USER:$GROUP ~/.config
     - run:
         name: Yarn install
         command: |
-          sudo yarn install
+          yarn install
     - react-native-install
     - run:
         name: Set Environment Variables
@@ -133,10 +136,10 @@ jobs:
         name: Run metro
         background: true
         command: |
-          sudo yarn start
+          yarn start
     - run:
         name: Yarn ios
-        command: sudo yarn ios
+        command: yarn ios
     - build-ios
     - run:
         name: Zip up .app file
