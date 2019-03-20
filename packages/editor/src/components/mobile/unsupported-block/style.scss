@@ -8,11 +8,17 @@
 	padding-right: 8;
 }
 
+.unsupportedBlockIcon {
+	width: 20;
+	height: 20;
+	margin-bottom: 6px;
+}
+
 .unsupportedBlockMessage {
 	text-align: center;
 	color: #4f748e; // grey darken 20
 	padding-top: 24;
 	padding-bottom: 24;
-	font-size: 16px;
+	font-size: 14px;
 	font-family: $default-regular-font;
 }
