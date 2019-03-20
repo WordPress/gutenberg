@@ -1,4 +1,4 @@
-## 1.1.1 (Unreleased)
+## 1.2.0 (2019-03-20)
 
 - Add fix for WordPress wptexturize greater-than tokenize bug (see https://core.trac.wordpress.org/ticket/45387)
 
