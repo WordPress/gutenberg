@@ -9,9 +9,9 @@
             "controls": true,
             "loop": false,
             "muted": false,
-            "playsInline": false,
             "preload": "metadata",
-            "src": "https://awesome-fake.video/file.mp4"
+            "src": "https://awesome-fake.video/file.mp4",
+            "playsInline": false
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-video\"><video controls src=\"https://awesome-fake.video/file.mp4\"></video></figure>"

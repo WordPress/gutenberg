@@ -96,6 +96,9 @@ function register_block_core_rss() {
 	register_block_type( 'core/rss',
 		array(
 			'attributes'      => array(
+				'className'      => array(
+					'type' => 'string',
+				),
 				'columns'        => array(
 					'type'    => 'number',
 					'default' => 2,

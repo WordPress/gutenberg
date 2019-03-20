@@ -60,6 +60,9 @@ function register_block_core_search() {
 		'core/search',
 		array(
 			'attributes'      => array(
+				'className'   => array(
+					'type' => 'string',
+				),
 				'label'       => array(
 					'type'    => 'string',
 					'default' => __( 'Search' ),
@@ -73,7 +76,6 @@ function register_block_core_search() {
 					'default' => __( 'Search' ),
 				),
 			),
-
 			'render_callback' => 'render_block_core_search',
 		)
 	);

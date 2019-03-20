@@ -17,12 +17,6 @@ export const settings = {
 
 	description: __( 'Create content, and save it for you and other contributors to reuse across your site. Update the block, and the changes apply everywhere it’s used.' ),
 
-	attributes: {
-		ref: {
-			type: 'number',
-		},
-	},
-
 	supports: {
 		customClassName: false,
 		html: false,

@@ -58,6 +58,7 @@ function register_block_core_calendar() {
 			'attributes'      => array(
 				'align'     => array(
 					'type' => 'string',
+					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
 				),
 				'className' => array(
 					'type' => 'string',

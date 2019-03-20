@@ -48,19 +48,20 @@ function register_block_core_tag_cloud() {
 		'core/tag-cloud',
 		array(
 			'attributes'      => array(
-				'taxonomy'      => array(
-					'type'    => 'string',
-					'default' => 'post_tag',
+				'align'         => array(
+					'type' => 'string',
+					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
 				),
 				'className'     => array(
 					'type' => 'string',
 				),
+				'taxonomy'      => array(
+					'type'    => 'string',
+					'default' => 'post_tag',
+				),
 				'showTagCounts' => array(
 					'type'    => 'boolean',
 					'default' => false,
-				),
-				'align'         => array(
-					'type' => 'string',
 				),
 			),
 			'render_callback' => 'render_block_core_tag_cloud',
