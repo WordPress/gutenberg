@@ -101,7 +101,7 @@ export function isHorizontalEdge( container, isReverse ) {
 		return false;
 	}
 
-	const rangeRect = getRectangleFromRange( range.cloneRange() );
+	const rangeRect = getRectangleFromRange( range );
 
 	if ( ! rangeRect ) {
 		return false;
@@ -114,7 +114,7 @@ export function isHorizontalEdge( container, isReverse ) {
 	// half the line height to the selection rectangle to ensure that it is well
 	// over its line boundary.
 	const { lineHeight, paddingLeft } = window.getComputedStyle( container );
-	const buffer = parseInt( lineHeight, 10 ) / 2;
+	const buffer = 3 * parseInt( lineHeight, 10 ) / 4;
 	const padding = parseInt( paddingLeft, 10 );
 
 	if ( isReverse ) {
