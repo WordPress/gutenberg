@@ -505,7 +505,9 @@ export class RichText extends Component {
 
 		if ( element ) {
 			const computedStyle = getComputedStyle( element );
-			const newColor = computedStyle.color.replace( ')', ', 0.2)' );
+			const newColor = computedStyle.color
+				.replace( ')', ', 0.2)' )
+				.replace( 'rgb', 'rgba' );
 
 			globalStyle.innerHTML =
 				`${ boundarySelector }{background-color: ${ newColor }}`;
