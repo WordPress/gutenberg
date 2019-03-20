@@ -1,105 +1,48 @@
 $block-name: "section";
 
 /**
- * All Alignment Settings
+ * Section: All Alignment Settings
  */
 .wp-block[data-type="core/#{$block-name}"] {
+	padding-left: 42px;
+	padding-right: 42px;
 
-	// Child: Wide Alignment
-	.wp-block[data-align="wide"] {
-		@include break-small() {
-			padding-left: $block-padding*2;
-			padding-right: $block-padding*2;
-		}
-	}
-
-	// Child: Full Alignment
-	.editor-block-list__layout > .wp-block[data-align="full"] {
-		left: auto;
-		max-width: 100%;
-		margin-left: 0;
-		margin-right: 0;
-		padding-left: 0;
-		padding-right: 0;
-
-		.editor-block-list__block-edit {
-			margin-left: 0;
-			margin-right: 0;
-		}
+	// Full Width Blocks
+	.wp-block[data-align="full"] {
+		padding-left: 58px;
+		padding-right: 58px;
+		margin-left: auto;
+		margin-right: auto;
 	}
 }
 
-
 /**
- * Section Wide Alignment
- */
-.wp-block[data-type="core/#{$block-name}"][data-align="wide"] {
-
-	// Wide
-	.wp-block[data-align="wide"] {
-		padding-left: $block-padding*2 + 2px;
-		padding-right: $block-padding*2 + 2px;
-
-		@include break-medium() {
-			padding-left: $block-padding*2;
-			padding-right: $block-padding*2;
-		}
-	}
-}
-
-
-/**
- * Section Full Alignment
+ * Section: Full Width Alignment
  */
 .wp-block[data-type="core/#{$block-name}"][data-align="full"] {
 
-	.editor-inner-blocks {
-		padding-left: 46px;
-		padding-right: 46px;
+	// First tier of InnerBlocks must act like the container of the standard canvas
+	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks {
+		padding-left: 56px;
+		padding-right: 56px;
+		margin-left: auto;
+		margin-right: auto;
 	}
 
-	// Cancel edge padding when filling the viewport
-	.wp-block-#{$block-name} {
-		padding-left: 0;
-		padding-right: 0;
-	}
-
-	// Standard
-	.wp-block:not([data-align="wide"]):not([data-align="full"]) {
-		@include break-wide() {
-			padding-left: $block-padding*3;
-			padding-right: $block-padding*3;
-		}
-
-		@include break-xlarge() {
-			width: 100%;
-		}
-	}
-
-	// Wide
-	.wp-block[data-align="wide"] {
-		width: 100%;
-
-		@include break-small() {
-			padding-right: $block-padding*4 + 1px;
-			padding-left: $block-padding*4 + 1px;
-		}
-
-		@include break-huge() {
-			padding-right: $block-padding*3 + 1px;
-			padding-left: $block-padding*3 + 1px;
-		}
-
-	}
-
-	// Full
+	// Full Width Blocks
 	.wp-block[data-align="full"] {
+
+		// we "pull" full width blocks out a little further when within a full width section
 		padding-right: 0;
 		padding-left: 0;
-
-		width: calc(100% + 64px);
-		left: -32px;
+		width: calc(100% + 81px);
+		left: -41px;
 		max-width: none;
 
+		// Allow to abutt the edges of the canvas
+		> .editor-block-list__block-edit {
+			margin-left: 0;
+			margin-right: 0;
+		}
 	}
 }
