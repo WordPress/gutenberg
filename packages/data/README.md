@@ -250,7 +250,7 @@ Specific implementation differences from Redux and React Redux:
 
 ### combineReducers
 
-[src/index.js#L57-L57](src/index.js#L57-L57)
+[src/index.js#L58-L58](src/index.js#L58-L58)
 
 The combineReducers helper function turns an object whose values are different
 reducing functions into a single reducing function you can pass to registerReducer.
@@ -293,7 +293,7 @@ registerStore( 'my-shop', {
 
 ### createRegistry
 
-[src/index.js#L16-L16](src/index.js#L16-L16)
+[src/index.js#L17-L17](src/index.js#L17-L17)
 
 Creates a new store registry, given an optional object of initial store
 configurations.
@@ -308,7 +308,7 @@ configurations.
 
 ### createRegistryControl
 
-[src/index.js#L18-L18](src/index.js#L18-L18)
+[src/index.js#L19-L19](src/index.js#L19-L19)
 
 Mark a control as a registry control.
 
@@ -322,7 +322,7 @@ Mark a control as a registry control.
 
 ### createRegistrySelector
 
-[src/index.js#L18-L18](src/index.js#L18-L18)
+[src/index.js#L19-L19](src/index.js#L19-L19)
 
 Mark a selector as a registry selector.
 
@@ -336,9 +336,10 @@ Mark a selector as a registry selector.
 
 ### dispatch
 
-[src/index.js#L88-L88](src/index.js#L88-L88)
+[src/index.js#L92-L92](src/index.js#L92-L92)
 
-Given the name of a registered store, returns an object of the store's action creators. Calling an action creator will cause it to be dispatched, updating the state value accordingly.
+Given the name of a registered store, returns an object of the store's action creators.
+Calling an action creator will cause it to be dispatched, updating the state value accordingly.
 
 **Usage**
 
@@ -358,13 +359,13 @@ dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
 
 ### plugins
 
-[src/index.js#L17-L17](src/index.js#L17-L17)
+[src/index.js#L18-L18](src/index.js#L18-L18)
 
 Undocumented declaration.
 
 ### registerGenericStore
 
-[src/index.js#L116-L116](src/index.js#L116-L116)
+[src/index.js#L122-L122](src/index.js#L122-L122)
 
 Registers a generic store.
 
@@ -375,7 +376,7 @@ Registers a generic store.
 
 ### registerStore
 
-[src/index.js#L126-L126](src/index.js#L126-L126)
+[src/index.js#L132-L132](src/index.js#L132-L132)
 
 Registers a standard `@wordpress/data` store.
 
@@ -390,21 +391,23 @@ Registers a standard `@wordpress/data` store.
 
 ### RegistryConsumer
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L15-L15](src/index.js#L15-L15)
 
 Undocumented declaration.
 
 ### RegistryProvider
 
-[src/index.js#L14-L14](src/index.js#L14-L14)
+[src/index.js#L15-L15](src/index.js#L15-L15)
 
 Undocumented declaration.
 
 ### select
 
-[src/index.js#L73-L73](src/index.js#L73-L73)
+[src/index.js#L76-L76](src/index.js#L76-L76)
 
-Given the name of a registered store, returns an object of the store's selectors. The selector functions are been pre-bound to pass the current state automatically. As a consumer, you need only pass arguments of the selector, if applicable.
+Given the name of a registered store, returns an object of the store's selectors.
+The selector functions are been pre-bound to pass the current state automatically.
+As a consumer, you need only pass arguments of the selector, if applicable.
 
 **Usage**
 
@@ -424,9 +427,11 @@ select( 'my-shop' ).getPrice( 'hammer' );
 
 ### subscribe
 
-[src/index.js#L108-L108](src/index.js#L108-L108)
+[src/index.js#L114-L114](src/index.js#L114-L114)
 
-Given a listener function, the function will be called any time the state value of one of the registered stores has changed. This function returns a `unsubscribe` function used to stop the subscription.
+Given a listener function, the function will be called any time the state value
+of one of the registered stores has changed. This function returns a `unsubscribe`
+function used to stop the subscription.
 
 **Usage**
 
@@ -448,7 +453,7 @@ unsubscribe();
 
 ### use
 
-[src/index.js#L127-L127](src/index.js#L127-L127)
+[src/index.js#L133-L133](src/index.js#L133-L133)
 
 Undocumented declaration.
 
@@ -519,6 +524,21 @@ _Note:_ It is important that the `mapDispatchToProps` function always returns an
 **Returns**
 
 `Component`: Enhanced component with merged dispatcher props.
+
+### withRegistry
+
+[src/index.js#L14-L14](src/index.js#L14-L14)
+
+Higher-order component which renders the original component with the current
+registry context passed as its `registry` prop.
+
+**Parameters**
+
+-   **OriginalComponent** `WPComponent`: Original component.
+
+**Returns**
+
+`WPComponent`: Enhanced component.
 
 ### withSelect
 
