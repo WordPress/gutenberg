@@ -1,3 +1,5 @@
+// This is a wrapper of the actual visible handle (pseudo element). It is styled
+// to be much bigger than the visual part so it's easier to click and use.
 .components-resizable-box__handle {
 	display: none;
 	width: $resize-handler-container-size;
