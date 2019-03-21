@@ -11,18 +11,6 @@
 		"resizer resizer";
 }
 
-.wp-block-media-text.is-vertically-aligned-top {
-	align-items: start;
-}
-
-.wp-block-media-text.is-vertically-aligned-center {
-	align-items: center;
-}
-
-.wp-block-media-text.is-vertically-aligned-bottom {
-	align-items: end;
-}
-
 .wp-block-media-text .__resizable_base__ {
 	grid-area: resizer;
 }
