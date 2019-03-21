@@ -1,4 +1,4 @@
-## 2.0.0 (Next)
+## 2.0.0 (Unreleased)
 
 ### Breaking Changes
 
