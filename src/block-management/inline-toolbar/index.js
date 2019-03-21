@@ -1,12 +1,26 @@
 /** @flow
  * @format */
 
+/**
+ * External dependencies
+ */
 import React from 'react';
 import { View } from 'react-native';
-import InlineToolbarActions from './actions';
+
+/**
+ * WordPress dependencies
+ */
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import styles from './style.scss';
+import InlineToolbarActions from './actions';
+
+export { InlineToolbarActions };
 
 type PropsType = {
 	clientId: string,
@@ -14,10 +28,6 @@ type PropsType = {
 	canMoveDown: boolean,
 	onButtonPressed: ( button: number ) => void,
 };
-
-export { InlineToolbarActions };
-
-import styles from './style.scss';
 
 export default class InlineToolbar extends React.Component<PropsType> {
 	constructor() {

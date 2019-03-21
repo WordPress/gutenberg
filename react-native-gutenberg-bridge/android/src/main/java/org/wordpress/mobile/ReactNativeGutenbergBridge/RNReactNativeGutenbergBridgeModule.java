@@ -21,6 +21,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_UPDATE_TITLE = "setTitle";
     private static final String EVENT_NAME_FOCUS_TITLE = "setFocusOnTitle";
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
+    private static final String EVENT_NAME_MEDIA_APPEND = "mediaAppend";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
@@ -79,6 +80,12 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         emitToJS(EVENT_NAME_FOCUS_TITLE, writableMap);
     }
 
+    public void appendNewImageBlock(int mediaId, String mediaUri) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUri);
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
+        emitToJS(EVENT_NAME_MEDIA_APPEND, writableMap);
+    }
 
     @ReactMethod
     public void provideToNative_Html(String html, String title, boolean changed) {

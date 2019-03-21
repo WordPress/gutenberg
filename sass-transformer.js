@@ -116,7 +116,7 @@ function transform( src, filename, options ) {
 		const result = sass.renderSync( {
 			data: src,
 			includePaths: [ path.dirname( filename ), ...autoImportIncludePaths ],
-			importer: function( url /*, prev, done */ ) {
+			importer( url /*, prev, done */ ) {
 				// url is the path in import as is, which LibSass encountered.
 				// prev is the previously resolved path.
 				// done is an optional callback, either consume it or return value synchronously.
