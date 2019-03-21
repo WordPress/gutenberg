@@ -6,13 +6,13 @@ commands:
       - restore_cache:
           name: Restore Yarn Cache
           keys:
-            - yarn-{{ arch }}-{{ checksum "yarn.lock" }}
+            - yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
-          command: yarn install --frozen-lockfile
+          command: YARN_CACHE_FOLDER=~/.cache/yarn yarn install --frozen-lockfile
       - save_cache:
           name: Save Yarn Cache
-          key: yarn-{{ arch }}-{{ checksum "yarn.lock" }}
+          key: yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
   react-native-install:
@@ -49,10 +49,9 @@ commands:
         command: |
           react-native bundle --reset-cache --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios'
     - run:
-        name: Build .app file
+        name: Generate .app file
         command:  |
-          cd ios
-          xcodebuild -project gutenberg.xcodeproj -configuration Release -scheme gutenberg -derivedDataPath build -sdk iphonesimulator build
+          react-native run-ios --configuration Release
 
 jobs:
   checks:
