@@ -6,13 +6,13 @@ commands:
       - restore_cache:
           name: Restore Yarn Cache
           keys:
-            - yarn-{{ checksum "yarn.lock" }}
+            - yarn-{{ arch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
           command: yarn install --frozen-lockfile
       - save_cache:
           name: Save Yarn Cache
-          key: yarn-{{ checksum "yarn.lock" }}
+          key: yarn-{{ arch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
   react-native-install:
@@ -119,10 +119,7 @@ jobs:
         command: |
           git submodule init
           git submodule update --recursive
-    - run:
-        name: Yarn install
-        command: |
-          yarn install
+    - yarn-install
     - react-native-install
     - run: |
         sudo chown -R $USER:$GROUP ~/.config
