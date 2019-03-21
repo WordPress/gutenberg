@@ -3,8 +3,15 @@
  * @flow
  */
 
+ /**
+ * External dependencies
+ */
 import * as React from 'react';
 import { View, Dimensions } from 'react-native';
+
+/**
+ * Internal dependencies
+ */
 import styles from './readable-content-view.scss';
 
 type PropsType = {
