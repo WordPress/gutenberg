@@ -127,9 +127,14 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
-	// If we detect block delimiters, parse entirely as blocks.
-	if ( mode !== 'INLINE' && HTML.indexOf( '<!-- wp:' ) !== -1 ) {
-		return parseWithGrammar( HTML );
+	// If we detect block delimiters in HTML, parse entirely as blocks.
+	if ( mode !== 'INLINE' ) {
+		// Check plain text if there is no HTML.
+		const content = HTML ? HTML : plainText;
+
+		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
+			return parseWithGrammar( content );
+		}
 	}
 
 	// Normalize unicode to use composed characters.
