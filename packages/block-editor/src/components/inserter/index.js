@@ -92,6 +92,7 @@ class Inserter extends Component {
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile
+				headerTitle={ __( 'Add a block' ) }
 				renderToggle={ this.renderToggle }
 				renderContent={ this.renderContent }
 			/>
