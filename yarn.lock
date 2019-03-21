@@ -7782,9 +7782,9 @@ react-native-iphone-x-helper@^1.0.3:
   resolved "https://registry.yarnpkg.com/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.2.0.tgz#9f8a376eb00bc712115abff4420318a0063fa796"
   integrity sha512-xIeTo4s77wwKgBZLVRIZC9tM9/PkXS46Ul76NXmvmixEb3ZwqGdQesR3zRiLMOoIdfOURB6N9bba9po7+x9Bag==
 
-"react-native-keyboard-aware-scroll-view@git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.6":
-  version "0.8.6"
-  resolved "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#f8fa3a3372ae46fe798bb6c843a5475b8f080673"
+"react-native-keyboard-aware-scroll-view@git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.7":
+  version "0.8.7"
+  resolved "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#ab9d6b88ff6366e49b8a6f97a7dcb114f7d0bbae"
   dependencies:
     prop-types "^15.6.2"
     react-native-iphone-x-helper "^1.0.3"

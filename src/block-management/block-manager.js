@@ -19,7 +19,7 @@ import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { PostTitle } from '@wordpress/editor';
 import { DefaultBlockAppender } from '@wordpress/block-editor';
-import { sendNativeEditorDidLayout, subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
+import { sendNativeEditorDidLayout, subscribeSetFocusOnTitle, subscribeMediaAppend } from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
@@ -65,6 +65,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	scrollViewRef: Object;
 	postTitleRef: ?Object;
 	subscriptionParentSetFocusOnTitle: ?Object;
+	subscriptionParentMediaAppend: ?Object;
 	_isMounted: boolean;
 
 	constructor( props: PropsType ) {
@@ -105,6 +106,10 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue );
 
+		this.finishBlockAppendingOrReplacing( newBlock );
+	}
+
+	finishBlockAppendingOrReplacing( newBlock: Object ) {
 		// now determine whether we need to replace the currently selected block (if it's empty)
 		// or just add a new block as usual
 		if ( this.isReplaceable( this.props.selectedBlock ) ) {
@@ -157,6 +162,18 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 				this.postTitleRef.focus();
 			}
 		} );
+
+		this.subscriptionParentMediaAppend = subscribeMediaAppend( ( payload ) => {
+			// create an empty image block
+			const newImageBlock = createBlock( 'core/image' );
+
+			// now set the url and id
+			newImageBlock.attributes.url = payload.mediaUrl;
+			newImageBlock.attributes.id = payload.mediaId;
+
+			// finally append or replace as appropriate
+			this.finishBlockAppendingOrReplacing( newImageBlock );
+		} );
 	}
 
 	componentWillUnmount() {
@@ -165,6 +182,9 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 		if ( this.subscriptionParentSetFocusOnTitle ) {
 			this.subscriptionParentSetFocusOnTitle.remove();
+		}
+		if ( this.subscriptionParentMediaAppend ) {
+			this.subscriptionParentMediaAppend.remove();
 		}
 		this._isMounted = false;
 	}
