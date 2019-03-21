@@ -8,7 +8,7 @@ $block-name: "section";
 	padding-right: 42px;
 
 	// Full Width Blocks
-	.wp-block[data-align="full"] {
+	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		padding-left: 58px;
 		padding-right: 58px;
 		margin-left: auto;
@@ -30,7 +30,7 @@ $block-name: "section";
 	}
 
 	// Full Width Blocks
-	.wp-block[data-align="full"] {
+	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 
 		// we "pull" full width blocks out a little further when within a full width section
 		padding-right: 0;
