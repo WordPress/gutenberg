@@ -14,5 +14,4 @@ import './hooks';
 import { SETTINGS_DEFAULTS } from './store/defaults';
 
 export * from './components';
-
 export { SETTINGS_DEFAULTS };

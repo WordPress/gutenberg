@@ -359,7 +359,7 @@ Undocumented declaration.
 
 ### SETTINGS_DEFAULTS
 
-[src/index.js#L18-L18](src/index.js#L18-L18)
+[src/index.js#L17-L17](src/index.js#L17-L17)
 
 The default editor settings
 
