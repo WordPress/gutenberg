@@ -1,11 +1,19 @@
-// External dependencies
+/**
+ * External dependencies
+ */
 import { AppRegistry, I18nManager, YellowBox } from 'react-native';
 import React from 'react';
 
-// Setting up environment
+/**
+ * WordPress dependencies
+ */
+import { setLocaleData } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
 import './globals';
 import { getTranslation } from '../i18n-cache';
-import { setLocaleData } from '@wordpress/i18n';
 
 const gutenbergSetup = () => {
 	const apiFetch = require( '@wordpress/api-fetch' ).default;
@@ -17,7 +25,7 @@ const gutenbergSetup = () => {
 	// wp-data
 	const userId = 1;
 	const storageKey = 'WP_DATA_USER_' + userId;
-	wpData.use( wpData.plugins.persistence, { storageKey: storageKey } );
+	wpData.use( wpData.plugins.persistence, { storageKey } );
 	wpData.use( wpData.plugins.controls );
 };
 

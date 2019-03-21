@@ -2,9 +2,17 @@
 * @format
 * @flow
 */
+
+/**
+ * External dependencies
+ */
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import React from 'react';
 import { FlatList } from 'react-native';
+
+/**
+ * Internal dependencies
+ */
 import styles from '../block-management/block-holder.scss';
 
 type PropsType = {
