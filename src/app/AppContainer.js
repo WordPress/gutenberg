@@ -15,7 +15,7 @@ import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
-import { UnsupportedBlock } from '@wordpress/editor';
+import { UnsupportedBlock } from '@wordpress/block-library';
 
 import type { BlockType } from '../store/types';
 
