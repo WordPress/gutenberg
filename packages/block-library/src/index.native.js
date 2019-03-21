@@ -4,6 +4,7 @@
 import {
 	registerBlockType,
 	setDefaultBlockName,
+	setUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
 
 /**
@@ -48,9 +49,6 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
-
-import * as UnsupportedBlock from './mobile/unsupported-block';
-export { UnsupportedBlock };
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -108,6 +106,7 @@ export const registerCoreBlocks = () => {
 		paragraph,
 		heading,
 		code,
+		missing,
 		more,
 		image,
 		nextpage,
@@ -117,3 +116,4 @@ export const registerCoreBlocks = () => {
 };
 
 setDefaultBlockName( paragraph.name );
+setUnregisteredTypeHandlerName( missing.name );

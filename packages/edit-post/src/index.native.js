@@ -3,8 +3,8 @@
  */
 import '@wordpress/core-data';
 import '@wordpress/notices';
-import { registerCoreBlocks, UnsupportedBlock } from '@wordpress/block-library';
-import { registerBlockType, setUnregisteredTypeHandlerName, unregisterBlockType } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
+import { unregisterBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -17,8 +17,6 @@ import './store';
 export function initializeEditor() {
 	// register and setup blocks
 	registerCoreBlocks();
-	registerBlockType( UnsupportedBlock.name, UnsupportedBlock.settings );
-	setUnregisteredTypeHandlerName( UnsupportedBlock.name );
 
 	// disable Code and More blocks for the release
 	// eslint-disable-next-line no-undef
