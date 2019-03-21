@@ -85,7 +85,7 @@ const setupDriver = async () => {
 	}
 
 	await driver.init( desiredCaps );
-	await timer( 15000 );
+	await timer( 20000 );
 	await driver.sleep( 10000 ); // wait for app to load
 	const status = await driver.status();
 	// Display the driver status
