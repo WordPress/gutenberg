@@ -128,9 +128,18 @@ jobs:
         command: |
           echo 'export TEST_RN_PLATFORM=ios' >> $BASH_ENV
           echo 'export TEST_ENV=sauce' >> $BASH_ENV
+    - restore_cache:
+        name: Restore Carthage Cache
+        keys:
+          - carthage-{{ checksum "react-native-aztec/ios/Cartfile" }}
     - run:
         name: Yarn preios
         command: yarn preios
+    - save_cache:
+        name: Save Carthage Cache
+        key: carthage-{{ checksum "react-native-aztec/ios/Cartfile" }}
+        paths:
+            - react-native-aztec/ios/Carthage
     - build-ios
     - run:
         name: Zip up .app file
