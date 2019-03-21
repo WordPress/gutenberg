@@ -132,8 +132,8 @@ jobs:
           echo 'export TEST_RN_PLATFORM=ios' >> $BASH_ENV
           echo 'export TEST_ENV=sauce' >> $BASH_ENV
     - run:
-        name: Yarn ios
-        command: yarn ios
+        name: Yarn preios
+        command: yarn preios
     - build-ios
     - run:
         name: Zip up .app file
