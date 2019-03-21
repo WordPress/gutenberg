@@ -65,7 +65,7 @@ E.g. displayShortcut.primary( 'm' ) will return '⌘M' on Mac.
 
 _Type_
 
-`Object` Keyed map of functions to display shortcuts.
+-   `Object` Keyed map of functions to display shortcuts.
 
 <a name="displayShortcutList" href="#displayShortcutList">#</a> **displayShortcutList** [\<>](src/index.js#L135-L158)
 
@@ -74,7 +74,7 @@ E.g displayShortcutList.primary( 'm' ) will return [ '⌘', 'M' ] on Mac.
 
 _Type_
 
-`Object` keyed map of functions to shortcut sequences
+-   `Object` keyed map of functions to shortcut sequences
 
 <a name="DOWN" href="#DOWN">#</a> **DOWN** [\<>](src/index.js#L62-L62)
 
@@ -101,7 +101,7 @@ signals pressing ⌘M.
 
 _Type_
 
-`Object` Keyed map of functions to match events.
+-   `Object` Keyed map of functions to match events.
 
 <a name="LEFT" href="#LEFT">#</a> **LEFT** [\<>](src/index.js#L50-L50)
 
@@ -131,7 +131,7 @@ These are intended for user with the KeyboardShortcuts component or TinyMCE.
 
 _Type_
 
-`Object` Keyed map of functions to raw shortcuts.
+-   `Object` Keyed map of functions to raw shortcuts.
 
 <a name="RIGHT" href="#RIGHT">#</a> **RIGHT** [\<>](src/index.js#L58-L58)
 
