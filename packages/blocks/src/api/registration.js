@@ -58,6 +58,15 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
 }
 
 /**
+ * Sets the block's metadata.
+ *
+ * @param {Object} definitions Server-side block definitions
+ */
+export function unstable__setBlockMetadata( { name, ...settings } ) { // eslint-disable-line camelcase
+	serverSideBlockDefinitions[ name ] = settings;
+}
+
+/**
  * Registers a new block provided a unique name and an object defining its
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
