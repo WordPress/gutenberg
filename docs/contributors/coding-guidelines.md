@@ -86,21 +86,31 @@ Example:
 import VisualEditor from '../visual-editor';
 ```
 
-### Experimental APIs
+### Experimental and Unstable APIs
 
-Exposed APIs that are still being tested, discussed and are subject to change should be prefixed with `__experimental`, until they are finalized. This is meant to discourage developers from relying on the API, because it might be removed or changed in the (near) future.
+Experimental and unstable APIs are temporary values exported from a module whose existence is either pending future revision or provides an immediate means to an end.
 
-Example:
+_To External Consumers:_
+
+**There is no support commitment for experimental and unstable APIs.** They can and will be removed or changed without advance warning, including as part of a minor or patch release. As an external consumer, you should avoid these APIs.
+
+_To Project Contributors:_
+
+An experimental or unstable API is named as such to communicate instability of a function whose interface is not yet finalized. Aside from references within the code, these APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
+
+An experimental or unstable function or object should be prefixed respectively using `__experimental` or `__unstable`.
 
 ```js
-export { __experimentalDoAction } from './api';
+export { __experimentalDoExcitingExperimentalAction } from './api';
+export { __unstableDoTerribleAwfulAction } from './api';
 ```
 
-If an API must be exposed but is clearly not intended to be supported into the future, you may also use `__unstable` as a prefix to differentiate it from an experimental API. Unstable APIs should serve an immediate and temporary purpose. They should _never_ be used by plugin developers as they can be removed at any point without notice, and thus should be omitted from public-facing documentation. The inline code documentation should clearly caution their use.
+- An **experimental API** is one which is planned for eventual public availability, but is subject to further experimentation, testing, and discussion.
+- An **unstable API** is one which serves as a means to an end. It is not desired to ever be converted into a public API.
 
-```js
-export { __unstableDoAction } from './api';
-```
+In both cases, the API should be made stable or removed at the earliest opportunity.
+
+While an experimental API may often stabilize into a publicly-available API, there is no guarantee that it will. The conversion to a stable API will inherently be considered a breaking change by the mere fact that the function name must be changed to remove the `__experimental` prefix.
 
 ### Objects
 
