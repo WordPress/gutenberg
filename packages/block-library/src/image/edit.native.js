@@ -36,7 +36,6 @@ import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 
-
 /**
  * Internal dependencies
  */
@@ -91,7 +90,7 @@ class ImageEdit extends React.Component {
 	componentWillUnmount() {
 		// this action will only exist if the user pressed the trash button on the block holder
 		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
-			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id )
+			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
 		}
 		this.removeMediaUploadListener();
 	}
