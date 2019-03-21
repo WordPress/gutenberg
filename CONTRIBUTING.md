@@ -108,6 +108,12 @@ You can pick among all the <a href="https://github.com/WordPress/gutenberg/issue
 
 The workflow is documented in greater detail in the [repository management](/docs/contributors/repository-management.md) document.
 
+## Playground
+
+The Gutenberg repository also includes a static Gutenberg playground that allows testing and developping in a WordPress-agnostic context. This is very helpful for developping reusable components and trying generic JavaScript modules without any backend dependency.
+
+You can launch the playground by running `npm run playground:start` locally. The playground should be available on [http://localhost:1234](http://localhost:1234).
+
 ## Testing
 
 Gutenberg contains both PHP and JavaScript code and encourages testing and code style linting for both. It also incorporates end-to-end testing using [Google Puppeteer](https://developers.google.com/web/tools/puppeteer/). You can find out more details in [Testing Overview document](/docs/contributors/testing-overview.md).
