@@ -38,7 +38,7 @@ export class BlockToolbar extends Component<PropsType> {
 		} = this.props;
 
 		return (
-			<View style={ styles.container } accessible={ false } accessibilityLabel="View Add block">
+			<View style={ styles.container } accessible={ false } accessibilityLabel="View Add block" >
 				<ScrollView
 					accessible={ false }
 					accessibilityLabel="Scrollview Add block"
