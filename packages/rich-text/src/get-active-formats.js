@@ -5,19 +5,26 @@
  *
  * @return {?Object} Active format objects.
  */
-export function getActiveFormats( { formats, start, selectedFormat } ) {
+export function getActiveFormats( { formats, start, end, activeFormats } ) {
 	if ( start === undefined ) {
 		return [];
 	}
 
-	const formatsBefore = formats[ start - 1 ] || [];
-	const formatsAfter = formats[ start ] || [];
+	if ( start === end ) {
+		// For a collapsed caret, it is possible to override the active formats.
+		if ( activeFormats ) {
+			return activeFormats;
+		}
 
-	let source = formatsAfter;
+		const formatsBefore = formats[ start - 1 ] || [];
+		const formatsAfter = formats[ start ] || [];
 
-	if ( formatsBefore.length > formatsAfter.length ) {
-		source = formatsBefore;
+		if ( formatsBefore.length < formatsAfter.length ) {
+			return formatsBefore;
+		}
+
+		return formatsAfter;
 	}
 
-	return source.slice( 0, selectedFormat );
+	return formats[ start ] || [];
 }
