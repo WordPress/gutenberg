@@ -134,10 +134,14 @@ jobs:
     - run:
         name: Yarn ios
         command: yarn ios
+    - build-ios
     - run:
         name: Zip up .app file
         command: |
-          zip ./Gutenberg.app.zip ./ios/build/Build/Products/Debug-iphonesimulator/gutenberg.app
+          cd ./ios/build/Build/Products/Release-iphonesimulator/
+          zip ./Gutenberg.app.zip ./gutenberg.app
+          mv ./Gutenberg.app.zip ../../../../../Gutenberg.app.zip
+          cd ../../../../../
     - run:
         name: Upload apk to sauce labs
         command: |
