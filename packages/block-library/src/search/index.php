@@ -60,6 +60,10 @@ function register_block_core_search() {
 		'core/search',
 		array(
 			'attributes'      => array(
+				'align'       => array(
+					'type' => 'string',
+					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
+				),
 				'className'   => array(
 					'type' => 'string',
 				),

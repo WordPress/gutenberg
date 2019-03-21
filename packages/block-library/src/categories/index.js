@@ -21,7 +21,7 @@ export const settings = {
 	category: 'widgets',
 
 	supports: {
-		align: [ 'left', 'center', 'right' ],
+		align: true,
 		html: false,
 	},
 
