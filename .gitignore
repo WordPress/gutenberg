@@ -23,6 +23,7 @@ yarn-error.log*
 *.apk
 *.ap_
 .gradle/
+android/app/src/main/assets/
 
 # files for the dex VM
 *.dex
