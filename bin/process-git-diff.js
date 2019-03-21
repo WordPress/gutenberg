@@ -24,9 +24,6 @@
 // +                       "dev": true,
 // +                       "optional": true
 
-// eslint-disable-next-line no-console
-console.log( 'receiving arguments:', process.argv[ 2 ] );
-
 const hasNonOptionalDiff = !! ( process.argv[ 2 ] || '' )
 	// Strip individual diffs of optional-only.
 	.replace( /@@ .+ @@\n(-.+\n\+.+,\n)?\+.+\"optional\": true,?\n/gm, '' )
