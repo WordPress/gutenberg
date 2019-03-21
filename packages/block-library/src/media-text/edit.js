@@ -179,7 +179,7 @@ class MediaTextEdit extends Component {
 					} ) }
 				/>
 				{ mediaType === 'image' && ( <ToggleControl
-					label={ __( 'Let image fill the entire column' ) }
+					label={ __( 'Crop image to fill entire column' ) }
 					checked={ imageFill }
 					onChange={ () => setAttributes( {
 						imageFill: ! imageFill,
