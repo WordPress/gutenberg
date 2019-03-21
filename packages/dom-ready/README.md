@@ -32,7 +32,7 @@ domReady( function() {
 
 _Parameters_
 
--   `Function`: A function to execute after the DOM is ready.
+-   _callback_ `Function`: A function to execute after the DOM is ready.
 
 _Returns_
 

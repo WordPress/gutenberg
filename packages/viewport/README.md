@@ -70,7 +70,7 @@ MyMobileComponent = ifViewportMatches( '< small' )( MyMobileComponent );
 
 _Parameters_
 
--   `string`: Viewport query.
+-   _query_ `string`: Viewport query.
 
 _Returns_
 
@@ -100,7 +100,7 @@ MyComponent = withViewportMatch( { isMobile: '< small' } )( MyComponent );
 
 _Parameters_
 
--   `Object`: Object of prop name to viewport query.
+-   _queries_ `Object`: Object of prop name to viewport query.
 
 _Returns_
 

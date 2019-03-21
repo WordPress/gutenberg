@@ -22,7 +22,7 @@ Returns a registered plugin settings.
 
 _Parameters_
 
--   `string`: Plugin name.
+-   _name_ `string`: Plugin name.
 
 _Returns_
 
@@ -144,10 +144,10 @@ registerPlugin( 'plugin-name', {
 
 _Parameters_
 
--   `string`: A string identifying the plugin. Must be unique across all registered plugins.
--   `Object`: The settings for this plugin.
--   `(string|WPElement|Function)`: An icon to be shown in the UI. It can be a slug of the Dashicon, or an element (or function returning an element) if you choose to render your own SVG.
--   `Function`: A component containing the UI elements to be rendered.
+-   _name_ `string`: A string identifying the plugin. Must be unique across all registered plugins.
+-   _settings_ `Object`: The settings for this plugin.
+-   _settings.icon_ `(string|WPElement|Function)`: An icon to be shown in the UI. It can be a slug of the Dashicon, or an element (or function returning an element) if you choose to render your own SVG.
+-   _settings.render_ `Function`: A component containing the UI elements to be rendered.
 
 _Returns_
 
@@ -175,7 +175,7 @@ unregisterPlugin( 'plugin-name' );
 
 _Parameters_
 
--   `string`: Plugin name.
+-   _name_ `string`: Plugin name.
 
 _Returns_
 
@@ -188,7 +188,7 @@ wrapped component.
 
 _Parameters_
 
--   `Function`: Function called on every context change, expected to return object of props to merge with the component's own props.
+-   _mapContextToProps_ `Function`: Function called on every context change, expected to return object of props to merge with the component's own props.
 
 _Returns_
 

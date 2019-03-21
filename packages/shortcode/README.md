@@ -32,7 +32,7 @@ or `name=value`. Numeric attributes can be formatted as `"value"` or just
 
 _Parameters_
 
--   `string`: Serialised shortcode attributes.
+-   _text_ `string`: Serialised shortcode attributes.
 
 _Returns_
 
@@ -49,7 +49,7 @@ the `type` of the shortcode ('single', 'self-closing', or 'closed'), and a
 
 _Parameters_
 
--   `Object`: Options as described.
+-   _options_ `Object`: Options as described.
 
 _Returns_
 
@@ -65,7 +65,7 @@ passed to `regexp.replace()`.
 
 _Parameters_
 
--   `Array`: Match array.
+-   _match_ `Array`: Match array.
 
 _Returns_
 
@@ -77,9 +77,9 @@ Find the next matching shortcode.
 
 _Parameters_
 
--   `string`: Shortcode tag.
--   `string`: Text to search.
--   `number`: Index to start search from.
+-   _tag_ `string`: Shortcode tag.
+-   _text_ `string`: Text to search.
+-   _index_ `number`: Index to start search from.
 
 _Returns_
 
@@ -104,7 +104,7 @@ Capture groups:
 
 _Parameters_
 
--   `string`: Shortcode tag.
+-   _tag_ `string`: Shortcode tag.
 
 _Returns_
 
@@ -116,9 +116,9 @@ Replace matching shortcodes in a block of text.
 
 _Parameters_
 
--   `string`: Shortcode tag.
--   `string`: Text to search.
--   `Function`: Function to process the match and return replacement string.
+-   _tag_ `string`: Shortcode tag.
+-   _text_ `string`: Text to search.
+-   _callback_ `Function`: Function to process the match and return replacement string.
 
 _Returns_
 
@@ -136,7 +136,7 @@ format the shortcode using a `single` tag, and a `content` string.
 
 _Parameters_
 
--   `Object`: 
+-   _options_ `Object`: 
 
 _Returns_
 

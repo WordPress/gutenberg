@@ -53,13 +53,13 @@ deprecated( 'Eating meat', {
 
 _Parameters_
 
--   `string`: Name of the deprecated feature.
--   `?Object`: Personalisation options
--   `?string`: Version in which the feature will be removed.
--   `?string`: Feature to use instead
--   `?string`: Plugin name if it's a plugin feature
--   `?string`: Link to documentation
--   `?string`: Additional message to help transition away from the deprecated feature.
+-   _feature_ `string`: Name of the deprecated feature.
+-   _options_ `?Object`: Personalisation options
+-   _options.version_ `?string`: Version in which the feature will be removed.
+-   _options.alternative_ `?string`: Feature to use instead
+-   _options.plugin_ `?string`: Plugin name if it's a plugin feature
+-   _options.link_ `?string`: Link to documentation
+-   _options.hint_ `?string`: Additional message to help transition away from the deprecated feature.
 
 <a name="logged" href="#logged">#</a> **logged** [\<>](src/index.js#L12-L12)
 

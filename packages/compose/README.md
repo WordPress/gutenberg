@@ -72,7 +72,7 @@ composition, where each successive invocation is supplied the return value of th
 
 _Parameters_
 
--   `...Function`: The HOC functions to invoke.
+-   _hocs_ `...Function`: The HOC functions to invoke.
 
 _Returns_
 
@@ -85,8 +85,8 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   `Function`: Function mapping component to enhanced component.
--   `string`: Seed name from which to generated display name.
+-   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
+-   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
@@ -99,7 +99,7 @@ the given condition is satisfied or with the given optional prop name.
 
 _Parameters_
 
--   `Function`: Function to test condition.
+-   _predicate_ `Function`: Function to test condition.
 
 _Returns_
 
@@ -112,8 +112,8 @@ only rerendering when its props/state change
 
 _Parameters_
 
--   `Function`: Function mapping component to enhanced component.
--   `string`: Seed name from which to generated display name.
+-   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
+-   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
@@ -130,7 +130,7 @@ component.
 
 _Parameters_
 
--   `WPElement`: The wrapped component.
+-   _WrappedComponent_ `WPElement`: The wrapped component.
 
 _Returns_
 
@@ -143,7 +143,7 @@ that ought to be bound to a component's lifecycle.
 
 _Parameters_
 
--   `Component`: Component requiring setTimeout
+-   _OriginalComponent_ `Component`: Component requiring setTimeout
 
 _Returns_
 
@@ -156,7 +156,7 @@ via props.
 
 _Parameters_
 
--   `?Object`: Optional initial state of the component.
+-   _initialState_ `?Object`: Optional initial state of the component.
 
 _Returns_
 

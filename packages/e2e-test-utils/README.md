@@ -20,7 +20,7 @@ Activates an installed plugin.
 
 _Parameters_
 
--   `string`: Plugin slug.
+-   _slug_ `string`: Plugin slug.
 
 <a name="arePrePublishChecksEnabled" href="#arePrePublishChecksEnabled">#</a> **arePrePublishChecksEnabled** [\<>](src/index.js#L2-L2)
 
@@ -44,7 +44,7 @@ Clicks a block toolbar button.
 
 _Parameters_
 
--   `string`: The aria label of the button to click.
+-   _buttonAriaLabel_ `string`: The aria label of the button to click.
 
 <a name="clickButton" href="#clickButton">#</a> **clickButton** [\<>](src/index.js#L6-L6)
 
@@ -52,7 +52,7 @@ Clicks a button based on the text on the button.
 
 _Parameters_
 
--   `string`: The text that appears on the button to click.
+-   _buttonText_ `string`: The text that appears on the button to click.
 
 <a name="clickOnCloseModalButton" href="#clickOnCloseModalButton">#</a> **clickOnCloseModalButton** [\<>](src/index.js#L7-L7)
 
@@ -60,7 +60,7 @@ Click on the close button of an open modal.
 
 _Parameters_
 
--   `?string`: Class name for the modal to close
+-   _modalClassName_ `?string`: Class name for the modal to close
 
 <a name="clickOnMoreMenuItem" href="#clickOnMoreMenuItem">#</a> **clickOnMoreMenuItem** [\<>](src/index.js#L8-L8)
 
@@ -68,7 +68,7 @@ Clicks on More Menu item, searches for the button with the text provided and cli
 
 _Parameters_
 
--   `string`: The label to search the button for.
+-   _buttonLabel_ `string`: The label to search the button for.
 
 <a name="createEmbeddingMatcher" href="#createEmbeddingMatcher">#</a> **createEmbeddingMatcher** [\<>](src/index.js#L52-L52)
 
@@ -76,7 +76,7 @@ Creates a function to determine if a request is embedding a certain URL.
 
 _Parameters_
 
--   `string`: The URL to check against a request.
+-   _url_ `string`: The URL to check against a request.
 
 _Returns_
 
@@ -88,7 +88,7 @@ Respond to a request with a JSON response.
 
 _Parameters_
 
--   `string`: The mock object to wrap in a JSON response.
+-   _mockResponse_ `string`: The mock object to wrap in a JSON response.
 
 _Returns_
 
@@ -100,7 +100,7 @@ Creates new post.
 
 _Parameters_
 
--   `Object`: Object to create new post, along with tips enabling option.
+-   _obj_ `Object`: Object to create new post, along with tips enabling option.
 
 <a name="createURL" href="#createURL">#</a> **createURL** [\<>](src/index.js#L10-L10)
 
@@ -108,8 +108,8 @@ Creates new URL by parsing base URL, WPPath and query string.
 
 _Parameters_
 
--   `string`: String to be serialized as pathname.
--   `?string`: String to be serialized as query portion of URL.
+-   _WPPath_ `string`: String to be serialized as pathname.
+-   _query_ `?string`: String to be serialized as query portion of URL.
 
 _Returns_
 
@@ -121,7 +121,7 @@ Creates a function to determine if a request is calling a URL with the substring
 
 _Parameters_
 
--   `string`: The substring to check for.
+-   _substring_ `string`: The substring to check for.
 
 _Returns_
 
@@ -133,7 +133,7 @@ Deactivates an active plugin.
 
 _Parameters_
 
--   `string`: Plugin slug.
+-   _slug_ `string`: Plugin slug.
 
 <a name="disablePrePublishChecks" href="#disablePrePublishChecks">#</a> **disablePrePublishChecks** [\<>](src/index.js#L12-L12)
 
@@ -162,7 +162,7 @@ Finds a sidebar panel with the provided title.
 
 _Parameters_
 
--   `string`: The name of sidebar panel.
+-   _panelTitle_ `string`: The name of sidebar panel.
 
 _Returns_
 
@@ -174,7 +174,7 @@ Finds the button responsible for toggling the sidebar panel with the provided ti
 
 _Parameters_
 
--   `string`: The name of sidebar panel.
+-   _panelTitle_ `string`: The name of sidebar panel.
 
 _Returns_
 
@@ -241,8 +241,8 @@ result that appears.
 
 _Parameters_
 
--   `string`: The text to search the inserter for.
--   `string`: The inserter panel to open (if it's closed by default).
+-   _searchTerm_ `string`: The text to search the inserter for.
+-   _panelName_ `string`: The inserter panel to open (if it's closed by default).
 
 <a name="installPlugin" href="#installPlugin">#</a> **installPlugin** [\<>](src/index.js#L25-L25)
 
@@ -250,8 +250,8 @@ Installs a plugin from the WP.org repository.
 
 _Parameters_
 
--   `string`: Plugin slug.
--   `?string`: If the plugin is not findable by its slug use an alternative term to search.
+-   _slug_ `string`: Plugin slug.
+-   _searchTerm_ `?string`: If the plugin is not findable by its slug use an alternative term to search.
 
 <a name="isCurrentURL" href="#isCurrentURL">#</a> **isCurrentURL** [\<>](src/index.js#L26-L26)
 
@@ -259,8 +259,8 @@ Checks if current URL is a WordPress path.
 
 _Parameters_
 
--   `string`: String to be serialized as pathname.
--   `?string`: String to be serialized as query portion of URL.
+-   _WPPath_ `string`: String to be serialized as pathname.
+-   _query_ `?string`: String to be serialized as query portion of URL.
 
 _Returns_
 
@@ -280,8 +280,8 @@ Performs log in with specified username and password.
 
 _Parameters_
 
--   `?string`: String to be used as user credential.
--   `?string`: String to be used as user credential.
+-   _username_ `?string`: String to be used as user credential.
+-   _password_ `?string`: String to be used as user credential.
 
 <a name="mockOrTransform" href="#mockOrTransform">#</a> **mockOrTransform** [\<>](src/index.js#L52-L52)
 
@@ -290,9 +290,9 @@ deserialised JSON response for the request.
 
 _Parameters_
 
--   `function`: function that returns true if the request should be mocked.
--   `Object`: A mock object to wrap in a JSON response, if the request should be mocked.
--   `(function|undefined)`: An optional function that transforms the response's object before the response is used.
+-   _mockCheck_ `function`: function that returns true if the request should be mocked.
+-   _mock_ `Object`: A mock object to wrap in a JSON response, if the request should be mocked.
+-   _responseObjectTransform_ `(function|undefined)`: An optional function that transforms the response's object before the response is used.
 
 _Returns_
 
@@ -325,8 +325,8 @@ Presses the given keyboard key a number of times in sequence.
 
 _Parameters_
 
--   `string`: Key to press.
--   `number`: Number of times to press.
+-   _key_ `string`: Key to press.
+-   _count_ `number`: Number of times to press.
 
 _Returns_
 
@@ -339,8 +339,8 @@ is normalized to platform-specific modifier.
 
 _Parameters_
 
--   `string`: Modifier key.
--   `string`: Key to press while modifier held.
+-   _modifier_ `string`: Modifier key.
+-   _key_ `string`: Key to press while modifier held.
 
 <a name="publishPost" href="#publishPost">#</a> **publishPost** [\<>](src/index.js#L36-L36)
 
@@ -375,7 +375,7 @@ Search for block in the global inserter
 
 _Parameters_
 
--   `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The text to search the inserter for.
 
 <a name="selectBlockByClientId" href="#selectBlockByClientId">#</a> **selectBlockByClientId** [\<>](src/index.js#L40-L40)
 
@@ -383,7 +383,7 @@ Given the clientId of a block, selects the block on the editor.
 
 _Parameters_
 
--   `string`: Identified of the block.
+-   _clientId_ `string`: Identified of the block.
 
 <a name="setBrowserViewport" href="#setBrowserViewport">#</a> **setBrowserViewport** [\<>](src/index.js#L41-L41)
 
@@ -391,7 +391,7 @@ Sets browser viewport to specified type.
 
 _Parameters_
 
--   `string`: String to represent dimensions type; can be either small or large.
+-   _type_ `string`: String to represent dimensions type; can be either small or large.
 
 <a name="setPostContent" href="#setPostContent">#</a> **setPostContent** [\<>](src/index.js#L42-L42)
 
@@ -399,7 +399,7 @@ Sets code editor content
 
 _Parameters_
 
--   `string`: New code editor content.
+-   _content_ `string`: New code editor content.
 
 _Returns_
 
@@ -432,7 +432,7 @@ If none of the mock settings match the request, the request is allowed to contin
 
 _Parameters_
 
--   `Array`: Array of mock settings.
+-   _mocks_ `Array`: Array of mock settings.
 
 <a name="switchEditorModeTo" href="#switchEditorModeTo">#</a> **switchEditorModeTo** [\<>](src/index.js#L43-L43)
 
@@ -440,7 +440,7 @@ Switches editor mode.
 
 _Parameters_
 
--   `string`: String editor mode.
+-   _mode_ `string`: String editor mode.
 
 <a name="switchUserToAdmin" href="#switchUserToAdmin">#</a> **switchUserToAdmin** [\<>](src/index.js#L44-L44)
 
@@ -458,8 +458,8 @@ Toggles the screen option with the given label.
 
 _Parameters_
 
--   `string`: The label of the screen option, e.g. 'Show Tips'.
--   `?boolean`: If true, turns the option on. If false, off. If undefined, the option will be toggled.
+-   _label_ `string`: The label of the screen option, e.g. 'Show Tips'.
+-   _shouldBeChecked_ `?boolean`: If true, turns the option on. If false, off. If undefined, the option will be toggled.
 
 <a name="transformBlockTo" href="#transformBlockTo">#</a> **transformBlockTo** [\<>](src/index.js#L47-L47)
 
@@ -467,7 +467,7 @@ Converts editor's block type.
 
 _Parameters_
 
--   `string`: Block name.
+-   _name_ `string`: Block name.
 
 <a name="uninstallPlugin" href="#uninstallPlugin">#</a> **uninstallPlugin** [\<>](src/index.js#L48-L48)
 
@@ -475,7 +475,7 @@ Uninstalls a plugin.
 
 _Parameters_
 
--   `string`: Plugin slug.
+-   _slug_ `string`: Plugin slug.
 
 <a name="visitAdminPage" href="#visitAdminPage">#</a> **visitAdminPage** [\<>](src/index.js#L49-L49)
 
@@ -483,8 +483,8 @@ Visits admin page; if user is not logged in then it logging in it first, then vi
 
 _Parameters_
 
--   `string`: String to be serialized as pathname.
--   `string`: String to be serialized as query portion of URL.
+-   _adminPath_ `string`: String to be serialized as pathname.
+-   _query_ `string`: String to be serialized as query portion of URL.
 
 <a name="waitForWindowDimensions" href="#waitForWindowDimensions">#</a> **waitForWindowDimensions** [\<>](src/index.js#L50-L50)
 
@@ -495,8 +495,8 @@ without the new dimensions being applied.
 
 _Parameters_
 
--   `number`: Width of the window.
--   `height`: Height of the window.
+-   _width_ `number`: Width of the window.
+-   _height_ `height`: Height of the window.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

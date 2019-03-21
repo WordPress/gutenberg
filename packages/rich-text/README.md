@@ -24,10 +24,10 @@ provided.
 
 _Parameters_
 
--   `Object`: Value to modify.
--   `Object`: Format to apply.
--   `[number]`: Start index.
--   `[number]`: End index.
+-   _value_ `Object`: Value to modify.
+-   _format_ `Object`: Format to apply.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
@@ -40,7 +40,7 @@ Combine all Rich Text values into one. This is similar to
 
 _Parameters_
 
--   `...Object`: Objects to combine.
+-   _values_ `...Object`: Objects to combine.
 
 _Returns_
 
@@ -77,13 +77,13 @@ provided if a `Range` was given.
 
 _Parameters_
 
--   `[Object]`: Optional named arguments.
--   `[Element]`: Element to create value from.
--   `[string]`: Text to create value from.
--   `[string]`: HTML to create value from.
--   `[Range]`: Range to create value from.
--   `[string]`: Multiline tag if the structure is multiline.
--   `[Array]`: Tags where lines can be found if nesting is possible.
+-   _$1_ `[Object]`: Optional named arguments.
+-   _$1.element_ `[Element]`: Element to create value from.
+-   _$1.text_ `[string]`: Text to create value from.
+-   _$1.html_ `[string]`: HTML to create value from.
+-   _$1.range_ `[Range]`: Range to create value from.
+-   _$1.multilineTag_ `[string]`: Multiline tag if the structure is multiline.
+-   _$1.multilineWrapperTags_ `[Array]`: Tags where lines can be found if nesting is possible.
 
 _Returns_
 
@@ -98,8 +98,8 @@ is no format at the selection.
 
 _Parameters_
 
--   `Object`: Value to inspect.
--   `string`: Format type to look for.
+-   _value_ `Object`: Value to inspect.
+-   _formatType_ `string`: Format type to look for.
 
 _Returns_
 
@@ -111,7 +111,7 @@ Gets the active object, if there is any.
 
 _Parameters_
 
--   `Object`: Value to inspect.
+-   _value_ `Object`: Value to inspect.
 
 _Returns_
 
@@ -124,7 +124,7 @@ Get the textual content of a Rich Text value. This is similar to
 
 _Parameters_
 
--   `Object`: Value to use.
+-   _value_ `Object`: Value to use.
 
 _Returns_
 
@@ -139,10 +139,10 @@ none are provided.
 
 _Parameters_
 
--   `Object`: Value to modify.
--   `(Object|string)`: Value to insert.
--   `[number]`: Start index.
--   `[number]`: End index.
+-   _value_ `Object`: Value to modify.
+-   _valueToInsert_ `(Object|string)`: Value to insert.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
@@ -156,10 +156,10 @@ removed. Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
--   `Object`: Value to modify.
--   `Object`: Format to insert as object.
--   `[number]`: Start index.
--   `[number]`: End index.
+-   _value_ `Object`: Value to modify.
+-   _formatToInsert_ `Object`: Format to insert as object.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
@@ -174,7 +174,7 @@ is no selection, `undefined` will be returned. This is similar to
 
 _Parameters_
 
--   `Object`: The rich text value to check.
+-   _value_ `Object`: The rich text value to check.
 
 _Returns_
 
@@ -187,7 +187,7 @@ objects (such as images).
 
 _Parameters_
 
--   `Object`: Value to use.
+-   _value_ `Object`: Value to use.
 
 _Returns_
 
@@ -201,8 +201,8 @@ string. This is similar to `Array.prototype.join`.
 
 _Parameters_
 
--   `Array<Object>`: An array of values to join.
--   `[(string|Object)]`: Separator string or value.
+-   _values_ `Array<Object>`: An array of values to join.
+-   _separator_ `[(string|Object)]`: Separator string or value.
 
 _Returns_
 
@@ -215,12 +215,12 @@ behavior.
 
 _Parameters_
 
--   `string`: Format name.
--   `Object`: Format settings.
--   `string`: The HTML tag this format will wrap the selection with.
--   `[string]`: A class to match the format.
--   `string`: Name of the format.
--   `Function`: Should return a component for the user to interact with the new registered format.
+-   _name_ `string`: Format name.
+-   _settings_ `Object`: Format settings.
+-   _settings.tagName_ `string`: The HTML tag this format will wrap the selection with.
+-   _settings.className_ `[string]`: A class to match the format.
+-   _settings.title_ `string`: Name of the format.
+-   _settings.edit_ `Function`: Should return a component for the user to interact with the new registered format.
 
 _Returns_
 
@@ -233,9 +233,9 @@ Remove content from a Rich Text value between the given `startIndex` and
 
 _Parameters_
 
--   `Object`: Value to modify.
--   `[number]`: Start index.
--   `[number]`: End index.
+-   _value_ `Object`: Value to modify.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
@@ -249,10 +249,10 @@ selection if none are provided.
 
 _Parameters_
 
--   `Object`: Value to modify.
--   `string`: Format type to remove.
--   `[number]`: Start index.
--   `[number]`: End index.
+-   _value_ `Object`: Value to modify.
+-   _formatType_ `string`: Format type to remove.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
@@ -265,9 +265,9 @@ is similar to `String.prototype.replace`.
 
 _Parameters_
 
--   `Object`: The value to modify.
--   `(RegExp|string)`: A RegExp object or literal. Can also be a string. It is treated as a verbatim string and is not interpreted as a regular expression. Only the first occurrence will be replaced.
--   `(Function|string)`: The match or matches are replaced with the specified or the value returned by the specified function.
+-   _value_ `Object`: The value to modify.
+-   _pattern_ `(RegExp|string)`: A RegExp object or literal. Can also be a string. It is treated as a verbatim string and is not interpreted as a regular expression. Only the first occurrence will be replaced.
+-   _replacement_ `(Function|string)`: The match or matches are replaced with the specified or the value returned by the specified function.
 
 _Returns_
 
@@ -281,9 +281,9 @@ retrieved from the selection if none are provided. This is similar to
 
 _Parameters_
 
--   `Object`: Value to modify.
--   `[number]`: Start index.
--   `[number]`: End index.
+-   _value_ `Object`: Value to modify.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
@@ -297,9 +297,9 @@ Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
--   `Object`: Value to modify.
--   `[(number|string)]`: Start index, or string at which to split.
--   `[number]`: End index.
+-   _value_ `Object`: Value to modify.
+-   _string_ `[(number|string)]`: Start index, or string at which to split.
+-   _endStr_ `[number]`: End index.
 
 _Returns_
 
@@ -311,8 +311,8 @@ Toggles a format object to a Rich Text value at the current selection.
 
 _Parameters_
 
--   `Object`: Value to modify.
--   `Object`: Format to apply or remove.
+-   _value_ `Object`: Value to modify.
+-   _format_ `Object`: Format to apply or remove.
 
 _Returns_
 
@@ -325,9 +325,9 @@ provided, text separated by a line separator will be wrapped in it.
 
 _Parameters_
 
--   `Object`: Named argements.
--   `Object`: Rich text value.
--   `[string]`: Multiline tag.
+-   _$1_ `Object`: Named argements.
+-   _$1.value_ `Object`: Rich text value.
+-   _$1.multilineTag_ `[string]`: Multiline tag.
 
 _Returns_
 
@@ -339,7 +339,7 @@ Unregisters a format.
 
 _Parameters_
 
--   `string`: Format name.
+-   _name_ `string`: Format name.
 
 _Returns_
 

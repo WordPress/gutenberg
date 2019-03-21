@@ -30,8 +30,8 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://g
 
 _Parameters_
 
--   `?string`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
--   `Object`: Query arguments to apply to URL.
+-   _url_ `?string`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
+-   _args_ `Object`: Query arguments to apply to URL.
 
 _Returns_
 
@@ -49,7 +49,7 @@ const displayUrl = filterURLForDisplay( 'https://www.wordpress.org/gutenberg/' )
 
 _Parameters_
 
--   `string`: Original URL.
+-   _url_ `string`: Original URL.
 
 _Returns_
 
@@ -68,7 +68,7 @@ const authority2 = getAuthority( 'https://localhost:8080/test/' ); // 'localhost
 
 _Parameters_
 
--   `string`: The full URL.
+-   _url_ `string`: The full URL.
 
 _Returns_
 
@@ -87,7 +87,7 @@ const fragment2 = getFragment( 'https://wordpress.org#another-fragment?query=tru
 
 _Parameters_
 
--   `string`: The full URL
+-   _url_ `string`: The full URL
 
 _Returns_
 
@@ -106,7 +106,7 @@ const path2 = getPath( 'https://wordpress.org/help/faq/' ); // 'help/faq'
 
 _Parameters_
 
--   `string`: The full URL.
+-   _url_ `string`: The full URL.
 
 _Returns_
 
@@ -125,7 +125,7 @@ const protocol2 = getProtocol( 'https://wordpress.org' ); // 'https:'
 
 _Parameters_
 
--   `string`: The full URL.
+-   _url_ `string`: The full URL.
 
 _Returns_
 
@@ -143,8 +143,8 @@ const foo = getQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'foo' ); // ba
 
 _Parameters_
 
--   `string`: URL
--   `string`: Query arg name
+-   _url_ `string`: URL
+-   _arg_ `string`: Query arg name
 
 _Returns_
 
@@ -163,7 +163,7 @@ const queryString2 = getQueryString( 'https://wordpress.org#fragment?query=false
 
 _Parameters_
 
--   `string`: The full URL.
+-   _url_ `string`: The full URL.
 
 _Returns_
 
@@ -181,8 +181,8 @@ const hasBar = hasQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'bar' ); //
 
 _Parameters_
 
--   `string`: URL
--   `string`: Query arg name
+-   _url_ `string`: URL
+-   _arg_ `string`: Query arg name
 
 _Returns_
 
@@ -200,7 +200,7 @@ const isURL = isURL( 'https://wordpress.org' ); // true
 
 _Parameters_
 
--   `string`: The string to scrutinise.
+-   _url_ `string`: The string to scrutinise.
 
 _Returns_
 
@@ -219,7 +219,7 @@ const isNotValid = isValidAuthority( 'wordpress#org' ); // false
 
 _Parameters_
 
--   `string`: A string containing the URL authority.
+-   _authority_ `string`: A string containing the URL authority.
 
 _Returns_
 
@@ -238,7 +238,7 @@ const isNotValid = isValidFragment( '#invalid-#fragment' ); // false
 
 _Parameters_
 
--   `string`: The url fragment.
+-   _fragment_ `string`: The url fragment.
 
 _Returns_
 
@@ -257,7 +257,7 @@ const isNotValid = isValidPath( '/invalid?test/path/' ); // false
 
 _Parameters_
 
--   `string`: The URL path.
+-   _path_ `string`: The URL path.
 
 _Returns_
 
@@ -276,7 +276,7 @@ const isNotValid = isValidProtocol( 'https :' ); // false
 
 _Parameters_
 
--   `string`: The url protocol.
+-   _protocol_ `string`: The url protocol.
 
 _Returns_
 
@@ -295,7 +295,7 @@ const isNotValid = isValidQueryString( 'query=true?another=false' ); // false
 
 _Parameters_
 
--   `string`: The query string.
+-   _queryString_ `string`: The query string.
 
 _Returns_
 
@@ -313,7 +313,7 @@ const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
 
 _Parameters_
 
--   `string`: The URL to test
+-   _url_ `string`: The URL to test
 
 _Returns_
 
@@ -331,8 +331,8 @@ const newUrl = removeQueryArgs( 'https://wordpress.org?foo=bar&bar=baz&baz=fooba
 
 _Parameters_
 
--   `string`: URL
--   `...string`: Query Args
+-   _url_ `string`: URL
+-   _args_ `...string`: Query Args
 
 _Returns_
 
@@ -351,7 +351,7 @@ const badUri = safeDecodeURI( '%z' ); // does not throw an Error, simply returns
 
 _Parameters_
 
--   `string`: URI to decode.
+-   _uri_ `string`: URI to decode.
 
 _Returns_
 
@@ -364,7 +364,7 @@ Safely decodes a URI component with `decodeURIComponent`. Returns the URI compon
 
 _Parameters_
 
--   `string`: URI component to decode.
+-   _uriComponent_ `string`: URI component to decode.
 
 _Returns_
 

@@ -173,7 +173,7 @@ export default compose(
 
 _Parameters_
 
--   `Array`: The array of color objects (name, slug, color, etc... ).
+-   _colorsArray_ `Array`: The array of color objects (name, slug, color, etc... ).
 
 _Returns_
 
@@ -193,8 +193,8 @@ Returns a class based on the context a color is being used and its slug.
 
 _Parameters_
 
--   `string`: Context/place where color is being used e.g: background, text etc...
--   `string`: Slug of the color.
+-   _colorContextName_ `string`: Context/place where color is being used e.g: background, text etc...
+-   _colorSlug_ `string`: Slug of the color.
 
 _Returns_
 
@@ -207,9 +207,9 @@ and the values of the defined color or custom color returns a color object descr
 
 _Parameters_
 
--   `Array`: Array of color objects as set by the theme or by the editor defaults.
--   `?string`: A string containing the color slug.
--   `?string`: A string containing the customColor value.
+-   _colors_ `Array`: Array of color objects as set by the theme or by the editor defaults.
+-   _definedColor_ `?string`: A string containing the color slug.
+-   _customColor_ `?string`: A string containing the customColor value.
 
 _Returns_
 
@@ -221,8 +221,8 @@ Provided an array of color objects as set by the theme or by the editor defaults
 
 _Parameters_
 
--   `Array`: Array of color objects as set by the theme or by the editor defaults.
--   `?string`: A string containing the color value.
+-   _colors_ `Array`: Array of color objects as set by the theme or by the editor defaults.
+-   _colorValue_ `?string`: A string containing the color value.
 
 _Returns_
 
@@ -235,9 +235,9 @@ Returns the font size object based on an array of named font sizes and the named
 
 _Parameters_
 
--   `Array`: Array of font size objects containing at least the "name" and "size" values as properties.
--   `?string`: Content of the font size attribute (slug).
--   `?number`: Contents of the custom font size attribute (value).
+-   _fontSizes_ `Array`: Array of font size objects containing at least the "name" and "size" values as properties.
+-   _fontSizeAttribute_ `?string`: Content of the font size attribute (slug).
+-   _customFontSizeAttribute_ `?number`: Contents of the custom font size attribute (value).
 
 _Returns_
 
@@ -249,7 +249,7 @@ Returns a class based on fontSizeName.
 
 _Parameters_
 
--   `string`: Slug of the fontSize.
+-   _fontSizeSlug_ `string`: Slug of the fontSize.
 
 _Returns_
 
@@ -385,7 +385,7 @@ export default compose(
 
 _Parameters_
 
--   `...(object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
+-   _colorTypes_ `...(object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
 
 _Returns_
 
@@ -398,7 +398,7 @@ font size value retrieval, and font size change handling.
 
 _Parameters_
 
--   `...(object|string)`: The arguments should all be strings Each string contains the font size attribute name e.g: 'fontSize'.
+-   _args_ `...(object|string)`: The arguments should all be strings Each string contains the font size attribute name e.g: 'fontSize'.
 
 _Returns_
 

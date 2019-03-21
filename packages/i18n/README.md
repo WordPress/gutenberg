@@ -38,8 +38,8 @@ _Related_
 
 _Parameters_
 
--   `?Object`: Locale data configuration.
--   `?string`: Domain for which configuration applies.
+-   _data_ `?Object`: Locale data configuration.
+-   _domain_ `?string`: Domain for which configuration applies.
 
 <a name="sprintf" href="#sprintf">#</a> **sprintf** [\<>](src/index.js#L159-L167)
 
@@ -52,8 +52,8 @@ _Related_
 
 _Parameters_
 
--   `string`: The format of the string to generate.
--   `...string`: Arguments to apply to the format.
+-   _format_ `string`: The format of the string to generate.
+-   _args_ `...string`: Arguments to apply to the format.
 
 _Returns_
 
@@ -70,10 +70,10 @@ _Related_
 
 _Parameters_
 
--   `string`: The text to be used if the number is singular.
--   `string`: The text to be used if the number is plural.
--   `number`: The number to compare against to use either the singular or plural form.
--   `?string`: Domain to retrieve the translated text.
+-   _single_ `string`: The text to be used if the number is singular.
+-   _plural_ `string`: The text to be used if the number is plural.
+-   _number_ `number`: The number to compare against to use either the singular or plural form.
+-   _domain_ `?string`: Domain to retrieve the translated text.
 
 _Returns_
 
@@ -90,11 +90,11 @@ _Related_
 
 _Parameters_
 
--   `string`: The text to be used if the number is singular.
--   `string`: The text to be used if the number is plural.
--   `number`: The number to compare against to use either the singular or plural form.
--   `string`: Context information for the translators.
--   `?string`: Domain to retrieve the translated text.
+-   _single_ `string`: The text to be used if the number is singular.
+-   _plural_ `string`: The text to be used if the number is plural.
+-   _number_ `number`: The number to compare against to use either the singular or plural form.
+-   _context_ `string`: Context information for the translators.
+-   _domain_ `?string`: Domain to retrieve the translated text.
 
 _Returns_
 
@@ -110,9 +110,9 @@ _Related_
 
 _Parameters_
 
--   `string`: Text to translate.
--   `string`: Context information for the translators.
--   `?string`: Domain to retrieve the translated text.
+-   _text_ `string`: Text to translate.
+-   _context_ `string`: Context information for the translators.
+-   _domain_ `?string`: Domain to retrieve the translated text.
 
 _Returns_
 
@@ -128,8 +128,8 @@ _Related_
 
 _Parameters_
 
--   `string`: Text to translate.
--   `?string`: Domain to retrieve the translated text.
+-   _text_ `string`: Text to translate.
+-   _domain_ `?string`: Domain to retrieve the translated text.
 
 _Returns_
 

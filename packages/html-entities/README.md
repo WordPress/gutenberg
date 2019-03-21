@@ -29,7 +29,7 @@ console.log( result ); // result will be "á"
 
 _Parameters_
 
--   `string`: String that contain HTML entities.
+-   _html_ `string`: String that contain HTML entities.
 
 _Returns_
 

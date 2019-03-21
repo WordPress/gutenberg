@@ -33,8 +33,8 @@ autop( 'my text' ); // "<p>my text</p>"
 
 _Parameters_
 
--   `string`: The text which has to be formatted.
--   `boolean`: Optional. If set, will convert all remaining line- breaks after paragraphing. Default true.
+-   _text_ `string`: The text which has to be formatted.
+-   _br_ `boolean`: Optional. If set, will convert all remaining line- breaks after paragraphing. Default true.
 
 _Returns_
 
@@ -56,7 +56,7 @@ removep( '<p>my text</p>' ); // "my text"
 
 _Parameters_
 
--   `string`: The content from the editor.
+-   _html_ `string`: The content from the editor.
 
 _Returns_
 

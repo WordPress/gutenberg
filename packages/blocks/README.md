@@ -187,9 +187,9 @@ new attributes and/or replacing its inner blocks.
 
 _Parameters_
 
--   `Object`: Block instance.
--   `Object`: Block attributes.
--   `?Array`: Nested blocks.
+-   _block_ `Object`: Block instance.
+-   _mergeAttributes_ `Object`: Block attributes.
+-   _newInnerBlocks_ `?Array`: Nested blocks.
 
 _Returns_
 
@@ -201,9 +201,9 @@ Returns a block object given its type and attributes.
 
 _Parameters_
 
--   `string`: Block name.
--   `Object`: Block attributes.
--   `?Array`: Nested blocks.
+-   _name_ `string`: Block name.
+-   _attributes_ `Object`: Block attributes.
+-   _innerBlocks_ `?Array`: Nested blocks.
 
 _Returns_
 
@@ -215,8 +215,8 @@ Checks whether a list of blocks matches a template by comparing the block names.
 
 _Parameters_
 
--   `Array`: Block list.
--   `Array`: Block template.
+-   _blocks_ `Array`: Block list.
+-   _template_ `Array`: Block template.
 
 _Returns_
 
@@ -232,8 +232,8 @@ falsey value for all entries.
 
 _Parameters_
 
--   `Array<Object>`: Transforms to search.
--   `Function`: Function returning true on matching transform.
+-   _transforms_ `Array<Object>`: Transforms to search.
+-   _predicate_ `Function`: Function returning true on matching transform.
 
 _Returns_
 
@@ -245,9 +245,9 @@ Returns the block attributes of a registered block node given its type.
 
 _Parameters_
 
--   `(string|Object)`: Block type or name.
--   `string`: Raw block content.
--   `?Object`: Known block attributes (from delimiters).
+-   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _innerHTML_ `string`: Raw block content.
+-   _attributes_ `?Object`: Known block attributes (from delimiters).
 
 _Returns_
 
@@ -259,7 +259,7 @@ Given a block object, returns the Block's Inner HTML markup.
 
 _Parameters_
 
--   `Object`: Block instance.
+-   _block_ `Object`: Block instance.
 
 _Returns_
 
@@ -271,7 +271,7 @@ Returns the block's default classname from its name.
 
 _Parameters_
 
--   `string`: The block name.
+-   _blockName_ `string`: The block name.
 
 _Returns_
 
@@ -283,7 +283,7 @@ Returns the block's default menu item classname from its name.
 
 _Parameters_
 
--   `string`: The block name.
+-   _blockName_ `string`: The block name.
 
 _Returns_
 
@@ -295,9 +295,9 @@ Returns the block support value for a feature, if defined.
 
 _Parameters_
 
--   `(string|Object)`: Block name or type object
--   `string`: Feature to retrieve
--   `*`: Default value to return if not explicitly defined
+-   _nameOrType_ `(string|Object)`: Block name or type object
+-   _feature_ `string`: Feature to retrieve
+-   _defaultSupports_ `*`: Default value to return if not explicitly defined
 
 _Returns_
 
@@ -312,8 +312,8 @@ transform object includes `blockName` as a property.
 
 _Parameters_
 
--   `string`: Transform direction ("to", "from").
--   `(string|Object)`: Block type or name.
+-   _direction_ `string`: Transform direction ("to", "from").
+-   _blockTypeOrName_ `(string|Object)`: Block type or name.
 
 _Returns_
 
@@ -325,7 +325,7 @@ Returns a registered block type.
 
 _Parameters_
 
--   `string`: Block name.
+-   _name_ `string`: Block name.
 
 _Returns_
 
@@ -353,7 +353,7 @@ Returns an array with the child blocks of a given block.
 
 _Parameters_
 
--   `string`: Name of block (example: “latest-posts”).
+-   _blockName_ `string`: Name of block (example: “latest-posts”).
 
 _Returns_
 
@@ -395,7 +395,7 @@ can be transformed into.
 
 _Parameters_
 
--   `Array`: Blocks array.
+-   _blocks_ `Array`: Blocks array.
 
 _Returns_
 
@@ -408,9 +408,9 @@ static markup to be saved.
 
 _Parameters_
 
--   `(string|Object)`: Block type or name.
--   `Object`: Block attributes.
--   `?Array`: Nested blocks.
+-   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _attributes_ `Object`: Block attributes.
+-   _innerBlocks_ `?Array`: Nested blocks.
 
 _Returns_
 
@@ -423,9 +423,9 @@ enhanced element to be saved or string when raw HTML expected.
 
 _Parameters_
 
--   `(string|Object)`: Block type or name.
--   `Object`: Block attributes.
--   `?Array`: Nested blocks.
+-   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _attributes_ `Object`: Block attributes.
+-   _innerBlocks_ `?Array`: Nested blocks.
 
 _Returns_
 
@@ -446,9 +446,9 @@ Returns true if the block defines support for a feature, or false otherwise.
 
 _Parameters_
 
--   `(string|Object)`: Block name or type object.
--   `string`: Feature to test.
--   `boolean`: Whether feature is supported by default if not explicitly defined.
+-   _nameOrType_ `(string|Object)`: Block name or type object.
+-   _feature_ `string`: Feature to test.
+-   _defaultSupports_ `boolean`: Whether feature is supported by default if not explicitly defined.
 
 _Returns_
 
@@ -460,7 +460,7 @@ Returns a boolean indicating if a block has child blocks or not.
 
 _Parameters_
 
--   `string`: Name of block (example: “latest-posts”).
+-   _blockName_ `string`: Name of block (example: “latest-posts”).
 
 _Returns_
 
@@ -472,7 +472,7 @@ Returns a boolean indicating if a block has at least one child block with insert
 
 _Parameters_
 
--   `string`: Block type name.
+-   _blockName_ `string`: Block type name.
 
 _Returns_
 
@@ -486,7 +486,7 @@ API.
 
 _Parameters_
 
--   `Object`: Block or Block Type to test.
+-   _blockOrType_ `Object`: Block or Block Type to test.
 
 _Returns_
 
@@ -500,7 +500,7 @@ which means the block is unmodified.
 
 _Parameters_
 
--   `WPBlock`: Block Object
+-   _block_ `WPBlock`: Block Object
 
 _Returns_
 
@@ -516,9 +516,9 @@ Logs to console in development environments when invalid.
 
 _Parameters_
 
--   `(string|Object)`: Block type.
--   `Object`: Parsed block attributes.
--   `string`: Original block content.
+-   _blockTypeOrName_ `(string|Object)`: Block type.
+-   _attributes_ `Object`: Parsed block attributes.
+-   _originalBlockContent_ `string`: Original block content.
 
 _Returns_
 
@@ -530,7 +530,7 @@ Function that checks if the parameter is a valid icon.
 
 _Parameters_
 
--   `*`: Parameter to be checked.
+-   _icon_ `*`: Parameter to be checked.
 
 _Returns_
 
@@ -548,7 +548,7 @@ in the codebase.
 
 _Parameters_
 
--   `(Object|string|WPElement)`: Slug of the Dashicon to be shown as the icon for the block in the inserter, or element or an object describing the icon.
+-   _icon_ `(Object|string|WPElement)`: Slug of the Dashicon to be shown as the icon for the block in the inserter, or element or an object describing the icon.
 
 _Returns_
 
@@ -560,7 +560,7 @@ Parses the post content with a PegJS grammar and returns a list of blocks.
 
 _Parameters_
 
--   `string`: The post content.
+-   _content_ `string`: The post content.
 
 _Returns_
 
@@ -573,8 +573,8 @@ value depending on its source.
 
 _Parameters_
 
--   `string`: Block's raw content.
--   `Object`: Attribute's schema.
+-   _innerHTML_ `string`: Block's raw content.
+-   _attributeSchema_ `Object`: Attribute's schema.
 
 _Returns_
 
@@ -586,11 +586,11 @@ Converts an HTML string to known blocks. Strips everything else.
 
 _Parameters_
 
--   `[string]`: The HTML to convert.
--   `[string]`: Plain text version.
--   `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
--   `[Array]`: The tag into which content will be inserted.
--   `[boolean]`: Whether or not the user can use unfiltered HTML.
+-   _options.HTML_ `[string]`: The HTML to convert.
+-   _options.plainText_ `[string]`: Plain text version.
+-   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
+-   _options.tagName_ `[Array]`: The tag into which content will be inserted.
+-   _options.canUserUseUnfilteredHTML_ `[boolean]`: Whether or not the user can use unfiltered HTML.
 
 _Returns_
 
@@ -602,7 +602,7 @@ Converts an HTML string to known blocks.
 
 _Parameters_
 
--   `string`: The HTML to convert.
+-   _$1.HTML_ `string`: The HTML to convert.
 
 _Returns_
 
@@ -614,8 +614,8 @@ Registers a new block style variation for the given block.
 
 _Parameters_
 
--   `string`: Name of block (example: “core/latest-posts”).
--   `Object`: Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
+-   _blockName_ `string`: Name of block (example: “core/latest-posts”).
+-   _styleVariation_ `Object`: Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
 
 <a name="registerBlockType" href="#registerBlockType">#</a> **registerBlockType** [\<>](src/index.js#L16-L16)
 
@@ -625,8 +625,8 @@ editor interface where blocks are implemented.
 
 _Parameters_
 
--   `string`: Block name.
--   `Object`: Block settings.
+-   _name_ `string`: Block name.
+-   _settings_ `Object`: Block settings.
 
 _Returns_
 
@@ -638,7 +638,7 @@ Takes a block or set of blocks and returns the serialized post content.
 
 _Parameters_
 
--   `Array`: Block(s) to serialize.
+-   _blocks_ `Array`: Block(s) to serialize.
 
 _Returns_
 
@@ -650,7 +650,7 @@ Sets the block categories.
 
 _Parameters_
 
--   `Array<Object>`: Block categories.
+-   _categories_ `Array<Object>`: Block categories.
 
 <a name="setDefaultBlockName" href="#setDefaultBlockName">#</a> **setDefaultBlockName** [\<>](src/index.js#L16-L16)
 
@@ -658,7 +658,7 @@ Assigns the default block name.
 
 _Parameters_
 
--   `string`: Block name.
+-   _name_ `string`: Block name.
 
 <a name="setFreeformContentHandlerName" href="#setFreeformContentHandlerName">#</a> **setFreeformContentHandlerName** [\<>](src/index.js#L16-L16)
 
@@ -666,7 +666,7 @@ Assigns name of block for handling non-block content.
 
 _Parameters_
 
--   `string`: Block name.
+-   _blockName_ `string`: Block name.
 
 <a name="setUnregisteredTypeHandlerName" href="#setUnregisteredTypeHandlerName">#</a> **setUnregisteredTypeHandlerName** [\<>](src/index.js#L16-L16)
 
@@ -674,7 +674,7 @@ Assigns name of block handling unregistered block types.
 
 _Parameters_
 
--   `string`: Block name.
+-   _blockName_ `string`: Block name.
 
 <a name="switchToBlockType" href="#switchToBlockType">#</a> **switchToBlockType** [\<>](src/index.js#L16-L16)
 
@@ -682,8 +682,8 @@ Switch one or more blocks into one or more blocks of the new block type.
 
 _Parameters_
 
--   `(Array|Object)`: Blocks array or block object.
--   `string`: Block name.
+-   _blocks_ `(Array|Object)`: Blocks array or block object.
+-   _name_ `string`: Block name.
 
 _Returns_
 
@@ -700,8 +700,8 @@ Extra blocks not present in the template are removed.
 
 _Parameters_
 
--   `Array`: Block list.
--   `Array`: Block template.
+-   _blocks_ `Array`: Block list.
+-   _template_ `Array`: Block template.
 
 _Returns_
 
@@ -713,8 +713,8 @@ Unregisters a block style variation for the given block.
 
 _Parameters_
 
--   `string`: Name of block (example: “core/latest-posts”).
--   `string`: Name of class applied to the block.
+-   _blockName_ `string`: Name of block (example: “core/latest-posts”).
+-   _styleVariationName_ `string`: Name of class applied to the block.
 
 <a name="unregisterBlockType" href="#unregisterBlockType">#</a> **unregisterBlockType** [\<>](src/index.js#L16-L16)
 
@@ -722,7 +722,7 @@ Unregisters a block.
 
 _Parameters_
 
--   `string`: Block name.
+-   _name_ `string`: Block name.
 
 _Returns_
 
@@ -734,8 +734,8 @@ Updates a category.
 
 _Parameters_
 
--   `string`: Block category slug.
--   `Object`: Object containing the category properties that should be updated.
+-   _slug_ `string`: Block category slug.
+-   _category_ `Object`: Object containing the category properties that should be updated.
 
 <a name="withBlockContentContext" href="#withBlockContentContext">#</a> **withBlockContentContext** [\<>](src/index.js#L17-L17)
 

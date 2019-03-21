@@ -88,8 +88,8 @@ Creates a copy of an element with extended props.
 
 _Parameters_
 
--   `WPElement`: Element
--   `?Object`: Props to apply to cloned element
+-   _element_ `WPElement`: Element
+-   _props_ `?Object`: Props to apply to cloned element
 
 _Returns_
 
@@ -105,7 +105,7 @@ Concatenate two or more React children objects.
 
 _Parameters_
 
--   `...?Object`: Array of children arguments (array of arrays/strings/objects) to concatenate.
+-   _childrenArguments_ `...?Object`: Array of children arguments (array of arrays/strings/objects) to concatenate.
 
 _Returns_
 
@@ -117,7 +117,7 @@ Creates a context object containing two components: a provider and consumer.
 
 _Parameters_
 
--   `Object`: A default data stored in the context.
+-   _defaultValue_ `Object`: A default data stored in the context.
 
 _Returns_
 
@@ -130,9 +130,9 @@ another function which itself returns an element.
 
 _Parameters_
 
--   `?(string|Function)`: Tag name or element creator
--   `Object`: Element properties, either attribute set to apply to DOM node or values to pass through to element creator
--   `...WPElement`: Descendant elements
+-   _type_ `?(string|Function)`: Tag name or element creator
+-   _props_ `Object`: Element properties, either attribute set to apply to DOM node or values to pass through to element creator
+-   _children_ `...WPElement`: Descendant elements
 
 _Returns_
 
@@ -148,8 +148,8 @@ _Related_
 
 _Parameters_
 
--   `Component`: Component
--   `Element`: DOM node into which element should be rendered
+-   _component_ `Component`: Component
+-   _target_ `Element`: DOM node into which element should be rendered
 
 <a name="createRef" href="#createRef">#</a> **createRef** [\<>](src/index.js#L1-L1)
 
@@ -167,8 +167,8 @@ Finds the dom node of a React component
 
 _Parameters_
 
--   `Component`: component's instance
--   `Element`: DOM node into which element should be rendered
+-   _component_ `Component`: component's instance
+-   _target_ `Element`: DOM node into which element should be rendered
 
 <a name="forwardRef" href="#forwardRef">#</a> **forwardRef** [\<>](src/index.js#L1-L1)
 
@@ -179,7 +179,7 @@ component which forwards its ref.
 
 _Parameters_
 
--   `Function`: Function passed `props` and `ref`, expected to return an element.
+-   _forwarder_ `Function`: Function passed `props` and `ref`, expected to return an element.
 
 _Returns_
 
@@ -195,7 +195,7 @@ Checks if the provided WP element is empty.
 
 _Parameters_
 
--   `*`: WP element to check.
+-   _element_ `*`: WP element to check.
 
 _Returns_
 
@@ -207,7 +207,7 @@ Checks if an object is a valid WPElement
 
 _Parameters_
 
--   `Object`: The object to be checked.
+-   _objectToCheck_ `Object`: The object to be checked.
 
 _Returns_
 
@@ -228,7 +228,7 @@ aside from `children` are passed.
 
 _Parameters_
 
--   `string`: HTML to render.
+-   _props.children_ `string`: HTML to render.
 
 _Returns_
 
@@ -240,8 +240,8 @@ Renders a given element into the target DOM node.
 
 _Parameters_
 
--   `WPElement`: Element to render
--   `Element`: DOM node into which element should be rendered
+-   _element_ `WPElement`: Element to render
+-   _target_ `Element`: DOM node into which element should be rendered
 
 <a name="renderToString" href="#renderToString">#</a> **renderToString** [\<>](src/index.js#L4-L4)
 
@@ -249,9 +249,9 @@ Serializes a React element to string.
 
 _Parameters_
 
--   `WPElement`: Element to serialize.
--   `?Object`: Context object.
--   `?Object`: Legacy context object.
+-   _element_ `WPElement`: Element to serialize.
+-   _context_ `?Object`: Context object.
+-   _legacyContext_ `?Object`: Legacy context object.
 
 _Returns_
 
@@ -273,8 +273,8 @@ Switches the nodeName of all the elements in the children object.
 
 _Parameters_
 
--   `?Object`: Children object.
--   `string`: Node name.
+-   _children_ `?Object`: Children object.
+-   _nodeName_ `string`: Node name.
 
 _Returns_
 
@@ -286,7 +286,7 @@ Removes any mounted element from the target DOM node.
 
 _Parameters_
 
--   `Element`: DOM node in which element is to be removed
+-   _target_ `Element`: DOM node in which element is to be removed
 
 <a name="useCallback" href="#useCallback">#</a> **useCallback** [\<>](src/index.js#L1-L1)
 

@@ -70,7 +70,7 @@ execution is not continued.
 
 _Parameters_
 
--   `Object`: Object of control handlers.
+-   _controls_ `Object`: Object of control handlers.
 
 _Returns_
 

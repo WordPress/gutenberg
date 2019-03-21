@@ -96,7 +96,7 @@ parse( post ) === [
 
 _Parameters_
 
--   `string`: The HTML document to parse.
+-   _doc_ `string`: The HTML document to parse.
 
 _Returns_
 

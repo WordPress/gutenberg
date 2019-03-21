@@ -110,7 +110,7 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 			formatTag(
 				'Parameters',
 				getTagsByName( symbol.tags, 'param' ),
-				( tag ) => `\n- \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- *${ tag.name }* \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(

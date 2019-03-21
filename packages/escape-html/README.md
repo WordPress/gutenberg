@@ -31,7 +31,7 @@ _Related_
 
 _Parameters_
 
--   `string`: Original string.
+-   _value_ `string`: Original string.
 
 _Returns_
 
@@ -58,7 +58,7 @@ See: <https://core.trac.wordpress.org/ticket/45387>
 
 _Parameters_
 
--   `string`: Attribute value.
+-   _value_ `string`: Attribute value.
 
 _Returns_
 
@@ -77,7 +77,7 @@ ambiguous ampersand."
 
 _Parameters_
 
--   `string`: Element value.
+-   _value_ `string`: Element value.
 
 _Returns_
 
@@ -89,7 +89,7 @@ Returns a string with less-than sign replaced.
 
 _Parameters_
 
--   `string`: Original string.
+-   _value_ `string`: Original string.
 
 _Returns_
 
@@ -101,7 +101,7 @@ Returns a string with quotation marks replaced.
 
 _Parameters_
 
--   `string`: Original string.
+-   _value_ `string`: Original string.
 
 _Returns_
 
@@ -113,7 +113,7 @@ Returns true if the given attribute name is valid, or false otherwise.
 
 _Parameters_
 
--   `string`: Attribute name to test.
+-   _name_ `string`: Attribute name to test.
 
 _Returns_
 
