@@ -43,7 +43,9 @@ let upstreamTransformer = null;
 const reactNativeVersionString = require( 'react-native/package.json' ).version;
 const reactNativeMinorVersion = semver( reactNativeVersionString ).minor;
 
-if ( reactNativeMinorVersion >= 56 ) {
+if ( reactNativeMinorVersion >= 59 ) {
+	upstreamTransformer = require( 'metro-react-native-babel-transformer' );
+} else if ( reactNativeMinorVersion >= 56 ) {
 	upstreamTransformer = require( 'metro/src/reactNativeTransformer' );
 } else if ( reactNativeMinorVersion >= 52 ) {
 	upstreamTransformer = require( 'metro/src/transformer' );
@@ -114,7 +116,7 @@ function transform( src, filename, options ) {
 		const result = sass.renderSync( {
 			data: src,
 			includePaths: [ path.dirname( filename ), ...autoImportIncludePaths ],
-			importer: function( url /*, prev, done */ ) {
+			importer( url /*, prev, done */ ) {
 				// url is the path in import as is, which LibSass encountered.
 				// prev is the previously resolved path.
 				// done is an optional callback, either consume it or return value synchronously.

@@ -4,19 +4,24 @@
  */
 
 /**
+ * External dependencies
+ */
+import React from 'react';
+import { Platform, TextInput, UIManager, PanResponder } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
-import React from 'react';
-import { Platform, TextInput, ScrollView } from 'react-native';
-import styles from './html-text-input.scss';
-import KeyboardAvoidingView from './keyboard-avoiding-view';
-
-// Gutenberg imports
 import { parse } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import styles from './html-text-input.scss';
+import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 type PropsType = {
 	onChange: string => mixed,
@@ -30,14 +35,13 @@ type PropsType = {
 type StateType = {
 	isDirty: boolean,
 	value: string,
-	contentHeight: number,
 };
 
 export class HTMLInputView extends React.Component<PropsType, StateType> {
 	isIOS: boolean = Platform.OS === 'ios';
-	textInput: TextInput;
 	edit: string => mixed;
 	stopEditing: () => mixed;
+	panResponder: PanResponder;
 
 	constructor() {
 		super( ...arguments );
@@ -45,10 +49,22 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 		this.edit = this.edit.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
 
+		this.panResponder = PanResponder.create( {
+			onStartShouldSetPanResponderCapture: ( ) => true,
+
+			onPanResponderMove: ( e, gestureState ) => {
+				if ( this.isIOS && ( gestureState.dy > 100 && gestureState.dy < 110 ) ) {
+					//Keyboard.dismiss() and this.textInput.blur() is not working here
+					//They require to know the currentlyFocusedID under the hood but
+					//during this gesture there's no currentlyFocusedID
+					UIManager.blur( e.target );
+				}
+			},
+		} );
+
 		this.state = {
 			isDirty: false,
 			value: '',
-			contentHeight: 0,
 		};
 	}
 
@@ -82,35 +98,29 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 
 	render() {
 		return (
-			<KeyboardAvoidingView style={ styles.container } parentHeight={ this.props.parentHeight }>
-				<ScrollView
-					style={ { flex: 1 } }
-					keyboardDismissMode="interactive" >
-					<TextInput
-						autoCorrect={ false }
-						textAlignVertical="center"
-						numberOfLines={ 1 }
-						style={ styles.htmlViewTitle }
-						value={ this.props.title }
-						placeholder={ __( 'Add title' ) }
-						onChangeText={ this.props.setTitleAction }
-					/>
-					<TextInput
-						autoCorrect={ false }
-						ref={ ( textInput ) => this.textInput = textInput }
-						textAlignVertical="top"
-						multiline
-						style={ { ...styles.htmlView, height: this.state.contentHeight + 16 } }
-						value={ this.state.value }
-						onChangeText={ this.edit }
-						onBlur={ this.stopEditing }
-						placeholder={ __( 'Start writing…' ) }
-						scrollEnabled={ false }
-						onContentSizeChange={ ( event ) => {
-							this.setState( { contentHeight: event.nativeEvent.contentSize.height } );
-						} }
-					/>
-				</ScrollView>
+			<KeyboardAvoidingView
+				style={ styles.container }
+				{ ...( this.isIOS ? { ...this.panResponder.panHandlers } : {} ) }
+				parentHeight={ this.props.parentHeight }>
+				<TextInput
+					autoCorrect={ false }
+					textAlignVertical="center"
+					numberOfLines={ 1 }
+					style={ styles.htmlViewTitle }
+					value={ this.props.title }
+					placeholder={ __( 'Add title' ) }
+					onChangeText={ this.props.setTitleAction }
+				/>
+				<TextInput
+					autoCorrect={ false }
+					textAlignVertical="top"
+					multiline
+					style={ { ...styles.htmlView } }
+					value={ this.state.value }
+					onChangeText={ this.edit }
+					onBlur={ this.stopEditing }
+					placeholder={ __( 'Start writing…' ) }
+				/>
 			</KeyboardAvoidingView>
 		);
 	}

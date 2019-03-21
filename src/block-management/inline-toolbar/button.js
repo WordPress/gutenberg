@@ -1,17 +1,27 @@
 /** @flow
  * @format */
 
+/**
+ * External dependencies
+ */
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
 import { Dashicon } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import styles from './style.scss';
 
 type PropsType = {
 	disabled: boolean,
 	icon: string,
 	onPress: () => void,
 };
-
-import styles from './style.scss';
 
 export default class InlineToolbarButton extends React.Component<PropsType> {
 	static defaultProps = {
