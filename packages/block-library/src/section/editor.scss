@@ -7,6 +7,11 @@ $block-name: "section";
 	padding-left: 42px;
 	padding-right: 42px;
 
+	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks {
+		margin-top: -32px;
+		margin-bottom: -32px;
+	}
+
 	// Full Width Blocks
 	// specificity required to only target immediate child Blocks of Section
 	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
