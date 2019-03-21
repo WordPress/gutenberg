@@ -26,9 +26,7 @@ export default class UnsupportedBlockEdit extends Component {
 
 		return (
 			<View style={ styles.unsupportedBlock }>
-				<View style={ styles.unsupportedBlockIcon }>
-					<Icon icon={ icon && icon.src ? icon.src : icon } />
-				</View>
+				<Icon className="unsupported-icon" icon={ icon && icon.src ? icon.src : icon } />
 				<Text style={ styles.unsupportedBlockMessage }>{ title }</Text>
 			</View>
 		);
