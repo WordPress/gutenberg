@@ -12,12 +12,31 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEditorProvider } from '@wordpress/block-editor';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import transformStyles from '../../editor-styles';
 import { mediaUpload } from '../../utils';
+
+const fetchLinkSuggestions = async ( search ) => {
+	const posts = await apiFetch( {
+		path: addQueryArgs( '/wp/v2/search', {
+			search,
+			per_page: 20,
+			type: 'post',
+		} ),
+	} );
+
+	return map( posts, ( post ) => ( {
+		id: post.id,
+		url: post.url,
+		title: decodeEntities( post.title ) || __( '(no title)' ),
+	} ) );
+};
 
 class EditorProvider extends Component {
 	constructor( props ) {
@@ -78,6 +97,7 @@ class EditorProvider extends Component {
 			},
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalMediaUpload: mediaUpload,
+			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 		};
 	}
 
