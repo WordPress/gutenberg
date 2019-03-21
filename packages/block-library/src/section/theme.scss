@@ -1,4 +1,6 @@
 .wp-block-section {
+	padding: $block-padding;
+
 	&.has-background {
 		margin-top: 0;
 		margin-bottom: 0;
