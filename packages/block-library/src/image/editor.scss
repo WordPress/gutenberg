@@ -124,3 +124,9 @@
 		caption-side: bottom;
 	}
 }
+
+// Edge case to spacing required for images when displayed within Section Block
+.wp-block-section .editor-block-list__layout [data-type="core/image"] {
+	padding-left: $block-padding*3;
+	padding-right: $block-padding*3;
+}
