@@ -19,7 +19,7 @@ const formatTag = ( title, tags, formatter, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( `**${ title }**` );
+		docs.push( `*${ title }*` );
 		docs.push( '\n' );
 		docs.push( ...tags.map( formatter ) );
 	}
@@ -29,7 +29,7 @@ const formatExamples = ( tags, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( '**Usage**' );
+		docs.push( '*Usage*' );
 		docs.push( '\n' );
 		docs.push( '\n' );
 		docs.push( ...tags.map(
@@ -55,6 +55,10 @@ const formatDescription = ( description, docs ) => {
 
 const getHeading = ( index, text ) => {
 	return '#'.repeat( index ) + ' ' + text;
+};
+
+const getSymbolHeading = ( text, source ) => {
+	return `<a href="#${ text }">#</a> **${ text }** ${ `[${ source }](${ source })` }`;
 };
 
 module.exports = function( rootDir, docPath, symbols, headingTitle, headingStartIndex ) {
@@ -87,8 +91,7 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 				path.basename( symbol.path ),
 			);
 			const symbolPathWithLines = `${ symbolPath }#L${ symbol.lineStart }-L${ symbol.lineEnd }`;
-			docs.push( getHeading( headingIndex, `${ symbol.name }` ) );
-			docs.push( `\n\n[${ symbolPathWithLines }](${ symbolPathWithLines })` );
+			docs.push( getSymbolHeading( symbol.name, symbolPathWithLines ) );
 			formatDeprecated( getTagsByName( symbol.tags, 'deprecated' ), docs );
 			formatDescription( symbol.description, docs );
 			formatTag(
@@ -107,13 +110,13 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 			formatTag(
 				'Parameters',
 				getTagsByName( symbol.tags, 'param' ),
-				( tag ) => `\n- **${ tag.name }** \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Returns',
 				getTagsByName( symbol.tags, 'return' ),
-				( tag ) => `\n\`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			docs.push( '\n' );
