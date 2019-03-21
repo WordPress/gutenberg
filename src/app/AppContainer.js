@@ -11,11 +11,10 @@ import RNReactNativeGutenbergBridge, {
 } from 'react-native-gutenberg-bridge';
 import { isEmpty } from 'lodash';
 
-import { parse, serialize } from '@wordpress/blocks';
+import { parse, serialize, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
-import { UnsupportedBlock } from '@wordpress/block-library';
 
 import type { BlockType } from '../store/types';
 
@@ -80,7 +79,7 @@ class AppContainer extends React.Component<PropsType> {
 
 	componentDidMount() {
 		const blocks = this.props.blocks;
-		const hasUnsupportedBlocks = ! isEmpty( blocks.filter( ( { name } ) => name === UnsupportedBlock.name ) );
+		const hasUnsupportedBlocks = ! isEmpty( blocks.filter( ( { name } ) => name === getUnregisteredTypeHandlerName() ) );
 		RNReactNativeGutenbergBridge.editorDidMount( hasUnsupportedBlocks );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
