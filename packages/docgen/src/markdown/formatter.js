@@ -58,7 +58,7 @@ const getHeading = ( index, text ) => {
 };
 
 const getSymbolHeading = ( text, source ) => {
-	return `<a href="#${ text.toLowerCase() }">#</a> **${ text }** ${ `[<>](${ source })` }`;
+	return `<a name="${ text }" href="#${ text }">#</a> **${ text }** ${ `[<>](${ source })` }`;
 };
 
 module.exports = function( rootDir, docPath, symbols, headingTitle, headingStartIndex ) {
