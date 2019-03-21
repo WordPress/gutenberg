@@ -78,7 +78,7 @@ _Returns_
 
 -   `Function`: Returns the new composite function.
 
-<a href="#createHigherOrderComponent">#</a> **createHigherOrderComponent** [src/index.js#L6-L6](src/index.js#L6-L6)
+<a href="#createhigherordercomponent">#</a> **createHigherOrderComponent** [src/index.js#L6-L6](src/index.js#L6-L6)
 
 Given a function mapping a component to an enhanced component and modifier
 name, returns the enhanced component augmented with a generated displayName.
@@ -92,7 +92,7 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
-<a href="#ifCondition">#</a> **ifCondition** [src/index.js#L7-L7](src/index.js#L7-L7)
+<a href="#ifcondition">#</a> **ifCondition** [src/index.js#L7-L7](src/index.js#L7-L7)
 
 Higher-order component creator, creating a new component which renders if
 the given condition is satisfied or with the given optional prop name.
@@ -119,11 +119,11 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
-<a href="#withGlobalEvents">#</a> **withGlobalEvents** [src/index.js#L9-L9](src/index.js#L9-L9)
+<a href="#withglobalevents">#</a> **withGlobalEvents** [src/index.js#L9-L9](src/index.js#L9-L9)
 
 Undocumented declaration.
 
-<a href="#withInstanceId">#</a> **withInstanceId** [src/index.js#L10-L10](src/index.js#L10-L10)
+<a href="#withinstanceid">#</a> **withInstanceId** [src/index.js#L10-L10](src/index.js#L10-L10)
 
 A Higher Order Component used to be provide a unique instance ID by
 component.
@@ -136,7 +136,7 @@ _Returns_
 
 -   `Component`: Component with an instanceId prop.
 
-<a href="#withSafeTimeout">#</a> **withSafeTimeout** [src/index.js#L11-L11](src/index.js#L11-L11)
+<a href="#withsafetimeout">#</a> **withSafeTimeout** [src/index.js#L11-L11](src/index.js#L11-L11)
 
 A higher-order component used to provide and manage delayed function calls
 that ought to be bound to a component's lifecycle.
@@ -149,7 +149,7 @@ _Returns_
 
 -   `Component`: Wrapped component.
 
-<a href="#withState">#</a> **withState** [src/index.js#L12-L12](src/index.js#L12-L12)
+<a href="#withstate">#</a> **withState** [src/index.js#L12-L12](src/index.js#L12-L12)
 
 A Higher Order Component used to provide and manage internal component state
 via props.

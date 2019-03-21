@@ -29,7 +29,7 @@ _Returns_
 
 -   `string`: Formatted date.
 
-<a href="#dateI18n">#</a> **dateI18n** [src/index.js#L356-L366](src/index.js#L356-L366)
+<a href="#datei18n">#</a> **dateI18n** [src/index.js#L356-L366](src/index.js#L356-L366)
 
 Formats a date (like `dateI18n()` in PHP).
 
@@ -56,7 +56,7 @@ _Returns_
 
 -   `string`: Formatted date.
 
-<a href="#getDate">#</a> **getDate** [src/index.js#L389-L395](src/index.js#L389-L395)
+<a href="#getdate">#</a> **getDate** [src/index.js#L389-L395](src/index.js#L389-L395)
 
 Create and return a JavaScript Date Object from a date string in the WP timezone.
 
@@ -81,7 +81,7 @@ _Returns_
 
 -   `string`: Formatted date.
 
-<a href="#isInTheFuture">#</a> **isInTheFuture** [src/index.js#L375-L380](src/index.js#L375-L380)
+<a href="#isinthefuture">#</a> **isInTheFuture** [src/index.js#L375-L380](src/index.js#L375-L380)
 
 Check whether a date is considered in the future according to the WordPress settings.
 
@@ -93,7 +93,7 @@ _Returns_
 
 -   `boolean`: Is in the future.
 
-<a href="#setSettings">#</a> **setSettings** [src/index.js#L36-L83](src/index.js#L36-L83)
+<a href="#setsettings">#</a> **setSettings** [src/index.js#L36-L83](src/index.js#L36-L83)
 
 Adds a locale to moment, using the format supplied by `wp_localize_script()`.
 

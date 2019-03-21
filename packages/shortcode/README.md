@@ -55,7 +55,7 @@ _Returns_
 
 -   `WPShortcode`: Shortcode instance.
 
-<a href="#fromMatch">#</a> **fromMatch** [src/index.js#L223-L240](src/index.js#L223-L240)
+<a href="#frommatch">#</a> **fromMatch** [src/index.js#L223-L240](src/index.js#L223-L240)
 
 Generate a Shortcode Object from a RegExp match.
 

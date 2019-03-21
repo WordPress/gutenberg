@@ -180,7 +180,7 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 Undocumented declaration.
 
-<a href="#cloneBlock">#</a> **cloneBlock** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#cloneblock">#</a> **cloneBlock** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Given a block object, returns a copy of the block object, optionally merging
 new attributes and/or replacing its inner blocks.
@@ -195,7 +195,7 @@ _Returns_
 
 -   `Object`: A cloned block.
 
-<a href="#createBlock">#</a> **createBlock** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#createblock">#</a> **createBlock** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns a block object given its type and attributes.
 
@@ -209,7 +209,7 @@ _Returns_
 
 -   `Object`: Block object.
 
-<a href="#doBlocksMatchTemplate">#</a> **doBlocksMatchTemplate** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#doblocksmatchtemplate">#</a> **doBlocksMatchTemplate** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Checks whether a list of blocks matches a template by comparing the block names.
 
@@ -222,7 +222,7 @@ _Returns_
 
 -   `boolean`: Whether the list of blocks matches a templates
 
-<a href="#findTransform">#</a> **findTransform** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#findtransform">#</a> **findTransform** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Given an array of transforms, returns the highest-priority transform where
 the predicate function returns a truthy value. A higher-priority transform
@@ -239,7 +239,7 @@ _Returns_
 
 -   `?Object`: Highest-priority transform candidate.
 
-<a href="#getBlockAttributes">#</a> **getBlockAttributes** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getblockattributes">#</a> **getBlockAttributes** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns the block attributes of a registered block node given its type.
 
@@ -253,7 +253,7 @@ _Returns_
 
 -   `Object`: All block attributes.
 
-<a href="#getBlockContent">#</a> **getBlockContent** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getblockcontent">#</a> **getBlockContent** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Given a block object, returns the Block's Inner HTML markup.
 
@@ -265,7 +265,7 @@ _Returns_
 
 -   `string`: HTML.
 
-<a href="#getBlockDefaultClassName">#</a> **getBlockDefaultClassName** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getblockdefaultclassname">#</a> **getBlockDefaultClassName** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns the block's default classname from its name.
 
@@ -277,7 +277,7 @@ _Returns_
 
 -   `string`: The block's default class.
 
-<a href="#getBlockMenuDefaultClassName">#</a> **getBlockMenuDefaultClassName** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getblockmenudefaultclassname">#</a> **getBlockMenuDefaultClassName** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns the block's default menu item classname from its name.
 
@@ -289,7 +289,7 @@ _Returns_
 
 -   `string`: The block's default menu item class.
 
-<a href="#getBlockSupport">#</a> **getBlockSupport** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getblocksupport">#</a> **getBlockSupport** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns the block support value for a feature, if defined.
 
@@ -303,7 +303,7 @@ _Returns_
 
 -   `?*`: Block support value
 
-<a href="#getBlockTransforms">#</a> **getBlockTransforms** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getblocktransforms">#</a> **getBlockTransforms** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns normal block transforms for a given transform direction, optionally
 for a specific block by name, or an empty array if there are no transforms.
@@ -319,7 +319,7 @@ _Returns_
 
 -   `Array`: Block transforms for direction.
 
-<a href="#getBlockType">#</a> **getBlockType** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getblocktype">#</a> **getBlockType** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns a registered block type.
 
@@ -331,7 +331,7 @@ _Returns_
 
 -   `?Object`: Block type.
 
-<a href="#getBlockTypes">#</a> **getBlockTypes** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getblocktypes">#</a> **getBlockTypes** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns all registered blocks.
 
@@ -339,7 +339,7 @@ _Returns_
 
 -   `Array`: Block settings.
 
-<a href="#getCategories">#</a> **getCategories** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getcategories">#</a> **getCategories** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns all the block categories.
 
@@ -347,7 +347,7 @@ _Returns_
 
 -   `Array<Object>`: Block categories.
 
-<a href="#getChildBlockNames">#</a> **getChildBlockNames** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getchildblocknames">#</a> **getChildBlockNames** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns an array with the child blocks of a given block.
 
@@ -359,7 +359,7 @@ _Returns_
 
 -   `Array`: Array of child block names.
 
-<a href="#getDefaultBlockName">#</a> **getDefaultBlockName** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getdefaultblockname">#</a> **getDefaultBlockName** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Retrieves the default block name.
 
@@ -367,7 +367,7 @@ _Returns_
 
 -   `?string`: Block name.
 
-<a href="#getFreeformContentHandlerName">#</a> **getFreeformContentHandlerName** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getfreeformcontenthandlername">#</a> **getFreeformContentHandlerName** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Retrieves name of block handling non-block content, or undefined if no
 handler has been defined.
@@ -376,7 +376,7 @@ _Returns_
 
 -   `?string`: Blog name.
 
-<a href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getphrasingcontentschema">#</a> **getPhrasingContentSchema** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Get schema of possible paths for phrasing content.
 
@@ -388,7 +388,7 @@ _Returns_
 
 -   `Object`: Schema.
 
-<a href="#getPossibleBlockTransformations">#</a> **getPossibleBlockTransformations** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getpossibleblocktransformations">#</a> **getPossibleBlockTransformations** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns an array of block types that the set of blocks received as argument
 can be transformed into.
@@ -401,7 +401,7 @@ _Returns_
 
 -   `Array`: Block types that the blocks argument can be transformed to.
 
-<a href="#getSaveContent">#</a> **getSaveContent** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getsavecontent">#</a> **getSaveContent** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Given a block type containing a save render implementation and attributes, returns the
 static markup to be saved.
@@ -416,7 +416,7 @@ _Returns_
 
 -   `string`: Save content.
 
-<a href="#getSaveElement">#</a> **getSaveElement** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getsaveelement">#</a> **getSaveElement** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Given a block type containing a save render implementation and attributes, returns the
 enhanced element to be saved or string when raw HTML expected.
@@ -431,7 +431,7 @@ _Returns_
 
 -   `(Object|string)`: Save element or raw HTML string.
 
-<a href="#getUnregisteredTypeHandlerName">#</a> **getUnregisteredTypeHandlerName** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#getunregisteredtypehandlername">#</a> **getUnregisteredTypeHandlerName** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Retrieves name of block handling unregistered block types, or undefined if no
 handler has been defined.
@@ -440,7 +440,7 @@ _Returns_
 
 -   `?string`: Blog name.
 
-<a href="#hasBlockSupport">#</a> **hasBlockSupport** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#hasblocksupport">#</a> **hasBlockSupport** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns true if the block defines support for a feature, or false otherwise.
 
@@ -454,7 +454,7 @@ _Returns_
 
 -   `boolean`: Whether block supports feature.
 
-<a href="#hasChildBlocks">#</a> **hasChildBlocks** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#haschildblocks">#</a> **hasChildBlocks** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns a boolean indicating if a block has child blocks or not.
 
@@ -466,7 +466,7 @@ _Returns_
 
 -   `boolean`: True if a block contains child blocks and false otherwise.
 
-<a href="#hasChildBlocksWithInserterSupport">#</a> **hasChildBlocksWithInserterSupport** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#haschildblockswithinsertersupport">#</a> **hasChildBlocksWithInserterSupport** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns a boolean indicating if a block has at least one child block with inserter support.
 
@@ -478,7 +478,7 @@ _Returns_
 
 -   `boolean`: True if a block contains at least one child blocks with inserter support and false otherwise.
 
-<a href="#isReusableBlock">#</a> **isReusableBlock** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#isreusableblock">#</a> **isReusableBlock** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Determines whether or not the given block is a reusable block. This is a
 special block type that is used to point to a global block stored via the
@@ -492,7 +492,7 @@ _Returns_
 
 -   `boolean`: Whether the given block is a reusable block.
 
-<a href="#isUnmodifiedDefaultBlock">#</a> **isUnmodifiedDefaultBlock** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#isunmodifieddefaultblock">#</a> **isUnmodifiedDefaultBlock** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Determines whether the block is a default block
 and its attributes are equal to the default attributes
@@ -506,7 +506,7 @@ _Returns_
 
 -   `boolean`: Whether the block is an unmodified default block
 
-<a href="#isValidBlockContent">#</a> **isValidBlockContent** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#isvalidblockcontent">#</a> **isValidBlockContent** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Returns true if the parsed block is valid given the input content. A block
 is considered valid if, when serialized with assumed attributes, the content
@@ -524,7 +524,7 @@ _Returns_
 
 -   `boolean`: Whether block is valid.
 
-<a href="#isValidIcon">#</a> **isValidIcon** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#isvalidicon">#</a> **isValidIcon** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Function that checks if the parameter is a valid icon.
 
@@ -540,7 +540,7 @@ _Returns_
 
 Undocumented declaration.
 
-<a href="#normalizeIconObject">#</a> **normalizeIconObject** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#normalizeiconobject">#</a> **normalizeIconObject** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Function that receives an icon as set by the blocks during the registration
 and returns a new icon object that is normalized so we can rely on just on possible icon structure
@@ -566,7 +566,7 @@ _Returns_
 
 -   `Array`: Block list.
 
-<a href="#parseWithAttributeSchema">#</a> **parseWithAttributeSchema** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#parsewithattributeschema">#</a> **parseWithAttributeSchema** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Given a block's raw content and an attribute's schema returns the attribute's
 value depending on its source.
@@ -580,7 +580,7 @@ _Returns_
 
 -   `*`: Attribute value.
 
-<a href="#pasteHandler">#</a> **pasteHandler** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#pastehandler">#</a> **pasteHandler** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Converts an HTML string to known blocks. Strips everything else.
 
@@ -596,7 +596,7 @@ _Returns_
 
 -   `(Array|string)`: A list of blocks or a string, depending on `handlerMode`.
 
-<a href="#rawHandler">#</a> **rawHandler** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#rawhandler">#</a> **rawHandler** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Converts an HTML string to known blocks.
 
@@ -608,7 +608,7 @@ _Returns_
 
 -   `Array`: A list of blocks.
 
-<a href="#registerBlockStyle">#</a> **registerBlockStyle** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#registerblockstyle">#</a> **registerBlockStyle** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Registers a new block style variation for the given block.
 
@@ -617,7 +617,7 @@ _Parameters_
 -   `string`: Name of block (example: “core/latest-posts”).
 -   `Object`: Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
 
-<a href="#registerBlockType">#</a> **registerBlockType** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#registerblocktype">#</a> **registerBlockType** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Registers a new block provided a unique name and an object defining its
 behavior. Once registered, the block is made available as an option to any
@@ -644,7 +644,7 @@ _Returns_
 
 -   `string`: The post content.
 
-<a href="#setCategories">#</a> **setCategories** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#setcategories">#</a> **setCategories** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Sets the block categories.
 
@@ -652,7 +652,7 @@ _Parameters_
 
 -   `Array<Object>`: Block categories.
 
-<a href="#setDefaultBlockName">#</a> **setDefaultBlockName** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#setdefaultblockname">#</a> **setDefaultBlockName** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Assigns the default block name.
 
@@ -660,7 +660,7 @@ _Parameters_
 
 -   `string`: Block name.
 
-<a href="#setFreeformContentHandlerName">#</a> **setFreeformContentHandlerName** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#setfreeformcontenthandlername">#</a> **setFreeformContentHandlerName** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Assigns name of block for handling non-block content.
 
@@ -668,7 +668,7 @@ _Parameters_
 
 -   `string`: Block name.
 
-<a href="#setUnregisteredTypeHandlerName">#</a> **setUnregisteredTypeHandlerName** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#setunregisteredtypehandlername">#</a> **setUnregisteredTypeHandlerName** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Assigns name of block handling unregistered block types.
 
@@ -676,7 +676,7 @@ _Parameters_
 
 -   `string`: Block name.
 
-<a href="#switchToBlockType">#</a> **switchToBlockType** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#switchtoblocktype">#</a> **switchToBlockType** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Switch one or more blocks into one or more blocks of the new block type.
 
@@ -689,7 +689,7 @@ _Returns_
 
 -   `Array`: Array of blocks.
 
-<a href="#synchronizeBlocksWithTemplate">#</a> **synchronizeBlocksWithTemplate** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#synchronizeblockswithtemplate">#</a> **synchronizeBlocksWithTemplate** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Synchronize a block list with a block template.
 
@@ -707,7 +707,7 @@ _Returns_
 
 -   `Array`: Updated Block list.
 
-<a href="#unregisterBlockStyle">#</a> **unregisterBlockStyle** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#unregisterblockstyle">#</a> **unregisterBlockStyle** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Unregisters a block style variation for the given block.
 
@@ -716,7 +716,7 @@ _Parameters_
 -   `string`: Name of block (example: “core/latest-posts”).
 -   `string`: Name of class applied to the block.
 
-<a href="#unregisterBlockType">#</a> **unregisterBlockType** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#unregisterblocktype">#</a> **unregisterBlockType** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Unregisters a block.
 
@@ -728,7 +728,7 @@ _Returns_
 
 -   `?WPBlock`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
 
-<a href="#updateCategory">#</a> **updateCategory** [src/index.js#L16-L16](src/index.js#L16-L16)
+<a href="#updatecategory">#</a> **updateCategory** [src/index.js#L16-L16](src/index.js#L16-L16)
 
 Updates a category.
 
@@ -737,7 +737,7 @@ _Parameters_
 -   `string`: Block category slug.
 -   `Object`: Object containing the category properties that should be updated.
 
-<a href="#withBlockContentContext">#</a> **withBlockContentContext** [src/index.js#L17-L17](src/index.js#L17-L17)
+<a href="#withblockcontentcontext">#</a> **withBlockContentContext** [src/index.js#L17-L17](src/index.js#L17-L17)
 
 A Higher Order Component used to inject BlockContent using context to the
 wrapped component.
