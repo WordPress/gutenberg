@@ -139,7 +139,7 @@ jobs:
         name: Zip up .app file
         command: |
           cd ./ios/build/Build/Products/Release-iphonesimulator/
-          zip ./Gutenberg.app.zip ./gutenberg.app
+          zip -r ./Gutenberg.app.zip ./gutenberg.app
           mv ./Gutenberg.app.zip ../../../../../Gutenberg.app.zip
           cd ../../../../../
     - run:
