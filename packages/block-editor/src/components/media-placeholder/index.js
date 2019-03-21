@@ -148,30 +148,17 @@ export class MediaPlaceholder extends Component {
 		this.setState( { isURLInputVisible: false } );
 	}
 
-	render() {
+	renderPlaceholder( content, onClick ) {
 		const {
-			accept,
-			addToGallery,
 			allowedTypes = [],
 			className,
-			dropZoneUIOnly,
 			hasUploadPermissions,
 			icon,
 			isAppender,
 			labels = {},
-			mediaUpload,
-			multiple = false,
 			notices,
-			onHTMLDrop = noop,
-			onSelect,
 			onSelectURL,
-			value = {},
 		} = this.props;
-
-		const {
-			isURLInputVisible,
-			src,
-		} = this.state;
 
 		let instructions = labels.instructions;
 		let title = labels.title;
@@ -223,103 +210,191 @@ export class MediaPlaceholder extends Component {
 			}
 		}
 
-		const dropZone = (
-			<DropZone
-				onFilesDrop={ this.onFilesUpload }
-				onHTMLDrop={ onHTMLDrop }
-			/>
+		const placeholderClassName = classnames(
+			'block-editor-media-placeholder',
+			'editor-media-placeholder',
+			className,
+			{ 'is-appender': isAppender }
 		);
-
-		if ( dropZoneUIOnly ) {
-			return (
-				<MediaUploadCheck>
-					{ dropZone }
-				</MediaUploadCheck>
-			);
-		}
 
 		return (
 			<Placeholder
 				icon={ icon }
 				label={ title }
 				instructions={ instructions }
-				className={
-					classnames(
-						'block-editor-media-placeholder',
-						'editor-media-placeholder',
-						className,
-						{ 'is-appender': isAppender }
-					)
-				}
+				className={ placeholderClassName }
 				notices={ notices }
+				onClick={ onClick }
 			>
-				<MediaUploadCheck>
-					{ !! mediaUpload && (
-						<Fragment>
-							{ dropZone }
-							<FormFileUpload
-								isLarge
-								className={ classnames(
-									'block-editor-media-placeholder__button',
-									'editor-media-placeholder__button',
-									'block-editor-media-placeholder__upload-button'
-								) }
-								onChange={ this.onUpload }
-								accept={ accept }
-								multiple={ multiple }
-							>
-								{ __( 'Upload' ) }
-							</FormFileUpload>
-						</Fragment>
-					) }
-					<MediaUpload
-						addToGallery={ addToGallery }
-						gallery={ multiple && this.onlyAllowsImages() }
+				{ content }
+			</Placeholder>
+		);
+	}
+
+	renderDropZone() {
+		const { onHTMLDrop = noop } = this.props;
+		return (
+			<DropZone
+				onFilesDrop={ this.onFilesUpload }
+				onHTMLDrop={ onHTMLDrop }
+			/>
+		);
+	}
+
+	renderUrlSelectionUI() {
+		const {
+			onSelectURL,
+		} = this.props;
+		if ( ! onSelectURL ) {
+			return null;
+		}
+		const {
+			isURLInputVisible,
+			src,
+		} = this.state;
+		return (
+			<div className="editor-media-placeholder__url-input-container block-editor-media-placeholder__url-input-container">
+				<Button
+					className="editor-media-placeholder__button block-editor-media-placeholder__button"
+					onClick={ this.openURLInput }
+					isToggled={ isURLInputVisible }
+					isLarge
+				>
+					{ __( 'Insert from URL' ) }
+				</Button>
+				{ isURLInputVisible && (
+					<InsertFromURLPopover
+						src={ src }
+						onChange={ this.onChangeSrc }
+						onSubmit={ this.onSubmitSrc }
+						onClose={ this.closeURLInput }
+					/>
+				) }
+			</div>
+		);
+	}
+
+	renderMediaUploadChecked() {
+		const {
+			accept,
+			addToGallery,
+			allowedTypes = [],
+			isAppender,
+			mediaUpload,
+			multiple = false,
+			onSelect,
+			value = {},
+		} = this.props;
+
+		const mediaLibraryButton = (
+			<MediaUpload
+				addToGallery={ addToGallery }
+				gallery={ multiple && this.onlyAllowsImages() }
+				multiple={ multiple }
+				onSelect={ onSelect }
+				allowedTypes={ allowedTypes }
+				value={
+					isArray( value ) ?
+						value.map( ( { id } ) => id ) :
+						value.id
+				}
+				render={ ( { open } ) => {
+					return (
+						<Button
+							isLarge
+							className={ classnames(
+								'editor-media-placeholder__button',
+								'editor-media-placeholder__media-library-button'
+							) }
+							onClick={ ( event ) => {
+								event.stopPropagation();
+								open();
+							} }
+						>
+							{ __( 'Media Library' ) }
+						</Button>
+					);
+				} }
+			/>
+		);
+
+		if ( mediaUpload && isAppender ) {
+			return (
+				<Fragment>
+					{ this.renderDropZone() }
+					<FormFileUpload
+						onChange={ this.onUpload }
+						accept={ accept }
 						multiple={ multiple }
-						onSelect={ onSelect }
-						allowedTypes={ allowedTypes }
-						value={
-							isArray( value ) ?
-								value.map( ( { id } ) => id ) :
-								value.id
-						}
-						render={ ( { open } ) => {
-							return (
-								<Button
-									isLarge
-									className={ classnames(
-										'editor-media-placeholder__button',
-										'editor-media-placeholder__media-library-button'
-									) }
-									onClick={ open }
-								>
-									{ __( 'Media Library' ) }
-								</Button>
+						render={ ( { openFileDialog } ) => {
+							const content = (
+								<Fragment>
+									<IconButton
+										isLarge
+										className={ classnames(
+											'block-editor-media-placeholder__button',
+											'editor-media-placeholder__button',
+											'block-editor-media-placeholder__upload-button'
+										) }
+										icon="upload"
+									>
+										{ __( 'Upload' ) }
+									</IconButton>
+									{ mediaLibraryButton }
+									{ this.renderUrlSelectionUI() }
+								</Fragment>
 							);
+							return this.renderPlaceholder( content, openFileDialog );
 						} }
 					/>
-				</MediaUploadCheck>
-				{ onSelectURL && (
-					<div className="editor-media-placeholder__url-input-container block-editor-media-placeholder__url-input-container">
-						<Button
-							className="editor-media-placeholder__button block-editor-media-placeholder__button"
-							onClick={ this.openURLInput }
-							isToggled={ isURLInputVisible }
-							isLarge
-						>
-							{ __( 'Insert from URL' ) }
-						</Button>
-						{ isURLInputVisible && (
-							<InsertFromURLPopover
-								src={ src }
-								onChange={ this.onChangeSrc }
-								onSubmit={ this.onSubmitSrc }
-								onClose={ this.closeURLInput }
-							/>
+				</Fragment>
+			);
+		}
+		if ( mediaUpload ) {
+			const content = (
+				<Fragment>
+					{ this.renderDropZone() }
+					<FormFileUpload
+						isLarge
+						className={ classnames(
+							'block-editor-media-placeholder__button',
+							'editor-media-placeholder__button',
+							'block-editor-media-placeholder__upload-button'
 						) }
-					</div>
-				) }
-			</Placeholder>
+						onChange={ this.onUpload }
+						accept={ accept }
+						multiple={ multiple }
+					>
+						{ __( 'Upload' ) }
+					</FormFileUpload>
+					{ mediaLibraryButton }
+					{ this.renderUrlSelectionUI() }
+				</Fragment>
+			);
+			return this.renderPlaceholder( content );
+		}
+		return this.renderPlaceholder( mediaLibraryButton );
+	}
+
+	render() {
+		const {
+			dropZoneUIOnly,
+		} = this.props;
+
+		if ( dropZoneUIOnly ) {
+			return (
+				<MediaUploadCheck>
+					{ this.renderDropZone() }
+				</MediaUploadCheck>
+			);
+		}
+
+		return (
+			<MediaUploadCheck
+				fallback={ this.renderPlaceholder( this.renderUrlSelectionUI() ) }
+			>
+				{ this.renderMediaUploadChecked() }
+			</MediaUploadCheck>
 		);
 	}
 }
