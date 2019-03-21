@@ -8,7 +8,7 @@ import '@babel/polyfill';
  */
 import '@wordpress/editor'; // This shouldn't be necessary
 
-import { render, useState } from '@wordpress/element';
+import { render, useState, Fragment } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockList,
@@ -37,20 +37,27 @@ function App() {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	return (
-		<BlockEditorProvider
-			value={ blocks }
-			onInput={ updateBlocks }
-			onChange={ updateBlocks }
-		>
-			<div className="editor-styles-wrapper">
-				<WritingFlow>
-					<ObserveTyping>
-						<BlockList />
-					</ObserveTyping>
-				</WritingFlow>
+		<Fragment>
+			<div className="playground__header">
+				<h1 className="playground__logo">Gutenberg Playground</h1>
 			</div>
-			<Popover.Slot />
-		</BlockEditorProvider>
+			<div className="playground__body">
+				<BlockEditorProvider
+					value={ blocks }
+					onInput={ updateBlocks }
+					onChange={ updateBlocks }
+				>
+					<div className="editor-styles-wrapper">
+						<WritingFlow>
+							<ObserveTyping>
+								<BlockList />
+							</ObserveTyping>
+						</WritingFlow>
+					</div>
+					<Popover.Slot />
+				</BlockEditorProvider>
+			</div>
+		</Fragment>
 	);
 }
 

@@ -1,7 +1,25 @@
-@import "./common.scss";
-@import "./editor-styles.scss";
+@import "../../assets/stylesheets/colors";
+@import "../../assets/stylesheets/variables";
+@import "../../assets/stylesheets/mixins";
+@import "../../assets/stylesheets/breakpoints";
+@import "../../assets/stylesheets/animations";
+@import "../../assets/stylesheets/z-index";
 
-#app {
+@import "./reset";
+@import "./editor-styles";
+
+
+.playground__header {
+	padding: 20px;
+	border-bottom: 1px solid #ddd;
+}
+
+.playground__logo {
+	font-size: 20px;
+	font-weight: 300;
+}
+
+.playground__body {
 	padding-top: 20px;
 
 	img {
