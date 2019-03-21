@@ -1,12 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
-
-window.React = React;
-/**
- * External dependencies
- */
 import '@babel/polyfill';
 
 /**
