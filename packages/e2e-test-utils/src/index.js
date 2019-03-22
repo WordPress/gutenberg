@@ -18,6 +18,7 @@ export { findSidebarPanelWithTitle } from './find-sidebar-panel-with-title';
 export { getAllBlockInserterItemTitles } from './get-all-block-inserter-item-titles';
 export { getAllBlocks } from './get-all-blocks';
 export { getAvailableBlockTransforms } from './get-available-block-transforms';
+export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
 export { hasBlockSwitcher } from './has-block-switcher';
 export { insertBlock } from './insert-block';
