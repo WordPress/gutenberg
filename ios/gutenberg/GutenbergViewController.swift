@@ -176,7 +176,8 @@ extension GutenbergViewController {
 
     func showMoreSheet() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
+        alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem
+
         let cancelAction = UIAlertAction(title: "Keep Editing", style: .cancel)
         alert.addAction(toggleHTMLModeAction)
         alert.addAction(updateHtmlAction)
