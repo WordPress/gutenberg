@@ -19,13 +19,17 @@ module.exports = {
 	blockCode: {
 		fontFamily: 'serif',
 	},
-	'editor-rich-text': {
+	'block-editor-rich-text': {
 		fontFamily: 'serif',
+		minHeight: 30,
 	},
-	'editor-plain-text': {
+	'block-editor-plain-text': {
 		fontFamily: 'serif',
 	},
 	blockHolderFocused: {
 		borderColor: 'gray',
+	},
+	'wp-block-heading': {
+		minHeight: 60,
 	},
 };

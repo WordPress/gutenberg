@@ -94,6 +94,11 @@ public class Gutenberg: NSObject {
         bridgeModule.sendEventIfNeeded(name: EventName.mediaUpload, body: data)
     }
 
+    public func appendMedia(id: Int32, url: URL) {
+        let data: [String: Any] = ["mediaId": id, "mediaUrl": url.absoluteString];
+        bridgeModule.sendEventIfNeeded(name: EventName.mediaAppend, body: data)
+    }
+
     public func setFocusOnTitle() {
         bridgeModule.sendEventIfNeeded(name: EventName.setFocusOnTitle, body: nil)
     }
@@ -122,6 +127,7 @@ extension Gutenberg {
         static let updateHtml = "updateHtml"
         static let mediaUpload = "mediaUpload"
         static let setFocusOnTitle = "setFocusOnTitle"
+        static let mediaAppend = "mediaAppend"
     }
     
     public enum MediaUploadState: Int {

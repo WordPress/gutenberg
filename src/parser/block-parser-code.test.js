@@ -1,7 +1,13 @@
 /** @format */
 
+/**
+ * Internal dependencies
+ */
 import '../globals';
 
+/**
+ * WordPress dependencies
+ */
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { parse } from '@wordpress/blocks';
 
