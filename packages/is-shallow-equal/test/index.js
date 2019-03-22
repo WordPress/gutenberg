@@ -1,5 +1,5 @@
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import isShallowEqual from '../';
 import isShallowEqualArrays from '../arrays';

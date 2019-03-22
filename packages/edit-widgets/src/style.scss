@@ -1,0 +1,19 @@
+// In order to use mix-blend-mode, this element needs to have an explicitly set background-color
+// We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations
+html.wp-toolbar {
+	background: $white;
+}
+
+body.gutenberg_page_gutenberg-widgets {
+	@include wp-admin-reset( ".blocks-widgets-container" );
+}
+
+.blocks-widgets-container,
+// The modals are shown outside the .blocks-widgets-container wrapper, they need these styles
+.components-modal__frame {
+	@include reset;
+}
+
+.blocks-widgets-container {
+	padding: 0 10px;
+}

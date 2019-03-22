@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
+import '@wordpress/block-editor';
+import '@wordpress/editor';
 import {
 	registerBlockType,
 	setDefaultBlockName,
@@ -20,6 +22,7 @@ import * as gallery from './gallery';
 import * as archives from './archives';
 import * as audio from './audio';
 import * as button from './button';
+import * as calendar from './calendar';
 import * as categories from './categories';
 import * as code from './code';
 import * as columns from './columns';
@@ -31,6 +34,7 @@ import * as html from './html';
 import * as mediaText from './media-text';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
+import * as legacyWidget from './legacy-widget';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -39,6 +43,7 @@ import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
 import * as rss from './rss';
+import * as search from './search';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
@@ -48,9 +53,20 @@ import * as template from './template';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as tagCloud from './tag-cloud';
 
 import * as classic from './classic';
 
+/**
+ * Function to register core blocks provided by the block editor.
+ *
+ * @example
+ * ```js
+ * import { registerCoreBlocks } from '@wordpress/block-library';
+ *
+ * registerCoreBlocks();
+ * ```
+ */
 export const registerCoreBlocks = () => {
 	[
 		// Common blocks are grouped at the top to prioritize their display
@@ -67,6 +83,7 @@ export const registerCoreBlocks = () => {
 		archives,
 		audio,
 		button,
+		calendar,
 		categories,
 		code,
 		columns,
@@ -81,17 +98,20 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		latestComments,
 		latestPosts,
+		process.env.GUTENBERG_PHASE === 2 ? legacyWidget : null,
 		missing,
 		more,
 		nextpage,
 		preformatted,
 		pullquote,
 		rss,
+		search,
 		separator,
 		reusableBlock,
 		spacer,
 		subhead,
 		table,
+		tagCloud,
 		template,
 		textColumns,
 		verse,

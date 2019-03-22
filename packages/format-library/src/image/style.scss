@@ -1,0 +1,21 @@
+.block-editor-format-toolbar__image-container-content {
+	display: flex;
+
+	.components-icon-button {
+		height: $icon-button-size + $grid-size + $grid-size;
+		align-self: flex-end;
+	}
+}
+
+.block-editor-format-toolbar__image-container-value {
+	margin: $grid-size - $border-width;
+	flex-grow: 1;
+	flex-shrink: 1;
+	white-space: nowrap;
+	min-width: 150px;
+	max-width: 500px;
+
+	&.components-base-control .components-base-control__field {
+		margin-bottom: 0;
+	}
+}

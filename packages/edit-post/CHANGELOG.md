@@ -5,7 +5,9 @@
 * Expose the `className` property to style the `PluginSidebar` component.
 
 ### Bug Fixes
- - Fix 'save' keyboard shortcut not functioning in the Code Editor.
+
+- Fix 'save' keyboard shortcut not functioning in the Code Editor.
+- Prevent `ClipboardButton` from incorrectly copying a serialized block string instead of the intended text in Safari.
 
 ## 3.1.7 (2019-01-03)
 

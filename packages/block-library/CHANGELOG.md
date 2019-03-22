@@ -1,9 +1,14 @@
-## 2.3.0 (Unreleased)
+## 2.4.0 (Unreleased)
+
+- Add vertical alignment controls to `columns` Block ([#13899](https://github.com/WordPress/gutenberg/pull/13899/)).
+
+## 2.3.0 (2019-03-06)
 
 ### New Feature
 
 - Add background color controls for the table block.
 - Add new `RSS` block ([#7966](https://github.com/WordPress/gutenberg/pull/7966)).
+- Add new `Search` block ([#13583](https://github.com/WordPress/gutenberg/pull/13583)).
 
 ## 2.2.12 (2019-01-03)
 

@@ -8,8 +8,6 @@ import { shallow } from 'enzyme';
  */
 import { PostPublishButton } from '../';
 
-jest.mock( '../../../../../components/src/button' );
-
 describe( 'PostPublishButton', () => {
 	describe( 'aria-disabled', () => {
 		it( 'should be true if post is currently saving', () => {
@@ -196,6 +194,6 @@ describe( 'PostPublishButton', () => {
 			/>
 		);
 
-		expect( wrapper.find( 'Button' ).prop( 'isBusy' ) ).toBe( true );
+		expect( wrapper.find( 'ForwardRef(Button)' ).prop( 'isBusy' ) ).toBe( true );
 	} );
 } );

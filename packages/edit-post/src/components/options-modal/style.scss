@@ -1,9 +1,4 @@
 .edit-post-options-modal {
-	&__title {
-		font-size: 1rem;
-		font-weight: 600;
-	}
-
 	&__section {
 		margin: 0 0 2rem 0;
 	}
@@ -24,6 +19,10 @@
 			align-items: center;
 			display: flex;
 			margin: 0;
+		}
+
+		&.components-base-control + &.components-base-control {
+			margin-bottom: 0;
 		}
 
 		.components-checkbox-control__label {

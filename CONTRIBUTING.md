@@ -79,6 +79,12 @@ Alternatively, you can use your own local WordPress environment and clone this r
 
 Next, open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Then you can type `npm run dev` in your terminal or command prompt to keep the plugin building in the background as you work on it.
 
+WordPress comes with specific [debug systems](https://codex.wordpress.org/Debugging_in_WordPress) designed to simplify the process as well as standardize code across core, plugins and themes. It is possible to use environment variables (`WP_DEBUG` and `SCRIPT_DEBUG`) to update a site's configuration constants located in `wp-config.php` file. Both flags can be disabled at any time by running the following command:
+```
+SCRIPT_DEBUG=false WP_DEBUG=false ./bin/setup-local-env.sh
+```
+By default, both flags will be set to `true`.
+
 ### On A Remote Server
 
 Open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`. You can now upload the entire repository to your `wp-content/plugins` directory on your web server and activate the plugin from the WordPress admin.

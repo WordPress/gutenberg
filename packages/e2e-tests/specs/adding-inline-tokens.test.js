@@ -1,5 +1,5 @@
 /**
- * Node dependencies
+ * External dependencies
  */
 import path from 'path';
 import fs from 'fs';
@@ -12,8 +12,9 @@ import uuid from 'uuid/v4';
 import {
 	clickBlockAppender,
 	getEditedPostContent,
-	insertBlock,
 	createNewPost,
+	clickBlockToolbarButton,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding inline tokens', () => {
@@ -26,7 +27,8 @@ describe( 'adding inline tokens', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'a ' );
 
-		await insertBlock( 'Inline Image', 'Inline Elements' );
+		await clickBlockToolbarButton( 'More Rich Text Controls' );
+		await clickButton( 'Inline Image' );
 
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );

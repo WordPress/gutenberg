@@ -1,4 +1,11 @@
-## 9.1.0 (Unreleased)
+## 9.1.1 (Unreleased)
+
+### Internal
+
+- Refactor setupEditor effects to action-generator using controls ([#14513](https://github.com/WordPress/gutenberg/pull/14513))
+- Remove redux-multi dependency (no longer needed/used with above refactor)
+
+## 9.1.0 (2019-03-06)
 
 ### New Features
 
@@ -15,7 +22,10 @@
 
 ### Internal
 
-- Removed `jQuery` dependency
+- Removed `jQuery` dependency.
+- Removed `TinyMCE` dependency.
+- RichText: improve format boundaries.
+- Refactor all post effects to action-generators using controls ([#13716](https://github.com/WordPress/gutenberg/pull/13716))
 
 ## 9.0.7 (2019-01-03)
 

@@ -145,7 +145,7 @@ class PostLockedModal extends Component {
 		const allPostsUrl = getWPAdminURL( 'edit.php', {
 			post_type: get( postType, [ 'slug' ] ),
 		} );
-		const allPostsLabel = get( postType, [ 'labels', 'all_items' ] );
+		const allPostsLabel = __( 'Exit the Editor' );
 		return (
 			<Modal
 				title={ isTakeover ? __( 'Someone else has taken over this post.' ) : __( 'This post is already being edited.' ) }
@@ -214,13 +214,13 @@ class PostLockedModal extends Component {
 export default compose(
 	withSelect( ( select ) => {
 		const {
-			getEditorSettings,
 			isPostLocked,
 			isPostLockTakeover,
 			getPostLockUser,
 			getCurrentPostId,
 			getActivePostLock,
 			getEditedPostAttribute,
+			getEditorSettings,
 		} = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 		return {
