@@ -211,8 +211,8 @@ Returns a string containing the block title associated with the provided block n
 
 _Parameters_
 
--   `string`: Block name.
--   `string`: Block setting e.g: title, attributes....
+-   _blockName_ `string`: Block name.
+-   _setting_ `string`: Block setting e.g: title, attributes....
 
 _Returns_
 
