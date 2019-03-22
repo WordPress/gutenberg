@@ -16,6 +16,8 @@ class LegacyWidgetEditDomManager extends Component {
 		this.containerRef = createRef();
 		this.formRef = createRef();
 		this.widgetContentRef = createRef();
+		this.idBaseInputRef = createRef();
+		this.widgetNumberInputRef = createRef();
 		this.triggerWidgetEvent = this.triggerWidgetEvent.bind( this );
 	}
 
@@ -27,11 +29,22 @@ class LegacyWidgetEditDomManager extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
+		let shouldTriggerWidgetUpdateEvent = false;
 		// We can not leverage react render otherwise we would destroy dom changes applied by the plugins.
 		// We manually update the required dom node replicating what the widget screen and the customizer do.
+		if ( nextProps.idBase !== this.props.idBase && this.idBaseInputRef.current ) {
+			this.idBaseInputRef.current.value = nextProps.idBase;
+			shouldTriggerWidgetUpdateEvent = true;
+		}
+		if ( nextProps.widgetNumber !== this.props.widgetNumber && this.widgetNumberInputRef.current ) {
+			this.widgetNumberInputRef.current.value = nextProps.widgetNumber;
+		}
 		if ( nextProps.form !== this.props.form && this.widgetContentRef.current ) {
 			const widgetContent = this.widgetContentRef.current;
 			widgetContent.innerHTML = nextProps.form;
+			shouldTriggerWidgetUpdateEvent = true;
+		}
+		if ( shouldTriggerWidgetUpdateEvent ) {
 			this.triggerWidgetEvent( 'widget-updated' );
 			this.previousFormData = new window.FormData(
 				this.formRef.current
@@ -41,7 +54,7 @@ class LegacyWidgetEditDomManager extends Component {
 	}
 
 	render() {
-		const { id, idBase, widgetNumber, form } = this.props;
+		const { id, idBase, widgetNumber, form, identifier } = this.props;
 		return (
 			<div className="widget open" ref={ this.containerRef }>
 				<div className="widget-inside">
@@ -50,6 +63,11 @@ class LegacyWidgetEditDomManager extends Component {
 						method="post"
 						onBlur={ () => {
 							if ( this.shouldTriggerInstanceUpdate() ) {
+								if ( identifier ) {
+									if ( this.containerRef.current ) {
+										window.wpWidgets.save( window.jQuery( this.containerRef.current ) );
+									}
+								}
 								this.props.onInstanceChange(
 									this.retrieveUpdatedInstance()
 								);
@@ -62,8 +80,8 @@ class LegacyWidgetEditDomManager extends Component {
 							dangerouslySetInnerHTML={ { __html: form } }
 						/>
 						<input type="hidden" name="widget-id" className="widget-id" value={ id } />
-						<input type="hidden" name="id_base" className="id_base" value={ idBase } />
-						<input type="hidden" name="widget_number" className="widget_number" value={ widgetNumber } />
+						<input ref={ this.idBaseInputRef } type="hidden" name="id_base" className="id_base" value={ idBase } />
+						<input ref={ this.widgetNumberInputRef } type="hidden" name="widget_number" className="widget_number" value={ widgetNumber } />
 						<input type="hidden" name="multi_number" className="multi_number" value="" />
 						<input type="hidden" name="add_new" className="add_new" value="" />
 					</form>
@@ -102,36 +120,32 @@ class LegacyWidgetEditDomManager extends Component {
 	}
 
 	triggerWidgetEvent( event ) {
-		window.$( window.document ).trigger(
+		window.jQuery( window.document ).trigger(
 			event,
-			[ window.$( this.containerRef.current ) ]
+			[ window.jQuery( this.containerRef.current ) ]
 		);
 	}
 
 	retrieveUpdatedInstance() {
 		if ( this.formRef.current ) {
-			const { idBase, widgetNumber } = this.props;
 			const form = this.formRef.current;
 			const formData = new window.FormData( form );
 			const updatedInstance = {};
-			const keyPrefixLength = `widget-${ idBase }[${ widgetNumber }][`.length;
-			const keySuffixLength = `]`.length;
-			for ( const rawKey of formData.keys() ) {
+			for ( const key of formData.keys() ) {
 				// This fields are added to the form because the widget JavaScript code may use this values.
 				// They are not relevant for the update mechanism.
 				if ( includes(
 					[ 'widget-id', 'id_base', 'widget_number', 'multi_number', 'add_new' ],
-					rawKey,
+					key,
 				) ) {
 					continue;
 				}
-				const keyParsed = rawKey.substring( keyPrefixLength, rawKey.length - keySuffixLength );
 
-				const value = formData.getAll( rawKey );
+				const value = formData.getAll( key );
 				if ( value.length > 1 ) {
-					updatedInstance[ keyParsed ] = value;
+					updatedInstance[ key ] = value;
 				} else {
-					updatedInstance[ keyParsed ] = value[ 0 ];
+					updatedInstance[ key ] = value[ 0 ];
 				}
 			}
 			return updatedInstance;
