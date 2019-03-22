@@ -15,7 +15,7 @@ PluginsMoreMenuGroup.Slot = ( { fillProps } ) => (
 	<Slot fillProps={ fillProps }>
 		{ ( fills ) => ! isEmpty( fills ) && (
 			<MenuGroup
-				role={ 'group' }
+				role="group"
 				useEventToOffset={ false }
 				label={ __( 'Plugins' ) }>
 				{ fills }

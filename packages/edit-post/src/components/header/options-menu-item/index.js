@@ -3,24 +3,18 @@
  */
 import { withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { MenuItem, MenuGroup } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 
 export function OptionsMenuItem( { openModal, onSelect } ) {
 	return (
-		<MenuGroup
-			role={ 'group' }
-			useEventToOffset={ false }
-			label={ __( 'Options' ) }
-			isScreenReaderLabel={ true }>
-			<MenuItem
-				onClick={ () => {
-					onSelect();
-					openModal( 'edit-post/options' );
-				} }
-			>
-				{ __( 'Options' ) }
-			</MenuItem>
-		</MenuGroup>
+		<MenuItem
+			onClick={ () => {
+				onSelect();
+				openModal( 'edit-post/options' );
+			} }
+		>
+			{ __( 'Options' ) }
+		</MenuItem>
 	);
 }
 

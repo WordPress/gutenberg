@@ -36,7 +36,7 @@ function ModeSwitcher( { onSwitch, mode } ) {
 
 	return (
 		<MenuGroup
-			role={ 'group' }
+			role="group"
 			useEventToOffset={ false }
 			label={ __( 'Editor' ) }
 		>

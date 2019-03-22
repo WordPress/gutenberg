@@ -20,9 +20,8 @@ export function MenuGroup( {
 	instanceId,
 	label,
 	role = 'menu',
-	labelRole = ( role === 'group' ) ? { role: 'presentation' } : {},
 	useEventToOffset = true,
-	isScreenReaderLabel = false,
+	isLabelHidden = false,
 } ) {
 	if ( ! Children.count( children ) ) {
 		return null;
@@ -39,10 +38,11 @@ export function MenuGroup( {
 			{ label &&
 				<div
 					className={ classnames( 'components-menu-group__label', {
-						'screen-reader-text': isScreenReaderLabel,
+						hidden: isLabelHidden,
 					} ) }
-					{ ...labelRole }
-					id={ labelId }>
+					id={ labelId }
+					aria-hidden={ ( role === 'group' ) }
+				>
 					{ label }
 				</div>
 			}

@@ -34,7 +34,7 @@ const MoreMenu = () => (
 		) }
 		renderContent={ ( { onClose } ) => (
 			<Fragment>
-				<MenuGroup label={ menuLabel } isScreenReaderLabel={ true }>
+				<MenuGroup label={ menuLabel } isLabelHidden={ true }>
 					<WritingMenu onClose={ onClose } />
 					<ModeSwitcher onSelect={ onClose } />
 					<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
