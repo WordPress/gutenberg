@@ -15,20 +15,20 @@ import { normaliseFormats } from './normalise-formats';
  * given `endIndex`. Indices are retrieved from the selection if none are
  * provided.
  *
- * @param {Object} value      Value to modify.
- * @param {Object} format     Format to apply.
- * @param {number} startIndex Start index.
- * @param {number} endIndex   End index.
+ * @param {Object} value        Value to modify.
+ * @param {Object} format       Format to apply.
+ * @param {number} [startIndex] Start index.
+ * @param {number} [endIndex]   End index.
  *
  * @return {Object} A new value with the format applied.
  */
 export function applyFormat(
-	{ formats, text, start, end },
+	value,
 	format,
-	startIndex = start,
-	endIndex = end
+	startIndex = value.start,
+	endIndex = value.end
 ) {
-	const newFormats = formats.slice( 0 );
+	const newFormats = value.formats.slice( 0 );
 
 	// The selection is collapsed.
 	if ( startIndex === endIndex ) {
@@ -52,17 +52,10 @@ export function applyFormat(
 		// with the format applied.
 		} else {
 			const previousFormat = newFormats[ startIndex - 1 ] || [];
-			const hasType = find( previousFormat, { type: format.type } );
 
 			return {
-				formats,
-				text,
-				start,
-				end,
-				formatPlaceholder: {
-					index: startIndex,
-					format: hasType ? undefined : format,
-				},
+				...value,
+				formatPlaceholder: [ ...previousFormat, format ],
 			};
 		}
 	} else {
@@ -71,7 +64,7 @@ export function applyFormat(
 		}
 	}
 
-	return normaliseFormats( { formats: newFormats, text, start, end } );
+	return normaliseFormats( { ...value, formats: newFormats } );
 }
 
 function applyFormats( formats, index, format ) {

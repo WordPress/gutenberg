@@ -1,0 +1,183 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Block transforms correctly transform block Code in fixture core__code into the Preformatted block 1`] = `
+"<!-- wp:preformatted -->
+<pre class=\\"wp-block-preformatted\\">export default function MyButton() {
+	return <Button>Click Me!</Button>;
+}</pre>
+<!-- /wp:preformatted -->"
+`;
+
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h2 into the Paragraph block 1`] = `
+"<!-- wp:paragraph -->
+<p>A picture is worth a thousand words, or so the saying goes</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h2 into the Quote block 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>A picture is worth a thousand words, or so the saying goes</p></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-em into the Paragraph block 1`] = `
+"<!-- wp:paragraph -->
+<p>The <em>Inserter</em> Tool</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-em into the Quote block 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>The <em>Inserter</em> Tool</p></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Block transforms correctly transform block List in fixture core__list__ul into the Paragraph block 1`] = `
+"<!-- wp:paragraph -->
+<p>Text &amp; Headings</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Images &amp; Videos</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Galleries</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Embeds, like YouTube, Tweets, or other WordPress posts.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Layout blocks, like Buttons, Hero Images, Separators, etc.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>And <em>Lists</em> like this one of course :)</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Block transforms correctly transform block List in fixture core__list__ul into the Quote block 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>Text &amp; Headings</p><p>Images &amp; Videos</p><p>Galleries</p><p>Embeds, like YouTube, Tweets, or other WordPress posts.</p><p>Layout blocks, like Buttons, Hero Images, Separators, etc.</p><p>And <em>Lists</em> like this one of course :)</p></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Block transforms correctly transform block Paragraph in fixture core__paragraph__align-right into the Heading block 1`] = `
+"<!-- wp:heading -->
+<h2>... like this one, which is separate from the above and right aligned.</h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`Block transforms correctly transform block Paragraph in fixture core__paragraph__align-right into the List block 1`] = `
+"<!-- wp:list -->
+<ul><li>... like this one, which is separate from the above and right aligned.</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`Block transforms correctly transform block Paragraph in fixture core__paragraph__align-right into the Preformatted block 1`] = `
+"<!-- wp:preformatted -->
+<pre class=\\"wp-block-preformatted\\">... like this one, which is separate from the above and right aligned.</pre>
+<!-- /wp:preformatted -->"
+`;
+
+exports[`Block transforms correctly transform block Paragraph in fixture core__paragraph__align-right into the Quote block 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>... like this one, which is separate from the above and right aligned.</p></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Block transforms correctly transform block Paragraph in fixture core__paragraph__align-right into the Verse block 1`] = `
+"<!-- wp:verse -->
+<pre class=\\"wp-block-verse\\">... like this one, which is separate from the above and right aligned.</pre>
+<!-- /wp:verse -->"
+`;
+
+exports[`Block transforms correctly transform block Preformatted in fixture core__preformatted into the Paragraph block 1`] = `
+"<!-- wp:paragraph -->
+<p>Some <em>preformatted</em> text...<br>And more!</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Block transforms correctly transform block Pullquote in fixture core__pullquote into the Quote block 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>Testing pullquote block...</p><cite>...with a caption</cite></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Block transforms correctly transform block Pullquote in fixture core__pullquote__multi-paragraph into the Quote block 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>Paragraph <strong>one</strong></p><p>Paragraph two</p><cite>by whomever</cite></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Block transforms correctly transform block Quote in fixture core__quote__style-1 into the Heading block 1`] = `
+"<!-- wp:heading -->
+<h2>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</h2>
+<!-- /wp:heading -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p><cite>Matt Mullenweg, 2017</cite></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Block transforms correctly transform block Quote in fixture core__quote__style-1 into the List block 1`] = `
+"<!-- wp:list -->
+<ul><li>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`Block transforms correctly transform block Quote in fixture core__quote__style-1 into the Paragraph block 1`] = `
+"<!-- wp:paragraph -->
+<p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Matt Mullenweg, 2017</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Block transforms correctly transform block Quote in fixture core__quote__style-1 into the Pullquote block 1`] = `
+"<!-- wp:pullquote -->
+<figure class=\\"wp-block-pullquote\\"><blockquote><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><cite>Matt Mullenweg, 2017</cite></blockquote></figure>
+<!-- /wp:pullquote -->"
+`;
+
+exports[`Block transforms correctly transform block Quote in fixture core__quote__style-2 into the Heading block 1`] = `
+"<!-- wp:heading -->
+<h2>There is no greater agony than bearing an untold story inside you.</h2>
+<!-- /wp:heading -->
+
+<!-- wp:quote {\\"className\\":\\"is-style-large\\"} -->
+<blockquote class=\\"wp-block-quote is-style-large\\"><p></p><cite>Maya Angelou</cite></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Block transforms correctly transform block Quote in fixture core__quote__style-2 into the List block 1`] = `
+"<!-- wp:list -->
+<ul><li>There is no greater agony than bearing an untold story inside you.</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`Block transforms correctly transform block Quote in fixture core__quote__style-2 into the Paragraph block 1`] = `
+"<!-- wp:paragraph -->
+<p>There is no greater agony than bearing an untold story inside you.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Maya Angelou</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Block transforms correctly transform block Quote in fixture core__quote__style-2 into the Pullquote block 1`] = `
+"<!-- wp:pullquote -->
+<figure class=\\"wp-block-pullquote\\"><blockquote><p>There is no greater agony than bearing an untold story inside you.</p><cite>Maya Angelou</cite></blockquote></figure>
+<!-- /wp:pullquote -->"
+`;
+
+exports[`Block transforms correctly transform block Verse in fixture core__verse into the Paragraph block 1`] = `
+"<!-- wp:paragraph -->
+<p>A <em>verse</em>…<br>And more!</p>
+<!-- /wp:paragraph -->"
+`;

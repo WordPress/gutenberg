@@ -7,6 +7,7 @@ import { castArray, mapValues } from 'lodash';
  * Internal dependencies
  */
 import { createRegistry } from '../registry';
+import { createRegistrySelector } from '../factory';
 
 describe( 'createRegistry', () => {
 	let registry;
@@ -150,7 +151,7 @@ describe( 'createRegistry', () => {
 	describe( 'registerStore', () => {
 		it( 'should be shorthand for reducer, actions, selectors registration', () => {
 			const store = registry.registerStore( 'butcher', {
-				reducer( state = { ribs: 6, chicken: 4 }, action ) {
+				reducer( state = {}, action ) {
 					switch ( action.type ) {
 						case 'sale':
 							return {
@@ -161,6 +162,7 @@ describe( 'createRegistry', () => {
 
 					return state;
 				},
+				initialState: { ribs: 6, chicken: 4 },
 				selectors: {
 					getPrice: ( state, meat ) => state[ meat ],
 				},
@@ -440,6 +442,27 @@ describe( 'createRegistry', () => {
 
 			expect( registry.select( 'reducer1' ).selector2() ).toEqual( 'result2' );
 			expect( selector2 ).toBeCalledWith( store.getState() );
+		} );
+
+		it( 'should run the registry selectors properly', () => {
+			const selector1 = () => 'result1';
+			const selector2 = createRegistrySelector( ( select ) => () =>
+				select( 'reducer1' ).selector1()
+			);
+			registry.registerStore( 'reducer1', {
+				reducer: () => 'state1',
+				selectors: {
+					selector1,
+				},
+			} );
+			registry.registerStore( 'reducer2', {
+				reducer: () => 'state1',
+				selectors: {
+					selector2,
+				},
+			} );
+
+			expect( registry.select( 'reducer2' ).selector2() ).toEqual( 'result1' );
 		} );
 	} );
 

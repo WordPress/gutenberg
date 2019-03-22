@@ -115,6 +115,7 @@ class Tooltip extends Component {
 						position={ position }
 						className="components-tooltip"
 						aria-hidden="true"
+						animate={ false }
 					>
 						{ text }
 						<Shortcut className="components-tooltip__shortcut" shortcut={ shortcut } />

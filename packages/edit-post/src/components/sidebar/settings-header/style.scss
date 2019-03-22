@@ -18,14 +18,14 @@
 .edit-post-sidebar__panel-tab {
 	background: transparent;
 	border: none;
-	border-radius: 0;
+	box-shadow: none;
 	cursor: pointer;
-	height: $grid-size * 6;
 	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: 400;
 	color: $dark-gray-900;
 	@include square-style__neutral;
+	transition: box-shadow 0.1s linear;
 
 	// This pseudo-element "duplicates" the tab label and sets the text to bold.
 	// This ensures that the tab doesn't change width when selected.
@@ -41,9 +41,20 @@
 	}
 
 	&.is-active {
-		padding-bottom: 0;
-		border-bottom: 3px solid theme(primary);
+		box-shadow: inset 0 -3px theme(outlines);
 		font-weight: 600;
+		position: relative;
+
+		// This border appears in Windows High Contrast mode instead of the box-shadow.
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			bottom: 1px;
+			right: 0;
+			left: 0;
+			border-bottom: 3px solid transparent;
+		}
 	}
 
 	&:focus {

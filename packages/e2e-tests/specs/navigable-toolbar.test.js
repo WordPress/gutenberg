@@ -26,11 +26,11 @@ describe( 'block toolbar', () => {
 		} );
 
 		const isInRichTextEditable = () => page.evaluate( () => (
-			document.activeElement.classList.contains( 'editor-rich-text__tinymce' )
+			document.activeElement.contentEditable === 'true'
 		) );
 
 		const isInBlockToolbar = () => page.evaluate( () => (
-			!! document.activeElement.closest( '.editor-block-toolbar' )
+			!! document.activeElement.closest( '.block-editor-block-toolbar' )
 		) );
 
 		describe( label, () => {

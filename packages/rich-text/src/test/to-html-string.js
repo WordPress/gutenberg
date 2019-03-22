@@ -35,7 +35,12 @@ describe( 'toHTMLString', () => {
 		formatType,
 		html,
 		value,
+		noToHTMLString,
 	} ) => {
+		if ( noToHTMLString ) {
+			return;
+		}
+
 		it( description, () => {
 			if ( formatName ) {
 				registerFormatType( formatName, formatType );

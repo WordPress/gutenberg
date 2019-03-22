@@ -2,7 +2,9 @@
 
 exports[`recordToDom should create a value with formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
     test
   </em>
   
@@ -11,7 +13,9 @@ exports[`recordToDom should create a value with formatting 1`] = `
 
 exports[`recordToDom should create a value with formatting for split tags 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
     test
   </em>
   
@@ -21,6 +25,7 @@ exports[`recordToDom should create a value with formatting for split tags 1`] = 
 exports[`recordToDom should create a value with formatting with attributes 1`] = `
 <body>
   <a
+    data-rich-text-format-boundary="true"
     href="#"
   >
     test
@@ -31,6 +36,7 @@ exports[`recordToDom should create a value with formatting with attributes 1`] =
 
 exports[`recordToDom should create a value with image object 1`] = `
 <body>
+  
   <img
     src=""
   />
@@ -40,7 +46,10 @@ exports[`recordToDom should create a value with image object 1`] = `
 
 exports[`recordToDom should create a value with image object and formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
+    
     <img
       src=""
     />
@@ -52,7 +61,10 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
+    
     <img
       src=""
     />
@@ -79,7 +91,9 @@ exports[`recordToDom should create a value with image object and text before 1`]
 exports[`recordToDom should create a value with nested formatting 1`] = `
 <body>
   <em>
-    <strong>
+    <strong
+      data-rich-text-format-boundary="true"
+    >
       test
     </strong>
   </em>
@@ -96,80 +110,69 @@ exports[`recordToDom should create a value without formatting 1`] = `
 exports[`recordToDom should create an empty value 1`] = `
 <body>
   
-  <br />
+  <br
+    data-rich-text-padding="true"
+  />
 </body>
 `;
 
 exports[`recordToDom should create an empty value from empty tags 1`] = `
 <body>
   
-  <br />
+  <br
+    data-rich-text-padding="true"
+  />
 </body>
 `;
 
-exports[`recordToDom should filter format attributes with settings 1`] = `
+exports[`recordToDom should filter format boundary attributes 1`] = `
 <body>
-  <strong>
+  <strong
+    data-rich-text-format-boundary="true"
+  >
     test
   </strong>
   
 </body>
 `;
 
-exports[`recordToDom should filter text at end with settings 1`] = `
-<body>
-  test
-</body>
-`;
-
-exports[`recordToDom should filter text in format with settings 1`] = `
-<body>
-  <em>
-    test
-  </em>
-  
-</body>
-`;
-
-exports[`recordToDom should filter text outside format with settings 1`] = `
-<body>
-  <em>
-    test
-  </em>
-  
-</body>
-`;
-
-exports[`recordToDom should filter text with settings 1`] = `
-<body>
-  
-  <br />
-</body>
-`;
-
 exports[`recordToDom should handle br 1`] = `
 <body>
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
+  <br
+    data-rich-text-padding="true"
+  />
 </body>
 `;
 
 exports[`recordToDom should handle br with formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
     
-    <br />
+    <br
+      data-rich-text-line-break="true"
+    />
     
   </em>
   
+  <br
+    data-rich-text-padding="true"
+  />
 </body>
 `;
 
 exports[`recordToDom should handle br with text 1`] = `
 <body>
   te
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   st
 </body>
 `;
@@ -177,9 +180,13 @@ exports[`recordToDom should handle br with text 1`] = `
 exports[`recordToDom should handle double br 1`] = `
 <body>
   a
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   b
 </body>
 `;
@@ -188,7 +195,9 @@ exports[`recordToDom should handle empty list value 1`] = `
 <body>
   <li>
     
-    <br />
+    <br
+      data-rich-text-padding="true"
+    />
   </li>
 </body>
 `;
@@ -197,7 +206,9 @@ exports[`recordToDom should handle empty multiline value 1`] = `
 <body>
   <p>
     
-    <br />
+    <br
+      data-rich-text-padding="true"
+    />
   </p>
 </body>
 `;
@@ -206,15 +217,23 @@ exports[`recordToDom should handle middle empty list value 1`] = `
 <body>
   <li>
     
-    <br />
+    <br
+      data-rich-text-padding="true"
+    />
+    
   </li>
   <li>
     
-    <br />
+    <br
+      data-rich-text-padding="true"
+    />
+    
   </li>
   <li>
     
-    <br />
+    <br
+      data-rich-text-padding="true"
+    />
   </li>
 </body>
 `;
@@ -272,7 +291,9 @@ exports[`recordToDom should handle multiline value with empty 1`] = `
   </p>
   <p>
     
-    <br />
+    <br
+      data-rich-text-padding="true"
+    />
   </p>
 </body>
 `;
@@ -280,11 +301,16 @@ exports[`recordToDom should handle multiline value with empty 1`] = `
 exports[`recordToDom should handle nested empty list value 1`] = `
 <body>
   <li>
-    <br />
+    
+    <br
+      data-rich-text-padding="true"
+    />
     <ul>
       <li>
         
-        <br />
+        <br
+          data-rich-text-padding="true"
+        />
       </li>
     </ul>
   </li>
@@ -294,9 +320,13 @@ exports[`recordToDom should handle nested empty list value 1`] = `
 exports[`recordToDom should handle selection before br 1`] = `
 <body>
   a
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   b
 </body>
 `;
@@ -325,7 +355,9 @@ exports[`recordToDom should preserve emoji 1`] = `
 
 exports[`recordToDom should preserve emoji in formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
     🍒
   </em>
   
@@ -338,38 +370,17 @@ exports[`recordToDom should preserve non breaking space 1`] = `
 </body>
 `;
 
-exports[`recordToDom should remove br with settings 1`] = `
+exports[`recordToDom should remove padding 1`] = `
 <body>
   
-  <br />
-</body>
-`;
-
-exports[`recordToDom should remove with children with settings 1`] = `
-<body>
-  two
-</body>
-`;
-
-exports[`recordToDom should remove with settings 1`] = `
-<body>
-  
-  <br />
+  <br
+    data-rich-text-padding="true"
+  />
 </body>
 `;
 
 exports[`recordToDom should replace characters to format HTML with space 1`] = `
 <body>
    
-</body>
-`;
-
-exports[`recordToDom should unwrap with settings 1`] = `
-<body>
-  te
-  <em>
-    st
-  </em>
-  
 </body>
 `;

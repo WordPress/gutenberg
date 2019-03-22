@@ -128,16 +128,23 @@ export function isHorizontalEdge( container, isReverse ) {
 	}
 
 	// If confirmed to be at extent, traverse up through DOM, verifying that
-	// the node is at first or last child for reverse or forward respectively.
-	// Continue until container is reached.
-	const order = isReverse ? 'first' : 'last';
+	// the node is at first or last child for reverse or forward respectively
+	// (ignoring empty text nodes). Continue until container is reached.
+	const order = isReverse ? 'previous' : 'next';
+
 	while ( node !== container ) {
-		const parentNode = node.parentNode;
-		if ( parentNode[ `${ order }Child` ] !== node ) {
+		let next = node[ `${ order }Sibling` ];
+
+		// Skip over empty text nodes.
+		while ( next && next.nodeType === TEXT_NODE && next.data === '' ) {
+			next = next[ `${ order }Sibling` ];
+		}
+
+		if ( next ) {
 			return false;
 		}
 
-		node = parentNode;
+		node = node.parentNode;
 	}
 
 	// If reached, range is assumed to be at edge.
@@ -163,6 +170,7 @@ export function isVerticalEdge( container, isReverse ) {
 
 	const selection = window.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+
 	if ( ! range ) {
 		return false;
 	}
@@ -173,8 +181,25 @@ export function isVerticalEdge( container, isReverse ) {
 		return false;
 	}
 
-	const buffer = rangeRect.height / 2;
+	// Calculate a buffer that is half the line height. In some browsers, the
+	// selection rectangle may not fill the entire height of the line, so we add
+	// half the line height to the selection rectangle to ensure that it is well
+	// over its line boundary.
+	const computedStyle = window.getComputedStyle( container );
+	const lineHeight = parseInt( computedStyle.lineHeight, 10 );
+
+	// Only consider the multiline selection at the edge if the direction is
+	// towards the edge.
+	if (
+		! selection.isCollapsed &&
+		rangeRect.height > lineHeight &&
+		isSelectionForward( selection ) === isReverse
+	) {
+		return false;
+	}
+
 	const editableRect = container.getBoundingClientRect();
+	const buffer = lineHeight / 2;
 
 	// Too low.
 	if ( isReverse && rangeRect.top - buffer > editableRect.top ) {

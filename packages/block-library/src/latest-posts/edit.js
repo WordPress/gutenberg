@@ -7,7 +7,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import {
+	Component,
+	Fragment,
+	RawHTML,
+} from '@wordpress/element';
 import {
 	PanelBody,
 	Placeholder,
@@ -21,12 +25,11 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
-import { decodeEntities } from '@wordpress/html-entities';
 import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -106,6 +109,7 @@ class LatestPostsEdit extends Component {
 							onChange={ ( value ) => setAttributes( { columns: value } ) }
 							min={ 2 }
 							max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+							required
 						/>
 					}
 				</PanelBody>
@@ -171,16 +175,27 @@ class LatestPostsEdit extends Component {
 						[ `columns-${ columns }` ]: postLayout === 'grid',
 					} ) }
 				>
-					{ displayPosts.map( ( post, i ) =>
-						<li key={ i }>
-							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
-							{ displayPostDate && post.date_gmt &&
-								<time dateTime={ format( 'c', post.date_gmt ) } className="wp-block-latest-posts__post-date">
-									{ dateI18n( dateFormat, post.date_gmt ) }
-								</time>
-							}
-						</li>
-					) }
+					{ displayPosts.map( ( post, i ) => {
+						const titleTrimmed = post.title.rendered.trim();
+						return (
+							<li key={ i }>
+								<a href={ post.link } target="_blank" rel="noreferrer noopener">
+									{ titleTrimmed ? (
+										<RawHTML>
+											{ titleTrimmed }
+										</RawHTML>
+									) :
+										__( '(Untitled)' )
+									}
+								</a>
+								{ displayPostDate && post.date_gmt &&
+									<time dateTime={ format( 'c', post.date_gmt ) } className="wp-block-latest-posts__post-date">
+										{ dateI18n( dateFormat, post.date_gmt ) }
+									</time>
+								}
+							</li>
+						);
+					} ) }
 				</ul>
 			</Fragment>
 		);

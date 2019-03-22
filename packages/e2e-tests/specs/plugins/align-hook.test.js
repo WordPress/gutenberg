@@ -29,7 +29,7 @@ describe( 'Align Hook Works As Expected', () => {
 		const buttonLabels = await page.evaluate( () => {
 			return Array.from(
 				document.querySelectorAll(
-					'.editor-block-toolbar button[aria-label^="Align"]'
+					'.block-editor-block-toolbar button[aria-label^="Align"]'
 				)
 			).map(
 				( button ) => {
@@ -54,7 +54,7 @@ describe( 'Align Hook Works As Expected', () => {
 		it( 'Does not apply any alignment by default', async () => {
 			await insertBlock( blockName );
 			// verify no alignment button is in pressed state
-			const pressedButtons = await page.$$( '.editor-block-toolbar button[aria-label^="Align"][aria-pressed="true"]' );
+			const pressedButtons = await page.$$( '.block-editor-block-toolbar button[aria-label^="Align"][aria-pressed="true"]' );
 			expect( pressedButtons ).toHaveLength( 0 );
 		} );
 	};
@@ -69,7 +69,7 @@ describe( 'Align Hook Works As Expected', () => {
 	const createCorrectlyAppliesAndRemovesAlignmentTest = ( blockName, alignment ) => {
 		it( 'Correctly applies the selected alignment and correctly removes the alignment',
 			async () => {
-				const BUTTON_SELECTOR = `.editor-block-toolbar button[aria-label="Align ${ alignment }"]`;
+				const BUTTON_SELECTOR = `.block-editor-block-toolbar button[aria-label="Align ${ alignment }"]`;
 				const BUTTON_PRESSED_SELECTOR = `${ BUTTON_SELECTOR }[aria-pressed="true"]`;
 				// set the specified alignment.
 				await insertBlock( blockName );
@@ -161,7 +161,7 @@ describe( 'Align Hook Works As Expected', () => {
 
 	describe( 'Block with default align', () => {
 		const BLOCK_NAME = 'Test Default Align';
-		const PRESSED_BUTTON_SELECTOR = '.editor-block-toolbar button[aria-label="Align right"][aria-pressed="true"]';
+		const PRESSED_BUTTON_SELECTOR = '.block-editor-block-toolbar button[aria-label="Align right"][aria-pressed="true"]';
 		createShowsTheExpectedButtonsTest( BLOCK_NAME, [
 			'Align left',
 			'Align center',

@@ -37,12 +37,9 @@ export const settings = {
 
 	supports: {
 		align: true,
+		alignWide: false,
 		html: false,
 	},
 
 	edit,
-
-	save() {
-		return null;
-	},
 };

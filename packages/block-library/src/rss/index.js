@@ -26,8 +26,4 @@ export const settings = {
 	},
 
 	edit,
-
-	save() {
-		return null;
-	},
 };

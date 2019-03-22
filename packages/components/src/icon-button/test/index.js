@@ -2,13 +2,17 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
+
+/**
+ * WordPress dependencies
+ */
+import { createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import IconButton from '../';
-
-jest.mock( '../../button' );
 
 describe( 'IconButton', () => {
 	describe( 'basic rendering', () => {
@@ -30,7 +34,7 @@ describe( 'IconButton', () => {
 
 		it( 'should add an aria-label when the label property is used', () => {
 			const iconButton = shallow( <IconButton label="WordPress">WordPress</IconButton> );
-			expect( iconButton.name() ).toBe( 'Button' );
+			expect( iconButton.name() ).toBe( 'ForwardRef(Button)' );
 			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 
@@ -38,7 +42,7 @@ describe( 'IconButton', () => {
 			const iconButton = shallow( <IconButton label="WordPress" /> );
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
-			expect( iconButton.find( 'Button' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
+			expect( iconButton.find( 'ForwardRef(Button)' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 
 		it( 'should support explicit aria-label override', () => {
@@ -51,21 +55,23 @@ describe( 'IconButton', () => {
 			expect( iconButton.hasClass( 'test' ) ).toBe( true );
 		} );
 
-		it( 'should add an additonal prop to the IconButton element', () => {
-			const iconButton = shallow( <IconButton test="test" /> );
-			expect( iconButton.props().test ).toBe( 'test' );
+		it( 'should pass additional props to the underlying button', () => {
+			const iconButton = shallow( <IconButton disabled aria-pressed="true" /> );
+
+			expect( iconButton.find( 'ForwardRef(Button)' ).prop( 'aria-pressed' ) ).toBe( 'true' );
+			expect( iconButton.find( 'ForwardRef(Button)' ).prop( 'disabled' ) ).toBe( true );
 		} );
 
 		it( 'should allow custom tooltip text', () => {
 			const iconButton = shallow( <IconButton label="WordPress" tooltip="Custom" /> );
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'Custom' );
-			expect( iconButton.find( 'Button' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
+			expect( iconButton.find( 'ForwardRef(Button)' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 
 		it( 'should allow tooltip disable', () => {
 			const iconButton = shallow( <IconButton label="WordPress" tooltip={ false } /> );
-			expect( iconButton.name() ).toBe( 'Button' );
+			expect( iconButton.name() ).toBe( 'ForwardRef(Button)' );
 			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 
@@ -73,6 +79,13 @@ describe( 'IconButton', () => {
 			const iconButton = shallow( <IconButton label="WordPress" children={ [] } /> );
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
+		} );
+
+		it( 'forwards ref', () => {
+			const ref = createRef();
+
+			TestUtils.renderIntoDocument( <IconButton ref={ ref } /> );
+			expect( ref.current.type ).toBe( 'button' );
 		} );
 	} );
 } );

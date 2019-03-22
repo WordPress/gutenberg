@@ -4,7 +4,7 @@
 import { flow } from 'lodash';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -26,7 +26,6 @@ function FeatureToggle( { onToggle, isActive, label, info, messageActivated, mes
 			isSelected={ isActive }
 			onClick={ flow( onToggle, speakMessage ) }
 			role="menuitemcheckbox"
-			label={ label }
 			info={ info }
 		>
 			{ label }

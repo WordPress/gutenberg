@@ -6,7 +6,8 @@ import path from 'path';
 /**
  * Internal dependencies
  */
-import { jsTester, phpTester, parse } from '../';
+import { parse } from '../';
+import { jsTester, phpTester } from '../shared-tests';
 
 describe( 'block-serialization-spec-parser-js', jsTester( parse ) );
 

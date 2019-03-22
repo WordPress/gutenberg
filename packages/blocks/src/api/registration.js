@@ -33,7 +33,7 @@ import { isValidIcon, normalizeIconObject } from './utils';
  * @property {?string[]}                 keywords   Additional keywords to produce
  *                                                  block as inserter search result.
  * @property {?Object}                   attributes Block attributes.
- * @property {Function}                  save       Serialize behavior of a block,
+ * @property {?Function}                 save       Serialize behavior of a block,
  *                                                  returning an element describing
  *                                                  structure of the block's post
  *                                                  content markup.
@@ -66,6 +66,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
+		save: () => null,
 		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};
@@ -100,12 +101,6 @@ export function registerBlockType( name, settings ) {
 	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
 		console.error(
 			'The "edit" property must be a valid function.'
-		);
-		return;
-	}
-	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
-		console.error(
-			'The block "' + name + '" can have a maximum of 3 keywords.'
 		);
 		return;
 	}

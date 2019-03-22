@@ -1,5 +1,5 @@
 /**
- * WordPress
+ * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
@@ -8,7 +8,7 @@ import {
 	RichText,
 	BlockControls,
 	AlignmentToolbar,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { SVG, Path } from '@wordpress/components';
 
 export const name = 'core/verse';

@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { PlainText } from '@wordpress/editor';
+import { PlainText } from '@wordpress/block-editor';
 
 /**
  * Block code style
@@ -36,6 +36,7 @@ export default function CodeEdit( props ) {
 				isSelected={ props.isSelected }
 				onFocus={ onFocus }
 				onBlur={ onBlur }
+				fontFamily={ ( styles.blockCode.fontFamily ) }
 			/>
 		</View>
 	);

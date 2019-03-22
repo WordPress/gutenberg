@@ -23,7 +23,7 @@ describe( 'a11y', () => {
 		await page.keyboard.press( 'Tab' );
 
 		const isFocusedToggle = await page.$eval( ':focus', ( focusedElement ) => {
-			return focusedElement.classList.contains( 'editor-inserter__toggle' );
+			return focusedElement.classList.contains( 'block-editor-inserter__toggle' );
 		} );
 
 		expect( isFocusedToggle ).toBe( true );

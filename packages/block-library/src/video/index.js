@@ -1,16 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { RichText } from '@wordpress/editor';
-import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
-import { SVG, Path } from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
+import { RichText } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
+import icon from './icon';
 
 export const name = 'core/video';
 
@@ -19,7 +19,7 @@ export const settings = {
 
 	description: __( 'Embed a video from your media library or upload a new one.' ),
 
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><Path d="M4 6l2 4h14v8H4V6m18-2h-4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4L2 6v12l2 2h16l2-2V4z" /></SVG>,
+	icon,
 
 	keywords: [ __( 'movie' ) ],
 
@@ -78,6 +78,12 @@ export const settings = {
 			selector: 'video',
 			attribute: 'src',
 		},
+		playsInline: {
+			type: 'boolean',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'playsinline',
+		},
 	},
 
 	transforms: {
@@ -98,6 +104,42 @@ export const settings = {
 					return block;
 				},
 			},
+			{
+				type: 'shortcode',
+				tag: 'video',
+				attributes: {
+					src: {
+						type: 'string',
+						shortcode: ( { named: { src } } ) => {
+							return src;
+						},
+					},
+					poster: {
+						type: 'string',
+						shortcode: ( { named: { poster } } ) => {
+							return poster;
+						},
+					},
+					loop: {
+						type: 'string',
+						shortcode: ( { named: { loop } } ) => {
+							return loop;
+						},
+					},
+					autoplay: {
+						type: 'string',
+						shortcode: ( { named: { autoplay } } ) => {
+							return autoplay;
+						},
+					},
+					preload: {
+						type: 'string',
+						shortcode: ( { named: { preload } } ) => {
+							return preload;
+						},
+					},
+				},
+			},
 		],
 	},
 
@@ -108,7 +150,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { autoplay, caption, controls, loop, muted, poster, preload, src } = attributes;
+		const { autoplay, caption, controls, loop, muted, poster, preload, src, playsInline } = attributes;
 		return (
 			<figure>
 				{ src && (
@@ -120,6 +162,7 @@ export const settings = {
 						poster={ poster }
 						preload={ preload !== 'metadata' ? preload : undefined }
 						src={ src }
+						playsInline={ playsInline }
 					/>
 				) }
 				{ ! RichText.isEmpty( caption ) && (

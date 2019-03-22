@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { __, _x } from '@wordpress/i18n';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import { G, Path, SVG } from '@wordpress/components';
-import { RichText, getColorClassName } from '@wordpress/editor';
+import { RichText, getColorClassName } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -18,11 +18,14 @@ import edit from './edit';
 
 const tableContentPasteSchema = {
 	tr: {
+		allowEmpty: true,
 		children: {
 			th: {
+				allowEmpty: true,
 				children: getPhrasingContentSchema(),
 			},
 			td: {
+				allowEmpty: true,
 				children: getPhrasingContentSchema(),
 			},
 		},
@@ -33,12 +36,15 @@ const tablePasteSchema = {
 	table: {
 		children: {
 			thead: {
+				allowEmpty: true,
 				children: tableContentPasteSchema,
 			},
 			tfoot: {
+				allowEmpty: true,
 				children: tableContentPasteSchema,
 			},
 			tbody: {
+				allowEmpty: true,
 				children: tableContentPasteSchema,
 			},
 		},
@@ -78,7 +84,7 @@ export const name = 'core/table';
 export const settings = {
 	title: __( 'Table' ),
 	description: __( 'Insert a table — perfect for sharing charts and data.' ),
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M20 3H5L3 5v14l2 2h15l2-2V5l-2-2zm0 2v3H5V5h15zm-5 14h-5v-9h5v9zM5 10h3v9H5v-9zm12 9v-9h3v9h-3z" /></G></SVG>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M20 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 2v3H5V5h15zm-5 14h-5v-9h5v9zM5 10h3v9H5v-9zm12 9v-9h3v9h-3z" /></G></SVG>,
 	category: 'formatting',
 
 	attributes: {
@@ -95,7 +101,7 @@ export const settings = {
 	},
 
 	styles: [
-		{ name: 'regular', label: _x( 'Regular', 'block style' ), isDefault: true },
+		{ name: 'regular', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: 'stripes', label: __( 'Stripes' ) },
 	],
 

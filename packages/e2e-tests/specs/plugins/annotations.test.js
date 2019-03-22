@@ -9,8 +9,8 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
-	await expect( page ).toClick( '.editor-block-settings-menu__toggle' );
-	const itemButton = ( await page.$x( `//*[contains(@class, "editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
+	await expect( page ).toClick( '.block-editor-block-settings-menu__toggle' );
+	const itemButton = ( await page.$x( `//*[contains(@class, "block-editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
 	await itemButton.click();
 };
 
@@ -80,7 +80,7 @@ describe( 'Using Plugins API', () => {
 	 * @return {Promise<string>} Inner HTML.
 	 */
 	async function getRichTextInnerHTML() {
-		const htmlContent = await page.$$( '.editor-rich-text__tinymce' );
+		const htmlContent = await page.$$( '*[contenteditable]' );
 		return await page.evaluate( ( el ) => {
 			return el.innerHTML;
 		}, htmlContent[ 0 ] );
@@ -105,7 +105,7 @@ describe( 'Using Plugins API', () => {
 
 			await clickOnBlockSettingsMenuItem( 'Edit as HTML' );
 
-			const htmlContent = await page.$$( '.editor-block-list__block-html-textarea' );
+			const htmlContent = await page.$$( '.block-editor-block-list__block-html-textarea' );
 			const html = await page.evaluate( ( el ) => {
 				return el.innerHTML;
 			}, htmlContent[ 0 ] );
@@ -124,7 +124,7 @@ describe( 'Using Plugins API', () => {
 			await page.keyboard.type( 'D' );
 
 			await removeAnnotations();
-			const htmlContent = await page.$$( '.editor-rich-text__tinymce' );
+			const htmlContent = await page.$$( '*[contenteditable]' );
 			const html = await page.evaluate( ( el ) => {
 				return el.innerHTML;
 			}, htmlContent[ 0 ] );
@@ -138,6 +138,8 @@ describe( 'Using Plugins API', () => {
 
 			await annotateFirstBlock( 1, 2 );
 
+			await page.keyboard.press( 'ArrowLeft' );
+			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'ArrowLeft' );
 
@@ -158,6 +160,7 @@ describe( 'Using Plugins API', () => {
 
 			await annotateFirstBlock( 1, 2 );
 
+			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'ArrowLeft' );
 
 			// Put an 1 after the A, it should not be annotated.

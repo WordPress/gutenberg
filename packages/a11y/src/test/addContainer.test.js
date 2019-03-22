@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import addContainer from '../addContainer';
 
 describe( 'addContainer', () => {

@@ -1,18 +1,35 @@
-## 7.1.0 (Unreleased)
+## 7.2.0 (2019-03-20)
+
+### Improvements
+
+- Make `RangeControl` validation rely on the `checkValidity` provided by the browsers instead of using our own validation.
+
+### Bug Fixes
+
+- Fix a problem that made `RangeControl` not work as expected with float values.
+
+## 7.1.0 (2019-03-06)
+
+### New Features
+
+- Added a new `Animate` component.
 
 ### Improvements
 
 - `withFilters` has been optimized to avoid binding hook handlers for each mounted instance of the component, instead using a single centralized hook delegator.
 - `withFilters` has been optimized to reuse a single shared component definition for all filtered instances of the component.
+- Make `RangeControl` validate min and max properties.
 
 ### Bug Fixes
 
 - Resolves a conflict where two instance of Slot would produce an inconsistent or duplicated rendering output.
+- Allow years between 0 and 1970 in DateTime component.
 
 ### New Feature
 
 - `Dropdown` now has a `focusOnMount` prop which is passed directly to the contained `Popover`.
 - `DatePicker` has new prop `isInvalidDate` exposing react-dates' `isOutsideRange`.
+- `DatePicker` allows `null` as accepted value for `currentDate` prop to signify no date selection.
 
 ## 7.0.5 (2019-01-03)
 

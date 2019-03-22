@@ -4,11 +4,11 @@
 import classnames from 'classnames';
 
 /**
- * WordPress
+ * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/editor';
+import { InspectorControls } from '@wordpress/block-editor';
 import { BaseControl, PanelBody, ResizableBox, G, SVG, Path } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 

@@ -21,7 +21,7 @@ ul.wp-block-gallery li {
 		opacity: 0.3;
 	}
 
-	.editor-rich-text {
+	.block-editor-rich-text {
 		position: absolute;
 		bottom: 0;
 		width: 100%;
@@ -29,12 +29,12 @@ ul.wp-block-gallery li {
 		overflow-y: auto;
 	}
 
-	.editor-rich-text figcaption:not([data-is-placeholder-visible="true"]) {
+	.block-editor-rich-text figcaption:not([data-is-placeholder-visible="true"]) {
 		position: relative;
 		overflow: hidden;
 	}
 
-	.is-selected .editor-rich-text {
+	.is-selected .block-editor-rich-text {
 		// IE calculates this incorrectly, so leave it to modern browsers.
 		@supports (position: sticky) {
 			right: 0;
@@ -43,12 +43,12 @@ ul.wp-block-gallery li {
 		}
 
 		// Override negative margins so this toolbar isn't hidden by overflow. Overflow is needed for long captions.
-		.editor-rich-text__inline-toolbar {
+		.block-editor-rich-text__inline-toolbar {
 			top: 0;
 		}
 
 		// Make extra space for the inline toolbar.
-		.editor-rich-text__tinymce {
+		figcaption {
 			padding-top: 48px;
 		}
 	}
@@ -78,13 +78,9 @@ ul.wp-block-gallery li {
 		}
 	}
 
-	.editor-rich-text .editor-rich-text__tinymce {
+	.block-editor-rich-text figcaption {
 		a {
 			color: $white;
-		}
-
-		&:focus a[data-mce-selected] {
-			color: rgba(0, 0, 0, 0.2);
 		}
 	}
 }

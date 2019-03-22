@@ -8,11 +8,11 @@ import { View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { parse, createBlock } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import { createBlock } from '@wordpress/blocks';
+import { RichText } from '@wordpress/block-editor';
 
 /**
- * Import style
+ * Internal dependencies
  */
 import styles from './style.scss';
 
@@ -22,6 +22,7 @@ class ParagraphEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
+		this.onReplace = this.onReplace.bind( this );
 
 		this.state = {
 			aztecHeight: 0,
@@ -71,6 +72,20 @@ class ParagraphEdit extends Component {
 		}
 	}
 
+	onReplace( blocks ) {
+		const { attributes, onReplace } = this.props;
+		onReplace( blocks.map( ( block, index ) => (
+			index === 0 && block.name === name ?
+				{ ...block,
+					attributes: {
+						...attributes,
+						...block.attributes,
+					},
+				} :
+				block
+		) ) );
+	}
+
 	render() {
 		const {
 			attributes,
@@ -99,20 +114,18 @@ class ParagraphEdit extends Component {
 						...style,
 						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
-					onChange={ ( event ) => {
-						// Create a React Tree from the new HTML
-						const newParaBlock = parse( '<!-- wp:paragraph --><p>' + event.content + '</p><!-- /wp:paragraph -->' )[ 0 ];
+					onChange={ ( nextContent ) => {
 						setAttributes( {
-							...this.props.attributes,
-							content: newParaBlock.attributes.content,
+							content: nextContent,
 						} );
 					} }
 					onSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
+					onReplace={ this.onReplace }
 					onContentSizeChange={ ( event ) => {
 						this.setState( { aztecHeight: event.aztecHeight } );
 					} }
-					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+					placeholder={ placeholder || __( 'Start writing…' ) }
 				/>
 			</View>
 		);

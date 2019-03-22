@@ -1,10 +1,10 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import { get } from 'lodash';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
 import { IconButton, Toolbar } from '@wordpress/components';
