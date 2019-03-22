@@ -54,26 +54,10 @@ export default class HTMLInputViewUI extends React.Component<PropsType, StateTyp
 			<KeyboardAvoidingView
 				style={ styles.container }
 				{ ...this.panResponder.panHandlers }
-				parentHeight={ this.props.parentHeight }>
-				<TextInput
-					autoCorrect={ false }
-					textAlignVertical="center"
-					numberOfLines={ 1 }
-					style={ styles.htmlViewTitle }
-					value={ this.props.title }
-					placeholder={ this.props.titlePlaceholder }
-					onChangeText={ this.props.setTitleAction }
-				/>
-				<TextInput
-					autoCorrect={ false }
-					textAlignVertical="top"
-					multiline
-					style={ { ...styles.htmlView } }
-					value={ this.props.value }
-					onChangeText={ this.props.onChangeHTMLText }
-					onBlur={ this.props.onBlurHTMLText }
-					placeholder={ this.props.htmlPlaceholder }
-				/>
+				parentHeight={ this.props.parentHeight }
+			>
+				{ this.props.content( true, styles.htmlView, ()=>{} ) }
+
 			</KeyboardAvoidingView>
 		);
 	}

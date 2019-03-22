@@ -39,35 +39,19 @@ export default class HTMLInputViewUI extends React.Component<PropsType, StateTyp
 		};
 	}
 
+	onContentSizeChange = ( event ) => {
+		this.setState( { contentHeight: event.nativeEvent.contentSize.height } );
+	}
+
 	render() {
+		const style = { ...styles.htmlView, height: this.state.contentHeight + 16 }
 		return (
 			<KeyboardAvoidingView style={ styles.container } parentHeight={ this.props.parentHeight }>
 				<ScrollView
 					style={ { flex: 1 } }
-					keyboardDismissMode="interactive" >
-					<TextInput
-						autoCorrect={ false }
-						textAlignVertical="center"
-						numberOfLines={ 1 }
-						style={ styles.htmlViewTitle }
-						value={ this.props.title }
-						placeholder={ this.props.titlePlaceholder }
-						onChangeText={ this.props.setTitleAction }
-					/>
-					<TextInput
-						autoCorrect={ false }
-						textAlignVertical="top"
-						multiline
-						style={ { ...styles.htmlView, height: this.state.contentHeight + 16 } }
-						value={ this.props.value }
-						onChangeText={ this.props.onChangeHTMLText }
-						onBlur={ this.props.onBlurHTMLText }
-						placeholder={ this.props.htmlPlaceholder }
-						scrollEnabled={ false }
-						onContentSizeChange={ ( event ) => {
-							this.setState( { contentHeight: event.nativeEvent.contentSize.height } );
-						} }
-					/>
+					keyboardDismissMode="interactive"
+				>
+					{ this.props.content( false, style, this.onContentSizeChange) }
 				</ScrollView>
 			</KeyboardAvoidingView>
 		);
