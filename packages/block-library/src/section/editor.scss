@@ -29,10 +29,11 @@ $block-name: "section";
 
 	// First tier of InnerBlocks must act like the container of the standard canvas
 	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks {
-		padding-left: 56px;
-		padding-right: 56px;
+
 		margin-left: auto;
 		margin-right: auto;
+		padding-left: $block-padding*3 + $block-spacing + $border-width;
+		padding-right: $block-padding*3 + $block-spacing + $border-width;
 	}
 
 	// Full Width Blocks
