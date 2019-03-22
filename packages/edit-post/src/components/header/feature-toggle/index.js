@@ -26,7 +26,6 @@ function FeatureToggle( { onToggle, isActive, label, info, messageActivated, mes
 			isSelected={ isActive }
 			onClick={ flow( onToggle, speakMessage ) }
 			role="menuitemcheckbox"
-			label={ label }
 			info={ info }
 		>
 			{ label }
