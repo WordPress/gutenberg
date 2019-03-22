@@ -52,14 +52,9 @@
 		}
 
 		&:focus {
-			// Stack borders on mobile.
 			border: $border-width solid transparent;
 			border-left-width: 0;
-			border-right-width: 0;
-
-			// Include transparent outline for Windows High Contrast mode.
 			outline: $border-width solid transparent;
-
 			box-shadow: none;
 		}
 	}
