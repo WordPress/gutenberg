@@ -1,9 +1,7 @@
-$block-name: "section";
-
 /**
  * Section: All Alignment Settings
  */
-.wp-block[data-type="core/#{$block-name}"] {
+.wp-block[data-type="core/section"] {
 	padding-left: 42px;
 	padding-right: 42px;
 
@@ -25,7 +23,7 @@ $block-name: "section";
 /**
  * Section: Full Width Alignment
  */
-.wp-block[data-type="core/#{$block-name}"][data-align="full"] {
+.wp-block[data-type="core/section"][data-align="full"] {
 
 	// First tier of InnerBlocks must act like the container of the standard canvas
 	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks {
