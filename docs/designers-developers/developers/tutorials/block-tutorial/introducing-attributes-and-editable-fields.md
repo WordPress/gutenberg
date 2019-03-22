@@ -18,14 +18,15 @@ One challenge of maintaining the representation of a block as a JavaScript objec
 	},
 ```
 
-
 When registering a new block type, the `attributes` property describes the shape of the attributes object you'd like to receive in the `edit` and `save` functions. Each value is a [source function](/docs/designers-developers/developers/block-api/block-attributes.md) to find the desired value from the markup of the block.
 
 In the code snippet above, when loading the editor, the `content` value will be extracted from the HTML of the paragraph element in the saved post's markup.
 
 ## Components and the `RichText` Component
 
-Earlier examples used the `createElement` function to create DOM nodes, but it's also possible to encapsulate this behavior into "components". This abstraction helps as a pattern to share common behaviors and to hide complexity into self-contained units. There are a number of [components available](/docs/designers-developers/developers/packages/packages-editor.md#components) to use in implementing your blocks. You can see one such component in the code below: the [`RichText` component](/docs/designers-developers/developers/packages/packages-editor.md#richtext).
+Earlier examples used the `createElement` function to create DOM nodes, but it's also possible to encapsulate this behavior into "components". This abstraction helps you share common behaviors and hide complexity in self-contained units.
+
+There are a number of [components available](/docs/designers-developers/developers/packages/packages-editor.md#components) to use in implementing your blocks. You can see one such component in the code below: the [`RichText` component](/docs/designers-developers/developers/packages/packages-editor.md#richtext).
 
 The `RichText` component can be considered as a super-powered `textarea` element, enabling rich content editing including bold, italics, hyperlinks, etc.
 
