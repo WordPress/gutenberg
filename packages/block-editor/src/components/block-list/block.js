@@ -247,15 +247,27 @@ export class BlockListBlock extends Component {
 	}
 
 	/**
-	 * Prevents default dragging behavior within a block to allow for multi-
-	 * selection to take effect unhampered.
+	 * Handle dragging behavior within a block to allow for multi-selection or
+	 * dragging selected text to take effect unhampered. If dragging selected
+	 * text, current multi-selection should revert and stop. Any other drag
+	 * behaviour should be default prevented.
 	 *
 	 * @param {DragEvent} event Drag event.
 	 *
 	 * @return {void}
 	 */
 	preventDrag( event ) {
-		event.preventDefault();
+		// If there is plain text being transferred, this means that there is a
+		// text selection being dragged. Images, for example, have HTML transfer
+		// data, but no plain text.
+		if ( event.dataTransfer.getData( 'text/plain' ) ) {
+			// Cancel multi-selection.
+			this.props.onSelectionEnd();
+			// Revert to selecting the block if there is multi-selection.
+			this.props.onSelect();
+		} else {
+			event.preventDefault();
+		}
 	}
 
 	/**

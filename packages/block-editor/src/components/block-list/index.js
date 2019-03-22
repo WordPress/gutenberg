@@ -218,6 +218,7 @@ class BlockList extends Component {
 								isFirst={ blockIndex === 0 }
 								isLast={ blockIndex === blockClientIds.length - 1 }
 								isDraggable={ isDraggable }
+								onSelectionEnd={ this.onSelectionEnd }
 							/>
 						</AsyncModeProvider>
 					);
