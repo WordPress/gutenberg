@@ -2,8 +2,10 @@
  * Section: All Alignment Settings
  */
 .wp-block[data-type="core/section"] {
-	padding-left: $block-padding*3;
-	padding-right: $block-padding*3;
+	@include break-small() {
+		padding-left: $block-padding*3;
+		padding-right: $block-padding*3;
+	}
 
 	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks {
 		margin-top: -#{$block-padding*2 + $block-spacing};
@@ -13,10 +15,15 @@
 	// Full Width Blocks
 	// specificity required to only target immediate child Blocks of Section
 	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
-		padding-left: $block-padding*4 + $block-spacing/2; // 58px
-		padding-right: $block-padding*4 + $block-spacing/2; // 58px
 		margin-left: auto;
 		margin-right: auto;
+		padding-left: $block-padding*2;
+		padding-right: $block-padding*2;
+
+		@include break-small() {
+			padding-left: $block-padding*4 + $block-spacing/2; // 58px
+			padding-right: $block-padding*4 + $block-spacing/2; // 58px
+		}
 	}
 }
 
@@ -27,7 +34,6 @@
 
 	// First tier of InnerBlocks must act like the container of the standard canvas
 	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks {
-
 		margin-left: auto;
 		margin-right: auto;
 		padding-left: $block-padding*3 + $block-spacing + $border-width;
