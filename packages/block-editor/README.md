@@ -392,12 +392,6 @@ The default editor settings
 
 Undocumented declaration.
 
-### UnstableRichTextInputEvent
-
-[src/index.js#L15-L15](src/index.js#L15-L15)
-
-Undocumented declaration.
-
 ### URLInput
 
 [src/index.js#L15-L15](src/index.js#L15-L15)
