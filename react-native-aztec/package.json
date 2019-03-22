@@ -1,6 +1,6 @@
 {
   "name": "react-native-aztec",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "license": "GPL-2.0",
   "scripts": {
     "install-aztec-ios": "cd ./ios && carthage bootstrap --platform iOS --cache-builds",
