@@ -5,6 +5,7 @@ exports[`MenuGroup should match snapshot 1`] = `
   className="components-menu-group"
 >
   <div
+    aria-hidden={false}
     className="components-menu-group__label"
     id="components-menu-group-label-1"
   >
