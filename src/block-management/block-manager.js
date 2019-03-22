@@ -270,7 +270,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderItem( value: { item: string, index: number } ) {
 		const clientId = value.item;
-		const testID = this.props.getBlockName( clientId ) + '-' + clientId;
+		const testID = `block-${ value.index }-${ this.props.getBlockName( clientId ) }`;
 
 		return (
 			<View >

@@ -2,7 +2,7 @@
  * @format */
 
 import wd from 'wd';
-import { isAndroid, setDifference } from '../helpers/utils';
+import { isAndroid } from '../helpers/utils';
 
 // Common code across used to interact with all blocks
 export default class BlockInteraction {
@@ -13,6 +13,7 @@ export default class BlockInteraction {
 	element: wd.PromiseChainWebdriver.Element;
 	accessibilityId: string;
 	accessibilityIdXPathAttrib: string;
+	static index = 0;
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
@@ -40,26 +41,11 @@ export default class BlockInteraction {
 	// and accessibilityId attributes on this object
 	async setupElement( blockName: string, blocks: Set<string> ) {
 		await this.driver.sleep( 2000 );
-		const blockLocator = `//*[starts-with(@${ this.accessibilityIdXPathAttrib }, '${ blockName }')]`;
-		const paragraphBlocks = await this.driver.elementsByXPath( blockLocator );
-
-		const currentBlocks = new Set( [] );
-
-		for ( const paragraphBlock of paragraphBlocks ) {
-			const elementID = await paragraphBlock.getAttribute( this.accessibilityIdKey );
-			currentBlocks.add( elementID );
-		}
-
-		let newBlocks = setDifference( currentBlocks, blocks );
-
-		if ( newBlocks.size === 0 ) {
-			newBlocks = setDifference( blocks, currentBlocks );
-		}
-
-		const newElementAccessibilityId = newBlocks.values().next().value;
-		this.element = await this.driver.elementByAccessibilityId( newElementAccessibilityId );
+		const blockLocator = `block-${ BlockInteraction.index }-${ blockName }`;
+		this.element = await this.driver.elementByAccessibilityId( blockLocator );
 		this.accessibilityId = await this.getAttribute( this.accessibilityIdKey );
 
+		BlockInteraction.index += 1;
 		return blocks;
 	}
 

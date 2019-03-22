@@ -32,23 +32,6 @@ const localAppiumPort = 4728; // Port to spawn appium process for local runs
 // $FlowFixMe
 const timer = ( ms: number ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
-const setDifference = ( set1: Set<string>, set2: Set<string> ) => {
-	// FLow complaining about type annotation on Set class here but Set<string>(); doesn't resolve
-	// $FlowFixMe
-	const differenceSet = new Set();
-
-	for ( const elem of set1 ) {
-		// if the value[i] is not present
-		// in nextSet add to the differenceSet
-		if ( ! set2.has( elem ) ) {
-			differenceSet.add( elem );
-		}
-	}
-
-	// returns values of differenceSet
-	return differenceSet;
-};
-
 const isAndroid = () => {
 	return rnPlatform.toLowerCase() === 'android';
 };
@@ -118,5 +101,4 @@ module.exports = {
 	setupDriver,
 	isLocalEnvironment,
 	isAndroid,
-	setDifference,
 };
