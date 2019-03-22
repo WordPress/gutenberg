@@ -67,17 +67,8 @@ export function* setupEditor( post, edits, template ) {
 		blocks = synchronizeBlocksWithTemplate( blocks, template );
 	}
 
-	yield dispatch(
-		STORE_KEY,
-		'resetEditorBlocks',
-		blocks
-	);
-
-	yield dispatch(
-		STORE_KEY,
-		'setupEditorState',
-		post
-	);
+	yield resetEditorBlocks( blocks );
+	yield setupEditorState( post );
 }
 
 /**

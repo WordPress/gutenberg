@@ -642,19 +642,14 @@ describe( 'Editor actions', () => {
 				post: { content: { raw: '' }, status: 'publish' },
 			} );
 		} );
-		it( 'should yield dispatch action for resetEditorBlocks', () => {
+		it( 'should yield action object for resetEditorBlocks', () => {
 			const { value } = fulfillment.next();
-			expect( value.type ).toBe( 'DISPATCH' );
-			expect( value.storeKey ).toBe( STORE_KEY );
-			expect( value.actionName ).toBe( 'resetEditorBlocks' );
-			expect( value.args ).toEqual( [ [] ] );
+			expect( value ).toEqual( actions.resetEditorBlocks( [] ) );
 		} );
-		it( 'should yield dispatch action for setupEditorState', () => {
+		it( 'should yield action object for setupEditorState', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual(
-				dispatch(
-					STORE_KEY,
-					'setupEditorState',
+				actions.setupEditorState(
 					{ content: { raw: '' }, status: 'publish' }
 				)
 			);
