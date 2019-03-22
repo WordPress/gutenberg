@@ -241,7 +241,7 @@ export class RichText extends Component {
 			this.lastEventCount = event.nativeEvent.eventCount;
 			const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
 			this.lastContent = contentWithoutRootTag;
-			this.onChange( this.lastContent );
+			this.props.onChange( this.lastContent );
 		}
 	}
 
