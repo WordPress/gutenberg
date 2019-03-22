@@ -287,4 +287,28 @@ Should there be any situation where you want to provide your own webpack config,
 * the command receives a `--config` argument. Example: `wp-scripts build --config my-own-webpack-config.js`.
 * there is a file called `webpack.config.js` or `webpack.config.babel.js` in the top-level directory of your package (at the same level than your `package.json`).
 
+##### Extending the webpack config
+
+To extend the provided webpack config, or replace subsections within the provided webpack config, you can provide your own `webpack.config.js` file, `require` the provided `webpack.config.js` file, and use the [`spread` operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) to import all of or part of the provided configuration.
+
+In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://github.com/webpack-contrib/url-loader):
+
+```javascript
+const defaultConfig = require("./node_modules/@wordpress/scripts/config/webpack.config");
+
+module.exports = {
+  ...defaultConfig,
+  module: {
+    ...defaultConfig.module,
+    rules: [
+      ...defaultConfig.module.rules,
+      {
+        test: /\.svg$/,
+        use: ["@svgr/webpack", "url-loader"]
+      }
+    ]
+  }
+};
+```
+
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
