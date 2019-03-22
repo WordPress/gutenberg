@@ -37,7 +37,7 @@ export function DefaultBlockAppender( {
 			<View style={ [ styles.blockHolder, containerStyle ] } pointerEvents="box-only">
 				<RichText
 					placeholder={ value }
-					onChange={ ()=>{} }
+					onChange={ () => {} }
 				/>
 			</View>
 		</TouchableWithoutFeedback>
