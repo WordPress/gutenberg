@@ -6,7 +6,7 @@ import { difference } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { IconButton } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -89,7 +89,7 @@ const PluginBlockSettingsMenuItem = ( { allowedBlocks, icon, label, onClick, sma
 			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
 				return null;
 			}
-			return ( <IconButton
+			return ( <MenuItem
 				className="editor-block-settings-menu__control"
 				onClick={ compose( onClick, onClose ) }
 				icon={ icon || 'admin-plugins' }
@@ -97,7 +97,7 @@ const PluginBlockSettingsMenuItem = ( { allowedBlocks, icon, label, onClick, sma
 				role={ role }
 			>
 				{ ! small && label }
-			</IconButton> );
+			</MenuItem> );
 		} }
 	</PluginBlockSettingsMenuGroup>
 );
