@@ -6,6 +6,64 @@
  */
 
 /**
+ * Returns the result of rendering a widget having its instance id.
+ *
+ * @param string $id Widget id.
+ *
+ * @return string Returns the rendered widget as a string.
+ */
+function render_widget_by_id( $id ) {
+	// Code extracted from src/wp-includes/widgets.php dynamic_sidebar function.
+	// Todo: When merging to core extract this part of dynamic_sidebar into its own function.
+	global $wp_registered_widgets;
+
+	if ( ! isset( $wp_registered_widgets[ $id ] ) ) {
+		return false;
+	}
+	$params = array_merge(
+		array(
+			array(
+				'before_widget' => '',
+				'after_widget'  => '',
+				'class'         => '',
+				'before_title'  => '',
+				'after_title'   => '',
+			),
+			array(
+				'widget_id'   => $id,
+				'widget_name' => $wp_registered_widgets[ $id ]['name'],
+			),
+		),
+		(array) $wp_registered_widgets[ $id ]['params']
+	);
+
+	// Substitute HTML id and class attributes into before_widget.
+	$classname_ = '';
+	foreach ( (array) $wp_registered_widgets[ $id ]['classname'] as $cn ) {
+		if ( is_string( $cn ) ) {
+			$classname_ .= '_' . $cn;
+		} elseif ( is_object( $cn ) ) {
+			$classname_ .= '_' . get_class( $cn );
+		}
+	}
+	$classname_                 = ltrim( $classname_, '_' );
+	$params[0]['before_widget'] = sprintf( $params[0]['before_widget'], $id, $classname_ );
+
+	$params = apply_filters( 'dynamic_sidebar_params', $params );
+
+	$callback = $wp_registered_widgets[ $id ]['callback'];
+
+	do_action( 'dynamic_sidebar', $wp_registered_widgets[ $id ] );
+
+	if ( is_callable( $callback ) ) {
+		ob_start();
+		call_user_func_array( $callback, $params );
+		return ob_get_clean();
+	}
+	return false;
+}
+
+/**
  * Renders the `core/legacy-widget` block on server.
  *
  * @see WP_Widget
@@ -15,41 +73,31 @@
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_legacy_widget( $attributes ) {
-	if ( ! isset( $attributes['identifier'] ) ) {
-		return '';
+	$identifier   = null;
+	$widget_class = null;
+	if ( isset( $attributes['identifier'] ) ) {
+		$identifier = $attributes['identifier'];
 	}
-	$identifier = $attributes['identifier'];
-	if (
-		isset( $attributes['isCallbackWidget'] ) &&
-		$attributes['isCallbackWidget']
-	) {
-		global $wp_registered_widgets;
-		if ( ! isset( $wp_registered_widgets[ $identifier ] ) ) {
+	if ( isset( $attributes['widgetClass'] ) ) {
+		$widget_class = $attributes['widgetClass'];
+	}
+
+	if ( ! $widget_class ) {
+		if ( ! $identifier ) {
 			return '';
 		}
-		$widget = $wp_registered_widgets[ $identifier ];
-		$params = array_merge(
-			array(
-				'widget_id'   => $identifier,
-				'widget_name' => $widget['name'],
-			),
-			(array) $wp_registered_widgets[ $identifier ]['params']
-		);
-		$params = apply_filters( 'dynamic_sidebar_params', $params );
-
-		$callback = $widget['callback'];
-
-		if ( is_callable( $callback ) ) {
-			ob_start();
-			call_user_func_array( $callback, $params );
-			return ob_get_clean();
-		}
-		return '';
+		return render_widget_by_id( $attributes['identifier'] );
 	}
 	ob_start();
-	the_widget( $identifier, $attributes['instance'] );
+	$instance = null;
+	if ( isset( $attributes['instance'] ) ) {
+		$instance = $attributes['instance'];
+	}
+	if ( $identifier ) {
+		$instance = Experimental_WP_Widget_Blocks_Manager::get_sidebar_widget_instance( array(), $identifier );
+	}
+	the_widget( $widget_class, $instance );
 	return ob_get_clean();
-
 }
 
 /**
@@ -60,14 +108,14 @@ function register_block_core_legacy_widget() {
 		'core/legacy-widget',
 		array(
 			'attributes'      => array(
-				'identifier'       => array(
+				'widgetClass' => array(
 					'type' => 'string',
 				),
-				'instance'         => array(
-					'type' => 'object',
+				'identifier'  => array(
+					'type' => 'string',
 				),
-				'isCallbackWidget' => array(
-					'type' => 'boolean',
+				'instance'    => array(
+					'type' => 'object',
 				),
 			),
 			'render_callback' => 'render_block_legacy_widget',

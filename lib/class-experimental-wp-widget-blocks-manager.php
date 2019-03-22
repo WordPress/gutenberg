@@ -125,9 +125,9 @@ class Experimental_WP_Widget_Blocks_Manager {
 			$blocks[]     = array(
 				'blockName' => 'core/legacy-widget',
 				'attrs'     => array(
-					'class'      => $widget_class,
-					'identifier' => $item,
-					'instance'   => self::get_sidebar_widget_instance( $wp_registered_sidebars[ $sidebar_id ], $item ),
+					'widgetClass' => $widget_class,
+					'identifier'  => $item,
+					'instance'    => self::get_sidebar_widget_instance( $wp_registered_sidebars[ $sidebar_id ], $item ),
 				),
 				'innerHTML' => '',
 			);
@@ -177,7 +177,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 * @param string $id Identifier of the widget instance.
 	 * @return array Array containing the widget instance.
 	 */
-	private static function get_sidebar_widget_instance( $sidebar, $id ) {
+	public static function get_sidebar_widget_instance( $sidebar, $id ) {
 		list( $object, $number, $name ) = self::get_widget_info( $id );
 		if ( ! $object ) {
 			return array();
