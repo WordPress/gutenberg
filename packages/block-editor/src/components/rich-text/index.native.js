@@ -196,7 +196,7 @@ export class RichText extends Component {
 			formatPlaceholder: record.formatPlaceholder,
 		} );
 		if ( newContent && newContent !== this.props.value ) {
-			this.props.onChange( newContent );
+			this.onChange( newContent );
 			if ( record.needsSelectionUpdate && record.start && record.end ) {
 				this.setState( { start: record.start, end: record.end } );
 			}
@@ -237,10 +237,12 @@ export class RichText extends Component {
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 	onChange( event ) {
-		this.lastEventCount = event.nativeEvent.eventCount;
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
-		this.lastContent = contentWithoutRootTag;
-		this.props.onChange( this.lastContent );
+		if ( event.nativeEvent ) {
+			this.lastEventCount = event.nativeEvent.eventCount;
+			const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
+			this.lastContent = contentWithoutRootTag;
+			this.onChange( this.lastContent );
+		}
 	}
 
 	/**
@@ -322,7 +324,7 @@ export class RichText extends Component {
 				} );
 				this.lastContent = this.valueToFormat( linkedRecord );
 				this.lastEventCount = undefined;
-				this.props.onChange( this.lastContent );
+				this.onChange( this.lastContent );
 
 				// Allows us to ask for this information when we get a report.
 				window.console.log( 'Created link:\n\n', trimmedText );
@@ -355,7 +357,7 @@ export class RichText extends Component {
 			const newContent = this.valueToFormat( insertedContent );
 			this.lastEventCount = undefined;
 			this.lastContent = newContent;
-			this.props.onChange( this.lastContent );
+			this.onChange( this.lastContent );
 		} else if ( onSplit ) {
 			if ( ! pastedContent.length ) {
 				return;
@@ -388,11 +390,14 @@ export class RichText extends Component {
 			end: realEnd,
 			formatPlaceholder,
 		} );
-		this.lastEventCount = event.nativeEvent.eventCount;
+
+		if ( event.nativeEvent ) {
+			this.lastEventCount = event.nativeEvent.eventCount;
+		}
 		// we don't want to refresh aztec as no content can have changed from this event
 		// let's update lastContent to prevent that in shouldComponentUpdate
 		this.lastContent = this.removeRootTagsProduceByAztec( unescapeSpaces( text ) );
-		this.props.onChange( this.lastContent );
+		this.onChange( this.lastContent );
 	}
 
 	isEmpty() {
