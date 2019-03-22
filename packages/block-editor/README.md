@@ -45,7 +45,7 @@ function MyEditorComponent () {
 // import '@wordpress/block-editor/build-style/style.css';
 ```
 
-In this example, we're instanciating a block editor. A block editor is composed by a `BlockEditorProvider` wrapper component where you passe the current array of blocks and on each change the `onInput` or `onChange` callbacks are called depending on whether the change is considered persistant or not.
+In this example, we're instantiating a block editor. A block editor is composed by a `BlockEditorProvider` wrapper component where you passe the current array of blocks and on each change the `onInput` or `onChange` callbacks are called depending on whether the change is considered persistent or not.
 
 Inside `BlockEditorProvider`, you can nest any of the available `@wordpress/block-editor` UI components to build the UI of your editor.
 
