@@ -2,21 +2,23 @@
  * @format
  * @flow
  */
-
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
-import React from 'react';
-import { Platform, TextInput, UIManager, PanResponder } from 'react-native';
-import styles from './html-text-input.scss';
-import KeyboardAvoidingView from './keyboard-avoiding-view';
-
-// Gutenberg imports
 import { parse } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
+
+/**
+ * External dependencies
+ */
+import React from 'react';
+
+/**
+ * Internal dependencies
+ */
+import HTMLInputViewUI from './html-text-input-ui/html-text-input-ui';
 
 type PropsType = {
 	onChange: string => mixed,
@@ -33,29 +35,14 @@ type StateType = {
 };
 
 export class HTMLInputView extends React.Component<PropsType, StateType> {
-	isIOS: boolean = Platform.OS === 'ios';
 	edit: string => mixed;
 	stopEditing: () => mixed;
-	panResponder: PanResponder;
 
 	constructor() {
 		super( ...arguments );
 
 		this.edit = this.edit.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
-
-		this.panResponder = PanResponder.create( {
-			onStartShouldSetPanResponderCapture: ( ) => true,
-
-			onPanResponderMove: ( e, gestureState ) => {
-				if ( this.isIOS && ( gestureState.dy > 100 && gestureState.dy < 110 ) ) {
-					//Keyboard.dismiss() and this.textInput.blur() is not working here
-					//They require to know the currentlyFocusedID under the hood but
-					//during this gesture there's no currentlyFocusedID
-					UIManager.blur( e.target );
-				}
-			},
-		} );
 
 		this.state = {
 			isDirty: false,
@@ -93,30 +80,16 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 
 	render() {
 		return (
-			<KeyboardAvoidingView
-				style={ styles.container }
-				{ ...( this.isIOS ? { ...this.panResponder.panHandlers } : {} ) }
-				parentHeight={ this.props.parentHeight }>
-				<TextInput
-					autoCorrect={ false }
-					textAlignVertical="center"
-					numberOfLines={ 1 }
-					style={ styles.htmlViewTitle }
-					value={ this.props.title }
-					placeholder={ __( 'Add title' ) }
-					onChangeText={ this.props.setTitleAction }
-				/>
-				<TextInput
-					autoCorrect={ false }
-					textAlignVertical="top"
-					multiline
-					style={ { ...styles.htmlView } }
-					value={ this.state.value }
-					onChangeText={ this.edit }
-					onBlur={ this.stopEditing }
-					placeholder={ __( 'Start writing…' ) }
-				/>
-			</KeyboardAvoidingView>
+			<HTMLInputViewUI
+				setTitleAction={ this.props.setTitleAction }
+				value={ this.state.value }
+				title={ this.props.title }
+				parentHeight={ this.props.parentHeight }
+				onChangeHTMLText={ this.edit }
+				onBlurHTMLText={ this.stopEditing }
+				titlePlaceholder={ __( 'Add title' ) }
+				htmlPlaceholder={ __( 'Start writing…' ) }
+			/>
 		);
 	}
 }

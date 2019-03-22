@@ -1,5 +1,8 @@
 /** @format */
 
+/**
+ * External dependencies
+ */
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
 const { RNReactNativeGutenbergBridge } = NativeModules;
@@ -42,6 +45,10 @@ export function subscribeUpdateHtml( callback ) {
 
 export function subscribeMediaUpload( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaUpload', callback );
+}
+
+export function subscribeMediaAppend( callback ) {
+	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
 }
 
 export function requestMediaPickFromMediaLibrary( callback ) {

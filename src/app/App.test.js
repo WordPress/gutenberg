@@ -1,11 +1,21 @@
 /** @format */
 
+/**
+ * External dependencies
+ */
 import renderer from 'react-test-renderer';
 
+/**
+ * WordPress dependencies
+ */
+import { dispatch, select } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
 import { bootstrapEditor } from '..';
 import App from './App';
 import BlockHolder from '../block-management/block-holder';
-import { dispatch, select } from '@wordpress/data';
 
 describe( 'App', () => {
 	beforeAll( bootstrapEditor );

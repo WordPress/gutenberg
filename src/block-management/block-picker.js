@@ -4,22 +4,22 @@
  */
 
 /**
-* External dependencies
-*/
+ * External dependencies
+ */
 import React from 'react';
 import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 
 /**
-* WordPress dependencies
-*/
+ * WordPress dependencies
+ */
 import { SVG } from '@wordpress/components';
 import { BottomSheet } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { getBlockTypes, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 
 /**
-* Internal dependencies
-*/
+ * Internal dependencies
+ */
 import styles from './block-picker.scss';
 
 type PropsType = {
