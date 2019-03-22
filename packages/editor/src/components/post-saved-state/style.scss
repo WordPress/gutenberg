@@ -16,7 +16,6 @@
 
 .editor-post-saved-state {
 	width: $icon-button-size - 8px;
-	white-space: nowrap;
 	padding: #{ $grid-size-small * 3 } $grid-size-small;
 
 	.dashicon {
@@ -43,4 +42,11 @@
 			display: none;
 		}
 	}
+}
+
+// Fix for draft button glitch on Small desktop (e.g. 1024px) windows os. while Top Toolbar is enabled.
+.editor-post-save-draft,
+.editor-post-switch-to-draft,
+.editor-post-saved-state {
+  	white-space: nowrap;
 }
