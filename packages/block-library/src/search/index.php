@@ -44,6 +44,10 @@ function render_block_core_search( $attributes ) {
 		$class .= ' ' . $attributes['className'];
 	}
 
+	if ( isset( $attributes['align'] ) ) {
+		$class .= ' align' . $attributes['align'];
+	}
+
 	return sprintf(
 		'<form class="%s" role="search" method="get" action="%s">%s</form>',
 		$class,

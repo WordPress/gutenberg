@@ -92,6 +92,10 @@ function render_block_core_rss( $attributes ) {
 	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['blockLayout'] ) {
 		$class .= ' columns-' . $attributes['columns'];
 	}
+
+	if ( isset( $attributes['className'] ) ) {
+		$class .= ' ' . $attributes['className'];
+	}
 	
 	$list_items_markup = "<ul class='{$class}'>{$list_items}</ul>";
 
