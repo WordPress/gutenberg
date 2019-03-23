@@ -24,22 +24,25 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured Image' );
 const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
 const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
+const path = require( 'path' );
 
 function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
 	const postLabel = get( postType, [ 'labels' ], {} );
 	const instructions = <p>{ __( 'To edit the featured image, you need permission to upload media.' ) }</p>;
 
-	let mediaWidth, mediaHeight, mediaSourceUrl;
+	let mediaWidth, mediaHeight, mediaSourceUrl, mediaAltText;
 	if ( media ) {
 		const mediaSize = applyFilters( 'editor.PostFeaturedImage.imageSize', 'post-thumbnail', media.id, currentPostId );
 		if ( has( media, [ 'media_details', 'sizes', mediaSize ] ) ) {
 			mediaWidth = media.media_details.sizes[ mediaSize ].width;
 			mediaHeight = media.media_details.sizes[ mediaSize ].height;
 			mediaSourceUrl = media.media_details.sizes[ mediaSize ].source_url;
+			mediaAltText = media.media_details.sizes[ mediaSize ].alt_text;
 		} else {
 			mediaWidth = media.media_details.width;
 			mediaHeight = media.media_details.height;
 			mediaSourceUrl = media.source_url;
+			mediaAltText = media.alt_text;
 		}
 	}
 
@@ -54,7 +57,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
-								<Button className="editor-post-featured-image__preview" onClick={ open } aria-label={ __( 'Edit or update the image' ) }>
+								<Button className="editor-post-featured-image__preview" onClick={ open } aria-label={ __( 'Edit or update the image' ) } aria-describedby={ !! mediaAltText ? 'Current image: ' + mediaAltText : 'The current image has no alternative text. The file name is: ' + path.basename( mediaSourceUrl ) }>
 									{ media &&
 										<ResponsiveWrapper
 											naturalWidth={ mediaWidth }
