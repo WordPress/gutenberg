@@ -62,10 +62,17 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			if ( switchedPreview || switchedURL ) {
 				if ( this.props.cannotEmbed ) {
 					// Can't embed this URL, and we've just received or switched the preview.
+					this.resubmitWithoutTrailingSlash();
 					return;
 				}
 				this.handleIncomingPreview();
 			}
+		}
+
+		resubmitWithoutTrailingSlash() {
+			this.setState( ( prevState ) => ( {
+				url: prevState.url.replace( /\/$/, '' ),
+			} ), this.setUrl );
 		}
 
 		setUrl( event ) {
