@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,9 +43,13 @@ export function Button( props, ref ) {
 	const tag = href !== undefined && ! disabled ? 'a' : 'button';
 	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
 
+	const passThruProps = additionalProps.instanceId ?
+		omit( additionalProps, [ 'instanceId' ] ) :
+		additionalProps;
+
 	return createElement( tag, {
 		...tagProps,
-		...additionalProps,
+		...passThruProps,
 		className: classes,
 		ref,
 	} );
