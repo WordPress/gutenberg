@@ -82,15 +82,18 @@ export const ColumnsEdit = function( { attributes, setAttributes, className, upd
 	);
 };
 
+const DEFAULT_EMPTY_ARRAY = [];
+
 export default compose(
 	/**
 	 * Selects the child column Blocks for this parent Column
 	 */
 	withSelect( ( select, { clientId } ) => {
 		const { getBlocksByClientId } = select( 'core/editor' );
+		const blocks = getBlocksByClientId( clientId )[ 0 ];
 
 		return {
-			childColumns: getBlocksByClientId( clientId )[ 0 ].innerBlocks,
+			childColumns: blocks ? blocks.innerBlocks : DEFAULT_EMPTY_ARRAY,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, childColumns } ) => {
