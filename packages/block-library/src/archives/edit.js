@@ -5,7 +5,6 @@ import { Fragment } from '@wordpress/element';
 import {
 	PanelBody,
 	ToggleControl,
-	Disabled,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -43,9 +42,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					controls={ [ 'left', 'center', 'right' ] }
 				/>
 			</BlockControls>
-			<Disabled>
-				<ServerSideRender block="core/archives" attributes={ attributes } />
-			</Disabled>
+			<ServerSideRender block="core/archives" attributes={ attributes } />
 		</Fragment>
 	);
 }
