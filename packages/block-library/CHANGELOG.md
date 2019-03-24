@@ -2,6 +2,10 @@
 
 - Add vertical alignment controls to `columns` Block ([#13899](https://github.com/WordPress/gutenberg/pull/13899/)).
 
+### Bug Fixes
+
+- fix uncaught error in `columns` block due to accessing a property on an object that might be undefined [#14605](https://github.com/WordPress/gutenberg/pull/14605)
+
 ## 2.3.0 (2019-03-06)
 
 ### New Feature
