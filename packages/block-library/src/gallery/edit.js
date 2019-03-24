@@ -271,10 +271,12 @@ class GalleryEdit extends Component {
 					className={ classnames(
 						className,
 						{
-							[ `align${ align }` ]: align,
 							[ `columns-${ columns }` ]: columns,
 							'is-cropped': imageCrop,
-						}
+						},
+						align ? {
+							[ `align${ align }` ]: align,
+						} : null
 					) }
 				>
 					{ dropZone }
