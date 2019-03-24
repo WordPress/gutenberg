@@ -90,10 +90,10 @@ export default compose(
 	 */
 	withSelect( ( select, { clientId } ) => {
 		const { getBlocksByClientId } = select( 'core/editor' );
-		const blocks = getBlocksByClientId( clientId )[ 0 ];
+		const block = getBlocksByClientId( clientId )[ 0 ];
 
 		return {
-			childColumns: blocks ? blocks.innerBlocks : DEFAULT_EMPTY_ARRAY,
+			childColumns: block ? block.innerBlocks : DEFAULT_EMPTY_ARRAY,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, childColumns } ) => {
