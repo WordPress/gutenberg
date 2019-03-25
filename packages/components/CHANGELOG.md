@@ -1,4 +1,4 @@
-7.2.1 (Unreleased)
+## 7.2.1 (Unreleased)
 
 ### Bug fixes
 
