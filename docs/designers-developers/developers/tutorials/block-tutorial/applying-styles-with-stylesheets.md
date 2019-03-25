@@ -79,6 +79,9 @@ Example 2 shows having a distinct style for each context. Your block is likely t
 
 ```php
 <?php
+/**
+ * Plugin Name: Gutenberg Examples Stylesheets
+ */
 
 function gutenberg_examples_02_register_block() {
 	wp_register_script(
