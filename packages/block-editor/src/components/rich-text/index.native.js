@@ -75,8 +75,10 @@ export class RichText extends Component {
 	constructor( { multiline } ) {
 		super( ...arguments );
 
+		this.isMultiline = false;
 		if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
 			this.multilineTag = multiline === true ? 'p' : multiline;
+			this.isMultiline = true;
 		}
 
 		if ( this.multilineTag === 'li' ) {
@@ -581,6 +583,7 @@ export class RichText extends Component {
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ this.props.disableEditingMenu }
+					isMultiline={ this.isMultiline }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>
