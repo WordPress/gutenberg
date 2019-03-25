@@ -1,13 +1,13 @@
-.editor-format-toolbar {
+.block-editor-format-toolbar {
 	display: flex;
 	flex-shrink: 0;
 }
 
-.editor-format-toolbar__selection-position {
+.block-editor-format-toolbar__selection-position {
 	position: absolute;
 	transform: translateX(-50%);
 }
 
-.editor-format-toolbar .components-dropdown-menu__toggle .components-dropdown-menu__indicator::after {
+.block-editor-format-toolbar .components-dropdown-menu__toggle .components-dropdown-menu__indicator::after {
 	margin: 7px;
 }

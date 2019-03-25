@@ -250,6 +250,7 @@ class GalleryEdit extends Component {
 							onChange={ this.setColumnsNumber }
 							min={ 1 }
 							max={ Math.min( MAX_COLUMNS, images.length ) }
+							required
 						/> }
 						<ToggleControl
 							label={ __( 'Crop Images' ) }

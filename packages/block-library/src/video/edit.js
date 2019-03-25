@@ -129,6 +129,7 @@ class VideoEdit extends Component {
 			poster,
 			preload,
 			src,
+			playsInline,
 		} = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
@@ -199,6 +200,11 @@ class VideoEdit extends Component {
 							label={ __( 'Playback Controls' ) }
 							onChange={ this.toggleAttribute( 'controls' ) }
 							checked={ controls }
+						/>
+						<ToggleControl
+							label={ __( 'Play inline' ) }
+							onChange={ this.toggleAttribute( 'playsInline' ) }
+							checked={ playsInline }
 						/>
 						<SelectControl
 							label={ __( 'Preload' ) }

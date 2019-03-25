@@ -12,9 +12,9 @@ import BlockIcon from '../block-icon';
 
 function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
 	return (
-		<div className="editor-inserter__child-blocks">
+		<div className="editor-inserter__child-blocks block-editor-inserter__child-blocks">
 			{ ( rootBlockIcon || rootBlockTitle ) && (
-				<div className="editor-inserter__parent-block-header">
+				<div className="editor-inserter__parent-block-header block-editor-inserter__parent-block-header">
 					<BlockIcon icon={ rootBlockIcon } showColors />
 					{ rootBlockTitle && <h2>{ rootBlockTitle }</h2> }
 				</div>

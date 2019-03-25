@@ -8,7 +8,7 @@ exports[`RichText should apply formatting when selection is collapsed 1`] = `
 
 exports[`RichText should apply formatting with access shortcut 1`] = `
 "<!-- wp:paragraph -->
-<p><del>test</del></p>
+<p><s>test</s></p>
 <!-- /wp:paragraph -->"
 `;
 

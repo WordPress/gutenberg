@@ -30,6 +30,8 @@ module.exports = {
 };
 ```
 
+_Note:_ `@wordpress/babel-plugin-import-jsx-pragma` is included in `@wordpress/babel-preset-default` (default preset for WordPress development) starting from `v4.0.0`. If you are using this preset, you shouldn't include this plugin in your Babel config. 
+
 ## Options
 
 As the `@babel/transform-react-jsx` plugin offers options to customize the `pragma` to which the transform references, there are equivalent options to assign for customizing the imports generated.

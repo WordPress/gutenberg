@@ -33,7 +33,7 @@ import { isValidIcon, normalizeIconObject } from './utils';
  * @property {?string[]}                 keywords   Additional keywords to produce
  *                                                  block as inserter search result.
  * @property {?Object}                   attributes Block attributes.
- * @property {Function}                  save       Serialize behavior of a block,
+ * @property {?Function}                 save       Serialize behavior of a block,
  *                                                  returning an element describing
  *                                                  structure of the block's post
  *                                                  content markup.
@@ -66,6 +66,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
+		save: () => null,
 		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};

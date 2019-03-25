@@ -40,11 +40,6 @@ registerBlockType( 'my-plugin/latest-post', {
 			post.title.rendered
 		);
 	} ),
-
-	save: function() {
-		// Rendering in PHP
-		return null;
-	},
 } );
 ```
 {% ESNext %}
@@ -79,16 +74,11 @@ registerBlockType( 'my-plugin/latest-post', {
 			{ post.title.rendered }
 		</a>;
 	} ),
-
-	save() {
-		// Rendering in PHP
-		return null;
-	},
 } );
 ```
 {% end %}
 
-Because it is a dynamic block it also needs a server component. The rendering can be added using the `render_callback` property when using the `register_block_type` function.
+Because it is a dynamic block it doesn't need to override the default `save` implementation on the client. Instead, it needs a server component. The rendering can be added using the `render_callback` property when using the `register_block_type` function.
 
 ```php
 <?php
@@ -118,8 +108,8 @@ register_block_type( 'my-plugin/latest-post', array(
 
 There are a few things to notice:
 
-* The edit function still shows a representation of the block in the editor's context (this could be very different from the rendered version, it's up to the block's author)
-* The save function just returns null because the rendering is performed server-side.
+* The `edit` function still shows a representation of the block in the editor's context (this could be very different from the rendered version, it's up to the block's author)
+* The built-in `save` function just returns `null` because the rendering is performed server-side.
 * The server-side rendering is a function taking the block attributes and the block inner content as arguments, and returning the markup (quite similar to shortcodes)
 
 ## Live rendering in Gutenberg editor
@@ -151,11 +141,6 @@ registerBlockType( 'my-plugin/latest-post', {
 			})
 		);
 	},
-
-	save: function() {
-		// Rendering in PHP
-		return null;
-	},
 } );
 ```
 {% ESNext %}
@@ -178,11 +163,6 @@ registerBlockType( 'my-plugin/latest-post', {
 				attributes={ props.attributes }
 			/>
 		);
-	},
-
-	save() {
-		// Rendering in PHP
-		return null;
 	},
 } );
 ```

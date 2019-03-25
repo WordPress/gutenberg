@@ -39,9 +39,9 @@ Then add a new file named `my-custom-format.js` with the following contents:
 } )( window.wp );
 ```
 
-Make that plugin available in your WordPress setup and activate it. Then, load a new page/post. 
+Make that plugin available in your WordPress setup and activate it. Then, load a new page/post.
 
-The list of available format types is maintained in the `core/rich-text` store. You can query the store to check that your custom format is now avaliable. To do so, run this code in your browser's console:
+The list of available format types is maintained in the `core/rich-text` store. You can query the store to check that your custom format is now available. To do so, run this code in your browser's console:
 
 	wp.data.select( 'core/rich-text' ).getFormatTypes();
 

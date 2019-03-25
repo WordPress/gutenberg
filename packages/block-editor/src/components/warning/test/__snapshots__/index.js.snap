@@ -2,13 +2,13 @@
 
 exports[`Warning should match snapshot 1`] = `
 <div
-  className="editor-warning"
+  className="editor-warning block-editor-warning"
 >
   <div
-    className="editor-warning__contents"
+    className="editor-warning__contents block-editor-warning__contents"
   >
     <p
-      className="editor-warning__message"
+      className="editor-warning__message block-editor-warning__message"
     >
       error
     </p>

@@ -1,6 +1,6 @@
 # Block Editor
 
-Generic block editor module.
+This module allows you to create and use standalone block editors.
 
 ## Installation
 
@@ -11,6 +11,58 @@ npm install @wordpress/block-editor --save
 ```
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
+## Usage
+
+```js
+import {
+	BlockEditorProvider
+	BlockList
+} from '@wordpress/block-editor';
+import { useState } from '@wordpress/element';
+
+function MyEditorComponent () {
+	const [ blocks, updateBlocks ] = useState( [] );
+
+	return (
+		<BlockEditorProvider
+			value={ blocks }
+			onInput={ updateBlocks }
+			onChange={ updateBlocks }
+		>
+			<WritingFlow>
+				<ObserveTyping>
+					<BlockList />
+				</ObserveTyping>
+			</WritingFlow>
+			<Popover.Slot />
+		</BlockEditorProvider>
+	);
+}
+
+// Make sure to load the block editor stylesheets too
+// import '@wordpress/components/build-style/style.css';
+// import '@wordpress/block-editor/build-style/style.css';
+```
+
+In this example, we're instantiating a block editor. A block editor is composed by a `BlockEditorProvider` wrapper component where you passe the current array of blocks and on each change the `onInput` or `onChange` callbacks are called depending on whether the change is considered persistent or not.
+
+Inside `BlockEditorProvider`, you can nest any of the available `@wordpress/block-editor` UI components to build the UI of your editor.
+
+In the example above we're rendering the `BlockList` to show and edit the block list. For instance we could add a custom sidebar and use the `BlockInspector` component to be able to edit the advanced settings for the currently selected block. (See the [API](#API) for the list of all the available components).
+
+In the example above, there's no registered block type, in order to use the block editor successfully make sure to register some block types. For instance, registering the core block types can be done like so:
+
+```js
+import { registerCoreBlocks } from '@wordpress/block-library';
+
+registerCoreBlockTypes();
+
+// Make sure to load the block stylesheets too
+// import '@wordpress/block-library/build-style/style.css';
+// import '@wordpress/block-library/build-style/editor.css';
+// import '@wordpress/block-library/build-style/theme.css';
+```
 
 ## API
 
@@ -113,6 +165,12 @@ Undocumented declaration.
 Undocumented declaration.
 
 ### BlockToolbar
+
+[src/index.js#L15-L15](src/index.js#L15-L15)
+
+Undocumented declaration.
+
+### BlockVerticalAlignmentToolbar
 
 [src/index.js#L15-L15](src/index.js#L15-L15)
 
@@ -381,12 +439,6 @@ The default editor settings
  titlePlaceholder              string        Empty title placeholder
 
 ### SkipToSelectedBlock
-
-[src/index.js#L15-L15](src/index.js#L15-L15)
-
-Undocumented declaration.
-
-### UnstableRichTextInputEvent
 
 [src/index.js#L15-L15](src/index.js#L15-L15)
 
