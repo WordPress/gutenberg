@@ -56,7 +56,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 ```
 {% end %}
 
-The class name is generated using the block's name prefixed with `wp-block-`, replacing the `/` namespace separator with a single `-`.
+The class name is generated using the block's name prefixed with `wp-block-`, replacing the `/` namespace separator with a single `-`. Create the following CSS in a file called `editor.css`:
 
 ```css
 .wp-block-gutenberg-examples-example-02-stylesheets {
