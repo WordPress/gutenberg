@@ -10,7 +10,9 @@ While the block's editor behaviors are implemented in JavaScript, you'll need to
 
 ```php
 <?php
-
+/*
+Plugin Name: Gutenberg examples 01
+*/
 function gutenberg_examples_01_register_block()
 	wp_register_script(
 		'gutenberg-examples-01',
