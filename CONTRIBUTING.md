@@ -110,7 +110,7 @@ The workflow is documented in greater detail in the [repository management](/doc
 
 ## Playground
 
-The Gutenberg repository also includes a static Gutenberg playground that allows testing and developping in a WordPress-agnostic context. This is very helpful for developping reusable components and trying generic JavaScript modules without any backend dependency.
+The Gutenberg repository also includes a static Gutenberg playground that allows testing and developing in a WordPress-agnostic context. This is very helpful for developing reusable components and trying generic JavaScript modules without any backend dependency.
 
 You can launch the playground by running `npm run playground:start` locally. The playground should be available on [http://localhost:1234](http://localhost:1234).
 
