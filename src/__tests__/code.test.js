@@ -1,5 +1,11 @@
+/**
+ * External dependencies
+ */
 import renderer from 'react-test-renderer';
 //import renderer from 'react-test-renderer/shallow';
+/**
+ * Internal dependencies
+ */
 import Code from '../../gutenberg/packages/block-library/src/code/edit.native.js';
 import { TextInput } from 'react-native';
 

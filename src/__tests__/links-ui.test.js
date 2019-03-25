@@ -1,4 +1,10 @@
+/**
+ * Internal dependencies
+ */
 import ModalLinkUI from '../../gutenberg/packages/format-library/src/link/modal.native.js';
+/**
+ * External dependencies
+ */
 import { shallow } from 'enzyme';
 
 describe( 'LinksUI', () => {

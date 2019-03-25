@@ -1,7 +1,16 @@
+/**
+ * External dependencies
+ */
 import { shallow } from 'enzyme';
 
+/**
+ * Internal dependencies
+ */
 import Paragraph from '../../gutenberg/packages/block-library/src/paragraph/edit.native.js';
 
+/**
+ * WordPress dependencies
+ */
 import { createBlock } from '@wordpress/blocks';
 jest.mock( '@wordpress/blocks' );
 
