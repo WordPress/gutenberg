@@ -7,7 +7,8 @@
 		padding-right: $block-padding*3;
 	}
 
-	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks {
+	// Only applied when background is added to cancel out padding
+	> .editor-block-list__block-edit > div > .wp-block-section.has-background > .editor-inner-blocks {
 		margin-top: -#{$block-padding*2 + $block-spacing};
 		margin-bottom: -#{$block-padding*2 + $block-spacing};
 	}
