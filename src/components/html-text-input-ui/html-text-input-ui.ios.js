@@ -34,7 +34,7 @@ export default class HTMLInputViewUI extends React.Component<PropsType, StateTyp
 
 			onPanResponderMove: ( e, gestureState ) => {
 				if ( gestureState.dy > 100 && gestureState.dy < 110 ) {
-					//Keyboard.dismiss() and this.textInput.blur() is not working here
+					//Keyboard.dismiss() and this.textInput.blur() are not working here
 					//They require to know the currentlyFocusedID under the hood but
 					//during this gesture there's no currentlyFocusedID
 					UIManager.blur( e.target );
@@ -46,12 +46,11 @@ export default class HTMLInputViewUI extends React.Component<PropsType, StateTyp
 	render() {
 		return (
 			<KeyboardAvoidingView
-				style={ styles.container }
+				style={ styles.keyboardAvoidingView }
 				{ ...this.panResponder.panHandlers }
 				parentHeight={ this.props.parentHeight }
 			>
 				{ this.props.content( true, styles.htmlView, () => {} ) }
-
 			</KeyboardAvoidingView>
 		);
 	}

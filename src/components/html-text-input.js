@@ -84,9 +84,9 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 		return (
 			<HTMLInputViewUI
 				parentHeight={ this.props.parentHeight }
-				content={ ( scrollEnabled, style, onContentSizeChange ) => {
+				content={ ( scrollEnabled, htmlStyle, onContentSizeChange ) => {
 					return (
-						<View>
+						<View style={ styles.container }>
 							<TextInput
 								autoCorrect={ false }
 								textAlignVertical="center"
@@ -100,7 +100,7 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 								autoCorrect={ false }
 								textAlignVertical="top"
 								multiline
-								style={ style }
+								style={ htmlStyle }
 								value={ this.state.value }
 								onChangeText={ this.edit }
 								onBlur={ this.stopEditing }
