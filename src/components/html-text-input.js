@@ -84,8 +84,6 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 		return (
 			<HTMLInputViewUI
 				parentHeight={ this.props.parentHeight }
-				titlePlaceholder={ __( 'Add title' ) }
-				htmlPlaceholder={ __( 'Start writing…' ) }
 				content={ ( scrollEnabled, style, onContentSizeChange ) => {
 					return (
 						<View>

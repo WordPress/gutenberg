@@ -9,7 +9,7 @@ $title-height: 32;
 	background-color: $backgroundColor;
 	padding-left: $padding;
 	padding-right: $padding;
-	padding-bottom: $title-height + $padding;
+	padding-bottom: $title-height + $padding + 100;
 }
 
 .htmlViewTitle {

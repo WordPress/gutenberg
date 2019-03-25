@@ -6,7 +6,7 @@
 /**
  * External dependencies
  */
-import React from 'react';
+import * as React from 'react';
 import { TextInput, UIManager, PanResponder } from 'react-native';
 
 /**
@@ -16,14 +16,8 @@ import styles from './html-text-input-ui.scss';
 import KeyboardAvoidingView from '../keyboard-avoiding-view';
 
 type PropsType = {
-    setTitleAction: string => void,
-	value: string,
-	title: string,
     parentHeight: number,
-    onChangeHTMLText: string => mixed,
-    onBlurHTMLText: () => mixed,
-    titlePlaceholder: string,
-    htmlPlaceholder: string,
+	content: (scrollEnabled: boolean, style: mixed, onContentSizeChange: () => void) => React.Node,
 };
 
 type StateType = {
