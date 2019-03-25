@@ -78,6 +78,12 @@ export const settings = {
 			selector: 'video',
 			attribute: 'src',
 		},
+		playsInline: {
+			type: 'boolean',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'playsinline',
+		},
 	},
 
 	transforms: {
@@ -144,7 +150,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { autoplay, caption, controls, loop, muted, poster, preload, src } = attributes;
+		const { autoplay, caption, controls, loop, muted, poster, preload, src, playsInline } = attributes;
 		return (
 			<figure>
 				{ src && (
@@ -156,6 +162,7 @@ export const settings = {
 						poster={ poster }
 						preload={ preload !== 'metadata' ? preload : undefined }
 						src={ src }
+						playsInline={ playsInline }
 					/>
 				) }
 				{ ! RichText.isEmpty( caption ) && (

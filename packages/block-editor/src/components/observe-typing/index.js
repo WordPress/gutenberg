@@ -145,7 +145,7 @@ class ObserveTyping extends Component {
 		// Abort early if already typing, or key press is incurred outside a
 		// text field (e.g. arrow-ing through toolbar buttons).
 		// Ignore typing in a block toolbar
-		if ( isTyping || ! isTextField( target ) || target.closest( '.editor-block-toolbar' ) ) {
+		if ( isTyping || ! isTextField( target ) || target.closest( '.block-editor-block-toolbar' ) ) {
 			return;
 		}
 

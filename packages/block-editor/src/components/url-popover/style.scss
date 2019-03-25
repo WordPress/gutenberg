@@ -1,15 +1,15 @@
-.editor-url-popover__row {
+.block-editor-url-popover__row {
 	display: flex;
 }
 
 // Any children of the popover-row that are not the settings-toggle
 // should take up as much space as possible.
-.editor-url-popover__row > :not(.editor-url-popover__settings-toggle) {
+.block-editor-url-popover__row > :not(.block-editor-url-popover__settings-toggle) {
 	flex-grow: 1;
 }
 
 // Mimic toolbar component styles for the icons in this popover.
-.editor-url-popover .components-icon-button {
+.block-editor-url-popover .components-icon-button {
 	padding: 3px;
 
 	> svg {
@@ -36,7 +36,7 @@
 	}
 }
 
-.editor-url-popover__settings-toggle {
+.block-editor-url-popover__settings-toggle {
 	flex-shrink: 0;
 
 	// Add a left divider to the toggle button.
@@ -49,7 +49,7 @@
 	}
 }
 
-.editor-url-popover__settings {
+.block-editor-url-popover__settings {
 	padding: $panel-padding;
 	border-top: $border-width solid $light-gray-500;
 

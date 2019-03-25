@@ -2,9 +2,9 @@
 $input-padding: 8px;
 $input-size: 300px;
 
-.editor-block-list__block .editor-url-input,
-.components-popover .editor-url-input,
-.editor-url-input {
+.block-editor-block-list__block .block-editor-url-input,
+.components-popover .block-editor-url-input,
+.block-editor-url-input {
 	flex-grow: 1;
 	position: relative;
 	padding: 1px;
@@ -40,7 +40,7 @@ $input-size: 300px;
 }
 
 // Suggestions
-.editor-url-input__suggestions {
+.block-editor-url-input__suggestions {
 	max-height: 200px;
 	transition: all 0.15s ease-in-out;
 	padding: 4px 0;
@@ -50,15 +50,15 @@ $input-size: 300px;
 }
 
 // Hide suggestions on mobile until we @todo find a better way to show them
-.editor-url-input__suggestions,
-.editor-url-input .components-spinner {
+.block-editor-url-input__suggestions,
+.block-editor-url-input .components-spinner {
 	display: none;
 	@include break-small() {
 		display: inherit;
 	}
 }
 
-.editor-url-input__suggestion {
+.block-editor-url-input__suggestion {
 	padding: 4px $input-padding;
 	color: $dark-gray-300; // lightest we can use for contrast
 	display: block;
@@ -83,11 +83,11 @@ $input-size: 300px;
 }
 
 // Toolbar button
-.components-toolbar > .editor-url-input__button {
+.components-toolbar > .block-editor-url-input__button {
 	position: inherit; // Let the dialog position according to parent.
 }
 
-.editor-url-input__button .editor-url-input__back {
+.block-editor-url-input__button .block-editor-url-input__back {
 	margin-right: 4px;
 	overflow: visible;
 
@@ -102,13 +102,13 @@ $input-size: 300px;
 	}
 }
 
-.editor-url-input__button-modal {
+.block-editor-url-input__button-modal {
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
 }
 
-.editor-url-input__button-modal-line {
+.block-editor-url-input__button-modal-line {
 	display: flex;
 	flex-direction: row;
 	flex-grow: 1;

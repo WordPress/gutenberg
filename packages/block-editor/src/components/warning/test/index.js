@@ -18,26 +18,26 @@ describe( 'Warning', () => {
 	it( 'should have valid class', () => {
 		const wrapper = shallow( <Warning /> );
 
-		expect( wrapper.hasClass( 'editor-warning' ) ).toBe( true );
-		expect( wrapper.find( '.editor-warning__actions' ) ).toHaveLength( 0 );
-		expect( wrapper.find( '.editor-warning__hidden' ) ).toHaveLength( 0 );
+		expect( wrapper.hasClass( 'block-editor-warning' ) ).toBe( true );
+		expect( wrapper.find( '.block-editor-warning__actions' ) ).toHaveLength( 0 );
+		expect( wrapper.find( '.block-editor-warning__hidden' ) ).toHaveLength( 0 );
 	} );
 
 	it( 'should show child error message element', () => {
 		const wrapper = shallow( <Warning actions={ <button /> }>Message</Warning> );
 
-		const actions = wrapper.find( '.editor-warning__actions' );
+		const actions = wrapper.find( '.block-editor-warning__actions' );
 		const action = actions.childAt( 0 );
 
 		expect( actions ).toHaveLength( 1 );
-		expect( action.hasClass( 'editor-warning__action' ) ).toBe( true );
+		expect( action.hasClass( 'block-editor-warning__action' ) ).toBe( true );
 		expect( action.childAt( 0 ).type() ).toBe( 'button' );
 	} );
 
 	it( 'should show hidden actions', () => {
 		const wrapper = shallow( <Warning secondaryActions={ [ { title: 'test', onClick: null } ] }>Message</Warning> );
 
-		const actions = wrapper.find( '.editor-warning__secondary' );
+		const actions = wrapper.find( '.block-editor-warning__secondary' );
 
 		expect( actions ).toHaveLength( 1 );
 	} );

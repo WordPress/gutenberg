@@ -123,6 +123,25 @@ function getFirstAnchorAttributeFormHTML( html, attributeName ) {
 	}
 }
 
+export function stripFirstImage( attributes, { shortcode } ) {
+	const { body } = document.implementation.createHTMLDocument( '' );
+
+	body.innerHTML = shortcode.content;
+
+	let nodeToRemove = body.querySelector( 'img' );
+
+	// if an image has parents, find the topmost node to remove
+	while ( nodeToRemove && nodeToRemove.parentNode && nodeToRemove.parentNode !== body ) {
+		nodeToRemove = nodeToRemove.parentNode;
+	}
+
+	if ( nodeToRemove ) {
+		nodeToRemove.parentNode.removeChild( nodeToRemove );
+	}
+
+	return body.innerHTML.trim();
+}
+
 export const settings = {
 	title: __( 'Image' ),
 
@@ -196,14 +215,7 @@ export const settings = {
 						selector: 'img',
 					},
 					caption: {
-						shortcode: ( attributes, { shortcode } ) => {
-							const { body } = document.implementation.createHTMLDocument( '' );
-
-							body.innerHTML = shortcode.content;
-							body.removeChild( body.firstElementChild );
-
-							return body.innerHTML.trim();
-						},
+						shortcode: stripFirstImage,
 					},
 					href: {
 						shortcode: ( attributes, { shortcode } ) => {

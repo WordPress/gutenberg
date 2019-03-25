@@ -22,8 +22,6 @@ import {
 	useImperativeHandle,
 	useLayoutEffect,
 	useDebugValue,
-	lazy,
-	Suspense,
 } from 'react';
 import { isString } from 'lodash';
 
@@ -112,33 +110,54 @@ export { isValidElement };
 export { StrictMode };
 
 /**
- * The React.lazy function lets you render a dynamic import as a regular component.
- *
- * @param {function} loadFunction A function that must call a dynamic import(). This must return a Promise which
- *                                resolves to a module with a default export containing a React component.
+ * @see https://reactjs.org/docs/hooks-reference.html#usecallback
  */
-export { lazy };
+export { useCallback };
 
 /**
- * Component to do code-splitting by wrapping a dynamic import.
+ * @see https://reactjs.org/docs/hooks-reference.html#usecontext
  */
-export { Suspense };
+export { useContext };
 
 /**
- * Make React Hooks available
+ * @see https://reactjs.org/docs/hooks-reference.html#usedebugvalue
  */
-export {
-	useCallback,
-	useContext,
-	useDebugValue,
-	useEffect,
-	useImperativeHandle,
-	useLayoutEffect,
-	useMemo,
-	useReducer,
-	useRef,
-	useState,
-};
+export { useDebugValue };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#useeffect
+ */
+export { useEffect };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#useimperativehandle
+ */
+export { useImperativeHandle };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#uselayouteffect
+ */
+export { useLayoutEffect };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usememo
+ */
+export { useMemo };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usereducer
+ */
+export { useReducer };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#useref
+ */
+export { useRef };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usestate
+ */
+export { useState };
 
 /**
  * Concatenate two or more React children objects.

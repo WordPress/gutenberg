@@ -1,20 +1,20 @@
-.editor-block-switcher {
+.block-editor-block-switcher {
 	position: relative;
 	height: $icon-button-size;
 }
 
-.components-icon-button.editor-block-switcher__toggle,
-.components-icon-button.editor-block-switcher__no-switcher-icon {
+.components-icon-button.block-editor-block-switcher__toggle,
+.components-icon-button.block-editor-block-switcher__no-switcher-icon {
 	margin: 0;
 	display: block;
 	height: $icon-button-size;
 	padding: 3px;
 }
 
-.components-icon-button.editor-block-switcher__no-switcher-icon {
+.components-icon-button.block-editor-block-switcher__no-switcher-icon {
 	width: $icon-button-size + 6px + 6px;
 
-	.editor-block-icon {
+	.block-editor-block-icon {
 		margin-right: auto;
 		margin-left: auto;
 	}
@@ -22,7 +22,7 @@
 
 // When the block switcher does not have any transformations, we show it but as disabled.
 // The background and opacity change helps make the icon legible, despite being disabled.
-.components-button.editor-block-switcher__no-switcher-icon:disabled {
+.components-button.block-editor-block-switcher__no-switcher-icon:disabled {
 	background: $light-gray-200;
 	border-radius: 0;
 	opacity: 0.84;
@@ -30,14 +30,14 @@
 	// Also make the icon monochrome to further imply disabled state.
 	// We use !important here because icon colors are set as inline styles,
 	// and should be overridden when disabled.
-	.editor-block-icon.has-colors {
+	.block-editor-block-icon.has-colors {
 		color: $dark-gray-500 !important;
 	}
 }
 
 // Style this the same as the block buttons in the library.
 // Needs specificiity to override the icon button.
-.components-icon-button.editor-block-switcher__toggle {
+.components-icon-button.block-editor-block-switcher__toggle {
 	width: auto;
 	// Unset icon button styles.
 	&:active,
@@ -49,8 +49,8 @@
 		border: none;
 	}
 
-	.editor-block-icon,
-	.editor-block-switcher__transform {
+	.block-editor-block-icon,
+	.block-editor-block-switcher__transform {
 		width: $icon-button-size + 3px + 3px;
 		height: $icon-button-size-small + 6px;
 		position: relative;
@@ -62,42 +62,42 @@
 	}
 
 	// Add a dropdown arrow indicator.
-	.editor-block-icon::after {
+	.block-editor-block-icon::after {
 		@include dropdown-arrow();
 	}
 
-	.editor-block-switcher__transform {
+	.block-editor-block-switcher__transform {
 		margin-top: 6px;
 		border-radius: $radius-round-rectangle;
 	}
 
 	// Block hover and focus style.
-	&[aria-expanded="true"] .editor-block-icon,
-	&[aria-expanded="true"] .editor-block-switcher__transform,
-	&:not(:disabled):hover .editor-block-icon,
-	&:not(:disabled):hover .editor-block-switcher__transform,
-	&:not(:disabled):focus .editor-block-icon,
-	&:not(:disabled):focus .editor-block-switcher__transform {
+	&[aria-expanded="true"] .block-editor-block-icon,
+	&[aria-expanded="true"] .block-editor-block-switcher__transform,
+	&:not(:disabled):hover .block-editor-block-icon,
+	&:not(:disabled):hover .block-editor-block-switcher__transform,
+	&:not(:disabled):focus .block-editor-block-icon,
+	&:not(:disabled):focus .block-editor-block-switcher__transform {
 		transform: translateY(-$icon-button-size);
 	}
 
 	// Block focus style.
-	&:not(:disabled):focus .editor-block-icon,
-	&:not(:disabled):focus .editor-block-switcher__transform {
+	&:not(:disabled):focus .block-editor-block-icon,
+	&:not(:disabled):focus .block-editor-block-switcher__transform {
 		@include formatting-button-style__focus();
 	}
 }
 
-.components-popover:not(.is-mobile).editor-block-switcher__popover .components-popover__content {
+.components-popover:not(.is-mobile).block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;
 	max-width: 340px;
 }
 
-.editor-block-switcher__popover .components-popover__content {
+.block-editor-block-switcher__popover .components-popover__content {
 	@include break-medium {
 		position: relative;
 
-		.editor-block-preview {
+		.block-editor-block-preview {
 			border: $border-width solid $light-gray-500;
 			box-shadow: $shadow-popover;
 			background: $white;
@@ -124,15 +124,15 @@
 	}
 }
 
-.editor-block-switcher__popover:not(.is-mobile) > .components-popover__content {
+.block-editor-block-switcher__popover:not(.is-mobile) > .components-popover__content {
 	// Reset overflow to allow showing the preview on the left once an item is hovered.
 	overflow-y: visible;
 }
 
-.editor-block-switcher__popover .editor-block-styles {
+.block-editor-block-switcher__popover .block-editor-block-styles {
 	margin: 0 -3px; // Remove the panel body padding while keeping it for the title.
 }
 
-.editor-block-switcher__popover .editor-block-types-list {
+.block-editor-block-switcher__popover .block-editor-block-types-list {
 	margin: 8px -8px -8px;
 }

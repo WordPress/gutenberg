@@ -109,6 +109,7 @@ class LatestPostsEdit extends Component {
 							onChange={ ( value ) => setAttributes( { columns: value } ) }
 							min={ 2 }
 							max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+							required
 						/>
 					}
 				</PanelBody>

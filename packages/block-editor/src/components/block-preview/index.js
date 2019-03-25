@@ -24,8 +24,8 @@ import BlockEdit from '../block-edit';
  */
 function BlockPreview( props ) {
 	return (
-		<div className="editor-block-preview">
-			<div className="editor-block-preview__title">{ __( 'Preview' ) }</div>
+		<div className="editor-block-preview block-editor-block-preview">
+			<div className="editor-block-preview__title block-editor-block-preview__title">{ __( 'Preview' ) }</div>
 			<BlockPreviewContent { ...props } />
 		</div>
 	);
@@ -34,7 +34,7 @@ function BlockPreview( props ) {
 export function BlockPreviewContent( { name, attributes } ) {
 	const block = createBlock( name, attributes );
 	return (
-		<Disabled className="editor-block-preview__content editor-styles-wrapper" aria-hidden>
+		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
 			<BlockEdit
 				name={ name }
 				focus={ false }

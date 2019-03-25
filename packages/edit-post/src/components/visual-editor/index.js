@@ -26,12 +26,13 @@ function VisualEditor() {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
 			<VisualEditorGlobalKeyboardShortcuts />
-			<CopyHandler />
 			<MultiSelectScrollIntoView />
 			<WritingFlow>
 				<ObserveTyping>
-					<PostTitle />
-					<BlockList />
+					<CopyHandler>
+						<PostTitle />
+						<BlockList />
+					</CopyHandler>
 				</ObserveTyping>
 			</WritingFlow>
 			<_BlockSettingsMenuFirstItem>
