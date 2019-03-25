@@ -95,7 +95,13 @@ const getTransformResult = async ( blockContent, transformName ) => {
 	return getEditedPostContent();
 };
 
-describe( 'Block transforms', () => {
+// Skipping all the tests when plugins are enabled
+// makes sure the tests are not executed, and no unused snapshots errors are thrown.
+const maybeDescribe = process.env.POPULAR_PLUGINS ?
+	describe :
+	describe.skip;
+
+maybeDescribe( 'Block transforms', () => {
 	// Todo: Remove the filter as soon as all fixtures are corrected,
 	// and its direct usage on the editor does not trigger errors.
 	// Currently some fixtures trigger errors (mainly media related)
@@ -166,10 +172,10 @@ describe( 'Block transforms', () => {
 			( { originalBlock, availableTransforms }, fixture ) => (
 				map(
 					availableTransforms,
-					( distinationBlock ) => ( [
+					( destinationBlock ) => ( [
 						originalBlock,
 						fixture,
-						distinationBlock,
+						destinationBlock,
 					] )
 				)
 			)
@@ -177,10 +183,10 @@ describe( 'Block transforms', () => {
 
 		it.each( testTable )(
 			'block %s in fixture %s into the %s block',
-			async ( originalBlock, fixture, distinationBlock ) => {
+			async ( originalBlock, fixture, destinationBlock ) => {
 				const { content } = transformStructure[ fixture ];
 				expect(
-					await getTransformResult( content, distinationBlock )
+					await getTransformResult( content, destinationBlock )
 				).toMatchSnapshot();
 			}
 		);
