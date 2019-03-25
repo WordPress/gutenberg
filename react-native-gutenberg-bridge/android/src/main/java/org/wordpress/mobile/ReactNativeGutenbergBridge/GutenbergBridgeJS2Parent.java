@@ -28,4 +28,6 @@ public interface GutenbergBridgeJS2Parent {
     void requestImageFailedRetryDialog(int mediaId);
 
     void requestImageUploadCancelDialog(int mediaId);
+
+    void requestImageUploadCancel(int mediaId);
 }

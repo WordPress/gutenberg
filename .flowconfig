@@ -109,4 +109,4 @@ suppress_comment=\\(.\\|\n\\)*\\$FlowExpectedError
 <PROJECT_ROOT>/node_modules/react-native-safe-area/.*
 
 [version]
-^0.67.1
+^0.92.0

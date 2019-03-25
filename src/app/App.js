@@ -1,8 +1,14 @@
 /** @flow
  * @format */
 
+/**
+ * External dependencies
+ */
 import React from 'react';
 
+/**
+ * Internal dependencies
+ */
 import AppContainer from './AppContainer';
 import initialHtml from './initial-html';
 

@@ -2,21 +2,23 @@
  * @format
  * @flow
  */
-
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
-import React from 'react';
-import { Platform, TextInput, ScrollView } from 'react-native';
-import styles from './html-text-input.scss';
-import KeyboardAvoidingView from './keyboard-avoiding-view';
-
-// Gutenberg imports
 import { parse } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
+
+/**
+ * External dependencies
+ */
+import React from 'react';
+
+/**
+ * Internal dependencies
+ */
+import HTMLInputViewUI from './html-text-input-ui/html-text-input-ui';
 
 type PropsType = {
 	onChange: string => mixed,
@@ -30,12 +32,9 @@ type PropsType = {
 type StateType = {
 	isDirty: boolean,
 	value: string,
-	contentHeight: number,
 };
 
 export class HTMLInputView extends React.Component<PropsType, StateType> {
-	isIOS: boolean = Platform.OS === 'ios';
-	textInput: TextInput;
 	edit: string => mixed;
 	stopEditing: () => mixed;
 
@@ -48,7 +47,6 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 		this.state = {
 			isDirty: false,
 			value: '',
-			contentHeight: 0,
 		};
 	}
 
@@ -82,34 +80,16 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 
 	render() {
 		return (
-			<KeyboardAvoidingView style={ styles.container } parentHeight={ this.props.parentHeight }>
-				<ScrollView style={ { flex: 1 } } >
-					<TextInput
-						autoCorrect={ false }
-						textAlignVertical="center"
-						numberOfLines={ 1 }
-						style={ styles.htmlViewTitle }
-						value={ this.props.title }
-						placeholder={ __( 'Add title' ) }
-						onChangeText={ this.props.setTitleAction }
-					/>
-					<TextInput
-						autoCorrect={ false }
-						ref={ ( textInput ) => this.textInput = textInput }
-						textAlignVertical="top"
-						multiline
-						style={ { ...styles.htmlView, height: this.state.contentHeight + 16 } }
-						value={ this.state.value }
-						onChangeText={ this.edit }
-						onBlur={ this.stopEditing }
-						placeholder={ __( 'Start writing…' ) }
-						scrollEnabled={ false }
-						onContentSizeChange={ ( event ) => {
-							this.setState( { contentHeight: event.nativeEvent.contentSize.height } );
-						} }
-					/>
-				</ScrollView>
-			</KeyboardAvoidingView>
+			<HTMLInputViewUI
+				setTitleAction={ this.props.setTitleAction }
+				value={ this.state.value }
+				title={ this.props.title }
+				parentHeight={ this.props.parentHeight }
+				onChangeHTMLText={ this.edit }
+				onBlurHTMLText={ this.stopEditing }
+				titlePlaceholder={ __( 'Add title' ) }
+				htmlPlaceholder={ __( 'Start writing…' ) }
+			/>
 		);
 	}
 }
@@ -125,7 +105,8 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetBlocks } = dispatch( 'core/editor' );
+		const { resetBlocks } = dispatch( 'core/block-editor' );
+		const { editPost } = dispatch( 'core/editor' );
 		return {
 			onChange( content ) {
 				editPost( { content } );

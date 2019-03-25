@@ -1,5 +1,8 @@
 /** @format */
 
+/**
+ * External dependencies
+ */
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
 const { RNReactNativeGutenbergBridge } = NativeModules;
@@ -44,6 +47,10 @@ export function subscribeMediaUpload( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaUpload', callback );
 }
 
+export function subscribeMediaAppend( callback ) {
+	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
+}
+
 export function requestMediaPickFromMediaLibrary( callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'SITE_MEDIA_LIBRARY', callback );
 }
@@ -66,6 +73,10 @@ export function requestImageFailedRetryDialog( mediaId ) {
 
 export function requestImageUploadCancelDialog( mediaId ) {
 	return RNReactNativeGutenbergBridge.requestImageUploadCancelDialog( mediaId );
+}
+
+export function requestImageUploadCancel( mediaId ) {
+	return RNReactNativeGutenbergBridge.requestImageUploadCancel( mediaId );
 }
 
 export default RNReactNativeGutenbergBridge;

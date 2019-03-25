@@ -3,6 +3,9 @@
 * @flow
 */
 
+/**
+ * External dependencies
+ */
 import React from 'react';
 import { View, KeyboardAvoidingView as IOSKeyboardAvoidingView, Dimensions } from 'react-native';
 

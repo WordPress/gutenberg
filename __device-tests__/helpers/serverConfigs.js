@@ -1,6 +1,6 @@
 exports.local = {
 	host: 'localhost',
-	port: 4728,
+	port: 4723, // Default Port
 };
 
 exports.sauce = {

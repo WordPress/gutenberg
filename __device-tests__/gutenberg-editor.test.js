@@ -2,6 +2,9 @@
  * @format
  * */
 
+/**
+ * Internal dependencies
+ */
 import EditorPage from './pages/editor-page';
 import ParagraphBlockInteraction from './blocks/paragraph-block-interaction';
 import { setupAppium, setupDriver, isLocalEnvironment, timer } from './helpers/utils';
@@ -47,13 +50,20 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	afterAll( async () => {
-		if ( driver === undefined ) {
-			return process.exit( 1 );
-		}
 		if ( isLocalEnvironment() ) {
+			if ( driver === undefined ) {
+				if ( appium !== undefined ) {
+					await appium.kill( 'SIGINT' );
+				}
+				return;
+			}
+
 			await driver.quit();
 			await appium.kill( 'SIGINT' );
 		} else {
+			if ( driver === undefined ) {
+				return;
+			}
 			driver.sauceJobStatus( allPassed );
 			await driver.quit();
 		}

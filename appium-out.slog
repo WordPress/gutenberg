@@ -1,0 +1,39 @@
+(node:85982) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+[35m[simctl][39m Error: simctl error running 'install': An error was encountered processing the command (domain=IXUserPresentableErrorDomain, code=1):
+[35m[simctl][39m This app could not be installed at this time.
+[35m[simctl][39m Failed to load Info.plist from bundle at path /Users/javon/Library/Developer/CoreSimulator/Devices/56219A86-C2FF-4EA7-9801-315717DEBACF/data/Library/Caches/com.apple.mobile.installd.staging/temp.bNnWWj/extracted/Payload/gutenberg.app
+[35m[simctl][39m Failed to load Info.plist from bundle at path /Users/javon/Library/Developer/CoreSimulator/Devices/56219A86-C2FF-4EA7-9801-315717DEBACF/data/Library/Caches/com.apple.mobile.installd.staging/temp.bNnWWj/extracted/Payload/gutenberg.app
+[35m[simctl][39m Underlying error (domain=MIInstallerErrorDomain, code=35):
+[35m[simctl][39m 	Failed to load Info.plist from bundle at path /Users/javon/Library/Developer/CoreSimulator/Devices/56219A86-C2FF-4EA7-9801-315717DEBACF/data/Library/Caches/com.apple.mobile.installd.staging/temp.bNnWWj/extracted/Payload/gutenberg.app
+[35m[simctl][39m     at Object.wrappedLogger.errorAndThrow (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/appium-support/lib/logging.js:78:13)
+[35m[simctl][39m     at simCommand$ (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/node-simctl/lib/simctl.js:50:11)
+[35m[simctl][39m     at tryCatch (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:67:40)
+[35m[simctl][39m     at GeneratorFunctionPrototype.invoke [as _invoke] (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:315:22)
+[35m[simctl][39m     at GeneratorFunctionPrototype.prototype.(anonymous function) [as throw] (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:100:21)
+[35m[simctl][39m     at GeneratorFunctionPrototype.invoke (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:136:37)
+(node:86475) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+[35m[simctl][39m Error: simctl error running 'install': An error was encountered processing the command (domain=IXUserPresentableErrorDomain, code=1):
+[35m[simctl][39m This app could not be installed at this time.
+[35m[simctl][39m Failed to load Info.plist from bundle at path /Users/javon/Library/Developer/CoreSimulator/Devices/56219A86-C2FF-4EA7-9801-315717DEBACF/data/Library/Caches/com.apple.mobile.installd.staging/temp.qkNMHa/extracted/Payload/gutenberg.app
+[35m[simctl][39m Failed to load Info.plist from bundle at path /Users/javon/Library/Developer/CoreSimulator/Devices/56219A86-C2FF-4EA7-9801-315717DEBACF/data/Library/Caches/com.apple.mobile.installd.staging/temp.qkNMHa/extracted/Payload/gutenberg.app
+[35m[simctl][39m Underlying error (domain=MIInstallerErrorDomain, code=35):
+[35m[simctl][39m 	Failed to load Info.plist from bundle at path /Users/javon/Library/Developer/CoreSimulator/Devices/56219A86-C2FF-4EA7-9801-315717DEBACF/data/Library/Caches/com.apple.mobile.installd.staging/temp.qkNMHa/extracted/Payload/gutenberg.app
+[35m[simctl][39m     at Object.wrappedLogger.errorAndThrow (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/appium-support/lib/logging.js:78:13)
+[35m[simctl][39m     at simCommand$ (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/node-simctl/lib/simctl.js:50:11)
+[35m[simctl][39m     at tryCatch (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:67:40)
+[35m[simctl][39m     at GeneratorFunctionPrototype.invoke [as _invoke] (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:315:22)
+[35m[simctl][39m     at GeneratorFunctionPrototype.prototype.(anonymous function) [as throw] (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:100:21)
+[35m[simctl][39m     at GeneratorFunctionPrototype.invoke (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:136:37)
+(node:86679) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+[35m[simctl][39m Error: simctl error running 'install': An error was encountered processing the command (domain=IXUserPresentableErrorDomain, code=1):
+[35m[simctl][39m This app could not be installed at this time.
+[35m[simctl][39m Failed to load Info.plist from bundle at path /Users/javon/Library/Developer/CoreSimulator/Devices/56219A86-C2FF-4EA7-9801-315717DEBACF/data/Library/Caches/com.apple.mobile.installd.staging/temp.10Hq9P/extracted/Payload/gutenberg.app
+[35m[simctl][39m Failed to load Info.plist from bundle at path /Users/javon/Library/Developer/CoreSimulator/Devices/56219A86-C2FF-4EA7-9801-315717DEBACF/data/Library/Caches/com.apple.mobile.installd.staging/temp.10Hq9P/extracted/Payload/gutenberg.app
+[35m[simctl][39m Underlying error (domain=MIInstallerErrorDomain, code=35):
+[35m[simctl][39m 	Failed to load Info.plist from bundle at path /Users/javon/Library/Developer/CoreSimulator/Devices/56219A86-C2FF-4EA7-9801-315717DEBACF/data/Library/Caches/com.apple.mobile.installd.staging/temp.10Hq9P/extracted/Payload/gutenberg.app
+[35m[simctl][39m     at Object.wrappedLogger.errorAndThrow (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/appium-support/lib/logging.js:78:13)
+[35m[simctl][39m     at simCommand$ (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/node-simctl/lib/simctl.js:50:11)
+[35m[simctl][39m     at tryCatch (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:67:40)
+[35m[simctl][39m     at GeneratorFunctionPrototype.invoke [as _invoke] (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:315:22)
+[35m[simctl][39m     at GeneratorFunctionPrototype.prototype.(anonymous function) [as throw] (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:100:21)
+[35m[simctl][39m     at GeneratorFunctionPrototype.invoke (/Users/javon/.nvm/versions/node/v10.12.0/lib/node_modules/appium/node_modules/babel-runtime/regenerator/runtime.js:136:37)

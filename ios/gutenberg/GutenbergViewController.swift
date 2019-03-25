@@ -113,6 +113,15 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         alertController.popoverPresentationController?.permittedArrowDirections = .any
         present(alertController, animated: true, completion: nil)
     }
+
+    /// Tells the delegate that an image block requested for the upload cancelation.
+    ///
+    func gutenbergDidRequestMediaUploadCancelation(for mediaID: Int32) {
+        guard let progress = mediaUploadCoordinator.progressForUpload(mediaID: mediaID) else {
+            return
+        }
+        progress.cancel()
+    }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
@@ -167,7 +176,8 @@ extension GutenbergViewController {
 
     func showMoreSheet() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
+        alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem
+
         let cancelAction = UIAlertAction(title: "Keep Editing", style: .cancel)
         alert.addAction(toggleHTMLModeAction)
         alert.addAction(updateHtmlAction)
