@@ -127,5 +127,4 @@ function register_block_core_latest_posts() {
 		)
 	);
 }
-
 add_action( 'init', 'register_block_core_latest_posts' );

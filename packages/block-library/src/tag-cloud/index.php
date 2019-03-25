@@ -67,5 +67,4 @@ function register_block_core_tag_cloud() {
 		)
 	);
 }
-
 add_action( 'init', 'register_block_core_tag_cloud' );

@@ -143,5 +143,4 @@ function register_block_core_archives() {
 		)
 	);
 }
-
 add_action( 'init', 'register_block_core_archives' );
