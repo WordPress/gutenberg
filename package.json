@@ -103,6 +103,7 @@
 		"mkdirp": "0.5.1",
 		"node-sass": "4.11.0",
 		"node-watch": "0.6.0",
+		"parcel-bundler": "1.12.2",
 		"pegjs": "0.10.0",
 		"phpegjs": "1.0.0-beta7",
 		"postcss": "7.0.13",
@@ -190,7 +191,9 @@
 		"test-unit:update": "npm run test-unit -- --updateSnapshot",
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
-		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit"
+		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit",
+		"playground:build": "npm run build:packages && parcel build playground/src/index.html -d playground/dist",
+		"playground:start": "concurrently \"npm run dev:packages\" \"parcel playground/src/index.html -d playground/dist\""
 	},
 	"lint-staged": {
 		"packages/*/package.json": [
