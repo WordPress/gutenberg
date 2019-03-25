@@ -34,12 +34,6 @@ const getTestInstanceWithContent = ( content ) => {
 };
 
 describe( 'Paragraph block', () => {
-	beforeEach( () => {
-		onReplace = jest.fn();
-		insertBlocksAfter = jest.fn();
-		setAttributes = jest.fn();
-	} );
-
 	it( 'renders without crashing', () => {
 		const component = getTestComponentWithContent( '' );
 		expect( component.exists() ).toBe( true );
