@@ -53,9 +53,15 @@
 @media (max-width: #{ ($break-small) }) {
 	.wp-block-media-text.is-stacked-on-mobile {
 		grid-template-columns: 100% !important;
+		-ms-grid-columns: 100% !important;
 		grid-template-areas:
 			"media-text-media"
 			"media-text-content";
+
+		.wp-block-media-text__media,
+		.wp-block-media-text__content {
+			-ms-grid-column: 1;
+		}
 	}
 
 	.wp-block-media-text.is-stacked-on-mobile.has-media-on-the-right {
