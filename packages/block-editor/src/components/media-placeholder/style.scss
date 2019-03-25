@@ -53,6 +53,7 @@
 
 	&:hover {
 		outline: $border-width dashed $dark-gray-500;
+		cursor: pointer;
 	}
 
 	.block-editor-media-placeholder__upload-button {
