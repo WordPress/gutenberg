@@ -6,7 +6,6 @@ import { last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -46,18 +45,15 @@ function BlockListAppender( {
 			<Inserter
 				rootClientId={ rootClientId }
 				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
-					<Fragment>
-						<Button
-							className="block-list-appender__toggle"
-							onClick={ onToggle }
-							aria-expanded={ isOpen }
-							disabled={ disabled }
-						>
-							<Icon icon="insert" />
-							<span>{ __( 'Add Block' ) }</span>
-						</Button>
-
-					</Fragment>
+					<Button
+						className="block-list-appender__toggle"
+						onClick={ onToggle }
+						aria-expanded={ isOpen }
+						disabled={ disabled }
+					>
+						<Icon icon="insert" />
+						<span>{ __( 'Add Block' ) }</span>
+					</Button>
 				) }
 				isAppender
 			/>
