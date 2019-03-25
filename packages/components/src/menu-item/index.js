@@ -8,7 +8,6 @@ import { isString } from 'lodash';
  * WordPress dependencies
  */
 import { createElement, cloneElement } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -77,4 +76,4 @@ export function MenuItem( {
 	);
 }
 
-export default withInstanceId( MenuItem );
+export default MenuItem;
