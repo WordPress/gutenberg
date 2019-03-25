@@ -24,7 +24,7 @@ export { metadata, name };
 const ColumnEdit = ( { attributes, updateAlignment } ) => {
 	const { verticalAlignment } = attributes;
 
-	const classes = classnames( 'block-core-columns', {
+	const classes = classnames( 'block-core-columns', 'is-passthrough', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
@@ -38,10 +38,10 @@ const ColumnEdit = ( { attributes, updateAlignment } ) => {
 					value={ verticalAlignment }
 				/>
 			</BlockControls>
-			<InnerBlocks 
-                useBlockAppenderPlaceholder={ true }
-                templateLock={ false } 
-             />
+			<InnerBlocks
+				useBlockAppenderPlaceholder={ true }
+				templateLock={ false }
+			/>
 		</div>
 	);
 };
