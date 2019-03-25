@@ -412,6 +412,7 @@ class ImageEdit extends Component {
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
 						onDoubleClick={ this.toggleIsEditing }
+						onCancel={ this.toggleIsEditing }
 						notices={ noticeUI }
 						onError={ this.onUploadError }
 						accept="image/*"

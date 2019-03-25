@@ -233,6 +233,7 @@ export class MediaPlaceholder extends Component {
 	renderUrlSelectionUI() {
 		const {
 			onSelectURL,
+			onCancel,
 		} = this.props;
 		if ( ! onSelectURL ) {
 			return null;
@@ -258,6 +259,16 @@ export class MediaPlaceholder extends Component {
 						onSubmit={ this.onSubmitSrc }
 						onClose={ this.closeURLInput }
 					/>
+				) }
+				{ onCancel && (
+					<Button
+						className="block-editor-media-placeholder__button__link"
+						title={ __( 'Cancel' ) }
+						isLink={ true }
+						onClick={ onCancel }
+					>
+						{ __( 'Cancel' ) }
+					</Button>
 				) }
 			</div>
 		);

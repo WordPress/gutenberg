@@ -42,6 +42,11 @@
 	}
 }
 
+.block-editor-media-placeholder__button__link.is-link {
+	margin: 1em;
+	display: block;
+}
+
 .components-form-file-upload .block-editor-media-placeholder__button {
 	margin-right: $grid-size-small;
 }
