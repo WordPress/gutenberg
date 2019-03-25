@@ -13,6 +13,7 @@ RCT_EXPORT_VIEW_PROPERTY(onPaste, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onSelectionChange, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(blockType, NSDictionary)
 RCT_EXPORT_VIEW_PROPERTY(activeFormats, NSSet)
+RCT_EXPORT_VIEW_PROPERTY(isMultiline, BOOL)
 
 RCT_EXPORT_VIEW_PROPERTY(onActiveFormatsChange, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onActiveFormatAttributesChange, RCTBubblingEventBlock)

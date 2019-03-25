@@ -28,7 +28,8 @@ class AztecView extends React.Component {
     onSelectionChange: PropTypes.func,
     onHTMLContentWithCursor: PropTypes.func,
     onCaretVerticalPositionChange: PropTypes.func,
-    blockType: PropTypes.object,
+	blockType: PropTypes.object,
+	isMultiline: PropTypes.bool,
     ...ViewPropTypes, // include the default view properties
   }
 
@@ -152,7 +153,7 @@ class AztecView extends React.Component {
           // combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
           onFocus = { () => {} } 
           onBlur = { this._onBlur }
-          onBackspace = { this._onBackspace }
+		  onBackspace = { this._onBackspace }
         />
       </TouchableWithoutFeedback>
     );

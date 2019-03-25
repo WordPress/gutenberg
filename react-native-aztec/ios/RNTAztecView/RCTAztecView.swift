@@ -34,6 +34,8 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
+    @objc var isMultiline: Bool = false
+
     var blockModel = BlockModel(tag: "") {
         didSet {
             forceTypingAttributesIfNeeded()
@@ -234,7 +236,7 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Custom Edit Intercepts
     
     private func interceptEnter(_ text: String) -> Bool {
-        guard text == "\n",
+        guard text == "\n", !isMultiline, 
             let onEnter = onEnter else {
                 return false
         }
