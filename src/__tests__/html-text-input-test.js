@@ -27,7 +27,6 @@ describe( 'HTMLInputView', () => {
 		const wrapper = shallow(
 			<HTMLInputView
 				onChange={ onChange }
-
 			/>
 		);
 
