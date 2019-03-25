@@ -7,7 +7,7 @@
  * External dependencies
  */
 import * as React from 'react';
-import { TextInput, UIManager, PanResponder } from 'react-native';
+import { UIManager, PanResponder } from 'react-native';
 
 /**
  * Internal dependencies
@@ -16,8 +16,8 @@ import styles from './html-text-input-ui.scss';
 import KeyboardAvoidingView from '../keyboard-avoiding-view';
 
 type PropsType = {
-    parentHeight: number,
-	content: (scrollEnabled: boolean, style: mixed, onContentSizeChange: () => void) => React.Node,
+	parentHeight: number,
+	content: ( scrollEnabled: boolean, style: mixed, onContentSizeChange: () => void ) => React.Node,
 };
 
 type StateType = {
@@ -50,7 +50,7 @@ export default class HTMLInputViewUI extends React.Component<PropsType, StateTyp
 				{ ...this.panResponder.panHandlers }
 				parentHeight={ this.props.parentHeight }
 			>
-				{ this.props.content( true, styles.htmlView, ()=>{} ) }
+				{ this.props.content( true, styles.htmlView, () => {} ) }
 
 			</KeyboardAvoidingView>
 		);
