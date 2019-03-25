@@ -16,7 +16,10 @@ module.exports = {
 	// Automatically clear mock calls and instances between every test
 	clearMocks: true,
 	preset: 'react-native',
-	setupFiles: [ './jest/setup.js' ],
+	setupFiles: [
+		'./jest/setup.js',
+		'<rootDir>/enzyme.config.js'
+	],
 	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [
 		'/node_modules/',
