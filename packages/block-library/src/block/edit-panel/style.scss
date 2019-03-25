@@ -1,4 +1,4 @@
-.editor-block-list__layout .reusable-block-edit-panel {
+.block-editor-block-list__layout .reusable-block-edit-panel {
 	align-items: center;
 	background: $light-gray-100;
 	color: $dark-gray-500;
@@ -12,8 +12,12 @@
 	padding: $grid-size $block-padding;
 	position: relative;
 
+	// Use opacity to work in various editor styles.
+	border: $border-width dashed $dark-opacity-light-500;
+	border-bottom: none;
+
 	// Show a smaller padding when nested.
-	.editor-block-list__layout & {
+	.block-editor-block-list__layout & {
 		margin: 0 (-$block-padding);
 		padding: $grid-size $block-padding;
 	}
@@ -56,5 +60,15 @@
 		.components-button.reusable-block-edit-panel__button {
 			margin: 0 0 0 5px;
 		}
+	}
+}
+
+.editor-block-list__layout .is-selected .reusable-block-edit-panel {
+	border-color: $dark-opacity-light-800;
+	border-left-color: transparent;
+
+	.is-dark-theme & {
+		border-color: $light-opacity-light-800;
+		border-left-color: transparent;
 	}
 }

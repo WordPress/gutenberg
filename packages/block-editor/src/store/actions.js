@@ -421,6 +421,26 @@ export function removeBlock( clientId, selectPrevious ) {
 }
 
 /**
+ * Returns an action object used in signalling that the inner blocks with the
+ * specified client ID should be replaced.
+ *
+ * @param {string}   rootClientId    Client ID of the block whose InnerBlocks will re replaced.
+ * @param {Object[]} blocks          Block objects to insert as new InnerBlocks
+ * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ *
+ * @return {Object} Action object.
+ */
+export function replaceInnerBlocks( rootClientId, blocks, updateSelection = true ) {
+	return {
+		type: 'REPLACE_INNER_BLOCKS',
+		rootClientId,
+		blocks,
+		updateSelection,
+		time: Date.now(),
+	};
+}
+
+/**
  * Returns an action object used to toggle the block editing mode between
  * visual and HTML modes.
  *

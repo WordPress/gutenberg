@@ -1,3 +1,7 @@
+## 2.4.0 (Unreleased)
+
+- Add vertical alignment controls to `columns` Block ([#13899](https://github.com/WordPress/gutenberg/pull/13899/)).
+
 ## 2.3.0 (2019-03-06)
 
 ### New Feature

@@ -56,19 +56,19 @@ export class BlockMover extends Component {
 		// to an unfocused state (body as active element) without firing blur on,
 		// the rendering parent, leaving it unable to react to focus out.
 		return (
-			<div className={ classnames( 'editor-block-mover', { 'is-visible': isFocused || ! isHidden } ) }>
+			<div className={ classnames( 'editor-block-mover block-editor-block-mover', { 'is-visible': isFocused || ! isHidden } ) }>
 				<IconButton
-					className="editor-block-mover__control"
+					className="editor-block-mover__control block-editor-block-mover__control"
 					onClick={ isFirst ? null : onMoveUp }
 					icon={ upArrow }
 					label={ __( 'Move up' ) }
-					aria-describedby={ `editor-block-mover__up-description-${ instanceId }` }
+					aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
 					aria-disabled={ isFirst }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 				/>
 				<IconDragHandle
-					className="editor-block-mover__control"
+					className="editor-block-mover__control block-editor-block-mover__control"
 					icon={ dragHandle }
 					clientId={ clientIds }
 					blockElementId={ blockElementId }
@@ -77,16 +77,16 @@ export class BlockMover extends Component {
 					onDragEnd={ onDragEnd }
 				/>
 				<IconButton
-					className="editor-block-mover__control"
+					className="editor-block-mover__control block-editor-block-mover__control"
 					onClick={ isLast ? null : onMoveDown }
 					icon={ downArrow }
 					label={ __( 'Move down' ) }
-					aria-describedby={ `editor-block-mover__down-description-${ instanceId }` }
+					aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
 					aria-disabled={ isLast }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 				/>
-				<span id={ `editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description">
+				<span id={ `block-editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
 					{
 						getBlockMoverDescription(
 							blocksCount,
@@ -98,7 +98,7 @@ export class BlockMover extends Component {
 						)
 					}
 				</span>
-				<span id={ `editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description">
+				<span id={ `block-editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description block-editor-block-mover__description">
 					{
 						getBlockMoverDescription(
 							blocksCount,

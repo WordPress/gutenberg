@@ -34,7 +34,7 @@ function render_block_core_calendar( $attributes ) {
 	$custom_class_name = empty( $attributes['className'] ) ? '' : ' ' . $attributes['className'];
 	$align_class_name  = empty( $attributes['align'] ) ? '' : ' ' . "align{$attributes['align']}";
 
-	return sprintf(
+	$output = sprintf(
 		'<div class="%1$s">%2$s</div>',
 		esc_attr( 'wp-block-calendar' . $custom_class_name . $align_class_name ),
 		get_calendar( true, false )
@@ -44,6 +44,8 @@ function render_block_core_calendar( $attributes ) {
 	$monthnum = $previous_monthnum;
 	// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 	$year = $previous_year;
+
+	return $output;
 }
 
 /**

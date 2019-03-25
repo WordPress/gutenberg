@@ -512,8 +512,8 @@ export class RichText extends Component {
 			html = '';
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
-		
-		let minHeight = styles[ 'editor-rich-text' ].minHeight;
+
+		let minHeight = styles[ 'block-editor-rich-text' ].minHeight;
 		if ( style && style.minHeight ) {
 			minHeight = style.minHeight;
 		}
@@ -541,7 +541,7 @@ export class RichText extends Component {
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }
 					placeholder={ this.props.placeholder }
-					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'editor-rich-text' ].textDecorationColor }
+					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].textDecorationColor }
 					onChange={ this.onChange }
 					onFocus={ this.props.onFocus }
 					onBlur={ this.props.onBlur }
@@ -556,7 +556,7 @@ export class RichText extends Component {
 					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
-					fontFamily={ this.props.fontFamily || styles[ 'editor-rich-text' ].fontFamily }
+					fontFamily={ this.props.fontFamily || styles[ 'block-editor-rich-text' ].fontFamily }
 					fontSize={ this.props.fontSize }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }

@@ -6,7 +6,7 @@ import HeadingToolbar from './heading-toolbar';
 /**
  * External dependencies
  */
-import { View, Platform } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -97,7 +97,7 @@ class HeadingEdit extends Component {
 					isSelected={ this.props.isSelected }
 					style={ {
 						...style,
-						minHeight: styles['wp-block-heading'].minHeight,
+						minHeight: styles[ 'wp-block-heading' ].minHeight,
 					} }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props

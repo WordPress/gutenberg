@@ -22,8 +22,4 @@ export const settings = {
 	keywords: [ __( 'find' ) ],
 
 	edit,
-
-	save() {
-		return null;
-	},
 };

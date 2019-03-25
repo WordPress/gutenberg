@@ -199,7 +199,7 @@ class BlockList extends Component {
 		} = this.props;
 
 		return (
-			<div className="editor-block-list__layout">
+			<div className="editor-block-list__layout block-editor-block-list__layout">
 				{ map( blockClientIds, ( clientId, blockIndex ) => {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :

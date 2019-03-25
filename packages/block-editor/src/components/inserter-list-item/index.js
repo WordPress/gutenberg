@@ -26,14 +26,14 @@ function InserterListItem( {
 	} : {};
 
 	return (
-		<li className="editor-block-types-list__list-item">
+		<li className="editor-block-types-list__list-item block-editor-block-types-list__list-item">
 			<button
 				className={
 					classnames(
-						'editor-block-types-list__item',
+						'editor-block-types-list__item block-editor-block-types-list__item',
 						className,
 						{
-							'editor-block-types-list__item-has-children':
+							'editor-block-types-list__item-has-children block-editor-block-types-list__item-has-children':
 								hasChildBlocksWithInserterSupport,
 						}
 					)
@@ -47,18 +47,18 @@ function InserterListItem( {
 				{ ...props }
 			>
 				<span
-					className="editor-block-types-list__item-icon"
+					className="editor-block-types-list__item-icon block-editor-block-types-list__item-icon"
 					style={ itemIconStyle }
 				>
 					<BlockIcon icon={ icon } showColors />
 					{ hasChildBlocksWithInserterSupport &&
 						<span
-							className="editor-block-types-list__item-icon-stack"
+							className="editor-block-types-list__item-icon-stack block-editor-block-types-list__item-icon-stack"
 							style={ itemIconStackStyle }
 						/>
 					}
 				</span>
-				<span className="editor-block-types-list__item-title">
+				<span className="editor-block-types-list__item-title block-editor-block-types-list__item-title">
 					{ title }
 				</span>
 			</button>

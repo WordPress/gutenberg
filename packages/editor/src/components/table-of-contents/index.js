@@ -26,7 +26,7 @@ function TableOfContents( { hasBlocks, hasOutlineItemsDisabled } ) {
 					aria-disabled={ ! hasBlocks }
 				/>
 			) }
-			renderContent={ () => <TableOfContentsPanel hasOutlineItemsDisabled={ hasOutlineItemsDisabled } /> }
+			renderContent={ ( { onClose } ) => <TableOfContentsPanel onRequestClose={ onClose } hasOutlineItemsDisabled={ hasOutlineItemsDisabled } /> }
 		/>
 	);
 }
