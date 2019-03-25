@@ -8,8 +8,6 @@ import { filter, pick, map, get } from 'lodash';
  * WordPress dependencies
  */
 import {
-	DropZone,
-	FormFileUpload,
 	IconButton,
 	PanelBody,
 	RangeControl,
@@ -25,7 +23,6 @@ import {
 	MediaUpload,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { mediaUpload } from '@wordpress/editor';
 import { Component, Fragment } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -64,8 +61,6 @@ class GalleryEdit extends Component {
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
-		this.addFiles = this.addFiles.bind( this );
-		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 
 		this.state = {
@@ -152,27 +147,6 @@ class GalleryEdit extends Component {
 		} );
 	}
 
-	uploadFromFiles( event ) {
-		this.addFiles( event.target.files );
-	}
-
-	addFiles( files ) {
-		const currentImages = this.props.attributes.images || [];
-		const { noticeOperations } = this.props;
-		const { setAttributes } = this;
-		mediaUpload( {
-			allowedTypes: ALLOWED_MEDIA_TYPES,
-			filesList: files,
-			onFileChange: ( images ) => {
-				const imagesNormalized = images.map( ( image ) => pickRelevantMediaFiles( image ) );
-				setAttributes( {
-					images: currentImages.concat( imagesNormalized ),
-				} );
-			},
-			onError: noticeOperations.createErrorNotice,
-		} );
-	}
-
 	componentDidUpdate( prevProps ) {
 		// Deselect images when deselecting the block
 		if ( ! this.props.isSelected && prevProps.isSelected ) {
@@ -187,15 +161,11 @@ class GalleryEdit extends Component {
 		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
-		const dropZone = (
-			<DropZone
-				onFilesDrop={ this.addFiles }
-			/>
-		);
+		const hasImages = !! images.length;
 
 		const controls = (
 			<BlockControls>
-				{ !! images.length && (
+				{ hasImages && (
 					<Toolbar>
 						<MediaUpload
 							onSelect={ this.onSelectImages }
@@ -217,24 +187,32 @@ class GalleryEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( images.length === 0 ) {
+		const mediaPlaceholder = (
+			<MediaPlaceholder
+				addToGallery={ hasImages }
+				isAppender={ hasImages }
+				className={ className }
+				dropZoneUIOnly={ hasImages && ! isSelected }
+				icon={ ! hasImages && <BlockIcon icon={ icon } /> }
+				labels={ {
+					title: ! hasImages && __( 'Gallery' ),
+					instructions: ! hasImages && __( 'Drag images, upload new ones or select files from your library.' ),
+				} }
+				onSelect={ this.onSelectImages }
+				accept="image/*"
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				multiple
+				value={ hasImages ? images : undefined }
+				onError={ noticeOperations.createErrorNotice }
+				notices={ hasImages ? undefined : noticeUI }
+			/>
+		);
+
+		if ( ! hasImages ) {
 			return (
 				<Fragment>
 					{ controls }
-					<MediaPlaceholder
-						icon={ <BlockIcon icon={ icon } /> }
-						className={ className }
-						labels={ {
-							title: __( 'Gallery' ),
-							instructions: __( 'Drag images, upload new ones or select files from your library.' ),
-						} }
-						onSelect={ this.onSelectImages }
-						accept="image/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						multiple
-						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
-					/>
+					{ mediaPlaceholder }
 				</Fragment>
 			);
 		}
@@ -277,7 +255,6 @@ class GalleryEdit extends Component {
 						}
 					) }
 				>
-					{ dropZone }
 					{ images.map( ( img, index ) => {
 						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
 						const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
@@ -298,21 +275,8 @@ class GalleryEdit extends Component {
 							</li>
 						);
 					} ) }
-					{ isSelected &&
-						<li className="blocks-gallery-item has-add-item-button">
-							<FormFileUpload
-								multiple
-								isLarge
-								className="block-library-gallery-add-item-button"
-								onChange={ this.uploadFromFiles }
-								accept="image/*"
-								icon="insert"
-							>
-								{ __( 'Upload an image' ) }
-							</FormFileUpload>
-						</li>
-					}
 				</ul>
+				{ mediaPlaceholder }
 			</Fragment>
 		);
 	}
