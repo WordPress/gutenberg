@@ -18,7 +18,6 @@ exports[`PluginMoreMenuItem renders menu item as button properly 1`] = `
   >
     <button
       className="components-button components-icon-button components-menu-item__button has-icon has-text"
-      instanceId={0}
       onClick={[Function]}
       role="menuitem"
       type="button"
