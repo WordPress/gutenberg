@@ -407,12 +407,25 @@ class ImageEdit extends Component {
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon={ <BlockIcon icon={ icon } /> }
-						className={ className }
+						icon={ ! url ? <BlockIcon icon={ icon } /> : <img
+							alt={ __( 'Replace image' ) }
+							title={ __( 'Replace image' ) }
+							width={ '50%' }
+							className={ 'replace-image-preview' }
+							src={ url }
+						/> }
+						labels={ {
+							title: ! url ? __( 'Image' ) : <span
+								className={ 'replace-image-preview-title' }
+							>
+								{ __( 'Replace image' ) }
+							</span>,
+						} }
+						className={ classnames( className, ! url ? '' : 'wp-block-image-replace' ) }
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
 						onDoubleClick={ this.toggleIsEditing }
-						onCancel={ this.toggleIsEditing }
+						onCancel={ ! url ? false : this.toggleIsEditing }
 						notices={ noticeUI }
 						onError={ this.onUploadError }
 						accept="image/*"

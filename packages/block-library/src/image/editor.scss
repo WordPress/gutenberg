@@ -124,3 +124,13 @@
 		caption-side: bottom;
 	}
 }
+
+.block-editor-block-list__block[data-type="core/image"] {
+	.wp-block-image-replace .components-placeholder__label {
+		flex-direction: column;
+	}
+
+	.replace-image-preview {
+		margin: 5%;
+	}
+}
