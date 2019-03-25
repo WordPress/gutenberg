@@ -22,6 +22,8 @@ import {
 	useImperativeHandle,
 	useLayoutEffect,
 	useDebugValue,
+	lazy,
+	Suspense,
 } from 'react';
 import { isString } from 'lodash';
 
@@ -158,6 +160,16 @@ export { useRef };
  * @see https://reactjs.org/docs/hooks-reference.html#usestate
  */
 export { useState };
+
+/**
+ * @see https://reactjs.org/docs/code-splitting.html#reactlazy
+ */
+export { lazy };
+
+/**
+ * @see https://reactjs.org/docs/react-api.html#suspense
+ */
+export { Suspense };
 
 /**
  * Concatenate two or more React children objects.
