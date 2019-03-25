@@ -115,7 +115,7 @@ function gutenberg_legacy_widget_settings( $settings ) {
 		}
 		$available_legacy_widgets[ $widget_id ] = array(
 			'name'             => html_entity_decode( $widget_obj['name'] ),
-			'description'      => null,
+			'description'      => html_entity_decode( wp_widget_description( $widget_id ) ),
 			'isCallbackWidget' => true,
 		);
 	}
