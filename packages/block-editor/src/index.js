@@ -9,7 +9,7 @@ import '@wordpress/viewport';
 /**
  * Internal dependencies
  */
-import './store';
+export { storeConfig } from './store';
 import './hooks';
 
 export * from './components';

@@ -29,6 +29,10 @@ function gutenberg_widgets_init( $hook ) {
 			return;
 	}
 
+	wp_add_inline_script(
+		'wp-edit-widgets',
+		'wp.editWidgets.initialize( ".blocks-widgets-container" )'
+	);
 	wp_enqueue_script( 'wp-edit-widgets' );
 	wp_enqueue_style( 'wp-edit-widgets' );
 }
