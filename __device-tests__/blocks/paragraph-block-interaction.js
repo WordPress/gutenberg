@@ -1,7 +1,13 @@
 /** @flow
  * @format */
 
+/**
+ * Internal dependencies
+ */
 import BlockInteraction from './block-interaction';
+/**
+ * External dependencies
+ */
 import wd from 'wd';
 import { isAndroid } from '../helpers/utils';
 

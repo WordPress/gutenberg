@@ -2,7 +2,13 @@
  * @flow
  * @format
  * */
+/**
+ * External dependencies
+ */
 import wd from 'wd';
+/**
+ * Internal dependencies
+ */
 import BlockInteraction from '../blocks/block-interaction';
 
 export default class EditorPage {

@@ -3,9 +3,15 @@
  * @format
  * */
 
+/**
+ * External dependencies
+ */
 import childProcess from 'child_process';
 import wd from 'wd';
 import fs from 'fs';
+/**
+ * Internal dependencies
+ */
 import serverConfigs from './serverConfigs';
 import { ios12, android8 } from './caps';
 import _ from 'underscore';
@@ -82,7 +88,6 @@ const setupDriver = async () => {
 
 // Spawns an appium process in the background
 const setupAppium = async () => {
-
 	const out = fs.openSync( './appium-out.log', 'a' );
 	const err = fs.openSync( './appium-out.slog', 'a' );
 

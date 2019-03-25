@@ -1,7 +1,13 @@
 /** @flow
  * @format */
 
+/**
+ * External dependencies
+ */
 import wd from 'wd';
+/**
+ * Internal dependencies
+ */
 import { isAndroid } from '../helpers/utils';
 
 // Common code across used to interact with all blocks
