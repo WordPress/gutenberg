@@ -14,9 +14,9 @@ import Paragraph from '../../gutenberg/packages/block-library/src/paragraph/edit
 import { createBlock } from '@wordpress/blocks';
 jest.mock( '@wordpress/blocks' );
 
-let onReplace = jest.fn();
-let insertBlocksAfter = jest.fn();
-let setAttributes = jest.fn();
+const onReplace = jest.fn();
+const insertBlocksAfter = jest.fn();
+const setAttributes = jest.fn();
 
 const getTestComponentWithContent = ( content ) => {
 	return shallow(
