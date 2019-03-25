@@ -20,7 +20,9 @@ function SectionEdit( { className, setBackgroundColor, backgroundColor } ) {
 		backgroundColor: backgroundColor.color,
 	};
 
-	const classes = classnames( className, backgroundColor.class );
+	const classes = classnames( className, backgroundColor.class, {
+		'has-background': !! backgroundColor.color,
+	} );
 
 	return (
 		<Fragment>
