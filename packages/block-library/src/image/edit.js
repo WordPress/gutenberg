@@ -20,9 +20,12 @@ import {
 	ButtonGroup,
 	IconButton,
 	PanelBody,
+	Path,
+	Rect,
 	ResizableBox,
 	SelectControl,
 	Spinner,
+	SVG,
 	TextareaControl,
 	TextControl,
 	ToggleControl,
@@ -378,10 +381,11 @@ class ImageEdit extends Component {
 			toolbarEditButton = (
 				<Toolbar>
 					<IconButton
-						className="components-icon-button components-toolbar__control"
+						className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing }
+						) }
 						label={ __( 'Edit image' ) }
 						onClick={ this.toggleIsEditing }
-						icon={ ( url && ! isEditing ) ? 'format-image' : 'dismiss' }
+						icon={ <SVG width={ 24 } height={ 24 } viewBox="0 0 24 24"><Rect x={ 14 } y={ 3 } width={ 8 } height={ 6 } rx={ 1 } /><Rect x={ 2 } y={ 15 } width={ 8 } height={ 6 } rx={ 1 } /><Path d="M16,15h1.87c-.63,2.35-3.38,4-5.87,4v2c3.47,0,7.29-2.42,7.91-6H22l-3-3.5Z" /><Path d="M8,9H6.13C6.76,6.65,9.51,5,12,5V3C8.53,3,4.71,5.42,4.09,9H2l3,3.5Z" /></SVG> }
 					/>
 				</Toolbar>
 			);
