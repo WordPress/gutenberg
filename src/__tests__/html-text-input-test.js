@@ -60,13 +60,19 @@ describe( 'HTMLInputView', () => {
 
 		//Simulate blur event
 		htmlTextInput.simulate( 'blur' );
-
+		
+		//Normally prop.value is updated with the help of withSelect
+		//But we don't have it in tests so we just simulate it
+		wrapper.setProps( { value: "text" } );
+		
 		//Check if the onPersist is called and the state is updated
 		expect( onPersist ).toHaveBeenCalledTimes( 1 );
 		expect( onPersist ).toHaveBeenCalledWith( 'text' );
 
 		expect( wrapper.instance().state.isDirty ).toBeFalsy();
-		expect( wrapper.instance().state.value ).toBeFalsy();
+
+		//We expect state.value is getting propagated from prop.value
+		expect( wrapper.instance().state.value ).toEqual( 'text' );
 	} );
 
 	it( 'HTMLInputView propagates title changes to store', () => {
