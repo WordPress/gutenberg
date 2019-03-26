@@ -90,7 +90,7 @@ function isEdge( container, { isReverse, isVertical } ) {
 	const selection = window.getSelection();
 
 	if ( ! selection.rangeCount ) {
-		return;
+		return false;
 	}
 
 	const rangeRect = getRectangleFromRange( selection.getRangeAt( 0 ) );
