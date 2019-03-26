@@ -5,11 +5,8 @@ import classnames from 'classnames';
 import {
 	find,
 	isNil,
-	isEqual,
 	omit,
-	pickBy,
 	get,
-	isPlainObject,
 } from 'lodash';
 import memize from 'memize';
 
@@ -202,14 +199,13 @@ export class RichText extends Component {
 		} );
 	}
 
-	applyRecord( record, { domOnly } = {} ) {
+	applyRecord() {
 		apply( {
-			value: record,
+			value: this.getRecord(),
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
-			__unstableDomOnly: domOnly,
 		} );
 	}
 
@@ -395,7 +391,7 @@ export class RichText extends Component {
 				inputType.indexOf( 'format' ) === 0 ||
 				INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType )
 			) {
-				this.applyRecord( this.getRecord() );
+				this.applyRecord();
 				return;
 			}
 		}
@@ -489,7 +485,6 @@ export class RichText extends Component {
 			}
 
 			this.setState( { start, end, selectedFormat } );
-			this.applyRecord( { ...value, selectedFormat }, { domOnly: true } );
 
 			delete this.formatPlaceholder;
 
@@ -536,8 +531,6 @@ export class RichText extends Component {
 	 *                                    created.
 	 */
 	onChange( record, { withoutHistory } = {} ) {
-		this.applyRecord( record );
-
 		const { start, end, formatPlaceholder, selectedFormat } = record;
 
 		this.formatPlaceholder = formatPlaceholder;
@@ -824,7 +817,6 @@ export class RichText extends Component {
 		setTimeout( () => this.recalculateBoundaryStyle() );
 
 		if ( newSelectedFormat !== selectedFormat ) {
-			this.applyRecord( { ...value, selectedFormat: newSelectedFormat } );
 			this.setState( { selectedFormat: newSelectedFormat } );
 			return;
 		}
@@ -832,12 +824,6 @@ export class RichText extends Component {
 		const newPos = value.start + ( isReverse ? -1 : 1 );
 
 		this.setState( { start: newPos, end: newPos } );
-		this.applyRecord( {
-			...value,
-			start: newPos,
-			end: newPos,
-			selectedFormat: isReverse ? formatsBefore.length : formatsAfter.length,
-		} );
 	}
 
 	/**
@@ -911,76 +897,6 @@ export class RichText extends Component {
 
 		selection.removeAllRanges();
 		selection.addRange( range );
-	}
-
-	componentDidUpdate( prevProps ) {
-		const { tagName, value, isSelected } = this.props;
-
-		if (
-			tagName === prevProps.tagName &&
-			value !== prevProps.value &&
-			value !== this.savedContent
-		) {
-			// Handle deprecated `children` and `node` sources.
-			// The old way of passing a value with the `node` matcher required
-			// the value to be mapped first, creating a new array each time, so
-			// a shallow check wouldn't work. We need to check deep equality.
-			// This is only executed for a deprecated API and will eventually be
-			// removed.
-			if ( Array.isArray( value ) && isEqual( value, this.savedContent ) ) {
-				return;
-			}
-
-			const record = this.formatToValue( value );
-
-			if ( isSelected ) {
-				const prevRecord = this.formatToValue( prevProps.value );
-				const length = getTextContent( prevRecord ).length;
-				record.start = length;
-				record.end = length;
-			}
-
-			this.applyRecord( record );
-			this.savedContent = value;
-		}
-
-		// If any format props update, reapply value.
-		const shouldReapply = Object.keys( this.props ).some( ( name ) => {
-			if ( name.indexOf( 'format_' ) !== 0 ) {
-				return false;
-			}
-
-			// Allow primitives and arrays:
-			if ( ! isPlainObject( this.props[ name ] ) ) {
-				return this.props[ name ] !== prevProps[ name ];
-			}
-
-			return Object.keys( this.props[ name ] ).some( ( subName ) => {
-				return this.props[ name ][ subName ] !== prevProps[ name ][ subName ];
-			} );
-		} );
-
-		if ( shouldReapply ) {
-			const record = this.formatToValue( value );
-
-			// Maintain the previous selection if the instance is currently
-			// selected.
-			if ( isSelected ) {
-				record.start = this.state.start;
-				record.end = this.state.end;
-			}
-
-			this.applyRecord( record );
-		}
-	}
-
-	/**
-	 * Get props that are provided by formats to modify RichText.
-	 *
-	 * @return {Object} Props that start with 'format_'.
-	 */
-	getFormatProps() {
-		return pickBy( this.props, ( propValue, name ) => name.startsWith( 'format_' ) );
 	}
 
 	/**
@@ -1132,6 +1048,7 @@ export class RichText extends Component {
 								style={ style }
 								record={ record }
 								valueToEditableHTML={ this.valueToEditableHTML }
+								reconcileInnerDom={ this.applyRecord }
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-label={ placeholder }
 								aria-autocomplete="list"

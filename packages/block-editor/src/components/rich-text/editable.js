@@ -108,6 +108,8 @@ export default class Editable extends Component {
 	// update the attributes on the wrapper nodes here. `componentDidUpdate`
 	// will never be called.
 	shouldComponentUpdate( nextProps ) {
+		this.props.reconcileInnerDom();
+
 		this.configureIsPlaceholderVisible( nextProps.isPlaceholderVisible );
 
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
