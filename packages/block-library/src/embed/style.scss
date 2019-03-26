@@ -1,3 +1,18 @@
+// Apply max-width to floated items that have no intrinsic width
+.wp-block[data-align="left"] > [data-type^="core-embed"],
+.wp-block[data-align="right"] > [data-type^="core-embed"],
+.wp-block-embed.alignleft,
+.wp-block-embed.alignright {
+	// Instagram widgets have a min-width of 326px, so go a bit beyond that.
+	max-width: 360px;
+	width: 100%;
+
+	// Unless these have a min-width, they collapse when floated.
+	.wp-block-embed__wrapper {
+		min-width: $break-zoomed-in;
+	}
+}
+
 .wp-block-embed {
 	// Supply caption styles to embeds, even if the theme hasn't opted in.
 	// Reason being: the new markup, figcaptions, are not likely to be styled in the majority of existing themes,
@@ -9,17 +24,9 @@
 	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
 	margin-bottom: 1em;
 
-	// Apply max-width to floated items that have no intrinsic width.
-	&.alignleft,
-	&.alignright {
-		// Instagram widgets have a min-width of 326px, so go a bit beyond that.
-		max-width: 360px;
-		width: 100%;
-
-		// override the iframe's static width.
-		iframe {
-			width: 100%;
-		}
+	// Don't allow iframe to overflow it's container.
+	iframe {
+		max-width: 100%;
 	}
 }
 
