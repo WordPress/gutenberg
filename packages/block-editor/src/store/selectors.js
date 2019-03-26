@@ -569,9 +569,12 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
 export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { start, end } = state.blockSelection;
+		if ( start === null || end === null ) {
+			return EMPTY_ARRAY;
+		}
+
 		if ( start === end ) {
-			const selectedBlockClientId = getSelectedBlockClientId( state );
-			return selectedBlockClientId ? [ selectedBlockClientId ] : [];
+			return [ start ];
 		}
 
 		// Retrieve root client ID to aid in retrieving relevant nested block
@@ -579,7 +582,7 @@ export const getSelectedBlockClientIds = createSelector(
 		// by explicitly testing against null.
 		const rootClientId = getBlockRootClientId( state, start );
 		if ( rootClientId === null ) {
-			return [];
+			return EMPTY_ARRAY;
 		}
 
 		const blockOrder = getBlockOrder( state, rootClientId );
