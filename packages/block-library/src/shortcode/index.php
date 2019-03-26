@@ -24,6 +24,12 @@ function register_block_core_shortcode() {
 	register_block_type(
 		'core/shortcode',
 		array(
+			'attributes'      => array(
+				'text' => array(
+					'type'   => 'string',
+					'source' => 'html',
+				),
+			),
 			'render_callback' => 'render_block_core_shortcode',
 		)
 	);
