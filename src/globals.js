@@ -1,10 +1,20 @@
 /** @flow
  * @format */
 
-import { createElement } from '@wordpress/element';
+/**
+ * External dependencies
+ */
 import jsdom from 'jsdom-jscore';
 import jsdomLevel1Core from 'jsdom-jscore/lib/jsdom/level1/core';
 
+/**
+ * WordPress dependencies
+ */
+import { createElement } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 // Import for side-effects: Patches for jsdom-jscore, details commented in file.
 import './jsdom-patches';
 

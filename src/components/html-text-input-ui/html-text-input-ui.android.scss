@@ -1,0 +1,21 @@
+/** @format */
+
+@import './html-text-input-ui-common.scss';
+
+.htmlView {
+	font-family: $htmlFont;
+	background-color: $backgroundColor;
+	padding-left: $padding;
+	padding-right: $padding;
+	padding-top: $padding;
+	padding-bottom: $padding;
+}
+
+.htmlViewTitle {
+	font-family: $htmlFont;
+	background-color: $backgroundColor;
+	padding-left: $padding;
+	padding-right: $padding;
+	padding-top: $padding;
+	padding-bottom: $padding;
+}

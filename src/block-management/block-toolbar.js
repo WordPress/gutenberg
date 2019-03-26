@@ -3,14 +3,24 @@
  * @flow
  */
 
+/**
+ * External dependencies
+ */
 import React, { Component } from 'react';
 import { View, ScrollView, Keyboard } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { BlockFormatControls, BlockControls } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
 import styles from './block-toolbar.scss';
 
 type PropsType = {

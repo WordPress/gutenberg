@@ -1,12 +1,26 @@
 /** @flow
  * @format */
 
+/**
+ * External dependencies
+ */
 import React from 'react';
 import { View } from 'react-native';
-import InlineToolbarActions from './actions';
+
+/**
+ * WordPress dependencies
+ */
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import styles from './style.scss';
+import InlineToolbarActions from './actions';
+
+export { InlineToolbarActions };
 
 type PropsType = {
 	clientId: string,
@@ -14,10 +28,6 @@ type PropsType = {
 	canMoveDown: boolean,
 	onButtonPressed: ( button: number ) => void,
 };
-
-export { InlineToolbarActions };
-
-import styles from './style.scss';
 
 export default class InlineToolbar extends React.Component<PropsType> {
 	constructor() {
@@ -45,14 +55,14 @@ export default class InlineToolbar extends React.Component<PropsType> {
 		return (
 			<View style={ styles.toolbar }>
 				<ToolbarButton
-					label={ __( 'Move block up' ) }
+					label={ __( 'Move up' ) }
 					isDisabled={ ! this.props.canMoveUp }
 					onClick={ this.onUpPressed }
 					icon="arrow-up-alt"
 				/>
 
 				<ToolbarButton
-					label={ __( 'Move block down' ) }
+					label={ __( 'Move down' ) }
 					isDisabled={ ! this.props.canMoveDown }
 					onClick={ this.onDownPressed }
 					icon="arrow-down-alt"
@@ -63,7 +73,7 @@ export default class InlineToolbar extends React.Component<PropsType> {
 				<InspectorControls.Slot />
 
 				<ToolbarButton
-					label={ __( 'Remove content' ) }
+					label={ __( 'Remove' ) }
 					onClick={ this.onDeletePressed }
 					icon="trash"
 				/>
