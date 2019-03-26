@@ -56,7 +56,15 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 ```
 {% end %}
 
-The class name is generated using the block's name prefixed with `wp-block-`, replacing the `/` namespace separator with a single `-`. Create the following CSS in a file called `editor.css`:
+The class name is generated using the block's name prefixed with `wp-block-`, replacing the `/` namespace separator with a single `-`.
+
+## Enqueueing Editor and Front end Assets
+
+Like scripts, you need to enqueue your block's styles. As explained in the section before, you use the `editor_style` handle for styles only relevant in the editor, and the `style` handle for common styles applied both in the editor and the front of your site.
+
+The stylesheets enqueued by `style` are the base styles and are loaded first. The `editor` stylesheet will be loaded after it.
+
+Let's move on into code. Create a file called `editor.css`:
 
 ```css
 .wp-block-gutenberg-examples-example-02-stylesheets {
@@ -67,15 +75,18 @@ The class name is generated using the block's name prefixed with `wp-block-`, re
 }
 ```
 
-## Enqueueing Editor and Front end Assets
+And a new `style.css` file containing:
 
-Like scripts, your block's editor-specific styles should be enqueued by assigning the `editor_style` setting of the registered block type.
+```css
+.wp-block-gutenberg-examples-example-02-stylesheets {
+	color: darkred;
+	background: #fcc;
+	border: 2px solid #c99;
+	padding: 20px;
+}
+```
 
-To enqueue a style that shows on both the front of your site and the editor, use `style` setting.
-
-When registering a block, you can assign one or both of `style` and `editor_style` to respectively assign styles always loaded for a block, or styles only loaded in the editor.
-
-Example 2 shows having a distinct style for each context. Your block is likely to share some styles in both contexts, so in this example you can consider `style.css` as the base stylesheet, placing editor-specific styles in `editor.css`.
+Configure your plugin to use these new styles:
 
 ```php
 <?php
@@ -113,4 +124,3 @@ function gutenberg_examples_02_register_block() {
 }
 add_action( 'init', 'gutenberg_examples_02_register_block' );
 ```
-
