@@ -12,8 +12,8 @@ import {
 	CopyHandler,
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
-	_BlockSettingsMenuFirstItem,
-	_BlockSettingsMenuPluginsExtension,
+	__experimentalBlockSettingsMenuFirstItem,
+	__experimentalBlockSettingsMenuPluginsExtension,
 } from '@wordpress/block-editor';
 
 /**
@@ -35,12 +35,12 @@ function VisualEditor() {
 					</CopyHandler>
 				</ObserveTyping>
 			</WritingFlow>
-			<_BlockSettingsMenuFirstItem>
+			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }
-			</_BlockSettingsMenuFirstItem>
-			<_BlockSettingsMenuPluginsExtension>
+			</__experimentalBlockSettingsMenuFirstItem>
+			<__experimentalBlockSettingsMenuPluginsExtension>
 				{ ( { clientIds, onClose } ) => <PluginBlockSettingsMenuGroup.Slot fillProps={ { clientIds, onClose } } /> }
-			</_BlockSettingsMenuPluginsExtension>
+			</__experimentalBlockSettingsMenuPluginsExtension>
 		</BlockSelectionClearer>
 	);
 }

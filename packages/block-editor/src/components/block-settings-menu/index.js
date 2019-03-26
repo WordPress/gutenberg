@@ -20,8 +20,8 @@ import BlockActions from '../block-actions';
 import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
-import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
-import _BlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
+import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
+import __experimentalBlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
 
 export function BlockSettingsMenu( { clientIds, onSelect } ) {
 	const blockClientIds = castArray( clientIds );
@@ -57,7 +57,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 					} }
 					renderContent={ ( { onClose } ) => (
 						<NavigableMenu className="editor-block-settings-menu__content block-editor-block-settings-menu__content">
-							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
+							<__experimentalBlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
 							{ count === 1 && (
 								<BlockUnknownConvertButton
 									clientId={ firstBlockClientId }
@@ -104,7 +104,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 									onToggle={ onClose }
 								/>
 							) }
-							<_BlockSettingsMenuPluginsExtension.Slot fillProps={ { clientIds, onClose } } />
+							<__experimentalBlockSettingsMenuPluginsExtension.Slot fillProps={ { clientIds, onClose } } />
 							<div className="editor-block-settings-menu__separator block-editor-block-settings-menu__separator" />
 							{ ! isLocked && (
 								<MenuItem
