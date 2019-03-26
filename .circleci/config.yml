@@ -120,7 +120,7 @@ jobs:
         command: |
           git submodule init
           git submodule update --recursive
-    - yarn-install
+    - run: yarn clean:install
     - react-native-install
     - run: |
         sudo chown -R $USER:$GROUP ~/.config
