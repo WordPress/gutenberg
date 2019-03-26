@@ -7,7 +7,7 @@
  * External dependencies
  */
 import * as React from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 
 /**
  * Internal dependencies
