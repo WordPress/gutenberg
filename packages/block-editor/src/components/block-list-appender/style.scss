@@ -1,6 +1,5 @@
 .block-list-appender {
-	margin: $block-padding auto;
-	max-width: $content-width - $block-padding*2 - $block-side-ui-clearance;
+	margin: $block-padding;
 
 	// Certain Blocks (eg: Column) act as as a "passthrough container"
 	// and therefore have their vertical margins/padding removed via negative margins
@@ -12,11 +11,6 @@
 		margin-top: $block-padding*2;
 		margin-bottom: $block-padding*2;
 	}
-}
-
-.wp-block .block-list-appender {
-	margin-left: $block-padding;
-	margin-right: $block-padding;
 }
 
 .block-list-appender > .block-editor-inserter {
