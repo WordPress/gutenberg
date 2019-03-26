@@ -480,8 +480,12 @@
 		border-radius: $radius-round;
 
 		&:checked::before {
-			margin: 3px 0 0 3px;
+			margin: 6px 0 0 6px;
 			background-color: $white;
+
+			@include break-medium() {
+				margin: -3px 0 0 -3px;
+			}
 		}
 	}
 
