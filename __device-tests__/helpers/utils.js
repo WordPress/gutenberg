@@ -89,7 +89,7 @@ const setupDriver = async () => {
 // Spawns an appium process in the background
 const setupAppium = async () => {
 	const out = fs.openSync( './appium-out.log', 'a' );
-	const err = fs.openSync( './appium-out.slog', 'a' );
+	const err = fs.openSync( './appium-out.log', 'a' );
 
 	const appium = await spawn( 'appium', [ '-p', '' + localAppiumPort ], {
 		detached: true, stdio: [ 'ignore', out, err ],

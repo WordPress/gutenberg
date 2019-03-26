@@ -71,7 +71,7 @@
     "pretest:ui:android": "DEVICE_TESTS=true sh ./bin/load-initial-html.sh && yarn android",
     "test:ui:android": "TEST_RN_PLATFORM=android yarn device-tests",
     "posttest:ui:android": "sh ./bin/load-initial-html.sh",
-    "pretest:ui:ios": "DEVICE_TESTS=true sh ./bin/load-initial-html.sh && yarn ios --configuration=Release",
+    "pretest:ui:ios": "DEVICE_TESTS=true sh ./bin/load-initial-html.sh && yarn ios",
     "test:ui:ios": "TEST_RN_PLATFORM=ios yarn device-tests",
     "posttest:ui:ios": "sh ./bin/load-initial-html.sh",
     "test:inside-gb": "cross-env NODE_ENV=test node node_modules/jest/bin/jest.js --verbose --config jest_gb.config.js",
