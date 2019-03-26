@@ -99,3 +99,5 @@ buck-out/
 
 # e2e output log
 appium-out.log
+
+bin/wp-cli.phar

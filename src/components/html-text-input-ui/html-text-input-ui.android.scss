@@ -8,7 +8,7 @@
 	padding-left: $padding;
 	padding-right: $padding;
 	padding-top: $padding;
-	padding-bottom: $padding;
+	padding-bottom: $padding + 16;
 }
 
 .htmlViewTitle {
@@ -18,4 +18,8 @@
 	padding-right: $padding;
 	padding-top: $padding;
 	padding-bottom: $padding;
+}
+
+.scrollView {
+	flex: 1;
 }
