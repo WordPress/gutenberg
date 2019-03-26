@@ -7,7 +7,7 @@
  * External dependencies
  */
 import * as React from 'react';
-import { ScrollView, NativeSyntheticEvent, TextInputContentSizeChangeEventData } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 /**
  * Internal dependencies
@@ -17,17 +17,16 @@ import KeyboardAvoidingView from '../keyboard-avoiding-view';
 
 type PropsType = {
 	parentHeight: number,
-	content: (
-		scrollEnabled: boolean,
-		style: mixed,
-		onContentSizeChange: ( NativeSyntheticEvent<TextInputContentSizeChangeEventData> ) => void ) => React.Node,
+	children: React.Node,
 };
 
 type StateType = {
 	contentHeight: number,
 };
 
-export default class HTMLInputViewUI extends React.Component<PropsType, StateType> {
+class HTMLInputViewUI extends React.Component<PropsType, StateType> {
+	static scrollEnabled: boolean;
+
 	constructor() {
 		super( ...arguments );
 
@@ -41,16 +40,20 @@ export default class HTMLInputViewUI extends React.Component<PropsType, StateTyp
 	}
 
 	render() {
-		const style = { ...styles.htmlView, height: this.state.contentHeight + 16 };
 		return (
 			<KeyboardAvoidingView style={ styles.keyboardAvoidingView } parentHeight={ this.props.parentHeight }>
 				<ScrollView
 					style={ { flex: 1 } }
 					keyboardDismissMode="interactive"
 				>
-					{ this.props.content( false, style, this.onContentSizeChange ) }
+					{ this.props.children }
+					<View style={ { height: 16 } } />
 				</ScrollView>
 			</KeyboardAvoidingView>
 		);
 	}
 }
+
+HTMLInputViewUI.scrollEnabled = false;
+
+export default HTMLInputViewUI;
