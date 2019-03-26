@@ -85,6 +85,12 @@ export class RichText extends Component {
 			this.multilineWrapperTags = [ 'ul', 'ol' ];
 		}
 
+		if ( this.props.onSplit ) {
+			this.onSplit = this.props.onSplit;			
+		} else if ( this.props.unstableOnSplit ) {
+			this.onSplit = this.props.unstableOnSplit;
+		}
+
 		this.isIOS = Platform.OS === 'ios';
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
@@ -132,10 +138,8 @@ export class RichText extends Component {
 	 * handler.
 	 *
 	 */
-	splitContent( currentRecord, blocks = [], isPasted = false ) {
-		const { onSplit } = this.props;
-
-		if ( ! onSplit ) {
+	splitContent( currentRecord, blocks = [], isPasted = false ) {		
+		if ( ! this.onSplit ) {
 			return;
 		}
 
@@ -174,7 +178,7 @@ export class RichText extends Component {
 		// always update when provided with new content.
 		this.lastEventCount = undefined;
 
-		onSplit( before, after, ...blocks );
+		this.onSplit( before, after, ...blocks );
 	}
 
 	valueToFormat( value ) {
@@ -268,7 +272,7 @@ export class RichText extends Component {
 	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
 		this.lastEventCount = event.nativeEvent.eventCount;
-		if ( ! this.props.onSplit ) {
+		if ( ! this.onSplit ) {
 			// TODO: insert the \n char instead?
 			return;
 		}
