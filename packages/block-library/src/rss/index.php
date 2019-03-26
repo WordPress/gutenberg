@@ -133,5 +133,4 @@ function register_block_core_rss() {
 		)
 	);
 }
-
 add_action( 'init', 'register_block_core_rss' );

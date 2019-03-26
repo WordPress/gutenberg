@@ -18,16 +18,13 @@ export default compose( [
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
 			getBlocksByClientId,
-			getMultiSelectedBlockClientIds,
-			getSelectedBlockClientId,
+			getSelectedBlockClientIds,
 			hasMultiSelection,
 		} = select( 'core/block-editor' );
 		const { removeBlocks } = dispatch( 'core/block-editor' );
 
 		const onCopy = ( event ) => {
-			const selectedBlockClientIds = getSelectedBlockClientId() ?
-				[ getSelectedBlockClientId() ] :
-				getMultiSelectedBlockClientIds();
+			const selectedBlockClientIds = getSelectedBlockClientIds();
 
 			if ( selectedBlockClientIds.length === 0 ) {
 				return;
@@ -52,9 +49,7 @@ export default compose( [
 				onCopy( event );
 
 				if ( hasMultiSelection() ) {
-					const selectedBlockClientIds = getSelectedBlockClientId() ?
-						[ getSelectedBlockClientId() ] :
-						getMultiSelectedBlockClientIds();
+					const selectedBlockClientIds = getSelectedBlockClientIds();
 
 					removeBlocks( selectedBlockClientIds );
 				}
