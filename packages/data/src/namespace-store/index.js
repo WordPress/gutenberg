@@ -43,7 +43,17 @@ export default function createNamespace( key, options, registry ) {
 	}, store );
 	let selectors = mapSelectors( {
 		...mapValues( metadataSelectors, ( selector ) => ( state, ...args ) => selector( state.metadata, ...args ) ),
-		...mapValues( options.selectors, ( selector ) => ( state, ...args ) => selector( state.root, ...args ) ),
+		...mapValues( options.selectors, ( selector ) => {
+			if ( selector.isRegistrySelector ) {
+				const mappedSelector = ( reg ) => ( state, ...args ) => {
+					return selector( reg )( state.root, ...args );
+				};
+				mappedSelector.isRegistrySelector = selector.isRegistrySelector;
+				return mappedSelector;
+			}
+
+			return ( state, ...args ) => selector( state.root, ...args );
+		} ),
 	}, store, registry );
 	if ( options.resolvers ) {
 		const result = mapResolvers( options.resolvers, selectors, store );
@@ -119,7 +129,11 @@ function createReduxStore( key, options, registry ) {
 		root: reducer,
 	} );
 
-	return createStore( enhancedReducer, initialState, flowRight( enhancers ) );
+	return createStore(
+		enhancedReducer,
+		{ root: initialState },
+		flowRight( enhancers )
+	);
 }
 
 /**
@@ -196,11 +210,11 @@ function mapResolvers( resolvers, selectors, store ) {
 		return ( ...args ) => {
 			async function fulfillSelector() {
 				const state = store.getState();
-				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state, ...args ) ) {
+				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state.root, ...args ) ) {
 					return;
 				}
 
-				if ( metadataSelectors.hasStartedResolution( store.getState().metadata, selectorName, args ) ) {
+				if ( metadataSelectors.hasStartedResolution( state.metadata, selectorName, args ) ) {
 					return;
 				}
 

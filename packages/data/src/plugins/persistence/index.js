@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, merge, isPlainObject, omit } from 'lodash';
+import { merge, isPlainObject, omit } from 'lodash';
 
 /**
  * Internal dependencies
@@ -147,14 +147,12 @@ const persistencePlugin = function( registry, pluginOptions ) {
 
 		let lastState = getPersistedState( undefined, { nextState: getState() } );
 
-		return ( result ) => {
+		return () => {
 			const state = getPersistedState( lastState, { nextState: getState() } );
 			if ( state !== lastState ) {
 				persistence.set( reducerKey, state );
 				lastState = state;
 			}
-
-			return result;
 		};
 	}
 
@@ -186,22 +184,17 @@ const persistencePlugin = function( registry, pluginOptions ) {
 
 				options = {
 					...options,
-					initialState: {
-						root: initialState,
-					},
+					initialState,
 				};
 			}
 
 			const store = registry.registerStore( reducerKey, options );
 
-			store.dispatch = flow( [
-				store.dispatch,
-				createPersistOnChange(
-					store.getState,
-					reducerKey,
-					options.persist
-				),
-			] );
+			store.subscribe( createPersistOnChange(
+				store.getState,
+				reducerKey,
+				options.persist
+			) );
 
 			return store;
 		},

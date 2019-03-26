@@ -1,16 +1,14 @@
 /**
  * Internal dependencies
  */
-import { createRegistry } from '../../../registry';
-import { createRegistryControl } from '../../../factory';
-import controlsPlugin from '../';
+import { createRegistry } from '../../registry';
+import { createRegistryControl } from '../../factory';
 
 describe( 'controls', () => {
 	let registry;
 
 	beforeEach( () => {
 		registry = createRegistry();
-		registry.use( controlsPlugin );
 	} );
 
 	describe( 'should call registry-aware controls', () => {
