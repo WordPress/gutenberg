@@ -47,7 +47,7 @@ commands:
     - run:
         name: Bundle iOS
         command: |
-          react-native bundle --reset-cache --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios'
+          yarn react-native bundle --reset-cache --platform ios --dev false --entry-file index.js --assets-dest "./ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/" --bundle-output "./ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle"
     - run:
         name: Generate .app file
         command:  |
