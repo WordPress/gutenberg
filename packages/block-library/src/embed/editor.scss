@@ -1,3 +1,11 @@
+// Apply max-width to floated items that have no intrinsic width
+.block-editor-block-list__block[data-type^="core-embed"][data-align="left"] .block-editor-block-list__block-edit,
+.block-editor-block-list__block[data-type^="core-embed"][data-align="right"] .block-editor-block-list__block-edit {
+	// Instagram widgets have a min-width of 326px, so go a bit beyond that.
+	max-width: 360px;
+	width: 100%;
+}
+
 .wp-block-embed {
 	// Remove the left and right margin the figure is born with.
 	margin-left: 0;
