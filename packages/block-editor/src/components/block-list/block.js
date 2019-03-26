@@ -431,7 +431,7 @@ export class BlockListBlock extends Component {
 					// The wp-block className is important for editor styles.
 					// Generate the wrapper class names handling the different states of the block.
 					const wrapperClassName = classnames(
-						'wp-block editor-block-list__block',
+						'wp-block editor-block-list__block block-editor-block-list__block',
 						{
 							'has-warning': ! isValid || !! error || isUnregisteredBlock,
 							'is-selected': shouldAppearSelected,
@@ -522,7 +522,7 @@ export class BlockListBlock extends Component {
 							{ isFirstMultiSelected && (
 								<BlockMultiControls rootClientId={ rootClientId } />
 							) }
-							<div className="editor-block-list__block-edit">
+							<div className="editor-block-list__block-edit block-editor-block-list__block-edit">
 								{ shouldRenderMovers && (
 									<BlockMover
 										clientIds={ clientId }
@@ -595,14 +595,14 @@ export class BlockListBlock extends Component {
 							</div>
 							{ showEmptyBlockSideInserter && (
 								<Fragment>
-									<div className="editor-block-list__side-inserter">
+									<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
 										<InserterWithShortcuts
 											clientId={ clientId }
 											rootClientId={ rootClientId }
 											onToggle={ this.selectOnOpen }
 										/>
 									</div>
-									<div className="editor-block-list__empty-block-inserter">
+									<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
 										<Inserter
 											position="top right"
 											onToggle={ this.selectOnOpen }

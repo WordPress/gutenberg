@@ -114,6 +114,7 @@ export const settings = {
 							onChange={ ( value ) => setAttributes( { columns: value } ) }
 							min={ 2 }
 							max={ 4 }
+							required
 						/>
 					</PanelBody>
 				</InspectorControls>

@@ -734,7 +734,7 @@ The editor settings object.
 
 ### setupEditor
 
-Returns an action object used in signalling that editor has initialized with
+Returns an action generator used in signalling that editor has initialized with
 the specified post object and editor settings.
 
 *Parameters*

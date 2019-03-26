@@ -1,14 +1,14 @@
-.editor-block-list__block[data-type="core/pullquote"] {
+.block-editor-block-list__block[data-type="core/pullquote"] {
 	&[data-align="left"],
 	&[data-align="right"] {
-		& .editor-rich-text p {
+		& .block-editor-rich-text p {
 			font-size: 20px;
 		}
 	}
 }
 
 .wp-block-pullquote {
-	& blockquote > .editor-rich-text p {
+	& blockquote > .block-editor-rich-text p {
 		font-size: 28px;
 		line-height: 1.6;
 	}
@@ -18,7 +18,7 @@
 	margin-left: 0;
 	margin-right: 0;
 
-	& blockquote > .editor-rich-text p {
+	& blockquote > .block-editor-rich-text p {
 		font-size: 32px;
 	}
 

@@ -85,6 +85,7 @@ class LatestComments extends Component {
 							onChange={ this.setCommentsToShow }
 							min={ MIN_COMMENTS }
 							max={ MAX_COMMENTS }
+							required
 						/>
 					</PanelBody>
 				</InspectorControls>

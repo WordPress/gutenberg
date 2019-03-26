@@ -20,7 +20,7 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 
 	if ( blockClientIds.length > 1 ) {
 		return (
-			<div className="editor-block-toolbar">
+			<div className="editor-block-toolbar block-editor-block-toolbar">
 				<MultiBlocksSwitcher />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
@@ -28,7 +28,7 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 	}
 
 	return (
-		<div className="editor-block-toolbar">
+		<div className="editor-block-toolbar block-editor-block-toolbar">
 			{ mode === 'visual' && isValid && (
 				<Fragment>
 					<BlockSwitcher clientIds={ blockClientIds } />
@@ -43,19 +43,15 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 
 export default withSelect( ( select ) => {
 	const {
-		getSelectedBlockClientId,
 		getBlockMode,
-		getMultiSelectedBlockClientIds,
+		getSelectedBlockClientIds,
 		isBlockValid,
 	} = select( 'core/block-editor' );
-	const selectedBlockClientId = getSelectedBlockClientId();
-	const blockClientIds = selectedBlockClientId ?
-		[ selectedBlockClientId ] :
-		getMultiSelectedBlockClientIds();
+	const blockClientIds = getSelectedBlockClientIds();
 
 	return {
 		blockClientIds,
-		isValid: selectedBlockClientId ? isBlockValid( selectedBlockClientId ) : null,
-		mode: selectedBlockClientId ? getBlockMode( selectedBlockClientId ) : null,
+		isValid: blockClientIds.length === 1 ? isBlockValid( blockClientIds[ 0 ] ) : null,
+		mode: blockClientIds.length === 1 ? getBlockMode( blockClientIds[ 0 ] ) : null,
 	};
 } )( BlockToolbar );

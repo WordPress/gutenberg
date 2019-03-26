@@ -12,6 +12,18 @@ import {
 	Fragment,
 	isValidElement,
 	StrictMode,
+	useState,
+	useEffect,
+	useContext,
+	useReducer,
+	useCallback,
+	useMemo,
+	useRef,
+	useImperativeHandle,
+	useLayoutEffect,
+	useDebugValue,
+	lazy,
+	Suspense,
 } from 'react';
 import { isString } from 'lodash';
 
@@ -98,6 +110,66 @@ export { isValidElement };
  * Component that activates additional checks and warnings for its descendants.
  */
 export { StrictMode };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usecallback
+ */
+export { useCallback };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usecontext
+ */
+export { useContext };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usedebugvalue
+ */
+export { useDebugValue };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#useeffect
+ */
+export { useEffect };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#useimperativehandle
+ */
+export { useImperativeHandle };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#uselayouteffect
+ */
+export { useLayoutEffect };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usememo
+ */
+export { useMemo };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usereducer
+ */
+export { useReducer };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#useref
+ */
+export { useRef };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usestate
+ */
+export { useState };
+
+/**
+ * @see https://reactjs.org/docs/react-api.html#reactlazy
+ */
+export { lazy };
+
+/**
+ * @see https://reactjs.org/docs/react-api.html#reactsuspense
+ */
+export { Suspense };
 
 /**
  * Concatenate two or more React children objects.

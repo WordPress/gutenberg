@@ -11,7 +11,7 @@ import VisualEditorInserter from '../inserter';
 
 function BlockMobileToolbar( { clientId } ) {
 	return (
-		<div className="editor-block-list__block-mobile-toolbar">
+		<div className="editor-block-list__block-mobile-toolbar block-editor-block-list__block-mobile-toolbar">
 			<VisualEditorInserter />
 			<BlockMover clientIds={ [ clientId ] } />
 		</div>

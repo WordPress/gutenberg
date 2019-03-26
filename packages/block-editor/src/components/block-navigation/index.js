@@ -30,16 +30,16 @@ function BlockNavigationList( {
 		 * Safari+VoiceOver won't announce the list otherwise.
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
-		<ul className="editor-block-navigation__list" role="list">
+		<ul className="editor-block-navigation__list block-editor-block-navigation__list" role="list">
 			{ map( blocks, ( block ) => {
 				const blockType = getBlockType( block.name );
 				const isSelected = block.clientId === selectedBlockClientId;
 
 				return (
 					<li key={ block.clientId }>
-						<div className="editor-block-navigation__item">
+						<div className="editor-block-navigation__item block-editor-block-navigation__item">
 							<Button
-								className={ classnames( 'editor-block-navigation__item-button', {
+								className={ classnames( 'editor-block-navigation__item-button block-editor-block-navigation__item-button', {
 									'is-selected': isSelected,
 								} ) }
 								onClick={ () => selectBlock( block.clientId ) }
@@ -80,9 +80,9 @@ function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, select
 	return (
 		<NavigableMenu
 			role="presentation"
-			className="editor-block-navigation__container"
+			className="editor-block-navigation__container block-editor-block-navigation__container"
 		>
-			<p className="editor-block-navigation__label">{ __( 'Block Navigation' ) }</p>
+			<p className="editor-block-navigation__label block-editor-block-navigation__label">{ __( 'Block Navigation' ) }</p>
 			{ hasHierarchy && (
 				<BlockNavigationList
 					blocks={ [ rootBlock ] }

@@ -31,8 +31,6 @@ import { isURL } from '@wordpress/url';
  */
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
-import { withBlockEditContext } from '../block-edit/context';
-import { ListEdit } from './list-edit';
 
 import styles from './style.scss';
 
@@ -72,19 +70,8 @@ const gutenbergFormatNamesToAztec = {
 };
 
 export class RichText extends Component {
-	constructor( { multiline } ) {
+	constructor() {
 		super( ...arguments );
-
-		this.isMultiline = false;
-		if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
-			this.multilineTag = multiline === true ? 'p' : multiline;
-			this.isMultiline = true;
-		}
-
-		if ( this.multilineTag === 'li' ) {
-			this.multilineWrapperTags = [ 'ul', 'ol' ];
-		}
-
 		this.isIOS = Platform.OS === 'ios';
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
@@ -514,7 +501,6 @@ export class RichText extends Component {
 			style,
 			formattingControls,
 			isSelected,
-			onTagNameChange,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -527,7 +513,7 @@ export class RichText extends Component {
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
 
-		let minHeight = styles[ 'editor-rich-text' ].minHeight;
+		let minHeight = styles[ 'block-editor-rich-text' ].minHeight;
 		if ( style && style.minHeight ) {
 			minHeight = style.minHeight;
 		}
@@ -536,14 +522,6 @@ export class RichText extends Component {
 
 		return (
 			<View>
-				{ isSelected && this.multilineTag === 'li' && (
-					<ListEdit
-						onTagNameChange={ onTagNameChange }
-						tagName={ tagName }
-						value={ record }
-						onChange={ this.onFormatChange }
-					/>
-				) }
 				{ isSelected && (
 					<BlockFormatControls>
 						<FormatToolbar controls={ formattingControls } />
@@ -563,7 +541,7 @@ export class RichText extends Component {
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }
 					placeholder={ this.props.placeholder }
-					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'editor-rich-text' ].textDecorationColor }
+					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].textDecorationColor }
 					onChange={ this.onChange }
 					onFocus={ this.props.onFocus }
 					onBlur={ this.props.onBlur }
@@ -578,12 +556,11 @@ export class RichText extends Component {
 					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
-					fontFamily={ this.props.fontFamily || styles[ 'editor-rich-text' ].fontFamily }
+					fontFamily={ this.props.fontFamily || styles[ 'block-editor-rich-text' ].fontFamily }
 					fontSize={ this.props.fontSize }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ this.props.disableEditingMenu }
-					isMultiline={ this.isMultiline }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>
@@ -605,46 +582,13 @@ const RichTextContainer = compose( [
 			formatTypes: getFormatTypes(),
 		};
 	} ),
-	withBlockEditContext( ( context, ownProps ) => {
-		// When explicitly set as not selected, do nothing.
-		if ( ownProps.isSelected === false ) {
-			return {
-				clientId: context.clientId,
-			};
-		}
-		// When explicitly set as selected, use the value stored in the context instead.
-		if ( ownProps.isSelected === true ) {
-			return {
-				isSelected: context.isSelected,
-				clientId: context.clientId,
-			};
-		}
-
-		// Ensures that only one RichText component can be focused.
-		return {
-			clientId: context.clientId,
-			isSelected: context.isSelected,
-			onFocus: context.onFocus,
-		};
-	} ),
 ] )( RichText );
 
-RichTextContainer.Content = ( { value, format, tagName: Tag, multiline, ...props } ) => {
+RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
 	let content;
-	let html = value;
-	let MultilineTag;
-
-	if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
-		MultilineTag = multiline === true ? 'p' : multiline;
-	}
-
-	if ( ! html && MultilineTag ) {
-		html = `<${ MultilineTag }></${ MultilineTag }>`;
-	}
-
 	switch ( format ) {
 		case 'string':
-			content = <RawHTML>{ html }</RawHTML>;
+			content = <RawHTML>{ value }</RawHTML>;
 			break;
 	}
 

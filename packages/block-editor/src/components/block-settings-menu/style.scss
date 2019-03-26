@@ -1,19 +1,19 @@
-.editor-block-settings-menu__toggle .dashicon {
+.block-editor-block-settings-menu__toggle .dashicon {
 	transform: rotate(90deg);
 }
 
 // Popout menu
-.editor-block-settings-menu__popover {
+.block-editor-block-settings-menu__popover {
 	&::before,
 	&::after {
 		margin-left: 2px;
 	}
 
-	.editor-block-settings-menu__content {
+	.block-editor-block-settings-menu__content {
 		padding: ($grid-size - $border-width) 0;
 	}
 
-	.editor-block-settings-menu__separator {
+	.block-editor-block-settings-menu__separator {
 		margin-top: $grid-size;
 		margin-bottom: $grid-size;
 		margin-left: 0;
@@ -26,14 +26,14 @@
 		}
 	}
 
-	.editor-block-settings-menu__title {
+	.block-editor-block-settings-menu__title {
 		display: block;
 		padding: 6px;
 		color: $dark-gray-300;
 	}
 
 	// Menu items
-	.editor-block-settings-menu__control {
+	.block-editor-block-settings-menu__control {
 		width: 100%;
 		justify-content: flex-start;
 		background: none;

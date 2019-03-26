@@ -18,7 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### escapeAmpersand
 
-[src/index.js#L28-L30](src/index.js#L28-L30)
+[src/index.js#L33-L35](src/index.js#L33-L35)
 
 Returns a string with ampersands escaped. Note that this is an imperfect
 implementation, where only ampersands which do not appear as a pattern of
@@ -41,7 +41,7 @@ named references (i.e. ambiguous ampersand) are are still permitted.
 
 ### escapeAttribute
 
-[src/index.js#L66-L68](src/index.js#L66-L68)
+[src/index.js#L79-L81](src/index.js#L79-L81)
 
 Returns an escaped attribute value.
 
@@ -51,6 +51,14 @@ Returns an escaped attribute value.
 
 "[...] the text cannot contain an ambiguous ampersand [...] must not contain
 any literal U+0022 QUOTATION MARK characters (")"
+
+Note we also escape the greater than symbol, as this is used by wptexturize to
+split HTML strings. This is a WordPress specific fix
+
+Note that if a resolution for Trac#45387 comes to fruition, it is no longer
+necessary for `__unstableEscapeGreaterThan` to be used.
+
+See: <https://core.trac.wordpress.org/ticket/45387>
 
 **Parameters**
 
@@ -62,7 +70,7 @@ any literal U+0022 QUOTATION MARK characters (")"
 
 ### escapeHTML
 
-[src/index.js#L82-L84](src/index.js#L82-L84)
+[src/index.js#L95-L97](src/index.js#L95-L97)
 
 Returns an escaped HTML element value.
 
@@ -83,7 +91,7 @@ ambiguous ampersand."
 
 ### escapeLessThan
 
-[src/index.js#L50-L52](src/index.js#L50-L52)
+[src/index.js#L55-L57](src/index.js#L55-L57)
 
 Returns a string with less-than sign replaced.
 
@@ -97,7 +105,7 @@ Returns a string with less-than sign replaced.
 
 ### escapeQuotationMark
 
-[src/index.js#L39-L41](src/index.js#L39-L41)
+[src/index.js#L44-L46](src/index.js#L44-L46)
 
 Returns a string with quotation marks replaced.
 
@@ -111,7 +119,7 @@ Returns a string with quotation marks replaced.
 
 ### isValidAttributeName
 
-[src/index.js#L93-L95](src/index.js#L93-L95)
+[src/index.js#L106-L108](src/index.js#L106-L108)
 
 Returns true if the given attribute name is valid, or false otherwise.
 

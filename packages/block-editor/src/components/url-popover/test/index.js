@@ -34,7 +34,7 @@ describe( 'URLPopover', () => {
 			</URLPopover>
 		);
 
-		const toggleButton = wrapper.find( '.editor-url-popover__settings-toggle' );
+		const toggleButton = wrapper.find( '.block-editor-url-popover__settings-toggle' );
 		expect( toggleButton ).toHaveLength( 1 );
 		toggleButton.simulate( 'click' );
 
