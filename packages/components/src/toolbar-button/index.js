@@ -19,8 +19,8 @@ function ToolbarButton( {
 	className,
 	isActive,
 	isDisabled,
+	extraProps,
 	children,
-	...extraProps
 } ) {
 	return (
 		<ToolbarButtonContainer className={ containerClassName }>

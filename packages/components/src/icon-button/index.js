@@ -25,7 +25,6 @@ function IconButton( props, ref ) {
 		tooltip,
 		shortcut,
 		labelPosition,
-		iconProps,
 		...additionalProps
 	} = props;
 	const { 'aria-pressed': ariaPressed } = additionalProps;
@@ -57,7 +56,7 @@ function IconButton( props, ref ) {
 			className={ classes }
 			ref={ ref }
 		>
-			{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } { ...iconProps } /> : icon }
+			{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } /> : icon }
 			{ children }
 		</Button>
 	);
