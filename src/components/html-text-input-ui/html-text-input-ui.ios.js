@@ -17,13 +17,14 @@ import KeyboardAvoidingView from '../keyboard-avoiding-view';
 
 type PropsType = {
 	parentHeight: number,
-	content: ( scrollEnabled: boolean, style: mixed, onContentSizeChange: () => void ) => React.Node,
+	children: React.Node,
 };
 
 type StateType = {
 };
 
-export default class HTMLInputViewUI extends React.Component<PropsType, StateType> {
+class HTMLInputViewUI extends React.Component<PropsType, StateType> {
+	static scrollEnabled: boolean;
 	panResponder: PanResponder;
 
 	constructor() {
@@ -50,8 +51,12 @@ export default class HTMLInputViewUI extends React.Component<PropsType, StateTyp
 				{ ...this.panResponder.panHandlers }
 				parentHeight={ this.props.parentHeight }
 			>
-				{ this.props.content( true, styles.htmlView, () => {} ) }
+				{ this.props.children }
 			</KeyboardAvoidingView>
 		);
 	}
 }
+
+HTMLInputViewUI.scrollEnabled = true;
+
+export default HTMLInputViewUI;

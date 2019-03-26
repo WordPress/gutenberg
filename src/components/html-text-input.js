@@ -14,7 +14,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
  * External dependencies
  */
 import React from 'react';
-import { View, TextInput } from 'react-native';
+import { TextInput } from 'react-native';
 
 /**
  * Internal dependencies
@@ -82,36 +82,28 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 
 	render() {
 		return (
-			<HTMLInputViewUI
-				parentHeight={ this.props.parentHeight }
-				content={ ( scrollEnabled, htmlStyle, onContentSizeChange ) => {
-					return (
-						<View style={ styles.container }>
-							<TextInput
-								autoCorrect={ false }
-								textAlignVertical="center"
-								numberOfLines={ 1 }
-								style={ styles.htmlViewTitle }
-								value={ this.props.title }
-								placeholder={ __( 'Add title' ) }
-								onChangeText={ this.props.setTitleAction }
-							/>
-							<TextInput
-								autoCorrect={ false }
-								textAlignVertical="top"
-								multiline
-								style={ htmlStyle }
-								value={ this.state.value }
-								onChangeText={ this.edit }
-								onBlur={ this.stopEditing }
-								placeholder={ __( 'Start writing…' ) }
-								scrollEnabled={ scrollEnabled }
-								onContentSizeChange={ onContentSizeChange }
-							/>
-						</View>
-					);
-				} }
-			/>
+			<HTMLInputViewUI parentHeight={ this.props.parentHeight }>
+				<TextInput
+					autoCorrect={ false }
+					textAlignVertical="center"
+					numberOfLines={ 1 }
+					style={ styles.htmlViewTitle }
+					value={ this.props.title }
+					placeholder={ __( 'Add title' ) }
+					onChangeText={ this.props.setTitleAction }
+				/>
+				<TextInput
+					autoCorrect={ false }
+					textAlignVertical="top"
+					multiline
+					style={ styles.htmlView }
+					value={ this.state.value }
+					onChangeText={ this.edit }
+					onBlur={ this.stopEditing }
+					placeholder={ __( 'Start writing…' ) }
+					scrollEnabled={ HTMLInputViewUI.scrollEnabled }
+				/>
+			</HTMLInputViewUI>
 		);
 	}
 }
