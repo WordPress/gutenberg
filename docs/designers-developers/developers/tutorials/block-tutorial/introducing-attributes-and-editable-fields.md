@@ -45,6 +45,8 @@ wp_register_script(
 );
 ```
 
+Do not forget to also update the `editor_script` handle in `register_block_type` to `gutenberg-examples-03`.
+
 Implementing this behavior as a component enables you as the block implementer to be much more granular about editable fields. Your block may not need `RichText` at all, or it may need many independent `RichText` elements, each operating on a subset of the overall block state.
 
 Because `RichText` allows for nested nodes, you'll most often use it in conjunction with the `html` attribute source when extracting the value from saved content. You'll also use `RichText.Content` in the `save` function to output RichText values.
