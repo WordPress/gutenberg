@@ -245,7 +245,9 @@ function gutenberg_register_scripts_and_styles() {
 	);
 
 	// TEMPORARY: Core does not (yet) provide persistence migration from the
-	// introduction of the block editor.
+	// introduction of the block editor and still calls the data plugins.
+	// We unset the existing inline scripts first.
+	$wp_scripts->registered['wp-data']->extra['after'] = array();
 	wp_add_inline_script(
 		'wp-data',
 		implode(
@@ -254,8 +256,10 @@ function gutenberg_register_scripts_and_styles() {
 				'( function() {',
 				'	var userId = ' . get_current_user_ID() . ';',
 				'	var storageKey = "WP_DATA_USER_" + userId;',
+				'	wp.data',
+				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } );',
 				'	wp.data.plugins.persistence.__unstableMigrate( { storageKey: storageKey } );',
-				'} )()',
+				'} )();',
 			)
 		)
 	);
