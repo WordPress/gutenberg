@@ -1,3 +1,3 @@
-export const IconClass = ( icon, className ) => {
+export const getIconClassName = ( icon, className ) => {
 	return [ 'dashicon', 'dashicons-' + icon, className ].filter( Boolean ).join( ' ' );
 };

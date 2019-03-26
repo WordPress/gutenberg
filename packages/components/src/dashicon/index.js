@@ -14,7 +14,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import { Path, SVG } from '../primitives';
-import { IconClass } from './icon-class';
+import { getIconClassName } from './icon-class';
 
 export default class Dashicon extends Component {
 	render() {
@@ -892,7 +892,7 @@ export default class Dashicon extends Component {
 			return null;
 		}
 
-		const iconClass = IconClass( icon, className, ariaPressed );
+		const iconClass = getIconClassName( icon, className, ariaPressed );
 
 		return (
 			<SVG
