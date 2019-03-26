@@ -3,17 +3,17 @@
 	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
 	margin-bottom: 1em;
 
+	// don't allow iframe to overflow it's container.
+	iframe {
+		max-width: 100%;
+	}
+
 	// Apply max-width to floated items that have no intrinsic width.
 	&.alignleft,
 	&.alignright {
 		// Instagram widgets have a min-width of 326px, so go a bit beyond that.
 		max-width: 360px;
 		width: 100%;
-
-		// override the iframe's static width.
-		iframe {
-			width: 100%;
-		}
 	}
 }
 
