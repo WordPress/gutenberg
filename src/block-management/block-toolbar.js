@@ -59,7 +59,7 @@ export class BlockToolbar extends Component<PropsType> {
 					<Toolbar>
 						<ToolbarButton
 							label={ __( 'Add block' ) }
-							icon={ (<Dashicon  icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } />)}
+							icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
 							onClick={ onInsertClick }
 							iconProps={ { style: styles.addBlockButton, color: styles.addBlockButton.color } }
 						/>
