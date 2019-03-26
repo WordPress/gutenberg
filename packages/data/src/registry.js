@@ -150,10 +150,7 @@ export function createRegistry( storeConfigs = {} ) {
 
 		const namespace = createNamespace( reducerKey, options, registry );
 		registerGenericStore( reducerKey, namespace );
-		return {
-			...namespace.store,
-			getState: () => namespace.store.getState().root,
-		};
+		return namespace.store;
 	};
 
 	//

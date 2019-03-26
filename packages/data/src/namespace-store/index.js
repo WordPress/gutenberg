@@ -64,12 +64,18 @@ export default function createNamespace( key, options, registry ) {
 	const getSelectors = () => selectors;
 	const getActions = () => actions;
 
+	// We have some modules monkey-patching the store object
+	// It's wrong to do so but until we refactor all of our effects to controls
+	// We need to keep the same "store" instance here.
+	store.__unstableOriginalGetState = store.getState;
+	store.getState = () => store.__unstableOriginalGetState().root;
+
 	// Customize subscribe behavior to call listeners only on effective change,
 	// not on every dispatch.
 	const subscribe = store && function( listener ) {
-		let lastState = store.getState();
+		let lastState = store.__unstableOriginalGetState();
 		store.subscribe( () => {
-			const state = store.getState();
+			const state = store.__unstableOriginalGetState();
 			const hasChanged = state !== lastState;
 			lastState = state;
 
@@ -161,7 +167,7 @@ function mapSelectors( selectors, store, registry ) {
 			// direct assignment.
 			const argsLength = arguments.length;
 			const args = new Array( argsLength + 1 );
-			args[ 0 ] = store.getState();
+			args[ 0 ] = store.__unstableOriginalGetState();
 			for ( let i = 0; i < argsLength; i++ ) {
 				args[ i + 1 ] = arguments[ i ];
 			}
@@ -210,11 +216,12 @@ function mapResolvers( resolvers, selectors, store ) {
 		return ( ...args ) => {
 			async function fulfillSelector() {
 				const state = store.getState();
-				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state.root, ...args ) ) {
+				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state, ...args ) ) {
 					return;
 				}
 
-				if ( metadataSelectors.hasStartedResolution( state.metadata, selectorName, args ) ) {
+				const metadata = store.__unstableOriginalGetState().metadata;
+				if ( metadataSelectors.hasStartedResolution( metadata, selectorName, args ) ) {
 					return;
 				}
 
