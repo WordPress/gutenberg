@@ -13,7 +13,7 @@ While the block's editor behaviors are implemented in JavaScript, you'll need to
 /*
 Plugin Name: Gutenberg examples 01
 */
-function gutenberg_examples_01_register_block()
+function gutenberg_examples_01_register_block() {
 	wp_register_script(
 		'gutenberg-examples-01',
 		plugins_url( 'block.js', __FILE__ ),
@@ -25,7 +25,7 @@ function gutenberg_examples_01_register_block()
 	) );
 
 }
-add_action( 'init', 'gutenberg_examples_01_register_block() ' );
+add_action( 'init', 'gutenberg_examples_01_register_block' );
 ```
 
 Note the two script dependencies:
