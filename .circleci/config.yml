@@ -51,6 +51,7 @@ commands:
     - run:
         name: Generate .app file
         command:  |
+          set +e
           react-native run-ios --configuration Release
 
 jobs:
