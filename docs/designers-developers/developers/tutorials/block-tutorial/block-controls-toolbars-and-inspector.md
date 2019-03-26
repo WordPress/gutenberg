@@ -13,7 +13,7 @@ You can also customize the toolbar to include controls specific to your block ty
 {% codetabs %}
 {% ES5 %}
 ```js
-( function( blocks, editor, i18n, element ) {
+( function( blocks, editor, element ) {
 	var el = element.createElement;
 	var RichText = editor.RichText;
 	var AlignmentToolbar = editor.AlignmentToolbar;
