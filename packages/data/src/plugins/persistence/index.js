@@ -184,7 +184,12 @@ const persistencePlugin = function( registry, pluginOptions ) {
 					initialState = persistedState;
 				}
 
-				options = { ...options, initialState };
+				options = {
+					...options,
+					initialState: {
+						root: initialState,
+					},
+				};
 			}
 
 			const store = registry.registerStore( reducerKey, options );

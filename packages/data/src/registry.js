@@ -9,8 +9,8 @@ import {
 /**
  * Internal dependencies
  */
-import createNamespace from './namespace-store.js';
-import dataStore from './store';
+import createNamespace from './namespace-store';
+import createCoreDataStore from './store';
 
 /**
  * An isolated orchestrator of store registrations.
@@ -150,7 +150,10 @@ export function createRegistry( storeConfigs = {} ) {
 
 		const namespace = createNamespace( reducerKey, options, registry );
 		registerGenericStore( reducerKey, namespace );
-		return namespace.store;
+		return {
+			...namespace.store,
+			getState: () => namespace.store.getState().root,
+		};
 	};
 
 	//
@@ -166,10 +169,11 @@ export function createRegistry( storeConfigs = {} ) {
 		return registry;
 	}
 
-	Object.entries( {
-		'core/data': dataStore,
-		...storeConfigs,
-	} ).map( ( [ name, config ] ) => registry.registerStore( name, config ) );
+	registerGenericStore( 'core/data', createCoreDataStore( registry ) );
+
+	Object.entries( storeConfigs ).map(
+		( [ name, config ] ) => registry.registerStore( name, config )
+	);
 
 	return withPlugins( registry );
 }
