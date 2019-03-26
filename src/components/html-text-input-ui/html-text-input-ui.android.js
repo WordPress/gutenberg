@@ -47,7 +47,6 @@ class HTMLInputContainer extends React.Component<PropsType, StateType> {
 					keyboardDismissMode="interactive"
 				>
 					{ this.props.children }
-					<View style={ { height: 16 } } />
 				</ScrollView>
 			</KeyboardAvoidingView>
 		);
