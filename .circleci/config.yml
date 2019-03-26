@@ -86,7 +86,7 @@ jobs:
           command: bin/ci-checks-js.sh
   android-device-checks:
     docker:
-    - image: circleci/android:api-27-node8-alpha
+    - image: circleci/android:api-28-node8-alpha
     steps:
       - checkout
       - run:
@@ -111,7 +111,7 @@ jobs:
           command: yarn device-tests
   ios-device-checks:
     macos:
-      xcode: "10.1"
+      xcode: "10.0"
     steps:
     - checkout
     - run:
@@ -128,21 +128,9 @@ jobs:
         command: |
           echo 'export TEST_RN_PLATFORM=ios' >> $BASH_ENV
           echo 'export TEST_ENV=sauce' >> $BASH_ENV
-    - restore_cache:
-        name: Restore Dependencies Cache
-        keys:
-          - dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{ checksum "yarn.lock" }}
-          - dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}
-          - dependencies-
     - run:
         name: Yarn preios
         command: yarn preios
-    - save_cache:
-        name: Save Dependencies Cache
-        key: dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{ checksum "yarn.lock" }}
-        paths:
-            - react-native-aztec/ios/Carthage
-            - ~/.rncache
     - build-ios
     - run:
         name: Zip up .app file
