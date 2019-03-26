@@ -48,10 +48,13 @@ class HeadingEdit extends Component {
 			onReplace,
 		} = this.props;
 
-		if ( after !== null ) {
-			// Append "After" content as a new paragraph block to the end of
-			// any other blocks being inserted after the current paragraph.
+		if ( after ) {
+			// Append "After" content as a new heading block to the end of
+			// any other blocks being inserted after the current heading.
 			const newBlock = createBlock( name, { content: after } );
+			blocks.push( newBlock );
+		} else {
+			const newBlock = createBlock( 'core/paragraph', { content: after } );
 			blocks.push( newBlock );
 		}
 
