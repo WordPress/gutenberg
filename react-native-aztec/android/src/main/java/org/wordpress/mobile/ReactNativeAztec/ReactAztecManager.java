@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
@@ -62,6 +63,8 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     private int mBlurTextInputCommandCode = BLUR_TEXT_INPUT; // pre-init
 
     private static final String TAG = "ReactAztecText";
+
+    private static final String BLOCK_TYPE_TAG_KEY = "tag";
 
     public ReactAztecManager() {
         initializeFocusAndBlurCommandCodes();
@@ -166,24 +169,33 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     @ReactProp(name = "text")
     public void setText(ReactAztecText view, ReadableMap inputMap) {
         if (!inputMap.hasKey("eventCount")) {
-            setTextfromJS(view, inputMap.getString("text"));
+            setTextfromJS(view, inputMap.getString("text"), inputMap.getMap("selection"));
         } else {
             // Don't think there is necessity of this branch, but justin case we want to
             // force a 2nd setText from JS side to Native, just set a high eventCount
             int eventCount = inputMap.getInt("eventCount");
 
             if (view.mNativeEventCount < eventCount) {
-                setTextfromJS(view, inputMap.getString("text"));
+                setTextfromJS(view, inputMap.getString("text"), inputMap.getMap("selection"));
             }
         }
     }
 
-    private void setTextfromJS(ReactAztecText view, String text) {
+    private void setTextfromJS(ReactAztecText view, String text, @Nullable ReadableMap selection) {
         view.setIsSettingTextFromJS(true);
         view.disableOnSelectionListener();
         view.fromHtml(text, true);
         view.enableOnSelectionListener();
         view.setIsSettingTextFromJS(false);
+        updateSelectionIfNeeded(view, selection);
+    }
+
+    private void updateSelectionIfNeeded(ReactAztecText view, @Nullable ReadableMap selection) {
+        if ( selection != null ) {
+            int start = selection.getInt("start");
+            int end = selection.getInt("end");
+            view.setSelection(start, end);
+        }
     }
 
     @ReactProp(name = "activeFormats", defaultBoolean = false)
@@ -291,6 +303,13 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
             newColor = color;
         }
         view.setTextColor(newColor);
+    }
+
+    @ReactProp(name = "blockType")
+    public void setBlockType(ReactAztecText view, ReadableMap inputMap) {
+        if (inputMap.hasKey(BLOCK_TYPE_TAG_KEY)) {
+            view.setTagName(inputMap.getString(BLOCK_TYPE_TAG_KEY));
+        }
     }
 
     @ReactProp(name = "placeholder")
@@ -480,13 +499,14 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                 return;
             }
 
+            int currentEventCount = mEditText.incrementAndGetEventCounter();
             // The event that contains the event counter and updates it must be sent first.
             // TODO: t7936714 merge these events
             mEventDispatcher.dispatchEvent(
                     new ReactTextChangedEvent(
                             mEditText.getId(),
                             mEditText.toHtml(false),
-                            mEditText.incrementAndGetEventCounter()));
+                            currentEventCount));
 
             mEventDispatcher.dispatchEvent(
                     new ReactTextInputEvent(
@@ -495,6 +515,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                             oldText,
                             start,
                             start + before));
+
+            // Add the outer tags when the field was started empty, and only the first time the user types in it.
+            if (mPreviousText.length() == 0 && !TextUtils.isEmpty(newText) && !TextUtils.isEmpty(mEditText.getTagName())) {
+                mEditText.fromHtml('<' + mEditText.getTagName() + '>' + newText + "</" + mEditText.getTagName() + '>', false);
+            }
         }
 
         @Override

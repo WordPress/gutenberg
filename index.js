@@ -1,6 +1,9 @@
 /** @flow
  * @format */
 
-import { setupApp } from './src';
+/**
+ * Internal dependencies
+ */
+import { registerApp } from './src';
 
-setupApp();
+registerApp();

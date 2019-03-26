@@ -56,6 +56,9 @@ public class MainApplication extends Application implements ReactApplication {
                 public void requestImageUploadCancelDialog(int mediaId) {}
 
                 @Override
+                public void requestImageUploadCancel(int mediaId) {}
+
+                @Override
                 public void editorDidMount(boolean hasUnsupportedBlocks) {}
             })
       );
