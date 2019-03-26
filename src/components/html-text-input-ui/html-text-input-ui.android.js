@@ -21,31 +21,15 @@ type PropsType = {
 };
 
 type StateType = {
-	contentHeight: number,
 };
 
 class HTMLInputContainer extends React.Component<PropsType, StateType> {
 	static scrollEnabled: boolean;
 
-	constructor() {
-		super( ...arguments );
-
-		this.state = {
-			contentHeight: 0,
-		};
-	}
-
-	onContentSizeChange = ( event: NativeSyntheticEvent<TextInputContentSizeChangeEventData> ) => {
-		this.setState( { contentHeight: event.nativeEvent.contentSize.height } );
-	}
-
 	render() {
 		return (
 			<KeyboardAvoidingView style={ styles.keyboardAvoidingView } parentHeight={ this.props.parentHeight }>
-				<ScrollView
-					style={ { flex: 1 } }
-					keyboardDismissMode="interactive"
-				>
+				<ScrollView style={ styles.scrollView } >
 					{ this.props.children }
 				</ScrollView>
 			</KeyboardAvoidingView>
