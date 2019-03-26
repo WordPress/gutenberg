@@ -49,7 +49,7 @@ class LatestPostsEdit extends Component {
 		this.toggleDisplayPostDate = this.toggleDisplayPostDate.bind( this );
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		this.isStillMounted = true;
 		this.fetchRequest = apiFetch( {
 			path: addQueryArgs( `/wp/v2/categories`, CATEGORIES_LIST_QUERY ),
