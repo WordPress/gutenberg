@@ -162,12 +162,12 @@ export { useRef };
 export { useState };
 
 /**
- * @see https://reactjs.org/docs/code-splitting.html#reactlazy
+ * @see https://reactjs.org/docs/react-api.html#reactlazy
  */
 export { lazy };
 
 /**
- * @see https://reactjs.org/docs/react-api.html#suspense
+ * @see https://reactjs.org/docs/react-api.html#reactsuspense
  */
 export { Suspense };
 
