@@ -245,7 +245,7 @@ Checks if an object is a valid WPElement
 
 **Related**
 
--   <https://reactjs.org/docs/code-splitting.html#reactlazy>
+-   <https://reactjs.org/docs/react-api.html#reactlazy>
 
 ### RawHTML
 
@@ -303,7 +303,7 @@ Component that activates additional checks and warnings for its descendants.
 
 **Related**
 
--   <https://reactjs.org/docs/react-api.html#suspense>
+-   <https://reactjs.org/docs/react-api.html#reactsuspense>
 
 ### switchChildrenNodeName
 
