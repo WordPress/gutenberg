@@ -19,7 +19,7 @@ import { TextInput } from 'react-native';
 /**
  * Internal dependencies
  */
-import HTMLInputViewUI from './html-text-input-ui/html-text-input-ui';
+import HTMLInputContainer from './html-text-input-ui/html-text-input-ui';
 import styles from './html-text-input-ui/html-text-input-ui.scss';
 
 type PropsType = {
@@ -82,7 +82,7 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 
 	render() {
 		return (
-			<HTMLInputViewUI parentHeight={ this.props.parentHeight }>
+			<HTMLInputContainer parentHeight={ this.props.parentHeight }>
 				<TextInput
 					autoCorrect={ false }
 					textAlignVertical="center"
@@ -101,9 +101,9 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 					onChangeText={ this.edit }
 					onBlur={ this.stopEditing }
 					placeholder={ __( 'Start writing…' ) }
-					scrollEnabled={ HTMLInputViewUI.scrollEnabled }
+					scrollEnabled={ HTMLInputContainer.scrollEnabled }
 				/>
-			</HTMLInputViewUI>
+			</HTMLInputContainer>
 		);
 	}
 }

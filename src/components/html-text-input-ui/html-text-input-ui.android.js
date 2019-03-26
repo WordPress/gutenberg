@@ -24,7 +24,7 @@ type StateType = {
 	contentHeight: number,
 };
 
-class HTMLInputViewUI extends React.Component<PropsType, StateType> {
+class HTMLInputContainer extends React.Component<PropsType, StateType> {
 	static scrollEnabled: boolean;
 
 	constructor() {
@@ -54,6 +54,6 @@ class HTMLInputViewUI extends React.Component<PropsType, StateType> {
 	}
 }
 
-HTMLInputViewUI.scrollEnabled = false;
+HTMLInputContainer.scrollEnabled = false;
 
-export default HTMLInputViewUI;
+export default HTMLInputContainer;

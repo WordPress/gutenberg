@@ -23,7 +23,7 @@ type PropsType = {
 type StateType = {
 };
 
-class HTMLInputViewUI extends React.Component<PropsType, StateType> {
+class HTMLInputContainer extends React.Component<PropsType, StateType> {
 	static scrollEnabled: boolean;
 	panResponder: PanResponder;
 
@@ -57,6 +57,6 @@ class HTMLInputViewUI extends React.Component<PropsType, StateType> {
 	}
 }
 
-HTMLInputViewUI.scrollEnabled = true;
+HTMLInputContainer.scrollEnabled = true;
 
-export default HTMLInputViewUI;
+export default HTMLInputContainer;
