@@ -52,8 +52,8 @@ The following code example shows how to create a dynamic block that shows only t
 const { registerBlockType } = wp.blocks;
 const { withSelect } = wp.data;
 
-registerBlockType( 'my-plugin/latest-post', {
-	title: 'Latest Post',
+registerBlockType( 'gutenberg-examples/example-05-dynamic', {
+	title: 'Example: last post',
 	icon: 'megaphone',
 	category: 'widgets',
 
