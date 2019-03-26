@@ -98,8 +98,7 @@ jobs:
       - react-native-install
       - run:
           name: Accept Licenses
-          command: y | sdkmanager --licenses || true && sdkmanager --update
-          background: true
+          command: yes | sdkmanager --licenses && sdkmanager --update
       - run:
           name: Set Environment Variables
           command: |
