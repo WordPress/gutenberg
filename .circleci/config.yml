@@ -96,7 +96,10 @@ jobs:
             git submodule update --recursive
       - yarn-install
       - react-native-install
-      - run: yes | sdkmanager --licenses && sdkmanager --update
+      - run:
+          name: Accept Licenses
+          command: yes | sdkmanager --licenses && sdkmanager --update
+          background: true
       - run:
           name: Set Environment Variables
           command: |
@@ -136,10 +139,11 @@ jobs:
     - run:
         name: Zip up .app file
         command: |
-          cd ./ios/build/Build/Products/Release-iphonesimulator/
+          cp ./ios/main.jsbundle ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle
+          cd ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/
           zip -r ./Gutenberg.app.zip ./gutenberg.app
-          mv ./Gutenberg.app.zip ../../../../../Gutenberg.app.zip
-          cd ../../../../../
+          mv ./Gutenberg.app.zip ../../../../../../Gutenberg.app.zip
+          cd ../../../../../../
     - run:
         name: Upload .app to sauce labs
         command: |
