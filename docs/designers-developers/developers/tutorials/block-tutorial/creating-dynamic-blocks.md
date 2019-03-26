@@ -139,45 +139,47 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-s
 {% codetabs %}
 {% ES5 %}
 ```js
-// myblock.js
+( function( blocks, element, components ) {
 
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	ServerSideRender = wp.components.ServerSideRender;
+	var el = element.createElement,
+	registerBlockType = blocks.registerBlockType,
+	ServerSideRender = components.ServerSideRender;
 
-registerBlockType( 'my-plugin/latest-post', {
-	title: 'Latest Post',
-	icon: 'megaphone',
-	category: 'widgets',
+	registerBlockType( 'gutenberg-examples/example-05-dynamic', {
+		title: 'Example: last post',
+		icon: 'megaphone',
+		category: 'widgets',
 
-	edit: function( props ) {
-		// ensure the block attributes matches this plugin's name
-		return (
-			el(ServerSideRender, {
-				block: "my-plugin/latest-post",
-				attributes:  props.attributes
-			})
-		);
-	},
-} );
+		edit: function( props ) {
+
+			return (
+				el(ServerSideRender, {
+					block: "gutenberg-examples/example-05-dynamic",
+					attributes: props.attributes
+				} )
+			);
+		},
+	} );
+}(
+	window.wp.blocks,
+	window.wp.element,
+	window.wp.components,
+) );
 ```
 {% ESNext %}
 ```js
-// myblock.js
-
 const { registerBlockType } = wp.blocks;
 const { ServerSideRender } = wp.components;
 
-registerBlockType( 'my-plugin/latest-post', {
-	title: 'Latest Post',
+registerBlockType( 'gutenberg-examples/example-05-dynamic', {
+	title: 'Example: last post',
 	icon: 'megaphone',
 	category: 'widgets',
 
 	edit: function( props ) {
-		// ensure the block attributes matches this plugin's name
 		return (
 			<ServerSideRender
-				block="my-plugin/latest-post"
+				block="gutenberg-examples/example-05-dynamic"
 				attributes={ props.attributes }
 			/>
 		);
@@ -186,4 +188,4 @@ registerBlockType( 'my-plugin/latest-post', {
 ```
 {% end %}
 
-The PHP code is the same as above and is automatically handled through the WP REST API.
+Note that this code uses the `wp.components` utility but not `wp.data`. Make sure to update the `wp-data` dependency to `wp-compononents` in the PHP code.
