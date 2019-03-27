@@ -7,6 +7,7 @@ import {
 	isNil,
 	omit,
 	get,
+	pickBy,
 } from 'lodash';
 import memize from 'memize';
 
@@ -43,6 +44,7 @@ import {
 import { decodeEntities } from '@wordpress/html-entities';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -85,6 +87,10 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 const globalStyle = document.createElement( 'style' );
 
 document.head.appendChild( globalStyle );
+
+function pickFormatValueProps( props ) {
+	return pickBy( props, ( value, key ) => key.startsWith( 'format_value' ) );
+}
 
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
@@ -186,6 +192,24 @@ export class RichText extends Component {
 		return { formats, replacements, text, start, end, selectedFormat };
 	}
 
+	/**
+	 * Get the current record with lingering selection state. In some cases,
+	 * lingering selection state after blur is needed to be able to format the
+	 * selected text.
+	 *
+	 * @return {Object} The current record (value and lingering selection).
+	 */
+	getLingeringRecord() {
+		const record = this.getRecord();
+		const { lastState = {} } = this;
+
+		return {
+			...record,
+			start: record.start ? record.start : lastState.start,
+			end: record.end ? record.end : lastState.end,
+		};
+	}
+
 	createRecord() {
 		const selection = getSelection();
 		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
@@ -200,9 +224,9 @@ export class RichText extends Component {
 		} );
 	}
 
-	applyRecord() {
+	applyRecord( value ) {
 		apply( {
-			value: this.getRecord(),
+			value,
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
@@ -396,7 +420,7 @@ export class RichText extends Component {
 				inputType.indexOf( 'format' ) === 0 ||
 				INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType )
 			) {
-				this.applyRecord();
+				this.applyRecord( this.getRecord() );
 				return;
 			}
 		}
@@ -906,6 +930,21 @@ export class RichText extends Component {
 		selection.addRange( range );
 	}
 
+	componentDidUpdate( prevProps ) {
+		let record = this.getRecord();
+
+		// To do: find a better way to refocus the field after annotation prop
+		// changes.
+		if ( ! isShallowEqual(
+			pickFormatValueProps( this.props ),
+			pickFormatValueProps( prevProps )
+		) ) {
+			record = this.getLingeringRecord();
+		}
+
+		this.applyRecord( record );
+	}
+
 	onPointerUp() {
 		delete this.preventSelectionUpdate;
 	}
@@ -1023,19 +1062,10 @@ export class RichText extends Component {
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
 		const classes = classnames( wrapperClassName, 'editor-rich-text block-editor-rich-text' );
 		const record = this.getRecord();
-		const { lastState = {} } = this;
-		const lingeringRecord = {
-			...record,
-			// We need lingering state after blur to be able to format with
-			// buttons.
-			start: record.start ? record.start : lastState.start,
-			end: record.end ? record.end : lastState.end,
-		};
+		const lingeringRecord = this.getLingeringRecord();
 
 		return (
-			<div className={ classes }
-				onFocus={ this.setFocusedElement }
-			>
+			<div className={ classes } onFocus={ this.setFocusedElement }>
 				{ isSelected && this.multilineTag === 'li' && (
 					<ListEdit
 						onTagNameChange={ onTagNameChange }
@@ -1067,7 +1097,6 @@ export class RichText extends Component {
 								style={ style }
 								record={ record }
 								valueToEditableHTML={ this.valueToEditableHTML }
-								reconcileInnerDom={ this.applyRecord }
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-label={ placeholder }
 								aria-autocomplete="list"
