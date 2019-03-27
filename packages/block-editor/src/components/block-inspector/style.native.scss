@@ -1,0 +1,29 @@
+/** @format */
+
+.toolbar {
+	flex-direction: row;
+	height: 44px;
+	align-items: flex-start;
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+.spacer {
+	flex-grow: 1;
+}
+
+.button {
+	width: 44px;
+	height: 44px;
+	justify-content: center;
+	align-items: center;
+}
+
+.icon {
+	color: $toolbar-button;
+	fill: currentColor;
+}
+
+.iconDisabled {
+	color: $toolbar-button-disabled;
+}

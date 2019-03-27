@@ -9,7 +9,11 @@ import { View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { BottomSheet } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import BottomSheet from '../bottom-sheet';
 
 export default class Picker extends Component {
 	constructor() {

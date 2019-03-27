@@ -6,12 +6,12 @@ import { TouchableOpacity, Text, View, TextInput, I18nManager } from 'react-nati
 /**
  * WordPress dependencies
  */
-import { Dashicon } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import Dashicon from '../../dashicon';
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
 

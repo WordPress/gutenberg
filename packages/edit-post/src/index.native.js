@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
+import '@wordpress/block-editor';
 import '@wordpress/notices';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { unregisterBlockType } from '@wordpress/blocks';

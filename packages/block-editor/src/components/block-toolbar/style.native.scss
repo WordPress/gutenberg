@@ -1,0 +1,20 @@
+.container {
+	height: 44;
+	flex-direction: row;
+	background-color: $white;
+	border-top-color: #e9eff3;
+	border-top-width: 1;
+}
+
+.scrollableContent {
+	flex-grow: 1; // Fixes RTL issue on Android.
+}
+
+.keyboardHideContainer {
+	padding-right: 0;
+	padding-left: 0;
+	padding-top: 4px;
+	width: 44;
+	justify-content: center;
+	align-items: center;
+}

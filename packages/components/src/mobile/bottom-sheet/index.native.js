@@ -17,7 +17,7 @@ import styles from './styles.scss';
 import Button from './button';
 import Cell from './cell';
 import PickerCell from './picker-cell';
-import KeyboardAvoidingView from './keyboard-avoiding-view';
+import KeyboardAvoidingView from '../keyboard-avoiding-view';
 
 class BottomSheet extends Component {
 	constructor() {

@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 
 // Post Related Components
 export { default as PostTitle } from './post-title';

@@ -17,19 +17,20 @@ import {
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import {
 	Toolbar,
 	ToolbarButton,
 	Spinner,
 	Dashicon,
+	BottomSheet,
+	Picker,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
 	RichText,
 	BlockControls,
 	InspectorControls,
-	BottomSheet,
-	Picker,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -53,7 +54,7 @@ const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_libr
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
 
-class ImageEdit extends React.Component {
+class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
 

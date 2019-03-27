@@ -9,9 +9,9 @@ import { Switch, Platform } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { BottomSheet } from '@wordpress/block-editor';
 import { prependHTTP } from '@wordpress/url';
 import {
+	BottomSheet,
 	withSpokenMessages,
 } from '@wordpress/components';
 import {

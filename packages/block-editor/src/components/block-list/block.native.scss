@@ -1,0 +1,40 @@
+/** @format */
+
+.blockCode {
+	font-family: $default-monospace-font;
+}
+
+.blockText {
+	min-height: 50;
+}
+
+.blockHolder {
+	flex: 1 1 auto;
+}
+
+.blockContainer {
+	background-color: $white;
+	padding-left: 16;
+	padding-right: 16;
+	padding-top: 12;
+	padding-bottom: 12;
+}
+
+.blockContainerFocused {
+	background-color: $white;
+	padding-left: 16;
+	padding-right: 16;
+	padding-top: 12;
+	padding-bottom: 0; // will be flushed into inline toolbar height
+}
+
+.blockTitle {
+	background-color: $gray;
+	padding-left: 8;
+	padding-top: 4;
+	padding-bottom: 4;
+}
+
+.aztec_container {
+	flex: 1;
+}
