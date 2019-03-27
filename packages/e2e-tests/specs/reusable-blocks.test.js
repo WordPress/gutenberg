@@ -8,6 +8,8 @@ import {
 	pressKeyWithModifier,
 	searchForBlock,
 	getEditedPostContent,
+	publishPost,
+	clickBlockAppender,
 } from '@wordpress/e2e-test-utils';
 
 function waitForAndAcceptDialog() {
@@ -264,5 +266,55 @@ describe( 'Reusable Blocks', () => {
 
 		// Check that we have two paragraph blocks on the page
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'can save and render embed blocks as reusable blocks', async () => {
+		await createNewPost();
+
+		// Create a post we can use to test embedding.
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Hello there!' );
+		await publishPost();
+		await page.waitForSelector( '#inspector-text-control-0' );
+		const postUrl = await page.$eval( '#inspector-text-control-0', ( el ) => el.value );
+		await createNewPost();
+		await clickBlockAppender();
+		await page.keyboard.type( '/WordPress' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( postUrl );
+		await page.keyboard.press( 'Enter' );
+
+		// Navigate to the WordPress block.
+		await page.click( '[aria-label="Block Navigation"]' );
+		const blockMenuItem = ( await page.$x( "//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'WordPress')]" ) )[ 0 ];
+		await blockMenuItem.click();
+		await clickBlockToolbarButton( 'More options' );
+
+		// Convert it to a reusable block.
+		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
+		await convertButton.click();
+
+		// Wait for creation to finish.
+		await page.waitForXPath(
+			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+		);
+
+		// Save the reusable block
+		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
+		await saveButton.click();
+
+		// Wait for saving to finish
+		await page.waitForXPath( '//button[text()="Edit"]' );
+
+		// Check that we have a reusable block on the page.
+		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
+		expect( block ).not.toBeNull();
+		await publishPost();
+		await page.waitForSelector( '#inspector-text-control-0' );
+		const postWithEmbedUrl = await page.$eval( '#inspector-text-control-0', ( el ) => el.value );
+
+		// Check the embed shows up on the front end of the site.
+		await page.goto( postWithEmbedUrl );
+		await page.waitForSelector( '.wp-embedded-content' );
 	} );
 } );
