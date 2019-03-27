@@ -77,4 +77,4 @@ Check out the [_Loading JavaScript_](/docs/designers-developers/developers/tutor
 
 The block editor offers a complete API for generating notices. The official documentation is a great place to review what's possible.
 
-For a full list of the available actions and selectors, refer to the [Notices Data Handbook](/docs/designers-developers/developers/data/data-core-notices.md) page.
+For a full list of the available actions and selectors, refer to the [Notices Data Handbook](/docs/data/data-core-notices.md) page.

@@ -105,7 +105,7 @@ This is how the code changes from the previous section:
 
 * The `MetaBlockField` function has now a `props` argument as input. It contains the data object returned by the `mapSelectToProps` function, which it uses to initialize its value property.
 * The component rendered within the `div` element was also updated, the plugin now uses `MetaBlockFieldWithData`. This will be updated every time the original data changes.
-* [getEditedPostAttribute](/docs/designers-developers/developers/data/data-core-editor.md#geteditedpostattribute) is used to retrieve data instead of [getCurrentPost](/docs/designers-developers/developers/data/data-core-editor.md#getcurrentpost) because it returns the most recent values of the post, including user editions that haven't been yet saved.
+* [getEditedPostAttribute](/docs/data/data-core-editor.md#geteditedpostattribute) is used to retrieve data instead of [getCurrentPost](/docs/data/data-core-editor.md#getcurrentpost) because it returns the most recent values of the post, including user editions that haven't been yet saved.
 
 Update the code and open the sidebar. The input's content is no longer `Initial value` but a void string. Users can't type values yet, but let's check that the component is updated if the value in the store changes. Open the browser's console, execute
 

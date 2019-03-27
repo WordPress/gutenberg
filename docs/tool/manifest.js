@@ -58,7 +58,7 @@ function getDataManifest( parsedNamespaces ) {
 		return {
 			title: parsedNamespace.title,
 			slug,
-			markdown_source: `${ baseRepoUrl }/docs/designers-developers/developers/data/${ slug }.md`,
+			markdown_source: `${ baseRepoUrl }/docs/data/${ slug }.md`,
 			parent: 'data',
 		};
 	} );

@@ -72,12 +72,6 @@
 		"parent": "developers"
 	},
 	{
-		"title": "Data Module Reference",
-		"slug": "data",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/README.md",
-		"parent": "developers"
-	},
-	{
 		"title": "Packages",
 		"slug": "packages",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/packages.md",
@@ -508,6 +502,12 @@
 		"slug": "block-annotations",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/block-api/block-annotations.md",
 		"parent": "block-api"
+	},
+	{
+		"title": "Data Module Reference",
+		"slug": "data",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/README.md",
+		"parent": null
 	},
 	{
 		"title": "@wordpress/a11y",
@@ -1244,55 +1244,55 @@
 	{
 		"title": "WordPress Core Data",
 		"slug": "data-core",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core.md",
 		"parent": "data"
 	},
 	{
 		"title": "Annotations",
 		"slug": "data-core-annotations",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-annotations.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-annotations.md",
 		"parent": "data"
 	},
 	{
 		"title": "Block Types Data",
 		"slug": "data-core-blocks",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-blocks.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-blocks.md",
 		"parent": "data"
 	},
 	{
 		"title": "The Block Editor’s Data",
 		"slug": "data-core-block-editor",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-block-editor.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-block-editor.md",
 		"parent": "data"
 	},
 	{
 		"title": "The Post Editor’s Data",
 		"slug": "data-core-editor",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-editor.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-editor.md",
 		"parent": "data"
 	},
 	{
 		"title": "The Editor’s UI Data",
 		"slug": "data-core-edit-post",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-edit-post.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-edit-post.md",
 		"parent": "data"
 	},
 	{
 		"title": "Notices Data",
 		"slug": "data-core-notices",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-notices.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-notices.md",
 		"parent": "data"
 	},
 	{
 		"title": "The NUX (New User Experience) Data",
 		"slug": "data-core-nux",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-nux.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-nux.md",
 		"parent": "data"
 	},
 	{
 		"title": "The Viewport Data",
 		"slug": "data-core-viewport",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-viewport.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-viewport.md",
 		"parent": "data"
 	}
 ]

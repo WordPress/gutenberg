@@ -12,7 +12,7 @@ register_meta( 'post', 'sidebar_plugin_meta_block_field', array(
 ) );
 ```
 
-To make sure the field has been loaded, query the block editor [internal data structures](/docs/designers-developers/developers/data/), also known as _stores_. Open your browser's console, and execute this piece of code:
+To make sure the field has been loaded, query the block editor [internal data structures](/docs/data/), also known as _stores_. Open your browser's console, and execute this piece of code:
 
 ```js
 wp.data.select( 'core/editor' ).getCurrentPost().meta;
