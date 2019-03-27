@@ -168,7 +168,7 @@ export function createRegistry( storeConfigs = {} ) {
 
 	registerGenericStore( 'core/data', createCoreDataStore( registry ) );
 
-	Object.entries( storeConfigs ).map(
+	Object.entries( storeConfigs ).forEach(
 		( [ name, config ] ) => registry.registerStore( name, config )
 	);
 
