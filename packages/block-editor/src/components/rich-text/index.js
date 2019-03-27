@@ -821,7 +821,7 @@ export class RichText extends Component {
 		}
 
 		// Wait for boundary class to be added.
-		setTimeout( () => this.recalculateBoundaryStyle() );
+		this.props.setTimeout( () => this.recalculateBoundaryStyle() );
 
 		if ( newSelectedFormat !== selectedFormat ) {
 			this.applyRecord( { ...value, selectedFormat: newSelectedFormat } );
