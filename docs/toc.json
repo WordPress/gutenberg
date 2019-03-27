@@ -3,12 +3,6 @@
 	{"docs/designers-developers/readme.md": [
 		{"docs/designers-developers/key-concepts.md": []},
 		{"docs/designers-developers/developers/README.md": [
-			{"docs/designers-developers/developers/filters/README.md": [
-				{"docs/designers-developers/developers/filters/block-filters.md": []},
-				{"docs/designers-developers/developers/filters/editor-filters.md": []},
-				{"docs/designers-developers/developers/filters/parser-filters.md": []},
-				{"docs/designers-developers/developers/filters/autocomplete-filters.md": []}
-			]},
 			{"docs/designers-developers/developers/internationalization.md": []},
 			{"docs/designers-developers/developers/accessibility.md": []},
 			{"docs/designers-developers/developers/feature-flags.md": []},
@@ -100,5 +94,11 @@
 		{"docs/block-api/block-templates.md": []},
 		{"docs/block-api/block-annotations.md": []}
 	]},
-	{"docs/data/README.md": "{{data}}"}
+	{"docs/data/README.md": "{{data}}"},
+	{"docs/filters/README.md": [
+		{"docs/filters/block-filters.md": []},
+		{"docs/filters/editor-filters.md": []},
+		{"docs/filters/parser-filters.md": []},
+		{"docs/filters/autocomplete-filters.md": []}
+	]}
 ]

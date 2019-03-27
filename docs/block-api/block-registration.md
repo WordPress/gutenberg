@@ -66,7 +66,7 @@ The core provided categories are:
 category: 'widgets',
 ```
 
-Plugins and Themes can also register [custom block categories](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories).
+Plugins and Themes can also register [custom block categories](/docs/filters/block-filters.md#managing-block-categories).
 
 #### Icon (optional)
 
@@ -138,7 +138,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/filters/block-filters.md#block-style-variations) for existing blocks.
 
 #### Attributes (optional)
 

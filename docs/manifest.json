@@ -24,36 +24,6 @@
 		"parent": "designers-developers"
 	},
 	{
-		"title": "Filter Reference",
-		"slug": "filters",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/filters/README.md",
-		"parent": "developers"
-	},
-	{
-		"title": "Block Filters",
-		"slug": "block-filters",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/filters/block-filters.md",
-		"parent": "filters"
-	},
-	{
-		"title": "Editor Filters (Experimental)",
-		"slug": "editor-filters",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/filters/editor-filters.md",
-		"parent": "filters"
-	},
-	{
-		"title": "Parser Filters",
-		"slug": "parser-filters",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/filters/parser-filters.md",
-		"parent": "filters"
-	},
-	{
-		"title": "Autocomplete",
-		"slug": "autocomplete-filters",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/filters/autocomplete-filters.md",
-		"parent": "filters"
-	},
-	{
 		"title": "Internationalization",
 		"slug": "internationalization",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/internationalization.md",
@@ -508,6 +478,36 @@
 		"slug": "data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/README.md",
 		"parent": null
+	},
+	{
+		"title": "Filter Reference",
+		"slug": "filters",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/filters/README.md",
+		"parent": null
+	},
+	{
+		"title": "Block Filters",
+		"slug": "block-filters",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/filters/block-filters.md",
+		"parent": "filters"
+	},
+	{
+		"title": "Editor Filters (Experimental)",
+		"slug": "editor-filters",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/filters/editor-filters.md",
+		"parent": "filters"
+	},
+	{
+		"title": "Parser Filters",
+		"slug": "parser-filters",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/filters/parser-filters.md",
+		"parent": "filters"
+	},
+	{
+		"title": "Autocomplete",
+		"slug": "autocomplete-filters",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/filters/autocomplete-filters.md",
+		"parent": "filters"
 	},
 	{
 		"title": "@wordpress/a11y",
