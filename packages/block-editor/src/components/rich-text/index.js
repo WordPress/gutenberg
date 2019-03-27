@@ -6,7 +6,6 @@ import {
 	find,
 	isNil,
 	omit,
-	get,
 	pickBy,
 } from 'lodash';
 import memize from 'memize';
@@ -88,8 +87,8 @@ const globalStyle = document.createElement( 'style' );
 
 document.head.appendChild( globalStyle );
 
-function pickFormatValueProps( props ) {
-	return pickBy( props, ( value, key ) => key.startsWith( 'format_value' ) );
+function pickPropsByPrefix( props, prefix ) {
+	return pickBy( props, ( value, key ) => key.startsWith( prefix ) );
 }
 
 export class RichText extends Component {
@@ -219,7 +218,7 @@ export class RichText extends Component {
 			range,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			prepareEditableTree: this.props.prepareEditableTree,
+			prepareEditableTree: Object.values( pickPropsByPrefix( this.props, 'format_prepare_functions' ) ),
 			__unstableIsEditableTree: true,
 		} );
 	}
@@ -230,7 +229,7 @@ export class RichText extends Component {
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			prepareEditableTree: this.props.prepareEditableTree,
+			prepareEditableTree: Object.values( pickPropsByPrefix( this.props, 'format_prepare_functions' ) ),
 			__unstableDomOnly: this.preventSelectionUpdate,
 		} );
 	}
@@ -545,9 +544,10 @@ export class RichText extends Component {
 	 * @param {string} text    The text of the latest rich-text value.
 	 */
 	onChangeEditableValue( { formats, text } ) {
-		get( this.props, [ 'onChangeEditableValue' ], [] ).forEach( ( eventHandler ) => {
-			eventHandler( formats, text );
-		} );
+		Object.values( pickPropsByPrefix( this.props, 'format_on_change_functions_' ) )
+			.forEach( ( eventHandler ) => {
+				eventHandler( formats, text );
+			} );
 	}
 
 	/**
@@ -931,13 +931,14 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		const prefix = 'format_prepare_props_';
 		let record = this.getRecord();
 
 		// To do: find a better way to refocus the field after annotation prop
 		// changes.
 		if ( ! isShallowEqual(
-			pickFormatValueProps( this.props ),
-			pickFormatValueProps( prevProps )
+			pickPropsByPrefix( this.props, prefix ),
+			pickPropsByPrefix( prevProps, prefix )
 		) ) {
 			record = this.getLingeringRecord();
 		}
@@ -986,7 +987,7 @@ export class RichText extends Component {
 		return unstableToDom( {
 			value,
 			multilineTag: this.multilineTag,
-			prepareEditableTree: this.props.prepareEditableTree,
+			prepareEditableTree: Object.values( pickPropsByPrefix( this.props, 'format_prepare_functions' ) ),
 		} ).body.innerHTML;
 	}
 

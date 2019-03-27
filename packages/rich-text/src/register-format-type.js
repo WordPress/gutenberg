@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { mapKeys } from 'lodash';
-import memize from 'memize';
 
 /**
  * WordPress dependencies
@@ -10,17 +9,6 @@ import memize from 'memize';
 import { select, dispatch, withSelect, withDispatch } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { compose } from '@wordpress/compose';
-
-/**
- * Shared reference to an empty array for cases where it is important to avoid
- * returning a new array reference on every invocation, as in a connected or
- * other pure component which performs `shouldComponentUpdate` check on props.
- * This should be used as a last resort, since the normalized data should be
- * maintained by the reducer result in state.
- *
- * @type {Array}
- */
-const EMPTY_ARRAY = [];
 
 function getPropsByPrefix( props, prefix ) {
 	return Object.keys( props ).reduce( ( accumulator, key ) => {
@@ -145,42 +133,34 @@ export function registerFormatType( name, settings ) {
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
 
-	const getFunctionStackMemoized = memize( ( previousStack = EMPTY_ARRAY, newFunction ) => {
-		return [
-			...previousStack,
-			newFunction,
-		];
-	} );
-
-	if (
-		settings.__experimentalCreatePrepareEditableTree
-	) {
+	if ( settings.__experimentalCreatePrepareEditableTree ) {
 		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
-			const selectPrefix = `format_value_(${ name })_`;
-			const dispatchPrefix = `format_on_change_(${ name })_`;
+			const selectPrefix = `format_prepare_props_(${ name })_`;
+			const dispatchPrefix = `format_on_change_props_(${ name })_`;
 
 			const Component = ( props ) => {
 				const newProps = { ...props };
+				const propsByPrefix = {
+					...getPropsByPrefix( props, selectPrefix ),
+					...getPropsByPrefix( props, dispatchPrefix ),
+				};
+				const args = {
+					richTextIdentifier: props.identifier,
+					blockClientId: props.clientId,
+				};
 
-				newProps.prepareEditableTree = getFunctionStackMemoized(
-					props.prepareEditableTree,
-					settings.__experimentalCreatePrepareEditableTree( getPropsByPrefix( props, selectPrefix ), {
-						richTextIdentifier: props.identifier,
-						blockClientId: props.clientId,
-					} )
-				);
+				newProps[ `format_prepare_functions_(${ name })` ] =
+					settings.__experimentalCreatePrepareEditableTree(
+						propsByPrefix,
+						args
+					);
 
 				if ( settings.__experimentalCreateOnChangeEditableValue ) {
-					newProps.onChangeEditableValue = getFunctionStackMemoized(
-						props.onChangeEditableValue,
-						settings.__experimentalCreateOnChangeEditableValue( {
-							...getPropsByPrefix( props, selectPrefix ),
-							...getPropsByPrefix( props, dispatchPrefix ),
-						}, {
-							richTextIdentifier: props.identifier,
-							blockClientId: props.clientId,
-						} )
-					);
+					newProps[ `format_on_change_functions_(${ name })` ] =
+						settings.__experimentalCreateOnChangeEditableValue(
+							propsByPrefix,
+							args
+						);
 				}
 
 				return <OriginalComponent { ...newProps } />;
