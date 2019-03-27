@@ -3,14 +3,6 @@
 	{"docs/designers-developers/readme.md": [
 		{"docs/designers-developers/key-concepts.md": []},
 		{"docs/designers-developers/developers/README.md": [
-			{"docs/designers-developers/developers/block-api/README.md": [
-				{"docs/designers-developers/developers/block-api/block-registration.md": []},
-				{"docs/designers-developers/developers/block-api/block-edit-save.md": []},
-				{"docs/designers-developers/developers/block-api/block-attributes.md": []},
-				{"docs/designers-developers/developers/block-api/block-deprecation.md": []},
-				{"docs/designers-developers/developers/block-api/block-templates.md": []},
-				{"docs/designers-developers/developers/block-api/block-annotations.md": []}
-			]},
 			{"docs/designers-developers/developers/filters/README.md": [
 				{"docs/designers-developers/developers/filters/block-filters.md": []},
 				{"docs/designers-developers/developers/filters/editor-filters.md": []},
@@ -100,5 +92,13 @@
 			{"docs/tutorials/format-api/2-toolbar-button.md": []},
 			{"docs/tutorials/format-api/3-apply-format.md": []}
 		]}
+	]},
+	{"docs/block-api/README.md": [
+		{"docs/block-api/block-registration.md": []},
+		{"docs/block-api/block-edit-save.md": []},
+		{"docs/block-api/block-attributes.md": []},
+		{"docs/block-api/block-deprecation.md": []},
+		{"docs/block-api/block-templates.md": []},
+		{"docs/block-api/block-annotations.md": []}
 	]}
 ]
