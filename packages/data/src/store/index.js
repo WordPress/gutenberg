@@ -36,6 +36,10 @@ function createCoreDataStore( registry ) {
 		},
 
 		subscribe() {
+			// There's no reasons to trigger any listener when we subscribe to this store
+			// because there's no state stored in this store that need to retrigger selectors
+			// if a change happens, the corresponding store where the tracking stated live
+			// would have already triggered a "subscribe" call.
 			return () => {};
 		},
 	};
