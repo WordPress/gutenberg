@@ -1,11 +1,65 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InnerBlocks } from '@wordpress/editor';
+import { InnerBlocks, BlockControls, BlockVerticalAlignmentToolbar } from '@wordpress/block-editor';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 export const name = 'core/column';
+
+const ColumnEdit = ( { attributes, updateAlignment } ) => {
+	const { verticalAlignment } = attributes;
+
+	const classes = classnames( 'block-core-columns', {
+		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+	} );
+
+	const onChange = ( alignment ) => updateAlignment( alignment );
+
+	return (
+		<div className={ classes }>
+			<BlockControls>
+				<BlockVerticalAlignmentToolbar
+					onChange={ onChange }
+					value={ verticalAlignment }
+				/>
+			</BlockControls>
+			<InnerBlocks templateLock={ false } />
+		</div>
+	);
+};
+
+const edit = compose(
+	withSelect( ( select, { clientId } ) => {
+		const { getBlockRootClientId } = select( 'core/editor' );
+
+		return {
+			parentColumsBlockClientId: getBlockRootClientId( clientId ),
+		};
+	} ),
+	withDispatch( ( dispatch, { clientId, parentColumsBlockClientId } ) => {
+		return {
+			updateAlignment( alignment ) {
+				// Update self...
+				dispatch( 'core/editor' ).updateBlockAttributes( clientId, {
+					verticalAlignment: alignment,
+				} );
+
+				// Reset Parent Columns Block
+				dispatch( 'core/editor' ).updateBlockAttributes( parentColumsBlockClientId, {
+					verticalAlignment: null,
+				} );
+			},
+		};
+	} )
+)( ColumnEdit );
 
 export const settings = {
 	title: __( 'Column' ),
@@ -18,17 +72,31 @@ export const settings = {
 
 	category: 'common',
 
+	attributes: {
+		verticalAlignment: {
+			type: 'string',
+		},
+	},
+
 	supports: {
 		inserter: false,
 		reusable: false,
 		html: false,
 	},
 
-	edit() {
-		return <InnerBlocks templateLock={ false } />;
-	},
+	edit,
 
-	save() {
-		return <div><InnerBlocks.Content /></div>;
+	save( { attributes } ) {
+		const { verticalAlignment } = attributes;
+		const wrapperClasses = classnames( {
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		} );
+
+		return (
+			<div className={ wrapperClasses }>
+				<InnerBlocks.Content />
+			</div>
+		);
 	},
 };
+

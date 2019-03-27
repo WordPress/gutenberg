@@ -21,9 +21,9 @@ export const settings = {
 
 	keywords: [ __( 'find' ) ],
 
-	edit,
-
-	save() {
-		return null;
+	supports: {
+		align: true,
 	},
+
+	edit,
 };

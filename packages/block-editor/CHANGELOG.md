@@ -1,4 +1,17 @@
-## 1.0.0 (Unreleased)
+## 2.0.0 (Unreleased)
+
+### New Features
+
+- Added the `addToGallery` property to the `MediaUpload` interface. The property allows users to open the media modal in the `gallery-library`instead of `gallery-edit` state.
+- Added the `addToGallery` property to the `MediaPlaceholder` component. The component passes the property to the `MediaUpload` component used inside the placeholder.
+- Added the `isAppender` property to the `MediaPlaceholder` component. The property changes the look of the placeholder to be adequate to scenarios where new files are added to an already existing set of files, e.g., adding files to a gallery.
+- Added the `dropZoneUIOnly` property to the `MediaPlaceholder` component. The property makes the `MediaPlaceholder` only render a dropzone without any other additional UI.
+
+### Breaking Changes
+
+- `CopyHandler` will now only catch cut/copy events coming from its `props.children`, instead of from anywhere in the `document`.
+
+## 1.0.0 (2019-03-06)
 
 ### New Features
 

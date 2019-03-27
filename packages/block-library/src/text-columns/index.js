@@ -15,7 +15,7 @@ import {
 	BlockAlignmentToolbar,
 	InspectorControls,
 	RichText,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import deprecated from '@wordpress/deprecated';
 
 export const name = 'core/text-columns';
@@ -114,6 +114,7 @@ export const settings = {
 							onChange={ ( value ) => setAttributes( { columns: value } ) }
 							min={ 2 }
 							max={ 4 }
+							required
 						/>
 					</PanelBody>
 				</InspectorControls>

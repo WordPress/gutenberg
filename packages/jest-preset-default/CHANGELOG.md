@@ -1,4 +1,4 @@
-## 4.0.0 (Unreleased)
+## 4.0.0 (2019-03-06)
 
 ### Breaking Changes
 
@@ -8,6 +8,7 @@
 ### Internal
 
 - The bundled `enzyme` dependency has been updated from requiring `^3.7.0` to requiring `^3.9.0` ([#13922](https://github.com/WordPress/gutenberg/pull/13922)).
+- The bundled `enzyme-adapter-react-16` dependency has been updated from requiring `^1.6.0` to requiring `^1.10.0` ([#13922](https://github.com/WordPress/gutenberg/pull/13922)).
 
 ## 3.0.3 (2018-11-20)
 

@@ -57,7 +57,7 @@ export default class PositionedAtSelection extends Component {
 		const { style } = this.state;
 
 		return (
-			<div className="editor-format-toolbar__selection-position" style={ style }>
+			<div className="editor-format-toolbar__selection-position block-editor-format-toolbar__selection-position" style={ style }>
 				{ children }
 			</div>
 		);

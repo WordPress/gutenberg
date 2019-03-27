@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, View, KeyboardAvoidingView, Platform, PanResponder, Dimensions } from 'react-native';
+import { Text, View, Platform, PanResponder, Dimensions } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
 
@@ -17,6 +17,7 @@ import styles from './styles.scss';
 import Button from './button';
 import Cell from './cell';
 import PickerCell from './picker-cell';
+import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 class BottomSheet extends Component {
 	constructor() {

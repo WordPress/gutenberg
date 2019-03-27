@@ -82,6 +82,8 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-01', {
 ```
 {% end %}
 
+_By now you should be able to see `Hello editor` in the admin side and `Hello saved content` on the frontend side._
+
 Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](/docs/designers-developers/developers/block-api/block-registration.md#icon-optional).
 
 A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name.

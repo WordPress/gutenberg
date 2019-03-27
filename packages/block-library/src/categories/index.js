@@ -20,30 +20,10 @@ export const settings = {
 
 	category: 'widgets',
 
-	attributes: {
-		displayAsDropdown: {
-			type: 'boolean',
-			default: false,
-		},
-		showHierarchy: {
-			type: 'boolean',
-			default: false,
-		},
-		showPostCounts: {
-			type: 'boolean',
-			default: false,
-		},
-	},
-
 	supports: {
 		align: true,
-		alignWide: false,
 		html: false,
 	},
 
 	edit,
-
-	save() {
-		return null;
-	},
 };

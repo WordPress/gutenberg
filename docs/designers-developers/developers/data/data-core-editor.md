@@ -718,11 +718,23 @@ Is the editor ready
 
 is Ready.
 
+### getEditorSettings
+
+Returns the post editor settings.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+The editor settings object.
+
 ## Actions
 
 ### setupEditor
 
-Returns an action object used in signalling that editor has initialized with
+Returns an action generator used in signalling that editor has initialized with
 the specified post object and editor settings.
 
 *Parameters*
@@ -749,6 +761,43 @@ post has been received, by initialization or autosave.
 
  * post: Autosave post object.
 
+### __experimentalRequestPostUpdateStart
+
+Optimistic action for dispatching that a post update request has started.
+
+*Parameters*
+
+ * options: null
+
+### __experimentalRequestPostUpdateSuccess
+
+Optimistic action for indicating that the request post update has completed
+successfully.
+
+*Parameters*
+
+ * data: The data for the action.
+ * data.previousPost: The previous post prior to update.
+ * data.post: The new post after update
+ * data.isRevision: Whether the post is a revision or not.
+ * data.options: Options passed through from the original
+                                     action dispatch.
+ * data.postType: The post type object.
+
+### __experimentalRequestPostUpdateFailure
+
+Optimistic action for indicating that the request post update has completed
+with a failure.
+
+*Parameters*
+
+ * data: The data for the action
+ * data.post: The post that failed updating.
+ * data.edits: The fields that were being updated.
+ * data.error: The error from the failed call.
+ * data.options: Options passed through from the original
+                               action dispatch.
+
 ### updatePost
 
 Returns an action object used in signalling that a patch of updates for the
@@ -760,7 +809,8 @@ latest version of the post have been received.
 
 ### setupEditorState
 
-Returns an action object used to setup the editor state when first opening an editor.
+Returns an action object used to setup the editor state when first opening
+an editor.
 
 *Parameters*
 
@@ -775,18 +825,34 @@ been edited.
 
  * edits: Post attributes to edit.
 
-### savePost
+### __experimentalOptimisticUpdatePost
 
-Returns an action object to save the post.
+Returns action object produced by the updatePost creator augmented by
+an optimist option that signals optimistically applying updates.
 
 *Parameters*
 
- * options: Options for the save.
- * options.isAutosave: Perform an autosave if true.
+ * edits: Updated post fields.
+
+### savePost
+
+Action generator for saving the current post in the editor.
+
+*Parameters*
+
+ * options: null
+
+### refreshPost
+
+Action generator for handling refreshing the current post.
+
+### trashPost
+
+Action generator for trashing the current post in the editor.
 
 ### autosave
 
-Returns an action object used in signalling that the post should autosave.
+Action generator used in signalling that the post should autosave.
 
 *Parameters*
 
@@ -864,7 +930,8 @@ to be updated.
 
 ### __experimentalConvertBlockToStatic
 
-Returns an action object used to convert a reusable block into a static block.
+Returns an action object used to convert a reusable block into a static
+block.
 
 *Parameters*
 
@@ -872,7 +939,8 @@ Returns an action object used to convert a reusable block into a static block.
 
 ### __experimentalConvertBlockToReusable
 
-Returns an action object used to convert a static block into a reusable block.
+Returns an action object used to convert a static block into a reusable
+block.
 
 *Parameters*
 
@@ -880,11 +948,13 @@ Returns an action object used to convert a static block into a reusable block.
 
 ### enablePublishSidebar
 
-Returns an action object used in signalling that the user has enabled the publish sidebar.
+Returns an action object used in signalling that the user has enabled the
+publish sidebar.
 
 ### disablePublishSidebar
 
-Returns an action object used in signalling that the user has disabled the publish sidebar.
+Returns an action object used in signalling that the user has disabled the
+publish sidebar.
 
 ### lockPostSaving
 
@@ -910,3 +980,11 @@ Returns an action object used to signal that the blocks have been updated.
 
  * blocks: Block Array.
  * options: Optional options.
+
+### updateEditorSettings
+
+Returns an action object used in signalling that the post editor settings have been updated.
+
+*Parameters*
+
+ * settings: Updated settings

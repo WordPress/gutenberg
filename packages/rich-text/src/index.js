@@ -8,6 +8,7 @@ export { charAt } from './char-at';
 export { concat } from './concat';
 export { create } from './create';
 export { getActiveFormat } from './get-active-format';
+export { getActiveObject } from './get-active-object';
 export { getSelectionEnd } from './get-selection-end';
 export { getSelectionStart } from './get-selection-start';
 export { getTextContent } from './get-text-content';

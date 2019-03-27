@@ -17,7 +17,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InspectorControls,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
@@ -119,6 +119,7 @@ class RSSEdit extends Component {
 							onChange={ ( value ) => setAttributes( { itemsToShow: value } ) }
 							min={ DEFAULT_MIN_ITEMS }
 							max={ DEFAULT_MAX_ITEMS }
+							required
 						/>
 						<ToggleControl
 							label={ __( 'Display author' ) }
@@ -142,6 +143,7 @@ class RSSEdit extends Component {
 								onChange={ ( value ) => setAttributes( { excerptLength: value } ) }
 								min={ 10 }
 								max={ 100 }
+								required
 							/>
 						}
 						{ blockLayout === 'grid' &&
@@ -151,6 +153,7 @@ class RSSEdit extends Component {
 								onChange={ ( value ) => setAttributes( { columns: value } ) }
 								min={ 2 }
 								max={ 6 }
+								required
 							/>
 						}
 					</PanelBody>

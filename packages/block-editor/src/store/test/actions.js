@@ -2,32 +2,34 @@
  * Internal dependencies
  */
 import {
-	replaceBlocks,
-	startTyping,
-	stopTyping,
+	clearSelectedBlock,
 	enterFormattedText,
 	exitFormattedText,
-	toggleSelection,
-	resetBlocks,
-	updateBlockAttributes,
-	updateBlock,
-	selectBlock,
-	selectPreviousBlock,
-	startMultiSelect,
-	stopMultiSelect,
-	multiSelect,
-	clearSelectedBlock,
-	replaceBlock,
+	hideInsertionPoint,
 	insertBlock,
 	insertBlocks,
-	showInsertionPoint,
-	hideInsertionPoint,
 	mergeBlocks,
-	removeBlocks,
+	multiSelect,
 	removeBlock,
+	removeBlocks,
+	replaceBlock,
+	replaceBlocks,
+	replaceInnerBlocks,
+	resetBlocks,
+	selectBlock,
+	selectPreviousBlock,
+	showInsertionPoint,
+	startMultiSelect,
+	startTyping,
+	stopMultiSelect,
+	stopTyping,
 	toggleBlockMode,
+	toggleSelection,
+	updateBlock,
+	updateBlockAttributes,
 	updateBlockListSettings,
 } from '../actions';
+import { select } from '../controls';
 
 describe( 'actions', () => {
 	describe( 'resetBlocks', () => {
@@ -218,6 +220,10 @@ describe( 'actions', () => {
 					type: 'REMOVE_BLOCKS',
 					clientIds,
 				},
+				select(
+					'core/block-editor',
+					'getBlockCount',
+				),
 			] );
 		} );
 	} );
@@ -234,10 +240,14 @@ describe( 'actions', () => {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				},
+				select(
+					'core/block-editor',
+					'getBlockCount',
+				),
 			] );
 		} );
 
-		it( 'should return REMOVE_BLOCKS action, opting out of remove previous', () => {
+		it( 'should return REMOVE_BLOCKS action, opting out of select previous', () => {
 			const clientId = 'myclientid';
 
 			const actions = Array.from( removeBlock( clientId, false ) );
@@ -247,6 +257,10 @@ describe( 'actions', () => {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				},
+				select(
+					'core/block-editor',
+					'getBlockCount',
+				),
 			] );
 		} );
 	} );
@@ -330,6 +344,32 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
 				clientId: 'chicken',
 				settings: { chicken: 'ribs' },
+			} );
+		} );
+	} );
+
+	describe( 'replaceInnerBlocks', () => {
+		const block = {
+			clientId: 'ribs',
+		};
+
+		it( 'should return the REPLACE_INNER_BLOCKS action with default values set', () => {
+			expect( replaceInnerBlocks( 'root', [ block ] ) ).toEqual( {
+				type: 'REPLACE_INNER_BLOCKS',
+				blocks: [ block ],
+				rootClientId: 'root',
+				time: expect.any( Number ),
+				updateSelection: true,
+			} );
+		} );
+
+		it( 'should return the REPLACE_INNER_BLOCKS action with updateSelection false', () => {
+			expect( replaceInnerBlocks( 'root', [ block ], false ) ).toEqual( {
+				type: 'REPLACE_INNER_BLOCKS',
+				blocks: [ block ],
+				rootClientId: 'root',
+				time: expect.any( Number ),
+				updateSelection: false,
 			} );
 		} );
 	} );

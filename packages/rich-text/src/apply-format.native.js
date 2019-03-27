@@ -23,11 +23,13 @@ import { normaliseFormats } from './normalise-formats';
  * @return {Object} A new value with the format applied.
  */
 export function applyFormat(
-	{ formats: currentFormats, formatPlaceholder, text, start, end },
+	value,
 	formats,
-	startIndex = start,
-	endIndex = end
+	startIndex = value.start,
+	endIndex = value.end
 ) {
+	const { formats: currentFormats, formatPlaceholder, start } = value;
+
 	if ( ! Array.isArray( formats ) ) {
 		formats = [ formats ];
 	}
@@ -40,10 +42,8 @@ export function applyFormat(
 		// Follow the same logic as in getActiveFormat: placeholderFormats has priority over previousFormats
 		const activeFormats = ( placeholderFormats ? placeholderFormats : previousFormats ) || [];
 		return {
+			...value,
 			formats: currentFormats,
-			text,
-			start,
-			end,
 			formatPlaceholder: {
 				index: start,
 				formats: mergeFormats( activeFormats, formats ),
@@ -57,7 +57,7 @@ export function applyFormat(
 		applyFormats( newFormats, index, formats );
 	}
 
-	return normaliseFormats( { formats: newFormats, text, start, end } );
+	return normaliseFormats( { ...value, formats: newFormats } );
 }
 
 function mergeFormats( formats1, formats2 ) {

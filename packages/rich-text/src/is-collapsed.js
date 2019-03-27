@@ -6,8 +6,8 @@
  *
  * @param {Object} value The rich text value to check.
  *
- * @return {?boolean} True if the selection is collapsed, false if not,
- *                    undefined if there is no selection.
+ * @return {boolean|undefined} True if the selection is collapsed, false if not,
+ *                             undefined if there is no selection.
  */
 export function isCollapsed( { start, end } ) {
 	if ( start === undefined || end === undefined ) {

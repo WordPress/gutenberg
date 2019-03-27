@@ -10,7 +10,12 @@ import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { PanelBody } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { RichText, BlockControls, InspectorControls, AlignmentToolbar } from '@wordpress/editor';
+import {
+	RichText,
+	BlockControls,
+	InspectorControls,
+	AlignmentToolbar,
+} from '@wordpress/block-editor';
 
 export default function HeadingEdit( {
 	attributes,

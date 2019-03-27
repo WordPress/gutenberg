@@ -327,6 +327,18 @@ This position is to used to position the caret properly when the selected block 
 
 Selected block.
 
+### getSelectedBlockClientIds
+
+Returns the current selection set of block client IDs (multiselection or single selection).
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Multi-selected block client IDs.
+
 ### getMultiSelectedBlockClientIds
 
 Returns the current multi-selection set of block client IDs, or an empty
@@ -737,7 +749,7 @@ Returns the Block List settings of a block, if any exist.
 
 Block settings of the block if set.
 
-### getEditorSettings
+### getSettings
 
 Returns the editor settings.
 
@@ -980,6 +992,17 @@ specified client ID is to be removed.
  * selectPrevious: True if the previous block should be
                                 selected when a block is removed.
 
+### replaceInnerBlocks
+
+Returns an action object used in signalling that the inner blocks with the
+specified client ID should be replaced.
+
+*Parameters*
+
+ * rootClientId: Client ID of the block whose InnerBlocks will re replaced.
+ * blocks: Block objects to insert as new InnerBlocks
+ * updateSelection: If true block selection will be updated. If false, block selection will not change. Defaults to true.
+
 ### toggleBlockMode
 
 Returns an action object used to toggle the block editing mode between
@@ -1027,9 +1050,9 @@ Returns an action object that changes the nested settings of a given block.
                          being received.
  * settings: Object with the new settings for the nested block.
 
-### updateEditorSettings
+### updateSettings
 
-Returns an action object used in signalling that the editor settings have been updated.
+Returns an action object used in signalling that the block editor settings have been updated.
 
 *Parameters*
 

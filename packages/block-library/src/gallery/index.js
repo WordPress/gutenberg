@@ -8,7 +8,8 @@ import { filter, every, map, some } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { RichText, mediaUpload } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
+import { mediaUpload } from '@wordpress/editor';
 import { createBlobURL } from '@wordpress/blob';
 
 /**

@@ -79,10 +79,10 @@ describe( 'Container block without paragraph support', () => {
 		await insertBlock( 'Container without paragraph' );
 
 		// Open the specific appender used when there's no paragraph support.
-		await page.click( '.editor-inner-blocks .block-list-appender .block-list-appender__toggle' );
+		await page.click( '.block-editor-inner-blocks .block-list-appender .block-list-appender__toggle' );
 
 		// Insert an image block.
-		await page.click( '.editor-inserter__results button[aria-label="Image"]' );
+		await page.click( '.block-editor-inserter__results button[aria-label="Image"]' );
 
 		// Check the inserted content.
 		expect( await getEditedPostContent() ).toMatchSnapshot();

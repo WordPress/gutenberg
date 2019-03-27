@@ -145,7 +145,7 @@ class PostLockedModal extends Component {
 		const allPostsUrl = getWPAdminURL( 'edit.php', {
 			post_type: get( postType, [ 'slug' ] ),
 		} );
-		const allPostsLabel = get( postType, [ 'labels', 'all_items' ] );
+		const allPostsLabel = __( 'Exit the Editor' );
 		return (
 			<Modal
 				title={ isTakeover ? __( 'Someone else has taken over this post.' ) : __( 'This post is already being edited.' ) }
@@ -220,17 +220,14 @@ export default compose(
 			getCurrentPostId,
 			getActivePostLock,
 			getEditedPostAttribute,
-		} = select( 'core/editor' );
-		const {
 			getEditorSettings,
-		} = select( 'core/block-editor' );
+		} = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 		return {
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
 			user: getPostLockUser(),
 			postId: getCurrentPostId(),
-			// This setting should not live in the block-editor's store.
 			postLockUtils: getEditorSettings().postLockUtils,
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),

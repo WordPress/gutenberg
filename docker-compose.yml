@@ -4,13 +4,18 @@ services:
 
   wordpress:
     image: wordpress
+    restart: always
     ports:
       - 8888:80
     environment:
+      WORDPRESS_DB_HOST: mysql
       WORDPRESS_DB_PASSWORD: example
       ABSPATH: /usr/src/wordpress/
+      WORDPRESS_DEBUG: 1
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'SCRIPT_DEBUG', true );
     volumes:
-      - wordpress:/var/www/html
+      - wordpress_data:/var/www/html
       - .:/var/www/html/wp-content/plugins/gutenberg
       - ./packages/e2e-tests/plugins:/var/www/html/wp-content/plugins/gutenberg-test-plugins
       - ./packages/e2e-tests/mu-plugins:/var/www/html/wp-content/mu-plugins
@@ -19,9 +24,10 @@ services:
 
   cli:
     image: wordpress:cli
+    restart: always
     user: xfs
     volumes:
-      - wordpress:/var/www/html
+      - wordpress_data:/var/www/html
       - .:/var/www/html/wp-content/plugins/gutenberg
     depends_on:
       - mysql
@@ -29,12 +35,14 @@ services:
 
   mysql:
     image: mysql:5.7
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: wordpress_test
 
   wordpress_phpunit:
     image: chriszarate/wordpress-phpunit
+    restart: always
     environment:
       PHPUNIT_DB_HOST: mysql
     volumes:
@@ -45,30 +53,43 @@ services:
 
   composer:
     image: composer
+    restart: always
     volumes:
       - .:/app
 
   wordpress_e2e_tests:
     image: wordpress
+    restart: always
     ports:
       - 8889:80
     environment:
+      WORDPRESS_DB_HOST: mysql
       WORDPRESS_DB_NAME: wordpress_e2e_tests
       WORDPRESS_DB_PASSWORD: example
       ABSPATH: /usr/src/wordpress/
+      WORDPRESS_DEBUG: 1
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'SCRIPT_DEBUG', true );
     volumes:
-      - wordpress_e2e_tests:/var/www/html
+      - wordpress_e2e_tests_data:/var/www/html
       - .:/var/www/html/wp-content/plugins/gutenberg
       - ./packages/e2e-tests/plugins:/var/www/html/wp-content/plugins/gutenberg-test-plugins
       - ./packages/e2e-tests/mu-plugins:/var/www/html/wp-content/mu-plugins
+    depends_on:
+      - mysql
 
   cli_e2e_tests:
     image: wordpress:cli
+    restart: always
+    user: xfs
     volumes:
-      - wordpress_e2e_tests:/var/www/html
+      - wordpress_e2e_tests_data:/var/www/html
       - .:/var/www/html/wp-content/plugins/gutenberg
+    depends_on:
+      - mysql
+      - wordpress_e2e_tests
 
 volumes:
   testsuite:
-  wordpress:
-  wordpress_e2e_tests:
+  wordpress_data:
+  wordpress_e2e_tests_data:

@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { G, Path, SVG } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -23,22 +23,9 @@ export const settings = {
 	keywords: [ __( 'recent comments' ) ],
 
 	supports: {
+		align: true,
 		html: false,
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-
-		// TODO: Use consistent values across the app;
-		// see: https://github.com/WordPress/gutenberg/issues/7908.
-		if ( [ 'left', 'center', 'right', 'wide', 'full' ].includes( align ) ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit,
-
-	save() {
-		return null;
-	},
 };

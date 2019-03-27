@@ -7,7 +7,7 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
@@ -17,8 +17,6 @@ import { withInstanceId, compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import styles from './style.scss';
-
-const minHeight = 30;
 
 class PostTitle extends Component {
 	constructor() {
@@ -30,7 +28,6 @@ class PostTitle extends Component {
 
 		this.state = {
 			isSelected: false,
-			aztecHeight: 0,
 		};
 	}
 
@@ -80,20 +77,16 @@ class PostTitle extends Component {
 					onFocus={ this.onSelect }
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }
-					style={ [ style, {
-						minHeight: Math.max( minHeight, this.state.aztecHeight ),
-					} ] }
+					style={ style }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
-					onContentSizeChange={ ( event ) => {
-						this.setState( { aztecHeight: event.aztecHeight } );
-					} }
 					placeholder={ decodedPlaceholder }
 					value={ title }
 					onSplit={ this.props.onEnterPress }
+					disableEditingMenu={ true }
 					setRef={ ( ref ) => {
 						this.titleViewRef = ref;
 					} }

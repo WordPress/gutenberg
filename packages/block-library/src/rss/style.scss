@@ -30,6 +30,7 @@
 
 .wp-block-rss__item-publish-date,
 .wp-block-rss__item-author {
+	display: block;
 	color: $dark-gray-300;
 	font-size: $default-font-size;
 }

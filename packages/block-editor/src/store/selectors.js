@@ -560,18 +560,21 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
 }
 
 /**
- * Returns the current multi-selection set of block client IDs, or an empty
- * array if there is no multi-selection.
+ * Returns the current selection set of block client IDs (multiselection or single selection).
  *
  * @param {Object} state Editor state.
  *
  * @return {Array} Multi-selected block client IDs.
  */
-export const getMultiSelectedBlockClientIds = createSelector(
+export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { start, end } = state.blockSelection;
+		if ( start === null || end === null ) {
+			return EMPTY_ARRAY;
+		}
+
 		if ( start === end ) {
-			return [];
+			return [ start ];
 		}
 
 		// Retrieve root client ID to aid in retrieving relevant nested block
@@ -579,7 +582,7 @@ export const getMultiSelectedBlockClientIds = createSelector(
 		// by explicitly testing against null.
 		const rootClientId = getBlockRootClientId( state, start );
 		if ( rootClientId === null ) {
-			return [];
+			return EMPTY_ARRAY;
 		}
 
 		const blockOrder = getBlockOrder( state, rootClientId );
@@ -600,6 +603,23 @@ export const getMultiSelectedBlockClientIds = createSelector(
 );
 
 /**
+ * Returns the current multi-selection set of block client IDs, or an empty
+ * array if there is no multi-selection.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Array} Multi-selected block client IDs.
+ */
+export function getMultiSelectedBlockClientIds( state ) {
+	const { start, end } = state.blockSelection;
+	if ( start === end ) {
+		return EMPTY_ARRAY;
+	}
+
+	return getSelectedBlockClientIds( state );
+}
+
+/**
  * Returns the current multi-selection set of blocks, or an empty array if
  * there is no multi-selection.
  *
@@ -617,7 +637,7 @@ export const getMultiSelectedBlocks = createSelector(
 		return multiSelectedBlockClientIds.map( ( clientId ) => getBlock( state, clientId ) );
 	},
 	( state ) => [
-		...getMultiSelectedBlockClientIds.getDependants( state ),
+		...getSelectedBlockClientIds.getDependants( state ),
 		state.blocks.byClientId,
 		state.blocks.order,
 		state.blocks.attributes,
@@ -1034,7 +1054,7 @@ const canInsertBlockTypeUnmemoized = ( state, blockName, rootClientId = null ) =
 		return false;
 	}
 
-	const { allowedBlockTypes } = getEditorSettings( state );
+	const { allowedBlockTypes } = getSettings( state );
 
 	const isBlockAllowedInEditor = checkAllowList( allowedBlockTypes, blockName, true );
 	if ( ! isBlockAllowedInEditor ) {
@@ -1350,7 +1370,7 @@ export function getBlockListSettings( state, clientId ) {
  *
  * @return {Object} The editor settings object.
  */
-export function getEditorSettings( state ) {
+export function getSettings( state ) {
 	return state.settings;
 }
 

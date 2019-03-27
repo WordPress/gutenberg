@@ -10,7 +10,7 @@ import { __, _x } from '@wordpress/i18n';
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -86,7 +86,7 @@ export const settings = {
 				transform: ( files ) => {
 					const blocks = [];
 
-					files.map( ( file ) => {
+					files.forEach( ( file ) => {
 						const blobURL = createBlobURL( file );
 
 						// File will be uploaded in componentDidMount()

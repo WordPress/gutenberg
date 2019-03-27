@@ -32,6 +32,7 @@ const {
 	getBlockRootClientId,
 	getBlockHierarchyRootClientId,
 	getGlobalBlockCount,
+	getSelectedBlockClientIds,
 	getMultiSelectedBlockClientIds,
 	getMultiSelectedBlocks,
 	getMultiSelectedBlocksStartClientId,
@@ -981,6 +982,61 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockHierarchyRootClientId( state, '12' ) ).toBe( '123' );
+		} );
+	} );
+
+	describe( 'getSelectedBlockClientIds', () => {
+		it( 'should return empty if there is no selection', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 123, 23 ],
+					},
+				},
+				blockSelection: { start: null, end: null },
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [] );
+		} );
+
+		it( 'should return the selected block clientId if there is a selection', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 5, 4, 3, 2, 1 ],
+					},
+				},
+				blockSelection: { start: 2, end: 2 },
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 2 ] );
+		} );
+
+		it( 'should return selected block clientIds if there is multi selection', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 5, 4, 3, 2, 1 ],
+					},
+				},
+				blockSelection: { start: 2, end: 4 },
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 4, 3, 2 ] );
+		} );
+
+		it( 'should return selected block clientIds if there is multi selection (nested context)', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 5, 4, 3, 2, 1 ],
+						4: [ 9, 8, 7, 6 ],
+					},
+				},
+				blockSelection: { start: 7, end: 9 },
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 9, 8, 7 ] );
 		} );
 	} );
 
