@@ -236,11 +236,15 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Custom Edit Intercepts
     
     private func interceptEnter(_ text: String) -> Bool {
-        guard text == "\n", !isMultiline, 
+        guard text == "\n",
             let onEnter = onEnter else {
                 return false
         }
-        
+
+        if isMultiline && !(self.text.isEmptyLine(at: selectedRange.location)) {
+            return false
+        }
+
         let caretData = packCaretDataForRN()
         onEnter(caretData)
         return true
