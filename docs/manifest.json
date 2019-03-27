@@ -42,12 +42,6 @@
 		"parent": "developers"
 	},
 	{
-		"title": "Packages",
-		"slug": "packages",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/packages.md",
-		"parent": "developers"
-	},
-	{
 		"title": "Components",
 		"slug": "components",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/README.md",
@@ -508,6 +502,12 @@
 		"slug": "autocomplete-filters",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/filters/autocomplete-filters.md",
 		"parent": "filters"
+	},
+	{
+		"title": "Packages",
+		"slug": "packages",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/packages/README.md",
+		"parent": null
 	},
 	{
 		"title": "@wordpress/a11y",

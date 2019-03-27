@@ -6,7 +6,6 @@
 			{"docs/designers-developers/developers/internationalization.md": []},
 			{"docs/designers-developers/developers/accessibility.md": []},
 			{"docs/designers-developers/developers/feature-flags.md": []},
-			{"docs/designers-developers/developers/packages.md": "{{packages}}"},
 			{"packages/components/README.md": "{{components}}"},
 			{"docs/designers-developers/developers/themes/README.md": [
 				{"docs/designers-developers/developers/themes/theme-support.md": []}
@@ -100,5 +99,6 @@
 		{"docs/filters/editor-filters.md": []},
 		{"docs/filters/parser-filters.md": []},
 		{"docs/filters/autocomplete-filters.md": []}
-	]}
+	]},
+	{"docs/packages/README.md": "{{packages}}"}
 ]

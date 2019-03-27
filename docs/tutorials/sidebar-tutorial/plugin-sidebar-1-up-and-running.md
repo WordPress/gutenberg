@@ -1,6 +1,6 @@
 # Get a Sidebar up and Running
 
-The first step in the journey is to tell the editor that there is a new plugin that will have its own sidebar. You can do so by using the [registerPlugin](/packages/plugins/README.md), [PluginSidebar](/packages/edit-post/README.md#pluginsidebar), and [createElement](/packages/element/README.md) utilities provided by WordPress, to be found in the `@wordpress/plugins`, `@wordpress/edit-post`, and `@wordpress/element` [packages](/docs/designers-developers/developers/packages.md), respectively.
+The first step in the journey is to tell the editor that there is a new plugin that will have its own sidebar. You can do so by using the [registerPlugin](/packages/plugins/README.md), [PluginSidebar](/packages/edit-post/README.md#pluginsidebar), and [createElement](/packages/element/README.md) utilities provided by WordPress, to be found in the `@wordpress/plugins`, `@wordpress/edit-post`, and `@wordpress/element` [packages](/docs/packages/README.md), respectively.
 
 Add the following code to a JavaScript file called `plugin-sidebar.js` and save it within your plugin's directory:
 

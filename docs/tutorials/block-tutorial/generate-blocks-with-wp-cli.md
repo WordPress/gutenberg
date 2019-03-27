@@ -114,12 +114,12 @@ add_action( 'init', 'movie_block_init' );
 	var registerBlockType = wp.blocks.registerBlockType;
 	/**
 	 * Returns a new element of given type. Element is an abstraction layer atop React.
-	 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-element/
+	 * @see https://wordpress.org/gutenberg/handbook/packages/packages-element/
 	 */
 	var el = wp.element.createElement;
 	/**
 	 * Retrieves the translation of text.
-	 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-i18n/
+	 * @see https://wordpress.org/gutenberg/handbook/packages/packages-i18n/
 	 */
 	var __ = wp.i18n.__;
 

@@ -30,7 +30,7 @@ add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
 
 The last argument in the `wp_enqueue_script()` function is an array of dependencies. WordPress makes packages available under the `wp` namespace. In the example, you use `wp.blocks` to access the items that the blocks package exports (in this case the `registerBlockStyle()` function).
 
-See [Packages](/docs/designers-developers/developers/packages.md) for list of available packages and what objects they export.
+See [Packages](/docs/packages/README.md) for list of available packages and what objects they export.
 
 After you have updated both JavaScript and PHP files, go to the block editor and create a new post.
 
