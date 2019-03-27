@@ -9,11 +9,6 @@ import EditorPage from './pages/editor-page';
 import ParagraphBlockInteraction from './blocks/paragraph-block-interaction';
 import { setupAppium, setupDriver, isLocalEnvironment, timer } from './helpers/utils';
 
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
 describe( 'Gutenberg Editor tests', () => {

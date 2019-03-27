@@ -14,7 +14,7 @@ import { View, ScrollView, Keyboard } from 'react-native';
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { Toolbar, ToolbarButton, Dashicon } from '@wordpress/components';
 import { BlockFormatControls, BlockControls } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -61,8 +61,8 @@ export class BlockToolbar extends Component<PropsType> {
 					<Toolbar accessible={ false }
 						accessibilityLabel={ 'Toolbar Add block' }>
 						<ToolbarButton
+							icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
 							title={ __( 'Add block' ) }
-							icon="insert"
 							accessible={ false }
 							accessibilityLabel={ __( 'Add block' ) }
 							onClick={ onInsertClick }
