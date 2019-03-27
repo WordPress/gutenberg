@@ -1,11 +1,11 @@
 package com.gutenberg;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.facebook.react.ReactApplication;
 import com.horcrux.svg.SvgPackage;
 
-import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
+
+  private static final String TAG = "MainApplication";
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
@@ -65,16 +67,16 @@ public class MainApplication extends Application implements ReactApplication {
                 public void nativeLoggingHook(String message, LogLevel logLevel) {
                     switch (logLevel) {
                         case TRACE:
-                            AppLog.d(AppLog.T.EDITOR, message);
+                            Log.d(TAG, message);
                             break;
                         case INFO:
-                            AppLog.i(AppLog.T.EDITOR, message);
+                            Log.i(TAG, message);
                             break;
                         case WARN:
-                            AppLog.w(AppLog.T.EDITOR, message);
+                            Log.w(TAG, message);
                             break;
                         case ERROR:
-                            AppLog.e(AppLog.T.EDITOR, message);
+                            Log.e(TAG, message);
                             break;
                     }
                 }
