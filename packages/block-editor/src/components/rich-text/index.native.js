@@ -86,7 +86,7 @@ export class RichText extends Component {
 		}
 
 		if ( this.props.onSplit ) {
-			this.onSplit = this.props.onSplit;			
+			this.onSplit = this.props.onSplit;
 		} else if ( this.props.unstableOnSplit ) {
 			this.onSplit = this.props.unstableOnSplit;
 		}
@@ -138,7 +138,7 @@ export class RichText extends Component {
 	 * handler.
 	 *
 	 */
-	splitContent( currentRecord, blocks = [], isPasted = false ) {		
+	splitContent( currentRecord, blocks = [], isPasted = false ) {
 		if ( ! this.onSplit ) {
 			return;
 		}
@@ -439,7 +439,8 @@ export class RichText extends Component {
 			...create( {
 				html: innerContent,
 				range: null,
-				multilineTag: false,
+				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} ),
 		};
 
