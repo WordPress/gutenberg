@@ -8,19 +8,11 @@ import {
 	Disabled,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import {
-	InspectorControls,
-	BlockAlignmentToolbar,
-	BlockControls,
-	ServerSideRender,
-} from '@wordpress/editor';
+import { InspectorControls } from '@wordpress/block-editor';
+import { ServerSideRender } from '@wordpress/editor';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
-	const { align, showPostCounts, displayAsDropdown } = attributes;
+	const { showPostCounts, displayAsDropdown } = attributes;
 
 	return (
 		<Fragment>
@@ -38,15 +30,6 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls>
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
-					} }
-					controls={ [ 'left', 'center', 'right' ] }
-				/>
-			</BlockControls>
 			<Disabled>
 				<ServerSideRender block="core/archives" attributes={ attributes } />
 			</Disabled>

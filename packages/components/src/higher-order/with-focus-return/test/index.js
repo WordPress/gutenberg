@@ -2,21 +2,22 @@
  * External dependencies
  */
 import renderer from 'react-test-renderer';
+import { mount } from 'enzyme';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import withFocusReturn from '../';
+import withFocusReturn, { Provider } from '../';
 
 class Test extends Component {
 	render() {
 		return (
-			<div className="test">Testing</div>
+			<div className="test"><textarea /></div>
 		);
 	}
 }
@@ -47,7 +48,7 @@ describe( 'withFocusReturn()', () => {
 			const wrappedElementShallow = wrappedElement.children[ 0 ];
 			expect( wrappedElementShallow.props.className ).toBe( 'test' );
 			expect( wrappedElementShallow.type ).toBe( 'div' );
-			expect( wrappedElementShallow.children[ 0 ] ).toBe( 'Testing' );
+			expect( wrappedElementShallow.children[ 0 ].type ).toBe( 'textarea' );
 		} );
 
 		it( 'should pass additional props through to the wrapped element', () => {
@@ -71,17 +72,47 @@ describe( 'withFocusReturn()', () => {
 			expect( document.activeElement ).toBe( switchFocusTo );
 		} );
 
-		it( 'should return focus to element associated with HOC', () => {
-			const mountedComposite = renderer.create( <Composite /> );
-			expect( getInstance( mountedComposite ).activeElementOnMount ).toBe( activeElement );
-
-			// Change activeElement.
-			document.activeElement.blur();
-			expect( document.activeElement ).toBe( document.body );
+		it( 'should switch focus back when unmounted while having focus', () => {
+			const wrapper = mount( <Composite /> );
+			wrapper.find( 'textarea' ).at( 0 ).simulate( 'focus' );
 
 			// Should return to the activeElement saved with this component.
-			mountedComposite.unmount();
+			wrapper.unmount();
 			expect( document.activeElement ).toBe( activeElement );
+		} );
+
+		it( 'should switch focus to the most recent still-available focus target', () => {
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			const wrapper = mount(
+				createElement(
+					( props ) => (
+						<Provider>
+							<input name="first" />
+							{ props.renderSecondInput && <input name="second" /> }
+							{ props.renderComposite && <Composite /> }
+						</Provider>
+					),
+					{ renderSecondInput: true }
+				),
+				{ attachTo: container }
+			);
+
+			function focus( selector ) {
+				const childWrapper = wrapper.find( selector );
+				const childNode = childWrapper.getDOMNode();
+				childWrapper.simulate( 'focus', { target: childNode } );
+			}
+
+			focus( 'input[name="first"]' );
+			jest.spyOn( wrapper.find( 'input[name="first"]' ).getDOMNode(), 'focus' );
+			focus( 'input[name="second"]' );
+			wrapper.setProps( { renderComposite: true } );
+			focus( 'textarea' );
+			wrapper.setProps( { renderSecondInput: false } );
+			wrapper.setProps( { renderComposite: false } );
+
+			expect( wrapper.find( 'input[name="first"]' ).getDOMNode().focus ).toHaveBeenCalled();
 		} );
 	} );
 } );

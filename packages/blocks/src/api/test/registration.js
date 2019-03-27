@@ -3,12 +3,12 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { addFilter, removeFilter } from '@wordpress/hooks';
+import { addFilter, removeAllFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -103,12 +103,6 @@ describe( 'blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			const block = registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( console ).toHaveErroredWith( 'Block "core/test-block" is already registered.' );
-			expect( block ).toBeUndefined();
-		} );
-
-		it( 'should reject blocks without a save function', () => {
-			const block = registerBlockType( 'my-plugin/fancy-block-5' );
-			expect( console ).toHaveErroredWith( 'The "save" property must be specified and must be a valid function.' );
 			expect( block ).toBeUndefined();
 		} );
 
@@ -309,7 +303,7 @@ describe( 'blocks', () => {
 
 		describe( 'applyFilters', () => {
 			afterEach( () => {
-				removeFilter( 'blocks.registerBlockType', 'core/blocks/without-title' );
+				removeAllFilters( 'blocks.registerBlockType' );
 			} );
 
 			it( 'should reject valid blocks when they become invalid after executing filter', () => {
@@ -321,6 +315,15 @@ describe( 'blocks', () => {
 				} );
 				const block = registerBlockType( 'my-plugin/fancy-block-12', defaultBlockSettings );
 				expect( console ).toHaveErroredWith( 'The block "my-plugin/fancy-block-12" must have a title.' );
+				expect( block ).toBeUndefined();
+			} );
+
+			it( 'should reject valid blocks when they become invalid after executing filter which removes save property', () => {
+				addFilter( 'blocks.registerBlockType', 'core/blocks/without-save', ( settings ) => {
+					return omit( settings, 'save' );
+				} );
+				const block = registerBlockType( 'my-plugin/fancy-block-13', defaultBlockSettings );
+				expect( console ).toHaveErroredWith( 'The "save" property must be specified and must be a valid function.' );
 				expect( block ).toBeUndefined();
 			} );
 		} );

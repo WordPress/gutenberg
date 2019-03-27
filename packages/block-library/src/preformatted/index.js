@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 import { Path, Rect, SVG } from '@wordpress/components';
 
 export const name = 'core/preformatted';

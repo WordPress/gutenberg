@@ -4,6 +4,7 @@
 import {
 	createNewPost,
 	clickBlockAppender,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'invalid blocks', () => {
@@ -16,16 +17,14 @@ describe( 'invalid blocks', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'hello' );
 
-		// Click the 'more options'
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 
 		// Change to HTML mode and close the options
 		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 
 		// Focus on the textarea and enter an invalid paragraph
-		await page.click( '.editor-block-list__layout .editor-block-list__block .editor-block-list__block-html-textarea' );
+		await page.click( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea' );
 		await page.keyboard.type( '<p>invalid paragraph' );
 
 		// Takes the focus away from the block so the invalid warning is triggered
@@ -34,10 +33,10 @@ describe( 'invalid blocks', () => {
 		expect( console ).toHaveWarned();
 
 		// Click on the 'resolve' button
-		await page.click( '.editor-warning__actions button' );
+		await page.click( '.block-editor-warning__actions button' );
 
 		// Check we get the resolve modal with the appropriate contents
-		const htmlBlockContent = await page.$eval( '.editor-block-compare__html', ( node ) => node.textContent );
+		const htmlBlockContent = await page.$eval( '.block-editor-block-compare__html', ( node ) => node.textContent );
 		expect( htmlBlockContent ).toEqual( '<p>hello</p><p>invalid paragraph' );
 	} );
 } );

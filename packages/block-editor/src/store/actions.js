@@ -107,7 +107,7 @@ export function selectBlock( clientId, initialPosition = null ) {
  */
 export function* selectPreviousBlock( clientId ) {
 	const previousBlockClientId = yield select(
-		'core/editor',
+		'core/block-editor',
 		'getPreviousBlockClientId',
 		clientId
 	);
@@ -123,7 +123,7 @@ export function* selectPreviousBlock( clientId ) {
  */
 export function* selectNextBlock( clientId ) {
 	const nextBlockClientId = yield select(
-		'core/editor',
+		'core/block-editor',
 		'getNextBlockClientId',
 		clientId
 	);
@@ -393,6 +393,17 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 		type: 'REMOVE_BLOCKS',
 		clientIds,
 	};
+
+	const count = yield select(
+		'core/block-editor',
+		'getBlockCount',
+	);
+
+	// To avoid a focus loss when removing the last block, assure there is
+	// always a default block if the last of the blocks have been removed.
+	if ( count === 0 ) {
+		yield insertDefaultBlock();
+	}
 }
 
 /**
@@ -407,6 +418,26 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
  */
 export function removeBlock( clientId, selectPrevious ) {
 	return removeBlocks( [ clientId ], selectPrevious );
+}
+
+/**
+ * Returns an action object used in signalling that the inner blocks with the
+ * specified client ID should be replaced.
+ *
+ * @param {string}   rootClientId    Client ID of the block whose InnerBlocks will re replaced.
+ * @param {Object[]} blocks          Block objects to insert as new InnerBlocks
+ * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ *
+ * @return {Object} Action object.
+ */
+export function replaceInnerBlocks( rootClientId, blocks, updateSelection = true ) {
+	return {
+		type: 'REPLACE_INNER_BLOCKS',
+		rootClientId,
+		blocks,
+		updateSelection,
+		time: Date.now(),
+	};
 }
 
 /**
@@ -503,15 +534,15 @@ export function updateBlockListSettings( clientId, settings ) {
 }
 
 /*
- * Returns an action object used in signalling that the editor settings have been updated.
+ * Returns an action object used in signalling that the block editor settings have been updated.
  *
  * @param {Object} settings Updated settings
  *
  * @return {Object} Action object
  */
-export function updateEditorSettings( settings ) {
+export function updateSettings( settings ) {
 	return {
-		type: 'UPDATE_EDITOR_SETTINGS',
+		type: 'UPDATE_SETTINGS',
 		settings,
 	};
 }

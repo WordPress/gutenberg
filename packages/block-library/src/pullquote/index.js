@@ -12,7 +12,7 @@ import {
 	getColorClassName,
 	RichText,
 	getColorObjectByAttributeValues,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import {
 	select,
 } from '@wordpress/data';
@@ -100,7 +100,7 @@ export const settings = {
 		// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
 		// as there is no expectation that themes create classes that set border colors.
 		} else if ( mainColor ) {
-			const colors = get( select( 'core/block-editor' ).getEditorSettings(), [ 'colors' ], [] );
+			const colors = get( select( 'core/block-editor' ).getSettings(), [ 'colors' ], [] );
 			const colorObject = getColorObjectByAttributeValues( colors, mainColor );
 			figureStyles = {
 				borderColor: colorObject.color,

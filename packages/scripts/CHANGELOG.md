@@ -1,4 +1,10 @@
-## 3.0.0 (Unreleased)
+## 3.1.0 (2019-03-20)
+
+## New features
+
+- The `build` and `start` commands will use a default webpack config if none is provided.
+
+## 3.0.0 (2019-03-06)
 
 ### Breaking Changes
 
@@ -10,6 +16,7 @@
 
 - Added support for `build` script ([#12837](https://github.com/WordPress/gutenberg/pull/12837))
 - Added support for `start` script ([#12837](https://github.com/WordPress/gutenberg/pull/12837))
+- Updated `npm-package-json-lint` dependency [#14200](https://github.com/WordPress/gutenberg/pull/14200)
 
 ### Bug Fix
 

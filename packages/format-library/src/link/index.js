@@ -11,7 +11,7 @@ import {
 	slice,
 } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
-import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/editor';
+import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

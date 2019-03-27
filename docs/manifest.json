@@ -636,6 +636,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/docgen",
+		"slug": "packages-docgen",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/docgen/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/dom-ready",
 		"slug": "packages-dom-ready",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/dom-ready/README.md",

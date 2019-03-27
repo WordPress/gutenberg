@@ -12,6 +12,7 @@ import {
 	keys,
 	isEqual,
 	isEmpty,
+	get,
 } from 'lodash';
 
 /**
@@ -25,7 +26,7 @@ import { isReusableBlock } from '@wordpress/blocks';
  */
 import {
 	PREFERENCES_DEFAULTS,
-	EDITOR_SETTINGS_DEFAULTS,
+	SETTINGS_DEFAULTS,
 } from './defaults';
 import { insertAt, moveTo } from './array';
 
@@ -187,20 +188,51 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 
+	/**
+	 * Set of action types for which a blocks state change should be considered
+	 * non-persistent.
+	 *
+	 * @type {Set}
+	 */
+	const IGNORED_ACTION_TYPES = new Set( [
+		'RECEIVE_BLOCKS',
+	] );
+
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
+
 		const isExplicitPersistentChange = action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT';
 
-		if ( state !== nextState || isExplicitPersistentChange ) {
-			nextState = {
+		// Defer to previous state value (or default) unless changing or
+		// explicitly marking as persistent.
+		if ( state === nextState && ! isExplicitPersistentChange ) {
+			return {
 				...nextState,
-				isPersistentChange: (
-					isExplicitPersistentChange ||
-					! isUpdatingSameBlockAttribute( action, lastAction )
-				),
+				isPersistentChange: get( state, [ 'isPersistentChange' ], true ),
 			};
 		}
 
+		// Some state changes should not be considered persistent, namely those
+		// which are not a direct result of user interaction.
+		const isIgnoredActionType = IGNORED_ACTION_TYPES.has( action.type );
+		if ( isIgnoredActionType ) {
+			return {
+				...nextState,
+				isPersistentChange: false,
+			};
+		}
+
+		nextState = {
+			...nextState,
+			isPersistentChange: (
+				isExplicitPersistentChange ||
+				! isUpdatingSameBlockAttribute( action, lastAction )
+			),
+		};
+
+		// In comparing against the previous action, consider only those which
+		// would have qualified as one which would have been ignored or not
+		// have resulted in a changed state.
 		lastAction = action;
 
 		return nextState;
@@ -266,6 +298,38 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 
 /**
  * Higher-order reducer which targets the combined blocks reducer and handles
+ * the `REPLACE_INNER_BLOCKS` action. When dispatched, this action the state should become equivalent
+ * to the execution of a `REMOVE_BLOCKS` action containing all the child's of the root block followed by
+ * the execution of `INSERT_BLOCKS` with the new blocks.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
+	if ( action.type !== 'REPLACE_INNER_BLOCKS' ) {
+		return reducer( state, action );
+	}
+	let stateAfterBlocksRemoval = state;
+	if ( state.order[ action.rootClientId ] ) {
+		stateAfterBlocksRemoval = reducer( stateAfterBlocksRemoval, {
+			type: 'REMOVE_BLOCKS',
+			clientIds: state.order[ action.rootClientId ],
+		} );
+	}
+	let stateAfterInsert = stateAfterBlocksRemoval;
+	if ( action.blocks.length ) {
+		stateAfterInsert = reducer( stateAfterInsert, {
+			...action,
+			type: 'INSERT_BLOCKS',
+			index: 0,
+		} );
+	}
+	return stateAfterInsert;
+};
+
+/**
+ * Higher-order reducer which targets the combined blocks reducer and handles
  * the `SAVE_REUSABLE_BLOCK_SUCCESS` action. This action can't be handled by
  * regular reducers and needs a higher-order reducer since it needs access to
  * both `byClientId` and `attributes` simultaneously.
@@ -312,6 +376,7 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 export const blocks = flow(
 	combineReducers,
 	withInnerBlocksRemoveCascade,
+	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
 	withBlockReset,
 	withSaveReusableBlock,
 	withPersistentBlockChange,
@@ -681,6 +746,7 @@ export function blockSelection( state = {
 				end: action.clientId,
 				initialPosition: action.initialPosition,
 			};
+		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
 		case 'INSERT_BLOCKS': {
 			if ( action.updateSelection ) {
 				return {
@@ -798,9 +864,9 @@ export function template( state = { isValid: true }, action ) {
  *
  * @return {Object} Updated state.
  */
-export function settings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
+export function settings( state = SETTINGS_DEFAULTS, action ) {
 	switch ( action.type ) {
-		case 'UPDATE_EDITOR_SETTINGS':
+		case 'UPDATE_SETTINGS':
 			return {
 				...state,
 				...action.settings,

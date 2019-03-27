@@ -2,13 +2,13 @@
     {
         "blockName": "core/rss",
         "attrs": {
-            "postLayout": "grid",
-            "feedURL": "https://wordpress.org/news/",
-            "postsToShow": 4,
+            "blockLayout": "grid",
+            "displayDate": true,
             "displayExcerpt": true,
             "displayAuthor": true,
-            "displayDate": true,
-            "excerptLength": 20
+            "excerptLength": 20,
+            "feedURL": "https://wordpress.org/news/",
+            "itemsToShow": 4
         },
         "innerBlocks": [],
         "innerHTML": "",

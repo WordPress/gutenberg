@@ -24,7 +24,6 @@ describe( 'recordToDom', () => {
 	spec.forEach( ( {
 		description,
 		multilineTag,
-		multilineWrapperTags,
 		record,
 		startPath,
 		endPath,
@@ -33,7 +32,6 @@ describe( 'recordToDom', () => {
 			const { body, selection } = toDom( {
 				value: record,
 				multilineTag,
-				multilineWrapperTags,
 			} );
 			expect( body ).toMatchSnapshot();
 			expect( selection ).toEqual( { startPath, endPath } );

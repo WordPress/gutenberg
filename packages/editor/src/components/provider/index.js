@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, pick, defaultTo } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -12,11 +12,33 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEditorProvider } from '@wordpress/block-editor';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import transformStyles from '../../editor-styles';
+import { mediaUpload } from '../../utils';
+import ReusableBlocksButtons from '../reusable-blocks-buttons';
+
+const fetchLinkSuggestions = async ( search ) => {
+	const posts = await apiFetch( {
+		path: addQueryArgs( '/wp/v2/search', {
+			search,
+			per_page: 20,
+			type: 'post',
+		} ),
+	} );
+
+	return map( posts, ( post ) => ( {
+		id: post.id,
+		url: post.url,
+		title: decodeEntities( post.title ) || __( '(no title)' ),
+	} ) );
+};
+
 class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -49,18 +71,40 @@ class EditorProvider extends Component {
 		}
 	}
 
-	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks ) {
+	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions ) {
 		return {
-			...settings,
+			...pick( settings, [
+				'alignWide',
+				'allowedBlockTypes',
+				'availableLegacyWidgets',
+				'bodyPlaceholder',
+				'colors',
+				'disableCustomColors',
+				'disableCustomFontSizes',
+				'focusMode',
+				'fontSizes',
+				'hasFixedToolbar',
+				'hasPermissionsToManageWidgets',
+				'imageSizes',
+				'isRTL',
+				'maxWidth',
+				'styles',
+				'templateLock',
+				'titlePlaceholder',
+			] ),
 			__experimentalMetaSource: {
 				value: meta,
 				onChange: onMetaChange,
 			},
 			__experimentalReusableBlocks: reusableBlocks,
+			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
+			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 		};
 	}
 
 	componentDidMount() {
+		this.props.updateEditorSettings( this.props.settings );
+
 		if ( ! this.props.settings.styles ) {
 			return;
 		}
@@ -76,6 +120,12 @@ class EditorProvider extends Component {
 		} );
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( this.props.settings !== prevProps.settings ) {
+			this.props.updateEditorSettings( this.props.settings );
+		}
+	}
+
 	render() {
 		const {
 			children,
@@ -87,6 +137,7 @@ class EditorProvider extends Component {
 			onMetaChange,
 			reusableBlocks,
 			resetEditorBlocksWithoutUndoLevel,
+			hasUploadPermissions,
 		} = this.props;
 
 		if ( ! isReady ) {
@@ -94,7 +145,7 @@ class EditorProvider extends Component {
 		}
 
 		const editorSettings = this.getBlockEditorSettings(
-			settings, meta, onMetaChange, reusableBlocks
+			settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions
 		);
 
 		return (
@@ -105,6 +156,7 @@ class EditorProvider extends Component {
 				settings={ editorSettings }
 			>
 				{ children }
+				<ReusableBlocksButtons />
 			</BlockEditorProvider>
 		);
 	}
@@ -118,11 +170,14 @@ export default compose( [
 			getEditedPostAttribute,
 			__experimentalGetReusableBlocks,
 		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
+
 		return {
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
 			meta: getEditedPostAttribute( 'meta' ),
 			reusableBlocks: __experimentalGetReusableBlocks(),
+			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -131,6 +186,7 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			editPost,
+			updateEditorSettings,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
@@ -139,6 +195,7 @@ export default compose( [
 			updatePostLock,
 			createWarningNotice,
 			resetEditorBlocks,
+			updateEditorSettings,
 			resetEditorBlocksWithoutUndoLevel( blocks ) {
 				resetEditorBlocks( blocks, {
 					__unstableShouldCreateUndoLevel: false,

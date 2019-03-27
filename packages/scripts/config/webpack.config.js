@@ -8,7 +8,7 @@ const path = require( 'path' );
 /**
  * Internal dependencies
  */
-const { camelCaseDash } = require( '../utils' );
+const { camelCaseDash, hasBabelConfig } = require( '../utils' );
 
 /**
  * Converts @wordpress/* string request into request object.
@@ -51,12 +51,26 @@ const externals = [
 		jquery: 'jQuery',
 		lodash: 'lodash',
 		'lodash-es': 'lodash',
+
+		// Distributed NPM packages may depend on Babel's runtime regenerator.
+		// In a WordPress context, the regenerator is assigned to the global
+		// scope via the `wp-polyfill` script. It is reassigned here as an
+		// externals to reduce the size of generated bundles.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/13890
+		'@babel/runtime/regenerator': 'regeneratorRuntime',
 	},
 	wordpressExternals,
 ];
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
+
+const getBabelLoaderOptions = () => hasBabelConfig() ? {} : {
+	babelrc: false,
+	configFile: false,
+	presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+};
 
 const config = {
 	mode,
@@ -83,7 +97,10 @@ const config = {
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
-				use: require.resolve( 'babel-loader' ),
+				use: {
+					loader: require.resolve( 'babel-loader' ),
+					options: getBabelLoaderOptions(),
+				},
 			},
 		],
 	},

@@ -5,7 +5,7 @@
  *
  * @param {Object} value Value to get the selection from.
  *
- * @return {?number} Index where the selection ends.
+ * @return {number|undefined} Index where the selection ends.
  */
 export function getSelectionEnd( { end } ) {
 	return end;

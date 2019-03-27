@@ -23,19 +23,9 @@ export const settings = {
 	keywords: [ __( 'recent posts' ) ],
 
 	supports: {
+		align: true,
 		html: false,
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( [ 'left', 'center', 'right', 'wide', 'full' ].includes( align ) ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit,
-
-	save() {
-		return null;
-	},
 };
