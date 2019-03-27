@@ -6,6 +6,7 @@ public enum MediaPickerSource: String {
     case deviceCamera = "DEVICE_CAMERA"
 }
 
+/// Ref. https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
 public enum LogLevel: Int {
     case trace
     case info

@@ -17,6 +17,7 @@ public interface GutenbergBridgeJS2Parent {
         void onMediaFileUploadFailed(int mediaId);
     }
 
+    // Ref: https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
     enum LogLevel {
         TRACE(0),
         INFO(1),
