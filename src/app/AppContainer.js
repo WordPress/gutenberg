@@ -148,7 +148,7 @@ class AppContainer extends React.Component<PropsType> {
 	componentDidUpdate( prevProps ) {
 		if ( ! prevProps.isReady && ( prevProps.isReady !== this.props.isReady ) ) {
 			const { blocks } = this.props;
-			const isUnsupportedBlock = ( { name } ) => ( { name } ) => name === UnsupportedBlock.name;
+			const isUnsupportedBlock = ( { name } ) => name === UnsupportedBlock.name;
 			const unsupportedBlocks = blocks.filter( isUnsupportedBlock );
 			const hasUnsupportedBlocks = ! isEmpty( unsupportedBlocks );
 
