@@ -9,7 +9,7 @@ import {
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
-	unstable__setBlockMetadata, // eslint-disable-line camelcase
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 
 /**
@@ -123,7 +123,7 @@ export const registerCoreBlocks = () => {
 		}
 		const { metadata, settings, name = metadata.name } = block;
 		if ( metadata ) {
-			unstable__setBlockMetadata( metadata ); // eslint-disable-line camelcase
+			unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } ); // eslint-disable-line camelcase
 		}
 		registerBlockType( name, settings );
 	} );

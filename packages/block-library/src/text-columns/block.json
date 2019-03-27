@@ -22,8 +22,5 @@
 		"width": {
 			"type": "string"
 		}
-	},
-	"supports": {
-		"inserter": false
 	}
 }
