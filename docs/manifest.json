@@ -162,210 +162,6 @@
 		"parent": "backward-compatibility"
 	},
 	{
-		"title": "Tutorials",
-		"slug": "tutorials",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/readme.md",
-		"parent": "developers"
-	},
-	{
-		"title": "Getting Started with JavaScript",
-		"slug": "javascript",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/readme.md",
-		"parent": "tutorials"
-	},
-	{
-		"title": "Plugins Background",
-		"slug": "plugins-background",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/plugins-background.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Loading JavaScript",
-		"slug": "loading-javascript",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/loading-javascript.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Extending the Block Editor",
-		"slug": "extending-the-block-editor",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/extending-the-block-editor.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Troubleshooting",
-		"slug": "troubleshooting",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/troubleshooting.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "JavaScript Versions and Build Step",
-		"slug": "versions-and-building",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/versions-and-building.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Scope Your Code",
-		"slug": "scope-your-code",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/scope-your-code.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "JavaScript Build Setup",
-		"slug": "js-build-setup",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Blocks",
-		"slug": "block-tutorial",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/readme.md",
-		"parent": "tutorials"
-	},
-	{
-		"title": "Writing Your First Block Type",
-		"slug": "writing-your-first-block-type",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Applying Styles From a Stylesheet",
-		"slug": "applying-styles-with-stylesheets",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Introducing Attributes and Editable Fields",
-		"slug": "introducing-attributes-and-editable-fields",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/introducing-attributes-and-editable-fields.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Block Controls: Toolbars and Inspector",
-		"slug": "block-controls-toolbars-and-inspector",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbars-and-inspector.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Creating dynamic blocks",
-		"slug": "creating-dynamic-blocks",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Generate Blocks with WP-CLI",
-		"slug": "generate-blocks-with-wp-cli",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/generate-blocks-with-wp-cli.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Meta Boxes",
-		"slug": "metabox",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/readme.md",
-		"parent": "tutorials"
-	},
-	{
-		"title": "Store Post Meta with a Block",
-		"slug": "meta-block-1-intro",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Register Meta Field",
-		"slug": "meta-block-2-register-meta",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-2-register-meta.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Create Meta Block",
-		"slug": "meta-block-3-add",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-3-add.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Use Post Meta Data",
-		"slug": "meta-block-4-use-data",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-4-use-data.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Finishing Touches",
-		"slug": "meta-block-5-finishing",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-5-finishing.md",
-		"parent": "metabox"
-	},
-	{
-		"title": "Displaying Notices from Your Plugin or Theme",
-		"slug": "notices",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/notices/README.md",
-		"parent": "tutorials"
-	},
-	{
-		"title": "Creating a Sidebar for Your Plugin",
-		"slug": "plugin-sidebar-0",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md",
-		"parent": "tutorials"
-	},
-	{
-		"title": "Get a Sidebar up and Running",
-		"slug": "plugin-sidebar-1-up-and-running",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-1-up-and-running.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Tweak the sidebar style and add controls",
-		"slug": "plugin-sidebar-2-styles-and-controls",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Register the Meta Field",
-		"slug": "plugin-sidebar-3-register-meta",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-3-register-meta.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Initialize the Input Control",
-		"slug": "plugin-sidebar-4-initialize-input",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-4-initialize-input.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Update the Meta Field When the Input's Content Changes",
-		"slug": "plugin-sidebar-5-update-meta",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Finishing Touches",
-		"slug": "plugin-sidebar-6-finishing-touches",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md",
-		"parent": "plugin-sidebar-0"
-	},
-	{
-		"title": "Introduction to the Format API",
-		"slug": "format-api",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/README.md",
-		"parent": "tutorials"
-	},
-	{
-		"title": "Register a New Format",
-		"slug": "1-register-format",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/1-register-format.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Add a Button to the Toolbar",
-		"slug": "2-toolbar-button",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md",
-		"parent": "format-api"
-	},
-	{
-		"title": "Apply the Format When the Button Is Clicked",
-		"slug": "3-apply-format",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/3-apply-format.md",
-		"parent": "format-api"
-	},
-	{
 		"title": "Designer Documentation",
 		"slug": "designers",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/README.md",
@@ -508,6 +304,210 @@
 		"slug": "outreach",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/outreach.md",
 		"parent": "contributors"
+	},
+	{
+		"title": "Tutorials",
+		"slug": "tutorials",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/readme.md",
+		"parent": null
+	},
+	{
+		"title": "Getting Started with JavaScript",
+		"slug": "javascript",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/javascript/readme.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Plugins Background",
+		"slug": "plugins-background",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/javascript/plugins-background.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Loading JavaScript",
+		"slug": "loading-javascript",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/javascript/loading-javascript.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Extending the Block Editor",
+		"slug": "extending-the-block-editor",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/javascript/extending-the-block-editor.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Troubleshooting",
+		"slug": "troubleshooting",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/javascript/troubleshooting.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "JavaScript Versions and Build Step",
+		"slug": "versions-and-building",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/javascript/versions-and-building.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Scope Your Code",
+		"slug": "scope-your-code",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/javascript/scope-your-code.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "JavaScript Build Setup",
+		"slug": "js-build-setup",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/javascript/js-build-setup.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Blocks",
+		"slug": "block-tutorial",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/block-tutorial/readme.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Writing Your First Block Type",
+		"slug": "writing-your-first-block-type",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/block-tutorial/writing-your-first-block-type.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Applying Styles From a Stylesheet",
+		"slug": "applying-styles-with-stylesheets",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/block-tutorial/applying-styles-with-stylesheets.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Introducing Attributes and Editable Fields",
+		"slug": "introducing-attributes-and-editable-fields",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/block-tutorial/introducing-attributes-and-editable-fields.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Block Controls: Toolbars and Inspector",
+		"slug": "block-controls-toolbars-and-inspector",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/block-tutorial/block-controls-toolbars-and-inspector.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Creating dynamic blocks",
+		"slug": "creating-dynamic-blocks",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/block-tutorial/creating-dynamic-blocks.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Generate Blocks with WP-CLI",
+		"slug": "generate-blocks-with-wp-cli",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/block-tutorial/generate-blocks-with-wp-cli.md",
+		"parent": "block-tutorial"
+	},
+	{
+		"title": "Meta Boxes",
+		"slug": "metabox",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/metabox/readme.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Store Post Meta with a Block",
+		"slug": "meta-block-1-intro",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/metabox/meta-block-1-intro.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Register Meta Field",
+		"slug": "meta-block-2-register-meta",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/metabox/meta-block-2-register-meta.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Create Meta Block",
+		"slug": "meta-block-3-add",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/metabox/meta-block-3-add.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Use Post Meta Data",
+		"slug": "meta-block-4-use-data",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/metabox/meta-block-4-use-data.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Finishing Touches",
+		"slug": "meta-block-5-finishing",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/metabox/meta-block-5-finishing.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Displaying Notices from Your Plugin or Theme",
+		"slug": "notices",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/notices/README.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Creating a Sidebar for Your Plugin",
+		"slug": "plugin-sidebar-0",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/sidebar-tutorial/plugin-sidebar-0.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Get a Sidebar up and Running",
+		"slug": "plugin-sidebar-1-up-and-running",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/sidebar-tutorial/plugin-sidebar-1-up-and-running.md",
+		"parent": "plugin-sidebar-0"
+	},
+	{
+		"title": "Tweak the sidebar style and add controls",
+		"slug": "plugin-sidebar-2-styles-and-controls",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md",
+		"parent": "plugin-sidebar-0"
+	},
+	{
+		"title": "Register the Meta Field",
+		"slug": "plugin-sidebar-3-register-meta",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/sidebar-tutorial/plugin-sidebar-3-register-meta.md",
+		"parent": "plugin-sidebar-0"
+	},
+	{
+		"title": "Initialize the Input Control",
+		"slug": "plugin-sidebar-4-initialize-input",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/sidebar-tutorial/plugin-sidebar-4-initialize-input.md",
+		"parent": "plugin-sidebar-0"
+	},
+	{
+		"title": "Update the Meta Field When the Input's Content Changes",
+		"slug": "plugin-sidebar-5-update-meta",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md",
+		"parent": "plugin-sidebar-0"
+	},
+	{
+		"title": "Finishing Touches",
+		"slug": "plugin-sidebar-6-finishing-touches",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md",
+		"parent": "plugin-sidebar-0"
+	},
+	{
+		"title": "Introduction to the Format API",
+		"slug": "format-api",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/format-api/README.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Register a New Format",
+		"slug": "1-register-format",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/format-api/1-register-format.md",
+		"parent": "format-api"
+	},
+	{
+		"title": "Add a Button to the Toolbar",
+		"slug": "2-toolbar-button",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/format-api/2-toolbar-button.md",
+		"parent": "format-api"
+	},
+	{
+		"title": "Apply the Format When the Button Is Clicked",
+		"slug": "3-apply-format",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/format-api/3-apply-format.md",
+		"parent": "format-api"
 	},
 	{
 		"title": "@wordpress/a11y",

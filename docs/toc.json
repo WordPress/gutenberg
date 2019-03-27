@@ -29,46 +29,6 @@
 			{"docs/designers-developers/developers/backward-compatibility/README.md": [
 				{"docs/designers-developers/developers/backward-compatibility/deprecations.md": []},
 				{"docs/designers-developers/developers/backward-compatibility/meta-box.md": []}
-			]},
-			{"docs/designers-developers/developers/tutorials/readme.md": [
-				{"docs/designers-developers/developers/tutorials/javascript/readme.md": [
-					{"docs/designers-developers/developers/tutorials/javascript/plugins-background.md": []},
-					{"docs/designers-developers/developers/tutorials/javascript/loading-javascript.md": []},
-					{"docs/designers-developers/developers/tutorials/javascript/extending-the-block-editor.md": []},
-					{"docs/designers-developers/developers/tutorials/javascript/troubleshooting.md": []},
-					{"docs/designers-developers/developers/tutorials/javascript/versions-and-building.md": []},
-					{"docs/designers-developers/developers/tutorials/javascript/scope-your-code.md": []},
-					{"docs/designers-developers/developers/tutorials/javascript/js-build-setup.md": []}
-				]},
-				{"docs/designers-developers/developers/tutorials/block-tutorial/readme.md" :[
-					{"docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md" :[]},
-					{"docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md" :[]},
-					{"docs/designers-developers/developers/tutorials/block-tutorial/introducing-attributes-and-editable-fields.md" :[]},
-					{"docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbars-and-inspector.md" :[]},
-					{"docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md" :[]},
-					{"docs/designers-developers/developers/tutorials/block-tutorial/generate-blocks-with-wp-cli.md" :[]}
-				]},
-				{"docs/designers-developers/developers/tutorials/metabox/readme.md": [
-					{"docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md": []},
-					{"docs/designers-developers/developers/tutorials/metabox/meta-block-2-register-meta.md": []},
-					{"docs/designers-developers/developers/tutorials/metabox/meta-block-3-add.md": []},
-					{"docs/designers-developers/developers/tutorials/metabox/meta-block-4-use-data.md": []},
-					{"docs/designers-developers/developers/tutorials/metabox/meta-block-5-finishing.md": []}
-				]},
-				{"docs/designers-developers/developers/tutorials/notices/README.md": []},
-				{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md": [
-					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-1-up-and-running.md": []},
-					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md": []},
-					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-3-register-meta.md": []},
-					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-4-initialize-input.md": []},
-					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md": []},
-					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md": []}
-				]},
-				{"docs/designers-developers/developers/tutorials/format-api/README.md": [
-					{"docs/designers-developers/developers/tutorials/format-api/1-register-format.md": []},
-					{"docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md": []},
-					{"docs/designers-developers/developers/tutorials/format-api/3-apply-format.md": []}
-				]}
 			]}
 		]},
 		{"docs/designers-developers/designers/README.md": [
@@ -100,5 +60,45 @@
 		{"docs/designers-developers/faq.md": []},
 		{"docs/contributors/repository-management.md": []},
 		{"docs/contributors/outreach.md": []}
+	]},
+	{"docs/tutorials/readme.md": [
+		{"docs/tutorials/javascript/readme.md": [
+			{"docs/tutorials/javascript/plugins-background.md": []},
+			{"docs/tutorials/javascript/loading-javascript.md": []},
+			{"docs/tutorials/javascript/extending-the-block-editor.md": []},
+			{"docs/tutorials/javascript/troubleshooting.md": []},
+			{"docs/tutorials/javascript/versions-and-building.md": []},
+			{"docs/tutorials/javascript/scope-your-code.md": []},
+			{"docs/tutorials/javascript/js-build-setup.md": []}
+		]},
+		{"docs/tutorials/block-tutorial/readme.md": [
+			{"docs/tutorials/block-tutorial/writing-your-first-block-type.md": []},
+			{"docs/tutorials/block-tutorial/applying-styles-with-stylesheets.md": []},
+			{"docs/tutorials/block-tutorial/introducing-attributes-and-editable-fields.md": []},
+			{"docs/tutorials/block-tutorial/block-controls-toolbars-and-inspector.md": []},
+			{"docs/tutorials/block-tutorial/creating-dynamic-blocks.md": []},
+			{"docs/tutorials/block-tutorial/generate-blocks-with-wp-cli.md": []}
+		]},
+		{"docs/tutorials/metabox/readme.md": [
+			{"docs/tutorials/metabox/meta-block-1-intro.md": []},
+			{"docs/tutorials/metabox/meta-block-2-register-meta.md": []},
+			{"docs/tutorials/metabox/meta-block-3-add.md": []},
+			{"docs/tutorials/metabox/meta-block-4-use-data.md": []},
+			{"docs/tutorials/metabox/meta-block-5-finishing.md": []}
+		]},
+		{"docs/tutorials/notices/README.md": []},
+		{"docs/tutorials/sidebar-tutorial/plugin-sidebar-0.md": [
+			{"docs/tutorials/sidebar-tutorial/plugin-sidebar-1-up-and-running.md": []},
+			{"docs/tutorials/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md": []},
+			{"docs/tutorials/sidebar-tutorial/plugin-sidebar-3-register-meta.md": []},
+			{"docs/tutorials/sidebar-tutorial/plugin-sidebar-4-initialize-input.md": []},
+			{"docs/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md": []},
+			{"docs/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md": []}
+		]},
+		{"docs/tutorials/format-api/README.md": [
+			{"docs/tutorials/format-api/1-register-format.md": []},
+			{"docs/tutorials/format-api/2-toolbar-button.md": []},
+			{"docs/tutorials/format-api/3-apply-format.md": []}
+		]}
 	]}
 ]
