@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-const path = require( 'path' );
-
 const getTagsByName = ( tags, ...names ) => tags.filter( ( tag ) => names.some( ( name ) => name === tag.title ) );
 
 const cleanSpaces = ( paragraph ) =>
@@ -57,8 +52,8 @@ const getHeading = ( index, text ) => {
 	return '#'.repeat( index ) + ' ' + text;
 };
 
-const getSymbolHeading = ( text, source ) => {
-	return `<a name="${ text }" href="#${ text }">#</a> **${ text }** ${ `[<>](${ source })` }`;
+const getSymbolHeading = ( text ) => {
+	return `<a name="${ text }" href="#${ text }">#</a> **${ text }**`;
 };
 
 module.exports = function( rootDir, docPath, symbols, headingTitle, headingStartIndex ) {
@@ -83,15 +78,7 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 	} );
 	if ( symbols && symbols.length > 0 ) {
 		symbols.forEach( ( symbol ) => {
-			const symbolPath = path.join(
-				path.relative(
-					path.dirname( docPath ),
-					path.join( rootDir, path.dirname( symbol.path ) )
-				),
-				path.basename( symbol.path ),
-			);
-			const symbolPathWithLines = `${ symbolPath }#L${ symbol.lineStart }-L${ symbol.lineEnd }`;
-			docs.push( getSymbolHeading( symbol.name, symbolPathWithLines ) );
+			docs.push( getSymbolHeading( symbol.name ) );
 			formatDeprecated( getTagsByName( symbol.tags, 'deprecated' ), docs );
 			formatDescription( symbol.description, docs );
 			formatTag(
