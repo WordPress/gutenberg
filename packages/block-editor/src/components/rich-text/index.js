@@ -943,6 +943,20 @@ export class RichText extends Component {
 			record = this.getLingeringRecord();
 		}
 
+		// To do: find a better way to move the caret to the end after merge.
+		// If the value's been changed from the outside and the instance is
+		// selected, set the caret at the end on focus (which sets
+		// this.lastState).
+		if ( this.props.isSelected && this.props.value !== this.savedContent ) {
+			const prevRecord = this.formatToValue( prevProps.value );
+			const length = getTextContent( prevRecord ).length;
+
+			this.lastState = {
+				start: length,
+				end: length,
+			};
+		}
+
 		this.applyRecord( record );
 	}
 
