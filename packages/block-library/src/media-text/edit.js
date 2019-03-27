@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
+import { get, values } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,10 +17,13 @@ import {
 } from '@wordpress/block-editor';
 import { Component, Fragment } from '@wordpress/element';
 import {
+	BaseControl,
 	Button,
+	ButtonGroup,
 	PanelBody,
-	RangeControl,
+	RadioControl,
 	TextareaControl,
+	TextControl,
 	ToggleControl,
 	Toolbar,
 } from '@wordpress/components';
@@ -36,6 +39,11 @@ const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/
 const TEMPLATE = [
 	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
 ];
+const WIDTH_PRESETS = {
+	38: { label: _x( 'Small', 'small media size' ), value: '38' },
+	50: { label: _x( 'Half', 'media size filling 50%' ), value: '50' },
+	62: { label: _x( 'Large', 'large media size' ), value: '62' },
+};
 
 class MediaTextEdit extends Component {
 	constructor() {
@@ -90,7 +98,7 @@ class MediaTextEdit extends Component {
 		const { setAttributes } = this.props;
 
 		setAttributes( {
-			mediaWidth: width,
+			mediaWidth: parseInt( width, 10 ),
 		} );
 		this.setState( {
 			mediaWidth: null,
@@ -180,15 +188,43 @@ class MediaTextEdit extends Component {
 			<Fragment>
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
-					<PanelBody title={ __( 'Layout' ) }>
-						<RangeControl
+					<PanelBody title={ __( 'Layout 1' ) }>
+						<TextControl
+							type="number"
 							label={ __( 'Media width' ) }
 							value={ temporaryMediaWidth || mediaWidth }
 							onChange={ this.commitWidthChange }
 						/>
-						<Button isSmall onClick={ () => setAttributes( { mediaWidth: 38 } ) }>Golden ratio small</Button>
-						<Button isSmall onClick={ () => setAttributes( { mediaWidth: 50 } ) }>Half and half</Button>
-						<Button isSmall onClick={ () => setAttributes( { mediaWidth: 62 } ) }>Golden ratio big</Button>
+						<ButtonGroup>
+							<Button isSmall isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 38 } onClick={ () => setAttributes( { mediaWidth: 38 } ) }>Small</Button>
+							<Button isSmall isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 50 } onClick={ () => setAttributes( { mediaWidth: 50 } ) }>Half</Button>
+							<Button isSmall isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 62 } onClick={ () => setAttributes( { mediaWidth: 62 } ) }>Large</Button>
+						</ButtonGroup>
+					</PanelBody>
+					<PanelBody title={ __( 'Layout 2' ) }>
+						<RadioControl
+							label="Media Width"
+							selected={ this.state.enableCustomWidth ? 'custom' : String( mediaWidth ) }
+							options={ values( WIDTH_PRESETS ).concat( { label: 'Custom', value: 'custom' } ) }
+							onChange={ ( newMediaWidth ) => setAttributes( { mediaWidth: newMediaWidth } ) }
+						/>
+					</PanelBody>
+					<PanelBody title={ __( 'Layout 3' ) }>
+						<BaseControl
+							label="Media Width"
+						>
+							<ButtonGroup>
+								<Button isLarge isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 38 } onClick={ () => setAttributes( { mediaWidth: 38 } ) }>Small</Button>
+								<Button isLarge isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 50 } onClick={ () => setAttributes( { mediaWidth: 50 } ) }>Half</Button>
+								<Button isLarge isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 62 } onClick={ () => setAttributes( { mediaWidth: 62 } ) }>Large</Button>
+							</ButtonGroup>
+						</BaseControl>
+						<TextControl
+							type="number"
+							label={ __( 'Custom width' ) }
+							value={ temporaryMediaWidth || mediaWidth }
+							onChange={ this.commitWidthChange }
+						/>
 					</PanelBody>
 					<PanelColorSettings
 						title={ __( 'Color Settings' ) }
