@@ -62,7 +62,7 @@ This will generate 4 files inside the `movies` plugin directory. All files conta
  * Registers all block assets so that they can be enqueued through Gutenberg in
  * the corresponding context.
  *
- * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type/
+ * @see https://wordpress.org/gutenberg/handbook/tutorials/block-tutorial/writing-your-first-block-type/
  */
 function movie_block_init() {
 	$dir = dirname( __FILE__ );

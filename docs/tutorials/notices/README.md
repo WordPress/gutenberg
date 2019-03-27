@@ -8,7 +8,7 @@ In the classic editor, notices hooked onto the `admin_notices` action can render
 
 In the classic editor, here's an example of the "Post draft updated" notice:
 
-![Post draft updated in the classic editor](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/notices/classic-editor-notice.png)
+![Post draft updated in the classic editor](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/notices/classic-editor-notice.png)
 
 Producing an equivalent "Post draft updated" notice would require code like this:
 
@@ -39,7 +39,7 @@ Importantly, the `admin_notices` hook allows a developer to render whatever HTML
 
 In the block editor, here's an example of the "Post published" notice:
 
-![Post published in the block editor](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/notices/block-editor-notice.png)
+![Post published in the block editor](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/notices/block-editor-notice.png)
 
 Producing an equivalent "Post published" notice would require code like this:
 
@@ -71,7 +71,7 @@ To better understand the specific code example above:
 * `wp.data.dispatch('core/notices')` accesses functionality registered to the block editor data store by the Notices package.
 * `createNotice()` is a function offered by the Notices package to register a new notice. The block editor reads from the notice data store in order to know which notices to display.
 
-Check out the [_Loading JavaScript_](/docs/designers-developers/developers/tutorials/javascript/loading-javascript.md) tutorial for a primer on how to load your custom JavaScript into the block editor.
+Check out the [_Loading JavaScript_](/docs/tutorials/javascript/loading-javascript.md) tutorial for a primer on how to load your custom JavaScript into the block editor.
 
 ## Learn More
 

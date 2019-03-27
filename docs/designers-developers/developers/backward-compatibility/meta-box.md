@@ -1,6 +1,6 @@
 # Meta Boxes
 
-This is a brief document detailing how meta box support works in Gutenberg. With the superior developer and user experience of blocks, especially once block templates are available, **porting PHP meta boxes to blocks is highly encouraged!** See the [Meta Block tutorial](/docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md) for how to store post meta data using blocks.
+This is a brief document detailing how meta box support works in Gutenberg. With the superior developer and user experience of blocks, especially once block templates are available, **porting PHP meta boxes to blocks is highly encouraged!** See the [Meta Block tutorial](/docs/tutorials/metabox/meta-block-1-intro.md) for how to store post meta data using blocks.
 
 ### Testing, Converting, and Maintaining Existing Meta Boxes
 

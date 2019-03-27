@@ -40,4 +40,4 @@ The expected behavior is that the format will be toggled, meaning that the text 
 
 Your browser may have already displayed the selection differently once the tag was applied, but you may want to use a special style of your own. You can use the `className` option in [`registerFormatType`](/packages/rich-text/README.md#registerFormatType) to target the new element by class name: if `className` is set, it'll be added to the new element.
 
-That's it. This is all that is necessary to make a custom format available in the new editor. From here, you may want to check out other [tutorials](/docs/designers-developers/developers/tutorials/) or apply your new knowledge to your next plugin!
+That's it. This is all that is necessary to make a custom format available in the new editor. From here, you may want to check out other [tutorials](/docs/tutorials/) or apply your new knowledge to your next plugin!

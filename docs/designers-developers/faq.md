@@ -251,7 +251,7 @@ Our [list of supported browsers can be found in the Make WordPress handbook](htt
 
 ## How do I make my own block?
 
-The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) section to get started.
+The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](/docs/tutorials/block-tutorial/readme.md) section to get started.
 
 ## Does Gutenberg involve editing posts/pages in the front-end?
 
