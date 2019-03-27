@@ -24,48 +24,6 @@
 		"parent": "designers-developers"
 	},
 	{
-		"title": "Block API Reference",
-		"slug": "block-api",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/block-api/README.md",
-		"parent": "developers"
-	},
-	{
-		"title": "Block Registration ",
-		"slug": "block-registration",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/block-api/block-registration.md",
-		"parent": "block-api"
-	},
-	{
-		"title": "Edit and Save",
-		"slug": "block-edit-save",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/block-api/block-edit-save.md",
-		"parent": "block-api"
-	},
-	{
-		"title": "Attributes",
-		"slug": "block-attributes",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/block-api/block-attributes.md",
-		"parent": "block-api"
-	},
-	{
-		"title": "Deprecated Blocks",
-		"slug": "block-deprecation",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/block-api/block-deprecation.md",
-		"parent": "block-api"
-	},
-	{
-		"title": "Templates",
-		"slug": "block-templates",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/block-api/block-templates.md",
-		"parent": "block-api"
-	},
-	{
-		"title": "Annotations",
-		"slug": "block-annotations",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/block-api/block-annotations.md",
-		"parent": "block-api"
-	},
-	{
 		"title": "Filter Reference",
 		"slug": "filters",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/filters/README.md",
@@ -508,6 +466,48 @@
 		"slug": "3-apply-format",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/tutorials/format-api/3-apply-format.md",
 		"parent": "format-api"
+	},
+	{
+		"title": "Block API Reference",
+		"slug": "block-api",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/block-api/README.md",
+		"parent": null
+	},
+	{
+		"title": "Block Registration ",
+		"slug": "block-registration",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/block-api/block-registration.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Edit and Save",
+		"slug": "block-edit-save",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/block-api/block-edit-save.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Attributes",
+		"slug": "block-attributes",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/block-api/block-attributes.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Deprecated Blocks",
+		"slug": "block-deprecation",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/block-api/block-deprecation.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Templates",
+		"slug": "block-templates",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/block-api/block-templates.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Annotations",
+		"slug": "block-annotations",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/block-api/block-annotations.md",
+		"parent": "block-api"
 	},
 	{
 		"title": "@wordpress/a11y",
