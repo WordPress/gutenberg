@@ -166,7 +166,7 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](/docs/designers-developers/developers/block-api/block-attributes.md).**
+* **See: [Attributes](/docs/block-api/block-attributes.md).**
 
 #### Transforms (optional)
 

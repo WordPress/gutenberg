@@ -123,7 +123,7 @@ After running this through the parser we're left with a simple object we can man
 
 This has dramatic implications for how simple and performant we can make our parser. These explicit boundaries also protect damage in a single block from bleeding into other blocks or tarnishing the entire document. It also allows the system to identify unrecognized blocks before rendering them.
 
-_N.B.:_ The defining aspect of blocks are their semantics and the isolation mechanism they provide; in other words, their identity. On the other hand, where their data is stored is a more liberal aspect. Blocks support more than just static local data (via JSON literals inside the HTML comment or within the block's HTML), and more mechanisms (_e.g._, global blocks or otherwise resorting to storage in complementary `WP_Post` objects) are expected. See [attributes](/docs/designers-developers/developers/block-api/block-attributes.md) for details.
+_N.B.:_ The defining aspect of blocks are their semantics and the isolation mechanism they provide; in other words, their identity. On the other hand, where their data is stored is a more liberal aspect. Blocks support more than just static local data (via JSON literals inside the HTML comment or within the block's HTML), and more mechanisms (_e.g._, global blocks or otherwise resorting to storage in complementary `WP_Post` objects) are expected. See [attributes](/docs/block-api/block-attributes.md) for details.
 
 ## The Anatomy of a Serialized Block
 

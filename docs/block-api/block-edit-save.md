@@ -30,7 +30,7 @@ The function receives the following properties through an object argument:
 
 ### attributes
 
-This property surfaces all the available attributes and their corresponding values, as described by the `attributes` property when the block type was registered. See [attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for how to specify attribute sources.
+This property surfaces all the available attributes and their corresponding values, as described by the `attributes` property when the block type was registered. See [attributes documentation](/docs/block-api/block-attributes.md) for how to specify attribute sources.
 
 In this case, assuming we had defined an attribute of `content` during block registration, we would receive and use that value in our edit function:
 
@@ -254,7 +254,7 @@ save: ( { attributes } ) => {
 {% end %}
 
 
-When saving your block, you want to save the attributes in the same format specified by the attribute source definition. If no attribute source is specified, the attribute will be saved to the block's comment delimiter. See the [Block Attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for more details.
+When saving your block, you want to save the attributes in the same format specified by the attribute source definition. If no attribute source is specified, the attribute will be saved to the block's comment delimiter. See the [Block Attributes documentation](/docs/block-api/block-attributes.md) for more details.
 
 ## Examples
 
@@ -402,10 +402,10 @@ The two most common sources of block invalidations are:
 
 Before starting to debug, be sure to familiarize yourself with the validation step described above documenting the process for detecting whether a block is invalid. A block is invalid if its regenerated markup does not match what is saved in post content, so often this can be caused by the attributes of a block being parsed incorrectly from the saved content.
 
-If you're using [attribute sources](/docs/designers-developers/developers/block-api/block-attributes.md), be sure that attributes sourced from markup are saved exactly as you expect, and in the correct type (usually a `'string'` or `'number'`).
+If you're using [attribute sources](/docs/block-api/block-attributes.md), be sure that attributes sourced from markup are saved exactly as you expect, and in the correct type (usually a `'string'` or `'number'`).
 
 When a block is detected as invalid, a warning will be logged into your browser's developer tools console. The warning will include specific details about the exact point at which a difference in markup occurred. Be sure to look closely at any differences in the expected and actual markups to see where problems are occurring.
 
 **I've changed my block's `save` behavior and old content now includes invalid blocks. How can I fix this?**
 
-Refer to the guide on [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecation.md) to learn more about how to accommodate legacy content in intentional markup changes.
+Refer to the guide on [Deprecated Blocks](/docs/block-api/block-deprecation.md) to learn more about how to accommodate legacy content in intentional markup changes.

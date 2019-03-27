@@ -109,7 +109,7 @@ add_action( 'init', 'movie_block_init' );
 ( function( wp ) {
 	/**
 	 * Registers a new block provided a unique name and an object defining its behavior.
-	 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/#registering-a-block
+	 * @see https://wordpress.org/gutenberg/handbook/block-api/#registering-a-block
 	 */
 	var registerBlockType = wp.blocks.registerBlockType;
 	/**
@@ -125,7 +125,7 @@ add_action( 'init', 'movie_block_init' );
 
 	/**
 	 * Every block starts by registering a new block type definition.
-	 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/#registering-a-block
+	 * @see https://wordpress.org/gutenberg/handbook/block-api/#registering-a-block
 	 */
 	registerBlockType( 'movies/movie', {
 		/**
@@ -151,7 +151,7 @@ add_action( 'init', 'movie_block_init' );
 		/**
 		 * The edit function describes the structure of your block in the context of the editor.
 		 * This represents what the editor will render when the block is used.
-		 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/block-edit-save/#edit
+		 * @see https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/#edit
 		 *
 		 * @param {Object} [props] Properties passed from the editor.
 		 * @return {Element}       Element to render.
@@ -167,7 +167,7 @@ add_action( 'init', 'movie_block_init' );
 		/**
 		 * The save function defines the way in which the different attributes should be combined
 		 * into the final markup, which is then serialized by Gutenberg into `post_content`.
-		 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/block-edit-save/#save
+		 * @see https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/#save
 		 *
 		 * @return {Element}       Element to render.
 		 */

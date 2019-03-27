@@ -113,7 +113,7 @@ wp.hooks.addFilter(
 );
 ```
 
-_Note:_ This filter must always be run on every page load, and not in your browser's developer tools console. Otherwise, a [block validation](/docs/designers-developers/developers/block-api/block-edit-save.md#validation) error will occur the next time the post is edited. This is due to the fact that block validation occurs by verifying that the saved output matches what is stored in the post's content during editor initialization. So, if this filter does not exist when the editor loads, the block will be marked as invalid.
+_Note:_ This filter must always be run on every page load, and not in your browser's developer tools console. Otherwise, a [block validation](/docs/block-api/block-edit-save.md#validation) error will occur the next time the post is edited. This is due to the fact that block validation occurs by verifying that the saved output matches what is stored in the post's content during editor initialization. So, if this filter does not exist when the editor loads, the block will be marked as invalid.
 
 #### `blocks.getBlockDefaultClassName`
 
