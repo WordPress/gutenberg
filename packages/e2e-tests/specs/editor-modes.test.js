@@ -98,8 +98,11 @@ describe( 'Editing modes (visual/HTML)', () => {
 		let blockInspectorTab = await page.$( '.edit-post-sidebar__panel-tab.is-active[data-label="Block"]' );
 		expect( blockInspectorTab ).not.toBeNull();
 
-		// Switch to Code Editor
+		// Switch to Code Editor and hide More Menu
 		await switchEditorModeTo( 'Code' );
+		await page.click(
+			'.edit-post-more-menu [aria-label="Hide more tools & options"]'
+		);
 
 		// The Block inspector should not be active anymore
 		blockInspectorTab = await page.$( '.edit-post-sidebar__panel-tab.is-active[data-label="Block"]' );
