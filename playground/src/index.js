@@ -6,63 +6,35 @@ import '@babel/polyfill';
 /**
  * WordPress dependencies
  */
-import '@wordpress/editor'; // This shouldn't be necessary
-
-import { render, useState, Fragment } from '@wordpress/element';
-import {
-	BlockEditorProvider,
-	BlockList,
-	WritingFlow,
-	ObserveTyping,
-} from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
-import { registerCoreBlocks } from '@wordpress/block-library';
-import '@wordpress/format-library';
+import { render, Fragment, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import Menu from './components/menu';
+import Editor from './components/editor';
+import Storybook from './components/storybook';
 
-/* eslint-disable no-restricted-syntax */
-import '@wordpress/components/build-style/style.css';
-import '@wordpress/block-editor/build-style/style.css';
-import '@wordpress/block-library/build-style/style.css';
-import '@wordpress/block-library/build-style/editor.css';
-import '@wordpress/block-library/build-style/theme.css';
-import '@wordpress/format-library/build-style/style.css';
-/* eslint-enable no-restricted-syntax */
-
-function App() {
-	const [ blocks, updateBlocks ] = useState( [] );
-
+function Playground() {
+	const [ page, updatePage ] = useState( 'editor' );
 	return (
 		<Fragment>
 			<div className="playground__header">
 				<h1 className="playground__logo">Gutenberg Playground</h1>
+				<div className="playground__menu">
+					<Menu page={ page } onNavigate={ updatePage } />
+				</div>
 			</div>
 			<div className="playground__body">
-				<BlockEditorProvider
-					value={ blocks }
-					onInput={ updateBlocks }
-					onChange={ updateBlocks }
-				>
-					<div className="editor-styles-wrapper">
-						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
-						</WritingFlow>
-					</div>
-					<Popover.Slot />
-				</BlockEditorProvider>
+				{ page === 'editor' && <Editor /> }
+				{ page === 'components' && <Storybook /> }
 			</div>
 		</Fragment>
 	);
 }
 
-registerCoreBlocks();
 render(
-	<App />,
+	<Playground />,
 	document.querySelector( '#app' )
 );

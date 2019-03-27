@@ -6,32 +6,20 @@
 @import "../../assets/stylesheets/z-index";
 
 @import "./reset";
-@import "./editor-styles";
+@import "./components/editor/editor-styles";
+@import "./components/menu/style";
+@import "./components/storybook/style";
 
 
 .playground__header {
-	padding: 20px;
-	border-bottom: 1px solid #ddd;
+	padding: 10px 20px;
+	display: flex;
+	align-items: center;
+	background: #f1f1f1;
 }
 
 .playground__logo {
 	font-size: 20px;
-	font-weight: 300;
-}
-
-.playground__body {
-	padding-top: 20px;
-
-	img {
-		max-width: 100%;
-		height: auto;
-	}
-
-	iframe {
-		width: 100%;
-	}
-
-	.components-navigate-regions {
-		height: 100%;
-	}
+	font-weight: 400;
+	margin-right: 20px;
 }

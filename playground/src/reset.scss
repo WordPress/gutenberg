@@ -22,8 +22,11 @@ html,
 body {
 	margin: 0;
 	padding: 0;
-	font-family: $default-font;
-	font-size: $default-font-size;
+	font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+	font-size: 16px;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	color: #34495e;
 }
 
 a,

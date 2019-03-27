@@ -1,0 +1,24 @@
+.menu {
+	padding: 0 20px;
+
+	.components-button {
+		margin-right: 10px;
+		padding: 8px;
+		border-radius: 4px;
+		font-size: 14px;
+
+		&:hover {
+			color: $blue-wordpress-700;
+		}
+
+		&.is-toggled {
+			background: $blue-wordpress-700;
+			color: $white;
+
+			&:focus {
+				background: $blue-wordpress-700;
+				color: $white;
+			}
+		}
+	}
+}
