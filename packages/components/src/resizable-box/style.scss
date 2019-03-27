@@ -1,16 +1,14 @@
+// This is a wrapper of the actual visible handle (pseudo element). It is styled
+// to be much bigger than the visual part so it's easier to click and use.
 .components-resizable-box__handle {
 	display: none;
+	width: $resize-handler-container-size;
+	height: $resize-handler-container-size;
 
 	// Show the resize handle when selected.
 	.components-resizable-box__container.is-selected & {
 		display: block;
 	}
-
-	// The handle is a pseudo-element and will sit inside this larger
-	// container size.
-	width: $resize-handler-container-size;
-	height: $resize-handler-container-size;
-	padding: $grid-size-small;
 }
 
 // This is the "visible" resize handle.
@@ -23,21 +21,48 @@
 	border-radius: 50%;
 	background: theme(primary);
 	cursor: inherit;
+	position: absolute;
+	top: calc(50% - #{$resize-handler-size / 2});
+	right: calc(50% - #{$resize-handler-size / 2});
+}
+
+// Show corner handles on top of side handles so they can be used
+.components-resizable-box__side-handle {
+	z-index: z-index(".components-resizable-box__side-handle");
+}
+
+.components-resizable-box__corner-handle {
+	z-index: z-index(".components-resizable-box__corner-handle");
+}
+
+// Make horizontal side-handles full width
+.components-resizable-box__side-handle.components-resizable-box__handle-top,
+.components-resizable-box__side-handle.components-resizable-box__handle-bottom {
+	width: 100%;
+	left: 0;
+}
+
+// Make vertical side-handles full height
+.components-resizable-box__side-handle.components-resizable-box__handle-left,
+.components-resizable-box__side-handle.components-resizable-box__handle-right {
+	height: 100%;
+	top: 0;
 }
 
 /*!rtl:begin:ignore*/
 .components-resizable-box__handle-right {
-	top: calc(50% - #{$resize-handler-container-size / 2});
 	right: calc(#{$resize-handler-container-size / 2} * -1);
+}
+
+.components-resizable-box__handle-left {
+	left: calc(#{$resize-handler-container-size / 2} * -1);
+}
+
+.components-resizable-box__handle-top {
+	top: calc(#{$resize-handler-container-size / 2} * -1);
 }
 
 .components-resizable-box__handle-bottom {
 	bottom: calc(#{$resize-handler-container-size / 2} * -1);
-	left: calc(50% - #{$resize-handler-container-size / 2});
-}
-
-.components-resizable-box__handle-left {
-	top: calc(50% - #{$resize-handler-container-size / 2});
-	left: calc(#{$resize-handler-container-size / 2} * -1);
 }
 /*!rtl:end:ignore*/
