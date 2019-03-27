@@ -459,7 +459,7 @@ class ImageEdit extends Component {
 						onChange={ this.updateAlt }
 						help={
 							<Fragment>
-								<ExternalLink href={ __( 'https://www.w3.org/WAI/tutorials/images/decision-tree' ) }>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 									{ __( 'Describe the purpose of the image' ) }
 								</ExternalLink>
 								{ __( 'Leave empty if the image is purely decorative.' ) }
