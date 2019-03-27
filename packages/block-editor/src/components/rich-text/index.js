@@ -129,6 +129,7 @@ export class RichText extends Component {
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
+		this.onPointerUp = this.onPointerUp.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
@@ -206,6 +207,7 @@ export class RichText extends Component {
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
+			__unstableDomOnly: this.preventSelectionUpdate,
 		} );
 	}
 
@@ -359,10 +361,13 @@ export class RichText extends Component {
 		}
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
+		this.setState( this.lastState );
 	}
 
 	onBlur() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+		this.lastState = this.state;
+		this.setState( { start: undefined, end: undefined, selectedFormat: undefined } );
 	}
 
 	/**
@@ -882,6 +887,8 @@ export class RichText extends Component {
 	onPointerDown( event ) {
 		const { target } = event;
 
+		this.preventSelectionUpdate = true;
+
 		// If the child element has no text content, it must be an object.
 		if ( target === this.editableRef || target.textContent ) {
 			return;
@@ -897,6 +904,10 @@ export class RichText extends Component {
 
 		selection.removeAllRanges();
 		selection.addRange( range );
+	}
+
+	onPointerUp() {
+		delete this.preventSelectionUpdate;
 	}
 
 	/**
@@ -1012,6 +1023,14 @@ export class RichText extends Component {
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
 		const classes = classnames( wrapperClassName, 'editor-rich-text block-editor-rich-text' );
 		const record = this.getRecord();
+		const { lastState = {} } = this;
+		const lingeringRecord = {
+			...record,
+			// We need lingering state after blur to be able to format with
+			// buttons.
+			start: record.start ? record.start : lastState.start,
+			end: record.end ? record.end : lastState.end,
+		};
 
 		return (
 			<div className={ classes }
@@ -1021,7 +1040,7 @@ export class RichText extends Component {
 					<ListEdit
 						onTagNameChange={ onTagNameChange }
 						tagName={ Tagname }
-						value={ record }
+						value={ lingeringRecord }
 						onChange={ this.onChange }
 					/>
 				) }
@@ -1065,6 +1084,8 @@ export class RichText extends Component {
 								onBlur={ this.onBlur }
 								onMouseDown={ this.onPointerDown }
 								onTouchStart={ this.onPointerDown }
+								onMouseUp={ this.onPointerUp }
+								onTouchEnd={ this.onPointerUp }
 								setRef={ this.setRef }
 							/>
 							{ isPlaceholderVisible &&
@@ -1075,7 +1096,10 @@ export class RichText extends Component {
 									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 								</Tagname>
 							}
-							{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
+							{ isSelected && <FormatEdit
+								value={ lingeringRecord }
+								onChange={ this.onChange }
+							/> }
 						</Fragment>
 					) }
 				</Autocomplete>
