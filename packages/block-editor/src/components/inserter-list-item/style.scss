@@ -43,15 +43,9 @@
 		}
 
 		&:hover {
-<<<<<<< HEAD:packages/editor/src/components/inserter-list-item/style.scss
-			.editor-block-types-list__item-icon,
-			.editor-block-types-list__item-title {
-				color: inherit;
-=======
 			.block-editor-block-types-list__item-icon,
 			.block-editor-block-types-list__item-title {
-				color: currentColor;
->>>>>>> upstream/master:packages/block-editor/src/components/inserter-list-item/style.scss
+				color: inherit;
 			}
 		}
 
@@ -64,15 +58,9 @@
 			outline: none;
 			@include block-style__focus-active();
 
-<<<<<<< HEAD:packages/editor/src/components/inserter-list-item/style.scss
-			.editor-block-types-list__item-icon,
-			.editor-block-types-list__item-title {
-				color: inherit;
-=======
 			.block-editor-block-types-list__item-icon,
 			.block-editor-block-types-list__item-title {
-				color: currentColor;
->>>>>>> upstream/master:packages/block-editor/src/components/inserter-list-item/style.scss
+				color: inherit;
 			}
 		}
 	}
