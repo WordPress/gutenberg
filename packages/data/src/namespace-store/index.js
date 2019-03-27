@@ -220,7 +220,7 @@ function mapResolvers( resolvers, selectors, store ) {
 					return;
 				}
 
-				const metadata = store.__unstableOriginalGetState().metadata;
+				const { metadata } = store.__unstableOriginalGetState();
 				if ( metadataSelectors.hasStartedResolution( metadata, selectorName, args ) ) {
 					return;
 				}
