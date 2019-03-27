@@ -9,6 +9,11 @@ import EditorPage from './pages/editor-page';
 import ParagraphBlockInteraction from './blocks/paragraph-block-interaction';
 import { setupAppium, setupDriver, isLocalEnvironment, timer } from './helpers/utils';
 
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
 describe( 'Gutenberg Editor tests', () => {
@@ -42,7 +47,7 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	it( 'should be able to add a new Paragraph block', async () => {
-		let paragraphBlockInteraction = new ParagraphBlockInteraction( driver, 'Paragraph' );
+		let paragraphBlockInteraction = new ParagraphBlockInteraction( driver );
 		paragraphBlockInteraction = await editorPage.addNewBlock( paragraphBlockInteraction );
 		await paragraphBlockInteraction.sendText( 'Hello Gutenberg!' );
 		await timer( 3000 );
@@ -62,6 +67,9 @@ describe( 'Gutenberg Editor tests', () => {
 			await appium.kill( 'SIGINT' );
 		} else {
 			if ( driver === undefined ) {
+				if ( appium !== undefined ) {
+					await appium.kill( 'SIGINT' );
+				}
 				return;
 			}
 			driver.sauceJobStatus( allPassed );

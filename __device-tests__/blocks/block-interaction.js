@@ -21,10 +21,11 @@ export default class BlockInteraction {
 	accessibilityIdXPathAttrib: string;
 	static index = 0;
 
-	constructor( driver: wd.PromiseChainWebdriver ) {
+	constructor( driver: wd.PromiseChainWebdriver, name: string = 'Unsupported Block' ) {
 		this.driver = driver;
 		this.accessibilityIdKey = 'name';
 		this.accessibilityIdXPathAttrib = 'name';
+		this.name = name;
 
 		if ( isAndroid() ) {
 			this.accessibilityIdXPathAttrib = 'content-desc';

@@ -11,6 +11,11 @@ import wd from 'wd';
  */
 import BlockInteraction from '../blocks/block-interaction';
 
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 export default class EditorPage {
 	driver: wd.PromiseChainWebdriver;
 	constructor( driver: wd.PromiseChainWebdriver ) {
@@ -26,7 +31,7 @@ export default class EditorPage {
 		const blockName = block.name;
 
 		// Click add button
-		const addButton = await this.driver.elementByAccessibilityId( 'Add block' );
+		const addButton = await this.driver.elementByAccessibilityId( __( 'Add block' ) );
 		await addButton.click();
 
 		// Click on block of choice

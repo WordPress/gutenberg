@@ -117,11 +117,11 @@ This repository uses appium to run UI tests. The tests live in `__device-tests__
 
 After those are checked off to run the UI tests on ios run 
 
-`TEST_RN_PLATFORM=ios yarn test:ui`
+`yarn test:ui:ios`
 
 and for android run, 
 
-`TEST_RN_PLATFORM=android yarn test:ui`
+`yarn test:ui:android`
 
 Alternatively if you're experiencing problems that seem to be related to the tests starting the appium server, for example errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. Sorry about that this is still a WIP, you can manually start the appium server via [appium desktop](https://github.com/appium/appium-desktop) or the cli, then change the port number in the tests while commenting out the `beforeAll` and `afterAll` block. 
 
