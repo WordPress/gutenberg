@@ -42,12 +42,6 @@
 		"parent": "developers"
 	},
 	{
-		"title": "Components",
-		"slug": "components",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/README.md",
-		"parent": "developers"
-	},
-	{
 		"title": "Theming for Gutenberg",
 		"slug": "themes",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/themes/README.md",
@@ -466,6 +460,12 @@
 		"slug": "block-annotations",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/block-api/block-annotations.md",
 		"parent": "block-api"
+	},
+	{
+		"title": "Components",
+		"slug": "components",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/README.md",
+		"parent": null
 	},
 	{
 		"title": "Data Module Reference",
