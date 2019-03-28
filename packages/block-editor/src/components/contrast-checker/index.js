@@ -2,7 +2,6 @@
  * External dependencies
  */
 import tinycolor from 'tinycolor2';
-import React, { useEffect } from 'react';
 
 /**
  * WordPress dependencies
@@ -10,6 +9,7 @@ import React, { useEffect } from 'react';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
+import { useEffect } from '@wordpress/element';
 
 function ContrastChecker( {
 	backgroundColor,
@@ -42,7 +42,7 @@ function ContrastChecker( {
 		} else {
 			speak( __( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' ) );
 		}
-	}, [ tinyBackgroundColor, tinyTextColor ] );
+	}, [ backgroundColor, textColor ] );
 	return (
 		<div className="editor-contrast-checker block-editor-contrast-checker">
 			<Notice status="warning" isDismissible={ false }>
