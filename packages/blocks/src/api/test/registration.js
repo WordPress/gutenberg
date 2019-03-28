@@ -332,7 +332,7 @@ describe( 'blocks', () => {
 					return [ settings ];
 				} );
 				const block = registerBlockType( 'my-plugin/fancy-block-13', defaultBlockSettings );
-				expect( console ).toHaveErroredWith( 'Block settings need to remain a plain object after all "blocks.registerBlockType" filters are applied.' );
+				expect( console ).toHaveErroredWith( 'Block settings must be a valid object.' );
 				expect( block ).toBeUndefined();
 			} );
 		} );

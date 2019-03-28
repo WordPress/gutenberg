@@ -98,7 +98,7 @@ export function registerBlockType( name, settings ) {
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 	if ( ! isPlainObject( settings ) ) {
 		console.error(
-			'Block settings need to remain a plain object after all "blocks.registerBlockType" filters are applied.'
+			'Block settings must be a valid object.'
 		);
 		return;
 	}
