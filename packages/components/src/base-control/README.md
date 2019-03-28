@@ -45,7 +45,7 @@ If this property is added, a label will be generated using label property as the
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String`
+- Type: `String|WPElement`
 - Required: No
 
 ### className
