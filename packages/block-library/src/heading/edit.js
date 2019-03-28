@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import HeadingToolbar from './heading-toolbar';
@@ -10,6 +15,7 @@ import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { PanelBody } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
+import { withSelect } from '@wordpress/data';
 import {
 	RichText,
 	BlockControls,
@@ -17,26 +23,29 @@ import {
 	AlignmentToolbar,
 } from '@wordpress/block-editor';
 
-export default function HeadingEdit( {
+function HeadingEdit( {
 	attributes,
 	setAttributes,
 	mergeBlocks,
 	insertBlocksAfter,
 	onReplace,
 	className,
+	levelChoices,
 } ) {
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
-
+	const BlockControlsLevelsRange = ( levelChoices.length <= 3 ) ?
+		levelChoices :
+		levelChoices.slice( 1, 4 );
 	return (
 		<Fragment>
 			<BlockControls>
-				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+				<HeadingToolbar levelsRange={ BlockControlsLevelsRange } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading Settings' ) }>
 					<p>{ __( 'Level' ) }</p>
-					<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+					<HeadingToolbar levelsRange={ levelChoices } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 					<p>{ __( 'Text Alignment' ) }</p>
 					<AlignmentToolbar
 						value={ align }
@@ -72,3 +81,17 @@ export default function HeadingEdit( {
 		</Fragment>
 	);
 }
+
+export default withSelect( ( select ) => {
+	const levelChoices = get(
+		select( 'core/blocks' ).getBlockType( 'core/heading' ),
+		[ 'attributes', 'content', 'selector' ],
+		''
+	)
+		.split( ',' )
+		.map( ( choice ) => Number( choice.substring( 1 ) ) );
+
+	return {
+		levelChoices,
+	};
+} )( HeadingEdit );
