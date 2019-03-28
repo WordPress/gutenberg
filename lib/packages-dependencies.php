@@ -159,7 +159,7 @@ return array(
 		'wp-block-library',
 		'wp-components',
 		'wp-element',
-		'wp-i18n'
+		'wp-i18n',
 	),
 	'wp-editor'                             => array(
 		'lodash',
