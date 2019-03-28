@@ -243,34 +243,36 @@ export class MediaPlaceholder extends Component {
 			src,
 		} = this.state;
 		return (
-			<div className="editor-media-placeholder__url-input-container block-editor-media-placeholder__url-input-container">
-				<Button
-					className="editor-media-placeholder__button block-editor-media-placeholder__button"
-					onClick={ this.openURLInput }
-					isToggled={ isURLInputVisible }
-					isLarge
-				>
-					{ __( 'Insert from URL' ) }
-				</Button>
-				{ isURLInputVisible && (
-					<InsertFromURLPopover
-						src={ src }
-						onChange={ this.onChangeSrc }
-						onSubmit={ this.onSubmitSrc }
-						onClose={ this.closeURLInput }
-					/>
-				) }
+			<Fragment>
+				<div className="editor-media-placeholder__url-input-container block-editor-media-placeholder__url-input-container">
+					<Button
+						className="editor-media-placeholder__button block-editor-media-placeholder__button"
+						onClick={ this.openURLInput }
+						isToggled={ isURLInputVisible }
+						isLarge
+					>
+						{ __( 'Insert from URL' ) }
+					</Button>
+					{ isURLInputVisible && (
+						<InsertFromURLPopover
+							src={ src }
+							onChange={ this.onChangeSrc }
+							onSubmit={ this.onSubmitSrc }
+							onClose={ this.closeURLInput }
+						/>
+					) }
+				</div>
 				{ onCancel && (
 					<Button
-						className="block-editor-media-placeholder__button__link"
+						className="block-editor-media-placeholder__cancel-button"
 						title={ __( 'Cancel' ) }
-						isLink={ true }
+						isLink
 						onClick={ onCancel }
 					>
 						{ __( 'Cancel' ) }
 					</Button>
 				) }
-			</div>
+			</Fragment>
 		);
 	}
 

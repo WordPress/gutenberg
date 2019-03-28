@@ -375,57 +375,57 @@ class ImageEdit extends Component {
 		} = attributes;
 		const isExternal = isExternalImage( id, url );
 
-		let toolbarEditButton;
-
-		if ( url ) {
-			toolbarEditButton = (
-				<Toolbar>
-					<IconButton
-						className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing }
-						) }
-						label={ __( 'Edit image' ) }
-						onClick={ this.toggleIsEditing }
-						icon={ <SVG width={ 24 } height={ 24 } viewBox="0 0 24 24"><Rect x={ 14 } y={ 3 } width={ 8 } height={ 6 } rx={ 1 } /><Rect x={ 2 } y={ 15 } width={ 8 } height={ 6 } rx={ 1 } /><Path d="M16,15h1.87c-.63,2.35-3.38,4-5.87,4v2c3.47,0,7.29-2.42,7.91-6H22l-3-3.5Z" /><Path d="M8,9H6.13C6.76,6.65,9.51,5,12,5V3C8.53,3,4.71,5.42,4.09,9H2l3,3.5Z" /></SVG> }
-					/>
-				</Toolbar>
-			);
-		}
-
 		const controls = (
 			<BlockControls>
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
 				/>
-				{ toolbarEditButton }
+				{ url && (
+					<Toolbar>
+						<IconButton
+							className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing }
+							) }
+							label={ __( 'Edit image' ) }
+							onClick={ this.toggleIsEditing }
+							icon={ <SVG width={ 24 } height={ 24 } viewBox="0 0 24 24"><Rect x={ 14 } y={ 3 } width={ 8 } height={ 6 } rx={ 1 } /><Rect x={ 2 } y={ 15 } width={ 8 } height={ 6 } rx={ 1 } /><Path d="M16,15h1.87c-.63,2.35-3.38,4-5.87,4v2c3.47,0,7.29-2.42,7.91-6H22l-3-3.5Z" /><Path d="M8,9H6.13C6.76,6.65,9.51,5,12,5V3C8.53,3,4.71,5.42,4.09,9H2l3,3.5Z" /></SVG> }
+						/>
+					</Toolbar>
+				) }
 			</BlockControls>
 		);
-
 		if ( isEditing || ! url ) {
 			const src = isExternal ? url : undefined;
+			const replaceImageLabel = (
+				<span className={ 'replace-image-preview__title' }>
+					{ __( 'Replace image' ) }
+				</span>
+			);
+			const labels = {
+				title: ! url ? __( 'Image' ) : replaceImageLabel,
+			};
+			let replaceImageIcon = ( <BlockIcon icon={ icon } /> );
+			if ( url ) {
+				replaceImageIcon = ( <img
+					alt={ __( 'Replace image' ) }
+					title={ __( 'Replace image' ) }
+					className={ 'replace-image-preview' }
+					src={ url }
+				/> );
+			}
 			return (
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon={ ! url ? <BlockIcon icon={ icon } /> : <img
-							alt={ __( 'Replace image' ) }
-							title={ __( 'Replace image' ) }
-							width={ '50%' }
-							className={ 'replace-image-preview' }
-							src={ url }
-						/> }
-						labels={ {
-							title: ! url ? __( 'Image' ) : <span
-								className={ 'replace-image-preview-title' }
-							>
-								{ __( 'Replace image' ) }
-							</span>,
-						} }
-						className={ classnames( className, ! url ? '' : 'wp-block-image-replace' ) }
+						icon={ replaceImageIcon }
+						labels={ labels }
+						className={ classnames( className, {
+							'wp-block-image-replace': url,
+						} ) }
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
 						onDoubleClick={ this.toggleIsEditing }
-						onCancel={ ! url ? false : this.toggleIsEditing }
+						onCancel={ !! url && this.toggleIsEditing }
 						notices={ noticeUI }
 						onError={ this.onUploadError }
 						accept="image/*"
