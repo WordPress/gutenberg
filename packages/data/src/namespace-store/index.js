@@ -7,12 +7,21 @@ import {
 	get,
 	mapValues,
 } from 'lodash';
+import combineReducers from 'turbo-combine-reducers';
+
+/**
+ * WordPress dependencies
+ */
+import createReduxRoutineMiddleware from '@wordpress/redux-routine';
 
 /**
  * Internal dependencies
  */
-import promise from './promise-middleware';
-import createResolversCacheMiddleware from './resolvers-cache-middleware';
+import promise from '../promise-middleware';
+import createResolversCacheMiddleware from '../resolvers-cache-middleware';
+import metadataReducer from './metadata/reducer';
+import * as metadataSelectors from './metadata/selectors';
+import * as metadataActions from './metadata/actions';
 
 /**
  * Creates a namespace object with a store derived from the reducer given.
@@ -27,16 +36,27 @@ export default function createNamespace( key, options, registry ) {
 	const reducer = options.reducer;
 	const store = createReduxStore( key, options, registry );
 
-	let selectors, actions, resolvers;
-	if ( options.actions ) {
-		actions = mapActions( options.actions, store );
-	}
-	if ( options.selectors ) {
-		selectors = mapSelectors( options.selectors, store, registry );
-	}
+	let resolvers;
+	const actions = mapActions( {
+		...metadataActions,
+		...options.actions,
+	}, store );
+	let selectors = mapSelectors( {
+		...mapValues( metadataSelectors, ( selector ) => ( state, ...args ) => selector( state.metadata, ...args ) ),
+		...mapValues( options.selectors, ( selector ) => {
+			if ( selector.isRegistrySelector ) {
+				const mappedSelector = ( reg ) => ( state, ...args ) => {
+					return selector( reg )( state.root, ...args );
+				};
+				mappedSelector.isRegistrySelector = selector.isRegistrySelector;
+				return mappedSelector;
+			}
+
+			return ( state, ...args ) => selector( state.root, ...args );
+		} ),
+	}, store, registry );
 	if ( options.resolvers ) {
-		const fulfillment = getCoreDataFulfillment( registry, key );
-		const result = mapResolvers( options.resolvers, selectors, fulfillment, store );
+		const result = mapResolvers( options.resolvers, selectors, store );
 		resolvers = result.resolvers;
 		selectors = result.selectors;
 	}
@@ -44,12 +64,18 @@ export default function createNamespace( key, options, registry ) {
 	const getSelectors = () => selectors;
 	const getActions = () => actions;
 
+	// We have some modules monkey-patching the store object
+	// It's wrong to do so but until we refactor all of our effects to controls
+	// We need to keep the same "store" instance here.
+	store.__unstableOriginalGetState = store.getState;
+	store.getState = () => store.__unstableOriginalGetState().root;
+
 	// Customize subscribe behavior to call listeners only on effective change,
 	// not on every dispatch.
 	const subscribe = store && function( listener ) {
-		let lastState = store.getState();
+		let lastState = store.__unstableOriginalGetState();
 		store.subscribe( () => {
-			const state = store.getState();
+			const state = store.__unstableOriginalGetState();
 			const hasChanged = state !== lastState;
 			lastState = state;
 
@@ -84,15 +110,36 @@ export default function createNamespace( key, options, registry ) {
  * @return {Object} Newly created redux store.
  */
 function createReduxStore( key, options, registry ) {
+	const middlewares = [
+		createResolversCacheMiddleware( registry, key ),
+		promise,
+	];
+
+	if ( options.controls ) {
+		const normalizedControls = mapValues( options.controls, ( control ) => {
+			return control.isRegistryControl ? control( registry ) : control;
+		} );
+		middlewares.push( createReduxRoutineMiddleware( normalizedControls ) );
+	}
+
 	const enhancers = [
-		applyMiddleware( createResolversCacheMiddleware( registry, key ), promise ),
+		applyMiddleware( ...middlewares ),
 	];
 	if ( typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: key, instanceId: key } ) );
 	}
 
 	const { reducer, initialState } = options;
-	return createStore( reducer, initialState, flowRight( enhancers ) );
+	const enhancedReducer = combineReducers( {
+		metadata: metadataReducer,
+		root: reducer,
+	} );
+
+	return createStore(
+		enhancedReducer,
+		{ root: initialState },
+		flowRight( enhancers )
+	);
 }
 
 /**
@@ -120,7 +167,7 @@ function mapSelectors( selectors, store, registry ) {
 			// direct assignment.
 			const argsLength = arguments.length;
 			const args = new Array( argsLength + 1 );
-			args[ 0 ] = store.getState();
+			args[ 0 ] = store.__unstableOriginalGetState();
 			for ( let i = 0; i < argsLength; i++ ) {
 				args[ i + 1 ] = arguments[ i ];
 			}
@@ -151,11 +198,15 @@ function mapActions( actions, store ) {
  *
  * @param {Object} resolvers   Resolvers to register.
  * @param {Object} selectors   The current selectors to be modified.
- * @param {Object} fulfillment Fulfillment implementation functions.
  * @param {Object} store       The redux store to which the resolvers should be mapped.
  * @return {Object}            An object containing updated selectors and resolvers.
  */
-function mapResolvers( resolvers, selectors, fulfillment, store ) {
+function mapResolvers( resolvers, selectors, store ) {
+	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
+		const { fulfill: resolverFulfill = resolver } = resolver;
+		return { ...resolver, fulfill: resolverFulfill };
+	} );
+
 	const mapSelector = ( selector, selectorName ) => {
 		const resolver = resolvers[ selectorName ];
 		if ( ! resolver ) {
@@ -169,24 +220,20 @@ function mapResolvers( resolvers, selectors, fulfillment, store ) {
 					return;
 				}
 
-				if ( fulfillment.hasStarted( selectorName, args ) ) {
+				const { metadata } = store.__unstableOriginalGetState();
+				if ( metadataSelectors.hasStartedResolution( metadata, selectorName, args ) ) {
 					return;
 				}
 
-				fulfillment.start( selectorName, args );
-				await fulfillment.fulfill( selectorName, ...args );
-				fulfillment.finish( selectorName, args );
+				store.dispatch( metadataActions.startResolution( selectorName, args ) );
+				await fulfillResolver( store, mappedResolvers, selectorName, ...args );
+				store.dispatch( metadataActions.finishResolution( selectorName, args ) );
 			}
 
 			fulfillSelector( ...args );
 			return selector( ...args );
 		};
 	};
-
-	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
-		const { fulfill: resolverFulfill = resolver } = resolver;
-		return { ...resolver, fulfill: resolverFulfill };
-	} );
 
 	return {
 		resolvers: mappedResolvers,
@@ -195,42 +242,21 @@ function mapResolvers( resolvers, selectors, fulfillment, store ) {
 }
 
 /**
- * Bundles up fulfillment functions for resolvers.
- * @param {Object} registry     Registry reference, for fulfilling via resolvers
- * @param {string} key          Part of the state shape to register the
- *                              selectors for.
- * @return {Object}             An object providing fulfillment functions.
- */
-function getCoreDataFulfillment( registry, key ) {
-	const { hasStartedResolution } = registry.select( 'core/data' );
-	const { startResolution, finishResolution } = registry.dispatch( 'core/data' );
-
-	return {
-		hasStarted: ( ...args ) => hasStartedResolution( key, ...args ),
-		start: ( ...args ) => startResolution( key, ...args ),
-		finish: ( ...args ) => finishResolution( key, ...args ),
-		fulfill: ( ...args ) => fulfillWithRegistry( registry, key, ...args ),
-	};
-}
-
-/**
  * Calls a resolver given arguments
  *
- * @param {Object} registry     Registry reference, for fulfilling via resolvers
- * @param {string} key          Part of the state shape to register the
- *                              selectors for.
+ * @param {Object} store        Store reference, for fulfilling via resolvers
+ * @param {Object} resolvers    Store Resolvers
  * @param {string} selectorName Selector name to fulfill.
- * @param {Array} args         Selector Arguments.
+ * @param {Array} args          Selector Arguments.
  */
-async function fulfillWithRegistry( registry, key, selectorName, ...args ) {
-	const namespace = registry.stores[ key ];
-	const resolver = get( namespace, [ 'resolvers', selectorName ] );
+async function fulfillResolver( store, resolvers, selectorName, ...args ) {
+	const resolver = get( resolvers, [ selectorName ] );
 	if ( ! resolver ) {
 		return;
 	}
 
 	const action = resolver.fulfill( ...args );
 	if ( action ) {
-		await namespace.store.dispatch( action );
+		await store.dispatch( action );
 	}
 }
