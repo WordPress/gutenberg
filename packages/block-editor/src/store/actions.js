@@ -220,6 +220,8 @@ export function toggleSelection( isSelectionEnabled = true ) {
  *
  * @param {(string|string[])} clientIds Block client ID(s) to replace.
  * @param {(Object|Object[])} blocks    Replacement block(s).
+ *
+ * @yields {Object} Action object.
  */
 export function* replaceBlocks( clientIds, blocks ) {
 	clientIds = castArray( clientIds );
@@ -229,8 +231,7 @@ export function* replaceBlocks( clientIds, blocks ) {
 		'getBlockRootClientId',
 		first( clientIds )
 	);
-	// Replace is valid if the new blocks can be inserted in the root block
-	// or if we had a block of the same type in the position of the block being replaced.
+	// Replace is valid if the new blocks can be inserted in the root block.
 	for ( let index = 0; index < blocks.length; index++ ) {
 		const block = blocks[ index ];
 		const canInsertBlock = yield select(
@@ -240,12 +241,7 @@ export function* replaceBlocks( clientIds, blocks ) {
 			rootClientId
 		);
 		if ( ! canInsertBlock ) {
-			const clientIdToReplace = clientIds[ index ];
-			const nameOfBlockToReplace = clientIdToReplace &&
-				( yield select( 'core/block-editor', 'getBlockName', clientIdToReplace ) );
-			if ( ! nameOfBlockToReplace || ( nameOfBlockToReplace !== block.name ) ) {
-				return;
-			}
+			return;
 		}
 	}
 	yield {
@@ -300,7 +296,7 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * @param  {?string} toRootClientId   Root client ID destination.
  * @param  {number}  index            The index to move the block into.
  *
- * @return {Object} Action object.
+ * @yields {Object} Action object.
  */
 export function* moveBlockToPosition( clientId, fromRootClientId, toRootClientId, index ) {
 	const templateLock = yield select(
@@ -324,7 +320,8 @@ export function* moveBlockToPosition( clientId, fromRootClientId, toRootClientId
 	};
 	// If moving inside the same root block the move is always possible.
 	if ( fromRootClientId === toRootClientId ) {
-		return action;
+		yield action;
+		return;
 	}
 
 	const blockName = yield select(
@@ -342,7 +339,7 @@ export function* moveBlockToPosition( clientId, fromRootClientId, toRootClientId
 
 	// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
 	if ( canInsertBlock ) {
-		return action;
+		yield action;
 	}
 }
 
@@ -391,16 +388,14 @@ export function* insertBlocks(
 	blocks = castArray( blocks );
 	const allowedBlocks = [];
 	for ( const block of blocks ) {
-		if ( block ) {
-			const isValid = yield select(
-				'core/block-editor',
-				'canInsertBlockType',
-				block.name,
-				rootClientId
-			);
-			if ( isValid ) {
-				allowedBlocks.push( block );
-			}
+		const isValid = yield select(
+			'core/block-editor',
+			'canInsertBlockType',
+			block.name,
+			rootClientId
+		);
+		if ( isValid ) {
+			allowedBlocks.push( block );
 		}
 	}
 	if ( allowedBlocks.length ) {

@@ -277,66 +277,6 @@ describe( 'actions', () => {
 				done: true,
 			} );
 		} );
-
-		it( 'should yield the REPLACE_BLOCKS if the block being replaced and the replacement are of the same type', () => {
-			const blocks = [ {
-				clientId: 'ribs',
-				name: 'core/test-block',
-			} ];
-
-			const replaceBlockGenerator = replaceBlocks( [ 'chicken' ], blocks );
-			expect(
-				replaceBlockGenerator.next().value,
-			).toEqual( {
-				args: [ 'chicken' ],
-				selectorName: 'getBlockRootClientId',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
-
-			expect(
-				replaceBlockGenerator.next().value,
-			).toEqual( {
-				args: [ 'core/test-block', undefined ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
-
-			expect(
-				replaceBlockGenerator.next( false ).value,
-			).toEqual( {
-				args: [ 'chicken' ],
-				selectorName: 'getBlockName',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
-
-			expect(
-				replaceBlockGenerator.next( 'core/test-block' ).value,
-			).toEqual( {
-				type: 'REPLACE_BLOCKS',
-				clientIds: [ 'chicken' ],
-				blocks,
-				time: expect.any( Number ),
-			} );
-
-			expect(
-				replaceBlockGenerator.next().value,
-			).toEqual( {
-				args: [],
-				selectorName: 'getBlockCount',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
-
-			expect(
-				replaceBlockGenerator.next( 1 ),
-			).toEqual( {
-				value: undefined,
-				done: true,
-			} );
-		} );
 	} );
 
 	describe( 'insertBlock', () => {
