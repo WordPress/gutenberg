@@ -68,19 +68,24 @@ export function applyFormat(
 			};
 		}
 	} else {
+		// Determine the highest position the new format can be inserted at.
+		let position = +Infinity;
+
 		for ( let index = startIndex; index < endIndex; index++ ) {
 			if ( newFormats[ index ] ) {
 				newFormats[ index ] = newFormats[ index ]
 					.filter( ( { type } ) => type !== format.type );
+
+				const length = newFormats[ index ].length;
+
+				if ( length < position ) {
+					position = length;
+				}
 			} else {
 				newFormats[ index ] = [];
+				position = 0;
 			}
 		}
-
-		const position = Math.min(
-			newFormats[ startIndex ].length,
-			newFormats[ endIndex - 1 ].length
-		);
 
 		for ( let index = startIndex; index < endIndex; index++ ) {
 			newFormats[ index ].splice( position, 0, format );

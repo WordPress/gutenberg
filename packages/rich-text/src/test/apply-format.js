@@ -112,6 +112,22 @@ describe( 'applyFormat', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
 	} );
 
+	it( 'should apply format around existing format with break', () => {
+		const record = {
+			formats: [ , [ em ], , [ em ] ],
+			text: 'test',
+		};
+		const expected = {
+			...record,
+			formats: [ , [ strong, em ], [ strong ], [ strong, em ] ],
+		};
+		const result = applyFormat( deepFreeze( record ), strong, 1, 4 );
+
+		expect( result ).toEqual( expected );
+		expect( result ).not.toBe( record );
+		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
+	} );
+
 	it( 'should apply format crossing existing format', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
