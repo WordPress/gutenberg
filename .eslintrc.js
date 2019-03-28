@@ -75,7 +75,7 @@ module.exports = {
 				message: 'Use memize instead of Lodash’s memoize',
 			},
 			{
-				selector: 'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+				selector: 'CallExpression[callee.object.name="page"][callee.property.name="waitFor"] > Literal:first-child',
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{
