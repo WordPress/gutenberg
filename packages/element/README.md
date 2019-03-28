@@ -239,6 +239,14 @@ Checks if an object is a valid WPElement
 
 `boolean`: true if objectToTest is a valid WPElement and false otherwise.
 
+### lazy
+
+[src/index.js#L1-L1](src/index.js#L1-L1)
+
+**Related**
+
+-   <https://reactjs.org/docs/react-api.html#reactlazy>
+
 ### RawHTML
 
 [src/index.js#L5-L5](src/index.js#L5-L5)
@@ -288,6 +296,14 @@ Serializes a React element to string.
 [src/index.js#L1-L1](src/index.js#L1-L1)
 
 Component that activates additional checks and warnings for its descendants.
+
+### Suspense
+
+[src/index.js#L1-L1](src/index.js#L1-L1)
+
+**Related**
+
+-   <https://reactjs.org/docs/react-api.html#reactsuspense>
 
 ### switchChildrenNodeName
 
