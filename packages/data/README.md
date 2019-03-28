@@ -297,6 +297,7 @@ configurations.
 _Parameters_
 
 -   _storeConfigs_ `Object`: Initial store configurations.
+-   _parent_ `?Object`: Parent registry.
 
 _Returns_
 
