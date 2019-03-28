@@ -19,6 +19,8 @@ import {
 	split,
 	toHTMLString,
 	insert,
+	insertLineSeparator,
+	isEmptyLine,
 	isCollapsed,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -282,7 +284,22 @@ export class RichText extends Component {
 			currentContent: unescapeSpaces( event.nativeEvent.text ),
 		} );
 
-		this.splitContent( currentRecord );
+		if ( this.multilineTag ) {
+			if ( event.shiftKey ) {
+				const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
+				this.onFormatChange( insertedLineBreak );
+			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
+				this.onSplit( ...split( currentRecord ).map( this.valueToFormat ) );
+			} else {
+				const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
+				this.onFormatChange( insertedLineSeparator );
+			}
+		} else if ( event.shiftKey || ! this.onSplit ) {
+			const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
+			this.onFormatChange( insertedLineBreak );
+		} else {
+			this.splitContent( currentRecord );
+		}
 	}
 
 	// eslint-disable-next-line no-unused-vars
