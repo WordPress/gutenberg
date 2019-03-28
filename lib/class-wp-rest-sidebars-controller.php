@@ -118,6 +118,8 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			);
 		}
 
+		$sidebar = $wp_registered_sidebars[ $sidebar_id ];
+
 		// TODO: How should we format blocks in the REST API? Or should we send down
 		// HTML so that we're consistent with the /posts and /blocks endpoints?
 		$blocks = array();
@@ -136,7 +138,10 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 				} else {
 					$blocks[] = array(
 						'name'         => 'core/legacy-widget',
-						'attributes'   => array( 'identifier' => $item ),
+						'attributes'   => array(
+							'identifier' => $item,
+							'instance'   => $this->get_sidebars_widget_instance( $sidebar, $item ),
+						),
 						'innerBlocks'  => array(),
 						'innerHTML'    => '',
 						'innerContent' => array(),
@@ -146,7 +151,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		}
 
 		return array_merge(
-			$wp_registered_sidebars[ $sidebar_id ],
+			$sidebar,
 			array( 'blocks' => $blocks )
 		);
 	}
@@ -176,8 +181,17 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					continue;
 				}
 
-				if ( 'core/legacy-widget' === $block['name'] ) {
+				if (
+					'core/legacy-widget' === $block['name'] &&
+					isset( $block['attributes']['identifier'] ) &&
+					isset( $block['attributes']['instance'] )
+				) {
 					$items[] = $block['attributes']['identifier'];
+
+					$this->update_widget_instance(
+						$block['attributes']['identifier'],
+						$block['attributes']['instance']
+					);
 				} else {
 					$items[] = array(
 						'blockName'    => $block['name'],
@@ -194,5 +208,96 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 				array( $sidebar_id => $items )
 			) );
 		}
+	}
+
+	private function get_sidebars_widget_instance( $sidebar, $id ) {
+		list( $object, $number, $name ) = $this->get_widget_info( $id );
+		if ( ! $object ) {
+			return array();
+		}
+
+		$object->_set( $number );
+
+		$instances = $object->get_settings();
+		$instance  = $instances[ $number ];
+
+		$args = array_merge(
+			$sidebar,
+			array(
+				'widget_id'   => $id,
+				'widget_name' => $name,
+			)
+		);
+
+		/**
+		 * Filters the settings for a particular widget instance.
+		 *
+		 * Returning false will effectively short-circuit display of the widget.
+		 *
+		 * @since 2.8.0
+		 *
+		 * @param array     $instance The current widget instance's settings.
+		 * @param WP_Widget $this     The current widget instance.
+		 * @param array     $args     An array of default widget arguments.
+		 */
+		$instance = apply_filters( 'widget_display_callback', $instance, $object, $args );
+
+		if ( false === $instance ) {
+			return array();
+		}
+
+		return $instance;
+	}
+
+	private function update_widget_instance( $id, $new_instance ) {
+		list( $object, $number, ) = $this->get_widget_info( $id );
+		if ( ! $object ) {
+			return;
+		}
+
+		$object->_set( $number );
+
+		$instances    = $object->get_settings();
+		$old_instance = $instances[ $number ];
+
+		$instance = $object->update( $new_instance, $old_instance );
+
+		/**
+		 * Filters a widget's settings before saving.
+		 *
+		 * Returning false will effectively short-circuit the widget's ability
+		 * to update settings.
+		 *
+		 * @since 2.8.0
+		 *
+		 * @param array     $instance     The current widget instance's settings.
+		 * @param array     $new_instance Array of new widget settings.
+		 * @param array     $old_instance Array of old widget settings.
+		 * @param WP_Widget $this         The current widget instance.
+		 */
+		$instance = apply_filters( 'widget_update_callback', $instance, $new_instance, $old_instance, $object );
+
+		if ( false !== $instance ) {
+			$instances[ $number ] = $instance;
+			$object->save_settings( $instances );
+		}
+	}
+
+	private function get_widget_info( $id ) {
+		global $wp_registered_widgets;
+
+		if (
+			! isset( $wp_registered_widgets[ $id ]['callback'][0] ) ||
+			! isset( $wp_registered_widgets[ $id ]['params'][0]['number'] ) ||
+			! isset( $wp_registered_widgets[ $id ]['name'] ) ||
+			! ( $wp_registered_widgets[ $id ]['callback'][0] instanceof WP_Widget )
+		) {
+			return array( null, null, null );
+		}
+
+		$object = $wp_registered_widgets[ $id ]['callback'][0];
+		$number = $wp_registered_widgets[ $id ]['params'][0]['number'];
+		$name   = $wp_registered_widgets[ $id ]['name'];
+		return array( $object, $number, $name );
 	}
 }
