@@ -58,6 +58,19 @@ _Returns_
 
 -   `?Node`: Offset parent.
 
+<a name="getPosition" href="#getPosition">#</a> **getPosition**
+
+Calculates which axis the event is closer to (`left`/`right`, `top`/`bottom`).
+
+_Parameters_
+
+-   _element_ `Element`: The element to get the axis from.
+-   _event_ `Event`: Event that tracks the coordinates.
+
+_Returns_
+
+-   `Object`: An object with `x` and `y` keys, whose values can be `left`/`right` or `top`/`bottom` respectively.
+
 <a name="getRectangleFromRange" href="#getRectangleFromRange">#</a> **getRectangleFromRange**
 
 Get the rectangle of a given Range.
@@ -149,6 +162,19 @@ _Parameters_
 _Returns_
 
 -   `boolean`: True if at the vertical edge, false if not.
+
+<a name="isWithinBounds" href="#isWithinBounds">#</a> **isWithinBounds**
+
+Whether the event coordinates are within the element bounds.
+
+_Parameters_
+
+-   _element_ `Element`: The element to check.
+-   _event_ `Event`: The event that tracks the coordinates.
+
+_Returns_
+
+-   `boolean`: True if is within bounds, false if not.
 
 <a name="placeCaretAtHorizontalEdge" href="#placeCaretAtHorizontalEdge">#</a> **placeCaretAtHorizontalEdge**
 

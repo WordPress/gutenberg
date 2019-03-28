@@ -655,3 +655,50 @@ export function wrap( newNode, referenceNode ) {
 	referenceNode.parentNode.insertBefore( newNode, referenceNode );
 	newNode.appendChild( referenceNode );
 }
+
+function maybeUnwrapEvent( event ) {
+	// In some contexts, it may be necessary to capture and redirect the
+	// event (e.g. atop an `iframe`). To accommodate this, you can
+	// create an instance of CustomEvent with the original event specified
+	// as the `detail` property.
+	//
+	// See: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+	return window.CustomEvent && event instanceof window.CustomEvent ? event.detail : event;
+}
+
+/**
+ * Whether the event coordinates are within the element bounds.
+ *
+ * @param {Element} element The element to check.
+ * @param {Event} event The event that tracks the coordinates.
+ * @return {boolean} True if is within bounds, false if not.
+ */
+export function isWithinBounds( element, event ) {
+	const { clientX: x, clientY: y } = maybeUnwrapEvent( event );
+
+	const rect = element.getBoundingClientRect();
+	/// make sure the rect is a valid rect
+	if ( rect.bottom === rect.top || rect.left === rect.right ) {
+		return false;
+	}
+
+	return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+}
+
+/**
+ * Calculates which axis the event is closer to (`left`/`right`, `top`/`bottom`).
+ *
+ * @param {Element} element The element to get the axis from.
+ * @param {Event} event Event that tracks the coordinates.
+ * @return {Object} An object with `x` and `y` keys,
+ * whose values can be `left`/`right` or `top`/`bottom` respectively.
+ */
+export function getPosition( element, event ) {
+	const { clientX, clientY } = maybeUnwrapEvent( event );
+	const rect = element.getBoundingClientRect();
+
+	return {
+		x: clientX - rect.left < rect.right - clientX ? 'left' : 'right',
+		y: clientY - rect.top < rect.bottom - clientY ? 'top' : 'bottom',
+	};
+}
