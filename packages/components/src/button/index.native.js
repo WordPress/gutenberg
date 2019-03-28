@@ -55,6 +55,7 @@ export default function Button( props ) {
 		children,
 		onClick,
 		disabled,
+		hint,
 		'aria-disabled': ariaDisabled,
 		'aria-label': ariaLabel,
 		'aria-pressed': ariaPressed,
@@ -66,12 +67,18 @@ export default function Button( props ) {
 		opacity: isDisabled ? 0.2 : 1,
 		...( ariaPressed ? styles.buttonActive : styles.buttonInactive ),
 	};
+	let states = [];
+	ariaPressed && states.push( 'selected' );
+	isDisabled && states.push( 'disabled' );
 
 	return (
 		<TouchableOpacity
 			activeOpacity={ 0.7 }
 			accessible={ true }
 			accessibilityLabel={ ariaLabel }
+			accessibilityStates={ states }
+			accessibilityRole={ 'button' }
+			accessibilityHint={ hint }
 			onPress={ onClick }
 			style={ styles.container }
 			disabled={ isDisabled }
