@@ -688,16 +688,16 @@ export function isWithinBounds( element, event ) {
 }
 
 /**
- * Calculates which axis the event is closer to (`left`/`right`, `top`/`bottom`).
+ * Calculates which element's edges the event coordinates are closer to.
  *
  * @since 2.2.0
  *
- * @param {Element} element The element to get the axis from.
+ * @param {Element} element The element to calculate closeness from.
  * @param {Event} event Event that tracks the coordinates.
  * @return {Object} An object with `x` and `y` keys,
  * whose values can be `left`/`right` or `top`/`bottom` respectively.
  */
-export function getPosition( element, event ) {
+export function getClosestEdges( element, event ) {
 	const { clientX, clientY } = maybeUnwrapEvent( event );
 	const rect = element.getBoundingClientRect();
 

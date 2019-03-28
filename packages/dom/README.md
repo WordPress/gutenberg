@@ -40,6 +40,19 @@ _Returns_
 Object grouping `focusable` and `tabbable` utils
 under the keys with the same name.
 
+<a name="getClosestEdges" href="#getClosestEdges">#</a> **getClosestEdges**
+
+Calculates which element's edges the event coordinates are closer to.
+
+_Parameters_
+
+-   _element_ `Element`: The element to calculate closeness from.
+-   _event_ `Event`: Event that tracks the coordinates.
+
+_Returns_
+
+-   `Object`: An object with `x` and `y` keys, whose values can be `left`/`right` or `top`/`bottom` respectively.
+
 <a name="getOffsetParent" href="#getOffsetParent">#</a> **getOffsetParent**
 
 Returns the closest positioned element, or null under any of the conditions
@@ -57,19 +70,6 @@ _Parameters_
 _Returns_
 
 -   `?Node`: Offset parent.
-
-<a name="getPosition" href="#getPosition">#</a> **getPosition**
-
-Calculates which axis the event is closer to (`left`/`right`, `top`/`bottom`).
-
-_Parameters_
-
--   _element_ `Element`: The element to get the axis from.
--   _event_ `Event`: Event that tracks the coordinates.
-
-_Returns_
-
--   `Object`: An object with `x` and `y` keys, whose values can be `left`/`right` or `top`/`bottom` respectively.
 
 <a name="getRectangleFromRange" href="#getRectangleFromRange">#</a> **getRectangleFromRange**
 
