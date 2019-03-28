@@ -48,10 +48,9 @@ export class BlockToolbar extends Component<PropsType> {
 		} = this.props;
 
 		return (
-			<View style={ styles.container } accessible={ false } accessibilityLabel="View Add block" >
+			<View style={ styles.container } accessible={ false }  >
 				<ScrollView
 					accessible={ false }
-					accessibilityLabel="Scrollview Add block"
 					horizontal={ true }
 					showsHorizontalScrollIndicator={ false }
 					keyboardShouldPersistTaps={ 'always' }
@@ -59,7 +58,7 @@ export class BlockToolbar extends Component<PropsType> {
 					contentContainerStyle={ styles.scrollableContent }
 				>
 					<Toolbar accessible={ false }
-						accessibilityLabel={ 'Toolbar Add block' }>
+						accessibilityLabel={ 'Bottom Toolbar' }>
 						<ToolbarButton
 							icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
 							title={ __( 'Add block' ) }

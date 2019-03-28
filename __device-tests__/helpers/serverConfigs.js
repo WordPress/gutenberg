@@ -1,6 +1,6 @@
 exports.local = {
 	host: 'localhost',
-	port: 4723, // Default Port
+	port: 4723, // Port for local Appium runs
 };
 
 exports.sauce = {

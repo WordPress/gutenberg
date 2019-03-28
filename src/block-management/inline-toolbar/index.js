@@ -55,7 +55,7 @@ export default class InlineToolbar extends React.Component<PropsType> {
 		return (
 			<View style={ styles.toolbar } >
 				<ToolbarButton
-					accessibilityLabel="toolbar"
+					accessibilityLabel={ __( 'Move up' ) }
 					label={ __( 'Move up' ) }
 					isDisabled={ ! this.props.canMoveUp }
 					onClick={ this.onUpPressed }

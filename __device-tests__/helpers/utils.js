@@ -33,7 +33,7 @@ const defaultIOSAppPath = './ios/build/gutenberg/Build/Products/Debug-iphonesimu
 const localAndroidAppPath = process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
 const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
 
-const localAppiumPort = 4723; // Port to spawn appium process for local runs
+const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs
 
 // $FlowFixMe
 const timer = ( ms: number ) => new Promise( ( res ) => setTimeout( res, ms ) );
@@ -48,7 +48,6 @@ const isLocalEnvironment = () => {
 
 // Initialises the driver and desired capabilities for appium
 const setupDriver = async () => {
-	serverConfigs.local.port = localAppiumPort;
 	const serverConfig = isLocalEnvironment() ? serverConfigs.local : serverConfigs.sauce;
 	const driver = wd.promiseChainRemote( serverConfig );
 
