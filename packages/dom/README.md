@@ -148,7 +148,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: True if at the edge, false if not.
+-   `boolean`: True if at the vertical edge, false if not.
 
 <a name="placeCaretAtHorizontalEdge" href="#placeCaretAtHorizontalEdge">#</a> **placeCaretAtHorizontalEdge**
 
