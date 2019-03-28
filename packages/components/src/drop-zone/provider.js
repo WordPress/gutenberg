@@ -8,6 +8,7 @@ import { isEqual, find, some, filter, throttle, includes } from 'lodash';
  */
 import { Component, createContext } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { getPosition, isWithinBounds } from '@wordpress/dom';
 
 const { Provider, Consumer } = createContext( {
 	addDropZone: () => {},
@@ -35,16 +36,6 @@ const isTypeSupportedByDropZone = ( type, dropZone ) => {
 	return ( type === 'file' && dropZone.onFilesDrop ) ||
 		( type === 'html' && dropZone.onHTMLDrop ) ||
 		( type === 'default' && dropZone.onDrop );
-};
-
-const isWithinElementBounds = ( element, x, y ) => {
-	const rect = element.getBoundingClientRect();
-	/// make sure the rect is a valid rect
-	if ( rect.bottom === rect.top || rect.left === rect.right ) {
-		return false;
-	}
-
-	return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
 };
 
 class DropZoneProvider extends Component {
@@ -119,18 +110,10 @@ class DropZoneProvider extends Component {
 	}
 
 	toggleDraggingOverDocument( event, dragEventType ) {
-		// In some contexts, it may be necessary to capture and redirect the
-		// drag event (e.g. atop an `iframe`). To accommodate this, you can
-		// create an instance of CustomEvent with the original event specified
-		// as the `detail` property.
-		//
-		// See: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
-		const detail = window.CustomEvent && event instanceof window.CustomEvent ? event.detail : event;
-
 		// Index of hovered dropzone.
 		const hoveredDropZones = filter( this.dropZones, ( dropZone ) =>
 			isTypeSupportedByDropZone( dragEventType, dropZone ) &&
-			isWithinElementBounds( dropZone.element, detail.clientX, detail.clientY )
+			isWithinBounds( dropZone.element, event )
 		);
 
 		// Find the leaf dropzone not containing another dropzone
@@ -139,17 +122,7 @@ class DropZoneProvider extends Component {
 		) );
 
 		const hoveredDropZoneIndex = this.dropZones.indexOf( hoveredDropZone );
-
-		let position = null;
-
-		if ( hoveredDropZone ) {
-			const rect = hoveredDropZone.element.getBoundingClientRect();
-
-			position = {
-				x: detail.clientX - rect.left < rect.right - detail.clientX ? 'left' : 'right',
-				y: detail.clientY - rect.top < rect.bottom - detail.clientY ? 'top' : 'bottom',
-			};
-		}
+		const position = hoveredDropZone ? getPosition( hoveredDropZone.element, event ) : null;
 
 		// Optimisation: Only update the changed dropzones
 		let toUpdate = [];
