@@ -1,56 +1,59 @@
 # Creating dynamic blocks
 
-It is possible to create dynamic blocks. These are blocks that can change their content even if the post is not saved. One example from WordPress itself is the latest posts block. This block will update everywhere it is used when a new post is published.
+Dynamic blocks are blocks that can change their content even if the post is not saved. One example from WordPress itself is the latest posts block. This block will update everywhere it is used when a new post is published.
 
-The following code example shows how to create the latest post block dynamic block.
+The following code example shows how to create a dynamic block that shows only the last post as a link.
 
 {% codetabs %}
 {% ES5 %}
 ```js
-// myblock.js
+( function( blocks, element, data ) {
 
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	withSelect = wp.data.withSelect;
+	var el = element.createElement,
+	registerBlockType = blocks.registerBlockType,
+	withSelect = data.withSelect;
 
-registerBlockType( 'my-plugin/latest-post', {
-	title: 'Latest Post',
-	icon: 'megaphone',
-	category: 'widgets',
-
-	edit: withSelect( function( select ) {
-		return {
-			posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
-		};
-	} )( function( props ) {
+	registerBlockType( 'gutenberg-examples/example-05-dynamic', {
+		title: 'Example: last post',
+		icon: 'megaphone',
+		category: 'widgets',
 		
-		if ( ! props.posts ) {
-			return "Loading...";
-		}
+		edit: withSelect( function( select ) {
+			return {
+				posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
+			};
+		} )( function( props ) {
 
-		if ( props.posts.length === 0 ) {
-			return "No posts";
-		}
-		var className = props.className;
-		var post = props.posts[ 0 ];
+			if ( ! props.posts ) {
+				return "Loading...";
+			}
 
-		return el(
-			'a',
-			{ className: className, href: post.link },
-			post.title.rendered
-		);
-	} ),
-} );
+			if ( props.posts.length === 0 ) {
+				return "No posts";
+			}
+			var className = props.className;
+			var post = props.posts[ 0 ];
+
+			return el(
+				'a',
+				{ className: className, href: post.link },
+				post.title.rendered
+			);
+		} ),
+	} );
+}(
+	window.wp.blocks,
+	window.wp.element,
+	window.wp.data,
+) );
 ```
 {% ESNext %}
 ```js
-// myblock.js
-
 const { registerBlockType } = wp.blocks;
 const { withSelect } = wp.data;
 
-registerBlockType( 'my-plugin/latest-post', {
-	title: 'Latest Post',
+registerBlockType( 'gutenberg-examples/example-05-dynamic', {
+	title: 'Example: last post',
 	icon: 'megaphone',
 	category: 'widgets',
 
@@ -78,13 +81,16 @@ registerBlockType( 'my-plugin/latest-post', {
 ```
 {% end %}
 
-Because it is a dynamic block it doesn't need to override the default `save` implementation on the client. Instead, it needs a server component. The rendering can be added using the `render_callback` property when using the `register_block_type` function.
+Because it is a dynamic block it doesn't need to override the default `save` implementation on the client. Instead, it needs a server component. The contents in the front of your site depend on the function called by the `render_callback` property of `register_block_type`.
 
 ```php
 <?php
-// block.php
 
-function my_plugin_render_block_latest_post( $attributes, $content ) {
+/*
+Plugin Name: Gutenberg examples 05
+*/
+
+function gutenberg_examples_05_dynamic_render_callback( $attributes, $content ) {
 	$recent_posts = wp_get_recent_posts( array(
 		'numberposts' => 1,
 		'post_status' => 'publish',
@@ -101,9 +107,21 @@ function my_plugin_render_block_latest_post( $attributes, $content ) {
 	);
 }
 
-register_block_type( 'my-plugin/latest-post', array(
-	'render_callback' => 'my_plugin_render_block_latest_post',
-) );
+function gutenberg_examples_05_dynamic() {
+	wp_register_script(
+		'gutenberg-examples-05',
+		plugins_url( 'block.js', __FILE__ ),
+		array( 'wp-blocks', 'wp-element', 'wp-data' )
+	);
+
+	register_block_type( 'gutenberg-examples/example-05-dynamic', array(
+		'editor_script' => 'gutenberg-examples-05',
+		'render_callback' => 'gutenberg_examples_05_dynamic_render_callback'
+	) );
+
+}
+add_action( 'init', 'gutenberg_examples_05_dynamic' );
+
 ```
 
 There are a few things to notice:
@@ -121,45 +139,47 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-s
 {% codetabs %}
 {% ES5 %}
 ```js
-// myblock.js
+( function( blocks, element, components ) {
 
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	ServerSideRender = wp.components.ServerSideRender;
+	var el = element.createElement,
+	registerBlockType = blocks.registerBlockType,
+	ServerSideRender = components.ServerSideRender;
 
-registerBlockType( 'my-plugin/latest-post', {
-	title: 'Latest Post',
-	icon: 'megaphone',
-	category: 'widgets',
+	registerBlockType( 'gutenberg-examples/example-05-dynamic', {
+		title: 'Example: last post',
+		icon: 'megaphone',
+		category: 'widgets',
 
-	edit: function( props ) {
-		// ensure the block attributes matches this plugin's name
-		return (
-			el(ServerSideRender, {
-				block: "my-plugin/latest-post",
-				attributes:  props.attributes
-			})
-		);
-	},
-} );
+		edit: function( props ) {
+
+			return (
+				el(ServerSideRender, {
+					block: "gutenberg-examples/example-05-dynamic",
+					attributes: props.attributes
+				} )
+			);
+		},
+	} );
+}(
+	window.wp.blocks,
+	window.wp.element,
+	window.wp.components,
+) );
 ```
 {% ESNext %}
 ```js
-// myblock.js
-
 const { registerBlockType } = wp.blocks;
 const { ServerSideRender } = wp.components;
 
-registerBlockType( 'my-plugin/latest-post', {
-	title: 'Latest Post',
+registerBlockType( 'gutenberg-examples/example-05-dynamic', {
+	title: 'Example: last post',
 	icon: 'megaphone',
 	category: 'widgets',
 
 	edit: function( props ) {
-		// ensure the block attributes matches this plugin's name
 		return (
 			<ServerSideRender
-				block="my-plugin/latest-post"
+				block="gutenberg-examples/example-05-dynamic"
 				attributes={ props.attributes }
 			/>
 		);
@@ -168,4 +188,4 @@ registerBlockType( 'my-plugin/latest-post', {
 ```
 {% end %}
 
-The PHP code is the same as above and is automatically handled through the WP REST API.
+Note that this code uses the `wp.components` utility but not `wp.data`. Make sure to update the `wp-data` dependency to `wp-compononents` in the PHP code.
