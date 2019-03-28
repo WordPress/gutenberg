@@ -23,7 +23,7 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"build": "wp-scripts run build",
+		"build": "wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses --production",
 		"lint:css": "wp-scripts lint-style '**/*.css'",
