@@ -22,6 +22,7 @@ export const settings = {
 	keywords: [ __( 'atom' ), __( 'feed' ) ],
 
 	supports: {
+		align: true,
 		html: false,
 	},
 

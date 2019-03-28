@@ -103,6 +103,7 @@
 		"mkdirp": "0.5.1",
 		"node-sass": "4.11.0",
 		"node-watch": "0.6.0",
+		"parcel-bundler": "1.12.2",
 		"pegjs": "0.10.0",
 		"phpegjs": "1.0.0-beta7",
 		"postcss": "7.0.13",
@@ -182,7 +183,7 @@
 		"publish:dev": "npm run build:packages && lerna publish --npm-tag next",
 		"publish:prod": "npm run build:packages && lerna publish",
 		"test": "npm run lint && npm run test-unit",
-		"pretest-e2e": "./bin/reset-e2e-tests.sh",
+		"pretest-e2e": "cross-env SCRIPT_DEBUG=false ./bin/reset-e2e-tests.sh",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-php": "npm run lint-php && npm run test-unit-php",
@@ -190,7 +191,9 @@
 		"test-unit:update": "npm run test-unit -- --updateSnapshot",
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
-		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit"
+		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit",
+		"playground:build": "npm run build:packages && parcel build playground/src/index.html -d playground/dist",
+		"playground:start": "concurrently \"npm run dev:packages\" \"parcel playground/src/index.html -d playground/dist\""
 	},
 	"lint-staged": {
 		"packages/*/package.json": [

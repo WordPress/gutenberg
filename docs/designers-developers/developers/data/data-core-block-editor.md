@@ -327,6 +327,18 @@ This position is to used to position the caret properly when the selected block 
 
 Selected block.
 
+### getSelectedBlockClientIds
+
+Returns the current selection set of block client IDs (multiselection or single selection).
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Multi-selected block client IDs.
+
 ### getMultiSelectedBlockClientIds
 
 Returns the current multi-selection set of block client IDs, or an empty

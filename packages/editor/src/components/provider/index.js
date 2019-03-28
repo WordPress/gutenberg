@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, pick } from 'lodash';
+import { map, pick, defaultTo } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -21,6 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import transformStyles from '../../editor-styles';
 import { mediaUpload } from '../../utils';
+import ReusableBlocksButtons from '../reusable-blocks-buttons';
 
 const fetchLinkSuggestions = async ( search ) => {
 	const posts = await apiFetch( {
@@ -70,7 +71,7 @@ class EditorProvider extends Component {
 		}
 	}
 
-	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks ) {
+	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions ) {
 		return {
 			...pick( settings, [
 				'alignWide',
@@ -96,7 +97,7 @@ class EditorProvider extends Component {
 				onChange: onMetaChange,
 			},
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalMediaUpload: mediaUpload,
+			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 		};
 	}
@@ -136,6 +137,7 @@ class EditorProvider extends Component {
 			onMetaChange,
 			reusableBlocks,
 			resetEditorBlocksWithoutUndoLevel,
+			hasUploadPermissions,
 		} = this.props;
 
 		if ( ! isReady ) {
@@ -143,7 +145,7 @@ class EditorProvider extends Component {
 		}
 
 		const editorSettings = this.getBlockEditorSettings(
-			settings, meta, onMetaChange, reusableBlocks
+			settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions
 		);
 
 		return (
@@ -154,6 +156,7 @@ class EditorProvider extends Component {
 				settings={ editorSettings }
 			>
 				{ children }
+				<ReusableBlocksButtons />
 			</BlockEditorProvider>
 		);
 	}
@@ -167,11 +170,14 @@ export default compose( [
 			getEditedPostAttribute,
 			__experimentalGetReusableBlocks,
 		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
+
 		return {
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
 			meta: getEditedPostAttribute( 'meta' ),
 			reusableBlocks: __experimentalGetReusableBlocks(),
+			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

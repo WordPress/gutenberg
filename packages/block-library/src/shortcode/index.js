@@ -19,13 +19,6 @@ export const settings = {
 
 	category: 'widgets',
 
-	attributes: {
-		text: {
-			type: 'string',
-			source: 'html',
-		},
-	},
-
 	transforms: {
 		from: [
 			{

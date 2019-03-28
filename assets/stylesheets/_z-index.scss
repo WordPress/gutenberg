@@ -99,7 +99,11 @@ $z-layers: (
 	".nux-dot-tip": 1000001,
 
 	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
-	".components-tooltip": 1000002
+	".components-tooltip": 1000002,
+
+	// Make sure corner handles are above side handles for ResizableBox component
+	".components-resizable-box__side-handle": 1,
+	".components-resizable-box__corner-handle": 2
 );
 
 @function z-index( $key ) {
