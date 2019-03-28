@@ -669,7 +669,7 @@ function maybeUnwrapEvent( event ) {
 /**
  * Whether the event coordinates are within the element bounds.
  *
- * @since 2.1.0
+ * @since 2.2.0
  *
  * @param {Element} element The element to check.
  * @param {Event} event The event that tracks the coordinates.
@@ -690,7 +690,7 @@ export function isWithinBounds( element, event ) {
 /**
  * Calculates which axis the event is closer to (`left`/`right`, `top`/`bottom`).
  *
- * @since 2.1.0
+ * @since 2.2.0
  *
  * @param {Element} element The element to get the axis from.
  * @param {Event} event Event that tracks the coordinates.

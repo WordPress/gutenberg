@@ -1,6 +1,10 @@
-## 2.1.0 (2019-03-06)
+## 2.2.0 (XXXX-XX-XX)
+
+### New features
 
 - Added new methods `isWithinBounds` and `getPosition`.
+
+## 2.1.0 (2019-03-06)
 
 ### Bug Fix
 
