@@ -193,21 +193,37 @@ https://developer.wordpress.org/rest-api/reference/
 Whether or not the user can perform the action,
                             or `undefined` if the OPTIONS request is still being made.
 
-### getAutosave
+### getAutosaves
 
-Returns the latest autosave that is a child of the provided post id for the
-author, if one exists.
+Returns the latest autosaves for the post.
+
+May return multiple autosaves since the backend stores one autosave per
+author for each post.
 
 *Parameters*
 
  * state: State tree.
  * postType: The type of the parent post.
  * postId: The id of the parent post.
- * author: The author of the autosave.
 
 *Returns*
 
-The autosave object, or undefined if there is none.
+An array of autosaves for the post, or undefined if there is none.
+
+### getAutosave
+
+Returns the autosave for the post and author.
+
+*Parameters*
+
+ * state: State tree.
+ * postType: The type of the parent post.
+ * postId: The id of the parent post.
+ * authorId: The id of the author.
+
+*Returns*
+
+The autosave for the post and author.
 
 ### hasFetchedAutosave
 
@@ -215,7 +231,6 @@ Returns true if the REST request for an autosave has completed.
 
 *Parameters*
 
- * state: State tree.
  * state: State tree.
  * postType: The type of the parent post.
  * postId: The id of the parent post.
@@ -309,12 +324,12 @@ permission to perform an action on a REST resource.
  * key: A key that represents the action and REST resource.
  * isAllowed: Whether or not the user can perform the action.
 
-### receiveAutosave
+### receiveAutosaves
 
-Returns an action object used in signalling that the latest autosave of the
-post has been received, by initialization or autosave.
+Returns an action object used in signalling that the autosaves for a
+post have been received.
 
 *Parameters*
 
  * postId: The id of the post that is parent to the autosave.
- * autosave: Autosave post object.
+ * autosaves: Array of autosave post objects.

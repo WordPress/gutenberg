@@ -194,3 +194,16 @@ export function* getAutosaves( postType, postId ) {
 		yield receiveAutosaves( postId, autosaves );
 	}
 }
+
+/**
+ * Request autosave data from the REST API.
+ *
+ * This resolver exists to ensure the underlying autosaves are fetched via
+ * `getAutosaves` when a call to the `getAutosave` selector is made.
+ *
+ * @param {string} postType The type of the parent post.
+ * @param {number} postId   The id of the parent post.
+ */
+export function* getAutosave( postType, postId ) {
+	yield resolveSelect( 'getAutosaves', postType, postId );
+}

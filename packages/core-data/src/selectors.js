@@ -217,7 +217,8 @@ export function canUser( state, action, resource, id ) {
 /**
  * Returns the latest autosaves for the post.
  *
- * The backend stores one autosave per user per post.
+ * May return multiple autosaves since the backend stores one autosave per
+ * author for each post.
  *
  * @param {Object} state    State tree.
  * @param {string} postType The type of the parent post.
@@ -227,6 +228,21 @@ export function canUser( state, action, resource, id ) {
  */
 export function getAutosaves( state, postType, postId ) {
 	return state.autosaves[ postId ];
+}
+
+/**
+ * Returns the autosave for the post and author.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} postType The type of the parent post.
+ * @param {number} postId   The id of the parent post.
+ * @param {number} authorId The id of the author.
+ *
+ * @return {?Object} The autosave for the post and author.
+ */
+export function getAutosave( state, postType, postId, authorId ) {
+	const autosaves = state.autosaves[ postId ];
+	return find( autosaves, { author: authorId } );
 }
 
 /**

@@ -12,6 +12,7 @@ import {
 	getEmbedPreview,
 	isPreviewEmbedFallback,
 	canUser,
+	getAutosave,
 	getAutosaves,
 	getCurrentUser,
 } from '../selectors';
@@ -145,6 +146,59 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( canUser( state, 'create', 'media', 123 ) ).toBe( false );
+	} );
+} );
+
+describe( 'getAutosave', () => {
+	const testAutosave = { author: 1, title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } };
+
+	it( 'returns undefined if no autosaves exist for the post id in state', () => {
+		const postType = 'post';
+		const postId = 2;
+		const author = 2;
+		const state = {
+			autosaves: {
+				1: [ testAutosave ],
+				2: [ testAutosave ],
+			},
+		};
+
+		const result = getAutosave( state, postType, postId, author );
+
+		expect( result ).toBeUndefined();
+	} );
+
+	it( 'returns undefined if there are autosaves for the post id, but none matching the autosave for the author', () => {
+		const postType = 'post';
+		const postId = 1;
+		const author = 2;
+		const state = {
+			autosaves: {
+				[ postId ]: [ testAutosave ],
+				2: [ testAutosave ],
+			},
+		};
+
+		const result = getAutosave( state, postType, postId, author );
+
+		expect( result ).toBeUndefined();
+	} );
+
+	it( 'returns the autosave for the post id and author when it exists in state', () => {
+		const postType = 'post';
+		const postId = 1;
+		const author = 2;
+		const expectedAutosave = { author, title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } };
+		const state = {
+			autosaves: {
+				[ postId ]: [ testAutosave, expectedAutosave ],
+				2: [ testAutosave ],
+			},
+		};
+
+		const result = getAutosave( state, postType, postId, author );
+
+		expect( result ).toEqual( expectedAutosave );
 	} );
 } );
 
