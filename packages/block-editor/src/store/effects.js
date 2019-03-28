@@ -116,7 +116,7 @@ export default {
 				{
 					...blockA,
 					attributes: {
-						...blockA.attributes,
+						...( blockA.attributes.content.length === 0 ? blockB.attributes : blockA.attributes ),
 						...updatedAttributes,
 					},
 				},
