@@ -2,11 +2,6 @@
  * Section: All Alignment Settings
  */
 .wp-block[data-type="core/section"] {
-	@include break-small() {
-		padding-left: $block-padding*3;
-		padding-right: $block-padding*3;
-	}
-
 	// Only applied when background is added to cancel out padding
 	> .editor-block-list__block-edit > div > .wp-block-section.has-background > .editor-inner-blocks {
 		margin-top: -#{$block-padding*2 + $block-spacing};
@@ -33,6 +28,9 @@
  */
 .wp-block[data-type="core/section"][data-align="full"] {
 
+	margin-left: -#{$block-container-side-padding - $border-width};
+	margin-right: -#{$block-container-side-padding - $border-width};
+
 	// First tier of InnerBlocks must act like the container of the standard canvas
 	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks {
 		margin-left: auto;
@@ -48,8 +46,8 @@
 		// we "pull" full width blocks out a little further when within a full width section
 		padding-right: 0;
 		padding-left: 0;
-		width: calc(100% + #{$block-padding*6 + $block-spacing*2 + $border-width});
-		left: -#{$block-padding*3 + $block-spacing};
+		width: calc(100% + #{$block-padding*6 + $block-spacing*2 + $border-width*2});
+		left: -#{$block-padding*3 + $block-spacing + $border-width};
 		max-width: none;
 
 		// Allow to abutt the edges of the canvas
