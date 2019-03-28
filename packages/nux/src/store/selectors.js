@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { includes, difference, keys } from 'lodash';
+import { includes, difference, keys, has } from 'lodash';
 
 /**
  * An object containing information about a guide.
@@ -55,7 +55,7 @@ export function isTipVisible( state, tipId ) {
 		return false;
 	}
 
-	if ( state.preferences.dismissedTips[ tipId ] ) {
+	if ( has( state.preferences.dismissedTips, [ tipId ] ) ) {
 		return false;
 	}
 
