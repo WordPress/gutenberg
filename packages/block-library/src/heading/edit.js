@@ -36,7 +36,7 @@ function HeadingEdit( {
 	const tagName = 'h' + level;
 	const BlockControlsLevelsRange = ( levelChoices.length <= 3 ) ?
 		levelChoices :
-		levelChoices.slice( 1, 4 );
+		levelChoices.slice( 1, 4 ); //
 	return (
 		<Fragment>
 			<BlockControls>
@@ -83,6 +83,7 @@ function HeadingEdit( {
 }
 
 export default withSelect( ( select ) => {
+	// Parse the h1,h2,h3... choices to level numbers and pass it as a prop.
 	const levelChoices = get(
 		select( 'core/blocks' ).getBlockType( 'core/heading' ),
 		[ 'attributes', 'content', 'selector' ],
