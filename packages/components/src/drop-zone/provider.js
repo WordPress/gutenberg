@@ -8,7 +8,7 @@ import { isEqual, find, some, filter, throttle, includes } from 'lodash';
  */
 import { Component, createContext } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { getPosition, isWithinBounds } from '@wordpress/dom';
+import { getClosestEdges, isWithinBounds } from '@wordpress/dom';
 
 const { Provider, Consumer } = createContext( {
 	addDropZone: () => {},
@@ -122,7 +122,7 @@ class DropZoneProvider extends Component {
 		) );
 
 		const hoveredDropZoneIndex = this.dropZones.indexOf( hoveredDropZone );
-		const position = hoveredDropZone ? getPosition( hoveredDropZone.element, event ) : null;
+		const position = hoveredDropZone ? getClosestEdges( hoveredDropZone.element, event ) : null;
 
 		// Optimisation: Only update the changed dropzones
 		let toUpdate = [];
