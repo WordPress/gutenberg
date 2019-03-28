@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout.LayoutParams;
 
+import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
@@ -20,6 +22,7 @@ import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
+import com.facebook.react.shell.MainPackageConfig;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
@@ -40,6 +43,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import okhttp3.OkHttpClient;
+
 
 public class WPAndroidGlueCode {
     private ReactRootView mReactRootView;
@@ -70,6 +75,9 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled";
     private static final String PROP_NAME_LOCALE = "locale";
     private static final String PROP_NAME_TRANSLATIONS = "translations";
+
+    private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
+    private static OkHttpClient sOkHttpClient = new OkHttpClient.Builder().addInterceptor(sAddCookiesInterceptor).build();
 
     public void onCreate(Context context) {
         SoLoader.init(context, /* native exopackage */ false);
@@ -102,6 +110,10 @@ public class WPAndroidGlueCode {
 
     public interface OnEditorMountListener {
         void onEditorDidMount(boolean hasUnsupportedBlocks);
+    }
+
+    public interface OnAuthHeaderRequestedListener {
+        String onAuthHeaderRequested(String url);
     }
 
     protected List<ReactPackage> getPackages() {
@@ -170,12 +182,23 @@ public class WPAndroidGlueCode {
                 }
             }
         });
+
+
         return Arrays.asList(
-                new MainReactPackage(),
+                new MainReactPackage(getMainPackageConfig(getImagePipelineConfig(sOkHttpClient))),
                 new SvgPackage(),
                 new ReactAztecPackage(),
                 new RNRecyclerviewListPackage(),
                 mRnReactNativeGutenbergBridgePackage);
+    }
+
+    private MainPackageConfig getMainPackageConfig(ImagePipelineConfig imagePipelineConfig) {
+        return new MainPackageConfig.Builder().setFrescoConfig(imagePipelineConfig).build();
+    }
+
+    private ImagePipelineConfig getImagePipelineConfig(OkHttpClient client) {
+        return  OkHttpImagePipelineConfigFactory
+                .newBuilder(mReactRootView.getContext(), client).build();
     }
 
     public void onCreateView(Context initContext, boolean htmlModeEnabled,
@@ -217,13 +240,16 @@ public class WPAndroidGlueCode {
 
     public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                                   OnReattachQueryListener onReattachQueryListener,
-                                  OnEditorMountListener onEditorMountListener) {
+                                  OnEditorMountListener onEditorMountListener,
+                                  OnAuthHeaderRequestedListener onAuthHeaderRequestedListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
         mOnReattachQueryListener = onReattachQueryListener;
         mOnEditorMountListener = onEditorMountListener;
+
+        sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
         if (mReactRootView.getParent() != null) {
             ((ViewGroup) mReactRootView.getParent()).removeView(mReactRootView);
@@ -279,6 +305,7 @@ public class WPAndroidGlueCode {
         if (mReactRootView != null) {
             mReactRootView.unmountReactApplication();
             mReactRootView = null;
+            sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(null);
         }
         if (mReactInstanceManager != null) {
             // onDestroy may be called on a ReactFragment after another ReactFragment has been
