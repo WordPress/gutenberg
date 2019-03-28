@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject, omit } from 'lodash';
+import { merge, isPlainObject, get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -209,20 +209,18 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const persistence = createPersistenceInterface( pluginOptions );
 
 	// Preferences migration to introduce the block editor module
-	const persistedState = persistence.get();
-	const coreEditorState = persistedState[ 'core/editor' ];
-	if ( coreEditorState && coreEditorState.preferences && coreEditorState.preferences.insertUsage ) {
-		const blockEditorState = {
-			preferences: {
-				insertUsage: coreEditorState.preferences.insertUsage,
-			},
-		};
+	const insertUsage = get( persistence.get(), [
+		'core/editor',
+		'preferences',
+		'insertUsage',
+	] );
 
-		persistence.set( 'core/editor', {
-			...coreEditorState,
-			preferences: omit( coreEditorState.preferences, [ 'insertUsage' ] ),
+	if ( insertUsage ) {
+		persistence.set( 'core/block-editor', {
+			preferences: {
+				insertUsage,
+			},
 		} );
-		persistence.set( 'core/block-editor', blockEditorState );
 	}
 };
 
