@@ -14,11 +14,13 @@ import { withInstanceId, compose } from '@wordpress/compose';
  * External dependencies
  */
 import React from 'react';
+import { TextInput } from 'react-native';
 
 /**
  * Internal dependencies
  */
-import HTMLInputViewUI from './html-text-input-ui/html-text-input-ui';
+import HTMLInputContainer from './html-text-input-ui/html-text-input-ui';
+import styles from './html-text-input-ui/html-text-input-ui.scss';
 
 type PropsType = {
 	onChange: string => mixed,
@@ -80,16 +82,28 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 
 	render() {
 		return (
-			<HTMLInputViewUI
-				setTitleAction={ this.props.setTitleAction }
-				value={ this.state.value }
-				title={ this.props.title }
-				parentHeight={ this.props.parentHeight }
-				onChangeHTMLText={ this.edit }
-				onBlurHTMLText={ this.stopEditing }
-				titlePlaceholder={ __( 'Add title' ) }
-				htmlPlaceholder={ __( 'Start writing…' ) }
-			/>
+			<HTMLInputContainer parentHeight={ this.props.parentHeight }>
+				<TextInput
+					autoCorrect={ false }
+					textAlignVertical="center"
+					numberOfLines={ 1 }
+					style={ styles.htmlViewTitle }
+					value={ this.props.title }
+					placeholder={ __( 'Add title' ) }
+					onChangeText={ this.props.setTitleAction }
+				/>
+				<TextInput
+					autoCorrect={ false }
+					textAlignVertical="top"
+					multiline
+					style={ styles.htmlView }
+					value={ this.state.value }
+					onChangeText={ this.edit }
+					onBlur={ this.stopEditing }
+					placeholder={ __( 'Start writing…' ) }
+					scrollEnabled={ HTMLInputContainer.scrollEnabled }
+				/>
+			</HTMLInputContainer>
 		);
 	}
 }
