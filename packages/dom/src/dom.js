@@ -61,16 +61,16 @@ function isSelectionForward( selection ) {
 
 /**
  * Check whether the selection is at the edge of the container. Checks for
- * horizontal position by default. Set `isVertical` to true to check only
+ * horizontal position by default. Set `onlyVertical` to true to check only
  * vertically.
  *
- * @param {Element} container  Focusable element.
- * @param {boolean} isReverse  Set to true to check left, false to check right.
- * @param {boolean} isVertical Set to true to check only vertical position.
+ * @param {Element} container    Focusable element.
+ * @param {boolean} isReverse    Set to true to check left, false to check right.
+ * @param {boolean} onlyVertical Set to true to check only vertical position.
  *
- * @return {boolean} True if at the horizontal edge, false if not.
+ * @return {boolean} True if at the edge, false if not.
  */
-function isEdge( container, { isReverse, isVertical } ) {
+function isEdge( container, isReverse, onlyVertical ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
@@ -126,10 +126,15 @@ function isEdge( container, { isReverse, isVertical } ) {
 		return false;
 	}
 
-	if ( isVertical ) {
+	if ( onlyVertical ) {
 		return true;
 	}
 
+	// To calculate the horizontal position, we insert a test range and see if
+	// this test range has the same horizontal position. This method proves to
+	// be better than a DOM-based calculation, because it ignores empty text
+	// nodes and a trailing line break element. In other words, we need to check
+	// visual positioning, not DOM positioning.
 	const x = isReverse ? containerRect.left + 1 : containerRect.right - 1;
 	const y = isReverse ? containerRect.top + buffer : containerRect.bottom - buffer;
 	const testRange = hiddenCaretRangeFromPoint( document, x, y, container );
@@ -153,7 +158,7 @@ function isEdge( container, { isReverse, isVertical } ) {
  * @return {boolean} True if at the horizontal edge, false if not.
  */
 export function isHorizontalEdge( container, isReverse ) {
-	return isEdge( container, { isReverse } );
+	return isEdge( container, isReverse );
 }
 
 /**
@@ -162,10 +167,10 @@ export function isHorizontalEdge( container, isReverse ) {
  * @param {Element} container Focusable element.
  * @param {boolean} isReverse Set to true to check top, false for bottom.
  *
- * @return {boolean} True if at the edge, false if not.
+ * @return {boolean} True if at the vertical edge, false if not.
  */
 export function isVerticalEdge( container, isReverse ) {
-	return isEdge( container, { isReverse, isVertical: true } );
+	return isEdge( container, isReverse, true );
 }
 
 /**
