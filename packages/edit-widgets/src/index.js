@@ -12,12 +12,12 @@ import Layout from './components/layout';
 /**
  * Initilizes the widgets screen
  *
- * @param {string} target Selector for the root element to render the screen.
+ * @param {string} id Id of the root element to render the screen.
  */
-export function initialize( target ) {
+export function initialize( id ) {
 	registerCoreBlocks();
 	render(
 		<Layout />,
-		document.querySelector( target )
+		document.getElementById( id )
 	);
 }
