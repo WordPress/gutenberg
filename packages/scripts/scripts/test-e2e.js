@@ -50,4 +50,10 @@ if ( hasCliArg( '--puppeteer-interactive' ) ) {
 	process.env.PUPPETEER_SLOWMO = getCliArg( '--puppeteer-slowmo' ) || 80;
 }
 
+if ( hasCliArg( '--puppeteer-local' ) ) {
+	process.env.WP_BASE_URL = 'http://localhost:8888';
+	process.env.WP_USERNAME = 'admin';
+	process.env.WP_PASSWORD = 'password';
+}
+
 jest.run( [ ...config, ...runInBand, ...getCliArgs( cleanUpPrefixes ) ] );
