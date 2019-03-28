@@ -7,7 +7,6 @@ import {
 	getEditedPostContent,
 	pressKeyTimes,
 	pressKeyWithModifier,
-	__unstableSelectAll,
 } from '@wordpress/e2e-test-utils';
 
 async function openBlockNavigator() {
@@ -100,7 +99,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Space' );
 
 		// Replace its content.
-		await __unstableSelectAll();
+		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'and I say hello' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

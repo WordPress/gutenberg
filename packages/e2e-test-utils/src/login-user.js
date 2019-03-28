@@ -4,7 +4,7 @@
 import { WP_USERNAME, WP_PASSWORD } from './shared/config';
 import { createURL } from './create-url';
 import { isCurrentURL } from './is-current-url';
-import { __unstableSelectAll } from './select-all';
+import { pressKeyWithModifier } from './press-key-with-modifier';
 
 /**
  * Performs log in with specified username and password.
@@ -20,10 +20,10 @@ export async function loginUser( username = WP_USERNAME, password = WP_PASSWORD 
 	}
 
 	await page.focus( '#user_login' );
-	await __unstableSelectAll();
+	await pressKeyWithModifier( 'primary', 'a' );
 	await page.type( '#user_login', username );
 	await page.focus( '#user_pass' );
-	await __unstableSelectAll();
+	await pressKeyWithModifier( 'primary', 'a' );
 	await page.type( '#user_pass', password );
 
 	await Promise.all( [ page.waitForNavigation(), page.click( '#wp-submit' ) ] );

@@ -5,9 +5,9 @@ import {
 	insertBlock,
 	createNewPost,
 	clickBlockToolbarButton,
+	pressKeyWithModifier,
 	searchForBlock,
 	getEditedPostContent,
-	selectAllBlocks,
 } from '@wordpress/e2e-test-utils';
 
 function waitForAndAcceptDialog() {
@@ -210,7 +210,8 @@ describe( 'Reusable Blocks', () => {
 		await page.keyboard.type( 'Second paragraph' );
 
 		// Select all the blocks
-		await selectAllBlocks();
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Convert block to a reusable block
 		await page.waitForSelector( 'button[aria-label="More options"]' );
