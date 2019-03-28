@@ -10,6 +10,20 @@ import { forEach } from 'lodash';
  */
 import { Component, Children } from '@wordpress/element';
 
+function throwForInvalidCombination( combination ) {
+	const keys = combination.split( '+' );
+	const modifiers = new Set( keys.filter( ( value ) => value.length > 1 ) );
+	const hasAlt = modifiers.has( 'alt' );
+	const hasShift = modifiers.has( 'shift' );
+
+	if (
+		( modifiers.size === 1 && hasAlt ) ||
+		( modifiers.size === 2 && hasAlt && hasShift )
+	) {
+		throw new Error( `Cannot bind ${ combination }. Alt and Shift+Alt modifiers are reserved for character input.` );
+	}
+}
+
 class KeyboardShortcuts extends Component {
 	constructor() {
 		super( ...arguments );
@@ -21,7 +35,12 @@ class KeyboardShortcuts extends Component {
 		const { keyTarget = document } = this;
 
 		this.mousetrap = new Mousetrap( keyTarget );
+
 		forEach( this.props.shortcuts, ( callback, key ) => {
+			if ( process.env.NODE_ENV === 'development' ) {
+				throwForInvalidCombination( key );
+			}
+
 			const { bindGlobal, eventName } = this.props;
 			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
 			this.mousetrap[ bindFn ]( key, callback, eventName );
