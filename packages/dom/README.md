@@ -170,7 +170,7 @@ Check whether the selection is vertically at the edge of the container.
 
 **Returns**
 
-`boolean`: True if at the edge, false if not.
+`boolean`: True if at the vertical edge, false if not.
 
 ### placeCaretAtHorizontalEdge
 
