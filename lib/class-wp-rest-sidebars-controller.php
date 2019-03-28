@@ -162,9 +162,9 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			);
 		}
 
-		$items = array();
-
 		if ( isset( $request['blocks'] ) && is_array( $request['blocks'] ) ) {
+			$items = array();
+
 			foreach ( $request['blocks'] as $block ) {
 				if (
 					! isset( $block['name'] ) || ! is_string( $block['name'] ) ||
@@ -188,9 +188,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					);
 				}
 			}
-		}
 
-		if ( ! empty( $items ) ) {
 			gutenberg_set_sidebars_items( array_merge(
 				gutenberg_get_sidebars_items(),
 				array( $sidebar_id => $items )
