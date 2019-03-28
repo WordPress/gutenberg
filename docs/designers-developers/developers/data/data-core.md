@@ -24,6 +24,18 @@ Returns all available authors.
 
 Authors list.
 
+### getCurrentUser
+
+Returns the current user.
+
+*Parameters*
+
+ * state: Data state.
+
+*Returns*
+
+Current user object.
+
 ### getUserQueryResults
 
 Returns all the users returned by a query ID.
@@ -204,6 +216,7 @@ Returns true if the REST request for an autosave has completed.
 *Parameters*
 
  * state: State tree.
+ * state: State tree.
  * postType: The type of the parent post.
  * postId: The id of the parent post.
 
@@ -221,6 +234,14 @@ Returns an action object used in signalling that authors have been received.
 
  * queryID: Query ID.
  * users: Users received.
+
+### receiveCurrentUser
+
+Returns an action used in signalling that the current user has been received.
+
+*Parameters*
+
+ * currentUser: Current user object.
 
 ### addEntities
 

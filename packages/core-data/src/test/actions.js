@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { saveEntityRecord, receiveEntityRecords, receiveUserPermission, receiveAutosaves } from '../actions';
+import { saveEntityRecord, receiveEntityRecords, receiveUserPermission, receiveAutosaves, receiveCurrentUser } from '../actions';
 
 describe( 'saveEntityRecord', () => {
 	it( 'triggers a POST request for a new record', async () => {
@@ -85,6 +85,16 @@ describe( 'receiveAutosaves', () => {
 			type: 'RECEIVE_AUTOSAVES',
 			postId,
 			autosaves,
+		} );
+	} );
+} );
+
+describe( 'receiveCurrentUser', () => {
+	it( 'builds an action object', () => {
+		const currentUser = { id: 1 };
+		expect( receiveCurrentUser( currentUser ) ).toEqual( {
+			type: 'RECEIVE_CURRENT_USER',
+			currentUser,
 		} );
 	} );
 } );

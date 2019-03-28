@@ -7,7 +7,7 @@ import { filter } from 'lodash';
 /**
  * Internal dependencies
  */
-import { terms, entities, embedPreviews, userPermissions, autosaves } from '../reducer';
+import { terms, entities, embedPreviews, userPermissions, autosaves, currentUser } from '../reducer';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -223,5 +223,34 @@ describe( 'autosaves', () => {
 		expect( state ).toEqual( {
 			1: newAutosaves,
 		} );
+	} );
+} );
+
+describe( 'currentUser', () => {
+	it( 'returns an empty object by default', () => {
+		const state = currentUser( undefined, {} );
+		expect( state ).toEqual( {} );
+	} );
+
+	it( 'returns the current user', () => {
+		const currentUserData = { id: 1 };
+
+		const state = currentUser( {}, {
+			type: 'RECEIVE_CURRENT_USER',
+			currentUser: currentUserData,
+		} );
+
+		expect( state ).toEqual( currentUserData );
+	} );
+
+	it( 'overwrites any existing current user state', () => {
+		const currentUserData = { id: 2 };
+
+		const state = currentUser( { id: 1 }, {
+			type: 'RECEIVE_CURRENT_USER',
+			currentUser: currentUserData,
+		} );
+
+		expect( state ).toEqual( currentUserData );
 	} );
 } );

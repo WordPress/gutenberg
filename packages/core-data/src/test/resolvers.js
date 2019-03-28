@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { getEntityRecord, getEntityRecords, getEmbedPreview, canUser, getAutosaves } from '../resolvers';
-import { receiveEntityRecords, receiveEmbedPreview, receiveUserPermission, receiveAutosaves } from '../actions';
+import { getEntityRecord, getEntityRecords, getEmbedPreview, canUser, getAutosaves, getCurrentUser } from '../resolvers';
+import { receiveEntityRecords, receiveEmbedPreview, receiveUserPermission, receiveAutosaves, receiveCurrentUser } from '../actions';
 import { apiFetch } from '../controls';
 
 describe( 'getEntityRecord', () => {
@@ -208,3 +208,19 @@ describe( 'getAutosaves', () => {
 	} );
 } );
 
+describe( 'getCurrentUser', () => {
+	const SUCCESSFUL_RESPONSE = {
+		id: 1,
+	};
+
+	it( 'yields with fetched user', async () => {
+		const fulfillment = getCurrentUser();
+
+		// Trigger generator
+		fulfillment.next();
+
+		// Provide apiFetch response and trigger Action
+		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) ).value;
+		expect( received ).toEqual( receiveCurrentUser( SUCCESSFUL_RESPONSE ) );
+	} );
+} );

@@ -14,6 +14,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import {
 	receiveUserQuery,
+	receiveCurrentUser,
 	receiveEntityRecords,
 	receiveThemeSupports,
 	receiveEmbedPreview,
@@ -29,6 +30,14 @@ import { apiFetch, resolveSelect } from './controls';
 export function* getAuthors() {
 	const users = yield apiFetch( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
 	yield receiveUserQuery( 'authors', users );
+}
+
+/**
+ * Requests the current user from the REST API.
+ */
+export function* getCurrentUser() {
+	const currentUser = yield apiFetch( { path: '/wp/v2/users/me' } );
+	yield receiveCurrentUser( currentUser );
 }
 
 /**

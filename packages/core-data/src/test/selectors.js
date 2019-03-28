@@ -13,6 +13,7 @@ import {
 	isPreviewEmbedFallback,
 	canUser,
 	getAutosaves,
+	getCurrentUser,
 } from '../selectors';
 
 describe( 'getEntityRecord', () => {
@@ -176,5 +177,25 @@ describe( 'getAutosaves', () => {
 		const result = getAutosaves( state, postType, postId );
 
 		expect( result ).toEqual( autosaves );
+	} );
+} );
+
+describe( 'getCurrentUser', () => {
+	it( 'returns undefined if no user exists in state', () => {
+		const state = {};
+
+		expect( getCurrentUser( state ) ).toBeUndefined();
+	} );
+
+	it( 'returns the user object when a user exists in state', () => {
+		const currentUser = {
+			id: 1,
+		};
+
+		const state = {
+			currentUser,
+		};
+
+		expect( getCurrentUser( state ) ).toEqual( currentUser );
 	} );
 } );
