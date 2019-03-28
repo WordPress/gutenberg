@@ -21,6 +21,7 @@ import {
 	TextareaControl,
 	ToggleControl,
 	Toolbar,
+	ExternalLink,
 } from '@wordpress/components';
 /**
  * Internal dependencies
@@ -170,7 +171,14 @@ class MediaTextEdit extends Component {
 					label={ __( 'Alt Text (Alternative Text)' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
-					help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
+					help={
+						<Fragment>
+							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+								{ __( 'Describe the purpose of the image' ) }
+							</ExternalLink>
+							{ __( 'Leave empty if the image is purely decorative.' ) }
+						</Fragment>
+					}
 				/> ) }
 			</PanelBody>
 		);
