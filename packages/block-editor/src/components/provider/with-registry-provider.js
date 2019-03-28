@@ -13,14 +13,11 @@ import applyMiddlewares from '../../store/middlewares';
 
 const withRegistryProvider = createHigherOrderComponent( ( WrappedComponent ) => {
 	return withRegistry( ( { useSubRegistry = true, registry, ...props } ) => {
-		// Disable reason, this rule conflicts with the React hooks rule (no conditionals)
-		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const [ subRegistry, updateRegistry ] = useState( null );
-
 		if ( ! useSubRegistry ) {
 			return <WrappedComponent registry={ registry } { ...props } />;
 		}
 
+		const [ subRegistry, updateRegistry ] = useState( null );
 		useEffect( () => {
 			const newRegistry = createRegistry( {}, registry );
 			const store = newRegistry.registerStore( 'core/block-editor', storeConfig );
