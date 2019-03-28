@@ -1,5 +1,7 @@
 ## 2.1.0 (2019-03-06)
 
+- Added new methods `isWithinBounds` and `getPosition`.
+
 ### Bug Fix
 
 - Update `isHorizontalEdge` to account for empty text nodes.
