@@ -33,7 +33,7 @@ class MediaPickCoordinator: NSObject, UIImagePickerControllerDelegate, UINavigat
 
   func save(image: UIImage, toTemporaryDirectoryUsingName name: String) -> URL? {
     let url = URL(fileURLWithPath: NSTemporaryDirectory() + name + ".jpg")
-    guard let data = UIImageJPEGRepresentation(image, 1.0) else {
+    guard let data = image.jpegData(compressionQuality: 1.0) else {
       return nil
     }
     do {
@@ -44,11 +44,11 @@ class MediaPickCoordinator: NSObject, UIImagePickerControllerDelegate, UINavigat
     }
   }
 
-  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
     presenter.dismiss(animated: true, completion: nil)
     let mediaID = UUID().uuidString
     guard
-      let image = info[UIImagePickerControllerOriginalImage] as? UIImage,
+      let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage,
       let url = save(image: image, toTemporaryDirectoryUsingName: mediaID)
     else {
         callback(nil)
