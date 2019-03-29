@@ -100,6 +100,7 @@ export class RichText extends Component {
 		this.onBackspace = this.onBackspace.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
+		this.onFormatChangeForceChild = this.onFormatChangeForceChild.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
@@ -202,7 +203,11 @@ export class RichText extends Component {
 		} ).map( ( name ) => gutenbergFormatNamesToAztec[ name ] ).filter( Boolean );
 	}
 
-	onFormatChange( record ) {
+	onFormatChangeForceChild( record ) {
+		this.onFormatChange( record, true );
+	}
+
+	onFormatChange( record, doUpdateChild ) {
 		let newContent;
 		// valueToFormat might throw when converting the record to a tree structure
 		// let's ignore the event for now and force a render update so we're still in sync
@@ -224,9 +229,13 @@ export class RichText extends Component {
 				needsSelectionUpdate: record.needsSelectionUpdate,
 			} );
 		} else {
-			// make sure the component rerenders without refreshing the text on gutenberg
-			// (this can trigger other events that might update the active formats on aztec)
-			this.lastEventCount = 0;
+			if ( doUpdateChild ) {
+				this.lastEventCount = undefined;
+			} else {
+				// make sure the component rerenders without refreshing the text on gutenberg
+				// (this can trigger other events that might update the active formats on aztec)
+				this.lastEventCount = 0;
+			}
 			this.forceUpdate();
 		}
 	}
@@ -284,7 +293,7 @@ export class RichText extends Component {
 		if ( this.multilineTag ) {
 			if ( event.shiftKey ) {
 				const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
-				this.onFormatChange( insertedLineBreak );
+				this.onFormatChangeForceChild( insertedLineBreak );
 			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
 				this.setState( {
 					needsSelectionUpdate: false,
@@ -292,11 +301,11 @@ export class RichText extends Component {
 				this.onSplit( ...split( currentRecord ).map( this.valueToFormat ) );
 			} else {
 				const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
-				this.onFormatChange( insertedLineSeparator );
+				this.onFormatChangeForceChild( insertedLineSeparator );
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
 			const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
-			this.onFormatChange( insertedLineBreak );
+			this.onFormatChangeForceChild( insertedLineBreak );
 		} else {
 			this.splitContent( currentRecord );
 		}
@@ -565,7 +574,7 @@ export class RichText extends Component {
 						onTagNameChange={ onTagNameChange }
 						tagName={ tagName }
 						value={ record }
-						onChange={ this.onFormatChange }
+						onChange={ this.onFormatChangeForceChild }
 					/>
 				) }
 				{ isSelected && (
