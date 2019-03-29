@@ -123,6 +123,20 @@ class ParagraphBlock extends Component {
 		}
 	}
 
+	getDisplayedTextColor( backgroundColorClass, textColor ) {
+		// If backgroundColor class is primary, secondary, dark gray, light grary,
+		// then the displayed color of text is '#fff' (white), even if the textColor remains undefined.
+		// If backgroundColor class is white, then the displayed color of text is '#111' (black).
+		// This is a feature to improve accessibility.
+		if ( backgroundColorClass ) {
+			if ( backgroundColorClass === 'has-white-background-color' ) {
+				return '#111';
+			}
+			return '#fff';
+		}
+		return textColor;
+	}
+
 	render() {
 		const {
 			attributes,
@@ -209,7 +223,7 @@ class ParagraphBlock extends Component {
 					>
 						<ContrastChecker
 							{ ...{
-								textColor: textColor.color,
+								textColor: this.getDisplayedTextColor( backgroundColor.class, textColor.color ),
 								backgroundColor: backgroundColor.color,
 								fallbackTextColor,
 								fallbackBackgroundColor,
