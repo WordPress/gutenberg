@@ -5,7 +5,8 @@ import { Button } from '@wordpress/components';
 import { Component, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
-import { withInstanceId } from '@wordpress/compose';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { withInstanceId, compose } from '@wordpress/compose';
 
 class ReusableBlockEditPanel extends Component {
 	constructor() {
@@ -107,4 +108,36 @@ class ReusableBlockEditPanel extends Component {
 	}
 }
 
-export default withInstanceId( ReusableBlockEditPanel );
+export default compose( [
+	withInstanceId,
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute, isSavingPost } = select( 'core/editor' );
+
+		return {
+			title: getEditedPostAttribute( 'title' ),
+			isSaving: isSavingPost(),
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => {
+		const {
+			editPost,
+			savePost,
+			clearSelectedBlock,
+		} = dispatch( 'core/editor' );
+
+		return {
+			onChangeTitle( title ) {
+				editPost( { title } );
+			},
+			onSave() {
+				clearSelectedBlock();
+				savePost();
+				ownProps.onSave();
+			},
+			onCancel() {
+				clearSelectedBlock();
+				ownProps.onCancel();
+			},
+		};
+	} ),
+] )( ReusableBlockEditPanel );

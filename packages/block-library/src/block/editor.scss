@@ -1,0 +1,9 @@
+.block-editor-block-list__block[data-type="core/block"] {
+	.block-editor-block-list__layout > .block-editor-block-list__block:first-child > .block-editor-block-list__block-edit {
+		margin-top: 0;
+	}
+
+	.block-editor-block-list__layout > .block-editor-block-list__block:last-child > .block-editor-block-list__block-edit {
+		margin-bottom: 0;
+	}
+}
