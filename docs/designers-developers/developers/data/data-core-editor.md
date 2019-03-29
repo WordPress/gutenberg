@@ -776,7 +776,7 @@ post has been received, by initialization or autosave.
 
 *Deprecated*
 
-Deprecated since 5.3. Callers should use the `receiveAutosaves( postId, autosave )`
+Deprecated since 5.4. Callers should use the `receiveAutosaves( postId, autosave )`
 			   selector from the '@wordpress/core-data' package.
 
 *Parameters*

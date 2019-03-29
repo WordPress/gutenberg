@@ -99,7 +99,7 @@ export function resetPost( post ) {
  * Returns an action object used in signalling that the latest autosave of the
  * post has been received, by initialization or autosave.
  *
- * @deprecated since 5.3. Callers should use the `receiveAutosaves( postId, autosave )`
+ * @deprecated since 5.4. Callers should use the `receiveAutosaves( postId, autosave )`
  * 			   selector from the '@wordpress/core-data' package.
  *
  * @param {Object} newAutosave Autosave post object.
