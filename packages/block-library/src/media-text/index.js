@@ -169,10 +169,9 @@ export const settings = {
 			imageFill,
 			focalPoint,
 		} = attributes;
-		const imageFillStyle = imageFillStyles( mediaUrl, focalPoint );
 		const mediaTypeRenders = {
 			image: () => imageFill ?
-				<div style={ imageFillStyle } ></div> :
+				<div style={ imageFillStyles( mediaUrl, focalPoint ) } ></div> :
 				<img src={ mediaUrl } alt={ mediaAlt } className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null } />,
 			video: () => <video controls src={ mediaUrl } />,
 		};
