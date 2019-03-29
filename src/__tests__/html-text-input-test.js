@@ -13,6 +13,18 @@ import { HTMLInputView } from '../components/html-text-input.js';
  */
 import { __ } from '@wordpress/i18n';
 
+// Utility to find the HTML TextInput from the wrapper
+const findHTMLTextInputFromWrapper = ( wrapper ) => {
+	const placeholder = __( 'Start writing…' );
+	return wrapper.dive().find( { multiline: true, placeholder } ).first();
+};
+
+// Utility to find the Title TextInput from the wrapper
+const findTitleTextInputFromWrapper = ( wrapper ) => {
+	const placeholder = __( 'Add title' );
+	return wrapper.dive().find( { placeholder } ).first();
+};
+
 describe( 'HTMLInputView', () => {
 	it( 'HTMLInput renders', () => {
 		const wrapper = shallow(
@@ -94,14 +106,3 @@ describe( 'HTMLInputView', () => {
 	} );
 } );
 
-// Utility to find the HTML TextInput from the wrapper
-const findHTMLTextInputFromWrapper = ( wrapper ) => {
-	const placeholder = __( 'Start writing…' );
-	return wrapper.dive().find( { multiline: true, placeholder } ).first();
-};
-
-// Utility to find the Title TextInput from the wrapper
-const findTitleTextInputFromWrapper = ( wrapper ) => {
-	const placeholder = __( 'Add title' );
-	return wrapper.dive().find( { placeholder } ).first();
-};
