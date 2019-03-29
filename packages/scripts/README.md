@@ -216,6 +216,9 @@ This is how you execute those scripts using the presented setup:
 
 * `npm run test:e2e` - runs all unit tests.
 * `npm run test:e2e:help` - prints all available options to configure unit tests runner.
+* `npm run test-e2e -- --puppeteer-interactive` - runs all unit tests interactively.
+* `npm run test-e2e FILE_NAME -- --puppeteer-interactive ` - runs one test file interactively.
+* `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
 
 This script automatically detects the best config to start Puppeteer but sometimes you may need to specify custom options:
  - You can add a `jest-puppeteer.config.js` at the root of the project or define a custom path using `JEST_PUPPETEER_CONFIG` environment variable. Check [jest-puppeteer](https://github.com/smooth-code/jest-puppeteer#jest-puppeteerconfigjs) for more details.

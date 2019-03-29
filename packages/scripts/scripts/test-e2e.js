@@ -50,4 +50,16 @@ if ( hasCliArg( '--puppeteer-interactive' ) ) {
 	process.env.PUPPETEER_SLOWMO = getCliArg( '--puppeteer-slowmo' ) || 80;
 }
 
+const configsMapping = {
+	WP_BASE_URL: "--wordpress-host",
+	WP_USERNAME: "--wordpress-username",
+	WP_PASSWORD: "--wordpress-password"
+};
+
+Object.entries(configsMapping).forEach(([key, value]) => {
+	if (hasCliArg(value)) {
+		process.env[key] = getCliArg(value);
+	}
+});
+
 jest.run( [ ...config, ...runInBand, ...getCliArgs( cleanUpPrefixes ) ] );
