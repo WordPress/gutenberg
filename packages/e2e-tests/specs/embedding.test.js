@@ -65,6 +65,10 @@ const MOCK_RESPONSES = [
 		onRequestMatch: createJSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
 	},
 	{
+		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook' ),
+		onRequestMatch: createJSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
+	},
+	{
 		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
 	},
