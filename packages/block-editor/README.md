@@ -348,10 +348,6 @@ The default editor settings
 
 Undocumented declaration.
 
-<a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
-
-Internal dependencies
-
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 
 Undocumented declaration.
