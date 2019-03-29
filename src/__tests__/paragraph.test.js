@@ -35,50 +35,58 @@ describe( 'Paragraph block', () => {
 		expect( component.exists() ).toBe( true );
 	} );
 
-	it( 'split empty block', () => {
+	it( 'splits empty block on Enter', () => {
 		// Given
 		const instance = getTestInstanceWithContent( '' );
 
-		const blocks = [ {} ];
-		const before = null;
-		const after = null;
+		const blocks = [ ];
+		const before = '';
+		const after = '';
 
-		//When
+		// Mock implemenattion of `createBlock` to test against `insertBlocksAfter`.
+		const newBlock = { content: after };
+		createBlock.mockImplementation( () => newBlock );
+
+		// When
 		instance.splitBlock( before, after, ...blocks );
 
-		//Then
+		// Then
 
-		// The block is deleted if before is null
-		expect( instance.props.onReplace ).toHaveBeenCalledTimes( 1 );
-		expect( instance.props.onReplace ).toHaveBeenCalledWith( [] );
+		// Should ask for creating a new paragraph block.
+		expect( createBlock ).toHaveBeenCalledTimes( 1 );
+		expect( createBlock ).toHaveBeenCalledWith( 'core/paragraph', { content: after } );
 
 		// New block is inserted after the current block.
 		expect( instance.props.insertBlocksAfter ).toHaveBeenCalledTimes( 1 );
-		expect( instance.props.insertBlocksAfter ).toHaveBeenCalledWith( blocks );
+		expect( instance.props.insertBlocksAfter ).toHaveBeenCalledWith( [ newBlock ] );
 	} );
 
-	it( 'splits block with content on the middle', () => {
+	it( 'splits block on Enter with content on the middle', () => {
 		// Given
 		const before = 'Some text ';
 		const after = 'to split';
+		const blocks = [ ];
 
 		const newBlock = { content: after };
 		createBlock.mockImplementation( () => newBlock );
 
 		const instance = getTestInstanceWithContent( before + after );
-		const block = {};
 
 		// When
-		instance.splitBlock( before, after, ...[ block ] );
+		instance.splitBlock( before, after, ...blocks );
 
 		// Then
 
 		// Do NOT remove current block
 		expect( instance.props.onReplace ).toHaveBeenCalledTimes( 0 );
 
+		// Should ask for creating a new paragraph block with the second half of the text.
+		expect( createBlock ).toHaveBeenCalledTimes( 1 );
+		expect( createBlock ).toHaveBeenCalledWith( 'core/paragraph', { content: after } );
+
 		// Insert new block with the second half of the text
 		expect( instance.props.insertBlocksAfter ).toHaveBeenCalledTimes( 1 );
-		expect( instance.props.insertBlocksAfter ).toHaveBeenCalledWith( [ block, newBlock ] );
+		expect( instance.props.insertBlocksAfter ).toHaveBeenCalledWith( [ newBlock ] );
 
 		// Replace current block content with first half of the text.
 		expect( instance.props.setAttributes ).toHaveBeenCalledTimes( 1 );
