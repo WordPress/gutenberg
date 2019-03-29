@@ -50,7 +50,7 @@ const MOCK_EMBED_AUDIO_SUCCESS_RESPONSE = {
 };
 
 const MOCK_EMBED_IMAGE_SUCCESS_RESPONSE = {
-	url: 'https://www.instagram.com/p/BtNsR8HFRif/',
+	url: 'https://www.instagram.com/p/Bvl97o2AK6x/',
 	html: '<iframe width="16" height="9"></iframe>',
 	type: 'video',
 	provider_name: 'Instagram',
@@ -97,7 +97,7 @@ const MOCK_RESPONSES = [
 		onRequestMatch: createJSONResponse( MOCK_EMBED_AUDIO_SUCCESS_RESPONSE ),
 	},
 	{
-		match: createEmbeddingMatcher( 'https://www.instagram.com/p/BtNsR8HFRif/' ),
+		match: createEmbeddingMatcher( 'https://www.instagram.com/p/Bvl97o2AK6x/' ),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_IMAGE_SUCCESS_RESPONSE ),
 	},
 	{
@@ -246,8 +246,7 @@ describe( 'Embedding content', () => {
 
 	it( 'should transform from video to embed block when YouTube URL is pasted', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( '/video' );
-		await page.keyboard.press( 'Enter' );
+		await insertBlock( 'Video' );
 		await page.click( '.editor-media-placeholder__url-input-container button' );
 		await page.keyboard.type( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
 		await page.keyboard.press( 'Enter' );
@@ -259,7 +258,7 @@ describe( 'Embedding content', () => {
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'Enter' );
 		await page.click( '.editor-media-placeholder__url-input-container button' );
-		await page.keyboard.type( 'https://www.instagram.com/p/BtNsR8HFRif/' );
+		await page.keyboard.type( 'https://www.instagram.com/p/Bvl97o2AK6x/' );
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( '.wp-block-embed-instagram' );
 	} );
