@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, pick, mapValues } from 'lodash';
+import { castArray, pick, mapValues, has } from 'lodash';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
@@ -99,7 +99,7 @@ export function resetPost( post ) {
  * Returns an action object used in signalling that the latest autosave of the
  * post has been received, by initialization or autosave.
  *
- * @deprecated since 5.3. Callers should use the `receiveAutosave( postId, autosave )`
+ * @deprecated since 5.3. Callers should use the `receiveAutosaves( postId, autosave )`
  * 			   selector from the '@wordpress/core-data' package.
  *
  * @param {Object} newAutosave Autosave post object.
@@ -108,12 +108,12 @@ export function resetPost( post ) {
  */
 export function* resetAutosave( newAutosave ) {
 	deprecated( 'resetAutosave action (`core/editor` store)', {
-		alternative: 'receiveAutosave action (`core` store)',
+		alternative: 'receiveAutosaves action (`core` store)',
 		plugin: 'Gutenberg',
 	} );
 
 	const postId = yield select( STORE_KEY, 'getCurrentPostId' );
-	yield dispatch( 'core', 'receiveAutosave', postId, newAutosave );
+	yield dispatch( 'core', 'receiveAutosaves', postId, newAutosave );
 
 	return { type: '__INERT__' };
 }
@@ -347,7 +347,9 @@ export function* savePost( options = {} ) {
 	let path = `/wp/v2/${ postType.rest_base }/${ post.id }`;
 	let method = 'PUT';
 	if ( isAutosave ) {
-		const autosavePost = yield select( 'core', 'getAutosave', post.type, post.id );
+		const currentUser = yield resolveSelect( 'core', 'getCurrentUser' );
+		const currentUserId = currentUser ? currentUser.id : null;
+		const autosavePost = yield resolveSelect( 'core', 'getAutosave', post.type, post.id, currentUserId );
 		const mappedAutosavePost = mapValues( pick( autosavePost, AUTOSAVE_PROPERTIES ), getPostRawValue );
 
 		// Ensure autosaves contain all expected fields, using autosave or
@@ -380,7 +382,7 @@ export function* savePost( options = {} ) {
 		} );
 
 		if ( isAutosave ) {
-			yield dispatch( 'core', 'receiveAutosave', post.id, newPost );
+			yield dispatch( 'core', 'receiveAutosaves', post.id, newPost );
 		} else {
 			yield dispatch( STORE_KEY, 'resetPost', newPost );
 		}

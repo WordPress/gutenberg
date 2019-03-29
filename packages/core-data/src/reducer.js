@@ -272,6 +272,7 @@ export function autosaves( state = {}, action ) {
 export default combineReducers( {
 	terms,
 	users,
+	currentUser,
 	taxonomies,
 	themeSupports,
 	entities,

@@ -68,13 +68,16 @@ export default compose( [
 			getCurrentPostId,
 		} = select( 'core/editor' );
 		const {
+			getCurrentUser,
 			getAutosave,
 		} = select( 'core' );
 
 		const { autosaveInterval } = select( 'core/editor' ).getEditorSettings();
 		const postType = getEditedPostAttribute( 'type' );
 		const postId = getCurrentPostId();
-		const autosave = getAutosave( postType, postId );
+		const currentUser = getCurrentUser();
+		const currentUserId = currentUser ? currentUser.id : null;
+		const autosave = getAutosave( postType, postId, currentUserId );
 
 		return {
 			isDirty: isEditedPostDirty(),

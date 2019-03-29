@@ -168,6 +168,20 @@ describe( 'getAutosave', () => {
 		expect( result ).toBeUndefined();
 	} );
 
+	it( 'returns undefined if an authorId is not provided (or undefined)', () => {
+		const postType = 'post';
+		const postId = 1;
+		const state = {
+			autosaves: {
+				1: [ testAutosave ],
+			},
+		};
+
+		const result = getAutosave( state, postType, postId );
+
+		expect( result ).toBeUndefined();
+	} );
+
 	it( 'returns undefined if there are autosaves for the post id, but none matching the autosave for the author', () => {
 		const postType = 'post';
 		const postId = 1;

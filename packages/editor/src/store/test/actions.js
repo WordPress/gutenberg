@@ -57,6 +57,7 @@ const postType = {
 };
 const postId = 44;
 const postTypeSlug = 'post';
+const userId = 1;
 
 describe( 'Post generator actions', () => {
 	describe( 'savePost()', () => {
@@ -64,6 +65,7 @@ describe( 'Post generator actions', () => {
 			edits,
 			currentPost,
 			currentPostStatus,
+			currentUser,
 			editPostToSendOptimistic,
 			autoSavePost,
 			autoSavePostToSend,
@@ -93,6 +95,7 @@ describe( 'Post generator actions', () => {
 				excerpt: 'crackers',
 				status: currentPostStatus,
 			} );
+			currentUser = { id: userId };
 			editPostToSendOptimistic = () => {
 				const postObject = {
 					...edits(),
@@ -134,6 +137,7 @@ describe( 'Post generator actions', () => {
 			fulfillment.next( postType );
 			fulfillment.next();
 			if ( isAutosaving ) {
+				fulfillment.next( currentUser );
 				fulfillment.next();
 			} else {
 				fulfillment.next();
@@ -269,16 +273,27 @@ describe( 'Post generator actions', () => {
 				},
 			],
 			[
-				'yield action for selecting the autosavePost',
+				'yields action for selecting the currentUser',
 				( isAutosaving ) => isAutosaving,
 				() => {
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
-						select(
+						resolveSelect( 'core', 'getCurrentUser' )
+					);
+				},
+			],
+			[
+				'yields action for selecting the autosavePost',
+				( isAutosaving ) => isAutosaving,
+				() => {
+					const { value } = fulfillment.next( currentUser );
+					expect( value ).toEqual(
+						resolveSelect(
 							'core',
 							'getAutosave',
 							postTypeSlug,
-							postId
+							postId,
+							userId
 						)
 					);
 				},
@@ -357,7 +372,7 @@ describe( 'Post generator actions', () => {
 					const { value } = fulfillment.next( savedPost() );
 
 					if ( isAutosave ) {
-						expect( value ).toEqual( dispatch( 'core', 'receiveAutosave', postId, savedPost() ) );
+						expect( value ).toEqual( dispatch( 'core', 'receiveAutosaves', postId, savedPost() ) );
 					} else {
 						expect( value ).toEqual( dispatch( STORE_KEY, 'resetPost', savedPost() ) );
 					}

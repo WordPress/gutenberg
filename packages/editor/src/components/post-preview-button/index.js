@@ -211,6 +211,7 @@ export default compose( [
 		} = select( 'core/editor' );
 		const {
 			getAutosave,
+			getCurrentUser,
 			getPostType,
 			hasFetchedAutosave,
 		} = select( 'core' );
@@ -219,7 +220,9 @@ export default compose( [
 		const postTypeName = getEditedPostAttribute( 'type' );
 		const postType = getPostType( postTypeName );
 		const postId = getCurrentPostId();
-		const autosave = getAutosave( postTypeName, postId );
+		const currentUser = getCurrentUser();
+		const currentUserId = currentUser ? currentUser.id : null;
+		const autosave = getAutosave( postTypeName, postId, currentUserId );
 
 		return {
 			postId: getCurrentPostId(),

@@ -224,7 +224,7 @@ export function canUser( state, action, resource, id ) {
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
  *
- * @return {?Object} An array of autosaves for the post, or undefined if there is none.
+ * @return {?Array} An array of autosaves for the post, or undefined if there is none.
  */
 export function getAutosaves( state, postType, postId ) {
 	return state.autosaves[ postId ];
@@ -241,6 +241,10 @@ export function getAutosaves( state, postType, postId ) {
  * @return {?Object} The autosave for the post and author.
  */
 export function getAutosave( state, postType, postId, authorId ) {
+	if ( authorId === undefined ) {
+		return;
+	}
+
 	const autosaves = state.autosaves[ postId ];
 	return find( autosaves, { author: authorId } );
 }
