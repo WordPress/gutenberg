@@ -63,6 +63,10 @@ const MOCK_BAD_WORDPRESS_RESPONSE = {
 
 const MOCK_RESPONSES = [
 	{
+		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook' ),
+		onRequestMatch: createJSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
+	},
+	{
 		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook/' ),
 		onRequestMatch: createJSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
 	},
@@ -81,6 +85,10 @@ const MOCK_RESPONSES = [
 	{
 		match: createEmbeddingMatcher( 'https://twitter.com/notnownikki' ),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+	},
+	{
+		match: createEmbeddingMatcher( 'https://twitter.com/notnownikki/' ),
+		onRequestMatch: createJSONResponse( MOCK_CANT_EMBED_RESPONSE ),
 	},
 	{
 		match: createEmbeddingMatcher( 'https://twitter.com/thatbunty' ),
@@ -173,6 +181,17 @@ describe( 'Embedding content', () => {
 
 		await clickButton( 'Convert to link' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should retry embeds that could not be embedded with trailing slashes, without the trailing slashes', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		// This URL can't be embedded, but without the trailing slash, it can.
+		await page.keyboard.type( 'https://twitter.com/notnownikki/' );
+		await page.keyboard.press( 'Enter' );
+		// The twitter block should appear correctly.
+		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
 	} );
 
 	it( 'should allow the user to try embedding a failed URL again', async () => {
