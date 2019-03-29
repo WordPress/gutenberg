@@ -80,8 +80,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	}
 
 	public function get_item( $request ) {
-		$data = $this->get_sidebar_data( $request['id'] );
-		return rest_ensure_response( $data );
+		return rest_ensure_response( $this->get_sidebar_data( $request['id'] ) );
 	}
 
 	public function update_item_permissions_check( $request ) {
@@ -96,13 +95,12 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	}
 
 	public function update_item( $request ) {
-		$result = $this->update_sidebar_blocks( $request['id'], $request );
-		if ( is_wp_error( $result ) ) {
-			return $result;
+		$status = $this->update_sidebar_data( $request['id'], $request );
+		if ( is_wp_error( $status ) ) {
+			return $status;
 		}
 
-		$data = $this->get_sidebar_data( $request['id'] );
-		return rest_ensure_response( $data );
+		return rest_ensure_response( $this->get_sidebar_data( $request['id'] ) );
 	}
 
 	// TODO: Add schema
@@ -119,32 +117,21 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		}
 
 		$sidebar = $wp_registered_sidebars[ $sidebar_id ];
-
-		// TODO: How should we format blocks in the REST API? Or should we send down
-		// HTML so that we're consistent with the /posts and /blocks endpoints?
-		$blocks = array();
+		$blocks  = array();
 
 		$sidebars_items = gutenberg_get_sidebars_items();
 		if ( ! empty( $sidebars_items[ $sidebar_id ] ) ) {
 			foreach ( $sidebars_items[ $sidebar_id ] as $item ) {
 				if ( is_array( $item ) && isset( $item['blockName'] ) ) {
-					$blocks[] = array(
-						'name'         => $item['blockName'],
-						'attributes'   => $item['attrs'],
-						'innerBlocks'  => $item['innerBlocks'],
-						'innerHTML'    => $item['innerHTML'],
-						'innerContent' => $item['innerContent'],
-					);
+					$blocks[] = $item;
 				} else {
 					$blocks[] = array(
-						'name'         => 'core/legacy-widget',
-						'attributes'   => array(
+						'blockName' => 'core/legacy-widget',
+						'attrs'     => array(
 							'identifier' => $item,
 							'instance'   => $this->get_sidebars_widget_instance( $sidebar, $item ),
 						),
-						'innerBlocks'  => array(),
-						'innerHTML'    => '',
-						'innerContent' => array(),
+						'innerHTML' => '',
 					);
 				}
 			}
@@ -152,11 +139,11 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 		return array_merge(
 			$sidebar,
-			array( 'blocks' => $blocks )
+			array( 'content' => serialize_blocks( $blocks ) )
 		);
 	}
 
-	protected function update_sidebar_blocks( $sidebar_id, $request ) {
+	protected function update_sidebar_data( $sidebar_id, $request ) {
 		global $wp_registered_sidebars;
 
 		if ( ! isset( $wp_registered_sidebars[ $sidebar_id ] ) ) {
@@ -167,39 +154,29 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			);
 		}
 
-		if ( isset( $request['blocks'] ) && is_array( $request['blocks'] ) ) {
+		if ( isset( $request['content'] ) && is_string( $request['content'] ) ) {
 			$items = array();
 
-			foreach ( $request['blocks'] as $block ) {
-				if (
-					! isset( $block['name'] ) || ! is_string( $block['name'] ) ||
-					! isset( $block['attributes'] ) || ! is_array( $block['attributes'] ) ||
-					! isset( $block['innerBlocks'] ) || ! is_array( $block['innerBlocks'] ) ||
-					! isset( $block['innerHTML'] ) || ! is_string( $block['innerHTML'] ) ||
-					! isset( $block['innerContent'] ) || ! is_array( $block['innerContent'] )
-				) {
+			$blocks = parse_blocks( $request['content'] );
+			foreach ( $blocks as $block ) {
+				if ( ! isset( $block['blockName'] ) ) {
 					continue;
 				}
 
 				if (
-					'core/legacy-widget' === $block['name'] &&
-					isset( $block['attributes']['identifier'] ) &&
-					isset( $block['attributes']['instance'] )
+					'core/legacy-widget' === $block['blockName'] &&
+					isset( $block['attrs']['identifier'] )
 				) {
-					$items[] = $block['attributes']['identifier'];
+					$items[] = $block['attrs']['identifier'];
 
-					$this->update_widget_instance(
-						$block['attributes']['identifier'],
-						$block['attributes']['instance']
-					);
+					if ( isset( $block['attrs']['instance'] ) ) {
+						$this->update_widget_instance(
+							$block['attrs']['identifier'],
+							$block['attrs']['instance']
+						);
+					}
 				} else {
-					$items[] = array(
-						'blockName'    => $block['name'],
-						'attrs'        => $block['attributes'],
-						'innerBlocks'  => $block['innerBlocks'],
-						'innerHTML'    => $block['innerHTML'],
-						'innerContent' => $block['innerContent'],
-					);
+					$items[] = $block;
 				}
 			}
 
@@ -208,6 +185,8 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 				array( $sidebar_id => $items )
 			) );
 		}
+
+		return true;
 	}
 
 	private function get_sidebars_widget_instance( $sidebar, $id ) {

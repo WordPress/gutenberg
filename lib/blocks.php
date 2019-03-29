@@ -45,3 +45,35 @@ function gutenberg_reregister_core_block_types() {
 	}
 }
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
+
+function serialize_blocks( $blocks ) {
+	return implode( array_map( 'serialize_block', $blocks ) );
+}
+
+function serialize_block( $block ) {
+	$name = $block['blockName'];
+	if ( 0 === strpos( $name, 'core/' ) ) {
+		$name = substr( $name, strlen( 'core/' ) );
+	}
+
+	if ( empty( $block['attrs'] ) ) {
+		$opening_tag_suffix = '';
+	} else {
+		$opening_tag_suffix = ' ' . json_encode( $block['attrs'] );
+	}
+
+	if ( empty( $block['innerHTML'] ) ) {
+		return sprintf(
+			'<!-- wp:%s%s /-->',
+			$name,
+			$opening_tag_suffix
+		);
+	} else {
+		return sprintf(
+			'<!-- wp:%1$s%2$s -->%3$s<!-- /wp:%1$s -->',
+			$name,
+			$opening_tag_suffix,
+			$block['innerHTML']
+		);
+	}
+}
