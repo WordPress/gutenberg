@@ -170,9 +170,7 @@ export const settings = {
 			focalPoint,
 		} = attributes;
 		const mediaTypeRenders = {
-			image: () => imageFill ?
-				<div style={ imageFillStyles( mediaUrl, focalPoint ) } ></div> :
-				<img src={ mediaUrl } alt={ mediaAlt } className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null } />,
+			image: () => <img src={ mediaUrl } alt={ mediaAlt } className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null } />,
 			video: () => <video controls src={ mediaUrl } />,
 		};
 		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
@@ -183,6 +181,7 @@ export const settings = {
 			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 			'is-image-fill': imageFill,
 		} );
+		const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
 
 		let gridTemplateColumns;
 		if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
@@ -194,7 +193,7 @@ export const settings = {
 		};
 		return (
 			<div className={ className } style={ style }>
-				<figure className="wp-block-media-text__media" >
+				<figure className="wp-block-media-text__media" style={ backgroundStyles }>
 					{ ( mediaTypeRenders[ mediaType ] || noop )() }
 				</figure>
 				<div className="wp-block-media-text__content">

@@ -55,25 +55,13 @@ class MediaContainer extends Component {
 	}
 
 	renderImage() {
-		const { mediaAlt, mediaUrl, className } = this.props;
+		const { mediaAlt, mediaUrl, className, imageFill, focalPoint } = this.props;
+		const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
 		return (
 			<Fragment>
 				{ this.renderToolbarEditButton() }
-				<figure className={ className }>
+				<figure className={ className } style={ backgroundStyles }>
 					<img src={ mediaUrl } alt={ mediaAlt } />
-				</figure>
-			</Fragment>
-		);
-	}
-
-	renderImageFill() {
-		const { mediaUrl, className, focalPoint } = this.props;
-		const style = imageFillStyles( mediaUrl, focalPoint );
-		return (
-			<Fragment>
-				{ this.renderToolbarEditButton() }
-				<figure className={ className }>
-					<div style={ style } ></div>
 				</figure>
 			</Fragment>
 		);
@@ -108,7 +96,7 @@ class MediaContainer extends Component {
 	}
 
 	render() {
-		const { mediaPosition, mediaUrl, mediaType, mediaWidth, imageFill, commitWidthChange, onWidthChange } = this.props;
+		const { mediaPosition, mediaUrl, mediaType, mediaWidth, commitWidthChange, onWidthChange } = this.props;
 		if ( mediaType && mediaUrl ) {
 			const onResize = ( event, direction, elt ) => {
 				onWidthChange( parseInt( elt.style.width ) );
@@ -124,7 +112,7 @@ class MediaContainer extends Component {
 			let mediaElement = null;
 			switch ( mediaType ) {
 				case 'image':
-					mediaElement = imageFill ? this.renderImageFill() : this.renderImage();
+					mediaElement = this.renderImage();
 					break;
 				case 'video':
 					mediaElement = this.renderVideo();

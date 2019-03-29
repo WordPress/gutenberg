@@ -41,15 +41,14 @@
 	vertical-align: middle;
 }
 
-.wp-block-media-text figure > div {
-	width: 100%;
+.wp-block-media-text.is-image-fill figure {
 	height: 100%;
 	min-height: 250px;
 	background-size: cover;
 }
 
-.wp-block-media-text.is-image-fill .wp-block-media-text__media {
-	height: 100%;
+.wp-block-media-text.is-image-fill figure > img {
+	display: none;
 }
 
 /*
