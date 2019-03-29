@@ -275,10 +275,6 @@ export class RichText extends Component {
 	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
 		this.lastEventCount = event.nativeEvent.eventCount;
-		if ( ! this.onSplit ) {
-			// TODO: insert the \n char instead?
-			return;
-		}
 
 		const currentRecord = this.createRecord( {
 			...event.nativeEvent,
