@@ -49,6 +49,7 @@ const schema = {
 	level: {
 		type: 'number',
 		default: 2,
+		enum: [ 1, 2, 3, 4, 5, 6 ],
 	},
 	align: {
 		type: 'string',

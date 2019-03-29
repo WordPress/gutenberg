@@ -86,13 +86,12 @@ export default withSelect( ( select ) => {
 	// Parse the h1,h2,h3... choices to level numbers and pass it as a prop.
 	const levelChoices = get(
 		select( 'core/blocks' ).getBlockType( 'core/heading' ),
-		[ 'attributes', 'content', 'selector' ],
-		''
-	)
-		.split( ',' )
-		.map( ( choice ) => Number( choice.substring( 1 ) ) );
+		[ 'attributes', 'level', 'enum' ],
+		[]
+	);
 
 	return {
 		levelChoices,
 	};
 } )( HeadingEdit );
+
