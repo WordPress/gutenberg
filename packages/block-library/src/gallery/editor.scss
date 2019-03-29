@@ -92,6 +92,13 @@ ul.wp-block-gallery {
 	}
 }
 
+.blocks-gallery-item__move-backward,
+.blocks-gallery-item__move-forward {
+	&.components-button:focus {
+		color: inherit;
+	}
+}
+
 .blocks-gallery-item__remove {
 	padding: 0;
 }
