@@ -1,5 +1,9 @@
 ## 2.2.0 (2019-06-12)
 
+### Breaking Changes
+
+- `BlockEditorProvider` no longer renders a wrapping `SlotFillProvider` (from `@wordpress/components`). For custom block editors, you should render your own as wrapping the `BlockEditorProvider`. A future release will include a new `BlockEditor` component for simple, standard usage. `BlockEditorProvider` will serve the simple purpose of establishing its own context for block editors.
+
 ### Internal
 
 - Refactored `BlockSettingsMenu` to use `DropdownMenu` from `@wordpress/components`.
