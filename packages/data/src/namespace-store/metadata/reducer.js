@@ -13,7 +13,7 @@ import { onSubKey } from './utils';
  * Reducer function returning next state for selector resolution of
  * subkeys, object form:
  *
- *  reducerKey -> selectorName -> EquivalentKeyMap<Array,boolean>
+ *  selectorName -> EquivalentKeyMap<Array,boolean>
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -21,7 +21,6 @@ import { onSubKey } from './utils';
  * @returns {Object} Next state.
  */
 const subKeysIsResolved = flowRight( [
-	onSubKey( 'reducerKey' ),
 	onSubKey( 'selectorName' ),
 ] )( ( state = new EquivalentKeyMap(), action ) => {
 	switch ( action.type ) {
@@ -44,7 +43,7 @@ const subKeysIsResolved = flowRight( [
 /**
  * Reducer function returning next state for selector resolution, object form:
  *
- *   reducerKey -> selectorName -> EquivalentKeyMap<Array, boolean>
+ *   selectorName -> EquivalentKeyMap<Array, boolean>
  *
  * @param {Object} state   Current state.
  * @param {Object} action  Dispatched action.
@@ -54,18 +53,10 @@ const subKeysIsResolved = flowRight( [
 const isResolved = ( state = {}, action ) => {
 	switch ( action.type ) {
 		case 'INVALIDATE_RESOLUTION_FOR_STORE':
-			return has( state, action.reducerKey ) ?
-				omit( state, [ action.reducerKey ] ) :
-				state;
+			return {};
 		case 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR':
-			return has( state, [ action.reducerKey, action.selectorName ] ) ?
-				{
-					...state,
-					[ action.reducerKey ]: omit(
-						state[ action.reducerKey ],
-						[ action.selectorName ]
-					),
-				} :
+			return has( state, [ action.selectorName ] ) ?
+				omit( state, [ action.selectorName ] ) :
 				state;
 		case 'START_RESOLUTION':
 		case 'FINISH_RESOLUTION':

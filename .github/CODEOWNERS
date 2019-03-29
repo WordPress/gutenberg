@@ -13,12 +13,12 @@
 /packages/block-library                         @youknowriad @gziolo @Soean @ajitbohra @jorgefilipecosta @talldan @noisysocks @notnownikki
 
 # Editor
-/packages/annotations                           @youknowriad @aduth @atimmer
+/packages/annotations                           @youknowriad @aduth @atimmer @ellatrix
 /packages/autop                                 @youknowriad @aduth
-/packages/block-editor                          @youknowriad @gziolo @talldan @noisysocks
+/packages/block-editor                          @youknowriad @gziolo @talldan @noisysocks @ellatrix
 /packages/block-serialization-spec-parser       @youknowriad @gziolo @aduth @dmsnell
 /packages/block-serialization-default-parser    @youknowriad @gziolo @aduth @dmsnell
-/packages/blocks                                @youknowriad @gziolo @aduth @noisysocks
+/packages/blocks                                @youknowriad @gziolo @aduth @noisysocks @ellatrix
 /packages/edit-post                             @youknowriad @talldan @noisysocks
 /packages/editor                                @youknowriad @talldan @noisysocks
 /packages/list-reusable-blocks                  @youknowriad @aduth @noisysocks
@@ -29,7 +29,7 @@
 
 # Tooling
 /bin                                            @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/docs/tool                                      @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki                      
+/docs/tool                                      @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
 /packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/babel-plugin-makepot                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
@@ -60,13 +60,13 @@
 /packages/blob                                  @youknowriad @gziolo @aduth
 /packages/date                                  @youknowriad @gziolo @aduth
 /packages/deprecated                            @youknowriad @gziolo @aduth
-/packages/dom                                   @youknowriad @gziolo @aduth @nosolosw
+/packages/dom                                   @youknowriad @gziolo @aduth @nosolosw @ellatrix
 /packages/dom-ready                             @youknowriad @gziolo @aduth
 /packages/escape-html                           @youknowriad @gziolo @aduth
 /packages/html-entities                         @youknowriad @gziolo @aduth
 /packages/i18n                                  @youknowriad @aduth @swissspidy
 /packages/is-shallow-equal                      @youknowriad @gziolo @aduth
-/packages/keycodes                              @youknowriad @gziolo @aduth @talldan
+/packages/keycodes                              @youknowriad @gziolo @aduth @talldan @ellatrix
 /packages/priority-queue                        @youknowriad @gziolo @aduth
 /packages/token-list                            @youknowriad @gziolo @aduth
 /packages/url                                   @youknowriad @gziolo @aduth @talldan
@@ -77,9 +77,9 @@
 /packages/plugins                               @youknowriad @gziolo @aduth @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @youknowriad @aduth @iseulde @jorgefilipecosta
-/packages/rich-text                             @youknowriad @aduth @iseulde @jorgefilipecosta
-/packages/block-editor/src/components/rich-text @youknowriad @aduth @iseulde @jorgefilipecosta
+/packages/format-library                        @youknowriad @aduth @ellatrix @jorgefilipecosta
+/packages/rich-text                             @youknowriad @aduth @ellatrix @jorgefilipecosta
+/packages/block-editor/src/components/rich-text @youknowriad @aduth @ellatrix @jorgefilipecosta
 
 # PHP
 /lib                                            @youknowriad @gziolo @aduth

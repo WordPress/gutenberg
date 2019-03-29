@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-const path = require( 'path' );
-
 const getTagsByName = ( tags, ...names ) => tags.filter( ( tag ) => names.some( ( name ) => name === tag.title ) );
 
 const cleanSpaces = ( paragraph ) =>
@@ -19,7 +14,7 @@ const formatTag = ( title, tags, formatter, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( `**${ title }**` );
+		docs.push( `*${ title }*` );
 		docs.push( '\n' );
 		docs.push( ...tags.map( formatter ) );
 	}
@@ -29,7 +24,7 @@ const formatExamples = ( tags, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( '**Usage**' );
+		docs.push( '*Usage*' );
 		docs.push( '\n' );
 		docs.push( '\n' );
 		docs.push( ...tags.map(
@@ -57,6 +52,10 @@ const getHeading = ( index, text ) => {
 	return '#'.repeat( index ) + ' ' + text;
 };
 
+const getSymbolHeading = ( text ) => {
+	return `<a name="${ text }" href="#${ text }">#</a> **${ text }**`;
+};
+
 module.exports = function( rootDir, docPath, symbols, headingTitle, headingStartIndex ) {
 	const docs = [ ];
 	let headingIndex = headingStartIndex || 1;
@@ -79,16 +78,7 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 	} );
 	if ( symbols && symbols.length > 0 ) {
 		symbols.forEach( ( symbol ) => {
-			const symbolPath = path.join(
-				path.relative(
-					path.dirname( docPath ),
-					path.join( rootDir, path.dirname( symbol.path ) )
-				),
-				path.basename( symbol.path ),
-			);
-			const symbolPathWithLines = `${ symbolPath }#L${ symbol.lineStart }-L${ symbol.lineEnd }`;
-			docs.push( getHeading( headingIndex, `${ symbol.name }` ) );
-			docs.push( `\n\n[${ symbolPathWithLines }](${ symbolPathWithLines })` );
+			docs.push( getSymbolHeading( symbol.name ) );
 			formatDeprecated( getTagsByName( symbol.tags, 'deprecated' ), docs );
 			formatDescription( symbol.description, docs );
 			formatTag(
@@ -101,19 +91,19 @@ module.exports = function( rootDir, docPath, symbols, headingTitle, headingStart
 			formatTag(
 				'Type',
 				getTagsByName( symbol.tags, 'type' ),
-				( tag ) => `\n\`${ tag.type }\` ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- \`${ tag.type }\` ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Parameters',
 				getTagsByName( symbol.tags, 'param' ),
-				( tag ) => `\n- **${ tag.name }** \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- *${ tag.name }* \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			formatTag(
 				'Returns',
 				getTagsByName( symbol.tags, 'return' ),
-				( tag ) => `\n\`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => `\n- \`${ tag.type }\`: ${ cleanSpaces( tag.description ) }`,
 				docs
 			);
 			docs.push( '\n' );

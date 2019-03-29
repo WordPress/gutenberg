@@ -1,6 +1,10 @@
-## 2.4.0 (Unreleased)
+## 2.5.0 (Unreleased)
 
-- Add vertical alignment controls to `columns` Block ([#13899](https://github.com/WordPress/gutenberg/pull/13899/)).
+- Add vertical alignment controls to Columns Block ([#13899](https://github.com/WordPress/gutenberg/pull/13899/)).
+- Add `wide` and `full` alignments to Archives block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
+- Add `wide` and `full` alignments to Categories block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
+- Add all alignment options to RSS block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
+- Add all alignment options to Search block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
 
 ### Bug Fixes
 

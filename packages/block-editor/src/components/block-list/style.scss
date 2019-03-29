@@ -904,6 +904,12 @@
 	.block-editor-block-contextual-toolbar > * {
 		pointer-events: auto;
 	}
+
+	// Full-aligned blocks have negative margins on the parent of the toolbar, so additional position adjustment is not required.
+	&[data-align="full"] .block-editor-block-contextual-toolbar {
+		left: 0;
+		right: 0;
+	}
 }
 
 .block-editor-block-list__block.is-focus-mode:not(.is-multi-selected) > .block-editor-block-contextual-toolbar {

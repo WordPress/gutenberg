@@ -1115,7 +1115,7 @@ export const canInsertBlockType = createSelector(
  *                                            the number of inserts that have occurred.
  */
 function getInsertUsage( state, id ) {
-	return state.preferences.insertUsage[ id ] || null;
+	return get( state.preferences.insertUsage, [ id ], null );
 }
 
 /**

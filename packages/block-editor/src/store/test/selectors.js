@@ -1927,9 +1927,11 @@ describe( 'selectors', () => {
 						{ id: 1, isTemporary: false, clientId: 'block1', title: 'Reusable Block 1' },
 					],
 				},
-				preferences: {
-					insertUsage: {},
-				},
+				// Intentionally include a test case which considers
+				// `insertUsage` as not present within preferences.
+				//
+				// See: https://github.com/WordPress/gutenberg/issues/14580
+				preferences: {},
 				blockListSettings: {},
 			};
 			const items = getInserterItems( state );

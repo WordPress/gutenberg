@@ -219,8 +219,10 @@ class VideoEdit extends Component {
 						<MediaUploadCheck>
 							<BaseControl
 								className="editor-video-poster-control"
-								label={ __( 'Poster Image' ) }
 							>
+								<BaseControl.VisualLabel>
+									{ __( 'Poster Image' ) }
+								</BaseControl.VisualLabel>
 								<MediaUpload
 									title={ __( 'Select Poster Image' ) }
 									onSelect={ this.onSelectPoster }

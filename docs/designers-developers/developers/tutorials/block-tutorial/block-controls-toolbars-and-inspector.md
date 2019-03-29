@@ -6,57 +6,52 @@ To simplify block customization and ensure a consistent experience for users, th
 
 ![Screenshot of the rich text toolbar applied to a paragraph block inside the block editor](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/toolbar-text.png)
 
-When the user selects a block, a number of control buttons may be shown in a toolbar above the selected block. Some of these block-level controls are included automatically if the editor is able to transform the block to another type, or if the focused element is an RichText component.
+When the user selects a block, a number of control buttons may be shown in a toolbar above the selected block. Some of these block-level controls are included automatically if the editor is able to transform the block to another type, or if the focused element is a RichText component.
 
 You can also customize the toolbar to include controls specific to your block type. If the return value of your block type's `edit` function includes a `BlockControls` element, those controls will be shown in the selected block's toolbar.
 
 {% codetabs %}
 {% ES5 %}
 ```js
-var el = wp.element.createElement,
-	Fragment = wp.element.Fragment
-	registerBlockType = wp.blocks.registerBlockType,
-	RichText = wp.editor.RichText,
-	BlockControls = wp.editor.BlockControls,
-	AlignmentToolbar = wp.editor.AlignmentToolbar;
+( function( blocks, editor, element ) {
+	var el = element.createElement;
+	var RichText = editor.RichText;
+	var AlignmentToolbar = editor.AlignmentToolbar;
+	var BlockControls = editor.BlockControls;
 
-registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
-	title: 'Hello World (Step 4)',
+	blocks.registerBlockType( 'gutenberg-examples/example-04-controls', {
+		title: 'Example: Controls',
+		icon: 'universal-access-alt',
+		category: 'layout',
 
-	icon: 'universal-access-alt',
-
-	category: 'layout',
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-			selector: 'p',
+		attributes: {
+			content: {
+				type: 'array',
+				source: 'children',
+				selector: 'p',
+			},
+			alignment: {
+				type: 'string',
+				default: 'none',
+			},
 		},
-		alignment: {
-			type: 'string',
-		},
-	},
 
-	edit: function( props ) {
-		var content = props.attributes.content,
-			alignment = props.attributes.alignment;
+		edit: function( props ) {
+			var content = props.attributes.content;
+			var alignment = props.attributes.alignment;
 
-		function onChangeContent( newContent ) {
-			props.setAttributes( { content: newContent } );
-		}
+			function onChangeContent( newContent ) {
+				props.setAttributes( { content: newContent } );
+			}
 
-		function onChangeAlignment( newAlignment ) {
-			props.setAttributes( { alignment: newAlignment } );
-		}
+			function onChangeAlignment( newAlignment ) {
+				props.setAttributes( { alignment: newAlignment === undefined ? 'none' : newAlignment } );
+			}
 
-		return (
-			el(
-				Fragment,
-				null,
+			return [
 				el(
 					BlockControls,
-					null,
+					{ key: 'controls' },
 					el(
 						AlignmentToolbar,
 						{
@@ -68,98 +63,99 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 				el(
 					RichText,
 					{
-						key: 'editable',
+						key: 'richtext',
 						tagName: 'p',
-						className: props.className,
 						style: { textAlign: alignment },
+						className: props.className,
 						onChange: onChangeContent,
 						value: content,
 					}
-				)
-			)
-		);
-	},
+				),
+			];
+		},
 
-	save: function( props ) {
-		var content = props.attributes.content,
-			alignment = props.attributes.alignment;
-
-		return el( RichText.Content, {
-			tagName: 'p',
-			className: props.className,
-			style: { textAlign: alignment },
-			value: content
-		} );
-	},
-} );
+		save: function( props ) {
+			return el( RichText.Content, {
+				tagName: 'p',
+				className: 'gutenberg-examples-align-' + props.attributes.alignment,
+				value: props.attributes.content,
+			} );
+		},
+	} );
+}(
+	window.wp.blocks,
+	window.wp.editor,
+	window.wp.element
+) );
 ```
 {% ESNext %}
 ```js
 const { registerBlockType } = wp.blocks;
-const { Fragment } = wp.element;
+
 const {
 	RichText,
-	BlockControls,
 	AlignmentToolbar,
+	BlockControls,
 } = wp.editor;
 
-registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
-	title: 'Hello World (Step 4)',
-
+registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
+	title: 'Example: Controls (esnext)',
 	icon: 'universal-access-alt',
-
 	category: 'layout',
-
 	attributes: {
 		content: {
-			type: 'string',
-			source: 'html',
+			type: 'array',
+			source: 'children',
 			selector: 'p',
 		},
 		alignment: {
 			type: 'string',
+			default: 'none',
 		},
 	},
+	edit: ( props ) => {
+		const {
+			attributes: {
+				content,
+				alignment,
+			},
+			className,
+		} = props;
 
-	edit( { attributes, className, setAttributes } ) {
-		const { content, alignment } = attributes;
+		const onChangeContent = ( newContent ) => {
+			props.setAttributes( { content: newContent } );
+		};
 
-		function onChangeContent( newContent ) {
-			setAttributes( { content: newContent } );
-		}
-
-		function onChangeAlignment( newAlignment ) {
-			setAttributes( { alignment: newAlignment } );
-		}
+		const onChangeAlignment = ( newAlignment ) => {
+			props.setAttributes( { alignment: newAlignment === undefined ? 'none' : newAlignment } );
+		};
 
 		return (
-			<Fragment>
-				<BlockControls>
-					<AlignmentToolbar
-						value={ alignment }
-						onChange={ onChangeAlignment }
-					/>
-				</BlockControls>
+			<div>
+				{
+					<BlockControls>
+						<AlignmentToolbar
+							value={ alignment }
+							onChange={ onChangeAlignment }
+						/>
+					</BlockControls>
+				}
 				<RichText
-					key="editable"
-					tagName="p"
 					className={ className }
 					style={ { textAlign: alignment } }
+					tagName="p"
 					onChange={ onChangeContent }
 					value={ content }
 				/>
-			</Fragment>
+			</div>
 		);
 	},
-
-	save( { attributes } ) {
-		const { content, alignment } = attributes;
-
+	save: ( props ) => {
 		return (
 			<RichText.Content
-				style={ { textAlign: alignment } }
-				value={ content }
+				className={ `gutenberg-examples-align-${ props.attributes.alignment }` }
 				tagName="p"
+				value={ props.attributes.content }
 			/>
 		);
 	},
