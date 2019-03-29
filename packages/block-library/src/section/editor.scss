@@ -36,9 +36,6 @@
  */
 .wp-block[data-type="core/section"][data-align="full"] {
 
-	margin-left: -#{$block-container-side-padding - $border-width};
-	margin-right: -#{$block-container-side-padding - $border-width};
-
 	// First tier of InnerBlocks must act like the container of the standard canvas
 	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks {
 		margin-left: auto;
