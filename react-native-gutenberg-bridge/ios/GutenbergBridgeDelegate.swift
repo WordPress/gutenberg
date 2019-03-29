@@ -6,6 +6,14 @@ public enum MediaPickerSource: String {
     case deviceCamera = "DEVICE_CAMERA"
 }
 
+/// Ref. https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
+public enum LogLevel: Int {
+    case trace
+    case info
+    case warn
+    case error
+}
+
 public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that Gutenberg had returned the requested HTML content.
     /// You can request HTML content by calling `requestHTML()` on a Gutenberg bridge instance.
@@ -49,6 +57,10 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that the editor view has completed the initial render.
     ///
     func gutenbergDidMount(hasUnsupportedBlocks: Bool)
+
+    /// Tells the delegate that logger method is called.
+    ///
+    func gutenbergDidEmitLog(message: String, logLevel: LogLevel)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

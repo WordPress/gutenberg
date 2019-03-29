@@ -28,6 +28,7 @@ import com.facebook.soloader.SoLoader;
 import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
 import com.horcrux.svg.SvgPackage;
 
+import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
@@ -179,6 +180,24 @@ public class WPAndroidGlueCode {
                     // send signal to Editor to create a new image block and pass the media URL, start uploading, etc
                     // use mMediaUrlToAddAfterMounting
                     dispatchOneMediaToAddAtATimeIfAvailable();
+                }
+            }
+
+            @Override
+            public void editorDidEmitLog(String message, LogLevel logLevel) {
+                switch (logLevel) {
+                    case TRACE:
+                        AppLog.d(AppLog.T.EDITOR, message);
+                        break;
+                    case INFO:
+                        AppLog.i(AppLog.T.EDITOR, message);
+                        break;
+                    case WARN:
+                        AppLog.w(AppLog.T.EDITOR, message);
+                        break;
+                    case ERROR:
+                        AppLog.e(AppLog.T.EDITOR, message);
+                        break;
                 }
             }
         });

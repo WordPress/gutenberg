@@ -122,6 +122,19 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         }
         progress.cancel()
     }
+
+    func gutenbergDidEmitLog(message: String, logLevel: LogLevel) {
+        switch logLevel {
+        case .trace:
+            print("Debug: \(message)")
+        case .info:
+            print("Info: \(message)")
+        case .warn:
+            print("Warn: \(message)")
+        case .error:
+            print("Error: \(message)")
+        }
+    }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
