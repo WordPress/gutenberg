@@ -327,7 +327,14 @@ class ImageEdit extends React.Component {
 		const progress = this.state.progress * 100;
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
+			<TouchableWithoutFeedback 
+				accessible={ ! isSelected } 
+				accessibilityLabel={ __( "Image block" ) + "." + alt } 
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( "Doulbe tap to edit the image" ) }
+				onPress={ this.onImagePressed } 
+				disabled={ ! isSelected }
+			>
 				<View style={ { flex: 1 } }>
 					{ showSpinner && <Spinner progress={ progress } /> }
 					<BlockControls>
