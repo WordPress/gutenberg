@@ -64,7 +64,7 @@ public class MainApplication extends Application implements ReactApplication {
                 public void editorDidMount(boolean hasUnsupportedBlocks) {}
 
                 @Override
-                public void nativeLoggingHook(String message, LogLevel logLevel) {
+                public void editorDidEmitLog(String message, LogLevel logLevel) {
                     switch (logLevel) {
                         case TRACE:
                             Log.d(TAG, message);

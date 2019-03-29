@@ -172,7 +172,7 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void nativeLoggingHook(String message, LogLevel logLevel) {
+            public void editorDidEmitLog(String message, LogLevel logLevel) {
                 switch (logLevel) {
                     case TRACE:
                         AppLog.d(AppLog.T.EDITOR, message);
