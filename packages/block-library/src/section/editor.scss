@@ -29,6 +29,20 @@
 			padding-right: $block-padding*4 + $block-spacing/2; // 58px
 		}
 	}
+
+	// Full Width Blocks with a background (ie: has padding)
+	> .editor-block-list__block-edit > div > .wp-block-section.has-background > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
+		// note: using position `left` causes hoz scrollbars so
+		// we opt to use margin instead
+		// the 30px matches the hoz padding applied in `theme.scss`
+		// added when the Block has a background set
+		margin-left: -30px;
+
+		// 60px here is x2 the hoz padding from `theme.scss` added when
+		// the Block has a background set
+		// note: also duplicated below for full width Sections
+		width: calc(100% + 60px);
+	}
 }
 
 /**
@@ -63,5 +77,11 @@
 			margin-left: 0;
 			margin-right: 0;
 		}
+	}
+
+	// Full Width Blocks with a background (ie: has padding)
+	// note: also duplicated above for all Section widths
+	> .editor-block-list__block-edit > div > .wp-block-section.has-background > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
+		width: calc(100% + 60px);
 	}
 }
