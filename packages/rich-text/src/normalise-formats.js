@@ -13,13 +13,13 @@ import { isFormatEqual } from './is-format-equal';
 /**
  * Normalises formats: ensures subsequent equal formats have the same reference.
  *
- * @param  {Object} value Value to normalise formats of.
+ * @param {Object} value Value to normalise formats of.
  *
  * @return {Object} New value with normalised formats.
  */
-export function normaliseFormats( { formats, text, start, end } ) {
+export function normaliseFormats( value ) {
 	const refs = [];
-	const newFormats = formats.map( ( formatsAtIndex ) =>
+	const newFormats = value.formats.map( ( formatsAtIndex ) =>
 		formatsAtIndex.map( ( format ) => {
 			const equalRef = find( refs, ( ref ) =>
 				isFormatEqual( ref, format )
@@ -35,5 +35,5 @@ export function normaliseFormats( { formats, text, start, end } ) {
 		} )
 	);
 
-	return { formats: newFormats, text, start, end };
+	return { ...value, formats: newFormats };
 }

@@ -7,6 +7,7 @@ import { image } from './image';
 import { italic } from './italic';
 import { link } from './link';
 import { strikethrough } from './strikethrough';
+import { underline } from './underline';
 
 export default [
 	bold,
@@ -15,4 +16,5 @@ export default [
 	italic,
 	link,
 	strikethrough,
+	underline,
 ];

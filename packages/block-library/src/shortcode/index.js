@@ -5,7 +5,7 @@ import { removep, autop } from '@wordpress/autop';
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Dashicon, SVG, Path } from '@wordpress/components';
-import { PlainText } from '@wordpress/editor';
+import { PlainText } from '@wordpress/block-editor';
 import { withInstanceId } from '@wordpress/compose';
 
 export const name = 'core/shortcode';
@@ -18,13 +18,6 @@ export const settings = {
 	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M8.5,21.4l1.9,0.5l5.2-19.3l-1.9-0.5L8.5,21.4z M3,19h4v-2H5V7h2V5H3V19z M17,5v2h2v10h-2v2h4V5H17z" /></SVG>,
 
 	category: 'widgets',
-
-	attributes: {
-		text: {
-			type: 'string',
-			source: 'html',
-		},
-	},
 
 	transforms: {
 		from: [

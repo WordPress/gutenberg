@@ -9,6 +9,8 @@ import {
 	createJSONResponse,
 	getEditedPostContent,
 	clickButton,
+	insertBlock,
+	publishPost,
 } from '@wordpress/e2e-test-utils';
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
@@ -191,5 +193,28 @@ describe( 'Embedding content', () => {
 		);
 		await clickButton( 'Try again' );
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+	} );
+
+	it( 'should switch to the WordPress block correctly', async () => {
+		// This test is to make sure that WordPress embeds are detected correctly,
+		// because the HTML can vary, and the block is detected by looking for
+		// classes in the HTML, so we need to flag up if the HTML changes.
+
+		// Publish a post to embed.
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Hello there!' );
+		await publishPost();
+		const postUrl = await page.$eval( '#inspector-text-control-0', ( el ) => el.value );
+
+		// Start a new post, embed the previous post.
+		await createNewPost();
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( postUrl );
+		await page.keyboard.press( 'Enter' );
+
+		// Check the block has become a WordPress block.
+		await page.waitForSelector( '.wp-block-embed-wordpress' );
 	} );
 } );

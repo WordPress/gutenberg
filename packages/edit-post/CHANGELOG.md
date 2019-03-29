@@ -1,11 +1,20 @@
-## 3.2.0 (Next)
+## V.V.V (Unreleased)
+
+### New Features
+
+- Implement the `addToGallery` option in the `MediaUpload` hook. The option allows users to open the media modal in the `gallery-library`instead of `gallery-edit` state.
+
+
+## 3.2.0 (2019-03-06)
 
 ### Polish
 
 * Expose the `className` property to style the `PluginSidebar` component.
 
 ### Bug Fixes
- - Fix 'save' keyboard shortcut not functioning in the Code Editor.
+
+- Fix 'save' keyboard shortcut not functioning in the Code Editor.
+- Prevent `ClipboardButton` from incorrectly copying a serialized block string instead of the intended text in Safari.
 
 ## 3.1.7 (2019-01-03)
 

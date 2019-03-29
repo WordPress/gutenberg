@@ -28,6 +28,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	withNotices,
+	ExternalLink,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -40,8 +41,8 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 	RichText,
-	mediaUpload,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
+import { mediaUpload } from '@wordpress/editor';
 import { Component, Fragment } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
@@ -456,7 +457,14 @@ class ImageEdit extends Component {
 						label={ __( 'Alt Text (Alternative Text)' ) }
 						value={ alt }
 						onChange={ this.updateAlt }
-						help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
+						help={
+							<Fragment>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									{ __( 'Describe the purpose of the image' ) }
+								</ExternalLink>
+								{ __( 'Leave empty if the image is purely decorative.' ) }
+							</Fragment>
+						}
 					/>
 					{ ! isEmpty( imageSizeOptions ) && (
 						<SelectControl
@@ -705,9 +713,9 @@ class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getSettings } = select( 'core/block-editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
+		const { maxWidth, isRTL, imageSizes } = getSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,

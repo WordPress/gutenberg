@@ -21,8 +21,8 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 	RichText,
-	mediaUpload,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
+import { mediaUpload } from '@wordpress/editor';
 import { Component, Fragment, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -129,6 +129,7 @@ class VideoEdit extends Component {
 			poster,
 			preload,
 			src,
+			playsInline,
 		} = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
@@ -200,6 +201,11 @@ class VideoEdit extends Component {
 							onChange={ this.toggleAttribute( 'controls' ) }
 							checked={ controls }
 						/>
+						<ToggleControl
+							label={ __( 'Play inline' ) }
+							onChange={ this.toggleAttribute( 'playsInline' ) }
+							checked={ playsInline }
+						/>
 						<SelectControl
 							label={ __( 'Preload' ) }
 							value={ preload }
@@ -213,8 +219,10 @@ class VideoEdit extends Component {
 						<MediaUploadCheck>
 							<BaseControl
 								className="editor-video-poster-control"
-								label={ __( 'Poster Image' ) }
 							>
+								<BaseControl.VisualLabel>
+									{ __( 'Poster Image' ) }
+								</BaseControl.VisualLabel>
 								<MediaUpload
 									title={ __( 'Select Poster Image' ) }
 									onSelect={ this.onSelectPoster }

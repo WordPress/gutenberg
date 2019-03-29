@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, merge, isPlainObject } from 'lodash';
+import { merge, isPlainObject, get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -72,7 +72,7 @@ export function createPersistenceInterface( options ) {
 	 *
 	 * @return {Object} Persisted data.
 	 */
-	function get() {
+	function getData() {
 		if ( data === undefined ) {
 			// If unset, getItem is expected to return null. Fall back to
 			// empty object.
@@ -99,12 +99,15 @@ export function createPersistenceInterface( options ) {
 	 * @param {string} key   Key to update.
 	 * @param {*}      value Updated value.
 	 */
-	function set( key, value ) {
+	function setData( key, value ) {
 		data = { ...data, [ key ]: value };
 		storage.setItem( storageKey, JSON.stringify( data ) );
 	}
 
-	return { get, set };
+	return {
+		get: getData,
+		set: setData,
+	};
 }
 
 /**
@@ -115,7 +118,7 @@ export function createPersistenceInterface( options ) {
  *
  * @return {WPDataPlugin} Data plugin.
  */
-export default function( registry, pluginOptions ) {
+const persistencePlugin = function( registry, pluginOptions ) {
 	const persistence = createPersistenceInterface( pluginOptions );
 
 	/**
@@ -147,14 +150,12 @@ export default function( registry, pluginOptions ) {
 
 		let lastState = getPersistedState( undefined, { nextState: getState() } );
 
-		return ( result ) => {
+		return () => {
 			const state = getPersistedState( lastState, { nextState: getState() } );
 			if ( state !== lastState ) {
 				persistence.set( reducerKey, state );
 				lastState = state;
 			}
-
-			return result;
 		};
 	}
 
@@ -184,21 +185,46 @@ export default function( registry, pluginOptions ) {
 					initialState = persistedState;
 				}
 
-				options = { ...options, initialState };
+				options = {
+					...options,
+					initialState,
+				};
 			}
 
 			const store = registry.registerStore( reducerKey, options );
 
-			store.dispatch = flow( [
-				store.dispatch,
-				createPersistOnChange(
-					store.getState,
-					reducerKey,
-					options.persist
-				),
-			] );
+			store.subscribe( createPersistOnChange(
+				store.getState,
+				reducerKey,
+				options.persist
+			) );
 
 			return store;
 		},
 	};
-}
+};
+
+/**
+ * Deprecated: Remove this function once WordPress 5.3 is released.
+ */
+
+persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
+	const persistence = createPersistenceInterface( pluginOptions );
+
+	// Preferences migration to introduce the block editor module
+	const insertUsage = get( persistence.get(), [
+		'core/editor',
+		'preferences',
+		'insertUsage',
+	] );
+
+	if ( insertUsage ) {
+		persistence.set( 'core/block-editor', {
+			preferences: {
+				insertUsage,
+			},
+		} );
+	}
+};
+
+export default persistencePlugin;

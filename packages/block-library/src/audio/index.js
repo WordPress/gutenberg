@@ -3,7 +3,7 @@
  */
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -75,6 +75,36 @@ export const settings = {
 					} );
 
 					return block;
+				},
+			},
+			{
+				type: 'shortcode',
+				tag: 'audio',
+				attributes: {
+					src: {
+						type: 'string',
+						shortcode: ( { named: { src } } ) => {
+							return src;
+						},
+					},
+					loop: {
+						type: 'string',
+						shortcode: ( { named: { loop } } ) => {
+							return loop;
+						},
+					},
+					autoplay: {
+						type: 'srting',
+						shortcode: ( { named: { autoplay } } ) => {
+							return autoplay;
+						},
+					},
+					preload: {
+						type: 'string',
+						shortcode: ( { named: { preload } } ) => {
+							return preload;
+						},
+					},
 				},
 			},
 		],

@@ -7,6 +7,7 @@ import {
 	createNewPost,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding blocks', () => {
@@ -208,6 +209,13 @@ describe( 'adding blocks', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should not create extra line breaks in multiline value', async () => {
+		await insertBlock( 'Quote' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Backspace' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should navigate native inputs vertically, not horizontally', async () => {
 		// See: https://github.com/WordPress/gutenberg/issues/9626
 
@@ -288,6 +296,18 @@ describe( 'adding blocks', () => {
 		await pressKeyTimes( 'Enter', 10 );
 
 		// Check that none of the paragraph blocks have <br> in them.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should navigate empty paragraph', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.waitForFunction( () => document.activeElement.isContentEditable );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '2' );
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

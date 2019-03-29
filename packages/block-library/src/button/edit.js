@@ -24,7 +24,7 @@ import {
 	InspectorControls,
 	withColors,
 	PanelColorSettings,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
 const { getComputedStyle } = window;
 

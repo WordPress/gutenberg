@@ -8,7 +8,7 @@ import { countBy, flatMap, get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import {
 	create,
 	getTextContent,
@@ -64,7 +64,7 @@ const computeOutlineHeadings = ( blocks = [], path = [] ) => {
 
 const isEmptyHeading = ( heading ) => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupported } ) => {
+export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupported, hasOutlineItemsDisabled } ) => {
 	const headings = computeOutlineHeadings( blocks );
 
 	if ( headings.length < 1 ) {
@@ -73,18 +73,9 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 
 	let prevHeadingLevel = 1;
 
-	// Select the corresponding block in the main editor
-	// when clicking on a heading item from the list.
-	const onSelectHeading = ( clientId ) => onSelect( clientId );
-	const focusTitle = () => {
-		// Not great but it's the simplest way to focus the title right now.
-		const titleNode = document.querySelector( '.editor-post-title__input' );
-		if ( titleNode ) {
-			titleNode.focus();
-		}
-	};
-
-	const hasTitle = isTitleSupported && title;
+	// Not great but it's the simplest way to locate the title right now.
+	const titleNode = document.querySelector( '.editor-post-title__input' );
+	const hasTitle = isTitleSupported && title && titleNode;
 	const countByLevel = countBy( headings, 'level' );
 	const hasMultipleH1 = countByLevel[ 1 ] > 1;
 
@@ -95,7 +86,9 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 					<DocumentOutlineItem
 						level={ __( 'Title' ) }
 						isValid
-						onClick={ focusTitle }
+						onSelect={ onSelect }
+						href={ `#${ titleNode.id }` }
+						isDisabled={ hasOutlineItemsDisabled }
 					>
 						{ title }
 					</DocumentOutlineItem>
@@ -118,8 +111,10 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 							key={ index }
 							level={ `H${ item.level }` }
 							isValid={ isValid }
-							onClick={ () => onSelectHeading( item.clientId ) }
 							path={ item.path }
+							isDisabled={ hasOutlineItemsDisabled }
+							href={ `#block-${ item.clientId }` }
+							onSelect={ onSelect }
 						>
 							{ item.isEmpty ?
 								emptyHeadingContent :
@@ -140,7 +135,8 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getBlocks } = select( 'core/editor' );
+		const { getBlocks } = select( 'core/block-editor' );
+		const { getEditedPostAttribute } = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
@@ -148,12 +144,6 @@ export default compose(
 			title: getEditedPostAttribute( 'title' ),
 			blocks: getBlocks(),
 			isTitleSupported: get( postType, [ 'supports', 'title' ], false ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { selectBlock } = dispatch( 'core/editor' );
-		return {
-			onSelect: selectBlock,
 		};
 	} )
 )( DocumentOutline );

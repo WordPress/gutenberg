@@ -10,7 +10,7 @@ import { Component, Fragment } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEdit } from '@wordpress/editor';
+import { BlockEdit } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -150,10 +150,11 @@ export default compose( [
 			__experimentalGetReusableBlock: getReusableBlock,
 			__experimentalIsFetchingReusableBlock: isFetchingReusableBlock,
 			__experimentalIsSavingReusableBlock: isSavingReusableBlock,
-			getBlock,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
-
+		const {
+			getBlock,
+		} = select( 'core/block-editor' );
 		const { ref } = ownProps.attributes;
 		const reusableBlock = getReusableBlock( ref );
 
@@ -168,10 +169,12 @@ export default compose( [
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			__experimentalFetchReusableBlocks: fetchReusableBlocks,
-			updateBlockAttributes,
 			__experimentalUpdateReusableBlockTitle: updateReusableBlockTitle,
 			__experimentalSaveReusableBlock: saveReusableBlock,
 		} = dispatch( 'core/editor' );
+		const {
+			updateBlockAttributes,
+		} = dispatch( 'core/block-editor' );
 		const { ref } = ownProps.attributes;
 
 		return {
