@@ -5,7 +5,8 @@ const { camelCase, kebabCase, nth, upperFirst } = require( 'lodash' );
 
 const fs = require( 'fs' );
 
-const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/master`;
+const BRANCH = 'master';
+const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/${ BRANCH }`;
 
 /**
  * Generates the package manifest.
