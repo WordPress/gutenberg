@@ -34,8 +34,6 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
-    @objc var isMultiline: Bool = false
-
     var blockModel = BlockModel(tag: "") {
         didSet {
             forceTypingAttributesIfNeeded()
@@ -239,10 +237,6 @@ class RCTAztecView: Aztec.TextView {
         guard text == "\n",
             let onEnter = onEnter else {
                 return false
-        }
-
-        if isMultiline && !(self.text.isEmptyLine(at: selectedRange.location)) {
-            return false
         }
 
         let caretData = packCaretDataForRN()
