@@ -2,7 +2,9 @@
  * WordPress dependencies
  */
 
-import { Toolbar, Slot } from '@wordpress/components';
+import { Toolbar, Slot, createSlotFill } from '@wordpress/components';
+
+const { Slot: ToolbarControlsSlot } = createSlotFill( 'RichText.ToolbarControls' );
 
 const FormatToolbar = ( { controls } ) => {
 	return (
@@ -10,9 +12,11 @@ const FormatToolbar = ( { controls } ) => {
 			{ controls.map( ( format ) =>
 				<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
 			) }
-			<Slot name="RichText.ToolbarControls" />
+			<ToolbarControlsSlot />
 		</Toolbar>
 	);
 };
+
+FormatToolbar.Slot = ToolbarControlsSlot;
 
 export default FormatToolbar;

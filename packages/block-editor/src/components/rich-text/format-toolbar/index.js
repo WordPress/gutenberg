@@ -9,7 +9,9 @@ import { orderBy } from 'lodash';
  */
 
 import { __ } from '@wordpress/i18n';
-import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
+import { Toolbar, Slot, DropdownMenu, createSlotFill } from '@wordpress/components';
+
+const { Slot: ToolbarControlsSlot } = createSlotFill( 'RichText.ToolbarControls' );
 
 const FormatToolbar = ( { controls } ) => {
 	return (
@@ -18,7 +20,7 @@ const FormatToolbar = ( { controls } ) => {
 				{ controls.map( ( format ) =>
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
 				) }
-				<Slot name="RichText.ToolbarControls">
+				<ToolbarControlsSlot>
 					{ ( fills ) => fills.length !== 0 &&
 						<DropdownMenu
 							icon={ false }
@@ -27,10 +29,12 @@ const FormatToolbar = ( { controls } ) => {
 							controls={ orderBy( fills.map( ( [ { props } ] ) => props ), 'title' ) }
 						/>
 					}
-				</Slot>
+				</ToolbarControlsSlot>
 			</Toolbar>
 		</div>
 	);
 };
+
+FormatToolbar.Slot = ToolbarControlsSlot;
 
 export default FormatToolbar;

@@ -197,6 +197,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="FormatToolbar" href="#FormatToolbar">#</a> **FormatToolbar**
+
+Undocumented declaration.
+
 <a name="getColorClassName" href="#getColorClassName">#</a> **getColorClassName**
 
 Returns a class based on the context a color is being used and its slug.
