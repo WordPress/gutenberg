@@ -91,6 +91,7 @@ class GalleryEdit extends Component {
 		const images = [ ...this.props.attributes.images ];
 		images.splice( newIndex, 1, this.props.attributes.images[ oldIndex ] );
 		images.splice( oldIndex, 1, this.props.attributes.images[ newIndex ] );
+		this.setState( { selectedImage: newIndex } );
 		this.setAttributes( { images } );
 	}
 
