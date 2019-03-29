@@ -64,6 +64,14 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing current user state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
 export function currentUser( state = {}, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_CURRENT_USER':
