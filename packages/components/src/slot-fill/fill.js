@@ -11,11 +11,11 @@ import { createPortal, useLayoutEffect, useRef, useState } from '@wordpress/elem
 /**
  * Internal dependencies
  */
-import { Consumer } from './context';
+import { withConsumerContext } from './context';
 
 let occurrences = 0;
 
-function FillComponent( { name, getSlot, children, registerFill, unregisterFill } ) {
+function Fill( { name, getSlot, children, registerFill, unregisterFill } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
 	const rerender = () => updateRerenderState( {} );
@@ -67,17 +67,4 @@ function FillComponent( { name, getSlot, children, registerFill, unregisterFill 
 	return createPortal( children, slot.node );
 }
 
-const Fill = ( props ) => (
-	<Consumer>
-		{ ( { getSlot, registerFill, unregisterFill } ) => (
-			<FillComponent
-				{ ...props }
-				getSlot={ getSlot }
-				registerFill={ registerFill }
-				unregisterFill={ unregisterFill }
-			/>
-		) }
-	</Consumer>
-);
-
-export default Fill;
+export default withConsumerContext( Fill );

@@ -15,6 +15,7 @@ export function createSlotFill( name ) {
 
 	const SlotComponent = ( props ) => <Slot name={ name } { ...props } />;
 	SlotComponent.displayName = name + 'Slot';
+	SlotComponent.slotName = name;
 
 	return {
 		Fill: FillComponent,

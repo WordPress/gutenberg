@@ -21,9 +21,9 @@ import {
 /**
  * Internal dependencies
  */
-import { Consumer } from './context';
+import { withConsumerContext } from './context';
 
-class SlotComponent extends Component {
+class Slot extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -89,17 +89,4 @@ class SlotComponent extends Component {
 	}
 }
 
-const Slot = ( props ) => (
-	<Consumer>
-		{ ( { registerSlot, unregisterSlot, getFills } ) => (
-			<SlotComponent
-				{ ...props }
-				registerSlot={ registerSlot }
-				unregisterSlot={ unregisterSlot }
-				getFills={ getFills }
-			/>
-		) }
-	</Consumer>
-);
-
-export default Slot;
+export default withConsumerContext( Slot );

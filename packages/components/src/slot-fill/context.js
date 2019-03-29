@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { sortBy, forEach, without } from 'lodash';
+import { sortBy, forEach, without, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component, createContext } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 const { Provider, Consumer } = createContext( {
 	registerSlot: () => {},
@@ -21,22 +22,49 @@ class SlotFillProvider extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.registerSlot = this.registerSlot.bind( this );
-		this.registerFill = this.registerFill.bind( this );
-		this.unregisterSlot = this.unregisterSlot.bind( this );
-		this.unregisterFill = this.unregisterFill.bind( this );
-		this.getSlot = this.getSlot.bind( this );
-		this.getFills = this.getFills.bind( this );
-
 		this.slots = {};
 		this.fills = {};
 		this.state = {
-			registerSlot: this.registerSlot,
-			unregisterSlot: this.unregisterSlot,
-			registerFill: this.registerFill,
-			unregisterFill: this.unregisterFill,
-			getSlot: this.getSlot,
-			getFills: this.getFills,
+			registerSlot: this.proxy( 'registerSlot' ).bind( this ),
+			registerFill: this.proxy( 'registerFill' ).bind( this ),
+			unregisterSlot: this.proxy( 'unregisterSlot' ).bind( this ),
+			unregisterFill: this.proxy( 'unregisterFill' ).bind( this ),
+			getSlot: this.proxy( 'getSlot' ).bind( this ),
+			getFills: this.proxy( 'getFills' ).bind( this ),
+		};
+	}
+
+	/**
+	 * Given a function name for a function on the SlotFillProvider prototype,
+	 * returns a new function which either passes the arguments to the current
+	 * instance, or to the context ancestor, dependent on whether the provider
+	 * is configured to handle the given slot.
+	 *
+	 * @param {string} functionName SlotFillProvider function name.
+	 *
+	 * @return {Function} Proxying function.
+	 */
+	proxy( functionName ) {
+		return ( name, ...args ) => {
+			const { slots: handledSlots } = this.props;
+
+			let handler = this[ functionName ];
+
+			if ( Array.isArray( handledSlots ) ) {
+				const isHandled = some( handledSlots, ( slotNameOrComponent ) => {
+					const { slotName = slotNameOrComponent } = slotNameOrComponent;
+					return typeof slotName === 'string' && (
+						slotName === name ||
+						name.startsWith( slotName + '.' )
+					);
+				} );
+
+				if ( ! isHandled ) {
+					handler = this.props[ functionName ];
+				}
+			}
+
+			return handler.call( this, name, ...args );
 		};
 	}
 
@@ -129,5 +157,25 @@ class SlotFillProvider extends Component {
 	}
 }
 
-export default SlotFillProvider;
-export { Consumer };
+const withConsumerContext = createHigherOrderComponent(
+	( WrappedComponent ) => ( props ) => (
+		<Consumer>
+			{ ( context ) => (
+				<WrappedComponent
+					{ ...props }
+					registerSlot={ context.registerSlot }
+					unregisterSlot={ context.unregisterSlot }
+					registerFill={ context.registerFill }
+					unregisterFill={ context.unregisterFill }
+					getSlot={ context.getSlot }
+					getFills={ context.getFills }
+				/>
+			) }
+		</Consumer>
+	),
+	'withConsumerContext'
+);
+
+export default withConsumerContext( SlotFillProvider );
+
+export { Consumer, withConsumerContext };
