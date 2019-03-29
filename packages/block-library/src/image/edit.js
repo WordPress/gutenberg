@@ -408,24 +408,24 @@ class ImageEdit extends Component {
 					{ __( 'Edit image' ) }
 				</span>
 			);
+
 			const labels = {
 				title: ! url ? __( 'Image' ) : replaceImageLabel,
 				instructions: __( 'Drag an image to upload, select a file from your library or add one from an URL.' ),
 			};
-			let replaceImageIcon = ( <BlockIcon icon={ icon } /> );
-			if ( url ) {
-				replaceImageIcon = ( <img
-					alt={ __( 'Edit image' ) }
-					title={ __( 'Edit image' ) }
-					className={ 'edit-image-preview' }
-					src={ url }
-				/> );
-			}
+
+			const mediaPreview = ( !! url && <img
+				alt={ __( 'Edit image' ) }
+				title={ __( 'Edit image' ) }
+				className={ 'edit-image-preview' }
+				src={ url }
+			/> );
+
 			return (
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon={ replaceImageIcon }
+						icon={ <BlockIcon icon={ icon } /> }
 						labels={ labels }
 						className={ classnames( className, {
 							'wp-block-image-replace': url,
@@ -439,6 +439,7 @@ class ImageEdit extends Component {
 						accept="image/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ { id, src } }
+						mediaPreview={ mediaPreview }
 					/>
 				</Fragment>
 			);
@@ -598,7 +599,13 @@ class ImageEdit extends Component {
 								// should direct focus to block.
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 								<Fragment>
-									<img src={ url } alt={ defaultedAlt } onDoubleClick={ this.toggleIsEditing } onClick={ this.onImageClick } onError={ () => this.onImageError( url ) } />
+									<img
+										src={ url }
+										alt={ defaultedAlt }
+										onDoubleClick={ this.toggleIsEditing }
+										onClick={ this.onImageClick }
+										onError={ () => this.onImageError( url ) }
+									/>
 									{ isBlobURL( url ) && <Spinner /> }
 								</Fragment>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */

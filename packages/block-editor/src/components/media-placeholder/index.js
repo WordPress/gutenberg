@@ -63,6 +63,7 @@ export class MediaPlaceholder extends Component {
 		this.state = {
 			src: '',
 			isURLInputVisible: false,
+			mediaPreview: false,
 		};
 		this.onChangeSrc = this.onChangeSrc.bind( this );
 		this.onSubmitSrc = this.onSubmitSrc.bind( this );
@@ -155,6 +156,7 @@ export class MediaPlaceholder extends Component {
 			isAppender,
 			labels = {},
 			onDoubleClick,
+			mediaPreview,
 			notices,
 			onSelectURL,
 			mediaUpload,
@@ -214,6 +216,7 @@ export class MediaPlaceholder extends Component {
 				notices={ notices }
 				onClick={ onClick }
 				onDoubleClick={ onDoubleClick }
+				mediaPreview={ mediaPreview }
 			>
 				{ content }
 			</Placeholder>
@@ -230,10 +233,25 @@ export class MediaPlaceholder extends Component {
 		);
 	}
 
+	renderCancelLink() {
+		const {
+			onCancel,
+		} = this.props;
+		return ( onCancel &&
+			<Button
+				className="block-editor-media-placeholder__cancel-button"
+				title={ __( 'Cancel' ) }
+				isLink
+				onClick={ onCancel }
+			>
+				{ __( 'Cancel' ) }
+			</Button>
+		);
+	}
+
 	renderUrlSelectionUI() {
 		const {
 			onSelectURL,
-			onCancel,
 		} = this.props;
 		if ( ! onSelectURL ) {
 			return null;
@@ -262,16 +280,6 @@ export class MediaPlaceholder extends Component {
 						/>
 					) }
 				</div>
-				{ onCancel && (
-					<Button
-						className="block-editor-media-placeholder__cancel-button"
-						title={ __( 'Cancel' ) }
-						isLink
-						onClick={ onCancel }
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-				) }
 			</Fragment>
 		);
 	}
@@ -344,6 +352,7 @@ export class MediaPlaceholder extends Component {
 									</IconButton>
 									{ mediaLibraryButton }
 									{ this.renderUrlSelectionUI() }
+									{ this.renderCancelLink() }
 								</Fragment>
 							);
 							return this.renderPlaceholder( content, openFileDialog );
@@ -371,6 +380,7 @@ export class MediaPlaceholder extends Component {
 					</FormFileUpload>
 					{ mediaLibraryButton }
 					{ this.renderUrlSelectionUI() }
+					{ this.renderCancelLink() }
 				</Fragment>
 			);
 			return this.renderPlaceholder( content );

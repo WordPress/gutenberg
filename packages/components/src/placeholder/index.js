@@ -15,12 +15,17 @@ import Dashicon from '../dashicon';
 * @param  {Object} props The component props.
 * @return {Object}       The rendered placeholder.
 */
-function Placeholder( { icon, children, label, instructions, className, notices, ...additionalProps } ) {
+function Placeholder( { icon, children, label, instructions, className, notices, mediaPreview, ...additionalProps } ) {
 	const classes = classnames( 'components-placeholder', className );
 
 	return (
 		<div { ...additionalProps } className={ classes }>
 			{ notices }
+			{ mediaPreview &&
+				<div className="components-placeholder__preview">
+					{ mediaPreview }
+				</div>
+			}
 			<div className="components-placeholder__label">
 				{ isString( icon ) ? <Dashicon icon={ icon } /> : icon }
 				{ label }
