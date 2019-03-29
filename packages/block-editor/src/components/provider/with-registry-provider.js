@@ -17,13 +17,13 @@ const withRegistryProvider = createHigherOrderComponent( ( WrappedComponent ) =>
 			return <WrappedComponent registry={ registry } { ...props } />;
 		}
 
-		const [ subRegistry, updateRegistry ] = useState( null );
+		const [ subRegistry, setSubRegistry ] = useState( null );
 		useEffect( () => {
 			const newRegistry = createRegistry( {}, registry );
 			const store = newRegistry.registerStore( 'core/block-editor', storeConfig );
 			// This should be removed after the refactoring of the effects to controls.
 			applyMiddlewares( store );
-			updateRegistry( newRegistry );
+			setSubRegistry( newRegistry );
 		}, [ registry ] );
 
 		if ( ! subRegistry ) {
