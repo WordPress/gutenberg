@@ -3,7 +3,7 @@
 exports[`PostPreviewButton render() should render currentPostLink otherwise 1`] = `
 <ForwardRef(Button)
   className="editor-post-preview"
-  disabled={false}
+  disabled={true}
   href="https://wordpress.org/?p=1"
   isLarge={true}
   onClick={[Function]}
@@ -26,7 +26,7 @@ exports[`PostPreviewButton render() should render currentPostLink otherwise 1`] 
 exports[`PostPreviewButton render() should render previewLink if provided 1`] = `
 <ForwardRef(Button)
   className="editor-post-preview"
-  disabled={false}
+  disabled={true}
   href="https://wordpress.org/?p=1&preview=true"
   isLarge={true}
   onClick={[Function]}

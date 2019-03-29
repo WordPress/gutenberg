@@ -250,7 +250,7 @@ export function getAutosave( state, postType, postId, authorId ) {
 }
 
 /**
- * Returns true if the REST request for an autosave has completed.
+ * Returns true if the REST request for autosaves has completed.
  *
  * @param {Object} state State tree.
  * @param {string} postType The type of the parent post.
@@ -258,6 +258,6 @@ export function getAutosave( state, postType, postId, authorId ) {
  *
  * @return {boolean} True if the REST request was completed. False otherwise.
  */
-export const hasFetchedAutosave = createRegistrySelector( ( select ) => ( state, postType, postId ) => {
+export const hasFetchedAutosaves = createRegistrySelector( ( select ) => ( state, postType, postId ) => {
 	return select( 'core/data' ).hasFinishedResolution( REDUCER_KEY, 'getAutosaves', [ postType, postId ] );
 } );

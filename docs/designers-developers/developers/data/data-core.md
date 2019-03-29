@@ -225,9 +225,9 @@ Returns the autosave for the post and author.
 
 The autosave for the post and author.
 
-### hasFetchedAutosave
+### hasFetchedAutosaves
 
-Returns true if the REST request for an autosave has completed.
+Returns true if the REST request for autosaves has completed.
 
 *Parameters*
 
