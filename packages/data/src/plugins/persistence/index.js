@@ -72,7 +72,7 @@ export function createPersistenceInterface( options ) {
 	 *
 	 * @return {Object} Persisted data.
 	 */
-	function get() {
+	function getData() {
 		if ( data === undefined ) {
 			// If unset, getItem is expected to return null. Fall back to
 			// empty object.
@@ -99,12 +99,15 @@ export function createPersistenceInterface( options ) {
 	 * @param {string} key   Key to update.
 	 * @param {*}      value Updated value.
 	 */
-	function set( key, value ) {
+	function setData( key, value ) {
 		data = { ...data, [ key ]: value };
 		storage.setItem( storageKey, JSON.stringify( data ) );
 	}
 
-	return { get, set };
+	return {
+		get: getData,
+		set: setData,
+	};
 }
 
 /**
