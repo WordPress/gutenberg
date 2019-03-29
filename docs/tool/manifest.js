@@ -5,7 +5,7 @@ const { camelCase, kebabCase, nth, upperFirst } = require( 'lodash' );
 
 const fs = require( 'fs' );
 
-const BRANCH = 'wp/5.1';
+const BRANCH = 'wp/5.2';
 const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/${ BRANCH }`;
 
 /**
