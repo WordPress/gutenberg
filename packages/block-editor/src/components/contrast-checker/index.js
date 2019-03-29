@@ -38,9 +38,9 @@ function ContrastChecker( {
 		__( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' );
 	useEffect( () => {
 		if ( tinyBackgroundColor.getBrightness() < tinyTextColor.getBrightness() ) {
-			speak( __( 'This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.' ) );
+			speak( __( 'This color combination may be hard for people to read.' ) );
 		} else {
-			speak( __( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' ) );
+			speak( __( 'This color combination may be hard for people to read.' ) );
 		}
 	}, [ backgroundColor, textColor ] );
 	return (
