@@ -26,6 +26,9 @@ module.exports = {
 	'block-editor-plain-text': {
 		fontFamily: 'serif',
 	},
+	addBlockButton: {
+		color: '',
+	},
 	blockHolderFocused: {
 		borderColor: 'gray',
 	},

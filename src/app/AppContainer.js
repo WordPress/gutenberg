@@ -87,10 +87,6 @@ class AppContainer extends React.Component<PropsType> {
 	}
 
 	componentDidMount() {
-		const blocks = this.props.blocks;
-		const hasUnsupportedBlocks = ! isEmpty( blocks.filter( ( { name } ) => name === UnsupportedBlock.name ) );
-		RNReactNativeGutenbergBridge.editorDidMount( hasUnsupportedBlocks );
-
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
 			this.serializeToNativeAction();
 		} );
@@ -147,6 +143,17 @@ class AppContainer extends React.Component<PropsType> {
 	toggleMode() {
 		const { mode, switchMode } = this.props;
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( ! prevProps.isReady && ( prevProps.isReady !== this.props.isReady ) ) {
+			const { blocks } = this.props;
+			const isUnsupportedBlock = ( { name } ) => name === UnsupportedBlock.name;
+			const unsupportedBlocks = blocks.filter( isUnsupportedBlock );
+			const hasUnsupportedBlocks = ! isEmpty( unsupportedBlocks );
+
+			RNReactNativeGutenbergBridge.editorDidMount( hasUnsupportedBlocks );
+		}
 	}
 
 	render() {
