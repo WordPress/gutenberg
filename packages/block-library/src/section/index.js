@@ -26,7 +26,7 @@ export const settings = {
 
 	description: __( 'A wrapping section acting as a container for other blocks.' ),
 
-	keywords: [ __( 'container' ), __( 'section' ), __( 'wrapper' ), __( 'row' ) ],
+	keywords: [ __( 'container' ), __( 'wrapper' ), __( 'row' ) ],
 
 	supports: {
 		align: [ 'wide', 'full' ],
