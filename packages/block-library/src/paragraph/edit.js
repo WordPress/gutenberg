@@ -244,8 +244,8 @@ class ParagraphBlock extends Component {
 					} }
 					unstableOnSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
-					onReplace={ this.onReplace }
-					onRemove={ () => onReplace( [] ) }
+					onReplace={ this.props.onReplace && this.onReplace }
+					onRemove={ this.props.onReplace && ( () => onReplace( [] ) ) }
 					aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
 					placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
 				/>
