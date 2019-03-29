@@ -20,6 +20,7 @@ import {
 	toHTMLString,
 	insert,
 	insertLineSeparator,
+	insertLineBreak,
 	isEmptyLine,
 	isCollapsed,
 } from '@wordpress/rich-text';
@@ -470,6 +471,7 @@ export class RichText extends Component {
 			return create( {
 				html: children.toHTML( value ),
 				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
@@ -477,6 +479,7 @@ export class RichText extends Component {
 			return create( {
 				html: value,
 				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
