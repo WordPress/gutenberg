@@ -10,7 +10,7 @@ import { size, map, without } from 'lodash';
 import { withSelect } from '@wordpress/data';
 import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
 import { StrictMode, Component } from '@wordpress/element';
-import { KeyboardShortcuts } from '@wordpress/components';
+import { KeyboardShortcuts, SlotFillProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -87,19 +87,21 @@ class Editor extends Component {
 
 		return (
 			<StrictMode>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ post }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<ErrorBoundary onError={ onError }>
-						<Layout />
-						<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
-					</ErrorBoundary>
-					<PostLockedModal />
-				</EditorProvider>
+				<SlotFillProvider>
+					<EditorProvider
+						settings={ editorSettings }
+						post={ post }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						{ ...props }
+					>
+						<ErrorBoundary onError={ onError }>
+							<Layout />
+							<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
+						</ErrorBoundary>
+						<PostLockedModal />
+					</EditorProvider>
+				</SlotFillProvider>
 			</StrictMode>
 		);
 	}
