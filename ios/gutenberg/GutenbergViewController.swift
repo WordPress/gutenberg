@@ -123,7 +123,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         progress.cancel()
     }
 
-    func nativeLoggingHook(message: String, logLevel: LogLevel) {
+    func gutenbergDidEmitLog(message: String, logLevel: LogLevel) {
         switch logLevel {
         case .trace:
             print("Debug: \(message)")

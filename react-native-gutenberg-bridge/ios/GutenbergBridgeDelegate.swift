@@ -60,7 +60,7 @@ public protocol GutenbergBridgeDelegate: class {
 
     /// Tells the delegate that logger method is called.
     ///
-    func nativeLoggingHook(message: String, logLevel: LogLevel)
+    func gutenbergDidEmitLog(message: String, logLevel: LogLevel)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

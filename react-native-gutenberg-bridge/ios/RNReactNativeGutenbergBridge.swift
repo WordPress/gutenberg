@@ -70,9 +70,9 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func nativeLoggingHook(_ message: String, logLevel: Int) {
-        guard let logLevel = LogLevel.init(rawValue: logLevel) else { return }
-        delegate?.nativeLoggingHook(message: message, logLevel: logLevel)
+    func editorDidEmitLog(_ message: String, logLevel: Int) {
+        guard let logLevel = LogLevel(rawValue: logLevel) else { return }
+        delegate?.gutenbergDidEmitLog(message: message, logLevel: logLevel)
     }
 
     override public func startObserving() {
