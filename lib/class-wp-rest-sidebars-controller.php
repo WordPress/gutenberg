@@ -2,7 +2,7 @@
 
 class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	public function __construct() {
-		$this->namespace = 'wp/v2';
+		$this->namespace = '__experimental';
 		$this->rest_base = 'sidebars';
 	}
 

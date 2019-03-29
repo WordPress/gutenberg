@@ -92,7 +92,7 @@ class WidgetEditHandler extends Component {
 		}
 
 		apiFetch( {
-			path: `/wp/v2/widgets/${ identifier }/`,
+			path: `/__experimental/widgets/${ identifier }/`,
 			data: {
 				identifier,
 				instance,
