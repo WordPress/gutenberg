@@ -10,7 +10,7 @@ const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBrid
 // Console polyfill from react-native
 
 export function nativeLoggingHook( message, logLevel ) {
-	RNReactNativeGutenbergBridge.nativeLoggingHook( message, logLevel );
+	RNReactNativeGutenbergBridge.editorDidEmitLog( message, logLevel );
 }
 
 // Send messages
