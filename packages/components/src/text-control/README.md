@@ -40,14 +40,16 @@ Label text is used to inform users as to what information is requested for a tex
 #### Containers
 Containers improve the discoverability of text fields by creating contrast between the text field and surrounding content.
  
+**Do**
+
 ![A TextControl with a stroke around the container to clearly indicate the input area](https://make.wordpress.org/design/files/2019/03/TextControl-Do.png)
 
-**Do**
 A stroke around the container clearly indicates that users can input information.
+
+**Don’t** 
 
 ![A TextControl without a clear visual marker to indicate the input area](https://make.wordpress.org/design/files/2019/03/TextControl-Dont.png)
 
-**Don’t**
 Don’t use unclear visual markers to indicate a text field.
 
 ## Development guidelines
