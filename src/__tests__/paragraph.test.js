@@ -14,17 +14,13 @@ import Paragraph from '../../gutenberg/packages/block-library/src/paragraph/edit
 import { createBlock } from '@wordpress/blocks';
 jest.mock( '@wordpress/blocks' );
 
-const onReplace = jest.fn();
-const insertBlocksAfter = jest.fn();
-const setAttributes = jest.fn();
-
 const getTestComponentWithContent = ( content ) => {
 	return shallow(
 		<Paragraph
 			attributes={ { content } }
-			setAttributes={ setAttributes }
-			onReplace={ onReplace }
-			insertBlocksAfter={ insertBlocksAfter }
+			setAttributes={ jest.fn() }
+			onReplace={ jest.fn() }
+			insertBlocksAfter={ jest.fn() }
 		/>
 	);
 };
@@ -53,12 +49,12 @@ describe( 'Paragraph block', () => {
 		//Then
 
 		// The block is deleted if before is null
-		expect( onReplace ).toHaveBeenCalledTimes( 1 );
-		expect( onReplace ).toHaveBeenCalledWith( [] );
+		expect( instance.props.onReplace ).toHaveBeenCalledTimes( 1 );
+		expect( instance.props.onReplace ).toHaveBeenCalledWith( [] );
 
 		// New block is inserted after the current block.
-		expect( insertBlocksAfter ).toHaveBeenCalledTimes( 1 );
-		expect( insertBlocksAfter ).toHaveBeenCalledWith( blocks );
+		expect( instance.props.insertBlocksAfter ).toHaveBeenCalledTimes( 1 );
+		expect( instance.props.insertBlocksAfter ).toHaveBeenCalledWith( blocks );
 	} );
 
 	it( 'splits block with content on the middle', () => {
@@ -78,14 +74,14 @@ describe( 'Paragraph block', () => {
 		// Then
 
 		// Do NOT remove current block
-		expect( onReplace ).toHaveBeenCalledTimes( 0 );
+		expect( instance.props.onReplace ).toHaveBeenCalledTimes( 0 );
 
 		// Insert new block with the second half of the text
-		expect( insertBlocksAfter ).toHaveBeenCalledTimes( 1 );
-		expect( insertBlocksAfter ).toHaveBeenCalledWith( [ block, newBlock ] );
+		expect( instance.props.insertBlocksAfter ).toHaveBeenCalledTimes( 1 );
+		expect( instance.props.insertBlocksAfter ).toHaveBeenCalledWith( [ block, newBlock ] );
 
 		// Replace current block content with first half of the text.
-		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
-		expect( setAttributes ).toHaveBeenCalledWith( { content: before } );
+		expect( instance.props.setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( instance.props.setAttributes ).toHaveBeenCalledWith( { content: before } );
 	} );
 } );
