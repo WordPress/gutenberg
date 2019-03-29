@@ -1266,15 +1266,15 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditedPostAutosaveable', () => {
-		// isEditedPostAutosaveable is only implemented as a registry selector
-		// to handle a deprecation. None of the tests here trigger the deprecation,
-		// so create the selector without passing it a registry.
-		const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector();
-
 		it( 'should return false if the post is not saveable', () => {
-			const autosave = {
-				title: 'sassel',
-			};
+			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
+				getCurrentUser() {},
+				getAutosave() {
+					return {
+						title: 'sassel',
+					};
+				},
+			} ) );
 
 			const state = {
 				editor: {
@@ -1294,10 +1294,15 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditedPostAutosaveable( state, autosave ) ).toBe( false );
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
 		} );
 
 		it( 'should return true if there is no autosave', () => {
+			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
+				getCurrentUser() {},
+				getAutosave() {},
+			} ) );
+
 			const state = {
 				editor: {
 					present: {
@@ -1314,14 +1319,19 @@ describe( 'selectors', () => {
 				saving: {},
 			};
 
-			expect( isEditedPostAutosaveable( state, null ) ).toBe( true );
+			expect( isEditedPostAutosaveable( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if none of title, excerpt, or content have changed', () => {
-			const autosave = {
-				title: 'foo',
-				excerpt: 'foo',
-			};
+			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
+				getCurrentUser() {},
+				getAutosave() {
+					return {
+						title: 'foo',
+						excerpt: 'foo',
+					};
+				},
+			} ) );
 
 			const state = {
 				editor: {
@@ -1341,14 +1351,19 @@ describe( 'selectors', () => {
 				saving: {},
 			};
 
-			expect( isEditedPostAutosaveable( state, autosave ) ).toBe( false );
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
 		} );
 
 		it( 'should return true if content has changes', () => {
-			const autosave = {
-				title: 'foo',
-				excerpt: 'foo',
-			};
+			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
+				getCurrentUser() {},
+				getAutosave() {
+					return {
+						title: 'foo',
+						excerpt: 'foo',
+					};
+				},
+			} ) );
 
 			const state = {
 				editor: {
@@ -1367,16 +1382,21 @@ describe( 'selectors', () => {
 				saving: {},
 			};
 
-			expect( isEditedPostAutosaveable( state, autosave ) ).toBe( true );
+			expect( isEditedPostAutosaveable( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if title or excerpt have changed', () => {
 			for ( const variantField of [ 'title', 'excerpt' ] ) {
 				for ( const constantField of without( [ 'title', 'excerpt' ], variantField ) ) {
-					const autosave = {
-						[ constantField ]: 'foo',
-						[ variantField ]: 'bar',
-					};
+					const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
+						getCurrentUser() {},
+						getAutosave() {
+							return {
+								[ constantField ]: 'foo',
+								[ variantField ]: 'bar',
+							};
+						},
+					} ) );
 
 					const state = {
 						editor: {
@@ -1396,7 +1416,7 @@ describe( 'selectors', () => {
 						saving: {},
 					};
 
-					expect( isEditedPostAutosaveable( state, autosave ) ).toBe( true );
+					expect( isEditedPostAutosaveable( state ) ).toBe( true );
 				}
 			}
 		} );

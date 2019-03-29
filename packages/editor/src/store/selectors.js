@@ -519,27 +519,16 @@ export function isEditedPostEmpty( state ) {
  *
  * @return {boolean} Whether the post can be autosaved.
  */
-export const isEditedPostAutosaveable = createRegistrySelector( ( select ) => function( state, autosave ) {
-	if ( arguments.length === 1 ) {
-		// Note: if this deprecation is removed, the selector can also be
-		// reverted to a normal selector instead of a registry selector.
-		// Unit tests will also need to be updated to reflect the removal
-		// of the registry selector.
-		deprecated( '`wp.data.select( \'core/editor\' ).isEditedPostAutosaveable()`', {
-			alternative: '`wp.data.select( \'core/editor\' ).isEditedPostAutosaveable( autosave )`',
-			plugin: 'Gutenberg',
-		} );
-
-		const postType = getCurrentPostType( state );
-		const postId = getCurrentPostId( state );
-		const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
-		autosave = select( 'core' ).getAutosave( postType, postId, currentUserId );
-	}
-
+export const isEditedPostAutosaveable = createRegistrySelector( ( select ) => function( state ) {
 	// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
 	if ( ! isEditedPostSaveable( state ) ) {
 		return false;
 	}
+
+	const postType = getCurrentPostType( state );
+	const postId = getCurrentPostId( state );
+	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
+	const autosave = select( 'core' ).getAutosave( postType, postId, currentUserId );
 
 	// If we don't already have an autosave, the post is autosaveable.
 	if ( ! autosave ) {

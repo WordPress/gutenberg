@@ -210,8 +210,6 @@ export default compose( [
 			getEditedPostPreviewLink,
 		} = select( 'core/editor' );
 		const {
-			getAutosave,
-			getCurrentUser,
 			getPostType,
 			hasFetchedAutosave,
 		} = select( 'core' );
@@ -220,16 +218,13 @@ export default compose( [
 		const postTypeName = getEditedPostAttribute( 'type' );
 		const postType = getPostType( postTypeName );
 		const postId = getCurrentPostId();
-		const currentUser = getCurrentUser();
-		const currentUserId = currentUser ? currentUser.id : null;
-		const autosave = getAutosave( postTypeName, postId, currentUserId );
 
 		return {
 			postId: getCurrentPostId(),
 			currentPostLink: getCurrentPostAttribute( 'link' ),
 			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : previewLink,
 			isSaveable: isEditedPostSaveable() && hasFetchedAutosave( postTypeName, postId ),
-			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable( autosave ),
+			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
 			isDraft: [ 'draft', 'auto-draft' ].indexOf( getEditedPostAttribute( 'status' ) ) !== -1,
 		};
