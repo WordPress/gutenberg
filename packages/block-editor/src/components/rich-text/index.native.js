@@ -290,6 +290,9 @@ export class RichText extends Component {
 				const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
 				this.onFormatChange( insertedLineBreak );
 			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
+				this.setState( {
+					needsSelectionUpdate: false,
+				} );
 				this.onSplit( ...split( currentRecord ).map( this.valueToFormat ) );
 			} else {
 				const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
