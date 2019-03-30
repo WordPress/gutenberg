@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, ResizableBox, Toolbar } from '@wordpress/components';
+import { IconButton, ResizableBox, Toolbar, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -22,6 +22,17 @@ import icon from './media-container-icon';
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 
 class MediaContainer extends Component {
+	constructor() {
+		super( ...arguments );
+		this.onUploadError = this.onUploadError.bind( this );
+	}
+
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	renderToolbarEditButton() {
 		const { mediaId, onSelectMedia } = this.props;
 		return (
@@ -70,7 +81,7 @@ class MediaContainer extends Component {
 	}
 
 	renderPlaceholder() {
-		const { onSelectMedia, className } = this.props;
+		const { onSelectMedia, className, noticeUI } = this.props;
 		return (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
@@ -81,6 +92,8 @@ class MediaContainer extends Component {
 				onSelect={ onSelectMedia }
 				accept="image/*,video/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				notices={ noticeUI }
+				onError={ this.onUploadError }
 			/>
 		);
 	}
@@ -127,4 +140,4 @@ class MediaContainer extends Component {
 	}
 }
 
-export default MediaContainer;
+export default withNotices( MediaContainer );
