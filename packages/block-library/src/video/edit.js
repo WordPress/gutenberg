@@ -50,6 +50,7 @@ class VideoEdit extends Component {
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onSelectPoster = this.onSelectPoster.bind( this );
 		this.onRemovePoster = this.onRemovePoster.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 	}
 
 	componentDidMount() {
@@ -119,6 +120,12 @@ class VideoEdit extends Component {
 		this.posterImageButton.current.focus();
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	render() {
 		const {
 			autoplay,
@@ -131,7 +138,7 @@ class VideoEdit extends Component {
 			src,
 			playsInline,
 		} = this.props.attributes;
-		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
+		const { setAttributes, isSelected, className, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
 			this.setState( { editing: true } );
@@ -161,7 +168,7 @@ class VideoEdit extends Component {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ this.props.attributes }
 					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
+					onError={ this.onUploadError }
 				/>
 			);
 		}
