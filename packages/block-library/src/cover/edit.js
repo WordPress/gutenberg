@@ -80,6 +80,7 @@ class CoverEdit extends Component {
 		this.imageRef = createRef();
 		this.videoRef = createRef();
 		this.changeIsDarkIfRequired = this.changeIsDarkIfRequired.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 	}
 
 	componentDidMount() {
@@ -90,12 +91,17 @@ class CoverEdit extends Component {
 		this.handleBackgroundMode( prevProps );
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	render() {
 		const {
 			attributes,
 			setAttributes,
 			className,
-			noticeOperations,
 			noticeUI,
 			overlayColor,
 			setOverlayColor,
@@ -241,7 +247,7 @@ class CoverEdit extends Component {
 						accept="image/*,video/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
+						onError={ this.onUploadError }
 					/>
 				</Fragment>
 			);
