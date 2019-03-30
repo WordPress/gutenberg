@@ -163,6 +163,7 @@ class ImageEdit extends Component {
 
 	onUploadError( message ) {
 		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
 		this.setState( {
 			isEditing: true,

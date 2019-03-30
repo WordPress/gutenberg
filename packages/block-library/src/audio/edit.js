@@ -45,6 +45,7 @@ class AudioEdit extends Component {
 
 		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 	}
 
 	componentDidMount() {
@@ -98,9 +99,15 @@ class AudioEdit extends Component {
 		this.setState( { editing: false } );
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	render() {
 		const { autoplay, caption, loop, preload, src } = this.props.attributes;
-		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
+		const { setAttributes, isSelected, className, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
 			this.setState( { editing: true } );
@@ -129,7 +136,7 @@ class AudioEdit extends Component {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ this.props.attributes }
 					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
+					onError={ this.onUploadError }
 				/>
 			);
 		}
