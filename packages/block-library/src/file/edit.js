@@ -47,6 +47,7 @@ class FileEdit extends Component {
 		this.changeLinkDestinationOption = this.changeLinkDestinationOption.bind( this );
 		this.changeOpenInNewWindow = this.changeOpenInNewWindow.bind( this );
 		this.changeShowDownloadButton = this.changeShowDownloadButton.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 
 		this.state = {
 			hasError: false,
@@ -94,6 +95,12 @@ class FileEdit extends Component {
 		}
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	confirmCopyURL() {
 		this.setState( { showCopyConfirmation: true } );
 	}
@@ -124,7 +131,6 @@ class FileEdit extends Component {
 			attributes,
 			setAttributes,
 			noticeUI,
-			noticeOperations,
 			media,
 		} = this.props;
 		const {
@@ -149,7 +155,7 @@ class FileEdit extends Component {
 					} }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
+					onError={ this.onUploadError }
 					accept="*"
 				/>
 			);
