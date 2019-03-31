@@ -51,15 +51,15 @@ if ( hasCliArg( '--puppeteer-interactive' ) ) {
 }
 
 const configsMapping = {
-	WP_BASE_URL: "--wordpress-host",
-	WP_USERNAME: "--wordpress-username",
-	WP_PASSWORD: "--wordpress-password"
+	WP_BASE_URL: '--wordpress-host',
+	WP_USERNAME: '--wordpress-username',
+	WP_PASSWORD: '--wordpress-password',
 };
 
-Object.entries(configsMapping).forEach(([key, value]) => {
-	if (hasCliArg(value)) {
-		process.env[key] = getCliArg(value);
+Object.entries( configsMapping ).forEach( ( [ key, value ] ) => {
+	if ( hasCliArg( value ) ) {
+		process.env[ key ] = getCliArg( value );
 	}
-});
+} );
 
 jest.run( [ ...config, ...runInBand, ...getCliArgs( cleanUpPrefixes ) ] );
