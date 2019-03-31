@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { BlockControls, PlainText } from '@wordpress/block-editor';
 import { transformStyles } from '@wordpress/editor';
-import { Disabled, SandBox } from '@wordpress/components';
+import { Disabled, SandBox, ResizableBox } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 class HTMLEdit extends Component {
@@ -47,7 +47,7 @@ class HTMLEdit extends Component {
 		this.setState( { isPreview: false } );
 	}
 
-	render() {
+	renderHTML() {
 		const { attributes, setAttributes } = this.props;
 		const { isPreview, styles } = this.state;
 
@@ -84,6 +84,18 @@ class HTMLEdit extends Component {
 					) }
 				</Disabled.Consumer>
 			</div>
+		);
+	}
+
+	render() {
+		return (
+			<ResizableBox
+				minWidth="10%"
+				maxWidth="100%"
+				axis="x"
+			>
+				{ this.renderHTML() }
+			</ResizableBox>
 		);
 	}
 }
