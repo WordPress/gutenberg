@@ -4,6 +4,7 @@
 
 - Added a new `render` property to `FormFileUpload` component. Allowing users of the component to custom the UI for their needs.
 - Added a new `BaseControl.VisualLabel` component.
+- Added a new `mediaPreview` prop to the `Placeholder` component which allows to display a media when the placeholder is used in media editing contexts.
 
 ### Bug fixes
 

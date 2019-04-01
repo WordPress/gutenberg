@@ -5,6 +5,7 @@
 - Add `wide` and `full` alignments to Categories block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
 - Add all alignment options to RSS block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
 - Add all alignment options to Search block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
+- Updated the edit flow of the `image` block, updated the edit icon and unified the image editing in only one UI based on `MediaPlaceholder`
 
 ### Bug Fixes
 
