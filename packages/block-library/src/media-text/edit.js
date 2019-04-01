@@ -79,7 +79,7 @@ class MediaTextEdit extends Component {
 			mediaType,
 			mediaUrl: src || media.url,
 			imageFill: false,
-			focalPoint: {},
+			focalPoint: undefined,
 		} );
 	}
 

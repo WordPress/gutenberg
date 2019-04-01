@@ -53,6 +53,9 @@ const blockAttributes = {
 	},
 	mediaUrl: {
 		type: 'string',
+		source: 'attribute',
+		selector: 'figure video,figure img',
+		attribute: 'src',
 	},
 	mediaType: {
 		type: 'string',
