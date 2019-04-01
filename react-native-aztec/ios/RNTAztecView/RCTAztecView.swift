@@ -192,7 +192,7 @@ class RCTAztecView: Aztec.TextView {
         let html = self.html(from: pasteboard) ?? ""
         
         onPaste?([
-            "currentContent": getHTML(),
+            "currentContent": getHTML(prettify: false),
             "selectionStart": start,
             "selectionEnd": end,
             "pastedText": text,
@@ -277,7 +277,7 @@ class RCTAztecView: Aztec.TextView {
             (start, end) = (end, start)
         }
         
-        var result: [AnyHashable : Any] = packForRN(getHTML(), withName: "text")
+        var result: [AnyHashable : Any] = packForRN(getHTML(prettify: false), withName: "text")
 
         result["selectionStart"] = start
         result["selectionEnd"] = end
@@ -456,7 +456,7 @@ class RCTAztecView: Aztec.TextView {
     
     func propagateContentChanges() {
         if let onChange = onChange {
-            let text = packForRN(getHTML(), withName: "text")
+            let text = packForRN(getHTML(prettify: false), withName: "text")
             onChange(text)
         }
     }
