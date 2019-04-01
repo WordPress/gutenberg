@@ -13,7 +13,7 @@ import {
 	InnerBlocks,
 	PanelColorSettings,
 	withColors,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
 function SectionEdit( { className, setBackgroundColor, backgroundColor } ) {
 	const styles = {

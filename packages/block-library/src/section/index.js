@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InnerBlocks, getColorClassName } from '@wordpress/editor';
+import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
