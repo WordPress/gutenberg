@@ -49,7 +49,7 @@ if ( hasCliArg( '--puppeteer-interactive' ) ) {
 }
 
 const configsMapping = {
-	WP_BASE_URL: '--wordpress-host',
+	WP_BASE_URL: '--wordpress-base-url',
 	WP_USERNAME: '--wordpress-username',
 	WP_PASSWORD: '--wordpress-password',
 };
