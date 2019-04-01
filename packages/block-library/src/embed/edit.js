@@ -41,11 +41,10 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		}
 
 		handleIncomingPreview() {
-			const { allowResponsive } = this.props.attributes;
 			this.setAttributesFromPreview();
 			const upgradedBlock = createUpgradedEmbedBlock(
 				this.props,
-				getAttributesFromPreview( this.props.preview, this.props.attributes.className, responsive, allowResponsive )
+				this.getAttributesFromPreview()
 			);
 			if ( upgradedBlock ) {
 				this.props.onReplace( upgradedBlock );
