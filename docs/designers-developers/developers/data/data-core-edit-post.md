@@ -373,3 +373,14 @@ Returns an action object used to request meta box update.
 ### metaBoxUpdatesSuccess
 
 Returns an action object used signal a successful meta box update.
+
+### init
+
+Returns an action generator used to initialize some subscriptions for the
+post editor:
+
+- subscription for toggling the `edit-post/block` general sidebar when a
+  block is selected.
+- subscription for hiding/showing the sidebar depending on size of viewport.
+- subscription for updating the "View Post" link in the admin bar when
+  permalink is updated.
