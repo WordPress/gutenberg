@@ -121,7 +121,7 @@ export const registerCoreBlocks = () => {
 		if ( ! block ) {
 			return;
 		}
-		const { metadata, settings, name = metadata.name } = block;
+		const { metadata, settings, name } = block;
 		if ( metadata ) {
 			unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } ); // eslint-disable-line camelcase
 		}

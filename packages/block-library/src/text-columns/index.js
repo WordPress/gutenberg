@@ -23,7 +23,9 @@ import deprecated from '@wordpress/deprecated';
  */
 import metadata from './block.json';
 
-export { metadata };
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	// Disable insertion as this block is deprecated and ultimately replaced by the Columns block.
