@@ -54,6 +54,8 @@
     "start:inside-gb:debug": "node --inspect-brk node_modules/.bin/react-native start:inside-gb",
     "bundle": "yarn bundle:android && yarn bundle:ios",
     "bundle:android": "mkdir -p bundle/android && yarn react-native bundle --platform android --dev false --entry-file index.js --assets-dest bundle/android --bundle-output bundle/android/App.js --sourcemap-output bundle/android/App.js.map",
+    "bundle:android:test": "mkdir -p android/app/src/main/assets && react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
+    "bundle:ios:test": "react-native bundle --reset-cache --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios'",
     "bundle:ios": "mkdir -p bundle/ios && yarn react-native bundle --platform ios --dev false --entry-file index.js --assets-dest bundle/ios --bundle-output bundle/ios/App.js --sourcemap-output bundle/ios/App.js.map",
     "i18n-cache": "node i18n-cache/index.js",
     "postinstall": "yarn i18n-cache",

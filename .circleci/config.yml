@@ -15,12 +15,6 @@ commands:
           key: yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
-  react-native-install:
-    steps:
-    - run:
-        name: Install command line tools
-        command: |
-          sudo npm install -g react-native-cli
   build-android:
     steps:
       - run:
@@ -29,9 +23,7 @@ commands:
             cp ./bin/tmp/initial-device-tests-html.js ./src/app/initial-html.js
       - run:
           name: Bundle Debug android
-          command: |
-            mkdir -p android/app/src/main/assets
-            react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+          command: yarn bundle:android:test
       - run:
           name: Gradle assemble debug android apk
           command: |
@@ -47,12 +39,12 @@ commands:
     - run:
         name: Bundle iOS
         command: |
-          react-native bundle --reset-cache --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios'
+          yarn bundle:ios:test
     - run:
         name: Generate .app file
         command:  |
           set +e
-          react-native run-ios --configuration Release
+          yarn react-native run-ios --configuration Release
 
 jobs:
   checks:
@@ -96,7 +88,6 @@ jobs:
             git submodule init
             git submodule update --recursive
       - yarn-install
-      - react-native-install
       - run:
           name: Accept Licenses
           command: |
@@ -128,7 +119,6 @@ jobs:
           git submodule init
           git submodule update --recursive
     - run: yarn clean:install
-    - react-native-install
     - run: |
         sudo chown -R $USER:$GROUP ~/.config
     - run:
