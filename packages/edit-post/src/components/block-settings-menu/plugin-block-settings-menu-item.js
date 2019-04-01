@@ -18,7 +18,7 @@ const isEverySelectedBlockAllowed = ( selected, allowed ) => difference( selecte
 
 /**
  * Plugins may want to add an item to the menu either for every block
- * or only for the specific ones provided in the `allowedBlocks` component property.
+ * or only for the specific ones provided in the `allowedBlockNames` component property.
  *
  * If there are multiple blocks selected the item will be rendered if every block
  * is of one allowed type (not necessarily the same).
@@ -83,10 +83,10 @@ const shouldRenderItem = ( selectedBlockNames, allowedBlockNames ) => ! Array.is
  *
  * @return {WPElement} The WPElement to be rendered.
  */
-const PluginBlockSettingsMenuItem = ( { allowedBlocks, icon, label, onClick, small, role } ) => (
+const PluginBlockSettingsMenuItem = ( { allowedBlockNames, icon, label, onClick, small, role } ) => (
 	<PluginBlockSettingsMenuGroup>
 		{ ( { selectedBlocks, onClose } ) => {
-			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
+			if ( ! shouldRenderItem( selectedBlocks, allowedBlockNames ) ) {
 				return null;
 			}
 			return ( <MenuItem
