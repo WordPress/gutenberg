@@ -182,6 +182,11 @@ class RCTAztecView: Aztec.TextView {
         
         return String(data: data, encoding: .utf8)
     }
+
+    private func cleanHTML() -> String {
+        let html = getHTML(prettify: false).replacingOccurrences(of: "\n", with: "")
+        return html
+    }
     
     override func paste(_ sender: Any?) {
         let start = selectedRange.location
@@ -192,7 +197,7 @@ class RCTAztecView: Aztec.TextView {
         let html = self.html(from: pasteboard) ?? ""
         
         onPaste?([
-            "currentContent": getHTML(prettify: false),
+            "currentContent": cleanHTML(),
             "selectionStart": start,
             "selectionEnd": end,
             "pastedText": text,
@@ -456,7 +461,7 @@ class RCTAztecView: Aztec.TextView {
     
     func propagateContentChanges() {
         if let onChange = onChange {
-            let text = packForRN(getHTML(prettify: false), withName: "text")
+            let text = packForRN(cleanHTML(), withName: "text")
             onChange(text)
         }
     }
