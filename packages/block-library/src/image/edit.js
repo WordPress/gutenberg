@@ -403,14 +403,9 @@ class ImageEdit extends Component {
 		);
 		if ( isEditing || ! url ) {
 			const src = isExternal ? url : undefined;
-			const replaceImageLabel = (
-				<span className={ 'replace-image-preview__title' }>
-					{ __( 'Edit image' ) }
-				</span>
-			);
 
 			const labels = {
-				title: ! url ? __( 'Image' ) : replaceImageLabel,
+				title: ! url ? __( 'Image' ) : __( 'Edit image' ),
 				instructions: __( 'Drag an image to upload, select a file from your library or add one from an URL.' ),
 			};
 
@@ -427,9 +422,6 @@ class ImageEdit extends Component {
 					<MediaPlaceholder
 						icon={ <BlockIcon icon={ icon } /> }
 						labels={ labels }
-						className={ classnames( className, {
-							'wp-block-image-replace': url,
-						} ) }
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
 						onDoubleClick={ this.toggleIsEditing }
