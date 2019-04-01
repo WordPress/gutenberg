@@ -6,17 +6,13 @@ This living document serves to prescribe coding guidelines specific to the Guten
 
 ### Naming
 
-To avoid class name collisions, class names **must** adhere to the following guidelines, which are loosely inspired by the [BEM (Block, Element, Modifier) methodology](https://en.bem.info/methodology/):
+To avoid class name collisions, class names **must** adhere to the following guidelines, which are loosely inspired by the [BEM (Block, Element, Modifier) methodology](https://en.bem.info/methodology/).
 
-All class names assigned to an element must be prefixed with the name of the package, followed by the name of the directory in which the component resides. Any descendent of the component's root element must append a dash-delimited descriptor, separated from the base by two consecutive underscores `__`.
-
-Components may be assigned with class names that indicate states (for example, an "active" tab or an "opened" panel). These modifiers should be applied as a separate class name, prefixed as an adjective expression by `is-` (`is-active` or `is-opened`). In rare cases, you may encounter variations of the modifier prefix, usually to improve readability (`has-warning`). Because a modifier class name is not contextualized to a specific component, it should always be written in stylesheets as accompanying the component being modified (`.components-panel.is-opened`).
-
-A component's class name should **never** be used outside its own folder (with rare exceptions such as [`_z-index.scss`](https://github.com/WordPress/gutenberg/blob/master/assets/stylesheets/_z-index.scss)). If, in your own components, you seek to inherit styles of another component, you should render an instance of that other component. At worst, you should duplicate the styles within your own component's stylesheet. This is intended to improve maintainability by treating individual components as the isolated abstract interface.
+All class names assigned to an element must be prefixed with the name of the package, followed by the name of the directory in which the component resides. Any descendent of the component's root element must append a dash-delimited descriptor, separated from the base by two consecutive underscores `__`. The root element is considered to be the highest ancestor element returned by the default export in the `index.js`. Notably, if your folder contains multiple files, each with their own default exported component, only the element rendered by that of `index.js` can be considered the root. All others should be treated as descendents.
 
 **Example:**
 
-Consider the following component residing at `packages/components/src/notice/index.js`:
+Consider the following component located at `packages/components/src/notice/index.js`:
 
 ```jsx
 export default function Notice( { children, onRemove } ) {
@@ -36,9 +32,29 @@ export default function Notice( { children, onRemove } ) {
 }
 ```
 
-This component is defined within the `components` package, and is contained within the `notice` directory. Thus, its root element is assigned the class name `components-notice`.
+Components may be assigned with class names that indicate states (for example, an "active" tab or an "opened" panel). These modifiers should be applied as a separate class name, prefixed as an adjective expression by `is-` (`is-active` or `is-opened`). In rare cases, you may encounter variations of the modifier prefix, usually to improve readability (`has-warning`). Because a modifier class name is not contextualized to a specific component, it should always be written in stylesheets as accompanying the component being modified (`.components-panel.is-opened`).
 
-Its descendent elements inherit this base class name, appending descriptors `content` and `dismiss` separated by `__`.
+**Example:**
+
+Consider again the Notices example. We may want to apply specific styling for dismissible notices. The [`classnames` package](https://www.npmjs.com/package/classnames) can be a helpful utility for conditionally applying modifier class names.
+
+```jsx
+import classnames from 'classnames';
+
+export default function Notice( { children, onRemove, isDismissible } ) {
+	const classes = classnames( 'components-notice', {
+		'is-dismissible': isDismissible,
+	} );
+
+	return (
+		<div className={ classes }>
+			{ /* ... */ }
+		</div>
+	);
+}
+```
+
+A component's class name should **never** be used outside its own folder (with rare exceptions such as [`_z-index.scss`](https://github.com/WordPress/gutenberg/blob/master/assets/stylesheets/_z-index.scss)). If you need to inherit styles of another component in your own components, you should render an instance of that other component. At worst, you should duplicate the styles within your own component's stylesheet. This is intended to improve maintainability by treating individual components as the isolated abstract interface.
 
 #### SCSS File Naming Conventions for Blocks
 
