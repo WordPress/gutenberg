@@ -7,14 +7,14 @@
  * External dependencies
  */
 import React, { Component } from 'react';
-import { View, ScrollView, Keyboard } from 'react-native';
+import { View, ScrollView, Keyboard, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { Toolbar, ToolbarButton, Dashicon } from '@wordpress/components';
 import { BlockFormatControls, BlockControls } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -30,11 +30,16 @@ type PropsType = {
 	hasUndo: boolean,
 	redo: void => void,
 	undo: void => void,
+	clearSelectedBlock: void => void,
 };
 
 export class BlockToolbar extends Component<PropsType> {
 	onKeyboardHide = () => {
-		Keyboard.dismiss();
+		this.props.clearSelectedBlock();
+		if ( Platform.OS === 'android' ) {
+			// Avoiding extra blur calls on iOS but still needed for android.
+			Keyboard.dismiss();
+		}
 	};
 
 	render() {
@@ -59,7 +64,7 @@ export class BlockToolbar extends Component<PropsType> {
 					<Toolbar>
 						<ToolbarButton
 							label={ __( 'Add block' ) }
-							icon="insert"
+							icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
 							onClick={ onInsertClick }
 						/>
 						<ToolbarButton
@@ -98,5 +103,6 @@ export default compose( [
 	withDispatch( ( dispatch ) => ( {
 		redo: dispatch( 'core/editor' ).redo,
 		undo: dispatch( 'core/editor' ).undo,
+		clearSelectedBlock: dispatch( 'core/editor' ).clearSelectedBlock,
 	} ) ),
 ] )( BlockToolbar );

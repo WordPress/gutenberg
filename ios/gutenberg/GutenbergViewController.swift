@@ -122,6 +122,19 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         }
         progress.cancel()
     }
+
+    func gutenbergDidEmitLog(message: String, logLevel: LogLevel) {
+        switch logLevel {
+        case .trace:
+            print("Debug: \(message)")
+        case .info:
+            print("Info: \(message)")
+        case .warn:
+            print("Warn: \(message)")
+        case .error:
+            print("Error: \(message)")
+        }
+    }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
@@ -176,7 +189,8 @@ extension GutenbergViewController {
 
     func showMoreSheet() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
+        alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem
+
         let cancelAction = UIAlertAction(title: "Keep Editing", style: .cancel)
         alert.addAction(toggleHTMLModeAction)
         alert.addAction(updateHtmlAction)

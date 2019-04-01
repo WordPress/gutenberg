@@ -10,6 +10,12 @@ const isIOS = Platform.OS === 'ios';
 
 const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
 
+// Console polyfill from react-native
+
+export function nativeLoggingHook( message, logLevel ) {
+	RNReactNativeGutenbergBridge.editorDidEmitLog( message, logLevel );
+}
+
 // Send messages
 
 export function sendNativeEditorDidLayout() {
