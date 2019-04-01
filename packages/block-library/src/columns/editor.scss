@@ -120,6 +120,18 @@
 }
 
 /**
+ * Columns act as as a "passthrough container"
+ * and therefore has its vertical margins/padding removed via negative margins
+ * therefore we need to compensate for this here by doubling the spacing on the
+ * vertical to ensure there is equal visual spacing around the inserter. Note there
+ * is no formal API for a "passthrough" Block so this is an edge case overide
+ */
+[data-type="core/columns"] .block-list-appender {
+	margin-top: $block-padding*2;
+	margin-bottom: $block-padding*2;
+}
+
+/**
  * Vertical Alignment Preview
  * note: specificity is important here to ensure individual
  * * columns alignment is prioritised over parent column alignment
