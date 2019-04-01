@@ -119,8 +119,6 @@ jobs:
           git submodule init
           git submodule update --recursive
     - run: yarn clean:install
-    - run: |
-        sudo chown -R $USER:$GROUP ~/.config
     - run:
         name: Set Environment Variables
         command: |
