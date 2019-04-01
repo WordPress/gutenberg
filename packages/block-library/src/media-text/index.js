@@ -73,7 +73,6 @@ const blockAttributes = {
 	},
 	imageFill: {
 		type: 'boolean',
-		default: false,
 	},
 	focalPoint: {
 		type: 'object',
