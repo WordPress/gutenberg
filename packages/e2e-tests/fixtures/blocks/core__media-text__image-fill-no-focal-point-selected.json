@@ -1,0 +1,34 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/media-text",
+        "isValid": true,
+        "attributes": {
+            "align": "wide",
+            "mediaAlt": "My alt text",
+            "mediaPosition": "left",
+            "mediaId": 11,
+            "mediaUrl": "http://localhost:8888/wp-content/uploads/2019/03/Dzts-v2X0AMxju_-1024x1024.jpg",
+            "mediaType": "image",
+            "mediaWidth": 50,
+            "isStackedOnMobile": false,
+            "imageFill": true
+        },
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": "My Content",
+                    "dropCap": false,
+                    "placeholder": "Content…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "originalContent": "<p class=\"has-large-font-size\">My Content</p>"
+            }
+        ],
+        "originalContent": "<div class=\"wp-block-media-text alignwide is-image-fill\">\n\t<figure class=\"wp-block-media-text__media\"\n\t\tstyle=\"background-image:url(http://localhost:8888/wp-content/uploads/2019/03/Dzts-v2X0AMxju_-1024x1024.jpg);background-position:initial\">\n\t\t<img src=\"http://localhost:8888/wp-content/uploads/2019/03/Dzts-v2X0AMxju_-1024x1024.jpg\" alt=\"My alt text\"\n\t\t\tclass=\"wp-image-11\" /></figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>"
+    }
+]
