@@ -43,8 +43,6 @@ const runInBand = ! hasRunInBand ?
 	[ '--runInBand' ] :
 	[];
 
-const cleanUpPrefixes = [ '--puppeteer-' ];
-
 if ( hasCliArg( '--puppeteer-interactive' ) ) {
 	process.env.PUPPETEER_HEADLESS = 'false';
 	process.env.PUPPETEER_SLOWMO = getCliArg( '--puppeteer-slowmo' ) || 80;
@@ -61,5 +59,7 @@ Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
 		process.env[ envKey ] = getCliArg( argName );
 	}
 } );
+
+const cleanUpPrefixes = [ '--puppeteer-', '--wordpress-' ];
 
 jest.run( [ ...config, ...runInBand, ...getCliArgs( cleanUpPrefixes ) ] );
