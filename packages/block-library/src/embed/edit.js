@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isFromWordPress, createUpgradedEmbedBlock, getClassNames, fallback } from './util';
+import { createUpgradedEmbedBlock, getClassNames, fallback, getAttributesFromPreview } from './util';
 import EmbedControls from './embed-controls';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
@@ -10,7 +10,7 @@ import EmbedPreview from './embed-preview';
 /**
  * External dependencies
  */
-import { kebabCase, toLower } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -45,7 +45,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			this.setAttributesFromPreview();
 			const upgradedBlock = createUpgradedEmbedBlock(
 				this.props,
-				this.getAttributesFromPreview( this.props.preview, allowResponsive )
+				getAttributesFromPreview( this.props.preview, this.props.attributes.className, responsive, allowResponsive )
 			);
 			if ( upgradedBlock ) {
 				this.props.onReplace( upgradedBlock );
@@ -89,43 +89,18 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			setAttributes( { url } );
 		}
 
-		/***
-		 * Gets block attributes based on the preview and responsive state.
-		 *
-		 * @param {string} preview The preview data.
-		 * @param {boolean} allowResponsive Apply responsive classes to fixed size content.
-		 * @return {Object} Attributes and values.
-		 */
-		getAttributesFromPreview( preview, allowResponsive = true ) {
-			const attributes = {};
-			// Some plugins only return HTML with no type info, so default this to 'rich'.
-			let { type = 'rich' } = preview;
-			// If we got a provider name from the API, use it for the slug, otherwise we use the title,
-			// because not all embed code gives us a provider name.
-			const { html, provider_name: providerName } = preview;
-			const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
-
-			if ( isFromWordPress( html ) ) {
-				type = 'wp-embed';
-			}
-
-			if ( html || 'photo' === type ) {
-				attributes.type = type;
-				attributes.providerNameSlug = providerNameSlug;
-			}
-
-			attributes.className = getClassNames( html, this.props.attributes.className, responsive && allowResponsive );
-
-			return attributes;
+		getAttributesFromPreview() {
+			const { preview } = this.props;
+			const { className, allowResponsive } = this.props.attributes;
+			return { ...this.props.attributes, ...getAttributesFromPreview( preview, title, className, responsive, allowResponsive ) };
 		}
 
 		/***
 		 * Sets block attributes based on the preview data.
 		 */
 		setAttributesFromPreview() {
-			const { setAttributes, preview } = this.props;
-			const { allowResponsive } = this.props.attributes;
-			setAttributes( this.getAttributesFromPreview( preview, allowResponsive ) );
+			const { setAttributes } = this.props;
+			setAttributes( this.getAttributesFromPreview() );
 		}
 
 		switchBackToURLInput() {
@@ -151,8 +126,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 
 		render() {
 			const { url, editingURL } = this.state;
-			const { caption, type, allowResponsive } = this.props.attributes;
-			const { fetching, setAttributes, isSelected, className, preview, cannotEmbed, themeSupportsResponsive, tryAgain } = this.props;
+			const { fetching, setAttributes, isSelected, preview, cannotEmbed, themeSupportsResponsive, tryAgain } = this.props;
 
 			if ( fetching ) {
 				return (
@@ -178,6 +152,23 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 					/>
 				);
 			}
+
+			// To render the preview, we must have the attributes determined by the preview.
+			// The higher order `withSelect` component supplies the preview, but cannot
+			// compute the attributes as it does not have access to the internal state of
+			// the edit component. If we wait for `getAttributesFromPreview` to complete
+			// when the component updates with a preview, we will render an `EmbedPreview`
+			// with incorrect props, and this results in a rendering glitch for responsive
+			// embeds. The glitch happens when the content is made responsive by applying
+			// the responsive styles, but the underlying iframe does not get new HTML
+			// for the sandbox to resize, and so it gets the wrong margins and either
+			// gains a lot of unwanted whitespace, or a scrollbar, depending on the size
+			// and shape of the content. So, we get the attributes from the preview here,
+			// and `getAttributesFromPreview` is memoized in `util` so we're not doing
+			// the computation on every render.
+			const previewAttributes = this.getAttributesFromPreview();
+			const { caption, type, allowResponsive } = previewAttributes;
+			const className = classnames( previewAttributes.className, this.props.className );
 
 			return (
 				<Fragment>
