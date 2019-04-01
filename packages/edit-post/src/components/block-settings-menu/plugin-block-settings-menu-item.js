@@ -23,12 +23,12 @@ const isEverySelectedBlockAllowed = ( selected, allowed ) => difference( selecte
  * If there are multiple blocks selected the item will be rendered if every block
  * is of one allowed type (not necessarily the same).
  *
- * @param {string[]} selectedBlockNames Array containing the names of the blocks selected
- * @param {string[]} allowedBlockNames Array containing the names of the blocks allowed
+ * @param {string[]} selectedBlocks Array containing the names of the blocks selected
+ * @param {string[]} allowedBlocks Array containing the names of the blocks allowed
  * @return {boolean} Whether the item will be rendered or not.
  */
-const shouldRenderItem = ( selectedBlockNames, allowedBlockNames ) => ! Array.isArray( allowedBlockNames ) ||
-	isEverySelectedBlockAllowed( selectedBlockNames, allowedBlockNames );
+const shouldRenderItem = ( selectedBlocks, allowedBlocks ) => ! Array.isArray( allowedBlocks ) ||
+	isEverySelectedBlockAllowed( selectedBlocks, allowedBlocks );
 
 /**
  * Renders a new item in the block settings menu.
