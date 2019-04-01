@@ -184,6 +184,7 @@ export function fallback( url, onReplace ) {
  * Gets block attributes based on the preview and responsive state.
  *
  * @param {Object} preview The preview data.
+ * @param {string} title The block's title, e.g. Twitter.
  * @param {Object} currentClassNames The block's current class names.
  * @param {boolean} isResponsive Boolean indicating if the block supports responsive content.
  * @param {boolean} allowResponsive Apply responsive classes to fixed size content.
