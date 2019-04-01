@@ -24,7 +24,7 @@ export { metadata, name };
 const ColumnEdit = ( { attributes, updateAlignment } ) => {
 	const { verticalAlignment } = attributes;
 
-	const classes = classnames( 'block-core-columns', 'is-passthrough', {
+	const classes = classnames( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 

@@ -1,16 +1,5 @@
 .block-list-appender {
 	margin: $block-padding;
-
-	// Certain Blocks (eg: Column) act as as a "passthrough container"
-	// and therefore have their vertical margins/padding removed via negative margins
-	// therefore we need to compensate for this here by doubling the spacing on the
-	// vertical to ensure there is equal visual spacing around the inserter. Note there
-	// is no formal API for a passthrough Block but in lieu of that a `is-` class should
-	// suffice here
-	.is-passthrough & {
-		margin-top: $block-padding*2;
-		margin-bottom: $block-padding*2;
-	}
 }
 
 .block-list-appender > .block-editor-inserter {
