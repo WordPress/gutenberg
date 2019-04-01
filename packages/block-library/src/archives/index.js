@@ -21,20 +21,9 @@ export const settings = {
 	category: 'widgets',
 
 	supports: {
+		align: true,
 		html: false,
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( [ 'left', 'center', 'right' ].includes( align ) ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit,
-
-	save() {
-		// Handled by PHP.
-		return null;
-	},
 };

@@ -9,7 +9,7 @@ exports[`ContrastChecker should render component when the colors do not meet AA 
   textColor="#666"
 >
   <div
-    className="editor-contrast-checker"
+    className="editor-contrast-checker block-editor-contrast-checker"
   >
     <Notice
       isDismissible={false}
@@ -38,7 +38,7 @@ exports[`ContrastChecker should render different message matching snapshot when 
   textColor="#666"
 >
   <div
-    className="editor-contrast-checker"
+    className="editor-contrast-checker block-editor-contrast-checker"
   >
     <Notice
       isDismissible={false}
@@ -64,7 +64,7 @@ exports[`ContrastChecker should render messages when the textColor is valid, but
   textColor="#000000"
 >
   <div
-    className="editor-contrast-checker"
+    className="editor-contrast-checker block-editor-contrast-checker"
   >
     <Notice
       isDismissible={false}
@@ -91,7 +91,7 @@ exports[`ContrastChecker should take into consideration the font size passed 1`]
   textColor="#000000"
 >
   <div
-    className="editor-contrast-checker"
+    className="editor-contrast-checker block-editor-contrast-checker"
   >
     <Notice
       isDismissible={false}
@@ -118,7 +118,7 @@ exports[`ContrastChecker should take into consideration wherever text is large o
   textColor="#000000"
 >
   <div
-    className="editor-contrast-checker"
+    className="editor-contrast-checker block-editor-contrast-checker"
   >
     <Notice
       isDismissible={false}
@@ -146,7 +146,7 @@ exports[`ContrastChecker should use isLargeText to make decisions if both isLarg
   textColor="#000000"
 >
   <div
-    className="editor-contrast-checker"
+    className="editor-contrast-checker block-editor-contrast-checker"
   >
     <Notice
       isDismissible={false}

@@ -77,6 +77,36 @@ export const settings = {
 					return block;
 				},
 			},
+			{
+				type: 'shortcode',
+				tag: 'audio',
+				attributes: {
+					src: {
+						type: 'string',
+						shortcode: ( { named: { src } } ) => {
+							return src;
+						},
+					},
+					loop: {
+						type: 'string',
+						shortcode: ( { named: { loop } } ) => {
+							return loop;
+						},
+					},
+					autoplay: {
+						type: 'srting',
+						shortcode: ( { named: { autoplay } } ) => {
+							return autoplay;
+						},
+					},
+					preload: {
+						type: 'string',
+						shortcode: ( { named: { preload } } ) => {
+							return preload;
+						},
+					},
+				},
+			},
 		],
 	},
 

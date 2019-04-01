@@ -1,4 +1,4 @@
-.editor-block-mover {
+.block-editor-block-mover {
 	min-height: $empty-paragraph-height;
 	opacity: 0;
 
@@ -11,14 +11,14 @@
 	// To vertically center against a 56px paragraph, move upwards 72px - 56px / 2.
 	// Don't do this for wide, fullwide, or mobile.
 	@include break-small() {
-		.editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) & {
+		.block-editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) & {
 			margin-top: -$grid-size;
 		}
 	}
 }
 
 // Mover icon buttons.
-.editor-block-mover__control {
+.block-editor-block-mover__control {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -59,7 +59,7 @@
 	}
 }
 
-.editor-block-mover__control-drag-handle {
+.block-editor-block-mover__control-drag-handle {
 	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
 	fill: currentColor;
@@ -91,17 +91,17 @@
 	}
 }
 
-.editor-block-mover__description {
+.block-editor-block-mover__description {
 	display: none;
 }
 
 // Apply a background in nested contexts, only on desktop.
-.editor-block-mover__control-drag-handle:not(:disabled):not([aria-disabled="true"]):not(.is-default),
-.editor-block-mover__control {
+.block-editor-block-mover__control-drag-handle:not(:disabled):not([aria-disabled="true"]):not(.is-default),
+.block-editor-block-mover__control {
 	@include break-small() {
-		.editor-block-list__layout [data-align="right"] &,
-		.editor-block-list__layout [data-align="left"] &,
-		.editor-block-list__layout .editor-block-list__layout & {
+		.block-editor-block-list__layout [data-align="right"] &,
+		.block-editor-block-list__layout [data-align="left"] &,
+		.block-editor-block-list__layout .block-editor-block-list__layout & {
 			background: $white;
 			box-shadow: inset 0 0 0 1px $light-gray-500;
 
@@ -113,7 +113,7 @@
 			&:active,
 			&:focus {
 				// Buttons are stacked with overlapping border to look like a unit, so elevate on interactions.
-				z-index: z-index(".editor-block-mover__control");
+				z-index: z-index(".block-editor-block-mover__control");
 			}
 		}
 	}

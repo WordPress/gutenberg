@@ -11,7 +11,7 @@ import { withSelect } from '@wordpress/data';
 import WordCount from '../word-count';
 import DocumentOutline from '../document-outline';
 
-function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, hasOutlineItemsDisabled } ) {
+function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, hasOutlineItemsDisabled, onRequestClose } ) {
 	return (
 		<Fragment>
 			<div
@@ -49,7 +49,7 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, h
 					<span className="table-of-contents__title">
 						{ __( 'Document Outline' ) }
 					</span>
-					<DocumentOutline hasOutlineItemsDisabled={ hasOutlineItemsDisabled } />
+					<DocumentOutline onSelect={ onRequestClose } hasOutlineItemsDisabled={ hasOutlineItemsDisabled } />
 				</Fragment>
 			) }
 		</Fragment>

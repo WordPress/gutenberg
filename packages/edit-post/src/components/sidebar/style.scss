@@ -40,16 +40,9 @@
 		z-index: z-index(".edit-post-sidebar .components-panel");
 
 		@include break-small() {
-			overflow: inherit;
+			overflow: hidden;
 			height: auto;
 			max-height: none;
-		}
-
-		@include break-medium() {
-
-			body.is-fullscreen-mode & {
-				max-height: calc(100vh - #{ $panel-header-height });
-			}
 		}
 	}
 
@@ -98,7 +91,7 @@
 		margin-top: -1em;
 	}
 
-	.editor-skip-to-selected-block:focus {
+	.block-editor-skip-to-selected-block:focus {
 		top: auto;
 		right: 10px;
 		bottom: 10px;

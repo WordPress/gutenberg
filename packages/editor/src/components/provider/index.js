@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, pick } from 'lodash';
+import { map, pick, defaultTo } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -12,12 +12,32 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEditorProvider } from '@wordpress/block-editor';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import transformStyles from '../../editor-styles';
 import { mediaUpload } from '../../utils';
+import ReusableBlocksButtons from '../reusable-blocks-buttons';
+
+const fetchLinkSuggestions = async ( search ) => {
+	const posts = await apiFetch( {
+		path: addQueryArgs( '/wp/v2/search', {
+			search,
+			per_page: 20,
+			type: 'post',
+		} ),
+	} );
+
+	return map( posts, ( post ) => ( {
+		id: post.id,
+		url: post.url,
+		title: decodeEntities( post.title ) || __( '(no title)' ),
+	} ) );
+};
 
 class EditorProvider extends Component {
 	constructor( props ) {
@@ -51,24 +71,25 @@ class EditorProvider extends Component {
 		}
 	}
 
-	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks ) {
+	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions ) {
 		return {
 			...pick( settings, [
 				'alignWide',
+				'allowedBlockTypes',
 				'availableLegacyWidgets',
+				'bodyPlaceholder',
 				'colors',
 				'disableCustomColors',
-				'fontSizes',
 				'disableCustomFontSizes',
-				'imageSizes',
-				'maxWidth',
-				'allowedBlockTypes',
+				'focusMode',
+				'fontSizes',
 				'hasFixedToolbar',
 				'hasPermissionsToManageWidgets',
-				'focusMode',
-				'styles',
+				'imageSizes',
 				'isRTL',
-				'bodyPlaceholder',
+				'maxWidth',
+				'styles',
+				'templateLock',
 				'titlePlaceholder',
 			] ),
 			__experimentalMetaSource: {
@@ -76,7 +97,8 @@ class EditorProvider extends Component {
 				onChange: onMetaChange,
 			},
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalMediaUpload: mediaUpload,
+			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
+			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 		};
 	}
 
@@ -115,6 +137,7 @@ class EditorProvider extends Component {
 			onMetaChange,
 			reusableBlocks,
 			resetEditorBlocksWithoutUndoLevel,
+			hasUploadPermissions,
 		} = this.props;
 
 		if ( ! isReady ) {
@@ -122,7 +145,7 @@ class EditorProvider extends Component {
 		}
 
 		const editorSettings = this.getBlockEditorSettings(
-			settings, meta, onMetaChange, reusableBlocks
+			settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions
 		);
 
 		return (
@@ -131,8 +154,10 @@ class EditorProvider extends Component {
 				onInput={ resetEditorBlocksWithoutUndoLevel }
 				onChange={ resetEditorBlocks }
 				settings={ editorSettings }
+				useSubRegistry={ false }
 			>
 				{ children }
+				<ReusableBlocksButtons />
 			</BlockEditorProvider>
 		);
 	}
@@ -146,11 +171,14 @@ export default compose( [
 			getEditedPostAttribute,
 			__experimentalGetReusableBlocks,
 		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
+
 		return {
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
 			meta: getEditedPostAttribute( 'meta' ),
 			reusableBlocks: __experimentalGetReusableBlocks(),
+			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

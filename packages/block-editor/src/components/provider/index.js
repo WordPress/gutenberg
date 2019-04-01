@@ -3,30 +3,13 @@
  */
 import { Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
-import { withDispatch, RegistryConsumer } from '@wordpress/data';
-import { createHigherOrderComponent, compose } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
- * Higher-order component which renders the original component with the current
- * registry context passed as its `registry` prop.
- *
- * @param {WPComponent} OriginalComponent Original component.
- *
- * @return {WPComponent} Enhanced component.
+ * Internal dependencies
  */
-const withRegistry = createHigherOrderComponent(
-	( OriginalComponent ) => ( props ) => (
-		<RegistryConsumer>
-			{ ( registry ) => (
-				<OriginalComponent
-					{ ...props }
-					registry={ registry }
-				/>
-			) }
-		</RegistryConsumer>
-	),
-	'withRegistry'
-);
+import withRegistryProvider from './with-registry-provider';
 
 class BlockEditorProvider extends Component {
 	componentDidMount() {
@@ -137,6 +120,7 @@ class BlockEditorProvider extends Component {
 }
 
 export default compose( [
+	withRegistryProvider,
 	withDispatch( ( dispatch ) => {
 		const {
 			updateSettings,
@@ -148,5 +132,4 @@ export default compose( [
 			resetBlocks,
 		};
 	} ),
-	withRegistry,
 ] )( BlockEditorProvider );

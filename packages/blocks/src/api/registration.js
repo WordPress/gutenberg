@@ -3,7 +3,12 @@
 /**
  * External dependencies
  */
-import { get, isFunction, some } from 'lodash';
+import {
+	get,
+	isFunction,
+	isPlainObject,
+	some,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -33,7 +38,7 @@ import { isValidIcon, normalizeIconObject } from './utils';
  * @property {?string[]}                 keywords   Additional keywords to produce
  *                                                  block as inserter search result.
  * @property {?Object}                   attributes Block attributes.
- * @property {Function}                  save       Serialize behavior of a block,
+ * @property {?Function}                 save       Serialize behavior of a block,
  *                                                  returning an element describing
  *                                                  structure of the block's post
  *                                                  content markup.
@@ -66,6 +71,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
+		save: () => null,
 		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};
@@ -90,10 +96,16 @@ export function registerBlockType( name, settings ) {
 	}
 
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
-
-	if ( ! settings || ! isFunction( settings.save ) ) {
+	if ( ! isPlainObject( settings ) ) {
 		console.error(
-			'The "save" property must be specified and must be a valid function.'
+			'Block settings must be a valid object.'
+		);
+		return;
+	}
+
+	if ( ! isFunction( settings.save ) ) {
+		console.error(
+			'The "save" property must be a valid function.'
 		);
 		return;
 	}
