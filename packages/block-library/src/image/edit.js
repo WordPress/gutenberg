@@ -421,6 +421,7 @@ class ImageEdit extends Component {
 					{ controls }
 					<MediaPlaceholder
 						icon={ <BlockIcon icon={ icon } /> }
+						className={ className }
 						labels={ labels }
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
