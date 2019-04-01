@@ -56,9 +56,9 @@ const configsMapping = {
 	WP_PASSWORD: '--wordpress-password',
 };
 
-Object.entries( configsMapping ).forEach( ( [ key, value ] ) => {
-	if ( hasCliArg( value ) ) {
-		process.env[ key ] = getCliArg( value );
+Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
+	if ( hasCliArg( argName ) ) {
+		process.env[ envKey ] = getCliArg( argName );
 	}
 } );
 
