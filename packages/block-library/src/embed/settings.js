@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { RichText } from '@wordpress/editor';
+import { registerBlockType } from '@wordpress/blocks';
 
 const embedAttributes = {
 	url: {
@@ -163,4 +164,11 @@ export function getEmbedBlockSettings( options ) {
 
 		deprecated,
 	};
+}
+
+export function registerEmbedBlock( embedSettings ) {
+	registerBlockType(
+		embedSettings.name,
+		getEmbedBlockSettings( embedSettings.settings )
+	);
 }

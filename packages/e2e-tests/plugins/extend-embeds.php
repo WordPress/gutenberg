@@ -40,6 +40,7 @@ function extend_embeds_init() {
 			'wp-element',
 			'wp-editor',
 			'wp-i18n',
+			'wp-block-library',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'extend-embeds/index.js' ),
 		true

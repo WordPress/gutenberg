@@ -57,6 +57,8 @@ import * as tagCloud from './tag-cloud';
 
 import * as classic from './classic';
 
+export { registerEmbedBlock } from './embed/settings';
+
 /**
  * Function to register core blocks provided by the block editor.
  *

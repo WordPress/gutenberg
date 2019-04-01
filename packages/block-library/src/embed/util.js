@@ -15,6 +15,7 @@ import classnames from 'classnames/dedupe';
  */
 import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Returns true if any of the regular expressions match the URL.
@@ -42,7 +43,7 @@ export const matchesPatterns = ( url, patterns = [] ) => {
  */
 export const findBlock = ( url, currentBlockName = '' ) => {
 	const matchingBlocks = [];
-	for ( const block of [ ...common, ...others ] ) {
+	for ( const block of applyFilters( 'blockLibrary.Embed.blockResolutionList', [ ...common, ...others ] ) ) {
 		if ( matchesPatterns( url, block.patterns ) ) {
 			matchingBlocks.push( block.name );
 		}
