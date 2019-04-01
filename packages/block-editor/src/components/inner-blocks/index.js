@@ -103,7 +103,7 @@ class InnerBlocks extends Component {
 			isSmallScreen,
 			isSelectedBlockInRoot,
 			hasChildBlocks,
-			useBlockAppenderPlaceholder,
+			placeholderType,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -113,7 +113,7 @@ class InnerBlocks extends Component {
 
 		// If enabled and there are no child Blocks then show the
 		// `BlockListAppender` as a placeholder
-		const disableDefaultInserter = useBlockAppenderPlaceholder && ! hasChildBlocks;
+		const disableDefaultInserter = placeholderType && placeholderType === 'block-appender' && ! hasChildBlocks;
 
 		return (
 			<div className={ classes }>
