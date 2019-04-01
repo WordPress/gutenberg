@@ -4,6 +4,13 @@
 import { castArray } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+import { subscribe, adjustSidebar } from './controls';
+import { onChangeListener } from './utils';
+import { STORE_KEY, VIEW_AS_LINK_SELECTOR } from './constants';
+
+/**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
  * @param {string} name Sidebar name to be opened.
@@ -230,5 +237,51 @@ export function metaBoxUpdatesSuccess() {
 	return {
 		type: 'META_BOX_UPDATES_SUCCESS',
 	};
+}
+
+/**
+ * Returns an action generator used to initialize some subscriptions for the
+ * post editor:
+ *
+ * - subscription for toggling the `edit-post/block` general sidebar when a
+ *   block is selected.
+ * - subscription for hiding/showing the sidebar depending on size of viewport.
+ * - subscription for updating the "View Post" link in the admin bar when
+ *   permalink is updated.
+ */
+export function* init() {
+	// Select the block settings tab when the selected block changes
+	yield subscribe( ( registry ) => onChangeListener(
+		() => !! registry.select( 'core/block-editor' )
+			.getBlockSelectionStart(),
+		( hasBlockSelection ) => {
+			if ( ! registry.select( 'core/edit-post' ).isEditorSidebarOpened() ) {
+				return;
+			}
+			if ( hasBlockSelection ) {
+				registry.dispatch( STORE_KEY )
+					.openGeneralSidebar( 'edit-post/block' );
+			} else {
+				registry.dispatch( STORE_KEY )
+					.openGeneralSidebar( 'edit-post/document' );
+			}
+		}
+	) );
+	// hide/show the sidebar depending on size of viewport.
+	yield adjustSidebar();
+	// Update View Post link in the admin bar when permalink is updated.
+	yield subscribe( ( registry ) => onChangeListener(
+		() => registry.select( 'core/editor' ).getCurrentPost().link,
+		( newPermalink ) => {
+			if ( ! newPermalink ) {
+				return;
+			}
+			const nodeToUpdate = document.querySelector( VIEW_AS_LINK_SELECTOR );
+			if ( ! nodeToUpdate ) {
+				return;
+			}
+			nodeToUpdate.setAttribute( 'href', newPermalink );
+		}
+	) );
 }
 
