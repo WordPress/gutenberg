@@ -67,9 +67,15 @@ export default function Button( props ) {
 		opacity: isDisabled ? 0.2 : 1,
 		...( ariaPressed ? styles.buttonActive : styles.buttonInactive ),
 	};
-	let states = [];
-	ariaPressed && states.push( 'selected' );
-	isDisabled && states.push( 'disabled' );
+
+	const states = [];
+	if ( ariaPressed ) {
+		states.push( 'selected' );
+	}
+
+	if ( isDisabled ) {
+		states.push( 'disabled' );
+	}
 
 	return (
 		<TouchableOpacity
