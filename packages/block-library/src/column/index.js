@@ -39,7 +39,6 @@ const ColumnEdit = ( { attributes, updateAlignment } ) => {
 				/>
 			</BlockControls>
 			<InnerBlocks
-				placeholderType={ 'block-appender' }
 				templateLock={ false }
 			/>
 		</div>
