@@ -211,7 +211,10 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View
 						accessibile={ true }
-						accessibilityLabel={ this.props.testID } style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>{ this.getBlockForType() }</View>
+						accessibilityLabel={ this.props.testID }
+						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
+						{ this.getBlockForType() }
+					</View>
 					{ this.renderToolbar() }
 				</View>
 
