@@ -79,6 +79,7 @@ ul.wp-block-gallery {
 	}
 }
 
+.block-library-gallery-item__move-menu,
 .block-library-gallery-item__inline-menu {
 	padding: 2px;
 	position: absolute;
@@ -92,13 +93,20 @@ ul.wp-block-gallery {
 	}
 }
 
-.blocks-gallery-item__move-backward,
-.blocks-gallery-item__move-forward {
-	&.components-button:focus {
-		color: inherit;
-	}
+.block-library-gallery-item__inline-menu {
+	position: absolute;
+	top: -2px;
+	right: -2px;
 }
 
+.block-library-gallery-item__move-menu {
+	position: absolute;
+	top: -2px;
+	left: -2px;
+}
+
+.blocks-gallery-item__move-backward,
+.blocks-gallery-item__move-forward,
 .blocks-gallery-item__remove {
 	padding: 0;
 }
