@@ -9,6 +9,7 @@
 import childProcess from 'child_process';
 import wd from 'wd';
 import fs from 'fs';
+
 /**
  * Internal dependencies
  */
@@ -56,6 +57,18 @@ const setupDriver = async () => {
 		desiredCaps = _.clone( android8 );
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = localAndroidAppPath;
+			try {
+				const androidVersion = childProcess
+					.execSync( 'adb shell getprop ro.build.version.release' )
+					.toString()
+					.replace( /^\s+|\s+$/g, '' );
+				if ( ! isNaN( androidVersion ) ) {
+					desiredCaps.platformVersion = androidVersion;
+					console.log( 'Detected Android device running Android %s', androidVersion );
+				}
+			} catch ( error ) {
+				// ignore error
+			}
 		} else {
 			desiredCaps.app = 'sauce-storage:Gutenberg.apk'; // App should be preloaded to sauce storage, this can also be a URL
 		}
