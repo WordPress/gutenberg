@@ -367,6 +367,8 @@ export class RichText extends Component {
 			unstableOnFocus();
 		}
 
+		this.recalculateBoundaryStyle();
+
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
@@ -478,7 +480,7 @@ export class RichText extends Component {
 				.replace( 'rgb', 'rgba' );
 
 			globalStyle.innerHTML =
-				`${ boundarySelector }{background-color: ${ newColor }}`;
+				`*:focus ${ boundarySelector }{background-color: ${ newColor }}`;
 		}
 	}
 
