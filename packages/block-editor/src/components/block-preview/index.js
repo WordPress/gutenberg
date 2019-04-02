@@ -9,6 +9,7 @@ import { noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { Disabled } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,18 +32,37 @@ function BlockPreview( props ) {
 	);
 }
 
-export function BlockPreviewContent( { name, attributes } ) {
-	const block = createBlock( name, attributes );
-	return (
-		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
-			<BlockEdit
-				name={ name }
-				focus={ false }
-				attributes={ block.attributes }
-				setAttributes={ noop }
-			/>
-		</Disabled>
-	);
+export class BlockPreviewContent extends Component {
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			hasError: false,
+		};
+	}
+
+	componentDidCatch() {
+		this.setState( {
+			hasError: true,
+		} );
+	}
+
+	render() {
+		if ( this.state.hasError ) {
+			return null;
+		}
+		const { name, attributes } = this.props;
+		const block = createBlock( name, attributes );
+		return (
+			<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
+				<BlockEdit
+					name={ name }
+					focus={ false }
+					attributes={ block.attributes }
+					setAttributes={ noop }
+				/>
+			</Disabled>
+		);
+	}
 }
 
 export default BlockPreview;
