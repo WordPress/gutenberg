@@ -215,7 +215,7 @@ export class MediaPlaceholder extends Component {
 				notices={ notices }
 				onClick={ onClick }
 				onDoubleClick={ onDoubleClick }
-				mediaPreview={ mediaPreview }
+				preview={ mediaPreview }
 			>
 				{ content }
 			</Placeholder>
