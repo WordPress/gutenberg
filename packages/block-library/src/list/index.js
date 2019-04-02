@@ -13,7 +13,7 @@ import {
 	getBlockAttributes,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
-import { replace, join, split, create, toHTMLString, LINE_SEPARATOR } from '@wordpress/rich-text';
+import { replace, join, split, create, toHTMLString, __UNSTABLE_LINE_SEPARATOR } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -87,8 +87,8 @@ export const settings = {
 
 								// When converting only one block, transform
 								// every line to a list item.
-								return replace( value, /\n/g, LINE_SEPARATOR );
-							} ), LINE_SEPARATOR ),
+								return replace( value, /\n/g, __UNSTABLE_LINE_SEPARATOR );
+							} ), __UNSTABLE_LINE_SEPARATOR ),
 							multilineTag: 'li',
 						} ),
 					} );
@@ -152,7 +152,7 @@ export const settings = {
 						html: values,
 						multilineTag: 'li',
 						multilineWrapperTags: [ 'ul', 'ol' ],
-					} ), LINE_SEPARATOR )
+					} ), __UNSTABLE_LINE_SEPARATOR )
 						.map( ( piece ) =>
 							createBlock( 'core/paragraph', {
 								content: toHTMLString( { value: piece } ),

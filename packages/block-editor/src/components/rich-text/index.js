@@ -27,7 +27,7 @@ import { isURL } from '@wordpress/url';
 import {
 	isEmpty,
 	create,
-	apply,
+	__unstableApply as apply,
 	applyFormat,
 	split,
 	toHTMLString,
