@@ -16,10 +16,10 @@ import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
 	return (
-		<TouchableWithoutFeedback 
-			accessibilityLabel={ __( "Image block. Empty " ) }
+		<TouchableWithoutFeedback
+			accessibilityLabel={ __( 'Image block. Empty ' ) }
 			accessibilityRole={ 'button' }
-			accessibilityHint={ __( "Double tap to select an image") }
+			accessibilityHint={ __( 'Double tap to select an image' ) }
 			onPress={ props.onMediaOptionsPressed }
 		>
 			<View style={ styles.emptyStateContainer }>
