@@ -77,6 +77,7 @@
 		"@wordpress/npm-package-json-lint-config": "file:packages/npm-package-json-lint-config",
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
+		"babel-plugin-inline-json-import": "0.3.2",
 		"benchmark": "2.1.4",
 		"browserslist": "4.4.1",
 		"chalk": "2.4.1",
