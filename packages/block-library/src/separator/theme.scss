@@ -1,7 +1,8 @@
 .wp-block-separator {
 	border: none;
 	border-bottom: 2px solid $dark-gray-100;
-	margin: $default-block-margin auto;
+	margin-left: auto;
+	margin-right: auto;
 
 	// Default, thin style
 	&:not(.is-style-wide):not(.is-style-dots) {

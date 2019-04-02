@@ -107,12 +107,17 @@
 					margin-left: -$border-width;
 				}
 
-				// The Column block is a child of the Columns block and is mostly a passthrough container.
-				// Therefore it shouldn't add additional paddings and margins, so we reset these, and compensate for margins.
-				// @todo In the future, if a passthrough feature lands, it would be good to apply these rules to such an element in a more generic way.
+				// Zero out margins.
+				> [data-block] {
+					margin-bottom: 0;
+				}
+
+				// The Columns block is a flex-container, therefore it nullifies margin collapsing.
+				// Therefore, blocks inside this will appear to create a double margin.
+				// We compensate for this using negative margins.
 				> div > .block-core-columns > .editor-inner-blocks {
-					margin-top: -$block-padding - $block-padding;
-					margin-bottom: -$block-padding - $block-padding;
+					margin-top: -$default-block-margin;
+					margin-bottom: -$default-block-margin;
 				}
 			}
 		}

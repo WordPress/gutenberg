@@ -33,3 +33,17 @@
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
+
+
+/**
+ * Editor Normalization Styles
+ *
+ * These are only output in the editor, but styles here are NOT prefixed .editor-styles-wrapper.
+ * This allows us to create normalization styles that are easily overridden by editor styles.
+ */
+
+// Provide every block with a default base margin. This margin provides a consistent spacing
+// between blocks in the editor.
+[data-block] {
+	margin-bottom: $default-block-margin;
+}

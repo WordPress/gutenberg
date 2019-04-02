@@ -142,7 +142,7 @@
 /**
  * Vanilla Block Styles
  * These are base styles that apply across blocks, meant to provide a baseline.
- * They are applied both to the editor, and the theme, so we should have as few of these as possible.
+ * They are applied both to the editor and the theme, so we should have as few of these as possible.
  * Please note that some styles are stored in packages/editor/src/editor-styles.scss, as they pertain to CSS bleed for the editor only.
  */
 
@@ -153,7 +153,7 @@ figcaption {
 	margin-top: 0.5em;
 }
 
-// Apply some base margins to blocks that need them.
+// Apply some base styles to blocks that need them.
 img {
 	max-width: 100%;
 	height: auto;

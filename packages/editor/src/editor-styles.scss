@@ -1,9 +1,10 @@
 /**
- * Normalization Styles
+ * Editor Normalization Styles
  *
+ * These are only output in the editor, but styles here are prefixed .editor-styles-wrapper and affect the theming
+ * of the editor by themes.
  * Why do these exist? Why not rely on browser defaults?
  * These styles are necessary so long as CSS can bleed from the wp-admin into the editing canvas itself.
- *
  * Let's continue working to refactor these away, whether through Shadow DOM or better scoping of upstream styles.
  */
 
@@ -96,10 +97,6 @@ p {
 	font-size: inherit;
 	line-height: inherit;
 	margin-top: $default-block-margin;
-	margin-bottom: $default-block-margin;
-}
-
-pre {
 	margin-bottom: $default-block-margin;
 }
 
