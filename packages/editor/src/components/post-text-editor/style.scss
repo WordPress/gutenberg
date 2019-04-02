@@ -18,10 +18,9 @@
 
 	&:hover,
 	&:focus {
-		border: $border-width solid $light-gray-500 !important;
+		border: $border-width solid $light-gray-800 !important;
 		box-shadow: none !important;
 		// Emulate the effect used on the post title.
-		outline: $border-width solid $light-gray-500 !important;
 		outline-offset: -2px !important;
 	}
 }
