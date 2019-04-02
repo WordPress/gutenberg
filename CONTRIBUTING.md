@@ -21,8 +21,8 @@ For another version of Windows, or if you prefer to set things up manually, be s
 If you have an incompatible version of Node in your development environment, you can use [nvm](https://github.com/creationix/nvm) to change node versions on the command line:
 
 ```
-npx nvm install
-npx nvm use
+nvm install
+nvm use
 ```
 
 You also should have the latest release of [npm installed][npm]. npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need also to update your npm installation. To update npm, type this into your terminal: `npm install npm@latest -g`

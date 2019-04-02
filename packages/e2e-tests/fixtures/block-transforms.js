@@ -144,6 +144,10 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Search',
 		availableTransforms: [],
 	},
+	core__section: {
+		originalBlock: 'Section',
+		availableTransforms: [],
+	},
 	core__separator: {
 		originalBlock: 'Separator',
 		availableTransforms: [],

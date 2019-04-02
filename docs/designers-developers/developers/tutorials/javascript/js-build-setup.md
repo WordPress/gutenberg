@@ -86,7 +86,7 @@ After installing, a `node_modules` directory is created with the modules and the
 Also, if you look at package.json file it will include a new section:
 
 ```json
-"dependencies": {
+"devDependencies": {
 	"@wordpress/scripts": "3.1.0"
 }
 ```

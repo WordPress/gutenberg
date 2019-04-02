@@ -18,7 +18,14 @@ import {
 } from '@wordpress/block-editor';
 import deprecated from '@wordpress/deprecated';
 
-export const name = 'core/text-columns';
+/**
+ * Internal dependencies
+ */
+import metadata from './block.json';
+
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	// Disable insertion as this block is deprecated and ultimately replaced by the Columns block.
@@ -29,32 +36,6 @@ export const settings = {
 	title: __( 'Text Columns (deprecated)' ),
 
 	description: __( 'This block is deprecated. Please use the Columns block instead.' ),
-
-	icon: 'columns',
-
-	category: 'layout',
-
-	attributes: {
-		content: {
-			type: 'array',
-			source: 'query',
-			selector: 'p',
-			query: {
-				children: {
-					type: 'string',
-					source: 'html',
-				},
-			},
-			default: [ {}, {} ],
-		},
-		columns: {
-			type: 'number',
-			default: 2,
-		},
-		width: {
-			type: 'string',
-		},
-	},
 
 	transforms: {
 		to: [
