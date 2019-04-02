@@ -1,0 +1,23 @@
+.wp-block-navigation-menu .block-editor-block-list__layout,
+.wp-block-navigation-menu {
+	display: grid;
+	grid-auto-columns: min-content;
+	grid-auto-flow: column;
+	align-items: center;
+	white-space: nowrap;
+}
+
+// Todo: corerctly allow custom inserters and remove the need for this display none.
+.wp-block-navigation-menu .block-editor-block-list__layout .block-list-appender {
+	display: none;
+}
+
+// Custom inserter
+.wp-block-navigation-menu__inserter {
+	display: inline-block;
+}
+
+.wp-block-navigation-menu__inserter-content {
+	width: 350px;
+	padding: $grid-size-large;
+}
