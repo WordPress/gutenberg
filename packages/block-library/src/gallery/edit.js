@@ -285,6 +285,8 @@ class GalleryEdit extends Component {
 									url={ img.url }
 									alt={ img.alt }
 									id={ img.id }
+									isFirstItem={ index === 0 }
+									isLastItem={ ( index + 1 ) === images.length }
 									isSelected={ isSelected && this.state.selectedImage === index }
 									onMoveBackward={ this.onMoveBackward( index ) }
 									onMoveForward={ this.onMoveForward( index ) }

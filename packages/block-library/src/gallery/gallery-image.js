@@ -86,7 +86,7 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isSelected, caption, onRemove, onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel } = this.props;
+		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption, onRemove, onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel } = this.props;
 
 		let href;
 
@@ -134,12 +134,14 @@ class GalleryImage extends Component {
 							onClick={ onMoveBackward }
 							className="blocks-gallery-item__move-backward"
 							label={ __( 'Move Image Backward' ) }
+							disabled={ isFirstItem }
 						/>
 						<IconButton
 							icon="arrow-right"
 							onClick={ onMoveForward }
 							className="blocks-gallery-item__move-forward"
 							label={ __( 'Move Image Forward' ) }
+							disabled={ isLastItem }
 						/>
 					</div> :
 					null
