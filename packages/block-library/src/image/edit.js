@@ -331,10 +331,10 @@ class ImageEdit extends Component {
 		this.setState( {
 			isEditing: ! this.state.isEditing,
 		} );
-		if ( ! this.state.isEditing ) {
-			speak( __( 'You are now editing the image in the image block.' ) );
-		} else {
+		if ( this.state.isEditing ) {
 			speak( __( 'You are now viewing the image in the image block.' ) );
+		} else {
+			speak( __( 'You are now editing the image in the image block.' ) );
 		}
 	}
 
