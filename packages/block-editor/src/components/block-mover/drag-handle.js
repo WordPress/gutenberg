@@ -13,7 +13,7 @@ export const IconDragHandle = ( { isVisible, className, icon, onDragStart, onDra
 		return null;
 	}
 
-	const dragHandleClassNames = classnames( 'editor-block-mover__control-drag-handle', className );
+	const dragHandleClassNames = classnames( 'editor-block-mover__control-drag-handle block-editor-block-mover__control-drag-handle', className );
 
 	return (
 		<BlockDraggable

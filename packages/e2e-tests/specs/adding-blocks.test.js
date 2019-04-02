@@ -29,7 +29,7 @@ describe( 'adding blocks', () => {
 
 	it( 'Should insert content using the placeholder and the regular inserter', async () => {
 		// Click below editor to focus last field (block appender)
-		await clickBelow( await page.$( '.editor-default-block-appender' ) );
+		await clickBelow( await page.$( '.block-editor-default-block-appender' ) );
 		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();
 		await page.keyboard.type( 'Paragraph block' );
 
@@ -81,16 +81,16 @@ describe( 'adding blocks', () => {
 		await page.click( '.editor-post-title__input' );
 
 		// Using the between inserter
-		const insertionPoint = await page.$( '[data-type="core/quote"] .editor-inserter__toggle' );
+		const insertionPoint = await page.$( '[data-type="core/quote"] .block-editor-inserter__toggle' );
 		const rect = await insertionPoint.boundingBox();
 		await page.mouse.move( rect.x + ( rect.width / 2 ), rect.y + ( rect.height / 2 ), { steps: 10 } );
-		await page.waitForSelector( '[data-type="core/quote"] .editor-inserter__toggle' );
-		await page.click( '[data-type="core/quote"] .editor-inserter__toggle' );
+		await page.waitForSelector( '[data-type="core/quote"] .block-editor-inserter__toggle' );
+		await page.click( '[data-type="core/quote"] .block-editor-inserter__toggle' );
 		// [TODO]: Search input should be focused immediately. It shouldn't be
 		// necessary to have `waitForFunction`.
 		await page.waitForFunction( () => (
 			document.activeElement &&
-			document.activeElement.classList.contains( 'editor-inserter__search' )
+			document.activeElement.classList.contains( 'block-editor-inserter__search' )
 		) );
 		await page.keyboard.type( 'para' );
 		await pressKeyTimes( 'Tab', 3 );
@@ -109,38 +109,38 @@ describe( 'adding blocks', () => {
 	it( 'should not allow transfer of focus outside of the block-insertion menu once open', async () => {
 		// Enter the default block and click the inserter toggle button to the left of it.
 		await page.keyboard.press( 'ArrowDown' );
-		await page.click( '.editor-block-list__empty-block-inserter .editor-inserter__toggle' );
+		await page.click( '.block-editor-block-list__empty-block-inserter .block-editor-inserter__toggle' );
 
 		// Expect the inserter search input to be the active element.
 		let activeElementClassList = await page.evaluate( () => document.activeElement.classList );
-		expect( Object.values( activeElementClassList ) ).toContain( 'editor-inserter__search' );
+		expect( Object.values( activeElementClassList ) ).toContain( 'block-editor-inserter__search' );
 
 		// Try using the up arrow key (vertical navigation triggers the issue described in #9583).
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Expect the inserter search input to still be the active element.
 		activeElementClassList = await page.evaluate( () => document.activeElement.classList );
-		expect( Object.values( activeElementClassList ) ).toContain( 'editor-inserter__search' );
+		expect( Object.values( activeElementClassList ) ).toContain( 'block-editor-inserter__search' );
 
 		// Tab to the block search results
 		await page.keyboard.press( 'Tab' );
 
 		// Expect the search results to be the active element.
 		activeElementClassList = await page.evaluate( () => document.activeElement.classList );
-		expect( Object.values( activeElementClassList ) ).toContain( 'editor-inserter__results' );
+		expect( Object.values( activeElementClassList ) ).toContain( 'block-editor-inserter__results' );
 
 		// Try using the up arrow key
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Expect the search results to still be the active element.
 		activeElementClassList = await page.evaluate( () => document.activeElement.classList );
-		expect( Object.values( activeElementClassList ) ).toContain( 'editor-inserter__results' );
+		expect( Object.values( activeElementClassList ) ).toContain( 'block-editor-inserter__results' );
 
 		// Press escape to close the block inserter.
 		await page.keyboard.press( 'Escape' );
 
 		// Expect focus to have transferred back to the inserter toggle button.
 		activeElementClassList = await page.evaluate( () => document.activeElement.classList );
-		expect( Object.values( activeElementClassList ) ).toContain( 'editor-inserter__toggle' );
+		expect( Object.values( activeElementClassList ) ).toContain( 'block-editor-inserter__toggle' );
 	} );
 } );

@@ -52,7 +52,6 @@ return array(
 		'wp-blocks',
 		'wp-compose',
 		'wp-components',
-		'wp-core-data',
 		'wp-data',
 		'wp-dom',
 		'wp-element',
@@ -112,6 +111,7 @@ return array(
 	'wp-data'                               => array(
 		'lodash',
 		'wp-compose',
+		'wp-deprecated',
 		'wp-element',
 		'wp-is-shallow-equal',
 		'wp-priority-queue',

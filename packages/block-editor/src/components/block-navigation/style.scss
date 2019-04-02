@@ -1,31 +1,31 @@
 $tree-border-width: 2px;
 $tree-item-height: 36px;
 
-.editor-block-navigation__container {
+.block-editor-block-navigation__container {
 	padding: $grid-size - $border-width;
 }
 
-.editor-block-navigation__label {
+.block-editor-block-navigation__label {
 	margin: 0 0 $grid-size;
 	color: $dark-gray-300;
 }
 
-.editor-block-navigation__list,
-.editor-block-navigation__paragraph {
+.block-editor-block-navigation__list,
+.block-editor-block-navigation__paragraph {
 	padding: 0;
 	margin: 0;
 }
 
-.editor-block-navigation__list .editor-block-navigation__list {
+.block-editor-block-navigation__list .block-editor-block-navigation__list {
 	margin-top: 2px;
 	border-left: $tree-border-width solid $light-gray-900;
 	margin-left: 1em;
 
-	.editor-block-navigation__list {
+	.block-editor-block-navigation__list {
 		margin-left: 1.5em;
 	}
 
-	.editor-block-navigation__item {
+	.block-editor-block-navigation__item {
 		position: relative;
 
 		&::before {
@@ -39,7 +39,7 @@ $tree-item-height: 36px;
 		}
 	}
 
-	.editor-block-navigation__item-button {
+	.block-editor-block-navigation__item-button {
 		margin-left: 0.8em;
 		width: calc(100% - 0.8em);
 	}
@@ -58,7 +58,7 @@ $tree-item-height: 36px;
 	}
 }
 
-.editor-block-navigation__item-button {
+.block-editor-block-navigation__item-button {
 	display: flex;
 	align-items: center;
 	width: 100%;
@@ -67,7 +67,7 @@ $tree-item-height: 36px;
 	color: $dark-gray-600;
 	border-radius: 4px;
 
-	.editor-block-icon {
+	.block-editor-block-icon {
 		margin-right: 6px;
 	}
 

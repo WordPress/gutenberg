@@ -22,7 +22,7 @@ describe( 'Links', () => {
 	} );
 
 	const waitForAutoFocus = async () => {
-		await page.waitForFunction( () => !! document.activeElement.closest( '.editor-url-input' ) );
+		await page.waitForFunction( () => !! document.activeElement.closest( '.block-editor-url-input' ) );
 	};
 
 	it( 'can be created by selecting text and clicking Link', async () => {
@@ -205,12 +205,12 @@ describe( 'Links', () => {
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let popover = await page.$( '.editor-url-popover' );
+		let popover = await page.$( '.block-editor-url-popover' );
 		expect( popover ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		popover = await page.$( '.editor-url-popover' );
+		popover = await page.$( '.block-editor-url-popover' );
 		expect( popover ).toBeNull();
 	} );
 
@@ -224,12 +224,12 @@ describe( 'Links', () => {
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let popover = await page.$( '.editor-url-popover' );
+		let popover = await page.$( '.block-editor-url-popover' );
 		expect( popover ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		popover = await page.$( '.editor-url-popover' );
+		popover = await page.$( '.block-editor-url-popover' );
 		expect( popover ).toBeNull();
 	} );
 
@@ -284,8 +284,8 @@ describe( 'Links', () => {
 		await waitForAutoFocus();
 
 		await page.keyboard.type( titleText );
-		await page.waitForSelector( '.editor-url-input__suggestion' );
-		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
+		await page.waitForSelector( '.block-editor-url-input__suggestion' );
+		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "block-editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
 
 		// Expect there to be some autocomplete suggestions.
 		expect( autocompleteSuggestions.length ).toBeGreaterThan( 0 );
@@ -294,16 +294,16 @@ describe( 'Links', () => {
 
 		// Expect that clicking on the autocomplete suggestion doesn't dismiss the link popover.
 		await firstSuggestion.click();
-		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+		expect( await page.$( '.block-editor-url-popover' ) ).not.toBeNull();
 
 		// Expect the url input value to have been updated with the post url.
-		const inputValue = await page.evaluate( () => document.querySelector( '.editor-url-input input[aria-label="URL"]' ).value );
+		const inputValue = await page.evaluate( () => document.querySelector( '.block-editor-url-input input[aria-label="URL"]' ).value );
 		expect( inputValue ).toEqual( postURL );
 
 		// Expect the link to apply correctly.
 		// Note - have avoided using snapshots here since the link url can't be determined ahead of time.
 		await page.click( 'button[aria-label="Apply"]' );
-		const linkHref = await page.evaluate( () => document.querySelector( '.editor-format-toolbar__link-container-value' ).href );
+		const linkHref = await page.evaluate( () => document.querySelector( '.block-editor-format-toolbar__link-container-value' ).href );
 		expect( linkHref ).toEqual( postURL );
 	} );
 
@@ -326,21 +326,21 @@ describe( 'Links', () => {
 		await waitForAutoFocus();
 
 		await page.keyboard.type( titleText );
-		await page.waitForSelector( '.editor-url-input__suggestion' );
-		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
+		await page.waitForSelector( '.block-editor-url-input__suggestion' );
+		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "block-editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
 
 		// Expect there to be some autocomplete suggestions.
 		expect( autocompleteSuggestions.length ).toBeGreaterThan( 0 );
 
 		// Expect the the first suggestion to be selected when pressing the down arrow.
 		await page.keyboard.press( 'ArrowDown' );
-		const isSelected = await page.evaluate( () => document.querySelector( '.editor-url-input__suggestion' ).getAttribute( 'aria-selected' ) );
+		const isSelected = await page.evaluate( () => document.querySelector( '.block-editor-url-input__suggestion' ).getAttribute( 'aria-selected' ) );
 		expect( isSelected ).toBe( 'true' );
 
 		// Expect the link to apply correctly when pressing Enter.
 		// Note - have avoided using snapshots here since the link url can't be determined ahead of time.
 		await page.keyboard.press( 'Enter' );
-		const linkHref = await page.evaluate( () => document.querySelector( '.editor-format-toolbar__link-container-value' ).href );
+		const linkHref = await page.evaluate( () => document.querySelector( '.block-editor-format-toolbar__link-container-value' ).href );
 		expect( linkHref ).toEqual( postURL );
 	} );
 
@@ -360,34 +360,34 @@ describe( 'Links', () => {
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
-		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+		expect( await page.$( '.block-editor-url-popover' ) ).not.toBeNull();
 
 		// Trigger the autocomplete suggestion list and select the first suggestion.
 		await page.keyboard.type( titleText );
-		await page.waitForSelector( '.editor-url-input__suggestion' );
+		await page.waitForSelector( '.block-editor-url-input__suggestion' );
 		await page.keyboard.press( 'ArrowDown' );
 
 		// Expect the the escape key to dismiss the popover when the autocomplete suggestion list is open.
 		await page.keyboard.press( 'Escape' );
-		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+		expect( await page.$( '.block-editor-url-popover' ) ).toBeNull();
 
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
-		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+		expect( await page.$( '.block-editor-url-popover' ) ).not.toBeNull();
 
 		// Expect the the escape key to dismiss the popover normally.
 		await page.keyboard.press( 'Escape' );
-		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+		expect( await page.$( '.block-editor-url-popover' ) ).toBeNull();
 
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
-		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+		expect( await page.$( '.block-editor-url-popover' ) ).not.toBeNull();
 
 		// Tab to the settings icon button.
 		await page.keyboard.press( 'Tab' );
@@ -395,7 +395,7 @@ describe( 'Links', () => {
 
 		// Expect the the escape key to dismiss the popover normally.
 		await page.keyboard.press( 'Escape' );
-		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+		expect( await page.$( '.block-editor-url-popover' ) ).toBeNull();
 	} );
 
 	it( 'can be modified using the keyboard once a link has been set', async () => {
@@ -413,19 +413,19 @@ describe( 'Links', () => {
 		// Deselect the link text by moving the caret to the end of the line
 		// and the link popover should not be displayed.
 		await page.keyboard.press( 'End' );
-		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+		expect( await page.$( '.block-editor-url-popover' ) ).toBeNull();
 
 		// Move the caret back into the link text and the link popover
 		// should be displayed.
 		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+		expect( await page.$( '.block-editor-url-popover' ) ).not.toBeNull();
 
 		// Press Cmd+K to edit the link and the url-input should become
 		// focused with the value previously inserted.
 		await pressKeyWithModifier( 'primary', 'K' );
 		await waitForAutoFocus();
 		const activeElementParentClasses = await page.evaluate( () => Object.values( document.activeElement.parentElement.classList ) );
-		expect( activeElementParentClasses ).toContain( 'editor-url-input' );
+		expect( activeElementParentClasses ).toContain( 'block-editor-url-input' );
 		const activeElementValue = await page.evaluate( () => document.activeElement.value );
 		expect( activeElementValue ).toBe( URL );
 	} );
@@ -451,7 +451,7 @@ describe( 'Links', () => {
 
 		// Focus on first paragraph, so the link popover will appear over the subsequent ones
 		await page.click( '[aria-label="Block Navigation"]' );
-		await page.click( '.editor-block-navigation__item button' );
+		await page.click( '.block-editor-block-navigation__item button' );
 
 		// Select some text
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
@@ -465,7 +465,7 @@ describe( 'Links', () => {
 		await page.click( 'button[aria-label="Link Settings"]' );
 
 		// Move mouse over the 'open in new tab' section, then click and drag
-		const settings = await page.$( '.editor-url-popover__settings' );
+		const settings = await page.$( '.block-editor-url-popover__settings' );
 		const bounds = await settings.boundingBox();
 
 		await page.mouse.move( bounds.x, bounds.y );
@@ -474,7 +474,7 @@ describe( 'Links', () => {
 		await page.mouse.up();
 
 		// The link popover should still be visible
-		const popover = await page.$$( '.editor-url-popover' );
+		const popover = await page.$$( '.block-editor-url-popover' );
 		expect( popover ).toHaveLength( 1 );
 	} );
 

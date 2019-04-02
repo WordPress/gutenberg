@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Popover, ScrollLock, navigateRegions } from '@wordpress/components';
+import {
+	Button,
+	Popover,
+	ScrollLock,
+	FocusReturnProvider,
+	navigateRegions,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { PreserveScrollInReorder } from '@wordpress/block-editor';
 import {
@@ -30,6 +36,7 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
+import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
 import MetaBoxes from '../meta-boxes';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -65,7 +72,7 @@ function Layout( {
 		tabIndex: -1,
 	};
 	return (
-		<div className={ className }>
+		<FocusReturnProvider className={ className }>
 			<FullscreenMode />
 			<BrowserURL />
 			<UnsavedChangesWarning />
@@ -83,6 +90,7 @@ function Layout( {
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
 				<KeyboardShortcutHelpModal />
+				<ManageBlocksModal />
 				<OptionsModal />
 				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
 				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
@@ -124,7 +132,7 @@ function Layout( {
 			) }
 			<Popover.Slot />
 			<PluginArea />
-		</div>
+		</FocusReturnProvider>
 	);
 }
 

@@ -26,6 +26,7 @@ body.js.is-fullscreen-mode {
 		.edit-post-header {
 			transform: translateY(-100%);
 			animation: edit-post-fullscreen-mode__slide-in-animation 0.1s forwards;
+			@include reduce-motion;
 		}
 	}
 }

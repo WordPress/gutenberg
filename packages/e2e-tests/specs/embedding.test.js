@@ -9,6 +9,8 @@ import {
 	createJSONResponse,
 	getEditedPostContent,
 	clickButton,
+	insertBlock,
+	publishPost,
 } from '@wordpress/e2e-test-utils';
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
@@ -61,6 +63,10 @@ const MOCK_BAD_WORDPRESS_RESPONSE = {
 
 const MOCK_RESPONSES = [
 	{
+		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook' ),
+		onRequestMatch: createJSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
+	},
+	{
 		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook/' ),
 		onRequestMatch: createJSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
 	},
@@ -79,6 +85,10 @@ const MOCK_RESPONSES = [
 	{
 		match: createEmbeddingMatcher( 'https://twitter.com/notnownikki' ),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+	},
+	{
+		match: createEmbeddingMatcher( 'https://twitter.com/notnownikki/' ),
+		onRequestMatch: createJSONResponse( MOCK_CANT_EMBED_RESPONSE ),
 	},
 	{
 		match: createEmbeddingMatcher( 'https://twitter.com/thatbunty' ),
@@ -173,6 +183,17 @@ describe( 'Embedding content', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should retry embeds that could not be embedded with trailing slashes, without the trailing slashes', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		// This URL can't be embedded, but without the trailing slash, it can.
+		await page.keyboard.type( 'https://twitter.com/notnownikki/' );
+		await page.keyboard.press( 'Enter' );
+		// The twitter block should appear correctly.
+		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+	} );
+
 	it( 'should allow the user to try embedding a failed URL again', async () => {
 		// URL that can't be embedded.
 		await clickBlockAppender();
@@ -191,5 +212,28 @@ describe( 'Embedding content', () => {
 		);
 		await clickButton( 'Try again' );
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+	} );
+
+	it( 'should switch to the WordPress block correctly', async () => {
+		// This test is to make sure that WordPress embeds are detected correctly,
+		// because the HTML can vary, and the block is detected by looking for
+		// classes in the HTML, so we need to flag up if the HTML changes.
+
+		// Publish a post to embed.
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Hello there!' );
+		await publishPost();
+		const postUrl = await page.$eval( '#inspector-text-control-0', ( el ) => el.value );
+
+		// Start a new post, embed the previous post.
+		await createNewPost();
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( postUrl );
+		await page.keyboard.press( 'Enter' );
+
+		// Check the block has become a WordPress block.
+		await page.waitForSelector( '.wp-block-embed-wordpress' );
 	} );
 } );

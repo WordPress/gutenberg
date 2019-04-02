@@ -82,6 +82,13 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 	'insertLink',
 ] );
 
+/**
+ * Global stylesheet.
+ */
+const globalStyle = document.createElement( 'style' );
+
+document.head.appendChild( globalStyle );
+
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
 		super( ...arguments );
@@ -126,7 +133,10 @@ export class RichText extends Component {
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 
-		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
+		this.formatToValue = memize(
+			this.formatToValue.bind( this ),
+			{ maxSize: 1 }
+		);
 
 		this.savedContent = value;
 		this.patterns = getPatterns( {
@@ -373,6 +383,8 @@ export class RichText extends Component {
 		// Browsers setting `isComposing` to `true` will usually emit a final
 		// `input` event when the characters are composed.
 		if ( event && event.nativeEvent.isComposing ) {
+			// Also don't update any selection.
+			document.removeEventListener( 'selectionchange', this.onSelectionChange );
 			return;
 		}
 
@@ -444,6 +456,8 @@ export class RichText extends Component {
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
 		this.onInput();
+		// Tracking selection changes can be resumed.
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	/**
@@ -468,10 +482,11 @@ export class RichText extends Component {
 			}
 
 			let selectedFormat;
+			const formatsAfter = formats[ start ] || [];
+			const collapsed = isCollapsed( value );
 
-			if ( isCollapsed( value ) ) {
+			if ( collapsed ) {
 				const formatsBefore = formats[ start - 1 ] || [];
-				const formatsAfter = formats[ start ] || [];
 
 				selectedFormat = Math.min( formatsBefore.length, formatsAfter.length );
 			}
@@ -480,6 +495,25 @@ export class RichText extends Component {
 			this.applyRecord( { ...value, selectedFormat }, { domOnly: true } );
 
 			delete this.formatPlaceholder;
+
+			if ( collapsed ? selectedFormat > 0 : formatsAfter.length > 0 ) {
+				this.recalculateBoundaryStyle();
+			}
+		}
+	}
+
+	recalculateBoundaryStyle() {
+		const boundarySelector = '*[data-rich-text-format-boundary]';
+		const element = this.editableRef.querySelector( boundarySelector );
+
+		if ( element ) {
+			const computedStyle = getComputedStyle( element );
+			const newColor = computedStyle.color
+				.replace( ')', ', 0.2)' )
+				.replace( 'rgb', 'rgba' );
+
+			globalStyle.innerHTML =
+				`${ boundarySelector }{background-color: ${ newColor }}`;
 		}
 	}
 
@@ -789,6 +823,9 @@ export class RichText extends Component {
 			}
 		}
 
+		// Wait for boundary class to be added.
+		this.props.setTimeout( () => this.recalculateBoundaryStyle() );
+
 		if ( newSelectedFormat !== selectedFormat ) {
 			this.applyRecord( { ...value, selectedFormat: newSelectedFormat } );
 			this.setState( { selectedFormat: newSelectedFormat } );
@@ -1060,7 +1097,7 @@ export class RichText extends Component {
 		const MultilineTag = this.multilineTag;
 		const ariaProps = pickAriaProps( this.props );
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
-		const classes = classnames( wrapperClassName, 'editor-rich-text' );
+		const classes = classnames( wrapperClassName, 'editor-rich-text block-editor-rich-text' );
 		const record = this.getRecord();
 
 		return (
@@ -1081,7 +1118,7 @@ export class RichText extends Component {
 					</BlockFormatControls>
 				) }
 				{ isSelected && inlineToolbar && (
-					<IsolatedEventContainer className="editor-rich-text__inline-toolbar">
+					<IsolatedEventContainer className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar">
 						<FormatToolbar controls={ formattingControls } />
 					</IsolatedEventContainer>
 				) }
@@ -1114,13 +1151,11 @@ export class RichText extends Component {
 								onBlur={ this.onBlur }
 								onMouseDown={ this.onPointerDown }
 								onTouchStart={ this.onPointerDown }
-								multilineTag={ this.multilineTag }
-								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
 							/>
 							{ isPlaceholderVisible &&
 								<Tagname
-									className={ classnames( 'editor-rich-text__editable', className ) }
+									className={ classnames( 'editor-rich-text__editable block-editor-rich-text__editable', className ) }
 									style={ style }
 								>
 									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }

@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Section can be created using the block inserter 1`] = `
+"<!-- wp:section -->
+<div class=\\"wp-block-section\\"><!-- wp:paragraph -->
+<p>Section block</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:section -->"
+`;
+
+exports[`Section can be created using the slash inserter 1`] = `
+"<!-- wp:section -->
+<div class=\\"wp-block-section\\"><!-- wp:paragraph -->
+<p>Section block</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:section -->"
+`;

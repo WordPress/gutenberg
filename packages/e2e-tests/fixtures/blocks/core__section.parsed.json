@@ -1,0 +1,46 @@
+[
+    {
+        "blockName": "core/section",
+        "attrs": {
+            "backgroundColor": "secondary",
+            "align": "full"
+        },
+        "innerBlocks": [
+            {
+                "blockName": "core/paragraph",
+                "attrs": {},
+                "innerBlocks": [],
+                "innerHTML": "\n\t<p>This is a section block.</p>\n\t",
+                "innerContent": [
+                    "\n\t<p>This is a section block.</p>\n\t"
+                ]
+            },
+            {
+                "blockName": "core/paragraph",
+                "attrs": {},
+                "innerBlocks": [],
+                "innerHTML": "\n\t<p>Section block content.</p>\n\t",
+                "innerContent": [
+                    "\n\t<p>Section block content.</p>\n\t"
+                ]
+            }
+        ],
+        "innerHTML": "\n<div class=\"wp-block-section alignfull has-secondary-background-color has-background\">\n\t\n\n\t</div>\n",
+        "innerContent": [
+            "\n<div class=\"wp-block-section alignfull has-secondary-background-color has-background\">\n\t",
+            null,
+            "\n\n\t",
+            null,
+            "</div>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

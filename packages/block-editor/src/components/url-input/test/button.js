@@ -11,12 +11,14 @@ import ReactDOM from 'react-dom';
 import URLInput from '../';
 import URLInputButton from '../button';
 
+import '../../../store';
+
 describe( 'URLInputButton', () => {
 	const clickEditLink = ( wrapper ) => wrapper.find( 'ForwardRef(IconButton).components-toolbar__control' ).simulate( 'click' );
 
 	it( 'should have a valid class name in the wrapper tag', () => {
 		const wrapper = shallow( <URLInputButton /> );
-		expect( wrapper.hasClass( 'editor-url-input__button' ) ).toBe( true );
+		expect( wrapper.hasClass( 'block-editor-url-input__button' ) ).toBe( true );
 	} );
 	it( 'should not have is-active class when url prop not defined', () => {
 		const wrapper = shallow( <URLInputButton /> );
@@ -56,7 +58,7 @@ describe( 'URLInputButton', () => {
 		const wrapper = shallow( <URLInputButton /> );
 		clickEditLink( wrapper );
 		expect( wrapper.state().expanded ).toBe( true );
-		wrapper.find( '.editor-url-input__back' ).simulate( 'click' );
+		wrapper.find( '.block-editor-url-input__back' ).simulate( 'click' );
 		expect( wrapper.state().expanded ).toBe( false );
 	} );
 	it( 'should close the form when user submits it', () => {

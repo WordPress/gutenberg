@@ -129,6 +129,21 @@ Returns true if the block defines support for a feature, or false otherwise.
 
 Whether block supports feature.
 
+### isMatchingSearchTerm
+
+Returns true if the block type by the given name or object value matches a
+search term, or false otherwise.
+
+*Parameters*
+
+ * state: Blocks state.
+ * nameOrType: Block name or type object.
+ * searchTerm: Search term by which to filter.
+
+*Returns*
+
+Wheter block type matches search term.
+
 ### hasChildBlocks
 
 Returns a boolean indicating if a block has child blocks or not.

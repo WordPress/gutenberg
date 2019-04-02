@@ -52,7 +52,7 @@ export class BlockInvalidWarning extends Component {
 						__( 'Resolve Block' )
 					}
 					onRequestClose={ this.onCompareClose }
-					className="editor-block-compare"
+					className="editor-block-compare block-editor-block-compare"
 				>
 					<BlockCompare
 						block={ block }

@@ -298,4 +298,16 @@ describe( 'adding blocks', () => {
 		// Check that none of the paragraph blocks have <br> in them.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should navigate empty paragraph', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.waitForFunction( () => document.activeElement.isContentEditable );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '2' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

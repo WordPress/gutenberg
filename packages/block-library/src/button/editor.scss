@@ -1,4 +1,4 @@
-.editor-block-list__block[data-type="core/button"] {
+.block-editor-block-list__block[data-type="core/button"] {
 	&[data-align="center"] {
 		text-align: center;
 	}
@@ -19,21 +19,21 @@
 	}
 
 	// Make placeholder text white unless custom colors or outline versions are chosen.
-	&:not(.has-text-color):not(.is-style-outline) .editor-rich-text__editable[data-is-placeholder-visible="true"] + .editor-rich-text__editable {
+	&:not(.has-text-color):not(.is-style-outline) .block-editor-rich-text__editable[data-is-placeholder-visible="true"] + .block-editor-rich-text__editable {
 		color: $white;
 	}
 
 	// Increase placeholder opacity to meet contrast ratios.
-	.editor-rich-text__editable[data-is-placeholder-visible="true"] + .editor-rich-text__editable {
+	.block-editor-rich-text__editable[data-is-placeholder-visible="true"] + .block-editor-rich-text__editable {
 		opacity: 0.8;
 	}
 
 	// Don't let the placeholder text wrap in the variation preview.
-	.editor-block-preview__content & {
+	.block-editor-block-preview__content & {
 		max-width: 100%;
 
 		// Polish the empty placeholder text for the button in variation previews.
-		.editor-rich-text__editable[data-is-placeholder-visible="true"] {
+		.block-editor-rich-text__editable[data-is-placeholder-visible="true"] {
 			height: auto;
 		}
 
@@ -59,13 +59,13 @@
 	$blocks-button__link-input-width: 300px + 2px + 2 * $icon-button-size;
 	width: $blocks-button__link-input-width;
 
-	.editor-url-input {
+	.block-editor-url-input {
 		width: auto;
 	}
 
-	.editor-url-input__suggestions {
+	.block-editor-url-input__suggestions {
 		width: $blocks-button__link-input-width - $icon-button-size - $icon-button-size;
-		z-index: z-index(".block-library-button__inline-link .editor-url-input__suggestions");
+		z-index: z-index(".block-library-button__inline-link .block-editor-url-input__suggestions");
 	}
 
 	> .dashicon {
@@ -76,7 +76,7 @@
 		color: $dark-gray-100;
 	}
 
-	.editor-url-input input[type="text"]::placeholder {
+	.block-editor-url-input input[type="text"]::placeholder {
 		color: $dark-gray-100;
 	}
 
