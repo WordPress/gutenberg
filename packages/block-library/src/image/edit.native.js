@@ -331,7 +331,7 @@ class ImageEdit extends React.Component {
 				accessible={ ! isSelected } 
 				accessibilityLabel={ __( "Image block" ) + "." + alt } 
 				accessibilityRole={ 'button' }
-				accessibilityHint={ __( "Doulbe tap to edit the image" ) }
+				accessibilityHint={ __( "Double tap to edit the image" ) }
 				onPress={ this.onImagePressed } 
 				disabled={ ! isSelected }
 			>
