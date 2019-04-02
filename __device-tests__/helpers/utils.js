@@ -14,9 +14,8 @@ import wd from 'wd';
  */
 import serverConfigs from './serverConfigs';
 import { ios12, android8 } from './caps';
+import AppiumLocal from './appium-local';
 import _ from 'underscore';
-
-const spawn = childProcess.spawn;
 
 // Platform setup
 const defaultPlatform = 'android';
@@ -34,8 +33,8 @@ const localAndroidAppPath = process.env.ANDROID_APP_PATH || defaultAndroidAppPat
 const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
 
 const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs
+let appiumProcess = undefined;
 
-// $FlowFixMe
 const timer = ( ms: number ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
@@ -48,6 +47,10 @@ const isLocalEnvironment = () => {
 
 // Initialises the driver and desired capabilities for appium
 const setupDriver = async () => {
+	if ( isLocalEnvironment() ) {
+		appiumProcess = await AppiumLocal.start( localAppiumPort );
+	}
+
 	const serverConfig = isLocalEnvironment() ? serverConfigs.local : serverConfigs.sauce;
 	const driver = wd.promiseChainRemote( serverConfig );
 
@@ -97,37 +100,21 @@ const setupDriver = async () => {
 	return driver;
 };
 
-// Spawns an appium process in the background
-const setupAppium = () => new Promise( ( resolve, reject ) => {
-	const appium = spawn( 'appium', [
-		'--port', '' + localAppiumPort,
-		'--log', './appium-out.log',
-		'--log-no-colors'
-	] );
+const stopDriver = async ( driver ) => {
+	if ( driver === undefined ) {
+		return;
+	}
+	await driver.quit();
 
-	let appiumOutputBuffer = '';
-	let resolved = false;
-	appium.stdout.on( 'data', ( data ) => {
-		if ( ! resolved ) {
-			appiumOutputBuffer += data.toString();
-			if ( appiumOutputBuffer.indexOf( 'Appium REST http interface listener started' ) >= 0 ) {
-				resolved = true;
-				resolve( appium );
-			}
-		}
-	} );
-
-	appium.on( 'close', ( code ) => {
-		if ( ! resolved ) {
-			reject( new Error( `Appium process exited with code ${ code }` ) );
-		}
-	} );
-} );
+	if ( appiumProcess !== undefined ) {
+		await AppiumLocal.stop( appiumProcess );
+	}
+};
 
 module.exports = {
 	timer,
-	setupAppium,
 	setupDriver,
 	isLocalEnvironment,
 	isAndroid,
+	stopDriver,
 };
