@@ -129,27 +129,31 @@ class GalleryImage extends Component {
 			<figure className={ className }>
 				{ href ? <a href={ href }>{ img }</a> : img }
 				<div className="block-library-gallery-item__inline-menu">
-					<IconButton
-						icon="controls-back"
-						onClick={ onMoveBackward }
-						className="blocks-gallery-item__move-backward"
-						label={ __( 'Move Image Backward' ) }
-					/>
-					<IconButton
-						icon="no-alt"
-						onClick={ onRemove }
-						onFocus={ this.onSelectImage }
-						className="blocks-gallery-item__remove"
-						label={ __( 'Remove Image' ) }
-						disabled={ ! isSelected }
-					/>
-					<IconButton
-						icon="controls-forward"
-						onClick={ onMoveForward }
-						className="blocks-gallery-item__move-forward"
-						label={ __( 'Move Image Forward' ) }
-					/>
-				</div>
+						{ process.env.GUTENBERG_PHASE === 2 ?
+							<IconButton
+								icon="controls-back"
+								onClick={ onMoveBackward }
+								className="blocks-gallery-item__move-backward"
+								label={ __( 'Move Image Backward' ) }
+							/> :
+							null
+						}
+						<IconButton
+							icon="no-alt"
+							onClick={ onRemove }
+							className="blocks-gallery-item__remove"
+							label={ __( 'Remove Image' ) }
+						/>
+						{ process.env.GUTENBERG_PHASE === 2 ?
+							<IconButton
+								icon="controls-forward"
+								onClick={ onMoveForward }
+								className="blocks-gallery-item__move-forward"
+								label={ __( 'Move Image Forward' ) }
+							/> :
+							null
+						}
+					</div>
 				<RichText
 					tagName="figcaption"
 					placeholder={ isSelected ? __( 'Write caption…' ) : null }
