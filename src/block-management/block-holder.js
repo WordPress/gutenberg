@@ -43,6 +43,7 @@ type PropsType = BlockType & {
 	isLastBlock: boolean,
 	showTitle: boolean,
 	borderStyle: Object,
+	testID: string,
 	focusedBorderColor: string,
 	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
 	getPreviousBlockClientId: ( clientId: string ) => string,
@@ -199,12 +200,24 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onFocus } >
+			// Needs to be false to access children
+			// https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
+			<TouchableWithoutFeedback
+				accessible={ false }
+				accessibilityLabel="block-container"
+				onPress={ this.onFocus } >
+
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
-					<View style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>{ this.getBlockForType() }</View>
+					<View
+						accessibile={ true }
+						accessibilityLabel={ this.props.testID }
+						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
+						{ this.getBlockForType() }
+					</View>
 					{ this.renderToolbar() }
 				</View>
+
 			</TouchableWithoutFeedback>
 		);
 	}
