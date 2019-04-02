@@ -390,8 +390,7 @@ class ImageEdit extends Component {
 				{ url && (
 					<Toolbar>
 						<IconButton
-							className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing }
-							) }
+							className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
 							label={ __( 'Edit image' ) }
 							aria-pressed={ this.state.isEditing }
 							onClick={ this.toggleIsEditing }
