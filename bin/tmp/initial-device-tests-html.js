@@ -1,6 +1,0 @@
-/**
- * @format
- * @flow
- */
-
-export default ``;

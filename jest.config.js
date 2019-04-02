@@ -21,7 +21,6 @@ module.exports = {
 		'<rootDir>/gutenberg/gutenberg-mobile/',
 		'/gutenberg/test/',
 		'/gutenberg/packages/',
-		'/__device-tests__/',
 	],
 	testURL: 'http://localhost/',
 	modulePathIgnorePatterns: [ '<rootDir>/gutenberg/gutenberg-mobile', 'react-native-aztec-old-submodule' ],
