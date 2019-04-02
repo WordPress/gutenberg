@@ -19,6 +19,9 @@ export function getActiveFormats( { formats, start, end, activeFormats } ) {
 		const formatsBefore = formats[ start - 1 ] || [];
 		const formatsAfter = formats[ start ] || [];
 
+		// By default, select the lowest amount of formats possible (which means
+		// the caret is positioned outside the format boundary). The user can
+		// then use arrow keys to define `activeFormats`.
 		if ( formatsBefore.length < formatsAfter.length ) {
 			return formatsBefore;
 		}

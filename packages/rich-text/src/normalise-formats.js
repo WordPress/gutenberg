@@ -5,7 +5,8 @@
 import { isFormatEqual } from './is-format-equal';
 
 /**
- * Normalises formats: ensures subsequent equal formats have the same reference.
+ * Normalises formats: ensures subsequent adjacent equal formats have the same
+ * reference.
  *
  * @param {Object} value Value to normalise formats of.
  *
