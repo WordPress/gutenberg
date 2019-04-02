@@ -20,6 +20,12 @@
 	&:hover,
 	&:focus {
 		outline: $border-width dashed $dark-gray-500;
+		color: $dark-gray-900;
+	}
+
+	&:active {
+		outline: $border-width dashed $dark-gray-900;
+		color: $dark-gray-900;
 	}
 
 	> span {
