@@ -8,7 +8,6 @@
  */
 import childProcess from 'child_process';
 import wd from 'wd';
-import fs from 'fs';
 
 /**
  * Internal dependencies
@@ -99,19 +98,31 @@ const setupDriver = async () => {
 };
 
 // Spawns an appium process in the background
-const setupAppium = async () => {
-	const out = fs.openSync( './appium-out.log', 'a' );
-	const err = fs.openSync( './appium-out.log', 'a' );
+const setupAppium = () => new Promise( ( resolve, reject ) => {
+	const appium = spawn( 'appium', [
+		'--port', '' + localAppiumPort,
+		'--log', './appium-out.log',
+		'--log-no-colors'
+	] );
 
-	const appium = await spawn( 'appium', [ '-p', '' + localAppiumPort ], {
-		detached: true, stdio: [ 'ignore', out, err ],
-
+	let appiumOutputBuffer = '';
+	let resolved = false;
+	appium.stdout.on( 'data', ( data ) => {
+		if ( ! resolved ) {
+			appiumOutputBuffer += data.toString();
+			if ( appiumOutputBuffer.indexOf( 'Appium REST http interface listener started' ) >= 0 ) {
+				resolved = true;
+				resolve( appium );
+			}
+		}
 	} );
 
-	// Wait a little for server to fire up
-	await timer( 5000 );
-	return appium;
-};
+	appium.on( 'close', ( code ) => {
+		if ( ! resolved ) {
+			reject( new Error( `Appium process exited with code ${ code }` ) );
+		}
+	} );
+} );
 
 module.exports = {
 	timer,
