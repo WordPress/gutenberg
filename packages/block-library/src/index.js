@@ -47,6 +47,7 @@ import * as search from './search';
 import * as section from './section';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
+import * as social from './social';
 import * as spacer from './spacer';
 import * as subhead from './subhead';
 import * as table from './table';
@@ -110,6 +111,7 @@ export const registerCoreBlocks = () => {
 		section,
 		separator,
 		reusableBlock,
+		social,
 		spacer,
 		subhead,
 		table,
