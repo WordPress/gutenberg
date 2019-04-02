@@ -1,0 +1,77 @@
+.wp-block-navigation-menu .block-editor-block-list__layout,
+.wp-block-navigation-menu,
+.wp-block-navigation-menu-item__edit-cotainer {
+	display: grid;
+	grid-auto-columns: min-content;
+	grid-auto-flow: column;
+	align-items: center;
+	white-space: nowrap;
+}
+
+// Todo: corerctly allow custom inserters and remove the need for this display none.
+.wp-block-navigation-menu .block-editor-block-list__layout .block-list-appender {
+	display: none;
+}
+
+$menu-label-field-width: 140px;
+.wp-block-navigation-menu-item__edit-cotainer {
+	border: 1px solid $light-gray-500;
+	// two pixes comes from two times one pixel border
+	width: $menu-label-field-width + $icon-button-size + 2px;
+}
+
+.wp-block-navigation-menu-item__edit-cotainer .wp-block-navigation-menu-item__field {
+	border-right: 1px solid $light-gray-500 !important;
+	width: $menu-label-field-width;
+	border: none;
+	border-radius: 0;
+	padding-left: $grid-size-large;
+
+	min-height: $icon-button-size;
+	line-height: $icon-button-size;
+
+	&,
+	&:focus {
+		color: $dark-gray-500;
+	}
+}
+
+
+.wp-block-navigation-menu-item {
+	font-family: $editor-font;
+	color: #0073af;
+	font-weight: bold;
+	font-size: $text-editor-font-size;
+}
+
+.wp-block-navigation-menu-item__nofollow-external-link {
+	display: block;
+}
+
+// Separator
+.wp-block-navigation-menu-item__separator {
+	margin-top: $grid-size;
+	margin-bottom: $grid-size;
+	margin-left: 0;
+	margin-right: 0;
+	border-top: $border-width solid $light-gray-500;
+}
+
+// Popover styles
+.components-popover:not(.is-mobile).wp-block-navigation-menu-item__dropdown-content {
+	margin-left: -$menu-label-field-width + 5px;
+}
+
+.wp-block-navigation-menu-item__dropdown-content .components-popover__content {
+	padding: $grid-size 0;
+}
+
+// Custom inserter
+.wp-block-navigation-menu__inserter {
+	display: inline-block;
+}
+
+.wp-block-navigation-menu__inserter-content {
+	width: 350px;
+	padding: $grid-size-large;
+}

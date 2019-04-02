@@ -241,6 +241,14 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'More',
 		availableTransforms: [],
 	},
+	'core__navigation-menu': {
+		originalBlock: 'Navigation Menu (Experimental)',
+		availableTransforms: [],
+	},
+	'core__navigation-menu-item': {
+		originalBlock: 'Menu Item (Experimental)',
+		availableTransforms: [],
+	},
 	core__nextpage: {
 		originalBlock: 'Page Break',
 		availableTransforms: [],

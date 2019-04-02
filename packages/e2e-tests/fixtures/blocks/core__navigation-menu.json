@@ -1,0 +1,26 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/navigation-menu",
+        "isValid": true,
+        "attributes": {
+            "automaticallyAdd": "false"
+        },
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/navigation-menu-item",
+                "isValid": true,
+                "attributes": {
+                    "label": "WordPress",
+                    "destination": "https://wordpress.org/",
+                    "nofollow": false,
+                    "opensInNewTab": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<li class=\"wp-block-navigation-menu-item\">\n\t\t<a href=\"https://wordpress.org/\">WordPress</a>\n\t</li>"
+            }
+        ],
+        "originalContent": "<ul class=\"wp-block-navigation-menu\">\n\t\n</ul>"
+    }
+]

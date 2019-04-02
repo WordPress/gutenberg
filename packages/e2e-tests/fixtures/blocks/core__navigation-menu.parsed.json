@@ -1,0 +1,35 @@
+[
+    {
+        "blockName": "core/navigation-menu",
+        "attrs": {},
+        "innerBlocks": [
+            {
+                "blockName": "core/navigation-menu-item",
+                "attrs": {
+                    "label": "WordPress",
+                    "destination": "https://wordpress.org/"
+                },
+                "innerBlocks": [],
+                "innerHTML": "\n\t<li class=\"wp-block-navigation-menu-item\">\n\t\t<a href=\"https://wordpress.org/\">WordPress</a>\n\t</li>\n\t",
+                "innerContent": [
+                    "\n\t<li class=\"wp-block-navigation-menu-item\">\n\t\t<a href=\"https://wordpress.org/\">WordPress</a>\n\t</li>\n\t"
+                ]
+            }
+        ],
+        "innerHTML": "\n<ul class=\"wp-block-navigation-menu\">\n\t\n</ul>\n",
+        "innerContent": [
+            "\n<ul class=\"wp-block-navigation-menu\">\n\t",
+            null,
+            "\n</ul>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

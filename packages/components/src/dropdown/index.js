@@ -66,6 +66,7 @@ class Dropdown extends Component {
 	render() {
 		const { isOpen } = this.state;
 		const {
+			noArrow,
 			renderContent,
 			renderToggle,
 			position = 'bottom',
@@ -83,6 +84,7 @@ class Dropdown extends Component {
 				{ renderToggle( args ) }
 				{ isOpen && (
 					<Popover
+						noArrow={ noArrow }
 						className={ contentClassName }
 						position={ position }
 						onClose={ this.close }
