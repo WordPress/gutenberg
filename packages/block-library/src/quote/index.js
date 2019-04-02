@@ -17,6 +17,11 @@ import { join, split, create, toHTMLString } from '@wordpress/rich-text';
 import edit from './edit';
 import icon from './icon';
 import { ATTRIBUTE_QUOTE, ATTRIBUTE_CITATION } from './contants';
+import metadata from './block.json';
+
+const { name } = metadata;
+
+export { metadata, name };
 
 const blockAttributes = {
 	[ ATTRIBUTE_QUOTE ]: {
@@ -37,13 +42,10 @@ const blockAttributes = {
 	},
 };
 
-export const name = 'core/quote';
-
 export const settings = {
 	title: __( 'Quote' ),
 	description: __( 'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar' ),
 	icon,
-	category: 'common',
 	keywords: [ __( 'blockquote' ) ],
 
 	attributes: blockAttributes,

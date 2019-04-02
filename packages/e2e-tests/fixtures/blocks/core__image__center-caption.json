@@ -4,10 +4,10 @@
         "name": "core/image",
         "isValid": true,
         "attributes": {
-            "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+            "align": "center",
+	        "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
             "alt": "",
             "caption": "Give it a try. Press the \"really wide\" button on the image toolbar.",
-            "align": "center",
             "linkDestination": "none"
         },
         "innerBlocks": [],

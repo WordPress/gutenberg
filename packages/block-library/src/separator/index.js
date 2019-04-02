@@ -9,8 +9,11 @@ import { createBlock } from '@wordpress/blocks';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/separator';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Separator' ),
@@ -18,8 +21,6 @@ export const settings = {
 	description: __( 'Create a break between ideas or sections with a horizontal separator.' ),
 
 	icon,
-
-	category: 'layout',
 
 	keywords: [ __( 'horizontal-line' ), 'hr', __( 'divider' ) ],
 

@@ -9,7 +9,6 @@ import {
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
-	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 
 /**
@@ -27,7 +26,7 @@ import * as calendar from './calendar';
 import * as categories from './categories';
 import * as code from './code';
 import * as columns from './columns';
-import * as column from './columns/column';
+import * as column from './column';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
@@ -124,10 +123,10 @@ export const registerCoreBlocks = () => {
 			return;
 		}
 		const { metadata, settings, name } = block;
-		if ( metadata ) {
-			unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } ); // eslint-disable-line camelcase
-		}
-		registerBlockType( name, settings );
+		registerBlockType( name, {
+			...metadata,
+			...settings,
+		} );
 	} );
 
 	setDefaultBlockName( paragraph.name );

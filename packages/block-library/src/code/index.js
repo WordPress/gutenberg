@@ -9,8 +9,11 @@ import { createBlock } from '@wordpress/blocks';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/code';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Code' ),
@@ -18,16 +21,6 @@ export const settings = {
 	description: __( 'Display code snippets that respect your spacing and tabs.' ),
 
 	icon,
-
-	category: 'formatting',
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'text',
-			selector: 'code',
-		},
-	},
 
 	supports: {
 		html: false,

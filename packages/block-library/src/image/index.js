@@ -21,69 +21,11 @@ import { __ } from '@wordpress/i18n';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/image';
+const { name, attributes: blockAttributes } = metadata;
 
-const blockAttributes = {
-	url: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'img',
-		attribute: 'src',
-	},
-	alt: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'img',
-		attribute: 'alt',
-		default: '',
-	},
-	caption: {
-		type: 'string',
-		source: 'html',
-		selector: 'figcaption',
-	},
-	href: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'figure > a',
-		attribute: 'href',
-	},
-	rel: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'figure > a',
-		attribute: 'rel',
-	},
-	linkClass: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'figure > a',
-		attribute: 'class',
-	},
-	id: {
-		type: 'number',
-	},
-	align: {
-		type: 'string',
-	},
-	width: {
-		type: 'number',
-	},
-	height: {
-		type: 'number',
-	},
-	linkDestination: {
-		type: 'string',
-		default: 'none',
-	},
-	linkTarget: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'figure > a',
-		attribute: 'target',
-	},
-};
+export { metadata, name };
 
 const imageSchema = {
 	img: {
@@ -149,14 +91,10 @@ export const settings = {
 
 	icon,
 
-	category: 'common',
-
 	keywords: [
 		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
 		__( 'photo' ),
 	],
-
-	attributes: blockAttributes,
 
 	transforms: {
 		from: [

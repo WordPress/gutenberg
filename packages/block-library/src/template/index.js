@@ -8,13 +8,14 @@ import { InnerBlocks } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/template';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Reusable Template' ),
-
-	category: 'reusable',
 
 	description: __( 'Template block used as a container.' ),
 
