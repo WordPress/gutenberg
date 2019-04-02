@@ -99,16 +99,6 @@
 			opacity: 1;
 		}
 	}
-
-	// Hide the thick block border in the Code Editor.
-	.edit-post-text-editor__body & {
-
-		&:not(.is-focus-mode):not(.has-fixed-toolbar):not(.is-selected) .editor-post-title__input:hover,
-		&:not(.is-focus-mode):not(.has-fixed-toolbar).is-selected .editor-post-title__input {
-			box-shadow: none;
-			border-left-width: $border-width;
-		}
-	}
 }
 
 .editor-post-title .editor-post-permalink {

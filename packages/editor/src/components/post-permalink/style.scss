@@ -36,15 +36,6 @@
 		// buttons to shrink anyway.
 		flex-shrink: 0;
 	}
-
-	// Hide the thick block border in the Code Editor.
-	.edit-post-text-editor__body .editor-post-title & {
-		box-shadow: none;
-		border: none;
-		outline: $border-width solid $light-gray-800;
-		left: 2px;
-		right: 2px;
-	}
 }
 
 .editor-post-permalink__copy {
