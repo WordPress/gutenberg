@@ -1,17 +1,18 @@
 /**
  * External dependencies
  */
-import { has, get } from 'lodash';
+import { has, get, last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
 import { Button, Spinner, ResponsiveWrapper, withFilters } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import { getPath } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -29,49 +30,63 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 	const postLabel = get( postType, [ 'labels' ], {} );
 	const instructions = <p>{ __( 'To edit the featured image, you need permission to upload media.' ) }</p>;
 
-	let mediaWidth, mediaHeight, mediaSourceUrl;
+	let mediaWidth, mediaHeight, mediaSourceUrl, mediaAltText, imageFilename;
 	if ( media ) {
 		const mediaSize = applyFilters( 'editor.PostFeaturedImage.imageSize', 'post-thumbnail', media.id, currentPostId );
 		if ( has( media, [ 'media_details', 'sizes', mediaSize ] ) ) {
 			mediaWidth = media.media_details.sizes[ mediaSize ].width;
 			mediaHeight = media.media_details.sizes[ mediaSize ].height;
 			mediaSourceUrl = media.media_details.sizes[ mediaSize ].source_url;
+			mediaAltText = media.media_details.sizes[ mediaSize ].alt_text;
 		} else {
 			mediaWidth = media.media_details.width;
 			mediaHeight = media.media_details.height;
 			mediaSourceUrl = media.source_url;
+			mediaAltText = media.alt_text;
 		}
+	}
+
+	const imagePath = getPath( mediaSourceUrl );
+	if ( imagePath ) {
+		imageFilename = last( imagePath.split( '/' ) );
 	}
 
 	return (
 		<PostFeaturedImageCheck>
 			<div className="editor-post-featured-image">
-				<MediaUploadCheck fallback={ instructions }>
-					<MediaUpload
-						title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
-						onSelect={ onUpdateImage }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						modalClass={ ! featuredImageId ? 'editor-post-featured-image__media-modal' : 'editor-post-featured-image__media-modal' }
-						render={ ( { open } ) => (
-							<Button
-								className={ ! featuredImageId ? 'editor-post-featured-image__toggle' : 'editor-post-featured-image__preview' }
-								onClick={ open }
-								aria-label={ ! featuredImageId ? null : __( 'Edit or update the image' ) }>
-								{ !! featuredImageId && media &&
-									<ResponsiveWrapper
-										naturalWidth={ mediaWidth }
-										naturalHeight={ mediaHeight }
-									>
-										<img src={ mediaSourceUrl } alt="" />
-									</ResponsiveWrapper>
-								}
-								{ !! featuredImageId && ! media && <Spinner /> }
-								{ ! featuredImageId && ( postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
-							</Button>
-						) }
-						value={ featuredImageId }
-					/>
-				</MediaUploadCheck>
+				{ !! featuredImageId &&
+					<MediaUploadCheck fallback={ instructions }>
+						<MediaUpload
+							title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
+							onSelect={ onUpdateImage }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							modalClass="editor-post-featured-image__media-modal"
+							render={ ( { open } ) => (
+								<Button className="editor-post-featured-image__preview" onClick={ open } aria-label={ __( 'Edit or update the image' ) } aria-describedby={ `editor-post-featured-image__description-${ featuredImageId }` } >
+									{ media &&
+										<ResponsiveWrapper
+											naturalWidth={ mediaWidth }
+											naturalHeight={ mediaHeight }
+										>
+											<img src={ mediaSourceUrl } alt="" />
+										</ResponsiveWrapper>
+									}
+									{ ! media && <Spinner /> }
+								</Button>
+							) }
+							value={ featuredImageId }
+						/>
+						<p
+							id={ `editor-post-featured-image__description-${ featuredImageId }` }
+							className="screen-reader-text"
+						>
+							{ mediaAltText ?
+								sprintf( __( 'Current image: %s' ), mediaAltText ) :
+								__( 'The current image has no alternative text. The file name is: ' + imageFilename )
+							}
+						</p>
+					</MediaUploadCheck>
+				}
 				{ !! featuredImageId && media && ! media.isLoading &&
 					<MediaUploadCheck>
 						<MediaUpload
@@ -86,6 +101,23 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 							) }
 						/>
 					</MediaUploadCheck>
+				}
+				{ ! featuredImageId &&
+					<div>
+						<MediaUploadCheck fallback={ instructions }>
+							<MediaUpload
+								title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
+								onSelect={ onUpdateImage }
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								modalClass="editor-post-featured-image__media-modal"
+								render={ ( { open } ) => (
+									<Button className="editor-post-featured-image__toggle" onClick={ open }>
+										{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+									</Button>
+								) }
+							/>
+						</MediaUploadCheck>
+					</div>
 				}
 				{ !! featuredImageId &&
 					<MediaUploadCheck>
