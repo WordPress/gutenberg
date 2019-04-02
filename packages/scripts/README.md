@@ -275,13 +275,13 @@ The `build` and `start` commands use [webpack](https://webpack.js.org/) behind t
 
 Package | Input syntax | Output
 --- | --- | ---
-React | `import x from React;` | `var x = window.React.x;`
-ReactDOM | `import x from ReactDOM;` | `var x = window.ReactDOM.x;`
-moment | `import x from moment;` | `var x = window.moment.x;`
-jQuery | `import x from jQuery;` | `var x = window.jQuery.x;`
-lodash | `import x from lodash;` | `var x = window.lodash.x;`
-lodash-es | `import x from lodash-es;` | `var x = window.lodash.x;`
-WordPress packages | `import x from '@wordpress/package-name` | `var x = window.wp.packageName.x`
+React | `import x from 'react';` | `var x = window.React.x;`
+ReactDOM | `import x from 'react-dom';` | `var x = window.ReactDOM.x;`
+moment | `import x from 'moment';` | `var x = window.moment.x;`
+jQuery | `import x from 'jquery';` | `var x = window.jQuery.x;`
+lodash | `import x from 'lodash';` | `var x = window.lodash.x;`
+lodash-es | `import x from 'lodash-es';` | `var x = window.lodash.x;`
+WordPress packages | `import x from '@wordpress/package-name'` | `var x = window.wp.packageName.x`
 
 #### Provide your own webpack config
 
