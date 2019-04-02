@@ -11,7 +11,7 @@
 	background-clip: padding-box;
 
 	// Show a thick left border to match the left border on the title field.
-	border-left: 0;
+	border-left-width: 0;
 	box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
 
 	// Use a lighter border for dark themes.
@@ -35,6 +35,15 @@
 		// This should be safe to apply in all browsers because we don't want these
 		// buttons to shrink anyway.
 		flex-shrink: 0;
+	}
+
+	// Hide the thick block border in the Code Editor.
+	.edit-post-text-editor__body .editor-post-title & {
+		box-shadow: none;
+		border: none;
+		outline: $border-width solid $light-gray-800;
+		left: 2px;
+		right: 2px;
 	}
 }
 
