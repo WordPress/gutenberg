@@ -95,7 +95,12 @@ function gutenberg_legacy_widget_settings( $settings ) {
 		if ( ! in_array( $class, $core_widgets ) ) {
 			$available_legacy_widgets[ $class ] = array(
 				'name'             => html_entity_decode( $widget_obj->name ),
-				'description'      => html_entity_decode( $widget_obj->widget_options['description'] ),
+				// wp_widget_description is not being used because its input parameter is a Widget Id.
+				// Widgets id's reference to a specific widget instance.
+				// Here we are iterating on all the available widget classes even if no widget instance exists for them.
+				'description'      => isset( $widget_obj->widget_options['description'] ) ?
+					html_entity_decode( $widget_obj->widget_options['description'] ) :
+					null,
 				'isCallbackWidget' => false,
 			);
 		}
@@ -110,7 +115,7 @@ function gutenberg_legacy_widget_settings( $settings ) {
 		}
 		$available_legacy_widgets[ $widget_id ] = array(
 			'name'             => html_entity_decode( $widget_obj['name'] ),
-			'description'      => null,
+			'description'      => html_entity_decode( wp_widget_description( $widget_id ) ),
 			'isCallbackWidget' => true,
 		);
 	}

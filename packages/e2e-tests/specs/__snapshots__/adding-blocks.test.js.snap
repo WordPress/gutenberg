@@ -42,7 +42,9 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 <!-- /wp:quote -->
 
 <!-- wp:preformatted -->
-<pre class=\\"wp-block-preformatted\\">Pre text<br><br>Foo</pre>
+<pre class=\\"wp-block-preformatted\\">Pre text
+
+Foo</pre>
 <!-- /wp:preformatted -->
 
 <!-- wp:shortcode -->

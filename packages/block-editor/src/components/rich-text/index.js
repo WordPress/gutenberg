@@ -82,6 +82,13 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 	'insertLink',
 ] );
 
+/**
+ * Global stylesheet.
+ */
+const globalStyle = document.createElement( 'style' );
+
+document.head.appendChild( globalStyle );
+
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
 		super( ...arguments );
@@ -126,7 +133,10 @@ export class RichText extends Component {
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 
-		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
+		this.formatToValue = memize(
+			this.formatToValue.bind( this ),
+			{ maxSize: 1 }
+		);
 
 		this.savedContent = value;
 		this.patterns = getPatterns( {
@@ -472,10 +482,11 @@ export class RichText extends Component {
 			}
 
 			let selectedFormat;
+			const formatsAfter = formats[ start ] || [];
+			const collapsed = isCollapsed( value );
 
-			if ( isCollapsed( value ) ) {
+			if ( collapsed ) {
 				const formatsBefore = formats[ start - 1 ] || [];
-				const formatsAfter = formats[ start ] || [];
 
 				selectedFormat = Math.min( formatsBefore.length, formatsAfter.length );
 			}
@@ -484,6 +495,25 @@ export class RichText extends Component {
 			this.applyRecord( { ...value, selectedFormat }, { domOnly: true } );
 
 			delete this.formatPlaceholder;
+
+			if ( collapsed ? selectedFormat > 0 : formatsAfter.length > 0 ) {
+				this.recalculateBoundaryStyle();
+			}
+		}
+	}
+
+	recalculateBoundaryStyle() {
+		const boundarySelector = '*[data-rich-text-format-boundary]';
+		const element = this.editableRef.querySelector( boundarySelector );
+
+		if ( element ) {
+			const computedStyle = getComputedStyle( element );
+			const newColor = computedStyle.color
+				.replace( ')', ', 0.2)' )
+				.replace( 'rgb', 'rgba' );
+
+			globalStyle.innerHTML =
+				`${ boundarySelector }{background-color: ${ newColor }}`;
 		}
 	}
 
@@ -792,6 +822,9 @@ export class RichText extends Component {
 				newSelectedFormat++;
 			}
 		}
+
+		// Wait for boundary class to be added.
+		this.props.setTimeout( () => this.recalculateBoundaryStyle() );
 
 		if ( newSelectedFormat !== selectedFormat ) {
 			this.applyRecord( { ...value, selectedFormat: newSelectedFormat } );

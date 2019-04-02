@@ -32,6 +32,7 @@ const {
 	getBlockRootClientId,
 	getBlockHierarchyRootClientId,
 	getGlobalBlockCount,
+	getSelectedBlockClientIds,
 	getMultiSelectedBlockClientIds,
 	getMultiSelectedBlocks,
 	getMultiSelectedBlocksStartClientId,
@@ -984,6 +985,61 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getSelectedBlockClientIds', () => {
+		it( 'should return empty if there is no selection', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 123, 23 ],
+					},
+				},
+				blockSelection: { start: null, end: null },
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [] );
+		} );
+
+		it( 'should return the selected block clientId if there is a selection', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 5, 4, 3, 2, 1 ],
+					},
+				},
+				blockSelection: { start: 2, end: 2 },
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 2 ] );
+		} );
+
+		it( 'should return selected block clientIds if there is multi selection', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 5, 4, 3, 2, 1 ],
+					},
+				},
+				blockSelection: { start: 2, end: 4 },
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 4, 3, 2 ] );
+		} );
+
+		it( 'should return selected block clientIds if there is multi selection (nested context)', () => {
+			const state = {
+				blocks: {
+					order: {
+						'': [ 5, 4, 3, 2, 1 ],
+						4: [ 9, 8, 7, 6 ],
+					},
+				},
+				blockSelection: { start: 7, end: 9 },
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 9, 8, 7 ] );
+		} );
+	} );
+
 	describe( 'getMultiSelectedBlockClientIds', () => {
 		it( 'should return empty if there is no multi selection', () => {
 			const state = {
@@ -1871,9 +1927,11 @@ describe( 'selectors', () => {
 						{ id: 1, isTemporary: false, clientId: 'block1', title: 'Reusable Block 1' },
 					],
 				},
-				preferences: {
-					insertUsage: {},
-				},
+				// Intentionally include a test case which considers
+				// `insertUsage` as not present within preferences.
+				//
+				// See: https://github.com/WordPress/gutenberg/issues/14580
+				preferences: {},
 				blockListSettings: {},
 			};
 			const items = getInserterItems( state );

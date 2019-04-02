@@ -481,6 +481,7 @@ describe( 'state', () => {
 		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 			expect( state ).toEqual( {
+				insertUsage: {},
 				isPublishSidebarEnabled: true,
 			} );
 		} );

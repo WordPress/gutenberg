@@ -6,6 +6,8 @@ exports[`Multi-block selection should allow selecting outer edge if there is no 
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Multi-block selection should always expand single line selection 1`] = `""`;
+
 exports[`Multi-block selection should only trigger multi-selection when at the end 1`] = `
 "<!-- wp:paragraph -->
 <p>1.</p>

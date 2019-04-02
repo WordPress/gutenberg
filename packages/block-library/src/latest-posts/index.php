@@ -89,10 +89,14 @@ function register_block_core_latest_posts() {
 		'core/latest-posts',
 		array(
 			'attributes'      => array(
-				'categories'      => array(
+				'align'           => array(
 					'type' => 'string',
+					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
 				),
 				'className'       => array(
+					'type' => 'string',
+				),
+				'categories'      => array(
 					'type' => 'string',
 				),
 				'postsToShow'     => array(
@@ -111,9 +115,6 @@ function register_block_core_latest_posts() {
 					'type'    => 'number',
 					'default' => 3,
 				),
-				'align'           => array(
-					'type' => 'string',
-				),
 				'order'           => array(
 					'type'    => 'string',
 					'default' => 'desc',
@@ -127,5 +128,4 @@ function register_block_core_latest_posts() {
 		)
 	);
 }
-
 add_action( 'init', 'register_block_core_latest_posts' );

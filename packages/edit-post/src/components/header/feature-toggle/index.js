@@ -26,7 +26,6 @@ function FeatureToggle( { onToggle, isActive, label, info, messageActivated, mes
 			isSelected={ isActive }
 			onClick={ flow( onToggle, speakMessage ) }
 			role="menuitemcheckbox"
-			label={ label }
 			info={ info }
 		>
 			{ label }
@@ -41,7 +40,6 @@ export default compose( [
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onToggle() {
 			dispatch( 'core/edit-post' ).toggleFeature( ownProps.feature );
-			ownProps.onToggle();
 		},
 	} ) ),
 	withSpokenMessages,

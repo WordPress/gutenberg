@@ -65,6 +65,7 @@ fi
 # Make sure the uploads and upgrade folders exist and we have permissions to add files.
 echo -e $(status_message "Ensuring that files can be uploaded...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod 767 /var/www/html/wp-content/plugins
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod 767 /var/www/html/wp-config.php
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod 767 /var/www/html/wp-settings.php
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER mkdir -p /var/www/html/wp-content/uploads
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod -v 767 /var/www/html/wp-content/uploads
@@ -104,3 +105,18 @@ fi
 # Install a dummy favicon to avoid 404 errors.
 echo -e $(status_message "Installing a dummy favicon...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER touch /var/www/html/favicon.ico
+
+# Configure site constants.
+echo -e $(status_message "Configuring site constants...")
+WP_DEBUG_CURRENT=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm -u 33 $CLI config get --type=constant --format=json WP_DEBUG)
+if [ $WP_DEBUG != $WP_DEBUG_CURRENT ]; then
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI config set WP_DEBUG $WP_DEBUG --raw --type=constant --quiet
+	WP_DEBUG_RESULT=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm -u 33 $CLI config get --type=constant --format=json WP_DEBUG)
+	echo -e $(status_message "WP_DEBUG: $WP_DEBUG_RESULT...")
+fi
+SCRIPT_DEBUG_CURRENT=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm -u 33 $CLI config get --type=constant --format=json SCRIPT_DEBUG)
+if [ $SCRIPT_DEBUG != $SCRIPT_DEBUG_CURRENT ]; then
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI config set SCRIPT_DEBUG $SCRIPT_DEBUG --raw --type=constant --quiet
+	SCRIPT_DEBUG_RESULT=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm -u 33 $CLI config get --type=constant --format=json SCRIPT_DEBUG)
+	echo -e $(status_message "SCRIPT_DEBUG: $SCRIPT_DEBUG_RESULT...")
+fi
