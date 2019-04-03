@@ -8,8 +8,6 @@ import {
 	isEqual,
 	omit,
 	pickBy,
-	get,
-	isPlainObject,
 } from 'lodash';
 import memize from 'memize';
 
@@ -48,6 +46,7 @@ import {
 import { decodeEntities } from '@wordpress/html-entities';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -90,6 +89,20 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 const globalStyle = document.createElement( 'style' );
 
 document.head.appendChild( globalStyle );
+
+function createPrepareEditableTree( props ) {
+	const fns = Object.keys( props ).reduce( ( accumulator, key ) => {
+		if ( key.startsWith( 'format_prepare_functions' ) ) {
+			accumulator.push( props[ key ] );
+		}
+
+		return accumulator;
+	}, [] );
+
+	return ( value ) => fns.reduce( ( accumulator, fn ) => {
+		return fn( accumulator, value.text );
+	}, value.formats );
+}
 
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
@@ -202,7 +215,7 @@ export class RichText extends Component {
 			range,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			prepareEditableTree: this.props.prepareEditableTree,
+			prepareEditableTree: createPrepareEditableTree( this.props ),
 			__unstableIsEditableTree: true,
 		} );
 	}
@@ -213,7 +226,7 @@ export class RichText extends Component {
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			prepareEditableTree: this.props.prepareEditableTree,
+			prepareEditableTree: createPrepareEditableTree( this.props ),
 			__unstableDomOnly: domOnly,
 		} );
 	}
@@ -485,18 +498,6 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Calls all registered onChangeEditableValue handlers.
-	 *
-	 * @param {Array}  formats The formats of the latest rich-text value.
-	 * @param {string} text    The text of the latest rich-text value.
-	 */
-	onChangeEditableValue( { formats, text } ) {
-		get( this.props, [ 'onChangeEditableValue' ], [] ).forEach( ( eventHandler ) => {
-			eventHandler( formats, text );
-		} );
-	}
-
-	/**
 	 * Sync the value to global state. The node tree and selection will also be
 	 * updated if differences are found.
 	 *
@@ -509,8 +510,14 @@ export class RichText extends Component {
 		this.applyRecord( record );
 
 		const { start, end, activeFormats = [] } = record;
+		const changeHandlers = pickBy( this.props, ( v, key ) =>
+			key.startsWith( 'format_on_change_functions_' )
+		);
 
-		this.onChangeEditableValue( record );
+		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
+			changeHandler( record.formats, record.text );
+		} );
+
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
 		this.setState( { start, end, activeFormats } );
@@ -912,23 +919,13 @@ export class RichText extends Component {
 			this.savedContent = value;
 		}
 
-		// If any format props update, reapply value.
-		const shouldReapply = Object.keys( this.props ).some( ( name ) => {
-			if ( name.indexOf( 'format_' ) !== 0 ) {
-				return false;
-			}
+		const prefix = 'format_prepare_props_';
+		const predicate = ( v, key ) => key.startsWith( prefix );
+		const prepareProps = pickBy( this.props, predicate );
+		const prevPrepareProps = pickBy( prevProps, predicate );
 
-			// Allow primitives and arrays:
-			if ( ! isPlainObject( this.props[ name ] ) ) {
-				return this.props[ name ] !== prevProps[ name ];
-			}
-
-			return Object.keys( this.props[ name ] ).some( ( subName ) => {
-				return this.props[ name ][ subName ] !== prevProps[ name ][ subName ];
-			} );
-		} );
-
-		if ( shouldReapply ) {
+		// If any format prepare props update, reapply value.
+		if ( ! isShallowEqual( prepareProps, prevPrepareProps ) ) {
 			const record = this.formatToValue( value );
 
 			// Maintain the previous selection if the instance is currently
@@ -940,15 +937,6 @@ export class RichText extends Component {
 
 			this.applyRecord( record );
 		}
-	}
-
-	/**
-	 * Get props that are provided by formats to modify RichText.
-	 *
-	 * @return {Object} Props that start with 'format_'.
-	 */
-	getFormatProps() {
-		return pickBy( this.props, ( propValue, name ) => name.startsWith( 'format_' ) );
 	}
 
 	/**
@@ -988,7 +976,7 @@ export class RichText extends Component {
 		return unstableToDom( {
 			value,
 			multilineTag: this.multilineTag,
-			prepareEditableTree: this.props.prepareEditableTree,
+			prepareEditableTree: createPrepareEditableTree( this.props ),
 		} ).body.innerHTML;
 	}
 
@@ -1066,9 +1054,7 @@ export class RichText extends Component {
 		const record = this.getRecord();
 
 		return (
-			<div className={ classes }
-				onFocus={ this.setFocusedElement }
-			>
+			<div className={ classes } onFocus={ this.setFocusedElement }>
 				{ isSelected && this.multilineTag === 'li' && (
 					<ListEdit
 						onTagNameChange={ onTagNameChange }
