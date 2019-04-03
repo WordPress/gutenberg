@@ -329,7 +329,7 @@ class ImageEdit extends React.Component {
 		return (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
-				accessibilityLabel={ __( 'Image block' ) + '.' + alt }
+				accessibilityLabel={ __( 'Image block' ) + '. ' + alt }
 				accessibilityRole={ 'button' }
 				accessibilityHint={ __( 'Double tap to edit the image' ) }
 				onPress={ this.onImagePressed }

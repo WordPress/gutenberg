@@ -17,7 +17,7 @@ import styles from './styles.scss';
 function MediaPlaceholder( props ) {
 	return (
 		<TouchableWithoutFeedback
-			accessibilityLabel={ __( 'Image block. Empty ' ) }
+			accessibilityLabel={ __( 'Image block' ) + '. ' + __( 'Empty' ) }
 			accessibilityRole={ 'button' }
 			accessibilityHint={ __( 'Double tap to select an image' ) }
 			onPress={ props.onMediaOptionsPressed }
