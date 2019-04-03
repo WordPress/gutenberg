@@ -17,10 +17,33 @@ public interface GutenbergBridgeJS2Parent {
         void onMediaFileUploadFailed(int mediaId);
     }
 
+    // Ref: https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
+    enum LogLevel {
+        TRACE(0),
+        INFO(1),
+        WARN(2),
+        ERROR(3);
+
+        private final int id;
+
+        LogLevel(int id) {
+            this.id = id;
+        }
+
+        public static LogLevel valueOf(int id) {
+            for (LogLevel num : values()) {
+                if (num.id == id) {
+                    return num;
+                }
+            }
+            return null;
+        }
+    }
+
     void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback);
 
     void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback);
-    
+
     void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback);
 
     void mediaUploadSync(MediaUploadCallback mediaUploadCallback);
@@ -30,4 +53,6 @@ public interface GutenbergBridgeJS2Parent {
     void requestImageUploadCancelDialog(int mediaId);
 
     void requestImageUploadCancel(int mediaId);
+
+    void editorDidEmitLog(String message, LogLevel logLevel);
 }

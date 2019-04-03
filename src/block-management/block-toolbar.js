@@ -7,7 +7,7 @@
  * External dependencies
  */
 import React, { Component } from 'react';
-import { View, ScrollView, Keyboard } from 'react-native';
+import { View, ScrollView, Keyboard, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -30,11 +30,16 @@ type PropsType = {
 	hasUndo: boolean,
 	redo: void => void,
 	undo: void => void,
+	clearSelectedBlock: void => void,
 };
 
 export class BlockToolbar extends Component<PropsType> {
 	onKeyboardHide = () => {
-		Keyboard.dismiss();
+		this.props.clearSelectedBlock();
+		if ( Platform.OS === 'android' ) {
+			// Avoiding extra blur calls on iOS but still needed for android.
+			Keyboard.dismiss();
+		}
 	};
 
 	render() {
@@ -48,7 +53,7 @@ export class BlockToolbar extends Component<PropsType> {
 		} = this.props;
 
 		return (
-			<View style={ styles.container }>
+			<View style={ styles.container } >
 				<ScrollView
 					horizontal={ true }
 					showsHorizontalScrollIndicator={ false }
@@ -58,18 +63,19 @@ export class BlockToolbar extends Component<PropsType> {
 				>
 					<Toolbar>
 						<ToolbarButton
-							label={ __( 'Add block' ) }
+							title={ __( 'Add block' ) }
 							icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
 							onClick={ onInsertClick }
+							extraProps={ { hint: __( 'Double tap to add a block' ) } }
 						/>
 						<ToolbarButton
-							label={ __( 'Undo' ) }
+							title={ __( 'Undo' ) }
 							icon="undo"
 							isDisabled={ ! hasUndo }
 							onClick={ undo }
 						/>
 						<ToolbarButton
-							label={ __( 'Redo' ) }
+							title={ __( 'Redo' ) }
 							icon="redo"
 							isDisabled={ ! hasRedo }
 							onClick={ redo }
@@ -81,6 +87,7 @@ export class BlockToolbar extends Component<PropsType> {
 				{ showKeyboardHideButton &&
 				( <Toolbar passedStyle={ styles.keyboardHideContainer }>
 					<ToolbarButton
+						title={ __( 'Hide keyboard' ) }
 						icon="keyboard-hide"
 						onClick={ this.onKeyboardHide }
 					/>
@@ -98,5 +105,6 @@ export default compose( [
 	withDispatch( ( dispatch ) => ( {
 		redo: dispatch( 'core/editor' ).redo,
 		undo: dispatch( 'core/editor' ).undo,
+		clearSelectedBlock: dispatch( 'core/editor' ).clearSelectedBlock,
 	} ) ),
 ] )( BlockToolbar );
