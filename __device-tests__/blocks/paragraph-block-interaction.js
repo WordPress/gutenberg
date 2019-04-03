@@ -5,11 +5,13 @@
  * Internal dependencies
  */
 import BlockInteraction from './block-interaction';
+
 /**
  * External dependencies
  */
 import wd from 'wd';
-import { isAndroid } from '../helpers/utils';
+import { isAndroid, typeString } from '../helpers/utils';
+import _ from 'underscore';
 
 /**
  * WordPress dependencies
@@ -41,12 +43,26 @@ export default class ParagraphBlockInteraction extends BlockInteraction {
 	}
 
 	async setup() {
-		await this.setupElement( this.blockName, ParagraphBlockInteraction.blocks );
+		if ( ! _.isUndefined( this.accessibilityId ) ) {
+			await this.setupElement( this.blockName, ParagraphBlockInteraction.blocks );
+		}
+
 		await this.setupTextView();
 	}
 
 	async sendText( str: string ) {
-		return await this.typeString( this.textViewElement, str );
+		const paragraphs = str.split( '\n' );
+		if ( paragraphs.length === 1 ) {
+			return await typeString( this.textViewElement, str );
+		}
+		const textViewElement = this.textViewElement;
+		for ( const paragraph in paragraphs ) {
+			await typeString( textViewElement, paragraph );
+			await typeString( textViewElement, '\n' );
+			BlockInteraction.index += 1;
+			const newBlock = ParagraphBlockInteraction( this.driver );
+			await this.loadBlockAtPosition( BlockInteraction.index, this.blockName, newBlock );
+		}
 	}
 
 	async getText() {

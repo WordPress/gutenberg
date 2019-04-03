@@ -160,12 +160,15 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 			return null;
 		}
 
+		const { testID } = this.props;
+
 		return (
 			<InlineToolbar
 				clientId={ this.props.clientId }
 				onButtonPressed={ this.onInlineToolbarButtonPressed }
 				canMoveUp={ ! this.props.isFirstBlock }
 				canMoveDown={ ! this.props.isLastBlock }
+				testID={ testID }
 			/>
 		);
 	}
@@ -195,7 +198,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	render() {
-		const { isSelected, borderStyle, focusedBorderColor } = this.props;
+		const { isSelected, borderStyle, focusedBorderColor, testID } = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
@@ -211,7 +214,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View
 						accessibile={ true }
-						accessibilityLabel={ this.props.testID }
+						accessibilityLabel={ testID }
 						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
 						{ this.getBlockForType() }
 					</View>

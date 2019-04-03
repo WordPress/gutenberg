@@ -47,6 +47,16 @@ describe( 'Gutenberg Editor tests', () => {
 		await paragraphBlockInteraction.sendText( 'Hello Gutenberg!' );
 		await timer( 3000 );
 		expect( await paragraphBlockInteraction.getText() ).toBe( 'Hello Gutenberg!' );
+		await paragraphBlockInteraction.removeBlock();
+	} );
+
+	it( 'should be able to create a post with multiple paragraph blocks', async () => {
+		let paragraphBlockInteraction = new ParagraphBlockInteraction( driver );
+		paragraphBlockInteraction = await editorPage.addNewBlock( paragraphBlockInteraction );
+		await paragraphBlockInteraction.sendText( 'Hello Gutenberg!\nGoodBye' );
+		await timer( 3000 );
+		paragraphBlockInteraction = await editorPage.addNewBlock( paragraphBlockInteraction );
+		await paragraphBlockInteraction.sendText( 'Hello Gutenberg!' );
 	} );
 
 	afterAll( async () => {

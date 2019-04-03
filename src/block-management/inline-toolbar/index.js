@@ -27,6 +27,7 @@ type PropsType = {
 	canMoveUp: boolean,
 	canMoveDown: boolean,
 	onButtonPressed: ( button: number ) => void,
+	testID: string,
 };
 
 export default class InlineToolbar extends React.Component<PropsType> {
@@ -52,18 +53,18 @@ export default class InlineToolbar extends React.Component<PropsType> {
 	}
 
 	render() {
+		const { testID } = this.props;
 		return (
 			<View style={ styles.toolbar } >
 				<ToolbarButton
-					accessibilityLabel={ __( 'Move up' ) }
-					label={ __( 'Move up' ) }
+					title={ __( `Move ${ testID } up` ) }
 					isDisabled={ ! this.props.canMoveUp }
 					onClick={ this.onUpPressed }
 					icon="arrow-up-alt"
 				/>
 
 				<ToolbarButton
-					label={ __( 'Move down' ) }
+					title={ __( `Move ${ testID } down` ) }
 					isDisabled={ ! this.props.canMoveDown }
 					onClick={ this.onDownPressed }
 					icon="arrow-down-alt"
@@ -74,7 +75,7 @@ export default class InlineToolbar extends React.Component<PropsType> {
 				<InspectorControls.Slot />
 
 				<ToolbarButton
-					label={ __( 'Remove' ) }
+					title={ __( `Remove ${ testID }` ) }
 					onClick={ this.onDeletePressed }
 					icon="trash"
 				/>
