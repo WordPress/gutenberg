@@ -6,6 +6,7 @@
 - Add `wide` and `full` alignments to Categories block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
 - Add all alignment options to RSS block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
 - Add all alignment options to Search block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
+- Add image fill option and focal point picker to Media & Text block ([#14445](https://github.com/WordPress/gutenberg/pull/14445)).
 
 ### Bug Fixes
 
