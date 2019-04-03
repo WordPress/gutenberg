@@ -114,7 +114,7 @@ If locking is not set in an `InnerBlocks` area: the locking of the parent `Inner
 If the block is a top level block: the locking of the Custom Post Type is used.
 
 ### `placeholderType`
-* **Type:** `Boolean`
+* **Type:** `String`
 * **Default:** - uses the `DefaultBlockAppender` (`packages/block-editor/src/components/default-block-appender/index.js`) to automatically insert a `paragraph` Block. 
 * **Options:** 
     - `block-appender` - forces the use of the Block List Appender (`packages/block-editor/src/components/block-list-appender/index.js`) to display a "Add Block" message with an icon which fills the Block preview. No default Block is inserted.
