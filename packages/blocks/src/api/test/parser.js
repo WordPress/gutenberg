@@ -191,7 +191,7 @@ describe( 'block parser', () => {
 			expect( isValidByType( null, [ 'string' ] ) ).toBe( false );
 		} );
 
-		it( 'returns false if value is one of types array', () => {
+		it( 'returns true if value is one of types array', () => {
 			expect( isValidByType( null, [ 'string', 'null' ] ) ).toBe( true );
 		} );
 
