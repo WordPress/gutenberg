@@ -23,18 +23,18 @@ const isEverySelectedBlockAllowed = ( selected, allowed ) => difference( selecte
  * If there are multiple blocks selected the item will be rendered if every block
  * is of one allowed type (not necessarily the same).
  *
- * @param {string[]} selectedBlockNames Array containing the names of the blocks selected
- * @param {string[]} allowedBlockNames Array containing the names of the blocks allowed
+ * @param {string[]} selectedBlocks Array containing the names of the blocks selected
+ * @param {string[]} allowedBlocks Array containing the names of the blocks allowed
  * @return {boolean} Whether the item will be rendered or not.
  */
-const shouldRenderItem = ( selectedBlockNames, allowedBlockNames ) => ! Array.isArray( allowedBlockNames ) ||
-	isEverySelectedBlockAllowed( selectedBlockNames, allowedBlockNames );
+const shouldRenderItem = ( selectedBlocks, allowedBlocks ) => ! Array.isArray( allowedBlocks ) ||
+	isEverySelectedBlockAllowed( selectedBlocks, allowedBlocks );
 
 /**
  * Renders a new item in the block settings menu.
  *
  * @param {Object} props Component props.
- * @param {Array} [props.allowedBlockNames] An array containing a list of block names for which the item should be shown. If not present, it'll be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the whitelist.
+ * @param {Array} [props.allowedBlocks] An array containing a list of block names for which the item should be shown. If not present, it'll be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the whitelist.
  * @param {string|Element} [props.icon] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
  * @param {string} props.label The menu item text.
  * @param {Function} props.onClick Callback function to be executed when the user click the menu item.
@@ -53,7 +53,7 @@ const shouldRenderItem = ( selectedBlockNames, allowedBlockNames ) => ! Array.is
  * 	return wp.element.createElement(
  * 		PluginBlockSettingsMenuItem,
  * 		{
- * 			allowedBlockNames: [ 'core/paragraph' ],
+ * 			allowedBlocks: [ 'core/paragraph' ],
  * 			icon: 'dashicon-name',
  * 			label: __( 'Menu item text' ),
  * 			onClick: doOnClick,
@@ -74,7 +74,7 @@ const shouldRenderItem = ( selectedBlockNames, allowedBlockNames ) => ! Array.is
  *
  * const MyPluginBlockSettingsMenuItem = () => (
  *     <PluginBlockSettingsMenuItem
- * 		allowedBlockNames=[ 'core/paragraph' ]
+ * 		allowedBlocks=[ 'core/paragraph' ]
  * 		icon='dashicon-name'
  * 		label=__( 'Menu item text' )
  * 		onClick={ doOnClick } />
