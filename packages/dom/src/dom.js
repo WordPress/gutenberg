@@ -113,7 +113,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 	}
 
 	const padding = parseInt( computedStyle[
-		`padding${ isReverse ? 'Bottom' : 'Top' }`
+		`padding${ isReverse ? 'Top' : 'Bottom' }`
 	], 10 ) || 0;
 
 	// Calculate a buffer that is half the line height. In some browsers, the
