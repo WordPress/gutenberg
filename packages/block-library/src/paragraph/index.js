@@ -212,6 +212,9 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
+			backgroundColor: attributes.content.length === 0 ? attributesToMerge.backgroundColor : attributes.backgroundColor,
+			textColor: attributes.content.length === 0 ? attributesToMerge.textColor : attributes.textColor,
+			fontSize: attributes.content.length === 0 ? attributesToMerge.fontSize : attributes.fontSize,
 			content: ( attributes.content || '' ) + ( attributesToMerge.content || '' ),
 		};
 	},

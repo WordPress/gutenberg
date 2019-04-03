@@ -117,7 +117,6 @@ export default {
 					...blockA,
 					attributes: {
 						...blockA.attributes,
-						...blockB.attributes,
 						...updatedAttributes,
 					},
 				},
