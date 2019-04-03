@@ -17,14 +17,12 @@ import {
 	replaceBlocks,
 	selectBlock,
 	setTemplateValidity,
-	insertDefaultBlock,
 	resetBlocks,
 } from './actions';
 import {
 	getBlock,
 	getBlocks,
 	getSelectedBlockCount,
-	getBlockCount,
 	getTemplateLock,
 	getTemplate,
 	isValidTemplate,
@@ -57,23 +55,6 @@ export function validateBlocksToTemplate( action, store ) {
 	// Update if validity has changed.
 	if ( isBlocksValidToTemplate !== isValidTemplate( state ) ) {
 		return setTemplateValidity( isBlocksValidToTemplate );
-	}
-}
-
-/**
- * Effect handler which will return a default block insertion action if there
- * are no other blocks at the root of the editor. This is expected to be used
- * in actions which may result in no blocks remaining in the editor (removal,
- * replacement, etc).
- *
- * @param {Object} action Action which had initiated the effect handler.
- * @param {Object} store  Store instance.
- *
- * @return {?Object} Default block insert action, if no other blocks exist.
- */
-export function ensureDefaultBlock( action, store ) {
-	if ( ! getBlockCount( store.getState() ) ) {
-		return insertDefaultBlock();
 	}
 }
 
@@ -126,9 +107,6 @@ export default {
 	},
 	RESET_BLOCKS: [
 		validateBlocksToTemplate,
-	],
-	REPLACE_BLOCKS: [
-		ensureDefaultBlock,
 	],
 	MULTI_SELECT: ( action, { getState } ) => {
 		const blockCount = getSelectedBlockCount( getState() );
