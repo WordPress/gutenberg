@@ -48,7 +48,12 @@ const isLocalEnvironment = () => {
 // Initialises the driver and desired capabilities for appium
 const setupDriver = async () => {
 	if ( isLocalEnvironment() ) {
-		appiumProcess = await AppiumLocal.start( localAppiumPort );
+		try {
+			appiumProcess = await AppiumLocal.start( localAppiumPort );
+		} catch ( err ) {
+			// Ignore error here, Appium is probably already running (Appium desktop has its own server for instance)
+			console.log( 'Could not start Appium server', err.toString() );
+		}
 	}
 
 	const serverConfig = isLocalEnvironment() ? serverConfigs.local : serverConfigs.sauce;
