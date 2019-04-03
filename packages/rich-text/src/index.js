@@ -33,3 +33,5 @@ export { unregisterFormatType } from './unregister-format-type';
 export { indentListItems } from './indent-list-items';
 export { outdentListItems } from './outdent-list-items';
 export { changeListType } from './change-list-type';
+export { updateFormats as __unstableUpdateFormats } from './update-formats';
+export { getActiveFormats as __unstableGetActiveFormats } from './get-active-formats';
