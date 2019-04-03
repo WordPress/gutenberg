@@ -462,9 +462,9 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Components",
+		"title": "Component Reference",
 		"slug": "components",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/README.md",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/components/README.md",
 		"parent": null
 	},
 	{

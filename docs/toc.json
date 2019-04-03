@@ -92,7 +92,7 @@
 		{"docs/block-api/block-templates.md": []},
 		{"docs/block-api/block-annotations.md": []}
 	]},
-	{"packages/components/README.md": "{{components}}"},
+	{"docs/components/README.md": "{{components}}"},
 	{"docs/data/README.md": "{{data}}"},
 	{"docs/filters/README.md": [
 		{"docs/filters/block-filters.md": []},
