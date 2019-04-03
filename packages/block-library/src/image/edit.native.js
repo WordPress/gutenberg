@@ -8,6 +8,7 @@ import {
 	requestMediaPickFromMediaLibrary,
 	requestMediaPickFromDeviceLibrary,
 	requestMediaPickFromDeviceCamera,
+	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
@@ -77,10 +78,18 @@ class ImageEdit extends React.Component {
 	}
 
 	componentDidMount() {
-		const { attributes } = this.props;
+		const { attributes, setAttributes } = this.props;
 
 		if ( attributes.id && ! isURL( attributes.url ) ) {
 			this.addMediaUploadListener();
+			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
+				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
+					if ( mediaUri ) {
+						this.addMediaUploadListener( );
+						setAttributes( { url: mediaUri, id: mediaId } );
+					}
+				} );
+			}
 			mediaUploadSync();
 		}
 	}
