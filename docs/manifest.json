@@ -504,7 +504,7 @@
 		"parent": "filters"
 	},
 	{
-		"title": "Packages",
+		"title": "Package Reference",
 		"slug": "packages",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/packages/README.md",
 		"parent": null

@@ -1,4 +1,4 @@
-# Packages
+# Package Reference
 
 WordPress exposes a list of JavaScript packages and tools for WordPress development.
 
@@ -37,4 +37,3 @@ Once installed, you can access the component in your code using:
 ```js
 import { PlainText }  from '@wordpress/block-editor';
 ```
-
