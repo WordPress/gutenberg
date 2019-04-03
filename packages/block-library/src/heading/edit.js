@@ -23,6 +23,8 @@ import {
 	AlignmentToolbar,
 } from '@wordpress/block-editor';
 
+const DEFAULT_LEVEL_CHOICES = [ 1, 2, 3, 4, 5, 6 ];
+
 function HeadingEdit( {
 	attributes,
 	setAttributes,
@@ -34,13 +36,13 @@ function HeadingEdit( {
 } ) {
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
-	const blockControlsLevelsRange = ( levelChoices.length <= 3 ) ?
+	const BlockControlsLevelsRange = ( levelChoices.length <= 3 ) ?
 		levelChoices :
-		levelChoices.slice( 1, 4 ); //
+		levelChoices.slice( 1, 4 );
 	return (
 		<Fragment>
 			<BlockControls>
-				<HeadingToolbar levelsRange={ blockControlsLevelsRange } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+				<HeadingToolbar levelsRange={ BlockControlsLevelsRange } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading Settings' ) }>
@@ -55,7 +57,6 @@ function HeadingEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<h1>HDHEDHJHEJHF</h1>
 			<RichText
 				identifier="content"
 				wrapperClassName="wp-block-heading"
@@ -88,7 +89,7 @@ export default withSelect( ( select ) => {
 	const levelChoices = get(
 		select( 'core/blocks' ).getBlockType( 'core/heading' ),
 		[ 'attributes', 'level', 'enum' ],
-		[]
+		DEFAULT_LEVEL_CHOICES
 	);
 
 	return {
