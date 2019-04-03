@@ -9,8 +9,8 @@
 import childProcess from 'child_process';
 
 // Spawns an appium process
-export const start = ( localAppiumPort ) => new Promise( ( resolve, reject ) => {
-	appium = childProcess.spawn( 'appium', [
+export const start = ( localAppiumPort: number ) => new Promise<child_process$ChildProcess>( ( resolve, reject ) => {
+	const appium = childProcess.spawn( 'appium', [
 		'--port', localAppiumPort.toString(),
 		'--log', './appium-out.log',
 		'--log-no-colors'
@@ -35,8 +35,8 @@ export const start = ( localAppiumPort ) => new Promise( ( resolve, reject ) => 
 	} );
 } );
 
-export const stop = async ( appium ) => {
-	if ( appium === undefined ) {
+export const stop = async ( appium: ?child_process$ChildProcess ) => {
+	if ( ! appium ) {
 		return;
 	}
 	await appium.kill( 'SIGINT' );
