@@ -1266,9 +1266,46 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditedPostAutosaveable', () => {
+		it( 'should return false if existing autosaves have not yet been fetched', () => {
+			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
+				getCurrentUser() {},
+				hasFetchedAutosaves() {
+					return false;
+				},
+				getAutosave() {
+					return {
+						title: 'sassel',
+					};
+				},
+			} ) );
+
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {
+					requesting: true,
+				},
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+
 		it( 'should return false if the post is not saveable', () => {
 			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
 				getCurrentUser() {},
+				hasFetchedAutosaves() {
+					return true;
+				},
 				getAutosave() {
 					return {
 						title: 'sassel',
@@ -1300,6 +1337,9 @@ describe( 'selectors', () => {
 		it( 'should return true if there is no autosave', () => {
 			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
 				getCurrentUser() {},
+				hasFetchedAutosaves() {
+					return true;
+				},
 				getAutosave() {},
 			} ) );
 
@@ -1325,6 +1365,9 @@ describe( 'selectors', () => {
 		it( 'should return false if none of title, excerpt, or content have changed', () => {
 			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
 				getCurrentUser() {},
+				hasFetchedAutosaves() {
+					return true;
+				},
 				getAutosave() {
 					return {
 						title: 'foo',
@@ -1357,6 +1400,9 @@ describe( 'selectors', () => {
 		it( 'should return true if content has changes', () => {
 			const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
 				getCurrentUser() {},
+				hasFetchedAutosaves() {
+					return true;
+				},
 				getAutosave() {
 					return {
 						title: 'foo',
@@ -1390,6 +1436,9 @@ describe( 'selectors', () => {
 				for ( const constantField of without( [ 'title', 'excerpt' ], variantField ) ) {
 					const isEditedPostAutosaveable = isEditedPostAutosaveableRegistrySelector( () => ( {
 						getCurrentUser() {},
+						hasFetchedAutosaves() {
+							return true;
+						},
 						getAutosave() {
 							return {
 								[ constantField ]: 'foo',
