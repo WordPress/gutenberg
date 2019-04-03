@@ -2,7 +2,6 @@
  * External dependencies
  */
 import {
-	filter,
 	flatMap,
 	map,
 	mapValues,
@@ -98,32 +97,11 @@ const getTransformResult = async ( blockContent, transformName ) => {
 // Skipping all the tests when plugins are enabled
 // makes sure the tests are not executed, and no unused snapshots errors are thrown.
 const maybeDescribe = process.env.POPULAR_PLUGINS ?
-	describe :
-	describe.skip;
+	describe.skip :
+	describe;
 
 maybeDescribe( 'Block transforms', () => {
-	// Todo: Remove the filter as soon as all fixtures are corrected,
-	// and its direct usage on the editor does not trigger errors.
-	// Currently some fixtures trigger errors (mainly media related)
-	// because when loaded in the editor,
-	// some requests are triggered that have a 404 response.
-	const fileBasenames = filter(
-		getAvailableBlockFixturesBasenames(),
-		( basename ) => (
-			! some(
-				[
-					'core__image',
-					'core__gallery',
-					'core__video',
-					'core__file',
-					'core__media-text',
-					'core__audio',
-					'core__cover',
-				],
-				( exclude ) => basename.startsWith( exclude )
-			)
-		)
-	);
+	const fileBasenames = getAvailableBlockFixturesBasenames();
 
 	const transformStructure = {};
 	beforeAll( async () => {
