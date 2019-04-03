@@ -348,7 +348,7 @@ export function* savePost( options = {} ) {
 	let method = 'PUT';
 	if ( isAutosave ) {
 		const currentUser = yield resolveSelect( 'core', 'getCurrentUser' );
-		const currentUserId = currentUser ? currentUser.id : null;
+		const currentUserId = currentUser ? currentUser.id : undefined;
 		const autosavePost = yield resolveSelect( 'core', 'getAutosave', post.type, post.id, currentUserId );
 		const mappedAutosavePost = mapValues( pick( autosavePost, AUTOSAVE_PROPERTIES ), getPostRawValue );
 
