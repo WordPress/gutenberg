@@ -7,8 +7,7 @@
             "align": "wide",
             "mediaAlt": "My alt text",
             "mediaPosition": "left",
-            "mediaId": 11,
-            "mediaUrl": "http://localhost:8888/wp-content/uploads/2019/03/Dzts-v2X0AMxju_-1024x1024.jpg",
+            "mediaUrl": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
             "mediaType": "image",
             "mediaWidth": 50,
             "isStackedOnMobile": false,
@@ -29,6 +28,6 @@
                 "originalContent": "<p class=\"has-large-font-size\">My content</p>"
             }
         ],
-        "originalContent": "<div class=\"wp-block-media-text alignwide is-vertically-aligned-bottom\">\n\t<figure class=\"wp-block-media-text__media\"><img\n\t\t\tsrc=\"http://localhost:8888/wp-content/uploads/2019/03/Dzts-v2X0AMxju_-1024x1024.jpg\" alt=\"My alt text\"\n\t\t\tclass=\"wp-image-11\" /></figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>"
+        "originalContent": "<div class=\"wp-block-media-text alignwide is-vertically-aligned-bottom\">\n\t<figure class=\"wp-block-media-text__media\"><img\n\t\t\tsrc=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" alt=\"My alt text\"\n\t\t\t/></figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>"
     }
 ]

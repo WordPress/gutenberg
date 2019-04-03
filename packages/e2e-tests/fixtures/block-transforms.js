@@ -45,6 +45,12 @@ export const EXPECTED_TRANSFORMS = {
 			'Video',
 		],
 	},
+	'core__media-text__vertical-align-bottom': {
+		originalBlock: 'Media & Text',
+		availableTransforms: [
+			'Image',
+		],
+	},
 	'core__media-text__video': {
 		originalBlock: 'Media & Text',
 		availableTransforms: [
