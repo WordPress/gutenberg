@@ -3,7 +3,7 @@
  */
 import { withSelect } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
-import { count as wordCount } from '@wordpress/wordcount';
+import { count as charCount } from '@wordpress/wordcount';
 
 function CharCount( { content } ) {
 	/*
@@ -13,7 +13,7 @@ function CharCount( { content } ) {
 	const charCountType = _x( 'characters_excluding_spaces', 'Word count type. Do not translate!' );
 
 	return (
-		<span className="word-count">{ wordCount( content, charCountType ) }</span>
+		<span className="char-count">{ charCount( content, charCountType ) }</span>
 	);
 }
 
