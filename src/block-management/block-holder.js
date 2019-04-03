@@ -200,7 +200,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
 		return (
-			// Needs to be false to access children
+			// accessible prop needs to be false to access children
 			// https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
 			<TouchableWithoutFeedback
 				accessible={ false }
