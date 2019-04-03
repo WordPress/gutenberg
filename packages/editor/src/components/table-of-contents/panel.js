@@ -9,6 +9,7 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import WordCount from '../word-count';
+import CharCount from '../char-count';
 import DocumentOutline from '../document-outline';
 
 function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, hasOutlineItemsDisabled, onRequestClose } ) {
@@ -23,6 +24,10 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, h
 				<div className="table-of-contents__count">
 					{ __( 'Words' ) }
 					<WordCount />
+				</div>
+				<div className="table-of-contents__count">
+					{ __( 'Characters' ) }
+					<CharCount />
 				</div>
 				<div className="table-of-contents__count">
 					{ __( 'Headings' ) }
