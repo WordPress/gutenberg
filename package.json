@@ -124,7 +124,7 @@
     "node-libs-react-native": "^1.0.2",
     "node-sass": "^4.8.3",
     "react": "16.8.3",
-    "react-native": "0.59.0",
+    "react-native": "0.59.3",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.7",
     "react-native-modal": "^6.5.0",
