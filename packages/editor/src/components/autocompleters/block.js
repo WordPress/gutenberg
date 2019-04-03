@@ -54,7 +54,7 @@ export function createBlockCompleter( {
 } = {} ) {
 	return {
 		name: 'blocks',
-		className: 'block-editor-autocompleters__block',
+		className: 'editor-autocompleters__block',
 		triggerPrefix: '/',
 		options() {
 			const selectedBlockName = getSelectedBlockName();
