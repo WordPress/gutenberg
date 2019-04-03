@@ -310,9 +310,10 @@ export class RichText extends Component {
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
 		if ( files ) {
+			const uploadId = Number.MAX_SAFE_INTEGER;
 			let html = '';
 			files.forEach( ( file ) => {
-				html += `<img src="${ file }">`;
+				html += `<img src="${ file }" class="wp-image-${ uploadId }">`;
 			} );
 			const content = pasteHandler( {
 				HTML: html,
