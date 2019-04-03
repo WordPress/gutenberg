@@ -89,13 +89,6 @@ jobs:
             git submodule update --recursive
       - yarn-install
       - run:
-          name: Accept Licenses
-          command: |
-            yes | sdkmanager --licenses > /dev/null
-            sleep 10
-            sdkmanager --update
-          background: true
-      - run:
           name: Set Environment Variables
           command: |
             echo 'export TEST_RN_PLATFORM=android' >> $BASH_ENV
