@@ -45,6 +45,11 @@ commands:
         command:  |
           set +e
           yarn react-native run-ios --configuration Release
+  checkout-gutenberg:
+    steps:
+      - run:
+          name: Checkout Gutenberg
+          command: git submodule update --init --recursive
 
 jobs:
   checks:
@@ -62,11 +67,7 @@ jobs:
       - image: circleci/node:8
     steps:
       - checkout
-      - run:
-          name: Checkout Gutenberg
-          command: |
-            git submodule init
-            git submodule update --recursive
+      - checkout-gutenberg
       - yarn-install
       - run:
           name: Set Environment Variables
@@ -84,9 +85,7 @@ jobs:
       - checkout
       - run:
           name: Checkout Gutenberg
-          command: |
-            git submodule init
-            git submodule update --recursive
+          command: git submodule update --init --recursive
       - yarn-install
       - run:
           name: Accept Licenses
@@ -113,11 +112,7 @@ jobs:
       xcode: "10.0"
     steps:
     - checkout
-    - run:
-        name: Checkout Gutenberg
-        command: |
-          git submodule init
-          git submodule update --recursive
+    - checkout-gutenberg
     - yarn-install
     - run:
         name: Set Environment Variables
@@ -148,8 +143,7 @@ jobs:
           cp ./ios/main.jsbundle ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle
           cd ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/
           zip -r ./Gutenberg.app.zip ./gutenberg.app
-          mv ./Gutenberg.app.zip ../../../../../../Gutenberg.app.zip
-          cd ../../../../../../
+          mv ./Gutenberg.app.zip "$CIRCLE_WORKING_DIRECTORY/Gutenberg.app.zip"
     - run:
         name: Upload .app to sauce labs
         command: |
