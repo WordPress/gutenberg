@@ -140,8 +140,8 @@ jobs:
     - run:
         name: Zip up .app file
         command: |
-          cp ./ios/main.jsbundle ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle
-          cd ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/
+          cp ./ios/main.jsbundle ./ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle
+          cd ./ios/build/gutenberg/Build/Products/Release-iphonesimulator/
           zip -r ./Gutenberg.app.zip ./gutenberg.app
           mv ./Gutenberg.app.zip "$CIRCLE_WORKING_DIRECTORY/Gutenberg.app.zip"
     - run:
