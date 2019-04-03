@@ -34,13 +34,13 @@ function HeadingEdit( {
 } ) {
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
-	const BlockControlsLevelsRange = ( levelChoices.length <= 3 ) ?
+	const blockControlsLevelsRange = ( levelChoices.length <= 3 ) ?
 		levelChoices :
 		levelChoices.slice( 1, 4 ); //
 	return (
 		<Fragment>
 			<BlockControls>
-				<HeadingToolbar levelsRange={ BlockControlsLevelsRange } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+				<HeadingToolbar levelsRange={ blockControlsLevelsRange } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading Settings' ) }>
@@ -55,6 +55,7 @@ function HeadingEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			<h1>HDHEDHJHEJHF</h1>
 			<RichText
 				identifier="content"
 				wrapperClassName="wp-block-heading"
