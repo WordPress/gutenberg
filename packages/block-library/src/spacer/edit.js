@@ -58,7 +58,7 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 									height: parseInt( event.target.value, 10 ),
 								} );
 							} }
-							value={ height }
+							value={ isNaN( height ) ? '' : height }
 							min="20"
 							step="10"
 						/>
