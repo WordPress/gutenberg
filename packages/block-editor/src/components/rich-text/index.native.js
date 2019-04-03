@@ -309,17 +309,17 @@ export class RichText extends Component {
 
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
-		const file = files[ 0 ];
-		if ( file ) {
+		if ( files ) {
+			let html = '';
+			files.forEach( ( file ) => {
+				html += `<img src="${ file }">`;
+			} );
 			const content = pasteHandler( {
-				HTML: `<img src="${ file }">`,
+				HTML: html,
 				mode: 'BLOCKS',
 				tagName: this.props.tagName,
 			} );
 			const shouldReplace = this.props.onReplace && this.isEmpty();
-
-			// Allows us to ask for this information when we get a report.
-			window.console.log( 'Received item:\n\n', file );
 
 			if ( shouldReplace ) {
 				this.props.onReplace( content );
