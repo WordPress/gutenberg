@@ -76,7 +76,7 @@ class ImageEdit extends React.Component {
 		this.onClearSettings = this.onClearSettings.bind( this );
 	}
 
-	componentDidMount() {			
+	componentDidMount() {
 		this.addMediaUploadListener();
 
 		const { attributes } = this.props;
