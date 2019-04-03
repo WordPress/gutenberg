@@ -168,7 +168,7 @@ export class PostPreviewButton extends Component {
 	}
 
 	render() {
-		const { previewLink, currentPostLink, isEnabled } = this.props;
+		const { previewLink, currentPostLink, isSaveable } = this.props;
 
 		// Link to the `?preview=true` URL if we have it, since this lets us see
 		// changes that were autosaved since the post was last published. Otherwise,
@@ -181,7 +181,7 @@ export class PostPreviewButton extends Component {
 				className="editor-post-preview"
 				href={ href }
 				target={ this.getWindowTarget() }
-				disabled={ ! isEnabled }
+				disabled={ ! isSaveable }
 				onClick={ this.openPreviewWindow }
 			>
 				{ _x( 'Preview', 'imperative verb' ) }
@@ -211,19 +211,16 @@ export default compose( [
 		} = select( 'core/editor' );
 		const {
 			getPostType,
-			hasFetchedAutosaves,
 		} = select( 'core' );
 
 		const previewLink = getEditedPostPreviewLink();
-		const postTypeName = getEditedPostAttribute( 'type' );
-		const postType = getPostType( postTypeName );
-		const postId = getCurrentPostId();
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
 			postId: getCurrentPostId(),
 			currentPostLink: getCurrentPostAttribute( 'link' ),
 			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : previewLink,
-			isEnabled: isEditedPostSaveable() && hasFetchedAutosaves( postTypeName, postId ),
+			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
 			isDraft: [ 'draft', 'auto-draft' ].indexOf( getEditedPostAttribute( 'status' ) ) !== -1,
