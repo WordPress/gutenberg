@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-
-import { writeFileSync } from 'fs';
+import { join } from 'path';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 
 /**
  * WordPress dependencies
@@ -13,19 +13,29 @@ import {
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Performance', async () => {
-	it.skip( '1000 paragraphs', async () => {
-		await createNewPost();
-		await page.evaluate( () => {
-			const { createBlock } = window.wp.blocks;
-			const { dispatch } = window.wp.data;
+function readFile( filePath ) {
+	return existsSync( filePath ) ? readFileSync( filePath, 'utf8' ).trim() : '';
+}
 
-			dispatch( 'core/editor' ).resetBlocks( Array( 1000 ).fill(
-				createBlock( 'core/paragraph', {
-					content: 'x'.repeat( 200 ),
-				} )
-			) );
-		} );
+describe( 'Performance', async () => {
+	it( '1000 paragraphs', async () => {
+		const html = readFile( join( __dirname, '../assets/neuralink.html' ) );
+
+		await createNewPost();
+		await page.evaluate( ( _html ) => {
+			const { parse } = window.wp.blocks;
+			const { dispatch } = window.wp.data;
+			const blocks = parse( _html );
+
+			blocks.forEach( ( block ) => {
+				if ( block.name === 'core/image' ) {
+					delete block.attributes.id;
+					delete block.attributes.url;
+				}
+			} );
+
+			dispatch( 'core/editor' ).resetBlocks( blocks );
+		}, html );
 		await saveDraft();
 
 		const results = {
@@ -34,7 +44,7 @@ describe( 'Performance', async () => {
 			type: [],
 		};
 
-		let i = 10;
+		let i = 1;
 		let startTime;
 
 		await page.on( 'load', () => results.load.push( new Date() - startTime ) );
