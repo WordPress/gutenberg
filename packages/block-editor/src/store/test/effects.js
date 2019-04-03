@@ -97,14 +97,19 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken', -1 ) );
-			expect( dispatch ).toHaveBeenCalledWith( {
-				...replaceBlocks( [ 'chicken', 'ribs' ], [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: { content: 'chicken ribs' },
-				} ] ),
-				time: expect.any( Number ),
-			} );
+			const lastCall = dispatch.mock.calls[ 1 ];
+			expect( lastCall ).toHaveLength( 1 );
+			const [ lastCallArgument ] = lastCall;
+			const expectedGenerator = replaceBlocks( [ 'chicken', 'ribs' ], [ {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken ribs' },
+			} ] );
+			expect(
+				Array.from( lastCallArgument )
+			).toEqual(
+				Array.from( expectedGenerator )
+			);
 		} );
 
 		it( 'should not merge the blocks have different types without transformation', () => {
@@ -195,14 +200,19 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			// expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
-			expect( dispatch ).toHaveBeenCalledWith( {
-				...replaceBlocks( [ 'chicken', 'ribs' ], [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: { content: 'chicken ribs' },
-				} ] ),
-				time: expect.any( Number ),
-			} );
+			const expectedGenerator = replaceBlocks( [ 'chicken', 'ribs' ], [ {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken ribs' },
+			} ] );
+			const lastCall = dispatch.mock.calls[ 1 ];
+			expect( lastCall ).toHaveLength( 1 );
+			const [ lastCallArgument ] = lastCall;
+			expect(
+				Array.from( lastCallArgument )
+			).toEqual(
+				Array.from( expectedGenerator )
+			);
 		} );
 	} );
 
