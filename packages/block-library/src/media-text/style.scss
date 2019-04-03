@@ -1,8 +1,6 @@
-.wp-block-media-text {
-	display: grid;
-}
 
 .wp-block-media-text {
+	display: grid;
 	grid-template-rows: auto;
 	align-items: center;
 	grid-template-areas: "media-text-media media-text-content";
@@ -11,6 +9,18 @@
 		grid-template-areas: "media-text-content media-text-media";
 		grid-template-columns: auto 50%;
 	}
+}
+
+.wp-block-media-text.is-vertically-aligned-top {
+	align-items: start;
+}
+
+.wp-block-media-text.is-vertically-aligned-center {
+	align-items: center;
+}
+
+.wp-block-media-text.is-vertically-aligned-bottom {
+	align-items: end;
 }
 
 .wp-block-media-text .wp-block-media-text__media {

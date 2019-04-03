@@ -4,9 +4,12 @@
 import { removep, autop } from '@wordpress/autop';
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Dashicon, SVG, Path } from '@wordpress/components';
-import { PlainText } from '@wordpress/block-editor';
-import { withInstanceId } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import edit from './edit';
+import icon from './icon';
 
 export const name = 'core/shortcode';
 
@@ -15,7 +18,7 @@ export const settings = {
 
 	description: __( 'Insert additional custom elements with a WordPress shortcode.' ),
 
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M8.5,21.4l1.9,0.5l5.2-19.3l-1.9-0.5L8.5,21.4z M3,19h4v-2H5V7h2V5H3V19z M17,5v2h2v10h-2v2h4V5H17z" /></SVG>,
+	icon,
 
 	category: 'widgets',
 
@@ -50,27 +53,7 @@ export const settings = {
 		html: false,
 	},
 
-	edit: withInstanceId(
-		( { attributes, setAttributes, instanceId } ) => {
-			const inputId = `blocks-shortcode-input-${ instanceId }`;
-
-			return (
-				<div className="wp-block-shortcode">
-					<label htmlFor={ inputId }>
-						<Dashicon icon="shortcode" />
-						{ __( 'Shortcode' ) }
-					</label>
-					<PlainText
-						className="input-control"
-						id={ inputId }
-						value={ attributes.text }
-						placeholder={ __( 'Write shortcode here…' ) }
-						onChange={ ( text ) => setAttributes( { text } ) }
-					/>
-				</div>
-			);
-		}
-	),
+	edit,
 
 	save( { attributes } ) {
 		return <RawHTML>{ attributes.text }</RawHTML>;

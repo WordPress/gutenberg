@@ -10,6 +10,7 @@ import { get } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
 import {
 	BlockControls,
+	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	InspectorControls,
 	PanelColorSettings,
@@ -126,6 +127,7 @@ class MediaTextEdit extends Component {
 			mediaPosition,
 			mediaType,
 			mediaWidth,
+			verticalAlignment,
 		} = attributes;
 		const temporaryMediaWidth = this.state.mediaWidth;
 		const classNames = classnames( className, {
@@ -133,6 +135,7 @@ class MediaTextEdit extends Component {
 			'is-selected': isSelected,
 			[ backgroundColor.class ]: backgroundColor.class,
 			'is-stacked-on-mobile': isStackedOnMobile,
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 		const style = {
@@ -157,6 +160,9 @@ class MediaTextEdit extends Component {
 		} ];
 		const onMediaAltChange = ( newMediaAlt ) => {
 			setAttributes( { mediaAlt: newMediaAlt } );
+		};
+		const onVerticalAlignmentChange = ( alignment ) => {
+			setAttributes( { verticalAlignment: alignment } );
 		};
 		const mediaTextGeneralSettings = (
 			<PanelBody title={ __( 'Media & Text Settings' ) }>
@@ -195,6 +201,10 @@ class MediaTextEdit extends Component {
 				<BlockControls>
 					<Toolbar
 						controls={ toolbarControls }
+					/>
+					<BlockVerticalAlignmentToolbar
+						onChange={ onVerticalAlignmentChange }
+						value={ verticalAlignment }
 					/>
 				</BlockControls>
 				<div className={ classNames } style={ style } >

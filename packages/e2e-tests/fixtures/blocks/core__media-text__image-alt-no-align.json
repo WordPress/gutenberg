@@ -7,8 +7,7 @@
             "align": "none",
             "mediaAlt": "my alt",
             "mediaPosition": "left",
-            "mediaId": 17985,
-            "mediaUrl": "http://localhost/wp-content/uploads/2018/09/1600px-Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg",
+            "mediaUrl": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
             "mediaType": "image",
             "mediaWidth": 50,
             "isStackedOnMobile": false
@@ -28,6 +27,6 @@
                 "originalContent": "<p class=\"has-large-font-size\">Content</p>"
             }
         ],
-        "originalContent": "<div class=\"wp-block-media-text\">\n\t<figure class=\"wp-block-media-text__media\">\n\t\t<img src=\"http://localhost/wp-content/uploads/2018/09/1600px-Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg\" alt=\"my alt\" class=\"wp-image-17985\" />\n\t</figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>"
+        "originalContent": "<div class=\"wp-block-media-text\">\n\t<figure class=\"wp-block-media-text__media\">\n\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" alt=\"my alt\"/>\n\t</figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>"
     }
 ]
