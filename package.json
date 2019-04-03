@@ -97,6 +97,7 @@
     "classnames": "^2.2.5",
     "dom-react": "^2.2.1",
     "domutils": "^1.7.0",
+    "fast-average-color": "^4.3.0",
     "hpq": "^1.2.0",
     "jed": "^1.1.1",
     "js-beautify": "^1.7.5",
