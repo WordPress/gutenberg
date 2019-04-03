@@ -137,8 +137,8 @@ export function isValidByType( value, type ) {
  *
  * @link https://json-schema.org/latest/json-schema-validation.html#rfc.section.6.1.2
  *
- * @param {*}              value   Value to test.
- * @param {?Array<string>} enumSet Block attribute schema enum.
+ * @param {*}      value   Value to test.
+ * @param {?Array} enumSet Block attribute schema enum.
  *
  * @return {boolean} Whether value is valid.
  */
