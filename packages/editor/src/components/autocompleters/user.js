@@ -10,7 +10,7 @@ import apiFetch from '@wordpress/api-fetch';
 */
 export default {
 	name: 'users',
-	className: 'editor-autocompleters__user',
+	className: 'block-editor-autocompleters__user',
 	triggerPrefix: '@',
 	options( search ) {
 		let payload = '';
@@ -25,9 +25,9 @@ export default {
 	},
 	getOptionLabel( user ) {
 		return [
-			<img key="avatar" className="editor-autocompleters__user-avatar" alt="" src={ user.avatar_urls[ 24 ] } />,
-			<span key="name" className="editor-autocompleters__user-name">{ user.name }</span>,
-			<span key="slug" className="editor-autocompleters__user-slug">{ user.slug }</span>,
+			<img key="avatar" className="block-editor-autocompleters__user-avatar" alt="" src={ user.avatar_urls[ 24 ] } />,
+			<span key="name" className="block-editor-autocompleters__user-name">{ user.name }</span>,
+			<span key="slug" className="block-editor-autocompleters__user-slug">{ user.slug }</span>,
 		];
 	},
 	getOptionCompletion( user ) {
