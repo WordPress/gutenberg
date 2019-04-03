@@ -10,6 +10,7 @@ import { get } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
 import {
 	BlockControls,
+	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	InspectorControls,
 	PanelColorSettings,
@@ -21,6 +22,7 @@ import {
 	TextareaControl,
 	ToggleControl,
 	Toolbar,
+	ExternalLink,
 } from '@wordpress/components';
 /**
  * Internal dependencies
@@ -125,6 +127,7 @@ class MediaTextEdit extends Component {
 			mediaPosition,
 			mediaType,
 			mediaWidth,
+			verticalAlignment,
 		} = attributes;
 		const temporaryMediaWidth = this.state.mediaWidth;
 		const classNames = classnames( className, {
@@ -132,6 +135,7 @@ class MediaTextEdit extends Component {
 			'is-selected': isSelected,
 			[ backgroundColor.class ]: backgroundColor.class,
 			'is-stacked-on-mobile': isStackedOnMobile,
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 		const style = {
@@ -157,6 +161,9 @@ class MediaTextEdit extends Component {
 		const onMediaAltChange = ( newMediaAlt ) => {
 			setAttributes( { mediaAlt: newMediaAlt } );
 		};
+		const onVerticalAlignmentChange = ( alignment ) => {
+			setAttributes( { verticalAlignment: alignment } );
+		};
 		const mediaTextGeneralSettings = (
 			<PanelBody title={ __( 'Media & Text Settings' ) }>
 				<ToggleControl
@@ -170,7 +177,14 @@ class MediaTextEdit extends Component {
 					label={ __( 'Alt Text (Alternative Text)' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
-					help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
+					help={
+						<Fragment>
+							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+								{ __( 'Describe the purpose of the image' ) }
+							</ExternalLink>
+							{ __( 'Leave empty if the image is purely decorative.' ) }
+						</Fragment>
+					}
 				/> ) }
 			</PanelBody>
 		);
@@ -187,6 +201,10 @@ class MediaTextEdit extends Component {
 				<BlockControls>
 					<Toolbar
 						controls={ toolbarControls }
+					/>
+					<BlockVerticalAlignmentToolbar
+						onChange={ onVerticalAlignmentChange }
+						value={ verticalAlignment }
 					/>
 				</BlockControls>
 				<div className={ classNames } style={ style } >

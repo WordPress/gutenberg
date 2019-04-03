@@ -484,7 +484,7 @@
 			background-color: $white;
 
 			@include break-medium() {
-				margin: -3px 0 0 -3px;
+				margin: 3px 0 0 3px;
 			}
 		}
 	}

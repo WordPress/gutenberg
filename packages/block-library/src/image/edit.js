@@ -20,14 +20,18 @@ import {
 	ButtonGroup,
 	IconButton,
 	PanelBody,
+	Path,
+	Rect,
 	ResizableBox,
 	SelectControl,
 	Spinner,
+	SVG,
 	TextareaControl,
 	TextControl,
 	ToggleControl,
 	Toolbar,
 	withNotices,
+	ExternalLink,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -37,8 +41,6 @@ import {
 	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUpload,
-	MediaUploadCheck,
 	RichText,
 } from '@wordpress/block-editor';
 import { mediaUpload } from '@wordpress/editor';
@@ -46,6 +48,7 @@ import { Component, Fragment } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -328,6 +331,11 @@ class ImageEdit extends Component {
 		this.setState( {
 			isEditing: ! this.state.isEditing,
 		} );
+		if ( this.state.isEditing ) {
+			speak( __( 'You are now viewing the image in the image block.' ) );
+		} else {
+			speak( __( 'You are now editing the image in the image block.' ) );
+		}
 	}
 
 	getImageSizeOptions() {
@@ -372,68 +380,58 @@ class ImageEdit extends Component {
 			linkTarget,
 		} = attributes;
 		const isExternal = isExternalImage( id, url );
-
-		let toolbarEditButton;
-		if ( url ) {
-			if ( isExternal ) {
-				toolbarEditButton = (
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit image' ) }
-							onClick={ this.toggleIsEditing }
-							icon="edit"
-						/>
-					</Toolbar>
-				);
-			} else {
-				toolbarEditButton = (
-					<MediaUploadCheck>
-						<Toolbar>
-							<MediaUpload
-								onSelect={ this.onSelectImage }
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								value={ id }
-								render={ ( { open } ) => (
-									<IconButton
-										className="components-toolbar__control"
-										label={ __( 'Edit image' ) }
-										icon="edit"
-										onClick={ open }
-									/>
-								) }
-							/>
-						</Toolbar>
-					</MediaUploadCheck>
-				);
-			}
-		}
-
+		const editImageIcon = ( <SVG width={ 24 } height={ 24 } viewBox="0 0 24 24"><Rect x={ 14 } y={ 3 } width={ 8 } height={ 6 } rx={ 1 } /><Rect x={ 2 } y={ 15 } width={ 8 } height={ 6 } rx={ 1 } /><Path d="M16,15h1.87c-.63,2.35-3.38,4-5.87,4v2c3.47,0,7.29-2.42,7.91-6H22l-3-3.5Z" /><Path d="M8,9H6.13C6.76,6.65,9.51,5,12,5V3C8.53,3,4.71,5.42,4.09,9H2l3,3.5Z" /></SVG> );
 		const controls = (
 			<BlockControls>
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
 				/>
-				{ toolbarEditButton }
+				{ url && (
+					<Toolbar>
+						<IconButton
+							className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
+							label={ __( 'Edit image' ) }
+							aria-pressed={ this.state.isEditing }
+							onClick={ this.toggleIsEditing }
+							icon={ editImageIcon }
+						/>
+					</Toolbar>
+				) }
 			</BlockControls>
 		);
-
 		if ( isEditing || ! url ) {
 			const src = isExternal ? url : undefined;
+
+			const labels = {
+				title: ! url ? __( 'Image' ) : __( 'Edit image' ),
+				instructions: __( 'Drag an image to upload, select a file from your library or add one from an URL.' ),
+			};
+
+			const mediaPreview = ( !! url && <img
+				alt={ __( 'Edit image' ) }
+				title={ __( 'Edit image' ) }
+				className={ 'edit-image-preview' }
+				src={ url }
+			/> );
+
 			return (
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
 						icon={ <BlockIcon icon={ icon } /> }
 						className={ className }
+						labels={ labels }
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
+						onDoubleClick={ this.toggleIsEditing }
+						onCancel={ !! url && this.toggleIsEditing }
 						notices={ noticeUI }
 						onError={ this.onUploadError }
 						accept="image/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ { id, src } }
+						mediaPreview={ mediaPreview }
 					/>
 				</Fragment>
 			);
@@ -456,7 +454,14 @@ class ImageEdit extends Component {
 						label={ __( 'Alt Text (Alternative Text)' ) }
 						value={ alt }
 						onChange={ this.updateAlt }
-						help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
+						help={
+							<Fragment>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									{ __( 'Describe the purpose of the image' ) }
+								</ExternalLink>
+								{ __( 'Leave empty if the image is purely decorative.' ) }
+							</Fragment>
+						}
 					/>
 					{ ! isEmpty( imageSizeOptions ) && (
 						<SelectControl
@@ -586,7 +591,13 @@ class ImageEdit extends Component {
 								// should direct focus to block.
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 								<Fragment>
-									<img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } onError={ () => this.onImageError( url ) } />
+									<img
+										src={ url }
+										alt={ defaultedAlt }
+										onDoubleClick={ this.toggleIsEditing }
+										onClick={ this.onImageClick }
+										onError={ () => this.onImageError( url ) }
+									/>
 									{ isBlobURL( url ) && <Spinner /> }
 								</Fragment>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */

@@ -42,7 +42,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	);
 }
 
-export default withDispatch( ( dispatch, { clientId, attributes } ) => {
+const MissingEdit = withDispatch( ( dispatch, { clientId, attributes } ) => {
 	const { replaceBlock } = dispatch( 'core/block-editor' );
 	return {
 		convertToHTML() {
@@ -52,3 +52,5 @@ export default withDispatch( ( dispatch, { clientId, attributes } ) => {
 		},
 	};
 } )( MissingBlockWarning );
+
+export default MissingEdit;

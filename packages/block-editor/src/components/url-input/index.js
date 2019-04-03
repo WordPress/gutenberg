@@ -12,7 +12,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
 // Since URLInput is rendered in the context of other inputs, but should be
@@ -49,7 +49,7 @@ class URLInput extends Component {
 				onlyScrollIfNeeded: true,
 			} );
 
-			setTimeout( () => {
+			this.props.setTimeout( () => {
 				this.scrollingIntoView = false;
 			}, 100 );
 		}
@@ -283,6 +283,7 @@ class URLInput extends Component {
 }
 
 export default compose(
+	withSafeTimeout,
 	withSpokenMessages,
 	withInstanceId,
 	withSelect( ( select ) => {

@@ -10,6 +10,7 @@
 }
 
 .wp-block-column {
+	margin-bottom: 1em;
 	flex-grow: 1;
 
 	// Responsiveness: Show at most one columns on mobile.
@@ -42,14 +43,6 @@
 			margin-left: $grid-size-large * 2;
 		}
 	}
-}
-
-// Specificity overide to ensure margin is applied
-// and preserved on last child to ensure that when columns
-// are aligned to bottom they are are flush with each other
-.wp-block-column,
-.entry-content > .wp-block-columns .wp-block-column:last-child {
-	margin-bottom: 1em;
 }
 
 /**

@@ -126,6 +126,16 @@ exports[`adding blocks should navigate around nested inline boundaries 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`adding blocks should navigate empty paragraph 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`adding blocks should not create extra line breaks in multiline value 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>

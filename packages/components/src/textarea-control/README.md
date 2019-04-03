@@ -33,7 +33,7 @@ Do not use TextareaControl if you need to let users enter shorter answers (no lo
 
 **Do**
 
-Use TextareaControl to let users to enter text longer than a single line. 
+Use TextareaControl to let users to enter text longer than a single line.
 
 ![](https://wordpress.org/gutenberg/files/2019/01/TextareaControl-Answers-Dont.png)
 
@@ -55,11 +55,11 @@ Containers improve the discoverability of text fields by creating contrast betwe
 ![](https://wordpress.org/gutenberg/files/2019/01/TextareaControl-Stroke-Do.png)
 
 **Do**
-Use a stroke around the container, which clearly indicates that users can input information. 
+Use a stroke around the container, which clearly indicates that users can input information.
 
 ![](https://wordpress.org/gutenberg/files/2019/01/TextareaControl-Stroke-Dont.png)
 
-**Don’t** 
+**Don’t**
 Use unclear visual markers to indicate a text field.
 
 ### Label text
@@ -78,10 +78,10 @@ When text input isn’t accepted, an error message can display instructions on h
 
     import { TextareaControl } from '@wordpress/components';
     import { withState } from '@wordpress/compose';
-    
+
     const MyTextareaControl = withState( {
         text: '',
-    } )( ( { text, setState } ) => ( 
+    } )( ( { text, setState } ) => (
         <TextareaControl
             label="Text"
             help="Enter some text"
@@ -93,7 +93,7 @@ When text input isn’t accepted, an error message can display instructions on h
 
 ### Props
 
-The set of props accepted by the component will be specified below. 
+The set of props accepted by the component will be specified below.
 
 Props not included in this set will be applied to the textarea element.
 
@@ -108,7 +108,7 @@ If this property is added, a label will be generated using label property as the
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String`
+- Type: `String|WPElement`
 - Required: No
 
 #### rows

@@ -40,7 +40,6 @@ export default compose( [
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onToggle() {
 			dispatch( 'core/edit-post' ).toggleFeature( ownProps.feature );
-			ownProps.onToggle();
 		},
 	} ) ),
 	withSpokenMessages,

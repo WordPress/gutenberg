@@ -23,6 +23,7 @@ module.exports = {
 		'plugin:jest/recommended',
 	],
 	rules: {
+		'@wordpress/react-no-unsafe-timeout': 'error',
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or

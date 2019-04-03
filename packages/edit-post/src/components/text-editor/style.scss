@@ -32,6 +32,10 @@
 			border: $border-width solid $light-gray-500;
 			margin-bottom: 4px;
 			padding: $block-padding;
+
+			&:focus {
+				border: $border-width solid $light-gray-500;
+			}
 		}
 
 		textarea:hover,

@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { noop, omit } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -103,6 +103,15 @@ describe( 'blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			const block = registerBlockType( 'core/test-block', defaultBlockSettings );
 			expect( console ).toHaveErroredWith( 'Block "core/test-block" is already registered.' );
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should reject blocks with invalid save function', () => {
+			const block = registerBlockType( 'my-plugin/fancy-block-5', {
+				...defaultBlockSettings,
+				save: 'invalid',
+			} );
+			expect( console ).toHaveErroredWith( 'The "save" property must be a valid function.' );
 			expect( block ).toBeUndefined();
 		} );
 
@@ -318,12 +327,12 @@ describe( 'blocks', () => {
 				expect( block ).toBeUndefined();
 			} );
 
-			it( 'should reject valid blocks when they become invalid after executing filter which removes save property', () => {
+			it( 'should reject blocks which become invalid after executing filter which does not return a plain object', () => {
 				addFilter( 'blocks.registerBlockType', 'core/blocks/without-save', ( settings ) => {
-					return omit( settings, 'save' );
+					return [ settings ];
 				} );
 				const block = registerBlockType( 'my-plugin/fancy-block-13', defaultBlockSettings );
-				expect( console ).toHaveErroredWith( 'The "save" property must be specified and must be a valid function.' );
+				expect( console ).toHaveErroredWith( 'Block settings must be a valid object.' );
 				expect( block ).toBeUndefined();
 			} );
 		} );

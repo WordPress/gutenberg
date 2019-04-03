@@ -21,15 +21,13 @@
 
 // Fullwide: show margin left/right to ensure there's room for the side UI.
 // This is not a 1:1 preview with the front-end where these margins would presumably be zero.
-// @todo This could be revisited, by for example showing this margin only when the parent block was selected first.
-// Then at least an unselected columns block would be an accurate preview.
-.editor-block-list__block[data-align="full"] .wp-block-columns > .editor-inner-blocks {
+.editor-block-list__block[data-align="full"] [data-type="core/columns"][data-align="full"] .wp-block-columns > .editor-inner-blocks {
 	padding-left: $block-padding;
 	padding-right: $block-padding;
 
 	@include break-small() {
-		padding-left: $block-padding + $block-padding + $block-side-ui-width + $block-side-ui-clearance + $block-side-ui-clearance;
-		padding-right: $block-padding + $block-padding + $block-side-ui-width + $block-side-ui-clearance + $block-side-ui-clearance;
+		padding-left: $block-container-side-padding;
+		padding-right: $block-container-side-padding;
 	}
 }
 

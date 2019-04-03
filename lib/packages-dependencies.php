@@ -111,6 +111,7 @@ return array(
 	'wp-data'                               => array(
 		'lodash',
 		'wp-compose',
+		'wp-deprecated',
 		'wp-element',
 		'wp-is-shallow-equal',
 		'wp-priority-queue',
