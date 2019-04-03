@@ -20,6 +20,7 @@
 .table-of-contents__counts {
 	display: flex;
 	flex-wrap: wrap;
+	margin-bottom: -$grid-size;
 }
 
 .table-of-contents__count {
@@ -28,15 +29,11 @@
 	flex-direction: column;
 	font-size: $default-font-size;
 	color: $dark-gray-300;
+	margin-bottom: $grid-size;
 }
 
 .table-of-contents__number,
-.table-of-contents__popover .word-count {
-	font-size: 21px;
-	font-weight: 400;
-	line-height: 30px;
-	color: $dark-gray-500;
-}
+.table-of-contents__popover .word-count,
 .table-of-contents__popover .char-count {
 	font-size: 21px;
 	font-weight: 400;
