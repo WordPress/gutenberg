@@ -36,7 +36,7 @@ Additionally, the [Node.js download page](https://nodejs.org/en/download/) inclu
 
 The Node Package Manager (npm) is a tool included with node. npm allows you to install and manage JavaScript packages. npm can also generate and process a special file called `package.json`, which contains some information about your project and the packages your project uses.
 
-To start a new node project, first create a directory to work in.
+To start a new node project, first create a directory to work in:
 
 ```
 mkdir myguten-block
@@ -153,7 +153,7 @@ Yes, the initial setup is a bit more involved, but the additional features and b
 
 With a setup in place, the standard workflow is:
 
-- Install dependencies: `npm install`
-- Start development builds: `npm start`
-- Develop. Test. Repeat.
-- Create production build: `npm run build`
+1. Install dependencies: `npm install`
+2. Start development builds: `npm start`
+3. Develop. Test. Repeat.
+4. Create production build: `npm run build`
