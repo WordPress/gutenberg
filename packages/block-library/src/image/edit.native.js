@@ -53,6 +53,7 @@ const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_libr
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
+const MEDIA_TYPE = "image";
 
 class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -211,7 +212,7 @@ class ImageEdit extends React.Component {
 		const { url, caption, height, width, alt, href } = attributes;
 
 		const onMediaLibraryButtonPressed = () => {
-			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
+			requestMediaPickFromMediaLibrary( [ MEDIA_TYPE ], ( mediaId, mediaUrl ) => {
 				if ( mediaUrl ) {
 					setAttributes( { id: mediaId, url: mediaUrl } );
 				}
@@ -219,7 +220,7 @@ class ImageEdit extends React.Component {
 		};
 
 		const onMediaUploadButtonPressed = () => {
-			requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
+			requestMediaPickFromDeviceLibrary( [ MEDIA_TYPE ], ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
 					this.addMediaUploadListener( );
 					setAttributes( { url: mediaUri, id: mediaId } );
