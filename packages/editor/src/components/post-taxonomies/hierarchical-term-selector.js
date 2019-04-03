@@ -302,7 +302,7 @@ class HierarchicalTermSelector extends Component {
 
 			// If the term's name contains the filterValue, or it has children
 			// (i.e. some child matched at some point in the tree) then return it.
-			if ( -1 !== term.name.toLowerCase().indexOf( filterValue ) || term.children.length > 0 ) {
+			if ( -1 !== term.name.toLowerCase().indexOf( filterValue.toLowerCase( ) ) || term.children.length > 0 ) {
 				return term;
 			}
 
