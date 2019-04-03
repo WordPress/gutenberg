@@ -113,12 +113,6 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
-function prepareFormats( prepareEditableTree = [], value ) {
-	return prepareEditableTree.reduce( ( accumlator, fn ) => {
-		return fn( accumlator, value.text );
-	}, value.formats );
-}
-
 export function toDom( {
 	value,
 	multilineTag,
@@ -128,11 +122,15 @@ export function toDom( {
 	let startPath = [];
 	let endPath = [];
 
-	const tree = toTree( {
-		value: {
+	if ( prepareEditableTree ) {
+		value = {
 			...value,
-			formats: prepareFormats( prepareEditableTree, value ),
-		},
+			formats: prepareEditableTree( value ),
+		};
+	}
+
+	const tree = toTree( {
+		value,
 		multilineTag,
 		createEmpty,
 		append,
