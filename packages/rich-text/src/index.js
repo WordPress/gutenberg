@@ -15,6 +15,7 @@ export { getTextContent } from './get-text-content';
 export { isCollapsed } from './is-collapsed';
 export { isEmpty, isEmptyLine } from './is-empty';
 export { join } from './join';
+export { registerCustomAlignmentType } from './register-custom-alignment-type';
 export { registerFormatType } from './register-format-type';
 export { removeFormat } from './remove-format';
 export { remove } from './remove';

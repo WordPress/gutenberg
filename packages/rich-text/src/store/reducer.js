@@ -9,6 +9,28 @@ import { keyBy, omit } from 'lodash';
 import { combineReducers } from '@wordpress/data';
 
 /**
+ * Reducer managing the alignment types
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function customAlignmentTypes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_CUSTOM_ALIGNMENT_TYPES':
+			return {
+				...state,
+				...keyBy( action.customAlignmentTypes, 'name' ),
+			};
+		case 'REMOVE_CUSTOM_ALIGNMENT_TYPES':
+			return omit( state, action.names );
+	}
+
+	return state;
+}
+
+/**
  * Reducer managing the format types
  *
  * @param {Object} state  Current state.
@@ -30,4 +52,4 @@ export function formatTypes( state = {}, action ) {
 	return state;
 }
 
-export default combineReducers( { formatTypes } );
+export default combineReducers( { customAlignmentTypes, formatTypes } );

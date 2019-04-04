@@ -35,19 +35,30 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 	},
 ];
 
-export function AlignmentToolbar( { isCollapsed, value, onChange, alignmentControls = DEFAULT_ALIGNMENT_CONTROLS } ) {
+export function AlignmentToolbar( {
+	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
+	customAlignmentTypes,
+	isCollapsed,
+	onChange,
+	value,
+} ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const activeAlignment = find( alignmentControls, ( control ) => control.align === value );
+	const extendedAlignmentControls = [
+		...alignmentControls,
+		...customAlignmentTypes,
+	];
+
+	const activeAlignment = find( extendedAlignmentControls, ( control ) => control.align === value );
 
 	return (
 		<Toolbar
 			isCollapsed={ isCollapsed }
 			icon={ activeAlignment ? activeAlignment.icon : 'editor-alignleft' }
 			label={ __( 'Change Text Alignment' ) }
-			controls={ alignmentControls.map( ( control ) => {
+			controls={ extendedAlignmentControls.map( ( control ) => {
 				const { align } = control;
 				const isActive = ( value === align );
 
@@ -69,12 +80,20 @@ export default compose(
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	withSelect( ( select, { clientId, isLargeViewport, isCollapsed } ) => {
-		const { getBlockRootClientId, getSettings } = select( 'core/block-editor' );
+		const { getSelectedBlock, getBlockRootClientId, getSettings } = select( 'core/block-editor' );
+		const { getCustomAlignmentTypesForBlock } = select( 'core/rich-text' );
+
+		const selectedBlock = getSelectedBlock();
+		const customAlignmentTypes = selectedBlock ?
+			getCustomAlignmentTypesForBlock( selectedBlock.name ) :
+			[];
+
 		return {
 			isCollapsed: isCollapsed || ! isLargeViewport || (
 				! getSettings().hasFixedToolbar &&
 				getBlockRootClientId( clientId )
 			),
+			customAlignmentTypes,
 		};
 	} ),
 )( AlignmentToolbar );

@@ -2,7 +2,33 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { find } from 'lodash';
+import { filter, find } from 'lodash';
+
+/**
+ * Returns all the available custom alignment types.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Custom alignment types.
+ */
+export const getCustomAlignmentTypes = createSelector(
+	( state ) => Object.values( state.customAlignmentTypes ),
+	( state ) => [
+		state.customAlignmentTypes,
+	]
+);
+
+/**
+ * Returns the custom alignment types available for a given block.
+ *
+ * @param {Object} state Data state.
+ * @param {string} blockName Block name.
+ *
+ * @return {Array} Custom alignment types.
+ */
+export function getCustomAlignmentTypesForBlock( state, blockName ) {
+	return filter( state.customAlignmentTypes, ( type ) => type.blockName === blockName );
+}
 
 /**
  * Returns all the available format types.
