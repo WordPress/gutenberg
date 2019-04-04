@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fix
+
+- Restore functionality of action-generators returning a Promise.  Clarify intent and behaviour for `wp.data.dispatch` behaviour ([#14830](https://github.com/WordPress/gutenberg/pull/14830)
+
 ## 4.3.0 (2019-03-06)
 
 ### Enhancements
