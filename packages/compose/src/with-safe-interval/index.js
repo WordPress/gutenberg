@@ -36,10 +36,7 @@ const withSafeInterval = createHigherOrderComponent(
 			}
 
 			setInterval( fn, delay ) {
-				const id = setInterval( () => {
-					fn();
-					this.clearInterval( id );
-				}, delay );
+				const id = setInterval( fn, delay );
 				this.intervals.push( id );
 				return id;
 			}
