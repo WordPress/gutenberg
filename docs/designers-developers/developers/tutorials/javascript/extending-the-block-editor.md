@@ -34,13 +34,13 @@ See [Packages](/docs/designers-developers/developers/packages.md) for list of av
 
 After you have updated both JavaScript and PHP files, go to the block editor and create a new post.
 
-Add a quote block, and in the right sidebar under Styles, you will see your new Fancy Quote style listed.  Click the Fancy Quote to select and apply that style to your quote block.
+Add a quote block, and in the right sidebar under Styles, you will see your new Fancy Quote style listed.  Click the Fancy Quote to select and apply that style to your quote block:
 
 
 ![Fancy Quote Style in Inspector](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/fancy-quote-in-inspector.png)
 
 
-You will not see a visible change, even if you Preview or Publish the post. However, if you look at the source, you will see the `is-style-fancy-quote` class name is now attached to your quote block.
+Even if you Preview or Publish the post you will not see a visible change. However, if you look at the source, you will see the `is-style-fancy-quote` class name is now attached to your quote block.
 
 Let's add some style. Go ahead and create a `style.css` file with:
 
@@ -48,7 +48,6 @@ Let's add some style. Go ahead and create a `style.css` file with:
 .is-style-fancy-quote {
 	color: tomato;
 }
-
 ```
 
 You enqueue the CSS file by adding the following to your `myguten-plugin.php`:
@@ -60,7 +59,7 @@ function myguten_stylesheet() {
 add_action( 'enqueue_block_assets', 'myguten_stylesheet' );
 ```
 
-Now when you view in the editor and published, you will see your Fancy Quote style, a delicious tomato color text.
+Now when you view in the editor and published, you will see your Fancy Quote style, a delicious tomato color text:
 
 ![Fancy Quote with Style](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/fancy-quote-with-style.png)
 
