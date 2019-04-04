@@ -55,8 +55,8 @@ export default class EditorPage {
 	}
 
 	// position of the block to move up
-	async moveBlockUp( position: number ) {
-		const blockLocator = `//*[starts-with(@${ this.accessibilityIdXPathAttrib }, block-${ position })]`;
+	async moveBlockUpAtPosition( position: number ) {
+		const blockLocator = `//*[starts-with(@${ this.accessibilityIdXPathAttrib }, "block-${ position }")]`;
 		const blockElement = await this.driver.elementByXPath( blockLocator );
 		const accessibilityId = blockElement.getAttribute( this.accessibilityIdKey );
 
@@ -65,8 +65,8 @@ export default class EditorPage {
 	}
 
 	// position of the block to move down
-	async moveBlockDown( position: number ) {
-		const blockLocator = `//*[starts-with(@${ this.accessibilityIdXPathAttrib }, block-${ position })]`;
+	async moveBlockDownAtPosition( position: number ) {
+		const blockLocator = `//*[starts-with(@${ this.accessibilityIdXPathAttrib }, "block-${ position }"]`;
 		const blockElement = await this.driver.elementByXPath( blockLocator );
 		const accessibilityId = blockElement.getAttribute( this.accessibilityIdKey );
 
@@ -76,10 +76,10 @@ export default class EditorPage {
 
 	// position of the block to remove
 	// Block will no longer be present if this succeeds
-	async removeBlock( position: number ) {
-		const blockLocator = `//*[starts-with(@${ this.accessibilityIdXPathAttrib }, block-${ position })]`;
+	async removeBlockAtPosition( position: number ) {
+		const blockLocator = `//*[starts-with(@${ this.accessibilityIdXPathAttrib }, "block-${ position }")]`;
 		const blockElement = await this.driver.elementByXPath( blockLocator );
-		const accessibilityId = blockElement.getAttribute( this.accessibilityIdKey );
+		const accessibilityId = await blockElement.getAttribute( this.accessibilityIdKey );
 
 		const removeButton = await this.driver.elementByAccessibilityId( __( `Remove ${ accessibilityId }` ) );
 		await removeButton.click();
@@ -112,7 +112,7 @@ export default class EditorPage {
 	}
 
 	async sendTextToParagraphBlock( block: wd.PromiseChainWebdriver.Element, text: string ) {
-		const textViewElement = this.getTextViewForParagraphBlock( block );
-		return await typeString( textViewElement, text );
+		const textViewElement = await this.getTextViewForParagraphBlock( block );
+		await typeString( textViewElement, text );
 	}
 }

@@ -6,8 +6,8 @@
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
-import ParagraphBlockInteraction from './blocks/paragraph-block-interaction';
 import { setupAppium, setupDriver, isLocalEnvironment, timer } from './helpers/utils';
+import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
@@ -42,26 +42,17 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	it( 'should be able to add a new Paragraph block', async () => {
-		// let paragraphBlockInteraction = new ParagraphBlockInteraction( driver );
-		// paragraphBlockInteraction = await editorPage.addNewBlock( paragraphBlockInteraction );
-		// await paragraphBlockInteraction.sendText( 'Hello Gutenberg!' );
-		// await timer( 3000 );
-		// expect( await paragraphBlockInteraction.getText() ).toBe( 'Hello Gutenberg!' );
-		// await paragraphBlockInteraction.removeBlock();
-
-		const paragraphBlockElement = await editorPage.addNewParagraphBlock();
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, 'Hello Gutenberg' );
-		await timer( 3000 );
+		await editorPage.addNewParagraphBlock();
+		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+		await editorPage.removeBlockAtPosition( 0 );
 	} );
 	//
-	// it( 'should be able to create a post with multiple paragraph blocks', async () => {
-	// 	let paragraphBlockInteraction = new ParagraphBlockInteraction( driver );
-	// 	paragraphBlockInteraction = await editorPage.addNewBlock( paragraphBlockInteraction );
-	// 	await paragraphBlockInteraction.sendText( 'Hello Gutenberg!\nGoodBye' );
-	// 	await timer( 3000 );
-	// 	paragraphBlockInteraction = await editorPage.addNewBlock( paragraphBlockInteraction );
-	// 	await paragraphBlockInteraction.sendText( 'Hello Gutenberg!' );
-	// } );
+	it( 'should be able to create a post with multiple paragraph blocks', async () => {
+		await editorPage.addNewParagraphBlock();
+		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.longText );
+	} );
 
 	afterAll( async () => {
 		if ( isLocalEnvironment() ) {

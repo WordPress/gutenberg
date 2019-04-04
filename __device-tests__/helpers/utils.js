@@ -105,7 +105,7 @@ const setupAppium = async () => {
 // https://github.com/facebook/WebDriverAgent/issues/1084
 const typeString = async ( element: wd.PromiseChainWebdriver.Element, str: string ) => {
 	await element.clear();
-	if ( isAndroid() ) {
+	if ( true ) {
 		return await element.type( str );
 	}
 	// iOS: Problem with Appium type function requiring me to do a little hacking to get it work,
