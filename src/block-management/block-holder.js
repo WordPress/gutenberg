@@ -239,7 +239,6 @@ export default compose( [
 			isLastBlock,
 			isSelected,
 			name,
-			clientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
