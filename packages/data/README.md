@@ -332,6 +332,9 @@ _Returns_
 Given the name of a registered store, returns an object of the store's action creators.
 Calling an action creator will cause it to be dispatched, updating the state value accordingly.
 
+Note: If the action creator is a generator then a promise is returned.
+Otherwise, the dispatch will return `undefined`.
+
 _Usage_
 
 ```js
