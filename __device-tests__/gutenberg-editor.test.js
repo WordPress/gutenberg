@@ -12,7 +12,6 @@ import testData from './helpers/test-data';
 /**
  * External dependencies
  */
-import wd from 'wd';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 

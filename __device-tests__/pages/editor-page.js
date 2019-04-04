@@ -19,6 +19,8 @@ import { isAndroid, typeString } from '../helpers/utils';
 
 export default class EditorPage {
 	driver: wd.PromiseChainWebdriver;
+	accessibilityIdKey: string;
+	accessibilityIdXPathAttrib: string;
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
@@ -54,9 +56,9 @@ export default class EditorPage {
 		return await this.driver.elementByAccessibilityId( blockLocator );
 	}
 
-	async hasBlockAtPosition( position: number, blockName: string = undefined ) {
+	async hasBlockAtPosition( position: number, blockName: string = '' ) {
 		await this.driver.sleep( 2000 );
-		if ( blockName ) {
+		if ( blockName !== '' ) {
 			const blockLocator = `block-${ position }-${ blockName }`;
 			const elements = await this.driver.elementsByAccessibilityId( blockLocator );
 			return elements.length > 0;
