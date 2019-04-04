@@ -8,7 +8,7 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import Popover from '../';
+import { Popover } from '../';
 
 describe( 'Popover', () => {
 	describe( '#componentDidUpdate()', () => {

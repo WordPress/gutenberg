@@ -389,4 +389,6 @@ const PopoverContainer = Popover;
 
 PopoverContainer.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
 
+export { PopoverContainer as Popover };
+
 export default withSafeInterval( PopoverContainer );
