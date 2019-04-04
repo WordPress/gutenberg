@@ -12,7 +12,7 @@ export { getActiveObject } from './get-active-object';
 export { getSelectionEnd } from './get-selection-end';
 export { getSelectionStart } from './get-selection-start';
 export { getTextContent } from './get-text-content';
-export { getStartNestingLevel } from './get-start-nesting-level';
+export { getStartListFormat } from './get-start-list-format';
 export { isCollapsed } from './is-collapsed';
 export { isEmpty, isEmptyLine } from './is-empty';
 export { join } from './join';

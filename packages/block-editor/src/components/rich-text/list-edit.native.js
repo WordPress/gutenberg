@@ -6,7 +6,7 @@ import { Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	changeListType,
-	getStartNestingLevel,
+	getStartListFormat,
 } from '@wordpress/rich-text';
 
 /**
@@ -22,7 +22,7 @@ import BlockFormatControls from '../block-format-controls';
  *                   inner list is selected.
  */
 function isListRootSelected( value ) {
-	return getStartNestingLevel( value ) < 1;
+	return getStartListFormat( value ).nestingLevel < 1;
 }
 
 /**
@@ -34,8 +34,14 @@ function isListRootSelected( value ) {
  *
  * @return {boolean}             [description]
  */
-function isActiveListType( tagName, rootTagName ) {
-	return tagName === rootTagName;
+function isActiveListType( tagName, rootTagName, value ) {
+	const listFormat = getStartListFormat( value );
+
+	if ( ! listFormat || ! listFormat.type ) {
+		return tagName === rootTagName;
+	}
+
+	return listFormat.type.toLowerCase() === tagName;
 }
 
 export const ListEdit = ( {
@@ -50,7 +56,7 @@ export const ListEdit = ( {
 				onTagNameChange && {
 					icon: 'editor-ul',
 					title: __( 'Convert to unordered list' ),
-					isActive: isActiveListType( 'ul', tagName ),
+					isActive: isActiveListType( 'ul', tagName, value ),
 					onClick() {
 						onChange( changeListType( value, { type: 'ul' } ) );
 
@@ -62,7 +68,7 @@ export const ListEdit = ( {
 				onTagNameChange && {
 					icon: 'editor-ol',
 					title: __( 'Convert to ordered list' ),
-					isActive: isActiveListType( 'ol', tagName ),
+					isActive: isActiveListType( 'ol', tagName, value ),
 					onClick() {
 						onChange( changeListType( value, { type: 'ol' } ) );
 

@@ -15,6 +15,6 @@ export function getStartListFormat( value ) {
 	const { text, replacements, start, end } = value;
 	const startingLineIndex = getLineIndex( value, start );
 	const startLineFormats = replacements[ startingLineIndex ] || [];
-	const listFormat = startLineFormats.slice( -1 );
-	return { nestingLevel: startLineFormats.length, listFormat };
+	const [ listFormat ] = startLineFormats.slice( -1 );
+	return { nestingLevel: startLineFormats.length, ...listFormat };
 }
