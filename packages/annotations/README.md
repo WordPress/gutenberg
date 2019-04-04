@@ -14,4 +14,5 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Usage
 
+
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

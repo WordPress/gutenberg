@@ -101,4 +101,5 @@ console.log( 'Currently showing:', guide.currentTipId );
 console.log( 'Next to show:', guide.nextTipId );
 ```
 
+
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

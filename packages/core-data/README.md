@@ -48,4 +48,5 @@ The following selectors are available on the object returned by `wp.data.select(
 
 _Refer to `selectors.js` for the full set of selectors. In the future, this documentation will be automatically generated to detail all available selectors._
 
+
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
