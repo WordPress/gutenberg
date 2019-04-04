@@ -6,8 +6,13 @@
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
-import { setupAppium, setupDriver, isLocalEnvironment, timer } from './helpers/utils';
+import { setupAppium, setupDriver, isLocalEnvironment, timer, clickMiddleOfElement } from './helpers/utils';
 import testData from './helpers/test-data';
+
+/**
+ * External dependencies
+ */
+import wd from 'wd';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
@@ -41,17 +46,40 @@ describe( 'Gutenberg Editor tests', () => {
 		await editorPage.expect();
 	} );
 
-	it( 'should be able to add a new Paragraph block', async () => {
+	// it( 'should be able to add a new Paragraph block', async () => {
+	// 	await editorPage.addNewParagraphBlock();
+	// 	const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
+	// 	await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+	// 	await editorPage.removeBlockAtPosition( 0 );
+	// } );
+	//
+	// it( 'should be able to create a post with multiple paragraph blocks', async () => {
+	// 	await editorPage.addNewParagraphBlock();
+	// 	const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
+	// 	await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.longText );
+	//
+	// 	for ( let i = 3; i > -1; i-- ) {
+	// 		await editorPage.removeBlockAtPosition( i );
+	// 	}
+	// } );
+
+	it( 'should be able to split one paragraph block into two', async () => {
 		await editorPage.addNewParagraphBlock();
 		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
-		await editorPage.removeBlockAtPosition( 0 );
-	} );
+		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
+		await clickMiddleOfElement( driver, textViewElement );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n' );
+		await timer( 3000 );
+		expect( await editorPage.hasParagraphBlockAtPosition( 0 ) && await editorPage.hasParagraphBlockAtPosition( 1 ) )
+			.toBe( true );
 
-	it( 'should be able to create a post with multiple paragraph blocks', async () => {
-		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.longText );
+		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 0 );
+		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		expect( testData.shortText ).toMatch( new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` ) );
+
+		await editorPage.removeBlockAtPosition( 1 );
+		await editorPage.removeBlockAtPosition( 0 );
 	} );
 
 	afterAll( async () => {

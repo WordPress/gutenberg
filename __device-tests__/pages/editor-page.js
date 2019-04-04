@@ -54,6 +54,18 @@ export default class EditorPage {
 		return await this.driver.elementByAccessibilityId( blockLocator );
 	}
 
+	async hasBlockAtPosition( position: number, blockName: string = undefined ) {
+		await this.driver.sleep( 2000 );
+		if ( blockName ) {
+			const blockLocator = `block-${ position }-${ blockName }`;
+			const elements = await this.driver.elementsByAccessibilityId( blockLocator );
+			return elements.length > 0;
+		}
+		const blockLocator = `//*[starts-with(@${ this.accessibilityIdXPathAttrib }, "block-${ position }")]`;
+		const elements = await this.driver.elementsByXPath( blockLocator );
+		return elements.length > 0;
+	}
+
 	// position of the block to move up
 	async moveBlockUpAtPosition( position: number ) {
 		const blockLocator = `//*[starts-with(@${ this.accessibilityIdXPathAttrib }, "block-${ position }")]`;
@@ -99,6 +111,12 @@ export default class EditorPage {
 		return this.getBlockAtPosition( position, blockName );
 	}
 
+	async hasParagraphBlockAtPosition( position: number ) {
+		await this.driver.sleep( 2000 );
+		const blockName = 'core/paragraph';
+		return await this.hasBlockAtPosition( position, blockName );
+	}
+
 	async getTextViewForParagraphBlock( block: wd.PromiseChainWebdriver.Element ) {
 		await this.driver.sleep( 2000 );
 		let textViewElementName = 'XCUIElementTypeTextView';
@@ -116,7 +134,15 @@ export default class EditorPage {
 		await typeString( textViewElement, text );
 	}
 
-	async getTextForParagraphBlockTextView( textViewElement: wd.PromiseChainWebdriver.Element ) {
+	async getTextForParagraphBlock( block: wd.PromiseChainWebdriver.Element ) {
+		const textViewElement = await this.getTextViewForParagraphBlock( block );
+		const text = await textViewElement.text();
+		return text.toString();
+	}
+
+	async getTextForParagraphBlockAtPosition( position: number ) {
+		const block = await this.getParagraphBlockAtPosition( position );
+		const textViewElement = await this.getTextViewForParagraphBlock( block );
 		const text = await textViewElement.text();
 		return text.toString().trim();
 	}

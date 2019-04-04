@@ -103,16 +103,30 @@ const setupAppium = async () => {
 // attempts to type a string to a given element, need for this stems from
 // https://github.com/appium/appium/issues/12285#issuecomment-471872239
 // https://github.com/facebook/WebDriverAgent/issues/1084
-const typeString = async ( element: wd.PromiseChainWebdriver.Element, str: string ) => {
-	await element.clear();
-	if ( true ) {
-		return await element.type( str );
+const typeString = async ( element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean = false ) => {
+	if ( clear ) {
+		await element.clear();
 	}
-	// iOS: Problem with Appium type function requiring me to do a little hacking to get it work,
-	// as a result typing on iOS will be slower
-	for ( let i = 0; i < str.length; i++ ) {
-		await element.type( str.charAt( i ) );
-	}
+
+	return await element.type( str );
+};
+
+const clickMiddleOfElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
+	const location = await element.getLocation();
+	const size = await element.getSize();
+
+	const action = await new wd.TouchAction( driver );
+	action.press( { x: location.x + ( size.width / 2 ), y: location.y } );
+	action.release();
+	await action.perform();
+};
+
+const clickBeginningOfElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
+	const location = await element.getLocation();
+	const action = await new wd.TouchAction( driver );
+	action.press( { x: location.x, y: location.y } );
+	action.release();
+	await action.perform();
 };
 
 module.exports = {
@@ -122,4 +136,6 @@ module.exports = {
 	isLocalEnvironment,
 	isAndroid,
 	typeString,
+	clickMiddleOfElement,
+	clickBeginningOfElement,
 };
