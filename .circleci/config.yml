@@ -80,20 +80,13 @@ jobs:
           command: bin/ci-checks-js.sh
   android-device-checks:
     docker:
-    - image: circleci/android:api-27-node8-alpha
+    - image: circleci/android:api-28-node8-alpha
     steps:
       - checkout
       - run:
           name: Checkout Gutenberg
           command: git submodule update --init --recursive
       - yarn-install
-      - run:
-          name: Accept Licenses
-          command: |
-            yes | sdkmanager --licenses > /dev/null
-            sleep 10
-            sdkmanager --update
-          background: true
       - run:
           name: Set Environment Variables
           command: |
@@ -140,10 +133,10 @@ jobs:
     - run:
         name: Zip up .app file
         command: |
-          cp ./ios/main.jsbundle ./ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle
-          cd ./ios/build/gutenberg/Build/Products/Release-iphonesimulator/
+          cp ./ios/main.jsbundle ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle
+          cd ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/
           zip -r ./Gutenberg.app.zip ./gutenberg.app
-          mv ./Gutenberg.app.zip "$CIRCLE_WORKING_DIRECTORY/Gutenberg.app.zip"
+          mv ./Gutenberg.app.zip "$CIRCLE_WORKING_DIRECTORYGutenberg.app.zip"
     - run:
         name: Upload .app to sauce labs
         command: |
