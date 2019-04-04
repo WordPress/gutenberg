@@ -18,7 +18,7 @@ class GalleryImage extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onImageClick = this.onImageClick.bind( this );
+		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectCaption = this.onSelectCaption.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
@@ -44,7 +44,7 @@ class GalleryImage extends Component {
 		}
 	}
 
-	onImageClick() {
+	onSelectImage() {
 		if ( ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
@@ -108,9 +108,9 @@ class GalleryImage extends Component {
 					src={ url }
 					alt={ alt }
 					data-id={ id }
-					onClick={ this.onImageClick }
-					onFocus={ this.onImageClick }
-					onKeyDown={ this.onImageClick }
+					onClick={ this.onSelectImage }
+					onFocus={ this.onSelectImage }
+					onKeyDown={ this.onSelectImage }
 					tabIndex="0"
 					aria-label={ ariaLabel }
 				/>
