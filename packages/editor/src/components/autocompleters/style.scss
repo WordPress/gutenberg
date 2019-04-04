@@ -1,12 +1,11 @@
-
-.block-editor-autocompleters__block {
-	.block-editor-block-icon {
+.editor-autocompleters__block {
+	.editor-block-icon {
 		margin-right: 8px;
 	}
 }
 
-.block-editor-autocompleters__user {
-	.block-editor-autocompleters__user-avatar {
+.editor-autocompleters__user {
+	.editor-autocompleters__user-avatar {
 		margin-right: 8px;
 		flex-grow: 0;
 		flex-shrink: 0;
@@ -14,7 +13,7 @@
 		width: 24px; // avoid jarring resize by seting the size upfront
 		height: 24px;
 	}
-	.block-editor-autocompleters__user-name {
+	.editor-autocompleters__user-name {
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow: hidden;
@@ -22,7 +21,7 @@
 		flex-shrink: 0;
 		flex-grow: 1;
 	}
-	.block-editor-autocompleters__user-slug {
+	.editor-autocompleters__user-slug {
 		margin-left: 8px;
 		color: $dark-gray-100;
 		white-space: nowrap;
@@ -32,7 +31,7 @@
 		flex-grow: 0;
 		flex-shrink: 0;
 	}
-	&:hover .block-editor-autocompleters__user-slug {
+	&:hover .editor-autocompleters__user-slug {
 		color: $blue-medium-300;
 	}
 }
