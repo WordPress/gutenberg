@@ -109,8 +109,9 @@ class GalleryImage extends Component {
 					alt={ alt }
 					data-id={ id }
 					onClick={ this.onImageClick }
-					tabIndex="0"
+					onFocus={ this.onImageClick }
 					onKeyDown={ this.onImageClick }
+					tabIndex="0"
 					aria-label={ ariaLabel }
 				/>
 				{ isBlobURL( url ) && <Spinner /> }
