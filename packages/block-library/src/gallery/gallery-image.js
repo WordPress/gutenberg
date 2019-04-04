@@ -134,14 +134,14 @@ class GalleryImage extends Component {
 							onClick={ onMoveBackward }
 							className="blocks-gallery-item__move-backward"
 							label={ __( 'Move Image Backward' ) }
-							disabled={ isFirstItem }
+							aria-disabled={ isFirstItem }
 						/>
 						<IconButton
 							icon="arrow-right"
 							onClick={ onMoveForward }
 							className="blocks-gallery-item__move-forward"
 							label={ __( 'Move Image Forward' ) }
-							disabled={ isLastItem }
+							aria-disabled={ isLastItem }
 						/>
 					</div> :
 					null
