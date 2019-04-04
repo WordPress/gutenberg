@@ -291,14 +291,13 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 						this.renderHTML() :
 						this.renderList()
 				}
-				{ this.state.blockTypePickerVisible && (
-					<BlockPicker
-						onDismiss={ () => this.showBlockTypePicker( false ) }
-						onValueSelected={ this.onBlockTypeSelected }
-						isReplacement={ this.isReplaceable( this.props.selectedBlock ) }
-						addExtraBottomPadding={ this.state.safeAreaBottomInset === 0 }
-					/>
-				) }
+				<BlockPicker
+					isVisible={ this.state.blockTypePickerVisible }
+					onDismiss={ () => this.showBlockTypePicker( false ) }
+					onValueSelected={ this.onBlockTypeSelected }
+					isReplacement={ this.isReplaceable( this.props.selectedBlock ) }
+					addExtraBottomPadding={ this.state.safeAreaBottomInset === 0 }
+				/>
 			</SafeAreaView>
 		);
 	}
