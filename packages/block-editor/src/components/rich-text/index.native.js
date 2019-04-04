@@ -483,6 +483,8 @@ export class RichText extends Component {
 			return;
 		}
 
+		// This logic will handle the selection when two blocks are merged or when block is split
+		// into two blocks
 		if ( nextTextContent === this.savedContent || nextTextContent.startsWith( this.savedContent ) ) {
 			this.forceSelectionUpdate( this.savedContent.length, this.savedContent.length );
 			this.savedContent = nextTextContent;
