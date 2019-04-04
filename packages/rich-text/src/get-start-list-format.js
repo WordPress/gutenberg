@@ -9,11 +9,12 @@ import { getLineIndex } from './get-line-index';
  *
  * @param {Object} value     The rich-text value
  *
- * @return {number} The nesting level, starting from 0.
+ * @return {Object} Object with { nestingLevel, listFormat }.
  */
-export function getStartNestingLevel( value ) {
+export function getStartListFormat( value ) {
 	const { text, replacements, start, end } = value;
 	const startingLineIndex = getLineIndex( value, start );
 	const startLineFormats = replacements[ startingLineIndex ] || [];
-	return startLineFormats.length;
+	const listFormat = startLineFormats.slice( -1 );
+	return { nestingLevel: startLineFormats.length, listFormat };
 }
