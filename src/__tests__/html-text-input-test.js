@@ -13,16 +13,24 @@ import { HTMLInputView } from '../components/html-text-input.js';
  */
 import { __ } from '@wordpress/i18n';
 
-// Utility to find the HTML TextInput from the wrapper
-const findHTMLTextInputFromWrapper = ( wrapper ) => {
-	const placeholder = __( 'Start writing…' );
-	return wrapper.dive().find( { multiline: true, placeholder } ).first();
+// Utility to find a TextInput in a ShallowWrapper
+const findTextInputInWrapper = ( wrapper, matchingProps ) => {
+	return wrapper.dive().findWhere( ( node ) => {
+		return node.name() === 'TextInput' && node.is( matchingProps );
+	} ).first();
 };
 
-// Utility to find the Title TextInput from the wrapper
-const findTitleTextInputFromWrapper = ( wrapper ) => {
+// Finds the Content TextInput in our HTMLInputView
+const findContentTextInput = ( wrapper ) => {
+	const placeholder = __( 'Start writing…' );
+	const matchingProps = { multiline: true, placeholder };
+	return findTextInputInWrapper( wrapper, matchingProps );
+};
+
+// Finds the Title TextInput in our HTMLInputView
+const findTitleTextInput = ( wrapper ) => {
 	const placeholder = __( 'Add title' );
-	return wrapper.dive().find( { placeholder } ).first();
+	return findTextInputInWrapper( wrapper, { placeholder } );
 };
 
 describe( 'HTMLInputView', () => {
@@ -45,7 +53,7 @@ describe( 'HTMLInputView', () => {
 		expect( wrapper.instance().state.isDirty ).toBeFalsy();
 
 		// Simulate user typing text
-		const htmlTextInput = findHTMLTextInputFromWrapper( wrapper );
+		const htmlTextInput = findContentTextInput( wrapper );
 		htmlTextInput.simulate( 'changeText', 'text' );
 
 		//Check if the onChange is called and the state is updated
@@ -67,7 +75,7 @@ describe( 'HTMLInputView', () => {
 		);
 
 		// Simulate user typing text
-		const htmlTextInput = findHTMLTextInputFromWrapper( wrapper );
+		const htmlTextInput = findContentTextInput( wrapper );
 		htmlTextInput.simulate( 'changeText', 'text' );
 
 		//Simulate blur event
@@ -97,7 +105,7 @@ describe( 'HTMLInputView', () => {
 		);
 
 		// Simulate user typing text
-		const textInput = findTitleTextInputFromWrapper( wrapper );
+		const textInput = findTitleTextInput( wrapper );
 		textInput.simulate( 'changeText', 'text' );
 
 		//Check if the setTitleAction is called
