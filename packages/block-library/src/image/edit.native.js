@@ -64,8 +64,6 @@ class ImageEdit extends React.Component {
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
-		this.addMediaUploadListener = this.addMediaUploadListener.bind( this );
-		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
@@ -77,10 +75,11 @@ class ImageEdit extends React.Component {
 	}
 
 	componentDidMount() {
+		this.addMediaUploadListener();
+
 		const { attributes } = this.props;
 
 		if ( attributes.id && ! isURL( attributes.url ) ) {
-			this.addMediaUploadListener();
 			mediaUploadSync();
 		}
 	}
@@ -139,8 +138,6 @@ class ImageEdit extends React.Component {
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
 		this.setState( { isUploadInProgress: false } );
-
-		this.removeMediaUploadListener();
 	}
 
 	finishMediaUploadWithFailure( payload ) {
@@ -219,7 +216,6 @@ class ImageEdit extends React.Component {
 		const onMediaUploadButtonPressed = () => {
 			requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
-					this.addMediaUploadListener( );
 					setAttributes( { url: mediaUri, id: mediaId } );
 				}
 			} );
@@ -228,7 +224,6 @@ class ImageEdit extends React.Component {
 		const onMediaCaptureButtonPressed = () => {
 			requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
-					this.addMediaUploadListener( );
 					setAttributes( { url: mediaUri, id: mediaId } );
 				}
 			} );
