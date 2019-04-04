@@ -127,6 +127,7 @@ class GalleryImage extends Component {
 
 		return (
 			<figure className={ className }>
+				{ href ? <a href={ href }>{ img }</a> : img }
 				{ isSelected &&
 					<div className="block-library-gallery-item__inline-menu">
 						<IconButton
@@ -137,7 +138,6 @@ class GalleryImage extends Component {
 						/>
 					</div>
 				}
-				{ href ? <a href={ href }>{ img }</a> : img }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) ? (
 					<RichText
 						tagName="figcaption"
