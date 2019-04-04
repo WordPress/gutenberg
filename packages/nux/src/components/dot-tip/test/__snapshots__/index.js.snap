@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DotTip should render correctly 1`] = `
-<Popover
+<WithSafeInterval(Popover)
   aria-label="Editor tips"
   className="nux-dot-tip"
   focusOnMount="container"
@@ -26,5 +26,5 @@ exports[`DotTip should render correctly 1`] = `
     icon="no-alt"
     label="Disable tips"
   />
-</Popover>
+</WithSafeInterval(Popover)>
 `;

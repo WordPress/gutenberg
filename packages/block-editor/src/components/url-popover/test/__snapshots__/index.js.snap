@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`URLPopover matches the snapshot in its default state 1`] = `
-<Popover
+<WithSafeInterval(Popover)
   className="editor-url-popover block-editor-url-popover"
   focusOnMount="firstElement"
   noArrow={false}
@@ -21,11 +21,11 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
       onClick={[Function]}
     />
   </div>
-</Popover>
+</WithSafeInterval(Popover)>
 `;
 
 exports[`URLPopover matches the snapshot when the settings are toggled open 1`] = `
-<Popover
+<WithSafeInterval(Popover)
   className="editor-url-popover block-editor-url-popover"
   focusOnMount="firstElement"
   noArrow={false}
@@ -52,11 +52,11 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
       Settings
     </div>
   </div>
-</Popover>
+</WithSafeInterval(Popover)>
 `;
 
 exports[`URLPopover matches the snapshot when there are no settings 1`] = `
-<Popover
+<WithSafeInterval(Popover)
   className="editor-url-popover block-editor-url-popover"
   focusOnMount="firstElement"
   noArrow={false}
@@ -69,5 +69,5 @@ exports[`URLPopover matches the snapshot when there are no settings 1`] = `
       Editor
     </div>
   </div>
-</Popover>
+</WithSafeInterval(Popover)>
 `;
