@@ -8,6 +8,7 @@ export { default as ifCondition } from './if-condition';
 export { default as pure } from './pure';
 export { default as withGlobalEvents } from './with-global-events';
 export { default as withInstanceId } from './with-instance-id';
+export { default as withSafeInterval } from './with-safe-interval';
 export { default as withSafeTimeout } from './with-safe-timeout';
 export { default as withState } from './with-state';
 
