@@ -6,6 +6,7 @@ import { Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	changeListType,
+	getStartNestingLevel,
 } from '@wordpress/rich-text';
 
 /**
@@ -20,9 +21,8 @@ import BlockFormatControls from '../block-format-controls';
  * @return {boolean} True if the root list or nothing is selected, false if an
  *                   inner list is selected.
  */
-function isListRootSelected() {
-	// Consider the root list selected if nothing is selected.
-	return true;
+function isListRootSelected( value ) {
+	return getStartNestingLevel( value ) < 1;
 }
 
 /**
@@ -54,7 +54,7 @@ export const ListEdit = ( {
 					onClick() {
 						onChange( changeListType( value, { type: 'ul' } ) );
 
-						if ( isListRootSelected() ) {
+						if ( isListRootSelected( value ) ) {
 							onTagNameChange( 'ul' );
 						}
 					},
@@ -66,7 +66,7 @@ export const ListEdit = ( {
 					onClick() {
 						onChange( changeListType( value, { type: 'ol' } ) );
 
-						if ( isListRootSelected() ) {
+						if ( isListRootSelected( value ) ) {
 							onTagNameChange( 'ol' );
 						}
 					},
