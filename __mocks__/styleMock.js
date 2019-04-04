@@ -35,4 +35,10 @@ module.exports = {
 	'wp-block-heading': {
 		minHeight: 60,
 	},
+	'editor-rich-text': {
+		minHeight: 50,
+	},
+	'editor-plain-text': {
+		fontFamily: 'serif',
+	},
 };
