@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { findKey } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
@@ -9,6 +14,7 @@ import {
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
 import { _n, sprintf } from '@wordpress/i18n';
+import { create, toHTMLString, insert, remove } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -18,6 +24,7 @@ import {
 	selectBlock,
 	setTemplateValidity,
 	resetBlocks,
+	selectionChange,
 } from './actions';
 import {
 	getBlock,
@@ -26,6 +33,7 @@ import {
 	getTemplateLock,
 	getTemplate,
 	isValidTemplate,
+	getSelectionStart,
 } from './selectors';
 
 /**
@@ -64,10 +72,10 @@ export default {
 		const state = store.getState();
 		const [ firstBlockClientId, secondBlockClientId ] = action.blocks;
 		const blockA = getBlock( state, firstBlockClientId );
-		const blockType = getBlockType( blockA.name );
+		const blockAType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
-		if ( ! blockType.merge ) {
+		if ( ! blockAType.merge ) {
 			dispatch( selectBlock( blockA.clientId ) );
 			return;
 		}
@@ -75,6 +83,24 @@ export default {
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
 		const blockB = getBlock( state, secondBlockClientId );
+		const blockBType = getBlockType( blockB.name );
+
+		// A robust way to retain selection position through various transforms
+		// is to insert a special character at the position and then recover it.
+		const START_OF_SELECTED_AREA = '\u0086';
+		const { identifier, offset } = getSelectionStart( state );
+		const html = blockB.attributes[ identifier ];
+		const multilineTagB = blockBType.attributes[ identifier ].multiline;
+		const value = insert( create( {
+			html,
+			multilineTag: multilineTagB,
+		} ), START_OF_SELECTED_AREA, offset, offset );
+
+		blockB.attributes[ identifier ] = toHTMLString( {
+			value,
+			multilineTag: multilineTagB,
+		} );
+
 		const blocksWithTheSameType = blockA.name === blockB.name ?
 			[ blockB ] :
 			switchToBlockType( blockB, blockA.name );
@@ -85,12 +111,30 @@ export default {
 		}
 
 		// Calling the merge to update the attributes and remove the block to be merged
-		const updatedAttributes = blockType.merge(
+		const updatedAttributes = blockAType.merge(
 			blockA.attributes,
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		dispatch( selectBlock( blockA.clientId, -1 ) );
+		const newIdentifier = findKey( updatedAttributes, ( v ) =>
+			typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
+		);
+		const convertedHtml = updatedAttributes[ newIdentifier ];
+		const multilineTagA = blockAType.attributes[ newIdentifier ].multiline;
+		const convertedValue = create( { html: convertedHtml, multilineTag: multilineTagA } );
+		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
+		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
+		const newHtml = toHTMLString( { value: newValue, multilineTag: multilineTagA } );
+
+		updatedAttributes[ newIdentifier ] = newHtml;
+
+		dispatch( selectionChange(
+			blockA.clientId,
+			newIdentifier,
+			newOffset,
+			newOffset
+		) );
+
 		dispatch( replaceBlocks(
 			[ blockA.clientId, blockB.clientId ],
 			[

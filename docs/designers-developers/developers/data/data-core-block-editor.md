@@ -1042,6 +1042,18 @@ Returns an action object used in signalling that the caret has entered formatted
 
 Returns an action object used in signalling that the user caret has exited formatted text.
 
+### selectionChange
+
+Returns an action object used in signalling that the user caret has changed
+position.
+
+*Parameters*
+
+ * block: The selected block client ID.
+ * identifier: The selected RichText ID within the block.
+ * start: The start offset.
+ * end: The end offset.
+
 ### insertDefaultBlock
 
 Returns an action object used in signalling that a new block of the default

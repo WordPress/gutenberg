@@ -698,6 +698,15 @@ export function isCaretWithinFormattedText( state = false, action ) {
 	return state;
 }
 
+const BLOCK_SELECTION_EMPTY_OBJECT = {};
+const BLOCK_SELECTION_INITIAL_STATE = {
+	start: BLOCK_SELECTION_EMPTY_OBJECT,
+	end: BLOCK_SELECTION_EMPTY_OBJECT,
+	isMultiSelecting: false,
+	isEnabled: true,
+	initialPosition: null,
+};
+
 /**
  * Reducer returning the block selection's state.
  *
@@ -706,26 +715,10 @@ export function isCaretWithinFormattedText( state = false, action ) {
  *
  * @return {Object} Updated state.
  */
-export function blockSelection( state = {
-	start: null,
-	end: null,
-	isMultiSelecting: false,
-	isEnabled: true,
-	initialPosition: null,
-}, action ) {
+export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
-			if ( state.start === null && state.end === null && ! state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				start: null,
-				end: null,
-				isMultiSelecting: false,
-				initialPosition: null,
-			};
+			return BLOCK_SELECTION_INITIAL_STATE;
 		case 'START_MULTI_SELECT':
 			if ( state.isMultiSelecting ) {
 				return state;
@@ -748,70 +741,91 @@ export function blockSelection( state = {
 			};
 		case 'MULTI_SELECT':
 			return {
-				...state,
-				start: action.start,
-				end: action.end,
-				initialPosition: null,
+				...BLOCK_SELECTION_INITIAL_STATE,
+				isMultiSelecting: state.isMultiSelecting,
+				start: { block: action.start },
+				end: { block: action.end },
 			};
 		case 'SELECT_BLOCK':
-			if ( action.clientId === state.start && action.clientId === state.end ) {
+			if (
+				action.clientId === state.start.block &&
+				action.clientId === state.end.block
+			) {
 				return state;
 			}
+
 			return {
-				...state,
-				start: action.clientId,
-				end: action.clientId,
+				...BLOCK_SELECTION_INITIAL_STATE,
 				initialPosition: action.initialPosition,
+				start: { block: action.clientId },
+				end: { block: action.clientId },
 			};
 		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
 		case 'INSERT_BLOCKS': {
 			if ( action.updateSelection ) {
 				return {
-					...state,
-					start: action.blocks[ 0 ].clientId,
-					end: action.blocks[ 0 ].clientId,
-					initialPosition: null,
-					isMultiSelecting: false,
+					...BLOCK_SELECTION_INITIAL_STATE,
+					start: { block: action.blocks[ 0 ].clientId },
+					end: { block: action.blocks[ 0 ].clientId },
 				};
 			}
+
 			return state;
 		}
 		case 'REMOVE_BLOCKS':
-			if ( ! action.clientIds || ! action.clientIds.length || action.clientIds.indexOf( state.start ) === -1 ) {
+			if (
+				! action.clientIds ||
+				! action.clientIds.length ||
+				action.clientIds.indexOf( state.start.block ) === -1
+			) {
 				return state;
 			}
-			return {
-				...state,
-				start: null,
-				end: null,
-				initialPosition: null,
-				isMultiSelecting: false,
-			};
-		case 'REPLACE_BLOCKS':
-			if ( action.clientIds.indexOf( state.start ) === -1 ) {
+
+			return BLOCK_SELECTION_INITIAL_STATE;
+		case 'REPLACE_BLOCKS': {
+			if ( action.clientIds.indexOf( state.start.block ) === -1 ) {
 				return state;
 			}
 
 			// If there are replacement blocks, assign last block as the next
 			// selected block, otherwise set to null.
 			const lastBlock = last( action.blocks );
-			const nextSelectedBlockClientId = lastBlock ? lastBlock.clientId : null;
 
-			if ( nextSelectedBlockClientId === state.start && nextSelectedBlockClientId === state.end ) {
+			if ( ! lastBlock ) {
+				return BLOCK_SELECTION_INITIAL_STATE;
+			}
+
+			if (
+				lastBlock.clientId === state.start.block &&
+				lastBlock.clientId === state.end.block
+			) {
 				return state;
 			}
 
 			return {
-				...state,
-				start: nextSelectedBlockClientId,
-				end: nextSelectedBlockClientId,
-				initialPosition: null,
-				isMultiSelecting: false,
+				...BLOCK_SELECTION_INITIAL_STATE,
+				start: { block: lastBlock.clientId },
+				end: { block: lastBlock.clientId },
 			};
+		}
 		case 'TOGGLE_SELECTION':
 			return {
-				...state,
+				...BLOCK_SELECTION_INITIAL_STATE,
 				isEnabled: action.isSelectionEnabled,
+			};
+		case 'SELECTION_CHANGE':
+			return {
+				...BLOCK_SELECTION_INITIAL_STATE,
+				start: {
+					block: action.block,
+					identifier: action.identifier,
+					offset: action.start,
+				},
+				end: {
+					block: action.block,
+					identifier: action.identifier,
+					offset: action.end,
+				},
 			};
 	}
 

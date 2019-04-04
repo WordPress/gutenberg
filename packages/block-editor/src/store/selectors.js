@@ -318,6 +318,14 @@ export function getBlockCount( state, rootClientId ) {
 	return getBlockOrder( state, rootClientId ).length;
 }
 
+export function getSelectionStart( state ) {
+	return state.blockSelection.start;
+}
+
+export function getSelectionEnd( state ) {
+	return state.blockSelection.end;
+}
+
 /**
  * Returns the current block selection start. This value may be null, and it
  * may represent either a singular block selection or multi-selection start.
@@ -328,7 +336,7 @@ export function getBlockCount( state, rootClientId ) {
  * @return {?string} Client ID of block selection start.
  */
 export function getBlockSelectionStart( state ) {
-	return state.blockSelection.start;
+	return state.blockSelection.start.block;
 }
 
 /**
@@ -341,7 +349,7 @@ export function getBlockSelectionStart( state ) {
  * @return {?string} Client ID of block selection end.
  */
 export function getBlockSelectionEnd( state ) {
-	return state.blockSelection.end;
+	return state.blockSelection.end.block;
 }
 
 /**
@@ -358,7 +366,7 @@ export function getSelectedBlockCount( state ) {
 		return multiSelectedBlockCount;
 	}
 
-	return state.blockSelection.start ? 1 : 0;
+	return state.blockSelection.start.block ? 1 : 0;
 }
 
 /**
@@ -370,7 +378,7 @@ export function getSelectedBlockCount( state ) {
  */
 export function hasSelectedBlock( state ) {
 	const { start, end } = state.blockSelection;
-	return !! start && start === end;
+	return !! start.block && start.block === end.block;
 }
 
 /**
@@ -386,7 +394,7 @@ export function getSelectedBlockClientId( state ) {
 	// We need to check the block exists because the current blockSelection
 	// reducer doesn't take into account when blocks are reset via undo. To be
 	// removed when that's fixed.
-	return start && start === end && !! state.blocks.byClientId[ start ] ? start : null;
+	return start.block && start.block === end.block && !! state.blocks.byClientId[ start.block ] ? start.block : null;
 }
 
 /**
@@ -552,7 +560,8 @@ export function getNextBlockClientId( state, startClientId ) {
  */
 export function getSelectedBlocksInitialCaretPosition( state ) {
 	const { start, end } = state.blockSelection;
-	if ( start !== end || ! start ) {
+
+	if ( start.block !== end.block || ! start.block ) {
 		return null;
 	}
 
@@ -569,25 +578,26 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
 export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { start, end } = state.blockSelection;
-		if ( start === null || end === null ) {
+
+		if ( start.block === undefined || end.block === undefined ) {
 			return EMPTY_ARRAY;
 		}
 
-		if ( start === end ) {
-			return [ start ];
+		if ( start.block === end.block ) {
+			return [ start.block ];
 		}
 
 		// Retrieve root client ID to aid in retrieving relevant nested block
 		// order, being careful to allow the falsey empty string top-level root
 		// by explicitly testing against null.
-		const rootClientId = getBlockRootClientId( state, start );
+		const rootClientId = getBlockRootClientId( state, start.block );
 		if ( rootClientId === null ) {
 			return EMPTY_ARRAY;
 		}
 
 		const blockOrder = getBlockOrder( state, rootClientId );
-		const startIndex = blockOrder.indexOf( start );
-		const endIndex = blockOrder.indexOf( end );
+		const startIndex = blockOrder.indexOf( start.block );
+		const endIndex = blockOrder.indexOf( end.block );
 
 		if ( startIndex > endIndex ) {
 			return blockOrder.slice( endIndex, startIndex + 1 );
@@ -597,8 +607,8 @@ export const getSelectedBlockClientIds = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
-		state.blockSelection.start,
-		state.blockSelection.end,
+		state.blockSelection.start.block,
+		state.blockSelection.end.block,
 	],
 );
 
@@ -612,7 +622,8 @@ export const getSelectedBlockClientIds = createSelector(
  */
 export function getMultiSelectedBlockClientIds( state ) {
 	const { start, end } = state.blockSelection;
-	if ( start === end ) {
+
+	if ( start.block === end.block ) {
 		return EMPTY_ARRAY;
 	}
 
@@ -741,8 +752,8 @@ export const isAncestorMultiSelected = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
-		state.blockSelection.start,
-		state.blockSelection.end,
+		state.blockSelection.start.block,
+		state.blockSelection.end.block,
 	],
 );
 /**
@@ -759,10 +770,10 @@ export const isAncestorMultiSelected = createSelector(
  */
 export function getMultiSelectedBlocksStartClientId( state ) {
 	const { start, end } = state.blockSelection;
-	if ( start === end ) {
+	if ( start.block === end.block ) {
 		return null;
 	}
-	return start || null;
+	return start.block || null;
 }
 
 /**
@@ -779,10 +790,10 @@ export function getMultiSelectedBlocksStartClientId( state ) {
  */
 export function getMultiSelectedBlocksEndClientId( state ) {
 	const { start, end } = state.blockSelection;
-	if ( start === end ) {
+	if ( start.block === end.block ) {
 		return null;
 	}
-	return end || null;
+	return end.block || null;
 }
 
 /**
@@ -825,11 +836,11 @@ export function getBlockIndex( state, clientId, rootClientId ) {
 export function isBlockSelected( state, clientId ) {
 	const { start, end } = state.blockSelection;
 
-	if ( start !== end ) {
+	if ( start.block !== end.block ) {
 		return false;
 	}
 
-	return start === clientId;
+	return start.block === clientId;
 }
 
 /**
@@ -883,7 +894,7 @@ export function isBlockWithinSelection( state, clientId ) {
  */
 export function hasMultiSelection( state ) {
 	const { start, end } = state.blockSelection;
-	return start !== end;
+	return start.block !== end.block;
 }
 
 /**
@@ -964,9 +975,9 @@ export function getBlockInsertionPoint( state ) {
 	}
 
 	const { end } = blockSelection;
-	if ( end ) {
-		rootClientId = getBlockRootClientId( state, end ) || undefined;
-		index = getBlockIndex( state, end, rootClientId ) + 1;
+	if ( end.block ) {
+		rootClientId = getBlockRootClientId( state, end.block ) || undefined;
+		index = getBlockIndex( state, end.block, rootClientId ) + 1;
 	} else {
 		index = getBlockOrder( state ).length;
 	}

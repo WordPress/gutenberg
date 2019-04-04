@@ -741,8 +741,8 @@ describe( 'selectors', () => {
 		it( 'should return false if no selection', () => {
 			const state = {
 				blockSelection: {
-					start: null,
-					end: null,
+					start: {},
+					end: {},
 				},
 			};
 
@@ -752,8 +752,8 @@ describe( 'selectors', () => {
 		it( 'should return false if multi-selection', () => {
 			const state = {
 				blockSelection: {
-					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
-					end: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+					start: { block: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
+					end: { block: '9db792c6-a25a-495d-adbd-97d56a4c4189' },
 				},
 			};
 
@@ -763,8 +763,8 @@ describe( 'selectors', () => {
 		it( 'should return true if singular selection', () => {
 			const state = {
 				blockSelection: {
-					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
-					end: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					start: { block: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
+					end: { block: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
 				},
 			};
 
@@ -815,7 +815,7 @@ describe( 'selectors', () => {
 	describe( 'getSelectedBlockClientId', () => {
 		it( 'should return null if no block is selected', () => {
 			const state = {
-				blockSelection: { start: null, end: null },
+				blockSelection: { start: {}, end: {} },
 			};
 
 			expect( getSelectedBlockClientId( state ) ).toBe( null );
@@ -823,7 +823,7 @@ describe( 'selectors', () => {
 
 		it( 'should return null if there is multi selection', () => {
 			const state = {
-				blockSelection: { start: 23, end: 123 },
+				blockSelection: { start: { block: 23 }, end: { block: 123 } },
 			};
 
 			expect( getSelectedBlockClientId( state ) ).toBe( null );
@@ -838,7 +838,7 @@ describe( 'selectors', () => {
 						},
 					},
 				},
-				blockSelection: { start: 23, end: 23 },
+				blockSelection: { start: { block: 23 }, end: { block: 23 } },
 			};
 
 			expect( getSelectedBlockClientId( state ) ).toEqual( 23 );
@@ -863,7 +863,7 @@ describe( 'selectors', () => {
 						123: [],
 					},
 				},
-				blockSelection: { start: null, end: null },
+				blockSelection: { start: {}, end: {} },
 			};
 
 			expect( getSelectedBlock( state ) ).toBe( null );
@@ -886,7 +886,7 @@ describe( 'selectors', () => {
 						123: [],
 					},
 				},
-				blockSelection: { start: 23, end: 123 },
+				blockSelection: { start: { block: 23 }, end: { block: 123 } },
 			};
 
 			expect( getSelectedBlock( state ) ).toBe( null );
@@ -909,7 +909,7 @@ describe( 'selectors', () => {
 						123: [],
 					},
 				},
-				blockSelection: { start: 23, end: 23 },
+				blockSelection: { start: { block: 23 }, end: { block: 23 } },
 			};
 
 			expect( getSelectedBlock( state ) ).toEqual( {
@@ -993,7 +993,7 @@ describe( 'selectors', () => {
 						'': [ 123, 23 ],
 					},
 				},
-				blockSelection: { start: null, end: null },
+				blockSelection: { start: {}, end: {} },
 			};
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [] );
@@ -1006,7 +1006,7 @@ describe( 'selectors', () => {
 						'': [ 5, 4, 3, 2, 1 ],
 					},
 				},
-				blockSelection: { start: 2, end: 2 },
+				blockSelection: { start: { block: 2 }, end: { block: 2 } },
 			};
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 2 ] );
@@ -1019,7 +1019,7 @@ describe( 'selectors', () => {
 						'': [ 5, 4, 3, 2, 1 ],
 					},
 				},
-				blockSelection: { start: 2, end: 4 },
+				blockSelection: { start: { block: 2 }, end: { block: 4 } },
 			};
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 4, 3, 2 ] );
@@ -1033,7 +1033,7 @@ describe( 'selectors', () => {
 						4: [ 9, 8, 7, 6 ],
 					},
 				},
-				blockSelection: { start: 7, end: 9 },
+				blockSelection: { start: { block: 7 }, end: { block: 9 } },
 			};
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 9, 8, 7 ] );
@@ -1048,7 +1048,7 @@ describe( 'selectors', () => {
 						'': [ 123, 23 ],
 					},
 				},
-				blockSelection: { start: null, end: null },
+				blockSelection: { start: {}, end: {} },
 			};
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [] );
@@ -1061,7 +1061,7 @@ describe( 'selectors', () => {
 						'': [ 5, 4, 3, 2, 1 ],
 					},
 				},
-				blockSelection: { start: 2, end: 4 },
+				blockSelection: { start: { block: 2 }, end: { block: 4 } },
 			};
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [ 4, 3, 2 ] );
@@ -1075,7 +1075,7 @@ describe( 'selectors', () => {
 						4: [ 9, 8, 7, 6 ],
 					},
 				},
-				blockSelection: { start: 7, end: 9 },
+				blockSelection: { start: { block: 7 }, end: { block: 9 } },
 			};
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [ 9, 8, 7 ] );
@@ -1090,7 +1090,7 @@ describe( 'selectors', () => {
 					attributes: {},
 					order: {},
 				},
-				blockSelection: { start: null, end: null },
+				blockSelection: { start: {}, end: {} },
 			};
 
 			expect(
@@ -1102,7 +1102,7 @@ describe( 'selectors', () => {
 	describe( 'getMultiSelectedBlocksStartClientId', () => {
 		it( 'returns null if there is no multi selection', () => {
 			const state = {
-				blockSelection: { start: null, end: null },
+				blockSelection: { start: {}, end: {} },
 			};
 
 			expect( getMultiSelectedBlocksStartClientId( state ) ).toBeNull();
@@ -1110,7 +1110,7 @@ describe( 'selectors', () => {
 
 		it( 'returns multi selection start', () => {
 			const state = {
-				blockSelection: { start: 2, end: 4 },
+				blockSelection: { start: { block: 2 }, end: { block: 4 } },
 			};
 
 			expect( getMultiSelectedBlocksStartClientId( state ) ).toBe( 2 );
@@ -1120,7 +1120,7 @@ describe( 'selectors', () => {
 	describe( 'getMultiSelectedBlocksEndClientId', () => {
 		it( 'returns null if there is no multi selection', () => {
 			const state = {
-				blockSelection: { start: null, end: null },
+				blockSelection: { start: {}, end: {} },
 			};
 
 			expect( getMultiSelectedBlocksEndClientId( state ) ).toBeNull();
@@ -1128,7 +1128,7 @@ describe( 'selectors', () => {
 
 		it( 'returns multi selection end', () => {
 			const state = {
-				blockSelection: { start: 2, end: 4 },
+				blockSelection: { start: { block: 2 }, end: { block: 4 } },
 			};
 
 			expect( getMultiSelectedBlocksEndClientId( state ) ).toBe( 4 );
@@ -1296,7 +1296,7 @@ describe( 'selectors', () => {
 	describe( 'isBlockSelected', () => {
 		it( 'should return true if the block is selected', () => {
 			const state = {
-				blockSelection: { start: 123, end: 123 },
+				blockSelection: { start: { block: 123 }, end: { block: 123 } },
 			};
 
 			expect( isBlockSelected( state, 123 ) ).toBe( true );
@@ -1304,7 +1304,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if a multi-selection range exists', () => {
 			const state = {
-				blockSelection: { start: 123, end: 124 },
+				blockSelection: { start: { block: 123 }, end: { block: 124 } },
 			};
 
 			expect( isBlockSelected( state, 123 ) ).toBe( false );
@@ -1312,7 +1312,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the block is not selected', () => {
 			const state = {
-				blockSelection: { start: null, end: null },
+				blockSelection: { start: {}, end: {} },
 			};
 
 			expect( isBlockSelected( state, 23 ) ).toBe( false );
@@ -1322,7 +1322,7 @@ describe( 'selectors', () => {
 	describe( 'hasSelectedInnerBlock', () => {
 		it( 'should return false if the selected block is a child of the given ClientId', () => {
 			const state = {
-				blockSelection: { start: 5, end: 5 },
+				blockSelection: { start: { block: 5 }, end: { block: 5 } },
 				blocks: {
 					order: {
 						4: [ 3, 2, 1 ],
@@ -1335,7 +1335,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true if the selected block is a child of the given ClientId', () => {
 			const state = {
-				blockSelection: { start: 3, end: 3 },
+				blockSelection: { start: { block: 3 }, end: { block: 3 } },
 				blocks: {
 					order: {
 						4: [ 3, 2, 1 ],
@@ -1353,7 +1353,7 @@ describe( 'selectors', () => {
 						6: [ 5, 4, 3, 2, 1 ],
 					},
 				},
-				blockSelection: { start: 2, end: 4 },
+				blockSelection: { start: { block: 2 }, end: { block: 4 } },
 			};
 			expect( hasSelectedInnerBlock( state, 6 ) ).toBe( true );
 		} );
@@ -1366,7 +1366,7 @@ describe( 'selectors', () => {
 						6: [ 5, 4 ],
 					},
 				},
-				blockSelection: { start: 5, end: 4 },
+				blockSelection: { start: { block: 5 }, end: { block: 4 } },
 			};
 			expect( hasSelectedInnerBlock( state, 3 ) ).toBe( false );
 		} );
@@ -1375,7 +1375,7 @@ describe( 'selectors', () => {
 	describe( 'isBlockWithinSelection', () => {
 		it( 'should return true if the block is selected but not the last', () => {
 			const state = {
-				blockSelection: { start: 5, end: 3 },
+				blockSelection: { start: { block: 5 }, end: { block: 3 } },
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
@@ -1388,7 +1388,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the block is the last selected', () => {
 			const state = {
-				blockSelection: { start: 5, end: 3 },
+				blockSelection: { start: { block: 5 }, end: { block: 3 } },
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
@@ -1401,7 +1401,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the block is not selected', () => {
 			const state = {
-				blockSelection: { start: 5, end: 3 },
+				blockSelection: { start: { block: 5 }, end: { block: 3 } },
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
@@ -1414,7 +1414,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if there is no selection', () => {
 			const state = {
-				blockSelection: {},
+				blockSelection: { start: {}, end: {} },
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
@@ -1430,8 +1430,8 @@ describe( 'selectors', () => {
 		it( 'should return false if no selection', () => {
 			const state = {
 				blockSelection: {
-					start: null,
-					end: null,
+					start: {},
+					end: {},
 				},
 			};
 
@@ -1441,8 +1441,8 @@ describe( 'selectors', () => {
 		it( 'should return false if singular selection', () => {
 			const state = {
 				blockSelection: {
-					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
-					end: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					start: { block: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
+					end: { block: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
 				},
 			};
 
@@ -1452,8 +1452,8 @@ describe( 'selectors', () => {
 		it( 'should return true if multi-selection', () => {
 			const state = {
 				blockSelection: {
-					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
-					end: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+					start: { block: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
+					end: { block: '9db792c6-a25a-495d-adbd-97d56a4c4189' },
 				},
 			};
 
@@ -1468,7 +1468,7 @@ describe( 'selectors', () => {
 					'': [ 5, 4, 3, 2, 1 ],
 				},
 			},
-			blockSelection: { start: 2, end: 4 },
+			blockSelection: { start: { block: 2 }, end: { block: 4 } },
 		};
 
 		it( 'should return true if the block is multi selected', () => {
@@ -1487,7 +1487,7 @@ describe( 'selectors', () => {
 					'': [ 5, 4, 3, 2, 1 ],
 				},
 			},
-			blockSelection: { start: 2, end: 4 },
+			blockSelection: { start: { block: 2 }, end: { block: 4 } },
 		};
 
 		it( 'should return true if the block is first in multi selection', () => {
@@ -1581,8 +1581,8 @@ describe( 'selectors', () => {
 		it( 'should return the explicitly assigned insertion point', () => {
 			const state = {
 				blockSelection: {
-					start: 'clientId2',
-					end: 'clientId2',
+					start: { block: 'clientId2' },
+					end: { block: 'clientId2' },
 				},
 				blocks: {
 					byClientId: {
@@ -1614,8 +1614,8 @@ describe( 'selectors', () => {
 		it( 'should return an object for the selected block', () => {
 			const state = {
 				blockSelection: {
-					start: 'clientId1',
-					end: 'clientId1',
+					start: { block: 'clientId1' },
+					end: { block: 'clientId1' },
 				},
 				blocks: {
 					byClientId: {
@@ -1641,8 +1641,8 @@ describe( 'selectors', () => {
 		it( 'should return an object for the nested selected block', () => {
 			const state = {
 				blockSelection: {
-					start: 'clientId2',
-					end: 'clientId2',
+					start: { block: 'clientId2' },
+					end: { block: 'clientId2' },
 				},
 				blocks: {
 					byClientId: {
@@ -1671,8 +1671,8 @@ describe( 'selectors', () => {
 		it( 'should return an object for the last multi selected clientId', () => {
 			const state = {
 				blockSelection: {
-					start: 'clientId1',
-					end: 'clientId2',
+					start: { block: 'clientId1' },
+					end: { block: 'clientId2' },
 				},
 				blocks: {
 					byClientId: {
@@ -1701,8 +1701,8 @@ describe( 'selectors', () => {
 		it( 'should return an object for the last block if no selection', () => {
 			const state = {
 				blockSelection: {
-					start: null,
-					end: null,
+					start: {},
+					end: {},
 				},
 				blocks: {
 					byClientId: {

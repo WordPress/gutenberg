@@ -598,6 +598,27 @@ export function exitFormattedText() {
 }
 
 /**
+ * Returns an action object used in signalling that the user caret has changed
+ * position.
+ *
+ * @param {string} block      The selected block client ID.
+ * @param {string} identifier The selected RichText ID within the block.
+ * @param {number} start      The start offset.
+ * @param {number} end        The end offset.
+ *
+ * @return {Object} Action object.
+ */
+export function selectionChange( block, identifier, start, end ) {
+	return {
+		type: 'SELECTION_CHANGE',
+		block,
+		identifier,
+		start,
+		end,
+	};
+}
+
+/**
  * Returns an action object used in signalling that a new block of the default
  * type should be added to the block list.
  *

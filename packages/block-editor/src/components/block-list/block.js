@@ -12,7 +12,6 @@ import {
 	focus,
 	isTextField,
 	placeCaretAtHorizontalEdge,
-	placeCaretAtVerticalEdge,
 } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
@@ -154,13 +153,7 @@ export class BlockListBlock extends Component {
 			return;
 		}
 
-		target.focus();
-
-		// In reverse case, need to explicitly place caret position.
-		if ( isReverse ) {
-			placeCaretAtHorizontalEdge( target, true );
-			placeCaretAtVerticalEdge( target, true );
-		}
+		placeCaretAtHorizontalEdge( target, isReverse );
 	}
 
 	setAttributes( attributes ) {
