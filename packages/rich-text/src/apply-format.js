@@ -28,7 +28,8 @@ export function applyFormat(
 	startIndex = value.start,
 	endIndex = value.end
 ) {
-	const newFormats = value.formats.slice( 0 );
+	const { formats, activeFormats = [] } = value;
+	const newFormats = formats.slice();
 
 	// The selection is collapsed.
 	if ( startIndex === endIndex ) {
@@ -51,11 +52,9 @@ export function applyFormat(
 		// Otherwise, insert a placeholder with the format so new input appears
 		// with the format applied.
 		} else {
-			const previousFormat = newFormats[ startIndex - 1 ] || [];
-
 			return {
 				...value,
-				formatPlaceholder: [ ...previousFormat, format ],
+				activeFormats: [ ...activeFormats, format ],
 			};
 		}
 	} else {

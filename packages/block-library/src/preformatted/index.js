@@ -68,10 +68,14 @@ export const settings = {
 		return (
 			<RichText
 				tagName="pre"
+				// Ensure line breaks are normalised to HTML.
 				value={ content.replace( /\n/g, '<br>' ) }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
-						content: nextContent,
+						// Ensure line breaks are normalised to characters. This
+						// saves space, is easier to read, and ensures display
+						// filters work correctly.
+						content: nextContent.replace( /<br ?\/?>/g, '\n' ),
 					} );
 				} }
 				placeholder={ __( 'Write preformatted text…' ) }
