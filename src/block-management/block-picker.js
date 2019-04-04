@@ -13,9 +13,9 @@ import { FlatList, Text, TouchableHighlight, View } from 'react-native';
  * WordPress dependencies
  */
 import { SVG } from '@wordpress/components';
-import { BottomSheet, UnsupportedBlock } from '@wordpress/editor';
+import { BottomSheet } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { getBlockTypes } from '@wordpress/blocks';
+import { getBlockTypes, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -31,7 +31,7 @@ type PropsType = {
 };
 
 export default class BlockPicker extends Component<PropsType> {
-	availableBlockTypes = getBlockTypes().filter( ( { name } ) => name !== UnsupportedBlock.name );
+	availableBlockTypes = getBlockTypes().filter( ( { name } ) => name !== getUnregisteredTypeHandlerName() );
 
 	render() {
 		const numberOfColumns = this.calculateNumberOfColumns();

@@ -53,37 +53,30 @@ export class BlockToolbar extends Component<PropsType> {
 		} = this.props;
 
 		return (
-			<View style={ styles.container } accessible={ false } >
+			<View style={ styles.container } >
 				<ScrollView
-					accessible={ false }
 					horizontal={ true }
 					showsHorizontalScrollIndicator={ false }
 					keyboardShouldPersistTaps={ 'always' }
 					alwaysBounceHorizontal={ false }
 					contentContainerStyle={ styles.scrollableContent }
 				>
-					<Toolbar accessible={ false }
-						accessibilityLabel={ 'Bottom Toolbar' }>
+					<Toolbar accessible={ false }>
 						<ToolbarButton
-							icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
 							title={ __( 'Add block' ) }
-							accessible={ false }
-							accessibilityLabel={ __( 'Add block' ) }
+							icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
 							onClick={ onInsertClick }
+							extraProps={ { hint: __( 'Double tap to add a block' ) } }
 						/>
 						<ToolbarButton
 							title={ __( 'Undo' ) }
 							icon="undo"
-							accessible={ false }
-							accessibilityLabel={ __( 'Undo' ) }
 							isDisabled={ ! hasUndo }
 							onClick={ undo }
 						/>
 						<ToolbarButton
 							title={ __( 'Redo' ) }
 							icon="redo"
-							accessible={ false }
-							accessibilityLabel={ __( 'Redo' ) }
 							isDisabled={ ! hasRedo }
 							onClick={ redo }
 						/>
@@ -94,6 +87,7 @@ export class BlockToolbar extends Component<PropsType> {
 				{ showKeyboardHideButton &&
 				( <Toolbar passedStyle={ styles.keyboardHideContainer }>
 					<ToolbarButton
+						title={ __( 'Hide keyboard' ) }
 						icon="keyboard-hide"
 						onClick={ this.onKeyboardHide }
 					/>
