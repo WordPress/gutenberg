@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
+import { withSafeInterval } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
@@ -95,6 +96,8 @@ class Popover extends Component {
 	}
 
 	toggleAutoRefresh( isActive ) {
+		const { clearInterval, setInterval } = this.props;
+
 		window.cancelAnimationFrame( this.rafHandle );
 
 		// Refresh the popover every time the window is resized or scrolled
@@ -386,4 +389,4 @@ const PopoverContainer = Popover;
 
 PopoverContainer.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
 
-export default PopoverContainer;
+export default withSafeInterval( PopoverContainer );
