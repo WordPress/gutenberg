@@ -477,17 +477,11 @@ export class RichText extends Component {
 			return;
 		}
 
-		if ( nextTextContent === this.savedContent ) {
+		if ( nextTextContent === this.savedContent || nextTextContent.startsWith( this.savedContent)) {
 			this.forceSelectionUpdate( this.savedContent.length, this.savedContent.length );
 			this.savedContent = nextTextContent;
 			return;
 		}
-
-		if ( nextTextContent.startsWith( this.savedContent ) ) {
-			this.forceSelectionUpdate( this.savedContent.length, this.savedContent.length );
-		}
-
-		this.savedContent = nextTextContent;
 	}
 
 	forceSelectionUpdate( start:number, end:number) {
@@ -555,7 +549,7 @@ export class RichText extends Component {
 			html = '';
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
-
+		
 		let minHeight = styles[ 'block-editor-rich-text' ].minHeight;
 		if ( style && style.minHeight ) {
 			minHeight = style.minHeight;
