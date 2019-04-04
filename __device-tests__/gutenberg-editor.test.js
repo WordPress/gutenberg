@@ -47,7 +47,7 @@ describe( 'Gutenberg Editor tests', () => {
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
 		await editorPage.removeBlockAtPosition( 0 );
 	} );
-	//
+
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
 		await editorPage.addNewParagraphBlock();
 		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );

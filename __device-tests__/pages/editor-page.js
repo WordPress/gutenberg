@@ -115,4 +115,9 @@ export default class EditorPage {
 		const textViewElement = await this.getTextViewForParagraphBlock( block );
 		await typeString( textViewElement, text );
 	}
+
+	async getTextForParagraphBlockTextView( textViewElement: wd.PromiseChainWebdriver.Element ) {
+		const text = await textViewElement.text();
+		return text.toString().trim();
+	}
 }
