@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import isPromise from 'is-promise';
-
-/**
  * Internal dependencies
  */
 import { createRegistry } from '../../registry';
@@ -85,18 +80,59 @@ describe( 'controls', () => {
 
 		registry.select( 'store' ).getItems();
 	} );
-	it( 'returns undefined when action is dispatched unless it is a ' +
-		'promise', () => {
+	describe( 'various action types have expected response and resolve as ' +
+		'expected', () => {
 		const actions = {
-			withPromise: () => new Promise( ( resolve ) => resolve( {} ) ),
+			*withPromise() {
+				yield { type: 'SOME_ACTION' };
+				return yield { type: 'TEST_PROMISE' };
+			},
+			*withNormal() {
+				yield { type: 'SOME_ACTION' };
+				yield { type: 'SOME_OTHER_ACTION' };
+			},
+			*withNonActionLikeValue() {
+				yield { type: 'SOME_ACTION' };
+				return 10;
+			},
+			normalShouldFail: () => 10,
 			normal: () => ( { type: 'NORMAL' } ),
 		};
-		registry.registerStore( 'store', {
-			reducer: () => {},
-			actions,
+		beforeEach( () => {
+			registry.registerStore( 'store', {
+				reducer: () => {},
+				controls: {
+					TEST_PROMISE() {
+						return new Promise( ( resolve ) => resolve( 10 ) );
+					},
+				},
+				actions,
+			} );
 		} );
-		expect( isPromise( registry.dispatch( 'store' ).withPromise() ) )
-			.toBe( true );
-		expect( registry.dispatch( 'store' ).normal() ).toBeUndefined();
+		it( 'action generator returning a yielded promise control descriptor ' +
+			'resolves as expected', () => {
+			const withPromise = registry.dispatch( 'store' ).withPromise();
+			expect( withPromise ).resolves.toEqual( 10 );
+		} );
+		it( 'action generator yielding normal action objects resolves as ' +
+			'expected', () => {
+			const withNormal = registry.dispatch( 'store' ).withNormal();
+			expect( withNormal ).resolves.toBeUndefined();
+		} );
+		it( 'action generator returning a non action like value', () => {
+			const withNonActionLikeValue = registry.dispatch( 'store' )
+				.withNonActionLikeValue();
+			expect( withNonActionLikeValue ).resolves.toEqual( 10 );
+		} );
+		it( 'normal dispatch action throwing error because no action ' +
+			'returned', () => {
+			const testDispatch = () => registry.dispatch( 'store' ).normalShouldFail();
+			expect( testDispatch ).toThrow(
+				'Actions must be plain objects. Use custom middleware for async actions.'
+			);
+		} );
+		it( 'returns undefined for normal dispatch action', () => {
+			expect( registry.dispatch( 'store' ).normal() ).toBeUndefined();
+		} );
 	} );
 } );
