@@ -491,7 +491,7 @@ export class RichText extends Component {
 		}
 	}
 
-	forceSelectionUpdate( start: number, end: number ) {
+	forceSelectionUpdate( start, end ) {
 		if ( ! this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = true;
 			this.setState( { start, end } );
