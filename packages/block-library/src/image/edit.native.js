@@ -27,11 +27,9 @@ import {
 	RichText,
 	BlockControls,
 	InspectorControls,
-} from '@wordpress/block-editor';
-import {
 	BottomSheet,
 	Picker,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';

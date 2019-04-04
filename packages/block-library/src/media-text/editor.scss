@@ -22,6 +22,11 @@
 	width: 100% !important;
 }
 
+.wp-block-media-text.is-image-fill .editor-media-container__resizer {
+	// The resizer sets an inline height but for the image fill we set it to full height.
+	height: 100% !important;
+}
+
 .wp-block-media-text .block-editor-inner-blocks {
 	word-break: break-word;
 	grid-area: media-text-content;
