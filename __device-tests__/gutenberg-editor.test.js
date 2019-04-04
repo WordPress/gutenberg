@@ -46,22 +46,12 @@ describe( 'Gutenberg Editor tests', () => {
 		await editorPage.expect();
 	} );
 
-	// it( 'should be able to add a new Paragraph block', async () => {
-	// 	await editorPage.addNewParagraphBlock();
-	// 	const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
-	// 	await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
-	// 	await editorPage.removeBlockAtPosition( 0 );
-	// } );
-	//
-	// it( 'should be able to create a post with multiple paragraph blocks', async () => {
-	// 	await editorPage.addNewParagraphBlock();
-	// 	const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
-	// 	await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.longText );
-	//
-	// 	for ( let i = 3; i > -1; i-- ) {
-	// 		await editorPage.removeBlockAtPosition( i );
-	// 	}
-	// } );
+	it( 'should be able to add a new Paragraph block', async () => {
+		await editorPage.addNewParagraphBlock();
+		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+		await editorPage.removeBlockAtPosition( 0 );
+	} );
 
 	it( 'should be able to split one paragraph block into two', async () => {
 		await editorPage.addNewParagraphBlock();
@@ -76,10 +66,22 @@ describe( 'Gutenberg Editor tests', () => {
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 0 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		expect( text0 ).not.toBe( '' );
+		expect( text1 ).not.toBe( '' );
 		expect( testData.shortText ).toMatch( new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` ) );
 
 		await editorPage.removeBlockAtPosition( 1 );
 		await editorPage.removeBlockAtPosition( 0 );
+	} );
+
+	it( 'should be able to create a post with multiple paragraph blocks', async () => {
+		await editorPage.addNewParagraphBlock();
+		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.longText );
+
+		for ( let i = 3; i > -1; i-- ) {
+			await editorPage.removeBlockAtPosition( i );
+		}
 	} );
 
 	afterAll( async () => {
