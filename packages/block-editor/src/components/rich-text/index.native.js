@@ -472,17 +472,12 @@ export class RichText extends Component {
 		const nextRecord = this.formatToValue( nextProps.value );
 		const nextTextContent = getTextContent( nextRecord );
 
-		if ( this.isTouched ) {
+		if ( this.isTouched || ! nextProps.isSelected ) {
 			this.savedContent = nextTextContent;
 			return;
 		}
 
-		if ( ! nextProps.isSelected ) {
-			this.savedContent = nextTextContent;
-			return;
-		}
-
-		if ( nextTextContent === this.savedContent) {
+		if ( nextTextContent === this.savedContent ) {
 			this.forceSelectionUpdate( this.savedContent.length, this.savedContent.length );
 			this.savedContent = nextTextContent;
 			return;
