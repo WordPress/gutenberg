@@ -64,18 +64,21 @@ export class BlockToolbar extends Component<PropsType> {
 					<Toolbar accessible={ false }>
 						<ToolbarButton
 							title={ __( 'Add block' ) }
+							accessibilityLabel={ __( 'Add block' ) }
 							icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
 							onClick={ onInsertClick }
 							extraProps={ { hint: __( 'Double tap to add a block' ) } }
 						/>
 						<ToolbarButton
 							title={ __( 'Undo' ) }
+							accessibilityLabel={ __( 'Undo' ) }
 							icon="undo"
 							isDisabled={ ! hasUndo }
 							onClick={ undo }
 						/>
 						<ToolbarButton
 							title={ __( 'Redo' ) }
+							accessibilityLabel={ __( 'Redo' ) }
 							icon="redo"
 							isDisabled={ ! hasRedo }
 							onClick={ redo }
