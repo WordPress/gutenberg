@@ -113,7 +113,7 @@ const typeString = async ( element: wd.PromiseChainWebdriver.Element, str: strin
 	for ( let i = 0; i < str.length; i++ ) {
 		await element.type( str.charAt( i ) );
 	}
-}
+};
 
 module.exports = {
 	timer,

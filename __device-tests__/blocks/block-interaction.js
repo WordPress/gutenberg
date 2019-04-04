@@ -65,7 +65,7 @@ export default class BlockInteraction {
 		const blockLocator = `block-${ position }-${ blockName }`;
 		block.element = await this.driver.elementByAccessibilityId( blockLocator );
 		block.accessibilityId = await this.getAttribute( this.accessibilityIdKey );
-		block.setup();
+		await block.setup();
 		await this.driver.elementByAccessibilityId( this.accessibilityId );
 	}
 
