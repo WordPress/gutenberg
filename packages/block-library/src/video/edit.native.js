@@ -27,9 +27,11 @@ import {
 	RichText,
 	BlockControls,
 	InspectorControls,
+} from '@wordpress/block-editor';
+import {
 	BottomSheet,
 	Picker,
-} from '@wordpress/block-editor';
+} from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
@@ -37,8 +39,8 @@ import { doAction, hasAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import ImageSize from './image-size';
-import styles from './styles.scss';
+import ImageSize from '../image/image-size';
+import styles from '../image/styles.scss';
 
 const MEDIA_UPLOAD_STATE_UPLOADING = 1;
 const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
@@ -51,8 +53,9 @@ const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_libr
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
+const MEDIA_TYPE = "image";
 
-class ImageEdit extends React.Component {
+class VideoEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 
@@ -64,6 +67,8 @@ class ImageEdit extends React.Component {
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
+		this.addMediaUploadListener = this.addMediaUploadListener.bind( this );
+		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
@@ -75,11 +80,10 @@ class ImageEdit extends React.Component {
 	}
 
 	componentDidMount() {
-		this.addMediaUploadListener();
-
 		const { attributes } = this.props;
 
 		if ( attributes.id && ! isURL( attributes.url ) ) {
+			this.addMediaUploadListener();
 			mediaUploadSync();
 		}
 	}
@@ -138,6 +142,8 @@ class ImageEdit extends React.Component {
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
 		this.setState( { isUploadInProgress: false } );
+
+		this.removeMediaUploadListener();
 	}
 
 	finishMediaUploadWithFailure( payload ) {
@@ -206,7 +212,7 @@ class ImageEdit extends React.Component {
 		const { url, caption, height, width, alt, href } = attributes;
 
 		const onMediaLibraryButtonPressed = () => {
-			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
+			requestMediaPickFromMediaLibrary( [ MEDIA_TYPE ], ( mediaId, mediaUrl ) => {
 				if ( mediaUrl ) {
 					setAttributes( { id: mediaId, url: mediaUrl } );
 				}
@@ -214,8 +220,9 @@ class ImageEdit extends React.Component {
 		};
 
 		const onMediaUploadButtonPressed = () => {
-			requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
+			requestMediaPickFromDeviceLibrary( [ MEDIA_TYPE ], ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
+					this.addMediaUploadListener( );
 					setAttributes( { url: mediaUri, id: mediaId } );
 				}
 			} );
@@ -224,6 +231,7 @@ class ImageEdit extends React.Component {
 		const onMediaCaptureButtonPressed = () => {
 			requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
+					this.addMediaUploadListener( );
 					setAttributes( { url: mediaUri, id: mediaId } );
 				}
 			} );
@@ -322,8 +330,6 @@ class ImageEdit extends React.Component {
 		return (
 			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
 				<View style={ { flex: 1 } }>
-					{ getInspectorControls() }
-					{ getMediaOptions() }
 					{ showSpinner && <Spinner progress={ progress } /> }
 					<BlockControls>
 						{ toolbarEditButton }
@@ -354,7 +360,8 @@ class ImageEdit extends React.Component {
 
 							return (
 								<View style={ { flex: 1 } } >
-
+									{ getInspectorControls() }
+									{ getMediaOptions() }
 									{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
 										<Dashicon icon={ 'format-image' } size={ 300 } />
 									</View> }
@@ -393,4 +400,4 @@ class ImageEdit extends React.Component {
 	}
 }
 
-export default ImageEdit;
+export default VideoEdit;
