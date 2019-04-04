@@ -477,6 +477,10 @@ export class RichText extends Component {
 			return;
 		}
 
+		if (nextTextContent === '' & this.savedContent === '') {
+			return;
+		}
+
 		if ( nextTextContent === this.savedContent || nextTextContent.startsWith( this.savedContent)) {
 			this.forceSelectionUpdate( this.savedContent.length, this.savedContent.length );
 			this.savedContent = nextTextContent;
