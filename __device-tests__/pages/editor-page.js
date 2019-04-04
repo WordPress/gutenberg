@@ -31,7 +31,7 @@ export default class EditorPage {
 		const blockName = block.name;
 
 		// Click add button
-		const addButton = await this.driver.elementByAccessibilityId( __( 'Double tap to add a block' ) );
+		const addButton = await this.driver.elementByAccessibilityId( __( 'Add block' ) );
 		await addButton.click();
 
 		// Click on block of choice
