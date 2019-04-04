@@ -20,7 +20,7 @@ import {
 	toHTMLString,
 	insert,
 	isCollapsed,
-	getTextContent
+	getTextContent,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
@@ -204,7 +204,7 @@ export class RichText extends Component {
 		if ( newContent && newContent !== this.props.value ) {
 			this.props.onChange( newContent );
 			if ( record.needsSelectionUpdate && record.start && record.end ) {
-				this.forceSelectionUpdate(record.start, record.end);
+				this.forceSelectionUpdate( record.start, record.end );
 			}
 		} else {
 			// make sure the component rerenders without refreshing the text on gutenberg
@@ -374,12 +374,15 @@ export class RichText extends Component {
 
 	onFocus( event ) {
 		this.isTouched = true;
-		this.props.onFocus(event);
+		this.props.onFocus( event );
 	}
 
-	onBlur() {
+	onBlur( event ) {
 		this.isTouched = false;
-		this.props.onBlur;
+
+		if ( this.props.onBlur ) {
+			this.props.onBlur( event );
+		}
 	}
 
 	onSelectionChange( start, end, text, event ) {
@@ -468,7 +471,6 @@ export class RichText extends Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		
 		const nextRecord = this.formatToValue( nextProps.value );
 		const nextTextContent = getTextContent( nextRecord );
 
@@ -477,21 +479,20 @@ export class RichText extends Component {
 			return;
 		}
 
-		if (nextTextContent === '' && this.savedContent === '') {
+		if ( nextTextContent === '' && this.savedContent === '' ) {
 			return;
 		}
 
-		if ( nextTextContent === this.savedContent || nextTextContent.startsWith( this.savedContent)) {
+		if ( nextTextContent === this.savedContent || nextTextContent.startsWith( this.savedContent ) ) {
 			this.forceSelectionUpdate( this.savedContent.length, this.savedContent.length );
 			this.savedContent = nextTextContent;
-			return;
 		}
 	}
 
-	forceSelectionUpdate( start:number, end:number) {
+	forceSelectionUpdate( start: number, end: number ) {
 		if ( ! this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = true;
-			this.setState( { start: start, end: end } );
+			this.setState( { start, end } );
 		}
 	}
 
@@ -511,7 +512,7 @@ export class RichText extends Component {
 			( typeof this.lastContent !== 'undefined' ) &&
 			nextProps.value !== this.lastContent ) {
 			this.lastEventCount = undefined; // force a refresh on the native side
-		}	
+		}
 
 		return true;
 	}
@@ -553,7 +554,7 @@ export class RichText extends Component {
 			html = '';
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
-		
+
 		let minHeight = styles[ 'block-editor-rich-text' ].minHeight;
 		if ( style && style.minHeight ) {
 			minHeight = style.minHeight;
