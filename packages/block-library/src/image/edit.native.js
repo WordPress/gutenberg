@@ -39,6 +39,7 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import ImageSize from './image-size';
 import styles from './styles.scss';
+import MediaUploadUI from './media-upload-ui.js';
 
 const MEDIA_UPLOAD_STATE_UPLOADING = 1;
 const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
@@ -51,6 +52,7 @@ const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_libr
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
+const MEDIA_TYPE = "image";
 
 class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -206,7 +208,7 @@ class ImageEdit extends React.Component {
 		const { url, caption, height, width, alt, href } = attributes;
 
 		const onMediaLibraryButtonPressed = () => {
-			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
+			requestMediaPickFromMediaLibrary( [ MEDIA_TYPE ], ( mediaId, mediaUrl ) => {
 				if ( mediaUrl ) {
 					setAttributes( { id: mediaId, url: mediaUrl } );
 				}
@@ -214,7 +216,7 @@ class ImageEdit extends React.Component {
 		};
 
 		const onMediaUploadButtonPressed = () => {
-			requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
+			requestMediaPickFromDeviceLibrary( [ MEDIA_TYPE ], ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
 					setAttributes( { url: mediaUri, id: mediaId } );
 				}
@@ -324,7 +326,6 @@ class ImageEdit extends React.Component {
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
 					{ getMediaOptions() }
-					{ showSpinner && <Spinner progress={ progress } /> }
 					<BlockControls>
 						{ toolbarEditButton }
 					</BlockControls>
@@ -335,6 +336,18 @@ class ImageEdit extends React.Component {
 							onClick={ onImageSettingsButtonPressed }
 						/>
 					</InspectorControls>
+					<MediaUploadUI 
+						height={ height }
+						width={ width }
+						coverUrl={ url }
+						mediaId={ mediaId }
+						onUpdateMediaProgress={ this.updateMediaProgress }
+						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
+						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+						onmediaUploadStateReset={ this.mediaUploadStateReset }
+					>
+					</MediaUploadUI>
+{/* 					{ showSpinner && <Spinner progress={ progress } /> }
 					<ImageSize src={ url } >
 						{ ( sizes ) => {
 							const {
@@ -354,6 +367,8 @@ class ImageEdit extends React.Component {
 
 							return (
 								<View style={ { flex: 1 } } >
+									//{ { getInspectorControls() }
+									//{ getMediaOptions() } }
 
 									{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
 										<Dashicon icon={ 'format-image' } size={ 300 } />
@@ -374,7 +389,7 @@ class ImageEdit extends React.Component {
 								</View>
 							);
 						} }
-					</ImageSize>
+					</ImageSize> */}
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 						<View style={ { padding: 12, flex: 1 } }>
 							<TextInput
