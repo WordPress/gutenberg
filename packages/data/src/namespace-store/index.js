@@ -8,6 +8,7 @@ import {
 	mapValues,
 } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
+import isPromise from 'is-promise';
 
 /**
  * WordPress dependencies
@@ -188,7 +189,10 @@ function mapSelectors( selectors, store, registry ) {
  */
 function mapActions( actions, store ) {
 	const createBoundAction = ( action ) => ( ...args ) => {
-		store.dispatch( action( ...args ) );
+		const result = store.dispatch( action( ...args ) );
+		if ( isPromise( result ) ) {
+			return result;
+		}
 	};
 
 	return mapValues( actions, createBoundAction );

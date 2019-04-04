@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import isPromise from 'is-promise';
+
+/**
  * Internal dependencies
  */
 import { createRegistry } from '../../registry';
@@ -79,5 +84,19 @@ describe( 'controls', () => {
 		} );
 
 		registry.select( 'store' ).getItems();
+	} );
+	it( 'returns undefined when action is dispatched unless it is a ' +
+		'promise', () => {
+		const actions = {
+			withPromise: () => new Promise( ( resolve ) => resolve( {} ) ),
+			normal: () => ( { type: 'NORMAL' } ),
+		};
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			actions,
+		} );
+		expect( isPromise( registry.dispatch( 'store' ).withPromise() ) )
+			.toBe( true );
+		expect( registry.dispatch( 'store' ).normal() ).toBeUndefined();
 	} );
 } );
