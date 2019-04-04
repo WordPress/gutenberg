@@ -20,6 +20,7 @@ import {
 	toHTMLString,
 	insert,
 	isCollapsed,
+	getTextContent
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
@@ -77,6 +78,8 @@ export class RichText extends Component {
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
 		this.onPaste = this.onPaste.bind( this );
+		this.onFocus = this.onFocus.bind( this );
+		this.onBlur = this.onBlur.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
@@ -88,6 +91,9 @@ export class RichText extends Component {
 			formatPlaceholder: null,
 			height: 0,
 		};
+		this.needsSelectionUpdate = false;
+		this.savedContent = '';
+		this.isTouched = false;
 	}
 
 	/**
@@ -198,11 +204,8 @@ export class RichText extends Component {
 		if ( newContent && newContent !== this.props.value ) {
 			this.props.onChange( newContent );
 			if ( record.needsSelectionUpdate && record.start && record.end ) {
-				this.setState( { start: record.start, end: record.end } );
+				this.forceSelectionUpdate(record.start, record.end);
 			}
-			this.setState( {
-				needsSelectionUpdate: record.needsSelectionUpdate,
-			} );
 		} else {
 			// make sure the component rerenders without refreshing the text on gutenberg
 			// (this can trigger other events that might update the active formats on aztec)
@@ -369,6 +372,16 @@ export class RichText extends Component {
 		}
 	}
 
+	onFocus( event ) {
+		this.isTouched = true;
+		this.props.onFocus(event);
+	}
+
+	onBlur() {
+		this.isTouched = false;
+		this.props.onBlur;
+	}
+
 	onSelectionChange( start, end, text, event ) {
 		// `end` can be less than `start` on iOS
 		// Let's fix that here so `rich-text/slice` can work properly
@@ -454,6 +467,41 @@ export class RichText extends Component {
 		return value;
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		
+		const nextRecord = this.formatToValue( nextProps.value );
+		const nextTextContent = getTextContent( nextRecord );
+
+		if ( this.isTouched ) {
+			this.savedContent = nextTextContent;
+			return;
+		}
+
+		if ( ! nextProps.isSelected ) {
+			this.savedContent = nextTextContent;
+			return;
+		}
+
+		if ( nextTextContent === this.savedContent) {
+			this.forceSelectionUpdate( this.savedContent.length, this.savedContent.length );
+			this.savedContent = nextTextContent;
+			return;
+		}
+
+		if ( nextTextContent.startsWith( this.savedContent ) ) {
+			this.forceSelectionUpdate( this.savedContent.length, this.savedContent.length );
+		}
+
+		this.savedContent = nextTextContent;
+	}
+
+	forceSelectionUpdate( start:number, end:number) {
+		if ( ! this.needsSelectionUpdate ) {
+			this.needsSelectionUpdate = true;
+			this.setState( { start: start, end: end } );
+		}
+	}
+
 	shouldComponentUpdate( nextProps ) {
 		if ( nextProps.tagName !== this.props.tagName || nextProps.isSelected !== this.props.isSelected ) {
 			this.lastEventCount = undefined;
@@ -470,7 +518,7 @@ export class RichText extends Component {
 			( typeof this.lastContent !== 'undefined' ) &&
 			nextProps.value !== this.lastContent ) {
 			this.lastEventCount = undefined; // force a refresh on the native side
-		}
+		}	
 
 		return true;
 	}
@@ -518,7 +566,11 @@ export class RichText extends Component {
 			minHeight = style.minHeight;
 		}
 
-		const selection = this.state.needsSelectionUpdate ? { start: this.state.start, end: this.state.end } : null;
+		let selection = null;
+		if ( this.needsSelectionUpdate ) {
+			this.needsSelectionUpdate = false;
+			selection = { start: this.state.start, end: this.state.end };
+		}
 
 		return (
 			<View>
@@ -543,8 +595,8 @@ export class RichText extends Component {
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].textDecorationColor }
 					onChange={ this.onChange }
-					onFocus={ this.props.onFocus }
-					onBlur={ this.props.onBlur }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
 					onPaste={ this.onPaste }
