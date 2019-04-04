@@ -477,7 +477,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		if (nextTextContent === '' & this.savedContent === '') {
+		if (nextTextContent === '' && this.savedContent === '') {
 			return;
 		}
 
