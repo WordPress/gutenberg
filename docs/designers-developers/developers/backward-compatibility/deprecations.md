@@ -10,7 +10,6 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 - The PHP function `gutenberg_default_post_format_template` has been removed.
 - The PHP function `gutenberg_get_available_image_sizes` has been removed.
 - The PHP function `gutenberg_get_autosave_newer_than_post_save` has been removed.
-- The PHP function `gutenberg_default_post_format_template` has been removed.
 - The PHP function `gutenberg_editor_scripts_and_styles` has been removed.
 
 ## 5.4.0

@@ -33,6 +33,18 @@ export const EXPECTED_TRANSFORMS = {
 			'Image',
 		],
 	},
+	'core__media-text__image-fill-no-focal-point-selected': {
+		originalBlock: 'Media & Text',
+		availableTransforms: [
+			'Image',
+		],
+	},
+	'core__media-text__image-fill-with-focal-point-selected': {
+		originalBlock: 'Media & Text',
+		availableTransforms: [
+			'Image',
+		],
+	},
 	'core__media-text__is-stacked-on-mobile': {
 		originalBlock: 'Media & Text',
 		availableTransforms: [
