@@ -34,14 +34,23 @@ Because many WordPress themes place widgets into a sidebar column, widget areas 
 
 ## Prior reading
 
-- [#14182][14182] is the issue which tracks adding an API for reading and updating blocks in widget areas.
-- [#13204][13204] contains design discussion about showing blocks in `wp-admin/widgets.php`.
-- [#13205][13205] contains design discussion about showing blocks in the Customizer.
-- [#13511][13511] is a PR which added support for rendering existing widgets as a block in Gutenberg.
+- [GB14182][] is the issue which tracks adding an API for reading and updating blocks in widget areas.
+- [GB13204][] contains design discussion about showing blocks in `wp-admin/widgets.php`.
+- [GB13205][] contains design discussion about showing blocks in the Customizer.
+- [GB13511][] is a PR which added support for rendering existing widgets as a block in Gutenberg.
+- [WP41683][] discusses adding a Widgets REST API endpoint.
+- [WP33507][] discusses allowing widgets to be JavaScript-driven. 
+- [WP35574][] discusses adding REST API JSON schema information to `WP_Widget`.
+- [WP35669][] discusses storing widgets in a custom post type.
 
-[13204]: https://github.com/WordPress/gutenberg/issues/13204
-[13205]: https://github.com/WordPress/gutenberg/issues/13205
-[13511]: https://github.com/WordPress/gutenberg/issues/13511
+[GB14182]: https://github.com/WordPress/gutenberg/issues/14182
+[GB13204]: https://github.com/WordPress/gutenberg/issues/13204
+[GB13205]: https://github.com/WordPress/gutenberg/issues/13205
+[GB13511]: https://github.com/WordPress/gutenberg/issues/13511
+[WP41683]: https://core.trac.wordpress.org/ticket/41683
+[WP33507]: https://core.trac.wordpress.org/ticket/33507
+[WP35574]: https://core.trac.wordpress.org/ticket/35574
+[WP35669]: https://core.trac.wordpress.org/ticket/35669
 
 ## Frontend
 
