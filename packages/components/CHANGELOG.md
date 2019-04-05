@@ -8,6 +8,10 @@
 
 - The `Button` component will no longer assign default styling (`is-default` class) when explicitly assigned as primary (the `isPrimary` prop). This should resolve potential conflicts affecting a combination of `isPrimary`, `isDefault`, and `isLarge` / `isSmall`, where the busy animation would appear with incorrect coloring.
 
+### Deprecations
+
+- The `Popover` component `onClickOutside` prop has been deprecated. Use `onFocusOutside` instead.
+
 ## 8.0.0 (2019-06-12)
 
 ### New Feature

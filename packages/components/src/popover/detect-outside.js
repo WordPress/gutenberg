@@ -1,19 +1,16 @@
 /**
- * External dependencies
- */
-import clickOutside from 'react-click-outside';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import withFocusOutside from '../higher-order/with-focus-outside';
+
 class PopoverDetectOutside extends Component {
-	handleClickOutside( event ) {
-		const { onClickOutside } = this.props;
-		if ( onClickOutside ) {
-			onClickOutside( event );
-		}
+	handleFocusOutside( event ) {
+		this.props.onFocusOutside( event );
 	}
 
 	render() {
@@ -21,4 +18,4 @@ class PopoverDetectOutside extends Component {
 	}
 }
 
-export default clickOutside( PopoverDetectOutside );
+export default withFocusOutside( PopoverDetectOutside );
