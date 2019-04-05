@@ -64,13 +64,15 @@ const setupDriver = async () => {
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = localIOSAppPath;
 		} else {
-			desiredCaps.app = 'sauce-storage:Gutenberg.app.zip'; // App should be preloaded to sauce storage, this can also be a URL
+			const branch = process.env.CIRCLE_BRANCH;
+			desiredCaps.app = `sauce-storage:Gutenberg-${ branch }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	}
 
 	if ( ! isLocalEnvironment() ) {
-		desiredCaps.name = `Gutenberg Editor Tests[${ rnPlatform }]`;
-		desiredCaps.tags = [ 'Gutenberg' ];
+		const branch = process.env.CIRCLE_BRANCH;
+		desiredCaps.name = `Gutenberg Editor Tests[${ rnPlatform }]-${ branch }`;
+		desiredCaps.tags = [ 'Gutenberg', branch ];
 	}
 
 	await driver.init( desiredCaps );
