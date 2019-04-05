@@ -113,10 +113,23 @@ If locking is not set in an `InnerBlocks` area: the locking of the parent `Inner
 
 If the block is a top level block: the locking of the Custom Post Type is used.
 
-### `placeholderType`
-* **Type:** `String`
-* **Default:** - uses the `DefaultBlockAppender` (`packages/block-editor/src/components/default-block-appender/index.js`) to automatically insert a `paragraph` Block. 
+### `renderAppender`
+* **Type:** `String|Function`
+* **Default:** - `null`. By default the `auto-insert` behaviour (see below) is utilised.
 * **Options:** 
-    - `block-appender` - forces the use of the Block List Appender (`packages/block-editor/src/components/block-list-appender/index.js`) to display a "Add Block" message with an icon which fills the Block preview. No default Block is inserted.
+    - `block-appender` - uses the Block List Appender (`packages/block-editor/src/components/block-list-appender/index.js`) to display a "Add Block" message with an icon which fills the Block preview. No default Block is inserted.
+    - `auto-insert` - automatically inserts whichever block is configured as the default block via `wp.blocks.getDefaultBlockName` (typically `paragraph`).
 
-Determines the type of placeholder to display when there are _no_ child Blocks assigned to the `InnerBlocks`. Defaults to the standard behaviour of automatically inserting a `paragraph` Block. 
+Determines the placeholder behaviour when the Block is initially inserted. You may pass a render function to provide your own placeholder as required.
+
+### hideAppenderWhenChildren
+* **Type:** `Boolean`
+* **Default:** - `false`
+* **Options:** 
+  - `false` - does _not_ hide the appender if `InnerBlocks` has child Blocks
+  - `true` - hides the appender if `InnerBlocks` has child Blocks
+
+Determines whether or not to show the appender (as defined by the `renderAppender` prop) if the `InnerBlocks` currently has child Blocks.
+
+
+
