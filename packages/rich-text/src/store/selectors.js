@@ -31,6 +31,19 @@ export function getCustomAlignmentTypesForBlock( state, blockName ) {
 }
 
 /**
+ * Returns a custom alignment type.
+ *
+ * @param {Object} state Data state.
+ * @param {string} name Alignment name.
+ * @param {string} blockName Block name.
+ *
+ * @return {?Object} Custom alignment types.
+ */
+export function getCustomAlignmentType( state, name, blockName ) {
+	return find( state.customAlignmentTypes, ( type ) => type.name === name && type.blockName === blockName );
+}
+
+/**
  * Returns all the available format types.
  *
  * @param {Object} state Data state.
