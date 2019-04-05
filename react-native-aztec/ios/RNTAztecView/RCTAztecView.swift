@@ -182,6 +182,30 @@ class RCTAztecView: Aztec.TextView {
         
         return String(data: data, encoding: .utf8)
     }
+
+    func saveToDisk(image: UIImage) -> URL? {
+        let fileName = "\(ProcessInfo.processInfo.globallyUniqueString)_file.jpg"
+
+        guard let data = image.jpegData(compressionQuality: 0.9) else {
+            return nil
+        }
+
+        let fileURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
+
+        guard (try? data.write(to: fileURL, options: [.atomic])) != nil else {
+            return nil
+        }
+
+        return fileURL
+    }
+
+    private func images(from pasteboard: UIPasteboard) -> [String] {
+        guard let images = pasteboard.images else {
+            return []
+        }
+        let imagesURLs = images.compactMap({ saveToDisk(image: $0)?.absoluteString })
+        return imagesURLs
+    }
     
     override func paste(_ sender: Any?) {
         let start = selectedRange.location
@@ -190,13 +214,15 @@ class RCTAztecView: Aztec.TextView {
         let pasteboard = UIPasteboard.general
         let text = self.text(from: pasteboard) ?? ""
         let html = self.html(from: pasteboard) ?? ""
-        
+        let imagesURLs = self.images(from: pasteboard)
+
         onPaste?([
             "currentContent": getHTML(),
             "selectionStart": start,
             "selectionEnd": end,
             "pastedText": text,
-            "pastedHtml": html])
+            "pastedHtml": html,
+            "files": imagesURLs] )
     }
     
     // MARK: - Edits
