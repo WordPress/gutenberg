@@ -24,4 +24,3 @@ export function isActiveListType( tagName, rootTagName, value ) {
 
 	return deepestListFormat.type.toLowerCase() === tagName;
 }
-
