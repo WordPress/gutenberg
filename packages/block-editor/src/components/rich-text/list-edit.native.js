@@ -6,7 +6,8 @@ import { Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	changeListType,
-	getLineListFormat,
+	__unstableGetLineNestingLevel,
+	__unstableGetLineListFormat,
 } from '@wordpress/rich-text';
 
 /**
@@ -22,7 +23,7 @@ import BlockFormatControls from '../block-format-controls';
  *                   inner list is selected.
  */
 function isListRootSelected( value ) {
-	return getLineListFormat( value ).nestingLevel < 1;
+	return __unstableGetLineNestingLevel( value ) < 1;
 }
 
 /**
@@ -35,7 +36,7 @@ function isListRootSelected( value ) {
  * @return {boolean}             [description]
  */
 function isActiveListType( tagName, rootTagName, value ) {
-	const listFormat = getLineListFormat( value );
+	const listFormat = __unstableGetLineListFormat( value );
 
 	if ( ! listFormat || ! listFormat.type ) {
 		return tagName === rootTagName;

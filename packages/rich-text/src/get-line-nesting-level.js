@@ -5,16 +5,15 @@
 import { getLineIndex } from './get-line-index';
 
 /**
- * Returns the list format of the line at the selection start position.
+ * Returns the nesting level of the list at the selection start position.
  *
  * @param {Object} value     The rich-text value
  *
- * @return {Object} Object with listFormat.
+ * @return {number} The list nesting level, starting from 0.
  */
-export function getLineListFormat( value ) {
+export function getLineNestingLevel( value ) {
 	const { replacements, start } = value;
 	const startingLineIndex = getLineIndex( value, start );
 	const startLineFormats = replacements[ startingLineIndex ] || [];
-	const [ listFormat ] = startLineFormats.slice( -1 );
-	return listFormat;
+	return startLineFormats.length;
 }
