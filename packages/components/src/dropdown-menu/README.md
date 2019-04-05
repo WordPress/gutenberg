@@ -112,6 +112,21 @@ A human-readable label to present as accessibility text on the focused collapsed
 - Type: `String`
 - Required: Yes
 
+#### menuLabel
+
+A human-readable label to present as accessibility text on the expanded menu container.
+
+- Type: `String`
+- Required: No
+
+#### position
+
+The direction in which the menu should open. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+
+- Type: `String`
+- Required: No
+- Default: `"top center"`
+
 #### controls
 
 An array of objects describing the options to be shown in the expanded menu.
@@ -122,3 +137,10 @@ Each object should include an `icon` [Dashicon](https://developer.wordpress.org/
 - Required: Yes
 
 See also: [https://developer.wordpress.org/resource/dashicons/](https://developer.wordpress.org/resource/dashicons/)
+
+#### className
+
+A class name to apply to the dropdown wrapper element.
+
+- Type: `String`
+- Required: No
