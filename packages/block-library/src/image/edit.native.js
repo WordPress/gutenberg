@@ -84,7 +84,6 @@ class ImageEdit extends React.Component {
 			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
 				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
-						this.addMediaUploadListener( );
 						setAttributes( { url: mediaUri, id: mediaId } );
 					}
 				} );
