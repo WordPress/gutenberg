@@ -19,6 +19,8 @@ import BlockFormatControls from '../block-format-controls';
 /**
  * Whether or not the root list is selected.
  *
+ * @param {Object}   value  The internal rich-text value.
+ *
  * @return {boolean} True if the root list or nothing is selected, false if an
  *                   inner list is selected.
  */
@@ -32,6 +34,7 @@ function isListRootSelected( value ) {
  * @param {string}  tagName     The tag name the list should have.
  * @param {string}  rootTagName The current root tag name, to compare with in
  *                              case nothing is selected.
+ * @param {Object}  value  The internal rich-text value.
  *
  * @return {boolean}             [description]
  */
