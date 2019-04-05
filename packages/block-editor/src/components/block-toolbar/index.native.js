@@ -55,18 +55,19 @@ export class BlockToolbar extends Component {
 				>
 					<Toolbar>
 						<ToolbarButton
-							label={ __( 'Add block' ) }
+							title={ __( 'Add block' ) }
 							icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
 							onClick={ onInsertClick }
+							extraProps={ { hint: __( 'Double tap to add a block' ) } }
 						/>
 						<ToolbarButton
-							label={ __( 'Undo' ) }
+							title={ __( 'Undo' ) }
 							icon="undo"
 							isDisabled={ ! hasUndo }
 							onClick={ undo }
 						/>
 						<ToolbarButton
-							label={ __( 'Redo' ) }
+							title={ __( 'Redo' ) }
 							icon="redo"
 							isDisabled={ ! hasRedo }
 							onClick={ redo }
@@ -78,6 +79,7 @@ export class BlockToolbar extends Component {
 				{ showKeyboardHideButton &&
 				( <Toolbar passedStyle={ styles.keyboardHideContainer }>
 					<ToolbarButton
+						title={ __( 'Hide keyboard' ) }
 						icon="keyboard-hide"
 						onClick={ this.onKeyboardHide }
 					/>

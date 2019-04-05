@@ -7,6 +7,7 @@ import { FlatList, Text, TouchableHighlight, View } from 'react-native';
  * WordPress dependencies
  */
 import { SVG, BottomSheet } from '@wordpress/components';
+import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';

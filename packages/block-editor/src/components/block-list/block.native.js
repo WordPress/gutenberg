@@ -5,6 +5,7 @@ import {
 	View,
 	Text,
 	TouchableWithoutFeedback,
+	Keyboard,
 } from 'react-native';
 import TextInputState from 'react-native/lib/TextInputState';
 import {
@@ -65,6 +66,7 @@ export class BlockListBlock extends Component {
 	}
 
 	onBlockInspectorButtonPressed( button ) {
+		Keyboard.dismiss();
 		switch ( button ) {
 			case BlockInspectorActions.UP:
 				this.props.moveBlockUp();
@@ -151,6 +153,7 @@ export class BlockListBlock extends Component {
 				insertBlocksAfter={ this.insertBlocksAfter }
 				mergeBlocks={ this.mergeBlocks }
 				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
+				clientId={ this.props.clientId }
 			/>
 		);
 	}
