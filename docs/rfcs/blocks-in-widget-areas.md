@@ -119,7 +119,9 @@ The REST API is built around a single resource object: the widget area.
 { "id": "footer" }
 ```
 
-The unique identifier for the widget area. This is set by the theme using [`register_sidebar()`][register_sidebar].
+The unique identifier for the widget area. This is set by the theme using [`register_sidebar()`][register_sidebar]. 
+
+`"wp_inactive"` is a special identifier used for blocks that belong to widget areas that are no longer registered.
 
 [register_sidebar]: https://developer.wordpress.org/reference/functions/register_sidebar/
 
