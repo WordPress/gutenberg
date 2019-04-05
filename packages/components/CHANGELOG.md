@@ -12,6 +12,10 @@
 
 - The `Popover` component `onClickOutside` prop has been deprecated. Use `onFocusOutside` instead.
 
+### Internal
+
+- The `Dropdown` component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
+
 ## 8.0.0 (2019-06-12)
 
 ### New Feature
