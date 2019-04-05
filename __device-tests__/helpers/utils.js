@@ -64,7 +64,6 @@ const setupDriver = async () => {
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = localIOSAppPath;
 		} else {
-			const branch = process.env.CIRCLE_BRANCH;
 			desiredCaps.app = `sauce-storage:Gutenberg.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	}
