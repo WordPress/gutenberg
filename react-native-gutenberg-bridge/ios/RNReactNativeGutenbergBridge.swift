@@ -28,6 +28,23 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func requestMediaImport(_ urlString: String, callback: @escaping RCTResponseSenderBlock) {
+        guard let url = URL(string: urlString) else {
+            callback(nil)
+            return
+        }
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestImport(from: url, with: { (mediaID, url) in
+                guard let url = url, let mediaID = mediaID else {
+                    callback(nil)
+                    return
+                }
+                callback([mediaID, url])
+            })
+        }
+    }
+
+    @objc
     func mediaUploadSync() {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaUploadSync()
@@ -67,6 +84,12 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidMount(hasUnsupportedBlocks: hasUnsupportedBlocks)
         }
+    }
+
+    @objc
+    func editorDidEmitLog(_ message: String, logLevel: Int) {
+        guard let logLevel = LogLevel(rawValue: logLevel) else { return }
+        delegate?.gutenbergDidEmitLog(message: message, logLevel: logLevel)
     }
 
     override public func startObserving() {

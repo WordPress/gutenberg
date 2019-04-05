@@ -95,3 +95,4 @@ buck-out/
 !.vscode/extensions.json
 
 *.pot
+bin/wp-cli.phar

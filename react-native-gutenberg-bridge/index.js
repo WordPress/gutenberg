@@ -10,6 +10,12 @@ const isIOS = Platform.OS === 'ios';
 
 const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
 
+// Console polyfill from react-native
+
+export function nativeLoggingHook( message, logLevel ) {
+	RNReactNativeGutenbergBridge.editorDidEmitLog( message, logLevel );
+}
+
 // Send messages
 
 export function sendNativeEditorDidLayout() {
@@ -61,6 +67,10 @@ export function requestMediaPickFromDeviceLibrary( callback ) {
 
 export function requestMediaPickFromDeviceCamera( callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_CAMERA', callback );
+}
+
+export function requestMediaImport( url, callback ) {
+	return RNReactNativeGutenbergBridge.requestMediaImport( url, callback );
 }
 
 export function mediaUploadSync() {

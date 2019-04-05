@@ -13,8 +13,13 @@ if ( process.env.TEST_RN_PLATFORM ) {
 
 module.exports = {
 	verbose: true,
+	// Automatically clear mock calls and instances between every test
+	clearMocks: true,
 	preset: 'react-native',
-	setupFiles: [ './jest/setup.js' ],
+	setupFiles: [
+		'./jest/setup.js',
+		'<rootDir>/enzyme.config.js',
+	],
 	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [
 		'/node_modules/',
@@ -48,5 +53,8 @@ module.exports = {
 		// There is no overloading in jest so we need to rewrite the config from react-native-jest-preset:
 		// https://github.com/facebook/react-native/blob/master/jest-preset.json#L20
 		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|react-clone-referenced-element))',
+	],
+	snapshotSerializers: [
+		'enzyme-to-json/serializer',
 	],
 };

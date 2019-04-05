@@ -54,6 +54,7 @@
 <PROJECT_ROOT>/gutenberg/node_modules/cypress/.*
 <PROJECT_ROOT>/gutenberg/node_modules/config-chain/.*
 <PROJECT_ROOT>/gutenberg/node_modules/editions/es2015/.*
+<PROJECT_ROOT>/gutenberg/node_modules/@parcel/.*
 
 ; Mirror some ignores from Gutenberg tools
 <PROJECT_ROOT>/node_modules/config-chain/.*

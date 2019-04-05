@@ -8,7 +8,7 @@
  */
 import React from 'react';
 import { identity } from 'lodash';
-import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView, Dimensions, Platform } from 'react-native';
+import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -36,6 +36,7 @@ import BlockToolbar from './block-toolbar';
 import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 import { KeyboardAwareFlatList, handleCaretVerticalPositionChange } from '../components/keyboard-aware-flat-list';
 import SafeArea from 'react-native-safe-area';
+import ReadableContentView from '../components/readable-content-view';
 
 type PropsType = {
 	rootClientId: ?string,
@@ -82,7 +83,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		( this: any ).keyboardDidHide = this.keyboardDidHide.bind( this );
 		( this: any ).onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		( this: any ).scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
-		( this: any ).onContentViewLayout = this.onContentViewLayout.bind( this );
 
 		this.state = {
 			blockTypePickerVisible: false,
@@ -133,18 +133,21 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	onRootViewLayout( event: LayoutChangeEvent ) {
+		this.setHeightState( event );
+		this.setBorderStyleState();
+	}
+
+	setHeightState( event: LayoutChangeEvent ) {
 		const { height } = event.nativeEvent.layout;
 		this.setState( { rootViewHeight: height }, () => {
 			sendNativeEditorDidLayout();
 		} );
 	}
 
-	onContentViewLayout( event: LayoutChangeEvent ) {
-		const { width: fullWidth } = Dimensions.get( 'window' );
-		const { width } = event.nativeEvent.layout;
-		const isFullyBordered = fullWidth > width + 1; //+1 is for not letting fraction differences effect the result on Android
+	setBorderStyleState() {
+		const isFullyBordered = ReadableContentView.isContentMaxWidth();
 		if ( isFullyBordered !== this.state.isFullyBordered ) {
-			this.setState( { ...this.state, isFullyBordered } );
+			this.setState( { isFullyBordered } );
 		}
 	}
 
@@ -211,34 +214,39 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderDefaultBlockAppender() {
 		return (
-			<DefaultBlockAppender
-				rootClientId={ this.props.rootClientId }
-				containerStyle={ [
-					blockHolderStyles.blockContainerFocused,
-					this.blockHolderBorderStyle(),
-					{ borderColor: 'transparent' },
-				] }
-			/>
+			<ReadableContentView>
+				<DefaultBlockAppender
+					rootClientId={ this.props.rootClientId }
+					containerStyle={ [
+						blockHolderStyles.blockContainerFocused,
+						this.blockHolderBorderStyle(),
+						{ borderColor: 'transparent' },
+					] }
+				/>
+			</ReadableContentView>
 		);
 	}
 
 	renderHeader() {
 		return (
-			<PostTitle
-				innerRef={ ( ref ) => {
-					this.postTitleRef = ref;
-				} }
-				title={ this.props.title }
-				onUpdate={ this.props.setTitleAction }
-				placeholder={ __( 'Add title' ) }
-				borderStyle={ this.blockHolderBorderStyle() }
-				focusedBorderColor={ styles.blockHolderFocused.borderColor } />
+			<ReadableContentView>
+				<PostTitle
+					innerRef={ ( ref ) => {
+						this.postTitleRef = ref;
+					} }
+					title={ this.props.title }
+					onUpdate={ this.props.setTitleAction }
+					placeholder={ __( 'Add title' ) }
+					borderStyle={ this.blockHolderBorderStyle() }
+					focusedBorderColor={ styles.blockHolderFocused.borderColor }
+				/>
+			</ReadableContentView>
 		);
 	}
 
 	renderList() {
 		return (
-			<View style={ { flex: 1 } } onLayout={ this.onContentViewLayout }>
+			<View style={ { flex: 1 } } >
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					innerRef={ this.scrollViewInnerRef }
@@ -306,7 +314,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		const clientId = value.item;
 
 		return (
-			<View>
+			<ReadableContentView>
 				<BlockHolder
 					key={ clientId }
 					showTitle={ false }
@@ -323,7 +331,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 						<View style={ styles.lineStyleAddHere }></View>
 					</View>
 				) }
-			</View>
+			</ReadableContentView>
 		);
 	}
 

@@ -1,13 +1,13 @@
 package com.gutenberg;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.facebook.react.ReactApplication;
 import com.horcrux.svg.SvgPackage;
+
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
 import com.facebook.react.ReactNativeHost;
@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
+
+  private static final String TAG = "MainApplication";
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
@@ -60,6 +62,24 @@ public class MainApplication extends Application implements ReactApplication {
 
                 @Override
                 public void editorDidMount(boolean hasUnsupportedBlocks) {}
+
+                @Override
+                public void editorDidEmitLog(String message, LogLevel logLevel) {
+                    switch (logLevel) {
+                        case TRACE:
+                            Log.d(TAG, message);
+                            break;
+                        case INFO:
+                            Log.i(TAG, message);
+                            break;
+                        case WARN:
+                            Log.w(TAG, message);
+                            break;
+                        case ERROR:
+                            Log.e(TAG, message);
+                            break;
+                    }
+                }
             })
       );
     }

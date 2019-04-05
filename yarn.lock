@@ -3044,7 +3044,7 @@ envinfo@^5.7.0:
   resolved "https://registry.yarnpkg.com/envinfo/-/envinfo-5.12.1.tgz#83068c33e0972eb657d6bc69a6df30badefb46ef"
   integrity sha512-pwdo0/G3CIkQ0y6PCXq4RdkvId2elvtPCJMG0konqlrfkWQbf1DWeH9K2b/cvu2YgGvPPTOnonZxXM1gikFu1w==
 
-enzyme-adapter-react-16@^1.10.0:
+enzyme-adapter-react-16@^1.10.0, enzyme-adapter-react-16@^1.11.2:
   version "1.11.2"
   resolved "https://registry.yarnpkg.com/enzyme-adapter-react-16/-/enzyme-adapter-react-16-1.11.2.tgz#8efeafb27e96873a5492fdef3f423693182eb9d4"
   integrity sha512-2ruTTCPRb0lPuw/vKTXGVZVBZqh83MNDnakMhzxhpJcIbneEwNy2Cv0KvL97pl57/GOazJHflWNLjwWhex5AAA==
@@ -3067,6 +3067,19 @@ enzyme-adapter-utils@^1.10.1:
     object.fromentries "^2.0.0"
     prop-types "^15.7.2"
     semver "^5.6.0"
+
+enzyme-to-json@^1.4.4:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/enzyme-to-json/-/enzyme-to-json-1.6.0.tgz#9d9bba706e8b500c673b7a4fa9ff7ce57b8b9254"
+  integrity sha512-izMrbriQySEiWDUR0NeAyzCiRBncgDjfX5bt3xobkyUinEA79q8UuBNUfWFyjX2ahhP2G8k1GN4kG9NAUF405g==
+  dependencies:
+    lodash.filter "^4.6.0"
+    lodash.isnil "^4.0.0"
+    lodash.isplainobject "^4.0.6"
+    lodash.omitby "^4.6.0"
+    lodash.range "^3.2.0"
+    object-values "^1.0.0"
+    object.entries "^1.0.4"
 
 enzyme-to-json@^3.3.5:
   version "3.3.5"
@@ -3628,6 +3641,11 @@ fancy-log@^1.3.2:
     color-support "^1.1.3"
     parse-node-version "^1.0.0"
     time-stamp "^1.0.0"
+
+fast-average-color@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/fast-average-color/-/fast-average-color-4.3.0.tgz#baf08eb9c62955c40718a26c47d0b1501c62193e"
+  integrity sha512-k8FXd6+JeXoItmdNqB3hMwFgArryjdYBLuzEM8fRY/oztd/051yhSHU6GUrMOfIQU9dDHyFDcIAkGrQKlYtpDA==
 
 fast-deep-equal@^1.0.0:
   version "1.1.0"
@@ -5224,6 +5242,13 @@ jest-runtime@^24.5.0:
     strip-bom "^3.0.0"
     yargs "^12.0.2"
 
+jest-serializer-enzyme@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/jest-serializer-enzyme/-/jest-serializer-enzyme-1.0.0.tgz#f8b5090d1ae4d105bbaebf04d33be5df2988f059"
+  integrity sha1-+LUJDRrk0QW7rr8E0zvl3ymI8Fk=
+  dependencies:
+    enzyme-to-json "^1.4.4"
+
 jest-serializer@24.0.0-alpha.6:
   version "24.0.0-alpha.6"
   resolved "https://registry.yarnpkg.com/jest-serializer/-/jest-serializer-24.0.0-alpha.6.tgz#27d2fee4b1a85698717a30c3ec2ab80767312597"
@@ -5689,6 +5714,11 @@ lodash.escape@^4.0.1:
   resolved "https://registry.yarnpkg.com/lodash.escape/-/lodash.escape-4.0.1.tgz#c9044690c21e04294beaa517712fded1fa88de98"
   integrity sha1-yQRGkMIeBClL6qUXcS/e0fqI3pg=
 
+lodash.filter@^4.6.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/lodash.filter/-/lodash.filter-4.6.0.tgz#668b1d4981603ae1cc5a6fa760143e480b4c4ace"
+  integrity sha1-ZosdSYFgOuHMWm+nYBQ+SAtMSs4=
+
 lodash.flattendeep@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/lodash.flattendeep/-/lodash.flattendeep-4.4.0.tgz#fb030917f86a3134e5bc9bec0d69e0013ddfedb2"
@@ -5703,6 +5733,16 @@ lodash.isequal@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
   integrity sha1-QVxEePK8wwEgwizhDtMib30+GOA=
+
+lodash.isnil@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/lodash.isnil/-/lodash.isnil-4.0.0.tgz#49e28cd559013458c814c5479d3c663a21bfaa6c"
+  integrity sha1-SeKM1VkBNFjIFMVHnTxmOiG/qmw=
+
+lodash.isplainobject@^4.0.6:
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz#7c526a52d89b45c45cc690b88163be0497f550cb"
+  integrity sha1-fFJqUtibRcRcxpC4gWO+BJf1UMs=
 
 lodash.memoize@^4.1.2:
   version "4.1.2"
@@ -5719,6 +5759,11 @@ lodash.mergewith@^4.6.0:
   resolved "https://registry.yarnpkg.com/lodash.mergewith/-/lodash.mergewith-4.6.1.tgz#639057e726c3afbdb3e7d42741caa8d6e4335927"
   integrity sha512-eWw5r+PYICtEBgrBE5hhlT6aAa75f411bgDz/ZL2KZqYV03USvucsxcHUIlGTDTECs1eunpI7HOV7U+WLDvNdQ==
 
+lodash.omitby@^4.6.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/lodash.omitby/-/lodash.omitby-4.6.0.tgz#5c15ff4754ad555016b53c041311e8f079204791"
+  integrity sha1-XBX/R1StVVAWtTwEExHo8HkgR5E=
+
 lodash.pad@^4.1.0:
   version "4.5.1"
   resolved "https://registry.yarnpkg.com/lodash.pad/-/lodash.pad-4.5.1.tgz#4330949a833a7c8da22cc20f6a26c4d59debba70"
@@ -5733,6 +5778,11 @@ lodash.padstart@^4.1.0:
   version "4.6.1"
   resolved "https://registry.yarnpkg.com/lodash.padstart/-/lodash.padstart-4.6.1.tgz#d2e3eebff0d9d39ad50f5cbd1b52a7bce6bb611b"
   integrity sha1-0uPuv/DZ05rVD1y9G1KnvOa7YRs=
+
+lodash.range@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/lodash.range/-/lodash.range-3.2.0.tgz#f461e588f66683f7eadeade513e38a69a565a15d"
+  integrity sha1-9GHliPZmg/fq3q3lE+OKaaVloV0=
 
 lodash.sortby@^4.7.0:
   version "4.7.0"
@@ -6832,6 +6882,11 @@ object-keys@^1.0.11, object-keys@^1.0.12:
   resolved "https://registry.yarnpkg.com/object-keys/-/object-keys-1.1.0.tgz#11bd22348dd2e096a045ab06f6c85bcc340fa032"
   integrity sha512-6OO5X1+2tYkNyNEx6TsCxEqFfRWaqx6EtMiSbGrw8Ob8v9Ne+Hl8rBAgLBZn5wjEz3s/s6U1WXFUFOcxxAwUpg==
 
+object-values@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/object-values/-/object-values-1.0.0.tgz#72af839630119e5b98c3b02bb8c27e3237158105"
+  integrity sha1-cq+DljARnluYw7AruMJ+MjcVgQU=
+
 object-visit@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/object-visit/-/object-visit-1.0.1.tgz#f79c4493af0c5377b59fe39d395e41042dd045bb"
@@ -7805,9 +7860,9 @@ react-native-randombytes@^3.5.1:
     buffer "^4.9.1"
     sjcl "^1.0.3"
 
-"react-native-recyclerview-list@git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#v1.0.0":
+"react-native-recyclerview-list@git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#v1.0.1":
   version "1.0.0"
-  resolved "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#53db23e2fa4f4cabfb2dcaa45496656ccc44c84a"
+  resolved "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#80236492d0792de1c603bb10e1be6d874be5a723"
   dependencies:
     prop-types "^15.6.0"
 
@@ -7829,10 +7884,10 @@ react-native-sass-transformer@^1.1.1:
   version "9.3.3"
   resolved "git+https://github.com/wordpress-mobile/react-native-svg.git#55244dc79ab876550599c82dca763c3eba0153c5"
 
-react-native@0.59.0:
-  version "0.59.0"
-  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.59.0.tgz#7d0ad297da3fd2e18f387f0ef5581270aaabac42"
-  integrity sha512-7DTOCFfmo9e2P0gXAaCH8DDUqW154Y6UFyKE74X08k1QW9FU5O9dQ+GQ7ryJYS0sxMLNQGDhMSADhnn72QQT4g==
+react-native@0.59.3:
+  version "0.59.3"
+  resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.59.3.tgz#b984bbe457f63d5515046d32ea5721fd22843548"
+  integrity sha512-dv3AA2rH0L0IccxRkIs4YsriaECy9ttTXrwrgwETXqmE45uVrBFRGePUFnqjcikYkkm6sS0FRxcva088un76JA==
   dependencies:
     "@babel/runtime" "^7.0.0"
     "@react-native-community/cli" "^1.2.1"

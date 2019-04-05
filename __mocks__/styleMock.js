@@ -26,10 +26,19 @@ module.exports = {
 	'block-editor-plain-text': {
 		fontFamily: 'serif',
 	},
+	addBlockButton: {
+		color: '',
+	},
 	blockHolderFocused: {
 		borderColor: 'gray',
 	},
 	'wp-block-heading': {
 		minHeight: 60,
+	},
+	'editor-rich-text': {
+		minHeight: 50,
+	},
+	'editor-plain-text': {
+		fontFamily: 'serif',
 	},
 };

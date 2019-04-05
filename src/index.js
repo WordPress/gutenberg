@@ -26,7 +26,6 @@ const gutenbergSetup = () => {
 	const userId = 1;
 	const storageKey = 'WP_DATA_USER_' + userId;
 	wpData.use( wpData.plugins.persistence, { storageKey } );
-	wpData.use( wpData.plugins.controls );
 };
 
 const editorSetup = () => {
