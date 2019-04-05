@@ -345,10 +345,34 @@ export class RichText extends Component {
 		const isPasted = true;
 		const { onSplit } = this.props;
 
-		const { pastedText, pastedHtml } = event.nativeEvent;
+		const { pastedText, pastedHtml, files } = event.nativeEvent;
 		const currentRecord = this.createRecord( event.nativeEvent );
 
 		event.preventDefault();
+
+		// Only process file if no HTML is present.
+		// Note: a pasted file may have the URL as plain text.
+		if ( files && files.length > 0 ) {
+			const uploadId = Number.MAX_SAFE_INTEGER;
+			let html = '';
+			files.forEach( ( file ) => {
+				html += `<img src="${ file }" class="wp-image-${ uploadId }">`;
+			} );
+			const content = pasteHandler( {
+				HTML: html,
+				mode: 'BLOCKS',
+				tagName: this.props.tagName,
+			} );
+			const shouldReplace = this.props.onReplace && this.isEmpty();
+
+			if ( shouldReplace ) {
+				this.props.onReplace( content );
+			} else {
+				this.splitContent( currentRecord, content, isPasted );
+			}
+
+			return;
+		}
 
 		// There is a selection, check if a URL is pasted.
 		if ( ! isCollapsed( currentRecord ) ) {
