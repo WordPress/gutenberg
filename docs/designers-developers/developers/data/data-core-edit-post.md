@@ -374,7 +374,7 @@ Returns an action object used to request meta box update.
 
 Returns an action object used signal a successful meta box update.
 
-### init
+### __unstableInitialize
 
 Returns an action generator used to initialize some subscriptions for the
 post editor:
