@@ -103,6 +103,8 @@ class InnerBlocks extends Component {
 			isSmallScreen,
 			isSelectedBlockInRoot,
 			renderAppender,
+			hideAppenderWhenChildren,
+			hasChildBlocks,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -110,12 +112,15 @@ class InnerBlocks extends Component {
 			'has-overlay': isSmallScreen && ! isSelectedBlockInRoot,
 		} );
 
+		const hideAppender = hideAppenderWhenChildren && hasChildBlocks;
+
 		return (
 			<div className={ classes }>
 				{ ! templateInProcess && (
 					<BlockList
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
+						hideAppender={ hideAppender }
 					/>
 				) }
 			</div>

@@ -197,6 +197,7 @@ class BlockList extends Component {
 			multiSelectedBlockClientIds,
 			hasMultiSelection,
 			renderAppender,
+			hideAppender,
 		} = this.props;
 
 		return (
@@ -223,10 +224,13 @@ class BlockList extends Component {
 						</AsyncModeProvider>
 					);
 				} ) }
-				<BlockListAppender
-					rootClientId={ rootClientId }
-					renderAppender={ renderAppender }
-				/>
+
+				{ ! hideAppender && (
+					<BlockListAppender
+						rootClientId={ rootClientId }
+						renderAppender={ renderAppender }
+					/>
+				) }
 			</div>
 		);
 	}
