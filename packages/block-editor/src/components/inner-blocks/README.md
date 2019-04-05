@@ -122,7 +122,7 @@ If the block is a top level block: the locking of the Custom Post Type is used.
 
 Determines the placeholder behaviour when the Block is initially inserted. You may pass a render function to provide your own placeholder as required.
 
-### hideAppenderWhenChildren
+### `hideAppenderWhenChildren`
 * **Type:** `Boolean`
 * **Default:** - `false`
 * **Options:** 
