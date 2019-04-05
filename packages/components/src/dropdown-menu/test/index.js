@@ -60,7 +60,7 @@ describe( 'DropdownMenu', () => {
 			const wrapper = mount( <DropdownMenu controls={ controls } /> );
 			const button = wrapper.find( IconButton ).filter( '.components-dropdown-menu__toggle' );
 
-			button.simulate( 'keydown',	{
+			button.simulate( 'keydown', {
 				stopPropagation: () => {},
 				preventDefault: () => {},
 				keyCode: DOWN,
@@ -74,7 +74,7 @@ describe( 'DropdownMenu', () => {
 			const wrapper = mount( <DropdownMenu children={ children } /> );
 			const button = wrapper.find( IconButton ).filter( '.components-dropdown-menu__toggle' );
 
-			button.simulate( 'keydown',	{
+			button.simulate( 'keydown', {
 				stopPropagation: () => {},
 				preventDefault: () => {},
 				keyCode: DOWN,
