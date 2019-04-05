@@ -13,6 +13,7 @@ import { mergePair } from './concat';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
+	ZWNBSP,
 } from './special-characters';
 
 /**
@@ -267,10 +268,14 @@ function filterRange( node, range, filter ) {
 	return { startContainer, startOffset, endContainer, endOffset };
 }
 
+const ZWNBSPRegExp = new RegExp( ZWNBSP, 'g' );
+
 function filterString( string ) {
 	// Reduce any whitespace used for HTML formatting to one space
 	// character, because it will also be displayed as such by the browser.
-	return string.replace( /[\n\r\t]+/g, ' ' );
+	return string.replace( /[\n\r\t]+/g, ' ' )
+		// Remove padding added by `toTree`.
+		.replace( ZWNBSPRegExp, '' );
 }
 
 /**
@@ -329,8 +334,9 @@ function createFromElement( {
 		}
 
 		if (
-			node.getAttribute( 'data-rich-text-padding' ) ||
-			( isEditableTree && type === 'br' && ! node.getAttribute( 'data-rich-text-line-break' ) )
+			isEditableTree &&
+			type === 'br' &&
+			! node.getAttribute( 'data-rich-text-line-break' )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
