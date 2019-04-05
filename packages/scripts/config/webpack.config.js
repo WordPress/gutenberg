@@ -4,6 +4,7 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const path = require( 'path' );
+const postcssPresetEnv = require( 'postcss-preset-env' );
 
 /**
  * Internal dependencies
@@ -66,11 +67,14 @@ const externals = [
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
-const getBabelLoaderOptions = () => hasBabelConfig() ? {} : {
-	babelrc: false,
-	configFile: false,
-	presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
-};
+const getBabelLoaderOptions = () =>
+	hasBabelConfig() ?
+		{} :
+		{
+			babelrc: false,
+			configFile: false,
+			presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+		};
 
 const config = {
 	mode,
@@ -102,6 +106,33 @@ const config = {
 					options: getBabelLoaderOptions(),
 				},
 			},
+			{
+				test: /\.(sc|sa|c)ss$/,
+				use: [
+					{
+						loader: require.resolve( 'file-loader' ),
+						options: {
+							name: '[name].css',
+						},
+					},
+					{
+						loader: require.resolve( 'extract-loader' ),
+					},
+					{
+						loader: require.resolve( 'css-loader' ),
+					},
+					{
+						loader: require.resolve( 'sass-loader' ),
+					},
+					{
+						loader: require.resolve( 'postcss-loader' ),
+						options: {
+							ident: 'postcss',
+							plugins: () => [ postcssPresetEnv( /* pluginOptions */ ) ],
+						},
+					},
+				],
+			},
 		],
 	},
 	plugins: [
@@ -110,7 +141,8 @@ const config = {
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload works
 		// when running watch mode.
-		! isProduction && new LiveReloadPlugin( { port: process.env.WP_LIVE_RELOAD_PORT || 35729 } ),
+		! isProduction &&
+			new LiveReloadPlugin( { port: process.env.WP_LIVE_RELOAD_PORT || 35729 } ),
 	].filter( Boolean ),
 	stats: {
 		children: false,
