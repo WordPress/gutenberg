@@ -19,7 +19,7 @@ import testData from './helpers/test-data';
  * External dependencies
  */
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
 
 describe( 'Gutenberg Editor tests', () => {
 	let appium;
