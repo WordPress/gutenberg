@@ -541,6 +541,10 @@ export class RichText extends Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
+		this.moveCaretToTheEndIfNeeded( nextProps );
+	}
+
+	moveCaretToTheEndIfNeeded( nextProps ) {
 		const nextRecord = this.formatToValue( nextProps.value );
 		const nextTextContent = getTextContent( nextRecord );
 
@@ -555,8 +559,13 @@ export class RichText extends Component {
 
 		// This logic will handle the selection when two blocks are merged or when block is split
 		// into two blocks
-		if ( nextTextContent === this.savedContent || nextTextContent.startsWith( this.savedContent ) ) {
-			this.forceSelectionUpdate( this.savedContent.length, this.savedContent.length );
+		if ( nextTextContent.startsWith( this.savedContent ) ) {
+			let length = this.savedContent.length;
+			if ( length === 0 && nextTextContent !== this.props.value ) {
+				length = this.props.value.length;
+			}
+
+			this.forceSelectionUpdate( length, length );
 			this.savedContent = nextTextContent;
 		}
 	}
