@@ -22,6 +22,5 @@ const store = registerStore( STORE_KEY, {
 } );
 
 applyMiddlewares( store );
-store.dispatch( actions.init() );
 
 export default store;
