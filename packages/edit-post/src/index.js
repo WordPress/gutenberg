@@ -11,6 +11,8 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
 
+import { registerCustomAlignmentType } from '@wordpress/rich-text';
+
 /**
  * Internal dependencies
  */
@@ -82,6 +84,13 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 		'core/editor.preview',
 		'core/editor.publish',
 	] );
+
+	registerCustomAlignmentType( 'test/custom-align-center', {
+		align: 'center',
+		icon: 'editor-aligncenter',
+		title: 'Custom Align Center',
+		blockName: 'core/paragraph',
+	} );
 
 	render(
 		<Editor
