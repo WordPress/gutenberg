@@ -100,6 +100,7 @@ describe( 'Gutenberg Editor tests', () => {
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 0 );
 		expect( text0 + text1 ).toMatch( text );
 
+		expect( await editorPage.hasParagraphBlockAtPosition( 1 ) ).toBe( false );
 		await editorPage.removeBlockAtPosition( 0 );
 	} );
 
