@@ -102,8 +102,6 @@ class InnerBlocks extends Component {
 			clientId,
 			isSmallScreen,
 			isSelectedBlockInRoot,
-			hasChildBlocks,
-			placeholderType,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -111,16 +109,12 @@ class InnerBlocks extends Component {
 			'has-overlay': isSmallScreen && ! isSelectedBlockInRoot,
 		} );
 
-		// If enabled and there are no child Blocks then show the
-		// `BlockListAppender` as a placeholder
-		const disableDefaultInserter = placeholderType && placeholderType === 'block-appender' && ! hasChildBlocks;
-
 		return (
 			<div className={ classes }>
 				{ ! templateInProcess && (
 					<BlockList
 						rootClientId={ clientId }
-						disableDefaultInserter={ disableDefaultInserter }
+						renderAppender={ this.props.renderAppender }
 					/>
 				) }
 			</div>
@@ -173,5 +167,9 @@ InnerBlocks = compose( [
 InnerBlocks.Content = withBlockContentContext(
 	( { BlockContent } ) => <BlockContent />
 );
+
+InnerBlocks.appenderType = {
+	BLOCK: 'block-appender',
+};
 
 export default InnerBlocks;

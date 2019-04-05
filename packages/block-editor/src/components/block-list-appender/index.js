@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last } from 'lodash';
+import { last, isFunction, isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,13 +23,13 @@ function BlockListAppender( {
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
-	disableDefaultInserter,
+	renderAppender,
 } ) {
 	if ( isLocked ) {
 		return null;
 	}
 
-	if ( ! disableDefaultInserter && canInsertDefaultBlock ) {
+	if ( ! renderAppender && canInsertDefaultBlock ) {
 		return (
 			<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
 				<DefaultBlockAppender
@@ -40,25 +40,36 @@ function BlockListAppender( {
 		);
 	}
 
-	return (
-		<div className="block-list-appender">
-			<Inserter
-				rootClientId={ rootClientId }
-				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
-					<Button
-						className="block-list-appender__toggle"
-						onClick={ onToggle }
-						aria-expanded={ isOpen }
-						disabled={ disabled }
-					>
-						<Icon icon="insert" />
-						<span>{ __( 'Add Block' ) }</span>
-					</Button>
-				) }
-				isAppender
-			/>
-		</div>
-	);
+	if ( isString( renderAppender ) && renderAppender === 'block-appender' ) {
+		return (
+			<div className="block-list-appender">
+				<Inserter
+					rootClientId={ rootClientId }
+					renderToggle={ ( { onToggle, disabled, isOpen } ) => (
+						<Button
+							className="block-list-appender__toggle"
+							onClick={ onToggle }
+							aria-expanded={ isOpen }
+							disabled={ disabled }
+						>
+							<Icon icon="insert" />
+							<span>{ __( 'Add Block' ) }</span>
+						</Button>
+					) }
+					isAppender
+				/>
+			</div>
+		);
+	}
+
+	// Render prop - custom appender
+	if ( isFunction( renderAppender ) ) {
+		return (
+			<div className="block-list-appender">
+				{ renderAppender() }
+			</div>
+		);
+	}
 }
 
 export default withSelect( ( select, { rootClientId } ) => {
