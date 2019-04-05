@@ -11,7 +11,7 @@ import { getLineIndex } from './get-line-index';
  *
  * @return {Object} Object with { nestingLevel, listFormat }.
  */
-export function getStartListFormat( value ) {
+export function getLineListFormat( value ) {
 	const { text, replacements, start, end } = value;
 	const startingLineIndex = getLineIndex( value, start );
 	const startLineFormats = replacements[ startingLineIndex ] || [];
