@@ -7,12 +7,12 @@ import { dispatch, select } from '@wordpress/data';
  * Registers a new custom alignment type provided a unique name and an object defining its
  * behavior.
  *
- * @param {string}   name               Custom alignment name.
- * @param {Object}   settings           Custom alignment settings.
- * @param {string}   settings.blockName The block name this custom alignment will be added to the Rich Text alignment toolbar.
- * @param {string}   settings.align     The alignment setting.
- * @param {string}   settings.title     Name of the custom alignment.
- * @param {Function} settings.icon      The icon to be displayed in the alignment toolbar.
+ * @param {string} name               Custom alignment name.
+ * @param {Object} settings           Custom alignment settings.
+ * @param {string} settings.blockName The block name this custom alignment will be added to the Rich Text alignment toolbar.
+ * @param {string} settings.align     The alignment setting.
+ * @param {string} settings.title     Name of the custom alignment.
+ * @param {string} settings.icon      The icon to be displayed in the alignment toolbar.
  *
  * @return {Object|undefined} The Custom alignment, if it has been successfully registered;
  *                            otherwise `undefined`.

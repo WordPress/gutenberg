@@ -208,6 +208,24 @@ _Returns_
 
 -   `Object`: A new combined value.
 
+<a name="registerCustomAlignmentType" href="#registerCustomAlignmentType">#</a> **registerCustomAlignmentType**
+
+Registers a new custom alignment type provided a unique name and an object defining its
+behavior.
+
+_Parameters_
+
+-   _name_ `string`: Custom alignment name.
+-   _settings_ `Object`: Custom alignment settings.
+-   _settings.blockName_ `string`: The block name this custom alignment will be added to the Rich Text alignment toolbar.
+-   _settings.align_ `string`: The alignment setting.
+-   _settings.title_ `string`: Name of the custom alignment.
+-   _settings.icon_ `string`: The icon to be displayed in the alignment toolbar.
+
+_Returns_
+
+-   `(Object|undefined)`: The Custom alignment, if it has been successfully registered; otherwise `undefined`.
+
 <a name="registerFormatType" href="#registerFormatType">#</a> **registerFormatType**
 
 Registers a new format provided a unique name and an object defining its
