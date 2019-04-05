@@ -4,6 +4,7 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const path = require( 'path' );
+const postcssPresetEnv = require( 'postcss-preset-env' );
 
 /**
  * WordPress dependencies
@@ -71,6 +72,35 @@ const config = {
 			{
 				test: /\.svg$/,
 				use: [ '@svgr/webpack', 'url-loader' ],
+			},
+			{
+				test: /\.(sc|sa|c)ss$/,
+				use: [
+					{
+						loader: require.resolve( 'file-loader' ),
+						options: {
+							name: '[name].css',
+						},
+					},
+					{
+						loader: require.resolve( 'extract-loader' ),
+					},
+					{
+						loader: require.resolve( 'css-loader' ),
+					},
+					{
+						loader: require.resolve( 'sass-loader' ),
+					},
+					{
+						loader: require.resolve( 'postcss-loader' ),
+						options: {
+							ident: 'postcss',
+							plugins: () => [
+								postcssPresetEnv(/* pluginOptions */),
+							],
+						},
+					},
+				],
 			},
 		],
 	},
