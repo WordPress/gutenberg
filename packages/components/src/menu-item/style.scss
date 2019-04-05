@@ -1,5 +1,6 @@
 .components-menu-item__button,
 .components-menu-item__button.components-icon-button {
+	@include menu-style__neutral;
 	width: 100%;
 	padding: $grid-size ($grid-size-large - $border-width);
 	text-align: left;
@@ -10,7 +11,7 @@
 	.dashicon,
 	.components-menu-items__item-icon,
 	> span > svg {
-		margin-right: 4px;
+		margin-right: 5px;
 	}
 
 	.components-menu-items__item-icon {
