@@ -102,6 +102,7 @@ class InnerBlocks extends Component {
 			clientId,
 			isSmallScreen,
 			isSelectedBlockInRoot,
+			renderAppender,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -114,7 +115,7 @@ class InnerBlocks extends Component {
 				{ ! templateInProcess && (
 					<BlockList
 						rootClientId={ clientId }
-						renderAppender={ this.props.renderAppender }
+						renderAppender={ renderAppender }
 					/>
 				) }
 			</div>
@@ -169,6 +170,7 @@ InnerBlocks.Content = withBlockContentContext(
 );
 
 InnerBlocks.appenderType = {
+	AUTO_INSERT: 'auto-insert',
 	BLOCK: 'block-appender',
 };
 

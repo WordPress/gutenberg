@@ -29,7 +29,7 @@ function BlockListAppender( {
 		return null;
 	}
 
-	if ( ! renderAppender && canInsertDefaultBlock ) {
+	if ( ( ! renderAppender || renderAppender === 'auto-insert' ) && canInsertDefaultBlock ) {
 		return (
 			<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
 				<DefaultBlockAppender
