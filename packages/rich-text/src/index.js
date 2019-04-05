@@ -12,6 +12,8 @@ export { getActiveObject } from './get-active-object';
 export { getSelectionEnd } from './get-selection-end';
 export { getSelectionStart } from './get-selection-start';
 export { getTextContent } from './get-text-content';
+export { isListRootSelected as __unstableIsListRootSelected } from './is-list-root-selected';
+export { isActiveListType as __unstableIsActiveListType } from './is-active-list-type';
 export { isCollapsed } from './is-collapsed';
 export { isEmpty, isEmptyLine } from './is-empty';
 export { join } from './join';
