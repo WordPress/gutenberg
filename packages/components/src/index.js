@@ -18,7 +18,7 @@ export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
-export { default as DropdownMenu } from './dropdown-menu';
+export { default as DropdownMenu, DropdownMenuSeparator } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';
 export { default as FocalPointPicker } from './focal-point-picker';
 export { default as FocusableIframe } from './focusable-iframe';

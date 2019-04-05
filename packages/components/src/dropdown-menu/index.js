@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap } from 'lodash';
+import { flatMap, isEmpty, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,7 @@ import { DOWN } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
+import DropdownMenuSeparator from './separator';
 import IconButton from '../icon-button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
@@ -23,15 +24,19 @@ function DropdownMenu( {
 	controls,
 	className,
 	position,
+	children,
 } ) {
-	if ( ! controls || ! controls.length ) {
+	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
-	let controlSets = controls;
-	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
-		controlSets = [ controlSets ];
+	let controlSets;
+	if ( ! isEmpty( controls ) ) {
+		controlSets = controls;
+		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
+			controlSets = [ controlSets ];
+		}
 	}
 
 	return (
@@ -62,20 +67,25 @@ function DropdownMenu( {
 					</IconButton>
 				);
 			} }
-			renderContent={ ( { onClose } ) => {
+			renderContent={ ( props ) => {
 				return (
 					<NavigableMenu
 						className="components-dropdown-menu__menu"
 						role="menu"
 						aria-label={ menuLabel }
 					>
+						{
+							isFunction( children ) ?
+								children( props ) :
+								null
+						}
 						{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 							controlSet.map( ( control, indexOfControl ) => (
 								<IconButton
 									key={ [ indexOfSet, indexOfControl ].join() }
 									onClick={ ( event ) => {
 										event.stopPropagation();
-										onClose();
+										props.onClose();
 										if ( control.onClick ) {
 											control.onClick();
 										}
@@ -101,5 +111,7 @@ function DropdownMenu( {
 		/>
 	);
 }
+
+export { DropdownMenuSeparator };
 
 export default DropdownMenu;

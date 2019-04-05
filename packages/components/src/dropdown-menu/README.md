@@ -91,6 +91,44 @@ const MyDropdownMenu = () => (
 );
 ```
 
+Alternatively, specify a `children` function which returns elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, `MenuGroup`, or `DropdownMenuSeparator`.
+
+```jsx
+import { Fragment } from '@wordpress/element';
+import { DropdownMenu, DropdownMenuSeparator, MenuItem } from '@wordpress/components';
+
+const MyDropdownMenu = () => (
+	<DropdownMenu
+		icon="move"
+		label="Select a direction"
+	>
+		{ ( { onClose } ) => (
+			<Fragment>
+				<MenuItem
+					icon="arrow-up-alt"
+					onClick={ onClose }
+				>
+					Move Up
+				</MenuItem>
+				<MenuItem
+					icon="arrow-down-alt"
+					onClick={ onClose }
+				>
+					Move Down
+				</MenuItem>
+				<DropdownMenuSeparator />
+				<MenuItem
+					icon="trash"
+					onClick={ onClose }
+				>
+					Remove
+				</MenuItem>
+			</Fragment>
+		) }
+	</DropdownMenu>
+);
+```
+
 ### Props
 
 The component accepts the following props:
@@ -133,8 +171,19 @@ An array of objects describing the options to be shown in the expanded menu.
 
 Each object should include an `icon` [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug string, a human-readable `title` string, `isDisabled` boolean flag and an `onClick` function callback to invoke when the option is selected.
 
+A valid DropdownMenu must specify one or the other of a `controls` or `children` prop.
+
 - Type: `Array`
-- Required: Yes
+- Required: No
+
+#### children
+
+A [function render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) which should return an element or elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, `MenuGroup`, or `DropdownMenuSeparator`. Its first argument is a props object including the same values as given to a [`Dropdown`'s `renderContent`](/packages/components/src/dropdown#rendercontent) (`isOpen`, `onToggle`, `onClose`).
+
+A valid DropdownMenu must specify one or the other of a `controls` or `children` prop.
+
+- Type: `Function`
+- Required: No
 
 See also: [https://developer.wordpress.org/resource/dashicons/](https://developer.wordpress.org/resource/dashicons/)
 
