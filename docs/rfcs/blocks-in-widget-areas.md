@@ -16,6 +16,7 @@ Adding blocks to widget-editing areas was first announced at WCUS 2018, is a [Gu
 - Upgrading WordPress must not affect the appearance of the user's site, or any of their existing widgets.
 - Existing Core and third-party widgets must remain functional in the new block-based interface.
 - Backwards compatibility must be maintained. That is, themes and plugins that use public widget APIs must remain functional.
+- During a transition period, it should be possible to disable the block-based interface and return to the classic widget-editing interface.
 
 ## Terminology
 
