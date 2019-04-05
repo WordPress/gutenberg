@@ -13,6 +13,7 @@ exports.ios12 = {
 exports.android8 = {
 	browserName: '',
 	platformName: 'Android',
+	platformVersion: '8.0',
 	deviceName: 'Android Emulator',
 	automationName: 'UiAutomator2',
 	os: 'Android',
