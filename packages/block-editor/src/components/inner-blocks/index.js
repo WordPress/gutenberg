@@ -176,7 +176,7 @@ InnerBlocks.Content = withBlockContentContext(
 
 InnerBlocks.appenderType = {
 	AUTO_INSERT: 'auto-insert',
-	BLOCK: 'block-appender',
+	BLOCK: 'block',
 };
 
 export default InnerBlocks;

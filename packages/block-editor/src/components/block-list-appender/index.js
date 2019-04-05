@@ -40,7 +40,7 @@ function BlockListAppender( {
 		);
 	}
 
-	if ( isString( renderAppender ) && renderAppender === 'block-appender' ) {
+	if ( isString( renderAppender ) && renderAppender === 'block' ) {
 		return (
 			<div className="block-list-appender">
 				<Inserter

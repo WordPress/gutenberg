@@ -117,7 +117,7 @@ If the block is a top level block: the locking of the Custom Post Type is used.
 * **Type:** `String|Function`
 * **Default:** - `null`. By default the `auto-insert` behaviour (see below) is utilised.
 * **Options:** 
-    - `block-appender` - uses the Block List Appender (`packages/block-editor/src/components/block-list-appender/index.js`) to display a "Add Block" message with an icon which fills the Block preview. No default Block is inserted.
+    - `block` - uses the Block List Appender (`packages/block-editor/src/components/block-list-appender/index.js`) to display a "Add Block" message with an icon which fills the Block preview. No default Block is inserted.
     - `auto-insert` - automatically inserts whichever block is configured as the default block via `wp.blocks.getDefaultBlockName` (typically `paragraph`).
 
 Determines the placeholder behaviour when the Block is initially inserted. You may pass a render function to provide your own placeholder as required.
