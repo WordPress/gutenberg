@@ -6,15 +6,50 @@ commands:
       - restore_cache:
           name: Restore Yarn Cache
           keys:
-            - yarn-{{ checksum "yarn.lock" }}
+            - yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
-          command: yarn install --frozen-lockfile
+          command: YARN_CACHE_FOLDER=~/.cache/yarn yarn install --frozen-lockfile
       - save_cache:
           name: Save Yarn Cache
-          key: yarn-{{ checksum "yarn.lock" }}
+          key: yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
+  build-android:
+    steps:
+      - run:
+          name: Change initial HTML file
+          command: |
+            cp ./bin/example-content/initial-device-tests-html.js ./src/app/initial-html.js
+      - run:
+          name: Bundle Debug android
+          command: yarn bundle:android:test
+      - run:
+          name: Gradle assemble debug android apk
+          command: |
+            cd android
+            ./gradlew clean
+            ./gradlew assembleDebug
+  build-ios:
+    steps:
+    - run:
+        name: Change initial HTML file
+        command: |
+          cp ./bin/example-content/initial-device-tests-html.js ./src/app/initial-html.js
+    - run:
+        name: Bundle iOS
+        command: |
+          yarn bundle:ios:test
+    - run:
+        name: Generate .app file
+        command:  |
+          set +e
+          yarn react-native run-ios --configuration Release
+  checkout-gutenberg:
+    steps:
+      - run:
+          name: Checkout Gutenberg
+          command: git submodule update --init --recursive
 
 jobs:
   checks:
@@ -32,11 +67,7 @@ jobs:
       - image: circleci/node:8
     steps:
       - checkout
-      - run:
-          name: Checkout Gutenberg
-          command: |
-            git submodule init
-            git submodule update --recursive
+      - checkout-gutenberg
       - yarn-install
       - run:
           name: Set Environment Variables
@@ -47,6 +78,73 @@ jobs:
       - run:
           name: Run Checks
           command: bin/ci-checks-js.sh
+  android-device-checks:
+    docker:
+    - image: circleci/android:api-28-node8-alpha
+    steps:
+      - checkout
+      - run:
+          name: Checkout Gutenberg
+          command: git submodule update --init --recursive
+      - yarn-install
+      - run:
+          name: Set Environment Variables
+          command: |
+            echo 'export TEST_RN_PLATFORM=android' >> $BASH_ENV
+            echo 'export TEST_ENV=sauce' >> $BASH_ENV
+      - build-android
+      - run:
+          name: Upload apk to sauce labs
+          command: |
+            curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
+      - run:
+          name: Run Device Tests
+          command: yarn device-tests
+  ios-device-checks:
+    macos:
+      xcode: "10.0"
+    steps:
+    - checkout
+    - checkout-gutenberg
+    - yarn-install
+    - run:
+        name: Set Environment Variables
+        command: |
+          echo 'export TEST_RN_PLATFORM=ios' >> $BASH_ENV
+          echo 'export TEST_ENV=sauce' >> $BASH_ENV
+    - restore_cache:
+        name: Restore Dependencies Cache
+        keys:
+        - dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+          checksum "yarn.lock" }}
+        - dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}
+        - dependencies-
+    - run:
+        name: Yarn preios
+        command: yarn preios
+    - save_cache:
+        name: Save Dependencies Cache
+        key: dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+          checksum "yarn.lock" }}
+        paths:
+        - react-native-aztec/ios/Carthage
+        - ~/.rncache
+    - build-ios
+    - run:
+        name: Zip up .app file
+        command: |
+          cp ./ios/main.jsbundle ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle
+          cd ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/
+          zip -r ./Gutenberg.app.zip ./gutenberg.app
+          mv ./Gutenberg.app.zip "$CIRCLE_WORKING_DIRECTORYGutenberg.app.zip"
+    - run:
+        name: Upload .app to sauce labs
+        command: |
+          curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.app.zip?overwrite=true --data-binary @./Gutenberg.app.zip
+    - run:
+        name: Run Device Tests
+        command: |
+          yarn device-tests
 
 workflows:
   gutenberg-mobile:
@@ -62,3 +160,7 @@ workflows:
           name: Test Android
           platform: android
           check-tests: true
+      - ios-device-checks:
+          name: Test iOS on Device
+      - android-device-checks:
+          name: Test Android on Device

@@ -61,7 +61,7 @@ export class BlockToolbar extends Component<PropsType> {
 					alwaysBounceHorizontal={ false }
 					contentContainerStyle={ styles.scrollableContent }
 				>
-					<Toolbar>
+					<Toolbar accessible={ false }>
 						<ToolbarButton
 							title={ __( 'Add block' ) }
 							icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
@@ -73,12 +73,14 @@ export class BlockToolbar extends Component<PropsType> {
 							icon="undo"
 							isDisabled={ ! hasUndo }
 							onClick={ undo }
+							extraProps={ { hint: __( 'Double tap to undo last change' ) } }
 						/>
 						<ToolbarButton
 							title={ __( 'Redo' ) }
 							icon="redo"
 							isDisabled={ ! hasRedo }
 							onClick={ redo }
+							extraProps={ { hint: __( 'Double tap to redo last change' ) } }
 						/>
 					</Toolbar>
 					<BlockControls.Slot />
@@ -90,6 +92,7 @@ export class BlockToolbar extends Component<PropsType> {
 						title={ __( 'Hide keyboard' ) }
 						icon="keyboard-hide"
 						onClick={ this.onKeyboardHide }
+						extraProps={ { hint: __( 'Tap to hide the keyboard' ) } }
 					/>
 				</Toolbar> ) }
 			</View>
