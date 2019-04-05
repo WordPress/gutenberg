@@ -136,7 +136,7 @@ jobs:
           cp ./ios/main.jsbundle ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle
           cd ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/
           zip -r ./Gutenberg.app.zip ./gutenberg.app
-          mv ./Gutenberg.app.zip "${CIRCLE_WORKING_DIRECTORY}/Gutenberg.app.zip"
+          mv ./Gutenberg.app.zip "../../../../../../Gutenberg.app.zip"
     - run:
         name: Upload .app to sauce labs
         command: |

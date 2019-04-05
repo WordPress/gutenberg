@@ -146,6 +146,6 @@ export default class EditorPage {
 		const block = await this.getParagraphBlockAtPosition( position );
 		const textViewElement = await this.getTextViewForParagraphBlock( block );
 		const text = await textViewElement.text();
-		return text.toString().trim();
+		return text.toString();
 	}
 }

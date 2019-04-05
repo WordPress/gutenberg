@@ -6,7 +6,13 @@
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
-import { setupAppium, setupDriver, isLocalEnvironment, timer, clickMiddleOfElement } from './helpers/utils';
+import {
+	setupAppium,
+	setupDriver,
+	isLocalEnvironment,
+	timer,
+	clickMiddleOfElement,
+	clickBeginningOfElement } from './helpers/utils';
 import testData from './helpers/test-data';
 
 /**
@@ -70,6 +76,30 @@ describe( 'Gutenberg Editor tests', () => {
 		expect( testData.shortText ).toMatch( new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` ) );
 
 		await editorPage.removeBlockAtPosition( 1 );
+		await editorPage.removeBlockAtPosition( 0 );
+	} );
+
+	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
+		await editorPage.addNewParagraphBlock();
+		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+		let textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
+		await clickMiddleOfElement( driver, textViewElement );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n' );
+		await timer( 3000 );
+		expect( await editorPage.hasParagraphBlockAtPosition( 0 ) && await editorPage.hasParagraphBlockAtPosition( 1 ) )
+			.toBe( true );
+
+		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 0 );
+		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
+		textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
+		await clickBeginningOfElement( driver, textViewElement );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\u0008' );
+
+		const text = await editorPage.getTextForParagraphBlockAtPosition( 0 );
+		expect( text0 + text1 ).toMatch( text );
+
 		await editorPage.removeBlockAtPosition( 0 );
 	} );
 
