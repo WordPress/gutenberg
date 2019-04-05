@@ -69,7 +69,7 @@ const setupDriver = async () => {
 	}
 
 	if ( ! isLocalEnvironment() ) {
-		const branch = process.env.CIRCLE_BRANCH;
+		const branch = process.env.CIRCLE_BRANCH || '';
 		desiredCaps.name = `Gutenberg Editor Tests[${ rnPlatform }]-${ branch }`;
 		desiredCaps.tags = [ 'Gutenberg', branch ];
 	}
