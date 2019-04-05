@@ -381,33 +381,6 @@ Here, `123` is the ID of a `wp_area` post. The `post_content` field of `get_post
 <!-- wp:legacy-widget {"identifier":"recent-comments-2","instance":{"title":"","number":5}} /-->
 ```
 
-## New APIs
-
-### `register_widget_area()`
-
-The `register_widget_area()` function is equivalent to [`register_sidebar()`][register_sidebar] except that it does not support `'class'`, `'before_widget'`, `'after_widget'`, `'before_title'` and `'after_title'`.
-
-By encouraging theme developers to use `register_widget_area()` instead of `register_sidebar()`, we encourage themes to allow users to have full control of their widget areas using the block editor.
-
-```php
-function register_widget_area( array|string $attributes = array() )
-```
-
-#### Parameters
-
-- `$attributes`: _(array|string)_ _(optional)_ Arguments for the widget area being registered.
-  - `'name'`: _(string)_ _(optional)_ Name or title of the widget area. Default `"Widget Area $instance"`.
-  - `'id'`: _(string)_ _(optional)_ Unique identifier of the widget area. Default `"widget-area-$instance"`.
-  - `'description'`: _(string)_ _(optional)_ Description the widget area, displayed in the admin interface.
-
-#### Return
-
-_(string)_ ID added to `$wp_registered_sidebars` global.
-
-### `widget_area()`
-
-The `widget_area()` function is an exact alias of the [`dynamic_sidebar()`][dynamic_sidebar] function, provided so that themes can transition away from thinking about "sidebars".
-
 ## Backwards Compatibility
 
 ### `wp_get_sidebars_widgets()`
