@@ -15,7 +15,7 @@ import {
 	toggleFeature,
 	togglePinnedPluginItem,
 	requestMetaBoxUpdates,
-	init,
+	__unstableInitialize,
 } from '../actions';
 import { VIEW_AS_LINK_SELECTOR } from '../constants';
 
@@ -136,9 +136,9 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'init', () => {
+	describe( '__unstableInitialize', () => {
 		let fulfillment;
-		const reset = () => fulfillment = init();
+		const reset = () => fulfillment = __unstableInitialize();
 		const registryMock = { select: {}, dispatch: {} };
 		describe( 'yields subscribe control descriptor for block settings', () => {
 			reset();

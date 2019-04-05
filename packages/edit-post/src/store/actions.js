@@ -6,7 +6,7 @@ import { castArray } from 'lodash';
 /**
  * Internal dependencies
  */
-import { subscribe, adjustSidebar } from './controls';
+import { __unstableSubscribe, __experimentalAdjustSidebar } from './controls';
 import { onChangeListener } from './utils';
 import { STORE_KEY, VIEW_AS_LINK_SELECTOR } from './constants';
 
@@ -249,9 +249,9 @@ export function metaBoxUpdatesSuccess() {
  * - subscription for updating the "View Post" link in the admin bar when
  *   permalink is updated.
  */
-export function* init() {
+export function* __unstableInitialize() {
 	// Select the block settings tab when the selected block changes
-	yield subscribe( ( registry ) => onChangeListener(
+	yield __unstableSubscribe( ( registry ) => onChangeListener(
 		() => !! registry.select( 'core/block-editor' )
 			.getBlockSelectionStart(),
 		( hasBlockSelection ) => {
@@ -268,9 +268,9 @@ export function* init() {
 		}
 	) );
 	// hide/show the sidebar depending on size of viewport.
-	yield adjustSidebar();
+	yield __experimentalAdjustSidebar();
 	// Update View Post link in the admin bar when permalink is updated.
-	yield subscribe( ( registry ) => onChangeListener(
+	yield __unstableSubscribe( ( registry ) => onChangeListener(
 		() => registry.select( 'core/editor' ).getCurrentPost().link,
 		( newPermalink ) => {
 			if ( ! newPermalink ) {

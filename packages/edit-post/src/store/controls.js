@@ -34,7 +34,7 @@ export function select( storeName, selectorName, ...args ) {
  *                                     receives the registry.
  * @return {Object} control descriptor.
  */
-export function subscribe( listenerCallback ) {
+export function __unstableSubscribe( listenerCallback ) {
 	return { type: 'SUBSCRIBE', listenerCallback };
 }
 
@@ -43,7 +43,7 @@ export function subscribe( listenerCallback ) {
  *
  * @return {Object} control.descriptor.
  */
-export function adjustSidebar() {
+export function __experimentalAdjustSidebar() {
 	return { type: 'ADJUST_SIDEBAR' };
 }
 
