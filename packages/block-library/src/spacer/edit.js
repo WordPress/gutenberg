@@ -54,11 +54,12 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 							type="number"
 							id={ id }
 							onChange={ ( event ) => {
+								const customHeight = parseInt( event.target.value, 10 );
 								setAttributes( {
-									height: parseInt( event.target.value, 10 ),
+									height: ( isNaN( customHeight ) ) ? 20 : customHeight,
 								} );
 							} }
-							value={ isNaN( height ) ? '' : height }
+							value={ height }
 							min="20"
 							step="10"
 						/>
