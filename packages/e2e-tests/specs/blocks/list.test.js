@@ -191,6 +191,18 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should split into two ordered lists with paragraph', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1. one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should split indented list item', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
