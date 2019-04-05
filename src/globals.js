@@ -16,7 +16,14 @@ import { createElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-// Import for side-effects: Patches for jsdom-jscore, details commented in file.
+
+/**
+ * Import for side-effects: Patches for jsdom-jscore, mostly to implement
+ * functions that are called from Gutenberg code paths, where a more full DOM
+ * implementation is expected (in the browser environment).
+ *
+ * More details are available within the comments in the file.
+ */
 import './jsdom-patches';
 
 global.wp = {
