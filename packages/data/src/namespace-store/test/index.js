@@ -81,7 +81,7 @@ describe( 'controls', () => {
 		registry.select( 'store' ).getItems();
 	} );
 	describe( 'various action types have expected response and resolve as ' +
-		'expected', () => {
+		'expected with controls middleware', () => {
 		const actions = {
 			*withPromise() {
 				yield { type: 'SOME_ACTION' };
@@ -133,6 +133,37 @@ describe( 'controls', () => {
 		} );
 		it( 'returns undefined for normal dispatch action', () => {
 			expect( registry.dispatch( 'store' ).normal() ).toBeUndefined();
+		} );
+	} );
+	describe( 'action type resolves as expected with just promise ' +
+		'middleware', () => {
+		const actions = {
+			normal: () => ( { type: 'NORMAL' } ),
+			withPromiseAndAction: () => new Promise(
+				( resolve ) => resolve( { type: 'WITH_PROMISE' } )
+			),
+			withPromiseAndNonAction: () => new Promise(
+				( resolve ) => resolve( 10 )
+			),
+		};
+		beforeEach( () => {
+			registry.registerStore( 'store', {
+				reducer: () => {},
+				actions,
+			} );
+		} );
+		it( 'normal action returns undefined', () => {
+			expect( registry.dispatch( 'store' ).normal() ).toBeUndefined();
+		} );
+		it( 'action with promise resolving to action returning undefined', () => {
+			expect( registry.dispatch( 'store' ).withPromiseAndAction() )
+				.resolves
+				.toBeUndefined();
+		} );
+		it( 'action with promise returning non action throws error', () => {
+			const dispatchedAction = registry.dispatch( 'store' )
+				.withPromiseAndNonAction();
+			expect( dispatchedAction ).resolves.toBe( 10 );
 		} );
 	} );
 } );
