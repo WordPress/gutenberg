@@ -79,8 +79,8 @@ export const select = defaultRegistry.select;
  * Given the name of a registered store, returns an object of the store's action creators.
  * Calling an action creator will cause it to be dispatched, updating the state value accordingly.
  *
- * Note: If the action creator is a generator then a promise is returned.
- * Otherwise, the dispatch will return `undefined`.
+ * Note: If the action creator is a generator or returns a promise, a promise is
+ * returned. Otherwise, the dispatch will return `undefined`.
  *
  * @param {string} name Store name
  *
