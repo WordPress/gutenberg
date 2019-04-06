@@ -737,6 +737,7 @@
 	left: 0;
 	right: 0;
 	justify-content: center;
+	height: $block-padding + 8px;
 
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
