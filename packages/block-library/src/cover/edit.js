@@ -137,9 +137,19 @@ class CoverEdit extends Component {
 				url: media.url,
 				id: media.id,
 				backgroundType: mediaType,
+				...( mediaType === VIDEO_BACKGROUND_TYPE ?
+					{ focalPoint: undefined, hasParallax: undefined } :
+					{}
+				),
 			} );
 		};
-		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
+
+		const toggleParallax = () => {
+			setAttributes( {
+				hasParallax: ! hasParallax,
+				...( ! hasParallax ? { focalPoint: undefined } : {} ),
+			} );
+		};
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
 
 		const style = {

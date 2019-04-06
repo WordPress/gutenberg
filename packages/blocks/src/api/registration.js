@@ -49,12 +49,15 @@ import { isValidIcon, normalizeIconObject } from './utils';
 let serverSideBlockDefinitions = {};
 
 /**
- * Set the server side block definition of blocks.
+ * Sets the server side block definition of blocks.
  *
  * @param {Object} definitions Server-side block definitions
  */
 export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { // eslint-disable-line camelcase
-	serverSideBlockDefinitions = definitions;
+	serverSideBlockDefinitions = {
+		...serverSideBlockDefinitions,
+		...definitions,
+	};
 }
 
 /**

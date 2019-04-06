@@ -18,6 +18,12 @@ exports[`RichText should apply formatting with primary shortcut 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should apply multiple formats when selection is collapsed 1`] = `
+"<!-- wp:paragraph -->
+<p><strong><em>1</em></strong>.</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should handle change in tag name gracefully 1`] = `
 "<!-- wp:heading {\\"level\\":3} -->
 <h3></h3>

@@ -555,7 +555,8 @@ describe( 'createRegistry', () => {
 				},
 			} );
 
-			registry.dispatch( 'counter' ).increment(); // state = 1
+			const dispatchResult = registry.dispatch( 'counter' ).increment(); // state = 1
+			expect( dispatchResult ).toBe( undefined ); // Actions are implementation detail.
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
 		} );
