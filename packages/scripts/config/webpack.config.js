@@ -97,10 +97,13 @@ const config = {
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
-				use: {
-					loader: require.resolve( 'babel-loader' ),
-					options: getBabelLoaderOptions(),
-				},
+				use: [
+					'thread-loader',
+					{
+						loader: require.resolve( 'babel-loader' ),
+						options: getBabelLoaderOptions(),
+					},
+				],
 			},
 		],
 	},
