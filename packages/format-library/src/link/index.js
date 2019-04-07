@@ -10,7 +10,7 @@ import {
 	removeFormat,
 	slice,
 } from '@wordpress/rich-text';
-import { isURL } from '@wordpress/url';
+import { isURL, isEmail } from '@wordpress/url';
 import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor';
 
 /**
@@ -19,8 +19,6 @@ import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor
 import InlineLinkUI from './inline';
 
 const name = 'core/link';
-
-const isEmail = ( email ) => /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/.test( email );
 
 export const link = {
 	name,
