@@ -66,12 +66,6 @@ const externals = [
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
-const getBabelLoaderOptions = () => hasBabelConfig() ? {} : {
-	babelrc: false,
-	configFile: false,
-	presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
-};
-
 const config = {
 	mode,
 	entry: {
@@ -103,7 +97,20 @@ const config = {
 					'thread-loader',
 					{
 						loader: require.resolve( 'babel-loader' ),
-						options: getBabelLoaderOptions(),
+						options: {
+							// Babel uses a directory within local node_modules
+							// by default. Use the environment variable option
+							// to enable more persistent caching.
+							cacheDirectory: process.env.BABEL_CACHE_DIRECTORY || true,
+
+							// Provide a fallback configuration if there's not
+							// one explicitly available in the project.
+							...( ! hasBabelConfig() && {
+								babelrc: false,
+								configFile: false,
+								presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+							} ),
+						},
 					},
 				],
 			},
