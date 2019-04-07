@@ -89,7 +89,9 @@ const config = {
 	},
 	module: {
 		rules: [
-			{
+			// Sourcemap Loader is a complement to the `devtool` configuration,
+			// and thus is only necessary for development environments.
+			! isProduction && {
 				test: /\.js$/,
 				use: require.resolve( 'source-map-loader' ),
 				enforce: 'pre',
@@ -105,7 +107,7 @@ const config = {
 					},
 				],
 			},
-		],
+		].filter( Boolean ),
 	},
 	plugins: [
 		// WP_BUNDLE_ANALYZER global variable enables utility that represents bundle content
