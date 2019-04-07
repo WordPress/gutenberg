@@ -20,6 +20,8 @@ import InlineLinkUI from './inline';
 
 const name = 'core/link';
 
+const isEmail = ( email ) => /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/.test( email );
+
 export const link = {
 	name,
 	title: __( 'Link' ),
@@ -47,6 +49,8 @@ export const link = {
 
 			if ( text && isURL( text ) ) {
 				onChange( applyFormat( value, { type: name, attributes: { url: text } } ) );
+			} else if ( text && isEmail( text ) ) {
+				onChange( applyFormat( value, { type: name, attributes: { url: `mailto:${ text }` } } ) );
 			} else {
 				this.setState( { addingLink: true } );
 			}
