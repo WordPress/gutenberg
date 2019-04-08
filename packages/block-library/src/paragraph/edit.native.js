@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -81,6 +82,10 @@ class ParagraphEdit extends Component {
 		) ) );
 	}
 
+	removeHtmlTags( html ) {
+		return create( { html } ).text;
+	}
+
 	render() {
 		const {
 			attributes,
@@ -95,12 +100,11 @@ class ParagraphEdit extends Component {
 			content,
 		} = attributes;
 
-
 		let accessibilityLabel = __( "Paragraph block" );
 		if ( ! content ) {
 			accessibilityLabel += ". " + __( "Empty" );
 		} else {
-			accessibilityLabel += ". " + content;
+			accessibilityLabel += ". " + this.removeHtmlTags( content );
 		}
 
 		return (
