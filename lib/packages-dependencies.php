@@ -111,6 +111,7 @@ return array(
 	'wp-data'                               => array(
 		'lodash',
 		'wp-compose',
+		'wp-deprecated',
 		'wp-element',
 		'wp-is-shallow-equal',
 		'wp-priority-queue',
@@ -154,7 +155,11 @@ return array(
 		'wp-viewport',
 	),
 	'wp-edit-widgets'                       => array(
+		'wp-block-editor',
+		'wp-block-library',
+		'wp-components',
 		'wp-element',
+		'wp-i18n',
 	),
 	'wp-editor'                             => array(
 		'lodash',

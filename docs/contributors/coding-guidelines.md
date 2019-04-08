@@ -6,30 +6,55 @@ This living document serves to prescribe coding guidelines specific to the Guten
 
 ### Naming
 
-To avoid class name collisions between elements of the editor and to the enclosing WordPress dashboard, class names **must** adhere to the following guidelines:
+To avoid class name collisions, class names **must** adhere to the following guidelines, which are loosely inspired by the [BEM (Block, Element, Modifier) methodology](https://en.bem.info/methodology/).
 
-Any default export of a folder's `index.js` **must** be prefixed with `editor-` followed by the directory name in which it resides:
+All class names assigned to an element must be prefixed with the name of the package, followed by the name of the directory in which the component resides. Any descendent of the component's root element must append a dash-delimited descriptor, separated from the base by two consecutive underscores `__`. The root element is considered to be the highest ancestor element returned by the default export in the `index.js`. Notably, if your folder contains multiple files, each with their own default exported component, only the element rendered by that of `index.js` can be considered the root. All others should be treated as descendents.
 
->.editor-_[ directory name ]_
+**Example:**
 
-(Example: `.editor-inserter` from `inserter/index.js`)
+Consider the following component located at `packages/components/src/notice/index.js`:
 
-For any descendant of the top-level (`index.js`) element, prefix using the top-level element's class name separated by two underscores:
+```jsx
+export default function Notice( { children, onRemove } ) {
+	return (
+		<div className="components-notice">
+			<div className="components-notice__content">
+				{ children }
+			</div>
+			<IconButton
+				className="components-notice__dismiss"
+				icon="no"
+				label={ __( 'Dismiss this notice' ) }
+				onClick={ onRemove }
+			/>
+		</div>
+	);
+}
+```
 
->.editor-_[ directory name ]_\_\__[ descendant description ]_
+Components may be assigned with class names that indicate states (for example, an "active" tab or an "opened" panel). These modifiers should be applied as a separate class name, prefixed as an adjective expression by `is-` (`is-active` or `is-opened`). In rare cases, you may encounter variations of the modifier prefix, usually to improve readability (`has-warning`). Because a modifier class name is not contextualized to a specific component, it should always be written in stylesheets as accompanying the component being modified (`.components-panel.is-opened`).
 
-(Example: `.editor-inserter__button-toggle` from `inserter/button.js`)
+**Example:**
 
-For optional variations of an element or its descendants, you may use a modifier class, but you **must not** apply styles to the modifier class directly; only as an additional selector to the element to which the modifier applies:
+Consider again the Notices example. We may want to apply specific styling for dismissible notices. The [`classnames` package](https://www.npmjs.com/package/classnames) can be a helpful utility for conditionally applying modifier class names.
 
->.editor-_[ directory name ]_.is-_[ modifier description ]_
->.editor-_[ directory name ]_\_\__[ descendant description ]_.is-_[ modifier description ]_
+```jsx
+import classnames from 'classnames';
 
-(Example: `.editor-inserter__button-toggle.is-active` )
+export default function Notice( { children, onRemove, isDismissible } ) {
+	const classes = classnames( 'components-notice', {
+		'is-dismissible': isDismissible,
+	} );
 
-In all of the above cases, except in separating the top-level element from its descendants, you **must** use dash delimiters when expressing multiple terms of a name.
+	return (
+		<div className={ classes }>
+			{ /* ... */ }
+		</div>
+	);
+}
+```
 
-You may observe that these conventions adhere closely to the [BEM (Blocks, Elements, Modifiers)](http://getbem.com/introduction/) CSS methodology, with minor adjustments to the application of modifiers.
+A component's class name should **never** be used outside its own folder (with rare exceptions such as [`_z-index.scss`](https://github.com/WordPress/gutenberg/blob/master/assets/stylesheets/_z-index.scss)). If you need to inherit styles of another component in your own components, you should render an instance of that other component. At worst, you should duplicate the styles within your own component's stylesheet. This is intended to improve maintainability by treating individual components as the isolated abstract interface.
 
 #### SCSS File Naming Conventions for Blocks
 

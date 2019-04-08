@@ -31,11 +31,10 @@
 		// Use specific selector to not affect nested block toolbars.
 		&[data-align="full"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar {
 			height: 0; // This collapses the container to an invisible element without margin.
-			width: 100%;
+			width: calc(100% - 1px); // -1px to account for inner element left: 1px value causing overflow-x scrollbars
 			margin-left: 0;
 			margin-right: 0;
 			text-align: center;
-
 			// This float rule takes the toolbar out of the flow, without it having to be absolute positioned.
 			// This is necessary because otherwise the mere presence of the toolbar can push down content.
 			// Pairs with relative rule on line 49.

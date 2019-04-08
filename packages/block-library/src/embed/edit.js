@@ -61,11 +61,22 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 
 			if ( switchedPreview || switchedURL ) {
 				if ( this.props.cannotEmbed ) {
-					// Can't embed this URL, and we've just received or switched the preview.
+					// We either have a new preview or a new URL, but we can't embed it.
+					if ( ! this.props.fetching ) {
+						// If we're not fetching the preview, then we know it can't be embedded, so try
+						// removing any trailing slash, and resubmit.
+						this.resubmitWithoutTrailingSlash();
+					}
 					return;
 				}
 				this.handleIncomingPreview();
 			}
+		}
+
+		resubmitWithoutTrailingSlash() {
+			this.setState( ( prevState ) => ( {
+				url: prevState.url.replace( /\/$/, '' ),
+			} ), this.setUrl );
 		}
 
 		setUrl( event ) {

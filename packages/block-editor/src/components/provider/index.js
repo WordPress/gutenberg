@@ -3,8 +3,13 @@
  */
 import { Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
-import { withDispatch, withRegistry } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import withRegistryProvider from './with-registry-provider';
 
 class BlockEditorProvider extends Component {
 	componentDidMount() {
@@ -115,6 +120,7 @@ class BlockEditorProvider extends Component {
 }
 
 export default compose( [
+	withRegistryProvider,
 	withDispatch( ( dispatch ) => {
 		const {
 			updateSettings,
@@ -126,5 +132,4 @@ export default compose( [
 			resetBlocks,
 		};
 	} ),
-	withRegistry,
 ] )( BlockEditorProvider );

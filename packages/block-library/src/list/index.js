@@ -14,7 +14,12 @@ import {
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
 import { replace, join, split, create, toHTMLString, LINE_SEPARATOR } from '@wordpress/rich-text';
-import { G, Path, SVG } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import edit from './edit';
+import icon from './icon';
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -56,7 +61,7 @@ export const name = 'core/list';
 export const settings = {
 	title: __( 'List' ),
 	description: __( 'Create a bulleted or numbered list.' ),
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><G><Path d="M9 19h12v-2H9v2zm0-6h12v-2H9v2zm0-8v2h12V5H9zm-4-.5c-.828 0-1.5.672-1.5 1.5S4.172 7.5 5 7.5 6.5 6.828 6.5 6 5.828 4.5 5 4.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5z" /></G></SVG>,
+	icon,
 	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
 
@@ -220,51 +225,7 @@ export const settings = {
 		};
 	},
 
-	edit( {
-		attributes,
-		insertBlocksAfter,
-		setAttributes,
-		mergeBlocks,
-		onReplace,
-		className,
-	} ) {
-		const { ordered, values } = attributes;
-
-		return (
-			<RichText
-				identifier="values"
-				multiline="li"
-				tagName={ ordered ? 'ol' : 'ul' }
-				onChange={ ( nextValues ) => setAttributes( { values: nextValues } ) }
-				value={ values }
-				wrapperClassName="block-library-list"
-				className={ className }
-				placeholder={ __( 'Write list…' ) }
-				onMerge={ mergeBlocks }
-				unstableOnSplit={
-					insertBlocksAfter ?
-						( before, after, ...blocks ) => {
-							if ( ! blocks.length ) {
-								blocks.push( createBlock( 'core/paragraph' ) );
-							}
-
-							if ( after !== '<li></li>' ) {
-								blocks.push( createBlock( 'core/list', {
-									ordered,
-									values: after,
-								} ) );
-							}
-
-							setAttributes( { values: before } );
-							insertBlocksAfter( blocks );
-						} :
-						undefined
-				}
-				onRemove={ () => onReplace( [] ) }
-				onTagNameChange={ ( tag ) => setAttributes( { ordered: tag === 'ol' } ) }
-			/>
-		);
-	},
+	edit,
 
 	save( { attributes } ) {
 		const { ordered, values } = attributes;

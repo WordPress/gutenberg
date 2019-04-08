@@ -25,6 +25,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/escape-html": "file:../escape-html",
+		"@wordpress/hooks": "file:../hooks",
 		"lodash": "^4.17.11",
 		"rememo": "^3.0.0"
 	},

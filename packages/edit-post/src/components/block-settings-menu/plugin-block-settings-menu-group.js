@@ -18,7 +18,7 @@ const PluginBlockSettingsMenuGroupSlot = ( { fillProps, selectedBlocks } ) => {
 		<Slot fillProps={ { ...fillProps, selectedBlocks } } >
 			{ ( fills ) => ! isEmpty( fills ) && (
 				<Fragment>
-					<div className="editor-block-settings-menu__separator" />
+					<div className="editor-block-settings-menu__separator block-editor-block-settings-menu__separator" />
 					{ fills }
 				</Fragment>
 			) }
