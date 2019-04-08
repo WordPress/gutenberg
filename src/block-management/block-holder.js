@@ -13,6 +13,7 @@ import {
 	TouchableWithoutFeedback,
 	NativeSyntheticEvent,
 	NativeTouchEvent,
+	Keyboard,
 } from 'react-native';
 import TextInputState from 'react-native/lib/TextInputState';
 import {
@@ -96,6 +97,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	onInlineToolbarButtonPressed = ( button: number ) => {
+		Keyboard.dismiss();
 		switch ( button ) {
 			case InlineToolbarActions.UP:
 				this.props.moveBlockUp();
@@ -185,6 +187,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				insertBlocksAfter={ this.insertBlocksAfter }
 				mergeBlocks={ this.mergeBlocks }
 				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
+				clientId={ this.props.clientId }
 			/>
 		);
 	}

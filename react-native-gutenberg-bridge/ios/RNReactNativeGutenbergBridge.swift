@@ -28,6 +28,23 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func requestMediaImport(_ urlString: String, callback: @escaping RCTResponseSenderBlock) {
+        guard let url = URL(string: urlString) else {
+            callback(nil)
+            return
+        }
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestImport(from: url, with: { (mediaID, url) in
+                guard let url = url, let mediaID = mediaID else {
+                    callback(nil)
+                    return
+                }
+                callback([mediaID, url])
+            })
+        }
+    }
+
+    @objc
     func mediaUploadSync() {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaUploadSync()

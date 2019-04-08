@@ -28,7 +28,7 @@ class AztecView extends React.Component {
     onSelectionChange: PropTypes.func,
     onHTMLContentWithCursor: PropTypes.func,
     onCaretVerticalPositionChange: PropTypes.func,
-    blockType: PropTypes.object,
+	blockType: PropTypes.object,	
     ...ViewPropTypes, // include the default view properties
   }
 
@@ -157,10 +157,13 @@ class AztecView extends React.Component {
           onContentSizeChange = { this._onContentSizeChange }
           onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
           onSelectionChange = { this._onSelectionChange }
-          onEnter = { this._onEnter }
+          onEnter = { this.props.onEnter && this._onEnter }
+          // IMPORTANT: the onFocus events are thrown away as these are handled by onPress() in the upper level.
+          // It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
+          // combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
           onFocus = { this._onAztecFocus } 
           onBlur = { this._onBlur }
-          onBackspace = { this._onBackspace }
+		      onBackspace = { this._onBackspace }
         />
       </TouchableWithoutFeedback>
     );

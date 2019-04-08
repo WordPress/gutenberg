@@ -32,6 +32,13 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMedia(from source: MediaPickerSource, with callback: @escaping MediaPickerDidPickMediaCallback)
 
+    /// Tells the delegate that gutenberg JS requested the import of media item based on the provided URL
+    ///
+    /// - Parameters:
+    ///   - url: the url to import
+    ///   - callback: A callback block to be called with an upload mediaIdentifier and a placeholder image file url, use nil on both parameters to signal that the action has failed.
+    //
+    func gutenbergDidRequestImport(from url: URL, with callback: @escaping MediaPickerDidPickMediaCallback)
 
     /// Tells the delegate that an image block requested to reconnect with media uploads coordinator.
     ///

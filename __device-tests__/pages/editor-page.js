@@ -40,7 +40,11 @@ export default class EditorPage {
 
 	async addNewBlock( blockName: string ) {
 		// Click add button
-		const addButton = await this.driver.elementByAccessibilityId( __( 'Add block' ) );
+		let identifier = 'Add block';
+		if ( isAndroid() ) {
+			identifier = 'Add block, Double tap to add a block';
+		}
+		const addButton = await this.driver.elementByAccessibilityId( __( identifier ) );
 		await addButton.click();
 
 		// Click on block of choice
