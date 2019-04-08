@@ -27,8 +27,8 @@ export default class UnsupportedBlockEdit extends Component {
 		return (
 			<View
 				accessible
-				accessibilityLabel={ __( "Block not supported" ) + ". " + accessibilityTitle }
-				accessibilityStates={ this.props.isSelected && [ "selected" ] }
+				accessibilityLabel={ __( 'Block not supported' ) + '. ' + accessibilityTitle }
+				accessibilityStates={ this.props.isSelected && [ 'selected' ] }
 				style={ styles.unsupportedBlock }
 			>
 				<Icon className="unsupported-icon" icon={ icon && icon.src ? icon.src : icon } />

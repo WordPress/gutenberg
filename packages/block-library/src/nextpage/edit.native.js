@@ -16,12 +16,12 @@ import styles from './editor.scss';
 
 export default function NextPageEdit( { attributes, isSelected, onFocus } ) {
 	const { customText = __( 'Page break' ) } = attributes;
-	const accessibilityTitle = attributes.customText || "";
+	const accessibilityTitle = attributes.customText || '';
 	return (
-		<View 
+		<View
 			accessible
-			accessibilityLabel={ __( 'Page break block' ) + ". " + accessibilityTitle }
-			accessibilityStates={ isSelected && [ "selected" ] }
+			accessibilityLabel={ __( 'Page break block' ) + '. ' + accessibilityTitle }
+			accessibilityStates={ isSelected && [ 'selected' ] }
 			onAccessibilityTap={ onFocus }
 			style={ styles[ 'block-library-nextpage__container' ] }
 		>

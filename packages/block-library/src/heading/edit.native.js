@@ -90,11 +90,11 @@ class HeadingEdit extends Component {
 
 		const tagName = 'h' + level;
 
-		let accessibilityLabel = __( "Heading block" );
+		let accessibilityLabel = __( 'Heading block' );
 		if ( ! content ) {
-			accessibilityLabel += ". " + __( "Empty" );
+			accessibilityLabel += '. ' + __( 'Empty' );
 		} else {
-			accessibilityLabel += ". " + content;
+			accessibilityLabel += '. ' + content;
 		}
 
 		return (
