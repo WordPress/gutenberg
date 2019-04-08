@@ -27,7 +27,7 @@ const testEnvironment = process.env.TEST_ENV || defaultEnvironment;
 
 // Local App Paths
 const defaultAndroidAppPath = './android/app/build/outputs/apk/debug/app-debug.apk';
-const defaultIOSAppPath = './ios/build/gutenberg/Build/Products/Debug-iphonesimulator/gutenberg.app';
+const defaultIOSAppPath = './ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app';
 
 const localAndroidAppPath = process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
 const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
