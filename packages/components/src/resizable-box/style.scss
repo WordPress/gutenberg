@@ -22,23 +22,30 @@
 	background: theme(primary);
 	cursor: inherit;
 	position: absolute;
-	top: calc(50% - #{$resize-handler-size / 2});
-	right: calc(50% - #{$resize-handler-size / 2});
+	top: calc(50% - #{ceil($resize-handler-size / 2)});
+	right: calc(50% - #{ceil($resize-handler-size / 2)});
 }
 
 // This is the "visible" resize handle for side handles - the line
 .components-resizable-box__side-handle::before {
 	display: block;
 	content: "";
-	width: 6px;
-	height: 6px;
+	width: 7px;
+	height: 7px;
 	border: 2px solid $white;
 	background: theme(primary);
 	cursor: inherit;
 	position: absolute;
-	top: calc(50% - 3px);
-	right: calc(50% - 3px);
+	top: calc(50% - 4px);
+	right: calc(50% - 4px);
 	transition: transform 0.1s ease-in;
+}
+
+.is-dark-theme {
+	.components-resizable-box__side-handle::before,
+	.components-resizable-box__handle::after {
+		border-color: $light-gray-500;
+	}
 }
 
 // Show corner handles on top of side handles so they can be used
