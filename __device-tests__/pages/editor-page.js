@@ -33,9 +33,8 @@ export default class EditorPage {
 		}
 	}
 
-	async expect( ) {
-		expect( await this.driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
-		return this;
+	async getBlockList() {
+		return this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
 	async addNewBlock( blockName: string ) {
@@ -55,13 +54,11 @@ export default class EditorPage {
 	// Finds the wd element for new block that was added and sets the element attribute
 	// and accessibilityId attributes on this object
 	async getBlockAtPosition( position: number, blockName: string ) {
-		await this.driver.sleep( 2000 );
 		const blockLocator = `block-${ position }-${ blockName }`;
 		return await this.driver.elementByAccessibilityId( blockLocator );
 	}
 
 	async hasBlockAtPosition( position: number, blockName: string = '' ) {
-		await this.driver.sleep( 2000 );
 		if ( blockName !== '' ) {
 			const blockLocator = `block-${ position }-${ blockName }`;
 			const elements = await this.driver.elementsByAccessibilityId( blockLocator );
@@ -112,19 +109,16 @@ export default class EditorPage {
 	}
 
 	async getParagraphBlockAtPosition( position: number ) {
-		await this.driver.sleep( 2000 );
 		const blockName = 'core/paragraph';
 		return this.getBlockAtPosition( position, blockName );
 	}
 
 	async hasParagraphBlockAtPosition( position: number ) {
-		await this.driver.sleep( 2000 );
 		const blockName = 'core/paragraph';
 		return await this.hasBlockAtPosition( position, blockName );
 	}
 
 	async getTextViewForParagraphBlock( block: wd.PromiseChainWebdriver.Element ) {
-		await this.driver.sleep( 2000 );
 		let textViewElementName = 'XCUIElementTypeTextView';
 		if ( isAndroid() ) {
 			textViewElementName = 'android.widget.EditText';
@@ -148,8 +142,7 @@ export default class EditorPage {
 
 	async getTextForParagraphBlockAtPosition( position: number ) {
 		const block = await this.getParagraphBlockAtPosition( position );
-		const textViewElement = await this.getTextViewForParagraphBlock( block );
-		const text = await textViewElement.text();
+		const text = await this.getTextForParagraphBlock( block )
 		return text.toString();
 	}
 }

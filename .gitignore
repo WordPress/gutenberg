@@ -25,6 +25,9 @@ yarn-error.log*
 .gradle/
 android/app/src/main/assets/
 
+# iOS builds
+*.app.zip
+
 # files for the dex VM
 *.dex
 

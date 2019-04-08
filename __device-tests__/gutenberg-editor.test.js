@@ -7,22 +7,17 @@
  */
 import EditorPage from './pages/editor-page';
 import {
-	setupAppium,
 	setupDriver,
 	isLocalEnvironment,
 	timer,
 	clickMiddleOfElement,
-	clickBeginningOfElement } from './helpers/utils';
+	clickBeginningOfElement,
+	stopDriver } from './helpers/utils';
 import testData from './helpers/test-data';
-
-/**
- * External dependencies
- */
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
 
 describe( 'Gutenberg Editor tests', () => {
-	let appium;
 	let driver;
 	let editorPage;
 	let allPassed = true;
@@ -39,16 +34,12 @@ describe( 'Gutenberg Editor tests', () => {
 	}
 
 	beforeAll( async () => {
-		if ( isLocalEnvironment() ) {
-			appium = await setupAppium();
-		}
-
 		driver = await setupDriver();
+		editorPage = new EditorPage( driver );
 	} );
 
 	it( 'should be able to see visual editor', async () => {
-		editorPage = new EditorPage( driver );
-		await editorPage.expect();
+		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
 	it( 'should be able to add a new Paragraph block', async () => {
@@ -65,7 +56,6 @@ describe( 'Gutenberg Editor tests', () => {
 		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickMiddleOfElement( driver, textViewElement );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n' );
-		await timer( 3000 );
 		expect( await editorPage.hasParagraphBlockAtPosition( 0 ) && await editorPage.hasParagraphBlockAtPosition( 1 ) )
 			.toBe( true );
 
@@ -86,7 +76,6 @@ describe( 'Gutenberg Editor tests', () => {
 		let textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickMiddleOfElement( driver, textViewElement );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n' );
-		await timer( 3000 );
 		expect( await editorPage.hasParagraphBlockAtPosition( 0 ) && await editorPage.hasParagraphBlockAtPosition( 1 ) )
 			.toBe( true );
 
@@ -115,25 +104,9 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	afterAll( async () => {
-		if ( isLocalEnvironment() ) {
-			if ( driver === undefined ) {
-				if ( appium !== undefined ) {
-					await appium.kill( 'SIGINT' );
-				}
-				return;
-			}
-
-			await driver.quit();
-			await appium.kill( 'SIGINT' );
-		} else {
-			if ( driver === undefined ) {
-				if ( appium !== undefined ) {
-					await appium.kill( 'SIGINT' );
-				}
-				return;
-			}
+		if ( ! isLocalEnvironment() ) {
 			driver.sauceJobStatus( allPassed );
-			await driver.quit();
 		}
+		await stopDriver( driver );
 	} );
 } );
