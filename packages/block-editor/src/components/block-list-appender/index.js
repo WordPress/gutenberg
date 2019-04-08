@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, isFunction, isString } from 'lodash';
+import { last, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,39 @@ import IgnoreNestedEvents from '../ignore-nested-events';
 import DefaultBlockAppender from '../default-block-appender';
 import Inserter from '../inserter';
 
+function renderDefaultAppender( rootClientId, lastBlockClientId ) {
+	return (
+		<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
+			<DefaultBlockAppender
+				rootClientId={ rootClientId }
+				lastBlockClientId={ lastBlockClientId }
+			/>
+		</IgnoreNestedEvents>
+	);
+}
+
+function renderBlockAppender( rootClientId ) {
+	return (
+		<div className="block-list-appender">
+			<Inserter
+				rootClientId={ rootClientId }
+				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
+					<Button
+						className="block-list-appender__toggle"
+						onClick={ onToggle }
+						aria-expanded={ isOpen }
+						disabled={ disabled }
+					>
+						<Icon icon="insert" />
+						<span>{ __( 'Add Block' ) }</span>
+					</Button>
+				) }
+				isAppender
+			/>
+		</div>
+	);
+}
+
 function BlockListAppender( {
 	blockClientIds,
 	rootClientId,
@@ -29,37 +62,10 @@ function BlockListAppender( {
 		return null;
 	}
 
+	// If auto-insert Blocks is enabled, default to the standard behaviour
+	// of auto-inserting a Block but only if no renderAppender is provided
 	if ( ( ! renderAppender || renderAppender === 'auto-insert' ) && canInsertDefaultBlock ) {
-		return (
-			<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
-				<DefaultBlockAppender
-					rootClientId={ rootClientId }
-					lastBlockClientId={ last( blockClientIds ) }
-				/>
-			</IgnoreNestedEvents>
-		);
-	}
-
-	if ( isString( renderAppender ) && renderAppender === 'block' ) {
-		return (
-			<div className="block-list-appender">
-				<Inserter
-					rootClientId={ rootClientId }
-					renderToggle={ ( { onToggle, disabled, isOpen } ) => (
-						<Button
-							className="block-list-appender__toggle"
-							onClick={ onToggle }
-							aria-expanded={ isOpen }
-							disabled={ disabled }
-						>
-							<Icon icon="insert" />
-							<span>{ __( 'Add Block' ) }</span>
-						</Button>
-					) }
-					isAppender
-				/>
-			</div>
-		);
+		return renderDefaultAppender( rootClientId, last( blockClientIds ) );
 	}
 
 	// Render prop - custom appender
@@ -69,6 +75,12 @@ function BlockListAppender( {
 				{ renderAppender() }
 			</div>
 		);
+	}
+
+	// If auto-insert is disabled or we have specifically
+	// requested the 'block' appender
+	if ( ! canInsertDefaultBlock || renderAppender === 'block' ) {
+		return renderBlockAppender( rootClientId );
 	}
 }
 
