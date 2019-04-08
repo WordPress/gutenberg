@@ -369,9 +369,39 @@ This property is a pointer to CSS files containing the CSS used for the block in
 
 ## Internationalization
 
-Localized properties are automatically wrapped in `__` function calls on the backend and the frontend of WordPress. These translations are added as an inline script to the `wp-block-library` script handle. 
+Localized properties are automatically wrapped in `_x` function calls on the backend and the frontend of WordPress. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle which defines block when loading metadata defintion.
 
 WordPress string discovery automatically includes these strings to the plugin's or core's domain name.
+
+**Example:**
+
+```json
+{
+	"title": "My block",
+	"description": "My block is fantastic",
+	"keywords": [ "fanstastic" ]
+}
+```
+
+in JavScript with help of Babel plugin becomes:
+
+```js
+const metadata = {
+	title: _x( 'My block', 'block title', 'my-plugin' ),
+	description: _x( 'My block is fantastic', 'block description', 'my-plugin' ),
+	keywords: [ _x( 'fanstastic', 'block keywords', 'my-plugin' ) ],
+}
+```
+
+in PHP it gets transformed on the fly to code close to:
+
+```php
+$metadata = array(
+	'title' => _x( 'My block', 'block title', 'my-plugin' ),
+	'description': _x( 'My block is fantastic', 'block description', 'my-plugin' ),
+	'keywords': array( _x( 'fanstastic', 'block keywords', 'my-plugin' ) ),
+);
+```
 
 ## PHP Runtime
 
