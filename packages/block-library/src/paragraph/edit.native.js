@@ -96,11 +96,11 @@ class ParagraphEdit extends Component {
 		} = attributes;
 
 
-		let accessibilityLabel = __( "Paragraph block." );
+		let accessibilityLabel = __( "Paragraph block" );
 		if ( ! content ) {
-			accessibilityLabel += " " + __( "Empty" );
+			accessibilityLabel += ". " + __( "Empty" );
 		} else {
-			accessibilityLabel += " " + content;
+			accessibilityLabel += ". " + content;
 		}
 
 		return (
