@@ -386,12 +386,25 @@ function createFromElement( {
 				} );
 			}
 		} else {
-			mergePair( accumulator, {
-				...value,
-				formats: Array.from( value.formats, ( formats ) =>
-					formats ? [ format, ...formats ] : [ format ]
-				),
-			} );
+			// Use same reference for equal vertical format list.
+			const newRef = [ format ];
+			const oldRefs = new Set;
+
+			let i = value.formats.length;
+
+			while ( i-- ) {
+				const formatsAtIndex = value.formats[ i ];
+
+				if ( formatsAtIndex ) {
+					oldRefs.add( formatsAtIndex );
+				} else {
+					value.formats[ i ] = newRef;
+				}
+			}
+
+			oldRefs.forEach( ( ref ) => ref.unshift( format ) );
+
+			mergePair( accumulator, value );
 		}
 	}
 
