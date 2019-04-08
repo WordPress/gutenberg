@@ -13,28 +13,28 @@ import { isFormatEqual } from './is-format-equal';
  * @return {Object} New value with normalised formats.
  */
 export function normaliseFormats( value ) {
-	const newFormats = value.formats.slice();
-
-	newFormats.forEach( ( formatsAtIndex, index ) => {
-		const formatsAtPreviousIndex = newFormats[ index - 1 ];
-
-		if ( formatsAtPreviousIndex ) {
-			const newFormatsAtIndex = formatsAtIndex.slice();
-
-			newFormatsAtIndex.forEach( ( format, formatIndex ) => {
-				const previousFormat = formatsAtPreviousIndex[ formatIndex ];
-
-				if ( isFormatEqual( format, previousFormat ) ) {
-					newFormatsAtIndex[ formatIndex ] = previousFormat;
-				}
-			} );
-
-			newFormats[ index ] = newFormatsAtIndex;
-		}
-	} );
-
 	return {
 		...value,
-		formats: newFormats,
+		formats: value.formats.reduce( ( accumulator, charFormats, charIndex ) => {
+			const prevCharFormats = accumulator[ charIndex - 1 ];
+
+			// Only if there are formats at the previous character, the same
+			// reference can be used.
+			if ( prevCharFormats ) {
+				accumulator[ charIndex ] = charFormats.map( ( format, formatIndex ) => {
+					const ref = prevCharFormats[ formatIndex ];
+
+					if ( isFormatEqual( format, ref ) ) {
+						return ref;
+					}
+
+					return format;
+				} );
+			} else {
+				accumulator[ charIndex ] = charFormats;
+			}
+
+			return accumulator;
+		}, Array( value.formats.length ) ),
 	};
 }
