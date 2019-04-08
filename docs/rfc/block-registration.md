@@ -23,6 +23,7 @@ It can statically analyze the files of any plugin to retrieve blocks and their p
 * Issue: [Block API: Server-side awareness of block types](https://github.com/WordPress/gutenberg/issues/2751)
 * Follow-up issue: [Expose available blocks via an API](https://github.com/WordPress/gutenberg/issues/4116)
 * Current documentation: [https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/block-registration/](https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/block-registration/)
+* Make WordPress.org post: [The Block Directory, and a new type of plugin](https://make.wordpress.org/meta/2019/03/08/the-block-directory-and-a-new-type-of-plugin/)
 
 
 ## Previous attempts
