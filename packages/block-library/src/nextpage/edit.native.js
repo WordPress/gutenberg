@@ -14,11 +14,17 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './editor.scss';
 
-export default function NextPageEdit( { attributes } ) {
+export default function NextPageEdit( { attributes, isSelected, onFocus } ) {
 	const { customText = __( 'Page break' ) } = attributes;
-
+	const accessibilityTitle = attributes.customText || "";
 	return (
-		<View style={ styles[ 'block-library-nextpage__container' ] }>
+		<View 
+			accessible
+			accessibilityLabel={ __( 'Page break block' ) + ". " + accessibilityTitle }
+			accessibilityStates={ isSelected && [ "selected" ] }
+			onAccessibilityTap={ onFocus }
+			style={ styles[ 'block-library-nextpage__container' ] }
+		>
 			<Hr text={ customText }
 				textStyle={ styles[ 'block-library-nextpage__text' ] }
 				lineStyle={ styles[ 'block-library-nextpage__line' ] } />
