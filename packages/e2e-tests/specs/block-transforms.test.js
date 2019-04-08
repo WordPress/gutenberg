@@ -2,7 +2,6 @@
  * External dependencies
  */
 import {
-	filter,
 	flatMap,
 	map,
 	mapValues,
@@ -95,29 +94,14 @@ const getTransformResult = async ( blockContent, transformName ) => {
 	return getEditedPostContent();
 };
 
-describe( 'Block transforms', () => {
-	// Todo: Remove the filter as soon as all fixtures are corrected,
-	// and its direct usage on the editor does not trigger errors.
-	// Currently some fixtures trigger errors (mainly media related)
-	// because when loaded in the editor,
-	// some requests are triggered that have a 404 response.
-	const fileBasenames = filter(
-		getAvailableBlockFixturesBasenames(),
-		( basename ) => (
-			! some(
-				[
-					'core__image',
-					'core__gallery',
-					'core__video',
-					'core__file',
-					'core__media-text',
-					'core__audio',
-					'core__cover',
-				],
-				( exclude ) => basename.startsWith( exclude )
-			)
-		)
-	);
+// Skipping all the tests when plugins are enabled
+// makes sure the tests are not executed, and no unused snapshots errors are thrown.
+const maybeDescribe = process.env.POPULAR_PLUGINS ?
+	describe.skip :
+	describe;
+
+maybeDescribe( 'Block transforms', () => {
+	const fileBasenames = getAvailableBlockFixturesBasenames();
 
 	const transformStructure = {};
 	beforeAll( async () => {
@@ -166,10 +150,10 @@ describe( 'Block transforms', () => {
 			( { originalBlock, availableTransforms }, fixture ) => (
 				map(
 					availableTransforms,
-					( distinationBlock ) => ( [
+					( destinationBlock ) => ( [
 						originalBlock,
 						fixture,
-						distinationBlock,
+						destinationBlock,
 					] )
 				)
 			)
@@ -177,10 +161,10 @@ describe( 'Block transforms', () => {
 
 		it.each( testTable )(
 			'block %s in fixture %s into the %s block',
-			async ( originalBlock, fixture, distinationBlock ) => {
+			async ( originalBlock, fixture, destinationBlock ) => {
 				const { content } = transformStructure[ fixture ];
 				expect(
-					await getTransformResult( content, distinationBlock )
+					await getTransformResult( content, destinationBlock )
 				).toMatchSnapshot();
 			}
 		);

@@ -47,12 +47,13 @@ The granular rulesets will not define any environment globals. As such, if they 
 
 ### Rules
 
-Rule|Description
----|---
-[dependency-group](/packages/eslint-plugin/docs/rules/dependency-group.md)|Enforce dependencies docblocks formatting
-[gutenberg-phase](docs/rules/gutenberg-phase.md)|Governs the use of the `process.env.GUTENBERG_PHASE` constant
-[no-unused-vars-before-return](/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)|Disallow assigning variable values if unused before a return
-[valid-sprintf](/packages/eslint-plugin/docs/rules/valid-sprintf.md)|Disallow assigning variable values if unused before a return
+Rule|Description|Recommended
+---|---|---
+[dependency-group](/packages/eslint-plugin/docs/rules/dependency-group.md)|Enforce dependencies docblocks formatting|✓
+[gutenberg-phase](docs/rules/gutenberg-phase.md)|Governs the use of the `process.env.GUTENBERG_PHASE` constant|✓
+[no-unused-vars-before-return](/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)|Disallow assigning variable values if unused before a return|✓
+[react-no-unsafe-timeout](/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)|Disallow unsafe `setTimeout` in component|
+[valid-sprintf](/packages/eslint-plugin/docs/rules/valid-sprintf.md)|Enforce valid sprintf usage|✓
 
 ### Legacy
 

@@ -1,0 +1,36 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/section",
+        "isValid": true,
+        "attributes": {
+            "backgroundColor": "secondary",
+            "align": "full"
+        },
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": "This is a section block.",
+                    "dropCap": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<p>This is a section block.</p>"
+            },
+            {
+                "clientId": "_clientId_1",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": "Section block content.",
+                    "dropCap": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<p>Section block content.</p>"
+            }
+        ],
+        "originalContent": "<div class=\"wp-block-section alignfull has-secondary-background-color has-background\">\n\t\n\n\t</div>"
+    }
+]
