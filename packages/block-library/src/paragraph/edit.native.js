@@ -87,6 +87,7 @@ class ParagraphEdit extends Component {
 			setAttributes,
 			mergeBlocks,
 			style,
+			isSelected,
 		} = this.props;
 
 		const {
@@ -94,8 +95,20 @@ class ParagraphEdit extends Component {
 			content,
 		} = attributes;
 
+
+		let accessibilityLabel = __( "Paragraph block." );
+		if ( ! content ) {
+			accessibilityLabel += " " + __( "Empty" );
+		} else {
+			accessibilityLabel += " " + content;
+		}
+
 		return (
-			<View>
+			<View
+				accessible={ ! isSelected }
+				accessibilityLabel={ accessibilityLabel }
+				onAccessibilityTap={ this.props.onFocus }
+			>
 				<RichText
 					tagName="p"
 					value={ content }
