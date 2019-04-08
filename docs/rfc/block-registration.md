@@ -371,7 +371,7 @@ This property is a pointer to CSS files containing the CSS used for the block in
 
 Localized properties are automatically wrapped in `_x` function calls on the backend and the frontend of WordPress. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle when it defines metadata defintion.
 
-WordPress string discovery automatically includes these strings to the plugin's or core's domain name.
+WordPress string discovery automatically translates these strings using the `textdomain` value specified in the plugin header.
 
 **Example:**
 
@@ -383,7 +383,7 @@ WordPress string discovery automatically includes these strings to the plugin's 
 }
 ```
 
-in JavScript with help of Babel plugin becomes:
+In JavaScript, with the help of a Babel plugin, this becomes:
 
 ```js
 const metadata = {
@@ -393,7 +393,7 @@ const metadata = {
 }
 ```
 
-in PHP it gets transformed on the fly to code close to:
+In PHP, it is transformed at runtime to code roughly equivalent to:
 
 ```php
 $metadata = array(
