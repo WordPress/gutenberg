@@ -358,9 +358,11 @@ class ImageEdit extends React.Component {
 			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
 				<View style={ { flex: 1 } }>
 					{ showSpinner && <Spinner progress={ progress } /> }
-					<BlockControls>
-						{ toolbarEditButton }
-					</BlockControls>
+					{ ( ! this.state.captionFocused ) &&
+						<BlockControls>
+							{ toolbarEditButton }
+						</BlockControls>
+					}
 					<InspectorControls>
 						<ToolbarButton
 							label={ __( 'Image Settings' ) }
