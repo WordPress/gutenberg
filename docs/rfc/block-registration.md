@@ -1,3 +1,5 @@
+# Block Type Registration RFC
+
 This RFC is intended to serve both as a specification and as documentation for the implementation of runtime-agnostic block type registration.
 
 ## Requirements
@@ -40,8 +42,6 @@ Another exploration in [#5652](https://github.com/WordPress/gutenberg/pull/5652)
 * On the server, a block type `icon` property can only be assigned as a string and thus cannot support SVGs and component-based icons.
 
 ---
-
-# Block Type Registration RFC
 
 ## Introduction
 
