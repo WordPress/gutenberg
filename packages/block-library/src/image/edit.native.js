@@ -40,12 +40,7 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import ImageSize from './image-size';
 import styles from './styles.scss';
-import MediaUploadUI from './media-upload-ui.js';
-
-const MEDIA_UPLOAD_STATE_UPLOADING = 1;
-const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
-const MEDIA_UPLOAD_STATE_FAILED = 3;
-const MEDIA_UPLOAD_STATE_RESET = 4;
+import MediaUploadUI from './media-upload-ui.native.js';
 
 const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
 const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO = 'take_photo';
@@ -61,12 +56,8 @@ class ImageEdit extends React.Component {
 
 		this.state = {
 			showSettings: false,
-			progress: 0,
-			isUploadInProgress: false,
-			isUploadFailed: false,
 		};
 
-		this.mediaUpload = this.mediaUpload.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
@@ -78,8 +69,6 @@ class ImageEdit extends React.Component {
 	}
 
 	componentDidMount() {
-		this.addMediaUploadListener();
-
 		const { attributes, setAttributes } = this.props;
 
 		if ( attributes.id && ! isURL( attributes.url ) ) {
@@ -99,7 +88,6 @@ class ImageEdit extends React.Component {
 		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
 			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
 		}
-		this.removeMediaUploadListener();
 	}
 
 	onImagePressed() {
@@ -112,32 +100,8 @@ class ImageEdit extends React.Component {
 		}
 	}
 
-	mediaUpload( payload ) {
-		const { attributes } = this.props;
-
-		if ( payload.mediaId !== attributes.id ) {
-			return;
-		}
-
-		switch ( payload.state ) {
-			case MEDIA_UPLOAD_STATE_UPLOADING:
-				this.updateMediaProgress( payload );
-				break;
-			case MEDIA_UPLOAD_STATE_SUCCEEDED:
-				this.finishMediaUploadWithSuccess( payload );
-				break;
-			case MEDIA_UPLOAD_STATE_FAILED:
-				this.finishMediaUploadWithFailure( payload );
-				break;
-			case MEDIA_UPLOAD_STATE_RESET:
-				this.mediaUploadStateReset( payload );
-				break;
-		}
-	}
-
 	updateMediaProgress( payload ) {
 		const { setAttributes } = this.props;
-		this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
 		if ( payload.mediaUrl ) {
 			setAttributes( { url: payload.mediaUrl } );
 		}
@@ -147,37 +111,18 @@ class ImageEdit extends React.Component {
 		const { setAttributes } = this.props;
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
-		this.setState( { isUploadInProgress: false } );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { id: payload.mediaId } );
-		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
 	}
 
 	mediaUploadStateReset( payload ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { id: payload.mediaId, url: null } );
-		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
-	}
-
-	addMediaUploadListener() {
-		//if we already have a subscription not worth doing it again
-		if ( this.subscriptionParentMediaUpload ) {
-			return;
-		}
-		this.subscriptionParentMediaUpload = subscribeMediaUpload( ( payload ) => {
-			this.mediaUpload( payload );
-		} );
-	}
-
-	removeMediaUploadListener() {
-		if ( this.subscriptionParentMediaUpload ) {
-			this.subscriptionParentMediaUpload.remove();
-		}
 	}
 
 	updateAlt( newAlt ) {
@@ -213,7 +158,7 @@ class ImageEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption, height, width, alt, href } = attributes;
+		const { url, caption, height, width, alt, href, id } = attributes;
 
 		const onMediaLibraryButtonPressed = () => {
 			requestMediaPickFromMediaLibrary( [ MEDIA_TYPE ], ( mediaId, mediaUrl ) => {
@@ -325,10 +270,6 @@ class ImageEdit extends React.Component {
 			);
 		}
 
-		const showSpinner = this.state.isUploadInProgress;
-		const opacity = this.state.isUploadInProgress ? 0.3 : 1;
-		const progress = this.state.progress * 100;
-
 		return (
 			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
 				<View style={ { flex: 1 } }>
@@ -348,56 +289,12 @@ class ImageEdit extends React.Component {
 						height={ height }
 						width={ width }
 						coverUrl={ url }
-						mediaId={ mediaId }
+						mediaId={ id }
 						onUpdateMediaProgress={ this.updateMediaProgress }
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
 						onmediaUploadStateReset={ this.mediaUploadStateReset }
-					>
-					</MediaUploadUI>
-{/* 					{ showSpinner && <Spinner progress={ progress } /> }
-					<ImageSize src={ url } >
-						{ ( sizes ) => {
-							const {
-								imageWidthWithinContainer,
-								imageHeightWithinContainer,
-							} = sizes;
-
-							let finalHeight = imageHeightWithinContainer;
-							if ( height > 0 && height < imageHeightWithinContainer ) {
-								finalHeight = height;
-							}
-
-							let finalWidth = imageWidthWithinContainer;
-							if ( width > 0 && width < imageWidthWithinContainer ) {
-								finalWidth = width;
-							}
-
-							return (
-								<View style={ { flex: 1 } } >
-									//{ { getInspectorControls() }
-									//{ getMediaOptions() } }
-
-									{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
-										<Dashicon icon={ 'format-image' } size={ 300 } />
-									</View> }
-									<ImageBackground
-										style={ { width: finalWidth, height: finalHeight, opacity } }
-										resizeMethod="scale"
-										source={ { uri: url } }
-										key={ url }
-									>
-										{ this.state.isUploadFailed &&
-											<View style={ styles.imageContainer } >
-												<Dashicon icon={ 'image-rotate' } ariaPressed={ 'dashicon-active' } />
-												<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.\nPlease tap for options.' ) }</Text>
-											</View>
-										}
-									</ImageBackground>
-								</View>
-							);
-						} }
-					</ImageSize> */}
+					/>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 						<View style={ { padding: 12, flex: 1 } }>
 							<TextInput

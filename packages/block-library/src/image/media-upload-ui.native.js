@@ -72,7 +72,7 @@ class MediaUploadUI extends React.Component {
 	}
 
 	mediaUpload( payload ) {
-		const { mediaId } = this.state;
+		const { mediaId } = this.props;
 
 		if ( payload.mediaId !== mediaId ) {
 			return;
@@ -107,24 +107,24 @@ class MediaUploadUI extends React.Component {
 		//const { setAttributes } = this.props;
 
 		//setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
-		this.props.onFinishMediaUploadWithSuccess( payload );
 		this.setState( { isUploadInProgress: false, mediaId: payload.mediaServerId } );
+		this.props.onFinishMediaUploadWithSuccess( payload );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
 		//const { setAttributes } = this.props;
 
 		//setAttributes( { id: payload.mediaId } );
-		this.props.onFinishMediaUploadWithFailure( payload );
 		this.setState( { isUploadInProgress: false, isUploadFailed: true, mediaId: payload.mediaId  } );
+		this.props.onFinishMediaUploadWithFailure( payload );
 	}
 
 	mediaUploadStateReset( payload ) {
 		//const { setAttributes } = this.props;
 
 		//setAttributes( { id: payload.mediaId, url: null } );
-		this.props.onMediaUploadStateReset( payload );
 		this.setState( { isUploadInProgress: false, isUploadFailed: false, mediaId: null } );
+		this.props.onMediaUploadStateReset( payload );
 	}
 
 	addMediaUploadListener() {
