@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -23,6 +23,9 @@
     "babel-plugin-react-native-platform-specific-extensions": "^1.1.1",
     "cross-env": "^5.1.4",
     "empty": "^0.10.1",
+    "enzyme": "^3.9.0",
+    "enzyme-adapter-react-16": "^1.11.2",
+    "enzyme-to-json": "^3.3.5",
     "equivalent-key-map": "^0.2.0",
     "eslint": "^5.12.1",
     "eslint-plugin-flowtype": "^3.4.2",
@@ -111,8 +114,10 @@
     "classnames": "^2.2.5",
     "dom-react": "^2.2.1",
     "domutils": "^1.7.0",
+    "fast-average-color": "^4.3.0",
     "hpq": "^1.2.0",
     "jed": "^1.1.1",
+    "jest-serializer-enzyme": "^1.0.0",
     "js-beautify": "^1.7.5",
     "jsc-android": "236355.x.x",
     "jsdom-jscore": "git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800",

@@ -72,6 +72,7 @@ const autoImportAssets = [
 	'_colors.scss',
 	'_breakpoints.scss',
 	'_variables.scss',
+	'_native.scss',
 	'_mixins.scss',
 	'_animations.scss',
 	'_z-index.scss',

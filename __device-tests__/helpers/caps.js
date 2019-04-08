@@ -6,8 +6,8 @@ exports.ios12 = {
 	os: 'iOS',
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
-	appiumVersion: '1.9.1',
-	app: undefined, // will be set later
+	appiumVersion: '1.9.1', // SauceLabs requires appiumVersion to be specified.
+	app: undefined, // will be set later, locally this is relative to root of project
 };
 
 exports.android8 = {
@@ -21,5 +21,5 @@ exports.android8 = {
 	appActivity: 'com.gutenberg.MainActivity',
 	deviceOrientation: 'portrait',
 	appiumVersion: '1.9.1',
-	app: undefined, // relative to root of project
+	app: undefined,
 };

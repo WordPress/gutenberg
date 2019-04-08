@@ -29,7 +29,6 @@ export default class AppProvider extends React.Component<PropsType> {
 		if ( initialTitle === undefined ) {
 			initialTitle = 'Welcome to Gutenberg!';
 		}
-
 		return (
 			<AppContainer
 				initialHtml={ initialData }

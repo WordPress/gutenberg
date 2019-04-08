@@ -9,6 +9,7 @@ jest.mock( '../react-native-gutenberg-bridge', () => {
 		subscribeUpdateHtml: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
 		editorDidMount: jest.fn(),
+		subscribeMediaUpload: jest.fn(),
 	};
 } );
 
@@ -27,3 +28,11 @@ jest.mock( 'react-native-safe-area', () => {
 } );
 
 jest.mock( 'react-native-recyclerview-list' );
+
+if ( ! global.window.matchMedia ) {
+	global.window.matchMedia = () => ( {
+		matches: false,
+		addListener: () => {},
+		removeListener: () => {},
+	} );
+}

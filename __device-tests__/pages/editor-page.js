@@ -16,6 +16,8 @@ import BlockInteraction from '../blocks/block-interaction';
  */
 import { __ } from '@wordpress/i18n';
 
+import { isAndroid } from '../helpers/utils';
+
 export default class EditorPage {
 	driver: wd.PromiseChainWebdriver;
 	constructor( driver: wd.PromiseChainWebdriver ) {
@@ -30,7 +32,11 @@ export default class EditorPage {
 		const blockName = block.name;
 
 		// Click add button
-		const addButton = await this.driver.elementByAccessibilityId( __( 'Add block' ) );
+		let identifier = 'Add block';
+		if ( isAndroid() ) {
+			identifier = 'Add block, Double tap to add a block';
+		}
+		const addButton = await this.driver.elementByAccessibilityId( __( identifier ) );
 		await addButton.click();
 
 		// Click on block of choice

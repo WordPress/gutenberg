@@ -182,6 +182,35 @@ class RCTAztecView: Aztec.TextView {
         
         return String(data: data, encoding: .utf8)
     }
+
+    private func cleanHTML() -> String {
+        let html = getHTML(prettify: false).replacingOccurrences(of: "\n", with: "")
+        return html
+    }
+
+    func saveToDisk(image: UIImage) -> URL? {
+        let fileName = "\(ProcessInfo.processInfo.globallyUniqueString)_file.jpg"
+
+        guard let data = image.jpegData(compressionQuality: 0.9) else {
+            return nil
+        }
+
+        let fileURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
+
+        guard (try? data.write(to: fileURL, options: [.atomic])) != nil else {
+            return nil
+        }
+
+        return fileURL
+    }
+
+    private func images(from pasteboard: UIPasteboard) -> [String] {
+        guard let images = pasteboard.images else {
+            return []
+        }
+        let imagesURLs = images.compactMap({ saveToDisk(image: $0)?.absoluteString })
+        return imagesURLs
+    }
     
     override func paste(_ sender: Any?) {
         let start = selectedRange.location
@@ -190,13 +219,15 @@ class RCTAztecView: Aztec.TextView {
         let pasteboard = UIPasteboard.general
         let text = self.text(from: pasteboard) ?? ""
         let html = self.html(from: pasteboard) ?? ""
-        
+        let imagesURLs = self.images(from: pasteboard)
+
         onPaste?([
-            "currentContent": getHTML(),
+            "currentContent": cleanHTML(),
             "selectionStart": start,
             "selectionEnd": end,
             "pastedText": text,
-            "pastedHtml": html])
+            "pastedHtml": html,
+            "files": imagesURLs] )
     }
     
     // MARK: - Edits
@@ -238,7 +269,7 @@ class RCTAztecView: Aztec.TextView {
             let onEnter = onEnter else {
                 return false
         }
-        
+
         let caretData = packCaretDataForRN()
         onEnter(caretData)
         return true
@@ -277,7 +308,7 @@ class RCTAztecView: Aztec.TextView {
             (start, end) = (end, start)
         }
         
-        var result: [AnyHashable : Any] = packForRN(getHTML(), withName: "text")
+        var result: [AnyHashable : Any] = packForRN(getHTML(prettify: false), withName: "text")
 
         result["selectionStart"] = start
         result["selectionEnd"] = end
@@ -456,7 +487,7 @@ class RCTAztecView: Aztec.TextView {
     
     func propagateContentChanges() {
         if let onChange = onChange {
-            let text = packForRN(getHTML(), withName: "text")
+            let text = packForRN(cleanHTML(), withName: "text")
             onChange(text)
         }
     }
