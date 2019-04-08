@@ -23,9 +23,14 @@ export default class UnsupportedBlockEdit extends Component {
 		const blockType = coreBlocks[ originalName ];
 		const title = blockType ? blockType.settings.title : __( 'Unsupported' );
 		const icon = blockType ? normalizeIconObject( blockType.settings.icon ) : 'admin-plugins';
-
+		const accessibilityTitle = blockType ? blockType.settings.title : __( 'Unknown' );
 		return (
-			<View style={ styles.unsupportedBlock }>
+			<View
+				accessible
+				accessibilityLabel={ __( "Block not supported" ) + ". " + accessibilityTitle }
+				accessibilityStates={ this.props.isSelected && [ "selected" ] }
+				style={ styles.unsupportedBlock }
+			>
 				<Icon className="unsupported-icon" icon={ icon && icon.src ? icon.src : icon } />
 				<Text style={ styles.unsupportedBlockMessage }>{ title }</Text>
 			</View>
