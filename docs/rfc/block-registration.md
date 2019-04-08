@@ -403,6 +403,8 @@ $metadata = array(
 );
 ```
 
+Implementation should follow the existing [get_plugin_data](https://codex.wordpress.org/Function_Reference/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
+
 ## PHP Runtime
 
 WordPress automatically discovers all the block.json files in the plugin/core `blocks` folder and registers the corresponding block types. These block types are made available through the [block registry](https://developer.wordpress.org/reference/classes/wp_block_type_registry/) PHP class and the blocks scripts and styles are added as dependencies to the `wp-block-library` script and style handles.
