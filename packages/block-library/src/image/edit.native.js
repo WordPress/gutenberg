@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
 import {
 	subscribeMediaUpload,
 	requestMediaPickFromMediaLibrary,
@@ -62,7 +62,7 @@ class ImageEdit extends React.Component {
 			progress: 0,
 			isUploadInProgress: false,
 			isUploadFailed: false,
-			captionFocused: false
+			captionFocused: false,
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
@@ -112,7 +112,7 @@ class ImageEdit extends React.Component {
 			requestImageFailedRetryDialog( attributes.id );
 		}
 
-		this._caption.blur()
+		this._caption.blur();
 	}
 
 	mediaUpload( payload ) {
@@ -215,8 +215,8 @@ class ImageEdit extends React.Component {
 	}
 
 	onFocusCaption() {
-		if (this.props.onFocus) {
-			this.props.onFocus()
+		if ( this.props.onFocus ) {
+			this.props.onFocus();
 		}
 		if ( ! this.state.captionFocused ) {
 			this.setState( {
@@ -226,8 +226,8 @@ class ImageEdit extends React.Component {
 	}
 
 	onBlurCaption() {
-		if (this.props.onBlur) {
-			this.props.onBlur()
+		if ( this.props.onBlur ) {
+			this.props.onBlur();
 		}
 		if ( this.state.captionFocused ) {
 			this.setState( {
@@ -411,20 +411,20 @@ class ImageEdit extends React.Component {
 					</ImageSize>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 						<View style={ { padding: 12, flex: 1 } }>
-                <RichText
-									setRef={ ( ref ) => {
-										this._caption = ref
-									} }
-									tagName="p"
-                  placeholder={ __( 'Write caption…' ) }
-                  value={ caption }
-                  onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-									onFocus={ this.onFocusCaption }
-									onBlur={ this.onBlurCaption }
-                  isSelected={ isSelected && this.state.captionFocused }
-									fontSize={ 14 }
-									underlineColorAndroid="transparent"
-                />
+							<RichText
+								setRef={ ( ref ) => {
+									this._caption = ref;
+								} }
+								tagName="p"
+								placeholder={ __( 'Write caption…' ) }
+								value={ caption }
+								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+								onFocus={ this.onFocusCaption }
+								onBlur={ this.onBlurCaption }
+								isSelected={ isSelected && this.state.captionFocused }
+								fontSize={ 14 }
+								underlineColorAndroid="transparent"
+							/>
 						</View>
 					) }
 				</View>
