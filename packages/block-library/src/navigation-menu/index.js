@@ -7,16 +7,16 @@ import { InnerBlocks } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import edit from './navigation-menu-edit';
+import metadata from './block.json';
+import edit from './edit';
 
-export const name = 'core/navigation-menu';
+const { name } = metadata;
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Navigation Menu (Experimental)' ),
 
 	icon: 'menu',
-
-	category: 'layout',
 
 	description: __( 'Add a navigation menu to your site.' ),
 
@@ -26,13 +26,6 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 		anchor: true,
 		html: false,
-	},
-
-	attributes: {
-		automaticallyAdd: {
-			type: 'boolean',
-			default: 'false',
-		},
 	},
 
 	edit,

@@ -1,0 +1,10 @@
+{
+	"name": "core/navigation-menu",
+	"category": "layout",
+	"attributes": {
+		"automaticallyAdd": {
+			"type": "boolean",
+			"default": false
+		}
+	}
+}

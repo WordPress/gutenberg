@@ -6,9 +6,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import edit from './navigation-menu-item-edit';
+import metadata from './block.json';
+import edit from './edit';
 
-export const name = 'core/navigation-menu-item';
+const { name } = metadata;
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Menu Item (Experimental)' ),
@@ -18,31 +20,6 @@ export const settings = {
 	icon: 'admin-links',
 
 	description: __( 'Add a page, link, or other item to your Navigation Menu.' ),
-
-	category: 'common',
-
-	attributes: {
-		label: {
-			type: 'string',
-		},
-		destination: {
-			type: 'string',
-		},
-		nofollow: {
-			type: 'boolean',
-			default: false,
-		},
-		title: {
-			type: 'string',
-		},
-		description: {
-			type: 'string',
-		},
-		opensInNewTab: {
-			type: 'boolean',
-			default: false,
-		},
-	},
 
 	supports: {},
 
