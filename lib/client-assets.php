@@ -357,7 +357,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_style(
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
-		array(),
+		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
 		filemtime( gutenberg_dir_path() . 'build/edit-widgets/style.css' )
 	);
 	wp_style_add_data( 'wp-edit-widgets', 'rtl', 'replace' );
