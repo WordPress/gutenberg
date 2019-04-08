@@ -79,6 +79,7 @@ class HeadingEdit extends Component {
 			setAttributes,
 			mergeBlocks,
 			style,
+			isSelected,
 		} = this.props;
 
 		const {
@@ -89,8 +90,19 @@ class HeadingEdit extends Component {
 
 		const tagName = 'h' + level;
 
+		let accessibilityLabel = __( "Heading block" );
+		if ( ! content ) {
+			accessibilityLabel += ". " + __( "Empty" );
+		} else {
+			accessibilityLabel += ". " + content;
+		}
+
 		return (
-			<View>
+			<View
+				accessible={ ! isSelected }
+				accessibilityLabel={ accessibilityLabel }
+				onAccessibilityTap={ this.props.onFocus }
+			>
 				<BlockControls>
 					<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				</BlockControls>
