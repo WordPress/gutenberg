@@ -7,7 +7,7 @@
  */
 import EditorPage from './pages/editor-page';
 import ParagraphBlockInteraction from './blocks/paragraph-block-interaction';
-import { setupDriver, isLocalEnvironment, timer, stopDriver, stop } from './helpers/utils';
+import { setupDriver, isLocalEnvironment, timer, stopDriver } from './helpers/utils';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 

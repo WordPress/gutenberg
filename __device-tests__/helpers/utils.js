@@ -33,9 +33,9 @@ const localAndroidAppPath = process.env.ANDROID_APP_PATH || defaultAndroidAppPat
 const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
 
 const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs
-let appiumProcess: ?child_process$ChildProcess = undefined;
+let appiumProcess: ?childProcess.ChildProcess;
 
-const timer = ( ms: number ) => new Promise<any>( ( res ) => setTimeout( res, ms ) );
+const timer = ( ms: number ) => new Promise < {} > ( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
 	return rnPlatform.toLowerCase() === 'android';
@@ -52,6 +52,7 @@ const setupDriver = async () => {
 			appiumProcess = await AppiumLocal.start( localAppiumPort );
 		} catch ( err ) {
 			// Ignore error here, Appium is probably already running (Appium desktop has its own server for instance)
+			// eslint-disable-next-line no-console
 			console.log( 'Could not start Appium server', err.toString() );
 		}
 	}
@@ -70,7 +71,8 @@ const setupDriver = async () => {
 					.toString()
 					.replace( /^\s+|\s+$/g, '' );
 				if ( ! isNaN( androidVersion ) ) {
-					desiredCaps.platformVersion = androidVersion;
+					delete desiredCaps.platformVersion;
+					// eslint-disable-next-line no-console
 					console.log( 'Detected Android device running Android %s', androidVersion );
 				}
 			} catch ( error ) {
