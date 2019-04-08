@@ -62,6 +62,7 @@ class ImageEdit extends React.Component {
 			progress: 0,
 			isUploadInProgress: false,
 			isUploadFailed: false,
+			captionFocused: false
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
@@ -73,6 +74,8 @@ class ImageEdit extends React.Component {
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
+		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.onBlurCaption = this.onBlurCaption.bind( this );
 	}
 
 	componentDidMount() {
@@ -108,6 +111,8 @@ class ImageEdit extends React.Component {
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
 		}
+
+		this._caption.blur()
 	}
 
 	mediaUpload( payload ) {
@@ -207,6 +212,28 @@ class ImageEdit extends React.Component {
 			{ icon: 'camera', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO, label: __( 'Take a Photo' ) },
 			{ icon: 'wordpress-alt', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
 		];
+	}
+
+	onFocusCaption() {
+		if (this.props.onFocus) {
+			this.props.onFocus()
+		}
+		if ( ! this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: true,
+			} );
+		}
+	}
+
+	onBlurCaption() {
+		if (this.props.onBlur) {
+			this.props.onBlur()
+		}
+		if ( this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: false,
+			} );
+		}
 	}
 
 	render() {
@@ -384,14 +411,20 @@ class ImageEdit extends React.Component {
 					</ImageSize>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 						<View style={ { padding: 12, flex: 1 } }>
-							<TextInput
-								style={ { textAlign: 'center' } }
-								fontFamily={ this.props.fontFamily || ( styles[ 'caption-text' ].fontFamily ) }
-								underlineColorAndroid="transparent"
-								value={ caption }
-								placeholder={ __( 'Write caption…' ) }
-								onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-							/>
+                <RichText
+									setRef={ ( ref ) => {
+										this._caption = ref
+									} }
+									tagName="p"
+                  placeholder={ __( 'Write caption…' ) }
+                  value={ caption }
+                  onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+									onFocus={ this.onFocusCaption }
+									onBlur={ this.onBlurCaption }
+                  isSelected={ isSelected && this.state.captionFocused }
+									fontSize={ 14 }
+									underlineColorAndroid="transparent"
+                />
 						</View>
 					) }
 				</View>
