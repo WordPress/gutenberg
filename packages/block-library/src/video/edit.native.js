@@ -2,12 +2,8 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, TextInput, TouchableWithoutFeedback } from 'react-native';
 import {
-	subscribeMediaUpload,
-	requestMediaPickFromMediaLibrary,
-	requestMediaPickFromDeviceLibrary,
-	requestMediaPickFromDeviceCamera,
 	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
@@ -20,8 +16,6 @@ import {
 import {
 	Toolbar,
 	ToolbarButton,
-	Spinner,
-	Dashicon,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -30,8 +24,6 @@ import {
 	RichText,
 	BlockControls,
 	InspectorControls,
-	BottomSheet,
-	Picker,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -40,16 +32,8 @@ import { doAction, hasAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import ImageSize from '../image/image-size';
 import styles from '../image/styles.scss';
 import MediaUploadUI from '../image/media-upload-ui.native.js';
-
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO = 'take_photo';
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_library';
-
-const LINK_DESTINATION_CUSTOM = 'custom';
-const LINK_DESTINATION_NONE = 'none';
 
 class VideoEdit extends React.Component {
 	constructor( props ) {
@@ -104,15 +88,14 @@ class VideoEdit extends React.Component {
 	}
 
 	updateMediaProgress( payload ) {
-		const { setAttributes } = this.props;
 		if ( payload.mediaUrl ) {
-			this.setState( { thumbnailUrl: payload.mediaUrl });
+			this.setState( { thumbnailUrl: payload.mediaUrl } );
 		}
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
 		const { setAttributes } = this.props;
-		setAttributes( { src: payload.mediaUrl, id: payload.mediaServerId, poster: this.state.thumbnailUrl  } );
+		setAttributes( { src: payload.mediaUrl, id: payload.mediaServerId, poster: this.state.thumbnailUrl } );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
@@ -129,7 +112,7 @@ class VideoEdit extends React.Component {
 		this.props.setAttributes( { url, width: undefined, height: undefined } );
 	}
 
-	onSelectMediaUploadOption( mediaId: number, mediaUrl: string ) {
+	onSelectMediaUploadOption( mediaId, mediaUrl ) {
 		const { setAttributes } = this.props;
 		setAttributes( { id: mediaId } );
 		this.setState( { thumbnailUrl: mediaUrl } );
@@ -137,33 +120,25 @@ class VideoEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { caption, height, width, alt, href, id, poster } = attributes;
+		const { caption, height, width, id, poster } = attributes;
 		const { thumbnailUrl } = this.state;
 		const url = poster ? poster : thumbnailUrl;
 
-		const onImageSettingsButtonPressed = () => {
-			this.setState( { showSettings: true } );
-		};
-
-		const onImageSettingsClose = () => {
-			this.setState( { showSettings: false } );
-		};
-
 		const toolbarEditButton = (
 			<MediaUpload mediaType={ MEDIA_TYPE_VIDEO }
-						onSelectURL={ this.onSelectMediaUploadOption }
-						render={ ( { open, getMediaOptions } ) => {
-							return (
-							<Toolbar>
-								{ getMediaOptions() }
-								<ToolbarButton
-									label={ __( 'Edit video' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							</Toolbar>
-							);
-						} } >
+				onSelectURL={ this.onSelectMediaUploadOption }
+				render={ ( { open, getMediaOptions } ) => {
+					return (
+						<Toolbar>
+							{ getMediaOptions() }
+							<ToolbarButton
+								label={ __( 'Edit video' ) }
+								icon="edit"
+								onClick={ open }
+							/>
+						</Toolbar>
+					);
+				} } >
 			</MediaUpload>
 		);
 
@@ -191,7 +166,7 @@ class VideoEdit extends React.Component {
 							onClick={ () => ( null ) }
 						/>
 					</InspectorControls>
-					<MediaUploadUI 
+					<MediaUploadUI
 						height={ height }
 						width={ width }
 						coverUrl={ url }

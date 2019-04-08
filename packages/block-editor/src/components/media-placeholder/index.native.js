@@ -50,7 +50,7 @@ function MediaPlaceholder( props ) {
 	}
 
 	return (
-		<MediaUpload 
+		<MediaUpload
 			mediaType={ mediaType }
 			onSelectURL={ onSelectURL }
 			render={ ( { open, getMediaOptions } ) => {
@@ -68,7 +68,7 @@ function MediaPlaceholder( props ) {
 						</View>
 					</TouchableWithoutFeedback>
 				);
-		}}/>
+			} } />
 	);
 }
 

@@ -2,38 +2,19 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, ImageBackground, Text } from 'react-native';
 import {
 	subscribeMediaUpload,
-	requestMediaPickFromMediaLibrary,
-	requestMediaPickFromDeviceLibrary,
-	requestMediaPickFromDeviceCamera,
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
 import {
-	Toolbar,
-	ToolbarButton,
 	Spinner,
 	Dashicon,
 } from '@wordpress/components';
-import {
-	MediaPlaceholder,
-	RichText,
-	BlockControls,
-	InspectorControls,
-} from '@wordpress/block-editor';
-import {
-	BottomSheet,
-	Picker,
-} from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -102,7 +83,7 @@ class MediaUploadUI extends React.Component {
 	}
 
 	finishMediaUploadWithFailure( payload ) {
-		this.setState( { isUploadInProgress: false, isUploadFailed: true, mediaId: payload.mediaId  } );
+		this.setState( { isUploadInProgress: false, isUploadFailed: true, mediaId: payload.mediaId } );
 		this.props.onFinishMediaUploadWithFailure( payload );
 	}
 
@@ -178,7 +159,6 @@ class MediaUploadUI extends React.Component {
 				</ImageSize>
 			</View>
 		);
-
 	}
 }
 

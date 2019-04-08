@@ -2,12 +2,8 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, TextInput, TouchableWithoutFeedback } from 'react-native';
 import {
-	subscribeMediaUpload,
-	requestMediaPickFromMediaLibrary,
-	requestMediaPickFromDeviceLibrary,
-	requestMediaPickFromDeviceCamera,
 	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
@@ -20,8 +16,6 @@ import {
 import {
 	Toolbar,
 	ToolbarButton,
-	Spinner,
-	Dashicon,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -31,7 +25,6 @@ import {
 	BlockControls,
 	InspectorControls,
 	BottomSheet,
-	Picker,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -40,13 +33,8 @@ import { doAction, hasAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import ImageSize from './image-size';
 import styles from './styles.scss';
 import MediaUploadUI from './media-upload-ui.native.js';
-
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO = 'take_photo';
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_library';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
@@ -151,7 +139,7 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
-	onSelectMediaUploadOption( mediaId: number, mediaUrl: string ) {
+	onSelectMediaUploadOption( mediaId, mediaUrl ) {
 		const { setAttributes } = this.props;
 		setAttributes( { url: mediaUrl, id: mediaId } );
 	}
@@ -170,19 +158,19 @@ class ImageEdit extends React.Component {
 
 		const toolbarEditButton = (
 			<MediaUpload mediaType={ MEDIA_TYPE_IMAGE }
-						onSelectURL={ this.onSelectMediaUploadOption }
-						render={ ( { open, getMediaOptions } ) => {
-							return (
-							<Toolbar>
-								{ getMediaOptions() }
-								<ToolbarButton
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							</Toolbar>
-							);
-						} } >
+				onSelectURL={ this.onSelectMediaUploadOption }
+				render={ ( { open, getMediaOptions } ) => {
+					return (
+						<Toolbar>
+							{ getMediaOptions() }
+							<ToolbarButton
+								label={ __( 'Edit image' ) }
+								icon="edit"
+								onClick={ open }
+							/>
+						</Toolbar>
+					);
+				} } >
 			</MediaUpload>
 		);
 
@@ -243,7 +231,7 @@ class ImageEdit extends React.Component {
 							onClick={ onImageSettingsButtonPressed }
 						/>
 					</InspectorControls>
-					<MediaUploadUI 
+					<MediaUploadUI
 						height={ height }
 						width={ width }
 						coverUrl={ url }

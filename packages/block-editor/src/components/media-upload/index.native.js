@@ -2,7 +2,6 @@
  * External dependencies
  */
 import React from 'react';
-import { View } from 'react-native';
 import {
 	requestMediaPickFromMediaLibrary,
 	requestMediaPickFromDeviceLibrary,
@@ -22,22 +21,16 @@ const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
 const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA = 'take_media';
 const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_library';
 
-type PropsType = {
-    onSelectURL: ( mediaId: number, mediaUrl: string ) => void,
-    mediaType: string,
-};
+class MediaUpload extends React.Component {
+	getTakeMediaLabel() {
+		const { mediaType } = this.props;
 
-class MediaUpload extends React.Component<PropsType> {
-
-    getTakeMediaLabel() {
-        const { mediaType } = this.props;
-
-        if ( mediaType === MEDIA_TYPE_IMAGE ) {
-            return __( 'Take a Photo' );
-        } else if ( mediaType === MEDIA_TYPE_VIDEO ) {
-            return __( 'Take a Video' );
-        }
-    }
+		if ( mediaType === MEDIA_TYPE_IMAGE ) {
+			return __( 'Take a Photo' );
+		} else if ( mediaType === MEDIA_TYPE_VIDEO ) {
+			return __( 'Take a Video' );
+		}
+	}
 
 	getMediaOptionsItems() {
 		return [
@@ -48,7 +41,7 @@ class MediaUpload extends React.Component<PropsType> {
 	}
 
 	render() {
-        const { mediaType } = this.props;
+		const { mediaType } = this.props;
 
 		const onMediaLibraryButtonPressed = () => {
 			requestMediaPickFromMediaLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
@@ -67,7 +60,7 @@ class MediaUpload extends React.Component<PropsType> {
 		};
 
 		const onMediaCaptureButtonPressed = () => {
-			requestMediaPickFromDeviceCamera( ( [ mediaType ], mediaId, mediaUrl ) => {
+			requestMediaPickFromDeviceCamera( [ mediaType ], ( mediaId, mediaUrl ) => {
 				if ( mediaUrl ) {
 					this.props.onSelectURL( mediaId, mediaUrl );
 				}
@@ -98,7 +91,7 @@ class MediaUpload extends React.Component<PropsType> {
 				} }
 			/>
 		);
-        return this.props.render( { open: onPickerPresent, getMediaOptions: getMediaOptions } );
+		return this.props.render( { open: onPickerPresent, getMediaOptions } );
 	}
 }
 
