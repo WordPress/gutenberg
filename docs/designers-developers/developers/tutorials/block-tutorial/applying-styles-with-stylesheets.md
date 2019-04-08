@@ -71,7 +71,7 @@ Let's move on into code. Create a file called `editor.css`:
 	color: green;
 	background: #cfc;
 	border: 2px solid #9c9;
-	padding: 20px;
+	padding: 20px; !important
 }
 ```
 
