@@ -25,6 +25,8 @@ import {
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
+	MediaUpload,
+	MEDIA_TYPE_IMAGE,
 	RichText,
 	BlockControls,
 	InspectorControls,
@@ -48,7 +50,6 @@ const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_libr
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
-const MEDIA_TYPE = "image";
 
 class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -60,6 +61,8 @@ class ImageEdit extends React.Component {
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.mediaUploadStateReset = this.mediaUploadStateReset( this );
+		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
@@ -148,41 +151,14 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
-	getMediaOptionsItems() {
-		return [
-			{ icon: 'format-image', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
-			{ icon: 'camera', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO, label: __( 'Take a Photo' ) },
-			{ icon: 'wordpress-alt', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
-		];
+	onSelectMediaUploadOption( mediaId: number, mediaUrl: string ) {
+		const { setAttributes } = this.props;
+		setAttributes( { url: mediaUrl, id: mediaId } );
 	}
 
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption, height, width, alt, href, id } = attributes;
-
-		const onMediaLibraryButtonPressed = () => {
-			requestMediaPickFromMediaLibrary( [ MEDIA_TYPE ], ( mediaId, mediaUrl ) => {
-				if ( mediaUrl ) {
-					setAttributes( { id: mediaId, url: mediaUrl } );
-				}
-			} );
-		};
-
-		const onMediaUploadButtonPressed = () => {
-			requestMediaPickFromDeviceLibrary( [ MEDIA_TYPE ], ( mediaId, mediaUri ) => {
-				if ( mediaUri ) {
-					setAttributes( { url: mediaUri, id: mediaId } );
-				}
-			} );
-		};
-
-		const onMediaCaptureButtonPressed = () => {
-			requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
-				if ( mediaUri ) {
-					setAttributes( { url: mediaUri, id: mediaId } );
-				}
-			} );
-		};
 
 		const onImageSettingsButtonPressed = () => {
 			this.setState( { showSettings: true } );
@@ -192,20 +168,22 @@ class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
-		let picker;
-
-		const onMediaOptionsButtonPressed = () => {
-			picker.presentPicker();
-		};
-
 		const toolbarEditButton = (
-			<Toolbar>
-				<ToolbarButton
-					label={ __( 'Edit image' ) }
-					icon="edit"
-					onClick={ onMediaOptionsButtonPressed }
-				/>
-			</Toolbar>
+			<MediaUpload mediaType={ MEDIA_TYPE_IMAGE }
+						onSelectURL={ this.onSelectMediaUploadOption }
+						render={ ( { open, getMediaOptions } ) => {
+							return (
+							<Toolbar>
+								{ getMediaOptions() }
+								<ToolbarButton
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							</Toolbar>
+							);
+						} } >
+			</MediaUpload>
 		);
 
 		const getInspectorControls = () => (
@@ -240,31 +218,12 @@ class ImageEdit extends React.Component {
 			</BottomSheet>
 		);
 
-		const mediaOptions = this.getMediaOptionsItems();
-
-		const getMediaOptions = () => (
-			<Picker
-				hideCancelButton={ true }
-				ref={ ( instance ) => picker = instance }
-				options={ mediaOptions }
-				onChange={ ( value ) => {
-					if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
-						onMediaUploadButtonPressed();
-					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO ) {
-						onMediaCaptureButtonPressed();
-					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
-						onMediaLibraryButtonPressed();
-					}
-				} }
-			/>
-		);
-
 		if ( ! url ) {
 			return (
 				<View style={ { flex: 1 } } >
-					{ getMediaOptions() }
 					<MediaPlaceholder
-						onMediaOptionsPressed={ onMediaOptionsButtonPressed }
+						mediaType={ MEDIA_TYPE_IMAGE }
+						onSelectURL={ this.onSelectMediaUploadOption }
 					/>
 				</View>
 			);
@@ -274,7 +233,6 @@ class ImageEdit extends React.Component {
 			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
-					{ getMediaOptions() }
 					<BlockControls>
 						{ toolbarEditButton }
 					</BlockControls>

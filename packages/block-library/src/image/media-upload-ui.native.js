@@ -58,9 +58,6 @@ class MediaUploadUI extends React.Component {
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
-	/*	this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
-		this.updateMediaProgress = this.updateMediaProgress.bind( this );*/
 	}
 
 	componentDidMount() {
@@ -95,34 +92,21 @@ class MediaUploadUI extends React.Component {
 	}
 
 	updateMediaProgress( payload ) {
-		//const { setAttributes } = this.props;
 		this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
 		this.props.onUpdateMediaProgress( payload );
-		//if ( payload.mediaUrl ) {
-			//	setAttributes( { url: payload.mediaUrl } );
-		//}
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
-		//const { setAttributes } = this.props;
-
-		//setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
 		this.setState( { isUploadInProgress: false, mediaId: payload.mediaServerId } );
 		this.props.onFinishMediaUploadWithSuccess( payload );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
-		//const { setAttributes } = this.props;
-
-		//setAttributes( { id: payload.mediaId } );
 		this.setState( { isUploadInProgress: false, isUploadFailed: true, mediaId: payload.mediaId  } );
 		this.props.onFinishMediaUploadWithFailure( payload );
 	}
 
 	mediaUploadStateReset( payload ) {
-		//const { setAttributes } = this.props;
-
-		//setAttributes( { id: payload.mediaId, url: null } );
 		this.setState( { isUploadInProgress: false, isUploadFailed: false, mediaId: null } );
 		this.props.onMediaUploadStateReset( payload );
 	}
@@ -172,9 +156,6 @@ class MediaUploadUI extends React.Component {
 
 						return (
 							<View style={ { flex: 1 } } >
-								{/* { getInspectorControls() }
-								{ getMediaOptions() } */}
-
 								{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
 									<Dashicon icon={ 'format-image' } size={ 300 } />
 								</View> }
