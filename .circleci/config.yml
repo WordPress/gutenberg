@@ -15,6 +15,11 @@ commands:
           key: yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
+  checkout-gutenberg:
+    steps:
+      - run:
+          name: Checkout Gutenberg
+          command: git submodule update --init --recursive
 
 jobs:
   checks:
