@@ -369,7 +369,7 @@ This property is a pointer to CSS files containing the CSS used for the block in
 
 ## Internationalization
 
-Localized properties are automatically wrapped in `_x` function calls on the backend and the frontend of WordPress. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle when it defines metadata defintion.
+Localized properties are automatically wrapped in `_x` function calls on the back end and the front end of WordPress. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle when it defines metadata definition.
 
 WordPress string discovery automatically translates these strings using the `textdomain` value specified in the plugin header.
 
