@@ -7,12 +7,11 @@
  */
 import EditorPage from './pages/editor-page';
 import ParagraphBlockInteraction from './blocks/paragraph-block-interaction';
-import { setupAppium, setupDriver, isLocalEnvironment, timer } from './helpers/utils';
+import { setupDriver, isLocalEnvironment, timer, stopDriver } from './helpers/utils';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
 describe( 'Gutenberg Editor tests', () => {
-	let appium;
 	let driver;
 	let editorPage;
 	let allPassed = true;
@@ -29,46 +28,26 @@ describe( 'Gutenberg Editor tests', () => {
 	}
 
 	beforeAll( async () => {
-		if ( isLocalEnvironment() ) {
-			appium = await setupAppium();
-		}
-
 		driver = await setupDriver();
+		editorPage = new EditorPage( driver );
 	} );
 
 	it( 'should be able to see visual editor', async () => {
-		editorPage = new EditorPage( driver );
-		await editorPage.expect();
+		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
 	it( 'should be able to add a new Paragraph block', async () => {
-		let paragraphBlockInteraction = new ParagraphBlockInteraction( driver );
-		paragraphBlockInteraction = await editorPage.addNewBlock( paragraphBlockInteraction );
+		const paragraphBlockInteraction = new ParagraphBlockInteraction( driver );
+		await editorPage.addNewBlock( paragraphBlockInteraction );
 		await paragraphBlockInteraction.sendText( 'Hello Gutenberg!' );
 		await timer( 3000 );
 		expect( await paragraphBlockInteraction.getText() ).toBe( 'Hello Gutenberg!' );
 	} );
 
 	afterAll( async () => {
-		if ( isLocalEnvironment() ) {
-			if ( driver === undefined ) {
-				if ( appium !== undefined ) {
-					await appium.kill( 'SIGINT' );
-				}
-				return;
-			}
-
-			await driver.quit();
-			await appium.kill( 'SIGINT' );
-		} else {
-			if ( driver === undefined ) {
-				if ( appium !== undefined ) {
-					await appium.kill( 'SIGINT' );
-				}
-				return;
-			}
+		if ( ! isLocalEnvironment() ) {
 			driver.sauceJobStatus( allPassed );
-			await driver.quit();
 		}
+		await stopDriver( driver );
 	} );
 } );

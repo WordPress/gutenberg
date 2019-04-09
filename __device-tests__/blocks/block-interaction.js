@@ -46,14 +46,13 @@ export default class BlockInteraction {
 
 	// Finds the wd element for new block that was added and sets the element attribute
 	// and accessibilityId attributes on this object
-	async setupElement( blockName: string, blocks: Set<string> ) {
+	async setupElement( blockName: string ) {
 		await this.driver.sleep( 2000 );
 		const blockLocator = `block-${ BlockInteraction.index }-${ blockName }`;
 		this.element = await this.driver.elementByAccessibilityId( blockLocator );
 		this.accessibilityId = await this.getAttribute( this.accessibilityIdKey );
 
 		BlockInteraction.index += 1;
-		return blocks;
 	}
 
 	// attempts to type a string to a given element, need for this stems from

@@ -15,36 +15,6 @@ commands:
           key: yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
-  build-android:
-    steps:
-      - run:
-          name: Change initial HTML file
-          command: |
-            cp ./bin/example-content/initial-device-tests-html.js ./src/app/initial-html.js
-      - run:
-          name: Bundle Debug android
-          command: yarn bundle:android:test
-      - run:
-          name: Gradle assemble debug android apk
-          command: |
-            cd android
-            ./gradlew clean
-            ./gradlew assembleDebug
-  build-ios:
-    steps:
-    - run:
-        name: Change initial HTML file
-        command: |
-          cp ./bin/example-content/initial-device-tests-html.js ./src/app/initial-html.js
-    - run:
-        name: Bundle iOS
-        command: |
-          yarn bundle:ios:test
-    - run:
-        name: Generate .app file
-        command:  |
-          set +e
-          yarn react-native run-ios --configuration Release
   checkout-gutenberg:
     steps:
       - run:
@@ -92,7 +62,9 @@ jobs:
           command: |
             echo 'export TEST_RN_PLATFORM=android' >> $BASH_ENV
             echo 'export TEST_ENV=sauce' >> $BASH_ENV
-      - build-android
+      - run:
+          name: Bundle Android and Generate debug .apk file for testing
+          command: yarn test:e2e:build-app:android
       - run:
           name: Upload apk to sauce labs
           command: |
@@ -129,18 +101,13 @@ jobs:
         paths:
         - react-native-aztec/ios/Carthage
         - ~/.rncache
-    - build-ios
     - run:
-        name: Zip up .app file
-        command: |
-          cp ./ios/main.jsbundle ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle
-          cd ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/
-          zip -r ./Gutenberg.app.zip ./gutenberg.app
-          mv ./Gutenberg.app.zip "$CIRCLE_WORKING_DIRECTORYGutenberg.app.zip"
+        name: Bundle iOS and Generate debug .app file for testing
+        command: yarn test:e2e:build-app:ios
     - run:
         name: Upload .app to sauce labs
         command: |
-          curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.app.zip?overwrite=true --data-binary @./Gutenberg.app.zip
+          curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.app.zip?overwrite=true --data-binary @./ios/Gutenberg.app.zip
     - run:
         name: Run Device Tests
         command: |

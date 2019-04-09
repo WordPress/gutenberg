@@ -17,9 +17,6 @@ import { isAndroid } from '../helpers/utils';
 import { __ } from '@wordpress/i18n';
 
 export default class ParagraphBlockInteraction extends BlockInteraction {
-	// FLow complaining about type annotation on Set class here but Set<string>(); doesn't resolve
-	// $FlowFixMe
-	static blocks = new Set();
 	textViewElement: wd.PromiseChainWebdriver.Element;
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
@@ -41,7 +38,7 @@ export default class ParagraphBlockInteraction extends BlockInteraction {
 	}
 
 	async setup() {
-		await this.setupElement( this.blockName, ParagraphBlockInteraction.blocks );
+		await this.setupElement( this.blockName );
 		await this.setupTextView();
 	}
 
