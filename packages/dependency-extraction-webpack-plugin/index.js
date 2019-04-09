@@ -28,7 +28,13 @@ class DependencyExtractionWebpackPlugin {
 	externalizeWpDeps( context, request, callback ) {
 		let externRootRequest;
 
-		if ( this.options.useDefaults ) {
+		// Handle via options.requestToExternal first
+		if ( 'function' === typeof this.options.requestToExternal ) {
+			externRootRequest = this.options.requestToExternal( request );
+		}
+
+		// Cascade to default if unhandled and enabled
+		if ( 'undefined' === typeof externRootRequest && this.options.useDefaults !== false ) {
 			externRootRequest = defaultRequestToExternal( request );
 		}
 
