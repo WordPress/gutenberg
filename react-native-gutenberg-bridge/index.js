@@ -69,6 +69,10 @@ export function requestMediaPickFromDeviceCamera( callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_CAMERA', callback );
 }
 
+export function requestMediaImport( url, callback ) {
+	return RNReactNativeGutenbergBridge.requestMediaImport( url, callback );
+}
+
 export function mediaUploadSync() {
 	return RNReactNativeGutenbergBridge.mediaUploadSync();
 }
