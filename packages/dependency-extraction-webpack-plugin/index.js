@@ -77,6 +77,9 @@ class DependencyExtractionWebpackPlugin {
 			// Each entrypoint will get a .deps.json file
 			for ( const [ entrypointName, entrypoint ] of compilation.entrypoints.entries() ) {
 				const entrypointExternalizedWpDeps = new Set();
+				if ( this.options.injectPolyfill ) {
+					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
+				}
 
 				// Search for externalized dependencies in all modules in all entrypoint chunks
 				for ( const c of entrypoint.chunks ) {
