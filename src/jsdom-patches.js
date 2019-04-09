@@ -37,7 +37,16 @@ const {
 	DOCUMENT_FRAGMENT_NODE,
 } = Node;
 
-// Simple recursive implementation of Node.contains method
+/**
+ * Simple recursive implementation of Node.contains method
+ * @param {number} otherNode Another node (may be the same node).
+ * @return {boolean} true if otherNode is a descendant of this node, or is this
+ * node, false otherwise.
+ *
+ * This function is necessary in the mobile environment, because there are code
+ * paths that make use of functions in the Gutenberg (web) project, which has
+ * expectation that this is implemented (as it is in the browser environment).
+ */
 Node.prototype.contains = function( otherNode ) {
 	return this === otherNode ||
 		Array.prototype.some.call( this._childNodes, ( childNode ) => {
@@ -45,7 +54,18 @@ Node.prototype.contains = function( otherNode ) {
 		} );
 };
 
-// copied from jsdom-jscore, but without WRONG_DOCUMENT_ERR exception
+/**
+ * Copy of insertBefore function from jsdom-jscore, WRONG_DOCUMENT_ERR exception
+ * disabled.
+ * @param {Object} newChild The node to be insterted.
+ * @param {Object} refChild The node before which newChild is inserted.
+ * @return {Object} the newly inserted child node
+ *
+ * This function is modified here to remove the WRONG_DOCUMENT_ERR exception
+ * that is no longer part of the DOM spec for this function.
+ * see: https://github.com/jsdom/jsdom/issues/717 for more information, * and:
+ * https://dom.spec.whatwg.org/#dom-node-insertbefore for the latest spec.
+ */
 Node.prototype.insertBefore = function( /* Node */ newChild, /* Node*/ refChild ) {
 	if ( this._readonly === true ) {
 		throw new core.DOMException( NO_MODIFICATION_ALLOWED_ERR, 'Attempting to modify a read-only node' );
@@ -118,6 +138,12 @@ Node.prototype.insertBefore = function( /* Node */ newChild, /* Node*/ refChild 
 	return newChild;
 }; // raises(DOMException);
 
-// alias (polyfill not needed)
-// see: https://developer.mozilla.org/en-US/docs/Web/API/Element/matches#Polyfill
+/*
+ * This is merely an alias (polyfill not needed).
+ * see: https://developer.mozilla.org/en-US/docs/Web/API/Element/matches#Polyfill
+ *
+ * This function is necessary in the mobile environment, because there are code
+ * paths that make use of functions in the Gutenberg (web) project, which has
+ * expectation that this is implemented (as it is in the browser environment).
+ */
 Element.prototype.matches = Element.prototype.matchesSelector;

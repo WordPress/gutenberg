@@ -146,5 +146,8 @@
     "tinycolor2": "^1.4.1",
     "turbo-combine-reducers": "^1.0.2",
     "underscore": "^1.9.1"
+  },
+  "resolutions": {
+    "@react-native-community/cli": "^1.5.2"
   }
 }

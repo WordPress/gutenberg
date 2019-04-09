@@ -1028,10 +1028,10 @@
     "@types/istanbul-lib-coverage" "^1.1.0"
     "@types/yargs" "^12.0.9"
 
-"@react-native-community/cli@^1.2.1":
-  version "1.4.5"
-  resolved "https://registry.yarnpkg.com/@react-native-community/cli/-/cli-1.4.5.tgz#6cf35d73e14f65e13e77fbb572f2d5b9d2cbadb5"
-  integrity sha512-WH5E7rEUpftXJ4aAS/U/3euMx1S7FI0+CwT2VN3sFDtErtCVgqmyBXnBNp9Zk3XK5ANbf49cVR25rkOBjf5TVw==
+"@react-native-community/cli@^1.2.1", "@react-native-community/cli@^1.5.2":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@react-native-community/cli/-/cli-1.6.0.tgz#889fbb1eff961945df28bb7e896dcee8516b010f"
+  integrity sha512-OV3N5O/wzjb8OTZDiFerX0gf9/KzLJOvDttU38BqIvn8+OLkH6SIgGrKked9vrKKvH5bFG6jmCmKCW5gP+tOwQ==
   dependencies:
     chalk "^1.1.1"
     commander "^2.19.0"
