@@ -13,7 +13,14 @@ const { RawSource } = require( 'webpack-sources' );
 const WORDPRESS_NAMESPACE = '@wordpress/';
 
 class DependencyExtractionWebpackPlugin {
-	constructor() {
+	constructor( options ) {
+		this.options = Object.assign(
+			{
+				injectPolyfill: false,
+				useDefaults: true,
+			},
+			options
+		);
 		this.externalizedDeps = new Set();
 		this.externalsPlugin = new ExternalsPlugin( 'global', [ this.externalizeWpDeps.bind( this ) ] );
 	}
