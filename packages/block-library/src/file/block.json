@@ -32,8 +32,7 @@
 		"downloadButtonText": {
 			"type": "string",
 			"source": "html",
-			"selector": "a[download]",
-			"default": "Download"
+			"selector": "a[download]"
 		}
 	}
 }
