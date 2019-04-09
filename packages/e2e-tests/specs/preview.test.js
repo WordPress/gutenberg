@@ -59,20 +59,24 @@ async function waitForPreviewNavigation( previewPage ) {
  * @param {boolean} shouldBeChecked If true, turns the option on. If false, off.
  */
 async function toggleCustomFieldsOption( shouldBeChecked ) {
+	const checkboxXPath = '//*[contains(@class, "edit-post-options-modal")]//label[contains(text(), "Custom Fields")]';
 	await clickOnMoreMenuItem( 'Options' );
-	const [ handle ] = await page.$x( `//label[contains(text(), "Custom Fields")]` );
+	await page.waitForXPath( checkboxXPath );
+	const [ checkboxHandle ] = await page.$x( checkboxXPath );
 
 	const isChecked = await page.evaluate(
 		( element ) => element.control.checked,
-		handle
+		checkboxHandle
 	);
+
 	if ( isChecked !== shouldBeChecked ) {
 		const navigationCompleted = page.waitForNavigation();
-		await handle.click();
-		return navigationCompleted;
+		await checkboxHandle.click();
+		await navigationCompleted;
+		return;
 	}
 
-	await page.click( 'button[aria-label="Close dialog"]' );
+	await page.click( '.edit-post-options-modal button[aria-label="Close dialog"]' );
 }
 
 describe( 'Preview', () => {
@@ -195,7 +199,7 @@ describe( 'Preview', () => {
 	} );
 } );
 
-describe( 'Preview + Custom Fields', async () => {
+describe( 'Preview with Custom Fields enabled', async () => {
 	beforeEach( async () => {
 		await createNewPost();
 		await toggleCustomFieldsOption( true );
