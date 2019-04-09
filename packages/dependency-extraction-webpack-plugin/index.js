@@ -26,7 +26,11 @@ class DependencyExtractionWebpackPlugin {
 	}
 
 	externalizeWpDeps( context, request, callback ) {
-		const externRootRequest = defaultRequestToExternal( request );
+		let externRootRequest;
+
+		if ( this.options.useDefaults ) {
+			externRootRequest = defaultRequestToExternal( request );
+		}
 
 		if ( externRootRequest ) {
 			this.externalizedDeps.add( request );
@@ -81,6 +85,17 @@ class DependencyExtractionWebpackPlugin {
 	}
 }
 
+/**
+ * Handle default dependency to WordPress global transformation
+ *
+ * Transform @wordpress dependencies:
+ *   @wordpress/api-fetch -> wp.apiFetch
+ *   @wordpress/i18n -> wp.i18n
+ *
+ * @param {string} request Requested module
+ *
+ * @return {(string|undefined)} Script dependency slug
+ */
 function defaultRequestToExternal( request ) {
 	switch ( request ) {
 		case 'lodash':
@@ -92,15 +107,13 @@ function defaultRequestToExternal( request ) {
 
 		case 'react':
 			return 'React';
+
 		case 'react-dom':
 			return 'ReactDOM';
+	}
 
-		default:
-			if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
-				// @wordpress/api-fetch -> wp.apiFetch
-				// @wordpress/i18n -> wp.i18n
-				return `wp.${ camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ) }`;
-			}
+	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
+		return `wp.${ camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ) }`;
 	}
 }
 
