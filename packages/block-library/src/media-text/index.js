@@ -21,63 +21,13 @@ import edit from './edit';
 import icon from './icon';
 import deprecated from './deprecated';
 import { imageFillStyles } from './media-container';
+import metadata from './block.json';
 
 export const DEFAULT_MEDIA_WIDTH = 50;
 
-export const name = 'core/media-text';
+const { name } = metadata;
 
-const blockAttributes = {
-	align: {
-		type: 'string',
-		default: 'wide',
-	},
-	backgroundColor: {
-		type: 'string',
-	},
-	customBackgroundColor: {
-		type: 'string',
-	},
-	mediaAlt: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'figure img',
-		attribute: 'alt',
-		default: '',
-	},
-	mediaPosition: {
-		type: 'string',
-		default: 'left',
-	},
-	mediaId: {
-		type: 'number',
-	},
-	mediaUrl: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'figure video,figure img',
-		attribute: 'src',
-	},
-	mediaType: {
-		type: 'string',
-	},
-	mediaWidth: {
-		type: 'number',
-		default: 50,
-	},
-	isStackedOnMobile: {
-		type: 'boolean',
-		default: false,
-	},
-	verticalAlignment: {
-		type: 'string',
-	},
-	imageFill: {
-		type: 'boolean',
-	},
-	focalPoint: {
-		type: 'object',
-	},
-};
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Media & Text' ),
@@ -86,11 +36,7 @@ export const settings = {
 
 	icon,
 
-	category: 'layout',
-
 	keywords: [ __( 'image' ), __( 'video' ) ],
-
-	attributes: blockAttributes,
 
 	supports: {
 		align: [ 'wide', 'full' ],

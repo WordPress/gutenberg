@@ -15,8 +15,11 @@ import { createBlock } from '@wordpress/blocks';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/more';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: _x( 'More', 'block name' ),
@@ -25,23 +28,11 @@ export const settings = {
 
 	icon,
 
-	category: 'layout',
-
 	supports: {
 		customClassName: false,
 		className: false,
 		html: false,
 		multiple: false,
-	},
-
-	attributes: {
-		customText: {
-			type: 'string',
-		},
-		noTeaser: {
-			type: 'boolean',
-			default: false,
-		},
 	},
 
 	transforms: {
