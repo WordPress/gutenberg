@@ -13,6 +13,7 @@ import {
 	TouchableWithoutFeedback,
 	NativeSyntheticEvent,
 	NativeTouchEvent,
+	Keyboard,
 } from 'react-native';
 import TextInputState from 'react-native/lib/TextInputState';
 import {
@@ -43,6 +44,7 @@ type PropsType = BlockType & {
 	isLastBlock: boolean,
 	showTitle: boolean,
 	borderStyle: Object,
+	testID: string,
 	focusedBorderColor: string,
 	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
 	getPreviousBlockClientId: ( clientId: string ) => string,
@@ -95,6 +97,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	onInlineToolbarButtonPressed = ( button: number ) => {
+		Keyboard.dismiss();
 		switch ( button ) {
 			case InlineToolbarActions.UP:
 				this.props.moveBlockUp();
@@ -181,6 +184,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				insertBlocksAfter={ this.insertBlocksAfter }
 				mergeBlocks={ this.mergeBlocks }
 				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
+				clientId={ this.props.clientId }
 			/>
 		);
 	}
@@ -199,12 +203,24 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onFocus } >
+			// accessible prop needs to be false to access children
+			// https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
+			<TouchableWithoutFeedback
+				accessible={ false }
+				accessibilityLabel="block-container"
+				onPress={ this.onFocus } >
+
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
-					<View style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>{ this.getBlockForType() }</View>
+					<View
+						accessibile={ true }
+						accessibilityLabel={ this.props.testID }
+						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
+						{ this.getBlockForType() }
+					</View>
 					{ this.renderToolbar() }
 				</View>
+
 			</TouchableWithoutFeedback>
 		);
 	}

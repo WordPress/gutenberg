@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -45,7 +45,8 @@
     "regenerator-runtime": "^0.12.1",
     "remote-redux-devtools": "^0.5.12",
     "rungen": "^0.3.2",
-    "sprintf-js": "^1.1.1"
+    "sprintf-js": "^1.1.1",
+    "wd": "^1.11.1"
   },
   "scripts": {
     "start": "yarn react-native start",
@@ -56,6 +57,8 @@
     "start:inside-gb:debug": "node --inspect-brk node_modules/.bin/react-native start:inside-gb",
     "bundle": "yarn bundle:android && yarn bundle:ios",
     "bundle:android": "mkdir -p bundle/android && yarn react-native bundle --platform android --dev false --entry-file index.js --assets-dest bundle/android --bundle-output bundle/android/App.js --sourcemap-output bundle/android/App.js.map",
+    "bundle:android:test": "mkdir -p android/app/src/main/assets && react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
+    "bundle:ios:test": "react-native bundle --reset-cache --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios'",
     "bundle:ios": "mkdir -p bundle/ios && yarn react-native bundle --platform ios --dev false --entry-file index.js --assets-dest bundle/ios --bundle-output bundle/ios/App.js --sourcemap-output bundle/ios/App.js.map",
     "i18n-cache": "node i18n-cache/index.js",
     "postinstall": "yarn i18n-cache",
@@ -73,6 +76,14 @@
     "preios:xcode10": "cd node_modules/react-native && ./scripts/ios-install-third-party.sh && cd third-party/glog-0.3.5 && [ -f libglog.pc ] || ../../scripts/ios-configure-glog.sh",
     "ios": "react-native run-ios",
     "test": "cross-env NODE_ENV=test node node_modules/jest/bin/jest.js --verbose false --config jest.config.js",
+    "device-tests":"cross-env NODE_ENV=test node node_modules/jest/bin/jest.js --detectOpenHandles --verbose --config jest_ui.config.js",
+    "test:ui":"yarn test:ui:android && yarn test:ui:ios",
+    "pretest:ui:android": "DEVICE_TESTS=true sh ./bin/load-initial-html.sh && yarn android",
+    "test:ui:android": "TEST_RN_PLATFORM=android yarn device-tests",
+    "posttest:ui:android": "sh ./bin/load-initial-html.sh",
+    "pretest:ui:ios": "DEVICE_TESTS=true sh ./bin/load-initial-html.sh && yarn ios",
+    "test:ui:ios": "TEST_RN_PLATFORM=ios yarn device-tests",
+    "posttest:ui:ios": "sh ./bin/load-initial-html.sh",
     "test:inside-gb": "cross-env NODE_ENV=test node node_modules/jest/bin/jest.js --verbose --config jest_gb.config.js",
     "test:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/jest/bin/jest.js --runInBand --verbose --config jest.config.js",
     "flow": "flow",
@@ -133,6 +144,10 @@
     "simple-html-tokenizer": "^0.4.1",
     "tannin": "^1.0.1",
     "tinycolor2": "^1.4.1",
-    "turbo-combine-reducers": "^1.0.2"
+    "turbo-combine-reducers": "^1.0.2",
+    "underscore": "^1.9.1"
+  },
+  "resolutions": {
+    "@react-native-community/cli": "^1.5.2"
   }
 }

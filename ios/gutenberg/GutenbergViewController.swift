@@ -64,6 +64,11 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         }
     }
 
+    func gutenbergDidRequestImport(from url: URL, with callback: @escaping MediaPickerDidPickMediaCallback) {
+        let id = mediaUploadCoordinator.upload(url: url)
+        callback(id, url.absoluteString)
+    }
+
     func pickAndUpload(from source: UIImagePickerController.SourceType, callback: @escaping MediaPickerDidPickMediaCallback) {
         mediaPickCoordinator = MediaPickCoordinator(presenter: self, callback: { (url) in
             guard let url = url, let mediaID = self.mediaUploadCoordinator.upload(url: url) else {
