@@ -9,7 +9,6 @@ import EditorPage from './pages/editor-page';
 import {
 	setupDriver,
 	isLocalEnvironment,
-	timer,
 	clickMiddleOfElement,
 	clickBeginningOfElement,
 	stopDriver } from './helpers/utils';

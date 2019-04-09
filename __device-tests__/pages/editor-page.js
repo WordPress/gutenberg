@@ -142,7 +142,7 @@ export default class EditorPage {
 
 	async getTextForParagraphBlockAtPosition( position: number ) {
 		const block = await this.getParagraphBlockAtPosition( position );
-		const text = await this.getTextForParagraphBlock( block )
+		const text = await this.getTextForParagraphBlock( block );
 		return text.toString();
 	}
 }
