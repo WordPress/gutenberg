@@ -55,6 +55,9 @@ commands:
       - run:
           name: Install JUnit coverage reporter
           command: yarn add --dev jest-junit
+      - run:
+          name: Create reports directory
+          command: mkdir reports && reports/test-results
 
 jobs:
   checks:
@@ -85,7 +88,7 @@ jobs:
           name: Run Checks
           command: bin/ci-checks-js.sh
       - store_test_results:
-          path: /reports/test-results
+          path: ./reports/test-results
   android-device-checks:
     docker:
     - image: circleci/android:api-28-node8-alpha
@@ -110,9 +113,9 @@ jobs:
           name: Run Device Tests
           command: yarn device-tests
           environment:
-            JEST_JUNIT_OUTPUT: "reports/test-results/js-test-results.xml"
+            JEST_JUNIT_OUTPUT: "reports/test-results/android-test-results.xml"
       - store_test_results:
-          path: /reports/test-results
+          path: ./reports/test-results
   ios-device-checks:
     macos:
       xcode: "10.0"
@@ -160,9 +163,9 @@ jobs:
         command: |
           yarn device-tests
         environment:
-          JEST_JUNIT_OUTPUT: "reports/test-results/js-test-results.xml"
+          JEST_JUNIT_OUTPUT: "reports/test-results/ios-test-results.xml"
     - store_test_results:
-        path: /reports/test-results
+        path: ./reports/test-results
 
 workflows:
   gutenberg-mobile:
