@@ -62,7 +62,7 @@ class ImageEdit extends React.Component {
 			progress: 0,
 			isUploadInProgress: false,
 			isUploadFailed: false,
-			captionFocused: false,
+			isCaptionSelected: false,
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
@@ -101,6 +101,12 @@ class ImageEdit extends React.Component {
 			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
 		}
 		this.removeMediaUploadListener();
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		this.setState( ( state ) => ( {
+			isCaptionSelected: nextProps.isSelected && state.isCaptionSelected,
+		} ) );
 	}
 
 	onImagePressed() {
@@ -218,9 +224,9 @@ class ImageEdit extends React.Component {
 		if ( this.props.onFocus ) {
 			this.props.onFocus();
 		}
-		if ( ! this.state.captionFocused ) {
+		if ( ! this.state.isCaptionSelected ) {
 			this.setState( {
-				captionFocused: true,
+				isCaptionSelected: true,
 			} );
 		}
 	}
@@ -229,9 +235,9 @@ class ImageEdit extends React.Component {
 		if ( this.props.onBlur ) {
 			this.props.onBlur();
 		}
-		if ( this.state.captionFocused ) {
+		if ( this.state.isCaptionSelected ) {
 			this.setState( {
-				captionFocused: false,
+				isCaptionSelected: false,
 			} );
 		}
 	}
@@ -358,7 +364,7 @@ class ImageEdit extends React.Component {
 			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
 				<View style={ { flex: 1 } }>
 					{ showSpinner && <Spinner progress={ progress } /> }
-					{ ( ! this.state.captionFocused ) &&
+					{ ( ! this.state.isCaptionSelected ) &&
 						<BlockControls>
 							{ toolbarEditButton }
 						</BlockControls>
@@ -423,7 +429,7 @@ class ImageEdit extends React.Component {
 								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 								onFocus={ this.onFocusCaption }
 								onBlur={ this.onBlurCaption }
-								isSelected={ isSelected && this.state.captionFocused }
+								isSelected={ this.state.isCaptionSelected }
 								fontSize={ 14 }
 								underlineColorAndroid="transparent"
 							/>
