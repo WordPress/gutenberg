@@ -1,17 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import { omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import {
-	RichText,
-	getColorClassName,
-} from '@wordpress/block-editor';
+import { RichText } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -19,6 +15,7 @@ import {
 import edit from './edit';
 import icon from './icon';
 import metadata from './block.json';
+import save from './save';
 
 const { name, attributes: blockAttributes } = metadata;
 
@@ -34,66 +31,20 @@ const colorsMigration = ( attributes ) => {
 
 export const settings = {
 	title: __( 'Button' ),
-
 	description: __( 'Prompt visitors to take action with a button-style link.' ),
-
 	icon,
-
 	keywords: [ __( 'link' ) ],
-
 	supports: {
 		align: true,
 		alignWide: false,
 	},
-
 	styles: [
 		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: 'outline', label: __( 'Outline' ) },
 		{ name: 'squared', label: _x( 'Squared', 'block style' ) },
 	],
-
 	edit,
-
-	save( { attributes } ) {
-		const {
-			url,
-			text,
-			title,
-			backgroundColor,
-			textColor,
-			customBackgroundColor,
-			customTextColor,
-		} = attributes;
-
-		const textClass = getColorClassName( 'color', textColor );
-		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-
-		const buttonClasses = classnames( 'wp-block-button__link', {
-			'has-text-color': textColor || customTextColor,
-			[ textClass ]: textClass,
-			'has-background': backgroundColor || customBackgroundColor,
-			[ backgroundClass ]: backgroundClass,
-		} );
-
-		const buttonStyle = {
-			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
-			color: textClass ? undefined : customTextColor,
-		};
-
-		return (
-			<div>
-				<RichText.Content
-					tagName="a"
-					className={ buttonClasses }
-					href={ url }
-					title={ title }
-					style={ buttonStyle }
-					value={ text }
-				/>
-			</div>
-		);
-	},
-
+	save,
 	deprecated: [ {
 		attributes: {
 			...pick( blockAttributes, [ 'url', 'title', 'text' ] ),
