@@ -39,4 +39,45 @@ describe( 'controls', () => {
 			expect( action1 ).toBeCalled();
 		} );
 	} );
+
+	it( 'resolves in expected order', ( done ) => {
+		const actions = {
+			wait: () => ( { type: 'WAIT' } ),
+			receive: ( items ) => ( { type: 'RECEIVE', items } ),
+		};
+
+		registry.registerStore( 'store', {
+			reducer: ( state = null, action ) => {
+				if ( action.type === 'RECEIVE' ) {
+					return action.items;
+				}
+
+				return state;
+			},
+			selectors: {
+				getItems: ( state ) => state,
+			},
+			resolvers: {
+				* getItems() {
+					yield actions.wait();
+					yield actions.receive( [ 1, 2, 3 ] );
+				},
+			},
+			controls: {
+				WAIT() {
+					return new Promise( ( resolve ) => process.nextTick( resolve ) );
+				},
+			},
+		} );
+
+		registry.subscribe( () => {
+			const isFinished = registry.select( 'store' ).hasFinishedResolution( 'getItems' );
+			if ( isFinished ) {
+				expect( registry.select( 'store' ).getItems() ).toEqual( [ 1, 2, 3 ] );
+				done();
+			}
+		} );
+
+		registry.select( 'store' ).getItems();
+	} );
 } );
