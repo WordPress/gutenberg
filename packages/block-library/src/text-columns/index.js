@@ -14,10 +14,6 @@ import { RichText } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import edit from './edit';
-
-/**
- * Internal dependencies
- */
 import metadata from './block.json';
 
 const { name } = metadata;
