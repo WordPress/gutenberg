@@ -50,6 +50,11 @@ commands:
       - run:
           name: Checkout Gutenberg
           command: git submodule update --init --recursive
+  add-jest-reporter:
+    steps:
+      - run:
+          name: Install JUnit coverage reporter
+          command: yarn add --dev jest-junit
 
 jobs:
   checks:
@@ -87,6 +92,7 @@ jobs:
           name: Checkout Gutenberg
           command: git submodule update --init --recursive
       - yarn-install
+      - add-jest-reporter
       - run:
           name: Set Environment Variables
           command: |
@@ -100,6 +106,10 @@ jobs:
       - run:
           name: Run Device Tests
           command: yarn device-tests
+          environment:
+            JEST_JUNIT_OUTPUT: "reports/test-results/js-test-results.xml"
+      - store_test_results:
+          path: /reports/test-results
   ios-device-checks:
     macos:
       xcode: "10.0"
@@ -107,6 +117,7 @@ jobs:
     - checkout
     - checkout-gutenberg
     - yarn-install
+    - add-jest-reporter
     - run:
         name: Set Environment Variables
         command: |
@@ -136,7 +147,7 @@ jobs:
           cp ./ios/main.jsbundle ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle
           cd ./ios/build/Gutenberg/Build/Products/Release-iphonesimulator/
           zip -r ./Gutenberg.app.zip ./gutenberg.app
-          mv ./Gutenberg.app.zip "$CIRCLE_WORKING_DIRECTORYGutenberg.app.zip"
+          mv ./Gutenberg.app.zip "${CIRCLE_WORKING_DIRECTORY}/Gutenberg.app.zip"
     - run:
         name: Upload .app to sauce labs
         command: |
@@ -145,6 +156,10 @@ jobs:
         name: Run Device Tests
         command: |
           yarn device-tests
+        environment:
+          JEST_JUNIT_OUTPUT: "reports/test-results/js-test-results.xml"
+    - store_test_results:
+        path: /reports/test-results
 
 workflows:
   gutenberg-mobile:
