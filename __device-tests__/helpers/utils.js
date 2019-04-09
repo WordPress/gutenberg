@@ -111,11 +111,9 @@ const setupDriver = async () => {
 const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
 	if ( ! isLocalEnvironment() ) {
 		const jobID = driver.sessionID;
-		const username = process.env.SAUCE_USERNAME;
-		const accessKey = process.env.SAUCE_ACCESS_KEY;
 
 		const hash = crypto.createHmac( 'md5', jobID )
-			.update( `${ username }:${ accessKey }` )
+			.update( serverConfigs.sauce.auth )
 			.digest( 'hex' );
 		const jobURL = `https://saucelabs.com/jobs/${ jobID }?auth=${ hash }.`;
 		// eslint-disable-next-line no-console
