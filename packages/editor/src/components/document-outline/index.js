@@ -48,7 +48,7 @@ const multipleH1Headings = [
  *
  * @return {Array} An array of heading blocks enhanced with the properties described above.
  */
-const computeOutlineHeadings = ( blocks = [], path = [] ) => {
+export const computeOutlineHeadings = ( blocks = [], path = [] ) => {
 	return flatMap( blocks, ( block = {} ) => {
 		if ( block.name === 'core/heading' ) {
 			return {
