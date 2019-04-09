@@ -1,4 +1,4 @@
-# @wordpress/dependency-extraction-webpack-plugin
+# Dependency Extraction Webpack Plugin
 
 This webpack plugin serves two purposes:
 
