@@ -9,7 +9,7 @@
 - Added a cancel link to the list of buttons in the `MediaPlaceholder` component which appears if an `onCancel` handler exists.
 - Added the usage of `mediaPreview` for the `Placeholder` component to the `MediaPlaceholder` component.
 - Added a an `onDoubleClick` event handler to the `MediaPlaceholder` component.
-- Added a `forwardRef` to the `PlainText` component.
+- Added a way to pass special `ref` property to the `PlainText` component.
 
 ### Breaking Changes
 
