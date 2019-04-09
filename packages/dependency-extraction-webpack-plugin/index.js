@@ -46,6 +46,27 @@ class DependencyExtractionWebpackPlugin {
 		return callback();
 	}
 
+	mapRequestToDependency( request ) {
+		// Handle via options.requestToDependency first
+		if ( 'function' === typeof this.options.requestToDependency ) {
+			const scriptDependency = this.options.requestToDependency( request );
+			if ( scriptDependency ) {
+				return scriptDependency;
+			}
+		}
+
+		// Cascade to default if enabled
+		if ( this.options.useDefaults ) {
+			const scriptDependency = defaultRequestToDependency( request );
+			if ( scriptDependency ) {
+				return scriptDependency;
+			}
+		}
+
+		// Fall back to the request name
+		return request;
+	}
+
 	apply( compiler ) {
 		this.externalsPlugin.apply( compiler );
 
@@ -61,7 +82,7 @@ class DependencyExtractionWebpackPlugin {
 				for ( const c of entrypoint.chunks ) {
 					for ( const { userRequest } of c.modulesIterable ) {
 						if ( this.externalizedDeps.has( userRequest ) ) {
-							const scriptDependency = defaultRequestToScript( userRequest ) || userRequest;
+							const scriptDependency = this.mapRequestToDependency( userRequest );
 							entrypointExternalizedWpDeps.add( scriptDependency );
 						}
 					}
@@ -123,11 +144,18 @@ function defaultRequestToExternal( request ) {
 	}
 }
 
-function defaultRequestToScript( request ) {
-	// Transform @wordpress dependencies:
-	//   @wordpress/i18n -> wp-i18n
-	//   @wordpress/escape-html -> wp-escape-html
-	// Pass other externalized deps as they are
+/**
+ * Handle default dependency to WordPress script dependency slug transformation
+ *
+ * Transform @wordpress dependencies:
+ *   @wordpress/i18n -> wp-i18n
+ *   @wordpress/escape-html -> wp-escape-html
+ *
+ * @param {string} request Requested module
+ *
+ * @return {(string|undefined)} Script dependency slug
+ */
+function defaultRequestToDependency( request ) {
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
 		return 'wp-' + request.substring( WORDPRESS_NAMESPACE.length );
 	}
