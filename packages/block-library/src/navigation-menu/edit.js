@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	Component,
 	Fragment,
 } from '@wordpress/element';
 import {
@@ -20,43 +19,40 @@ import {
 import MenuItemInserter from './menu-item-inserter';
 import { __ } from '@wordpress/i18n';
 
-class NavigationMenu extends Component {
-	render() {
-		const {
-			attributes,
-			clientId,
-			isSelected,
-			setAttributes,
-		} = this.props;
-		return (
-			<Fragment>
-				<InspectorControls>
-					<PanelBody
-						title={ __( 'Menu Settings' ) }
-					>
-						<CheckboxControl
-							value={ attributes.automaticallyAdd }
-							onChange={ ( automaticallyAdd ) => {
-								setAttributes( { automaticallyAdd } );
-							} }
-							label={ __( 'Automatically add new pages' ) }
-							help={ __( 'Automatically add new top level pages to this menu.' ) }
-						/>
-					</PanelBody>
-				</InspectorControls>
-				<div className="wp-block-navigation-menu">
-					<InnerBlocks
-						allowedBlocks={ [ 'core/navigation-menu-item' ] }
+function NavigationMenu( {
+	attributes,
+	clientId,
+	isSelected,
+	setAttributes,
+} ) {
+	return (
+		<Fragment>
+			<InspectorControls>
+				<PanelBody
+					title={ __( 'Menu Settings' ) }
+				>
+					<CheckboxControl
+						value={ attributes.automaticallyAdd }
+						onChange={ ( automaticallyAdd ) => {
+							setAttributes( { automaticallyAdd } );
+						} }
+						label={ __( 'Automatically add new pages' ) }
+						help={ __( 'Automatically add new top level pages to this menu.' ) }
 					/>
-					{ isSelected && (
-						<MenuItemInserter
-							rootClientId={ clientId }
-						/>
-					) }
-				</div>
-			</Fragment>
-		);
-	}
+				</PanelBody>
+			</InspectorControls>
+			<div className="wp-block-navigation-menu">
+				<InnerBlocks
+					allowedBlocks={ [ 'core/navigation-menu-item' ] }
+				/>
+				{ isSelected && (
+					<MenuItemInserter
+						rootClientId={ clientId }
+					/>
+				) }
+			</div>
+		</Fragment>
+	);
 }
 
 export default NavigationMenu;
