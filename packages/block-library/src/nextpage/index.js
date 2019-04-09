@@ -10,8 +10,11 @@ import { createBlock } from '@wordpress/blocks';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/nextpage';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Page Break' ),
@@ -20,8 +23,6 @@ export const settings = {
 
 	icon,
 
-	category: 'layout',
-
 	keywords: [ __( 'next page' ), __( 'pagination' ) ],
 
 	supports: {
@@ -29,8 +30,6 @@ export const settings = {
 		className: false,
 		html: false,
 	},
-
-	attributes: {},
 
 	transforms: {
 		from: [
