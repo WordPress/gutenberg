@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,10 +26,22 @@ class GalleryImage extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.onBlur = this.onBlur.bind( this );
+		this.onFocus = this.onFocus.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectCaption = this.onSelectCaption.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
+
+		// debouncedOnSelect will be called every time any figure's element
+		// is blurred. Every time a figure's element is focused, it'll be cancelled.
+		//
+		// We use this to detect whether the figure element has lost focus permanently
+		// or the change was internal (a focus transition from image to caption, for example).
+		//
+		// onBlur / onFocus events are quick operations (<5ms apart in my testing),
+		// so 50ms accounts for 10x lagging while feels responsive to the user.
+		this.debouncedOnDeselect = debounce( this.props.onDeselect, 50 );
 
 		this.state = {
 			captionSelected: false,
@@ -103,6 +116,14 @@ class GalleryImage extends Component {
 		}
 	}
 
+	onBlur() {
+		this.debouncedOnDeselect();
+	}
+
+	onFocus() {
+		this.debouncedOnDeselect.cancel();
+	}
+
 	render() {
 		const {
 			url,
@@ -159,7 +180,11 @@ class GalleryImage extends Component {
 		} );
 
 		return (
-			<figure className={ className }>
+			<figure
+				className={ className }
+				onBlur={ this.onBlur }
+				onFocus={ this.onFocus }
+			>
 				{ href ? <a href={ href }>{ img }</a> : img }
 				<div className="block-library-gallery-item__move-menu">
 					<Button
