@@ -19,35 +19,7 @@ class DependencyExtractionWebpackPlugin {
 	}
 
 	externalizeWpDeps( context, request, callback ) {
-		let externRootRequest;
-
-		switch ( request ) {
-			case 'lodash':
-			case 'moment':
-				externRootRequest = request;
-				break;
-
-			case 'jquery':
-				externRootRequest = 'jQuery';
-				break;
-
-			case 'react':
-				externRootRequest = 'React';
-				break;
-			case 'react-dom':
-				externRootRequest = 'ReactDOM';
-				break;
-
-			default:
-				if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
-					// @wordpress/api-fetch -> wp.apiFetch
-					// @wordpress/i18n -> wp.i18n
-					externRootRequest = `wp.${ camelCaseDash(
-						request.substring( WORDPRESS_NAMESPACE.length )
-					) }`;
-				}
-				break;
-		}
+		const externRootRequest = defaultRequestToExternal( request );
 
 		if ( externRootRequest ) {
 			this.externalizedDeps.add( request );
@@ -72,15 +44,8 @@ class DependencyExtractionWebpackPlugin {
 				for ( const c of entrypoint.chunks ) {
 					for ( const { userRequest } of c.modulesIterable ) {
 						if ( this.externalizedDeps.has( userRequest ) ) {
-							// Transform @wordpress dependencies:
-							//   @wordpress/i18n -> wp-i18n
-							//   @wordpress/escape-html -> wp-escape-html
-							// Pass other externalized deps as they are
-							entrypointExternalizedWpDeps.add(
-								userRequest.startsWith( WORDPRESS_NAMESPACE ) ?
-									'wp-' + userRequest.substring( WORDPRESS_NAMESPACE.length ) :
-									userRequest
-							);
+							const scriptDependency = defaultRequestToScript( userRequest ) || userRequest;
+							entrypointExternalizedWpDeps.add( scriptDependency );
 						}
 					}
 				}
@@ -106,6 +71,39 @@ class DependencyExtractionWebpackPlugin {
 				entrypoint.getRuntimeChunk().files.push( depsFile );
 			}
 		} );
+	}
+}
+
+function defaultRequestToExternal( request ) {
+	switch ( request ) {
+		case 'lodash':
+		case 'moment':
+			return request;
+
+		case 'jquery':
+			return 'jQuery';
+
+		case 'react':
+			return 'React';
+		case 'react-dom':
+			return 'ReactDOM';
+
+		default:
+			if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
+				// @wordpress/api-fetch -> wp.apiFetch
+				// @wordpress/i18n -> wp.i18n
+				return `wp.${ camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ) }`;
+			}
+	}
+}
+
+function defaultRequestToScript( request ) {
+	// Transform @wordpress dependencies:
+	//   @wordpress/i18n -> wp-i18n
+	//   @wordpress/escape-html -> wp-escape-html
+	// Pass other externalized deps as they are
+	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
+		return 'wp-' + request.substring( WORDPRESS_NAMESPACE.length );
 	}
 }
 
