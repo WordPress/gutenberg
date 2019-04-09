@@ -19,6 +19,11 @@ export function normaliseFormats( value ) {
 		// Only if there are formats at the previous character, the same
 		// reference can be used.
 		if ( prevCharFormats ) {
+			// Early return if the format list was already normalised.
+			if ( prevCharFormats === charFormats ) {
+				return accumulator;
+			}
+
 			const newCharFormats = charFormats.map( ( format, formatIndex ) => {
 				const ref = prevCharFormats[ formatIndex ];
 
