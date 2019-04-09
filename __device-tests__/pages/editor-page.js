@@ -37,20 +37,6 @@ export default class EditorPage {
 		return this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
-	async addNewBlock( blockName: string ) {
-		// Click add button
-		let identifier = 'Add block';
-		if ( isAndroid() ) {
-			identifier = 'Add block, Double tap to add a block';
-		}
-		const addButton = await this.driver.elementByAccessibilityId( __( identifier ) );
-		await addButton.click();
-
-		// Click on block of choice
-		const blockButton = await this.driver.elementByAccessibilityId( blockName );
-		await blockButton.click();
-	}
-
 	// Finds the wd element for new block that was added and sets the element attribute
 	// and accessibilityId attributes on this object
 	async getBlockAtPosition( position: number, blockName: string ) {
@@ -68,6 +54,28 @@ export default class EditorPage {
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		return elements.length > 0;
 	}
+
+	// =========================
+	// Block toolbar functions
+	// =========================
+
+	async addNewBlock( blockName: string ) {
+		// Click add button
+		let identifier = 'Add block';
+		if ( isAndroid() ) {
+			identifier = 'Add block, Double tap to add a block';
+		}
+		const addButton = await this.driver.elementByAccessibilityId( __( identifier ) );
+		await addButton.click();
+
+		// Click on block of choice
+		const blockButton = await this.driver.elementByAccessibilityId( blockName );
+		await blockButton.click();
+	}
+
+	// =========================
+	// Inline toolbar functions
+	// =========================
 
 	// position of the block to move up
 	async moveBlockUpAtPosition( position: number ) {
