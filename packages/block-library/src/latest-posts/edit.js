@@ -32,7 +32,7 @@ import {
 import { withSelect } from '@wordpress/data';
 
 /**
- * Module Constants
+ *  Module Constants
  */
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
