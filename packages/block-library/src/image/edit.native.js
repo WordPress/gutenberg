@@ -234,56 +234,34 @@ class ImageEdit extends React.Component {
 						/>
 					</InspectorControls>
 					<MediaUploadUI
-						//height={ height }
-						//width={ width }
-						//coverUrl={ url }
+						height={ height }
+						width={ width }
+						coverUrl={ url }
 						mediaId={ id }
 						onUpdateMediaProgress={ this.updateMediaProgress }
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( isUploadInProgress ) => {
+						renderContent={ ( isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
 							return (
-								<ImageSize src={ url } >
-									{ ( sizes ) => {
-										const {
-											imageWidthWithinContainer,
-											imageHeightWithinContainer,
-										} = sizes;
-				
-										let finalHeight = imageHeightWithinContainer;
-										if ( height > 0 && height < imageHeightWithinContainer ) {
-											finalHeight = height;
-										}
-				
-										let finalWidth = imageWidthWithinContainer;
-										if ( width > 0 && width < imageWidthWithinContainer ) {
-											finalWidth = width;
-										}
-				
-										return (
-											<View style={ { flex: 1 } } >
-												{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
-													<Dashicon icon={ 'format-image' } size={ 300 } />
-												</View> }
-												<ImageBackground
-													style={ { width: finalWidth, height: finalHeight, opacity } }
-													resizeMethod="scale"
-													source={ { uri: url } }
-													key={ url }
-												>
-													{ this.state.isUploadFailed &&
-														<View style={ styles.imageContainer } >
-															<Dashicon icon={ 'image-rotate' } ariaPressed={ 'dashicon-active' } />
-															<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.\nPlease tap for options.' ) }</Text>
-														</View>
-													}
-												</ImageBackground>
+								<View style={ { flex: 1 } } >
+									{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
+										<Dashicon icon={ 'format-image' } size={ 300 } />
+									</View> }
+									<ImageBackground
+										style={ { width: finalWidth, height: finalHeight, opacity } }
+										resizeMethod="scale"
+										source={ { uri: url } }
+										key={ url }>
+										{ isUploadFailed &&
+											<View style={ styles.imageContainer } >
+												<Dashicon icon={ 'image-rotate' } ariaPressed={ 'dashicon-active' } />
+												<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.\nPlease tap for options.' ) }</Text>
 											</View>
-										);
-									} }
-								</ImageSize>
+										}
+									</ImageBackground>
+								</View>
 							);
 						}}
 					/>

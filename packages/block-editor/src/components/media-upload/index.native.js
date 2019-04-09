@@ -44,25 +44,25 @@ class MediaUpload extends React.Component {
 		const { mediaType } = this.props;
 
 		const onMediaLibraryButtonPressed = () => {
-			requestMediaPickFromMediaLibrary( [ mediaType ], ( mediaId, mediaUrl, thumbnailUrl) => {
+			requestMediaPickFromMediaLibrary( [ mediaType ], ( mediaId, mediaUrl) => {
 				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl, thumbnailUrl );
+					this.props.onSelectURL( mediaId, mediaUrl );
 				}
 			} );
 		};
 
 		const onMediaUploadButtonPressed = () => {
-			requestMediaPickFromDeviceLibrary( [ mediaType ], ( mediaId, mediaUrl, thumbnailUrl ) => {
+			requestMediaPickFromDeviceLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
 				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl, thumbnailUrl);
+					this.props.onSelectURL( mediaId, mediaUrl);
 				}
 			} );
 		};
 
 		const onMediaCaptureButtonPressed = () => {
-			requestMediaPickFromDeviceCamera( [ mediaType ], ( mediaId, mediaUrl, thumbnailUrl ) => {
+			requestMediaPickFromDeviceCamera( [ mediaType ], ( mediaId, mediaUrl ) => {
 				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl, thumbnailUrl);
+					this.props.onSelectURL( mediaId, mediaUrl);
 				}
 			} );
 		};

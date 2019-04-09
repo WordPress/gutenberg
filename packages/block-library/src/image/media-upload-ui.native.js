@@ -15,6 +15,11 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import ImageSize from './image-size';
+
 const MEDIA_UPLOAD_STATE_UPLOADING = 1;
 const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
 const MEDIA_UPLOAD_STATE_FAILED = 3;
@@ -67,22 +72,22 @@ class MediaUploadUI extends React.Component {
 
 	updateMediaProgress( payload ) {
 		this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
-		this.props.onUpdateMediaProgress( payload );
+		this.props.onUpdateMediaProgress && this.props.onUpdateMediaProgress( payload );
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
 		this.setState( { isUploadInProgress: false, mediaId: payload.mediaServerId } );
-		this.props.onFinishMediaUploadWithSuccess( payload );
+		this.props.onFinishMediaUploadWithSuccess && this.props.onFinishMediaUploadWithSuccess( payload );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
 		this.setState( { isUploadInProgress: false, isUploadFailed: true, mediaId: payload.mediaId } );
-		this.props.onFinishMediaUploadWithFailure( payload );
+		this.props.onFinishMediaUploadWithFailure && this.props.onFinishMediaUploadWithFailure( payload );
 	}
 
 	mediaUploadStateReset( payload ) {
 		this.setState( { isUploadInProgress: false, isUploadFailed: false, mediaId: null } );
-		this.props.onMediaUploadStateReset( payload );
+		this.props.onMediaUploadStateReset && this.props.onMediaUploadStateReset( payload );
 	}
 
 	addMediaUploadListener() {
@@ -102,13 +107,35 @@ class MediaUploadUI extends React.Component {
 	}
 
 	render() {
+		const { coverUrl, width, height } = this.props;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
 
 		return (
 			<View style={ { flex: 1 } }>
 				{ showSpinner && <Spinner progress={ progress } /> }
-				{ this.props.renderContent( this.state.isUploadInProgress ) }
+				{ coverUrl && 
+					 <ImageSize src={ coverUrl } >
+					{ ( sizes ) => {
+						const {
+							imageWidthWithinContainer,
+							imageHeightWithinContainer,
+						} = sizes;
+
+						let finalHeight = imageHeightWithinContainer;
+						if ( height > 0 && height < imageHeightWithinContainer ) {
+							finalHeight = height;
+						}
+
+						let finalWidth = imageWidthWithinContainer;
+						if ( width > 0 && width < imageWidthWithinContainer ) {
+							finalWidth = width;
+						}
+						return ( this.props.renderContent( this.state.isUploadInProgress, this.state.isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer ) );
+					} }
+				</ImageSize>
+				} 
+				{ ! coverUrl && this.props.renderContent( this.state.isUploadInProgress, this.state.isUploadFailed ) }
 			</View>
 		);
 	}
