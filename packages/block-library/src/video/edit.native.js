@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import { View, TextInput, TouchableWithoutFeedback } from 'react-native';
+import Video from 'react-native-video';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -41,10 +42,10 @@ class VideoEdit extends React.Component {
 
 		this.state = {
 			showSettings: false,
-			thumbnailUrl: props.poster,
+			thumbnailUrl: null,
 		};
 
-		this.mediaUploadStateReset = this.mediaUploadStateReset( this );
+		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
 		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
@@ -95,7 +96,7 @@ class VideoEdit extends React.Component {
 
 	finishMediaUploadWithSuccess( payload ) {
 		const { setAttributes } = this.props;
-		setAttributes( { src: payload.mediaUrl, id: payload.mediaServerId, poster: this.state.thumbnailUrl } );
+		setAttributes( { src: payload.mediaUrl, id: payload.mediaServerId } );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
@@ -105,24 +106,26 @@ class VideoEdit extends React.Component {
 
 	mediaUploadStateReset( payload ) {
 		const { setAttributes } = this.props;
-		setAttributes( { id: payload.mediaId, thumbnailUrl: null } );
+		setAttributes( { id: payload.mediaId, src: null } );
+		this.setState( { thumbnailUrl: null } );
 	}
 
 	updateImageURL( url ) {
 		this.props.setAttributes( { url, width: undefined, height: undefined } );
 	}
 
-	onSelectMediaUploadOption( mediaId, mediaUrl ) {
+	onSelectMediaUploadOption( mediaId, mediaUrl, thumbnailUrl ) {
 		const { setAttributes } = this.props;
-		setAttributes( { id: mediaId } );
-		this.setState( { thumbnailUrl: mediaUrl } );
+		setAttributes( { id: mediaId, src: mediaUrl } );
+		this.setState( { thumbnailUrl: thumbnailUrl } );
 	}
 
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { caption, height, width, id, poster } = attributes;
+		const { caption, height, width, id, poster, src } = attributes;
 		const { thumbnailUrl } = this.state;
-		const url = poster ? poster : thumbnailUrl;
+		//const url = src ? src : thumbnailUrl;
+		const activePoster = poster ? poster : thumbnailUrl;
 
 		const toolbarEditButton = (
 			<MediaUpload mediaType={ MEDIA_TYPE_VIDEO }
@@ -142,7 +145,7 @@ class VideoEdit extends React.Component {
 			</MediaUpload>
 		);
 
-		if ( ! url ) {
+		if ( ! activePoster && ! src ) {
 			return (
 				<View style={ { flex: 1 } } >
 					<MediaPlaceholder
@@ -167,14 +170,38 @@ class VideoEdit extends React.Component {
 						/>
 					</InspectorControls>
 					<MediaUploadUI
-						height={ height }
-						width={ width }
-						coverUrl={ url }
+						//height={ height }
+						//width={ width }
+						//coverUrl={ url }
 						mediaId={ id }
 						onUpdateMediaProgress={ this.updateMediaProgress }
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
-						onmediaUploadStateReset={ this.mediaUploadStateReset }
+						onMediaUploadStateReset={ this.mediaUploadStateReset }
+						renderContent={ ( isUploadInProgress ) => {
+							// Later on in your styles..
+							var videoStyle = {
+								backgroundVideo: {
+									height: 200,
+									width: 300,
+								},
+							};
+
+							return (
+								
+								<View style={ { flex: 1, justifyContent: 'center', alignItems: 'center' } }>
+									{ src && 
+										<Video
+											source={ { uri: src } }
+											poster={ activePoster }
+											style={ videoStyle.backgroundVideo }
+											controls={ true }
+										/>}
+							
+								</View>
+
+							);
+						}}
 					/>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 						<View style={ { padding: 12, flex: 1 } }>

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text } from 'react-native';
+import { View } from 'react-native';
 import {
 	subscribeMediaUpload,
 } from 'react-native-gutenberg-bridge';
@@ -12,15 +12,8 @@ import {
  */
 import {
 	Spinner,
-	Dashicon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import ImageSize from './image-size';
-import styles from './styles.scss';
 
 const MEDIA_UPLOAD_STATE_UPLOADING = 1;
 const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
@@ -109,54 +102,13 @@ class MediaUploadUI extends React.Component {
 	}
 
 	render() {
-		const { coverUrl, height, width } = this.props;
-
 		const showSpinner = this.state.isUploadInProgress;
-		const opacity = this.state.isUploadInProgress ? 0.3 : 1;
 		const progress = this.state.progress * 100;
 
 		return (
 			<View style={ { flex: 1 } }>
 				{ showSpinner && <Spinner progress={ progress } /> }
-				<ImageSize src={ coverUrl } >
-					{ ( sizes ) => {
-						const {
-							imageWidthWithinContainer,
-							imageHeightWithinContainer,
-						} = sizes;
-
-						let finalHeight = imageHeightWithinContainer;
-						if ( height > 0 && height < imageHeightWithinContainer ) {
-							finalHeight = height;
-						}
-
-						let finalWidth = imageWidthWithinContainer;
-						if ( width > 0 && width < imageWidthWithinContainer ) {
-							finalWidth = width;
-						}
-
-						return (
-							<View style={ { flex: 1 } } >
-								{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
-									<Dashicon icon={ 'format-image' } size={ 300 } />
-								</View> }
-								<ImageBackground
-									style={ { width: finalWidth, height: finalHeight, opacity } }
-									resizeMethod="scale"
-									source={ { uri: coverUrl } }
-									key={ coverUrl }
-								>
-									{ this.state.isUploadFailed &&
-										<View style={ styles.imageContainer } >
-											<Dashicon icon={ 'image-rotate' } ariaPressed={ 'dashicon-active' } />
-											<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.\nPlease tap for options.' ) }</Text>
-										</View>
-									}
-								</ImageBackground>
-							</View>
-						);
-					} }
-				</ImageSize>
+				{ this.props.renderContent( this.state.isUploadInProgress ) }
 			</View>
 		);
 	}
