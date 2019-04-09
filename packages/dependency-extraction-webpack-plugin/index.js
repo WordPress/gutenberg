@@ -34,7 +34,7 @@ class DependencyExtractionWebpackPlugin {
 		}
 
 		// Cascade to default if unhandled and enabled
-		if ( typeof externRootRequest === 'undefined' && this.options.useDefaults !== false ) {
+		if ( typeof externRootRequest === 'undefined' && this.options.useDefaults ) {
 			externRootRequest = defaultRequestToExternal( request );
 		}
 
