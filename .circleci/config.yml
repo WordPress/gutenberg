@@ -57,7 +57,7 @@ commands:
           command: yarn add --dev jest-junit
       - run:
           name: Create reports directory
-          command: mkdir reports && reports/test-results
+          command: mkdir reports && mkdir reports/test-results
 
 jobs:
   checks:
