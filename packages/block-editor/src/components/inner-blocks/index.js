@@ -12,7 +12,14 @@ import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { compose } from '@wordpress/compose';
+import { compose, ifCondition } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import withClientId from './utils/with-client-id';
+import ButtonAppender from './button-appender';
+import DefaultBlockAppender from './default-block-appender';
 
 /**
  * Internal dependencies
@@ -169,6 +176,30 @@ InnerBlocks = compose( [
 		};
 	} ),
 ] )( InnerBlocks );
+
+InnerBlocks.HideWhenChildren = compose( [
+	withClientId,
+	withSelect( ( select, { clientId } ) => {
+		const {
+			getBlock,
+		} = select( 'core/block-editor' );
+
+		const block = getBlock( clientId );
+
+		return {
+			hasChildBlocks: !! ( block && block.innerBlocks.length ),
+		};
+	} ),
+	ifCondition( ( { hasChildBlocks } ) => {
+		return ! hasChildBlocks;
+	} ),
+] )( function( props ) {
+	return props.children;
+} );
+
+// Expose default appender placeholders as components
+InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
+InnerBlocks.ButtonAppender = ButtonAppender;
 
 InnerBlocks.Content = withBlockContentContext(
 	( { BlockContent } ) => <BlockContent />
