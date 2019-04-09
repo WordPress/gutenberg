@@ -121,7 +121,7 @@ class DependencyExtractionWebpackPlugin {
  *
  * @param {string} request Requested module
  *
- * @return {(string|undefined)} Script dependency slug
+ * @return {(string|undefined)} Script global
  */
 function defaultRequestToExternal( request ) {
 	switch ( request ) {
