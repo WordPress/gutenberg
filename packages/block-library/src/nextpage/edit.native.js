@@ -14,20 +14,20 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './editor.scss';
 
-export default function NextPageEdit( { attributes } ) {
-	const { customText = __( 'Page break' ) } = attributes;
-	// Setting the font here to keep the CSS linter happy, it was demanding a syntax
-	// that React Native wasn't able to handle (adding a fallback generic font family).
-	const textStyle = {
-		...styles[ 'block-library-nextpage__text' ],
-		fontFamily: 'System',
-	};
+export default function NextPageEdit( { attributes, isSelected, onFocus } ) {
+	const { customText = __('Page break') } = attributes;
+	const accessibilityTitle = attributes.customText || '';
 
 	return (
-		<View style={ styles[ 'block-library-nextpage__container' ] }>
-			<Hr text={ customText }
-				textStyle={ textStyle }
-				lineStyle={ styles[ 'block-library-nextpage__line' ] } />
+		<View
+			accessible
+			accessibilityLabel={__('Page break block') + '. ' + accessibilityTitle}
+			accessibilityStates={isSelected && ['selected']}
+			onAccessibilityTap={onFocus}
+		>
+			<Hr text={customText}
+				textStyle={styles['block-library-nextpage__text']}
+				lineStyle={styles['block-library-nextpage__line']} />
 		</View>
 	);
 }
