@@ -188,6 +188,24 @@ _Returns_
 
 -   `boolean`: Whether or not the URL contains the query arg.
 
+<a name="isEmail" href="#isEmail">#</a> **isEmail**
+
+Determines whether the given string looks like an email.
+
+_Usage_
+
+```js
+const isEmail = isEmail( 'hello@wordpress.org' ); // true
+```
+
+_Parameters_
+
+-   _email_ `string`: The string to scrutinise.
+
+_Returns_
+
+-   `boolean`: Whether or not it looks like an email.
+
 <a name="isURL" href="#isURL">#</a> **isURL**
 
 Determines whether the given string looks like a URL.

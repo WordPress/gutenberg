@@ -20,6 +20,11 @@ import { replace, join, split, create, toHTMLString, LINE_SEPARATOR } from '@wor
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
+
+const { name, attributes: schema } = metadata;
+
+export { metadata, name };
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -42,30 +47,11 @@ const supports = {
 	className: false,
 };
 
-const schema = {
-	ordered: {
-		type: 'boolean',
-		default: false,
-	},
-	values: {
-		type: 'string',
-		source: 'html',
-		selector: 'ol,ul',
-		multiline: 'li',
-		default: '',
-	},
-};
-
-export const name = 'core/list';
-
 export const settings = {
 	title: __( 'List' ),
 	description: __( 'Create a bulleted or numbered list.' ),
 	icon,
-	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
-
-	attributes: schema,
 
 	supports,
 

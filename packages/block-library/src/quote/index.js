@@ -9,41 +9,23 @@ import { omit } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
-import { join, split, create, toHTMLString } from '@wordpress/rich-text';
+import { create, join, split, toHTMLString } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
 import icon from './icon';
-import { ATTRIBUTE_QUOTE, ATTRIBUTE_CITATION } from './contants';
+import metadata from './block.json';
 
-const blockAttributes = {
-	[ ATTRIBUTE_QUOTE ]: {
-		type: 'string',
-		source: 'html',
-		selector: 'blockquote',
-		multiline: 'p',
-		default: '',
-	},
-	[ ATTRIBUTE_CITATION ]: {
-		type: 'string',
-		source: 'html',
-		selector: 'cite',
-		default: '',
-	},
-	align: {
-		type: 'string',
-	},
-};
+const { name, attributes: blockAttributes } = metadata;
 
-export const name = 'core/quote';
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Quote' ),
 	description: __( 'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar' ),
 	icon,
-	category: 'common',
 	keywords: [ __( 'blockquote' ) ],
 
 	attributes: blockAttributes,

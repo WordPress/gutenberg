@@ -380,7 +380,7 @@ class ImageEdit extends Component {
 			linkTarget,
 		} = attributes;
 		const isExternal = isExternalImage( id, url );
-		const editImageIcon = ( <SVG width={ 24 } height={ 24 } viewBox="0 0 24 24"><Rect x={ 14 } y={ 3 } width={ 8 } height={ 6 } rx={ 1 } /><Rect x={ 2 } y={ 15 } width={ 8 } height={ 6 } rx={ 1 } /><Path d="M16,15h1.87c-.63,2.35-3.38,4-5.87,4v2c3.47,0,7.29-2.42,7.91-6H22l-3-3.5Z" /><Path d="M8,9H6.13C6.76,6.65,9.51,5,12,5V3C8.53,3,4.71,5.42,4.09,9H2l3,3.5Z" /></SVG> );
+		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		const controls = (
 			<BlockControls>
 				<BlockAlignmentToolbar

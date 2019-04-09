@@ -357,7 +357,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_style(
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
-		array(),
+		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
 		filemtime( gutenberg_dir_path() . 'build/edit-widgets/style.css' )
 	);
 	wp_style_add_data( 'wp-edit-widgets', 'rtl', 'replace' );
@@ -498,59 +498,6 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 		$deps,
 		null
 	);
-}
-
-/**
- * Assigns a default editor template with a default block by post format, if
- * not otherwise assigned for a new post of type "post".
- *
- * @deprecated 5.3.0
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered block editor settings.
- */
-function gutenberg_default_post_format_template( $settings ) {
-	_deprecated_function( __FUNCTION__, '5.3.0' );
-
-	return $settings;
-}
-
-/**
- * Retrieve a stored autosave that is newer than the post save.
- *
- * Deletes autosaves that are older than the post save.
- *
- * @deprecated 5.3.0
- *
- * @return WP_Post|boolean The post autosave. False if none found.
- */
-function gutenberg_get_autosave_newer_than_post_save() {
-	_deprecated_function( __FUNCTION__, '5.3.0' );
-
-	return false;
-}
-
-/**
- * Loads Gutenberg Locale Data.
- *
- * @deprecated 5.2.0
- */
-function gutenberg_load_locale_data() {
-	_deprecated_function( __FUNCTION__, '5.2.0' );
-}
-
-/**
- * Retrieve The available image sizes for a post
- *
- * @deprecated 5.3.0
- *
- * @return array
- */
-function gutenberg_get_available_image_sizes() {
-	_deprecated_function( __FUNCTION__, '5.3.0' );
-
-	return array();
 }
 
 /**

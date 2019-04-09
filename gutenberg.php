@@ -17,19 +17,6 @@ define( 'GUTENBERG_DEVELOPMENT_MODE', true );
 gutenberg_pre_init();
 
 /**
- * Project.
- *
- * The main entry point for the Gutenberg editor. Renders the editor on the
- * wp-admin page for the plugin.
- *
- * @since 0.1.0
- * @deprecated 5.3.0
- */
-function the_gutenberg_project() {
-	_deprecated_function( __FUNCTION__, '5.3.0' );
-}
-
-/**
  * Gutenberg's Menu.
  *
  * Adds a new wp-admin menu page for the Gutenberg editor.
@@ -82,22 +69,6 @@ function gutenberg_menu() {
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
- * Checks whether we're currently loading a Gutenberg page
- *
- * @since 3.1.0
- * @deprecated 5.3.0 WP_Screen::is_block_editor
- *
- * @return boolean Whether Gutenberg is being loaded.
- */
-function is_gutenberg_page() {
-	_deprecated_function( __FUNCTION__, '5.3.0', 'WP_Screen::is_block_editor' );
-
-	require_once ABSPATH . 'wp-admin/includes/screen.php';
-	$screen = get_current_screen();
-	return ! is_null( $screen ) && get_current_screen()->is_block_editor();
-}
-
-/**
  * Display a version notice and deactivate the Gutenberg plugin.
  *
  * @since 0.1.0
@@ -145,21 +116,4 @@ function gutenberg_pre_init() {
 	}
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
-}
-
-/**
- * Initialize Gutenberg.
- *
- * Load API functions, register scripts and actions, etc.
- *
- * @deprecated 5.3.0
- *
- * @return bool Whether Gutenberg was initialized.
- */
-function gutenberg_init() {
-	_deprecated_function( __FUNCTION__, '5.3.0' );
-
-	require_once ABSPATH . 'wp-admin/includes/screen.php';
-	$screen = get_current_screen();
-	return ! is_null( $screen ) && get_current_screen()->is_block_editor();
 }
