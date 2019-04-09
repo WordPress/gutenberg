@@ -171,7 +171,3 @@ div.block-core-columns.is-vertically-aligned-bottom {
 		pointer-events: all;
 	}
 }
-
-:not(.components-disabled) > .wp-block-columns > .editor-inner-blocks > .editor-block-list__layout > [data-type="core/column"] > .editor-block-list__block-edit > * {
-	//pointer-events: all;
-}
