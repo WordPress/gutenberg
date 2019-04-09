@@ -53,7 +53,7 @@ class ReusableBlockEditPanel extends Component {
 	}
 
 	render() {
-		const { isEditing, title, isSaving, onEdit, instanceId } = this.props;
+		const { isEditing, title, isSaving, isEditDisabled, onEdit, instanceId } = this.props;
 
 		return (
 			<Fragment>
@@ -66,6 +66,7 @@ class ReusableBlockEditPanel extends Component {
 							ref={ this.editButton }
 							isLarge
 							className="reusable-block-edit-panel__button"
+							disabled={ isEditDisabled }
 							onClick={ onEdit }
 						>
 							{ __( 'Edit' ) }

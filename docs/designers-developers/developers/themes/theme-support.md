@@ -5,7 +5,7 @@ The new Blocks include baseline support in all themes, enhancements to opt-in to
 There are a few new concepts to consider when building themes:
 
 - **Editor Color Palette** - A default set of colors is provided, but themes can register their own and optionally lock users into picking from the defined palette.
-- **Editor Text Size Palette** - A default set of sizes is provided, but themes and register their own and optionally lock users into picking from preselected sizes.
+- **Editor Text Size Palette** - A default set of sizes is provided, but themes can register their own and optionally lock users into picking from preselected sizes.
 - **Responsive Embeds** - Themes must opt-in to responsive embeds.
 - **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.
 - **Dark Mode** - If a Theme is a Dark Theme with a dark background containing light text, the theme author can opt-in to the Dark Mode.
@@ -266,7 +266,7 @@ To change the main column width of the editor, add the following CSS to `style-e
 
 You can use those editor widths to match those in your theme. You can use any CSS width unit, including `%` or `px`.
 
-Further reading: [Applying Styles with Stylesheets](https://wordpress.org/gutenberg/handbook/blocks/applying-styles-with-stylesheets/).
+Further reading: [Applying Styles with Stylesheets](/docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md).
 
 ## Default block styles
 

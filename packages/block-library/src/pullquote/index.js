@@ -12,46 +12,25 @@ import {
 	getColorClassName,
 	RichText,
 	getColorObjectByAttributeValues,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import {
 	select,
 } from '@wordpress/data';
-import { Path, Polygon, SVG } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
 import {
 	default as edit,
 	SOLID_COLOR_STYLE_NAME,
 	SOLID_COLOR_CLASS,
 } from './edit';
+import icon from './icon';
+import metadata from './block.json';
 
-const blockAttributes = {
-	value: {
-		type: 'string',
-		source: 'html',
-		selector: 'blockquote',
-		multiline: 'p',
-	},
-	citation: {
-		type: 'string',
-		source: 'html',
-		selector: 'cite',
-		default: '',
-	},
-	mainColor: {
-		type: 'string',
-	},
-	customMainColor: {
-		type: 'string',
-	},
-	textColor: {
-		type: 'string',
-	},
-	customTextColor: {
-		type: 'string',
-	},
-};
+const { name, attributes: blockAttributes } = metadata;
 
-export const name = 'core/pullquote';
+export { metadata, name };
 
 export const settings = {
 
@@ -59,14 +38,10 @@ export const settings = {
 
 	description: __( 'Give special visual emphasis to a quote from your text.' ),
 
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M0,0h24v24H0V0z" fill="none" /><Polygon points="21 18 2 18 2 20 21 20" /><Path d="m19 10v4h-15v-4h15m1-2h-17c-0.55 0-1 0.45-1 1v6c0 0.55 0.45 1 1 1h17c0.55 0 1-0.45 1-1v-6c0-0.55-0.45-1-1-1z" /><Polygon points="21 4 2 4 2 6 21 6" /></SVG>,
-
-	category: 'formatting',
-
-	attributes: blockAttributes,
+	icon,
 
 	styles: [
-		{ name: 'default', label: _x( 'Regular', 'block style' ), isDefault: true },
+		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ) },
 	],
 
@@ -97,7 +72,7 @@ export const settings = {
 		// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
 		// as there is no expectation that themes create classes that set border colors.
 		} else if ( mainColor ) {
-			const colors = get( select( 'core/editor' ).getEditorSettings(), [ 'colors' ], [] );
+			const colors = get( select( 'core/block-editor' ).getSettings(), [ 'colors' ], [] );
 			const colorObject = getColorObjectByAttributeValues( colors, mainColor );
 			figureStyles = {
 				borderColor: colorObject.color,

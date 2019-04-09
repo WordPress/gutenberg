@@ -70,7 +70,7 @@ function getRootManifest( tocFileName ) {
 
 function generateRootManifestFromTOCItems( items, parent = null ) {
 	let pageItems = [];
-	items.map( ( obj ) => {
+	items.forEach( ( obj ) => {
 		const fileName = Object.keys( obj )[ 0 ];
 		const children = obj[ fileName ];
 
@@ -91,10 +91,10 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 		}
 
 		pageItems.push( {
-			title: title,
-			slug: slug,
+			title,
+			slug,
 			markdown_source: `${ baseRepoUrl }\/${ fileName }`,
-			parent: parent,
+			parent,
 		} );
 		if ( Array.isArray( children ) && children.length ) {
 			pageItems = pageItems.concat( generateRootManifestFromTOCItems( children, slug ) );

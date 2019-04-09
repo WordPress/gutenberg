@@ -14,7 +14,7 @@ import { get } from 'lodash';
 const createResolversCacheMiddleware = ( registry, reducerKey ) => () => ( next ) => ( action ) => {
 	const resolvers = registry.select( 'core/data' ).getCachedResolvers( reducerKey );
 	Object.entries( resolvers ).forEach( ( [ selectorName, resolversByArgs ] ) => {
-		const resolver = get( registry.namespaces, [ reducerKey, 'resolvers', selectorName ] );
+		const resolver = get( registry.stores, [ reducerKey, 'resolvers', selectorName ] );
 		if ( ! resolver || ! resolver.shouldInvalidate ) {
 			return;
 		}
@@ -30,7 +30,7 @@ const createResolversCacheMiddleware = ( registry, reducerKey ) => () => ( next 
 			registry.dispatch( 'core/data' ).invalidateResolution( reducerKey, selectorName, args );
 		} );
 	} );
-	next( action );
+	return next( action );
 };
 
 export default createResolversCacheMiddleware;

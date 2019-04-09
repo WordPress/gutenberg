@@ -18,7 +18,7 @@ const PluginBlockSettingsMenuGroupSlot = ( { fillProps, selectedBlocks } ) => {
 		<Slot fillProps={ { ...fillProps, selectedBlocks } } >
 			{ ( fills ) => ! isEmpty( fills ) && (
 				<Fragment>
-					<div className="editor-block-settings-menu__separator" />
+					<div className="editor-block-settings-menu__separator block-editor-block-settings-menu__separator" />
 					{ fills }
 				</Fragment>
 			) }
@@ -27,7 +27,7 @@ const PluginBlockSettingsMenuGroupSlot = ( { fillProps, selectedBlocks } ) => {
 };
 
 PluginBlockSettingsMenuGroup.Slot = withSelect( ( select, { fillProps: { clientIds } } ) => ( {
-	selectedBlocks: select( 'core/editor' ).getBlocksByClientId( clientIds ),
+	selectedBlocks: select( 'core/block-editor' ).getBlocksByClientId( clientIds ),
 } ) )( PluginBlockSettingsMenuGroupSlot );
 
 export default PluginBlockSettingsMenuGroup;

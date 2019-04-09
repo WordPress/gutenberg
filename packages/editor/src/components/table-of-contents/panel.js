@@ -11,7 +11,7 @@ import { withSelect } from '@wordpress/data';
 import WordCount from '../word-count';
 import DocumentOutline from '../document-outline';
 
-function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks } ) {
+function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, hasOutlineItemsDisabled, onRequestClose } ) {
 	return (
 		<Fragment>
 			<div
@@ -49,7 +49,7 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks } 
 					<span className="table-of-contents__title">
 						{ __( 'Document Outline' ) }
 					</span>
-					<DocumentOutline />
+					<DocumentOutline onSelect={ onRequestClose } hasOutlineItemsDisabled={ hasOutlineItemsDisabled } />
 				</Fragment>
 			) }
 		</Fragment>
@@ -57,7 +57,7 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks } 
 }
 
 export default withSelect( ( select ) => {
-	const { getGlobalBlockCount } = select( 'core/editor' );
+	const { getGlobalBlockCount } = select( 'core/block-editor' );
 	return {
 		headingCount: getGlobalBlockCount( 'core/heading' ),
 		paragraphCount: getGlobalBlockCount( 'core/paragraph' ),

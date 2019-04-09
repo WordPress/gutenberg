@@ -45,26 +45,22 @@ const effects = {
 
 		let wasSavingPost = select( 'core/editor' ).isSavingPost();
 		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-		let wasPreviewingPost = select( 'core/editor' ).isPreviewingPost();
 		// Save metaboxes when performing a full save on the post.
 		subscribe( () => {
 			const isSavingPost = select( 'core/editor' ).isSavingPost();
 			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-			const isPreviewingPost = select( 'core/editor' ).isPreviewingPost();
 			const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
 
 			// Save metaboxes on save completion, except for autosaves that are not a post preview.
 			const shouldTriggerMetaboxesSave = (
 				hasActiveMetaBoxes && (
-					( wasSavingPost && ! isSavingPost && ! wasAutosavingPost ) ||
-					( wasAutosavingPost && wasPreviewingPost && ! isPreviewingPost )
+					( wasSavingPost && ! isSavingPost && ! wasAutosavingPost )
 				)
 			);
 
 			// Save current state for next inspection.
 			wasSavingPost = isSavingPost;
 			wasAutosavingPost = isAutosavingPost;
-			wasPreviewingPost = isPreviewingPost;
 
 			if ( shouldTriggerMetaboxesSave ) {
 				store.dispatch( requestMetaBoxUpdates() );
@@ -119,7 +115,7 @@ const effects = {
 	SWITCH_MODE( action ) {
 		// Unselect blocks when we switch to the code editor.
 		if ( action.mode !== 'visual' ) {
-			dispatch( 'core/editor' ).clearSelectedBlock();
+			dispatch( 'core/block-editor' ).clearSelectedBlock();
 		}
 
 		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
@@ -128,7 +124,7 @@ const effects = {
 	INIT( _, store ) {
 		// Select the block settings tab when the selected block changes
 		subscribe( onChangeListener(
-			() => !! select( 'core/editor' ).getBlockSelectionStart(),
+			() => !! select( 'core/block-editor' ).getBlockSelectionStart(),
 			( hasBlockSelection ) => {
 				if ( ! select( 'core/edit-post' ).isEditorSidebarOpened() ) {
 					return;

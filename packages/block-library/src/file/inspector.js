@@ -8,11 +8,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
-import { InspectorControls } from '@wordpress/editor';
-
-function getDownloadButtonHelp( checked ) {
-	return checked ? __( 'The download button is visible.' ) : __( 'The download button is hidden.' );
-}
+import { InspectorControls } from '@wordpress/block-editor';
 
 export default function FileBlockInspector( {
 	hrefs,
@@ -51,7 +47,6 @@ export default function FileBlockInspector( {
 				<PanelBody title={ __( 'Download Button Settings' ) }>
 					<ToggleControl
 						label={ __( 'Show Download Button' ) }
-						help={ getDownloadButtonHelp }
 						checked={ showDownloadButton }
 						onChange={ changeShowDownloadButton }
 					/>

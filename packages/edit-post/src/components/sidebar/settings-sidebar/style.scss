@@ -1,12 +1,13 @@
 .edit-post-settings-sidebar__panel-block .components-panel__body {
 	border: none;
 	border-top: $border-width solid $light-gray-500;
-	margin: 0 -16px;
+	margin: 0 #{ -$grid-size-large };
 
 	.components-base-control {
-		margin: 0 0 1.5em 0;
+		margin-bottom: #{ $grid-size * 3 };
+
 		&:last-child {
-			margin-bottom: 0.5em;
+			margin-bottom: $grid-size;
 		}
 	}
 
@@ -15,10 +16,10 @@
 	}
 
 	&:first-child {
-		margin-top: 16px;
+		margin-top: $grid-size-large;
 	}
 
 	&:last-child {
-		margin-bottom: -16px;
+		margin-bottom: -$grid-size-large;
 	}
 }

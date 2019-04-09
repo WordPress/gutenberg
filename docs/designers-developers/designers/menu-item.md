@@ -16,7 +16,7 @@
 
 ### Usage
 
-A `MenuGroup` contiaining `MenuItem`s can be used within a `Dropdown`. A `MenuGroup` can also have other `MenuGroup`s within it so menus can be nested.
+A `MenuGroup` containing `MenuItem`s can be used within a `Dropdown`. A `MenuGroup` can also have other `MenuGroup`s within it so menus can be nested.
 
 ## Development guidelines
 

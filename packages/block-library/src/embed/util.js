@@ -46,13 +46,14 @@ export const findBlock = ( url ) => {
 };
 
 export const isFromWordPress = ( html ) => {
-	return includes( html, 'class="wp-embedded-content" data-secret' );
+	return includes( html, 'class="wp-embedded-content"' );
 };
 
 export const getPhotoHtml = ( photo ) => {
 	// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
-	// acually the full size photo.
-	const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
+	// actually the full size photo. If thumbnails not found, use full image.
+	const imageUrl = ( photo.thumbnail_url ) ? photo.thumbnail_url : photo.url;
+	const photoPreview = <p><img src={ imageUrl } alt={ photo.title } width="100%" /></p>;
 	return renderToString( photoPreview );
 };
 

@@ -1,17 +1,17 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import classnames from 'classnames';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 
 class GalleryImage extends Component {
@@ -109,8 +109,9 @@ class GalleryImage extends Component {
 					alt={ alt }
 					data-id={ id }
 					onClick={ this.onImageClick }
-					tabIndex="0"
+					onFocus={ this.onImageClick }
 					onKeyDown={ this.onImageClick }
+					tabIndex="0"
 					aria-label={ ariaLabel }
 				/>
 				{ isBlobURL( url ) && <Spinner /> }

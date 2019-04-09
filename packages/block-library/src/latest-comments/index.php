@@ -117,6 +117,9 @@ function render_block_core_latest_comments( $attributes = array() ) {
 	}
 
 	$class = 'wp-block-latest-comments';
+	if ( ! empty( $attributes['className'] ) ) {
+		$class .= ' ' . $attributes['className'];
+	}
 	if ( isset( $attributes['align'] ) ) {
 		$class .= " align{$attributes['align']}";
 	}
@@ -147,36 +150,49 @@ function render_block_core_latest_comments( $attributes = array() ) {
 	return $block_content;
 }
 
-register_block_type(
-	'core/latest-comments',
-	array(
-		'attributes'      => array(
-			'className'      => array(
-				'type' => 'string',
+/**
+ * Registers the `core/latest-comments` block.
+ */
+function register_block_core_latest_comments() {
+	register_block_type(
+		'core/latest-comments',
+		array(
+			'attributes'      => array(
+				'align'          => array(
+					'type' => 'string',
+					'enum' => array(
+						'left',
+						'center',
+						'right',
+						'wide',
+						'full',
+					),
+				),
+				'className'      => array(
+					'type' => 'string',
+				),
+				'commentsToShow' => array(
+					'type'    => 'number',
+					'default' => 5,
+					'minimum' => 1,
+					'maximum' => 100,
+				),
+				'displayAvatar'  => array(
+					'type'    => 'boolean',
+					'default' => true,
+				),
+				'displayDate'    => array(
+					'type'    => 'boolean',
+					'default' => true,
+				),
+				'displayExcerpt' => array(
+					'type'    => 'boolean',
+					'default' => true,
+				),
 			),
-			'commentsToShow' => array(
-				'type'    => 'number',
-				'default' => 5,
-				'minimum' => 1,
-				'maximum' => 100,
-			),
-			'displayAvatar'  => array(
-				'type'    => 'boolean',
-				'default' => true,
-			),
-			'displayDate'    => array(
-				'type'    => 'boolean',
-				'default' => true,
-			),
-			'displayExcerpt' => array(
-				'type'    => 'boolean',
-				'default' => true,
-			),
-			'align'          => array(
-				'type' => 'string',
-				'enum' => array( 'center', 'left', 'right', 'wide', 'full', '' ),
-			),
-		),
-		'render_callback' => 'render_block_core_latest_comments',
-	)
-);
+			'render_callback' => 'render_block_core_latest_comments',
+		)
+	);
+}
+
+add_action( 'init', 'register_block_core_latest_comments' );

@@ -8,68 +8,20 @@ import { filter, every, map, some } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { RichText, mediaUpload } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
+import { mediaUpload } from '@wordpress/editor';
 import { createBlobURL } from '@wordpress/blob';
-import { G, Path, SVG } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { default as edit, defaultColumnsNumber, pickRelevantMediaFiles } from './edit';
+import icon from './icon';
+import metadata from './block.json';
 
-const blockAttributes = {
-	images: {
-		type: 'array',
-		default: [],
-		source: 'query',
-		selector: 'ul.wp-block-gallery .blocks-gallery-item',
-		query: {
-			url: {
-				source: 'attribute',
-				selector: 'img',
-				attribute: 'src',
-			},
-			link: {
-				source: 'attribute',
-				selector: 'img',
-				attribute: 'data-link',
-			},
-			alt: {
-				source: 'attribute',
-				selector: 'img',
-				attribute: 'alt',
-				default: '',
-			},
-			id: {
-				source: 'attribute',
-				selector: 'img',
-				attribute: 'data-id',
-			},
-			caption: {
-				type: 'string',
-				source: 'html',
-				selector: 'figcaption',
-			},
-		},
-	},
-	ids: {
-		type: 'array',
-		default: [],
-	},
-	columns: {
-		type: 'number',
-	},
-	imageCrop: {
-		type: 'boolean',
-		default: true,
-	},
-	linkTo: {
-		type: 'string',
-		default: 'none',
-	},
-};
+const { name, attributes: blockAttributes } = metadata;
 
-export const name = 'core/gallery';
+export { metadata, name };
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -84,10 +36,8 @@ const parseShortcodeIds = ( ids ) => {
 export const settings = {
 	title: __( 'Gallery' ),
 	description: __( 'Display multiple images in a rich gallery.' ),
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M20 4v12H8V4h12m0-2H8L6 4v12l2 2h12l2-2V4l-2-2z" /><Path d="M12 12l1 2 3-3 3 4H9z" /><Path d="M2 6v14l2 2h14v-2H4V6H2z" /></G></SVG>,
-	category: 'common',
+	icon,
 	keywords: [ __( 'images' ), __( 'photos' ) ],
-	attributes: blockAttributes,
 	supports: {
 		align: true,
 	},

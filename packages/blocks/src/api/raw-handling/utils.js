@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-import { mergeWith, includes, noop } from 'lodash';
+import { mapValues, mergeWith, includes, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { unwrap, insertAfter, remove } from '@wordpress/dom';
-import { hasBlockSupport } from '..';
 
 /**
  * Internal dependencies
  */
+import { hasBlockSupport } from '..';
 import { isPhrasingContent } from './phrasing-content';
 
 /**
@@ -28,23 +28,25 @@ const { ELEMENT_NODE, TEXT_NODE } = window.Node;
  */
 export function getBlockContentSchema( transforms ) {
 	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
-		// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
-		if ( hasBlockSupport( blockName, 'anchor' ) ) {
-			for ( const tag in schema ) {
-				if ( ! schema[ tag ].attributes ) {
-					schema[ tag ].attributes = [];
-				}
-				schema[ tag ].attributes.push( 'id' );
-			}
+		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
+		// If the block does not has anchor support and the transform does not
+		// provides an isMatch we can return the schema right away.
+		if ( ! hasAnchorSupport && ! isMatch ) {
+			return schema;
 		}
 
-		// If an isMatch function exists add it to each schema tag that it applies to.
-		if ( isMatch ) {
-			for ( const tag in schema ) {
-				schema[ tag ].isMatch = isMatch;
+		return mapValues( schema, ( value ) => {
+			let attributes = value.attributes || [];
+			// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
+			if ( hasAnchorSupport ) {
+				attributes = [ ...attributes, 'id' ];
 			}
-		}
-		return schema;
+			return {
+				...value,
+				attributes,
+				isMatch: isMatch ? isMatch : undefined,
+			};
+		} );
 	} );
 
 	return mergeWith( {}, ...schemas, ( objValue, srcValue, key ) => {
@@ -183,11 +185,17 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
 		) {
 			if ( node.nodeType === ELEMENT_NODE ) {
-				const { attributes = [], classes = [], children, require = [] } = schema[ tag ];
+				const {
+					attributes = [],
+					classes = [],
+					children,
+					require = [],
+					allowEmpty,
+				} = schema[ tag ];
 
 				// If the node is empty and it's supposed to have children,
 				// remove the node.
-				if ( isEmpty( node ) && children ) {
+				if ( children && ! allowEmpty && isEmpty( node ) ) {
 					remove( node );
 					return;
 				}
@@ -201,7 +209,9 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 					} );
 
 					// Strip invalid classes.
-					if ( node.classList.length ) {
+					// In jsdom-jscore, 'node.classList' can be undefined.
+					// TODO: Explore patching this in jsdom-jscore.
+					if ( node.classList && node.classList.length ) {
 						const mattchers = classes.map( ( item ) => {
 							if ( typeof item === 'string' ) {
 								return ( className ) => className === item;
@@ -237,9 +247,21 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 						if ( require.length && ! node.querySelector( require.join( ',' ) ) ) {
 							cleanNodeList( node.childNodes, doc, schema, inline );
 							unwrap( node );
-						}
+						// If the node is at the top, phrasing content, and
+						// contains children that are block content, unwrap
+						// the node because it is invalid.
+						} else if (
+							node.parentNode.nodeName === 'BODY' &&
+							isPhrasingContent( node )
+						) {
+							cleanNodeList( node.childNodes, doc, schema, inline );
 
-						cleanNodeList( node.childNodes, doc, children, inline );
+							if ( Array.from( node.childNodes ).some( ( child ) => ! isPhrasingContent( child ) ) ) {
+								unwrap( node );
+							}
+						} else {
+							cleanNodeList( node.childNodes, doc, children, inline );
+						}
 					// Remove children if the node is not supposed to have any.
 					} else {
 						while ( node.firstChild ) {

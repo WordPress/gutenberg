@@ -1,3 +1,9 @@
+## 2.1.0 (2019-03-06)
+
+### Bug Fix
+
+- `autop` correctly matches whitespace preceding and following block-level elements.
+
 ## 2.0.0 (2018-09-05)
 
 ### Breaking Change

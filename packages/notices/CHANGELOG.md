@@ -1,10 +1,11 @@
+## 1.1.2 (2019-01-03)
+
 ## 1.1.1 (2018-12-12)
 
 ## 1.1.0 (2018-11-20)
 
 ### New Feature
 
-- The `createNotice` can now optionally accept a WPNotice object as the sole argument.
 - New option `speak` enables control as to whether the notice content is announced to screen readers (defaults to `true`)
 
 ### Bug Fixes

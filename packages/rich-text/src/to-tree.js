@@ -2,24 +2,50 @@
  * Internal dependencies
  */
 
+import { getActiveFormats } from './get-active-formats';
 import { getFormatType } from './get-format-type';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
-	ZERO_WIDTH_NO_BREAK_SPACE,
 } from './special-characters';
 
-function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
+/**
+ * Converts a format object to information that can be used to create an element
+ * from (type, attributes and object).
+ *
+ * @param  {Object}  $1                        Named parameters.
+ * @param  {string}  $1.type                   The format type.
+ * @param  {Object}  $1.attributes             The format attributes.
+ * @param  {Object}  $1.unregisteredAttributes The unregistered format
+ *                                             attributes.
+ * @param  {boolean} $1.object                 Wether or not it is an object
+ *                                             format.
+ * @param  {boolean} $1.boundaryClass          Wether or not to apply a boundary
+ *                                             class.
+ * @return {Object}                            Information to be used for
+ *                                             element creation.
+ */
+function fromFormat( { type, attributes, unregisteredAttributes, object, boundaryClass } ) {
 	const formatType = getFormatType( type );
 
-	if ( ! formatType ) {
-		return { type, attributes, object };
+	let elementAttributes = {};
+
+	if ( boundaryClass ) {
+		elementAttributes[ 'data-rich-text-format-boundary' ] = 'true';
 	}
 
-	const elementAttributes = { ...unregisteredAttributes };
+	if ( ! formatType ) {
+		if ( attributes ) {
+			elementAttributes = { ...attributes, ...elementAttributes };
+		}
+
+		return { type, attributes: elementAttributes, object };
+	}
+
+	elementAttributes = { ...unregisteredAttributes, ...elementAttributes };
 
 	for ( const name in attributes ) {
-		const key = formatType.attributes[ name ];
+		const key = formatType.attributes ? formatType.attributes[ name ] : false;
 
 		if ( key ) {
 			elementAttributes[ key ] = attributes[ name ];
@@ -43,10 +69,17 @@ function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
 	};
 }
 
+const padding = {
+	type: 'br',
+	attributes: {
+		'data-rich-text-padding': 'true',
+	},
+	object: true,
+};
+
 export function toTree( {
 	value,
 	multilineTag,
-	multilineWrapperTags = [],
 	createEmpty,
 	append,
 	getLastChild,
@@ -59,10 +92,12 @@ export function toTree( {
 	onEndIndex,
 	isEditableTree,
 } ) {
-	const { formats, text, start, end, formatPlaceholder } = value;
+	const { formats, replacements, text, start, end } = value;
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
 	const multilineFormat = { type: multilineTag };
+	const activeFormats = getActiveFormats( value );
+	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
 
 	let lastSeparatorFormats;
 	let lastCharacterFormats;
@@ -76,35 +111,24 @@ export function toTree( {
 		append( tree, '' );
 	}
 
-	function setFormatPlaceholder( pointer, index ) {
-		if ( isEditableTree && formatPlaceholder && formatPlaceholder.index === index ) {
-			const parent = getParent( pointer );
-
-			if ( formatPlaceholder.format === undefined ) {
-				pointer = getParent( parent );
-			} else {
-				pointer = append( parent, fromFormat( formatPlaceholder.format ) );
-			}
-
-			pointer = append( pointer, ZERO_WIDTH_NO_BREAK_SPACE );
-		}
-
-		return pointer;
-	}
-
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
+		const shouldInsertPadding = isEditableTree && (
+			// Pad the line if the line is empty.
+			! lastCharacter ||
+			lastCharacter === LINE_SEPARATOR ||
+			// Pad the line if the previous character is a line break, otherwise
+			// the line break won't be visible.
+			lastCharacter === '\n'
+		);
+
 		let characterFormats = formats[ i ];
 
 		// Set multiline tags in queue for building the tree.
 		if ( multilineTag ) {
 			if ( character === LINE_SEPARATOR ) {
-				characterFormats = lastSeparatorFormats = ( characterFormats || [] ).reduce( ( accumulator, format ) => {
-					if ( character === LINE_SEPARATOR && multilineWrapperTags.indexOf( format.type ) !== -1 ) {
-						accumulator.push( format );
-						accumulator.push( multilineFormat );
-					}
-
+				characterFormats = lastSeparatorFormats = ( replacements[ i ] || [] ).reduce( ( accumulator, format ) => {
+					accumulator.push( format, multilineFormat );
 					return accumulator;
 				}, [ multilineFormat ] );
 			} else {
@@ -113,6 +137,17 @@ export function toTree( {
 		}
 
 		let pointer = getLastChild( tree );
+
+		if ( shouldInsertPadding && character === LINE_SEPARATOR ) {
+			let node = pointer;
+
+			while ( ! isText( node ) ) {
+				node = getLastChild( node );
+			}
+
+			append( getParent( node ), padding );
+			append( getParent( node ), '' );
+		}
 
 		// Set selection for the start of line.
 		if ( lastCharacter === LINE_SEPARATOR ) {
@@ -146,14 +181,27 @@ export function toTree( {
 					return;
 				}
 
+				const { type, attributes, unregisteredAttributes } = format;
+
+				const boundaryClass = (
+					isEditableTree &&
+					character !== LINE_SEPARATOR &&
+					format === deepestActiveFormat
+				);
+
 				const parent = getParent( pointer );
-				const newNode = append( parent, fromFormat( format ) );
+				const newNode = append( parent, fromFormat( {
+					type,
+					attributes,
+					unregisteredAttributes,
+					boundaryClass,
+				} ) );
 
 				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
 					remove( pointer );
 				}
 
-				pointer = append( format.object ? parent : newNode, '' );
+				pointer = append( newNode, '' );
 			} );
 		}
 
@@ -163,8 +211,6 @@ export function toTree( {
 			lastCharacter = character;
 			continue;
 		}
-
-		pointer = setFormatPlaceholder( pointer, 0 );
 
 		// If there is selection at 0, handle it before characters are inserted.
 		if ( i === 0 ) {
@@ -177,19 +223,28 @@ export function toTree( {
 			}
 		}
 
-		if ( character !== OBJECT_REPLACEMENT_CHARACTER ) {
-			if ( character === '\n' ) {
-				pointer = append( getParent( pointer ), { type: 'br', object: true } );
-				// Ensure pointer is text node.
-				pointer = append( getParent( pointer ), '' );
-			} else if ( ! isText( pointer ) ) {
-				pointer = append( getParent( pointer ), character );
-			} else {
-				appendText( pointer, character );
-			}
+		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
+			pointer = append( getParent( pointer ), fromFormat( {
+				...replacements[ i ],
+				object: true,
+			} ) );
+			// Ensure pointer is text node.
+			pointer = append( getParent( pointer ), '' );
+		} else if ( character === '\n' ) {
+			pointer = append( getParent( pointer ), {
+				type: 'br',
+				attributes: isEditableTree ? {
+					'data-rich-text-line-break': 'true',
+				} : undefined,
+				object: true,
+			} );
+			// Ensure pointer is text node.
+			pointer = append( getParent( pointer ), '' );
+		} else if ( ! isText( pointer ) ) {
+			pointer = append( getParent( pointer ), character );
+		} else {
+			appendText( pointer, character );
 		}
-
-		pointer = setFormatPlaceholder( pointer, i + 1 );
 
 		if ( onStartIndex && start === i + 1 ) {
 			onStartIndex( tree, pointer );
@@ -197,6 +252,10 @@ export function toTree( {
 
 		if ( onEndIndex && end === i + 1 ) {
 			onEndIndex( tree, pointer );
+		}
+
+		if ( shouldInsertPadding && i === text.length ) {
+			append( getParent( pointer ), padding );
 		}
 
 		lastCharacterFormats = characterFormats;

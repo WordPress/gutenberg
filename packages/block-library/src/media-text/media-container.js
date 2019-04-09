@@ -1,19 +1,34 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
 import { IconButton, ResizableBox, Toolbar } from '@wordpress/components';
 import {
 	BlockControls,
+	BlockIcon,
 	MediaPlaceholder,
 	MediaUpload,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
+import { Component, Fragment } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import icon from './media-container-icon';
 
 /**
  * Constants
  */
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+
+export function imageFillStyles( url, focalPoint ) {
+	return url ?
+		{
+			backgroundImage: `url(${ url })`,
+			backgroundPosition: focalPoint ? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%` : `50% 50%`,
+		} :
+		{};
+}
 
 class MediaContainer extends Component {
 	renderToolbarEditButton() {
@@ -40,11 +55,12 @@ class MediaContainer extends Component {
 	}
 
 	renderImage() {
-		const { mediaAlt, mediaUrl, className } = this.props;
+		const { mediaAlt, mediaUrl, className, imageFill, focalPoint } = this.props;
+		const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
 		return (
 			<Fragment>
 				{ this.renderToolbarEditButton() }
-				<figure className={ className }>
+				<figure className={ className } style={ backgroundStyles }>
 					<img src={ mediaUrl } alt={ mediaAlt } />
 				</figure>
 			</Fragment>
@@ -67,7 +83,7 @@ class MediaContainer extends Component {
 		const { onSelectMedia, className } = this.props;
 		return (
 			<MediaPlaceholder
-				icon="format-image"
+				icon={ <BlockIcon icon={ icon } /> }
 				labels={ {
 					title: __( 'Media area' ),
 				} }

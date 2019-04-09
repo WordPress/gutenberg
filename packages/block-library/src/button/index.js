@@ -7,51 +7,22 @@ import { omit, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { G, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import {
 	RichText,
 	getColorClassName,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
+import icon from './icon';
+import metadata from './block.json';
 
-const blockAttributes = {
-	url: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'href',
-	},
-	title: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'title',
-	},
-	text: {
-		type: 'string',
-		source: 'html',
-		selector: 'a',
-	},
-	backgroundColor: {
-		type: 'string',
-	},
-	textColor: {
-		type: 'string',
-	},
-	customBackgroundColor: {
-		type: 'string',
-	},
-	customTextColor: {
-		type: 'string',
-	},
-};
+const { name, attributes: blockAttributes } = metadata;
 
-export const name = 'core/button';
+export { metadata, name };
 
 const colorsMigration = ( attributes ) => {
 	return omit( {
@@ -64,13 +35,11 @@ const colorsMigration = ( attributes ) => {
 export const settings = {
 	title: __( 'Button' ),
 
-	description: __( 'Prompt visitors to take action with a custom button.' ),
+	description: __( 'Prompt visitors to take action with a button-style link.' ),
 
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M19 6H5L3 8v8l2 2h14l2-2V8l-2-2zm0 10H5V8h14v8z" /></G></SVG>,
+	icon,
 
-	category: 'layout',
-
-	attributes: blockAttributes,
+	keywords: [ __( 'link' ) ],
 
 	supports: {
 		align: true,
@@ -78,7 +47,7 @@ export const settings = {
 	},
 
 	styles: [
-		{ name: 'default', label: _x( 'Rounded', 'block style' ), isDefault: true },
+		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: 'outline', label: __( 'Outline' ) },
 		{ name: 'squared', label: _x( 'Squared', 'block style' ) },
 	],

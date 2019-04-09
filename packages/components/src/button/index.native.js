@@ -37,16 +37,16 @@ const styles = StyleSheet.create( {
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
-		marginLeft: marginLeft,
-		marginBottom: marginBottom,
+		marginLeft,
+		marginBottom,
 	},
 	subscriptActive: {
 		color: 'white',
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
-		marginLeft: marginLeft,
-		marginBottom: marginBottom,
+		marginLeft,
+		marginBottom,
 	},
 } );
 
@@ -55,6 +55,7 @@ export default function Button( props ) {
 		children,
 		onClick,
 		disabled,
+		hint,
 		'aria-disabled': ariaDisabled,
 		'aria-label': ariaLabel,
 		'aria-pressed': ariaPressed,
@@ -67,11 +68,23 @@ export default function Button( props ) {
 		...( ariaPressed ? styles.buttonActive : styles.buttonInactive ),
 	};
 
+	const states = [];
+	if ( ariaPressed ) {
+		states.push( 'selected' );
+	}
+
+	if ( isDisabled ) {
+		states.push( 'disabled' );
+	}
+
 	return (
 		<TouchableOpacity
 			activeOpacity={ 0.7 }
 			accessible={ true }
 			accessibilityLabel={ ariaLabel }
+			accessibilityStates={ states }
+			accessibilityRole={ 'button' }
+			accessibilityHint={ hint }
 			onPress={ onClick }
 			style={ styles.container }
 			disabled={ isDisabled }

@@ -12,16 +12,18 @@ import {
 	getPhrasingContentSchema,
 	getBlockAttributes,
 } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
-import {
-	Path,
-	SVG,
-} from '@wordpress/components';
+import { RichText } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
+import icon from './icon';
+import metadata from './block.json';
+
+const { name, attributes: schema } = metadata;
+
+export { metadata, name };
 
 /**
  * Given a node name string for a heading node, returns its numeric level.
@@ -39,41 +41,16 @@ const supports = {
 	anchor: true,
 };
 
-const schema = {
-	content: {
-		type: 'string',
-		source: 'html',
-		selector: 'h1,h2,h3,h4,h5,h6',
-		default: '',
-	},
-	level: {
-		type: 'number',
-		default: 2,
-	},
-	align: {
-		type: 'string',
-	},
-	placeholder: {
-		type: 'string',
-	},
-};
-
-export const name = 'core/heading';
-
 export const settings = {
 	title: __( 'Heading' ),
 
 	description: __( 'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.' ),
 
-	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M5 4v3h5.5v12h3V7H19V4z" /><Path fill="none" d="M0 0h24v24H0V0z" /></SVG>,
-
-	category: 'common',
+	icon,
 
 	keywords: [ __( 'title' ), __( 'subtitle' ) ],
 
 	supports,
-
-	attributes: schema,
 
 	transforms: {
 		from: [
@@ -168,7 +145,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: attributes.content + attributesToMerge.content,
+			content: ( attributes.content || '' ) + ( attributesToMerge.content || '' ),
 		};
 	},
 

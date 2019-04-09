@@ -6,13 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import {
 	ExternalLink,
 	IconButton,
 	ToggleControl,
 	withSpokenMessages,
+	PositionedAtSelection,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
@@ -24,44 +25,14 @@ import {
 	getTextContent,
 	slice,
 } from '@wordpress/rich-text';
-import { URLInput, URLPopover } from '@wordpress/editor';
+import { URLInput, URLPopover } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import PositionedAtSelection from './positioned-at-selection';
-import { isValidHref } from './utils';
+import { createLinkFormat, isValidHref } from './utils';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
-
-/**
- * Generates the format object that will be applied to the link text.
- *
- * @param {string}  url              The href of the link.
- * @param {boolean} opensInNewWindow Whether this link will open in a new window.
- * @param {Object}  text             The text that is being hyperlinked.
- *
- * @return {Object} The final format object.
- */
-function createLinkFormat( { url, opensInNewWindow, text } ) {
-	const format = {
-		type: 'core/link',
-		attributes: {
-			url,
-		},
-	};
-
-	if ( opensInNewWindow ) {
-		// translators: accessibility label for external links, where the argument is the link text
-		const label = sprintf( __( '%s (opens in a new tab)' ), text );
-
-		format.attributes.target = '_blank';
-		format.attributes.rel = 'noreferrer noopener';
-		format.attributes[ 'aria-label' ] = label;
-	}
-
-	return format;
-}
 
 function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
@@ -71,7 +42,7 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 	<form
-		className="editor-format-toolbar__link-container-content"
+		className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 		onKeyPress={ stopKeyPropagation }
 		onKeyDown={ onKeyDown }
 		onSubmit={ submitLink }
@@ -88,7 +59,7 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 
 const LinkViewerUrl = ( { url } ) => {
 	const prependedURL = prependHTTP( url );
-	const linkClassName = classnames( 'editor-format-toolbar__link-container-value', {
+	const linkClassName = classnames( 'editor-format-toolbar__link-container-value block-editor-format-toolbar__link-container-value', {
 		'has-invalid-link': ! isValidHref( prependedURL ),
 	} );
 
@@ -111,7 +82,7 @@ const LinkViewer = ( { url, editLink } ) => {
 		// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		<div
-			className="editor-format-toolbar__link-container-content"
+			className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 			onKeyPress={ stopKeyPropagation }
 		>
 			<LinkViewerUrl url={ url } />
@@ -223,7 +194,7 @@ class InlineLinkUI extends Component {
 
 	onClickOutside( event ) {
 		// The autocomplete suggestions list renders in a separate popover (in a portal),
-		// so onClickOutside fails to detect that a click on a suggestion occured in the
+		// so onClickOutside fails to detect that a click on a suggestion occurred in the
 		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
 		// return to avoid the popover being closed.
 		const autocompleteElement = this.autocompleteRef.current;

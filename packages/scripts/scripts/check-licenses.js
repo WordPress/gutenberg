@@ -47,7 +47,6 @@ const gpl2CompatibleLicenses = [
 	'BSD-3-Clause',
 	'BSD-3-Clause-W3C',
 	'BSD-like',
-	'CC-BY-3.0',
 	'CC-BY-4.0',
 	'CC0-1.0',
 	'GPL-2.0',
@@ -65,6 +64,7 @@ const gpl2CompatibleLicenses = [
 	'Zlib',
 	'(MIT AND BSD-3-Clause)',
 	'(MIT AND Zlib)',
+	'(CC-BY-4.0 AND MIT)',
 ];
 
 /*
@@ -78,6 +78,8 @@ const otherOssLicenses = [
 	'Apache 2.0',
 	'Apache License, Version 2.0',
 	'Apache version 2.0',
+	'CC-BY-3.0',
+	'LGPL',
 ];
 
 const licenses = [
@@ -257,6 +259,7 @@ modules.forEach( ( path ) => {
 					}, stringDetectedType );
 				}, detectedType );
 			}
+			return detectedType;
 		}, false );
 	}
 

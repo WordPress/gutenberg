@@ -1,8 +1,33 @@
-## 9.0.7 (Unreleased)
+## 9.1.1 (Unreleased)
 
 ### Internal
 
-- Removed `jQuery` dependency
+- Refactor setupEditor effects to action-generator using controls ([#14513](https://github.com/WordPress/gutenberg/pull/14513))
+- Remove redux-multi dependency (no longer needed/used with above refactor)
+
+## 9.1.0 (2019-03-06)
+
+### New Features
+
+- Added `createCustomColorsHOC` for creating a higher order `withCustomColors` component.
+- Added a new `TextEditorGlobalKeyboardShortcuts` component.
+
+### Deprecations
+
+- `EditorGlobalKeyboardShortcuts` has been deprecated in favor of `VisualEditorGlobalKeyboardShortcuts`.
+
+### Bug Fixes
+
+- BlockSwitcher will now consistently render an icon for block multi-selections.
+
+### Internal
+
+- Removed `jQuery` dependency.
+- Removed `TinyMCE` dependency.
+- RichText: improve format boundaries.
+- Refactor all post effects to action-generators using controls ([#13716](https://github.com/WordPress/gutenberg/pull/13716))
+
+## 9.0.7 (2019-01-03)
 
 ## 9.0.6 (2018-12-18)
 

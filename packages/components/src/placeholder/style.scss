@@ -21,12 +21,14 @@
 
 .components-placeholder__label {
 	display: flex;
+	align-items: center;
 	justify-content: center;
 	font-weight: 600;
 	margin-bottom: 1em;
 
 	.dashicon,
-	.editor-block-icon {
+	.block-editor-block-icon {
+		fill: currentColor;
 		margin-right: 1ch;
 	}
 }
@@ -54,4 +56,9 @@
 
 .components-placeholder__instructions {
 	margin-bottom: 1em;
+}
+
+.components-placeholder__preview img {
+	margin: 3%;
+	width: 50%;
 }
