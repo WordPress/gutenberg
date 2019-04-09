@@ -29,12 +29,12 @@ class DependencyExtractionWebpackPlugin {
 		let externRootRequest;
 
 		// Handle via options.requestToExternal first
-		if ( 'function' === typeof this.options.requestToExternal ) {
+		if ( typeof this.options.requestToExternal === 'function' ) {
 			externRootRequest = this.options.requestToExternal( request );
 		}
 
 		// Cascade to default if unhandled and enabled
-		if ( 'undefined' === typeof externRootRequest && this.options.useDefaults !== false ) {
+		if ( typeof externRootRequest === 'undefined' && this.options.useDefaults !== false ) {
 			externRootRequest = defaultRequestToExternal( request );
 		}
 
@@ -48,7 +48,7 @@ class DependencyExtractionWebpackPlugin {
 
 	mapRequestToDependency( request ) {
 		// Handle via options.requestToDependency first
-		if ( 'function' === typeof this.options.requestToDependency ) {
+		if ( typeof this.options.requestToDependency === 'function' ) {
 			const scriptDependency = this.options.requestToDependency( request );
 			if ( scriptDependency ) {
 				return scriptDependency;
