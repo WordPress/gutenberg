@@ -207,16 +207,18 @@ export const settings = {
 							break;
 					}
 
-					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } className={ image.id ? `wp-image-${ image.id }` : null } />;
+					const figure = (
+						<figure>
+							<img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } className={ image.id ? `wp-image-${ image.id }` : null } />
+							{ ( image.caption && image.caption.length > 0 ) ? (
+								<RichText.Content tagName="figcaption" value={ image.caption } />
+							) : null }
+						</figure>
+					);
 
 					return (
 						<li key={ image.id || image.url } className="blocks-gallery-item">
-							<figure>
-								{ href ? <a href={ href }>{ img }</a> : img }
-								{ image.caption && image.caption.length > 0 && (
-									<RichText.Content tagName="figcaption" value={ image.caption } />
-								) }
-							</figure>
+							{ href ? <a href={ href }>{ figure }</a> : figure }
 						</li>
 					);
 				} ) }
