@@ -87,6 +87,8 @@ jobs:
       - run:
           name: Run Checks
           command: bin/ci-checks-js.sh
+          environment:
+            JEST_JUNIT_OUTPUT: "reports/test-results/android-test-results.xml"
       - store_test_results:
           path: ./reports/test-results
   android-device-checks:
