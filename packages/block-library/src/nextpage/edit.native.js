@@ -17,12 +17,6 @@ import styles from './editor.scss';
 export default function NextPageEdit( { attributes, isSelected, onFocus } ) {
 	const { customText = __( 'Page break' ) } = attributes;
 	const accessibilityTitle = attributes.customText || '';
-	// Setting the font here to keep the CSS linter happy, it was demanding a syntax
-	// that React Native wasn't able to handle (adding a fallback generic font family).
-	const textStyle = {
-		...styles[ 'block-library-nextpage__text' ],
-		fontFamily: 'System',
-	};
 
 	return (
 		<View
@@ -30,10 +24,9 @@ export default function NextPageEdit( { attributes, isSelected, onFocus } ) {
 			accessibilityLabel={ __( 'Page break block' ) + '. ' + accessibilityTitle }
 			accessibilityStates={ isSelected && [ 'selected' ] }
 			onAccessibilityTap={ onFocus }
-			style={ styles[ 'block-library-nextpage__container' ] }
 		>
 			<Hr text={ customText }
-				textStyle={ textStyle }
+				textStyle={ styles[ 'block-library-nextpage__text' ] }
 				lineStyle={ styles[ 'block-library-nextpage__line' ] } />
 		</View>
 	);
