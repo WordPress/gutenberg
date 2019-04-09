@@ -17,13 +17,10 @@ import {
 } from '@wordpress/block-editor';
 import { Component, Fragment } from '@wordpress/element';
 import {
-	BaseControl,
-	Button,
-	ButtonGroup,
 	PanelBody,
 	RadioControl,
+	RangeControl,
 	TextareaControl,
-	TextControl,
 	ToggleControl,
 	Toolbar,
 } from '@wordpress/components';
@@ -46,14 +43,16 @@ const WIDTH_PRESETS = {
 };
 
 class MediaTextEdit extends Component {
-	constructor() {
+	constructor( { attributes } ) {
 		super( ...arguments );
 
 		this.onSelectMedia = this.onSelectMedia.bind( this );
 		this.onWidthChange = this.onWidthChange.bind( this );
+		this.onPresetChange = this.onPresetChange.bind( this );
 		this.commitWidthChange = this.commitWidthChange.bind( this );
 		this.state = {
 			mediaWidth: null,
+			enableCustomWidth: ! WIDTH_PRESETS[ attributes.mediaWidth ],
 		};
 	}
 
@@ -91,18 +90,32 @@ class MediaTextEdit extends Component {
 	onWidthChange( width ) {
 		this.setState( {
 			mediaWidth: width,
+			enableCustomWidth: true,
 		} );
 	}
 
 	commitWidthChange( width ) {
 		const { setAttributes } = this.props;
-
+		width = parseInt( width, 10 );
 		setAttributes( {
-			mediaWidth: parseInt( width, 10 ),
+			mediaWidth: width,
 		} );
+		this.setState( { enableCustomWidth: ! WIDTH_PRESETS[ width ] } );
+	}
+
+	onPresetChange( preset ) {
+		const { setAttributes } = this.props;
+
 		this.setState( {
+			enableCustomWidth: preset === 'custom',
 			mediaWidth: null,
 		} );
+
+		if ( preset !== 'custom' ) {
+			setAttributes( {
+				mediaWidth: parseInt( preset, 10 ),
+			} );
+		}
 	}
 
 	renderMediaArea() {
@@ -143,7 +156,8 @@ class MediaTextEdit extends Component {
 			[ backgroundColor.class ]: backgroundColor.class,
 			'is-stacked-on-mobile': isStackedOnMobile,
 		} );
-		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
+		const currentWidth = temporaryMediaWidth || mediaWidth;
+		const widthString = `${ currentWidth }%`;
 		const style = {
 			gridTemplateColumns: 'right' === mediaPosition ? `auto ${ widthString }` : `${ widthString } auto`,
 			backgroundColor: backgroundColor.color,
@@ -188,43 +202,22 @@ class MediaTextEdit extends Component {
 			<Fragment>
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
-					<PanelBody title={ __( 'Layout 1' ) }>
-						<TextControl
-							type="number"
-							label={ __( 'Media width' ) }
-							value={ temporaryMediaWidth || mediaWidth }
-							onChange={ this.commitWidthChange }
-						/>
-						<ButtonGroup>
-							<Button isSmall isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 38 } onClick={ () => setAttributes( { mediaWidth: 38 } ) }>Small</Button>
-							<Button isSmall isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 50 } onClick={ () => setAttributes( { mediaWidth: 50 } ) }>Half</Button>
-							<Button isSmall isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 62 } onClick={ () => setAttributes( { mediaWidth: 62 } ) }>Large</Button>
-						</ButtonGroup>
-					</PanelBody>
-					<PanelBody title={ __( 'Layout 2' ) }>
+					<PanelBody title={ __( 'Layout' ) }>
 						<RadioControl
 							label="Media Width"
 							selected={ this.state.enableCustomWidth ? 'custom' : String( mediaWidth ) }
 							options={ values( WIDTH_PRESETS ).concat( { label: 'Custom', value: 'custom' } ) }
-							onChange={ ( newMediaWidth ) => setAttributes( { mediaWidth: newMediaWidth } ) }
+							onChange={ this.onPresetChange }
 						/>
-					</PanelBody>
-					<PanelBody title={ __( 'Layout 3' ) }>
-						<BaseControl
-							label="Media Width"
-						>
-							<ButtonGroup>
-								<Button isLarge isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 38 } onClick={ () => setAttributes( { mediaWidth: 38 } ) }>Small</Button>
-								<Button isLarge isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 50 } onClick={ () => setAttributes( { mediaWidth: 50 } ) }>Half</Button>
-								<Button isLarge isPrimary={ ( temporaryMediaWidth || mediaWidth ) === 62 } onClick={ () => setAttributes( { mediaWidth: 62 } ) }>Large</Button>
-							</ButtonGroup>
-						</BaseControl>
-						<TextControl
-							type="number"
-							label={ __( 'Custom width' ) }
-							value={ temporaryMediaWidth || mediaWidth }
-							onChange={ this.commitWidthChange }
-						/>
+						{ ( this.state.enableCustomWidth ) &&
+							<RangeControl
+								label={ __( 'Custom width' ) }
+								value={ currentWidth }
+								onChange={ this.commitWidthChange }
+								min={ 1 }
+								max={ 99 }
+							/>
+						}
 					</PanelBody>
 					<PanelColorSettings
 						title={ __( 'Color Settings' ) }
