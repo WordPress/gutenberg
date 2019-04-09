@@ -94,6 +94,8 @@ export default class EditorPage {
 	async removeBlockAtPosition( position: number ) {
 		const blockLocator = `//*[starts-with(@${ this.accessibilityIdXPathAttrib }, "block-${ position }")]`;
 		const blockElement = await this.driver.elementByXPath( blockLocator );
+		// Click on the block to focus and bring into view
+		await blockElement.click();
 		const accessibilityId = await blockElement.getAttribute( this.accessibilityIdKey );
 
 		const removeButton = await this.driver.elementByAccessibilityId( __( `Remove ${ accessibilityId }` ) );
