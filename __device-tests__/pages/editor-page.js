@@ -24,9 +24,8 @@ export default class EditorPage {
 		this.driver = driver;
 	}
 
-	async expect( ) {
-		expect( await this.driver.hasElementByAccessibilityId( 'block-list' ) ).toBe( true );
-		return this;
+	async getBlockList() {
+		return this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
 	async addNewBlock( block: BlockInteraction ) {
