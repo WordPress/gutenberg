@@ -16,7 +16,7 @@ Consult the [webpack website](https://webpack.js.org) for additional information
 Install the module
 
 ```bash
-npm install @wordpress/dependency-extraction-webpack-plugin --save
+npm install @wordpress/dependency-extraction-webpack-plugin --save-dev
 ```
 
 ## Usage
