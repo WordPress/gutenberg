@@ -10,7 +10,7 @@ import {
 	removeFormat,
 	slice,
 } from '@wordpress/rich-text';
-import { isURL } from '@wordpress/url';
+import { isURL, isEmail } from '@wordpress/url';
 import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor';
 
 /**
@@ -47,6 +47,8 @@ export const link = {
 
 			if ( text && isURL( text ) ) {
 				onChange( applyFormat( value, { type: name, attributes: { url: text } } ) );
+			} else if ( text && isEmail( text ) ) {
+				onChange( applyFormat( value, { type: name, attributes: { url: `mailto:${ text }` } } ) );
 			} else {
 				this.setState( { addingLink: true } );
 			}
