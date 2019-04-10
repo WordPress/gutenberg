@@ -21,13 +21,13 @@ function MediaPlaceholder( props ) {
 	const isImage = MEDIA_TYPE_IMAGE === mediaType;
 	const isVideo = MEDIA_TYPE_VIDEO === mediaType;
 
-	let plceholderTitle = labels.title;
-	if ( plceholderTitle === undefined ) {
-		plceholderTitle = __( 'Media' );
+	let placeholderTitle = labels.title;
+	if ( placeholderTitle === undefined ) {
+		placeholderTitle = __( 'Media' );
 		if ( isImage ) {
-			plceholderTitle = __( 'Image' );
+			placeholderTitle = __( 'Image' );
 		} else if ( isVideo ) {
-			plceholderTitle = __( 'Video' );
+			placeholderTitle = __( 'Video' );
 		}
 	}
 
@@ -60,7 +60,7 @@ function MediaPlaceholder( props ) {
 							{ getMediaOptions() }
 							<Dashicon icon={ placeholderIcon } />
 							<Text style={ styles.emptyStateTitle }>
-								{ plceholderTitle }
+								{ placeholderTitle }
 							</Text>
 							<Text style={ styles.emptyStateDescription }>
 								{ instructions }
