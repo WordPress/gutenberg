@@ -54,9 +54,16 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 							type="number"
 							id={ id }
 							onChange={ ( event ) => {
-								const customHeight = parseInt( event.target.value, 10 );
+								let customHeight = parseInt( event.target.value, 10 );
+								if ( isNaN( customHeight ) ) {
+									// Set to the default size
+									customHeight = 100;
+								} else if ( customHeight < 20 ) {
+									// Set to the minimum size
+									customHeight = 20;
+								}
 								setAttributes( {
-									height: ( isNaN( customHeight ) ) ? 20 : customHeight,
+									height: customHeight,
 								} );
 							} }
 							value={ height }
