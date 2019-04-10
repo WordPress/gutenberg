@@ -127,19 +127,19 @@ class AudioEdit extends Component {
 			return (
 				<Fragment>
 					<BlockControls>
-						<Toolbar>
+						{ !! src && ( <Toolbar>
 							<IconButton
 								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.editing } ) }
 								label={ __( 'Edit audio' ) }
 								onClick={ switchToEditing }
 								icon={ editImageIcon }
 							/>
-						</Toolbar>
+						</Toolbar> ) }
 					</BlockControls>
 					<MediaPlaceholder
 						icon={ <BlockIcon icon={ icon } /> }
 						className={ className }
-						onCancel={ switchToEditing }
+						onCancel={ !! src && switchToEditing }
 						onSelect={ onSelectAudio }
 						onSelectURL={ this.onSelectURL }
 						accept="audio/*"
