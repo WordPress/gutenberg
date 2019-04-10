@@ -7,9 +7,29 @@ import { shallow } from 'enzyme';
  * Internal dependencies
  */
 import blockCompleter, { createBlockCompleter } from '../block';
+import '../../../';
 
 describe( 'block', () => {
-	it( 'should retrieve block options for current insertion point', () => {
+	let originalFetch;
+	beforeEach( () => {
+		originalFetch = window.fetch;
+		window.fetch = ( url ) => {
+			if ( ! /\/wp\/v2\/types\/wp_block(\?|$)/.test( url ) ) {
+				throw new Error( 'Unhandled fetch ' + url );
+			}
+
+			return Promise.resolve( {
+				status: 200,
+				json: () => Promise.resolve( [] ),
+			} );
+		};
+	} );
+
+	afterEach( () => {
+		window.fetch = originalFetch;
+	} );
+
+	it( 'should retrieve block options for current insertion point', async () => {
 		const expectedOptions = [ {}, {}, {} ];
 		const mockGetBlockInsertionParentClientId = jest.fn( () => 'expected-insertion-point' );
 		const mockGetInserterItems = jest.fn( () => expectedOptions );
