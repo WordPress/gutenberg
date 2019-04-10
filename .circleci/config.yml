@@ -74,7 +74,7 @@ jobs:
           command: yarn device-tests
   ios-device-checks:
     macos:
-      xcode: "10.0"
+      xcode: "10.2.0"
     steps:
     - checkout
     - checkout-gutenberg
