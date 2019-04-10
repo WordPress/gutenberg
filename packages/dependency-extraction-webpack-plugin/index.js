@@ -21,7 +21,15 @@ class DependencyExtractionWebpackPlugin {
 			},
 			options
 		);
+
+		// Track requests that are externalized.
+		//
+		// Because we don't have a closed set of dependencies, we need to track what has
+		// been externalized so we can recognize them in a later phase when the dependency
+		// lists are generated.
 		this.externalizedDeps = new Set();
+
+		// Offload externalization work to the ExternalsPlugin.
 		this.externalsPlugin = new ExternalsPlugin( 'global', [ this.externalizeWpDeps.bind( this ) ] );
 	}
 
@@ -74,16 +82,16 @@ class DependencyExtractionWebpackPlugin {
 		const { filename: outputFilename } = output;
 
 		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
-			// Each entrypoint will get a .deps.json file
+			// Process each entrypoint independently.
 			for ( const [ entrypointName, entrypoint ] of compilation.entrypoints.entries() ) {
 				const entrypointExternalizedWpDeps = new Set();
 				if ( this.options.injectPolyfill ) {
 					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
 				}
 
-				// Search for externalized dependencies in all modules in all entrypoint chunks
-				for ( const c of entrypoint.chunks ) {
-					for ( const { userRequest } of c.modulesIterable ) {
+				// Search for externalized modules in all chunks.
+				for ( const chunk of entrypoint.chunks ) {
+					for ( const { userRequest } of chunk.modulesIterable ) {
 						if ( this.externalizedDeps.has( userRequest ) ) {
 							const scriptDependency = this.mapRequestToDependency( userRequest );
 							entrypointExternalizedWpDeps.add( scriptDependency );
@@ -95,21 +103,24 @@ class DependencyExtractionWebpackPlugin {
 				const sortedDepsArray = Array.from( entrypointExternalizedWpDeps ).sort();
 				const depsString = JSON.stringify( sortedDepsArray );
 
-				// Determine a name for the `[entrypoint].deps.json` file.
+				// Determine a filename for the `[entrypoint].deps.json` file.
 				const [ filename, query ] = entrypointName.split( '?', 2 );
-				const depsFile = compilation.getPath( outputFilename.replace( /\.js$/i, '.deps.json' ), {
-					chunk: entrypoint.getRuntimeChunk(),
-					filename,
-					query,
-					basename: basename( filename ),
-					contentHash: createHash( 'md4' )
-						.update( depsString )
-						.digest( 'hex' ),
-				} );
+				const depsFilename = compilation.getPath(
+					outputFilename.replace( /\.js$/i, '.deps.json' ),
+					{
+						chunk: entrypoint.getRuntimeChunk(),
+						filename,
+						query,
+						basename: basename( filename ),
+						contentHash: createHash( 'md4' )
+							.update( depsString )
+							.digest( 'hex' ),
+					}
+				);
 
-				// Inject source/file into the compilation for webpack to output.
-				compilation.assets[ depsFile ] = new RawSource( depsString );
-				entrypoint.getRuntimeChunk().files.push( depsFile );
+				// Add source and file into compilation for webpack to output.
+				compilation.assets[ depsFilename ] = new RawSource( depsString );
+				entrypoint.getRuntimeChunk().files.push( depsFilename );
 			}
 		} );
 	}
