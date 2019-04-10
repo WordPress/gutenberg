@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
@@ -29,10 +34,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import icon from './icon';
-
-/**
- * Internal dependencies
- */
 import { createUpgradedEmbedBlock } from '../embed/util';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
@@ -106,7 +107,7 @@ class AudioEdit extends Component {
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
-			this.setState( { editing: true } );
+			this.setState( { editing: ! this.state.editing } );
 		};
 		const onSelectAudio = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -121,23 +122,35 @@ class AudioEdit extends Component {
 			setAttributes( { src: media.url, id: media.id } );
 			this.setState( { src: media.url, editing: false } );
 		};
+		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		if ( editing ) {
 			return (
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					className={ className }
-					onSelect={ onSelectAudio }
-					onSelectURL={ this.onSelectURL }
-					accept="audio/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ this.props.attributes }
-					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
-				/>
+				<Fragment>
+					<BlockControls>
+						<Toolbar>
+							<IconButton
+								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.editing } ) }
+								label={ __( 'Edit audio' ) }
+								onClick={ switchToEditing }
+								icon={ editImageIcon }
+							/>
+						</Toolbar>
+					</BlockControls>
+					<MediaPlaceholder
+						icon={ <BlockIcon icon={ icon } /> }
+						className={ className }
+						onCancel={ switchToEditing }
+						onSelect={ onSelectAudio }
+						onSelectURL={ this.onSelectURL }
+						accept="audio/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ this.props.attributes }
+						notices={ noticeUI }
+						onError={ noticeOperations.createErrorNotice }
+					/>
+				</Fragment>
 			);
 		}
-
-		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<Fragment>

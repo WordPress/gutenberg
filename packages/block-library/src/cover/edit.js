@@ -200,7 +200,7 @@ class CoverEdit extends Component {
 							<MediaUploadCheck>
 								<Toolbar>
 									<IconButton
-										className="components-toolbar__control"
+										className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
 										label={ __( 'Edit media' ) }
 										icon={ editImageIcon }
 										onClick={ this.toggleIsEditing }
