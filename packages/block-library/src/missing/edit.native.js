@@ -24,11 +24,12 @@ export default class UnsupportedBlockEdit extends Component {
 		const title = blockType ? blockType.settings.title : __( 'Unsupported' );
 		const icon = blockType ? normalizeIconObject( blockType.settings.icon ) : 'admin-plugins';
 		const accessibilityTitle = blockType ? blockType.settings.title : __( 'Unknown' );
+		const accessibilityState = this.props.isSelected ? [ 'selected' ] : [];
 		return (
 			<View
 				accessible
 				accessibilityLabel={ __( 'Block not supported' ) + '. ' + accessibilityTitle }
-				accessibilityStates={ this.props.isSelected && [ 'selected' ] }
+				accessibilityStates={ accessibilityState }
 				style={ styles.unsupportedBlock }
 			>
 				<Icon className="unsupported-icon" icon={ icon && icon.src ? icon.src : icon } />
