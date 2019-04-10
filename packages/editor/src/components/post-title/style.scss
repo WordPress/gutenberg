@@ -24,6 +24,7 @@
 		border: $border-width solid transparent;
 		border-left-width: 0;
 		border-right-width: 0;
+		border-radius: 0;
 
 		// Include transparent outline for Windows High Contrast mode.
 		outline: $border-width solid transparent;
@@ -48,6 +49,13 @@
 
 		&:-ms-input-placeholder {
 			color: $dark-opacity-200;
+		}
+
+		&:focus {
+			border: $border-width solid transparent;
+			border-left-width: 0;
+			outline: $border-width solid transparent;
+			box-shadow: none;
 		}
 	}
 
@@ -75,7 +83,11 @@
 
 	&:not(.is-focus-mode):not(.has-fixed-toolbar):not(.is-selected) {
 		.editor-post-title__input:hover {
-			box-shadow: -$block-left-border-width 0 0 0 $light-gray-500;
+			box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
+
+			.is-dark-theme & {
+				box-shadow: -$block-left-border-width 0 0 0 $light-opacity-light-400;
+			}
 		}
 	}
 

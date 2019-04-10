@@ -17,77 +17,32 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import {
-	Path,
-	SVG,
-} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
+import icon from './icon';
+import metadata from './block.json';
+
+const { name, attributes: schema } = metadata;
+
+export { metadata, name };
 
 const supports = {
 	className: false,
 };
-
-const schema = {
-	content: {
-		type: 'string',
-		source: 'html',
-		selector: 'p',
-		default: '',
-	},
-	align: {
-		type: 'string',
-	},
-	dropCap: {
-		type: 'boolean',
-		default: false,
-	},
-	placeholder: {
-		type: 'string',
-	},
-	textColor: {
-		type: 'string',
-	},
-	customTextColor: {
-		type: 'string',
-	},
-	backgroundColor: {
-		type: 'string',
-	},
-	customBackgroundColor: {
-		type: 'string',
-	},
-	fontSize: {
-		type: 'string',
-	},
-	customFontSize: {
-		type: 'number',
-	},
-	direction: {
-		type: 'string',
-		enum: [ 'ltr', 'rtl' ],
-	},
-};
-
-export const name = 'core/paragraph';
 
 export const settings = {
 	title: __( 'Paragraph' ),
 
 	description: __( 'Start with the building block of all narrative.' ),
 
-	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M11 5v7H9.5C7.6 12 6 10.4 6 8.5S7.6 5 9.5 5H11m8-2H9.5C6.5 3 4 5.5 4 8.5S6.5 14 9.5 14H11v7h2V5h2v16h2V5h2V3z" /></SVG>,
-
-	category: 'common',
+	icon,
 
 	keywords: [ __( 'text' ) ],
 
 	supports,
-
-	attributes: schema,
 
 	transforms: {
 		from: [

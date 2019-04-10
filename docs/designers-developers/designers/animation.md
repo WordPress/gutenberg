@@ -28,6 +28,13 @@ In creating consistent animations, we have to establish physical rules for how e
 
 Reuse animations if one already exists for your task. 
 
+## Accessibility Considerations
+
+- Animations should be subtle. Be cognizent of users with [vestibular disorders triggered by motion](https://www.ncbi.nlm.nih.gov/pubmed/29017000).
+- Don't animate elements that are currently reporting content to adaptive technology (e.g., an `aria-live` region that's receiving updates). This can cause confusion wherein the technology tries to parse a region that's actively changing.
+- Avoid animations that aren't directly triggered by user behaviors.
+- Whenever possible, ensure that animations respect the OS-level "Reduce Motion" settings. This can be done by utilizing the [`prefers-reduce-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) media query. Gutenberg includes a `@reduce-motion` mixin for this, to be used alongside rules that include a CSS `animate` property. 
+
 ## Inventory of Reused Animations
 
 The generic `Animate` component is used to animate different parts of the interface. See [the component documentation](/packages/components/src/animate/README.md) for more details about the available animations. 

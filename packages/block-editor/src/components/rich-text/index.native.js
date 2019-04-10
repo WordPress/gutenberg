@@ -19,7 +19,11 @@ import {
 	split,
 	toHTMLString,
 	insert,
+	insertLineSeparator,
+	insertLineBreak,
+	isEmptyLine,
 	isCollapsed,
+	getTextContent,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
@@ -31,6 +35,8 @@ import { isURL } from '@wordpress/url';
  */
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
+import { withBlockEditContext } from '../block-edit/context';
+import { ListEdit } from './list-edit';
 
 import styles from './style.scss';
 
@@ -70,14 +76,34 @@ const gutenbergFormatNamesToAztec = {
 };
 
 export class RichText extends Component {
-	constructor() {
+	constructor( { multiline } ) {
 		super( ...arguments );
+
+		this.isMultiline = false;
+		if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
+			this.multilineTag = multiline === true ? 'p' : multiline;
+			this.isMultiline = true;
+		}
+
+		if ( this.multilineTag === 'li' ) {
+			this.multilineWrapperTags = [ 'ul', 'ol' ];
+		}
+
+		if ( this.props.onSplit ) {
+			this.onSplit = this.props.onSplit;
+		} else if ( this.props.unstableOnSplit ) {
+			this.onSplit = this.props.unstableOnSplit;
+		}
+
 		this.isIOS = Platform.OS === 'ios';
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
 		this.onPaste = this.onPaste.bind( this );
+		this.onFocus = this.onFocus.bind( this );
+		this.onBlur = this.onBlur.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
+		this.onFormatChangeForceChild = this.onFormatChangeForceChild.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
@@ -86,7 +112,11 @@ export class RichText extends Component {
 			start: 0,
 			end: 0,
 			formatPlaceholder: null,
+			height: 0,
 		};
+		this.needsSelectionUpdate = false;
+		this.savedContent = '';
+		this.isTouched = false;
 	}
 
 	/**
@@ -96,9 +126,16 @@ export class RichText extends Component {
 	 */
 	getRecord() {
 		const { formatPlaceholder, start, end } = this.state;
+
+		let value = this.props.value === undefined ? null : this.props.value;
+
 		// Since we get the text selection from Aztec we need to be in sync with the HTML `value`
 		// Removing leading white spaces using `trim()` should make sure this is the case.
-		const { formats, replacements, text } = this.formatToValue( this.props.value === undefined ? undefined : this.props.value.trimLeft() );
+		if ( typeof value === 'string' || value instanceof String ) {
+			value = value.trimLeft();
+		}
+
+		const { formats, replacements, text } = this.formatToValue( value );
 
 		return { formats, replacements, formatPlaceholder, text, start, end };
 	}
@@ -112,9 +149,7 @@ export class RichText extends Component {
 	 *
 	 */
 	splitContent( currentRecord, blocks = [], isPasted = false ) {
-		const { onSplit } = this.props;
-
-		if ( ! onSplit ) {
+		if ( ! this.onSplit ) {
 			return;
 		}
 
@@ -153,7 +188,7 @@ export class RichText extends Component {
 		// always update when provided with new content.
 		this.lastEventCount = undefined;
 
-		onSplit( before, after, ...blocks );
+		this.onSplit( before, after, ...blocks );
 	}
 
 	valueToFormat( value ) {
@@ -174,7 +209,11 @@ export class RichText extends Component {
 		} ).map( ( name ) => gutenbergFormatNamesToAztec[ name ] ).filter( Boolean );
 	}
 
-	onFormatChange( record ) {
+	onFormatChangeForceChild( record ) {
+		this.onFormatChange( record, true );
+	}
+
+	onFormatChange( record, doUpdateChild ) {
 		let newContent;
 		// valueToFormat might throw when converting the record to a tree structure
 		// let's ignore the event for now and force a render update so we're still in sync
@@ -189,10 +228,17 @@ export class RichText extends Component {
 		} );
 		if ( newContent && newContent !== this.props.value ) {
 			this.props.onChange( newContent );
+			if ( record.needsSelectionUpdate && record.start && record.end ) {
+				this.forceSelectionUpdate( record.start, record.end );
+			}
 		} else {
-			// make sure the component rerenders without refreshing the text on gutenberg
-			// (this can trigger other events that might update the active formats on aztec)
-			this.lastEventCount = 0;
+			if ( doUpdateChild ) {
+				this.lastEventCount = undefined;
+			} else {
+				// make sure the component rerenders without refreshing the text on gutenberg
+				// (this can trigger other events that might update the active formats on aztec)
+				this.lastEventCount = 0;
+			}
 			this.forceUpdate();
 		}
 	}
@@ -235,25 +281,37 @@ export class RichText extends Component {
 
 	onContentSizeChange( contentSize ) {
 		const contentHeight = contentSize.height;
-		this.props.onContentSizeChange( {
-			aztecHeight: contentHeight,
-		} );
+		this.setState( { height: contentHeight } );
 	}
 
 	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
 		this.lastEventCount = event.nativeEvent.eventCount;
-		if ( ! this.props.onSplit ) {
-			// TODO: insert the \n char instead?
-			return;
-		}
 
 		const currentRecord = this.createRecord( {
 			...event.nativeEvent,
 			currentContent: unescapeSpaces( event.nativeEvent.text ),
 		} );
 
-		this.splitContent( currentRecord );
+		if ( this.multilineTag ) {
+			if ( event.shiftKey ) {
+				const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
+				this.onFormatChangeForceChild( insertedLineBreak );
+			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
+				this.setState( {
+					needsSelectionUpdate: false,
+				} );
+				this.onSplit( ...split( currentRecord ).map( this.valueToFormat ) );
+			} else {
+				const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
+				this.onFormatChangeForceChild( insertedLineSeparator );
+			}
+		} else if ( event.shiftKey || ! this.onSplit ) {
+			const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
+			this.onFormatChangeForceChild( insertedLineBreak );
+		} else {
+			this.splitContent( currentRecord );
+		}
 	}
 
 	// eslint-disable-next-line no-unused-vars
@@ -290,10 +348,34 @@ export class RichText extends Component {
 		const isPasted = true;
 		const { onSplit } = this.props;
 
-		const { pastedText, pastedHtml } = event.nativeEvent;
+		const { pastedText, pastedHtml, files } = event.nativeEvent;
 		const currentRecord = this.createRecord( event.nativeEvent );
 
 		event.preventDefault();
+
+		// Only process file if no HTML is present.
+		// Note: a pasted file may have the URL as plain text.
+		if ( files && files.length > 0 ) {
+			const uploadId = Number.MAX_SAFE_INTEGER;
+			let html = '';
+			files.forEach( ( file ) => {
+				html += `<img src="${ file }" class="wp-image-${ uploadId }">`;
+			} );
+			const content = pasteHandler( {
+				HTML: html,
+				mode: 'BLOCKS',
+				tagName: this.props.tagName,
+			} );
+			const shouldReplace = this.props.onReplace && this.isEmpty();
+
+			if ( shouldReplace ) {
+				this.props.onReplace( content );
+			} else {
+				this.splitContent( currentRecord, content, isPasted );
+			}
+
+			return;
+		}
 
 		// There is a selection, check if a URL is pasted.
 		if ( ! isCollapsed( currentRecord ) ) {
@@ -357,6 +439,19 @@ export class RichText extends Component {
 		}
 	}
 
+	onFocus( event ) {
+		this.isTouched = true;
+		this.props.onFocus( event );
+	}
+
+	onBlur( event ) {
+		this.isTouched = false;
+
+		if ( this.props.onBlur ) {
+			this.props.onBlur( event );
+		}
+	}
+
 	onSelectionChange( start, end, text, event ) {
 		// `end` can be less than `start` on iOS
 		// Let's fix that here so `rich-text/slice` can work properly
@@ -410,7 +505,8 @@ export class RichText extends Component {
 			...create( {
 				html: innerContent,
 				range: null,
-				multilineTag: false,
+				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} ),
 		};
 
@@ -423,6 +519,7 @@ export class RichText extends Component {
 			return create( {
 				html: children.toHTML( value ),
 				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
@@ -430,6 +527,7 @@ export class RichText extends Component {
 			return create( {
 				html: value,
 				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
@@ -440,6 +538,43 @@ export class RichText extends Component {
 		}
 
 		return value;
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		this.moveCaretToTheEndIfNeeded( nextProps );
+	}
+
+	moveCaretToTheEndIfNeeded( nextProps ) {
+		const nextRecord = this.formatToValue( nextProps.value );
+		const nextTextContent = getTextContent( nextRecord );
+
+		if ( this.isTouched || ! nextProps.isSelected ) {
+			this.savedContent = nextTextContent;
+			return;
+		}
+
+		if ( nextTextContent === '' && this.savedContent === '' ) {
+			return;
+		}
+
+		// This logic will handle the selection when two blocks are merged or when block is split
+		// into two blocks
+		if ( nextTextContent.startsWith( this.savedContent ) ) {
+			let length = this.savedContent.length;
+			if ( length === 0 && nextTextContent !== this.props.value ) {
+				length = this.props.value.length;
+			}
+
+			this.forceSelectionUpdate( length, length );
+			this.savedContent = nextTextContent;
+		}
+	}
+
+	forceSelectionUpdate( start, end ) {
+		if ( ! this.needsSelectionUpdate ) {
+			this.needsSelectionUpdate = true;
+			this.setState( { start, end } );
+		}
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -489,6 +624,7 @@ export class RichText extends Component {
 			style,
 			formattingControls,
 			isSelected,
+			onTagNameChange,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -501,8 +637,27 @@ export class RichText extends Component {
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
 
+		let minHeight = styles[ 'block-editor-rich-text' ].minHeight;
+		if ( style && style.minHeight ) {
+			minHeight = style.minHeight;
+		}
+
+		let selection = null;
+		if ( this.needsSelectionUpdate ) {
+			this.needsSelectionUpdate = false;
+			selection = { start: this.state.start, end: this.state.end };
+		}
+
 		return (
 			<View>
+				{ isSelected && this.multilineTag === 'li' && (
+					<ListEdit
+						onTagNameChange={ onTagNameChange }
+						tagName={ tagName }
+						value={ record }
+						onChange={ this.onFormatChangeForceChild }
+					/>
+				) }
 				{ isSelected && (
 					<BlockFormatControls>
 						<FormatToolbar controls={ formattingControls } />
@@ -516,12 +671,16 @@ export class RichText extends Component {
 							this.props.setRef( ref );
 						}
 					} }
-					text={ { text: html, eventCount: this.lastEventCount } }
+					style={ {
+						...style,
+						minHeight: Math.max( minHeight, this.state.height ),
+					} }
+					text={ { text: html, eventCount: this.lastEventCount, selection } }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].textDecorationColor }
 					onChange={ this.onChange }
-					onFocus={ this.props.onFocus }
-					onBlur={ this.props.onBlur }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
 					onPaste={ this.onPaste }
@@ -533,11 +692,12 @@ export class RichText extends Component {
 					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
-					style={ style }
 					fontFamily={ this.props.fontFamily || styles[ 'block-editor-rich-text' ].fontFamily }
 					fontSize={ this.props.fontSize }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
+					disableEditingMenu={ this.props.disableEditingMenu }
+					isMultiline={ this.isMultiline }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>
@@ -559,13 +719,46 @@ const RichTextContainer = compose( [
 			formatTypes: getFormatTypes(),
 		};
 	} ),
+	withBlockEditContext( ( context, ownProps ) => {
+		// When explicitly set as not selected, do nothing.
+		if ( ownProps.isSelected === false ) {
+			return {
+				clientId: context.clientId,
+			};
+		}
+		// When explicitly set as selected, use the value stored in the context instead.
+		if ( ownProps.isSelected === true ) {
+			return {
+				isSelected: context.isSelected,
+				clientId: context.clientId,
+			};
+		}
+
+		// Ensures that only one RichText component can be focused.
+		return {
+			clientId: context.clientId,
+			isSelected: context.isSelected,
+			onFocus: context.onFocus,
+		};
+	} ),
 ] )( RichText );
 
-RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
+RichTextContainer.Content = ( { value, format, tagName: Tag, multiline, ...props } ) => {
 	let content;
+	let html = value;
+	let MultilineTag;
+
+	if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
+		MultilineTag = multiline === true ? 'p' : multiline;
+	}
+
+	if ( ! html && MultilineTag ) {
+		html = `<${ MultilineTag }></${ MultilineTag }>`;
+	}
+
 	switch ( format ) {
 		case 'string':
-			content = <RawHTML>{ value }</RawHTML>;
+			content = <RawHTML>{ html }</RawHTML>;
 			break;
 	}
 

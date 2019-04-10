@@ -1,4 +1,16 @@
-## 7.2.0 (Unreleased)
+## 7.3.0 (Unreleased)
+
+### New Features
+
+- Added a new `render` property to `FormFileUpload` component. Allowing users of the component to custom the UI for their needs.
+- Added a new `BaseControl.VisualLabel` component.
+- Added a new `preview` prop to the `Placeholder` component which allows to display a preview, for example a media preview when the Placeholder is used in media editing contexts.
+
+### Bug fixes
+
+- Fix `instanceId` prop passed through to `Button` component via `MenuItems` producing React console error. Fixed by removing the unnecessary use of `withInstanceId` on the `MenuItems` component [#14599](https://github.com/WordPress/gutenberg/pull/14599)
+
+## 7.2.0 (2019-03-20)
 
 ### Improvements
 

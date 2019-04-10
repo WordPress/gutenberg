@@ -7,7 +7,6 @@ import { omit, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { G, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import {
 	RichText,
@@ -18,40 +17,12 @@ import {
  * Internal dependencies
  */
 import edit from './edit';
+import icon from './icon';
+import metadata from './block.json';
 
-const blockAttributes = {
-	url: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'href',
-	},
-	title: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'title',
-	},
-	text: {
-		type: 'string',
-		source: 'html',
-		selector: 'a',
-	},
-	backgroundColor: {
-		type: 'string',
-	},
-	textColor: {
-		type: 'string',
-	},
-	customBackgroundColor: {
-		type: 'string',
-	},
-	customTextColor: {
-		type: 'string',
-	},
-};
+const { name, attributes: blockAttributes } = metadata;
 
-export const name = 'core/button';
+export { metadata, name };
 
 const colorsMigration = ( attributes ) => {
 	return omit( {
@@ -66,13 +37,9 @@ export const settings = {
 
 	description: __( 'Prompt visitors to take action with a button-style link.' ),
 
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M19 6H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H5V8h14v8z" /></G></SVG>,
-
-	category: 'layout',
+	icon,
 
 	keywords: [ __( 'link' ) ],
-
-	attributes: blockAttributes,
 
 	supports: {
 		align: true,

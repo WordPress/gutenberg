@@ -7,45 +7,25 @@ import { omit } from 'lodash';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
-import {
-	BlockControls,
-	AlignmentToolbar,
-	RichText,
-} from '@wordpress/block-editor';
-import { join, split, create, toHTMLString } from '@wordpress/rich-text';
-import { Path, SVG } from '@wordpress/components';
+import { RichText } from '@wordpress/block-editor';
+import { create, join, split, toHTMLString } from '@wordpress/rich-text';
 
-const ATTRIBUTE_QUOTE = 'value';
-const ATTRIBUTE_CITATION = 'citation';
+/**
+ * Internal dependencies
+ */
+import edit from './edit';
+import icon from './icon';
+import metadata from './block.json';
 
-const blockAttributes = {
-	[ ATTRIBUTE_QUOTE ]: {
-		type: 'string',
-		source: 'html',
-		selector: 'blockquote',
-		multiline: 'p',
-		default: '',
-	},
-	[ ATTRIBUTE_CITATION ]: {
-		type: 'string',
-		source: 'html',
-		selector: 'cite',
-		default: '',
-	},
-	align: {
-		type: 'string',
-	},
-};
+const { name, attributes: blockAttributes } = metadata;
 
-export const name = 'core/quote';
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Quote' ),
 	description: __( 'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar' ),
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><Path d="M18.62 18h-5.24l2-4H13V6h8v7.24L18.62 18zm-2-2h.76L19 12.76V8h-4v4h3.62l-2 4zm-8 2H3.38l2-4H3V6h8v7.24L8.62 18zm-2-2h.76L9 12.76V8H5v4h3.62l-2 4z" /></SVG>,
-	category: 'common',
+	icon,
 	keywords: [ __( 'blockquote' ) ],
 
 	attributes: blockAttributes,
@@ -223,60 +203,7 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
-		const { align, value, citation } = attributes;
-		return (
-			<Fragment>
-				<BlockControls>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-				<blockquote className={ className } style={ { textAlign: align } }>
-					<RichText
-						identifier={ ATTRIBUTE_QUOTE }
-						multiline
-						value={ value }
-						onChange={
-							( nextValue ) => setAttributes( {
-								value: nextValue,
-							} )
-						}
-						onMerge={ mergeBlocks }
-						onRemove={ ( forward ) => {
-							const hasEmptyCitation = ! citation || citation.length === 0;
-							if ( ! forward && hasEmptyCitation ) {
-								onReplace( [] );
-							}
-						} }
-						placeholder={
-							// translators: placeholder text used for the quote
-							__( 'Write quote…' )
-						}
-					/>
-					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
-						<RichText
-							identifier={ ATTRIBUTE_CITATION }
-							value={ citation }
-							onChange={
-								( nextCitation ) => setAttributes( {
-									citation: nextCitation,
-								} )
-							}
-							placeholder={
-								// translators: placeholder text used for the citation
-								__( 'Write citation…' )
-							}
-							className="wp-block-quote__citation"
-						/>
-					) }
-				</blockquote>
-			</Fragment>
-		);
-	},
+	edit,
 
 	save( { attributes } ) {
 		const { align, value, citation } = attributes;

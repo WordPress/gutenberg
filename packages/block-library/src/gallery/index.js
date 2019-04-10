@@ -17,60 +17,11 @@ import { createBlobURL } from '@wordpress/blob';
  */
 import { default as edit, defaultColumnsNumber, pickRelevantMediaFiles } from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-const blockAttributes = {
-	images: {
-		type: 'array',
-		default: [],
-		source: 'query',
-		selector: 'ul.wp-block-gallery .blocks-gallery-item',
-		query: {
-			url: {
-				source: 'attribute',
-				selector: 'img',
-				attribute: 'src',
-			},
-			link: {
-				source: 'attribute',
-				selector: 'img',
-				attribute: 'data-link',
-			},
-			alt: {
-				source: 'attribute',
-				selector: 'img',
-				attribute: 'alt',
-				default: '',
-			},
-			id: {
-				source: 'attribute',
-				selector: 'img',
-				attribute: 'data-id',
-			},
-			caption: {
-				type: 'string',
-				source: 'html',
-				selector: 'figcaption',
-			},
-		},
-	},
-	ids: {
-		type: 'array',
-		default: [],
-	},
-	columns: {
-		type: 'number',
-	},
-	imageCrop: {
-		type: 'boolean',
-		default: true,
-	},
-	linkTo: {
-		type: 'string',
-		default: 'none',
-	},
-};
+const { name, attributes: blockAttributes } = metadata;
 
-export const name = 'core/gallery';
+export { metadata, name };
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -86,9 +37,7 @@ export const settings = {
 	title: __( 'Gallery' ),
 	description: __( 'Display multiple images in a rich gallery.' ),
 	icon,
-	category: 'common',
 	keywords: [ __( 'images' ), __( 'photos' ) ],
-	attributes: blockAttributes,
 	supports: {
 		align: true,
 	},

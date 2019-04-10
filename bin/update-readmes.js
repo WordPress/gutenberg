@@ -13,7 +13,7 @@ const packages = [
 	'block-serialization-default-parser',
 	'blocks',
 	'compose',
-	//'data',
+	'data',
 	'date',
 	'deprecated',
 	'dom',
@@ -35,31 +35,15 @@ const packages = [
 	'wordcount',
 ];
 
-const getArgsForPackage = ( packageName ) => {
-	switch ( packageName ) {
-		case 'rich-text':
-			return [
-				`packages/${ packageName }/src/index.js`,
-				`--output packages/${ packageName }/README.md`,
-				'--to-token',
-				'--ignore "unstable|experimental|^apply$|^changeListType$|^charAt$|^getSelectionStart$|^getSelectionEnd$|^indentListItems$|^insertLineBreak$|^insertLineSeparator$|^isEmptyLine$|^LINE_SEPARATOR$|^outdentListItems$"',
-			];
-		default:
-			return [
-				`packages/${ packageName }/src/index.js`,
-				`--output packages/${ packageName }/README.md`,
-				'--to-token',
-				'--ignore "unstable|experimental"',
-			];
-	}
-};
-
 Promise.all( packages.map( async ( packageName ) => {
-	const args = getArgsForPackage( packageName );
-	const pathToDocGen = path.join( __dirname, '..', 'node_modules', '.bin', 'docgen' );
 	const { status, stderr } = await spawn(
-		pathToDocGen,
-		args,
+		path.join( __dirname, '..', 'node_modules', '.bin', 'docgen' ),
+		[
+			`packages/${ packageName }/src/index.js`,
+			`--output packages/${ packageName }/README.md`,
+			'--to-token',
+			'--ignore "/unstable|experimental/i"',
+		],
 		{ shell: true },
 	);
 	if ( status !== 0 ) {

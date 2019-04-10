@@ -10,12 +10,10 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
-import { decodeEntities } from '@wordpress/html-entities';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
-import { withInstanceId } from '@wordpress/compose';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
+import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 
 // Since URLInput is rendered in the context of other inputs, but should be
 // considered a separate modal node, prevent keyboard events from propagating
@@ -35,7 +33,7 @@ class URLInput extends Component {
 		this.suggestionNodes = [];
 
 		this.state = {
-			posts: [],
+			suggestions: [],
 			showSuggestions: false,
 			selectedSuggestion: null,
 		};
@@ -51,7 +49,7 @@ class URLInput extends Component {
 				onlyScrollIfNeeded: true,
 			} );
 
-			setTimeout( () => {
+			this.props.setTimeout( () => {
 				this.scrollingIntoView = false;
 			}, 100 );
 		}
@@ -68,6 +66,11 @@ class URLInput extends Component {
 	}
 
 	updateSuggestions( value ) {
+		const { fetchLinkSuggestions } = this.props;
+		if ( ! fetchLinkSuggestions ) {
+			return;
+		}
+
 		// Show the suggestions after typing at least 2 characters
 		// and also for URLs
 		if ( value.length < 2 || /^https?:/.test( value ) ) {
@@ -86,15 +89,9 @@ class URLInput extends Component {
 			loading: true,
 		} );
 
-		const request = apiFetch( {
-			path: addQueryArgs( '/wp/v2/search', {
-				search: value,
-				per_page: 20,
-				type: 'post',
-			} ),
-		} );
+		const request = fetchLinkSuggestions( value );
 
-		request.then( ( posts ) => {
+		request.then( ( suggestions ) => {
 			// A fetch Promise doesn't have an abort option. It's mimicked by
 			// comparing the request reference in on the instance, which is
 			// reset or deleted on subsequent requests or unmounting.
@@ -103,16 +100,16 @@ class URLInput extends Component {
 			}
 
 			this.setState( {
-				posts,
+				suggestions,
 				loading: false,
 			} );
 
-			if ( !! posts.length ) {
+			if ( !! suggestions.length ) {
 				this.props.debouncedSpeak( sprintf( _n(
 					'%d result found, use up and down arrow keys to navigate.',
 					'%d results found, use up and down arrow keys to navigate.',
-					posts.length
-				), posts.length ), 'assertive' );
+					suggestions.length
+				), suggestions.length ), 'assertive' );
 			} else {
 				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 			}
@@ -134,10 +131,10 @@ class URLInput extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { showSuggestions, selectedSuggestion, posts, loading } = this.state;
+		const { showSuggestions, selectedSuggestion, suggestions, loading } = this.state;
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
-		if ( ! showSuggestions || ! posts.length || loading ) {
+		if ( ! showSuggestions || ! suggestions.length || loading ) {
 			// In the Windows version of Firefox the up and down arrows don't move the caret
 			// within an input field like they do for Mac Firefox/Chrome/Safari. This causes
 			// a form of focus trapping that is disruptive to the user experience. This disruption
@@ -173,13 +170,13 @@ class URLInput extends Component {
 			return;
 		}
 
-		const post = this.state.posts[ this.state.selectedSuggestion ];
+		const suggestion = this.state.suggestions[ this.state.selectedSuggestion ];
 
 		switch ( event.keyCode ) {
 			case UP: {
 				event.stopPropagation();
 				event.preventDefault();
-				const previousIndex = ! selectedSuggestion ? posts.length - 1 : selectedSuggestion - 1;
+				const previousIndex = ! selectedSuggestion ? suggestions.length - 1 : selectedSuggestion - 1;
 				this.setState( {
 					selectedSuggestion: previousIndex,
 				} );
@@ -188,7 +185,7 @@ class URLInput extends Component {
 			case DOWN: {
 				event.stopPropagation();
 				event.preventDefault();
-				const nextIndex = selectedSuggestion === null || ( selectedSuggestion === posts.length - 1 ) ? 0 : selectedSuggestion + 1;
+				const nextIndex = selectedSuggestion === null || ( selectedSuggestion === suggestions.length - 1 ) ? 0 : selectedSuggestion + 1;
 				this.setState( {
 					selectedSuggestion: nextIndex,
 				} );
@@ -196,7 +193,7 @@ class URLInput extends Component {
 			}
 			case TAB: {
 				if ( this.state.selectedSuggestion !== null ) {
-					this.selectLink( post );
+					this.selectLink( suggestion );
 					// Announce a link has been selected when tabbing away from the input field.
 					this.props.speak( __( 'Link selected.' ) );
 				}
@@ -205,30 +202,30 @@ class URLInput extends Component {
 			case ENTER: {
 				if ( this.state.selectedSuggestion !== null ) {
 					event.stopPropagation();
-					this.selectLink( post );
+					this.selectLink( suggestion );
 				}
 				break;
 			}
 		}
 	}
 
-	selectLink( post ) {
-		this.props.onChange( post.url, post );
+	selectLink( suggestion ) {
+		this.props.onChange( suggestion.url, suggestion );
 		this.setState( {
 			selectedSuggestion: null,
 			showSuggestions: false,
 		} );
 	}
 
-	handleOnClick( post ) {
-		this.selectLink( post );
+	handleOnClick( suggestion ) {
+		this.selectLink( suggestion );
 		// Move focus to the input field when a link suggestion is clicked.
 		this.inputRef.current.focus();
 	}
 
 	render() {
 		const { value = '', autoFocus = true, instanceId, className } = this.props;
-		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
+		const { showSuggestions, suggestions, selectedSuggestion, loading } = this.state;
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div className={ classnames( 'editor-url-input block-editor-url-input', className ) }>
@@ -252,7 +249,7 @@ class URLInput extends Component {
 
 				{ ( loading ) && <Spinner /> }
 
-				{ showSuggestions && !! posts.length &&
+				{ showSuggestions && !! suggestions.length &&
 					<Popover position="bottom" noArrow focusOnMount={ false }>
 						<div
 							className="editor-url-input__suggestions block-editor-url-input__suggestions"
@@ -260,9 +257,9 @@ class URLInput extends Component {
 							ref={ this.autocompleteRef }
 							role="listbox"
 						>
-							{ posts.map( ( post, index ) => (
+							{ suggestions.map( ( suggestion, index ) => (
 								<button
-									key={ post.id }
+									key={ suggestion.id }
 									role="option"
 									tabIndex="-1"
 									id={ `block-editor-url-input-suggestion-${ instanceId }-${ index }` }
@@ -270,10 +267,10 @@ class URLInput extends Component {
 									className={ classnames( 'editor-url-input__suggestion block-editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
-									onClick={ () => this.handleOnClick( post ) }
+									onClick={ () => this.handleOnClick( suggestion ) }
 									aria-selected={ index === selectedSuggestion }
 								>
-									{ decodeEntities( post.title ) || __( '(no title)' ) }
+									{ suggestion.title }
 								</button>
 							) ) }
 						</div>
@@ -285,4 +282,14 @@ class URLInput extends Component {
 	}
 }
 
-export default withSpokenMessages( withInstanceId( URLInput ) );
+export default compose(
+	withSafeTimeout,
+	withSpokenMessages,
+	withInstanceId,
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return {
+			fetchLinkSuggestions: getSettings().__experimentalFetchLinkSuggestions,
+		};
+	} )
+)( URLInput );

@@ -1,10 +1,5 @@
 .wp-block-cover-image,
 .wp-block-cover {
-	.block-editor-rich-text__editable:focus a[data-rich-text-format-boundary] {
-		box-shadow: none;
-		background: rgba(255, 255, 255, 0.3);
-	}
-
 	&.components-placeholder h2 {
 		color: inherit;
 	}

@@ -158,10 +158,10 @@
 
 	// Hover style.
 	&.is-hovered > .block-editor-block-list__block-edit::before {
-		box-shadow: -$block-left-border-width 0 0 0 $light-gray-500;
+		box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
 
 		.is-dark-theme & {
-			box-shadow: -$block-left-border-width 0 0 0 $dark-gray-600;
+			box-shadow: -$block-left-border-width 0 0 0 $light-opacity-light-400;
 		}
 	}
 
@@ -737,10 +737,11 @@
 	left: 0;
 	right: 0;
 	justify-content: center;
+	height: $block-padding + 8px;
 
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
-		margin-top: -4px;
+		margin-top: -8px;
 		border-radius: 50%;
 		color: $blue-medium-focus;
 		background: $white;
@@ -903,6 +904,12 @@
 	// Reset pointer-events on children.
 	.block-editor-block-contextual-toolbar > * {
 		pointer-events: auto;
+	}
+
+	// Full-aligned blocks have negative margins on the parent of the toolbar, so additional position adjustment is not required.
+	&[data-align="full"] .block-editor-block-contextual-toolbar {
+		left: 0;
+		right: 0;
 	}
 }
 

@@ -12,10 +12,10 @@ import { withState } from '@wordpress/compose';
 
 const MyToggleControl = withState( {
 	hasFixedBackground: false,
-} )( ( { hasFixedBackground, setState } ) => ( 
+} )( ( { hasFixedBackground, setState } ) => (
 	<ToggleControl
 		label="Fixed Background"
-		help={ hasFixedBackground ? 'Has fixed background.' : 'No fixed background.' } 
+		help={ hasFixedBackground ? 'Has fixed background.' : 'No fixed background.' }
 		checked={ hasFixedBackground }
 		onChange={ () => setState( ( state ) => ( { hasFixedBackground: ! state.hasFixedBackground } ) ) }
 	/>
@@ -37,7 +37,7 @@ If this property is added, a label will be generated using label property as the
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String` | `Function`
+- Type: `String|WPElement`
 - Required: No
 
 ### checked
@@ -61,4 +61,3 @@ The class that will be added with `components-base-control` and `components-togg
 
 Type: String
 Required: No
-

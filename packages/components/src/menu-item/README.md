@@ -34,15 +34,6 @@ Element to render as child of button.
 
 Element
 
-### `label`
-
-- Type: `string`
-- Required: No
-
-String to use as primary button label text, applied as `aria-label`. Useful in cases where an `info` prop is passed, where `label` should be the minimal text of the button, described in further detail by `info`.
-
-Defaults to the value of `children`, if `children` is passed as a string.
-
 ### `info`
 
 - Type: `string`

@@ -11,8 +11,11 @@ import { __ } from '@wordpress/i18n';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/audio';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Audio' ),
@@ -20,43 +23,6 @@ export const settings = {
 	description: __( 'Embed a simple audio player.' ),
 
 	icon,
-
-	category: 'common',
-
-	attributes: {
-		src: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'audio',
-			attribute: 'src',
-		},
-		caption: {
-			type: 'string',
-			source: 'html',
-			selector: 'figcaption',
-		},
-		id: {
-			type: 'number',
-		},
-		autoplay: {
-			type: 'boolean',
-			source: 'attribute',
-			selector: 'audio',
-			attribute: 'autoplay',
-		},
-		loop: {
-			type: 'boolean',
-			source: 'attribute',
-			selector: 'audio',
-			attribute: 'loop',
-		},
-		preload: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'audio',
-			attribute: 'preload',
-		},
-	},
 
 	transforms: {
 		from: [
@@ -75,6 +41,36 @@ export const settings = {
 					} );
 
 					return block;
+				},
+			},
+			{
+				type: 'shortcode',
+				tag: 'audio',
+				attributes: {
+					src: {
+						type: 'string',
+						shortcode: ( { named: { src } } ) => {
+							return src;
+						},
+					},
+					loop: {
+						type: 'string',
+						shortcode: ( { named: { loop } } ) => {
+							return loop;
+						},
+					},
+					autoplay: {
+						type: 'srting',
+						shortcode: ( { named: { autoplay } } ) => {
+							return autoplay;
+						},
+					},
+					preload: {
+						type: 'string',
+						shortcode: ( { named: { preload } } ) => {
+							return preload;
+						},
+					},
 				},
 			},
 		],

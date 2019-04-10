@@ -16,12 +16,12 @@
 
 ### Usage
 
-A `MenuGroup` should be used to indicate that two or more individual MenuItems are related. When other menu items exist above or below a `MenuGroup`, the group should have a divider line between it and the adjacent item. A MenuGroup can optionally include a label to describe its contents. 
+A `MenuGroup` should be used to indicate that two or more individual MenuItems are related. When other menu items exist above or below a `MenuGroup`, the group should have a divider line between it and the adjacent item. A `MenuGroup` can optionally include a label to describe its contents. 
 
 ![MenuGroup diagram with label and dividers](https://wordpress.org/gutenberg/files/2019/03/MenuGroup-Anatomy.png)
 
-1. MenuGroup label
-2. MenuGroup dividers
+1. `MenuGroup` label
+2. `MenuGroup` dividers
 
 ## Development guidelines
 
