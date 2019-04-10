@@ -20,11 +20,7 @@ commands:
       - run:
           name: Checkout Gutenberg
           command: git submodule update --init --recursive
-  add-jest-reporter:
-    steps:
-      - run:
-          name: Install JUnit coverage reporter
-          command: yarn add --dev jest-junit
+  add-jest-reporter-dir:
       - run:
           name: Create reports directory
           command: mkdir reports && mkdir reports/test-results
@@ -47,7 +43,7 @@ jobs:
       - checkout
       - checkout-gutenberg
       - yarn-install
-      - add-jest-reporter
+      - add-jest-reporter-dir
       - run:
           name: Set Environment Variables
           command: |
@@ -70,7 +66,7 @@ jobs:
           name: Checkout Gutenberg
           command: git submodule update --init --recursive
       - yarn-install
-      - add-jest-reporter
+      - add-jest-reporter-dir
       - run:
           name: Set Environment Variables
           command: |
@@ -97,7 +93,7 @@ jobs:
     - checkout
     - checkout-gutenberg
     - yarn-install
-    - add-jest-reporter
+    - add-jest-reporter-dir
     - run:
         name: Set Environment Variables
         command: |
