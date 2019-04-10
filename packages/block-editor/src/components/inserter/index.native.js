@@ -44,6 +44,7 @@ class Inserter extends Component {
 							style={ styles.touchableArea }
 							underlayColor={ 'transparent' }
 							activeOpacity={ .5 }
+							accessibilityLabel={ item.title }
 							onPress={ () => this.props.onValueSelected( item.name ) }>
 							<View style={ styles.modalItem }>
 								<View style={ styles.modalIconWrapper }>

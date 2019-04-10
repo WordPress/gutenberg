@@ -49,6 +49,7 @@ export default class BlockInspector extends Component {
 		return (
 			<View style={ styles.toolbar }>
 				<ToolbarButton
+					accessibilityLabel={ __( 'Move up' ) }
 					label={ __( 'Move up' ) }
 					isDisabled={ ! this.props.canMoveUp }
 					onClick={ this.onUpPressed }

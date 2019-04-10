@@ -149,6 +149,7 @@ export class BlockList extends Component {
 			<View style={ { flex: 1 } } >
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
+					accessibilityLabel="block-list"
 					innerRef={ this.scrollViewInnerRef }
 					blockToolbarHeight={ toolbarStyles.container.height }
 					innerToolbarHeight={ inlineToolbarStyles.toolbar.height + blockHolderStyles.blockContainerFocused.paddingBottom }
@@ -207,6 +208,7 @@ export class BlockList extends Component {
 
 	renderItem( value ) {
 		const clientId = value.item;
+		const testID = `block-${ value.index }-${ this.props.getBlockName( clientId ) }`;
 
 		return (
 			<ReadableContentView>
@@ -214,6 +216,7 @@ export class BlockList extends Component {
 					key={ clientId }
 					showTitle={ false }
 					clientId={ clientId }
+					testID={ testID }
 					rootClientId={ this.props.rootClientId }
 					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 					borderStyle={ this.blockHolderBorderStyle() }
@@ -235,6 +238,7 @@ export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getBlockCount,
+			getBlockName,
 			getBlockIndex,
 			getBlockOrder,
 			getSelectedBlock,
@@ -247,6 +251,7 @@ export default compose( [
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
 			blockCount: getBlockCount( rootClientId ),
+			getBlockName,
 			isBlockSelected,
 			selectedBlock: getSelectedBlock(),
 			selectedBlockClientId,
