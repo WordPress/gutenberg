@@ -6,9 +6,9 @@ import { Toolbar } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import {
-	indentListItems,
-	outdentListItems,
-	changeListType,
+	__unstableIndentListItems as indentListItems,
+	__unstableOutdentListItems as outdentListItems,
+	__unstableChangeListType as changeListType,
 } from '@wordpress/rich-text';
 
 /**
