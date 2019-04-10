@@ -139,6 +139,9 @@ class DependencyExtractionWebpackPlugin {
  */
 function defaultRequestToExternal( request ) {
 	switch ( request ) {
+		case '@babel/runtime/regenerator':
+			return 'regeneratorRuntime';
+
 		case 'lodash':
 		case 'lodash-es':
 		case 'moment':
@@ -171,6 +174,10 @@ function defaultRequestToExternal( request ) {
  * @return {(string|undefined)} Script dependency slug
  */
 function defaultRequestToDependency( request ) {
+	if ( request === '@babel/runtime/regenerator' ) {
+		return 'wp-polyfill';
+	}
+
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
 		return 'wp-' + request.substring( WORDPRESS_NAMESPACE.length );
 	}
