@@ -187,3 +187,13 @@ exports[`adding blocks should not delete surrounding space when deleting a word 
 <p>1 2 3</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`adding blocks should not prematurely multi-select 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>></p>
+<!-- /wp:paragraph -->"
+`;
