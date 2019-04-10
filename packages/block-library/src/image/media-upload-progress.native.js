@@ -24,7 +24,7 @@ const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
 const MEDIA_UPLOAD_STATE_FAILED = 3;
 const MEDIA_UPLOAD_STATE_RESET = 4;
 
-class MediaUploadUI extends React.Component {
+class MediaUploadProgress extends React.Component {
 	constructor( props ) {
 		super( props );
 
@@ -148,4 +148,4 @@ class MediaUploadUI extends React.Component {
 	}
 }
 
-export default MediaUploadUI;
+export default MediaUploadProgress;

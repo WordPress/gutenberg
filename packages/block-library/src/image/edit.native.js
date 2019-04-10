@@ -35,7 +35,7 @@ import { doAction, hasAction } from '@wordpress/hooks';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import MediaUploadUI from './media-upload-ui.native.js';
+import MediaUploadProgress from './media-upload-progress';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
@@ -232,7 +232,7 @@ class ImageEdit extends React.Component {
 							onClick={ onImageSettingsButtonPressed }
 						/>
 					</InspectorControls>
-					<MediaUploadUI
+					<MediaUploadProgress
 						height={ height }
 						width={ width }
 						coverUrl={ url }
