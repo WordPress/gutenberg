@@ -223,13 +223,13 @@ Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but th
 
 ### Enqueuing the editor style
 
-To make sure your editor style is loaded and parsed correctly, enqueue it using the following method:
+The `add_editor_style` function enqueues and loads the CSS on the editor screen. For the classic editor, this was the only function needed to add style to the editor. For the new block editor, you first need to `add_theme_support( 'editor-styles');` mentioned above.
 
 ```php
 add_editor_style( 'style-editor.css' );
 ```
 
-It is enough to paste that in your `functions.php` file, for the style to be loaded and parsed.
+Adding that to your `functions.php` file will load the stylesheet `style-editor.css` found in your theme directory.
 
 ### Basic colors
 
