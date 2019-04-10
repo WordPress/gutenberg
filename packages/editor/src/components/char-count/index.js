@@ -7,10 +7,10 @@ import { count as charCount } from '@wordpress/wordcount';
 
 function CharCount( { content } ) {
 	/*
-	 * Only count the number of characters (no spaces).
+	 * Two options available for counting: 'characters_excluding_spaces' or 'characters_including_spaces'
 	 * Do not translate into your own language.
 	 */
-	const charCountType = _x( 'characters_excluding_spaces', 'Word count type. Do not translate!' );
+	const charCountType = _x( 'characters_including_spaces', 'Character count type. Do not translate literally!' );
 
 	return (
 		<span className="char-count">{ charCount( content, charCountType ) }</span>
