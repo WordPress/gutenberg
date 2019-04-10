@@ -26,35 +26,11 @@ import {
 	SOLID_COLOR_CLASS,
 } from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-const blockAttributes = {
-	value: {
-		type: 'string',
-		source: 'html',
-		selector: 'blockquote',
-		multiline: 'p',
-	},
-	citation: {
-		type: 'string',
-		source: 'html',
-		selector: 'cite',
-		default: '',
-	},
-	mainColor: {
-		type: 'string',
-	},
-	customMainColor: {
-		type: 'string',
-	},
-	textColor: {
-		type: 'string',
-	},
-	customTextColor: {
-		type: 'string',
-	},
-};
+const { name, attributes: blockAttributes } = metadata;
 
-export const name = 'core/pullquote';
+export { metadata, name };
 
 export const settings = {
 
@@ -63,10 +39,6 @@ export const settings = {
 	description: __( 'Give special visual emphasis to a quote from your text.' ),
 
 	icon,
-
-	category: 'formatting',
-
-	attributes: blockAttributes,
 
 	styles: [
 		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
