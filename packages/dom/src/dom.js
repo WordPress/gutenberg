@@ -95,9 +95,10 @@ function isEdge( container, isReverse, onlyVertical ) {
 
 	const range = selection.getRangeAt( 0 ).cloneRange();
 	const isForward = isSelectionForward( selection );
+	const isCollapsed = selection.isCollapsed;
 
 	// Collapse in direction of selection.
-	if ( ! range.collapsed ) {
+	if ( ! isCollapsed ) {
 		range.collapse( ! isForward );
 	}
 
@@ -113,7 +114,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 	// Only consider the multiline selection at the edge if the direction is
 	// towards the edge.
 	if (
-		! selection.isCollapsed &&
+		! isCollapsed &&
 		rangeRect.height > lineHeight &&
 		isForward === isReverse
 	) {
