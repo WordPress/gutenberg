@@ -119,7 +119,7 @@ After those are checked off to run the UI tests on iOS run
 
 `yarn test:e2e:ios:local`
 
-and for android ensure you have an emulator with at least platform version 8.0 running and run, 
+and for android run, 
 
 `yarn test:e2e:android:local`
 
