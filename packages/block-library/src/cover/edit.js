@@ -201,6 +201,7 @@ class CoverEdit extends Component {
 								<Toolbar>
 									<IconButton
 										className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
+										aria-pressed={ this.state.isEditing }
 										label={ __( 'Edit media' ) }
 										icon={ editImageIcon }
 										onClick={ this.toggleIsEditing }
