@@ -27,7 +27,6 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUpload,
 	MediaUploadCheck,
 	PanelColorSettings,
 	withColors,
@@ -45,6 +44,7 @@ import {
 	backgroundImageStyles,
 	dimRatioToClass,
 } from './shared';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Module Constants
@@ -67,14 +67,27 @@ function retrieveFastAverageColor() {
 }
 
 class CoverEdit extends Component {
-	constructor() {
+	constructor( { attributes } ) {
 		super( ...arguments );
 		this.state = {
 			isDark: false,
+			isEditing: ! attributes.url,
 		};
 		this.imageRef = createRef();
 		this.videoRef = createRef();
 		this.changeIsDarkIfRequired = this.changeIsDarkIfRequired.bind( this );
+		this.toggleIsEditing = this.toggleIsEditing.bind( this );
+	}
+
+	toggleIsEditing() {
+		this.setState( {
+			isEditing: ! this.state.isEditing,
+		} );
+		if ( this.state.isEditing ) {
+			speak( __( 'You are now viewing the image in the image block.' ) );
+		} else {
+			speak( __( 'You are now editing the image in the image block.' ) );
+		}
 	}
 
 	componentDidMount() {
@@ -86,11 +99,11 @@ class CoverEdit extends Component {
 	}
 
 	render() {
+		const { isEditing } = this.state;
 		const {
 			attributes,
 			setAttributes,
 			className,
-			noticeOperations,
 			noticeUI,
 			overlayColor,
 			setOverlayColor,
@@ -100,9 +113,23 @@ class CoverEdit extends Component {
 			dimRatio,
 			focalPoint,
 			hasParallax,
-			id,
 			url,
+			id,
 		} = attributes;
+
+		const onSelectUrl = ( newURL ) => {
+			if ( newURL !== url ) {
+				this.props.setAttributes( {
+					url: newURL,
+					id: undefined,
+				} );
+			}
+
+			this.setState( {
+				isEditing: false,
+			} );
+		};
+
 		const onSelectMedia = ( media ) => {
 			if ( ! media || ! media.url ) {
 				setAttributes( { url: undefined, id: undefined } );
@@ -137,6 +164,10 @@ class CoverEdit extends Component {
 					{}
 				),
 			} );
+
+			this.setState( {
+				isEditing: false,
+			} );
 		};
 
 		const toggleParallax = () => {
@@ -168,18 +199,11 @@ class CoverEdit extends Component {
 						<Fragment>
 							<MediaUploadCheck>
 								<Toolbar>
-									<MediaUpload
-										onSelect={ onSelectMedia }
-										allowedTypes={ ALLOWED_MEDIA_TYPES }
-										value={ id }
-										render={ ( { open } ) => (
-											<IconButton
-												className="components-toolbar__control"
-												label={ __( 'Edit media' ) }
-												icon={ editImageIcon }
-												onClick={ open }
-											/>
-										) }
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit media' ) }
+										icon={ editImageIcon }
+										onClick={ this.toggleIsEditing }
 									/>
 								</Toolbar>
 							</MediaUploadCheck>
@@ -229,25 +253,36 @@ class CoverEdit extends Component {
 			</Fragment>
 		);
 
-		if ( ! url ) {
-			const placeholderIcon = <BlockIcon icon={ icon } />;
-			const label = __( 'Cover' );
+		if ( isEditing || ! url ) {
+			const labels = {
+				title: __( 'Cover' ),
+				instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
+			};
+
+			const mediaPreview = ( !! url && <img
+				alt={ __( 'Edit image' ) }
+				title={ __( 'Edit image' ) }
+				className={ 'edit-image-preview' }
+				src={ url }
+			/> );
 
 			return (
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon={ placeholderIcon }
+						icon={ <BlockIcon icon={ icon } /> }
 						className={ className }
-						labels={ {
-							title: label,
-							instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
-						} }
+						labels={ labels }
 						onSelect={ onSelectMedia }
+						onSelectURL={ onSelectUrl }
+						onDoubleClick={ this.toggleIsEditing }
+						onCancel={ !! url && this.toggleIsEditing }
+						notices={ noticeUI }
+						onError={ this.onUploadError }
 						accept="image/*,video/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
+						value={ { id, url } }
+						mediaPreview={ backgroundType === IMAGE_BACKGROUND_TYPE && mediaPreview }
 					/>
 				</Fragment>
 			);
