@@ -6,6 +6,11 @@ export default {
 		htmlUnescaped: [ 'a&nbsp;&nbsp;&nbsp;b', 'i&nbsp;&lt;3&nbsp;tags', '1&amp;2&amp;3&amp;4' ],
 	},
 	specialSuggestions: {
+		default: [
+			'the', 'of', 'and', 'to', 'a', 'in', 'for', 'is', 'on', 'that', 'by', 'this', 'with', 'i', 'you', 'it',
+			'not', 'or', 'be', 'are', 'from', 'at', 'as', 'your', 'all', 'have', 'new', 'more', 'an', 'was', 'we',
+			'associate', 'snake', 'pipes', 'sound',
+		],
 		textEscaped: [ '&lt;3', 'Stuff &amp; Things', 'Tags &amp; Stuff', 'Tags &amp; Stuff 2' ],
 		textUnescaped: [ '<3', 'Stuff & Things', 'Tags & Stuff', 'Tags & Stuff 2' ],
 		matchAmpersandUnescaped: [
