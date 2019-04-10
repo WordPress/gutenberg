@@ -2,8 +2,8 @@
  * External dependencies
  */
 import React from 'react';
-import { View, TextInput, TouchableWithoutFeedback } from 'react-native';
-import Video from 'react-native-video';
+import { View, TextInput, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import Video from './video-player';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -180,16 +180,16 @@ class VideoEdit extends React.Component {
 							const videoStyle = {
 								height: this.state.videoContainerHeight,
 								width: '100%',
+								
 							};
 
 							return (
-								<View onLayout={ this.onVideoContanerLayout } style={ style.videoContainer }>
+								<View onLayout={ this.onVideoContanerLayout } style={ { flex: 1 } }>
 									{ showVideo &&
 										<Video
 											source={ { uri: src } }
 											poster={ poster }
 											style={ videoStyle }
-											controls={ true }
 											paused={ true }
 											muted={ true }
 										/>
