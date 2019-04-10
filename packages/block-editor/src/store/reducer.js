@@ -236,8 +236,7 @@ function withPersistentBlockChange( reducer ) {
  */
 function withIgnoredBlockChange( reducer ) {
 	/**
-	 * Set of action types for which a blocks state change should be considered
-	 * non-persistent.
+	 * Set of action types for which a blocks state change should be ignored.
 	 *
 	 * @type {Set}
 	 */
