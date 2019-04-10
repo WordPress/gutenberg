@@ -233,7 +233,8 @@ describe( 'state', () => {
 				const state = blocks( existingState, action );
 
 				expect( state ).toEqual( {
-					isPersistentChange: expect.anything(),
+					isPersistentChange: true,
+					isIgnoredChange: false,
 					byClientId: {
 						clicken: {
 							clientId: 'chicken',
@@ -295,7 +296,8 @@ describe( 'state', () => {
 				const state = blocks( existingState, action );
 
 				expect( state ).toEqual( {
-					isPersistentChange: expect.anything(),
+					isPersistentChange: true,
+					isIgnoredChange: false,
 					byClientId: {
 						clicken: {
 							clientId: 'chicken',
@@ -386,7 +388,8 @@ describe( 'state', () => {
 				const state = blocks( existingState, action );
 
 				expect( state ).toEqual( {
-					isPersistentChange: expect.anything(),
+					isPersistentChange: true,
+					isIgnoredChange: false,
 					byClientId: {
 						clicken: {
 							clientId: 'chicken',
@@ -478,7 +481,8 @@ describe( 'state', () => {
 				const state = blocks( existingState, action );
 
 				expect( state ).toEqual( {
-					isPersistentChange: expect.anything(),
+					isPersistentChange: true,
+					isIgnoredChange: false,
 					byClientId: {
 						clicken: {
 							clientId: 'chicken',
@@ -512,6 +516,7 @@ describe( 'state', () => {
 				attributes: {},
 				order: {},
 				isPersistentChange: true,
+				isIgnoredChange: false,
 			} );
 		} );
 
@@ -1512,8 +1517,10 @@ describe( 'state', () => {
 
 					expect( state ).toBe( original );
 				} );
+			} );
 
-				it( 'should not consider received blocks as persistent change', () => {
+			describe( 'isIgnoredChange', () => {
+				it( 'should consider received blocks as ignored change', () => {
 					const state = blocks( undefined, {
 						type: 'RECEIVE_BLOCKS',
 						blocks: [ {
@@ -1523,7 +1530,7 @@ describe( 'state', () => {
 						} ],
 					} );
 
-					expect( state.isPersistentChange ).toBe( false );
+					expect( state.isIgnoredChange ).toBe( true );
 				} );
 			} );
 		} );
