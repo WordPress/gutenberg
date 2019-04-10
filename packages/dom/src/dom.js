@@ -93,7 +93,15 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const rangeRect = getRectangleFromRange( selection.getRangeAt( 0 ) );
+	const range = selection.getRangeAt( 0 ).cloneRange();
+	const isForward = isSelectionForward( selection );
+
+	// Collapse in direction of selection.
+	if ( ! range.collapsed ) {
+		range.collapse( ! isForward );
+	}
+
+	const rangeRect = getRectangleFromRange( range );
 
 	if ( ! rangeRect ) {
 		return false;
@@ -107,7 +115,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 	if (
 		! selection.isCollapsed &&
 		rangeRect.height > lineHeight &&
-		isSelectionForward( selection ) === isReverse
+		isForward === isReverse
 	) {
 		return false;
 	}
