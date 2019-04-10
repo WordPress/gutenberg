@@ -25,8 +25,6 @@ import { withSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	BlockIcon,
-	MediaUpload,
-	MediaUploadCheck,
 	MediaPlaceholder,
 	RichText,
 } from '@wordpress/block-editor';
@@ -39,12 +37,15 @@ import { __ } from '@wordpress/i18n';
  */
 import icon from './icon';
 import FileBlockInspector from './inspector';
+import { speak } from '@wordpress/a11y';
 
 class FileEdit extends Component {
-	constructor() {
+	constructor( { attributes } ) {
 		super( ...arguments );
 
 		this.onSelectFile = this.onSelectFile.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
+		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.confirmCopyURL = this.confirmCopyURL.bind( this );
 		this.resetCopyConfirmation = this.resetCopyConfirmation.bind( this );
 		this.changeLinkDestinationOption = this.changeLinkDestinationOption.bind( this );
@@ -54,6 +55,7 @@ class FileEdit extends Component {
 		this.state = {
 			hasError: false,
 			showCopyConfirmation: false,
+			isEditing: ! attributes.href,
 		};
 	}
 
@@ -94,6 +96,33 @@ class FileEdit extends Component {
 				textLinkHref: media.url,
 				id: media.id,
 			} );
+		}
+		this.toggleIsEditing();
+	}
+
+	onSelectURL( newURL ) {
+		const { href } = this.props.attributes;
+
+		if ( newURL !== href ) {
+			this.props.setAttributes( {
+				href: newURL,
+				id: undefined,
+			} );
+		}
+
+		this.setState( {
+			isEditing: false,
+		} );
+	}
+
+	toggleIsEditing() {
+		this.setState( {
+			isEditing: ! this.state.isEditing,
+		} );
+		if ( this.state.isEditing ) {
+			speak( __( 'You are now viewing the image in the image block.' ) );
+		} else {
+			speak( __( 'You are now editing the image in the image block.' ) );
 		}
 	}
 
@@ -137,33 +166,58 @@ class FileEdit extends Component {
 			textLinkTarget,
 			showDownloadButton,
 			downloadButtonText,
-			id,
 		} = attributes;
-		const { hasError, showCopyConfirmation } = this.state;
+		const { hasError, showCopyConfirmation, isEditing } = this.state;
 		const attachmentPage = media && media.link;
+		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 
-		if ( ! href || hasError ) {
+		if ( ! href || isEditing || hasError ) {
 			return (
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					labels={ {
-						title: __( 'File' ),
-						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
-					} }
-					onSelect={ this.onSelectFile }
-					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
-					accept="*"
-				/>
+				<Fragment>
+					<BlockControls>
+						<Toolbar>
+							{ !! href && ( <IconButton
+								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
+								aria-pressed={ this.state.isEditing }
+								label={ __( 'Edit file' ) }
+								onClick={ this.toggleIsEditing }
+								icon={ editImageIcon }
+							/> ) }
+						</Toolbar>
+					</BlockControls>
+					<MediaPlaceholder
+						icon={ <BlockIcon icon={ icon } /> }
+						labels={ {
+							title: __( 'File' ),
+							instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
+						} }
+						onSelect={ this.onSelectFile }
+						onSelectURL={ this.onSelectURL }
+						onCancel={ !! href && this.toggleIsEditing }
+						notices={ noticeUI }
+						onError={ noticeOperations.createErrorNotice }
+						accept="*"
+					/>
+				</Fragment>
 			);
 		}
 
 		const classes = classnames( className, {
 			'is-transient': isBlobURL( href ),
 		} );
-		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		return (
 			<Fragment>
+				<BlockControls>
+					<Toolbar>
+						<IconButton
+							className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
+							aria-pressed={ this.state.isEditing }
+							label={ __( 'Edit file' ) }
+							onClick={ this.toggleIsEditing }
+							icon={ editImageIcon }
+						/>
+					</Toolbar>
+				</BlockControls>
 				<FileBlockInspector
 					hrefs={ { href, textLinkHref, attachmentPage } }
 					{ ...{
@@ -174,24 +228,6 @@ class FileEdit extends Component {
 						changeShowDownloadButton: this.changeShowDownloadButton,
 					} }
 				/>
-				<BlockControls>
-					<MediaUploadCheck>
-						<Toolbar>
-							<MediaUpload
-								onSelect={ this.onSelectFile }
-								value={ id }
-								render={ ( { open } ) => (
-									<IconButton
-										className="components-toolbar__control"
-										label={ __( 'Edit file' ) }
-										onClick={ open }
-										icon={ editImageIcon }
-									/>
-								) }
-							/>
-						</Toolbar>
-					</MediaUploadCheck>
-				</BlockControls>
 				<div className={ classes }>
 					<div className={ 'wp-block-file__content-wrapper' }>
 						<RichText
