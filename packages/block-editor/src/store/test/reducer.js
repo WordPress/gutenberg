@@ -1500,6 +1500,19 @@ describe( 'state', () => {
 					expect( state.isPersistentChange ).toBe( true );
 				} );
 
+				it( 'should retain reference for same state, same persistence', () => {
+					const original = deepFreeze( blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [],
+					} ) );
+
+					const state = blocks( original, {
+						type: '__INERT__',
+					} );
+
+					expect( state ).toBe( original );
+				} );
+
 				it( 'should not consider received blocks as persistent change', () => {
 					const state = blocks( undefined, {
 						type: 'RECEIVE_BLOCKS',

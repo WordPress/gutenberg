@@ -15,6 +15,10 @@
 
 - `CopyHandler` will now only catch cut/copy events coming from its `props.children`, instead of from anywhere in the `document`.
 
+### Internal
+
+- Improved handling of blocks state references for unchanging states.
+
 ## 1.0.0 (2019-03-06)
 
 ### New Features

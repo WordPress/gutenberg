@@ -206,9 +206,14 @@ function withPersistentBlockChange( reducer ) {
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
 		if ( state === nextState && ! isExplicitPersistentChange ) {
+			const nextIsPersistentChange = get( state, [ 'isPersistentChange' ], true );
+			if ( state.isPersistentChange === nextIsPersistentChange ) {
+				return state;
+			}
+
 			return {
 				...nextState,
-				isPersistentChange: get( state, [ 'isPersistentChange' ], true ),
+				isPersistentChange: nextIsPersistentChange,
 			};
 		}
 
