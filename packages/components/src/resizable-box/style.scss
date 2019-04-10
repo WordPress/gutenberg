@@ -39,6 +39,7 @@
 	top: calc(50% - 4px);
 	right: calc(50% - 4px);
 	transition: transform 0.1s ease-in;
+	opacity: 0;
 }
 
 .is-dark-theme {
@@ -79,22 +80,43 @@
 	border-bottom: 0;
 }
 
-// Hide side handle line by default
-.components-resizable-box__side-handle.components-resizable-box__handle-top::before,
-.components-resizable-box__side-handle.components-resizable-box__handle-bottom::before {
-	transform: scaleX(0);
-}
-
-.components-resizable-box__side-handle.components-resizable-box__handle-left::before,
-.components-resizable-box__side-handle.components-resizable-box__handle-right::before {
-	transform: scaleY(0);
-}
-
 // Reveal the side handle line when hovered or in use
-.components-resizable-box__side-handle:active::before,
-.components-resizable-box__side-handle:hover::before {
-	transform: none;
-	transition: transform 0.1s ease-out;
+.components-resizable-box__side-handle.components-resizable-box__handle-top:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-bottom:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-top:active::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-bottom:active::before {
+	animation: components-resizable-box__top-bottom-animation 0.1s ease-out 0s;
+	animation-fill-mode: forwards;
+}
+
+.components-resizable-box__side-handle.components-resizable-box__handle-left:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-right:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-left:active::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-right:active::before {
+	animation: components-resizable-box__left-right-animation 0.1s ease-out 0s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes components-resizable-box__top-bottom-animation {
+	from {
+		transform: scaleX(0);
+		opacity: 0;
+	}
+	to {
+		transform: scaleX(1);
+		opacity: 1;
+	}
+}
+
+@keyframes components-resizable-box__left-right-animation {
+	from {
+		transform: scaleY(0);
+		opacity: 0;
+	}
+	to {
+		transform: scaleY(1);
+		opacity: 1;
+	}
 }
 
 /*!rtl:begin:ignore*/
