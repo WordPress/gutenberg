@@ -2,7 +2,10 @@
  * External dependencies
  */
 import React from 'react';
-import { View, TextInput, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import { View, TextInput, TouchableWithoutFeedback } from 'react-native';
+/**
+ * Internal dependencies
+ */
 import Video from './video-player';
 import {
 	requestMediaImport,
@@ -34,7 +37,6 @@ import { doAction, hasAction } from '@wordpress/hooks';
  * Internal dependencies
  */
 import styles from '../image/styles.scss';
-import style from './style.scss';
 import MediaUploadProgress from '../image/media-upload-progress';
 import icon from './icon';
 
@@ -180,7 +182,7 @@ class VideoEdit extends React.Component {
 							const videoStyle = {
 								height: this.state.videoContainerHeight,
 								width: '100%',
-								
+
 							};
 
 							return (
