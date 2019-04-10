@@ -58,6 +58,7 @@ class MediaContainer extends Component {
 		const {
 			mediaUrl,
 			mediaId,
+			mediaType,
 			toggleIsEditing,
 			onSelectMedia,
 			onSelectUrl,
@@ -89,7 +90,7 @@ class MediaContainer extends Component {
 				accept="image/*,video/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { mediaId, mediaUrl } }
-				mediaPreview={ mediaPreview }
+				mediaPreview={ mediaType === 'image' && mediaPreview }
 			/>
 		);
 	}
