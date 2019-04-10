@@ -129,6 +129,7 @@ class DependencyExtractionWebpackPlugin {
 function defaultRequestToExternal( request ) {
 	switch ( request ) {
 		case 'lodash':
+		case 'lodash-es':
 		case 'moment':
 			return request;
 
