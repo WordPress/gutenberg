@@ -218,6 +218,11 @@ describe( 'Preview with Custom Fields enabled', async () => {
 		await editorPage.keyboard.press( 'Tab' );
 		await editorPage.keyboard.type( 'content 1' );
 
+		// Publish the post and then close the publish panel.
+		await publishPost();
+		await page.waitForSelector( '.editor-post-publish-panel' );
+		await page.click( '.editor-post-publish-panel__header button' );
+
 		// Open the preview page.
 		const previewPage = await openPreviewPage( editorPage );
 
