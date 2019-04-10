@@ -44,7 +44,7 @@ class MediaUpload extends React.Component {
 		const { mediaType } = this.props;
 
 		const onMediaLibraryButtonPressed = () => {
-			requestMediaPickFromMediaLibrary( [ mediaType ], ( mediaId, mediaUrl) => {
+			requestMediaPickFromMediaLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
 				if ( mediaId ) {
 					this.props.onSelectURL( mediaId, mediaUrl );
 				}
@@ -54,7 +54,7 @@ class MediaUpload extends React.Component {
 		const onMediaUploadButtonPressed = () => {
 			requestMediaPickFromDeviceLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
 				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl);
+					this.props.onSelectURL( mediaId, mediaUrl );
 				}
 			} );
 		};
@@ -62,7 +62,7 @@ class MediaUpload extends React.Component {
 		const onMediaCaptureButtonPressed = () => {
 			requestMediaPickFromDeviceCamera( [ mediaType ], ( mediaId, mediaUrl ) => {
 				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl);
+					this.props.onSelectURL( mediaId, mediaUrl );
 				}
 			} );
 		};

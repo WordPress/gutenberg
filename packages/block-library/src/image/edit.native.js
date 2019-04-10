@@ -35,7 +35,6 @@ import { doAction, hasAction } from '@wordpress/hooks';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import ImageSize from './image-size';
 import MediaUploadUI from './media-upload-ui.native.js';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
@@ -263,7 +262,7 @@ class ImageEdit extends React.Component {
 									</ImageBackground>
 								</View>
 							);
-						}}
+						} }
 					/>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 						<View style={ { padding: 12, flex: 1 } }>

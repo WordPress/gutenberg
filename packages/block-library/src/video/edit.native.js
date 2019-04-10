@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, TextInput, TouchableWithoutFeedback, ImageBackground } from 'react-native';
+import { View, TextInput, TouchableWithoutFeedback } from 'react-native';
 import Video from 'react-native-video';
 import {
 	requestMediaImport,
@@ -38,7 +38,7 @@ import style from './style.scss';
 import MediaUploadUI from '../image/media-upload-ui.native.js';
 import icon from './icon';
 
-const VIDEO_ASPECT_RATIO =  1.7;
+const VIDEO_ASPECT_RATIO = 1.7;
 
 class VideoEdit extends React.Component {
 	constructor( props ) {
@@ -124,7 +124,7 @@ class VideoEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { caption, height, width, id, poster, src } = attributes;
+		const { caption, id, poster, src } = attributes;
 		const { isMediaRequested } = this.state;
 
 		const toolbarEditButton = (
@@ -171,7 +171,7 @@ class VideoEdit extends React.Component {
 					</InspectorControls>
 					<MediaUploadUI
 						mediaId={ id }
-ü						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
+						ü						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( isUploadInProgress ) => {
@@ -192,16 +192,16 @@ class VideoEdit extends React.Component {
 											controls={ true }
 											paused={ true }
 											muted={ true }
-										/> 
+										/>
 									}
 									{ ! showVideo &&
-										<View style={ { ...videoStyle, opacity } }> 
+										<View style={ { ...videoStyle, opacity } }>
 											{ icon }
 										</View>
 									}
 								</View>
 							);
-						}}
+						} }
 					/>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 						<View style={ { padding: 12, flex: 1 } }>
