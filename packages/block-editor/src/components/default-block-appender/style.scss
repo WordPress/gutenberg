@@ -74,6 +74,12 @@
 
 	.block-editor-inserter__toggle {
 		margin-right: 0;
+
+		// Hide the box shadow that appears on hover.
+		// All the :not() rules are needed to override default iconButton styles.
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+			box-shadow: none;
+		}
 	}
 }
 
