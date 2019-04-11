@@ -100,7 +100,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 	}
 
 	const computedStyle = window.getComputedStyle( container );
-	const lineHeight = parseInt( computedStyle.lineHeight, 10 );
+	const lineHeight = parseInt( computedStyle.lineHeight, 10 ) || 0;
 
 	// Only consider the multiline selection at the edge if the direction is
 	// towards the edge.
@@ -112,6 +112,10 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
+	const padding = parseInt( computedStyle[
+		`padding${ isReverse ? 'Top' : 'Bottom' }`
+	], 10 ) || 0;
+
 	// Calculate a buffer that is half the line height. In some browsers, the
 	// selection rectangle may not fill the entire height of the line, so we add
 	// 3/4 the line height to the selection rectangle to ensure that it is well
@@ -119,8 +123,8 @@ function isEdge( container, isReverse, onlyVertical ) {
 	const buffer = 3 * parseInt( lineHeight, 10 ) / 4;
 	const containerRect = container.getBoundingClientRect();
 	const verticalEdge = isReverse ?
-		containerRect.top > rangeRect.top - buffer :
-		containerRect.bottom < rangeRect.bottom + buffer;
+		containerRect.top + padding > rangeRect.top - buffer :
+		containerRect.bottom - padding < rangeRect.bottom + buffer;
 
 	if ( ! verticalEdge ) {
 		return false;
