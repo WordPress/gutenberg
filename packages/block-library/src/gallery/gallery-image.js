@@ -127,23 +127,23 @@ class GalleryImage extends Component {
 
 		return (
 			<figure className={ className }>
+				{ href ? <a href={ href }>{ img }</a> : img }
 				<div className="block-library-gallery-item__move-menu">
 					<IconButton
 						icon="arrow-left"
-						onClick={ onMoveBackward }
+						onClick={ isFirstItem ? undefined : onMoveBackward }
 						className="blocks-gallery-item__move-backward"
 						label={ __( 'Move Image Backward' ) }
 						aria-disabled={ isFirstItem }
 					/>
 					<IconButton
 						icon="arrow-right"
-						onClick={ onMoveForward }
+						onClick={ isLastItem ? undefined : onMoveForward }
 						className="blocks-gallery-item__move-forward"
 						label={ __( 'Move Image Forward' ) }
 						aria-disabled={ isLastItem }
 					/>
 				</div>
-
 				<div className="block-library-gallery-item__inline-menu">
 					<IconButton
 						icon="no-alt"
