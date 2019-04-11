@@ -13,8 +13,19 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import IgnoreNestedEvents from '../ignore-nested-events';
-import DefaultBlockAppender from '../default-block-appender';
+import BaseDefaultBlockAppender from '../default-block-appender';
 import withClientId from './utils/with-client-id';
+
+export const DefaultBlockAppender = function( { clientId, lastBlockClientId } ) {
+	return (
+		<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
+			<BaseDefaultBlockAppender
+				rootClientId={ clientId }
+				lastBlockClientId={ lastBlockClientId }
+			/>
+		</IgnoreNestedEvents>
+	);
+};
 
 export default compose( [
 	withClientId,
@@ -29,13 +40,4 @@ export default compose( [
 			lastBlockClientId: last( blockClientIds ),
 		};
 	} ),
-] )( function( { clientId, lastBlockClientId } ) {
-	return (
-		<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
-			<DefaultBlockAppender
-				rootClientId={ clientId }
-				lastBlockClientId={ lastBlockClientId }
-			/>
-		</IgnoreNestedEvents>
-	);
-} );
+] )( DefaultBlockAppender );
