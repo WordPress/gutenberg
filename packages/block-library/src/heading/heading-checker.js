@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { flatMap } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
@@ -8,10 +13,31 @@ import { useEffect } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
+// copy from packages/editor/src/components/document-outline/index.js
 /**
- * Internal dependencies
+ * Returns an array of heading blocks enhanced with the following properties:
+ * path    - An array of blocks that are ancestors of the heading starting from a top-level node.
+ *           Can be an empty array if the heading is a top-level node (is not nested inside another block).
+ * level   - An integer with the heading level.
+ * isEmpty - Flag indicating if the heading has no content.
+ *
+ * @param {?Array} blocks An array of blocks.
+ * @param {?Array} path   An array of blocks that are ancestors of the blocks passed as blocks.
+ *
+ * @return {Array} An array of heading blocks enhanced with the properties described above.
  */
-import { computeOutlineHeadings } from '../../../editor/src/components/document-outline/index.js';
+export const computeOutlineHeadings = ( blocks = [], path = [] ) => {
+	return flatMap( blocks, ( block = {} ) => {
+		if ( block.name === 'core/heading' ) {
+			return {
+				...block,
+				path,
+				level: block.attributes.level,
+			};
+		}
+		return computeOutlineHeadings( block.innerBlocks, [ ...path, block ] );
+	} );
+};
 
 export const HeadingChecker = ( { blocks = [], selectedLevel, selectedHeadingId } ) => {
 	const headings = computeOutlineHeadings( blocks );
