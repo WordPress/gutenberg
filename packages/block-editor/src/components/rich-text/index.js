@@ -413,7 +413,9 @@ export class RichText extends Component {
 			}
 		}
 
-		const { formats, activeFormats = [], start, end } = this.getRecord();
+		const record = this.getRecord();
+		const { activeFormats = [], start, end } = record;
+		const formats = createPrepareEditableTree( this.props )( record );
 		const value = this.createRecord();
 
 		let newFormats;
@@ -750,7 +752,7 @@ export class RichText extends Component {
 	 */
 	handleHorizontalNavigation( event ) {
 		const value = this.getRecord();
-		const { formats, text, start, end } = value;
+		const { text, start, end } = value;
 		const { activeFormats = [] } = this.state;
 		const collapsed = isCollapsed( value );
 		const isReverse = event.keyCode === LEFT;
@@ -779,6 +781,7 @@ export class RichText extends Component {
 		// In all other cases, prevent default behaviour.
 		event.preventDefault();
 
+		const formats = createPrepareEditableTree( this.props )( value );
 		const formatsBefore = formats[ start - 1 ] || [];
 		const formatsAfter = formats[ start ] || [];
 
