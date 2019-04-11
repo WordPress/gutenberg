@@ -1,7 +1,7 @@
 /**
- * Section: All Alignment Settings
+ * Group: All Alignment Settings
  */
-.wp-block[data-type="core/section"] {
+.wp-block[data-type="core/group"] {
 
 	// Ensure not rendering outside the element
 	// as -1px causes overflow-x scrollbars
@@ -11,14 +11,14 @@
 	}
 
 	// Only applied when background is added to cancel out padding
-	> .editor-block-list__block-edit > div > .wp-block-section.has-background > .editor-inner-blocks {
+	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .editor-inner-blocks {
 		margin-top: -#{$block-padding*2 + $block-spacing};
 		margin-bottom: -#{$block-padding*2 + $block-spacing};
 	}
 
 	// Full Width Blocks
-	// specificity required to only target immediate child Blocks of Section
-	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
+	// specificity required to only target immediate child Blocks of a Group
+	> .editor-block-list__block-edit > div > .wp-block-group > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		margin-left: auto;
 		margin-right: auto;
 		padding-left: $block-padding*2;
@@ -31,7 +31,7 @@
 	}
 
 	// Full Width Blocks with a background (ie: has padding)
-	> .editor-block-list__block-edit > div > .wp-block-section.has-background > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
+	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		// note: using position `left` causes hoz scrollbars so
 		// we opt to use margin instead
 		// the 30px matches the hoz padding applied in `theme.scss`
@@ -40,18 +40,18 @@
 
 		// 60px here is x2 the hoz padding from `theme.scss` added when
 		// the Block has a background set
-		// note: also duplicated below for full width Sections
+		// note: also duplicated below for full width Groups
 		width: calc(100% + 60px);
 	}
 }
 
 /**
- * Section: Full Width Alignment
+ * Group: Full Width Alignment
  */
-.wp-block[data-type="core/section"][data-align="full"] {
+.wp-block[data-type="core/group"][data-align="full"] {
 
 	// First tier of InnerBlocks must act like the container of the standard canvas
-	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks {
+	> .editor-block-list__block-edit > div > .wp-block-group > .editor-inner-blocks {
 		margin-left: auto;
 		margin-right: auto;
 		padding-left: 0;
@@ -64,8 +64,8 @@
 	}
 
 	// Full Width Blocks
-	// specificity required to only target immediate child Blocks of Section
-	> .editor-block-list__block-edit > div > .wp-block-section > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
+	// specificity required to only target immediate child Blocks of Group
+	> .editor-block-list__block-edit > div > .wp-block-group > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		padding-right: 0;
 		padding-left: 0;
 		left: 0;
@@ -80,8 +80,8 @@
 	}
 
 	// Full Width Blocks with a background (ie: has padding)
-	// note: also duplicated above for all Section widths
-	> .editor-block-list__block-edit > div > .wp-block-section.has-background > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
+	// note: also duplicated above for all Group widths
+	> .editor-block-list__block-edit > div > .wp-block-group.has-background > .editor-inner-blocks > .editor-block-list__layout > .wp-block[data-align="full"] {
 		width: calc(100% + 60px);
 	}
 }

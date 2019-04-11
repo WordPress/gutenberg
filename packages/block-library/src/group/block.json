@@ -1,5 +1,5 @@
 {
-	"name": "core/section",
+	"name": "core/group",
 	"category": "layout",
 	"attributes": {
 		"backgroundColor": {
