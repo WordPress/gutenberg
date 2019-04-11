@@ -26,38 +26,11 @@ import {
 	backgroundImageStyles,
 	dimRatioToClass,
 } from './edit';
+import metadata from './block.json';
 
-const blockAttributes = {
-	url: {
-		type: 'string',
-	},
-	id: {
-		type: 'number',
-	},
-	hasParallax: {
-		type: 'boolean',
-		default: false,
-	},
-	dimRatio: {
-		type: 'number',
-		default: 50,
-	},
-	overlayColor: {
-		type: 'string',
-	},
-	customOverlayColor: {
-		type: 'string',
-	},
-	backgroundType: {
-		type: 'string',
-		default: 'image',
-	},
-	focalPoint: {
-		type: 'object',
-	},
-};
+const { name, attributes: blockAttributes } = metadata;
 
-export const name = 'core/cover';
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Cover' ),
@@ -65,10 +38,6 @@ export const settings = {
 	description: __( 'Add an image or video with a text overlay — great for headers.' ),
 
 	icon,
-
-	category: 'common',
-
-	attributes: blockAttributes,
 
 	supports: {
 		align: true,

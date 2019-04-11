@@ -18,40 +18,11 @@ import {
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-const blockAttributes = {
-	url: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'href',
-	},
-	title: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'title',
-	},
-	text: {
-		type: 'string',
-		source: 'html',
-		selector: 'a',
-	},
-	backgroundColor: {
-		type: 'string',
-	},
-	textColor: {
-		type: 'string',
-	},
-	customBackgroundColor: {
-		type: 'string',
-	},
-	customTextColor: {
-		type: 'string',
-	},
-};
+const { name, attributes: blockAttributes } = metadata;
 
-export const name = 'core/button';
+export { metadata, name };
 
 const colorsMigration = ( attributes ) => {
 	return omit( {
@@ -68,11 +39,7 @@ export const settings = {
 
 	icon,
 
-	category: 'layout',
-
 	keywords: [ __( 'link' ) ],
-
-	attributes: blockAttributes,
 
 	supports: {
 		align: true,

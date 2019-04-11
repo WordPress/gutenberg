@@ -10,8 +10,11 @@ import { RichText } from '@wordpress/block-editor';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/subhead';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Subheading (deprecated)' ),
@@ -20,23 +23,10 @@ export const settings = {
 
 	icon,
 
-	category: 'common',
-
 	supports: {
 		// Hide from inserter as this block is deprecated.
 		inserter: false,
 		multiple: false,
-	},
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-			selector: 'p',
-		},
-		align: {
-			type: 'string',
-		},
 	},
 
 	transforms: {

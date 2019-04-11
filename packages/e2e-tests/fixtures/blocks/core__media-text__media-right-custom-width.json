@@ -18,8 +18,8 @@
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
-                    "content": "My video",
                     "align": "right",
+                    "content": "My video",
                     "dropCap": false,
                     "placeholder": "Content…",
                     "fontSize": "large"

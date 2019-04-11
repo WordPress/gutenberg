@@ -93,24 +93,37 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const rangeRect = getRectangleFromRange( selection.getRangeAt( 0 ) );
+	const range = selection.getRangeAt( 0 ).cloneRange();
+	const isForward = isSelectionForward( selection );
+	const isCollapsed = selection.isCollapsed;
+
+	// Collapse in direction of selection.
+	if ( ! isCollapsed ) {
+		range.collapse( ! isForward );
+	}
+
+	const rangeRect = getRectangleFromRange( range );
 
 	if ( ! rangeRect ) {
 		return false;
 	}
 
 	const computedStyle = window.getComputedStyle( container );
-	const lineHeight = parseInt( computedStyle.lineHeight, 10 );
+	const lineHeight = parseInt( computedStyle.lineHeight, 10 ) || 0;
 
 	// Only consider the multiline selection at the edge if the direction is
 	// towards the edge.
 	if (
-		! selection.isCollapsed &&
+		! isCollapsed &&
 		rangeRect.height > lineHeight &&
-		isSelectionForward( selection ) === isReverse
+		isForward === isReverse
 	) {
 		return false;
 	}
+
+	const padding = parseInt( computedStyle[
+		`padding${ isReverse ? 'Top' : 'Bottom' }`
+	], 10 ) || 0;
 
 	// Calculate a buffer that is half the line height. In some browsers, the
 	// selection rectangle may not fill the entire height of the line, so we add
@@ -119,8 +132,8 @@ function isEdge( container, isReverse, onlyVertical ) {
 	const buffer = 3 * parseInt( lineHeight, 10 ) / 4;
 	const containerRect = container.getBoundingClientRect();
 	const verticalEdge = isReverse ?
-		containerRect.top > rangeRect.top - buffer :
-		containerRect.bottom < rangeRect.bottom + buffer;
+		containerRect.top + padding > rangeRect.top - buffer :
+		containerRect.bottom - padding < rangeRect.bottom + buffer;
 
 	if ( ! verticalEdge ) {
 		return false;
@@ -209,6 +222,8 @@ export function getRectangleFromRange( range ) {
 	// See: https://stackoverflow.com/a/6847328/995445
 	if ( ! rect ) {
 		const padNode = document.createTextNode( '\u200b' );
+		// Do not modify the live range.
+		range = range.cloneRange();
 		range.insertNode( padNode );
 		rect = range.getClientRects()[ 0 ];
 		padNode.parentNode.removeChild( padNode );
