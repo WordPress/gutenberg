@@ -423,7 +423,7 @@ export class RichText extends Component {
 			this.lastEventCount = undefined;
 			this.lastContent = newContent;
 
-			// explicitly set selection after inline paste
+			// explicitly set selection after inline paste - wake up Travis
 			( ( { start, end } ) => this.setState( { start, end,
 				needsSelectionUpdate: true } ) )( insertedContent );
 
