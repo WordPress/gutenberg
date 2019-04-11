@@ -88,14 +88,14 @@ public class ReactAztecText extends AztecText {
         this.setAztecKeyListener(new ReactAztecText.OnAztecKeyListener() {
             @Override
             public boolean onEnterKey() {
-                if (shouldHandleOnEnter) {
+                if (shouldHandleOnEnter && !isTextChangedListenerDisabled()) {
                     return onEnter();
                 }
                 return false;
             }
             @Override
             public boolean onBackspaceKey() {
-                if (shouldHandleOnBackspace) {
+                if (shouldHandleOnBackspace && !isTextChangedListenerDisabled()) {
                     String content = toHtml(false);
                     if (TextUtils.isEmpty(content)) {
                         return onBackspace();
