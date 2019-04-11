@@ -10,7 +10,7 @@ Inspector Controls appear in the post settings sidebar when a block is being edi
 {% ES5 %}
 ```js
 var el = wp.element.createElement,
-	Fragment = wp.element.Fragment
+	Fragment = wp.element.Fragment,
 	registerBlockType = wp.blocks.registerBlockType,
 	RichText = wp.editor.RichText,
 	InspectorControls = wp.editor.InspectorControls,
@@ -19,9 +19,9 @@ var el = wp.element.createElement,
 	TextControl = wp.components.TextControl,
 	ToggleControl = wp.components.ToggleControl,
 	SelectControl = wp.components.SelectControl;
-  
-registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
-	title: 'Hello World (Step 4)',
+
+registerBlockType( 'my-plugin/inspector-controls-example', {
+	title: 'Inspector controls example',
 
 	icon: 'universal-access-alt',
 
@@ -54,11 +54,11 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 
 	edit: function( props ) {
 		var content = props.attributes.content,
-			props.attributes.checkboxField,
-			props.attributes.radioField,
-			props.attributes.textField,
-			props.attributes.toggleField,
-			props.attributes.selectField;
+			checkboxField = props.attributes.checkboxField,
+			radioField = props.attributes.radioField,
+			textField = props.attributes.textField,
+			toggleField = props.attributes.toggleField,
+			selectField = props.attributes.selectField;
 
 		function onChangeContent( newContent ) {
 			props.setAttributes( { content: newContent } );
@@ -84,153 +84,152 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 			props.setAttributes( { selectField: newValue } );
 		}
 
-
 		return (
+			el(
+				Fragment,
+				null,
 				el(
-					Fragment, 
-					null, 
+					InspectorControls,
+					null,
 					el(
-						InspectorControls, 
-						null, 
-						el(
-							CheckboxControl, 
-							{
-								heading: "Checkbox Field",
-								label: "Tick Me",
-								help: "Additional help text",
-								checked: checkboxField,
-								onChange: onChangeCheckboxField
-							}
-						), 
-						el(
-							RadioControl, 
-							{
-								label: "Radio Field",
-								selected: radioField,
-								options: [
-									{
-										label: "Yes",
-										value: "yes"
-									}, 
-									{
-										label: "No",
-										value: "no"
-									}
-								],
-								onChange: onChangeRadioControl
-							}
-						), 
-						el(
-							TextControl, 
-							{
-								label: "Text Field",
-								help: "Additional help text",
-								value: textField,
-								onChange: onChangeTextField
-							}
-						), 
-						el(
-							ToggleControl, 
-							{
-								label: "Toggle Field",
-								checked: toggleField,
-								onChange: onToggleField
-							}
-						), 
-						el(
-							SelectControl, 
-							{
-								label: "Select Control",
-								value: selectControl,
-								options: [
-									{
-										value: "a",
-										label: "Option A"
-									}, 
-									{
-										value: "b",
-										label: "Option B"
-									}, 
-									{
-										value: "c",
-										label: "Option C"
-									}
-								],
-								onChange: onChangeSelectControl
-							}
-						)
-					), 
-					el(
-						RichText, 
+						CheckboxControl,
 						{
-							key: "editable",
-							tagName: "p",
-							onChange: onChangeContent,
-							value: content
+							heading: 'Checkbox Field',
+							label: 'Tick Me',
+							help: 'Additional help text',
+							checked: checkboxField,
+							onChange: onChangeCheckboxField
+						}
+					),
+					el(
+						RadioControl,
+						{
+							label: 'Radio Field',
+							selected: radioField,
+							options: [
+								{
+									label: 'Yes',
+									value: 'yes'
+								},
+								{
+									label: 'No',
+									value: 'no'
+								}
+							],
+							onChange: onChangeRadioField
+						}
+					),
+					el(
+						TextControl,
+						{
+							label: 'Text Field',
+							help: 'Additional help text',
+							value: textField,
+							onChange: onChangeTextField
+						}
+					),
+					el(
+						ToggleControl,
+						{
+							label: 'Toggle Field',
+							checked: toggleField,
+							onChange: onChangeToggleField
+						}
+					),
+					el(
+						SelectControl,
+						{
+							label: 'Select Field',
+							value: selectField,
+							options: [
+								{
+									value: 'a',
+									label: 'Option A'
+								},
+								{
+									value: 'b',
+									label: 'Option B'
+								},
+								{
+									value: 'c',
+									label: 'Option C'
+								}
+							],
+							onChange: onChangeSelectField
 						}
 					)
+				),
+				el(
+					RichText,
+					{
+						key: 'editable',
+						tagName: 'p',
+						onChange: onChangeContent,
+						value: content
+					}
 				)
+			)
 		);
 	},
 
 	save: function( props ) {
 		var content = props.attributes.content,
-			props.attributes.checkboxField,
-			props.attributes.radioField,
-			props.attributes.textField,
-			props.attributes.toggleField,
-			props.attributes.selectField;
+			checkboxField = props.attributes.checkboxField,
+			radioField = props.attributes.radioField,
+			textField = props.attributes.textField,
+			toggleField = props.attributes.toggleField,
+			selectField = props.attributes.selectField;
 
 		return el(
-					"div", 
-					null, 
-					el(
-						RichText.Content, 
-						{
-							value: content,
-							tagName: "p"
-						}
-					), 
-					el(
-						"h2", 
-						null, 
-						"Inspector Control Fields"
-					), 
-					el(
-						"ul", 
-						null, 
-						el(
-							"li", 
-							null, 
-							"Checkbox Field: ", 
-							checkboxField
-						), 
-						el(
-							"li", 
-							null, 
-							"Radio Field: ", 
-							radioField
-						), 
-						el(
-							"li", 
-							null, 
-							"Text Field: ", 
-							textField
-						), 
-						el(
-							"li", 
-							null, 
-							"Toggle Field: ", 
-							toggleField
-						), 
-						el(
-							"li", 
-							null, 
-							"Select Field: ", 
-							selectField
-						)
-					)
-				);
+			'div',
+			null,
+			el(
+				RichText.Content,
+				{
+					value: content,
+					tagName: 'p'
+				}
+			),
+			el(
+				'h2',
+				null,
+				'Inspector Control Fields'
+			),
+			el(
+				'ul',
+				null,
+				el(
+					'li',
+					null,
+					'Checkbox Field: ',
+					checkboxField
+				),
+				el(
+					'li',
+					null,
+					'Radio Field: ',
+					radioField
+				),
+				el(
+					'li',
+					null,
+					'Text Field: ',
+					textField
+				),
+				el(
+					'li',
+					null,
+					'Toggle Field: ',
+					toggleField
+				),
+				el(
+					'li',
+					null,
+					'Select Field: ',
+					selectField
+				)
+			)
+		);
 	},
 } );
 ```
@@ -239,19 +238,19 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 const { registerBlockType } = wp.blocks;
 const { Fragment } = wp.element;
 const {
-  CheckboxControl,
-  RadioControl,
-  TextControl,
-  ToggleControl,
-  SelectControl
+	CheckboxControl,
+	RadioControl,
+	TextControl,
+	ToggleControl,
+	SelectControl,
 } = wp.components;
 const {
-	RichText
+	RichText,
 	InspectorControls,
 } = wp.editor;
 
-registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
-	title: 'Hello World (Step 4)',
+registerBlockType( 'my-plugin/inspector-controls-example', {
+	title: 'Inspector controls example',
 
 	icon: 'universal-access-alt',
 
@@ -324,13 +323,13 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 					<RadioControl
 						label="Radio Field"
 						selected={ radioField }
-						options={ 
+						options={
 							[
-								{ label: "Yes", value: "yes" },
-								{ label: "No", value: "no" }
-							] 
+								{ label: 'Yes', value: 'yes' },
+								{ label: 'No', value: 'no' },
+							]
 						}
-						onChange={ onChangeRadioControl }
+						onChange={ onChangeRadioField }
 					/>
 
 					<TextControl
@@ -343,20 +342,20 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 					<ToggleControl
 						label="Toggle Field"
 						checked={ toggleField }
-						onChange={ onToggleField }
+						onChange={ onChangeToggleField }
 					/>
 
 					<SelectControl
 						label="Select Control"
-						value={ selectControl }
+						value={ selectField }
 						options={
 							[
-								{ value: "a", label: "Option A" },
-								{ value: "b", label: "Option B" },
-								{ value: "c", label: "Option C" }
+								{ value: 'a', label: 'Option A' },
+								{ value: 'b', label: 'Option B' },
+								{ value: 'c', label: 'Option C' },
 							]
 						}
-						onChange={ onChangeSelectControl }
+						onChange={ onChangeSelectField }
 					/>
 
 				</InspectorControls>
@@ -383,11 +382,11 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 
 				<h2>Inspector Control Fields</h2>
 				<ul>
-					<li>Checkbox Field: {checkboxField}</li>
-					<li>Radio Field: {radioField}</li>
-					<li>Text Field: {textField}</li>
-					<li>Toggle Field: {toggleField}</li>
-					<li>Select Field: {selectField}</li>
+					<li>Checkbox Field: { checkboxField }</li>
+					<li>Radio Field: { radioField }</li>
+					<li>Text Field: { textField }</li>
+					<li>Toggle Field: { toggleField }</li>
+					<li>Select Field: { selectField }</li>
 				</ul>
 			</div>
 		);
