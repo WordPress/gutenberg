@@ -10,8 +10,8 @@ const ShortcodeEdit = ( { attributes, setAttributes, instanceId } ) => {
 	const inputId = `blocks-shortcode-input-${ instanceId }`;
 
 	return (
-		<div className="wp-block-shortcode">
-			<label htmlFor={ inputId }>
+		<div className="wp-block-shortcode  components-placeholder">
+			<label htmlFor={ inputId } className="components-placeholder__label">
 				<Dashicon icon="shortcode" />
 				{ __( 'Shortcode' ) }
 			</label>
