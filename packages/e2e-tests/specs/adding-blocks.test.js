@@ -66,7 +66,6 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Foo' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
-		await pressKeyTimes( 'ArrowRight', 3 );
 		await pressKeyTimes( 'Delete', 6 );
 		await page.keyboard.type( ' text' );
 

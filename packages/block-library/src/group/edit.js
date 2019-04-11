@@ -15,7 +15,7 @@ import {
 	withColors,
 } from '@wordpress/block-editor';
 
-function SectionEdit( { className, setBackgroundColor, backgroundColor } ) {
+function GroupEdit( { className, setBackgroundColor, backgroundColor } ) {
 	const styles = {
 		backgroundColor: backgroundColor.color,
 	};
@@ -45,4 +45,4 @@ function SectionEdit( { className, setBackgroundColor, backgroundColor } ) {
 	);
 }
 
-export default withColors( 'backgroundColor' )( SectionEdit );
+export default withColors( 'backgroundColor' )( GroupEdit );

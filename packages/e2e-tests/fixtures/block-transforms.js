@@ -129,6 +129,10 @@ export const EXPECTED_TRANSFORMS = {
 			'Image',
 		],
 	},
+	core__group: {
+		originalBlock: 'Group',
+		availableTransforms: [],
+	},
 	'core__heading__h2-em': {
 		originalBlock: 'Heading',
 		availableTransforms: [
@@ -301,10 +305,6 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	'core__search__custom-text': {
 		originalBlock: 'Search',
-		availableTransforms: [],
-	},
-	core__section: {
-		originalBlock: 'Section',
 		availableTransforms: [],
 	},
 	core__separator: {

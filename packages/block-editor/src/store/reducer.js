@@ -188,16 +188,6 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 
-	/**
-	 * Set of action types for which a blocks state change should be considered
-	 * non-persistent.
-	 *
-	 * @type {Set}
-	 */
-	const IGNORED_ACTION_TYPES = new Set( [
-		'RECEIVE_BLOCKS',
-	] );
-
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
 
@@ -206,19 +196,14 @@ function withPersistentBlockChange( reducer ) {
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
 		if ( state === nextState && ! isExplicitPersistentChange ) {
-			return {
-				...nextState,
-				isPersistentChange: get( state, [ 'isPersistentChange' ], true ),
-			};
-		}
+			const nextIsPersistentChange = get( state, [ 'isPersistentChange' ], true );
+			if ( state.isPersistentChange === nextIsPersistentChange ) {
+				return state;
+			}
 
-		// Some state changes should not be considered persistent, namely those
-		// which are not a direct result of user interaction.
-		const isIgnoredActionType = IGNORED_ACTION_TYPES.has( action.type );
-		if ( isIgnoredActionType ) {
 			return {
 				...nextState,
-				isPersistentChange: false,
+				isPersistentChange: nextIsPersistentChange,
 			};
 		}
 
@@ -234,6 +219,37 @@ function withPersistentBlockChange( reducer ) {
 		// would have qualified as one which would have been ignored or not
 		// have resulted in a changed state.
 		lastAction = action;
+
+		return nextState;
+	};
+}
+
+/**
+ * Higher-order reducer intended to augment the blocks reducer, assigning an
+ * `isIgnoredChange` property value corresponding to whether a change in state
+ * can be considered as ignored. A change is considered ignored when the result
+ * of an action not incurred by direct user interaction.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+function withIgnoredBlockChange( reducer ) {
+	/**
+	 * Set of action types for which a blocks state change should be ignored.
+	 *
+	 * @type {Set}
+	 */
+	const IGNORED_ACTION_TYPES = new Set( [
+		'RECEIVE_BLOCKS',
+	] );
+
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
+
+		if ( nextState !== state ) {
+			nextState.isIgnoredChange = IGNORED_ACTION_TYPES.has( action.type );
+		}
 
 		return nextState;
 	};
@@ -380,6 +396,7 @@ export const blocks = flow(
 	withBlockReset,
 	withSaveReusableBlock,
 	withPersistentBlockChange,
+	withIgnoredBlockChange,
 )( {
 	byClientId( state = {}, action ) {
 		switch ( action.type ) {
