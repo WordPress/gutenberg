@@ -57,7 +57,8 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  */
 function gutenberg_add_blocks_to_post_resource( $content ) {
 	$registry = WP_Block_Type_Registry::get_instance();
-	$blocks   = gutenberg_parse_blocks( $content );
+	$parser   = new WP_Block_Parser();
+	$blocks   = $parser->parse( $content );
 	$data     = array();
 
 	// Loop thru the blocks, adding rendered content when available.
