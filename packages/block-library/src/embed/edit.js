@@ -129,7 +129,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		}
 
 		switchBackToURLInput() {
-			this.setState( { editingURL: true } );
+			this.setState( { editingURL: ! this.state.editingURL } );
 		}
 
 		getResponsiveHelp( checked ) {
@@ -166,16 +166,32 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			// No preview, or we can't embed the current URL, or we've clicked the edit button.
 			if ( ! preview || cannotEmbed || editingURL ) {
 				return (
-					<EmbedPlaceholder
-						icon={ icon }
-						label={ label }
-						onSubmit={ this.setUrl }
-						value={ url }
-						cannotEmbed={ cannotEmbed }
-						onChange={ ( event ) => this.setState( { url: event.target.value } ) }
-						fallback={ () => fallback( url, this.props.onReplace ) }
-						tryAgain={ tryAgain }
-					/>
+					<Fragment>
+						<EmbedControls
+							showEditButton={ preview && ! cannotEmbed }
+							editingURL={ this.state.editingURL }
+							url={ this.state.url }
+							themeSupportsResponsive={ themeSupportsResponsive }
+							blockSupportsResponsive={ responsive }
+							allowResponsive={ allowResponsive }
+							getResponsiveHelp={ this.getResponsiveHelp }
+							toggleResponsive={ this.toggleResponsive }
+							switchBackToURLInput={ this.switchBackToURLInput }
+						/>
+						<EmbedPlaceholder
+							icon={ icon }
+							label={ label }
+							onSubmit={ this.setUrl }
+							value={ url }
+							cannotEmbed={ cannotEmbed }
+							onChange={ ( event ) => this.setState( { url: event.target.value } ) }
+							fallback={ () => fallback( url, this.props.onReplace ) }
+							tryAgain={ tryAgain }
+							switchBackToURLInput={ this.switchBackToURLInput }
+							editingURL={ this.state.editingURL }
+							url={ this.state.url }
+						/>
+					</Fragment>
 				);
 			}
 
@@ -183,6 +199,8 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 				<Fragment>
 					<EmbedControls
 						showEditButton={ preview && ! cannotEmbed }
+						editingURL={ this.state.editingURL }
+						url={ this.state.url }
 						themeSupportsResponsive={ themeSupportsResponsive }
 						blockSupportsResponsive={ responsive }
 						allowResponsive={ allowResponsive }
