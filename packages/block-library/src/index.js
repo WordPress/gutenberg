@@ -95,6 +95,7 @@ export const registerCoreBlocks = () => {
 		...embed.common,
 		...embed.others,
 		file,
+		group,
 		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
 		html,
 		mediaText,
@@ -108,7 +109,6 @@ export const registerCoreBlocks = () => {
 		pullquote,
 		rss,
 		search,
-		group,
 		separator,
 		reusableBlock,
 		spacer,
