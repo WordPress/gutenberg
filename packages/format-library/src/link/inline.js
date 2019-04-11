@@ -236,7 +236,9 @@ class InlineLinkUI extends Component {
 
 		return (
 			<PositionedAtSelection
-				selector="a"
+				// When adding a new link, set the container at the caret,
+				// otherwise set it at the link element.
+				selector={ addingLink ? null : 'a' }
 				// Since the key cannot be the format object, we have to keep it
 				// in the state and bump it when the object reference changes.
 				key={ this.state.key }
