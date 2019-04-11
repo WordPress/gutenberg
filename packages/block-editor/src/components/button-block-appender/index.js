@@ -20,7 +20,7 @@ const ButtonBlockAppender = function( { rootClientId, className = '' } ) {
 					aria-expanded={ isOpen }
 					disabled={ disabled }
 				>
-					<span>{ __( 'Add Block' ) }</span>
+					<span className="screen-reader-text">{ __( 'Add Block' ) }</span>
 					<Icon icon="insert" />
 				</Button>
 			) }

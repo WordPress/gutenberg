@@ -20,10 +20,6 @@
 		outline: $border-width dashed $dark-gray-900;
 		color: $dark-gray-900;
 	}
-
-	> span {
-		@include screenreadertext();
-	}
 }
 
 // Use opacity to work in various editor styles
