@@ -29,7 +29,7 @@ function BlockListAppender( {
 
 	// If auto-insert Blocks is enabled, default to the standard behaviour
 	// of auto-inserting a Block but only if no renderAppender is provided
-	if ( ( ! renderAppender || renderAppender === 'auto-insert' ) && canInsertDefaultBlock ) {
+	if ( ! renderAppender && canInsertDefaultBlock ) {
 		return (
 			<div className="block-list-appender">
 				<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
@@ -51,9 +51,9 @@ function BlockListAppender( {
 		);
 	}
 
-	// If auto-insert is disabled or we have specifically
-	// requested the 'block' appender
-	if ( ! canInsertDefaultBlock || renderAppender === 'button' ) {
+	// Fallback in the case no renderAppender has been provided
+	// and we can't auto-insert the default block
+	if ( ! canInsertDefaultBlock ) {
 		return (
 			<div className="block-list-appender">
 				<ButtonBlockAppender rootClientId={ rootClientId } />
