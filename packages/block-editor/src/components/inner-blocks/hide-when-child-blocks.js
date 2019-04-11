@@ -9,7 +9,7 @@ import { withSelect } from '@wordpress/data';
  */
 import withClientId from './utils/with-client-id';
 
-export const hideWhenChildBlocks = function( props ) {
+export const HideWhenChildBlocks = function( props ) {
 	return props.children;
 };
 
@@ -29,4 +29,4 @@ export default compose( [
 	ifCondition( ( { hasChildBlocks } ) => {
 		return ! hasChildBlocks;
 	} ),
-] )( hideWhenChildBlocks );
+] )( HideWhenChildBlocks );
