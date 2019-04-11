@@ -9,7 +9,6 @@ import {
 	omit,
 	pickBy,
 } from 'lodash';
-import memize from 'memize';
 
 /**
  * WordPress dependencies
@@ -40,7 +39,6 @@ import {
 	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	__unstableIndentListItems as indentListItems,
 	__unstableGetActiveFormats as getActiveFormats,
-	__unstableUpdateFormats as updateFormats,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
@@ -147,12 +145,8 @@ export class RichText extends Component {
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 
-		this.formatToValue = memize(
-			this.formatToValue.bind( this ),
-			{ maxSize: 1 }
-		);
-
 		this.savedContent = value;
+		this.rawValue = this.formatToValue( value );
 		this.patterns = getPatterns( {
 			onReplace,
 			valueToFormat: this.valueToFormat,
@@ -199,7 +193,7 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { formats, replacements, text } = this.formatToValue( this.props.value );
+		const { formats, replacements, text } = this.rawValue;
 		const { start, end, activeFormats } = this.state;
 
 		return { formats, replacements, text, start, end, activeFormats };
@@ -231,7 +225,7 @@ export class RichText extends Component {
 	}
 
 	isEmpty() {
-		return isEmpty( this.formatToValue( this.props.value ) );
+		return isEmpty( this.rawValue );
 	}
 
 	/**
@@ -419,16 +413,31 @@ export class RichText extends Component {
 			}
 		}
 
+		const { formats, activeFormats = [], start, end } = this.getRecord();
 		const value = this.createRecord();
-		const { activeFormats = [], start } = this.state;
+
+		let newFormats;
 
 		// Update the formats between the last and new caret position.
-		const change = updateFormats( {
-			value,
-			start,
-			end: value.start,
-			formats: activeFormats,
-		} );
+		if ( value.start <= start ) { // Deletion
+			const beforeFormats = formats.slice( 0, value.start );
+			const afterFormats = formats.slice( end );
+
+			newFormats = beforeFormats.concat( afterFormats );
+		} else { // Insertion
+			const length = value.start - start;
+			const formatsToInsert = Array.from( Array( length ), () => activeFormats );
+			const beforeFormats = formats.slice( 0, start );
+			const afterFormats = formats.slice( end );
+
+			newFormats = beforeFormats.concat( formatsToInsert, afterFormats );
+		}
+
+		const change = {
+			...value,
+			formats: newFormats,
+			activeFormats,
+		};
 
 		this.onChange( change, { withoutHistory: true } );
 
@@ -523,6 +532,7 @@ export class RichText extends Component {
 			changeHandler( record.formats, record.text );
 		} );
 
+		this.rawValue = record;
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
 		this.setState( { start, end, activeFormats } );
@@ -739,7 +749,7 @@ export class RichText extends Component {
 	 * @param  {SyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleHorizontalNavigation( event ) {
-		const value = this.createRecord();
+		const value = this.getRecord();
 		const { formats, text, start, end } = value;
 		const { activeFormats = [] } = this.state;
 		const collapsed = isCollapsed( value );
@@ -921,6 +931,7 @@ export class RichText extends Component {
 			}
 
 			this.applyRecord( record );
+			this.rawValue = record;
 			this.savedContent = value;
 		}
 

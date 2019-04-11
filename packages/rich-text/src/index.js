@@ -31,5 +31,4 @@ export { unregisterFormatType } from './unregister-format-type';
 export { indentListItems as __unstableIndentListItems } from './indent-list-items';
 export { outdentListItems as __unstableOutdentListItems } from './outdent-list-items';
 export { changeListType as __unstableChangeListType } from './change-list-type';
-export { updateFormats as __unstableUpdateFormats } from './update-formats';
 export { getActiveFormats as __unstableGetActiveFormats } from './get-active-formats';
