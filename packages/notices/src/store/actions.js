@@ -28,8 +28,16 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                                                       announced to screen
  *                                                       readers. Defaults to
  *                                                       `true`.
- * @param {?Array<WPNoticeAction>} options.actions       User actions to be
- *                                                       presented with notice.
+ * @param {?Array<WPNoticeAction>} options.actions       Array of user actions to be
+ *                                                       presented with notice. Array elements
+                                                         are objects in the following shape.
+ * @param {?string}                options.actions.label Message to use as an action label
+ * @param {?string}                options.actions.url   Optional URL for the link. Use `#` to only 
+                                                         call the onClick callback.
+ * @param {?function}              options.actions.onClick Optional function to invoke when link is 
+                                                         clicked by user. Function receives one 
+							 parameter, the click event. 
+
  */
 export function* createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 	const {
