@@ -20,8 +20,8 @@ class EditorModeKeyboardShortcuts extends Component {
 	}
 
 	toggleMode() {
-		const { mode, switchMode, isRichEditingEnabled } = this.props;
-		if ( ! isRichEditingEnabled ) {
+		const { mode, switchMode, isRichEditingEnabled, isCodeEditingEnabled } = this.props;
+		if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
 			return;
 		}
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
@@ -56,6 +56,7 @@ class EditorModeKeyboardShortcuts extends Component {
 export default compose( [
 	withSelect( ( select ) => ( {
 		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+		isCodeEditingEnabled: select( 'core/editor' ).getEditorSettings().codeEditingEnabled,
 		mode: select( 'core/edit-post' ).getEditorMode(),
 		isEditorSidebarOpen: select( 'core/edit-post' ).isEditorSidebarOpened(),
 	} ) ),
