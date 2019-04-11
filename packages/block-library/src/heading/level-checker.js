@@ -39,7 +39,7 @@ export const computeOutlineHeadings = ( blocks = [], path = [] ) => {
 	} );
 };
 
-export const HeadingChecker = ( { blocks = [], selectedHeadingId } ) => {
+export const HeadingLevelChecker = ( { blocks = [], selectedHeadingId } ) => {
 	const headings = computeOutlineHeadings( blocks );
 
 	// Iterate headings to find prevHeadingLevel and selectedLevel
@@ -47,9 +47,11 @@ export const HeadingChecker = ( { blocks = [], selectedHeadingId } ) => {
 	let selectedLevel = 1;
 	let i = 0;
 	for ( i = 0; i < headings.length; i++ ) {
-		if ( i >= 1 && headings[ i ].clientId === selectedHeadingId ) {
+		if ( headings[ i ].clientId === selectedHeadingId ) {
 			selectedLevel = headings[ i ].level;
-			prevHeadingLevel = headings[ i - 1 ].level;
+			if ( i >= 1 ) {
+				prevHeadingLevel = headings[ i - 1 ].level;
+			}
 		}
 	}
 
@@ -67,7 +69,7 @@ export const HeadingChecker = ( { blocks = [], selectedHeadingId } ) => {
 	}, [ selectedLevel ] );
 
 	return (
-		<div className="editor-heading-checker block-editor-heading-checker">
+		<div className="block-library-heading__heading-level-checker">
 			<Notice status="warning" isDismissible={ false }>
 				{ msg }
 			</Notice>
@@ -83,4 +85,4 @@ export default compose(
 			blocks: getBlocks(),
 		};
 	} )
-)( HeadingChecker );
+)( HeadingLevelChecker );

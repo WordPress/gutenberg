@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import HeadingToolbar from './heading-toolbar';
-import HeadingChecker from './heading-checker';
+import HeadingLevelChecker from './level-checker';
 
 /**
  * WordPress dependencies
@@ -39,7 +39,7 @@ export default function HeadingEdit( {
 				<PanelBody title={ __( 'Heading Settings' ) }>
 					<p>{ __( 'Level' ) }</p>
 					<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-					<HeadingChecker selectedHeadingId={ clientId } />
+					<HeadingLevelChecker selectedHeadingId={ clientId } />
 					<p>{ __( 'Text Alignment' ) }</p>
 					<AlignmentToolbar
 						value={ align }
