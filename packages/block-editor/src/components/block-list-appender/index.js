@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, isFunction } from 'lodash';
+import { last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,7 +43,7 @@ function BlockListAppender( {
 	}
 
 	// Render prop - custom appender.
-	if ( isFunction( renderAppender ) ) {
+	if ( renderAppender ) {
 		return (
 			<div className="block-list-appender">
 				{ renderAppender() }
