@@ -344,6 +344,28 @@
 }
 
 /**
+ * Hides content visually whilst preserving for assistive
+ * technologies such as screenreaders.
+ * see: https://a11yproject.com/posts/how-to-hide-content/
+ */
+@mixin screenreadertext {
+	position: absolute !important;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	clip: rect(1px 1px 1px 1px);
+	clip: rect(1px, 1px, 1px, 1px);
+}
+
+/**
+ * Alias for `screenreadertext`
+ * see `screenreadertext` mixin
+ */
+@mixin visuallyhidden {
+	@include screenreadertext();
+}
+
+/**
  * Reset default styles for JavaScript UI based pages.
  * This is a WP-admin agnostic reset
  */
