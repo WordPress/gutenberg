@@ -64,6 +64,7 @@ public class ReactAztecText extends AztecText {
     // This is required to keep placeholder text working, and start typing with styled text.
     // Ref: https://github.com/wordpress-mobile/gutenberg-mobile/issues/707
     private String mTagName = "";
+    private String mEmptyTagHTML = "";
 
     private static final HashMap<ITextFormat, String> typingFormatsMap = new HashMap<ITextFormat, String>() {
         {
@@ -101,8 +102,7 @@ public class ReactAztecText extends AztecText {
                         return onBackspace();
                     }
                     else {
-                        String emptyTag = "<" + getTagName() + "></" + getTagName() + ">";
-                        if (!content.equals(emptyTag)) {
+                        if (!content.equals(mEmptyTagHTML)) {
                             return onBackspace();
                         }
                     }
@@ -239,6 +239,7 @@ public class ReactAztecText extends AztecText {
 
     public void setTagName(@Nullable String tagName) {
         mTagName = tagName;
+        mEmptyTagHTML = "<" + mTagName + "></" + mTagName + ">";
     }
 
     public String getTagName() {
