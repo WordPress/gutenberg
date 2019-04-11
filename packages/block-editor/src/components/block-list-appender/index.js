@@ -56,7 +56,10 @@ function BlockListAppender( {
 	if ( ! canInsertDefaultBlock ) {
 		return (
 			<div className="block-list-appender">
-				<ButtonBlockAppender rootClientId={ rootClientId } />
+				<ButtonBlockAppender
+					rootClientId={ rootClientId }
+					className="block-list-appender__toggle"
+				/>
 			</div>
 		);
 	}
