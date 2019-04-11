@@ -32,6 +32,12 @@ _Note:_
 
 The `clientId` of the Block from who's root new Blocks should be inserted. This prop is required by the block `Inserter` component. Typically this is the `clientID` of the Block where the prop is being rendered.
 
+### `className`
+* **Type:** `String`
+* **Default:** `""`
+
+A CSS `class` to be _prepended_ to the default class of `"button-block-appender"`.
+
 ## Examples
 
 The [`<InnerBlocks>` component](packages/block-editor/src/components/inner-blocks/) exposes an enhanced version of `ButtonBlockAppender` to allow consumers to choose it as an alternative to the standard behaviour of auto-inserting the default Block (typically `core/paragraph`).

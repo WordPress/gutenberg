@@ -9,13 +9,13 @@ import { __ } from '@wordpress/i18n';
  */
 import Inserter from '../inserter';
 
-const ButtonBlockAppender = function( { rootClientId } ) {
+const ButtonBlockAppender = function( { rootClientId, className = '' } ) {
 	return (
 		<Inserter
 			rootClientId={ rootClientId }
 			renderToggle={ ( { onToggle, disabled, isOpen } ) => (
 				<Button
-					className="button-block-appender"
+					className={ `${ className } button-block-appender` }
 					onClick={ onToggle }
 					aria-expanded={ isOpen }
 					disabled={ disabled }
