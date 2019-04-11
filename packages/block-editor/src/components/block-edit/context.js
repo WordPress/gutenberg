@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createContext } from '@wordpress/element';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 
 const { Consumer, Provider } = createContext( {
 	name: '',
@@ -59,3 +60,44 @@ export const ifBlockEditSelected = createHigherOrderComponent( ( OriginalCompone
 		</Consumer>
 	);
 }, 'ifBlockEditSelected' );
+
+/**
+ * A Higher Order Component used to render conditionally the wrapped
+ * component only when the BlockEdit has selected state set or it is
+ * the first block in a multi selection of all one type of block..
+ *
+ * @param {Component} OriginalComponent Component to wrap.
+ *
+ * @return {Component} Component which renders only when the BlockEdit is selected or it is the first block in a multi selection.
+ */
+const isFirstOrOnlyBlockSelected = createHigherOrderComponent( ( OriginalComponent ) => {
+	return ( props ) => {
+		return (
+			<Consumer>
+				{ ( { isSelected, clientId } ) => ( isSelected || ( clientId === props.getFirstMultiSelectedBlockClientId && props.allSelectedBlocksOfSameType ) ) && (
+					<OriginalComponent { ...props } />
+				) }
+			</Consumer>
+		);
+	};
+}, 'isFirstOrOnlyBlockSelected' );
+
+export const withFirstOrOnlyBlockSelected = ( component ) => {
+	return compose( [
+		withSelect( ( select ) => {
+			const {
+				getMultiSelectedBlocks,
+				getFirstMultiSelectedBlockClientId,
+				isMultiSelecting,
+			} = select( 'core/editor' );
+			const allSelectedBlocksOfSameType = uniq( getMultiSelectedBlocks().map( ( { name } ) => name ) ).length === 1;
+			return {
+				getFirstMultiSelectedBlockClientId: getFirstMultiSelectedBlockClientId(),
+				isSelecting: isMultiSelecting(),
+				selectedBlocks: getMultiSelectedBlocks(),
+				allSelectedBlocksOfSameType,
+			};
+		} ),
+		isFirstOrOnlyBlockSelected,
+	] )( component );
+};

@@ -8,8 +8,9 @@ import { Fragment } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockSwitcher from '../block-switcher';
-import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockControls from '../block-controls';
+import MultiBlockControls from '../block-controls/multi-block-controls';
+import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 
@@ -22,6 +23,7 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 		return (
 			<div className="editor-block-toolbar block-editor-block-toolbar">
 				<MultiBlocksSwitcher />
+				<MultiBlockControls.Slot />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		);
@@ -32,6 +34,7 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 			{ mode === 'visual' && isValid && (
 				<Fragment>
 					<BlockSwitcher clientIds={ blockClientIds } />
+					<MultiBlockControls.Slot />
 					<BlockControls.Slot />
 					<BlockFormatControls.Slot />
 				</Fragment>

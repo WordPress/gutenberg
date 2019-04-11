@@ -19,8 +19,8 @@ import {
 } from '@wordpress/components';
 import {
 	withColors,
-	AlignmentToolbar,
-	BlockControls,
+	MultiBlockAlignmentToolbar,
+	MultiBlockControls,
 	ContrastChecker,
 	FontSizePicker,
 	InspectorControls,
@@ -152,8 +152,8 @@ class ParagraphBlock extends Component {
 
 		return (
 			<Fragment>
-				<BlockControls>
-					<AlignmentToolbar
+				<MultiBlockControls>
+					<MultiBlockAlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
@@ -176,7 +176,7 @@ class ParagraphBlock extends Component {
 							] }
 						/>
 					) }
-				</BlockControls>
+				</MultiBlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
 						<FontSizePicker
