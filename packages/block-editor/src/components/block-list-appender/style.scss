@@ -29,7 +29,7 @@
 	}
 
 	> span {
-		margin-top: 0.5em;
+		@include screenreadertext();
 	}
 }
 

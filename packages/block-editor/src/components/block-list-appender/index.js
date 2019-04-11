@@ -41,8 +41,8 @@ function renderBlockAppender( rootClientId ) {
 						aria-expanded={ isOpen }
 						disabled={ disabled }
 					>
-						<Icon icon="insert" />
 						<span>{ __( 'Add Block' ) }</span>
+						<Icon icon="insert" />
 					</Button>
 				) }
 				isAppender
