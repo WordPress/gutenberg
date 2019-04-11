@@ -64,6 +64,7 @@ class BlockEditorProvider extends Component {
 		const {
 			getBlocks,
 			isLastBlockChangePersistent,
+			__unstableIsLastBlockChangeIgnored,
 		} = registry.select( 'core/block-editor' );
 
 		let blocks = getBlocks();
@@ -76,7 +77,12 @@ class BlockEditorProvider extends Component {
 			} = this.props;
 			const newBlocks = getBlocks();
 			const newIsPersistent = isLastBlockChangePersistent();
-			if ( newBlocks !== blocks && this.isSyncingIncomingValue ) {
+			if (
+				newBlocks !== blocks && (
+					this.isSyncingIncomingValue ||
+					__unstableIsLastBlockChangeIgnored()
+				)
+			) {
 				this.isSyncingIncomingValue = false;
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
