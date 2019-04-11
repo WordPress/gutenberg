@@ -20,6 +20,7 @@ Gutenberg is already in use by millions of sites through WordPress, so in order 
 - **Async Loading** — propose a strategy for loading block code only when necessary in the editor without overhead for the developer or disrupting the user experience.
 - **Styles** — continue to develop the mechanisms for managing block style variations and other styling solutions. (See overview at [#7551](https://github.com/WordPress/gutenberg/issue/7551) and [#9534](https://github.com/WordPress/gutenberg/issue/9534).)
 - **Bundling Front-end Assets** — explore ways in which front-end styles for blocks could be assembled based on which blocks are used in a given page response. ([See overview](https://github.com/WordPress/gutenberg/issue/5445).)
+- **Better Block Transforms API** - improve the transform API to allow advanced use-cases: support for async-transforms, access to the block editor settings and bring consistency between the different types of transforms. ([See related issue](https://github.com/WordPress/gutenberg/issues/14755).)
 
 ## Timeline
 
