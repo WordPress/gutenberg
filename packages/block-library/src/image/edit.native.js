@@ -104,6 +104,8 @@ class ImageEdit extends React.Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
+		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
+		// is updated immediately any time the isSelected prop becomes false
 		this.setState( ( state ) => ( {
 			isCaptionSelected: nextProps.isSelected && state.isCaptionSelected,
 		} ) );
