@@ -327,4 +327,19 @@ describe( 'adding blocks', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should not prematurely multi-select', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '><<' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '<<<' );
+		await page.keyboard.down( 'Shift' );
+		await pressKeyTimes( 'ArrowLeft', '<<\n<<<'.length );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
