@@ -13,9 +13,9 @@ import {
 	IconButton,
 	ToggleControl,
 	withSpokenMessages,
-	PositionedAtSelection,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { getRectangleFromRange } from '@wordpress/dom';
 import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import {
 	create,
@@ -36,6 +36,20 @@ const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
+}
+
+/**
+ * Returns a DOMRect object representing dimensions of the current selection
+ * caret.
+ *
+ * @return {DOMRect} Selection caret dimensions.
+ */
+function getCaretRect() {
+	const range = window.getSelection().getRangeAt( 0 );
+
+	if ( range ) {
+		return getRectangleFromRange( range );
+	}
 }
 
 const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocompleteRef } ) => (
@@ -211,7 +225,7 @@ class InlineLinkUI extends Component {
 	}
 
 	render() {
-		const { isActive, activeAttributes: { url }, addingLink, value } = this.props;
+		const { isActive, activeAttributes: { url }, addingLink } = this.props;
 
 		if ( ! isActive && ! addingLink ) {
 			return null;
@@ -221,37 +235,34 @@ class InlineLinkUI extends Component {
 		const showInput = isShowingInput( this.props, this.state );
 
 		return (
-			<PositionedAtSelection
-				key={ `${ value.start }${ value.end }` /* Used to force rerender on selection change */ }
+			<URLPopover
+				onClickOutside={ this.onClickOutside }
+				onClose={ this.resetState }
+				focusOnMount={ showInput ? 'firstElement' : false }
+				getAnchorRect={ getCaretRect }
+				renderSettings={ () => (
+					<ToggleControl
+						label={ __( 'Open in New Tab' ) }
+						checked={ opensInNewWindow }
+						onChange={ this.setLinkTarget }
+					/>
+				) }
 			>
-				<URLPopover
-					onClickOutside={ this.onClickOutside }
-					onClose={ this.resetState }
-					focusOnMount={ showInput ? 'firstElement' : false }
-					renderSettings={ () => (
-						<ToggleControl
-							label={ __( 'Open in New Tab' ) }
-							checked={ opensInNewWindow }
-							onChange={ this.setLinkTarget }
-						/>
-					) }
-				>
-					{ showInput ? (
-						<LinkEditor
-							value={ inputValue }
-							onChangeInputValue={ this.onChangeInputValue }
-							onKeyDown={ this.onKeyDown }
-							submitLink={ this.submitLink }
-							autocompleteRef={ this.autocompleteRef }
-						/>
-					) : (
-						<LinkViewer
-							url={ url }
-							editLink={ this.editLink }
-						/>
-					) }
-				</URLPopover>
-			</PositionedAtSelection>
+				{ showInput ? (
+					<LinkEditor
+						value={ inputValue }
+						onChangeInputValue={ this.onChangeInputValue }
+						onKeyDown={ this.onKeyDown }
+						submitLink={ this.submitLink }
+						autocompleteRef={ this.autocompleteRef }
+					/>
+				) : (
+					<LinkViewer
+						url={ url }
+						editLink={ this.editLink }
+					/>
+				) }
+			</URLPopover>
 		);
 	}
 }
