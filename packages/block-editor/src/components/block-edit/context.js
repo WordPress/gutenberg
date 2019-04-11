@@ -90,7 +90,9 @@ export const withFirstOrOnlyBlockSelected = ( component ) => {
 				getFirstMultiSelectedBlockClientId,
 				isMultiSelecting,
 			} = select( 'core/editor' );
-			const allSelectedBlocksOfSameType = uniq( getMultiSelectedBlocks().map( ( { name } ) => name ) ).length === 1;
+			const allSelectedBlocksOfSameType = uniq(
+				getMultiSelectedBlocks().map( ( { name } ) => name )
+			).length === 1;
 			return {
 				getFirstMultiSelectedBlockClientId: getFirstMultiSelectedBlockClientId(),
 				isSelecting: isMultiSelecting(),
