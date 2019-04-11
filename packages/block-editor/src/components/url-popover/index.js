@@ -29,10 +29,9 @@ class URLPopover extends Component {
 		const {
 			children,
 			renderSettings,
-			onClose,
-			onClickOutside,
 			position = 'bottom center',
 			focusOnMount = 'firstElement',
+			...popoverProps
 		} = this.props;
 
 		const {
@@ -46,8 +45,7 @@ class URLPopover extends Component {
 				className="editor-url-popover block-editor-url-popover"
 				focusOnMount={ focusOnMount }
 				position={ position }
-				onClose={ onClose }
-				onClickOutside={ onClickOutside }
+				{ ...popoverProps }
 			>
 				<div className="editor-url-popover__row block-editor-url-popover__row">
 					{ children }
