@@ -119,6 +119,8 @@ class RSSEdit extends Component {
 							onChange={ ( value ) => setAttributes( { itemsToShow: value } ) }
 							min={ DEFAULT_MIN_ITEMS }
 							max={ DEFAULT_MAX_ITEMS }
+							allowReset={ true }
+							initialValue={ 5 }
 							required
 						/>
 						<ToggleControl
