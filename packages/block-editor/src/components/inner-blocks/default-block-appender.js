@@ -14,7 +14,7 @@ import { withSelect } from '@wordpress/data';
  */
 import IgnoreNestedEvents from '../ignore-nested-events';
 import BaseDefaultBlockAppender from '../default-block-appender';
-import withClientId from './utils/with-client-id';
+import withClientId from './with-client-id';
 
 export const DefaultBlockAppender = function( { clientId, lastBlockClientId } ) {
 	return (

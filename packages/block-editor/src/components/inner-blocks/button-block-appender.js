@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import BaseButtonBlockAppender from '../button-block-appender';
-import withClientId from './utils/with-client-id';
+import withClientId from './with-client-id';
 
 export const ButtonBlockAppender = function( { clientId } ) {
 	return (

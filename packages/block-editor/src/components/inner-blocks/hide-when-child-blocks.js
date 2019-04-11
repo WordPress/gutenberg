@@ -7,7 +7,7 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import withClientId from './utils/with-client-id';
+import withClientId from './with-client-id';
 
 export const HideWhenChildBlocks = function( props ) {
 	return props.children;

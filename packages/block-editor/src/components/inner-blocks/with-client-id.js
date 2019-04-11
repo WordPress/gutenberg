@@ -11,7 +11,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { withBlockEditContext } from '../../block-edit/context';
+import { withBlockEditContext } from '../block-edit/context';
 
 const withClientId = createHigherOrderComponent(
 	( WrappedComponent ) => withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) )( WrappedComponent ),
