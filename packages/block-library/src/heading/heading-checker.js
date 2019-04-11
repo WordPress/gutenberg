@@ -39,14 +39,16 @@ export const computeOutlineHeadings = ( blocks = [], path = [] ) => {
 	} );
 };
 
-export const HeadingChecker = ( { blocks = [], selectedLevel, selectedHeadingId } ) => {
+export const HeadingChecker = ( { blocks = [], selectedHeadingId } ) => {
 	const headings = computeOutlineHeadings( blocks );
 
-	// Iterate headings to find prevHeadingLevel
+	// Iterate headings to find prevHeadingLevel and selectedLevel
 	let prevHeadingLevel = 1;
+	let selectedLevel = 1;
 	let i = 0;
 	for ( i = 0; i < headings.length; i++ ) {
 		if ( i >= 1 && headings[ i ].clientId === selectedHeadingId ) {
+			selectedLevel = headings[ i ].level;
 			prevHeadingLevel = headings[ i - 1 ].level;
 		}
 	}

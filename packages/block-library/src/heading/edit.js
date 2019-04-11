@@ -39,7 +39,7 @@ export default function HeadingEdit( {
 				<PanelBody title={ __( 'Heading Settings' ) }>
 					<p>{ __( 'Level' ) }</p>
 					<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-					<HeadingChecker selectedLevel={ level } selectedHeadingId={ clientId } />
+					<HeadingChecker selectedHeadingId={ clientId } />
 					<p>{ __( 'Text Alignment' ) }</p>
 					<AlignmentToolbar
 						value={ align }
