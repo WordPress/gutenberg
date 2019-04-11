@@ -120,7 +120,7 @@ If the block is a top level block: the locking of the Custom Post Type is used.
 Determines the placeholder behaviour when the Block is initially inserted. You may pass a render function to provide your own placeholder as required.
 
 #### Notes
-* For convience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
+* For convenience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
 	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon inside a box which fills the Block preview. No default Block is inserted. Clicking the appender reveals the Block picker UI.
 	- `<InnerBlocks.DefaultBlockAppender />` - provides the default "auto-insert" functionality described above under `default`.
 	- `<InnerBlocks.HideWhenChildBlocks />` - will only render `children` if the instance of `InnerBlocks` has no child blocks (typically only at point of first insertion). Once a child Block is added the `children` will not be rendered (see example usage below)
