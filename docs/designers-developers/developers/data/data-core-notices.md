@@ -37,8 +37,15 @@ Yields action objects used in signalling that a notice is to be created.
                                                       announced to screen
                                                       readers. Defaults to
                                                       `true`.
- * options.actions: User actions to be
-                                                      presented with notice.
+ * options.actions: Array of user actions to be
+                                                      presented with notice. Array elements 
+																											are object in the following shape.
+   * label: Message to use as action label.
+   * url: Optional URL for the link.                  Use `#` to only 
+	                                                    call the onClick callback.
+   * onClick: Optional function to invoke when        link is clicked by user. Function receives
+	                                                    one parameter, the click event. 
+	            
 
 ### createSuccessNotice
 
