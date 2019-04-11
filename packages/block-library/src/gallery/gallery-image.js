@@ -127,25 +127,22 @@ class GalleryImage extends Component {
 
 		return (
 			<figure className={ className }>
-				{ process.env.GUTENBERG_PHASE === 2 ?
-					<div className="block-library-gallery-item__move-menu">
-						<IconButton
-							icon="arrow-left"
-							onClick={ onMoveBackward }
-							className="blocks-gallery-item__move-backward"
-							label={ __( 'Move Image Backward' ) }
-							aria-disabled={ isFirstItem }
-						/>
-						<IconButton
-							icon="arrow-right"
-							onClick={ onMoveForward }
-							className="blocks-gallery-item__move-forward"
-							label={ __( 'Move Image Forward' ) }
-							aria-disabled={ isLastItem }
-						/>
-					</div> :
-					null
-				}
+				<div className="block-library-gallery-item__move-menu">
+					<IconButton
+						icon="arrow-left"
+						onClick={ onMoveBackward }
+						className="blocks-gallery-item__move-backward"
+						label={ __( 'Move Image Backward' ) }
+						aria-disabled={ isFirstItem }
+					/>
+					<IconButton
+						icon="arrow-right"
+						onClick={ onMoveForward }
+						className="blocks-gallery-item__move-forward"
+						label={ __( 'Move Image Forward' ) }
+						aria-disabled={ isLastItem }
+					/>
+				</div>
 
 				<div className="block-library-gallery-item__inline-menu">
 					<IconButton
