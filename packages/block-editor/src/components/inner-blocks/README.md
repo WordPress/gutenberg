@@ -114,22 +114,46 @@ If locking is not set in an `InnerBlocks` area: the locking of the parent `Inner
 If the block is a top level block: the locking of the Custom Post Type is used.
 
 ### `renderAppender`
-* **Type:** `String|Function`
-* **Default:** - `null`. By default the `auto-insert` behaviour (see below) is utilised.
-* **Options:** 
-    - `block` - uses the Block List Appender (`packages/block-editor/src/components/block-list-appender/index.js`) to display a "Add Block" message with an icon which fills the Block preview. No default Block is inserted.
-    - `auto-insert` - automatically inserts whichever block is configured as the default block via `wp.blocks.getDefaultBlockName` (typically `paragraph`).
+* **Type:** `Function`
+* **Default:** - `null`. By default the `<DefaultBlockAppender>` component is used which automatically inserts whichever block is configured as the default block via `wp.blocks.getDefaultBlockName` (typically `paragraph`).
 
 Determines the placeholder behaviour when the Block is initially inserted. You may pass a render function to provide your own placeholder as required.
 
-### `hideAppenderWhenChildren`
-* **Type:** `Boolean`
-* **Default:** - `false`
-* **Options:** 
-  - `false` - does _not_ hide the appender if `InnerBlocks` has child Blocks
-  - `true` - hides the appender if `InnerBlocks` has child Blocks
+#### Notes
+* For convience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
+	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon inside a box which fills the Block preview. No default Block is inserted. Clicking the appender reveals the Block picker UI.
+	- `<InnerBlocks.DefaultBlockAppender />` - provides the default "auto-insert" functionality described above under `default`.
+	- `<InnerBlocks.HideWhenChildBlocks />` - will only render `children` if the instance of `InnerBlocks` has no child blocks (typically only at point of first insertion). Once a child Block is added the `children` will not be rendered (see example usage below)
+* Consumers are also free to pass any valid render function which provides full 
+flexibility to define a bespoke appender
 
-Determines whether or not to show the appender (as defined by the `renderAppender` prop) if the `InnerBlocks` currently has child Blocks.
+#### Example usage
+
+```jsx
+// Utilise a predefined component
+<InnerBlocks
+	renderAppender={ () => (
+		<InnerBlocks.ButtonBlockAppender />
+	) }
+/>
+
+// Will only display `ButtonBlockAppender` when there are no child blocks present
+<InnerBlocks
+	renderAppender={ () => (
+		<InnerBlocks.HideWhenChildBlocks>
+			<InnerBlocks.ButtonBlockAppender />
+		</InnerBlocks.HideWhenChildBlocks>
+	) }
+/>
+
+// Fully custom
+<InnerBlocks
+	renderAppender={ () => (
+		<button className="bespoke-appender" type="button">Some Special Appender</button>
+	) }
+/>
+```
+
 
 
 
