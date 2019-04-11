@@ -28,7 +28,7 @@ function BlockListAppender( {
 	}
 
 	// If auto-insert Blocks is enabled, default to the standard behaviour
-	// of auto-inserting a Block but only if no renderAppender is provided
+	// of auto-inserting a Block but only if no renderAppender is provided.
 	if ( ! renderAppender && canInsertDefaultBlock ) {
 		return (
 			<div className="block-list-appender">
@@ -42,7 +42,7 @@ function BlockListAppender( {
 		);
 	}
 
-	// Render prop - custom appender
+	// Render prop - custom appender.
 	if ( isFunction( renderAppender ) ) {
 		return (
 			<div className="block-list-appender">
@@ -52,7 +52,7 @@ function BlockListAppender( {
 	}
 
 	// Fallback in the case no renderAppender has been provided
-	// and we can't auto-insert the default block
+	// and we can't auto-insert the default block.
 	if ( ! canInsertDefaultBlock ) {
 		return (
 			<div className="block-list-appender">
