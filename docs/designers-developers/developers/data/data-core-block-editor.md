@@ -763,6 +763,20 @@ via its `onChange` callback, in addition to `onInput`.
 
 Whether the most recent block change was persistent.
 
+### __unstableIsLastBlockChangeIgnored
+
+Returns true if the most recent block change is be considered ignored, or
+false otherwise. An ignored change is one not to be committed by
+BlockEditorProvider, neither via `onChange` nor `onInput`.
+
+*Parameters*
+
+ * state: Block editor state.
+
+*Returns*
+
+Whether the most recent block change was ignored.
+
 ## Actions
 
 ### resetBlocks
