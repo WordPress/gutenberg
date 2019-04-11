@@ -9,9 +9,12 @@ import { getOffsetParent, getRectangleFromRange } from '@wordpress/dom';
  * relative to the bottom-center of the current selection. Includes `top` and
  * `left` style properties.
  *
+ * @param {string} selector Use the position of the closest element that matches
+ *                          the selector instead of the position of the caret.
+ *
  * @return {Object} Style object.
  */
-function getCurrentCaretPositionStyle() {
+function getCurrentCaretPositionStyle( selector ) {
 	const selection = window.getSelection();
 
 	// Unlikely, but in the case there is no selection, return empty styles so
@@ -20,8 +23,32 @@ function getCurrentCaretPositionStyle() {
 		return {};
 	}
 
+	const range = selection.getRangeAt( 0 );
+
 	// Get position relative viewport.
-	const rect = getRectangleFromRange( selection.getRangeAt( 0 ) );
+	let rect;
+
+	if ( selector ) {
+		let element = range.startContainer;
+
+		// If the caret is right before the element, select the next element.
+		element = element.nextElementSibling || element;
+
+		while ( element.nodeType !== window.Node.ELEMENT_NODE ) {
+			element = element.parentNode;
+		}
+
+		const closest = element.closest( selector );
+
+		if ( closest ) {
+			rect = closest.getBoundingClientRect();
+		}
+	}
+
+	if ( ! rect ) {
+		rect = getRectangleFromRange( range );
+	}
+
 	let top = rect.top + rect.height;
 	let left = rect.left + ( rect.width / 2 );
 
@@ -44,11 +71,11 @@ function getCurrentCaretPositionStyle() {
  * @type {WPComponent}
  */
 export default class PositionedAtSelection extends Component {
-	constructor() {
+	constructor( { selector } ) {
 		super( ...arguments );
 
 		this.state = {
-			style: getCurrentCaretPositionStyle(),
+			style: getCurrentCaretPositionStyle( selector ),
 		};
 	}
 

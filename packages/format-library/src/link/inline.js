@@ -24,6 +24,7 @@ import {
 	applyFormat,
 	getTextContent,
 	slice,
+	getActiveFormat,
 } from '@wordpress/rich-text';
 import { URLInput, URLPopover } from '@wordpress/block-editor';
 
@@ -108,21 +109,34 @@ class InlineLinkUI extends Component {
 		this.state = {
 			opensInNewWindow: false,
 			inputValue: '',
+			key: 0,
 		};
 	}
 
 	static getDerivedStateFromProps( props, state ) {
-		const { activeAttributes: { url, target } } = props;
+		const { activeAttributes: { url, target }, value } = props;
 		const opensInNewWindow = target === '_blank';
+		const activeFormat = getActiveFormat( value, 'core/link' );
+
+		const newState = {};
 
 		if ( ! isShowingInput( props, state ) ) {
 			if ( url !== state.inputValue ) {
-				return { inputValue: url };
+				newState.inputValue = url;
 			}
 
 			if ( opensInNewWindow !== state.opensInNewWindow ) {
-				return { opensInNewWindow };
+				newState.opensInNewWindow = opensInNewWindow;
 			}
+		}
+
+		if ( activeFormat && activeFormat !== state.activeFormat ) {
+			newState.activeFormat = activeFormat;
+			newState.key = state.key + 1;
+		}
+
+		if ( Object.keys( newState ).length ) {
+			return newState;
 		}
 
 		return null;
@@ -211,7 +225,7 @@ class InlineLinkUI extends Component {
 	}
 
 	render() {
-		const { isActive, activeAttributes: { url }, addingLink, value } = this.props;
+		const { isActive, activeAttributes: { url }, addingLink } = this.props;
 
 		if ( ! isActive && ! addingLink ) {
 			return null;
@@ -222,7 +236,10 @@ class InlineLinkUI extends Component {
 
 		return (
 			<PositionedAtSelection
-				key={ `${ value.start }${ value.end }` /* Used to force rerender on selection change */ }
+				selector="a"
+				// Since the key cannot be the format object, we have to keep it
+				// in the state and bump it when the object reference changes.
+				key={ this.state.key }
 			>
 				<URLPopover
 					onClickOutside={ this.onClickOutside }
