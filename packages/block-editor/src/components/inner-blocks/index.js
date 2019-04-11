@@ -12,14 +12,14 @@ import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { compose, ifCondition } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import withClientId from './utils/with-client-id';
 import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
+import HideWhenChildBlocks from './hide-when-child-blocks';
 
 /**
  * Internal dependencies
@@ -110,8 +110,6 @@ class InnerBlocks extends Component {
 			isSmallScreen,
 			isSelectedBlockInRoot,
 			renderAppender,
-			hideAppenderWhenChildren,
-			hasChildBlocks,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -119,15 +117,12 @@ class InnerBlocks extends Component {
 			'has-overlay': isSmallScreen && ! isSelectedBlockInRoot,
 		} );
 
-		const hideAppender = hideAppenderWhenChildren && hasChildBlocks;
-
 		return (
 			<div className={ classes }>
 				{ ! templateInProcess && (
 					<BlockList
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
-						hideAppender={ hideAppender }
 					/>
 				) }
 			</div>
@@ -149,14 +144,12 @@ InnerBlocks = compose( [
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 		const rootClientId = getBlockRootClientId( clientId );
-		const block = getBlock( clientId );
 
 		return {
 			isSelectedBlockInRoot: isBlockSelected( clientId ) || hasSelectedInnerBlock( clientId ),
-			block,
+			block: getBlock( clientId ),
 			blockListSettings: getBlockListSettings( clientId ),
 			parentLock: getTemplateLock( rootClientId ),
-			hasChildBlocks: !! ( block && block.innerBlocks.length ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
@@ -177,29 +170,10 @@ InnerBlocks = compose( [
 	} ),
 ] )( InnerBlocks );
 
-InnerBlocks.HideWhenChildren = compose( [
-	withClientId,
-	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlock,
-		} = select( 'core/block-editor' );
-
-		const block = getBlock( clientId );
-
-		return {
-			hasChildBlocks: !! ( block && block.innerBlocks.length ),
-		};
-	} ),
-	ifCondition( ( { hasChildBlocks } ) => {
-		return ! hasChildBlocks;
-	} ),
-] )( function( props ) {
-	return props.children;
-} );
-
-// Expose default appender placeholders as components
+// Expose default appender placeholders as components.
 InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
+InnerBlocks.HideWhenChildBlocks = HideWhenChildBlocks;
 
 InnerBlocks.Content = withBlockContentContext(
 	( { BlockContent } ) => <BlockContent />
