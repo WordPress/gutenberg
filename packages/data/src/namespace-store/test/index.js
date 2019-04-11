@@ -110,19 +110,19 @@ describe( 'controls', () => {
 			} );
 		} );
 		it( 'action generator returning a yielded promise control descriptor ' +
-			'resolves as expected', () => {
+			'resolves as expected', async () => {
 			const withPromise = registry.dispatch( 'store' ).withPromise();
-			expect( withPromise ).resolves.toEqual( 10 );
+			await expect( withPromise ).resolves.toEqual( 10 );
 		} );
 		it( 'action generator yielding normal action objects resolves as ' +
-			'expected', () => {
+			'expected', async () => {
 			const withNormal = registry.dispatch( 'store' ).withNormal();
-			expect( withNormal ).resolves.toBeUndefined();
+			await expect( withNormal ).resolves.toBeUndefined();
 		} );
-		it( 'action generator returning a non action like value', () => {
+		it( 'action generator returning a non action like value', async () => {
 			const withNonActionLikeValue = registry.dispatch( 'store' )
 				.withNonActionLikeValue();
-			expect( withNonActionLikeValue ).resolves.toEqual( 10 );
+			await expect( withNonActionLikeValue ).resolves.toEqual( 10 );
 		} );
 		it( 'normal dispatch action throwing error because no action ' +
 			'returned', () => {
@@ -131,8 +131,10 @@ describe( 'controls', () => {
 				'Actions must be plain objects. Use custom middleware for async actions.'
 			);
 		} );
-		it( 'returns undefined for normal dispatch action', () => {
-			expect( registry.dispatch( 'store' ).normal() ).toBeUndefined();
+		it( 'returns action object for normal dispatch action', async () => {
+			await expect( registry.dispatch( 'store' ).normal() )
+				.resolves
+				.toEqual( { type: 'NORMAL' } );
 		} );
 	} );
 	describe( 'action type resolves as expected with just promise ' +
@@ -152,18 +154,23 @@ describe( 'controls', () => {
 				actions,
 			} );
 		} );
-		it( 'normal action returns undefined', () => {
-			expect( registry.dispatch( 'store' ).normal() ).toBeUndefined();
-		} );
-		it( 'action with promise resolving to action returning undefined', () => {
-			expect( registry.dispatch( 'store' ).withPromiseAndAction() )
+		it( 'normal action returns action object', async () => {
+			await expect( registry.dispatch( 'store' ).normal() )
 				.resolves
-				.toBeUndefined();
+				.toEqual( { type: 'NORMAL' } );
 		} );
-		it( 'action with promise returning non action throws error', () => {
+		it( 'action with promise resolving to action returning ' +
+			'action object', async () => {
+			await expect( registry.dispatch( 'store' ).withPromiseAndAction() )
+				.resolves
+				.toEqual( { type: 'WITH_PROMISE' } );
+		} );
+		it( 'action with promise returning non action throws error', async () => {
 			const dispatchedAction = registry.dispatch( 'store' )
 				.withPromiseAndNonAction();
-			expect( dispatchedAction ).resolves.toBe( 10 );
+			await expect( dispatchedAction ).rejects.toThrow(
+				'Actions must be plain objects. Use custom middleware for async actions.'
+			);
 		} );
 	} );
 } );
