@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
+import { Fragment, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
@@ -15,6 +15,7 @@ import { withInstanceId } from '@wordpress/compose';
 const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, instanceId } ) => {
 	const { height } = attributes;
 	const id = `block-spacer-height-input-${ instanceId }`;
+	const [ inputHeightValue, setInputHeightValue ] = useState( height );
 
 	return (
 		<Fragment>
@@ -54,19 +55,21 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 							type="number"
 							id={ id }
 							onChange={ ( event ) => {
-								let customHeight = parseInt( event.target.value, 10 );
-								if ( isNaN( customHeight ) ) {
-									// Set to the default size
-									customHeight = 100;
-								} else if ( customHeight < 20 ) {
-									// Set to the minimum size
-									customHeight = 20;
+								let spacerHeight = parseInt( event.target.value, 10 );
+								setInputHeightValue( spacerHeight );
+								if ( isNaN( spacerHeight ) ) {
+									// Set spacer height to default size and input box to empty string
+									setInputHeightValue( '' );
+									spacerHeight = 100;
+								} else if ( spacerHeight < 20 ) {
+									// Set spacer height to minimum size
+									spacerHeight = 20;
 								}
 								setAttributes( {
-									height: customHeight,
+									height: spacerHeight,
 								} );
 							} }
-							value={ height }
+							value={ inputHeightValue }
 							min="20"
 							step="10"
 						/>
