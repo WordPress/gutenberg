@@ -66,7 +66,7 @@
 
 		// Remove the appearance of scrolling based on OS-level animation preferences.
 		@media (prefers-reduced-motion: reduce) {
-			background-attachment: local;
+			background-attachment: scroll;
 		}
 	}
 
