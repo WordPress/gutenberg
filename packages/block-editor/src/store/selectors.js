@@ -1392,17 +1392,16 @@ export function isLastBlockChangePersistent( state ) {
  * false otherwise. An ignored change is one not to be committed by
  * BlockEditorProvider, neither via `onChange` nor `onInput`.
  *
- * TODO: Removal Plan: Changes incurred by RECEIVE_BLOCKS should not be ignored
- * if in-fact they result in a change in blocks state. The current need to
- * ignore changes incurred not as a result of user interaction should be
- * accounted for in the refactoring of reusable blocks as occurring within
- * their own separate block editor / state (#7119).
- *
  * @param {Object} state Block editor state.
  *
  * @return {boolean} Whether the most recent block change was ignored.
  */
 export function __unstableIsLastBlockChangeIgnored( state ) {
+	// TODO: Removal Plan: Changes incurred by RECEIVE_BLOCKS should not be
+	// ignored if in-fact they result in a change in blocks state. The current
+	// need to ignore changes not a result of user interaction should be
+	// accounted for in the refactoring of reusable blocks as occurring within
+	// their own separate block editor / state (#7119).
 	return state.blocks.isIgnoredChange;
 }
 
