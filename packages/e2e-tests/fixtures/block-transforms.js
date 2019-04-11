@@ -303,8 +303,8 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Search',
 		availableTransforms: [],
 	},
-	core__section: {
-		originalBlock: 'Section',
+	core__group: {
+		originalBlock: 'Group',
 		availableTransforms: [],
 	},
 	core__separator: {
