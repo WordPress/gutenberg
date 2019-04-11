@@ -18,7 +18,7 @@ import { compose, ifCondition } from '@wordpress/compose';
  * Internal dependencies
  */
 import withClientId from './utils/with-client-id';
-import ButtonAppender from './button-appender';
+import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
 
 /**
@@ -199,15 +199,10 @@ InnerBlocks.HideWhenChildren = compose( [
 
 // Expose default appender placeholders as components
 InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
-InnerBlocks.ButtonAppender = ButtonAppender;
+InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
 InnerBlocks.Content = withBlockContentContext(
 	( { BlockContent } ) => <BlockContent />
 );
-
-InnerBlocks.appenderType = {
-	AUTO_INSERT: 'auto-insert',
-	BLOCK: 'block',
-};
 
 export default InnerBlocks;
