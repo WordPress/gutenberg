@@ -20,6 +20,7 @@ import {
 import {
 	Toolbar,
 	ToolbarButton,
+	Dashicon,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -38,7 +39,7 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import styles from '../image/styles.scss';
 import MediaUploadProgress from '../image/media-upload-progress';
-import icon from './icon';
+import style from './style.scss';
 
 const VIDEO_ASPECT_RATIO = 1.7;
 
@@ -127,7 +128,7 @@ class VideoEdit extends React.Component {
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { caption, id, poster, src } = attributes;
-		const { isMediaRequested } = this.state;
+		const { isMediaRequested, videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
 			<MediaUpload mediaType={ MEDIA_TYPE_VIDEO }
@@ -180,9 +181,8 @@ class VideoEdit extends React.Component {
 							const opacity = isUploadInProgress ? 0.3 : 1;
 							const showVideo = src && ! isUploadInProgress;
 							const videoStyle = {
-								height: this.state.videoContainerHeight,
-								width: '100%',
-
+								height: videoContainerHeight,
+								...style.video,
 							};
 
 							return (
@@ -197,8 +197,8 @@ class VideoEdit extends React.Component {
 										/>
 									}
 									{ ! showVideo &&
-										<View style={ { ...videoStyle, opacity } }>
-											{ icon }
+										<View style={ { ...videoStyle, ...style.placeholder, opacity } }>
+											{ videoContainerHeight > 0 && <Dashicon icon={ 'format-video' } size={ 100 } style={ style.placeholderIcon } /> }
 										</View>
 									}
 								</View>
