@@ -1,0 +1,92 @@
+.block-editor-block-list__block[data-type="core/button"] {
+	&[data-align="center"] {
+		text-align: center;
+	}
+
+	&[data-align="right"] {
+		/*!rtl:ignore*/
+		text-align: right;
+	}
+}
+
+.wp-block-button {
+	display: inline-block;
+	margin-bottom: 0;
+	position: relative;
+
+	[contenteditable] {
+		cursor: text;
+	}
+
+	// Make placeholder text white unless custom colors or outline versions are chosen.
+	&:not(.has-text-color):not(.is-style-outline) .block-editor-rich-text__editable[data-is-placeholder-visible="true"] + .block-editor-rich-text__editable {
+		color: $white;
+	}
+
+	// Increase placeholder opacity to meet contrast ratios.
+	.block-editor-rich-text__editable[data-is-placeholder-visible="true"] + .block-editor-rich-text__editable {
+		opacity: 0.8;
+	}
+
+	// Don't let the placeholder text wrap in the variation preview.
+	.block-editor-block-preview__content & {
+		max-width: 100%;
+
+		// Polish the empty placeholder text for the button in variation previews.
+		.block-editor-rich-text__editable[data-is-placeholder-visible="true"] {
+			height: auto;
+		}
+
+		.wp-block-button__link {
+			max-width: 100%;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+	}
+}
+
+.block-library-button__inline-link {
+	background: $white;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+
+	// The width of input box plus padding plus two icon buttons.
+	$blocks-button__link-input-width: 300px + 2px + 2 * $icon-button-size;
+	width: $blocks-button__link-input-width;
+
+	.block-editor-url-input {
+		width: auto;
+	}
+
+	.block-editor-url-input__suggestions {
+		width: $blocks-button__link-input-width - $icon-button-size - $icon-button-size;
+		z-index: z-index(".block-library-button__inline-link .block-editor-url-input__suggestions");
+	}
+
+	> .dashicon {
+		width: $icon-button-size;
+	}
+
+	.dashicon {
+		color: $dark-gray-100;
+	}
+
+	.block-editor-url-input input[type="text"]::placeholder {
+		color: $dark-gray-100;
+	}
+
+	[data-align="center"] & {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	[data-align="right"] & {
+		margin-left: auto;
+		margin-right: 0;
+	}
+}

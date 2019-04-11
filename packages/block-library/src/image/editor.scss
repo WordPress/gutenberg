@@ -1,0 +1,126 @@
+.wp-block-image {
+	position: relative;
+
+	&.is-transient img {
+		opacity: 0.3;
+	}
+
+	figcaption img {
+		display: inline;
+	}
+
+	// Shown while image is being uploaded
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
+	}
+}
+
+// This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
+.wp-block-image .components-resizable-box__container {
+	display: inline-block;
+
+	img {
+		display: block;
+		width: 100%;
+	}
+}
+
+// Ensure the resize handles are visible when the image is focused.
+.wp-block-image.is-focused .components-resizable-box__handle {
+	display: block;
+	z-index: z-index(".block-library-image__resize-handlers");
+}
+
+.block-editor-block-list__block[data-type="core/image"][data-align="center"] {
+	.wp-block-image {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	&[data-resized="false"] .wp-block-image > div {
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
+
+.edit-post-sidebar .block-library-image__dimensions {
+	margin-bottom: 1em;
+
+	.block-library-image__dimensions__row {
+		display: flex;
+		justify-content: space-between;
+
+		.block-library-image__dimensions__width,
+		.block-library-image__dimensions__height {
+			margin-bottom: 0.5em;
+
+			// Fix the text and placeholder text being misaligned in Safari
+			input {
+				line-height: 1.25;
+			}
+		}
+
+		.block-library-image__dimensions__width {
+			margin-right: 5px;
+		}
+
+		.block-library-image__dimensions__height {
+			margin-left: 5px;
+		}
+	}
+}
+
+.block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
+	position: absolute;
+	left: 0;
+	right: 0;
+	margin: -$border-width 0;
+
+	@include break-small() {
+		margin: -$border-width;
+	}
+}
+
+// Although the float markup is different in the editor compared to the frontend,
+// this CSS uses the same technique to allow floats in a wide images context.
+// That is, the block retains its centering and max-width, and a child inside
+// is floated instead of the block itself.
+[data-type="core/image"][data-align="center"],
+[data-type="core/image"][data-align="left"],
+[data-type="core/image"][data-align="right"] {
+	.block-editor-block-list__block-edit {
+		figure {
+			margin: 0;
+			display: table;
+		}
+
+		// This maps to the figcaption on the frontend.
+		.block-editor-rich-text {
+			display: table-caption;
+			caption-side: bottom;
+		}
+	}
+}
+
+[data-type="core/image"][data-align="wide"],
+[data-type="core/image"][data-align="full"] {
+	figure img {
+		width: 100%;
+	}
+}
+
+// This is similar to above but for resized unfloated images only, where the markup is different.
+[data-type="core/image"] .block-editor-block-list__block-edit figure.is-resized {
+	margin: 0;
+	display: table;
+
+	// This maps to the figcaption on the frontend.
+	.block-editor-rich-text {
+		display: table-caption;
+		caption-side: bottom;
+	}
+}

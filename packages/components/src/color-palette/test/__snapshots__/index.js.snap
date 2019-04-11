@@ -1,0 +1,286 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
+<div
+  className="components-color-picker is-alpha-disabled"
+>
+  <div
+    className="components-color-picker__saturation"
+  >
+    <WithInstanceId(Saturation)
+      hsl={
+        Object {
+          "a": 1,
+          "h": 0,
+          "l": 50,
+          "s": 100,
+        }
+      }
+      hsv={
+        Object {
+          "a": 1,
+          "h": 0,
+          "s": 100,
+          "v": 100,
+        }
+      }
+      onChange={[Function]}
+    />
+  </div>
+  <div
+    className="components-color-picker__body"
+  >
+    <div
+      className="components-color-picker__controls"
+    >
+      <div
+        className="components-color-picker__swatch"
+      >
+        <div
+          className="components-color-picker__active"
+          style={
+            Object {
+              "backgroundColor": "rgb(255, 0, 0)",
+            }
+          }
+        />
+      </div>
+      <div
+        className="components-color-picker__toggles"
+      >
+        <WithInstanceId(Hue)
+          hsl={
+            Object {
+              "a": 1,
+              "h": 0,
+              "l": 50,
+              "s": 100,
+            }
+          }
+          onChange={[Function]}
+        />
+      </div>
+    </div>
+    <Inputs
+      disableAlpha={true}
+      hex="#ff0000"
+      hsl={
+        Object {
+          "a": 1,
+          "h": 0,
+          "l": 50,
+          "s": 100,
+        }
+      }
+      onChange={[Function]}
+      rgb={
+        Object {
+          "a": 1,
+          "b": 0,
+          "g": 0,
+          "r": 255,
+        }
+      }
+    />
+  </div>
+</div>
+`;
+
+exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `
+<button
+  aria-expanded={true}
+  aria-label="Custom color picker"
+  className="components-button is-link"
+  onClick={[MockFunction]}
+  type="button"
+>
+  Custom Color
+</button>
+`;
+
+exports[`ColorPalette Dropdown should render it correctly 1`] = `
+<Dropdown
+  className="components-color-palette__custom-color"
+  contentClassName="components-color-palette__picker"
+  renderContent={[Function]}
+  renderToggle={[Function]}
+/>
+`;
+
+exports[`ColorPalette should allow disabling custom color picker 1`] = `
+<div
+  className="components-color-palette"
+>
+  <div
+    className="components-color-palette__item-wrapper"
+    key="#f00"
+  >
+    <Tooltip
+      text="red"
+    >
+      <button
+        aria-label="Color: red"
+        aria-pressed={true}
+        className="components-color-palette__item is-active"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#f00",
+          }
+        }
+        type="button"
+      />
+    </Tooltip>
+    <Dashicon
+      icon="saved"
+    />
+  </div>
+  <div
+    className="components-color-palette__item-wrapper"
+    key="#fff"
+  >
+    <Tooltip
+      text="white"
+    >
+      <button
+        aria-label="Color: white"
+        aria-pressed={false}
+        className="components-color-palette__item"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#fff",
+          }
+        }
+        type="button"
+      />
+    </Tooltip>
+  </div>
+  <div
+    className="components-color-palette__item-wrapper"
+    key="#00f"
+  >
+    <Tooltip
+      text="blue"
+    >
+      <button
+        aria-label="Color: blue"
+        aria-pressed={false}
+        className="components-color-palette__item"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#00f",
+          }
+        }
+        type="button"
+      />
+    </Tooltip>
+  </div>
+  <div
+    className="components-color-palette__custom-clear-wrapper"
+  >
+    <ForwardRef(Button)
+      className="components-color-palette__clear"
+      isDefault={true}
+      isSmall={true}
+      onClick={[Function]}
+      type="button"
+    >
+      Clear
+    </ForwardRef(Button)>
+  </div>
+</div>
+`;
+
+exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+<div
+  className="components-color-palette"
+>
+  <div
+    className="components-color-palette__item-wrapper"
+    key="#f00"
+  >
+    <Tooltip
+      text="red"
+    >
+      <button
+        aria-label="Color: red"
+        aria-pressed={true}
+        className="components-color-palette__item is-active"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#f00",
+          }
+        }
+        type="button"
+      />
+    </Tooltip>
+    <Dashicon
+      icon="saved"
+    />
+  </div>
+  <div
+    className="components-color-palette__item-wrapper"
+    key="#fff"
+  >
+    <Tooltip
+      text="white"
+    >
+      <button
+        aria-label="Color: white"
+        aria-pressed={false}
+        className="components-color-palette__item"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#fff",
+          }
+        }
+        type="button"
+      />
+    </Tooltip>
+  </div>
+  <div
+    className="components-color-palette__item-wrapper"
+    key="#00f"
+  >
+    <Tooltip
+      text="blue"
+    >
+      <button
+        aria-label="Color: blue"
+        aria-pressed={false}
+        className="components-color-palette__item"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#00f",
+          }
+        }
+        type="button"
+      />
+    </Tooltip>
+  </div>
+  <div
+    className="components-color-palette__custom-clear-wrapper"
+  >
+    <Dropdown
+      className="components-color-palette__custom-color"
+      contentClassName="components-color-palette__picker"
+      renderContent={[Function]}
+      renderToggle={[Function]}
+    />
+    <ForwardRef(Button)
+      className="components-color-palette__clear"
+      isDefault={true}
+      isSmall={true}
+      onClick={[Function]}
+      type="button"
+    >
+      Clear
+    </ForwardRef(Button)>
+  </div>
+</div>
+`;

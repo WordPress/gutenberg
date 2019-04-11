@@ -1,0 +1,25 @@
+.edit-post-settings-sidebar__panel-block .components-panel__body {
+	border: none;
+	border-top: $border-width solid $light-gray-500;
+	margin: 0 #{ -$grid-size-large };
+
+	.components-base-control {
+		margin-bottom: #{ $grid-size * 3 };
+
+		&:last-child {
+			margin-bottom: $grid-size;
+		}
+	}
+
+	.components-panel__body-toggle {
+		color: $dark-gray-900;
+	}
+
+	&:first-child {
+		margin-top: $grid-size-large;
+	}
+
+	&:last-child {
+		margin-bottom: -$grid-size-large;
+	}
+}

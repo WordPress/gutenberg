@@ -1,0 +1,65 @@
+.components-notice {
+	font-family: $default-font;
+	font-size: $default-font-size;
+	background-color: $blue-medium-100;
+	border-left: 4px solid $blue-medium-500;
+	margin: 5px 15px 2px;
+	padding: 8px 12px;
+
+	&.is-dismissible {
+		padding-right: 36px;
+		position: relative;
+	}
+
+	&.is-success {
+		border-left-color: $alert-green;
+		background-color: lighten($alert-green, 45%);
+	}
+
+	&.is-warning {
+		border-left-color: $alert-yellow;
+		background-color: lighten($alert-yellow, 35%);
+	}
+
+	&.is-error {
+		border-left-color: $alert-red;
+		background-color: lighten($alert-red, 35%);
+	}
+}
+
+.components-notice__content {
+	margin: 1em #{ $icon-button-size-small + $border-width } 1em 0;
+}
+
+.components-notice__action.components-button {
+	&,
+	&.is-link {
+		margin-left: 4px;
+	}
+	&.is-default {
+		vertical-align: initial;
+	}
+}
+
+.components-notice__dismiss {
+	position: absolute;
+	top: 0;
+	right: 0;
+	color: $dark-gray-300;
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
+	&:not(:disabled):not([aria-disabled="true"]):focus {
+		color: $alert-red;
+		background-color: transparent;
+	}
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+		box-shadow: none;
+	}
+}
+
+.components-notice-list {
+	min-width: 300px;
+	z-index: z-index(".components-notice-list");
+}

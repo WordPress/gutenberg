@@ -1,0 +1,35 @@
+body {
+	font-family: $editor-font;
+	font-size: $editor-font-size;
+	line-height: $editor-line-height;
+	color: $dark-gray-900;
+}
+
+p {
+	font-size: inherit;
+	line-height: inherit;
+}
+
+ul,
+ol {
+	margin: 0;
+	padding: 0;
+
+	li {
+		// This overrides a bottom margin globally applied to list items in wp-admin.
+		margin-bottom: initial;
+	}
+}
+
+ul {
+	list-style-type: disc;
+}
+
+ol {
+	list-style-type: decimal;
+}
+
+ul ul,
+ol ul {
+	list-style-type: circle;
+}

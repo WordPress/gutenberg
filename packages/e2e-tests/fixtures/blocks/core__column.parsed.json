@@ -1,0 +1,43 @@
+[
+    {
+        "blockName": "core/column",
+        "attrs": {},
+        "innerBlocks": [
+            {
+                "blockName": "core/paragraph",
+                "attrs": {},
+                "innerBlocks": [],
+                "innerHTML": "\n\t<p>Column One, Paragraph One</p>\n\t",
+                "innerContent": [
+                    "\n\t<p>Column One, Paragraph One</p>\n\t"
+                ]
+            },
+            {
+                "blockName": "core/paragraph",
+                "attrs": {},
+                "innerBlocks": [],
+                "innerHTML": "\n\t<p>Column One, Paragraph Two</p>\n\t",
+                "innerContent": [
+                    "\n\t<p>Column One, Paragraph Two</p>\n\t"
+                ]
+            }
+        ],
+        "innerHTML": "\n<div class=\"wp-block-column\">\n\t\n\t\n</div>\n",
+        "innerContent": [
+            "\n<div class=\"wp-block-column\">\n\t",
+            null,
+            "\n\t",
+            null,
+            "\n</div>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

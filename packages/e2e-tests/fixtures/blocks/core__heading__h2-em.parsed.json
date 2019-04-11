@@ -1,0 +1,20 @@
+[
+    {
+        "blockName": "core/heading",
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n<h2>The <em>Inserter</em> Tool</h2>\n",
+        "innerContent": [
+            "\n<h2>The <em>Inserter</em> Tool</h2>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

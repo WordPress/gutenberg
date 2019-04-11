@@ -1,0 +1,39 @@
+.edit-post-post-visibility__dialog {
+	.editor-post-visibility__dialog-fieldset {
+		padding: $grid-size-small;
+		padding-top: 0;
+	}
+
+	.editor-post-visibility__dialog-legend {
+		font-weight: 600;
+		margin-bottom: 1em;
+		margin-top: 0.5em;
+		padding: 0;
+	}
+
+	.editor-post-visibility__dialog-radio {
+		margin-top: 2px;
+	}
+
+	.editor-post-visibility__dialog-label {
+		font-weight: 600;
+	}
+
+	.editor-post-visibility__dialog-info {
+		margin-top: 0;
+		margin-left: 28px;
+	}
+
+	// Remove bottom margin on the last label only.
+	.editor-post-visibility__choice:last-child .editor-post-visibility__dialog-info {
+		margin-bottom: 0;
+	}
+
+	.editor-post-visibility__dialog-password-input {
+		margin-left: 28px;
+	}
+}
+
+.edit-post-post-visibility__dialog.components-popover.is-bottom {
+	z-index: z-index(".edit-post-post-visibility__dialog.components-popover.is-bottom");
+}

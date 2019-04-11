@@ -1,13 +1,22 @@
-# Introduction
+# Gutenberg Handbook
 
-"Gutenberg" is the codename for the 2017 WordPress editor focus. The goal of this focus is to create a new post and page editing experience that makes it easy for anyone to create rich post layouts. This was the kickoff goal:
- 
-> The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
- 
-Key take-aways from parsing that paragraph:
- 
-- Authoring richly laid out posts is a key strength of WordPress.
-- By embracing "the block", we can potentially unify multiple different interfaces into one. Instead of learning how to write shortcodes, custom HTML, or paste URLs to embed, you should do with just learning the block, and all the pieces should fall in place.
-- "Mystery meat" refers to hidden features in software, features that you have to discover. WordPress already supports a large number of blocks and 30+ embeds, so let's surface them.
- 
-Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg), and you can try [an early beta version today from the plugin repository](https://wordpress.org/plugins/gutenberg/). Though keep in mind it's not fully functional, feature complete, or production ready.
+The Gutenberg project provides three sources of documentation:
+
+## Designer & Developer Handbook
+
+Learn how to build blocks and extend the editor, best practices for designing block interfaces, and how to create themes that make the most of the new features Gutenberg provides.
+
+Start with [the Designer & Developer Handbook](/docs/designers-developers/readme.md) to learn the background and concepts, or jump straight to [Gutenberg Tutorials](/docs/designers-developers/developers/tutorials/readme.md) for detailed examples.
+
+## User Handbook
+
+Discover the new features WordPress offers, learn how your site will be affected by the new editor and how to keep using the old interface, and tips for creating beautiful posts and pages.
+
+See [the WordPress Editor](https://wordpress.org/support/article/wordpress-editor/) support documentation.
+
+
+## Contributor Handbook
+
+Help make Gutenberg better by contributing ideas, code, testing, and more.
+
+[Visit the Contributor Handbook](/docs/contributors/readme.md)

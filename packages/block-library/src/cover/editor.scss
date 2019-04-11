@@ -1,0 +1,47 @@
+.wp-block-cover-image,
+.wp-block-cover {
+	&.components-placeholder h2 {
+		color: inherit;
+	}
+
+	&.has-right-content .block-editor-rich-text__inline-toolbar,
+	&.has-left-content .block-editor-rich-text__inline-toolbar {
+		display: inline-block;
+	}
+
+	.block-editor-block-list__layout {
+		width: 100%;
+	}
+
+	.block-editor-block-list__block {
+		color: $light-gray-100;
+	}
+
+	// wp-block-cover class is used just to increase selector specificity
+	.wp-block-cover__inner-container {
+		// avoid text align inherit from cover image align.
+		text-align: left;
+	}
+
+	.wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	&.components-placeholder {
+		// use opacity to work in various editor styles
+		background: $dark-opacity-light-200;
+		min-height: 200px;
+
+		.is-dark-theme & {
+			background: $light-opacity-light-200;
+		}
+	}
+
+	// Apply max-width to floated items that have no intrinsic width
+	[data-align="left"] &,
+	[data-align="right"] & {
+		max-width: $content-width / 2;
+		width: 100%;
+	}
+}

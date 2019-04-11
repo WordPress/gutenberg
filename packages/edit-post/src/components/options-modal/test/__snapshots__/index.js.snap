@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OptionsModal should match snapshot when the modal is active 1`] = `
+<WithInstanceId(Modal)
+  className="edit-post-options-modal"
+  closeLabel="Close"
+  title="Options"
+>
+  <Section
+    title="General"
+  >
+    <WithSelect(WithDispatch(IfViewportMatches(BaseOption)))
+      label="Enable Pre-publish Checks"
+    />
+    <WithSelect(WithDispatch(DeferredOption))
+      label="Enable Tips"
+    />
+  </Section>
+  <Section
+    title="Document Panels"
+  >
+    <WithSelect(PostTaxonomies)
+      taxonomyWrapper={[Function]}
+    />
+    <PostFeaturedImageCheck>
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
+        label="Featured Image"
+        panelName="featured-image"
+      />
+    </PostFeaturedImageCheck>
+    <PostExcerptCheck>
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
+        label="Excerpt"
+        panelName="post-excerpt"
+      />
+    </PostExcerptCheck>
+    <WithSelect(PostTypeSupportCheck)
+      supportKeys={
+        Array [
+          "comments",
+          "trackbacks",
+        ]
+      }
+    >
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
+        label="Discussion"
+        panelName="discussion-panel"
+      />
+    </WithSelect(PostTypeSupportCheck)>
+    <WithSelect(PageAttributesCheck)>
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
+        label="Page Attributes"
+        panelName="page-attributes"
+      />
+    </WithSelect(PageAttributesCheck)>
+  </Section>
+  <WithSelect(MetaBoxesSection)
+    title="Advanced Panels"
+  />
+</WithInstanceId(Modal)>
+`;

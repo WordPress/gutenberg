@@ -1,0 +1,69 @@
+.wp-block-media-text {
+	grid-template-areas:
+		"media-text-media media-text-content"
+		"resizer resizer";
+	align-items: center;
+}
+
+.wp-block-media-text.has-media-on-the-right {
+	grid-template-areas:
+		"media-text-content media-text-media"
+		"resizer resizer";
+}
+
+.wp-block-media-text .__resizable_base__ {
+	grid-area: resizer;
+}
+
+.wp-block-media-text .editor-media-container__resizer {
+	grid-area: media-text-media;
+	// The resizer sets a inline width but as we are using a grid layout,
+	// we set the width on container.
+	width: 100% !important;
+}
+
+.wp-block-media-text.is-image-fill .editor-media-container__resizer {
+	// The resizer sets an inline height but for the image fill we set it to full height.
+	height: 100% !important;
+}
+
+.wp-block-media-text .block-editor-inner-blocks {
+	word-break: break-word;
+	grid-area: media-text-content;
+	text-align: initial;
+	padding: 0 8% 0 8%;
+}
+
+.wp-block-media-text > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block {
+	max-width: unset;
+}
+
+figure.block-library-media-text__media-container {
+	margin: 0;
+	height: 100%;
+	width: 100%;
+}
+
+.wp-block-media-text .block-library-media-text__media-container img,
+.wp-block-media-text .block-library-media-text__media-container video {
+	vertical-align: middle;
+	width: 100%;
+}
+
+.editor-media-container__resizer .components-resizable-box__handle {
+	display: none;
+}
+
+.wp-block-media-text.is-selected:not(.is-stacked-on-mobile) {
+	.editor-media-container__resizer .components-resizable-box__handle {
+		display: block;
+	}
+}
+
+@include break-small {
+	.wp-block-media-text.is-selected.is-stacked-on-mobile {
+		.editor-media-container__resizer .components-resizable-box__handle {
+			display: block;
+		}
+	}
+}

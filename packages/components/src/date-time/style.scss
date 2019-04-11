@@ -1,0 +1,192 @@
+// We can't reference this package with ~ because of how Lerna handles packages.
+// Also, don't convert styles to RTL because react-dates uses an isRTL flag instead.
+/*rtl:begin:ignore*/
+@import "node_modules/react-dates/lib/css/_datepicker";
+/*rtl:end:ignore*/
+
+.components-datetime {
+	.components-datetime__calendar-help {
+		padding: $grid-size;
+
+		h4 {
+			margin: 0;
+		}
+	}
+
+	.components-datetime__date-help-button {
+		display: block;
+		margin-left: auto;
+		margin-right: $grid-size;
+		margin-top: 0.5em;
+	}
+}
+
+.components-datetime__date {
+	min-height: 236px;
+	border-top: 1px solid $light-gray-500;
+	margin-left: -$grid-size;
+	margin-right: -$grid-size;
+
+	// Override external DatePicker styles.
+	.CalendarMonth_caption {
+		font-size: $default-font-size;
+	}
+
+	.CalendarDay {
+		font-size: $default-font-size;
+		border: 1px solid transparent;
+		border-radius: $radius-round;
+		text-align: center;
+	}
+
+	.CalendarDay__selected {
+		background: theme(primary);
+
+		&:hover {
+			background: color(theme(primary) shade(15%));
+		}
+	}
+
+	.DayPickerNavigation_button__horizontalDefault {
+		padding: 2px 8px;
+		top: 20px;
+	}
+
+	.DayPicker_weekHeader {
+		top: 50px;
+	}
+
+	&.is-description-visible .DayPicker,
+	&.is-description-visible .components-datetime__date-help-button {
+		visibility: hidden;
+	}
+}
+
+.components-datetime__time {
+	margin-bottom: 1em;
+
+	fieldset {
+		margin-top: 0.5em;
+		position: relative;
+	}
+
+	.components-datetime__time-field-am-pm fieldset {
+		margin-top: 0;
+	}
+
+	.components-datetime__time-wrapper {
+		display: flex;
+
+		.components-datetime__time-separator {
+			display: inline-block;
+			padding: 0 3px 0 0;
+			color: $dark-gray-500;
+		}
+
+		.components-datetime__time-am-button {
+			margin-left: 8px;
+			margin-right: -1px;
+			border-radius: 3px 0 0 3px;
+		}
+
+		.components-datetime__time-pm-button {
+			margin-left: -1px;
+			border-radius: 0 3px 3px 0;
+		}
+
+		.components-datetime__time-am-button.is-toggled,
+		.components-datetime__time-pm-button.is-toggled {
+			background: $light-gray-300;
+			border-color: $dark-gray-100;
+			box-shadow: inset 0 2px 5px -3px $dark-gray-500;
+		}
+
+		.components-datetime__time-field {
+			align-self: center;
+			flex: 0 1 auto;
+			order: 1;
+
+			&.am-pm button {
+				font-size: 11px;
+				font-weight: 600;
+			}
+
+			select {
+				padding: 2px;
+				margin-right: 4px;
+
+				&:focus {
+					position: relative;
+					z-index: 1;
+				}
+			}
+
+			input[type="number"] {
+				padding: 2px;
+				margin-right: 4px;
+				width: 40px;
+				text-align: center;
+				-moz-appearance: textfield;
+
+				&:focus {
+					position: relative;
+					z-index: 1;
+				}
+
+				&::-webkit-inner-spin-button {
+					-webkit-appearance: none;
+					margin: 0;
+				}
+			}
+		}
+	}
+
+	// Makes the month appear before the day if time format uses AM/PM
+	// We are assuming MM-DD-YYY correlates with AM/PM
+	&.is-12-hour {
+		.components-datetime__time-field-day input {
+			margin: 0 -4px 0 0 !important;
+			border-radius: $radius-round-rectangle 0 0 $radius-round-rectangle !important;
+		}
+		.components-datetime__time-field-year input {
+			border-radius: 0 $radius-round-rectangle $radius-round-rectangle 0 !important;
+		}
+	}
+}
+
+.components-datetime__time-legend {
+	font-weight: 600;
+	margin-top: 0.5em;
+
+	&.invisible {
+		position: absolute;
+		top: -999em;
+		left: -999em;
+	}
+}
+
+.components-datetime__time-field-hours-input,
+.components-datetime__time-field-minutes-input,
+.components-datetime__time-field-day-input {
+	width: 35px;
+}
+
+.components-datetime__time-field-year-input {
+	width: 55px;
+}
+
+.components-datetime__time-field-month-select {
+	width: 90px;
+}
+
+// Hack to center the datepicker component within the popover.
+// It sets its own styles so centering is tricky.
+.components-popover .components-datetime__date {
+	padding-left: 6px;
+}
+
+// Used to prevent z-index issues on mobile.
+// See: https://github.com/WordPress/gutenberg/pull/7621#issuecomment-424322735
+.components-popover.edit-post-post-schedule__dialog.is-bottom.is-left {
+	z-index: 100000;
+}

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Include useful functions
+. "$(dirname "$0")/includes.sh"
+
 if [ $# -lt 3 ]; then
 	echo "usage: $0 <db-name> <db-user> <db-pass> [db-host] [wp-version] [skip-database-creation]"
 	exit 1
@@ -14,14 +17,6 @@ SKIP_DB_CREATE=${6-false}
 
 WP_TESTS_DIR=${WP_TESTS_DIR-/tmp/wordpress-tests-lib}
 WP_CORE_DIR=${WP_CORE_DIR-/tmp/wordpress/}
-
-download() {
-    if [ `which curl` ]; then
-        curl -s "$1" > "$2";
-    elif [ `which wget` ]; then
-        wget -nv -O "$2" "$1"
-    fi
-}
 
 if [[ $WP_VERSION =~ [0-9]+\.[0-9]+(\.[0-9]+)? ]]; then
 	WP_TESTS_TAG="tags/$WP_VERSION"
@@ -119,7 +114,7 @@ install_db() {
 	fi
 
 	# create database
-	mysqladmin create $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
+	mysql --user="$DB_USER" --password="$DB_PASS"$EXTRA --execute "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 }
 
 install_wp

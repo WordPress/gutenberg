@@ -1,0 +1,68 @@
+.wp-block-code .block-editor-plain-text {
+	font-family: $editor-html-font;
+	color: $dark-gray-800;
+
+	/* Fonts smaller than 16px causes mobile safari to zoom. */
+	font-size: $mobile-text-min-font-size;
+	@include break-small {
+		font-size: $default-font-size;
+	}
+
+	&:focus {
+		box-shadow: none;
+	}
+}
+
+// We should extract this to a separate components-toolbar
+.components-tab-button {
+	display: inline-flex;
+	align-items: flex-end;
+	margin: 0;
+	padding: 3px;
+	background: none;
+	outline: none;
+	color: $dark-gray-500;
+	cursor: pointer;
+	position: relative;
+	height: $icon-button-size;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	font-weight: 500;
+	border: 0;
+
+	&.is-active,
+	&.is-active:hover {
+		color: $white;
+	}
+
+	&:disabled {
+		cursor: default;
+	}
+
+	& > span {
+		border: $border-width solid transparent;
+		padding: 0 6px;
+		box-sizing: content-box;
+		height: 28px;
+		line-height: 28px;
+	}
+
+	&:hover > span,
+	&:focus > span {
+		color: $dark-gray-500;
+	}
+
+	&:not(:disabled) {
+		&.is-active > span,
+		&:hover > span,
+		&:focus > span {
+			border: $border-width solid $dark-gray-500;
+		}
+	}
+
+	&.is-active > span,
+	&.is-active:hover > span {
+		background-color: $dark-gray-500;
+		color: $white;
+	}
+}

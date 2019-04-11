@@ -1,0 +1,27 @@
+{
+	"moduleNameMapper": {
+		"\\.(scss|css)$": "<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/style-mock.js"
+	},
+	"modulePaths": [
+		"<rootDir>"
+	],
+	"setupFiles": [
+		"<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/setup-globals.js"
+	],
+	"setupFilesAfterEnv": [
+		"<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/setup-test-framework.js"
+	],
+	"snapshotSerializers": [
+		"<rootDir>/node_modules/enzyme-to-json/serializer.js"
+	],
+	"testMatch": [
+		"**/__tests__/**/*.js",
+		"**/?(*.)(spec|test).js",
+		"**/test/*.js"
+	],
+	"timers": "fake",
+	"transform": {
+		"^.+\\.[jt]sx?$": "<rootDir>/node_modules/babel-jest"
+	},
+	"verbose": true
+}

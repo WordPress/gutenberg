@@ -1,0 +1,14 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/search",
+        "isValid": true,
+        "attributes": {
+            "label": "Custom label",
+            "placeholder": "Custom placeholder",
+            "buttonText": "Custom button text"
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]
