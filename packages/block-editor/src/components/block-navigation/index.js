@@ -9,7 +9,6 @@ import { noop } from 'lodash';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { NavigableMenu } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -36,9 +35,6 @@ function BlockNavigation( {
 			role="presentation"
 			className="block-editor-block-navigation__container"
 		>
-			<p className="block-editor-block-navigation__label">
-				{ __( 'Block navigation' ) }
-			</p>
 			{ hasHierarchy && (
 				<BlockNavigationList
 					blocks={ [ rootBlock ] }

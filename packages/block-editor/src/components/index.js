@@ -13,6 +13,7 @@ export { default as BlockControls } from './block-controls';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
+export { default as BlockNavigation } from './block-navigation';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { default as __experimentalBlockNavigationList } from './block-navigation/list';
 export { default as __experimentalBlockPatterns } from './block-patterns';

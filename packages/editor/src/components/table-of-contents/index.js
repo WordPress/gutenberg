@@ -14,7 +14,7 @@ import TableOfContentsPanel from './panel';
 function TableOfContents( { hasBlocks, hasOutlineItemsDisabled } ) {
 	return (
 		<Dropdown
-			position="bottom"
+			position="bottom right"
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (

@@ -8,7 +8,6 @@ import {
 	Inserter,
 	BlockToolbar,
 	NavigableToolbar,
-	BlockNavigationDropdown,
 	ToolSelector,
 } from '@wordpress/block-editor';
 import {
@@ -68,7 +67,6 @@ function HeaderToolbar() {
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
-			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />
