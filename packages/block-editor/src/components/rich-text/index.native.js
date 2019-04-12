@@ -445,7 +445,10 @@ export class RichText extends Component {
 
 	onFocus( event ) {
 		this.isTouched = true;
-		this.props.onFocus( event );
+
+		if ( this.props.onFocus ) {
+			this.props.onFocus( event );
+		}
 	}
 
 	onBlur( event ) {
