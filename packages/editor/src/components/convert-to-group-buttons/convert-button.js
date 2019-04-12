@@ -13,6 +13,11 @@ import { switchToBlockType } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { Group } from './icons';
+
 export function ConvertToGroupButton( {
 	onConvertToGroup,
 	isVisible = true,
@@ -25,7 +30,7 @@ export function ConvertToGroupButton( {
 		<Fragment>
 			<MenuItem
 				className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-				icon="controls-repeat"
+				icon={ Group }
 				onClick={ onConvertToGroup }
 			>
 				{ __( 'Group' ) }
