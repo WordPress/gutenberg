@@ -21,9 +21,10 @@ commands:
           name: Checkout Gutenberg
           command: git submodule update --init --recursive
   add-jest-reporter-dir:
-      - run:
-          name: Create reports directory
-          command: mkdir reports && mkdir reports/test-results
+      steps:
+        - run:
+            name: Create reports directory
+            command: mkdir reports && mkdir reports/test-results
 
 jobs:
   checks:
