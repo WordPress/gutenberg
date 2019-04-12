@@ -27,9 +27,18 @@ function BlockListAppender( {
 		return null;
 	}
 
-	// If auto-insert Blocks is enabled, default to the standard behaviour
-	// of auto-inserting a Block but only if no renderAppender is provided.
-	if ( ! renderAppender && canInsertDefaultBlock ) {
+	// A render prop has been provided, use it to render the appender.
+	if ( renderAppender ) {
+		return (
+			<div className="block-list-appender">
+				{ renderAppender() }
+			</div>
+		);
+	}
+
+	// Render the default block appender when renderAppender has not been
+	// provided and the context supports use of the default appender.
+	if ( canInsertDefaultBlock ) {
 		return (
 			<div className="block-list-appender">
 				<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
@@ -42,27 +51,16 @@ function BlockListAppender( {
 		);
 	}
 
-	// Render prop - custom appender.
-	if ( renderAppender ) {
-		return (
-			<div className="block-list-appender">
-				{ renderAppender() }
-			</div>
-		);
-	}
-
-	// Fallback in the case no renderAppender has been provided
-	// and we can't auto-insert the default block.
-	if ( ! canInsertDefaultBlock ) {
-		return (
-			<div className="block-list-appender">
-				<ButtonBlockAppender
-					rootClientId={ rootClientId }
-					className="block-list-appender__toggle"
-				/>
-			</div>
-		);
-	}
+	// Fallback in the case no renderAppender has been provided and the
+	// default block can't be inserted.
+	return (
+		<div className="block-list-appender">
+			<ButtonBlockAppender
+				rootClientId={ rootClientId }
+				className="block-list-appender__toggle"
+			/>
+		</div>
+	);
 }
 
 export default withSelect( ( select, { rootClientId } ) => {
