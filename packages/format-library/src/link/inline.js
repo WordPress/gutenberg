@@ -103,7 +103,7 @@ const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
 		return null;
 	}
 
-	return <URLPopover getAnchorRect={ () => anchorRect } { ...props } />;
+	return <URLPopover anchorRect={ anchorRect } { ...props } />;
 };
 
 const LinkViewer = ( { url, editLink } ) => {
