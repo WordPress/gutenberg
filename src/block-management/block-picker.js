@@ -25,7 +25,6 @@ import styles from './block-picker.scss';
 type PropsType = {
 	style?: StyleSheet,
 	isReplacement: boolean,
-	isVisible: boolean,
 	onValueSelected: ( itemValue: string ) => void,
 	onDismiss: () => void,
 	addExtraBottomPadding: boolean,
@@ -40,7 +39,7 @@ export default class BlockPicker extends Component<PropsType> {
 
 		return (
 			<BottomSheet
-				isVisible={ this.props.isVisible }
+				isVisible={ true }
 				onClose={ this.props.onDismiss }
 				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
