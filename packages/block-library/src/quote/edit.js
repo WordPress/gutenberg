@@ -3,16 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import {
-	BlockControls,
-	AlignmentToolbar,
-	RichText,
-} from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import { ATTRIBUTE_QUOTE, ATTRIBUTE_CITATION } from './contants';
+import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
 
 export default function QuoteEdit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
 	const { align, value, citation } = attributes;
@@ -28,7 +19,7 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 			</BlockControls>
 			<blockquote className={ className } style={ { textAlign: align } }>
 				<RichText
-					identifier={ ATTRIBUTE_QUOTE }
+					identifier="value"
 					multiline
 					value={ value }
 					onChange={
@@ -50,7 +41,7 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
-						identifier={ ATTRIBUTE_CITATION }
+						identifier="citation"
 						value={ citation }
 						onChange={
 							( nextCitation ) => setAttributes( {

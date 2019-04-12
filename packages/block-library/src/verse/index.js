@@ -10,8 +10,11 @@ import { RichText } from '@wordpress/block-editor';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/verse';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Verse' ),
@@ -20,21 +23,7 @@ export const settings = {
 
 	icon,
 
-	category: 'formatting',
-
 	keywords: [ __( 'poetry' ) ],
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-			selector: 'pre',
-			default: '',
-		},
-		textAlign: {
-			type: 'string',
-		},
-	},
 
 	transforms: {
 		from: [

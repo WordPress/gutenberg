@@ -9,8 +9,11 @@ import { __, _x } from '@wordpress/i18n';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/freeform';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: _x( 'Classic', 'block title' ),
@@ -18,15 +21,6 @@ export const settings = {
 	description: __( 'Use the classic WordPress editor.' ),
 
 	icon,
-
-	category: 'formatting',
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-		},
-	},
 
 	supports: {
 		className: false,

@@ -18,25 +18,16 @@ import {
 import deprecated from './deprecated';
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/columns';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Columns' ),
 
 	icon,
-
-	category: 'layout',
-
-	attributes: {
-		columns: {
-			type: 'number',
-			default: 2,
-		},
-		verticalAlignment: {
-			type: 'string',
-		},
-	},
 
 	description: __( 'Add a block that displays content in multiple columns, then add whatever content blocks you’d like.' ),
 

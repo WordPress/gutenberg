@@ -11,8 +11,11 @@ import { __ } from '@wordpress/i18n';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/video';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Video' ),
@@ -22,69 +25,6 @@ export const settings = {
 	icon,
 
 	keywords: [ __( 'movie' ) ],
-
-	category: 'common',
-
-	attributes: {
-		autoplay: {
-			type: 'boolean',
-			source: 'attribute',
-			selector: 'video',
-			attribute: 'autoplay',
-		},
-		caption: {
-			type: 'string',
-			source: 'html',
-			selector: 'figcaption',
-		},
-		controls: {
-			type: 'boolean',
-			source: 'attribute',
-			selector: 'video',
-			attribute: 'controls',
-			default: true,
-		},
-		id: {
-			type: 'number',
-		},
-		loop: {
-			type: 'boolean',
-			source: 'attribute',
-			selector: 'video',
-			attribute: 'loop',
-		},
-		muted: {
-			type: 'boolean',
-			source: 'attribute',
-			selector: 'video',
-			attribute: 'muted',
-		},
-		poster: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'video',
-			attribute: 'poster',
-		},
-		preload: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'video',
-			attribute: 'preload',
-			default: 'metadata',
-		},
-		src: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'video',
-			attribute: 'src',
-		},
-		playsInline: {
-			type: 'boolean',
-			source: 'attribute',
-			selector: 'video',
-			attribute: 'playsinline',
-		},
-	},
 
 	transforms: {
 		from: [

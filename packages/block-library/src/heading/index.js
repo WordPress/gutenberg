@@ -19,6 +19,11 @@ import { RichText } from '@wordpress/block-editor';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
+
+const { name, attributes: schema } = metadata;
+
+export { metadata, name };
 
 /**
  * Given a node name string for a heading node, returns its numeric level.
@@ -36,27 +41,6 @@ const supports = {
 	anchor: true,
 };
 
-const schema = {
-	content: {
-		type: 'string',
-		source: 'html',
-		selector: 'h1,h2,h3,h4,h5,h6',
-		default: '',
-	},
-	level: {
-		type: 'number',
-		default: 2,
-	},
-	align: {
-		type: 'string',
-	},
-	placeholder: {
-		type: 'string',
-	},
-};
-
-export const name = 'core/heading';
-
 export const settings = {
 	title: __( 'Heading' ),
 
@@ -64,13 +48,9 @@ export const settings = {
 
 	icon,
 
-	category: 'common',
-
 	keywords: [ __( 'title' ), __( 'subtitle' ) ],
 
 	supports,
-
-	attributes: schema,
 
 	transforms: {
 		from: [

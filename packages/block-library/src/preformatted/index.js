@@ -10,8 +10,11 @@ import { RichText } from '@wordpress/block-editor';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/preformatted';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Preformatted' ),
@@ -19,17 +22,6 @@ export const settings = {
 	description: __( 'Add text that respects your spacing and tabs, and also allows styling.' ),
 
 	icon,
-
-	category: 'formatting',
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-			selector: 'pre',
-			default: '',
-		},
-	},
 
 	transforms: {
 		from: [

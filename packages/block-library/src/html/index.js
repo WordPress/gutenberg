@@ -10,8 +10,11 @@ import { getPhrasingContentSchema } from '@wordpress/blocks';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/html';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Custom HTML' ),
@@ -20,21 +23,12 @@ export const settings = {
 
 	icon,
 
-	category: 'formatting',
-
 	keywords: [ __( 'embed' ) ],
 
 	supports: {
 		customClassName: false,
 		className: false,
 		html: false,
-	},
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-		},
 	},
 
 	transforms: {

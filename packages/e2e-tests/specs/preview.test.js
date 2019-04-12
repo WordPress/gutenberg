@@ -12,47 +12,79 @@ import {
 	createURL,
 	publishPost,
 	saveDraft,
+	clickOnMoreMenuItem,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
+
+async function openPreviewPage( editorPage ) {
+	let openTabs = await browser.pages();
+	const expectedTabsCount = openTabs.length + 1;
+	await editorPage.click( '.editor-post-preview' );
+
+	// Wait for the new tab to open.
+	while ( openTabs.length < expectedTabsCount ) {
+		await editorPage.waitFor( 1 );
+		openTabs = await browser.pages();
+	}
+
+	const previewPage = last( openTabs );
+	// Wait for the preview to load. We can't do interstitial detection here,
+	// because it might load too quickly for us to pick up, so we wait for
+	// the preview to load by waiting for the title to appear.
+	await previewPage.waitForSelector( '.entry-title' );
+	return previewPage;
+}
+
+/**
+ * Given a Puppeteer Page instance for a preview window, clicks Preview, and
+ * awaits the window navigation.
+ *
+ * @param {puppeteer.Page} previewPage Page on which to await navigation.
+ *
+ * @return {Promise} Promise resolving once navigation completes.
+ */
+async function waitForPreviewNavigation( previewPage ) {
+	const navigationCompleted = previewPage.waitForNavigation();
+	await page.click( '.editor-post-preview' );
+	return navigationCompleted;
+}
+
+/**
+ * Enables or disables the custom fields option.
+ *
+ * Note that this is implemented separately from the `toggleScreenOptions`
+ * utility, since the custom fields option triggers a page reload and requires
+ * extra async logic to wait for navigation to complete.
+ *
+ * @param {boolean} shouldBeChecked If true, turns the option on. If false, off.
+ */
+async function toggleCustomFieldsOption( shouldBeChecked ) {
+	const checkboxXPath = '//*[contains(@class, "edit-post-options-modal")]//label[contains(text(), "Custom Fields")]';
+	await clickOnMoreMenuItem( 'Options' );
+	await page.waitForXPath( checkboxXPath );
+	const [ checkboxHandle ] = await page.$x( checkboxXPath );
+
+	const isChecked = await page.evaluate(
+		( element ) => element.control.checked,
+		checkboxHandle
+	);
+
+	if ( isChecked !== shouldBeChecked ) {
+		const navigationCompleted = page.waitForNavigation();
+		await checkboxHandle.click();
+		await navigationCompleted;
+		return;
+	}
+
+	await page.click( '.edit-post-options-modal button[aria-label="Close dialog"]' );
+}
 
 describe( 'Preview', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
 
-	async function openPreviewPage( editorPage ) {
-		let openTabs = await browser.pages();
-		const expectedTabsCount = openTabs.length + 1;
-		await editorPage.click( '.editor-post-preview' );
-
-		// Wait for the new tab to open.
-		while ( openTabs.length < expectedTabsCount ) {
-			await editorPage.waitFor( 1 );
-			openTabs = await browser.pages();
-		}
-
-		const previewPage = last( openTabs );
-		// Wait for the preview to load. We can't do interstitial detection here,
-		// because it might load too quickly for us to pick up, so we wait for
-		// the preview to load by waiting for the title to appear.
-		await previewPage.waitForSelector( '.entry-title' );
-		return previewPage;
-	}
-
-	/**
-	 * Given a Puppeteer Page instance for a preview window, clicks Preview, and
-	 * awaits the window navigation.
-	 *
-	 * @param {puppeteer.Page} previewPage Page on which to await navigation.
-	 *
-	 * @return {Promise} Promise resolving once navigation completes.
-	 */
-	async function waitForPreviewNavigation( previewPage ) {
-		const navigationCompleted = previewPage.waitForNavigation();
-		await page.click( '.editor-post-preview' );
-		return navigationCompleted;
-	}
-
-	it( 'Should open a preview window for a new post', async () => {
+	it( 'should open a preview window for a new post', async () => {
 		const editorPage = page;
 
 		// Disabled until content present.
@@ -129,7 +161,7 @@ describe( 'Preview', () => {
 		await previewPage.close();
 	} );
 
-	it( 'Should not revert title during a preview right after a save draft', async () => {
+	it( 'should not revert title during a preview right after a save draft', async () => {
 		const editorPage = page;
 
 		// Type aaaaa in the title filed.
@@ -164,5 +196,63 @@ describe( 'Preview', () => {
 		expect( previewTitle ).toBe( 'aaaaabbbbb' );
 
 		await previewPage.close();
+	} );
+} );
+
+describe( 'Preview with Custom Fields enabled', async () => {
+	beforeEach( async () => {
+		await createNewPost();
+		await toggleCustomFieldsOption( true );
+	} );
+
+	afterEach( async () => {
+		await toggleCustomFieldsOption( false );
+	} );
+
+	// Catch regressions of https://github.com/WordPress/gutenberg/issues/12617
+	it( 'displays edits to the post title and content in the preview', async () => {
+		const editorPage = page;
+
+		// Add an initial title and content.
+		await editorPage.type( '.editor-post-title__input', 'title 1' );
+		await editorPage.keyboard.press( 'Tab' );
+		await editorPage.keyboard.type( 'content 1' );
+
+		// Publish the post and then close the publish panel.
+		await publishPost();
+		await page.waitForSelector( '.editor-post-publish-panel' );
+		await page.click( '.editor-post-publish-panel__header button' );
+
+		// Open the preview page.
+		const previewPage = await openPreviewPage( editorPage );
+
+		// Check the title and preview match.
+		let previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		expect( previewTitle ).toBe( 'title 1' );
+		let previewContent = await previewPage.$eval( '.entry-content p', ( node ) => node.textContent );
+		expect( previewContent ).toBe( 'content 1' );
+
+		// Return to editor and modify the title and content.
+		await editorPage.bringToFront();
+		await editorPage.click( '.editor-post-title__input' );
+		await pressKeyWithModifier( 'shift', 'Home' );
+		await editorPage.keyboard.press( 'Delete' );
+		await editorPage.keyboard.type( 'title 2' );
+		await editorPage.keyboard.press( 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Home' );
+		await editorPage.keyboard.press( 'Delete' );
+		await editorPage.keyboard.type( 'content 2' );
+
+		// Open the preview page.
+		await waitForPreviewNavigation( previewPage );
+
+		// Title in preview should match input.
+		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		expect( previewTitle ).toBe( 'title 2' );
+		previewContent = await previewPage.$eval( '.entry-content p', ( node ) => node.textContent );
+		expect( previewContent ).toBe( 'content 2' );
+
+		// Make sure the editor is active for the afterEach function.
+		await editorPage.bringToFront();
 	} );
 } );

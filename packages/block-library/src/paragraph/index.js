@@ -23,53 +23,15 @@ import { getPhrasingContentSchema } from '@wordpress/blocks';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
+
+const { name, attributes: schema } = metadata;
+
+export { metadata, name };
 
 const supports = {
 	className: false,
 };
-
-const schema = {
-	content: {
-		type: 'string',
-		source: 'html',
-		selector: 'p',
-		default: '',
-	},
-	align: {
-		type: 'string',
-	},
-	dropCap: {
-		type: 'boolean',
-		default: false,
-	},
-	placeholder: {
-		type: 'string',
-	},
-	textColor: {
-		type: 'string',
-	},
-	customTextColor: {
-		type: 'string',
-	},
-	backgroundColor: {
-		type: 'string',
-	},
-	customBackgroundColor: {
-		type: 'string',
-	},
-	fontSize: {
-		type: 'string',
-	},
-	customFontSize: {
-		type: 'number',
-	},
-	direction: {
-		type: 'string',
-		enum: [ 'ltr', 'rtl' ],
-	},
-};
-
-export const name = 'core/paragraph';
 
 export const settings = {
 	title: __( 'Paragraph' ),
@@ -78,13 +40,9 @@ export const settings = {
 
 	icon,
 
-	category: 'common',
-
 	keywords: [ __( 'text' ) ],
 
 	supports,
-
-	attributes: schema,
 
 	transforms: {
 		from: [

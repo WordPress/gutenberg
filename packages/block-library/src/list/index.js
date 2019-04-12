@@ -13,13 +13,18 @@ import {
 	getBlockAttributes,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
-import { replace, join, split, create, toHTMLString, LINE_SEPARATOR } from '@wordpress/rich-text';
+import { replace, join, split, create, toHTMLString, __UNSTABLE_LINE_SEPARATOR } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
+
+const { name, attributes: schema } = metadata;
+
+export { metadata, name };
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -42,30 +47,11 @@ const supports = {
 	className: false,
 };
 
-const schema = {
-	ordered: {
-		type: 'boolean',
-		default: false,
-	},
-	values: {
-		type: 'string',
-		source: 'html',
-		selector: 'ol,ul',
-		multiline: 'li',
-		default: '',
-	},
-};
-
-export const name = 'core/list';
-
 export const settings = {
 	title: __( 'List' ),
 	description: __( 'Create a bulleted or numbered list.' ),
 	icon,
-	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
-
-	attributes: schema,
 
 	supports,
 
@@ -87,8 +73,8 @@ export const settings = {
 
 								// When converting only one block, transform
 								// every line to a list item.
-								return replace( value, /\n/g, LINE_SEPARATOR );
-							} ), LINE_SEPARATOR ),
+								return replace( value, /\n/g, __UNSTABLE_LINE_SEPARATOR );
+							} ), __UNSTABLE_LINE_SEPARATOR ),
 							multilineTag: 'li',
 						} ),
 					} );
@@ -152,7 +138,7 @@ export const settings = {
 						html: values,
 						multilineTag: 'li',
 						multilineWrapperTags: [ 'ul', 'ol' ],
-					} ), LINE_SEPARATOR )
+					} ), __UNSTABLE_LINE_SEPARATOR )
 						.map( ( piece ) =>
 							createBlock( 'core/paragraph', {
 								content: toHTMLString( { value: piece } ),

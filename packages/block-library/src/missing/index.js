@@ -8,12 +8,14 @@ import { RawHTML } from '@wordpress/element';
  * Internal dependencies
  */
 import edit from './edit';
+import metadata from './block.json';
 
-export const name = 'core/missing';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	name,
-	category: 'common',
 	title: __( 'Unrecognized Block' ),
 	description: __( 'Your site doesn’t include support for this block.' ),
 
@@ -23,19 +25,6 @@ export const settings = {
 		inserter: false,
 		html: false,
 		reusable: false,
-	},
-
-	attributes: {
-		originalName: {
-			type: 'string',
-		},
-		originalUndelimitedContent: {
-			type: 'string',
-		},
-		originalContent: {
-			type: 'string',
-			source: 'html',
-		},
 	},
 
 	edit,

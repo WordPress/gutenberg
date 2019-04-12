@@ -23,6 +23,7 @@ import {
 	insertLineBreak,
 	isEmptyLine,
 	isCollapsed,
+	getTextContent,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
@@ -99,6 +100,8 @@ export class RichText extends Component {
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
 		this.onPaste = this.onPaste.bind( this );
+		this.onFocus = this.onFocus.bind( this );
+		this.onBlur = this.onBlur.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.onFormatChangeForceChild = this.onFormatChangeForceChild.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
@@ -111,6 +114,9 @@ export class RichText extends Component {
 			formatPlaceholder: null,
 			height: 0,
 		};
+		this.needsSelectionUpdate = false;
+		this.savedContent = '';
+		this.isTouched = false;
 	}
 
 	/**
@@ -223,11 +229,8 @@ export class RichText extends Component {
 		if ( newContent && newContent !== this.props.value ) {
 			this.props.onChange( newContent );
 			if ( record.needsSelectionUpdate && record.start && record.end ) {
-				this.setState( { start: record.start, end: record.end } );
+				this.forceSelectionUpdate( record.start, record.end );
 			}
-			this.setState( {
-				needsSelectionUpdate: record.needsSelectionUpdate,
-			} );
 		} else {
 			if ( doUpdateChild ) {
 				this.lastEventCount = undefined;
@@ -436,6 +439,19 @@ export class RichText extends Component {
 		}
 	}
 
+	onFocus( event ) {
+		this.isTouched = true;
+		this.props.onFocus( event );
+	}
+
+	onBlur( event ) {
+		this.isTouched = false;
+
+		if ( this.props.onBlur ) {
+			this.props.onBlur( event );
+		}
+	}
+
 	onSelectionChange( start, end, text, event ) {
 		// `end` can be less than `start` on iOS
 		// Let's fix that here so `rich-text/slice` can work properly
@@ -524,6 +540,43 @@ export class RichText extends Component {
 		return value;
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		this.moveCaretToTheEndIfNeeded( nextProps );
+	}
+
+	moveCaretToTheEndIfNeeded( nextProps ) {
+		const nextRecord = this.formatToValue( nextProps.value );
+		const nextTextContent = getTextContent( nextRecord );
+
+		if ( this.isTouched || ! nextProps.isSelected ) {
+			this.savedContent = nextTextContent;
+			return;
+		}
+
+		if ( nextTextContent === '' && this.savedContent === '' ) {
+			return;
+		}
+
+		// This logic will handle the selection when two blocks are merged or when block is split
+		// into two blocks
+		if ( nextTextContent.startsWith( this.savedContent ) ) {
+			let length = this.savedContent.length;
+			if ( length === 0 && nextTextContent !== this.props.value ) {
+				length = this.props.value.length;
+			}
+
+			this.forceSelectionUpdate( length, length );
+			this.savedContent = nextTextContent;
+		}
+	}
+
+	forceSelectionUpdate( start, end ) {
+		if ( ! this.needsSelectionUpdate ) {
+			this.needsSelectionUpdate = true;
+			this.setState( { start, end } );
+		}
+	}
+
 	shouldComponentUpdate( nextProps ) {
 		if ( nextProps.tagName !== this.props.tagName || nextProps.isSelected !== this.props.isSelected ) {
 			this.lastEventCount = undefined;
@@ -589,7 +642,11 @@ export class RichText extends Component {
 			minHeight = style.minHeight;
 		}
 
-		const selection = this.state.needsSelectionUpdate ? { start: this.state.start, end: this.state.end } : null;
+		let selection = null;
+		if ( this.needsSelectionUpdate ) {
+			this.needsSelectionUpdate = false;
+			selection = { start: this.state.start, end: this.state.end };
+		}
 
 		return (
 			<View>
@@ -622,8 +679,8 @@ export class RichText extends Component {
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].textDecorationColor }
 					onChange={ this.onChange }
-					onFocus={ this.props.onFocus }
-					onBlur={ this.props.onBlur }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
 					onPaste={ this.onPaste }
