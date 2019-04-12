@@ -115,16 +115,15 @@ If the block is a top level block: the locking of the Custom Post Type is used.
 
 ### `renderAppender`
 * **Type:** `Function`
-* **Default:** - `null`. By default the `<DefaultBlockAppender>` component is used which automatically inserts whichever block is configured as the default block via `wp.blocks.getDefaultBlockName` (typically `paragraph`).
+* **Default:** - `undefined`. When `renderAppender` is not specific the `<DefaultBlockAppender>` component is as a default. It automatically inserts whichever block is configured as the default block via `wp.blocks.setDefaultBlockName` (typically `paragraph`).
 
-Determines the placeholder behaviour when the Block is initially inserted. You may pass a render function to provide your own placeholder as required.
+A 'render prop' function that can be used to customize the block's appender.
 
 #### Notes
 * For convenience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
-	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon inside a box which fills the Block preview. No default Block is inserted. Clicking the appender reveals the Block picker UI.
-	- `<InnerBlocks.DefaultBlockAppender />` - provides the default "auto-insert" functionality described above under `default`.
-* Consumers are also free to pass any valid render function which provides full 
-flexibility to define a bespoke appender
+	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon button that, when clicked, displays the block picker menu. No default Block is inserted. 
+	- `<InnerBlocks.DefaultBlockAppender />` - display the default block appender as set by `wp.blocks.setDefaultBlockName`. Typically this is the `paragraph` block.
+* Consumers are also free to pass any valid render function. This provides the full flexibility to define a bespoke block appender.
 
 #### Example usage
 
