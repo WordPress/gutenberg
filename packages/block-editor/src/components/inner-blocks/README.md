@@ -123,7 +123,6 @@ Determines the placeholder behaviour when the Block is initially inserted. You m
 * For convenience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
 	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon inside a box which fills the Block preview. No default Block is inserted. Clicking the appender reveals the Block picker UI.
 	- `<InnerBlocks.DefaultBlockAppender />` - provides the default "auto-insert" functionality described above under `default`.
-	- `<InnerBlocks.HideWhenChildBlocks />` - will only render `children` if the instance of `InnerBlocks` has no child blocks (typically only at point of first insertion). Once a child Block is added the `children` will not be rendered (see example usage below)
 * Consumers are also free to pass any valid render function which provides full 
 flexibility to define a bespoke appender
 
@@ -134,15 +133,6 @@ flexibility to define a bespoke appender
 <InnerBlocks
 	renderAppender={ () => (
 		<InnerBlocks.ButtonBlockAppender />
-	) }
-/>
-
-// Will only display `ButtonBlockAppender` when there are no child blocks present
-<InnerBlocks
-	renderAppender={ () => (
-		<InnerBlocks.HideWhenChildBlocks>
-			<InnerBlocks.ButtonBlockAppender />
-		</InnerBlocks.HideWhenChildBlocks>
 	) }
 />
 
