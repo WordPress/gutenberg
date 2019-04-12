@@ -127,6 +127,8 @@ Name | Type | Default | Description
 `href` | `string` | `undefined` | If provided, renders `a` instead of `button`.
 `isDefault` | `bool` | `false` | Renders a default button style.
 `isPrimary` | `bool` | `false` | Renders a primary button style.
+`isTertiary` | `bool` | `false` | Renders a text-based button style.
+`isDestructive` | `bool` | `false` | Renders a red text-based button style to indicate destructive behavior.
 `isLarge` | `bool` | `false` | Increases the size of the button.
 `isSmall` | `bool` | `false` | Decreases the size of the button.
 `isToggled` | `bool` | `false` | Renders a toggled button style.
