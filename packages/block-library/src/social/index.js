@@ -18,39 +18,11 @@ import {
  */
 import edit from './edit';
 
-const blockAttributes = {
-	url: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'href',
-	},
-	title: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'title',
-	},
-	text: {
-		type: 'string',
-		source: 'html',
-		selector: 'a',
-	},
-	backgroundColor: {
-		type: 'string',
-	},
-	textColor: {
-		type: 'string',
-	},
-	customBackgroundColor: {
-		type: 'string',
-	},
-	customTextColor: {
-		type: 'string',
-	},
-};
+import metadata from './block.json';
 
-export const name = 'core/social';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Social Links' ),
@@ -62,8 +34,6 @@ export const settings = {
 	category: 'layout',
 
 	keywords: [ __( 'link' ) ],
-
-	attributes: blockAttributes,
 
 	edit,
 
