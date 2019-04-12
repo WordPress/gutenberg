@@ -7,7 +7,7 @@
 	outline: $border-width dashed $dark-gray-150;
 	width: 100%;
 	color: $dark-gray-500;
-	background: $dark-opacity-light-100;
+	background: $light-opacity-background-fill;
 
 	&:hover,
 	&:focus {
@@ -22,7 +22,7 @@
 
 	// Use opacity to work in various editor styles
 	.is-dark-theme & {
-		background: $light-opacity-light-100;
+		background: $dark-opacity-background-fill;
 		color: $light-gray-100;
 
 		&:hover,
