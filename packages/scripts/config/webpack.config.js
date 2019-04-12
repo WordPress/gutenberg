@@ -83,13 +83,6 @@ const config = {
 	},
 	module: {
 		rules: [
-			// Sourcemap Loader is a complement to the `devtool` configuration,
-			// and thus is only necessary for development environments.
-			! isProduction && {
-				test: /\.js$/,
-				use: require.resolve( 'source-map-loader' ),
-				enforce: 'pre',
-			},
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
@@ -114,7 +107,7 @@ const config = {
 					},
 				],
 			},
-		].filter( Boolean ),
+		],
 	},
 	plugins: [
 		// WP_BUNDLE_ANALYZER global variable enables utility that represents bundle content
@@ -133,6 +126,11 @@ if ( ! isProduction ) {
 	// WP_DEVTOOL global variable controls how source maps are generated.
 	// See: https://webpack.js.org/configuration/devtool/#devtool.
 	config.devtool = process.env.WP_DEVTOOL || 'source-map';
+	config.module.rules.unshift( {
+		test: /\.js$/,
+		use: require.resolve( 'source-map-loader' ),
+		enforce: 'pre',
+	} );
 }
 
 module.exports = config;
