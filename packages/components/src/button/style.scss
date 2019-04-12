@@ -175,7 +175,10 @@
 		@include button-style__focus-active;
 	}
 
-	&.is-busy {
+	&.is-busy,
+	&.is-default.is-busy,
+	&.is-default.is-busy:disabled,
+	&.is-default.is-busy[aria-disabled="true"] {
 		animation: components-button__busy-animation 2500ms infinite linear;
 		background-size: 100px 100%;
 		background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px);
