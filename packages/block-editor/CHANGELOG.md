@@ -1,5 +1,9 @@
 ## 2.0.0 (Unreleased)
 
+### New Features
+
+- The `URLPopover` component now passes through all unhandled props to the underlying Popover component.
+
 ### Breaking Changes
 
 - `CopyHandler` will now only catch cut/copy events coming from its `props.children`, instead of from anywhere in the `document`.
