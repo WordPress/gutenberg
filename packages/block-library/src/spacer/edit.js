@@ -39,9 +39,11 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 					topLeft: false,
 				} }
 				onResizeStop={ ( event, direction, elt, delta ) => {
+					const spacerHeight = parseInt( height + delta.height, 10 );
 					setAttributes( {
-						height: parseInt( height + delta.height, 10 ),
+						height: spacerHeight,
 					} );
+					setInputHeightValue( spacerHeight );
 					toggleSelection( true );
 				} }
 				onResizeStart={ () => {
