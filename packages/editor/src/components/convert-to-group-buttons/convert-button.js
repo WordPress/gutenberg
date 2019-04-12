@@ -65,7 +65,7 @@ export default compose( [
 					return;
 				}
 
-				const wrapperBlock = createBlock( 'core/section', {
+				const wrapperBlock = createBlock( 'core/group', {
 					backgroundColor: 'lighter-blue',
 				} );
 
