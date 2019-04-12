@@ -8,13 +8,14 @@ import { castArray, first, last, every } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { cloneBlock, hasBlockSupport } from '@wordpress/blocks';
+import { cloneBlock, hasBlockSupport, switchToBlockType } from '@wordpress/blocks';
 
 function BlockActions( {
 	onDuplicate,
 	onRemove,
 	onInsertBefore,
 	onInsertAfter,
+	onGroup,
 	isLocked,
 	canDuplicate,
 	children,
@@ -24,6 +25,7 @@ function BlockActions( {
 		onRemove,
 		onInsertAfter,
 		onInsertBefore,
+		onGroup,
 		isLocked,
 		canDuplicate,
 	} );
@@ -65,6 +67,7 @@ export default compose( [
 			multiSelect,
 			removeBlocks,
 			insertDefaultBlock,
+			replaceBlocks,
 		} = dispatch( 'core/block-editor' );
 
 		return {
@@ -106,6 +109,19 @@ export default compose( [
 					const lastSelectedIndex = getBlockIndex( last( castArray( clientIds ) ), rootClientId );
 					insertDefaultBlock( {}, rootClientId, lastSelectedIndex + 1 );
 				}
+			},
+			onGroup() {
+				if ( ! blocks.length ) {
+					return;
+				}
+
+				// Activate the `transform` on `core/group` which does the conversion
+				const newBlocks = switchToBlockType( blocks, 'core/group' );
+
+				replaceBlocks(
+					clientIds,
+					newBlocks
+				);
 			},
 		};
 	} ),
