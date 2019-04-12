@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import Inserter from '../inserter';
 
-const ButtonBlockAppender = function( { rootClientId, className } ) {
+export default function ButtonBlockAppender( { rootClientId, className } ) {
 	return (
 		<Inserter
 			rootClientId={ rootClientId }
@@ -32,7 +32,4 @@ const ButtonBlockAppender = function( { rootClientId, className } ) {
 			isAppender
 		/>
 	);
-};
-
-export default ButtonBlockAppender;
-
+}

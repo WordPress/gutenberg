@@ -9,7 +9,7 @@ import { withSelect } from '@wordpress/data';
  */
 import withClientId from './with-client-id';
 
-export const HideWhenChildBlocks = function( props ) {
+export const HideWhenChildBlocks = ( props ) => {
 	return props.children;
 };
 
