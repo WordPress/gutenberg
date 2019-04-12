@@ -13,6 +13,7 @@ import {
 import {
 	Spinner,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -115,8 +116,11 @@ class MediaUploadProgress extends React.Component {
 
 	render() {
 		const { coverUrl, width, height } = this.props;
+		const { isUploadInProgress, isUploadFailed } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
+		const retryIconName = 'image-rotate';
+		const retryMessage = __( 'Failed to insert media.\nPlease tap for options.' );
 
 		return (
 			<View style={ { flex: 1 } }>
@@ -138,11 +142,24 @@ class MediaUploadProgress extends React.Component {
 							if ( width > 0 && width < imageWidthWithinContainer ) {
 								finalWidth = width;
 							}
-							return ( this.props.renderContent( this.state.isUploadInProgress, this.state.isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer ) );
+							return ( this.props.renderContent( {
+								isUploadInProgress,
+								isUploadFailed,
+								finalWidth,
+								finalHeight,
+								imageWidthWithinContainer,
+								retryIconName,
+								retryMessage,
+							} ) );
 						} }
 					</ImageSize>
 				}
-				{ ! coverUrl && this.props.renderContent( this.state.isUploadInProgress, this.state.isUploadFailed ) }
+				{ ! coverUrl && this.props.renderContent( {
+					isUploadInProgress,
+					isUploadFailed,
+					retryIconName,
+					retryMessage,
+				} ) }
 			</View>
 		);
 	}

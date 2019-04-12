@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, TextInput, TouchableWithoutFeedback } from 'react-native';
+import { View, TextInput, TouchableWithoutFeedback, Text } from 'react-native';
 /**
  * Internal dependencies
  */
@@ -177,9 +177,11 @@ class VideoEdit extends React.Component {
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( isUploadInProgress ) => {
-							const opacity = isUploadInProgress ? 0.3 : 1;
-							const showVideo = src && ! isUploadInProgress;
+						renderContent={ ( { isUploadInProgress, isUploadFailed, retryIconName, retryMessage } ) => {
+							const opacity = ( isUploadInProgress || isUploadFailed ) ? 0.3 : 1;
+							const showVideo = src && ! isUploadInProgress && ! isUploadFailed;
+							const iconName = isUploadFailed ? retryIconName : 'format-video';
+
 							const videoStyle = {
 								height: videoContainerHeight,
 								...style.video,
@@ -198,7 +200,8 @@ class VideoEdit extends React.Component {
 									}
 									{ ! showVideo &&
 										<View style={ { ...videoStyle, ...style.placeholder, opacity } }>
-											{ videoContainerHeight > 0 && <Dashicon icon={ 'format-video' } size={ 100 } style={ style.placeholderIcon } /> }
+											{ videoContainerHeight > 0 && <Dashicon icon={ iconName } size={ 80 } style={ style.placeholderIcon } /> }
+											{ isUploadFailed && <Text style={ style.uploadFailedText }>{ retryMessage }</Text> }
 										</View>
 									}
 								</View>

@@ -241,7 +241,7 @@ class ImageEdit extends React.Component {
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer ) => {
+						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryIconName, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
 							return (
 								<View style={ { flex: 1 } } >
@@ -255,8 +255,8 @@ class ImageEdit extends React.Component {
 										key={ url }>
 										{ isUploadFailed &&
 											<View style={ styles.imageContainer } >
-												<Dashicon icon={ 'image-rotate' } ariaPressed={ 'dashicon-active' } />
-												<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.\nPlease tap for options.' ) }</Text>
+												<Dashicon icon={ retryIconName } ariaPressed={ 'dashicon-active' } />
+												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 											</View>
 										}
 									</ImageBackground>
