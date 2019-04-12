@@ -460,7 +460,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                         }
                     }
                 });
-
+        
         // Don't think we need to add setOnEditorActionListener here (intercept Enter for example), but
         // in case check ReactTextInputManager
     }
