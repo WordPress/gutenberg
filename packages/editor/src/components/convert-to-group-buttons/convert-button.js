@@ -15,7 +15,12 @@ import { compose } from '@wordpress/compose';
 
 export function ConvertToGroupButton( {
 	onConvertToGroup,
+	isVisible = true,
 } ) {
+	if ( ! isVisible ) {
+		return null;
+	}
+
 	return (
 		<Fragment>
 			<MenuItem
@@ -23,7 +28,7 @@ export function ConvertToGroupButton( {
 				icon="controls-repeat"
 				onClick={ onConvertToGroup }
 			>
-				{ __( 'Convert to Group' ) }
+				{ __( 'Group' ) }
 			</MenuItem>
 		</Fragment>
 	);
@@ -38,16 +43,18 @@ export default compose( [
 
 		const blocksToGroup = getBlocksByClientId( clientIds );
 
+		const isSingleContainerBlock = blocksToGroup.length === 1 && blocksToGroup[ 0 ].name === 'core/group';
+
 		const isGroupable = (
-			blocksToGroup.length === 1 &&
-			blocksToGroup[ 0 ]
+			blocksToGroup.length &&
+			blocksToGroup[ 0 ] &&
+			! isSingleContainerBlock
 		);
 
 		// Define any edge cases here
-		const isVisible = true;
+		const isVisible = isGroupable;
 
 		return {
-			isGroupable,
 			isVisible,
 			blocksToGroup,
 			getBlockRootClientId,
