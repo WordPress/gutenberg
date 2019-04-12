@@ -38,9 +38,7 @@ const ColumnEdit = ( { attributes, updateAlignment } ) => {
 					value={ verticalAlignment }
 				/>
 			</BlockControls>
-			<InnerBlocks
-				templateLock={ false }
-			/>
+			<InnerBlocks templateLock={ false } />
 		</div>
 	);
 };
