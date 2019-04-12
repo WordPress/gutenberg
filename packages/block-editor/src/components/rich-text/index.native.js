@@ -19,9 +19,9 @@ import {
 	split,
 	toHTMLString,
 	insert,
-	insertLineSeparator,
+	__unstableInsertLineSeparator as insertLineSeparator,
 	insertLineBreak,
-	isEmptyLine,
+	__unstableIsEmptyLine as isEmptyLine,
 	isCollapsed,
 	getTextContent,
 } from '@wordpress/rich-text';
