@@ -5,7 +5,10 @@ const { createHash } = require( 'crypto' );
 const { ExternalsPlugin } = require( 'webpack' );
 const { RawSource } = require( 'webpack-sources' );
 
-const WORDPRESS_NAMESPACE = '@wordpress/';
+/**
+ * Internal dependencies
+ */
+const { defaultRequestToExternal, defaultRequestToHandle } = require( './util' );
 
 class DependencyExtractionWebpackPlugin {
 	constructor( options ) {
@@ -60,7 +63,7 @@ class DependencyExtractionWebpackPlugin {
 
 		// Cascade to default if enabled
 		if ( this.options.useDefaults ) {
-			const scriptDependency = defaultRequestToDependency( request );
+			const scriptDependency = defaultRequestToHandle( request );
 			if ( scriptDependency ) {
 				return scriptDependency;
 			}
@@ -121,84 +124,11 @@ class DependencyExtractionWebpackPlugin {
 	}
 }
 
-/**
- * Handle default dependency to WordPress global transformation
- *
- * Transform @wordpress dependencies:
- *   @wordpress/api-fetch -> wp.apiFetch
- *   @wordpress/i18n -> wp.i18n
- *
- * @param {string} request Requested module
- *
- * @return {(string|undefined)} Script global
- */
-function defaultRequestToExternal( request ) {
-	switch ( request ) {
-		case '@babel/runtime/regenerator':
-			return 'regeneratorRuntime';
-
-		case 'lodash':
-		case 'lodash-es':
-		case 'moment':
-			return request;
-
-		case 'jquery':
-			return 'jQuery';
-
-		case 'react':
-			return 'React';
-
-		case 'react-dom':
-			return 'ReactDOM';
-	}
-
-	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
-		return `wp.${ camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ) }`;
-	}
-}
-
-/**
- * Handle default dependency to WordPress script dependency slug transformation
- *
- * Transform @wordpress dependencies:
- *   @wordpress/i18n -> wp-i18n
- *   @wordpress/escape-html -> wp-escape-html
- *
- * @param {string} request Requested module
- *
- * @return {(string|undefined)} Script dependency slug
- */
-function defaultRequestToDependency( request ) {
-	if ( request === '@babel/runtime/regenerator' ) {
-		return 'wp-polyfill';
-	}
-
-	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
-		return 'wp-' + request.substring( WORDPRESS_NAMESPACE.length );
-	}
-}
-
 function basename( name ) {
 	if ( ! name.includes( '/' ) ) {
 		return name;
 	}
 	return name.substr( name.lastIndexOf( '/' ) + 1 );
-}
-
-/**
- * Given a string, returns a new string with dash separators converted to
- * camelCase equivalent. This is not as aggressive as `_.camelCase` in
- * converting to uppercase, where Lodash will also capitalize letters
- * following numbers.
- *
- * Temporarily duplicated from @wordpress/scripts/utils.
- *
- * @param {string} string Input dash-delimited string.
- *
- * @return {string} Camel-cased string.
- */
-function camelCaseDash( string ) {
-	return string.replace( /-([a-z])/g, ( match, letter ) => letter.toUpperCase() );
 }
 
 module.exports = DependencyExtractionWebpackPlugin;
