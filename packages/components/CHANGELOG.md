@@ -1,3 +1,9 @@
+## 7.3.0 (Unreleased)
+
+### New Features
+
+- Added a new `anchorRect` prop to `Popover` which enables a developer to provide a custom `DOMRect` object at which to position the popover.
+
 ## 7.2.0 (2019-03-20)
 
 ### Improvements
