@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
@@ -17,7 +16,7 @@ import {
  * Internal dependencies
  */
 import edit from './edit';
-
+import icon from './icon';
 import metadata from './block.json';
 
 const { name } = metadata;
@@ -29,7 +28,7 @@ export const settings = {
 
 	description: __( 'Display a row of icons of your social media accounts.' ),
 
-	icon: <SVG width="24" height="24" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><Path d="M20 3H4c-.6 0-1 .4-1 1v16c0 .5.4 1 1 1h8.6v-7h-2.3v-2.7h2.3v-2c0-2.3 1.4-3.6 3.5-3.6 1 0 1.8.1 2.1.1v2.4h-1.4c-1.1 0-1.3.5-1.3 1.3v1.7h2.7l-.4 2.8h-2.3v7H20c.5 0 1-.4 1-1V4c0-.6-.4-1-1-1z"></Path></SVG>,
+	icon,
 
 	category: 'layout',
 
