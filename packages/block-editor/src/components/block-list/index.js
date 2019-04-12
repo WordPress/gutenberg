@@ -3,17 +3,18 @@
  */
 import {
 	findLast,
-	map,
 	invert,
 	mapValues,
 	sortBy,
 	throttle,
 } from 'lodash';
+import useResizeAware from 'react-resize-aware';
+import { useTransition, animated } from 'react-spring';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, useEffect, useReducer } from '@wordpress/element';
 import {
 	withSelect,
 	withDispatch,
@@ -36,6 +37,107 @@ const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
 		</AsyncModeProvider>
 	);
 };
+
+function heightsReducer( state, action ) {
+	switch ( action.type ) {
+		case 'add':
+			return {
+				...state,
+				[ action.clientId ]: action.height,
+			};
+		default:
+			throw new Error();
+	}
+}
+
+const BlockListItemWrapper = ( { onChangeHeight = () => {}, style, ...props } ) => {
+	const [ resizeListener, sizes ] = useResizeAware();
+	useEffect( () => {
+		onChangeHeight( sizes.height );
+	}, [] );
+	useEffect( () => {
+		onChangeHeight( sizes.height );
+	}, [ sizes.height ] );
+
+	return (
+		<animated.div style={ { position: 'absolute', ...style } }>
+			{ resizeListener }
+			<BlockListBlock
+				{ ...props }
+			/>
+		</animated.div>
+	);
+};
+
+const BlockListUI = ( {
+	blockClientIds,
+	rootClientId,
+	isDraggable,
+	selectedBlockClientId,
+	multiSelectedBlockClientIds,
+	hasMultiSelection,
+	renderAppender,
+	setBlockRef,
+	onSelectionStart,
+} ) => {
+	const [ heightsPerClientId, dispatch ] = useReducer( heightsReducer, {} );
+	const updateHeight = ( item ) => {
+		const index = blockClientIds.indexOf( item );
+		const top = blockClientIds.slice( 0, index ).reduce( ( memo, currentId ) => {
+			return memo + ( heightsPerClientId[ currentId ] || 0 );
+		}, 0 );
+		return { top };
+	};
+	const transitions = useTransition(
+		blockClientIds,
+		( item ) => item,
+		{
+			enter: updateHeight,
+			update: updateHeight,
+			from: { top: 0 },
+		}
+	);
+
+	return (
+		<div className="editor-block-list__layout block-editor-block-list__layout" style={ { position: 'relative' } }>
+			{ transitions.map( ( { item: clientId, props: animationProps } ) => {
+				const isBlockInSelection = hasMultiSelection ?
+					multiSelectedBlockClientIds.includes( clientId ) :
+					selectedBlockClientId === clientId;
+
+				return (
+					<BlockAsyncModeProvider
+						key={ 'block-' + clientId }
+						clientId={ clientId }
+						isBlockInSelection={ isBlockInSelection }
+					>
+						<BlockListItemWrapper
+							rootClientId={ rootClientId }
+							clientId={ clientId }
+							blockRef={ setBlockRef }
+							onSelectionStart={ onSelectionStart }
+							isDraggable={ isDraggable }
+							onChangeHeight={ ( height ) => {
+								dispatch( {
+									type: 'add',
+									clientId,
+									height,
+								} );
+							} }
+							style={ animationProps }
+						/>
+					</BlockAsyncModeProvider>
+				);
+			} ) }
+
+			<BlockListAppender
+				rootClientId={ rootClientId }
+				renderAppender={ renderAppender }
+			/>
+		</div>
+	);
+};
+
 class BlockList extends Component {
 	constructor( props ) {
 		super( props );
@@ -190,45 +292,12 @@ class BlockList extends Component {
 	}
 
 	render() {
-		const {
-			blockClientIds,
-			rootClientId,
-			isDraggable,
-			selectedBlockClientId,
-			multiSelectedBlockClientIds,
-			hasMultiSelection,
-			renderAppender,
-		} = this.props;
-
 		return (
-			<div className="editor-block-list__layout block-editor-block-list__layout">
-				{ map( blockClientIds, ( clientId ) => {
-					const isBlockInSelection = hasMultiSelection ?
-						multiSelectedBlockClientIds.includes( clientId ) :
-						selectedBlockClientId === clientId;
-
-					return (
-						<BlockAsyncModeProvider
-							key={ 'block-' + clientId }
-							clientId={ clientId }
-							isBlockInSelection={ isBlockInSelection }
-						>
-							<BlockListBlock
-								clientId={ clientId }
-								blockRef={ this.setBlockRef }
-								onSelectionStart={ this.onSelectionStart }
-								rootClientId={ rootClientId }
-								isDraggable={ isDraggable }
-							/>
-						</BlockAsyncModeProvider>
-					);
-				} ) }
-
-				<BlockListAppender
-					rootClientId={ rootClientId }
-					renderAppender={ renderAppender }
-				/>
-			</div>
+			<BlockListUI
+				{ ...this.props }
+				setBlockRef={ this.setBlockRef }
+				onSelectionStart={ this.onSelectionStart }
+			/>
 		);
 	}
 }
