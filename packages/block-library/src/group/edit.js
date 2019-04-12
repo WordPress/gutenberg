@@ -39,7 +39,7 @@ function GroupEdit( { className, setBackgroundColor, backgroundColor } ) {
 				/>
 			</InspectorControls>
 			<div className={ classes } style={ styles }>
-				<InnerBlocks />
+				<InnerBlocks renderAppender={ () => <InnerBlocks.ButtonBlockAppender /> } />
 			</div>
 		</Fragment>
 	);
