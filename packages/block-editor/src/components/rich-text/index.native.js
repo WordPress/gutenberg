@@ -19,9 +19,8 @@ import {
 	split,
 	toHTMLString,
 	insert,
-	insertLineSeparator,
-	insertLineBreak,
-	isEmptyLine,
+	__unstableInsertLineSeparator as insertLineSeparator,
+	__unstableIsEmptyLine as isEmptyLine,
 	isCollapsed,
 	getTextContent,
 } from '@wordpress/rich-text';
@@ -295,7 +294,7 @@ export class RichText extends Component {
 
 		if ( this.multilineTag ) {
 			if ( event.shiftKey ) {
-				const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
+				const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
 				this.onFormatChangeForceChild( insertedLineBreak );
 			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
 				this.setState( {
@@ -307,7 +306,7 @@ export class RichText extends Component {
 				this.onFormatChangeForceChild( insertedLineSeparator );
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
-			const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
+			const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
 			this.onFormatChangeForceChild( insertedLineBreak );
 		} else {
 			this.splitContent( currentRecord );
