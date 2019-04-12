@@ -17,9 +17,13 @@
 - Fixed display of reset button when using RangeControl `allowReset` prop.
 - Fixed minutes field of `DateTimePicker` missed '0' before single digit values.
 
+### Internal
+
+- `MenuGroup` no longer uses `NavigableMenu` internally. It needs to be explicitly wrapped with `NavigableMenu` to bring back the same behavior.
+
 ### Documentation
 
-- Added missing documentation for `DropdownMenu` props `menuLabel`, `position`, `className`
+- Added missing documentation for `DropdownMenu` props `menuLabel`, `position`, `className`.
 
 ## 7.3.0 (2019-04-16)
 

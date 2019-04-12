@@ -18,13 +18,15 @@ import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 
 function DropdownMenu( {
+	contentClassName,
+	children,
+	className,
+	controls,
 	icon = 'menu',
 	label,
+	labelPosition,
 	menuLabel,
-	controls,
-	className,
 	position,
-	children,
 } ) {
 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
@@ -42,9 +44,10 @@ function DropdownMenu( {
 	return (
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
-			contentClassName="components-dropdown-menu__popover"
+			contentClassName={ classnames( 'components-dropdown-menu__popover', contentClassName ) }
 			position={ position }
 			renderToggle={ ( { isOpen, onToggle } ) => {
+				const buttonLabel = isFunction( label ) ? label( isOpen ) : label;
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
 						event.preventDefault();
@@ -60,10 +63,11 @@ function DropdownMenu( {
 						onKeyDown={ openOnArrowDown }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
-						label={ label }
-						tooltip={ label }
+						label={ buttonLabel }
+						labelPosition={ labelPosition }
+						tooltip={ buttonLabel }
 					>
-						<span className="components-dropdown-menu__indicator" />
+						{ icon !== 'ellipsis' && <span className="components-dropdown-menu__indicator" /> }
 					</IconButton>
 				);
 			} }

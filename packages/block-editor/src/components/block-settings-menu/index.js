@@ -25,6 +25,8 @@ import BlockUnknownConvertButton from './block-unknown-convert-button';
 import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import __experimentalBlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
 
+const getButtonLabel = ( isOpen ) => isOpen ? __( 'Hide options' ) : __( 'More options' );
+
 export function BlockSettingsMenu( { clientIds } ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
@@ -36,7 +38,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 				<Toolbar>
 					<DropdownMenu
 						icon="ellipsis"
-						label={ __( 'Block options' ) }
+						label={ getButtonLabel }
 						position="bottom right"
 						className="block-editor-block-settings-menu"
 					>

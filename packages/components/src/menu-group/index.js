@@ -9,11 +9,6 @@ import classnames from 'classnames';
 import { Children } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
 
-/**
- * Internal dependencies
- */
-import { NavigableMenu } from '../navigable-container';
-
 export function MenuGroup( {
 	children,
 	className = '',
@@ -33,11 +28,12 @@ export function MenuGroup( {
 	return (
 		<div className={ classNames }>
 			{ label &&
-				<div className="components-menu-group__label" id={ labelId }>{ label }</div>
+				<div
+					className="components-menu-group__label" id={ labelId } aria-hidden="true">{ label }</div>
 			}
-			<NavigableMenu orientation="vertical" aria-labelledby={ label ? labelId : null }>
+			<div role="group" aria-labelledby={ label ? labelId : null }>
 				{ children }
-			</NavigableMenu>
+			</div>
 		</div>
 	);
 }
