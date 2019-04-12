@@ -3,17 +3,14 @@
  */
 import ReactNativeHr from 'react-native-hr';
 
-export const HorizontalRule = ( originalProps ) => {
-	const props = {
-		...originalProps,
-		lineStyle: {
-			backgroundColor: '#555d66',
-			height: 2,
-			...originalProps.lineStyle,
-		},
+export const HorizontalRule = ( props ) => {
+	const lineStyle = {
+		backgroundColor: '#555d66',
+		height: 2,
+		...props.lineStyle,
 	};
 
 	return (
-		<ReactNativeHr { ...props } />
+		<ReactNativeHr { ...props } lineStyle={ lineStyle } />
 	);
 };
