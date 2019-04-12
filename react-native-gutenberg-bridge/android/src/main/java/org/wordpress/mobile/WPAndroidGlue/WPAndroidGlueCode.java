@@ -151,6 +151,12 @@ public class WPAndroidGlueCode {
             }
 
             @Override
+            public void requestMediaImport(String url, MediaSelectedCallback mediaSelectedCallback) {
+                // no op - we don't need to paste images on Android, but the method needs to exist
+                // to match the iOS counterpart
+            }
+
+            @Override
             public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 mOnReattachQueryListener.onQueryCurrentProgressForUploadingMedia();

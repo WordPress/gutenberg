@@ -366,7 +366,7 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
-    func setSelection(start: NSNumber, end: NSNumber) {        
+    func setSelection(start: NSNumber, end: NSNumber) {
         if let startPosition = position(from: beginningOfDocument, offset: start.intValue),
             let endPosition = position(from: beginningOfDocument, offset: end.intValue) {
             selectedTextRange = textRange(from: startPosition, to: endPosition)
