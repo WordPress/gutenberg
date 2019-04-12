@@ -20,7 +20,7 @@ const ButtonBlockAppender = function( { rootClientId, className } ) {
 			rootClientId={ rootClientId }
 			renderToggle={ ( { onToggle, disabled, isOpen } ) => (
 				<Button
-					className={ classnames( className, 'button-block-appender' ) }
+					className={ classnames( className, 'block-editor-button-block-appender' ) }
 					onClick={ onToggle }
 					aria-expanded={ isOpen }
 					disabled={ disabled }

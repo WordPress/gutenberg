@@ -1,5 +1,4 @@
-
-.button-block-appender {
+.block-editor-button-block-appender {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -20,15 +19,15 @@
 		outline: $border-width dashed $dark-gray-900;
 		color: $dark-gray-900;
 	}
-}
 
-// Use opacity to work in various editor styles
-.is-dark-theme .button-block-appender {
-	background: $light-opacity-light-100;
-	color: $light-gray-100;
+	// Use opacity to work in various editor styles
+	.is-dark-theme & {
+		background: $light-opacity-light-100;
+		color: $light-gray-100;
 
-	&:hover,
-	&:focus {
-		outline: $border-width dashed $white;
+		&:hover,
+		&:focus {
+			outline: $border-width dashed $white;
+		}
 	}
 }
