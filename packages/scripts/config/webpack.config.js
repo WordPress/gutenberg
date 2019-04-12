@@ -87,7 +87,7 @@ const config = {
 				test: /\.js$/,
 				exclude: /node_modules/,
 				use: [
-					'thread-loader',
+					require.resolve( 'thread-loader' ),
 					{
 						loader: require.resolve( 'babel-loader' ),
 						options: {
