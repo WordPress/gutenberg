@@ -196,13 +196,13 @@ class LatestPostsEdit extends Component {
 }
 
 export default withSelect( ( select, props ) => {
-	const { postsToShow, order, orderBy, categories } = props.attributes;
+	const { postCount, order, orderBy, categories } = props.attributes;
 	const { getEntityRecords } = select( 'core' );
 	const latestPostsQuery = pickBy( {
 		categories,
 		order,
 		orderby: orderBy,
-		per_page: postsToShow,
+		per_page: postCount,
 	}, ( value ) => ! isUndefined( value ) );
 	return {
 		latestPosts: getEntityRecords( 'postType', 'post', latestPostsQuery ),
