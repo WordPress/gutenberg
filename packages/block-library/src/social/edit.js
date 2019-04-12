@@ -95,7 +95,9 @@ class SocialLinksEdit extends Component {
 							value={ url }
 							onChange={ ( value ) => setAttributes( { url: value } ) }
 						/>
-						<IconButton className="submit" icon="plus" label={ __( 'Add an icon' ) } type="submit" />
+						<div>
+							<IconButton className="submit" icon="plus" label={ __( 'Add an icon' ) } type="submit" /> Add an icon
+						</div>
 					</form>
 				) }
 			</Fragment>
