@@ -1,10 +1,10 @@
-# Block Registration 
+# Block Registration
 
 ## `register_block_type`
 
 * **Type:** `Function`
 
-Every block starts by registering a new block type definition. The function `registerBlockType` takes two arguments, a block `name` and a block configuration object.
+Every block starts by registering a new block type definition. To register, you use the `registerBlockType` function from the [`wp-blocks` package](/packages/blocks/README.md#registerBlockType). The function takes two arguments, a block `name` and a block configuration object.
 
 ### Block Name
 
@@ -174,7 +174,7 @@ attributes: {
 
 Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
 
-For example, a paragraph block can be transformed into a heading block.
+For example, a paragraph block can be transformed into a heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock)
 
 {% codetabs %}
 {% ES5 %}
