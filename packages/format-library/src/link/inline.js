@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, createRef } from '@wordpress/element';
+import { Component, createRef, useMemo } from '@wordpress/element';
 import {
 	ExternalLink,
 	IconButton,
@@ -36,20 +36,6 @@ const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
-}
-
-/**
- * Returns a DOMRect object representing dimensions of the current selection
- * caret.
- *
- * @return {DOMRect} Selection caret dimensions.
- */
-function getCaretRect() {
-	const range = window.getSelection().getRangeAt( 0 );
-
-	if ( range ) {
-		return getRectangleFromRange( range );
-	}
 }
 
 const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocompleteRef } ) => (
@@ -89,6 +75,35 @@ const LinkViewerUrl = ( { url } ) => {
 			{ filterURLForDisplay( safeDecodeURI( url ) ) }
 		</ExternalLink>
 	);
+};
+
+const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
+	const anchorRect = useMemo( () => {
+		const range = window.getSelection().getRangeAt( 0 );
+		if ( ! range ) {
+			return;
+		}
+
+		if ( addingLink ) {
+			return getRectangleFromRange( range );
+		}
+
+		let element = range.startContainer;
+		while ( element.nodeType !== window.Node.ELEMENT_NODE ) {
+			element = element.parentNode;
+		}
+
+		const closest = element.closest( 'a' );
+		if ( closest ) {
+			return closest.getBoundingClientRect();
+		}
+	}, [ isActive, addingLink, value.start, value.end ] );
+
+	if ( ! anchorRect ) {
+		return null;
+	}
+
+	return <URLPopover getAnchorRect={ () => anchorRect } { ...props } />;
 };
 
 const LinkViewer = ( { url, editLink } ) => {
@@ -225,7 +240,7 @@ class InlineLinkUI extends Component {
 	}
 
 	render() {
-		const { isActive, activeAttributes: { url }, addingLink } = this.props;
+		const { isActive, activeAttributes: { url }, addingLink, value } = this.props;
 
 		if ( ! isActive && ! addingLink ) {
 			return null;
@@ -235,11 +250,13 @@ class InlineLinkUI extends Component {
 		const showInput = isShowingInput( this.props, this.state );
 
 		return (
-			<URLPopover
+			<URLPopoverAtLink
+				value={ value }
+				isActive={ isActive }
+				addingLink={ addingLink }
 				onClickOutside={ this.onClickOutside }
 				onClose={ this.resetState }
 				focusOnMount={ showInput ? 'firstElement' : false }
-				getAnchorRect={ getCaretRect }
 				renderSettings={ () => (
 					<ToggleControl
 						label={ __( 'Open in New Tab' ) }
@@ -262,7 +279,7 @@ class InlineLinkUI extends Component {
 						editLink={ this.editLink }
 					/>
 				) }
-			</URLPopover>
+			</URLPopoverAtLink>
 		);
 	}
 }
