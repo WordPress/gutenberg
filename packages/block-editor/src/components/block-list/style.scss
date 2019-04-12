@@ -146,6 +146,15 @@
 				}
 			}
 		}
+
+		// Add extra padding and border when there are child blocks.
+		.block-editor-inner-blocks {
+			padding: $block-padding;
+
+			.block-editor-block-list__layout .block-editor-block-list__block > .block-editor-block-list__block-edit::before {
+				border: $border-width dashed $dark-opacity-light-800;
+			}
+		}
 	}
 
 	// Hover style.
