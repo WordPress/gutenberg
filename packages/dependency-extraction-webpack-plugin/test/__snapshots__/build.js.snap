@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Build tests no-default no-default should produce expected output 1`] = `Array []`;
+
+exports[`Build tests no-deps no-deps should produce expected output 1`] = `Array []`;
+
+exports[`Build tests overrides overrides should produce expected output 1`] = `
+Array [
+  "wp-blob",
+  "wp-script-handle-for-rxjs",
+  "wp-url",
+]
+`;
+
+exports[`Build tests with-externs with-externs should produce expected output 1`] = `
+Array [
+  "wp-blob",
+  "wp-url",
+]
+`;
+
+exports[`Build tests wordpress wordpress should produce expected output 1`] = `
+Array [
+  "lodash",
+  "wp-blob",
+]
+`;
