@@ -9,7 +9,7 @@ import { noop } from 'lodash';
 import { Fragment } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
+import { switchToBlockType } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -38,7 +38,6 @@ export default compose( [
 	withSelect( ( select, { clientIds } ) => {
 		const {
 			getBlocksByClientId,
-			getBlockRootClientId,
 		} = select( 'core/block-editor' );
 
 		const blocksToGroup = getBlocksByClientId( clientIds );
@@ -57,13 +56,11 @@ export default compose( [
 		return {
 			isVisible,
 			blocksToGroup,
-			getBlockRootClientId,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientIds, onToggle = noop, blocksToGroup = [], getBlockRootClientId } ) => {
+	withDispatch( ( dispatch, { clientIds, onToggle = noop, blocksToGroup = [] } ) => {
 		const {
-			insertBlock,
-			moveBlockToPosition,
+			replaceBlocks,
 		} = dispatch( 'core/block-editor' );
 
 		return {
@@ -72,17 +69,14 @@ export default compose( [
 					return;
 				}
 
-				const wrapperBlock = createBlock( 'core/group', {
-					backgroundColor: 'lighter-blue',
-				} );
+				// Activate the `transform` on `core/group` which does the conversion
+				const newBlocks = switchToBlockType( blocksToGroup, 'core/group' );
 
-				const firstBlockIndex = blocksToGroup[ 0 ].clientId;
+				replaceBlocks(
+					clientIds,
+					newBlocks
+				);
 
-				insertBlock( wrapperBlock, firstBlockIndex );
-
-				clientIds.forEach( ( blockClientId ) => {
-					moveBlockToPosition( blockClientId, getBlockRootClientId( blockClientId ), wrapperBlock.clientId );
-				} );
 				onToggle();
 			},
 		};
