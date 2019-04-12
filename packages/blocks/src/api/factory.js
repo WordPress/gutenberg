@@ -171,7 +171,9 @@ const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
 
 			return !! findTransform(
 				fromTransforms,
-				( transform ) => isPossibleTransformForSource( transform, 'from', blocks )
+				( transform ) => {
+					return ( transform && transform.blocks && transform.blocks[ 0 ] === '*' ) || isPossibleTransformForSource( transform, 'from', blocks );
+				}
 			);
 		},
 	);
@@ -199,7 +201,9 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	// filter all 'to' transforms to find those that are possible.
 	const possibleTransforms = filter(
 		transformsTo,
-		( transform ) => isPossibleTransformForSource( transform, 'to', blocks )
+		( transform ) => {
+			return ( transform && transform.blocks && transform.blocks[ 0 ] === '*' ) || isPossibleTransformForSource( transform, 'to', blocks );
+		}
 	);
 
 	// Build a list of block names using the possible 'to' transforms.
@@ -222,12 +226,6 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
  */
 export function getPossibleBlockTransformations( blocks ) {
 	if ( isEmpty( blocks ) ) {
-		return [];
-	}
-
-	const sourceBlock = first( blocks );
-	const isMultiBlock = blocks.length > 1;
-	if ( isMultiBlock && ! every( blocks, { name: sourceBlock.name } ) ) {
 		return [];
 	}
 
@@ -321,7 +319,10 @@ export function switchToBlockType( blocks, name ) {
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
 
-	if ( isMultiBlock && ! every( blocksArray, ( block ) => ( block.name === sourceName ) ) ) {
+	// Unless it's a `core/group` Block then check
+	// that all Blocks are of the same type otherwise
+	// we can't run a conversion
+	if ( isMultiBlock && ! name === 'core/group' && ! every( blocksArray, ( block ) => ( block.name === sourceName ) ) ) {
 		return null;
 	}
 
@@ -329,14 +330,15 @@ export function switchToBlockType( blocks, name ) {
 	// transformation.
 	const transformationsFrom = getBlockTransforms( 'from', name );
 	const transformationsTo = getBlockTransforms( 'to', sourceName );
+
 	const transformation =
 		findTransform(
 			transformationsTo,
-			( t ) => t.type === 'block' && t.blocks.indexOf( name ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
+			( t ) => t.type === 'block' && ( ( t.blocks.length && t.blocks[ 0 ] === '*' ) || t.blocks.indexOf( name ) !== -1 ) && ( ! isMultiBlock || t.isMultiBlock )
 		) ||
 		findTransform(
 			transformationsFrom,
-			( t ) => t.type === 'block' && t.blocks.indexOf( sourceName ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
+			( t ) => t.type === 'block' && ( ( t.blocks.length && t.blocks[ 0 ] === '*' ) || t.blocks.indexOf( sourceName ) !== -1 ) && ( ! isMultiBlock || t.isMultiBlock )
 		);
 
 	// Stop if there is no valid transformation.
@@ -345,13 +347,15 @@ export function switchToBlockType( blocks, name ) {
 	}
 
 	let transformationResults;
+
 	if ( transformation.isMultiBlock ) {
 		transformationResults = transformation.transform(
 			blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
-			blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks )
+			blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks ),
+			blocksArray.map( ( currentBlock ) => currentBlock.name ),
 		);
 	} else {
-		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks );
+		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks, firstBlock.name );
 	}
 
 	// Ensure that the transformation function returned an object or an array
