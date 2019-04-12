@@ -77,10 +77,12 @@ export default compose( [
 				// Activate the `transform` on `core/group` which does the conversion
 				const newBlocks = switchToBlockType( blocksToGroup, 'core/group' );
 
-				replaceBlocks(
-					clientIds,
-					newBlocks
-				);
+				if ( newBlocks ) {
+					replaceBlocks(
+						clientIds,
+						newBlocks
+					);
+				}
 
 				onToggle();
 			},

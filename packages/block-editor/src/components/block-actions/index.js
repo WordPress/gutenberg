@@ -118,6 +118,9 @@ export default compose( [
 				// Activate the `transform` on `core/group` which does the conversion
 				const newBlocks = switchToBlockType( blocks, 'core/group' );
 
+				if ( ! newBlocks ) {
+					return;
+				}
 				replaceBlocks(
 					clientIds,
 					newBlocks
