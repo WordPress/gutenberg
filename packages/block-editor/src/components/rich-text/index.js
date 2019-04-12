@@ -374,6 +374,7 @@ export class RichText extends Component {
 		}
 
 		this.recalculateBoundaryStyle();
+		this.onSelectionChange();
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
