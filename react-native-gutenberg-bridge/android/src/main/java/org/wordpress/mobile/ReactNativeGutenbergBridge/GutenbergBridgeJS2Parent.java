@@ -46,6 +46,8 @@ public interface GutenbergBridgeJS2Parent {
 
     void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback);
 
+    void requestMediaImport(String url, MediaSelectedCallback mediaSelectedCallback);
+
     void mediaUploadSync(MediaUploadCallback mediaUploadCallback);
 
     void requestImageFailedRetryDialog(int mediaId);
