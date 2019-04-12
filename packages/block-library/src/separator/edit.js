@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Hr } from '@wordpress/components';
+import { HorizontalRule } from '@wordpress/components';
 
 export default function SeparatorEdit( { className } ) {
-	return <Hr className={ className } />;
+	return <HorizontalRule className={ className } />;
 }
