@@ -37,6 +37,7 @@ const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/
 const TEMPLATE = [
 	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
 ];
+const applyWidthConstraints = ( width ) => Math.max( 15, Math.min( width, 85 ) );
 
 class MediaTextEdit extends Component {
 	constructor() {
@@ -85,7 +86,7 @@ class MediaTextEdit extends Component {
 
 	onWidthChange( width ) {
 		this.setState( {
-			mediaWidth: width,
+			mediaWidth: applyWidthConstraints( width ),
 		} );
 	}
 
@@ -93,7 +94,7 @@ class MediaTextEdit extends Component {
 		const { setAttributes } = this.props;
 
 		setAttributes( {
-			mediaWidth: width,
+			mediaWidth: applyWidthConstraints( width ),
 		} );
 		this.setState( {
 			mediaWidth: null,
