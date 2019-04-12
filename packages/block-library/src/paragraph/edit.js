@@ -33,17 +33,23 @@ const { getComputedStyle } = window;
 
 const name = 'core/paragraph';
 
-const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor, fontSize, customFontSize } = ownProps.attributes;
-	const editableNode = node.querySelector( '[contenteditable="true"]' );
-	//verify if editableNode is available, before using getComputedStyle.
-	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;
-	return {
-		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
-		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
-		fallbackFontSize: fontSize || customFontSize || ! computedStyles ? undefined : parseInt( computedStyles.fontSize ) || undefined,
-	};
-} );
+const applyFallbackStyles = withFallbackStyles(
+	( node, ownProps ) => {
+		const { textColor, backgroundColor, fontSize } = ownProps;
+		const editableNode = node.querySelector( '[contenteditable="true"]' );
+		//verify if editableNode is available, before using getComputedStyle.
+		const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;
+		return {
+			fallbackBackgroundColor: ( backgroundColor.color || ! computedStyles ) ? undefined : computedStyles.backgroundColor,
+			fallbackTextColor: ( textColor.color || ! computedStyles ) ? undefined : computedStyles.color,
+			fallbackFontSize: ( fontSize.size || ! computedStyles ) ? undefined : parseInt( computedStyles.fontSize ) || undefined,
+		};
+	},
+	( ownProps ) => {
+		const { textColor, backgroundColor, fontSize } = ownProps;
+		return [ textColor.color, backgroundColor.color, fontSize.size ];
+	}
+);
 
 class ParagraphBlock extends Component {
 	constructor() {

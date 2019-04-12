@@ -8,8 +8,9 @@ import { every, isEqual } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
-export default ( mapNodeToProps ) => createHigherOrderComponent(
+export default ( mapNodeToProps, computeWhenChange ) => createHigherOrderComponent(
 	( WrappedComponent ) => {
 		return class extends Component {
 			constructor() {
@@ -19,6 +20,7 @@ export default ( mapNodeToProps ) => createHigherOrderComponent(
 					fallbackStyles: undefined,
 					grabStylesCompleted: false,
 				};
+				this.shouldRecomputeValues = this.shouldRecomputeValues().bind( this );
 
 				this.bindRef = this.bindRef.bind( this );
 			}
@@ -38,9 +40,24 @@ export default ( mapNodeToProps ) => createHigherOrderComponent(
 				this.grabFallbackStyles();
 			}
 
+			shouldRecomputeValues() {
+				let lastRecomputeValues = [];
+				return () => {
+					if ( ! computeWhenChange ) {
+						return ! this.state.grabStylesCompleted;
+					}
+					const newRecomputeValues = computeWhenChange( this.props );
+					if ( isShallowEqual( lastRecomputeValues, newRecomputeValues ) ) {
+						return false;
+					}
+					lastRecomputeValues = newRecomputeValues;
+					return true;
+				};
+			}
+
 			grabFallbackStyles() {
-				const { grabStylesCompleted, fallbackStyles } = this.state;
-				if ( this.nodeRef && ! grabStylesCompleted ) {
+				const { fallbackStyles } = this.state;
+				if ( this.nodeRef && this.shouldRecomputeValues() ) {
 					const newFallbackStyles = mapNodeToProps( this.nodeRef, this.props );
 					if ( ! isEqual( newFallbackStyles, fallbackStyles ) ) {
 						this.setState( {
