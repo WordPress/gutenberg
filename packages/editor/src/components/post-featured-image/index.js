@@ -78,7 +78,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 						/>
 						<p
 							id={ `editor-post-featured-image__description-${ featuredImageId }` }
-							className="screen-reader-text"
+							hidden
 						>
 							{ mediaAltText ?
 								sprintf( __( 'Current image: %s' ), mediaAltText ) :
