@@ -425,6 +425,11 @@ export class RichText extends Component {
 			const newContent = this.valueToFormat( insertedContent );
 			this.lastEventCount = undefined;
 			this.lastContent = newContent;
+
+			// explicitly set selection after inline paste
+			( ( { start, end } ) => this.setState( { start, end,
+				needsSelectionUpdate: true } ) )( insertedContent );
+
 			this.props.onChange( this.lastContent );
 		} else if ( onSplit ) {
 			if ( ! pastedContent.length ) {
