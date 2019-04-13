@@ -37,6 +37,12 @@
 	.components-placeholder__error {
 		word-break: break-word;
 	}
+	.components-placeholder__cancel {
+		padding-top: 10px;
+		width: 100%;
+		float: none;
+		text-align: center;
+	}
 }
 
 .block-library-embed__interactive-overlay {
