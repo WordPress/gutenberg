@@ -426,8 +426,7 @@ export class RichText extends Component {
 			this.lastContent = newContent;
 
 			// explicitly set selection after inline paste
-			( ( { start, end } ) => this.setState( { start, end,
-				needsSelectionUpdate: true } ) )( insertedContent );
+			this.forceSelectionUpdate( insertedContent.start, insertedContent.end );
 
 			this.props.onChange( this.lastContent );
 		} else if ( onSplit ) {
