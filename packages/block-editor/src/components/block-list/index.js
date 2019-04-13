@@ -8,13 +8,12 @@ import {
 	sortBy,
 	throttle,
 } from 'lodash';
-import useResizeAware from 'react-resize-aware';
-import { useTransition, animated } from 'react-spring';
+import { useSpring, animated, interpolate } from 'react-spring';
 
 /**
  * WordPress dependencies
  */
-import { Component, useEffect, useReducer } from '@wordpress/element';
+import { Component, useEffect, useLayoutEffect, useState, useRef } from '@wordpress/element';
 import {
 	withSelect,
 	withDispatch,
@@ -38,30 +37,42 @@ const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
 	);
 };
 
-function heightsReducer( state, action ) {
-	switch ( action.type ) {
-		case 'add':
-			return {
-				...state,
-				[ action.clientId ]: action.height,
-			};
-		default:
-			throw new Error();
-	}
-}
-
-const BlockListItemWrapper = ( { onChangeHeight = () => {}, style, ...props } ) => {
-	const [ resizeListener, sizes ] = useResizeAware();
+const BlockListItemWrapper = ( { blockClientIds, ...props } ) => {
+	const ref = useRef( null );
+	const [ resetAnimation, updateReset ] = useState( false );
+	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
+	const previous = ref.current ? ref.current.getBoundingClientRect() : null;
+	useLayoutEffect( () => {
+		const previousTransform = ref.current.style.transform;
+		ref.current.style.transform = 'none';
+		const destination = ref.current.getBoundingClientRect();
+		ref.current.style.transform = previousTransform;
+		updateReset( true );
+		setTransform( {
+			x: previous ? previous.left - destination.left : 0,
+			y: previous ? previous.top - destination.top : 0,
+		} );
+	}, [ blockClientIds ] );
 	useEffect( () => {
-		onChangeHeight( sizes.height );
-	}, [] );
-	useEffect( () => {
-		onChangeHeight( sizes.height );
-	}, [ sizes.height ] );
+		if ( resetAnimation ) {
+			updateReset( false );
+		}
+	}, [ resetAnimation ] );
+	const animationProps = useSpring( {
+		from: transform,
+		to: { x: 0, y: 0 },
+		reset: resetAnimation,
+		config: { tension: 300 },
+	} );
 
 	return (
-		<animated.div style={ { position: 'absolute', ...style } }>
-			{ resizeListener }
+		<animated.div ref={ ref } className="animated-container" data-client-id={ props.clientId } style={ {
+			position: 'relative',
+			transform: interpolate(
+				[ animationProps.x, animationProps.y ],
+				( x, y ) => `translate3d(${ x }px,${ y }px,0)`
+			),
+		} }>
 			<BlockListBlock
 				{ ...props }
 			/>
@@ -80,27 +91,9 @@ const BlockListUI = ( {
 	setBlockRef,
 	onSelectionStart,
 } ) => {
-	const [ heightsPerClientId, dispatch ] = useReducer( heightsReducer, {} );
-	const updateHeight = ( item ) => {
-		const index = blockClientIds.indexOf( item );
-		const top = blockClientIds.slice( 0, index ).reduce( ( memo, currentId ) => {
-			return memo + ( heightsPerClientId[ currentId ] || 0 );
-		}, 0 );
-		return { top };
-	};
-	const transitions = useTransition(
-		blockClientIds,
-		( item ) => item,
-		{
-			enter: updateHeight,
-			update: updateHeight,
-			from: { top: 0 },
-		}
-	);
-
 	return (
 		<div className="editor-block-list__layout block-editor-block-list__layout" style={ { position: 'relative' } }>
-			{ transitions.map( ( { item: clientId, props: animationProps } ) => {
+			{ blockClientIds.map( ( clientId ) => {
 				const isBlockInSelection = hasMultiSelection ?
 					multiSelectedBlockClientIds.includes( clientId ) :
 					selectedBlockClientId === clientId;
@@ -117,14 +110,7 @@ const BlockListUI = ( {
 							blockRef={ setBlockRef }
 							onSelectionStart={ onSelectionStart }
 							isDraggable={ isDraggable }
-							onChangeHeight={ ( height ) => {
-								dispatch( {
-									type: 'add',
-									clientId,
-									height,
-								} );
-							} }
-							style={ animationProps }
+							blockClientIds={ blockClientIds }
 						/>
 					</BlockAsyncModeProvider>
 				);
