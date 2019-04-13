@@ -42,7 +42,6 @@ class LatestPostsEdit extends Component {
 		this.state = {
 			categoriesList: [],
 		};
-		this.updateAttribute = this.updateAttribute.bind( this );
 	}
 
 	componentDidMount() {
@@ -68,12 +67,6 @@ class LatestPostsEdit extends Component {
 		this.isStillMounted = false;
 	}
 
-	updateAttribute( name, value ) {
-		const { setAttributes } = this.props;
-
-		setAttributes( { [ name ]: value } );
-	}
-
 	render() {
 		const { attributes, setAttributes, latestPosts } = this.props;
 		const { categoriesList } = this.state;
@@ -85,7 +78,7 @@ class LatestPostsEdit extends Component {
 					<ToggleControl
 						label={ __( 'Post Content' ) }
 						checked={ displayPostContent }
-						onChange={ ( value ) => this.updateAttribute( 'displayPostContent', value ) }
+						onChange={ ( value ) => setAttributes( { displayPostContent: value } ) }
 					/>
 					{ displayPostContent &&
 					<RadioControl
@@ -95,7 +88,7 @@ class LatestPostsEdit extends Component {
 							{ label: 'Excerpt', value: 'excerpt' },
 							{ label: 'Full Post', value: 'full_post' },
 						] }
-						onChange={ ( value ) => this.updateAttribute( 'displayPostContentRadio', value ) }
+						onChange={ ( value ) => setAttributes( { displayPostContentRadio: value } ) }
 					/>
 					}
 					{ displayPostContent && displayPostContentRadio === 'excerpt' &&
@@ -113,7 +106,7 @@ class LatestPostsEdit extends Component {
 					<ToggleControl
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
-						onChange={ ( value ) => this.updateAttribute( 'displayPostDate', value ) }
+						onChange={ ( value ) => setAttributes( { displayPostDate: value } ) }
 					/>
 				</PanelBody>
 
