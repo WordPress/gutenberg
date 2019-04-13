@@ -42,15 +42,15 @@ const BlockListItemWrapper = ( { blockClientIds, ...props } ) => {
 	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
 	const previous = ref.current ? ref.current.getBoundingClientRect() : null;
 	useLayoutEffect( () => {
-		const previousTransform = ref.current.style.transform;
 		ref.current.style.transform = 'none';
 		const destination = ref.current.getBoundingClientRect();
-		ref.current.style.transform = previousTransform;
-		updateReset( true );
-		setTransform( {
+		const newTransform = {
 			x: previous ? previous.left - destination.left : 0,
 			y: previous ? previous.top - destination.top : 0,
-		} );
+		};
+		ref.current.style.transform = `translate3d(${ newTransform.x }px,${ newTransform.y }px,0)`;
+		updateReset( true );
+		setTransform( newTransform );
 	}, [ blockClientIds ] );
 	useEffect( () => {
 		if ( resetAnimation ) {
