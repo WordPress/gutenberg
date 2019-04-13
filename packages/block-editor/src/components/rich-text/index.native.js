@@ -436,6 +436,12 @@ export class RichText extends Component {
 			} else {
 				this.splitContent( currentRecord, pastedContent, isPasted );
 			}
+
+			// select last pasted block
+			if ( this.props.selectBlock ) {
+				const lastPastedBlock = pastedContent[ pastedContent.length - 1 ];
+				this.props.selectBlock( lastPastedBlock );
+			}
 		}
 	}
 
