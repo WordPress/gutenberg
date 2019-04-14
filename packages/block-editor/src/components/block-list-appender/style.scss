@@ -1,17 +1,7 @@
-.block-list-appender > .block-editor-inserter {
-	display: block;
+.block-list-appender {
+	margin: $block-padding;
 }
 
-.block-list-appender__toggle {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: $grid-size-large;
-	outline: $border-width dashed $dark-gray-150;
-	width: 100%;
-	color: $dark-gray-500;
-
-	&:hover {
-		outline: $border-width dashed $dark-gray-500;
-	}
+.block-list-appender > .block-editor-inserter {
+	display: block;
 }

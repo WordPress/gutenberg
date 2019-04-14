@@ -102,13 +102,13 @@ This is the canonical list of keyboard shortcuts:
 		</tr>
 		<tr>
 			<td>Navigate to a the next part of the editor (alternative).</td>
-			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>N</kbd></td>
-			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>N</kbd></td>
+			<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>N</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>N</kbd></td>
 		</tr>
 		<tr>
 			<td>Navigate to the previous part of the editor (alternative).</td>
-			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd></td>
-			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>P</kbd></td>
+			<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>P</kbd></td>
 		</tr>
 		<tr>
 			<td>Navigate to the nearest toolbar.</td>

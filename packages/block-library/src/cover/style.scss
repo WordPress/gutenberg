@@ -63,6 +63,11 @@
 		@supports (-webkit-overflow-scrolling: touch) {
 			background-attachment: scroll;
 		}
+
+		// Remove the appearance of scrolling based on OS-level animation preferences.
+		@media (prefers-reduced-motion: reduce) {
+			background-attachment: scroll;
+		}
 	}
 
 	&.has-background-dim::before {

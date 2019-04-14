@@ -9,7 +9,6 @@ import classnames from 'classnames';
  */
 import { createBlock } from '@wordpress/blocks';
 import {
-	InnerBlocks,
 	RichText,
 	getColorClassName,
 } from '@wordpress/block-editor';
@@ -18,15 +17,17 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
+import save from './save';
+import transforms from './transforms';
 import {
-	default as CoverEdit,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	backgroundImageStyles,
 	dimRatioToClass,
-} from './edit';
-import metadata from './block.json';
+} from './shared';
 
 const { name, attributes: blockAttributes } = metadata;
 
@@ -34,124 +35,14 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Cover' ),
-
 	description: __( 'Add an image or video with a text overlay — great for headers.' ),
-
 	icon,
-
 	supports: {
 		align: true,
 	},
-
-	transforms: {
-		from: [
-			{
-				type: 'block',
-				blocks: [ 'core/image' ],
-				transform: ( { caption, url, align, id } ) => (
-					createBlock( 'core/cover', {
-						title: caption,
-						url,
-						align,
-						id,
-					} )
-				),
-			},
-			{
-				type: 'block',
-				blocks: [ 'core/video' ],
-				transform: ( { caption, src, align, id } ) => (
-					createBlock( 'core/cover', {
-						title: caption,
-						url: src,
-						align,
-						id,
-						backgroundType: VIDEO_BACKGROUND_TYPE,
-					} )
-				),
-			},
-		],
-		to: [
-			{
-				type: 'block',
-				blocks: [ 'core/image' ],
-				isMatch: ( { backgroundType, url } ) => {
-					return ! url || backgroundType === IMAGE_BACKGROUND_TYPE;
-				},
-				transform: ( { title, url, align, id } ) => (
-					createBlock( 'core/image', {
-						caption: title,
-						url,
-						align,
-						id,
-					} )
-				),
-			},
-			{
-				type: 'block',
-				blocks: [ 'core/video' ],
-				isMatch: ( { backgroundType, url } ) => {
-					return ! url || backgroundType === VIDEO_BACKGROUND_TYPE;
-				},
-				transform: ( { title, url, align, id } ) => (
-					createBlock( 'core/video', {
-						caption: title,
-						src: url,
-						id,
-						align,
-					} )
-				),
-			},
-		],
-	},
-
-	save( { attributes } ) {
-		const {
-			backgroundType,
-			customOverlayColor,
-			dimRatio,
-			focalPoint,
-			hasParallax,
-			overlayColor,
-			url,
-		} = attributes;
-		const overlayColorClass = getColorClassName( 'background-color', overlayColor );
-		const style = backgroundType === IMAGE_BACKGROUND_TYPE ?
-			backgroundImageStyles( url ) :
-			{};
-		if ( ! overlayColorClass ) {
-			style.backgroundColor = customOverlayColor;
-		}
-		if ( focalPoint && ! hasParallax ) {
-			style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
-		}
-
-		const classes = classnames(
-			dimRatioToClass( dimRatio ),
-			overlayColorClass,
-			{
-				'has-background-dim': dimRatio !== 0,
-				'has-parallax': hasParallax,
-			},
-		);
-
-		return (
-			<div className={ classes } style={ style }>
-				{ VIDEO_BACKGROUND_TYPE === backgroundType && url && ( <video
-					className="wp-block-cover__video-background"
-					autoPlay
-					muted
-					loop
-					src={ url }
-				/> ) }
-				<div className="wp-block-cover__inner-container">
-					<InnerBlocks.Content />
-				</div>
-			</div>
-		);
-	},
-
-	edit: CoverEdit,
+	transforms,
+	save,
+	edit,
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,

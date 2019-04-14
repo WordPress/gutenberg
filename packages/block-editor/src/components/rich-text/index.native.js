@@ -19,10 +19,10 @@ import {
 	split,
 	toHTMLString,
 	insert,
-	insertLineSeparator,
-	insertLineBreak,
-	isEmptyLine,
+	__unstableInsertLineSeparator as insertLineSeparator,
+	__unstableIsEmptyLine as isEmptyLine,
 	isCollapsed,
+	getTextContent,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
@@ -99,6 +99,8 @@ export class RichText extends Component {
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
 		this.onPaste = this.onPaste.bind( this );
+		this.onFocus = this.onFocus.bind( this );
+		this.onBlur = this.onBlur.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.onFormatChangeForceChild = this.onFormatChangeForceChild.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
@@ -111,6 +113,9 @@ export class RichText extends Component {
 			formatPlaceholder: null,
 			height: 0,
 		};
+		this.needsSelectionUpdate = false;
+		this.savedContent = '';
+		this.isTouched = false;
 	}
 
 	/**
@@ -223,11 +228,8 @@ export class RichText extends Component {
 		if ( newContent && newContent !== this.props.value ) {
 			this.props.onChange( newContent );
 			if ( record.needsSelectionUpdate && record.start && record.end ) {
-				this.setState( { start: record.start, end: record.end } );
+				this.forceSelectionUpdate( record.start, record.end );
 			}
-			this.setState( {
-				needsSelectionUpdate: record.needsSelectionUpdate,
-			} );
 		} else {
 			if ( doUpdateChild ) {
 				this.lastEventCount = undefined;
@@ -292,7 +294,7 @@ export class RichText extends Component {
 
 		if ( this.multilineTag ) {
 			if ( event.shiftKey ) {
-				const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
+				const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
 				this.onFormatChangeForceChild( insertedLineBreak );
 			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
 				this.setState( {
@@ -304,7 +306,7 @@ export class RichText extends Component {
 				this.onFormatChangeForceChild( insertedLineSeparator );
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
-			const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
+			const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
 			this.onFormatChangeForceChild( insertedLineBreak );
 		} else {
 			this.splitContent( currentRecord );
@@ -422,6 +424,10 @@ export class RichText extends Component {
 			const newContent = this.valueToFormat( insertedContent );
 			this.lastEventCount = undefined;
 			this.lastContent = newContent;
+
+			// explicitly set selection after inline paste
+			this.forceSelectionUpdate( insertedContent.start, insertedContent.end );
+
 			this.props.onChange( this.lastContent );
 		} else if ( onSplit ) {
 			if ( ! pastedContent.length ) {
@@ -433,6 +439,22 @@ export class RichText extends Component {
 			} else {
 				this.splitContent( currentRecord, pastedContent, isPasted );
 			}
+		}
+	}
+
+	onFocus( event ) {
+		this.isTouched = true;
+
+		if ( this.props.onFocus ) {
+			this.props.onFocus( event );
+		}
+	}
+
+	onBlur( event ) {
+		this.isTouched = false;
+
+		if ( this.props.onBlur ) {
+			this.props.onBlur( event );
 		}
 	}
 
@@ -524,6 +546,43 @@ export class RichText extends Component {
 		return value;
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		this.moveCaretToTheEndIfNeeded( nextProps );
+	}
+
+	moveCaretToTheEndIfNeeded( nextProps ) {
+		const nextRecord = this.formatToValue( nextProps.value );
+		const nextTextContent = getTextContent( nextRecord );
+
+		if ( this.isTouched || ! nextProps.isSelected ) {
+			this.savedContent = nextTextContent;
+			return;
+		}
+
+		if ( nextTextContent === '' && this.savedContent === '' ) {
+			return;
+		}
+
+		// This logic will handle the selection when two blocks are merged or when block is split
+		// into two blocks
+		if ( nextTextContent.startsWith( this.savedContent ) ) {
+			let length = this.savedContent.length;
+			if ( length === 0 && nextTextContent !== this.props.value ) {
+				length = this.props.value.length;
+			}
+
+			this.forceSelectionUpdate( length, length );
+			this.savedContent = nextTextContent;
+		}
+	}
+
+	forceSelectionUpdate( start, end ) {
+		if ( ! this.needsSelectionUpdate ) {
+			this.needsSelectionUpdate = true;
+			this.setState( { start, end } );
+		}
+	}
+
 	shouldComponentUpdate( nextProps ) {
 		if ( nextProps.tagName !== this.props.tagName || nextProps.isSelected !== this.props.isSelected ) {
 			this.lastEventCount = undefined;
@@ -589,7 +648,11 @@ export class RichText extends Component {
 			minHeight = style.minHeight;
 		}
 
-		const selection = this.state.needsSelectionUpdate ? { start: this.state.start, end: this.state.end } : null;
+		let selection = null;
+		if ( this.needsSelectionUpdate ) {
+			this.needsSelectionUpdate = false;
+			selection = { start: this.state.start, end: this.state.end };
+		}
 
 		return (
 			<View>
@@ -622,8 +685,8 @@ export class RichText extends Component {
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].textDecorationColor }
 					onChange={ this.onChange }
-					onFocus={ this.props.onFocus }
-					onBlur={ this.props.onBlur }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
 					onPaste={ this.onPaste }

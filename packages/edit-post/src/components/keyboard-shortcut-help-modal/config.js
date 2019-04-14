@@ -18,7 +18,6 @@ const {
 	ctrl,
 	alt,
 	ctrlShift,
-	shiftAlt,
 } = displayShortcutList;
 
 const globalShortcuts = {
@@ -60,11 +59,11 @@ const globalShortcuts = {
 			ariaLabel: shortcutAriaLabel.ctrlShift( '`' ),
 		},
 		{
-			keyCombination: shiftAlt( 'n' ),
+			keyCombination: access( 'n' ),
 			description: __( 'Navigate to the next part of the editor (alternative).' ),
 		},
 		{
-			keyCombination: shiftAlt( 'p' ),
+			keyCombination: access( 'p' ),
 			description: __( 'Navigate to the previous part of the editor (alternative).' ),
 		},
 		{

@@ -30,7 +30,7 @@
 		"parent": "developers"
 	},
 	{
-		"title": "Block Registration ",
+		"title": "Block Registration",
 		"slug": "block-registration",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/block-api/block-registration.md",
 		"parent": "block-api"
