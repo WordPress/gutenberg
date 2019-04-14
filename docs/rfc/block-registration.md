@@ -65,6 +65,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 	"name": "my-plugin/notice",
 	"title": "Notice",
 	"category": "common",
+	"parent": [ "core/group" ],
 	"icon": "star",
 	"description": "Shows warning, error or success notices  ...",
 	"keywords": [ "alert", "message" ],
@@ -149,6 +150,19 @@ Plugins and Themes can also register [custom block categories](https://wordpress
 
 An implementation should expect and tolerate unknown categories, providing some reasonable fallback behavior (e.g. a "common" category).
 
+### Parent
+
+* Type: `string[]`
+* Optional
+* Localized: No
+* Property: `parent`
+
+```json
+{ "parent": [ "my-block/product" ] }
+```
+
+Setting `parent` lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+
 ### Icon
 
 * Type: `string`|`object`
@@ -199,7 +213,7 @@ This is a short description for your block, which can be translated with our tra
 { "keywords": [ "keyword1", "keyword2" ] }
 ```
 
-Sometimes a block could have aliases that help users discover it while searching. For example, an image block could also want to be discovered by photo. You can do so by providing an array of terms (which can be translated). It is only allowed to add as much as three terms per block.
+Sometimes a block could have aliases that help users discover it while searching. For example, an image block could also want to be discovered by photo. You can do so by providing an array of unlimited terms (which are translated).
 
 ### Attributes
 
