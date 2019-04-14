@@ -301,7 +301,7 @@ See the [dynamic blocks documentation](https://wordpress.org/gutenberg/handbook/
 
 *   Type: `array`
 *   Optional
-*   Localized: No
+*   Localized: Yes (`label`)
 *   Property: `styleVariations`
 
 ```json
