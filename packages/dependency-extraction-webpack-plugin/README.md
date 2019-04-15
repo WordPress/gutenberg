@@ -46,11 +46,121 @@ For example:
 import { Component } from '@wordpress/element';
 
 // Webpack will produce the output output/entrypoint.js
-/* bundled JS output */
+/* bundled JavaScript output */
 
 // Webpack will also produce output/entrypoint.deps.json declaring script dependencies
 ['wp-element']
 ```
+
+**Note:** This plugin overlaps with the functionality provided by [webpack
+`externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract
+script handles from bundle compilation so that a list of script dependencies does not need to be
+manually maintained. If you don't need to extract a list of script dependencies, use the `externals`
+option directly.
+
+#### Options
+
+An object can be passed to the constructor to customize the behavior, for example:
+
+```js
+module.exports = {
+  plugins: [
+    new WordPressExternalDependenciesPlugin( { injectPolyfill: true } ),
+  ]
+}
+```
+
+##### `useDefaults`
+
+- Type: boolean
+- Default: `true`
+
+Pass `useDefaults: false` to disable the default plugin behavior. This will disable the handling of
+modules like `@wordpress/i18n`, `lodash`, and `jquery`.
+
+##### `injectPolyfill`
+
+- Type: boolean
+- Default: `false`
+
+Force `wp-polyfill` to be included in each entrypoint's dependency list. This would be the same as
+adding `import '@wordpress/polyfill';` to each entrypoint.
+
+##### `requestToExternal`
+
+- Type: function
+
+`requestToExternal` allows the module handling to be customized. The function should accept a
+module request string and may return a string representing the global variable to use.
+
+`requestToExternal` provided via configuration has precedence over default external handling.
+Unhandled requests will be handled by the default unless `useDefaults` is set to `false`.
+
+```js
+/**
+ * Externalize 'my-module'
+ *
+ * @param {string} request Requested module
+ *
+ * @return {(string|undefined)} Script global
+ */
+function requestToExternal( request ) {
+
+  // Handle imports like `import myModule from 'my-module'`
+  if ( request === 'my-module' ) {
+    // Expect to find `my-module` as myModule in the global scope:
+    return 'myModule';
+  }
+}
+
+module.exports = {
+  plugins: [
+    new WordPressExternalDependenciesPlugin( { requestToExternal } ),
+  ]
+}
+```
+
+##### `requestToHandle`
+
+- Type: function
+
+All of the external modules handled by the plugin are expected to be WordPress script dependencies
+and will be added to the dependency list. `requestToHandle` allows the script handle included in the dependency list to be customized.
+
+If no string is returned, the script handle is assumed to be the same as the request.
+
+`requestToHandle` provided via configuration has precedence over the defaults. Unhandled requests will be handled by the default unless `useDefaults` is set to `false`.
+
+```js
+/**
+ * Map 'my-module' request to 'my-module-script-handle'
+ *
+ * @param {string} request Requested module
+ *
+ * @return {(string|undefined)} Script global
+ */
+function requestToHandle( request ) {
+
+  // Handle imports like `import myModule from 'my-module'`
+  if ( request === 'my-module' ) {
+    // Expect to find `my-module` as myModule in the global scope:
+    return 'my-module-script-handle';
+  }
+}
+
+module.exports = {
+  plugins: [
+    new WordPressExternalDependenciesPlugin( { requestToExternal } ),
+  ]
+}
+```
+
+##### `requestToExternal` and `requestToHandle`
+
+The functions `requestToExternal` and `requestToHandle` allow this module to handle arbitrary
+modules. `requestToExternal` is necessary to handle any module and maps a module request to a global
+name. `requestToHandle` maps the same module request to a script handle, the strings that will be
+included in the `entrypoint.deps.json` files.
 
 ### WordPress
 
