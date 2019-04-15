@@ -28,6 +28,7 @@ describe( 'BlockModeToggle', () => {
 			<BlockModeToggle
 				blockType={ { supports: { html: true } } }
 				mode="visual"
+				isCodeEditingEnabled={ true }
 			/>
 		);
 		const text = wrapper.props.children;
@@ -40,6 +41,7 @@ describe( 'BlockModeToggle', () => {
 			<BlockModeToggle
 				blockType={ { supports: { html: true } } }
 				mode="html"
+				isCodeEditingEnabled={ true }
 			/>
 		);
 		const text = wrapper.props.children;
