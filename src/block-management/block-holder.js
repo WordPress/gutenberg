@@ -162,15 +162,13 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 			return null;
 		}
 
-		const { testID } = this.props;
-
+		const order = this.props.getBlockIndex( this.props.clientId, this.props.rootClientId );
 		return (
 			<InlineToolbar
-				clientId={ this.props.clientId }
 				onButtonPressed={ this.onInlineToolbarButtonPressed }
 				canMoveUp={ ! this.props.isFirstBlock }
 				canMoveDown={ ! this.props.isLastBlock }
-				testID={ testID }
+				rowIndex={ order }
 			/>
 		);
 	}

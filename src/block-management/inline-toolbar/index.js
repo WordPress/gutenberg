@@ -23,11 +23,10 @@ import InlineToolbarActions from './actions';
 export { InlineToolbarActions };
 
 type PropsType = {
-	clientId: string,
 	canMoveUp: boolean,
 	canMoveDown: boolean,
 	onButtonPressed: ( button: number ) => void,
-	testID: string,
+	rowIndex: number,
 };
 
 export default class InlineToolbar extends React.Component<PropsType> {
@@ -53,18 +52,31 @@ export default class InlineToolbar extends React.Component<PropsType> {
 	}
 
 	render() {
-		const { testID } = this.props;
+		const { rowIndex } = this.props;
+		const rowNumber = rowIndex + 1;
+		let moveUpButtonTitle = `Move up from row ${ rowNumber }`;
+		if ( this.props.canMoveUp ) {
+			moveUpButtonTitle += ` to row ${ rowNumber - 1 }`;
+		}
+
+		let moveDownButtonTitle = `Move down from row ${ rowNumber }`;
+		if ( this.props.canMoveDown ) {
+			moveDownButtonTitle += ` to row ${ rowNumber + 1 }`;
+		}
+
+		const removeButtonTitle = `Remove row ${ rowNumber }`;
+
 		return (
 			<View style={ styles.toolbar } >
 				<ToolbarButton
-					title={ __( `Move ${ testID } up` ) }
+					title={ __( moveUpButtonTitle ) }
 					isDisabled={ ! this.props.canMoveUp }
 					onClick={ this.onUpPressed }
 					icon="arrow-up-alt"
 				/>
 
 				<ToolbarButton
-					title={ __( `Move ${ testID } down` ) }
+					title={ __( moveDownButtonTitle ) }
 					isDisabled={ ! this.props.canMoveDown }
 					onClick={ this.onDownPressed }
 					icon="arrow-down-alt"
@@ -75,7 +87,7 @@ export default class InlineToolbar extends React.Component<PropsType> {
 				<InspectorControls.Slot />
 
 				<ToolbarButton
-					title={ __( `Remove ${ testID }` ) }
+					title={ __( removeButtonTitle ) }
 					onClick={ this.onDeletePressed }
 					icon="trash"
 				/>

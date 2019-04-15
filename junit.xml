@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="23" failures="0" time="9.606">
+  <testsuite name="HTMLInputView" errors="0" failures="0" skipped="0" timestamp="2019-04-10T14:32:43" time="2.229" tests="4">
+    <testcase classname="HTMLInputView HTMLInput renders" name="HTMLInputView HTMLInput renders" time="0.46">
+    </testcase>
+    <testcase classname="HTMLInputView HTMLInputView updates store and state on HTML text change" name="HTMLInputView HTMLInputView updates store and state on HTML text change" time="0.043">
+    </testcase>
+    <testcase classname="HTMLInputView HTMLInputView persists changes in HTML text input on blur" name="HTMLInputView HTMLInputView persists changes in HTML text input on blur" time="0.006">
+    </testcase>
+    <testcase classname="HTMLInputView HTMLInputView propagates title changes to store" name="HTMLInputView HTMLInputView propagates title changes to store" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="Paragraph block" errors="0" failures="0" skipped="0" timestamp="2019-04-10T14:32:43" time="3.965" tests="3">
+    <testcase classname="Paragraph block renders without crashing" name="Paragraph block renders without crashing" time="0.01">
+    </testcase>
+    <testcase classname="Paragraph block splits empty block on Enter" name="Paragraph block splits empty block on Enter" time="0.004">
+    </testcase>
+    <testcase classname="Paragraph block splits block on Enter with content on the middle" name="Paragraph block splits block on Enter with content on the middle" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="LinksUI" errors="0" failures="0" skipped="0" timestamp="2019-04-10T14:32:43" time="3.977" tests="3">
+    <testcase classname="LinksUI LinksUI renders" name="LinksUI LinksUI renders" time="0.009">
+    </testcase>
+    <testcase classname="LinksUI Links are removed when no text is in the URL field" name="LinksUI Links are removed when no text is in the URL field" time="0.024">
+    </testcase>
+    <testcase classname="LinksUI Links are saved when URL field has content" name="LinksUI Links are saved when URL field has content" time="0.004">
+    </testcase>
+  </testsuite>
+  <testsuite name="Code" errors="0" failures="0" skipped="0" timestamp="2019-04-10T14:32:43" time="4.037" tests="2">
+    <testcase classname="Code renders without crashing" name="Code renders without crashing" time="0.093">
+    </testcase>
+    <testcase classname="Code renders given text without crashing" name="Code renders given text without crashing" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="Parser" errors="0" failures="0" skipped="0" timestamp="2019-04-10T14:32:43" time="5.501" tests="2">
+    <testcase classname="Parser parses the more block ok" name="Parser parses the more block ok" time="0.007">
+    </testcase>
+    <testcase classname="Parser parses the more block attributes ok" name="Parser parses the more block attributes ok" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="Parser" errors="0" failures="0" skipped="0" timestamp="2019-04-10T14:32:43" time="5.578" tests="2">
+    <testcase classname="Parser parses the code block ok" name="Parser parses the code block ok" time="0.028">
+    </testcase>
+    <testcase classname="Parser parses the code block content ok" name="Parser parses the code block content ok" time="0.005">
+    </testcase>
+  </testsuite>
+  <testsuite name="Parser" errors="0" failures="0" skipped="0" timestamp="2019-04-10T14:32:43" time="5.597" tests="2">
+    <testcase classname="Parser parses the paragraph block ok" name="Parser parses the paragraph block ok" time="0.026">
+    </testcase>
+    <testcase classname="Parser parses the paragraph block content ok" name="Parser parses the paragraph block content ok" time="0.004">
+    </testcase>
+  </testsuite>
+  <testsuite name="AppContainer" errors="0" failures="0" skipped="0" timestamp="2019-04-10T14:32:43" time="6.222" tests="1">
+    <testcase classname="AppContainer detects unsupported block and sends hasUnsupportedBlocks true to native" name="AppContainer detects unsupported block and sends hasUnsupportedBlocks true to native" time="0.113">
+    </testcase>
+  </testsuite>
+  <testsuite name="App" errors="0" failures="0" skipped="0" timestamp="2019-04-10T14:32:43" time="7.17" tests="4">
+    <testcase classname="App renders without crashing" name="App renders without crashing" time="0.449">
+    </testcase>
+    <testcase classname="App renders without crashing with a block focused" name="App renders without crashing with a block focused" time="0.219">
+    </testcase>
+    <testcase classname="App Code block is a TextInput" name="App Code block is a TextInput" time="0.19">
+    </testcase>
+    <testcase classname="App Heading block test" name="App Heading block test" time="0.199">
+    </testcase>
+  </testsuite>
+</testsuites>
