@@ -47,7 +47,6 @@ function DropdownMenu( {
 			contentClassName={ classnames( 'components-dropdown-menu__popover', contentClassName ) }
 			position={ position }
 			renderToggle={ ( { isOpen, onToggle } ) => {
-				const buttonLabel = isFunction( label ) ? label( isOpen ) : label;
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
 						event.preventDefault();
@@ -63,9 +62,9 @@ function DropdownMenu( {
 						onKeyDown={ openOnArrowDown }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
-						label={ buttonLabel }
+						label={ label }
 						labelPosition={ labelPosition }
-						tooltip={ buttonLabel }
+						tooltip={ label }
 					>
 						{ icon !== 'ellipsis' && <span className="components-dropdown-menu__indicator" /> }
 					</IconButton>
