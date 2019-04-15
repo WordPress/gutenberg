@@ -61,7 +61,7 @@
     "prebundle:android": "yarn patch-metro-no-file-watch",
     "postbundle:android": "yarn un-patch-metro-no-file-watch",
     "bundle": "yarn bundle:android && yarn bundle:ios",
-    "bundle:android": "mkdir -p bundle/android && react-native bundle --platform android --dev false --entry-file index.js --assets-dest bundle/android --bundle-output bundle/android/App.js --sourcemap-output bundle/android/App.js.map --config rn-cli.bundle.config.js",
+    "bundle:android": "mkdir -p bundle/android && react-native bundle --platform android --dev false --entry-file index.js --assets-dest bundle/android --bundle-output bundle/android/App.js --sourcemap-output bundle/android/App.js.map",
     "bundle:ios": "mkdir -p bundle/ios && react-native bundle --platform ios --dev false --entry-file index.js --assets-dest bundle/ios --bundle-output bundle/ios/App.js --sourcemap-output bundle/ios/App.js.map",
     "i18n-cache": "node i18n-cache/index.js",
     "postinstall": "yarn i18n-cache",
