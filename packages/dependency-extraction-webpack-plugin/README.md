@@ -57,8 +57,8 @@ import { Component } from '@wordpress/element';
 Enqueue your script as usual and read the script dependencies dynamically:
 
 ```php
-$script_path      = 'path/to/script.js';
-$script_deps_path = 'path/to/script.deps.json';
+$script_path         = 'path/to/script.js';
+$script_deps_path    = 'path/to/script.deps.json';
 $script_dependencies = file_exists( $script_deps_path )
 	? json_decode( file_get_contents( $script_deps_path ) )
 	: array();
