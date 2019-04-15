@@ -94,10 +94,15 @@ class BlockEditorProvider extends Component {
 				// This happens when a previous input is explicitely marked as persistent.
 				( newIsPersistent && ! isPersistent )
 			) {
+				// When knowing the blocks value is changing, assign instance
+				// value to skip reset in subsequent `componentDidUpdate`.
+				if ( newBlocks !== blocks ) {
+					this.isSyncingOutcomingValue = true;
+				}
+
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
 
-				this.isSyncingOutcomingValue = true;
 				if ( isPersistent ) {
 					onChange( blocks );
 				} else {
