@@ -1,6 +1,7 @@
 module.exports = {
 	externals: {
-		rxjs: true,
+		'@wordpress/blob': 'wp.blob',
 		'rxjs/operators': 'rxjs.operators',
+		rxjs: true,
 	},
 };

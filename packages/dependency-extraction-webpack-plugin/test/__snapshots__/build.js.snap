@@ -43,7 +43,6 @@ Array [
 
 exports[`Build tests with-externs with-externs should produce expected output: Dependencies JSON should match snapshot 1`] = `
 Array [
-  "wp-blob",
   "wp-url",
 ]
 `;
@@ -51,7 +50,7 @@ Array [
 exports[`Build tests with-externs with-externs should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
-    "externalType": "root",
+    "externalType": "var",
     "request": "wp.blob",
     "userRequest": "@wordpress/blob",
   },
