@@ -87,7 +87,7 @@
     "test:e2e:build-app:android": "yarn test:e2e:bundle:android && cd android && ./gradlew clean && ./gradlew assembleDebug",
     "test:e2e:install-app:android": "cd android && ./gradlew installDebug",
     "test:e2e:bundle:ios": "react-native bundle --reset-cache --platform=ios --dev=false --minify false --entry-file=index.js --bundle-output=./ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle --assets-dest=./ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app",
-    "test:e2e:build-app:ios": "react-native run-ios --configuration Release --no-packager && yarn test:e2e:bundle:ios && cd ./ios/build/gutenberg/Build/Products/Release-iphonesimulator/; zip -r ./Gutenberg.app.zip ./gutenberg.app; mv ./Gutenberg.app.zip ../../../../../Gutenberg.app.zip ",
+    "test:e2e:build-app:ios": "react-native run-ios --configuration Release --no-packager && yarn test:e2e:bundle:ios && WORK_DIR=$(pwd) && cd ./ios/build/gutenberg/Build/Products/Release-iphonesimulator && zip -r $WORK_DIR/ios/Gutenberg.app.zip gutenberg.app",
     "test:e2e:install-app:ios": "yarn test:e2e:build-app:ios",
     "flow": "flow",
     "prettier": "prettier-eslint --write $npm_package_config_jsfiles $npm_package_config_scssfiles",

@@ -7,13 +7,9 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.Selection;
-import android.text.Spannable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.method.ArrowKeyMovementMethod;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.TextView;
 
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
@@ -68,6 +64,7 @@ public class ReactAztecText extends AztecText {
     // This is required to keep placeholder text working, and start typing with styled text.
     // Ref: https://github.com/wordpress-mobile/gutenberg-mobile/issues/707
     private String mTagName = "";
+    private String mEmptyTagHTML = "";
 
     private static final HashMap<ITextFormat, String> typingFormatsMap = new HashMap<ITextFormat, String>() {
         {
@@ -92,19 +89,28 @@ public class ReactAztecText extends AztecText {
         this.setAztecKeyListener(new ReactAztecText.OnAztecKeyListener() {
             @Override
             public boolean onEnterKey() {
-                if (shouldHandleOnEnter) {
+                if (shouldHandleOnEnter && !isTextChangedListenerDisabled()) {
                     return onEnter();
                 }
                 return false;
             }
             @Override
             public boolean onBackspaceKey() {
-                if (shouldHandleOnBackspace) {
-                    return onBackspace();
+                if (shouldHandleOnBackspace && !isTextChangedListenerDisabled()) {
+                    String content = toHtml(false);
+                    if (TextUtils.isEmpty(content)) {
+                        return onBackspace();
+                    }
+                    else {
+                        if (!content.equals(mEmptyTagHTML)) {
+                            return onBackspace();
+                        }
+                    }
                 }
                 return false;
             }
         });
+
         mInputMethodManager = (InputMethodManager)
                 Assertions.assertNotNull(getContext().getSystemService(Context.INPUT_METHOD_SERVICE));
         this.setOnSelectionChangedListener(new OnSelectionChangedListener() {
@@ -122,20 +128,7 @@ public class ReactAztecText extends AztecText {
         // Fixes https://github.com/wordpress-mobile/gutenberg-mobile/issues/602
         // onTakeFocus adapted from the Android source code at:
         //  https://android.googlesource.com/platform/frameworks/base/+/refs/heads/pie-release/core/java/android/text/method/ArrowKeyMovementMethod.java#316
-        setMovementMethod(new ArrowKeyMovementMethod() {
-            @Override
-            public void onTakeFocus(TextView view, Spannable text, int dir) {
-                if ((dir & (View.FOCUS_FORWARD | View.FOCUS_DOWN)) != 0) {
-                    if (view.getLayout() == null) {
-                        // This shouldn't be null, but do something sensible if it is.
-                        Selection.setSelection(text, 0); // <-- setting caret to start of text
-                    }
-                } else {
-                    Selection.setSelection(text, text.length());  // <-- same as original Android implementation. Not sure if we should change this too
-                }
-            }
-        });
-
+        setMovementMethod(new ReactAztecArrowKeyMovementMethod());
     }
 
     @Override
@@ -245,12 +238,14 @@ public class ReactAztecText extends AztecText {
     }
 
     public void setTagName(@Nullable String tagName) {
-        this.mTagName = tagName;
+        mTagName = tagName;
+        mEmptyTagHTML = "<" + mTagName + "></" + mTagName + ">";
     }
 
     public String getTagName() {
-        return this.mTagName;
+        return mTagName;
     }
+
 
     private void updateToolbarButtons(int selStart, int selEnd) {
         ArrayList<ITextFormat> appliedStyles = getAppliedStyles(selStart, selEnd);

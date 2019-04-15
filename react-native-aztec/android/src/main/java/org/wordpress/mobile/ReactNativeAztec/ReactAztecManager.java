@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -460,7 +459,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                         }
                     }
                 });
-
+        
         // Don't think we need to add setOnEditorActionListener here (intercept Enter for example), but
         // in case check ReactTextInputManager
     }
@@ -516,9 +515,19 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                             start,
                             start + before));
 
-            // Add the outer tags when the field was started empty, and only the first time the user types in it.
-            if (mPreviousText.length() == 0 && !TextUtils.isEmpty(newText) && !TextUtils.isEmpty(mEditText.getTagName())) {
-                mEditText.fromHtml('<' + mEditText.getTagName() + '>' + newText + "</" + mEditText.getTagName() + '>', false);
+
+            if (mPreviousText.length() == 0
+                    && !TextUtils.isEmpty(newText)
+                    && !TextUtils.isEmpty(mEditText.getTagName())
+                    && mEditText.getSelectedStyles().isEmpty()) {
+
+                // Some block types (e.g. header block ) need to be created with default style  (e.g. h2)
+                // In order to achieve that, we need to toggle formatting with proper style,
+                // otherwise header block won't be created with style, it will be presented as plain text
+                ReactAztecTextFormatEnum reactAztecTextFormat = ReactAztecTextFormatEnum.get(mEditText.getTagName());
+                if (reactAztecTextFormat != null) {
+                    mEditText.toggleFormatting(reactAztecTextFormat.getAztecTextFormat());
+                }
             }
         }
 
