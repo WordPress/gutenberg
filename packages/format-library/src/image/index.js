@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG, TextControl, Popover, IconButton, PositionedAtSelection } from '@wordpress/components';
+import { Path, SVG, TextControl, Popover, IconButton, __unstablePositionedAtSelection } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { insertObject } from '@wordpress/rich-text';
@@ -113,7 +113,7 @@ export const image = {
 							return null;
 						} }
 					/> }
-					{ isObjectActive && <PositionedAtSelection key={ key }>
+					{ isObjectActive && <__unstablePositionedAtSelection key={ key }>
 						<Popover
 							position="bottom center"
 							focusOnMount={ false }
@@ -155,7 +155,7 @@ export const image = {
 							</form>
 							{ /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */ }
 						</Popover>
-					</PositionedAtSelection> }
+					</__unstablePositionedAtSelection> }
 				</MediaUploadCheck>
 			);
 		}

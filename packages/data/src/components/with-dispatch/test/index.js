@@ -34,8 +34,13 @@ describe( 'withDispatch', () => {
 
 			return {
 				increment: () => {
-					const actionReturnedFromDispatch = _dispatch( 'counter' ).increment( count );
-					expect( actionReturnedFromDispatch ).toBe( undefined );
+					const actionReturnedFromDispatch = Promise.resolve( _dispatch( 'counter' ).increment( count ) );
+					expect( actionReturnedFromDispatch ).resolves.toEqual(
+						{
+							type: 'increment',
+							count,
+						}
+					);
 				},
 			};
 		} )( ( props ) => <button onClick={ props.increment } /> );
@@ -120,7 +125,8 @@ describe( 'withDispatch', () => {
 		expect( secondRegistryAction ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'always calls select with the latest state in the handler passed to the component', () => {
+	it( 'always calls select with the latest state in the handler passed to ' +
+		'the component', () => {
 		const store = registry.registerStore( 'counter', {
 			reducer: ( state = 0, action ) => {
 				if ( action.type === 'update' ) {
@@ -142,8 +148,13 @@ describe( 'withDispatch', () => {
 				update: () => {
 					const innerCount = _select( 'counter' ).getCount();
 					expect( innerCount ).toBe( outerCount );
-					const actionReturnedFromDispatch = _dispatch( 'counter' ).update( innerCount + 1 );
-					expect( actionReturnedFromDispatch ).toBe( undefined );
+					const actionReturnedFromDispatch = Promise.resolve(
+						_dispatch( 'counter' ).update( innerCount + 1 )
+					);
+					expect( actionReturnedFromDispatch ).resolves.toEqual( {
+						type: 'update',
+						count: innerCount + 1,
+					} );
 				},
 			};
 		} )( ( props ) => <button onClick={ props.update } /> );

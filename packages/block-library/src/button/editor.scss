@@ -40,7 +40,11 @@
 		.wp-block-button__link {
 			max-width: 100%;
 			overflow: hidden;
-			white-space: nowrap;
+			// Override is allowed here only because the rich text instance in
+			// a preview is not editable.
+			// To do: use the `save` function to preview a block transform, not
+			// the `edit` function.
+			white-space: nowrap !important;
 			text-overflow: ellipsis;
 		}
 	}
