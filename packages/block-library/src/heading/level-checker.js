@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flatMap } from 'lodash';
+import { countBy, flatMap, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,7 +39,7 @@ export const computeOutlineHeadings = ( blocks = [], path = [] ) => {
 	} );
 };
 
-export const HeadingLevelChecker = ( { blocks = [], selectedHeadingId } ) => {
+export const HeadingLevelChecker = ( { blocks = [], title, isTitleSupported, selectedHeadingId } ) => {
 	const headings = computeOutlineHeadings( blocks );
 
 	// Iterate headings to find prevHeadingLevel and selectedLevel
@@ -55,17 +55,26 @@ export const HeadingLevelChecker = ( { blocks = [], selectedHeadingId } ) => {
 		}
 	}
 
-	const isIncorrectLevel = ( selectedLevel === 1 || selectedLevel > prevHeadingLevel + 1 );
+	const titleNode = document.querySelector( '.editor-post-title__input' );
+	const hasTitle = isTitleSupported && title && titleNode;
+	const countByLevel = countBy( headings, 'level' );
+	const hasMultipleH1 = countByLevel[ 1 ] > 1;
+	const isIncorrectLevel = selectedLevel > prevHeadingLevel + 1;
 
-	if ( ! isIncorrectLevel ) {
+	let msg = '';
+	if ( isIncorrectLevel ) {
+		msg = __( 'This heading level is incorrect.' );
+	} else if ( selectedLevel === 1 && hasMultipleH1 ) {
+		msg = __( 'Multiple H1 headings found.' );
+	} else if ( selectedLevel === 1 && hasTitle && ! hasMultipleH1 ) {
+		msg = __( 'H1 is already used for the post title.' );
+	} else {
 		return null;
 	}
 
-	const msg = __( 'This heading level is incorrect. ' );
-
 	// For accessibility
 	useEffect( () => {
-		speak( __( 'This heading level is incorrect' ) );
+		speak( msg );
 	}, [ selectedLevel ] );
 
 	return (
@@ -80,9 +89,14 @@ export const HeadingLevelChecker = ( { blocks = [], selectedHeadingId } ) => {
 export default compose(
 	withSelect( ( select ) => {
 		const { getBlocks } = select( 'core/block-editor' );
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
 			blocks: getBlocks(),
+			title: getEditedPostAttribute( 'title' ),
+			isTitleSupported: get( postType, [ 'supports', 'title' ], false ),
 		};
 	} )
 )( HeadingLevelChecker );
