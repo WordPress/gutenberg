@@ -4,10 +4,10 @@ exports[`MoreMenu should match snapshot 1`] = `
 <MoreMenu>
   <DropdownMenu
     className="edit-post-more-menu"
-    contentClassName="edit-post-more-menu__content"
     icon="ellipsis"
-    label={[Function]}
+    label="More tools & options"
     labelPosition="bottom"
+    popoverClassName="edit-post-more-menu__content"
     position="bottom left"
   >
     <Dropdown
@@ -25,20 +25,20 @@ exports[`MoreMenu should match snapshot 1`] = `
           aria-haspopup="true"
           className="components-dropdown-menu__toggle"
           icon="ellipsis"
-          label="Show more tools & options"
+          label="More tools & options"
           labelPosition="bottom"
           onClick={[Function]}
           onKeyDown={[Function]}
-          tooltip="Show more tools & options"
+          tooltip="More tools & options"
         >
           <Tooltip
             position="bottom"
-            text="Show more tools & options"
+            text="More tools & options"
           >
             <ForwardRef(Button)
               aria-expanded={false}
               aria-haspopup="true"
-              aria-label="Show more tools & options"
+              aria-label="More tools & options"
               className="components-icon-button components-dropdown-menu__toggle"
               onBlur={[Function]}
               onClick={[Function]}
@@ -50,7 +50,7 @@ exports[`MoreMenu should match snapshot 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup="true"
-                aria-label="Show more tools & options"
+                aria-label="More tools & options"
                 className="components-button components-icon-button components-dropdown-menu__toggle"
                 onBlur={[Function]}
                 onClick={[Function]}
