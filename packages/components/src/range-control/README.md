@@ -184,6 +184,14 @@ The maximum value accepted. If higher values are inserted onChange will not be c
 - Type: `Number`
 - Required: No
 
+#### step
+
+This property can be used to change the number by which the value increments or decrements when the slider is moved.
+
+- Type: `Number`
+- Required: No
+- Default: 1
+
 ## Related components
 
 - To collect a numerical input in a text field, use the `TextControl` component.
