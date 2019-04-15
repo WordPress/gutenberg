@@ -1,34 +1,23 @@
 /**
 * @format
 * @flow
-*/
+ */
 
 /**
  * External dependencies
  */
 import React from 'react';
-import {
-	View,
-	Text,
-	TouchableWithoutFeedback,
-	NativeSyntheticEvent,
-	NativeTouchEvent,
-	Keyboard,
-} from 'react-native';
+import { Keyboard, NativeSyntheticEvent, NativeTouchEvent, Text, TouchableWithoutFeedback, View } from 'react-native';
 import TextInputState from 'react-native/lib/TextInputState';
-import {
-	requestImageUploadCancel,
-} from 'react-native-gutenberg-bridge';
-
+import { requestImageUploadCancel } from 'react-native-gutenberg-bridge';
 /**
  * WordPress dependencies
  */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { addAction, removeAction, hasAction } from '@wordpress/hooks';
+import { addAction, hasAction, removeAction } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
 import { BlockEdit } from '@wordpress/block-editor';
-
 /**
  * Internal dependencies
  */
@@ -44,7 +33,6 @@ type PropsType = BlockType & {
 	isLastBlock: boolean,
 	showTitle: boolean,
 	borderStyle: Object,
-	testID: string,
 	focusedBorderColor: string,
 	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
 	getPreviousBlockClientId: ( clientId: string ) => string,
@@ -190,6 +178,17 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		);
 	}
 
+	getAccessibilityLabelForBlock() {
+		const { clientId, rootClientId } = this.props;
+		const order = this.props.getBlockIndex( clientId, rootClientId );
+		const name = this.props.getBlockName( clientId );
+		let blockType = getBlockType( name ).title;
+
+		blockType = blockType === 'Unrecognized Block' ? blockType : blockType + ' Block';
+
+		return `${ blockType }. Row ${ order }.`;
+	}
+
 	renderBlockTitle() {
 		return (
 			<View style={ styles.blockTitle }>
@@ -199,23 +198,24 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	render() {
-		const { isSelected, borderStyle, focusedBorderColor, testID } = this.props;
+		const { isSelected, borderStyle, focusedBorderColor, clientId, rootClientId } = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
+
+		const accessibilityLabel = this.getAccessibilityLabelForBlock( clientId, rootClientId );
 
 		return (
 			// accessible prop needs to be false to access children
 			// https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
 			<TouchableWithoutFeedback
 				accessible={ false }
-				accessibilityLabel="block-container"
 				onPress={ this.onFocus } >
 
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View
 						accessibile={ true }
-						accessibilityLabel={ testID }
+						accessibilityLabel={ accessibilityLabel }
 						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
 						{ this.getBlockForType() }
 					</View>
