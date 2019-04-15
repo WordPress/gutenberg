@@ -9,6 +9,7 @@ import {
 	throttle,
 } from 'lodash';
 import { useSpring, animated, interpolate } from 'react-spring';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -36,7 +37,7 @@ const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
 	);
 };
 
-const BlockListItemWrapper = ( { blockClientIds, ...props } ) => {
+const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } ) => {
 	const ref = useRef( null );
 	const [ resetAnimation, updateReset ] = useState( false );
 	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
@@ -58,20 +59,49 @@ const BlockListItemWrapper = ( { blockClientIds, ...props } ) => {
 		}
 	}, [ resetAnimation ] );
 	const animationProps = useSpring( {
-		from: transform,
-		to: { x: 0, y: 0 },
+		from: {
+			...transform,
+		//	opacity: 0,
+		//	scale: 0,
+		},
+		to: {
+			x: 0,
+			y: 0,
+		//	scale: isBlockInSelection ? 1 : 0,
+		//	opacity: isBlockInSelection ? 0 : 1,
+		},
 		reset: resetAnimation,
 		config: { tension: 300 },
 	} );
 
 	return (
-		<animated.div ref={ ref } className="animated-container" data-client-id={ props.clientId } style={ {
-			position: 'relative',
-			transform: interpolate(
-				[ animationProps.x, animationProps.y ],
-				( x, y ) => `translate3d(${ x }px,${ y }px,0)`
-			),
-		} }>
+		<animated.div
+			ref={ ref }
+			className={ classnames( 'animated-container', {
+				'is-in-selection': isBlockInSelection,
+			} ) }
+			data-client-id={ props.clientId }
+			style={ {
+				position: 'relative',
+				transformOrigin: 'center',
+				/* opacity: animationProps.opacity.interpolate( {
+					range: [ 0, 0.2, 0.8, 1 ],
+					output: [ 1, 0.5, 0.5, 1 ],
+				} ), */
+				transform: interpolate(
+					[
+						animationProps.x,
+						// eslint-disable-next-line
+						animationProps.y
+						/*	animationProps.scale.interpolate( {
+							range: [ 0, 0.2, 0.8, 1 ],
+							output: [ 1, 1.02, 1.02, 1 ],
+						} ),*/
+					],
+					( x, y/*, scale*/ ) => `translate3d(${ x }px,${ y }px,0)` // +  `scale(${ scale })`
+				),
+			} }
+		>
 			<BlockListBlock
 				{ ...props }
 			/>
@@ -111,6 +141,7 @@ const BlockListUI = ( {
 							isLast={ blockIndex === blockClientIds.length - 1 }
 							isDraggable={ isDraggable }
 							blockClientIds={ blockClientIds }
+							isBlockInSelection={ isBlockInSelection }
 						/>
 					</AsyncModeProvider>
 				);
