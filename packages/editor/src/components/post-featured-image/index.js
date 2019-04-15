@@ -103,21 +103,19 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 					</MediaUploadCheck>
 				}
 				{ ! featuredImageId &&
-					<div>
-						<MediaUploadCheck fallback={ instructions }>
-							<MediaUpload
-								title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
-								onSelect={ onUpdateImage }
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								modalClass="editor-post-featured-image__media-modal"
-								render={ ( { open } ) => (
-									<Button className="editor-post-featured-image__toggle" onClick={ open }>
-										{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-									</Button>
-								) }
-							/>
-						</MediaUploadCheck>
-					</div>
+				<MediaUploadCheck fallback={ instructions }>
+					<MediaUpload
+						title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
+						onSelect={ onUpdateImage }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						modalClass="editor-post-featured-image__media-modal"
+						render={ ( { open } ) => (
+							<Button className="editor-post-featured-image__toggle" onClick={ open }>
+								{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+							</Button>
+						) }
+					/>
+				</MediaUploadCheck>
 				}
 				{ !! featuredImageId &&
 					<MediaUploadCheck>
