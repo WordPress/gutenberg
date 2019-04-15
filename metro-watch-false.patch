@@ -1,0 +1,11 @@
+--- node_modules/metro/src/node-haste/DependencyGraph.js    2019-04-15 18:39:31.027000000 +0300
++++ node_modules/metro/src/node-haste/DependencyGraph.js    2019-04-15 18:38:19.295000000 +0300
+@@ -138,7 +138,7 @@
+       roots: config.watchFolders,
+       throwOnModuleCollision: true,
+       useWatchman: config.resolver.useWatchman,
+-      watch: true
++      watch: false
+     });
+   }
+
