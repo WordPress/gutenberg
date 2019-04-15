@@ -93,3 +93,25 @@ Array [
   },
 ]
 `;
+
+exports[`Build tests wordpress-require wordpress-require should produce expected output: Dependencies JSON should match snapshot 1`] = `
+Array [
+  "lodash",
+  "wp-blob",
+]
+`;
+
+exports[`Build tests wordpress-require wordpress-require should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "root",
+    "request": "wp.blob",
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "root",
+    "request": "lodash",
+    "userRequest": "lodash",
+  },
+]
+`;
