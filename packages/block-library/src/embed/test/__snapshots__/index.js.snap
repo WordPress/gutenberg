@@ -45,6 +45,17 @@ exports[`core/embed block edit matches snapshot 1`] = `
         Embed
       </button>
     </form>
+    <div
+      class="components-placeholder__cancel"
+    >
+      <button
+        class="components-button block-editor-embed-placeholder__cancel-button is-link"
+        title="Cancel"
+        type="button"
+      >
+        Cancel
+      </button>
+    </div>
   </div>
 </div>
 `;
