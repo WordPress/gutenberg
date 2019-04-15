@@ -72,7 +72,7 @@ const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } 
 		//	opacity: isBlockInSelection ? 0 : 1,
 		},
 		reset: resetAnimation,
-		config: { tension: 300 },
+		config: { mass: 5, tension: 2000, friction: 200 },
 	} );
 
 	return (
