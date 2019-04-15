@@ -1,10 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Build tests no-default no-default should produce expected output 1`] = `Array []`;
+exports[`Build tests no-default no-default should produce expected output: Dependencies JSON should match snapshot 1`] = `Array []`;
 
-exports[`Build tests no-deps no-deps should produce expected output 1`] = `Array []`;
+exports[`Build tests no-default no-default should produce expected output: External modules should match snapshot 1`] = `Array []`;
 
-exports[`Build tests overrides overrides should produce expected output 1`] = `
+exports[`Build tests no-deps no-deps should produce expected output: Dependencies JSON should match snapshot 1`] = `Array []`;
+
+exports[`Build tests no-deps no-deps should produce expected output: External modules should match snapshot 1`] = `Array []`;
+
+exports[`Build tests overrides overrides should produce expected output: Dependencies JSON should match snapshot 1`] = `
 Array [
   "wp-blob",
   "wp-script-handle-for-rxjs",
@@ -12,16 +16,81 @@ Array [
 ]
 `;
 
-exports[`Build tests with-externs with-externs should produce expected output 1`] = `
+exports[`Build tests overrides overrides should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "root",
+    "request": "wp.blob",
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "root",
+    "request": "wp.url",
+    "userRequest": "@wordpress/url",
+  },
+  Object {
+    "externalType": "root",
+    "request": "rxjs.operators",
+    "userRequest": "rxjs/operators",
+  },
+  Object {
+    "externalType": "root",
+    "request": "rxjs",
+    "userRequest": "rxjs",
+  },
+]
+`;
+
+exports[`Build tests with-externs with-externs should produce expected output: Dependencies JSON should match snapshot 1`] = `
 Array [
   "wp-blob",
   "wp-url",
 ]
 `;
 
-exports[`Build tests wordpress wordpress should produce expected output 1`] = `
+exports[`Build tests with-externs with-externs should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "root",
+    "request": "wp.blob",
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "root",
+    "request": "wp.url",
+    "userRequest": "@wordpress/url",
+  },
+  Object {
+    "externalType": "var",
+    "request": "rxjs.operators",
+    "userRequest": "rxjs/operators",
+  },
+  Object {
+    "externalType": "var",
+    "request": "rxjs",
+    "userRequest": "rxjs",
+  },
+]
+`;
+
+exports[`Build tests wordpress wordpress should produce expected output: Dependencies JSON should match snapshot 1`] = `
 Array [
   "lodash",
   "wp-blob",
+]
+`;
+
+exports[`Build tests wordpress wordpress should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "root",
+    "request": "wp.blob",
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "root",
+    "request": "lodash",
+    "userRequest": "lodash",
+  },
 ]
 `;

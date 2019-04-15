@@ -16,8 +16,6 @@ const DependencyExtractionWebpackPlugin = require( '..' );
 describe( 'Build tests', () => {
 	afterAll( () => rimraf( path.join( __dirname, 'build' ) ) );
 
-	// jest.setTimeout( 20000 );
-
 	const fixturesPath = path.join( __dirname, 'fixtures' );
 	const configFixtures = fs.readdirSync( fixturesPath ).sort();
 
@@ -36,7 +34,11 @@ describe( 'Build tests', () => {
 							context: testDirectory,
 							entry: './index.js',
 							mode: 'production',
-							optimization: { minimize: false },
+							optimization: {
+								minimize: false,
+								namedChunks: true,
+								namedModules: true,
+							},
 							output: {},
 						},
 						require( path.join( testDirectory, 'webpack.config.js' ) )
@@ -46,7 +48,7 @@ describe( 'Build tests', () => {
 						options.plugins = [ new DependencyExtractionWebpackPlugin() ];
 					}
 
-					webpack( options, ( err ) => {
+					webpack( options, ( err, stats ) => {
 						expect( err ).toBeNull();
 
 						const depsFiles = glob( `${ outputDirectory }/*.deps.json` );
@@ -54,9 +56,24 @@ describe( 'Build tests', () => {
 							typeof options.entry === 'object' ? Object.keys( options.entry ).length : 1;
 						expect( depsFiles ).toHaveLength( expectedLength );
 
+						// Deps files should match
 						depsFiles.forEach( ( depsFile ) => {
-							expect( require( depsFile ) ).toMatchSnapshot();
+							expect( require( depsFile ) ).toMatchSnapshot(
+								'Dependencies JSON should match snapshot'
+							);
 						} );
+
+						// Webpack stats external modules should match
+						const externalModules = stats.compilation.modules
+							.filter( ( { external } ) => external )
+							.sort()
+							.map( ( module ) => ( {
+								externalType: module.externalType,
+								request: module.request,
+								userRequest: module.userRequest,
+							} ) );
+						expect( externalModules ).toMatchSnapshot( 'External modules should match snapshot' );
+
 						resolve();
 					} );
 				} ) );
