@@ -58,6 +58,10 @@ script handles from bundle compilation so that a list of script dependencies doe
 manually maintained. If you don't need to extract a list of script dependencies, use the `externals`
 option directly.
 
+This plugin is compatible with `externals`, but they may conflict. For example, adding
+`{ externals: { '@wordpress/blob': 'wp.blob' } }` to webpack configuration will effectively hide the
+`@wordpress/blob` module from the plugin and it will not be included in dependency lists.
+
 #### Options
 
 An object can be passed to the constructor to customize the behavior, for example:
