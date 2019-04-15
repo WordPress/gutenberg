@@ -39,7 +39,9 @@ export function BlockSettingsMenu( { clientIds } ) {
 						label={ __( 'More options' ) }
 						position="bottom right"
 						className="block-editor-block-settings-menu"
-						contentClassName="block-editor-block-settings-menu__popover editor-block-settings-menu__popover"
+						toggleClassName="block-editor-block-settings-menu__toggle editor-block-settings-menu__toggle"
+						menuClassName="block-editor-block-settings-menu__content editor-block-settings-menu__content"
+						popoverClassName="block-editor-block-settings-menu__popover editor-block-settings-menu__popover"
 					>
 						{ ( { onClose } ) => (
 							<>
@@ -58,6 +60,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 								) }
 								{ ! isLocked && canDuplicate && (
 									<MenuItem
+										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 										onClick={ flow( onClose, onDuplicate ) }
 										icon="admin-page"
 										shortcut={ shortcuts.duplicate.display }
@@ -68,6 +71,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 								{ ! isLocked && (
 									<>
 										<MenuItem
+											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onInsertBefore ) }
 											icon="insert-before"
 											shortcut={ shortcuts.insertBefore.display }
@@ -75,6 +79,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											{ __( 'Insert Before' ) }
 										</MenuItem>
 										<MenuItem
+											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onInsertAfter ) }
 											icon="insert-after"
 											shortcut={ shortcuts.insertAfter.display }
@@ -95,6 +100,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 								<DropdownMenuSeparator />
 								{ ! isLocked && (
 									<MenuItem
+										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 										onClick={ flow( onClose, onRemove ) }
 										icon="trash"
 										shortcut={ shortcuts.removeBlock.display }
