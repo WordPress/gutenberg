@@ -36,9 +36,10 @@ export function BlockSettingsMenu( { clientIds } ) {
 				<Toolbar>
 					<DropdownMenu
 						icon="ellipsis"
-						label={ __( 'Block options' ) }
+						label={ __( 'More options' ) }
 						position="bottom right"
 						className="block-editor-block-settings-menu"
+						contentClassName="block-editor-block-settings-menu__popover editor-block-settings-menu__popover"
 					>
 						{ ( { onClose } ) => (
 							<>
