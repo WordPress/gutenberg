@@ -273,7 +273,8 @@ The `build` and `start` commands use [webpack](https://webpack.js.org/) behind t
 * [Output](https://webpack.js.org/configuration/output): `build/index.js`
 * [Plugins](https://webpack.js.org/configuration/plugins): The webpack plugin provided by
 [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) is used
-with the default configuration.
+with the default configuration to ensure that WordPress provided scripts are not included in the
+built bundle.
 
 #### Provide your own webpack config
 
