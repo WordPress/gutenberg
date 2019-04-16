@@ -66,6 +66,7 @@
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
 		"@wordpress/browserslist-config": "file:packages/browserslist-config",
 		"@wordpress/custom-templated-path-webpack-plugin": "file:packages/custom-templated-path-webpack-plugin",
+		"@wordpress/dependency-extraction-webpack-plugin": "file:packages/dependency-extraction-webpack-plugin",
 		"@wordpress/docgen": "file:packages/docgen",
 		"@wordpress/e2e-test-utils": "file:packages/e2e-test-utils",
 		"@wordpress/e2e-tests": "file:packages/e2e-tests",
