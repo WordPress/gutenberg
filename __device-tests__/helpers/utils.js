@@ -35,6 +35,13 @@ const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
 const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs
 let appiumProcess: ?childProcess.ChildProcess;
 
+// Used to map unicode and special values to keycodes on Android
+// Docs for keycode values: https://developer.android.com/reference/android/view/KeyEvent.html
+const strToKeycode = {
+	'\n': 66,
+	'\u0008': 67,
+};
+
 const timer = ( ms: number ) => new Promise < {} > ( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
@@ -122,9 +129,13 @@ const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
 // attempts to type a string to a given element, need for this stems from
 // https://github.com/appium/appium/issues/12285#issuecomment-471872239
 // https://github.com/facebook/WebDriverAgent/issues/1084
-const typeString = async ( element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean = false ) => {
+const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean = false ) => {
 	if ( clear ) {
 		await element.clear();
+	}
+
+	if ( isAndroid() && str in strToKeycode ) {
+		return await driver.pressKeycode( strToKeycode[ str ] );
 	}
 
 	return await element.type( str );

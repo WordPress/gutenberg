@@ -82,7 +82,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 			removeAction( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks' );
 			requestImageUploadCancel( mediaId );
 		}
-	}
+	};
 
 	onInlineToolbarButtonPressed = ( button: number ) => {
 		Keyboard.dismiss();
@@ -186,7 +186,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 
 		blockType = blockType === 'Unrecognized Block' ? blockType : blockType + ' Block';
 
-		return `${ blockType }. Row ${ order }.`;
+		return `${ blockType }. Row ${ order + 1 }.`; // Use one indexing for better accessibility
 	}
 
 	renderBlockTitle() {
@@ -198,11 +198,11 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	render() {
-		const { isSelected, borderStyle, focusedBorderColor, clientId, rootClientId } = this.props;
+		const { isSelected, borderStyle, focusedBorderColor } = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
-		const accessibilityLabel = this.getAccessibilityLabelForBlock( clientId, rootClientId );
+		const accessibilityLabel = this.getAccessibilityLabelForBlock();
 
 		return (
 			// accessible prop needs to be false to access children

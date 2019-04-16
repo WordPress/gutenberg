@@ -43,61 +43,61 @@ describe( 'Gutenberg Editor tests', () => {
 
 	it( 'should be able to add a new Paragraph block', async () => {
 		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
+		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
-		await editorPage.removeBlockAtPosition( 0 );
+		await editorPage.removeBlockAtPosition( 1 );
 	} );
 
 	it( 'should be able to split one paragraph block into two', async () => {
 		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
+		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
 		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickMiddleOfElement( driver, textViewElement );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n' );
-		expect( await editorPage.hasParagraphBlockAtPosition( 0 ) && await editorPage.hasParagraphBlockAtPosition( 1 ) )
+		expect( await editorPage.hasParagraphBlockAtPosition( 1 ) && await editorPage.hasParagraphBlockAtPosition( 2 ) )
 			.toBe( true );
 
-		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 0 );
-		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
 		expect( text0 ).not.toBe( '' );
 		expect( text1 ).not.toBe( '' );
 		expect( testData.shortText ).toMatch( new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` ) );
 
+		await editorPage.removeBlockAtPosition( 2 );
 		await editorPage.removeBlockAtPosition( 1 );
-		await editorPage.removeBlockAtPosition( 0 );
 	} );
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
 		await editorPage.addNewParagraphBlock();
-		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
+		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
 		let textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickMiddleOfElement( driver, textViewElement );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n' );
-		expect( await editorPage.hasParagraphBlockAtPosition( 0 ) && await editorPage.hasParagraphBlockAtPosition( 1 ) )
+		expect( await editorPage.hasParagraphBlockAtPosition( 1 ) && await editorPage.hasParagraphBlockAtPosition( 2 ) )
 			.toBe( true );
 
-		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 0 );
-		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
+		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
+		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
 		textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickBeginningOfElement( driver, textViewElement );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\u0008' );
 
-		const text = await editorPage.getTextForParagraphBlockAtPosition( 0 );
+		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( text );
 
-		expect( await editorPage.hasParagraphBlockAtPosition( 1 ) ).toBe( false );
-		await editorPage.removeBlockAtPosition( 0 );
+		expect( await editorPage.hasParagraphBlockAtPosition( 2 ) ).toBe( false );
+		await editorPage.removeBlockAtPosition( 1 );
 	} );
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
 		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 0 );
+		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.longText );
 
-		for ( let i = 3; i > -1; i-- ) {
+		for ( let i = 4; i > 0; i-- ) {
 			await editorPage.removeBlockAtPosition( i );
 		}
 	} );
