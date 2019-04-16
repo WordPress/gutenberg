@@ -134,11 +134,30 @@ const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.Promise
 		await element.clear();
 	}
 
-	if ( isAndroid() && str in strToKeycode ) {
-		return await driver.pressKeycode( strToKeycode[ str ] );
-	}
+	if ( isAndroid() ) {
+		if ( str in strToKeycode ) {
+			return await driver.pressKeycode( strToKeycode[ str ] );
+		}
+		const paragraphs = str.split( '\n' );
 
-	return await element.type( str );
+		if ( paragraphs.length > 1 ) {
+			for ( let i = 0; i < paragraphs.length; i++ ) {
+				const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
+				if ( paragraph in strToKeycode ) {
+					await driver.driver.pressKeycode( strToKeycode[ str ] );
+				} else {
+					await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', paragraph ] } );
+				}
+				if ( i !== paragraphs.length - 1 ) {
+					await driver.pressKeycode( strToKeycode[ '\n' ] );
+				}
+			}
+		} else {
+			await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', str.replace( /[ ]/g, '%s' ) ] } );
+		}
+	} else {
+		return await element.type( str );
+	}
 };
 
 const clickMiddleOfElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
