@@ -87,6 +87,19 @@ describe( 'receiveAutosaves', () => {
 			autosaves,
 		} );
 	} );
+
+	it( 'converts singular autosaves into an array', () => {
+		const postId = 1;
+		const autosave = {
+			content: 'test 1',
+		};
+
+		expect( receiveAutosaves( postId, autosave ) ).toEqual( {
+			type: 'RECEIVE_AUTOSAVES',
+			postId,
+			autosaves: [ autosave ],
+		} );
+	} );
 } );
 
 describe( 'receiveCurrentUser', () => {

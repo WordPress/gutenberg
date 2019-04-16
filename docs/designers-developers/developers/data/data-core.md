@@ -332,4 +332,4 @@ post have been received.
 *Parameters*
 
  * postId: The id of the post that is parent to the autosave.
- * autosaves: Array of autosave post objects.
+ * autosaves: An array of autosaves or singular autosave object.

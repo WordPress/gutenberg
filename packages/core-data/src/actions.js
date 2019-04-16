@@ -178,8 +178,8 @@ export function receiveUserPermission( key, isAllowed ) {
  * Returns an action object used in signalling that the autosaves for a
  * post have been received.
  *
- * @param {number} postId    The id of the post that is parent to the autosave.
- * @param {Array}  autosaves Array of autosave post objects.
+ * @param {number}       postId    The id of the post that is parent to the autosave.
+ * @param {Array|Object} autosaves An array of autosaves or singular autosave object.
  *
  * @return {Object} Action object.
  */
@@ -187,6 +187,6 @@ export function receiveAutosaves( postId, autosaves ) {
 	return {
 		type: 'RECEIVE_AUTOSAVES',
 		postId,
-		autosaves,
+		autosaves: castArray( autosaves ),
 	};
 }
