@@ -184,6 +184,24 @@ class ButtonEdit extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
+<<<<<<< HEAD
+=======
+				{ isSelected && (
+					<URLPopover
+						focusOnMount={ false }
+						position={ popoverPosition }
+					>
+						<form
+							className="editor-format-toolbar__link-container-content"
+							onSubmit={ ( event ) => event.preventDefault() }>
+							<URLInput
+								value={ url }
+								onChange={ ( value ) => setAttributes( { url: value } ) }
+							/>
+						</form>
+					</URLPopover>
+				) }
+>>>>>>> Moved 'Open in New Tab' toggle to InspectorControls
 			</div>
 		);
 	}
