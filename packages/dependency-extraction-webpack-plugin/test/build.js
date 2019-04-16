@@ -23,7 +23,10 @@ configFixtures.forEach( ( configCase ) => {
 		const testDirectory = path.join( fixturesPath, configCase );
 		const outputDirectory = path.join( __dirname, 'build', configCase );
 
-		beforeAll( () => mkdirp( outputDirectory ) );
+		beforeAll( () => {
+			rimraf( outputDirectory );
+			mkdirp( outputDirectory );
+		} );
 		afterAll( () => rimraf( outputDirectory ) );
 
 		test( 'should produce expected output', () =>
