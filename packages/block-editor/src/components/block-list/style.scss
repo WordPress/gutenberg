@@ -146,15 +146,6 @@
 				}
 			}
 		}
-
-		// Add extra padding and border when there are child blocks.
-		.block-editor-inner-blocks {
-			padding: $block-padding;
-
-			.block-editor-block-list__layout .block-editor-block-list__block > .block-editor-block-list__block-edit::before {
-				border: $border-width dashed $dark-opacity-light-800;
-			}
-		}
 	}
 
 	// Hover style.
@@ -175,6 +166,25 @@
 		&:not(.is-focused) .block-editor-block-list__block,
 		&.is-focused {
 			opacity: 1;
+		}
+	}
+
+	// Add extra padding and border to nested blocks.
+	&.is-selected,
+	&.has-child-selected {
+
+		.block-editor-inner-blocks {
+			padding: $block-padding;
+
+			.block-editor-block-list__layout .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before {
+				border: $border-width dashed $dark-opacity-light-800;
+			}
+		}
+	}
+
+	&.has-child-selected {
+		> .block-editor-block-list__block-edit::before {
+			border: $border-width dashed $dark-opacity-light-800;
 		}
 	}
 }

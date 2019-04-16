@@ -34,7 +34,8 @@
 }
 
 .wp-block-media-text .block-editor-inner-blocks,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/media-text"].is-selected .block-editor-inner-blocks {
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/media-text"].is-selected .block-editor-inner-blocks,
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/media-text"].has-child-selected .block-editor-inner-blocks {
 	padding: 0 8% 0 8%;
 }
 
