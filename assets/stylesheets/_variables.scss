@@ -48,7 +48,7 @@ $icon-button-size: 36px;
 $icon-button-size-small: 24px;
 $inserter-tabs-height: 36px;
 $block-toolbar-height: $block-controls-height + $border-width;
-$resize-handler-size: 16px;
+$resize-handler-size: 15px;
 $resize-handler-container-size: $resize-handler-size + ($grid-size-small * 2); // Make the resize handle container larger so there's a larger grabbable area.
 
 // Blocks
@@ -58,8 +58,8 @@ $block-spacing: 4px; // Vertical space between blocks.
 $block-side-ui-width: 28px; // Width of the movers/drag handle UI.
 $block-side-ui-clearance: 2px; // Space between movers/drag handle UI, and block.
 $block-container-side-padding: $block-side-ui-width + $block-padding + 2 * $block-side-ui-clearance; // Total space left and right of the block footprint.
-$block-bg-padding--v: $block-padding + $block-spacing + $block-side-ui-clearance; // padding for Blocks with a background color (eg: paragraph or section)
-$block-bg-padding--h: $block-side-ui-width + $block-side-ui-clearance; // padding for Blocks with a background color (eg: paragraph or section)
+$block-bg-padding--v: $block-padding + $block-spacing + $block-side-ui-clearance; // padding for Blocks with a background color (eg: paragraph or group)
+$block-bg-padding--h: $block-side-ui-width + $block-side-ui-clearance; // padding for Blocks with a background color (eg: paragraph or group)
 
 // Buttons & UI Widgets
 $radius-round-rectangle: 4px;
