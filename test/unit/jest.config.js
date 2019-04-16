@@ -19,7 +19,7 @@ module.exports = {
 	],
 	testURL: 'http://localhost',
 	testPathIgnorePatterns: [
-		'/.git/',
+		'/\.git/',
 		'/node_modules/',
 		'/packages/e2e-tests',
 		'<rootDir>/.*/build/',
