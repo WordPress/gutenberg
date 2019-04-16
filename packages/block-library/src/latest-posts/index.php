@@ -37,7 +37,7 @@ function render_block_core_latest_posts( $attributes ) {
 			$title = __( '(Untitled)' );
 		}
 		$list_items_markup .= sprintf(
-			'<p><a href="%1$s">%2$s</a>',
+			'<li><a href="%1$s">%2$s</a>',
 			esc_url( get_permalink( $post ) ),
 			$title
 		);
@@ -84,10 +84,10 @@ function render_block_core_latest_posts( $attributes ) {
 			);
 		}
 
-		$list_items_markup .= "</p>\n";
+		$list_items_markup .= "</li>\n";
 	}
 
-	$class = 'wp-block-latest-posts';
+	$class = 'wp-block-latest-posts wp-block-latest-posts__list';
 	if ( isset( $attributes['align'] ) ) {
 		$class .= ' align' . $attributes['align'];
 	}
@@ -109,7 +109,7 @@ function render_block_core_latest_posts( $attributes ) {
 	}
 
 	$block_content = sprintf(
-		'<div class="%1$s">%2$s</div>',
+		'<ul class="%1$s">%2$s</ul>',
 		esc_attr( $class ),
 		$list_items_markup
 	);

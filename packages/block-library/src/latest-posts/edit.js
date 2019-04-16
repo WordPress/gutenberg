@@ -181,8 +181,9 @@ class LatestPostsEdit extends Component {
 				<BlockControls>
 					<Toolbar controls={ layoutControls } />
 				</BlockControls>
-				<div
+				<ul
 					className={ classnames( this.props.className, {
+						'wp-block-latest-posts__list': true,
 						'is-grid': postLayout === 'grid',
 						'has-dates': displayPostDate,
 						[ `columns-${ columns }` ]: postLayout === 'grid',
@@ -191,7 +192,7 @@ class LatestPostsEdit extends Component {
 					{ displayPosts.map( ( post, i ) => {
 						const titleTrimmed = post.title.rendered.trim();
 						return (
-							<p key={ i }>
+							<li key={ i }>
 								<a href={ post.link } target="_blank" rel="noreferrer noopener">
 									{ titleTrimmed ? (
 										<RawHTML>
@@ -226,10 +227,10 @@ class LatestPostsEdit extends Component {
 									</RawHTML>
 								</div>
 								}
-							</p>
+							</li>
 						);
 					} ) }
-				</div>
+				</ul>
 			</Fragment>
 		);
 	}
