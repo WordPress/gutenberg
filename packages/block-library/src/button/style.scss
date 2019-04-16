@@ -48,14 +48,3 @@ $blocks-button__height: 56px;
 		border: 2px solid;
 	}
 }
-
-.editor-format-toolbar__url-inline {
-	margin-top: 16px;
-	color: $dark-gray-500;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-	font-size: 13px;
-
-	.block-editor-url-input {
-		@include reset;
-	}
-}
