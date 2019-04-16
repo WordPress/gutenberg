@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Webpack no-default should produce expected output: Dependencies JSON should match snapshot 1`] = `Array []`;
+exports[`Webpack \`no-default\` should produce expected output: Dependencies JSON should match snapshot 1`] = `Array []`;
 
-exports[`Webpack no-default should produce expected output: External modules should match snapshot 1`] = `Array []`;
+exports[`Webpack \`no-default\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
 
-exports[`Webpack no-deps should produce expected output: Dependencies JSON should match snapshot 1`] = `Array []`;
+exports[`Webpack \`no-deps\` should produce expected output: Dependencies JSON should match snapshot 1`] = `Array []`;
 
-exports[`Webpack no-deps should produce expected output: External modules should match snapshot 1`] = `Array []`;
+exports[`Webpack \`no-deps\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
 
-exports[`Webpack overrides should produce expected output: Dependencies JSON should match snapshot 1`] = `
+exports[`Webpack \`overrides\` should produce expected output: Dependencies JSON should match snapshot 1`] = `
 Array [
   "wp-blob",
   "wp-script-handle-for-rxjs",
@@ -16,7 +16,7 @@ Array [
 ]
 `;
 
-exports[`Webpack overrides should produce expected output: External modules should match snapshot 1`] = `
+exports[`Webpack \`overrides\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
     "externalType": "root",
@@ -41,13 +41,13 @@ Array [
 ]
 `;
 
-exports[`Webpack with-externs should produce expected output: Dependencies JSON should match snapshot 1`] = `
+exports[`Webpack \`with-externs\` should produce expected output: Dependencies JSON should match snapshot 1`] = `
 Array [
   "wp-url",
 ]
 `;
 
-exports[`Webpack with-externs should produce expected output: External modules should match snapshot 1`] = `
+exports[`Webpack \`with-externs\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
     "externalType": "var",
@@ -72,14 +72,14 @@ Array [
 ]
 `;
 
-exports[`Webpack wordpress should produce expected output: Dependencies JSON should match snapshot 1`] = `
+exports[`Webpack \`wordpress\` should produce expected output: Dependencies JSON should match snapshot 1`] = `
 Array [
   "lodash",
   "wp-blob",
 ]
 `;
 
-exports[`Webpack wordpress should produce expected output: External modules should match snapshot 1`] = `
+exports[`Webpack \`wordpress\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
     "externalType": "root",
@@ -94,14 +94,14 @@ Array [
 ]
 `;
 
-exports[`Webpack wordpress-require should produce expected output: Dependencies JSON should match snapshot 1`] = `
+exports[`Webpack \`wordpress-require\` should produce expected output: Dependencies JSON should match snapshot 1`] = `
 Array [
   "lodash",
   "wp-blob",
 ]
 `;
 
-exports[`Webpack wordpress-require should produce expected output: External modules should match snapshot 1`] = `
+exports[`Webpack \`wordpress-require\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
     "externalType": "root",
