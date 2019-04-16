@@ -10,7 +10,7 @@
 		[ 'core/paragraph', { placeholder: __( 'Add a description' ) } ],
 		[ 'core/quote' ]
 	];
-	const allowedBlocksLessThan2 = [ 'core/image', 'core/list' ];
+	const allowedBlocksWhenSingleChild = [ 'core/image', 'core/list' ];
 	const allowedBlocksLessGreaterThan2 = [ 'core/gallery', 'core/video' ];
 
 	const save = function() {
