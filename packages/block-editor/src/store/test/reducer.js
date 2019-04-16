@@ -232,9 +232,7 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( state ).toEqual( {
-					isPersistentChange: true,
-					isIgnoredChange: false,
+				expect( state ).toMatchObject( {
 					byClientId: {
 						clicken: {
 							clientId: 'chicken',
@@ -295,9 +293,7 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( state ).toEqual( {
-					isPersistentChange: true,
-					isIgnoredChange: false,
+				expect( state ).toMatchObject( {
 					byClientId: {
 						clicken: {
 							clientId: 'chicken',
@@ -387,9 +383,7 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( state ).toEqual( {
-					isPersistentChange: true,
-					isIgnoredChange: false,
+				expect( state ).toMatchObject( {
 					byClientId: {
 						clicken: {
 							clientId: 'chicken',
@@ -480,9 +474,7 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( state ).toEqual( {
-					isPersistentChange: true,
-					isIgnoredChange: false,
+				expect( state ).toMatchObject( {
 					byClientId: {
 						clicken: {
 							clientId: 'chicken',
