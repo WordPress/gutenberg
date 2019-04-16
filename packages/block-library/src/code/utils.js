@@ -113,5 +113,5 @@ function escapeProtocolInIsolatedUrls( content ) {
  *                  isolated URL from the HTML entity &#73; into /.
  */
 function unescapeProtocolInIsolatedUrls( content ) {
-	return content.replace( /^(\s*https?:)&#47;&#47;([^\s<>"]+\s*)$/m, '$//$2' );
+	return content.replace( /^(\s*https?:)&#47;&#47;([^\s<>"]+\s*)$/m, '$1//$2' );
 }
