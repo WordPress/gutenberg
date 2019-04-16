@@ -271,17 +271,9 @@ The `build` and `start` commands use [webpack](https://webpack.js.org/) behind t
 
 * [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
 * [Output](https://webpack.js.org/configuration/output): `build/index.js`
-* [Externals](https://webpack.js.org/configuration/externals). These are libraries that are to be found in the global scope:
-
-Package | Input syntax | Output
---- | --- | ---
-React | `import x from 'react';` | `var x = window.React.x;`
-ReactDOM | `import x from 'react-dom';` | `var x = window.ReactDOM.x;`
-moment | `import x from 'moment';` | `var x = window.moment.x;`
-jQuery | `import x from 'jquery';` | `var x = window.jQuery.x;`
-lodash | `import x from 'lodash';` | `var x = window.lodash.x;`
-lodash-es | `import x from 'lodash-es';` | `var x = window.lodash.x;`
-WordPress packages | `import x from '@wordpress/package-name'` | `var x = window.wp.packageName.x`
+* [Plugins](https://webpack.js.org/configuration/plugins): The webpack plugin provided by
+[`@wordpress/dependency-extraction-webpack-plugin`](../dependency-extraction-webpack-plugin) is used
+with the default configuration.
 
 #### Provide your own webpack config
 
