@@ -52,6 +52,20 @@ import { Component } from '@wordpress/element';
 ['wp-element']
 ```
 
+By default, the following module requests are handled:
+
+| Request | Global | Script handle |
+| --- | --- | --- |
+| `@babel/runtime/regenerator` | `regeneratorRuntime` | `wp-polyfill` |
+| `@wordpress/*` | `wp.*` | `wp-*` |
+| `jquery` | `jQuery` | `jquery` |
+| `jquery` | `jQuery` | `jquery` |
+| `lodash-es` | `lodash` | `lodash` |
+| `lodash` | `lodash` | `lodash` |
+| `moment` | `moment` | `moment` |
+| `react-dom` | `ReactDOM` | `react-dom` |
+| `react` | `React` | `react` |
+
 **Note:** This plugin overlaps with the functionality provided by [webpack
 `externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract
 script handles from bundle compilation so that a list of script dependencies does not need to be
@@ -79,8 +93,7 @@ module.exports = {
 - Type: boolean
 - Default: `true`
 
-Pass `useDefaults: false` to disable the default plugin behavior. This will disable the handling of
-modules like `@wordpress/i18n`, `lodash`, and `jquery`.
+Pass `useDefaults: false` to disable the default request handling.
 
 ##### `injectPolyfill`
 
