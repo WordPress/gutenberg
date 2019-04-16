@@ -75,7 +75,6 @@ class ImageEdit extends React.Component {
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
-		this.onBlurCaption = this.onBlurCaption.bind( this );
 	}
 
 	componentDidMount() {
@@ -121,6 +120,9 @@ class ImageEdit extends React.Component {
 		}
 
 		this._caption.blur();
+		this.setState( {
+			isCaptionSelected: false,
+		} );
 	}
 
 	mediaUpload( payload ) {
@@ -229,17 +231,6 @@ class ImageEdit extends React.Component {
 		if ( ! this.state.isCaptionSelected ) {
 			this.setState( {
 				isCaptionSelected: true,
-			} );
-		}
-	}
-
-	onBlurCaption() {
-		if ( this.props.onBlur ) {
-			this.props.onBlur();
-		}
-		if ( this.state.isCaptionSelected ) {
-			this.setState( {
-				isCaptionSelected: false,
 			} );
 		}
 	}
@@ -430,7 +421,7 @@ class ImageEdit extends React.Component {
 								value={ caption }
 								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 								onFocus={ this.onFocusCaption }
-								onBlur={ this.onBlurCaption }
+								onBlur={ this.props.onBlur } // always assign onBlur as props
 								isSelected={ this.state.isCaptionSelected }
 								fontSize={ 14 }
 								underlineColorAndroid="transparent"
