@@ -105,4 +105,3 @@ appium-out.log
 
 bin/wp-cli.phar
 junit.xml
-/DependencyGraph.js.patched
