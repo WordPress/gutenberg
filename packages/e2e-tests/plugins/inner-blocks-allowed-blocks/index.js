@@ -10,7 +10,7 @@
 		[ 'core/paragraph', { placeholder: __( 'Add a description' ) } ],
 		[ 'core/quote' ]
 	];
-	const allowedBlocksWhenSingleChild = [ 'core/image', 'core/list' ];
+	const allowedBlocksWhenSingleEmptyChild = [ 'core/image', 'core/list' ];
 	const allowedBlocksWhenMultipleChildren = [ 'core/gallery', 'core/video' ];
 
 	const save = function() {
@@ -74,8 +74,8 @@
 					InnerBlocks,
 					{
 						allowedBlocks: props.numberOfChildren < 2 ?
-							allowedBlocksLessThan2 :
-							allowedBlocksLessGreaterThan2,
+							allowedBlocksWhenSingleEmptyChild :
+							allowedBlocksWhenMultipleChildren,
 					}
 				)
 			);
