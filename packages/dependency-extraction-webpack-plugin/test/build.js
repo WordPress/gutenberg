@@ -8,11 +8,6 @@ const path = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
 
-/**
- * Internal dependencies
- */
-const DependencyExtractionWebpackPlugin = require( '..' );
-
 const fixturesPath = path.join( __dirname, 'fixtures' );
 const configFixtures = fs.readdirSync( fixturesPath ).sort();
 
@@ -46,9 +41,6 @@ configFixtures.forEach( ( configCase ) => {
 					require( path.join( testDirectory, 'webpack.config.js' ) )
 				);
 				options.output.path = outputDirectory;
-				if ( ! options.plugins ) {
-					options.plugins = [ new DependencyExtractionWebpackPlugin() ];
-				}
 
 				webpack( options, ( err, stats ) => {
 					expect( err ).toBeNull();
