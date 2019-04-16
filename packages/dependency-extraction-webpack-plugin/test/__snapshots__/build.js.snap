@@ -41,7 +41,10 @@ Array [
   Object {
     "externalType": "this",
     "request": Object {
-      "this": "rxjs.operators",
+      "this": Array [
+        "rxjs",
+        "operators",
+      ],
     },
     "userRequest": "rxjs/operators",
   },

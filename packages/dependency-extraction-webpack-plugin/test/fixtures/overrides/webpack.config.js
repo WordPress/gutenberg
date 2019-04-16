@@ -9,7 +9,7 @@ module.exports = {
 				}
 
 				if ( request === 'rxjs/operators' ) {
-					return 'rxjs.operators';
+					return [ 'rxjs', 'operators' ];
 				}
 			},
 			requestToDependency( request ) {
