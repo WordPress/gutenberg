@@ -41,4 +41,21 @@ module.exports = {
 	'editor-plain-text': {
 		fontFamily: 'serif',
 	},
+	background: {
+		maxWidth: 512,
+	},
+	modalItem: {
+		paddingLeft: 8,
+		paddingRight: 8,
+	},
+	content: {
+		paddingLeft: 8,
+		paddingRight: 8,
+	},
+	modalIconWrapper: {
+		width: 104,
+	},
+	modalIcon: {
+		fill: 'gray',
+	},
 };
