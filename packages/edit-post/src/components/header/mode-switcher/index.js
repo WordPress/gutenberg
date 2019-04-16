@@ -53,8 +53,7 @@ export default compose( [
 		isCodeEditingEnabled: select( 'core/editor' ).getEditorSettings().codeEditingEnabled,
 		mode: select( 'core/edit-post' ).getEditorMode(),
 	} ) ),
-	ifCondition( ( { isRichEditingEnabled } ) => isRichEditingEnabled ),
-	ifCondition( ( { isCodeEditingEnabled } ) => isCodeEditingEnabled ),
+	ifCondition( ( { isRichEditingEnabled, isCodeEditingEnabled } ) => isRichEditingEnabled && isCodeEditingEnabled ),
 	withDispatch( ( dispatch ) => ( {
 		onSwitch( mode ) {
 			dispatch( 'core/edit-post' ).switchEditorMode( mode );

@@ -12,12 +12,8 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, isCodeEditingEnabled } ) {
-	if ( ! hasBlockSupport( blockType, 'html', true ) ) {
-		return null;
-	}
-
-	if ( ! isCodeEditingEnabled ) {
+export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, isCodeEditingEnabled = true } ) {
+	if ( ! hasBlockSupport( blockType, 'html', true ) || ! isCodeEditingEnabled ) {
 		return null;
 	}
 

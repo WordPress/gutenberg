@@ -28,7 +28,6 @@ describe( 'BlockModeToggle', () => {
 			<BlockModeToggle
 				blockType={ { supports: { html: true } } }
 				mode="visual"
-				isCodeEditingEnabled={ true }
 			/>
 		);
 		const text = wrapper.props.children;
@@ -41,11 +40,22 @@ describe( 'BlockModeToggle', () => {
 			<BlockModeToggle
 				blockType={ { supports: { html: true } } }
 				mode="html"
-				isCodeEditingEnabled={ true }
 			/>
 		);
 		const text = wrapper.props.children;
 
 		expect( text ).toEqual( 'Edit visually' );
+	} );
+
+	it( 'should not render the Visual mode button if code editing is disabled', () => {
+		const wrapper = getShallowRenderOutput(
+			<BlockModeToggle
+				blockType={ { supports: { html: true } } }
+				mode="html"
+				isCodeEditingEnabled={ false }
+			/>
+		);
+
+		expect( wrapper ).toBe( null );
 	} );
 } );
