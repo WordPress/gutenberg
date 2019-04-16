@@ -129,11 +129,22 @@ class GalleryEdit extends Component {
 		};
 	}
 
-	onSelectImages( images ) {
-		const { columns } = this.props.attributes;
+	onSelectImages( newImages ) {
+		const { columns, images } = this.props.attributes;
+
 		this.setAttributes( {
-			images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
-			columns: columns ? Math.min( images.length, columns ) : columns,
+			images: newImages.map( ( image ) => {
+				const newImage = pickRelevantMediaFiles( image );
+				let oldImage = filter( images, { id: newImage.id } );
+				if ( oldImage.length > 0 ) {
+					oldImage = oldImage.reduce( ( img ) => img );
+					if ( oldImage.caption !== '' ) {
+						newImage.caption = oldImage.caption;
+					}
+				}
+				return newImage;
+			} ),
+			columns: columns ? Math.min( newImages.length, columns ) : columns,
 		} );
 	}
 
