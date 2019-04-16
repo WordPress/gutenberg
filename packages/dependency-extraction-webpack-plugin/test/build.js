@@ -17,10 +17,13 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 	const testDirectory = path.join( fixturesPath, configCase );
 	const outputDirectory = path.join( __dirname, 'build', configCase );
 
-	beforeAll( () => {
+	beforeEach( () => {
 		rimraf( outputDirectory );
 		mkdirp( outputDirectory );
 	} );
+
+	// This afterEach is necessary to prevent watched tests from retriggering on every run.
+	afterEach( () => rimraf( outputDirectory ) );
 
 	test( 'should produce expected output', () =>
 		new Promise( ( resolve ) => {
