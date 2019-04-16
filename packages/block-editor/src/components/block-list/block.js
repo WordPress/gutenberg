@@ -395,6 +395,7 @@ function BlockListBlock( {
 						'is-typing': isTypingWithinBlock,
 						'is-focused':
 							isFocusMode && ( isSelected || isParentOfSelectedBlock ),
+						'has-child-selected': isParentOfSelectedBlock,
 						'is-focus-mode': isFocusMode,
 					},
 					className
