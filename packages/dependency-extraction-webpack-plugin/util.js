@@ -9,7 +9,7 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
  *
  * @param {string} request Requested module
  *
- * @return {(string|undefined)} Script global
+ * @return {(string|string[]|undefined)} Script global
  */
 function defaultRequestToExternal( request ) {
 	switch ( request ) {
@@ -34,7 +34,7 @@ function defaultRequestToExternal( request ) {
 	}
 
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
-		return `wp.${ camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ) }`;
+		return [ 'wp', camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ) ];
 	}
 }
 

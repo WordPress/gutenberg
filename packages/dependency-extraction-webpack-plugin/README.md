@@ -57,7 +57,7 @@ By default, the following module requests are handled:
 | Request | Global | Script handle |
 | --- | --- | --- |
 | `@babel/runtime/regenerator` | `regeneratorRuntime` | `wp-polyfill` |
-| `@wordpress/*` | `wp.*` | `wp-*` |
+| `@wordpress/*` | `wp['*']` | `wp-*` |
 | `jquery` | `jQuery` | `jquery` |
 | `jquery` | `jQuery` | `jquery` |
 | `lodash-es` | `lodash` | `lodash` |
@@ -108,7 +108,9 @@ adding `import '@wordpress/polyfill';` to each entrypoint.
 - Type: function
 
 `requestToExternal` allows the module handling to be customized. The function should accept a
-module request string and may return a string representing the global variable to use.
+module request string and may return a string representing the global variable to use. An array of
+strings may be used to access globals via an object path, e.g. `wp.i18n` may be represented as `[
+'wp', 'i18n' ]`.
 
 `requestToExternal` provided via configuration has precedence over default external handling.
 Unhandled requests will be handled by the default unless `useDefaults` is set to `false`.

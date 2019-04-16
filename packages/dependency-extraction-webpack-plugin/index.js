@@ -28,25 +28,26 @@ class DependencyExtractionWebpackPlugin {
 		this.externalizedDeps = new Set();
 
 		// Offload externalization work to the ExternalsPlugin.
-		this.externalsPlugin = new ExternalsPlugin( 'global', [ this.externalizeWpDeps.bind( this ) ] );
+		this.externalsPlugin = new ExternalsPlugin( 'this', this.externalizeWpDeps.bind( this ) );
 	}
 
 	externalizeWpDeps( context, request, callback ) {
-		let externRootRequest;
+		let externalRequest;
 
 		// Handle via options.requestToExternal first
 		if ( typeof this.options.requestToExternal === 'function' ) {
-			externRootRequest = this.options.requestToExternal( request );
+			externalRequest = this.options.requestToExternal( request );
 		}
 
 		// Cascade to default if unhandled and enabled
-		if ( typeof externRootRequest === 'undefined' && this.options.useDefaults ) {
-			externRootRequest = defaultRequestToExternal( request );
+		if ( typeof externalRequest === 'undefined' && this.options.useDefaults ) {
+			externalRequest = defaultRequestToExternal( request );
 		}
 
-		if ( externRootRequest ) {
+		if ( externalRequest ) {
 			this.externalizedDeps.add( request );
-			return callback( null, `root ${ externRootRequest }` );
+
+			return callback( null, { this: externalRequest } );
 		}
 
 		return callback();

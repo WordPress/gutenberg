@@ -13,13 +13,14 @@ describe( 'defaultRequestToExternal', () => {
 	} );
 
 	test( 'Handles known @wordpress request', () => {
-		expect( defaultRequestToExternal( '@wordpress/i18n' ) ).toBe( 'wp.i18n' );
+		expect( defaultRequestToExternal( '@wordpress/i18n' ) ).toEqual( [ 'wp', 'i18n' ] );
 	} );
 
 	test( 'Handles future @wordpress namespace packages', () => {
-		expect( defaultRequestToExternal( '@wordpress/some-future-package' ) ).toBe(
-			'wp.someFuturePackage'
-		);
+		expect( defaultRequestToExternal( '@wordpress/some-future-package' ) ).toEqual( [
+			'wp',
+			'someFuturePackage',
+		] );
 	} );
 } );
 

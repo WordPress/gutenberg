@@ -19,23 +19,37 @@ Array [
 exports[`Webpack \`overrides\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
-    "externalType": "root",
-    "request": "wp.blob",
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "blob",
+      ],
+    },
     "userRequest": "@wordpress/blob",
   },
   Object {
-    "externalType": "root",
-    "request": "wp.url",
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "url",
+      ],
+    },
     "userRequest": "@wordpress/url",
   },
   Object {
-    "externalType": "root",
-    "request": "rxjs.operators",
+    "externalType": "this",
+    "request": Object {
+      "this": "rxjs.operators",
+    },
     "userRequest": "rxjs/operators",
   },
   Object {
-    "externalType": "root",
-    "request": "rxjs",
+    "externalType": "this",
+    "request": Object {
+      "this": "rxjs",
+    },
     "userRequest": "rxjs",
   },
 ]
@@ -55,8 +69,13 @@ Array [
     "userRequest": "@wordpress/blob",
   },
   Object {
-    "externalType": "root",
-    "request": "wp.url",
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "url",
+      ],
+    },
     "userRequest": "@wordpress/url",
   },
   Object {
@@ -82,13 +101,20 @@ Array [
 exports[`Webpack \`wordpress\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
-    "externalType": "root",
-    "request": "wp.blob",
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "blob",
+      ],
+    },
     "userRequest": "@wordpress/blob",
   },
   Object {
-    "externalType": "root",
-    "request": "lodash",
+    "externalType": "this",
+    "request": Object {
+      "this": "lodash",
+    },
     "userRequest": "lodash",
   },
 ]
@@ -104,13 +130,20 @@ Array [
 exports[`Webpack \`wordpress-require\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
-    "externalType": "root",
-    "request": "wp.blob",
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "blob",
+      ],
+    },
     "userRequest": "@wordpress/blob",
   },
   Object {
-    "externalType": "root",
-    "request": "lodash",
+    "externalType": "this",
+    "request": Object {
+      "this": "lodash",
+    },
     "userRequest": "lodash",
   },
 ]
