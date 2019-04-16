@@ -11,7 +11,7 @@
 		[ 'core/quote' ]
 	];
 	const allowedBlocksWhenSingleChild = [ 'core/image', 'core/list' ];
-	const allowedBlocksLessGreaterThan2 = [ 'core/gallery', 'core/video' ];
+	const allowedBlocksWhenMultipleChildren = [ 'core/gallery', 'core/video' ];
 
 	const save = function() {
 		return el( 'div', divProps,
