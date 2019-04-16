@@ -84,9 +84,8 @@ function BlockListBlock( {
 	attributes,
 	initialPosition,
 	wrapperProps,
-	onMetaChange,
+	setAttributes,
 	onReplace,
-	onChange,
 	onInsertBlocksAfter,
 	onMerge,
 	onSelect,
@@ -245,25 +244,6 @@ function BlockListBlock( {
 	}, [ isFirstMultiSelected ] );
 
 	// Other event handlers -----------------------------------------------------
-	const setAttributes = ( newAttributes ) => {
-		const type = getBlockType( name );
-		onChange( clientId, newAttributes );
-		const metaAttributes = reduce(
-			newAttributes,
-			( result, value, key ) => {
-				if ( get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
-					result[ type.attributes[ key ].meta ] = value;
-				}
-
-				return result;
-			},
-			{}
-		);
-
-		if ( size( metaAttributes ) ) {
-			onMetaChange( metaAttributes );
-		}
-	};
 
 	/**
 	 * Marks the block as selected when focused and not already selected. This
@@ -663,11 +643,31 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		mergeBlocks,
 		replaceBlocks,
 		toggleSelection,
+
 	} = dispatch( 'core/block-editor' );
 
 	return {
-		onChange( clientId, attributes ) {
-			updateBlockAttributes( clientId, attributes );
+		setAttributes( newAttributes ) {
+			const { name, clientId } = ownProps;
+			const type = getBlockType( name );
+			updateBlockAttributes( clientId, newAttributes );
+			const metaAttributes = reduce(
+				newAttributes,
+				( result, value, key ) => {
+					if ( get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
+						result[ type.attributes[ key ].meta ] = value;
+					}
+
+					return result;
+				},
+				{}
+			);
+
+			if ( size( metaAttributes ) ) {
+				const { getSettings } = select( 'core/block-editor' );
+				const onChangeMeta = getSettings().__experimentalMetaSource.onChange;
+				onChangeMeta( metaAttributes );
+			}
 		},
 		onSelect( clientId = ownProps.clientId, initialPosition ) {
 			selectBlock( clientId, initialPosition );
@@ -716,11 +716,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onReplace( blocks ) {
 			replaceBlocks( [ ownProps.clientId ], blocks );
-		},
-		onMetaChange( updatedMeta ) {
-			const { getSettings } = select( 'core/block-editor' );
-			const onChangeMeta = getSettings().__experimentalMetaSource.onChange;
-			onChangeMeta( updatedMeta );
 		},
 		onShiftSelection() {
 			if ( ! ownProps.isSelectionEnabled ) {
