@@ -98,10 +98,9 @@ describe( 'Gutenberg Editor tests', () => {
 		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.longText );
 
-		// Swipe up to show remove icon at the bottom
-		await swipeUp( driver );
-
 		for ( let i = 4; i > 0; i-- ) {
+			// Swipe up to show remove icon at the bottom
+			await swipeUp( driver );
 			await editorPage.removeBlockAtPosition( i );
 		}
 	} );
