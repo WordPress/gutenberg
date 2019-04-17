@@ -216,3 +216,15 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 		return event.key === character;
 	};
 } );
+
+/**
+ * Determine if an event is a "delete" keyboard event.
+ * @param {SyntheticEvent} event A synthetic keyboard event.
+ * @return {boolean} True if the event is a keyboard event, otherwise false.
+ */
+export const isDeleteKeyboardEvent = ( { keyCode, ctrlKey } ) => (
+	keyCode === DELETE ||
+	keyCode === BACKSPACE ||
+	// On Apple devices, treat control + d as a delete event
+	( isAppleOS && ctrlKey && keyCode === 68 )
+);

@@ -92,6 +92,18 @@ Keycode for ESCAPE key.
 
 Keycode for F10 key.
 
+<a name="isDeleteKeyboardEvent" href="#isDeleteKeyboardEvent">#</a> **isDeleteKeyboardEvent**
+
+Determine if an event is a "delete" keyboard event.
+
+_Parameters_
+
+-   _event_ `SyntheticEvent`: A synthetic keyboard event.
+
+_Returns_
+
+-   `boolean`: True if the event is a keyboard event, otherwise false.
+
 <a name="isKeyboardEvent" href="#isKeyboardEvent">#</a> **isKeyboardEvent**
 
 An object that contains functions to check if a keyboard event matches a

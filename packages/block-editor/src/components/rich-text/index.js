@@ -17,7 +17,7 @@ import memize from 'memize';
 import { Component, Fragment, RawHTML } from '@wordpress/element';
 import { isHorizontalEdge } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
+import { BACKSPACE, ENTER, LEFT, RIGHT, SPACE, isDeleteKeyboardEvent } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -619,7 +619,7 @@ export class RichText extends Component {
 			}
 		}
 
-		if ( keyCode === DELETE || keyCode === BACKSPACE || ( ctrlKey && keyCode === 68 ) ) {
+		if ( isDeleteKeyboardEvent( event ) ) {
 			const value = this.createRecord();
 			const { replacements, text, start, end } = value;
 
