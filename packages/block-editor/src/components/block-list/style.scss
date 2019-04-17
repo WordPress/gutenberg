@@ -432,11 +432,6 @@
 			float: left;
 		}
 
-		// Position hover label on the right
-		> .block-editor-block-list__block-edit > .block-editor-block-list__breadcrumb {
-			right: -$border-width;
-		}
-
 		// Hide mover until wide breakpoints, or it might be covered by toolbar
 		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			display: none;
