@@ -6,7 +6,6 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import '@wordpress/jest-console';
 import {
 	activatePlugin,
 	clearLocalStorage,
