@@ -49,6 +49,9 @@ public class MainApplication extends Application implements ReactApplication {
                 public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {}
 
                 @Override
+                public void requestMediaImport(String url, MediaSelectedCallback mediaSelectedCallback) {}
+
+                @Override
                 public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {}
 
                 @Override

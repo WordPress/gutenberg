@@ -1517,6 +1517,7 @@
 					"$(SRCROOT)/../node_modules/react-native-safe-area/ios/RNSafeArea",
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SRCROOT)/../react-native-aztec/ios/**",
@@ -1553,6 +1554,7 @@
 					"$(SRCROOT)/../node_modules/react-native-safe-area/ios/RNSafeArea",
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SRCROOT)/../react-native-aztec/ios/**",

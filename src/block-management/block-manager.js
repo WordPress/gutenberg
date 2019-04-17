@@ -45,6 +45,7 @@ type PropsType = {
 	focusBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
 	replaceBlock: ( string, BlockType ) => mixed,
+	getBlockName: string => string,
 	selectedBlock: ?BlockType,
 	selectedBlockClientId: string,
 	setTitleAction: string => void,
@@ -239,6 +240,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					placeholder={ __( 'Add title' ) }
 					borderStyle={ this.blockHolderBorderStyle() }
 					focusedBorderColor={ styles.blockHolderFocused.borderColor }
+					accessibilityLabel="post-title"
 				/>
 			</ReadableContentView>
 		);
@@ -249,6 +251,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			<View style={ { flex: 1 } } >
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
+					accessibilityLabel="block-list"
 					innerRef={ this.scrollViewInnerRef }
 					blockToolbarHeight={ toolbarStyles.container.height }
 					innerToolbarHeight={ inlineToolbarStyles.toolbar.height }
@@ -312,6 +315,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderItem( value: { item: string, index: number } ) {
 		const clientId = value.item;
+		const testID = `block-${ value.index }-${ this.props.getBlockName( clientId ) }`;
 
 		return (
 			<ReadableContentView>
@@ -319,6 +323,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					key={ clientId }
 					showTitle={ false }
 					clientId={ clientId }
+					testID={ testID }
 					rootClientId={ this.props.rootClientId }
 					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 					borderStyle={ this.blockHolderBorderStyle() }
@@ -346,6 +351,7 @@ export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getBlockCount,
+			getBlockName,
 			getBlockIndex,
 			getBlockOrder,
 			getSelectedBlock,
@@ -358,6 +364,7 @@ export default compose( [
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
 			blockCount: getBlockCount( rootClientId ),
+			getBlockName,
 			isBlockSelected,
 			selectedBlock: getSelectedBlock(),
 			selectedBlockClientId,
