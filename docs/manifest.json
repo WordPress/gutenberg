@@ -1128,6 +1128,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "HorizontalRule",
+		"slug": "horizontal-rule",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/primitives/horizontal-rule/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Svg",
 		"slug": "svg",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/primitives/svg/README.md",
