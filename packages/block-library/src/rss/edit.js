@@ -28,6 +28,7 @@ class RSSEdit extends Component {
 
 		this.state = {
 			editing: ! this.props.attributes.feedURL,
+			initialItemsToShow: this.props.attributes.itemsToShow,
 		};
 
 		this.toggleAttribute = this.toggleAttribute.bind( this );
@@ -120,7 +121,7 @@ class RSSEdit extends Component {
 							min={ DEFAULT_MIN_ITEMS }
 							max={ DEFAULT_MAX_ITEMS }
 							allowReset={ true }
-							initialValue={ 5 }
+							initialValue={ this.state.initialItemsToShow }
 							required
 						/>
 						<ToggleControl
