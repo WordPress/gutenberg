@@ -406,6 +406,7 @@
 		z-index: z-index(".block-editor-block-list__block {core/image aligned wide or fullwide}");
 
 		// Mover and settings above
+		&.is-multi-selected > .block-editor-block-mover,
 		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			// This moves the menu up by the height of the button + border + padding.
 			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
@@ -419,16 +420,19 @@
 			}
 		}
 
+		&.is-multi-selected > .block-editor-block-mover .block-editor-block-mover__control,
 		> .block-editor-block-list__block-edit > .block-editor-block-mover .block-editor-block-mover__control {
 			float: left;
 		}
 
 		// Hide mover until wide breakpoints, or it might be covered by toolbar
+		&.is-multi-selected > .block-editor-block-mover,
 		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			display: none;
 		}
 
 		@include break-wide() {
+			&.is-multi-selected > .block-editor-block-mover,
 			> .block-editor-block-list__block-edit > .block-editor-block-mover {
 				display: block;
 			}
@@ -446,6 +450,7 @@
 	// Wide
 	&[data-align="wide"] {
 		// Position mover
+		&.is-multi-selected > .block-editor-block-mover,
 		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			left: -$block-padding + $border-width;
 		}
@@ -488,6 +493,7 @@
 		}
 
 		// Position mover
+		&.is-multi-selected > .block-editor-block-mover,
 		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			left: $border-width;
 		}
