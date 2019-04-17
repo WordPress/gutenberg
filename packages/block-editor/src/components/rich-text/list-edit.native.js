@@ -5,7 +5,7 @@
 import { Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	changeListType,
+	__unstableChangeListType as changeListType,
 	__unstableIsListRootSelected as isListRootSelected,
 	__unstableIsActiveListType as isActiveListType,
 } from '@wordpress/rich-text';
