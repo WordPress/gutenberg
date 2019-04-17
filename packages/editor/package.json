@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.2.3",
+	"version": "9.2.4",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
