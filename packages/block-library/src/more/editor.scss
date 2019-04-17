@@ -1,6 +1,8 @@
 .block-editor-block-list__block[data-type="core/more"] {
 	max-width: 100%;
 	text-align: center;
+	margin-top: $default-block-margin;
+	margin-bottom: $default-block-margin;
 }
 
 .block-editor .wp-block-more { // needs specificity

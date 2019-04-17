@@ -66,12 +66,6 @@ const externals = [
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
-const getBabelLoaderOptions = () => hasBabelConfig() ? {} : {
-	babelrc: false,
-	configFile: false,
-	presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
-};
-
 const config = {
 	mode,
 	entry: {
@@ -91,16 +85,27 @@ const config = {
 		rules: [
 			{
 				test: /\.js$/,
-				use: require.resolve( 'source-map-loader' ),
-				enforce: 'pre',
-			},
-			{
-				test: /\.js$/,
 				exclude: /node_modules/,
-				use: {
-					loader: require.resolve( 'babel-loader' ),
-					options: getBabelLoaderOptions(),
-				},
+				use: [
+					require.resolve( 'thread-loader' ),
+					{
+						loader: require.resolve( 'babel-loader' ),
+						options: {
+							// Babel uses a directory within local node_modules
+							// by default. Use the environment variable option
+							// to enable more persistent caching.
+							cacheDirectory: process.env.BABEL_CACHE_DIRECTORY || true,
+
+							// Provide a fallback configuration if there's not
+							// one explicitly available in the project.
+							...( ! hasBabelConfig() && {
+								babelrc: false,
+								configFile: false,
+								presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+							} ),
+						},
+					},
+				],
 			},
 		],
 	},
@@ -121,6 +126,11 @@ if ( ! isProduction ) {
 	// WP_DEVTOOL global variable controls how source maps are generated.
 	// See: https://webpack.js.org/configuration/devtool/#devtool.
 	config.devtool = process.env.WP_DEVTOOL || 'source-map';
+	config.module.rules.unshift( {
+		test: /\.js$/,
+		use: require.resolve( 'source-map-loader' ),
+		enforce: 'pre',
+	} );
 }
 
 module.exports = config;

@@ -112,9 +112,9 @@ Renders a button with default style.
 import { Button } from "@wordpress/components";
 
 const MyButton = () => (
-
-Click me!
-
+	<Button isDefault>
+		Click me!
+	</Button>
 );
 ```
 

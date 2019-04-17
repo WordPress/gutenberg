@@ -112,3 +112,37 @@ Template locking allows locking the `InnerBlocks` area for the current template.
 If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.
 
 If the block is a top level block: the locking of the Custom Post Type is used.
+
+### `renderAppender`
+* **Type:** `Function`
+* **Default:** - `undefined`. When `renderAppender` is not specific the `<DefaultBlockAppender>` component is as a default. It automatically inserts whichever block is configured as the default block via `wp.blocks.setDefaultBlockName` (typically `paragraph`).
+
+A 'render prop' function that can be used to customize the block's appender.
+
+#### Notes
+* For convenience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
+	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon button that, when clicked, displays the block picker menu. No default Block is inserted. 
+	- `<InnerBlocks.DefaultBlockAppender />` - display the default block appender as set by `wp.blocks.setDefaultBlockName`. Typically this is the `paragraph` block.
+* Consumers are also free to pass any valid render function. This provides the full flexibility to define a bespoke block appender.
+
+#### Example usage
+
+```jsx
+// Utilise a predefined component
+<InnerBlocks
+	renderAppender={ () => (
+		<InnerBlocks.ButtonBlockAppender />
+	) }
+/>
+
+// Fully custom
+<InnerBlocks
+	renderAppender={ () => (
+		<button className="bespoke-appender" type="button">Some Special Appender</button>
+	) }
+/>
+```
+
+
+
+

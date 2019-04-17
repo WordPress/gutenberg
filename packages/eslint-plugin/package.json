@@ -21,6 +21,7 @@
 		"babel-eslint": "^8.0.3",
 		"eslint-plugin-jsx-a11y": "^6.2.1",
 		"eslint-plugin-react": "^7.12.4",
+		"eslint-plugin-react-hooks": "^1.6.0",
 		"requireindex": "^1.2.0"
 	},
 	"publishConfig": {
