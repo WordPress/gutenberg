@@ -176,7 +176,7 @@ afterEach( async () => {
 			],
 			exclude: [
 				'.edit-post-layout__metaboxes',
-				'.mce-open',
+				'.mce-tinymce',
 			],
 		} );
 	}
