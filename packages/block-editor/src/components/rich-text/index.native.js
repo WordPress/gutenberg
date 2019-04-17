@@ -1,3 +1,5 @@
+/*eslint no-console: ["error", { allow: ["warn"] }] */
+
 /**
  * External dependencies
  */
