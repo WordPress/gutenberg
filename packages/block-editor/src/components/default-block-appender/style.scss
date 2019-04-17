@@ -13,6 +13,8 @@
 		outline: $border-width solid transparent;
 		transition: 0.2s outline;
 		resize: none;
+		margin-top: $default-block-margin;
+		margin-bottom: $default-block-margin;
 
 		// Emulate the dimensions of a paragraph block.
 		// On mobile and in nested contexts, the plus to add blocks shows up on the right.

@@ -1,8 +1,15 @@
-// Override the default list style type _only in the editor_
-// to avoid :not() selector specificity issues.
-// See https://github.com/WordPress/gutenberg/pull/10358
-ul.wp-block-gallery li {
-	list-style-type: none;
+ul.wp-block-gallery {
+	// Override the default list style type _only in the editor_
+	// to avoid :not() selector specificity issues.
+	// See https://github.com/WordPress/gutenberg/pull/10358
+	li {
+		list-style-type: none;
+	}
+
+	// Override the bottom margin every block gets.
+	.is-selected & {
+		margin-bottom: 0;
+	}
 }
 
 .blocks-gallery-item {
