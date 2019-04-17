@@ -8,13 +8,13 @@ import { get } from 'lodash';
  */
 import '@wordpress/jest-console';
 import {
+	activatePlugin,
 	clearLocalStorage,
 	enablePageDialogAccept,
 	setBrowserViewport,
-	visitAdminPage,
-	activatePlugin,
 	switchUserToAdmin,
 	switchUserToTest,
+	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -162,6 +162,26 @@ beforeAll( async () => {
 } );
 
 afterEach( async () => {
+	if ( await page.$( '.block-editor' ) ) {
+		await expect( page ).toPassAxeTests( {
+			disabledRules: [
+				'aria-allowed-role',
+				'aria-valid-attr-value',
+				'color-contrast',
+				'dlitem',
+				'duplicate-id',
+				'label',
+				'link-name',
+				'listitem',
+				'region',
+			],
+			exclude: [
+				'.edit-post-layout__metaboxes',
+				'.mce-open',
+			],
+		} );
+	}
+
 	await setupBrowser();
 } );
 

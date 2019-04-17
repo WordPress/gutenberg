@@ -52,16 +52,17 @@ function formatViolations( violations ) {
  *
  * @see https://github.com/dequelabs/axe-puppeteer
  *
- * @param {Page}    page             Puppeteer's page instance.
- * @param {?Object} params           Optional Axe API options.
- * @param {?string} params.include   CSS selector to add to the list of elements
- *                                   to include in analysis.
- * @param {?string} params.exclude   CSS selector to add to the list of elements
- *                                   to exclude from analysis.
+ * @param {Page}          page                 Puppeteer's page instance.
+ * @param {?Object}       params               Optional Axe API options.
+ * @param {?string|Array} params.include       CSS selector to add to the list of elements
+ *                                             to include in analysis.
+ * @param {?string|Array} params.exclude       CSS selector to add to the list of elements
+ *                                             to exclude from analysis.
+ * @param {?Array}        params.disabledRules The list of Axe rules to skip from verification.
  *
  * @return {Object} A matcher object with two keys `pass` and `message`.
  */
-async function toPassAxeTests( page, { include, exclude } = {} ) {
+async function toPassAxeTests( page, { include, exclude, disabledRules } = {} ) {
 	const axe = new AxePuppeteer( page );
 
 	if ( include ) {
@@ -70,6 +71,10 @@ async function toPassAxeTests( page, { include, exclude } = {} ) {
 
 	if ( exclude ) {
 		axe.exclude( exclude );
+	}
+
+	if ( disabledRules ) {
+		axe.disableRules( disabledRules );
 	}
 
 	const { violations } = await axe.analyze();
