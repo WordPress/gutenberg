@@ -234,8 +234,8 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 export const isDeleteKeyboardEvent = ( { keyCode, ctrlKey } ) => (
 	keyCode === DELETE ||
 	keyCode === BACKSPACE ||
-	// On Apple devices, treat control + d & control + h as delete events
-	( isAppleOS && ctrlKey && [ D, H ].includes( keyCode ) )
+	// Treat control + d & control + h as delete events
+	( ctrlKey && [ D, H ].includes( keyCode ) )
 );
 
 /**
@@ -246,5 +246,6 @@ export const isDeleteKeyboardEvent = ( { keyCode, ctrlKey } ) => (
  */
 export const isReverseDeleteKeyboardEvent = ( { keyCode, ctrlKey } ) => (
 	keyCode === BACKSPACE ||
+	// Treat control + h as a reverse delete event
 	( ctrlKey && keyCode === H )
 );
