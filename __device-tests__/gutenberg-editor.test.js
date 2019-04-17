@@ -100,7 +100,9 @@ describe( 'Gutenberg Editor tests', () => {
 
 		for ( let i = 4; i > 0; i-- ) {
 			// Swipe up to show remove icon at the bottom
-			await swipeUp( driver, await editorPage.getParagraphBlockAtPosition( i ) );
+			const element = await editorPage.getParagraphBlockAtPosition( i );
+			await element.click();
+			await swipeUp( driver, element );
 			await editorPage.removeBlockAtPosition( i );
 		}
 	} );
