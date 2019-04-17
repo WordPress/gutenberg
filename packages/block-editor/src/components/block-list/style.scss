@@ -427,6 +427,7 @@
 		// Position hover label on the right
 		> .block-editor-block-list__block-edit > .block-editor-block-list__breadcrumb {
 			right: -$border-width;
+			left: auto;
 		}
 
 		// Hide mover until wide breakpoints, or it might be covered by toolbar
@@ -459,11 +460,6 @@
 
 	// Full-wide
 	&[data-align="full"] {
-		// Position hover label on the left for the top level block.
-		> .block-editor-block-list__block-edit > .block-editor-block-list__breadcrumb {
-			left: 0;
-		}
-
 		// Compensate for main container padding and subtract border.
 		@include break-small() {
 			margin-left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance - $border-width;
