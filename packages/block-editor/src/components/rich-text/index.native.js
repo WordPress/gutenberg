@@ -670,7 +670,7 @@ export class RichText extends Component {
 			if (! this.isIOS && this.willTrimSpaces( html )) {
 				// the html will get trimmed by the cleaning up functions in Aztec and caret position will get out-of-sync.
 				// So, skip forcing it, let Aztec just do its best and just log the fact.
-				console.warn("RichText value will be trimmed for spaces! Avoiding setting the caret position manually." + html);
+				console.warn( "RichText value will be trimmed for spaces! Avoiding setting the caret position manually." + html );
 			} else {
 				selection = { start: this.state.start, end: this.state.end };
 			}
