@@ -1,1 +1,1 @@
-export const Hr = 'hr';
+export const HorizontalRule = 'hr';

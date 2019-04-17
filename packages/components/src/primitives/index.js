@@ -1,2 +1,2 @@
 export * from './svg';
-export * from './hr';
+export * from './horizontal-rule';

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import ReactNativeHr from 'react-native-hr';
+import Hr from 'react-native-hr';
 
 export const HorizontalRule = ( props ) => {
 	const lineStyle = {
@@ -11,6 +11,6 @@ export const HorizontalRule = ( props ) => {
 	};
 
 	return (
-		<ReactNativeHr { ...props } lineStyle={ lineStyle } />
+		<Hr { ...props } lineStyle={ lineStyle } />
 	);
 };
