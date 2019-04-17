@@ -158,6 +158,32 @@ Returns the number of blocks currently present in the post.
 
 Number of blocks in the post.
 
+### getSelectionStart
+
+Returns the current selection start block client ID, rich text area ID and
+text index.
+
+*Parameters*
+
+ * state: Block editor state.
+
+*Returns*
+
+Selection start information.
+
+### getSelectionEnd
+
+Returns the current selection end block client ID, rich text area ID and
+text index.
+
+*Parameters*
+
+ * state: Block editor state.
+
+*Returns*
+
+Selection end information.
+
 ### getBlockSelectionStart
 
 Returns the current block selection start. This value may be null, and it

@@ -318,10 +318,26 @@ export function getBlockCount( state, rootClientId ) {
 	return getBlockOrder( state, rootClientId ).length;
 }
 
+/**
+ * Returns the current selection start block client ID, rich text area ID and
+ * text index.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {Object} Selection start information.
+ */
 export function getSelectionStart( state ) {
 	return state.blockSelection.start;
 }
 
+/**
+ * Returns the current selection end block client ID, rich text area ID and
+ * text index.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {Object} Selection end information.
+ */
 export function getSelectionEnd( state ) {
 	return state.blockSelection.end;
 }
