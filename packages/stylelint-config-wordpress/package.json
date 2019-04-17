@@ -41,8 +41,8 @@
 		"stylelint-scss": "^3.3.0"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^7.0.0",
-		"@commitlint/config-conventional": "^7.0.1",
+		"@commitlint/cli": "^7.5.2",
+		"@commitlint/config-conventional": "^7.5.0",
 		"@wordpress/npm-package-json-lint-config": "^1.1.2",
 		"eslint": "^5.4.0",
 		"eslint-plugin-jest": "^22.0.0",
