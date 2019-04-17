@@ -119,6 +119,7 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 				content,
 				alignment,
 			},
+			setAttributes,
 			className,
 		} = props;
 
