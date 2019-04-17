@@ -31,6 +31,13 @@ Array [
     "text": "Unexpected whitespace before \\":\\" (media-feature-colon-space-before)",
   },
   Object {
+    "column": 17,
+    "line": 11,
+    "rule": "media-feature-name-no-unknown",
+    "severity": "error",
+    "text": "Unexpected unknown media feature name \\"max-width 699px\\" (media-feature-name-no-unknown)",
+  },
+  Object {
     "column": 28,
     "line": 16,
     "rule": "media-feature-range-operator-space-after",
@@ -71,13 +78,6 @@ Array [
     "rule": "media-query-list-comma-space-before",
     "severity": "error",
     "text": "Unexpected whitespace before \\",\\" (media-query-list-comma-space-before)",
-  },
-  Object {
-    "column": 17,
-    "line": 11,
-    "rule": "media-feature-name-no-unknown",
-    "severity": "error",
-    "text": "Unexpected unknown media feature name \\"max-width 699px\\" (media-feature-name-no-unknown)",
   },
 ]
 `;
