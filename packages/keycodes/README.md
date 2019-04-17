@@ -54,6 +54,10 @@ Keycode for COMMAND/META key.
 
 Keycode for CTRL key.
 
+<a name="D" href="#D">#</a> **D**
+
+Keycode for the D key
+
 <a name="DELETE" href="#DELETE">#</a> **DELETE**
 
 Keycode for DELETE key.
@@ -92,9 +96,14 @@ Keycode for ESCAPE key.
 
 Keycode for F10 key.
 
+<a name="H" href="#H">#</a> **H**
+
+Keycode for the H key
+
 <a name="isDeleteKeyboardEvent" href="#isDeleteKeyboardEvent">#</a> **isDeleteKeyboardEvent**
 
 Determine if an event is a "delete" keyboard event.
+This includes keypresses to `delete`, `backspace`, `ctrl+d`, `ctrl+h`, etc.
 
 _Parameters_
 
@@ -102,7 +111,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: True if the event is a keyboard event, otherwise false.
+-   `boolean`: True if the event is a "delete" keyboard event, otherwise false.
 
 <a name="isKeyboardEvent" href="#isKeyboardEvent">#</a> **isKeyboardEvent**
 
@@ -114,6 +123,19 @@ signals pressing ⌘M.
 _Type_
 
 -   `Object` Keyed map of functions to match events.
+
+<a name="isReverseDeleteKeyboardEvent" href="#isReverseDeleteKeyboardEvent">#</a> **isReverseDeleteKeyboardEvent**
+
+Determine if an event is a "reverse delete" keyboard event.
+This includes keypresses to `backspace`, `ctrl+h`, etc.
+
+_Parameters_
+
+-   _event_ `SyntheticEvent`: A synthetic keyboard event.
+
+_Returns_
+
+-   `boolean`: True if the event is a "reverse delete" keyboard event, otherwise false.
 
 <a name="LEFT" href="#LEFT">#</a> **LEFT**
 
