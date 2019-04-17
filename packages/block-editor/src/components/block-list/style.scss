@@ -406,36 +406,34 @@
 		z-index: z-index(".block-editor-block-list__block {core/image aligned wide or fullwide}");
 
 		// Mover and settings above
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			// This moves the menu up by the height of the button + border + padding.
 			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
 			bottom: auto;
 			min-height: 0;
 			height: auto;
 			width: auto;
-			z-index: inherit;
 
 			&::before {
 				content: none;
 			}
 		}
 
-		> .block-editor-block-mover .block-editor-block-mover__control {
+		&.is-multi-selected > .block-editor-block-mover .block-editor-block-mover__control,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover .block-editor-block-mover__control {
 			float: left;
 		}
 
-		// Position hover label on the right
-		> .block-editor-block-list__breadcrumb {
-			right: -$border-width;
-		}
-
 		// Hide mover until wide breakpoints, or it might be covered by toolbar
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			display: none;
 		}
 
 		@include break-wide() {
-			> .block-editor-block-mover {
+			&.is-multi-selected > .block-editor-block-mover,
+			> .block-editor-block-list__block-edit > .block-editor-block-mover {
 				display: block;
 			}
 		}
@@ -452,7 +450,8 @@
 	// Wide
 	&[data-align="wide"] {
 		// Position mover
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			left: -$block-padding + $border-width;
 		}
 	}
@@ -494,7 +493,8 @@
 		}
 
 		// Position mover
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			left: $border-width;
 		}
 	}
@@ -904,7 +904,7 @@
 	}
 }
 
-.block-editor-block-list__block.is-focus-mode:not(.is-multi-selected) > .block-editor-block-contextual-toolbar {
+.block-editor-block-list__block.is-focus-mode:not(.is-multi-selected) > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar {
 	margin-left: -$block-side-ui-width;
 }
 

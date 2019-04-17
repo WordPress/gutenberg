@@ -1,3 +1,5 @@
+/*eslint no-console: ["error", { allow: ["warn"] }] */
+
 /**
  * External dependencies
  */
@@ -107,6 +109,7 @@ export class RichText extends Component {
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
+		this.willTrimSpaces = this.willTrimSpaces.bind( this );
 		this.state = {
 			start: 0,
 			end: 0,
@@ -624,6 +627,17 @@ export class RichText extends Component {
 		}
 	}
 
+	willTrimSpaces( html ) {
+		// regex for detecting spaces around html tags
+		const trailingSpaces = /(\s+)<.+?>|<.+?>(\s+)/g;
+		const matches = html.match( trailingSpaces );
+		if ( matches && matches.length > 0 ) {
+			return true;
+		}
+
+		return false;
+	}
+
 	render() {
 		const {
 			tagName,
@@ -651,7 +665,17 @@ export class RichText extends Component {
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = false;
-			selection = { start: this.state.start, end: this.state.end };
+
+			// Aztec performs some html text cleanup while parsing it so, its internal representation gets out-of-sync with the
+			// representation of the format-lib on the RN side. We need to avoid trying to set the caret position because it may
+			// be outside the text bounds and crash Aztec, at least on Android.
+			if ( ! this.isIOS && this.willTrimSpaces( html ) ) {
+				// the html will get trimmed by the cleaning up functions in Aztec and caret position will get out-of-sync.
+				// So, skip forcing it, let Aztec just do its best and just log the fact.
+				console.warn( 'RichText value will be trimmed for spaces! Avoiding setting the caret position manually.' );
+			} else {
+				selection = { start: this.state.start, end: this.state.end };
+			}
 		}
 
 		return (
