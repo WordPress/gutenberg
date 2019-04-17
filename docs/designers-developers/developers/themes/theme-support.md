@@ -114,7 +114,7 @@ add_theme_support( 'editor-color-palette', array(
 ) );
 ```
 
-`name` is a meaningful human-understand color (demonstrated above) that shows up in the tooltip and also provides accessibility support to a11y users. `slug` is a unique identifier for the color and is used to generate the CSS classes used by the Gutenberg color palette. `color` is the hexadecimal code to specify the color.
+`name` is a human-readable label (demonstrated above) that appears in the tooltip and provides a meaningful description of the color to users. It is especially important for those who rely on screen readers or would otherwise have difficulty perceiving the color. `slug` is a unique identifier for the color and is used to generate the CSS classes used by the Gutenberg color palette. `color` is the hexadecimal code to specify the color.
 
 The colors will be shown in order on the palette, and there's no limit to how many can be specified.
 
