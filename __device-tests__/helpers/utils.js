@@ -192,13 +192,13 @@ const swipeUp = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseCha
 	}
 
 	const startX = size.width / 2;
-	const startY = y + ( size.height / 2 );
+	const startY = y + ( size.height / 3 );
 	const endX = startX;
-	const endY = startY + ( startY * -1 * 0.75 );
+	const endY = startY + ( startY * -1 * 0.5 );
 
 	const action = await new wd.TouchAction( driver );
 	action.press( { x: startX, y: startY } );
-	action.wait( 1000 );
+	action.wait( 3000 );
 	action.moveTo( { x: endX, y: endY } );
 	action.release();
 	await action.perform();
