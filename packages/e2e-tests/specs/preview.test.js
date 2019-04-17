@@ -199,7 +199,7 @@ describe( 'Preview', () => {
 	} );
 } );
 
-describe( 'Preview with Custom Fields enabled', async () => {
+describe( 'Preview with Custom Fields enabled', () => {
 	beforeEach( async () => {
 		await createNewPost();
 		await toggleCustomFieldsOption( true );

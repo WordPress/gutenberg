@@ -111,6 +111,7 @@ export const registerCoreBlocks = () => {
 		image,
 		video,
 		nextpage,
+		separator,
 		list,
 	].forEach( ( { metadata, name, settings } ) => {
 		registerBlockType( name, {

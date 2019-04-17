@@ -6,62 +6,14 @@ const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const path = require( 'path' );
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-const { camelCaseDash, hasBabelConfig } = require( '../utils' );
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 
 /**
- * Converts @wordpress/* string request into request object.
- *
- * Note this isn't the same as camel case because of the
- * way that numbers don't trigger the capitalized next letter.
- *
- * @example
- * formatRequest( '@wordpress/api-fetch' );
- * // { this: [ 'wp', 'apiFetch' ] }
- * formatRequest( '@wordpress/i18n' );
- * // { this: [ 'wp', 'i18n' ] }
- *
- * @param {string} request Request name from import statement.
- * @return {Object} Request object formatted for further processing.
+ * Internal dependencies
  */
-const formatRequest = ( request ) => {
-	// '@wordpress/api-fetch' -> [ '@wordpress', 'api-fetch' ]
-	const [ , name ] = request.split( '/' );
-
-	// { this: [ 'wp', 'apiFetch' ] }
-	return {
-		this: [ 'wp', camelCaseDash( name ) ],
-	};
-};
-
-const wordpressExternals = ( context, request, callback ) => {
-	if ( /^@wordpress\//.test( request ) ) {
-		callback( null, formatRequest( request ), 'this' );
-	} else {
-		callback();
-	}
-};
-
-const externals = [
-	{
-		react: 'React',
-		'react-dom': 'ReactDOM',
-		moment: 'moment',
-		jquery: 'jQuery',
-		lodash: 'lodash',
-		'lodash-es': 'lodash',
-
-		// Distributed NPM packages may depend on Babel's runtime regenerator.
-		// In a WordPress context, the regenerator is assigned to the global
-		// scope via the `wp-polyfill` script. It is reassigned here as an
-		// externals to reduce the size of generated bundles.
-		//
-		// See: https://github.com/WordPress/gutenberg/issues/13890
-		'@babel/runtime/regenerator': 'regeneratorRuntime',
-	},
-	wordpressExternals,
-];
+const { hasBabelConfig } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
@@ -75,7 +27,6 @@ const config = {
 		filename: '[name].js',
 		path: path.resolve( process.cwd(), 'build' ),
 	},
-	externals,
 	resolve: {
 		alias: {
 			'lodash-es': 'lodash',
@@ -116,6 +67,7 @@ const config = {
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload works
 		// when running watch mode.
 		! isProduction && new LiveReloadPlugin( { port: process.env.WP_LIVE_RELOAD_PORT || 35729 } ),
+		new DependencyExtractionWebpackPlugin(),
 	].filter( Boolean ),
 	stats: {
 		children: false,

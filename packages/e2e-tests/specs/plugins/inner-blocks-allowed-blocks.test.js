@@ -56,4 +56,30 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 			'Quote',
 		] );
 	} );
+
+	it( 'correctly applies dynamic allowed blocks restrictions', async () => {
+		await insertBlock( 'Allowed Blocks Dynamic' );
+		const parentBlockSelector = '[data-type="test/allowed-blocks-dynamic"]';
+		const blockAppender = '.block-list-appender button';
+		const appenderSelector = `${ parentBlockSelector } ${ blockAppender }`;
+		await page.waitForSelector( appenderSelector );
+		await page.click( appenderSelector );
+		await openAllBlockInserterCategories();
+		expect(
+			await getAllBlockInserterItemTitles()
+		).toEqual( [
+			'Image',
+			'List',
+		] );
+		await page.click( `.block-editor-block-types-list__item[aria-label="List"]` );
+		await insertBlock( 'Image' );
+		await page.click( appenderSelector );
+		await openAllBlockInserterCategories();
+		expect(
+			await getAllBlockInserterItemTitles()
+		).toEqual( [
+			'Gallery',
+			'Video',
+		] );
+	} );
 } );
