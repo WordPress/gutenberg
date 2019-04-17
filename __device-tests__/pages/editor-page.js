@@ -15,12 +15,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { isAndroid, typeString } from '../helpers/utils';
+import { isAndroid, swipeUp, typeString } from '../helpers/utils';
 
 export default class EditorPage {
 	driver: wd.PromiseChainWebdriver;
 	accessibilityIdKey: string;
 	accessibilityIdXPathAttrib: string;
+	paragraphBlockName = 'Paragraph';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
@@ -129,6 +130,15 @@ export default class EditorPage {
 		let blockLocator = `${ parentLocator }/following-sibling::*`;
 		blockLocator += isAndroid() ? '' : '//*';
 		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Remove row ${ position }"]`;
+		if ( isAndroid() ) {
+			const block = await this.getBlockAtPosition( position, blockName );
+			let checkList = await this.driver.elementsByXPath( blockLocator );
+			while ( checkList.length === 0 ) {
+				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom
+				checkList = await this.driver.elementsByXPath( blockLocator );
+			}
+		}
+
 		const removeButton = await this.driver.elementByXPath( blockLocator );
 		await removeButton.click();
 	}
@@ -138,17 +148,15 @@ export default class EditorPage {
 	// =========================
 
 	async addNewParagraphBlock() {
-		await this.addNewBlock( 'Paragraph' );
+		await this.addNewBlock( this.paragraphBlockName );
 	}
 
 	async getParagraphBlockAtPosition( position: number ) {
-		const blockName = 'Paragraph';
-		return this.getBlockAtPosition( position, blockName );
+		return this.getBlockAtPosition( position, this.paragraphBlockName );
 	}
 
 	async hasParagraphBlockAtPosition( position: number ) {
-		const blockName = 'Paragraph';
-		return await this.hasBlockAtPosition( position, blockName );
+		return await this.hasBlockAtPosition( position, this.paragraphBlockName );
 	}
 
 	async getTextViewForParagraphBlock( block: wd.PromiseChainWebdriver.Element ) {
@@ -171,6 +179,10 @@ export default class EditorPage {
 		const textViewElement = await this.getTextViewForParagraphBlock( block );
 		const text = await textViewElement.text();
 		return text.toString();
+	}
+
+	async removeParagraphBlockAtPosition( position: number ) {
+		return await this.removeBlockAtPosition( position, this.paragraphBlockName );
 	}
 
 	async getTextForParagraphBlockAtPosition( position: number ) {

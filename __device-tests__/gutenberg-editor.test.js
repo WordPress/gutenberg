@@ -11,8 +11,7 @@ import {
 	isLocalEnvironment,
 	clickMiddleOfElement,
 	clickBeginningOfElement,
-	stopDriver,
-	swipeUp } from './helpers/utils';
+	stopDriver } from './helpers/utils';
 import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
@@ -46,7 +45,7 @@ describe( 'Gutenberg Editor tests', () => {
 		await editorPage.addNewParagraphBlock();
 		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
-		await editorPage.removeBlockAtPosition( 1 );
+		await editorPage.removeParagraphBlockAtPosition( 1 );
 	} );
 
 	it( 'should be able to split one paragraph block into two', async () => {
@@ -65,8 +64,8 @@ describe( 'Gutenberg Editor tests', () => {
 		expect( text1 ).not.toBe( '' );
 		expect( testData.shortText ).toMatch( new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` ) );
 
-		await editorPage.removeBlockAtPosition( 2 );
-		await editorPage.removeBlockAtPosition( 1 );
+		await editorPage.removeParagraphBlockAtPosition( 2 );
+		await editorPage.removeParagraphBlockAtPosition( 1 );
 	} );
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
@@ -90,7 +89,7 @@ describe( 'Gutenberg Editor tests', () => {
 		expect( text0 + text1 ).toMatch( text );
 
 		expect( await editorPage.hasParagraphBlockAtPosition( 2 ) ).toBe( false );
-		await editorPage.removeBlockAtPosition( 1 );
+		await editorPage.removeParagraphBlockAtPosition( 1 );
 	} );
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
@@ -99,11 +98,7 @@ describe( 'Gutenberg Editor tests', () => {
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.longText );
 
 		for ( let i = 4; i > 0; i-- ) {
-			// Swipe up to show remove icon at the bottom
-			const element = await editorPage.getParagraphBlockAtPosition( i );
-			await element.click();
-			await swipeUp( driver, element );
-			await editorPage.removeBlockAtPosition( i );
+			await editorPage.removeParagraphBlockAtPosition( i );
 		}
 	} );
 
