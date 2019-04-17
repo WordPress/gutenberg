@@ -73,7 +73,7 @@ export default function( node, doc, schema ) {
 	let wrapper = nodeToInsert;
 
 	while ( wrapper && wrapper.nodeName !== 'P' ) {
-		wrapper = wrapper.parentElement;
+		wrapper = wrapper.parentNode;
 	}
 
 	const figure = doc.createElement( 'figure' );
