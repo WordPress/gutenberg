@@ -27,8 +27,9 @@
 			margin-right: -$block-side-ui-width;
 		}
 
-		// Center the block toolbar on full-wide blocks.
+		// Center the block toolbar on wide and full-wide blocks.
 		// Use specific selector to not affect nested block toolbars.
+		&[data-align="wide"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar,
 		&[data-align="full"] > .block-editor-block-list__block-edit > .block-editor-block-contextual-toolbar {
 			height: 0; // This collapses the container to an invisible element without margin.
 			width: calc(100% - 1px); // -1px to account for inner element left: 1px value causing overflow-x scrollbars
@@ -63,9 +64,10 @@
 	margin-left: auto;
 	margin-right: auto;
 
-	// Space title similarly to other blocks.
-	// This uses negative margins so as to not affect the default block margins.
-	margin-bottom: -$block-padding - $block-spacing - $border-width - $border-width;
+	// Apply default block margin below the post title.
+	// This ensures the first block on the page is in a good position.
+	// This rule can be retired once the title becomes an actual block.
+	margin-bottom: ($block-padding * 2) + $block-spacing; // This matches 2em in the vanilla style.
 
 	// Stack borders.
 	> div {

@@ -15,7 +15,7 @@
 	// breaking spaces in between words. If also prevent Firefox from inserting
 	// a trailing `br` node to visualise any trailing space, causing the element
 	// to be saved.
-	white-space: pre-wrap;
+	white-space: pre-wrap !important;
 
 	> p:first-child {
 		margin-top: 0;

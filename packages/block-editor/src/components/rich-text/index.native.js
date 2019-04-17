@@ -1,3 +1,5 @@
+/*eslint no-console: ["error", { allow: ["warn"] }] */
+
 /**
  * External dependencies
  */
@@ -19,9 +21,8 @@ import {
 	split,
 	toHTMLString,
 	insert,
-	insertLineSeparator,
-	insertLineBreak,
-	isEmptyLine,
+	__unstableInsertLineSeparator as insertLineSeparator,
+	__unstableIsEmptyLine as isEmptyLine,
 	isCollapsed,
 	getTextContent,
 } from '@wordpress/rich-text';
@@ -108,6 +109,7 @@ export class RichText extends Component {
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
+		this.willTrimSpaces = this.willTrimSpaces.bind( this );
 		this.state = {
 			start: 0,
 			end: 0,
@@ -295,7 +297,7 @@ export class RichText extends Component {
 
 		if ( this.multilineTag ) {
 			if ( event.shiftKey ) {
-				const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
+				const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
 				this.onFormatChangeForceChild( insertedLineBreak );
 			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
 				this.setState( {
@@ -307,7 +309,7 @@ export class RichText extends Component {
 				this.onFormatChangeForceChild( insertedLineSeparator );
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
-			const insertedLineBreak = { needsSelectionUpdate: true, ...insertLineBreak( currentRecord ) };
+			const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
 			this.onFormatChangeForceChild( insertedLineBreak );
 		} else {
 			this.splitContent( currentRecord );
@@ -425,6 +427,10 @@ export class RichText extends Component {
 			const newContent = this.valueToFormat( insertedContent );
 			this.lastEventCount = undefined;
 			this.lastContent = newContent;
+
+			// explicitly set selection after inline paste
+			this.forceSelectionUpdate( insertedContent.start, insertedContent.end );
+
 			this.props.onChange( this.lastContent );
 		} else if ( onSplit ) {
 			if ( ! pastedContent.length ) {
@@ -441,7 +447,10 @@ export class RichText extends Component {
 
 	onFocus( event ) {
 		this.isTouched = true;
-		this.props.onFocus( event );
+
+		if ( this.props.onFocus ) {
+			this.props.onFocus( event );
+		}
 	}
 
 	onBlur( event ) {
@@ -618,6 +627,17 @@ export class RichText extends Component {
 		}
 	}
 
+	willTrimSpaces( html ) {
+		// regex for detecting spaces around html tags
+		const trailingSpaces = /(\s+)<.+?>|<.+?>(\s+)/g;
+		const matches = html.match( trailingSpaces );
+		if ( matches && matches.length > 0 ) {
+			return true;
+		}
+
+		return false;
+	}
+
 	render() {
 		const {
 			tagName,
@@ -645,7 +665,17 @@ export class RichText extends Component {
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = false;
-			selection = { start: this.state.start, end: this.state.end };
+
+			// Aztec performs some html text cleanup while parsing it so, its internal representation gets out-of-sync with the
+			// representation of the format-lib on the RN side. We need to avoid trying to set the caret position because it may
+			// be outside the text bounds and crash Aztec, at least on Android.
+			if ( ! this.isIOS && this.willTrimSpaces( html ) ) {
+				// the html will get trimmed by the cleaning up functions in Aztec and caret position will get out-of-sync.
+				// So, skip forcing it, let Aztec just do its best and just log the fact.
+				console.warn( 'RichText value will be trimmed for spaces! Avoiding setting the caret position manually.' );
+			} else {
+				selection = { start: this.state.start, end: this.state.end };
+			}
 		}
 
 		return (

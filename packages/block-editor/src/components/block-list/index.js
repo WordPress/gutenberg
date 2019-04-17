@@ -196,6 +196,7 @@ class BlockList extends Component {
 			selectedBlockClientId,
 			multiSelectedBlockClientIds,
 			hasMultiSelection,
+			renderAppender,
 		} = this.props;
 
 		return (
@@ -222,7 +223,11 @@ class BlockList extends Component {
 						</AsyncModeProvider>
 					);
 				} ) }
-				<BlockListAppender rootClientId={ rootClientId } />
+
+				<BlockListAppender
+					rootClientId={ rootClientId }
+					renderAppender={ renderAppender }
+				/>
 			</div>
 		);
 	}
@@ -244,6 +249,7 @@ export default compose( [
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
 		} = select( 'core/block-editor' );
+
 		const { rootClientId } = ownProps;
 
 		return {
