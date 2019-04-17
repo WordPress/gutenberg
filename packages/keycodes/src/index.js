@@ -84,6 +84,14 @@ export const COMMAND = 'meta';
  * Keycode for SHIFT key.
  */
 export const SHIFT = 'shift';
+/**
+ * Keycode for the D key
+ */
+export const D = 'D'.charCodeAt( 0 );
+/**
+ * Keycode for the H key
+ */
+export const H = 'H'.charCodeAt( 0 );
 
 /**
  * Object that contains functions that return the available modifier
@@ -219,12 +227,24 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 
 /**
  * Determine if an event is a "delete" keyboard event.
+ * This includes keypresses to `delete`, `backspace`, `ctrl+d`, `ctrl+h`, etc.
  * @param {SyntheticEvent} event A synthetic keyboard event.
- * @return {boolean} True if the event is a keyboard event, otherwise false.
+ * @return {boolean} True if the event is a "delete" keyboard event, otherwise false.
  */
 export const isDeleteKeyboardEvent = ( { keyCode, ctrlKey } ) => (
 	keyCode === DELETE ||
 	keyCode === BACKSPACE ||
-	// On Apple devices, treat control + d as a delete event
-	( isAppleOS && ctrlKey && keyCode === 68 )
+	// On Apple devices, treat control + d & control + h as delete events
+	( isAppleOS && ctrlKey && [ D, H ].includes( keyCode ) )
+);
+
+/**
+ * Determine if an event is a "reverse delete" keyboard event.
+ * This includes keypresses to `backspace`, `ctrl+h`, etc.
+ * @param {SyntheticEvent} event A synthetic keyboard event.
+ * @return {boolean} True if the event is a "reverse delete" keyboard event, otherwise false.
+ */
+export const isReverseDeleteKeyboardEvent = ( { keyCode, ctrlKey } ) => (
+	keyCode === BACKSPACE ||
+	( ctrlKey && keyCode === H )
 );

@@ -17,7 +17,7 @@ import memize from 'memize';
 import { Component, Fragment, RawHTML } from '@wordpress/element';
 import { isHorizontalEdge } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, ENTER, LEFT, RIGHT, SPACE, isDeleteKeyboardEvent } from '@wordpress/keycodes';
+import { BACKSPACE, ENTER, LEFT, RIGHT, SPACE, isDeleteKeyboardEvent, isReverseDeleteKeyboardEvent } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -551,15 +551,13 @@ export class RichText extends Component {
 			return;
 		}
 
-		const { keyCode } = event;
-		const isReverse = keyCode === BACKSPACE;
-
 		// Only process delete if the key press occurs at uncollapsed edge.
 		if ( ! isCollapsed( this.createRecord() ) ) {
 			return;
 		}
 
 		const empty = this.isEmpty();
+		const isReverse = isReverseDeleteKeyboardEvent( event );
 
 		// It is important to consider emptiness because an empty container
 		// will include a padding BR node _after_ the caret, so in a forward
