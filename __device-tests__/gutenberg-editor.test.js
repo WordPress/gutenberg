@@ -11,7 +11,8 @@ import {
 	isLocalEnvironment,
 	clickMiddleOfElement,
 	clickBeginningOfElement,
-	stopDriver } from './helpers/utils';
+	stopDriver,
+	swipeUp } from './helpers/utils';
 import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
@@ -96,6 +97,9 @@ describe( 'Gutenberg Editor tests', () => {
 		await editorPage.addNewParagraphBlock();
 		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.longText );
+
+		// Swipe up to show remove icon at the bottom
+		await swipeUp( driver );
 
 		for ( let i = 4; i > 0; i-- ) {
 			await editorPage.removeBlockAtPosition( i );

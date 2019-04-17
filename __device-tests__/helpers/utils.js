@@ -160,6 +160,7 @@ const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.Promise
 	}
 };
 
+// Calculates middle x,y and clicks that position
 const clickMiddleOfElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
@@ -170,10 +171,35 @@ const clickMiddleOfElement = async ( driver: wd.PromiseChainWebdriver, element: 
 	await action.perform();
 };
 
+// Clicks in the top left of an element
 const clickBeginningOfElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
 	action.press( { x: location.x, y: location.y } );
+	action.release();
+	await action.perform();
+};
+
+// Starts from the middle of the screen or the element(if specified)
+// and swipes upwards
+const swipeUp = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element = undefined ) => {
+	let size = await driver.getWindowSize();
+	let y = 0;
+	if ( element !== undefined ) {
+		size = await element.getSize();
+		const location = await element.getLocation();
+		y = location.y;
+	}
+
+	const startX = size.width / 2;
+	const startY = y + ( size.height / 2 );
+	const endX = startX;
+	const endY = startY + ( startY * -1 * 0.75 );
+
+	const action = await new wd.TouchAction( driver );
+	action.press( { x: startX, y: startY } );
+	action.wait( 1000 );
+	action.moveTo( { x: endX, y: endY } );
 	action.release();
 	await action.perform();
 };
@@ -186,5 +212,6 @@ module.exports = {
 	typeString,
 	clickMiddleOfElement,
 	clickBeginningOfElement,
+	swipeUp,
 	stopDriver,
 };
