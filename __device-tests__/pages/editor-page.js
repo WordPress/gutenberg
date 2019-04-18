@@ -127,19 +127,19 @@ export default class EditorPage {
 			parentLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ blockName } Block. Row ${ position }."]`;
 		}
 
-		let blockLocator = `${ parentLocator }/following-sibling::*`;
-		blockLocator += isAndroid() ? '' : '//*';
-		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Remove row ${ position }"]`;
+		let removeBlockLocator = `${ parentLocator }/following-sibling::*`;
+		removeBlockLocator += isAndroid() ? '' : '//*';
+		removeBlockLocator += `[@${ this.accessibilityIdXPathAttrib }="Remove row ${ position }"]`;
 		if ( isAndroid() ) {
 			const block = await this.getBlockAtPosition( position, blockName );
-			let checkList = await this.driver.elementsByXPath( blockLocator );
+			let checkList = await this.driver.elementsByXPath( removeBlockLocator );
 			while ( checkList.length === 0 ) {
 				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom
-				checkList = await this.driver.elementsByXPath( blockLocator );
+				checkList = await this.driver.elementsByXPath( removeBlockLocator );
 			}
 		}
 
-		const removeButton = await this.driver.elementByXPath( blockLocator );
+		const removeButton = await this.driver.elementByXPath( removeBlockLocator );
 		await removeButton.click();
 	}
 

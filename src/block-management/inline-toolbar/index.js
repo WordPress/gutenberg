@@ -10,6 +10,8 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
+import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -26,10 +28,10 @@ type PropsType = {
 	canMoveUp: boolean,
 	canMoveDown: boolean,
 	onButtonPressed: ( button: number ) => void,
-	rowIndex: number,
+	order: number,
 };
 
-export default class InlineToolbar extends React.Component<PropsType> {
+export class InlineToolbar extends React.Component<PropsType> {
 	constructor() {
 		super( ...arguments );
 		// Flow gets picky about reassigning methods on classes
@@ -52,19 +54,18 @@ export default class InlineToolbar extends React.Component<PropsType> {
 	}
 
 	render() {
-		const { rowIndex } = this.props;
-		const rowNumber = rowIndex + 1;
-		let moveUpButtonTitle = `Move up from row ${ rowNumber }`;
+		const { order } = this.props;
+		let moveUpButtonTitle = `Move up from row ${ order }`;
 		if ( this.props.canMoveUp ) {
-			moveUpButtonTitle += ` to row ${ rowNumber - 1 }`;
+			moveUpButtonTitle += ` to row ${ order - 1 }`;
 		}
 
-		let moveDownButtonTitle = `Move down from row ${ rowNumber }`;
+		let moveDownButtonTitle = `Move down from row ${ order }`;
 		if ( this.props.canMoveDown ) {
-			moveDownButtonTitle += ` to row ${ rowNumber + 1 }`;
+			moveDownButtonTitle += ` to row ${ order + 1 }`;
 		}
 
-		const removeButtonTitle = `Remove row ${ rowNumber }`;
+		const removeButtonTitle = `Remove row ${ order }`;
 
 		return (
 			<View style={ styles.toolbar } >
@@ -95,3 +96,15 @@ export default class InlineToolbar extends React.Component<PropsType> {
 		);
 	}
 }
+
+export default compose( [
+	withSelect( ( select, { clientId } ) => {
+		const {
+			getBlockIndex,
+		} = select( 'core/block-editor' );
+
+		return {
+			order: getBlockIndex( clientId ) + 1,
+		};
+	} ),
+] )( InlineToolbar );

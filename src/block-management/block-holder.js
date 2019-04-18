@@ -18,6 +18,7 @@ import { compose } from '@wordpress/compose';
 import { addAction, hasAction, removeAction } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
 import { BlockEdit } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -150,13 +151,12 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 			return null;
 		}
 
-		const order = this.props.getBlockIndex( this.props.clientId, this.props.rootClientId );
 		return (
 			<InlineToolbar
 				onButtonPressed={ this.onInlineToolbarButtonPressed }
 				canMoveUp={ ! this.props.isFirstBlock }
 				canMoveDown={ ! this.props.isLastBlock }
-				rowIndex={ order }
+				clientId={this.props.clientId}
 			/>
 		);
 	}
@@ -182,11 +182,11 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		const { clientId, rootClientId } = this.props;
 		const order = this.props.getBlockIndex( clientId, rootClientId );
 		const name = this.props.getBlockName( clientId );
-		let blockType = getBlockType( name ).title;
+		let blockTitle = getBlockType( name ).title;
 
-		blockType = blockType === 'Unrecognized Block' ? blockType : blockType + ' Block';
+		blockTitle = blockTitle === 'Unrecognized Block' ? blockTitle : `${ blockTitle } Block`;
 
-		return `${ blockType }. Row ${ order + 1 }.`; // Use one indexing for better accessibility
+		return __( `${ blockTitle }. Row ${ order + 1 }.` ); // Use one indexing for better accessibility
 	}
 
 	renderBlockTitle() {

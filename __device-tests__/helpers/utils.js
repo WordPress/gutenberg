@@ -144,7 +144,7 @@ const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.Promise
 			for ( let i = 0; i < paragraphs.length; i++ ) {
 				const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
 				if ( paragraph in strToKeycode ) {
-					await driver.driver.pressKeycode( strToKeycode[ str ] );
+					await driver.driver.pressKeycode( strToKeycode[ paragraph ] );
 				} else {
 					await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', paragraph ] } );
 				}
