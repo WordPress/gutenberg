@@ -12,6 +12,7 @@ export default function ListEdit( {
 	mergeBlocks,
 	onReplace,
 	className,
+	...props
 } ) {
 	const { ordered, values } = attributes;
 
@@ -47,6 +48,7 @@ export default function ListEdit( {
 			}
 			onRemove={ () => onReplace( [] ) }
 			onTagNameChange={ ( tag ) => setAttributes( { ordered: tag === 'ol' } ) }
+			{ ...props }
 		/>
 	);
 }
