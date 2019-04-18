@@ -201,7 +201,7 @@ class BlockList extends Component {
 
 		return (
 			<div className="editor-block-list__layout block-editor-block-list__layout">
-				{ map( blockClientIds, ( clientId, blockIndex ) => {
+				{ map( blockClientIds, ( clientId ) => {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :
 						selectedBlockClientId === clientId;
@@ -216,8 +216,6 @@ class BlockList extends Component {
 								blockRef={ this.setBlockRef }
 								onSelectionStart={ this.onSelectionStart }
 								rootClientId={ rootClientId }
-								isFirst={ blockIndex === 0 }
-								isLast={ blockIndex === blockClientIds.length - 1 }
 								isDraggable={ isDraggable }
 							/>
 						</AsyncModeProvider>

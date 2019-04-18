@@ -363,8 +363,6 @@ export class BlockListBlock extends Component {
 						isFocusMode,
 						hasFixedToolbar,
 						isLocked,
-						isFirst,
-						isLast,
 						clientId,
 						rootClientId,
 						isSelected,
@@ -527,8 +525,6 @@ export class BlockListBlock extends Component {
 									<BlockMover
 										clientIds={ clientId }
 										blockElementId={ blockElementId }
-										isFirst={ isFirst }
-										isLast={ isLast }
 										isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
 										isDraggable={
 											isDraggable !== false &&
