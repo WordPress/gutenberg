@@ -320,6 +320,8 @@ class Popover extends Component {
 			}
 		);
 
+		delete contentProps.anchorRect;
+
 		// Disable reason: We care to capture the _bubbled_ events from inputs
 		// within popover as inferring close intent.
 
