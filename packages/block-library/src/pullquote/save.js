@@ -19,7 +19,7 @@ import {
 /**
  * Internal dependencies
  */
-import { SOLID_COLOR_CLASS } from './edit';
+import { SOLID_COLOR_CLASS } from './shared';
 
 export default function save( { attributes } ) {
 	const { mainColor, customMainColor, textColor, customTextColor, value, citation, className } = attributes;
