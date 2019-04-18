@@ -45,11 +45,11 @@ const effects = {
 
 		let wasSavingPost = select( 'core/editor' ).isSavingPost();
 		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+		const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
 		// Save metaboxes when performing a full save on the post.
 		subscribe( () => {
 			const isSavingPost = select( 'core/editor' ).isSavingPost();
 			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-			const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
 
 			// Save metaboxes on save completion, except for autosaves that are not a post preview.
 			const shouldTriggerMetaboxesSave = (
