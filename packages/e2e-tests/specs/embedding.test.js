@@ -5,6 +5,7 @@ import {
 	clickBlockAppender,
 	createNewPost,
 	createEmbeddingMatcher,
+	createURLMatcher,
 	setUpResponseMocking,
 	createJSONResponse,
 	getEditedPostContent,
@@ -122,6 +123,12 @@ const MOCK_RESPONSES = [
 	},
 	{
 		match: createEmbeddingMatcher( 'https://twitter.com/wooyaygutenberg123454312' ),
+		onRequestMatch: createJSONResponse( MOCK_CANT_EMBED_RESPONSE ),
+	},
+	// Respond to the instagram URL with a non-image response, doesn't matter what it is,
+	// just make sure the image errors.
+	{
+		match: createURLMatcher( 'https://www.instagram.com/p/Bvl97o2AK6x/' ),
 		onRequestMatch: createJSONResponse( MOCK_CANT_EMBED_RESPONSE ),
 	},
 ];
