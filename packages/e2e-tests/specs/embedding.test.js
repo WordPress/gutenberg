@@ -178,8 +178,10 @@ const addAllEmbeds = async () => {
 };
 
 describe( 'Embedding content', () => {
-	beforeAll( async () => await setUpResponseMocking( MOCK_RESPONSES ) );
-	beforeEach( createNewPost );
+	beforeEach( async () => {
+		await setUpResponseMocking( MOCK_RESPONSES );
+		await createNewPost();
+	} );
 
 	it( 'should render embeds in the correct state', async () => {
 		await addAllEmbeds();
