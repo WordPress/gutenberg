@@ -17,18 +17,21 @@ import { Picker } from '@wordpress/block-editor';
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
 
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA = 'take_media';
-const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_library';
+export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
+export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA = 'take_media';
+export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_library';
 
-class MediaUpload extends React.Component {
+export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
+export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
+
+export class MediaUpload extends React.Component {
 	getTakeMediaLabel() {
 		const { mediaType } = this.props;
 
 		if ( mediaType === MEDIA_TYPE_IMAGE ) {
-			return __( 'Take a Photo' );
+			return OPTION_TAKE_PHOTO;
 		} else if ( mediaType === MEDIA_TYPE_VIDEO ) {
-			return __( 'Take a Video' );
+			return OPTION_TAKE_VIDEO;
 		}
 	}
 
