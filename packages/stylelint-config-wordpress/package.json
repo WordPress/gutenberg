@@ -36,7 +36,7 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"stylelint-config-recommended": "^2.1.0",
+		"stylelint-config-recommended": "^2.2.0",
 		"stylelint-config-recommended-scss": "^3.2.0",
 		"stylelint-scss": "^3.3.0"
 	},
