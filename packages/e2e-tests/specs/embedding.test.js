@@ -8,7 +8,6 @@ import {
 	createURLMatcher,
 	setUpResponseMocking,
 	createJSONResponse,
-	create404Response,
 	getEditedPostContent,
 	clickButton,
 	insertBlock,
