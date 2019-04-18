@@ -31,6 +31,11 @@
 		opacity: 0.8;
 	}
 
+	// Reduce placeholder opacity on focus to make cursor visible.
+	.block-editor-rich-text__editable[data-is-placeholder-visible="true"]:focus + .block-editor-rich-text__editable {
+		opacity: 0.4;
+	}
+
 	// Don't let the placeholder text wrap in the variation preview.
 	.block-editor-block-preview__content & {
 		max-width: 100%;
