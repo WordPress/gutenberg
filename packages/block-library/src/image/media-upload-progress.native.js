@@ -33,7 +33,6 @@ class MediaUploadProgress extends React.Component {
 			progress: 0,
 			isUploadInProgress: false,
 			isUploadFailed: false,
-			mediaId: null,
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
@@ -78,21 +77,21 @@ class MediaUploadProgress extends React.Component {
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
-		this.setState( { isUploadInProgress: false, mediaId: payload.mediaServerId } );
+		this.setState( { isUploadInProgress: false } );
 		if ( this.props.onFinishMediaUploadWithSuccess ) {
 			this.props.onFinishMediaUploadWithSuccess( payload );
 		}
 	}
 
 	finishMediaUploadWithFailure( payload ) {
-		this.setState( { isUploadInProgress: false, isUploadFailed: true, mediaId: payload.mediaId } );
+		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
 		if ( this.props.onFinishMediaUploadWithFailure ) {
 			this.props.onFinishMediaUploadWithFailure( payload );
 		}
 	}
 
 	mediaUploadStateReset( payload ) {
-		this.setState( { isUploadInProgress: false, isUploadFailed: false, mediaId: null } );
+		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
 		if ( this.props.onMediaUploadStateReset ) {
 			this.props.onMediaUploadStateReset( payload );
 		}
