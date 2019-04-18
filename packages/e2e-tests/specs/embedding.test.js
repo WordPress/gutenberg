@@ -40,6 +40,24 @@ const MOCK_EMBED_VIDEO_SUCCESS_RESPONSE = {
 	version: '1.0',
 };
 
+const MOCK_EMBED_AUDIO_SUCCESS_RESPONSE = {
+	url: 'https://soundcloud.com/a-boogie-wit-da-hoodie/swervin',
+	html: '<iframe width="16" height="9"></iframe>',
+	type: 'audio',
+	provider_name: 'SoundCloud',
+	provider_url: 'https://soundcloud.com',
+	version: '1.0',
+};
+
+const MOCK_EMBED_IMAGE_SUCCESS_RESPONSE = {
+	url: 'https://www.instagram.com/p/Bvl97o2AK6x/',
+	html: '<iframe width="16" height="9"></iframe>',
+	type: 'video',
+	provider_name: 'Instagram',
+	provider_url: 'https://www.instagram.com',
+	version: '1.0',
+};
+
 const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
 	url: 'https://twitter.com/thatbunty',
 	html: false,
@@ -77,6 +95,14 @@ const MOCK_RESPONSES = [
 	{
 		match: createEmbeddingMatcher( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' ),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_VIDEO_SUCCESS_RESPONSE ),
+	},
+	{
+		match: createEmbeddingMatcher( 'https://soundcloud.com/a-boogie-wit-da-hoodie/swervin' ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_AUDIO_SUCCESS_RESPONSE ),
+	},
+	{
+		match: createEmbeddingMatcher( 'https://www.instagram.com/p/Bvl97o2AK6x/' ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_IMAGE_SUCCESS_RESPONSE ),
 	},
 	{
 		match: createEmbeddingMatcher( 'https://cloudup.com/cQFlxqtY4ob' ),
@@ -235,5 +261,34 @@ describe( 'Embedding content', () => {
 
 		// Check the block has become a WordPress block.
 		await page.waitForSelector( '.wp-block-embed-wordpress' );
+	} );
+
+	it( 'should transform from video to embed block when YouTube URL is pasted', async () => {
+		await clickBlockAppender();
+		await insertBlock( 'Video' );
+		await page.click( '.editor-media-placeholder__url-input-container button' );
+		await page.keyboard.type( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
+		await page.keyboard.press( 'Enter' );
+		await page.waitForSelector( '.wp-block-embed-youtube' );
+	} );
+
+	it( 'should transform from image to embed block when Instagram URL is pasted', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '/image' );
+		await page.keyboard.press( 'Enter' );
+		await page.click( '.editor-media-placeholder__url-input-container button' );
+		await page.keyboard.type( 'https://www.instagram.com/p/Bvl97o2AK6x/' );
+		await page.keyboard.press( 'Enter' );
+		await page.waitForSelector( '.wp-block-embed-instagram' );
+	} );
+
+	it( 'should transform from audio to embed block when Soundcloud URL is pasted', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '/audio' );
+		await page.keyboard.press( 'Enter' );
+		await page.click( '.editor-media-placeholder__url-input-container button' );
+		await page.keyboard.type( 'https://soundcloud.com/a-boogie-wit-da-hoodie/swervin' );
+		await page.keyboard.press( 'Enter' );
+		await page.waitForSelector( '.wp-block-embed-soundcloud' );
 	} );
 } );

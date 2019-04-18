@@ -65,6 +65,23 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 }
 
 /**
+ * Reducer managing current user state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function currentUser( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_CURRENT_USER':
+			return action.currentUser;
+	}
+
+	return state;
+}
+
+/**
  * Reducer managing taxonomies.
  *
  * @param {Object} state  Current state.
@@ -238,12 +255,36 @@ export function userPermissions( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning autosaves keyed by their parent's post id.
+ *
+ * @param  {Object} state  Current state.
+ * @param  {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function autosaves( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_AUTOSAVES':
+			const { postId, autosaves: autosavesData } = action;
+
+			return {
+				...state,
+				[ postId ]: autosavesData,
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
+	currentUser,
 	taxonomies,
 	themeSupports,
 	entities,
 	embedPreviews,
 	userPermissions,
+	autosaves,
 } );
