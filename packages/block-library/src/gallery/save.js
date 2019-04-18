@@ -8,7 +8,7 @@ import { RichText } from '@wordpress/block-editor';
  */
 import { defaultColumnsNumber } from './shared';
 
-export default function	save( { attributes } ) {
+export default function save( { attributes } ) {
 	const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
 	return (
 		<ul className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
