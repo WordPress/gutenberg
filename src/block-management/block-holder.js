@@ -156,7 +156,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				onButtonPressed={ this.onInlineToolbarButtonPressed }
 				canMoveUp={ ! this.props.isFirstBlock }
 				canMoveDown={ ! this.props.isLastBlock }
-				clientId={this.props.clientId}
+				clientId={ this.props.clientId }
 			/>
 		);
 	}
