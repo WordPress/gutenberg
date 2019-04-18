@@ -76,6 +76,7 @@
     "wpandroid": "yarn android --root $TMPDIR/gbmobile-wpandroidfakernroot --variant wasabiDebug --appIdSuffix beta --appFolder WordPress --main-activity=ui.WPLaunchActivity",
     "preios": "yarn preios:xcode10 && yarn preios:carthage",
     "preios:carthage": "cd react-native-aztec && yarn install-aztec-ios",
+    "preios:carthage:update": "cd react-native-aztec && yarn update-aztec-ios",
     "preios:xcode10": "cd node_modules/react-native && ./scripts/ios-install-third-party.sh && cd third-party/glog-0.3.5 && [ -f libglog.pc ] || ../../scripts/ios-configure-glog.sh",
     "ios": "react-native run-ios",
     "test": "cross-env NODE_ENV=test jest --verbose --config jest.config.js",
