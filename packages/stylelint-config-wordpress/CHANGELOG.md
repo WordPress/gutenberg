@@ -1,3 +1,9 @@
+# 14.0.0
+
+-   Updated: `stylelint` to `10.0.0`.
+-   Updated: `stylelint-scss` to `3.6.0`.
+-   Updated: `stylelint-config-recommended` to `2.2.0`.
+
 # 13.1.0
 
 -   Added: Added SCSS _shared config_ `extends` tests.
