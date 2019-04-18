@@ -31,13 +31,8 @@ describe( 'Group', () => {
 	it( 'can have other blocks appended to it using the button appender', async () => {
 		await searchForBlock( 'Group' );
 		await page.click( '.editor-block-list-item-group' );
-
-		await page.waitForSelector( '.block-editor-button-block-appender' );
 		await page.click( '.block-editor-button-block-appender' );
-
-		await page.waitForSelector( '.editor-block-list-item-paragraph' );
 		await page.click( '.editor-block-list-item-paragraph' );
-
 		await page.keyboard.type( 'Group Block with a Paragraph' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

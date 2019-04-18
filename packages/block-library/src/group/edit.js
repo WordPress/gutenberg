@@ -17,13 +17,13 @@ import {
 	withColors,
 } from '@wordpress/block-editor';
 
+const renderAppender = () => <InnerBlocks.ButtonBlockAppender />;
+
 function GroupEdit( {
 	className,
 	setBackgroundColor,
 	backgroundColor,
-	isSelected,
 	hasInnerBlocks,
-	isInnerBlockSelected,
 } ) {
 	const styles = {
 		backgroundColor: backgroundColor.color,
@@ -32,12 +32,6 @@ function GroupEdit( {
 	const classes = classnames( className, backgroundColor.class, {
 		'has-background': !! backgroundColor.color,
 	} );
-
-	const isAppenderVisible = (
-		isSelected ||
-		isInnerBlockSelected ||
-		! hasInnerBlocks
-	);
 
 	return (
 		<Fragment>
@@ -55,9 +49,7 @@ function GroupEdit( {
 			</InspectorControls>
 			<div className={ classes } style={ styles }>
 				<InnerBlocks
-					renderAppender={ () => (
-						isAppenderVisible && <InnerBlocks.ButtonBlockAppender />
-					) }
+					renderAppender={ ! hasInnerBlocks && renderAppender }
 				/>
 			</div>
 		</Fragment>
@@ -69,14 +61,12 @@ export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getBlock,
-			hasSelectedInnerBlock,
 		} = select( 'core/block-editor' );
 
 		const block = getBlock( clientId );
 
 		return {
 			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
-			isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
 		};
 	} ),
 ] )( GroupEdit );
