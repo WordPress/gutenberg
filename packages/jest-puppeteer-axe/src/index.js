@@ -55,9 +55,9 @@ function formatViolations( violations ) {
  *
  * @param {Page}          page                 Puppeteer's page instance.
  * @param {?Object}       params               Optional Axe API options.
- * @param {?string|Array} params.include       CSS selector to add to the list of elements
+ * @param {?string|Array} params.include       CSS selector(s) to add to the list of elements
  *                                             to include in analysis.
- * @param {?string|Array} params.exclude       CSS selector to add to the list of elements
+ * @param {?string|Array} params.exclude       CSS selector(s) to add to the list of elements
  *                                             to exclude from analysis.
  * @param {?Array}        params.disabledRules The list of Axe rules to skip from verification.
  *
