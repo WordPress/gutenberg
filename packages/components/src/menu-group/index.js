@@ -29,7 +29,12 @@ export function MenuGroup( {
 		<div className={ classNames }>
 			{ label &&
 				<div
-					className="components-menu-group__label" id={ labelId } aria-hidden="true">{ label }</div>
+					className="components-menu-group__label"
+					id={ labelId }
+					aria-hidden="true"
+				>
+					{ label }
+				</div>
 			}
 			<div role="group" aria-labelledby={ label ? labelId : null }>
 				{ children }
