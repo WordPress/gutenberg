@@ -1,3 +1,7 @@
 .block-library-spacer__resize-container.is-selected {
 	background: $light-gray-200;
 }
+
+.block-library-spacer__resize-container {
+	margin-bottom: $default-block-margin;
+}

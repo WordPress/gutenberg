@@ -17,6 +17,12 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import ButtonBlockAppender from './button-block-appender';
+import DefaultBlockAppender from './default-block-appender';
+
+/**
+ * Internal dependencies
+ */
 import BlockList from '../block-list';
 import { withBlockEditContext } from '../block-edit/context';
 
@@ -102,6 +108,7 @@ class InnerBlocks extends Component {
 			clientId,
 			isSmallScreen,
 			isSelectedBlockInRoot,
+			renderAppender,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -114,6 +121,7 @@ class InnerBlocks extends Component {
 				{ ! templateInProcess && (
 					<BlockList
 						rootClientId={ clientId }
+						renderAppender={ renderAppender }
 					/>
 				) }
 			</div>
@@ -135,6 +143,7 @@ InnerBlocks = compose( [
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
 		const rootClientId = getBlockRootClientId( clientId );
+
 		return {
 			isSelectedBlockInRoot: isBlockSelected( clientId ) || hasSelectedInnerBlock( clientId ),
 			block: getBlock( clientId ),
@@ -159,6 +168,10 @@ InnerBlocks = compose( [
 		};
 	} ),
 ] )( InnerBlocks );
+
+// Expose default appender placeholders as components.
+InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
+InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
 InnerBlocks.Content = withBlockContentContext(
 	( { BlockContent } ) => <BlockContent />

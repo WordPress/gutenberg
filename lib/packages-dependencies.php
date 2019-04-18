@@ -155,7 +155,11 @@ return array(
 		'wp-viewport',
 	),
 	'wp-edit-widgets'                       => array(
+		'wp-block-editor',
+		'wp-block-library',
+		'wp-components',
 		'wp-element',
+		'wp-i18n',
 	),
 	'wp-editor'                             => array(
 		'lodash',

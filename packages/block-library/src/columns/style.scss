@@ -1,5 +1,6 @@
 .wp-block-columns {
 	display: flex;
+	margin-bottom: $default-block-margin;
 
 	// Responsiveness: Allow wrapping on mobile.
 	flex-wrap: wrap;

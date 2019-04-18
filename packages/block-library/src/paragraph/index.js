@@ -13,95 +13,33 @@ import {
 } from '@wordpress/element';
 import {
 	getColorClassName,
-	getFontSizeClass,
 	RichText,
 } from '@wordpress/block-editor';
-import { getPhrasingContentSchema } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
+import save from './save';
+import transforms from './transforms';
+
+const { name, attributes: schema } = metadata;
+
+export { metadata, name };
 
 const supports = {
 	className: false,
 };
 
-const schema = {
-	content: {
-		type: 'string',
-		source: 'html',
-		selector: 'p',
-		default: '',
-	},
-	align: {
-		type: 'string',
-	},
-	dropCap: {
-		type: 'boolean',
-		default: false,
-	},
-	placeholder: {
-		type: 'string',
-	},
-	textColor: {
-		type: 'string',
-	},
-	customTextColor: {
-		type: 'string',
-	},
-	backgroundColor: {
-		type: 'string',
-	},
-	customBackgroundColor: {
-		type: 'string',
-	},
-	fontSize: {
-		type: 'string',
-	},
-	customFontSize: {
-		type: 'number',
-	},
-	direction: {
-		type: 'string',
-		enum: [ 'ltr', 'rtl' ],
-	},
-};
-
-export const name = 'core/paragraph';
-
 export const settings = {
 	title: __( 'Paragraph' ),
-
 	description: __( 'Start with the building block of all narrative.' ),
-
 	icon,
-
-	category: 'common',
-
 	keywords: [ __( 'text' ) ],
-
 	supports,
-
-	attributes: schema,
-
-	transforms: {
-		from: [
-			{
-				type: 'raw',
-				// Paragraph is a fallback and should be matched last.
-				priority: 20,
-				selector: 'p',
-				schema: {
-					p: {
-						children: getPhrasingContentSchema(),
-					},
-				},
-			},
-		],
-	},
-
+	transforms,
 	deprecated: [
 		{
 			supports,
@@ -206,64 +144,17 @@ export const settings = {
 			},
 		},
 	],
-
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: ( attributes.content || '' ) + ( attributesToMerge.content || '' ),
 		};
 	},
-
 	getEditWrapperProps( attributes ) {
 		const { width } = attributes;
 		if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
 			return { 'data-align': width };
 		}
 	},
-
 	edit,
-
-	save( { attributes } ) {
-		const {
-			align,
-			content,
-			dropCap,
-			backgroundColor,
-			textColor,
-			customBackgroundColor,
-			customTextColor,
-			fontSize,
-			customFontSize,
-			direction,
-		} = attributes;
-
-		const textClass = getColorClassName( 'color', textColor );
-		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-		const fontSizeClass = getFontSizeClass( fontSize );
-
-		const className = classnames( {
-			'has-text-color': textColor || customTextColor,
-			'has-background': backgroundColor || customBackgroundColor,
-			'has-drop-cap': dropCap,
-			[ fontSizeClass ]: fontSizeClass,
-			[ textClass ]: textClass,
-			[ backgroundClass ]: backgroundClass,
-		} );
-
-		const styles = {
-			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
-			color: textClass ? undefined : customTextColor,
-			fontSize: fontSizeClass ? undefined : customFontSize,
-			textAlign: align,
-		};
-
-		return (
-			<RichText.Content
-				tagName="p"
-				style={ styles }
-				className={ className ? className : undefined }
-				value={ content }
-				dir={ direction }
-			/>
-		);
-	},
+	save,
 };

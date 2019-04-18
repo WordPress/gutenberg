@@ -14,7 +14,6 @@ We release a new major version approximately every two weeks. The current and ne
 
 On the date of the current milestone, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new release candidate can be published.
 
-
 The date in the milestone is the date of **tagging the release candidate**. On this date, all remaining PRs on the milestone are moved automatically to the next release.
 
 Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
@@ -74,7 +73,7 @@ Here's an example [release candidate page](https://github.com/WordPress/gutenber
 
 ##### Publishing the Call For Testing
 
-Ping someone from the `[#core-test](https://wordpress.slack.com/messages/C03B0H5J0)` team to publish a call for testing post. Here's an [example call for testing post.](https://make.wordpress.org/test/2019/01/04/call-for-testing-gutenberg-4-8/)
+Ping @karmatosed in the `[#core-test](https://wordpress.slack.com/messages/C03B0H5J0)` team to publish a call for testing post. Here's an [example call for testing post.](https://make.wordpress.org/test/2019/01/04/call-for-testing-gutenberg-4-8/)
 
 #### Creating Release Candidate Patches (done via `git cherry-pick`)
 

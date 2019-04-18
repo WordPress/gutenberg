@@ -30,7 +30,7 @@
 		"parent": "developers"
 	},
 	{
-		"title": "Block Registration ",
+		"title": "Block Registration",
 		"slug": "block-registration",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/block-api/block-registration.md",
 		"parent": "block-api"
@@ -630,6 +630,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/dependency-extraction-webpack-plugin",
+		"slug": "packages-dependency-extraction-webpack-plugin",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/dependency-extraction-webpack-plugin/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/deprecated",
 		"slug": "packages-deprecated",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/deprecated/README.md",
@@ -1125,6 +1131,12 @@
 		"title": "Popover",
 		"slug": "popover",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/popover/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "HorizontalRule",
+		"slug": "horizontal-rule",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/primitives/horizontal-rule/README.md",
 		"parent": "components"
 	},
 	{

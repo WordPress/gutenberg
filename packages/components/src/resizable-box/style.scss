@@ -11,8 +11,8 @@
 	}
 }
 
-// This is the "visible" resize handle.
-.components-resizable-box__handle::before {
+// This is the "visible" resize handle - the circle part
+.components-resizable-box__handle::after {
 	display: block;
 	content: "";
 	width: $resize-handler-size;
@@ -22,8 +22,31 @@
 	background: theme(primary);
 	cursor: inherit;
 	position: absolute;
-	top: calc(50% - #{$resize-handler-size / 2});
-	right: calc(50% - #{$resize-handler-size / 2});
+	top: calc(50% - #{ceil($resize-handler-size / 2)});
+	right: calc(50% - #{ceil($resize-handler-size / 2)});
+}
+
+// This is the "visible" resize handle for side handles - the line
+.components-resizable-box__side-handle::before {
+	display: block;
+	content: "";
+	width: 7px;
+	height: 7px;
+	border: 2px solid $white;
+	background: theme(primary);
+	cursor: inherit;
+	position: absolute;
+	top: calc(50% - 4px);
+	right: calc(50% - 4px);
+	transition: transform 0.1s ease-in;
+	opacity: 0;
+}
+
+.is-dark-theme {
+	.components-resizable-box__side-handle::before,
+	.components-resizable-box__handle::after {
+		border-color: $light-gray-600;
+	}
 }
 
 // Show corner handles on top of side handles so they can be used
@@ -37,16 +60,65 @@
 
 // Make horizontal side-handles full width
 .components-resizable-box__side-handle.components-resizable-box__handle-top,
-.components-resizable-box__side-handle.components-resizable-box__handle-bottom {
+.components-resizable-box__side-handle.components-resizable-box__handle-bottom,
+.components-resizable-box__side-handle.components-resizable-box__handle-top::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-bottom::before {
 	width: 100%;
 	left: 0;
+	border-left: 0;
+	border-right: 0;
 }
 
 // Make vertical side-handles full height
 .components-resizable-box__side-handle.components-resizable-box__handle-left,
-.components-resizable-box__side-handle.components-resizable-box__handle-right {
+.components-resizable-box__side-handle.components-resizable-box__handle-right,
+.components-resizable-box__side-handle.components-resizable-box__handle-left::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-right::before {
 	height: 100%;
 	top: 0;
+	border-top: 0;
+	border-bottom: 0;
+}
+
+// Reveal the side handle line when hovered or in use
+.components-resizable-box__side-handle.components-resizable-box__handle-top:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-bottom:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-top:active::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-bottom:active::before {
+	animation: components-resizable-box__top-bottom-animation 0.1s ease-out 0s;
+	animation-fill-mode: forwards;
+	@include reduce-motion;
+}
+
+.components-resizable-box__side-handle.components-resizable-box__handle-left:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-right:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-left:active::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-right:active::before {
+	animation: components-resizable-box__left-right-animation 0.1s ease-out 0s;
+	animation-fill-mode: forwards;
+	@include reduce-motion;
+}
+
+@keyframes components-resizable-box__top-bottom-animation {
+	from {
+		transform: scaleX(0);
+		opacity: 0;
+	}
+	to {
+		transform: scaleX(1);
+		opacity: 1;
+	}
+}
+
+@keyframes components-resizable-box__left-right-animation {
+	from {
+		transform: scaleY(0);
+		opacity: 0;
+	}
+	to {
+		transform: scaleY(1);
+		opacity: 1;
+	}
 }
 
 /*!rtl:begin:ignore*/

@@ -5,9 +5,9 @@
 import { Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	changeListType,
-	__unstableIsListRootSelected,
-	__unstableIsActiveListType,
+	__unstableChangeListType as changeListType,
+	__unstableIsListRootSelected as isListRootSelected,
+	__unstableIsActiveListType as isActiveListType,
 } from '@wordpress/rich-text';
 
 /**
@@ -28,11 +28,11 @@ export const ListEdit = ( {
 				onTagNameChange && {
 					icon: 'editor-ul',
 					title: __( 'Convert to unordered list' ),
-					isActive: __unstableIsActiveListType( 'ul', tagName, value ),
+					isActive: isActiveListType( value, 'ul', tagName ),
 					onClick() {
 						onChange( changeListType( value, { type: 'ul' } ) );
 
-						if ( __unstableIsListRootSelected( value ) ) {
+						if ( isListRootSelected( value ) ) {
 							onTagNameChange( 'ul' );
 						}
 					},
@@ -40,11 +40,11 @@ export const ListEdit = ( {
 				onTagNameChange && {
 					icon: 'editor-ol',
 					title: __( 'Convert to ordered list' ),
-					isActive: __unstableIsActiveListType( 'ol', tagName, value ),
+					isActive: isActiveListType( value, 'ol', tagName ),
 					onClick() {
 						onChange( changeListType( value, { type: 'ol' } ) );
 
-						if ( __unstableIsListRootSelected( value ) ) {
+						if ( isListRootSelected( value ) ) {
 							onTagNameChange( 'ol' );
 						}
 					},

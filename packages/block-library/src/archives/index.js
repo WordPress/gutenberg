@@ -13,17 +13,12 @@ export const name = 'core/archives';
 
 export const settings = {
 	title: __( 'Archives' ),
-
 	description: __( 'Display a monthly archive of your posts.' ),
-
 	icon,
-
 	category: 'widgets',
-
 	supports: {
 		align: true,
 		html: false,
 	},
-
 	edit,
 };
