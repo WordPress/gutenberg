@@ -92,6 +92,10 @@ Keycode for ESCAPE key.
 
 Keycode for F10 key.
 
+<a name="isApple" href="#isApple">#</a> **isApple**
+
+Utility to check for Apple platform.
+
 <a name="isKeyboardEvent" href="#isKeyboardEvent">#</a> **isKeyboardEvent**
 
 An object that contains functions to check if a keyboard event matches a
