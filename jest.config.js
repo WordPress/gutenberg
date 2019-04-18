@@ -58,4 +58,5 @@ module.exports = {
 	snapshotSerializers: [
 		'enzyme-to-json/serializer',
 	],
+	reporters: [ 'default', 'jest-junit' ],
 };
