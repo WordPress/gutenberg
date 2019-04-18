@@ -135,16 +135,13 @@ const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.Promise
 	}
 
 	if ( isAndroid() ) {
-		if ( str in strToKeycode ) {
-			return await driver.pressKeycode( strToKeycode[ str ] );
-		}
 		const paragraphs = str.split( '\n' );
 
-		if ( paragraphs.length > 1 ) {
+		if ( paragraphs.length > 0 ) {
 			for ( let i = 0; i < paragraphs.length; i++ ) {
 				const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
 				if ( paragraph in strToKeycode ) {
-					await driver.driver.pressKeycode( strToKeycode[ paragraph ] );
+					await driver.pressKeycode( strToKeycode[ paragraph ] );
 				} else {
 					await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', paragraph ] } );
 				}
