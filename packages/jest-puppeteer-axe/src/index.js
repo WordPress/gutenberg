@@ -11,8 +11,9 @@ import AxePuppeteer from 'axe-puppeteer';
  * @return {string} The user friendly message to display when the matcher fails.
  */
 function formatViolations( violations ) {
-	return violations.map( ( { help, id, nodes } ) => {
-		let output = `Rule: ${ id } (${ help })\n` +
+	return violations.map( ( { help, helpUrl, id, nodes } ) => {
+		let output = `Rule: "${ id }" (${ help })\n` +
+			`Help: ${ helpUrl }\n` +
 			'Affected Nodes:\n';
 
 		nodes.forEach( ( node ) => {
