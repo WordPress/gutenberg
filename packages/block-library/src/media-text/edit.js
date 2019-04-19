@@ -273,7 +273,8 @@ class MediaTextEdit extends Component {
 				<BlockControls>
 					<Toolbar
 						controls={ toolbarControls }
-					>
+					/>
+					<Toolbar>
 						{ mediaUrl && <IconButton
 							className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
 							label={ __( 'Edit Media' ) }
