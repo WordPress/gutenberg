@@ -266,8 +266,7 @@ describe( 'Links', () => {
 	};
 
 	// Test for regressions of https://github.com/WordPress/gutenberg/issues/10496.
-	// Disabled until improved as it wasn't reliable enough.
-	it( 'allows autocomplete suggestions to be selected with the mouse', async () => {
+	it.skip( 'allows autocomplete suggestions to be selected with the mouse', async () => {
 		// First create a post that we can search for using the link autocompletion.
 		const titleText = 'Test post mouse';
 		const postURL = await createPostWithTitle( titleText );
