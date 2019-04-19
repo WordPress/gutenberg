@@ -98,6 +98,14 @@
 }
 
 .wp-block-button__inline-link {
-	margin-top: $grid-size-large;
 	color: $dark-gray-500;
+	height: 0;
+	overflow: hidden;
+
+	.is-selected & {
+		height: 100%;
+		overflow: visible;
+		margin-top: $grid-size-large;
+		transition: 0.5s;
+	}
 }
