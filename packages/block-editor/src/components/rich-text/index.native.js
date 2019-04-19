@@ -761,6 +761,7 @@ const RichTextContainer = compose( [
 			return {
 				isSelected: context.isSelected,
 				clientId: context.clientId,
+				onCaretVerticalPositionChange: context.onCaretVerticalPositionChange,
 			};
 		}
 
