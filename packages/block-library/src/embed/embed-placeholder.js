@@ -31,7 +31,7 @@ const EmbedPlaceholder = ( props ) => {
 						</p>
 					}
 				</form>
-				<div className="components-placeholder__cancel">
+				{ value && <div className="components-placeholder__cancel">
 					<Button
 						className="block-editor-embed-placeholder__cancel-button"
 						title={ __( 'Cancel' ) }
@@ -40,7 +40,7 @@ const EmbedPlaceholder = ( props ) => {
 					>
 						{ __( 'Cancel' ) }
 					</Button>
-				</div>
+				</div> }
 			</Fragment>
 		</Placeholder>
 	);
