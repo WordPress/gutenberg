@@ -94,29 +94,30 @@ describe( 'applyValue', () => {
 			const count = childNodes.reduce( ( acc, { parentNode } ) => {
 				return parentNode === body ? acc + 1 : acc;
 			}, 0 );
-			const sortNodeAttributes = function ( node ) {
+			const sortNodeAttributes = function( node ) {
 				if ( ! node.attributes ) {
 					return;
 				}
-				const keys = [], values = {};
+				const keys = [];
+				const values = {};
 				for ( let i = node.attributes.length; --i >= 0; ) {
 					const name = node.attributes[ i ].name;
 					keys.push( name );
 					values[ name ] = node.attributes[ i ].value;
 					node.removeAttribute( name );
 				}
-				keys.sort( function ( a, b ) {
+				keys.sort( function( a, b ) {
 					return a.localeCompare( b );
 				} );
-				keys.forEach( function ( key ) {
+				keys.forEach( function( key ) {
 					node.setAttribute( key, values[ key ] );
 				} );
 			};
-			body.childNodes.forEach( function ( node ) {
+			body.childNodes.forEach( function( node ) {
 				sortNodeAttributes( node );
 			} );
 			const attributesSortedFutureBody = createElement( document, future ).cloneNode( true );
-			attributesSortedFutureBody.childNodes.forEach( function ( node ) {
+			attributesSortedFutureBody.childNodes.forEach( function( node ) {
 				sortNodeAttributes( node );
 			} );
 			expect( attributesSortedFutureBody.innerHTML ).toEqual( body.innerHTML );
