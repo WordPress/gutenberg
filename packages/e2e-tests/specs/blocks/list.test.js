@@ -358,4 +358,17 @@ describe( 'List', () => {
 		// That's 9 key presses to create the list, and 9 key presses to remove
 		// the list. ;)
 	} );
+
+	it( 'should place the caret in the right place with nested list', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '* 1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' a' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Enter' );
+		// The caret should land in the second item.
+		await page.keyboard.type( '2' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
