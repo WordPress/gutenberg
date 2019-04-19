@@ -95,7 +95,7 @@ describe( 'applyValue', () => {
 			const count = childNodes.reduce( ( acc, { parentNode } ) => {
 				return parentNode === body ? acc + 1 : acc;
 			}, 0 );
-			expect( undefined === expected ? future : expected ).toEqual( body.innerHTML );
+			expect( body.innerHTML ).toEqual( undefined === expected ? future : expected );
 			expect( count ).toEqual( movedCount );
 		} );
 	} );
