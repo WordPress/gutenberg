@@ -19,21 +19,23 @@ describe( 'selectors', () => {
 		className: null,
 		tagName: 'format',
 	};
-	const formatTypeBareTag = {
-		name: 'core/test-format-bare-tag',
-		className: null,
-		tagName: 'strong',
-	};
 	const formatTypeClassName = {
 		name: 'core/test-format-class-name',
 		className: 'class-name',
 		tagName: 'strong',
 	};
+	const formatTypeBareTag = {
+		name: 'core/test-format-bare-tag',
+		className: null,
+		tagName: 'strong',
+	};
 	const defaultState = deepFreeze( {
 		formatTypes: {
 			'core/test-format': formatType,
-			'core/test-format-bare-tag': formatTypeBareTag,
 			'core/test-format-class-name': formatTypeClassName,
+			// Order matters: we need to ensure that
+			// `core/test-format-class-name` is not considered bare.
+			'core/test-format-bare-tag': formatTypeBareTag,
 		},
 	} );
 
@@ -41,8 +43,8 @@ describe( 'selectors', () => {
 		it( 'should get format types', () => {
 			const expected = [
 				formatType,
-				formatTypeBareTag,
 				formatTypeClassName,
+				formatTypeBareTag,
 			];
 			expect( getFormatTypes( defaultState ) ).toEqual( expected );
 		} );
