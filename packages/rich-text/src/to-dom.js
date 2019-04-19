@@ -270,15 +270,15 @@ export function applySelection( { startPath, endPath }, current ) {
 	range.setStart( startContainer, startOffset );
 	range.setEnd( endContainer, endOffset );
 
+	// Set back focus if focus is lost.
+	if ( ownerDocument.activeElement !== current ) {
+		current.focus();
+	}
+
 	if ( selection.rangeCount > 0 ) {
 		// If the to be added range and the live range are the same, there's no
 		// need to remove the live range and add the equivalent range.
 		if ( isRangeEqual( range, selection.getRangeAt( 0 ) ) ) {
-			// Set back focus if focus is lost.
-			if ( ownerDocument.activeElement !== current ) {
-				current.focus();
-			}
-
 			return;
 		}
 

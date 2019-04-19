@@ -158,6 +158,32 @@ Returns the number of blocks currently present in the post.
 
 Number of blocks in the post.
 
+### getSelectionStart
+
+Returns the current selection start block client ID, attribute key and text
+offset.
+
+*Parameters*
+
+ * state: Block editor state.
+
+*Returns*
+
+Selection start information.
+
+### getSelectionEnd
+
+Returns the current selection end block client ID, attribute key and text
+offset.
+
+*Parameters*
+
+ * state: Block editor state.
+
+*Returns*
+
+Selection end information.
+
 ### getBlockSelectionStart
 
 Returns the current block selection start. This value may be null, and it
@@ -1041,6 +1067,18 @@ Returns an action object used in signalling that the caret has entered formatted
 ### exitFormattedText
 
 Returns an action object used in signalling that the user caret has exited formatted text.
+
+### selectionChange
+
+Returns an action object used in signalling that the user caret has changed
+position.
+
+*Parameters*
+
+ * clientId: The selected block client ID.
+ * attributeKey: The selected block attribute key.
+ * startOffset: The start offset.
+ * endOffset: The end offset.
 
 ### insertDefaultBlock
 
