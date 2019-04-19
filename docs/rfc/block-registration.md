@@ -319,7 +319,7 @@ Plugins and Themes can also register [custom block style](https://wordpress.org/
 
 ### Transforms
 
-* Type: `string`
+* Type: `string` (`WPDefinedPropertyFile`)
 * Optional
 * Localized: No
 * Property: `transforms`
@@ -334,33 +334,18 @@ See the [Transforms](https://wordpress.org/gutenberg/handbook/designers-develope
 
 ### Deprecated versions
 
-* Type: `object[]`
+* Type: `string` (`WPDefinedPropertyFile`)
 * Optional
 * Localized: No
 * Property: `deprecated`
 
 ```json
-{ "deprecated": [ {
-	"attributes": {},
-	"save": "my-deprecated-save.js",
-	"supports": {}
-} ] }
+{ "deprecated": "my-block-deprecated.js" }
 ```
 
 This property contains the definition of the deprecated versions of the block type. It is used to ensure that old blocks with old markup are not considered invalid.
 
 See the [Deprecated Blocks](https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/block-deprecation/) documentation for more details.
-
-### Supports
-
-* Type: `object`
-* Optional
-* Localized: No
-* Property: `supports`
-
-Optional block extended support features. 
-
-See the [block supports](https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/block-registration/#supports-optional) documentation page for more details.
 
 ### Stylesheets
 
@@ -380,6 +365,28 @@ See the [block supports](https://wordpress.org/gutenberg/handbook/designers-deve
 ```
 
 This property is a pointer to CSS files containing the CSS used for the block in different contexts.
+
+## Backward compatibility
+
+There are 3 properties that are going to supported for backward compatibility reasons and are going to be replaced with alternative APIs:
+ - `supports` - see the [block supports](https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/block-registration/#supports-optional) documentation page for more details.
+ - `merge` - not documented as of today.
+ - `getEditWrapperProps` - not documented as well.
+ 
+**Example**:
+```js
+wp.blocks.registerBlockType( 'my-block/name', {
+    edit: function() {
+    	// Edit definition goes here.
+    },
+    save: function() {
+    	// Save definition goes here.
+    },
+    supports: {
+        html: false
+    }
+} );
+``` 
 
 ## Internationalization
 
