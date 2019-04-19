@@ -156,6 +156,9 @@ class ParagraphBlock extends Component {
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
+							if ( nextAlign !== 'left' && dropCap ) {
+								this.toggleDropCap();
+							}
 							setAttributes( { align: nextAlign } );
 						} }
 					/>
@@ -184,12 +187,13 @@ class ParagraphBlock extends Component {
 							value={ fontSize.size }
 							onChange={ setFontSize }
 						/>
-						<ToggleControl
-							label={ __( 'Drop Cap' ) }
-							checked={ !! dropCap }
-							onChange={ this.toggleDropCap }
-							help={ this.getDropCapHelp }
-						/>
+						{ align === 'left' &&
+							<ToggleControl
+								label={ __( 'Drop Cap' ) }
+								checked={ !! dropCap }
+								onChange={ this.toggleDropCap }
+								help={ this.getDropCapHelp }
+							/> }
 					</PanelBody>
 					<PanelColorSettings
 						title={ __( 'Color Settings' ) }
