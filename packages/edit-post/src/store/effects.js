@@ -45,6 +45,11 @@ const effects = {
 
 		let wasSavingPost = select( 'core/editor' ).isSavingPost();
 		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+		
+		// Meta boxes are initialized once at page load. It is not necessary to
+		// account for updates on each state change.
+		//
+		// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
 		const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
 		// Save metaboxes when performing a full save on the post.
 		subscribe( () => {
