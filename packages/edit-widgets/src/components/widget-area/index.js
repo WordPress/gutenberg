@@ -1,20 +1,19 @@
 /**
  * WordPress dependencies
  */
+import { compose } from '@wordpress/compose';
 import { Panel, PanelBody } from '@wordpress/components';
 import {
 	BlockEditorProvider,
 	BlockList,
 } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import { withDispatch, withSelect } from '@wordpress/data';
 
-function WidgetArea( { title, initialOpen } ) {
-	const [ blocks, updateBlocks ] = useState( [] );
-
+function WidgetArea( { area, initialOpen, blocks, updateBlocks } ) {
 	return (
 		<Panel>
 			<PanelBody
-				title={ title }
+				title={ area.name }
 				initialOpen={ initialOpen }
 			>
 				<BlockEditorProvider
@@ -29,4 +28,20 @@ function WidgetArea( { title, initialOpen } ) {
 	);
 }
 
-export default WidgetArea;
+export default compose( [
+	withSelect( ( select, { area } ) => {
+		const { getWidgetAreaBlocks } = select( 'core/edit-widgets' );
+		const blocks = getWidgetAreaBlocks( area.id );
+		return {
+			blocks,
+		};
+	} ),
+	withDispatch( ( dispatch, { area } ) => {
+		return {
+			updateBlocks( blocks ) {
+				const { updateBlocksInWidgetArea } = dispatch( 'core/edit-widgets' );
+				updateBlocksInWidgetArea( area.id, blocks );
+			},
+		};
+	} ),
+] )( WidgetArea );
