@@ -591,13 +591,30 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
  * additions here should be complemented with a corresponding core ticket to
  * reconcile the change upstream for future removal from Gutenberg.
  *
- * @since 5.6.0
- *
- * @param array $preload_paths $preload_paths Array of paths to preload.
+ * @param array   $preload_paths Array of paths to preload.
+ * @param WP_Post $post          Post being edited.
  *
  * @return array Filtered array of paths to preload.
  */
-function gutenberg_extend_block_editor_preload_paths( $preload_paths ) {
+function gutenberg_extend_block_editor_preload_paths( $preload_paths, $post ) {
+	/*
+	 * Preload any autosaves for the post. (see https://github.com/WordPress/gutenberg/pull/7945)
+	 *
+	 * Trac ticket: https://core.trac.wordpress.org/ticket/46974
+	 *
+	 * At the time of writing, the change is not committed or released
+	 * in core. This path should be removed from Gutenberg when the code is
+	 * released in core, and the corresponding release version becomes
+	 * the minimum supported version.
+	 */
+	$post_type_object = get_post_type_object( $post->post_type );
+	$rest_base        = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
+	$autosaves_path   = sprintf( '/wp/v2/%s/%d/autosaves?context=edit', $rest_base, $post->ID );
+
+	if ( ! in_array( $autosaves_path, $preload_paths ) ) {
+		$preload_paths[] = $autosaves_path;
+	}
+
 	/*
 	 * Used in considering user permissions for creating and updating blocks,
 	 * as condition for displaying relevant actions in the interface.
@@ -607,10 +624,12 @@ function gutenberg_extend_block_editor_preload_paths( $preload_paths ) {
 	 * This is present in WordPress 5.2 and should be removed from Gutenberg
 	 * once WordPress 5.2 is the minimum supported version.
 	 */
-	if ( ! in_array( array( '/wp/v2/blocks', 'OPTIONS' ), $preload_paths ) ) {
-		$preload_paths[] = array( '/wp/v2/blocks', 'OPTIONS' );
+	$blocks_path = array( '/wp/v2/blocks', 'OPTIONS' );
+
+	if ( ! in_array( $blocks_path, $preload_paths ) ) {
+		$preload_paths[] = $blocks_path;
 	}
 
 	return $preload_paths;
 }
-add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload_paths' );
+add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload_paths', 10, 2 );
