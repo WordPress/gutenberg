@@ -70,7 +70,6 @@
 			text-overflow: ellipsis;
 		}
 	}
-<<<<<<< HEAD
 
 	// Limit width of the text field if empty
 	.wp-block-button__link[data-is-placeholder-visible="true"] {
@@ -92,20 +91,5 @@
 		height: auto;
 		overflow: visible;
 		margin-top: $grid-size-large;
-	}
-=======
->>>>>>> Updated popover style
-}
-
-.wp-block-button__inline-link {
-	color: $dark-gray-500;
-	height: 0;
-	overflow: hidden;
-
-	.is-selected & {
-		height: 100%;
-		overflow: visible;
-		margin-top: $grid-size-large;
-		transition: 0.5s;
 	}
 }
