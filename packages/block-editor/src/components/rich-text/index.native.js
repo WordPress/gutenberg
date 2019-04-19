@@ -768,7 +768,7 @@ const RichTextContainer = compose( [
 		return {
 			clientId: context.clientId,
 			isSelected: context.isSelected,
-			onFocus: context.onFocus,
+			onFocus: context.onFocus || ownProps.onFocus,
 		};
 	} ),
 ] )( RichText );
