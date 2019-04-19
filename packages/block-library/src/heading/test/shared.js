@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getLevelFromHeadingNodeName } from '../';
+import { getLevelFromHeadingNodeName } from '../shared';
 
 describe( 'getLevelFromHeadingNodeName()', () => {
 	it( 'should return a numeric value from nodeName', () => {
