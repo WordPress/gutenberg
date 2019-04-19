@@ -8,9 +8,9 @@ import { getBlockType, createBlock } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
 
-function MissingBlockWarning( { attributes, convertToHTML } ) {
-	const { originalName, originalUndelimitedContent } = attributes;
-	const hasContent = !! originalUndelimitedContent;
+function MissingBlockWarning( { attributes, convertToHTML, convertToBlocks } ) {
+	const { originalName, originalInnerContent } = attributes;
+	const hasContent = !! originalInnerContent.length;
 	const hasHTMLBlock = getBlockType( 'core/html' );
 
 	const actions = [];
@@ -25,6 +25,11 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 				{ __( 'Keep as HTML' ) }
 			</Button>
 		);
+		actions.push(
+			<Button key="convert_to_blocks" onClick={ convertToBlocks } isLarge isPrimary>
+				{ __( 'Extract contents as blocks' ) }
+			</Button>
+		);
 	} else {
 		messageHTML = sprintf(
 			__( 'Your site doesn’t include support for the "%s" block. You can leave this block intact or remove it entirely.' ),
@@ -37,17 +42,40 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 			<Warning actions={ actions }>
 				{ messageHTML }
 			</Warning>
-			<RawHTML>{ originalUndelimitedContent }</RawHTML>
+			<RawHTML>{ originalInnerContent.join( '' ) }</RawHTML>
 		</Fragment>
 	);
 }
 
-const MissingEdit = withDispatch( ( dispatch, { clientId, attributes } ) => {
-	const { replaceBlock } = dispatch( 'core/block-editor' );
+const MissingEdit = withDispatch( ( dispatch, props ) => {
+	const { clientId, attributes: { originalInnerBlocks: innerBlocks, originalInnerContent: innerContent } } = props;
+	const { replaceBlock, replaceBlocks } = dispatch( 'core/block-editor' );
 	return {
+		convertToBlocks() {
+			const blocks = [];
+			let blockIndex = 0;
+
+			for ( const content of innerContent ) {
+				// just an inner block
+				if ( null === content ) {
+					blocks.push( innerBlocks[ blockIndex++ ] );
+					continue;
+				}
+
+				// skip whitespace-only freeform HTML content
+				// it usually comes in between blocks
+				if ( ! content.blockName && ! content.trim().length ) {
+					continue;
+				}
+
+				blocks.push( createBlock( 'core/html', { content } ) );
+			}
+
+			replaceBlocks( clientId, blocks );
+		},
 		convertToHTML() {
 			replaceBlock( clientId, createBlock( 'core/html', {
-				content: attributes.originalUndelimitedContent,
+				content: innerContent.join( '' ),
 			} ) );
 		},
 	};

@@ -21,7 +21,6 @@ import {
 } from './registration';
 import { createBlock } from './factory';
 import { isValidBlockContent } from './validation';
-import { getCommentDelimitedContent } from './serializer';
 import { attr, html, text, query, node, children, prop } from './matchers';
 import { normalizeBlockType } from './utils';
 
@@ -422,6 +421,7 @@ export function createBlockWithFallback( blockNode ) {
 		innerBlocks = [],
 		innerHTML,
 	} = blockNode;
+	const { innerContent = [] } = blockNode;
 	const freeformContentFallbackBlock = getFreeformContentHandlerName();
 	const unregisteredFallbackBlock = getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
 
@@ -454,23 +454,19 @@ export function createBlockWithFallback( blockNode ) {
 	// Try finding the type for known block name, else fall back again.
 	let blockType = getBlockType( name );
 
-	if ( ! blockType ) {
-		// Preserve undelimited content for use by the unregistered type handler.
-		const originalUndelimitedContent = innerHTML;
-
-		// If detected as a block which is not registered, preserve comment
-		// delimiters in content of unregistered type handler.
-		if ( name ) {
-			innerHTML = getCommentDelimitedContent( name, attributes, innerHTML );
-		}
-
-		name = unregisteredFallbackBlock;
-		attributes = { originalName, originalUndelimitedContent };
-		blockType = getBlockType( name );
-	}
-
 	// Coerce inner blocks from parsed form to canonical form.
 	innerBlocks = innerBlocks.map( createBlockWithFallback );
+
+	if ( ! blockType ) {
+		name = unregisteredFallbackBlock;
+		attributes = {
+			originalName,
+			originalAttributes: attributes,
+			originalInnerContent: innerContent,
+			originalInnerBlocks: innerBlocks,
+		};
+		blockType = getBlockType( name );
+	}
 
 	const isFallbackBlock = (
 		name === freeformContentFallbackBlock ||

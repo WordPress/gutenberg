@@ -5,12 +5,14 @@
 		"originalName": {
 			"type": "string"
 		},
-		"originalUndelimitedContent": {
-			"type": "string"
+    "originalAttributes": {
+			"type": "object"
 		},
-		"originalContent": {
-			"type": "string",
-			"source": "html"
+    "originalInnerContent": {
+			"type": "array"
+		},
+		"originalInnerBlocks": {
+			"type": "array"
 		}
 	}
 }
