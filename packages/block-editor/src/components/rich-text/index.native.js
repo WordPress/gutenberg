@@ -769,6 +769,7 @@ const RichTextContainer = compose( [
 			clientId: context.clientId,
 			isSelected: context.isSelected,
 			onFocus: context.onFocus || ownProps.onFocus,
+			onCaretVerticalPositionChange: context.onCaretVerticalPositionChange,
 		};
 	} ),
 ] )( RichText );
