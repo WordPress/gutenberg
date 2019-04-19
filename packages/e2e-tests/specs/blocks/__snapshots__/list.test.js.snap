@@ -254,7 +254,7 @@ exports[`List should split into two with paragraph and merge lists 2`] = `
 
 exports[`List should split into two with paragraph and merge lists 3`] = `
 "<!-- wp:list -->
-<ul><li>one</li></ul>
+<ul><li>one</li><li></li></ul>
 <!-- /wp:list -->
 
 <!-- wp:list -->
