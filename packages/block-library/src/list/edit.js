@@ -5,9 +5,13 @@ import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { name } from './';
+
 export default function ListEdit( {
 	attributes,
-	insertBlocksAfter,
 	setAttributes,
 	mergeBlocks,
 	onReplace,
@@ -26,25 +30,9 @@ export default function ListEdit( {
 			className={ className }
 			placeholder={ __( 'Write list…' ) }
 			onMerge={ mergeBlocks }
-			unstableOnSplit={
-				insertBlocksAfter ?
-					( before, after, ...blocks ) => {
-						if ( ! blocks.length ) {
-							blocks.push( createBlock( 'core/paragraph' ) );
-						}
-
-						if ( after !== '<li></li>' ) {
-							blocks.push( createBlock( 'core/list', {
-								ordered,
-								values: after,
-							} ) );
-						}
-
-						setAttributes( { values: before } );
-						insertBlocksAfter( blocks );
-					} :
-					undefined
-			}
+			onSplit={ ( value ) => createBlock( name, { values: value } ) }
+			onSplitMiddle={ () => createBlock( 'core/paragraph' ) }
+			onReplace={ onReplace }
 			onRemove={ () => onReplace( [] ) }
 			onTagNameChange={ ( tag ) => setAttributes( { ordered: tag === 'ol' } ) }
 		/>

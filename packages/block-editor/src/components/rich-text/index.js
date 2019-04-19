@@ -40,10 +40,10 @@ import {
 	__unstableIndentListItems as indentListItems,
 	__unstableGetActiveFormats as getActiveFormats,
 	__unstableUpdateFormats as updateFormats,
+	replace,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
-import deprecated from '@wordpress/deprecated';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -114,17 +114,6 @@ export class RichText extends Component {
 			this.multilineWrapperTags = [ 'ul', 'ol' ];
 		}
 
-		if ( this.props.onSplit ) {
-			this.onSplit = this.props.onSplit;
-
-			deprecated( 'wp.editor.RichText onSplit prop', {
-				plugin: 'Gutenberg',
-				alternative: 'wp.editor.RichText unstableOnSplit prop',
-			} );
-		} else if ( this.props.unstableOnSplit ) {
-			this.onSplit = this.props.unstableOnSplit;
-		}
-
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
 		this.onChange = this.onChange.bind( this );
@@ -144,6 +133,7 @@ export class RichText extends Component {
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
+		this.onSplit = this.onSplit.bind( this );
 
 		this.formatToValue = memize(
 			this.formatToValue.bind( this ),
@@ -276,6 +266,8 @@ export class RichText extends Component {
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
 		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+		const record = this.getRecord();
+
 		if ( item && ! html ) {
 			const file = item.getAsFile ? item.getAsFile() : item;
 			const content = pasteHandler( {
@@ -291,13 +283,11 @@ export class RichText extends Component {
 			if ( shouldReplace ) {
 				this.props.onReplace( content );
 			} else if ( this.onSplit ) {
-				this.splitContent( content );
+				this.onSplit( record, content );
 			}
 
 			return;
 		}
-
-		const record = this.getRecord();
 
 		// There is a selection, check if a URL is pasted.
 		if ( ! isCollapsed( record ) ) {
@@ -319,13 +309,14 @@ export class RichText extends Component {
 			}
 		}
 
-		const shouldReplace = this.props.onReplace && this.isEmpty();
+		const canReplace = this.props.onReplace && this.isEmpty();
+		const canSplit = this.props.onReplace && this.props.onSplit;
 
 		let mode = 'INLINE';
 
-		if ( shouldReplace ) {
+		if ( canReplace ) {
 			mode = 'BLOCKS';
-		} else if ( this.onSplit ) {
+		} else if ( canSplit ) {
 			mode = 'AUTO';
 		}
 
@@ -338,17 +329,20 @@ export class RichText extends Component {
 		} );
 
 		if ( typeof content === 'string' ) {
-			const recordToInsert = create( { html: content } );
-			this.onChange( insert( record, recordToInsert ) );
-		} else if ( this.onSplit ) {
-			if ( ! content.length ) {
-				return;
+			let valueToInsert = create( { html: content } );
+
+			// If the content should be multiline, we should process text
+			// separated by a line break as separate lines.
+			if ( this.multilineTag ) {
+				valueToInsert = replace( valueToInsert, /\n+/g, LINE_SEPARATOR );
 			}
 
-			if ( shouldReplace ) {
+			this.onChange( insert( record, valueToInsert ) );
+		} else if ( content.length > 0 ) {
+			if ( canReplace ) {
 				this.props.onReplace( content );
 			} else {
-				this.splitContent( content, { paste: true } );
+				this.onSplit( record, content );
 			}
 		}
 	}
@@ -599,6 +593,8 @@ export class RichText extends Component {
 	 */
 	onKeyDown( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
+		const { onReplace, onSplit } = this.props;
+		const canSplit = onReplace && onSplit;
 
 		if (
 			// Only override left and right keys without modifiers pressed.
@@ -718,15 +714,15 @@ export class RichText extends Component {
 			if ( this.multilineTag ) {
 				if ( event.shiftKey ) {
 					this.onChange( insert( record, '\n' ) );
-				} else if ( this.onSplit && isEmptyLine( record ) ) {
-					this.onSplit( ...split( record ).map( this.valueToFormat ) );
+				} else if ( canSplit && isEmptyLine( record ) ) {
+					this.onSplit( record );
 				} else {
 					this.onChange( insertLineSeparator( record ) );
 				}
-			} else if ( event.shiftKey || ! this.onSplit ) {
+			} else if ( event.shiftKey || ! canSplit ) {
 				this.onChange( insert( record, '\n' ) );
 			} else {
-				this.splitContent();
+				this.onSplit( record );
 			}
 		}
 	}
@@ -824,51 +820,40 @@ export class RichText extends Component {
 		} );
 	}
 
-	/**
-	 * Splits the content at the location of the selection.
-	 *
-	 * Replaces the content of the editor inside this element with the contents
-	 * before the selection. Sends the elements after the selection to the `onSplit`
-	 * handler.
-	 *
-	 * @param {Array}  blocks  The blocks to add after the split point.
-	 * @param {Object} context The context for splitting.
-	 */
-	splitContent( blocks = [], context = {} ) {
-		if ( ! this.onSplit ) {
+	onSplit( record, pastedBlocks = [] ) {
+		const { onReplace, onSplit, onSplitMiddle } = this.props;
+
+		if ( ! onReplace || ! onSplit ) {
 			return;
 		}
 
-		const record = this.createRecord();
-		let [ before, after ] = split( record );
+		const blocks = [];
+		const [ before, after ] = split( record );
+		const hasPastedBlocks = pastedBlocks.length > 0;
 
-		// In case split occurs at the trailing or leading edge of the field,
-		// assume that the before/after values respectively reflect the current
-		// value. This also provides an opportunity for the parent component to
-		// determine whether the before/after value has changed using a trivial
-		//  strict equality operation.
-		if ( isEmpty( after ) ) {
-			before = record;
-		} else if ( isEmpty( before ) ) {
-			after = record;
+		// Create a block with the content before the caret if there's no pasted
+		// blocks, or if there are pasted blocks and the value is not empty.
+		// We do not want a leading empty block on paste, but we do if split
+		// with e.g. the enter key.
+		if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
+			blocks.push( onSplit( this.valueToFormat( before ) ) );
 		}
 
-		// If pasting and the split would result in no content other than the
-		// pasted blocks, remove the before and after blocks.
-		if ( context.paste ) {
-			before = isEmpty( before ) ? null : before;
-			after = isEmpty( after ) ? null : after;
+		if ( hasPastedBlocks ) {
+			blocks.push( ...pastedBlocks );
+		} else if ( onSplitMiddle ) {
+			blocks.push( onSplitMiddle() );
 		}
 
-		if ( before ) {
-			before = this.valueToFormat( before );
+		// If there's pasted blocks, append a block with the content after the
+		// caret. Otherwise, do append and empty block if there is no
+		// `onSplitMiddle` prop, but if there is and the content is empty, the
+		// middle block is enough to set focus in.
+		if ( hasPastedBlocks || ! onSplitMiddle || ! isEmpty( after ) ) {
+			blocks.push( onSplit( this.valueToFormat( after ) ) );
 		}
 
-		if ( after ) {
-			after = this.valueToFormat( after );
-		}
-
-		this.onSplit( before, after, ...blocks );
+		onReplace( blocks );
 	}
 
 	/**
@@ -961,12 +946,6 @@ export class RichText extends Component {
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 			} );
-		}
-
-		// Guard for blocks passing `null` in onSplit callbacks. May be removed
-		// if onSplit is revised to not pass a `null` value.
-		if ( value === null ) {
-			return create();
 		}
 
 		return value;
