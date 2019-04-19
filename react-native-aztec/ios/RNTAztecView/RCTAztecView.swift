@@ -265,6 +265,10 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Custom Edit Intercepts
     
     private func interceptEnter(_ text: String) -> Bool {
+        if text == "\t" {
+            return true
+        }
+
         guard text == "\n",
             let onEnter = onEnter else {
                 return false
@@ -285,7 +289,12 @@ class RCTAztecView: Aztec.TextView {
         onBackspace(caretData)
         return true
     }
-    
+
+    override var keyCommands: [UIKeyCommand]? {
+        // Remove defautls Tab and Shift+Tab commands, leaving just Shift+Enter command.
+        return [carriageReturnKeyCommand]
+    }
+
     // MARK: - Native-to-RN Value Packing Logic
     
     func packForRN(_ text: String, withName name: String) -> [AnyHashable: Any] {

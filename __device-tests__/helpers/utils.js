@@ -8,6 +8,7 @@
  */
 import childProcess from 'child_process';
 import wd from 'wd';
+import crypto from 'crypto';
 
 /**
  * Internal dependencies
@@ -116,6 +117,16 @@ const setupDriver = async () => {
 };
 
 const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
+	if ( ! isLocalEnvironment() ) {
+		const jobID = driver.sessionID;
+
+		const hash = crypto.createHmac( 'md5', jobID )
+			.update( serverConfigs.sauce.auth )
+			.digest( 'hex' );
+		const jobURL = `https://saucelabs.com/jobs/${ jobID }?auth=${ hash }.`;
+		// eslint-disable-next-line no-console
+		console.log( `You can view the video of this test run at ${ jobURL }` );
+	}
 	if ( driver === undefined ) {
 		return;
 	}

@@ -104,4 +104,6 @@ buck-out/
 appium-out.log
 
 bin/wp-cli.phar
-junit.xml
+
+# Report generated from jest-junit
+/junit.xml
