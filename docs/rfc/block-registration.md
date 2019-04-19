@@ -368,10 +368,10 @@ This property is a pointer to CSS files containing the CSS used for the block in
 
 ## Backward compatibility
 
-There are 3 properties that are going to supported for backward compatibility reasons and are going to be replaced with alternative APIs:
+Three properties are going to be supported for backward compatibility reasons on the client-side, and they are going to be replaced with alternative APIs in the future:
  - `supports` - see the [block supports](https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/block-registration/#supports-optional) documentation page for more details.
- - `merge` - not documented as of today.
- - `getEditWrapperProps` - not documented as well.
+ - `merge` - undocumented as of today. Its role is to handle merging multiple blocks into one.
+ - `getEditWrapperProps` - undocumented as well. Its role is to inject additional props to the block edit's component wrapper.
  
 **Example**:
 ```js
