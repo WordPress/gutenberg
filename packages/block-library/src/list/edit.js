@@ -30,7 +30,7 @@ export default function ListEdit( {
 			className={ className }
 			placeholder={ __( 'Write list…' ) }
 			onMerge={ mergeBlocks }
-			onSplit={ ( value ) => createBlock( name, { values: value } ) }
+			onSplit={ ( value ) => createBlock( name, { ordered, values: value } ) }
 			onSplitMiddle={ () => createBlock( 'core/paragraph' ) }
 			onReplace={ onReplace }
 			onRemove={ () => onReplace( [] ) }
