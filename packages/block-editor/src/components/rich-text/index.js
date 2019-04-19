@@ -853,7 +853,11 @@ export class RichText extends Component {
 			blocks.push( onSplit( this.valueToFormat( after ) ) );
 		}
 
-		onReplace( blocks );
+		// If there are pasted blocks, set the selection to the last one.
+		// Otherwise, set the selection to the second block.
+		const indexToSelect = hasPastedBlocks ? blocks.length - 1 : 1;
+
+		onReplace( blocks, indexToSelect );
 	}
 
 	/**

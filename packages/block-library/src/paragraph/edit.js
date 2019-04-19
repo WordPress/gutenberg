@@ -53,7 +53,7 @@ class ParagraphBlock extends Component {
 		this.toggleDropCap = this.toggleDropCap.bind( this );
 	}
 
-	onReplace( blocks ) {
+	onReplace( blocks, indexToSelect ) {
 		const { attributes, onReplace } = this.props;
 		onReplace( blocks.map( ( block, index ) => (
 			index === 0 && block.name === name ?
@@ -64,7 +64,7 @@ class ParagraphBlock extends Component {
 					},
 				} :
 				block
-		) ) );
+		) ), indexToSelect );
 	}
 
 	toggleDropCap() {
