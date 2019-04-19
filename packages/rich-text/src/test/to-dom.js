@@ -59,6 +59,12 @@ describe( 'applyValue', () => {
 			movedCount: 0,
 			description: 'should not modify',
 		},
+		{
+			current: 'test1 <span data-current-attribute1="current1" data-current-attribute2="current2">test2</span> <span>test3</span>',
+			future: 'test1 test2 <span data-future-attribute1="future1" data-future-attribute2="future2">test3</span>',
+			movedCount: 1,
+			description: 'should apply attributes',
+		},
 	];
 
 	cases.forEach( ( { current, future, description, movedCount } ) => {

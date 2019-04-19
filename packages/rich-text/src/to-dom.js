@@ -207,7 +207,7 @@ export function applyValue( future, current ) {
 				const futureAttributes = futureChild.attributes;
 
 				if ( currentAttributes ) {
-					for ( let ii = 0; ii < currentAttributes.length; ii++ ) {
+					for ( let ii = currentAttributes.length; --ii >= 0; ) {
 						const { name } = currentAttributes[ ii ];
 
 						if ( ! futureChild.getAttribute( name ) ) {
