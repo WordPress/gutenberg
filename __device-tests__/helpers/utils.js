@@ -154,6 +154,7 @@ const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.Promise
 				if ( paragraph in strToKeycode ) {
 					await driver.pressKeycode( strToKeycode[ paragraph ] );
 				} else {
+					// Execute with adb shell input <text> since normal type auto clears field on Android
 					await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', paragraph ] } );
 				}
 				if ( i !== paragraphs.length - 1 ) {
