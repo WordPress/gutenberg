@@ -31,9 +31,9 @@
 		opacity: 0.8;
 	}
 
-	// Reduce placeholder opacity on focus to make cursor visible.
+	// Make placeholder disappear on focus to make focus-state visible.
 	.block-editor-rich-text__editable[data-is-placeholder-visible="true"]:focus + .block-editor-rich-text__editable {
-		opacity: 0.4;
+		opacity: 0;
 	}
 
 	// Don't let the placeholder text wrap in the variation preview.
