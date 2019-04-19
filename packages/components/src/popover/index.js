@@ -182,30 +182,39 @@ const Popover = ( {
 	}, [] );
 
 	// Focus handling
-	useRef( () => {
-		if ( ! focusOnMount || ! contentRef.current ) {
-			return;
-		}
-
-		if ( focusOnMount === 'firstElement' ) {
-			// Find first tabbable node within content and shift focus, falling
-			// back to the popover panel itself.
-			const firstTabbable = focus.tabbable.find( contentRef.current )[ 0 ];
-
-			if ( firstTabbable ) {
-				firstTabbable.focus();
-			} else {
-				contentRef.current.focus();
+	useEffect( () => {
+		/*
+		 * Without the setTimeout, the dom node is not being focused. Related:
+		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
+		 *
+		 * TODO: Treat the cause, not the symptom.
+		 */
+		const focusTimeout = setTimeout( () => {
+			if ( ! focusOnMount || ! contentRef.current ) {
+				return;
 			}
 
-			return;
-		}
+			if ( focusOnMount === 'firstElement' ) {
+			// Find first tabbable node within content and shift focus, falling
+			// back to the popover panel itself.
+				const firstTabbable = focus.tabbable.find( contentRef.current )[ 0 ];
+				if ( firstTabbable ) {
+					firstTabbable.focus();
+				} else {
+					contentRef.current.focus();
+				}
 
-		if ( focusOnMount === 'container' ) {
+				return;
+			}
+
+			if ( focusOnMount === 'container' ) {
 			// Focus the popover panel itself so items in the popover are easily
 			// accessed via keyboard navigation.
-			contentRef.current.focus();
-		}
+				contentRef.current.focus();
+			}
+		}, 0 );
+
+		return () => clearTimeout( focusTimeout );
 	}, [] );
 
 	// Event handlers
