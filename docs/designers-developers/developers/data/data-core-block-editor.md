@@ -160,8 +160,8 @@ Number of blocks in the post.
 
 ### getSelectionStart
 
-Returns the current selection start block client ID, rich text area ID and
-text index.
+Returns the current selection start block client ID, attribute key and text
+offset.
 
 *Parameters*
 
@@ -173,8 +173,8 @@ Selection start information.
 
 ### getSelectionEnd
 
-Returns the current selection end block client ID, rich text area ID and
-text index.
+Returns the current selection end block client ID, attribute key and text
+offset.
 
 *Parameters*
 
@@ -1075,10 +1075,10 @@ position.
 
 *Parameters*
 
- * block: The selected block client ID.
- * identifier: The selected RichText ID within the block.
- * start: The start offset.
- * end: The end offset.
+ * clientId: The selected block client ID.
+ * attributeKey: The selected block attribute key.
+ * startOffset: The start offset.
+ * endOffset: The end offset.
 
 ### insertDefaultBlock
 

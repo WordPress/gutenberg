@@ -1151,8 +1151,8 @@ const RichTextContainer = compose( [
 
 		if ( isSelected === undefined ) {
 			isSelected = (
-				selectionStart.block === clientId &&
-				selectionStart.identifier === identifier
+				selectionStart.clientId === clientId &&
+				selectionStart.attributeKey === identifier
 			);
 		}
 

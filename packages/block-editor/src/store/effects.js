@@ -88,15 +88,15 @@ export default {
 		// A robust way to retain selection position through various transforms
 		// is to insert a special character at the position and then recover it.
 		const START_OF_SELECTED_AREA = '\u0086';
-		const { identifier, offset } = getSelectionStart( state );
-		const html = blockB.attributes[ identifier ];
-		const multilineTagB = blockBType.attributes[ identifier ].multiline;
+		const { attributeKey, offset } = getSelectionStart( state );
+		const html = blockB.attributes[ attributeKey ];
+		const multilineTagB = blockBType.attributes[ attributeKey ].multiline;
 		const value = insert( create( {
 			html,
 			multilineTag: multilineTagB,
 		} ), START_OF_SELECTED_AREA, offset, offset );
 
-		blockB.attributes[ identifier ] = toHTMLString( {
+		blockB.attributes[ attributeKey ] = toHTMLString( {
 			value,
 			multilineTag: multilineTagB,
 		} );
@@ -116,21 +116,21 @@ export default {
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		const newIdentifier = findKey( updatedAttributes, ( v ) =>
+		const newAttributeKey = findKey( updatedAttributes, ( v ) =>
 			typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
 		);
-		const convertedHtml = updatedAttributes[ newIdentifier ];
-		const multilineTagA = blockAType.attributes[ newIdentifier ].multiline;
+		const convertedHtml = updatedAttributes[ newAttributeKey ];
+		const multilineTagA = blockAType.attributes[ newAttributeKey ].multiline;
 		const convertedValue = create( { html: convertedHtml, multilineTag: multilineTagA } );
 		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
 		const newHtml = toHTMLString( { value: newValue, multilineTag: multilineTagA } );
 
-		updatedAttributes[ newIdentifier ] = newHtml;
+		updatedAttributes[ newAttributeKey ] = newHtml;
 
 		dispatch( selectionChange(
 			blockA.clientId,
-			newIdentifier,
+			newAttributeKey,
 			newOffset,
 			newOffset
 		) );

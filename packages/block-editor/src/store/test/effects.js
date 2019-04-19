@@ -106,8 +106,8 @@ describe( 'effects', () => {
 			const getState = () => ( {
 				blockSelection: {
 					start: {
-						block: blockB.clientId,
-						identifier: 'content',
+						clientId: blockB.clientId,
+						attributeKey: 'content',
 						offset: 0,
 					},
 				},
@@ -168,8 +168,8 @@ describe( 'effects', () => {
 			const getState = () => ( {
 				blockSelection: {
 					start: {
-						block: blockB.clientId,
-						identifier: 'content',
+						clientId: blockB.clientId,
+						attributeKey: 'content',
 						offset: 0,
 					},
 				},
@@ -233,8 +233,8 @@ describe( 'effects', () => {
 			const getState = () => ( {
 				blockSelection: {
 					start: {
-						block: blockB.clientId,
-						identifier: 'content2',
+						clientId: blockB.clientId,
+						attributeKey: 'content2',
 						offset: 0,
 					},
 				},

@@ -743,13 +743,13 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
 				isMultiSelecting: state.isMultiSelecting,
-				start: { block: action.start },
-				end: { block: action.end },
+				start: { clientId: action.start },
+				end: { clientId: action.end },
 			};
 		case 'SELECT_BLOCK':
 			if (
-				action.clientId === state.start.block &&
-				action.clientId === state.end.block
+				action.clientId === state.start.clientId &&
+				action.clientId === state.end.clientId
 			) {
 				return state;
 			}
@@ -757,16 +757,16 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
 				initialPosition: action.initialPosition,
-				start: { block: action.clientId },
-				end: { block: action.clientId },
+				start: { clientId: action.clientId },
+				end: { clientId: action.clientId },
 			};
 		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
 		case 'INSERT_BLOCKS': {
 			if ( action.updateSelection ) {
 				return {
 					...BLOCK_SELECTION_INITIAL_STATE,
-					start: { block: action.blocks[ 0 ].clientId },
-					end: { block: action.blocks[ 0 ].clientId },
+					start: { clientId: action.blocks[ 0 ].clientId },
+					end: { clientId: action.blocks[ 0 ].clientId },
 				};
 			}
 
@@ -776,14 +776,14 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			if (
 				! action.clientIds ||
 				! action.clientIds.length ||
-				action.clientIds.indexOf( state.start.block ) === -1
+				action.clientIds.indexOf( state.start.clientId ) === -1
 			) {
 				return state;
 			}
 
 			return BLOCK_SELECTION_INITIAL_STATE;
 		case 'REPLACE_BLOCKS': {
-			if ( action.clientIds.indexOf( state.start.block ) === -1 ) {
+			if ( action.clientIds.indexOf( state.start.clientId ) === -1 ) {
 				return state;
 			}
 
@@ -796,16 +796,16 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			}
 
 			if (
-				lastBlock.clientId === state.start.block &&
-				lastBlock.clientId === state.end.block
+				lastBlock.clientId === state.start.clientId &&
+				lastBlock.clientId === state.end.clientId
 			) {
 				return state;
 			}
 
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
-				start: { block: lastBlock.clientId },
-				end: { block: lastBlock.clientId },
+				start: { clientId: lastBlock.clientId },
+				end: { clientId: lastBlock.clientId },
 			};
 		}
 		case 'TOGGLE_SELECTION':
@@ -817,14 +817,14 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
 				start: {
-					block: action.block,
-					identifier: action.identifier,
-					offset: action.start,
+					clientId: action.clientId,
+					attributeKey: action.attributeKey,
+					offset: action.startOffset,
 				},
 				end: {
-					block: action.block,
-					identifier: action.identifier,
-					offset: action.end,
+					clientId: action.clientId,
+					attributeKey: action.attributeKey,
+					offset: action.endOffset,
 				},
 			};
 	}
