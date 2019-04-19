@@ -36,6 +36,11 @@
 		opacity: 0;
 	}
 
+	// Align cursor to left when text input is focused and placeholder is active.
+	.block-editor-rich-text__editable[data-is-placeholder-visible="true"]:focus {
+		text-align: left;
+	}
+
 	// Don't let the placeholder text wrap in the variation preview.
 	.block-editor-block-preview__content & {
 		max-width: 100%;
