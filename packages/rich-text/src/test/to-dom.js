@@ -82,10 +82,11 @@ describe( 'applyValue', () => {
 			future: 'test1 test2 <span data-common-attribute2="common" data-common-attribute1="future" data-future-attribute2="future2" data-future-attribute1="future1">test3</span>',
 			movedCount: 1,
 			description: 'should apply attributes',
+			expected: 'test1 test2 <span data-common-attribute1="future" data-common-attribute2="common" data-future-attribute2="future2" data-future-attribute1="future1">test3</span>',
 		},
 	];
 
-	cases.forEach( ( { current, future, description, movedCount } ) => {
+	cases.forEach( ( { current, future, description, movedCount, expected } ) => {
 		it( description, () => {
 			const body = createElement( document, current ).cloneNode( true );
 			const futureBody = createElement( document, future ).cloneNode( true );
@@ -94,33 +95,7 @@ describe( 'applyValue', () => {
 			const count = childNodes.reduce( ( acc, { parentNode } ) => {
 				return parentNode === body ? acc + 1 : acc;
 			}, 0 );
-			const sortNodeAttributes = function( node ) {
-				if ( ! node.attributes ) {
-					return;
-				}
-				const keys = [];
-				const values = {};
-				for ( let i = node.attributes.length; --i >= 0; ) {
-					const name = node.attributes[ i ].name;
-					keys.push( name );
-					values[ name ] = node.attributes[ i ].value;
-					node.removeAttribute( name );
-				}
-				keys.sort( function( a, b ) {
-					return a.localeCompare( b );
-				} );
-				keys.forEach( function( key ) {
-					node.setAttribute( key, values[ key ] );
-				} );
-			};
-			body.childNodes.forEach( function( node ) {
-				sortNodeAttributes( node );
-			} );
-			const attributesSortedFutureBody = createElement( document, future ).cloneNode( true );
-			attributesSortedFutureBody.childNodes.forEach( function( node ) {
-				sortNodeAttributes( node );
-			} );
-			expect( attributesSortedFutureBody.innerHTML ).toEqual( body.innerHTML );
+			expect( undefined === expected ? future : expected ).toEqual( body.innerHTML );
 			expect( count ).toEqual( movedCount );
 		} );
 	} );
