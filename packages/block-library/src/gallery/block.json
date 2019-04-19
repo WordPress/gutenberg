@@ -33,6 +33,9 @@
 					"type": "string",
 					"source": "html",
 					"selector": "figcaption"
+				},
+				"attachmentCaption": {
+					"type": "string"
 				}
 			}
 		},
