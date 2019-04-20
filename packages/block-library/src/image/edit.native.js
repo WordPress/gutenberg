@@ -8,6 +8,7 @@ import {
 	requestMediaPickFromMediaLibrary,
 	requestMediaPickFromDeviceLibrary,
 	requestMediaPickFromDeviceCamera,
+	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
@@ -27,11 +28,9 @@ import {
 	RichText,
 	BlockControls,
 	InspectorControls,
-} from '@wordpress/block-editor';
-import {
 	BottomSheet,
 	Picker,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
@@ -66,8 +65,6 @@ class ImageEdit extends React.Component {
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
-		this.addMediaUploadListener = this.addMediaUploadListener.bind( this );
-		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
@@ -79,10 +76,18 @@ class ImageEdit extends React.Component {
 	}
 
 	componentDidMount() {
-		const { attributes } = this.props;
+		this.addMediaUploadListener();
+
+		const { attributes, setAttributes } = this.props;
 
 		if ( attributes.id && ! isURL( attributes.url ) ) {
-			this.addMediaUploadListener();
+			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
+				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
+					if ( mediaUri ) {
+						setAttributes( { url: mediaUri, id: mediaId } );
+					}
+				} );
+			}
 			mediaUploadSync();
 		}
 	}
@@ -141,8 +146,6 @@ class ImageEdit extends React.Component {
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
 		this.setState( { isUploadInProgress: false } );
-
-		this.removeMediaUploadListener();
 	}
 
 	finishMediaUploadWithFailure( payload ) {
@@ -221,7 +224,6 @@ class ImageEdit extends React.Component {
 		const onMediaUploadButtonPressed = () => {
 			requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
-					this.addMediaUploadListener( );
 					setAttributes( { url: mediaUri, id: mediaId } );
 				}
 			} );
@@ -230,7 +232,6 @@ class ImageEdit extends React.Component {
 		const onMediaCaptureButtonPressed = () => {
 			requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
-					this.addMediaUploadListener( );
 					setAttributes( { url: mediaUri, id: mediaId } );
 				}
 			} );

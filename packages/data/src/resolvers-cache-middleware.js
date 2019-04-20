@@ -30,7 +30,7 @@ const createResolversCacheMiddleware = ( registry, reducerKey ) => () => ( next 
 			registry.dispatch( 'core/data' ).invalidateResolution( reducerKey, selectorName, args );
 		} );
 	} );
-	next( action );
+	return next( action );
 };
 
 export default createResolversCacheMiddleware;

@@ -541,7 +541,7 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'dispatch', () => {
-		it( 'registers actions to the public API', () => {
+		it( 'registers actions to the public API', async () => {
 			const increment = ( count = 1 ) => ( { type: 'increment', count } );
 			const store = registry.registerStore( 'counter', {
 				reducer: ( state = 0, action ) => {
@@ -554,8 +554,14 @@ describe( 'createRegistry', () => {
 					increment,
 				},
 			} );
-
-			registry.dispatch( 'counter' ).increment(); // state = 1
+			// state = 1
+			const dispatchResult = await registry.dispatch( 'counter' ).increment();
+			await expect( dispatchResult ).toEqual(
+				{
+					type: 'increment',
+					count: 1,
+				}
+			);
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
 		} );

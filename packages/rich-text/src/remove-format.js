@@ -28,7 +28,8 @@ export function removeFormat(
 	startIndex = value.start,
 	endIndex = value.end
 ) {
-	const newFormats = value.formats.slice( 0 );
+	const { formats, activeFormats } = value;
+	const newFormats = formats.slice();
 
 	// If the selection is collapsed, expand start and end to the edges of the
 	// format.
@@ -50,10 +51,7 @@ export function removeFormat(
 		} else {
 			return {
 				...value,
-				formatPlaceholder: reject(
-					newFormats[ startIndex - 1 ] || [],
-					{ type: formatType }
-				),
+				activeFormats: reject( activeFormats, { type: formatType } ),
 			};
 		}
 	} else {

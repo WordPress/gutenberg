@@ -154,6 +154,8 @@ export class MediaPlaceholder extends Component {
 			icon,
 			isAppender,
 			labels = {},
+			onDoubleClick,
+			mediaPreview,
 			notices,
 			onSelectURL,
 			mediaUpload,
@@ -212,6 +214,8 @@ export class MediaPlaceholder extends Component {
 				className={ placeholderClassName }
 				notices={ notices }
 				onClick={ onClick }
+				onDoubleClick={ onDoubleClick }
+				preview={ mediaPreview }
 			>
 				{ content }
 			</Placeholder>
@@ -225,6 +229,22 @@ export class MediaPlaceholder extends Component {
 				onFilesDrop={ this.onFilesUpload }
 				onHTMLDrop={ onHTMLDrop }
 			/>
+		);
+	}
+
+	renderCancelLink() {
+		const {
+			onCancel,
+		} = this.props;
+		return ( onCancel &&
+			<Button
+				className="block-editor-media-placeholder__cancel-button"
+				title={ __( 'Cancel' ) }
+				isLink
+				onClick={ onCancel }
+			>
+				{ __( 'Cancel' ) }
+			</Button>
 		);
 	}
 
@@ -329,6 +349,7 @@ export class MediaPlaceholder extends Component {
 									</IconButton>
 									{ mediaLibraryButton }
 									{ this.renderUrlSelectionUI() }
+									{ this.renderCancelLink() }
 								</Fragment>
 							);
 							return this.renderPlaceholder( content, openFileDialog );
@@ -356,6 +377,7 @@ export class MediaPlaceholder extends Component {
 					</FormFileUpload>
 					{ mediaLibraryButton }
 					{ this.renderUrlSelectionUI() }
+					{ this.renderCancelLink() }
 				</Fragment>
 			);
 			return this.renderPlaceholder( content );

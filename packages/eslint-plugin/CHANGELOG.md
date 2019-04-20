@@ -1,3 +1,10 @@
+## x.x.x (Unreleased)
+
+### New Features
+
+- New Rule: [`@wordpress/react-no-unsafe-timeout`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)
+- Add [React Hooks Rules](https://reactjs.org/docs/hooks-rules.html) config.
+
 ## 2.1.0 (2019-03-20)
 
 ### New Features

@@ -6,7 +6,7 @@ If you're having trouble getting your code to work, here are a few ways to troub
 
 The console log is a JavaScript developer's best friend. It is a good practice to work with it open, as it collects errors and notices into one place. See Mozilla's [JavaScript console](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools#The_JavaScript_console) documentation for more.
 
-Your first step in debugging should be to check the JavaScript console for any errors. Here is an example, which shows a syntax error on line 6.
+Your first step in debugging should be to check the JavaScript console for any errors. Here is an example, which shows a syntax error on line 6:
 
 ![console error](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/js-tutorial-console-log-error.png)
 

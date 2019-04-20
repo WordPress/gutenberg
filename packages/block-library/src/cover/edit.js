@@ -36,12 +36,16 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import icon from './icon';
+import {
+	IMAGE_BACKGROUND_TYPE,
+	VIDEO_BACKGROUND_TYPE,
+	backgroundImageStyles,
+	dimRatioToClass,
+} from './shared';
 
 /**
  * Module Constants
  */
-export const IMAGE_BACKGROUND_TYPE = 'image';
-export const VIDEO_BACKGROUND_TYPE = 'video';
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 const INNER_BLOCKS_TEMPLATE = [
 	[ 'core/paragraph', {
@@ -57,18 +61,6 @@ function retrieveFastAverageColor() {
 		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
 	}
 	return retrieveFastAverageColor.fastAverageColor;
-}
-
-export function backgroundImageStyles( url ) {
-	return url ?
-		{ backgroundImage: `url(${ url })` } :
-		{};
-}
-
-export function dimRatioToClass( ratio ) {
-	return ( ratio === 0 || ratio === 50 ) ?
-		null :
-		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
 }
 
 class CoverEdit extends Component {
@@ -143,9 +135,19 @@ class CoverEdit extends Component {
 				url: media.url,
 				id: media.id,
 				backgroundType: mediaType,
+				...( mediaType === VIDEO_BACKGROUND_TYPE ?
+					{ focalPoint: undefined, hasParallax: undefined } :
+					{}
+				),
 			} );
 		};
-		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
+
+		const toggleParallax = () => {
+			setAttributes( {
+				hasParallax: ! hasParallax,
+				...( ! hasParallax ? { focalPoint: undefined } : {} ),
+			} );
+		};
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
 
 		const style = {

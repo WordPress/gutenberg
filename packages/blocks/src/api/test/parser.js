@@ -18,6 +18,8 @@ import {
 	toBooleanAttributeMatcher,
 	isOfType,
 	isOfTypes,
+	isValidByType,
+	isValidByEnum,
 } from '../parser';
 import {
 	registerBlockType,
@@ -180,6 +182,42 @@ describe( 'block parser', () => {
 		} );
 	} );
 
+	describe( 'isValidByType', () => {
+		it( 'returns true if type undefined', () => {
+			expect( isValidByType( null ) ).toBe( true );
+		} );
+
+		it( 'returns false if value is not one of types array', () => {
+			expect( isValidByType( null, [ 'string' ] ) ).toBe( false );
+		} );
+
+		it( 'returns true if value is one of types array', () => {
+			expect( isValidByType( null, [ 'string', 'null' ] ) ).toBe( true );
+		} );
+
+		it( 'returns false if value is not of type string', () => {
+			expect( isValidByType( null, 'string' ) ).toBe( false );
+		} );
+
+		it( 'returns true if value is type string', () => {
+			expect( isValidByType( null, 'null' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isValidByEnum', () => {
+		it( 'returns true if enum set undefined', () => {
+			expect( isValidByEnum( 2 ) ).toBe( true );
+		} );
+
+		it( 'returns false if value is not of enum set', () => {
+			expect( isValidByEnum( 2, [ 1, 3 ] ) ).toBe( false );
+		} );
+
+		it( 'returns true if value is of enum set', () => {
+			expect( isValidByEnum( 2, [ 1, 2, 3 ] ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'parseWithAttributeSchema', () => {
 		it( 'should return the matcher’s attribute value', () => {
 			const value = parseWithAttributeSchema(
@@ -258,6 +296,62 @@ describe( 'block parser', () => {
 			);
 
 			expect( value ).toBe( 10 );
+		} );
+
+		it( 'should reject type-invalid value, with default', () => {
+			const value = getBlockAttribute(
+				'number',
+				{
+					type: 'string',
+					default: 5,
+				},
+				'',
+				{ number: 10 }
+			);
+
+			expect( value ).toBe( 5 );
+		} );
+
+		it( 'should reject type-invalid value, without default', () => {
+			const value = getBlockAttribute(
+				'number',
+				{
+					type: 'string',
+				},
+				'',
+				{ number: 10 }
+			);
+
+			expect( value ).toBe( undefined );
+		} );
+
+		it( 'should reject enum-invalid value, with default', () => {
+			const value = getBlockAttribute(
+				'number',
+				{
+					type: 'number',
+					enum: [ 4, 5, 6 ],
+					default: 5,
+				},
+				'',
+				{ number: 10 }
+			);
+
+			expect( value ).toBe( 5 );
+		} );
+
+		it( 'should reject enum-invalid value, without default', () => {
+			const value = getBlockAttribute(
+				'number',
+				{
+					type: 'number',
+					enum: [ 4, 5, 6 ],
+				},
+				'',
+				{ number: 10 }
+			);
+
+			expect( value ).toBe( undefined );
 		} );
 
 		it( "should return the matcher's attribute value", () => {

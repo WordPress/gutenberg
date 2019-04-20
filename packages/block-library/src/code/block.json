@@ -1,0 +1,11 @@
+{
+	"name": "core/code",
+	"category": "formatting",
+	"attributes": {
+		"content": {
+			"type": "string",
+			"source": "text",
+			"selector": "code"
+		}
+	}
+}

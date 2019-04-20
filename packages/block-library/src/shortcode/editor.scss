@@ -1,15 +1,15 @@
 .wp-block-shortcode {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	padding: $block-padding;
-	background-color: $light-gray-100;
+	background-color: $dark-opacity-light-200;
 	font-size: $default-font-size;
 	font-family: $default-font;
+	margin-bottom: $default-block-margin;
 
 	label {
 		display: flex;
 		align-items: center;
-		margin-right: $grid-size;
 		white-space: nowrap;
 		font-weight: 600;
 		flex-shrink: 0;
@@ -17,6 +17,9 @@
 
 	.block-editor-plain-text {
 		flex-grow: 1;
+		line-height: 1;
+		max-height: 30px;
+		width: 80%;
 	}
 
 	.dashicon {

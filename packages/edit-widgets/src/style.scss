@@ -1,3 +1,7 @@
+@import "./components/header/style.scss";
+@import "./components/layout/style.scss";
+@import "./components/sidebar/style.scss";
+
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations
 html.wp-toolbar {
@@ -12,8 +16,27 @@ body.gutenberg_page_gutenberg-widgets {
 // The modals are shown outside the .blocks-widgets-container wrapper, they need these styles
 .components-modal__frame {
 	@include reset;
+
 }
 
 .blocks-widgets-container {
-	padding: 0 10px;
+	// On mobile the main content area has to scroll, otherwise you can invoke
+	// the overscroll bounce on the non-scrolling container, for a bad experience.
+	@include break-small {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		min-height: calc(100vh - #{ $admin-bar-height-big });
+	}
+
+	// The WP header height changes at this breakpoint.
+	@include break-medium {
+		min-height: calc(100vh - #{ $admin-bar-height });
+	}
+
+	> .components-navigate-regions {
+		height: 100%;
+	}
 }

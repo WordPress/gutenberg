@@ -69,17 +69,6 @@ function fromFormat( { type, attributes, unregisteredAttributes, object, boundar
 	};
 }
 
-function getDeepestActiveFormat( value ) {
-	const activeFormats = getActiveFormats( value );
-	const { selectedFormat } = value;
-
-	if ( selectedFormat === undefined ) {
-		return activeFormats[ activeFormats.length - 1 ];
-	}
-
-	return activeFormats[ selectedFormat - 1 ];
-}
-
 const padding = {
 	type: 'br',
 	attributes: {
@@ -107,7 +96,8 @@ export function toTree( {
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
 	const multilineFormat = { type: multilineTag };
-	const deepestActiveFormat = getDeepestActiveFormat( value );
+	const activeFormats = getActiveFormats( value );
+	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
 
 	let lastSeparatorFormats;
 	let lastCharacterFormats;

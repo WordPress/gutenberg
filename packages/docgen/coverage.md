@@ -20,8 +20,8 @@
 
 These either happen in private API, aren't relevant, or are pending of decission.
 
-- [ ] go undocummented: `unstable__*`, rich-text `unstableToDom`, `experimental__`
-- [ ] `constants` keycodes, rich-text `LINE_SEPARATOR`
+- [ ] go undocummented: `unstable__*`
+- [ ] `constants` keycodes
 - [ ] `{?{ time: number, count: number }}`packages/editor/src/store/selectors.js
 - [ ] `{type=}` packages/block-library/src/image/edit.js
 - [ ] `@api` packages/editor/src/editor-styles/ast/stringify/compiler.js

@@ -19,8 +19,8 @@ describe( 'Editing modes (visual/HTML)', () => {
 		let visualBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
 
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 200, 300, { steps: 10 } );
+		// Press Escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "Visual" to "HTML".
 		await page.waitForSelector( 'button[aria-label="More options"]' );
@@ -32,8 +32,8 @@ describe( 'Editing modes (visual/HTML)', () => {
 		const htmlBlock = await page.$$( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea' );
 		expect( htmlBlock ).toHaveLength( 1 );
 
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 200, 300, { steps: 10 } );
+		// Press Escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "HTML" back to "Visual".
 		await page.waitForSelector( 'button[aria-label="More options"]' );
@@ -47,8 +47,8 @@ describe( 'Editing modes (visual/HTML)', () => {
 	} );
 
 	it( 'should display sidebar in HTML mode', async () => {
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 200, 300, { steps: 10 } );
+		// Press Escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "Visual" to "HTML".
 		await page.waitForSelector( 'button[aria-label="More options"]' );
@@ -63,8 +63,8 @@ describe( 'Editing modes (visual/HTML)', () => {
 	} );
 
 	it( 'should update HTML in HTML mode when sidebar is used', async () => {
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 200, 300, { steps: 10 } );
+		// Press Escape to show the block toolbar
+		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "Visual" to "HTML".
 		await page.waitForSelector( 'button[aria-label="More options"]' );

@@ -20,3 +20,7 @@ export { default as DefaultBlockAppender } from './default-block-appender';
 
 // State Related Components
 export { default as BlockEditorProvider } from './provider';
+
+// Mobile Editor Related Components
+export { default as BottomSheet } from './mobile/bottom-sheet';
+export { default as Picker } from './mobile/picker';

@@ -12,7 +12,7 @@
  */
 function the_gutenberg_widgets() {
 	?>
-	<div class="blocks-widgets-container">
+	<div id="widgets-editor" class="blocks-widgets-container">
 	</div>
 	<?php
 }
@@ -29,6 +29,10 @@ function gutenberg_widgets_init( $hook ) {
 			return;
 	}
 
+	wp_add_inline_script(
+		'wp-edit-widgets',
+		'wp.editWidgets.initialize( "widgets-editor" );'
+	);
 	wp_enqueue_script( 'wp-edit-widgets' );
 	wp_enqueue_style( 'wp-edit-widgets' );
 }
