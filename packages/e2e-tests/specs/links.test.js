@@ -266,7 +266,6 @@ describe( 'Links', () => {
 	};
 
 	// Test for regressions of https://github.com/WordPress/gutenberg/issues/10496.
-	// Disabled until improved as it wasn't reliable enough.
 	it.skip( 'allows autocomplete suggestions to be selected with the mouse', async () => {
 		// First create a post that we can search for using the link autocompletion.
 		const titleText = 'Test post mouse';
@@ -284,11 +283,12 @@ describe( 'Links', () => {
 		await waitForAutoFocus();
 
 		await page.keyboard.type( titleText );
-		await page.waitForSelector( '.block-editor-url-input__suggestion' );
-		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "block-editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
+		const suggestionXPath = `//*[contains(@class, "block-editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]`;
+		await page.waitForXPath( suggestionXPath );
+		const autocompleteSuggestions = await page.$x( suggestionXPath );
 
 		// Expect there to be some autocomplete suggestions.
-		expect( autocompleteSuggestions.length ).toBeGreaterThan( 0 );
+		expect( autocompleteSuggestions ).toHaveLength( 1 );
 
 		const firstSuggestion = autocompleteSuggestions[ 0 ];
 
@@ -330,7 +330,7 @@ describe( 'Links', () => {
 		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "block-editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
 
 		// Expect there to be some autocomplete suggestions.
-		expect( autocompleteSuggestions.length ).toBeGreaterThan( 0 );
+		expect( autocompleteSuggestions ).toHaveLength( 1 );
 
 		// Expect the the first suggestion to be selected when pressing the down arrow.
 		await page.keyboard.press( 'ArrowDown' );

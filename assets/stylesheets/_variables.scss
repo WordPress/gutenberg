@@ -9,6 +9,7 @@ $default-line-height: 1.4;
 $editor-font: "Noto Serif", serif;
 $editor-html-font: Menlo, Consolas, monaco, monospace;
 $editor-font-size: 16px;
+$default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks (it's 2x $block-padding).
 $text-editor-font-size: 14px;
 $editor-line-height: 1.8;
 $big-font-size: 18px;

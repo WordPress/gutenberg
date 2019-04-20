@@ -37,10 +37,10 @@ export default compose(
 		const { getBlockRootClientId } = select( 'core/editor' );
 
 		return {
-			parentColumsBlockClientId: getBlockRootClientId( clientId ),
+			parentColumnsBlockClientId: getBlockRootClientId( clientId ),
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, parentColumsBlockClientId } ) => {
+	withDispatch( ( dispatch, { clientId, parentColumnsBlockClientId } ) => {
 		return {
 			updateAlignment( alignment ) {
 				// Update self...
@@ -49,7 +49,7 @@ export default compose(
 				} );
 
 				// Reset Parent Columns Block
-				dispatch( 'core/editor' ).updateBlockAttributes( parentColumsBlockClientId, {
+				dispatch( 'core/editor' ).updateBlockAttributes( parentColumnsBlockClientId, {
 					verticalAlignment: null,
 				} );
 			},

@@ -10,12 +10,15 @@
 }
 
 .wp-block-button {
-	display: inline-block;
-	margin-bottom: 0;
 	position: relative;
 
 	[contenteditable] {
 		cursor: text;
+	}
+
+	// Don't let placeholder expand parent width.
+	.block-editor-rich-text {
+		display: inline-block;
 	}
 
 	// Make placeholder text white unless custom colors or outline versions are chosen.
@@ -40,7 +43,11 @@
 		.wp-block-button__link {
 			max-width: 100%;
 			overflow: hidden;
-			white-space: nowrap;
+			// Override is allowed here only because the rich text instance in
+			// a preview is not editable.
+			// To do: use the `save` function to preview a block transform, not
+			// the `edit` function.
+			white-space: nowrap !important;
 			text-overflow: ellipsis;
 		}
 	}
