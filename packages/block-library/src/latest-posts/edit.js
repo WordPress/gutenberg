@@ -191,6 +191,10 @@ class LatestPostsEdit extends Component {
 				>
 					{ displayPosts.map( ( post, i ) => {
 						const titleTrimmed = post.title.rendered.trim();
+						let excerpt = post.excerpt.rendered;
+						if ( post.excerpt.raw === '' ) {
+							excerpt = post.content.rendered;
+						}
 						return (
 							<li key={ i }>
 								<a href={ post.link } target="_blank" rel="noreferrer noopener">
@@ -212,9 +216,9 @@ class LatestPostsEdit extends Component {
 									<RawHTML
 										key="html"
 									>
-										{ excerptLength < post.excerpt.rendered.trim().split( ' ' ).length ?
-											post.excerpt.rendered.trim().split( ' ', excerptLength ).join( ' ' ) + ' ... <a href=' + post.link + 'target="_blank" rel="noopener noreferrer">Read More</a>' :
-											post.excerpt.rendered.trim().split( ' ', excerptLength ).join( ' ' ) }
+										{ excerptLength < excerpt.trim().split( ' ' ).length ?
+											excerpt.trim().split( ' ', excerptLength ).join( ' ' ) + ' ... <a href=' + post.link + 'target="_blank" rel="noopener noreferrer">Read More</a>' :
+											excerpt.trim().split( ' ', excerptLength ).join( ' ' ) }
 									</RawHTML>
 								</div>
 								}
