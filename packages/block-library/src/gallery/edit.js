@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { filter, pick, map, get } from 'lodash';
+import { filter, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,6 +31,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import GalleryImage from './gallery-image';
 import icon from './icon';
+import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -39,16 +40,6 @@ const linkOptions = [
 	{ value: 'none', label: __( 'None' ) },
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-
-export function defaultColumnsNumber( attributes ) {
-	return Math.min( 3, attributes.images.length );
-}
-
-export const pickRelevantMediaFiles = ( image ) => {
-	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
-	imageProps.url = get( image, [ 'sizes', 'large', 'url' ] ) || get( image, [ 'media_details', 'sizes', 'large', 'source_url' ] ) || image.url;
-	return imageProps;
-};
 
 class GalleryEdit extends Component {
 	constructor() {

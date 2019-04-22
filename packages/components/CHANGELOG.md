@@ -1,4 +1,8 @@
-## 7.3.0 (Unreleased)
+## 7.4.0 (Unreleased)
+
+- Added a new `HorizontalRule` component.
+
+## 7.3.0 (2019-04-16)
 
 ### New Features
 

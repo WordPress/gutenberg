@@ -12,6 +12,9 @@ import {
 	getEmbedPreview,
 	isPreviewEmbedFallback,
 	canUser,
+	getAutosave,
+	getAutosaves,
+	getCurrentUser,
 } from '../selectors';
 
 describe( 'getEntityRecord', () => {
@@ -143,5 +146,124 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( canUser( state, 'create', 'media', 123 ) ).toBe( false );
+	} );
+} );
+
+describe( 'getAutosave', () => {
+	const testAutosave = { author: 1, title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } };
+
+	it( 'returns undefined if no autosaves exist for the post id in state', () => {
+		const postType = 'post';
+		const postId = 2;
+		const author = 2;
+		const state = {
+			autosaves: {
+				1: [ testAutosave ],
+				2: [ testAutosave ],
+			},
+		};
+
+		const result = getAutosave( state, postType, postId, author );
+
+		expect( result ).toBeUndefined();
+	} );
+
+	it( 'returns undefined if an authorId is not provided (or undefined)', () => {
+		const postType = 'post';
+		const postId = 1;
+		const state = {
+			autosaves: {
+				1: [ testAutosave ],
+			},
+		};
+
+		const result = getAutosave( state, postType, postId );
+
+		expect( result ).toBeUndefined();
+	} );
+
+	it( 'returns undefined if there are autosaves for the post id, but none matching the autosave for the author', () => {
+		const postType = 'post';
+		const postId = 1;
+		const author = 2;
+		const state = {
+			autosaves: {
+				[ postId ]: [ testAutosave ],
+				2: [ testAutosave ],
+			},
+		};
+
+		const result = getAutosave( state, postType, postId, author );
+
+		expect( result ).toBeUndefined();
+	} );
+
+	it( 'returns the autosave for the post id and author when it exists in state', () => {
+		const postType = 'post';
+		const postId = 1;
+		const author = 2;
+		const expectedAutosave = { author, title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } };
+		const state = {
+			autosaves: {
+				[ postId ]: [ testAutosave, expectedAutosave ],
+				2: [ testAutosave ],
+			},
+		};
+
+		const result = getAutosave( state, postType, postId, author );
+
+		expect( result ).toEqual( expectedAutosave );
+	} );
+} );
+
+describe( 'getAutosaves', () => {
+	it( 'returns undefined for the provided post id if no autosaves exist for it in state', () => {
+		const postType = 'post';
+		const postId = 2;
+		const autosaves = [ { title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } } ];
+		const state = {
+			autosaves: {
+				1: autosaves,
+			},
+		};
+
+		const result = getAutosaves( state, postType, postId );
+
+		expect( result ).toBeUndefined();
+	} );
+
+	it( 'returns the autosaves for the provided post id when they exist in state', () => {
+		const postType = 'post';
+		const postId = 1;
+		const autosaves = [ { title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } } ];
+		const state = {
+			autosaves: {
+				1: autosaves,
+			},
+		};
+
+		const result = getAutosaves( state, postType, postId );
+
+		expect( result ).toEqual( autosaves );
+	} );
+} );
+
+describe( 'getCurrentUser', () => {
+	it( 'returns undefined if no user exists in state', () => {
+		const state = {};
+
+		expect( getCurrentUser( state ) ).toBeUndefined();
+	} );
+
+	it( 'returns the user object when a user exists in state', () => {
+		const currentUser = {
+			id: 1,
+		};
+
+		const state = {
+			currentUser,
+		};
+
+		expect( getCurrentUser( state ) ).toEqual( currentUser );
 	} );
 } );

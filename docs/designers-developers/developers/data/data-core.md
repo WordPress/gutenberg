@@ -24,6 +24,18 @@ Returns all available authors.
 
 Authors list.
 
+### getCurrentUser
+
+Returns the current user.
+
+*Parameters*
+
+ * state: Data state.
+
+*Returns*
+
+Current user object.
+
 ### getUserQueryResults
 
 Returns all the users returned by a query ID.
@@ -181,6 +193,52 @@ https://developer.wordpress.org/rest-api/reference/
 Whether or not the user can perform the action,
                             or `undefined` if the OPTIONS request is still being made.
 
+### getAutosaves
+
+Returns the latest autosaves for the post.
+
+May return multiple autosaves since the backend stores one autosave per
+author for each post.
+
+*Parameters*
+
+ * state: State tree.
+ * postType: The type of the parent post.
+ * postId: The id of the parent post.
+
+*Returns*
+
+An array of autosaves for the post, or undefined if there is none.
+
+### getAutosave
+
+Returns the autosave for the post and author.
+
+*Parameters*
+
+ * state: State tree.
+ * postType: The type of the parent post.
+ * postId: The id of the parent post.
+ * authorId: The id of the author.
+
+*Returns*
+
+The autosave for the post and author.
+
+### hasFetchedAutosaves
+
+Returns true if the REST request for autosaves has completed.
+
+*Parameters*
+
+ * state: State tree.
+ * postType: The type of the parent post.
+ * postId: The id of the parent post.
+
+*Returns*
+
+True if the REST request was completed. False otherwise.
+
 ## Actions
 
 ### receiveUserQuery
@@ -191,6 +249,14 @@ Returns an action object used in signalling that authors have been received.
 
  * queryID: Query ID.
  * users: Users received.
+
+### receiveCurrentUser
+
+Returns an action used in signalling that the current user has been received.
+
+*Parameters*
+
+ * currentUser: Current user object.
 
 ### addEntities
 
@@ -257,3 +323,13 @@ permission to perform an action on a REST resource.
 
  * key: A key that represents the action and REST resource.
  * isAllowed: Whether or not the user can perform the action.
+
+### receiveAutosaves
+
+Returns an action object used in signalling that the autosaves for a
+post have been received.
+
+*Parameters*
+
+ * postId: The id of the post that is parent to the autosave.
+ * autosaves: An array of autosaves or singular autosave object.
