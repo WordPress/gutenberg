@@ -6,15 +6,25 @@ commands:
       - restore_cache:
           name: Restore Yarn Cache
           keys:
-            - yarn-{{ checksum "yarn.lock" }}
+            - yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
-          command: yarn install --frozen-lockfile
+          command: YARN_CACHE_FOLDER=~/.cache/yarn yarn install --frozen-lockfile
       - save_cache:
           name: Save Yarn Cache
-          key: yarn-{{ checksum "yarn.lock" }}
+          key: yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
+  checkout-gutenberg:
+    steps:
+      - run:
+          name: Checkout Gutenberg
+          command: git submodule update --init --recursive
+  add-jest-reporter-dir:
+      steps:
+        - run:
+            name: Create reports directory
+            command: mkdir reports && mkdir reports/test-results
 
 jobs:
   checks:
@@ -32,12 +42,9 @@ jobs:
       - image: circleci/node:8
     steps:
       - checkout
-      - run:
-          name: Checkout Gutenberg
-          command: |
-            git submodule init
-            git submodule update --recursive
+      - checkout-gutenberg
       - yarn-install
+      - add-jest-reporter-dir
       - run:
           name: Set Environment Variables
           command: |
@@ -47,6 +54,84 @@ jobs:
       - run:
           name: Run Checks
           command: bin/ci-checks-js.sh
+          environment:
+            JEST_JUNIT_OUTPUT: "reports/test-results/android-test-results.xml"
+      - store_test_results:
+          path: ./reports/test-results
+  android-device-checks:
+    docker:
+    - image: circleci/android:api-28-node8-alpha
+    steps:
+      - checkout
+      - run:
+          name: Checkout Gutenberg
+          command: git submodule update --init --recursive
+      - yarn-install
+      - add-jest-reporter-dir
+      - run:
+          name: Set Environment Variables
+          command: |
+            echo 'export TEST_RN_PLATFORM=android' >> $BASH_ENV
+            echo 'export TEST_ENV=sauce' >> $BASH_ENV
+      - run:
+          name: Bundle Android and Generate debug .apk file for testing
+          command: yarn test:e2e:build-app:android
+      - run:
+          name: Upload apk to sauce labs
+          command: |
+            curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
+      - run:
+          name: Run Device Tests
+          command: yarn device-tests
+          environment:
+            JEST_JUNIT_OUTPUT: "reports/test-results/android-test-results.xml"
+      - store_test_results:
+          path: ./reports/test-results
+  ios-device-checks:
+    macos:
+      xcode: "10.2.0"
+    steps:
+    - checkout
+    - checkout-gutenberg
+    - yarn-install
+    - add-jest-reporter-dir
+    - run:
+        name: Set Environment Variables
+        command: |
+          echo 'export TEST_RN_PLATFORM=ios' >> $BASH_ENV
+          echo 'export TEST_ENV=sauce' >> $BASH_ENV
+    - restore_cache:
+        name: Restore Dependencies Cache
+        keys:
+        - dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+          checksum "yarn.lock" }}
+        - dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}
+        - dependencies-
+    - run:
+        name: Yarn preios
+        command: yarn preios
+    - save_cache:
+        name: Save Dependencies Cache
+        key: dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+          checksum "yarn.lock" }}
+        paths:
+        - react-native-aztec/ios/Carthage
+        - ~/.rncache
+    - run:
+        name: Bundle iOS and Generate debug .app file for testing
+        command: yarn test:e2e:build-app:ios
+    - run:
+        name: Upload .app to sauce labs
+        command: |
+          curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.app.zip?overwrite=true --data-binary @./ios/Gutenberg.app.zip
+    - run:
+        name: Run Device Tests
+        command: |
+          yarn device-tests
+        environment:
+          JEST_JUNIT_OUTPUT: "reports/test-results/ios-test-results.xml"
+    - store_test_results:
+        path: ./reports/test-results
 
 workflows:
   gutenberg-mobile:
@@ -62,3 +147,7 @@ workflows:
           name: Test Android
           platform: android
           check-tests: true
+      - ios-device-checks:
+          name: Test iOS on Device
+      - android-device-checks:
+          name: Test Android on Device

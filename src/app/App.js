@@ -23,7 +23,7 @@ export default class AppProvider extends React.Component<PropsType> {
 		const { initialHtmlModeEnabled } = this.props;
 		let initialData = this.props.initialData;
 		let initialTitle = this.props.initialTitle;
-		if ( initialData === undefined ) {
+		if ( initialData === undefined && __DEV__ ) {
 			initialData = initialHtml;
 		}
 		if ( initialTitle === undefined ) {

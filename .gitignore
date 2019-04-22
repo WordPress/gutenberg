@@ -23,6 +23,10 @@ yarn-error.log*
 *.apk
 *.ap_
 .gradle/
+android/app/src/main/assets/
+
+# iOS builds
+*.app.zip
 
 # files for the dex VM
 *.dex
@@ -95,4 +99,11 @@ buck-out/
 !.vscode/extensions.json
 
 *.pot
+
+# e2e output log
+appium-out.log
+
 bin/wp-cli.phar
+
+# Report generated from jest-junit
+/junit.xml
