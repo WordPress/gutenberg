@@ -97,34 +97,6 @@ const tabThroughBlockToolbar = async () => {
 	);
 	await expect( isFocusedRightAlignmentControl ).toBe( true );
 
-	// Tab to focus on the 'Bold' formatting button
-	await page.keyboard.press( 'Tab' );
-	const isFocusedBoldFormattingButton = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'components-toolbar__control' )
-	);
-	await expect( isFocusedBoldFormattingButton ).toBe( true );
-
-	// Tab to focus on the 'Italic' formatting button
-	await page.keyboard.press( 'Tab' );
-	const isFocusedItalicFormattingButton = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'components-toolbar__control' )
-	);
-	await expect( isFocusedItalicFormattingButton ).toBe( true );
-
-	// Tab to focus on the 'Hyperlink' formatting button
-	await page.keyboard.press( 'Tab' );
-	const isFocusedHyperlinkFormattingButton = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'components-toolbar__control' )
-	);
-	await expect( isFocusedHyperlinkFormattingButton ).toBe( true );
-
-	// Tab to focus on the 'Strikethrough' formatting button
-	await page.keyboard.press( 'Tab' );
-	const isFocusedMoreFormattingDropdown = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'components-dropdown-menu__toggle' )
-	);
-	await expect( isFocusedMoreFormattingDropdown ).toBe( true );
-
 	// Tab to focus on the 'More formatting' dropdown toggle
 	await page.keyboard.press( 'Tab' );
 	const isFocusedBlockSettingsDropdown = await page.evaluate( () =>
