@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { Platform } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -113,6 +118,11 @@ export const registerCoreBlocks = () => {
 		separator,
 		list,
 	].forEach( ( { metadata, name, settings } ) => {
+		// Don't register the List block on Android for now.
+		if (name == 'core/list' && Platform.OS === 'android') {
+			return;
+		}
+
 		registerBlockType( name, {
 			...metadata,
 			...settings,
