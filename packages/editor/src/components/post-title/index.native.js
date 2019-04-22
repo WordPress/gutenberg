@@ -96,7 +96,6 @@ class PostTitle extends Component {
 					setRef={ ( ref ) => {
 						this.titleViewRef = ref;
 					} }
-					accessible={ false }
 				>
 				</RichText>
 			</View>
