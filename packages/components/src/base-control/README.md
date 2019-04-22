@@ -45,7 +45,7 @@ If this property is added, a label will be generated using label property as the
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String`
+- Type: `String|WPElement`
 - Required: No
 
 ### className
@@ -59,6 +59,47 @@ If no className is passed only components-base-control is used.
 ### children
 
 The content to be displayed within the BaseControl.
+
+- Type: `Element`
+- Required: Yes
+
+## BaseControl.VisualLabel
+
+`BaseControl.VisualLabel` component is used to render a purely visual label inside a `BaseControl` component.
+It should only be used in cases where the children being rendered inside BaseControl are already properly labeled, e.g., a button, but we want an additional visual label for that section equivalent to the labels BaseControl would otherwise use if the label prop was passed.
+
+
+## Usage
+```jsx
+import { BaseControl } from '@wordpress/components';
+
+const MyBaseControl = () => (
+	<BaseControl
+		help="Pressing the Select an author buttom will open a modal that allows an advanced mechanism for author selection"
+	>
+		<BaseControl.VisualLabel>
+			Author
+		</BaseControl.VisualLabel>
+		<Button>
+			Select an author
+		</Button>
+	</BaseControl>
+);
+```
+
+### Props
+
+#### className
+
+The class that will be added with `components-base-control__label` to the classes of the wrapper div.
+If no className is passed only `components-base-control__label` is used.
+
+- Type: `String`
+- Required: No
+
+#### children
+
+The content to be displayed within the `BaseControl.VisualLabel`.
 
 - Type: `Element`
 - Required: Yes

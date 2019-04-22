@@ -12,22 +12,13 @@ export const name = 'core/rss';
 
 export const settings = {
 	title: __( 'RSS' ),
-
 	description: __( 'Display entries from any RSS or Atom feed.' ),
-
 	icon: 'rss',
-
 	category: 'widgets',
-
 	keywords: [ __( 'atom' ), __( 'feed' ) ],
-
 	supports: {
+		align: true,
 		html: false,
 	},
-
 	edit,
-
-	save() {
-		return null;
-	},
 };

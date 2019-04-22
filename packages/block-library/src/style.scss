@@ -2,6 +2,7 @@
 @import "./block/edit-panel/style.scss";
 @import "./block/indicator/style.scss";
 @import "./button/style.scss";
+@import "./calendar/style.scss";
 @import "./categories/style.scss";
 @import "./columns/style.scss";
 @import "./cover/style.scss";
@@ -119,7 +120,7 @@
 	font-size: 13px;
 }
 
-.has-regular-font-size, // not used now, kept because of backward compatibility.
+.has-regular-font-size, // Not used now, kept because of backward compatibility.
 .has-normal-font-size {
 	font-size: 16px;
 }
@@ -132,7 +133,32 @@
 	font-size: 36px;
 }
 
-.has-larger-font-size, // not used now, kept because of backward compatibility.
+.has-larger-font-size, // Not used now, kept because of backward compatibility.
 .has-huge-font-size {
 	font-size: 42px;
+}
+
+
+/**
+ * Vanilla Block Styles
+ * These are base styles that apply across blocks, meant to provide a baseline.
+ * They are applied both to the editor and the theme, so we should have as few of these as possible.
+ * Please note that some styles are stored in packages/editor/src/editor-styles.scss, as they pertain to CSS bleed for the editor only.
+ */
+
+// Caption styles.
+// Supply these even if the theme hasn't opted in, because the figcaption element is not likely to be styled in the majority of existing themes.
+// By providing a minimum of margin styles, we ensure it doesn't look broken or unstyled in those themes.
+figcaption {
+	margin-top: 0.5em;
+}
+
+// Apply some base styles to blocks that need them.
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+iframe {
+	width: 100%;
 }

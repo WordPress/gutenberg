@@ -1,12 +1,30 @@
 # Deprecations
 
-The Gutenberg project's deprecation policy is intended to support backward compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
+For features included in the Gutenberg plugin, the deprecation policy is intended to support backward compatibility for two minor plugin releases, when possible. Features and code included in a stable release of WordPress are not included in this deprecation timeline, and are instead subject to the [versioning policies of the WordPress project](https://make.wordpress.org/core/handbook/about/release-cycle/version-numbering/). The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
+
+## 5.5.0
+
+- The PHP function `gutenberg_init` has been removed.
+- The PHP function `is_gutenberg_page` has been removed. Use [`WP_Screen::is_block_editor`](https://developer.wordpress.org/reference/classes/wp_screen/is_block_editor/) instead.
+- The PHP function `the_gutenberg_project` has been removed.
+- The PHP function `gutenberg_default_post_format_template` has been removed.
+- The PHP function `gutenberg_get_available_image_sizes` has been removed.
+- The PHP function `gutenberg_get_autosave_newer_than_post_save` has been removed.
+- The PHP function `gutenberg_editor_scripts_and_styles` has been removed.
+
+## 5.4.0
+
+- The PHP function `gutenberg_load_plugin_textdomain` has been removed.
+- The PHP function `gutenberg_get_jed_locale_data` has been removed.
+- The PHP function `gutenberg_load_locale_data` has been removed.
 
 ## 5.3.0
 
 - The PHP function `gutenberg_redirect_to_classic_editor_when_saving_posts` has been removed.
 - The PHP function `gutenberg_revisions_link_to_editor` has been removed.
 - The PHP function `gutenberg_remember_classic_editor_when_saving_posts` has been removed.
+- The PHP function `gutenberg_can_edit_post_type` has been removed. Use [`use_block_editor_for_post_type`](https://developer.wordpress.org/reference/functions/use_block_editor_for_post_type/) instead.
+- The PHP function `gutenberg_can_edit_post` has been removed. Use [`use_block_editor_for_post`](https://developer.wordpress.org/reference/functions/use_block_editor_for_post/) instead.
 
 ## 5.2.0
 

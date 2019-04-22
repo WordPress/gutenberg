@@ -4,6 +4,7 @@
 import {
 	createNewPost,
 	insertBlock,
+	isInDefaultBlock,
 	getEditedPostContent,
 	pressKeyTimes,
 	pressKeyWithModifier,
@@ -193,21 +194,12 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// There is a default block:
-		expect( await page.$$( '.editor-block-list__block' ) ).toHaveLength( 1 );
+		expect( await page.$$( '.block-editor-block-list__block' ) ).toHaveLength( 1 );
 
 		// But the effective saved content is still empty:
 		expect( await getEditedPostContent() ).toBe( '' );
 
 		// And focus is retained:
-		const isInDefaultBlock = await page.evaluate( () => {
-			const activeBlockName = document.activeElement
-				.closest( '[data-type]' )
-				.getAttribute( 'data-type' );
-			const defaultBlockName = window.wp.blocks.getDefaultBlockName();
-
-			return activeBlockName === defaultBlockName;
-		} );
-
-		expect( isInDefaultBlock ).toBe( true );
+		expect( await isInDefaultBlock() ).toBe( true );
 	} );
 } );

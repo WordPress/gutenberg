@@ -1,5 +1,5 @@
 .components-placeholder {
-	margin: 0;
+	margin-bottom: $default-block-margin;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -8,15 +8,20 @@
 	min-height: 200px;
 	width: 100%;
 	text-align: center;
-	font-family: $default-font;
-	font-size: $default-font-size;
 
-	// use opacity to work in various editor styles
+	// Use opacity to work in various editor styles.
 	background: $dark-opacity-light-200;
 
 	.is-dark-theme & {
 		background: $light-opacity-light-200;
 	}
+}
+
+.components-placeholder__instructions,
+.components-placeholder__label,
+.components-placeholder__fieldset {
+	font-family: $default-font;
+	font-size: $default-font-size;
 }
 
 .components-placeholder__label {
@@ -27,7 +32,8 @@
 	margin-bottom: 1em;
 
 	.dashicon,
-	.editor-block-icon {
+	.block-editor-block-icon {
+		fill: currentColor;
 		margin-right: 1ch;
 	}
 }
@@ -55,4 +61,9 @@
 
 .components-placeholder__instructions {
 	margin-bottom: 1em;
+}
+
+.components-placeholder__preview img {
+	margin: 3%;
+	width: 50%;
 }

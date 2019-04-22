@@ -126,6 +126,7 @@ function register_block_core_archives() {
 			'attributes'      => array(
 				'align'             => array(
 					'type' => 'string',
+					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
 				),
 				'className'         => array(
 					'type' => 'string',
@@ -143,5 +144,4 @@ function register_block_core_archives() {
 		)
 	);
 }
-
 add_action( 'init', 'register_block_core_archives' );

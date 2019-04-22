@@ -20,18 +20,14 @@ npm install @wordpress/jest-console --save-dev
 
 ### Setup
 
-The simplest setup is to use Jest's `setupTestFrameworkScriptFile` config option:
+The simplest setup is to use Jest's `setupFilesAfterEnv` config option:
 
 ```js
 "jest": {
-  "setupTestFrameworkScriptFile": "./node_modules/@wordpress/jest-console/build/index.js"
+  "setupFilesAfterEnv": [
+    "@wordpress/jest-console"
+  ]
 },
-```
-
-If your project already has a script file which sets up the test framework, you will need the following import statement:
-
-```js
-import '@wordpress/jest-console';
 ```
 
 ### Usage

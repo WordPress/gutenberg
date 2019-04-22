@@ -16,7 +16,7 @@
 		font-family: $editor-font;
 		line-height: $default-line-height;
 		color: $dark-gray-900;
-		transition: border 0.1s ease-out;
+		transition: border 0.1s ease-out, box-shadow 0.1s linear;
 		padding: #{ $block-padding + 5px } $block-padding;
 		word-break: keep-all;
 
@@ -24,9 +24,14 @@
 		border: $border-width solid transparent;
 		border-left-width: 0;
 		border-right-width: 0;
+		border-radius: 0;
+
+		// Include transparent outline for Windows High Contrast mode.
+		outline: $border-width solid transparent;
 
 		@include break-small() {
 			border-width: $border-width;
+			border-left-width: 0;
 		}
 
 		// Match h1 heading.
@@ -45,22 +50,44 @@
 		&:-ms-input-placeholder {
 			color: $dark-opacity-200;
 		}
+
+		&:focus {
+			border: $border-width solid transparent;
+			border-left-width: 0;
+			outline: $border-width solid transparent;
+			box-shadow: none;
+		}
 	}
 
 	&:not(.is-focus-mode) {
 		&.is-selected .editor-post-title__input {
-			// use opacity to work in various editor styles
-			border-color: $dark-opacity-light-500;
+			// use opacity to work in various editor styles.
+			border-color: $dark-opacity-light-800;
+			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
 
 			.is-dark-theme & {
-				border-color: $light-opacity-light-500;
+				border-color: $light-opacity-light-800;
+				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
+			}
+
+			// Switch to outset borders on larger screens.
+			@include break-small() {
+				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
+
+				.is-dark-theme & {
+					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
+				}
 			}
 		}
 	}
 
-	&:not(.is-focus-mode):not(.has-fixed-toolbar) {
+	&:not(.is-focus-mode):not(.has-fixed-toolbar):not(.is-selected) {
 		.editor-post-title__input:hover {
-			border-color: theme(outlines);
+			box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
+
+			.is-dark-theme & {
+				box-shadow: -$block-left-border-width 0 0 0 $light-opacity-light-400;
+			}
 		}
 	}
 

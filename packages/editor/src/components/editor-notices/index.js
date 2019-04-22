@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { filter } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { NoticeList } from '@wordpress/components';
@@ -10,10 +15,16 @@ import { compose } from '@wordpress/compose';
  */
 import TemplateValidationNotice from '../template-validation-notice';
 
-function EditorNotices( props ) {
+export function EditorNotices( { dismissible, notices, ...props } ) {
+	if ( dismissible !== undefined ) {
+		notices = filter( notices, { isDismissible: dismissible } );
+	}
+
 	return (
-		<NoticeList { ...props }>
-			<TemplateValidationNotice />
+		<NoticeList notices={ notices } { ...props }>
+			{ dismissible !== false && (
+				<TemplateValidationNotice />
+			) }
 		</NoticeList>
 	);
 }

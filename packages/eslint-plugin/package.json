@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "1.0.1",
+	"version": "2.1.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -11,15 +11,17 @@
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/eslint-plugin/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git"
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/eslint-plugin"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"dependencies": {
 		"babel-eslint": "^8.0.3",
-		"eslint-plugin-jsx-a11y": "6.0.2",
-		"eslint-plugin-react": "7.7.0",
+		"eslint-plugin-jsx-a11y": "^6.2.1",
+		"eslint-plugin-react": "^7.12.4",
+		"eslint-plugin-react-hooks": "^1.6.0",
 		"requireindex": "^1.2.0"
 	},
 	"publishConfig": {

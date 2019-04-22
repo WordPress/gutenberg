@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import __unstableEscapeGreaterThan from './escape-greater';
+
+/**
  * Regular expression matching invalid attribute names.
  *
  * "Attribute names must consist of one or more characters other than controls,
@@ -59,12 +64,20 @@ export function escapeLessThan( value ) {
  * "[...] the text cannot contain an ambiguous ampersand [...] must not contain
  * any literal U+0022 QUOTATION MARK characters (")"
  *
+ * Note we also escape the greater than symbol, as this is used by wptexturize to
+ * split HTML strings. This is a WordPress specific fix
+ *
+ * Note that if a resolution for Trac#45387 comes to fruition, it is no longer
+ * necessary for `__unstableEscapeGreaterThan` to be used.
+ *
+ * See: https://core.trac.wordpress.org/ticket/45387
+ *
  * @param {string} value Attribute value.
  *
  * @return {string} Escaped attribute value.
  */
 export function escapeAttribute( value ) {
-	return escapeQuotationMark( escapeAmpersand( value ) );
+	return __unstableEscapeGreaterThan( escapeQuotationMark( escapeAmpersand( value ) ) );
 }
 
 /**

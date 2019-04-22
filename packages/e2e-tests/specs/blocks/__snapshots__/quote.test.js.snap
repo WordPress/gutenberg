@@ -6,44 +6,6 @@ exports[`Quote can be converted to a pullquote 1`] = `
 <!-- /wp:pullquote -->"
 `;
 
-exports[`Quote can be converted to headings 1`] = `
-"<!-- wp:heading -->
-<h2>one</h2>
-<!-- /wp:heading -->
-
-<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>two</p><cite>cite</cite></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Quote can be converted to headings 2`] = `
-"<!-- wp:heading -->
-<h2>one</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading -->
-<h2>two</h2>
-<!-- /wp:heading -->
-
-<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p></p><cite>cite</cite></blockquote>
-<!-- /wp:quote -->"
-`;
-
-exports[`Quote can be converted to headings 3`] = `
-"<!-- wp:heading -->
-<h2>one</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading -->
-<h2>two</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading -->
-<h2>cite</h2>
-<!-- /wp:heading -->"
-`;
-
 exports[`Quote can be converted to paragraphs and renders a paragraph for the cite, if it exists 1`] = `
 "<!-- wp:paragraph -->
 <p>one</p>
@@ -116,4 +78,74 @@ exports[`Quote can be merged into from a paragraph 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p>test</p></blockquote>
 <!-- /wp:quote -->"
+`;
+
+exports[`Quote is transformed to a heading and a quote if the quote contains a citation 1`] = `
+"<!-- wp:heading -->
+<h2>one</h2>
+<!-- /wp:heading -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p><cite>cite</cite></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Quote is transformed to a heading and a quote if the quote contains multiple paragraphs 1`] = `
+"<!-- wp:heading -->
+<h2>one</h2>
+<!-- /wp:heading -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>two</p><p>three</p></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Quote is transformed to a heading if the quote just contains one paragraph 1`] = `
+"<!-- wp:heading -->
+<h2>one</h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`Quote is transformed to an empty heading if the quote is empty 1`] = `
+"<!-- wp:heading -->
+<h2></h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`Quote the resuling quote after transforming to a heading can be transformed again 1`] = `
+"<!-- wp:heading -->
+<h2>one</h2>
+<!-- /wp:heading -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>two</p><cite>cite</cite></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Quote the resuling quote after transforming to a heading can be transformed again 2`] = `
+"<!-- wp:heading -->
+<h2>one</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading -->
+<h2>two</h2>
+<!-- /wp:heading -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p><cite>cite</cite></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Quote the resuling quote after transforming to a heading can be transformed again 3`] = `
+"<!-- wp:heading -->
+<h2>one</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading -->
+<h2>two</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading -->
+<h2>cite</h2>
+<!-- /wp:heading -->"
 `;

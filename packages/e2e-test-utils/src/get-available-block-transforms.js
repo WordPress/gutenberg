@@ -13,7 +13,7 @@ export const getAvailableBlockTransforms = async () => {
 	if ( ! await hasBlockSwitcher() ) {
 		return [];
 	}
-	await page.click( '.editor-block-toolbar .editor-block-switcher' );
+	await page.click( '.block-editor-block-toolbar .block-editor-block-switcher' );
 	return page.evaluate( ( buttonSelector ) => {
 		return Array.from(
 			document.querySelectorAll(
@@ -24,5 +24,5 @@ export const getAvailableBlockTransforms = async () => {
 				return button.getAttribute( 'aria-label' );
 			}
 		);
-	}, '.editor-block-types-list .editor-block-types-list__list-item button' );
+	}, '.block-editor-block-types-list .block-editor-block-types-list__list-item button' );
 };

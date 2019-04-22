@@ -20,10 +20,76 @@ const plugins = {};
 /**
  * Registers a plugin to the editor.
  *
- * @param {string}                    name            The name of the plugin.
+ * @param {string}                    name            A string identifying the plugin. Must be unique across all registered plugins.
  * @param {Object}                    settings        The settings for this plugin.
- * @param {Function}                  settings.render The function that renders the plugin.
- * @param {string|WPElement|Function} settings.icon   An icon to be shown in the UI.
+ * @param {string|WPElement|Function} settings.icon   An icon to be shown in the UI. It can be a slug of the Dashicon,
+ * or an element (or function returning an element) if you choose to render your own SVG.
+ * @param {Function}                  settings.render A component containing the UI elements to be rendered.
+ *
+ * @example <caption>ES5</caption>
+ * ```js
+ * // Using ES5 syntax
+ * var el = wp.element.createElement;
+ * var Fragment = wp.element.Fragment;
+ * var PluginSidebar = wp.editPost.PluginSidebar;
+ * var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+ * var registerPlugin = wp.plugins.registerPlugin;
+ *
+ * function Component() {
+ * 	return el(
+ * 		Fragment,
+ * 		{},
+ * 		el(
+ * 			PluginSidebarMoreMenuItem,
+ * 			{
+ * 				target: 'sidebar-name',
+ * 			},
+ * 			'My Sidebar'
+ * 		),
+ * 		el(
+ * 			PluginSidebar,
+ * 			{
+ * 				name: 'sidebar-name',
+ * 				title: 'My Sidebar',
+ * 			},
+ * 			'Content of the sidebar'
+ * 		)
+ * 	);
+ * }
+ * registerPlugin( 'plugin-name', {
+ * 	icon: 'smiley',
+ * 	render: Component,
+ * } );
+ * ```
+ *
+ * @example <caption>ESNext</caption>
+ * ```js
+ * // Using ESNext syntax
+ * const { Fragment } = wp.element;
+ * const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
+ * const { registerPlugin } = wp.plugins;
+ *
+ * const Component = () => (
+ * 	<Fragment>
+ * 		<PluginSidebarMoreMenuItem
+ * 			target="sidebar-name"
+ * 		>
+ * 			My Sidebar
+ * 		</PluginSidebarMoreMenuItem>
+ * 		<PluginSidebar
+ * 			name="sidebar-name"
+ * 			title="My Sidebar"
+ * 		>
+ * 			Content of the sidebar
+ * 		</PluginSidebar>
+ * 	</Fragment>
+ * );
+ *
+ * registerPlugin( 'plugin-name', {
+ * 	icon: 'smiley',
+ * 	render: Component,
+ * } );
+ * ```
  *
  * @return {Object} The final plugin settings object.
  */
@@ -76,6 +142,22 @@ export function registerPlugin( name, settings ) {
  * Unregisters a plugin by name.
  *
  * @param {string} name Plugin name.
+ *
+ * @example <caption>ES5</caption>
+ * ```js
+ * // Using ES5 syntax
+ * var unregisterPlugin = wp.plugins.unregisterPlugin;
+ *
+ * unregisterPlugin( 'plugin-name' );
+ * ```
+ *
+ * @example <caption>ESNext</caption>
+ * ```js
+ * // Using ESNext syntax
+ * const { unregisterPlugin } = wp.plugins;
+ *
+ * unregisterPlugin( 'plugin-name' );
+ * ```
  *
  * @return {?WPPlugin} The previous plugin settings object, if it has been
  *                     successfully unregistered; otherwise `undefined`.

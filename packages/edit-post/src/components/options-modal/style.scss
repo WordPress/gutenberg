@@ -21,6 +21,10 @@
 			margin: 0;
 		}
 
+		&.components-base-control + &.components-base-control {
+			margin-bottom: 0;
+		}
+
 		.components-checkbox-control__label {
 			flex-grow: 1;
 			padding: 0.6rem 0 0.6rem 10px;

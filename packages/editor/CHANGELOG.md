@@ -1,4 +1,15 @@
-## 9.1.0 (Unreleased)
+## 9.2.0 (Unreleased)
+
+### Deprecations
+- The `getAutosave`, `getAutosaveAttribute`, and `hasAutosave` selectors are deprecated. Please use the `getAutosave` selector in the `@wordpress/core-data` package.
+- The `resetAutosave` action is deprecated. An equivalent action `receiveAutosaves` has been added to the `@wordpress/core-data` package.
+
+### Internal
+
+- Refactor setupEditor effects to action-generator using controls ([#14513](https://github.com/WordPress/gutenberg/pull/14513))
+- Remove redux-multi dependency (no longer needed/used with above refactor)
+
+## 9.1.0 (2019-03-06)
 
 ### New Features
 
@@ -18,6 +29,7 @@
 - Removed `jQuery` dependency.
 - Removed `TinyMCE` dependency.
 - RichText: improve format boundaries.
+- Refactor all post effects to action-generators using controls ([#13716](https://github.com/WordPress/gutenberg/pull/13716))
 
 ## 9.0.7 (2019-01-03)
 

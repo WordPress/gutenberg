@@ -1,0 +1,13 @@
+.block-editor .wp-block-tag-cloud {
+	a {
+		display: inline-block;
+		margin-right: 5px;
+	}
+
+	span {
+		display: inline-block;
+		margin-left: 5px;
+		color: $dark-gray-100;
+		text-decoration: none;
+	}
+}

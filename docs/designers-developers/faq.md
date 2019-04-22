@@ -102,13 +102,13 @@ This is the canonical list of keyboard shortcuts:
 		</tr>
 		<tr>
 			<td>Navigate to a the next part of the editor (alternative).</td>
-			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>N</kbd></td>
-			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>N</kbd></td>
+			<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>N</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>N</kbd></td>
 		</tr>
 		<tr>
 			<td>Navigate to the previous part of the editor (alternative).</td>
-			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd></td>
-			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>P</kbd></td>
+			<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>P</kbd></td>
 		</tr>
 		<tr>
 			<td>Navigate to the nearest toolbar.</td>
@@ -322,7 +322,7 @@ We realize it's a big change. We also think there will be many new opportunities
 
 There is a “Classic” block, which is virtually the same as the current editor, except in block form.
 
-There is also the [Classic Editor Plugin](https://wordpress.org/plugins/classic-editor/) which restores the previous editor, see the plugin for more information. The WordPress Core team has committed to supporting the Classic Editor Plugin [until December 2021](https://make.wordpress.org/core/2018/11/07/classic-editor-plugin-support-window/).
+There is also the [Classic Editor plugin](https://wordpress.org/plugins/classic-editor/) which restores the previous editor, see the plugin for more information. The WordPress Core team has committed to supporting the Classic Editor plugin [until December 2021](https://make.wordpress.org/core/2018/11/07/classic-editor-plugin-support-window/).
 
 
 ## How will custom TinyMCE buttons work in Gutenberg?
@@ -365,8 +365,7 @@ var blocks = wp.blocks.parse( postContent );
 In PHP:
 
 ```php
-$blocks = gutenberg_parse_blocks( $post_content ); // plugin
-$blocks = parse_blocks( $post_content ); // WordPress 5.0
+$blocks = parse_blocks( $post_content );
 ```
 
 ## Why should I start using this once released?

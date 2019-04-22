@@ -26,6 +26,9 @@ function FontSizePicker( {
 	value,
 	withSlider = false,
 } ) {
+	if ( disableCustomFontSizes && ! fontSizes.length ) {
+		return null;
+	}
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
 		if ( newValue === '' ) {

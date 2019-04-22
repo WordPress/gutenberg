@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`MenuItem should match snapshot when all props provided 1`] = `
-<IconButton
+<ForwardRef(IconButton)
   aria-checked={true}
   className="components-menu-item__button my-class has-icon"
   icon="wordpress"
@@ -13,12 +13,11 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
     className="components-menu-item__shortcut"
     shortcut="mod+shift+alt+w"
   />
-</IconButton>
+</ForwardRef(IconButton)>
 `;
 
 exports[`MenuItem should match snapshot when info is provided 1`] = `
-<Button
-  aria-describedby="edit-post-feature-toggle__info-1"
+<ForwardRef(Button)
   className="components-menu-item__button"
   role="menuitem"
 >
@@ -28,7 +27,6 @@ exports[`MenuItem should match snapshot when info is provided 1`] = `
     My item
     <span
       className="components-menu-item__info"
-      id="edit-post-feature-toggle__info-1"
     >
       Extended description of My Item
     </span>
@@ -36,11 +34,11 @@ exports[`MenuItem should match snapshot when info is provided 1`] = `
   <Shortcut
     className="components-menu-item__shortcut"
   />
-</Button>
+</ForwardRef(Button)>
 `;
 
 exports[`MenuItem should match snapshot when isSelected and role are optionally provided 1`] = `
-<IconButton
+<ForwardRef(IconButton)
   className="components-menu-item__button my-class has-icon"
   icon="wordpress"
   onClick={[Function]}
@@ -51,11 +49,11 @@ exports[`MenuItem should match snapshot when isSelected and role are optionally 
     className="components-menu-item__shortcut"
     shortcut="mod+shift+alt+w"
   />
-</IconButton>
+</ForwardRef(IconButton)>
 `;
 
 exports[`MenuItem should match snapshot when only label provided 1`] = `
-<Button
+<ForwardRef(Button)
   className="components-menu-item__button"
   role="menuitem"
 >
@@ -63,5 +61,5 @@ exports[`MenuItem should match snapshot when only label provided 1`] = `
   <Shortcut
     className="components-menu-item__shortcut"
   />
-</Button>
+</ForwardRef(Button)>
 `;

@@ -43,6 +43,7 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
+export { default as __unstablePositionedAtSelection } from './positioned-at-selection';
 export { default as QueryControls } from './query-controls';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
@@ -69,6 +70,6 @@ export { default as withConstrainedTabbing } from './higher-order/with-constrain
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
 export { default as withFocusOutside } from './higher-order/with-focus-outside';
-export { default as withFocusReturn } from './higher-order/with-focus-return';
+export { default as withFocusReturn, Provider as FocusReturnProvider } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';

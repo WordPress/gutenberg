@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/token-list",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Constructable, plain JavaScript DOMTokenList implementation, supporting non-browser runtimes.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -10,7 +10,8 @@
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/token-list/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git"
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/token-list"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -18,8 +19,8 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0",
-		"lodash": "^4.17.10"
+		"@babel/runtime": "^7.3.1",
+		"lodash": "^4.17.11"
 	},
 	"publishConfig": {
 		"access": "public"

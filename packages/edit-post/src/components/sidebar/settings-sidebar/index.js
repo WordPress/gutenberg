@@ -4,7 +4,7 @@
 import { Panel, PanelBody } from '@wordpress/components';
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { BlockInspector } from '@wordpress/editor';
+import { BlockInspector } from '@wordpress/block-editor';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 /**

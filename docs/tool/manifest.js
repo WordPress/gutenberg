@@ -70,7 +70,7 @@ function getRootManifest( tocFileName ) {
 
 function generateRootManifestFromTOCItems( items, parent = null ) {
 	let pageItems = [];
-	items.map( ( obj ) => {
+	items.forEach( ( obj ) => {
 		const fileName = Object.keys( obj )[ 0 ];
 		const children = obj[ fileName ];
 

@@ -1,7 +1,7 @@
 // Specific to the empty paragraph placeholder:
 // when shown on mobile and in nested contexts, one or more icons show up on the right.
 // This padding makes sure it doesn't overlap text.
-.editor-rich-text__editable[data-is-placeholder-visible="true"] + .editor-rich-text__editable.wp-block-paragraph {
+.block-editor-rich-text__editable[data-is-placeholder-visible="true"] + .block-editor-rich-text__editable.wp-block-paragraph {
 	padding-right: $icon-button-size * 3;
 
 	// In nested contexts only one icon shows up.

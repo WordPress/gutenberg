@@ -35,7 +35,7 @@
 	z-index: z-index(".block-library-image__resize-handlers");
 }
 
-.editor-block-list__block[data-type="core/image"][data-align="center"] {
+.block-editor-block-list__block[data-type="core/image"][data-align="center"] {
 	.wp-block-image {
 		margin-left: auto;
 		margin-right: auto;
@@ -74,7 +74,7 @@
 	}
 }
 
-.editor-block-list__block[data-type="core/image"] .editor-block-toolbar .editor-url-input__button-modal {
+.block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
 	position: absolute;
 	left: 0;
 	right: 0;
@@ -92,14 +92,14 @@
 [data-type="core/image"][data-align="center"],
 [data-type="core/image"][data-align="left"],
 [data-type="core/image"][data-align="right"] {
-	.editor-block-list__block-edit {
+	.block-editor-block-list__block-edit {
 		figure {
 			margin: 0;
 			display: table;
 		}
 
 		// This maps to the figcaption on the frontend.
-		.editor-rich-text {
+		.block-editor-rich-text {
 			display: table-caption;
 			caption-side: bottom;
 		}
@@ -114,12 +114,12 @@
 }
 
 // This is similar to above but for resized unfloated images only, where the markup is different.
-[data-type="core/image"] .editor-block-list__block-edit figure.is-resized {
+[data-type="core/image"] .block-editor-block-list__block-edit figure.is-resized {
 	margin: 0;
 	display: table;
 
 	// This maps to the figcaption on the frontend.
-	.editor-rich-text {
+	.block-editor-rich-text {
 		display: table-caption;
 		caption-side: bottom;
 	}

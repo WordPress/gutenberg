@@ -30,7 +30,7 @@ The editor includes a number of packages to enable various pieces of functionali
 | [I18N](/packages/i18n/README.md) | wp-i18n | Internationalization utilities for client-side localization |
 | [Is Shallow Equal](/packages/is-shallow-equal/README.md) | wp-is-shallow-equal | A function for performing a shallow comparison between two objects or arrays |
 | [Keycodes](/packages/keycodes/README.md) | wp-keycodes | Keycodes utilities for WordPress, used to check the key pressed in events like `onKeyDown` |
-| [List Reusable Bocks](/packages/list-reusable-blocks/README.md) | wp-list-reusable-blocks | Package used to add import/export links to the listing page of the reusable blocks |
+| [List Reusable Blocks](/packages/list-reusable-blocks/README.md) | wp-list-reusable-blocks | Package used to add import/export links to the listing page of the reusable blocks |
 | [NUX](/packages/nux/README.md) | wp-nux | Components, and wp.data methods useful for onboarding a new user to the WordPress admin interface |
 | [Plugins](/packages/plugins/README.md) | wp-plugins | Plugins module for WordPress |
 | [Redux Routine](/packages/redux-routine/README.md) | wp-redux-routine | Redux middleware for generator coroutines |
@@ -55,7 +55,7 @@ The editor also uses some popular third-party packages and scripts. Plugin devel
 ## Polyfill Scripts
 
 The editor also provides polyfills for certain features that may not be available in all modern browsers.
-It is recommened to use the main `wp-polyfill` script handle which takes care of loading all the below mentioned polyfills.
+It is recommended to use the main `wp-polyfill` script handle which takes care of loading all the below mentioned polyfills.
 
 | Script Name | Handle | Description |
 |-------------|--------|-------------|
@@ -65,3 +65,15 @@ It is recommened to use the main `wp-polyfill` script handle which takes care of
 | [Formdata Polyfill](https://www.npmjs.com/package/formdata-polyfill) | wp-polyfill-formdata| Polyfill conditionally replaces the native implementation |
 | [Node Contains Polyfill](https://polyfill.io) | wp-polyfill-node-contains |Polyfill for Node.contains |
 | [Element Closest Polyfill](https://www.npmjs.com/package/element-closest) | wp-polyfill-element-closest| Return the closest element matching a selector up the DOM tree |
+
+## Bundling and code sharing
+
+When using a JavaScript bundler like [webpack](https://webpack.js.org/), the scripts mentioned here
+can be excluded from the bundle and provided by WordPress in the form of script dependencies [(see
+`wp_enqueue_script`)][https://developer.wordpress.org/reference/functions/wp_enqueue_script/#default-scripts-included-and-registered-by-wordpress].
+
+The
+[`@wordpress/dependency-extraction-webpack-plugin`](https://github.com/WordPress/gutenberg/tree/master/packages/dependency-extraction-webpack-plugin)
+provides a webpack plugin to help extract WordPress dependencies from bundles. `@wordpress/scripts`
+[`build`](https://github.com/WordPress/gutenberg/tree/master/packages/scripts#build) script includes
+the plugin by default.

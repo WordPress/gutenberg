@@ -90,19 +90,17 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
 <button
   aria-expanded={true}
   aria-label="Custom color picker"
-  className="components-color-palette__item"
+  className="components-button is-link"
   onClick={[MockFunction]}
   type="button"
 >
-  <span
-    className="components-color-palette__custom-color-gradient"
-  />
+  Custom Color
 </button>
 `;
 
 exports[`ColorPalette Dropdown should render it correctly 1`] = `
 <Dropdown
-  className="components-color-palette__item-wrapper components-color-palette__custom-color"
+  className="components-color-palette__custom-color"
   contentClassName="components-color-palette__picker"
   renderContent={[Function]}
   renderToggle={[Function]}
@@ -179,15 +177,19 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
       />
     </Tooltip>
   </div>
-  <Button
-    className="components-color-palette__clear"
-    isDefault={true}
-    isSmall={true}
-    onClick={[Function]}
-    type="button"
+  <div
+    className="components-color-palette__custom-clear-wrapper"
   >
-    Clear
-  </Button>
+    <ForwardRef(Button)
+      className="components-color-palette__clear"
+      isDefault={true}
+      isSmall={true}
+      onClick={[Function]}
+      type="button"
+    >
+      Clear
+    </ForwardRef(Button)>
+  </div>
 </div>
 `;
 
@@ -261,20 +263,24 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
       />
     </Tooltip>
   </div>
-  <Dropdown
-    className="components-color-palette__item-wrapper components-color-palette__custom-color"
-    contentClassName="components-color-palette__picker"
-    renderContent={[Function]}
-    renderToggle={[Function]}
-  />
-  <Button
-    className="components-color-palette__clear"
-    isDefault={true}
-    isSmall={true}
-    onClick={[Function]}
-    type="button"
+  <div
+    className="components-color-palette__custom-clear-wrapper"
   >
-    Clear
-  </Button>
+    <Dropdown
+      className="components-color-palette__custom-color"
+      contentClassName="components-color-palette__picker"
+      renderContent={[Function]}
+      renderToggle={[Function]}
+    />
+    <ForwardRef(Button)
+      className="components-color-palette__clear"
+      isDefault={true}
+      isSmall={true}
+      onClick={[Function]}
+      type="button"
+    >
+      Clear
+    </ForwardRef(Button)>
+  </div>
 </div>
 `;

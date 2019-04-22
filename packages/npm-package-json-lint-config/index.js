@@ -95,6 +95,7 @@ const defaultConfig = {
 		'require-private': 'off',
 		'require-publishConfig': 'off',
 		'require-repository': 'error',
+		'require-repository-directory': 'off',
 		'require-scripts': 'off',
 		'require-version': 'error',
 		'scripts-type': 'error',

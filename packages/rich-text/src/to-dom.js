@@ -113,62 +113,25 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
-function createLinePadding( doc ) {
-	const element = doc.createElement( 'br' );
-	element.setAttribute( 'data-rich-text-padding', 'true' );
-	return element;
-}
-
-function padEmptyLines( { element, multilineWrapperTags } ) {
-	const length = element.childNodes.length;
-	const doc = element.ownerDocument;
-
-	for ( let index = 0; index < length; index++ ) {
-		const child = element.childNodes[ index ];
-
-		if ( child.nodeType === TEXT_NODE ) {
-			if ( length === 1 && ! child.nodeValue ) {
-				// Pad if the only child is an empty text node.
-				element.appendChild( createLinePadding( doc ) );
-			}
-		} else {
-			if (
-				multilineWrapperTags &&
-				! child.previousSibling &&
-				multilineWrapperTags.indexOf( child.nodeName.toLowerCase() ) !== -1
-			) {
-				// Pad the line if there is no content before a nested wrapper.
-				element.insertBefore( createLinePadding( doc ), child );
-			}
-
-			padEmptyLines( { element: child, multilineWrapperTags } );
-		}
-	}
-}
-
-function prepareFormats( prepareEditableTree = [], value ) {
-	return prepareEditableTree.reduce( ( accumlator, fn ) => {
-		return fn( accumlator, value.text );
-	}, value.formats );
-}
-
 export function toDom( {
 	value,
 	multilineTag,
-	multilineWrapperTags,
 	prepareEditableTree,
 	isEditableTree = true,
 } ) {
 	let startPath = [];
 	let endPath = [];
 
-	const tree = toTree( {
-		value: {
+	if ( prepareEditableTree ) {
+		value = {
 			...value,
-			formats: prepareFormats( prepareEditableTree, value ),
-		},
+			formats: prepareEditableTree( value ),
+		};
+	}
+
+	const tree = toTree( {
+		value,
 		multilineTag,
-		multilineWrapperTags,
 		createEmpty,
 		append,
 		getLastChild,
@@ -186,10 +149,6 @@ export function toDom( {
 		isEditableTree,
 	} );
 
-	if ( isEditableTree ) {
-		padEmptyLines( { element: tree, multilineWrapperTags } );
-	}
-
 	return {
 		body: tree,
 		selection: { startPath, endPath },
@@ -201,29 +160,29 @@ export function toDom( {
  * the `Element` tree contained by `current`. If a `multilineTag` is provided,
  * text separated by two new lines will be wrapped in an `Element` of that type.
  *
- * @param {Object}      value        Value to apply.
- * @param {HTMLElement} current      The live root node to apply the element
- *                                   tree to.
- * @param {string}      multilineTag Multiline tag.
+ * @param {Object}      $1                        Named arguments.
+ * @param {Object}      $1.value                  Value to apply.
+ * @param {HTMLElement} $1.current                The live root node to apply the element tree to.
+ * @param {string}      [$1.multilineTag]         Multiline tag.
+ * @param {Array}       [$1.multilineWrapperTags] Tags where lines can be found if nesting is possible.
  */
 export function apply( {
 	value,
 	current,
 	multilineTag,
-	multilineWrapperTags,
 	prepareEditableTree,
+	__unstableDomOnly,
 } ) {
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
 		value,
 		multilineTag,
-		multilineWrapperTags,
 		prepareEditableTree,
 	} );
 
 	applyValue( body, current );
 
-	if ( value.start !== undefined ) {
+	if ( value.start !== undefined && ! __unstableDomOnly ) {
 		applySelection( selection, current );
 	}
 }
@@ -311,15 +270,15 @@ export function applySelection( { startPath, endPath }, current ) {
 	range.setStart( startContainer, startOffset );
 	range.setEnd( endContainer, endOffset );
 
+	// Set back focus if focus is lost.
+	if ( ownerDocument.activeElement !== current ) {
+		current.focus();
+	}
+
 	if ( selection.rangeCount > 0 ) {
 		// If the to be added range and the live range are the same, there's no
 		// need to remove the live range and add the equivalent range.
 		if ( isRangeEqual( range, selection.getRangeAt( 0 ) ) ) {
-			// Set back focus if focus is lost.
-			if ( ownerDocument.activeElement !== current ) {
-				current.focus();
-			}
-
 			return;
 		}
 

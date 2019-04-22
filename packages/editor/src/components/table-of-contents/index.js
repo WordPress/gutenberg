@@ -10,7 +10,7 @@ import { withSelect } from '@wordpress/data';
  */
 import TableOfContentsPanel from './panel';
 
-function TableOfContents( { hasBlocks } ) {
+function TableOfContents( { hasBlocks, hasOutlineItemsDisabled } ) {
 	return (
 		<Dropdown
 			position="bottom"
@@ -26,13 +26,13 @@ function TableOfContents( { hasBlocks } ) {
 					aria-disabled={ ! hasBlocks }
 				/>
 			) }
-			renderContent={ () => <TableOfContentsPanel /> }
+			renderContent={ ( { onClose } ) => <TableOfContentsPanel onRequestClose={ onClose } hasOutlineItemsDisabled={ hasOutlineItemsDisabled } /> }
 		/>
 	);
 }
 
 export default withSelect( ( select ) => {
 	return {
-		hasBlocks: !! select( 'core/editor' ).getBlockCount(),
+		hasBlocks: !! select( 'core/block-editor' ).getBlockCount(),
 	};
 } )( TableOfContents );

@@ -3,7 +3,7 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { Button, Placeholder } from '@wordpress/components';
-import { BlockIcon } from '@wordpress/editor';
+import { BlockIcon } from '@wordpress/block-editor';
 
 const EmbedPlaceholder = ( props ) => {
 	const { icon, label, value, onSubmit, onChange, cannotEmbed, fallback, tryAgain } = props;

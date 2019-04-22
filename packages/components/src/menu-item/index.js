@@ -8,7 +8,6 @@ import { isString } from 'lodash';
  * WordPress dependencies
  */
 import { createElement, cloneElement } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,7 +29,6 @@ export function MenuItem( {
 	shortcut,
 	isSelected,
 	role = 'menuitem',
-	instanceId,
 	...props
 } ) {
 	className = classnames( 'components-menu-item__button', className, {
@@ -38,16 +36,10 @@ export function MenuItem( {
 	} );
 
 	if ( info ) {
-		const infoId = 'edit-post-feature-toggle__info-' + instanceId;
-
-		// Deconstructed props is scoped to the function; mutation is fine.
-		props[ 'aria-describedby' ] = infoId;
-
 		children = (
 			<span className="components-menu-item__info-wrapper">
 				{ children }
 				<span
-					id={ infoId }
 					className="components-menu-item__info">
 					{ info }
 				</span>
@@ -84,4 +76,4 @@ export function MenuItem( {
 	);
 }
 
-export default withInstanceId( MenuItem );
+export default MenuItem;

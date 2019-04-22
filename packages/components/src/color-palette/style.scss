@@ -3,10 +3,12 @@ $color-palette-circle-spacing: 14px;
 
 .components-color-palette {
 	margin-right: -14px;
+	width: calc(100% + 14px);
 
-	.components-color-palette__clear {
-		float: right;
-		margin-right: 20px;
+	.components-color-palette__custom-clear-wrapper {
+		width: calc(100% - 14px);
+		display: flex;
+		justify-content: flex-end;
 	}
 }
 
@@ -44,7 +46,8 @@ $color-palette-circle-spacing: 14px;
 
 	&.is-active {
 		box-shadow: inset 0 0 0 4px;
-		border: $border-width solid $dark-gray-400;
+		position: relative;
+		z-index: 1;
 
 		& + .dashicons-saved {
 			position: absolute;
@@ -110,48 +113,12 @@ $color-palette-circle-spacing: 14px;
 	}
 }
 
-.components-color-palette__custom-color .components-color-palette__item {
-	position: relative;
-	box-shadow: none;
-}
+.components-color-palette__custom-color {
+	margin-right: $grid-size-large;
 
-.components-color-palette__custom-color .components-color-palette__custom-color-gradient {
-	display: block;
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	top: 0;
-	left: 0;
-	border-radius: 50%;
-	overflow: hidden;
-}
-
-.components-color-palette__custom-color .components-color-palette__custom-color-gradient::before {
-	content: "";
-	filter: blur(6px) saturate(0.7) brightness(1.1);
-	display: block;
-	width: 200%;
-	height: 200%;
-	position: absolute;
-	top: -50%;
-	left: -50%;
-	padding-top: 100%;
-	transform: scale(1);
-	background-image:
-		linear-gradient(330deg, transparent 50%, #ff8100 50%),
-		linear-gradient(300deg, transparent 50%, #ff5800 50%),
-		linear-gradient(270deg, transparent 50%, #c92323 50%),
-		linear-gradient(240deg, transparent 50%, #cc42a2 50%),
-		linear-gradient(210deg, transparent 50%, #9f49ac 50%),
-		linear-gradient(180deg, transparent 50%, #306cd3 50%),
-		linear-gradient(150deg, transparent 50%, #179067 50%),
-		linear-gradient(120deg, transparent 50%, #0eb5d6 50%),
-		linear-gradient(90deg, transparent 50%, #50b517 50%),
-		linear-gradient(60deg, transparent 50%, #ede604 50%),
-		linear-gradient(30deg, transparent 50%, #fc0 50%),
-		linear-gradient(0deg, transparent 50%, #feac00 50%);
-
-	background-clip: content-box, content-box, content-box, content-box, content-box, content-box, padding-box, padding-box, padding-box, padding-box, padding-box, padding-box;
+	.components-button {
+		line-height: 22px;
+	}
 }
 
 .block-editor__container .components-popover.components-color-palette__picker.is-bottom {

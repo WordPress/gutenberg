@@ -19,6 +19,7 @@
 			]},
 			{"docs/designers-developers/developers/internationalization.md": []},
 			{"docs/designers-developers/developers/accessibility.md": []},
+			{"docs/designers-developers/developers/feature-flags.md": []},
 			{"docs/designers-developers/developers/data/README.md": "{{data}}"},
 			{"docs/designers-developers/developers/packages.md": "{{packages}}"},
 			{"packages/components/README.md": "{{components}}"},

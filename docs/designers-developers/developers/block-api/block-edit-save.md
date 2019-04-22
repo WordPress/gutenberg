@@ -226,7 +226,9 @@ For most blocks, the return value of `save` should be an [instance of WordPress 
 
 _Note:_ While it is possible to return a string value from `save`, it _will be escaped_. If the string includes HTML markup, the markup will be shown on the front of the site verbatim, not as the equivalent HTML node content. If you must return raw HTML from `save`, use `wp.element.RawHTML`. As the name implies, this is prone to [cross-site scripting](https://en.wikipedia.org/wiki/Cross-site_scripting) and therefore is discouraged in favor of a WordPress Element hierarchy whenever possible.
 
-For [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md), the return value of `save` could either represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled. Alternatively, return a `null` (empty) value to save no markup in post content for the dynamic block, instead deferring this to always be calculated when the block is shown on the front of the site.
+For [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md), the return value of `save` could represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled.
+
+If left unspecified, the default implementation will save no markup in post content for the dynamic block, instead deferring this to always be calculated when the block is shown on the front of the site.
 
 ### attributes
 
@@ -406,4 +408,4 @@ When a block is detected as invalid, a warning will be logged into your browser'
 
 **I've changed my block's `save` behavior and old content now includes invalid blocks. How can I fix this?**
 
-Refer to the guide on [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecations.md) to learn more about how to accommodate legacy content in intentional markup changes.
+Refer to the guide on [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecation.md) to learn more about how to accommodate legacy content in intentional markup changes.

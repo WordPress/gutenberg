@@ -47,18 +47,21 @@ fi
 # Do a dry run of the repository reset. Prompting the user for a list of all
 # files that will be removed should prevent them from losing important files!
 status "Resetting the repository to pristine condition. ✨"
-git clean -xdf --dry-run
-warning "🚨 About to delete everything above! Is this okay? 🚨"
-echo -n "[y]es/[N]o: "
-read answer
-if [ "$answer" != "${answer#[Yy]}" ]; then
-	# Remove ignored files to reset repository to pristine condition. Previous
-	# test ensures that changed files abort the plugin build.
-	status "Cleaning working directory... 🛀"
-	git clean -xdf
-else
-	error "Fair enough; aborting. Tidy up your repo and try again. 🙂"
-	exit 1
+to_clean=$(git clean -xdf --dry-run)
+if [ ! -z "$to_clean" ]; then
+	echo $to_clean
+	warning "🚨 About to delete everything above! Is this okay? 🚨"
+	echo -n "[y]es/[N]o: "
+	read answer
+	if [ "$answer" != "${answer#[Yy]}" ]; then
+		# Remove ignored files to reset repository to pristine condition. Previous
+		# test ensures that changed files abort the plugin build.
+		status "Cleaning working directory... 🛀"
+		git clean -xdf
+	else
+		error "Fair enough; aborting. Tidy up your repo and try again. 🙂"
+		exit 1
+	fi
 fi
 
 # Download all vendor scripts
@@ -97,8 +100,6 @@ status "Installing dependencies... 📦"
 npm install
 status "Generating build... 👷‍♀️"
 npm run build
-status "Generating PHP file for wordpress.org to parse translations... 👷‍♂️"
-npx pot-to-php ./languages/gutenberg.pot ./languages/gutenberg-translations.php gutenberg
 
 # Temporarily modify `gutenberg.php` with production constants defined. Use a
 # temp file because `bin/generate-gutenberg-php.php` reads from `gutenberg.php`
@@ -106,20 +107,17 @@ npx pot-to-php ./languages/gutenberg.pot ./languages/gutenberg-translations.php 
 php bin/generate-gutenberg-php.php > gutenberg.tmp.php
 mv gutenberg.tmp.php gutenberg.php
 
-build_files=$(ls build/*/*.{js,css})
+build_files=$(ls build/*/*.{js,css} build/block-library/blocks/*.php)
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
 zip -r gutenberg.zip \
 	gutenberg.php \
 	lib/*.php \
-	packages/block-library/src/*/*.php \
 	packages/block-serialization-default-parser/*.php \
 	post-content.php \
 	$vendor_scripts \
 	$build_files \
-	languages/gutenberg.pot \
-	languages/gutenberg-translations.php \
 	README.md
 
 # Reset `gutenberg.php`.

@@ -3,7 +3,7 @@
  */
 import { createNewPost, insertBlock, publishPost } from '@wordpress/e2e-test-utils';
 
-describe( 'Compatibility with Classic Editor', () => {
+describe( 'Compatibility with classic editor', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );

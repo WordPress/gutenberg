@@ -30,7 +30,7 @@ add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 );
 ```
 
-When Gutenberg is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the Classic editor.
+When Gutenberg is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the classic editor.
 
 ### Meta Box Data Collection
 

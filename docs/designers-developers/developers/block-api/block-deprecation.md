@@ -194,7 +194,8 @@ E.g: a block wants to migrate a title attribute to a paragraph innerBlock.
 {% ES5 %}
 ```js
 var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType;
+	registerBlockType = wp.blocks.registerBlockType,
+	omit = lodash.omit;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
 
@@ -232,6 +233,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 {% ESNext %}
 ```js
 const { registerBlockType } = wp.blocks;
+const { omit } = lodash;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
 

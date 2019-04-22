@@ -53,6 +53,26 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isTipVisible', () => {
+		it( 'is tolerant to individual preferences being undefined', () => {
+			// See: https://github.com/WordPress/gutenberg/issues/14580
+			const state = {
+				guides: [],
+				preferences: {},
+			};
+			expect( isTipVisible( state, 'test/tip' ) ).toBe( false );
+		} );
+
+		it( 'is tolerant to undefined dismissedTips', () => {
+			// See: https://github.com/WordPress/gutenberg/issues/14580
+			const state = {
+				guides: [],
+				preferences: {
+					areTipsEnabled: true,
+				},
+			};
+			expect( isTipVisible( state, 'test/tip' ) ).toBe( true );
+		} );
+
 		it( 'should return true by default', () => {
 			const state = {
 				guides: [],

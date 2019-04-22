@@ -18,7 +18,7 @@ describe( 'Code block', () => {
 
 		await insertBlock( 'Code' );
 
-		await page.type( '.editor-block-list__block textarea', code );
+		await page.type( '.block-editor-block-list__block textarea', code );
 
 		// Verify the content starts out as a Code block.
 		const originalPostContent = await getEditedPostContent();

@@ -1,4 +1,31 @@
-## 7.1.0 (Unreleased)
+## 7.4.0 (Unreleased)
+
+- Added a new `HorizontalRule` component.
+
+## 7.3.0 (2019-04-16)
+
+### New Features
+
+- Added a new `render` property to `FormFileUpload` component. Allowing users of the component to custom the UI for their needs.
+- Added a new `BaseControl.VisualLabel` component.
+- Added a new `preview` prop to the `Placeholder` component which allows to display a preview, for example a media preview when the Placeholder is used in media editing contexts.
+- Added a new `anchorRect` prop to `Popover` which enables a developer to provide a custom `DOMRect` object at which to position the popover.
+
+### Bug fixes
+
+- Fix `instanceId` prop passed through to `Button` component via `MenuItems` producing React console error. Fixed by removing the unnecessary use of `withInstanceId` on the `MenuItems` component [#14599](https://github.com/WordPress/gutenberg/pull/14599)
+
+## 7.2.0 (2019-03-20)
+
+### Improvements
+
+- Make `RangeControl` validation rely on the `checkValidity` provided by the browsers instead of using our own validation.
+
+### Bug Fixes
+
+- Fix a problem that made `RangeControl` not work as expected with float values.
+
+## 7.1.0 (2019-03-06)
 
 ### New Features
 
@@ -8,6 +35,7 @@
 
 - `withFilters` has been optimized to avoid binding hook handlers for each mounted instance of the component, instead using a single centralized hook delegator.
 - `withFilters` has been optimized to reuse a single shared component definition for all filtered instances of the component.
+- Make `RangeControl` validate min and max properties.
 
 ### Bug Fixes
 

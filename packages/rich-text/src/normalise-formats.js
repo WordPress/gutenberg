@@ -1,39 +1,40 @@
 /**
- * External dependencies
- */
-
-import { find } from 'lodash';
-
-/**
  * Internal dependencies
  */
 
 import { isFormatEqual } from './is-format-equal';
 
 /**
- * Normalises formats: ensures subsequent equal formats have the same reference.
+ * Normalises formats: ensures subsequent adjacent equal formats have the same
+ * reference.
  *
- * @param  {Object} value Value to normalise formats of.
+ * @param {Object} value Value to normalise formats of.
  *
  * @return {Object} New value with normalised formats.
  */
-export function normaliseFormats( { formats, text, start, end } ) {
-	const refs = [];
-	const newFormats = formats.map( ( formatsAtIndex ) =>
-		formatsAtIndex.map( ( format ) => {
-			const equalRef = find( refs, ( ref ) =>
-				isFormatEqual( ref, format )
-			);
+export function normaliseFormats( value ) {
+	const newFormats = value.formats.slice();
 
-			if ( equalRef ) {
-				return equalRef;
-			}
+	newFormats.forEach( ( formatsAtIndex, index ) => {
+		const formatsAtPreviousIndex = newFormats[ index - 1 ];
 
-			refs.push( format );
+		if ( formatsAtPreviousIndex ) {
+			const newFormatsAtIndex = formatsAtIndex.slice();
 
-			return format;
-		} )
-	);
+			newFormatsAtIndex.forEach( ( format, formatIndex ) => {
+				const previousFormat = formatsAtPreviousIndex[ formatIndex ];
 
-	return { formats: newFormats, text, start, end };
+				if ( isFormatEqual( format, previousFormat ) ) {
+					newFormatsAtIndex[ formatIndex ] = previousFormat;
+				}
+			} );
+
+			newFormats[ index ] = newFormatsAtIndex;
+		}
+	} );
+
+	return {
+		...value,
+		formats: newFormats,
+	};
 }

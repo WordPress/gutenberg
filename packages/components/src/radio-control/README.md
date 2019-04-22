@@ -62,7 +62,7 @@ import { withState } from '@wordpress/compose';
 
 const MyRadioControl = withState( {
 	option: 'a',
-} )( ( { option, setState } ) => ( 
+} )( ( { option, setState } ) => (
 	<RadioControl
 		label="User type"
 		help="The type of the current user"
@@ -91,7 +91,7 @@ If this property is added, a label will be generated using label property as the
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String`
+- Type: `String|WPElement`
 - Required: No
 
 #### selected

@@ -10,15 +10,18 @@ import { __, _x } from '@wordpress/i18n';
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/file';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'File' ),
@@ -26,8 +29,6 @@ export const settings = {
 	description: __( 'Add a link to a downloadable file.' ),
 
 	icon,
-
-	category: 'common',
 
 	keywords: [ __( 'document' ), __( 'pdf' ) ],
 
@@ -86,7 +87,7 @@ export const settings = {
 				transform: ( files ) => {
 					const blocks = [];
 
-					files.map( ( file ) => {
+					files.forEach( ( file ) => {
 						const blobURL = createBlobURL( file );
 
 						// File will be uploaded in componentDidMount()

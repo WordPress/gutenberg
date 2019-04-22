@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { PlainText } from '@wordpress/editor';
+import { PlainText } from '@wordpress/block-editor';
 
 export default function CodeEdit( { attributes, setAttributes, className } ) {
 	return (

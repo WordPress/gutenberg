@@ -16,7 +16,7 @@ SelectControl allow users to select from a single-option menu. It functions as a
 
 #### When to use a select control
 
-Use a select control when: 
+Use a select control when:
 
 - You want users to select a single option from a list.
 - There is a strong default option.
@@ -83,10 +83,10 @@ Render a user interface to select the size of an image.
 
     import { SelectControl } from '@wordpress/components';
     import { withState } from '@wordpress/compose';
-    
+
     const MySelectControl = withState( {
         size: '50%',
-    } )( ( { size, setState } ) => ( 
+    } )( ( { size, setState } ) => (
         <SelectControl
             label="Size"
             value={ size }
@@ -130,7 +130,7 @@ If this property is added, a label will be generated using label property as the
 #### help
 
 If this property is added, a help text will be generated using help property as the content.
-- Type: `String`
+- Type: `String|WPElement`
 - Required: No
 
 #### multiple

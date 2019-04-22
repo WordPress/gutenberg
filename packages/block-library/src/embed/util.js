@@ -46,7 +46,7 @@ export const findBlock = ( url ) => {
 };
 
 export const isFromWordPress = ( html ) => {
-	return includes( html, 'class="wp-embedded-content" data-secret' );
+	return includes( html, 'class="wp-embedded-content"' );
 };
 
 export const getPhotoHtml = ( photo ) => {

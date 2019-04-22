@@ -58,6 +58,34 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should apply multiple formats when selection is collapsed', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '.' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not highlight more than one format', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( ' 2' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'b' );
+
+		const count = await page.evaluate( () => document.querySelectorAll(
+			'*[data-rich-text-format-boundary]'
+		).length );
+
+		expect( count ).toBe( 1 );
+	} );
+
 	it( 'should return focus when pressing formatting button', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Some ' );
@@ -156,6 +184,27 @@ describe( 'RichText', () => {
 
 			window.unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
 		} );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not lose selection direction', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '23' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.up( 'Shift' );
+
+		// There should be no selection. The following should insert "-" without
+		// deleting the numbers.
+		await page.keyboard.type( '-' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

@@ -11,6 +11,10 @@
 	display: flex;
 	margin: 4px 0;
 
+	a {
+		text-decoration: none;
+	}
+
 	.document-outline__emdash::before {
 		color: $light-gray-500;
 		margin-right: 4px;
@@ -43,8 +47,14 @@
 	border: none;
 	display: flex;
 	align-items: flex-start;
+	margin: 0 0 0 -1px;
+	padding: 2px 5px 2px 1px;
 	color: $dark-gray-800;
 	text-align: left;
+
+	&:disabled {
+		cursor: default;
+	}
 
 	&:focus {
 		@include button-style__focus-active;
@@ -62,4 +72,8 @@
 	.is-invalid & {
 		background: $alert-yellow;
 	}
+}
+
+.document-outline__item-content {
+	padding: 1px 0;
 }

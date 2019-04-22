@@ -18,6 +18,35 @@ import { getPlugins } from '../../api';
 /**
  * A component that renders all plugin fills in a hidden div.
  *
+ * @example <caption>ES5</caption>
+ * ```js
+ * // Using ES5 syntax
+ * var el = wp.element.createElement;
+ * var PluginArea = wp.plugins.PluginArea;
+ *
+ * function Layout() {
+ * 	return el(
+ * 		'div',
+ * 		{},
+ * 		'Content of the page',
+ * 		PluginArea
+ * 	);
+ * }
+ * ```
+ *
+ * @example <caption>ESNext</caption>
+ * ```js
+ * // Using ESNext syntax
+ * const { PluginArea } = wp.plugins;
+ *
+ * const Layout = () => (
+ * 	<div>
+ * 		Content of the page
+ * 		<PluginArea />
+ * 	</div>
+ * );
+ * ```
+ *
  * @return {WPElement} Plugin area.
  */
 class PluginArea extends Component {

@@ -9,8 +9,8 @@ import {
 /**
  * Internal dependencies
  */
-import createNamespace from './namespace-store.js';
-import dataStore from './store';
+import createNamespace from './namespace-store';
+import createCoreDataStore from './store';
 
 /**
  * An isolated orchestrator of store registrations.
@@ -34,11 +34,12 @@ import dataStore from './store';
  * Creates a new store registry, given an optional object of initial store
  * configurations.
  *
- * @param {Object} storeConfigs Initial store configurations.
+ * @param {Object}  storeConfigs Initial store configurations.
+ * @param {Object?} parent       Parent registry.
  *
  * @return {WPDataRegistry} Data registry.
  */
-export function createRegistry( storeConfigs = {} ) {
+export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	let listeners = [];
 
@@ -74,7 +75,11 @@ export function createRegistry( storeConfigs = {} ) {
 	 */
 	function select( reducerKey ) {
 		const store = stores[ reducerKey ];
-		return store && store.getSelectors();
+		if ( store ) {
+			return store.getSelectors();
+		}
+
+		return parent && parent.select( reducerKey );
 	}
 
 	/**
@@ -87,7 +92,11 @@ export function createRegistry( storeConfigs = {} ) {
 	 */
 	function dispatch( reducerKey ) {
 		const store = stores[ reducerKey ];
-		return store && store.getActions();
+		if ( store ) {
+			return store.getActions();
+		}
+
+		return parent && parent.dispatch( reducerKey );
 	}
 
 	//
@@ -166,10 +175,15 @@ export function createRegistry( storeConfigs = {} ) {
 		return registry;
 	}
 
-	Object.entries( {
-		'core/data': dataStore,
-		...storeConfigs,
-	} ).map( ( [ name, config ] ) => registry.registerStore( name, config ) );
+	registerGenericStore( 'core/data', createCoreDataStore( registry ) );
+
+	Object.entries( storeConfigs ).forEach(
+		( [ name, config ] ) => registry.registerStore( name, config )
+	);
+
+	if ( parent ) {
+		parent.subscribe( globalListener );
+	}
 
 	return withPlugins( registry );
 }

@@ -12,7 +12,7 @@ const chalk = require( 'chalk' );
  */
 const getPackages = require( './get-packages' );
 
-const BUILD_CMD = `node ${ path.resolve( __dirname, './build.js' ) }`;
+const BUILD_CMD = `node \"${ path.resolve( __dirname, './build.js' ) }\"`;
 
 let filesToBuild = new Map();
 
@@ -23,9 +23,11 @@ const exists = ( filename ) => {
 	return false;
 };
 
-// Exclude deceitful source-like files, such as editor swap files.
+// Exclude test files including .js files inside of __tests__ or test folders
+// and files with a suffix of .test or .spec (e.g. blocks.test.js),
+// and deceitful source-like files, such as editor swap files.
 const isSourceFile = ( filename ) => {
-	return /.\.(js|scss)$/.test( filename );
+	return ! [ /\/(__tests__|test)\/.+.js$/, /.\.(spec|test)\.js$/ ].some( ( regex ) => regex.test( filename ) ) && /.\.(js|scss)$/.test( filename );
 };
 
 const rebuild = ( filename ) => filesToBuild.set( filename, true );
@@ -67,7 +69,7 @@ setInterval( () => {
 	if ( files.length ) {
 		filesToBuild = new Map();
 		try {
-			execSync( `${ BUILD_CMD } ${ files.join( ' ' ) }`, { stdio: [ 0, 1, 2 ] } );
+			execSync( `${ BUILD_CMD } \"${ files.join( ' ' ) }\"`, { stdio: [ 0, 1, 2 ] } );
 		} catch ( e ) {}
 	}
 }, 100 );

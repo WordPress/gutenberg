@@ -4,6 +4,7 @@ module.exports = {
 	],
 	rules: {
 		'@wordpress/dependency-group': 'error',
+		'@wordpress/gutenberg-phase': 'error',
 		'@wordpress/no-unused-vars-before-return': 'error',
 		'@wordpress/valid-sprintf': 'error',
 		'no-restricted-syntax': [
@@ -21,5 +22,10 @@ module.exports = {
 				message: 'Translate function arguments must be string literals.',
 			},
 		],
+	},
+	settings: {
+		react: {
+			version: '16.6',
+		},
 	},
 };

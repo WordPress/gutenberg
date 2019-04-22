@@ -5,7 +5,7 @@ The new Blocks include baseline support in all themes, enhancements to opt-in to
 There are a few new concepts to consider when building themes:
 
 - **Editor Color Palette** - A default set of colors is provided, but themes can register their own and optionally lock users into picking from the defined palette.
-- **Editor Text Size Palette** - A default set of sizes is provided, but themes and register their own and optionally lock users into picking from preselected sizes.
+- **Editor Text Size Palette** - A default set of sizes is provided, but themes can register their own and optionally lock users into picking from preselected sizes.
 - **Responsive Embeds** - Themes must opt-in to responsive embeds.
 - **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.
 - **Dark Mode** - If a Theme is a Dark Theme with a dark background containing light text, the theme author can opt-in to the Dark Mode.
@@ -223,13 +223,13 @@ Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but th
 
 ### Enqueuing the editor style
 
-To make sure your editor style is loaded and parsed correctly, enqueue it using the following method:
+Use the `add_editor_style` function to enqueue and load CSS on the editor screen. For the classic editor, this was the only function needed to add style to the editor. For the new block editor, you first need to `add_theme_support( 'editor-styles');` mentioned above.
 
 ```php
 add_editor_style( 'style-editor.css' );
 ```
 
-It is enough to paste that in your `functions.php` file, for the style to be loaded and parsed.
+Adding that to your `functions.php` file will add the stylesheet `style-editor.css` to the queue of stylesheets to be loaded in the editor.
 
 ### Basic colors
 

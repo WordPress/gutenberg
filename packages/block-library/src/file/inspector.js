@@ -8,7 +8,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
-import { InspectorControls } from '@wordpress/editor';
+import { InspectorControls } from '@wordpress/block-editor';
 
 export default function FileBlockInspector( {
 	hrefs,

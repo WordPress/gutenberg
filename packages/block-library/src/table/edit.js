@@ -13,7 +13,7 @@ import {
 	RichText,
 	PanelColorSettings,
 	createCustomColorsHOC,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,

@@ -29,9 +29,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
-		const {
-			savePost,
-		} = dispatch( 'core/editor' );
+		const { savePost } = dispatch( 'core/editor' );
 
 		return {
 			onSave() {

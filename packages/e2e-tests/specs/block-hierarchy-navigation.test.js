@@ -26,25 +26,25 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the columns blocks.
 		await page.click( '[aria-label="Block Navigation"]' );
-		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-navigation__item') and contains(text(), 'Columns')]" ) )[ 0 ];
+		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]" ) )[ 0 ];
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
 		await page.focus( '.edit-post-settings-sidebar__panel-block .components-range-control__number[aria-label="Columns"]' );
-		page.keyboard.down( 'Shift' );
-		page.keyboard.press( 'ArrowLeft' );
-		page.keyboard.up( 'Shift' );
-		page.keyboard.type( '3' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.type( '3' );
 
 		// Navigate to the last column block.
 		await page.click( '[aria-label="Block Navigation"]' );
 		const lastColumnsBlockMenuItem = ( await page.$x(
-			"//button[contains(@class,'editor-block-navigation__item') and contains(text(), 'Column')]"
+			"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
 		) )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
 
 		// Insert text in the last column block.
-		await pressKeyTimes( 'Tab', 2 ); // Navigate to the appender.
+		await pressKeyTimes( 'Tab', 5 ); // Navigate to the appender.
 		await page.keyboard.type( 'Third column' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -76,17 +76,19 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Insert text in the last column block
-		await pressKeyTimes( 'Tab', 2 ); // Navigate to the appender.
+		await pressKeyTimes( 'Tab', 5 ); // Navigate to the appender.
 		await page.keyboard.type( 'Third column' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should appear and function even without nested blocks', async () => {
+		const textString = 'You say goodbye';
+
 		await insertBlock( 'Paragraph' );
 
 		// Add content so there is a block in the hierachy.
-		await page.keyboard.type( 'You say goodbye' );
+		await page.keyboard.type( textString );
 
 		// Create an image block too.
 		await page.keyboard.press( 'Enter' );
@@ -97,7 +99,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Space' );
 
 		// Replace its content.
-		await pressKeyWithModifier( 'primary', 'A' );
+		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'and I say hello' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

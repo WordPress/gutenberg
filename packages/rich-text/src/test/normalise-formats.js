@@ -26,7 +26,7 @@ describe( 'normaliseFormats', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
 		expect( result.formats[ 1 ][ 0 ] ).toBe( result.formats[ 2 ][ 0 ] );
 		expect( result.formats[ 1 ][ 0 ] ).toBe( result.formats[ 3 ][ 0 ] );
-		expect( result.formats[ 1 ][ 0 ] ).toBe( result.formats[ 5 ][ 0 ] );
+		expect( result.formats[ 1 ][ 0 ] ).not.toBe( result.formats[ 5 ][ 0 ] );
 		expect( result.formats[ 2 ][ 1 ] ).toBe( result.formats[ 3 ][ 1 ] );
 	} );
 } );

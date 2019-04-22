@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.2.16",
+	"version": "2.4.4",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -11,7 +11,8 @@
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-library/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git"
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/block-library"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -20,9 +21,10 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0",
+		"@babel/runtime": "^7.3.1",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
+		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
@@ -36,7 +38,8 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.10",
+		"fast-average-color": "4.3.0",
+		"lodash": "^4.17.11",
 		"memize": "^1.0.5",
 		"url": "^0.11.0"
 	},

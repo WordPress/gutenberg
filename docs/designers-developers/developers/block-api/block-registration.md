@@ -1,10 +1,10 @@
-# Block Registration 
+# Block Registration
 
 ## `register_block_type`
 
 * **Type:** `Function`
 
-Every block starts by registering a new block type definition. The function `registerBlockType` takes two arguments, a block `name` and a block configuration object.
+Every block starts by registering a new block type definition. To register, you use the `registerBlockType` function from the [`wp-blocks` package](/packages/blocks/README.md#registerBlockType). The function takes two arguments, a block `name` and a block configuration object.
 
 ### Block Name
 
@@ -104,7 +104,7 @@ icon: {
 
 * **Type:** `Array`
 
-Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated). It is only allowed to add as much as three terms per block.
+Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated).
 
 ```js
 // Make it easier to discover a block with keyword aliases.
@@ -174,7 +174,7 @@ attributes: {
 
 Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
 
-For example, a paragraph block can be transformed into a heading block.
+For example, a paragraph block can be transformed into a heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock)
 
 {% codetabs %}
 {% ES5 %}
@@ -486,7 +486,7 @@ transforms: {
 
 * **Type:** `Array`
 
-Blocks are able to be inserted into blocks that use [`InnerBlocks`](/packages/editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks.
 
