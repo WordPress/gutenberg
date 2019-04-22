@@ -47,6 +47,7 @@
 		"command-exists": "^1.2.8",
 		"cross-spawn": "^5.1.0",
 		"css-loader": "^2.1.1",
+<<<<<<< HEAD
 		"decompress-zip": "^0.2.2",
 		"dir-glob": "^3.0.1",
 		"eslint": "^6.8.0",
@@ -61,6 +62,7 @@
 		"markdownlint": "^0.18.0",
 		"markdownlint-cli": "^0.21.0",
 		"minimist": "^1.2.0",
+		"mini-css-extract-plugin": "^0.6.0",
 		"node-sass": "^4.11.0",
 		"npm-package-json-lint": "^5.0.0",
 		"postcss-loader": "^3.0.0",
