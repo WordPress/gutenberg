@@ -51,6 +51,7 @@ import {
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
+	InspectorAdvancedControls,
 	MediaPlaceholder,
 	URLPopover,
 	RichText,
@@ -281,6 +282,7 @@ export class ImageEdit extends Component {
 		this.onSetLinkClass = this.onSetLinkClass.bind( this );
 		this.onSetLinkRel = this.onSetLinkRel.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
+		this.onSetTitle = this.onSetTitle.bind( this );
 		this.getFilename = this.getFilename.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
@@ -350,6 +352,7 @@ export class ImageEdit extends Component {
 				url: undefined,
 				alt: undefined,
 				id: undefined,
+				title: undefined,
 				caption: undefined,
 			} );
 			return;
@@ -442,6 +445,11 @@ export class ImageEdit extends Component {
 			return;
 		}
 		this.props.setAttributes( { href: value } );
+	}
+
+	onSetTitle( value ) {
+		// This is the HTML title attribute, separate from the media object title
+		this.props.setAttributes( { title: value } );
 	}
 
 	onSetLinkClass( value ) {
@@ -579,6 +587,7 @@ export class ImageEdit extends Component {
 			rel,
 			linkClass,
 			linkDestination,
+			title,
 			width,
 			height,
 			linkTarget,
@@ -689,84 +698,94 @@ export class ImageEdit extends Component {
 		const imageSizeOptions = this.getImageSizeOptions();
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
-			<InspectorControls>
-				<PanelBody title={ __( 'Image Settings' ) }>
-					<TextareaControl
-						label={ __( 'Alt Text (Alternative Text)' ) }
-						value={ alt }
-						onChange={ this.updateAlt }
-						help={
-							<>
-								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-									{ __( 'Describe the purpose of the image' ) }
-								</ExternalLink>
-								{ __( 'Leave empty if the image is purely decorative.' ) }
-							</>
-						}
-					/>
-					{ ! isEmpty( imageSizeOptions ) && (
-						<SelectControl
-							label={ __( 'Image Size' ) }
-							value={ sizeSlug }
-							options={ imageSizeOptions }
-							onChange={ this.updateImage }
+			<>
+				<InspectorControls>
+					<PanelBody title={ __( 'Image Settings' ) }>
+						<TextareaControl
+							label={ __( 'Alt Text (Alternative Text)' ) }
+							value={ alt }
+							onChange={ this.updateAlt }
+							help={
+								<>
+									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+										{ __( 'Describe the purpose of the image' ) }
+									</ExternalLink>
+									{ __( 'Leave empty if the image is purely decorative.' ) }
+								</>
+							}
 						/>
-					) }
-					{ isResizable && (
-						<div className="block-library-image__dimensions">
-							<p className="block-library-image__dimensions__row">
-								{ __( 'Image Dimensions' ) }
-							</p>
-							<div className="block-library-image__dimensions__row">
-								<TextControl
-									type="number"
-									className="block-library-image__dimensions__width"
-									label={ __( 'Width' ) }
-									value={ width || imageWidth || '' }
-									min={ 1 }
-									onChange={ this.updateWidth }
-								/>
-								<TextControl
-									type="number"
-									className="block-library-image__dimensions__height"
-									label={ __( 'Height' ) }
-									value={ height || imageHeight || '' }
-									min={ 1 }
-									onChange={ this.updateHeight }
-								/>
-							</div>
-							<div className="block-library-image__dimensions__row">
-								<ButtonGroup aria-label={ __( 'Image Size' ) }>
-									{ [ 25, 50, 75, 100 ].map( ( scale ) => {
-										const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
-										const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
+						{ ! isEmpty( imageSizeOptions ) && (
+							<SelectControl
+								label={ __( 'Image Size' ) }
+								value={ sizeSlug }
+								options={ imageSizeOptions }
+								onChange={ this.updateImage }
+							/>
+						) }
+						{ isResizable && (
+							<div className="block-library-image__dimensions">
+								<p className="block-library-image__dimensions__row">
+									{ __( 'Image Dimensions' ) }
+								</p>
+								<div className="block-library-image__dimensions__row">
+									<TextControl
+										type="number"
+										className="block-library-image__dimensions__width"
+										label={ __( 'Width' ) }
+										value={ width || imageWidth || '' }
+										min={ 1 }
+										onChange={ this.updateWidth }
+									/>
+									<TextControl
+										type="number"
+										className="block-library-image__dimensions__height"
+										label={ __( 'Height' ) }
+										value={ height || imageHeight || '' }
+										min={ 1 }
+										onChange={ this.updateHeight }
+									/>
+								</div>
+								<div className="block-library-image__dimensions__row">
+									<ButtonGroup aria-label={ __( 'Image Size' ) }>
+										{ [ 25, 50, 75, 100 ].map( ( scale ) => {
+											const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
+											const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
 
-										const isCurrent = width === scaledWidth && height === scaledHeight;
+											const isCurrent = width === scaledWidth && height === scaledHeight;
 
-										return (
-											<Button
-												key={ scale }
-												isSmall
-												isPrimary={ isCurrent }
-												aria-pressed={ isCurrent }
-												onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
-											>
-												{ scale }%
-											</Button>
-										);
-									} ) }
-								</ButtonGroup>
-								<Button
-									isSmall
-									onClick={ this.updateDimensions() }
-								>
-									{ __( 'Reset' ) }
-								</Button>
+											return (
+												<Button
+													key={ scale }
+													isSmall
+													isPrimary={ isCurrent }
+													aria-pressed={ isCurrent }
+													onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
+												>
+													{ scale }%
+												</Button>
+											);
+										} ) }
+									</ButtonGroup>
+									<Button
+										isSmall
+										onClick={ this.updateDimensions() }
+									>
+										{ __( 'Reset' ) }
+									</Button>
+								</div>
 							</div>
-						</div>
-					) }
-				</PanelBody>
-			</InspectorControls>
+						) }
+					</PanelBody>
+				</InspectorControls>
+				<InspectorAdvancedControls>
+					<TextControl
+						label={ __( 'Title Attribute' ) }
+						value={ title || '' }
+						onChange={ this.onSetTitle }
+						help={ __( 'Provide a clear name for this image.' ) }
+					/>
+				</InspectorAdvancedControls>
+			</>
 		);
 
 		// Disable reason: Each block can be selected by clicking on it
