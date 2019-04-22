@@ -75,7 +75,7 @@ class PostTitle extends Component {
 			<View
 				style={ [ styles.titleContainer, borderStyle, { borderColor } ] }
 				accessible={ ! this.state.isSelected }
-				accessibilityLabel={ sprintf( '%s %s%s', __( 'Post title' ), __( '.' ), ( isEmpty( title ) ? __( 'Empty' ) : title ) ) }
+				accessibilityLabel={ sprintf( '%s%s %s', __( 'Post title' ), __( '.' ), ( isEmpty( title ) ? __( 'Empty' ) : title ) ) }
 			>
 				<RichText
 					tagName={ 'p' }
