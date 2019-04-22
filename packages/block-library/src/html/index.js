@@ -1,67 +1,32 @@
 /**
  * WordPress dependencies
  */
-import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { getPhrasingContentSchema } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
+import save from './save';
+import transforms from './transforms';
 
-export const name = 'core/html';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Custom HTML' ),
-
 	description: __( 'Add custom HTML code and preview it as you edit.' ),
-
 	icon,
-
-	category: 'formatting',
-
 	keywords: [ __( 'embed' ) ],
-
 	supports: {
 		customClassName: false,
 		className: false,
 		html: false,
 	},
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-		},
-	},
-
-	transforms: {
-		from: [
-			{
-				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'iframe' ),
-				schema: {
-					figure: {
-						require: [ 'iframe' ],
-						children: {
-							iframe: {
-								attributes: [ 'src', 'allowfullscreen', 'height', 'width' ],
-							},
-							figcaption: {
-								children: getPhrasingContentSchema(),
-							},
-						},
-					},
-				},
-			},
-		],
-	},
-
+	transforms,
 	edit,
-
-	save( { attributes } ) {
-		return <RawHTML>{ attributes.content }</RawHTML>;
-	},
+	save,
 };

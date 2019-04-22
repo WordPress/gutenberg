@@ -107,16 +107,34 @@
 					margin-left: -$border-width;
 				}
 
-				// The Column block is a child of the Columns block and is mostly a passthrough container.
-				// Therefore it shouldn't add additional paddings and margins, so we reset these, and compensate for margins.
-				// @todo In the future, if a passthrough feature lands, it would be good to apply these rules to such an element in a more generic way.
+				// Zero out margins.
+				> [data-block] {
+					margin-top: 0;
+					margin-bottom: 0;
+				}
+
+				// The Columns block is a flex-container, therefore it nullifies margin collapsing.
+				// Therefore, blocks inside this will appear to create a double margin.
+				// We compensate for this using negative margins.
 				> div > .block-core-columns > .editor-inner-blocks {
-					margin-top: -$block-padding - $block-padding;
-					margin-bottom: -$block-padding - $block-padding;
+					margin-top: -$default-block-margin;
+					margin-bottom: -$default-block-margin;
 				}
 			}
 		}
 	}
+}
+
+/**
+ * Columns act as as a "passthrough container"
+ * and therefore has its vertical margins/padding removed via negative margins
+ * therefore we need to compensate for this here by doubling the spacing on the
+ * vertical to ensure there is equal visual spacing around the inserter. Note there
+ * is no formal API for a "passthrough" Block so this is an edge case overide
+ */
+[data-type="core/columns"] .block-list-appender {
+	margin-top: $block-padding*2;
+	margin-bottom: $block-padding*2;
 }
 
 /**
@@ -148,26 +166,26 @@ div.block-core-columns.is-vertically-aligned-bottom {
 	right: 0;
 }
 
+// The empty state of a columns block has the default appenders.
+// Since those appenders are not blocks, the parent, actual block, appears "hovered" when hovering the appenders.
+// Because the column shouldn't be hovered as part of this temporary passthrough, we unset the hover style.
+.wp-block-columns [data-type="core/column"].is-hovered {
+	> .block-editor-block-list__block-edit::before {
+		content: none;
+	}
+
+	.block-editor-block-list__breadcrumb {
+		display: none;
+	}
+}
+
 // In absence of making the individual columns resizable, we prevent them from being clickable.
 // This makes them less fiddly. @todo: This should be revisited as the interface is refined.
 .wp-block-columns [data-type="core/column"] {
 	pointer-events: none;
 
-	// The empty state of a columns block has the default appenders.
-	// Since those appenders are not blocks, the parent, actual block, appears "hovered" when hovering the appenders.
-	// Because the column shouldn't be hovered as part of this temporary passthrough, we unset the hover style.
-	&.is-hovered {
-		> .block-editor-block-list__block-edit::before {
-			content: none;
-		}
-
-		.block-editor-block-list__breadcrumb {
-			display: none;
-		}
+	// This selector re-enables clicking on any child of a column block.
+	.block-core-columns .block-editor-block-list__layout {
+		pointer-events: all;
 	}
-}
-
-// This selector re-enables clicking on any child of a column block.
-:not(.components-disabled) > .wp-block-columns > .editor-inner-blocks > .editor-block-list__layout > [data-type="core/column"] > .editor-block-list__block-edit > * {
-	pointer-events: all;
 }

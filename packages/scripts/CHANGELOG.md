@@ -1,3 +1,10 @@
+## Unreleased
+
+### New Feature
+
+- Leverage `@wordpress/dependency-extraction-webpack-plugin` plugin to extract WordPress
+  dependencies.
+
 ## 3.1.0 (2019-03-20)
 
 ## New features

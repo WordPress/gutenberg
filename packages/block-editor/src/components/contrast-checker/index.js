@@ -11,6 +11,22 @@ import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 
+function ContrastCheckerMessage( { tinyBackgroundColor, tinyTextColor, backgroundColor, textColor } ) {
+	const msg = tinyBackgroundColor.getBrightness() < tinyTextColor.getBrightness() ?
+		__( 'This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.' ) :
+		__( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' );
+	useEffect( () => {
+		speak( __( 'This color combination may be hard for people to read.' ) );
+	}, [ backgroundColor, textColor ] );
+	return (
+		<div className="editor-contrast-checker block-editor-contrast-checker">
+			<Notice status="warning" isDismissible={ false }>
+				{ msg }
+			</Notice>
+		</div>
+	);
+}
+
 function ContrastChecker( {
 	backgroundColor,
 	fallbackBackgroundColor,
@@ -33,18 +49,14 @@ function ContrastChecker( {
 	) ) {
 		return null;
 	}
-	const msg = tinyBackgroundColor.getBrightness() < tinyTextColor.getBrightness() ?
-		__( 'This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.' ) :
-		__( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' );
-	useEffect( () => {
-		speak( __( 'This color combination may be hard for people to read.' ) );
-	}, [ backgroundColor, textColor ] );
+
 	return (
-		<div className="editor-contrast-checker block-editor-contrast-checker">
-			<Notice status="warning" isDismissible={ false }>
-				{ msg }
-			</Notice>
-		</div>
+		<ContrastCheckerMessage
+			backgroundColor={ backgroundColor }
+			textColor={ textColor }
+			tinyBackgroundColor={ tinyBackgroundColor }
+			tinyTextColor={ tinyTextColor }
+		/>
 	);
 }
 

@@ -9,7 +9,7 @@ It might be also a good idea to browse the folder with [all core blocks](/packag
 
 ## WP-CLI
 
-Another way of making developer's life easier is to use [WP-CLI](http://wp-cli.org/), which provides a command-line interface for many actions you might perform on the WordPress instance. One of the commands generates all the code required to register a Gutenberg block for a plugin or theme.
+Another way of making a developer's life easier is to use [WP-CLI](http://wp-cli.org/), which provides a command-line interface for many actions you might perform on the WordPress instance. One of the commands generates all the code required to register a Gutenberg block for a plugin or theme.
 
 ### Installing
 

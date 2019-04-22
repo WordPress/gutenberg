@@ -1,4 +1,5 @@
 ( function() {
+	const { withSelect } = wp.data;
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;
 	const { InnerBlocks } = wp.editor;
@@ -9,6 +10,8 @@
 		[ 'core/paragraph', { placeholder: __( 'Add a description' ) } ],
 		[ 'core/quote' ]
 	];
+	const allowedBlocksWhenSingleEmptyChild = [ 'core/image', 'core/list' ];
+	const allowedBlocksWhenMultipleChildren = [ 'core/gallery', 'core/video' ];
 
 	const save = function() {
 		return el( 'div', divProps,
@@ -51,6 +54,32 @@
 				)
 			);
 		},
+
+		save,
+	} );
+
+	registerBlockType( 'test/allowed-blocks-dynamic', {
+		title: 'Allowed Blocks Dynamic',
+		icon: 'carrot',
+		category: 'common',
+
+		edit: withSelect( function( select, ownProps ) {
+			var getBlockOrder = select( 'core/editor' ).getBlockOrder;
+			return {
+				numberOfChildren: getBlockOrder( ownProps.clientId ).length,
+			};
+		} )( function( props ) {
+			return el( 'div', divProps,
+				el(
+					InnerBlocks,
+					{
+						allowedBlocks: props.numberOfChildren < 2 ?
+							allowedBlocksWhenSingleEmptyChild :
+							allowedBlocksWhenMultipleChildren,
+					}
+				)
+			);
+		} ),
 
 		save,
 	} );

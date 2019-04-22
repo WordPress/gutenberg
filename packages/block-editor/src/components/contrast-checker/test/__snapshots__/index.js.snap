@@ -8,24 +8,57 @@ exports[`ContrastChecker should render component when the colors do not meet AA 
   isLargeText={true}
   textColor="#666"
 >
-  <div
-    className="editor-contrast-checker block-editor-contrast-checker"
+  <ContrastCheckerMessage
+    backgroundColor="#666"
+    textColor="#666"
+    tinyBackgroundColor={
+      Object {
+        "_a": 1,
+        "_b": 102,
+        "_format": "hex",
+        "_g": 102,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#666",
+        "_r": 102,
+        "_roundA": 1,
+        "_tc_id": 2,
+      }
+    }
+    tinyTextColor={
+      Object {
+        "_a": 1,
+        "_b": 102,
+        "_format": "hex",
+        "_g": 102,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#666",
+        "_r": 102,
+        "_roundA": 1,
+        "_tc_id": 3,
+      }
+    }
   >
-    <Notice
-      isDismissible={false}
-      status="warning"
+    <div
+      className="editor-contrast-checker block-editor-contrast-checker"
     >
-      <div
-        className="components-notice is-warning"
+      <Notice
+        isDismissible={false}
+        status="warning"
       >
         <div
-          className="components-notice__content"
+          className="components-notice is-warning"
         >
-          This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+          <div
+            className="components-notice__content"
+          >
+            This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+          </div>
         </div>
-      </div>
-    </Notice>
-  </div>
+      </Notice>
+    </div>
+  </ContrastCheckerMessage>
 </ContrastChecker>
 `;
 
@@ -37,24 +70,57 @@ exports[`ContrastChecker should render different message matching snapshot when 
   isLargeText={false}
   textColor="#666"
 >
-  <div
-    className="editor-contrast-checker block-editor-contrast-checker"
+  <ContrastCheckerMessage
+    backgroundColor="#555"
+    textColor="#666"
+    tinyBackgroundColor={
+      Object {
+        "_a": 1,
+        "_b": 85,
+        "_format": "hex",
+        "_g": 85,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#555",
+        "_r": 85,
+        "_roundA": 1,
+        "_tc_id": 8,
+      }
+    }
+    tinyTextColor={
+      Object {
+        "_a": 1,
+        "_b": 102,
+        "_format": "hex",
+        "_g": 102,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#666",
+        "_r": 102,
+        "_roundA": 1,
+        "_tc_id": 9,
+      }
+    }
   >
-    <Notice
-      isDismissible={false}
-      status="warning"
+    <div
+      className="editor-contrast-checker block-editor-contrast-checker"
     >
-      <div
-        className="components-notice is-warning"
+      <Notice
+        isDismissible={false}
+        status="warning"
       >
         <div
-          className="components-notice__content"
+          className="components-notice is-warning"
         >
-          This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.
+          <div
+            className="components-notice__content"
+          >
+            This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.
+          </div>
         </div>
-      </div>
-    </Notice>
-  </div>
+      </Notice>
+    </div>
+  </ContrastCheckerMessage>
 </ContrastChecker>
 `;
 
@@ -63,24 +129,56 @@ exports[`ContrastChecker should render messages when the textColor is valid, but
   fallbackBackgroundColor="#000000"
   textColor="#000000"
 >
-  <div
-    className="editor-contrast-checker block-editor-contrast-checker"
+  <ContrastCheckerMessage
+    textColor="#000000"
+    tinyBackgroundColor={
+      Object {
+        "_a": 1,
+        "_b": 0,
+        "_format": "hex",
+        "_g": 0,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#000000",
+        "_r": 0,
+        "_roundA": 1,
+        "_tc_id": 24,
+      }
+    }
+    tinyTextColor={
+      Object {
+        "_a": 1,
+        "_b": 0,
+        "_format": "hex",
+        "_g": 0,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#000000",
+        "_r": 0,
+        "_roundA": 1,
+        "_tc_id": 25,
+      }
+    }
   >
-    <Notice
-      isDismissible={false}
-      status="warning"
+    <div
+      className="editor-contrast-checker block-editor-contrast-checker"
     >
-      <div
-        className="components-notice is-warning"
+      <Notice
+        isDismissible={false}
+        status="warning"
       >
         <div
-          className="components-notice__content"
+          className="components-notice is-warning"
         >
-          This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+          <div
+            className="components-notice__content"
+          >
+            This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+          </div>
         </div>
-      </div>
-    </Notice>
-  </div>
+      </Notice>
+    </div>
+  </ContrastCheckerMessage>
 </ContrastChecker>
 `;
 
@@ -90,24 +188,57 @@ exports[`ContrastChecker should take into consideration the font size passed 1`]
   fontSize={23}
   textColor="#000000"
 >
-  <div
-    className="editor-contrast-checker block-editor-contrast-checker"
+  <ContrastCheckerMessage
+    backgroundColor="#C44B4B"
+    textColor="#000000"
+    tinyBackgroundColor={
+      Object {
+        "_a": 1,
+        "_b": 75,
+        "_format": "hex",
+        "_g": 75,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#C44B4B",
+        "_r": 196,
+        "_roundA": 1,
+        "_tc_id": 14,
+      }
+    }
+    tinyTextColor={
+      Object {
+        "_a": 1,
+        "_b": 0,
+        "_format": "hex",
+        "_g": 0,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#000000",
+        "_r": 0,
+        "_roundA": 1,
+        "_tc_id": 15,
+      }
+    }
   >
-    <Notice
-      isDismissible={false}
-      status="warning"
+    <div
+      className="editor-contrast-checker block-editor-contrast-checker"
     >
-      <div
-        className="components-notice is-warning"
+      <Notice
+        isDismissible={false}
+        status="warning"
       >
         <div
-          className="components-notice__content"
+          className="components-notice is-warning"
         >
-          This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+          <div
+            className="components-notice__content"
+          >
+            This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+          </div>
         </div>
-      </div>
-    </Notice>
-  </div>
+      </Notice>
+    </div>
+  </ContrastCheckerMessage>
 </ContrastChecker>
 `;
 
@@ -117,24 +248,57 @@ exports[`ContrastChecker should take into consideration wherever text is large o
   isLargeText={false}
   textColor="#000000"
 >
-  <div
-    className="editor-contrast-checker block-editor-contrast-checker"
+  <ContrastCheckerMessage
+    backgroundColor="#C44B4B"
+    textColor="#000000"
+    tinyBackgroundColor={
+      Object {
+        "_a": 1,
+        "_b": 75,
+        "_format": "hex",
+        "_g": 75,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#C44B4B",
+        "_r": 196,
+        "_roundA": 1,
+        "_tc_id": 10,
+      }
+    }
+    tinyTextColor={
+      Object {
+        "_a": 1,
+        "_b": 0,
+        "_format": "hex",
+        "_g": 0,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#000000",
+        "_r": 0,
+        "_roundA": 1,
+        "_tc_id": 11,
+      }
+    }
   >
-    <Notice
-      isDismissible={false}
-      status="warning"
+    <div
+      className="editor-contrast-checker block-editor-contrast-checker"
     >
-      <div
-        className="components-notice is-warning"
+      <Notice
+        isDismissible={false}
+        status="warning"
       >
         <div
-          className="components-notice__content"
+          className="components-notice is-warning"
         >
-          This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+          <div
+            className="components-notice__content"
+          >
+            This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+          </div>
         </div>
-      </div>
-    </Notice>
-  </div>
+      </Notice>
+    </div>
+  </ContrastCheckerMessage>
 </ContrastChecker>
 `;
 
@@ -145,23 +309,56 @@ exports[`ContrastChecker should use isLargeText to make decisions if both isLarg
   isLargeText={false}
   textColor="#000000"
 >
-  <div
-    className="editor-contrast-checker block-editor-contrast-checker"
+  <ContrastCheckerMessage
+    backgroundColor="#C44B4B"
+    textColor="#000000"
+    tinyBackgroundColor={
+      Object {
+        "_a": 1,
+        "_b": 75,
+        "_format": "hex",
+        "_g": 75,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#C44B4B",
+        "_r": 196,
+        "_roundA": 1,
+        "_tc_id": 20,
+      }
+    }
+    tinyTextColor={
+      Object {
+        "_a": 1,
+        "_b": 0,
+        "_format": "hex",
+        "_g": 0,
+        "_gradientType": undefined,
+        "_ok": true,
+        "_originalInput": "#000000",
+        "_r": 0,
+        "_roundA": 1,
+        "_tc_id": 21,
+      }
+    }
   >
-    <Notice
-      isDismissible={false}
-      status="warning"
+    <div
+      className="editor-contrast-checker block-editor-contrast-checker"
     >
-      <div
-        className="components-notice is-warning"
+      <Notice
+        isDismissible={false}
+        status="warning"
       >
         <div
-          className="components-notice__content"
+          className="components-notice is-warning"
         >
-          This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+          <div
+            className="components-notice__content"
+          >
+            This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+          </div>
         </div>
-      </div>
-    </Notice>
-  </div>
+      </Notice>
+    </div>
+  </ContrastCheckerMessage>
 </ContrastChecker>
 `;

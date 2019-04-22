@@ -8,6 +8,7 @@ export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
+export { default as ButtonBlockerAppender } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
 export { default as withColorContext } from './color-palette/with-color-context';
 export * from './colors';

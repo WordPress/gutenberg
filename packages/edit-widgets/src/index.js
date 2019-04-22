@@ -2,8 +2,22 @@
  * WordPress dependencies
  */
 import { render } from '@wordpress/element';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
-render(
-	<h1>Widgets (beta)</h1>,
-	document.querySelector( '.blocks-widgets-container' )
-);
+/**
+ * Internal dependencies
+ */
+import Layout from './components/layout';
+
+/**
+ * Initilizes the widgets screen
+ *
+ * @param {string} id Id of the root element to render the screen.
+ */
+export function initialize( id ) {
+	registerCoreBlocks();
+	render(
+		<Layout />,
+		document.getElementById( id )
+	);
+}

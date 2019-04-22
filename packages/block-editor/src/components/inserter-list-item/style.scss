@@ -45,7 +45,7 @@
 		&:hover {
 			.block-editor-block-types-list__item-icon,
 			.block-editor-block-types-list__item-title {
-				color: currentColor;
+				color: inherit;
 			}
 		}
 
@@ -60,7 +60,7 @@
 
 			.block-editor-block-types-list__item-icon,
 			.block-editor-block-types-list__item-title {
-				color: currentColor;
+				color: inherit;
 			}
 		}
 	}

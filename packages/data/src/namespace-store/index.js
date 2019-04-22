@@ -188,7 +188,7 @@ function mapSelectors( selectors, store, registry ) {
  */
 function mapActions( actions, store ) {
 	const createBoundAction = ( action ) => ( ...args ) => {
-		store.dispatch( action( ...args ) );
+		return Promise.resolve( store.dispatch( action( ...args ) ) );
 	};
 
 	return mapValues( actions, createBoundAction );
