@@ -14,10 +14,17 @@ const { Provider, Consumer } = createContext( {
 	removeDropZone: () => {},
 } );
 
+const getDeclaredDragEventType = ( dataTransfer ) => {
+	const data = dataTransfer.getData( 'text' );
+	if ( data !== '' ) {
+		return JSON.parse( data ).type;
+	}
+	return null;
+};
+
 const getDragEventType = ( { dataTransfer } ) => {
 	if ( dataTransfer ) {
-		// If the event has declared any type, use it.
-		const declaredDragEventType = JSON.parse( dataTransfer.getData( 'text' ) ).type;
+		const declaredDragEventType = getDeclaredDragEventType( dataTransfer );
 		if ( declaredDragEventType ) {
 			return declaredDragEventType;
 		}
@@ -27,6 +34,7 @@ const getDragEventType = ( { dataTransfer } ) => {
 		if ( includes( dataTransfer.types, 'Files' ) ) {
 			return 'file';
 		}
+
 		if ( includes( dataTransfer.types, 'text/html' ) ) {
 			return 'html';
 		}
@@ -39,7 +47,7 @@ const isTypeSupportedByDropZone = ( type, dropZone ) =>
 	( type === 'file' && !! dropZone.onFilesDrop ) ||
 	( type === 'html' && !! dropZone.onHTMLDrop ) ||
 	( type === 'block' && !! dropZone.onDrop ) ||
-	( type === 'image' && !! dropZone.onDropImage );
+	( type === 'image' && !! dropZone.onImageDrop );
 
 const isWithinElementBounds = ( element, x, y ) => {
 	const rect = element.getBoundingClientRect();
@@ -224,7 +232,7 @@ class DropZoneProvider extends Component {
 					dropZone.onDrop( event, position );
 					break;
 				case 'image':
-					dropZone.onDropImage( event, position );
+					dropZone.onImageDrop( event, position );
 					break;
 			}
 		}

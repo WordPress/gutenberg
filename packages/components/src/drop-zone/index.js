@@ -37,6 +37,7 @@ class DropZoneComponent extends Component {
 			onDrop: this.props.onDrop,
 			onFilesDrop: this.props.onFilesDrop,
 			onHTMLDrop: this.props.onHTMLDrop,
+			onImageDrop: this.props.onImageDrop,
 			setState: this.setState.bind( this ),
 		};
 		this.state = {

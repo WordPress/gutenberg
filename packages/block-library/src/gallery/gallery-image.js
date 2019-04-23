@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { Draggable, IconButton, Spinner } from '@wordpress/components';
+import { Draggable, DropZone, IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
@@ -138,6 +138,7 @@ class GalleryImage extends Component {
 
 		return (
 			<figure className={ className }>
+				<DropZone onImageDrop={ () => console.log( 'onImageDrop ', id ) } />
 				{ isSelected &&
 					<div className="block-library-gallery-item__inline-menu">
 						<IconButton
