@@ -92,7 +92,7 @@ Keycode for ESCAPE key.
 
 Keycode for F10 key.
 
-<a name="isApple" href="#isApple">#</a> **isApple**
+<a name="isAppleOS" href="#isAppleOS">#</a> **isAppleOS**
 
 Utility to check for Apple platform.
 
