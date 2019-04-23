@@ -481,7 +481,7 @@ export class RichText extends Component {
 			formatPlaceholder,
 		} );
 		this.lastEventCount = event.nativeEvent.eventCount;
-		
+
 		// Make sure there are changes made to the content before upgrading it upward
 		const newContent = this.removeRootTagsProduceByAztec( unescapeSpaces( text ) );
 		if ( this.lastContent !== newContent ) {
