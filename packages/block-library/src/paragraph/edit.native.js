@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,6 +23,12 @@ class ParagraphEdit extends Component {
 		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
 		this.onReplace = this.onReplace.bind( this );
+		this.onFocus = this.onFocus.bind( this );
+		this.onBlur = this.onBlur.bind( this );
+
+		this.state = {
+			isSelected: false,
+		};
 	}
 
 	/**
@@ -81,6 +88,20 @@ class ParagraphEdit extends Component {
 		) ) );
 	}
 
+	onFocus() {
+		this.setState( { isSelected: true } );
+		if ( this.props.onFocus ) {
+			this.props.onFocus();
+		}
+	}
+
+	onBlur() {
+		this.setState( { isSelected: false } );
+		if ( this.props.onBlur ) {
+			this.props.onBlur();
+		}
+	}
+
 	render() {
 		const {
 			attributes,
@@ -95,13 +116,16 @@ class ParagraphEdit extends Component {
 		} = attributes;
 
 		return (
-			<View>
+			<View
+				accessible={ ! this.state.isSelected }
+				accessibilityLabel={ __( 'Paragraph block' ) + __( '.' ) + ' ' + ( isEmpty( content ) ? __( 'Empty' ) : content ) }
+			>
 				<RichText
 					tagName="p"
 					value={ content }
 					isSelected={ this.props.isSelected }
-					onFocus={ this.props.onFocus } // always assign onFocus as a props
-					onBlur={ this.props.onBlur } // always assign onBlur as a props
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					style={ style }
 					onChange={ ( nextContent ) => {
