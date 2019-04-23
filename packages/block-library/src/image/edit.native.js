@@ -379,6 +379,8 @@ class ImageEdit extends React.Component {
 										resizeMethod="scale"
 										source={ { uri: url } }
 										key={ url }
+										accessible={ true }
+										accessibilityLabel={ __( 'Image' ) + __( '.' ) + ' ' + alt }
 									>
 										{ this.state.isUploadFailed &&
 											<View style={ styles.imageContainer } >
