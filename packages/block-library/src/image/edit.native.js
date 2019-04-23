@@ -31,7 +31,7 @@ import {
 	BottomSheet,
 	Picker,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 
@@ -328,7 +328,14 @@ class ImageEdit extends React.Component {
 		const progress = this.state.progress * 100;
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
+			<TouchableWithoutFeedback
+				accessible={ ! isSelected }
+				accessibilityLabel={ sprintf( '%s%s %s', __( 'Image block' ), __( '.' ), alt ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Double tap to edit the image' ) }
+				onPress={ this.onImagePressed }
+				disabled={ ! isSelected }
+			>
 				<View style={ { flex: 1 } }>
 					{ showSpinner && <Spinner progress={ progress } /> }
 					<BlockControls>
