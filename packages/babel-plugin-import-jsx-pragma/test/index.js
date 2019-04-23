@@ -135,7 +135,7 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 		);
 	} );
 
-	it( 'adds Fragment import for Fragment', () => {
+	it( 'does not add Fragment import for <Fragment />', () => {
 		const original = 'let foo = <Fragment><bar /><baz /></Fragment>;';
 		const string = getTransformedCode( original, {
 			scopeVariable: 'createElement',
@@ -145,7 +145,7 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 		} );
 
 		expect( string ).toBe(
-			'import { createElement, Fragment } from "@wordpress/element";\nlet foo = <Fragment><bar /><baz /></Fragment>;'
+			'import { createElement } from "@wordpress/element";\nlet foo = <Fragment><bar /><baz /></Fragment>;'
 		);
 	} );
 } );

@@ -66,7 +66,8 @@ Name of variable required to be in scope for use by the JSX pragma. For the defa
 
 _Type:_ String
 
-Name of variable required to be in scope for `Fragment` (`<></>` or `<Fragment />`) JSX.
+Name of variable required to be in scope for `<></>` `Fragment` JSX. Named `<Fragment />` elements
+expect Fragment to be in scope and will not add the import.
 
 ### `source`
 

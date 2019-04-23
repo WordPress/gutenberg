@@ -55,7 +55,7 @@ module.exports = function( babel ) {
 				const { scopeVariable } = getOptions( state );
 				state.hasUndeclaredScopeVariable = ! path.scope.hasBinding( scopeVariable );
 			},
-			'JSXElement|JSXFragment'( path, state ) {
+			JSXFragment( path, state ) {
 				if ( state.hasUndeclaredScopeVariableFrag ) {
 					return;
 				}
@@ -65,10 +65,7 @@ module.exports = function( babel ) {
 					return;
 				}
 
-				if (
-					path.type === 'JSXFragment' ||
-					( path.type === 'JSXElement' && path.node.openingElement.name.name === 'Fragment' )
-				) {
+				if ( path.type === 'JSXFragment' ) {
 					state.hasUndeclaredScopeVariableFrag = ! path.scope.hasBinding( scopeVariableFrag );
 				}
 			},
