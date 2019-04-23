@@ -145,13 +145,17 @@ export const editor = flow( [
 	// editor initialization firing post reset as an effect.
 	blocks: withChangeDetection( {
 		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
-	} )( ( state = { value: [] }, action ) => {
+	} )( ( state = { value: [], selection: {} }, action ) => {
 		switch ( action.type ) {
 			case 'RESET_EDITOR_BLOCKS':
 				if ( action.blocks === state.value ) {
 					return state;
 				}
-				return { value: action.blocks };
+				console.log( action.selection, 'RESET_EDITOR_BLOCKS' )
+				return {
+					value: action.blocks,
+					selection: action.selection,
+				};
 		}
 
 		return state;
@@ -314,125 +318,6 @@ export function isCaretWithinFormattedText( state = false, action ) {
 
 		case 'EXIT_FORMATTED_TEXT':
 			return false;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the block selection's state.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function blockSelection( state = {
-	start: null,
-	end: null,
-	isMultiSelecting: false,
-	isEnabled: true,
-	initialPosition: null,
-}, action ) {
-	switch ( action.type ) {
-		case 'CLEAR_SELECTED_BLOCK':
-			if ( state.start === null && state.end === null && ! state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				start: null,
-				end: null,
-				isMultiSelecting: false,
-				initialPosition: null,
-			};
-		case 'START_MULTI_SELECT':
-			if ( state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				isMultiSelecting: true,
-				initialPosition: null,
-			};
-		case 'STOP_MULTI_SELECT':
-			if ( ! state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				isMultiSelecting: false,
-				initialPosition: null,
-			};
-		case 'MULTI_SELECT':
-			return {
-				...state,
-				start: action.start,
-				end: action.end,
-				initialPosition: null,
-			};
-		case 'SELECT_BLOCK':
-			if ( action.clientId === state.start && action.clientId === state.end ) {
-				return state;
-			}
-			return {
-				...state,
-				start: action.clientId,
-				end: action.clientId,
-				initialPosition: action.initialPosition,
-			};
-		case 'INSERT_BLOCKS': {
-			if ( action.updateSelection ) {
-				return {
-					...state,
-					start: action.blocks[ 0 ].clientId,
-					end: action.blocks[ 0 ].clientId,
-					initialPosition: null,
-					isMultiSelecting: false,
-				};
-			}
-			return state;
-		}
-		case 'REMOVE_BLOCKS':
-			if ( ! action.clientIds || ! action.clientIds.length || action.clientIds.indexOf( state.start ) === -1 ) {
-				return state;
-			}
-			return {
-				...state,
-				start: null,
-				end: null,
-				initialPosition: null,
-				isMultiSelecting: false,
-			};
-		case 'REPLACE_BLOCKS':
-			if ( action.clientIds.indexOf( state.start ) === -1 ) {
-				return state;
-			}
-
-			// If there are replacement blocks, assign last block as the next
-			// selected block, otherwise set to null.
-			const lastBlock = last( action.blocks );
-			const nextSelectedBlockClientId = lastBlock ? lastBlock.clientId : null;
-
-			if ( nextSelectedBlockClientId === state.start && nextSelectedBlockClientId === state.end ) {
-				return state;
-			}
-
-			return {
-				...state,
-				start: nextSelectedBlockClientId,
-				end: nextSelectedBlockClientId,
-				initialPosition: null,
-				isMultiSelecting: false,
-			};
-		case 'TOGGLE_SELECTION':
-			return {
-				...state,
-				isEnabled: action.isSelectionEnabled,
-			};
 	}
 
 	return state;

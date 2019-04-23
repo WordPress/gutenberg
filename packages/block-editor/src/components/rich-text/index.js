@@ -478,6 +478,8 @@ export class RichText extends Component {
 			this.selectionStart = start;
 			this.selectionEnd = end;
 
+			console.log( 'onSelectionChange', start )
+
 			if ( activeFormats.length > 0 ) {
 				this.recalculateBoundaryStyle();
 			}
@@ -521,9 +523,9 @@ export class RichText extends Component {
 		} );
 
 		this.value = this.valueToFormat( record );
+		this.props.onSelectionChange( start, end );
 		this.props.onChange( this.value );
 		this.setState( { activeFormats } );
-		this.props.onSelectionChange( start, end );
 		this.selectionStart = start;
 		this.selectionEnd = end;
 
@@ -910,7 +912,7 @@ export class RichText extends Component {
 
 		// Check if the selection changed.
 		shouldReapply = shouldReapply || (
-			isSelected && ! prevProps.isSelected && (
+			isSelected && (
 				this.selectionStart !== record.start ||
 				this.selectionEnd !== record.end
 			)
@@ -933,6 +935,16 @@ export class RichText extends Component {
 
 			this.applyRecord( record );
 		}
+
+		const updated = {};
+
+		Object.keys( this.props ).forEach( ( key ) => {
+			if ( this.props[ key ] !== prevProps[ key ] ) {
+				updated[ key ] = [ prevProps[ key ], this.props[ key ] ];
+			}
+		} );
+
+		console.log( updated, this.selectionStart, this.props.selectionStart );
 
 		this.value = value;
 		this.selectionStart = record.start;

@@ -1134,6 +1134,16 @@ export function getEditorBlocks( state ) {
 }
 
 /**
+ * Return the current block selection.
+ *
+ * @param {Object} state
+ * @return {Array} Block selection.
+ */
+export function getEditorSelection( state ) {
+	return state.editor.present.blocks.selection;
+}
+
+/**
  * Is the editor ready
  *
  * @param {Object} state

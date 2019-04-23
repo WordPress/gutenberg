@@ -743,6 +743,7 @@ export function resetEditorBlocks( blocks, options = {} ) {
 	return {
 		type: 'RESET_EDITOR_BLOCKS',
 		blocks,
+		selection: options.selection,
 		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
 	};
 }

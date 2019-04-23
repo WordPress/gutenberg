@@ -23,6 +23,7 @@ class BlockEditorProvider extends Component {
 			settings,
 			updateSettings,
 			value,
+			selection,
 			resetBlocks,
 			registry,
 		} = this.props;
@@ -39,7 +40,7 @@ class BlockEditorProvider extends Component {
 			this.isSyncingOutcomingValue = false;
 		} else if ( value !== prevProps.value ) {
 			this.isSyncingIncomingValue = true;
-			resetBlocks( value );
+			resetBlocks( value, selection );
 		}
 	}
 
@@ -68,11 +69,15 @@ class BlockEditorProvider extends Component {
 
 		const {
 			getBlocks,
+			getSelectionStart,
+			getSelectionEnd,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
 		} = registry.select( 'core/block-editor' );
 
 		let blocks = getBlocks();
+		let selectionStart = getSelectionStart();
+		let selectionEnd = getSelectionEnd();
 		let isPersistent = isLastBlockChangePersistent();
 
 		this.unsubscribe = registry.subscribe( () => {
@@ -81,7 +86,14 @@ class BlockEditorProvider extends Component {
 				onInput,
 			} = this.props;
 			const newBlocks = getBlocks();
+			const newSelectionStart = getSelectionStart();
+			const newSelectionEnd = getSelectionEnd();
 			const newIsPersistent = isLastBlockChangePersistent();
+			const selection = {
+				start: newSelectionStart,
+				end: newSelectionEnd,
+			};
+
 			if (
 				newBlocks !== blocks && (
 					this.isSyncingIncomingValue ||
@@ -90,6 +102,8 @@ class BlockEditorProvider extends Component {
 			) {
 				this.isSyncingIncomingValue = false;
 				blocks = newBlocks;
+				selectionStart = newSelectionStart;
+				selectionEnd = newSelectionEnd;
 				isPersistent = newIsPersistent;
 				return;
 			}
@@ -106,13 +120,21 @@ class BlockEditorProvider extends Component {
 				}
 
 				blocks = newBlocks;
+				selectionStart = newSelectionStart;
+				selectionEnd = newSelectionEnd;
 				isPersistent = newIsPersistent;
 
 				if ( isPersistent ) {
-					onChange( blocks );
+					onChange( blocks, selection );
 				} else {
-					onInput( blocks );
+					onInput( blocks, selection );
 				}
+			} else if (
+				selectionStart !== newSelectionStart ||
+				selectionEnd !== newSelectionEnd
+			) {
+				selectionStart = newSelectionStart;
+				selectionEnd = newSelectionEnd;
 			}
 		} );
 	}

@@ -740,9 +740,11 @@ describe( 'selectors', () => {
 	describe( 'hasSelectedBlock', () => {
 		it( 'should return false if no selection', () => {
 			const state = {
-				blockSelection: {
-					start: {},
-					end: {},
+				blocks: {
+					selection: {
+						start: {},
+						end: {},
+					},
 				},
 			};
 
@@ -751,9 +753,11 @@ describe( 'selectors', () => {
 
 		it( 'should return false if multi-selection', () => {
 			const state = {
-				blockSelection: {
-					start: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
-					end: { clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189' },
+				blocks: {
+					selection: {
+						start: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
+						end: { clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189' },
+					},
 				},
 			};
 
@@ -762,9 +766,11 @@ describe( 'selectors', () => {
 
 		it( 'should return true if singular selection', () => {
 			const state = {
-				blockSelection: {
-					start: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
-					end: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
+				blocks: {
+					selection: {
+						start: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
+						end: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
+					},
 				},
 			};
 

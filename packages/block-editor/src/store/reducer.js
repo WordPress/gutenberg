@@ -175,6 +175,18 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 	);
 }
 
+function isUpdatingSelectionOnly( { type } ) {
+	return (
+		type === 'CLEAR_SELECTED_BLOCK' ||
+		type === 'START_MULTI_SELECT' ||
+		type === 'STOP_MULTI_SELECT' ||
+		type === 'MULTI_SELECT' ||
+		type === 'SELECT_BLOCK' ||
+		type === 'TOGGLE_SELECTION' ||
+		type === 'SELECTION_CHANGE'
+	);
+}
+
 /**
  * Higher-order reducer intended to augment the blocks reducer, assigning an
  * `isPersistentChange` property value corresponding to whether a change in
@@ -211,14 +223,19 @@ function withPersistentBlockChange( reducer ) {
 			...nextState,
 			isPersistentChange: (
 				isExplicitPersistentChange ||
-				! isUpdatingSameBlockAttribute( action, lastAction )
+				(
+					! isUpdatingSameBlockAttribute( action, lastAction ) &&
+					! isUpdatingSelectionOnly( action )
+				)
 			),
 		};
 
 		// In comparing against the previous action, consider only those which
 		// would have qualified as one which would have been ignored or not
 		// have resulted in a changed state.
-		lastAction = action;
+		if ( ! isUpdatingSelectionOnly( action ) ) {
+			lastAction = action;
+		}
 
 		return nextState;
 	};
@@ -306,6 +323,7 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 				...omit( state.order, visibleClientIds ),
 				...mapBlockOrder( action.blocks ),
 			},
+			selection: action.selection || { start: {}, end: {} },
 		};
 	}
 
@@ -379,6 +397,15 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 	}
 
 	return reducer( state, action );
+};
+
+const BLOCK_SELECTION_EMPTY_OBJECT = {};
+const BLOCK_SELECTION_INITIAL_STATE = {
+	start: BLOCK_SELECTION_EMPTY_OBJECT,
+	end: BLOCK_SELECTION_EMPTY_OBJECT,
+	isMultiSelecting: false,
+	isEnabled: true,
+	initialPosition: null,
 };
 
 /**
@@ -656,6 +683,123 @@ export const blocks = flow(
 
 		return state;
 	},
+
+	selection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
+		switch ( action.type ) {
+			case 'CLEAR_SELECTED_BLOCK':
+				return BLOCK_SELECTION_INITIAL_STATE;
+			case 'START_MULTI_SELECT':
+				if ( state.isMultiSelecting ) {
+					return state;
+				}
+
+				return {
+					...state,
+					isMultiSelecting: true,
+					initialPosition: null,
+				};
+			case 'STOP_MULTI_SELECT':
+				if ( ! state.isMultiSelecting ) {
+					return state;
+				}
+
+				return {
+					...state,
+					isMultiSelecting: false,
+					initialPosition: null,
+				};
+			case 'MULTI_SELECT':
+				return {
+					...BLOCK_SELECTION_INITIAL_STATE,
+					isMultiSelecting: state.isMultiSelecting,
+					start: { clientId: action.start },
+					end: { clientId: action.end },
+				};
+			case 'SELECT_BLOCK':
+				if (
+					action.clientId === state.start.clientId &&
+					action.clientId === state.end.clientId
+				) {
+					return state;
+				}
+
+				return {
+					...BLOCK_SELECTION_INITIAL_STATE,
+					initialPosition: action.initialPosition,
+					start: { clientId: action.clientId },
+					end: { clientId: action.clientId },
+				};
+			case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
+			case 'INSERT_BLOCKS': {
+				if ( action.updateSelection ) {
+					return {
+						...BLOCK_SELECTION_INITIAL_STATE,
+						start: { clientId: action.blocks[ 0 ].clientId },
+						end: { clientId: action.blocks[ 0 ].clientId },
+					};
+				}
+
+				return state;
+			}
+			case 'REMOVE_BLOCKS':
+				if (
+					! action.clientIds ||
+					! action.clientIds.length ||
+					action.clientIds.indexOf( state.start.clientId ) === -1
+				) {
+					return state;
+				}
+
+				return BLOCK_SELECTION_INITIAL_STATE;
+			case 'REPLACE_BLOCKS': {
+				if ( action.clientIds.indexOf( state.start.clientId ) === -1 ) {
+					return state;
+				}
+
+				// If there are replacement blocks, assign last block as the next
+				// selected block, otherwise set to null.
+				const lastBlock = last( action.blocks );
+
+				if ( ! lastBlock ) {
+					return BLOCK_SELECTION_INITIAL_STATE;
+				}
+
+				if (
+					lastBlock.clientId === state.start.clientId &&
+					lastBlock.clientId === state.end.clientId
+				) {
+					return state;
+				}
+
+				return {
+					...BLOCK_SELECTION_INITIAL_STATE,
+					start: { clientId: lastBlock.clientId },
+					end: { clientId: lastBlock.clientId },
+				};
+			}
+			case 'TOGGLE_SELECTION':
+				return {
+					...BLOCK_SELECTION_INITIAL_STATE,
+					isEnabled: action.isSelectionEnabled,
+				};
+			case 'SELECTION_CHANGE':
+				return {
+					...BLOCK_SELECTION_INITIAL_STATE,
+					start: {
+						clientId: action.clientId,
+						attributeKey: action.attributeKey,
+						offset: action.startOffset,
+					},
+					end: {
+						clientId: action.clientId,
+						attributeKey: action.attributeKey,
+						offset: action.endOffset,
+					},
+				};
+		}
+
+		return state;
+	},
 } );
 
 /**
@@ -693,140 +837,6 @@ export function isCaretWithinFormattedText( state = false, action ) {
 
 		case 'EXIT_FORMATTED_TEXT':
 			return false;
-	}
-
-	return state;
-}
-
-const BLOCK_SELECTION_EMPTY_OBJECT = {};
-const BLOCK_SELECTION_INITIAL_STATE = {
-	start: BLOCK_SELECTION_EMPTY_OBJECT,
-	end: BLOCK_SELECTION_EMPTY_OBJECT,
-	isMultiSelecting: false,
-	isEnabled: true,
-	initialPosition: null,
-};
-
-/**
- * Reducer returning the block selection's state.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
-	switch ( action.type ) {
-		case 'CLEAR_SELECTED_BLOCK':
-			return BLOCK_SELECTION_INITIAL_STATE;
-		case 'START_MULTI_SELECT':
-			if ( state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				isMultiSelecting: true,
-				initialPosition: null,
-			};
-		case 'STOP_MULTI_SELECT':
-			if ( ! state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				isMultiSelecting: false,
-				initialPosition: null,
-			};
-		case 'MULTI_SELECT':
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				isMultiSelecting: state.isMultiSelecting,
-				start: { clientId: action.start },
-				end: { clientId: action.end },
-			};
-		case 'SELECT_BLOCK':
-			if (
-				action.clientId === state.start.clientId &&
-				action.clientId === state.end.clientId
-			) {
-				return state;
-			}
-
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				initialPosition: action.initialPosition,
-				start: { clientId: action.clientId },
-				end: { clientId: action.clientId },
-			};
-		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
-		case 'INSERT_BLOCKS': {
-			if ( action.updateSelection ) {
-				return {
-					...BLOCK_SELECTION_INITIAL_STATE,
-					start: { clientId: action.blocks[ 0 ].clientId },
-					end: { clientId: action.blocks[ 0 ].clientId },
-				};
-			}
-
-			return state;
-		}
-		case 'REMOVE_BLOCKS':
-			if (
-				! action.clientIds ||
-				! action.clientIds.length ||
-				action.clientIds.indexOf( state.start.clientId ) === -1
-			) {
-				return state;
-			}
-
-			return BLOCK_SELECTION_INITIAL_STATE;
-		case 'REPLACE_BLOCKS': {
-			if ( action.clientIds.indexOf( state.start.clientId ) === -1 ) {
-				return state;
-			}
-
-			// If there are replacement blocks, assign last block as the next
-			// selected block, otherwise set to null.
-			const lastBlock = last( action.blocks );
-
-			if ( ! lastBlock ) {
-				return BLOCK_SELECTION_INITIAL_STATE;
-			}
-
-			if (
-				lastBlock.clientId === state.start.clientId &&
-				lastBlock.clientId === state.end.clientId
-			) {
-				return state;
-			}
-
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				start: { clientId: lastBlock.clientId },
-				end: { clientId: lastBlock.clientId },
-			};
-		}
-		case 'TOGGLE_SELECTION':
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				isEnabled: action.isSelectionEnabled,
-			};
-		case 'SELECTION_CHANGE':
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				start: {
-					clientId: action.clientId,
-					attributeKey: action.attributeKey,
-					offset: action.startOffset,
-				},
-				end: {
-					clientId: action.clientId,
-					attributeKey: action.attributeKey,
-					offset: action.endOffset,
-				},
-			};
 	}
 
 	return state;
@@ -988,7 +998,6 @@ export default combineReducers( {
 	blocks,
 	isTyping,
 	isCaretWithinFormattedText,
-	blockSelection,
 	blocksMode,
 	blockListSettings,
 	insertionPoint,

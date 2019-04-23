@@ -41,10 +41,12 @@ function* ensureDefaultBlock() {
  *
  * @return {Object} Action object.
  */
-export function resetBlocks( blocks ) {
+export function resetBlocks( blocks, selection ) {
+	console.log( resetBlocks, arguments );
 	return {
 		type: 'RESET_BLOCKS',
 		blocks,
+		selection,
 	};
 }
 
