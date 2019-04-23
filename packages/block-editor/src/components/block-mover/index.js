@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, partial, castArray } from 'lodash';
+import { first, last, partial, castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -117,16 +117,22 @@ export class BlockMover extends Component {
 
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlock, getBlockIndex, getTemplateLock, getBlockRootClientId } = select( 'core/block-editor' );
-		const firstClientId = first( castArray( clientIds ) );
+		const { getBlock, getBlockIndex, getTemplateLock, getBlockRootClientId, getBlockOrder } = select( 'core/block-editor' );
+		const normalizedClientIds = castArray( clientIds );
+		const firstClientId = first( normalizedClientIds );
 		const block = getBlock( firstClientId );
-		const rootClientId = getBlockRootClientId( first( castArray( clientIds ) ) );
+		const rootClientId = getBlockRootClientId( first( normalizedClientIds ) );
+		const blockOrder = getBlockOrder( rootClientId );
+		const firstIndex = getBlockIndex( firstClientId, rootClientId );
+		const lastIndex = getBlockIndex( last( normalizedClientIds ), rootClientId );
 
 		return {
-			firstIndex: getBlockIndex( firstClientId, rootClientId ),
 			blockType: block ? getBlockType( block.name ) : null,
 			isLocked: getTemplateLock( rootClientId ) === 'all',
 			rootClientId,
+			firstIndex,
+			isFirst: firstIndex === 0,
+			isLast: lastIndex === blockOrder.length - 1,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {

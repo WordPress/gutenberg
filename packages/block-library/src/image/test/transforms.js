@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { stripFirstImage } from '../';
+import { stripFirstImage } from '../transforms';
 
 describe( 'stripFirstImage', () => {
 	test( 'should do nothing if no image is present', () => {
