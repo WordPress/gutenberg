@@ -31,12 +31,11 @@ const getDragEventType = ( { dataTransfer } ) => {
 	return JSON.parse( dataTransfer.getData( 'text' ) ).type;
 };
 
-const isTypeSupportedByDropZone = ( type, dropZone ) => {
-	return ( type === 'file' && dropZone.onFilesDrop ) ||
-		( type === 'html' && dropZone.onHTMLDrop ) ||
-		( type === 'block' && dropZone.onDrop ) ||
-		( type === 'image' && dropZone.onDropImage );
-};
+const isTypeSupportedByDropZone = ( type, dropZone ) =>
+	( type === 'file' && !! dropZone.onFilesDrop ) ||
+	( type === 'html' && !! dropZone.onHTMLDrop ) ||
+	( type === 'block' && !! dropZone.onDrop ) ||
+	( type === 'image' && !! dropZone.onDropImage );
 
 const isWithinElementBounds = ( element, x, y ) => {
 	const rect = element.getBoundingClientRect();
