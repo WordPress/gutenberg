@@ -248,7 +248,10 @@ export class BlockListBlock extends Component {
 	 * @return {void}
 	 */
 	preventDrag( event ) {
-		event.preventDefault();
+		const { type } = JSON.parse( event.dataTransfer.getData( 'text' ) );
+		if ( type !== 'gallery' ) {
+			event.preventDefault();
+		}
 	}
 
 	/**
