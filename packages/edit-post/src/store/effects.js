@@ -45,7 +45,7 @@ const effects = {
 
 		let wasSavingPost = select( 'core/editor' ).isSavingPost();
 		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-		
+
 		// Meta boxes are initialized once at page load. It is not necessary to
 		// account for updates on each state change.
 		//

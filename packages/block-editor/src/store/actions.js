@@ -598,6 +598,27 @@ export function exitFormattedText() {
 }
 
 /**
+ * Returns an action object used in signalling that the user caret has changed
+ * position.
+ *
+ * @param {string} clientId     The selected block client ID.
+ * @param {string} attributeKey The selected block attribute key.
+ * @param {number} startOffset  The start offset.
+ * @param {number} endOffset    The end offset.
+ *
+ * @return {Object} Action object.
+ */
+export function selectionChange( clientId, attributeKey, startOffset, endOffset ) {
+	return {
+		type: 'SELECTION_CHANGE',
+		clientId,
+		attributeKey,
+		startOffset,
+		endOffset,
+	};
+}
+
+/**
  * Returns an action object used in signalling that a new block of the default
  * type should be added to the block list.
  *
