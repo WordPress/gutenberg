@@ -3,37 +3,37 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
 
-function PostTrash( { isNew, postId, postType, ...props } ) {
-	if ( isNew || ! postId ) {
-		return null;
-	}
+/**
+ * Internal dependencies
+ */
+import PostTrashCheck from './check';
 
-	const onClick = () => props.trashPost( postId, postType );
-
+function PostTrash( { trashPost } ) {
 	return (
-		<Button className="editor-post-trash button-link-delete" onClick={ onClick } isDefault isLarge>
-			{ __( 'Move to Trash' ) }
-		</Button>
+		<PostTrashCheck>
+			<Button
+				onClick={ trashPost }
+				isDefault
+				isLarge
+				className="editor-post-trash button-link-delete"
+			>
+				{ __( 'Move to Trash' ) }
+			</Button>
+		</PostTrashCheck>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const {
-			isEditedPostNew,
-			getCurrentPostId,
-			getCurrentPostType,
-		} = select( 'core/editor' );
-		return {
-			isNew: isEditedPostNew(),
-			postId: getCurrentPostId(),
-			postType: getCurrentPostType(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		trashPost: dispatch( 'core/editor' ).trashPost,
-	} ) ),
-] )( PostTrash );
+export default withDispatch( ( dispatch, ownProps, registry ) => {
+	const { trashPost } = dispatch( 'core/editor' );
+
+	return {
+		trashPost() {
+			const { postId } = ownProps;
+			const { getCurrentPostType } = registry.select( 'core/editor' );
+			const postType = getCurrentPostType();
+			trashPost( postId, postType );
+		},
+	};
+} )( PostTrash );
