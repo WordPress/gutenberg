@@ -16,19 +16,23 @@ const { Provider, Consumer } = createContext( {
 
 const getDragEventType = ( { dataTransfer } ) => {
 	if ( dataTransfer ) {
-		// Use lodash `includes` here as in the Edge browser `types` is implemented
-		// as a DomStringList, whereas in other browsers it's an array. `includes`
-		// happily works with both types.
+		// If the event has declared any type, use it.
+		const declaredDragEventType = JSON.parse( dataTransfer.getData( 'text' ) ).type;
+		if ( declaredDragEventType ) {
+			return declaredDragEventType;
+		}
+
+		// The Edge browser `types` is implemented as a DomStringList,
+		// whereas in other browsers it's an array. `includes` works with both.
 		if ( includes( dataTransfer.types, 'Files' ) ) {
 			return 'file';
 		}
-
 		if ( includes( dataTransfer.types, 'text/html' ) ) {
 			return 'html';
 		}
 	}
 
-	return JSON.parse( dataTransfer.getData( 'text' ) ).type;
+	return 'unknown';
 };
 
 const isTypeSupportedByDropZone = ( type, dropZone ) =>
