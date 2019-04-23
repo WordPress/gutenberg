@@ -30,6 +30,11 @@
 			display: block;
 			max-width: 100%;
 			height: auto;
+			cursor: grab;
+
+			&:active {
+				cursor: grabbing;
+			}
 		}
 
 		// IE doesn't handle cropping, so we need an explicit width here.
