@@ -1,17 +1,20 @@
 /**
  * Default options for the plugin.
  *
- * @property {string}  scopeVariable Name of variable required to be in scope
- *                                   for use by the JSX pragma. For the default
- *                                   pragma of React.createElement, the React
- *                                   variable must be within scope.
- * @property {string}  source        The module from which the scope variable
- *                                   is to be imported when missing.
- * @property {boolean} isDefault     Whether the scopeVariable is the default
- *                                   import of the source module.
+ * @property {string}  scopeVariable     Name of variable required to be in scope
+ *                                       for use by the JSX pragma. For the default
+ *                                       pragma of React.createElement, the React
+ *                                       variable must be within scope.
+ * @property {string}  scopeVariableFrag Name of variable required to be in scope
+ *                                       for use by the Fragment pragma.
+ * @property {string}  source            The module from which the scope variable
+ *                                       is to be imported when missing.
+ * @property {boolean} isDefault         Whether the scopeVariable is the default
+ *                                       import of the source module.
  */
 const DEFAULT_OPTIONS = {
 	scopeVariable: 'React',
+	scopeVariableFrag: null,
 	source: 'react',
 	isDefault: true,
 };
@@ -32,6 +35,11 @@ module.exports = function( babel ) {
 	function getOptions( state ) {
 		if ( ! state._options ) {
 			state._options = Object.assign( {}, DEFAULT_OPTIONS, state.opts );
+			if ( state._options.isDefault && state._options.scopeVariableFrag ) {
+				// eslint-disable-next-line no-console
+				console.warn( 'scopeVariableFrag is only available when isDefault is false' );
+				state._options.scopeVariableFrag = null;
+			}
 		}
 
 		return state._options;
@@ -39,7 +47,7 @@ module.exports = function( babel ) {
 
 	return {
 		visitor: {
-			JSXElement( path, state ) {
+			JSX( path, state ) {
 				if ( state.hasUndeclaredScopeVariable ) {
 					return;
 				}
@@ -47,32 +55,60 @@ module.exports = function( babel ) {
 				const { scopeVariable } = getOptions( state );
 				state.hasUndeclaredScopeVariable = ! path.scope.hasBinding( scopeVariable );
 			},
+			'JSXElement|JSXFragment'( path, state ) {
+				if ( state.hasUndeclaredScopeVariableFrag ) {
+					return;
+				}
+
+				const { scopeVariableFrag } = getOptions( state );
+				if ( scopeVariableFrag === null ) {
+					return;
+				}
+
+				if (
+					path.type === 'JSXFragment' ||
+					( path.type === 'JSXElement' && path.node.openingElement.name.name === 'Fragment' )
+				) {
+					state.hasUndeclaredScopeVariableFrag = ! path.scope.hasBinding( scopeVariableFrag );
+				}
+			},
 			Program: {
 				exit( path, state ) {
-					if ( ! state.hasUndeclaredScopeVariable ) {
-						return;
+					const { scopeVariable, scopeVariableFrag, source, isDefault } = getOptions( state );
+
+					let scopeVariableSpecifier;
+					let scopeVariableFragSpecifier;
+
+					if ( state.hasUndeclaredScopeVariable ) {
+						if ( isDefault ) {
+							scopeVariableSpecifier = t.importDefaultSpecifier( t.identifier( scopeVariable ) );
+						} else {
+							scopeVariableSpecifier = t.importSpecifier(
+								t.identifier( scopeVariable ),
+								t.identifier( scopeVariable )
+							);
+						}
 					}
 
-					const { scopeVariable, source, isDefault } = getOptions( state );
-
-					let specifier;
-					if ( isDefault ) {
-						specifier = t.importDefaultSpecifier(
-							t.identifier( scopeVariable )
-						);
-					} else {
-						specifier = t.importSpecifier(
-							t.identifier( scopeVariable ),
-							t.identifier( scopeVariable )
+					if ( state.hasUndeclaredScopeVariableFrag ) {
+						scopeVariableFragSpecifier = t.importSpecifier(
+							t.identifier( scopeVariableFrag ),
+							t.identifier( scopeVariableFrag )
 						);
 					}
 
-					const importDeclaration = t.importDeclaration(
-						[ specifier ],
-						t.stringLiteral( source )
-					);
+					const importDeclarationSpecifiers = [
+						scopeVariableSpecifier,
+						scopeVariableFragSpecifier,
+					].filter( Boolean );
+					if ( importDeclarationSpecifiers.length ) {
+						const importDeclaration = t.importDeclaration(
+							importDeclarationSpecifiers,
+							t.stringLiteral( source )
+						);
 
-					path.unshiftContainer( 'body', importDeclaration );
+						path.unshiftContainer( 'body', importDeclaration );
+					}
 				},
 			},
 		},
