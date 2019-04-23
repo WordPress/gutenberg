@@ -305,8 +305,10 @@ export class RichText extends Component {
 				} );
 				this.onSplit( ...split( currentRecord ).map( this.valueToFormat ) );
 			} else {
-				const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
-				this.onFormatChangeForceChild( insertedLineSeparator );
+				if ( ! event.nativeEvent.firedAfterTextChanged ) {
+					const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
+					this.onFormatChangeForceChild( insertedLineSeparator );
+				}
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
 			const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
