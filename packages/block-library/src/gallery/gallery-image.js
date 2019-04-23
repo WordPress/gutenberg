@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { IconButton, Spinner } from '@wordpress/components';
+import { Draggable, IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
@@ -104,17 +104,28 @@ class GalleryImage extends Component {
 			// direct image selection and unfocus caption fields.
 			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 			<Fragment>
-				<img
-					src={ url }
-					alt={ alt }
-					data-id={ id }
-					onClick={ this.onSelectImage }
-					onFocus={ this.onSelectImage }
-					onKeyDown={ this.onRemoveImage }
-					tabIndex="0"
-					aria-label={ ariaLabel }
-					ref={ this.bindContainer }
-				/>
+				<Draggable
+					elementId={ id }
+					transferData={ { type: 'gallery', id } }
+				>
+					{ ( { onDraggableStart, onDraggableEnd } ) => (
+						<img
+							src={ url }
+							alt={ alt }
+							id={ id }
+							data-id={ id }
+							onClick={ this.onSelectImage }
+							onFocus={ this.onSelectImage }
+							onKeyDown={ this.onRemoveImage }
+							tabIndex="0"
+							aria-label={ ariaLabel }
+							ref={ this.bindContainer }
+							draggable={ true }
+							onDragStart={ onDraggableStart }
+							onDragEnd={ onDraggableEnd }
+						/>
+					) }
+				</Draggable>
 				{ isBlobURL( url ) && <Spinner /> }
 			</Fragment>
 			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
