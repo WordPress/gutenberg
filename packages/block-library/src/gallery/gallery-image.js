@@ -22,6 +22,7 @@ class GalleryImage extends Component {
 		this.onSelectCaption = this.onSelectCaption.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
+		this.onMoveTo = this.onMoveTo.bind( this );
 
 		this.state = {
 			captionSelected: false,
@@ -85,8 +86,16 @@ class GalleryImage extends Component {
 		}
 	}
 
+	onMoveTo( event ) {
+		const data = event.dataTransfer.getData( 'text' );
+		if ( data !== '' ) {
+			const oldIndex = JSON.parse( data ).index;
+			this.props.onMoveTo( oldIndex );
+		}
+	}
+
 	render() {
-		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption, onRemove, onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel } = this.props;
+		const { url, alt, id, linkTo, link, index, isFirstItem, isLastItem, isSelected, caption, onRemove, onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel } = this.props;
 
 		let href;
 
@@ -106,7 +115,7 @@ class GalleryImage extends Component {
 			<Fragment>
 				<Draggable
 					elementId={ id }
-					transferData={ { type: 'image', id } }
+					transferData={ { type: 'image', index } }
 				>
 					{ ( { onDraggableStart, onDraggableEnd } ) => (
 						<img
@@ -138,7 +147,7 @@ class GalleryImage extends Component {
 
 		return (
 			<figure className={ className }>
-				<DropZone onImageDrop={ () => console.log( 'onImageDrop ', id ) } />
+				<DropZone onImageDrop={ this.onMoveTo } />
 				{ isSelected &&
 					<div className="block-library-gallery-item__move-menu">
 						<IconButton

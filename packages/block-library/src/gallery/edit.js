@@ -95,6 +95,12 @@ class GalleryEdit extends Component {
 		this.setAttributes( { images } );
 	}
 
+	onMoveTo( newIndex ) {
+		return ( oldIndex ) => {
+			this.onMove( oldIndex, newIndex );
+		};
+	}
+
 	onMoveForward( oldIndex ) {
 		return () => {
 			if ( oldIndex === this.props.attributes.images.length - 1 ) {
@@ -285,11 +291,13 @@ class GalleryEdit extends Component {
 									url={ img.url }
 									alt={ img.alt }
 									id={ img.id }
+									index={ index }
 									isFirstItem={ index === 0 }
 									isLastItem={ ( index + 1 ) === images.length }
 									isSelected={ isSelected && this.state.selectedImage === index }
 									onMoveBackward={ this.onMoveBackward( index ) }
 									onMoveForward={ this.onMoveForward( index ) }
+									onMoveTo={ this.onMoveTo( index ) }
 									onRemove={ this.onRemoveImage( index ) }
 									onSelect={ this.onSelectImage( index ) }
 									setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
