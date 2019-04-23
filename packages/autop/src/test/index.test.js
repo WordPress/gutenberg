@@ -86,6 +86,23 @@ done = 0;
 	expect( autop( str ).trim() ).toBe( expected );
 } );
 
+test( 'skip script/style elements', () => {
+	// Not wrapped in <p> tags
+	const str = `<script>
+(function(){
+
+done = 0;
+});</script>
+<style>
+.example {
+
+	color: red;
+}
+</style>`;
+
+	expect( autop( str ).trim() ).toBe( str );
+} );
+
 test( 'skip input elements', () => {
 	const str = 'Username: <input type="text" id="username" name="username" /><br />Password: <input type="password" id="password1" name="password1" />';
 	expect( autop( str ).trim() ).toBe( '<p>' + str + '</p>' );

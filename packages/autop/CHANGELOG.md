@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fix
+
+- `autop` will correctly avoid adding `br` and `p` elements within `script` and `style` tags.
+
 ## 2.3.0 (2019-05-21)
 
 ### Bug Fix
