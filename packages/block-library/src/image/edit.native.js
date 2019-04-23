@@ -13,6 +13,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -394,7 +395,13 @@ class ImageEdit extends React.Component {
 						} }
 					</ImageSize>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View style={ { padding: 12, flex: 1 } }>
+						<View
+							style={ { padding: 12, flex: 1 } }
+							accessible={ true }
+							accessibilityLabel={ __( 'Image caption' ) + __( '.' ) + ' ' + ( isEmpty( caption ) ? __( 'Empty' ) : caption ) }
+							accessibilityHint={ __( 'Double tap to edit caption' ) }
+							accessibilityRole={ 'button' }
+						>
 							<TextInput
 								style={ { textAlign: 'center' } }
 								fontFamily={ this.props.fontFamily || ( styles[ 'caption-text' ].fontFamily ) }
