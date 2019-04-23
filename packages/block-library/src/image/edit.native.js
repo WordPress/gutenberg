@@ -31,7 +31,7 @@ import {
 	BottomSheet,
 	Picker,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf} from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 
@@ -330,7 +330,7 @@ class ImageEdit extends React.Component {
 		return (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
-				accessibilityLabel={ __( 'Image block' ) + '. ' + alt }
+				accessibilityLabel={ sprintf( '%s%s %s', __( 'Image block' ), __( '.' ), alt ) }
 				accessibilityRole={ 'button' }
 				accessibilityHint={ __( 'Double tap to edit the image' ) }
 				onPress={ this.onImagePressed }

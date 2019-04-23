@@ -6,7 +6,7 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Dashicon } from '@wordpress/components';
 
 /**
@@ -17,7 +17,7 @@ import styles from './styles.scss';
 function MediaPlaceholder( props ) {
 	return (
 		<TouchableWithoutFeedback
-			accessibilityLabel={ __( 'Image block' ) + '. ' + __( 'Empty' ) }
+			accessibilityLabel={ sprintf( '%s%s %s', __( 'Image block' ), __( '.' ), __( 'Empty' ) ) }
 			accessibilityRole={ 'button' }
 			accessibilityHint={ __( 'Double tap to select an image' ) }
 			onPress={ props.onMediaOptionsPressed }

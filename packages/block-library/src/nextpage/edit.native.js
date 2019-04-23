@@ -7,7 +7,7 @@ import Hr from 'react-native-hr';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,7 +22,7 @@ export default function NextPageEdit( { attributes, isSelected, onFocus } ) {
 	return (
 		<View
 			accessible
-			accessibilityLabel={ __( 'Page break block' ) + '. ' + accessibilityTitle }
+			accessibilityLabel={ sprintf( '%s%s %s', __( 'Page break block' ), __( '.' ), accessibilityTitle ) }
 			accessibilityStates={ accessibilityState }
 			onAccessibilityTap={ onFocus }
 		>
