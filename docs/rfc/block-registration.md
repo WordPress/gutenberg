@@ -77,7 +77,11 @@ To register a new block type, start by creating a `block.json` file. This file:
 		}
 	},
 	"edit": "blocks/notice-edit.js",
-	"save": "blocks/notice-save.js"
+	"save": "blocks/notice-save.js",
+	"styles": [ 
+		{ "name": "default", "label": "Default", "isDefault": true }, 
+		{ "name": "other", "label": "Other" }
+	]
 }
 ```
 
@@ -297,16 +301,16 @@ This is a pointer to a php file returning a render callback php function.  The r
 
 See the [dynamic blocks documentation](https://wordpress.org/gutenberg/handbook/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks/) for more details.
 
-### Styles Variations
+### Style Variations
 
 *   Type: `array`
 *   Optional
 *   Localized: Yes (`label`)
-*   Property: `styleVariations`
+*   Property: `styles`
 
 ```json
 { 
-	"styleVariations": [ 
+	"styles": [ 
 		{ "name": "default", "label": "Default", "isDefault": true }, 
 		{ "name": "other", "label": "Other" }
 	]
