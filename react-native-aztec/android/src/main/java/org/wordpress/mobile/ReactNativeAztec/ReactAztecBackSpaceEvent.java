@@ -15,12 +15,15 @@ class ReactAztecBackspaceEvent extends Event<ReactAztecBackspaceEvent> {
   private String mText;
   private int mSelectionStart;
   private int mSelectionEnd;
+  private boolean mFiredAfterTextChanged;
 
-  public ReactAztecBackspaceEvent(int viewId, String text, int selectionStart, int selectionEnd) {
+  public ReactAztecBackspaceEvent(int viewId, String text, int selectionStart, int selectionEnd,
+          boolean firedAfterTextChanged) {
     super(viewId);
     mText = text;
     mSelectionStart = selectionStart;
     mSelectionEnd = selectionEnd;
+    mFiredAfterTextChanged = firedAfterTextChanged;
   }
 
   @Override
@@ -44,6 +47,7 @@ class ReactAztecBackspaceEvent extends Event<ReactAztecBackspaceEvent> {
     eventData.putString("text", mText);
     eventData.putInt("selectionStart", mSelectionStart);
     eventData.putInt("selectionEnd", mSelectionEnd);
+    eventData.putBoolean("firedAfterTextChanged", mFiredAfterTextChanged);
     return eventData;
   }
 }
