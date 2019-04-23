@@ -28,13 +28,14 @@ const getDragEventType = ( { dataTransfer } ) => {
 		}
 	}
 
-	return 'default';
+	return JSON.parse( dataTransfer.getData( 'text' ) ).type;
 };
 
 const isTypeSupportedByDropZone = ( type, dropZone ) => {
 	return ( type === 'file' && dropZone.onFilesDrop ) ||
 		( type === 'html' && dropZone.onHTMLDrop ) ||
-		( type === 'default' && dropZone.onDrop );
+		( type === 'block' && dropZone.onDrop ) ||
+		( type === 'image' && dropZone.onDropImage );
 };
 
 const isWithinElementBounds = ( element, x, y ) => {
@@ -216,8 +217,12 @@ class DropZoneProvider extends Component {
 				case 'html':
 					dropZone.onHTMLDrop( event.dataTransfer.getData( 'text/html' ), position );
 					break;
-				case 'default':
+				case 'block':
 					dropZone.onDrop( event, position );
+					break;
+				case 'image':
+					dropZone.onDropImage( event, position );
+					break;
 			}
 		}
 

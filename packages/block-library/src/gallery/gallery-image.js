@@ -106,7 +106,7 @@ class GalleryImage extends Component {
 			<Fragment>
 				<Draggable
 					elementId={ id }
-					transferData={ { type: 'gallery', id } }
+					transferData={ { type: 'image', id } }
 				>
 					{ ( { onDraggableStart, onDraggableEnd } ) => (
 						<img

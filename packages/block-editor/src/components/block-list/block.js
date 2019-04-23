@@ -249,7 +249,7 @@ export class BlockListBlock extends Component {
 	 */
 	preventDrag( event ) {
 		const { type } = JSON.parse( event.dataTransfer.getData( 'text' ) );
-		if ( type !== 'gallery' ) {
+		if ( type !== 'image' ) {
 			event.preventDefault();
 		}
 	}
