@@ -254,9 +254,10 @@ class ImageEdit extends React.Component {
 		const toolbarEditButton = (
 			<Toolbar>
 				<ToolbarButton
-					label={ __( 'Edit image' ) }
+					title={ __( 'Edit image' ) }
 					icon="edit"
 					onClick={ onMediaOptionsButtonPressed }
+					extraProps={ { hint: __( 'Double tap to edit image' ) } }
 				/>
 			</Toolbar>
 		);
@@ -343,9 +344,10 @@ class ImageEdit extends React.Component {
 					</BlockControls>
 					<InspectorControls>
 						<ToolbarButton
-							label={ __( 'Image Settings' ) }
+							title={ __( 'Image Settings' ) }
 							icon="admin-generic"
 							onClick={ onImageSettingsButtonPressed }
+							extraProps={ { hint: __( 'Double tap to open image settings' ) } }
 						/>
 					</InspectorControls>
 					<ImageSize src={ url } >
