@@ -163,9 +163,9 @@ export class RichText extends Component {
 		// value. This also provides an opportunity for the parent component to
 		// determine whether the before/after value has changed using a trivial
 		//  strict equality operation.
-		if ( isEmpty( after ) ) {
+		if ( isEmpty( after ) && before.text.length == currentRecord.text.length ) {
 			before = currentRecord;
-		} else if ( isEmpty( before ) ) {
+		} else if ( isEmpty( before ) && after.text.length == currentRecord.text.length ) {
 			after = currentRecord;
 		}
 
@@ -215,7 +215,7 @@ export class RichText extends Component {
 		this.onFormatChange( record, true );
 	}
 
-	onFormatChange( record, doUpdateChild ) {
+	onFormatChange( record, doUpdateChild = true ) {
 		let newContent;
 		// valueToFormat might throw when converting the record to a tree structure
 		// let's ignore the event for now and force a render update so we're still in sync
@@ -230,7 +230,7 @@ export class RichText extends Component {
 		} );
 		if ( newContent && newContent !== this.props.value ) {
 			this.props.onChange( newContent );
-			if ( record.needsSelectionUpdate && record.start && record.end ) {
+			if ( record.needsSelectionUpdate && record.start && record.end && doUpdateChild ) {
 				this.forceSelectionUpdate( record.start, record.end );
 			}
 		} else {
@@ -303,12 +303,12 @@ export class RichText extends Component {
 				this.setState( {
 					needsSelectionUpdate: false,
 				} );
-				this.onSplit( ...split( currentRecord ).map( this.valueToFormat ) );
+				this.splitContent( currentRecord );
 			} else {
-				if ( ! event.nativeEvent.firedAfterTextChanged ) {
+				// if ( ! event.nativeEvent.firedAfterTextChanged ) {
 					const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
-					this.onFormatChangeForceChild( insertedLineSeparator );
-				}
+					this.onFormatChange( insertedLineSeparator, ! event.nativeEvent.firedAfterTextChanged );
+				// }
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
 			const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
@@ -589,9 +589,13 @@ export class RichText extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		if ( nextProps.tagName !== this.props.tagName || nextProps.isSelected !== this.props.isSelected ) {
+		if ( nextProps.tagName !== this.props.tagName ) {
 			this.lastEventCount = undefined;
 			this.lastContent = undefined;
+			return true;
+		}
+
+		if ( nextProps.isSelected !== this.props.isSelected ) {
 			return true;
 		}
 
@@ -603,7 +607,7 @@ export class RichText extends Component {
 		if ( ( typeof nextProps.value !== 'undefined' ) &&
 			( typeof this.lastContent !== 'undefined' ) &&
 			nextProps.value !== this.lastContent ) {
-			this.lastEventCount = undefined; // force a refresh on the native side
+			// this.lastEventCount = undefined; // force a refresh on the native side
 		}
 
 		return true;
