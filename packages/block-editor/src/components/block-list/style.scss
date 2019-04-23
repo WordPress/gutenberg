@@ -445,6 +445,11 @@
 				display: inline-flex;
 			}
 		}
+
+		// If the block movers are visible, push the breadcrumb down to make room for them.
+		.block-editor-block-mover.is-visible + .block-editor-block-list__breadcrumb {
+			top: (-$block-padding - $block-left-border-width - ($grid-size-small / 2));
+		}
 	}
 
 	// Wide
