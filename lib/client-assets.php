@@ -177,17 +177,26 @@ function gutenberg_override_style( $handle, $src, $deps = array(), $ver = false,
  * @since 4.5.0
  */
 function gutenberg_register_packages_scripts() {
-	$packages_dependencies = include dirname( __FILE__ ) . '/packages-dependencies.php';
+	foreach ( glob( gutenberg_dir_path() . 'build/*/index.js' ) as $path ) {
+		// Prefix `wp-` to package directory to get script handle.
+		// For example, `…/build/a11y/index.js` becomes `wp-a11y`.
+		$handle = 'wp-' . basename( dirname( $path ) );
 
-	foreach ( $packages_dependencies as $handle => $dependencies ) {
-		// Remove `wp-` prefix from the handle to get the package's name.
-		$package_name = strpos( $handle, 'wp-' ) === 0 ? substr( $handle, 3 ) : $handle;
-		$path         = "build/$package_name/index.js";
+		// Replace `.js` extension with `.deps.json` to find the generated dependencies file.
+		$dependencies_file = substr( $path, 0, -3 ) . '.deps.json';
+
+		$dependencies = is_readable( $dependencies_file )
+			? json_decode( file_get_contents( $dependencies_file ) )
+			: array();
+
+		// Get the path from Gutenberg directory as expected by `gutenberg_url`.
+		$gutenberg_path = substr( $path, strlen( gutenberg_dir_path() ) );
+
 		gutenberg_override_script(
 			$handle,
-			gutenberg_url( $path ),
+			gutenberg_url( $gutenberg_path ),
 			array_merge( $dependencies, array( 'wp-polyfill' ) ),
-			filemtime( gutenberg_dir_path() . $path ),
+			filemtime( $path ),
 			true
 		);
 	}
