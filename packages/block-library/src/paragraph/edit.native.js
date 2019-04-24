@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -81,6 +83,14 @@ class ParagraphEdit extends Component {
 		) ) );
 	}
 
+	plainTextContent( html ) {
+		const result = create( { html } );
+		if ( result ) {
+			return result.text;
+		}
+		return '';
+	}
+
 	render() {
 		const {
 			attributes,
@@ -95,7 +105,11 @@ class ParagraphEdit extends Component {
 		} = attributes;
 
 		return (
-			<View>
+			<View
+				accessible={ ! this.props.isSelected }
+				accessibilityLabel={ __( 'Paragraph block' ) + __( '.' ) + ' ' + ( isEmpty( content ) ? __( 'Empty' ) : this.plainTextContent( content ) ) }
+				onAccessibilityTap={ this.props.onFocus }
+			>
 				<RichText
 					tagName="p"
 					value={ content }
