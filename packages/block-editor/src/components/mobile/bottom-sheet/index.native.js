@@ -134,6 +134,7 @@ class BottomSheet extends Component {
 				swipeDirection="down"
 				onMoveShouldSetResponder={ panResponder.panHandlers.onMoveShouldSetResponder }
 				onMoveShouldSetResponderCapture={ panResponder.panHandlers.onMoveShouldSetResponderCapture }
+				onAccessibilityEscape={ this.props.onClose }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
