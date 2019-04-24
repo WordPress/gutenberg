@@ -49,22 +49,7 @@ class ParagraphBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onReplace = this.onReplace.bind( this );
 		this.toggleDropCap = this.toggleDropCap.bind( this );
-	}
-
-	onReplace( blocks, indexToSelect ) {
-		const { attributes, onReplace } = this.props;
-		onReplace( blocks.map( ( block, index ) => (
-			index === 0 && block.name === name ?
-				{ ...block,
-					attributes: {
-						...attributes,
-						...block.attributes,
-					},
-				} :
-				block
-		) ), indexToSelect );
 	}
 
 	toggleDropCap() {
@@ -206,8 +191,8 @@ class ParagraphBlock extends Component {
 						} );
 					} }
 					onMerge={ mergeBlocks }
-					onReplace={ this.props.onReplace && this.onReplace }
-					onRemove={ onReplace && ( () => onReplace( [] ) ) }
+					onReplace={ onReplace }
+					onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 					aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
 					placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
 				/>
