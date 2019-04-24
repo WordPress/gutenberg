@@ -396,7 +396,6 @@ class ImageEdit extends React.Component {
 							style={ { padding: 12, flex: 1 } }
 							accessible={ true }
 							accessibilityLabel={ __( 'Image caption' ) + __( '.' ) + ' ' + ( isEmpty( caption ) ? __( 'Empty' ) : caption ) }
-							accessibilityHint={ __( 'Double tap to edit caption' ) }
 							accessibilityRole={ 'button' }
 						>
 							<TextInput
