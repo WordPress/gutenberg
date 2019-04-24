@@ -8,22 +8,21 @@ This folder contains all paste specific logic (filters, converters, normalisers.
 | ---------------- | ---------- | -------- | ----- | ----- | --------- | ----- |
 | Google Docs      | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     |
 | Apple Pages      | ✓          | ✘ [1]    | ✓     | ✘ [1] | n/a       | ✓     |
-| MS Word          | ✓          | ✓        | ✓     | ✓     | n/a       | ✓     |
-| Open Office      | ✓          | ✓        | ✓     | ✓     | n/a       | ✓     |
-| Libre Office     | ✓          | ✓        | ✓     | ✓     | n/a       | ✓     |
-| MS Word Online   | ✓          | ✘        | ✓     | ✓     | n/a       | ✓     |
-| Evernote         | ✓          | ✘ [3]    | ✓     | ✓     | ✓         | ✓     |
+| MS Word          | ✓          | ✓        | ✓     | ✘ [2] | n/a       | ✓     |
+| MS Word Online   | ✓          | ✘ [3]    | ✓     | ✓     | n/a       | ✓     |
+| Evernote         | ✓          | ✘ [4]    | ✓     | ✓     | ✓         | ✓     |
 | Markdown         | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     |
-| Legacy WordPress | ✓          | ✓        | ✓     | … [4] | ✓         | ✓     |
+| Legacy WordPress | ✓          | ✓        | ✓     | … [5] | ✓         | ✓     |
 | Web              | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     |
 
 
 1. Apple Pages does not pass heading and image information.
-2. Still to do for MS Word Online.
-3. Evernote does not have headings.
-4. For caption and gallery shortcodes, see #2874.
+2. MS Word only provides a local file path, which cannot be accessed in JavaScript for security reasons. Image placeholders will be provided instead. Single images, however, _can_ be copied and pasted without any problem.
+3. Still to do for MS Word Online.
+4. Evernote does not have headings.
+5. For caption and gallery shortcodes, see #2874.
 
 ## Other notable capabilities
 
 * Filters out analytics trackers in the form of images.
-* Direct image data pasting coming soon.
+* Pasting a single images (if the browser provides image data).
