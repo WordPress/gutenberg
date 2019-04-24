@@ -27,13 +27,13 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@babel/core": "^7.2.2",
+		"@babel/core": "^7.4.3",
 		"@babel/plugin-proposal-async-generator-functions": "^7.2.0",
-		"@babel/plugin-proposal-object-rest-spread": "^7.3.2",
+		"@babel/plugin-proposal-object-rest-spread": "^7.4.3",
 		"@babel/plugin-transform-react-jsx": "^7.3.0",
-		"@babel/plugin-transform-runtime": "^7.2.0",
-		"@babel/preset-env": "^7.3.1",
-		"@babel/runtime": "^7.3.1",
+		"@babel/plugin-transform-runtime": "^7.4.3",
+		"@babel/preset-env": "^7.4.3",
+		"@babel/runtime": "^7.4.3",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:../babel-plugin-import-jsx-pragma",
 		"@wordpress/browserslist-config": "file:../browserslist-config"
 	},
