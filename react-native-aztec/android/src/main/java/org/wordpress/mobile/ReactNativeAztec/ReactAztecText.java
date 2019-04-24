@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
@@ -88,16 +89,16 @@ public class ReactAztecText extends AztecText {
 
         this.setAztecKeyListener(new ReactAztecText.OnAztecKeyListener() {
             @Override
-            public boolean onEnterKey(boolean firedAfterTextChanged, int selStart, int selEnd) {
+            public boolean onEnterKey(Spanned text, boolean firedAfterTextChanged, int selStart, int selEnd) {
                 if (shouldHandleOnEnter && !isTextChangedListenerDisabled()) {
-                    return onEnter(firedAfterTextChanged, selStart, selEnd);
+                    return onEnter(text, firedAfterTextChanged, selStart, selEnd);
                 }
                 return false;
             }
             @Override
             public boolean onBackspaceKey(boolean firedAfterTextChanged) {
                 if (shouldHandleOnBackspace && !isTextChangedListenerDisabled()) {
-                    String content = toHtml(false);
+                    String content = toHtml(getText(), false);
                     if (TextUtils.isEmpty(content)) {
                         return onBackspace(firedAfterTextChanged);
                     }
@@ -296,7 +297,7 @@ public class ReactAztecText extends AztecText {
         if (!shouldHandleOnSelectionChange) {
             return;
         }
-        String content = toHtml(false);
+        String content = toHtml(getText(), false);
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
@@ -355,9 +356,9 @@ public class ReactAztecText extends AztecText {
         this.mIsSettingTextFromJS = mIsSettingTextFromJS;
     }
 
-    private boolean onEnter(boolean firedAfterTextChanged, int selStart, int selEnd) {
+    private boolean onEnter(Spanned text, boolean firedAfterTextChanged, int selStart, int selEnd) {
         disableTextChangedListener();
-        String content = toHtml(false);
+        String content = toHtml(text, false);
         int cursorPositionStart = firedAfterTextChanged ? selStart : getSelectionStart();
         int cursorPositionEnd = firedAfterTextChanged ? selEnd : getSelectionEnd();
 //        if (firedAfterTextChanged) {
@@ -383,7 +384,7 @@ public class ReactAztecText extends AztecText {
         }
 
         disableTextChangedListener();
-        String content = toHtml(false);
+        String content = toHtml(getText(), false);
         enableTextChangedListener();
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
@@ -426,7 +427,7 @@ public class ReactAztecText extends AztecText {
 
         // temporarily disable listener during call to toHtml()
         disableTextChangedListener();
-        String content = toHtml(false);
+        String content = toHtml(getText(), false);
         int cursorPositionStart = getSelectionStart();
         int cursorPositionEnd = getSelectionEnd();
         enableTextChangedListener();
