@@ -8,19 +8,20 @@ This folder contains all paste specific logic (filters, converters, normalisers.
 | ---------------- | ---------- | -------- | ----- | ----- | --------- | ----- |
 | Google Docs      | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     |
 | Apple Pages      | ✓          | ✘ [1]    | ✓     | ✘ [1] | n/a       | ✓     |
-| MS Word          | ✓          | ✓        | ✓     | ✘ [2] | n/a       | ✓     |
-| MS Word Online   | ✓          | ✘ [3]    | ✓     | ✓     | n/a       | ✓     |
-| Evernote         | ✓          | ✘ [4]    | ✓     | ✓     | ✓         | ✓     |
+| MS Word          | ✓          | ✓        | ✓     | ✓     | n/a       | ✓     |
+| Open Office      | ✓          | ✓        | ✓     | ✓     | n/a       | ✓     |
+| Libre Office     | ✓          | ✓        | ✓     | ✓     | n/a       | ✓     |
+| MS Word Online   | ✓          | ✘        | ✓     | ✓     | n/a       | ✓     |
+| Evernote         | ✓          | ✘ [3]    | ✓     | ✓     | ✓         | ✓     |
 | Markdown         | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     |
-| Legacy WordPress | ✓          | ✓        | ✓     | … [5] | ✓         | ✓     |
+| Legacy WordPress | ✓          | ✓        | ✓     | … [4] | ✓         | ✓     |
 | Web              | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     |
 
 
 1. Apple Pages does not pass heading and image information.
-2. MS Word only provides a local file path, which cannot be accessed in JavaScript for security reasons.
-3. Still to do for MS Word Online.
-4. Evernote does not have headings.
-5. For caption and gallery shortcodes, see #2874.
+2. Still to do for MS Word Online.
+3. Evernote does not have headings.
+4. For caption and gallery shortcodes, see #2874.
 
 ## Other notable capabilities
 
