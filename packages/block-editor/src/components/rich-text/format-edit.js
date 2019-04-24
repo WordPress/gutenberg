@@ -2,12 +2,11 @@
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { Fragment } from '@wordpress/element';
 import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
 
 const FormatEdit = ( { formatTypes, onChange, value } ) => {
 	return (
-		<Fragment>
+		<>
 			{ formatTypes.map( ( { name, edit: Edit } ) => {
 				if ( ! Edit ) {
 					return null;
@@ -34,7 +33,7 @@ const FormatEdit = ( { formatTypes, onChange, value } ) => {
 					/>
 				);
 			} ) }
-		</Fragment>
+		</>
 	);
 };
 

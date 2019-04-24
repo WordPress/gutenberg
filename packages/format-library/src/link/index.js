@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSpokenMessages } from '@wordpress/components';
 import {
 	getTextContent,
@@ -70,7 +70,7 @@ export const link = {
 			const { isActive, activeAttributes, value, onChange } = this.props;
 
 			return (
-				<Fragment>
+				<>
 					<RichTextShortcut
 						type="access"
 						character="a"
@@ -117,7 +117,7 @@ export const link = {
 						value={ value }
 						onChange={ onChange }
 					/>
-				</Fragment>
+				</>
 			);
 		}
 	} ),

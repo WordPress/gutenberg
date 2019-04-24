@@ -6,7 +6,6 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -104,9 +103,9 @@ function PostLink( {
 				target="_blank"
 			>
 				{ isEditable ?
-					( <Fragment>
+					( <>
 						{ prefixElement }{ postNameElement }{ suffixElement }
-					</Fragment> ) :
+					</> ) :
 					postLink
 				}
 			</ExternalLink>

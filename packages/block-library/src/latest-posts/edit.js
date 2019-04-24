@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, RawHTML } from '@wordpress/element';
+import { Component, RawHTML } from '@wordpress/element';
 import {
 	PanelBody,
 	Placeholder,
@@ -138,7 +138,7 @@ class LatestPostsEdit extends Component {
 		const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
 		if ( ! hasPosts ) {
 			return (
-				<Fragment>
+				<>
 					{ inspectorControls }
 					<Placeholder
 						icon="admin-post"
@@ -149,7 +149,7 @@ class LatestPostsEdit extends Component {
 							__( 'No posts found.' )
 						}
 					</Placeholder>
-				</Fragment>
+				</>
 			);
 		}
 
@@ -176,7 +176,7 @@ class LatestPostsEdit extends Component {
 		const dateFormat = __experimentalGetSettings().formats.date;
 
 		return (
-			<Fragment>
+			<>
 				{ inspectorControls }
 				<BlockControls>
 					<Toolbar controls={ layoutControls } />
@@ -238,7 +238,7 @@ class LatestPostsEdit extends Component {
 						);
 					} ) }
 				</ul>
-			</Fragment>
+			</>
 		);
 	}
 }

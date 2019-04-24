@@ -7,7 +7,6 @@ import HeadingToolbar from './heading-toolbar';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import { PanelBody } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
@@ -29,7 +28,7 @@ export default function HeadingEdit( {
 	const tagName = 'h' + level;
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 			</BlockControls>
@@ -69,6 +68,6 @@ export default function HeadingEdit( {
 				className={ className }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 			/>
-		</Fragment>
+		</>
 	);
 }
