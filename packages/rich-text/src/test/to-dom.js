@@ -97,7 +97,7 @@ describe( 'applyValue', () => {
 		},
 	];
 
-	cases.forEach( ( { current, future, description, movedCount, expected } ) => {
+	cases.forEach( ( { current, future, description, movedCount } ) => {
 		it( description, () => {
 			const body = createElement( document, current ).cloneNode( true );
 			const futureBody = createElement( document, future ).cloneNode( true );
@@ -106,7 +106,7 @@ describe( 'applyValue', () => {
 			const count = childNodes.reduce( ( acc, { parentNode } ) => {
 				return parentNode === body ? acc + 1 : acc;
 			}, 0 );
-			expect( body.innerHTML ).toEqual( undefined === expected ? future : expected );
+			expect( body.innerHTML ).toEqual( future );
 			expect( count ).toEqual( movedCount );
 		} );
 	} );
