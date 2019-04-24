@@ -258,7 +258,6 @@ class ImageEdit extends React.Component {
 					title={ __( 'Edit image' ) }
 					icon="edit"
 					onClick={ onMediaOptionsButtonPressed }
-					extraProps={ { hint: __( 'Double tap to edit image' ) } }
 				/>
 			</Toolbar>
 		);
@@ -334,7 +333,6 @@ class ImageEdit extends React.Component {
 				accessible={ ! isSelected }
 				accessibilityLabel={ sprintf( '%s%s %s', __( 'Image block' ), __( '.' ), alt ) }
 				accessibilityRole={ 'button' }
-				accessibilityHint={ __( 'Double tap to edit the image' ) }
 				onPress={ this.onImagePressed }
 				disabled={ ! isSelected }
 			>
@@ -348,7 +346,6 @@ class ImageEdit extends React.Component {
 							title={ __( 'Image Settings' ) }
 							icon="admin-generic"
 							onClick={ onImageSettingsButtonPressed }
-							extraProps={ { hint: __( 'Double tap to open image settings' ) } }
 						/>
 					</InspectorControls>
 					<ImageSize src={ url } >
