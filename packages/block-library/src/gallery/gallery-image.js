@@ -147,7 +147,7 @@ class GalleryImage extends Component {
 
 		return (
 			<figure className={ className }>
-				<DropZone onImageDrop={ this.onMoveTo } />
+				<DropZone className="block-library-gallery-item__drop-zone" onImageDrop={ this.onMoveTo } />
 				{ isSelected &&
 					<div className="block-library-gallery-item__move-menu">
 						<IconButton

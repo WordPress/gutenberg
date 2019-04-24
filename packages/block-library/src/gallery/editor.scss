@@ -94,6 +94,23 @@ ul.wp-block-gallery {
 	left: -2px;
 }
 
+.block-library-gallery-item__drop-zone {
+	border: none;
+	border-radius: 0;
+
+	&.is-close-to-left {
+		background: none;
+		border-left: 3px solid theme(primary);
+		border-right: none;
+	}
+
+	&.is-close-to-right {
+		background: none;
+		border-left: none;
+		border-right: 3px solid theme(primary);
+	}
+}
+
 .blocks-gallery-item__move-backward,
 .blocks-gallery-item__move-forward,
 .blocks-gallery-item__remove {
