@@ -193,8 +193,11 @@ class LatestPostsEdit extends Component {
 						const titleTrimmed = post.title.rendered.trim();
 						let excerpt = post.excerpt.rendered;
 						if ( post.excerpt.raw === '' ) {
-							excerpt = post.content.rendered;
+							excerpt = post.content.raw;
 						}
+						const temp = document.createElement( 'div' );
+						temp.innerHTML = excerpt;
+						excerpt = temp.textContent || temp.innerText || '';
 						return (
 							<li key={ i }>
 								<a href={ post.link } target="_blank" rel="noreferrer noopener">
