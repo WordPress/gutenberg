@@ -14,7 +14,7 @@ module.exports = {
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
-		'core-js/fn/symbol/async-iterator',
+		'core-js/es/symbol/async-iterator',
 		'<rootDir>/test/unit/config/gutenberg-phase.js',
 	],
 	testURL: 'http://localhost',
