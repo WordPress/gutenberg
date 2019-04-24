@@ -195,7 +195,16 @@ class ParagraphBlock extends Component {
 							content: nextContent,
 						} );
 					} }
-					onSplit={ ( value ) => createBlock( name, { content: value } ) }
+					onSplit={ ( value ) => {
+						if ( ! value ) {
+							return createBlock( name );
+						}
+
+						return createBlock( name, {
+							...attributes,
+							content: value,
+						} );
+					} }
 					onMerge={ mergeBlocks }
 					onReplace={ this.props.onReplace && this.onReplace }
 					onRemove={ onReplace && ( () => onReplace( [] ) ) }
