@@ -42,7 +42,10 @@ function FontSizePicker( {
 	const currentFontSizeName = ( currentFont && currentFont.name ) || ( ! value && _x( 'Normal', 'font size name' ) ) || _x( 'Custom', 'font size name' );
 
 	return (
-		<BaseControl label={ __( 'Font Size' ) }>
+		<BaseControl>
+			<BaseControl.VisualLabel>
+				{ __( 'Font Size' ) }
+			</BaseControl.VisualLabel>
 			<div className="components-font-size-picker__buttons">
 				{ ( fontSizes.length > 0 ) &&
 					<Dropdown

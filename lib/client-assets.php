@@ -560,3 +560,32 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
+
+/**
+ * Extends block editor preload paths to preload additional data. Note that any
+ * additions here should be complemented with a corresponding core ticket to
+ * reconcile the change upstream for future removal from Gutenberg.
+ *
+ * @since 5.6.0
+ *
+ * @param array $preload_paths $preload_paths Array of paths to preload.
+ *
+ * @return array Filtered array of paths to preload.
+ */
+function gutenberg_extend_block_editor_preload_paths( $preload_paths ) {
+	/*
+	 * Used in considering user permissions for creating and updating blocks,
+	 * as condition for displaying relevant actions in the interface.
+	 *
+	 * Trac ticket: https://core.trac.wordpress.org/ticket/46429
+	 *
+	 * This is present in WordPress 5.2 and should be removed from Gutenberg
+	 * once WordPress 5.2 is the minimum supported version.
+	 */
+	if ( ! in_array( array( '/wp/v2/blocks', 'OPTIONS' ), $preload_paths ) ) {
+		$preload_paths[] = array( '/wp/v2/blocks', 'OPTIONS' );
+	}
+
+	return $preload_paths;
+}
+add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload_paths' );

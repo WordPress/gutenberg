@@ -343,7 +343,7 @@ export function removep( html ) {
 	html = html.replace( new RegExp( '\\s*<((?:' + blocklist1 + ')(?: [^>]*)?)>', 'g' ), '\n<$1>' );
 
 	// Mark </p> if it has any attributes.
-	html = html.replace( /(<p [^>]+>.*?)<\/p>/g, '$1</p#>' );
+	html = html.replace( /(<p [^>]+>[\s\S]*?)<\/p>/g, '$1</p#>' );
 
 	// Preserve the first <p> inside a <div>.
 	html = html.replace( /<div( [^>]*)?>\s*<p>/gi, '<div$1>\n\n' );
