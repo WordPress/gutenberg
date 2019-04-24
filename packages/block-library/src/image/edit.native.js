@@ -9,6 +9,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -165,7 +166,7 @@ class ImageEdit extends React.Component {
 						<Toolbar>
 							{ getMediaOptions() }
 							<ToolbarButton
-								label={ __( 'Edit image' ) }
+								title={ __( 'Edit image' ) }
 								icon="edit"
 								onClick={ open }
 							/>
@@ -219,7 +220,13 @@ class ImageEdit extends React.Component {
 		}
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
+			<TouchableWithoutFeedback
+				accessible={ ! isSelected }
+				accessibilityLabel={ __( 'Image block' ) + __( '.' ) + ' ' + alt + __( '.' ) + ' ' + caption }
+				accessibilityRole={ 'button' }
+				onPress={ this.onImagePressed }
+				disabled={ ! isSelected }
+			>
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
 					<BlockControls>
@@ -227,7 +234,7 @@ class ImageEdit extends React.Component {
 					</BlockControls>
 					<InspectorControls>
 						<ToolbarButton
-							label={ __( 'Image Settings' ) }
+							title={ __( 'Image Settings' ) }
 							icon="admin-generic"
 							onClick={ onImageSettingsButtonPressed }
 						/>
@@ -252,7 +259,10 @@ class ImageEdit extends React.Component {
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
 										source={ { uri: url } }
-										key={ url }>
+										key={ url }
+										accessible={ true }
+										accessibilityLabel={ alt }
+									>
 										{ isUploadFailed &&
 											<View style={ styles.imageContainer } >
 												<Dashicon icon={ retryIconName } ariaPressed={ 'dashicon-active' } />
@@ -265,7 +275,12 @@ class ImageEdit extends React.Component {
 						} }
 					/>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View style={ { padding: 12, flex: 1 } }>
+						<View
+							style={ { padding: 12, flex: 1 } }
+							accessible={ true }
+							accessibilityLabel={ __( 'Image caption' ) + __( '.' ) + ' ' + ( isEmpty( caption ) ? __( 'Empty' ) : caption ) }
+							accessibilityRole={ 'button' }
+						>
 							<TextInput
 								style={ { textAlign: 'center' } }
 								fontFamily={ this.props.fontFamily || ( styles[ 'caption-text' ].fontFamily ) }

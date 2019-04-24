@@ -481,10 +481,15 @@ export class RichText extends Component {
 			formatPlaceholder,
 		} );
 		this.lastEventCount = event.nativeEvent.eventCount;
-		// we don't want to refresh aztec as no content can have changed from this event
-		// let's update lastContent to prevent that in shouldComponentUpdate
-		this.lastContent = this.removeRootTagsProduceByAztec( unescapeSpaces( text ) );
-		this.props.onChange( this.lastContent );
+
+		// Make sure there are changes made to the content before upgrading it upward
+		const newContent = this.removeRootTagsProduceByAztec( unescapeSpaces( text ) );
+		if ( this.lastContent !== newContent ) {
+			// we don't want to refresh aztec native as no content can have changed from this event
+			// let's update lastContent to prevent that in shouldComponentUpdate
+			this.lastContent = newContent;
+			this.props.onChange( this.lastContent );
+		}
 	}
 
 	isEmpty() {
