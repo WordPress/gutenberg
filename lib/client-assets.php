@@ -114,9 +114,14 @@ function gutenberg_override_translation_file( $file, $handle ) {
 		return $file;
 	}
 
-	// Only override script handles generated from the Gutenberg plugin.
-	$packages_dependencies = include dirname( __FILE__ ) . '/packages-dependencies.php';
-	if ( ! isset( $packages_dependencies[ $handle ] ) ) {
+	// Ignore scripts whose handle does not have the "wp-" prefix.
+	if ( 'wp-' !== substr( $handle, 0, 3 ) ) {
+		return $file;
+	}
+
+	// Ignore scripts that are not found in the expected `build/` location.
+	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . '/index.js';
+	if ( ! file_exists( $script_path ) ) {
 		return $file;
 	}
 
