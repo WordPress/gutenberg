@@ -207,7 +207,11 @@ export function applyValue( future, current ) {
 				const futureAttributes = futureChild.attributes;
 
 				if ( currentAttributes ) {
-					for ( let ii = currentAttributes.length; --ii >= 0; ) {
+					let ii = currentAttributes.length;
+
+					// Reverse loop because `removeAttribute` on `currentChild`
+					// changes `currentAttributes`.
+					while ( ii-- ) {
 						const { name } = currentAttributes[ ii ];
 
 						if ( ! futureChild.getAttribute( name ) ) {
