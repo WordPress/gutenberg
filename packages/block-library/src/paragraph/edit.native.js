@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -23,12 +24,6 @@ class ParagraphEdit extends Component {
 		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
 		this.onReplace = this.onReplace.bind( this );
-		this.onFocus = this.onFocus.bind( this );
-		this.onBlur = this.onBlur.bind( this );
-
-		this.state = {
-			isSelected: false,
-		};
 	}
 
 	/**
@@ -88,18 +83,12 @@ class ParagraphEdit extends Component {
 		) ) );
 	}
 
-	onFocus() {
-		this.setState( { isSelected: true } );
-		if ( this.props.onFocus ) {
-			this.props.onFocus();
+	plainTextContent( html ) {
+		const result = create( { html } );
+		if ( result ) {
+			return result.text;
 		}
-	}
-
-	onBlur() {
-		this.setState( { isSelected: false } );
-		if ( this.props.onBlur ) {
-			this.props.onBlur();
-		}
+		return '';
 	}
 
 	render() {
@@ -117,15 +106,16 @@ class ParagraphEdit extends Component {
 
 		return (
 			<View
-				accessible={ ! this.state.isSelected }
-				accessibilityLabel={ __( 'Paragraph block' ) + __( '.' ) + ' ' + ( isEmpty( content ) ? __( 'Empty' ) : content ) }
+				accessible={ ! this.props.isSelected }
+				accessibilityLabel={ __( 'Paragraph block' ) + __( '.' ) + ' ' + ( isEmpty( content ) ? __( 'Empty' ) : this.plainTextContent( content ) ) }
+				onAccessibilityTap={ this.props.onFocus }
 			>
 				<RichText
 					tagName="p"
 					value={ content }
 					isSelected={ this.props.isSelected }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
+					onFocus={ this.props.onFocus } // always assign onFocus as a props
+					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					style={ style }
 					onChange={ ( nextContent ) => {
