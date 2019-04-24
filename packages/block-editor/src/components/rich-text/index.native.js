@@ -274,6 +274,7 @@ export class RichText extends Component {
 		this.lastEventCount = event.nativeEvent.eventCount;
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
 		this.lastContent = contentWithoutRootTag;
+		this.comesFromAztec = true;
 		this.props.onChange( this.lastContent );
 	}
 
@@ -289,6 +290,7 @@ export class RichText extends Component {
 	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
 		this.lastEventCount = event.nativeEvent.eventCount;
+		this.comesFromAztec = true;
 
 		const currentRecord = this.createRecord( {
 			...event.nativeEvent,
@@ -395,7 +397,6 @@ export class RichText extends Component {
 					},
 				} );
 				this.lastContent = this.valueToFormat( linkedRecord );
-				this.lastEventCount = undefined;
 				this.props.onChange( this.lastContent );
 
 				// Allows us to ask for this information when we get a report.
@@ -427,7 +428,6 @@ export class RichText extends Component {
 			const recordToInsert = create( { html: pastedContent } );
 			const insertedContent = insert( currentRecord, recordToInsert );
 			const newContent = this.valueToFormat( insertedContent );
-			this.lastEventCount = undefined;
 			this.lastContent = newContent;
 
 			// explicitly set selection after inline paste
@@ -483,10 +483,15 @@ export class RichText extends Component {
 			formatPlaceholder,
 		} );
 		this.lastEventCount = event.nativeEvent.eventCount;
-		// we don't want to refresh aztec as no content can have changed from this event
-		// let's update lastContent to prevent that in shouldComponentUpdate
-		this.lastContent = this.removeRootTagsProduceByAztec( unescapeSpaces( text ) );
-		this.props.onChange( this.lastContent );
+		// Make sure there are changes made to the content before upgrading it upward
+		const newContent = this.removeRootTagsProduceByAztec( unescapeSpaces( text ) );
+		if ( this.lastContent !== newContent ) {
+			// we don't want to refresh aztec native as no content can have changed from this event
+			// let's update lastContent to prevent that in shouldComponentUpdate
+			this.lastContent = newContent;
+			this.comesFromAztec = true;
+			this.props.onChange( this.lastContent );
+		}
 	}
 
 	isEmpty() {
@@ -570,7 +575,7 @@ export class RichText extends Component {
 
 		// This logic will handle the selection when two blocks are merged or when block is split
 		// into two blocks
-		if ( nextTextContent.startsWith( this.savedContent ) ) {
+		if ( nextTextContent.startsWith( this.savedContent ) && this.savedContent && this.savedContent.length > 0) {
 			let length = this.savedContent.length;
 			if ( length === 0 && nextTextContent !== this.props.value ) {
 				length = this.props.value.length;
@@ -595,19 +600,26 @@ export class RichText extends Component {
 			return true;
 		}
 
-		if ( nextProps.isSelected !== this.props.isSelected ) {
-			return true;
-		}
-
 		// TODO: Please re-introduce the check to avoid updating the content right after an `onChange` call.
 		// It was removed in https://github.com/WordPress/gutenberg/pull/12417 to fix undo/redo problem.
 
 		// If the component is changed React side (undo/redo/merging/splitting/custom text actions)
-		// we need to make sure the native is updated as well
-		if ( ( typeof nextProps.value !== 'undefined' ) &&
-			( typeof this.lastContent !== 'undefined' ) &&
-			nextProps.value !== this.lastContent ) {
-			// this.lastEventCount = undefined; // force a refresh on the native side
+		// we need to make sure the native is updated as well.
+
+		if ( this.comesFromAztec === false ) {
+			// Also, don't trust the "this.lastContent" as on Android, incomplete text events arrive
+			//  with only some of the text, while the virtual keyboard's suggestion system does its magic.
+			// ** compare with this.lastContent for optimizing performance by not forcing Aztec with text it already has
+			// , but compare with props.value to not lose "half word" text because of Android virtual keyb autosuggestion behavior
+			if ( ( typeof nextProps.value !== 'undefined' ) &&
+				( typeof this.props.value !== 'undefined' ) &&
+				nextProps.value !== this.props.value ) {
+					this.lastEventCount = undefined; // force a refresh on the native side
+			}
+
+			if ( this.needsSelectionUpdate ) {
+				this.lastEventCount = undefined; // force a refresh on the native side
+			}
 		}
 
 		return true;
@@ -682,6 +694,10 @@ export class RichText extends Component {
 			} else {
 				selection = { start: this.state.start, end: this.state.end };
 			}
+		}
+
+		if ( this.comesFromAztec ) {
+			this.comesFromAztec = false;
 		}
 
 		return (
