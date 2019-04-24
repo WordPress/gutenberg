@@ -181,6 +181,19 @@ describe( 'Multi-block selection', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should always expand single line selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '12' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowRight' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		// This delete all blocks.
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should allow selecting outer edge if there is no sibling block', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );

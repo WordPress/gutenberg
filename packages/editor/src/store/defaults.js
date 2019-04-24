@@ -4,6 +4,7 @@
 import { SETTINGS_DEFAULTS } from '@wordpress/block-editor';
 
 export const PREFERENCES_DEFAULTS = {
+	insertUsage: {}, // Should be kept for backward compatibility, see: https://github.com/WordPress/gutenberg/issues/14580.
 	isPublishSidebarEnabled: true,
 };
 

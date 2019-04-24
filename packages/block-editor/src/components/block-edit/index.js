@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import memize from 'memize';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -10,39 +15,28 @@ import Edit from './edit';
 import { BlockEditContextProvider } from './context';
 
 class BlockEdit extends Component {
-	constructor( props ) {
-		super( props );
+	constructor() {
+		super( ...arguments );
 
-		this.setFocusedElement = this.setFocusedElement.bind( this );
-
-		this.state = {
-			focusedElement: null,
-			setFocusedElement: this.setFocusedElement,
-		};
+		// It is important to return the same object if props haven't changed
+		// to avoid  unnecessary rerenders.
+		// See https://reactjs.org/docs/context.html#caveats.
+		this.propsToContext = memize(
+			this.propsToContext.bind( this ),
+			{ maxSize: 1 }
+		);
 	}
 
-	setFocusedElement( focusedElement ) {
-		this.setState( ( prevState ) => {
-			if ( prevState.focusedElement === focusedElement ) {
-				return null;
-			}
-			return { focusedElement };
-		} );
-	}
-
-	static getDerivedStateFromProps( props ) {
-		const { clientId, name, isSelected } = props;
-
-		return {
-			name,
-			isSelected,
-			clientId,
-		};
+	propsToContext( name, isSelected, clientId, onFocus ) {
+		return { name, isSelected, clientId, onFocus };
 	}
 
 	render() {
+		const { name, isSelected, clientId, onFocus } = this.props;
+		const value = this.propsToContext( name, isSelected, clientId, onFocus );
+
 		return (
-			<BlockEditContextProvider value={ this.state }>
+			<BlockEditContextProvider value={ value }>
 				<Edit { ...this.props } />
 			</BlockEditContextProvider>
 		);

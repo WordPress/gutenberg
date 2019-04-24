@@ -19,7 +19,7 @@ const FormatToolbar = ( { controls } ) => {
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
 				) }
 				<Slot name="RichText.ToolbarControls">
-					{ ( fills ) => fills.length &&
+					{ ( fills ) => fills.length !== 0 &&
 						<DropdownMenu
 							icon={ false }
 							position="bottom left"

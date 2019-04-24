@@ -6,7 +6,6 @@ import {
 	remove,
 	applyFormat,
 	getTextContent,
-	getSelectionStart,
 	slice,
 } from '@wordpress/rich-text';
 
@@ -20,7 +19,7 @@ export function getPatterns( { onReplace, valueToFormat } ) {
 				return record;
 			}
 
-			const start = getSelectionStart( record );
+			const { start } = record;
 			const text = getTextContent( record );
 			const characterBefore = text.slice( start - 1, start );
 
@@ -46,7 +45,7 @@ export function getPatterns( { onReplace, valueToFormat } ) {
 		},
 		( record ) => {
 			const BACKTICK = '`';
-			const start = getSelectionStart( record );
+			const { start } = record;
 			const text = getTextContent( record );
 			const characterBefore = text.slice( start - 1, start );
 

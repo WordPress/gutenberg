@@ -158,6 +158,32 @@ Returns the number of blocks currently present in the post.
 
 Number of blocks in the post.
 
+### getSelectionStart
+
+Returns the current selection start block client ID, attribute key and text
+offset.
+
+*Parameters*
+
+ * state: Block editor state.
+
+*Returns*
+
+Selection start information.
+
+### getSelectionEnd
+
+Returns the current selection end block client ID, attribute key and text
+offset.
+
+*Parameters*
+
+ * state: Block editor state.
+
+*Returns*
+
+Selection end information.
+
 ### getBlockSelectionStart
 
 Returns the current block selection start. This value may be null, and it
@@ -326,6 +352,18 @@ This position is to used to position the caret properly when the selected block 
 *Returns*
 
 Selected block.
+
+### getSelectedBlockClientIds
+
+Returns the current selection set of block client IDs (multiselection or single selection).
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Multi-selected block client IDs.
 
 ### getMultiSelectedBlockClientIds
 
@@ -763,6 +801,20 @@ via its `onChange` callback, in addition to `onInput`.
 
 Whether the most recent block change was persistent.
 
+### __unstableIsLastBlockChangeIgnored
+
+Returns true if the most recent block change is be considered ignored, or
+false otherwise. An ignored change is one not to be committed by
+BlockEditorProvider, neither via `onChange` nor `onInput`.
+
+*Parameters*
+
+ * state: Block editor state.
+
+*Returns*
+
+Whether the most recent block change was ignored.
+
 ## Actions
 
 ### resetBlocks
@@ -1015,6 +1067,18 @@ Returns an action object used in signalling that the caret has entered formatted
 ### exitFormattedText
 
 Returns an action object used in signalling that the user caret has exited formatted text.
+
+### selectionChange
+
+Returns an action object used in signalling that the user caret has changed
+position.
+
+*Parameters*
+
+ * clientId: The selected block client ID.
+ * attributeKey: The selected block attribute key.
+ * startOffset: The start offset.
+ * endOffset: The end offset.
 
 ### insertDefaultBlock
 

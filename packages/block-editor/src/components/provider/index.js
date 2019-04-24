@@ -3,8 +3,13 @@
  */
 import { Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
-import { withDispatch, withRegistry } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import withRegistryProvider from './with-registry-provider';
 
 class BlockEditorProvider extends Component {
 	componentDidMount() {
@@ -64,6 +69,7 @@ class BlockEditorProvider extends Component {
 		const {
 			getBlocks,
 			isLastBlockChangePersistent,
+			__unstableIsLastBlockChangeIgnored,
 		} = registry.select( 'core/block-editor' );
 
 		let blocks = getBlocks();
@@ -76,7 +82,12 @@ class BlockEditorProvider extends Component {
 			} = this.props;
 			const newBlocks = getBlocks();
 			const newIsPersistent = isLastBlockChangePersistent();
-			if ( newBlocks !== blocks && this.isSyncingIncomingValue ) {
+			if (
+				newBlocks !== blocks && (
+					this.isSyncingIncomingValue ||
+					__unstableIsLastBlockChangeIgnored()
+				)
+			) {
 				this.isSyncingIncomingValue = false;
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
@@ -88,10 +99,15 @@ class BlockEditorProvider extends Component {
 				// This happens when a previous input is explicitely marked as persistent.
 				( newIsPersistent && ! isPersistent )
 			) {
+				// When knowing the blocks value is changing, assign instance
+				// value to skip reset in subsequent `componentDidUpdate`.
+				if ( newBlocks !== blocks ) {
+					this.isSyncingOutcomingValue = true;
+				}
+
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
 
-				this.isSyncingOutcomingValue = true;
 				if ( isPersistent ) {
 					onChange( blocks );
 				} else {
@@ -115,6 +131,7 @@ class BlockEditorProvider extends Component {
 }
 
 export default compose( [
+	withRegistryProvider,
 	withDispatch( ( dispatch ) => {
 		const {
 			updateSettings,
@@ -126,5 +143,4 @@ export default compose( [
 			resetBlocks,
 		};
 	} ),
-	withRegistry,
 ] )( BlockEditorProvider );

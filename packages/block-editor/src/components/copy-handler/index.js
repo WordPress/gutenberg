@@ -1,49 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 import { documentHasSelection } from '@wordpress/dom';
 import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-class CopyHandler extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.onCopy = ( event ) => this.props.onCopy( event );
-		this.onCut = ( event ) => this.props.onCut( event );
-	}
-
-	componentDidMount() {
-		document.addEventListener( 'copy', this.onCopy );
-		document.addEventListener( 'cut', this.onCut );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'copy', this.onCopy );
-		document.removeEventListener( 'cut', this.onCut );
-	}
-
-	render() {
-		return null;
-	}
+function CopyHandler( { children, onCopy, onCut } ) {
+	return (
+		<div onCopy={ onCopy } onCut={ onCut }>
+			{ children }
+		</div>
+	);
 }
 
 export default compose( [
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
 			getBlocksByClientId,
-			getMultiSelectedBlockClientIds,
-			getSelectedBlockClientId,
+			getSelectedBlockClientIds,
 			hasMultiSelection,
 		} = select( 'core/block-editor' );
 		const { removeBlocks } = dispatch( 'core/block-editor' );
 
 		const onCopy = ( event ) => {
-			const selectedBlockClientIds = getSelectedBlockClientId() ?
-				[ getSelectedBlockClientId() ] :
-				getMultiSelectedBlockClientIds();
+			const selectedBlockClientIds = getSelectedBlockClientIds();
 
 			if ( selectedBlockClientIds.length === 0 ) {
 				return;
@@ -68,9 +49,7 @@ export default compose( [
 				onCopy( event );
 
 				if ( hasMultiSelection() ) {
-					const selectedBlockClientIds = getSelectedBlockClientId() ?
-						[ getSelectedBlockClientId() ] :
-						getMultiSelectedBlockClientIds();
+					const selectedBlockClientIds = getSelectedBlockClientIds();
 
 					removeBlocks( selectedBlockClientIds );
 				}

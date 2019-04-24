@@ -10,19 +10,22 @@ While the block's editor behaviors are implemented in JavaScript, you'll need to
 
 ```php
 <?php
-
-function gutenberg_boilerplate_block() {
+/*
+Plugin Name: Gutenberg examples 01
+*/
+function gutenberg_examples_01_register_block() {
 	wp_register_script(
-		'gutenberg-boilerplate-es5-step01',
-		plugins_url( 'step-01/block.js', __FILE__ ),
+		'gutenberg-examples-01',
+		plugins_url( 'block.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element' )
 	);
 
-	register_block_type( 'gutenberg-boilerplate-es5/hello-world-step-01', array(
-		'editor_script' => 'gutenberg-boilerplate-es5-step01',
+	register_block_type( 'gutenberg-examples/example-01-basic', array(
+		'editor_script' => 'gutenberg-examples-01',
 	) );
+
 }
-add_action( 'init', 'gutenberg_boilerplate_block' );
+add_action( 'init', 'gutenberg_examples_01_register_block' );
 ```
 
 Note the two script dependencies:
@@ -39,51 +42,67 @@ With the script enqueued, let's look at the implementation of the block itself:
 {% codetabs %}
 {% ES5 %}
 ```js
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
+( function( blocks, element ) {
+	var el = element.createElement;
 
-registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-01', {
-	title: 'Hello World (Step 1)',
+	var blockStyle = {
+		backgroundColor: '#900',
+		color: '#fff',
+		padding: '20px',
+	};
 
-	icon: 'universal-access-alt',
-
-	category: 'layout',
-
-	edit: function() {
-		return el( 'p', { style: blockStyle }, 'Hello editor.' );
-	},
-
-	save: function() {
-		return el( 'p', { style: blockStyle }, 'Hello saved content.' );
-	},
-} );
+	blocks.registerBlockType( 'gutenberg-examples/example-01-basic', {
+		title: 'Example: Basic',
+		icon: 'universal-access-alt',
+		category: 'layout',
+		edit: function() {
+			return el(
+				'p',
+				{ style: blockStyle },
+				'Hello World, step 1 (from the editor).'
+			);
+		},
+		save: function() {
+			return el(
+				'p',
+				{ style: blockStyle },
+				'Hello World, step 1 (from the frontend).'
+			);
+		},
+	} );
+}(
+	window.wp.blocks,
+	window.wp.element
+) );
 ```
 {% ESNext %}
 ```js
 const { registerBlockType } = wp.blocks;
-const blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
-registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-01', {
-	title: 'Hello World (Step 1)',
+const blockStyle = {
+	backgroundColor: '#900',
+	color: '#fff',
+	padding: '20px',
+};
 
+registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
+	title: 'Example: Basic (esnext)',
 	icon: 'universal-access-alt',
-
 	category: 'layout',
-
 	edit() {
-		return <p style={ blockStyle }>Hello editor.</p>;
+		return <div style={ blockStyle }>Basic example with JSX! (editor)</div>;
 	},
-
 	save() {
-		return <p style={ blockStyle }>Hello saved content.</p>;
+		return <div style={ blockStyle }>Basic example with JSX! (front)</div>;
 	},
 } );
 ```
 {% end %}
 
+_By now you should be able to see `Hello editor` in the admin side and `Hello saved content` on the frontend side._
+
 Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](/docs/designers-developers/developers/block-api/block-registration.md#icon-optional).
 
-A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name.
+A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name. In this example, the namespace is `gutenberg-examples`.
 
 The `edit` and `save` functions describe the structure of your block in the context of the editor and the saved content respectively. While the difference is not obvious in this simple example, in the following sections we'll explore how these are used to enable customization of the block in the editor preview.

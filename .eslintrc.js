@@ -23,6 +23,7 @@ module.exports = {
 		'plugin:jest/recommended',
 	],
 	rules: {
+		'@wordpress/react-no-unsafe-timeout': 'error',
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or
@@ -91,6 +92,10 @@ module.exports = {
 			{
 				selector: 'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
 				message: 'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
+			},
+			{
+				selector: 'LogicalExpression[operator="&&"][left.property.name="length"][right.type="JSXElement"]',
+				message: 'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
 			},
 		],
 		'react/forbid-elements': [ 'error', {

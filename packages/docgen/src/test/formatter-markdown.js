@@ -28,7 +28,7 @@ describe( 'Formatter', () => {
 			lineEnd: 2,
 		} ], 'API docs' );
 		expect( docs ).toBe(
-			'# API docs\n\n## myDeclaration\n\n[home/my-path/docs-code.js#L1-L2](home/my-path/docs-code.js#L1-L2)\n\nMy declaration example.\n\n**Parameters**\n\n- **firstParam** `number`: First declaration parameter.\n\n**Returns**\n\n`number`: The result of the declaration.\n'
+			'# API docs\n\n<a name="myDeclaration" href="#myDeclaration">#</a> **myDeclaration**\n\nMy declaration example.\n\n*Parameters*\n\n- *firstParam* `number`: First declaration parameter.\n\n*Returns*\n\n- `number`: The result of the declaration.\n'
 		);
 	} );
 } );

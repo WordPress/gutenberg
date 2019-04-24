@@ -42,6 +42,38 @@
 	}
 }
 
+.block-editor-media-placeholder__cancel-button.is-link {
+	margin: 1em;
+	display: block;
+}
+
 .components-form-file-upload .block-editor-media-placeholder__button {
 	margin-right: $grid-size-small;
+}
+
+.block-editor-media-placeholder.is-appender {
+	min-height: 100px;
+	outline: $border-width dashed $dark-gray-150;
+
+	&:hover {
+		outline: $border-width dashed $dark-gray-500;
+		cursor: pointer;
+	}
+
+	.is-dark-theme & {
+
+		&:hover {
+			outline: $border-width dashed $white;
+		}
+	}
+
+	.block-editor-media-placeholder__upload-button {
+		margin-right: $grid-size-small;
+		&.components-button:hover,
+		&.components-button:focus {
+			box-shadow: none;
+			border: $border-width solid $dark-gray-500;
+		}
+	}
+
 }

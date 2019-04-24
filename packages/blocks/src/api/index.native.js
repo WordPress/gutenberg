@@ -28,6 +28,7 @@ export {
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,
+	normalizeIconObject,
 } from './utils';
 export { pasteHandler, getPhrasingContentSchema } from './raw-handling';
 export { default as children } from './children';

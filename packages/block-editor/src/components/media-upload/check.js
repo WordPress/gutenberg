@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { defaultTo } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
@@ -13,9 +8,9 @@ export function MediaUploadCheck( { hasUploadPermissions, fallback = null, child
 }
 
 export default withSelect( ( select ) => {
-	const { canUser } = select( 'core' );
+	const { getSettings } = select( 'core/block-editor' );
 
 	return {
-		hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
+		hasUploadPermissions: !! getSettings().__experimentalMediaUpload,
 	};
 } )( MediaUploadCheck );

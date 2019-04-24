@@ -1,5 +1,7 @@
 .wp-block-embed {
-	margin: 0;
+	// Remove the left and right margin the figure is born with.
+	margin-left: 0;
+	margin-right: 0;
 
 	// Necessary because we use responsive trickery to set width/height,
 	// therefore the video doesn't intrinsically clear floats like an image does.

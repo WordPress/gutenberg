@@ -123,14 +123,12 @@ export default compose( [
 	withSelect( ( select ) => {
 		const {
 			getBlockOrder,
-			getMultiSelectedBlockClientIds,
+			getSelectedBlockClientIds,
 			hasMultiSelection,
 			getBlockRootClientId,
 			getTemplateLock,
-			getSelectedBlockClientId,
 		} = select( 'core/block-editor' );
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const selectedBlockClientIds = selectedBlockClientId ? [ selectedBlockClientId ] : getMultiSelectedBlockClientIds();
+		const selectedBlockClientIds = getSelectedBlockClientIds();
 
 		return {
 			rootBlocksClientIds: getBlockOrder(),

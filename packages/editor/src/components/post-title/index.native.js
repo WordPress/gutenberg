@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,13 +13,12 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-
-const minHeight = 30;
 
 class PostTitle extends Component {
 	constructor() {
@@ -30,7 +30,6 @@ class PostTitle extends Component {
 
 		this.state = {
 			isSelected: false,
-			aztecHeight: 0,
 		};
 	}
 
@@ -73,27 +72,27 @@ class PostTitle extends Component {
 		const borderColor = this.state.isSelected ? focusedBorderColor : 'transparent';
 
 		return (
-			<View style={ [ styles.titleContainer, borderStyle, { borderColor } ] }>
+			<View
+				style={ [ styles.titleContainer, borderStyle, { borderColor } ] }
+				accessible={ ! this.state.isSelected }
+				accessibilityLabel={ sprintf( '%s%s %s', __( 'Post title' ), __( '.' ), ( isEmpty( title ) ? __( 'Empty' ) : title ) ) }
+			>
 				<RichText
 					tagName={ 'p' }
 					rootTagsToEliminate={ [ 'strong' ] }
 					onFocus={ this.onSelect }
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }
-					style={ [ style, {
-						minHeight: Math.max( minHeight, this.state.aztecHeight ),
-					} ] }
+					style={ style }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
-					onContentSizeChange={ ( event ) => {
-						this.setState( { aztecHeight: event.aztecHeight } );
-					} }
 					placeholder={ decodedPlaceholder }
 					value={ title }
 					onSplit={ this.props.onEnterPress }
+					disableEditingMenu={ true }
 					setRef={ ( ref ) => {
 						this.titleViewRef = ref;
 					} }

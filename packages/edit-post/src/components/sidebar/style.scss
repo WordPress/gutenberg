@@ -40,16 +40,9 @@
 		z-index: z-index(".edit-post-sidebar .components-panel");
 
 		@include break-small() {
-			overflow: inherit;
+			overflow: hidden;
 			height: auto;
 			max-height: none;
-		}
-
-		@include break-medium() {
-
-			body.is-fullscreen-mode & {
-				max-height: calc(100vh - #{ $panel-header-height });
-			}
 		}
 	}
 

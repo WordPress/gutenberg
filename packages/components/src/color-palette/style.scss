@@ -46,7 +46,8 @@ $color-palette-circle-spacing: 14px;
 
 	&.is-active {
 		box-shadow: inset 0 0 0 4px;
-		border: $border-width solid $dark-gray-400;
+		position: relative;
+		z-index: 1;
 
 		& + .dashicons-saved {
 			position: absolute;

@@ -27,7 +27,6 @@ import { __ } from '@wordpress/i18n';
 import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
 import {
 	InspectorControls,
-	BlockAlignmentToolbar,
 	BlockControls,
 } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
@@ -49,7 +48,7 @@ class LatestPostsEdit extends Component {
 		this.toggleDisplayPostDate = this.toggleDisplayPostDate.bind( this );
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		this.isStillMounted = true;
 		this.fetchRequest = apiFetch( {
 			path: addQueryArgs( `/wp/v2/categories`, CATEGORIES_LIST_QUERY ),
@@ -82,7 +81,7 @@ class LatestPostsEdit extends Component {
 	render() {
 		const { attributes, setAttributes, latestPosts } = this.props;
 		const { categoriesList } = this.state;
-		const { displayPostDate, align, postLayout, columns, order, orderBy, categories, postsToShow } = attributes;
+		const { displayPostDate, postLayout, columns, order, orderBy, categories, postsToShow } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -160,12 +159,6 @@ class LatestPostsEdit extends Component {
 			<Fragment>
 				{ inspectorControls }
 				<BlockControls>
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
 					<Toolbar controls={ layoutControls } />
 				</BlockControls>
 				<ul

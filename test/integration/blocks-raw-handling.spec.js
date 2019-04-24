@@ -221,6 +221,14 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should paste gutenberg content from plain text', () => {
+		const block = '<!-- wp:latest-posts /-->';
+		expect( serialize( pasteHandler( {
+			plainText: block,
+			mode: 'AUTO',
+		} ) ) ).toBe( block );
+	} );
+
 	describe( 'pasteHandler', () => {
 		[
 			'plain',

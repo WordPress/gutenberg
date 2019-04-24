@@ -101,6 +101,25 @@ CSS class added to the media modal frame.
 - Type: `String`
 - Required: No
 
+
+### addToGallery
+
+If true, the gallery media modal opens directly in the media library where the user can add additional images.
+If false the gallery media modal opens in the edit mode where the user can edit existing images, by reordering them, remove them, or change their attributes.
+Only applies if `gallery === true`.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+
+### gallery
+
+If true, the component will initiate all the states required to represent a gallery. By default, the media modal opens in the gallery edit frame, but that can be changed using the `addToGallery`flag.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+
 ## render
 
 A callback invoked to render the Button opening the media library.

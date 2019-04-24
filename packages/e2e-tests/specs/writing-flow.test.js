@@ -298,4 +298,48 @@ describe( 'adding blocks', () => {
 		// Check that none of the paragraph blocks have <br> in them.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should navigate empty paragraph', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.waitForFunction( () => document.activeElement.isContentEditable );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '2' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should navigate contenteditable with padding', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.evaluate( () => {
+			document.activeElement.style.paddingTop = '100px';
+		} );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '1' );
+		await page.evaluate( () => {
+			document.activeElement.style.paddingBottom = '100px';
+		} );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( '2' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not prematurely multi-select', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '><<' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '<<<' );
+		await page.keyboard.down( 'Shift' );
+		await pressKeyTimes( 'ArrowLeft', '<<\n<<<'.length );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

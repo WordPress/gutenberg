@@ -1,6 +1,17 @@
-## 2.4.0 (Unreleased)
+## 2.5.0 (Unreleased)
 
-- Add vertical alignment controls to `columns` Block ([#13899](https://github.com/WordPress/gutenberg/pull/13899/)).
+- Add vertical alignment controls to Columns Block ([#13899](https://github.com/WordPress/gutenberg/pull/13899/)).
+- Add vertical alignment controls to Media & Text Block ([#13989](https://github.com/WordPress/gutenberg/pull/13989)).
+- Add `wide` and `full` alignments to Archives block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
+- Add `wide` and `full` alignments to Categories block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
+- Add all alignment options to RSS block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
+- Add all alignment options to Search block ([#14533](https://github.com/WordPress/gutenberg/pull/14533)).
+- Add image fill option and focal point picker to Media & Text block ([#14445](https://github.com/WordPress/gutenberg/pull/14445)).
+- Updated the edit flow of the `image` block, updated the edit icon and unified the image editing in only one UI based on `MediaPlaceholder`
+
+### Bug Fixes
+
+- fix uncaught error in `columns` block due to accessing a property on an object that might be undefined [#14605](https://github.com/WordPress/gutenberg/pull/14605)
 
 ## 2.3.0 (2019-03-06)
 

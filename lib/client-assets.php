@@ -245,7 +245,9 @@ function gutenberg_register_scripts_and_styles() {
 	);
 
 	// TEMPORARY: Core does not (yet) provide persistence migration from the
-	// introduction of the block editor.
+	// introduction of the block editor and still calls the data plugins.
+	// We unset the existing inline scripts first.
+	$wp_scripts->registered['wp-data']->extra['after'] = array();
 	wp_add_inline_script(
 		'wp-data',
 		implode(
@@ -254,8 +256,10 @@ function gutenberg_register_scripts_and_styles() {
 				'( function() {',
 				'	var userId = ' . get_current_user_ID() . ';',
 				'	var storageKey = "WP_DATA_USER_" + userId;',
+				'	wp.data',
+				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } );',
 				'	wp.data.plugins.persistence.__unstableMigrate( { storageKey: storageKey } );',
-				'} )()',
+				'} )();',
 			)
 		)
 	);
@@ -353,7 +357,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_style(
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
-		array(),
+		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
 		filemtime( gutenberg_dir_path() . 'build/edit-widgets/style.css' )
 	);
 	wp_style_add_data( 'wp-edit-widgets', 'rtl', 'replace' );
@@ -497,59 +501,6 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 }
 
 /**
- * Assigns a default editor template with a default block by post format, if
- * not otherwise assigned for a new post of type "post".
- *
- * @deprecated 5.3.0
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered block editor settings.
- */
-function gutenberg_default_post_format_template( $settings ) {
-	_deprecated_function( __FUNCTION__, '5.3.0' );
-
-	return $settings;
-}
-
-/**
- * Retrieve a stored autosave that is newer than the post save.
- *
- * Deletes autosaves that are older than the post save.
- *
- * @deprecated 5.3.0
- *
- * @return WP_Post|boolean The post autosave. False if none found.
- */
-function gutenberg_get_autosave_newer_than_post_save() {
-	_deprecated_function( __FUNCTION__, '5.3.0' );
-
-	return false;
-}
-
-/**
- * Loads Gutenberg Locale Data.
- *
- * @deprecated 5.2.0
- */
-function gutenberg_load_locale_data() {
-	_deprecated_function( __FUNCTION__, '5.2.0' );
-}
-
-/**
- * Retrieve The available image sizes for a post
- *
- * @deprecated 5.3.0
- *
- * @return array
- */
-function gutenberg_get_available_image_sizes() {
-	_deprecated_function( __FUNCTION__, '5.3.0' );
-
-	return array();
-}
-
-/**
  * Extends block editor settings to include Gutenberg's `editor-styles.css` as
  * taking precedent those styles shipped with core.
  *
@@ -609,3 +560,32 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
+
+/**
+ * Extends block editor preload paths to preload additional data. Note that any
+ * additions here should be complemented with a corresponding core ticket to
+ * reconcile the change upstream for future removal from Gutenberg.
+ *
+ * @since 5.6.0
+ *
+ * @param array $preload_paths $preload_paths Array of paths to preload.
+ *
+ * @return array Filtered array of paths to preload.
+ */
+function gutenberg_extend_block_editor_preload_paths( $preload_paths ) {
+	/*
+	 * Used in considering user permissions for creating and updating blocks,
+	 * as condition for displaying relevant actions in the interface.
+	 *
+	 * Trac ticket: https://core.trac.wordpress.org/ticket/46429
+	 *
+	 * This is present in WordPress 5.2 and should be removed from Gutenberg
+	 * once WordPress 5.2 is the minimum supported version.
+	 */
+	if ( ! in_array( array( '/wp/v2/blocks', 'OPTIONS' ), $preload_paths ) ) {
+		$preload_paths[] = array( '/wp/v2/blocks', 'OPTIONS' );
+	}
+
+	return $preload_paths;
+}
+add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload_paths' );

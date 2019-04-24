@@ -5,7 +5,6 @@
 }
 
 .block-editor-rich-text__editable {
-	margin: 0;
 	position: relative;
 	// In HTML, leading and trailing spaces are not visible, and multiple spaces
 	// elsewhere are visually reduced to one space. This rule prevents spaces
@@ -16,7 +15,7 @@
 	// breaking spaces in between words. If also prevent Firefox from inserting
 	// a trailing `br` node to visualise any trailing space, causing the element
 	// to be saved.
-	white-space: pre-wrap;
+	white-space: pre-wrap !important;
 
 	> p:first-child {
 		margin-top: 0;
@@ -45,27 +44,6 @@
 
 		*[data-rich-text-format-boundary] {
 			border-radius: 2px;
-			box-shadow: 0 0 0 1px $light-gray-400;
-			background: $light-gray-400;
-
-			// Enforce a dark text color so active inline boundaries
-			// are always readable.
-			// See https://github.com/WordPress/gutenberg/issues/9508
-			color: $dark-gray-900;
-		}
-
-		// Link inline boundaries get special colors.
-		a[data-rich-text-format-boundary] {
-			box-shadow: 0 0 0 1px $blue-medium-100;
-			background: $blue-medium-100;
-			color: $blue-medium-900;
-		}
-
-		// <code> inline boundaries need special treatment because their
-		// un-selected style is already padded.
-		code[data-rich-text-format-boundary] {
-			background: $light-gray-400;
-			box-shadow: 0 0 0 1px $light-gray-400;
 		}
 	}
 

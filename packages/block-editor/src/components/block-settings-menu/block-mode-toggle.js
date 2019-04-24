@@ -26,7 +26,6 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false 
 			className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 			onClick={ onToggleMode }
 			icon="html"
-			label={ small ? label : undefined }
 		>
 			{ ! small && label }
 		</MenuItem>

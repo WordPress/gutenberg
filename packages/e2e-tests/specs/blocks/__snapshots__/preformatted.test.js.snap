@@ -9,6 +9,8 @@ exports[`Preformatted should preserve character newlines 1`] = `
 
 exports[`Preformatted should preserve character newlines 2`] = `
 "<!-- wp:preformatted -->
-<pre class=\\"wp-block-preformatted\\">0<br>1<br>2</pre>
+<pre class=\\"wp-block-preformatted\\">0
+1
+2</pre>
 <!-- /wp:preformatted -->"
 `;

@@ -33,6 +33,7 @@
 
 	<!-- Exclude generated files -->
 	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
+	<exclude-pattern>./build</exclude-pattern>
 
 	<rule ref="PHPCompatibility.PHP.NewKeywords.t_namespaceFound">
 		<exclude-pattern>lib/class-wp-rest-block-renderer-controller.php</exclude-pattern>

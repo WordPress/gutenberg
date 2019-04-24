@@ -12,7 +12,7 @@ const chalk = require( 'chalk' );
  */
 const getPackages = require( './get-packages' );
 
-const BUILD_CMD = `node ${ path.resolve( __dirname, './build.js' ) }`;
+const BUILD_CMD = `node \"${ path.resolve( __dirname, './build.js' ) }\"`;
 
 let filesToBuild = new Map();
 
@@ -69,7 +69,7 @@ setInterval( () => {
 	if ( files.length ) {
 		filesToBuild = new Map();
 		try {
-			execSync( `${ BUILD_CMD } ${ files.join( ' ' ) }`, { stdio: [ 0, 1, 2 ] } );
+			execSync( `${ BUILD_CMD } \"${ files.join( ' ' ) }\"`, { stdio: [ 0, 1, 2 ] } );
 		} catch ( e ) {}
 	}
 }, 100 );

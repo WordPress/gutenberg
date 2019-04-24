@@ -11,6 +11,8 @@ import ReactDOM from 'react-dom';
 import URLInput from '../';
 import URLInputButton from '../button';
 
+import '../../../store';
+
 describe( 'URLInputButton', () => {
 	const clickEditLink = ( wrapper ) => wrapper.find( 'ForwardRef(IconButton).components-toolbar__control' ).simulate( 'click' );
 

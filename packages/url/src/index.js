@@ -24,6 +24,22 @@ export function isURL( url ) {
 }
 
 /**
+ * Determines whether the given string looks like an email.
+ *
+ * @param {string} email The string to scrutinise.
+ *
+ * @example
+ * ```js
+ * const isEmail = isEmail( 'hello@wordpress.org' ); // true
+ * ```
+ *
+ * @return {boolean} Whether or not it looks like an email.
+ */
+export function isEmail( email ) {
+	return EMAIL_REGEXP.test( email );
+}
+
+/**
  * Returns the protocol part of the URL.
  *
  * @param {string} url The full URL.

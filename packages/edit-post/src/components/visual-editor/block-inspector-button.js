@@ -39,7 +39,6 @@ export function BlockInspectorButton( {
 			className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 			onClick={ flow( areAdvancedSettingsOpened ? closeSidebar : openEditorSidebar, speakMessage, onClick ) }
 			icon="admin-generic"
-			label={ small ? label : undefined }
 			shortcut={ shortcuts.toggleSidebar }
 		>
 			{ ! small && label }

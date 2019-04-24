@@ -8,10 +8,12 @@ import {
 	requestMediaPickFromMediaLibrary,
 	requestMediaPickFromDeviceLibrary,
 	requestMediaPickFromDeviceCamera,
+	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,13 +29,12 @@ import {
 	RichText,
 	BlockControls,
 	InspectorControls,
-} from '@wordpress/block-editor';
-import {
 	BottomSheet,
 	Picker,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
+import { doAction, hasAction } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -65,8 +66,6 @@ class ImageEdit extends React.Component {
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
-		this.addMediaUploadListener = this.addMediaUploadListener.bind( this );
-		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
@@ -78,15 +77,27 @@ class ImageEdit extends React.Component {
 	}
 
 	componentDidMount() {
-		const { attributes } = this.props;
+		this.addMediaUploadListener();
+
+		const { attributes, setAttributes } = this.props;
 
 		if ( attributes.id && ! isURL( attributes.url ) ) {
-			this.addMediaUploadListener();
+			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
+				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
+					if ( mediaUri ) {
+						setAttributes( { url: mediaUri, id: mediaId } );
+					}
+				} );
+			}
 			mediaUploadSync();
 		}
 	}
 
 	componentWillUnmount() {
+		// this action will only exist if the user pressed the trash button on the block holder
+		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
+			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
+		}
 		this.removeMediaUploadListener();
 	}
 
@@ -136,8 +147,6 @@ class ImageEdit extends React.Component {
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
 		this.setState( { isUploadInProgress: false } );
-
-		this.removeMediaUploadListener();
 	}
 
 	finishMediaUploadWithFailure( payload ) {
@@ -216,7 +225,6 @@ class ImageEdit extends React.Component {
 		const onMediaUploadButtonPressed = () => {
 			requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
-					this.addMediaUploadListener( );
 					setAttributes( { url: mediaUri, id: mediaId } );
 				}
 			} );
@@ -225,7 +233,6 @@ class ImageEdit extends React.Component {
 		const onMediaCaptureButtonPressed = () => {
 			requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
-					this.addMediaUploadListener( );
 					setAttributes( { url: mediaUri, id: mediaId } );
 				}
 			} );
@@ -248,7 +255,7 @@ class ImageEdit extends React.Component {
 		const toolbarEditButton = (
 			<Toolbar>
 				<ToolbarButton
-					label={ __( 'Edit image' ) }
+					title={ __( 'Edit image' ) }
 					icon="edit"
 					onClick={ onMediaOptionsButtonPressed }
 				/>
@@ -322,7 +329,13 @@ class ImageEdit extends React.Component {
 		const progress = this.state.progress * 100;
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
+			<TouchableWithoutFeedback
+				accessible={ ! isSelected }
+				accessibilityLabel={ __( 'Image block' ) + __( '.' ) + ' ' + alt + __( '.' ) + ' ' + caption }
+				accessibilityRole={ 'button' }
+				onPress={ this.onImagePressed }
+				disabled={ ! isSelected }
+			>
 				<View style={ { flex: 1 } }>
 					{ showSpinner && <Spinner progress={ progress } /> }
 					<BlockControls>
@@ -330,7 +343,7 @@ class ImageEdit extends React.Component {
 					</BlockControls>
 					<InspectorControls>
 						<ToolbarButton
-							label={ __( 'Image Settings' ) }
+							title={ __( 'Image Settings' ) }
 							icon="admin-generic"
 							onClick={ onImageSettingsButtonPressed }
 						/>
@@ -341,14 +354,6 @@ class ImageEdit extends React.Component {
 								imageWidthWithinContainer,
 								imageHeightWithinContainer,
 							} = sizes;
-
-							if ( imageWidthWithinContainer === undefined ) {
-								return (
-									<View style={ styles.imageContainer } >
-										<Dashicon icon={ 'format-image' } size={ 300 } />
-									</View>
-								);
-							}
 
 							let finalHeight = imageHeightWithinContainer;
 							if ( height > 0 && height < imageHeightWithinContainer ) {
@@ -364,11 +369,16 @@ class ImageEdit extends React.Component {
 								<View style={ { flex: 1 } } >
 									{ getInspectorControls() }
 									{ getMediaOptions() }
+									{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
+										<Dashicon icon={ 'format-image' } size={ 300 } />
+									</View> }
 									<ImageBackground
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
 										source={ { uri: url } }
 										key={ url }
+										accessible={ true }
+										accessibilityLabel={ alt }
 									>
 										{ this.state.isUploadFailed &&
 											<View style={ styles.imageContainer } >
@@ -382,7 +392,12 @@ class ImageEdit extends React.Component {
 						} }
 					</ImageSize>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View style={ { padding: 12, flex: 1 } }>
+						<View
+							style={ { padding: 12, flex: 1 } }
+							accessible={ true }
+							accessibilityLabel={ __( 'Image caption' ) + __( '.' ) + ' ' + ( isEmpty( caption ) ? __( 'Empty' ) : caption ) }
+							accessibilityRole={ 'button' }
+						>
 							<TextInput
 								style={ { textAlign: 'center' } }
 								fontFamily={ this.props.fontFamily || ( styles[ 'caption-text' ].fontFamily ) }

@@ -23,7 +23,7 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"build": "wp-scripts run build",
+		"build": "wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses --production",
 		"lint:css": "wp-scripts lint-style '**/*.css'",
@@ -216,6 +216,9 @@ This is how you execute those scripts using the presented setup:
 
 * `npm run test:e2e` - runs all unit tests.
 * `npm run test:e2e:help` - prints all available options to configure unit tests runner.
+* `npm run test-e2e -- --puppeteer-interactive` - runs all unit tests interactively.
+* `npm run test-e2e FILE_NAME -- --puppeteer-interactive ` - runs one test file interactively.
+* `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
 
 This script automatically detects the best config to start Puppeteer but sometimes you may need to specify custom options:
  - You can add a `jest-puppeteer.config.js` at the root of the project or define a custom path using `JEST_PUPPETEER_CONFIG` environment variable. Check [jest-puppeteer](https://github.com/smooth-code/jest-puppeteer#jest-puppeteerconfigjs) for more details.
@@ -268,17 +271,10 @@ The `build` and `start` commands use [webpack](https://webpack.js.org/) behind t
 
 * [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
 * [Output](https://webpack.js.org/configuration/output): `build/index.js`
-* [Externals](https://webpack.js.org/configuration/externals). These are libraries that are to be found in the global scope:
-
-Package | Input syntax | Output
---- | --- | ---
-React | `import x from React;` | `var x = window.React.x;`
-ReactDOM | `import x from ReactDOM;` | `var x = window.ReactDOM.x;`
-moment | `import x from moment;` | `var x = window.moment.x;`
-jQuery | `import x from jQuery;` | `var x = window.jQuery.x;`
-lodash | `import x from lodash;` | `var x = window.lodash.x;`
-lodash-es | `import x from lodash-es;` | `var x = window.lodash.x;`
-WordPress packages | `import x from '@wordpress/package-name` | `var x = window.wp.packageName.x`
+* [Plugins](https://webpack.js.org/configuration/plugins): The webpack plugin provided by
+[`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) is used
+with the default configuration to ensure that WordPress provided scripts are not included in the
+built bundle.
 
 #### Provide your own webpack config
 
@@ -287,4 +283,28 @@ Should there be any situation where you want to provide your own webpack config,
 * the command receives a `--config` argument. Example: `wp-scripts build --config my-own-webpack-config.js`.
 * there is a file called `webpack.config.js` or `webpack.config.babel.js` in the top-level directory of your package (at the same level than your `package.json`).
 
+##### Extending the webpack config
+
+To extend the provided webpack config, or replace subsections within the provided webpack config, you can provide your own `webpack.config.js` file, `require` the provided `webpack.config.js` file, and use the [`spread` operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) to import all of or part of the provided configuration.
+
+In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://github.com/webpack-contrib/url-loader):
+
+```javascript
+const defaultConfig = require("./node_modules/@wordpress/scripts/config/webpack.config");
+
+module.exports = {
+  ...defaultConfig,
+  module: {
+    ...defaultConfig.module,
+    rules: [
+      ...defaultConfig.module.rules,
+      {
+        test: /\.svg$/,
+        use: ["@svgr/webpack", "url-loader"]
+      }
+    ]
+  }
+};
+```
+If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package's CHANGELOG](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

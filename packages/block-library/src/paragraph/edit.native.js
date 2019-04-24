@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,11 +11,11 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
 
 const name = 'core/paragraph';
 
@@ -23,10 +24,6 @@ class ParagraphEdit extends Component {
 		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
 		this.onReplace = this.onReplace.bind( this );
-
-		this.state = {
-			aztecHeight: 0,
-		};
 	}
 
 	/**
@@ -86,6 +83,14 @@ class ParagraphEdit extends Component {
 		) ) );
 	}
 
+	plainTextContent( html ) {
+		const result = create( { html } );
+		if ( result ) {
+			return result.text;
+		}
+		return '';
+	}
+
 	render() {
 		const {
 			attributes,
@@ -99,10 +104,12 @@ class ParagraphEdit extends Component {
 			content,
 		} = attributes;
 
-		const minHeight = styles.blockText.minHeight;
-
 		return (
-			<View>
+			<View
+				accessible={ ! this.props.isSelected }
+				accessibilityLabel={ __( 'Paragraph block' ) + __( '.' ) + ' ' + ( isEmpty( content ) ? __( 'Empty' ) : this.plainTextContent( content ) ) }
+				onAccessibilityTap={ this.props.onFocus }
+			>
 				<RichText
 					tagName="p"
 					value={ content }
@@ -110,10 +117,7 @@ class ParagraphEdit extends Component {
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
-					style={ {
-						...style,
-						minHeight: Math.max( minHeight, this.state.aztecHeight ),
-					} }
+					style={ style }
 					onChange={ ( nextContent ) => {
 						setAttributes( {
 							content: nextContent,
@@ -122,9 +126,6 @@ class ParagraphEdit extends Component {
 					onSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
 					onReplace={ this.onReplace }
-					onContentSizeChange={ ( event ) => {
-						this.setState( { aztecHeight: event.aztecHeight } );
-					} }
 					placeholder={ placeholder || __( 'Start writing…' ) }
 				/>
 			</View>

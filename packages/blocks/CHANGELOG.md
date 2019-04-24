@@ -1,3 +1,9 @@
+## x.x.x (Unreleased)
+
+### New Feature
+
+- Added a default implementation for `save` setting in `registerBlockType` which saves no markup in the post content.
+
 ## 6.1.0 (2019-03-06)
 
 ### New Feature

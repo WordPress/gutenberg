@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, merge, isPlainObject, omit } from 'lodash';
+import { merge, isPlainObject, get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -72,7 +72,7 @@ export function createPersistenceInterface( options ) {
 	 *
 	 * @return {Object} Persisted data.
 	 */
-	function get() {
+	function getData() {
 		if ( data === undefined ) {
 			// If unset, getItem is expected to return null. Fall back to
 			// empty object.
@@ -99,12 +99,15 @@ export function createPersistenceInterface( options ) {
 	 * @param {string} key   Key to update.
 	 * @param {*}      value Updated value.
 	 */
-	function set( key, value ) {
+	function setData( key, value ) {
 		data = { ...data, [ key ]: value };
 		storage.setItem( storageKey, JSON.stringify( data ) );
 	}
 
-	return { get, set };
+	return {
+		get: getData,
+		set: setData,
+	};
 }
 
 /**
@@ -147,14 +150,12 @@ const persistencePlugin = function( registry, pluginOptions ) {
 
 		let lastState = getPersistedState( undefined, { nextState: getState() } );
 
-		return ( result ) => {
+		return () => {
 			const state = getPersistedState( lastState, { nextState: getState() } );
 			if ( state !== lastState ) {
 				persistence.set( reducerKey, state );
 				lastState = state;
 			}
-
-			return result;
 		};
 	}
 
@@ -184,19 +185,19 @@ const persistencePlugin = function( registry, pluginOptions ) {
 					initialState = persistedState;
 				}
 
-				options = { ...options, initialState };
+				options = {
+					...options,
+					initialState,
+				};
 			}
 
 			const store = registry.registerStore( reducerKey, options );
 
-			store.dispatch = flow( [
-				store.dispatch,
-				createPersistOnChange(
-					store.getState,
-					reducerKey,
-					options.persist
-				),
-			] );
+			store.subscribe( createPersistOnChange(
+				store.getState,
+				reducerKey,
+				options.persist
+			) );
 
 			return store;
 		},
@@ -211,20 +212,18 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const persistence = createPersistenceInterface( pluginOptions );
 
 	// Preferences migration to introduce the block editor module
-	const persistedState = persistence.get();
-	const coreEditorState = persistedState[ 'core/editor' ];
-	if ( coreEditorState && coreEditorState.preferences && coreEditorState.preferences.insertUsage ) {
-		const blockEditorState = {
-			preferences: {
-				insertUsage: coreEditorState.preferences.insertUsage,
-			},
-		};
+	const insertUsage = get( persistence.get(), [
+		'core/editor',
+		'preferences',
+		'insertUsage',
+	] );
 
-		persistence.set( 'core/editor', {
-			...coreEditorState,
-			preferences: omit( coreEditorState.preferences, [ 'insertUsage' ] ),
+	if ( insertUsage ) {
+		persistence.set( 'core/block-editor', {
+			preferences: {
+				insertUsage,
+			},
 		} );
-		persistence.set( 'core/block-editor', blockEditorState );
 	}
 };
 

@@ -18,7 +18,6 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
 
 exports[`MenuItem should match snapshot when info is provided 1`] = `
 <ForwardRef(Button)
-  aria-describedby="edit-post-feature-toggle__info-1"
   className="components-menu-item__button"
   role="menuitem"
 >
@@ -28,7 +27,6 @@ exports[`MenuItem should match snapshot when info is provided 1`] = `
     My item
     <span
       className="components-menu-item__info"
-      id="edit-post-feature-toggle__info-1"
     >
       Extended description of My Item
     </span>

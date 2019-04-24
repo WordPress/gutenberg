@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.1.0",
+	"version": "9.2.4",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -47,7 +47,6 @@
 		"lodash": "^4.17.11",
 		"memize": "^1.0.5",
 		"react-autosize-textarea": "^3.0.2",
-		"redux-multi": "^0.1.12",
 		"redux-optimist": "^1.0.0",
 		"refx": "^3.0.0",
 		"rememo": "^3.0.0",

@@ -11,6 +11,18 @@
 	}
 }
 
+.wp-block-media-text.is-vertically-aligned-top {
+	align-items: start;
+}
+
+.wp-block-media-text.is-vertically-aligned-center {
+	align-items: center;
+}
+
+.wp-block-media-text.is-vertically-aligned-bottom {
+	align-items: end;
+}
+
 .wp-block-media-text .wp-block-media-text__media {
 	grid-area: media-text-media;
 	margin: 0;
@@ -27,6 +39,24 @@
 	max-width: unset;
 	width: 100%;
 	vertical-align: middle;
+}
+
+.wp-block-media-text.is-image-fill figure {
+	height: 100%;
+	min-height: 250px;
+	background-size: cover;
+}
+
+.wp-block-media-text.is-image-fill figure > img {
+	// The image is visually hidden but accessible to assistive technologies.
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
 }
 
 /*

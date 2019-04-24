@@ -78,10 +78,10 @@ const getAttachmentsCollection = ( ids ) => {
 class MediaUpload extends Component {
 	constructor( {
 		allowedTypes,
-		multiple = false,
 		gallery = false,
-		title = __( 'Select or Upload Media' ),
 		modalClass,
+		multiple = false,
+		title = __( 'Select or Upload Media' ),
 	} ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
@@ -124,6 +124,7 @@ class MediaUpload extends Component {
 
 	buildAndSetGalleryFrame() {
 		const {
+			addToGallery = false,
 			allowedTypes,
 			multiple = false,
 			value = null,
@@ -140,7 +141,12 @@ class MediaUpload extends Component {
 		if ( this.frame ) {
 			this.frame.remove();
 		}
-		const currentState = value ? 'gallery-edit' : 'gallery';
+		let currentState;
+		if ( addToGallery ) {
+			currentState = 'gallery-library';
+		} else {
+			currentState = value ? 'gallery-edit' : 'gallery';
+		}
 		if ( ! this.GalleryDetailsMediaFrame ) {
 			this.GalleryDetailsMediaFrame = getGalleryDetailsMediaFrame();
 		}

@@ -65,3 +65,15 @@ It is recommended to use the main `wp-polyfill` script handle which takes care o
 | [Formdata Polyfill](https://www.npmjs.com/package/formdata-polyfill) | wp-polyfill-formdata| Polyfill conditionally replaces the native implementation |
 | [Node Contains Polyfill](https://polyfill.io) | wp-polyfill-node-contains |Polyfill for Node.contains |
 | [Element Closest Polyfill](https://www.npmjs.com/package/element-closest) | wp-polyfill-element-closest| Return the closest element matching a selector up the DOM tree |
+
+## Bundling and code sharing
+
+When using a JavaScript bundler like [webpack](https://webpack.js.org/), the scripts mentioned here
+can be excluded from the bundle and provided by WordPress in the form of script dependencies [(see
+`wp_enqueue_script`)][https://developer.wordpress.org/reference/functions/wp_enqueue_script/#default-scripts-included-and-registered-by-wordpress].
+
+The
+[`@wordpress/dependency-extraction-webpack-plugin`](https://github.com/WordPress/gutenberg/tree/master/packages/dependency-extraction-webpack-plugin)
+provides a webpack plugin to help extract WordPress dependencies from bundles. `@wordpress/scripts`
+[`build`](https://github.com/WordPress/gutenberg/tree/master/packages/scripts#build) script includes
+the plugin by default.

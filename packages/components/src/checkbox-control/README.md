@@ -60,7 +60,7 @@ import { withState } from '@wordpress/compose';
 
 const MyCheckboxControl = withState( {
 	isChecked: true,
-} )( ( { isChecked, setState } ) => ( 
+} )( ( { isChecked, setState } ) => (
 	<CheckboxControl
 		heading="User"
 		label="Is author"
@@ -78,7 +78,7 @@ Props not included in this set will be applied to the input element.
 
 #### heading
 
-A heading for the input field, that appears above the checkbox. If the prop is not passed no heading will be rendered. 
+A heading for the input field, that appears above the checkbox. If the prop is not passed no heading will be rendered.
 
 - Type: `String`
 - Required: No
@@ -96,7 +96,7 @@ If no prop is passed an empty label is rendered.
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String`
+- Type: `String|WPElement`
 - Required: No
 
 #### checked

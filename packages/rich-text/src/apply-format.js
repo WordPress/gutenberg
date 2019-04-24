@@ -10,6 +10,12 @@ import { find } from 'lodash';
 
 import { normaliseFormats } from './normalise-formats';
 
+function replace( array, index, value ) {
+	array = array.slice();
+	array[ index ] = value;
+	return array;
+}
+
 /**
  * Apply a format object to a Rich Text value from the given `startIndex` to the
  * given `endIndex`. Indices are retrieved from the selection if none are
@@ -28,7 +34,8 @@ export function applyFormat(
 	startIndex = value.start,
 	endIndex = value.end
 ) {
-	const newFormats = value.formats.slice( 0 );
+	const { formats, activeFormats = [] } = value;
+	const newFormats = formats.slice();
 
 	// The selection is collapsed.
 	if ( startIndex === endIndex ) {
@@ -37,42 +44,53 @@ export function applyFormat(
 		// If the caret is at a format of the same type, expand start and end to
 		// the edges of the format. This is useful to apply new attributes.
 		if ( startFormat ) {
-			while ( find( newFormats[ startIndex ], startFormat ) ) {
-				applyFormats( newFormats, startIndex, format );
+			const index = newFormats[ startIndex ].indexOf( startFormat );
+
+			while ( newFormats[ startIndex ] && newFormats[ startIndex ][ index ] === startFormat ) {
+				newFormats[ startIndex ] =
+					replace( newFormats[ startIndex ], index, format );
 				startIndex--;
 			}
 
 			endIndex++;
 
-			while ( find( newFormats[ endIndex ], startFormat ) ) {
-				applyFormats( newFormats, endIndex, format );
+			while ( newFormats[ endIndex ] && newFormats[ endIndex ][ index ] === startFormat ) {
+				newFormats[ endIndex ] =
+					replace( newFormats[ endIndex ], index, format );
 				endIndex++;
 			}
 		// Otherwise, insert a placeholder with the format so new input appears
 		// with the format applied.
 		} else {
-			const previousFormat = newFormats[ startIndex - 1 ] || [];
-
 			return {
 				...value,
-				formatPlaceholder: [ ...previousFormat, format ],
+				activeFormats: [ ...activeFormats, format ],
 			};
 		}
 	} else {
+		// Determine the highest position the new format can be inserted at.
+		let position = +Infinity;
+
 		for ( let index = startIndex; index < endIndex; index++ ) {
-			applyFormats( newFormats, index, format );
+			if ( newFormats[ index ] ) {
+				newFormats[ index ] = newFormats[ index ]
+					.filter( ( { type } ) => type !== format.type );
+
+				const length = newFormats[ index ].length;
+
+				if ( length < position ) {
+					position = length;
+				}
+			} else {
+				newFormats[ index ] = [];
+				position = 0;
+			}
+		}
+
+		for ( let index = startIndex; index < endIndex; index++ ) {
+			newFormats[ index ].splice( position, 0, format );
 		}
 	}
 
 	return normaliseFormats( { ...value, formats: newFormats } );
-}
-
-function applyFormats( formats, index, format ) {
-	if ( formats[ index ] ) {
-		const newFormatsAtIndex = formats[ index ].filter( ( { type } ) => type !== format.type );
-		newFormatsAtIndex.push( format );
-		formats[ index ] = newFormatsAtIndex;
-	} else {
-		formats[ index ] = [ format ];
-	}
 }

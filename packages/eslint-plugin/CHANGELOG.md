@@ -1,4 +1,11 @@
-## 2.1.0 (Unreleased)
+## x.x.x (Unreleased)
+
+### New Features
+
+- New Rule: [`@wordpress/react-no-unsafe-timeout`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)
+- Add [React Hooks Rules](https://reactjs.org/docs/hooks-rules.html) config.
+
+## 2.1.0 (2019-03-20)
 
 ### New Features
 
@@ -18,6 +25,7 @@
 - New Rule: [`@wordpress/dependency-group`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md)
 - New Rule: [`@wordpress/valid-sprintf`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/valid-sprintf.md)
 - New Rule: [`@wordpress/gutenberg-phase`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/gutenberg-phase.md)
+- New Rule: [`@wordpress/no-base-control-with-label-without-id`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)
 
 ## 1.0.0 (2018-12-12)
 

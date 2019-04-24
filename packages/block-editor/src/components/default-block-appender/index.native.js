@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { TouchableWithoutFeedback, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { RichText } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -21,6 +22,7 @@ export function DefaultBlockAppender( {
 	isVisible,
 	onAppend,
 	placeholder,
+	containerStyle,
 } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
@@ -32,16 +34,11 @@ export function DefaultBlockAppender( {
 		<TouchableWithoutFeedback
 			onPress={ onAppend }
 		>
-			<View style={ styles.blockHolder } pointerEvents="box-only">
-				<View style={ styles.blockContainer }>
-					<TextInput
-						style={ styles.textView }
-						textAlignVertical="top"
-						multiline
-						numberOfLines={ 0 }
-						value={ value }
-					/>
-				</View>
+			<View style={ [ styles.blockHolder, containerStyle ] } pointerEvents="box-only">
+				<RichText
+					placeholder={ value }
+					onChange={ () => {} }
+				/>
 			</View>
 		</TouchableWithoutFeedback>
 	);
