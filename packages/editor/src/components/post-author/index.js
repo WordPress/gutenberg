@@ -42,7 +42,7 @@ export class PostAuthor extends Component {
 					className="editor-post-author__select"
 				>
 					{ authors.map( ( author ) => (
-						<option key={ author.id } value={ author.id }>{ decodeEntities(author.name) }</option>
+						<option key={ author.id } value={ author.id }>{ decodeEntities( author.name ) }</option>
 					) ) }
 				</select>
 			</PostAuthorCheck>
