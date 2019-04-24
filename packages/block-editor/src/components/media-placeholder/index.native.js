@@ -49,13 +49,25 @@ function MediaPlaceholder( props ) {
 		}
 	}
 
+	let accessibilityHint = __( 'Double tap to select' );
+	if ( isImage ) {
+		accessibilityHint = __( 'Double tap to select an image' );
+	} else if ( isVideo ) {
+		accessibilityHint = __( 'Double tap to select a video' );
+	}
+
 	return (
 		<MediaUpload
 			mediaType={ mediaType }
 			onSelectURL={ onSelectURL }
 			render={ ( { open, getMediaOptions } ) => {
 				return (
-					<TouchableWithoutFeedback onPress={ open }>
+					<TouchableWithoutFeedback
+						accessibilityLabel={ placeholderTitle + ' ' + __( 'block' ) + __( '.' ) + ' ' + __( 'Empty' ) }
+						accessibilityRole={ 'button' }
+						accessibilityHint={ accessibilityHint }
+						onPress={ open }
+					>
 						<View style={ styles.emptyStateContainer }>
 							{ getMediaOptions() }
 							<Dashicon icon={ placeholderIcon } />

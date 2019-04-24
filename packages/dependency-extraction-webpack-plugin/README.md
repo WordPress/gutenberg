@@ -194,3 +194,5 @@ $script_dependencies = file_exists( $script_deps_path )
 $script_url = plugins_url( $script_path, __FILE__ );
 wp_enqueue_script( 'script', $script_url, $script_dependencies );
 ```
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
