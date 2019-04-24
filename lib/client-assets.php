@@ -211,7 +211,7 @@ function gutenberg_register_packages_scripts() {
 		gutenberg_override_script(
 			$handle,
 			gutenberg_url( $gutenberg_path ),
-			array_merge( $dependencies, array( 'wp-polyfill' ) ),
+			$dependencies,
 			filemtime( $path ),
 			true
 		);
