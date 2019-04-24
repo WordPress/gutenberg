@@ -1,6 +1,6 @@
 ## 2.1.0 (unreleased)
 
-### Enhancement
+### New Feature
 
 - Add Fragment import handling ([#15120](https://github.com/WordPress/gutenberg/pull/15120)).
 
