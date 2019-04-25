@@ -353,7 +353,15 @@ _Returns_
 
 <a name="plugins" href="#plugins">#</a> **plugins**
 
-Undocumented declaration.
+Object of available plugins to use with a registry.
+
+_Related_
+
+-   [use](#use)
+
+_Type_
+
+-   `Object` 
 
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 
