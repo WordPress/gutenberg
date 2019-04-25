@@ -54,7 +54,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @pento | @pento |
 | @karmatosed | @karmatosed |
 | @nitrajka | @nitrajka |
-| @sirreal | |
+| @sirreal | @jonsurrell |
 | @inhil | |
 | @georgeolaru | @babbardel |
 | @martinlugton | @martinlugton |
