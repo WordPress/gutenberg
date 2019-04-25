@@ -25,96 +25,125 @@
 @import "./verse/style.scss";
 @import "./video/style.scss";
 
-// Class names are doubled to increase specificity to assure colors take effect
-// over another base class color.
 
-.has-pale-pink-background-color.has-pale-pink-background-color {
+// Background colors.
+
+.has-pale-pink-background-color {
 	background-color: #f78da7;
 }
 
-.has-vivid-red-background-color.has-vivid-red-background-color {
+.has-vivid-red-background-color {
 	background-color: #cf2e2e;
 }
 
-.has-luminous-vivid-orange-background-color.has-luminous-vivid-orange-background-color {
+.has-luminous-vivid-orange-background-color {
 	background-color: #ff6900;
 }
 
-.has-luminous-vivid-amber-background-color.has-luminous-vivid-amber-background-color {
+.has-luminous-vivid-amber-background-color {
 	background-color: #fcb900;
 }
 
-.has-light-green-cyan-background-color.has-light-green-cyan-background-color {
+.has-light-green-cyan-background-color {
 	background-color: #7bdcb5;
 }
 
-.has-vivid-green-cyan-background-color.has-vivid-green-cyan-background-color {
+.has-vivid-green-cyan-background-color {
 	background-color: #00d084;
 }
 
-.has-pale-cyan-blue-background-color.has-pale-cyan-blue-background-color {
+.has-pale-cyan-blue-background-color {
 	background-color: #8ed1fc;
 }
 
-.has-vivid-cyan-blue-background-color.has-vivid-cyan-blue-background-color {
+.has-vivid-cyan-blue-background-color {
 	background-color: #0693e3;
 }
 
-.has-very-light-gray-background-color.has-very-light-gray-background-color {
+.has-very-light-gray-background-color {
 	background-color: #eee;
 }
 
-.has-cyan-bluish-gray-background-color.has-cyan-bluish-gray-background-color {
+.has-cyan-bluish-gray-background-color {
 	background-color: #abb8c3;
 }
 
-.has-very-dark-gray-background-color.has-very-dark-gray-background-color {
+.has-very-dark-gray-background-color {
 	background-color: #313131;
 }
 
-.has-pale-pink-color.has-pale-pink-color {
+// Foreground colors.
+// Selectors have increased specificity to assure colors take effect
+// over another base class color.
+
+.has-pale-pink-color,
+a.has-pale-pink-color:link,
+a.has-pale-pink-color:visited {
 	color: #f78da7;
 }
 
-.has-vivid-red-color.has-vivid-red-color {
+.has-vivid-red-color,
+a.has-vivid-red-color:link,
+a.has-vivid-red-color:visited {
 	color: #cf2e2e;
 }
 
-.has-luminous-vivid-orange-color.has-luminous-vivid-orange-color {
+.has-luminous-vivid-orange-color,
+a.has-luminous-vivid-orange-color:link,
+a.has-luminous-vivid-orange-color:visited {
 	color: #ff6900;
 }
 
-.has-luminous-vivid-amber-color.has-luminous-vivid-amber-color {
+.has-luminous-vivid-amber-color,
+a.has-luminous-vivid-amber-color:link,
+a.has-luminous-vivid-amber-color:visited {
 	color: #fcb900;
 }
 
-.has-light-green-cyan-color.has-light-green-cyan-color {
+.has-light-green-cyan-color,
+a.has-light-green-cyan-color:link,
+a.has-light-green-cyan-color:visited {
 	color: #7bdcb5;
 }
 
-.has-vivid-green-cyan-color.has-vivid-green-cyan-color {
+.has-vivid-green-cyan-color,
+a.has-vivid-green-cyan-color:link,
+a.has-vivid-green-cyan-color:visited {
 	color: #00d084;
 }
 
-.has-pale-cyan-blue-color.has-pale-cyan-blue-color {
+.has-pale-cyan-blue-color,
+a.has-pale-cyan-blue-color:link,
+a.has-pale-cyan-blue-color:visited {
 	color: #8ed1fc;
 }
 
-.has-vivid-cyan-blue-color.has-vivid-cyan-blue-color {
+.has-vivid-cyan-blue-color,
+a.has-vivid-cyan-blue-color:link,
+a.has-vivid-cyan-blue-color:visited {
 	color: #0693e3;
 }
 
-.has-very-light-gray-color.has-very-light-gray-color {
+.has-very-light-gray-color,
+a.has-very-light-gray-color:link,
+a.has-very-light-gray-color:visited {
 	color: #eee;
 }
 
-.has-cyan-bluish-gray-color.has-cyan-bluish-gray-color {
+.has-cyan-bluish-gray-color,
+a.has-cyan-bluish-gray-color:link,
+a.has-cyan-bluish-gray-color:visited {
 	color: #abb8c3;
 }
 
-.has-very-dark-gray-color.has-very-dark-gray-color {
+.has-very-dark-gray-color,
+a.has-very-dark-gray-color:link,
+a.has-very-dark-gray-color:visited {
 	color: #313131;
 }
+
+
+// Font sizes.
 
 .has-small-font-size {
 	font-size: 13px;
