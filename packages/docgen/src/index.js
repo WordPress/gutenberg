@@ -10,6 +10,7 @@ const { last } = require( 'lodash' );
  */
 const engine = require( './engine' );
 const defaultMarkdownFormatter = require( './markdown' );
+const isSymbolPrivate = require( './is-symbol-private' );
 
 /**
  * Helpers functions.
@@ -102,7 +103,17 @@ module.exports = function( sourceFile, options ) {
 
 	// Process
 	const result = processFile( processDir, sourceFile );
-	const filteredIr = result.ir.filter( ( { name } ) => options.ignore ? ! name.match( options.ignore ) : true );
+	const filteredIR = result.ir.filter( ( symbol ) => {
+		if ( isSymbolPrivate( symbol ) ) {
+			return false;
+		}
+
+		if ( options.ignore ) {
+			return ! symbol.name.match( options.ignore );
+		}
+
+		return true;
+	} );
 
 	// Ouput
 	if ( result === undefined ) {
@@ -113,9 +124,9 @@ module.exports = function( sourceFile, options ) {
 	}
 
 	if ( options.formatter ) {
-		runCustomFormatter( path.join( processDir, options.formatter ), processDir, doc, filteredIr, 'API' );
+		runCustomFormatter( path.join( processDir, options.formatter ), processDir, doc, filteredIR, 'API' );
 	} else {
-		defaultMarkdownFormatter( options, processDir, doc, filteredIr, 'API' );
+		defaultMarkdownFormatter( options, processDir, doc, filteredIR, 'API' );
 	}
 
 	if ( debugMode ) {
