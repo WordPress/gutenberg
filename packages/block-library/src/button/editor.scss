@@ -36,8 +36,8 @@
 		opacity: 0;
 	}
 
-	// Align cursor to left when text input is focused and placeholder is active.
-	.block-editor-rich-text__editable[data-is-placeholder-visible="true"]:focus {
+	// Align cursor to left when placeholder is active.
+	.block-editor-rich-text__editable[data-is-placeholder-visible="true"] {
 		text-align: left;
 	}
 
