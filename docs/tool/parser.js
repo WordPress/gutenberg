@@ -6,7 +6,7 @@ const fs = require( 'fs' );
 /**
  * External dependencies
  */
-const { last, size, first, some, overEvery, negate } = require( 'lodash' );
+const { last, size, first, some, overEvery, negate, isEmpty } = require( 'lodash' );
 const espree = require( 'espree' );
 const doctrine = require( 'doctrine' );
 
@@ -24,6 +24,29 @@ function isDocumentedNamedExport( node ) {
 		size( node.leadingComments ) > 0
 	);
 }
+
+/**
+ * Returns true if the given exported declaration name is considered stable for
+ * documentation, or false otherwise.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/docs/contributors/coding-guidelines.md#experimental-and-unstable-apis
+ *
+ * @param {string} name Name to test.
+ *
+ * @return {boolean} Whether the provided name describes a stable API.
+ */
+const isStableExportName = ( name ) => ! /^__(unstable|experimental)/.test( name );
+
+/**
+ * Returns true if the given export name is eligible to be included in
+ * generated output, or false otherwise.
+ *
+ * @type {boolean} Whether name is eligible for documenting.
+ */
+const isEligibleExportedName = overEvery( [
+	negate( isEmpty ),
+	isStableExportName,
+] );
 
 /**
  * Returns the assigned name for a given declaration node type, or undefined if
@@ -145,7 +168,7 @@ module.exports = function( config ) {
 					}
 
 					const name = getDeclarationExportedName( node.declaration );
-					if ( ! name ) {
+					if ( ! isEligibleExportedName( name ) ) {
 						return;
 					}
 
