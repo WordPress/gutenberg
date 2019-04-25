@@ -32,7 +32,7 @@ import {
 	BottomSheet,
 	Picker,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 
@@ -331,7 +331,13 @@ class ImageEdit extends React.Component {
 		return (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
-				accessibilityLabel={ __( 'Image block' ) + __( '.' ) + ' ' + alt + __( '.' ) + ' ' + caption }
+
+				accessibilityLabel={ sprintf(
+					/* translators: accessibility text. 1: image alt text. 2: image caption. */
+					__( 'Image block. %1$s. %2$s' ),
+					alt,
+					caption
+				) }
 				accessibilityRole={ 'button' }
 				onPress={ this.onImagePressed }
 				disabled={ ! isSelected }
@@ -395,7 +401,16 @@ class ImageEdit extends React.Component {
 						<View
 							style={ { padding: 12, flex: 1 } }
 							accessible={ true }
-							accessibilityLabel={ __( 'Image caption' ) + __( '.' ) + ' ' + ( isEmpty( caption ) ? __( 'Empty' ) : caption ) }
+							accessibilityLabel={
+								isEmpty( caption ) ?
+									/* translators: accessibility text. Empty image caption. */
+									__( 'Image caption. Empty.' ) :
+									sprintf(
+										/* translators: accessibility text. %s: image caption. */
+										__( 'Image caption. Empty. %s' ),
+										caption
+									)
+							}
 							accessibilityRole={ 'button' }
 						>
 							<TextInput
