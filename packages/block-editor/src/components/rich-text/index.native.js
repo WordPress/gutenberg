@@ -320,6 +320,7 @@ export class RichText extends Component {
 		}
 	}
 
+	
 	// eslint-disable-next-line no-unused-vars
 	onBackspace( event ) {
 		const { onMerge, onRemove } = this.props;
