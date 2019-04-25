@@ -109,10 +109,10 @@ class ParagraphEdit extends Component {
 				accessible={ ! this.props.isSelected }
 				accessibilityLabel={
 					isEmpty( content ) ?
-					/* translators: accessibility text. empty paragraph block. */
+						/* translators: accessibility text. empty paragraph block. */
 						__( 'Paragraph block. Empty' ) :
 						sprintf(
-						/* translators: accessibility text. %s: text content of the paragraph block. */
+							/* translators: accessibility text. %s: text content of the paragraph block. */
 							__( 'Paragraph block. %s' ),
 							this.plainTextContent( content )
 						)

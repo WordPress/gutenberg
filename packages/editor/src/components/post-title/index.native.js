@@ -77,10 +77,10 @@ class PostTitle extends Component {
 				accessible={ ! this.state.isSelected }
 				accessibilityLabel={
 					isEmpty( title ) ?
-					/* translators: accessibility text. empty post title. */
+						/* translators: accessibility text. empty post title. */
 						__( 'Post title. Empty' ) :
 						sprintf(
-						/* translators: accessibility text. %s: text content of the post title. */
+							/* translators: accessibility text. %s: text content of the post title. */
 							__( 'Post title. %s' ),
 							title
 						)
