@@ -25,11 +25,6 @@ import { __ } from '@wordpress/i18n';
 import { isAppleOS } from './platform';
 
 /**
- * Utility to check for Apple platform.
- */
-export { isAppleOS } from './platform';
-
-/**
  * Keycode for BACKSPACE key.
  */
 export const BACKSPACE = 8;

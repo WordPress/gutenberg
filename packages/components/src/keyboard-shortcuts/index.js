@@ -9,7 +9,11 @@ import { forEach } from 'lodash';
  * WordPress dependencies
  */
 import { Component, Children } from '@wordpress/element';
-import { isAppleOS } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import { isAppleOS } from './platform';
 
 class KeyboardShortcuts extends Component {
 	constructor() {
