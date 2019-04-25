@@ -148,4 +148,12 @@ export const registerGenericStore = defaultRegistry.registerGenericStore;
  * @return {Object} Registered store object.
  */
 export const registerStore = defaultRegistry.registerStore;
+
+/**
+ * Extends a registry to inherit functionality provided by a given plugin. A
+ * plugin is an object with properties aligning to that of a registry, merged
+ * to extend the default registry behavior.
+ *
+ * @param {Object} plugin Plugin object.
+ */
 export const use = defaultRegistry.use;

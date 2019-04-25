@@ -473,7 +473,13 @@ _Parameters_
 
 <a name="use" href="#use">#</a> **use**
 
-Undocumented declaration.
+Extends a registry to inherit functionality provided by a given plugin. A
+plugin is an object with properties aligning to that of a registry, merged
+to extend the default registry behavior.
+
+_Parameters_
+
+-   _plugin_ `Object`: Plugin object.
 
 <a name="useRegistry" href="#useRegistry">#</a> **useRegistry**
 
