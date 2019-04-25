@@ -361,10 +361,6 @@ public class ReactAztecText extends AztecText {
         String content = toHtml(text, false);
         int cursorPositionStart = firedAfterTextChanged ? selStart : getSelectionStart();
         int cursorPositionEnd = firedAfterTextChanged ? selEnd : getSelectionEnd();
-//        if (firedAfterTextChanged) {
-//            cursorPositionStart--;
-//            cursorPositionEnd--;
-//        }
         enableTextChangedListener();
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
