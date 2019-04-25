@@ -291,6 +291,7 @@ export class RichText extends Component {
 	onEnter( event ) {
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
+		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
 
 		const currentRecord = this.createRecord( {
 			...event.nativeEvent,
@@ -309,7 +310,7 @@ export class RichText extends Component {
 			} else {
 				// if ( ! event.nativeEvent.firedAfterTextChanged ) {
 					const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
-					this.onFormatChange( insertedLineSeparator, ! event.nativeEvent.firedAfterTextChanged );
+					this.onFormatChange( insertedLineSeparator, ! this.firedAfterTextChanged );
 				// }
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
@@ -614,7 +615,7 @@ export class RichText extends Component {
 		// , but compare with props.value to not lose "half word" text because of Android virtual keyb autosuggestion behavior
 		if ( ( typeof nextProps.value !== 'undefined' ) &&
 			( typeof this.props.value !== 'undefined' ) &&
-			( Platform.OS === 'ios' || ( Platform.OS == 'android' && this.comesFromAztec === false ) ) &&
+			( Platform.OS === 'ios' || ( Platform.OS == 'android' && ( ! this.comesFromAztec || ! this.firedAfterTextChanged ) ) ) &&
 			nextProps.value !== previousValueToCheck ) {
 				this.lastEventCount = undefined; // force a refresh on the native side
 		}
@@ -701,6 +702,7 @@ export class RichText extends Component {
 
 		if ( this.comesFromAztec ) {
 			this.comesFromAztec = false;
+			this.firedAfterTextChanged = false;
 		}
 
 		return (
