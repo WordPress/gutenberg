@@ -163,9 +163,9 @@ export class RichText extends Component {
 		// value. This also provides an opportunity for the parent component to
 		// determine whether the before/after value has changed using a trivial
 		//  strict equality operation.
-		if ( isEmpty( after ) && before.text.length == currentRecord.text.length ) {
+		if ( isEmpty( after ) && before.text.length === currentRecord.text.length ) {
 			before = currentRecord;
-		} else if ( isEmpty( before ) && after.text.length == currentRecord.text.length ) {
+		} else if ( isEmpty( before ) && after.text.length === currentRecord.text.length ) {
 			after = currentRecord;
 		}
 
@@ -309,10 +309,8 @@ export class RichText extends Component {
 				} );
 				this.splitContent( currentRecord );
 			} else {
-				// if ( ! event.nativeEvent.firedAfterTextChanged ) {
-					const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
-					this.onFormatChange( insertedLineSeparator, ! this.firedAfterTextChanged );
-				// }
+				const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
+				this.onFormatChange( insertedLineSeparator, ! this.firedAfterTextChanged );
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
 			const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
@@ -578,7 +576,7 @@ export class RichText extends Component {
 
 		// This logic will handle the selection when two blocks are merged or when block is split
 		// into two blocks
-		if ( nextTextContent.startsWith( this.savedContent ) && this.savedContent && this.savedContent.length > 0) {
+		if ( nextTextContent.startsWith( this.savedContent ) && this.savedContent && this.savedContent.length > 0 ) {
 			let length = this.savedContent.length;
 			if ( length === 0 && nextTextContent !== this.props.value ) {
 				length = this.props.value.length;
@@ -616,13 +614,13 @@ export class RichText extends Component {
 		// ** compare with this.lastContent for optimizing performance by not forcing Aztec with text it already has
 		// , but compare with props.value to not lose "half word" text because of Android virtual keyb autosuggestion behavior
 		if ( ( typeof nextProps.value !== 'undefined' ) &&
-			( typeof this.props.value !== 'undefined' ) &&
-			( Platform.OS === 'ios' || ( Platform.OS == 'android' && ( ! this.comesFromAztec || ! this.firedAfterTextChanged ) ) ) &&
-			nextProps.value !== previousValueToCheck ) {
-				this.lastEventCount = undefined; // force a refresh on the native side
+				( typeof this.props.value !== 'undefined' ) &&
+				( Platform.OS === 'ios' || ( Platform.OS === 'android' && ( ! this.comesFromAztec || ! this.firedAfterTextChanged ) ) ) &&
+				nextProps.value !== previousValueToCheck ) {
+			this.lastEventCount = undefined; // force a refresh on the native side
 		}
 
-		if ( Platform.OS == 'android' && this.comesFromAztec === false ) {
+		if ( Platform.OS === 'android' && this.comesFromAztec === false ) {
 			if ( this.needsSelectionUpdate ) {
 				this.lastEventCount = undefined; // force a refresh on the native side
 			}
