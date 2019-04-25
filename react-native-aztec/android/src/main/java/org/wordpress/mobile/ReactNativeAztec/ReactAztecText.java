@@ -96,15 +96,15 @@ public class ReactAztecText extends AztecText {
                 return false;
             }
             @Override
-            public boolean onBackspaceKey(boolean firedAfterTextChanged) {
+            public boolean onBackspaceKey() {
                 if (shouldHandleOnBackspace && !isTextChangedListenerDisabled()) {
                     String content = toHtml(getText(), false);
                     if (TextUtils.isEmpty(content)) {
-                        return onBackspace(firedAfterTextChanged);
+                        return onBackspace();
                     }
                     else {
                         if (!content.equals(mEmptyTagHTML)) {
-                            return onBackspace(firedAfterTextChanged);
+                            return onBackspace();
                         }
                     }
                 }
@@ -371,7 +371,7 @@ public class ReactAztecText extends AztecText {
         return true;
     }
 
-    private boolean onBackspace(boolean firedAfterTextChanged) {
+    private boolean onBackspace() {
         int cursorPositionStart = getSelectionStart();
         int cursorPositionEnd = getSelectionEnd();
         // Make sure to report backspace at the beginning only, with no selection.
@@ -386,8 +386,7 @@ public class ReactAztecText extends AztecText {
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         // TODO: isRTL? Should be passed here?
         eventDispatcher.dispatchEvent(
-                new ReactAztecBackspaceEvent(getId(), content, cursorPositionStart, cursorPositionEnd,
-                        firedAfterTextChanged)
+                new ReactAztecBackspaceEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
         );
         return true;
     }
