@@ -7,10 +7,11 @@ import { toggleFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton, RichTextShortcut, UnstableRichTextInputEvent } from '@wordpress/block-editor';
 
 const name = 'core/italic';
+const title = __( 'Italic' );
 
 export const italic = {
 	name,
-	title: __( 'Italic' ),
+	title,
 	tagName: 'em',
 	className: null,
 	edit( { isActive, value, onChange } ) {
@@ -26,7 +27,7 @@ export const italic = {
 				<RichTextToolbarButton
 					name="italic"
 					icon="editor-italic"
-					title={ __( 'Italic' ) }
+					title={ title }
 					onClick={ onToggle }
 					isActive={ isActive }
 					shortcutType="primary"
