@@ -88,9 +88,12 @@ class GalleryEdit extends Component {
 	}
 
 	onMove( oldIndex, newIndex ) {
+		if ( oldIndex === newIndex ) {
+			return;
+		}
 		const images = [ ...this.props.attributes.images ];
-		images.splice( newIndex, 1, this.props.attributes.images[ oldIndex ] );
-		images.splice( oldIndex, 1, this.props.attributes.images[ newIndex ] );
+		images.splice( oldIndex, 1 );
+		images.splice( newIndex, 0, this.props.attributes.images[ oldIndex ] );
 		this.setState( { selectedImage: newIndex } );
 		this.setAttributes( { images } );
 	}
