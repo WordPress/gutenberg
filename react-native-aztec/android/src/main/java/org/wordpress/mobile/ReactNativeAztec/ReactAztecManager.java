@@ -42,7 +42,7 @@ import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
 import org.wordpress.aztec.plugins.wpcomments.HiddenGutenbergPlugin;
 import org.wordpress.aztec.plugins.wpcomments.WordPressCommentsPlugin;
 import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
-import org.wordpress.aztec.watchers.EnterPressedWatcher;
+import org.wordpress.aztec.watchers.EnterPressedUnderway;
 
 import java.util.Map;
 import java.util.ArrayList;
@@ -501,7 +501,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
             // if the "Enter" handling is underway, don't sent text change events. The ReactAztecEnterEvent will have
             // the text (minus the Enter char itself).
-            if (mEditText.getText().getSpans(0, 0, EnterPressedWatcher.EnterPressedUnderway.class).length == 0) {
+            if (mEditText.getText().getSpans(0, 0, EnterPressedUnderway.class).length == 0) {
                 int currentEventCount = mEditText.incrementAndGetEventCounter();
                 // The event that contains the event counter and updates it must be sent first.
                 // TODO: t7936714 merge these events
