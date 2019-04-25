@@ -13,7 +13,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { RichText, BlockControls } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
@@ -98,13 +98,23 @@ class HeadingEdit extends Component {
 
 		const tagName = 'h' + level;
 
-		const accessibilityLabelLevel = __( 'level' ) + ' ' + level + __( '.' );
-		const accessibilityLabelContent = isEmpty( content ) ? __( 'Empty' ) : this.plainTextContent( content );
-
 		return (
 			<View
 				accessible={ ! this.props.isSelected }
-				accessibilityLabel={ __( 'Heading block' ) + __( '.' ) + ' ' + accessibilityLabelLevel + ' ' + accessibilityLabelContent }
+				accessibilityLabel={
+					isEmpty( content ) ?
+						sprintf(
+							/* translators: accessibility text. %s: heading level. */
+							__( 'Heading block. Level %s. Empty.' ),
+							level
+						) :
+						sprintf(
+							/* translators: accessibility text. 1: heading level. 2: heading content. */
+							__( 'Heading block. Level %1$s. %2$s' ),
+							level,
+							this.plainTextContent( content )
+						)
+				}
 				onAccessibilityTap={ this.props.onFocus }
 			>
 				<BlockControls>
