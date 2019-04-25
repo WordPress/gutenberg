@@ -532,10 +532,6 @@ _Returns_
 
 -   `boolean`: True if the parameter is a valid icon and false otherwise.
 
-<a name="node" href="#node">#</a> **node**
-
-Undocumented declaration.
-
 <a name="normalizeIconObject" href="#normalizeIconObject">#</a> **normalizeIconObject**
 
 Function that receives an icon as set by the blocks during the registration
