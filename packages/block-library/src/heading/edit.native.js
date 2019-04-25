@@ -110,7 +110,7 @@ class HeadingEdit extends Component {
 						) :
 						/* translators: accessibility text. 1: heading level. 2: heading content. */
 						sprintf(
-							__( 'Heading block. Level %s1$s. %2$s' ),
+							__( 'Heading block. Level %1$s. %2$s' ),
 							level,
 							this.plainTextContent( content )
 						)
