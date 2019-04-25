@@ -103,12 +103,12 @@ class HeadingEdit extends Component {
 				accessible={ ! this.props.isSelected }
 				accessibilityLabel={
 					isEmpty( content ) ?
-						/* translators: %s: heading level. */
+						/* translators: accessibility text. %s: heading level. */
 						sprintf(
 							__( 'Heading block. Level %s. Empty.' ),
 							level
 						) :
-						/* translators: 1: heading level. 2: heading content. */
+						/* translators: accessibility text. 1: heading level. 2: heading content. */
 						sprintf(
 							__( 'Heading block. Level %s1$s. %2$s' ),
 							level,
