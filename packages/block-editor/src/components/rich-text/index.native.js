@@ -275,6 +275,7 @@ export class RichText extends Component {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
 		this.lastContent = contentWithoutRootTag;
 		this.comesFromAztec = true;
+		this.firedAfterTextChanged = true; // the onChange event always fires after the fact
 		this.props.onChange( this.lastContent );
 	}
 
@@ -491,6 +492,7 @@ export class RichText extends Component {
 			// let's update lastContent to prevent that in shouldComponentUpdate
 			this.lastContent = newContent;
 			this.comesFromAztec = true;
+			this.firedAfterTextChanged = true; // Selection change event always fires after the fact
 			this.props.onChange( this.lastContent );
 		}
 	}
