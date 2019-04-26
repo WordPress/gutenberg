@@ -88,6 +88,11 @@ ul.wp-block-gallery {
 	border: none;
 	border-radius: 0;
 
+	.components-drop-zone__content,
+	&.is-dragging-over-element .components-drop-zone__content {
+		display: none;
+	}
+
 	&.is-close-to-left {
 		background: none;
 		border-left: 3px solid theme(primary);
