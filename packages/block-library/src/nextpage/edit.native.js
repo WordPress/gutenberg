@@ -22,7 +22,13 @@ export default function NextPageEdit( { attributes, isSelected, onFocus } ) {
 	return (
 		<View
 			accessible
-			accessibilityLabel={ sprintf( '%s%s %s', __( 'Page break block' ), __( '.' ), accessibilityTitle ) }
+			accessibilityLabel={
+				sprintf(
+					/* translators: accessibility text. %s: Page break text. */
+					__( 'Page break block. %s' ),
+					accessibilityTitle
+				)
+			}
 			accessibilityStates={ accessibilityState }
 			onAccessibilityTap={ onFocus }
 		>
