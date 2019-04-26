@@ -26,9 +26,28 @@
 		color: $white;
 	}
 
+	// Add outline to button on focus to indicate focus-state
+	.block-editor-rich-text__editable:focus {
+		box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
+
+		// Windows' High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+		outline-offset: -2px;
+	}
+
 	// Increase placeholder opacity to meet contrast ratios.
 	.block-editor-rich-text__editable[data-is-placeholder-visible="true"] + .block-editor-rich-text__editable {
 		opacity: 0.8;
+	}
+
+	// Make placeholder disappear on focus to make focus-state visible.
+	.block-editor-rich-text__editable[data-is-placeholder-visible="true"]:focus + .block-editor-rich-text__editable {
+		opacity: 0;
+	}
+
+	// Align cursor to left when placeholder is active.
+	.block-editor-rich-text__editable[data-is-placeholder-visible="true"] {
+		text-align: left;
 	}
 
 	// Don't let the placeholder text wrap in the variation preview.
@@ -65,6 +84,9 @@
 	// The width of input box plus padding plus two icon buttons.
 	$blocks-button__link-input-width: 300px + 2px + 2 * $icon-button-size;
 	width: $blocks-button__link-input-width;
+
+	// Move it down by 2px so that it doesn't overlap the button focus outline.
+	margin-top: 2px;
 
 	.block-editor-url-input {
 		width: auto;
