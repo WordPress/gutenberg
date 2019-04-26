@@ -177,4 +177,7 @@ InnerBlocks.Content = withBlockContentContext(
 	( { BlockContent } ) => <BlockContent />
 );
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ */
 export default InnerBlocks;
