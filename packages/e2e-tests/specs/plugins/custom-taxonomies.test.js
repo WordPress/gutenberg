@@ -21,7 +21,7 @@ describe( 'Custom Taxonomies labels are used', () => {
 	} );
 
 	it( 'Ensures the custom taxonomy labels are respected', async () => {
-		const button = await page.$x( "//button[contains(text(), 'Model') and contains(@class, 'components-button')]" );
+		const [ button ] = await page.$x( "//button[contains(text(), 'Model') and contains(@class, 'components-button')]" );
 		expect( button ).not.toBeFalsy();
 
 		const labelNew = await page.$x( "//label[@class='components-form-token-field__label' and contains(text(), 'Add New Model')]" );
