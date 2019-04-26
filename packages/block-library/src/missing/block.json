@@ -5,10 +5,10 @@
 		"originalName": {
 			"type": "string"
 		},
-    "originalAttributes": {
+		"originalAttributes": {
 			"type": "object"
 		},
-    "originalInnerContent": {
+		"originalInnerContent": {
 			"type": "array"
 		},
 		"originalInnerBlocks": {
