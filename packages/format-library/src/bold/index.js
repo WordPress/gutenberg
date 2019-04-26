@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextToolbarButton, RichTextShortcut, UnstableRichTextInputEvent } from '@wordpress/block-editor';
+import { RichTextToolbarButton, RichTextShortcut, __unstableRichTextInputEvent } from '@wordpress/block-editor';
 
 const name = 'core/bold';
 
@@ -32,7 +32,7 @@ export const bold = {
 					shortcutType="primary"
 					shortcutCharacter="b"
 				/>
-				<UnstableRichTextInputEvent
+				<__unstableRichTextInputEvent
 					inputType="formatBold"
 					onInput={ onToggle }
 				/>

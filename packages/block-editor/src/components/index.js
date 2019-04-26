@@ -28,7 +28,7 @@ export {
 	default as RichText,
 	RichTextShortcut,
 	RichTextToolbarButton,
-	UnstableRichTextInputEvent,
+	__unstableRichTextInputEvent,
 } from './rich-text';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
