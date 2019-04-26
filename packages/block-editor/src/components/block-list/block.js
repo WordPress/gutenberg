@@ -397,7 +397,6 @@ export class BlockListBlock extends Component {
 						! isEmptyDefaultBlock;
 					// We render block movers and block settings to keep them tabbale even if hidden
 					const shouldRenderMovers =
-						! isFocusMode &&
 						( isSelected || hoverArea === 'left' ) &&
 						! showEmptyBlockSideInserter &&
 						! isPartOfMultiSelection &&
