@@ -122,8 +122,6 @@ export default class Cell extends Component {
 			);
 		};
 
-		const defaultInlineValueHint = __( 'Double tap to edit this value ');
-
 		return (
 			<TouchableOpacity 
 				accessible={ ! this.state.isEditingValue }
@@ -131,7 +129,7 @@ export default class Cell extends Component {
 				accessibilityRole={ accessibilityRole || 'button' }
 				accessibilityHint={ isValueEditable ? 
 					/* translators: accessibility text */
-					__( 'Double tap to edit this value ') :
+					__( 'Double tap to edit this value') :
 					accessibilityHint
 				}
 				onPress={ onCellPress }
