@@ -429,7 +429,6 @@ class ImageEdit extends React.Component {
 								setRef={ ( ref ) => {
 									this._caption = ref;
 								} }
-								tagName="figcaption"
 								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
 								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
