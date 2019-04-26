@@ -51,8 +51,7 @@ class GalleryEdit extends Component {
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
 		this.onMove = this.onMove.bind( this );
-		this.onMoveForward = this.onMoveForward.bind( this );
-		this.onMoveBackward = this.onMoveBackward.bind( this );
+		this.onMoveTo = this.onMoveTo.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
@@ -101,24 +100,6 @@ class GalleryEdit extends Component {
 	onMoveTo( newIndex ) {
 		return ( oldIndex ) => {
 			this.onMove( oldIndex, newIndex );
-		};
-	}
-
-	onMoveForward( oldIndex ) {
-		return () => {
-			if ( oldIndex === this.props.attributes.images.length - 1 ) {
-				return;
-			}
-			this.onMove( oldIndex, oldIndex + 1 );
-		};
-	}
-
-	onMoveBackward( oldIndex ) {
-		return () => {
-			if ( oldIndex === 0 ) {
-				return;
-			}
-			this.onMove( oldIndex, oldIndex - 1 );
 		};
 	}
 
@@ -295,11 +276,7 @@ class GalleryEdit extends Component {
 									alt={ img.alt }
 									id={ img.id }
 									index={ index }
-									isFirstItem={ index === 0 }
-									isLastItem={ ( index + 1 ) === images.length }
 									isSelected={ isSelected && this.state.selectedImage === index }
-									onMoveBackward={ this.onMoveBackward( index ) }
-									onMoveForward={ this.onMoveForward( index ) }
 									onMoveTo={ this.onMoveTo( index ) }
 									onRemove={ this.onRemoveImage( index ) }
 									onSelect={ this.onSelectImage( index ) }
