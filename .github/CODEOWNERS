@@ -83,6 +83,7 @@
 
 # PHP
 /lib                                            @youknowriad @gziolo @aduth
+*-controller.php                                @youknowriad @gziolo @aduth @timothybjacobs
 
 # Styles
 *.scss                                          @chrisvanpatten
