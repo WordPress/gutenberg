@@ -185,7 +185,27 @@ class DropZoneProvider extends Component {
 			position,
 		};
 		if ( ! isShallowEqual( newState, this.state ) ) {
-			this.setState( newState );
+			this.setState( newState, () => {
+				const dz = this.dropZones[ this.state.hoveredDropZone ];
+				if ( dz ) {
+					switch ( dragEventType ) {
+						case 'file':
+							dz.onFilesDrop(
+								[ ...event.dataTransfer.files ],
+								position
+							);
+							break;
+						case 'html':
+							dz.onHTMLDrop(
+								event.dataTransfer.getData( 'text/html' ),
+								position
+							);
+							break;
+						case 'default':
+							dz.onDrop( event, position );
+					}
+				}
+			} );
 		}
 	}
 
