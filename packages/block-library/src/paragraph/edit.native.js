@@ -24,6 +24,26 @@ class ParagraphEdit extends Component {
 		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
 		this.onReplace = this.onReplace.bind( this );
+		props.setAttributes( { accessibilityContent: this.accessibilityContent() } );
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if ( prevProps.attributes.content !== this.props.attributes.content ) {
+			this.props.setAttributes( { accessibilityContent: this.accessibilityContent() } );
+		}
+	}
+
+	accessibilityContent() {
+		const { attributes } = this.props;
+		const { content } = attributes;
+		return isEmpty( content ) ?
+			/* translators: accessibility text. empty paragraph block. */
+			__( 'Empty' ) :
+			sprintf(
+				/* translators: accessibility text. %s: text content of the paragraph block. */
+				__( '%s' ),
+				this.plainTextContent( content )
+			);
 	}
 
 	/**
@@ -105,20 +125,7 @@ class ParagraphEdit extends Component {
 		} = attributes;
 
 		return (
-			<View
-				accessible={ ! this.props.isSelected }
-				accessibilityLabel={
-					isEmpty( content ) ?
-						/* translators: accessibility text. empty paragraph block. */
-						__( 'Paragraph block. Empty' ) :
-						sprintf(
-							/* translators: accessibility text. %s: text content of the paragraph block. */
-							__( 'Paragraph block. %s' ),
-							this.plainTextContent( content )
-						)
-				}
-				onAccessibilityTap={ this.props.onFocus }
-			>
+			<View>
 				<RichText
 					tagName="p"
 					value={ content }
