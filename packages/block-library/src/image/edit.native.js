@@ -334,7 +334,8 @@ class ImageEdit extends React.Component {
 				accessibilityLabel={ __( 'Image block' ) + __( '.' ) + ' ' + alt + __( '.' ) + ' ' + caption }
 				accessibilityRole={ 'button' }
 				onPress={ this.onImagePressed }
-				disabled={ ! isSelected || url }
+				onLongPress={ url && onMediaOptionsButtonPressed }
+				disabled={ ! isSelected }
 			>
 				<View style={ { flex: 1 } }>
 					{ showSpinner && <Spinner progress={ progress } /> }
@@ -369,7 +370,7 @@ class ImageEdit extends React.Component {
 								<TouchableOpacity
 									onLongPress={ onMediaOptionsButtonPressed }
 									accessible={ true }
-									disabled={ ! isSelected || ! url }
+									disabled={ ! isSelected }
 									accessibilityLabel={ alt }
 									accessibilityHint={ __( 'Long press to edit the image' ) }
 									accessibilityRole={ 'imagebutton' }
