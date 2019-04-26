@@ -27,17 +27,28 @@ before_install:
 
 jobs:
   include:
-    - name: JS unit tests
-      env: WP_VERSION=latest
+    - name: Lint
       before_install:
         - nvm install --latest-npm
-      install:
-        - npm ci
       script:
-        - npm run build
         - npm run lint
+
+    - name: Build artifacts
+      before_install:
+        - nvm install --latest-npm
+      script:
         - npm run check-local-changes
+
+    - name: License compatibility
+      before_install:
+        - nvm install --latest-npm
+      script:
         - npm run check-licenses
+
+    - name: JavaScript unit tests
+      before_install:
+        - nvm install --latest-npm
+      script:
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests (Docker)
