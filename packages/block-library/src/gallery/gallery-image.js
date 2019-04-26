@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import uuid from 'uuid/v4';
 
 /**
  * WordPress dependencies
@@ -24,6 +25,7 @@ class GalleryImage extends Component {
 		this.bindContainer = this.bindContainer.bind( this );
 		this.onMoveTo = this.onMoveTo.bind( this );
 
+		this.imgUUID = uuid();
 		this.state = {
 			captionSelected: false,
 		};
@@ -114,14 +116,14 @@ class GalleryImage extends Component {
 			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 			<Fragment>
 				<Draggable
-					elementId={ id }
+					elementId={ this.imgUUID }
 					transferData={ { type: 'image', index } }
 				>
 					{ ( { onDraggableStart, onDraggableEnd } ) => (
 						<img
 							src={ url }
 							alt={ alt }
-							id={ id }
+							id={ this.imgUUID }
 							data-id={ id }
 							onClick={ this.onSelectImage }
 							onFocus={ this.onSelectImage }
