@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, ImageBackground, TextInput, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import {
 	subscribeMediaUpload,
 	requestMediaPickFromMediaLibrary,
@@ -334,7 +334,7 @@ class ImageEdit extends React.Component {
 				accessibilityLabel={ __( 'Image block' ) + __( '.' ) + ' ' + alt + __( '.' ) + ' ' + caption }
 				accessibilityRole={ 'button' }
 				onPress={ this.onImagePressed }
-				disabled={ ! isSelected }
+				disabled={ ! isSelected || url }
 			>
 				<View style={ { flex: 1 } }>
 					{ showSpinner && <Spinner progress={ progress } /> }
@@ -366,28 +366,35 @@ class ImageEdit extends React.Component {
 							}
 
 							return (
-								<View style={ { flex: 1 } } >
-									{ getInspectorControls() }
-									{ getMediaOptions() }
-									{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
-										<Dashicon icon={ 'format-image' } size={ 300 } />
-									</View> }
-									<ImageBackground
-										style={ { width: finalWidth, height: finalHeight, opacity } }
-										resizeMethod="scale"
-										source={ { uri: url } }
-										key={ url }
-										accessible={ true }
-										accessibilityLabel={ alt }
-									>
-										{ this.state.isUploadFailed &&
+								<TouchableOpacity
+									onLongPress={ onMediaOptionsButtonPressed }
+									accessible={ true }
+									disabled={ ! isSelected || ! url }
+									accessibilityLabel={ alt }
+									accessibilityHint={ __( 'Long press to edit the image' ) }
+									accessibilityRole={ 'imagebutton' }
+								>
+									<View style={ { flex: 1 } }>
+										{ getInspectorControls() }
+										{ getMediaOptions() }
+										{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
+											<Dashicon icon={ 'format-image' } size={ 300 } />
+										</View> }
+										<ImageBackground
+											style={ { width: finalWidth, height: finalHeight, opacity } }
+											resizeMethod="scale"
+											source={ { uri: url } }
+											key={ url }
+										>
+											{ this.state.isUploadFailed &&
 											<View style={ styles.imageContainer } >
 												<Dashicon icon={ 'image-rotate' } ariaPressed={ 'dashicon-active' } />
 												<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.\nPlease tap for options.' ) }</Text>
 											</View>
-										}
-									</ImageBackground>
-								</View>
+											}
+										</ImageBackground>
+									</View>
+								</TouchableOpacity>
 							);
 						} }
 					</ImageSize>
