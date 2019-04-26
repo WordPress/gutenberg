@@ -19,13 +19,7 @@ const blockTraverser = ( combiner, initialValue, reducer ) => {
 const blockToSave = blockTraverser(
 	( a, b ) => a.concat( b ),
 	[],
-	( content, recurse ) => {
-		if ( 'string' === typeof content ) {
-			return content;
-		}
-
-		return `<!-- wp:${ content.name } ${ JSON.stringify( content.attributes ) } -->${ recurse( content ).join( '\n' ) }<!-- /wp:${ content.name } -->`;
-	}
+	( content, recurse ) => 'string' === typeof content ? content : `<!-- wp:${ content.name } ${ JSON.stringify( content.attributes ) } -->${ recurse( content ).join( '\n' ) }<!-- /wp:${ content.name } -->`
 );
 
 export default function save( { attributes: {
