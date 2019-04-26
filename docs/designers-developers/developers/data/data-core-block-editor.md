@@ -801,20 +801,6 @@ via its `onChange` callback, in addition to `onInput`.
 
 Whether the most recent block change was persistent.
 
-### __unstableIsLastBlockChangeIgnored
-
-Returns true if the most recent block change is be considered ignored, or
-false otherwise. An ignored change is one not to be committed by
-BlockEditorProvider, neither via `onChange` nor `onInput`.
-
-*Parameters*
-
- * state: Block editor state.
-
-*Returns*
-
-Whether the most recent block change was ignored.
-
 ## Actions
 
 ### resetBlocks
@@ -1109,17 +1095,3 @@ Returns an action object used in signalling that the block editor settings have 
 *Parameters*
 
  * settings: Updated settings
-
-### __unstableSaveReusableBlock
-
-Returns an action object used in signalling that a temporary reusable blocks have been saved
-in order to switch its temporary id with the real id.
-
-*Parameters*
-
- * id: Reusable block's id.
- * updatedId: Updated block's id.
-
-### __unstableMarkLastChangeAsPersistent
-
-Returns an action object used in signalling that the last block change should be marked explicitely as persistent.
