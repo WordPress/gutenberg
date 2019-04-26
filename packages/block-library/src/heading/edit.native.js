@@ -26,6 +26,8 @@ class HeadingEdit extends Component {
 		super( props );
 
 		this.splitBlock = this.splitBlock.bind( this );
+		this.accessibilityContent = this.accessibilityContent.bind( this );
+		props.setAttributes( { getAccessibilityContent: this.accessibilityContent } );
 	}
 
 	/**
@@ -74,6 +76,24 @@ class HeadingEdit extends Component {
 		}
 	}
 
+	accessibilityContent() {
+		const { attributes } = this.props;
+		const { content, level } = attributes;
+
+		return isEmpty( content ) ?
+			sprintf(
+				/* translators: accessibility text. %s: heading level. */
+				__( 'Level %s. Empty.' ),
+				level
+			) :
+			sprintf(
+				/* translators: accessibility text. 1: heading level. 2: heading content. */
+				__( 'Level %1$s. %2$s' ),
+				level,
+				this.plainTextContent( content )
+			);
+	}
+
 	plainTextContent( html ) {
 		const result = create( { html } );
 		if ( result ) {
@@ -99,24 +119,7 @@ class HeadingEdit extends Component {
 		const tagName = 'h' + level;
 
 		return (
-			<View
-				accessible={ ! this.props.isSelected }
-				accessibilityLabel={
-					isEmpty( content ) ?
-						sprintf(
-							/* translators: accessibility text. %s: heading level. */
-							__( 'Heading block. Level %s. Empty.' ),
-							level
-						) :
-						sprintf(
-							/* translators: accessibility text. 1: heading level. 2: heading content. */
-							__( 'Heading block. Level %1$s. %2$s' ),
-							level,
-							this.plainTextContent( content )
-						)
-				}
-				onAccessibilityTap={ this.props.onFocus }
-			>
+			<View>
 				<BlockControls>
 					<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				</BlockControls>
