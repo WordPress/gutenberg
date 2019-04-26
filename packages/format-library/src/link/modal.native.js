@@ -184,6 +184,7 @@ class ModalLinkUI extends Component {
 					label={ __( 'Open in New Tab' ) }
 					value={ this.state.opensInNewWindow }
 					onValueChange={ this.onChangeOpensInNewWindow }
+					separatorType={ 'fullWidth' }
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Remove Link' ) }

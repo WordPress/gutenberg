@@ -32,7 +32,7 @@ import {
 	BottomSheet,
 	Picker,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 
@@ -269,6 +269,16 @@ class ImageEdit extends React.Component {
 				hideHeader
 			>
 				<BottomSheet.Cell
+					accessibilityLabel={
+						isEmpty( href ) ?
+							/* translators: accessibility text. Empty "Link To" image setting. */
+							__( 'Link To. Empty' ) :
+							sprintf(
+								/* translators: accessibility text. %s: an URL address (i.e. example.com). */
+								__( 'Link To. %s' ),
+								href
+							)
+					}
 					icon={ 'admin-links' }
 					label={ __( 'Link To' ) }
 					value={ href || '' }
@@ -278,6 +288,16 @@ class ImageEdit extends React.Component {
 					autoCorrect={ false }
 				/>
 				<BottomSheet.Cell
+					accessibilityLabel={
+						isEmpty( alt ) ?
+							/* translators: accessibility text. Empty "Alt" image setting. */
+							__( 'Alt Text. Empty' ) :
+							sprintf(
+								/* translators: accessibility text. %s: Alt image seting value. */
+								__( 'Alt Text. %s' ),
+								alt
+							)
+					}
 					icon={ 'editor-textcolor' }
 					label={ __( 'Alt Text' ) }
 					value={ alt || '' }
