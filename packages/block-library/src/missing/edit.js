@@ -2,15 +2,39 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { RawHTML, Fragment } from '@wordpress/element';
+import { Fragment, RawHTML } from '@wordpress/element';
 import { Button } from '@wordpress/components';
-import { getBlockType, createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
 
-function MissingBlockWarning( { attributes, convertToHTML, convertToBlocks } ) {
-	const { originalName, originalInnerContent } = attributes;
-	const hasContent = !! originalInnerContent.length;
+const blockTraverser = ( combiner, initialValue, reducer ) => {
+	const recurse = ( block ) => block.innerContent.reduce(
+		( [ accumulator, blockIndex ], content ) => (
+			null === content ?
+				[ combiner( accumulator, reducer( block.innerBlocks[ blockIndex ], recurse ) ), blockIndex + 1 ] :
+				[ combiner( accumulator, reducer( content, recurse ) ), blockIndex ]
+		),
+		[ initialValue, 0 ]
+	)[ 0 ];
+
+	return recurse;
+};
+
+const blockToHTML = blockTraverser(
+	( a, b ) => a + b,
+	'',
+	( content, recurse ) => 'string' === typeof content ? content : recurse( content )
+);
+
+function MissingBlockWarning( { attributes: originalBlock, convertToHTML, convertToBlocks } ) {
+	const {
+		originalName: blockName,
+		originalAttributes: attributes,
+		originalInnerBlocks: innerBlocks,
+		originalInnerContent: innerContent,
+	} = originalBlock;
+	const hasContent = !! innerContent.length;
 	const hasHTMLBlock = getBlockType( 'core/html' );
 
 	const actions = [];
@@ -18,7 +42,7 @@ function MissingBlockWarning( { attributes, convertToHTML, convertToBlocks } ) {
 	if ( hasContent && hasHTMLBlock ) {
 		messageHTML = sprintf(
 			__( 'Your site doesn’t include support for the "%s" block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.' ),
-			originalName
+			blockName
 		);
 		actions.push(
 			<Button key="convert" onClick={ convertToHTML } isLarge isPrimary>
@@ -33,7 +57,7 @@ function MissingBlockWarning( { attributes, convertToHTML, convertToBlocks } ) {
 	} else {
 		messageHTML = sprintf(
 			__( 'Your site doesn’t include support for the "%s" block. You can leave this block intact or remove it entirely.' ),
-			originalName
+			blockName
 		);
 	}
 
@@ -42,40 +66,51 @@ function MissingBlockWarning( { attributes, convertToHTML, convertToBlocks } ) {
 			<Warning actions={ actions }>
 				{ messageHTML }
 			</Warning>
-			<RawHTML>{ originalInnerContent.join( '' ) }</RawHTML>
+			<RawHTML>{ blockToHTML( { name: blockName, attributes, innerContent, innerBlocks } ) }</RawHTML>
 		</Fragment>
 	);
 }
 
 const MissingEdit = withDispatch( ( dispatch, props ) => {
-	const { clientId, attributes: { originalInnerBlocks: innerBlocks, originalInnerContent: innerContent } } = props;
+	const { clientId, attributes: {
+		originalName: blockName,
+		originalAttributes: attributes,
+		originalInnerBlocks: innerBlocks,
+		originalInnerContent: innerContent,
+	} } = props;
 	const { replaceBlock, replaceBlocks } = dispatch( 'core/block-editor' );
 	return {
 		convertToBlocks() {
-			const blocks = [];
-			let blockIndex = 0;
+			const blocks = blockTraverser(
+				( a, b ) => a.concat( b ),
+				[],
+				( content, recurse ) => {
+					// splice in nested inner content
+					if ( Array.isArray( content ) ) {
+						return recurse( content );
+					}
 
-			for ( const content of innerContent ) {
-				// just an inner block
-				if ( null === content ) {
-					blocks.push( innerBlocks[ blockIndex++ ] );
-					continue;
+					// pass-through regular block objects
+					if ( 'string' !== typeof content ) {
+						return content;
+					}
+
+					// skip "empty" blocks which came from the
+					// whitespace between blocks
+					if ( ! content.blockName && ! content.trim().length ) {
+						return [];
+					}
+
+					// append other text as a raw HTML block
+					return createBlock( 'core/html', { content } );
 				}
-
-				// skip whitespace-only freeform HTML content
-				// it usually comes in between blocks
-				if ( ! content.blockName && ! content.trim().length ) {
-					continue;
-				}
-
-				blocks.push( createBlock( 'core/html', { content } ) );
-			}
+			)( { name: blockName, attributes, innerBlocks, innerContent } );
 
 			replaceBlocks( clientId, blocks );
 		},
 		convertToHTML() {
 			replaceBlock( clientId, createBlock( 'core/html', {
-				content: innerContent.join( '' ),
+				content: blockToHTML( { name: blockName, attributes, innerBlocks, innerContent } ),
 			} ) );
 		},
 	};

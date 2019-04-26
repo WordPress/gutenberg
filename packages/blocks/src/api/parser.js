@@ -495,6 +495,7 @@ export function createBlockWithFallback( blockNode ) {
 	// Preserve original content for future use in case the block is parsed as
 	// invalid, or future serialization attempt results in an error.
 	block.originalContent = innerHTML;
+	block.innerContent = innerContent;
 
 	block = getMigratedBlock( block, attributes );
 
