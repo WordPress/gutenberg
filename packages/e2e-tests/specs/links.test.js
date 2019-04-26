@@ -308,7 +308,9 @@ describe( 'Links', () => {
 	} );
 
 	// Test for regressions of https://github.com/WordPress/gutenberg/issues/10496.
-	it( 'allows autocomplete suggestions to be navigated with the keyboard', async () => {
+	// This test isn't reliable on Travis and fails from time to time.
+	// See: https://github.com/WordPress/gutenberg/pull/15211.
+	it.skip( 'allows autocomplete suggestions to be navigated with the keyboard', async () => {
 		const titleText = 'Test post keyboard';
 		const postURL = await createPostWithTitle( titleText );
 
