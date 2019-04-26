@@ -3,11 +3,12 @@
  */
 import React from 'react';
 import { Switch, Platform } from 'react-native';
+import { capitalize, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { BottomSheet } from '@wordpress/block-editor';
 import { prependHTTP } from '@wordpress/url';
@@ -123,6 +124,7 @@ class ModalLinkUI extends Component {
 
 	render() {
 		const { isVisible } = this.props;
+		const { inputValue, text } = this.state;
 
 		return (
 			<BottomSheet
@@ -132,9 +134,19 @@ class ModalLinkUI extends Component {
 			>
 				{ /* eslint-disable jsx-a11y/no-autofocus */
 					<BottomSheet.Cell
+						accessibilityLabel={
+							isEmpty( inputValue ) ?
+								/* translators: accessibility text. Empty URL address. */
+								__( 'URL. Empty' ) :
+								sprintf(
+									/* translators: accessibility text. %s: an URL address (i.e. example.com). */
+									__( 'URL. %s' ),
+									capitalize( inputValue )
+								)
+						}
 						icon={ 'admin-links' }
 						label={ __( 'URL' ) }
-						value={ this.state.inputValue }
+						value={ inputValue }
 						placeholder={ __( 'Add URL' ) }
 						autoCapitalize="none"
 						autoCorrect={ false }
@@ -144,9 +156,19 @@ class ModalLinkUI extends Component {
 					/>
 				/* eslint-enable jsx-a11y/no-autofocus */ }
 				<BottomSheet.Cell
+					accessibilityLabel={
+						isEmpty( text ) ?
+							/* translators: accessibility text. Empty Link Text. A setting of a text with web link attribute. */
+							__( 'Link Text. Empty' ) :
+							sprintf(
+								/* translators: accessibility text. %s: a text with web link attribute. */
+								__( 'Link Text. %s' ),
+								text
+							)
+					}
 					icon={ 'editor-textcolor' }
 					label={ __( 'Link Text' ) }
-					value={ this.state.text }
+					value={ text }
 					placeholder={ __( 'Add Link Text' ) }
 					onChangeValue={ this.onChangeText }
 				/>

@@ -8,6 +8,7 @@ import { TouchableOpacity, Text, View, TextInput, I18nManager } from 'react-nati
  */
 import { Dashicon } from '@wordpress/components';
 import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -31,6 +32,8 @@ export default class Cell extends Component {
 
 	render() {
 		const {
+			accessibilityLabel,
+			accessibilityHint,
 			onPress,
 			label,
 			value,
@@ -118,8 +121,17 @@ export default class Cell extends Component {
 			);
 		};
 
+		const defaultInlineValueHint = __( 'Double tap to edit this value ');
+
 		return (
-			<TouchableOpacity onPress={ onCellPress } style={ { ...styles.clipToBounds, ...style } } >
+			<TouchableOpacity 
+				accessible={ ! this.state.isEditingValue }
+				accessibilityLabel={ accessibilityLabel || label }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ isValueEditable ? defaultInlineValueHint : accessibilityHint }
+				onPress={ onCellPress }
+				style={ { ...styles.clipToBounds, ...style } } 
+			>
 				<View style={ styles.cellContainer }>
 					<View style={ styles.cellRowContainer }>
 						{ icon && (
