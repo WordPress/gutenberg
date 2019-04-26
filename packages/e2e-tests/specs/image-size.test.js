@@ -12,8 +12,6 @@ import uuid from 'uuid/v4';
 import {
 	createNewPost,
 	activatePlugin,
-	clickBlockAppender,
-	clickBlockToolbarButton,
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
@@ -51,10 +49,8 @@ describe( 'changing image size', () => {
 
 		await page.select( '.components-base-control__label + select', value );
 
-		// Get the size of the image{}
+		// Get the size of the image
 		const size = await page.$eval( '.block-library-image__dimensions__width input', ( el ) => parseInt( el.value, 10 ) );
 		expect( size ).toBe( expectedImageWidth );
-
-		expect( console ).toHaveErrored();
 	} );
 } );
