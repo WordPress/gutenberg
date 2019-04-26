@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
-import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -24,8 +22,6 @@ class ParagraphEdit extends Component {
 		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
 		this.onReplace = this.onReplace.bind( this );
-		this.accessibilityContent = this.accessibilityContent.bind( this );
-		props.setAttributes( { getAccessibilityContent: this.accessibilityContent } );
 	}
 
 	/**
@@ -83,21 +79,6 @@ class ParagraphEdit extends Component {
 				} :
 				block
 		) ) );
-	}
-
-	accessibilityContent() {
-		const { attributes } = this.props;
-		const { content } = attributes;
-
-		return isEmpty( content ) ? __( 'Empty' ) : this.plainTextContent( content );
-	}
-
-	plainTextContent( html ) {
-		const result = create( { html } );
-		if ( result ) {
-			return result.text;
-		}
-		return '';
 	}
 
 	render() {

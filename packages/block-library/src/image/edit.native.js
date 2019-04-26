@@ -28,7 +28,7 @@ import {
 	InspectorControls,
 	BottomSheet,
 } from '@wordpress/block-editor';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 
@@ -59,8 +59,6 @@ class ImageEdit extends React.Component {
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
-		this.accessibilityContent = this.accessibilityContent.bind( this );
-		props.setAttributes( { getAccessibilityContent: this.accessibilityContent } );
 	}
 
 	componentDidMount() {
@@ -83,18 +81,6 @@ class ImageEdit extends React.Component {
 		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
 			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
 		}
-	}
-
-	accessibilityContent() {
-		const { attributes } = this.props;
-		const { caption, alt } = attributes;
-
-		return sprintf(
-			/* translators: accessibility text. 1: image alt text. 2: image caption. */
-			_x( '%1$s. %2$s', 'Image block accessibility text: alt, caption' ),
-			alt,
-			caption
-		);
 	}
 
 	onImagePressed() {

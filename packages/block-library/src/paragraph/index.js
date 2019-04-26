@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFinite, omit } from 'lodash';
+import { isEmpty, isFinite, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import {
 	getColorClassName,
 	RichText,
 } from '@wordpress/block-editor';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -36,6 +37,13 @@ const supports = {
 export const settings = {
 	title: __( 'Paragraph' ),
 	description: __( 'Start with the building block of all narrative.' ),
+	getAccessibilityLabel( attributes ) {
+		const { content } = attributes;
+
+		const plainTextContent = ( html ) => create( { html } ).text || '';
+
+		return isEmpty( content ) ? __( 'Empty' ) : plainTextContent( content );
+	},
 	icon,
 	keywords: [ __( 'text' ) ],
 	supports,
