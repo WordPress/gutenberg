@@ -26,8 +26,9 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { addAction, removeAction, hasAction } from '@wordpress/hooks';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { BlockEdit } from '@wordpress/block-editor';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -197,8 +198,23 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		);
 	}
 
+	accessibilityLabel() {
+		const { title, attributes, name } = this.props;
+		if ( name === getUnregisteredTypeHandlerName() ) { // is the block unrecognized?
+			return title; //already localized
+		}
+		else {
+			return sprintf(
+				/* translators: accessibility text. 1: block name. 2: block content information. */
+				_x('%1$s block. %2$s', "Accessibility text for a block"), 
+				title, //already localized
+				attributes.accessibilityContent || '' 
+			);
+		}
+	}
+
 	render() {
-		const { isSelected, borderStyle, focusedBorderColor } = this.props;
+		const { isSelected, borderStyle, focusedBorderColor, attributes } = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
@@ -206,8 +222,8 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 			// accessible prop needs to be false to access children
 			// https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
 			<TouchableWithoutFeedback
-				accessible={ false }
-				accessibilityLabel="block-container"
+				accessible={ ! isSelected }
+				accessibilityLabel={ this.accessibilityLabel() }
 				onPress={ this.onFocus } >
 
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
@@ -243,6 +259,7 @@ export default compose( [
 		const isSelected = isBlockSelected( clientId );
 		const isFirstBlock = order === 0;
 		const isLastBlock = order === getBlocks().length - 1;
+		const title = getBlockType( name ).title;
 
 		return {
 			attributes,
@@ -254,6 +271,7 @@ export default compose( [
 			isLastBlock,
 			isSelected,
 			name,
+			title,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
