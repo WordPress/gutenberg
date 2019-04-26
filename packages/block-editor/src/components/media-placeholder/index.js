@@ -416,6 +416,9 @@ const applyWithSelect = withSelect( ( select ) => {
 	};
 } );
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md
+ */
 export default compose(
 	applyWithSelect,
 	withFilters( 'editor.MediaPlaceholder' ),

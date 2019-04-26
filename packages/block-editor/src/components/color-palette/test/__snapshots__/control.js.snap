@@ -3,16 +3,14 @@
 exports[`ColorPaletteControl matches the snapshot 1`] = `
 <BaseControl
   className="editor-color-palette-control block-editor-color-palette-control"
-  label={
-    <React.Fragment>
-      Test Color
-      <ColorIndicator
-        aria-label="(current test color: red)"
-        colorValue="#f00"
-      />
-    </React.Fragment>
-  }
 >
+  <Component>
+    Test Color
+    <ColorIndicator
+      aria-label="(current test color: red)"
+      colorValue="#f00"
+    />
+  </Component>
   <WithColorContext(ColorPalette)
     className="editor-color-palette-control__color-palette block-editor-color-palette-control__color-palette"
     colors={

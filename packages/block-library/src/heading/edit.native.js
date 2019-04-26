@@ -2,21 +2,22 @@
  * Internal dependencies
  */
 import HeadingToolbar from './heading-toolbar';
+import styles from './editor.scss';
 
 /**
  * External dependencies
  */
 import { View } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { RichText, BlockControls } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-
-import styles from './editor.scss';
+import { create } from '@wordpress/rich-text';
 
 const name = 'core/heading';
 
@@ -73,6 +74,14 @@ class HeadingEdit extends Component {
 		}
 	}
 
+	plainTextContent( html ) {
+		const result = create( { html } );
+		if ( result ) {
+			return result.text;
+		}
+		return '';
+	}
+
 	render() {
 		const {
 			attributes,
@@ -90,7 +99,24 @@ class HeadingEdit extends Component {
 		const tagName = 'h' + level;
 
 		return (
-			<View>
+			<View
+				accessible={ ! this.props.isSelected }
+				accessibilityLabel={
+					isEmpty( content ) ?
+						sprintf(
+							/* translators: accessibility text. %s: heading level. */
+							__( 'Heading block. Level %s. Empty.' ),
+							level
+						) :
+						sprintf(
+							/* translators: accessibility text. 1: heading level. 2: heading content. */
+							__( 'Heading block. Level %1$s. %2$s' ),
+							level,
+							this.plainTextContent( content )
+						)
+				}
+				onAccessibilityTap={ this.props.onFocus }
+			>
 				<BlockControls>
 					<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				</BlockControls>
