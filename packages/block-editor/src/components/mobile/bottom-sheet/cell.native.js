@@ -123,17 +123,17 @@ export default class Cell extends Component {
 		};
 
 		return (
-			<TouchableOpacity 
+			<TouchableOpacity
 				accessible={ ! this.state.isEditingValue }
 				accessibilityLabel={ accessibilityLabel || label }
 				accessibilityRole={ accessibilityRole || 'button' }
-				accessibilityHint={ isValueEditable ? 
+				accessibilityHint={ isValueEditable ?
 					/* translators: accessibility text */
-					__( 'Double tap to edit this value') :
+					__( 'Double tap to edit this value' ) :
 					accessibilityHint
 				}
 				onPress={ onCellPress }
-				style={ { ...styles.clipToBounds, ...style } } 
+				style={ { ...styles.clipToBounds, ...style } }
 			>
 				<View style={ styles.cellContainer }>
 					<View style={ styles.cellRowContainer }>

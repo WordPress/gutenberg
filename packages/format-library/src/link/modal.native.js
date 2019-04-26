@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { Switch, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import { capitalize, isEmpty } from 'lodash';
 
 /**

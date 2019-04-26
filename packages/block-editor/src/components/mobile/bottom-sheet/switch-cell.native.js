@@ -1,5 +1,11 @@
 
+/**
+ * External dependencies
+ */
 import { Switch } from 'react-native';
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
@@ -13,16 +19,12 @@ export default function SwitchCell( props ) {
 		...cellProps
 	} = props;
 
-	const onChange = ( newValue ) => {
-		onChangeValue( newValue );
-	};
-
 	const onPress = () => {
 		onValueChange( ! value );
-	}
+	};
 
 	return (
-		<Cell 
+		<Cell
 			{ ...cellProps }
 			accessibilityRole={ 'none' }
 			accessibilityHint={
