@@ -110,7 +110,10 @@ describe( 'Taxonomies', () => {
 		expect( selectedCategories[ 0 ] ).toEqual( 'z rand category 1' );
 	} );
 
-	it( 'should be able to open the tags panel and create a new tag if the user has the right capabilities', async () => {
+	// This test isn't reliable locally because repeated execution of the test triggers 400 network
+	// because of the tag's duplication. Also, it randomly doesn't add a new tag after pressing enter.
+	// See: https://github.com/WordPress/gutenberg/pull/15211.
+	it.skip( 'should be able to open the tags panel and create a new tag if the user has the right capabilities', async () => {
 		await createNewPost();
 
 		await openDocumentSettingsSidebar();
