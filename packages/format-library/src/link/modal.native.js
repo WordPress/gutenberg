@@ -172,16 +172,19 @@ class ModalLinkUI extends Component {
 					placeholder={ __( 'Add Link Text' ) }
 					onChangeValue={ this.onChangeText }
 				/>
-				<BottomSheet.Cell
+				<BottomSheet.SwitchCell
+					accessibilityLabel={
+						this.state.opensInNewWindow ?
+							/* translators: accessibility text. "Open in New Tab" switch setting in ON state. */
+							__( 'Open in New Tab. On' ) :
+							/* translators: accessibility text. "Open in New Tab" switch setting in OFF state. */
+							__( 'Open in New Tab. Off' )
+					}
 					icon={ 'external' }
 					label={ __( 'Open in New Tab' ) }
-					value={ '' }
-				>
-					<Switch
-						value={ this.state.opensInNewWindow }
-						onValueChange={ this.onChangeOpensInNewWindow }
-					/>
-				</BottomSheet.Cell>
+					value={ this.state.opensInNewWindow }
+					onValueChange={ this.onChangeOpensInNewWindow }
+				/>
 				<BottomSheet.Cell
 					label={ __( 'Remove Link' ) }
 					labelStyle={ styles.clearLinkButton }

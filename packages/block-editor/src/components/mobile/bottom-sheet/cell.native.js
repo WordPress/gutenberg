@@ -34,6 +34,7 @@ export default class Cell extends Component {
 		const {
 			accessibilityLabel,
 			accessibilityHint,
+			accessibilityRole,
 			onPress,
 			label,
 			value,
@@ -127,8 +128,12 @@ export default class Cell extends Component {
 			<TouchableOpacity 
 				accessible={ ! this.state.isEditingValue }
 				accessibilityLabel={ accessibilityLabel || label }
-				accessibilityRole={ 'button' }
-				accessibilityHint={ isValueEditable ? defaultInlineValueHint : accessibilityHint }
+				accessibilityRole={ accessibilityRole || 'button' }
+				accessibilityHint={ isValueEditable ? 
+					/* translators: accessibility text */
+					__( 'Double tap to edit this value ') :
+					accessibilityHint
+				}
 				onPress={ onCellPress }
 				style={ { ...styles.clipToBounds, ...style } } 
 			>
