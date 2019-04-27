@@ -17,7 +17,7 @@ import {
 	requestMetaBoxUpdates,
 	__unstableInitialize,
 } from '../actions';
-import { VIEW_AS_LINK_SELECTOR } from '../constants';
+import { STORE_KEY, VIEW_AS_LINK_SELECTOR } from '../constants';
 
 describe( 'actions', () => {
 	describe( 'openGeneralSidebar', () => {
@@ -192,13 +192,76 @@ describe( 'actions', () => {
 				expect( openSidebar ).toHaveBeenCalledWith( 'edit-post/document' );
 			} );
 		} );
-		// testing of this control is done in in test/controls.js
-		it( 'yields adjustSidebar control descriptor for adjusting the ' +
+		describe( 'yields subscribe control descriptor for adjusting the ' +
 			'sidebar', () => {
 			reset();
 			fulfillment.next();
 			const { value } = fulfillment.next();
-			expect( value ).toEqual( { type: 'ADJUST_SIDEBAR' } );
+			const listenerCallback = value.listenerCallback;
+			const isViewportMatch = jest.fn();
+			const getActiveGeneralSidebarName = jest.fn();
+			const willCloseGeneralSidebar = jest.fn();
+			const willOpenGeneralSidebar = jest.fn();
+			beforeEach( () => {
+				registryMock.select = ( store ) => {
+					const stores = {
+						'core/viewport': { isViewportMatch },
+						[ STORE_KEY ]: { getActiveGeneralSidebarName },
+					};
+					return stores[ store ];
+				};
+				registryMock.dispatch = ( store ) => {
+					const stores = {
+						[ STORE_KEY ]: {
+							closeGeneralSidebar: willCloseGeneralSidebar,
+							openGeneralSidebar: willOpenGeneralSidebar,
+						},
+					};
+					return stores[ store ];
+				};
+				registryMock.subscribe = jest.fn();
+				isViewportMatch.mockReturnValue( true );
+			} );
+			afterEach( () => {
+				isViewportMatch.mockClear();
+				getActiveGeneralSidebarName.mockClear();
+				willCloseGeneralSidebar.mockClear();
+				willOpenGeneralSidebar.mockClear();
+			} );
+			it( 'returns subscribe control descriptor', () => {
+				expect( value.type ).toBe( 'SUBSCRIBE' );
+			} );
+			it( 'initializes and does nothing when viewport is not small', () => {
+				isViewportMatch.mockReturnValue( false );
+				listenerCallback( registryMock )();
+				expect( isViewportMatch ).toHaveBeenCalled();
+				expect( getActiveGeneralSidebarName ).not.toHaveBeenCalled();
+			} );
+			it( 'does not close sidebar if viewport is small and there is no ' +
+				'active sidebar name available', () => {
+				getActiveGeneralSidebarName.mockReturnValue( false );
+				listenerCallback( registryMock )();
+				expect( willCloseGeneralSidebar ).not.toHaveBeenCalled();
+				expect( willOpenGeneralSidebar ).not.toHaveBeenCalled();
+			} );
+			it( 'closes sidebar if viewport is small and there is an active ' +
+				'sidebar name available', () => {
+				getActiveGeneralSidebarName.mockReturnValue( 'someSidebar' );
+				listenerCallback( registryMock )();
+				expect( willCloseGeneralSidebar ).toHaveBeenCalled();
+				expect( willOpenGeneralSidebar ).not.toHaveBeenCalled();
+			} );
+			it( 'opens sidebar if viewport is not small, there is a cached sidebar to ' +
+				'reopen on expand, and there is no current sidebar name available', () => {
+				getActiveGeneralSidebarName.mockReturnValue( 'someSidebar' );
+				const listener = listenerCallback( registryMock );
+				listener();
+				isViewportMatch.mockReturnValue( false );
+				getActiveGeneralSidebarName.mockReturnValue( false );
+				listener();
+				expect( willCloseGeneralSidebar ).toHaveBeenCalledTimes( 1 );
+				expect( willOpenGeneralSidebar ).toHaveBeenCalledTimes( 1 );
+			} );
 		} );
 		describe( 'yields subscribe control descriptor for updating the ' +
 			'view post link when the permalink changes', () => {
