@@ -15,8 +15,7 @@ const blockToHTML = blockTraverser(
 );
 
 function MissingBlockWarning( { attributes: { parsedBlock }, convertToHTML, convertToBlocks } ) {
-	const { name, attributes, innerBlocks, innerContent } = parsedBlock;
-	const hasContent = !! innerContent.length;
+	const hasContent = !! parsedBlock.innerContent.length;
 	const hasHTMLBlock = getBlockType( 'core/html' );
 
 	const actions = [];
@@ -24,7 +23,7 @@ function MissingBlockWarning( { attributes: { parsedBlock }, convertToHTML, conv
 	if ( hasContent && hasHTMLBlock ) {
 		messageHTML = sprintf(
 			__( 'Your site doesn’t include support for the "%s" block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.' ),
-			name
+			parsedBlock.name
 		);
 		actions.push(
 			<Button key="convert" onClick={ convertToHTML } isLarge isPrimary>
@@ -39,7 +38,7 @@ function MissingBlockWarning( { attributes: { parsedBlock }, convertToHTML, conv
 	} else {
 		messageHTML = sprintf(
 			__( 'Your site doesn’t include support for the "%s" block. You can leave this block intact or remove it entirely.' ),
-			name
+			parsedBlock.name
 		);
 	}
 
@@ -48,7 +47,7 @@ function MissingBlockWarning( { attributes: { parsedBlock }, convertToHTML, conv
 			<Warning actions={ actions }>
 				{ messageHTML }
 			</Warning>
-			<RawHTML>{ blockToHTML( { name, attributes, innerContent, innerBlocks } ) }</RawHTML>
+			<RawHTML>{ blockToHTML( parsedBlock ) }</RawHTML>
 		</Fragment>
 	);
 }
