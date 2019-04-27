@@ -31,6 +31,7 @@ describe( 'RichText', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
 		await pressKeyWithModifier( 'primary', 'a' );
+		await page.waitForFunction( () => window.getSelection().toString() === 'test' );
 		await pressKeyWithModifier( 'access', 'd' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -40,6 +41,7 @@ describe( 'RichText', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
 		await pressKeyWithModifier( 'primary', 'a' );
+		await page.waitForFunction( () => window.getSelection().toString() === 'test' );
 		await pressKeyWithModifier( 'primary', 'b' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
