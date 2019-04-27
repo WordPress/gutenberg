@@ -2,17 +2,8 @@
 	"name": "core/missing",
 	"category": "common",
 	"attributes": {
-		"originalName": {
-			"type": "string"
-		},
-		"originalAttributes": {
+		"parsedBlock": {
 			"type": "object"
-		},
-		"originalInnerContent": {
-			"type": "array"
-		},
-		"originalInnerBlocks": {
-			"type": "array"
 		}
 	}
 }

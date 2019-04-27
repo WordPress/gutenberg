@@ -125,3 +125,16 @@ export function normalizeBlockType( blockTypeOrName ) {
 
 	return blockTypeOrName;
 }
+
+export const blockTraverser = ( combiner, initialValue, reducer ) => {
+	const recurse = ( block ) => block.innerContent.reduce(
+		( [ accumulator, blockIndex ], content ) => (
+			null === content ?
+				[ combiner( accumulator, reducer( block.innerBlocks[ blockIndex ], recurse ) ), blockIndex + 1 ] :
+				[ combiner( accumulator, reducer( content, recurse ) ), blockIndex ]
+		),
+		[ initialValue, 0 ]
+	)[ 0 ];
+
+	return recurse;
+};

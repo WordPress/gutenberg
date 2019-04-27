@@ -48,6 +48,7 @@ export {
 	unregisterBlockStyle,
 } from './registration';
 export {
+	blockTraverser,
 	isUnmodifiedDefaultBlock,
 	normalizeIconObject,
 	isValidIcon,

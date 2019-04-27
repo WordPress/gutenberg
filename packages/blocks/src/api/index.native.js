@@ -27,6 +27,7 @@ export {
 	getDefaultBlockName,
 } from './registration';
 export {
+	blockTraverser,
 	isUnmodifiedDefaultBlock,
 	normalizeIconObject,
 } from './utils';

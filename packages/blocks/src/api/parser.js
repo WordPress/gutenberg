@@ -460,10 +460,12 @@ export function createBlockWithFallback( blockNode ) {
 	if ( ! blockType ) {
 		name = unregisteredFallbackBlock;
 		attributes = {
-			originalName,
-			originalAttributes: attributes,
-			originalInnerContent: innerContent,
-			originalInnerBlocks: innerBlocks,
+			parsedBlock: {
+				name: originalName,
+				attributes: blockNode.attrs,
+				innerContent,
+				innerBlocks,
+			},
 		};
 		blockType = getBlockType( name );
 	}
@@ -483,6 +485,14 @@ export function createBlockWithFallback( blockNode ) {
 		getBlockAttributes( blockType, innerHTML, attributes ),
 		innerBlocks
 	);
+
+	// why is this required here? why is `createBlock` zapping them?
+	block.attributes.parsedBlock = {
+		name: originalName,
+		attributes: blockNode.attrs,
+		innerContent,
+		innerBlocks,
+	};
 
 	// Block validation assumes an idempotent operation from source block to serialized block
 	// provided there are no changes in attributes. The validation procedure thus compares the
