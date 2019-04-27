@@ -4,12 +4,6 @@
 import { createRegistryControl } from '@wordpress/data';
 
 /**
- * Internal dependencies
- */
-import { STORE_KEY } from './constants';
-import { onChangeListener } from './utils';
-
-/**
  * Calls a selector using the current state.
  *
  * @param {string} storeName    Store name.
@@ -38,15 +32,6 @@ export function __unstableSubscribe( listenerCallback ) {
 	return { type: 'SUBSCRIBE', listenerCallback };
 }
 
-/**
- * A control for adjusting the sidebar when viewport mobile size is triggered.
- *
- * @return {Object} control.descriptor.
- */
-export function __experimentalAdjustSidebar() {
-	return { type: 'ADJUST_SIDEBAR' };
-}
-
 const controls = {
 	SELECT: createRegistryControl(
 		( registry ) => ( { storeName, selectorName, args } ) => {
@@ -56,44 +41,6 @@ const controls = {
 	SUBSCRIBE: createRegistryControl(
 		( registry ) => ( { listenerCallback } ) => {
 			return registry.subscribe( listenerCallback( registry ) );
-		}
-	),
-	ADJUST_SIDEBAR: createRegistryControl(
-		( registry ) => () => {
-			const isMobileViewPort = () => registry.select( 'core/viewport' )
-				.isViewportMatch( '< medium' );
-			const adjuster = ( () => {
-				// contains the sidebar we close when going to viewport sizes lower than
-				// medium. This allows to reopen it when going again to viewport sizes
-				// greater than medium.
-				let sidebarToReOpenOnExpand = null;
-				return ( isSmall ) => {
-					const { getActiveGeneralSidebarName } = registry.select( STORE_KEY );
-					const {
-						closeGeneralSidebar,
-						openGeneralSidebar,
-					} = registry.dispatch( STORE_KEY );
-					if ( isSmall ) {
-						sidebarToReOpenOnExpand = getActiveGeneralSidebarName();
-						if ( sidebarToReOpenOnExpand ) {
-							closeGeneralSidebar();
-						}
-					} else if (
-						sidebarToReOpenOnExpand &&
-						! getActiveGeneralSidebarName()
-					) {
-						openGeneralSidebar( sidebarToReOpenOnExpand );
-					}
-				};
-			} )();
-			adjuster( isMobileViewPort() );
-
-			// Collapse sidebar when viewport shrinks.
-			// Reopen sidebar it if viewport expands and it was closed because of a
-			// previous shrink.
-			return registry.subscribe(
-				onChangeListener( isMobileViewPort, adjuster )
-			);
 		}
 	),
 };

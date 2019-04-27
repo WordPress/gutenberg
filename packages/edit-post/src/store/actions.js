@@ -6,7 +6,7 @@ import { castArray } from 'lodash';
 /**
  * Internal dependencies
  */
-import { __unstableSubscribe, __experimentalAdjustSidebar } from './controls';
+import { __unstableSubscribe } from './controls';
 import { onChangeListener } from './utils';
 import { STORE_KEY, VIEW_AS_LINK_SELECTOR } from './constants';
 
@@ -268,7 +268,32 @@ export function* __unstableInitialize() {
 		}
 	) );
 	// hide/show the sidebar depending on size of viewport.
-	yield __experimentalAdjustSidebar();
+	yield __unstableSubscribe( ( registry ) => onChangeListener(
+		() => registry.select( 'core/viewport' )
+			.isViewportMatch( '< medium' ),
+		( () => {
+			let sidebarToReOpenOnExpand = null;
+			return ( isSmall ) => {
+				const { getActiveGeneralSidebarName } = registry.select( STORE_KEY );
+				const {
+					closeGeneralSidebar: closeSidebar,
+					openGeneralSidebar: openSidebar,
+				} = registry.dispatch( STORE_KEY );
+				if ( isSmall ) {
+					sidebarToReOpenOnExpand = getActiveGeneralSidebarName();
+					if ( sidebarToReOpenOnExpand ) {
+						closeSidebar();
+					}
+				} else if (
+					sidebarToReOpenOnExpand &&
+					! getActiveGeneralSidebarName()
+				) {
+					openSidebar( sidebarToReOpenOnExpand );
+				}
+			};
+		} )(),
+		true
+	) );
 	// Update View Post link in the admin bar when permalink is updated.
 	yield __unstableSubscribe( ( registry ) => onChangeListener(
 		() => registry.select( 'core/editor' ).getCurrentPost().link,
