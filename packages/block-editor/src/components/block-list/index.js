@@ -217,6 +217,7 @@ class BlockList extends Component {
 								onSelectionStart={ this.onSelectionStart }
 								rootClientId={ rootClientId }
 								isDraggable={ isDraggable }
+								onSelectionEnd={ this.onSelectionEnd }
 							/>
 						</AsyncModeProvider>
 					);

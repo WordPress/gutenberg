@@ -194,17 +194,28 @@ class DropZoneProvider extends Component {
 	}
 
 	onDragOver( event ) {
+		const dragEventType = getDragEventType( event );
+
+		if ( dragEventType === 'html' ) {
+			return;
+		}
+
 		this.toggleDraggingOverDocument( event, getDragEventType( event ) );
 		event.preventDefault();
 	}
 
 	onDrop( event ) {
+		const dragEventType = getDragEventType( event );
+
+		if ( dragEventType === 'html' ) {
+			return;
+		}
+
 		// This seemingly useless line has been shown to resolve a Safari issue
 		// where files dragged directly from the dock are not recognized
 		event.dataTransfer && event.dataTransfer.files.length; // eslint-disable-line no-unused-expressions
 
 		const { position, hoveredDropZone } = this.state;
-		const dragEventType = getDragEventType( event );
 		const dropZone = this.dropZones[ hoveredDropZone ];
 		this.resetDragState();
 
@@ -212,9 +223,6 @@ class DropZoneProvider extends Component {
 			switch ( dragEventType ) {
 				case 'file':
 					dropZone.onFilesDrop( [ ...event.dataTransfer.files ], position );
-					break;
-				case 'html':
-					dropZone.onHTMLDrop( event.dataTransfer.getData( 'text/html' ), position );
 					break;
 				case 'default':
 					dropZone.onDrop( event, position );

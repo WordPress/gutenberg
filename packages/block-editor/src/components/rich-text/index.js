@@ -102,6 +102,46 @@ function createPrepareEditableTree( props ) {
 	}, value.formats );
 }
 
+function extractData( dataTransfer ) {
+	let plainText = '';
+	let html = '';
+
+	// IE11 only supports `Text` as an argument for `getData` and will
+	// otherwise throw an invalid argument error, so we try the standard
+	// arguments first, then fallback to `Text` if they fail.
+	try {
+		plainText = dataTransfer.getData( 'text/plain' );
+		html = dataTransfer.getData( 'text/html' );
+	} catch ( error1 ) {
+		try {
+			html = dataTransfer.getData( 'Text' );
+		} catch ( error2 ) {
+			// Some browsers like UC Browser paste plain text by default and
+			// don't support clipboardData at all, so allow default
+			// behaviour.
+			return;
+		}
+	}
+
+	let { items, files } = dataTransfer;
+
+	// In Edge these properties can be null instead of undefined, so a more
+	// rigorous test is required over using default values.
+	files = isNil( files ) ? [] : [ ...files ];
+	items = isNil( items ) ? [] : [ ...items ];
+
+	items.forEach( ( item ) => {
+		if (
+			item.type.indexOf( 'text/' ) !== 0 &&
+			item.getAsFile
+		) {
+			files.push( item.getAsFile() );
+		}
+	} );
+
+	return { plainText, html, files };
+}
+
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline, selectionStart, selectionEnd } ) {
 		super( ...arguments );
@@ -131,6 +171,7 @@ export class RichText extends Component {
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onPaste = this.onPaste.bind( this );
+		this.onDrop = this.onDrop.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.onInput = this.onInput.bind( this );
 		this.onCompositionEnd = this.onCompositionEnd.bind( this );
@@ -239,45 +280,27 @@ export class RichText extends Component {
 	 * @param {PasteEvent} event The paste event.
 	 */
 	onPaste( event ) {
-		const clipboardData = event.clipboardData;
-		let { items, files } = clipboardData;
+		const data = extractData( event.clipboardData );
 
-		// In Edge these properties can be null instead of undefined, so a more
-		// rigorous test is required over using default values.
-		items = isNil( items ) ? [] : items;
-		files = isNil( files ) ? [] : files;
-
-		let plainText = '';
-		let html = '';
-
-		// IE11 only supports `Text` as an argument for `getData` and will
-		// otherwise throw an invalid argument error, so we try the standard
-		// arguments first, then fallback to `Text` if they fail.
-		try {
-			plainText = clipboardData.getData( 'text/plain' );
-			html = clipboardData.getData( 'text/html' );
-		} catch ( error1 ) {
-			try {
-				html = clipboardData.getData( 'Text' );
-			} catch ( error2 ) {
-				// Some browsers like UC Browser paste plain text by default and
-				// don't support clipboardData at all, so allow default
-				// behaviour.
-				return;
-			}
+		if ( ! data ) {
+			return;
 		}
 
 		event.preventDefault();
 
+		this.onProcessData( this.getRecord(), data );
+	}
+
+	onProcessData( record, { plainText, html, files } ) {
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Received HTML:\n\n', html );
 		window.console.log( 'Received plain text:\n\n', plainText );
 
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
-		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
-		if ( item && ! html ) {
-			const file = item.getAsFile ? item.getAsFile() : item;
+		const file = find( files, ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+
+		if ( file && ! html ) {
 			const content = pasteHandler( {
 				HTML: `<img src="${ createBlobURL( file ) }">`,
 				mode: 'BLOCKS',
@@ -296,8 +319,6 @@ export class RichText extends Component {
 
 			return;
 		}
-
-		const record = this.getRecord();
 
 		// There is a selection, check if a URL is pasted.
 		if ( ! isCollapsed( record ) ) {
@@ -353,6 +374,16 @@ export class RichText extends Component {
 		}
 	}
 
+	onDrop( event ) {
+		const data = extractData( event.dataTransfer );
+
+		// We have to wait until the browser inserts content and updates
+		// selection, so we can overwrite the content at the selection.
+		this.props.setTimeout(
+			() => this.onProcessData( this.createRecord(), data )
+		);
+	}
+
 	/**
 	 * Handles a focus event on the contenteditable field, calling the
 	 * `unstableOnFocus` prop callback if one is defined. The callback does not
@@ -405,6 +436,18 @@ export class RichText extends Component {
 
 		if ( event && event.nativeEvent.inputType ) {
 			const { inputType } = event.nativeEvent;
+
+			// When the browser inserts from drop, discard the content, but keep
+			// the selection. The content is cleaned and inserted by us.
+			if ( inputType === 'insertFromDrop' ) {
+				const { start } = this.createRecord();
+				this.applyRecord( {
+					...this.getRecord(),
+					start,
+					end: start,
+				} );
+				return;
+			}
 
 			// The browser formatted something or tried to insert HTML.
 			// Overwrite it. It will be handled later by the format library if
@@ -1095,6 +1138,7 @@ export class RichText extends Component {
 								className={ className }
 								key={ key }
 								onPaste={ this.onPaste }
+								onDrop={ this.onDrop }
 								onInput={ this.onInput }
 								onCompositionEnd={ this.onCompositionEnd }
 								onKeyDown={ this.onKeyDown }
