@@ -85,6 +85,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Tweak the columns count by increasing it by one.
 		await page.keyboard.press( 'ArrowRight' );
+		await page.waitForSelector( '.wp-block-columns.has-3-columns' );
 
 		// Navigate to the last column in the columns block.
 		await openBlockNavigator();

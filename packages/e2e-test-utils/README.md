@@ -345,10 +345,6 @@ _Parameters_
 -   _key_ `string`: Key to press.
 -   _count_ `number`: Number of times to press.
 
-_Returns_
-
--   `Promise`: Promise resolving when key presses complete.
-
 <a name="pressKeyWithModifier" href="#pressKeyWithModifier">#</a> **pressKeyWithModifier**
 
 Performs a key press with modifier (Shift, Control, Meta, Alt), where each modifier
