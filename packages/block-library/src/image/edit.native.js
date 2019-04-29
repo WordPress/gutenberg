@@ -13,6 +13,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,7 +32,7 @@ import {
 	BottomSheet,
 	Picker,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 
@@ -254,7 +255,7 @@ class ImageEdit extends React.Component {
 		const toolbarEditButton = (
 			<Toolbar>
 				<ToolbarButton
-					label={ __( 'Edit image' ) }
+					title={ __( 'Edit image' ) }
 					icon="edit"
 					onClick={ onMediaOptionsButtonPressed }
 				/>
@@ -328,7 +329,19 @@ class ImageEdit extends React.Component {
 		const progress = this.state.progress * 100;
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
+			<TouchableWithoutFeedback
+				accessible={ ! isSelected }
+
+				accessibilityLabel={ sprintf(
+					/* translators: accessibility text. 1: image alt text. 2: image caption. */
+					__( 'Image block. %1$s. %2$s' ),
+					alt,
+					caption
+				) }
+				accessibilityRole={ 'button' }
+				onPress={ this.onImagePressed }
+				disabled={ ! isSelected }
+			>
 				<View style={ { flex: 1 } }>
 					{ showSpinner && <Spinner progress={ progress } /> }
 					<BlockControls>
@@ -336,7 +349,7 @@ class ImageEdit extends React.Component {
 					</BlockControls>
 					<InspectorControls>
 						<ToolbarButton
-							label={ __( 'Image Settings' ) }
+							title={ __( 'Image Settings' ) }
 							icon="admin-generic"
 							onClick={ onImageSettingsButtonPressed }
 						/>
@@ -370,6 +383,8 @@ class ImageEdit extends React.Component {
 										resizeMethod="scale"
 										source={ { uri: url } }
 										key={ url }
+										accessible={ true }
+										accessibilityLabel={ alt }
 									>
 										{ this.state.isUploadFailed &&
 											<View style={ styles.imageContainer } >
@@ -383,7 +398,21 @@ class ImageEdit extends React.Component {
 						} }
 					</ImageSize>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View style={ { padding: 12, flex: 1 } }>
+						<View
+							style={ { padding: 12, flex: 1 } }
+							accessible={ true }
+							accessibilityLabel={
+								isEmpty( caption ) ?
+									/* translators: accessibility text. Empty image caption. */
+									__( 'Image caption. Empty' ) :
+									sprintf(
+										/* translators: accessibility text. %s: image caption. */
+										__( 'Image caption. %s' ),
+										caption
+									)
+							}
+							accessibilityRole={ 'button' }
+						>
 							<TextInput
 								style={ { textAlign: 'center' } }
 								fontFamily={ this.props.fontFamily || ( styles[ 'caption-text' ].fontFamily ) }

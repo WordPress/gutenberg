@@ -114,6 +114,9 @@ export function withFilteredAutocompleters( Autocomplete ) {
 	};
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/autocomplete/README.md
+ */
 export default compose( [
 	withBlockEditContext( ( { name } ) => {
 		return {

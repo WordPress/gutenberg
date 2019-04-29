@@ -432,6 +432,18 @@
 		"parent": "contributors"
 	},
 	{
+		"title": "Getting Started",
+		"slug": "getting-started",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/getting-started.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Git Workflow",
+		"slug": "git-workflow",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/git-workflow.md",
+		"parent": "develop"
+	},
+	{
 		"title": "Coding Guidelines",
 		"slug": "coding-guidelines",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/coding-guidelines.md",
@@ -441,12 +453,6 @@
 		"title": "Testing Overview",
 		"slug": "testing-overview",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/testing-overview.md",
-		"parent": "develop"
-	},
-	{
-		"title": "Git Workflow",
-		"slug": "git-workflow",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/git-workflow.md",
 		"parent": "develop"
 	},
 	{
@@ -462,9 +468,21 @@
 		"parent": "develop"
 	},
 	{
+		"title": "Managing Packages",
+		"slug": "managing-packages",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/managing-packages.md",
+		"parent": "develop"
+	},
+	{
 		"title": "Gutenberg Release Process",
 		"slug": "release",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/release.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Localizing Gutenberg Plugin",
+		"slug": "localizing",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/localizing.md",
 		"parent": "develop"
 	},
 	{
