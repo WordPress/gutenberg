@@ -33,11 +33,14 @@ class GalleryImage extends Component {
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 
-		// debouncedOnSelect will be called every time any figure's element
-		// is blurred. Every time a figure's element is focused, it'll be cancelled.
+		// The onDeselect prop is used to signal that the GalleryImage component
+		// has lost focus. We want to call it when focus has been lost
+		// by the figure element or any of its children but only if
+		// the element that gained focus isn't any of them.
 		//
-		// We use this to detect whether the figure element has lost focus permanently
-		// or the change was internal (a focus transition from image to caption, for example).
+		// debouncedOnSelect is scheduled every time figure or any of its children
+		// is blurred and cancelled when any is focused. If neither gain focus,
+		// the call to onDeselect will be executed.
 		//
 		// onBlur / onFocus events are quick operations (<5ms apart in my testing),
 		// so 50ms accounts for 10x lagging while feels responsive to the user.
