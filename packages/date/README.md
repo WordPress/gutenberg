@@ -31,7 +31,7 @@ _Returns_
 
 <a name="dateI18n" href="#dateI18n">#</a> **dateI18n**
 
-Formats a date (like `dateI18n()` in PHP).
+Formats a date (like `date_i18n()` in PHP).
 
 _Parameters_
 
