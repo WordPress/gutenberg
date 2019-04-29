@@ -8,7 +8,7 @@ import { flatMap, filter, compact } from 'lodash';
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockContent } from '../serializer';
-import { getBlockAttributes, parseWithGrammar } from '../parser';
+import { getBlockAttributes, blockParser } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import isInlineContent from './is-inline-content';
@@ -133,7 +133,7 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		const content = HTML ? HTML : plainText;
 
 		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
-			return parseWithGrammar( content );
+			return blockParser( content );
 		}
 	}
 

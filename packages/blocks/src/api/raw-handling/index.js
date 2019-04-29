@@ -7,7 +7,7 @@ import { flatMap, filter, compact } from 'lodash';
  * Internal dependencies
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
-import { getBlockAttributes, parseWithGrammar } from '../parser';
+import { getBlockAttributes, blockParser } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import listReducer from './list-reducer';
@@ -88,7 +88,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
 export function rawHandler( { HTML = '' } ) {
 	// If we detect block delimiters, parse entirely as blocks.
 	if ( HTML.indexOf( '<!-- wp:' ) !== -1 ) {
-		return parseWithGrammar( HTML );
+		return blockParser( HTML );
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched

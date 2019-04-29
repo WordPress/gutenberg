@@ -556,15 +556,36 @@ _Returns_
 
 <a name="parse" href="#parse">#</a> **parse**
 
-Parses the post content with a PegJS grammar and returns a list of blocks.
+Transforms an HTML document into a list of Gutenberg Blocks
+
+Parsing is performed in two stage:
+
+-   stage one: transforms an HTML document into parsed block objects
+               these objects contain only those attributes of a block
+               which can be directly inferred from the serialized HTML
+               without additional processing
+
+-   stage two: matches block implementation with each parsed block object
+               this stage performs additional attribute parsing and may
+               make other arbitrary transformations of the block's data
+               as well as upgrade older blocks with registered deprecations
+               it's free to exclude a block entirely from the final list
+
+Failure behaviors are the responsibility of the second stage of parsing
+
+-   No supported block implementation can be found for a block: e.g. missing plugin
+-   Non-block content is found inside the document: e.g. freeform content between blocks
+-   Failure to validate block implementation given parsed block attributes: e.g. corrupt document
+
+The second-stage parser should attempt to preserve or gracefully handle failures.
 
 _Parameters_
 
--   _content_ `string`: The post content.
+-   _content_ `string`: HTML string which may contain serialized Gutenberg Blocks
 
 _Returns_
 
--   `Array`: Block list.
+-   `Array<Object>`: List of blocks attached to their implementations: e.g. a paragraph block
 
 <a name="parseWithAttributeSchema" href="#parseWithAttributeSchema">#</a> **parseWithAttributeSchema**
 
