@@ -120,6 +120,7 @@ class ParagraphEdit extends Component {
 				onAccessibilityTap={ this.props.onFocus }
 			>
 				<RichText
+					identifier="content"
 					tagName="p"
 					value={ content }
 					isSelected={ this.props.isSelected }
