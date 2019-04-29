@@ -121,6 +121,7 @@ class HeadingEdit extends Component {
 					<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				</BlockControls>
 				<RichText
+					identifier="content"
 					tagName={ tagName }
 					value={ content }
 					isSelected={ this.props.isSelected }

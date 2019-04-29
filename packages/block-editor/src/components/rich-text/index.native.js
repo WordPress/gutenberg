@@ -12,7 +12,7 @@ import { View, Platform } from 'react-native';
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { BlockFormatControls } from '@wordpress/block-editor';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	applyFormat,
 	getActiveFormat,
@@ -494,6 +494,7 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = true; // Selection change event always fires after the fact
 			this.props.onChange( this.lastContent );
 		}
+		this.props.onSelectionChange(realStart, realEnd);
 	}
 
 	isEmpty() {
@@ -800,6 +801,21 @@ const RichTextContainer = compose( [
 			isSelected: context.isSelected,
 			onFocus: context.onFocus || ownProps.onFocus,
 			onCaretVerticalPositionChange: context.onCaretVerticalPositionChange,
+		};
+	} ),
+	withDispatch( ( dispatch, {
+		clientId,
+		instanceId,
+		identifier = instanceId,
+	} ) => {
+		const {
+			selectionChange,
+		} = dispatch( 'core/block-editor' );
+
+		return {
+			onSelectionChange( start, end ) {
+				selectionChange( clientId, identifier, start, end );
+			},
 		};
 	} ),
 ] )( RichText );
