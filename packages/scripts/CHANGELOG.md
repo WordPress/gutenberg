@@ -1,10 +1,11 @@
 ## Unreleased
 
-### New Feature
+### New Features
 
-- Leverage `@wordpress/dependency-extraction-webpack-plugin` plugin to extract WordPress
-  dependencies.
+- Leverage `@wordpress/dependency-extraction-webpack-plugin` plugin to extract WordPress dependencies.
 - The bundled `eslint` dependency has been updated from requiring `^5.12.1` to requiring `^5.16.0`.
+- The bundled `puppeteer` dependency has been updated from requiring `1.6.1` to requiring `^1.15.0` ([#14986](https://github.com/WordPress/gutenberg/pull/14986)). It uses Chromium v75 instead of Chromium v69.
+- The bundled `jest-puppeteer` dependency has been updated from requiring `^4.0.0` to requiring `^4.1.1` ([#14986](https://github.com/WordPress/gutenberg/pull/14986)).
 
 ### Enhancements
 
