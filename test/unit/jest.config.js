@@ -25,7 +25,4 @@ module.exports = {
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
 	],
-	transformIgnorePatterns: [
-		'node_modules/(?!(simple-html-tokenizer)/)',
-	],
 };
