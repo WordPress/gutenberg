@@ -38,7 +38,7 @@
 		"lodash": "^4.17.11",
 		"rememo": "^3.0.0",
 		"showdown": "^1.8.6",
-		"simple-html-tokenizer": "^0.4.1",
+		"simple-html-tokenizer": "^0.5.7",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^3.3.2"
 	},
