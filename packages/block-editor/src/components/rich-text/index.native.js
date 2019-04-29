@@ -740,6 +740,7 @@ export class RichText extends Component {
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ this.props.disableEditingMenu }
 					isMultiline={ this.isMultiline }
+					textAlign={ this.props.textAlign }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>

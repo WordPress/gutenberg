@@ -452,6 +452,7 @@ class ImageEdit extends React.Component {
 								isSelected={ this.state.isCaptionSelected }
 								fontSize={ 14 }
 								underlineColorAndroid="transparent"
+								textAlign={ 'center' }
 							/>
 						</View>
 					) }
