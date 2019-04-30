@@ -35,11 +35,6 @@ module.exports = function( babel ) {
 	function getOptions( state ) {
 		if ( ! state._options ) {
 			state._options = Object.assign( {}, DEFAULT_OPTIONS, state.opts );
-			if ( state._options.isDefault && state._options.scopeVariableFrag ) {
-				// eslint-disable-next-line no-console
-				console.warn( 'scopeVariableFrag is only available when isDefault is false' );
-				state._options.scopeVariableFrag = null;
-			}
 		}
 
 		return state._options;
