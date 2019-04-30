@@ -12,7 +12,7 @@ buildscript {
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
 
-        aztecVersion = 'list-block-fix-try2'
+        aztecVersion = 'list-block-fix-try3'
     }
 
     repositories {
@@ -27,6 +27,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
 
 // import the `readReactNativeVersion()` function
@@ -62,6 +63,7 @@ android {
         main {
             dirs.each { dir ->
                 java.srcDirs "src/${dir}/java"
+                java.srcDirs += "src/${dir}/kotlin"
                 res.srcDirs "src/${dir}/res"
             }
         }

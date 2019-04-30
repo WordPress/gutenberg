@@ -42,7 +42,6 @@ import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
 import org.wordpress.aztec.plugins.wpcomments.HiddenGutenbergPlugin;
 import org.wordpress.aztec.plugins.wpcomments.WordPressCommentsPlugin;
 import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
-import org.wordpress.aztec.watchers.EnterPressedUnderway;
 
 import java.util.Map;
 import java.util.ArrayList;
@@ -413,6 +412,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     @ReactProp(name = "onPaste", defaultBoolean = false)
     public void setOnPasteHandling(final ReactAztecText view, boolean onPasteHandling) {
         view.shouldHandleOnPaste = onPasteHandling;
+    }
+
+    @ReactProp(name = "deleteEnter", defaultBoolean = false)
+    public void setShouldDeleteEnter(final ReactAztecText view, boolean shouldDeleteEnter) {
+        view.shouldDeleteEnter = shouldDeleteEnter;
     }
 
     @Override
