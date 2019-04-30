@@ -63,13 +63,29 @@ yarn android
 
 The app should now open in a connected device or a running emulator and fetch the JavaScript code from the running packager.
 
-To compile and run the iOS variant of the app, use:
+To compile and run the iOS variant of the app using the _default_ simulator device, use:
 
 ```
 yarn ios
 ```
 
 which will attempt to open your app in the iOS Simulator if you're on a Mac and have it installed.
+
+### Running on Other iOS Devices
+
+To compile and run the app using a different device, open the target device in Xcode by going to `Hardware > Device`, then use:
+
+```
+yarn ios --simulator="DEVICE_NAME"
+```
+
+For example, if you'd like to run in an iPhone Xs Max, try:
+
+```
+yarn ios --simulator="iPhone Xs Max"
+```
+
+To see a list of all of your available iOS devices, use `xcrun simctl list devices`.
 
 ### When things seem crazy
 
@@ -109,21 +125,21 @@ This project is set up to use [jest](https://facebook.github.io/jest/) for tests
 
 ## UI Tests
 
-This repository uses Appium to run UI tests. The tests live in `__device-tests__` and are written using Appium to run tests against simulators and real devices. To run these you'll need to check off a few things: 
+This repository uses Appium to run UI tests. The tests live in `__device-tests__` and are written using Appium to run tests against simulators and real devices. To run these you'll need to check off a few things:
 
-* For now when running the tests you'll need to ensure the metro bundler is not running. 
-* [Appium cli](https://github.com/appium/appium/blob/master/docs/en/about-appium/getting-started.md) installed and available globally, I'd also recommend using [appium doctor](https://github.com/appium/appium-doctor) to ensure all of Appium's dependencies are good to go. You don't have to worry about starting the server yourself, the tests handle starting the server on port 4723, just be sure that the port is free or feel free to change the port number in the test file. 
+* For now when running the tests you'll need to ensure the metro bundler is not running.
+* [Appium cli](https://github.com/appium/appium/blob/master/docs/en/about-appium/getting-started.md) installed and available globally, I'd also recommend using [appium doctor](https://github.com/appium/appium-doctor) to ensure all of Appium's dependencies are good to go. You don't have to worry about starting the server yourself, the tests handle starting the server on port 4723, just be sure that the port is free or feel free to change the port number in the test file.
 * For iOS a simulator should automatically launch but for Android you'll need to have an emulator *with at least platform version 8.0* fired up and running.
 
-After those are checked off to run the UI tests on iOS run 
+After those are checked off to run the UI tests on iOS run
 
 `yarn test:e2e:ios:local`
 
-and for android run, 
+and for android run,
 
 `yarn test:e2e:android:local`
 
-Note, you might experience problems that seem to be related to the tests starting the Appium server, for example errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. Sorry about that this is still a WIP, you can manually start the Appium server via [appium desktop](https://github.com/appium/appium-desktop) or the cli, then change the port number in the tests while optionally commenting out related code in the `beforeAll` and `afterAll` block. 
+Note, you might experience problems that seem to be related to the tests starting the Appium server, for example errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. Sorry about that this is still a WIP, you can manually start the Appium server via [appium desktop](https://github.com/appium/appium-desktop) or the cli, then change the port number in the tests while optionally commenting out related code in the `beforeAll` and `afterAll` block.
 
 ## Static analysis and code style
 
