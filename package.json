@@ -57,10 +57,10 @@
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
-		"@babel/core": "7.4.3",
+		"@babel/core": "7.4.4",
 		"@babel/plugin-syntax-jsx": "7.2.0",
-		"@babel/runtime-corejs3": "7.4.3",
-		"@babel/traverse": "7.4.3",
+		"@babel/runtime-corejs3": "7.4.4",
+		"@babel/traverse": "7.4.4",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
