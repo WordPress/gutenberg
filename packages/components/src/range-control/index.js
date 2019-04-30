@@ -35,8 +35,7 @@ function RangeControl( {
 } ) {
 	const id = `inspector-range-control-${ instanceId }`;
 	const currentInputValue = currentInput === null ? value : currentInput;
-	const initialInputValue = ! ( initialValue && min <= initialValue && max >= initialValue ) ?
-		undefined : parseFloat( initialValue );
+	const initialInputValue = ( initialValue && initialValue >= min && initialValue <= max ) ? parseFloat( initialValue ) : undefined;
 	const resetValue = () => {
 		resetCurrentInput();
 		onChange( initialInputValue );
