@@ -195,9 +195,9 @@ class LatestPostsEdit extends Component {
 						if ( post.excerpt.raw === '' ) {
 							excerpt = post.content.raw;
 						}
-						const temp = document.createElement( 'div' );
-						temp.innerHTML = excerpt;
-						excerpt = temp.textContent || temp.innerText || '';
+						const excerptElement = document.createElement( 'div' );
+						excerptElement.innerHTML = excerpt;
+						excerpt = excerptElement.textContent || excerptElement.innerText || '';
 						return (
 							<li key={ i }>
 								<a href={ post.link } target="_blank" rel="noreferrer noopener">
