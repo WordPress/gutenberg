@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { map, some } from 'lodash';
 
 /**
@@ -134,8 +135,25 @@ export const settings = {
 			attributes: {
 				...blockAttributes,
 				images: {
-					...blockAttributes.images,
+					type: 'array',
+					default: [],
+					source: 'query',
 					selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
+					query: {
+						url: {
+							source: 'attribute',
+							attribute: 'src',
+						},
+						alt: {
+							source: 'attribute',
+							attribute: 'alt',
+							default: '',
+						},
+						id: {
+							source: 'attribute',
+							attribute: 'data-id',
+						},
+					},
 				},
 				align: {
 					type: 'string',
@@ -145,8 +163,12 @@ export const settings = {
 
 			save( { attributes } ) {
 				const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+				const className = classnames( `columns-${ columns }`, {
+					alignnone: align === 'none',
+					'is-cropped': imageCrop,
+				} );
 				return (
-					<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+					<div className={ className } >
 						{ images.map( ( image ) => {
 							let href;
 
