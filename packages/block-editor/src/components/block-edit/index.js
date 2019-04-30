@@ -31,13 +31,14 @@ class BlockEdit extends Component {
 	}
 
 	static getDerivedStateFromProps( props ) {
-		const { clientId, name, isSelected, onFocus } = props;
+		const { clientId, name, isSelected, onFocus, onCaretVerticalPositionChange } = props;
 
 		return {
 			name,
 			isSelected,
 			clientId,
 			onFocus,
+			onCaretVerticalPositionChange,
 		};
 	}
 

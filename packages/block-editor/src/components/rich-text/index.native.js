@@ -766,6 +766,7 @@ const RichTextContainer = compose( [
 			return {
 				isSelected: context.isSelected,
 				clientId: context.clientId,
+				onCaretVerticalPositionChange: context.onCaretVerticalPositionChange,
 			};
 		}
 
@@ -774,6 +775,7 @@ const RichTextContainer = compose( [
 			clientId: context.clientId,
 			isSelected: context.isSelected,
 			onFocus: context.onFocus || ownProps.onFocus,
+			onCaretVerticalPositionChange: context.onCaretVerticalPositionChange,
 		};
 	} ),
 ] )( RichText );
