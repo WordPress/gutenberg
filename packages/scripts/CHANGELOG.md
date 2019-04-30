@@ -4,6 +4,7 @@
 
 - Leverage `@wordpress/dependency-extraction-webpack-plugin` plugin to extract WordPress
   dependencies.
+- The bundled `eslint` dependency has been updated from requiring `^5.12.1` to requiring `^5.16.0`.
 
 ### Enhancements
 

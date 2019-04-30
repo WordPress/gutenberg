@@ -100,7 +100,7 @@ describe( 'Preview', () => {
 
 		// When autosave completes for a new post, the URL of the editor should
 		// update to include the ID. Use this to assert on preview URL.
-		const [ , postId ] = await( await editorPage.waitForFunction( () => {
+		const [ , postId ] = await ( await editorPage.waitForFunction( () => {
 			return window.location.search.match( /[\?&]post=(\d+)/ );
 		} ) ).jsonValue();
 
