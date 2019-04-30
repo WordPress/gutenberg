@@ -47,6 +47,6 @@ It is set by default by the WordPress function [`user_can_richedit`](https://dev
 
 
 #### `codeEditingEnabled`
-Default `true`. Sets if the user can access the code editor **in adition** to the visual editor.
+Default `true`. Indicates whether the user can access the Code Editor **in addition** to the Visual Editor.
 
 If set to false the user will not be able to switch between Visual and Code editor. The option in the settings menu will not be available and the keyboard shortcut for switching editor types will not fire.  
