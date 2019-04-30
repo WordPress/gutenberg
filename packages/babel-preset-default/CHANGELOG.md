@@ -1,8 +1,9 @@
-## 4.1.0 (unreleased)
+## Unreleased
 
-### New Feature
+### New Features
 
 - Handle `<></>` JSX Fragments with `@wordpress/element` `Fragment` ([#15120](https://github.com/WordPress/gutenberg/pull/15120)).
+- The bundled `@babel/core` dependency has been updated from requiring `^7.2.2` to requiring `^7.4.4`. Babel preset is now using `core-js@3` instead of `core-js@2` (see [Migration Guide](https://babeljs.io/blog/2019/03/19/7.4.0#migration-from-core-js-2)).
 
 ## 4.0.0 (2019-03-06)
 
