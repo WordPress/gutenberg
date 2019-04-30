@@ -7,6 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -15,7 +17,14 @@ import {
 	withColors,
 } from '@wordpress/block-editor';
 
-function GroupEdit( { className, setBackgroundColor, backgroundColor } ) {
+const renderAppender = () => <InnerBlocks.ButtonBlockAppender />;
+
+function GroupEdit( {
+	className,
+	setBackgroundColor,
+	backgroundColor,
+	hasInnerBlocks,
+} ) {
 	const styles = {
 		backgroundColor: backgroundColor.color,
 	};
@@ -39,10 +48,25 @@ function GroupEdit( { className, setBackgroundColor, backgroundColor } ) {
 				/>
 			</InspectorControls>
 			<div className={ classes } style={ styles }>
-				<InnerBlocks />
+				<InnerBlocks
+					renderAppender={ ! hasInnerBlocks && renderAppender }
+				/>
 			</div>
 		</Fragment>
 	);
 }
 
-export default withColors( 'backgroundColor' )( GroupEdit );
+export default compose( [
+	withColors( 'backgroundColor' ),
+	withSelect( ( select, { clientId } ) => {
+		const {
+			getBlock,
+		} = select( 'core/block-editor' );
+
+		const block = getBlock( clientId );
+
+		return {
+			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+		};
+	} ),
+] )( GroupEdit );
