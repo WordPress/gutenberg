@@ -6,7 +6,6 @@ import { last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createElement } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
@@ -22,17 +21,17 @@ function BlockListAppender( {
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
-	renderAppender,
+	renderAppender: CustomAppender,
 } ) {
 	if ( isLocked ) {
 		return null;
 	}
 
 	// A render prop has been provided, use it to render the appender.
-	if ( renderAppender ) {
+	if ( CustomAppender ) {
 		return (
 			<div className="block-list-appender">
-				{ createElement( renderAppender ) }
+				<CustomAppender />
 			</div>
 		);
 	}
