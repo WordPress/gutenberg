@@ -37,7 +37,9 @@ const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/
 const TEMPLATE = [
 	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
 ];
-const applyWidthConstraints = ( width ) => Math.max( 15, Math.min( width, 85 ) );
+// this limits the resize to a safe zone to avoid making broken layouts
+const WIDTH_CONSTRAINT_PERCENTAGE = 15;
+const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
 class MediaTextEdit extends Component {
 	constructor() {
