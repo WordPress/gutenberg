@@ -1,0 +1,191 @@
+@mixin flex-full-height() {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+
+// These margins make sure that nested blocks stack/overlay with the parent block chrome
+// This is sort of an experiment at making sure the editor looks as much like the end result as possible
+// Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
+// When using CSS grid, margins do not collapse on the container.
+.wp-block-columns .editor-block-list__layout {
+	margin-left: 0;
+	margin-right: 0;
+
+	// This max-width is used to constrain the main editor column, it should not cascade into columns
+	.editor-block-list__block {
+		max-width: none;
+	}
+}
+
+// Fullwide: show margin left/right to ensure there's room for the side UI.
+// This is not a 1:1 preview with the front-end where these margins would presumably be zero.
+.editor-block-list__block[data-align="full"] [data-type="core/columns"][data-align="full"] .wp-block-columns > .editor-inner-blocks {
+	padding-left: $block-padding;
+	padding-right: $block-padding;
+
+	@include break-small() {
+		padding-left: $block-container-side-padding;
+		padding-right: $block-container-side-padding;
+	}
+}
+
+.wp-block-columns {
+	display: block;
+
+	> .editor-inner-blocks > .editor-block-list__layout {
+		display: flex;
+
+		// Responsiveness: Allow wrapping on mobile.
+		flex-wrap: wrap;
+
+		@include break-medium() {
+			flex-wrap: nowrap;
+		}
+		// Set full heights on Columns to enable vertical alignment preview
+		> [data-type="core/column"],
+		> [data-type="core/column"] > .editor-block-list__block-edit,
+		> [data-type="core/column"] > .editor-block-list__block-edit > div[data-block],
+		> [data-type="core/column"] > .editor-block-list__block-edit .block-core-columns {
+			@include flex-full-height();
+		}
+		// Adjust the individual column block.
+		> [data-type="core/column"] {
+
+			// On mobile, only a single column is shown, so match adjacent block paddings.
+			padding-left: 0;
+			padding-right: 0;
+			margin-left: -$block-padding;
+			margin-right: -$block-padding;
+
+			// Prevent the columns from growing wider than their distributed sizes.
+			min-width: 0;
+
+			// Prevent long unbroken words from overflowing.
+			word-break: break-word; // For back-compat.
+			overflow-wrap: break-word; // New standard.
+
+			// Responsiveness: Show at most one columns on mobile.
+			flex-basis: 100%;
+
+			// Beyond mobile, allow 2 columns.
+			@include break-small() {
+				flex-basis: calc(50% - (#{$grid-size-large} + #{$block-padding * 2}));
+				flex-grow: 0;
+				margin-left: $block-padding;
+				margin-right: $block-padding;
+			}
+
+			// Add space between columns. Themes can customize this if they wish to work differently.
+			// This has to match the same padding applied in style.scss.
+			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
+			@include break-small() {
+				&:nth-child(even) {
+					margin-left: calc(#{$grid-size-large * 2} + #{$block-padding});
+				}
+			}
+
+			// When columns are in a single row, add space before all except the first.
+			@include break-medium() {
+				&:not(:first-child) {
+					margin-left: calc(#{$grid-size-large * 2} + #{$block-padding});
+				}
+			}
+
+			> .editor-block-list__block-edit {
+				margin-top: 0;
+				margin-bottom: 0;
+
+				// Remove Block "padding" so individual Column is flush with parent Columns
+				&::before {
+					left: 0;
+					right: 0;
+				}
+
+				> .editor-block-contextual-toolbar {
+					margin-left: -$border-width;
+				}
+
+				// Zero out margins.
+				> [data-block] {
+					margin-top: 0;
+					margin-bottom: 0;
+				}
+
+				// The Columns block is a flex-container, therefore it nullifies margin collapsing.
+				// Therefore, blocks inside this will appear to create a double margin.
+				// We compensate for this using negative margins.
+				> div > .block-core-columns > .editor-inner-blocks {
+					margin-top: -$default-block-margin;
+					margin-bottom: -$default-block-margin;
+				}
+			}
+		}
+	}
+}
+
+/**
+ * Columns act as as a "passthrough container"
+ * and therefore has its vertical margins/padding removed via negative margins
+ * therefore we need to compensate for this here by doubling the spacing on the
+ * vertical to ensure there is equal visual spacing around the inserter. Note there
+ * is no formal API for a "passthrough" Block so this is an edge case overide
+ */
+[data-type="core/columns"] .block-list-appender {
+	margin-top: $block-padding*2;
+	margin-bottom: $block-padding*2;
+}
+
+/**
+ * Vertical Alignment Preview
+ * note: specificity is important here to ensure individual
+ * * columns alignment is prioritised over parent column alignment
+ *
+ */
+.are-vertically-aligned-top .block-core-columns,
+div.block-core-columns.is-vertically-aligned-top {
+	justify-content: flex-start;
+}
+
+.are-vertically-aligned-center .block-core-columns,
+div.block-core-columns.is-vertically-aligned-center {
+	justify-content: center;
+}
+
+.are-vertically-aligned-bottom .block-core-columns,
+div.block-core-columns.is-vertically-aligned-bottom {
+	justify-content: flex-end;
+}
+
+
+/**
+ * Fixes single Column breadcrumb to RHS of Block boundary
+ */
+[data-type="core/column"] > .editor-block-list__block-edit > .editor-block-list__breadcrumb {
+	right: 0;
+}
+
+// The empty state of a columns block has the default appenders.
+// Since those appenders are not blocks, the parent, actual block, appears "hovered" when hovering the appenders.
+// Because the column shouldn't be hovered as part of this temporary passthrough, we unset the hover style.
+.wp-block-columns [data-type="core/column"].is-hovered {
+	> .block-editor-block-list__block-edit::before {
+		content: none;
+	}
+
+	.block-editor-block-list__breadcrumb {
+		display: none;
+	}
+}
+
+// In absence of making the individual columns resizable, we prevent them from being clickable.
+// This makes them less fiddly. @todo: This should be revisited as the interface is refined.
+.wp-block-columns [data-type="core/column"] {
+	pointer-events: none;
+
+	// This selector re-enables clicking on any child of a column block.
+	.block-core-columns .block-editor-block-list__layout {
+		pointer-events: all;
+	}
+}

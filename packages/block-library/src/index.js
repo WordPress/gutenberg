@@ -15,6 +15,8 @@ import {
 /**
  * Internal dependencies
  */
+import * as socialLinks from './social-links';
+import * as socialLink from './social-links/social-link';
 import * as paragraph from './paragraph';
 import * as image from './image';
 import * as heading from './heading';
@@ -48,7 +50,6 @@ import * as search from './search';
 import * as group from './group';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
-import * as social from './social';
 import * as spacer from './spacer';
 import * as subhead from './subhead';
 import * as table from './table';
@@ -112,7 +113,8 @@ export const registerCoreBlocks = () => {
 		search,
 		separator,
 		reusableBlock,
-		social,
+		socialLinks,
+		socialLink,
 		spacer,
 		subhead,
 		table,
