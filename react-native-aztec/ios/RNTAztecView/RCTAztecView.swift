@@ -34,6 +34,14 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
+    override var textAlignment: NSTextAlignment {
+        didSet {
+            super.textAlignment = textAlignment
+            defaultParagraphStyle.alignment = textAlignment
+            placeholderLabel.textAlignment = textAlignment
+        }
+    }
+
     var blockModel = BlockModel(tag: "") {
         didSet {
             forceTypingAttributesIfNeeded()
@@ -123,15 +131,17 @@ class RCTAztecView: Aztec.TextView {
         delegate = self
         textContainerInset = .zero
         contentInset = .zero
-        textContainer.lineFragmentPadding = 0        
+        textContainer.lineFragmentPadding = 0
         addPlaceholder()
     }
 
     func addPlaceholder() {
         addSubview(placeholderLabel)
+        let topConstant = contentInset.top + textContainerInset.top
         NSLayoutConstraint.activate([
             placeholderHorizontalConstraint,
-            placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: contentInset.top + textContainerInset.top)
+            placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: topConstant),
+            placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor),
         ])
     }
 
