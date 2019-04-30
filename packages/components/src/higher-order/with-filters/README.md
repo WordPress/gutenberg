@@ -7,7 +7,8 @@ Wrapping a component with `withFilters` provides a filtering capability controll
 ## Usage
 
 ```jsx
-import { Fragment, withFilters } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
+import { withFilters } from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
 
 const MyComponent = ( { title } ) => <h1>{ title }</h1>;
@@ -37,7 +38,8 @@ const MyComponentWithFilters = withFilters( 'MyHookName' )( MyComponent );
 It is also possible to override props by implementing a higher-order component which works as follows:
 
 ```jsx
-import { Fragment, withFilters } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
+import { withFilters } from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
 
 const MyComponent = ( { hint, title } ) => (
