@@ -501,7 +501,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
             // if the "Enter" handling is underway, don't sent text change events. The ReactAztecEnterEvent will have
             // the text (minus the Enter char itself).
-            if (mEditText.getText().getSpans(0, 0, EnterPressedUnderway.class).length == 0) {
+            if (!mEditText.isEnterPressedUnderway()) {
                 int currentEventCount = mEditText.incrementAndGetEventCounter();
                 // The event that contains the event counter and updates it must be sent first.
                 // TODO: t7936714 merge these events
