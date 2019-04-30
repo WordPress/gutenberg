@@ -187,7 +187,7 @@ class ParagraphBlock extends Component {
 							value={ fontSize.size }
 							onChange={ setFontSize }
 						/>
-						{ align === 'left' &&
+						{ ( align === 'left' || ! align ) &&
 							<ToggleControl
 								label={ __( 'Drop Cap' ) }
 								checked={ !! dropCap }
