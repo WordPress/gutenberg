@@ -1,3 +1,9 @@
+## 4.1.0 (unreleased)
+
+### New Feature
+
+- Handle `<></>` JSX Fragments with `@wordpress/element` `Fragment` ([#15120](https://github.com/WordPress/gutenberg/pull/15120)).
+
 ## 4.0.0 (2019-03-06)
 
 ### Breaking Change
