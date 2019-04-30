@@ -43,7 +43,7 @@ The filter will send any setting to the initialized Editor, which means any edit
 #### `richEditingEnabled`
 If it is `true` the user can edit the content using the Visual Editor.
 
-It is set by default by the WordPress function [`user_can_richedit`](https://developer.wordpress.org/reference/functions/user_can_richedit/). This function checks if the user can access the visual editor and that it’s supported by the user’s browser.
+It is set by default to the return value of the [`user_can_richedit`](https://developer.wordpress.org/reference/functions/user_can_richedit/) function. It checks if the user can access the Visual Editor and whether it’s supported by the user’s browser.
 
 
 #### `codeEditingEnabled`
