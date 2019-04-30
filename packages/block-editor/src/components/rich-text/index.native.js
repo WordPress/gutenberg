@@ -104,7 +104,6 @@ export class RichText extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
-		this.onFormatChangeForceChild = this.onFormatChangeForceChild.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
@@ -211,10 +210,6 @@ export class RichText extends Component {
 		} ).map( ( name ) => gutenbergFormatNamesToAztec[ name ] ).filter( Boolean );
 	}
 
-	onFormatChangeForceChild( record ) {
-		this.onFormatChange( record, true );
-	}
-
 	onFormatChange( record, doUpdateChild = true ) {
 		let newContent;
 		// valueToFormat might throw when converting the record to a tree structure
@@ -302,7 +297,7 @@ export class RichText extends Component {
 		if ( this.multilineTag ) {
 			if ( event.shiftKey ) {
 				const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
-				this.onFormatChangeForceChild( insertedLineBreak );
+				this.onFormatChange( insertedLineBreak );
 			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
 				this.setState( {
 					needsSelectionUpdate: false,
@@ -314,7 +309,7 @@ export class RichText extends Component {
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
 			const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
-			this.onFormatChangeForceChild( insertedLineBreak );
+			this.onFormatChange( insertedLineBreak );
 		} else {
 			this.splitContent( currentRecord );
 		}
@@ -713,7 +708,7 @@ export class RichText extends Component {
 						onTagNameChange={ onTagNameChange }
 						tagName={ tagName }
 						value={ record }
-						onChange={ this.onFormatChangeForceChild }
+						onChange={ this.onFormatChange }
 					/>
 				) }
 				{ isSelected && (
