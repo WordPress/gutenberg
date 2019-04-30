@@ -60,9 +60,7 @@ module.exports = function( babel ) {
 					return;
 				}
 
-				if ( path.type === 'JSXFragment' ) {
-					state.hasUndeclaredScopeVariableFrag = ! path.scope.hasBinding( scopeVariableFrag );
-				}
+				state.hasUndeclaredScopeVariableFrag = ! path.scope.hasBinding( scopeVariableFrag );
 			},
 			Program: {
 				exit( path, state ) {
