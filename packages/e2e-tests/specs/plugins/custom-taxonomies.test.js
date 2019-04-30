@@ -4,7 +4,7 @@
 import {
 	activatePlugin,
 	createNewPost,
-	deactivatePlugin,
+	deactivatePlugin, findSidebarPanelWithTitle, openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Custom Taxonomies labels are used', () => {
@@ -21,14 +21,23 @@ describe( 'Custom Taxonomies labels are used', () => {
 	} );
 
 	it( 'Ensures the custom taxonomy labels are respected', async () => {
-		const [ button ] = await page.$x( "//button[contains(text(), 'Model') and contains(@class, 'components-button')]" );
-		expect( button ).not.toBeFalsy();
+		// Open the Setting sidebar.
+		await openDocumentSettingsSidebar();
 
+		const openButton = await findSidebarPanelWithTitle( 'Model' );
+		expect( openButton ).not.toBeFalsy();
+
+		// Get the classes from the panel
+		const buttonClassName = await( await openButton.getProperty( 'className' ) ).jsonValue();
+
+		// Open the panel if needed.
+		if ( -1 === buttonClassName.indexOf( 'is-opened' ) ) {
+			await openButton.click();
+		}
+
+		// Check the add new button
 		const labelNew = await page.$x( "//label[@class='components-form-token-field__label' and contains(text(), 'Add New Model')]" );
 		expect( labelNew ).not.toBeFalsy();
-
-		// Open the sidebar.
-		await button.click();
 
 		// Fill with one entry
 		await page.type( 'input.components-form-token-field__input', 'Model 1' );
