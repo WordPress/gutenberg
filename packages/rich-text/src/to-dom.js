@@ -207,7 +207,11 @@ export function applyValue( future, current ) {
 				const futureAttributes = futureChild.attributes;
 
 				if ( currentAttributes ) {
-					for ( let ii = 0; ii < currentAttributes.length; ii++ ) {
+					let ii = currentAttributes.length;
+
+					// Reverse loop because `removeAttribute` on `currentChild`
+					// changes `currentAttributes`.
+					while ( ii-- ) {
 						const { name } = currentAttributes[ ii ];
 
 						if ( ! futureChild.getAttribute( name ) ) {
@@ -270,15 +274,15 @@ export function applySelection( { startPath, endPath }, current ) {
 	range.setStart( startContainer, startOffset );
 	range.setEnd( endContainer, endOffset );
 
+	// Set back focus if focus is lost.
+	if ( ownerDocument.activeElement !== current ) {
+		current.focus();
+	}
+
 	if ( selection.rangeCount > 0 ) {
 		// If the to be added range and the live range are the same, there's no
 		// need to remove the live range and add the equivalent range.
 		if ( isRangeEqual( range, selection.getRangeAt( 0 ) ) ) {
-			// Set back focus if focus is lost.
-			if ( ownerDocument.activeElement !== current ) {
-				current.focus();
-			}
-
 			return;
 		}
 

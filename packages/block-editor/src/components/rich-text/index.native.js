@@ -483,6 +483,7 @@ export class RichText extends Component {
 			formatPlaceholder,
 		} );
 		this.lastEventCount = event.nativeEvent.eventCount;
+
 		// Make sure there are changes made to the content before upgrading it upward
 		const newContent = this.removeRootTagsProduceByAztec( unescapeSpaces( text ) );
 		if ( this.lastContent !== newContent ) {
@@ -788,6 +789,7 @@ const RichTextContainer = compose( [
 			return {
 				isSelected: context.isSelected,
 				clientId: context.clientId,
+				onCaretVerticalPositionChange: context.onCaretVerticalPositionChange,
 			};
 		}
 
@@ -796,6 +798,7 @@ const RichTextContainer = compose( [
 			clientId: context.clientId,
 			isSelected: context.isSelected,
 			onFocus: context.onFocus || ownProps.onFocus,
+			onCaretVerticalPositionChange: context.onCaretVerticalPositionChange,
 		};
 	} ),
 ] )( RichText );
@@ -835,4 +838,4 @@ RichTextContainer.Content.defaultProps = {
 export default RichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { UnstableRichTextInputEvent } from './input-event';
+export { __unstableRichTextInputEvent } from './input-event';

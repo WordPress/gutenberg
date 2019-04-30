@@ -54,9 +54,9 @@ class DependencyExtractionWebpackPlugin {
 	}
 
 	mapRequestToDependency( request ) {
-		// Handle via options.requestToDependency first
-		if ( typeof this.options.requestToDependency === 'function' ) {
-			const scriptDependency = this.options.requestToDependency( request );
+		// Handle via options.requestToHandle first
+		if ( typeof this.options.requestToHandle === 'function' ) {
+			const scriptDependency = this.options.requestToHandle( request );
 			if ( scriptDependency ) {
 				return scriptDependency;
 			}

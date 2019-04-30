@@ -71,7 +71,6 @@ $color-palette-circle-spacing: 14px;
 		outline: none;
 		&::after {
 			content: "";
-			position: absolute;
 			border: #{ $border-width * 2 } solid $dark-gray-400;
 			width: 32px;
 			height: 32px;

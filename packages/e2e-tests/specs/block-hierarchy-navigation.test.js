@@ -68,7 +68,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await pressKeyTimes( 'Tab', 4 );
 
 		// Tweak the columns count by increasing it by one.
-		page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
 
 		// Navigate to the last column in the columns block.
 		await openBlockNavigator();
