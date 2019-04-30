@@ -6,6 +6,7 @@ import { last } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { createElement } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
@@ -31,7 +32,7 @@ function BlockListAppender( {
 	if ( renderAppender ) {
 		return (
 			<div className="block-list-appender">
-				{ renderAppender() }
+				{ createElement( renderAppender ) }
 			</div>
 		);
 	}
