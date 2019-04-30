@@ -447,7 +447,7 @@ class ImageEdit extends Component {
 		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;
 		const imageSizeOptions = this.getImageSizeOptions();
 
-		const getInspectorControls = ( imageWidth, imageHeight ) => (
+		const getInspectorControls = ( imageWidth = 0, imageHeight = 0 ) => (
 			<InspectorControls>
 				<PanelBody title={ __( 'Image Settings' ) }>
 					<TextareaControl
