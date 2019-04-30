@@ -26,98 +26,101 @@
 @import "./video/style.scss";
 
 // The following selectors have increased specificity (using the :root prefix)
-// to assure colors take effect over another base class color.
+// to assure colors take effect over another base class color, mainly to let
+// the colors override the added specificity by link states such as :hover.
 
-// Background colors.
+:root {
+	// Background colors.
 
-:root .has-pale-pink-background-color {
-	background-color: #f78da7;
-}
+	.has-pale-pink-background-color {
+		background-color: #f78da7;
+	}
 
-:root .has-vivid-red-background-color {
-	background-color: #cf2e2e;
-}
+	.has-vivid-red-background-color {
+		background-color: #cf2e2e;
+	}
 
-:root .has-luminous-vivid-orange-background-color {
-	background-color: #ff6900;
-}
+	.has-luminous-vivid-orange-background-color {
+		background-color: #ff6900;
+	}
 
-:root .has-luminous-vivid-amber-background-color {
-	background-color: #fcb900;
-}
+	.has-luminous-vivid-amber-background-color {
+		background-color: #fcb900;
+	}
 
-:root .has-light-green-cyan-background-color {
-	background-color: #7bdcb5;
-}
+	.has-light-green-cyan-background-color {
+		background-color: #7bdcb5;
+	}
 
-:root .has-vivid-green-cyan-background-color {
-	background-color: #00d084;
-}
+	.has-vivid-green-cyan-background-color {
+		background-color: #00d084;
+	}
 
-:root .has-pale-cyan-blue-background-color {
-	background-color: #8ed1fc;
-}
+	.has-pale-cyan-blue-background-color {
+		background-color: #8ed1fc;
+	}
 
-:root .has-vivid-cyan-blue-background-color {
-	background-color: #0693e3;
-}
+	.has-vivid-cyan-blue-background-color {
+		background-color: #0693e3;
+	}
 
-:root .has-very-light-gray-background-color {
-	background-color: #eee;
-}
+	.has-very-light-gray-background-color {
+		background-color: #eee;
+	}
 
-:root .has-cyan-bluish-gray-background-color {
-	background-color: #abb8c3;
-}
+	.has-cyan-bluish-gray-background-color {
+		background-color: #abb8c3;
+	}
 
-:root .has-very-dark-gray-background-color {
-	background-color: #313131;
-}
+	.has-very-dark-gray-background-color {
+		background-color: #313131;
+	}
 
-// Foreground colors.
+	// Foreground colors.
 
-:root .has-pale-pink-color {
-	color: #f78da7;
-}
+	.has-pale-pink-color {
+		color: #f78da7;
+	}
 
-:root .has-vivid-red-color {
-	color: #cf2e2e;
-}
+	.has-vivid-red-color {
+		color: #cf2e2e;
+	}
 
-:root .has-luminous-vivid-orange-color {
-	color: #ff6900;
-}
+	.has-luminous-vivid-orange-color {
+		color: #ff6900;
+	}
 
-:root .has-luminous-vivid-amber-color {
-	color: #fcb900;
-}
+	.has-luminous-vivid-amber-color {
+		color: #fcb900;
+	}
 
-:root .has-light-green-cyan-color {
-	color: #7bdcb5;
-}
+	.has-light-green-cyan-color {
+		color: #7bdcb5;
+	}
 
-:root .has-vivid-green-cyan-color {
-	color: #00d084;
-}
+	.has-vivid-green-cyan-color {
+		color: #00d084;
+	}
 
-:root .has-pale-cyan-blue-color {
-	color: #8ed1fc;
-}
+	.has-pale-cyan-blue-color {
+		color: #8ed1fc;
+	}
 
-:root .has-vivid-cyan-blue-color {
-	color: #0693e3;
-}
+	.has-vivid-cyan-blue-color {
+		color: #0693e3;
+	}
 
-:root .has-very-light-gray-color {
-	color: #eee;
-}
+	.has-very-light-gray-color {
+		color: #eee;
+	}
 
-:root .has-cyan-bluish-gray-color {
-	color: #abb8c3;
-}
+	.has-cyan-bluish-gray-color {
+		color: #abb8c3;
+	}
 
-:root .has-very-dark-gray-color {
-	color: #313131;
+	.has-very-dark-gray-color {
+		color: #313131;
+	}
 }
 
 
