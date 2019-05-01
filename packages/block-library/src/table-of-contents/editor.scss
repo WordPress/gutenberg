@@ -2,6 +2,10 @@
 	.editor-block-list__block & ul {
 		padding-left: 1.3em;
 
+		a {
+			display: block;
+		}
+
 		ul {
 			margin-bottom: 0;
 		}

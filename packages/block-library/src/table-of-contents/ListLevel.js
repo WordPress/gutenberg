@@ -9,13 +9,11 @@ export default function ListLevel( props ) {
 
 	if ( props.children ) {
 		childnodes = props.children.map( function( childnode ) {
-			const content = getContentElement( childnode, props );
+			const link = getLinkElement( childnode, props );
 
 			return (
 				<li key={ childnode.block.anchor }>
-					<a href={ childnode.block.anchor } data-level={ childnode.block.level }>
-						{ content }
-					</a>
+					{ link }
 					{ childnode.children ? <ListLevel
 						edit={ edit }
 						attributes={ attributes }
@@ -35,7 +33,7 @@ export default function ListLevel( props ) {
 	}
 }
 
-function getContentElement( childnode, props ) {
+function getLinkElement( childnode, props ) {
 	const { edit, attributes, setAttributes } = props;
 	const { headings, autosync } = attributes;
 
@@ -45,13 +43,15 @@ function getContentElement( childnode, props ) {
 	};
 
 	if ( autosync ) {
-		return <span>{ childnode.block.content }</span>;
+		return <a href={ childnode.block.anchor } data-level={ childnode.block.level }>{ childnode.block.content }</a>;
 	}
 
 	if ( edit ) {
 		return (
 			<RichText
-				tagName="span"
+				tagName="a"
+				href={ childnode.block.anchor }
+				data-level={ childnode.block.level }
 				onChange={ ( content ) => updateHeading( content ) }
 				value={ childnode.block.content }
 			/>
@@ -60,7 +60,9 @@ function getContentElement( childnode, props ) {
 
 	return (
 		<RichText.Content
-			tagName="span"
+			tagName="a"
+			href={ childnode.block.anchor }
+			data-level={ childnode.block.level }
 			value={ childnode.block.content }
 		/>
 	);
