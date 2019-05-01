@@ -21,10 +21,13 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, h
 				aria-label={ __( 'Document Statistics' ) }
 				tabIndex="0"
 			>
-				<div className="table-of-contents__count">
-					{ __( 'Words' ) }
-					<WordCount />
-				</div>
+				{
+					__( 'Words' ) !== __( 'Characters' ) &&
+					<div className="table-of-contents__count">
+						{ __( 'Words' ) }
+						<WordCount />
+					</div>
+				}
 				<div className="table-of-contents__count">
 					{ __( 'Characters' ) }
 					<CharCount />
