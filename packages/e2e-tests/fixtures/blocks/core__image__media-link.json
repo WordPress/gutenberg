@@ -4,13 +4,13 @@
         "name": "core/image",
         "isValid": true,
         "attributes": {
-            "url": "https://cldup.com/uuUqE_dXzy.jpg",
+            "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
             "alt": "",
             "caption": "",
-            "href": "https://cldup.com/uuUqE_dXzy.jpg",
+            "href": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
             "linkDestination": "media"
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-image\"><a href=\"https://cldup.com/uuUqE_dXzy.jpg\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" /></a></figure>"
+        "originalContent": "<figure class=\"wp-block-image\"><a href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /></a></figure>"
     }
 ]

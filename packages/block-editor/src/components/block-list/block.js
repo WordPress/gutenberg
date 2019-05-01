@@ -12,7 +12,6 @@ import {
 	focus,
 	isTextField,
 	placeCaretAtHorizontalEdge,
-	placeCaretAtVerticalEdge,
 } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
@@ -154,13 +153,7 @@ export class BlockListBlock extends Component {
 			return;
 		}
 
-		target.focus();
-
-		// In reverse case, need to explicitly place caret position.
-		if ( isReverse ) {
-			placeCaretAtHorizontalEdge( target, true );
-			placeCaretAtVerticalEdge( target, true );
-		}
+		placeCaretAtHorizontalEdge( target, isReverse );
 	}
 
 	setAttributes( attributes ) {
@@ -363,8 +356,6 @@ export class BlockListBlock extends Component {
 						isFocusMode,
 						hasFixedToolbar,
 						isLocked,
-						isFirst,
-						isLast,
 						clientId,
 						rootClientId,
 						isSelected,
@@ -406,7 +397,6 @@ export class BlockListBlock extends Component {
 						! isEmptyDefaultBlock;
 					// We render block movers and block settings to keep them tabbale even if hidden
 					const shouldRenderMovers =
-						! isFocusMode &&
 						( isSelected || hoverArea === 'left' ) &&
 						! showEmptyBlockSideInserter &&
 						! isPartOfMultiSelection &&
@@ -527,8 +517,6 @@ export class BlockListBlock extends Component {
 									<BlockMover
 										clientIds={ clientId }
 										blockElementId={ blockElementId }
-										isFirst={ isFirst }
-										isLast={ isLast }
 										isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
 										isDraggable={
 											isDraggable !== false &&

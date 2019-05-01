@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const watch = require( 'node-watch' );
-const { execSync } = require( 'child_process' );
+const { spawn } = require( 'child_process' );
 const path = require( 'path' );
 const chalk = require( 'chalk' );
 
@@ -12,7 +12,7 @@ const chalk = require( 'chalk' );
  */
 const getPackages = require( './get-packages' );
 
-const BUILD_CMD = `node ${ path.resolve( __dirname, './build.js' ) }`;
+const BUILD_SCRIPT = path.resolve( __dirname, './build.js' );
 
 let filesToBuild = new Map();
 
@@ -69,7 +69,7 @@ setInterval( () => {
 	if ( files.length ) {
 		filesToBuild = new Map();
 		try {
-			execSync( `${ BUILD_CMD } ${ files.join( ' ' ) }`, { stdio: [ 0, 1, 2 ] } );
+			spawn( 'node', [ BUILD_SCRIPT, ...files ], { stdio: [ 0, 1, 2 ] } );
 		} catch ( e ) {}
 	}
 }, 100 );

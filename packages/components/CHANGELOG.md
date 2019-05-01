@@ -1,9 +1,15 @@
-## 7.3.0 (Unreleased)
+## 7.4.0 (Unreleased)
+
+- Added a new `HorizontalRule` component.
+
+## 7.3.0 (2019-04-16)
 
 ### New Features
 
 - Added a new `render` property to `FormFileUpload` component. Allowing users of the component to custom the UI for their needs.
 - Added a new `BaseControl.VisualLabel` component.
+- Added a new `preview` prop to the `Placeholder` component which allows to display a preview, for example a media preview when the Placeholder is used in media editing contexts.
+- Added a new `anchorRect` prop to `Popover` which enables a developer to provide a custom `DOMRect` object at which to position the popover.
 
 ### Bug fixes
 

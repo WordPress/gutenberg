@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fix
+
+- `removep` will correctly preserve multi-line paragraph tags where attributes are present.
+
 ## 2.1.0 (2019-03-06)
 
 ### Bug Fix

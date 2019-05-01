@@ -8,7 +8,7 @@ URLPopover is a presentational React component used to render a popover used for
 The component will be rendered adjacent to its parent.
 
 ```jsx
-import { Fragment } from '@wordpress/elements';
+import { Fragment } from '@wordpress/element';
 import { ToggleControl, IconButton, Button } from '@wordpress/components';
 import { URLPopover } from '@wordpress/block-editor';
 
@@ -85,7 +85,7 @@ class MyURLPopover extends Component {
 
 ## Props
 
-The component accepts the following props.
+The component accepts the following props. Any other props are passed through to the underlying `Popover` component ([refer to props documentation](/packages/components/src/popover/README.md)).
 
 ### position
 
@@ -103,14 +103,6 @@ an element.
 - Type: `String`
 - Required: No
 - Default: "firstElement"
-
-### onClose
-
-Callback that triggers when the user indicates the popover should close (e.g. they've used the escape key or clicked
-outside of the popover.)
-
-- Type: `Function`
-- Required: No
 
 ### renderSettings
 

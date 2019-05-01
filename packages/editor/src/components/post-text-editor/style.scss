@@ -1,27 +1,27 @@
 .editor-post-text-editor {
-	border: $border-width solid $light-gray-500;
+	border: $border-width solid $light-gray-500 !important;
 	display: block;
 	margin: 0 0 2em;
 	width: 100%;
 	box-shadow: none;
 	resize: none;
 	overflow: hidden;
-	font-family: $editor-html-font;
+	font-family: $editor-html-font !important;
 	line-height: 150%;
+	border-radius: 0 !important;
 
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
-	font-size: $mobile-text-min-font-size;
+	font-size: $mobile-text-min-font-size !important;
 	@include break-small {
-		font-size: $text-editor-font-size;
+		font-size: $text-editor-font-size !important;
 	}
 
 	&:hover,
 	&:focus {
-		border: $border-width solid $light-gray-500;
-		box-shadow: none;
+		border: $border-width solid $light-gray-800 !important;
+		box-shadow: none !important;
 		// Emulate the effect used on the post title.
-		outline: $border-width solid $light-gray-500;
-		outline-offset: -2px;
+		outline-offset: -2px !important;
 	}
 }
 

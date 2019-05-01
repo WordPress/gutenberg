@@ -2,7 +2,7 @@
 
 This page covers how to set up your development environment to use the ESNext and [JSX](https://reactjs.org/docs/introducing-jsx.html) syntaxes. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short). JSX is a custom syntax extension to JavaScript which helps you to describe what the UI should look like.
 
-This documentation covers development for your plugin to work with Gutenberg. If you want to setup a development environment for developing Gutenberg itself, see the [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) documentation.
+This documentation covers development for your plugin to work with Gutenberg. If you want to setup a development environment for developing Gutenberg itself, see the [Getting Started](/docs/contributors/getting-started.md) documentation.
 
 Most browsers can not interpret or run ESNext and JSX syntaxes, so we use a transformation step to convert these syntaxes to code that browsers can understand.
 
@@ -36,7 +36,7 @@ Additionally, the [Node.js download page](https://nodejs.org/en/download/) inclu
 
 The Node Package Manager (npm) is a tool included with node. npm allows you to install and manage JavaScript packages. npm can also generate and process a special file called `package.json`, which contains some information about your project and the packages your project uses.
 
-To start a new node project, first create a directory to work in.
+To start a new node project, first create a directory to work in:
 
 ```
 mkdir myguten-block
@@ -86,7 +86,7 @@ After installing, a `node_modules` directory is created with the modules and the
 Also, if you look at package.json file it will include a new section:
 
 ```json
-"dependencies": {
+"devDependencies": {
 	"@wordpress/scripts": "3.1.0"
 }
 ```
@@ -153,7 +153,7 @@ Yes, the initial setup is a bit more involved, but the additional features and b
 
 With a setup in place, the standard workflow is:
 
-- Install dependencies: `npm install`
-- Start development builds: `npm start`
-- Develop. Test. Repeat.
-- Create production build: `npm run build`
+1. Install dependencies: `npm install`
+2. Start development builds: `npm start`
+3. Develop. Test. Repeat.
+4. Create production build: `npm run build`

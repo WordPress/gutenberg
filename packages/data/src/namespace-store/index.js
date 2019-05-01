@@ -187,7 +187,10 @@ function mapSelectors( selectors, store, registry ) {
  * @return {Object}           Actions mapped to the redux store provided.
  */
 function mapActions( actions, store ) {
-	const createBoundAction = ( action ) => ( ...args ) => store.dispatch( action( ...args ) );
+	const createBoundAction = ( action ) => ( ...args ) => {
+		return Promise.resolve( store.dispatch( action( ...args ) ) );
+	};
+
 	return mapValues( actions, createBoundAction );
 }
 

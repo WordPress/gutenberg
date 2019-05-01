@@ -216,6 +216,9 @@ This is how you execute those scripts using the presented setup:
 
 * `npm run test:e2e` - runs all unit tests.
 * `npm run test:e2e:help` - prints all available options to configure unit tests runner.
+* `npm run test-e2e -- --puppeteer-interactive` - runs all unit tests interactively.
+* `npm run test-e2e FILE_NAME -- --puppeteer-interactive ` - runs one test file interactively.
+* `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
 
 This script automatically detects the best config to start Puppeteer but sometimes you may need to specify custom options:
  - You can add a `jest-puppeteer.config.js` at the root of the project or define a custom path using `JEST_PUPPETEER_CONFIG` environment variable. Check [jest-puppeteer](https://github.com/smooth-code/jest-puppeteer#jest-puppeteerconfigjs) for more details.
@@ -268,17 +271,10 @@ The `build` and `start` commands use [webpack](https://webpack.js.org/) behind t
 
 * [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
 * [Output](https://webpack.js.org/configuration/output): `build/index.js`
-* [Externals](https://webpack.js.org/configuration/externals). These are libraries that are to be found in the global scope:
-
-Package | Input syntax | Output
---- | --- | ---
-React | `import x from React;` | `var x = window.React.x;`
-ReactDOM | `import x from ReactDOM;` | `var x = window.ReactDOM.x;`
-moment | `import x from moment;` | `var x = window.moment.x;`
-jQuery | `import x from jQuery;` | `var x = window.jQuery.x;`
-lodash | `import x from lodash;` | `var x = window.lodash.x;`
-lodash-es | `import x from lodash-es;` | `var x = window.lodash.x;`
-WordPress packages | `import x from '@wordpress/package-name` | `var x = window.wp.packageName.x`
+* [Plugins](https://webpack.js.org/configuration/plugins): The webpack plugin provided by
+[`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) is used
+with the default configuration to ensure that WordPress provided scripts are not included in the
+built bundle.
 
 #### Provide your own webpack config
 

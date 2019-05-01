@@ -45,26 +45,27 @@ const effects = {
 
 		let wasSavingPost = select( 'core/editor' ).isSavingPost();
 		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-		let wasPreviewingPost = select( 'core/editor' ).isPreviewingPost();
+
+		// Meta boxes are initialized once at page load. It is not necessary to
+		// account for updates on each state change.
+		//
+		// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
+		const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
 		// Save metaboxes when performing a full save on the post.
 		subscribe( () => {
 			const isSavingPost = select( 'core/editor' ).isSavingPost();
 			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-			const isPreviewingPost = select( 'core/editor' ).isPreviewingPost();
-			const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
 
 			// Save metaboxes on save completion, except for autosaves that are not a post preview.
 			const shouldTriggerMetaboxesSave = (
 				hasActiveMetaBoxes && (
-					( wasSavingPost && ! isSavingPost && ! wasAutosavingPost ) ||
-					( wasAutosavingPost && wasPreviewingPost && ! isPreviewingPost )
+					( wasSavingPost && ! isSavingPost && ! wasAutosavingPost )
 				)
 			);
 
 			// Save current state for next inspection.
 			wasSavingPost = isSavingPost;
 			wasAutosavingPost = isAutosavingPost;
-			wasPreviewingPost = isPreviewingPost;
 
 			if ( shouldTriggerMetaboxesSave ) {
 				store.dispatch( requestMetaBoxUpdates() );

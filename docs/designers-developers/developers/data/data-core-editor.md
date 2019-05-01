@@ -193,10 +193,16 @@ saved state of the post.
 
 Post attribute value.
 
-### getAutosaveAttribute
+### getAutosaveAttribute (deprecated)
 
 Returns an attribute value of the current autosave revision for a post, or
 null if there is no autosave for the post.
+
+*Deprecated*
+
+Deprecated since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector
+			   from the '@wordpress/core-data' package and access properties on the returned
+			   autosave object using getPostRawValue.
 
 *Parameters*
 
@@ -303,16 +309,22 @@ Returns true if the post can be autosaved, or false otherwise.
 *Parameters*
 
  * state: Global application state.
+ * autosave: A raw autosave object from the REST API.
 
 *Returns*
 
 Whether the post can be autosaved.
 
-### getAutosave
+### getAutosave (deprecated)
 
 Returns the current autosave, or null if one is not set (i.e. if the post
 has yet to be autosaved, or has been saved or published since the last
 autosave).
+
+*Deprecated*
+
+Deprecated since 5.6. Callers should use the `getAutosave( postType, postId, userId )`
+			   selector from the '@wordpress/core-data' package.
 
 *Parameters*
 
@@ -322,9 +334,14 @@ autosave).
 
 Current autosave, if exists.
 
-### hasAutosave
+### hasAutosave (deprecated)
 
 Returns the true if there is an existing autosave, otherwise false.
+
+*Deprecated*
+
+Deprecated since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector
+            from the '@wordpress/core-data' package and check for a truthy value.
 
 *Parameters*
 
@@ -478,58 +495,6 @@ before falling back to serialization of block state.
 *Returns*
 
 Post content.
-
-### __experimentalGetReusableBlock
-
-Returns the reusable block with the given ID.
-
-*Parameters*
-
- * state: Global application state.
- * ref: The reusable block's ID.
-
-*Returns*
-
-The reusable block, or null if none exists.
-
-### __experimentalIsSavingReusableBlock
-
-Returns whether or not the reusable block with the given ID is being saved.
-
-*Parameters*
-
- * state: Global application state.
- * ref: The reusable block's ID.
-
-*Returns*
-
-Whether or not the reusable block is being saved.
-
-### __experimentalIsFetchingReusableBlock
-
-Returns true if the reusable block with the given ID is being fetched, or
-false otherwise.
-
-*Parameters*
-
- * state: Global application state.
- * ref: The reusable block's ID.
-
-*Returns*
-
-Whether the reusable block is being fetched.
-
-### __experimentalGetReusableBlocks
-
-Returns an array of all reusable blocks.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-An array of all reusable blocks.
 
 ### getStateBeforeOptimisticTransaction
 
@@ -706,18 +671,6 @@ Return the current block list.
 
 Block list.
 
-### __unstableIsEditorReady
-
-Is the editor ready
-
-*Parameters*
-
- * state: null
-
-*Returns*
-
-is Ready.
-
 ### getEditorSettings
 
 Returns the post editor settings.
@@ -752,51 +705,19 @@ post has been received, either by initialization or save.
 
  * post: Post object.
 
-### resetAutosave
+### resetAutosave (deprecated)
 
 Returns an action object used in signalling that the latest autosave of the
 post has been received, by initialization or autosave.
 
-*Parameters*
+*Deprecated*
 
- * post: Autosave post object.
-
-### __experimentalRequestPostUpdateStart
-
-Optimistic action for dispatching that a post update request has started.
+Deprecated since 5.6. Callers should use the `receiveAutosaves( postId, autosave )`
+			   selector from the '@wordpress/core-data' package.
 
 *Parameters*
 
- * options: null
-
-### __experimentalRequestPostUpdateSuccess
-
-Optimistic action for indicating that the request post update has completed
-successfully.
-
-*Parameters*
-
- * data: The data for the action.
- * data.previousPost: The previous post prior to update.
- * data.post: The new post after update
- * data.isRevision: Whether the post is a revision or not.
- * data.options: Options passed through from the original
-                                     action dispatch.
- * data.postType: The post type object.
-
-### __experimentalRequestPostUpdateFailure
-
-Optimistic action for indicating that the request post update has completed
-with a failure.
-
-*Parameters*
-
- * data: The data for the action
- * data.post: The post that failed updating.
- * data.edits: The fields that were being updated.
- * data.error: The error from the failed call.
- * data.options: Options passed through from the original
-                               action dispatch.
+ * newAutosave: Autosave post object.
 
 ### updatePost
 
@@ -824,15 +745,6 @@ been edited.
 *Parameters*
 
  * edits: Post attributes to edit.
-
-### __experimentalOptimisticUpdatePost
-
-Returns action object produced by the updatePost creator augmented by
-an optimist option that signals optimistically applying updates.
-
-*Parameters*
-
- * edits: Updated post fields.
 
 ### savePost
 
@@ -879,72 +791,6 @@ Returns an action object used to lock the editor.
 *Parameters*
 
  * lock: Details about the post lock status, user, and nonce.
-
-### __experimentalFetchReusableBlocks
-
-Returns an action object used to fetch a single reusable block or all
-reusable blocks from the REST API into the store.
-
-*Parameters*
-
- * id: If given, only a single reusable block with this ID will
-                    be fetched.
-
-### __experimentalReceiveReusableBlocks
-
-Returns an action object used in signalling that reusable blocks have been
-received. `results` is an array of objects containing:
- - `reusableBlock` - Details about how the reusable block is persisted.
- - `parsedBlock` - The original block.
-
-*Parameters*
-
- * results: Reusable blocks received.
-
-### __experimentalSaveReusableBlock
-
-Returns an action object used to save a reusable block that's in the store to
-the REST API.
-
-*Parameters*
-
- * id: The ID of the reusable block to save.
-
-### __experimentalDeleteReusableBlock
-
-Returns an action object used to delete a reusable block via the REST API.
-
-*Parameters*
-
- * id: The ID of the reusable block to delete.
-
-### __experimentalUpdateReusableBlockTitle
-
-Returns an action object used in signalling that a reusable block's title is
-to be updated.
-
-*Parameters*
-
- * id: The ID of the reusable block to update.
- * title: The new title.
-
-### __experimentalConvertBlockToStatic
-
-Returns an action object used to convert a reusable block into a static
-block.
-
-*Parameters*
-
- * clientId: The client ID of the block to attach.
-
-### __experimentalConvertBlockToReusable
-
-Returns an action object used to convert a static block into a reusable
-block.
-
-*Parameters*
-
- * clientIds: The client IDs of the block to detach.
 
 ### enablePublishSidebar
 

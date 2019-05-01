@@ -2,6 +2,7 @@
 	grid-template-areas:
 		"media-text-media media-text-content"
 		"resizer resizer";
+	align-items: center;
 }
 
 .wp-block-media-text.has-media-on-the-right {
@@ -16,10 +17,14 @@
 
 .wp-block-media-text .editor-media-container__resizer {
 	grid-area: media-text-media;
-	align-self: center;
 	// The resizer sets a inline width but as we are using a grid layout,
 	// we set the width on container.
 	width: 100% !important;
+}
+
+.wp-block-media-text.is-image-fill .editor-media-container__resizer {
+	// The resizer sets an inline height but for the image fill we set it to full height.
+	height: 100% !important;
 }
 
 .wp-block-media-text .block-editor-inner-blocks {
@@ -62,4 +67,3 @@ figure.block-library-media-text__media-container {
 		}
 	}
 }
-

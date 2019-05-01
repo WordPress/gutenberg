@@ -27,6 +27,7 @@ $z-layers: (
 	".block-library-gallery-item__inline-menu": 20,
 	".block-editor-url-input__suggestions": 30,
 	".edit-post-header": 30,
+	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".block-library-image__resize-handlers": 1, // Resize handlers above sibling inserter
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
@@ -64,6 +65,7 @@ $z-layers: (
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
 	".edit-post-sidebar": 100000,
+	".edit-widgets-sidebar": 100000,
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
 
 	// Show sidebar in greater than small viewports above editor related elements

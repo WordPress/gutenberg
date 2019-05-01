@@ -12,18 +12,12 @@ export const name = 'core/search';
 
 export const settings = {
 	title: __( 'Search' ),
-
 	description: __( 'Help visitors find your content.' ),
-
 	icon: 'search',
-
 	category: 'widgets',
-
 	keywords: [ __( 'find' ) ],
-
 	supports: {
 		align: true,
 	},
-
 	edit,
 };

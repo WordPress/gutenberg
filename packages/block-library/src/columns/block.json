@@ -1,0 +1,13 @@
+{
+	"name": "core/columns",
+	"category": "layout",
+	"attributes": {
+		"columns": {
+			"type": "number",
+			"default": 2
+		},
+		"verticalAlignment": {
+			"type": "string"
+		}
+	}
+}

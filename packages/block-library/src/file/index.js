@@ -17,8 +17,11 @@ import { RichText } from '@wordpress/block-editor';
  */
 import edit from './edit';
 import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/file';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'File' ),
@@ -26,8 +29,6 @@ export const settings = {
 	description: __( 'Add a link to a downloadable file.' ),
 
 	icon,
-
-	category: 'common',
 
 	keywords: [ __( 'document' ), __( 'pdf' ) ],
 

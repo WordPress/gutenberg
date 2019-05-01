@@ -56,15 +56,6 @@
 		margin-left: -$block-padding;
 		margin-right: -$block-padding;
 	}
-
-	// Space every block, and the default appender, using margins.
-	// This allows margins to collapse, which gives a better representation of how it looks on the frontend.
-	.block-editor-default-block-appender > .block-editor-default-block-appender__content,
-	> .block-editor-block-list__block > .block-editor-block-list__block-edit,
-	> .block-editor-block-list__layout > .block-editor-block-list__block > .block-editor-block-list__block-edit {
-		margin-top: $block-padding * 2 + $block-spacing;
-		margin-bottom: $block-padding * 2 + $block-spacing;
-	}
 }
 
 .block-editor-block-list__layout .block-editor-block-list__block {
@@ -415,36 +406,34 @@
 		z-index: z-index(".block-editor-block-list__block {core/image aligned wide or fullwide}");
 
 		// Mover and settings above
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			// This moves the menu up by the height of the button + border + padding.
 			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
 			bottom: auto;
 			min-height: 0;
 			height: auto;
 			width: auto;
-			z-index: inherit;
 
 			&::before {
 				content: none;
 			}
 		}
 
-		> .block-editor-block-mover .block-editor-block-mover__control {
+		&.is-multi-selected > .block-editor-block-mover .block-editor-block-mover__control,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover .block-editor-block-mover__control {
 			float: left;
 		}
 
-		// Position hover label on the right
-		> .block-editor-block-list__breadcrumb {
-			right: -$border-width;
-		}
-
 		// Hide mover until wide breakpoints, or it might be covered by toolbar
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			display: none;
 		}
 
 		@include break-wide() {
-			> .block-editor-block-mover {
+			&.is-multi-selected > .block-editor-block-mover,
+			> .block-editor-block-list__block-edit > .block-editor-block-mover {
 				display: block;
 			}
 		}
@@ -456,12 +445,18 @@
 				display: inline-flex;
 			}
 		}
+
+		// If the block movers are visible, push the breadcrumb down to make room for them.
+		.block-editor-block-mover.is-visible + .block-editor-block-list__breadcrumb {
+			top: (-$block-padding - $block-left-border-width - ($grid-size-small / 2));
+		}
 	}
 
 	// Wide
 	&[data-align="wide"] {
 		// Position mover
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			left: -$block-padding + $border-width;
 		}
 	}
@@ -503,7 +498,8 @@
 		}
 
 		// Position mover
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			left: $border-width;
 		}
 	}
@@ -737,10 +733,11 @@
 	left: 0;
 	right: 0;
 	justify-content: center;
+	height: $block-padding + 8px;
 
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
-		margin-top: -4px;
+		margin-top: -8px;
 		border-radius: 50%;
 		color: $blue-medium-focus;
 		background: $white;
@@ -912,10 +909,6 @@
 	}
 }
 
-.block-editor-block-list__block.is-focus-mode:not(.is-multi-selected) > .block-editor-block-contextual-toolbar {
-	margin-left: -$block-side-ui-width;
-}
-
 // Enable toolbar footprint collapsing
 .block-editor-block-contextual-toolbar {
 	// Position the contextual toolbar above the block.
@@ -990,7 +983,6 @@
 	top: (($block-padding * -2) - $block-left-border-width);
 
 	.components-toolbar {
-		padding: 0;
 		border: none;
 		line-height: 1;
 		font-family: $default-font;

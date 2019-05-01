@@ -1,3 +1,9 @@
+## 2.1.0 (Unreleased)
+
+### New features
+- The `getAutosave`, `getAutosaves` and `getCurrentUser` selectors have been added.
+- The `receiveAutosaves` and `receiveCurrentUser` actions have been added.
+
 ## 2.0.16 (2019-01-03)
 
 ### Bug Fixes

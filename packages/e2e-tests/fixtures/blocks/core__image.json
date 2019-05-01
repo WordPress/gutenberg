@@ -4,12 +4,12 @@
         "name": "core/image",
         "isValid": true,
         "attributes": {
-            "url": "https://cldup.com/uuUqE_dXzy.jpg",
+            "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
             "alt": "",
             "caption": "",
             "linkDestination": "none"
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-image\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" /></figure>"
+        "originalContent": "<figure class=\"wp-block-image\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /></figure>"
     }
 ]

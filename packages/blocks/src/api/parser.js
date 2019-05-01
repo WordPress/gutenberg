@@ -117,6 +117,36 @@ export function isOfTypes( value, types ) {
 }
 
 /**
+ * Returns true if value is valid per the given block attribute schema type
+ * definition, or false otherwise.
+ *
+ * @link https://json-schema.org/latest/json-schema-validation.html#rfc.section.6.1.1
+ *
+ * @param {*}                       value Value to test.
+ * @param {?(Array<string>|string)} type  Block attribute schema type.
+ *
+ * @return {boolean} Whether value is valid.
+ */
+export function isValidByType( value, type ) {
+	return type === undefined || isOfTypes( value, castArray( type ) );
+}
+
+/**
+ * Returns true if value is valid per the given block attribute schema enum
+ * definition, or false otherwise.
+ *
+ * @link https://json-schema.org/latest/json-schema-validation.html#rfc.section.6.1.2
+ *
+ * @param {*}      value   Value to test.
+ * @param {?Array} enumSet Block attribute schema enum.
+ *
+ * @return {boolean} Whether value is valid.
+ */
+export function isValidByEnum( value, enumSet ) {
+	return ! Array.isArray( enumSet ) || enumSet.includes( value );
+}
+
+/**
  * Returns true if the given attribute schema describes a value which may be
  * an ambiguous string.
  *
@@ -242,7 +272,7 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
  * @return {*} Attribute value.
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
-	const { type } = attributeSchema;
+	const { type, enum: enumSet } = attributeSchema;
 	let value;
 
 	switch ( attributeSchema.source ) {
@@ -262,9 +292,9 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 			break;
 	}
 
-	if ( type !== undefined && ! isOfTypes( value, castArray( type ) ) ) {
-		// Reject the value if it is not valid of type. Reverting to the
-		// undefined value ensures the default is restored, if applicable.
+	if ( ! isValidByType( value, type ) || ! isValidByEnum( value, enumSet ) ) {
+		// Reject the value if it is not valid. Reverting to the undefined
+		// value ensures the default is respected, if applicable.
 		value = undefined;
 	}
 

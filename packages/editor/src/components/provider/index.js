@@ -154,6 +154,7 @@ class EditorProvider extends Component {
 				onInput={ resetEditorBlocksWithoutUndoLevel }
 				onChange={ resetEditorBlocks }
 				settings={ editorSettings }
+				useSubRegistry={ false }
 			>
 				{ children }
 				<ReusableBlocksButtons />
