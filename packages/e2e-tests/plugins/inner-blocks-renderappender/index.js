@@ -2,11 +2,11 @@
 	var wp = window.wp;
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
-	var InnerBlocks = wp.editor.InnerBlocks;
+	var InnerBlocks = wp.blockEditor.InnerBlocks;
 	var withSelect = wp.data.withSelect;
 
 	var dataSelector = withSelect( function( select, ownProps ) {
-		var getBlockOrder = select( 'core/editor' ).getBlockOrder;
+		var getBlockOrder = select( 'core/block-editor' ).getBlockOrder;
 		return {
 			numberOfChildren: getBlockOrder( ownProps.clientId ).length,
 		};
@@ -25,7 +25,7 @@
 	function emptyBlockAppender() {
 		return (
 			el( 'div', { className: 'my-dynamic-blocks-appender' },
-				el( 'span', {}, 'Empty Blocks Appender' ),
+				el( 'span', { className: 'empty-blocks-appender' }, 'Empty Blocks Appender' ),
 				el( InnerBlocks.ButtonBlockAppender )
 			)
 		);
@@ -34,7 +34,7 @@
 	function singleBlockAppender() {
 		return (
 			el( 'div', { className: 'my-dynamic-blocks-appender' },
-				el( 'span', {}, 'Single Blocks Appender' ),
+				el( 'span', { className: 'single-blocks-appender' }, 'Single Blocks Appender' ),
 				el( InnerBlocks.ButtonBlockAppender )
 			)
 		);
@@ -43,7 +43,7 @@
 	function multipleBlockAppender() {
 		return (
 			el( 'div', { className: 'my-dynamic-blocks-appender' },
-				el( 'span', {}, 'Multiple Blocks Appender' ),
+				el( 'span', { className: 'multiple-blocks-appender' }, 'Multiple Blocks Appender' ),
 			)
 		);
 	}

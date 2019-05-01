@@ -11,6 +11,8 @@ import {
 	openAllBlockInserterCategories,
 } from '@wordpress/e2e-test-utils';
 
+const QUOTE_INSERT_BUTTON_SELECTOR = '//button[contains(concat(" ", @class, " "), " block-editor-block-types-list__item ")][./span[contains(text(),"Quote")]]';
+
 describe( 'RenderAppender prop of InnerBlocks ', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-innerblocks-renderappender' );
@@ -42,7 +44,8 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 			'Quote',
 			'Video',
 		] );
-		await page.click( `.block-editor-block-types-list__item[aria-label="Quote"]` );
+		const quoteButton = ( await page.$x( QUOTE_INSERT_BUTTON_SELECTOR ) )[ 0 ];
+		await quoteButton.click();
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -53,7 +56,7 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		expect(
 			await page.evaluate(
 				( el ) => ( el.innerText ),
-				await page.$( `${ dynamicAppenderSelector } > span` ) )
+				await page.$( `${ dynamicAppenderSelector } > span.empty-blocks-appender` ) )
 		).toEqual( 'Empty Blocks Appender' );
 		const blockAppenderButtonSelector = `${ dynamicAppenderSelector } .block-editor-button-block-appender`;
 		await page.click( blockAppenderButtonSelector );
@@ -64,11 +67,12 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 			'Quote',
 			'Video',
 		] );
-		await page.click( `.block-editor-block-types-list__item[aria-label="Quote"]` );
+		const quoteButton = ( await page.$x( QUOTE_INSERT_BUTTON_SELECTOR ) )[ 0 ];
+		await quoteButton.click();
 		expect(
 			await page.evaluate(
 				( el ) => ( el.innerText ),
-				await page.$( `${ dynamicAppenderSelector } > span` ) )
+				await page.$( `${ dynamicAppenderSelector } > span.single-blocks-appender` ) )
 		).toEqual( 'Single Blocks Appender' );
 		expect(
 			await page.$( blockAppenderButtonSelector )
@@ -77,7 +81,7 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		expect(
 			await page.evaluate(
 				( el ) => ( el.innerText ),
-				await page.$( `${ dynamicAppenderSelector } > span` ) )
+				await page.$( `${ dynamicAppenderSelector } > span.multiple-blocks-appender` ) )
 		).toEqual( 'Multiple Blocks Appender' );
 		expect(
 			await page.$( blockAppenderButtonSelector )

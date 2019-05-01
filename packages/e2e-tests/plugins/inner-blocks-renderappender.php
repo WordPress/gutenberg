@@ -16,7 +16,7 @@ function enqueue_inner_blocks_renderappender_script() {
 		plugins_url( 'inner-blocks-renderappender/index.js', __FILE__ ),
 		array(
 			'wp-blocks',
-			'wp-editor',
+			'wp-block-editor',
 			'wp-element',
 			'wp-i18n',
 			'wp-data',
