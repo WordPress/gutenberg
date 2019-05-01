@@ -27,6 +27,8 @@ const gutenbergPackages = Object.keys( dependencies )
 	.filter( ( packageName ) => packageName.startsWith( WORDPRESS_NAMESPACE ) )
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
+const cssSpecificity = require( './bin/packages/postcss-specificity' );
+
 module.exports = {
 	...defaultConfig,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
@@ -105,6 +107,28 @@ module.exports = {
 				},
 			} ) )
 		),
+
+		new CopyWebpackPlugin(
+			[
+				'block-editor',
+				'editor',
+				'components',
+				'edit-post',
+			].map( ( packageName ) => ( {
+				from: `./packages/${ packageName }/build-style/style.css`,
+				to: `./build/${ packageName }/`,
+				flatten: true,
+				force: true,
+				transform: ( content ) => {
+					return postcss( [
+						cssSpecificity( { scopeTo: ':root', repeat: 3 } ),
+					] )
+						.process( content, { from: 'src/app.css', to: 'dest/app.css' } )
+						.then( ( result ) => result.css );
+				},
+			} ) )
+		),
+
 		new CopyWebpackPlugin( [
 			{
 				from: './packages/block-library/src/**/index.php',

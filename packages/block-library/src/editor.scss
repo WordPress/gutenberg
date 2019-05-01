@@ -34,13 +34,23 @@
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
 
-
 /**
  * Editor Normalization Styles
  *
  * These are only output in the editor, but styles here are NOT prefixed .editor-styles-wrapper.
  * This allows us to create normalization styles that are easily overridden by editor styles.
  */
+
+// Reset class selectors that are used on HTML elements.
+// Raise the specificity to keep theme styles from overriding.
+// Specificity = 030.
+:root .editor-styles-wrapper .dashicon,
+:root .editor-styles-wrapper .components-button,
+:root .editor-styles-wrapper .components-dropdown-menu__indicator,
+:root .editor-styles-wrapper .block-editor-block-icon {
+	all: unset;
+	box-sizing: inherit;
+}
 
 // Provide every block with a default base margin. This margin provides a consistent spacing
 // between blocks in the editor.
