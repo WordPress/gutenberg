@@ -400,39 +400,40 @@ class ImageEdit extends Component {
 				) }
 			</BlockControls>
 		);
+		const src = isExternal ? url : undefined;
+		const labels = {
+			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
+			instructions: __( 'Drag an image to upload, select a file from your library or add one from an URL.' ),
+		};
+		const mediaPreview = ( !! url && <img
+			alt={ __( 'Edit image' ) }
+			title={ __( 'Edit image' ) }
+			className={ 'edit-image-preview' }
+			src={ url }
+		/> );
+		const mediaPlaceholder = (
+			<MediaPlaceholder
+				icon={ <BlockIcon icon={ icon } /> }
+				className={ className }
+				labels={ labels }
+				onSelect={ this.onSelectImage }
+				onSelectURL={ this.onSelectURL }
+				onDoubleClick={ this.toggleIsEditing }
+				onCancel={ !! url && this.toggleIsEditing }
+				notices={ noticeUI }
+				onError={ this.onUploadError }
+				accept="image/*"
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ { id, src } }
+				mediaPreview={ mediaPreview }
+				dropZoneUIOnly={ ! isEditing && url }
+			/>
+		);
 		if ( isEditing || ! url ) {
-			const src = isExternal ? url : undefined;
-
-			const labels = {
-				title: ! url ? __( 'Image' ) : __( 'Edit image' ),
-				instructions: __( 'Drag an image to upload, select a file from your library or add one from an URL.' ),
-			};
-
-			const mediaPreview = ( !! url && <img
-				alt={ __( 'Edit image' ) }
-				title={ __( 'Edit image' ) }
-				className={ 'edit-image-preview' }
-				src={ url }
-			/> );
-
 			return (
 				<Fragment>
 					{ controls }
-					<MediaPlaceholder
-						icon={ <BlockIcon icon={ icon } /> }
-						className={ className }
-						labels={ labels }
-						onSelect={ this.onSelectImage }
-						onSelectURL={ this.onSelectURL }
-						onDoubleClick={ this.toggleIsEditing }
-						onCancel={ !! url && this.toggleIsEditing }
-						notices={ noticeUI }
-						onError={ this.onUploadError }
-						accept="image/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ { id, src } }
-						mediaPreview={ mediaPreview }
-					/>
+					{ mediaPlaceholder }
 				</Fragment>
 			);
 		}
@@ -707,6 +708,7 @@ class ImageEdit extends Component {
 						/>
 					) }
 				</figure>
+				{ mediaPlaceholder }
 			</Fragment>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
