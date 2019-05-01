@@ -6,7 +6,7 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Dashicon } from '@wordpress/components';
 import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
 
@@ -63,7 +63,11 @@ function MediaPlaceholder( props ) {
 			render={ ( { open, getMediaOptions } ) => {
 				return (
 					<TouchableWithoutFeedback
-						accessibilityLabel={ placeholderTitle + ' ' + __( 'block' ) + __( '.' ) + ' ' + __( 'Empty' ) }
+						accessibilityLabel={ sprintf(
+							/* translators: accessibility text for the media block empty state. %s: media type */
+							__( '%s block. Empty' ),
+							placeholderTitle
+						) }
 						accessibilityRole={ 'button' }
 						accessibilityHint={ accessibilityHint }
 						onPress={ open }

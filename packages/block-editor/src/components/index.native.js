@@ -10,7 +10,7 @@ export {
 	default as RichText,
 	RichTextShortcut,
 	RichTextToolbarButton,
-	UnstableRichTextInputEvent,
+	__unstableRichTextInputEvent,
 } from './rich-text';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from './media-upload';

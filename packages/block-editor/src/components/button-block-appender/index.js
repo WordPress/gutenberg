@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import Inserter from '../inserter';
 
-export default function ButtonBlockAppender( { rootClientId, className } ) {
+function ButtonBlockAppender( { rootClientId, className } ) {
 	return (
 		<Inserter
 			rootClientId={ rootClientId }
@@ -33,3 +33,8 @@ export default function ButtonBlockAppender( { rootClientId, className } ) {
 		/>
 	);
 }
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md
+ */
+export default ButtonBlockAppender;
