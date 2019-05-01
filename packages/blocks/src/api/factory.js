@@ -322,7 +322,7 @@ export function switchToBlockType( blocks, name ) {
 	// Unless it's a `core/group` Block then check
 	// that all Blocks are of the same type otherwise
 	// we can't run a conversion
-	if ( isMultiBlock && ! name === 'core/group' && ! every( blocksArray, ( block ) => ( block.name === sourceName ) ) ) {
+	if ( isMultiBlock && name !== 'core/group' && ! every( blocksArray, ( block ) => ( block.name === sourceName ) ) ) {
 		return null;
 	}
 
