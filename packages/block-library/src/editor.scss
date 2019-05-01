@@ -44,6 +44,8 @@
 // Reset class selectors that are used on HTML elements.
 // Raise the specificity to keep theme styles from overriding.
 // Specificity = 030.
+:root .editor-styles-wrapper .components-tab-button,
+:root .editor-styles-wrapper .block-editor-url-input > input,
 :root .editor-styles-wrapper .dashicon,
 :root .editor-styles-wrapper .components-button,
 :root .editor-styles-wrapper .components-dropdown-menu__indicator,
@@ -57,4 +59,38 @@
 [data-block] {
 	margin-top: $default-block-margin;
 	margin-bottom: $default-block-margin;
+}
+
+// block-library styles
+:root:root:root .block-library-gallery-item__inline-menu .components-button {
+	color: #fff;
+}
+
+:root:root:root .blocks-gallery-item__remove {
+	padding: 0;
+}
+
+:root:root:root .blocks-gallery-item .block-editor-rich-text {
+	position: absolute;
+}
+
+:root:root:root .wp-block-cover .block-editor-block-list__block {
+	color: #f8f9f9;
+}
+
+:root:root:root .components-tab-button {
+	display: inline-flex;
+	align-items: flex-end;
+	margin: 0;
+	padding: 3px;
+	background: none;
+	outline: none;
+	color: #555d66;
+	cursor: pointer;
+	position: relative;
+	height: 36px;
+	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	border: 0;
 }
