@@ -217,6 +217,32 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 };
 
 /**
+ * Determines whether the given Block is the core Block which
+ * acts as a container Block for other Blocks as part of the
+ * Grouping mechanocs
+ * @param  {string} name the name of the Block to test against
+ * @return {boolean}      whether or not the Block is the container Block type
+ */
+const isContainerGroupBlock = ( name ) => name === 'core/group';
+
+/**
+ * Determines whether the provided Blocks are a multi Block selection
+ * and of the same type (eg: all `core/paragraph`).
+ *
+ * @param  {Array}  blocksArray the Block definitions
+ * @return {boolean}             whether or not the given Blocks pass the criteria
+ */
+const isMultiBlockSelectionOfSameType = ( blocksArray = [] ) => {
+	// Is it a Multi Block selection?
+	if ( ! blocksArray.length > 1 ) {
+		return false;
+	}
+	const sourceName = blocksArray[ 0 ].name;
+
+	return ! every( blocksArray, ( block ) => ( block.name === sourceName ) );
+};
+
+/**
  * Returns an array of block types that the set of blocks received as argument
  * can be transformed into.
  *
@@ -322,7 +348,7 @@ export function switchToBlockType( blocks, name ) {
 	// Unless it's a `core/group` Block then check
 	// that all Blocks are of the same type otherwise
 	// we can't run a conversion
-	if ( isMultiBlock && name !== 'core/group' && ! every( blocksArray, ( block ) => ( block.name === sourceName ) ) ) {
+	if ( ! isContainerGroupBlock( name ) && isMultiBlockSelectionOfSameType( blocksArray ) ) {
 		return null;
 	}
 
