@@ -235,8 +235,6 @@ export function getRectangleFromRange( range ) {
 /**
  * Get the rectangle for the selection in a container.
  *
- * @param {Element} container Editable container.
- *
  * @return {?DOMRect} The rectangle.
  */
 export function computeCaretRect() {

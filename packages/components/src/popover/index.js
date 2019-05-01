@@ -282,6 +282,7 @@ class Popover extends Component {
 			getAnchorRect,
 			expandOnMobile,
 			animate = true,
+			anchorRect,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
@@ -319,8 +320,6 @@ class Popover extends Component {
 				'is-without-arrow': noArrow || ( xAxis === 'center' && yAxis === 'middle' ),
 			}
 		);
-
-		delete contentProps.anchorRect;
 
 		// Disable reason: We care to capture the _bubbled_ events from inputs
 		// within popover as inferring close intent.
