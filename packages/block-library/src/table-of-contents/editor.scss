@@ -1,0 +1,13 @@
+.wp-block-table-of-contents {
+	.editor-block-list__block & ul {
+		padding-left: 1.3em;
+
+		ul {
+			margin-bottom: 0;
+		}
+	}
+
+	p {
+		opacity: 0.5;
+	}
+}
