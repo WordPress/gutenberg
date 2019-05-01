@@ -117,9 +117,10 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		return false;
 	}
 
-	// If multiple blocks are selected, only multi block transforms are allowed.
+	// If multiple blocks are selected, only multi block transforms
+	// or wildcard transforms are allowed.
 	const isMultiBlock = blocks.length > 1;
-	const isValidForMultiBlocks = ! isMultiBlock || transform.isMultiBlock;
+	const isValidForMultiBlocks = isWildCardBlockTransform( transform ) || ! isMultiBlock || transform.isMultiBlock;
 	if ( ! isValidForMultiBlocks ) {
 		return false;
 	}
@@ -130,10 +131,17 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		return false;
 	}
 
-	// Check if the transform's block name matches the source block only if this is a transform 'from'.
+	// Check if the transform's block name matches the source block (or is a wildcard)
+	// only if this is a transform 'from'.
 	const sourceBlock = first( blocks );
-	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1;
+	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1 || isWildCardBlockTransform( transform );
 	if ( ! hasMatchingName ) {
+		return false;
+	}
+
+	// Don't allow single 'core/group' blocks to be transformed into
+	// a 'core/group' block.
+	if ( ! isMultiBlock && isContainerGroupBlock( sourceBlock.name ) && isContainerGroupBlock( transform.blockName ) ) {
 		return false;
 	}
 
@@ -172,7 +180,7 @@ const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
 			return !! findTransform(
 				fromTransforms,
 				( transform ) => {
-					return ( transform && isWildCardBlockTransform( transform ) ) || isPossibleTransformForSource( transform, 'from', blocks );
+					return transform && isPossibleTransformForSource( transform, 'from', blocks );
 				}
 			);
 		},
@@ -202,7 +210,7 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	const possibleTransforms = filter(
 		transformsTo,
 		( transform ) => {
-			return ( transform && isWildCardBlockTransform( transform ) ) || isPossibleTransformForSource( transform, 'to', blocks );
+			return transform && isPossibleTransformForSource( transform, 'to', blocks );
 		}
 	);
 
