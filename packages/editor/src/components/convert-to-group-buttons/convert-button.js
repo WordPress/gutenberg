@@ -20,21 +20,30 @@ import { Group } from './icons';
 
 export function ConvertToGroupButton( {
 	onConvertToGroup,
-	isVisible = true,
+	onUnCovertFromGroup,
+	isGroupable = false,
+	isUnGroupable = false,
 } ) {
-	if ( ! isVisible ) {
-		return null;
-	}
-
 	return (
 		<Fragment>
-			<MenuItem
-				className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-				icon={ Group }
-				onClick={ onConvertToGroup }
-			>
-				{ __( 'Group' ) }
-			</MenuItem>
+			{ isGroupable && (
+				<MenuItem
+					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+					icon={ Group }
+					onClick={ onConvertToGroup }
+				>
+					{ __( 'Group' ) }
+				</MenuItem>
+			) }
+			{ isUnGroupable && (
+				<MenuItem
+					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+					icon={ Group }
+					onClick={ onUnCovertFromGroup }
+				>
+					{ __( 'Ungroup' ) }
+				</MenuItem>
+			) }
 		</Fragment>
 	);
 }
@@ -45,37 +54,40 @@ export default compose( [
 			getBlocksByClientId,
 		} = select( 'core/block-editor' );
 
-		const blocksToGroup = getBlocksByClientId( clientIds );
+		const blocksSelection = getBlocksByClientId( clientIds );
 
-		const isSingleContainerBlock = blocksToGroup.length === 1 && blocksToGroup[ 0 ].name === 'core/group';
+		const isSingleContainerBlock = blocksSelection.length === 1 && blocksSelection[ 0 ].name === 'core/group';
 
+		// Do we have one or more blocks selected
+		// (we allow single Blocks to become groups unless
+		// they are a soltiary group block themselves)
 		const isGroupable = (
-			blocksToGroup.length &&
-			blocksToGroup[ 0 ] &&
+			blocksSelection.length &&
 			! isSingleContainerBlock
 		);
 
-		// Define any edge cases here
-		const isVisible = isGroupable;
+		// Do we have a single Group Block selected?
+		const isUnGroupable = isSingleContainerBlock;
 
 		return {
-			isVisible,
-			blocksToGroup,
+			isGroupable,
+			isUnGroupable,
+			blocksSelection,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientIds, onToggle = noop, blocksToGroup = [] } ) => {
+	withDispatch( ( dispatch, { clientIds, onToggle = noop, blocksSelection = [] } ) => {
 		const {
 			replaceBlocks,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			onConvertToGroup() {
-				if ( ! blocksToGroup.length ) {
+				if ( ! blocksSelection.length ) {
 					return;
 				}
 
 				// Activate the `transform` on `core/group` which does the conversion
-				const newBlocks = switchToBlockType( blocksToGroup, 'core/group' );
+				const newBlocks = switchToBlockType( blocksSelection, 'core/group' );
 
 				if ( newBlocks ) {
 					replaceBlocks(
@@ -83,6 +95,24 @@ export default compose( [
 						newBlocks
 					);
 				}
+
+				onToggle();
+			},
+			onUnCovertFromGroup() {
+				if ( ! blocksSelection.length ) {
+					return;
+				}
+
+				const innerBlocks = blocksSelection[ 0 ].innerBlocks;
+
+				if ( ! innerBlocks.length ) {
+					return;
+				}
+
+				replaceBlocks(
+					clientIds,
+					innerBlocks
+				);
 
 				onToggle();
 			},
