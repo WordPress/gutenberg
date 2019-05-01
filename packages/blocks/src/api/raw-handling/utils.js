@@ -17,7 +17,7 @@ import { isPhrasingContent } from './phrasing-content';
 /**
  * Browser dependencies
  */
-const { ELEMENT_NODE, TEXT_NODE } = window.Node;
+const { COMMENT_NODE, ELEMENT_NODE, TEXT_NODE } = window.Node;
 
 /**
  * Given raw transforms from blocks, merges all schemas into one.
@@ -275,8 +275,8 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 			cleanNodeList( node.childNodes, doc, schema, inline );
 
 			// For inline mode, insert a line break when unwrapping nodes that
-			// are not phrasing content.
-			if ( inline && ! isPhrasingContent( node ) && node.nextElementSibling ) {
+			// are not phrasing content and no comments.
+			if ( inline && node.nodeType !== COMMENT_NODE && ! isPhrasingContent( node ) && node.nextElementSibling ) {
 				insertAfter( doc.createElement( 'br' ), node );
 			}
 
