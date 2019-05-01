@@ -34,13 +34,16 @@ export const settings = {
 				isMultiBlock: true,
 				blocks: [ '*' ],
 				transform: ( attributes, innerBlocks, names ) => {
+					// Avoid transforming a single `core/group` Block
+					if ( names.length === 1 && names[ 0 ] === 'core/group' ) {
+						return;
+					}
+
 					const groupInnerBlocks = attributes.map( ( attrs, index ) => {
 						return createBlock( names[ index ], attrs, innerBlocks[ index ] );
 					} );
 
-					return createBlock( 'core/group', {
-						backgroundColor: 'lighter-blue', // TODO: remove this once https://github.com/WordPress/gutenberg/pull/14241 is activated on `core/group`
-					}, groupInnerBlocks );
+					return createBlock( 'core/group', {}, groupInnerBlocks );
 				},
 			},
 
