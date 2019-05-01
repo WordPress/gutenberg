@@ -16,7 +16,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { Group } from './icons';
+import { Group, UnGroup } from './icons';
 
 export function ConvertToGroupButton( {
 	onConvertToGroup,
@@ -38,7 +38,7 @@ export function ConvertToGroupButton( {
 			{ isUnGroupable && (
 				<MenuItem
 					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-					icon={ Group }
+					icon={ UnGroup }
 					onClick={ onUnCovertFromGroup }
 				>
 					{ __( 'Ungroup' ) }
