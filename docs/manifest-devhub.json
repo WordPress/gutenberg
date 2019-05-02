@@ -342,24 +342,6 @@
 		"parent": "format-api"
 	},
 	{
-		"title": "Data Module Reference",
-		"slug": "data",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/README.md",
-		"parent": null
-	},
-	{
-		"title": "Packages",
-		"slug": "packages",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/packages.md",
-		"parent": null
-	},
-	{
-		"title": "Components",
-		"slug": "components",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/README.md",
-		"parent": null
-	},
-	{
 		"title": "Designer Documentation",
 		"slug": "designers",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/README.md",
@@ -520,6 +502,24 @@
 		"slug": "outreach",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/outreach.md",
 		"parent": "contributors"
+	},
+	{
+		"title": "Components",
+		"slug": "components",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/README.md",
+		"parent": null
+	},
+	{
+		"title": "Data Module Reference",
+		"slug": "data",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/README.md",
+		"parent": null
+	},
+	{
+		"title": "Packages",
+		"slug": "packages",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/packages.md",
+		"parent": null
 	},
 	{
 		"title": "@wordpress/a11y",
