@@ -105,7 +105,7 @@ Template locking of `InnerBlocks` is similar to [Custom Post Type templates lock
 Template locking allows locking the `InnerBlocks` area for the current template.
 *Options:*
 
-- `all` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
+- `'all'` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
 - `insert` — prevents inserting or removing blocks, but allows moving existing ones.
 - `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
 
