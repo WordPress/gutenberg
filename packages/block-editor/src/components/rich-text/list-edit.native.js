@@ -5,6 +5,8 @@
 import { Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	__unstableIndentListItems as indentListItems,
+	__unstableOutdentListItems as outdentListItems,
 	__unstableChangeListType as changeListType,
 	__unstableIsListRootSelected as isListRootSelected,
 	__unstableIsActiveListType as isActiveListType,
@@ -47,6 +49,20 @@ export const ListEdit = ( {
 						if ( isListRootSelected( value ) ) {
 							onTagNameChange( 'ol' );
 						}
+					},
+				},
+				{
+					icon: 'editor-outdent',
+					title: __( 'Outdent list item' ),
+					onClick: () => {
+						onChange( outdentListItems( value ) );
+					},
+				},
+				{
+					icon: 'editor-indent',
+					title: __( 'Indent list item' ),
+					onClick: () => {
+						onChange( indentListItems( value, { type: tagName } ) );
 					},
 				},
 			].filter( Boolean ) }
