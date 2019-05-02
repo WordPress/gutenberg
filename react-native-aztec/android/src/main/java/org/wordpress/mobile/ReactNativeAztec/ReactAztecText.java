@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.Spannable;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -91,7 +92,7 @@ public class ReactAztecText extends AztecText {
 
         this.setAztecKeyListener(new ReactAztecText.OnAztecKeyListener() {
             @Override
-            public boolean onEnterKey(Spanned text, boolean firedAfterTextChanged, int selStart, int selEnd) {
+            public boolean onEnterKey(Spannable text, boolean firedAfterTextChanged, int selStart, int selEnd) {
                 if (shouldHandleOnEnter && !isTextChangedListenerDisabled()) {
                     return onEnter(text, firedAfterTextChanged, selStart, selEnd);
                 }
@@ -368,7 +369,7 @@ public class ReactAztecText extends AztecText {
         this.mIsSettingTextFromJS = mIsSettingTextFromJS;
     }
 
-    private boolean onEnter(Spanned text, boolean firedAfterTextChanged, int selStart, int selEnd) {
+    private boolean onEnter(Spannable text, boolean firedAfterTextChanged, int selStart, int selEnd) {
         disableTextChangedListener();
         String content = toHtml(text, false);
         int cursorPositionStart = firedAfterTextChanged ? selStart : getSelectionStart();
