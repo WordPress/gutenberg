@@ -130,7 +130,6 @@ class HeadingEdit extends Component {
 					} }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
-					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					onChange={ ( value ) => setAttributes( { content: value } ) }
 					onMerge={ mergeBlocks }
 					onSplit={ this.splitBlock }

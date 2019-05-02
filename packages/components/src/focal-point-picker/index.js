@@ -178,7 +178,7 @@ export class FocalPointPicker extends Component {
 		);
 		const id = `inspector-focal-point-picker-control-${ instanceId }`;
 		const horizontalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
-		const verticalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
+		const verticalPositionId = `inspector-focal-point-picker-control-vertical-position-${ instanceId }`;
 		return (
 			<BaseControl label={ label } id={ id } help={ help } className={ className }>
 				<div className="components-focal-point-picker-wrapper">

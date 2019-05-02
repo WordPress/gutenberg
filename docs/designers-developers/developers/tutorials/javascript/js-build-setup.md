@@ -2,7 +2,7 @@
 
 This page covers how to set up your development environment to use the ESNext and [JSX](https://reactjs.org/docs/introducing-jsx.html) syntaxes. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short). JSX is a custom syntax extension to JavaScript which helps you to describe what the UI should look like.
 
-This documentation covers development for your plugin to work with Gutenberg. If you want to setup a development environment for developing Gutenberg itself, see the [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) documentation.
+This documentation covers development for your plugin to work with Gutenberg. If you want to setup a development environment for developing Gutenberg itself, see the [Getting Started](/docs/contributors/getting-started.md) documentation.
 
 Most browsers can not interpret or run ESNext and JSX syntaxes, so we use a transformation step to convert these syntaxes to code that browsers can understand.
 

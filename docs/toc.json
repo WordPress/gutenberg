@@ -85,12 +85,15 @@
 			{"docs/contributors/reference.md": []}
 		]},
 		{"docs/contributors/develop.md": [
+			{"docs/contributors/getting-started.md": []},
+			{"docs/contributors/git-workflow.md": []},
 			{"docs/contributors/coding-guidelines.md": []},
 			{"docs/contributors/testing-overview.md": []},
-			{"docs/contributors/git-workflow.md": []},
 			{"docs/contributors/grammar.md": []},
 			{"docs/contributors/scripts.md": []},
-			{"docs/contributors/release.md": []}
+			{"docs/contributors/managing-packages.md": []},
+			{"docs/contributors/release.md": []},
+			{"docs/contributors/localizing.md": []}
 		]},
 		{"docs/contributors/document.md": [
 			{"docs/contributors/copy-guide.md": []}

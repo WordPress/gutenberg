@@ -52,7 +52,7 @@ const processFile = ( rootDir, inputFile ) => {
 		currentFileStack.push( inputFile );
 		const relativePath = path.relative( rootDir, inputFile );
 		const result = engine( relativePath, data, getIRFromRelativePath( rootDir, last( currentFileStack ) ) );
-		currentFileStack.pop( inputFile );
+		currentFileStack.pop();
 		return result;
 	} catch ( e ) {
 		process.stderr.write( `\n${ e }` );
