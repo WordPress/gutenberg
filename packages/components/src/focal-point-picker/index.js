@@ -27,7 +27,7 @@ export class FocalPointPicker extends Component {
 		this.state = {
 			isDragging: false,
 			bounds: {},
-			percentages: {},
+			percentages: FocalPointPicker.defaultProps.value,
 		};
 		this.containerRef = createRef();
 		this.imageRef = createRef();
