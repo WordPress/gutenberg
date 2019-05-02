@@ -168,7 +168,7 @@
 		"parent": "designers"
 	},
 	{
-		"title": "Contributors Guide",
+		"title": "Contributor Documentation",
 		"slug": "contributors",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/readme.md",
 		"parent": null
