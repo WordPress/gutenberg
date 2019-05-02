@@ -130,19 +130,19 @@ class ModalLinkUI extends Component {
 				onClose={ this.onDismiss }
 				hideHeader
 			>
-				{ /* eslint-disable jsx-a11y/no-autofocus */
-					<BottomSheet.Cell
-						icon={ 'admin-links' }
-						label={ __( 'URL' ) }
-						value={ this.state.inputValue }
-						placeholder={ __( 'Add URL' ) }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						keyboardType="url"
-						onChangeValue={ this.onChangeInputValue }
-						autoFocus={ Platform.OS === 'ios' }
-					/>
-				/* eslint-enable jsx-a11y/no-autofocus */ }
+				{ /* eslint-disable jsx-a11y/no-autofocus */ }
+				<BottomSheet.Cell
+					icon={ 'admin-links' }
+					label={ __( 'URL' ) }
+					value={ this.state.inputValue }
+					placeholder={ __( 'Add URL' ) }
+					autoCapitalize="none"
+					autoCorrect={ false }
+					keyboardType="url"
+					onChangeValue={ this.onChangeInputValue }
+					autoFocus={ Platform.OS === 'ios' }
+				/>
+				{ /* eslint-enable jsx-a11y/no-autofocus */ }
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
 					label={ __( 'Link Text' ) }

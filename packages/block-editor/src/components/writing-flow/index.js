@@ -357,7 +357,7 @@ class WritingFlow extends Component {
 				/>
 			</div>
 		);
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
