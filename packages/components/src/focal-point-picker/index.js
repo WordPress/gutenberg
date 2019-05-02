@@ -21,24 +21,19 @@ const TEXTCONTROL_MIN = 0;
 const TEXTCONTROL_MAX = 100;
 
 export class FocalPointPicker extends Component {
-	constructor() {
-		super( ...arguments );
+	constructor( props ) {
+		super( props );
 		this.onMouseMove = this.onMouseMove.bind( this );
 		this.state = {
 			isDragging: false,
 			bounds: {},
-			percentages: FocalPointPicker.defaultProps.value,
+			percentages: props.value,
 		};
 		this.containerRef = createRef();
 		this.imageRef = createRef();
 		this.horizontalPositionChanged = this.horizontalPositionChanged.bind( this );
 		this.verticalPositionChanged = this.verticalPositionChanged.bind( this );
 		this.onLoad = this.onLoad.bind( this );
-	}
-	componentDidMount() {
-		this.setState( {
-			percentages: this.props.value,
-		} );
 	}
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.url !== this.props.url ) {
