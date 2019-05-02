@@ -334,7 +334,12 @@ public class ReactAztecText extends AztecText {
             // Keep the enter pressed watcher at the beginning of the watchers list.
             // We want to intercept Enter.key as soon as possible, and before other listeners start modifying the text.
             // Also note that this Watchers, when the AztecKeyListener is set, keep hold a copy of the content in the editor.
-            mListeners.add(new EnterPressedWatcher(this, () -> shouldDeleteEnter));
+            mListeners.add(new EnterPressedWatcher(this, new EnterDeleter() {
+                @Override
+                public boolean shouldDeleteEnter() {
+                    return shouldDeleteEnter;
+                }
+            }));
         }
 
         mListeners.add(watcher);
