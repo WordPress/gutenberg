@@ -258,7 +258,6 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
 		const {
-			clearSelectedBlock,
 			insertBlocks,
 			mergeBlocks,
 			moveBlocksDown,
@@ -284,7 +283,6 @@ export default compose( [
 				insertBlocks( blocks, index, rootClientId );
 			},
 			onSelect: ( selectedClientId: string ) => {
-				clearSelectedBlock();
 				selectBlock( selectedClientId );
 			},
 			onChange: ( attributes: Object ) => {
