@@ -44,6 +44,7 @@
 // Reset class selectors that are used on HTML elements.
 // Raise the specificity to keep theme styles from overriding.
 // Specificity = 030.
+:root .editor-styles-wrapper .editor-post-permalink__link,
 :root .editor-styles-wrapper .components-tab-button,
 :root .editor-styles-wrapper .block-editor-url-input > input,
 :root .editor-styles-wrapper .dashicon,
