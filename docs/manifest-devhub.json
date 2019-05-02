@@ -516,7 +516,7 @@
 		"parent": null
 	},
 	{
-		"title": "Packages",
+		"title": "Package Reference",
 		"slug": "packages",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/packages.md",
 		"parent": null
