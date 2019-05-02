@@ -123,7 +123,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		}
 
 		// now set the focus
-		this.props.focusBlock( newBlock.clientId );
+		this.props.selectBlock( newBlock.clientId );
 	}
 
 	onSafeAreaInsetsUpdate( result: Object ) {
@@ -373,7 +373,6 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
-			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
 			selectBlock,
@@ -381,10 +380,7 @@ export default compose( [
 
 		return {
 			insertBlock,
-			focusBlock: ( clientId ) => {
-				clearSelectedBlock();
-				selectBlock( clientId );
-			},
+			selectBlock,
 			replaceBlock,
 		};
 	} ),
