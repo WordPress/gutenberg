@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
@@ -60,6 +61,8 @@ public class ReactAztecText extends AztecText {
     boolean shouldHandleOnSelectionChange = false;
     boolean shouldHandleActiveFormatsChange = false;
 
+    boolean shouldDeleteEnter = false;
+
     // This optional variable holds the outer HTML tag that will be added to the text when the user start typing in it
     // This is required to keep placeholder text working, and start typing with styled text.
     // Ref: https://github.com/wordpress-mobile/gutenberg-mobile/issues/707
@@ -88,16 +91,16 @@ public class ReactAztecText extends AztecText {
 
         this.setAztecKeyListener(new ReactAztecText.OnAztecKeyListener() {
             @Override
-            public boolean onEnterKey() {
+            public boolean onEnterKey(Spanned text, boolean firedAfterTextChanged, int selStart, int selEnd) {
                 if (shouldHandleOnEnter && !isTextChangedListenerDisabled()) {
-                    return onEnter();
+                    return onEnter(text, firedAfterTextChanged, selStart, selEnd);
                 }
                 return false;
             }
             @Override
             public boolean onBackspaceKey() {
                 if (shouldHandleOnBackspace && !isTextChangedListenerDisabled()) {
-                    String content = toHtml(false);
+                    String content = toHtml(getText(), false);
                     if (TextUtils.isEmpty(content)) {
                         return onBackspace();
                     }
@@ -296,7 +299,7 @@ public class ReactAztecText extends AztecText {
         if (!shouldHandleOnSelectionChange) {
             return;
         }
-        String content = toHtml(false);
+        String content = toHtml(getText(), false);
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
@@ -327,6 +330,16 @@ public class ReactAztecText extends AztecText {
         if (mListeners == null) {
             mListeners = new ArrayList<>();
             super.addTextChangedListener(getTextWatcherDelegator());
+
+            // Keep the enter pressed watcher at the beginning of the watchers list.
+            // We want to intercept Enter.key as soon as possible, and before other listeners start modifying the text.
+            // Also note that this Watchers, when the AztecKeyListener is set, keep hold a copy of the content in the editor.
+            mListeners.add(new EnterPressedWatcher(this, new EnterDeleter() {
+                @Override
+                public boolean shouldDeleteEnter() {
+                    return shouldDeleteEnter;
+                }
+            }));
         }
 
         mListeners.add(watcher);
@@ -355,16 +368,17 @@ public class ReactAztecText extends AztecText {
         this.mIsSettingTextFromJS = mIsSettingTextFromJS;
     }
 
-    private boolean onEnter() {
+    private boolean onEnter(Spanned text, boolean firedAfterTextChanged, int selStart, int selEnd) {
         disableTextChangedListener();
-        String content = toHtml(false);
-        int cursorPositionStart = getSelectionStart();
-        int cursorPositionEnd = getSelectionEnd();
+        String content = toHtml(text, false);
+        int cursorPositionStart = firedAfterTextChanged ? selStart : getSelectionStart();
+        int cursorPositionEnd = firedAfterTextChanged ? selEnd : getSelectionEnd();
         enableTextChangedListener();
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
-                new ReactAztecEnterEvent(getId(), content, cursorPositionStart, cursorPositionEnd, incrementAndGetEventCounter())
+                new ReactAztecEnterEvent(getId(), content, cursorPositionStart, cursorPositionEnd,
+                        firedAfterTextChanged, incrementAndGetEventCounter())
         );
         return true;
     }
@@ -378,7 +392,7 @@ public class ReactAztecText extends AztecText {
         }
 
         disableTextChangedListener();
-        String content = toHtml(false);
+        String content = toHtml(getText(), false);
         enableTextChangedListener();
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
@@ -420,7 +434,7 @@ public class ReactAztecText extends AztecText {
 
         // temporarily disable listener during call to toHtml()
         disableTextChangedListener();
-        String content = toHtml(false);
+        String content = toHtml(getText(), false);
         int cursorPositionStart = getSelectionStart();
         int cursorPositionEnd = getSelectionEnd();
         enableTextChangedListener();
@@ -454,6 +468,10 @@ public class ReactAztecText extends AztecText {
         ArrayList<ITextFormat> newStylesList = new ArrayList<>(selectedStylesSet);
         setSelectedStyles(newStylesList);
         updateToolbarButtons(newStylesList);
+    }
+
+    protected boolean isEnterPressedUnderway() {
+        return EnterPressedWatcher.Companion.isEnterPressedUnderway(getText());
     }
 
     /**
