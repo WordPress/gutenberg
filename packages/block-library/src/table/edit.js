@@ -43,6 +43,7 @@ import {
 	isCellSelected,
 } from './state';
 import icon from './icon';
+import NavigableTable from './navigable-table';
 
 const BACKGROUND_COLORS = [
 	{
@@ -110,6 +111,7 @@ export class TableEdit extends Component {
 		this.onToggleFooterSection = this.onToggleFooterSection.bind( this );
 		this.onChangeColumnAlignment = this.onChangeColumnAlignment.bind( this );
 		this.getCellAlignment = this.getCellAlignment.bind( this );
+		this.updateSelectedCell = this.updateSelectedCell.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
@@ -354,22 +356,18 @@ export class TableEdit extends Component {
 	}
 
 	/**
-	 * Creates an onFocus handler for a specified cell.
+	 * Update the cell selection
 	 *
 	 * @param {Object} cellLocation Object with `section`, `rowIndex`, and
 	 *                              `columnIndex` properties.
-	 *
-	 * @return {Function} Function to call on focus.
 	 */
-	createOnFocus( cellLocation ) {
-		return () => {
-			this.setState( {
-				selectedCell: {
-					...cellLocation,
-					type: 'cell',
-				},
-			} );
-		};
+	updateSelectedCell( cellLocation ) {
+		this.setState( {
+			selectedCell: {
+				...cellLocation,
+				type: 'cell',
+			},
+		} );
 	}
 
 	/**
@@ -473,7 +471,7 @@ export class TableEdit extends Component {
 										className={ richTextClassName }
 										value={ content }
 										onChange={ this.onChange }
-										unstableOnFocus={ this.createOnFocus( cellLocation ) }
+										unstableOnFocus={ () => this.updateSelectedCell( cellLocation ) }
 									/>
 								</CellTag>
 							);
@@ -500,7 +498,11 @@ export class TableEdit extends Component {
 			backgroundColor,
 			setBackgroundColor,
 		} = this.props;
-		const { initialRowCount, initialColumnCount } = this.state;
+		const {
+			initialRowCount,
+			initialColumnCount,
+			selectedCell,
+		} = this.state;
 		const { hasFixedLayout, head, body, foot } = attributes;
 		const isEmpty = isEmptyTableSection( head ) && isEmptyTableSection( body ) && isEmptyTableSection( foot );
 		const Section = this.renderSection;
@@ -593,11 +595,16 @@ export class TableEdit extends Component {
 					/>
 				</InspectorControls>
 				<figure className={ className }>
-					<table className={ tableClasses }>
+					<NavigableTable
+						className={ tableClasses }
+						tableState={ attributes }
+						selectedCell={ selectedCell }
+						onNavigation={ ( cellLocation ) => this.updateSelectedCell( cellLocation ) }
+					>
 						<Section name="head" rows={ head } />
 						<Section name="body" rows={ body } />
 						<Section name="foot" rows={ foot } />
-					</table>
+					</NavigableTable>
 				</figure>
 			</>
 		);
