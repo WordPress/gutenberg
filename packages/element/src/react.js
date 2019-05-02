@@ -11,6 +11,7 @@ import {
 	forwardRef,
 	Fragment,
 	isValidElement,
+	memo,
 	StrictMode,
 	useState,
 	useEffect,
@@ -107,6 +108,11 @@ export { Fragment };
 export { isValidElement };
 
 /**
+ * @see https://reactjs.org/docs/react-api.html#reactmemo
+ */
+export { memo };
+
+/**
  * Component that activates additional checks and warnings for its descendants.
  */
 export { StrictMode };
@@ -179,7 +185,7 @@ export { Suspense };
  * @return {Array} The concatenated value.
  */
 export function concatChildren( ...childrenArguments ) {
-	return childrenArguments.reduce( ( memo, children, i ) => {
+	return childrenArguments.reduce( ( memoized, children, i ) => {
 		Children.forEach( children, ( child, j ) => {
 			if ( child && 'string' !== typeof child ) {
 				child = cloneElement( child, {
@@ -187,10 +193,10 @@ export function concatChildren( ...childrenArguments ) {
 				} );
 			}
 
-			memo.push( child );
+			memoized.push( child );
 		} );
 
-		return memo;
+		return memoized;
 	}, [] );
 }
 
