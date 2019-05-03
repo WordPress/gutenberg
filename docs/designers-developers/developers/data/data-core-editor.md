@@ -8,7 +8,9 @@ Namespace: `core/editor`.
 
 <a name="canInsertBlockType" href="#canInsertBlockType">#</a> **canInsertBlockType**
 
-Undocumented declaration.
+_Related_
+
+-   canInsertBlockType in core/block-editor store.
 
 <a name="canUserUseUnfilteredHTML" href="#canUserUseUnfilteredHTML">#</a> **canUserUseUnfilteredHTML**
 
@@ -62,7 +64,9 @@ _Returns_
 
 <a name="getAdjacentBlockClientId" href="#getAdjacentBlockClientId">#</a> **getAdjacentBlockClientId**
 
-Undocumented declaration.
+_Related_
+
+-   getAdjacentBlockClientId in core/block-editor store.
 
 <a name="getAutosave" href="#getAutosave">#</a> **getAutosave**
 
@@ -98,67 +102,99 @@ _Returns_
 
 <a name="getBlock" href="#getBlock">#</a> **getBlock**
 
-Undocumented declaration.
+_Related_
+
+-   getBlock in core/block-editor store.
 
 <a name="getBlockAttributes" href="#getBlockAttributes">#</a> **getBlockAttributes**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockAttributes in core/block-editor store.
 
 <a name="getBlockCount" href="#getBlockCount">#</a> **getBlockCount**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockCount in core/block-editor store.
 
 <a name="getBlockDependantsCacheBust" href="#getBlockDependantsCacheBust">#</a> **getBlockDependantsCacheBust**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockDependantsCacheBust in core/block-editor store.
 
 <a name="getBlockHierarchyRootClientId" href="#getBlockHierarchyRootClientId">#</a> **getBlockHierarchyRootClientId**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockHierarchyRootClientId in core/block-editor store.
 
 <a name="getBlockIndex" href="#getBlockIndex">#</a> **getBlockIndex**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockIndex in core/block-editor store.
 
 <a name="getBlockInsertionPoint" href="#getBlockInsertionPoint">#</a> **getBlockInsertionPoint**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockInsertionPoint in core/block-editor store.
 
 <a name="getBlockListSettings" href="#getBlockListSettings">#</a> **getBlockListSettings**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockListSettings in core/block-editor store.
 
 <a name="getBlockMode" href="#getBlockMode">#</a> **getBlockMode**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockMode in core/block-editor store.
 
 <a name="getBlockName" href="#getBlockName">#</a> **getBlockName**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockName in core/block-editor store.
 
 <a name="getBlockOrder" href="#getBlockOrder">#</a> **getBlockOrder**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockOrder in core/block-editor store.
 
 <a name="getBlockRootClientId" href="#getBlockRootClientId">#</a> **getBlockRootClientId**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockRootClientId in core/block-editor store.
 
 <a name="getBlocks" href="#getBlocks">#</a> **getBlocks**
 
-Undocumented declaration.
+_Related_
+
+-   getBlocks in core/block-editor store.
 
 <a name="getBlocksByClientId" href="#getBlocksByClientId">#</a> **getBlocksByClientId**
 
-Undocumented declaration.
+_Related_
+
+-   getBlocksByClientId in core/block-editor store.
 
 <a name="getBlockSelectionEnd" href="#getBlockSelectionEnd">#</a> **getBlockSelectionEnd**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockSelectionEnd in core/block-editor store.
 
 <a name="getBlockSelectionStart" href="#getBlockSelectionStart">#</a> **getBlockSelectionStart**
 
-Undocumented declaration.
+_Related_
+
+-   getBlockSelectionStart in core/block-editor store.
 
 <a name="getBlocksForSerialization" href="#getBlocksForSerialization">#</a> **getBlocksForSerialization**
 
@@ -175,11 +211,15 @@ _Returns_
 
 <a name="getClientIdsOfDescendants" href="#getClientIdsOfDescendants">#</a> **getClientIdsOfDescendants**
 
-Undocumented declaration.
+_Related_
+
+-   getClientIdsOfDescendants in core/block-editor store.
 
 <a name="getClientIdsWithDescendants" href="#getClientIdsWithDescendants">#</a> **getClientIdsWithDescendants**
 
-Undocumented declaration.
+_Related_
+
+-   getClientIdsWithDescendants in core/block-editor store.
 
 <a name="getCurrentPost" href="#getCurrentPost">#</a> **getCurrentPost**
 
@@ -338,39 +378,57 @@ _Returns_
 
 <a name="getFirstMultiSelectedBlockClientId" href="#getFirstMultiSelectedBlockClientId">#</a> **getFirstMultiSelectedBlockClientId**
 
-Undocumented declaration.
+_Related_
+
+-   getFirstMultiSelectedBlockClientId in core/block-editor store.
 
 <a name="getGlobalBlockCount" href="#getGlobalBlockCount">#</a> **getGlobalBlockCount**
 
-Undocumented declaration.
+_Related_
+
+-   getGlobalBlockCount in core/block-editor store.
 
 <a name="getInserterItems" href="#getInserterItems">#</a> **getInserterItems**
 
-Undocumented declaration.
+_Related_
+
+-   getInserterItems in core/block-editor store.
 
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
-Undocumented declaration.
+_Related_
+
+-   getLastMultiSelectedBlockClientId in core/block-editor store.
 
 <a name="getMultiSelectedBlockClientIds" href="#getMultiSelectedBlockClientIds">#</a> **getMultiSelectedBlockClientIds**
 
-Undocumented declaration.
+_Related_
+
+-   getMultiSelectedBlockClientIds in core/block-editor store.
 
 <a name="getMultiSelectedBlocks" href="#getMultiSelectedBlocks">#</a> **getMultiSelectedBlocks**
 
-Undocumented declaration.
+_Related_
+
+-   getMultiSelectedBlocks in core/block-editor store.
 
 <a name="getMultiSelectedBlocksEndClientId" href="#getMultiSelectedBlocksEndClientId">#</a> **getMultiSelectedBlocksEndClientId**
 
-Undocumented declaration.
+_Related_
+
+-   getMultiSelectedBlocksEndClientId in core/block-editor store.
 
 <a name="getMultiSelectedBlocksStartClientId" href="#getMultiSelectedBlocksStartClientId">#</a> **getMultiSelectedBlocksStartClientId**
 
-Undocumented declaration.
+_Related_
+
+-   getMultiSelectedBlocksStartClientId in core/block-editor store.
 
 <a name="getNextBlockClientId" href="#getNextBlockClientId">#</a> **getNextBlockClientId**
 
-Undocumented declaration.
+_Related_
+
+-   getNextBlockClientId in core/block-editor store.
 
 <a name="getPermalink" href="#getPermalink">#</a> **getPermalink**
 
@@ -424,7 +482,9 @@ _Returns_
 
 <a name="getPreviousBlockClientId" href="#getPreviousBlockClientId">#</a> **getPreviousBlockClientId**
 
-Undocumented declaration.
+_Related_
+
+-   getPreviousBlockClientId in core/block-editor store.
 
 <a name="getReferenceByDistinctEdits" href="#getReferenceByDistinctEdits">#</a> **getReferenceByDistinctEdits**
 
@@ -449,19 +509,27 @@ _Returns_
 
 <a name="getSelectedBlock" href="#getSelectedBlock">#</a> **getSelectedBlock**
 
-Undocumented declaration.
+_Related_
+
+-   getSelectedBlock in core/block-editor store.
 
 <a name="getSelectedBlockClientId" href="#getSelectedBlockClientId">#</a> **getSelectedBlockClientId**
 
-Undocumented declaration.
+_Related_
+
+-   getSelectedBlockClientId in core/block-editor store.
 
 <a name="getSelectedBlockCount" href="#getSelectedBlockCount">#</a> **getSelectedBlockCount**
 
-Undocumented declaration.
+_Related_
+
+-   getSelectedBlockCount in core/block-editor store.
 
 <a name="getSelectedBlocksInitialCaretPosition" href="#getSelectedBlocksInitialCaretPosition">#</a> **getSelectedBlocksInitialCaretPosition**
 
-Undocumented declaration.
+_Related_
+
+-   getSelectedBlocksInitialCaretPosition in core/block-editor store.
 
 <a name="getStateBeforeOptimisticTransaction" href="#getStateBeforeOptimisticTransaction">#</a> **getStateBeforeOptimisticTransaction**
 
@@ -493,11 +561,15 @@ _Returns_
 
 <a name="getTemplate" href="#getTemplate">#</a> **getTemplate**
 
-Undocumented declaration.
+_Related_
+
+-   getTemplate in core/block-editor store.
 
 <a name="getTemplateLock" href="#getTemplateLock">#</a> **getTemplateLock**
 
-Undocumented declaration.
+_Related_
+
+-   getTemplateLock in core/block-editor store.
 
 <a name="hasAutosave" href="#hasAutosave">#</a> **hasAutosave**
 
@@ -552,19 +624,27 @@ _Returns_
 
 <a name="hasInserterItems" href="#hasInserterItems">#</a> **hasInserterItems**
 
-Undocumented declaration.
+_Related_
+
+-   hasInserterItems in core/block-editor store.
 
 <a name="hasMultiSelection" href="#hasMultiSelection">#</a> **hasMultiSelection**
 
-Undocumented declaration.
+_Related_
+
+-   hasMultiSelection in core/block-editor store.
 
 <a name="hasSelectedBlock" href="#hasSelectedBlock">#</a> **hasSelectedBlock**
 
-Undocumented declaration.
+_Related_
+
+-   hasSelectedBlock in core/block-editor store.
 
 <a name="hasSelectedInnerBlock" href="#hasSelectedInnerBlock">#</a> **hasSelectedInnerBlock**
 
-Undocumented declaration.
+_Related_
+
+-   hasSelectedInnerBlock in core/block-editor store.
 
 <a name="inSomeHistory" href="#inSomeHistory">#</a> **inSomeHistory**
 
@@ -582,7 +662,9 @@ _Returns_
 
 <a name="isAncestorMultiSelected" href="#isAncestorMultiSelected">#</a> **isAncestorMultiSelected**
 
-Undocumented declaration.
+_Related_
+
+-   isAncestorMultiSelected in core/block-editor store.
 
 <a name="isAutosavingPost" href="#isAutosavingPost">#</a> **isAutosavingPost**
 
@@ -598,27 +680,39 @@ _Returns_
 
 <a name="isBlockInsertionPointVisible" href="#isBlockInsertionPointVisible">#</a> **isBlockInsertionPointVisible**
 
-Undocumented declaration.
+_Related_
+
+-   isBlockInsertionPointVisible in core/block-editor store.
 
 <a name="isBlockMultiSelected" href="#isBlockMultiSelected">#</a> **isBlockMultiSelected**
 
-Undocumented declaration.
+_Related_
+
+-   isBlockMultiSelected in core/block-editor store.
 
 <a name="isBlockSelected" href="#isBlockSelected">#</a> **isBlockSelected**
 
-Undocumented declaration.
+_Related_
+
+-   isBlockSelected in core/block-editor store.
 
 <a name="isBlockValid" href="#isBlockValid">#</a> **isBlockValid**
 
-Undocumented declaration.
+_Related_
+
+-   isBlockValid in core/block-editor store.
 
 <a name="isBlockWithinSelection" href="#isBlockWithinSelection">#</a> **isBlockWithinSelection**
 
-Undocumented declaration.
+_Related_
+
+-   isBlockWithinSelection in core/block-editor store.
 
 <a name="isCaretWithinFormattedText" href="#isCaretWithinFormattedText">#</a> **isCaretWithinFormattedText**
 
-Undocumented declaration.
+_Related_
+
+-   isCaretWithinFormattedText in core/block-editor store.
 
 <a name="isCleanNewPost" href="#isCleanNewPost">#</a> **isCleanNewPost**
 
@@ -780,11 +874,15 @@ _Returns_
 
 <a name="isFirstMultiSelectedBlock" href="#isFirstMultiSelectedBlock">#</a> **isFirstMultiSelectedBlock**
 
-Undocumented declaration.
+_Related_
+
+-   isFirstMultiSelectedBlock in core/block-editor store.
 
 <a name="isMultiSelecting" href="#isMultiSelecting">#</a> **isMultiSelecting**
 
-Undocumented declaration.
+_Related_
+
+-   isMultiSelecting in core/block-editor store.
 
 <a name="isPermalinkEditable" href="#isPermalinkEditable">#</a> **isPermalinkEditable**
 
@@ -885,15 +983,21 @@ _Returns_
 
 <a name="isSelectionEnabled" href="#isSelectionEnabled">#</a> **isSelectionEnabled**
 
-Undocumented declaration.
+_Related_
+
+-   isSelectionEnabled in core/block-editor store.
 
 <a name="isTyping" href="#isTyping">#</a> **isTyping**
 
-Undocumented declaration.
+_Related_
+
+-   isTyping in core/block-editor store.
 
 <a name="isValidTemplate" href="#isValidTemplate">#</a> **isValidTemplate**
 
-Undocumented declaration.
+_Related_
+
+-   isValidTemplate in core/block-editor store.
 
 
 <!-- END TOKEN(Autogenerated selectors) -->
@@ -912,7 +1016,9 @@ _Parameters_
 
 <a name="clearSelectedBlock" href="#clearSelectedBlock">#</a> **clearSelectedBlock**
 
-Undocumented declaration.
+_Related_
+
+-   clearSelectedBlock in core/block-editor store.
 
 <a name="createUndoLevel" href="#createUndoLevel">#</a> **createUndoLevel**
 
@@ -956,27 +1062,39 @@ _Returns_
 
 <a name="enterFormattedText" href="#enterFormattedText">#</a> **enterFormattedText**
 
-Undocumented declaration.
+_Related_
+
+-   enterFormattedText in core/block-editor store.
 
 <a name="exitFormattedText" href="#exitFormattedText">#</a> **exitFormattedText**
 
-Undocumented declaration.
+_Related_
+
+-   exitFormattedText in core/block-editor store.
 
 <a name="hideInsertionPoint" href="#hideInsertionPoint">#</a> **hideInsertionPoint**
 
-Undocumented declaration.
+_Related_
+
+-   hideInsertionPoint in core/block-editor store.
 
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 
-Undocumented declaration.
+_Related_
+
+-   insertBlock in core/block-editor store.
 
 <a name="insertBlocks" href="#insertBlocks">#</a> **insertBlocks**
 
-Undocumented declaration.
+_Related_
+
+-   insertBlocks in core/block-editor store.
 
 <a name="insertDefaultBlock" href="#insertDefaultBlock">#</a> **insertDefaultBlock**
 
-Undocumented declaration.
+_Related_
+
+-   insertDefaultBlock in core/block-editor store.
 
 <a name="lockPostSaving" href="#lockPostSaving">#</a> **lockPostSaving**
 
@@ -992,27 +1110,39 @@ _Returns_
 
 <a name="mergeBlocks" href="#mergeBlocks">#</a> **mergeBlocks**
 
-Undocumented declaration.
+_Related_
+
+-   mergeBlocks in core/block-editor store.
 
 <a name="moveBlocksDown" href="#moveBlocksDown">#</a> **moveBlocksDown**
 
-Undocumented declaration.
+_Related_
+
+-   moveBlocksDown in core/block-editor store.
 
 <a name="moveBlocksUp" href="#moveBlocksUp">#</a> **moveBlocksUp**
 
-Undocumented declaration.
+_Related_
+
+-   moveBlocksUp in core/block-editor store.
 
 <a name="moveBlockToPosition" href="#moveBlockToPosition">#</a> **moveBlockToPosition**
 
-Undocumented declaration.
+_Related_
+
+-   moveBlockToPosition in core/block-editor store.
 
 <a name="multiSelect" href="#multiSelect">#</a> **multiSelect**
 
-Undocumented declaration.
+_Related_
+
+-   multiSelect in core/block-editor store.
 
 <a name="receiveBlocks" href="#receiveBlocks">#</a> **receiveBlocks**
 
-Undocumented declaration.
+_Related_
+
+-   receiveBlocks in core/block-editor store.
 
 <a name="redo" href="#redo">#</a> **redo**
 
@@ -1029,15 +1159,21 @@ Action generator for handling refreshing the current post.
 
 <a name="removeBlock" href="#removeBlock">#</a> **removeBlock**
 
-Undocumented declaration.
+_Related_
+
+-   removeBlock in core/block-editor store.
 
 <a name="removeBlocks" href="#removeBlocks">#</a> **removeBlocks**
 
-Undocumented declaration.
+_Related_
+
+-   removeBlocks in core/block-editor store.
 
 <a name="replaceBlocks" href="#replaceBlocks">#</a> **replaceBlocks**
 
-Undocumented declaration.
+_Related_
+
+-   replaceBlocks in core/block-editor store.
 
 <a name="resetAutosave" href="#resetAutosave">#</a> **resetAutosave**
 
@@ -1056,7 +1192,9 @@ _Returns_
 
 <a name="resetBlocks" href="#resetBlocks">#</a> **resetBlocks**
 
-Undocumented declaration.
+_Related_
+
+-   resetBlocks in core/block-editor store.
 
 <a name="resetEditorBlocks" href="#resetEditorBlocks">#</a> **resetEditorBlocks**
 
@@ -1094,11 +1232,15 @@ _Parameters_
 
 <a name="selectBlock" href="#selectBlock">#</a> **selectBlock**
 
-Undocumented declaration.
+_Related_
+
+-   selectBlock in core/block-editor store.
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
-Undocumented declaration.
+_Related_
+
+-   setTemplateValidity in core/block-editor store.
 
 <a name="setupEditor" href="#setupEditor">#</a> **setupEditor**
 
@@ -1126,35 +1268,51 @@ _Returns_
 
 <a name="showInsertionPoint" href="#showInsertionPoint">#</a> **showInsertionPoint**
 
-Undocumented declaration.
+_Related_
+
+-   showInsertionPoint in core/block-editor store.
 
 <a name="startMultiSelect" href="#startMultiSelect">#</a> **startMultiSelect**
 
-Undocumented declaration.
+_Related_
+
+-   startMultiSelect in core/block-editor store.
 
 <a name="startTyping" href="#startTyping">#</a> **startTyping**
 
-Undocumented declaration.
+_Related_
+
+-   startTyping in core/block-editor store.
 
 <a name="stopMultiSelect" href="#stopMultiSelect">#</a> **stopMultiSelect**
 
-Undocumented declaration.
+_Related_
+
+-   stopMultiSelect in core/block-editor store.
 
 <a name="stopTyping" href="#stopTyping">#</a> **stopTyping**
 
-Undocumented declaration.
+_Related_
+
+-   stopTyping in core/block-editor store.
 
 <a name="synchronizeTemplate" href="#synchronizeTemplate">#</a> **synchronizeTemplate**
 
-Undocumented declaration.
+_Related_
+
+-   synchronizeTemplate in core/block-editor store.
 
 <a name="toggleBlockMode" href="#toggleBlockMode">#</a> **toggleBlockMode**
 
-Undocumented declaration.
+_Related_
+
+-   toggleBlockMode in core/block-editor store.
 
 <a name="toggleSelection" href="#toggleSelection">#</a> **toggleSelection**
 
-Undocumented declaration.
+_Related_
+
+-   toggleSelection in core/block-editor store.
 
 <a name="trashPost" href="#trashPost">#</a> **trashPost**
 
@@ -1182,15 +1340,21 @@ _Returns_
 
 <a name="updateBlock" href="#updateBlock">#</a> **updateBlock**
 
-Undocumented declaration.
+_Related_
+
+-   updateBlock in core/block-editor store.
 
 <a name="updateBlockAttributes" href="#updateBlockAttributes">#</a> **updateBlockAttributes**
 
-Undocumented declaration.
+_Related_
+
+-   updateBlockAttributes in core/block-editor store.
 
 <a name="updateBlockListSettings" href="#updateBlockListSettings">#</a> **updateBlockListSettings**
 
-Undocumented declaration.
+_Related_
+
+-   updateBlockListSettings in core/block-editor store.
 
 <a name="updateEditorSettings" href="#updateEditorSettings">#</a> **updateEditorSettings**
 
