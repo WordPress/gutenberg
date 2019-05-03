@@ -38,35 +38,6 @@ module.exports = {
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},
 			{
-				// Builds a selector which handles CallExpression with path
-				// argument at varied position by function.
-				//
-				// See: https://github.com/WordPress/gutenberg/pull/9615
-				selector: map( {
-					1: [
-						'property',
-						'matchesProperty',
-						'path',
-					],
-					2: [
-						'invokeMap',
-						'get',
-						'has',
-						'hasIn',
-						'invoke',
-						'result',
-						'set',
-						'setWith',
-						'unset',
-						'update',
-						'updateWith',
-					],
-				}, ( functionNames, argPosition ) => (
-					`CallExpression[callee.name=/^(${ functionNames.join( '|' ) })$/] > Literal:nth-child(${ argPosition })`
-				) ).join( ',' ),
-				message: 'Always pass an array as the path argument',
-			},
-			{
 				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
 				message: 'Use ellipsis character (…) in place of three dots',
 			},

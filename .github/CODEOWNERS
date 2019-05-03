@@ -83,9 +83,7 @@
 
 # PHP
 /lib                                            @youknowriad @gziolo @aduth
-
-# Styles
-*.scss                                          @chrisvanpatten
+*-controller.php                                @youknowriad @gziolo @aduth @timothybjacobs
 
 # Native (Unowned)
 *.native.js                                     @ghost
