@@ -21,11 +21,6 @@ class Extend_Preload_Paths_Test extends WP_UnitTestCase {
 	 * Tests paths added if missing.
 	 */
 	function test_localizes_script() {
-		$post = (object) array(
-			'ID'        => 12,
-			'post_type' => 'post',
-		);
-
 		$preload_paths = gutenberg_extend_block_editor_preload_paths( array(), self::$post );
 
 		$expected_blocks_path    = array( '/wp/v2/blocks', 'OPTIONS' );
@@ -38,11 +33,6 @@ class Extend_Preload_Paths_Test extends WP_UnitTestCase {
 	 * Tests paths not added if present.
 	 */
 	function test_replaces_registered_properties() {
-		$post = (object) array(
-			'ID'        => 12,
-			'post_type' => 'post',
-		);
-
 		$existing_blocks_path    = array( '/wp/v2/blocks', 'OPTIONS' );
 		$existing_autosaves_path = sprintf( '/wp/v2/%s/%d/autosaves?context=edit', 'posts', self::$post->ID );
 		$existing_preload_paths  = array( $existing_blocks_path, $existing_autosaves_path );
