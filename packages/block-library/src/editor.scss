@@ -62,7 +62,7 @@
 	margin-bottom: $default-block-margin;
 }
 
-// block-library styles
+// block-library styles. This isn't a good place for this and should be temporary.
 :root:root:root .block-library-gallery-item__inline-menu .components-button {
 	color: #fff;
 }
@@ -94,4 +94,26 @@
 	font-size: 13px;
 	font-weight: 500;
 	border: 0;
+}
+
+:root:root:root .wp-block-image.is-focused .components-resizable-box__handle {
+	display: block;
+	z-index: 1;
+}
+
+:root:root:root .block-library-button__inline-link .dashicon {
+	color: #8f98a1;
+}
+
+:root:root:root .block-library-button__inline-link {
+	background: #fff;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue,
+		sans-serif;
+	font-size: 13px;
+	line-height: 1.4;
+	width: 374px;
+	margin-top: 2px;
 }
