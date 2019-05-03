@@ -9,6 +9,7 @@ import {
 	map,
 	last,
 	pick,
+	findKey,
 } from 'lodash';
 
 /**
@@ -190,6 +191,7 @@ class ImageEdit extends Component {
 			...pickRelevantMediaFiles( media ),
 			width: undefined,
 			height: undefined,
+			mediaSizeClass: 'size-large',
 		} );
 	}
 
@@ -293,8 +295,13 @@ class ImageEdit extends Component {
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
-	updateImageURL( url ) {
-		this.props.setAttributes( { url, width: undefined, height: undefined } );
+	updateImageURL( url, data ) {
+		this.props.setAttributes( {
+			url,
+			width: undefined,
+			height: undefined,
+			mediaSizeClass: 'size-' + data.slug,
+		} );
 	}
 
 	updateWidth( width ) {
@@ -348,8 +355,17 @@ class ImageEdit extends Component {
 			return {
 				value: sizeUrl,
 				label: name,
+				data: { 'data-slug': slug },
 			};
 		} ) );
+	}
+
+	getImageSizeByURL() {
+		const { image } = this.props;
+		const { url } = this.props.attributes;
+		const imageSizes = get( image, [ 'media_details', 'sizes' ] );
+		const imageSize = findKey( imageSizes, { source_url: url } );
+		return imageSize;
 	}
 
 	render() {
@@ -442,7 +458,7 @@ class ImageEdit extends Component {
 			'is-transient': isBlobURL( url ),
 			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
-		} );
+		}, attributes.mediaSizeClass || 'size-' + this.getImageSizeByURL() );
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;
