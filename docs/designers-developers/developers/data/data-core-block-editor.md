@@ -637,6 +637,22 @@ _Returns_
 
 -   `boolean`: Whether the block as an inner block selected
 
+<a name="INSERTER_UTILITY_HIGH" href="#INSERTER_UTILITY_HIGH">#</a> **INSERTER_UTILITY_HIGH**
+
+Undocumented declaration.
+
+<a name="INSERTER_UTILITY_LOW" href="#INSERTER_UTILITY_LOW">#</a> **INSERTER_UTILITY_LOW**
+
+Undocumented declaration.
+
+<a name="INSERTER_UTILITY_MEDIUM" href="#INSERTER_UTILITY_MEDIUM">#</a> **INSERTER_UTILITY_MEDIUM**
+
+Undocumented declaration.
+
+<a name="INSERTER_UTILITY_NONE" href="#INSERTER_UTILITY_NONE">#</a> **INSERTER_UTILITY_NONE**
+
+Undocumented declaration.
+
 <a name="isAncestorMultiSelected" href="#isAncestorMultiSelected">#</a> **isAncestorMultiSelected**
 
 Returns true if an ancestor of the block is multi-selected, or false
