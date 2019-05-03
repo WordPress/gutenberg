@@ -532,8 +532,11 @@ extension RCTAztecView: UITextViewDelegate {
         textView.setNeedsLayout()
     }
 
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        onFocus?([:])
+    override func becomeFirstResponder() -> Bool {
+        if !isFirstResponder && canBecomeFirstResponder {
+            onFocus?([:])
+        }
+        return super.becomeFirstResponder()
     }
 
     func textViewDidEndEditing(_ textView: UITextView) {
