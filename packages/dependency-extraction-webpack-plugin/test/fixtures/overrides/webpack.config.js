@@ -12,7 +12,7 @@ module.exports = {
 					return [ 'rxjs', 'operators' ];
 				}
 			},
-			requestToDependency( request ) {
+			requestToHandle( request ) {
 				if ( request === 'rxjs' || request === 'rxjs/operators' ) {
 					return 'wp-script-handle-for-rxjs';
 				}

@@ -444,6 +444,7 @@ class ImageEdit extends React.Component {
 								setRef={ ( ref ) => {
 									this._caption = ref;
 								} }
+								rootTagsToEliminate={ [ 'p' ] }
 								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
 								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }

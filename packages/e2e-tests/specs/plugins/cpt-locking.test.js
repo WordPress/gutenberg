@@ -8,6 +8,7 @@ import {
 	deactivatePlugin,
 	getEditedPostContent,
 	insertBlock,
+	pressKeyTimes,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'cpt locking', () => {
@@ -57,6 +58,14 @@ describe( 'cpt locking', () => {
 			expect(
 				await page.$( 'button[aria-label="Move up"]' )
 			).toBeNull();
+		} );
+
+		it( 'should not error when deleting the cotents of a paragraph', async () => {
+			await page.click( '.block-editor-block-list__block[data-type="core/paragraph"] p' );
+			const textToType = 'Paragraph';
+			await page.keyboard.type( 'Paragraph' );
+			await pressKeyTimes( 'Backspace', textToType.length + 1 );
+			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 	} );
 

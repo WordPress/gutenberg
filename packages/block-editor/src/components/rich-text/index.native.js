@@ -164,9 +164,9 @@ export class RichText extends Component {
 		// value. This also provides an opportunity for the parent component to
 		// determine whether the before/after value has changed using a trivial
 		//  strict equality operation.
-		if ( isEmpty( after ) ) {
+		if ( isEmpty( after ) && before.text.length === currentRecord.text.length ) {
 			before = currentRecord;
-		} else if ( isEmpty( before ) ) {
+		} else if ( isEmpty( before ) && after.text.length === currentRecord.text.length ) {
 			after = currentRecord;
 		}
 
@@ -231,7 +231,7 @@ export class RichText extends Component {
 		} );
 		if ( newContent && newContent !== this.props.value ) {
 			this.props.onChange( newContent );
-			if ( record.needsSelectionUpdate && record.start && record.end ) {
+			if ( record.needsSelectionUpdate && record.start && record.end && doUpdateChild ) {
 				this.forceSelectionUpdate( record.start, record.end );
 			}
 		} else {
@@ -275,6 +275,8 @@ export class RichText extends Component {
 		this.lastEventCount = event.nativeEvent.eventCount;
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
 		this.lastContent = contentWithoutRootTag;
+		this.comesFromAztec = true;
+		this.firedAfterTextChanged = true; // the onChange event always fires after the fact
 		this.props.onChange( this.lastContent );
 	}
 
@@ -290,6 +292,8 @@ export class RichText extends Component {
 	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
 		this.lastEventCount = event.nativeEvent.eventCount;
+		this.comesFromAztec = true;
+		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
 
 		const currentRecord = this.createRecord( {
 			...event.nativeEvent,
@@ -304,10 +308,10 @@ export class RichText extends Component {
 				this.setState( {
 					needsSelectionUpdate: false,
 				} );
-				this.onSplit( ...split( currentRecord ).map( this.valueToFormat ) );
+				this.splitContent( currentRecord );
 			} else {
 				const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
-				this.onFormatChangeForceChild( insertedLineSeparator );
+				this.onFormatChange( insertedLineSeparator, ! this.firedAfterTextChanged );
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
 			const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
@@ -394,7 +398,6 @@ export class RichText extends Component {
 					},
 				} );
 				this.lastContent = this.valueToFormat( linkedRecord );
-				this.lastEventCount = undefined;
 				this.props.onChange( this.lastContent );
 
 				// Allows us to ask for this information when we get a report.
@@ -426,7 +429,6 @@ export class RichText extends Component {
 			const recordToInsert = create( { html: pastedContent } );
 			const insertedContent = insert( currentRecord, recordToInsert );
 			const newContent = this.valueToFormat( insertedContent );
-			this.lastEventCount = undefined;
 			this.lastContent = newContent;
 
 			// explicitly set selection after inline paste
@@ -489,6 +491,8 @@ export class RichText extends Component {
 			// we don't want to refresh aztec native as no content can have changed from this event
 			// let's update lastContent to prevent that in shouldComponentUpdate
 			this.lastContent = newContent;
+			this.comesFromAztec = true;
+			this.firedAfterTextChanged = true; // Selection change event always fires after the fact
 			this.props.onChange( this.lastContent );
 		}
 	}
@@ -574,7 +578,7 @@ export class RichText extends Component {
 
 		// This logic will handle the selection when two blocks are merged or when block is split
 		// into two blocks
-		if ( nextTextContent.startsWith( this.savedContent ) ) {
+		if ( nextTextContent.startsWith( this.savedContent ) && this.savedContent && this.savedContent.length > 0 ) {
 			let length = this.savedContent.length;
 			if ( length === 0 && nextTextContent !== this.props.value ) {
 				length = this.props.value.length;
@@ -593,7 +597,7 @@ export class RichText extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		if ( nextProps.tagName !== this.props.tagName || nextProps.isSelected !== this.props.isSelected ) {
+		if ( nextProps.tagName !== this.props.tagName ) {
 			this.lastEventCount = undefined;
 			this.lastContent = undefined;
 			return true;
@@ -603,11 +607,25 @@ export class RichText extends Component {
 		// It was removed in https://github.com/WordPress/gutenberg/pull/12417 to fix undo/redo problem.
 
 		// If the component is changed React side (undo/redo/merging/splitting/custom text actions)
-		// we need to make sure the native is updated as well
+		// we need to make sure the native is updated as well.
+
+		const previousValueToCheck = Platform.OS === 'android' ? this.props.value : this.lastContent;
+
+		// Also, don't trust the "this.lastContent" as on Android, incomplete text events arrive
+		//  with only some of the text, while the virtual keyboard's suggestion system does its magic.
+		// ** compare with this.lastContent for optimizing performance by not forcing Aztec with text it already has
+		// , but compare with props.value to not lose "half word" text because of Android virtual keyb autosuggestion behavior
 		if ( ( typeof nextProps.value !== 'undefined' ) &&
-			( typeof this.lastContent !== 'undefined' ) &&
-			nextProps.value !== this.lastContent ) {
+				( typeof this.props.value !== 'undefined' ) &&
+				( Platform.OS === 'ios' || ( Platform.OS === 'android' && ( ! this.comesFromAztec || ! this.firedAfterTextChanged ) ) ) &&
+				nextProps.value !== previousValueToCheck ) {
 			this.lastEventCount = undefined; // force a refresh on the native side
+		}
+
+		if ( Platform.OS === 'android' && this.comesFromAztec === false ) {
+			if ( this.needsSelectionUpdate ) {
+				this.lastEventCount = undefined; // force a refresh on the native side
+			}
 		}
 
 		return true;
@@ -690,6 +708,11 @@ export class RichText extends Component {
 			}
 		}
 
+		if ( this.comesFromAztec ) {
+			this.comesFromAztec = false;
+			this.firedAfterTextChanged = false;
+		}
+
 		return (
 			<View>
 				{ isSelected && this.multilineTag === 'li' && (
@@ -720,6 +743,7 @@ export class RichText extends Component {
 					text={ { text: html, eventCount: this.lastEventCount, selection } }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].textDecorationColor }
+					deleteEnter={ this.props.deleteEnter }
 					onChange={ this.onChange }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
@@ -774,6 +798,7 @@ const RichTextContainer = compose( [
 			return {
 				isSelected: context.isSelected,
 				clientId: context.clientId,
+				onCaretVerticalPositionChange: context.onCaretVerticalPositionChange,
 			};
 		}
 
@@ -782,6 +807,7 @@ const RichTextContainer = compose( [
 			clientId: context.clientId,
 			isSelected: context.isSelected,
 			onFocus: context.onFocus || ownProps.onFocus,
+			onCaretVerticalPositionChange: context.onCaretVerticalPositionChange,
 		};
 	} ),
 ] )( RichText );
