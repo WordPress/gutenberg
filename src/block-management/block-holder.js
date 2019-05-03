@@ -124,39 +124,6 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		}
 	};
 
-	mergeBlocks = ( forward: boolean = false ) => {
-		const {
-			clientId,
-			getPreviousBlockClientId,
-			getNextBlockClientId,
-			mergeBlocks,
-		} = this.props;
-
-		const previousBlockClientId = getPreviousBlockClientId( clientId );
-		const nextBlockClientId = getNextBlockClientId( clientId );
-
-		// Do nothing when it's the first block.
-		if (
-			( ! forward && ! previousBlockClientId ) ||
-			( forward && ! nextBlockClientId )
-		) {
-			return;
-		}
-
-		if ( forward ) {
-			mergeBlocks( clientId, nextBlockClientId );
-		} else {
-			const name = this.props.getBlockName( previousBlockClientId );
-			const blockType = getBlockType( name );
-			// The default implementation does only focus the previous block if it's not mergeable
-			// We don't want to move the focus for now, just keep for and caret at the beginning of the current block.
-			if ( ! blockType.merge ) {
-				return;
-			}
-			mergeBlocks( previousBlockClientId, clientId );
-		}
-	};
-
 	renderToolbar() {
 		if ( ! this.props.isSelected ) {
 			return null;
@@ -182,7 +149,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				onFocus={ this.onFocus }
 				onReplace={ this.props.onReplace }
 				insertBlocksAfter={ this.insertBlocksAfter }
-				mergeBlocks={ this.mergeBlocks }
+				mergeBlocks={ this.props.mergeBlocks }
 				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 				clientId={ this.props.clientId }
 			/>
@@ -256,7 +223,7 @@ export default compose( [
 			name,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
+	withDispatch( ( dispatch, { clientId, rootClientId }, { select } ) => {
 		const {
 			insertBlocks,
 			mergeBlocks,
@@ -269,7 +236,24 @@ export default compose( [
 		} = dispatch( 'core/block-editor' );
 
 		return {
-			mergeBlocks,
+			mergeBlocks( forward ) {
+				const {
+					getPreviousBlockClientId,
+					getNextBlockClientId,
+				} = select( 'core/block-editor' );
+
+				if ( forward ) {
+					const nextBlockClientId = getNextBlockClientId( clientId );
+					if ( nextBlockClientId ) {
+						mergeBlocks( clientId, nextBlockClientId );
+					}
+				} else {
+					const previousBlockClientId = getPreviousBlockClientId( clientId );
+					if ( previousBlockClientId ) {
+						mergeBlocks( previousBlockClientId, clientId );
+					}
+				}
+			},
 			moveBlockDown() {
 				moveBlocksDown( clientId );
 			},
