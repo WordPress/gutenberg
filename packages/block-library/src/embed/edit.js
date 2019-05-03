@@ -24,8 +24,8 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			super( ...arguments );
 			this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
 			this.setUrl = this.setUrl.bind( this );
-			this.getAttributesFromPreview = this.getAttributesFromPreview.bind( this );
-			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
+			this.getMergedAttributes = this.getMergedAttributes.bind( this );
+			this.setMergedAttributes = this.setMergedAttributes.bind( this );
 			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
 			this.toggleResponsive = this.toggleResponsive.bind( this );
 			this.handleIncomingPreview = this.handleIncomingPreview.bind( this );
@@ -41,10 +41,10 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		}
 
 		handleIncomingPreview() {
-			this.setAttributesFromPreview();
+			this.setMergedAttributes();
 			const upgradedBlock = createUpgradedEmbedBlock(
 				this.props,
-				this.getAttributesFromPreview()
+				this.getMergedAttributes()
 			);
 			if ( upgradedBlock ) {
 				this.props.onReplace( upgradedBlock );
@@ -88,18 +88,21 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			setAttributes( { url } );
 		}
 
-		getAttributesFromPreview() {
+		/***
+		 * @return {Object} Attributes derived from the preview, merged with the current attributes.
+		 */
+		getMergedAttributes() {
 			const { preview } = this.props;
 			const { className, allowResponsive } = this.props.attributes;
 			return { ...this.props.attributes, ...getAttributesFromPreview( preview, title, className, responsive, allowResponsive ) };
 		}
 
 		/***
-		 * Sets block attributes based on the preview data.
+		 * Sets block attributes based on the current attributes and preview data.
 		 */
-		setAttributesFromPreview() {
+		setMergedAttributes() {
 			const { setAttributes } = this.props;
-			setAttributes( this.getAttributesFromPreview() );
+			setAttributes( this.getMergedAttributes() );
 		}
 
 		switchBackToURLInput() {
@@ -152,20 +155,15 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 				);
 			}
 
-			// To render the preview, we must have the attributes determined by the preview.
-			// The higher order `withSelect` component supplies the preview, but cannot
-			// compute the attributes as it does not have access to the internal state of
-			// the edit component. If we wait for `getAttributesFromPreview` to complete
-			// when the component updates with a preview, we will render an `EmbedPreview`
-			// with incorrect props, and this results in a rendering glitch for responsive
-			// embeds. The glitch happens when the content is made responsive by applying
-			// the responsive styles, but the underlying iframe does not get new HTML
-			// for the sandbox to resize, and so it gets the wrong margins and either
-			// gains a lot of unwanted whitespace, or a scrollbar, depending on the size
-			// and shape of the content. So, we get the attributes from the preview here,
-			// and `getAttributesFromPreview` is memoized in `util` so we're not doing
-			// the computation on every render.
-			const previewAttributes = this.getAttributesFromPreview();
+			// Even though we set attributes that get derived from the preview,
+			// we don't access them directly because for the initial render,
+			// the `setAttributes` call will not have taken effect. If we're
+			// rendering responsive content, setting the responsive classes
+			// after the preview has been rendered can result in unwanted
+			// clipping or scrollbars. The `getAttributesFromPreview` function
+			// that `getMergedAttributes` uses is memoized so that we're not
+			// calculating them on every render.
+			const previewAttributes = this.getMergedAttributes();
 			const { caption, type, allowResponsive } = previewAttributes;
 			const className = classnames( previewAttributes.className, this.props.className );
 
