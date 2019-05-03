@@ -130,7 +130,7 @@ There are a few things to notice:
 * The built-in `save` function just returns `null` because the rendering is performed server-side.
 * The server-side rendering is a function taking the block attributes and the block inner content as arguments, and returning the markup (quite similar to shortcodes)
 
-## Live rendering in Gutenberg editor
+## Live rendering in the block editor
 
 Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-side-render) block which enables rendering to take place on the server using PHP rather than in JavaScript. 
 

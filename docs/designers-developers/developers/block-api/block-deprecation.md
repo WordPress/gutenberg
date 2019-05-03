@@ -3,7 +3,7 @@
 When updating static blocks markup and attributes, block authors need to consider existing posts using the old versions of their block. In order to provide a good upgrade path, you can choose one of the following strategies:
 
  - Do not deprecate the block and create a new one (a different name)
- - Provide a "deprecated" version of the block allowing users opening these blocks in Gutenberg to edit them using the updated block.
+ - Provide a "deprecated" version of the block allowing users opening these in the block editor to edit them using the updated block.
 
 A block can have several deprecated versions. A deprecation will be tried if a parsed block appears to be invalid, or if there is a deprecation defined for which its `isEligible` property function returns true.
 
