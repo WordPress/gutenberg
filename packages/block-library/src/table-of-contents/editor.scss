@@ -4,6 +4,10 @@
 
 		a {
 			display: block;
+
+			&:focus {
+				box-shadow: none;
+			}
 		}
 
 		ul {

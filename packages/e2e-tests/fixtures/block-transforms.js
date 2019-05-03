@@ -323,6 +323,10 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Table',
 		availableTransforms: [],
 	},
+	'core__table-of-contents': {
+		originalBlock: 'Table of Contents',
+		availableTransforms: [],
+	},
 	'core__tag-cloud': {
 		originalBlock: 'Tag Cloud',
 		availableTransforms: [],
