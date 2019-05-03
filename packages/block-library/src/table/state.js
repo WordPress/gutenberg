@@ -86,7 +86,7 @@ export function insertRow( state, {
 			{
 				cells: times( cellCount, () => ( {
 					content: '',
-					tag: 'td',
+					tag: section === 'head' ? 'th' : 'td',
 				} ) ),
 			},
 			...state[ section ].slice( rowIndex ),
@@ -131,7 +131,7 @@ export function insertColumn( state, {
 				...row.cells.slice( 0, columnIndex ),
 				{
 					content: '',
-					tag: 'td',
+					tag: section === 'head' ? 'th' : 'td',
 				},
 				...row.cells.slice( columnIndex ),
 			],
