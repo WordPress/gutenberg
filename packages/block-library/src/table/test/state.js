@@ -146,6 +146,65 @@ describe( 'insertRow', () => {
 		expect( state ).toEqual( expected );
 	} );
 
+	it( 'allows the number of columns to be specified', () => {
+		const state = insertRow( tableWithContent, {
+			section: 'body',
+			rowIndex: 2,
+			columnCount: 4,
+		} );
+
+		const expected = {
+			body: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+						{
+							content: 'test',
+							tag: 'td',
+						},
+					],
+				},
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
+
 	it( 'adds `th` cells to the head', () => {
 		const tableWithHead = {
 			head: [
