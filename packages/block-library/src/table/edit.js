@@ -462,12 +462,12 @@ export class TableEdit extends Component {
 							onChange={ this.onChangeFixedLayout }
 						/>
 						<ToggleControl
-							label={ __( 'Show table header' ) }
+							label={ __( 'Header section' ) }
 							checked={ !! ( head && head.length ) }
 							onChange={ this.onToggleHeaderSection }
 						/>
 						<ToggleControl
-							label={ __( 'Show table footer' ) }
+							label={ __( 'Footer section' ) }
 							checked={ !! ( foot && foot.length ) }
 							onChange={ this.onToggleFooterSection }
 						/>
