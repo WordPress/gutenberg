@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times } from 'lodash';
+import { times, get } from 'lodash';
 
 /**
  * Creates a table state.
@@ -76,8 +76,9 @@ export function updateCellContent( state, {
 export function insertRow( state, {
 	section,
 	rowIndex,
+	columnCount,
 } ) {
-	const cellCount = state[ section ][ 0 ].cells.length;
+	const cellCount = columnCount || state[ section ][ 0 ].cells.length;
 
 	return {
 		[ section ]: [
@@ -156,4 +157,25 @@ export function deleteColumn( state, {
 			cells: row.cells.filter( ( cell, index ) => index !== columnIndex ),
 		} ) ).filter( ( row ) => row.cells.length ),
 	};
+}
+
+/**
+ * Toggles the existance of a section.
+ *
+ * @param {Object} state   Current table state.
+ * @param {string} section Name of the section to toggle.
+ *
+ * @return {Object} New table state.
+ */
+export function toggleSection( state, section ) {
+	// Section exists, replace it with an empty row to remove it.
+	if ( state[ section ] && state[ section ].length ) {
+		return { [ section ]: [] };
+	}
+
+	// Get the length of the first row of the body to use when creating the header.
+	const columnCount = get( state, [ 'body', 0, 'cells', 'length' ], 1 );
+
+	// Section doesn't exist, insert an empty row to create the section.
+	return insertRow( state, { section, rowIndex: 0, columnCount } );
 }
