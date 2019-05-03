@@ -185,7 +185,7 @@ export { Suspense };
  * @return {Array} The concatenated value.
  */
 export function concatChildren( ...childrenArguments ) {
-	return childrenArguments.reduce( ( memoized, children, i ) => {
+	return childrenArguments.reduce( ( result, children, i ) => {
 		Children.forEach( children, ( child, j ) => {
 			if ( child && 'string' !== typeof child ) {
 				child = cloneElement( child, {
@@ -193,10 +193,10 @@ export function concatChildren( ...childrenArguments ) {
 				} );
 			}
 
-			memoized.push( child );
+			result.push( child );
 		} );
 
-		return memoized;
+		return result;
 	}, [] );
 }
 
