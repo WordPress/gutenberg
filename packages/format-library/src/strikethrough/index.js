@@ -7,10 +7,11 @@ import { toggleFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor';
 
 const name = 'core/strikethrough';
+const title = __( 'Strikethrough' );
 
 export const strikethrough = {
 	name,
-	title: __( 'Strikethrough' ),
+	title,
 	tagName: 's',
 	className: null,
 	edit( { isActive, value, onChange } ) {
@@ -25,7 +26,7 @@ export const strikethrough = {
 				/>
 				<RichTextToolbarButton
 					icon="editor-strikethrough"
-					title={ __( 'Strikethrough' ) }
+					title={ title }
 					onClick={ onToggle }
 					isActive={ isActive }
 					shortcutType="access"
