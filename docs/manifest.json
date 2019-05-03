@@ -132,7 +132,7 @@
 		"parent": "developers"
 	},
 	{
-		"title": "Theming for Gutenberg",
+		"title": "Theming for the Block Editor",
 		"slug": "themes",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/themes/README.md",
 		"parent": "developers"
