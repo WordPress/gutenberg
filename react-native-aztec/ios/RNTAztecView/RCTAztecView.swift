@@ -131,10 +131,6 @@ class RCTAztecView: Aztec.TextView {
         delegate = self
         textContainerInset = .zero
         contentInset = .zero
-<<<<<<< HEAD
-        textContainer.lineFragmentPadding = 0
-=======
->>>>>>> feature/caption
         addPlaceholder()
     }
 
