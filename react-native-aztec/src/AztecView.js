@@ -12,6 +12,7 @@ class AztecView extends React.Component {
     activeFormats: PropTypes.array,
     isSelected: PropTypes.bool,
     disableGutenbergMode: PropTypes.bool,
+    deleteEnter: PropTypes.bool,
     text: PropTypes.object,
     placeholder: PropTypes.string,
     placeholderTextColor: ColorPropType,
@@ -160,6 +161,7 @@ class AztecView extends React.Component {
           onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
           onSelectionChange = { this._onSelectionChange }
           onEnter = { this.props.onEnter && this._onEnter }
+          deleteEnter = { this.props.deleteEnter }
           // IMPORTANT: the onFocus events are thrown away as these are handled by onPress() in the upper level.
           // It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
           // combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
