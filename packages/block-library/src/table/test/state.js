@@ -13,6 +13,7 @@ import {
 	deleteRow,
 	insertColumn,
 	deleteColumn,
+	toggleSection,
 } from '../state';
 
 const table = deepFreeze( {
@@ -144,6 +145,49 @@ describe( 'insertRow', () => {
 
 		expect( state ).toEqual( expected );
 	} );
+
+	it( 'adds `th` cells to the head', () => {
+		const tableWithHead = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+			],
+		};
+
+		const state = insertRow( tableWithHead, {
+			section: 'head',
+			rowIndex: 1,
+		} );
+
+		const expected = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+			],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
 } );
 
 describe( 'insertColumn', () => {
@@ -184,6 +228,45 @@ describe( 'insertColumn', () => {
 						{
 							content: '',
 							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
+
+	it( 'adds `th` cells to the head', () => {
+		const tableWithHead = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+			],
+		};
+
+		const state = insertColumn( tableWithHead, {
+			section: 'head',
+			columnIndex: 1,
+		} );
+
+		const expected = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+						{
+							content: '',
+							tag: 'th',
 						},
 					],
 				},
@@ -281,6 +364,103 @@ describe( 'deleteColumn', () => {
 
 		const expected = {
 			body: [],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
+} );
+
+describe( 'toggleSection', () => {
+	it( 'removes rows from the head section if the table already has them', () => {
+		const tableWithHead = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+			],
+		};
+
+		const state = toggleSection( tableWithHead, 'head' );
+
+		const expected = {
+			head: [],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
+
+	it( 'adds a row to the head section if the table has none', () => {
+		const tableWithHead = {
+			head: [],
+		};
+
+		const state = toggleSection( tableWithHead, 'head' );
+
+		const expected = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+			],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
+
+	it( 'uses the number of cells in the first row of the body for the added table row', () => {
+		const tableWithHead = {
+			head: [],
+			body: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		const state = toggleSection( tableWithHead, 'head' );
+
+		const expected = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+						{
+							content: '',
+							tag: 'th',
+						},
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+			],
 		};
 
 		expect( state ).toEqual( expected );
