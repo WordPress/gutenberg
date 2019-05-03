@@ -104,6 +104,15 @@ const hasPrivateTag = ( docBlock ) => hasDocBlockTag( docBlock, 'private' );
 const hasParamTag = ( docBlock ) => hasDocBlockTag( docBlock, 'param' );
 
 /**
+ * Returns true if the give DocBlock contains a description.
+ *
+ * @param {Object} docBlock Parsed DocBlock node.
+ *
+ * @return {boolean} Whether DocBlock contains a description.
+ */
+const hasDescription = ( docBlock ) => !! docBlock.description;
+
+/**
  * Maps parse type to specific filtering logic by which to consider for
  * inclusion a parsed named export.
  *
@@ -129,7 +138,7 @@ const FILTER_PARSED_DOCBLOCK_BY_TYPE = {
 	 *
 	 * @return {boolean} Whether documented action should be included.
 	 */
-	actions: negate( hasPrivateTag ),
+	actions: overEvery( [ hasDescription, negate( hasPrivateTag ) ] ),
 };
 
 module.exports = function( config ) {
