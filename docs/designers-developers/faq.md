@@ -243,7 +243,7 @@ Here is a brief animation illustrating how to find and use the keyboard shortcut
 
 No. [TinyMCE](https://www.tinymce.com/) is only used for the "Classic" block.
 
-## What browsers do Gutenberg support?
+## What browsers does Gutenberg support?
 
 Gutenberg works in modern browsers, and Internet Explorer 11.
 
