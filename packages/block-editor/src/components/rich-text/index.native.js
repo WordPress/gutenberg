@@ -310,20 +310,20 @@ export class RichText extends Component {
 	 */
 	onChange( event ) {
 		this.lastEventCount = event.nativeEvent.eventCount;
+		this.firedAfterTextChanged = true; // the onChange event always fires after the fact
 		this.onTextUpdate( event );
 	}
 
 	onTextUpdate( event, refresh = false ) {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
 
-		if ( ! refresh ) {
-			this.value = contentWithoutRootTag;
-		}
-
+		this.value = contentWithoutRootTag;
 		this.comesFromAztec = true;
-		this.firedAfterTextChanged = true; // the onChange event always fires after the fact
 
-		this.props.onChange( contentWithoutRootTag );
+		// we don't want to refresh if our goal is just to create a record
+		if ( refresh ) {
+			this.props.onChange( contentWithoutRootTag );
+		}
 	}
 
 	/*
@@ -340,7 +340,7 @@ export class RichText extends Component {
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
 
-		this.onTextUpdate( event );
+		//this.onTextUpdate( event );
 		const currentRecord = this.createRecord();
 
 		if ( this.multilineTag ) {
@@ -528,6 +528,10 @@ export class RichText extends Component {
 	}
 
 	onSelectionChangeFromAztec( start, end, text, event ) {
+		if ( ! this.props.isSelected ) {
+			return;
+		}
+
 		// update text before updating selection
 		// Make sure there are changes made to the content before upgrading it upward
 		this.onTextUpdate( event, true );
@@ -609,6 +613,7 @@ export class RichText extends Component {
 			this.needsSelectionUpdate = true;
 			this.selectionStart = start;
 			this.selectionEnd = end;
+			this.forceUpdate();
 		}
 	}
 
@@ -619,7 +624,7 @@ export class RichText extends Component {
 			return true;
 		}
 
-		// TODO: Please re-introduce the check to avoid updating the content right after an `onChange` call.
+		//  TODO: Please re-introduce the check to avoid updating the content right after an `onChange` call.
 		// It was removed in https://github.com/WordPress/gutenberg/pull/12417 to fix undo/redo problem.
 
 		// If the component is changed React side (undo/redo/merging/splitting/custom text actions)
