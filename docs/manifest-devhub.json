@@ -1,8 +1,8 @@
 [
 	{
 		"title": "Block Editor Handbook",
-		"slug": "designers-developers",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/readme.md",
+		"slug": "handbook",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/readme.md",
 		"parent": null
 	},
 	{

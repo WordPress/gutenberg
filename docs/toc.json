@@ -1,4 +1,5 @@
 [
+<<<<<<< d571c5a9f1542f6f5522eb1e1a68d3c1534347fb
 <<<<<<< 8d8a3cb964f9a1becf3bf2185f8b53210036585d
 	{"docs/designers-developers/readme.md": []},
 	{"docs/designers-developers/key-concepts.md": []},
@@ -115,6 +116,9 @@
 	]}
 =======
 	{ "docs/designers-developers/readme.md": [] },
+=======
+	{ "docs/readme.md": [] },
+>>>>>>> Substitute old top-level README
 	{ "docs/designers-developers/key-concepts.md": [] },
 	{
 		"docs/designers-developers/developers/README.md": [
