@@ -1,7 +1,7 @@
 buildscript {
     ext {
         gradlePluginVersion = '3.3.1'
-        kotlinVersion = '1.2.31'
+        kotlinVersion = '1.3.11'
         supportLibVersion = '28.0.0'
         tagSoupVersion = '1.2.1'
         glideVersion = '3.7.0'
@@ -12,7 +12,7 @@ buildscript {
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
 
-        aztecVersion = 'v1.3.25'
+        aztecVersion = '0a4a1b269fcb28972eabab81eae606df9469a228'
     }
 
     repositories {
@@ -23,10 +23,12 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$gradlePluginVersion"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
 
 // import the `readReactNativeVersion()` function
@@ -62,6 +64,7 @@ android {
         main {
             dirs.each { dir ->
                 java.srcDirs "src/${dir}/java"
+                java.srcDirs += "src/${dir}/kotlin"
                 res.srcDirs "src/${dir}/res"
             }
         }

@@ -18,7 +18,7 @@ public class RCTAztecViewManager: RCTViewManager {
     public override func view() -> UIView {
         let view = RCTAztecView(
             defaultFont: defaultFont,
-            defaultParagraphStyle: .default,
+            defaultParagraphStyle: defaultParagrahStyle,
             defaultMissingImage: UIImage())
 
         view.isScrollEnabled = false
@@ -59,5 +59,11 @@ public class RCTAztecViewManager: RCTViewManager {
         }
 
         return defaultFont
+    }
+    private var defaultParagrahStyle: ParagraphStyle {
+        let defaultStyle = ParagraphStyle.default
+        defaultStyle.textListParagraphSpacing = 5
+        defaultStyle.textListParagraphSpacingBefore = 5
+        return defaultStyle
     }
 }
