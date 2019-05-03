@@ -63,22 +63,83 @@
 }
 
 // block-library styles. This isn't a good place for this and should be temporary.
+
+// packages/block-library/src/gallery/editor.scss
+:root:root:root .blocks-gallery-item {
+	// Hide the focus outline that otherwise briefly appears when selecting a block.
+	figure:not(.is-selected):focus {
+		outline: none;
+	}
+
+	.is-selected {
+		outline: 4px solid theme(primary);
+	}
+
+	.is-transient img {
+		opacity: 0.3;
+	}
+
+	.block-editor-rich-text {
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		max-height: 100%;
+		overflow-y: auto;
+	}
+
+	.block-editor-rich-text figcaption:not([data-is-placeholder-visible="true"]) {
+		position: relative;
+		overflow: hidden;
+	}
+
+	.is-selected .block-editor-rich-text {
+		// IE calculates this incorrectly, so leave it to modern browsers.
+		@supports (position: sticky) {
+			right: 0;
+			left: 0;
+			margin-top: -4px;
+		}
+
+		// Override negative margins so this toolbar isn't hidden by overflow. Overflow is needed for long captions.
+		.block-editor-rich-text__inline-toolbar {
+			top: 0;
+		}
+
+		// Make extra space for the inline toolbar.
+		figcaption {
+			padding-top: 48px;
+		}
+	}
+
+	.block-editor-rich-text figcaption {
+		a {
+			color: $white;
+		}
+	}
+}
+
 :root:root:root .block-library-gallery-item__inline-menu .components-button {
-	color: #fff;
+	color: $white;
+	&:hover,
+	&:focus {
+		color: $white;
+	}
 }
 
 :root:root:root .blocks-gallery-item__remove {
 	padding: 0;
+
+	&.components-button:focus {
+		color: inherit;
+	}
 }
 
-:root:root:root .blocks-gallery-item .block-editor-rich-text {
-	position: absolute;
-}
-
+// packages/block-library/src/cover/editor.scss
 :root:root:root .wp-block-cover .block-editor-block-list__block {
-	color: #f8f9f9;
+	color: $light-gray-100;
 }
 
+// packages/block-library/src/code/editor.scss
 :root:root:root .components-tab-button {
 	display: inline-flex;
 	align-items: flex-end;
@@ -86,34 +147,107 @@
 	padding: 3px;
 	background: none;
 	outline: none;
-	color: #555d66;
+	color: $dark-gray-500;
 	cursor: pointer;
 	position: relative;
-	height: 36px;
-	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif;
-	font-size: 13px;
+	height: $icon-button-size;
+	font-family: $default-font;
+	font-size: $default-font-size;
 	font-weight: 500;
 	border: 0;
+
+	&.is-active,
+	&.is-active:hover {
+		color: $white;
+	}
+
+	&:disabled {
+		cursor: default;
+	}
+
+	& > span {
+		border: $border-width solid transparent;
+		padding: 0 6px;
+		box-sizing: content-box;
+		height: 28px;
+		line-height: 28px;
+	}
+
+	&:hover > span,
+	&:focus > span {
+		color: $dark-gray-500;
+	}
+
+	&:not(:disabled) {
+		&.is-active > span,
+		&:hover > span,
+		&:focus > span {
+			border: $border-width solid $dark-gray-500;
+		}
+	}
+
+	&.is-active > span,
+	&.is-active:hover > span {
+		background-color: $dark-gray-500;
+		color: $white;
+	}
 }
 
+// packages/block-library/src/image/editor.scss
+// Ensure the resize handles are visible when the image is focused.
 :root:root:root .wp-block-image.is-focused .components-resizable-box__handle {
 	display: block;
-	z-index: 1;
+	z-index: z-index(".block-library-image__resize-handlers");
 }
 
-:root:root:root .block-library-button__inline-link .dashicon {
-	color: #8f98a1;
-}
-
+// packages/block-library/src/button/editor.scss
 :root:root:root .block-library-button__inline-link {
-	background: #fff;
+	background: $white;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue,
-		sans-serif;
-	font-size: 13px;
-	line-height: 1.4;
-	width: 374px;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+
+	// The width of input box plus padding plus two icon buttons.
+	$blocks-button__link-input-width: 300px + 2px + 2 * $icon-button-size;
+	width: $blocks-button__link-input-width;
+
+	// Move it down by 2px so that it doesn't overlap the button focus outline.
 	margin-top: 2px;
+
+	.block-editor-url-input {
+		width: auto;
+	}
+
+	.block-editor-url-input__suggestions {
+		width: $blocks-button__link-input-width - $icon-button-size - $icon-button-size;
+		z-index: z-index(".block-library-button__inline-link .block-editor-url-input__suggestions");
+	}
+
+	> .dashicon {
+		width: $icon-button-size;
+
+		// adds the inline height back, after reset.
+		height: 20px;
+	}
+
+	.dashicon {
+		color: $dark-gray-100;
+	}
+
+	.block-editor-url-input input[type="text"]::placeholder {
+		color: $dark-gray-100;
+	}
+}
+
+:root:root:root [data-align="center"] .block-library-button__inline-link {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+:root:root:root [data-align="right"] .block-library-button__inline-link {
+	margin-left: auto;
+	margin-right: 0;
 }
