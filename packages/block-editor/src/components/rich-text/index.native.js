@@ -340,7 +340,6 @@ export class RichText extends Component {
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
 
-		//this.onTextUpdate( event );
 		const currentRecord = this.createRecord();
 
 		if ( this.multilineTag ) {
