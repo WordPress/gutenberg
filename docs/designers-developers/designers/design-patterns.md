@@ -2,7 +2,7 @@
 
 ## Basic Editor Interface
 
-Gutenberg’s general layout uses on a bar at the top, with content below.
+The Block Editor’s general layout uses on a bar at the top, with content below.
 
 ![Editor Interface](https://cldup.com/VWA_jMcIRw-3000x3000.png)
 
@@ -22,7 +22,7 @@ A selected block shows a number of contextual actions:
 
 ![Block Interface](https://cldup.com/3tQqIncKPB-3000x3000.png)
 
-The block interface has basic actions. Gutenberg aims for good, common defaults, so users should be able to create a complete document without actually needing the advanced actions in the Settings Sidebar.
+The block interface has basic actions. The Block Editor aims for good, common defaults, so users should be able to create a complete document without actually needing the advanced actions in the Settings Sidebar.
 
 **The Block Toolbar** highlights commonly-used actions. The **Block Chip** lives in the block toolbar, and contains high-level controls for the selected block. It primarily allows users to transform a block into another type of compatible block. Some blocks also use the block chip to users to choose from a set of alternate block styles.
 
