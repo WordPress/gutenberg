@@ -131,7 +131,10 @@ class RCTAztecView: Aztec.TextView {
         delegate = self
         textContainerInset = .zero
         contentInset = .zero
+<<<<<<< HEAD
         textContainer.lineFragmentPadding = 0
+=======
+>>>>>>> feature/caption
         addPlaceholder()
     }
 
@@ -543,8 +546,11 @@ extension RCTAztecView: UITextViewDelegate {
         textView.setNeedsLayout()
     }
 
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        onFocus?([:])
+    override func becomeFirstResponder() -> Bool {
+        if !isFirstResponder && canBecomeFirstResponder {
+            onFocus?([:])
+        }
+        return super.becomeFirstResponder()
     }
 
     func textViewDidEndEditing(_ textView: UITextView) {

@@ -398,7 +398,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
             view.setImageGetter(new GlideImageLoader(view.getContext()));
             view.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(view.getContext()));
             // we need to restart the editor now
-            String content = view.toHtml(false);
+            String content = view.toHtml(view.getText(), false);
             view.fromHtml(content, false);
         }
     }
@@ -452,6 +452,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         view.shouldHandleOnPaste = onPasteHandling;
     }
 
+    @ReactProp(name = "deleteEnter", defaultBoolean = false)
+    public void setShouldDeleteEnter(final ReactAztecText view, boolean shouldDeleteEnter) {
+        view.shouldDeleteEnter = shouldDeleteEnter;
+    }
+
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.<String, Integer>builder()
@@ -493,7 +498,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecEndEditingEvent(
                                             editText.getId(),
-                                            editText.toHtml(false)));
+                                            editText.toHtml(editText.getText(), false)));
                         }
                     }
                 });
@@ -536,22 +541,26 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                 return;
             }
 
-            int currentEventCount = mEditText.incrementAndGetEventCounter();
-            // The event that contains the event counter and updates it must be sent first.
-            // TODO: t7936714 merge these events
-            mEventDispatcher.dispatchEvent(
-                    new ReactTextChangedEvent(
-                            mEditText.getId(),
-                            mEditText.toHtml(false),
-                            currentEventCount));
+            // if the "Enter" handling is underway, don't sent text change events. The ReactAztecEnterEvent will have
+            // the text (minus the Enter char itself).
+            if (!mEditText.isEnterPressedUnderway()) {
+                int currentEventCount = mEditText.incrementAndGetEventCounter();
+                // The event that contains the event counter and updates it must be sent first.
+                // TODO: t7936714 merge these events
+                mEventDispatcher.dispatchEvent(
+                        new ReactTextChangedEvent(
+                                mEditText.getId(),
+                                mEditText.toHtml(mEditText.getText(), false),
+                                currentEventCount));
 
-            mEventDispatcher.dispatchEvent(
-                    new ReactTextInputEvent(
-                            mEditText.getId(),
-                            newText,
-                            oldText,
-                            start,
-                            start + before));
+                mEventDispatcher.dispatchEvent(
+                        new ReactTextInputEvent(
+                                mEditText.getId(),
+                                newText,
+                                oldText,
+                                start,
+                                start + before));
+            }
 
 
             if (mPreviousText.length() == 0

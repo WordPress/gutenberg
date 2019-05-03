@@ -15,13 +15,16 @@ class ReactAztecEnterEvent extends Event<ReactAztecEnterEvent> {
   private String mText;
   private int mSelectionStart;
   private int mSelectionEnd;
+  private boolean mFiredAfterTextChanged;
   private int mEventCount;
 
-  public ReactAztecEnterEvent(int viewId, String text, int selectionStart, int selectionEnd, int eventCount) {
+  public ReactAztecEnterEvent(int viewId, String text, int selectionStart, int selectionEnd,
+          boolean firedAfterTextChanged, int eventCount) {
     super(viewId);
     mText = text;
     mSelectionStart = selectionStart;
     mSelectionEnd = selectionEnd;
+    mFiredAfterTextChanged = firedAfterTextChanged;
     mEventCount = eventCount;
   }
 
@@ -46,6 +49,7 @@ class ReactAztecEnterEvent extends Event<ReactAztecEnterEvent> {
     eventData.putString("text", mText);
     eventData.putInt("selectionStart", mSelectionStart);
     eventData.putInt("selectionEnd", mSelectionEnd);
+    eventData.putBoolean("firedAfterTextChanged", mFiredAfterTextChanged);
     eventData.putInt("eventCount", mEventCount);
     return eventData;
   }
