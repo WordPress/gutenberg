@@ -1,12 +1,12 @@
 # Meta Boxes
 
-This is a brief document detailing how meta box support works in the Block Editor. With the superior developer and user experience of blocks, especially once block templates are available, **porting PHP meta boxes to blocks is highly encouraged!** See the [Meta Block tutorial](/docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md) for how to store post meta data using blocks.
+This is a brief document detailing how meta box support works in the block editor. With the superior developer and user experience of blocks, especially once block templates are available, **porting PHP meta boxes to blocks is highly encouraged!** See the [Meta Block tutorial](/docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md) for how to store post meta data using blocks.
 
 ### Testing, Converting, and Maintaining Existing Meta Boxes
 
-Before converting meta boxes to blocks, it may be  easier to test if a meta box works with the Block Editor, and explicitly mark it as such.
+Before converting meta boxes to blocks, it may be  easier to test if a meta box works with the block editor, and explicitly mark it as such.
 
-If a meta box *doesn't* work with the Block Editor, and updating it to work correctly is not an option, the next step is to add the `__block_editor_compatible_meta_box` argument to the meta box declaration:
+If a meta box *doesn't* work with the block editor, and updating it to work correctly is not an option, the next step is to add the `__block_editor_compatible_meta_box` argument to the meta box declaration:
 
 ```php
 add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
@@ -30,11 +30,11 @@ add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 );
 ```
 
-When the Block Editor is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the classic editor.
+When the block editor is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the classic editor.
 
 ### Meta Box Data Collection
 
-On each Block Editor page load, we register an action that collects the meta box data to determine if an area is empty. The original global state is reset upon collection of meta box data.
+On each block editor page load, we register an action that collects the meta box data to determine if an area is empty. The original global state is reset upon collection of meta box data.
 
 See [`register_and_do_post_meta_boxes`](https://developer.wordpress.org/reference/functions/register_and_do_post_meta_boxes/).
 
@@ -48,7 +48,7 @@ Ideally, this could be done at instantiation of the editor and help simplify thi
 
 ### Redux and React Meta Box Management
 
-When rendering the Block Editor, the meta boxes are rendered to a hidden div `#metaboxes`.
+When rendering the block editor, the meta boxes are rendered to a hidden div `#metaboxes`.
 
 *The Redux store will hold all meta boxes as inactive by default*. When
 `INITIALIZE_META_BOX_STATE` comes in, the store will update any active meta box areas by setting the `isActive` flag to `true`. Once this happens React will check for the new props sent in by Redux on the `MetaBox` component. If that `MetaBox` is now active, instead of rendering null, a `MetaBoxArea` component will be rendered. The `MetaBox` component is the container component that mediates between the `MetaBoxArea` and the Redux Store. *If no meta boxes are active, nothing happens. This will be the default behavior, as all core meta boxes have been stripped.*
@@ -71,10 +71,10 @@ This page mimics the `post.php` post form, so when it is submitted it will fire 
 
 ### Common Compatibility Issues
 
-Most PHP meta boxes should continue to work in the Block Editor, but some meta boxes that include advanced functionality could break. Here are some common reasons why meta boxes might not work as expected in the Block Editor:
+Most PHP meta boxes should continue to work in the block editor, but some meta boxes that include advanced functionality could break. Here are some common reasons why meta boxes might not work as expected in the block editor:
 
 - Plugins relying on selectors that target the post title, post content fields, and other metaboxes (of the old editor).
-- Plugins relying on TinyMCE's API because there's no longer a single TinyMCE instance to talk to in the Block Editor.
+- Plugins relying on TinyMCE's API because there's no longer a single TinyMCE instance to talk to in the block editor.
 - Plugins making updates to their DOM on "submit" or on "save".
 
 Please also note that if your plugin triggers a PHP warning or notice to be output on the page, this will cause the HTML document type (`<!DOCTYPE html>`) to be output incorrectly. This will cause the browser to render using "Quirks Mode", which is a compatibility layer that gets enabled when the browser doesn't know what type of document it is parsing. The block editor is not meant to work in this mode, but it can _appear_ to be working just fine. If you encounter issues such as *meta boxes overlaying the editor* or other layout issues, please check the raw page source of your document to see that the document type definition is the first thing output on the page. There will also be a warning in the JavaScript console, noting the issue.
