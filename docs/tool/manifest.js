@@ -1,7 +1,7 @@
 /**
  * Node dependencies
  */
-const { camelCase, kebabCase, nth, upperFirst } = require( 'lodash' );
+const { camelCase, nth, upperFirst } = require( 'lodash' );
 
 const fs = require( 'fs' );
 
@@ -41,25 +41,6 @@ function getComponentManifest( componentPaths ) {
 			slug,
 			markdown_source: `${ baseRepoUrl }/${ filePath }`,
 			parent: 'components',
-		};
-	} );
-}
-
-/**
- * Generates the data manifest.
- *
- * @param {Object} parsedNamespaces Parsed Namespace Object
- *
- * @return {Array} Manifest
- */
-function getDataManifest( parsedNamespaces ) {
-	return Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
-		const slug = `data-${ kebabCase( parsedNamespace.name ) }`;
-		return {
-			title: parsedNamespace.title,
-			slug,
-			markdown_source: `${ baseRepoUrl }/docs/designers-developers/developers/data/${ slug }.md`,
-			parent: 'data',
 		};
 	} );
 }
@@ -106,6 +87,5 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 module.exports = {
 	getPackageManifest,
 	getComponentManifest,
-	getDataManifest,
 	getRootManifest,
 };
