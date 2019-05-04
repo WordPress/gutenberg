@@ -7,7 +7,7 @@ import { mapKeys } from 'lodash';
  * WordPress dependencies
  */
 import { select, dispatch, withSelect, withDispatch } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
+import { addFilter, applyFilters } from '@wordpress/hooks';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -51,6 +51,7 @@ export function registerFormatType( name, settings ) {
 		return;
 	}
 
+	settings = applyFilters( 'richText.registerFormatType', settings, name );
 	if (
 		typeof settings.tagName !== 'string' ||
 		settings.tagName === ''

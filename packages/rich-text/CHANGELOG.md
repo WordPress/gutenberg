@@ -1,3 +1,9 @@
+## Unreleased
+
+### Enhancements
+
+- New `richText.registerFormatType` hook to extend format types during registration.
+
 ## 3.2.0 (Unreleased)
 
 ### Internal
