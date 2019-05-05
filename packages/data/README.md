@@ -381,6 +381,10 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="RegistryContext" href="#RegistryContext">#</a> **RegistryContext**
+
+Undocumented declaration.
+
 <a name="RegistryProvider" href="#RegistryProvider">#</a> **RegistryProvider**
 
 Undocumented declaration.
