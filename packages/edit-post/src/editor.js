@@ -21,6 +21,7 @@ import {
  */
 import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
+import EditorInitialization from './components/editor-initialization';
 
 class Editor extends Component {
 	constructor() {
@@ -93,15 +94,16 @@ class Editor extends Component {
 			<StrictMode>
 				<SlotFillProvider>
 					<DropZoneProvider>
-						<EditorProvider
-							settings={ editorSettings }
-							post={ post }
-							initialEdits={ initialEdits }
-							useSubRegistry={ false }
-							{ ...props }
-						>
-							<ErrorBoundary onError={ onError }>
-								<Layout />
+				<EditorProvider
+					settings={ editorSettings }
+					post={ post }
+					initialEdits={ initialEdits }
+					useSubRegistry={ false }
+					{ ...props }
+				>
+					<ErrorBoundary onError={ onError }>
+						<EditorInitialization postId={ post.id } />
+						<Layout />
 								<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
 							</ErrorBoundary>
 							<PostLockedModal />
