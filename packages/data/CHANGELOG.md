@@ -2,8 +2,11 @@
 
 ### Bug Fix
 
-- Restore functionality of action-generators returning a Promise.  Clarify intent and behaviour for `wp.data.dispatch` behaviour. Dispatch actions now always
- return a promise ([#14830](https://github.com/WordPress/gutenberg/pull/14830)
+- Restore functionality of action-generators returning a Promise.  Clarify intent and behaviour for `wp.data.dispatch` behaviour. Dispatch actions now always return a promise ([#14830](https://github.com/WordPress/gutenberg/pull/14830))
+ 
+### Enhancements
+
+- Export the entire registry context (as `RegistryContext`) so consuming code can implement it using the `useContext` react hook ([#15445](https://github.com/WordPress/gutenberg/pull/15445))
 
 ## 4.3.0 (2019-03-06)
 
