@@ -421,6 +421,10 @@ const App = ( { props } ) => {
 }
 ```
 
+<a name="RegistryContext" href="#RegistryContext">#</a> **RegistryContext**
+
+Undocumented declaration.
+
 <a name="RegistryProvider" href="#RegistryProvider">#</a> **RegistryProvider**
 
 A custom Context provider for exposing the provided `registry` to children
