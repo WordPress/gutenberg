@@ -213,10 +213,11 @@ function mapResolvers( resolvers, selectors, store ) {
 	const mapSelector = ( selector, selectorName ) => {
 		const resolver = resolvers[ selectorName ];
 		if ( ! resolver ) {
+			selector.hasResolver = false;
 			return selector;
 		}
 
-		return ( ...args ) => {
+		const selectorResolver = ( ...args ) => {
 			async function fulfillSelector() {
 				const state = store.getState();
 				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state, ...args ) ) {
@@ -236,6 +237,8 @@ function mapResolvers( resolvers, selectors, store ) {
 			fulfillSelector( ...args );
 			return selector( ...args );
 		};
+		selectorResolver.hasResolver = true;
+		return selectorResolver;
 	};
 
 	return {
