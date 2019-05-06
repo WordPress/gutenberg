@@ -9,7 +9,7 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 
 export const { Fill, Slot } = createSlotFill( 'PluginSettingsSidebar' );
 
-const PluginSettingsSidebar = ( { children, className, title, initialOpen } ) => (
+const PluginDocumentSetting = ( { children, className, title, initialOpen } ) => (
 	<Fill>
 		<PanelBody
 			className={ className }
@@ -21,6 +21,6 @@ const PluginSettingsSidebar = ( { children, className, title, initialOpen } ) =>
 	</Fill>
 );
 
-PluginSettingsSidebar.Slot = Slot;
+PluginDocumentSetting.Slot = Slot;
 
-export default PluginSettingsSidebar;
+export default PluginDocumentSetting;

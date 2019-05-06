@@ -21,7 +21,7 @@ import PostLink from '../post-link';
 import DiscussionPanel from '../discussion-panel';
 import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
-import PluginSettingsSidebar from '../plugin-settings-sidebar';
+import PluginDocumentSetting from '../plugin-document-setting';
 
 const SettingsSidebar = ( { sidebarName } ) => (
 	<Sidebar
@@ -31,7 +31,7 @@ const SettingsSidebar = ( { sidebarName } ) => (
 		<SettingsHeader sidebarName={ sidebarName } />
 		<Panel>
 			{ sidebarName === 'edit-post/document' && (
-				<PluginSettingsSidebar.Slot>
+				<PluginDocumentSetting.Slot>
 					{ ( fills ) => (
 						<Fragment>
 							<PostStatus />
@@ -46,7 +46,7 @@ const SettingsSidebar = ( { sidebarName } ) => (
 							<MetaBoxes location="side" />
 						</Fragment>
 					) }
-				</PluginSettingsSidebar.Slot>
+				</PluginDocumentSetting.Slot>
 			) }
 			{ sidebarName === 'edit-post/block' && (
 				<PanelBody className="edit-post-settings-sidebar__panel-block">
