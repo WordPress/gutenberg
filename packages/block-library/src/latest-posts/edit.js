@@ -70,7 +70,7 @@ class LatestPostsEdit extends Component {
 	render() {
 		const { attributes, setAttributes, latestPosts } = this.props;
 		const { categoriesList } = this.state;
-		const { displayPostContentRadio, displayPostContent, displayPostDate, postLayout, columns, order, orderBy, categories, postCount, excerptLength } = attributes;
+		const { displayPostContentRadio, displayPostContent, displayPostDate, postLayout, columns, order, orderBy, categories, postsToShow, excerptLength } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -113,13 +113,13 @@ class LatestPostsEdit extends Component {
 				<PanelBody title={ __( 'Sorting and Filtering' ) }>
 					<QueryControls
 						{ ...{ order, orderBy } }
-						numberOfItems={ postCount }
+						numberOfItems={ postsToShow }
 						categoriesList={ categoriesList }
 						selectedCategoryId={ categories }
 						onOrderChange={ ( value ) => setAttributes( { order: value } ) }
 						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
 						onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
-						onNumberOfItemsChange={ ( value ) => setAttributes( { postCount: value } ) }
+						onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
 					/>
 					{ postLayout === 'grid' &&
 						<RangeControl
@@ -154,8 +154,8 @@ class LatestPostsEdit extends Component {
 		}
 
 		// Removing posts from display should be instant.
-		const displayPosts = latestPosts.length > postCount ?
-			latestPosts.slice( 0, postCount ) :
+		const displayPosts = latestPosts.length > postsToShow ?
+			latestPosts.slice( 0, postsToShow ) :
 			latestPosts;
 
 		const layoutControls = [
@@ -244,13 +244,13 @@ class LatestPostsEdit extends Component {
 }
 
 export default withSelect( ( select, props ) => {
-	const { postCount, order, orderBy, categories } = props.attributes;
+	const { postsToShow, order, orderBy, categories } = props.attributes;
 	const { getEntityRecords } = select( 'core' );
 	const latestPostsQuery = pickBy( {
 		categories,
 		order,
 		orderby: orderBy,
-		per_page: postCount,
+		per_page: postsToShow,
 	}, ( value ) => ! isUndefined( value ) );
 	return {
 		latestPosts: getEntityRecords( 'postType', 'post', latestPostsQuery ),
