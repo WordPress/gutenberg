@@ -116,6 +116,7 @@ class ImageEdit extends Component {
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.getFilename = this.getFilename.bind( this );
+		this.getImageSizeByURL = this.getImageSizeByURL.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 		this.onImageError = this.onImageError.bind( this );
@@ -453,12 +454,20 @@ class ImageEdit extends Component {
 				</>
 			);
 		}
+		let mediaSizeClass = attributes.mediaSizeClass;
+		if ( ! mediaSizeClass ) {
+			mediaSizeClass = 'size-' + this.getImageSizeByURL();
+			this.props.setAttributes( {
+				mediaSizeClass,
+			} );
+		}
 
-		const classes = classnames( className, {
+		const classNameWithoutSize = className.replace( /size-(.*)/, '' );
+		const classes = classnames( classNameWithoutSize, {
 			'is-transient': isBlobURL( url ),
 			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
-		}, attributes.mediaSizeClass || 'size-' + this.getImageSizeByURL() );
+		}, mediaSizeClass );
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;
