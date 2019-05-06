@@ -303,76 +303,21 @@ array(
 )
 ```
 
-When a widget area stored this way is accessed via the REST API, widgets will be represented using `core/legacy-widget` blocks. Each `core/legacy-widget` block stores a reference to the existing widget (`identifier`), and, if it is a multi widget, the attributes that that instance has (`instance`).
+This array will be _migrated_ when block widget-editing areas are activated. This happens when the Gutenberg plugin is activated, or when WordPress is updated to the version that includes support for blocks in widget-editing areas.
 
-```
-GET /wp/v2/widget-areas/footer
-```
-
-```json
-{
-	"id": "footer",
-	...
-	"content": {
-		"raw": "
-			<!-- wp:legacy-widget {\"identifier\":\"search-2\",\"instance\":{\"title\":\"\"}} /-->
-			<!-- wp:legacy-widget {\"identifier\":\"recent-posts-2\",\"instance\":{\"title\":\"\",\"number\":5}} /-->
-			<!-- wp:legacy-widget {\"identifier\":\"recent-comments-2\",\"instance\":{\"title\":\"\",\"number\":5}} /-->
-		",
-		"rendered": ...,
-	}
-}
-```
-
-When a widget area is updated using the REST API, the storage format is _migrated_ and its `'array_version'` is set to `4`.
-
-After migration, the widget area identifier no longer maps to an array of widget identifiers. Instead, it maps to the ID of a `wp_area` post.
-
-`wp_area` is a new post type that denotes posts that contain block markup for a widget area. The `wp_area` post type is similar to the `wp_block` post type, except that it is marked as private and therefore not viewable by accessing `wp-admin/edit.php?post_type=wp_area`.
-
-Let's illustrate with an example. Say that we update the `'footer'` widget area to include a non-`core/legacy-widget` block.
-
-```
-PUT /wp/v2/widget-areas/footer
-
-{ "content": { "raw": "
-	<!-- wp:paragraph --><p>Hello there!</p><!-- /wp:paragraph -->
-	<!-- wp:legacy-widget {\"identifier\":\"search-2\",\"instance\":{\"title\":\"\"}} /-->
-	<!-- wp:legacy-widget {\"identifier\":\"recent-posts-2\",\"instance\":{\"title\":\"\",\"number\":5}} /-->
-	<!-- wp:legacy-widget {\"identifier\":\"recent-comments-2\",\"instance\":{\"title\":\"\",\"number\":5}} /-->
-" } }
-```
-
-```json
-{
-	"id": "footer",
-	...
-	"content": {
-		"raw": "
-			<!-- wp:paragraph --><p>Hello there!</p><!-- /wp:paragraph -->
-			<!-- wp:legacy-widget {\"identifier\":\"search-2\",\"instance\":{\"title\":\"\"}} /-->
-			<!-- wp:legacy-widget {\"identifier\":\"recent-posts-2\",\"instance\":{\"title\":\"\",\"number\":5}} /-->
-			<!-- wp:legacy-widget {\"identifier\":\"recent-comments-2\",\"instance\":{\"title\":\"\",\"number\":5}} /-->
-		",
-		"rendered": ...
-	}
-}
-```
-
-This triggers a migration. `'footer'` now points to a numeric ID instead of an array. Other widget areas are not affected.
+After migration, the `'array_version'` field is set to `4` and each widget area identifier maps to the ID of a `wp_area` post.
 
 ```php
 array(
 	'footer' => 123,
-	'sidebar' => array(
-		'recent-posts-2',
-		'recent-comments-2',
-	),
+	'sidebar' => 456,
 	'array_version' => 4,
 )
 ```
 
-Here, `123` is the ID of a `wp_area` post. The `post_content` field of `get_post( 123 )` contains the `'footer'` widget area's block markup.
+`wp_area` is a new post type that denotes posts that contain block markup for a widget area. The `wp_area` post type is similar to the `wp_block` post type, except that it is marked as private and therefore not viewable by accessing `wp-admin/edit.php?post_type=wp_area`.
+
+Block markup is stored in the `wp_area` post's `post_content` field, and the `core/legacy-widget` block is used to store widgets that have not been transformed into a block. `wp_area` posts are created lazily when a widget area is saved.
 
 ```html
 <!-- wp:paragraph --><p>Hello there!</p><!-- /wp:paragraph -->
@@ -380,6 +325,8 @@ Here, `123` is the ID of a `wp_area` post. The `post_content` field of `get_post
 <!-- wp:legacy-widget {"identifier":"recent-posts-2","instance":{"title":"","number":5}} /-->
 <!-- wp:legacy-widget {"identifier":"recent-comments-2","instance":{"title":"","number":5}} /-->
 ```
+
+The `'sidebars_widgets'` is _demigrated_ when the Gutenberg plugin is deactivated. This involves resetting `'array_version'` to `3`, restoring an array that maps widget area identifiers to a list of widget identifiers, and deleting all `wp_area` posts that were previously referenced.
 
 ## Backwards Compatibility
 
