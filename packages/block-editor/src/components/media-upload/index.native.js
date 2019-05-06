@@ -34,10 +34,28 @@ class MediaUpload extends React.Component {
 
 	getMediaOptionsItems() {
 		return [
-			{ icon: 'format-image', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
-			{ icon: 'camera', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA, label: this.getTakeMediaLabel() },
-			{ icon: 'wordpress-alt', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
+			{ icon: this.getChooseFromDeviceIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
+			{ icon: this.getTakeMediaIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA, label: this.getTakeMediaLabel() },
+			{ icon: this.getWordPressLibraryIcon(), value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
 		];
+	}
+
+	getChooseFromDeviceIcon() {
+		const { mediaType } = this.props;
+
+		if ( mediaType === MEDIA_TYPE_IMAGE ) {
+			return 'format-image';
+		} else if ( mediaType === MEDIA_TYPE_VIDEO ) {
+			return 'format-video';
+		}
+	}
+
+	getTakeMediaIcon() {
+		return 'camera';
+	}
+
+	getWordPressLibraryIcon() {
+		return 'wordpress-alt';
 	}
 
 	render() {
