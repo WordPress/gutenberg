@@ -1,0 +1,17 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/cover",
+        "isValid": false,
+        "attributes": {
+            "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+            "id": 34,
+            "hasParallax": false,
+            "dimRatio": 50,
+            "backgroundType": "image",
+            "className": "wp-block-cover-image"
+        },
+        "innerBlocks": [],
+        "originalContent": "<section class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\"><h2><strong>Cover <br/>Image</strong></h2></section>"
+    }
+]
