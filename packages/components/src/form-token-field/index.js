@@ -583,8 +583,11 @@ class FormTokenField extends Component {
 						/>
 					) }
 				</div>
-				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className="screen-reader-text">
-					{ __( 'Separate with commas' ) }
+				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className="components-form-token-field__help">
+					{ this.props.tokenizeOnSpace ?
+						__( 'Separate using commas, spaces or the enter key' ) :
+						__( 'Separate using commas or the enter key' )
+					}
 				</div>
 			</div>
 		);
