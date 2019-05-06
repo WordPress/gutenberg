@@ -27,32 +27,30 @@ import {
 const blockAttributes = {
 	url: {
 		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'href',
 	},
-	title: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'title',
+	id: {
+		type: 'number',
 	},
-	text: {
-		type: 'string',
-		source: 'html',
-		selector: 'a',
+	hasParallax: {
+		type: 'boolean',
+		default: false,
 	},
-	backgroundColor: {
+	dimRatio: {
+		type: 'number',
+		default: 50,
+	},
+	overlayColor: {
 		type: 'string',
 	},
-	textColor: {
+	customOverlayColor: {
 		type: 'string',
 	},
-	customBackgroundColor: {
+	backgroundType: {
 		type: 'string',
+		default: 'image',
 	},
-	customTextColor: {
-		type: 'string',
+	focalPoint: {
+		type: 'object',
 	},
 };
 
