@@ -18,7 +18,7 @@
 									props.value, {
 										type: 'my-plugin/link',
 										attributes: {
-											url: '#test',
+											url: 'https://example.com',
 										}
 									}
 								)

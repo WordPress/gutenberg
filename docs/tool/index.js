@@ -2,24 +2,23 @@
  * Node dependencies
  */
 const fs = require( 'fs' );
+const { join } = require( 'path' );
+const { execSync } = require( 'child_process' );
 
 /**
  * Internal dependencies
  */
 const config = require( './config' );
-const parser = require( './parser' );
-const generator = require( './generator' );
-const { getPackageManifest, getComponentManifest, getDataManifest, getRootManifest } = require( './manifest' );
+const { getPackageManifest, getComponentManifest, getRootManifest } = require( './manifest' );
 
-const parsedModules = parser( config.dataNamespaces );
-generator( parsedModules, config.dataDocsOutput );
+// Update data files from code
+execSync( join( __dirname, 'update-data.js' ) );
 
 const rootManifest = getRootManifest( config.tocFileName );
 const packageManifest = getPackageManifest( config.packageFileNames );
 const componentManifest = getComponentManifest( config.componentPaths );
-const dataManifest = getDataManifest( parsedModules );
 
 fs.writeFileSync(
 	config.manifestOutput,
-	JSON.stringify( rootManifest.concat( packageManifest, componentManifest, dataManifest ), undefined, '\t' )
+	JSON.stringify( rootManifest.concat( packageManifest, componentManifest ), undefined, '\t' )
 );

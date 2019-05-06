@@ -17,8 +17,6 @@ import {
 	withColors,
 } from '@wordpress/block-editor';
 
-const renderAppender = () => <InnerBlocks.ButtonBlockAppender />;
-
 function GroupEdit( {
 	className,
 	setBackgroundColor,
@@ -49,7 +47,7 @@ function GroupEdit( {
 			</InspectorControls>
 			<div className={ classes } style={ styles }>
 				<InnerBlocks
-					renderAppender={ ! hasInnerBlocks && renderAppender }
+					renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
 				/>
 			</div>
 		</Fragment>
