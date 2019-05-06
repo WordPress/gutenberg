@@ -94,6 +94,26 @@ exports[`Block Grouping Keyboard shortcuts ungroups using keyboard shortcut 1`] 
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Block Grouping Preserving selected blocks attributes preserves width alignment settings of selected blocks 1`] = `
+"<!-- wp:group {\\"align\\":\\"full\\"} -->
+<div class=\\"wp-block-group alignfull\\"><!-- wp:heading -->
+<h2>Group Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image {\\"align\\":\\"full\\"} -->
+<figure class=\\"wp-block-image alignfull\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"align\\":\\"wide\\"} -->
+<figure class=\\"wp-block-image alignwide\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Some paragraph</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->"
+`;
+
 exports[`Block Grouping Ungrouping ungroups an existing group via options menu 1`] = `
 "<!-- wp:heading -->
 <h2>Group Heading</h2>

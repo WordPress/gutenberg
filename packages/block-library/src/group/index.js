@@ -39,11 +39,22 @@ export const settings = {
 						return;
 					}
 
+					const alignments = [ 'wide', 'full' ];
+
+					let widestAlignment;
+
 					const groupInnerBlocks = attributes.map( ( attrs, index ) => {
+						// Determines the widest setting of all the blocks to be grouped
+						const currBlockAlignment = attrs.align;
+						widestAlignment = alignments.indexOf( currBlockAlignment ) > alignments.indexOf( widestAlignment ) ? currBlockAlignment : widestAlignment;
+
+						// Creates the new Block
 						return createBlock( names[ index ], attrs, innerBlocks[ index ] );
 					} );
 
-					return createBlock( 'core/group', {}, groupInnerBlocks );
+					return createBlock( 'core/group', {
+						align: widestAlignment,
+					}, groupInnerBlocks );
 				},
 			},
 

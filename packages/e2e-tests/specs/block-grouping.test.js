@@ -176,13 +176,15 @@ describe( 'Block Grouping', () => {
 	} );
 
 	describe( 'Container Block availability', () => {
-		it( 'does not show group transform if container block is disabled', async () => {
+		beforeAll( async () => {
 			// Disable the Group block
 			await page.evaluate( () => {
 				const { dispatch } = wp.data;
 				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/group' ] );
 			} );
+		} );
 
+		beforeEach( async () => {
 			// Create a Group
 			await insertBlock( 'Heading' );
 			await page.keyboard.type( 'Group Heading' );
@@ -191,7 +193,17 @@ describe( 'Block Grouping', () => {
 			await page.keyboard.type( 'Some paragraph' );
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
+		} );
 
+		afterAll( async () => {
+			// Re-enable the Group block
+			await page.evaluate( () => {
+				const { dispatch } = wp.data;
+				dispatch( 'core/edit-post' ).showBlockTypes( [ 'core/group' ] );
+			} );
+		} );
+
+		it( 'does not show group transform if container block is disabled', async () => {
 			const availableTransforms = await getAvailableBlockTransforms();
 
 			expect(
@@ -202,26 +214,42 @@ describe( 'Block Grouping', () => {
 		} );
 
 		it( 'does not show group option in the options toolbar if container block is disabled ', async () => {
-			// Disable the Group block
-			await page.evaluate( () => {
-				const { dispatch } = wp.data;
-				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/group' ] );
-			} );
-
-			// Create a Group
-			await insertBlock( 'Heading' );
-			await page.keyboard.type( 'Group Heading' );
-			await insertBlock( 'Image' );
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Some paragraph' );
-			await pressKeyWithModifier( 'primary', 'a' );
-			await pressKeyWithModifier( 'primary', 'a' );
-
 			await clickBlockToolbarButton( 'More options' );
 
 			const blockOptionsDropdownHTML = await page.evaluate( () => document.querySelector( '.block-editor-block-settings-menu__content' ).innerHTML );
 
 			expect( blockOptionsDropdownHTML ).not.toContain( 'Group' );
+		} );
+	} );
+
+	describe( 'Preserving selected blocks attributes', () => {
+		it( 'preserves width alignment settings of selected blocks', async () => {
+			await insertBlock( 'Heading' );
+			await page.keyboard.type( 'Group Heading' );
+
+			// Full width image
+			await insertBlock( 'Image' );
+			await clickBlockToolbarButton( 'Full width' );
+
+			// Wide width image)
+			await insertBlock( 'Image' );
+			await clickBlockToolbarButton( 'Wide width' );
+
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'Some paragraph' );
+
+			await pressKeyWithModifier( 'primary', 'a' );
+			await pressKeyWithModifier( 'primary', 'a' );
+
+			await transformBlockTo( 'Group' );
+
+			const allBlocks = await getAllBlocks();
+
+			// We expect Group block align setting to match that
+			// of the widest of it's "child" innerBlocks
+			expect( allBlocks[ 0 ].attributes.align ).toBe( 'full' );
+
+			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 	} );
 } );
