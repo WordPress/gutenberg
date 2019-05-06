@@ -20,6 +20,7 @@
 .table-of-contents__counts {
 	display: flex;
 	flex-wrap: wrap;
+	margin: 0;
 
 	&:focus {
 		@include square-style__focus();
