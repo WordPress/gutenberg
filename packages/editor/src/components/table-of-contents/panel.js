@@ -45,9 +45,9 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, h
 			{ headingCount > 0 && (
 				<>
 					<hr />
-					<span className="table-of-contents__title">
+					<h2 className="table-of-contents__title">
 						{ __( 'Document Outline' ) }
-					</span>
+					</h2>
 					<DocumentOutline onSelect={ onRequestClose } hasOutlineItemsDisabled={ hasOutlineItemsDisabled } />
 				</>
 			) }
