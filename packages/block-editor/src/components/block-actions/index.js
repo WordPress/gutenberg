@@ -16,6 +16,7 @@ function BlockActions( {
 	onInsertBefore,
 	onInsertAfter,
 	onGroup,
+	onUnGroup,
 	isLocked,
 	canDuplicate,
 	children,
@@ -26,6 +27,7 @@ function BlockActions( {
 		onInsertAfter,
 		onInsertBefore,
 		onGroup,
+		onUnGroup,
 		isLocked,
 		canDuplicate,
 	} );
@@ -124,6 +126,23 @@ export default compose( [
 				replaceBlocks(
 					clientIds,
 					newBlocks
+				);
+			},
+
+			onUnGroup() {
+				if ( ! blocks.length ) {
+					return;
+				}
+
+				const innerBlocks = blocks[ 0 ].innerBlocks;
+
+				if ( ! innerBlocks.length ) {
+					return;
+				}
+
+				replaceBlocks(
+					clientIds,
+					innerBlocks
 				);
 			},
 		};
