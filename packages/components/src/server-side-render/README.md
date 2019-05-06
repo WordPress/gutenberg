@@ -8,6 +8,36 @@ ServerSideRender should be regarded as a fallback or legacy mechanism, it is not
 
 New blocks should be built in conjunction with any necessary REST API endpoints, so that JavaScript can be used for rendering client-side in the `edit` function. This gives the best user experience, instead of relying on using the PHP `render_callback`. The logic necessary for rendering should be included in the endpoint, so that both the client-side JavaScript and server-side PHP logic should require a minimal amount of differences.
 
+## Props
+
+### attributes
+
+An object containing the attributes of the block to be server-side rendered.
+E.g: `{ displayAsDropdown: true }`, `{ showHierarchy: true }`, etc...
+- Type: `Object`
+- Required: No
+
+### block
+
+The identifier of the block to be server-side rendered.
+Examples: "core/archives", "core/latest-comments", "core/rss", etc...
+- Type: `String`
+- Required: Yes
+
+### className
+
+A class added to the DOM element that wraps the server side rendered block.
+Examples: "my-custom-server-side-rendered".
+- Type: `String`
+- Required: No
+
+### urlQueryArgs
+
+Query arguments to apply to the request URL.
+E.g: `{ post_id: 12 }`.
+- Type: `Object`
+- Required: No
+
 ## Usage
 
 Render core/archives preview.

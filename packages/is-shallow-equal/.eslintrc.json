@@ -1,5 +1,7 @@
 {
-	"rules": {
-		"no-var": 0
+	"root": true,
+	"extends": "plugin:@wordpress/eslint-plugin/es5",
+	"env": {
+		"node": true
 	}
 }

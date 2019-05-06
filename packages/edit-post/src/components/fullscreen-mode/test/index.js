@@ -4,7 +4,7 @@
 import { shallow } from 'enzyme';
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 import { FullscreenMode } from '..';
 

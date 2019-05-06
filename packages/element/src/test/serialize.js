@@ -528,7 +528,7 @@ describe( 'renderAttributes()', () => {
 				href: '/index.php?foo=bar&qux=<"scary">',
 			} );
 
-			expect( result ).toBe( ' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;>"' );
+			expect( result ).toBe( ' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;"' );
 		} );
 
 		it( 'should render numeric attributes', () => {

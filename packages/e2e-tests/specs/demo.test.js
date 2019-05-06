@@ -22,7 +22,7 @@ const stripIframeFromEmbed = ( embedObject ) => {
 
 describe( 'new editor state', () => {
 	beforeAll( async () => {
-		setUpResponseMocking( [
+		await setUpResponseMocking( [
 			{
 				match: createURLMatcher( 'oembed%2F1.0%2Fproxy' ),
 				onRequestMatch: mockOrTransform( couldNotBePreviewed, MOCK_VIMEO_RESPONSE, stripIframeFromEmbed ),

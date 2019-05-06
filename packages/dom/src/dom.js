@@ -60,14 +60,17 @@ function isSelectionForward( selection ) {
 }
 
 /**
- * Check whether the selection is horizontally at the edge of the container.
+ * Check whether the selection is at the edge of the container. Checks for
+ * horizontal position by default. Set `onlyVertical` to true to check only
+ * vertically.
  *
- * @param {Element} container Focusable element.
- * @param {boolean} isReverse Set to true to check left, false for right.
+ * @param {Element} container    Focusable element.
+ * @param {boolean} isReverse    Set to true to check left, false to check right.
+ * @param {boolean} onlyVertical Set to true to check only vertical position.
  *
- * @return {boolean} True if at the horizontal edge, false if not.
+ * @return {boolean} True if at the edge, false if not.
  */
-export function isHorizontalEdge( container, isReverse ) {
+function isEdge( container, isReverse, onlyVertical ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
@@ -86,85 +89,17 @@ export function isHorizontalEdge( container, isReverse ) {
 
 	const selection = window.getSelection();
 
-	// Create copy of range for setting selection to find effective offset.
+	if ( ! selection.rangeCount ) {
+		return false;
+	}
+
 	const range = selection.getRangeAt( 0 ).cloneRange();
+	const isForward = isSelectionForward( selection );
+	const isCollapsed = selection.isCollapsed;
 
 	// Collapse in direction of selection.
-	if ( ! selection.isCollapsed ) {
-		range.collapse( ! isSelectionForward( selection ) );
-	}
-
-	let node = range.startContainer;
-
-	let extentOffset;
-	if ( isReverse ) {
-		// When in reverse, range node should be first.
-		extentOffset = 0;
-	} else if ( node.nodeValue ) {
-		// Otherwise, vary by node type. A text node has no children. Its range
-		// offset reflects its position in nodeValue.
-		//
-		// "If the startContainer is a Node of type Text, Comment, or
-		// CDATASection, then the offset is the number of characters from the
-		// start of the startContainer to the boundary point of the Range."
-		//
-		// See: https://developer.mozilla.org/en-US/docs/Web/API/Range/startOffset
-		// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue
-		extentOffset = node.nodeValue.length;
-	} else {
-		// "For other Node types, the startOffset is the number of child nodes
-		// between the start of the startContainer and the boundary point of
-		// the Range."
-		//
-		// See: https://developer.mozilla.org/en-US/docs/Web/API/Range/startOffset
-		extentOffset = node.childNodes.length;
-	}
-
-	// Offset of range should be at expected extent.
-	const position = isReverse ? 'start' : 'end';
-	const offset = range[ `${ position }Offset` ];
-	if ( offset !== extentOffset ) {
-		return false;
-	}
-
-	// If confirmed to be at extent, traverse up through DOM, verifying that
-	// the node is at first or last child for reverse or forward respectively.
-	// Continue until container is reached.
-	const order = isReverse ? 'first' : 'last';
-	while ( node !== container ) {
-		const parentNode = node.parentNode;
-		if ( parentNode[ `${ order }Child` ] !== node ) {
-			return false;
-		}
-
-		node = parentNode;
-	}
-
-	// If reached, range is assumed to be at edge.
-	return true;
-}
-
-/**
- * Check whether the selection is vertically at the edge of the container.
- *
- * @param {Element} container Focusable element.
- * @param {boolean} isReverse Set to true to check top, false for bottom.
- *
- * @return {boolean} True if at the edge, false if not.
- */
-export function isVerticalEdge( container, isReverse ) {
-	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
-		return isHorizontalEdge( container, isReverse );
-	}
-
-	if ( ! container.isContentEditable ) {
-		return true;
-	}
-
-	const selection = window.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	if ( ! range ) {
-		return false;
+	if ( ! isCollapsed ) {
+		range.collapse( ! isForward );
 	}
 
 	const rangeRect = getRectangleFromRange( range );
@@ -173,20 +108,82 @@ export function isVerticalEdge( container, isReverse ) {
 		return false;
 	}
 
-	const buffer = rangeRect.height / 2;
-	const editableRect = container.getBoundingClientRect();
+	const computedStyle = window.getComputedStyle( container );
+	const lineHeight = parseInt( computedStyle.lineHeight, 10 ) || 0;
 
-	// Too low.
-	if ( isReverse && rangeRect.top - buffer > editableRect.top ) {
+	// Only consider the multiline selection at the edge if the direction is
+	// towards the edge.
+	if (
+		! isCollapsed &&
+		rangeRect.height > lineHeight &&
+		isForward === isReverse
+	) {
 		return false;
 	}
 
-	// Too high.
-	if ( ! isReverse && rangeRect.bottom + buffer < editableRect.bottom ) {
+	const padding = parseInt( computedStyle[
+		`padding${ isReverse ? 'Top' : 'Bottom' }`
+	], 10 ) || 0;
+
+	// Calculate a buffer that is half the line height. In some browsers, the
+	// selection rectangle may not fill the entire height of the line, so we add
+	// 3/4 the line height to the selection rectangle to ensure that it is well
+	// over its line boundary.
+	const buffer = 3 * parseInt( lineHeight, 10 ) / 4;
+	const containerRect = container.getBoundingClientRect();
+	const verticalEdge = isReverse ?
+		containerRect.top + padding > rangeRect.top - buffer :
+		containerRect.bottom - padding < rangeRect.bottom + buffer;
+
+	if ( ! verticalEdge ) {
 		return false;
 	}
 
-	return true;
+	if ( onlyVertical ) {
+		return true;
+	}
+
+	// To calculate the horizontal position, we insert a test range and see if
+	// this test range has the same horizontal position. This method proves to
+	// be better than a DOM-based calculation, because it ignores empty text
+	// nodes and a trailing line break element. In other words, we need to check
+	// visual positioning, not DOM positioning.
+	const x = isReverse ? containerRect.left + 1 : containerRect.right - 1;
+	const y = isReverse ? containerRect.top + buffer : containerRect.bottom - buffer;
+	const testRange = hiddenCaretRangeFromPoint( document, x, y, container );
+
+	if ( ! testRange ) {
+		return false;
+	}
+
+	const side = isReverse ? 'left' : 'right';
+	const testRect = getRectangleFromRange( testRange );
+
+	return Math.round( testRect[ side ] ) === Math.round( rangeRect[ side ] );
+}
+
+/**
+ * Check whether the selection is horizontally at the edge of the container.
+ *
+ * @param {Element} container Focusable element.
+ * @param {boolean} isReverse Set to true to check left, false for right.
+ *
+ * @return {boolean} True if at the horizontal edge, false if not.
+ */
+export function isHorizontalEdge( container, isReverse ) {
+	return isEdge( container, isReverse );
+}
+
+/**
+ * Check whether the selection is vertically at the edge of the container.
+ *
+ * @param {Element} container Focusable element.
+ * @param {boolean} isReverse Set to true to check top, false for bottom.
+ *
+ * @return {boolean} True if at the vertical edge, false if not.
+ */
+export function isVerticalEdge( container, isReverse ) {
+	return isEdge( container, isReverse, true );
 }
 
 /**
@@ -204,6 +201,18 @@ export function getRectangleFromRange( range ) {
 		return range.getBoundingClientRect();
 	}
 
+	const { startContainer } = range;
+
+	// Correct invalid "BR" ranges. The cannot contain any children.
+	if ( startContainer.nodeName === 'BR' ) {
+		const { parentNode } = startContainer;
+		const index = Array.from( parentNode.childNodes ).indexOf( startContainer );
+
+		range = document.createRange();
+		range.setStart( parentNode, index );
+		range.setEnd( parentNode, index );
+	}
+
 	let rect = range.getClientRects()[ 0 ];
 
 	// If the collapsed range starts (and therefore ends) at an element node,
@@ -213,6 +222,8 @@ export function getRectangleFromRange( range ) {
 	// See: https://stackoverflow.com/a/6847328/995445
 	if ( ! rect ) {
 		const padNode = document.createTextNode( '\u200b' );
+		// Do not modify the live range.
+		range = range.cloneRange();
 		range.insertNode( padNode );
 		rect = range.getClientRects()[ 0 ];
 		padNode.parentNode.removeChild( padNode );
@@ -224,15 +235,9 @@ export function getRectangleFromRange( range ) {
 /**
  * Get the rectangle for the selection in a container.
  *
- * @param {Element} container Editable container.
- *
  * @return {?DOMRect} The rectangle.
  */
-export function computeCaretRect( container ) {
-	if ( ! container.isContentEditable ) {
-		return;
-	}
-
+export function computeCaretRect() {
 	const selection = window.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 

@@ -2,31 +2,19 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { map, find, get, filter } from 'lodash';
+import { map, find, get, filter, compact, defaultTo } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
+import { createRegistrySelector } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import { REDUCER_KEY } from './name';
 import { getQueriedItems } from './queried-data';
-
-/**
- * Returns true if resolution is in progress for the core selector of the given
- * name and arguments.
- *
- * @param {string} selectorName Core data selector name.
- * @param {...*}   args         Arguments passed to selector.
- *
- * @return {boolean} Whether resolution is in progress.
- */
-function isResolving( selectorName, ...args ) {
-	return select( 'core/data' ).isResolving( REDUCER_KEY, selectorName, args );
-}
 
 /**
  * Returns true if a request is in progress for embed preview data, or false
@@ -37,9 +25,9 @@ function isResolving( selectorName, ...args ) {
  *
  * @return {boolean} Whether a request is in progress for an embed preview.
  */
-export function isRequestingEmbedPreview( state, url ) {
-	return isResolving( 'getEmbedPreview', url );
-}
+export const isRequestingEmbedPreview = createRegistrySelector( ( select ) => ( state, url ) => {
+	return select( 'core/data' ).isResolving( REDUCER_KEY, 'getEmbedPreview', [ url ] );
+} );
 
 /**
  * Returns all available authors.
@@ -50,6 +38,17 @@ export function isRequestingEmbedPreview( state, url ) {
  */
 export function getAuthors( state ) {
 	return getUserQueryResults( state, 'authors' );
+}
+
+/**
+ * Returns the current user.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Object} Current user object.
+ */
+export function getCurrentUser( state ) {
+	return state.currentUser;
 }
 
 /**
@@ -171,12 +170,94 @@ export function isPreviewEmbedFallback( state, url ) {
 }
 
 /**
- * Return Upload Permissions.
+ * Returns whether the current user can upload media.
  *
- * @param  {Object}  state State tree.
+ * Calling this may trigger an OPTIONS request to the REST API via the
+ * `canUser()` resolver.
  *
- * @return {boolean} Upload Permissions.
+ * https://developer.wordpress.org/rest-api/reference/
+ *
+ * @deprecated since 5.0. Callers should use the more generic `canUser()` selector instead of
+ *             `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {boolean} Whether or not the user can upload media. Defaults to `true` if the OPTIONS
+ *                   request is being made.
  */
 export function hasUploadPermissions( state ) {
-	return state.hasUploadPermissions;
+	deprecated( "select( 'core' ).hasUploadPermissions()", {
+		alternative: "select( 'core' ).canUser( 'create', 'media' )",
+	} );
+	return defaultTo( canUser( state, 'create', 'media' ), true );
 }
+
+/**
+ * Returns whether the current user can perform the given action on the given
+ * REST resource.
+ *
+ * Calling this may trigger an OPTIONS request to the REST API via the
+ * `canUser()` resolver.
+ *
+ * https://developer.wordpress.org/rest-api/reference/
+ *
+ * @param {Object}   state            Data state.
+ * @param {string}   action           Action to check. One of: 'create', 'read', 'update', 'delete'.
+ * @param {string}   resource         REST resource to check, e.g. 'media' or 'posts'.
+ * @param {string=}  id               Optional ID of the rest resource to check.
+ *
+ * @return {boolean|undefined} Whether or not the user can perform the action,
+ *                             or `undefined` if the OPTIONS request is still being made.
+ */
+export function canUser( state, action, resource, id ) {
+	const key = compact( [ action, resource, id ] ).join( '/' );
+	return get( state, [ 'userPermissions', key ] );
+}
+
+/**
+ * Returns the latest autosaves for the post.
+ *
+ * May return multiple autosaves since the backend stores one autosave per
+ * author for each post.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} postType The type of the parent post.
+ * @param {number} postId   The id of the parent post.
+ *
+ * @return {?Array} An array of autosaves for the post, or undefined if there is none.
+ */
+export function getAutosaves( state, postType, postId ) {
+	return state.autosaves[ postId ];
+}
+
+/**
+ * Returns the autosave for the post and author.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} postType The type of the parent post.
+ * @param {number} postId   The id of the parent post.
+ * @param {number} authorId The id of the author.
+ *
+ * @return {?Object} The autosave for the post and author.
+ */
+export function getAutosave( state, postType, postId, authorId ) {
+	if ( authorId === undefined ) {
+		return;
+	}
+
+	const autosaves = state.autosaves[ postId ];
+	return find( autosaves, { author: authorId } );
+}
+
+/**
+ * Returns true if the REST request for autosaves has completed.
+ *
+ * @param {Object} state State tree.
+ * @param {string} postType The type of the parent post.
+ * @param {number} postId   The id of the parent post.
+ *
+ * @return {boolean} True if the REST request was completed. False otherwise.
+ */
+export const hasFetchedAutosaves = createRegistrySelector( ( select ) => ( state, postType, postId ) => {
+	return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [ postType, postId ] );
+} );

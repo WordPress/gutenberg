@@ -102,13 +102,13 @@ This is the canonical list of keyboard shortcuts:
 		</tr>
 		<tr>
 			<td>Navigate to a the next part of the editor (alternative).</td>
-			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>N</kbd></td>
-			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>N</kbd></td>
+			<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>N</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>N</kbd></td>
 		</tr>
 		<tr>
 			<td>Navigate to the previous part of the editor (alternative).</td>
-			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd></td>
-			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>P</kbd></td>
+			<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>P</kbd></td>
 		</tr>
 		<tr>
 			<td>Navigate to the nearest toolbar.</td>
@@ -241,7 +241,7 @@ Here is a brief animation illustrating how to find and use the keyboard shortcut
 
 ## Is Gutenberg built on top of TinyMCE?
 
-No. [TinyMCE](https://www.tinymce.com/) is one of the best tools for enabling rich text on the web. In Gutenberg, TinyMCE does exactly that. Nearly every text field you'll find is augmented with TinyMCE for rich text. Whether it be text, lists, or even just a single caption, TinyMCE can be invoked on blocks for rich text enhancements.
+No. [TinyMCE](https://www.tinymce.com/) is only used for the "Classic" block.
 
 ## What browsers will Gutenberg support?
 
@@ -251,7 +251,7 @@ Our [list of supported browsers can be found in the Make WordPress handbook](htt
 
 ## How do I make my own block?
 
-The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](../../docs/designers-developers/developers/tutorials/block-tutorial/readme.md) section to get started.
+The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) section to get started.
 
 ## Does Gutenberg involve editing posts/pages in the front-end?
 
@@ -295,7 +295,7 @@ Blocks will be able to provide base structural CSS styles, and themes can add st
 
 Other features, like the new _wide_ and _full-wide_ alignment options, will simply be CSS classes applied to blocks that offer this alignment. We are looking at how a theme can opt in to this feature, for example using `add_theme_support`.
 
-*See:* [Theme Support](../../docs/designers-developers/developers/themes/theme-support.md)
+*See:* [Theme Support](/docs/designers-developers/developers/themes/theme-support.md)
 
 ## How will editor styles work?
 
@@ -308,7 +308,7 @@ function gutenbergtheme_editor_styles() {
 add_action( 'enqueue_block_editor_assets', 'gutenbergtheme_editor_styles' );
 ```
 
-*See:* [Editor Styles](../../docs/designers-developers/developers/themes/theme-support.md#editor-styles)
+*See:* [Editor Styles](/docs/designers-developers/developers/themes/theme-support.md#editor-styles)
 
 ## Should I be concerned that Gutenberg will make my plugin obsolete?
 
@@ -320,9 +320,9 @@ We realize it's a big change. We also think there will be many new opportunities
 
 ## Will I be able to opt out of Gutenberg for my site?
 
-There is a “Classic” block, which is virtually the same as the current editor, except in block form. 
+There is a “Classic” block, which is virtually the same as the current editor, except in block form.
 
-There is also the [Classic Editor Plugin](https://wordpress.org/plugins/classic-editor/) which restores the previous editor, see the plugin for more information. The WordPress Core team has committed to supporting the Classic Editor Plugin [until December 2021](https://make.wordpress.org/core/2018/11/07/classic-editor-plugin-support-window/).
+There is also the [Classic Editor plugin](https://wordpress.org/plugins/classic-editor/) which restores the previous editor, see the plugin for more information. The WordPress Core team has committed to supporting the Classic Editor plugin [until December 2021](https://make.wordpress.org/core/2018/11/07/classic-editor-plugin-support-window/).
 
 
 ## How will custom TinyMCE buttons work in Gutenberg?
@@ -353,7 +353,7 @@ Our approach—as outlined in [the technical overview introduction](https://make
 
 This also [gives us the flexibility](https://github.com/WordPress/gutenberg/issues/1516) to store those blocks that are inherently separate from the content stream (reusable pieces like widgets or small post type elements) elsewhere, and just keep token references for their placement.
 
-We suggest you look at the [Gutenberg key concepts](../../docs/designers-developers/key-concepts.md) to learn more about how this aspect of the project works.
+We suggest you look at the [Gutenberg key concepts](/docs/designers-developers/key-concepts.md) to learn more about how this aspect of the project works.
 
 ## How can I parse the post content back out into blocks in PHP or JS?
 In JS:
@@ -365,8 +365,7 @@ var blocks = wp.blocks.parse( postContent );
 In PHP:
 
 ```php
-$blocks = gutenberg_parse_blocks( $post_content ); // plugin
-$blocks = parse_blocks( $post_content ); // WordPress 5.0
+$blocks = parse_blocks( $post_content );
 ```
 
 ## Why should I start using this once released?

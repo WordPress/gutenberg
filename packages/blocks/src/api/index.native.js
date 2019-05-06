@@ -4,6 +4,7 @@ export {
 } from './factory';
 export {
 	default as parse,
+	getBlockAttributes,
 	parseWithAttributeSchema,
 } from './parser';
 export {
@@ -27,6 +28,7 @@ export {
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,
+	normalizeIconObject,
 } from './utils';
-export { getPhrasingContentSchema } from './raw-handling';
+export { pasteHandler, getPhrasingContentSchema } from './raw-handling';
 export { default as children } from './children';

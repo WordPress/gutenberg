@@ -1,0 +1,13 @@
+.block-editor-format-toolbar {
+	display: flex;
+	flex-shrink: 0;
+}
+
+.block-editor-format-toolbar__selection-position {
+	position: absolute;
+	transform: translateX(-50%);
+}
+
+.block-editor-format-toolbar .components-dropdown-menu__toggle .components-dropdown-menu__indicator::after {
+	margin: 7px;
+}

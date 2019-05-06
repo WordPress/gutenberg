@@ -23,6 +23,7 @@ module.exports = {
 		'no-useless-computed-key': 'error',
 		'no-useless-constructor': 'error',
 		'no-var': 'error',
+		'object-shorthand': 'error',
 		'prefer-const': 'error',
 		quotes: [ 'error', 'single', { allowTemplateLiterals: true, avoidEscape: true } ],
 		'space-unary-ops': [ 'error', {

@@ -12,10 +12,10 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { ClipboardButton, Button, ExternalLink } from '@wordpress/components';
-import { safeDecodeURI } from '@wordpress/url';
+import { safeDecodeURI, safeDecodeURIComponent } from '@wordpress/url';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import PostPermalinkEditor from './editor.js';
 import { getWPAdminURL, cleanForSlug } from '../../utils/url';
@@ -78,7 +78,7 @@ class PostPermalink extends Component {
 		const ariaLabel = isCopied ? __( 'Permalink copied' ) : __( 'Copy the permalink' );
 
 		const { prefix, suffix } = permalinkParts;
-		const slug = postSlug || cleanForSlug( postTitle ) || postID;
+		const slug = safeDecodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID;
 		const samplePermalink = ( isEditable ) ? prefix + slug + suffix : prefix;
 
 		return (

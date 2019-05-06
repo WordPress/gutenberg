@@ -1,7 +1,7 @@
 /**
  * Node dependencies
  */
-const { camelCase, kebabCase, nth, upperFirst } = require( 'lodash' );
+const { camelCase, nth, upperFirst } = require( 'lodash' );
 
 const fs = require( 'fs' );
 
@@ -45,32 +45,13 @@ function getComponentManifest( componentPaths ) {
 	} );
 }
 
-/**
- * Generates the data manifest.
- *
- * @param {Object} parsedNamespaces Parsed Namespace Object
- *
- * @return {Array} Manifest
- */
-function getDataManifest( parsedNamespaces ) {
-	return Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
-		const slug = `data-${ kebabCase( parsedNamespace.name ) }`;
-		return {
-			title: parsedNamespace.title,
-			slug,
-			markdown_source: `${ baseRepoUrl }/docs/designers-developers/developers/data/${ slug }.md`,
-			parent: 'data',
-		};
-	} );
-}
-
 function getRootManifest( tocFileName ) {
 	return generateRootManifestFromTOCItems( require( tocFileName ) );
 }
 
 function generateRootManifestFromTOCItems( items, parent = null ) {
 	let pageItems = [];
-	items.map( ( obj ) => {
+	items.forEach( ( obj ) => {
 		const fileName = Object.keys( obj )[ 0 ];
 		const children = obj[ fileName ];
 
@@ -91,10 +72,10 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 		}
 
 		pageItems.push( {
-			title: title,
-			slug: slug,
+			title,
+			slug,
 			markdown_source: `${ baseRepoUrl }\/${ fileName }`,
-			parent: parent,
+			parent,
 		} );
 		if ( Array.isArray( children ) && children.length ) {
 			pageItems = pageItems.concat( generateRootManifestFromTOCItems( children, slug ) );
@@ -106,6 +87,5 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 module.exports = {
 	getPackageManifest,
 	getComponentManifest,
-	getDataManifest,
 	getRootManifest,
 };

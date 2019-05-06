@@ -12,10 +12,10 @@ import { withState } from '@wordpress/compose';
 
 const MyToggleControl = withState( {
 	hasFixedBackground: false,
-} )( ( { hasFixedBackground, setState } ) => ( 
+} )( ( { hasFixedBackground, setState } ) => (
 	<ToggleControl
 		label="Fixed Background"
-		help={ hasFixedBackground ? 'Has fixed background.' : 'No fixed background.' } 
+		help={ hasFixedBackground ? 'Has fixed background.' : 'No fixed background.' }
 		checked={ hasFixedBackground }
 		onChange={ () => setState( ( state ) => ( { hasFixedBackground: ! state.hasFixedBackground } ) ) }
 	/>
@@ -37,7 +37,7 @@ If this property is added, a label will be generated using label property as the
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String` | `Function`
+- Type: `String|WPElement`
 - Required: No
 
 ### checked
@@ -55,3 +55,9 @@ A function that receives the checked state (boolean) as input.
 - Type: `function`
 - Required: Yes
 
+### className
+
+The class that will be added with `components-base-control` and `components-toggle-control` to the classes of the wrapper div. If no className is passed only `components-base-control` and `components-toggle-control` are used.
+
+Type: String
+Required: No

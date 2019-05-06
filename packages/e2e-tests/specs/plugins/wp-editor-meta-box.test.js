@@ -8,7 +8,9 @@ import {
 	publishPost,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'WP Editor Meta Boxes', () => {
+// This test isn't reliable on Travis and fails from time to time.
+// See: https://github.com/WordPress/gutenberg/pull/15211.
+describe.skip( 'WP Editor Meta Boxes', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-plugin-wp-editor-meta-box' );
 		await createNewPost();

@@ -1122,6 +1122,106 @@ describe( 'block factory', () => {
 				value: 'smoked ribs',
 			} );
 		} );
+
+		it( 'should pass through inner blocks to transform', () => {
+			registerBlockType( 'core/updated-columns-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/columns-block' ],
+						transform( attributes, innerBlocks ) {
+							return createBlock(
+								'core/updated-columns-block',
+								attributes,
+								innerBlocks.map( ( innerBlock ) => {
+									return cloneBlock( innerBlock, {
+										value: 'after',
+									} );
+								} ),
+							);
+						},
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated columns block',
+			} );
+			registerBlockType( 'core/columns-block', defaultBlockSettings );
+			registerBlockType( 'core/column-block', defaultBlockSettings );
+
+			const block = createBlock(
+				'core/columns-block',
+				{},
+				[ createBlock( 'core/column-block', { value: 'before' } ) ]
+			);
+
+			const transformedBlocks = switchToBlockType( block, 'core/updated-columns-block' );
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after' );
+		} );
+
+		it( 'should pass through inner blocks to transform (multi)', () => {
+			registerBlockType( 'core/updated-columns-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/columns-block' ],
+						isMultiBlock: true,
+						transform( blocksAttributes, blocksInnerBlocks ) {
+							return blocksAttributes.map( ( attributes, i ) => {
+								return createBlock(
+									'core/updated-columns-block',
+									attributes,
+									blocksInnerBlocks[ i ].map( ( innerBlock ) => {
+										return cloneBlock( innerBlock, {
+											value: 'after' + i,
+										} );
+									} ),
+								);
+							} );
+						},
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated columns block',
+			} );
+			registerBlockType( 'core/columns-block', defaultBlockSettings );
+			registerBlockType( 'core/column-block', defaultBlockSettings );
+
+			const blocks = [
+				createBlock(
+					'core/columns-block',
+					{},
+					[ createBlock( 'core/column-block', { value: 'before' } ) ]
+				),
+				createBlock(
+					'core/columns-block',
+					{},
+					[ createBlock( 'core/column-block', { value: 'before' } ) ]
+				),
+			];
+
+			const transformedBlocks = switchToBlockType( blocks, 'core/updated-columns-block' );
+
+			expect( transformedBlocks ).toHaveLength( 2 );
+			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after0' );
+			expect( transformedBlocks[ 1 ].innerBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 1 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after1' );
+		} );
 	} );
 
 	describe( 'getBlockTransforms', () => {

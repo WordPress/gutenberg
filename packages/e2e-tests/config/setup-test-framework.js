@@ -1,17 +1,18 @@
 /**
  * External dependencies
  */
-import 'expect-puppeteer';
 import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import '@wordpress/jest-console';
 import {
+	activatePlugin,
 	clearLocalStorage,
 	enablePageDialogAccept,
 	setBrowserViewport,
+	switchUserToAdmin,
+	switchUserToTest,
 	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
 
@@ -54,6 +55,7 @@ async function setupBrowser() {
  * @return {Promise} Promise resolving once posts have been trashed.
  */
 async function trashExistingPosts() {
+	await switchUserToAdmin();
 	// Visit `/wp-admin/edit.php` so we can see a list of posts and delete them.
 	await visitAdminPage( 'edit.php' );
 
@@ -70,9 +72,10 @@ async function trashExistingPosts() {
 	await page.select( '#bulk-action-selector-top', 'trash' );
 	// Submit the form to send all draft/scheduled/published posts to the trash.
 	await page.click( '#doaction' );
-	return page.waitForXPath(
+	await page.waitForXPath(
 		'//*[contains(@class, "updated notice")]/p[contains(text(), "moved to the Trash.")]'
 	);
+	await switchUserToTest();
 }
 
 /**
@@ -144,6 +147,40 @@ function observeConsoleLogging() {
 	} );
 }
 
+/**
+ * Runs Axe tests when the block editor is found on the current page.
+ *
+ * @return {?Promise} Promise resolving once Axe texts are finished.
+ */
+async function runAxeTestsForBlockEditor() {
+	if ( ! await page.$( '.block-editor' ) ) {
+		return;
+	}
+
+	await expect( page ).toPassAxeTests( {
+		// Temporary disabled rules to enable initial integration.
+		// See: https://github.com/WordPress/gutenberg/pull/15018.
+		disabledRules: [
+			'aria-allowed-role',
+			'aria-valid-attr-value',
+			'button-name',
+			'color-contrast',
+			'dlitem',
+			'duplicate-id',
+			'label',
+			'link-name',
+			'listitem',
+			'region',
+		],
+		exclude: [
+			// Ignores elements created by metaboxes.
+			'.edit-post-layout__metaboxes',
+			// Ignores elements created by TinyMCE.
+			'.mce-container',
+		],
+	} );
+}
+
 // Before every test suite run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
 // each other's side-effects.
@@ -154,9 +191,11 @@ beforeAll( async () => {
 
 	await trashExistingPosts();
 	await setupBrowser();
+	await activatePlugin( 'gutenberg-test-plugin-disables-the-css-animations' );
 } );
 
 afterEach( async () => {
+	await runAxeTestsForBlockEditor();
 	await setupBrowser();
 } );
 

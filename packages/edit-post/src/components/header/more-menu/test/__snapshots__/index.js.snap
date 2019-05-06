@@ -12,7 +12,7 @@ exports[`MoreMenu should match snapshot 1`] = `
     <div
       className="edit-post-more-menu"
     >
-      <IconButton
+      <ForwardRef(IconButton)
         aria-expanded={false}
         icon="ellipsis"
         label="Show more tools & options"
@@ -23,7 +23,7 @@ exports[`MoreMenu should match snapshot 1`] = `
           position="bottom"
           text="Show more tools & options"
         >
-          <Button
+          <ForwardRef(Button)
             aria-expanded={false}
             aria-label="Show more tools & options"
             className="components-icon-button"
@@ -79,9 +79,9 @@ exports[`MoreMenu should match snapshot 1`] = `
                 </SVG>
               </Dashicon>
             </button>
-          </Button>
+          </ForwardRef(Button)>
         </Tooltip>
-      </IconButton>
+      </ForwardRef(IconButton)>
     </div>
   </Dropdown>
 </MoreMenu>

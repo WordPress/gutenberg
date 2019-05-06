@@ -1,15 +1,16 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import { get } from 'lodash';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { PanelBody, Button, ClipboardButton, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import { safeDecodeURIComponent } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -79,7 +80,7 @@ class PostPublishPanelPostpublish extends Component {
 							/* translators: %s: post type singular name */
 							__( '%s address' ), postLabel
 						) }
-						value={ post.link }
+						value={ safeDecodeURIComponent( post.link ) }
 						onFocus={ this.onSelectInput }
 					/>
 					<div className="post-publish-panel__postpublish-buttons">

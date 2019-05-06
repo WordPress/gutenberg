@@ -1,0 +1,37 @@
+@import "../../assets/stylesheets/colors";
+@import "../../assets/stylesheets/variables";
+@import "../../assets/stylesheets/mixins";
+@import "../../assets/stylesheets/breakpoints";
+@import "../../assets/stylesheets/animations";
+@import "../../assets/stylesheets/z-index";
+
+@import "./reset";
+@import "./editor-styles";
+
+
+.playground__header {
+	padding: 20px;
+	border-bottom: 1px solid #ddd;
+}
+
+.playground__logo {
+	font-size: 20px;
+	font-weight: 300;
+}
+
+.playground__body {
+	padding-top: 20px;
+
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+
+	iframe {
+		width: 100%;
+	}
+
+	.components-navigate-regions {
+		height: 100%;
+	}
+}

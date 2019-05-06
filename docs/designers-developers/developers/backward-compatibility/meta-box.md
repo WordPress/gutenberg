@@ -1,12 +1,12 @@
 # Meta Boxes
 
-This is a brief document detailing how meta box support works in Gutenberg. With the superior developer and user experience of blocks, especially once block templates are available, **porting PHP meta boxes to blocks is highly encouraged!** See the [Meta Block tutorial](/docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md) for how to store post meta data using blocks.
+This is a brief document detailing how meta box support works in the block editor. With the superior developer and user experience of blocks, especially once block templates are available, **porting PHP meta boxes to blocks is highly encouraged!** See the [Meta Block tutorial](/docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md) for how to store post meta data using blocks.
 
 ### Testing, Converting, and Maintaining Existing Meta Boxes
 
-Before converting meta boxes to blocks, it may be  easier to test if a meta box works with Gutenberg, and explicitly mark it as such.
+Before converting meta boxes to blocks, it may be  easier to test if a meta box works with the block editor, and explicitly mark it as such.
 
-If a meta box *doesn't* work with in Gutenberg, and updating it to work correctly is not an option, the next step is to add the `__block_editor_compatible_meta_box` argument to the meta box declaration:
+If a meta box *doesn't* work with the block editor, and updating it to work correctly is not an option, the next step is to add the `__block_editor_compatible_meta_box` argument to the meta box declaration:
 
 ```php
 add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
@@ -17,9 +17,7 @@ add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 );
 ```
 
-WordPress will fall back to the Classic editor, where the meta box will continue working as before.
-
-Explicitly setting `__block_editor_compatible_meta_box` to `true` will cause WordPress to stay in Gutenberg (assuming another meta box doesn't cause a fallback).
+WordPress won't show the meta box but a message saying that it isn't compatible with the block editor, including a link to the Classic Editor plugin. By default, `__block_editor_compatible_meta_box` is `true`.
 
 After a meta box is converted to a block, it can be declared as existing for backward compatibility:
 
@@ -32,17 +30,17 @@ add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 );
 ```
 
-When Gutenberg is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the Classic editor, should some other meta box cause a fallback.
+When the block editor is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the classic editor.
 
 ### Meta Box Data Collection
 
-On each Gutenberg page load, we register an action that collects the meta box data to determine if an area is empty. The original global state is reset upon collection of meta box data.
+On each block editor page load, we register an action that collects the meta box data to determine if an area is empty. The original global state is reset upon collection of meta box data.
 
-See `lib/register.php gutenberg_trick_plugins_into_registering_meta_boxes()`
+See [`register_and_do_post_meta_boxes`](https://developer.wordpress.org/reference/functions/register_and_do_post_meta_boxes/).
 
-`gutenberg_collect_meta_box_data()` is hooked in later on `admin_head`. It will run through the functions and hooks that `post.php` runs to register meta boxes; namely `add_meta_boxes`, `add_meta_boxes_{$post->post_type}`, and `do_meta_boxes`.
+It will run through the functions and hooks that `post.php` runs to register meta boxes; namely `add_meta_boxes`, `add_meta_boxes_{$post->post_type}`, and `do_meta_boxes`.
 
-A copy of the global `$wp_meta_boxes` is made then filtered through `apply_filters( 'filter_gutenberg_meta_boxes', $_meta_boxes_copy );`, which will strip out any core meta boxes, standard custom taxonomy meta boxes, and any meta boxes that have declared themselves as only existing for backward compatibility purposes.
+Meta boxes are filtered to strip out any core meta boxes, standard custom taxonomy meta boxes, and any meta boxes that have declared themselves as only existing for backward compatibility purposes.
 
 Then each location for this particular type of meta box is checked for whether it is active. If it is not empty a value of true is stored, if it is empty a value of false is stored. This meta box location data is then dispatched by the editor Redux store in `INITIALIZE_META_BOX_STATE`.
 
@@ -50,7 +48,7 @@ Ideally, this could be done at instantiation of the editor and help simplify thi
 
 ### Redux and React Meta Box Management
 
-When rendering the Gutenberg Page, the meta boxes are rendered to a hidden div `#metaboxes`.
+When rendering the block editor, the meta boxes are rendered to a hidden div `#metaboxes`.
 
 *The Redux store will hold all meta boxes as inactive by default*. When
 `INITIALIZE_META_BOX_STATE` comes in, the store will update any active meta box areas by setting the `isActive` flag to `true`. Once this happens React will check for the new props sent in by Redux on the `MetaBox` component. If that `MetaBox` is now active, instead of rendering null, a `MetaBoxArea` component will be rendered. The `MetaBox` component is the container component that mediates between the `MetaBoxArea` and the Redux Store. *If no meta boxes are active, nothing happens. This will be the default behavior, as all core meta boxes have been stripped.*
@@ -63,13 +61,9 @@ When the post is updated, only meta box areas that are active will be submitted.
 
 When the meta box area is saving, we display an updating overlay, to prevent users from changing the form values while a save is in progress.
 
-After the new block editor is made into the default editor, it will be necessary to provide the classic-editor flag to access the meta box partial page.
+An example save url would look like:
 
-`gutenberg_meta_box_save()` saves meta box changes. A `meta_box` request parameter should be present and should match one of `'advanced'`, `'normal'`, or `'side'`. This value will determine which meta box area is served.
-
-So an example url would look like:
-
-`mysite.com/wp-admin/post.php?post=1&action=edit&meta_box=$location&classic-editor`
+`mysite.com/wp-admin/post.php?post=1&action=edit&meta-box-loader=1`
 
 This url is automatically passed into React via a `_wpMetaBoxUrl` global variable.
 
@@ -77,10 +71,10 @@ This page mimics the `post.php` post form, so when it is submitted it will fire 
 
 ### Common Compatibility Issues
 
-Most PHP meta boxes should continue to work in Gutenberg, but some meta boxes that include advanced functionality could break. Here are some common reasons why meta boxes might not work as expected in Gutenberg:
+Most PHP meta boxes should continue to work in the block editor, but some meta boxes that include advanced functionality could break. Here are some common reasons why meta boxes might not work as expected in the block editor:
 
 - Plugins relying on selectors that target the post title, post content fields, and other metaboxes (of the old editor).
-- Plugins relying on TinyMCE's API because there's no longer a single TinyMCE instance to talk to in Gutenberg.
+- Plugins relying on TinyMCE's API because there's no longer a single TinyMCE instance to talk to in the block editor.
 - Plugins making updates to their DOM on "submit" or on "save".
 
 Please also note that if your plugin triggers a PHP warning or notice to be output on the page, this will cause the HTML document type (`<!DOCTYPE html>`) to be output incorrectly. This will cause the browser to render using "Quirks Mode", which is a compatibility layer that gets enabled when the browser doesn't know what type of document it is parsing. The block editor is not meant to work in this mode, but it can _appear_ to be working just fine. If you encounter issues such as *meta boxes overlaying the editor* or other layout issues, please check the raw page source of your document to see that the document type definition is the first thing output on the page. There will also be a warning in the JavaScript console, noting the issue.

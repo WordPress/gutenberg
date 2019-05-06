@@ -3,53 +3,58 @@
  */
 import classnames from 'classnames';
 import {
+	compact,
 	get,
 	isEmpty,
 	map,
 	last,
 	pick,
-	compact,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { getPath } from '@wordpress/url';
-import { __, sprintf } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
-import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
+import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	Button,
 	ButtonGroup,
 	IconButton,
 	PanelBody,
+	Path,
+	Rect,
 	ResizableBox,
 	SelectControl,
 	Spinner,
-	TextControl,
+	SVG,
 	TextareaControl,
+	TextControl,
+	ToggleControl,
 	Toolbar,
 	withNotices,
-	ToggleControl,
+	ExternalLink,
 } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import {
-	RichText,
+	BlockAlignmentToolbar,
 	BlockControls,
+	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUpload,
-	MediaUploadCheck,
-	BlockAlignmentToolbar,
-	mediaUpload,
-} from '@wordpress/editor';
+	RichText,
+} from '@wordpress/block-editor';
+import { mediaUpload } from '@wordpress/editor';
+import { Component, Fragment } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
-import { compose } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import icon from './icon';
 import ImageSize from './image-size';
 
 /**
@@ -326,6 +331,11 @@ class ImageEdit extends Component {
 		this.setState( {
 			isEditing: ! this.state.isEditing,
 		} );
+		if ( this.state.isEditing ) {
+			speak( __( 'You are now viewing the image in the image block.' ) );
+		} else {
+			speak( __( 'You are now editing the image in the image block.' ) );
+		}
 	}
 
 	getImageSizeOptions() {
@@ -370,69 +380,60 @@ class ImageEdit extends Component {
 			linkTarget,
 		} = attributes;
 		const isExternal = isExternalImage( id, url );
-
-		let toolbarEditButton;
-		if ( url ) {
-			if ( isExternal ) {
-				toolbarEditButton = (
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit image' ) }
-							onClick={ this.toggleIsEditing }
-							icon="edit"
-						/>
-					</Toolbar>
-				);
-			} else {
-				toolbarEditButton = (
-					<MediaUploadCheck>
-						<Toolbar>
-							<MediaUpload
-								onSelect={ this.onSelectImage }
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								value={ id }
-								render={ ( { open } ) => (
-									<IconButton
-										className="components-toolbar__control"
-										label={ __( 'Edit image' ) }
-										icon="edit"
-										onClick={ open }
-									/>
-								) }
-							/>
-						</Toolbar>
-					</MediaUploadCheck>
-				);
-			}
-		}
-
+		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		const controls = (
 			<BlockControls>
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
 				/>
-				{ toolbarEditButton }
+				{ url && (
+					<Toolbar>
+						<IconButton
+							className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
+							label={ __( 'Edit image' ) }
+							aria-pressed={ this.state.isEditing }
+							onClick={ this.toggleIsEditing }
+							icon={ editImageIcon }
+						/>
+					</Toolbar>
+				) }
 			</BlockControls>
 		);
-
+		const src = isExternal ? url : undefined;
+		const labels = {
+			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
+			instructions: __( 'Drag an image to upload, select a file from your library or add one from an URL.' ),
+		};
+		const mediaPreview = ( !! url && <img
+			alt={ __( 'Edit image' ) }
+			title={ __( 'Edit image' ) }
+			className={ 'edit-image-preview' }
+			src={ url }
+		/> );
+		const mediaPlaceholder = (
+			<MediaPlaceholder
+				icon={ <BlockIcon icon={ icon } /> }
+				className={ className }
+				labels={ labels }
+				onSelect={ this.onSelectImage }
+				onSelectURL={ this.onSelectURL }
+				onDoubleClick={ this.toggleIsEditing }
+				onCancel={ !! url && this.toggleIsEditing }
+				notices={ noticeUI }
+				onError={ this.onUploadError }
+				accept="image/*"
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ { id, src } }
+				mediaPreview={ mediaPreview }
+				dropZoneUIOnly={ ! isEditing && url }
+			/>
+		);
 		if ( isEditing || ! url ) {
-			const src = isExternal ? url : undefined;
 			return (
 				<Fragment>
 					{ controls }
-					<MediaPlaceholder
-						icon="format-image"
-						className={ className }
-						onSelect={ this.onSelectImage }
-						onSelectURL={ this.onSelectURL }
-						notices={ noticeUI }
-						onError={ this.onUploadError }
-						accept="image/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ { id, src } }
-					/>
+					{ mediaPlaceholder }
 				</Fragment>
 			);
 		}
@@ -454,7 +455,14 @@ class ImageEdit extends Component {
 						label={ __( 'Alt Text (Alternative Text)' ) }
 						value={ alt }
 						onChange={ this.updateAlt }
-						help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
+						help={
+							<Fragment>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									{ __( 'Describe the purpose of the image' ) }
+								</ExternalLink>
+								{ __( 'Leave empty if the image is purely decorative.' ) }
+							</Fragment>
+						}
 					/>
 					{ ! isEmpty( imageSizeOptions ) && (
 						<SelectControl
@@ -474,8 +482,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ width !== undefined ? width : '' }
-									placeholder={ imageWidth }
+									value={ width !== undefined ? width : imageWidth }
 									min={ 1 }
 									onChange={ this.updateWidth }
 								/>
@@ -483,8 +490,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ height !== undefined ? height : '' }
-									placeholder={ imageHeight }
+									value={ height !== undefined ? height : imageHeight }
 									min={ 1 }
 									onChange={ this.updateHeight }
 								/>
@@ -586,7 +592,13 @@ class ImageEdit extends Component {
 								// should direct focus to block.
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 								<Fragment>
-									<img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } onError={ () => this.onImageError( url ) } />
+									<img
+										src={ url }
+										alt={ defaultedAlt }
+										onDoubleClick={ this.toggleIsEditing }
+										onClick={ this.onImageClick }
+										onError={ () => this.onImageError( url ) }
+									/>
 									{ isBlobURL( url ) && <Spinner /> }
 								</Fragment>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
@@ -696,6 +708,7 @@ class ImageEdit extends Component {
 						/>
 					) }
 				</figure>
+				{ mediaPlaceholder }
 			</Fragment>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -705,9 +718,9 @@ class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getSettings } = select( 'core/block-editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
+		const { maxWidth, isRTL, imageSizes } = getSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,

@@ -7,7 +7,7 @@ import { filter } from 'lodash';
 /**
  * Internal dependencies
  */
-import { terms, entities, embedPreviews, hasUploadPermissions } from '../reducer';
+import { terms, entities, embedPreviews, userPermissions, autosaves, currentUser } from '../reducer';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -118,21 +118,139 @@ describe( 'embedPreviews()', () => {
 	} );
 } );
 
-describe( 'hasUploadPermissions()', () => {
-	it( 'returns true by default', () => {
-		const state = hasUploadPermissions( undefined, {} );
-
-		expect( state ).toEqual( true );
+describe( 'userPermissions()', () => {
+	it( 'defaults to an empty object', () => {
+		const state = userPermissions( undefined, {} );
+		expect( state ).toEqual( {} );
 	} );
 
-	it( 'returns with updated upload permissions value', () => {
-		const originalState = true;
-
-		const state = hasUploadPermissions( originalState, {
-			type: 'RECEIVE_UPLOAD_PERMISSIONS',
-			hasUploadPermissions: false,
+	it( 'updates state with whether an action is allowed', () => {
+		const original = deepFreeze( {
+			'create/media': false,
 		} );
 
-		expect( state ).toEqual( false );
+		const state = userPermissions( original, {
+			type: 'RECEIVE_USER_PERMISSION',
+			key: 'create/media',
+			isAllowed: true,
+		} );
+
+		expect( state ).toEqual( {
+			'create/media': true,
+		} );
+	} );
+} );
+
+describe( 'autosaves', () => {
+	it( 'returns an empty object by default', () => {
+		const state = autosaves( undefined, {} );
+
+		expect( state ).toEqual( {} );
+	} );
+
+	it( 'returns the current state with the new autosaves merged in, keyed by the parent post id', () => {
+		const existingAutosaves = [ {
+			title: {
+				raw: 'Some',
+			},
+			content: {
+				raw: 'other',
+			},
+			excerpt: {
+				raw: 'autosave',
+			},
+			status: 'publish',
+		} ];
+
+		const newAutosaves = [ {
+			title: {
+				raw: 'The Title',
+			},
+			content: {
+				raw: 'The Content',
+			},
+			excerpt: {
+				raw: 'The Excerpt',
+			},
+			status: 'draft',
+		} ];
+
+		const state = autosaves( { 1: existingAutosaves }, {
+			type: 'RECEIVE_AUTOSAVES',
+			postId: 2,
+			autosaves: newAutosaves,
+		} );
+
+		expect( state ).toEqual( {
+			1: existingAutosaves,
+			2: newAutosaves,
+		} );
+	} );
+
+	it( 'overwrites any existing state if new autosaves are received with the same post id', () => {
+		const existingAutosaves = [ {
+			title: {
+				raw: 'Some',
+			},
+			content: {
+				raw: 'other',
+			},
+			excerpt: {
+				raw: 'autosave',
+			},
+			status: 'publish',
+		} ];
+
+		const newAutosaves = [ {
+			title: {
+				raw: 'The Title',
+			},
+			content: {
+				raw: 'The Content',
+			},
+			excerpt: {
+				raw: 'The Excerpt',
+			},
+			status: 'draft',
+		} ];
+
+		const state = autosaves( { 1: existingAutosaves }, {
+			type: 'RECEIVE_AUTOSAVES',
+			postId: 1,
+			autosaves: newAutosaves,
+		} );
+
+		expect( state ).toEqual( {
+			1: newAutosaves,
+		} );
+	} );
+} );
+
+describe( 'currentUser', () => {
+	it( 'returns an empty object by default', () => {
+		const state = currentUser( undefined, {} );
+		expect( state ).toEqual( {} );
+	} );
+
+	it( 'returns the current user', () => {
+		const currentUserData = { id: 1 };
+
+		const state = currentUser( {}, {
+			type: 'RECEIVE_CURRENT_USER',
+			currentUser: currentUserData,
+		} );
+
+		expect( state ).toEqual( currentUserData );
+	} );
+
+	it( 'overwrites any existing current user state', () => {
+		const currentUserData = { id: 2 };
+
+		const state = currentUser( { id: 1 }, {
+			type: 'RECEIVE_CURRENT_USER',
+			currentUser: currentUserData,
+		} );
+
+		expect( state ).toEqual( currentUserData );
 	} );
 } );

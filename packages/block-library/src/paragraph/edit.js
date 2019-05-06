@@ -27,7 +27,7 @@ import {
 	PanelColorSettings,
 	RichText,
 	withFontSizes,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -244,8 +244,8 @@ class ParagraphBlock extends Component {
 					} }
 					unstableOnSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
-					onReplace={ this.onReplace }
-					onRemove={ () => onReplace( [] ) }
+					onReplace={ this.props.onReplace && this.onReplace }
+					onRemove={ onReplace && ( () => onReplace( [] ) ) }
 					aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
 					placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
 				/>
@@ -259,10 +259,10 @@ const ParagraphEdit = compose( [
 	withFontSizes( 'fontSize' ),
 	applyFallbackStyles,
 	withSelect( ( select ) => {
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getSettings } = select( 'core/block-editor' );
 
 		return {
-			isRTL: getEditorSettings().isRTL,
+			isRTL: getSettings().isRTL,
 		};
 	} ),
 ] )( ParagraphBlock );

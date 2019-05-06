@@ -38,7 +38,7 @@ const isSameTermName = ( termA, termB ) => termA.toLowerCase() === termB.toLower
 
 /**
  * Returns a term object with name unescaped.
- * The unescape of the name propery is done using lodash unescape function.
+ * The unescape of the name property is done using lodash unescape function.
  *
  * @param {Object} term The term object to unescape.
  *
@@ -57,7 +57,7 @@ const unescapeTerm = ( term ) => {
  *
  * @param {Object[]} terms Array of term objects to unescape.
  *
- * @return {Object[]} Array of therm objects unscaped.
+ * @return {Object[]} Array of term objects unescaped.
  */
 const unescapeTerms = ( terms ) => {
 	return map( terms, unescapeTerm );
@@ -70,7 +70,7 @@ class FlatTermSelector extends Component {
 		this.searchTerms = throttle( this.searchTerms.bind( this ), 500 );
 		this.findOrCreateTerm = this.findOrCreateTerm.bind( this );
 		this.state = {
-			loading: false,
+			loading: ! isEmpty( this.props.terms ),
 			availableTerms: [],
 			selectedTerms: [],
 		};
@@ -78,7 +78,6 @@ class FlatTermSelector extends Component {
 
 	componentDidMount() {
 		if ( ! isEmpty( this.props.terms ) ) {
-			this.setState( { loading: false } );
 			this.initRequest = this.fetchTerms( {
 				include: this.props.terms.join( ',' ),
 				per_page: -1,

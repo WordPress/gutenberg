@@ -10,7 +10,7 @@ import { Component, Fragment } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEdit } from '@wordpress/editor';
+import { BlockEdit } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -97,7 +97,7 @@ class ReusableBlockEdit extends Component {
 	}
 
 	render() {
-		const { isSelected, reusableBlock, block, isFetching, isSaving } = this.props;
+		const { isSelected, reusableBlock, block, isFetching, isSaving, canUpdateBlock } = this.props;
 		const { isEditing, title, changedAttributes } = this.state;
 
 		if ( ! reusableBlock && isFetching ) {
@@ -130,6 +130,7 @@ class ReusableBlockEdit extends Component {
 						isEditing={ isEditing }
 						title={ title !== null ? title : reusableBlock.title }
 						isSaving={ isSaving && ! reusableBlock.isTemporary }
+						isEditDisabled={ ! canUpdateBlock }
 						onEdit={ this.startEditing }
 						onChangeTitle={ this.setTitle }
 						onSave={ this.save }
@@ -149,8 +150,11 @@ export default compose( [
 			__experimentalGetReusableBlock: getReusableBlock,
 			__experimentalIsFetchingReusableBlock: isFetchingReusableBlock,
 			__experimentalIsSavingReusableBlock: isSavingReusableBlock,
-			getBlock,
 		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
+		const {
+			getBlock,
+		} = select( 'core/block-editor' );
 		const { ref } = ownProps.attributes;
 		const reusableBlock = getReusableBlock( ref );
 
@@ -159,15 +163,18 @@ export default compose( [
 			isFetching: isFetchingReusableBlock( ref ),
 			isSaving: isSavingReusableBlock( ref ),
 			block: reusableBlock ? getBlock( reusableBlock.clientId ) : null,
+			canUpdateBlock: !! reusableBlock && ! reusableBlock.isTemporary && !! canUser( 'update', 'blocks', ref ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			__experimentalFetchReusableBlocks: fetchReusableBlocks,
-			updateBlockAttributes,
 			__experimentalUpdateReusableBlockTitle: updateReusableBlockTitle,
 			__experimentalSaveReusableBlock: saveReusableBlock,
 		} = dispatch( 'core/editor' );
+		const {
+			updateBlockAttributes,
+		} = dispatch( 'core/block-editor' );
 		const { ref } = ownProps.attributes;
 
 		return {

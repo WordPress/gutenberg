@@ -35,7 +35,7 @@
 <dd>A sidebar region containing metadata fields for the post, including scheduling, visibility, terms, and featured image.</dd>
 
 <dt>RichText</dt>
-<dd>A common component enabling rich content editing including bold, italics, hyperlinks, etc. It is not too much unlike the single editor region of the legacy post editor, and is in fact powered by the same TinyMCE library.</dd>
+<dd>A common component enabling rich content editing including bold, italics, hyperlinks, etc.</dd>
 
 <dt>Reusable block</dt>
 <dd>A block that is saved and then can be shared as a reusable, repeatable piece of content.</dd>

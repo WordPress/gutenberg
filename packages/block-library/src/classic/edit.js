@@ -128,7 +128,7 @@ export default class ClassicEdit extends Component {
 		editor.addButton( 'kitchensink', {
 			tooltip: _x( 'More', 'button to expand options' ),
 			icon: 'dashicon dashicons-editor-kitchensink',
-			onClick: function() {
+			onClick() {
 				const button = this;
 				const active = ! button.active();
 
@@ -178,13 +178,18 @@ export default class ClassicEdit extends Component {
 	render() {
 		const { clientId } = this.props;
 
-		// Disable reason: the toolbar itself is non-interactive, but must capture
-		// events from the KeyboardShortcuts component to stop their propagation.
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		// Disable reasons:
+		//
+		// jsx-a11y/no-static-element-interactions
+		//  - the toolbar itself is non-interactive, but must capture events
+		//    from the KeyboardShortcuts component to stop their propagation.
+		//
+		// jsx-a11y/no-static-element-interactions
+		//  - Clicking on this visual placeholder should create the
+		//    toolbar, it can also be created by focussing the field below.
+
+		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 		return [
-			// Disable reason: Clicking on this visual placeholder should create
-			// the toolbar, it can also be created by focussing the field below.
-			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 			<div
 				key="toolbar"
 				id={ `toolbar-${ clientId }` }
@@ -200,6 +205,6 @@ export default class ClassicEdit extends Component {
 				className="wp-block-freeform block-library-rich-text__tinymce"
 			/>,
 		];
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
+		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	}
 }

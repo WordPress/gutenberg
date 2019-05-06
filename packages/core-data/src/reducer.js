@@ -65,6 +65,23 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 }
 
 /**
+ * Reducer managing current user state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function currentUser( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_CURRENT_USER':
+			return action.currentUser;
+	}
+
+	return state;
+}
+
+/**
  * Reducer managing taxonomies.
  *
  * @param {Object} state  Current state.
@@ -218,17 +235,43 @@ export function embedPreviews( state = {}, action ) {
 }
 
 /**
- * Reducer managing Upload permissions.
+ * State which tracks whether the user can perform an action on a REST
+ * resource.
  *
- * @param  {Object}  state  Current state.
- * @param  {Object}  action Dispatched action.
+ * @param  {Object} state  Current state.
+ * @param  {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function hasUploadPermissions( state = true, action ) {
+export function userPermissions( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_UPLOAD_PERMISSIONS':
-			return action.hasUploadPermissions;
+		case 'RECEIVE_USER_PERMISSION':
+			return {
+				...state,
+				[ action.key ]: action.isAllowed,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning autosaves keyed by their parent's post id.
+ *
+ * @param  {Object} state  Current state.
+ * @param  {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function autosaves( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_AUTOSAVES':
+			const { postId, autosaves: autosavesData } = action;
+
+			return {
+				...state,
+				[ postId ]: autosavesData,
+			};
 	}
 
 	return state;
@@ -237,9 +280,11 @@ export function hasUploadPermissions( state = true, action ) {
 export default combineReducers( {
 	terms,
 	users,
+	currentUser,
 	taxonomies,
 	themeSupports,
 	entities,
 	embedPreviews,
-	hasUploadPermissions,
+	userPermissions,
+	autosaves,
 } );

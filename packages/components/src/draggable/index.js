@@ -4,7 +4,7 @@
 import { noop } from 'lodash';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { withSafeTimeout } from '@wordpress/compose';

@@ -5,7 +5,7 @@ The new Blocks include baseline support in all themes, enhancements to opt-in to
 There are a few new concepts to consider when building themes:
 
 - **Editor Color Palette** - A default set of colors is provided, but themes can register their own and optionally lock users into picking from the defined palette.
-- **Editor Text Size Palette** - A default set of sizes is provided, but themes and register their own and optionally lock users into picking from preselected sizes.
+- **Editor Text Size Palette** - A default set of sizes is provided, but themes can register their own and optionally lock users into picking from preselected sizes.
 - **Responsive Embeds** - Themes must opt-in to responsive embeds.
 - **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.
 - **Dark Mode** - If a Theme is a Dark Theme with a dark background containing light text, the theme author can opt-in to the Dark Mode.
@@ -61,7 +61,7 @@ For more information about this function, see [the developer docs on `add_theme_
 
 It can be difficult to create a responsive layout that accommodates wide images, a sidebar, a centered column, and floated elements that stay within that centered column.
 
-Gutenberg adds additional markup to floated images to make styling them easier.
+The block editor adds additional markup to floated images to make styling them easier.
 
 Here's the markup for an `Image` with a caption:
 
@@ -87,7 +87,7 @@ Here's an example using the above markup to achieve a responsive layout that fea
 
 ### Block Color Palettes
 
-Different blocks have the possibility of customizing colors. Gutenberg provides a default palette, but a theme can overwrite it and provide its own:
+Different blocks have the possibility of customizing colors. The block editor provides a default palette, but a theme can overwrite it and provide its own:
 
 ```php
 add_theme_support( 'editor-color-palette', array(
@@ -114,6 +114,10 @@ add_theme_support( 'editor-color-palette', array(
 ) );
 ```
 
+`name` is a human-readable label (demonstrated above) that appears in the tooltip and provides a meaningful description of the color to users. It is especially important for those who rely on screen readers or would otherwise have difficulty perceiving the color. `slug` is a unique identifier for the color and is used to generate the CSS classes used by the block editor color palette. `color` is the hexadecimal code to specify the color.
+
+Some colors change dynamically — such as "Primary" and "Secondary" color — such as in the Twenty Nineteen theme and cannot be described programmatically. In spite of that, it is still advisable to provide meaningful `name`s for at least the default values when applicable.
+
 The colors will be shown in order on the palette, and there's no limit to how many can be specified.
 
 Themes are responsible for creating the classes that apply the colors in different contexts. Core blocks use "color" and "background-color" contexts. So to correctly apply "strong magenta" to all contexts of core blocks a theme should implement the following classes:
@@ -132,7 +136,7 @@ The class name is built appending 'has-', followed by the class name _using_ keb
 
 ### Block Font Sizes:
 
-Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. Gutenberg provides a default set of font sizes, but a theme can overwrite it and provide its own:
+Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. The block  provides a default set of font sizes, but a theme can overwrite it and provide its own:
 
 ```php
 add_theme_support( 'editor-font-sizes', array(
@@ -180,7 +184,7 @@ Themes can disable the ability to set custom font sizes with the following code:
 add_theme_support('disable-custom-font-sizes');
 ```
 
-When set, users will be restricted to the default sizes provided in Gutenberg or the sizes provided via the `editor-font-sizes` theme support setting.
+When set, users will be restricted to the default sizes provided in the block editor or the sizes provided via the `editor-font-sizes` theme support setting.
 
 ### Disabling custom colors in block Color Palettes
 
@@ -196,9 +200,9 @@ This flag will make sure users are only able to choose colors from the `editor-c
 
 ## Editor styles
 
-Gutenberg supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style), however it works a little differently than in the classic editor.
+The block editor supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style), however it works a little differently than in the classic editor.
 
-In the classic editor, the editor stylesheet is loaded directly into the iframe of the WYSIWYG editor, with no changes. Gutenberg, however, doesn't use iframes. To make sure your styles are applied only to the content of the editor, we automatically transform your editor styles by selectively rewriting or adjusting certain CSS selectors. This also allows Gutenberg to leverage your editor style in block variation previews.
+In the classic editor, the editor stylesheet is loaded directly into the iframe of the WYSIWYG editor, with no changes. The block editor, however, doesn't use iframes. To make sure your styles are applied only to the content of the editor, we automatically transform your editor styles by selectively rewriting or adjusting certain CSS selectors. This also allows the block editor to leverage your editor style in block variation previews.
 
 For example, if you write `body { ... }` in your editor style, this is rewritten to `.editor-styles-wrapper { ... }`.  This also means that you should _not_ target any of the editor class names directly.
 
@@ -208,7 +212,7 @@ Because it works a little differently, you need to opt-in to this by adding an e
 add_theme_support('editor-styles');
 ```
 
-You shouldn't need to change your editor styles too much; most themes can add the snippet above and get similar results in the classic editor and inside Gutenberg.
+You shouldn't need to change your editor styles too much; most themes can add the snippet above and get similar results in the classic editor and inside the block editor.
 
 ### Dark backgrounds
 
@@ -223,13 +227,13 @@ Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but th
 
 ### Enqueuing the editor style
 
-To make sure your editor style is loaded and parsed correctly, enqueue it using the following method:
+Use the `add_editor_style` function to enqueue and load CSS on the editor screen. For the classic editor, this was the only function needed to add style to the editor. For the new block editor, you first need to `add_theme_support( 'editor-styles');` mentioned above.
 
 ```php
 add_editor_style( 'style-editor.css' );
 ```
 
-It is enough to paste that in your `functions.php` file, for the style to be loaded and parsed.
+Adding that to your `functions.php` file will add the stylesheet `style-editor.css` to the queue of stylesheets to be loaded in the editor.
 
 ### Basic colors
 
@@ -266,7 +270,7 @@ To change the main column width of the editor, add the following CSS to `style-e
 
 You can use those editor widths to match those in your theme. You can use any CSS width unit, including `%` or `px`.
 
-Further reading: [Applying Styles with Stylesheets](https://wordpress.org/gutenberg/handbook/blocks/applying-styles-with-stylesheets/).
+Further reading: [Applying Styles with Stylesheets](/docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md).
 
 ## Default block styles
 

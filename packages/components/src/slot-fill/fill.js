@@ -62,7 +62,7 @@ class FillComponent extends Component {
 		let { children } = this.props;
 		const slot = getSlot( name );
 
-		if ( ! slot || ! slot.props.bubblesVirtually ) {
+		if ( ! slot || ! slot.node || ! slot.props.bubblesVirtually ) {
 			return null;
 		}
 

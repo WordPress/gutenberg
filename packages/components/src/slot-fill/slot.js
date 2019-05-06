@@ -63,7 +63,7 @@ class SlotComponent extends Component {
 			return <div ref={ this.bindNode } />;
 		}
 
-		const fills = map( getFills( name ), ( fill ) => {
+		const fills = map( getFills( name, this ), ( fill ) => {
 			const fillKey = fill.occurrence;
 			const fillChildren = isFunction( fill.props.children ) ? fill.props.children( fillProps ) : fill.props.children;
 

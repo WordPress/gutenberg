@@ -76,7 +76,7 @@ exports[`List can be created by using an asterisk at the start of a paragraph bl
 
 exports[`List can undo asterisk transform 1`] = `
 "<!-- wp:paragraph -->
-<p>1.</p>
+<p>1. </p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -85,6 +85,56 @@ exports[`List should be immeadiately saved on indentation 1`] = `
 <ul><li>one<ul><li></li></ul></li></ul>
 <!-- /wp:list -->"
 `;
+
+exports[`List should change the base list type 1`] = `
+"<!-- wp:list {\\"ordered\\":true} -->
+<ol><li></li></ol>
+<!-- /wp:list -->"
+`;
+
+exports[`List should change the indented list type 1`] = `
+"<!-- wp:list -->
+<ul><li>a<ol><li>1</li></ol></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 1`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>a<ul><li>i</li></ul></li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 2`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>a</li><li></li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 3`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>a</li></ul></li><li></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 4`] = `
+"<!-- wp:list -->
+<ul><li>1<ul><li>a</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 5`] = `
+"<!-- wp:list -->
+<ul><li>1</li><li></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 6`] = `
+"<!-- wp:list -->
+<ul><li>1</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should create and remove indented list with keyboard only 7`] = `""`;
 
 exports[`List should create paragraph on split at end and merge back with content 1`] = `
 "<!-- wp:list -->
@@ -102,9 +152,83 @@ exports[`List should create paragraph on split at end and merge back with conten
 <!-- /wp:list -->"
 `;
 
+exports[`List should indent and outdent level 1 1`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 1 2`] = `
+"<!-- wp:list -->
+<ul><li>a</li><li>1</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 2 1`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1<ul><li>i</li></ul></li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 2 2`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1</li><li>i</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 2 3`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1</li></ul></li><li>i</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should insert a line break on shift+enter 1`] = `
+"<!-- wp:list -->
+<ul><li>a<br></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should insert a line break on shift+enter in a non trailing list item 1`] = `
+"<!-- wp:list -->
+<ul><li>a</li><li>b<br></li><li>c</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should not transform lines in block when transforming multiple blocks 1`] = `
+"<!-- wp:list -->
+<ul><li>one<br>...</li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should outdent with children 1`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>b<ul><li>c</li></ul></li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should outdent with children 2`] = `
+"<!-- wp:list -->
+<ul><li>a</li><li>b<ul><li>c</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`List should split indented list item 1`] = `
 "<!-- wp:list -->
 <ul><li>one<ul><li>two</li><li>three</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should split into two ordered lists with paragraph 1`] = `
+"<!-- wp:list {\\"ordered\\":true} -->
+<ol><li>one</li></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {\\"ordered\\":true} -->
+<ol><li>two</li></ol>
 <!-- /wp:list -->"
 `;
 
@@ -130,7 +254,7 @@ exports[`List should split into two with paragraph and merge lists 2`] = `
 
 exports[`List should split into two with paragraph and merge lists 3`] = `
 "<!-- wp:list -->
-<ul><li>one</li></ul>
+<ul><li>one</li><li></li></ul>
 <!-- /wp:list -->
 
 <!-- wp:list -->

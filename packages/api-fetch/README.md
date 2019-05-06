@@ -76,6 +76,8 @@ const nonce = "nonce value";
 apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
 ```
 
+The function returned by `createNonceMiddleware` includes a `nonce` property corresponding to the actively used nonce. You may also assign to this property if you have a fresh nonce value to use.
+
 **Root URL middleware**
 
 ```js

@@ -1,5 +1,13 @@
 module.exports = {
+	plugins: [
+		'@wordpress',
+	],
 	rules: {
+		'@wordpress/dependency-group': 'error',
+		'@wordpress/gutenberg-phase': 'error',
+		'@wordpress/no-unused-vars-before-return': 'error',
+		'@wordpress/valid-sprintf': 'error',
+		'@wordpress/no-base-control-with-label-without-id': 'error',
 		'no-restricted-syntax': [
 			'error',
 			{
@@ -15,5 +23,18 @@ module.exports = {
 				message: 'Translate function arguments must be string literals.',
 			},
 		],
+	},
+	overrides: [
+		{
+			files: [ '*.native.js' ],
+			rules: {
+				'@wordpress/no-base-control-with-label-without-id': 'off',
+			},
+		},
+	],
+	settings: {
+		react: {
+			version: '16.6',
+		},
 	},
 };

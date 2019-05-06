@@ -3,6 +3,7 @@
  */
 import {
 	clickBlockAppender,
+	clickBlockToolbarButton,
 	getEditedPostContent,
 	createNewPost,
 	pressKeyTimes,
@@ -95,6 +96,21 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should not transform lines in block when transforming multiple blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'one' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '...' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.down( 'Shift' );
+		await page.click( '[data-type="core/paragraph"]' );
+		await page.keyboard.up( 'Shift' );
+		await transformBlockTo( 'List' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'can be converted to paragraphs', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
@@ -109,11 +125,7 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
-		// Pointer device is needed. Shift+Tab won't focus the toolbar.
-		// To do: fix so Shift+Tab works.
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
-		await page.click( 'button[aria-label="Indent list item"]' );
+		await clickBlockToolbarButton( 'Indent list item' );
 		await page.keyboard.type( 'two' );
 		await transformBlockTo( 'Paragraph' );
 
@@ -179,15 +191,23 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should split into two ordered lists with paragraph', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1. one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should split indented list item', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
-		// Pointer device is needed. Shift+Tab won't focus the toolbar.
-		// To do: fix so Shift+Tab works.
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
-		await page.click( 'button[aria-label="Indent list item"]' );
+		await clickBlockToolbarButton( 'Indent list item' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'three' );
@@ -202,5 +222,140 @@ describe( 'List', () => {
 		await pressKeyWithModifier( 'primary', 'm' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should change the base list type', async () => {
+		await insertBlock( 'List' );
+		await page.click( 'button[aria-label="Convert to ordered list"]' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should change the indented list type', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( '1' );
+
+		await clickBlockToolbarButton( 'Convert to ordered list' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should indent and outdent level 1', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( '1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should indent and outdent level 2', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( 'i' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should outdent with children', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( 'c' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'ArrowUp' );
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert a line break on shift+enter', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert a line break on shift+enter in a non trailing list item', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'c' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should create and remove indented list with keyboard only', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '* 1' ); // Should be at level 0.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' a' ); // Should be at level 1.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' i' ); // Should be at level 2.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' ); // Should remove list.
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// That's 9 key presses to create the list, and 9 key presses to remove
+		// the list. ;)
 	} );
 } );

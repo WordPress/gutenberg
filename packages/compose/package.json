@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "3.0.1",
+	"version": "3.2.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -12,7 +12,8 @@
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/compose/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git"
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/compose"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -21,10 +22,10 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0",
+		"@babel/runtime": "^7.4.4",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"lodash": "^4.17.10"
+		"lodash": "^4.17.11"
 	},
 	"publishConfig": {
 		"access": "public"

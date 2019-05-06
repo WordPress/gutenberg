@@ -8,7 +8,7 @@ export default {
 		}
 
 		event.preventDefault();
-		window.wp.data.dispatch( 'core/editor' ).insertBlock(
+		window.wp.data.dispatch( 'core/block-editor' ).insertBlock(
 			window.wp.blocks.createBlock( 'core/paragraph', {
 				content: '🐡🐢🦀🐤🦋🐘🐧🐹🦁🦄🦍🐼🐿🎃🐴🐝🐆🦕🦔🌱🍇π🍌🐉💧🥨🌌🍂🍠🥦🥚🥝🎟🥥🥒🛵🥖🍒🍯🎾🎲🐺🐚🐮⌛️',
 			} )

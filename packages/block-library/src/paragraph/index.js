@@ -13,98 +13,33 @@ import {
 } from '@wordpress/element';
 import {
 	getColorClassName,
-	getFontSizeClass,
 	RichText,
-} from '@wordpress/editor';
-import { getPhrasingContentSchema } from '@wordpress/blocks';
-import {
-	Path,
-	SVG,
-} from '@wordpress/components';
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
+import icon from './icon';
+import metadata from './block.json';
+import save from './save';
+import transforms from './transforms';
+
+const { name, attributes: schema } = metadata;
+
+export { metadata, name };
 
 const supports = {
 	className: false,
 };
 
-const schema = {
-	content: {
-		type: 'string',
-		source: 'html',
-		selector: 'p',
-		default: '',
-	},
-	align: {
-		type: 'string',
-	},
-	dropCap: {
-		type: 'boolean',
-		default: false,
-	},
-	placeholder: {
-		type: 'string',
-	},
-	textColor: {
-		type: 'string',
-	},
-	customTextColor: {
-		type: 'string',
-	},
-	backgroundColor: {
-		type: 'string',
-	},
-	customBackgroundColor: {
-		type: 'string',
-	},
-	fontSize: {
-		type: 'string',
-	},
-	customFontSize: {
-		type: 'number',
-	},
-	direction: {
-		type: 'string',
-		enum: [ 'ltr', 'rtl' ],
-	},
-};
-
-export const name = 'core/paragraph';
-
 export const settings = {
 	title: __( 'Paragraph' ),
-
 	description: __( 'Start with the building block of all narrative.' ),
-
-	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M11 5v7H9.5C7.6 12 6 10.4 6 8.5S7.6 5 9.5 5H11m8-2H9.5C6.5 3 4 5.5 4 8.5S6.5 14 9.5 14H11v7h2V5h2v16h2V5h2V3z" /></SVG>,
-
-	category: 'common',
-
+	icon,
 	keywords: [ __( 'text' ) ],
-
 	supports,
-
-	attributes: schema,
-
-	transforms: {
-		from: [
-			{
-				type: 'raw',
-				// Paragraph is a fallback and should be matched last.
-				priority: 20,
-				selector: 'p',
-				schema: {
-					p: {
-						children: getPhrasingContentSchema(),
-					},
-				},
-			},
-		],
-	},
-
+	transforms,
 	deprecated: [
 		{
 			supports,
@@ -174,9 +109,9 @@ export const settings = {
 					'has-drop-cap': dropCap,
 				} );
 				const styles = {
-					backgroundColor: backgroundColor,
+					backgroundColor,
 					color: textColor,
-					fontSize: fontSize,
+					fontSize,
 					textAlign: align,
 				};
 
@@ -209,64 +144,17 @@ export const settings = {
 			},
 		},
 	],
-
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: attributes.content + attributesToMerge.content,
+			content: ( attributes.content || '' ) + ( attributesToMerge.content || '' ),
 		};
 	},
-
 	getEditWrapperProps( attributes ) {
 		const { width } = attributes;
 		if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
 			return { 'data-align': width };
 		}
 	},
-
 	edit,
-
-	save( { attributes } ) {
-		const {
-			align,
-			content,
-			dropCap,
-			backgroundColor,
-			textColor,
-			customBackgroundColor,
-			customTextColor,
-			fontSize,
-			customFontSize,
-			direction,
-		} = attributes;
-
-		const textClass = getColorClassName( 'color', textColor );
-		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-		const fontSizeClass = getFontSizeClass( fontSize );
-
-		const className = classnames( {
-			'has-text-color': textColor || customTextColor,
-			'has-background': backgroundColor || customBackgroundColor,
-			'has-drop-cap': dropCap,
-			[ fontSizeClass ]: fontSizeClass,
-			[ textClass ]: textClass,
-			[ backgroundClass ]: backgroundClass,
-		} );
-
-		const styles = {
-			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
-			color: textClass ? undefined : customTextColor,
-			fontSize: fontSizeClass ? undefined : customFontSize,
-			textAlign: align,
-		};
-
-		return (
-			<RichText.Content
-				tagName="p"
-				style={ styles }
-				className={ className ? className : undefined }
-				value={ content }
-				dir={ direction }
-			/>
-		);
-	},
+	save,
 };

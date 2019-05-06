@@ -3,7 +3,12 @@
 /**
  * External dependencies
  */
-import { get, isFunction, some } from 'lodash';
+import {
+	get,
+	isFunction,
+	isPlainObject,
+	some,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -33,7 +38,7 @@ import { isValidIcon, normalizeIconObject } from './utils';
  * @property {?string[]}                 keywords   Additional keywords to produce
  *                                                  block as inserter search result.
  * @property {?Object}                   attributes Block attributes.
- * @property {Function}                  save       Serialize behavior of a block,
+ * @property {?Function}                 save       Serialize behavior of a block,
  *                                                  returning an element describing
  *                                                  structure of the block's post
  *                                                  content markup.
@@ -44,12 +49,15 @@ import { isValidIcon, normalizeIconObject } from './utils';
 let serverSideBlockDefinitions = {};
 
 /**
- * Set the server side block definition of blocks.
+ * Sets the server side block definition of blocks.
  *
  * @param {Object} definitions Server-side block definitions
  */
 export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { // eslint-disable-line camelcase
-	serverSideBlockDefinitions = definitions;
+	serverSideBlockDefinitions = {
+		...serverSideBlockDefinitions,
+		...definitions,
+	};
 }
 
 /**
@@ -66,6 +74,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
+		save: () => null,
 		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};
@@ -90,22 +99,22 @@ export function registerBlockType( name, settings ) {
 	}
 
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
-
-	if ( ! settings || ! isFunction( settings.save ) ) {
+	if ( ! isPlainObject( settings ) ) {
 		console.error(
-			'The "save" property must be specified and must be a valid function.'
+			'Block settings must be a valid object.'
+		);
+		return;
+	}
+
+	if ( ! isFunction( settings.save ) ) {
+		console.error(
+			'The "save" property must be a valid function.'
 		);
 		return;
 	}
 	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
 		console.error(
 			'The "edit" property must be a valid function.'
-		);
-		return;
-	}
-	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
-		console.error(
-			'The block "' + name + '" can have a maximum of 3 keywords.'
 		);
 		return;
 	}

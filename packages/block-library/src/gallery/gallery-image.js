@@ -1,26 +1,26 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import classnames from 'classnames';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 
 class GalleryImage extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onImageClick = this.onImageClick.bind( this );
+		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectCaption = this.onSelectCaption.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 
 		this.state = {
@@ -44,7 +44,7 @@ class GalleryImage extends Component {
 		}
 	}
 
-	onImageClick() {
+	onSelectImage() {
 		if ( ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
@@ -56,7 +56,7 @@ class GalleryImage extends Component {
 		}
 	}
 
-	onKeyDown( event ) {
+	onRemoveImage( event ) {
 		if (
 			this.container === document.activeElement &&
 			this.props.isSelected && [ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
@@ -108,10 +108,12 @@ class GalleryImage extends Component {
 					src={ url }
 					alt={ alt }
 					data-id={ id }
-					onClick={ this.onImageClick }
+					onClick={ this.onSelectImage }
+					onFocus={ this.onSelectImage }
+					onKeyDown={ this.onRemoveImage }
 					tabIndex="0"
-					onKeyDown={ this.onImageClick }
 					aria-label={ ariaLabel }
+					ref={ this.bindContainer }
 				/>
 				{ isBlobURL( url ) && <Spinner /> }
 			</Fragment>
@@ -123,10 +125,8 @@ class GalleryImage extends Component {
 			'is-transient': isBlobURL( url ),
 		} );
 
-		// Disable reason: Each block can be selected by clicking on it and we should keep the same saved markup
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<figure className={ className } tabIndex="-1" onKeyDown={ this.onKeyDown } ref={ this.bindContainer }>
+			<figure className={ className }>
 				{ isSelected &&
 					<div className="block-library-gallery-item__inline-menu">
 						<IconButton
@@ -151,7 +151,6 @@ class GalleryImage extends Component {
 				) : null }
 			</figure>
 		);
-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 

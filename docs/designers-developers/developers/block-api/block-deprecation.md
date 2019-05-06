@@ -3,15 +3,15 @@
 When updating static blocks markup and attributes, block authors need to consider existing posts using the old versions of their block. In order to provide a good upgrade path, you can choose one of the following strategies:
 
  - Do not deprecate the block and create a new one (a different name)
- - Provide a "deprecated" version of the block allowing users opening these blocks in Gutenberg to edit them using the updated block.
+ - Provide a "deprecated" version of the block allowing users opening these in the block editor to edit them using the updated block.
 
 A block can have several deprecated versions. A deprecation will be tried if a parsed block appears to be invalid, or if there is a deprecation defined for which its `isEligible` property function returns true.
 
 Deprecations are defined on a block type as its `deprecated` property, an array of deprecation objects where each object takes the form:
 
-- `attributes` (Object): The [attributes definition](../../../../docs/designers-developers/developers/block-api/block-attributes.md) of the deprecated form of the block.
-- `support` (Object): The [supports definition](../../../../docs/designers-developers/developers/block-api/block-registration.md) of the deprecated form of the block.
-- `save` (Function): The [save implementation](../../../../docs/designers-developers/developers/block-api/block-edit-save.md) of the deprecated form of the block.
+- `attributes` (Object): The [attributes definition](/docs/designers-developers/developers/block-api/block-attributes.md) of the deprecated form of the block.
+- `support` (Object): The [supports definition](/docs/designers-developers/developers/block-api/block-registration.md) of the deprecated form of the block.
+- `save` (Function): The [save implementation](/docs/designers-developers/developers/block-api/block-edit-save.md) of the deprecated form of the block.
 - `migrate` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, is expected to return either the attributes compatible with the deprecated block, or a tuple array of `[ attributes, innerBlocks ]`.
 - `isEligible` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, returns true if the deprecation can handle the block migration. This is particularly useful in cases where a block is technically valid even once deprecated, and requires updates to its attributes or inner blocks.
 
@@ -194,7 +194,8 @@ E.g: a block wants to migrate a title attribute to a paragraph innerBlock.
 {% ES5 %}
 ```js
 var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType;
+	registerBlockType = wp.blocks.registerBlockType,
+	omit = lodash.omit;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
 
@@ -232,6 +233,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 {% ESNext %}
 ```js
 const { registerBlockType } = wp.blocks;
+const { omit } = lodash;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
 
@@ -275,4 +277,4 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 
 In the example above we updated the block to use an inner paragraph block with a title instead of a title attribute.
 
-*Above are example cases of block deprecation. For more, real-world examples, check for deprecations in the [core block library](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src). Core blocks have been updated across releases and contain simple and complex deprecations.*
+*Above are example cases of block deprecation. For more, real-world examples, check for deprecations in the [core block library](/packages/block-library/src/README.md). Core blocks have been updated across releases and contain simple and complex deprecations.*

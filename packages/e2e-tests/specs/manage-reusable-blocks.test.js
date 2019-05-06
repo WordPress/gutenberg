@@ -1,5 +1,5 @@
 /**
- * Node dependencies
+ * External dependencies
  */
 import path from 'path';
 
@@ -9,11 +9,23 @@ import path from 'path';
 import { visitAdminPage } from '@wordpress/e2e-test-utils';
 
 describe( 'Managing reusable blocks', () => {
+	/**
+	 * Returns a Promise which resolves to the number of post list entries on
+	 * the current page.
+	 *
+	 * @return {Promise} Promise resolving to number of post list entries.
+	 */
+	async function getNumberOfEntries() {
+		return page.evaluate( () => document.querySelectorAll( '.entry' ).length );
+	}
+
 	beforeAll( async () => {
 		await visitAdminPage( 'edit.php', 'post_type=wp_block' );
 	} );
 
 	it( 'Should import reusable blocks', async () => {
+		const originalEntries = await getNumberOfEntries();
+
 		// Import Reusable block
 		await page.waitForSelector( '.list-reusable-blocks__container' );
 		const importButton = await page.$( '.list-reusable-blocks__container button' );
@@ -36,7 +48,9 @@ describe( 'Managing reusable blocks', () => {
 		// Refresh the page
 		await visitAdminPage( 'edit.php', 'post_type=wp_block' );
 
-		// The reusable block has been imported
-		page.waitForXPath( 'div[@class="post_title"][contains(text(), "Greeting")]' );
+		const expectedEntries = originalEntries + 1;
+		const actualEntries = await getNumberOfEntries();
+
+		expect( actualEntries ).toBe( expectedEntries );
 	} );
 } );

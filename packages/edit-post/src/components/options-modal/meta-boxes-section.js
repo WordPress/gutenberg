@@ -38,6 +38,7 @@ export default withSelect( ( select ) => {
 	const { getAllMetaBoxes } = select( 'core/edit-post' );
 
 	return {
+		// This setting should not live in the block editor's store.
 		areCustomFieldsRegistered: getEditorSettings().enableCustomFields !== undefined,
 		metaBoxes: getAllMetaBoxes(),
 	};

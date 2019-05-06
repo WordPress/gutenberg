@@ -18,10 +18,12 @@ import {
 	InspectorControls,
 	withColors,
 	PanelColorSettings,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
-export const SOLID_COLOR_STYLE_NAME = 'solid-color';
-export const SOLID_COLOR_CLASS = `is-style-${ SOLID_COLOR_STYLE_NAME }`;
+/**
+ * Internal dependencies
+ */
+import { SOLID_COLOR_CLASS } from './shared';
 
 class PullQuoteEdit extends Component {
 	constructor( props ) {

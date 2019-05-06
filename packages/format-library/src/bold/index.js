@@ -4,13 +4,14 @@
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/editor';
+import { RichTextToolbarButton, RichTextShortcut, __unstableRichTextInputEvent } from '@wordpress/block-editor';
 
 const name = 'core/bold';
+const title = __( 'Bold' );
 
 export const bold = {
 	name,
-	title: __( 'Bold' ),
+	title,
 	tagName: 'strong',
 	className: null,
 	edit( { isActive, value, onChange } ) {
@@ -26,11 +27,15 @@ export const bold = {
 				<RichTextToolbarButton
 					name="bold"
 					icon="editor-bold"
-					title={ __( 'Bold' ) }
+					title={ title }
 					onClick={ onToggle }
 					isActive={ isActive }
 					shortcutType="primary"
 					shortcutCharacter="b"
+				/>
+				<__unstableRichTextInputEvent
+					inputType="formatBold"
+					onInput={ onToggle }
 				/>
 			</Fragment>
 		);

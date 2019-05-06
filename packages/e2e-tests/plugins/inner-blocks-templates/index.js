@@ -1,5 +1,6 @@
 ( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
+	var createBlock = wp.blocks.createBlock;
 	var el = wp.element.createElement;
 	var InnerBlocks = wp.editor.InnerBlocks;
 	var __ = wp.i18n.__;
@@ -28,10 +29,10 @@
 
 		edit: function( props ) {
 			return el(
-					InnerBlocks,
-					{
-						template: TEMPLATE,
-					}
+				InnerBlocks,
+				{
+					template: TEMPLATE,
+				}
 			);
 		},
 
@@ -45,11 +46,11 @@
 
 		edit: function( props ) {
 			return el(
-					InnerBlocks,
-					{
-						template: TEMPLATE,
-						templateLock: 'all',
-					}
+				InnerBlocks,
+				{
+					template: TEMPLATE,
+					templateLock: 'all',
+				}
 			);
 		},
 
@@ -63,13 +64,57 @@
 
 		edit: function( props ) {
 			return el(
-					InnerBlocks,
-					{
-						template: TEMPLATE_PARAGRAPH_PLACEHOLDER,
-					}
+				InnerBlocks,
+				{
+					template: TEMPLATE_PARAGRAPH_PLACEHOLDER,
+				}
 			);
 		},
 
 		save,
 	} );
+
+	registerBlockType( 'test/test-inner-blocks-transformer-target', {
+		title: 'Test Inner Blocks transformer target',
+		icon: 'cart',
+		category: 'common',
+
+		transforms: {
+			from: [
+				{
+					type: 'block',
+					blocks: [
+						'test/i-dont-exist',
+						'test/test-inner-blocks-no-locking',
+						'test/test-inner-blocks-locking-all',
+						'test/test-inner-blocks-paragraph-placeholder'
+					],
+					transform: function( attributes, innerBlocks ) {
+						return createBlock( 'test/test-inner-blocks-transformer-target', attributes, innerBlocks );
+					},
+				},
+			],
+			to: [
+				{
+					type: 'block',
+					blocks: [ 'test/i-dont-exist' ],
+					transform: function( attributes, innerBlocks ) {
+						return createBlock( 'test/test-inner-blocks-transformer-target', attributes, innerBlocks );
+					},
+				}
+			]
+		},
+
+		edit: function( props ) {
+			return el(
+				InnerBlocks,
+				{
+					template: TEMPLATE,
+				}
+			);
+		},
+
+		save,
+	} );
+
 } )();

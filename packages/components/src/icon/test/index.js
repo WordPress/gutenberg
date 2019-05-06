@@ -7,12 +7,12 @@ import { shallow } from 'enzyme';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Path, SVG } from '../../';
 
 /**
  * Internal dependencies
  */
 import Icon from '../';
+import { Path, SVG } from '../../';
 
 describe( 'Icon', () => {
 	const className = 'example-class';

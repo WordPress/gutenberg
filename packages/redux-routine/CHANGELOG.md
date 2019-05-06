@@ -1,8 +1,11 @@
-## 3.0.4 (Unreleased)
+## 3.1.0 (2019-03-06)
 
 ### Bug Fixes
 
-- Fix unhandled promise rejection error caused by returning null from registered generator ([#13314](https://github.com/WordPress/gutenberg/pull/13314)
+- Fix unhandled promise rejection error caused by returning null from registered generator ([#13314](https://github.com/WordPress/gutenberg/pull/13314))
+- The middleware will no longer attempt to coerce an error to an instance of `Error`, and instead passes through the thrown value directly. This resolves issues where an `Error` would be thrown when the underlying values were not of type `Error` or `string` (e.g. a thrown object) and the message would end up not being useful (e.g. `[Object object]`).
+([#13315](https://github.com/WordPress/gutenberg/pull/13315))
+- Fix unintended recursion when invoking sync routine ([#13818](https://github.com/WordPress/gutenberg/pull/13818))
 
 ## 3.0.3 (2018-10-19)
 

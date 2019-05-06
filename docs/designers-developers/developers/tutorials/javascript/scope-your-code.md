@@ -1,4 +1,4 @@
-# Scope your code
+# Scope Your Code
 
 Historically, JavaScript files loaded in a web page share the same scope. This means that a global variable declared in one file will be seen by the code in other files.
 
@@ -26,9 +26,9 @@ When loaded on the same page, `first.js` and `second.js` will output the plugin 
 
 This behavior can be problematic, and is the reason we need to scope the code. By scoping the code—ensuring each file is isolated from each other—we can prevent values unexpectedly changing.
 
-## Scoping code within a function
+## Scoping Code Within a Function
 
-In JavaScript, you can scope your code by writing it within a function. Functions have "local scope", or a scope that is specific only to that function. Aditionally, in JavaScript you can write anonymous functions, functions without a name, which will also prevent your function name from being overridden in the global scope.
+In JavaScript, you can scope your code by writing it within a function. Functions have "local scope", or a scope that is specific only to that function. Additionally, in JavaScript you can write anonymous functions, functions without a name, which will also prevent your function name from being overridden in the global scope.
 
 Taking advantage of these two JavaScript features, `first.js` could be scoped as:
 
@@ -58,7 +58,7 @@ function() {
 
 With this trick, the different files won't override each other's variables. Unfortunately, they also won't work as expected, because these functions are being called by no one. We've only _defined_ the functions; we haven't _executed_ them yet.
 
-## Automatically execute anonymous functions
+## Automatically Execute Anonymous Functions
 
 It turns out there are a few ways to execute anonymous functions in JavaScript, but the most popular is this:
 
@@ -106,7 +106,7 @@ On the other hand, `third.js` doesn't declare a `pluginName` variable, but needs
 } )( window.pluginName )
 ```
 
-## Future changes
+## Future Changes
 
 At the beginning we mentioned that:
 

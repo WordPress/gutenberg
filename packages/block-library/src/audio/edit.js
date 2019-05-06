@@ -1,25 +1,31 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 import {
 	Disabled,
 	IconButton,
 	PanelBody,
 	SelectControl,
-	Toolbar,
 	ToggleControl,
+	Toolbar,
 	withNotices,
 } from '@wordpress/components';
-import { Component, Fragment } from '@wordpress/element';
 import {
 	BlockControls,
+	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	RichText,
-	mediaUpload,
-} from '@wordpress/editor';
-import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+} from '@wordpress/block-editor';
+import { mediaUpload } from '@wordpress/editor';
+import { Component, Fragment } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import icon from './icon';
 
 /**
  * Internal dependencies
@@ -115,7 +121,7 @@ class AudioEdit extends Component {
 		if ( editing ) {
 			return (
 				<MediaPlaceholder
-					icon="media-audio"
+					icon={ <BlockIcon icon={ icon } /> }
 					className={ className }
 					onSelect={ onSelectAudio }
 					onSelectURL={ this.onSelectURL }

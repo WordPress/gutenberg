@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-import { parse, stringify } from './ast';
 import traverse from 'traverse';
+
+/**
+ * Internal dependencies
+ */
+import { parse, stringify } from './ast';
 
 function traverseCSS( css, callback ) {
 	try {

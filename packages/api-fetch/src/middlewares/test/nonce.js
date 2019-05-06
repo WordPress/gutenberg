@@ -31,6 +31,7 @@ describe( 'Nonce middleware', () => {
 			headers: { 'X-WP-Nonce': 'existing nonce' },
 		};
 		const callback = ( options ) => {
+			expect( options ).toBe( requestOptions );
 			expect( options.headers[ 'X-WP-Nonce' ] ).toBe( 'existing nonce' );
 		};
 

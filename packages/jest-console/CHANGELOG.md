@@ -1,3 +1,9 @@
+## 3.0.0 (2019-03-06)
+
+### Breaking Changes
+
+- Increased the recommended Jest dependency to version 24 ([#13922](https://github.com/WordPress/gutenberg/pull/13922).
+
 ## 2.0.7 (2018-11-20)
 
 ## 2.0.5 (2018-09-30)
@@ -8,7 +14,7 @@
 
 ## 2.0.0 (2018-07-12)
 
-### Breaking Change
+### Breaking Changes
 
 - Add new API methods `toHaveInformed`, `toHaveInformedWith`, `toHaveLogged` and `toHaveLoggedWith` ([#137](https://github.com/WordPress/packages/pull/137)). If the code under test calls `console.log` or `console.info` it will fail, unless one of the newly introduced methods is explicitly used to verify it.
 - Updated code to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))

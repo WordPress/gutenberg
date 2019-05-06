@@ -2,19 +2,20 @@
  * External dependencies
  */
 import { View } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { parse, createBlock } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import { createBlock } from '@wordpress/blocks';
+import { RichText } from '@wordpress/block-editor';
+import { create } from '@wordpress/rich-text';
 
 /**
- * Import style
+ * Internal dependencies
  */
-import styles from './style.scss';
 
 const name = 'core/paragraph';
 
@@ -22,10 +23,7 @@ class ParagraphEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
-
-		this.state = {
-			aztecHeight: 0,
-		};
+		this.onReplace = this.onReplace.bind( this );
 	}
 
 	/**
@@ -71,6 +69,28 @@ class ParagraphEdit extends Component {
 		}
 	}
 
+	onReplace( blocks ) {
+		const { attributes, onReplace } = this.props;
+		onReplace( blocks.map( ( block, index ) => (
+			index === 0 && block.name === name ?
+				{ ...block,
+					attributes: {
+						...attributes,
+						...block.attributes,
+					},
+				} :
+				block
+		) ) );
+	}
+
+	plainTextContent( html ) {
+		const result = create( { html } );
+		if ( result ) {
+			return result.text;
+		}
+		return '';
+	}
+
 	render() {
 		const {
 			attributes,
@@ -84,35 +104,38 @@ class ParagraphEdit extends Component {
 			content,
 		} = attributes;
 
-		const minHeight = styles.blockText.minHeight;
-
 		return (
-			<View>
+			<View
+				accessible={ ! this.props.isSelected }
+				accessibilityLabel={
+					isEmpty( content ) ?
+						/* translators: accessibility text. empty paragraph block. */
+						__( 'Paragraph block. Empty' ) :
+						sprintf(
+							/* translators: accessibility text. %s: text content of the paragraph block. */
+							__( 'Paragraph block. %s' ),
+							this.plainTextContent( content )
+						)
+				}
+				onAccessibilityTap={ this.props.onFocus }
+			>
 				<RichText
 					tagName="p"
 					value={ content }
 					isSelected={ this.props.isSelected }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
-					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
-					style={ {
-						...style,
-						minHeight: Math.max( minHeight, this.state.aztecHeight ),
-					} }
-					onChange={ ( event ) => {
-						// Create a React Tree from the new HTML
-						const newParaBlock = parse( '<!-- wp:paragraph --><p>' + event.content + '</p><!-- /wp:paragraph -->' )[ 0 ];
+					deleteEnter={ true }
+					style={ style }
+					onChange={ ( nextContent ) => {
 						setAttributes( {
-							...this.props.attributes,
-							content: newParaBlock.attributes.content,
+							content: nextContent,
 						} );
 					} }
 					onSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
-					onContentSizeChange={ ( event ) => {
-						this.setState( { aztecHeight: event.aztecHeight } );
-					} }
-					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+					onReplace={ this.onReplace }
+					placeholder={ placeholder || __( 'Start writing…' ) }
 				/>
 			</View>
 		);

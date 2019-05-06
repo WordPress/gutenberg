@@ -17,10 +17,6 @@
 		height: auto;
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
-
-		body.is-fullscreen-mode & {
-			top: $header-height;
-		}
 	}
 
 	@include break-medium() {
@@ -40,16 +36,11 @@
 		max-height: calc(100vh - #{ $admin-bar-height-big + $panel-header-height });
 		margin-top: -1px;
 		margin-bottom: -1px;
-
-		body.is-fullscreen-mode & {
-			max-height: calc(100vh - #{ $panel-header-height });
-			@include break-small() {
-				max-height: none;
-			}
-		}
+		position: relative;
+		z-index: z-index(".edit-post-sidebar .components-panel");
 
 		@include break-small() {
-			overflow: inherit;
+			overflow: hidden;
 			height: auto;
 			max-height: none;
 		}
@@ -100,7 +91,7 @@
 		margin-top: -1em;
 	}
 
-	.editor-skip-to-selected-block:focus {
+	.block-editor-skip-to-selected-block:focus {
 		top: auto;
 		right: 10px;
 		bottom: 10px;
@@ -165,18 +156,30 @@
 .edit-post-sidebar__panel-tab {
 	background: transparent;
 	border: none;
-	border-radius: 0;
+	box-shadow: none;
 	cursor: pointer;
 	height: 50px;
 	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: 400;
 	@include square-style__neutral;
+	transition: box-shadow 0.1s linear;
 
 	&.is-active {
-		padding-bottom: 0;
-		border-bottom: 3px solid theme(primary);
+		box-shadow: inset 0 -3px theme(outlines);
 		font-weight: 600;
+		position: relative;
+
+		// This border appears in Windows High Contrast mode instead of the box-shadow.
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			bottom: 1px;
+			right: 0;
+			left: 0;
+			border-bottom: 3px solid transparent;
+		}
 	}
 
 	&:focus {

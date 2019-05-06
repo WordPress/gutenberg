@@ -4,13 +4,14 @@
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/editor';
+import { RichTextToolbarButton, RichTextShortcut, __unstableRichTextInputEvent } from '@wordpress/block-editor';
 
 const name = 'core/italic';
+const title = __( 'Italic' );
 
 export const italic = {
 	name,
-	title: __( 'Italic' ),
+	title,
 	tagName: 'em',
 	className: null,
 	edit( { isActive, value, onChange } ) {
@@ -26,11 +27,15 @@ export const italic = {
 				<RichTextToolbarButton
 					name="italic"
 					icon="editor-italic"
-					title={ __( 'Italic' ) }
+					title={ title }
 					onClick={ onToggle }
 					isActive={ isActive }
 					shortcutType="primary"
 					shortcutCharacter="i"
+				/>
+				<__unstableRichTextInputEvent
+					inputType="formatItalic"
+					onInput={ onToggle }
 				/>
 			</Fragment>
 		);

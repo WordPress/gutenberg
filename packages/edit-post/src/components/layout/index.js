@@ -6,14 +6,20 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Popover, ScrollLock, navigateRegions } from '@wordpress/components';
+import {
+	Button,
+	Popover,
+	ScrollLock,
+	FocusReturnProvider,
+	navigateRegions,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { PreserveScrollInReorder } from '@wordpress/block-editor';
 import {
 	AutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
 	PostPublishPanel,
-	PreserveScrollInReorder,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
@@ -30,6 +36,7 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
+import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
 import MetaBoxes from '../meta-boxes';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -65,7 +72,7 @@ function Layout( {
 		tabIndex: -1,
 	};
 	return (
-		<div className={ className }>
+		<FocusReturnProvider className={ className }>
 			<FullscreenMode />
 			<BrowserURL />
 			<UnsavedChangesWarning />
@@ -78,10 +85,12 @@ function Layout( {
 				aria-label={ __( 'Editor content' ) }
 				tabIndex="-1"
 			>
-				<EditorNotices />
+				<EditorNotices dismissible={ false } className="is-pinned" />
+				<EditorNotices dismissible={ true } />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
 				<KeyboardShortcutHelpModal />
+				<ManageBlocksModal />
 				<OptionsModal />
 				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
 				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
@@ -123,7 +132,7 @@ function Layout( {
 			) }
 			<Popover.Slot />
 			<PluginArea />
-		</div>
+		</FocusReturnProvider>
 	);
 }
 

@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/eslint-plugin --save-dev
 ```
 
-### Usage
+## Usage
 
 To opt-in to the default configuration, extend your own project's `.eslintrc` file:
 
@@ -24,7 +24,7 @@ Refer to the [ESLint documentation on Shareable Configs](http://eslint.org/docs/
 
 The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsx-a11y`](https://github.com/evcohen/eslint-plugin-jsx-a11y) and [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react) projects.
 
-#### Rulesets
+### Rulesets
 
 Alternatively, you can opt-in to only the more granular rulesets offered by the plugin. These include:
 
@@ -45,7 +45,18 @@ These rules can be used additively, so you could extend both `esnext` and `custo
 
 The granular rulesets will not define any environment globals. As such, if they are required for your project, you will need to define them yourself.
 
-#### Legacy
+### Rules
+
+Rule|Description|Recommended
+---|---|---
+[dependency-group](/packages/eslint-plugin/docs/rules/dependency-group.md)|Enforce dependencies docblocks formatting|✓
+[gutenberg-phase](docs/rules/gutenberg-phase.md)|Governs the use of the `process.env.GUTENBERG_PHASE` constant|✓
+[no-unused-vars-before-return](/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)|Disallow assigning variable values if unused before a return|✓
+[react-no-unsafe-timeout](/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)|Disallow unsafe `setTimeout` in component|
+[valid-sprintf](/packages/eslint-plugin/docs/rules/valid-sprintf.md)|Enforce valid sprintf usage|✓
+[no-base-control-with-label-without-id](/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)| Disallow the usage of BaseControl component with a label prop set but omitting the id property|✓
+
+### Legacy
 
 If you are using WordPress' `.jshintrc` JSHint configuration and you would like to take the first step to migrate to an ESLint equivalent it is also possible to define your own project's `.eslintrc` file as:
 

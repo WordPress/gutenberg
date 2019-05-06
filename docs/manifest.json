@@ -30,7 +30,7 @@
 		"parent": "developers"
 	},
 	{
-		"title": "Block Registration ",
+		"title": "Block Registration",
 		"slug": "block-registration",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/block-api/block-registration.md",
 		"parent": "block-api"
@@ -102,10 +102,76 @@
 		"parent": "developers"
 	},
 	{
+		"title": "Accessibility",
+		"slug": "accessibility",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/accessibility.md",
+		"parent": "developers"
+	},
+	{
+		"title": "Feature Flags",
+		"slug": "feature-flags",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/feature-flags.md",
+		"parent": "developers"
+	},
+	{
 		"title": "Data Module Reference",
 		"slug": "data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/README.md",
 		"parent": "developers"
+	},
+	{
+		"title": "WordPress Core Data",
+		"slug": "data-core",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core.md",
+		"parent": "data"
+	},
+	{
+		"title": "Annotations",
+		"slug": "data-core-annotations",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-annotations.md",
+		"parent": "data"
+	},
+	{
+		"title": "Block Types Data",
+		"slug": "data-core-blocks",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-blocks.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Block Editor’s Data",
+		"slug": "data-core-block-editor",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-block-editor.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Post Editor’s Data",
+		"slug": "data-core-editor",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-editor.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Editor’s UI Data",
+		"slug": "data-core-edit-post",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-edit-post.md",
+		"parent": "data"
+	},
+	{
+		"title": "Notices Data",
+		"slug": "data-core-notices",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-notices.md",
+		"parent": "data"
+	},
+	{
+		"title": "The NUX (New User Experience) Data",
+		"slug": "data-core-nux",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-nux.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Viewport Data",
+		"slug": "data-core-viewport",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-viewport.md",
+		"parent": "data"
 	},
 	{
 		"title": "Packages",
@@ -120,7 +186,7 @@
 		"parent": "developers"
 	},
 	{
-		"title": "Theming for Gutenberg",
+		"title": "Theming for the Block Editor",
 		"slug": "themes",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/themes/README.md",
 		"parent": "developers"
@@ -154,6 +220,54 @@
 		"slug": "tutorials",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/readme.md",
 		"parent": "developers"
+	},
+	{
+		"title": "Getting Started with JavaScript",
+		"slug": "javascript",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/readme.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Plugins Background",
+		"slug": "plugins-background",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/plugins-background.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Loading JavaScript",
+		"slug": "loading-javascript",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/loading-javascript.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Extending the Block Editor",
+		"slug": "extending-the-block-editor",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/extending-the-block-editor.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Troubleshooting",
+		"slug": "troubleshooting",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/troubleshooting.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "JavaScript Versions and Build Step",
+		"slug": "versions-and-building",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/versions-and-building.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Scope Your Code",
+		"slug": "scope-your-code",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/scope-your-code.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "JavaScript Build Setup",
+		"slug": "js-build-setup",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md",
+		"parent": "javascript"
 	},
 	{
 		"title": "Blocks",
@@ -198,48 +312,6 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Getting Started with JavaScript",
-		"slug": "javascript",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/readme.md",
-		"parent": "tutorials"
-	},
-	{
-		"title": "Plugins Background",
-		"slug": "plugins-background",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/plugins-background.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Loading JavaScript",
-		"slug": "loading-javascript",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/loading-javascript.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Extending the Block Editor",
-		"slug": "extending-the-block-editor",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/extending-the-block-editor.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Troubleshooting",
-		"slug": "troubleshooting",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/troubleshooting.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "JavaScript versions and build step",
-		"slug": "versions-and-building",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/versions-and-building.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Scope your code",
-		"slug": "scope-your-code",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/scope-your-code.md",
-		"parent": "javascript"
-	},
-	{
 		"title": "Meta Boxes",
 		"slug": "metabox",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/readme.md",
@@ -276,13 +348,19 @@
 		"parent": "metabox"
 	},
 	{
-		"title": "Creating a sidebar for your plugin",
+		"title": "Displaying Notices from Your Plugin or Theme",
+		"slug": "notices",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/notices/README.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Creating a Sidebar for Your Plugin",
 		"slug": "plugin-sidebar-0",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md",
 		"parent": "tutorials"
 	},
 	{
-		"title": "Get a sidebar up and running",
+		"title": "Get a Sidebar up and Running",
 		"slug": "plugin-sidebar-1-up-and-running",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-1-up-and-running.md",
 		"parent": "plugin-sidebar-0"
@@ -294,25 +372,25 @@
 		"parent": "plugin-sidebar-0"
 	},
 	{
-		"title": "Register the meta field",
+		"title": "Register the Meta Field",
 		"slug": "plugin-sidebar-3-register-meta",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-3-register-meta.md",
 		"parent": "plugin-sidebar-0"
 	},
 	{
-		"title": "Initialize the input control",
+		"title": "Initialize the Input Control",
 		"slug": "plugin-sidebar-4-initialize-input",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-4-initialize-input.md",
 		"parent": "plugin-sidebar-0"
 	},
 	{
-		"title": "Update the meta field when the input's content changes",
+		"title": "Update the Meta Field When the Input's Content Changes",
 		"slug": "plugin-sidebar-5-update-meta",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md",
 		"parent": "plugin-sidebar-0"
 	},
 	{
-		"title": "Finishing touches",
+		"title": "Finishing Touches",
 		"slug": "plugin-sidebar-6-finishing-touches",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md",
 		"parent": "plugin-sidebar-0"
@@ -324,19 +402,19 @@
 		"parent": "tutorials"
 	},
 	{
-		"title": "Register a new format",
+		"title": "Register a New Format",
 		"slug": "1-register-format",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/1-register-format.md",
 		"parent": "format-api"
 	},
 	{
-		"title": "Add a button to the toolbar",
+		"title": "Add a Button to the Toolbar",
 		"slug": "2-toolbar-button",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md",
 		"parent": "format-api"
 	},
 	{
-		"title": "Apply the format when the button is clicked",
+		"title": "Apply the Format When the Button Is Clicked",
 		"slug": "3-apply-format",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/3-apply-format.md",
 		"parent": "format-api"
@@ -366,16 +444,10 @@
 		"parent": "designers"
 	},
 	{
-		"title": "Glossary",
-		"slug": "glossary",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/glossary.md",
-		"parent": "designers-developers"
-	},
-	{
-		"title": "Frequently Asked Questions",
-		"slug": "faq",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/faq.md",
-		"parent": "designers-developers"
+		"title": "Animation",
+		"slug": "animation",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/animation.md",
+		"parent": "designers"
 	},
 	{
 		"title": "Contributors Guide",
@@ -384,28 +456,100 @@
 		"parent": null
 	},
 	{
-		"title": "Coding Guidelines",
-		"slug": "coding-guidelines",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/coding-guidelines.md",
+		"title": "Principles",
+		"slug": "principles",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/principles.md",
 		"parent": "contributors"
 	},
 	{
-		"title": "Gutencopy Guidelines",
-		"slug": "copy-guide",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/copy-guide.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Gutenberg Design Principles & Vision",
+		"title": "Design Principles & Vision",
 		"slug": "design",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/design.md",
 		"parent": "contributors"
 	},
 	{
-		"title": "The Gutenberg block grammar",
+		"title": "Blocks are the Interface",
+		"slug": "the-block",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/principles/the-block.md",
+		"parent": "design"
+	},
+	{
+		"title": "Reference",
+		"slug": "reference",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/reference.md",
+		"parent": "design"
+	},
+	{
+		"title": "Developer Contributions",
+		"slug": "develop",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/develop.md",
+		"parent": "contributors"
+	},
+	{
+		"title": "Getting Started",
+		"slug": "getting-started",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/getting-started.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Git Workflow",
+		"slug": "git-workflow",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/git-workflow.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Coding Guidelines",
+		"slug": "coding-guidelines",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/coding-guidelines.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Testing Overview",
+		"slug": "testing-overview",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/testing-overview.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Block Grammar",
 		"slug": "grammar",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/grammar.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Scripts",
+		"slug": "scripts",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/scripts.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Managing Packages",
+		"slug": "managing-packages",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/managing-packages.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Gutenberg Release Process",
+		"slug": "release",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/release.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Localizing Gutenberg Plugin",
+		"slug": "localizing",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/localizing.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Documentation Contributions",
+		"slug": "document",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/document.md",
 		"parent": "contributors"
+	},
+	{
+		"title": "Copy Guidelines",
+		"slug": "copy-guide",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/copy-guide.md",
+		"parent": "document"
 	},
 	{
 		"title": "History",
@@ -414,57 +558,15 @@
 		"parent": "contributors"
 	},
 	{
-		"title": "Outreach",
-		"slug": "outreach",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/outreach.md",
+		"title": "Glossary",
+		"slug": "glossary",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/glossary.md",
 		"parent": "contributors"
 	},
 	{
-		"title": "Articles",
-		"slug": "articles",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/outreach/articles.md",
-		"parent": "outreach"
-	},
-	{
-		"title": "Meetups",
-		"slug": "meetups",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/outreach/meetups.md",
-		"parent": "outreach"
-	},
-	{
-		"title": "Resources",
-		"slug": "resources",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/outreach/resources.md",
-		"parent": "outreach"
-	},
-	{
-		"title": "Talks",
-		"slug": "talks",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/outreach/talks.md",
-		"parent": "outreach"
-	},
-	{
-		"title": "Principles",
-		"slug": "principles",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/principles.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Blocks are the Interface",
-		"slug": "the-block",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/principles/the-block.md",
-		"parent": "principles"
-	},
-	{
-		"title": "Reference",
-		"slug": "reference",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/reference.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Gutenberg Release Process",
-		"slug": "release",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/release.md",
+		"title": "Frequently Asked Questions",
+		"slug": "faq",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/faq.md",
 		"parent": "contributors"
 	},
 	{
@@ -474,15 +576,9 @@
 		"parent": "contributors"
 	},
 	{
-		"title": "Scripts",
-		"slug": "scripts",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/scripts.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Testing Overview",
-		"slug": "testing-overview",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/testing-overview.md",
+		"title": "Outreach",
+		"slug": "outreach",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/outreach.md",
 		"parent": "contributors"
 	},
 	{
@@ -531,6 +627,12 @@
 		"title": "@wordpress/blob",
 		"slug": "packages-blob",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/blob/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/block-editor",
+		"slug": "packages-block-editor",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/block-editor/README.md",
 		"parent": "packages"
 	},
 	{
@@ -600,9 +702,21 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/dependency-extraction-webpack-plugin",
+		"slug": "packages-dependency-extraction-webpack-plugin",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/dependency-extraction-webpack-plugin/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/deprecated",
 		"slug": "packages-deprecated",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/deprecated/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/docgen",
+		"slug": "packages-docgen",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/docgen/README.md",
 		"parent": "packages"
 	},
 	{
@@ -633,6 +747,12 @@
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/edit-post/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/edit-widgets",
+		"slug": "packages-edit-widgets",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/edit-widgets/README.md",
 		"parent": "packages"
 	},
 	{
@@ -810,6 +930,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "Animate",
+		"slug": "animate",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/animate/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Autocomplete",
 		"slug": "autocomplete",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/autocomplete/README.md",
@@ -909,6 +1035,12 @@
 		"title": "ExternalLink",
 		"slug": "external-link",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/external-link/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "FocalPointPicker",
+		"slug": "focal-point-picker",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/focal-point-picker/README.md",
 		"parent": "components"
 	},
 	{
@@ -1074,6 +1206,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "HorizontalRule",
+		"slug": "horizontal-rule",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/primitives/horizontal-rule/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Svg",
 		"slug": "svg",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/primitives/svg/README.md",
@@ -1186,53 +1324,5 @@
 		"slug": "tree-select",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/tree-select/README.md",
 		"parent": "components"
-	},
-	{
-		"title": "WordPress Core Data",
-		"slug": "data-core",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core.md",
-		"parent": "data"
-	},
-	{
-		"title": "Annotations",
-		"slug": "data-core-annotations",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-annotations.md",
-		"parent": "data"
-	},
-	{
-		"title": "Block Types Data",
-		"slug": "data-core-blocks",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-blocks.md",
-		"parent": "data"
-	},
-	{
-		"title": "The Editor’s Data",
-		"slug": "data-core-editor",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-editor.md",
-		"parent": "data"
-	},
-	{
-		"title": "The Editor’s UI Data",
-		"slug": "data-core-edit-post",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-edit-post.md",
-		"parent": "data"
-	},
-	{
-		"title": "Notices Data",
-		"slug": "data-core-notices",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-notices.md",
-		"parent": "data"
-	},
-	{
-		"title": "The NUX (New User Experience) Data",
-		"slug": "data-core-nux",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-nux.md",
-		"parent": "data"
-	},
-	{
-		"title": "The Viewport Data",
-		"slug": "data-core-viewport",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/data-core-viewport.md",
-		"parent": "data"
 	}
 ]

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 import {
 	BaseControl,
 	Button,
@@ -9,26 +9,35 @@ import {
 	IconButton,
 	PanelBody,
 	SelectControl,
-	Toolbar,
 	ToggleControl,
+	Toolbar,
 	withNotices,
 } from '@wordpress/components';
-import { Component, Fragment, createRef } from '@wordpress/element';
 import {
 	BlockControls,
+	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
 	RichText,
-	mediaUpload,
-} from '@wordpress/editor';
-import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+} from '@wordpress/block-editor';
+import { mediaUpload } from '@wordpress/editor';
+import { Component, Fragment, createRef } from '@wordpress/element';
+import {
+	__,
+	sprintf,
+} from '@wordpress/i18n';
+import {
+	compose,
+	withInstanceId,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import icon from './icon';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -124,11 +133,19 @@ class VideoEdit extends Component {
 			controls,
 			loop,
 			muted,
+			playsInline,
 			poster,
 			preload,
 			src,
 		} = this.props.attributes;
-		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
+		const {
+			className,
+			instanceId,
+			isSelected,
+			noticeOperations,
+			noticeUI,
+			setAttributes,
+		} = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
 			this.setState( { editing: true } );
@@ -150,7 +167,7 @@ class VideoEdit extends Component {
 		if ( editing ) {
 			return (
 				<MediaPlaceholder
-					icon="media-video"
+					icon={ <BlockIcon icon={ icon } /> }
 					className={ className }
 					onSelect={ onSelectVideo }
 					onSelectURL={ this.onSelectURL }
@@ -162,6 +179,7 @@ class VideoEdit extends Component {
 				/>
 			);
 		}
+		const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
@@ -198,6 +216,11 @@ class VideoEdit extends Component {
 							onChange={ this.toggleAttribute( 'controls' ) }
 							checked={ controls }
 						/>
+						<ToggleControl
+							label={ __( 'Play inline' ) }
+							onChange={ this.toggleAttribute( 'playsInline' ) }
+							checked={ playsInline }
+						/>
 						<SelectControl
 							label={ __( 'Preload' ) }
 							value={ preload }
@@ -211,8 +234,10 @@ class VideoEdit extends Component {
 						<MediaUploadCheck>
 							<BaseControl
 								className="editor-video-poster-control"
-								label={ __( 'Poster Image' ) }
 							>
+								<BaseControl.VisualLabel>
+									{ __( 'Poster Image' ) }
+								</BaseControl.VisualLabel>
 								<MediaUpload
 									title={ __( 'Select Poster Image' ) }
 									onSelect={ this.onSelectPoster }
@@ -222,11 +247,21 @@ class VideoEdit extends Component {
 											isDefault
 											onClick={ open }
 											ref={ this.posterImageButton }
+											aria-describedby={ videoPosterDescription }
 										>
 											{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
 										</Button>
 									) }
 								/>
+								<p
+									id={ videoPosterDescription }
+									hidden
+								>
+									{ this.props.attributes.poster ?
+										sprintf( __( 'The current poster image url is %s' ), this.props.attributes.poster ) :
+										__( 'There is no poster image currently selected' )
+									}
+								</p>
 								{ !! this.props.attributes.poster &&
 									<Button onClick={ this.onRemovePoster } isLink isDestructive>
 										{ __( 'Remove Poster Image' ) }
@@ -265,4 +300,7 @@ class VideoEdit extends Component {
 	}
 }
 
-export default withNotices( VideoEdit );
+export default compose( [
+	withNotices,
+	withInstanceId,
+] )( VideoEdit );

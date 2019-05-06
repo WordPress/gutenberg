@@ -8,7 +8,7 @@
  */
 
 // Include the generated parser.
-require_once dirname( __FILE__ ) . '/../../../lib/parser.php';
+require_once dirname( __FILE__ ) . '/../parser.php';
 
 $parser = new Gutenberg_PEG_Parser();
 

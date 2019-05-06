@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { saveEntityRecord, receiveEntityRecords } from '../actions';
+import { saveEntityRecord, receiveEntityRecords, receiveUserPermission, receiveAutosaves, receiveCurrentUser } from '../actions';
 
 describe( 'saveEntityRecord', () => {
 	it( 'triggers a POST request for a new record', async () => {
@@ -56,5 +56,58 @@ describe( 'saveEntityRecord', () => {
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( postType );
 		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', postType, undefined, true ) );
+	} );
+} );
+
+describe( 'receiveUserPermission', () => {
+	it( 'builds an action object', () => {
+		expect( receiveUserPermission( 'create/media', true ) ).toEqual( {
+			type: 'RECEIVE_USER_PERMISSION',
+			key: 'create/media',
+			isAllowed: true,
+		} );
+	} );
+} );
+
+describe( 'receiveAutosaves', () => {
+	it( 'builds an action object', () => {
+		const postId = 1;
+		const autosaves = [
+			{
+				content: 'test 1',
+			},
+			{
+				content: 'test 2',
+			},
+		];
+
+		expect( receiveAutosaves( postId, autosaves ) ).toEqual( {
+			type: 'RECEIVE_AUTOSAVES',
+			postId,
+			autosaves,
+		} );
+	} );
+
+	it( 'converts singular autosaves into an array', () => {
+		const postId = 1;
+		const autosave = {
+			content: 'test 1',
+		};
+
+		expect( receiveAutosaves( postId, autosave ) ).toEqual( {
+			type: 'RECEIVE_AUTOSAVES',
+			postId,
+			autosaves: [ autosave ],
+		} );
+	} );
+} );
+
+describe( 'receiveCurrentUser', () => {
+	it( 'builds an action object', () => {
+		const currentUser = { id: 1 };
+		expect( receiveCurrentUser( currentUser ) ).toEqual( {
+			type: 'RECEIVE_CURRENT_USER',
+			currentUser,
+		} );
 	} );
 } );

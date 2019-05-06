@@ -6,7 +6,6 @@
 
 ### New Feature
 
-- The `createNotice` can now optionally accept a WPNotice object as the sole argument.
 - New option `speak` enables control as to whether the notice content is announced to screen readers (defaults to `true`)
 
 ### Bug Fixes
