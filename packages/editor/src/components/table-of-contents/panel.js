@@ -13,35 +13,35 @@ import DocumentOutline from '../document-outline';
 function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, hasOutlineItemsDisabled, onRequestClose } ) {
 	return (
 		<>
-			<div
+			<ul
 				className="table-of-contents__counts"
 				role="note"
 				aria-label={ __( 'Document Statistics' ) }
 				tabIndex="0"
 			>
-				<div className="table-of-contents__count">
+				<li className="table-of-contents__count">
 					{ __( 'Words' ) }
 					<WordCount />
-				</div>
-				<div className="table-of-contents__count">
+				</li>
+				<li className="table-of-contents__count">
 					{ __( 'Headings' ) }
 					<span className="table-of-contents__number">
 						{ headingCount }
 					</span>
-				</div>
-				<div className="table-of-contents__count">
+				</li>
+				<li className="table-of-contents__count">
 					{ __( 'Paragraphs' ) }
 					<span className="table-of-contents__number">
 						{ paragraphCount }
 					</span>
-				</div>
-				<div className="table-of-contents__count">
+				</li>
+				<li className="table-of-contents__count">
 					{ __( 'Blocks' ) }
 					<span className="table-of-contents__number">
 						{ numberOfBlocks }
 					</span>
-				</div>
-			</div>
+				</li>
+			</ul>
 			{ headingCount > 0 && (
 				<>
 					<hr />
