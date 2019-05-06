@@ -27,7 +27,7 @@ const exists = ( filename ) => {
 // and files with a suffix of .test or .spec (e.g. blocks.test.js),
 // and deceitful source-like files, such as editor swap files.
 const isSourceFile = ( filename ) => {
-	return ! [ /\/(__tests__|test)\/.+.js$/, /.\.(spec|test)\.js$/ ].some( ( regex ) => regex.test( filename ) ) && /.\.(js|scss)$/.test( filename );
+	return ! [ /\/(__tests__|test)\/.+.js$/, /.\.(spec|test)\.js$/ ].some( ( regex ) => regex.test( filename ) ) && /.\.(js|json|scss)$/.test( filename );
 };
 
 const rebuild = ( filename ) => filesToBuild.set( filename, true );
