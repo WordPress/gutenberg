@@ -57,15 +57,15 @@ class VideoEdit extends React.Component {
 		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
-		this.onImagePressed = this.onImagePressed.bind( this );
+		this.updateMediaProgress = this.updateMediaProgress.bind( this );
+		this.onVideoPressed = this.onVideoPressed.bind( this );
 		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
 	}
 
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
-
-		if ( attributes.id && ! isURL( attributes.url ) ) {
-			if ( attributes.url && attributes.url.indexOf( 'file:' ) === 0 ) {
+		if ( attributes.id && ! isURL( attributes.src ) ) {
+			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
 				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
 						setAttributes( { url: mediaUri, id: mediaId } );
@@ -83,32 +83,43 @@ class VideoEdit extends React.Component {
 		}
 	}
 
-	onImagePressed() {
+	onVideoPressed() {
 		const { attributes } = this.props;
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( attributes.id );
-		} else if ( attributes.id && ! isURL( attributes.url ) ) {
+		} else if ( attributes.id && ! isURL( attributes.src ) ) {
 			requestImageFailedRetryDialog( attributes.id );
+		}
+	}
+
+	updateMediaProgress( payload ) {
+		const { setAttributes } = this.props;
+		if ( payload.mediaUrl ) {
+			setAttributes( { url: payload.mediaUrl } );
+		}
+
+		if ( ! this.state.isUploadInProgress ) {
+			this.setState( { isUploadInProgress: true } );
 		}
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
 		const { setAttributes } = this.props;
 		setAttributes( { src: payload.mediaUrl, id: payload.mediaServerId } );
-		this.setState( { isMediaRequested: false } );
+		this.setState( { isMediaRequested: false, isUploadInProgress: false } );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
 		const { setAttributes } = this.props;
 		setAttributes( { id: payload.mediaId } );
-		this.setState( { isMediaRequested: false } );
+		this.setState( { isMediaRequested: false, isUploadInProgress: false } );
 	}
 
 	mediaUploadStateReset( payload ) {
 		const { setAttributes } = this.props;
 		setAttributes( { id: payload.mediaId, src: null } );
-		this.setState( { isMediaRequested: false } );
+		this.setState( { isMediaRequested: false, isUploadInProgress: false } );
 	}
 
 	onSelectMediaUploadOption( mediaId, mediaUrl ) {
@@ -160,7 +171,7 @@ class VideoEdit extends React.Component {
 		}
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
+			<TouchableWithoutFeedback onPress={ this.onVideoPressed } disabled={ ! isSelected }>
 				<View style={ { flex: 1 } }>
 					<BlockControls>
 						{ toolbarEditButton }
@@ -176,6 +187,7 @@ class VideoEdit extends React.Component {
 						mediaId={ id }
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+						onUpdateMediaProgress={ this.updateMediaProgress }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( { isUploadInProgress, isUploadFailed, retryIconName, retryMessage } ) => {
 							const opacity = ( isUploadInProgress || isUploadFailed ) ? 0.3 : 1;
