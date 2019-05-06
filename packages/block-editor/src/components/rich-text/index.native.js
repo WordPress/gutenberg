@@ -543,7 +543,7 @@ export class RichText extends Component {
 		// when simply updating the active formats
 		// let's ignore this event in that case
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
-		if ( contentWithoutRootTag === this.value && start === 0 && end === 0 ) {
+		if ( this.lastEventCount === undefined && contentWithoutRootTag === this.value && start === 0 && end === 0 ) {
 			return;
 		}
 
@@ -594,6 +594,11 @@ export class RichText extends Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
+		if ( nextProps.value !== this.value ) {
+			this.value = this.props.value;
+			this.lastEventCount = undefined;
+		}
+
 		this.moveCaretToTheEndIfNeeded( nextProps );
 	}
 
@@ -681,10 +686,6 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( this.props.value !== this.value ) {
-			this.value = this.props.value;
-		}
-
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this._editor.focus();
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
