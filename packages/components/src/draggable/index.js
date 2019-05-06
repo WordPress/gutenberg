@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import {
+	invoke,
+	noop,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,7 +18,9 @@ const cloneHeightTransformationBreakpoint = 700;
 const clonePadding = 20;
 
 const isChromeUA = ( ) => /Chrome/i.test( window.navigator.userAgent );
-const documentHasIframes = ( ) => [ ...document.getElementById( 'editor' ).querySelectorAll( 'iframe' ) ].length > 0;
+const documentHasIframes = () => {
+	return !! invoke( document, [ 'body', 'querySelector' ], 'iframe' );
+};
 
 class Draggable extends Component {
 	constructor() {
