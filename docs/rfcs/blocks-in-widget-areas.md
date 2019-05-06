@@ -186,7 +186,9 @@ GET /wp/v2/widget-areas
 
 #### Response
 
-- Status: `200` if successful
+- Status:
+  - `200` if successful
+  - `403` if the authenticated user does not have the `'edit_theme_options'` cap
 - Body: A list of widget area resources
 
 ```json
@@ -231,6 +233,7 @@ GET /wp/v2/widget-areas/footer
 
 - Status:
   - `200` if successful
+  - `403` if the authenticated user does not have the `'edit_theme_options'` cap
   - `404` if requested widget area does not exist
 - Body: A single widget area resource
 
@@ -268,8 +271,9 @@ PUT /wp/v2/widget-areas/footer
 
 - Status:
   - `200` if successful
-  - `404` if specified widget area does not exist
   - `400` if request body is not a valid widget area resource
+  - `403` if the authenticated user does not have the `'edit_theme_options'` cap
+  - `404` if specified widget area does not exist
 - Body: The updated widget area resource
 
 ```json5
