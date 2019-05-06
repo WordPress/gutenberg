@@ -27,12 +27,12 @@ Use this plugin as you would other webpack plugins:
 
 ```js
 // webpack.config.js
-const WordPressExternalDependenciesPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 
 module.exports = {
   // …snip
   plugins: [
-    new WordPressExternalDependenciesPlugin(),
+    new DependencyExtractionWebpackPlugin(),
   ]
 }
 ```
@@ -83,7 +83,7 @@ An object can be passed to the constructor to customize the behavior, for exampl
 ```js
 module.exports = {
   plugins: [
-    new WordPressExternalDependenciesPlugin( { injectPolyfill: true } ),
+    new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
   ]
 }
 ```
@@ -134,7 +134,7 @@ function requestToExternal( request ) {
 
 module.exports = {
   plugins: [
-    new WordPressExternalDependenciesPlugin( { requestToExternal } ),
+    new DependencyExtractionWebpackPlugin( { requestToExternal } ),
   ]
 }
 ```
@@ -162,14 +162,14 @@ function requestToHandle( request ) {
 
   // Handle imports like `import myModule from 'my-module'`
   if ( request === 'my-module' ) {
-    // Expect to find `my-module` as myModule in the global scope:
+    // `my-module` depends on the script with the 'my-module-script-handle' handle.
     return 'my-module-script-handle';
   }
 }
 
 module.exports = {
   plugins: [
-    new WordPressExternalDependenciesPlugin( { requestToExternal } ),
+    new DependencyExtractionWebpackPlugin( { requestToExternal } ),
   ]
 }
 ```
