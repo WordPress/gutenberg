@@ -16,7 +16,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ```js
 import {
-	BlockEditorProvider
+	BlockEditorProvider,
 	BlockList
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';

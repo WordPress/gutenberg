@@ -120,6 +120,7 @@ class NavigableContainer extends Component {
 				{ children }
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

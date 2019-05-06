@@ -125,7 +125,7 @@ class ParagraphEdit extends Component {
 					isSelected={ this.props.isSelected }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
-					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
+					deleteEnter={ true }
 					style={ style }
 					onChange={ ( nextContent ) => {
 						setAttributes( {

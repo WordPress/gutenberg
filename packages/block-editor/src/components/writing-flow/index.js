@@ -284,7 +284,7 @@ class WritingFlow extends Component {
 		if ( ! isVertical ) {
 			this.verticalRect = null;
 		} else if ( ! this.verticalRect ) {
-			this.verticalRect = computeCaretRect( target );
+			this.verticalRect = computeCaretRect();
 		}
 
 		if ( isShift ) {
@@ -357,7 +357,7 @@ class WritingFlow extends Component {
 				/>
 			</div>
 		);
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
