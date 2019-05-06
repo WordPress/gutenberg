@@ -507,9 +507,10 @@ export class RichText extends Component {
 			const newColor = computedStyle.color
 				.replace( ')', ', 0.2)' )
 				.replace( 'rgb', 'rgba' );
+			const path = `[contenteditable]:focus ${ boundarySelector }`;
+			const rules = `{background-color: ${ newColor }}`;
 
-			globalStyle.innerHTML =
-				`*:focus ${ boundarySelector }{background-color: ${ newColor }}`;
+			globalStyle.innerHTML = path + rules;
 		}
 	}
 
