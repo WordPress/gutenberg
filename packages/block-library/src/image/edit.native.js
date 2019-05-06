@@ -98,24 +98,31 @@ class ImageEdit extends React.Component {
 		if ( payload.mediaUrl ) {
 			setAttributes( { url: payload.mediaUrl } );
 		}
+
+		if ( ! this.state.isUploadInProgress ) {
+			this.setState( { isUploadInProgress: true } );
+		}
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
+		this.setState( { isUploadInProgress: false } );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { id: payload.mediaId } );
+		this.setState( { isUploadInProgress: false } );
 	}
 
 	mediaUploadStateReset( payload ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { id: payload.mediaId, url: null } );
+		this.setState( { isUploadInProgress: false } );
 	}
 
 	updateAlt( newAlt ) {
