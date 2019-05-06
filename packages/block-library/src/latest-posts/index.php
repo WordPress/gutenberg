@@ -124,16 +124,16 @@ function register_block_core_latest_posts() {
 	register_block_type(
 		'core/latest-posts',
 		array(
-			'attributes' => array(
+			'attributes'      => array(
 				'align'                   => array(
-					'type'    => 'string',
-					'enum'    => array( 'left', 'center', 'right', 'wide', 'full' ),
+					'type' => 'string',
+					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
 				),
 				'className'               => array(
-					'type'    => 'string',
+					'type' => 'string',
 				),
 				'categories'              => array(
-					'type'    => 'string',
+					'type' => 'string',
 				),
 				'postsToShow'             => array(
 					'type'    => 'number',
