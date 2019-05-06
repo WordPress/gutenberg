@@ -42,19 +42,19 @@ you plan to extend the webpack configuration from `@wordpress/scripts` with your
 remove the default instance of the plugin:
 
 ```js
-const defaultConfig = require('@wordpress/scripts/config/webpack.config');
+const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 const config = {
   ...defaultConfig,
   plugins: [
     ...defaultConfig.plugins.filter(
       plugin => plugin.constructor.name !== 'DependencyExtractionWebpackPlugin',
     ),
-    new DependencyExtractionWebpackPlugin({
+    new DependencyExtractionWebpackPlugin( {
       injectPolyfill: true,
       requestToExternal(request) {
         /* My externals */
       },
-    }),
+    } ),
   ],
 };
 ```
