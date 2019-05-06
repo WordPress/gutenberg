@@ -27,32 +27,30 @@ import {
 const blockAttributes = {
 	url: {
 		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'href',
 	},
-	title: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'title',
+	id: {
+		type: 'number',
 	},
-	text: {
-		type: 'string',
-		source: 'html',
-		selector: 'a',
+	hasParallax: {
+		type: 'boolean',
+		default: false,
 	},
-	backgroundColor: {
+	dimRatio: {
+		type: 'number',
+		default: 50,
+	},
+	overlayColor: {
 		type: 'string',
 	},
-	textColor: {
+	customOverlayColor: {
 		type: 'string',
 	},
-	customBackgroundColor: {
+	backgroundType: {
 		type: 'string',
+		default: 'image',
 	},
-	customTextColor: {
-		type: 'string',
+	focalPoint: {
+		type: 'object',
 	},
 };
 
@@ -184,26 +182,46 @@ const deprecated = [
 				</div>
 			);
 		},
+		migrate( attributes ) {
+			return [
+				omit( attributes, [ 'title', 'contentAlign', 'align' ] ),
+				[
+					createBlock(
+						'core/paragraph',
+						{
+							content: attributes.title,
+							align: attributes.contentAlign,
+							fontSize: 'large',
+							placeholder: __( 'Write title…' ),
+						}
+					),
+				],
+			];
+		},
 	}, {
 		attributes: {
 			...blockAttributes,
-			align: {
-				type: 'string',
-			},
 			title: {
 				type: 'string',
 				source: 'html',
 				selector: 'h2',
+			},
+			align: {
+				type: 'string',
 			},
 			contentAlign: {
 				type: 'string',
 				default: 'center',
 			},
 		},
+		supports: {
+			className: false,
+		},
 		save( { attributes } ) {
 			const { url, title, hasParallax, dimRatio, align } = attributes;
 			const style = backgroundImageStyles( url );
 			const classes = classnames(
+				'wp-block-cover-image',
 				dimRatioToClass( dimRatio ),
 				{
 					'has-background-dim': dimRatio !== 0,
@@ -217,6 +235,22 @@ const deprecated = [
 					<RichText.Content tagName="h2" value={ title } />
 				</section>
 			);
+		},
+		migrate( attributes ) {
+			return [
+				omit( attributes, [ 'title', 'contentAlign', 'align' ] ),
+				[
+					createBlock(
+						'core/paragraph',
+						{
+							content: attributes.title,
+							align: attributes.contentAlign,
+							fontSize: 'large',
+							placeholder: __( 'Write title…' ),
+						}
+					),
+				],
+			];
 		},
 	},
 ];
