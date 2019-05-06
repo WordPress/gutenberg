@@ -2,10 +2,11 @@
  * Node dependencies
  */
 const { camelCase, nth, upperFirst } = require( 'lodash' );
-
 const fs = require( 'fs' );
+const glob = require( 'glob' ).sync;
 
 const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/master`;
+const componentPaths = glob( 'packages/components/src/*/**/README.md' );
 
 /**
  * Generates the package manifest.
@@ -29,12 +30,12 @@ function getPackageManifest( packageFolderNames ) {
 /**
  * Generates the components manifest.
  *
- * @param {Array} componentPaths Paths for all components
+ * @param {Array} paths Paths for all components
  *
  * @return {Array} Manifest
  */
-function getComponentManifest( componentPaths ) {
-	return componentPaths.map( ( filePath ) => {
+function getComponentManifest( paths ) {
+	return paths.map( ( filePath ) => {
 		const slug = nth( filePath.split( '/' ), -2 );
 		return {
 			title: upperFirst( camelCase( slug ) ),
@@ -79,6 +80,8 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 		} );
 		if ( Array.isArray( children ) && children.length ) {
 			pageItems = pageItems.concat( generateRootManifestFromTOCItems( children, slug ) );
+		} else if ( children === '{{components}}' ) {
+			pageItems = pageItems.concat( getComponentManifest( componentPaths ) );
 		}
 	} );
 	return pageItems;
@@ -86,6 +89,5 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 
 module.exports = {
 	getPackageManifest,
-	getComponentManifest,
 	getRootManifest,
 };

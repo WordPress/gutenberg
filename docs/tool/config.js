@@ -5,7 +5,6 @@ const glob = require( 'glob' ).sync;
 const path = require( 'path' );
 
 module.exports = {
-	componentPaths: glob( 'packages/components/src/*/**/README.md' ),
 	packageFileNames: glob( 'packages/*/package.json' )
 		.map( ( fileName ) => fileName.split( '/' )[ 1 ] ),
 
