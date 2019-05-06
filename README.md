@@ -63,13 +63,29 @@ yarn android
 
 The app should now open in a connected device or a running emulator and fetch the JavaScript code from the running packager.
 
-To compile and run the iOS variant of the app, use:
+To compile and run the iOS variant of the app using the _default_ simulator device, use:
 
 ```
 yarn ios
 ```
 
 which will attempt to open your app in the iOS Simulator if you're on a Mac and have it installed.
+
+### Running on Other iOS Device Simulators
+
+To compile and run the app using a different device simulator, use:
+
+```
+yarn ios --simulator="DEVICE_NAME"
+```
+
+For example, if you'd like to run in an iPhone Xs Max, try:
+
+```
+yarn ios --simulator="iPhone Xs Max"
+```
+
+To see a list of all of your available iOS devices, use `xcrun simctl list devices`.
 
 ### When things seem crazy
 
