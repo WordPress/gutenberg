@@ -583,12 +583,12 @@ class FormTokenField extends Component {
 						/>
 					) }
 				</div>
-				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className="components-form-token-field__help">
+				<p id={ `components-form-token-suggestions-howto-${ instanceId }` } className="components-form-token-field__help">
 					{ this.props.tokenizeOnSpace ?
-						__( 'Separate using commas, spaces or the enter key' ) :
-						__( 'Separate using commas or the enter key' )
+						__( 'Separate using commas, spaces, or the Enter key' ) :
+						__( 'Separate using commas or the Enter key' )
 					}
-				</div>
+				</p>
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
