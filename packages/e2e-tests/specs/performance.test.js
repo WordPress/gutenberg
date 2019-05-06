@@ -17,7 +17,7 @@ function readFile( filePath ) {
 	return existsSync( filePath ) ? readFileSync( filePath, 'utf8' ).trim() : '';
 }
 
-describe( 'Performance', async () => {
+describe( 'Performance', () => {
 	it( '1000 paragraphs', async () => {
 		const html = readFile( join( __dirname, '../assets/neuralink.html' ) );
 
