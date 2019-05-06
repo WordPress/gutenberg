@@ -56,7 +56,7 @@ export default compose( [
 
 		const blocksSelection = getBlocksByClientId( clientIds );
 
-		const isSingleContainerBlock = blocksSelection.length === 1 && blocksSelection[ 0 ].name === 'core/group';
+		const isSingleContainerBlock = blocksSelection.length === 1 && blocksSelection[ 0 ] && blocksSelection[ 0 ].name === 'core/group';
 
 		// Do we have one or more blocks selected
 		// (we allow single Blocks to become groups unless
