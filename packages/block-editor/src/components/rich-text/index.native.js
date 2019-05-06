@@ -681,6 +681,10 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		if ( this.props.value !== this.value ) {
+			this.value = this.props.value;
+		}
+
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this._editor.focus();
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
