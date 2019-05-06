@@ -71,9 +71,9 @@ yarn ios
 
 which will attempt to open your app in the iOS Simulator if you're on a Mac and have it installed.
 
-### Running on Other iOS Devices
+### Running on Other iOS Device Simulators
 
-To compile and run the app using a different device, open the target device in Xcode by going to `Hardware > Device`, then use:
+To compile and run the app using a different device simulator, use:
 
 ```
 yarn ios --simulator="DEVICE_NAME"
