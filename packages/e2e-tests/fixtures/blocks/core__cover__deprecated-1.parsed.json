@@ -6,9 +6,9 @@
             "id": 34
         },
         "innerBlocks": [],
-        "innerHTML": "\n<section class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\"><h2><strong>Cover <br/>Image</strong></h2></section>\n",
+        "innerHTML": "\n<section class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\"><h2><strong>Cover Image</strong></h2></section>\n",
         "innerContent": [
-            "\n<section class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\"><h2><strong>Cover <br/>Image</strong></h2></section>\n"
+            "\n<section class=\"wp-block-cover-image has-background-dim\" style=\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\"><h2><strong>Cover Image</strong></h2></section>\n"
         ]
     },
     {

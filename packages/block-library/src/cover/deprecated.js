@@ -201,23 +201,27 @@ const deprecated = [
 	}, {
 		attributes: {
 			...blockAttributes,
-			align: {
-				type: 'string',
-			},
 			title: {
 				type: 'string',
 				source: 'html',
 				selector: 'h2',
+			},
+			align: {
+				type: 'string',
 			},
 			contentAlign: {
 				type: 'string',
 				default: 'center',
 			},
 		},
+		supports: {
+			className: false,
+		},
 		save( { attributes } ) {
 			const { url, title, hasParallax, dimRatio, align } = attributes;
 			const style = backgroundImageStyles( url );
 			const classes = classnames(
+				'wp-block-cover-image',
 				dimRatioToClass( dimRatio ),
 				{
 					'has-background-dim': dimRatio !== 0,
@@ -231,6 +235,22 @@ const deprecated = [
 					<RichText.Content tagName="h2" value={ title } />
 				</section>
 			);
+		},
+		migrate( attributes ) {
+			return [
+				omit( attributes, [ 'title', 'contentAlign', 'align' ] ),
+				[
+					createBlock(
+						'core/paragraph',
+						{
+							content: attributes.title,
+							align: attributes.contentAlign,
+							fontSize: 'large',
+							placeholder: __( 'Write title…' ),
+						}
+					),
+				],
+			];
 		},
 	},
 ];
