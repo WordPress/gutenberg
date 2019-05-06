@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Block Grouping creates a group from multiple blocks of different types via block transforms 1`] = `
+exports[`Block Grouping Group creation creates a group from multiple blocks of different types via block transforms 1`] = `
 "<!-- wp:group -->
 <div class=\\"wp-block-group\\"><!-- wp:heading -->
 <h2>Group Heading</h2>
@@ -16,7 +16,7 @@ exports[`Block Grouping creates a group from multiple blocks of different types 
 <!-- /wp:group -->"
 `;
 
-exports[`Block Grouping creates a group from multiple blocks of different types via options toolbar 1`] = `
+exports[`Block Grouping Group creation creates a group from multiple blocks of different types via options toolbar 1`] = `
 "<!-- wp:group -->
 <div class=\\"wp-block-group\\"><!-- wp:heading -->
 <h2>Group Heading</h2>
@@ -32,7 +32,7 @@ exports[`Block Grouping creates a group from multiple blocks of different types 
 <!-- /wp:group -->"
 `;
 
-exports[`Block Grouping creates a group from multiple blocks of the same type via block transforms 1`] = `
+exports[`Block Grouping Group creation creates a group from multiple blocks of the same type via block transforms 1`] = `
 "<!-- wp:group -->
 <div class=\\"wp-block-group\\"><!-- wp:paragraph -->
 <p>First Paragraph</p>
@@ -48,7 +48,7 @@ exports[`Block Grouping creates a group from multiple blocks of the same type vi
 <!-- /wp:group -->"
 `;
 
-exports[`Block Grouping creates a group from multiple blocks of the same type via options toolbar 1`] = `
+exports[`Block Grouping Group creation creates a group from multiple blocks of the same type via options toolbar 1`] = `
 "<!-- wp:group -->
 <div class=\\"wp-block-group\\"><!-- wp:paragraph -->
 <p>First Options Paragraph</p>
@@ -62,4 +62,48 @@ exports[`Block Grouping creates a group from multiple blocks of the same type vi
 <p>Third Options  Paragraph</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->"
+`;
+
+exports[`Block Grouping Keyboard shortcuts groups using keyboard shortcut 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><!-- wp:heading -->
+<h2>Group Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Some paragraph</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Block Grouping Keyboard shortcuts ungroups using keyboard shortcut 1`] = `
+"<!-- wp:heading -->
+<h2>Group Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Some paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Block Grouping Ungrouping ungroups an existing group via options menu 1`] = `
+"<!-- wp:heading -->
+<h2>Group Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Some paragraph</p>
+<!-- /wp:paragraph -->"
 `;
