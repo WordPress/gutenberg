@@ -37,6 +37,28 @@ module.exports = {
 }
 ```
 
+**Note:** Multiple instances of the plugin are not supported and may produced unexpected results. If
+you plan to extend the webpack configuration from `@wordpress/scripts` with your own `DependencyExtractionWebpackPlugin`, be sure to
+remove the default instance of the plugin:
+
+```js
+const defaultConfig = require('@wordpress/scripts/config/webpack.config');
+const config = {
+  ...defaultConfig,
+  plugins: [
+    ...defaultConfig.plugins.filter(
+      plugin => plugin.constructor.name !== 'DependencyExtractionWebpackPlugin',
+    ),
+    new DependencyExtractionWebpackPlugin({
+      injectPolyfill: true,
+      requestToExternal(request) {
+        /* My externals */
+      },
+    }),
+  ],
+};
+```
+
 Each entrypoint in the webpack bundle will include JSON file that declares the WordPress script dependencies that should be enqueued.
 
 For example:
