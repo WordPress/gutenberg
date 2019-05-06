@@ -22,7 +22,7 @@ Adding blocks to widget-editing areas was first announced at WCUS 2018, is a [Gu
 
 A _widget_ is an element in a WordPress site that displays some content. Widgets generally display the same content regardless of what post or page the user is viewing.
 
-A _widget area_ is an area in a WordPress site where widgets can be placed. The active theme defines how many widget areas there are, where they appear, and what they are called.
+A [_widget area_][widget-area] is an area in a WordPress site where widgets can be placed. The active theme defines how many widget areas there are, where they appear, and what they are called.
 
 Regular widgets can only be placed **once** into a widget area. A _multi widget_, however, can be placed several times into a widget area. When a multi widget is used several times, each usage is called an _instance_.
 
@@ -30,6 +30,7 @@ Because many WordPress themes place widgets into a sidebar column, widget areas 
 
 **For more terminology and a detailed overview of how widgets _currently_ work in WordPress, see [#14182][14182].**
 
+[widget-area]: https://codex.wordpress.org/Widgetizing_Themes#How_to_display_new_Widget_Areas
 [14182]: https://github.com/WordPress/gutenberg/issues/14182
 
 ## Prior reading
