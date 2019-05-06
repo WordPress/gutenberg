@@ -463,7 +463,7 @@ class ImageEdit extends Component {
 			);
 		}
 
-		const classNameWithoutSize = className.replace( /size-(.*)/, '' );
+		const classNameWithoutSize = className.replace( /size-(.*) /, '' );
 		const classes = classnames( classNameWithoutSize, {
 			'is-transient': isBlobURL( url ),
 			'is-resized': !! width || !! height,
