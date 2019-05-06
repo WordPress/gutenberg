@@ -10,7 +10,7 @@ import { withSelect } from '@wordpress/data';
  */
 import ConvertToGroupButton from './convert-button';
 
-function ReusableBlocksButtons( { clientIds } ) {
+function ConvertToGroupButtons( { clientIds } ) {
 	return (
 		<__experimentalBlockSettingsMenuPluginsExtension>
 			{ ( { onClose } ) => (
@@ -30,4 +30,4 @@ export default withSelect( ( select ) => {
 	return {
 		clientIds: getSelectedBlockClientIds(),
 	};
-} )( ReusableBlocksButtons );
+} )( ConvertToGroupButtons );
