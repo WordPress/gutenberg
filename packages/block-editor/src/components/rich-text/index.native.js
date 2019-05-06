@@ -516,18 +516,34 @@ export class RichText extends Component {
 	}
 
 	onSelectionChange( start, end ) {
+		// onSelectionChange should not be emitted when we're simply typing, but Aztec does emit it
+		// Let's try to detect typing with a simple hack:
+		const noChange = this.selectionStart === start && this.selectionEnd === end;
+		const isTyping = this.selectionStart + 1 === start;
+		const shouldKeepFormats = noChange || isTyping;
+
 		this.selectionStart = start;
 		this.selectionEnd = end;
 
-		const value = this.createRecord();
-		const activeFormats = getActiveFormats( value );
-		this.setState( { activeFormats } );
+		if ( ! shouldKeepFormats ) {
+			const value = this.createRecord();
+			const activeFormats = getActiveFormats( value );
+			this.setState( { activeFormats } );
+		}
 
 		this.props.onSelectionChange( start, end );
 	}
 
 	onSelectionChangeFromAztec( start, end, text, event ) {
 		if ( ! this.props.isSelected ) {
+			return;
+		}
+
+		// AztecEditor-Android may emit a selection change event with 0,0
+		// when simply updating the active formats
+		// let's ignore this event in that case
+		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
+		if ( contentWithoutRootTag === this.value && start === 0 && end === 0 ) {
 			return;
 		}
 
