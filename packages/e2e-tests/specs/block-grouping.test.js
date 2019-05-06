@@ -9,6 +9,7 @@ import {
 	getEditedPostContent,
 	transformBlockTo,
 	getAllBlocks,
+	getAvailableBlockTransforms,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Block Grouping', () => {
@@ -171,6 +172,56 @@ describe( 'Block Grouping', () => {
 
 			expect( allBlocks[ 0 ].name ).not.toBe( 'core/group' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+	} );
+
+	describe( 'Container Block availability', () => {
+		it( 'does not show group transform if container block is disabled', async () => {
+			// Disable the Group block
+			await page.evaluate( () => {
+				const { dispatch } = wp.data;
+				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/group' ] );
+			} );
+
+			// Create a Group
+			await insertBlock( 'Heading' );
+			await page.keyboard.type( 'Group Heading' );
+			await insertBlock( 'Image' );
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'Some paragraph' );
+			await pressKeyWithModifier( 'primary', 'a' );
+			await pressKeyWithModifier( 'primary', 'a' );
+
+			const availableTransforms = await getAvailableBlockTransforms();
+
+			expect(
+				availableTransforms
+			).not.toEqual( expect.arrayContaining( [
+				'Group',
+			] ) );
+		} );
+
+		it( 'does not show group option in the options toolbar if container block is disabled ', async () => {
+			// Disable the Group block
+			await page.evaluate( () => {
+				const { dispatch } = wp.data;
+				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/group' ] );
+			} );
+
+			// Create a Group
+			await insertBlock( 'Heading' );
+			await page.keyboard.type( 'Group Heading' );
+			await insertBlock( 'Image' );
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'Some paragraph' );
+			await pressKeyWithModifier( 'primary', 'a' );
+			await pressKeyWithModifier( 'primary', 'a' );
+
+			await clickBlockToolbarButton( 'More options' );
+
+			const blockOptionsDropdownHTML = await page.evaluate( () => document.querySelector( '.block-editor-block-settings-menu__content' ).innerHTML );
+
+			expect( blockOptionsDropdownHTML ).not.toContain( 'Group' );
 		} );
 	} );
 } );

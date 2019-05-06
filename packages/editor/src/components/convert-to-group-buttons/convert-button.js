@@ -52,16 +52,22 @@ export default compose( [
 	withSelect( ( select, { clientIds } ) => {
 		const {
 			getBlocksByClientId,
+			canInsertBlockType,
 		} = select( 'core/block-editor' );
+
+		const containerBlockAvailable = canInsertBlockType( 'core/group' );
 
 		const blocksSelection = getBlocksByClientId( clientIds );
 
 		const isSingleContainerBlock = blocksSelection.length === 1 && blocksSelection[ 0 ] && blocksSelection[ 0 ].name === 'core/group';
 
-		// Do we have one or more blocks selected
+		// Do we have
+		// 1. Container block available to be inserted?
+		// 2. One or more blocks selected
 		// (we allow single Blocks to become groups unless
 		// they are a soltiary group block themselves)
 		const isGroupable = (
+			containerBlockAvailable &&
 			blocksSelection.length &&
 			! isSingleContainerBlock
 		);
