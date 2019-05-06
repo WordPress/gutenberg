@@ -330,24 +330,13 @@ The `'sidebars_widgets'` is _demigrated_ when the Gutenberg plugin is deactivate
 
 ## Backwards Compatibility
 
-### `wp_get_sidebars_widgets()`
+### `wp_get_sidebars_widgets()`, `wp_set_sidebars_widgets()`, and the `'sidebars_widgets'` filter
 
-[`wp_get_sidebars_widgets()`][wp_get_sidebars_widgets] can now potentially return an associative array that maps strings to integers. This differs from the current behaviour which is to always return an associative array that maps strings to arrays.
-
-Since `wp_get_sidebars_widgets()` is marked `@private`, no effort is made to ensure backwards compatibility beyond incrementing the `'array_version'` field from `3` to `4`.
-
-The same goes for [`wp_set_sidebars_widgets()`][wp_set_sidebars_widgets] and `get_option( 'sidebars_widgets' )`.
-
-[wp_get_sidebars_widgets]: https://developer.wordpress.org/reference/functions/wp_get_sidebars_widgets/
-[wp_set_sidebars_widgets]: https://developer.wordpress.org/reference/functions/wp_set_sidebars_widgets/
-
-### `'sidebars_widgets'` filter
-
-The [`'sidebars_widgets'` filter][sidebars_widgets] remains as-is and is passed an associative array that maps widget area identifiers to an an array of widget identifiers.
+[`wp_get_sidebars_widgets()`][wp_get_sidebars_widgets], [`wp_set_sidebars_widgets()`][wp_set_sidebars_widgets] and the [`'sidebars_widgets'` filter][sidebars_widgets] all remain as-is and continue to accept or produce an associative array that maps widget area identifiers to an array of widget identifiers.
 
 To do this, sequences of blocks in a widget area will be converted into dynamically registered _blocks widgets_ which outputs the blocks in that sequence.
 
-To illustrate, let's say that the `'footer'` widget area has been migrated.
+To illustrate, let's say that there is a `'footer'` widget area.
 
 ```php
 array(
@@ -365,17 +354,7 @@ The referenced `wp_area` contains some blocks and a legacy widget in its `post_c
 <!-- wp:paragraph --><p>Welcome to my cool website!</p><!-- /wp:paragraph -->
 ```
 
-Now, let's take a look at what the `'sidebars_widgets'` filter receives.
-
-```php
-function my_sidebars_widgets_filter( $sidebars_widgets ) {
-	var_dump( $sidebars_widgets );
-	return $sidebars_widgets;
-}
-add_filter( 'sidebars_widgets', 'my_sidebars_widgets_filter' );
-```
-
-We receive an array that contains three widgets.
+Now, let's take a look at what `'wp_get_sidebars_widgets()'` returns.
 
 ```php
 array(
@@ -390,6 +369,8 @@ array(
 
 The first `wp-blocks-{hash}` widget is a dynamically registered widget that outputs a paragraph, and the second outputs a separator and a paragraph.
 
+[wp_get_sidebars_widgets]: https://developer.wordpress.org/reference/functions/wp_get_sidebars_widgets/
+[wp_set_sidebars_widgets]: https://developer.wordpress.org/reference/functions/wp_set_sidebars_widgets/
 [sidebars_widgets]: https://developer.wordpress.org/reference/hooks/sidebars_widgets/
 
 ### `dynamic_sidebar()`
