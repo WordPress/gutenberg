@@ -9,7 +9,7 @@ import { Switch, Platform } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { BottomSheet } from '@wordpress/block-editor';
+import { BottomSheet } from '@wordpress-mobile/components';
 import { prependHTTP } from '@wordpress/url';
 import {
 	withSpokenMessages,

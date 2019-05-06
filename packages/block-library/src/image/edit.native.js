@@ -29,9 +29,11 @@ import {
 	RichText,
 	BlockControls,
 	InspectorControls,
+} from '@wordpress/block-editor';
+import {
 	BottomSheet,
 	Picker,
-} from '@wordpress/block-editor';
+} from '@wordpress-mobile/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';

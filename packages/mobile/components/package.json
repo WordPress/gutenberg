@@ -1,0 +1,24 @@
+{
+	"name": "@wordpress-mobile/components",
+	"version": "1.0.0",
+	"description": "React Native components for WordPress mobile apps",
+	"repository": "git+https://github.com/WordPress/gutenberg.git",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"mobile",
+		"react-native"
+	],
+	"main": "src/index",
+	"react-native": "src/index",
+	"dependencies": {
+		"@wordpress/components": "file:../components",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"react": "16.8.3",
+		"react-native": "^0.59.3",
+		"react-native-modal": "^6.5.0",
+		"react-native-safe-area": "^0.5.0"
+	}
+}
