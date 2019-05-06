@@ -107,6 +107,7 @@ The REST API is built around a single resource object: the widget area.
 			</form>
 		",
 	},
+	"is_active": true,
 }
 ```
 
@@ -171,9 +172,24 @@ The rendered HTML content of the widget area. Contains only rendered block marku
 
 [dynamic_sidebar]: https://developer.wordpress.org/reference/functions/dynamic_sidebar/
 
+#### `is_active`
+
+- Type: `boolean`
+- Access: Read-only
+
+```json
+{ "is_active": true }
+```
+
+Indicates whether or not the widget area is active.
+
+A widget area is _active_ if the theme has registered it using [`register_sidebar()`][register_sidebar]. A widget area is _inactive_ if the theme has not registered it **and** the area contains some content. Inactive widget areas typically occur when the user switches theme.
+
+[register_sidebar]: https://developer.wordpress.org/reference/functions/register_sidebar/
+
 ### Fetching all widget areas
 
-Fetches all registered widget areas.
+Fetches all widget areas.
 
 #### Request
 
@@ -201,6 +217,7 @@ GET /wp/v2/widget-areas
 			"raw": "<!-- wp:paragraph --><p>Hello there!</p><!-- /wp:paragraph -->",
 			"rendered": "<p>Hello there!</p>"
 		},
+		"is_active": true,
 	},
 	{
 		"id": "sidebar",
@@ -210,13 +227,14 @@ GET /wp/v2/widget-areas
 			"raw": "<!-- wp:paragraph --><p>Hello there!</p><!-- /wp:paragraph -->",
 			"rendered": "<p>Hello there!</p>"
 		},
+		"is_active": true,
 	}
 ]
 ```
 
 ### Fetching a single widget area
 
-Fetches a single registered widget area by its ID.
+Fetches a single widget area by its ID.
 
 #### Request
 
@@ -246,12 +264,13 @@ GET /wp/v2/widget-areas/footer
 		"raw": "<!-- wp:paragraph --><p>Hello there!</p><!-- /wp:paragraph -->",
 		"rendered": "<p>Hello there!</p>"
 	},
+	"is_active": true,
 }
 ```
 
 ### Updating a single widget area
 
-Updates the blocks in a single registered widget area.
+Updates the blocks in a single widget area.
 
 #### Request
 
@@ -285,6 +304,7 @@ PUT /wp/v2/widget-areas/footer
 		"raw": "<!-- wp:block {\"ref\":123} /-->",
 		"rendered": "<p>This is a reusable paragraph block</p>"
 	},
+	"is_active": true,
 }
 ```
 
