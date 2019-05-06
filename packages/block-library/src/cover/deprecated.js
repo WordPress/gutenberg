@@ -182,6 +182,22 @@ const deprecated = [
 				</div>
 			);
 		},
+		migrate( attributes ) {
+			return [
+				omit( attributes, [ 'title', 'contentAlign', 'align' ] ),
+				[
+					createBlock(
+						'core/paragraph',
+						{
+							content: attributes.title,
+							align: attributes.contentAlign,
+							fontSize: 'large',
+							placeholder: __( 'Write title…' ),
+						}
+					),
+				],
+			];
+		},
 	}, {
 		attributes: {
 			...blockAttributes,
