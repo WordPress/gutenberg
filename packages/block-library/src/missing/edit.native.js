@@ -10,7 +10,7 @@ import { Icon } from '@wordpress/components';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -25,7 +25,20 @@ export default class UnsupportedBlockEdit extends Component {
 		const icon = blockType ? normalizeIconObject( blockType.settings.icon ) : 'admin-plugins';
 
 		return (
-			<View style={ styles.unsupportedBlock }>
+			<View style={ styles.unsupportedBlock }
+				accessible={ true }
+				accessibilityLabel={
+					blockType ?
+						sprintf(
+							/* translators: accessibility text. %s: unsupported block type. */
+							__( 'Unsupported block: %s.' ),
+							title
+						) :
+						/* translators: accessibility text. */
+						__( 'Unsupported block.' )
+				}
+				onAccessibilityTap={ this.props.onFocus }
+			>
 				<Icon className="unsupported-icon" icon={ icon && icon.src ? icon.src : icon } />
 				<Text style={ styles.unsupportedBlockMessage }>{ title }</Text>
 			</View>
