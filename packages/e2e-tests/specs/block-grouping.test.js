@@ -12,6 +12,27 @@ import {
 	getAvailableBlockTransforms,
 } from '@wordpress/e2e-test-utils';
 
+async function insertBlocksOfSameType() {
+	await insertBlock( 'Paragraph' );
+	await page.keyboard.type( 'First Paragraph' );
+
+	await insertBlock( 'Paragraph' );
+	await page.keyboard.type( 'Second Paragraph' );
+
+	await insertBlock( 'Paragraph' );
+	await page.keyboard.type( 'Third Paragraph' );
+}
+
+async function insertBlocksOfMultipleTypes() {
+	await insertBlock( 'Heading' );
+	await page.keyboard.type( 'Group Heading' );
+
+	await insertBlock( 'Image' );
+
+	await insertBlock( 'Paragraph' );
+	await page.keyboard.type( 'Some paragraph' );
+}
+
 describe( 'Block Grouping', () => {
 	beforeAll( async () => {
 		await createNewPost();
@@ -29,14 +50,7 @@ describe( 'Block Grouping', () => {
 	describe( 'Group creation', () => {
 		it( 'creates a group from multiple blocks of the same type via block transforms', async () => {
 			// Creating test blocks
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'First Paragraph' );
-
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Second Paragraph' );
-
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Third Paragraph' );
+			await insertBlocksOfSameType();
 
 			// Multiselect via keyboard.
 			await pressKeyWithModifier( 'primary', 'a' );
@@ -49,13 +63,7 @@ describe( 'Block Grouping', () => {
 
 		it( 'creates a group from multiple blocks of different types via block transforms', async () => {
 			// Creating test blocks
-			await insertBlock( 'Heading' );
-			await page.keyboard.type( 'Group Heading' );
-
-			await insertBlock( 'Image' );
-
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Some paragraph' );
+			await insertBlocksOfMultipleTypes();
 
 			// Multiselect via keyboard.
 			await pressKeyWithModifier( 'primary', 'a' );
@@ -68,14 +76,7 @@ describe( 'Block Grouping', () => {
 
 		it( 'creates a group from multiple blocks of the same type via options toolbar', async () => {
 			// Creating test blocks
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'First Options Paragraph' );
-
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Second Options  Paragraph' );
-
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Third Options  Paragraph' );
+			await insertBlocksOfSameType();
 
 			// Multiselect via keyboard.
 			await pressKeyWithModifier( 'primary', 'a' );
@@ -91,13 +92,7 @@ describe( 'Block Grouping', () => {
 
 		it( 'creates a group from multiple blocks of different types via options toolbar', async () => {
 			// Creating test blocks
-			await insertBlock( 'Heading' );
-			await page.keyboard.type( 'Group Heading' );
-
-			await insertBlock( 'Image' );
-
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Some paragraph' );
+			await insertBlocksOfMultipleTypes();
 
 			// Multiselect via keyboard.
 			await pressKeyWithModifier( 'primary', 'a' );
@@ -115,11 +110,7 @@ describe( 'Block Grouping', () => {
 	describe( 'Ungrouping', () => {
 		it( 'ungroups an existing group via options menu', async () => {
 			// Create a Group
-			await insertBlock( 'Heading' );
-			await page.keyboard.type( 'Group Heading' );
-			await insertBlock( 'Image' );
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Some paragraph' );
+			await insertBlocksOfMultipleTypes();
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 			await transformBlockTo( 'Group' );
@@ -136,11 +127,7 @@ describe( 'Block Grouping', () => {
 
 	describe( 'Keyboard shortcuts', () => {
 		it( 'groups using keyboard shortcut', async () => {
-			await insertBlock( 'Heading' );
-			await page.keyboard.type( 'Group Heading' );
-			await insertBlock( 'Image' );
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Some paragraph' );
+			await insertBlocksOfMultipleTypes();
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 			await transformBlockTo( 'Group' );
@@ -156,11 +143,7 @@ describe( 'Block Grouping', () => {
 
 		it( 'ungroups using keyboard shortcut', async () => {
 			// Create a Group
-			await insertBlock( 'Heading' );
-			await page.keyboard.type( 'Group Heading' );
-			await insertBlock( 'Image' );
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Some paragraph' );
+			await insertBlocksOfMultipleTypes();
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 			await transformBlockTo( 'Group' );
@@ -186,11 +169,7 @@ describe( 'Block Grouping', () => {
 
 		beforeEach( async () => {
 			// Create a Group
-			await insertBlock( 'Heading' );
-			await page.keyboard.type( 'Group Heading' );
-			await insertBlock( 'Image' );
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Some paragraph' );
+			await insertBlocksOfMultipleTypes();
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 		} );

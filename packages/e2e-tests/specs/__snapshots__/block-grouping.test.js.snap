@@ -51,15 +51,15 @@ exports[`Block Grouping Group creation creates a group from multiple blocks of t
 exports[`Block Grouping Group creation creates a group from multiple blocks of the same type via options toolbar 1`] = `
 "<!-- wp:group -->
 <div class=\\"wp-block-group\\"><!-- wp:paragraph -->
-<p>First Options Paragraph</p>
+<p>First Paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second Options  Paragraph</p>
+<p>Second Paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third Options  Paragraph</p>
+<p>Third Paragraph</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->"
 `;
