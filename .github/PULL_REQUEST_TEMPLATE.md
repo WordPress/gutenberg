@@ -20,3 +20,4 @@
 - [ ] My code follows the accessibility standards. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/coding-standards/accessibility-coding-standards/ -->
 - [ ] My code has proper inline documentation. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/ -->
 - [ ] I've included developer documentation if appropriate. <!-- Handbook: https://wordpress.org/gutenberg/handbook/designers-developers/ -->
+- [ ] I've updated all `.native.js` files affected by refactorings/renamings (if any) in this PR.
