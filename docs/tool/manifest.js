@@ -7,6 +7,9 @@ const glob = require( 'glob' ).sync;
 
 const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/master`;
 const componentPaths = glob( 'packages/components/src/*/**/README.md' );
+const packagePaths = glob( 'packages/*/package.json' ).map(
+	( fileName ) => fileName.split( '/' )[ 1 ]
+);
 
 /**
  * Generates the package manifest.
@@ -82,12 +85,13 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 			pageItems = pageItems.concat( generateRootManifestFromTOCItems( children, slug ) );
 		} else if ( children === '{{components}}' ) {
 			pageItems = pageItems.concat( getComponentManifest( componentPaths ) );
+		} else if ( children === '{{packages}}' ) {
+			pageItems = pageItems.concat( getPackageManifest( packagePaths ) );
 		}
 	} );
 	return pageItems;
 }
 
 module.exports = {
-	getPackageManifest,
 	getRootManifest,
 };
