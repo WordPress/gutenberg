@@ -82,18 +82,17 @@ class ModalLinkUI extends Component {
 			opensInNewWindow,
 			text: linkText,
 		} );
-		const placeholderFormats = ( value.formatPlaceholder && value.formatPlaceholder.formats ) || [];
 
 		if ( isCollapsed( value ) && ! isActive ) { // insert link
-			const toInsert = applyFormat( create( { text: linkText } ), [ ...placeholderFormats, format ], 0, linkText.length );
+			const toInsert = applyFormat( create( { text: linkText } ), format, 0, linkText.length );
 			const newAttributes = insert( value, toInsert );
 			onChange( { ...newAttributes, needsSelectionUpdate: true } );
 		} else if ( text !== getTextContent( slice( value ) ) ) { // edit text in selected link
-			const toInsert = applyFormat( create( { text } ), [ ...placeholderFormats, format ], 0, text.length );
+			const toInsert = applyFormat( create( { text } ), format, 0, text.length );
 			const newAttributes = insert( value, toInsert, value.start, value.end );
 			onChange( { ...newAttributes, needsSelectionUpdate: true } );
 		} else { // transform selected text into link
-			const newAttributes = applyFormat( value, [ ...placeholderFormats, format ] );
+			const newAttributes = applyFormat( value, format );
 			onChange( { ...newAttributes, needsSelectionUpdate: true } );
 		}
 
