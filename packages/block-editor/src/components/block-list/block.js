@@ -105,7 +105,7 @@ function BlockListBlock( {
 		blockRef( wrapper.current, clientId );
 		// We need to rerender to trigger a rerendering of HoverArea.
 		rerender();
-	}, [ blockRef, clientId ] );
+	}, [] );
 
 	// Reference to the block edit node
 	const blockNodeRef = useRef();
@@ -234,7 +234,7 @@ function BlockListBlock( {
 			focusTabbable( ! isMounting.current );
 		}
 		isMounting.current = false;
-	}, [ focusTabbable, isSelected ] );
+	}, [ isSelected ] );
 
 	// Focus the first multi selected block
 	useEffect( () => {
