@@ -78,9 +78,8 @@ export default function createNamespace( key, options, registry ) {
 			const state = store.__unstableOriginalGetState();
 			const hasChanged = state !== lastState;
 			lastState = state;
-
 			if ( hasChanged ) {
-				listener();
+				listener( key );
 			}
 		} );
 	};

@@ -494,6 +494,27 @@ describe( 'createRegistry', () => {
 			expect( incrementedValue ).toBe( 3 );
 		} );
 
+		it( 'only calls listeners registered to the specific store', () => {
+			const store1 = registry.registerStore( 'store1', {
+				reducer: ( state ) => state + 1,
+			} );
+			const store2 = registry.registerStore( 'store2', {
+				reducer: ( state ) => state + 1,
+			} );
+
+			const action = { type: 'dummy' };
+
+			const subscription1 = jest.fn();
+			const subscription2 = jest.fn();
+			registry.subscribe( subscription1, [ 'store1' ] );
+			registry.subscribe( subscription2, [ 'store2' ] );
+
+			store1.dispatch( action );
+			store2.dispatch( action );
+			expect( subscription1 ).toHaveBeenCalledTimes( 1 );
+			expect( subscription2 ).toHaveBeenCalledTimes( 1 );
+		} );
+
 		it( 'snapshots listeners on change, avoiding a later listener if subscribed during earlier callback', () => {
 			const store = registry.registerStore( 'myAwesomeReducer', {
 				reducer: ( state = 0 ) => state + 1,
@@ -506,7 +527,6 @@ describe( 'createRegistry', () => {
 			subscribeWithUnsubscribe( firstListener );
 
 			store.dispatch( { type: 'dummy' } );
-
 			expect( secondListener ).not.toHaveBeenCalled();
 		} );
 

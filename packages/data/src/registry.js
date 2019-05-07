@@ -2,8 +2,8 @@
  * External dependencies
  */
 import {
-	without,
 	mapValues,
+	castArray,
 } from 'lodash';
 
 /**
@@ -41,27 +41,44 @@ import createCoreDataStore from './store';
  */
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
-	let listeners = [];
+	const listeners = new Map();
 
 	/**
 	 * Global listener called for each store's update.
+	 *
+	 * @param {string} storeKey
 	 */
-	function globalListener() {
-		listeners.forEach( ( listener ) => listener() );
+	function globalListener( storeKey ) {
+		// Need to convert Map to array here because iterating through  the Map
+		// iterator will pick up any nested subscriptions added DURING iteration.
+		// So this captures the snapshot of the contents of the map before
+		// iterating.
+		const current = Array.from( listeners.entries() );
+		for ( const [ dependencies, listener ] of current ) {
+			if ( dependencies.length === 0 || dependencies.indexOf( storeKey ) > -1 ) {
+				listener();
+			}
+		}
 	}
 
 	/**
 	 * Subscribe to changes to any data.
 	 *
-	 * @param {Function}   listener Listener function.
+	 * @param {Function}   listener          Listener function.
+	 * @param {Array}      storeDependencies If included, the listener will only
+	 *                                       be invoked when a store in this array
+	 *                                       has a state change.
 	 *
 	 * @return {Function}           Unsubscribe function.
 	 */
-	const subscribe = ( listener ) => {
-		listeners.push( listener );
+	const subscribe = ( listener, storeDependencies ) => {
+		storeDependencies = typeof storeDependencies !== 'undefined' ?
+			castArray( storeDependencies ) :
+			[];
+		listeners.set( storeDependencies, listener );
 
 		return () => {
-			listeners = without( listeners, listener );
+			listeners.delete( storeDependencies );
 		};
 	};
 
