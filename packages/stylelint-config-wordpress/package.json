@@ -62,7 +62,6 @@
 		"stylelint": "^9.5.0 || ^10.0.0"
 	},
 	"scripts": {
-		"commitmsg": "commitlint -e $GIT_PARAMS",
 		"dry-release": "npmpub --dry --verbose",
 		"jest": "jest",
 		"lint:js": "eslint . --ignore-path .gitignore",
@@ -79,6 +78,11 @@
 		"extends": [
 			"@commitlint/config-conventional"
 		]
+	},
+	"husky": {
+		"hooks": {
+			"commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
+		}
 	},
 	"jest": {
 		"roots": [
