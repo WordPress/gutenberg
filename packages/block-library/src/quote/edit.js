@@ -2,13 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
 
 export default function QuoteEdit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
 	const { align, value, citation } = attributes;
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<AlignmentToolbar
 					value={ align }
@@ -56,6 +55,6 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 					/>
 				) }
 			</blockquote>
-		</Fragment>
+		</>
 	);
 }

@@ -9,7 +9,7 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Dropdown, IconButton, Toolbar, PanelBody, Path, SVG } from '@wordpress/components';
 import { getBlockType, getPossibleBlockTransformations, switchToBlockType, hasChildBlocksWithInserterSupport } from '@wordpress/blocks';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -117,17 +117,17 @@ export class BlockSwitcher extends Component {
 								tooltip={ label }
 								onKeyDown={ openOnArrowDown }
 								icon={ (
-									<Fragment>
+									<>
 										<BlockIcon icon={ icon } showColors />
 										<SVG className="editor-block-switcher__transform block-editor-block-switcher__transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M6.5 8.9c.6-.6 1.4-.9 2.2-.9h6.9l-1.3 1.3 1.4 1.4L19.4 7l-3.7-3.7-1.4 1.4L15.6 6H8.7c-1.4 0-2.6.5-3.6 1.5l-2.8 2.8 1.4 1.4 2.8-2.8zm13.8 2.4l-2.8 2.8c-.6.6-1.3.9-2.1.9h-7l1.3-1.3-1.4-1.4L4.6 16l3.7 3.7 1.4-1.4L8.4 17h6.9c1.3 0 2.6-.5 3.5-1.5l2.8-2.8-1.3-1.4z" /></SVG>
-									</Fragment>
+									</>
 								) }
 							/>
 						</Toolbar>
 					);
 				} }
 				renderContent={ ( { onClose } ) => (
-					<Fragment>
+					<>
 						{ hasBlockStyles &&
 							<PanelBody
 								title={ __( 'Block Styles' ) }
@@ -166,7 +166,7 @@ export class BlockSwitcher extends Component {
 								attributes={ { ...blocks[ 0 ].attributes, className: hoveredClassName } }
 							/>
 						}
-					</Fragment>
+					</>
 				) }
 			/>
 		);

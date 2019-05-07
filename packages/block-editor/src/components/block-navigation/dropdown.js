@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { IconButton, Dropdown, SVG, Path, KeyboardShortcuts } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
@@ -24,7 +23,7 @@ function BlockNavigationDropdown( { hasBlocks, isDisabled } ) {
 	return	(
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Fragment>
+				<>
 					{ isEnabled && <KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
@@ -41,7 +40,7 @@ function BlockNavigationDropdown( { hasBlocks, isDisabled } ) {
 						shortcut={ displayShortcut.access( 'o' ) }
 						aria-disabled={ ! isEnabled }
 					/>
-				</Fragment>
+				</>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<BlockNavigation onSelect={ onClose } />

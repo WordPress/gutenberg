@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
@@ -431,7 +431,7 @@ export class TableEdit extends Component {
 		} );
 
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar>
 						<DropdownMenu
@@ -468,7 +468,7 @@ export class TableEdit extends Component {
 					<Section type="body" rows={ body } />
 					<Section type="foot" rows={ foot } />
 				</table>
-			</Fragment>
+			</>
 		);
 	}
 }
