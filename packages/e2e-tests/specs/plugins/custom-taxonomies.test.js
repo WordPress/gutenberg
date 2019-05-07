@@ -28,7 +28,7 @@ describe( 'Custom Taxonomies labels are used', () => {
 		expect( openButton ).not.toBeFalsy();
 
 		// Get the classes from the panel
-		const buttonClassName = await( await openButton.getProperty( 'className' ) ).jsonValue();
+		const buttonClassName = await ( await openButton.getProperty( 'className' ) ).jsonValue();
 
 		// Open the panel if needed.
 		if ( -1 === buttonClassName.indexOf( 'is-opened' ) ) {
