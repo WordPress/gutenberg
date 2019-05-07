@@ -14,6 +14,8 @@ export const { Fill, Slot } = createSlotFill( 'PluginSettingsSidebar' );
  *
  * @param {Object} props Component properties.
  * @param {string} [props.className] An optional class name added to the row.
+ * @param {string} [props.title] The title of the panel
+ * @param {boolean} [props.initialOpen] The initial opened state for the panel.
  *
  * @example <caption>ES5</caption>
  * ```js
@@ -22,15 +24,16 @@ export const { Fill, Slot } = createSlotFill( 'PluginSettingsSidebar' );
  * var __ = wp.i18n.__;
  * var registerPlugin = wp.plugins.registerPlugin;
  * var PluginDocumentSetting = wp.editPost.PluginPostStatusInfo;
+ *
  * function MyDocumentSettingPlugin() {
  * 	return el(
  * 		PluginDocumentSetting,
  *		{
  * 			className: 'my-document-setting-plugin',
  * 		},
- * 		__( 'My Document Setting Panel' )
+ * 			__( 'My Document Setting Panel' )
  * 		);
- * 	}
+ * 	};
  *
  * 	registerPlugin( 'my-document-setting-plugin', {
  * 	render: MyDocumentSettingPlugin
@@ -44,9 +47,9 @@ export const { Fill, Slot } = createSlotFill( 'PluginSettingsSidebar' );
  * const { PluginDocumentSetting } = wp.editPost;
  *
  * const MyDocumentSettingTest = () => (
- * 	<PluginDocumentSetting className="my-document-setting-plugin">
- *		<p>My Document Setting Panel</p>
- *	</PluginDocumentSetting>
+ * 		<PluginDocumentSetting className="my-document-setting-plugin">
+ *			<p>My Document Setting Panel</p>
+ *		</PluginDocumentSetting>
  *	);
  *
  *  registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
