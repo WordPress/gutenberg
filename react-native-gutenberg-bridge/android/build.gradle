@@ -121,7 +121,6 @@ dependencies {
         implementation project(':react-native-recyclerview-list')
 
         implementation 'com.facebook.react:react-native:+'
-        implementation "com.facebook.fresco:imagepipeline-okhttp3:1.10.0"
     } else {
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-recyclerview-list', 'f845b3c2c4411b8e97db23724bf1a535530c5435'))
