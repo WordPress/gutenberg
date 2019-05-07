@@ -155,6 +155,7 @@ describe( 'Links', () => {
 
 		// Click on the Apply button
 		await page.click( 'button[aria-label="Apply"]' );
+		await page.waitForSelector( '.wp-block-paragraph a[href="https://wordpress.org/gutenberg"]' );
 	};
 
 	it( 'can be edited', async () => {
@@ -238,8 +239,6 @@ describe( 'Links', () => {
 		// Make a collapsed selection inside the link
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowRight' );
-		// Press escape to show the block toolbar
-		await page.keyboard.press( 'Escape' );
 		await page.click( 'button[aria-label="Edit"]' );
 		await waitForAutoFocus();
 		await page.keyboard.type( '/handbook' );
