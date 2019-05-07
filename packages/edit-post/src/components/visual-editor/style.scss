@@ -12,7 +12,7 @@
 	height: 240px;
 	width: 100%;
 	// Offset for: Visual editor padding, block (default appender) margin.
-	margin: #{ -1 * $block-spacing } auto -50px;
+	margin: #{ -1 * $block-spacing } auto -240px;
 }
 
 // The base width of blocks
