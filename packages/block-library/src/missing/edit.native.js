@@ -31,7 +31,7 @@ export default class UnsupportedBlockEdit extends Component {
 					blockType ?
 						sprintf(
 							/* translators: accessibility text. %s: unsupported block type. */
-							__( 'Unsupported block: %s.' ),
+							__( 'Unsupported block: %s' ),
 							title
 						) :
 						/* translators: accessibility text. */
