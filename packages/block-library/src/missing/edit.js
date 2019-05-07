@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { RawHTML, Fragment } from '@wordpress/element';
+import { RawHTML } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { getBlockType, createBlock } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
@@ -33,12 +33,12 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	}
 
 	return (
-		<Fragment>
+		<>
 			<Warning actions={ actions }>
 				{ messageHTML }
 			</Warning>
 			<RawHTML>{ originalUndelimitedContent }</RawHTML>
-		</Fragment>
+		</>
 	);
 }
 

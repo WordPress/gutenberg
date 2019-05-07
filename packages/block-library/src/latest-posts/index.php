@@ -14,7 +14,7 @@
  */
 function render_block_core_latest_posts( $attributes ) {
 	$args = array(
-		'posts_per_page'   => $attributes['postCount'],
+		'posts_per_page'   => $attributes['postsToShow'],
 		'post_status'      => 'publish',
 		'order'            => $attributes['order'],
 		'orderby'          => $attributes['orderBy'],
@@ -135,7 +135,7 @@ function register_block_core_latest_posts() {
 				'categories'              => array(
 					'type' => 'string',
 				),
-				'postCount'               => array(
+				'postsToShow'             => array(
 					'type'    => 'number',
 					'default' => 5,
 				),
