@@ -53,8 +53,6 @@ import { isInsideRootBlock } from '../../utils/dom';
  * selection to take effect unhampered.
  *
  * @param {DragEvent} event Drag event.
- *
- * @return {void}
  */
 const preventDrag = ( event ) => {
 	event.preventDefault();
@@ -249,8 +247,6 @@ function BlockListBlock( {
 	 * Marks the block as selected when focused and not already selected. This
 	 * specifically handles the case where block does not set focus on its own
 	 * (via `setFocus`), typically if there is no focusable input in the block.
-	 *
-	 * @return {void}
 	 */
 	const onFocus = () => {
 		if ( ! isSelected && ! isPartOfMultiSelection ) {
@@ -300,8 +296,6 @@ function BlockListBlock( {
 	 * Begins tracking cursor multi-selection when clicking down within block.
 	 *
 	 * @param {MouseEvent} event A mousedown event.
-	 *
-	 * @return {void}
 	 */
 	const onPointerDown = ( event ) => {
 		// Not the main button.
