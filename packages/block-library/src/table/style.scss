@@ -45,30 +45,30 @@
 		border-collapse: inherit;
 		background-color: transparent;
 
-		tr:nth-child(odd) {
+		tbody tr:nth-child(odd) {
 			background-color: $light-gray-200;
 		}
 
 		&.has-subtle-light-gray-background-color {
-			tr:nth-child(odd) {
+			tbody tr:nth-child(odd) {
 				background-color: $subtle-light-gray;
 			}
 		}
 
 		&.has-subtle-pale-green-background-color {
-			tr:nth-child(odd) {
+			tbody tr:nth-child(odd) {
 				background-color: $subtle-pale-green;
 			}
 		}
 
 		&.has-subtle-pale-blue-background-color {
-			tr:nth-child(odd) {
+			tbody tr:nth-child(odd) {
 				background-color: $subtle-pale-blue;
 			}
 		}
 
 		&.has-subtle-pale-pink-background-color {
-			tr:nth-child(odd) {
+			tbody tr:nth-child(odd) {
 				background-color: $subtle-pale-pink;
 			}
 		}
