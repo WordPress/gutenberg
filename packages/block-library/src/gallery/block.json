@@ -33,9 +33,6 @@
 					"type": "string",
 					"source": "html",
 					"selector": "figcaption"
-				},
-				"attachmentCaption": {
-					"type": "string"
 				}
 			}
 		},
@@ -53,6 +50,10 @@
 		"linkTo": {
 			"type": "string",
 			"default": "none"
+		},
+		"attachmentCaptions": {
+			"type": "array",
+			"default": []
 		}
 	}
 }
