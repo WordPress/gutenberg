@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
@@ -103,7 +103,7 @@ class GalleryImage extends Component {
 			// Disable reason: Image itself is not meant to be interactive, but should
 			// direct image selection and unfocus caption fields.
 			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-			<Fragment>
+			<>
 				<img
 					src={ url }
 					alt={ alt }
@@ -116,7 +116,7 @@ class GalleryImage extends Component {
 					ref={ this.bindContainer }
 				/>
 				{ isBlobURL( url ) && <Spinner /> }
-			</Fragment>
+			</>
 			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 		);
 

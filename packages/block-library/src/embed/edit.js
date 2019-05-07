@@ -16,7 +16,7 @@ import { kebabCase, toLower } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 export function getEmbedEditComponent( title, icon, responsive = true ) {
 	return class extends Component {
@@ -180,7 +180,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			}
 
 			return (
-				<Fragment>
+				<>
 					<EmbedControls
 						showEditButton={ preview && ! cannotEmbed }
 						themeSupportsResponsive={ themeSupportsResponsive }
@@ -201,7 +201,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						icon={ icon }
 						label={ label }
 					/>
-				</Fragment>
+				</>
 			);
 		}
 	};

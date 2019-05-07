@@ -236,7 +236,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 {% ESNext %}
 ```js
 const { registerBlockType } = wp.blocks;
-const { Fragment } = wp.element;
 const {
 	CheckboxControl,
 	RadioControl,
@@ -309,7 +308,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 		}
 
 		return (
-			<Fragment>
+			<>
 				<InspectorControls>
 
 					<CheckboxControl
@@ -366,7 +365,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 					onChange={ onChangeContent }
 					value={ content }
 				/>
-			</Fragment>
+			</>
 		);
 	},
 

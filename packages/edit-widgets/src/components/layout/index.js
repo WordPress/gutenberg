@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { navigateRegions } from '@wordpress/components';
 
@@ -20,7 +19,7 @@ function Layout() {
 	];
 
 	return (
-		<Fragment>
+		<>
 			<Header />
 			<Sidebar />
 			<div
@@ -35,7 +34,7 @@ function Layout() {
 					</div>
 				) ) }
 			</div>
-		</Fragment>
+		</>
 	);
 }
 
