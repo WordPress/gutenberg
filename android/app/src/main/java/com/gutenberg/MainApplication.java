@@ -9,6 +9,7 @@ import com.horcrux.svg.SvgPackage;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
+
 import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -20,51 +21,58 @@ import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
 
-  private static final String TAG = "MainApplication";
+    private static final String TAG = "MainApplication";
 
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-    @Override
-    public boolean getUseDeveloperSupport() {
-      return BuildConfig.DEBUG;
-    }
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+        @Override
+        public boolean getUseDeveloperSupport() {
+            return BuildConfig.DEBUG;
+        }
 
-    @Override
-    protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-            new SvgPackage(),
-            new ReactAztecPackage(),
-            new RNRecyclerviewListPackage(),
-            new RNReactNativeGutenbergBridgePackage(new GutenbergBridgeJS2Parent() {
+        @Override
+        protected List<ReactPackage> getPackages() {
+            return Arrays.<ReactPackage>asList(new MainReactPackage(), new SvgPackage(), new ReactAztecPackage(),
+                    new RNRecyclerviewListPackage(),
+                    new RNReactNativeGutenbergBridgePackage(new GutenbergBridgeJS2Parent() {
                 @Override
-                public void responseHtml(String title, String html, boolean changed) {}
+                public void responseHtml(String title, String html, boolean changed) {
+                }
 
                 @Override
-                public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback) {}
+                public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback) {
+                }
 
                 @Override
-                public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback) {}
+                public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback) {
+                }
 
                 @Override
-                public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {}
+                public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {
+                }
 
                 @Override
-                public void requestMediaImport(String url, MediaSelectedCallback mediaSelectedCallback) {}
+                public void requestMediaImport(String url, MediaSelectedCallback mediaSelectedCallback) {
+                }
 
                 @Override
-                public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {}
+                public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {
+                }
 
                 @Override
-                public void requestImageFailedRetryDialog(int mediaId) {}
+                public void requestImageFailedRetryDialog(int mediaId) {
+                }
 
                 @Override
-                public void requestImageUploadCancelDialog(int mediaId) {}
+                public void requestImageUploadCancelDialog(int mediaId) {
+                }
 
                 @Override
-                public void requestImageUploadCancel(int mediaId) {}
+                public void requestImageUploadCancel(int mediaId) {
+                }
 
                 @Override
-                public void editorDidMount(boolean hasUnsupportedBlocks) {}
+                public void editorDidMount(boolean hasUnsupportedBlocks) {
+                }
 
                 @Override
                 public void editorDidEmitLog(String message, LogLevel logLevel) {
@@ -83,24 +91,23 @@ public class MainApplication extends Application implements ReactApplication {
                             break;
                     }
                 }
-            })
-      );
+            }));
+        }
+
+        @Override
+        protected String getJSMainModuleName() {
+            return "index";
+        }
+    };
+
+    @Override
+    public ReactNativeHost getReactNativeHost() {
+        return mReactNativeHost;
     }
 
     @Override
-    protected String getJSMainModuleName() {
-      return "index";
+    public void onCreate() {
+        super.onCreate();
+        SoLoader.init(this, /* native exopackage */ false);
     }
-  };
-
-  @Override
-  public ReactNativeHost getReactNativeHost() {
-    return mReactNativeHost;
-  }
-
-  @Override
-  public void onCreate() {
-    super.onCreate();
-    SoLoader.init(this, /* native exopackage */ false);
-  }
 }
