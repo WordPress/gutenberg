@@ -12,7 +12,6 @@ In a block's `edit` implementation, render a `<BlockControls />` component. Then
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
-import { Fragment } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
@@ -38,7 +37,7 @@ registerBlockType( 'my-plugin/my-block', {
 		const onChange = ( alignment ) => setAttributes( { verticalAlignment: alignment } );
 
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<BlockVerticalAlignmentToolbar
 						onChange={ onChange }
@@ -48,7 +47,7 @@ registerBlockType( 'my-plugin/my-block', {
 				<div>
 					// your Block here
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 } );
