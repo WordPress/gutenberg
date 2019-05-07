@@ -8,7 +8,6 @@ import { View, TextInput, TouchableWithoutFeedback, Text } from 'react-native';
  */
 import Video from './video-player';
 import {
-	requestMediaImport,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
@@ -63,15 +62,8 @@ class VideoEdit extends React.Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
+		const { attributes } = this.props;
 		if ( attributes.id && ! isURL( attributes.src ) ) {
-			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
-				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
-					if ( mediaUri ) {
-						setAttributes( { url: mediaUri, id: mediaId } );
-					}
-				} );
-			}
 			mediaUploadSync();
 		}
 	}
