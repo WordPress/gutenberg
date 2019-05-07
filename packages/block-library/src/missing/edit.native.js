@@ -35,7 +35,7 @@ export default class UnsupportedBlockEdit extends Component {
 							title
 						) :
 						/* translators: accessibility text. */
-						__( 'Unsupported block.' )
+						__( 'Unsupported block' )
 				}
 				onAccessibilityTap={ this.props.onFocus }
 			>
