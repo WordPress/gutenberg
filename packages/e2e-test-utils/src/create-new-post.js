@@ -36,4 +36,6 @@ export async function createNewPost( {
 	if ( enableTips ) {
 		await page.reload();
 	}
+
+	await page.waitForSelector( '.editor-block-list__layout' );
 }
