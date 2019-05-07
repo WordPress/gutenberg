@@ -14,10 +14,6 @@
                     "alt": "title"
                 }
             ],
-            "ids": [
-                null,
-                null
-            ],
             "columns": 2,
             "imageCrop": true,
             "linkTo": "none",

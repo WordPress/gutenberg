@@ -4,7 +4,7 @@
         "name": "core/latest-posts",
         "isValid": true,
         "attributes": {
-            "postCount": 5,
+            "postsToShow": 5,
             "displayPostContent": false,
             "displayPostContentRadio": "excerpt",
             "excerptLength": 55,
