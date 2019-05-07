@@ -519,7 +519,7 @@ export class RichText extends Component {
 		// onSelectionChange should not be emitted when we're simply typing, but Aztec does emit it
 		// Let's try to detect typing with a simple hack:
 		const noChange = this.selectionStart === start && this.selectionEnd === end;
-		const isTyping = this.selectionStart + 1 === start;
+		const isTyping = this.selectionStart + 1 === start && this.value !== this.props.value;
 		const shouldKeepFormats = noChange || isTyping;
 
 		this.selectionStart = start;
