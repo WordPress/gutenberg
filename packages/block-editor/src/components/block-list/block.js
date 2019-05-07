@@ -7,7 +7,7 @@ import { get, reduce, size, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
@@ -582,7 +582,7 @@ export class BlockListBlock extends Component {
 								</IgnoreNestedEvents>
 							</div>
 							{ showEmptyBlockSideInserter && (
-								<Fragment>
+								<>
 									<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
 										<InserterWithShortcuts
 											clientId={ clientId }
@@ -598,11 +598,11 @@ export class BlockListBlock extends Component {
 											clientId={ clientId }
 										/>
 									</div>
-								</Fragment>
+								</>
 							) }
 						</IgnoreNestedEvents>
 					);
-					/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
+					/* eslint-enable jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 				} }
 			</HoverArea>
 		);

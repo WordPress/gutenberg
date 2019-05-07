@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 
@@ -13,7 +12,7 @@ import DocumentOutline from '../document-outline';
 
 function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, hasOutlineItemsDisabled, onRequestClose } ) {
 	return (
-		<Fragment>
+		<>
 			<div
 				className="table-of-contents__counts"
 				role="note"
@@ -44,15 +43,15 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, h
 				</div>
 			</div>
 			{ headingCount > 0 && (
-				<Fragment>
+				<>
 					<hr />
 					<span className="table-of-contents__title">
 						{ __( 'Document Outline' ) }
 					</span>
 					<DocumentOutline onSelect={ onRequestClose } hasOutlineItemsDisabled={ hasOutlineItemsDisabled } />
-				</Fragment>
+				</>
 			) }
-		</Fragment>
+		</>
 	);
 }
 

@@ -8,7 +8,7 @@ import { get } from 'lodash';
  */
 import { PanelBody, Button, ClipboardButton, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Component, Fragment, createRef } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { safeDecodeURIComponent } from '@wordpress/url';
 
@@ -61,7 +61,7 @@ class PostPublishPanelPostpublish extends Component {
 		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
 
 		const postPublishNonLinkHeader = isScheduled ?
-			<Fragment>{ __( 'is now scheduled. It will go live on' ) } <PostScheduleLabel />.</Fragment> :
+			<>{ __( 'is now scheduled. It will go live on' ) } <PostScheduleLabel />.</> :
 			__( 'is now live.' );
 
 		return (

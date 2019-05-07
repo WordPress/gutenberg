@@ -7,7 +7,6 @@ import {
 	SelectControl,
 	ToggleControl,
 } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/block-editor';
 
 export default function FileBlockInspector( {
@@ -29,7 +28,7 @@ export default function FileBlockInspector( {
 	}
 
 	return (
-		<Fragment>
+		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Text Link Settings' ) }>
 					<SelectControl
@@ -52,6 +51,6 @@ export default function FileBlockInspector( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-		</Fragment>
+		</>
 	);
 }
