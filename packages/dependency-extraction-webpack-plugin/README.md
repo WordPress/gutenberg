@@ -81,7 +81,6 @@ By default, the following module requests are handled:
 | `@babel/runtime/regenerator` | `regeneratorRuntime` | `wp-polyfill` |
 | `@wordpress/*` | `wp['*']` | `wp-*` |
 | `jquery` | `jQuery` | `jquery` |
-| `jquery` | `jQuery` | `jquery` |
 | `lodash-es` | `lodash` | `lodash` |
 | `lodash` | `lodash` | `lodash` |
 | `moment` | `moment` | `moment` |
