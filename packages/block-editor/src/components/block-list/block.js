@@ -99,7 +99,7 @@ function BlockListBlock( {
 	const [ , updateRerenderState ] = useState( {} );
 	const rerender = () => updateRerenderState( {} );
 
-	// Reference of the wrapper -------------------------------------------------
+	// Reference of the wrapper
 	const wrapper = useRef( null );
 	useEffect( () => {
 		blockRef( wrapper.current, clientId );
@@ -107,10 +107,10 @@ function BlockListBlock( {
 		rerender();
 	}, [ blockRef, clientId ] );
 
-	// Reference to the block edit node -----------------------------------------
+	// Reference to the block edit node
 	const blockNodeRef = useRef();
 
-	// Keep track of touchstart to disable hover on iOS -------------------------
+	// Keep track of touchstart to disable hover on iOS
 	const hadTouchStart = useRef( false );
 	const onTouchStart = () => {
 		hadTouchStart.current = true;
@@ -121,7 +121,7 @@ function BlockListBlock( {
 		hadTouchStart.current = false;
 	};
 
-	// Handling isHovered -------------------------------------------------------
+	// Handling isHovered
 	const [ isBlockHovered, setBlockHoveredState ] = useState( false );
 
 	/**
@@ -163,7 +163,7 @@ function BlockListBlock( {
 		}
 	} );
 
-	// Handling the dragging state ----------------------------------------------
+	// Handling the dragging state
 	const [ isDragging, setBlockDraggingState ] = useState( false );
 	const onDragStart = () => {
 		setBlockDraggingState( true );
@@ -172,11 +172,11 @@ function BlockListBlock( {
 		setBlockDraggingState( false );
 	};
 
-	// Handling the error state -------------------------------------------------
+	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
 	const onBlockError = () => setErrorState( false );
 
-	// Handling of forceContextualToolbarFocus ----------------------------------
+	// Handling of forceContextualToolbarFocus
 	const isForcingContextualToolbar = useRef( false );
 	useEffect( () => {
 		if ( isForcingContextualToolbar.current ) {
@@ -191,7 +191,7 @@ function BlockListBlock( {
 		rerender();
 	};
 
-	// Handing the focus of the block on creation and update --------------------
+	// Handing the focus of the block on creation and update
 
 	/**
 	 * When a block becomes selected, transition focus to an inner tabbable.
@@ -243,7 +243,7 @@ function BlockListBlock( {
 		}
 	}, [ isFirstMultiSelected ] );
 
-	// Other event handlers -----------------------------------------------------
+	// Other event handlers
 
 	/**
 	 * Marks the block as selected when focused and not already selected. This
