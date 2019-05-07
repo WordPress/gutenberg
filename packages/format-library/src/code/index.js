@@ -7,10 +7,11 @@ import { toggleFormat } from '@wordpress/rich-text';
 import { RichTextShortcut, RichTextToolbarButton } from '@wordpress/block-editor';
 
 const name = 'core/code';
+const title = __( 'Inline Code' );
 
 export const code = {
 	name,
-	title: __( 'Code' ),
+	title,
 	tagName: 'code',
 	className: null,
 	edit( { value, onChange, isActive } ) {
@@ -25,7 +26,7 @@ export const code = {
 				/>
 				<RichTextToolbarButton
 					icon="editor-code"
-					title={ __( 'Code' ) }
+					title={ title }
 					onClick={ onToggle }
 					isActive={ isActive }
 					shortcutType="access"
