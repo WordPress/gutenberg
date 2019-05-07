@@ -10,7 +10,11 @@ import { InnerBlocks, BlockControls, BlockVerticalAlignmentToolbar } from '@word
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-const ColumnEdit = ( { attributes, updateAlignment } ) => {
+function ColumnEdit( {
+	attributes,
+	updateAlignment,
+	hasChildBlocks,
+} ) {
 	const { verticalAlignment } = attributes;
 
 	const classes = classnames( 'block-core-columns', {
@@ -27,17 +31,29 @@ const ColumnEdit = ( { attributes, updateAlignment } ) => {
 					value={ verticalAlignment }
 				/>
 			</BlockControls>
-			<InnerBlocks templateLock={ false } />
+			<InnerBlocks
+				templateLock={ false }
+				renderAppender={ (
+					hasChildBlocks ?
+						undefined :
+						() => <InnerBlocks.ButtonBlockAppender />
+				) }
+			/>
 		</div>
 	);
-};
+}
 
 export default compose(
-	withSelect( ( select, { clientId } ) => {
-		const { getBlockRootClientId } = select( 'core/editor' );
+	withSelect( ( select, ownProps ) => {
+		const { clientId } = ownProps;
+		const {
+			getBlockRootClientId,
+			getBlockOrder,
+		} = select( 'core/block-editor' );
 
 		return {
 			parentColumnsBlockClientId: getBlockRootClientId( clientId ),
+			hasChildBlocks: getBlockOrder( clientId ).length > 0,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, parentColumnsBlockClientId } ) => {
