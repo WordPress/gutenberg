@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import {
 	PanelBody,
 	ToggleControl,
@@ -15,7 +14,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 	const { showPostCounts, displayAsDropdown } = attributes;
 
 	return (
-		<Fragment>
+		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Archives Settings' ) }>
 					<ToggleControl
@@ -33,6 +32,6 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 			<Disabled>
 				<ServerSideRender block="core/archives" attributes={ attributes } />
 			</Disabled>
-		</Fragment>
+		</>
 	);
 }

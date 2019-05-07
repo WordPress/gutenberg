@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,7 +37,7 @@ const BlockInspector = ( { selectedBlockClientId, selectedBlockName, blockType, 
 	}
 
 	return (
-		<Fragment>
+		<>
 			<div className="editor-block-inspector__card block-editor-block-inspector__card">
 				<BlockIcon icon={ blockType.icon } showColors />
 				<div className="editor-block-inspector__card-content block-editor-block-inspector__card-content">
@@ -73,7 +72,7 @@ const BlockInspector = ( { selectedBlockClientId, selectedBlockName, blockType, 
 				</InspectorAdvancedControls.Slot>
 			</div>
 			<SkipToSelectedBlock key="back" />
-		</Fragment>
+		</>
 	);
 };
 

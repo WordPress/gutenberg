@@ -41,13 +41,14 @@ describe( 'Block with a meta attribute', () => {
 		await page.keyboard.type( 'Meta Value' );
 
 		const inputs = await page.$$( '.my-meta-input' );
-		await inputs.forEach( async ( input ) => {
+		await Promise.all( inputs.map( async ( input ) => {
 			// Clicking the input selects the block,
 			// and selecting the block enables the sync data mode
-			// as otherwise the asynchronous rerendering of unselected blocks
+			// as otherwise the asynchronous re-rendering of unselected blocks
 			// may cause the input to have not yet been updated for the other blocks
 			await input.click();
-			expect( await input.getProperty( 'value' ) ).toBe( 'Meta Value' );
-		} );
+			const inputValue = await input.getProperty( 'value' );
+			expect( await inputValue.jsonValue() ).toBe( 'Meta Value' );
+		} ) );
 	} );
 } );

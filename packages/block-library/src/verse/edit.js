@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import {
 	RichText,
 	BlockControls,
@@ -13,7 +12,7 @@ export default function VerseEdit( { attributes, setAttributes, className, merge
 	const { textAlign, content } = attributes;
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<AlignmentToolbar
 					value={ textAlign }
@@ -35,6 +34,6 @@ export default function VerseEdit( { attributes, setAttributes, className, merge
 				wrapperClassName={ className }
 				onMerge={ mergeBlocks }
 			/>
-		</Fragment>
+		</>
 	);
 }

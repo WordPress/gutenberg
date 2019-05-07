@@ -6,7 +6,7 @@ import { first, last, some, flow } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
@@ -80,7 +80,7 @@ class BlockEditorKeyboardShortcuts extends Component {
 	render() {
 		const { selectedBlockClientIds } = this.props;
 		return (
-			<Fragment>
+			<>
 				<KeyboardShortcuts
 					shortcuts={ {
 						[ rawShortcut.primary( 'a' ) ]: this.selectAll,
@@ -114,7 +114,7 @@ class BlockEditorKeyboardShortcuts extends Component {
 						) }
 					</BlockActions>
 				) }
-			</Fragment>
+			</>
 		);
 	}
 }
