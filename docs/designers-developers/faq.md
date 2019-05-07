@@ -18,7 +18,7 @@ Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg)
 
 ## When will Gutenberg be merged into WordPress?
 
-Gutenberg was be merged into [WordPress 5.0](https://wordpress.org/news/2018/12/bebo/) that was released in December 2018.
+Gutenberg was merged into [WordPress 5.0](https://wordpress.org/news/2018/12/bebo/) that was released in December 2018.
 
 The editor focus started in early 2017 with the first three months spent designing, planning, prototyping, and testing prototypes, to help us inform how to approach this project. The actual plugin, which you can install from the repository, was launched during WordCamp Europe in June.
 
@@ -277,9 +277,7 @@ Yes, a columns block is available in Gutenberg.
 
 ## Does Gutenberg support nested blocks?
 
-We are currently implementing the infrastructure for nested blocks support. We expect this to open further customization opportunities. Block authors also can nest components and HTML inside of a block during construction. The UI for manipulating nested blocks is still being refined, and depending on the timing, it might not be included in the first version of Gutenberg.
-
-See also [Issue #428](https://github.com/WordPress/gutenberg/issues/428)
+Yes, it is supported. You can have multiple levels of nesting – blocks within blocks within blocks.
 
 ## Does drag and drop work for rearranging blocks?
 
