@@ -317,10 +317,10 @@ class WritingFlow extends Component {
 				event.preventDefault();
 			}
 		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverse ) ) {
-			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			const { direction } = getComputedStyle( target );
-			const atStart = direction === 'rtl' ? ( ! isReverse ) : isReverse;
-			placeCaretAtHorizontalEdge( closestTabbable, atStart );
+			const isBackward = direction === 'rtl' ? ( ! isReverse ) : isReverse;
+			const closestTabbable = this.getClosestTabbable( target, isBackward );
+			placeCaretAtHorizontalEdge( closestTabbable, isBackward );
 			event.preventDefault();
 		}
 	}

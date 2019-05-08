@@ -750,6 +750,7 @@ export class RichText extends Component {
 		const { formats, text, start, end } = value;
 		const { activeFormats = [] } = this.state;
 		const collapsed = isCollapsed( value );
+		// To do: ideally, we should look at visual position instead.
 		const direction = this.getDirection();
 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
 		const isReverse = event.keyCode === reverseKey;
@@ -774,9 +775,6 @@ export class RichText extends Component {
 		if ( ! collapsed ) {
 			return;
 		}
-
-		// In all other cases, prevent default behaviour.
-		event.preventDefault();
 
 		const formatsBefore = formats[ start - 1 ] || [];
 		const formatsAfter = formats[ start ] || [];
@@ -808,29 +806,19 @@ export class RichText extends Component {
 			}
 		}
 
-		// Wait for boundary class to be added.
-		this.props.setTimeout( () => this.recalculateBoundaryStyle() );
-
-		if ( newActiveFormatsLength !== activeFormats.length ) {
-			const newActiveFormats = source.slice( 0, newActiveFormatsLength );
-			this.applyRecord( { ...value, activeFormats: newActiveFormats } );
-			this.setState( { activeFormats: newActiveFormats } );
+		if ( newActiveFormatsLength === activeFormats.length ) {
 			return;
 		}
 
-		const newPos = value.start + ( isReverse ? -1 : 1 );
-		const newActiveFormats = isReverse ? formatsBefore.length : formatsAfter.length;
+		event.preventDefault();
 
-		this.setState( { selectedFormat: newActiveFormats } );
-		this.props.onSelectionChange( newPos, newPos );
-		this.selectionStart = newPos;
-		this.selectionEnd = newPos;
-		this.applyRecord( {
-			...value,
-			start: newPos,
-			end: newPos,
-			activeFormats: newActiveFormats,
-		} );
+		const newActiveFormats = source.slice( 0, newActiveFormatsLength );
+
+		this.applyRecord( { ...value, activeFormats: newActiveFormats } );
+		this.setState( { activeFormats: newActiveFormats } );
+
+		// Wait for boundary class to be added.
+		this.props.setTimeout( () => this.recalculateBoundaryStyle() );
 	}
 
 	/**
