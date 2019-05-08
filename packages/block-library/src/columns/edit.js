@@ -2,12 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
 import {
 	PanelBody,
 	RangeControl,
@@ -18,7 +18,8 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -36,17 +37,17 @@ import { getColumnsTemplate } from './utils';
 */
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
-export const ColumnsEdit = function( { attributes, setAttributes, className, updateAlignment } ) {
+export function ColumnsEdit( {
+	attributes,
+	className,
+	updateAlignment,
+	updateColumns,
+} ) {
 	const { columns, verticalAlignment } = attributes;
 
 	const classes = classnames( className, `has-${ columns }-columns`, {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
-
-	const onChange = ( alignment ) => {
-		// Update all the (immediate) child Column Blocks
-		updateAlignment( alignment );
-	};
 
 	return (
 		<>
@@ -55,11 +56,7 @@ export const ColumnsEdit = function( { attributes, setAttributes, className, upd
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
-						onChange={ ( nextColumns ) => {
-							setAttributes( {
-								columns: nextColumns,
-							} );
-						} }
+						onChange={ updateColumns }
 						min={ 2 }
 						max={ 6 }
 					/>
@@ -67,7 +64,7 @@ export const ColumnsEdit = function( { attributes, setAttributes, className, upd
 			</InspectorControls>
 			<BlockControls>
 				<BlockVerticalAlignmentToolbar
-					onChange={ onChange }
+					onChange={ updateAlignment }
 					value={ verticalAlignment }
 				/>
 			</BlockControls>
@@ -79,45 +76,92 @@ export const ColumnsEdit = function( { attributes, setAttributes, className, upd
 			</div>
 		</>
 	);
-};
+}
 
-const DEFAULT_EMPTY_ARRAY = [];
-
-export default compose(
+export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 	/**
-	 * Selects the child column Blocks for this parent Column
+	 * Update all child Column blocks with a new vertical alignment setting
+	 * based on whatever alignment is passed in. This allows change to parent
+	 * to overide anything set on a individual column basis.
+	 *
+	 * @param {string} verticalAlignment the vertical alignment setting
 	 */
-	withSelect( ( select, { clientId } ) => {
-		const { getBlocksByClientId } = select( 'core/editor' );
-		const block = getBlocksByClientId( clientId )[ 0 ];
+	updateAlignment( verticalAlignment ) {
+		const { clientId, setAttributes } = ownProps;
+		const { updateBlockAttributes } = dispatch( 'core/block-editor' );
+		const { getBlockOrder } = registry.select( 'core/block-editor' );
 
-		return {
-			childColumns: block ? block.innerBlocks : DEFAULT_EMPTY_ARRAY,
-		};
-	} ),
-	withDispatch( ( dispatch, { clientId, childColumns } ) => {
-		return {
-			/**
-			 * Update all child column Blocks with a new
-			 * vertical alignment setting based on whatever
-			 * alignment is passed in. This allows change to parent
-			 * to overide anything set on a individual column basis
-			 *
-			 * @param  {string} alignment the vertical alignment setting
-			 */
-			updateAlignment( alignment ) {
-				// Update self...
-				dispatch( 'core/editor' ).updateBlockAttributes( clientId, {
-					verticalAlignment: alignment,
-				} );
+		// Update own alignment.
+		setAttributes( { verticalAlignment } );
 
-				// Update all child Column Blocks to match
-				childColumns.forEach( ( childColumn ) => {
-					dispatch( 'core/editor' ).updateBlockAttributes( childColumn.clientId, {
-						verticalAlignment: alignment,
-					} );
-				} );
-			},
-		};
-	} ),
-)( ColumnsEdit );
+		// Update all child Column Blocks to match
+		const innerBlockClientIds = getBlockOrder( clientId );
+		innerBlockClientIds.forEach( ( innerBlockClientId ) => {
+			updateBlockAttributes( innerBlockClientId, {
+				verticalAlignment,
+			} );
+		} );
+	},
+
+	/**
+	 * Updates the column count, including necessary revisions to child Column
+	 * blocks to grant required or redistribute available space.
+	 *
+	 * @param {number} columns New column count.
+	 */
+	updateColumns( columns ) {
+		const { clientId, setAttributes, attributes } = ownProps;
+		const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+		const { getBlocks } = registry.select( 'core/block-editor' );
+
+		// Update columns count.
+		setAttributes( { columns } );
+
+		let innerBlocks = getBlocks( clientId );
+		const hasExplicitColumnWidths = innerBlocks.some( ( innerBlock ) => (
+			innerBlock.attributes.width !== undefined
+		) );
+
+		let newOrRemovedColumnWidth;
+		if ( ! hasExplicitColumnWidths ) {
+			return;
+		}
+
+		// Redistribute available width for existing inner blocks.
+		const { columns: previousColumns } = attributes;
+		const isAddingColumn = columns > previousColumns;
+
+		if ( isAddingColumn ) {
+			// If adding a new column, assign width to the new column equal to
+			// as if it were `1 / columns` of the total available space.
+			newOrRemovedColumnWidth = ( 100 / columns );
+		} else {
+			// The removed column will be the last of the inner blocks.
+			newOrRemovedColumnWidth = last( innerBlocks ).attributes.width || ( 100 / previousColumns );
+		}
+
+		const adjustment = newOrRemovedColumnWidth / ( isAddingColumn ? -1 * previousColumns : columns );
+		innerBlocks = innerBlocks.map( ( innerBlock ) => {
+			const { width: columnWidth = ( 100 / previousColumns ) } = innerBlock.attributes;
+			return {
+				...innerBlock,
+				attributes: {
+					...innerBlocks.attributes,
+					width: parseFloat( ( columnWidth + adjustment ).toFixed( 2 ) ),
+				},
+			};
+		} );
+
+		// Explicitly manage the new column block, since template would not
+		// account for the explicitly assigned width.
+		if ( isAddingColumn ) {
+			const block = createBlock( 'core/column', {
+				width: parseFloat( newOrRemovedColumnWidth.toFixed( 2 ) ),
+			} );
+
+			innerBlocks = [ ...innerBlocks, block ];
+		}
+
+		replaceInnerBlocks( clientId, innerBlocks, false );
+	},
+} ) )( ColumnsEdit );
