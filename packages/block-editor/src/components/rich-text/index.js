@@ -144,6 +144,7 @@ export class RichText extends Component {
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
+		this.getDirection = this.getDirection.bind( this );
 
 		this.formatToValue = memize(
 			this.formatToValue.bind( this ),
@@ -731,6 +732,10 @@ export class RichText extends Component {
 		}
 	}
 
+	getDirection() {
+		return getComputedStyle( this.editableRef ).direction;
+	}
+
 	/**
 	 * Handles horizontal keyboard navigation when no modifiers are pressed. The
 	 * navigation is handled separately to move correctly around format
@@ -743,7 +748,9 @@ export class RichText extends Component {
 		const { formats, text, start, end } = value;
 		const { activeFormats = [] } = this.state;
 		const collapsed = isCollapsed( value );
-		const isReverse = event.keyCode === LEFT;
+		const direction = this.getDirection();
+		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
+		const isReverse = event.keyCode === reverseKey;
 
 		// If the selection is collapsed and at the very start, do nothing if
 		// navigating backward.
