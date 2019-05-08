@@ -118,19 +118,8 @@
 	.wp-block-cover__inner-container {
 		width: calc(100% - 70px);
 		z-index: z-index(".wp-block-cover__inner-container");
-		color: $light-gray-100;
 	}
 
-	p,
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6,
-	.wp-block-subhead {
-		color: inherit;
-	}
 }
 
 .wp-block-cover__video-background {
