@@ -62,6 +62,7 @@ describe( 'Navigating the block hierarchy', () => {
 		// Navigate to the columns blocks using the keyboard.
 		await openBlockNavigator();
 		await page.keyboard.press( 'Enter' );
+		// Skip reason: when it fails Columns block doesn't get properly selected from the block navigator.
 		await page.waitForSelector( '.block-editor-block-list__block.is-selected[data-type="core/columns"]' );
 
 		// Move focus to the sidebar area.

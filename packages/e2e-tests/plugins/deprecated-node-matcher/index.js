@@ -2,7 +2,6 @@
 	var registerBlockType = wp.blocks.registerBlockType;
 	var RichText = wp.editor.RichText;
 	var el = wp.element.createElement;
-	var el = wp.element.createElement;
 
 	registerBlockType( 'core/deprecated-children-matcher', {
 		title: 'Deprecated Children Matcher',
