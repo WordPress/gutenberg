@@ -7,6 +7,7 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 /**
  * Internal dependencies
  */
+import './hooks';
 import './store';
 import EditWidgetsInitializer from './components/edit-widgets-initializer';
 

@@ -45,6 +45,7 @@
 		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
 		"@wordpress/keycodes": "file:packages/keycodes",
 		"@wordpress/list-reusable-blocks": "file:packages/list-reusable-blocks",
+		"@wordpress/media-utils": "file:packages/media-utils",
 		"@wordpress/notices": "file:packages/notices",
 		"@wordpress/nux": "file:packages/nux",
 		"@wordpress/plugins": "file:packages/plugins",
