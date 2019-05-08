@@ -5,7 +5,7 @@ const { camelCase, nth, upperFirst } = require( 'lodash' );
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
 
-const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/master`;
+const baseRepoUrl = '..';
 const componentPaths = glob( 'packages/components/src/*/**/README.md' );
 const packagePaths = glob( 'packages/*/package.json' ).map(
 	( fileName ) => fileName.split( '/' )[ 1 ]
