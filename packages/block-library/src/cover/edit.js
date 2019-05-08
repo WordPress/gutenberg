@@ -12,7 +12,10 @@ import {
 	FocalPointPicker,
 	IconButton,
 	PanelBody,
+	Path,
 	RangeControl,
+	Rect,
+	SVG,
 	ToggleControl,
 	Toolbar,
 	withNotices,
@@ -24,7 +27,6 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUpload,
 	MediaUploadCheck,
 	PanelColorSettings,
 	withColors,
@@ -42,6 +44,7 @@ import {
 	backgroundImageStyles,
 	dimRatioToClass,
 } from './shared';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Module Constants
@@ -64,14 +67,27 @@ function retrieveFastAverageColor() {
 }
 
 class CoverEdit extends Component {
-	constructor() {
+	constructor( { attributes } ) {
 		super( ...arguments );
 		this.state = {
 			isDark: false,
+			isEditing: ! attributes.url,
 		};
 		this.imageRef = createRef();
 		this.videoRef = createRef();
 		this.changeIsDarkIfRequired = this.changeIsDarkIfRequired.bind( this );
+		this.toggleIsEditing = this.toggleIsEditing.bind( this );
+	}
+
+	toggleIsEditing() {
+		this.setState( {
+			isEditing: ! this.state.isEditing,
+		} );
+		if ( this.state.isEditing ) {
+			speak( __( 'You are now viewing the image in the image block.' ) );
+		} else {
+			speak( __( 'You are now editing the image in the image block.' ) );
+		}
 	}
 
 	componentDidMount() {
@@ -83,6 +99,7 @@ class CoverEdit extends Component {
 	}
 
 	render() {
+		const { isEditing } = this.state;
 		const {
 			attributes,
 			setAttributes,
@@ -97,9 +114,22 @@ class CoverEdit extends Component {
 			dimRatio,
 			focalPoint,
 			hasParallax,
-			id,
 			url,
 		} = attributes;
+
+		const onSelectUrl = ( newURL ) => {
+			if ( newURL !== url ) {
+				this.props.setAttributes( {
+					url: newURL,
+					id: undefined,
+				} );
+			}
+
+			this.setState( {
+				isEditing: false,
+			} );
+		};
+
 		const onSelectMedia = ( media ) => {
 			if ( ! media || ! media.url ) {
 				setAttributes( { url: undefined, id: undefined } );
@@ -134,6 +164,10 @@ class CoverEdit extends Component {
 					{}
 				),
 			} );
+
+			this.setState( {
+				isEditing: false,
+			} );
 		};
 
 		const toggleParallax = () => {
@@ -156,6 +190,7 @@ class CoverEdit extends Component {
 		if ( focalPoint ) {
 			style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
 		}
+		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 
 		const controls = (
 			<>
@@ -164,18 +199,12 @@ class CoverEdit extends Component {
 						<>
 							<MediaUploadCheck>
 								<Toolbar>
-									<MediaUpload
-										onSelect={ onSelectMedia }
-										allowedTypes={ ALLOWED_MEDIA_TYPES }
-										value={ id }
-										render={ ( { open } ) => (
-											<IconButton
-												className="components-toolbar__control"
-												label={ __( 'Edit media' ) }
-												icon="edit"
-												onClick={ open }
-											/>
-										) }
+									<IconButton
+										className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
+										aria-pressed={ this.state.isEditing }
+										label={ __( 'Edit media' ) }
+										icon={ editImageIcon }
+										onClick={ this.toggleIsEditing }
 									/>
 								</Toolbar>
 							</MediaUploadCheck>
@@ -225,25 +254,27 @@ class CoverEdit extends Component {
 			</>
 		);
 
-		if ( ! url ) {
-			const placeholderIcon = <BlockIcon icon={ icon } />;
-			const label = __( 'Cover' );
+		if ( isEditing || ! url ) {
+			const labels = {
+				title: __( 'Cover' ),
+				instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
+			};
 
 			return (
 				<>
 					{ controls }
 					<MediaPlaceholder
-						icon={ placeholderIcon }
+						icon={ <BlockIcon icon={ icon } /> }
 						className={ className }
-						labels={ {
-							title: label,
-							instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
-						} }
+						labels={ labels }
 						onSelect={ onSelectMedia }
-						accept="image/*,video/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onSelectURL={ onSelectUrl }
+						onDoubleClick={ this.toggleIsEditing }
+						onCancel={ !! url && this.toggleIsEditing }
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
+						accept="image/*,video/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
 					/>
 				</>
 			);
