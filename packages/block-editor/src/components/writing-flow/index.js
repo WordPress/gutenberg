@@ -34,7 +34,7 @@ import {
  * Browser constants
  */
 
-const { getSelection } = window;
+const { getSelection, getComputedStyle } = window;
 
 /**
  * Given an element, returns true if the element is a tabbable text field, or
@@ -318,7 +318,9 @@ class WritingFlow extends Component {
 			}
 		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
-			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+			const { direction } = getComputedStyle( target );
+			const atStart = direction === 'rtl' ? ( ! isReverse ) : isReverse;
+			placeCaretAtHorizontalEdge( closestTabbable, atStart );
 			event.preventDefault();
 		}
 	}
