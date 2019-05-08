@@ -559,7 +559,9 @@ export class RichText extends Component {
 		}
 
 		const { keyCode } = event;
-		const isReverse = keyCode === BACKSPACE;
+		const direction = this.getDirection();
+		const reverseKey = direction === 'rtl' ? DELETE : BACKSPACE;
+		const isReverse = keyCode === reverseKey;
 
 		// Only process delete if the key press occurs at uncollapsed edge.
 		if ( ! isCollapsed( this.createRecord() ) ) {
