@@ -87,7 +87,9 @@ describe( 'adding blocks', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should navigate around inline boundaries', async () => {
+	// This test isn't reliable on Travis and fails from time to time.
+	// See: https://github.com/WordPress/gutenberg/pull/14986.
+	it.skip( 'should navigate around inline boundaries', async () => {
 		// Add demo content
 		await clickBlockAppender();
 		await page.keyboard.type( 'First' );
@@ -145,7 +147,9 @@ describe( 'adding blocks', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should navigate around nested inline boundaries', async () => {
+	// This test isn't reliable on Travis and fails from time to time.
+	// See: https://github.com/WordPress/gutenberg/pull/14986.
+	it.skip( 'should navigate around nested inline boundaries', async () => {
 		await clickBlockAppender();
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '1 2' );

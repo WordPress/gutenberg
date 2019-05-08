@@ -71,6 +71,7 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( ' 2' );
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		// Skip reason: when it fails the selection above doesn't get applied.
 		await pressKeyWithModifier( 'primary', 'b' );
 
 		const count = await page.evaluate( () => document.querySelectorAll(

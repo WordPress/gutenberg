@@ -278,7 +278,9 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should outdent with children', async () => {
+	// This test isn't reliable on Travis and fails from time to time.
+	// See: https://github.com/WordPress/gutenberg/pull/14986.
+	it.skip( 'should outdent with children', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
