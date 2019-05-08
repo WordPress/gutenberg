@@ -380,7 +380,6 @@ export class RichText extends Component {
 		}
 
 		this.recalculateBoundaryStyle();
-		this.onSelectionChange();
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
@@ -471,10 +470,10 @@ export class RichText extends Component {
 
 			// When the selection changes as a result of a key press, then
 			// the active formats should be set depending on direction.
-			if ( this.isKeyPressed ) {
+			if ( this.isKeyPressed && this.props.selectionStart !== undefined ) {
 				// Selection is moved forward if the new start is higher than
 				// the last.
-				const isForward = start < this.selectionStart;
+				const isForward = start < this.props.selectionStart;
 
 				if ( isForward ) {
 					activeFormats = formats[ start ] || [];
@@ -597,15 +596,15 @@ export class RichText extends Component {
 		}
 
 		if ( onMerge ) {
-			onMerge( ! isReverse );
+			onMerge( keyCode === DELETE );
 		}
 
 		// Only handle remove on Backspace. This serves dual-purpose of being
 		// an intentional user interaction distinguishing between Backspace and
 		// Delete to remove the empty field, but also to avoid merge & remove
 		// causing destruction of two fields (merge, then removed merged).
-		if ( onRemove && empty && isReverse ) {
-			onRemove( ! isReverse );
+		if ( onRemove && empty && keyCode === BACKSPACE ) {
+			onRemove();
 		}
 
 		event.preventDefault();
