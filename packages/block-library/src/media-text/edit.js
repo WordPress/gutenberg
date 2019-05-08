@@ -24,11 +24,16 @@ import {
 	Toolbar,
 	ExternalLink,
 	FocalPointPicker,
+	IconButton,
+	Path,
+	Rect,
+	SVG,
 } from '@wordpress/components';
 /**
  * Internal dependencies
  */
 import MediaContainer from './media-container';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Constants
@@ -42,15 +47,45 @@ const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) => Math.max( WIDTH_CONSTRAINT_PERCENTAGE, Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE ) );
 
 class MediaTextEdit extends Component {
-	constructor() {
+	constructor( { attributes } ) {
 		super( ...arguments );
 
 		this.onSelectMedia = this.onSelectMedia.bind( this );
 		this.onWidthChange = this.onWidthChange.bind( this );
 		this.commitWidthChange = this.commitWidthChange.bind( this );
+		this.toggleIsEditing = this.toggleIsEditing.bind( this );
+		this.onSelectUrl = this.onSelectUrl.bind( this );
+		this.renderMediaArea = this.renderMediaArea.bind( this );
 		this.state = {
 			mediaWidth: null,
+			isEditing: ! attributes.mediaUrl,
 		};
+	}
+
+	toggleIsEditing() {
+		this.setState( {
+			isEditing: ! this.state.isEditing,
+		} );
+		if ( this.state.isEditing ) {
+			speak( __( 'You are now viewing the image in the image block.' ) );
+		} else {
+			speak( __( 'You are now editing the image in the image block.' ) );
+		}
+	}
+
+	onSelectUrl( newURL ) {
+		const { mediaUrl } = this.props.attributes;
+
+		if ( newURL !== mediaUrl ) {
+			this.props.setAttributes( {
+				mediaUrl: newURL,
+				mediaId: undefined,
+			} );
+		}
+
+		this.setState( {
+			isEditing: false,
+		} );
 	}
 
 	onSelectMedia( media ) {
@@ -75,6 +110,10 @@ class MediaTextEdit extends Component {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src = get( media, [ 'sizes', 'large', 'url' ] ) || get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
 		}
+
+		this.setState( {
+			isEditing: false,
+		} );
 
 		setAttributes( {
 			mediaAlt: media.alt,
@@ -105,14 +144,25 @@ class MediaTextEdit extends Component {
 
 	renderMediaArea() {
 		const { attributes } = this.props;
-		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth, imageFill, focalPoint } = attributes;
-
+		const {
+			mediaAlt,
+			mediaId,
+			mediaPosition,
+			mediaType,
+			mediaUrl,
+			mediaWidth,
+			imageFill,
+			focalPoint,
+		} = attributes;
 		return (
 			<MediaContainer
 				className="block-library-media-text__media-container"
 				onSelectMedia={ this.onSelectMedia }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
+				isEditing={ this.state.isEditing }
+				toggleIsEditing={ this.toggleIsEditing }
+				onSelectUrl={ this.onSelectUrl }
 				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint } }
 			/>
 		);
@@ -211,6 +261,8 @@ class MediaTextEdit extends Component {
 				/> ) }
 			</PanelBody>
 		);
+		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
+
 		return (
 			<>
 				<InspectorControls>
@@ -225,6 +277,15 @@ class MediaTextEdit extends Component {
 					<Toolbar
 						controls={ toolbarControls }
 					/>
+					<Toolbar>
+						{ mediaUrl && <IconButton
+							className={ classnames( 'components-toolbar__control', { 'is-active': this.state.isEditing } ) }
+							label={ __( 'Edit Media' ) }
+							aria-pressed={ this.state.isEditing }
+							onClick={ this.toggleIsEditing }
+							icon={ editImageIcon }
+						/> }
+					</Toolbar>
 					<BlockVerticalAlignmentToolbar
 						onChange={ onVerticalAlignmentChange }
 						value={ verticalAlignment }

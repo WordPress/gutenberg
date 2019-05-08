@@ -1,12 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, ResizableBox, Toolbar } from '@wordpress/components';
+import { ResizableBox } from '@wordpress/components';
 import {
-	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	MediaUpload,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -31,35 +29,11 @@ export function imageFillStyles( url, focalPoint ) {
 }
 
 class MediaContainer extends Component {
-	renderToolbarEditButton() {
-		const { mediaId, onSelectMedia } = this.props;
-		return (
-			<BlockControls>
-				<Toolbar>
-					<MediaUpload
-						onSelect={ onSelectMedia }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ mediaId }
-						render={ ( { open } ) => (
-							<IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit media' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
-					/>
-				</Toolbar>
-			</BlockControls>
-		);
-	}
-
 	renderImage() {
 		const { mediaAlt, mediaUrl, className, imageFill, focalPoint } = this.props;
 		const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
 		return (
 			<>
-				{ this.renderToolbarEditButton() }
 				<figure className={ className } style={ backgroundStyles }>
 					<img src={ mediaUrl } alt={ mediaAlt } />
 				</figure>
@@ -71,7 +45,6 @@ class MediaContainer extends Component {
 		const { mediaUrl, className } = this.props;
 		return (
 			<>
-				{ this.renderToolbarEditButton() }
 				<figure className={ className }>
 					<video controls src={ mediaUrl } />
 				</figure>
@@ -80,60 +53,84 @@ class MediaContainer extends Component {
 	}
 
 	renderPlaceholder() {
-		const { onSelectMedia, className } = this.props;
+		const {
+			mediaUrl,
+			mediaId,
+			mediaType,
+			toggleIsEditing,
+			onSelectMedia,
+			onSelectUrl,
+			className,
+		} = this.props;
+
+		const labels = {
+			title: ! mediaUrl ? __( 'Media' ) : __( 'Edit media' ),
+		};
+
+		const mediaPreview = ( !! mediaUrl && <img
+			alt={ __( 'Edit media' ) }
+			title={ __( 'Edit media' ) }
+			className={ 'edit-image-preview' }
+			src={ mediaUrl }
+		/> );
+
 		return (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
-				labels={ {
-					title: __( 'Media area' ),
-				} }
 				className={ className }
+				labels={ labels }
 				onSelect={ onSelectMedia }
+				onSelectURL={ onSelectUrl }
+				onDoubleClick={ toggleIsEditing }
+				onCancel={ !! mediaUrl && toggleIsEditing }
+				onError={ this.onUploadError }
 				accept="image/*,video/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ { mediaId, mediaUrl } }
+				mediaPreview={ mediaType === 'image' && mediaPreview }
 			/>
 		);
 	}
 
 	render() {
-		const { mediaPosition, mediaUrl, mediaType, mediaWidth, commitWidthChange, onWidthChange } = this.props;
-		if ( mediaType && mediaUrl ) {
-			const onResize = ( event, direction, elt ) => {
-				onWidthChange( parseInt( elt.style.width ) );
-			};
-			const onResizeStop = ( event, direction, elt ) => {
-				commitWidthChange( parseInt( elt.style.width ) );
-			};
-			const enablePositions = {
-				right: mediaPosition === 'left',
-				left: mediaPosition === 'right',
-			};
-
-			let mediaElement = null;
-			switch ( mediaType ) {
-				case 'image':
-					mediaElement = this.renderImage();
-					break;
-				case 'video':
-					mediaElement = this.renderVideo();
-					break;
-			}
-			return (
-				<ResizableBox
-					className="editor-media-container__resizer"
-					size={ { width: mediaWidth + '%' } }
-					minWidth="10%"
-					maxWidth="100%"
-					enable={ enablePositions }
-					onResize={ onResize }
-					onResizeStop={ onResizeStop }
-					axis="x"
-				>
-					{ mediaElement }
-				</ResizableBox>
-			);
+		const { isEditing, mediaPosition, mediaType, mediaWidth, commitWidthChange, onWidthChange } = this.props;
+		if ( isEditing ) {
+			return this.renderPlaceholder();
 		}
-		return this.renderPlaceholder();
+		const onResize = ( event, direction, elt ) => {
+			onWidthChange( parseInt( elt.style.width ) );
+		};
+		const onResizeStop = ( event, direction, elt ) => {
+			commitWidthChange( parseInt( elt.style.width ) );
+		};
+		const enablePositions = {
+			right: mediaPosition === 'left',
+			left: mediaPosition === 'right',
+		};
+
+		let mediaElement = null;
+		switch ( mediaType ) {
+			case 'image':
+				mediaElement = this.renderImage();
+				break;
+			case 'video':
+				mediaElement = this.renderVideo();
+				break;
+		}
+		return (
+			<ResizableBox
+				className="editor-media-container__resizer"
+				size={ { width: mediaWidth + '%' } }
+				minWidth="10%"
+				maxWidth="100%"
+				enable={ enablePositions }
+				onResize={ onResize }
+				onResizeStop={ onResizeStop }
+				axis="x"
+			>
+				{ mediaElement }
+			</ResizableBox>
+		);
 	}
 }
 
