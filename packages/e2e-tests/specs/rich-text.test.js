@@ -62,7 +62,9 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should not highlight more than one format', async () => {
+	// This test isn't reliable on Travis and fails from time to time.
+	// See: https://github.com/WordPress/gutenberg/pull/14986.
+	it.skip( 'should not highlight more than one format', async () => {
 		await clickBlockAppender();
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '1' );
