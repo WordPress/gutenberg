@@ -42,7 +42,7 @@ type PropsType = {
 	rootClientId: ?string,
 	blockClientIds: Array<string>,
 	blockCount: number,
-	focusBlock: ( clientId: string ) => void,
+	selectBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
 	replaceBlock: ( string, BlockType ) => mixed,
 	getBlockName: string => string,

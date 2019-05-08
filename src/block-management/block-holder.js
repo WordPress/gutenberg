@@ -26,7 +26,6 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { addAction, removeAction, hasAction } from '@wordpress/hooks';
-import { getBlockType } from '@wordpress/blocks';
 import { BlockEdit } from '@wordpress/block-editor';
 
 /**
