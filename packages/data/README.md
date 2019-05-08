@@ -435,6 +435,19 @@ _Parameters_
 
 Undocumented declaration.
 
+<a name="useSelect" href="#useSelect">#</a> **useSelect**
+
+A custom hook used for retrieving enhanced selector hooks from the given
+store.
+
+_Parameters_
+
+-   _store_ `string`: The store from which to retrieve the selectors.
+
+_Returns_
+
+-   `Object`: A collection of enhanced selectors
+
 <a name="withDispatch" href="#withDispatch">#</a> **withDispatch**
 
 Higher-order component used to add dispatch props using registered action creators.
