@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
@@ -6,7 +11,10 @@ import {
 	Disabled,
 	IconButton,
 	PanelBody,
+	Path,
+	Rect,
 	SelectControl,
+	SVG,
 	ToggleControl,
 	Toolbar,
 	withNotices,
@@ -19,7 +27,7 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { mediaUpload } from '@wordpress/editor';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -81,7 +89,7 @@ class AudioEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { src } = attributes;
 
-		// Set the block's src from the edit component's state, and switch off
+		// Set the block's src from the edit component's state, and toggle off
 		// the editing UI.
 		if ( newSrc !== src ) {
 			// Check if there's an embed block that handles this URL.
@@ -106,35 +114,49 @@ class AudioEdit extends Component {
 		const { autoplay, caption, loop, preload, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
-		const switchToEditing = () => {
-			this.setState( { editing: true } );
+		const toggleEditing = () => {
+			this.setState( { editing: ! this.state.editing } );
 		};
 		const onSelectAudio = ( media ) => {
 			if ( ! media || ! media.url ) {
 				// in this case there was an error and we should continue in the editing state
 				// previous attributes should be removed because they may be temporary blob urls
 				setAttributes( { src: undefined, id: undefined } );
-				switchToEditing();
+				toggleEditing();
 				return;
 			}
 			// sets the block's attribute and updates the edit component from the
-			// selected media, then switches off the editing UI
+			// selected media, then toggles off the editing UI
 			setAttributes( { src: media.url, id: media.id } );
 			this.setState( { src: media.url, editing: false } );
 		};
+		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		if ( editing ) {
 			return (
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					className={ className }
-					onSelect={ onSelectAudio }
-					onSelectURL={ this.onSelectURL }
-					accept="audio/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ this.props.attributes }
-					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
-				/>
+				<Fragment>
+					<BlockControls>
+						{ !! src && ( <Toolbar>
+							<IconButton
+								className={ classnames( 'components-toolbar__control is-active' ) }
+								label={ __( 'Edit audio' ) }
+								onClick={ toggleEditing }
+								icon={ editImageIcon }
+							/>
+						</Toolbar> ) }
+					</BlockControls>
+					<MediaPlaceholder
+						icon={ <BlockIcon icon={ icon } /> }
+						className={ className }
+						onCancel={ !! src && toggleEditing }
+						onSelect={ onSelectAudio }
+						onSelectURL={ this.onSelectURL }
+						accept="audio/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ this.props.attributes }
+						notices={ noticeUI }
+						onError={ noticeOperations.createErrorNotice }
+					/>
+				</Fragment>
 			);
 		}
 
@@ -144,10 +166,10 @@ class AudioEdit extends Component {
 				<BlockControls>
 					<Toolbar>
 						<IconButton
-							className="components-icon-button components-toolbar__control"
+							class={ classnames( 'components-toolbar__control' ) }
 							label={ __( 'Edit audio' ) }
-							onClick={ switchToEditing }
-							icon="edit"
+							onClick={ toggleEditing }
+							icon={ editImageIcon }
 						/>
 					</Toolbar>
 				</BlockControls>
