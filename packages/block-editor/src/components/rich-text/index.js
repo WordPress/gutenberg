@@ -130,6 +130,7 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onKeyUp = this.onKeyUp.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.onInput = this.onInput.bind( this );
@@ -461,11 +462,26 @@ export class RichText extends Component {
 	 */
 	onSelectionChange() {
 		const value = this.createRecord();
-		const { start, end } = value;
+		const { start, end, formats } = value;
 
 		if ( start !== this.selectionStart || end !== this.selectionEnd ) {
 			const { isCaretWithinFormattedText } = this.props;
-			const activeFormats = getActiveFormats( value );
+
+			let activeFormats = getActiveFormats( value );
+
+			// When the selection changes as a result of a key press, then
+			// the active formats should be set depending on direction.
+			if ( this.isKeyPressed ) {
+				// Selection is moved forward if the new start is higher than
+				// the last.
+				const isForward = start < this.selectionStart;
+
+				if ( isForward ) {
+					activeFormats = formats[ start ] || [];
+				} else {
+					activeFormats = formats[ start - 1 ] || [];
+				}
+			}
 
 			if ( ! isCaretWithinFormattedText && activeFormats.length ) {
 				this.props.onEnterFormattedText();
@@ -603,6 +619,8 @@ export class RichText extends Component {
 	onKeyDown( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
+		this.isKeyPressed = true;
+
 		if (
 			// Only override left and right keys without modifiers pressed.
 			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
@@ -732,6 +750,10 @@ export class RichText extends Component {
 				this.splitContent();
 			}
 		}
+	}
+
+	onKeyUp() {
+		delete this.isKeyPressed;
 	}
 
 	getDirection() {
@@ -1095,6 +1117,7 @@ export class RichText extends Component {
 								onInput={ this.onInput }
 								onCompositionEnd={ this.onCompositionEnd }
 								onKeyDown={ this.onKeyDown }
+								onKeyUp={ this.onKeyUp }
 								onFocus={ this.onFocus }
 								onBlur={ this.onBlur }
 								onMouseDown={ this.onPointerDown }
