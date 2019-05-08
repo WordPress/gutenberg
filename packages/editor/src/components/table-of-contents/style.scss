@@ -17,15 +17,15 @@
 	}
 }
 
+.table-of-contents__wrapper:focus {
+	@include square-style__focus();
+	outline-offset: $grid-size;
+}
+
 .table-of-contents__counts {
 	display: flex;
 	flex-wrap: wrap;
 	margin: 0;
-
-	&:focus {
-		@include square-style__focus();
-		outline-offset: $grid-size;
-	}
 }
 
 .table-of-contents__count {
