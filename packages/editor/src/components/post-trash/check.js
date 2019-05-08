@@ -1,20 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
-function PostTrashCheck( { isNew, postId, children } ) {
+export default function PostTrashCheck( { children } ) {
+	const { isEditedPostNew, getCurrentPostId } = useSelect( 'core/editor' );
+	const isNew = isEditedPostNew();
+	const postId = getCurrentPostId();
 	if ( isNew || ! postId ) {
 		return null;
 	}
 
 	return children;
 }
-
-export default withSelect( ( select ) => {
-	const { isEditedPostNew, getCurrentPostId } = select( 'core/editor' );
-	return {
-		isNew: isEditedPostNew(),
-		postId: getCurrentPostId(),
-	};
-} )( PostTrashCheck );
