@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
@@ -8,7 +13,10 @@ import {
 	Disabled,
 	IconButton,
 	PanelBody,
+	Path,
+	Rect,
 	SelectControl,
+	SVG,
 	ToggleControl,
 	Toolbar,
 	withNotices,
@@ -152,7 +160,7 @@ class VideoEdit extends Component {
 		} = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
-			this.setState( { editing: true } );
+			this.setState( { editing: ! this.state.editing } );
 		};
 		const onSelectVideo = ( media ) => {
 			if ( ! media || ! media.url ) {
@@ -168,19 +176,34 @@ class VideoEdit extends Component {
 			this.setState( { src: media.url, editing: false } );
 		};
 
+		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		if ( editing ) {
 			return (
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					className={ className }
-					onSelect={ onSelectVideo }
-					onSelectURL={ this.onSelectURL }
-					accept="video/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ this.props.attributes }
-					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
-				/>
+				<>
+					<BlockControls>
+						{ !! src && ( <Toolbar>
+							<IconButton
+								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.editing } ) }
+								aria-pressed={ this.state.editing }
+								label={ __( 'Edit video' ) }
+								onClick={ switchToEditing }
+								icon={ editImageIcon }
+							/>
+						</Toolbar> ) }
+					</BlockControls>
+					<MediaPlaceholder
+						icon={ <BlockIcon icon={ icon } /> }
+						className={ className }
+						onSelect={ onSelectVideo }
+						onSelectURL={ this.onSelectURL }
+						onCancel={ !! src && switchToEditing }
+						accept="video/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ this.props.attributes }
+						notices={ noticeUI }
+						onError={ noticeOperations.createErrorNotice }
+					/>
+				</>
 			);
 		}
 		const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
@@ -194,7 +217,7 @@ class VideoEdit extends Component {
 							className="components-icon-button components-toolbar__control"
 							label={ __( 'Edit video' ) }
 							onClick={ switchToEditing }
-							icon="edit"
+							icon={ editImageIcon }
 						/>
 					</Toolbar>
 				</BlockControls>
