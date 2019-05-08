@@ -403,7 +403,6 @@ export class RichText extends Component {
 		const { onSplit } = this.props;
 
 		const { pastedText, pastedHtml, files } = event.nativeEvent;
-		this.onTextUpdate( event );
 		const currentRecord = this.createRecord();
 
 		event.preventDefault();
@@ -446,7 +445,6 @@ export class RichText extends Component {
 					},
 				} );
 				this.value = this.valueToFormat( linkedRecord );
-				//this.lastEventCount = undefined;
 				this.props.onChange( this.value );
 
 				// Allows us to ask for this information when we get a report.
@@ -644,7 +642,7 @@ export class RichText extends Component {
 			return true;
 		}
 
-		//  TODO: Please re-introduce the check to avoid updating the content right after an `onChange` call.
+		// TODO: Please re-introduce the check to avoid updating the content right after an `onChange` call.
 		// It was removed in https://github.com/WordPress/gutenberg/pull/12417 to fix undo/redo problem.
 
 		// If the component is changed React side (undo/redo/merging/splitting/custom text actions)
