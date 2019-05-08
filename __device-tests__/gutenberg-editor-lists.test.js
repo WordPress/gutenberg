@@ -54,7 +54,8 @@ describe( 'Gutenberg Editor tests', () => {
 		// Send the second list item text
 		await editorPage.sendTextToListBlock( listBlockElement, testData.listItem2 );
 
-		await editorPage.removeListBlockAtPosition( 1 );
+		// switch to html and verify html
+		await editorPage.verifyHtmlContent( testData.listHtml );
 	} );
 
 	afterAll( async () => {

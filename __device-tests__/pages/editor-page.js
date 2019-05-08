@@ -15,7 +15,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { isAndroid, swipeUp, typeString } from '../helpers/utils';
+import { isAndroid, swipeUp, typeString, toggleHtmlMode } from '../helpers/utils';
 
 export default class EditorPage {
 	driver: wd.PromiseChainWebdriver;
@@ -238,5 +238,21 @@ export default class EditorPage {
 		const block = await this.getListBlockAtPosition( position );
 		const text = await this.getTextForListBlock( block );
 		return text.toString();
+	}
+
+	async getTextViewForHtmlViewContent() {
+		const accessibilityId = 'html-view-content';
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async verifyHtmlContent( html: string ) {
+		await toggleHtmlMode( this.driver );
+
+		const htmlContentView = await this.getTextViewForHtmlViewContent();
+		const text = await htmlContentView.text();
+		expect( text ).toBe( html );
+
+		await toggleHtmlMode( this.driver );
 	}
 }

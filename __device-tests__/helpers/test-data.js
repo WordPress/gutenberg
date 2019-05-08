@@ -7,3 +7,6 @@ Nullam porta aliquam nisi, eu dapibus mauris dignissim at. Praesent ut congue se
 
 exports.listItem1 = `Milk`;
 exports.listItem2 = `Honey`;
+exports.listHtml = `<!-- wp:list -->
+<ul><li>Milk</li><li>Honey</li></ul>
+<!-- /wp:list -->`;
