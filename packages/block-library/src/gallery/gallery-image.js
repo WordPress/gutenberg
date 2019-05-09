@@ -127,17 +127,15 @@ class GalleryImage extends Component {
 
 		return (
 			<figure className={ className }>
-				{ isSelected &&
-					<div className="block-library-gallery-item__inline-menu">
-						<IconButton
-							icon="no-alt"
-							onClick={ onRemove }
-							className="blocks-gallery-item__remove"
-							label={ __( 'Remove Image' ) }
-						/>
-					</div>
-				}
 				{ href ? <a href={ href }>{ img }</a> : img }
+				<div className="block-library-gallery-item__inline-menu">
+					<IconButton
+						icon="no-alt"
+						onClick={ onRemove }
+						className="blocks-gallery-item__remove"
+						label={ __( 'Remove Image' ) }
+					/>
+				</div>
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) ? (
 					<RichText
 						tagName="figcaption"
