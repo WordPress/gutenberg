@@ -58,6 +58,7 @@ function ColumnEdit( {
 						min={ 0 }
 						max={ 100 }
 						required
+						allowReset
 					/>
 				</PanelBody>
 			</InspectorControls>
