@@ -143,12 +143,15 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return true;
 	}
 
+	const { direction } = computedStyle;
+	const isReverseDir = direction === 'rtl' ? ( ! isReverse ) : isReverse;
+
 	// To calculate the horizontal position, we insert a test range and see if
 	// this test range has the same horizontal position. This method proves to
 	// be better than a DOM-based calculation, because it ignores empty text
 	// nodes and a trailing line break element. In other words, we need to check
 	// visual positioning, not DOM positioning.
-	const x = isReverse ? containerRect.left + 1 : containerRect.right - 1;
+	const x = isReverseDir ? containerRect.left + 1 : containerRect.right - 1;
 	const y = isReverse ? containerRect.top + buffer : containerRect.bottom - buffer;
 	const testRange = hiddenCaretRangeFromPoint( document, x, y, container );
 
@@ -156,7 +159,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const side = isReverse ? 'left' : 'right';
+	const side = isReverseDir ? 'left' : 'right';
 	const testRect = getRectangleFromRange( testRange );
 
 	return Math.round( testRect[ side ] ) === Math.round( rangeRect[ side ] );

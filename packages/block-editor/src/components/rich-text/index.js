@@ -574,9 +574,7 @@ export class RichText extends Component {
 		}
 
 		const { keyCode } = event;
-		const direction = this.getDirection();
-		const reverseKey = direction === 'rtl' ? DELETE : BACKSPACE;
-		const isReverse = keyCode === reverseKey;
+		const isReverse = keyCode === BACKSPACE;
 
 		// Only process delete if the key press occurs at uncollapsed edge.
 		if ( ! isCollapsed( this.createRecord() ) ) {
@@ -596,15 +594,15 @@ export class RichText extends Component {
 		}
 
 		if ( onMerge ) {
-			onMerge( keyCode === DELETE );
+			onMerge( ! isReverse );
 		}
 
 		// Only handle remove on Backspace. This serves dual-purpose of being
 		// an intentional user interaction distinguishing between Backspace and
 		// Delete to remove the empty field, but also to avoid merge & remove
 		// causing destruction of two fields (merge, then removed merged).
-		if ( onRemove && empty && keyCode === BACKSPACE ) {
-			onRemove();
+		if ( onRemove && empty && isReverse ) {
+			onRemove( ! isReverse );
 		}
 
 		event.preventDefault();

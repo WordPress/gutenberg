@@ -287,6 +287,9 @@ class WritingFlow extends Component {
 			this.verticalRect = computeCaretRect();
 		}
 
+		const { direction } = getComputedStyle( target );
+		const isReverseDir = direction === 'rtl' ? ( ! isReverse ) : isReverse;
+
 		if ( isShift ) {
 			if (
 				(
@@ -316,11 +319,9 @@ class WritingFlow extends Component {
 				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 				event.preventDefault();
 			}
-		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverse ) ) {
-			const { direction } = getComputedStyle( target );
-			const isBackward = direction === 'rtl' ? ( ! isReverse ) : isReverse;
-			const closestTabbable = this.getClosestTabbable( target, isBackward );
-			placeCaretAtHorizontalEdge( closestTabbable, isBackward );
+		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverseDir ) ) {
+			const closestTabbable = this.getClosestTabbable( target, isReverseDir );
+			placeCaretAtHorizontalEdge( closestTabbable, isReverseDir );
 			event.preventDefault();
 		}
 	}
