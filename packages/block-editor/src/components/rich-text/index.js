@@ -465,12 +465,14 @@ export class RichText extends Component {
 
 		if ( start !== this.selectionStart || end !== this.selectionEnd ) {
 			const { isCaretWithinFormattedText } = this.props;
+			const isHorizontal =
+				this.keyPressed === LEFT || this.keyPressed === RIGHT;
 
 			let activeFormats = getActiveFormats( value );
 
 			// When the selection changes as a result of a key press, then
 			// the active formats should be set depending on direction.
-			if ( this.isKeyPressed && this.props.selectionStart !== undefined ) {
+			if ( isHorizontal && this.props.selectionStart !== undefined ) {
 				// Selection is moved forward if the new start is higher than
 				// the last.
 				const isForward = start < this.props.selectionStart;
@@ -616,7 +618,7 @@ export class RichText extends Component {
 	onKeyDown( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
-		this.isKeyPressed = true;
+		this.keyPressed = keyCode;
 
 		if (
 			// Only override left and right keys without modifiers pressed.
@@ -750,7 +752,7 @@ export class RichText extends Component {
 	}
 
 	onKeyUp() {
-		delete this.isKeyPressed;
+		delete this.keyPressed;
 	}
 
 	getDirection() {
