@@ -112,12 +112,12 @@
  */
 
 // Buttons with rounded corners.
-@mixin button-style__disabled {
+@mixin button-style__disabled() {
 	opacity: 0.6;
 	cursor: default;
 }
 
-@mixin button-style__hover {
+@mixin button-style__hover() {
 	background-color: $white;
 	color: $dark-gray-900;
 	box-shadow: inset 0 0 0 1px $light-gray-500, inset 0 0 0 2px $white, 0 1px 1px rgba($dark-gray-900, 0.2);
@@ -150,7 +150,7 @@
 }
 
 // Formatting Buttons.
-@mixin formatting-button-style__hover {
+@mixin formatting-button-style__hover() {
 	color: $dark-gray-500;
 	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
 }
@@ -221,12 +221,12 @@
 }
 
 // Blocks in the Library.
-@mixin block-style__disabled {
+@mixin block-style__disabled() {
 	opacity: 0.6;
 	cursor: default;
 }
 
-@mixin block-style__hover {
+@mixin block-style__hover() {
 	background: $light-gray-200;
 	color: $dark-gray-900;
 }
@@ -347,7 +347,7 @@
  * Reset default styles for JavaScript UI based pages.
  * This is a WP-admin agnostic reset
  */
-@mixin reset {
+@mixin reset() {
 	box-sizing: border-box;
 
 	*,
