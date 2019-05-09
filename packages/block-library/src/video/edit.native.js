@@ -130,7 +130,7 @@ class VideoEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { caption, id, poster, src } = attributes;
+		const { caption, id, src } = attributes;
 		const { isMediaRequested, videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
@@ -196,7 +196,6 @@ class VideoEdit extends React.Component {
 									{ showVideo &&
 										<Video
 											source={ { uri: src } }
-											poster={ poster }
 											style={ videoStyle }
 											paused={ true }
 											muted={ true }
