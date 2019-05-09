@@ -51,11 +51,29 @@
 		text-align: left;
 		align-items: center;
 	}
+
 	&__placeholder-input {
 		width: 100px;
 	}
+
 	&__placeholder-button {
 		min-width: 100px;
 		justify-content: center;
+	}
+
+	&__caption-content {
+		overflow: hidden;
+		height: 0;
+		margin: 0.5em 0 0;
+
+		&.is-visible {
+			overflow: auto;
+			height: auto;
+
+			// The following rules are specified under the `.is-visible` selector
+			// as it helps introduce specificity and override conflicting styles.
+			margin: 0.5em 0 0;
+			@include caption-style-theme();
+		}
 	}
 }
