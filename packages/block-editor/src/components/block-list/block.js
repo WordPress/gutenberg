@@ -397,6 +397,7 @@ function BlockListBlock( {
 							isFocusMode && ( isSelected || isParentOfSelectedBlock ),
 						'has-child-selected': isParentOfSelectedBlock,
 						'is-focus-mode': isFocusMode,
+						'has-child-selected': isParentOfSelectedBlock,
 					},
 					className
 				);
