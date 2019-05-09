@@ -40,7 +40,7 @@ function ColumnEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Column Settings' ) }>
 					<RangeControl
-						label={ __( 'Width' ) }
+						label={ __( 'Percentage width' ) }
 						value={ width }
 						onChange={ updateWidth }
 						min={ 0 }
