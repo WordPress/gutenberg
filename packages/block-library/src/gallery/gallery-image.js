@@ -140,7 +140,7 @@ class GalleryImage extends Component {
 				</div>
 				<RichText
 					tagName="figcaption"
-					placeholder={ __( 'Write caption…' ) }
+					placeholder={ isSelected ? __( 'Write caption…' ) : null }
 					value={ caption }
 					isSelected={ this.state.captionSelected }
 					onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
