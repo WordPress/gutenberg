@@ -732,6 +732,7 @@ export const multiSelect = getBlockEditorAction( 'multiSelect' );
 export const clearSelectedBlock = getBlockEditorAction( 'clearSelectedBlock' );
 export const toggleSelection = getBlockEditorAction( 'toggleSelection' );
 export const replaceBlocks = getBlockEditorAction( 'replaceBlocks' );
+export const replaceBlock = getBlockEditorAction( 'replaceBlock' );
 export const moveBlocksDown = getBlockEditorAction( 'moveBlocksDown' );
 export const moveBlocksUp = getBlockEditorAction( 'moveBlocksUp' );
 export const moveBlockToPosition = getBlockEditorAction( 'moveBlockToPosition' );
