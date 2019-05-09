@@ -617,7 +617,7 @@ export class RichText extends Component {
 
 		// This logic will handle the selection when two blocks are merged or when block is split
 		// into two blocks
-		if ( nextTextContent.startsWith( this.savedContent ) && this.savedContent && this.savedContent.length > 0 ) {
+		if ( nextTextContent === this.savedContent && this.savedContent && this.savedContent.length > 0 ) {
 			let length = this.savedContent.length;
 			if ( length === 0 && nextTextContent !== this.props.value ) {
 				length = this.props.value.length;
