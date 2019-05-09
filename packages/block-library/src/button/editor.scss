@@ -28,7 +28,7 @@
 
 	// Add outline to button on focus to indicate focus-state
 	.block-editor-rich-text__editable:focus {
-		box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
+		box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-focus;
 
 		// Windows' High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;

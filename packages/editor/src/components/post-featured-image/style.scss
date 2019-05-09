@@ -25,11 +25,11 @@
 	width: 100%;
 	padding: 0;
 	transition: all 0.1s ease-out;
-	box-shadow: 0 0 0 0 $blue-medium-500;
+	box-shadow: 0 0 0 0 $blue-medium-focus;
 }
 
 .editor-post-featured-image__preview:not(:disabled):not([aria-disabled="true"]):focus {
-	box-shadow: 0 0 0 4px $blue-medium-500;
+	box-shadow: 0 0 0 4px $blue-medium-focus;
 }
 
 .editor-post-featured-image__toggle {
