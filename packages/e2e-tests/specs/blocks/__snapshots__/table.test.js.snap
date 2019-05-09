@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Table allows text to by typed into cells 1`] = `
+"<!-- wp:table -->
+<table class=\\"wp-block-table\\"><tbody><tr><td>This</td><td>is</td></tr><tr><td>table</td><td>block</td></tr></tbody></table>
+<!-- /wp:table -->"
+`;
+
+exports[`Table displays a form for choosing the row and column count of the table 1`] = `
+"<!-- wp:table -->
+<table class=\\"wp-block-table\\"><tbody><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr></tbody></table>
+<!-- /wp:table -->"
+`;
