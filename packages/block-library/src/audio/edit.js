@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+import { compose } from '@wordpress/compose';
 import {
 	Disabled,
 	IconButton,
@@ -18,9 +19,9 @@ import {
 	MediaPlaceholder,
 	RichText,
 } from '@wordpress/block-editor';
-import { mediaUpload } from '@wordpress/editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -48,7 +49,12 @@ class AudioEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, noticeOperations, setAttributes } = this.props;
+		const {
+			attributes,
+			mediaUpload,
+			noticeOperations,
+			setAttributes,
+		} = this.props;
 		const { id, src = '' } = attributes;
 
 		if ( ! id && isBlobURL( src ) ) {
@@ -200,5 +206,13 @@ class AudioEdit extends Component {
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
-
-export default withNotices( AudioEdit );
+export default compose( [
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		const { __experimentalMediaUpload } = getSettings();
+		return {
+			mediaUpload: __experimentalMediaUpload,
+		};
+	} ),
+	withNotices,
+] )( AudioEdit );

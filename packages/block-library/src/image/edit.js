@@ -43,7 +43,6 @@ import {
 	MediaPlaceholder,
 	RichText,
 } from '@wordpress/block-editor';
-import { mediaUpload } from '@wordpress/editor';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
@@ -126,7 +125,12 @@ class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes, noticeOperations } = this.props;
+		const {
+			attributes,
+			mediaUpload,
+			noticeOperations,
+			setAttributes,
+		} = this.props;
 		const { id, url = '' } = attributes;
 
 		if ( isTemporaryImage( id, url ) ) {
@@ -720,13 +724,19 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL, imageSizes } = getSettings();
+		const {
+			__experimentalMediaUpload,
+			imageSizes,
+			isRTL,
+			maxWidth,
+		} = getSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
 			imageSizes,
+			mediaUpload: __experimentalMediaUpload,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
