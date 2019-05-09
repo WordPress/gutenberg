@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RTL should arrow navigate 1`] = `
+"<!-- wp:paragraph -->
+<p>٠١٢</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RTL should merge backward 1`] = `
+"<!-- wp:paragraph -->
+<p>٠١</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RTL should merge forward 1`] = `
+"<!-- wp:paragraph -->
+<p>٠١</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RTL should split 1`] = `
+"<!-- wp:paragraph -->
+<p>٠</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>١</p>
+<!-- /wp:paragraph -->"
+`;
