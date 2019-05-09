@@ -545,6 +545,8 @@ export class RichText extends Component {
 			return;
 		}
 
+		this.firedAfterTextChanged = true; // Selection change event always fires after the fact
+
 		// update text before updating selection
 		// Make sure there are changes made to the content before upgrading it upward
 		this.onTextUpdate( event, true );
