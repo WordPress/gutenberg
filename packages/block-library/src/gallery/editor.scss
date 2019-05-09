@@ -61,9 +61,15 @@ ul.wp-block-gallery {
 
 	.is-selected .block-library-gallery-item__inline-menu {
 		background-color: theme(primary);
+
 		.components-button {
 			color: $white;
 		}
+
+		.components-button:focus {
+			color: inherit;
+		}
+
 	}
 
 	.block-editor-rich-text figcaption {
@@ -83,19 +89,11 @@ ul.wp-block-gallery {
 
 	.components-button {
 		color: transparent;
-		&:hover,
-		&:focus {
-			color: $white;
-		}
 	}
 }
 
 .blocks-gallery-item__remove {
 	padding: 0;
-
-	&.components-button:focus {
-		color: inherit;
-	}
 }
 
 .blocks-gallery-item .components-spinner {
