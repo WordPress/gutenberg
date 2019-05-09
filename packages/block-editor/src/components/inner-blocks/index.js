@@ -129,6 +129,7 @@ class InnerBlocks extends Component {
 
 InnerBlocks = compose( [
 	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
+	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withSelect( ( select, ownProps ) => {
 		const {
 			isBlockSelected,
