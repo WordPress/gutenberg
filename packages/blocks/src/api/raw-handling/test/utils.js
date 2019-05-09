@@ -175,8 +175,20 @@ describe( 'removeInvalidHTML', () => {
 		expect( removeInvalidHTML( input, schema ) ).toBe( output );
 	} );
 
+	it( 'should remove comment nodes', () => {
+		const input = '<!-- This is a comment -->';
+		const output = '';
+		expect( removeInvalidHTML( input, schema ) ).toBe( output );
+	} );
+
 	it( 'should break up block content with phrasing schema', () => {
 		const input = '<p>test</p><p>test</p>';
+		const output = 'test<br>test';
+		expect( removeInvalidHTML( input, phrasingContentSchema, true ) ).toBe( output );
+	} );
+
+	it( 'should ignore comment nodes when breaking up block content', () => {
+		const input = '<!-- Comment 1 --><p>test</p><!-- Comment 2 --><p>test</p><!-- Comment 3 -->';
 		const output = 'test<br>test';
 		expect( removeInvalidHTML( input, phrasingContentSchema, true ) ).toBe( output );
 	} );
