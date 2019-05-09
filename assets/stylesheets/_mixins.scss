@@ -203,6 +203,7 @@
 @mixin menu-style__neutral() {
 	border: none;
 	box-shadow: none;
+	color: $dark-gray-600;
 }
 
 @mixin menu-style__hover() {
