@@ -53,7 +53,7 @@ function ColumnEdit( {
 				<PanelBody title={ __( 'Column Settings' ) }>
 					<RangeControl
 						label={ __( 'Percentage width' ) }
-						value={ width }
+						value={ width || '' }
 						onChange={ updateWidth }
 						min={ 0 }
 						max={ 100 }
