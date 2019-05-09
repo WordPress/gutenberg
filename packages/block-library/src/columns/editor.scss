@@ -164,17 +164,5 @@ div.block-core-columns.is-vertically-aligned-bottom {
  */
 [data-type="core/column"] > .editor-block-list__block-edit > .editor-block-list__breadcrumb {
 	right: 0;
-}
-
-// The empty state of a columns block has the default appenders.
-// Since those appenders are not blocks, the parent, actual block, appears "hovered" when hovering the appenders.
-// Because the column shouldn't be hovered as part of this temporary passthrough, we unset the hover style.
-.wp-block-columns [data-type="core/column"].is-hovered {
-	> .block-editor-block-list__block-edit::before {
-		content: none;
-	}
-
-	.block-editor-block-list__breadcrumb {
-		display: none;
-	}
+	left: auto;
 }

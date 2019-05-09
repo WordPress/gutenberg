@@ -106,14 +106,13 @@ class InnerBlocks extends Component {
 	render() {
 		const {
 			clientId,
-			isSmallScreen,
 			isSelectedBlockInRoot,
 			renderAppender,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
-			'has-overlay': isSmallScreen && ! isSelectedBlockInRoot,
+			'has-overlay': ! isSelectedBlockInRoot,
 		} );
 
 		return (
