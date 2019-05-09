@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last } from 'lodash';
+import { dropRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,13 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { getColumnsTemplate } from './utils';
+import {
+	getColumnsTemplate,
+	hasExplicitColumnWidths,
+	getMappedColumnWidths,
+	getRedistributedColumnWidths,
+	toWidthPrecision,
+} from './utils';
 
 /**
  * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
@@ -118,12 +124,7 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 		setAttributes( { columns } );
 
 		let innerBlocks = getBlocks( clientId );
-		const hasExplicitColumnWidths = innerBlocks.some( ( innerBlock ) => (
-			innerBlock.attributes.width !== undefined
-		) );
-
-		let newOrRemovedColumnWidth;
-		if ( ! hasExplicitColumnWidths ) {
+		if ( ! hasExplicitColumnWidths( innerBlocks ) ) {
 			return;
 		}
 
@@ -134,32 +135,26 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 		if ( isAddingColumn ) {
 			// If adding a new column, assign width to the new column equal to
 			// as if it were `1 / columns` of the total available space.
-			newOrRemovedColumnWidth = ( 100 / columns );
+			const newColumnWidth = toWidthPrecision( 100 / columns );
+
+			// Redistribute in consideration of pending block insertion as
+			// constraining the available working width.
+			const widths = getRedistributedColumnWidths( innerBlocks, 100 - newColumnWidth );
+
+			innerBlocks = [
+				...getMappedColumnWidths( innerBlocks, widths ),
+				createBlock( 'core/column', {
+					width: newColumnWidth,
+				} ),
+			];
 		} else {
 			// The removed column will be the last of the inner blocks.
-			newOrRemovedColumnWidth = last( innerBlocks ).attributes.width || ( 100 / previousColumns );
-		}
+			innerBlocks = dropRight( innerBlocks );
 
-		const adjustment = newOrRemovedColumnWidth / ( isAddingColumn ? -1 * previousColumns : columns );
-		innerBlocks = innerBlocks.map( ( innerBlock ) => {
-			const { width: columnWidth = ( 100 / previousColumns ) } = innerBlock.attributes;
-			return {
-				...innerBlock,
-				attributes: {
-					...innerBlocks.attributes,
-					width: parseFloat( ( columnWidth + adjustment ).toFixed( 2 ) ),
-				},
-			};
-		} );
+			// Redistribute as if block is already removed.
+			const widths = getRedistributedColumnWidths( innerBlocks, 100 );
 
-		// Explicitly manage the new column block, since template would not
-		// account for the explicitly assigned width.
-		if ( isAddingColumn ) {
-			const block = createBlock( 'core/column', {
-				width: parseFloat( newOrRemovedColumnWidth.toFixed( 2 ) ),
-			} );
-
-			innerBlocks = [ ...innerBlocks, block ];
+			innerBlocks = getMappedColumnWidths( innerBlocks, widths );
 		}
 
 		replaceInnerBlocks( clientId, innerBlocks, false );
