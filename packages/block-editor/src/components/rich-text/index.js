@@ -145,7 +145,6 @@ export class RichText extends Component {
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
-		this.getDirection = this.getDirection.bind( this );
 
 		this.formatToValue = memize(
 			this.formatToValue.bind( this ),
@@ -755,10 +754,6 @@ export class RichText extends Component {
 		delete this.keyPressed;
 	}
 
-	getDirection() {
-		return getComputedStyle( this.editableRef ).direction;
-	}
-
 	/**
 	 * Handles horizontal keyboard navigation when no modifiers are pressed. The
 	 * navigation is handled separately to move correctly around format
@@ -772,7 +767,7 @@ export class RichText extends Component {
 		const { activeFormats = [] } = this.state;
 		const collapsed = isCollapsed( value );
 		// To do: ideally, we should look at visual position instead.
-		const direction = this.getDirection();
+		const { direction } = getComputedStyle( this.editableRef );
 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
 		const isReverse = event.keyCode === reverseKey;
 
