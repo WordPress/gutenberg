@@ -135,20 +135,17 @@ class GalleryImage extends Component {
 						onFocus={ this.onSelectImage }
 						className="blocks-gallery-item__remove"
 						label={ __( 'Remove Image' ) }
-						disabled={ ! isSelected }
 					/>
 				</div>
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) ? (
-					<RichText
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
-						isSelected={ this.state.captionSelected }
-						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-						unstableOnFocus={ this.onSelectCaption }
-						inlineToolbar
-					/>
-				) : null }
+				<RichText
+					tagName="figcaption"
+					placeholder={ __( 'Write caption…' ) }
+					value={ caption }
+					isSelected={ this.state.captionSelected }
+					onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+					unstableOnFocus={ this.onSelectCaption }
+					inlineToolbar
+				/>
 			</figure>
 		);
 	}
