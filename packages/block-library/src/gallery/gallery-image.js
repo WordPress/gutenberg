@@ -135,6 +135,7 @@ class GalleryImage extends Component {
 						onFocus={ this.onSelectImage }
 						className="blocks-gallery-item__remove"
 						label={ __( 'Remove Image' ) }
+						disabled={ ! isSelected }
 					/>
 				</div>
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) ? (
