@@ -17,12 +17,16 @@ export const getColumnsTemplate = memoize( ( columns ) => {
 
 /**
  * Returns a column width attribute value rounded to standard precision.
+ * Returns `undefined` if the value is not a valid finite number.
  *
- * @param {number} value Raw value.
+ * @param {?number} value Raw value.
  *
  * @return {number} Value rounded to standard precision.
  */
-export const toWidthPrecision = ( value ) => parseFloat( value.toFixed( 2 ) );
+export const toWidthPrecision = ( value ) =>
+	Number.isFinite( value ) ?
+		parseFloat( value.toFixed( 2 ) ) :
+		undefined;
 
 /**
  * Returns the considered adjacent to that of the specified `clientId` for

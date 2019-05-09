@@ -32,6 +32,11 @@ describe( 'toWidthPrecision', () => {
 
 		expect( value ).toBe( 50.11 );
 	} );
+
+	it( 'should return undefined for invalid number', () => {
+		expect( toWidthPrecision( null ) ).toBe( undefined );
+		expect( toWidthPrecision( undefined ) ).toBe( undefined );
+	} );
 } );
 
 describe( 'getAdjacentBlocks', () => {
