@@ -80,7 +80,7 @@ class ImageEdit extends React.Component {
 
 		const { attributes, setAttributes } = this.props;
 
-		if ( attributes.id && ! isURL( attributes.url ) ) {
+		if ( attributes.id && attributes.url && ! isURL( attributes.url ) ) {
 			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
 				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
