@@ -311,7 +311,7 @@ export class RichText extends Component {
 	onChange( event ) {
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.firedAfterTextChanged = true; // the onChange event always fires after the fact
-		this.onTextUpdate( event );
+		this.onTextUpdate( event, true );
 	}
 
 	onTextUpdate( event, refresh = false ) {
