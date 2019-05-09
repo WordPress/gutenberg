@@ -108,7 +108,10 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 							{ ! isLocked && (
 								<MenuItem
 									className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-									onClick={ onRemove }
+									onClick={ () => {
+										onClose();
+										onRemove();
+									} }
 									icon="trash"
 									shortcut={ shortcuts.removeBlock.display }
 								>
