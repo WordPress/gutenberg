@@ -143,6 +143,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return true;
 	}
 
+	// In the case of RTL scripts, the horizontal edge is at the opposite side.
 	const { direction } = computedStyle;
 	const isReverseDir = direction === 'rtl' ? ( ! isReverse ) : isReverse;
 
