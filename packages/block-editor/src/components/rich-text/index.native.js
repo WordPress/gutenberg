@@ -817,7 +817,12 @@ RichText.defaultProps = {
 
 const RichTextContainer = compose( [
 	withInstanceId,
-	withBlockEditContext( ( { clientId } ) => ( { clientId } ) ),
+	withBlockEditContext( ( { clientId, onFocus }, ownProps ) => {
+		return { 
+			clientId: clientId,
+			onFocus: onFocus || ownProps.onFocus
+		}
+	}),
 	withSelect( ( select, {
 		clientId,
 		instanceId,
