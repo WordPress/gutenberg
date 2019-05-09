@@ -64,7 +64,53 @@ describe( 'Table', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( 'block' );
 
-		// Expect the post content to have a correctly sized table.
+		// Expect the post to have the correct written content inside the table.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'allows header and footer rows to be switched on and off', async () => {
+		await insertBlock( 'Table' );
+
+		const headerSwitchSelector = "//label[text()='Header section']";
+		const footerSwitchSelector = "//label[text()='Footer section']";
+
+		// Expect the header and footer switches not to be present before the table has been created.
+		let headerSwitch = await page.$x( headerSwitchSelector );
+		let footerSwitch = await page.$x( footerSwitchSelector );
+		expect( headerSwitch ).toHaveLength( 0 );
+		expect( footerSwitch ).toHaveLength( 0 );
+
+		// Create the table.
+		const createButton = await page.$x( "//div[@data-type='core/table']//button[text()='Create']" );
+		await createButton[ 0 ].click();
+
+		// Expect the header and footer switches to be present now that the table has been created.
+		headerSwitch = await page.$x( headerSwitchSelector );
+		footerSwitch = await page.$x( footerSwitchSelector );
+		expect( headerSwitch ).toHaveLength( 1 );
+		expect( footerSwitch ).toHaveLength( 1 );
+
+		// Toggle on the switches and add some content.
+		await headerSwitch[ 0 ].click();
+		await footerSwitch[ 0 ].click();
+
+		await page.click( 'thead .wp-block-table__cell-content' );
+		await page.keyboard.type( 'header' );
+
+		await page.click( 'tbody .wp-block-table__cell-content' );
+		await page.keyboard.type( 'body' );
+
+		await page.click( 'tfoot .wp-block-table__cell-content' );
+		await page.keyboard.type( 'footer' );
+
+		// Expect the table to have a header, body and footer with written content.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Toggle off the switches
+		await headerSwitch[ 0 ].click();
+		await footerSwitch[ 0 ].click();
+
+		// Expect the table to have only a body with written content.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
