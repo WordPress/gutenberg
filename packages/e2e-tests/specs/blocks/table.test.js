@@ -152,4 +152,19 @@ describe( 'Table', () => {
 		// Expect the table to have 2 columns across the header, body and footer.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'allows a caption to be added', async () => {
+		await insertBlock( 'Table' );
+
+		// Create the table.
+		const createButton = await page.$x( createButtonSelector );
+		await createButton[ 0 ].click();
+
+		// Click the first cell and add some text.
+		await page.click( '.wp-block-table__caption-content' );
+		await page.keyboard.type( 'Caption!' );
+
+		// Expect the post to have the correct written content inside the table.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

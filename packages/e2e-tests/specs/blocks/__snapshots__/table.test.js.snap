@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Table allows a caption to be added 1`] = `
+"<!-- wp:table -->
+<table class=\\"wp-block-table\\"><caption>Caption!</caption><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table>
+<!-- /wp:table -->"
+`;
+
 exports[`Table allows adding and deleting columns across the table header, body and footer 1`] = `
 "<!-- wp:table -->
 <figure class=\\"wp-block-table\\"><table class=\\"\\"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody><tfoot><tr><td></td><td></td></tr></tfoot></table></figure>
