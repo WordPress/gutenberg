@@ -71,7 +71,10 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 			'Image',
 			'List',
 		] );
-		await page.click( `.block-editor-block-types-list__item[aria-label="List"]` );
+		const insertButton = ( await page.$x(
+			`//button//span[contains(text(), 'List')]`
+		) )[ 0 ];
+		await insertButton.click();
 		await insertBlock( 'Image' );
 		await page.click( appenderSelector );
 		await openAllBlockInserterCategories();
