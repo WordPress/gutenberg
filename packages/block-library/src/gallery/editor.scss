@@ -59,6 +59,13 @@ ul.wp-block-gallery {
 		}
 	}
 
+	.is-selected .block-library-gallery-item__inline-menu {
+		background-color: theme(primary);
+		.components-button {
+			color: $white;
+		}
+	}
+
 	.block-editor-rich-text figcaption {
 		a {
 			color: $white;
@@ -71,12 +78,11 @@ ul.wp-block-gallery {
 	position: absolute;
 	top: -2px;
 	right: -2px;
-	background-color: theme(primary);
 	display: inline-flex;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
 
 	.components-button {
-		color: $white;
+		color: transparent;
 		&:hover,
 		&:focus {
 			color: $white;
