@@ -14,8 +14,6 @@ import EditorPage from './pages/editor-page';
 import {
 	setupDriver,
 	isLocalEnvironment,
-	// clickMiddleOfElement,
-	// clickBeginningOfElement,
 	stopDriver } from './helpers/utils';
 import testData from './helpers/test-data';
 
