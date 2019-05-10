@@ -176,7 +176,7 @@ msgid "Hello World"
 msgstr "Saltuon mundo"
 ```
 
-The last step to create the translation file is to convert the `myguten-eo.po` to the JSON format needed. For this, you can use the wp-cli [make-json command](https://developer.wordpress.org/cli/commands/i18n/make-json/), requires wp-cli v2.2.0 and later.
+The last step to create the translation file is to convert the `myguten-eo.po` to the JSON format needed. For this, you can use WP-CLI's [`wp i18n make-json` command](https://developer.wordpress.org/cli/commands/i18n/make-json/), which requires WP-CLI v2.2.0 and later.
 
 ```
 wp i18n make-json myguten-eo.po --no-purge
@@ -223,7 +223,7 @@ The final part is to tell WordPress where it can look to find the translation fi
 
 WordPress will check for a file in that path with the format `${domain}-${locale}-${handle}.json` as the source of translations. Alternatively, instead of the registered handle you can use the md5 hash of the relative path of the file, `${domain}-${locale} in the form of ${domain}-${locale}-${md5}.json.`
 
-Using `make-json` automatically names the file with the md5 hash, so it is ready as-is. You could rename to use the handle, in this case would be `myguten-eo-myguten-script.json`.
+Using `make-json` automatically names the file with the md5 hash, so it is ready as-is. You could rename the file to use the handle instead, in which case the file name would be `myguten-eo-myguten-script.json`.
 
 ### Test Translations
 
