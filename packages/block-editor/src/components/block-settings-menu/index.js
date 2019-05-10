@@ -70,7 +70,10 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 							{ ! isLocked && canDuplicate && (
 								<MenuItem
 									className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-									onClick={ onDuplicate }
+									onClick={ () => {
+										onClose();
+										onDuplicate();
+									} }
 									icon="admin-page"
 									shortcut={ shortcuts.duplicate.display }
 								>
@@ -81,7 +84,10 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 								<>
 									<MenuItem
 										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-										onClick={ onInsertBefore }
+										onClick={ () => {
+											onClose();
+											onInsertBefore();
+										} }
 										icon="insert-before"
 										shortcut={ shortcuts.insertBefore.display }
 									>
@@ -89,7 +95,10 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 									</MenuItem>
 									<MenuItem
 										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-										onClick={ onInsertAfter }
+										onClick={ () => {
+											onClose();
+											onInsertAfter();
+										} }
 										icon="insert-after"
 										shortcut={ shortcuts.insertAfter.display }
 									>
