@@ -59,6 +59,19 @@ ul.wp-block-gallery {
 		}
 	}
 
+	.is-selected .block-library-gallery-item__inline-menu {
+		background-color: theme(primary);
+
+		.components-button {
+			color: $white;
+		}
+
+		.components-button:focus {
+			color: inherit;
+		}
+
+	}
+
 	.block-editor-rich-text figcaption {
 		a {
 			color: $white;
@@ -71,25 +84,16 @@ ul.wp-block-gallery {
 	position: absolute;
 	top: -2px;
 	right: -2px;
-	background-color: theme(primary);
 	display: inline-flex;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
 
 	.components-button {
-		color: $white;
-		&:hover,
-		&:focus {
-			color: $white;
-		}
+		color: transparent;
 	}
 }
 
 .blocks-gallery-item__remove {
 	padding: 0;
-
-	&.components-button:focus {
-		color: inherit;
-	}
 }
 
 .blocks-gallery-item .components-spinner {
