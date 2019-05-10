@@ -4,6 +4,11 @@
 
 - The minimum version of Gutenberg `5.6.0` or the minimum version of WordPress `5.2.0`.
 
+### Bug Fixes
+
+- WordPress 5.2: Fix a false positive build failure caused by Dashicons font file.
+- WordPress 5.2: Fix a test failure for Classic Block media insertion caused by a change in tooltips text ([rWP45066](https://core.trac.wordpress.org/changeset/45066)).
+
 ## 1.1.0 (2019-03-20)
 
 ### New Features

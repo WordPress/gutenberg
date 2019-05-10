@@ -1,0 +1,14 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/pullquote",
+        "isValid": true,
+        "attributes": {
+            "value": "<p>Testing deprecated pullquote block...</p>",
+            "citation": "...with a caption",
+            "align": "none"
+        },
+        "innerBlocks": [],
+        "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n    <p>Testing deprecated pullquote block...</p>\n\t<footer>...with a caption</footer>\n</blockquote>"
+    }
+]

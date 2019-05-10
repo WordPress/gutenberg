@@ -7,10 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Component,
-	Fragment,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import {
 	Dashicon,
@@ -75,7 +72,7 @@ class ButtonEdit extends Component {
 		} = attributes;
 
 		return (
-			<Fragment>
+			<>
 				<div className={ className } title={ title } ref={ this.bindRef }>
 					<RichText
 						placeholder={ __( 'Add text…' ) }
@@ -138,7 +135,7 @@ class ButtonEdit extends Component {
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
 				) }
-			</Fragment>
+			</>
 		);
 	}
 }
