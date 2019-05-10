@@ -30,3 +30,18 @@
 	flex: 1;
 	background-color: $gray-lighten-30;
 }
+
+.modalIcon {
+	width: 80px;
+	height: 80px;
+	justify-content: center;
+	align-items: center;
+}
+
+.iconFillColor {
+	color: $gray-lighten-20;
+}
+
+.iconRetryFillColor {
+	color: $gray-dark;
+}

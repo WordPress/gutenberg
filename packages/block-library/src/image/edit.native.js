@@ -17,7 +17,7 @@ import { isEmpty } from 'lodash';
 import {
 	Toolbar,
 	ToolbarButton,
-	Dashicon,
+	SVG,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -37,7 +37,8 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import styles from './styles.scss';
 import MediaUploadProgress from './media-upload-progress';
-import icon from './icon';
+import svgIcon from './icon';
+import svgIconRetry from './icon-retry';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
@@ -154,6 +155,14 @@ class ImageEdit extends React.Component {
 		setAttributes( { url: mediaUrl, id: mediaId } );
 	}
 
+	iconWithUpdatedFillColor( color: string, icon: SVG ) {
+		return (
+			<SVG viewBox={ icon.props.viewBox } xmlns={ icon.props.xmlns } style={ { fill: color } }>
+				{ icon.props.children }
+			</SVG>
+		);
+	}
+
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption, height, width, alt, href, id } = attributes;
@@ -222,11 +231,14 @@ class ImageEdit extends React.Component {
 					<MediaPlaceholder
 						mediaType={ MEDIA_TYPE_IMAGE }
 						onSelectURL={ this.onSelectMediaUploadOption }
-						icon={ icon }
+						icon={ svgIcon }
 					/>
 				</View>
 			);
 		}
+
+		const svgIconRetryWithUpdatedColor = this.iconWithUpdatedFillColor( styles.iconRetryFillColor.color, svgIconRetry );
+		const svgIconWithUpdatedColor = this.iconWithUpdatedFillColor( styles.iconFillColor.color, svgIcon );
 
 		return (
 			<TouchableWithoutFeedback
@@ -263,12 +275,20 @@ class ImageEdit extends React.Component {
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryIconName, retryMessage } ) => {
+						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
+							const icon = isUploadFailed ? svgIconRetryWithUpdatedColor : svgIconWithUpdatedColor;
+
+							const iconContainer = (
+								<View style={ styles.modalIcon }>
+									{ icon }
+								</View>
+							);
+
 							return (
 								<View style={ { flex: 1 } } >
 									{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
-										<Dashicon icon={ 'format-image' } size={ 300 } />
+										{ svgIconWithUpdatedColor }
 									</View> }
 									<ImageBackground
 										style={ { width: finalWidth, height: finalHeight, opacity } }
@@ -280,7 +300,7 @@ class ImageEdit extends React.Component {
 									>
 										{ isUploadFailed &&
 											<View style={ styles.imageContainer } >
-												<Dashicon icon={ retryIconName } ariaPressed={ 'dashicon-active' } />
+												{ iconContainer }
 												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 											</View>
 										}

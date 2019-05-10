@@ -173,6 +173,9 @@ class VideoEdit extends React.Component {
 			);
 		}
 
+		const svgIconRetryWithUpdatedColor = this.iconWithUpdatedFillColor( styles.iconRetryFillColor.color, svgIconRetry );
+		const svgIconWithUpdatedColor = this.iconWithUpdatedFillColor( styles.iconFillColor.color, svgIcon );
+
 		return (
 			<TouchableWithoutFeedback onPress={ this.onVideoPressed } disabled={ ! isSelected }>
 				<View style={ { flex: 1 } }>
@@ -194,7 +197,8 @@ class VideoEdit extends React.Component {
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( { isUploadInProgress, isUploadFailed, retryMessage } ) => {
 							const showVideo = src && ! isUploadInProgress && ! isUploadFailed;
-							const icon = isUploadFailed ? this.iconWithUpdatedFillColor( '#2e4453', svgIconRetry ) : this.iconWithUpdatedFillColor( '#c8d7e1', svgIcon );
+							const icon = isUploadFailed ? svgIconRetryWithUpdatedColor : svgIconWithUpdatedColor;
+
 							const iconContainer = (
 								<View style={ style.modalIcon }>
 									{ icon }
