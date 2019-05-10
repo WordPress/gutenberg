@@ -43,6 +43,7 @@ describe( 'toggleFormat', () => {
 		};
 		const expected = {
 			formats: [ , , , [ strong ], [ strong, em ], [ strong, em ], [ em ], , , , , , , ],
+			activeFormats: [ strong ],
 			text: 'one two three',
 			start: 3,
 			end: 6,
