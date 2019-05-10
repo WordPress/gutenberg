@@ -87,9 +87,9 @@ const globalStyle = document.createElement( 'style' );
 
 document.head.appendChild( globalStyle );
 
-function createPrepareEditableTree( props ) {
+function createPrepareEditableTree( props, prefix ) {
 	const fns = Object.keys( props ).reduce( ( accumulator, key ) => {
-		if ( key.startsWith( 'format_prepare_functions' ) ) {
+		if ( key.startsWith( prefix ) ) {
 			accumulator.push( props[ key ] );
 		}
 
@@ -99,24 +99,6 @@ function createPrepareEditableTree( props ) {
 	return ( value ) => fns.reduce( ( accumulator, fn ) => {
 		return fn( accumulator, value.text );
 	}, value.formats );
-}
-
-function createEditableTreeValue( props ) {
-	const fns = Object.keys( props ).reduce( ( accumulator, key ) => {
-		if ( key.startsWith( 'format_value_functions' ) ) {
-			accumulator.push( props[ key ] );
-		}
-
-		return accumulator;
-	}, [] );
-
-	return ( value ) => {
-		value.formats = fns.reduce( ( accumulator, fn ) => {
-			return fn( accumulator, value.text );
-		}, value.formats );
-
-		return value;
-	};
 }
 
 export class RichText extends Component {
@@ -235,7 +217,7 @@ export class RichText extends Component {
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			prepareEditableTree: createPrepareEditableTree( this.props ),
+			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
 			__unstableDomOnly: domOnly,
 		} );
 	}
@@ -481,21 +463,23 @@ export class RichText extends Component {
 
 		if ( start !== this.selectionStart || end !== this.selectionEnd ) {
 			const { isCaretWithinFormattedText } = this.props;
-			const isHorizontal =
-				this.keyPressed === LEFT || this.keyPressed === RIGHT;
+			const isHorizontal = this.keyPressed === LEFT || this.keyPressed === RIGHT;
 
 			// Reuse the current references.
 			const value = this.getRecord();
 
+			// Allow `getActiveFormats` to get new `activeFormats`.
 			delete value.activeFormats;
 
+			// Update the value with the new selection.
 			value.start = start;
 			value.end = end;
 
 			let activeFormats = getActiveFormats( value );
 
-			// When the selection changes as a result of a key press, then
-			// the active formats should be set depending on direction.
+			// When the selection changes as a result of a horizontal arrow key
+			// press, then the active formats should be set depending on the
+			// direction.
 			if ( isHorizontal && this.selectionStart !== undefined ) {
 				// Selection is moved forward if the new start is higher than
 				// the last.
@@ -508,6 +492,9 @@ export class RichText extends Component {
 				}
 			}
 
+			// Update the value with the new active formats.
+			value.activeFormats = activeFormats;
+
 			if ( ! isCaretWithinFormattedText && activeFormats.length ) {
 				this.props.onEnterFormattedText();
 			} else if ( isCaretWithinFormattedText && ! activeFormats.length ) {
@@ -515,7 +502,7 @@ export class RichText extends Component {
 			}
 
 			this.setState( { activeFormats } );
-			this.applyRecord( { ...value, activeFormats }, { domOnly: true } );
+			this.applyRecord( value, { domOnly: true } );
 			this.props.onSelectionChange( start, end );
 			this.selectionStart = start;
 			this.selectionEnd = end;
@@ -990,11 +977,16 @@ export class RichText extends Component {
 		}
 
 		if ( this.props.format === 'string' ) {
-			return createEditableTreeValue( this.props )( create( {
+			const prepare = createPrepareEditableTree( this.props, 'format_value_functions' );
+
+			value = create( {
 				html: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
-			} ) );
+			} );
+			value.formats = prepare( value );
+
+			return value;
 		}
 
 		// Guard for blocks passing `null` in onSplit callbacks. May be removed
@@ -1010,7 +1002,7 @@ export class RichText extends Component {
 		return toDom( {
 			value,
 			multilineTag: this.multilineTag,
-			prepareEditableTree: createPrepareEditableTree( this.props ),
+			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
 		} ).body.innerHTML;
 	}
 
