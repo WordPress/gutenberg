@@ -129,7 +129,7 @@ class ImageEdit extends React.Component {
 				this.finishMediaUploadWithFailure( payload );
 				break;
 			case MEDIA_UPLOAD_STATE_RESET:
-				this.mediaUploadStateReset( payload );
+				this.mediaUploadStateReset();
 				break;
 		}
 	}
@@ -156,10 +156,10 @@ class ImageEdit extends React.Component {
 		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
 	}
 
-	mediaUploadStateReset( payload ) {
+	mediaUploadStateReset() {
 		const { setAttributes } = this.props;
 
-		setAttributes( { id: payload.mediaId, url: null } );
+		setAttributes( { id: null, url: null } );
 		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
 	}
 
