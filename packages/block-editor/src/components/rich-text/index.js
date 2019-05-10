@@ -376,8 +376,10 @@ export class RichText extends Component {
 			...this.record,
 			start: undefined,
 			end: undefined,
+			activeFormats: undefined,
 		};
 		this.props.onSelectionChange( undefined, undefined );
+		this.setState( { activeFormats: undefined } );
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
@@ -504,6 +506,7 @@ export class RichText extends Component {
 			this.record = newValue;
 			this.applyRecord( newValue, { domOnly: true } );
 			this.props.onSelectionChange( start, end );
+			this.setState( { activeFormats } );
 
 			if ( activeFormats.length > 0 ) {
 				this.recalculateBoundaryStyle();
@@ -538,7 +541,7 @@ export class RichText extends Component {
 	onChange( record, { withoutHistory } = {} ) {
 		this.applyRecord( record );
 
-		const { start, end } = record;
+		const { start, end, activeFormats = [] } = record;
 		const changeHandlers = pickBy( this.props, ( v, key ) =>
 			key.startsWith( 'format_on_change_functions_' )
 		);
@@ -551,6 +554,7 @@ export class RichText extends Component {
 		this.record = record;
 		this.props.onChange( this.value );
 		this.props.onSelectionChange( start, end );
+		this.setState( { activeFormats } );
 
 		if ( ! withoutHistory ) {
 			this.onCreateUndoLevel();
@@ -840,8 +844,7 @@ export class RichText extends Component {
 
 		this.record = newValue;
 		this.applyRecord( newValue );
-		// active format data is not stored in state or props.
-		this.forceUpdate();
+		this.setState( { activeFormats } );
 
 		// Wait for boundary class to be added.
 		this.props.setTimeout( () => this.recalculateBoundaryStyle() );
