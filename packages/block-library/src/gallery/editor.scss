@@ -83,9 +83,6 @@ ul.wp-block-gallery {
 .block-library-gallery-item__move-menu,
 .block-library-gallery-item__inline-menu {
 	padding: 2px;
-	position: absolute;
-	top: -2px;
-	right: -2px;
 	display: inline-flex;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
 
@@ -94,7 +91,15 @@ ul.wp-block-gallery {
 	}
 }
 
+.block-library-gallery-item__inline-menu {
+	position: absolute;
+	top: -2px;
+	right: -2px;
+}
+
 .block-library-gallery-item__move-menu {
+	position: absolute;
+	top: -2px;
 	left: -2px;
 }
 
