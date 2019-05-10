@@ -127,28 +127,26 @@ class GalleryImage extends Component {
 
 		return (
 			<figure className={ className }>
-				{ isSelected &&
-					<div className="block-library-gallery-item__inline-menu">
-						<IconButton
-							icon="no-alt"
-							onClick={ onRemove }
-							className="blocks-gallery-item__remove"
-							label={ __( 'Remove Image' ) }
-						/>
-					</div>
-				}
 				{ href ? <a href={ href }>{ img }</a> : img }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) ? (
-					<RichText
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
-						isSelected={ this.state.captionSelected }
-						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-						unstableOnFocus={ this.onSelectCaption }
-						inlineToolbar
+				<div className="block-library-gallery-item__inline-menu">
+					<IconButton
+						icon="no-alt"
+						onClick={ onRemove }
+						onFocus={ this.onSelectImage }
+						className="blocks-gallery-item__remove"
+						label={ __( 'Remove Image' ) }
+						disabled={ ! isSelected }
 					/>
-				) : null }
+				</div>
+				<RichText
+					tagName="figcaption"
+					placeholder={ isSelected ? __( 'Write caption…' ) : null }
+					value={ caption }
+					isSelected={ this.state.captionSelected }
+					onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+					unstableOnFocus={ this.onSelectCaption }
+					inlineToolbar
+				/>
 			</figure>
 		);
 	}
