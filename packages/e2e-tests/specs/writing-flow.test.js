@@ -24,13 +24,22 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/columns' );
 		await page.keyboard.press( 'Enter' );
+		await pressKeyTimes( 'Tab', 5 ); // Tab to inserter.
+		await page.keyboard.press( 'Enter' ); // Activate inserter.
+		await page.keyboard.type( 'Paragraph' );
+		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'First col' );
 
 		// Arrow down should navigate through layouts in columns block (to
 		// its default appender). Two key presses are required since the first
 		// will land user on the Column wrapper block.
 		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
+		await pressKeyTimes( 'Tab', 5 ); // Tab to inserter.
+		await page.keyboard.press( 'Enter' ); // Activate inserter.
+		await page.keyboard.type( 'Paragraph' );
+		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'Second col' );
 
 		// Arrow down from last of layouts exits nested context to default
