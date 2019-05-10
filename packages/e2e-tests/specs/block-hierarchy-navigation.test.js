@@ -96,6 +96,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Return to first block.
 		await openBlockNavigator();
+		await page.waitForSelector( '.editor-block-navigation__container' );
 		await page.keyboard.press( 'Space' );
 
 		// Replace its content.
