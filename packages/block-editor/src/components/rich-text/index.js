@@ -483,7 +483,7 @@ export class RichText extends Component {
 			if ( isHorizontal && this.selectionStart !== undefined ) {
 				// Selection is moved forward if the new start is higher than
 				// the last.
-				const isForward = start < this.props.selectionStart;
+				const isForward = start < this.selectionStart;
 
 				if ( isForward ) {
 					activeFormats = value.formats[ start ] || [];
