@@ -99,7 +99,7 @@ The REST API is built around a single resource object: the widget area.
 			<p>Hello there!</p>
 			<!-- /wp:paragraph -->
 
-			<!-- wp:legacy-widget {\"identifier\":\"search-2\",\"instance\":{\"title\":\"\"}} /-->
+			<!-- wp:legacy-widget {\"identifier\":\"search-2\"} /-->
 		",
 		"rendered": "
 			<p>Hello there!</p>
@@ -346,9 +346,9 @@ Block markup is stored in the `wp_area` post's `post_content` field, and the `co
 
 ```html
 <!-- wp:paragraph --><p>Hello there!</p><!-- /wp:paragraph -->
-<!-- wp:legacy-widget {"identifier":"search-2","instance":{"title":""}} /-->
-<!-- wp:legacy-widget {"identifier":"recent-posts-2","instance":{"title":"","number":5}} /-->
-<!-- wp:legacy-widget {"identifier":"recent-comments-2","instance":{"title":"","number":5}} /-->
+<!-- wp:legacy-widget {"identifier":"search-2"} /-->
+<!-- wp:legacy-widget {"identifier":"recent-posts-2"} /-->
+<!-- wp:legacy-widget {"identifier":"recent-comments-2"} /-->
 ```
 
 The `'sidebars_widgets'` is _demigrated_ when the Gutenberg plugin is deactivated. This involves resetting `'array_version'` to `3`, restoring an array that maps widget area identifiers to a list of widget identifiers, and deleting all `wp_area` posts that were previously referenced.
@@ -374,7 +374,7 @@ The referenced `wp_area` contains some blocks and a legacy widget in its `post_c
 
 ```html
 <!-- wp:paragraph --><p>Hello there!</p><!-- /wp:paragraph -->
-<!-- wp:legacy-widget {"identifier":"search-2","instance":{"title":""}} /-->
+<!-- wp:legacy-widget {"identifier":"search-2"}} /-->
 <!-- wp:separator --><hr class="wp-block-separator"/><!-- /wp:separator -->
 <!-- wp:paragraph --><p>Welcome to my cool website!</p><!-- /wp:paragraph -->
 ```
@@ -442,7 +442,7 @@ The referenced `wp_area` contains some blocks and a legacy widget in its `post_c
 
 ```html
 <!-- wp:paragraph --><p>Hello there!</p><!-- /wp:paragraph -->
-<!-- wp:legacy-widget {"identifier":"search-2","instance":{"title":"Search"}} /-->
+<!-- wp:legacy-widget {"identifier":"search-2"}} /-->
 <!-- wp:separator --><hr class="wp-block-separator"/><!-- /wp:separator -->
 <!-- wp:paragraph --><p>Welcome to my cool website!</p><!-- /wp:paragraph -->
 ```
