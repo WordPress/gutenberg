@@ -135,6 +135,7 @@ class GalleryImage extends Component {
 						className="blocks-gallery-item__move-backward"
 						label={ __( 'Move Image Backward' ) }
 						aria-disabled={ isFirstItem }
+						disabled={ ! isSelected }
 					/>
 					<IconButton
 						icon="arrow-right"
@@ -142,6 +143,7 @@ class GalleryImage extends Component {
 						className="blocks-gallery-item__move-forward"
 						label={ __( 'Move Image Forward' ) }
 						aria-disabled={ isLastItem }
+						disabled={ ! isSelected }
 					/>
 				</div>
 				<div className="block-library-gallery-item__inline-menu">
