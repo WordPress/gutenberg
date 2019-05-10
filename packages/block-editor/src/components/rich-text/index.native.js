@@ -332,11 +332,22 @@ export class RichText extends Component {
 		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
 		const isReverse = keyCode === BACKSPACE;
 
-		if ( this.multilineTag ) {
-			const value = this.createRecord();
-			const { replacements, text, start, end } = value;
-			let newValue;
+		const value = this.createRecord( {
+			...event.nativeEvent,
+			currentContent: unescapeSpaces( event.nativeEvent.text ),
+		} );
+		const { replacements, text, start, end } = value;
+		let newValue;
 
+		// Always handle full content deletion ourselves.
+		if ( start === 0 && end !== 0 && end >= value.text.length ) {
+			newValue = remove( value, start, end );
+			this.props.onChange( newValue );
+			this.forceSelectionUpdate( 0, 0 );
+			return;
+		}
+
+		if ( this.multilineTag ) {
 			if ( keyCode === BACKSPACE ) {
 				const index = start - 1;
 
@@ -388,7 +399,7 @@ export class RichText extends Component {
 			}
 
 			if ( newValue ) {
-				this.onChange( newValue );
+				this.onFormatChange( { needsSelectionUpdate: true, ...newValue }, true );
 			}
 		}
 
