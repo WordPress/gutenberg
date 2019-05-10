@@ -118,32 +118,25 @@ describe( 'Block Grouping', () => {
 	} );
 
 	describe( 'Keyboard shortcuts', () => {
-		it( 'groups using keyboard shortcut', async () => {
+		it( 'groups and ungroups using keyboard shortcuts', async () => {
+			let allBlocks;
+
 			await insertBlocksOfMultipleTypes();
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
-			await transformBlockTo( 'Group' );
 
 			// Group
 			await pressKeyWithModifier( 'primaryAlt', 'g' );
 
-			const allBlocks = await getAllBlocks();
+			allBlocks = await getAllBlocks();
 
 			expect( allBlocks[ 0 ].name ).toBe( 'core/group' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
-		} );
-
-		it( 'ungroups using keyboard shortcut', async () => {
-			// Create a Group
-			await insertBlocksOfMultipleTypes();
-			await pressKeyWithModifier( 'primary', 'a' );
-			await pressKeyWithModifier( 'primary', 'a' );
-			await transformBlockTo( 'Group' );
 
 			// Ungroup (Primary, Shift, Alt)
 			await pressKeyWithModifier( 'secondary', 'g' );
 
-			const allBlocks = await getAllBlocks();
+			allBlocks = await getAllBlocks();
 
 			expect( allBlocks[ 0 ].name ).not.toBe( 'core/group' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();

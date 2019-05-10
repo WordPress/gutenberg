@@ -64,6 +64,36 @@ exports[`Block Grouping Group creation creates a group from multiple blocks of t
 <!-- /wp:group -->"
 `;
 
+exports[`Block Grouping Keyboard shortcuts groups and ungroups using keyboard shortcuts 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><!-- wp:heading -->
+<h2>Group Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Some paragraph</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Block Grouping Keyboard shortcuts groups and ungroups using keyboard shortcuts 2`] = `
+"<!-- wp:heading -->
+<h2>Group Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Some paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Block Grouping Keyboard shortcuts groups using keyboard shortcut 1`] = `
 "<!-- wp:group -->
 <div class=\\"wp-block-group\\"><!-- wp:heading -->
