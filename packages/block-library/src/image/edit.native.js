@@ -37,6 +37,7 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import styles from './styles.scss';
 import MediaUploadProgress from './media-upload-progress';
+import icon from './icon';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
@@ -221,6 +222,7 @@ class ImageEdit extends React.Component {
 					<MediaPlaceholder
 						mediaType={ MEDIA_TYPE_IMAGE }
 						onSelectURL={ this.onSelectMediaUploadOption }
+						icon={ icon }
 					/>
 				</View>
 			);

@@ -19,7 +19,7 @@ import {
 import {
 	Toolbar,
 	ToolbarButton,
-	Dashicon,
+	SVG,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -39,6 +39,8 @@ import { doAction, hasAction } from '@wordpress/hooks';
 import styles from '../image/styles.scss';
 import MediaUploadProgress from '../image/media-upload-progress';
 import style from './style.scss';
+import svgIcon from './icon';
+import svgIconRetry from './icon-retry';
 
 const VIDEO_ASPECT_RATIO = 1.7;
 
@@ -128,6 +130,14 @@ class VideoEdit extends React.Component {
 		}
 	}
 
+	iconWithUpdatedFillColor( color: string, icon: SVG ) {
+		return (
+			<SVG viewBox={ icon.props.viewBox } xmlns={ icon.props.xmlns } style={ { fill: color } }>
+				{ icon.props.children }
+			</SVG>
+		);
+	}
+
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { caption, id, poster, src } = attributes;
@@ -157,6 +167,7 @@ class VideoEdit extends React.Component {
 					<MediaPlaceholder
 						mediaType={ MEDIA_TYPE_VIDEO }
 						onSelectURL={ this.onSelectMediaUploadOption }
+						icon={ svgIcon }
 					/>
 				</View>
 			);
@@ -181,20 +192,27 @@ class VideoEdit extends React.Component {
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
 						onUpdateMediaProgress={ this.updateMediaProgress }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( { isUploadInProgress, isUploadFailed, retryIconName, retryMessage } ) => {
-							const opacity = ( isUploadInProgress || isUploadFailed ) ? 0.3 : 1;
+						renderContent={ ( { isUploadInProgress, isUploadFailed, retryMessage } ) => {
 							const showVideo = src && ! isUploadInProgress && ! isUploadFailed;
-							const iconName = isUploadFailed ? retryIconName : 'format-video';
+							const icon = isUploadFailed ? this.iconWithUpdatedFillColor( '#2e4453', svgIconRetry ) : this.iconWithUpdatedFillColor( '#c8d7e1', svgIcon );
+							const iconContainer = (
+								<View style={ style.modalIcon }>
+									{ icon }
+								</View>
+							);
 
 							const videoStyle = {
 								height: videoContainerHeight,
 								...style.video,
 							};
 
+							const containerStyle = showVideo && isSelected ? style.containerFocused : style.container;
+
 							return (
-								<View onLayout={ this.onVideoContanerLayout } style={ { flex: 1 } }>
+								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
 									{ showVideo &&
 										<Video
+											isSelected={ isSelected }
 											source={ { uri: src } }
 											poster={ poster }
 											style={ videoStyle }
@@ -203,8 +221,8 @@ class VideoEdit extends React.Component {
 										/>
 									}
 									{ ! showVideo &&
-										<View style={ { ...videoStyle, ...style.placeholder, opacity } }>
-											{ videoContainerHeight > 0 && <Dashicon icon={ iconName } size={ 80 } style={ style.placeholderIcon } /> }
+										<View style={ { ...videoStyle, ...style.placeholder } }>
+											{ videoContainerHeight > 0 && iconContainer }
 											{ isUploadFailed && <Text style={ style.uploadFailedText }>{ retryMessage }</Text> }
 										</View>
 									}

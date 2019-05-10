@@ -19,6 +19,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ImageSize from './image-size';
+import styles from './styles.scss';
 
 const MEDIA_UPLOAD_STATE_UPLOADING = 1;
 const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
@@ -118,11 +119,10 @@ class MediaUploadProgress extends React.Component {
 		const { isUploadInProgress, isUploadFailed } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
-		const retryIconName = 'image-rotate';
 		const retryMessage = __( 'Failed to insert media.\nPlease tap for options.' );
 
 		return (
-			<View style={ { flex: 1 } }>
+			<View style={ styles.mediaUploadProgress }>
 				{ showSpinner && <Spinner progress={ progress } /> }
 				{ coverUrl &&
 					<ImageSize src={ coverUrl } >
@@ -147,7 +147,6 @@ class MediaUploadProgress extends React.Component {
 								finalWidth,
 								finalHeight,
 								imageWidthWithinContainer,
-								retryIconName,
 								retryMessage,
 							} ) );
 						} }
@@ -156,7 +155,6 @@ class MediaUploadProgress extends React.Component {
 				{ ! coverUrl && this.props.renderContent( {
 					isUploadInProgress,
 					isUploadFailed,
-					retryIconName,
 					retryMessage,
 				} ) }
 			</View>
