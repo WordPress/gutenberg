@@ -166,6 +166,7 @@ export class RichText extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+		window.cancelAnimationFrame( this.rafID );
 	}
 
 	setRef( node ) {
@@ -636,7 +637,7 @@ export class RichText extends Component {
 			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
 			( keyCode === LEFT || keyCode === RIGHT )
 		) {
-			window.requestAnimationFrame( () => this.onSelectionChange() );
+			this.rafID = window.requestAnimationFrame( () => this.onSelectionChange() );
 			this.handleHorizontalNavigation( event );
 		}
 
