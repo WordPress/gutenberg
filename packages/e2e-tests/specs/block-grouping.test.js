@@ -82,35 +82,22 @@ describe( 'Block Grouping', () => {
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
-		it( 'creates a group from multiple blocks of different types via options toolbar', async () => {
+		it( 'groups and ungroups multiple blocks of different types via options toolbar', async () => {
 			// Creating test blocks
 			await insertBlocksOfMultipleTypes();
-
-			// Multiselect via keyboard.
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 
+			// Group
 			await clickBlockToolbarButton( 'More options' );
-
 			const groupButton = await page.waitForXPath( '//button[text()="Group"]' );
 			await groupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
-		} );
-	} );
 
-	describe( 'Ungrouping', () => {
-		it( 'ungroups an existing group via options menu', async () => {
-			// Create a Group
-			await insertBlocksOfMultipleTypes();
-			await pressKeyWithModifier( 'primary', 'a' );
-			await pressKeyWithModifier( 'primary', 'a' );
-			await transformBlockTo( 'Group' );
-
+			// UnGroup
 			await clickBlockToolbarButton( 'More options' );
-
 			const unGroupButton = await page.waitForXPath( '//button[text()="Ungroup"]' );
-
 			await unGroupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
