@@ -177,9 +177,7 @@ describe( 'Block Grouping', () => {
 
 			expect(
 				availableTransforms
-			).not.toEqual( expect.arrayContaining( [
-				'Group',
-			] ) );
+			).not.toContain( 'Group' );
 		} );
 
 		it( 'does not show group option in the options toolbar if container block is disabled ', async () => {
