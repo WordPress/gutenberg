@@ -8,7 +8,7 @@ This is a living document that outlines the design principles and patterns of th
 
 ### Goal of Gutenberg
 
-Gutenberg's all-encompassing goal is a post- and page-building experience that makes it easy to create rich layouts.
+Gutenberg's all-encompassing goal is a post- and page-building experience that makes it easy to create rich layouts. The block editor was the first product launched following this methodology for working with content.
 
 From the [kickoff post](https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/):
 
@@ -18,13 +18,13 @@ We can extract a few key principles from this:
 
 - **Authoring rich posts is a key strength of WordPress.**
 - **Blocks will unify features and types of interaction under a single interface.** Users shouldn’t have to write shortcodes, custom HTML, or paste URLs to embed. Users only need to learn how the block works in order to use all of its features.
-- **Gutenberg makes core features more discoverable**, reducing hard-to-find “Mystery meat.” WordPress supports a large number of blocks and 30+ embeds. Let’s increase their visibility.
+- **Make core features more discoverable**, reducing hard-to-find “Mystery meat.” WordPress supports a large number of blocks and 30+ embeds. Let’s increase their visibility.
 
 ### Why
 
 One thing that sets WordPress apart from other systems is that it allows users to create as rich a post layout as they can imagine — as long as they know HTML and CSS and build a custom theme.
 
-Gutenberg reshapes the editor into tool that allows users write rich posts and build beautiful layouts in a few clicks — no technical knowledge needed. WordPress will become a powerful and flexible content tool that’s accessible to all.
+Gutenberg reshapes the editor into a tool that allows users write rich posts and build beautiful layouts in a few clicks — no technical knowledge needed. WordPress will become a powerful and flexible content tool that’s accessible to all.
 
 ### Vision
 

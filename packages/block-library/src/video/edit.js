@@ -23,7 +23,7 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { mediaUpload } from '@wordpress/editor';
-import { Component, Fragment, createRef } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	__,
 	sprintf,
@@ -183,7 +183,7 @@ class VideoEdit extends Component {
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar>
 						<IconButton
@@ -294,7 +294,7 @@ class VideoEdit extends Component {
 						/>
 					) }
 				</figure>
-			</Fragment>
+			</>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}

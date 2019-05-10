@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
@@ -34,6 +34,7 @@ import {
 	deleteRow,
 	insertColumn,
 	deleteColumn,
+	toggleSection,
 } from './state';
 
 const BACKGROUND_COLORS = [
@@ -80,6 +81,8 @@ export class TableEdit extends Component {
 		this.onInsertColumnBefore = this.onInsertColumnBefore.bind( this );
 		this.onInsertColumnAfter = this.onInsertColumnAfter.bind( this );
 		this.onDeleteColumn = this.onDeleteColumn.bind( this );
+		this.onToggleHeaderSection = this.onToggleHeaderSection.bind( this );
+		this.onToggleFooterSection = this.onToggleFooterSection.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
@@ -193,6 +196,16 @@ export class TableEdit extends Component {
 	 */
 	onInsertRowAfter() {
 		this.onInsertRow( 1 );
+	}
+
+	onToggleHeaderSection() {
+		const { attributes, setAttributes } = this.props;
+		setAttributes( toggleSection( attributes, 'head' ) );
+	}
+
+	onToggleFooterSection() {
+		const { attributes, setAttributes } = this.props;
+		setAttributes( toggleSection( attributes, 'foot' ) );
 	}
 
 	/**
@@ -431,7 +444,7 @@ export class TableEdit extends Component {
 		} );
 
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar>
 						<DropdownMenu
@@ -447,6 +460,16 @@ export class TableEdit extends Component {
 							label={ __( 'Fixed width table cells' ) }
 							checked={ !! hasFixedLayout }
 							onChange={ this.onChangeFixedLayout }
+						/>
+						<ToggleControl
+							label={ __( 'Header section' ) }
+							checked={ !! ( head && head.length ) }
+							onChange={ this.onToggleHeaderSection }
+						/>
+						<ToggleControl
+							label={ __( 'Footer section' ) }
+							checked={ !! ( foot && foot.length ) }
+							onChange={ this.onToggleFooterSection }
 						/>
 					</PanelBody>
 					<PanelColorSettings
@@ -468,7 +491,7 @@ export class TableEdit extends Component {
 					<Section type="body" rows={ body } />
 					<Section type="foot" rows={ foot } />
 				</table>
-			</Fragment>
+			</>
 		);
 	}
 }

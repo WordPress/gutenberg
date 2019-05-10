@@ -8,7 +8,6 @@ import { get, times } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockAlignmentToolbar,
@@ -26,7 +25,7 @@ export default function TextColumnsEdit( { attributes, setAttributes, className 
 	} );
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<BlockAlignmentToolbar
 					value={ width }
@@ -68,6 +67,6 @@ export default function TextColumnsEdit( { attributes, setAttributes, className 
 					);
 				} ) }
 			</div>
-		</Fragment>
+		</>
 	);
 }
