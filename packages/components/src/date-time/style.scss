@@ -50,6 +50,11 @@
 	.DayPickerNavigation_button__horizontalDefault {
 		padding: 2px 8px;
 		top: 20px;
+
+		&:focus {
+			border-color: $blue-medium-focus;
+			box-shadow: 0 0 0 1px $blue-medium-focus;
+		}
 	}
 
 	.DayPicker_weekHeader {
@@ -92,6 +97,12 @@
 		.components-datetime__time-pm-button {
 			margin-left: -1px;
 			border-radius: 0 3px 3px 0;
+		}
+
+		.components-datetime__time-am-button:focus,
+		.components-datetime__time-pm-button:focus {
+			position: relative;
+			z-index: 1;
 		}
 
 		.components-datetime__time-am-button.is-toggled,
