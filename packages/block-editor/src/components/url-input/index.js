@@ -253,7 +253,7 @@ class URLInput extends Component {
 					<Popover position="bottom" noArrow focusOnMount={ false }>
 						<div
 							className="editor-url-input__suggestions block-editor-url-input__suggestions"
-							id={ `editor-url-input-suggestions-${ instanceId }` }
+							id={ `block-editor-url-input-suggestions-${ instanceId }` }
 							ref={ this.autocompleteRef }
 							role="listbox"
 						>
