@@ -157,11 +157,11 @@ export class RichText extends Component {
 		this.usedDeprecatedChildrenSource = Array.isArray( value );
 		this.lastHistoryValue = value;
 
-		// Internal values that are update synchronously, unlike props.
+		// Internal values are updated synchronously, unlike props and state.
 		this.value = value;
 		this.internalValue = this.formatToValue( value );
-		this.selectionStart = selectionStart;
-		this.selectionEnd = selectionEnd;
+		this.internalValue.start = selectionStart;
+		this.internalValue.end = selectionEnd;
 	}
 
 	componentWillUnmount() {
@@ -191,11 +191,7 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { selectionStart: start, selectionEnd: end } = this.props;
-		const { formats, replacements, text } = this.internalValue;
-		const { activeFormats } = this.state;
-
-		return { formats, replacements, text, start, end, activeFormats };
+		return this.internalValue;
 	}
 
 	createRecord() {
@@ -376,8 +372,8 @@ export class RichText extends Component {
 
 		// We know for certain that of focus, the old selection is invalid. It
 		// will be recalculated on `selectionchange`.
-		delete this.selectionStart;
-		delete this.selectionEnd;
+		delete this.internalValue.start;
+		delete this.internalValue.end;
 		this.props.onSelectionChange( undefined, undefined );
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
@@ -419,8 +415,7 @@ export class RichText extends Component {
 		}
 
 		const value = this.createRecord();
-		const { activeFormats = [] } = this.state;
-		const start = this.selectionStart;
+		const { start, activeFormats = [] } = this.internalValue;
 
 		// Update the formats between the last and new caret position.
 		const change = updateFormats( {
@@ -460,40 +455,40 @@ export class RichText extends Component {
 	 */
 	onSelectionChange() {
 		const { start, end } = this.createRecord();
+		const value = this.internalValue;
 
-		if ( start !== this.selectionStart || end !== this.selectionEnd ) {
+		if ( start !== value.start || end !== value.end ) {
 			const { isCaretWithinFormattedText } = this.props;
 			const isHorizontal = this.keyPressed === LEFT || this.keyPressed === RIGHT;
+			const newValue = {
+				...value,
+				start,
+				end,
+				// Allow `getActiveFormats` to get new `activeFormats`.
+				activeFormats: undefined,
+			};
 
-			// Reuse the current references.
-			const value = this.getRecord();
-
-			// Allow `getActiveFormats` to get new `activeFormats`.
-			delete value.activeFormats;
-
-			// Update the value with the new selection.
-			value.start = start;
-			value.end = end;
-
-			let activeFormats = getActiveFormats( value );
+			let activeFormats;
 
 			// When the selection changes as a result of a horizontal arrow key
 			// press, then the active formats should be set depending on the
 			// direction.
-			if ( isHorizontal && this.selectionStart !== undefined ) {
+			if ( isHorizontal && value.start !== undefined ) {
 				// Selection is moved forward if the new start is higher than
 				// the last.
-				const isForward = start < this.selectionStart;
+				const isForward = start < value.start;
 
 				if ( isForward ) {
 					activeFormats = value.formats[ start ] || [];
 				} else {
 					activeFormats = value.formats[ start - 1 ] || [];
 				}
+			} else {
+				activeFormats = getActiveFormats( newValue );
 			}
 
 			// Update the value with the new active formats.
-			value.activeFormats = activeFormats;
+			newValue.activeFormats = activeFormats;
 
 			if ( ! isCaretWithinFormattedText && activeFormats.length ) {
 				this.props.onEnterFormattedText();
@@ -502,10 +497,9 @@ export class RichText extends Component {
 			}
 
 			this.setState( { activeFormats } );
-			this.applyRecord( value, { domOnly: true } );
+			this.applyRecord( newValue, { domOnly: true } );
 			this.props.onSelectionChange( start, end );
-			this.selectionStart = start;
-			this.selectionEnd = end;
+			this.internalValue = newValue;
 
 			if ( activeFormats.length > 0 ) {
 				this.recalculateBoundaryStyle();
@@ -554,8 +548,6 @@ export class RichText extends Component {
 		this.props.onChange( this.value );
 		this.setState( { activeFormats } );
 		this.props.onSelectionChange( start, end );
-		this.selectionStart = start;
-		this.selectionEnd = end;
 
 		if ( ! withoutHistory ) {
 			this.onCreateUndoLevel();
@@ -776,8 +768,7 @@ export class RichText extends Component {
 	 */
 	handleHorizontalNavigation( event ) {
 		const value = this.getRecord();
-		const { text, formats, start, end } = value;
-		const { activeFormats = [] } = this.state;
+		const { text, formats, start, end, activeFormats = [] } = value;
 		const collapsed = isCollapsed( value );
 		// To do: ideally, we should look at visual position instead.
 		const { direction } = getComputedStyle( this.editableRef );
@@ -842,9 +833,11 @@ export class RichText extends Component {
 		event.preventDefault();
 
 		const newActiveFormats = source.slice( 0, newActiveFormatsLength );
+		const newValue = { ...value, activeFormats: newActiveFormats };
 
-		this.applyRecord( { ...value, activeFormats: newActiveFormats } );
+		this.applyRecord( newValue );
 		this.setState( { activeFormats: newActiveFormats } );
+		this.internalValue = newValue;
 
 		// Wait for boundary class to be added.
 		this.props.setTimeout( () => this.recalculateBoundaryStyle() );
@@ -936,8 +929,8 @@ export class RichText extends Component {
 		// Check if the selection changed.
 		shouldReapply = shouldReapply || (
 			isSelected && ! prevProps.isSelected && (
-				this.selectionStart !== selectionStart ||
-				this.selectionEnd !== selectionEnd
+				this.internalValue.start !== selectionStart ||
+				this.internalValue.end !== selectionEnd
 			)
 		);
 
@@ -952,16 +945,14 @@ export class RichText extends Component {
 
 		if ( shouldReapply ) {
 			this.internalValue = this.formatToValue( value );
-			this.applyRecord( {
-				...this.internalValue,
-				start: selectionStart,
-				end: selectionEnd,
-			} );
+			this.internalValue.start = selectionStart;
+			this.internalValue.end = selectionEnd;
+			this.applyRecord( this.internalValue );
 		}
 
 		this.value = value;
-		this.selectionStart = selectionStart;
-		this.selectionEnd = selectionEnd;
+		this.internalValue.start = selectionStart;
+		this.internalValue.end = selectionEnd;
 	}
 
 	/**
