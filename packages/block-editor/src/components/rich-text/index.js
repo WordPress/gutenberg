@@ -636,6 +636,7 @@ export class RichText extends Component {
 			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
 			( keyCode === LEFT || keyCode === RIGHT )
 		) {
+			window.requestAnimationFrame( () => this.onSelectionChange() );
 			this.handleHorizontalNavigation( event );
 		}
 
