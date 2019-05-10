@@ -14,7 +14,7 @@
 	margin-bottom: 1em;
 	flex-grow: 1;
 
-	@media (max-width: #{ ($break-medium) }) {
+	@media (max-width: #{ ($break-small - 1) }) {
 		// Responsiveness: Show at most one columns on mobile. This must be
 		// important since the Column assigns its own width as an inline style.
 		flex-basis: 100% !important;
@@ -29,6 +29,8 @@
 
 	@include break-small() {
 
+		// Beyond mobile, allow 2 columns.
+		flex-basis: calc(50% - #{$grid-size-large});
 		flex-grow: 0;
 
 		// Add space between the multiple columns. Themes can customize this if they wish to work differently.
