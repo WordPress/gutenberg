@@ -378,7 +378,7 @@ class ImageEdit extends React.Component {
 									accessible={ true }
 									disabled={ ! isSelected }
 									accessibilityLabel={ alt }
-									accessibilityHint={ __( 'Long press to edit the image' ) }
+									accessibilityHint={ __( 'Double tap and hold to edit the image' ) }
 									accessibilityRole={ 'imagebutton' }
 								>
 									<View style={ { flex: 1 } }>
