@@ -148,8 +148,10 @@ class GalleryImage extends Component {
 					<IconButton
 						icon="no-alt"
 						onClick={ onRemove }
+						onFocus={ this.onSelectImage }
 						className="blocks-gallery-item__remove"
 						label={ __( 'Remove Image' ) }
+						disabled={ ! isSelected }
 					/>
 				</div>
 				<RichText
