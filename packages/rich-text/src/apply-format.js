@@ -59,13 +59,6 @@ export function applyFormat(
 					replace( newFormats[ endIndex ], index, format );
 				endIndex++;
 			}
-		// Otherwise, insert a placeholder with the format so new input appears
-		// with the format applied.
-		} else {
-			return {
-				...value,
-				activeFormats: [ ...activeFormats, format ],
-			};
 		}
 	} else {
 		// Determine the highest position the new format can be inserted at.
@@ -92,5 +85,12 @@ export function applyFormat(
 		}
 	}
 
-	return normaliseFormats( { ...value, formats: newFormats } );
+	return normaliseFormats( {
+		...value,
+		formats: newFormats,
+		// Always revise active formats. This serves as a placeholder for new
+		// inputs with the format so new input appears with the format applied,
+		// and ensures a format of the same type uses the latest values.
+		activeFormats: [ format, ...activeFormats ],
+	} );
 }
