@@ -16,7 +16,7 @@ import {
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	PanelBody,
 	TextareaControl,
@@ -198,18 +198,18 @@ class MediaTextEdit extends Component {
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={
-						<Fragment>
+						<>
 							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 								{ __( 'Describe the purpose of the image' ) }
 							</ExternalLink>
 							{ __( 'Leave empty if the image is purely decorative.' ) }
-						</Fragment>
+						</>
 					}
 				/> ) }
 			</PanelBody>
 		);
 		return (
-			<Fragment>
+			<>
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
 					<PanelColorSettings
@@ -235,7 +235,7 @@ class MediaTextEdit extends Component {
 						templateInsertUpdatesSelection={ false }
 					/>
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 }

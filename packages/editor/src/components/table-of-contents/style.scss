@@ -4,7 +4,7 @@
 
 .table-of-contents__popover {
 	.components-popover__content {
-		padding: 16px;
+		padding: $grid-size-large;
 
 		@include break-small {
 			max-height: calc(100vh - 120px);
@@ -20,6 +20,11 @@
 .table-of-contents__counts {
 	display: flex;
 	flex-wrap: wrap;
+
+	&:focus {
+		@include square-style__focus();
+		outline-offset: $grid-size;
+	}
 }
 
 .table-of-contents__count {

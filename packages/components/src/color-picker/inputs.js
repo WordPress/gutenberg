@@ -10,59 +10,68 @@ import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { DOWN, ENTER, UP } from '@wordpress/keycodes';
+import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import IconButton from '../icon-button';
-import { isValidHex } from './utils';
 import TextControl from '../text-control';
+import { isValidHex } from './utils';
 
 /* Wrapper for TextControl, only used to handle intermediate state while typing. */
-class Input extends Component {
-	constructor( { value } ) {
+export class Input extends Component {
+	constructor() {
 		super( ...arguments );
-		this.state = { value: String( value ).toLowerCase() };
 		this.handleBlur = this.handleBlur.bind( this );
 		this.handleChange = this.handleChange.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( nextProps.value !== this.props.value ) {
-			this.setState( {
-				value: String( nextProps.value ).toLowerCase(),
-			} );
-		}
-	}
-
 	handleBlur() {
-		const { valueKey, onChange } = this.props;
-		const { value } = this.state;
-		onChange( { [ valueKey ]: value } );
+		const { value, valueKey, onChange, source } = this.props;
+		onChange( {
+			source,
+			state: 'commit',
+			value,
+			valueKey,
+		} );
 	}
 
 	handleChange( value ) {
-		const { valueKey, onChange } = this.props;
-		// Protect against expanding a value while we're typing.
-		if ( value.length > 4 ) {
-			onChange( { [ valueKey ]: value } );
+		const { valueKey, onChange, source } = this.props;
+		if ( value.length > 4 && isValidHex( value ) ) {
+			onChange( {
+				source,
+				state: 'commit',
+				value,
+				valueKey,
+			} );
+		} else {
+			onChange( {
+				source,
+				state: 'draft',
+				value,
+				valueKey,
+			} );
 		}
-		this.setState( { value } );
 	}
 
 	handleKeyDown( { keyCode } ) {
 		if ( keyCode !== ENTER && keyCode !== UP && keyCode !== DOWN ) {
 			return;
 		}
-		const { value } = this.state;
-		const { valueKey, onChange } = this.props;
-		onChange( { [ valueKey ]: value } );
+		const { value, valueKey, onChange, source } = this.props;
+		onChange( {
+			source,
+			state: 'commit',
+			value,
+			valueKey,
+		} );
 	}
 
 	render() {
-		const { label, ...props } = this.props;
-		const { value } = this.state;
+		const { label, value, ...props } = this.props;
 		return (
 			<TextControl
 				className="components-color-picker__inputs-field"
@@ -71,11 +80,13 @@ class Input extends Component {
 				onChange={ ( newValue ) => this.handleChange( newValue ) }
 				onBlur={ this.handleBlur }
 				onKeyDown={ this.handleKeyDown }
-				{ ...omit( props, [ 'onChange', 'value', 'valueKey' ] ) }
+				{ ...omit( props, [ 'onChange', 'valueKey', 'source' ] ) }
 			/>
 		);
 	}
 }
+
+const PureIconButton = pure( IconButton );
 
 export class Inputs extends Component {
 	constructor( { hsl } ) {
@@ -85,7 +96,9 @@ export class Inputs extends Component {
 		this.state = { view };
 
 		this.toggleViews = this.toggleViews.bind( this );
+		this.resetDraftValues = this.resetDraftValues.bind( this );
 		this.handleChange = this.handleChange.bind( this );
+		this.normalizeValue = this.normalizeValue.bind( this );
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -97,63 +110,52 @@ export class Inputs extends Component {
 
 	toggleViews() {
 		if ( this.state.view === 'hex' ) {
-			this.setState( { view: 'rgb' } );
+			this.setState( { view: 'rgb' }, this.resetDraftValues );
 
 			speak( __( 'RGB mode active' ) );
 		} else if ( this.state.view === 'rgb' ) {
-			this.setState( { view: 'hsl' } );
+			this.setState( { view: 'hsl' }, this.resetDraftValues );
 
 			speak( __( 'Hue/saturation/lightness mode active' ) );
 		} else if ( this.state.view === 'hsl' ) {
 			if ( this.props.hsl.a === 1 ) {
-				this.setState( { view: 'hex' } );
+				this.setState( { view: 'hex' }, this.resetDraftValues );
 
 				speak( __( 'Hex color mode active' ) );
 			} else {
-				this.setState( { view: 'rgb' } );
+				this.setState( { view: 'rgb' }, this.resetDraftValues );
 
 				speak( __( 'RGB mode active' ) );
 			}
 		}
 	}
 
-	handleChange( data ) {
-		if ( data.hex ) {
-			if ( isValidHex( data.hex ) ) {
-				this.props.onChange( {
-					hex: data.hex,
-					source: 'hex',
-				} );
-			}
-		} else if ( data.r || data.g || data.b ) {
-			this.props.onChange( {
-				r: data.r || this.props.rgb.r,
-				g: data.g || this.props.rgb.g,
-				b: data.b || this.props.rgb.b,
-				source: 'rgb',
-			} );
-		} else if ( data.a ) {
-			if ( data.a < 0 ) {
-				data.a = 0;
-			} else if ( data.a > 1 ) {
-				data.a = 1;
-			}
+	resetDraftValues() {
+		return this.props.onChange( {
+			state: 'reset',
+		} );
+	}
 
-			this.props.onChange( {
-				h: this.props.hsl.h,
-				s: this.props.hsl.s,
-				l: this.props.hsl.l,
-				a: Math.round( data.a * 100 ) / 100,
-				source: 'rgb',
-			} );
-		} else if ( data.h || data.s || data.l ) {
-			this.props.onChange( {
-				h: data.h || this.props.hsl.h,
-				s: data.s || this.props.hsl.s,
-				l: data.l || this.props.hsl.l,
-				source: 'hsl',
-			} );
+	normalizeValue( valueKey, value ) {
+		if ( valueKey !== 'a' ) {
+			return value;
 		}
+
+		if ( value > 0 ) {
+			return 0;
+		} else if ( value > 1 ) {
+			return 1;
+		}
+		return Math.round( value * 100 ) / 100;
+	}
+
+	handleChange( { source, state, value, valueKey } ) {
+		this.props.onChange( {
+			source,
+			state,
+			valueKey,
+			value: this.normalizeValue( valueKey, value ),
+		} );
 	}
 
 	renderFields() {
@@ -162,6 +164,7 @@ export class Inputs extends Component {
 			return (
 				<div className="components-color-picker__inputs-fields">
 					<Input
+						source={ this.state.view }
 						label={ __( 'Color value in hexadecimal' ) }
 						valueKey="hex"
 						value={ this.props.hex }
@@ -177,6 +180,7 @@ export class Inputs extends Component {
 					</legend>
 					<div className="components-color-picker__inputs-fields">
 						<Input
+							source={ this.state.view }
 							label="r"
 							valueKey="r"
 							value={ this.props.rgb.r }
@@ -186,6 +190,7 @@ export class Inputs extends Component {
 							max="255"
 						/>
 						<Input
+							source={ this.state.view }
 							label="g"
 							valueKey="g"
 							value={ this.props.rgb.g }
@@ -195,6 +200,7 @@ export class Inputs extends Component {
 							max="255"
 						/>
 						<Input
+							source={ this.state.view }
 							label="b"
 							valueKey="b"
 							value={ this.props.rgb.b }
@@ -205,6 +211,7 @@ export class Inputs extends Component {
 						/>
 						{ disableAlpha ? null : (
 							<Input
+								source={ this.state.view }
 								label="a"
 								valueKey="a"
 								value={ this.props.rgb.a }
@@ -226,6 +233,7 @@ export class Inputs extends Component {
 					</legend>
 					<div className="components-color-picker__inputs-fields">
 						<Input
+							source={ this.state.view }
 							label="h"
 							valueKey="h"
 							value={ this.props.hsl.h }
@@ -235,6 +243,7 @@ export class Inputs extends Component {
 							max="359"
 						/>
 						<Input
+							source={ this.state.view }
 							label="s"
 							valueKey="s"
 							value={ this.props.hsl.s }
@@ -244,6 +253,7 @@ export class Inputs extends Component {
 							max="100"
 						/>
 						<Input
+							source={ this.state.view }
 							label="l"
 							valueKey="l"
 							value={ this.props.hsl.l }
@@ -254,6 +264,7 @@ export class Inputs extends Component {
 						/>
 						{ disableAlpha ? null : (
 							<Input
+								source={ this.state.view }
 								label="a"
 								valueKey="a"
 								value={ this.props.hsl.a }
@@ -275,7 +286,7 @@ export class Inputs extends Component {
 			<div className="components-color-picker__inputs-wrapper">
 				{ this.renderFields() }
 				<div className="components-color-picker__inputs-toggle">
-					<IconButton
+					<PureIconButton
 						icon="arrow-down-alt2"
 						label={ __( 'Change color format' ) }
 						onClick={ this.toggleViews }
