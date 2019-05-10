@@ -372,8 +372,11 @@ export class RichText extends Component {
 
 		// We know for certain that of focus, the old selection is invalid. It
 		// will be recalculated on `selectionchange`.
-		delete this.internalValue.start;
-		delete this.internalValue.end;
+		this.internalValue = {
+			...this.internalValue,
+			start: undefined,
+			end: undefined,
+		};
 		this.props.onSelectionChange( undefined, undefined );
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
@@ -415,7 +418,7 @@ export class RichText extends Component {
 		}
 
 		const value = this.createRecord();
-		const { start, activeFormats = [] } = this.internalValue;
+		const { start, activeFormats = [] } = this.getRecord();
 
 		// Update the formats between the last and new caret position.
 		const change = updateFormats( {
@@ -455,7 +458,7 @@ export class RichText extends Component {
 	 */
 	onSelectionChange() {
 		const { start, end } = this.createRecord();
-		const value = this.internalValue;
+		const value = this.getRecord();
 
 		if ( start !== value.start || end !== value.end ) {
 			const { isCaretWithinFormattedText } = this.props;
@@ -544,7 +547,7 @@ export class RichText extends Component {
 		} );
 
 		this.value = this.valueToFormat( record );
-		this.internalValue = record;
+		this.internalValue = { ...record };
 		this.props.onChange( this.value );
 		this.setState( { activeFormats } );
 		this.props.onSelectionChange( start, end );
@@ -944,15 +947,21 @@ export class RichText extends Component {
 			! isShallowEqual( prepareProps, prevPrepareProps );
 
 		if ( shouldReapply ) {
+			this.value = value;
 			this.internalValue = this.formatToValue( value );
 			this.internalValue.start = selectionStart;
 			this.internalValue.end = selectionEnd;
 			this.applyRecord( this.internalValue );
+		} else if (
+			this.internalValue.start !== selectionStart ||
+			this.internalValue.end !== selectionEnd
+		) {
+			this.internalValue = {
+				...this.internalValue,
+				start: selectionStart,
+				end: selectionEnd,
+			};
 		}
-
-		this.value = value;
-		this.internalValue.start = selectionStart;
-		this.internalValue.end = selectionEnd;
 	}
 
 	/**
