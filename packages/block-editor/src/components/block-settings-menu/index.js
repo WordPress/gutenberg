@@ -8,7 +8,6 @@ import { castArray } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import { Toolbar, Dropdown, NavigableMenu, MenuItem } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 
@@ -79,7 +78,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 								</MenuItem>
 							) }
 							{ ! isLocked && (
-								<Fragment>
+								<>
 									<MenuItem
 										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 										onClick={ onInsertBefore }
@@ -96,7 +95,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 									>
 										{ __( 'Insert After' ) }
 									</MenuItem>
-								</Fragment>
+								</>
 							) }
 							{ count === 1 && (
 								<BlockModeToggle

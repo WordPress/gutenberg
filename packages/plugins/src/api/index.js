@@ -65,12 +65,11 @@ const plugins = {};
  * @example <caption>ESNext</caption>
  * ```js
  * // Using ESNext syntax
- * const { Fragment } = wp.element;
  * const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
  * const { registerPlugin } = wp.plugins;
  *
  * const Component = () => (
- * 	<Fragment>
+ * 	<>
  * 		<PluginSidebarMoreMenuItem
  * 			target="sidebar-name"
  * 		>
@@ -82,7 +81,7 @@ const plugins = {};
  * 		>
  * 			Content of the sidebar
  * 		</PluginSidebar>
- * 	</Fragment>
+ * 	</>
  * );
  *
  * registerPlugin( 'plugin-name', {

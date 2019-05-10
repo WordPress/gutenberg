@@ -23,7 +23,7 @@ import {
 	MediaUpload,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -201,15 +201,15 @@ class GalleryEdit extends Component {
 
 		if ( ! hasImages ) {
 			return (
-				<Fragment>
+				<>
 					{ controls }
 					{ mediaPlaceholder }
-				</Fragment>
+				</>
 			);
 		}
 
 		return (
-			<Fragment>
+			<>
 				{ controls }
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery Settings' ) }>
@@ -268,7 +268,7 @@ class GalleryEdit extends Component {
 					} ) }
 				</ul>
 				{ mediaPlaceholder }
-			</Fragment>
+			</>
 		);
 	}
 }

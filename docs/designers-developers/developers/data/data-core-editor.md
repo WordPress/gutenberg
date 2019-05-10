@@ -1169,6 +1169,12 @@ _Related_
 
 -   removeBlocks in core/block-editor store.
 
+<a name="replaceBlock" href="#replaceBlock">#</a> **replaceBlock**
+
+_Related_
+
+-   replaceBlock in core/block-editor store.
+
 <a name="replaceBlocks" href="#replaceBlocks">#</a> **replaceBlocks**
 
 _Related_
