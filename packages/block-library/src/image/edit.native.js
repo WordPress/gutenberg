@@ -80,6 +80,13 @@ class ImageEdit extends React.Component {
 
 		const { attributes, setAttributes } = this.props;
 
+    // This will warn when we have `id` defined, while `url` is undefined.
+    // This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
+    // where a cancelled image upload was resulting in a subsequent crash.
+    if ( attributes.id && ! attributes.url ) {
+      console.warn( "Attributes has id with no url." );
+    }
+
 		if ( attributes.id && attributes.url && ! isURL( attributes.url ) ) {
 			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
 				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
