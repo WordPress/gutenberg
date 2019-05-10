@@ -34,17 +34,9 @@ async function insertBlocksOfMultipleTypes() {
 }
 
 describe( 'Block Grouping', () => {
-	beforeAll( async () => {
-		await createNewPost();
-	} );
-
 	beforeEach( async () => {
-		// Remove all blocks from the post so that we're working with a clean slate
-		await page.evaluate( () => {
-			const blocks = wp.data.select( 'core/editor' ).getBlocks();
-			const clientIds = blocks.map( ( block ) => block.clientId );
-			wp.data.dispatch( 'core/editor' ).removeBlocks( clientIds );
-		} );
+		// Posts are auto-removed at the end of each test run
+		await createNewPost();
 	} );
 
 	describe( 'Group creation', () => {
@@ -159,15 +151,13 @@ describe( 'Block Grouping', () => {
 	} );
 
 	describe( 'Container Block availability', () => {
-		beforeAll( async () => {
+		beforeEach( async () => {
 			// Disable the Group block
 			await page.evaluate( () => {
 				const { dispatch } = wp.data;
 				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/group' ] );
 			} );
-		} );
 
-		beforeEach( async () => {
 			// Create a Group
 			await insertBlocksOfMultipleTypes();
 			await pressKeyWithModifier( 'primary', 'a' );
