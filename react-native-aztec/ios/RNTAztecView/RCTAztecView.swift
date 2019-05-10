@@ -279,7 +279,7 @@ class RCTAztecView: Aztec.TextView {
     }
     
     private func interceptBackspace() -> Bool {
-        guard selectedRange.location == 0 && selectedRange.length == 0,
+        guard isNewLineBeforeSelection() || (selectedRange.location == 0 && selectedRange.length == 0),
             let onBackspace = onBackspace else {
                 return false
         }
@@ -289,6 +289,13 @@ class RCTAztecView: Aztec.TextView {
         return true
     }
 
+    private func isNewLineBeforeSelection() -> Bool {
+        guard let currentLocation = text.indexFromLocation(selectedRange.location) else {
+            return false
+        }
+
+        return text.isStartOfParagraph(at: currentLocation)
+    }
     override var keyCommands: [UIKeyCommand]? {
         // Remove defautls Tab and Shift+Tab commands, leaving just Shift+Enter command.
         return [carriageReturnKeyCommand]
