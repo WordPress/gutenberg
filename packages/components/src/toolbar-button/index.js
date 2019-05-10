@@ -40,6 +40,7 @@ function ToolbarButton( {
 				) }
 				aria-pressed={ isActive }
 				disabled={ isDisabled }
+				tabIndex={ -1 }
 				{ ...extraProps }
 			/>
 			{ children }

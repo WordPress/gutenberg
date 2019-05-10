@@ -57,6 +57,7 @@ function DropdownMenu( {
 						aria-expanded={ isOpen }
 						label={ label }
 						tooltip={ label }
+						tabIndex={ -1 }
 					>
 						<span className="components-dropdown-menu__indicator" />
 					</IconButton>
