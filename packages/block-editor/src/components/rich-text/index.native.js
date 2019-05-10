@@ -347,7 +347,6 @@ export class RichText extends Component {
 				const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
 				this.onFormatChangeForceChild( insertedLineBreak );
 			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
-				this.needsSelectionUpdate = false;
 				this.splitContent( currentRecord );
 			} else {
 				const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
@@ -598,34 +597,6 @@ export class RichText extends Component {
 			this.value = this.props.value;
 			this.lastEventCount = undefined;
 		}
-
-		this.moveCaretToTheEndIfNeeded( nextProps );
-	}
-
-	moveCaretToTheEndIfNeeded( nextProps ) {
-		const nextRecord = this.formatToValue( nextProps.value );
-		const nextTextContent = getTextContent( nextRecord );
-
-		if ( this.isTouched || ! nextProps.isSelected ) {
-			this.savedContent = nextTextContent;
-			return;
-		}
-
-		if ( nextTextContent === '' && this.savedContent === '' ) {
-			return;
-		}
-
-		// This logic will handle the selection when two blocks are merged or when block is split
-		// into two blocks
-		if ( nextTextContent === this.savedContent && this.savedContent && this.savedContent.length > 0 ) {
-			let length = this.savedContent.length;
-			if ( length === 0 && nextTextContent !== this.props.value ) {
-				length = this.props.value.length;
-			}
-
-			this.forceSelectionUpdate( length, length );
-			this.savedContent = nextTextContent;
-		}
 	}
 
 	forceSelectionUpdate( start, end ) {
@@ -663,8 +634,11 @@ export class RichText extends Component {
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
 
-		if ( Platform.OS === 'android' && this.comesFromAztec === false ) {
-			if ( this.needsSelectionUpdate ) {
+		if ( ! this.comesFromAztec ) {
+			if ( nextProps.selectionStart !== this.props.selectionStart &&
+					nextProps.selectionStart !== this.selectionStart &&
+					nextProps.isSelected) {
+				this.needsSelectionUpdate = true;
 				this.lastEventCount = undefined; // force a refresh on the native side
 			}
 		}
@@ -743,7 +717,7 @@ export class RichText extends Component {
 				// So, skip forcing it, let Aztec just do its best and just log the fact.
 				console.warn( 'RichText value will be trimmed for spaces! Avoiding setting the caret position manually.' );
 			} else {
-				selection = { start: this.selectionStart, end: this.selectionEnd };
+				selection = { start: this.props.selectionStart, end: this.props.selectionEnd };
 			}
 		}
 
