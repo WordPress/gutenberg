@@ -59,6 +59,7 @@ ul.wp-block-gallery {
 		}
 	}
 
+	.is-selected .block-library-gallery-item__move-menu,
 	.is-selected .block-library-gallery-item__inline-menu {
 		background-color: theme(primary);
 
@@ -93,15 +94,7 @@ ul.wp-block-gallery {
 	}
 }
 
-.block-library-gallery-item__inline-menu {
-	position: absolute;
-	top: -2px;
-	right: -2px;
-}
-
 .block-library-gallery-item__move-menu {
-	position: absolute;
-	top: -2px;
 	left: -2px;
 }
 
