@@ -17,18 +17,17 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
-	ServerSideRender,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
+import { ServerSideRender } from '@wordpress/editor';
 
-import WidgetEditHandler from './WidgetEditHandler';
+/**
+ * Internal dependencies
+ */
+import LegacyWidgetEditHandler from './handler';
 
 class LegacyWidgetEdit extends Component {
 	constructor() {
@@ -136,7 +135,7 @@ class LegacyWidgetEdit extends Component {
 				</BlockControls>
 				{ inspectorControls }
 				{ ! isCallbackWidget && (
-					<WidgetEditHandler
+					<LegacyWidgetEditHandler
 						isVisible={ ! isPreview }
 						identifier={ attributes.identifier }
 						instance={ attributes.instance }
