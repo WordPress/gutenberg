@@ -3,6 +3,7 @@
 	width: 100%;
 	padding: $grid-size ($grid-size-large - $border-width);
 	text-align: left;
+	color: $dark-gray-600;
 	@include menu-style__neutral;
 
 	// Target plugin icons that can have arbitrary classes by using an aggressive selector.

@@ -41,6 +41,7 @@
 		border-radius: 0;
 		text-align: left;
 		cursor: pointer;
+		color: $dark-gray-600;
 		@include menu-style__neutral;
 
 		&:hover:not(:disabled):not([aria-disabled="true"]) {
