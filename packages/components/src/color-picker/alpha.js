@@ -36,6 +36,7 @@ import { noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { TAB } from '@wordpress/keycodes';
+import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -174,4 +175,4 @@ export class Alpha extends Component {
 	}
 }
 
-export default Alpha;
+export default pure( Alpha );

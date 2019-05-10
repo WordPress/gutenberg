@@ -38,10 +38,8 @@ describe( 'Popover', () => {
 
 		it( 'should turn off auto refresh', () => {
 			wrapper = TestUtils.renderIntoDocument( <Popover /> );
-			/* eslint-disable react/no-find-dom-node */
+			// eslint-disable-next-line react/no-find-dom-node
 			ReactDOM.unmountComponentAtNode( ReactDOM.findDOMNode( wrapper ).parentNode );
-			/* eslint-enable react/no-find-dom-node */
-
 			expect( Popover.prototype.toggleAutoRefresh ).toHaveBeenCalledWith( false );
 		} );
 

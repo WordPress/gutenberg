@@ -3,7 +3,7 @@
 	align-items: center;
 	width: $icon-button-size - 8px;
 	padding: #{ $grid-size-small * 3 } $grid-size-small;
-	color: $light-gray-900; // Doesn't need to meet AA because button is disabled and it's supporting text.
+	color: $dark-gray-500;
 	overflow: hidden;
 	white-space: nowrap;
 

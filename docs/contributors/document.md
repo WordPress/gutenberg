@@ -15,7 +15,7 @@ To add a new documentation page:
 
 It's very likely that at some point you will want to link to other documentation pages. It's worth emphasizing that all documents can be browsed in different contexts:
 
-- Gutenberg Handbook
+- Block Editor Handbook
 - GitHub website
 - npm website
 

@@ -7,10 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import {
-	Component,
-	Fragment,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	PanelBody,
 	ToggleControl,
@@ -151,7 +148,7 @@ class ParagraphBlock extends Component {
 		} = attributes;
 
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<AlignmentToolbar
 						value={ align }
@@ -244,12 +241,12 @@ class ParagraphBlock extends Component {
 					} }
 					unstableOnSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
-					onReplace={ this.onReplace }
-					onRemove={ () => onReplace( [] ) }
+					onReplace={ this.props.onReplace && this.onReplace }
+					onRemove={ onReplace && ( () => onReplace( [] ) ) }
 					aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
 					placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
 				/>
-			</Fragment>
+			</>
 		);
 	}
 }

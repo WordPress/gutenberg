@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
@@ -18,7 +18,7 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 	const [ inputHeightValue, setInputHeightValue ] = useState( height );
 
 	return (
-		<Fragment>
+		<>
 			<ResizableBox
 				className={ classnames(
 					'block-library-spacer__resize-container',
@@ -78,7 +78,7 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 					</BaseControl>
 				</PanelBody>
 			</InspectorControls>
-		</Fragment>
+		</>
 	);
 };
 

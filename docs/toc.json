@@ -20,7 +20,17 @@
 			{"docs/designers-developers/developers/internationalization.md": []},
 			{"docs/designers-developers/developers/accessibility.md": []},
 			{"docs/designers-developers/developers/feature-flags.md": []},
-			{"docs/designers-developers/developers/data/README.md": "{{data}}"},
+			{"docs/designers-developers/developers/data/README.md": [
+				{"docs/designers-developers/developers/data/data-core.md": []},
+				{"docs/designers-developers/developers/data/data-core-annotations.md": []},
+				{"docs/designers-developers/developers/data/data-core-blocks.md": []},
+				{"docs/designers-developers/developers/data/data-core-block-editor.md": []},
+				{"docs/designers-developers/developers/data/data-core-editor.md": []},
+				{"docs/designers-developers/developers/data/data-core-edit-post.md": []},
+				{"docs/designers-developers/developers/data/data-core-notices.md": []},
+				{"docs/designers-developers/developers/data/data-core-nux.md": []},
+				{"docs/designers-developers/developers/data/data-core-viewport.md": []}
+			]},
 			{"docs/designers-developers/developers/packages.md": "{{packages}}"},
 			{"packages/components/README.md": "{{components}}"},
 			{"docs/designers-developers/developers/themes/README.md": [
@@ -85,12 +95,15 @@
 			{"docs/contributors/reference.md": []}
 		]},
 		{"docs/contributors/develop.md": [
+			{"docs/contributors/getting-started.md": []},
+			{"docs/contributors/git-workflow.md": []},
 			{"docs/contributors/coding-guidelines.md": []},
 			{"docs/contributors/testing-overview.md": []},
-			{"docs/contributors/git-workflow.md": []},
 			{"docs/contributors/grammar.md": []},
 			{"docs/contributors/scripts.md": []},
-			{"docs/contributors/release.md": []}
+			{"docs/contributors/managing-packages.md": []},
+			{"docs/contributors/release.md": []},
+			{"docs/contributors/localizing.md": []}
 		]},
 		{"docs/contributors/document.md": [
 			{"docs/contributors/copy-guide.md": []}

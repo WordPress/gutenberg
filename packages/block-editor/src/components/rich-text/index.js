@@ -13,7 +13,7 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, RawHTML } from '@wordpress/element';
+import { Component, RawHTML } from '@wordpress/element';
 import { isHorizontalEdge } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
@@ -1080,7 +1080,7 @@ export class RichText extends Component {
 					onChange={ this.onChange }
 				>
 					{ ( { listBoxId, activeId } ) => (
-						<Fragment>
+						<>
 							<Editable
 								tagName={ Tagname }
 								style={ style }
@@ -1113,7 +1113,7 @@ export class RichText extends Component {
 								</Tagname>
 							}
 							{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
-						</Fragment>
+						</>
 					) }
 				</Autocomplete>
 				{ isSelected && <RemoveBrowserShortcuts /> }
@@ -1236,4 +1236,4 @@ RichTextContainer.Content.defaultProps = {
 export default RichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { UnstableRichTextInputEvent } from './input-event';
+export { __unstableRichTextInputEvent } from './input-event';

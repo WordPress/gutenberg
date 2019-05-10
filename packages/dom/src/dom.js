@@ -235,15 +235,9 @@ export function getRectangleFromRange( range ) {
 /**
  * Get the rectangle for the selection in a container.
  *
- * @param {Element} container Editable container.
- *
  * @return {?DOMRect} The rectangle.
  */
-export function computeCaretRect( container ) {
-	if ( ! container.isContentEditable ) {
-		return;
-	}
-
+export function computeCaretRect() {
 	const selection = window.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 

@@ -27,17 +27,40 @@ before_install:
 
 jobs:
   include:
-    - name: JS unit tests
-      env: WP_VERSION=latest
+    - name: Lint
       before_install:
         - nvm install --latest-npm
       install:
         - npm ci
       script:
-        - npm run build
         - npm run lint
+
+    - name: Build artifacts
+      before_install:
+        - nvm install --latest-npm
+      install:
+        - npm ci
+      script:
         - npm run check-local-changes
+
+    - name: License compatibility
+      before_install:
+        - nvm install --latest-npm
+      install:
+        - npm ci
+      script:
         - npm run check-licenses
+
+    - name: JavaScript unit tests
+      before_install:
+        - nvm install --latest-npm
+      install:
+        - npm ci
+      script:
+        # It's not necessary to run the full build, since Jest can interpret
+        # source files with `babel-jest`. Some packages have their own custom
+        # build tasks, however. These must be run.
+        - npx lerna run build
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests (Docker)
@@ -64,41 +87,78 @@ jobs:
       script:
         - ./bin/run-wp-unit-tests.sh
 
-    - name: E2E tests (Admin with plugins) (1/2)
+    - name: E2E tests (Admin with plugins) (1/4)
       env: WP_VERSION=latest SCRIPT_DEBUG=false POPULAR_PLUGINS=true
       install:
         - ./bin/setup-local-env.sh
       script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - npm run build
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 0' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
-    - name: E2E tests (Admin with plugins) (2/2)
+    - name: E2E tests (Admin with plugins) (2/4)
       env: WP_VERSION=latest SCRIPT_DEBUG=false POPULAR_PLUGINS=true
       install:
         - ./bin/setup-local-env.sh
       script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - npm run build
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 1' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
-    - name: E2E tests (Author without plugins) (1/2)
+    - name: E2E tests (Admin with plugins) (3/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false POPULAR_PLUGINS=true
+      install:
+        - ./bin/setup-local-env.sh
+      script:
+        - npm run build
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
+
+    - name: E2E tests (Admin with plugins) (4/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false POPULAR_PLUGINS=true
+      install:
+        - ./bin/setup-local-env.sh
+      script:
+        - npm run build
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
+
+    - name: E2E tests (Author without plugins) (1/4)
       env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author
       install:
         - ./bin/setup-local-env.sh
       script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - npm run build
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 0' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
-    - name: E2E tests (Author without plugins) (2/2)
+    - name: E2E tests (Author without plugins) (2/4)
       env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author
       install:
         - ./bin/setup-local-env.sh
       script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - npm run build
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 1' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
+
+    - name: E2E tests (Author without plugins) (3/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author
+      install:
+        - ./bin/setup-local-env.sh
+      script:
+        - npm run build
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
+
+    - name: E2E tests (Author without plugins) (4/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author
+      install:
+        - ./bin/setup-local-env.sh
+      script:
+        - npm run build
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
+
   allow_failures:
     - name: PHP unit tests (PHP 5.3)
       env: WP_VERSION=latest SWITCH_TO_PHP=5.3
