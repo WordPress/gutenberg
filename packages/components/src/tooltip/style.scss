@@ -1,5 +1,6 @@
 .components-tooltip.components-popover {
 	z-index: z-index(".components-tooltip");
+	cursor: default;
 
 	&::before {
 		border-color: transparent;
