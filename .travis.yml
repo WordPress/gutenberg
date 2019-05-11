@@ -18,10 +18,6 @@ cache:
     - $HOME/.nvm/.cache
     - $HOME/.phpbrew
 
-branches:
-  only:
-    - master
-
 before_install:
   - nvm install
 
