@@ -65,6 +65,13 @@ Class name added to the placeholder.
 - Type: `String`
 - Required: No
 
+### icon
+
+Dashicon to display left of the title.
+
+- Type: `String`
+- Required: No
+
 ### isAppender
 
 If true, the property changes the look of the placeholder to be adequate to scenarios where new files are added to an already existing set of files, e.g., adding files to a gallery.
