@@ -63,7 +63,12 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
  * Browser dependencies
  */
 
-const { getSelection, getComputedStyle } = window;
+const {
+	getSelection,
+	getComputedStyle,
+	requestAnimationFrame,
+	cancelAnimationFrame,
+} = window;
 
 /**
  * All inserting input types that would insert HTML into the DOM.
@@ -144,6 +149,7 @@ export class RichText extends Component {
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
+		this.updateSelection = this.updateSelection.bind( this );
 
 		this.patterns = getPatterns( {
 			onReplace,
@@ -166,7 +172,7 @@ export class RichText extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
-		window.cancelAnimationFrame( this.rafID );
+		cancelAnimationFrame( this.rafID );
 	}
 
 	setRef( node ) {
@@ -373,14 +379,18 @@ export class RichText extends Component {
 
 		// We know for certain that of focus, the old selection is invalid. It
 		// will be recalculated on `selectionchange`.
+		const index = undefined;
+		const activeFormats = undefined;
+
 		this.record = {
 			...this.record,
-			start: undefined,
-			end: undefined,
-			activeFormats: undefined,
+			start: index,
+			end: index,
+			activeFormats,
 		};
-		this.props.onSelectionChange( undefined, undefined );
-		this.setState( { activeFormats: undefined } );
+		this.props.onSelectionChange( index, index );
+		this.setState( { activeFormats } );
+		this.updateSelection();
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
@@ -623,6 +633,20 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Updates the selection state as soon as possible, event before the next
+	 * `selectionchange` event.
+	 * In order to handle subsequent events that rely on selection correctly, we
+	 * need to set the new selection as soon as we can. The `selectionchange`
+	 * event happens too late. The order is as follows: `keydown`, `paint`, then
+	 * `selectionchange`. The browser already updated the selection internally
+	 * before `paint`, so we can use `requestAnimationFrame` to set it.
+	 */
+	updateSelection() {
+		cancelAnimationFrame( this.rafID );
+		this.rafID = requestAnimationFrame( () => this.onSelectionChange() );
+	}
+
+	/**
 	 * Handles a keydown event.
 	 *
 	 * @param {SyntheticEvent} event A synthetic keyboard event.
@@ -637,8 +661,8 @@ export class RichText extends Component {
 			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
 			( keyCode === LEFT || keyCode === RIGHT )
 		) {
-			this.rafID = window.requestAnimationFrame( () => this.onSelectionChange() );
 			this.handleHorizontalNavigation( event );
+			this.updateSelection();
 		}
 
 		// Use the space key in list items (at the start of an item) to indent
