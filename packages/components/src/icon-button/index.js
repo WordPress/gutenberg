@@ -45,7 +45,7 @@ function IconButton( props, ref ) {
 			// the children are empty and...
 			( ! children || ( isArray( children ) && ! children.length ) ) &&
 			// the tooltip is not explicitly disabled.
-			false !== tooltip
+			tooltip !== false
 		)
 	);
 

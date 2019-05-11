@@ -105,6 +105,7 @@ class Tooltip extends Component {
 			onMouseEnter: this.createToggleIsOver( 'onMouseEnter', true ),
 			onMouseLeave: this.createToggleIsOver( 'onMouseLeave' ),
 			onClick: this.createToggleIsOver( 'onClick' ),
+			onKeyDown: this.createToggleIsOver( 'onKeyDown' ),
 			onFocus: this.createToggleIsOver( 'onFocus' ),
 			onBlur: this.createToggleIsOver( 'onBlur' ),
 			children: concatChildren(
