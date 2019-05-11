@@ -204,6 +204,17 @@ export function clearSelectedBlock() {
 }
 
 /**
+ * Returns an action object used in restoring the previously cleared selected blocks.
+ *
+ * @return {Object} Action object.
+ */
+export function restoreSelectedBlock() {
+	return {
+		type: 'RESTORE_SELECTED_BLOCK',
+	};
+}
+
+/**
  * Returns an action object that enables or disables block selection.
  *
  * @param {boolean} [isSelectionEnabled=true] Whether block selection should

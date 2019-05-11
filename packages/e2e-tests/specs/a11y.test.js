@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	clickBlockAppender,
 	createNewPost,
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
@@ -27,6 +28,36 @@ describe( 'a11y', () => {
 		} );
 
 		expect( isFocusedToggle ).toBe( true );
+	} );
+
+	it( 'checks persistent selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'Testing editor selection persistence' );
+
+		await page.keyboard.down( 'Control' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( '`' );
+		await page.keyboard.press( '`' );
+		await page.keyboard.up( 'Control' );
+		await page.keyboard.up( 'Shift' );
+
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		let isFocusedParagraphBlock = await page.$eval( ':focus', ( focusedElement ) => {
+			return focusedElement.classList.contains( 'block-editor-rich-text__editable' );
+		} );
+
+		expect( isFocusedParagraphBlock ).toBe( false );
+
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		isFocusedParagraphBlock = await page.$eval( ':focus', ( focusedElement ) => {
+			return focusedElement.classList.contains( 'block-editor-rich-text__editable' );
+		} );
+
+		expect( isFocusedParagraphBlock ).toBe( true );
 	} );
 
 	it( 'constrains focus to a modal when tabbing', async () => {
