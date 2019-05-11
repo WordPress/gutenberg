@@ -656,13 +656,13 @@ export class RichText extends Component {
 
 		this.keyPressed = keyCode;
 
-		if (
-			// Only override left and right keys without modifiers pressed.
-			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
-			( keyCode === LEFT || keyCode === RIGHT )
-		) {
-			this.handleHorizontalNavigation( event );
+		if ( keyCode === LEFT || keyCode === RIGHT ) {
 			this.updateSelection();
+
+			// Only override left and right keys without modifiers pressed.
+			if ( ! shiftKey && ! altKey && ! metaKey && ! ctrlKey ) {
+				this.handleHorizontalNavigation( event );
+			}
 		}
 
 		// Use the space key in list items (at the start of an item) to indent
