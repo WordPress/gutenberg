@@ -72,16 +72,13 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	// This test isn't reliable on Travis and fails from time to time.
-	// See: https://github.com/WordPress/gutenberg/pull/14986.
-	it.skip( 'should not highlight more than one format', async () => {
+	it( 'should not highlight more than one format', async () => {
 		await clickBlockAppender();
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '1' );
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( ' 2' );
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
-		// Skip reason: when it fails the selection above doesn't get applied.
 		await pressKeyWithModifier( 'primary', 'b' );
 
 		const count = await page.evaluate( () => document.querySelectorAll(

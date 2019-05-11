@@ -15,9 +15,7 @@ describe( 'splitting and merging blocks', () => {
 		await createNewPost();
 	} );
 
-	// This test isn't reliable on Travis and fails from time to time.
-	// See: https://github.com/WordPress/gutenberg/pull/14986.
-	it.skip( 'should split and merge paragraph blocks using Enter and Backspace', async () => {
+	it( 'should split and merge paragraph blocks using Enter and Backspace', async () => {
 		// Use regular inserter to add paragraph block and text
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'FirstSecond' );
@@ -25,7 +23,6 @@ describe( 'splitting and merging blocks', () => {
 		// Move caret between 'First' and 'Second' and press Enter to split
 		// paragraph blocks
 		await pressKeyTimes( 'ArrowLeft', 6 );
-		// Skip reason: when it fails only 'econd' goes to a new line.
 		await page.keyboard.press( 'Enter' );
 
 		// Assert that there are now two paragraph blocks with correct content
@@ -119,9 +116,7 @@ describe( 'splitting and merging blocks', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	// This test isn't reliable on Travis and fails from time to time.
-	// See: https://github.com/WordPress/gutenberg/pull/14986.
-	it.skip( 'should gracefully handle if placing caret in empty container', async () => {
+	it( 'should gracefully handle if placing caret in empty container', async () => {
 		// Regression Test: placeCaretAtHorizontalEdge previously did not
 		// account for contentEditables which have no children.
 		//
