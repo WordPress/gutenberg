@@ -375,8 +375,8 @@ class ImageEdit extends Component {
 			rel,
 			linkClass,
 			linkDestination,
-			width = 0,
-			height = 0,
+			width,
+			height,
 			linkTarget,
 		} = attributes;
 		const isExternal = isExternalImage( id, url );
@@ -447,7 +447,7 @@ class ImageEdit extends Component {
 		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;
 		const imageSizeOptions = this.getImageSizeOptions();
 
-		const getInspectorControls = ( imageWidth = 0, imageHeight = 0 ) => (
+		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
 				<PanelBody title={ __( 'Image Settings' ) }>
 					<TextareaControl
@@ -481,7 +481,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ width ? width : imageWidth }
+									value={ width !== undefined ? width || '' : imageWidth }
 									min={ 1 }
 									onChange={ this.updateWidth }
 								/>
@@ -489,7 +489,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ height ? height : imageHeight }
+									value={ height !== undefined ? height || '' : imageHeight }
 									min={ 1 }
 									onChange={ this.updateHeight }
 								/>
