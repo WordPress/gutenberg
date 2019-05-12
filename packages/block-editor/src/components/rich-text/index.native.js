@@ -554,9 +554,7 @@ export class RichText extends Component {
 			this.setState( { activeFormats } );
 		}
 
-		if ( this.props.isSelected ) {
-			this.props.onSelectionChange( start, end );
-		}
+		this.props.onSelectionChange( start, end );
 	}
 
 	onSelectionChangeFromAztec( start, end, text, event ) {
@@ -572,17 +570,23 @@ export class RichText extends Component {
 		// 	return;
 		// }
 
+		// `end` can be less than `start` on iOS
+		// Let's fix that here so `rich-text/slice` can work properly
+		const realStart = Math.min( start, end );
+		const realEnd = Math.max( start, end );
+
+		// check and dicsard stray event, where the text and selection is equal to the ones already cached
+		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
+		if ( contentWithoutRootTag === this.value && realStart === this.selectionStart && realEnd === this.selectionEnd ) {
+			return;
+		}
+
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = true; // Selection change event always fires after the fact
 
 		// update text before updating selection
 		// Make sure there are changes made to the content before upgrading it upward
 		this.onTextUpdate( event, true );
-
-		// `end` can be less than `start` on iOS
-		// Let's fix that here so `rich-text/slice` can work properly
-		const realStart = Math.min( start, end );
-		const realEnd = Math.max( start, end );
 
 		this.onSelectionChange( realStart, realEnd );
 
