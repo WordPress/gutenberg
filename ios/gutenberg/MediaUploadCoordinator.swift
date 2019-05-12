@@ -5,12 +5,17 @@ import RNReactNativeGutenbergBridge
 
 class MediaUploadCoordinator: NSObject {
   
+  static let failUpload: Notification.Name = Notification.Name(rawValue: "Notification.FailUpload")
+  
   private let gutenberg: Gutenberg
 
   private var activeUploads: [Int32: Progress] = [:]
+  private(set) var successfullUpload = true
   
   init(gutenberg: Gutenberg) {
-      self.gutenberg = gutenberg
+    self.gutenberg = gutenberg
+    super.init()
+    NotificationCenter.default.addObserver(self, selector: #selector(failUpload), name: MediaUploadCoordinator.failUpload, object: nil)
   }
 
   func upload(url: URL) -> Int32? {
@@ -36,6 +41,7 @@ class MediaUploadCoordinator: NSObject {
       return
     }
     progress.completedUnitCount = 0
+    successfullUpload = true
     Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(timerFireMethod(_:)), userInfo: progress, repeats: true)
   }
 
@@ -44,6 +50,10 @@ class MediaUploadCoordinator: NSObject {
       return
     }
     progress.cancel()
+  }
+  
+  @objc func failUpload() {
+      successfullUpload = false
   }
   
   @objc func timerFireMethod(_ timer: Timer) {
@@ -55,21 +65,25 @@ class MediaUploadCoordinator: NSObject {
         return
     }
     progress.completedUnitCount += 1
+    
+    if !successfullUpload {
+      timer.invalidate()
+      progress.setUserInfoObject("Network upload failed", forKey: .mediaError)
+      gutenberg.mediaUploadUpdate(id: mediaID, state: .failed, progress: 1, url: nil, serverID: nil)
+      successfullUpload = true
+      return
+    }
+    
     //Variable to switch upload final state from success to failure.
-    let successfull = true
     if progress.fractionCompleted < 1 {
       gutenberg.mediaUploadUpdate(id: mediaID, state: .uploading, progress: Float(progress.fractionCompleted), url: nil, serverID: nil)
     } else if progress.fractionCompleted >= 1 {
       timer.invalidate()
-      if successfull {
-        gutenberg.mediaUploadUpdate(id: mediaID, state: .succeeded, progress: 1, url: mediaURL, serverID: 123)
-        activeUploads[mediaID] = nil
-      } else {
-        progress.setUserInfoObject("Network upload failed", forKey: .mediaError)
-        gutenberg.mediaUploadUpdate(id: mediaID, state: .failed, progress: 1, url: nil, serverID: nil)
-      }
+      gutenberg.mediaUploadUpdate(id: mediaID, state: .succeeded, progress: 1, url: mediaURL, serverID: mediaID)
+      activeUploads[mediaID] = nil
     }
   }
+  
 }
 
 extension ProgressUserInfoKey {

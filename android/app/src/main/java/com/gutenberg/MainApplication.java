@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.react.ReactApplication;
+import com.brentvatne.react.ReactVideoPackage;
 import com.horcrux.svg.SvgPackage;
 
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
@@ -32,6 +33,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactVideoPackage(),
             new SvgPackage(),
             new ReactAztecPackage(),
             new RNRecyclerviewListPackage(),
@@ -40,13 +42,13 @@ public class MainApplication extends Application implements ReactApplication {
                 public void responseHtml(String title, String html, boolean changed) {}
 
                 @Override
-                public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback) {}
+                public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, MediaType mediaType) {}
 
                 @Override
-                public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback) {}
+                public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback, MediaType mediaType) {}
 
                 @Override
-                public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {}
+                public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback, MediaType mediaType) {}
 
                 @Override
                 public void requestMediaImport(String url, MediaSelectedCallback mediaSelectedCallback) {}

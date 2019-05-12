@@ -7595,6 +7595,11 @@ jszip@^3.1.3:
     readable-stream "~2.3.6"
     set-immediate-shim "~1.0.1"
 
+keymirror@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/keymirror/-/keymirror-0.1.1.tgz#918889ea13f8d0a42e7c557250eee713adc95c35"
+  integrity sha1-kYiJ6hP40KQufFVyUO7nE63JXDU=
+
 kind-of@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-1.1.0.tgz#140a3d2d41a36d2efcfa9377b62c24f8495a5c44"
@@ -10248,6 +10253,14 @@ react-native-sass-transformer@^1.1.1:
   version "9.3.3"
   resolved "git+https://github.com/wordpress-mobile/react-native-svg.git#55244dc79ab876550599c82dca763c3eba0153c5"
 
+"react-native-video@git+https://github.com/wordpress-mobile/react-native-video.git#4dc15d1efcfafc4c55c1f073366235d506481a26":
+  version "4.4.1"
+  resolved "git+https://github.com/wordpress-mobile/react-native-video.git#4dc15d1efcfafc4c55c1f073366235d506481a26"
+  dependencies:
+    keymirror "^0.1.1"
+    prop-types "^15.5.10"
+    shaka-player "^2.4.4"
+
 react-native@0.59.3:
   version "0.59.3"
   resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.59.3.tgz#b984bbe457f63d5515046d32ea5721fd22843548"
@@ -11192,6 +11205,11 @@ sha.js@^2.4.0, sha.js@^2.4.8:
   dependencies:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
+
+shaka-player@^2.4.4:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-2.5.0.tgz#e479366120c248597f0697d5e4458ebe9f75846d"
+  integrity sha512-MaJ1BbMBiSDpfhctMHG+C/GYspH2D037gcGBAKGrQBWdVc/7loJ50flbvmOhZm2LJsFV8sSg/JjAlH7gei3Ozg==
 
 shallowequal@^1.0.2:
   version "1.1.0"
