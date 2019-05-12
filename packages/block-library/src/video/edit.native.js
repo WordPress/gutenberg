@@ -217,7 +217,7 @@ class VideoEdit extends React.Component {
 									{ showVideo &&
 										<Video
 											isSelected={ isSelected }
-											style={ videoStyle }
+											style={ [ videoStyle, { backgroundColor: 'black' } ] }
 											source={ { uri: src } }
 											paused={ true }
 											muted={ true }
