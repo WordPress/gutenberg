@@ -65,7 +65,7 @@ class VideoEdit extends React.Component {
 
 	componentDidMount() {
 		const { attributes } = this.props;
-		if ( attributes.id && ! isURL( attributes.src ) ) {
+		if ( attributes.id && attributes.url && ! isURL( attributes.src ) ) {
 			mediaUploadSync();
 		}
 	}
@@ -110,9 +110,9 @@ class VideoEdit extends React.Component {
 		this.setState( { isMediaRequested: false, isUploadInProgress: false } );
 	}
 
-	mediaUploadStateReset( payload ) {
+	mediaUploadStateReset() {
 		const { setAttributes } = this.props;
-		setAttributes( { id: payload.mediaId, src: null } );
+		setAttributes( { id: null, src: null } );
 		this.setState( { isMediaRequested: false, isUploadInProgress: false } );
 	}
 
