@@ -1,6 +1,12 @@
-## 7.4.0 (Unreleased)
+## Master
+
+### New Features
 
 - Added a new `HorizontalRule` component.
+
+### Bug Fixes
+
+- Fixed display of reset button when using RangeControl `allowReset` prop.
 
 ## 7.3.0 (2019-04-16)
 
