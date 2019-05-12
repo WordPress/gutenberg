@@ -26,7 +26,6 @@ import {
 	__unstableInsertLineSeparator as insertLineSeparator,
 	__unstableIsEmptyLine as isEmptyLine,
 	isCollapsed,
-	getTextContent,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
@@ -637,7 +636,7 @@ export class RichText extends Component {
 		if ( ! this.comesFromAztec ) {
 			if ( nextProps.selectionStart !== this.props.selectionStart &&
 					nextProps.selectionStart !== this.selectionStart &&
-					nextProps.isSelected) {
+					nextProps.isSelected ) {
 				this.needsSelectionUpdate = true;
 				this.lastEventCount = undefined; // force a refresh on the native side
 			}
@@ -792,12 +791,12 @@ RichText.defaultProps = {
 const RichTextContainer = compose( [
 	withInstanceId,
 	withBlockEditContext( ( { clientId, onFocus, isSelected }, ownProps ) => {
-		return { 
-			clientId: clientId,
-			isSelected: isSelected,
-			onFocus: onFocus || ownProps.onFocus
-		}
-	}),
+		return {
+			clientId,
+			isSelected,
+			onFocus: onFocus || ownProps.onFocus,
+		};
+	} ),
 	withSelect( ( select, {
 		clientId,
 		instanceId,
