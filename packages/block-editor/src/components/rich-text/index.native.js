@@ -5,6 +5,9 @@
  */
 import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
+import {
+	pickBy,
+} from 'lodash';
 import memize from 'memize';
 
 /**
@@ -98,6 +101,7 @@ export class RichText extends Component {
 		}
 
 		this.isIOS = Platform.OS === 'ios';
+		this.createRecord = this.createRecord.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
@@ -126,6 +130,8 @@ export class RichText extends Component {
 		this.needsSelectionUpdate = false;
 		this.savedContent = '';
 		this.isTouched = false;
+
+		this.lastHistoryValue = value;
 
 		// Internal values that are update synchronously, unlike props.
 		this.value = value;
@@ -253,40 +259,55 @@ export class RichText extends Component {
 	}
 
 	onFormatChange( record, doUpdateChild ) {
-		let newContent;
-		// valueToFormat might throw when converting the record to a tree structure
-		// let's ignore the event for now and force a render update so we're still in sync
-		try {
-			newContent = this.valueToFormat( record );
-		} catch ( error ) {
-			// eslint-disable-next-line no-console
-			console.log( error );
-		}
-		this.setState( {
-			activeFormats: record.activeFormats,
+		const { start, end, activeFormats = [] } = record;
+		const changeHandlers = pickBy( this.props, ( v, key ) =>
+			key.startsWith( 'format_on_change_functions_' )
+		);
+
+		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
+			changeHandler( record.formats, record.text );
 		} );
-		if ( newContent && newContent !== this.props.value ) {
-			this.props.onChange( newContent );
-			if ( record.needsSelectionUpdate && record.start && record.end && doUpdateChild ) {
-				this.forceSelectionUpdate( record.start, record.end );
-			}
-		} else {
-			if ( doUpdateChild ) {
-				this.lastEventCount = undefined;
-			} else {
-				// make sure the component rerenders without refreshing the text on gutenberg
-				// (this can trigger other events that might update the active formats on aztec)
-				this.lastEventCount = 0;
-			}
-			this.forceUpdate();
+
+		this.value = this.valueToFormat( record );
+		this.props.onChange( this.value );
+		this.setState( { activeFormats } );
+		// this.props.onSelectionChange( start, end );
+		this.selectionStart = start;
+		this.selectionEnd = end;
+
+		this.onCreateUndoLevel();
+
+		// ////////////
+
+		// let newContent = this.value;
+		// if ( newContent && newContent !== this.props.value ) {
+		// 	///
+		// } else {
+		// 	if ( doUpdateChild ) {
+		// 		this.lastEventCount = undefined;
+		// 	} else {
+		// 		// make sure the component rerenders without refreshing the text on gutenberg
+		// 		// (this can trigger other events that might update the active formats on aztec)
+		// 		this.lastEventCount = 0;
+		// 	}
+		// 	this.forceUpdate();
+		// }
+	}
+
+	onCreateUndoLevel() {
+		// If the content is the same, no level needs to be created.
+		if ( this.lastHistoryValue === this.value ) {
+			return;
 		}
+
+		this.props.onCreateUndoLevel();
+		this.lastHistoryValue = this.value;
 	}
 
 	/*
 	 * Cleans up any root tags produced by aztec.
 	 * TODO: This should be removed on a later version when aztec doesn't return the top tag of the text being edited
 	 */
-
 	removeRootTagsProduceByAztec( html ) {
 		let result = this.removeRootTag( this.props.tagName, html );
 		// Temporary workaround for https://github.com/WordPress/gutenberg/pull/13763
@@ -309,15 +330,16 @@ export class RichText extends Component {
 	 */
 	onChange( event ) {
 		this.lastEventCount = event.nativeEvent.eventCount;
+		this.comesFromAztec = true;
 		this.firedAfterTextChanged = true; // the onChange event always fires after the fact
 		this.onTextUpdate( event, true );
 	}
 
-	onTextUpdate( event, refresh = false ) {
+	onTextUpdate( event ) {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
 
+		const refresh = this.value != contentWithoutRootTag;
 		this.value = contentWithoutRootTag;
-		this.comesFromAztec = true;
 
 		// we don't want to refresh if our goal is just to create a record
 		if ( refresh ) {
@@ -369,10 +391,10 @@ export class RichText extends Component {
 		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
 		const isReverse = keyCode === BACKSPACE;
 
-		// Only process delete if the key press occurs at uncollapsed edge.
-		if ( ! isCollapsed( this.createRecord() ) ) {
-			return;
-		}
+		// // Only process delete if the key press occurs at uncollapsed edge.
+		// if ( ! isCollapsed( this.createRecord() ) ) {
+		// 	return;
+		// }
 
 		const empty = this.isEmpty();
 
@@ -499,8 +521,10 @@ export class RichText extends Component {
 		this.isTouched = true;
 
 		if ( this.props.onFocus ) {
-			this.props.onFocus( event );
+			this.props.onFocus();
 		}
+
+		// this.onSelectionChange();
 	}
 
 	onBlur( event ) {
@@ -527,22 +551,25 @@ export class RichText extends Component {
 			this.setState( { activeFormats } );
 		}
 
-		this.props.onSelectionChange( start, end );
+		if ( this.props.isSelected ) {
+			this.props.onSelectionChange( start, end );
+		}
 	}
 
 	onSelectionChangeFromAztec( start, end, text, event ) {
-		if ( ! this.props.isSelected ) {
-			return;
-		}
+		// if ( ! this.props.isSelected ) {
+		// 	return;
+		// }
 
-		// AztecEditor-Android may emit a selection change event with 0,0
-		// when simply updating the active formats
-		// let's ignore this event in that case
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
-		if ( this.lastEventCount === undefined && contentWithoutRootTag === this.value && start === 0 && end === 0 ) {
-			return;
-		}
+		// // AztecEditor-Android may emit a selection change event with 0,0
+		// // when simply updating the active formats
+		// // let's ignore this event in that case
+		// const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
+		// if ( this.lastEventCount === undefined && contentWithoutRootTag === this.value && start === 0 && end === 0 ) {
+		// 	return;
+		// }
 
+		this.comesFromAztec = true;
 		this.firedAfterTextChanged = true; // Selection change event always fires after the fact
 
 		// update text before updating selection
@@ -647,6 +674,7 @@ export class RichText extends Component {
 
 	componentDidMount() {
 		if ( this.props.isSelected ) {
+			console.log( `Will focus block on mount: ${this.props.clientId}` );
 			this._editor.focus();
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
 		}
@@ -660,6 +688,7 @@ export class RichText extends Component {
 
 	componentDidUpdate( prevProps ) {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
+			console.log( `Will focus block on update: ${this.props.clientId}` );
 			this._editor.focus();
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
 			// if its internal value hasn't change. When created, default value is 0, 0
@@ -817,6 +846,9 @@ const RichTextContainer = compose( [
 				selectionStart.clientId === clientId &&
 				selectionStart.attributeKey === identifier
 			);
+			console.log( `iSelected is undefined and will set it to ${isSelected} for ${clientId}` );
+		} else {
+			console.log( `iSelected: ${isSelected} for ${clientId}` );
 		}
 
 		return {
@@ -832,11 +864,14 @@ const RichTextContainer = compose( [
 		identifier = instanceId,
 	} ) => {
 		const {
+			__unstableMarkLastChangeAsPersistent,
 			selectionChange,
 		} = dispatch( 'core/block-editor' );
 
 		return {
+			onCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
 			onSelectionChange( start, end ) {
+				debugger;
 				selectionChange( clientId, identifier, start, end );
 			},
 		};
