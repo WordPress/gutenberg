@@ -64,7 +64,7 @@ class MediaUploadProgress extends React.Component {
 				this.finishMediaUploadWithFailure( payload );
 				break;
 			case MEDIA_UPLOAD_STATE_RESET:
-				this.mediaUploadStateReset( payload );
+				this.mediaUploadStateReset();
 				break;
 		}
 	}
@@ -90,10 +90,10 @@ class MediaUploadProgress extends React.Component {
 		}
 	}
 
-	mediaUploadStateReset( payload ) {
+	mediaUploadStateReset( ) {
 		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
 		if ( this.props.onMediaUploadStateReset ) {
-			this.props.onMediaUploadStateReset( payload );
+			this.props.onMediaUploadStateReset();
 		}
 	}
 
