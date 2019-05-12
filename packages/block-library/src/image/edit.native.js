@@ -81,7 +81,15 @@ class ImageEdit extends React.Component {
 
 		const { attributes, setAttributes } = this.props;
 
-		if ( attributes.id && ! isURL( attributes.url ) ) {
+		// This will warn when we have `id` defined, while `url` is undefined.
+		// This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
+		// where a cancelled image upload was resulting in a subsequent crash.
+		if ( attributes.id && ! attributes.url ) {
+			// eslint-disable-next-line no-console
+			console.warn( 'Attributes has id with no url.' );
+		}
+
+		if ( attributes.id && attributes.url && ! isURL( attributes.url ) ) {
 			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
 				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
@@ -129,7 +137,7 @@ class ImageEdit extends React.Component {
 				this.finishMediaUploadWithFailure( payload );
 				break;
 			case MEDIA_UPLOAD_STATE_RESET:
-				this.mediaUploadStateReset( payload );
+				this.mediaUploadStateReset();
 				break;
 		}
 	}
@@ -156,10 +164,10 @@ class ImageEdit extends React.Component {
 		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
 	}
 
-	mediaUploadStateReset( payload ) {
+	mediaUploadStateReset() {
 		const { setAttributes } = this.props;
 
-		setAttributes( { id: payload.mediaId, url: null } );
+		setAttributes( { id: null, url: null } );
 		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
 	}
 
