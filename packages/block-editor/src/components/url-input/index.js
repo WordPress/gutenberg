@@ -226,6 +226,10 @@ class URLInput extends Component {
 	render() {
 		const { value = '', autoFocus = true, instanceId, className } = this.props;
 		const { showSuggestions, suggestions, selectedSuggestion, loading } = this.state;
+
+		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
+		const suggestionOptionIdPrefix = `block-editor-url-input-suggestion-${ instanceId }`;
+
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div className={ classnames( 'editor-url-input block-editor-url-input', className ) }>
@@ -242,8 +246,8 @@ class URLInput extends Component {
 					role="combobox"
 					aria-expanded={ showSuggestions }
 					aria-autocomplete="list"
-					aria-owns={ `block-editor-url-input-suggestions-${ instanceId }` }
-					aria-activedescendant={ selectedSuggestion !== null ? `block-editor-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
+					aria-owns={ suggestionsListboxId }
+					aria-activedescendant={ selectedSuggestion !== null ? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }` : undefined }
 					ref={ this.inputRef }
 				/>
 
@@ -253,7 +257,7 @@ class URLInput extends Component {
 					<Popover position="bottom" noArrow focusOnMount={ false }>
 						<div
 							className="editor-url-input__suggestions block-editor-url-input__suggestions"
-							id={ `block-editor-url-input-suggestions-${ instanceId }` }
+							id={ suggestionsListboxId }
 							ref={ this.autocompleteRef }
 							role="listbox"
 						>
@@ -262,7 +266,7 @@ class URLInput extends Component {
 									key={ suggestion.id }
 									role="option"
 									tabIndex="-1"
-									id={ `block-editor-url-input-suggestion-${ instanceId }-${ index }` }
+									id={ `${ suggestionOptionIdPrefix }-${ index }` }
 									ref={ this.bindSuggestionNode( index ) }
 									className={ classnames( 'editor-url-input__suggestion block-editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
