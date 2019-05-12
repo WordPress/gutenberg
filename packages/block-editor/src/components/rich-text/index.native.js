@@ -271,7 +271,7 @@ export class RichText extends Component {
 		this.value = this.valueToFormat( record );
 		this.props.onChange( this.value );
 		this.setState( { activeFormats } );
-		// this.props.onSelectionChange( start, end );
+		this.props.onSelectionChange( start, end );
 		this.selectionStart = start;
 		this.selectionEnd = end;
 
@@ -365,16 +365,19 @@ export class RichText extends Component {
 
 		if ( this.multilineTag ) {
 			if ( event.shiftKey ) {
-				const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
+				this.needsSelectionUpdate = true;
+				const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
 				this.onFormatChangeForceChild( insertedLineBreak );
 			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
 				this.splitContent( currentRecord );
 			} else {
-				const insertedLineSeparator = { needsSelectionUpdate: true, ...insertLineSeparator( currentRecord ) };
+				this.needsSelectionUpdate = true;
+				const insertedLineSeparator = { ...insertLineSeparator( currentRecord ) };
 				this.onFormatChange( insertedLineSeparator, ! this.firedAfterTextChanged );
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
-			const insertedLineBreak = { needsSelectionUpdate: true, ...insert( currentRecord, '\n' ) };
+			this.needsSelectionUpdate = true;
+			const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
 			this.onFormatChangeForceChild( insertedLineBreak );
 		} else {
 			this.splitContent( currentRecord );
@@ -871,7 +874,6 @@ const RichTextContainer = compose( [
 		return {
 			onCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
 			onSelectionChange( start, end ) {
-				debugger;
 				selectionChange( clientId, identifier, start, end );
 			},
 		};
