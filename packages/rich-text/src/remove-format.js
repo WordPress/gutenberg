@@ -48,11 +48,6 @@ export function removeFormat(
 				filterFormats( newFormats, endIndex, formatType );
 				endIndex++;
 			}
-		} else {
-			return {
-				...value,
-				activeFormats: reject( activeFormats, { type: formatType } ),
-			};
 		}
 	} else {
 		for ( let i = startIndex; i < endIndex; i++ ) {
@@ -62,7 +57,11 @@ export function removeFormat(
 		}
 	}
 
-	return normaliseFormats( { ...value, formats: newFormats } );
+	return normaliseFormats( {
+		...value,
+		formats: newFormats,
+		activeFormats: reject( activeFormats, { type: formatType } ),
+	} );
 }
 
 function filterFormats( formats, index, formatType ) {
