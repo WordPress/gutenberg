@@ -20,12 +20,12 @@ module.exports = {
 		'./jest/setup.js',
 		'<rootDir>/enzyme.config.js',
 	],
-    testEnvironment: 'jsdom',
-    testMatch: [
-        '**/__native_tests__/**/*.[jt]s?(x)',
-        '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
-        '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'
-    ],
+	testEnvironment: 'jsdom',
+	testMatch: [
+		'**/__native_tests__/**/*.[jt]s?(x)',
+		'<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
+		'<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
+	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
 		'<rootDir>/gutenberg/gutenberg-mobile/',
