@@ -39,7 +39,7 @@ class CustomTemplatedPathPlugin {
 				for ( let i = 0; i < this.handlers.length; i++ ) {
 					const [ regexp, handler ] = this.handlers[ i ];
 					if ( regexp.test( path ) ) {
-						return path.replace( regexp, handler( path, data ) );
+						path = path.replace( regexp, handler( path, data ) );
 					}
 				}
 
