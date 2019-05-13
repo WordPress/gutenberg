@@ -133,7 +133,7 @@ class VideoEdit extends React.Component {
 		}
 	}
 
-	iconWithUpdatedFillColor( color: string, icon: SVG ) {
+	iconWithUpdatedFillColor( color, icon ) {
 		return (
 			<SVG viewBox={ icon.props.viewBox } xmlns={ icon.props.xmlns } style={ { fill: color } }>
 				{ icon.props.children }
