@@ -22,6 +22,7 @@ describe( 'applyFormat', () => {
 			text: 'one two three',
 		};
 		const expected = {
+			activeFormats: [ strong ],
 			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
@@ -40,6 +41,7 @@ describe( 'applyFormat', () => {
 			end: 6,
 		};
 		const expected = {
+			activeFormats: [ strong ],
 			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
 			text: 'one two three',
 			start: 3,
@@ -72,12 +74,14 @@ describe( 'applyFormat', () => {
 
 	it( 'should apply format on existing format if selection is collapsed', () => {
 		const record = {
+			activeFormats: [ a ],
 			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
 			text: 'one two three',
 			start: 4,
 			end: 4,
 		};
 		const expected = {
+			activeFormats: [ a2 ],
 			formats: [ , , , , [ a2 ], [ a2 ], [ a2 ], , , , , , , ],
 			text: 'one two three',
 			start: 4,
