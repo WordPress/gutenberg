@@ -44,6 +44,9 @@ import svgIconRetry from './icon-retry';
 
 const VIDEO_ASPECT_RATIO = 1.7;
 
+const ICON_FILL_COLOR = '#2e4453';
+const ICON_RETRY_FILL_COLOR = '#2e4453';
+
 class VideoEdit extends React.Component {
 	constructor( props ) {
 		super( props );
@@ -173,8 +176,8 @@ class VideoEdit extends React.Component {
 			);
 		}
 
-		const svgIconRetryWithUpdatedColor = this.iconWithUpdatedFillColor( styles.iconRetryFillColor.color, svgIconRetry );
-		const svgIconWithUpdatedColor = this.iconWithUpdatedFillColor( styles.iconFillColor.color, svgIcon );
+		const svgIconRetryWithUpdatedColor = this.iconWithUpdatedFillColor( ICON_RETRY_FILL_COLOR, svgIconRetry );
+		const svgIconWithUpdatedColor = this.iconWithUpdatedFillColor( ICON_FILL_COLOR, svgIcon );
 
 		return (
 			<TouchableWithoutFeedback onPress={ this.onVideoPressed } disabled={ ! isSelected }>
@@ -214,7 +217,7 @@ class VideoEdit extends React.Component {
 
 							return (
 								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
-									{ showVideo &&
+									{ showVideo && isURL( src ) &&
 										<Video
 											isSelected={ isSelected }
 											style={ [ videoStyle, { backgroundColor: 'black' } ] }

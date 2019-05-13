@@ -43,6 +43,9 @@ import svgIconRetry from './icon-retry';
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
 
+const ICON_FILL_COLOR = '#2e4453';
+const ICON_RETRY_FILL_COLOR = '#ffffff';
+
 class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
@@ -237,8 +240,8 @@ class ImageEdit extends React.Component {
 			);
 		}
 
-		const svgIconRetryWithUpdatedColor = this.iconWithUpdatedFillColor( styles.iconRetryFillColor.color, svgIconRetry );
-		const svgIconWithUpdatedColor = this.iconWithUpdatedFillColor( styles.iconFillColor.color, svgIcon );
+		const svgIconRetryWithUpdatedColor = this.iconWithUpdatedFillColor( ICON_RETRY_FILL_COLOR, svgIconRetry );
+		const svgIconWithUpdatedColor = this.iconWithUpdatedFillColor( ICON_FILL_COLOR, svgIcon );
 
 		return (
 			<TouchableWithoutFeedback
