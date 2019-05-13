@@ -110,9 +110,9 @@ Every pull request goes through a manual code review, in addition to automated t
 
 ### Design Review
 
-If your pull request impacts the design, you can ask for a designer to review. Most pull requests that have an impact on design are reviewed. However, you can request a design review on something by adding the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label. As a guide, this could be:
+If your pull request impacts the design, you should ask for a design review. To request a design review add the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label to your PR. As a guide, changes that should be reviewed:
 
-- Something based on a previous design, to check is as that design.
+- A change based on a previous design, to confirm the design is still valid with the change.
 - Anything that changes something visually.
 - If you just want design feedback on an idea or exploration.
 
