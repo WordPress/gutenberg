@@ -20,9 +20,6 @@
 			"attribute": "controls",
 			"default": true
 		},
-		"id": {
-			"type": "number"
-		},
 		"loop": {
 			"type": "boolean",
 			"source": "attribute",
@@ -48,17 +45,27 @@
 			"attribute": "preload",
 			"default": "metadata"
 		},
-		"src": {
-			"type": "string",
-			"source": "attribute",
-			"selector": "video",
-			"attribute": "src"
-		},
 		"playsInline": {
 			"type": "boolean",
 			"source": "attribute",
 			"selector": "video",
 			"attribute": "playsinline"
+		},
+		"sources": {
+			"type": "array",
+			"default": [],
+			"source": "query",
+			"selector": "source",
+			"query": {
+				"src": {
+					"source": "attribute",
+					"attribute": "src"
+				},
+				"type": {
+					"source": "attribute",
+					"attribute": "type"
+				}
+			}
 		}
 	}
 }

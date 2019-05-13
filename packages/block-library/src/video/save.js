@@ -4,10 +4,10 @@
 import { RichText } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { autoplay, caption, controls, loop, muted, poster, preload, src, playsInline } = attributes;
+	const { autoplay, caption, controls, loop, muted, poster, preload, playsInline, sources } = attributes;
 	return (
 		<figure>
-			{ src && (
+			{ !! sources.length &&
 				<video
 					autoPlay={ autoplay }
 					controls={ controls }
@@ -15,10 +15,19 @@ export default function save( { attributes } ) {
 					muted={ muted }
 					poster={ poster }
 					preload={ preload !== 'metadata' ? preload : undefined }
-					src={ src }
 					playsInline={ playsInline }
-				/>
-			) }
+				>
+					{ sources.map( ( source ) => {
+						return (
+							<source
+								key={ source.src }
+								src={ source.src }
+								type={ source.type }
+							/>
+						);
+					} ) }
+				</video>
+			}
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content tagName="figcaption" value={ caption } />
 			) }

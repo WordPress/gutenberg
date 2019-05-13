@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
@@ -8,7 +13,10 @@ import {
 	Disabled,
 	IconButton,
 	PanelBody,
+	Path,
+	Rect,
 	SelectControl,
+	SVG,
 	ToggleControl,
 	Toolbar,
 	withNotices,
@@ -36,7 +44,7 @@ import {
 /**
  * Internal dependencies
  */
-import { createUpgradedEmbedBlock } from '../embed/util';
+//import { createUpgradedEmbedBlock } from '../embed/util'; TODO: implement embed fallback
 import icon from './icon';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
@@ -48,11 +56,12 @@ class VideoEdit extends Component {
 		// edit component has its own src in the state so it can be edited
 		// without setting the actual value outside of the edit UI
 		this.state = {
-			editing: ! this.props.attributes.src,
+			editing: ! this.props.attributes.sources.length,
 		};
 
 		this.videoPlayer = createRef();
 		this.posterImageButton = createRef();
+		this.onAddSource = this.onAddSource.bind( this );
 		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onSelectPoster = this.onSelectPoster.bind( this );
@@ -86,29 +95,56 @@ class VideoEdit extends Component {
 		}
 	}
 
+	onAddSource( media ) {
+		const { setAttributes, attributes } = this.props;
+		const src = media.url !== undefined ? media.url : media;
+		const type = media.mime || this.getVideoMimeType( src );
+		setAttributes( {
+			sources: [ ...attributes.sources, { src, type } ],
+		} );
+		this.setState( { editing: false } );
+	}
+
+	removeSource( src ) {
+		const { attributes: { sources }, setAttributes } = this.props;
+		const filteredSources = sources.filter( ( source ) => source.src !== src );
+		setAttributes( {
+			sources: filteredSources,
+		} );
+	}
+
+	getVideoMimeType( url ) {
+		// wp.media.view.settings.embedMimes
+		const fileType = url.split( '.' ).pop();
+		let mime;
+		switch ( fileType ) {
+			case 'mp4':
+				mime = 'video/mp4';
+				break;
+			case 'webm':
+				mime = 'video/webm';
+				break;
+			case 'ogv':
+				mime = 'video/ogg';
+				break;
+			default:
+				mime = 'undefined';
+		}
+		return mime;
+	}
+
 	toggleAttribute( attribute ) {
 		return ( newValue ) => {
 			this.props.setAttributes( { [ attribute ]: newValue } );
 		};
 	}
 
-	onSelectURL( newSrc ) {
-		const { attributes, setAttributes } = this.props;
-		const { src } = attributes;
-
-		// Set the block's src from the edit component's state, and switch off
-		// the editing UI.
-		if ( newSrc !== src ) {
-			// Check if there's an embed block that handles this URL.
-			const embedBlock = createUpgradedEmbedBlock(
-				{ attributes: { url: newSrc } }
-			);
-			if ( undefined !== embedBlock ) {
-				this.props.onReplace( embedBlock );
-				return;
-			}
-			setAttributes( { src: newSrc, id: undefined } );
-		}
+	onSelectURL( src ) {
+		const { setAttributes, attributes } = this.props;
+		const type = this.getVideoMimeType( src );
+		setAttributes( {
+			sources: [ ...attributes.sources, { src, type } ],
+		} );
 
 		this.setState( { editing: false } );
 	}
@@ -140,7 +176,7 @@ class VideoEdit extends Component {
 			playsInline,
 			poster,
 			preload,
-			src,
+			sources,
 		} = this.props.attributes;
 		const {
 			className,
@@ -152,35 +188,37 @@ class VideoEdit extends Component {
 		} = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
-			this.setState( { editing: true } );
-		};
-		const onSelectVideo = ( media ) => {
-			if ( ! media || ! media.url ) {
-				// in this case there was an error and we should continue in the editing state
-				// previous attributes should be removed because they may be temporary blob urls
-				setAttributes( { src: undefined, id: undefined } );
-				switchToEditing();
-				return;
-			}
-			// sets the block's attribute and updates the edit component from the
-			// selected media, then switches off the editing UI
-			setAttributes( { src: media.url, id: media.id } );
-			this.setState( { src: media.url, editing: false } );
+			this.setState( { editing: ! this.state.editing } );
 		};
 
-		if ( editing ) {
+		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
+		if ( editing || ! sources.length ) {
 			return (
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					className={ className }
-					onSelect={ onSelectVideo }
-					onSelectURL={ this.onSelectURL }
-					accept="video/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ this.props.attributes }
-					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
-				/>
+				<>
+					<BlockControls>
+						{ !! sources.length && ( <Toolbar>
+							<IconButton
+								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.editing } ) }
+								aria-pressed={ this.state.editing }
+								label={ __( 'Edit video' ) }
+								onClick={ switchToEditing }
+								icon={ editImageIcon }
+							/>
+						</Toolbar> ) }
+					</BlockControls>
+					<MediaPlaceholder
+						icon={ <BlockIcon icon={ icon } /> }
+						className={ className }
+						onSelect={ this.onAddSource }
+						onSelectURL={ this.onSelectURL }
+						onCancel={ !! sources.length && switchToEditing }
+						accept="video/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ this.props.attributes }
+						notices={ noticeUI }
+						onError={ noticeOperations.createErrorNotice }
+					/>
+				</>
 			);
 		}
 		const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
@@ -192,9 +230,9 @@ class VideoEdit extends Component {
 					<Toolbar>
 						<IconButton
 							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit video' ) }
+							label={ __( 'Add alternative source' ) }
 							onClick={ switchToEditing }
-							icon="edit"
+							icon={ editImageIcon }
 						/>
 					</Toolbar>
 				</BlockControls>
@@ -285,9 +323,18 @@ class VideoEdit extends Component {
 						<video
 							controls={ controls }
 							poster={ poster }
-							src={ src }
 							ref={ this.videoPlayer }
-						/>
+						>
+							{ sources.map( ( source ) => {
+								return (
+									<source
+										key={ source.src }
+										src={ source.src }
+										type={ source.type }
+									/>
+								);
+							} ) }
+						</video>
 					</Disabled>
 					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
@@ -299,6 +346,26 @@ class VideoEdit extends Component {
 						/>
 					) }
 				</figure>
+				{ ( !! sources.length && isSelected ) && (
+					<>
+						<b>{ __( 'Sources:' ) }</b>
+						<p>{ __( 'You can add fallback files for for maximum HTML playback:' ) }</p>
+						<ul>
+							{ sources.map( ( source ) => {
+								return (
+									<li key={ source.src } className="source-file">
+										{ source.src.substring( source.src.lastIndexOf( '/' ) + 1 ) }{ ' ' }
+										<Button
+											isLink
+											className="is-destructive"
+											onClick={ () => this.removeSource( source.src ) }
+										>{ __( 'Remove file' ) }</Button>
+									</li>
+								);
+							} ) }
+						</ul>
+					</>
+				) }
 			</>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
