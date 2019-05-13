@@ -78,25 +78,11 @@ class WritingFlow extends Component {
 
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
-		this.clearVerticalRect = this.clearVerticalRect.bind( this );
 		this.focusLastTextField = this.focusLastTextField.bind( this );
-
-		/**
-		 * Here a rectangle is stored while moving the caret vertically so
-		 * vertical position of the start position can be restored.
-		 * This is to recreate browser behaviour across blocks.
-		 *
-		 * @type {?DOMRect}
-		 */
-		this.verticalRect = null;
 	}
 
 	bindContainer( ref ) {
 		this.container = ref;
-	}
-
-	clearVerticalRect() {
-		this.verticalRect = null;
 	}
 
 	/**
@@ -281,12 +267,6 @@ class WritingFlow extends Component {
 			return;
 		}
 
-		if ( ! isVertical ) {
-			this.verticalRect = null;
-		} else if ( ! this.verticalRect ) {
-			this.verticalRect = computeCaretRect();
-		}
-
 		if ( isShift ) {
 			if (
 				(
@@ -313,7 +293,7 @@ class WritingFlow extends Component {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 
 			if ( closestTabbable ) {
-				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
+				placeCaretAtVerticalEdge( closestTabbable, isReverse, computeCaretRect() );
 				event.preventDefault();
 			}
 		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverse ) ) {
@@ -345,7 +325,6 @@ class WritingFlow extends Component {
 				<div
 					ref={ this.bindContainer }
 					onKeyDown={ this.onKeyDown }
-					onMouseDown={ this.clearVerticalRect }
 				>
 					{ children }
 				</div>

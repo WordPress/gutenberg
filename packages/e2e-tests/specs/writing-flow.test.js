@@ -355,4 +355,18 @@ describe( 'adding blocks', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should preserve horizontal position when navigating vertically between blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'abc' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '23' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( '1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
