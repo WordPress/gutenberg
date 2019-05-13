@@ -38,6 +38,7 @@ export function* createNotice( status = DEFAULT_STATUS, content, options = {} ) 
 		context = DEFAULT_CONTEXT,
 		id = uniqueId( context ),
 		actions = [],
+		type = 'default',
 		__unstableHTML,
 	} = options;
 
@@ -60,6 +61,7 @@ export function* createNotice( status = DEFAULT_STATUS, content, options = {} ) 
 			__unstableHTML,
 			isDismissible,
 			actions,
+			type,
 		},
 	};
 }

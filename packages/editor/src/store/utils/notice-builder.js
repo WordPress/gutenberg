@@ -67,10 +67,12 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 			noticeMessage,
 			{
 				id: SAVE_POST_NOTICE_ID,
+				type: 'snackbar',
 				actions,
 			},
 		];
 	}
+
 	return [];
 }
 
@@ -103,7 +105,10 @@ export function getNotificationArgumentsForSaveFail( data ) {
 		messages[ edits.status ] :
 		__( 'Updating failed' );
 
-	return [ noticeMessage, { id: SAVE_POST_NOTICE_ID } ];
+	return [ noticeMessage, {
+		id: SAVE_POST_NOTICE_ID,
+		type: 'snackbar',
+	} ];
 }
 
 /**
@@ -118,6 +123,9 @@ export function getNotificationArgumentsForTrashFail( data ) {
 		data.error.message && data.error.code !== 'unknown_error' ?
 			data.error.message :
 			__( 'Trashing failed' ),
-		{ id: TRASH_POST_NOTICE_ID },
+		{
+			id: TRASH_POST_NOTICE_ID,
+			type: 'snackbar',
+		},
 	];
 }

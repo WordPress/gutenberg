@@ -366,11 +366,13 @@ export function* savePost( options = {} ) {
 			'core/notices',
 			'removeNotice',
 			SAVE_POST_NOTICE_ID,
+			{ type: 'snackbar' }
 		);
 		yield dispatch(
 			'core/notices',
 			'removeNotice',
 			'autosave-exists',
+			{ type: 'snackbar' }
 		);
 	}
 

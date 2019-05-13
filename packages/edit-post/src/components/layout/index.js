@@ -84,8 +84,7 @@ function Layout( {
 				aria-label={ __( 'Editor content' ) }
 				tabIndex="-1"
 			>
-				<EditorNotices dismissible={ false } className="is-pinned" />
-				<EditorNotices dismissible={ true } />
+				<EditorNotices />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
 				<KeyboardShortcutHelpModal />

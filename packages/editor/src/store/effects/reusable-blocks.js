@@ -133,6 +133,7 @@ export const saveReusableBlocks = async ( action, store ) => {
 		const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
 		dataDispatch( 'core/notices' ).createSuccessNotice( message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
+			type: 'snackbar',
 		} );
 
 		dataDispatch( 'core/block-editor' ).__unstableSaveReusableBlock( id, updatedReusableBlock.id );
@@ -140,6 +141,7 @@ export const saveReusableBlocks = async ( action, store ) => {
 		dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
 		dataDispatch( 'core/notices' ).createErrorNotice( error.message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
+			type: 'snackbar',
 		} );
 	}
 };
@@ -199,6 +201,7 @@ export const deleteReusableBlocks = async ( action, store ) => {
 		const message = __( 'Block deleted.' );
 		dataDispatch( 'core/notices' ).createSuccessNotice( message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
+			type: 'snackbar',
 		} );
 	} catch ( error ) {
 		dispatch( {
@@ -208,6 +211,7 @@ export const deleteReusableBlocks = async ( action, store ) => {
 		} );
 		dataDispatch( 'core/notices' ).createErrorNotice( error.message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
+			type: 'snackbar',
 		} );
 	}
 };
