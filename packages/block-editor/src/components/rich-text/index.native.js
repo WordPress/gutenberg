@@ -654,16 +654,14 @@ export class RichText extends Component {
 		// If the component is changed React side (undo/redo/merging/splitting/custom text actions)
 		// we need to make sure the native is updated as well.
 
-		const previousValueToCheck = Platform.OS === 'android' ? this.props.value : this.value;
-
 		// Also, don't trust the "this.lastContent" as on Android, incomplete text events arrive
 		//  with only some of the text, while the virtual keyboard's suggestion system does its magic.
 		// ** compare with this.lastContent for optimizing performance by not forcing Aztec with text it already has
 		// , but compare with props.value to not lose "half word" text because of Android virtual keyb autosuggestion behavior
 		if ( ( typeof nextProps.value !== 'undefined' ) &&
 				( typeof this.props.value !== 'undefined' ) &&
-				( Platform.OS === 'ios' || ( Platform.OS === 'android' && ( ! this.comesFromAztec || ! this.firedAfterTextChanged ) ) ) &&
-				nextProps.value !== previousValueToCheck ) {
+				( ! this.comesFromAztec || ! this.firedAfterTextChanged ) &&
+				nextProps.value !== this.props.value ) {
 
 			// Gutenberg seems to try to mirror the caret state even on events that only change the content so,
 			//  let's force caret update if state has selection set.
