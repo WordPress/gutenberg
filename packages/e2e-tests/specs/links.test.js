@@ -503,5 +503,48 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Regression Test: This verifies that the UI is updated according to
+		// the expected changed values, where previously the value could have
+		// fallen out of sync with how the UI is displayed (specifically for
+		// collapsed selections).
+		//
+		// See: https://github.com/WordPress/gutenberg/pull/15573
+
+		// Collapse selection.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowRight' );
+		// Edit link.
+		await pressKeyWithModifier( 'primary', 'k' );
+		await waitForAutoFocus();
+		await pressKeyWithModifier( 'primary', 'a' );
+		await page.keyboard.type( 'wordpress.org' );
+		// Navigate to the settings toggle.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		// Open settings.
+		await page.keyboard.press( 'Space' );
+		// Navigate to the "Open in New Tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		// Uncheck the checkbox.
+		await page.keyboard.press( 'Space' );
+		// Navigate back to the input field.
+		await page.keyboard.press( 'Tab' );
+		// Submit the form.
+		await page.keyboard.press( 'Enter' );
+
+		// Navigate back to inputs to verify appears as changed.
+		await pressKeyWithModifier( 'primary', 'k' );
+		await waitForAutoFocus();
+		const link = await page.evaluate( () => document.activeElement.value );
+		expect( link ).toBe( 'http://wordpress.org' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+		await page.keyboard.press( 'Tab' );
+		const isChecked = await page.evaluate( () => document.activeElement.checked );
+		expect( isChecked ).toBe( false );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
