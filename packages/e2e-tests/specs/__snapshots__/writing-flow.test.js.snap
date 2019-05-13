@@ -100,6 +100,12 @@ exports[`adding blocks should insert line break mid text 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`adding blocks should merge forwards 1`] = `
+"<!-- wp:paragraph -->
+<p>123</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`adding blocks should navigate around inline boundaries 1`] = `
 "<!-- wp:paragraph -->
 <p>FirstAfter</p>
