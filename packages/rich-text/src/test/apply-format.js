@@ -193,6 +193,7 @@ describe( 'applyFormat', () => {
 
 	it( 'should apply format on existing format if selection is collapsed', () => {
 		const record = {
+			activeFormats: [ a ],
 			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
 			text: 'one two three',
 			start: 4,
