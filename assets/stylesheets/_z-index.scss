@@ -19,7 +19,6 @@ $z-layers: (
 	".components-modal__header": 10,
 	".edit-post-meta-boxes-area.is-loading::before": 1,
 	".edit-post-meta-boxes-area .spinner": 5,
-	".block-editor-block-contextual-toolbar": 21,
 	".components-popover__close": 5,
 	".block-editor-block-list__insertion-point": 6,
 	".block-editor-inserter-with-shortcuts": 5,
@@ -60,7 +59,10 @@ $z-layers: (
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
-	".block-editor-inner-blocks__small-screen-overlay:after": 120,
+	".block-editor-inner-blocks.has-overlay::after": 120,
+
+	// The toolbar, when contextual, should be above any adjacent nested block click overlays.
+	".block-editor-block-contextual-toolbar": 121,
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }

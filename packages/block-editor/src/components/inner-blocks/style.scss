@@ -1,9 +1,31 @@
 .block-editor-inner-blocks.has-overlay::after {
 	content: "";
 	position: absolute;
-	top: 0;
+	top: -$block-padding;
 	right: 0;
-	bottom: 0;
+	bottom: -$block-padding;
 	left: 0;
-	z-index: z-index(".block-editor-inner-blocks__small-screen-overlay:after");
+	z-index: z-index(".block-editor-inner-blocks.has-overlay::after");
+}
+
+// These are temporary debug colors.
+/*.block-editor-inner-blocks.has-overlay {
+	background-color: #00a0d2;
+
+	.block-editor-inner-blocks.has-overlay {
+		background-color: #4ab866;
+	}
+}
+*/
+
+// Temporary hover style for testing
+.block-editor-block-list__block.is-hovered .block-editor-inner-blocks.has-overlay {
+	&::after {
+		background: rgba($blue-medium-500, 0.5);
+	}
+
+	// Stop propogating beyond one level
+	.block-editor-inner-blocks.has-overlay::after {
+		background: none;
+	}
 }
