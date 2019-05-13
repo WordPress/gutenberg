@@ -156,7 +156,7 @@ Two Github teams are used in the project.
 
 * [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core): A team composed of people that are actively involved in the project: attending meeting regularly, participating in triage sessions, performing reviews regularly, working on features and bug fixes and performing plugin and npm releases.
 
-* [Gutenberg](https://github.com/orgs/WordPress/teams/gutenberg): A team composed of contributors with at least 2/3 meaningful contributions to the project.
+* [Gutenberg](https://github.com/orgs/WordPress/teams/gutenberg): A team composed of contributors with at least 2–3 meaningful contributions to the project.
 
 Feel free to ask to be added to the repository in the #core-editor slack channel.
 
