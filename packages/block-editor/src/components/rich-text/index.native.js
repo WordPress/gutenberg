@@ -664,6 +664,13 @@ export class RichText extends Component {
 				( typeof this.props.value !== 'undefined' ) &&
 				( Platform.OS === 'ios' || ( Platform.OS === 'android' && ( ! this.comesFromAztec || ! this.firedAfterTextChanged ) ) ) &&
 				nextProps.value !== previousValueToCheck ) {
+
+			// Gutenberg seems to try to mirror the caret state even on events that only change the content so,
+			//  let's force caret update if state has selection set.
+			if ( typeof nextProps.selectionStart !== 'undefined' && typeof nextProps.selectionEnd !== 'undefined' ) {
+				this.needsSelectionUpdate = true;
+			}
+
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
 
