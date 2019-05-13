@@ -6,6 +6,13 @@ public enum MediaPickerSource: String {
     case deviceCamera = "DEVICE_CAMERA"
 }
 
+public enum MediaFilter: String {
+    case image
+    case video
+    case audio
+    case other
+}
+
 /// Ref. https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
 public enum LogLevel: Int {
     case trace
@@ -30,7 +37,7 @@ public protocol GutenbergBridgeDelegate: class {
     ///     - source: the source from where the picker will get the media
     ///     - callback: A callback block to be called with an upload mediaIdentifier and a placeholder image file url, use nil on both parameters to signal that the action was canceled.
     ///
-    func gutenbergDidRequestMedia(from source: MediaPickerSource, with callback: @escaping MediaPickerDidPickMediaCallback)
+    func gutenbergDidRequestMedia(from source: MediaPickerSource, filter: [MediaFilter]?, with callback: @escaping MediaPickerDidPickMediaCallback)
 
     /// Tells the delegate that gutenberg JS requested the import of media item based on the provided URL
     ///
