@@ -820,8 +820,21 @@ export class RichText extends Component {
 		} );
 	}
 
+	/**
+	 * Signals to the RichText owner that the block can be replaced with two
+	 * blocks as a result of splitting the block by pressing enter, more with
+	 * blocks as a result of splitting the block by pasting block content in the
+	 * instance.
+	 *
+	 * @param  {Object} record       The rich text value to split.
+	 * @param  {Array}  pastedBlocks The pasted blocks to insert, if any.
+	 */
 	onSplit( record, pastedBlocks = [] ) {
-		const { onReplace, onSplit, onSplitMiddle } = this.props;
+		const {
+			onReplace,
+			onSplit,
+			__unstableOnSplitMiddle: onSplitMiddle,
+		} = this.props;
 
 		if ( ! onReplace || ! onSplit ) {
 			return;
