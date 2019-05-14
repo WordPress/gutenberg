@@ -9,7 +9,7 @@ import { includes } from 'lodash';
 import { Component, createRef } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
-class WidgetEditDomManager extends Component {
+class LegacyWidgetEditDomManager extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -139,5 +139,5 @@ class WidgetEditDomManager extends Component {
 	}
 }
 
-export default WidgetEditDomManager;
+export default LegacyWidgetEditDomManager;
 
