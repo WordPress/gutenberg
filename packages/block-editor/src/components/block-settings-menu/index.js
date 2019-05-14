@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { castArray } from 'lodash';
+import { castArray, flow } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,10 +70,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 							{ ! isLocked && canDuplicate && (
 								<MenuItem
 									className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-									onClick={ () => {
-										onClose();
-										onDuplicate();
-									} }
+									onClick={ flow( onClose, onDuplicate ) }
 									icon="admin-page"
 									shortcut={ shortcuts.duplicate.display }
 								>
@@ -84,10 +81,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 								<>
 									<MenuItem
 										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-										onClick={ () => {
-											onClose();
-											onInsertBefore();
-										} }
+										onClick={ flow( onClose, onInsertBefore ) }
 										icon="insert-before"
 										shortcut={ shortcuts.insertBefore.display }
 									>
@@ -95,10 +89,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 									</MenuItem>
 									<MenuItem
 										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-										onClick={ () => {
-											onClose();
-											onInsertAfter();
-										} }
+										onClick={ flow( onClose, onInsertAfter ) }
 										icon="insert-after"
 										shortcut={ shortcuts.insertAfter.display }
 									>
@@ -117,10 +108,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 							{ ! isLocked && (
 								<MenuItem
 									className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-									onClick={ () => {
-										onClose();
-										onRemove();
-									} }
+									onClick={ flow( onClose, onRemove ) }
 									icon="trash"
 									shortcut={ shortcuts.removeBlock.display }
 								>
