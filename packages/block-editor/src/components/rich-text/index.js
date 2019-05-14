@@ -822,7 +822,7 @@ export class RichText extends Component {
 
 	/**
 	 * Signals to the RichText owner that the block can be replaced with two
-	 * blocks as a result of splitting the block by pressing enter, more with
+	 * blocks as a result of splitting the block by pressing enter, or with
 	 * blocks as a result of splitting the block by pasting block content in the
 	 * instance.
 	 *
