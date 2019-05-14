@@ -26,6 +26,10 @@
 - Fixed display of reset button when using RangeControl `allowReset` prop.
 - Fixed minutes field of `DateTimePicker` missed '0' before single digit values.
 
+### Breaking Change
+
+- `ServerSideRender` is no longer part of components. It was extracted to an independent package `@wordpress/server-side-render`.
+
 ## 7.3.0 (2019-04-16)
 
 ### New Features

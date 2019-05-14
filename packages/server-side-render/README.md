@@ -8,6 +8,19 @@ ServerSideRender should be regarded as a fallback or legacy mechanism, it is not
 
 New blocks should be built in conjunction with any necessary REST API endpoints, so that JavaScript can be used for rendering client-side in the `edit` function. This gives the best user experience, instead of relying on using the PHP `render_callback`. The logic necessary for rendering should be included in the endpoint, so that both the client-side JavaScript and server-side PHP logic should require a minimal amount of differences.
 
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/server-side-render --save
+```
+
+## Usage
+
+The props accepted by the component are described bellow.
+
+
 ## Props
 
 ### attributes
@@ -43,7 +56,7 @@ E.g: `{ post_id: 12 }`.
 Render core/archives preview.
 
 ```jsx
-import { ServerSideRender } from '@wordpress/components';
+import { ServerSideRender } from '@wordpress/server-side-render';
 
 const MyServerSideRender = () => (
 	<ServerSideRender
