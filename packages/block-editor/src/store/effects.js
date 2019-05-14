@@ -84,15 +84,15 @@ export default {
 		const blockBType = getBlockType( blockB.name );
 		const { clientId, attributeKey, offset } = getSelectionStart( state );
 		const hasSelection = clientId === clientIdA || clientId === clientIdB;
+		const selectedBlock = clientId === clientIdA ? blockA : blockB;
+		const html = selectedBlock.attributes[ attributeKey ];
 
 		// A robust way to retain selection position through various transforms
 		// is to insert a special character at the position and then recover it.
 		const START_OF_SELECTED_AREA = '\u0086';
 
 		if ( hasSelection ) {
-			const selectedBlock = clientId === clientIdA ? blockA : blockB;
 			const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
-			const html = selectedBlock.attributes[ attributeKey ];
 			const multilineTag = selectedBlockType.attributes[ attributeKey ].multiline;
 			const value = insert( create( {
 				html,
@@ -134,6 +134,7 @@ export default {
 			const newHtml = toHTMLString( { value: newValue, multilineTag } );
 
 			updatedAttributes[ newAttributeKey ] = newHtml;
+			selectedBlock.attributes[ attributeKey ] = html;
 
 			dispatch( selectionChange(
 				blockA.clientId,
