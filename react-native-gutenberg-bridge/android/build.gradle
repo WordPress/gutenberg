@@ -119,11 +119,13 @@ dependencies {
         println "using gutenberg from source"
         implementation project(':react-native-svg')
         implementation project(':react-native-recyclerview-list')
+        implementation project(':react-native-video')
 
         implementation 'com.facebook.react:react-native:+'
     } else {
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-recyclerview-list', 'f845b3c2c4411b8e97db23724bf1a535530c5435'))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../package.json', 'react-native-video', 'dependencies')))
 
         def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
         implementation "com.facebook.react:react-native:${rnVersion}"
