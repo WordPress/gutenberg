@@ -34,7 +34,7 @@ import {
  * Browser constants
  */
 
-const { getSelection } = window;
+const { getSelection, getComputedStyle } = window;
 
 /**
  * Given an element, returns true if the element is a tabbable text field, or
@@ -287,6 +287,11 @@ class WritingFlow extends Component {
 			this.verticalRect = computeCaretRect();
 		}
 
+		// In the case of RTL scripts, right means previous and left means next,
+		// which is the exact reverse of LTR.
+		const { direction } = getComputedStyle( target );
+		const isReverseDir = direction === 'rtl' ? ( ! isReverse ) : isReverse;
+
 		if ( isShift ) {
 			if (
 				(
@@ -316,9 +321,9 @@ class WritingFlow extends Component {
 				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 				event.preventDefault();
 			}
-		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverse ) ) {
-			const closestTabbable = this.getClosestTabbable( target, isReverse );
-			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverseDir ) ) {
+			const closestTabbable = this.getClosestTabbable( target, isReverseDir );
+			placeCaretAtHorizontalEdge( closestTabbable, isReverseDir );
 			event.preventDefault();
 		}
 	}
