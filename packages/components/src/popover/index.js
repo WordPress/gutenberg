@@ -63,7 +63,7 @@ const Popover = ( {
 	// Anchor position
 	const [ anchor, setAnchor ] = useState( null );
 	const refreshAnchorRect = () => {
-		if ( ! anchorRect && ! anchorRef.current ) {
+		if ( ! anchorRef.current ) {
 			return;
 		}
 
@@ -90,24 +90,26 @@ const Popover = ( {
 			};
 		}
 
-		const didAnchorRectChange = ! isShallowEqual( anchorRect, anchor );
+		const didAnchorRectChange = ! isShallowEqual( newAnchor, anchor );
 		if ( didAnchorRectChange ) {
 			setAnchor( newAnchor );
 		}
 	};
 	useEffect( refreshAnchorRect, [ anchorRect, getAnchorRect ] );
 	useEffect( () => {
-		/*
-		 * There are sometimes we need to reposition or resize the popover that are not
-		 * handled by the resize/scroll window events (i.e. CSS changes in the layout
-		 * that changes the position of the anchor).
-		 *
-		 * For these situations, we refresh the popover every 0.5s
-		 */
-		const intervalHandle = setInterval( refreshAnchorRect, 500 );
+		if ( ! anchorRect ) {
+			/*
+			* There are sometimes we need to reposition or resize the popover that are not
+			* handled by the resize/scroll window events (i.e. CSS changes in the layout
+			* that changes the position of the anchor).
+			*
+			* For these situations, we refresh the popover every 0.5s
+			*/
+			const intervalHandle = setInterval( refreshAnchorRect, 500 );
 
-		return () => clearInterval( intervalHandle );
-	}, [] );
+			return () => clearInterval( intervalHandle );
+		}
+	}, [ anchorRect ] );
 
 	// Content size
 	const [ contentSize, setContentSize ] = useState( null );
