@@ -9,9 +9,9 @@ import { withInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import WidgetEditDomManager from './WidgetEditDomManager';
+import LegacyWidgetEditDomManager from './dom-manager';
 
-class WidgetEditHandler extends Component {
+class LegacyWidgetEditHandler extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
@@ -64,7 +64,7 @@ class WidgetEditHandler extends Component {
 					display: this.props.isVisible ? 'block' : 'none',
 				} }
 			>
-				<WidgetEditDomManager
+				<LegacyWidgetEditDomManager
 					ref={ ( ref ) => {
 						this.widgetEditDomManagerRef = ref;
 					} }
@@ -118,5 +118,5 @@ class WidgetEditHandler extends Component {
 	}
 }
 
-export default withInstanceId( WidgetEditHandler );
+export default withInstanceId( LegacyWidgetEditHandler );
 
