@@ -258,7 +258,7 @@ export class RichText extends Component {
 		this.onFormatChange( record, true );
 	}
 
-	onFormatChange( record, doUpdateChild ) {
+	onFormatChange( record ) {
 		const { start, end, activeFormats = [] } = record;
 		const changeHandlers = pickBy( this.props, ( v, key ) =>
 			key.startsWith( 'format_on_change_functions_' )
@@ -276,22 +276,6 @@ export class RichText extends Component {
 		this.selectionEnd = end;
 
 		this.onCreateUndoLevel();
-
-		// ////////////
-
-		// let newContent = this.value;
-		// if ( newContent && newContent !== this.props.value ) {
-		// 	///
-		// } else {
-		// 	if ( doUpdateChild ) {
-		// 		this.lastEventCount = undefined;
-		// 	} else {
-		// 		// make sure the component rerenders without refreshing the text on gutenberg
-		// 		// (this can trigger other events that might update the active formats on aztec)
-		// 		this.lastEventCount = 0;
-		// 	}
-		// 	this.forceUpdate();
-		// }
 	}
 
 	onCreateUndoLevel() {
@@ -338,7 +322,7 @@ export class RichText extends Component {
 	onTextUpdate( event ) {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
 
-		const refresh = this.value != contentWithoutRootTag;
+		const refresh = this.value !== contentWithoutRootTag;
 		this.value = contentWithoutRootTag;
 
 		// we don't want to refresh if our goal is just to create a record
@@ -393,11 +377,6 @@ export class RichText extends Component {
 
 		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
 		const isReverse = keyCode === BACKSPACE;
-
-		// // Only process delete if the key press occurs at uncollapsed edge.
-		// if ( ! isCollapsed( this.createRecord() ) ) {
-		// 	return;
-		// }
 
 		const empty = this.isEmpty();
 
@@ -520,14 +499,12 @@ export class RichText extends Component {
 		}
 	}
 
-	onFocus( event ) {
+	onFocus() {
 		this.isTouched = true;
 
 		if ( this.props.onFocus ) {
 			this.props.onFocus();
 		}
-
-		// this.onSelectionChange();
 	}
 
 	onBlur( event ) {
@@ -558,18 +535,6 @@ export class RichText extends Component {
 	}
 
 	onSelectionChangeFromAztec( start, end, text, event ) {
-		// if ( ! this.props.isSelected ) {
-		// 	return;
-		// }
-
-		// // AztecEditor-Android may emit a selection change event with 0,0
-		// // when simply updating the active formats
-		// // let's ignore this event in that case
-		// const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
-		// if ( this.lastEventCount === undefined && contentWithoutRootTag === this.value && start === 0 && end === 0 ) {
-		// 	return;
-		// }
-
 		// `end` can be less than `start` on iOS
 		// Let's fix that here so `rich-text/slice` can work properly
 		const realStart = Math.min( start, end );
@@ -662,7 +627,6 @@ export class RichText extends Component {
 				( typeof this.props.value !== 'undefined' ) &&
 				( ! this.comesFromAztec || ! this.firedAfterTextChanged ) &&
 				nextProps.value !== this.props.value ) {
-
 			// Gutenberg seems to try to mirror the caret state even on events that only change the content so,
 			//  let's force caret update if state has selection set.
 			if ( typeof nextProps.selectionStart !== 'undefined' && typeof nextProps.selectionEnd !== 'undefined' ) {
@@ -686,7 +650,6 @@ export class RichText extends Component {
 
 	componentDidMount() {
 		if ( this.props.isSelected ) {
-			console.log( `Will focus block on mount: ${this.props.clientId}` );
 			this._editor.focus();
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
 		}
@@ -700,7 +663,6 @@ export class RichText extends Component {
 
 	componentDidUpdate( prevProps ) {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
-			console.log( `Will focus block on update: ${this.props.clientId}` );
 			this._editor.focus();
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
 			// if its internal value hasn't change. When created, default value is 0, 0
@@ -713,7 +675,7 @@ export class RichText extends Component {
 	willTrimSpaces( html ) {
 		// regex for detecting spaces around block element html tags
 		const blockHtmlElements = '(div|br|blockquote|ul|ol|li|p|pre|h1|h2|h3|h4|h5|h6|iframe|hr)';
-		const leadingOrTrailingSpaces = new RegExp(`(\\s+)<\/?${blockHtmlElements}>|<\/?${blockHtmlElements}>(\\s+)`, 'g');
+		const leadingOrTrailingSpaces = new RegExp( `(\\s+)<\/?${ blockHtmlElements }>|<\/?${ blockHtmlElements }>(\\s+)`, 'g' );
 		const matches = html.match( leadingOrTrailingSpaces );
 		if ( matches && matches.length > 0 ) {
 			return true;
@@ -860,9 +822,6 @@ const RichTextContainer = compose( [
 				selectionStart.clientId === clientId &&
 				selectionStart.attributeKey === identifier
 			);
-			console.log( `iSelected is undefined and will set it to ${isSelected} for ${clientId}` );
-		} else {
-			console.log( `iSelected: ${isSelected} for ${clientId}` );
 		}
 
 		return {
