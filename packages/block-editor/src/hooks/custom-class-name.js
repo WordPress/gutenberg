@@ -60,13 +60,14 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 					<BlockEdit { ...props } />
 					<InspectorAdvancedControls>
 						<TextControl
-							label={ __( 'Additional CSS Class' ) }
+							label={ __( 'Additional CSS Class(es)' ) }
 							value={ props.attributes.className || '' }
 							onChange={ ( nextValue ) => {
 								props.setAttributes( {
 									className: nextValue !== '' ? nextValue : undefined,
 								} );
 							} }
+							help={ __( 'Space separate multiple classes.' ) }
 						/>
 					</InspectorAdvancedControls>
 				</>
