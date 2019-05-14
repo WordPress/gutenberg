@@ -242,7 +242,11 @@ class WritingFlow extends Component {
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
 		// When presing any key other than up or down, the initial vertical
-		// position must ALWAYS be reset.
+		// position must ALWAYS be reset. The vertical position is saved so it
+		// can be restored as well as possible on sebsequent vertical arrow key
+		// presses. It may not always be possible to restore the exact same
+		// position (such as at an empty line), so it wouldn't be good to
+		// compute the position right before any vertical arrow key press.
 		if ( ! isVertical ) {
 			this.verticalRect = null;
 		} else if ( ! this.verticalRect ) {
