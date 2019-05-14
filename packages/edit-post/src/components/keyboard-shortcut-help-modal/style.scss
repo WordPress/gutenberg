@@ -22,14 +22,12 @@
 	}
 
 	&__shortcut-term {
-		order: 1;
 		font-weight: 600;
 		margin: 0 0 0 1rem;
 	}
 
 	&__shortcut-description {
 		flex: 1;
-		order: 0;
 		margin: 0;
 
 		// IE 11 flex item fix - ensure the item does not collapse
