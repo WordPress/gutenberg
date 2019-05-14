@@ -16,11 +16,11 @@ import WritingMenu from '../writing-menu';
 const MoreMenu = () => (
 	<DropdownMenu
 		className="edit-post-more-menu"
-		popoverClassName="edit-post-more-menu__content"
 		position="bottom left"
 		icon="ellipsis"
 		label={ __( 'More tools & options' ) }
-		labelPosition="bottom"
+		__unstableLabelPosition="bottom"
+		__unstablePopoverClassName="edit-post-more-menu__content"
 	>
 		{ ( { onClose } ) => (
 			<>

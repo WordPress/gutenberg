@@ -23,12 +23,12 @@ function DropdownMenu( {
 	controls,
 	icon = 'menu',
 	label,
-	labelPosition,
-	menuClassName,
 	menuLabel,
 	position,
-	popoverClassName,
-	toggleClassName,
+	__unstableLabelPosition,
+	__unstableMenuClassName,
+	__unstablePopoverClassName,
+	__unstableToggleClassName,
 } ) {
 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
@@ -46,7 +46,7 @@ function DropdownMenu( {
 	return (
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
-			contentClassName={ classnames( 'components-dropdown-menu__popover', popoverClassName ) }
+			contentClassName={ classnames( 'components-dropdown-menu__popover', __unstablePopoverClassName ) }
 			position={ position }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
@@ -59,7 +59,7 @@ function DropdownMenu( {
 
 				return (
 					<IconButton
-						className={ classnames( 'components-dropdown-menu__toggle', toggleClassName, {
+						className={ classnames( 'components-dropdown-menu__toggle', __unstableToggleClassName, {
 							'is-opened': isOpen,
 						} ) }
 						icon={ icon }
@@ -68,7 +68,7 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
-						labelPosition={ labelPosition }
+						labelPosition={ __unstableLabelPosition }
 						tooltip={ label }
 					>
 						{ icon !== 'ellipsis' && <span className="components-dropdown-menu__indicator" /> }
@@ -78,7 +78,7 @@ function DropdownMenu( {
 			renderContent={ ( props ) => {
 				return (
 					<NavigableMenu
-						className={ classnames( 'components-dropdown-menu__menu', menuClassName ) }
+						className={ classnames( 'components-dropdown-menu__menu', __unstableMenuClassName ) }
 						role="menu"
 						aria-label={ menuLabel }
 					>
