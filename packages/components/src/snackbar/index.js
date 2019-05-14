@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RawHTML } from '@wordpress/element';
+import { RawHTML, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,6 +15,7 @@ import { RawHTML } from '@wordpress/element';
 import { Button } from '../';
 
 const stopPropagation = ( event ) => event.stopPropagation();
+const NOTICE_TIMEOUT = 10000;
 
 function Snackbar( {
 	className,
@@ -24,6 +25,16 @@ function Snackbar( {
 	__unstableHTML,
 	onRemove = noop,
 } ) {
+	useEffect( () => {
+		// This rule doesn't account yet for React Hooks
+		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+		const timeoutHandle = setTimeout( () => {
+			onRemove();
+		}, NOTICE_TIMEOUT );
+
+		return () => clearTimeout( timeoutHandle );
+	}, [] );
+
 	const classes = classnames( className, 'components-snackbar', 'is-' + status );
 
 	if ( __unstableHTML ) {
