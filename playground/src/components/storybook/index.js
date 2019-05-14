@@ -25,7 +25,7 @@ import dropdownReadme from '../../../../packages/components/src/dropdown/README.
 import dropdownMenuReadme from '../../../../packages/components/src/dropdown-menu/README.md';
 
 import menuGroupReadme from '../../../../packages/components/src/menu-group/README.md';
-import menuItemReadme from '../../../../packages/components/src/menu-item/README.md';
+// import menuItemReadme from '../../../../packages/components/src/menu-item/README.md';
 import menuItemsChoiceReadme from '../../../../packages/components/src/menu-items-choice/README.md';
 
 const components = [
@@ -43,7 +43,7 @@ const components = [
 	{ name: 'dropdown-menu', label: 'Dropdown Menu', readme: dropdownMenuReadme },
 
 	{ name: 'menu-group', label: 'Menu Group', readme: menuGroupReadme },
-	{ name: 'menu-item', label: 'Menu Item', readme: menuItemReadme },
+	//	{ name: 'menu-item', label: 'Menu Item', readme: menuItemReadme },
 	{ name: 'menu-items-choice', label: 'Menu Items Choice', readme: menuItemsChoiceReadme },
 ];
 
