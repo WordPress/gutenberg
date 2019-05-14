@@ -83,7 +83,10 @@ function applyInternetExplorerInputFix( editorNode ) {
 }
 
 const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
-const CLASS_NAME = 'editor-rich-text__editable block-editor-rich-text__editable';
+
+const oldClassName = 'editor-rich-text__editable';
+
+export const className = 'block-editor-rich-text__editable';
 
 /**
  * Whether or not the user agent is Internet Explorer.
@@ -116,7 +119,11 @@ export default class Editable extends Component {
 		}
 
 		if ( ! isEqual( this.props.className, nextProps.className ) ) {
-			this.editorNode.className = classnames( nextProps.className, CLASS_NAME );
+			this.editorNode.className = classnames(
+				className,
+				oldClassName,
+				nextProps.className
+			);
 		}
 
 		const { removedKeys, updatedKeys } = diffAriaProps( this.props, nextProps );
@@ -156,7 +163,7 @@ export default class Editable extends Component {
 			style,
 			record,
 			valueToEditableHTML,
-			className,
+			className: additionalClassName,
 			isPlaceholderVisible,
 			...remainingProps
 		} = this.props;
@@ -166,7 +173,7 @@ export default class Editable extends Component {
 		return createElement( tagName, {
 			role: 'textbox',
 			'aria-multiline': true,
-			className: classnames( className, CLASS_NAME ),
+			className: classnames( className, oldClassName, additionalClassName ),
 			contentEditable: true,
 			[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
 			ref: this.bindEditorNode,
