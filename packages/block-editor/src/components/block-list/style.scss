@@ -174,13 +174,6 @@
  */
 
 .block-editor-block-list__layout .block-editor-block-list__block {
-	::-moz-selection {
-		background-color: $blue-medium-highlight;
-	}
-
-	::selection {
-		background-color: $blue-medium-highlight;
-	}
 
 	// Selection style for multiple blocks.
 	&.is-multi-selected *::selection {
