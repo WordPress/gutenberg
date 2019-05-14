@@ -342,4 +342,31 @@ describe( 'adding blocks', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should preserve horizontal position when navigating vertically between blocks', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'abc' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '23' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( '1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should remember initial vertical position', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( 'x' ); // Should be right after "1".
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
