@@ -202,7 +202,6 @@ export class RichText extends Component {
 			range,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			prepareEditableTree: this.props.prepareEditableTree,
 			__unstableIsEditableTree: true,
 		} );
 	}
@@ -731,7 +730,10 @@ export class RichText extends Component {
 		const { formats, text, start, end } = value;
 		const { activeFormats = [] } = this.state;
 		const collapsed = isCollapsed( value );
-		const isReverse = event.keyCode === LEFT;
+		// To do: ideally, we should look at visual position instead.
+		const { direction } = getComputedStyle( this.editableRef );
+		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
+		const isReverse = event.keyCode === reverseKey;
 
 		// If the selection is collapsed and at the very start, do nothing if
 		// navigating backward.
