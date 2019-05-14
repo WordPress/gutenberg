@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
@@ -103,7 +103,7 @@ class GalleryImage extends Component {
 			// Disable reason: Image itself is not meant to be interactive, but should
 			// direct image selection and unfocus caption fields.
 			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-			<Fragment>
+			<>
 				<img
 					src={ url }
 					alt={ alt }
@@ -116,7 +116,7 @@ class GalleryImage extends Component {
 					ref={ this.bindContainer }
 				/>
 				{ isBlobURL( url ) && <Spinner /> }
-			</Fragment>
+			</>
 			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 		);
 
@@ -127,28 +127,26 @@ class GalleryImage extends Component {
 
 		return (
 			<figure className={ className }>
-				{ isSelected &&
-					<div className="block-library-gallery-item__inline-menu">
-						<IconButton
-							icon="no-alt"
-							onClick={ onRemove }
-							className="blocks-gallery-item__remove"
-							label={ __( 'Remove Image' ) }
-						/>
-					</div>
-				}
 				{ href ? <a href={ href }>{ img }</a> : img }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) ? (
-					<RichText
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
-						isSelected={ this.state.captionSelected }
-						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-						unstableOnFocus={ this.onSelectCaption }
-						inlineToolbar
+				<div className="block-library-gallery-item__inline-menu">
+					<IconButton
+						icon="no-alt"
+						onClick={ onRemove }
+						onFocus={ this.onSelectImage }
+						className="blocks-gallery-item__remove"
+						label={ __( 'Remove Image' ) }
+						disabled={ ! isSelected }
 					/>
-				) : null }
+				</div>
+				<RichText
+					tagName="figcaption"
+					placeholder={ isSelected ? __( 'Write caption…' ) : null }
+					value={ caption }
+					isSelected={ this.state.captionSelected }
+					onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+					unstableOnFocus={ this.onSelectCaption }
+					inlineToolbar
+				/>
 			</figure>
 		);
 	}

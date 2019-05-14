@@ -7,7 +7,7 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
   <div
     className="components-color-picker__saturation"
   >
-    <WithInstanceId(Saturation)
+    <Pure(WithInstanceId(Saturation))
       hsl={
         Object {
           "a": 1,
@@ -48,7 +48,7 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
       <div
         className="components-color-picker__toggles"
       >
-        <WithInstanceId(Hue)
+        <Pure(WithInstanceId(Hue))
           hsl={
             Object {
               "a": 1,

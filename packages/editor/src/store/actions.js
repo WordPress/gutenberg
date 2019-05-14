@@ -825,6 +825,11 @@ export const toggleSelection = getBlockEditorAction( 'toggleSelection' );
 export const replaceBlocks = getBlockEditorAction( 'replaceBlocks' );
 
 /**
+ * @see replaceBlock in core/block-editor store.
+ */
+export const replaceBlock = getBlockEditorAction( 'replaceBlock' );
+
+/**
  * @see moveBlocksDown in core/block-editor store.
  */
 export const moveBlocksDown = getBlockEditorAction( 'moveBlocksDown' );

@@ -12,7 +12,6 @@ import {
 	PanelBody,
 	RangeControl,
 } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import {
 	InspectorControls,
 	InnerBlocks,
@@ -50,7 +49,7 @@ export const ColumnsEdit = function( { attributes, setAttributes, className, upd
 	};
 
 	return (
-		<Fragment>
+		<>
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
@@ -78,7 +77,7 @@ export const ColumnsEdit = function( { attributes, setAttributes, className, upd
 					templateLock="all"
 					allowedBlocks={ ALLOWED_BLOCKS } />
 			</div>
-		</Fragment>
+		</>
 	);
 };
 

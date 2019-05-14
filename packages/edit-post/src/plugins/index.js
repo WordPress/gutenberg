@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { MenuItem } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 import { addQueryArgs } from '@wordpress/url';
@@ -18,10 +17,10 @@ import ToolsMoreMenuGroup from '../components/header/tools-more-menu-group';
 registerPlugin( 'edit-post', {
 	render() {
 		return (
-			<Fragment>
+			<>
 				<ToolsMoreMenuGroup>
 					{ ( { onClose } ) => (
-						<Fragment>
+						<>
 							<ManageBlocksMenuItem onSelect={ onClose } />
 							<MenuItem
 								role="menuitem"
@@ -31,10 +30,10 @@ registerPlugin( 'edit-post', {
 							</MenuItem>
 							<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
 							<CopyContentMenuItem />
-						</Fragment>
+						</>
 					) }
 				</ToolsMoreMenuGroup>
-			</Fragment>
+			</>
 		);
 	},
 } );

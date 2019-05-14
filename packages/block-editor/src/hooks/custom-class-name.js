@@ -7,7 +7,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -57,7 +56,7 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true );
 		if ( hasCustomClassName && props.isSelected ) {
 			return (
-				<Fragment>
+				<>
 					<BlockEdit { ...props } />
 					<InspectorAdvancedControls>
 						<TextControl
@@ -70,7 +69,7 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 							} }
 						/>
 					</InspectorAdvancedControls>
-				</Fragment>
+				</>
 			);
 		}
 
