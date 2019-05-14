@@ -236,6 +236,8 @@ describe( 'Blocks raw handling', () => {
 			'apple',
 			'google-docs',
 			'google-docs-table',
+			'google-docs-table-with-comments',
+			'google-docs-with-comments',
 			'ms-word',
 			'ms-word-styled',
 			'ms-word-online',
