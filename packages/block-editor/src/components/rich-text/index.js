@@ -68,7 +68,7 @@ const { getSelection, getComputedStyle } = window;
 /**
  * All inserting input types that would insert HTML into the DOM.
  *
- * @see  https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
+ * @see https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
  *
  * @type {Set}
  */
@@ -563,7 +563,7 @@ export class RichText extends Component {
 	 * selection where caret is at directional edge: forward for a delete key,
 	 * reverse for a backspace key.
 	 *
-	 * @link https://en.wikipedia.org/wiki/Caret_navigation
+	 * @see https://en.wikipedia.org/wiki/Caret_navigation
 	 *
 	 * @param {KeyboardEvent} event Keydown event.
 	 */
