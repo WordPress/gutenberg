@@ -6,21 +6,36 @@ Add the following code to a JavaScript file called `plugin-sidebar.js` and save 
 
 ```js
 ( function( wp ) {
-	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
 	var el = wp.element.createElement;
+	var Fragment = wp.element.Fragment;
+	var PluginSidebar = wp.editPost.PluginSidebar;
+	var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+	var registerPlugin = wp.plugins.registerPlugin;
 
-	registerPlugin( 'my-plugin-sidebar', {
-		render: function() {
-			return el( PluginSidebar,
-				{
-					name: 'my-plugin-sidebar',
-					icon: 'admin-post',
-					title: 'My plugin sidebar',
-				},
-				'Meta field'
-			);
-		},
+	function Component() {
+	    return el(
+		Fragment,
+		{},
+		el(
+		    PluginSidebarMoreMenuItem,
+		    {
+			target: 'sidebar-name',
+		    },
+		    'My Sidebar'
+		),
+		el(
+		    PluginSidebar,
+		    {
+			name: 'sidebar-name',
+			title: 'My Sidebar',
+		    },
+		    'Content of the sidebar'
+		)
+	    );
+	}
+	registerPlugin( 'plugin-name', {
+	    icon: 'smiley',
+	    render: Component,
 	} );
 } )( window.wp );
 ```
