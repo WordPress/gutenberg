@@ -203,3 +203,13 @@ exports[`adding blocks should not prematurely multi-select 1`] = `
 <p>></p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`adding blocks should preserve horizontal position when navigating vertically between blocks 1`] = `
+"<!-- wp:paragraph -->
+<p>abc</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>123</p>
+<!-- /wp:paragraph -->"
+`;

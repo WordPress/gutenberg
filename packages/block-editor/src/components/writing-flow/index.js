@@ -241,6 +241,12 @@ class WritingFlow extends Component {
 		const hasModifier = isShift || event.ctrlKey || event.altKey || event.metaKey;
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
+		if ( ! isVertical ) {
+			this.verticalRect = null;
+		} else if ( ! this.verticalRect ) {
+			this.verticalRect = computeCaretRect();
+		}
+
 		// This logic inside this condition needs to be checked before
 		// the check for event.nativeEvent.defaultPrevented.
 		// The logic handles meta+a keypress and this event is default prevented
@@ -279,12 +285,6 @@ class WritingFlow extends Component {
 		// preserve native input behaviors).
 		if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
 			return;
-		}
-
-		if ( ! isVertical ) {
-			this.verticalRect = null;
-		} else if ( ! this.verticalRect ) {
-			this.verticalRect = computeCaretRect();
 		}
 
 		// In the case of RTL scripts, right means previous and left means next,
