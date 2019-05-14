@@ -63,12 +63,7 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
  * Browser dependencies
  */
 
-const {
-	getSelection,
-	getComputedStyle,
-	requestAnimationFrame,
-	cancelAnimationFrame,
-} = window;
+const { getSelection, getComputedStyle } = window;
 
 /**
  * All inserting input types that would insert HTML into the DOM.
@@ -134,7 +129,6 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onKeyUp = this.onKeyUp.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.onInput = this.onInput.bind( this );
@@ -149,7 +143,6 @@ export class RichText extends Component {
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
-		this.updateSelection = this.updateSelection.bind( this );
 
 		this.patterns = getPatterns( {
 			onReplace,
@@ -172,7 +165,6 @@ export class RichText extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
-		cancelAnimationFrame( this.rafID );
 	}
 
 	setRef( node ) {
@@ -390,7 +382,6 @@ export class RichText extends Component {
 		};
 		this.props.onSelectionChange( index, index );
 		this.setState( { activeFormats } );
-		this.updateSelection();
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
@@ -475,7 +466,6 @@ export class RichText extends Component {
 
 		if ( start !== value.start || end !== value.end ) {
 			const { isCaretWithinFormattedText } = this.props;
-			const isHorizontal = this.keyPressed === LEFT || this.keyPressed === RIGHT;
 			const newValue = {
 				...value,
 				start,
@@ -484,24 +474,7 @@ export class RichText extends Component {
 				activeFormats: undefined,
 			};
 
-			let activeFormats;
-
-			// When the selection changes as a result of a horizontal arrow key
-			// press, then the active formats should be set depending on the
-			// direction.
-			if ( isHorizontal && value.start !== undefined ) {
-				// Selection is moved forward if the new start is higher than
-				// the last.
-				const isForward = start < value.start;
-
-				if ( isForward ) {
-					activeFormats = value.formats[ start ] || [];
-				} else {
-					activeFormats = value.formats[ start - 1 ] || [];
-				}
-			} else {
-				activeFormats = getActiveFormats( newValue );
-			}
+			const activeFormats = getActiveFormats( newValue );
 
 			// Update the value with the new active formats.
 			newValue.activeFormats = activeFormats;
@@ -633,20 +606,6 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Updates the selection state as soon as possible, event before the next
-	 * `selectionchange` event.
-	 * In order to handle subsequent events that rely on selection correctly, we
-	 * need to set the new selection as soon as we can. The `selectionchange`
-	 * event happens too late. The order is as follows: `keydown`, `paint`, then
-	 * `selectionchange`. The browser already updated the selection internally
-	 * before `paint`, so we can use `requestAnimationFrame` to set it.
-	 */
-	updateSelection() {
-		cancelAnimationFrame( this.rafID );
-		this.rafID = requestAnimationFrame( () => this.onSelectionChange() );
-	}
-
-	/**
 	 * Handles a keydown event.
 	 *
 	 * @param {SyntheticEvent} event A synthetic keyboard event.
@@ -654,15 +613,12 @@ export class RichText extends Component {
 	onKeyDown( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
-		this.keyPressed = keyCode;
-
-		if ( keyCode === LEFT || keyCode === RIGHT ) {
-			this.updateSelection();
-
-			// Only override left and right keys without modifiers pressed.
-			if ( ! shiftKey && ! altKey && ! metaKey && ! ctrlKey ) {
-				this.handleHorizontalNavigation( event );
-			}
+		// Only override left and right keys without modifiers pressed.
+		if (
+			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
+			( keyCode === LEFT || keyCode === RIGHT )
+		) {
+			this.handleHorizontalNavigation( event );
 		}
 
 		// Use the space key in list items (at the start of an item) to indent
@@ -788,10 +744,6 @@ export class RichText extends Component {
 		}
 	}
 
-	onKeyUp() {
-		delete this.keyPressed;
-	}
-
 	/**
 	 * Handles horizontal keyboard navigation when no modifiers are pressed. The
 	 * navigation is handled separately to move correctly around format
@@ -829,6 +781,9 @@ export class RichText extends Component {
 			return;
 		}
 
+		// In all other cases, prevent default behaviour.
+		event.preventDefault();
+
 		const formatsBefore = formats[ start - 1 ] || [];
 		const formatsAfter = formats[ start ] || [];
 
@@ -859,21 +814,31 @@ export class RichText extends Component {
 			}
 		}
 
-		if ( newActiveFormatsLength === activeFormats.length ) {
+		// Wait for boundary class to be added.
+		this.props.setTimeout( () => this.recalculateBoundaryStyle() );
+
+		if ( newActiveFormatsLength !== activeFormats.length ) {
+			const newActiveFormats = source.slice( 0, newActiveFormatsLength );
+			const newValue = { ...value, activeFormats: newActiveFormats };
+			this.record = newValue;
+			this.applyRecord( newValue );
+			this.setState( { activeFormats: newActiveFormats } );
 			return;
 		}
 
-		event.preventDefault();
-
-		const newActiveFormats = source.slice( 0, newActiveFormatsLength );
-		const newValue = { ...value, activeFormats: newActiveFormats };
+		const newPos = value.start + ( isReverse ? -1 : 1 );
+		const newActiveFormats = isReverse ? formatsBefore : formatsAfter;
+		const newValue = {
+			...value,
+			start: newPos,
+			end: newPos,
+			activeFormats: newActiveFormats,
+		};
 
 		this.record = newValue;
 		this.applyRecord( newValue );
-		this.setState( { activeFormats } );
-
-		// Wait for boundary class to be added.
-		this.props.setTimeout( () => this.recalculateBoundaryStyle() );
+		this.props.onSelectionChange( newPos, newPos );
+		this.setState( { activeFormats: newActiveFormats } );
 	}
 
 	/**
@@ -1160,7 +1125,6 @@ export class RichText extends Component {
 								onInput={ this.onInput }
 								onCompositionEnd={ this.onCompositionEnd }
 								onKeyDown={ this.onKeyDown }
-								onKeyUp={ this.onKeyUp }
 								onFocus={ this.onFocus }
 								onBlur={ this.onBlur }
 								onMouseDown={ this.onPointerDown }
