@@ -241,6 +241,8 @@ class WritingFlow extends Component {
 		const hasModifier = isShift || event.ctrlKey || event.altKey || event.metaKey;
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
+		// When presing any key other than up or down, the initial vertical
+		// position must ALWAYS be reset.
 		if ( ! isVertical ) {
 			this.verticalRect = null;
 		} else if ( ! this.verticalRect ) {
