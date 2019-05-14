@@ -369,7 +369,7 @@ export class RichText extends Component {
 
 		this.recalculateBoundaryStyle();
 
-		// We know for certain that of focus, the old selection is invalid. It
+		// We know for certain that on focus, the old selection is invalid. It
 		// will be recalculated on `selectionchange`.
 		const index = undefined;
 		const activeFormats = undefined;
@@ -613,8 +613,8 @@ export class RichText extends Component {
 	onKeyDown( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
-		// Only override left and right keys without modifiers pressed.
 		if (
+			// Only override left and right keys without modifiers pressed.
 			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
 			( keyCode === LEFT || keyCode === RIGHT )
 		) {
@@ -946,14 +946,9 @@ export class RichText extends Component {
 		if ( shouldReapply ) {
 			this.value = value;
 			this.record = this.formatToValue( value );
-		} else {
-			this.record = { ...this.record };
-		}
+			this.record.start = selectionStart;
+			this.record.end = selectionEnd;
 
-		this.record.start = selectionStart;
-		this.record.end = selectionEnd;
-
-		if ( shouldReapply ) {
 			updateFormats( {
 				value: this.record,
 				start: this.record.start,
@@ -962,6 +957,15 @@ export class RichText extends Component {
 			} );
 
 			this.applyRecord( this.record );
+		} else if (
+			this.record.start !== selectionStart ||
+			this.record.end !== selectionEnd
+		) {
+			this.record = {
+				...this.record,
+				start: selectionStart,
+				end: selectionEnd,
+			};
 		}
 	}
 
