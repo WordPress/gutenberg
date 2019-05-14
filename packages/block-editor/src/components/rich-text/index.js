@@ -52,7 +52,7 @@ import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
-import Editable from './editable';
+import Editable, { className as editableClassName } from './editable';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
@@ -502,16 +502,18 @@ export class RichText extends Component {
 		const boundarySelector = '*[data-rich-text-format-boundary]';
 		const element = this.editableRef.querySelector( boundarySelector );
 
-		if ( element ) {
-			const computedStyle = getComputedStyle( element );
-			const newColor = computedStyle.color
-				.replace( ')', ', 0.2)' )
-				.replace( 'rgb', 'rgba' );
-			const path = `[contenteditable]:focus ${ boundarySelector }`;
-			const rules = `{background-color: ${ newColor }}`;
-
-			globalStyle.innerHTML = path + rules;
+		if ( ! element ) {
+			return;
 		}
+
+		const computedStyle = getComputedStyle( element );
+		const newColor = computedStyle.color
+			.replace( ')', ', 0.2)' )
+			.replace( 'rgb', 'rgba' );
+		const selector = `.${ editableClassName }:focus ${ boundarySelector }`;
+		const rule = `background-color: ${ newColor }`;
+
+		globalStyle.innerHTML = `${ selector } {${ rule }}`;
 	}
 
 	/**
