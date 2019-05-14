@@ -130,6 +130,7 @@ export class RichText extends Component {
 		this.needsSelectionUpdate = false;
 		this.savedContent = '';
 		this.isTouched = false;
+		this.lastAztecEventType = null;
 
 		this.lastHistoryValue = value;
 
@@ -276,6 +277,8 @@ export class RichText extends Component {
 		this.selectionEnd = end;
 
 		this.onCreateUndoLevel();
+
+		this.lastAztecEventType = 'format change';
 	}
 
 	onCreateUndoLevel() {
@@ -316,7 +319,8 @@ export class RichText extends Component {
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = true; // the onChange event always fires after the fact
-		this.onTextUpdate( event, true );
+		this.onTextUpdate( event );
+		this.lastAztecEventType = 'input';
 	}
 
 	onTextUpdate( event ) {
@@ -337,6 +341,7 @@ export class RichText extends Component {
 	onContentSizeChange( contentSize ) {
 		const contentHeight = contentSize.height;
 		this.setState( { height: contentHeight } );
+		this.lastAztecEventType = 'content size change';
 	}
 
 	// eslint-disable-next-line no-unused-vars
@@ -366,6 +371,7 @@ export class RichText extends Component {
 		} else {
 			this.splitContent( currentRecord );
 		}
+		this.lastAztecEventType = 'input';
 	}
 
 	// eslint-disable-next-line no-unused-vars
@@ -393,6 +399,7 @@ export class RichText extends Component {
 		}
 
 		event.preventDefault();
+		this.lastAztecEventType = 'input';
 	}
 
 	/**
@@ -505,6 +512,8 @@ export class RichText extends Component {
 		if ( this.props.onFocus ) {
 			this.props.onFocus();
 		}
+
+		this.lastAztecEventType = 'focus';
 	}
 
 	onBlur( event ) {
@@ -513,19 +522,22 @@ export class RichText extends Component {
 		if ( this.props.onBlur ) {
 			this.props.onBlur( event );
 		}
+
+		this.lastAztecEventType = 'blur';
 	}
 
 	onSelectionChange( start, end ) {
-		// onSelectionChange should not be emitted when we're simply typing, but Aztec does emit it
-		// Let's try to detect typing with a simple hack:
-		const noChange = this.selectionStart === start && this.selectionEnd === end;
-		const isTyping = this.selectionStart + 1 === start && this.value !== this.props.value;
-		const shouldKeepFormats = noChange || isTyping;
+		const hasChanged = this.selectionStart !== start || this.selectionEnd !== end;
 
 		this.selectionStart = start;
 		this.selectionEnd = end;
 
-		if ( ! shouldKeepFormats ) {
+		// This is a manual selection change event if onChange was not triggered just before
+		// and we did not just trigger a text update
+		// `onChange` could be the last event and could have been triggered a long time ago so
+		// this approach is not perfectly reliable
+		const isManual = this.lastAztecEventType !== 'input' && this.props.value === this.value;
+		if ( hasChanged && isManual ) {
 			const value = this.createRecord();
 			const activeFormats = getActiveFormats( value );
 			this.setState( { activeFormats } );
@@ -551,12 +563,14 @@ export class RichText extends Component {
 
 		// update text before updating selection
 		// Make sure there are changes made to the content before upgrading it upward
-		this.onTextUpdate( event, true );
+		this.onTextUpdate( event );
 
 		this.onSelectionChange( realStart, realEnd );
 
 		// Update lastEventCount to prevent Aztec from re-rendering the content it just sent
 		this.lastEventCount = event.nativeEvent.eventCount;
+
+		this.lastAztecEventType = 'selection change';
 	}
 
 	isEmpty() {
