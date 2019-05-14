@@ -238,7 +238,6 @@ class ImageEdit extends React.Component {
 				) }
 				accessibilityRole={ 'button' }
 				onPress={ this.onImagePressed }
-				onLongPress={ url && onMediaOptionsButtonPressed }
 				disabled={ ! isSelected }
 			>
 				<View style={ { flex: 1 } }>
@@ -272,12 +271,10 @@ class ImageEdit extends React.Component {
 										</View>
 									) }
 									<ImageBackground
-										onLongPress={ onMediaOptionsButtonPressed }
 										accessible={ true }
 										disabled={ ! isSelected }
 										accessibilityLabel={ alt }
-										accessibilityHint={ __( 'Double tap and hold to edit the image' ) }
-										accessibilityRole={ 'imagebutton' }
+										accessibilityRole={ 'image' }
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
 										source={ { uri: url } }
