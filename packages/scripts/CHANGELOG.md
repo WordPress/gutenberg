@@ -4,6 +4,13 @@
 
 - Leverage `@wordpress/dependency-extraction-webpack-plugin` plugin to extract WordPress
   dependencies.
+- The bundled `eslint` dependency has been updated from requiring `^5.12.1` to requiring `^5.16.0`.
+
+### Enhancements
+
+- The default Webpack configuration uses [`thread-loader`](https://github.com/webpack-contrib/thread-loader) to parallelize Babel processing.
+- The default Webpack configuration now opts-in to [the `cacheDirectory` option](https://webpack.js.org/loaders/babel-loader/#options) for its Babel loader.
+- The `source-map-loader` is excluded from production builds. This serves only as an optimization and should otherwise have no impact on build results.
 
 ## 3.1.0 (2019-03-20)
 

@@ -50,7 +50,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 	},
 
 	save() {
-		return <p>Hello World, step 2 (from the frontend, in red)./p>;
+		return <p>Hello World, step 2 (from the frontend, in red).</p>;
 	}
 } );
 ```

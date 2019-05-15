@@ -8,7 +8,7 @@ import 'react-dates/initialize';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 
 /**
@@ -39,7 +39,7 @@ export class DateTimePicker extends Component {
 		return (
 			<div className="components-datetime">
 				{ ! this.state.calendarHelpIsVisible && (
-					<Fragment>
+					<>
 						<TimePicker
 							currentTime={ currentDate }
 							onChange={ onChange }
@@ -49,11 +49,11 @@ export class DateTimePicker extends Component {
 							currentDate={ currentDate }
 							onChange={ onChange }
 						/>
-					</Fragment>
+					</>
 				) }
 
 				{ this.state.calendarHelpIsVisible && (
-					<Fragment>
+					<>
 						<div className="components-datetime__calendar-help">
 							<h4>{ __( 'Click to Select' ) }</h4>
 							<ul>
@@ -94,7 +94,7 @@ export class DateTimePicker extends Component {
 								{ __( 'Close' ) }
 							</Button>
 						</div>
-					</Fragment>
+					</>
 				) }
 
 				{ ! this.state.calendarHelpIsVisible && (

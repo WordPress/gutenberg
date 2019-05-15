@@ -8,12 +8,11 @@ import {
 	omit,
 	pickBy,
 } from 'lodash';
-import memize from 'memize';
 
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, RawHTML } from '@wordpress/element';
+import { Component, RawHTML } from '@wordpress/element';
 import { isHorizontalEdge } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
@@ -53,7 +52,7 @@ import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
-import Editable from './editable';
+import Editable, { className as editableClassName } from './editable';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
@@ -69,7 +68,7 @@ const { getSelection, getComputedStyle } = window;
 /**
  * All inserting input types that would insert HTML into the DOM.
  *
- * @see  https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
+ * @see https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
  *
  * @type {Set}
  */
@@ -88,9 +87,9 @@ const globalStyle = document.createElement( 'style' );
 
 document.head.appendChild( globalStyle );
 
-function createPrepareEditableTree( props ) {
+function createPrepareEditableTree( props, prefix ) {
 	const fns = Object.keys( props ).reduce( ( accumulator, key ) => {
-		if ( key.startsWith( 'format_prepare_functions' ) ) {
+		if ( key.startsWith( prefix ) ) {
 			accumulator.push( props[ key ] );
 		}
 
@@ -145,11 +144,6 @@ export class RichText extends Component {
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 
-		this.formatToValue = memize(
-			this.formatToValue.bind( this ),
-			{ maxSize: 1 }
-		);
-
 		this.patterns = getPatterns( {
 			onReplace,
 			valueToFormat: this.valueToFormat,
@@ -162,10 +156,11 @@ export class RichText extends Component {
 		this.usedDeprecatedChildrenSource = Array.isArray( value );
 		this.lastHistoryValue = value;
 
-		// Internal values that are update synchronously, unlike props.
+		// Internal values are updated synchronously, unlike props and state.
 		this.value = value;
-		this.selectionStart = selectionStart;
-		this.selectionEnd = selectionEnd;
+		this.record = this.formatToValue( value );
+		this.record.start = selectionStart;
+		this.record.end = selectionEnd;
 	}
 
 	componentWillUnmount() {
@@ -195,11 +190,7 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { value, selectionStart: start, selectionEnd: end } = this.props;
-		const { formats, replacements, text } = this.formatToValue( value );
-		const { activeFormats } = this.state;
-
-		return { formats, replacements, text, start, end, activeFormats };
+		return this.record;
 	}
 
 	createRecord() {
@@ -211,7 +202,6 @@ export class RichText extends Component {
 			range,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			prepareEditableTree: createPrepareEditableTree( this.props ),
 			__unstableIsEditableTree: true,
 		} );
 	}
@@ -222,13 +212,13 @@ export class RichText extends Component {
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			prepareEditableTree: createPrepareEditableTree( this.props ),
+			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
 			__unstableDomOnly: domOnly,
 		} );
 	}
 
 	isEmpty() {
-		return isEmpty( this.formatToValue( this.props.value ) );
+		return isEmpty( this.record );
 	}
 
 	/**
@@ -378,7 +368,20 @@ export class RichText extends Component {
 		}
 
 		this.recalculateBoundaryStyle();
-		this.onSelectionChange();
+
+		// We know for certain that on focus, the old selection is invalid. It
+		// will be recalculated on `selectionchange`.
+		const index = undefined;
+		const activeFormats = undefined;
+
+		this.record = {
+			...this.record,
+			start: index,
+			end: index,
+			activeFormats,
+		};
+		this.props.onSelectionChange( index, index );
+		this.setState( { activeFormats } );
 
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
@@ -419,8 +422,7 @@ export class RichText extends Component {
 		}
 
 		const value = this.createRecord();
-		const { activeFormats = [] } = this.state;
-		const start = this.selectionStart;
+		const { start, activeFormats = [] } = this.record;
 
 		// Update the formats between the last and new caret position.
 		const change = updateFormats( {
@@ -459,12 +461,23 @@ export class RichText extends Component {
 	 * Handles the `selectionchange` event: sync the selection to local state.
 	 */
 	onSelectionChange() {
-		const value = this.createRecord();
-		const { start, end } = value;
+		const { start, end } = this.createRecord();
+		const value = this.getRecord();
 
-		if ( start !== this.selectionStart || end !== this.selectionEnd ) {
+		if ( start !== value.start || end !== value.end ) {
 			const { isCaretWithinFormattedText } = this.props;
-			const activeFormats = getActiveFormats( value );
+			const newValue = {
+				...value,
+				start,
+				end,
+				// Allow `getActiveFormats` to get new `activeFormats`.
+				activeFormats: undefined,
+			};
+
+			const activeFormats = getActiveFormats( newValue );
+
+			// Update the value with the new active formats.
+			newValue.activeFormats = activeFormats;
 
 			if ( ! isCaretWithinFormattedText && activeFormats.length ) {
 				this.props.onEnterFormattedText();
@@ -472,11 +485,12 @@ export class RichText extends Component {
 				this.props.onExitFormattedText();
 			}
 
-			this.setState( { activeFormats } );
-			this.applyRecord( { ...value, activeFormats }, { domOnly: true } );
+			// It is important that the internal value is updated first,
+			// otherwise the value will be wrong on render!
+			this.record = newValue;
+			this.applyRecord( newValue, { domOnly: true } );
 			this.props.onSelectionChange( start, end );
-			this.selectionStart = start;
-			this.selectionEnd = end;
+			this.setState( { activeFormats } );
 
 			if ( activeFormats.length > 0 ) {
 				this.recalculateBoundaryStyle();
@@ -488,15 +502,18 @@ export class RichText extends Component {
 		const boundarySelector = '*[data-rich-text-format-boundary]';
 		const element = this.editableRef.querySelector( boundarySelector );
 
-		if ( element ) {
-			const computedStyle = getComputedStyle( element );
-			const newColor = computedStyle.color
-				.replace( ')', ', 0.2)' )
-				.replace( 'rgb', 'rgba' );
-
-			globalStyle.innerHTML =
-				`*:focus ${ boundarySelector }{background-color: ${ newColor }}`;
+		if ( ! element ) {
+			return;
 		}
+
+		const computedStyle = getComputedStyle( element );
+		const newColor = computedStyle.color
+			.replace( ')', ', 0.2)' )
+			.replace( 'rgb', 'rgba' );
+		const selector = `.${ editableClassName }:focus ${ boundarySelector }`;
+		const rule = `background-color: ${ newColor }`;
+
+		globalStyle.innerHTML = `${ selector } {${ rule }}`;
 	}
 
 	/**
@@ -521,11 +538,10 @@ export class RichText extends Component {
 		} );
 
 		this.value = this.valueToFormat( record );
+		this.record = record;
 		this.props.onChange( this.value );
-		this.setState( { activeFormats } );
 		this.props.onSelectionChange( start, end );
-		this.selectionStart = start;
-		this.selectionEnd = end;
+		this.setState( { activeFormats } );
 
 		if ( ! withoutHistory ) {
 			this.onCreateUndoLevel();
@@ -547,7 +563,7 @@ export class RichText extends Component {
 	 * selection where caret is at directional edge: forward for a delete key,
 	 * reverse for a backspace key.
 	 *
-	 * @link https://en.wikipedia.org/wiki/Caret_navigation
+	 * @see https://en.wikipedia.org/wiki/Caret_navigation
 	 *
 	 * @param {KeyboardEvent} event Keydown event.
 	 */
@@ -739,11 +755,13 @@ export class RichText extends Component {
 	 * @param  {SyntheticEvent} event A synthetic keyboard event.
 	 */
 	handleHorizontalNavigation( event ) {
-		const value = this.createRecord();
-		const { formats, text, start, end } = value;
-		const { activeFormats = [] } = this.state;
+		const value = this.getRecord();
+		const { text, formats, start, end, activeFormats = [] } = value;
 		const collapsed = isCollapsed( value );
-		const isReverse = event.keyCode === LEFT;
+		// To do: ideally, we should look at visual position instead.
+		const { direction } = getComputedStyle( this.editableRef );
+		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
+		const isReverse = event.keyCode === reverseKey;
 
 		// If the selection is collapsed and at the very start, do nothing if
 		// navigating backward.
@@ -804,24 +822,26 @@ export class RichText extends Component {
 
 		if ( newActiveFormatsLength !== activeFormats.length ) {
 			const newActiveFormats = source.slice( 0, newActiveFormatsLength );
-			this.applyRecord( { ...value, activeFormats: newActiveFormats } );
+			const newValue = { ...value, activeFormats: newActiveFormats };
+			this.record = newValue;
+			this.applyRecord( newValue );
 			this.setState( { activeFormats: newActiveFormats } );
 			return;
 		}
 
 		const newPos = value.start + ( isReverse ? -1 : 1 );
-		const newActiveFormats = isReverse ? formatsBefore.length : formatsAfter.length;
-
-		this.setState( { selectedFormat: newActiveFormats } );
-		this.props.onSelectionChange( newPos, newPos );
-		this.selectionStart = newPos;
-		this.selectionEnd = newPos;
-		this.applyRecord( {
+		const newActiveFormats = isReverse ? formatsBefore : formatsAfter;
+		const newValue = {
 			...value,
 			start: newPos,
 			end: newPos,
 			activeFormats: newActiveFormats,
-		} );
+		};
+
+		this.record = newValue;
+		this.applyRecord( newValue );
+		this.props.onSelectionChange( newPos, newPos );
+		this.setState( { activeFormats: newActiveFormats } );
 	}
 
 	/**
@@ -898,8 +918,7 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { tagName, value, isSelected } = this.props;
-		const record = this.getRecord();
+		const { tagName, value, selectionStart, selectionEnd, isSelected } = this.props;
 
 		// Check if the content changed.
 		let shouldReapply = (
@@ -911,8 +930,8 @@ export class RichText extends Component {
 		// Check if the selection changed.
 		shouldReapply = shouldReapply || (
 			isSelected && ! prevProps.isSelected && (
-				this.selectionStart !== record.start ||
-				this.selectionEnd !== record.end
+				this.record.start !== selectionStart ||
+				this.record.end !== selectionEnd
 			)
 		);
 
@@ -925,18 +944,32 @@ export class RichText extends Component {
 		shouldReapply = shouldReapply ||
 			! isShallowEqual( prepareProps, prevPrepareProps );
 
+		const { activeFormats = [] } = this.record;
+
 		if ( shouldReapply ) {
-			if ( ! isSelected ) {
-				delete record.start;
-				delete record.end;
-			}
+			this.value = value;
+			this.record = this.formatToValue( value );
+			this.record.start = selectionStart;
+			this.record.end = selectionEnd;
 
-			this.applyRecord( record );
+			updateFormats( {
+				value: this.record,
+				start: this.record.start,
+				end: this.record.end,
+				formats: activeFormats,
+			} );
+
+			this.applyRecord( this.record );
+		} else if (
+			this.record.start !== selectionStart ||
+			this.record.end !== selectionEnd
+		) {
+			this.record = {
+				...this.record,
+				start: selectionStart,
+				end: selectionEnd,
+			};
 		}
-
-		this.value = value;
-		this.selectionStart = record.start;
-		this.selectionEnd = record.end;
 	}
 
 	/**
@@ -948,19 +981,20 @@ export class RichText extends Component {
 	formatToValue( value ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
-			return create( {
-				html: children.toHTML( value ),
-				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
-			} );
+			value = children.toHTML( value );
 		}
 
 		if ( this.props.format === 'string' ) {
-			return create( {
+			const prepare = createPrepareEditableTree( this.props, 'format_value_functions' );
+
+			value = create( {
 				html: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 			} );
+			value.formats = prepare( value );
+
+			return value;
 		}
 
 		// Guard for blocks passing `null` in onSplit callbacks. May be removed
@@ -976,7 +1010,7 @@ export class RichText extends Component {
 		return toDom( {
 			value,
 			multilineTag: this.multilineTag,
-			prepareEditableTree: createPrepareEditableTree( this.props ),
+			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
 		} ).body.innerHTML;
 	}
 
@@ -1080,7 +1114,7 @@ export class RichText extends Component {
 					onChange={ this.onChange }
 				>
 					{ ( { listBoxId, activeId } ) => (
-						<Fragment>
+						<>
 							<Editable
 								tagName={ Tagname }
 								style={ style }
@@ -1113,7 +1147,7 @@ export class RichText extends Component {
 								</Tagname>
 							}
 							{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
-						</Fragment>
+						</>
 					) }
 				</Autocomplete>
 				{ isSelected && <RemoveBrowserShortcuts /> }
@@ -1236,4 +1270,4 @@ RichTextContainer.Content.defaultProps = {
 export default RichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { UnstableRichTextInputEvent } from './input-event';
+export { __unstableRichTextInputEvent } from './input-event';

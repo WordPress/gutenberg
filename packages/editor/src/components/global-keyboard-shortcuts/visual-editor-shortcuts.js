@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 import { rawShortcut } from '@wordpress/keycodes';
@@ -33,7 +33,7 @@ class VisualEditorGlobalKeyboardShortcuts extends Component {
 
 	render() {
 		return (
-			<Fragment>
+			<>
 				<BlockEditorKeyboardShortcuts />
 				<KeyboardShortcuts
 					shortcuts={ {
@@ -42,7 +42,7 @@ class VisualEditorGlobalKeyboardShortcuts extends Component {
 					} }
 				/>
 				<SaveShortcut />
-			</Fragment>
+			</>
 		);
 	}
 }

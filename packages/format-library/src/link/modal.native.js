@@ -146,7 +146,7 @@ class ModalLinkUI extends Component {
 						}
 						icon={ 'admin-links' }
 						label={ __( 'URL' ) }
-						value={ inputValue }
+						value={ this.state.inputValue }
 						placeholder={ __( 'Add URL' ) }
 						autoCapitalize="none"
 						autoCorrect={ false }

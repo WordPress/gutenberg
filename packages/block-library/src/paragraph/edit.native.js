@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
@@ -107,7 +107,16 @@ class ParagraphEdit extends Component {
 		return (
 			<View
 				accessible={ ! this.props.isSelected }
-				accessibilityLabel={ __( 'Paragraph block' ) + __( '.' ) + ' ' + ( isEmpty( content ) ? __( 'Empty' ) : this.plainTextContent( content ) ) }
+				accessibilityLabel={
+					isEmpty( content ) ?
+						/* translators: accessibility text. empty paragraph block. */
+						__( 'Paragraph block. Empty' ) :
+						sprintf(
+							/* translators: accessibility text. %s: text content of the paragraph block. */
+							__( 'Paragraph block. %s' ),
+							this.plainTextContent( content )
+						)
+				}
 				onAccessibilityTap={ this.props.onFocus }
 			>
 				<RichText
@@ -116,7 +125,7 @@ class ParagraphEdit extends Component {
 					isSelected={ this.props.isSelected }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
-					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
+					deleteEnter={ true }
 					style={ style }
 					onChange={ ( nextContent ) => {
 						setAttributes( {

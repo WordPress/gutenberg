@@ -1,7 +1,7 @@
 # Documentation
-/docs                                           @youknowriad @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
-/docs/designers-developers/developers           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
-/docs/designers-developers/designers            @youknowriad @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
+/docs                                           @youknowriad @chrisvanpatten @mkaz @ajitbohra @notnownikki
+/docs/designers-developers/developers           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @notnownikki
+/docs/designers-developers/designers            @youknowriad @chrisvanpatten @mkaz @ajitbohra @notnownikki
 
 # Data
 /packages/api-fetch                             @youknowriad @aduth @nerrad @mmtr
@@ -28,23 +28,23 @@
 /packages/edit-widgets                          @youknowriad
 
 # Tooling
-/bin                                            @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/bin                                            @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /docs/tool                                      @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
 /packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/babel-plugin-makepot                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
-/packages/browserslist-config                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/custom-templated-path-webpack-plugin  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/browserslist-config                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/custom-templated-path-webpack-plugin  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/docgen                                @nosolosw @mkaz @gziolo
 /packages/e2e-test-utils                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @talldan
-/packages/eslint-plugin                         @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/eslint-plugin                         @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/jest-console                          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/jest-puppeteer-axe                    @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/library-export-default-webpack-plugin @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/npm-package-json-lint-config          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/postcss-themes                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/library-export-default-webpack-plugin @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/npm-package-json-lint-config          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/postcss-themes                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/scripts                               @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw @mkaz
 
 # UI Components
@@ -83,9 +83,7 @@
 
 # PHP
 /lib                                            @youknowriad @gziolo @aduth
-
-# Styles
-*.scss                                          @chrisvanpatten
+*-controller.php                                @youknowriad @gziolo @aduth @timothybjacobs
 
 # Native (Unowned)
 *.native.js                                     @ghost

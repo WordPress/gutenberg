@@ -28,8 +28,8 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { mediaUpload } from '@wordpress/editor';
-import { Component, Fragment } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -55,8 +55,8 @@ class FileEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, noticeOperations } = this.props;
-		const { href } = attributes;
+		const { attributes, noticeOperations, setAttributes } = this.props;
+		const { downloadButtonText, href } = attributes;
 
 		// Upload a file drag-and-dropped into the editor
 		if ( isBlobURL( href ) ) {
@@ -72,6 +72,12 @@ class FileEdit extends Component {
 			} );
 
 			revokeBlobURL( href );
+		}
+
+		if ( downloadButtonText === undefined ) {
+			setAttributes( {
+				downloadButtonText: _x( 'Download', 'button label' ),
+			} );
 		}
 	}
 
@@ -160,7 +166,7 @@ class FileEdit extends Component {
 		} );
 
 		return (
-			<Fragment>
+			<>
 				<FileBlockInspector
 					hrefs={ { href, textLinkHref, attachmentPage } }
 					{ ...{
@@ -228,7 +234,7 @@ class FileEdit extends Component {
 						</ClipboardButton>
 					}
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 }
