@@ -1,4 +1,4 @@
-# Packages
+# Package Reference
 
 WordPress exposes a list of JavaScript packages and tools for WordPress development.
 
