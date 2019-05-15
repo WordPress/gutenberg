@@ -23,5 +23,6 @@ module.exports = {
 		'/packages/e2e-tests',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
+		'.*.native.js',
 	],
 };
