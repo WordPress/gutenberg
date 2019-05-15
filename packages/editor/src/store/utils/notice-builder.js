@@ -95,13 +95,17 @@ export function getNotificationArgumentsForSaveFail( data ) {
 	// If the post was being published, we show the corresponding publish error message
 	// Unless we publish an "updating failed" message
 	const messages = {
-		publish: __( 'Publishing failed' ),
-		private: __( 'Publishing failed' ),
-		future: __( 'Scheduling failed' ),
+		publish: __( 'Publishing failed.' ),
+		private: __( 'Publishing failed.' ),
+		future: __( 'Scheduling failed.' ),
 	};
-	const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1 ?
+	let noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1 ?
 		messages[ edits.status ] :
-		__( 'Updating failed' );
+		__( 'Updating failed.' );
+
+	if ( ! ( /<\/?[^>]*>/.test( error.message ) ) ) {
+		noticeMessage = noticeMessage + ' ' + error.message;
+	}
 
 	return [ noticeMessage, { id: SAVE_POST_NOTICE_ID } ];
 }
