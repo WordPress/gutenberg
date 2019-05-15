@@ -125,6 +125,14 @@ Renders the URL input field used by the `URLInputButton` component. It can be us
 }
 ```
 
+### `label: String`
+
+*Optional.* If this property is added, a label will be generated using label property as the content.
+
+### `id: String`
+
+*Optional.* The id of the element to which labels and help text are being generated. That element should be passed as a child.
+
 ### `autoFocus: Boolean`
 
 *Optional.* By default, the input will gain focus when it is rendered, as typically it is displayed conditionally. For example when clicking on `URLInputButton` or editing a block.
