@@ -25,7 +25,7 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Image' ),
 	description: __( 'Insert an image to make a visual statement.' ),
-	getAccessibilityLabel( attributes ) {
+	__experimentalGetAccessibilityLabel( attributes ) {
 		const { caption, alt, url } = attributes;
 
 		if ( ! url ) {

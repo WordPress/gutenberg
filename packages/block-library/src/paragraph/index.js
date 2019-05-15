@@ -37,7 +37,7 @@ const supports = {
 export const settings = {
 	title: __( 'Paragraph' ),
 	description: __( 'Start with the building block of all narrative.' ),
-	getAccessibilityLabel( attributes ) {
+	__experimentalGetAccessibilityLabel( attributes ) {
 		const { content } = attributes;
 
 		const plainTextContent = ( html ) => create( { html } ).text || '';
