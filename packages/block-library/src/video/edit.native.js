@@ -171,6 +171,7 @@ class VideoEdit extends React.Component {
 						mediaType={ MEDIA_TYPE_VIDEO }
 						onSelectURL={ this.onSelectMediaUploadOption }
 						icon={ svgIcon }
+						onFocus={ this.props.onFocus }
 					/>
 				</View>
 			);

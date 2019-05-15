@@ -235,6 +235,7 @@ class ImageEdit extends React.Component {
 						mediaType={ MEDIA_TYPE_IMAGE }
 						onSelectURL={ this.onSelectMediaUploadOption }
 						icon={ svgIcon }
+						onFocus={ this.props.onFocus }
 					/>
 				</View>
 			);

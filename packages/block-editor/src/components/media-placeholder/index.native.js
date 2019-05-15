@@ -67,7 +67,11 @@ function MediaPlaceholder( props ) {
 						) }
 						accessibilityRole={ 'button' }
 						accessibilityHint={ accessibilityHint }
-						onPress={ open }
+						onPress={ ( event ) => {
+							props.onFocus( event );
+							open();
+						}
+						}
 					>
 						<View style={ styles.emptyStateContainer }>
 							{ getMediaOptions() }
