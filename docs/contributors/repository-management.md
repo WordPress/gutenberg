@@ -158,7 +158,7 @@ Two GitHub teams are used in the project.
 
 * [Gutenberg](https://github.com/orgs/WordPress/teams/gutenberg): A team composed of contributors with at least 2–3 meaningful contributions to the project.
 
-Feel free to ask to be added to the repository in the #core-editor slack channel.
+If you meet this criteria of several meaningful contributions having been accepted into the repository and would like to be added to the Gutenberg team, feel free to ask in the [#core-editor Slack channel](https://make.wordpress.org/chat/).
 
 ## Projects
 
