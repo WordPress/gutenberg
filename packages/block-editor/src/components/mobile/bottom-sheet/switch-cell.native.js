@@ -16,7 +16,6 @@ export default function SwitchCell( props ) {
 	const {
 		value,
 		onValueChange,
-		accessibilityLabel,
 		...cellProps
 	} = props;
 
@@ -28,12 +27,12 @@ export default function SwitchCell( props ) {
 		sprintf(
 			/* translators: accessibility text. Switch setting ON state. %s: Switch title. */
 			_x( '%s. On', 'switch control' ),
-			accessibilityLabel
+			cellProps.label
 		) :
 		sprintf(
 			/* translators: accessibility text. Switch setting OFF state. %s: Switch title. */
 			_x( '%s. Off', 'switch control' ),
-			accessibilityLabel
+			cellProps.label
 		);
 
 	return (

@@ -153,10 +153,6 @@ class ModalLinkUI extends Component {
 					onChangeValue={ this.onChangeText }
 				/>
 				<BottomSheet.SwitchCell
-					accessibilityLabel={
-							/* translators: accessibility text. "Open in New Tab" switch setting. */
-							__( 'Open in New Tab' ) 
-					}
 					icon={ 'external' }
 					label={ __( 'Open in New Tab' ) }
 					value={ this.state.opensInNewWindow }

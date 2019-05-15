@@ -124,7 +124,7 @@ export default class Cell extends Component {
 		};
 
 		const getAccessibilityLabel = () => {
-			if ( ! showValue ) {
+			if ( accessibilityLabel || ! showValue ) {
 				return accessibilityLabel || label;
 			}
 			return isEmpty( value ) ?
