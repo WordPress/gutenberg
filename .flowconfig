@@ -94,6 +94,8 @@ module.name_mapper='^[./a-zA-Z0-9$_-]+\.\(bmp\|gif\|jpg\|jpeg\|png\|psd\|svg\|we
 ; mock/ignore style files
 module.name_mapper='.*\(.scss\)' -> 'empty/object'
 
+server.max_workers=4
+
 suppress_type=$FlowIssue
 suppress_type=$FlowFixMe
 suppress_type=$FlowFixMeProps
