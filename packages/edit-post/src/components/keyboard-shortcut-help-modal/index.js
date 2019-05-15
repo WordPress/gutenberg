@@ -40,7 +40,12 @@ const mapKeyCombination = ( keyCombination ) => keyCombination.map( ( character,
 } );
 
 const ShortcutList = ( { shortcuts } ) => (
-	<ul className="edit-post-keyboard-shortcut-help__shortcut-list">
+	/*
+	 * Disable reason: The `list` ARIA role is redundant but
+	 * Safari+VoiceOver won't announce the list otherwise.
+	 */
+	/* eslint-disable jsx-a11y/no-redundant-roles */
+	<ul className="edit-post-keyboard-shortcut-help__shortcut-list" role="list">
 		{ shortcuts.map( ( { keyCombination, description, ariaLabel }, index ) => (
 			<li
 				className="edit-post-keyboard-shortcut-help__shortcut"
