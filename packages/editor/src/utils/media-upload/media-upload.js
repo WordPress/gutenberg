@@ -152,7 +152,7 @@ export async function mediaUpload( {
 		if ( mediaFile.size <= 0 ) {
 			triggerError( {
 				code: 'EMPTY_FILE',
-				message: __( 'This file is empty.' ),
+				message: __( 'This file is empty. Please try another.' ),
 				file: mediaFile,
 			} );
 			continue;
