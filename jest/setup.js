@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { NativeModules } from 'react-native';
+
 jest.mock( '../react-native-gutenberg-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
@@ -36,3 +41,22 @@ if ( ! global.window.matchMedia ) {
 		removeListener: () => {},
 	} );
 }
+
+// Overwrite some native module mocks from `react-native` jest preset:
+// https://github.com/facebook/react-native/blob/master/jest/setup.js
+// to fix issue "TypeError: Cannot read property 'Commands' of undefined"
+// raised when calling focus or blur on a native component
+const mockNativeModules = {
+	UIManager: {
+		...NativeModules.UIManager,
+		getViewManagerConfig: jest.fn( () => ( { Commands: {} } ) ),
+	},
+};
+
+Object.keys( mockNativeModules ).forEach( ( module ) => {
+	try {
+		jest.doMock( module, () => mockNativeModules[ module ] ); // needed by FacebookSDK-test
+	} catch ( error ) {
+		jest.doMock( module, () => mockNativeModules[ module ], { virtual: true } );
+	}
+} );

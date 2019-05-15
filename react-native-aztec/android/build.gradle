@@ -12,7 +12,7 @@ buildscript {
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
 
-        aztecVersion = 'v1.3.26'
+        aztecVersion = 'gb-stray-selection-fix-try1'
     }
 
     repositories {
