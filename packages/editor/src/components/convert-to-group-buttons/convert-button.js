@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ export function ConvertToGroupButton( {
 					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 					icon={ Group }
 					onClick={ onConvertToGroup }
+					shortcut={ displayShortcut.primaryAlt( 'g' ) }
 				>
 					{ __( 'Group' ) }
 				</MenuItem>
@@ -40,6 +42,7 @@ export function ConvertToGroupButton( {
 					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 					icon={ UnGroup }
 					onClick={ onUnCovertFromGroup }
+					shortcut={ displayShortcut.secondary( 'g' ) }
 				>
 					{ __( 'Ungroup' ) }
 				</MenuItem>
