@@ -118,6 +118,14 @@ const blockShortcuts = {
 			/* translators: The forward-slash character. e.g. '/'. */
 			ariaLabel: __( 'Forward-slash' ),
 		},
+		{
+			keyCombination: primaryAlt( 'G' ),
+			description: __( 'Group the selected blocks.' ),
+		},
+		{
+			keyCombination: secondary( 'G' ),
+			description: __( 'Ungroup the selected blocks.' ),
+		},
 	],
 };
 
