@@ -6,7 +6,7 @@ import { Switch } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { _x, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -16,6 +16,7 @@ export default function SwitchCell( props ) {
 	const {
 		value,
 		onValueChange,
+		accessibilityLabel,
 		...cellProps
 	} = props;
 
@@ -23,9 +24,22 @@ export default function SwitchCell( props ) {
 		onValueChange( ! value );
 	};
 
+	const finalAccessibilityLabel = value ?
+		sprintf(
+			/* translators: accessibility text. Switch setting ON state. %s: Switch title. */
+			_x( '%s. On', 'switch control' ),
+			accessibilityLabel
+		) :
+		sprintf(
+			/* translators: accessibility text. Switch setting OFF state. %s: Switch title. */
+			_x( '%s. Off', 'switch control' ),
+			accessibilityLabel
+		);
+
 	return (
 		<Cell
 			{ ...cellProps }
+			accessibilityLabel={ finalAccessibilityLabel }
 			accessibilityRole={ 'none' }
 			accessibilityHint={
 				/* translators: accessibility text (hint for switches) */
