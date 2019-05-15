@@ -73,9 +73,8 @@ export class BlockSwitcher extends Component {
 						disabled
 						className="editor-block-switcher__no-switcher-icon block-editor-block-switcher__no-switcher-icon"
 						label={ __( 'Block icon' ) }
-					>
-						<BlockIcon icon={ icon } showColors />
-					</IconButton>
+						icon={ <BlockIcon icon={ icon } showColors /> }
+					/>
 				</Toolbar>
 			);
 		}

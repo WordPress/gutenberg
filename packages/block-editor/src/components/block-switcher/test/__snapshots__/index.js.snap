@@ -5,13 +5,14 @@ exports[`BlockSwitcher should render disabled block switcher with multi block of
   <ForwardRef(IconButton)
     className="editor-block-switcher__no-switcher-icon block-editor-block-switcher__no-switcher-icon"
     disabled={true}
+    icon={
+      <BlockIcon
+        icon="layout"
+        showColors={true}
+      />
+    }
     label="Block icon"
-  >
-    <BlockIcon
-      icon="layout"
-      showColors={true}
-    />
-  </ForwardRef(IconButton)>
+  />
 </Toolbar>
 `;
 
