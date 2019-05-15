@@ -200,16 +200,6 @@ class ImageEdit extends React.Component {
 					keyboardType="url"
 				/>
 				<BottomSheet.Cell
-					accessibilityLabel={
-						isEmpty( alt ) ?
-							/* translators: accessibility text. Empty "Alt" image setting. */
-							__( 'Alt Text. Empty' ) :
-							sprintf(
-								/* translators: accessibility text. %s: Alt image seting value. */
-								__( 'Alt Text. %s' ),
-								alt
-							)
-					}
 					icon={ 'editor-textcolor' }
 					label={ __( 'Alt Text' ) }
 					value={ alt || '' }

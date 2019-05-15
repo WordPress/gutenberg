@@ -23,7 +23,7 @@ export default function SwitchCell( props ) {
 		onValueChange( ! value );
 	};
 
-	const finalAccessibilityLabel = value ?
+	const accessibilityLabel = value ?
 		sprintf(
 			/* translators: accessibility text. Switch setting ON state. %s: Switch title. */
 			_x( '%s. On', 'switch control' ),
@@ -38,7 +38,7 @@ export default function SwitchCell( props ) {
 	return (
 		<Cell
 			{ ...cellProps }
-			accessibilityLabel={ finalAccessibilityLabel }
+			accessibilityLabel={ accessibilityLabel }
 			accessibilityRole={ 'none' }
 			accessibilityHint={
 				/* translators: accessibility text (hint for switches) */
