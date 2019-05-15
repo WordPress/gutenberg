@@ -25,6 +25,7 @@ module.exports = function( api ) {
 						'@babel/plugin-transform-react-jsx',
 						{
 							pragma: 'createElement',
+							pragmaFrag: 'Fragment',
 						},
 					],
 				],
@@ -33,9 +34,10 @@ module.exports = function( api ) {
 			{ // Auto-add `import { createElement } from '@wordpress/element';` when JSX is found
 				plugins: [
 					[
-						'@wordpress/babel-plugin-import-jsx-pragma',
+						'./gutenberg/packages/babel-plugin-import-jsx-pragma',
 						{
 							scopeVariable: 'createElement',
+							scopeVariableFrag: 'Fragment',
 							source: '@wordpress/element',
 							isDefault: false,
 						},

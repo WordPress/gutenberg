@@ -41,6 +41,7 @@
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		CF45443564B845C8BDCFBAB6 /* libRNTAztecView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ADEFEC092CF4D00BEF1019E /* libRNTAztecView.a */; };
 		DD2AE937473A49B2B5A0E7B6 /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EB766FE2F6D446A80AC6E6A /* libRNSVG.a */; };
+		E7502A18084B44E7AB172B10 /* libRCTVideo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D53EF8FEF024C98A7AC9A56 /* libRCTVideo.a */; };
 		F1289ECB2100E4320091E81D /* Aztec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1289ECA2100E4320091E81D /* Aztec.framework */; };
 		F151983C2100DC3D000F6E97 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15198392100DC3D000F6E97 /* AppDelegate.swift */; };
 		F151983D2100DC3D000F6E97 /* MediaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F151983A2100DC3D000F6E97 /* MediaProvider.swift */; };
@@ -315,6 +316,20 @@
 			remoteGlobalIDString = 6DA7B8031F692C4C00FD1D50;
 			remoteInfo = RNSafeArea;
 		};
+		919386EF225DEDFD00E4FBD6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24AEC4495B174D4C9E96E630 /* RCTVideo.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RCTVideo;
+		};
+		919386F1225DEDFD00E4FBD6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24AEC4495B174D4C9E96E630 /* RCTVideo.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 641E28441F0EEC8500443AF6;
+			remoteInfo = "RCTVideo-tvOS";
+		};
 		91C2E1B222422C9F00D5E1F5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 91C2E1AE22422C9F00D5E1F5 /* RNTKeyboardAwareScrollView.xcodeproj */;
@@ -411,10 +426,12 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = gutenberg/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = gutenberg/Info.plist; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
+		24AEC4495B174D4C9E96E630 /* RCTVideo.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTVideo.xcodeproj; path = "../node_modules/react-native-video/ios/RCTVideo.xcodeproj"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* gutenberg-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gutenberg-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* gutenberg-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gutenberg-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3ADEFEC092CF4D00BEF1019E /* libRNTAztecView.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNTAztecView.a; sourceTree = "<group>"; };
+		3D53EF8FEF024C98A7AC9A56 /* libRCTVideo.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTVideo.a; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		69F3DF692A7C4E5994CD3CBB /* libRNSafeArea.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSafeArea.a; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
@@ -422,6 +439,8 @@
 		7EA30CF021AC8CDA0092F894 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
 		7EC7328E21907E3F00FED2E6 /* GutenbergViewController.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = GutenbergViewController.swift; path = gutenberg/GutenbergViewController.swift; sourceTree = "<group>"; tabWidth = 1; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
+		9193870E2260BA5500E4FBD6 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		9193873C2260BA7800E4FBD6 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		91C2E1AE22422C9F00D5E1F5 /* RNTKeyboardAwareScrollView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNTKeyboardAwareScrollView.xcodeproj; path = "../node_modules/react-native-keyboard-aware-scroll-view/ios/RNTKeyboardAwareScrollView.xcodeproj"; sourceTree = "<group>"; };
 		9B18D59B9364468890D0E546 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSVG.xcodeproj; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; };
 		9BFAFEB337654221B2F14D03 /* libRNSVG-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNSVG-tvOS.a"; sourceTree = "<group>"; };
@@ -475,6 +494,7 @@
 				CF45443564B845C8BDCFBAB6 /* libRNTAztecView.a in Frameworks */,
 				7E45CC5B218B42E000C0B2AB /* libRNReactNativeGutenbergBridge.a in Frameworks */,
 				16AEBAC87CB24520ADA106D7 /* libRNSafeArea.a in Frameworks */,
+				E7502A18084B44E7AB172B10 /* libRCTVideo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -628,6 +648,8 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9193873C2260BA7800E4FBD6 /* CoreServices.framework */,
+				9193870E2260BA5500E4FBD6 /* MobileCoreServices.framework */,
 				FF37F8D0223819FA00AFA3DB /* JavaScriptCore.framework */,
 				7EA30CF021AC8CDA0092F894 /* libxml2.tbd */,
 				F1289ECA2100E4320091E81D /* Aztec.framework */,
@@ -682,6 +704,7 @@
 				F619623252704B46A619C33C /* RNTAztecView.xcodeproj */,
 				9B18D59B9364468890D0E546 /* RNSVG.xcodeproj */,
 				E74B8C5507C34F8DBD70AECC /* RNSafeArea.xcodeproj */,
+				24AEC4495B174D4C9E96E630 /* RCTVideo.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -730,6 +753,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		919386EB225DEDFD00E4FBD6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				919386F0225DEDFD00E4FBD6 /* libRCTVideo.a */,
+				919386F2225DEDFD00E4FBD6 /* libRCTVideo.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		91C2E1AF22422C9F00D5E1F5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -754,6 +786,7 @@
 				0EB766FE2F6D446A80AC6E6A /* libRNSVG.a */,
 				9BFAFEB337654221B2F14D03 /* libRNSVG-tvOS.a */,
 				69F3DF692A7C4E5994CD3CBB /* libRNSafeArea.a */,
+				3D53EF8FEF024C98A7AC9A56 /* libRCTVideo.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -951,6 +984,10 @@
 				{
 					ProductGroup = 00C302E01ABCB9EE00DB3ED1 /* Products */;
 					ProjectRef = 00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */;
+				},
+				{
+					ProductGroup = 919386EB225DEDFD00E4FBD6 /* Products */;
+					ProjectRef = 24AEC4495B174D4C9E96E630 /* RCTVideo.xcodeproj */;
 				},
 				{
 					ProductGroup = 139FDEE71B06529A00C62182 /* Products */;
@@ -1230,6 +1267,20 @@
 			remoteRef = 9161EFC721D277D300314043 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		919386F0225DEDFD00E4FBD6 /* libRCTVideo.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTVideo.a;
+			remoteRef = 919386EF225DEDFD00E4FBD6 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		919386F2225DEDFD00E4FBD6 /* libRCTVideo.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTVideo.a;
+			remoteRef = 919386F1225DEDFD00E4FBD6 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		91C2E1B322422C9F00D5E1F5 /* libRNTKeyboardAwareScrollView.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1448,12 +1499,14 @@
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-safe-area/ios/RNSafeArea",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = gutenbergTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1479,12 +1532,14 @@
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-safe-area/ios/RNSafeArea",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = gutenbergTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1515,6 +1570,7 @@
 					"$(SRCROOT)/../react-native-gutenberg-bridge/ios/**",
 					"$(SRCROOT)/../react-native-aztec/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-safe-area/ios/RNSafeArea",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -1552,6 +1608,7 @@
 					"$(SRCROOT)/../react-native-gutenberg-bridge/ios/**",
 					"$(SRCROOT)/../react-native-aztec/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-safe-area/ios/RNSafeArea",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -1590,11 +1647,13 @@
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-safe-area/ios/RNSafeArea",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = "gutenberg-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1629,11 +1688,13 @@
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-safe-area/ios/RNSafeArea",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = "gutenberg-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1667,11 +1728,13 @@
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-safe-area/ios/RNSafeArea",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = "gutenberg-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1705,11 +1768,13 @@
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-safe-area/ios/RNSafeArea",
+					"$(SRCROOT)/../node_modules/react-native-video/ios/**",
 				);
 				INFOPLIST_FILE = "gutenberg-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
