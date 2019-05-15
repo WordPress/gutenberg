@@ -2,13 +2,14 @@
  * External dependencies
  */
 import { TouchableOpacity, Text, View, TextInput, I18nManager } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Dashicon } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -122,10 +123,29 @@ export default class Cell extends Component {
 			);
 		};
 
+		const getAccessibilityLabel = () => {
+			if ( ! showValue ) {
+				return accessibilityLabel || label;
+			}
+			return isEmpty( value ) ?
+				sprintf(
+					/* translators: accessibility text. Empty state of a inline textinput cell. %s: The cell's title */
+					_x( '%s. Empty', 'inline textinput cell' ),
+					label
+				) :
+				// Separating by ',' is necessary to make a pause on urls (non-capitalized text)
+				sprintf(
+					/* translators: accessibility text. Inline textinput title and value.%1: Cell title, %2: cell value. */
+					_x( '%1$s, %2$s', 'inline textinput cell' ),
+					label,
+					value
+				);
+		}
+
 		return (
 			<TouchableOpacity
 				accessible={ ! this.state.isEditingValue }
-				accessibilityLabel={ accessibilityLabel || label }
+				accessibilityLabel={ getAccessibilityLabel() }
 				accessibilityRole={ accessibilityRole || 'button' }
 				accessibilityHint={ isValueEditable ?
 					/* translators: accessibility text */

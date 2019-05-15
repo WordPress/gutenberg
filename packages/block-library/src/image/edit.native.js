@@ -190,16 +190,6 @@ class ImageEdit extends React.Component {
 				hideHeader
 			>
 				<BottomSheet.Cell
-					accessibilityLabel={
-						isEmpty( href ) ?
-							/* translators: accessibility text. Empty "Link To" image setting. */
-							__( 'Link To. Empty' ) :
-							sprintf(
-								/* translators: accessibility text. %s: an URL address (i.e. example.com). */
-								__( 'Link To. %s' ),
-								href
-							)
-					}
 					icon={ 'admin-links' }
 					label={ __( 'Link To' ) }
 					value={ href || '' }
@@ -207,6 +197,7 @@ class ImageEdit extends React.Component {
 					onChangeValue={ this.onSetLinkDestination }
 					autoCapitalize="none"
 					autoCorrect={ false }
+					keyboardType="url"
 				/>
 				<BottomSheet.Cell
 					accessibilityLabel={

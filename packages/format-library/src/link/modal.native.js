@@ -134,16 +134,6 @@ class ModalLinkUI extends Component {
 			>
 				{ /* eslint-disable jsx-a11y/no-autofocus */
 					<BottomSheet.Cell
-						accessibilityLabel={
-							isEmpty( inputValue ) ?
-								/* translators: accessibility text. Empty URL address. */
-								__( 'URL. Empty' ) :
-								sprintf(
-									/* translators: accessibility text. %s: an URL address (i.e. example.com). */
-									__( 'URL. %s' ),
-									capitalize( inputValue )
-								)
-						}
 						icon={ 'admin-links' }
 						label={ __( 'URL' ) }
 						value={ this.state.inputValue }
@@ -156,16 +146,6 @@ class ModalLinkUI extends Component {
 					/>
 				/* eslint-enable jsx-a11y/no-autofocus */ }
 				<BottomSheet.Cell
-					accessibilityLabel={
-						isEmpty( text ) ?
-							/* translators: accessibility text. Empty Link Text. A setting of a text with web link attribute. */
-							__( 'Link Text. Empty' ) :
-							sprintf(
-								/* translators: accessibility text. %s: a text with web link attribute. */
-								__( 'Link Text. %s' ),
-								text
-							)
-					}
 					icon={ 'editor-textcolor' }
 					label={ __( 'Link Text' ) }
 					value={ text }
