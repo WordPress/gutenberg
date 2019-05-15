@@ -316,6 +316,11 @@ export class RichText extends Component {
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 	onChange( event ) {
+		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
+		// On iOS, onChange can be triggered after selection changes, even though there are no content changes.
+		if ( contentWithoutRootTag === this.value ) {
+			return;
+		}
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = true; // the onChange event always fires after the fact
