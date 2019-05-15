@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash';
  */
 import { Dashicon } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -140,7 +140,7 @@ export default class Cell extends Component {
 					label,
 					value
 				);
-		}
+		};
 
 		return (
 			<TouchableOpacity

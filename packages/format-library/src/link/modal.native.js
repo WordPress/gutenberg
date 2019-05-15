@@ -3,12 +3,11 @@
  */
 import React from 'react';
 import { Platform } from 'react-native';
-import { capitalize, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { BottomSheet } from '@wordpress/block-editor';
 import { prependHTTP } from '@wordpress/url';
@@ -124,7 +123,7 @@ class ModalLinkUI extends Component {
 
 	render() {
 		const { isVisible } = this.props;
-		const { inputValue, text } = this.state;
+		const { text } = this.state;
 
 		return (
 			<BottomSheet
