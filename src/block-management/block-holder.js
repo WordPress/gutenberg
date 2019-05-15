@@ -213,7 +213,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 
 		const blockType = getBlockType( name );
 		if ( blockType.getAccessibilityLabel ) {
-			const blockAccessibilityLabel = blockType.getAccessibilityLabel( attributes ) || '';
+			const blockAccessibilityLabel = blockType.__experimentalGetAccessibilityLabel( attributes ) || '';
 			return blockName + ( blockAccessibilityLabel ? '. ' + blockAccessibilityLabel : '' );
 		}
 
