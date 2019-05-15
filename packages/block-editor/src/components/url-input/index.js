@@ -11,7 +11,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
-import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
+import { BaseControl, Spinner, withSpokenMessages, Popover } from '@wordpress/components';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
@@ -224,17 +224,23 @@ class URLInput extends Component {
 	}
 
 	render() {
-		const { value = '', autoFocus = true, instanceId, className } = this.props;
+		const { label, value = '', autoFocus = true, instanceId, className } = this.props;
 		const { showSuggestions, suggestions, selectedSuggestion, loading } = this.state;
+		const id = `inspector-url-input-control-${ instanceId }`;
 
 		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
 		const suggestionOptionIdPrefix = `block-editor-url-input-suggestion-${ instanceId }`;
 
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<div className={ classnames( 'editor-url-input block-editor-url-input', className ) }>
+			<BaseControl
+				label={ label }
+				id={ id }
+				className={ classnames( 'editor-url-input block-editor-url-input', className ) }
+			>
 				<input
 					autoFocus={ autoFocus }
+					id={ id }
 					type="text"
 					aria-label={ __( 'URL' ) }
 					required
@@ -280,7 +286,7 @@ class URLInput extends Component {
 						</div>
 					</Popover>
 				}
-			</div>
+			</BaseControl>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
 	}
