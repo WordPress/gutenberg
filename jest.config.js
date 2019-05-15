@@ -22,7 +22,7 @@ module.exports = {
 	],
 	testEnvironment: 'jsdom',
 	testMatch: [
-		'**/__native_tests__/**/*.[jt]s?(x)',
+		'**/test/**/*.native.[jt]s?(x)',
 		'<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
 		'<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
 	],
