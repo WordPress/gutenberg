@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import Tokenizer from 'simple-html-tokenizer/dist/es6/tokenizer';
+import { Tokenizer } from 'simple-html-tokenizer';
 import {
 	identity,
 	xor,
@@ -170,8 +170,8 @@ const TEXT_NORMALIZATIONS = [
  * references.every( ( reference ) => /^[\da-z]+$/i.test( reference ) )
  * ```
  *
- * @link https://html.spec.whatwg.org/multipage/syntax.html#character-references
- * @link https://html.spec.whatwg.org/multipage/named-characters.html#named-character-references
+ * @see https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ * @see https://html.spec.whatwg.org/multipage/named-characters.html#named-character-references
  *
  * @type {RegExp}
  */
@@ -183,7 +183,7 @@ const REGEXP_NAMED_CHARACTER_REFERENCE = /^[\da-z]+$/i;
  * "The ampersand must be followed by a U+0023 NUMBER SIGN character (#),
  * followed by one or more ASCII digits, representing a base-ten integer"
  *
- * @link https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ * @see https://html.spec.whatwg.org/multipage/syntax.html#character-references
  *
  * @type {RegExp}
  */
@@ -197,7 +197,7 @@ const REGEXP_DECIMAL_CHARACTER_REFERENCE = /^#\d+$/;
  * U+0058 LATIN CAPITAL LETTER X character (X), which must then be followed by
  * one or more ASCII hex digits, representing a hexadecimal integer"
  *
- * @link https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ * @see https://html.spec.whatwg.org/multipage/syntax.html#character-references
  *
  * @type {RegExp}
  */

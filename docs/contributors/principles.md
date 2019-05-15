@@ -1,6 +1,6 @@
 # Principles
 
-First, let’s look at the big picture. If the architectural and UX principles described here are activated at scale, how will Gutenberg improve and transform both users and creators experiences?
+First, let’s look at the big picture. If the architectural and UX principles described here are activated at scale, how will the Gutenberg project improve and transform both users and creators experiences?
 
 How Gutenberg can transform the *user experience*:
 

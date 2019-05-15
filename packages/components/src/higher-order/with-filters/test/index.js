@@ -17,9 +17,8 @@ import { Component } from '@wordpress/element';
 import withFilters from '..';
 
 const assertExpectedHtml = ( wrapper, expectedHTML ) => {
-	/* eslint-disable react/no-find-dom-node */
+	// eslint-disable-next-line react/no-find-dom-node
 	const element = ReactDOM.findDOMNode( wrapper );
-	/* eslint-enable react/no-find-dom-node */
 	expect( element.outerHTML ).toBe( expectedHTML );
 };
 
@@ -42,13 +41,12 @@ describe( 'withFilters', () => {
 
 	afterEach( () => {
 		if ( wrapper ) {
-			/* eslint-disable react/no-find-dom-node */
+			// eslint-disable-next-line react/no-find-dom-node
 			ReactDOM.unmountComponentAtNode( ReactDOM.findDOMNode( wrapper ).parentNode );
 		}
 		if ( shallowWrapper ) {
 			shallowWrapper.unmount();
 		}
-		/* eslint-enable react/no-find-dom-node */
 		removeAllFilters( hookName );
 	} );
 
