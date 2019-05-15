@@ -1,6 +1,6 @@
 # Documentation Contributions
 
-Documentation for Gutenberg is maintained in the `/docs/` directory in the same Gutenberg Github repository. The docs are published every 15 minutes to the [Gutenberg Handbook site](https://wordpress.org/gutenberg/handbook/).
+Documentation for Gutenberg is maintained in the `/docs/` directory in the same Gutenberg Github repository. The docs are published every 15 minutes to the [Block Editor Handbook on DevHub](http://developer.wordpress.org/block-editor/).
 
 ## New Document
 
