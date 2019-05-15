@@ -20,7 +20,7 @@ cache:
 
 branches:
   only:
-    - master
+    - wp/5.2
 
 before_install:
   - nvm install
