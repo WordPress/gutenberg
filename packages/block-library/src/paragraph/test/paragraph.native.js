@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import Paragraph from '../edit.native.js';
+import Paragraph from '../edit';
 
 /**
  * WordPress dependencies
