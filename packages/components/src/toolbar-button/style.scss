@@ -10,7 +10,7 @@
 	height: $icon-button-size;
 
 	// Unset icon button styles
-	&:active,
+	&:not([aria-disabled="true"]):not(.is-default):active,
 	&:not([aria-disabled="true"]):hover,
 	&:not([aria-disabled="true"]):focus {
 		outline: none;

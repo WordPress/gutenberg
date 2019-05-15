@@ -134,9 +134,10 @@ function gutenberg_create_wp_area_post_type() {
 	register_post_type(
 		'wp_area',
 		array(
+			'description'  => __( 'Experimental custom post type that will store block areas referenced by themes.', 'gutenberg' ),
 			'labels'       => array(
-				'name'                     => _x( 'Block Area', 'post type general name', 'gutenberg' ),
-				'singular_name'            => _x( 'Block Area', 'post type singular name', 'gutenberg' ),
+				'name'                     => _x( 'Block Area (Experimental)', 'post type general name', 'gutenberg' ),
+				'singular_name'            => _x( 'Block Area (Experimental)', 'post type singular name', 'gutenberg' ),
 				'menu_name'                => _x( 'Block Areas', 'admin menu', 'gutenberg' ),
 				'name_admin_bar'           => _x( 'Block Area', 'add new on admin bar', 'gutenberg' ),
 				'add_new'                  => _x( 'Add New', 'Block', 'gutenberg' ),
