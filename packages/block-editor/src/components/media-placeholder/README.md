@@ -65,6 +65,13 @@ Class name added to the placeholder.
 - Type: `String`
 - Required: No
 
+### icon
+
+Icon to display left of the title. When passed as a `String`, the icon will be resolved as a [Dashicon](https://developer.wordpress.org/resource/dashicons/). Alternatively, you can pass in a `WPComponent` such as `BlockIcon`to render instead.
+
+- Type: `String|WPComponent`
+- Required: No
+
 ### isAppender
 
 If true, the property changes the look of the placeholder to be adequate to scenarios where new files are added to an already existing set of files, e.g., adding files to a gallery.

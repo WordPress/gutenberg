@@ -15,7 +15,7 @@ module.exports = {
 	context: __dirname,
 	entry: './entry',
 	output: {
-		filename: 'build/[basename].js',
+		filename: 'build/[basename]-[theanswertolife].js',
 		path: __dirname,
 	},
 	plugins: [
@@ -31,6 +31,9 @@ module.exports = {
 				}
 
 				return path;
+			},
+			theanswertolife() {
+				return 42;
 			},
 		} ),
 	],
