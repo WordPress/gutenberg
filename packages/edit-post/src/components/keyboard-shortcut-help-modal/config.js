@@ -119,11 +119,11 @@ const blockShortcuts = {
 			ariaLabel: __( 'Forward-slash' ),
 		},
 		{
-			keyCombination: primaryAlt( 'G' ),
+			keyCombination: primaryAlt( 'g' ),
 			description: __( 'Group the selected blocks.' ),
 		},
 		{
-			keyCombination: secondary( 'G' ),
+			keyCombination: secondary( 'g' ),
 			description: __( 'Ungroup the selected blocks.' ),
 		},
 	],
