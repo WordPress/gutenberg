@@ -202,3 +202,5 @@ function gutenberg_create_wp_area_post_type() {
 	);
 }
 add_action( 'init', 'gutenberg_create_wp_area_post_type' );
+
+add_filter( 'sidebars_widgets', 'Experimental_WP_Widget_Blocks_Manager::gutenberg_swap_out_sidebars_blocks_for_block_widgets' );
