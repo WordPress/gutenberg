@@ -15,7 +15,6 @@ import {
 	Children,
 	Component,
 	cloneElement,
-	Fragment,
 	isEmptyElement,
 } from '@wordpress/element';
 
@@ -83,9 +82,9 @@ class SlotComponent extends Component {
 		);
 
 		return (
-			<Fragment>
+			<>
 				{ isFunction( children ) ? children( fills ) : fills }
-			</Fragment>
+			</>
 		);
 	}
 }

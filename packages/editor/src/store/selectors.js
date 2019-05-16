@@ -1164,56 +1164,267 @@ function getBlockEditorSelector( name ) {
 	} );
 }
 
+/**
+ * @see getBlockDependantsCacheBust in core/block-editor store.
+ */
 export const getBlockDependantsCacheBust = getBlockEditorSelector( 'getBlockDependantsCacheBust' );
+
+/**
+ * @see getBlockName in core/block-editor store.
+ */
 export const getBlockName = getBlockEditorSelector( 'getBlockName' );
+
+/**
+ * @see isBlockValid in core/block-editor store.
+ */
 export const isBlockValid = getBlockEditorSelector( 'isBlockValid' );
+
+/**
+ * @see getBlockAttributes in core/block-editor store.
+ */
 export const getBlockAttributes = getBlockEditorSelector( 'getBlockAttributes' );
+
+/**
+ * @see getBlock in core/block-editor store.
+ */
 export const getBlock = getBlockEditorSelector( 'getBlock' );
+
+/**
+ * @see getBlocks in core/block-editor store.
+ */
 export const getBlocks = getBlockEditorSelector( 'getBlocks' );
+
+/**
+ * @see __unstableGetBlockWithoutInnerBlocks in core/block-editor store.
+ */
 export const __unstableGetBlockWithoutInnerBlocks = getBlockEditorSelector( '__unstableGetBlockWithoutInnerBlocks' );
+
+/**
+ * @see getClientIdsOfDescendants in core/block-editor store.
+ */
 export const getClientIdsOfDescendants = getBlockEditorSelector( 'getClientIdsOfDescendants' );
+
+/**
+ * @see getClientIdsWithDescendants in core/block-editor store.
+ */
 export const getClientIdsWithDescendants = getBlockEditorSelector( 'getClientIdsWithDescendants' );
+
+/**
+ * @see getGlobalBlockCount in core/block-editor store.
+ */
 export const getGlobalBlockCount = getBlockEditorSelector( 'getGlobalBlockCount' );
+
+/**
+ * @see getBlocksByClientId in core/block-editor store.
+ */
 export const getBlocksByClientId = getBlockEditorSelector( 'getBlocksByClientId' );
+
+/**
+ * @see getBlockCount in core/block-editor store.
+ */
 export const getBlockCount = getBlockEditorSelector( 'getBlockCount' );
+
+/**
+ * @see getBlockSelectionStart in core/block-editor store.
+ */
 export const getBlockSelectionStart = getBlockEditorSelector( 'getBlockSelectionStart' );
+
+/**
+ * @see getBlockSelectionEnd in core/block-editor store.
+ */
 export const getBlockSelectionEnd = getBlockEditorSelector( 'getBlockSelectionEnd' );
+
+/**
+ * @see getSelectedBlockCount in core/block-editor store.
+ */
 export const getSelectedBlockCount = getBlockEditorSelector( 'getSelectedBlockCount' );
+
+/**
+ * @see hasSelectedBlock in core/block-editor store.
+ */
 export const hasSelectedBlock = getBlockEditorSelector( 'hasSelectedBlock' );
+
+/**
+ * @see getSelectedBlockClientId in core/block-editor store.
+ */
 export const getSelectedBlockClientId = getBlockEditorSelector( 'getSelectedBlockClientId' );
+
+/**
+ * @see getSelectedBlock in core/block-editor store.
+ */
 export const getSelectedBlock = getBlockEditorSelector( 'getSelectedBlock' );
+
+/**
+ * @see getBlockRootClientId in core/block-editor store.
+ */
 export const getBlockRootClientId = getBlockEditorSelector( 'getBlockRootClientId' );
+
+/**
+ * @see getBlockHierarchyRootClientId in core/block-editor store.
+ */
 export const getBlockHierarchyRootClientId = getBlockEditorSelector( 'getBlockHierarchyRootClientId' );
+
+/**
+ * @see getAdjacentBlockClientId in core/block-editor store.
+ */
 export const getAdjacentBlockClientId = getBlockEditorSelector( 'getAdjacentBlockClientId' );
+
+/**
+ * @see getPreviousBlockClientId in core/block-editor store.
+ */
 export const getPreviousBlockClientId = getBlockEditorSelector( 'getPreviousBlockClientId' );
+
+/**
+ * @see getNextBlockClientId in core/block-editor store.
+ */
 export const getNextBlockClientId = getBlockEditorSelector( 'getNextBlockClientId' );
+
+/**
+ * @see getSelectedBlocksInitialCaretPosition in core/block-editor store.
+ */
 export const getSelectedBlocksInitialCaretPosition = getBlockEditorSelector( 'getSelectedBlocksInitialCaretPosition' );
+
+/**
+ * @see getMultiSelectedBlockClientIds in core/block-editor store.
+ */
 export const getMultiSelectedBlockClientIds = getBlockEditorSelector( 'getMultiSelectedBlockClientIds' );
+
+/**
+ * @see getMultiSelectedBlocks in core/block-editor store.
+ */
 export const getMultiSelectedBlocks = getBlockEditorSelector( 'getMultiSelectedBlocks' );
+
+/**
+ * @see getFirstMultiSelectedBlockClientId in core/block-editor store.
+ */
 export const getFirstMultiSelectedBlockClientId = getBlockEditorSelector( 'getFirstMultiSelectedBlockClientId' );
+
+/**
+ * @see getLastMultiSelectedBlockClientId in core/block-editor store.
+ */
 export const getLastMultiSelectedBlockClientId = getBlockEditorSelector( 'getLastMultiSelectedBlockClientId' );
+
+/**
+ * @see isFirstMultiSelectedBlock in core/block-editor store.
+ */
 export const isFirstMultiSelectedBlock = getBlockEditorSelector( 'isFirstMultiSelectedBlock' );
+
+/**
+ * @see isBlockMultiSelected in core/block-editor store.
+ */
 export const isBlockMultiSelected = getBlockEditorSelector( 'isBlockMultiSelected' );
+
+/**
+ * @see isAncestorMultiSelected in core/block-editor store.
+ */
 export const isAncestorMultiSelected = getBlockEditorSelector( 'isAncestorMultiSelected' );
+
+/**
+ * @see getMultiSelectedBlocksStartClientId in core/block-editor store.
+ */
 export const getMultiSelectedBlocksStartClientId = getBlockEditorSelector( 'getMultiSelectedBlocksStartClientId' );
+
+/**
+ * @see getMultiSelectedBlocksEndClientId in core/block-editor store.
+ */
 export const getMultiSelectedBlocksEndClientId = getBlockEditorSelector( 'getMultiSelectedBlocksEndClientId' );
+
+/**
+ * @see getBlockOrder in core/block-editor store.
+ */
 export const getBlockOrder = getBlockEditorSelector( 'getBlockOrder' );
+
+/**
+ * @see getBlockIndex in core/block-editor store.
+ */
 export const getBlockIndex = getBlockEditorSelector( 'getBlockIndex' );
+
+/**
+ * @see isBlockSelected in core/block-editor store.
+ */
 export const isBlockSelected = getBlockEditorSelector( 'isBlockSelected' );
+
+/**
+ * @see hasSelectedInnerBlock in core/block-editor store.
+ */
 export const hasSelectedInnerBlock = getBlockEditorSelector( 'hasSelectedInnerBlock' );
+
+/**
+ * @see isBlockWithinSelection in core/block-editor store.
+ */
 export const isBlockWithinSelection = getBlockEditorSelector( 'isBlockWithinSelection' );
+
+/**
+ * @see hasMultiSelection in core/block-editor store.
+ */
 export const hasMultiSelection = getBlockEditorSelector( 'hasMultiSelection' );
+
+/**
+ * @see isMultiSelecting in core/block-editor store.
+ */
 export const isMultiSelecting = getBlockEditorSelector( 'isMultiSelecting' );
+
+/**
+ * @see isSelectionEnabled in core/block-editor store.
+ */
 export const isSelectionEnabled = getBlockEditorSelector( 'isSelectionEnabled' );
+
+/**
+ * @see getBlockMode in core/block-editor store.
+ */
 export const getBlockMode = getBlockEditorSelector( 'getBlockMode' );
+
+/**
+ * @see isTyping in core/block-editor store.
+ */
 export const isTyping = getBlockEditorSelector( 'isTyping' );
+
+/**
+ * @see isCaretWithinFormattedText in core/block-editor store.
+ */
 export const isCaretWithinFormattedText = getBlockEditorSelector( 'isCaretWithinFormattedText' );
+
+/**
+ * @see getBlockInsertionPoint in core/block-editor store.
+ */
 export const getBlockInsertionPoint = getBlockEditorSelector( 'getBlockInsertionPoint' );
+
+/**
+ * @see isBlockInsertionPointVisible in core/block-editor store.
+ */
 export const isBlockInsertionPointVisible = getBlockEditorSelector( 'isBlockInsertionPointVisible' );
+
+/**
+ * @see isValidTemplate in core/block-editor store.
+ */
 export const isValidTemplate = getBlockEditorSelector( 'isValidTemplate' );
+
+/**
+ * @see getTemplate in core/block-editor store.
+ */
 export const getTemplate = getBlockEditorSelector( 'getTemplate' );
+
+/**
+ * @see getTemplateLock in core/block-editor store.
+ */
 export const getTemplateLock = getBlockEditorSelector( 'getTemplateLock' );
+
+/**
+ * @see canInsertBlockType in core/block-editor store.
+ */
 export const canInsertBlockType = getBlockEditorSelector( 'canInsertBlockType' );
+
+/**
+ * @see getInserterItems in core/block-editor store.
+ */
 export const getInserterItems = getBlockEditorSelector( 'getInserterItems' );
+
+/**
+ * @see hasInserterItems in core/block-editor store.
+ */
 export const hasInserterItems = getBlockEditorSelector( 'hasInserterItems' );
+
+/**
+ * @see getBlockListSettings in core/block-editor store.
+ */
 export const getBlockListSettings = getBlockEditorSelector( 'getBlockListSettings' );

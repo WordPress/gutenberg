@@ -120,11 +120,13 @@ class ParagraphEdit extends Component {
 				onAccessibilityTap={ this.props.onFocus }
 			>
 				<RichText
+					identifier="content"
 					tagName="p"
 					value={ content }
 					isSelected={ this.props.isSelected }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
+					deleteEnter={ true }
 					style={ style }
 					onChange={ ( nextContent ) => {
 						setAttributes( {

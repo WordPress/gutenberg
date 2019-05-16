@@ -1,3 +1,9 @@
+## Unreleased
+
+### Bug Fixes
+
+- Resolved an issue where only the value of the first matched tag would be produced.
+
 ## 1.1.0 (2018-07-12)
 
 ### Internal

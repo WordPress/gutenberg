@@ -120,7 +120,7 @@ export function isOfTypes( value, types ) {
  * Returns true if value is valid per the given block attribute schema type
  * definition, or false otherwise.
  *
- * @link https://json-schema.org/latest/json-schema-validation.html#rfc.section.6.1.1
+ * @see https://json-schema.org/latest/json-schema-validation.html#rfc.section.6.1.1
  *
  * @param {*}                       value Value to test.
  * @param {?(Array<string>|string)} type  Block attribute schema type.
@@ -135,7 +135,7 @@ export function isValidByType( value, type ) {
  * Returns true if value is valid per the given block attribute schema enum
  * definition, or false otherwise.
  *
- * @link https://json-schema.org/latest/json-schema-validation.html#rfc.section.6.1.2
+ * @see https://json-schema.org/latest/json-schema-validation.html#rfc.section.6.1.2
  *
  * @param {*}      value   Value to test.
  * @param {?Array} enumSet Block attribute schema enum.

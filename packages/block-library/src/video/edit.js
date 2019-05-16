@@ -23,7 +23,7 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { mediaUpload } from '@wordpress/editor';
-import { Component, Fragment, createRef } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	__,
 	sprintf,
@@ -126,6 +126,10 @@ class VideoEdit extends Component {
 		this.posterImageButton.current.focus();
 	}
 
+	getAutoplayHelp( checked ) {
+		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
+	}
+
 	render() {
 		const {
 			autoplay,
@@ -183,7 +187,7 @@ class VideoEdit extends Component {
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar>
 						<IconButton
@@ -200,6 +204,7 @@ class VideoEdit extends Component {
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ this.getAutoplayHelp }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }
@@ -294,7 +299,7 @@ class VideoEdit extends Component {
 						/>
 					) }
 				</figure>
-			</Fragment>
+			</>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
