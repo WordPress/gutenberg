@@ -150,6 +150,16 @@ If you’d like a template to follow:
 >
 > For more details, please see ____ and ____.
 
+## Teams
+
+Two GitHub teams are used in the project.
+
+* [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core): A team composed of people that are actively involved in the project: attending meetings regularly, participating in triage sessions, performing reviews regularly, working on features and bug fixes and performing plugin and npm releases.
+
+* [Gutenberg](https://github.com/orgs/WordPress/teams/gutenberg): A team composed of contributors with at least 2–3 meaningful contributions to the project.
+
+If you meet this criteria of several meaningful contributions having been accepted into the repository and would like to be added to the Gutenberg team, feel free to ask in the [#core-editor Slack channel](https://make.wordpress.org/chat/).
+
 ## Projects
 
 We use [GitHub projects](https://github.com/WordPress/gutenberg/projects) to keep track of details that aren't immediately actionable, but that we want to keep around for future reference.
