@@ -1,15 +1,25 @@
 /**
 * @format
 * @flow
- */
+*/
 
 /**
  * External dependencies
  */
 import React from 'react';
-import { Keyboard, NativeSyntheticEvent, NativeTouchEvent, Text, TouchableWithoutFeedback, View } from 'react-native';
+import {
+	View,
+	Text,
+	TouchableWithoutFeedback,
+	NativeSyntheticEvent,
+	NativeTouchEvent,
+	Keyboard,
+} from 'react-native';
 import TextInputState from 'react-native/lib/TextInputState';
-import { requestImageUploadCancel } from 'react-native-gutenberg-bridge';
+import {
+	requestImageUploadCancel,
+} from 'react-native-gutenberg-bridge';
+
 /**
  * WordPress dependencies
  */
@@ -113,39 +123,6 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		}
 	};
 
-	mergeBlocks = ( forward: boolean = false ) => {
-		const {
-			clientId,
-			getPreviousBlockClientId,
-			getNextBlockClientId,
-			mergeBlocks,
-		} = this.props;
-
-		const previousBlockClientId = getPreviousBlockClientId( clientId );
-		const nextBlockClientId = getNextBlockClientId( clientId );
-
-		// Do nothing when it's the first block.
-		if (
-			( ! forward && ! previousBlockClientId ) ||
-			( forward && ! nextBlockClientId )
-		) {
-			return;
-		}
-
-		if ( forward ) {
-			mergeBlocks( clientId, nextBlockClientId );
-		} else {
-			const name = this.props.getBlockName( previousBlockClientId );
-			const blockType = getBlockType( name );
-			// The default implementation does only focus the previous block if it's not mergeable
-			// We don't want to move the focus for now, just keep for and caret at the beginning of the current block.
-			if ( ! blockType.merge ) {
-				return;
-			}
-			mergeBlocks( previousBlockClientId, clientId );
-		}
-	};
-
 	renderToolbar() {
 		if ( ! this.props.isSelected ) {
 			return null;
@@ -153,10 +130,10 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 
 		return (
 			<InlineToolbar
+				clientId={ this.props.clientId }
 				onButtonPressed={ this.onInlineToolbarButtonPressed }
 				canMoveUp={ ! this.props.isFirstBlock }
 				canMoveDown={ ! this.props.isLastBlock }
-				clientId={ this.props.clientId }
 			/>
 		);
 	}
@@ -171,7 +148,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				onFocus={ this.onFocus }
 				onReplace={ this.props.onReplace }
 				insertBlocksAfter={ this.insertBlocksAfter }
-				mergeBlocks={ this.mergeBlocks }
+				mergeBlocks={ this.props.mergeBlocks }
 				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 				clientId={ this.props.clientId }
 			/>
@@ -257,9 +234,8 @@ export default compose( [
 			name,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
+	withDispatch( ( dispatch, { clientId, rootClientId }, { select } ) => {
 		const {
-			clearSelectedBlock,
 			insertBlocks,
 			mergeBlocks,
 			moveBlocksDown,
@@ -271,7 +247,24 @@ export default compose( [
 		} = dispatch( 'core/block-editor' );
 
 		return {
-			mergeBlocks,
+			mergeBlocks( forward ) {
+				const {
+					getPreviousBlockClientId,
+					getNextBlockClientId,
+				} = select( 'core/block-editor' );
+
+				if ( forward ) {
+					const nextBlockClientId = getNextBlockClientId( clientId );
+					if ( nextBlockClientId ) {
+						mergeBlocks( clientId, nextBlockClientId );
+					}
+				} else {
+					const previousBlockClientId = getPreviousBlockClientId( clientId );
+					if ( previousBlockClientId ) {
+						mergeBlocks( previousBlockClientId, clientId );
+					}
+				}
+			},
 			moveBlockDown() {
 				moveBlocksDown( clientId );
 			},
@@ -285,7 +278,6 @@ export default compose( [
 				insertBlocks( blocks, index, rootClientId );
 			},
 			onSelect: ( selectedClientId: string ) => {
-				clearSelectedBlock();
 				selectBlock( selectedClientId );
 			},
 			onChange: ( attributes: Object ) => {
