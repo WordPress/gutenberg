@@ -34,14 +34,8 @@
 }
 
 .wp-block-media-text .block-editor-inner-blocks,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/media-text"].is-selected .block-editor-inner-blocks,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/media-text"].has-child-selected .block-editor-inner-blocks {
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/media-text"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks {
 	padding: 0 8% 0 8%;
-}
-
-// Disable padding animation for this block, since no extra padding is added.
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/media-text"].is-selected .block-editor-inner-blocks,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/media-text"].has-child-selected .block-editor-inner-blocks {
 	animation: none;
 }
 
