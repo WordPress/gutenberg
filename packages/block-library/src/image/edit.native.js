@@ -247,6 +247,7 @@ class ImageEdit extends React.Component {
 					onChangeValue={ this.onSetLinkDestination }
 					autoCapitalize="none"
 					autoCorrect={ false }
+					keyboardType="url"
 				/>
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
