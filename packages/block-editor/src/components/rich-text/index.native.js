@@ -391,10 +391,10 @@ export class RichText extends Component {
 		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
 		const isReverse = keyCode === BACKSPACE;
 
-		const value = this.createRecord( {
-			...event.nativeEvent,
-			currentContent: unescapeSpaces( event.nativeEvent.text ),
-		} );
+		this.lastEventCount = event.nativeEvent.eventCount;
+		this.comesFromAztec = true;
+		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
+		const value = this.createRecord();
 		const { replacements, text, start, end } = value;
 		let newValue;
 
@@ -458,7 +458,7 @@ export class RichText extends Component {
 			}
 
 			if ( newValue ) {
-				this.onFormatChange( { needsSelectionUpdate: true, ...newValue }, true );
+				this.onFormatChange( newValue );
 			}
 		}
 
