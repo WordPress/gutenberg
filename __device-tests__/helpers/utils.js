@@ -148,21 +148,17 @@ const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.Promise
 	if ( isAndroid() ) {
 		const paragraphs = str.split( '\n' );
 
-		if ( paragraphs.length > 0 ) {
-			for ( let i = 0; i < paragraphs.length; i++ ) {
-				const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
-				if ( paragraph in strToKeycode ) {
-					await driver.pressKeycode( strToKeycode[ paragraph ] );
-				} else {
-					// Execute with adb shell input <text> since normal type auto clears field on Android
-					await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', paragraph ] } );
-				}
-				if ( i !== paragraphs.length - 1 ) {
-					await driver.pressKeycode( strToKeycode[ '\n' ] );
-				}
+		for ( let i = 0; i < paragraphs.length; i++ ) {
+			const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
+			if ( paragraph in strToKeycode ) {
+				await driver.pressKeycode( strToKeycode[ paragraph ] );
+			} else {
+				// Execute with adb shell input <text> since normal type auto clears field on Android
+				await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', paragraph ] } );
 			}
-		} else {
-			await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', str.replace( /[ ]/g, '%s' ) ] } );
+			if ( i !== paragraphs.length - 1 ) {
+				await driver.pressKeycode( strToKeycode[ '\n' ] );
+			}
 		}
 	} else {
 		return await element.type( str );

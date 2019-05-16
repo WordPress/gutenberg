@@ -129,8 +129,10 @@ export default class EditorPage {
 
 		let removeBlockLocator = `${ parentLocator }/following-sibling::*`;
 		removeBlockLocator += isAndroid() ? '' : '//*';
-		removeBlockLocator += `[@${ this.accessibilityIdXPathAttrib }="Remove row ${ position }"]`;
+		let removeButtonIdentifier = `Remove row ${ position }`;
+
 		if ( isAndroid() ) {
+			removeButtonIdentifier += ', Double tap to remove the block';
 			const block = await this.getBlockAtPosition( position, blockName );
 			let checkList = await this.driver.elementsByXPath( removeBlockLocator );
 			while ( checkList.length === 0 ) {
@@ -138,6 +140,8 @@ export default class EditorPage {
 				checkList = await this.driver.elementsByXPath( removeBlockLocator );
 			}
 		}
+
+		removeBlockLocator += `[@${ this.accessibilityIdXPathAttrib }="${ removeButtonIdentifier }"]`;
 
 		const removeButton = await this.driver.elementByXPath( removeBlockLocator );
 		await removeButton.click();
