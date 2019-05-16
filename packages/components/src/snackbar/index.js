@@ -19,7 +19,6 @@ const NOTICE_TIMEOUT = 10000;
 
 function Snackbar( {
 	className,
-	status,
 	children,
 	actions = [],
 	onRemove = noop,
@@ -34,7 +33,7 @@ function Snackbar( {
 		return () => clearTimeout( timeoutHandle );
 	}, [] );
 
-	const classes = classnames( className, 'components-snackbar', 'is-' + status );
+	const classes = classnames( className, 'components-snackbar' );
 
 	return (
 		<div
