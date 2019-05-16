@@ -211,6 +211,28 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             "description": "Change the block type after adding a new paragraph.",
             "keyCombination": "/",
           },
+          Object {
+            "description": "Group the selected blocks.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Alt",
+              "+",
+              "G",
+            ],
+          },
+          Object {
+            "description": "Ungroup the selected blocks.",
+            "keyCombination": Array [
+              "Ctrl",
+              "+",
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "G",
+            ],
+          },
         ]
       }
       title="Block shortcuts"
