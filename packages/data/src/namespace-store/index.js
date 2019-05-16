@@ -155,9 +155,11 @@ function createReduxStore( key, options, registry ) {
  */
 function mapSelectors( selectors, store, registry ) {
 	const createStateSelector = ( registeredSelector ) => {
-		const selector = registeredSelector.isRegistrySelector ? registeredSelector( registry.select ) : registeredSelector;
+		const registrySelector = registeredSelector.isRegistrySelector ?
+			registeredSelector( registry.select ) :
+			registeredSelector;
 
-		return function runSelector() {
+		const selector = function runSelector() {
 			// This function is an optimized implementation of:
 			//
 			//   selector( store.getState(), ...arguments )
@@ -172,8 +174,10 @@ function mapSelectors( selectors, store, registry ) {
 				args[ i + 1 ] = arguments[ i ];
 			}
 
-			return selector( ...args );
+			return registrySelector( ...args );
 		};
+		selector.hasResolver = false;
+		return selector;
 	};
 
 	return mapValues( selectors, createStateSelector );

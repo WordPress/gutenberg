@@ -80,21 +80,32 @@ describe( 'controls', () => {
 
 		registry.select( 'store' ).getItems();
 	} );
-	it( 'selectors have expected value for the `hasResolver` property', () => {
-		registry.registerStore( 'store', {
-			reducer: jest.fn(),
-			selectors: {
-				getItems: ( state ) => state,
-				getItem: ( state ) => state,
-			},
-			resolvers: {
-				* getItems() {
-					yield 'foo';
+	describe( 'selectors have expected value for the `hasResolver` property', () => {
+		it( 'when custom store has resolvers defined', () => {
+			registry.registerStore( 'store', {
+				reducer: jest.fn(),
+				selectors: {
+					getItems: ( state ) => state,
+					getItem: ( state ) => state,
 				},
-			},
+				resolvers: {
+					* getItems() {
+						yield 'foo';
+					},
+				},
+			} );
+			expect( registry.select( 'store' ).getItems.hasResolver ).toBe( true );
+			expect( registry.select( 'store' ).getItem.hasResolver ).toBe( false );
 		} );
-		expect( registry.select( 'store' ).getItems.hasResolver ).toBe( true );
-		expect( registry.select( 'store' ).getItem.hasResolver ).toBe( false );
+		it( 'when custom store does not have resolvers defined', () => {
+			registry.registerStore( 'store', {
+				reducer: jest.fn(),
+				selectors: {
+					getItems: ( state ) => state,
+				},
+			} );
+			expect( registry.select( 'store' ).getItems.hasResolver ).toBe( false );
+		} );
 	} );
 	describe( 'various action types have expected response and resolve as ' +
 		'expected with controls middleware', () => {
