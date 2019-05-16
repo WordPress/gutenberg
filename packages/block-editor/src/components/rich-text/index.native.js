@@ -459,6 +459,7 @@ export class RichText extends Component {
 
 			if ( newValue ) {
 				this.onFormatChange( newValue );
+				return;
 			}
 		}
 
