@@ -339,7 +339,7 @@ class ImageEdit extends React.Component {
 										accessibilityLabel={ alt }
 									>
 										{ isUploadFailed &&
-											<View style={ [ styles.imageContainer, { backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
+											<View style={ [ styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
 												{ iconContainer }
 												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 											</View>
