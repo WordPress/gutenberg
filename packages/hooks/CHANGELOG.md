@@ -1,5 +1,8 @@
-## 2.1.0 (2019-05-16)
-Enable support for the 'all' hook in non production environments. 
+## Master
+
+### New Feature
+
+- Enable support for the 'all' hook in non production environments. 
 
 ## 2.0.4 (2019-01-03)
 
