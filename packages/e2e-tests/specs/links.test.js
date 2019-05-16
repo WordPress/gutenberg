@@ -426,7 +426,7 @@ describe( 'Links', () => {
 		// focused with the value previously inserted.
 		await pressKeyWithModifier( 'primary', 'K' );
 		await waitForAutoFocus();
-		const activeElementParentClasses = await page.evaluate( () => Object.values( document.activeElement.parentElement.classList ) );
+		const activeElementParentClasses = await page.evaluate( () => Object.values( document.activeElement.parentElement.parentElement.classList ) );
 		expect( activeElementParentClasses ).toContain( 'block-editor-url-input' );
 		const activeElementValue = await page.evaluate( () => document.activeElement.value );
 		expect( activeElementValue ).toBe( URL );
