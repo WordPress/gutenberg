@@ -365,14 +365,12 @@ export function* savePost( options = {} ) {
 		yield dispatch(
 			'core/notices',
 			'removeNotice',
-			SAVE_POST_NOTICE_ID,
-			{ type: 'snackbar' }
+			SAVE_POST_NOTICE_ID
 		);
 		yield dispatch(
 			'core/notices',
 			'removeNotice',
-			'autosave-exists',
-			{ type: 'snackbar' }
+			'autosave-exists'
 		);
 	}
 
