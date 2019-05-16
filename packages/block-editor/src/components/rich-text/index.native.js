@@ -822,10 +822,18 @@ RichText.defaultProps = {
 const RichTextContainer = compose( [
 	withInstanceId,
 	withBlockEditContext( ( { clientId, onFocus, isSelected, onCaretVerticalPositionChange }, ownProps ) => {
+		// ownProps isSelected and onFocus has precedence over the block context
+		// So instances of RichText outside blocks can handle their own onFocus and send custom isSelected
+		if ( ownProps.isSelected !== undefined ) {
+			isSelected = ownProps.isSelected;
+		}
+		if ( ownProps.onFocus !== undefined ) {
+			onFocus = ownProps.onFocus;
+		}
 		return {
 			clientId,
 			isSelected,
-			onFocus: onFocus || ownProps.onFocus,
+			onFocus: onFocus,
 			onCaretVerticalPositionChange,
 		};
 	} ),
