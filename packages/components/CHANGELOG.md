@@ -3,6 +3,7 @@
 ### New Features
 
 - Added a new `HorizontalRule` component.
+- Added a new `Snackbar` component.
 
 ### Bug Fixes
 
