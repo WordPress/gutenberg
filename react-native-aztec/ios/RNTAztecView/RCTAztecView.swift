@@ -323,7 +323,7 @@ class RCTAztecView: Aztec.TextView {
             (start, end) = (end, start)
         }
         
-        var result: [AnyHashable : Any] = packForRN(getHTML(prettify: false), withName: "text")
+        var result: [AnyHashable : Any] = packForRN(cleanHTML(), withName: "text")
 
         result["selectionStart"] = start
         result["selectionEnd"] = end
