@@ -25,17 +25,6 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Image' ),
 	description: __( 'Insert an image to make a visual statement.' ),
-	__experimentalGetAccessibilityLabel( attributes ) {
-		const { caption, alt, url } = attributes;
-
-		if ( ! url ) {
-			return __( 'Empty' );
-		}
-
-		// This is intended to be read by a screen reader.
-		// A period simply means a pause, no need to translate it.
-		return alt + '. ' + caption;
-	},
 	icon,
 	keywords: [
 		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
