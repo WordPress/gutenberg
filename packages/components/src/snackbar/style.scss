@@ -1,7 +1,7 @@
 .components-snackbar {
 	font-family: $default-font;
 	font-size: $default-font-size;
-	background-color: $dark-gray-800;
+	background-color: $dark-gray-700;
 	border-radius: $radius-round-rectangle;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 	color: $white;
@@ -9,26 +9,30 @@
 	min-width: 200px;
 	max-width: 400px;
 
-	&.is-success {
-		background-color: $alert-green;
-	}
-
-	&.is-warning {
-		background-color: $alert-yellow;
-	}
-
-	&.is-error {
-		background-color: $alert-red;
+	&:hover {
+		background-color: $dark-gray-900;
 	}
 
 	&:focus {
-		@include menu-style__focus;
+		background-color: $dark-gray-900;
+		box-shadow:
+			0 0 0 1px $white,
+			0 0 0 3px $blue-medium-focus;
 	}
 }
 
 .components-snackbar__action.components-button {
 	margin-left: 20px;
 	color: $white;
+
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
+		text-decoration: underline;
+
+		&:hover {
+			color: $white;
+			text-decoration: none;
+		}
+	}
 }
 
 .components-snackbar__content {
