@@ -92,7 +92,7 @@
 		"doctrine": "2.1.0",
 		"enzyme": "3.9.0",
 		"eslint-plugin-jest": "21.5.0",
-		"espree": "3.5.4",
+		"espree": "5.0.1",
 		"fbjs": "0.8.17",
 		"glob": "7.1.2",
 		"husky": "0.14.3",
