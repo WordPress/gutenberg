@@ -8,7 +8,7 @@ import { noop } from 'lodash';
  */
 import { Fragment } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -34,7 +34,7 @@ export function ConvertToGroupButton( {
 					onClick={ onConvertToGroup }
 					shortcut={ displayShortcut.primaryAlt( 'g' ) }
 				>
-					{ __( 'Group' ) }
+					{ _x( 'Group', 'Grouping a selection of blocks together within the Editor' ) }
 				</MenuItem>
 			) }
 			{ isUnGroupable && (
@@ -44,7 +44,7 @@ export function ConvertToGroupButton( {
 					onClick={ onUnCovertFromGroup }
 					shortcut={ displayShortcut.secondary( 'g' ) }
 				>
-					{ __( 'Ungroup' ) }
+					{ _x( 'Ungroup', 'Ungrouping blocks from within a Group block back into individual blocks within the Editor ' ) }
 				</MenuItem>
 			) }
 		</Fragment>
