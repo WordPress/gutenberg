@@ -61,7 +61,7 @@ packages.forEach( ( entry ) => {
 		);
 
 		if ( status !== 0 ) {
-			process.stderr.write( `${ stderr.toString() }\n` );
+			process.stderr.write( `${ packageName } ${ stderr.toString() }\n` );
 			process.exit( 1 );
 		}
 	} );
