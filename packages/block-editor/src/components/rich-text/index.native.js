@@ -122,6 +122,7 @@ export class RichText extends Component {
 		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.willTrimSpaces = this.willTrimSpaces.bind( this );
+		this.getHtmlToRender = this.getHtmlToRender.bind( this );
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -703,6 +704,19 @@ export class RichText extends Component {
 		return false;
 	}
 
+	getHtmlToRender( record, tagName ) {
+		// Save back to HTML from React tree
+		const value = this.valueToFormat( record );
+
+		if ( value === undefined || value === '' ) {
+			this.lastEventCount = undefined; // force a refresh on the native side
+			return '';
+		} else if ( tagName ) {
+			return `<${ tagName }>${ value }</${ tagName }>`;
+		}
+		return value;
+	}
+
 	render() {
 		const {
 			tagName,
@@ -713,14 +727,7 @@ export class RichText extends Component {
 		} = this.props;
 
 		const record = this.getRecord();
-		// Save back to HTML from React tree
-		const value = this.valueToFormat( record );
-		let html = `<${ tagName }>${ value }</${ tagName }>`;
-		// We need to check if the value is undefined or empty, and then assign it properly otherwise the placeholder is not visible
-		if ( value === undefined || value === '' ) {
-			html = '';
-			this.lastEventCount = undefined; // force a refresh on the native side
-		}
+		const html = this.getHtmlToRender( record, tagName );
 
 		let minHeight = styles[ 'block-editor-rich-text' ].minHeight;
 		if ( style && style.minHeight ) {
@@ -799,6 +806,7 @@ export class RichText extends Component {
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ this.props.disableEditingMenu }
 					isMultiline={ this.isMultiline }
+					textAlign={ this.props.textAlign }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>
