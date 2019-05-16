@@ -28,7 +28,7 @@ import { compose } from '@wordpress/compose';
 import { addAction, hasAction, removeAction } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
 import { BlockEdit } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -163,7 +163,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 
 		blockTitle = blockTitle === 'Unrecognized Block' ? blockTitle : `${ blockTitle } Block`;
 
-		return __( `${ blockTitle }. Row ${ order + 1 }.` ); // Use one indexing for better accessibility
+		return sprintf( __( '%s. Row %d.' ), blockTitle, order + 1 ); // Use one indexing for better accessibility
 	}
 
 	renderBlockTitle() {
