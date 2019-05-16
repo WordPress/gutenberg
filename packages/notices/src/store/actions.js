@@ -48,7 +48,11 @@ export function* createNotice( status = DEFAULT_STATUS, content, options = {} ) 
 	content = String( content );
 
 	if ( speak ) {
-		yield { type: 'SPEAK', message: content };
+		yield {
+			type: 'SPEAK',
+			message: content,
+			ariaLive: type === 'snackbar' ? 'polite' : 'assertive',
+		};
 	}
 
 	yield {
