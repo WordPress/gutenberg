@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -45,6 +45,9 @@ const LINK_DESTINATION_NONE = 'none';
 
 const ICON_FILL_COLOR = '#2e4453';
 const ICON_RETRY_FILL_COLOR = '#ffffff';
+
+// Default Image ratio 4:3
+const IMAGE_ASPECT_RATIO = 4 / 3;
 
 class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -278,6 +281,8 @@ class ImageEdit extends React.Component {
 		const svgIconRetryWithUpdatedColor = this.iconWithUpdatedFillColor( ICON_RETRY_FILL_COLOR, svgIconRetry );
 		const svgIconWithUpdatedColor = this.iconWithUpdatedFillColor( ICON_FILL_COLOR, svgIcon );
 
+		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
+
 		return (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
@@ -327,7 +332,7 @@ class ImageEdit extends React.Component {
 
 							return (
 								<View style={ { flex: 1 } } >
-									{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
+									{ ! imageWidthWithinContainer && <View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
 										{ svgIconWithUpdatedColor }
 									</View> }
 									<ImageBackground

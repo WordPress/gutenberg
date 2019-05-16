@@ -1,9 +1,9 @@
 // @format
 
 .imageContainer {
-	flex: 1;
 	justify-content: center;
 	align-items: center;
+	background-color: $gray-lighten-30;
 }
 
 .uploadFailedText {
