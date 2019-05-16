@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RawHTML, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,7 +22,6 @@ function Snackbar( {
 	status,
 	children,
 	actions = [],
-	__unstableHTML,
 	onRemove = noop,
 } ) {
 	useEffect( () => {
@@ -36,10 +35,6 @@ function Snackbar( {
 	}, [] );
 
 	const classes = classnames( className, 'components-snackbar', 'is-' + status );
-
-	if ( __unstableHTML ) {
-		children = <RawHTML>{ children }</RawHTML>;
-	}
 
 	return (
 		<div
