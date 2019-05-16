@@ -19,7 +19,7 @@ import {
 import {
 	Toolbar,
 	ToolbarButton,
-	SVG,
+	Icon,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -42,9 +42,6 @@ import svgIcon from './icon';
 import svgIconRetry from './icon-retry';
 
 const VIDEO_ASPECT_RATIO = 1.7;
-
-const ICON_FILL_COLOR = '#2e4453';
-const ICON_RETRY_FILL_COLOR = '#2e4453';
 
 class VideoEdit extends React.Component {
 	constructor( props ) {
@@ -132,12 +129,12 @@ class VideoEdit extends React.Component {
 		}
 	}
 
-	iconWithUpdatedFillColor( color, icon ) {
-		return (
-			<SVG viewBox={ icon.props.viewBox } xmlns={ icon.props.xmlns } style={ { fill: color } }>
-				{ icon.props.children }
-			</SVG>
-		);
+	getIcon( isRetryIcon ) {
+		if ( isRetryIcon ) {
+			return <Icon icon={ svgIconRetry } style={ style.icon } />;
+		}
+
+		return <Icon icon={ svgIcon } style={ style.icon } />;
 	}
 
 	render() {
@@ -169,15 +166,12 @@ class VideoEdit extends React.Component {
 					<MediaPlaceholder
 						mediaType={ MEDIA_TYPE_VIDEO }
 						onSelectURL={ this.onSelectMediaUploadOption }
-						icon={ svgIcon }
+						icon={ this.getIcon( false ) }
 						onFocus={ this.props.onFocus }
 					/>
 				</View>
 			);
 		}
-
-		const svgIconRetryWithUpdatedColor = this.iconWithUpdatedFillColor( ICON_RETRY_FILL_COLOR, svgIconRetry );
-		const svgIconWithUpdatedColor = this.iconWithUpdatedFillColor( ICON_FILL_COLOR, svgIcon );
 
 		return (
 			<TouchableWithoutFeedback onPress={ this.onVideoPressed } disabled={ ! isSelected }>
@@ -200,7 +194,7 @@ class VideoEdit extends React.Component {
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( { isUploadInProgress, isUploadFailed, retryMessage } ) => {
 							const showVideo = src && ! isUploadInProgress && ! isUploadFailed;
-							const icon = isUploadFailed ? svgIconRetryWithUpdatedColor : svgIconWithUpdatedColor;
+							const icon = this.getIcon( isUploadFailed );
 
 							const iconContainer = (
 								<View style={ style.modalIcon }>

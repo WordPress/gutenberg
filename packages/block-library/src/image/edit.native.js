@@ -17,7 +17,7 @@ import { isEmpty } from 'lodash';
 import {
 	Toolbar,
 	ToolbarButton,
-	SVG,
+	Icon,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -42,9 +42,6 @@ import svgIconRetry from './icon-retry';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
-
-const ICON_FILL_COLOR = '#2e4453';
-const ICON_RETRY_FILL_COLOR = '#ffffff';
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -184,14 +181,6 @@ class ImageEdit extends React.Component {
 		setAttributes( { url: mediaUrl, id: mediaId } );
 	}
 
-	iconWithUpdatedFillColor( color, icon ) {
-		return (
-			<SVG viewBox={ icon.props.viewBox } xmlns={ icon.props.xmlns } style={ { fill: color } }>
-				{ icon.props.children }
-			</SVG>
-		);
-	}
-
 	onFocusCaption() {
 		if ( this.props.onFocus ) {
 			this.props.onFocus();
@@ -201,6 +190,14 @@ class ImageEdit extends React.Component {
 				isCaptionSelected: true,
 			} );
 		}
+	}
+
+	getIcon( isRetryIcon ) {
+		if ( isRetryIcon ) {
+			return <Icon icon={ svgIconRetry } style={ styles.iconRetry } />;
+		}
+
+		return <Icon icon={ svgIcon } style={ styles.icon } />;
 	}
 
 	render() {
@@ -272,15 +269,12 @@ class ImageEdit extends React.Component {
 					<MediaPlaceholder
 						mediaType={ MEDIA_TYPE_IMAGE }
 						onSelectURL={ this.onSelectMediaUploadOption }
-						icon={ svgIcon }
+						icon={ this.getIcon( false ) }
 						onFocus={ this.props.onFocus }
 					/>
 				</View>
 			);
 		}
-
-		const svgIconRetryWithUpdatedColor = this.iconWithUpdatedFillColor( ICON_RETRY_FILL_COLOR, svgIconRetry );
-		const svgIconWithUpdatedColor = this.iconWithUpdatedFillColor( ICON_FILL_COLOR, svgIcon );
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 
@@ -323,7 +317,7 @@ class ImageEdit extends React.Component {
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
-							const icon = isUploadFailed ? svgIconRetryWithUpdatedColor : svgIconWithUpdatedColor;
+							const icon = this.getIcon( isUploadFailed );
 
 							const iconContainer = (
 								<View style={ styles.modalIcon }>
@@ -334,7 +328,7 @@ class ImageEdit extends React.Component {
 							return (
 								<View style={ { flex: 1 } } >
 									{ ! imageWidthWithinContainer && <View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
-										{ svgIconWithUpdatedColor }
+										{ this.getIcon( false ) }
 									</View> }
 									<ImageBackground
 										style={ { width: finalWidth, height: finalHeight, opacity } }

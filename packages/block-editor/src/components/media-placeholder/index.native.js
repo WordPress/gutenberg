@@ -7,7 +7,6 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { SVG } from '@wordpress/components';
 import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
 
 /**
@@ -47,12 +46,6 @@ function MediaPlaceholder( props ) {
 		accessibilityHint = __( 'Double tap to select a video' );
 	}
 
-	const svgIcon = (
-		<SVG viewBox={ icon.props.viewBox } xmlns={ icon.props.xmlns } style={ { fill: styles.modalIcon.fill } }>
-			{ icon.props.children }
-		</SVG>
-	);
-
 	return (
 		<MediaUpload
 			mediaType={ mediaType }
@@ -70,13 +63,12 @@ function MediaPlaceholder( props ) {
 						onPress={ ( event ) => {
 							props.onFocus( event );
 							open();
-						}
-						}
+						} }
 					>
 						<View style={ styles.emptyStateContainer }>
 							{ getMediaOptions() }
 							<View style={ styles.modalIcon }>
-								{ svgIcon }
+								{ icon }
 							</View>
 							<Text style={ styles.emptyStateTitle }>
 								{ placeholderTitle }
