@@ -2,7 +2,11 @@
  * External dependencies
  */
 import React from 'react';
+<<<<<<< HEAD
 import { View, ImageBackground, TextInput, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+=======
+import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
+>>>>>>> master
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -47,6 +51,7 @@ class ImageEdit extends React.Component {
 
 		this.state = {
 			showSettings: false,
+			isCaptionSelected: false,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
@@ -59,6 +64,7 @@ class ImageEdit extends React.Component {
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
+		this.onFocusCaption = this.onFocusCaption.bind( this );
 	}
 
 	componentDidMount() {
@@ -83,6 +89,14 @@ class ImageEdit extends React.Component {
 		}
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
+		// is updated immediately any time the isSelected prop becomes false
+		this.setState( ( state ) => ( {
+			isCaptionSelected: nextProps.isSelected && state.isCaptionSelected,
+		} ) );
+	}
+
 	onImagePressed() {
 		const { attributes } = this.props;
 
@@ -91,6 +105,11 @@ class ImageEdit extends React.Component {
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
 		}
+
+		this._caption.blur();
+		this.setState( {
+			isCaptionSelected: false,
+		} );
 	}
 
 	updateMediaProgress( payload ) {
@@ -151,6 +170,17 @@ class ImageEdit extends React.Component {
 	onSelectMediaUploadOption( mediaId, mediaUrl ) {
 		const { setAttributes } = this.props;
 		setAttributes( { url: mediaUrl, id: mediaId } );
+	}
+
+	onFocusCaption() {
+		if ( this.props.onFocus ) {
+			this.props.onFocus();
+		}
+		if ( ! this.state.isCaptionSelected ) {
+			this.setState( {
+				isCaptionSelected: true,
+			} );
+		}
 	}
 
 	render() {
@@ -242,9 +272,11 @@ class ImageEdit extends React.Component {
 			>
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
-					<BlockControls>
-						{ toolbarEditButton }
-					</BlockControls>
+					{ ( ! this.state.isCaptionSelected ) &&
+						<BlockControls>
+							{ toolbarEditButton }
+						</BlockControls>
+					}
 					<InspectorControls>
 						<ToolbarButton
 							title={ __( 'Image Settings' ) }
@@ -292,8 +324,7 @@ class ImageEdit extends React.Component {
 						} }
 					/>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View
-							style={ { padding: 12, flex: 1 } }
+						<View style={ { padding: 12, flex: 1 } }
 							accessible={ true }
 							accessibilityLabel={
 								isEmpty( caption ) ?
@@ -307,13 +338,20 @@ class ImageEdit extends React.Component {
 							}
 							accessibilityRole={ 'button' }
 						>
-							<TextInput
-								style={ { textAlign: 'center' } }
-								fontFamily={ this.props.fontFamily || ( styles[ 'caption-text' ].fontFamily ) }
-								underlineColorAndroid="transparent"
-								value={ caption }
+							<RichText
+								setRef={ ( ref ) => {
+									this._caption = ref;
+								} }
+								rootTagsToEliminate={ [ 'p' ] }
 								placeholder={ __( 'Write caption…' ) }
-								onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+								value={ caption }
+								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+								onFocus={ this.onFocusCaption }
+								onBlur={ this.props.onBlur } // always assign onBlur as props
+								isSelected={ this.state.isCaptionSelected }
+								fontSize={ 14 }
+								underlineColorAndroid="transparent"
+								textAlign={ 'center' }
 							/>
 						</View>
 					) }

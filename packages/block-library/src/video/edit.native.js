@@ -36,7 +36,6 @@ import { doAction, hasAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import styles from '../image/styles.scss';
 import MediaUploadProgress from '../image/media-upload-progress';
 import style from './style.scss';
 
@@ -215,7 +214,7 @@ class VideoEdit extends React.Component {
 						<View style={ { padding: 12, flex: 1 } }>
 							<TextInput
 								style={ { textAlign: 'center' } }
-								fontFamily={ this.props.fontFamily || ( styles[ 'caption-text' ].fontFamily ) }
+								fontFamily={ this.props.fontFamily || ( style[ 'caption-text' ].fontFamily ) }
 								underlineColorAndroid="transparent"
 								value={ caption }
 								placeholder={ __( 'Write caption…' ) }
