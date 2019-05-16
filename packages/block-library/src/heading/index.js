@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import deprecated from './deprecated';
 import edit from './edit';
 import icon from './icon';
 import metadata from './block.json';
@@ -27,7 +26,6 @@ export const settings = {
 		anchor: true,
 	},
 	transforms,
-	deprecated,
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: ( attributes.content || '' ) + ( attributesToMerge.content || '' ),
