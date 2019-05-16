@@ -94,8 +94,7 @@ describe( 'Gutenberg Editor tests', () => {
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
 		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.longText );
+		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 
 		for ( let i = 4; i > 0; i-- ) {
 			await editorPage.removeParagraphBlockAtPosition( i );

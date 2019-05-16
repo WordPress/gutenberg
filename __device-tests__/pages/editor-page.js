@@ -39,7 +39,7 @@ export default class EditorPage {
 	}
 
 	// Finds the wd element for new block that was added and sets the element attribute
-	// and accessibilityId attributes on this object
+	// and accessibilityId attributes on this object and selects the block
 	// position uses one based numbering
 	async getBlockAtPosition( position: number, blockName: string ) {
 		const blockLocator = `${ blockName } Block. Row ${ position }.`;
@@ -175,6 +175,20 @@ export default class EditorPage {
 		return await typeString( this.driver, textViewElement, text );
 	}
 
+	async sendTextToParagraphBlockAtPosition( position: number, text: string ) {
+		const paragraphs = text.split( '\n' );
+		for ( let i = 0; i < paragraphs.length; i++ ) {
+			// Select block first
+			const block = await this.getParagraphBlockAtPosition( position + i );
+			await block.click();
+
+			await this.sendTextToParagraphBlock( block, paragraphs[ i ] );
+			if ( i !== paragraphs.length - 1 ) {
+				await this.sendTextToParagraphBlock( block, '\n' );
+			}
+		}
+	}
+
 	async getTextForParagraphBlock( block: wd.PromiseChainWebdriver.Element ) {
 		const textViewElement = await this.getTextViewForParagraphBlock( block );
 		const text = await textViewElement.text();
@@ -186,7 +200,11 @@ export default class EditorPage {
 	}
 
 	async getTextForParagraphBlockAtPosition( position: number ) {
-		const block = await this.getParagraphBlockAtPosition( position );
+		// Select block first
+		let block = await this.getParagraphBlockAtPosition( position );
+		await block.click();
+
+		block = await this.getParagraphBlockAtPosition( position );
 		const text = await this.getTextForParagraphBlock( block );
 		return text.toString();
 	}
