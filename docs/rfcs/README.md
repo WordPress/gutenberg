@@ -22,7 +22,7 @@ The flow to propose a new RFC is the following:
 
 - Create an RFC document for your proposal in Markdown format.
 - Submit a pull request to the Gutenberg repository with the Markdown file included in the `docs/rfc` folder ([see examples](/docs/rfcs/)).
-- Discussion and feedback should take place in the pull request amongst the original author, Gutenberg Core team members, focus leads, and project contributors.
+- Discussion and feedback should take place in the pull request amongst the original author, Gutenberg Core team members, focus leads, project contributors, and any applicable [Core component maintainers](https://make.wordpress.org/core/components/). As the author of the proposal, you are encouraged to solicit feedback publicly, including to share your proposal in [Slack channels](https://make.wordpress.org/chat/) of interested teams.
 - As a result of discussion in the pull request and at least one [weekly editor meeting](https://make.wordpress.org/meetings/), the RFC will be accepted (merged) or rejected (closed).
 
 A merged RFC should serve as a sufficient baseline for an initial implementation, and as the de-facto documentation for the feature.
