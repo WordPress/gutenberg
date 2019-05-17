@@ -121,8 +121,7 @@
 		"sprintf-js": "1.1.1",
 		"stylelint-config-wordpress": "13.1.0",
 		"uuid": "3.3.2",
-		"webpack": "4.8.3",
-		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
+		"webpack": "4.8.3"
 	},
 	"npmPackageJsonLintConfig": {
 		"extends": "@wordpress/npm-package-json-lint-config",
