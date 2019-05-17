@@ -25,6 +25,6 @@ export const settings = {
 
 		// This is intended to be read by a screen reader.
 		// A period simply means a pause, no need to translate it.
-		return alt + '. ' + caption;
+		return alt + ( caption ? '. ' + caption : '' );
 	},
 };
