@@ -54,7 +54,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @pento | @pento |
 | @karmatosed | @karmatosed |
 | @nitrajka | @nitrajka |
-| @sirreal | |
+| @sirreal | @jonsurrell |
 | @inhil | |
 | @georgeolaru | @babbardel |
 | @martinlugton | @martinlugton |
@@ -128,3 +128,6 @@ This list is manually curated to include valuable contributions by volunteers th
 | @gutendev | @gutendev |
 | @drdogbot7 | @drdogbot7 |
 | @m-e-h | @m-e-h |
+| @melchoyce | @melchoyce |
+| @sarahmonster | @tinkerbelly |
+| @kjellr | @kjellr |

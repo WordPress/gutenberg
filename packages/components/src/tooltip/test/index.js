@@ -90,10 +90,9 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			/* eslint-disable react/no-find-dom-node */
 			const button = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
+			// eslint-disable-next-line react/no-find-dom-node
 			TestUtils.Simulate.mouseEnter( ReactDOM.findDOMNode( button ) );
-			/* eslint-enable react/no-find-dom-node */
 
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 			expect( wrapper.state.isOver ).toBe( false );

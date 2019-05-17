@@ -1,8 +1,11 @@
 .editor-post-saved-state {
 	display: flex;
 	align-items: center;
-	color: $light-gray-900; // Doesn't need to meet AA because button is disabled and it's supporting text.
+	width: $icon-button-size - 8px;
+	padding: #{ $grid-size-small * 3 } $grid-size-small;
+	color: $dark-gray-500;
 	overflow: hidden;
+	white-space: nowrap;
 
 	&.is-saving {
 		animation: edit-post__loading-fade-animation 0.5s infinite;
@@ -11,15 +14,6 @@
 	.dashicon {
 		display: inline-block;
 		flex: 0 0 auto;
-	}
-}
-
-.editor-post-saved-state {
-	width: $icon-button-size - 8px;
-	white-space: nowrap;
-	padding: #{ $grid-size-small * 3 } $grid-size-small;
-
-	.dashicon {
 		margin-right: $grid-size;
 	}
 

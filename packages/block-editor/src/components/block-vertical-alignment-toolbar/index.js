@@ -57,6 +57,9 @@ export function BlockVerticalAlignmentToolbar( { isCollapsed, value, onChange, c
 	);
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-vertical-alignment-toolbar/README.md
+ */
 export default compose(
 	withBlockEditContext( ( { clientId } ) => {
 		return {
@@ -65,10 +68,10 @@ export default compose(
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	withSelect( ( select, { clientId, isLargeViewport, isCollapsed } ) => {
-		const { getBlockRootClientId, getEditorSettings } = select( 'core/editor' );
+		const { getBlockRootClientId, getSettings } = select( 'core/block-editor' );
 		return {
 			isCollapsed: isCollapsed || ! isLargeViewport || (
-				! getEditorSettings().hasFixedToolbar &&
+				! getSettings().hasFixedToolbar &&
 				getBlockRootClientId( clientId )
 			),
 		};

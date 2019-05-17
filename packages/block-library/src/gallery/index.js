@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { map, some } from 'lodash';
 
 /**
@@ -19,7 +20,7 @@ import save from './save';
 import transforms from './transforms';
 import { defaultColumnsNumber } from './shared';
 
-const { name, attributes: blockAttributes } = metadata;
+const { name } = metadata;
 
 export { metadata, name };
 
@@ -36,7 +37,53 @@ export const settings = {
 	save,
 	deprecated: [
 		{
-			attributes: blockAttributes,
+			attributes: {
+				images: {
+					type: 'array',
+					default: [],
+					source: 'query',
+					selector: 'ul.wp-block-gallery .blocks-gallery-item',
+					query: {
+						url: {
+							source: 'attribute',
+							selector: 'img',
+							attribute: 'src',
+						},
+						alt: {
+							source: 'attribute',
+							selector: 'img',
+							attribute: 'alt',
+							default: '',
+						},
+						id: {
+							source: 'attribute',
+							selector: 'img',
+							attribute: 'data-id',
+						},
+						link: {
+							source: 'attribute',
+							selector: 'img',
+							attribute: 'data-link',
+						},
+						caption: {
+							type: 'array',
+							source: 'children',
+							selector: 'figcaption',
+						},
+					},
+				},
+				columns: {
+					type: 'number',
+				},
+				imageCrop: {
+					type: 'boolean',
+					default: true,
+				},
+				linkTo: {
+					type: 'string',
+					default: 'none',
+				},
+			},
 			isEligible( { images, ids } ) {
 				return images &&
 					images.length > 0 &&
@@ -96,46 +143,38 @@ export const settings = {
 			},
 		},
 		{
-			attributes: blockAttributes,
-			save( { attributes } ) {
-				const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
-				return (
-					<ul className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
-						{ images.map( ( image ) => {
-							let href;
-
-							switch ( linkTo ) {
-								case 'media':
-									href = image.url;
-									break;
-								case 'attachment':
-									href = image.link;
-									break;
-							}
-
-							const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } />;
-
-							return (
-								<li key={ image.id || image.url } className="blocks-gallery-item">
-									<figure>
-										{ href ? <a href={ href }>{ img }</a> : img }
-										{ image.caption && image.caption.length > 0 && (
-											<RichText.Content tagName="figcaption" value={ image.caption } />
-										) }
-									</figure>
-								</li>
-							);
-						} ) }
-					</ul>
-				);
-			},
-		},
-		{
 			attributes: {
-				...blockAttributes,
 				images: {
-					...blockAttributes.images,
+					type: 'array',
+					default: [],
+					source: 'query',
 					selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
+					query: {
+						url: {
+							source: 'attribute',
+							attribute: 'src',
+						},
+						alt: {
+							source: 'attribute',
+							attribute: 'alt',
+							default: '',
+						},
+						id: {
+							source: 'attribute',
+							attribute: 'data-id',
+						},
+					},
+				},
+				columns: {
+					type: 'number',
+				},
+				imageCrop: {
+					type: 'boolean',
+					default: true,
+				},
+				linkTo: {
+					type: 'string',
+					default: 'none',
 				},
 				align: {
 					type: 'string',
@@ -145,8 +184,12 @@ export const settings = {
 
 			save( { attributes } ) {
 				const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+				const className = classnames( `columns-${ columns }`, {
+					alignnone: align === 'none',
+					'is-cropped': imageCrop,
+				} );
 				return (
-					<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+					<div className={ className } >
 						{ images.map( ( image ) => {
 							let href;
 

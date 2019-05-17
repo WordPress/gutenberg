@@ -22,7 +22,7 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
@@ -327,7 +327,7 @@ export class MediaPlaceholder extends Component {
 
 		if ( mediaUpload && isAppender ) {
 			return (
-				<Fragment>
+				<>
 					{ this.renderDropZone() }
 					<FormFileUpload
 						onChange={ this.onUpload }
@@ -335,7 +335,7 @@ export class MediaPlaceholder extends Component {
 						multiple={ multiple }
 						render={ ( { openFileDialog } ) => {
 							const content = (
-								<Fragment>
+								<>
 									<IconButton
 										isLarge
 										className={ classnames(
@@ -350,17 +350,17 @@ export class MediaPlaceholder extends Component {
 									{ mediaLibraryButton }
 									{ this.renderUrlSelectionUI() }
 									{ this.renderCancelLink() }
-								</Fragment>
+								</>
 							);
 							return this.renderPlaceholder( content, openFileDialog );
 						} }
 					/>
-				</Fragment>
+				</>
 			);
 		}
 		if ( mediaUpload ) {
 			const content = (
-				<Fragment>
+				<>
 					{ this.renderDropZone() }
 					<FormFileUpload
 						isLarge
@@ -378,7 +378,7 @@ export class MediaPlaceholder extends Component {
 					{ mediaLibraryButton }
 					{ this.renderUrlSelectionUI() }
 					{ this.renderCancelLink() }
-				</Fragment>
+				</>
 			);
 			return this.renderPlaceholder( content );
 		}
@@ -416,6 +416,9 @@ const applyWithSelect = withSelect( ( select ) => {
 	};
 } );
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md
+ */
 export default compose(
 	applyWithSelect,
 	withFilters( 'editor.MediaPlaceholder' ),

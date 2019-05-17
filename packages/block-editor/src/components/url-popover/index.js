@@ -69,4 +69,7 @@ class URLPopover extends Component {
 	}
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md
+ */
 export default URLPopover;

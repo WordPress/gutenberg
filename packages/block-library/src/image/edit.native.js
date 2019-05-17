@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, TextInput, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -28,7 +28,7 @@ import {
 	InspectorControls,
 	BottomSheet,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 
@@ -47,6 +47,7 @@ class ImageEdit extends React.Component {
 
 		this.state = {
 			showSettings: false,
+			isCaptionSelected: false,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
@@ -59,12 +60,21 @@ class ImageEdit extends React.Component {
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
+		this.onFocusCaption = this.onFocusCaption.bind( this );
 	}
 
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
 
-		if ( attributes.id && ! isURL( attributes.url ) ) {
+		// This will warn when we have `id` defined, while `url` is undefined.
+		// This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
+		// where a cancelled image upload was resulting in a subsequent crash.
+		if ( attributes.id && ! attributes.url ) {
+			// eslint-disable-next-line no-console
+			console.warn( 'Attributes has id with no url.' );
+		}
+
+		if ( attributes.id && attributes.url && ! isURL( attributes.url ) ) {
 			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
 				requestMediaImport( attributes.url, ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
@@ -83,6 +93,14 @@ class ImageEdit extends React.Component {
 		}
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
+		// is updated immediately any time the isSelected prop becomes false
+		this.setState( ( state ) => ( {
+			isCaptionSelected: nextProps.isSelected && state.isCaptionSelected,
+		} ) );
+	}
+
 	onImagePressed() {
 		const { attributes } = this.props;
 
@@ -91,6 +109,11 @@ class ImageEdit extends React.Component {
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
 		}
+
+		this._caption.blur();
+		this.setState( {
+			isCaptionSelected: false,
+		} );
 	}
 
 	updateMediaProgress( payload ) {
@@ -98,24 +121,31 @@ class ImageEdit extends React.Component {
 		if ( payload.mediaUrl ) {
 			setAttributes( { url: payload.mediaUrl } );
 		}
+
+		if ( ! this.state.isUploadInProgress ) {
+			this.setState( { isUploadInProgress: true } );
+		}
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
+		this.setState( { isUploadInProgress: false } );
 	}
 
 	finishMediaUploadWithFailure( payload ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { id: payload.mediaId } );
+		this.setState( { isUploadInProgress: false } );
 	}
 
-	mediaUploadStateReset( payload ) {
+	mediaUploadStateReset() {
 		const { setAttributes } = this.props;
 
-		setAttributes( { id: payload.mediaId, url: null } );
+		setAttributes( { id: null, url: null } );
+		this.setState( { isUploadInProgress: false } );
 	}
 
 	updateAlt( newAlt ) {
@@ -144,6 +174,17 @@ class ImageEdit extends React.Component {
 	onSelectMediaUploadOption( mediaId, mediaUrl ) {
 		const { setAttributes } = this.props;
 		setAttributes( { url: mediaUrl, id: mediaId } );
+	}
+
+	onFocusCaption() {
+		if ( this.props.onFocus ) {
+			this.props.onFocus();
+		}
+		if ( ! this.state.isCaptionSelected ) {
+			this.setState( {
+				isCaptionSelected: true,
+			} );
+		}
 	}
 
 	render() {
@@ -190,6 +231,7 @@ class ImageEdit extends React.Component {
 					onChangeValue={ this.onSetLinkDestination }
 					autoCapitalize="none"
 					autoCorrect={ false }
+					keyboardType="url"
 				/>
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
@@ -222,16 +264,24 @@ class ImageEdit extends React.Component {
 		return (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
-				accessibilityLabel={ __( 'Image block' ) + __( '.' ) + ' ' + alt + __( '.' ) + ' ' + caption }
+
+				accessibilityLabel={ sprintf(
+					/* translators: accessibility text. 1: image alt text. 2: image caption. */
+					__( 'Image block. %1$s. %2$s' ),
+					alt,
+					caption
+				) }
 				accessibilityRole={ 'button' }
 				onPress={ this.onImagePressed }
 				disabled={ ! isSelected }
 			>
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
-					<BlockControls>
-						{ toolbarEditButton }
-					</BlockControls>
+					{ ( ! this.state.isCaptionSelected ) &&
+						<BlockControls>
+							{ toolbarEditButton }
+						</BlockControls>
+					}
 					<InspectorControls>
 						<ToolbarButton
 							title={ __( 'Image Settings' ) }
@@ -275,19 +325,34 @@ class ImageEdit extends React.Component {
 						} }
 					/>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View
-							style={ { padding: 12, flex: 1 } }
+						<View style={ { padding: 12, flex: 1 } }
 							accessible={ true }
-							accessibilityLabel={ __( 'Image caption' ) + __( '.' ) + ' ' + ( isEmpty( caption ) ? __( 'Empty' ) : caption ) }
+							accessibilityLabel={
+								isEmpty( caption ) ?
+									/* translators: accessibility text. Empty image caption. */
+									__( 'Image caption. Empty' ) :
+									sprintf(
+										/* translators: accessibility text. %s: image caption. */
+										__( 'Image caption. %s' ),
+										caption
+									)
+							}
 							accessibilityRole={ 'button' }
 						>
-							<TextInput
-								style={ { textAlign: 'center' } }
-								fontFamily={ this.props.fontFamily || ( styles[ 'caption-text' ].fontFamily ) }
-								underlineColorAndroid="transparent"
-								value={ caption }
+							<RichText
+								setRef={ ( ref ) => {
+									this._caption = ref;
+								} }
+								rootTagsToEliminate={ [ 'p' ] }
 								placeholder={ __( 'Write caption…' ) }
-								onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+								value={ caption }
+								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+								onFocus={ this.onFocusCaption }
+								onBlur={ this.props.onBlur } // always assign onBlur as props
+								isSelected={ this.state.isCaptionSelected }
+								fontSize={ 14 }
+								underlineColorAndroid="transparent"
+								textAlign={ 'center' }
 							/>
 						</View>
 					) }

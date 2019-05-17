@@ -282,6 +282,7 @@ class Popover extends Component {
 			getAnchorRect,
 			expandOnMobile,
 			animate = true,
+			anchorRect,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
