@@ -30,6 +30,8 @@ program
 	.alias( 'rc' )
 	.description( 'Release an RC version of the plugin (supports only rc.1 for now)' )
 	.action( async () => {
+		console.log( '>> 💃 Time to release Gutenberg 🕺' );
+
 		// Check the current branch and if the versions
 		const gitStatus = await simpleGit.status();
 		const parsedVersion = semver.parse( packageJson.version );
@@ -50,7 +52,7 @@ program
 			const { acceptLocalChanges } = await inquirer.prompt( [ {
 				type: 'confirm',
 				name: 'acceptLocalChanges',
-				message: 'Your working tree is dirty. Do you want to continue? (some changes might be inadvertantly commited)',
+				message: 'Your working tree is dirty. Do you want to continue? (you may loose uncommited changes).',
 				default: false,
 			} ] );
 
@@ -58,6 +60,17 @@ program
 				console.log( error( 'Aborting' ) );
 				process.exit( 1 );
 			}
+		}
+
+		// Cleaning the repository
+		const { skipCleaning } = await inquirer.prompt( [ {
+			type: 'confirm',
+			name: 'skipCleaning',
+			message: 'Your working tree is going to be cleaned. Uncommited changes will be lost. Do you want to skip?',
+			default: false,
+		} ] );
+		if ( ! skipCleaning ) {
+			await simpleGit.clean( 'xfd' );
 		}
 
 		// Choosing the right version
