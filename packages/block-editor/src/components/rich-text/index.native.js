@@ -828,7 +828,7 @@ const RichTextContainer = compose( [
 		}
 		return {
 			clientId,
-			onFocus: onFocus,
+			onFocus,
 			onCaretVerticalPositionChange,
 		};
 	} ),
