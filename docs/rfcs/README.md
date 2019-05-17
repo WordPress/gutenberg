@@ -6,6 +6,8 @@ For more information, refer to the blog post:
 
 https://make.wordpress.org/core/2019/04/01/the-block-registration-rfc-and-the-gutenberg-rfc-process/
 
+This process is both inspired and informed by other open source projects such as [React](https://github.com/reactjs/rfcs), [Yarn](https://github.com/yarnpkg/rfcs), and [Rust](https://github.com/rust-lang/rfcs), and of technical bodies standardization processes such as [IETF](https://tools.ietf.org/html/rfc2026), [W3C](https://www.w3.org/2004/02/Process-20040205/tr.html), and [TC39](https://tc39.github.io/process-document/).
+
 ## What types of features or problems should be submitted as RFCs?
 
 While an issue can be sufficient to describe small feature requests, an RFC should be proposed for all features with impact across many areas of the code base, new patterns for extensibility APIs, and technical problems that are hard to solve without making compromises.
