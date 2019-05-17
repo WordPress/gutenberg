@@ -489,14 +489,14 @@ export class RichText extends Component {
 
 		if ( typeof pastedContent === 'string' ) {
 			const recordToInsert = create( { html: pastedContent } );
-			const insertedContent = insert( currentRecord, recordToInsert );
-			const newContent = this.valueToFormat( insertedContent );
+			const resultingRecord = insert( currentRecord, recordToInsert );
+			const resultingContent = this.valueToFormat( resultingRecord );
 
 			this.lastEventCount = undefined;
-			this.value = newContent;
+			this.value = resultingContent;
 
 			// explicitly set selection after inline paste
-			this.forceSelectionUpdate( insertedContent.start, insertedContent.end );
+			this.forceSelectionUpdate( resultingContent.start, resultingContent.end );
 
 			this.props.onChange( this.value );
 		} else if ( onSplit ) {
