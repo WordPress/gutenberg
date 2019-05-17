@@ -112,7 +112,6 @@ export class RichText extends Component {
 		this.onBlur = this.onBlur.bind( this );
 		this.onTextUpdate = this.onTextUpdate.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
-		this.onFormatChangeForceChild = this.onFormatChangeForceChild.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
 		this.formatToValue = memize(
 			this.formatToValue.bind( this ),
@@ -257,10 +256,6 @@ export class RichText extends Component {
 		} ).map( ( name ) => gutenbergFormatNamesToAztec[ name ] ).filter( Boolean );
 	}
 
-	onFormatChangeForceChild( record ) {
-		this.onFormatChange( record, true );
-	}
-
 	onFormatChange( record ) {
 		const { start, end, activeFormats = [] } = record;
 		const changeHandlers = pickBy( this.props, ( v, key ) =>
@@ -363,18 +358,18 @@ export class RichText extends Component {
 			if ( event.shiftKey ) {
 				this.needsSelectionUpdate = true;
 				const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
-				this.onFormatChangeForceChild( insertedLineBreak );
+				this.onFormatChange( insertedLineBreak );
 			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
 				this.splitContent( currentRecord );
 			} else {
 				this.needsSelectionUpdate = true;
 				const insertedLineSeparator = { ...insertLineSeparator( currentRecord ) };
-				this.onFormatChange( insertedLineSeparator, ! this.firedAfterTextChanged );
+				this.onFormatChange( insertedLineSeparator );
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
 			this.needsSelectionUpdate = true;
 			const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
-			this.onFormatChangeForceChild( insertedLineBreak );
+			this.onFormatChange( insertedLineBreak );
 		} else {
 			this.splitContent( currentRecord );
 		}
@@ -829,7 +824,7 @@ export class RichText extends Component {
 						onTagNameChange={ onTagNameChange }
 						tagName={ tagName }
 						value={ record }
-						onChange={ this.onFormatChangeForceChild }
+						onChange={ this.onFormatChange }
 					/>
 				) }
 				{ isSelected && (
