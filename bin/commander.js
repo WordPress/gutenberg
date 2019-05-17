@@ -31,9 +31,9 @@ program
 	.description( 'Release an RC version of the plugin (supports only rc.1 for now)' )
 	.action( async () => {
 		// Check the current branch and if the versions
-		const status = await simpleGit.status();
+		const gitStatus = await simpleGit.status();
 		const parsedVersion = semver.parse( packageJson.version );
-		if ( status.current !== 'master' ) {
+		if ( gitStatus.current !== 'master' ) {
 			const { acceptBranch } = await inquirer.prompt( [ {
 				type: 'confirm',
 				name: 'acceptBranch',
@@ -42,6 +42,19 @@ program
 			} ] );
 
 			if ( ! acceptBranch ) {
+				console.log( error( 'Aborting' ) );
+				process.exit( 1 );
+			}
+		}
+		if ( gitStatus.files.length ) {
+			const { acceptLocalChanges } = await inquirer.prompt( [ {
+				type: 'confirm',
+				name: 'acceptLocalChanges',
+				message: 'Your working tree is dirty. Do you want to continue? (some changes might be inadvertantly commited)',
+				default: false,
+			} ] );
+
+			if ( ! acceptLocalChanges ) {
 				console.log( error( 'Aborting' ) );
 				process.exit( 1 );
 			}
