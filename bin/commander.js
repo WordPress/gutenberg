@@ -90,14 +90,14 @@ program
 			...packageJson,
 			version: nextVersion,
 		};
-		await fs.writeFileSync( packageJsonPath, JSON.stringify( newPackageJson, null, '\t' ) + '\n' );
+		fs.writeFileSync( packageJsonPath, JSON.stringify( newPackageJson, null, '\t' ) + '\n' );
 		const newPackageLock = {
 			...packageLock,
 			version: nextVersion,
 		};
-		await fs.writeFileSync( packageLockPath, JSON.stringify( newPackageLock, null, '\t' ) + '\n' );
-		const content = await fs.readFileSync( pluginFilePath, 'utf8' );
-		await fs.writeFileSync( pluginFilePath, content.replace( ' * Version: ' + packageJson.version, ' * Version: ' + nextVersion ) );
+		fs.writeFileSync( packageLockPath, JSON.stringify( newPackageLock, null, '\t' ) + '\n' );
+		const content = fs.readFileSync( pluginFilePath, 'utf8' );
+		fs.writeFileSync( pluginFilePath, content.replace( ' * Version: ' + packageJson.version, ' * Version: ' + nextVersion ) );
 		console.log( '>> The plugin version has been updated successfully.' );
 
 		// Commit the version bump
