@@ -136,7 +136,7 @@ program
 		const { acceptBuildZip } = await inquirer.prompt( [ {
 			type: 'confirm',
 			name: 'acceptBuildZip',
-			message: 'Proceed and build the plugin zip?',
+			message: 'Proceed and build the plugin zip? (It takes a few minutes)',
 			default: true,
 		} ] );
 		if ( ! acceptBuildZip ) {
@@ -151,7 +151,7 @@ program
 			},
 			stdio: [ 'inherit', 'ignore', 'inherit' ],
 		} );
-		console.log( '>> The plugin zip was built succesfully 🎉. Path: ' + success( rootFolder + 'gutenberg.zip' ) );
+		console.log( '>> The plugin zip was built succesfully 🎉. Path: ' + success( rootFolder + '/gutenberg.zip' ) );
 	} );
 
 program.parse( process.argv );
