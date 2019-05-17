@@ -1,0 +1,45 @@
+{
+  "name": "react-native-video",
+  "version": "4.4.1",
+  "summary": "A <Video /> element for react-native",
+  "description": "A <Video /> element for react-native",
+  "license": "MIT",
+  "authors": "Brent Vatne <brentvatne@gmail.com> (https://github.com/brentvatne)",
+  "homepage": "https://github.com/brentvatne/react-native-video",
+  "source": {
+    "git": "https://github.com/brentvatne/react-native-video.git",
+    "tag": "4.4.1"
+  },
+  "platforms": {
+    "ios": "8.0",
+    "tvos": "9.0"
+  },
+  "static_framework": true,
+  "dependencies": {
+    "React": [
+
+    ]
+  },
+  "default_subspecs": "Video",
+  "subspecs": [
+    {
+      "name": "Video",
+      "source_files": "ios/Video/*.{h,m}"
+    },
+    {
+      "name": "VideoCaching",
+      "dependencies": {
+        "react-native-video/Video": [
+
+        ],
+        "SPTPersistentCache": [
+          "~> 1.1.0"
+        ],
+        "DVAssetLoaderDelegate": [
+          "~> 0.3.1"
+        ]
+      },
+      "source_files": "ios/VideoCaching/**/*.{h,m}"
+    }
+  ]
+}

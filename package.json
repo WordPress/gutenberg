@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -15,8 +15,7 @@
     "@wordpress/babel-preset-default": "^4.0.0",
     "@wordpress/eslint-plugin": "^2.0.0",
     "@wordpress/jest-preset-default": "^4.0.0",
-    "appium": "^1.12.1",
-    "jest-junit": "^6.3.0",
+    "appium": "^1.13.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^8.2.2",
     "babel-jest": "^24.1.0",
@@ -36,6 +35,7 @@
     "flow-bin": "0.92.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.1.0",
+    "jest-junit": "^6.3.0",
     "metro-react-native-babel-preset": "^0.52.0",
     "node-fetch": "^2.3.0",
     "prettier": "git+https://github.com/Automattic/calypso-prettier.git#calypso-1.9",
@@ -145,6 +145,7 @@
     "react-native-recyclerview-list": "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#v1.0.1",
     "react-native-safe-area": "^0.5.0",
     "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#55244dc79ab876550599c82dca763c3eba0153c5",
+    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#4dc15d1efcfafc4c55c1f073366235d506481a26",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
     "redux-multi": "^0.1.12",

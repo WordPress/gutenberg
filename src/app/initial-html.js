@@ -57,6 +57,10 @@ else:
 <figure class="wp-block-image alignfull"><img src="https://wordpress.org/gutenberg/files/2018/07/Screenshot-4-1.png" alt="" class="wp-image-97629"/></figure>
 <!-- /wp:image -->
 
+<!-- wp:video {"id":683} -->
+<figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure>
+<!-- /wp:video -->
+
 <!-- wp:paragraph {"align":"left"} -->
 <p style="text-align:left">We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts. Experience the flexibility that blocks will bring, whether you are building your first site, or write code for a living.</p>
 <!-- /wp:paragraph -->

@@ -3,14 +3,18 @@ package org.wordpress.mobile.ReactNativeAztec;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 
 import com.facebook.infer.annotation.Assertions;
+import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -293,6 +297,40 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                 100 * (fontWeightString.charAt(0) - '0') : -1;
     }
 
+    /**
+     * This method is based on {@link ReactTextInputManager#setTextAlign}. The only change made to that method is to
+     * use {@link android.widget.TextView#setGravity} instead of a custom method that preserves vertical gravity
+     * like the setGravityHorizontal method from {@link com.facebook.react.views.textinput.ReactEditText}. The
+     * reason for this change was to simplify the code. Since we never set vertical gravity, we do not need to add
+     * the complexity of preserving vertical gravity—we can just use {@link android.widget.TextView#setGravity}
+     * directly.
+     */
+    @ReactProp(name = ViewProps.TEXT_ALIGN)
+    public void setTextAlign(ReactAztecText view, @Nullable String textAlign) {
+        if ("justify".equals(textAlign)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                view.setJustificationMode(Layout.JUSTIFICATION_MODE_INTER_WORD);
+            }
+            view.setGravity(Gravity.START);
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                view.setJustificationMode(Layout.JUSTIFICATION_MODE_NONE);
+            }
+
+            if (textAlign == null || "auto".equals(textAlign)) {
+                view.setGravity(Gravity.NO_GRAVITY);
+            } else if ("left".equals(textAlign)) {
+                view.setGravity(Gravity.START);
+            } else if ("right".equals(textAlign)) {
+                view.setGravity(Gravity.END);
+            } else if ("center".equals(textAlign)) {
+                view.setGravity(Gravity.CENTER_HORIZONTAL);
+            } else {
+                throw new JSApplicationIllegalArgumentException("Invalid textAlign: " + textAlign);
+            }
+        }
+    }
+
     /* End of the code taken from ReactTextInputManager */
 
     @ReactProp(name = "color", customType = "Color")
@@ -360,7 +398,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
             view.setImageGetter(new GlideImageLoader(view.getContext()));
             view.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(view.getContext()));
             // we need to restart the editor now
-            String content = view.toHtml(false);
+            String content = view.toHtml(view.getText(), false);
             view.fromHtml(content, false);
         }
     }
@@ -414,6 +452,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         view.shouldHandleOnPaste = onPasteHandling;
     }
 
+    @ReactProp(name = "deleteEnter", defaultBoolean = false)
+    public void setShouldDeleteEnter(final ReactAztecText view, boolean shouldDeleteEnter) {
+        view.shouldDeleteEnter = shouldDeleteEnter;
+    }
+
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.<String, Integer>builder()
@@ -455,7 +498,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecEndEditingEvent(
                                             editText.getId(),
-                                            editText.toHtml(false)));
+                                            editText.toHtml(editText.getText(), false)));
                         }
                     }
                 });
@@ -498,22 +541,26 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                 return;
             }
 
-            int currentEventCount = mEditText.incrementAndGetEventCounter();
-            // The event that contains the event counter and updates it must be sent first.
-            // TODO: t7936714 merge these events
-            mEventDispatcher.dispatchEvent(
-                    new ReactTextChangedEvent(
-                            mEditText.getId(),
-                            mEditText.toHtml(false),
-                            currentEventCount));
+            // if the "Enter" handling is underway, don't sent text change events. The ReactAztecEnterEvent will have
+            // the text (minus the Enter char itself).
+            if (!mEditText.isEnterPressedUnderway()) {
+                int currentEventCount = mEditText.incrementAndGetEventCounter();
+                // The event that contains the event counter and updates it must be sent first.
+                // TODO: t7936714 merge these events
+                mEventDispatcher.dispatchEvent(
+                        new ReactTextChangedEvent(
+                                mEditText.getId(),
+                                mEditText.toHtml(mEditText.getText(), false),
+                                currentEventCount));
 
-            mEventDispatcher.dispatchEvent(
-                    new ReactTextInputEvent(
-                            mEditText.getId(),
-                            newText,
-                            oldText,
-                            start,
-                            start + before));
+                mEventDispatcher.dispatchEvent(
+                        new ReactTextInputEvent(
+                                mEditText.getId(),
+                                newText,
+                                oldText,
+                                start,
+                                start + before));
+            }
 
 
             if (mPreviousText.length() == 0

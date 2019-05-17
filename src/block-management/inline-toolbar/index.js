@@ -13,7 +13,7 @@ import { View } from 'react-native';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { ToolbarButton } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 
 /**
@@ -55,17 +55,17 @@ export class InlineToolbar extends React.Component<PropsType> {
 
 	render() {
 		const { order } = this.props;
-		let moveUpButtonTitle = `Move up from row ${ order }`;
+		let moveUpButtonTitle = sprintf( __( 'Move up from row %d' ), order );
 		if ( this.props.canMoveUp ) {
-			moveUpButtonTitle += ` to row ${ order - 1 }`;
+			moveUpButtonTitle += sprintf( __( ' to row %d' ), order - 1 );
 		}
 
-		let moveDownButtonTitle = `Move down from row ${ order }`;
+		let moveDownButtonTitle = sprintf( __( 'Move down from row %d' ), order );
 		if ( this.props.canMoveDown ) {
-			moveDownButtonTitle += ` to row ${ order + 1 }`;
+			moveDownButtonTitle += sprintf( __( ' to row %d' ), order + 1 );
 		}
 
-		const removeButtonTitle = `Remove row ${ order }`;
+		const removeButtonTitle = sprintf( __( 'Remove row %d' ), order );
 
 		return (
 			<View style={ styles.toolbar } >
@@ -74,6 +74,7 @@ export class InlineToolbar extends React.Component<PropsType> {
 					isDisabled={ ! this.props.canMoveUp }
 					onClick={ this.onUpPressed }
 					icon="arrow-up-alt"
+					extraProps={ { hint: __( 'Double tap to move the block up' ) } }
 				/>
 
 				<ToolbarButton
@@ -81,6 +82,7 @@ export class InlineToolbar extends React.Component<PropsType> {
 					isDisabled={ ! this.props.canMoveDown }
 					onClick={ this.onDownPressed }
 					icon="arrow-down-alt"
+					extraProps={ { hint: __( 'Double tap to move the block down' ) } }
 				/>
 
 				<View style={ styles.spacer } />
@@ -91,6 +93,7 @@ export class InlineToolbar extends React.Component<PropsType> {
 					title={ __( removeButtonTitle ) }
 					onClick={ this.onDeletePressed }
 					icon="trash"
+					extraProps={ { hint: __( 'Double tap to remove the block' ) } }
 				/>
 			</View>
 		);
