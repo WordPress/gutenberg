@@ -271,7 +271,7 @@ class URLInput extends Component {
 			selectedSuggestion,
 			loading,
 		} = this.state;
-		const id = `inspector-url-input-control-${ instanceId }`;
+		const id = `url-input-control-${ instanceId }`;
 
 		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
 		const suggestionOptionIdPrefix = `block-editor-url-input-suggestion-${ instanceId }`;
