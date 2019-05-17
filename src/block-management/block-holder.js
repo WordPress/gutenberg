@@ -38,6 +38,9 @@ import styles from './block-holder.scss';
 import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
 
 type PropsType = BlockType & {
+	name: string,
+	title: string,
+	attributes: mixed,
 	clientId: string,
 	rootClientId: string,
 	isSelected: boolean,
@@ -48,9 +51,6 @@ type PropsType = BlockType & {
 	testID: string,
 	focusedBorderColor: string,
 	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
-	getPreviousBlockClientId: ( clientId: string ) => string,
-	getNextBlockClientId: ( clientId: string ) => string,
-	getBlockName: ( clientId: string ) => string,
 	onChange: ( attributes: mixed ) => void,
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
 	onCaretVerticalPositionChange: ( targetId: number, caretY: number, previousCaretY: ?number ) => void,
@@ -95,7 +95,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 			removeAction( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks' );
 			requestImageUploadCancel( mediaId );
 		}
-	}
+	};
 
 	onInlineToolbarButtonPressed = ( button: number ) => {
 		Keyboard.dismiss();
@@ -224,8 +224,6 @@ export default compose( [
 			getBlockName,
 			getBlockIndex,
 			getBlocks,
-			getPreviousBlockClientId,
-			getNextBlockClientId,
 			isBlockSelected,
 		} = select( 'core/block-editor' );
 		const name = getBlockName( clientId );
@@ -237,16 +235,13 @@ export default compose( [
 		const title = getBlockType( name ) !== undefined ? getBlockType( name ).title : '';
 
 		return {
+			name,
+			title,
 			attributes,
 			getBlockIndex,
-			getBlockName,
-			getPreviousBlockClientId,
-			getNextBlockClientId,
 			isFirstBlock,
 			isLastBlock,
 			isSelected,
-			name,
-			title,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId }, { select } ) => {
