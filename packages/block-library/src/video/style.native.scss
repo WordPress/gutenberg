@@ -25,8 +25,8 @@
 }
 
 .modalIcon {
-	width: 80px;
-	height: 80px;
+	width: 40px;
+	height: 40px;
 	justify-content: center;
 	align-items: center;
 }
@@ -48,4 +48,8 @@
 
 .icon {
 	fill: $gray-dark;
+}
+
+.iconUploading {
+	fill: $gray-lighten-20;
 }

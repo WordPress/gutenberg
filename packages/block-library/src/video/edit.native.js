@@ -128,12 +128,12 @@ class VideoEdit extends React.Component {
 		}
 	}
 
-	getIcon( isRetryIcon ) {
+	getIcon( isRetryIcon, isUploadInProgress ) {
 		if ( isRetryIcon ) {
 			return <SvgIconRetry fill={ style.icon.fill } />;
 		}
 
-		return <SvgIcon fill={ style.icon.fill } />;
+		return <SvgIcon fill={ isUploadInProgress ? style.iconUploading.fill : style.icon.fill } />;
 	}
 
 	render() {
@@ -193,7 +193,7 @@ class VideoEdit extends React.Component {
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( { isUploadInProgress, isUploadFailed, retryMessage } ) => {
 							const showVideo = src && ! isUploadInProgress && ! isUploadFailed;
-							const icon = this.getIcon( isUploadFailed );
+							const icon = this.getIcon( isUploadFailed, isUploadInProgress );
 
 							const iconContainer = (
 								<View style={ style.modalIcon }>
@@ -230,7 +230,7 @@ class VideoEdit extends React.Component {
 						} }
 					/>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View style={ { padding: 12, flex: 1 } }>
+						<View style={ { paddingTop: 8, paddingBottom: 0, flex: 1 } }>
 							<TextInput
 								style={ { textAlign: 'center' } }
 								fontFamily={ this.props.fontFamily || ( style[ 'caption-text' ].fontFamily ) }
