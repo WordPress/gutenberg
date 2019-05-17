@@ -163,14 +163,9 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Creates a RichText value "record" from native content and selection
+	 * Creates a RichText value "record" from the current content and selection
 	 * information
 	 *
-	 * @param {string} currentContent The content (usually an HTML string) from
-	 *                                the native component.
-	 * @param {number}    selectionStart The start of the selection.
-	 * @param {number}      selectionEnd The end of the selection (same as start if
-	 *                                cursor instead of selection).
 	 *
 	 * @return {Object} A RichText value with formats and selection.
 	 */
