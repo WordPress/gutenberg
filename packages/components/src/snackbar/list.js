@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import { omit, noop } from 'lodash';
-import { useTransition, animated } from 'react-spring';
 
 /**
  * Internal dependencies
@@ -24,30 +23,17 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 	className = classnames( 'components-snackbar-list', className );
 	const removeNotice = ( id ) => () => onRemove( id );
 
-	const transitions = useTransition(
-		notices,
-		( notice ) => notice.id,
-		{
-			from: { opacity: 0 },
-			enter: { opacity: 1 },
-			leave: { opacity: 0 },
-			config: { tension: 300 },
-		}
-	);
-
 	return (
 		<div className={ className }>
 			{ children }
-			{ transitions.map( ( { item: notice, key, props: style } ) => (
-				<animated.div key={ key } style={ style }>
-					<Snackbar
-						{ ...omit( notice, [ 'content' ] ) }
-
-						onRemove={ removeNotice( notice.id ) }
-					>
-						{ notice.content }
-					</Snackbar>
-				</animated.div>
+			{ [ ...notices ].reverse().map( ( notice ) => (
+				<Snackbar
+					{ ...omit( notice, [ 'content' ] ) }
+					key={ notice.id }
+					onRemove={ removeNotice( notice.id ) }
+				>
+					{ notice.content }
+				</Snackbar>
 			) ) }
 		</div>
 	);
