@@ -146,12 +146,12 @@ const Popover = ( {
 
 		if (
 			popoverPosition.yAxis !== newPopoverPosition.yAxis ||
-				popoverPosition.xAxis !== newPopoverPosition.xAxis ||
-				popoverPosition.popoverLeft !== newPopoverPosition.popoverLeft ||
-				popoverPosition.popoverTop !== newPopoverPosition.popoverTop ||
-				popoverPosition.contentHeight !== newPopoverPosition.contentHeight ||
-				popoverPosition.contentWidth !== newPopoverPosition.contentWidth ||
-				popoverPosition.isMobile !== newPopoverPosition.isMobile
+			popoverPosition.xAxis !== newPopoverPosition.xAxis ||
+			popoverPosition.popoverLeft !== newPopoverPosition.popoverLeft ||
+			popoverPosition.popoverTop !== newPopoverPosition.popoverTop ||
+			popoverPosition.contentHeight !== newPopoverPosition.contentHeight ||
+			popoverPosition.contentWidth !== newPopoverPosition.contentWidth ||
+			popoverPosition.isMobile !== newPopoverPosition.isMobile
 		) {
 			setPopoverPosition( newPopoverPosition );
 		}
