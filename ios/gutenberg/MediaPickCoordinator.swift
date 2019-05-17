@@ -2,16 +2,31 @@
 import Foundation
 import UIKit
 import RNReactNativeGutenbergBridge
+import CoreServices
 
 class MediaPickCoordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
   
   private let presenter: UIViewController
   private let callback: (URL?) -> Void
+  private let filter: MediaFilter
   
   init(presenter: UIViewController,
+       filter: MediaFilter,
        callback: @escaping (URL?) -> Void) {
       self.presenter = presenter
       self.callback = callback
+      self.filter = filter
+  }
+  
+  private var mediaTypes: [ String ]? {
+    switch filter {
+    case .image:
+      return [ kUTTypeImage as String ]
+    case .video:
+      return [ kUTTypeVideo as String, kUTTypeMovie as String ]
+    default:
+      return nil
+    }
   }
   
   func pick(from source: UIImagePickerController.SourceType) {
@@ -22,6 +37,9 @@ class MediaPickCoordinator: NSObject, UIImagePickerControllerDelegate, UINavigat
     }
     let pickerController = UIImagePickerController()
     pickerController.sourceType = source
+    if let mediaTypes = mediaTypes {
+      pickerController.mediaTypes = mediaTypes
+    }
     pickerController.delegate = self
     presenter.show(pickerController, sender: nil)
   }
@@ -47,14 +65,25 @@ class MediaPickCoordinator: NSObject, UIImagePickerControllerDelegate, UINavigat
   func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
     presenter.dismiss(animated: true, completion: nil)
     let mediaID = UUID().uuidString
-    guard
-      let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage,
-      let url = save(image: image, toTemporaryDirectoryUsingName: mediaID)
-    else {
+    switch filter {
+    case .image:
+      guard
+        let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage,
+        let url = save(image: image, toTemporaryDirectoryUsingName: mediaID)
+        else {
+          callback(nil)
+          return
+      }
+      callback(url)
+    case .video:
+      guard let url = info[UIImagePickerController.InfoKey.mediaURL] as? URL else {
         callback(nil)
         return
+      }
+      callback(url)
+    default:
+      callback(nil)
     }
-    callback(url)
   }
 
 }
