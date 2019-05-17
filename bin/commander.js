@@ -62,21 +62,28 @@ program
 
 		// Choosing the right version
 		let nextVersion;
+		let releaseBranch;
 		if ( parsedVersion.minor === 9 ) {
 			nextVersion = ( parsedVersion.major + 1 ) + '.0.0-rc.1';
+			releaseBranch = 'release/' + ( parsedVersion.major + 1 ) + '.0';
 		} else {
 			nextVersion = parsedVersion.major + '.' + ( parsedVersion.minor + 1 ) + '.0-rc.1';
+			releaseBranch = 'release/' + parsedVersion.major + '.' + ( parsedVersion.minor + 1 );
 		}
 		const { acceptVersion } = await inquirer.prompt( [ {
 			type: 'confirm',
 			name: 'acceptVersion',
-			message: 'The RC Version to be applied is ' + success( nextVersion ) + '. Is this correct?',
+			message: 'The RC Version to be applied is ' + success( nextVersion ) + '. Proceed with the creation of the release branch?',
 			default: true,
 		} ] );
 		if ( ! acceptVersion ) {
 			console.log( error( 'Aborting' ) );
 			process.exit( 1 );
 		}
+
+		// Creating the release branch
+		await simpleGit.checkoutLocalBranch( releaseBranch );
+		console.log( '>> The local release branch "' + success( releaseBranch ) + '" has been successfully created.' );
 
 		// Bumping the version in the different files (package.json, package-lock.json, gutenberg.php)
 		const newPackageJson = {
@@ -91,8 +98,27 @@ program
 		await fs.writeFileSync( packageLockPath, JSON.stringify( newPackageLock, null, '\t' ) + '\n' );
 		const content = await fs.readFileSync( pluginFilePath, 'utf8' );
 		await fs.writeFileSync( pluginFilePath, content.replace( ' * Version: ' + packageJson.version, ' * Version: ' + nextVersion ) );
+		console.log( '>> The plugin version has been updated successfully.' );
 
-		console.log( success( 'The version has been updated, commit the diff to the release branch.' ) );
+		// Commit the version bump
+		const { acceptDiff } = await inquirer.prompt( [ {
+			type: 'confirm',
+			name: 'acceptDiff',
+			message: 'Please check the diff. Proceed with the version bump commit?',
+			default: true,
+		} ] );
+		if ( ! acceptDiff ) {
+			console.log( error( 'Aborting. Make sure to remove the local release branch' ) );
+			process.exit( 1 );
+		}
+		await simpleGit.add( [
+			packageJsonPath,
+			packageLockPath,
+			pluginFilePath,
+		] );
+		const { commit } = await simpleGit.commit( 'Bump plugin version to ' + nextVersion );
+
+		console.log( '>> The plugin version bump was commited succesfully. Please push the release branch to the repository and cherry-pick the ' + success( commit ) + ' commit to the master branch.' );
 	} );
 
 program.parse( process.argv );
