@@ -17,7 +17,6 @@ import { isEmpty } from 'lodash';
 import {
 	Toolbar,
 	ToolbarButton,
-	Icon,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -37,8 +36,8 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import styles from './styles.scss';
 import MediaUploadProgress from './media-upload-progress';
-import svgIcon from './icon';
-import svgIconRetry from './icon-retry';
+import SvgIcon from './icon';
+import SvgIconRetry from './icon-retry';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
@@ -194,10 +193,10 @@ class ImageEdit extends React.Component {
 
 	getIcon( isRetryIcon ) {
 		if ( isRetryIcon ) {
-			return <Icon icon={ svgIconRetry } style={ styles.iconRetry } />;
+			return <SvgIconRetry fill={ styles.iconRetry.fill } />;
 		}
 
-		return <Icon icon={ svgIcon } style={ styles.icon } />;
+		return <SvgIcon fill={ styles.icon.fill } />;
 	}
 
 	render() {
