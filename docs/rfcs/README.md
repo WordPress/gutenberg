@@ -54,7 +54,7 @@ A good RFC document can be broken into the following sections:
 - Solution Proposal
 - Unsolved Problems
 
-For reference, [view current RFCs](/docs/rfcs/).
+For reference, [view current Gutenberg RFCs](/docs/rfcs/).
 
 ## Who can submit an RFC?
 
