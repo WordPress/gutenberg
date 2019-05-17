@@ -10,6 +10,7 @@ const semver = require( 'semver' );
 const chalk = require( 'chalk' );
 const fs = require( 'fs' );
 const SimpleGit = require( 'simple-git/promise' );
+const childProcess = require( 'child_process' );
 
 // Common info
 const rootFolder = path.resolve( __dirname, '../' );
@@ -90,7 +91,7 @@ program
 			default: true,
 		} ] );
 		if ( ! acceptVersion ) {
-			console.log( error( 'Aborting' ) );
+			console.log( error( 'Aborting.' ) );
 			process.exit( 1 );
 		}
 
@@ -121,7 +122,7 @@ program
 			default: true,
 		} ] );
 		if ( ! acceptDiff ) {
-			console.log( error( 'Aborting. Make sure to remove the local release branch' ) );
+			console.log( error( 'Aborting. Make sure to remove the local release branch.' ) );
 			process.exit( 1 );
 		}
 		await simpleGit.add( [
@@ -130,8 +131,27 @@ program
 			pluginFilePath,
 		] );
 		const { commit } = await simpleGit.commit( 'Bump plugin version to ' + nextVersion );
-
 		console.log( '>> The plugin version bump was commited succesfully. Please push the release branch to the repository and cherry-pick the ' + success( commit ) + ' commit to the master branch.' );
+
+		const { acceptBuildZip } = await inquirer.prompt( [ {
+			type: 'confirm',
+			name: 'acceptBuildZip',
+			message: 'Proceed and build the plugin zip?',
+			default: true,
+		} ] );
+		if ( ! acceptBuildZip ) {
+			console.log( error( 'Aborting. Make sure to remove the local release branch.' ) );
+			process.exit( 1 );
+		}
+		childProcess.execSync( '/bin/bash bin/build-plugin-zip.sh', {
+			cwd: rootFolder,
+			env: {
+				NO_CHECKS: true,
+				PATH: process.env.PATH,
+			},
+			stdio: [ 'inherit', 'ignore', 'inherit' ],
+		} );
+		console.log( '>> The plugin zip was built succesfully 🎉. Path: ' + success( rootFolder + 'gutenberg.zip' ) );
 	} );
 
 program.parse( process.argv );
