@@ -33,34 +33,45 @@ const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) =
  */
 const SLOT_NAME = 'Popover';
 
-const Popover = ( {
-	headerTitle,
-	onClose,
-	onKeyDown,
-	children,
-	className,
-	onClickOutside = onClose,
-	noArrow = false,
-	// Disable reason: We generate the `...contentProps` rest as remainder
-	// of props which aren't explicitly handled by this component.
-	/* eslint-disable no-unused-vars */
-	position = 'top',
-	range,
-	focusOnMount = 'firstElement',
-	anchorRect,
-	getAnchorRect,
-	expandOnMobile,
-	animate = true,
-	/* eslint-enable no-unused-vars */
-	...contentProps
-} ) => {
-	const anchorRef = useRef( null );
-	const contentRef = useRef( null );
+/**
+ * Hook used trigger an event handler once the window is resized or scrolled.
+ *
+ * @param {function} handler              Event handler.
+ * @param {Object}   ignoredScrollalbeRef scroll events inside this element are ignored.
+ */
+function useThrottledWindowScrollOrResize( handler, ignoredScrollalbeRef ) {
+	// Refresh anchor rect on resize
+	useEffect( () => {
+		let refreshHandle;
+		const throttledRefresh = ( event ) => {
+			window.cancelAnimationFrame( refreshHandle );
+			if ( ignoredScrollalbeRef && event && event.type === 'scroll' && ignoredScrollalbeRef.current.contains( event.target ) ) {
+				return;
+			}
+			refreshHandle = window.requestAnimationFrame( handler );
+		};
 
-	// Animation
-	const [ isReadyToAnimate, setIsReadyToAnimate ] = useState( false );
+		window.addEventListener( 'resize', throttledRefresh );
+		window.addEventListener( 'scroll', throttledRefresh );
 
-	// Anchor position
+		return () => {
+			window.removeEventListener( 'resize', throttledRefresh );
+			window.removeEventListener( 'scroll', throttledRefresh );
+		};
+	}, [] );
+}
+
+/**
+ * Hook used to compute and update the anchor position properly.
+ *
+ * @param {Object} anchorRef       reference to the popover anchor element.
+ * @param {Object} contentRef      reference to the popover content element.
+ * @param {Object} anchorRect      anchor Rect prop used to override the computed value.
+ * @param {Function} getAnchorRect function used to override the anchor value computation algorithm.
+ *
+ * @return {Object} Anchor position.
+ */
+function useAnchor( anchorRef, contentRef, anchorRect, getAnchorRect ) {
 	const [ anchor, setAnchor ] = useState( null );
 	const refreshAnchorRect = () => {
 		if ( ! anchorRef.current ) {
@@ -111,18 +122,46 @@ const Popover = ( {
 		}
 	}, [ anchorRect ] );
 
-	// Content size
+	useThrottledWindowScrollOrResize( refreshAnchorRect, contentRef );
+
+	return anchor;
+}
+
+/**
+ * Hook used to compute the initial size of an element.
+ * The popover applies styling to limit the height of the element,
+ * we only care about the initial size.
+ *
+ * @param {Object} ref Reference to the popover content element.
+ *
+ * @return {Object} Content size.
+ */
+function useInitialContentSize( ref ) {
 	const [ contentSize, setContentSize ] = useState( null );
 	useEffect( () => {
-		const contentRect = contentRef.current.getBoundingClientRect();
+		const contentRect = ref.current.getBoundingClientRect();
 		setContentSize( {
 			width: contentRect.width,
 			height: contentRect.height,
 		} );
-		setIsReadyToAnimate( true );
 	}, [] );
 
-	// Compute the position
+	return contentSize;
+}
+
+/**
+ * Hook used to compute and update the position of the popover
+ * based on the anchor position and the content size.
+ *
+ * @param {Object} anchor          Anchor Position.
+ * @param {Object} contentSize     Content Size.
+ * @param {string} position        Position prop.
+ * @param {boolean} expandOnMobile Whether to show the popover full width on mobile.
+ * @param {Object} contentRef      Reference to the popover content element.
+ *
+ * @return {Object} Popover position.
+ */
+function usePopoverPosition( anchor, contentSize, position, expandOnMobile, contentRef ) {
 	const [ popoverPosition, setPopoverPosition ] = useState( {
 		popoverLeft: null,
 		popoverTop: null,
@@ -157,32 +196,18 @@ const Popover = ( {
 		}
 	};
 	useEffect( refreshPopoverPosition, [ anchor, contentSize ] );
+	useThrottledWindowScrollOrResize( refreshPopoverPosition, contentRef );
 
-	// Refresh anchor rect on resize
-	useEffect( () => {
-		const refreshWindowSizeDependencies = () => {
-			refreshAnchorRect();
-			refreshPopoverPosition();
-		};
+	return popoverPosition;
+}
 
-		let refreshHandle;
-		const throttledRefresh = ( event ) => {
-			window.cancelAnimationFrame( refreshHandle );
-			if ( event && event.type === 'scroll' && contentRef.current.contains( event.target ) ) {
-				return;
-			}
-			refreshHandle = window.requestAnimationFrame( refreshWindowSizeDependencies );
-		};
-
-		window.addEventListener( 'resize', throttledRefresh );
-		window.addEventListener( 'scroll', throttledRefresh );
-
-		return () => {
-			window.removeEventListener( 'resize', throttledRefresh );
-			window.removeEventListener( 'scroll', throttledRefresh );
-		};
-	}, [] );
-
+/**
+ * Hook used to focus the first tabbable element on mount.
+ *
+ * @param {boolean|string} focusOnMount Focus on mount mode.
+ * @param {Object} contentRef           Reference to the popover content element.
+ */
+function useFocusContentOnMount( focusOnMount, contentRef ) {
 	// Focus handling
 	useEffect( () => {
 		/*
@@ -218,6 +243,56 @@ const Popover = ( {
 
 		return () => clearTimeout( focusTimeout );
 	}, [] );
+}
+
+const Popover = ( {
+	headerTitle,
+	onClose,
+	onKeyDown,
+	children,
+	className,
+	onClickOutside = onClose,
+	noArrow = false,
+	// Disable reason: We generate the `...contentProps` rest as remainder
+	// of props which aren't explicitly handled by this component.
+	/* eslint-disable no-unused-vars */
+	position = 'top',
+	range,
+	focusOnMount = 'firstElement',
+	anchorRect,
+	getAnchorRect,
+	expandOnMobile,
+	animate = true,
+	/* eslint-enable no-unused-vars */
+	...contentProps
+} ) => {
+	const anchorRef = useRef( null );
+	const contentRef = useRef( null );
+
+	// Animation
+	const [ isReadyToAnimate, setIsReadyToAnimate ] = useState( false );
+
+	// Anchor position
+	const anchor = useAnchor( anchorRef, contentRef, anchorRect, getAnchorRect );
+
+	// Content size
+	const contentSize = useInitialContentSize( contentRef );
+	useEffect( () => {
+		if ( contentSize ) {
+			setIsReadyToAnimate( true );
+		}
+	}, [ contentSize ] );
+
+	// Compute the position
+	const popoverPosition = usePopoverPosition(
+		anchor,
+		contentSize,
+		position,
+		expandOnMobile,
+		contentRef
+	);
+
+	useFocusContentOnMount( focusOnMount, contentRef );
 
 	// Event handlers
 	const maybeClose = ( event ) => {
