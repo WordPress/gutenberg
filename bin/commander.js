@@ -8,22 +8,21 @@ const program = require( 'commander' );
 const inquirer = require( 'inquirer' );
 const semver = require( 'semver' );
 const chalk = require( 'chalk' );
-const fs = require( 'fs' );
+const fs = require( 'fs-extra' );
 const SimpleGit = require( 'simple-git/promise' );
 const childProcess = require( 'child_process' );
 const Octokit = require( '@octokit/rest' );
+const os = require( 'os' );
+const uuid = require( 'uuid/v4' );
 
 // Common info
-const rootFolder = path.resolve( __dirname, '../' );
-const packageJsonPath = rootFolder + '/package.json';
-const packageLockPath = rootFolder + '/package-lock.json';
-const pluginFilePath = rootFolder + '/gutenberg.php';
-const packageJson = require( packageJsonPath );
-const packageLock = require( packageLockPath );
-const simpleGit = SimpleGit( rootFolder );
-const gutenbergZipPath = rootFolder + '/gutenberg.zip';
-const gitRemote = 'origin';
+const workingDirectoryPath = path.join( os.tmpdir(), uuid() );
+const packageJsonPath = workingDirectoryPath + '/package.json';
+const packageLockPath = workingDirectoryPath + '/package-lock.json';
+const pluginFilePath = workingDirectoryPath + '/gutenberg.php';
+const gutenbergZipPath = workingDirectoryPath + '/gutenberg.zip';
 const repoOwner = 'WordPress';
+const repoURL = 'git@github.com:' + repoOwner + '/gutenberg.git';
 
 // UI
 const error = chalk.bold.red;
@@ -88,46 +87,23 @@ program
 
 		// This is a variable that contains the abort message shown when the script is aborted.
 		let abortMessage = 'Aborting!';
+		await askForConfirmationToContinue( 'Ready go go? ' );
 
-		// Initial checks
-		await runStep( 'Initial checks', abortMessage, async () => {
-			await askForConfirmationToContinue( 'Ready go go? ' );
-			// Check the current branch and if the versions
-			const gitStatus = await simpleGit.status();
-			if ( gitStatus.current !== 'master' ) {
-				await askForConfirmationToContinue(
-					'Releasing plugin RC versions usually happens from the ' + warning( 'master' ) + ' branch. Do you want to continue from the current branch?',
-					false,
-					abortMessage
-				);
-			}
-
-			if ( gitStatus.files.length ) {
-				await askForConfirmationToContinue(
-					'Your working tree is dirty. Do you want to continue? (you may loose uncommited changes).',
-					false,
-					abortMessage
-				);
-			}
-		} );
-
-		// Cleaning the repository
-		await runStep( 'Cleaning the repository', abortMessage, async () => {
-			const { skipCleaning } = await inquirer.prompt( [ {
-				type: 'confirm',
-				name: 'skipCleaning',
-				message: 'Your working tree is going to be cleaned. Uncommited changes will be lost. Do you want to skip this step?',
-				default: false,
-			} ] );
-			if ( ! skipCleaning ) {
-				await simpleGit.clean( 'xfd' );
-			}
+		// Cloning the repository
+		await runStep( 'Cloning the repository', abortMessage, async () => {
+			console.log( '>> Cloning the repository' );
+			const simpleGit = SimpleGit();
+			await simpleGit.clone( repoURL, workingDirectoryPath );
+			console.log( '>> The gutenberg repository has been successfully cloned in the following temporary folder: ' + success( workingDirectoryPath ) );
 		} );
 
 		// Creating the release branch
+		const simpleGit = SimpleGit( workingDirectoryPath );
 		let nextVersion;
 		let nextVersionLabel;
 		let releaseBranch;
+		const packageJson = require( packageJsonPath );
+		const packageLock = require( packageLockPath );
 		await runStep( 'Creating the release branch', abortMessage, async () => {
 			const parsedVersion = semver.parse( packageJson.version );
 			if ( parsedVersion.minor === 9 ) {
@@ -149,7 +125,6 @@ program
 			await simpleGit.checkoutLocalBranch( releaseBranch );
 			console.log( '>> The local release branch ' + success( releaseBranch ) + ' has been successfully created.' );
 		} );
-		abortMessage = 'Aborting. Make sure to remove the local release branch.';
 
 		// Bumping the version in the different files (package.json, package-lock.json, gutenberg.php)
 		let commitHash;
@@ -192,7 +167,7 @@ program
 				abortMessage
 			);
 			childProcess.execSync( '/bin/bash bin/build-plugin-zip.sh', {
-				cwd: rootFolder,
+				cwd: workingDirectoryPath,
 				env: {
 					NO_CHECKS: true,
 					PATH: process.env.PATH,
@@ -213,7 +188,6 @@ program
 			await simpleGit.addTag( 'v' + nextVersion );
 			console.log( '>> The ' + success( 'v' + nextVersion ) + ' tag has been created succesfully.' );
 		} );
-		abortMessage = 'Aborting. Make sure to remove the local release branch and the local git tag.';
 
 		await runStep( 'Pushing the release branch and the tag', abortMessage, async () => {
 			await askForConfirmationToContinue(
@@ -221,10 +195,10 @@ program
 				true,
 				abortMessage
 			);
-			await simpleGit.push( gitRemote, releaseBranch );
-			await simpleGit.pushTags( gitRemote );
+			await simpleGit.push( 'origin', releaseBranch );
+			await simpleGit.pushTags( 'origin' );
 		} );
-		abortMessage = 'Aborting. Make sure to remove the local and remote release branches and tags.';
+		abortMessage = 'Aborting! Make sure to remove remote release branch and tag.';
 
 		// Creating the GitHub Release
 		let octokit;
@@ -263,7 +237,7 @@ program
 
 			console.log( '>> The Github release has been created succesfully.' );
 		} );
-		abortMessage = 'Aborting. Make sure to remove the local and remote releases branches and tags and the Github release.';
+		abortMessage = 'Aborting! Make sure to remove the remote release branch, the git tag and the Github release.';
 
 		// Uploading the Gutenberg Zip to the release
 		await runStep( 'Uploading the plugin zip', abortMessage, async () => {
@@ -279,7 +253,7 @@ program
 			} );
 			console.log( '>> The plugin zip has been succesfully uploaded.' );
 		} );
-		abortMessage = 'Aborting. Make sure to manually cherry-pick the ' + success( commitHash ) + ' commit to the master branch.';
+		abortMessage = 'Aborting! Make sure to manually cherry-pick the ' + success( commitHash ) + ' commit to the master branch.';
 
 		// Cherry-picking the bump commit into master
 		await runStep( 'Cherry-picking the bump commit into master', abortMessage, async () => {
@@ -290,9 +264,14 @@ program
 			);
 			await simpleGit.fetch();
 			await simpleGit.checkout( 'master' );
-			await simpleGit.pull( gitRemote, 'master' );
+			await simpleGit.pull( 'origin', 'master' );
 			await simpleGit.raw( [ 'cherry-pick', commitHash ] );
-			await simpleGit.push( gitRemote, 'master' );
+			await simpleGit.push( 'origin', 'master' );
+		} );
+
+		abortMessage = 'Aborting! The release is finished though.';
+		await runStep( 'Cleaning the temporary folder', abortMessage, async () => {
+			await fs.remove( workingDirectoryPath );
 		} );
 
 		console.log(
