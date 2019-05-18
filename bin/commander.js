@@ -93,7 +93,7 @@ program
 		await runStep( 'Cloning the repository', abortMessage, async () => {
 			console.log( '>> Cloning the repository' );
 			const simpleGit = SimpleGit();
-			await simpleGit.clone( repoURL, workingDirectoryPath );
+			await simpleGit.clone( repoURL, workingDirectoryPath, [ '--depth=1' ] );
 			console.log( '>> The gutenberg repository has been successfully cloned in the following temporary folder: ' + success( workingDirectoryPath ) );
 		} );
 
@@ -264,6 +264,7 @@ program
 			);
 			await simpleGit.fetch();
 			await simpleGit.checkout( 'master' );
+			await simpleGit.reset( 'hard' );
 			await simpleGit.pull( 'origin', 'master' );
 			await simpleGit.raw( [ 'cherry-pick', commitHash ] );
 			await simpleGit.push( 'origin', 'master' );
