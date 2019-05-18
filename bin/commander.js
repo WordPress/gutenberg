@@ -31,7 +31,24 @@ program
 	.alias( 'rc' )
 	.description( 'Release an RC version of the plugin (supports only rc.1 for now)' )
 	.action( async () => {
-		console.log( '>> 💃 Time to release Gutenberg 🕺' );
+		console.log(
+			chalk.bold( '💃 Time to release Gutenberg 🕺\n\n' ),
+			'Welcome! This tool is going to help you release a new RC version of the Gutenberg Plugin.\n',
+			'It goes throught different steps : creating the release branch, bumping the plugin version, tagging and creating the github release, building the zip...\n',
+			'To perform a release you\'ll have to be a member of the Gutenberg Core Team.\n'
+		);
+
+		const { isReady } = await inquirer.prompt( [ {
+			type: 'confirm',
+			name: 'isReady',
+			message: 'Ready go go?',
+			default: true,
+		} ] );
+
+		if ( ! isReady ) {
+			console.log( error( 'Aborting' ) );
+			process.exit( 1 );
+		}
 
 		// Check the current branch and if the versions
 		const gitStatus = await simpleGit.status();
