@@ -11,6 +11,7 @@ const chalk = require( 'chalk' );
 const fs = require( 'fs' );
 const SimpleGit = require( 'simple-git/promise' );
 const childProcess = require( 'child_process' );
+const Octokit = require( '@octokit/rest' );
 
 // Common info
 const rootFolder = path.resolve( __dirname, '../' );
@@ -20,6 +21,9 @@ const pluginFilePath = rootFolder + '/gutenberg.php';
 const packageJson = require( packageJsonPath );
 const packageLock = require( packageLockPath );
 const simpleGit = SimpleGit( rootFolder );
+const gutenbergZipPath = rootFolder + '/gutenberg.zip';
+const gitRemote = 'origin';
+const repoOwner = 'WordPress';
 
 // UI
 const error = chalk.bold.red;
@@ -61,9 +65,9 @@ const runStep = async ( name, abortMessage, handler ) => {
 		await handler();
 	} catch ( exception ) {
 		console.log(
-			error( 'The following error happened during the step: ' ) + warning( name ) + '\n\n',
+			error( 'The following error happened during the "' + warning( name ) + '" step:' ) + '\n\n',
 			exception,
-			error( '\n' + abortMessage )
+			error( '\n\n' + abortMessage )
 		);
 
 		process.exit( 1 );
@@ -112,7 +116,7 @@ program
 			const { skipCleaning } = await inquirer.prompt( [ {
 				type: 'confirm',
 				name: 'skipCleaning',
-				message: 'Your working tree is going to be cleaned. Uncommited changes will be lost. Do you want to skip?',
+				message: 'Your working tree is going to be cleaned. Uncommited changes will be lost. Do you want to skip this step?',
 				default: false,
 			} ] );
 			if ( ! skipCleaning ) {
@@ -122,15 +126,18 @@ program
 
 		// Creating the release branch
 		let nextVersion;
+		let nextVersionLabel;
 		let releaseBranch;
 		await runStep( 'Creating the release branch', abortMessage, async () => {
 			const parsedVersion = semver.parse( packageJson.version );
 			if ( parsedVersion.minor === 9 ) {
 				nextVersion = ( parsedVersion.major + 1 ) + '.0.0-rc.1';
 				releaseBranch = 'release/' + ( parsedVersion.major + 1 ) + '.0';
+				nextVersionLabel = ( parsedVersion.major + 1 ) + '.0.0 RC1';
 			} else {
 				nextVersion = parsedVersion.major + '.' + ( parsedVersion.minor + 1 ) + '.0-rc.1';
 				releaseBranch = 'release/' + parsedVersion.major + '.' + ( parsedVersion.minor + 1 );
+				nextVersionLabel = parsedVersion.major + '.' + ( parsedVersion.minor + 1 ) + '.0 RC1';
 			}
 			await askForConfirmationToContinue(
 				'The RC Version to be applied is ' + success( nextVersion ) + '. Proceed with the creation of the release branch?',
@@ -145,6 +152,7 @@ program
 		abortMessage = 'Aborting. Make sure to remove the local release branch.';
 
 		// Bumping the version in the different files (package.json, package-lock.json, gutenberg.php)
+		let commitHash;
 		await runStep( 'Updating the plugin version', abortMessage, async () => {
 			const newPackageJson = {
 				...packageJson,
@@ -171,22 +179,10 @@ program
 				packageLockPath,
 				pluginFilePath,
 			] );
-			const { commit } = await simpleGit.commit( 'Bump plugin version to ' + nextVersion );
-			console.log( '>> The plugin version bump was commited succesfully. Please push the release branch to the repository and cherry-pick the ' + success( commit ) + ' commit to the master branch.' );
+			const commitData = await simpleGit.commit( 'Bump plugin version to ' + nextVersion );
+			commitHash = commitData.commit;
+			console.log( '>> The plugin version bump has been commited succesfully.' );
 		} );
-
-		// Creating the release tag
-		await runStep( 'Creating the release tag', abortMessage, async () => {
-			// Commit the version bump
-			await askForConfirmationToContinue(
-				'Proceed with the creation of the release tag?',
-				true,
-				abortMessage
-			);
-			await simpleGit.addTag( 'v' + nextVersion );
-			console.log( '>> The ' + success( 'v' + nextVersion ) + ' tag was created succesfully.' );
-		} );
-		abortMessage = 'Aborting. Make sure to remove the local release branch and the local release tag.';
 
 		// Plugin ZIP creation
 		await runStep( 'Plugin ZIP creation', abortMessage, async () => {
@@ -204,8 +200,106 @@ program
 				stdio: [ 'inherit', 'ignore', 'inherit' ],
 			} );
 
-			console.log( '>> The plugin zip was built succesfully 🎉. Path: ' + success( rootFolder + '/gutenberg.zip' ) );
+			console.log( '>> The plugin zip has been built succesfully. Path: ' + success( gutenbergZipPath ) );
 		} );
+
+		// Creating the git tag
+		await runStep( 'Creating the git tag', abortMessage, async () => {
+			await askForConfirmationToContinue(
+				'Proceed with the creation of the git tag?',
+				true,
+				abortMessage
+			);
+			await simpleGit.addTag( 'v' + nextVersion );
+			console.log( '>> The ' + success( 'v' + nextVersion ) + ' tag has been created succesfully.' );
+		} );
+		abortMessage = 'Aborting. Make sure to remove the local release branch and the local git tag.';
+
+		await runStep( 'Pushing the release branch and the tag', abortMessage, async () => {
+			await askForConfirmationToContinue(
+				'The release branch and the tag are going to be pushed to the remote repository. Continue?',
+				true,
+				abortMessage
+			);
+			await simpleGit.push( gitRemote, releaseBranch );
+			await simpleGit.pushTags( gitRemote );
+		} );
+		abortMessage = 'Aborting. Make sure to remove the local and remote release branches and tags.';
+
+		// Creating the GitHub Release
+		let octokit;
+		let release;
+		await runStep( 'Creating the Github release', abortMessage, async () => {
+			await askForConfirmationToContinue(
+				'Proceed with the creation of the Github release?',
+				true,
+				abortMessage
+			);
+			const { changelog } = await inquirer.prompt( [ {
+				type: 'editor',
+				name: 'changelog',
+				message: 'Please provide the CHANGELOG of the release (markdown)',
+			} ] );
+
+			const { token } = await inquirer.prompt( [ {
+				type: 'input',
+				name: 'token',
+				message: 'Please provide a Github personal authentication token. (Navigate to ' + success( 'https://github.com/settings/tokens' ) + ' to create one with admin:org, repo and write:packages rights)',
+			} ] );
+
+			octokit = new Octokit( {
+				auth: token,
+			} );
+
+			const releaseData = await octokit.repos.createRelease( {
+				owner: repoOwner,
+				repo: 'gutenberg',
+				tag_name: 'v' + nextVersion,
+				name: nextVersionLabel,
+				body: changelog,
+				prerelease: true,
+			} );
+			release = releaseData.data;
+
+			console.log( '>> The Github release has been created succesfully.' );
+		} );
+		abortMessage = 'Aborting. Make sure to remove the local and remote releases branches and tags and the Github release.';
+
+		// Uploading the Gutenberg Zip to the release
+		await runStep( 'Uploading the plugin zip', abortMessage, async () => {
+			const filestats = fs.statSync( gutenbergZipPath );
+			await octokit.repos.uploadReleaseAsset( {
+				url: release.upload_url,
+				headers: {
+					'content-length': filestats.size,
+					'content-type': 'application/zip',
+				},
+				name: 'gutenberg.zip',
+				file: fs.createReadStream( gutenbergZipPath ),
+			} );
+			console.log( '>> The plugin zip has been succesfully uploaded.' );
+		} );
+		abortMessage = 'Aborting. Make sure to manually cherry-pick the ' + success( commitHash ) + ' commit to the master branch.';
+
+		// Cherry-picking the bump commit into master
+		await runStep( 'Cherry-picking the bump commit into master', abortMessage, async () => {
+			await askForConfirmationToContinue(
+				'The plugin RC is now released. Proceed with the version bump in the master branch?',
+				true,
+				'test'
+			);
+			await simpleGit.fetch();
+			await simpleGit.checkout( 'master' );
+			await simpleGit.pull( gitRemote, 'master' );
+			await simpleGit.raw( [ 'cherry-pick', commitHash ] );
+			await simpleGit.push( gitRemote, 'master' );
+		} );
+
+		console.log(
+			'\n>> 🎉 The Gutenberg ' + success( nextVersionLabel ) + '  has been successfully released.\n',
+			'You can access the Github release here: ' + success( release.html_url ) + '\n',
+			'Thanks for performing the release!'
+		);
 	} );
 
 program.parse( process.argv );
