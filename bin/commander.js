@@ -175,6 +175,19 @@ program
 			console.log( '>> The plugin version bump was commited succesfully. Please push the release branch to the repository and cherry-pick the ' + success( commit ) + ' commit to the master branch.' );
 		} );
 
+		// Creating the release tag
+		await runStep( 'Creating the release tag', abortMessage, async () => {
+			// Commit the version bump
+			await askForConfirmationToContinue(
+				'Proceed with the creation of the release tag?',
+				true,
+				abortMessage
+			);
+			await simpleGit.addTag( 'v' + nextVersion );
+			console.log( '>> The ' + success( 'v' + nextVersion ) + ' tag was created succesfully.' );
+		} );
+		abortMessage = 'Aborting. Make sure to remove the local release branch and the local release tag.';
+
 		// Plugin ZIP creation
 		await runStep( 'Plugin ZIP creation', abortMessage, async () => {
 			await askForConfirmationToContinue(
