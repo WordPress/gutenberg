@@ -31,9 +31,9 @@ const success = chalk.bold.green;
 /**
  * Asks the user for a confirmation to continue or abort otherwise
  *
- * @param {string} message      Confirmation message
- * @param {boolean} isDefault   Default reply
- * @param {string} abortMessage Abort message
+ * @param {string} message      Confirmation message.
+ * @param {boolean} isDefault   Default reply.
+ * @param {string} abortMessage Abort message.
  */
 const askForConfirmationToContinue = async ( message, isDefault = true, abortMessage = 'Aborting.' ) => {
 	const { isReady } = await inquirer.prompt( [ {
@@ -45,6 +45,27 @@ const askForConfirmationToContinue = async ( message, isDefault = true, abortMes
 
 	if ( ! isReady ) {
 		console.log( error( '\n' + abortMessage ) );
+		process.exit( 1 );
+	}
+};
+
+/**
+ * Common logic wrapping a step in the process.
+ *
+ * @param {string} name         Step name.
+ * @param {string} abortMessage Abort message.
+ * @param {function} handler    Step logic.
+ */
+const runStep = async ( name, abortMessage, handler ) => {
+	try {
+		await handler();
+	} catch ( exception ) {
+		console.log(
+			error( 'The following error happened during the step: ' ) + warning( name ) + '\n\n',
+			exception,
+			error( '\n' + abortMessage )
+		);
+
 		process.exit( 1 );
 	}
 };
@@ -61,97 +82,117 @@ program
 			'To perform a release you\'ll have to be a member of the Gutenberg Core Team.\n'
 		);
 
-		await askForConfirmationToContinue( 'Ready go go? ' );
+		// This is a variable that contains the abort message shown when the script is aborted.
+		let abortMessage = 'Aborting!';
 
-		// Check the current branch and if the versions
-		const gitStatus = await simpleGit.status();
-		const parsedVersion = semver.parse( packageJson.version );
-		if ( gitStatus.current !== 'master' ) {
-			await askForConfirmationToContinue(
-				'Releasing plugin RC versions usually happens from the ' + warning( 'master' ) + ' branch. Do you want to continue from the current branch?',
-				false,
-			);
-		}
+		// Initial checks
+		await runStep( 'Initial checks', abortMessage, async () => {
+			await askForConfirmationToContinue( 'Ready go go? ' );
+			// Check the current branch and if the versions
+			const gitStatus = await simpleGit.status();
+			if ( gitStatus.current !== 'master' ) {
+				await askForConfirmationToContinue(
+					'Releasing plugin RC versions usually happens from the ' + warning( 'master' ) + ' branch. Do you want to continue from the current branch?',
+					false,
+					abortMessage
+				);
+			}
 
-		if ( gitStatus.files.length ) {
-			await askForConfirmationToContinue(
-				'Your working tree is dirty. Do you want to continue? (you may loose uncommited changes).',
-				false,
-			);
-		}
+			if ( gitStatus.files.length ) {
+				await askForConfirmationToContinue(
+					'Your working tree is dirty. Do you want to continue? (you may loose uncommited changes).',
+					false,
+					abortMessage
+				);
+			}
+		} );
 
 		// Cleaning the repository
-		const { skipCleaning } = await inquirer.prompt( [ {
-			type: 'confirm',
-			name: 'skipCleaning',
-			message: 'Your working tree is going to be cleaned. Uncommited changes will be lost. Do you want to skip?',
-			default: false,
-		} ] );
-		if ( ! skipCleaning ) {
-			await simpleGit.clean( 'xfd' );
-		}
-
-		// Choosing the right version
-		let nextVersion;
-		let releaseBranch;
-		if ( parsedVersion.minor === 9 ) {
-			nextVersion = ( parsedVersion.major + 1 ) + '.0.0-rc.1';
-			releaseBranch = 'release/' + ( parsedVersion.major + 1 ) + '.0';
-		} else {
-			nextVersion = parsedVersion.major + '.' + ( parsedVersion.minor + 1 ) + '.0-rc.1';
-			releaseBranch = 'release/' + parsedVersion.major + '.' + ( parsedVersion.minor + 1 );
-		}
-		await askForConfirmationToContinue(
-			'The RC Version to be applied is ' + success( nextVersion ) + '. Proceed with the creation of the release branch?'
-		);
+		await runStep( 'Cleaning the repository', abortMessage, async () => {
+			const { skipCleaning } = await inquirer.prompt( [ {
+				type: 'confirm',
+				name: 'skipCleaning',
+				message: 'Your working tree is going to be cleaned. Uncommited changes will be lost. Do you want to skip?',
+				default: false,
+			} ] );
+			if ( ! skipCleaning ) {
+				await simpleGit.clean( 'xfd' );
+			}
+		} );
 
 		// Creating the release branch
-		await simpleGit.checkoutLocalBranch( releaseBranch );
-		console.log( '>> The local release branch ' + success( releaseBranch ) + ' has been successfully created.' );
+		let nextVersion;
+		let releaseBranch;
+		await runStep( 'Creating the release branch', abortMessage, async () => {
+			const parsedVersion = semver.parse( packageJson.version );
+			if ( parsedVersion.minor === 9 ) {
+				nextVersion = ( parsedVersion.major + 1 ) + '.0.0-rc.1';
+				releaseBranch = 'release/' + ( parsedVersion.major + 1 ) + '.0';
+			} else {
+				nextVersion = parsedVersion.major + '.' + ( parsedVersion.minor + 1 ) + '.0-rc.1';
+				releaseBranch = 'release/' + parsedVersion.major + '.' + ( parsedVersion.minor + 1 );
+			}
+			await askForConfirmationToContinue(
+				'The RC Version to be applied is ' + success( nextVersion ) + '. Proceed with the creation of the release branch?',
+				true,
+				abortMessage
+			);
+
+			// Creating the release branch
+			await simpleGit.checkoutLocalBranch( releaseBranch );
+			console.log( '>> The local release branch ' + success( releaseBranch ) + ' has been successfully created.' );
+		} );
+		abortMessage = 'Aborting. Make sure to remove the local release branch.';
 
 		// Bumping the version in the different files (package.json, package-lock.json, gutenberg.php)
-		const newPackageJson = {
-			...packageJson,
-			version: nextVersion,
-		};
-		fs.writeFileSync( packageJsonPath, JSON.stringify( newPackageJson, null, '\t' ) + '\n' );
-		const newPackageLock = {
-			...packageLock,
-			version: nextVersion,
-		};
-		fs.writeFileSync( packageLockPath, JSON.stringify( newPackageLock, null, '\t' ) + '\n' );
-		const content = fs.readFileSync( pluginFilePath, 'utf8' );
-		fs.writeFileSync( pluginFilePath, content.replace( ' * Version: ' + packageJson.version, ' * Version: ' + nextVersion ) );
-		console.log( '>> The plugin version has been updated successfully.' );
+		await runStep( 'Updating the plugin version', abortMessage, async () => {
+			const newPackageJson = {
+				...packageJson,
+				version: nextVersion,
+			};
+			fs.writeFileSync( packageJsonPath, JSON.stringify( newPackageJson, null, '\t' ) + '\n' );
+			const newPackageLock = {
+				...packageLock,
+				version: nextVersion,
+			};
+			fs.writeFileSync( packageLockPath, JSON.stringify( newPackageLock, null, '\t' ) + '\n' );
+			const content = fs.readFileSync( pluginFilePath, 'utf8' );
+			fs.writeFileSync( pluginFilePath, content.replace( ' * Version: ' + packageJson.version, ' * Version: ' + nextVersion ) );
+			console.log( '>> The plugin version has been updated successfully.' );
 
-		// Commit the version bump
-		await askForConfirmationToContinue(
-			'Please check the diff. Proceed with the version bump commit?',
-			true,
-			'Aborting. Make sure to remove the local release branch.'
-		);
-		await simpleGit.add( [
-			packageJsonPath,
-			packageLockPath,
-			pluginFilePath,
-		] );
-		const { commit } = await simpleGit.commit( 'Bump plugin version to ' + nextVersion );
-		console.log( '>> The plugin version bump was commited succesfully. Please push the release branch to the repository and cherry-pick the ' + success( commit ) + ' commit to the master branch.' );
-
-		await askForConfirmationToContinue(
-			'Proceed and build the plugin zip? (It takes a few minutes)',
-			true,
-			'Aborting. Make sure to remove the local release branch.'
-		);
-		childProcess.execSync( '/bin/bash bin/build-plugin-zip.sh', {
-			cwd: rootFolder,
-			env: {
-				NO_CHECKS: true,
-				PATH: process.env.PATH,
-			},
-			stdio: [ 'inherit', 'ignore', 'inherit' ],
+			// Commit the version bump
+			await askForConfirmationToContinue(
+				'Please check the diff. Proceed with the version bump commit?',
+				true,
+				abortMessage
+			);
+			await simpleGit.add( [
+				packageJsonPath,
+				packageLockPath,
+				pluginFilePath,
+			] );
+			const { commit } = await simpleGit.commit( 'Bump plugin version to ' + nextVersion );
+			console.log( '>> The plugin version bump was commited succesfully. Please push the release branch to the repository and cherry-pick the ' + success( commit ) + ' commit to the master branch.' );
 		} );
-		console.log( '>> The plugin zip was built succesfully 🎉. Path: ' + success( rootFolder + '/gutenberg.zip' ) );
+
+		// Plugin ZIP creation
+		await runStep( 'Plugin ZIP creation', abortMessage, async () => {
+			await askForConfirmationToContinue(
+				'Proceed and build the plugin zip? (It takes a few minutes)',
+				true,
+				abortMessage
+			);
+			childProcess.execSync( '/bin/bash bin/build-plugin-zip.sh', {
+				cwd: rootFolder,
+				env: {
+					NO_CHECKS: true,
+					PATH: process.env.PATH,
+				},
+				stdio: [ 'inherit', 'ignore', 'inherit' ],
+			} );
+
+			console.log( '>> The plugin zip was built succesfully 🎉. Path: ' + success( rootFolder + '/gutenberg.zip' ) );
+		} );
 	} );
 
 program.parse( process.argv );
