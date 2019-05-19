@@ -2,6 +2,8 @@
 
 The core controls module is a module intended to simplify implementation of common controls used with the [`@wordpress/data`](/packages/data/README.md) package.
 
+**Note:** It is assumed that the registry being used has the controls plugin enabled on it (see [more details on controls here](https://github.com/WordPress/gutenberg/tree/master/packages/data#controls))
+
 ## Installation
 
 Install the module
@@ -76,11 +78,23 @@ _Returns_
 
 Dispatches a control action for triggering a registry dispatch.
 
+_Usage_
+
+```js
+import { dispatch } from '@wordpress/data-controls';
+
+// Action generator using dispatch
+export function* myAction {
+  yield dispatch( 'core/edit-post' ).togglePublishSidebar();
+  // do some other things.
+}
+```
+
 _Parameters_
 
 -   _storeKey_ `string`: The key for the store the action belongs to
 -   _actionName_ `string`: The name of the action to dispatch
--   _args_ `Array`: Arguments for the dispatch action.  `js import { dispatch } from '@wordpress/data-controls';  // Action generator using dispatch export function* myAction { yield dispatch( 'core/edit-post' ).togglePublishSidebar(); // do some other things. }`
+-   _args_ `Array`: Arguments for the dispatch action.
 
 _Returns_
 

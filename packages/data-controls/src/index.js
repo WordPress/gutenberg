@@ -70,6 +70,7 @@ export function select( storeKey, selectorName, ...args ) {
  * @param {string} actionName  The name of the action to dispatch
  * @param {Array}  args        Arguments for the dispatch action.
  *
+ * @example
  * ```js
  * import { dispatch } from '@wordpress/data-controls';
  *
