@@ -157,10 +157,9 @@ export default {
 	},
 	SELECT: createRegistryControl(
 		( registry ) => ( { storeKey, selectorName, args } ) => {
-			if ( registry.select( storeKey )[ selectorName ].hasResolver ) {
-				return resolveSelect( registry, { storeKey, selectorName, args } );
-			}
-			return registry.select( storeKey )[ selectorName ]( ...args );
+			return registry.select( storeKey )[ selectorName ].hasResolver ?
+				resolveSelect( registry, { storeKey, selectorName, args } ) :
+				registry.select( storeKey )[ selectorName ]( ...args );
 		}
 	),
 	DISPATCH: createRegistryControl(
