@@ -18,7 +18,7 @@ import {
  */
 import Popover from '../popover';
 import Shortcut from '../shortcut';
-import KeyboardShortcuts from '../keyboard-shortcuts';
+import { KeyboardShortcuts } from '../';
 
 /**
  * Time over children to wait before showing tooltip
@@ -76,7 +76,7 @@ class Tooltip extends Component {
 			// quickly blur/mouseleave before delayedSetIsOver is called
 			this.delayedSetIsOver.cancel();
 
-			const isOver = includes( [ 'focus', 'mouseenter' ], event.type );
+			const isOver = includes( [ 'focus', 'mouseenter', 'keydown' ], event.type );
 			if ( isOver === this.state.isOver ) {
 				return;
 			}
@@ -98,15 +98,7 @@ class Tooltip extends Component {
 				console.error( 'Tooltip should be called with only a single child element.' );
 			}
 
-			return (
-				<KeyboardShortcuts
-					shortcuts={ {
-						escape: this.createToggleIsOver,
-					} }
-				>
-					{ children }
-				</KeyboardShortcuts>
-			);
+			return children;
 		}
 
 		const child = Children.only( children );
@@ -128,8 +120,13 @@ class Tooltip extends Component {
 						aria-hidden="true"
 						animate={ false }
 					>
-
-						{ text }
+						<KeyboardShortcuts
+							shortcuts={ {
+								escape: this.createToggleIsOver( 'onKeyDown' ),
+							} }
+						>
+							{ text }
+						</KeyboardShortcuts>
 						<Shortcut className="components-tooltip__shortcut" shortcut={ shortcut } />
 					</Popover>
 				),
