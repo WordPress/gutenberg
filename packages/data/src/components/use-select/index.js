@@ -30,6 +30,16 @@ export default function useSelect( mapSelect, nextProps ) {
 	const latestMapOutput = useRef( mapOutput );
 	const isMounted = useRef();
 
+	const onStoreChange = useCallback( () => {
+		if ( isMounted.current ) {
+			const newMapOutput = latestMapSelect.current( registry.select, registry );
+			if ( ! isShallowEqualObjects( latestMapOutput.current, newMapOutput ) ) {
+				latestMapOutput.current = newMapOutput;
+				setMapOutput( newMapOutput );
+			}
+		}
+	}, [ registry ] );
+
 	/**
 	 * Set current values.
 	 */
@@ -45,19 +55,6 @@ export default function useSelect( mapSelect, nextProps ) {
 		latestIsAsync.current = isAsync;
 		renderQueue.flush( queueContext );
 	}, [ isAsync ] );
-
-	/**
-	 * Callback for doing changes to store.
-	 */
-	const onStoreChange = useCallback( () => {
-		if ( isMounted.current ) {
-			const newMapOutput = latestMapSelect.current( registry.select, registry );
-			if ( ! isShallowEqualObjects( latestMapOutput.current, newMapOutput ) ) {
-				latestMapOutput.current = newMapOutput;
-				setMapOutput( newMapOutput );
-			}
-		}
-	}, [ registry, nextProps ] );
 
 	/**
 	 * Map output should always be called if incoming prop dependencies
@@ -81,7 +78,7 @@ export default function useSelect( mapSelect, nextProps ) {
 			unsubscribe();
 			renderQueue.flush( queueContext );
 		};
-	}, [ registry ] );
+	}, [ onStoreChange ] );
 
 	return mapOutput;
 }
