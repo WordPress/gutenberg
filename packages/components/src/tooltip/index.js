@@ -12,13 +12,13 @@ import {
 	cloneElement,
 	concatChildren,
 } from '@wordpress/element';
-import { KeyboardShortcuts } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import Popover from '../popover';
 import Shortcut from '../shortcut';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 
 /**
  * Time over children to wait before showing tooltip
@@ -91,17 +91,25 @@ class Tooltip extends Component {
 
 	render() {
 		const { children, position, text, shortcut } = this.props;
+		const { isOver } = this.state;
 		if ( Children.count( children ) !== 1 ) {
 			if ( 'development' === process.env.NODE_ENV ) {
 				// eslint-disable-next-line no-console
 				console.error( 'Tooltip should be called with only a single child element.' );
 			}
 
-			return children;
+			return (
+				<KeyboardShortcuts
+					shortcuts={ {
+						escape: this.createToggleIsOver,
+					} }
+				>
+					{ children }
+				</KeyboardShortcuts>
+			);
 		}
 
 		const child = Children.only( children );
-		const { isOver } = this.state;
 		return cloneElement( child, {
 			onMouseEnter: this.createToggleIsOver( 'onMouseEnter', true ),
 			onMouseLeave: this.createToggleIsOver( 'onMouseLeave' ),
@@ -120,6 +128,7 @@ class Tooltip extends Component {
 						aria-hidden="true"
 						animate={ false }
 					>
+
 						{ text }
 						<Shortcut className="components-tooltip__shortcut" shortcut={ shortcut } />
 					</Popover>
