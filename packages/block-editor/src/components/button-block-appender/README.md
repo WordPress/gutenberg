@@ -40,4 +40,4 @@ A CSS `class` to be _prepended_ to the default class of `"button-block-appender"
 
 ## Examples
 
-The [`<InnerBlocks>` component](packages/block-editor/src/components/inner-blocks/) exposes an enhanced version of `ButtonBlockAppender` to allow consumers to choose it as an alternative to the standard behaviour of auto-inserting the default Block (typically `core/paragraph`).
+The [`<InnerBlocks>` component](../inner-blocks/) exposes an enhanced version of `ButtonBlockAppender` to allow consumers to choose it as an alternative to the standard behaviour of auto-inserting the default Block (typically `core/paragraph`).

@@ -21,7 +21,7 @@ export const getAvailableBlockTransforms = async () => {
 			)
 		).map(
 			( button ) => {
-				return button.getAttribute( 'aria-label' );
+				return button.textContent;
 			}
 		);
 	}, '.block-editor-block-types-list .block-editor-block-types-list__list-item button' );

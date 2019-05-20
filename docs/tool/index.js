@@ -12,7 +12,7 @@ const path = require( 'path' );
 const { getRootManifest } = require( './manifest' );
 
 const tocFileInput = path.resolve( __dirname, '../toc.json' );
-const manifestOutput = path.resolve( __dirname, '../manifest.json' );
+const manifestOutput = path.resolve( __dirname, '../manifest-devhub.json' );
 
 // Update data files from code
 execSync( join( __dirname, 'update-data.js' ) );
