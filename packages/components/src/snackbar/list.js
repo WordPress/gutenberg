@@ -26,7 +26,7 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 	return (
 		<div className={ className }>
 			{ children }
-			{ [ ...notices ].reverse().map( ( notice ) => (
+			{ notices.map( ( notice ) => (
 				<Snackbar
 					{ ...omit( notice, [ 'content' ] ) }
 					key={ notice.id }
