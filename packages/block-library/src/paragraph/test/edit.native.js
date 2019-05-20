@@ -35,7 +35,7 @@ describe( 'Paragraph block', () => {
 		expect( component.exists() ).toBe( true );
 	} );
 
-	it( 'splits empty block on Enter', () => {
+	it( 'splits empty block', () => {
 		// Given
 		const instance = getTestInstanceWithContent( '' );
 
@@ -61,7 +61,7 @@ describe( 'Paragraph block', () => {
 		expect( instance.props.insertBlocksAfter ).toHaveBeenCalledWith( [ newBlock ] );
 	} );
 
-	it( 'splits block on Enter with content on the middle', () => {
+	it( 'splits block with content on the middle', () => {
 		// Given
 		const before = 'Some text ';
 		const after = 'to split';
