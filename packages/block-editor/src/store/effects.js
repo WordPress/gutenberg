@@ -70,8 +70,8 @@ export default {
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
 		const state = store.getState();
-		const [ firstBlockClientId, secondBlockClientId ] = action.blocks;
-		const blockA = getBlock( state, firstBlockClientId );
+		const [ clientIdA, clientIdB ] = action.blocks;
+		const blockA = getBlock( state, clientIdA );
 		const blockAType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
@@ -80,27 +80,33 @@ export default {
 			return;
 		}
 
-		// We can only merge blocks with similar types
-		// thus, we transform the block to merge first
-		const blockB = getBlock( state, secondBlockClientId );
+		const blockB = getBlock( state, clientIdB );
 		const blockBType = getBlockType( blockB.name );
+		const { clientId, attributeKey, offset } = getSelectionStart( state );
+		const hasSelection = clientId === clientIdA || clientId === clientIdB;
+		const selectedBlock = clientId === clientIdA ? blockA : blockB;
+		const html = selectedBlock.attributes[ attributeKey ];
 
 		// A robust way to retain selection position through various transforms
 		// is to insert a special character at the position and then recover it.
 		const START_OF_SELECTED_AREA = '\u0086';
-		const { attributeKey, offset } = getSelectionStart( state );
-		const html = blockB.attributes[ attributeKey ];
-		const multilineTagB = blockBType.attributes[ attributeKey ].multiline;
-		const value = insert( create( {
-			html,
-			multilineTag: multilineTagB,
-		} ), START_OF_SELECTED_AREA, offset, offset );
 
-		blockB.attributes[ attributeKey ] = toHTMLString( {
-			value,
-			multilineTag: multilineTagB,
-		} );
+		if ( hasSelection ) {
+			const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
+			const multilineTag = selectedBlockType.attributes[ attributeKey ].multiline;
+			const value = insert( create( {
+				html,
+				multilineTag,
+			} ), START_OF_SELECTED_AREA, offset, offset );
 
+			selectedBlock.attributes[ attributeKey ] = toHTMLString( {
+				value,
+				multilineTag,
+			} );
+		}
+
+		// We can only merge blocks with similar types
+		// thus, we transform the block to merge first
 		const blocksWithTheSameType = blockA.name === blockB.name ?
 			[ blockB ] :
 			switchToBlockType( blockB, blockA.name );
@@ -116,24 +122,27 @@ export default {
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		const newAttributeKey = findKey( updatedAttributes, ( v ) =>
-			typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
-		);
-		const convertedHtml = updatedAttributes[ newAttributeKey ];
-		const multilineTagA = blockAType.attributes[ newAttributeKey ].multiline;
-		const convertedValue = create( { html: convertedHtml, multilineTag: multilineTagA } );
-		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
-		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
-		const newHtml = toHTMLString( { value: newValue, multilineTag: multilineTagA } );
+		if ( hasSelection ) {
+			const newAttributeKey = findKey( updatedAttributes, ( v ) =>
+				typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
+			);
+			const convertedHtml = updatedAttributes[ newAttributeKey ];
+			const multilineTag = blockAType.attributes[ newAttributeKey ].multiline;
+			const convertedValue = create( { html: convertedHtml, multilineTag } );
+			const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
+			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
+			const newHtml = toHTMLString( { value: newValue, multilineTag } );
 
-		updatedAttributes[ newAttributeKey ] = newHtml;
+			updatedAttributes[ newAttributeKey ] = newHtml;
+			selectedBlock.attributes[ attributeKey ] = html;
 
-		dispatch( selectionChange(
-			blockA.clientId,
-			newAttributeKey,
-			newOffset,
-			newOffset
-		) );
+			dispatch( selectionChange(
+				blockA.clientId,
+				newAttributeKey,
+				newOffset,
+				newOffset
+			) );
+		}
 
 		dispatch( replaceBlocks(
 			[ blockA.clientId, blockB.clientId ],

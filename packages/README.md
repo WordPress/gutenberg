@@ -124,5 +124,5 @@ NPM_CONFIG_OTP=123456 npm run publish:prod
 
 Choose the correct version based on `CHANGELOG.md` files, confirm your choices and let Lerna do its magic.
 
-[lerna]: https://lernajs.io/
+[lerna]: https://lerna.js.org/
 [npm]: https://www.npmjs.com/

@@ -98,6 +98,10 @@ class AudioEdit extends Component {
 		this.setState( { editing: false } );
 	}
 
+	getAutoplayHelp( checked ) {
+		return checked ? __( 'Note: Autoplaying audio may cause usability issues for some visitors.' ) : null;
+	}
+
 	render() {
 		const { autoplay, caption, loop, preload, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
@@ -153,6 +157,7 @@ class AudioEdit extends Component {
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ this.getAutoplayHelp }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }

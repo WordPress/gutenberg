@@ -4,7 +4,7 @@ Thank you for thinking about contributing to WordPress' Gutenberg project! If yo
 
 As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](/CODE_OF_CONDUCT.md).
 
-Before contributing, we encourage you to review the [Contributor Handbook](https://wordpress.org/gutenberg/handbook/contributors/). If you have any questions, please ask, either in Slack or open an issue in GitHub so we can help clarify.
+Before contributing, we encourage you to review the [Contributor Handbook](https://developer.wordpress.org/block-editor/contributors/). If you have any questions, please ask, either in Slack or open an issue in GitHub so we can help clarify.
 
 All WordPress projects are [licensed under the GPLv2+](/LICENSE.md), and all contributions to Gutenberg will be released under the GPLv2+ license. You maintain copyright over any contribution you make, and by submitting a pull request, you are agreeing to release that contribution under the GPLv2+ license.
 
@@ -22,7 +22,7 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 
 Please see the [Documentation section](/docs/contributors/document.md) of the Contributor Handbook.
 
-Documentation is automatically synced from `master` to the [Gutenberg Handbook](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
+Documentation is automatically synced from `master` to the [Block Editor Handbook](https://developer.wordpress.org/block-editor/) every 15 minutes.
 
 ### `@wordpress/component`
 

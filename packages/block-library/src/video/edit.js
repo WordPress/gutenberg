@@ -126,6 +126,10 @@ class VideoEdit extends Component {
 		this.posterImageButton.current.focus();
 	}
 
+	getAutoplayHelp( checked ) {
+		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
+	}
+
 	render() {
 		const {
 			autoplay,
@@ -200,6 +204,7 @@ class VideoEdit extends Component {
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ this.getAutoplayHelp }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }

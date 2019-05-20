@@ -20,12 +20,12 @@ import { __ } from '@wordpress/i18n';
  */
 import ImageSize from './image-size';
 
-const MEDIA_UPLOAD_STATE_UPLOADING = 1;
-const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
-const MEDIA_UPLOAD_STATE_FAILED = 3;
-const MEDIA_UPLOAD_STATE_RESET = 4;
+export const MEDIA_UPLOAD_STATE_UPLOADING = 1;
+export const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
+export const MEDIA_UPLOAD_STATE_FAILED = 3;
+export const MEDIA_UPLOAD_STATE_RESET = 4;
 
-class MediaUploadProgress extends React.Component {
+export class MediaUploadProgress extends React.Component {
 	constructor( props ) {
 		super( props );
 
@@ -64,7 +64,7 @@ class MediaUploadProgress extends React.Component {
 				this.finishMediaUploadWithFailure( payload );
 				break;
 			case MEDIA_UPLOAD_STATE_RESET:
-				this.mediaUploadStateReset();
+				this.mediaUploadStateReset( payload );
 				break;
 		}
 	}
@@ -90,10 +90,10 @@ class MediaUploadProgress extends React.Component {
 		}
 	}
 
-	mediaUploadStateReset( ) {
+	mediaUploadStateReset( payload ) {
 		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
 		if ( this.props.onMediaUploadStateReset ) {
-			this.props.onMediaUploadStateReset();
+			this.props.onMediaUploadStateReset( payload );
 		}
 	}
 
