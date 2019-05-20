@@ -7,12 +7,11 @@ import TestUtils from 'react-dom/test-utils';
  * Internal dependencies
  */
 import Dropdown from '../';
-import Popover from '../../popover';
 
 describe( 'Dropdown', () => {
 	const expectPopoverVisible = ( wrapper, visible ) => {
 		expect(
-			TestUtils.scryRenderedComponentsWithType( wrapper, Popover ) )
+			TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' ) )
 			.toHaveLength( visible ? 1 : 0 );
 	};
 	const buttonElement = ( wrapper ) => TestUtils.findRenderedDOMComponentWithTag(
@@ -31,13 +30,14 @@ describe( 'Dropdown', () => {
 				buttonElement( wrapper ).getAttribute( 'aria-expanded' )
 			).toBe( expanded.toString() );
 		};
+
 		const wrapper = TestUtils.renderIntoDocument( <Dropdown
 			className="container"
 			contentClassName="content"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<button aria-expanded={ isOpen } onClick={ onToggle }>Toggleee</button>
 			) }
-			renderContent={ () => null }
+			renderContent={ () => <span>test</span> }
 		/> );
 
 		expectButtonExpanded( wrapper, false );

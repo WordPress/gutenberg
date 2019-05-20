@@ -178,14 +178,3 @@ div.block-core-columns.is-vertically-aligned-bottom {
 		display: none;
 	}
 }
-
-// In absence of making the individual columns resizable, we prevent them from being clickable.
-// This makes them less fiddly. @todo: This should be revisited as the interface is refined.
-.wp-block-columns [data-type="core/column"] {
-	pointer-events: none;
-
-	// This selector re-enables clicking on any child of a column block.
-	.block-core-columns .block-editor-block-list__layout {
-		pointer-events: all;
-	}
-}
