@@ -12,6 +12,7 @@ import {
 	cloneElement,
 	concatChildren,
 } from '@wordpress/element';
+import { KeyboardShortcuts } from '@wordpress/components';
 
 /**
  * Internal dependencies
