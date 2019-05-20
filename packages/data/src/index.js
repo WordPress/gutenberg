@@ -9,11 +9,14 @@ import combineReducers from 'turbo-combine-reducers';
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 
-export { default as withSelect } from './components/with-select';
+export { withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as withRegistry } from './components/with-registry';
-export { default as RegistryProvider, RegistryConsumer } from './components/registry-provider';
-export { default as __experimentalAsyncModeProvider } from './components/async-mode-provider';
+export { RegistryProvider, RegistryConsumer } from './components/registry-provider';
+export {
+	AsyncModeProvider as __experimentalAsyncModeProvider,
+	useAsyncMode as __experimentalUseAsyncMode,
+} from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { plugins };
 export { createRegistrySelector, createRegistryControl } from './factory';
