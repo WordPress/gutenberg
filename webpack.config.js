@@ -5,8 +5,7 @@ const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const postcss = require( 'postcss' );
 const { get, escapeRegExp } = require( 'lodash' );
-const { basename, sep, join } = require( 'path' );
-const { statSync } = require( 'fs' );
+const { basename, sep } = require( 'path' );
 
 /**
  * WordPress dependencies
@@ -31,20 +30,11 @@ module.exports = {
 	...defaultConfig,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
 		const name = camelCaseDash( packageName );
-
-		let path = `./packages/${ packageName }`;
-		try {
-			// Operate on source files, if exists. Since statSync will throw if
-			// the path doesn't exist, append will only occur if it does exist.
-			statSync( `${ path }/src` );
-			path += '/src';
-		} catch ( error ) {}
-
-		memo[ name ] = path;
+		memo[ name ] = `./packages/${ packageName }`;
 		return memo;
 	}, {} ),
 	output: {
-		filename: './build/[package]/index.js',
+		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
@@ -57,7 +47,7 @@ module.exports = {
 			'process.env.GUTENBERG_PHASE': JSON.stringify( parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1 ),
 		} ),
 		new CustomTemplatedPathPlugin( {
-			package( path, data ) {
+			basename( path, data ) {
 				let rawRequest;
 
 				const entryModule = get( data, [ 'chunk', 'entryModule' ], {} );
@@ -72,12 +62,7 @@ module.exports = {
 				}
 
 				if ( rawRequest ) {
-					let packageName = basename( rawRequest );
-					if ( packageName === 'src' ) {
-						packageName = basename( join( rawRequest, '..' ) );
-					}
-
-					return packageName;
+					return basename( rawRequest );
 				}
 
 				return path;
