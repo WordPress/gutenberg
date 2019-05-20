@@ -14,7 +14,6 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import DropdownMenu from '../';
-import Popover from '../../popover';
 
 describe( 'DropdownMenu', () => {
 	let controls;
@@ -79,7 +78,7 @@ describe( 'DropdownMenu', () => {
 				}
 			);
 
-			expect( TestUtils.scryRenderedComponentsWithType( wrapper, Popover ) ).toHaveLength( 1 );
+			expect( TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' ) ).toHaveLength( 1 );
 		} );
 	} );
 } );
