@@ -26,7 +26,7 @@ registerPlugin( 'plugin-sidebar-test', { render: PluginSidebarTest } );
 ## Location
 
 ### Closed State
-![Closed State](../../../../docs/designer-developers/assets/plugin-sidebar-closed-state.png?raw=true)
+![Closed State](./plugin-sidebar-closed-state.png?raw=true)
 ### Open State
 ![Open State](../../../../docs/designer-developers/assets/plugin-sidebar-open-state.png?raw=true)
 
