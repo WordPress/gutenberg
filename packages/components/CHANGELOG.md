@@ -7,6 +7,7 @@
 ### Bug Fixes
 
 - Fixed display of reset button when using RangeControl `allowReset` prop.
+- Fixed minutes field of `DateTimePicker` missed '0' before single digit values.
 
 ## 7.3.0 (2019-04-16)
 
