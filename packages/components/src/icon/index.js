@@ -8,13 +8,13 @@ import { cloneElement, createElement, Component, isValidElement } from '@wordpre
  */
 import { Dashicon, SVG } from '../';
 
-function Icon( { icon = null, size, className } ) {
+function Icon( { icon = null, size, className, style } ) {
 	let iconSize;
 
 	if ( 'string' === typeof icon ) {
 		// Dashicons should be 20x20 by default
 		iconSize = size || 20;
-		return <Dashicon icon={ icon } size={ iconSize } className={ className } />;
+		return <Dashicon icon={ icon } size={ iconSize } className={ className } { ...style } />;
 	}
 
 	// Any other icons should be 24x24 by default
@@ -22,7 +22,7 @@ function Icon( { icon = null, size, className } ) {
 
 	if ( 'function' === typeof icon ) {
 		if ( icon.prototype instanceof Component ) {
-			return createElement( icon, { className, size: iconSize } );
+			return createElement( icon, { className, style, size: iconSize } );
 		}
 
 		return icon();
@@ -34,6 +34,7 @@ function Icon( { icon = null, size, className } ) {
 			width: iconSize,
 			height: iconSize,
 			...icon.props,
+			...style,
 		};
 
 		return <SVG { ...appliedProps } />;
@@ -42,6 +43,7 @@ function Icon( { icon = null, size, className } ) {
 	if ( isValidElement( icon ) ) {
 		return cloneElement( icon, {
 			className,
+			style,
 			size: iconSize,
 		} );
 	}

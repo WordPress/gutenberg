@@ -17,6 +17,7 @@ import {
  * WordPress dependencies
  */
 import {
+	Icon,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -37,8 +38,7 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import MediaUploadProgress from '../image/media-upload-progress';
 import style from './style.scss';
-import SvgIcon from './icon';
-import SvgIconRetry from './icon-retry';
+import icon from './icon';
 
 const VIDEO_ASPECT_RATIO = 1.7;
 
@@ -129,11 +129,10 @@ class VideoEdit extends React.Component {
 	}
 
 	getIcon( isRetryIcon, isUploadInProgress ) {
-		if ( isRetryIcon ) {
-			return <SvgIconRetry fill={ style.icon.fill } />;
-		}
+		const iconValue = isRetryIcon ? 'retry' : icon;
+		const iconStyles = ! isRetryIcon && isUploadInProgress ? style.iconUploading : style.icon;
 
-		return <SvgIcon fill={ isUploadInProgress ? style.iconUploading.fill : style.icon.fill } />;
+		return <Icon icon={ iconValue } style={ iconStyles } />;
 	}
 
 	render() {
@@ -193,11 +192,11 @@ class VideoEdit extends React.Component {
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( { isUploadInProgress, isUploadFailed, retryMessage } ) => {
 							const showVideo = src && ! isUploadInProgress && ! isUploadFailed;
-							const icon = this.getIcon( isUploadFailed, isUploadInProgress );
+							const blockIcon = this.getIcon( isUploadFailed, isUploadInProgress );
 
 							const iconContainer = (
 								<View style={ style.modalIcon }>
-									{ icon }
+									{ blockIcon }
 								</View>
 							);
 
