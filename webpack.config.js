@@ -39,6 +39,12 @@ module.exports = {
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
 	},
+	// Despite being empty, this must exist as an entry to override the default
+	// configuration. Gutenberg does not inherit the same Webpack rules as in
+	// the default. Notably, it does not require Babel processing because the
+	// files are transpiled by `npm run build:packages` before being processed
+	// by Webpack.
+	module: {},
 	plugins: [
 		...defaultConfig.plugins,
 		new DefinePlugin( {
