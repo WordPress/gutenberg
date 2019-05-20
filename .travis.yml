@@ -25,9 +25,7 @@ branches:
 before_install:
   - nvm install --latest-npm
 
-env:
-  - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-  - HARDWARE_CONCURRENCY=2
+env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 jobs:
   include:
