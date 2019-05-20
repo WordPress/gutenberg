@@ -26,9 +26,9 @@ registerPlugin( 'plugin-sidebar-test', { render: PluginSidebarTest } );
 ## Location
 
 ### Closed State
-![Closed State](../../../../master/docs/designer-developers/assets/plugin-sidebar-closed-state.png?raw=true)
+![Closed State](../../../../docs/designer-developers/assets/plugin-sidebar-closed-state.png?raw=true)
 ### Open State
-![Open State](../../../../master/docs/designer-developers/assets/plugin-sidebar-open-state.png?raw=true)
+![Open State](../../../../docs/designer-developers/assets/plugin-sidebar-open-state.png?raw=true)
 
 
 [Back to SlotFills](../)
