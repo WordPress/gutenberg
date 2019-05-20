@@ -1,11 +1,15 @@
 /**
  * Node dependencies
  */
-const { camelCase, kebabCase, nth, upperFirst } = require( 'lodash' );
-
+const { camelCase, nth, upperFirst } = require( 'lodash' );
 const fs = require( 'fs' );
+const glob = require( 'glob' ).sync;
 
 const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/master`;
+const componentPaths = glob( 'packages/components/src/*/**/README.md' );
+const packagePaths = glob( 'packages/*/package.json' ).map(
+	( fileName ) => fileName.split( '/' )[ 1 ]
+);
 
 /**
  * Generates the package manifest.
@@ -29,37 +33,18 @@ function getPackageManifest( packageFolderNames ) {
 /**
  * Generates the components manifest.
  *
- * @param {Array} componentPaths Paths for all components
+ * @param {Array} paths Paths for all components
  *
  * @return {Array} Manifest
  */
-function getComponentManifest( componentPaths ) {
-	return componentPaths.map( ( filePath ) => {
+function getComponentManifest( paths ) {
+	return paths.map( ( filePath ) => {
 		const slug = nth( filePath.split( '/' ), -2 );
 		return {
 			title: upperFirst( camelCase( slug ) ),
 			slug,
 			markdown_source: `${ baseRepoUrl }/${ filePath }`,
 			parent: 'components',
-		};
-	} );
-}
-
-/**
- * Generates the data manifest.
- *
- * @param {Object} parsedNamespaces Parsed Namespace Object
- *
- * @return {Array} Manifest
- */
-function getDataManifest( parsedNamespaces ) {
-	return Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
-		const slug = `data-${ kebabCase( parsedNamespace.name ) }`;
-		return {
-			title: parsedNamespace.title,
-			slug,
-			markdown_source: `${ baseRepoUrl }/docs/designers-developers/developers/data/${ slug }.md`,
-			parent: 'data',
 		};
 	} );
 }
@@ -98,14 +83,15 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 		} );
 		if ( Array.isArray( children ) && children.length ) {
 			pageItems = pageItems.concat( generateRootManifestFromTOCItems( children, slug ) );
+		} else if ( children === '{{components}}' ) {
+			pageItems = pageItems.concat( getComponentManifest( componentPaths ) );
+		} else if ( children === '{{packages}}' ) {
+			pageItems = pageItems.concat( getPackageManifest( packagePaths ) );
 		}
 	} );
 	return pageItems;
 }
 
 module.exports = {
-	getPackageManifest,
-	getComponentManifest,
-	getDataManifest,
 	getRootManifest,
 };

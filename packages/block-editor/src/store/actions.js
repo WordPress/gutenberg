@@ -298,7 +298,7 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  *
  * @yields {Object} Action object.
  */
-export function* moveBlockToPosition( clientId, fromRootClientId, toRootClientId, index ) {
+export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootClientId = '', index ) {
 	const templateLock = yield select(
 		'core/block-editor',
 		'getTemplateLock',

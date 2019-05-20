@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import { PostSchedule as PostScheduleForm, PostScheduleLabel, PostScheduleCheck } from '@wordpress/editor';
-import { Fragment } from '@wordpress/element';
 
 export function PostSchedule( { instanceId } ) {
 	return (
@@ -21,7 +20,7 @@ export function PostSchedule( { instanceId } ) {
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
 					renderToggle={ ( { onToggle, isOpen } ) => (
-						<Fragment>
+						<>
 							<label
 								className="edit-post-post-schedule__label"
 								htmlFor={ `edit-post-post-schedule__toggle-${ instanceId }` }
@@ -39,7 +38,7 @@ export function PostSchedule( { instanceId } ) {
 							>
 								<PostScheduleLabel />
 							</Button>
-						</Fragment>
+						</>
 					) }
 					renderContent={ () => <PostScheduleForm /> }
 				/>

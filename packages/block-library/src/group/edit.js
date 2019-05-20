@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -16,8 +15,6 @@ import {
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
-
-const renderAppender = () => <InnerBlocks.ButtonBlockAppender />;
 
 function GroupEdit( {
 	className,
@@ -34,7 +31,7 @@ function GroupEdit( {
 	} );
 
 	return (
-		<Fragment>
+		<>
 			<InspectorControls>
 				<PanelColorSettings
 					title={ __( 'Color Settings' ) }
@@ -49,10 +46,10 @@ function GroupEdit( {
 			</InspectorControls>
 			<div className={ classes } style={ styles }>
 				<InnerBlocks
-					renderAppender={ ! hasInnerBlocks && renderAppender }
+					renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
 				/>
 			</div>
-		</Fragment>
+		</>
 	);
 }
 
