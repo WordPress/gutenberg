@@ -6,7 +6,7 @@ import { isFunction } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createPortal, useEffect, useRef, useState } from '@wordpress/element';
+import { createPortal, useLayoutEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,20 +25,17 @@ function FillComponent( { name, getSlot, children, registerFill, unregisterFill 
 		children,
 	} );
 
-	useEffect( () => {
-		ref.current.occurence = ++occurrences;
-		ref.current.resetOccurrence = () => {
-			ref.current.occurence = null;
-		};
+	if ( ! ref.current.occurrence ) {
+		ref.current.occurrence = ++occurrences;
+	}
+
+	useLayoutEffect( () => {
 		ref.current.forceUpdate = rerender;
 		registerFill( name, ref.current );
 		return () => unregisterFill( name, ref.current );
 	}, [] );
 
-	useEffect( () => {
-		if ( ! ref.current.occurence ) {
-			ref.current.occurence = ++occurrences;
-		}
+	useLayoutEffect( () => {
 		ref.current.children = children;
 		const slot = getSlot( name );
 		if ( slot && ! slot.props.bubblesVirtually ) {
@@ -46,7 +43,11 @@ function FillComponent( { name, getSlot, children, registerFill, unregisterFill 
 		}
 	}, [ children ] );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
+		if ( name === ref.current.name ) {
+			// ignore initial effect
+			return;
+		}
 		unregisterFill( ref.current.name, ref.current );
 		ref.current.name = name;
 		registerFill( name, ref.current );
