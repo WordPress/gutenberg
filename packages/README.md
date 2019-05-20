@@ -50,7 +50,7 @@ When creating a new package, you need to provide at least the following:
 
 ### Maintaining Changelogs
 
-In maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each project includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Master") changes, if any exist.
+In maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Master") changes, if any exist.
 
 For each pull request, you should always include relevant changes in a "Master" heading at the top of the file. You should add the heading if it doesn't already exist.
 
