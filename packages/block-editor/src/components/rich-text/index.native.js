@@ -749,8 +749,8 @@ export class RichText extends Component {
 					// So, skip forcing it, let Aztec just do its best and just log the fact.
 					console.warn( 'RichText value will be trimmed for spaces! Avoiding setting the caret position manually.' );
 					selection = null;
-				} else if ( this.props.selectionStart > record.text.length || this.props.selectionEnd > record.text.length) {
-					console.warn( 'Oops, selection will land outside the text, skipping setting it...');
+				} else if ( this.props.selectionStart > record.text.length || this.props.selectionEnd > record.text.length ) {
+					console.warn( 'Oops, selection will land outside the text, skipping setting it...' );
 					selection = null;
 				}
 			}
