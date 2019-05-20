@@ -40,4 +40,15 @@ describe( 'Notice', () => {
 		expect( classes.contains( 'components-notice' ) ).toBe( true );
 		expect( classes.contains( 'is-dismissible' ) ).toBe( false );
 	} );
+
+	it( 'should default to info status', () => {
+		const renderer = new ShallowRenderer();
+
+		renderer.render( <Notice /> );
+
+		const classes = new TokenList(
+			renderer.getRenderOutput().props.className
+		);
+		expect( classes.contains( 'is-info' ) ).toBe( true );
+	} );
 } );

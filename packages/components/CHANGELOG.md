@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fixes
+
+- Notice will assume a default status of 'info' if none is provided. This resolves an issue where the notice would be assigned a class name `is-undefined`. This was previously the effective default by styled appearance and should not be considered a breaking change in that regard.
+
 ## 9.0.0 (2020-01-13)
 
 ### New Features
