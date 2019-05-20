@@ -20,6 +20,6 @@ registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 ```
 ## Location
 
-![Location in the Status & Visibility panel](../../../../master/assets/images/plugin-post-status-info-location.png?raw=true)
+![Location in the Status & Visibility panel](../../assets/plugin-post-status-info-location.png?raw=true)
 
 [Back to SlotFills](../)

@@ -28,7 +28,7 @@ registerPlugin( 'plugin-sidebar-test', { render: PluginSidebarTest } );
 ### Closed State
 ![Closed State](../../assets/plugin-sidebar-closed-state.png?raw=true)
 ### Open State
-![Open State](./plugin-sidebar-open-state.png?raw=true)
+![Open State](../../assets/plugin-sidebar-open-state.png?raw=true)
 
 
 [Back to SlotFills](../)

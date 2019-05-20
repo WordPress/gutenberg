@@ -37,7 +37,7 @@ registerPlugin( 'plugin-sidebar-expanded-test', { render: PluginSidebarMoreMenuI
 ```
 
 ## Location
-![Interaction](../../../../master/assets/images/plugin-sidebar-more-menu-item.gif?raw=true)
+![Interaction](../../assets/plugin-sidebar-more-menu-item.gif?raw=true)
 
 
 
