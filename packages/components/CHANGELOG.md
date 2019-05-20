@@ -1,5 +1,9 @@
 ## Master
 
+### Enhancements
+
+- The `Notice` component will speak its message.
+
 ### Bug Fixes
 
 - Notice will assume a default status of 'info' if none is provided. This resolves an issue where the notice would be assigned a class name `is-undefined`. This was previously the effective default by styled appearance and should not be considered a breaking change in that regard.

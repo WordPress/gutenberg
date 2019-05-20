@@ -8,13 +8,57 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RawHTML } from '@wordpress/element';
+import { RawHTML, useEffect, renderToString } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { Button } from '../';
+
+/**
+ * Custom hook which announces the message with the given politeness, if a
+ * valid message is provided.
+ *
+ * @param {?string} message    Message to announce.
+ * @param {string}  politeness Politeness in which to announce, one of 'polite'
+ *                             or 'assertive'.
+ */
+function useSpokenMessage( message, politeness ) {
+	useEffect( () => {
+		if ( ! message ) {
+			return;
+		}
+
+		if ( typeof message !== 'string' ) {
+			message = renderToString( message );
+		}
+
+		speak( message, politeness );
+	}, [ message, politeness ] );
+}
+
+/**
+ * Given a notice status, returns an assumed default equivalent role for the
+ * status. Defaults to 'alert'.
+ *
+ * @param {?string} status Notice status.
+ *
+ * @return {string} Notice role.
+ */
+function getDefaultRole( status ) {
+	switch ( status ) {
+		case 'success':
+		case 'warning':
+		case 'info':
+			return 'status';
+
+		case 'error':
+		default:
+			return 'alert';
+	}
+}
 
 function Notice( {
 	className,
@@ -23,8 +67,12 @@ function Notice( {
 	onRemove = noop,
 	isDismissible = true,
 	actions = [],
+	role = getDefaultRole( status ),
 	__unstableHTML,
 } ) {
+	const politeness = role === 'status' ? 'polite' : 'assertive';
+	useSpokenMessage( children, politeness );
+
 	const classes = classnames(
 		className,
 		'components-notice',
