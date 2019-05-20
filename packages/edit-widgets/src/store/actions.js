@@ -6,19 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	parse,
-	serialize,
-} from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import { STORE_KEY } from './constants';
-import {
-	select,
-	apiFetch,
-} from './controls';
+import { parse } from '@wordpress/blocks';
 
 export function setupWidgetAreas( widgetAreas ) {
 	return {
@@ -38,25 +26,4 @@ export function updateBlocksInWidgetArea( widgetAreaId, blocks ) {
 		widgetAreaId,
 		blocks,
 	};
-}
-
-export function* saveWidgetAreas() {
-	const widgetAreas = yield select(
-		STORE_KEY,
-		'getWidgetAreas'
-	);
-	for ( const widgetArea of widgetAreas ) {
-		const widgetAreaBlocks = yield select(
-			STORE_KEY,
-			'getWidgetAreaBlocks',
-			widgetArea.id
-		);
-		const content = serialize( widgetAreaBlocks );
-		const path = `/__experimental/widget-areas/${ widgetArea.id }`;
-		yield apiFetch( {
-			path,
-			method: 'POST',
-			data: { content },
-		} );
-	}
 }

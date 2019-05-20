@@ -5,6 +5,9 @@ import { compose } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
+import {
+	serialize,
+} from '@wordpress/blocks';
 
 function Header( { saveWidgetAreas } ) {
 	return (
@@ -28,10 +31,19 @@ function Header( { saveWidgetAreas } ) {
 }
 
 export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { saveWidgetAreas } = dispatch( 'core/edit-widgets' );
+	withDispatch( ( dispatch, props, { select } ) => {
 		return {
-			saveWidgetAreas,
+			saveWidgetAreas() {
+				const { getWidgetAreas, getWidgetAreaBlocks } = select( 'core/edit-widgets' );
+				const widgetAreas = getWidgetAreas();
+				const { saveWidgetArea } = dispatch( 'core' );
+				widgetAreas.forEach( ( { id } ) => {
+					saveWidgetArea( {
+						id,
+						content: serialize( getWidgetAreaBlocks( id ) ),
+					} );
+				} );
+			},
 		};
 	} ),
 ] )( Header );
