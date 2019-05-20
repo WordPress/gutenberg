@@ -2,7 +2,7 @@
 	var el = wp.element.createElement;
 	var __ = wp.i18n.__;
 	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginDocumentSetting = wp.editPost.PluginPostStatusInfo;
+	var PluginDocumentSetting = wp.editPost.PluginDocumentSetting;
 
 	function MyDocumentSettingPlugin() {
 		return el(
