@@ -652,7 +652,7 @@ export class RichText extends Component {
 
 	willTrimSpaces( html ) {
 		// regex for detecting spaces around html tags
-		const trailingSpaces = /^(\s+)<.+?>|<.+?>(\s+)$/g;
+		const trailingSpaces = /(\s+)<.+?>|<.+?>(\s+)/g;
 		const matches = html.match( trailingSpaces );
 		if ( matches && matches.length > 0 ) {
 			return true;
