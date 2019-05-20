@@ -163,7 +163,7 @@
 		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module ./packages/*/build-style ./packages/*/node_modules",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
 		"build:packages": "node ./bin/packages/build.js",
-		"build": "npm run build:packages && wp-scripts build",
+		"build": "npm run build:packages && wp-scripts build --no-babel",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
