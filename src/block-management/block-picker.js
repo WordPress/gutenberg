@@ -12,7 +12,7 @@ import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { SVG } from '@wordpress/components';
+import { SVG, Dashicon } from '@wordpress/components';
 import { BottomSheet } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { getBlockTypes, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
@@ -76,12 +76,18 @@ export default class BlockPicker extends Component<PropsType> {
 		);
 	}
 
-	iconWithUpdatedFillColor( color: string, icon: SVG ) {
-		return (
-			<SVG viewBox={ icon.src.props.viewBox } xmlns={ icon.src.props.xmlns } style={ { fill: color } }>
-				{ icon.src.props.children }
-			</SVG>
-		);
+	iconWithUpdatedFillColor( color: string, icon: Object ) {
+		if ( 'string' === typeof icon.src ) {
+			return (
+				<Dashicon icon={ icon.src } fill={ color } size={ styles.modalIcon.width } />
+			);
+		} else if ( icon.src && ( icon.src.type === 'svg' || icon.src.type === SVG ) ) {
+			return (
+				<SVG viewBox={ icon.src.props.viewBox } xmlns={ icon.src.props.xmlns } style={ { fill: color } }>
+					{ icon.src.props.children }
+				</SVG>
+			);
+		}
 	}
 
 	calculateNumberOfColumns() {

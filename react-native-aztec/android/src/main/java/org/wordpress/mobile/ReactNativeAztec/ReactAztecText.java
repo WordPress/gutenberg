@@ -84,6 +84,8 @@ public class ReactAztecText extends AztecText {
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
 
+        setGutenbergMode(true);
+
         // don't auto-focus when Aztec becomes visible.
         // Needed on rotation and multiple Aztec instances to avoid losing the exact care position.
         setFocusOnVisible(false);
