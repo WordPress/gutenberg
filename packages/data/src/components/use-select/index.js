@@ -4,7 +4,6 @@
 import { createQueue } from '@wordpress/priority-queue';
 import {
 	useLayoutEffect,
-	useEffect,
 	useState,
 	useRef,
 	useMemo,
@@ -17,19 +16,6 @@ import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
  */
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
-
-/**
- * Favor useLayoutEffect to ensure the store subscription callback always has
- * the selector from the latest render. If a store update happens between render
- * and the effect, this could cause missed/stale updates or inconsistent state.
- *
- * Fallback to useEffect for server rendered components because currently React
- * throws a warning when using useLayoutEffect in that environment.
- */
-// const useIsomorphicLayoutEffect = typeof window !== 'undefined' ?
-// 	useLayoutEffect : useEffect;
-const useIsomorphicLayoutEffect = typeof window !== 'undefined' ?
-	useLayoutEffect : useEffect;
 
 const renderQueue = createQueue();
 
@@ -47,7 +33,7 @@ export default function useSelect( mapSelect, nextProps ) {
 	/**
 	 * Set current values.
 	 */
-	useIsomorphicLayoutEffect( () => {
+	useLayoutEffect( () => {
 		latestMapSelect.current = mapSelect;
 		isMounted.current = true;
 	} );
@@ -55,7 +41,7 @@ export default function useSelect( mapSelect, nextProps ) {
 	/**
 	 * Flush queue if isAsync changes
 	 */
-	useIsomorphicLayoutEffect( () => {
+	useLayoutEffect( () => {
 		latestIsAsync.current = isAsync;
 		renderQueue.flush( queueContext );
 	}, [ isAsync ] );
@@ -77,11 +63,11 @@ export default function useSelect( mapSelect, nextProps ) {
 	 * Map output should always be called if incoming prop dependencies
 	 * has changed.
 	 */
-	useIsomorphicLayoutEffect( () => {
+	useLayoutEffect( () => {
 		onStoreChange();
 	}, [ registry, nextProps ] );
 
-	useIsomorphicLayoutEffect( () => {
+	useLayoutEffect( () => {
 		const unsubscribe = registry.subscribe( () => {
 			if ( latestIsAsync.current ) {
 				renderQueue.add( queueContext, onStoreChange );
