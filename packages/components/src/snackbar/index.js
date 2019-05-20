@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, noop } from 'lodash';
+import { noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -14,7 +14,6 @@ import { useEffect } from '@wordpress/element';
  */
 import { Button } from '../';
 
-const stopPropagation = ( event ) => event.stopPropagation();
 const NOTICE_TIMEOUT = 10000;
 
 function Snackbar( {
@@ -60,7 +59,12 @@ function Snackbar( {
 								key={ index }
 								href={ url }
 								isTertiary
-								onClick={ url ? stopPropagation : flow( stopPropagation, onClick ) }
+								onClick={ ( event ) => {
+									event.stopPropagation();
+									if ( onClick ) {
+										onClick( event );
+									}
+								} }
 								className={ classnames(
 									'components-snackbar__action',
 									buttonCustomClasses
