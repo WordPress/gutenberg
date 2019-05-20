@@ -58,6 +58,10 @@ This is how you execute the script with presented setup:
 
 * `npm run build` - builds the code for production.
 
+_Flags_:
+
+- `--no-babel`: When present, excludes the default Babel file processing
+
 #### Advanced information
 
 This script uses [webpack](https://webpack.js.org/) behind the scenes. It'll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it'll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.

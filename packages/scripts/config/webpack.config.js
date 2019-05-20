@@ -13,7 +13,7 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
 /**
  * Internal dependencies
  */
-const { hasBabelConfig } = require( '../utils' );
+const { hasBabelConfig, hasCliArg } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
@@ -33,32 +33,8 @@ const config = {
 		},
 	},
 	module: {
-		rules: [
-			{
-				test: /\.js$/,
-				exclude: /node_modules/,
-				use: [
-					require.resolve( 'thread-loader' ),
-					{
-						loader: require.resolve( 'babel-loader' ),
-						options: {
-							// Babel uses a directory within local node_modules
-							// by default. Use the environment variable option
-							// to enable more persistent caching.
-							cacheDirectory: process.env.BABEL_CACHE_DIRECTORY || true,
-
-							// Provide a fallback configuration if there's not
-							// one explicitly available in the project.
-							...( ! hasBabelConfig() && {
-								babelrc: false,
-								configFile: false,
-								presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
-							} ),
-						},
-					},
-				],
-			},
-		],
+		// Rules are conditionally assigned in logic below.
+		rules: [],
 	},
 	plugins: [
 		// WP_BUNDLE_ANALYZER global variable enables utility that represents bundle content
@@ -73,6 +49,33 @@ const config = {
 		children: false,
 	},
 };
+
+if ( ! hasCliArg( '--no-babel' ) ) {
+	config.module.rules.push( {
+		test: /\.js$/,
+		exclude: /node_modules/,
+		use: [
+			require.resolve( 'thread-loader' ),
+			{
+				loader: require.resolve( 'babel-loader' ),
+				options: {
+					// Babel uses a directory within local node_modules
+					// by default. Use the environment variable option
+					// to enable more persistent caching.
+					cacheDirectory: process.env.BABEL_CACHE_DIRECTORY || true,
+
+					// Provide a fallback configuration if there's not
+					// one explicitly available in the project.
+					...( ! hasBabelConfig() && {
+						babelrc: false,
+						configFile: false,
+						presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+					} ),
+				},
+			},
+		],
+	} );
+}
 
 if ( ! isProduction ) {
 	// WP_DEVTOOL global variable controls how source maps are generated.
