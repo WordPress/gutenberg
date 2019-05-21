@@ -4,28 +4,24 @@
 import { RichText } from '../index.native';
 
 describe( 'RichText Native', () => {
-  let richText;
+	let richText;
 
-  beforeEach( () => {
-    richText = new RichText( { multiline: false } );
-  } );
-
-  it ( 'exists', () => {
-    expect( richText );
-  } );
+	beforeEach( () => {
+		richText = new RichText( { multiline: false } );
+	} );
 
 	describe( 'willTrimSpaces', () => {
 		it( 'exists', () => {
-      expect( richText.willTrimSpaces );
+			expect( richText ).toHaveProperty( 'willTrimSpaces' );
 		} );
 
 		it( 'is a function', () => {
-      expect( typeof richText.willTrimSpaces === 'function' );
+			expect( richText.willTrimSpaces ).toBeInstanceOf( Function );
 		} );
 
-    it( 'reports false for styled text with no outer spaces', () => {
-      let html = '<p><b>Hello</b> <strong>Hello</strong> WorldWorld!</p>';
-      expect( richText.willTrimSpaces( html ) ).toBe( false );
-    } );
+		it( 'reports false for styled text with no outer spaces', () => {
+			const html = '<p><b>Hello</b> <strong>Hello</strong> WorldWorld!</p>';
+			expect( richText.willTrimSpaces( html ) ).toBe( false );
+		} );
 	} );
 } );
