@@ -1039,6 +1039,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="restoreSelectedBlock" href="#restoreSelectedBlock">#</a> **restoreSelectedBlock**
+
+Returns an action object used in restoring the previously cleared selected blocks.
+
+_Returns_
+
+-   `Object`: Action object.
+
 <a name="selectBlock" href="#selectBlock">#</a> **selectBlock**
 
 Returns an action object used in signalling that the block with the
