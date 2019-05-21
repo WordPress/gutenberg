@@ -131,7 +131,9 @@ export function* selectPreviousBlock( clientId ) {
 		clientId
 	);
 
-	yield selectBlock( previousBlockClientId, -1 );
+	if ( previousBlockClientId ) {
+		yield selectBlock( previousBlockClientId, -1 );
+	}
 }
 
 /**
@@ -147,7 +149,9 @@ export function* selectNextBlock( clientId ) {
 		clientId
 	);
 
-	yield selectBlock( nextBlockClientId );
+	if ( nextBlockClientId ) {
+		yield selectBlock( nextBlockClientId );
+	}
 }
 
 /**
