@@ -194,9 +194,10 @@ class VideoEdit extends React.Component {
 						renderContent={ ( { isUploadInProgress, isUploadFailed, retryMessage } ) => {
 							const showVideo = src && ! isUploadInProgress && ! isUploadFailed;
 							const icon = this.getIcon( isUploadFailed, isUploadInProgress );
+							const styleIconContainer = isUploadFailed ? style.modalIconRetry : style.modalIcon;
 
 							const iconContainer = (
-								<View style={ style.modalIcon }>
+								<View style={ styleIconContainer }>
 									{ icon }
 								</View>
 							);
