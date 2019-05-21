@@ -78,3 +78,10 @@ figure.block-library-media-text__media-container {
 		}
 	}
 }
+
+
+// Disable nested block padding for this block.
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/media-text"] > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks {
+	padding: 0 8% 0 8%;
+	animation: none;
+}

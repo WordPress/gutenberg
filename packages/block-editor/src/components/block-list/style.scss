@@ -167,36 +167,30 @@
 		}
 	}
 
-	// Add extra padding and border to nested blocks.
-	&.is-selected,
+	// Add extra padding and border to parent blocks when their children are selected.
 	&.has-child-selected {
 
-		.block-editor-inner-blocks {
+		> .block-editor-block-list__block-edit::before {
+			border: $border-width dashed $dark-opacity-light-800;
+		}
+
+		> .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks {
 			padding: $block-padding;
 
-			// Animate the transition.
-			animation: block-editor-inner-blocks__padding-animation 0.1s ease-out;
-			animation-fill-mode: forwards;
-
-			.block-editor-block-list__layout .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before {
+			> .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before {
 				border: $border-width dashed $dark-opacity-light-800;
 			}
 		}
 	}
 
-	&.has-child-selected {
-		> .block-editor-block-list__block-edit::before {
+	// Add extra padding and border to child blocks when they are selected.
+	&.is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+	&.is-selected > .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks {
+		padding: $block-padding;
+
+		> .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before {
 			border: $border-width dashed $dark-opacity-light-800;
 		}
-	}
-}
-
-@keyframes block-editor-inner-blocks__padding-animation {
-	from {
-		transform: scale(1.01);
-	}
-	to {
-		transform: scale(1);
 	}
 }
 
