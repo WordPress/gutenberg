@@ -16,6 +16,15 @@
 			{ "docs/designers-developers/developers/filters/parser-filters.md": [] },
 			{ "docs/designers-developers/developers/filters/autocomplete-filters.md": [] }
 		] },
+		{"docs/designers-developers/developers/slotfills/README.md": [
+			{ "docs/designers-developers/developers/slotfills/plugin-sidebar.md": [] },
+			{ "docs/designers-developers/developers/slotfills/plugin-more-menu-item.md": []  },
+			{ "docs/designers-developers/developers/slotfills/plugin-sidebar-more-menu-item.md": []  },
+			{ "docs/designers-developers/developers/slotfills/plugin-post-status-info.md": []  },
+			{ "docs/designers-developers/developers/slotfills/plugin-block-settings-menu-item.md": []  },
+			{ "docs/designers-developers/developers/slotfills/plugin-pre-publish-panel.md": []  },
+			{ "docs/designers-developers/developers/slotfills/plugin-post-publish-panel.md": []  }
+		]},
 		{ "docs/designers-developers/developers/internationalization.md": [] },
 		{ "docs/designers-developers/developers/accessibility.md": [] },
 		{ "docs/designers-developers/developers/feature-flags.md": [] },
