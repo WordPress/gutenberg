@@ -11,7 +11,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 
 function WidgetArea( { area, initialOpen, blocks, updateBlocks } ) {
 	return (
-		<Panel>
+		<Panel className="edit-widgets-widget-area">
 			<PanelBody
 				title={ area.name }
 				initialOpen={ initialOpen }

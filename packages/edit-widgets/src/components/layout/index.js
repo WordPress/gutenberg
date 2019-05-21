@@ -1,19 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { navigateRegions } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import Header from '../header';
 import Sidebar from '../sidebar';
-import WidgetArea from '../widget-area';
+import WidgetAreas from '../widget-areas';
 
-function Layout( { areas } ) {
+function Layout() {
 	return (
 		<>
 			<Header />
@@ -24,23 +22,10 @@ function Layout( { areas } ) {
 				aria-label={ __( 'Widgets screen content' ) }
 				tabIndex="-1"
 			>
-				{ areas.map( ( area, index ) => (
-					<div key={ area.id } className="edit-widgets-layout__area">
-						<WidgetArea area={ area } initialOpen={ index === 0 } />
-					</div>
-				) ) }
+				<WidgetAreas />
 			</div>
 		</>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getWidgetAreas } = select( 'core/edit-widgets' );
-		const areas = getWidgetAreas();
-		return {
-			areas,
-		};
-	} ),
-	navigateRegions,
-] )( Layout );
+export default navigateRegions( Layout );
