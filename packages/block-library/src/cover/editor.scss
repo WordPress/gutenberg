@@ -45,3 +45,10 @@
 		width: 100%;
 	}
 }
+
+// Remove unnecessary child block padding and animation.
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/cover"].is-selected .block-editor-inner-blocks,
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/cover"].has-child-selected .block-editor-inner-blocks {
+	padding: 0;
+	animation: none;
+}
