@@ -136,20 +136,16 @@ function Layout( {
 }
 
 export default compose(
-	withSelect( ( select ) => {
-		const isCodeEditingEnabled = select( 'core/editor' ).getEditorSettings().codeEditingEnabled;
-		return {
-			editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-			pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
-			publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-			isCodeEditingEnabled,
-			mode: isCodeEditingEnabled ? select( 'core/edit-post' ).getEditorMode() : 'visual',
-		};
-	} ),
+	withSelect( ( select ) => ( {
+		mode: select( 'core/edit-post' ).getEditorMode(),
+		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
+		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
+		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
 		return {
