@@ -34,14 +34,19 @@ describe( 'a11y', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Testing editor selection persistence' );
 
-		await page.keyboard.down( 'Control' );
-		await page.keyboard.down( 'Shift' );
-		await page.keyboard.press( '`' );
-		await page.keyboard.press( '`' );
-		await page.keyboard.up( 'Control' );
-		await page.keyboard.up( 'Shift' );
+		// moving focus backwards using keyboard shortcuts
+		// twice to get to the inspector tabs
+		await pressKeyWithModifier( 'ctrlShift', '`' );
+		await pressKeyWithModifier( 'ctrlShift', '`' );
 
 		await page.keyboard.press( 'Tab' );
+
+		const isFocusedInspectorDocumentTab = await page.$eval( ':focus', ( focusedElement ) => {
+			return focusedElement.getAttribute( 'data-label' );
+		} );
+
+		expect( isFocusedInspectorDocumentTab ).toEqual( 'Document' );
+
 		await page.keyboard.press( 'Space' );
 
 		let isFocusedParagraphBlock = await page.$eval( ':focus', ( focusedElement ) => {
@@ -51,6 +56,13 @@ describe( 'a11y', () => {
 		expect( isFocusedParagraphBlock ).toBe( false );
 
 		await page.keyboard.press( 'Tab' );
+
+		const isFocusedInspectorBlockTab = await page.$eval( ':focus', ( focusedElement ) => {
+			return focusedElement.getAttribute( 'data-label' );
+		} );
+
+		expect( isFocusedInspectorBlockTab ).toEqual( 'Block' );
+
 		await page.keyboard.press( 'Space' );
 
 		isFocusedParagraphBlock = await page.$eval( ':focus', ( focusedElement ) => {
