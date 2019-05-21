@@ -21,6 +21,5 @@ registerPlugin( 'more-menu-item-test', { render: MyButtonMoreMenuItemTest } );
 ```
 
 ## Location
-![Location](../../assets/plugin-more-menu-item.png?raw=true)
+![Location](/docs/designers-developers/assets/plugin-more-menu-item.png?raw=true)
 
-[Back to SlotFills](../)

@@ -21,6 +21,5 @@ registerPlugin( 'post-publish-panel-test', { render: PluginPostPublishPanelTest 
 ```
 ## Location
 
-![post publish panel](../../assets/plugin-post-publish-panel.png?raw=true)
+![post publish panel](/docs/designers-developers/assets/plugin-post-publish-panel.png?raw=true)
 
-[Back to SlotFills](../)

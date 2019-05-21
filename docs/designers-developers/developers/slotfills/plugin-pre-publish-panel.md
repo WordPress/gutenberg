@@ -21,6 +21,5 @@ registerPlugin( 'pre-publish-panel-test', { render: PluginPrePublishPanelTest } 
 ```
 ## Location
 
-![Prepublish panel](../../assets/plugin-pre-publish-panel.png?raw=true)
+![Prepublish panel](/docs/designers-developers/assets/plugin-pre-publish-panel.png?raw=true)
 
-[Back to SlotFills](../)

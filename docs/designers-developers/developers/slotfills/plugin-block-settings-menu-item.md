@@ -22,6 +22,5 @@ registerPlugin( 'block-settings-menu-group-test', { render: PluginBlockSettingsM
 ```
 ## Location
 
-![Alt text](../../assets/plugin-block-settings-menu-item-screenshot.png?raw=true "PluginBlockSettingsMenuItem Location")
+![Alt text](/docs/designers-developers/assets/plugin-block-settings-menu-item-screenshot.png?raw=true "PluginBlockSettingsMenuItem Location")
 
-[Back to SlotFills](../)

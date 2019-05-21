@@ -39,8 +39,4 @@ registerPlugin( 'plugin-sidebar-expanded-test', { render: PluginSidebarMoreMenuI
 
 ## Location
 
-![Interaction](../../assets/plugin-sidebar-more-menu-item.gif?raw=true)
-
-
-
-[Back to SlotFills](../)
+![Interaction](/docs/designers-developers/assets/plugin-sidebar-more-menu-item.gif?raw=true)
