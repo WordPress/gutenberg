@@ -2,9 +2,9 @@
 
 The primary means of extending WordPress is the plugin. The WordPress [Plugin Basics](https://developer.wordpress.org/plugins/the-basics/) documentation provides details on building a plugin. 
 
-The quickest way to start is to create a new directory in `wp-content/plugins/` to contain your plugin code. For this example, you can call it `myguten-plugin`.
+The quickest way to start is to create a new directory in `wp-content/plugins/` to contain your plugin code. For this example, call it `myguten-plugin`.
 
-Inside of this new directory, create a file called `myguten-plugin.php`. This is the server-side code that runs when your plugin is active. 
+Inside this new directory, create a file called `myguten-plugin.php`. This is the server-side code that runs when your plugin is active. 
 
 For now, add the following code in the file:
 
