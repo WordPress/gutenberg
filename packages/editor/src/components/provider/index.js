@@ -69,6 +69,7 @@ class EditorProvider extends Component {
 				'isRTL',
 				'maxWidth',
 				'styles',
+				'template',
 				'templateLock',
 				'titlePlaceholder',
 			] ),
