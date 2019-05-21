@@ -7,16 +7,21 @@ import { get, map } from 'lodash';
  * WordPress dependencies
  */
 import { parse } from '@wordpress/blocks';
+import { select } from '@wordpress/data-controls';
 
 /**
- * Returns an action object used to setup the widget areas.
+ * Yields an action object that setups the widget areas.
  *
- * @param {Object[]} widgetAreas Array of widget area objects.
- *
- * @return {Object} Action object.
+ * @yields {Object} Action object.
  */
-export function setupWidgetAreas( widgetAreas = [] ) {
-	return {
+export function* setupWidgetAreas() {
+	const widgetAreas = yield select(
+		'core',
+		'getEntityRecords',
+		'root',
+		'widgetArea'
+	);
+	yield {
 		type: 'SETUP_WIDGET_AREAS',
 		widgetAreas: map( widgetAreas, ( { content, ...widgetAreaProperties } ) => {
 			return {

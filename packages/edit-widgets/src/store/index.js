@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { registerStore } from '@wordpress/data';
+import controls from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -14,6 +15,7 @@ const store = registerStore( 'core/edit-widgets', {
 	reducer,
 	actions,
 	selectors,
+	controls,
 } );
 
 store.dispatch( { type: 'INIT' } );
