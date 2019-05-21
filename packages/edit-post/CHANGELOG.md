@@ -1,6 +1,6 @@
-## Master
+## 3.4.0 (2019-05-21)
 
-### New Features
+### New Feature
 
 - Implement the `addToGallery` option in the `MediaUpload` hook. The option allows users to open the media modal in the `gallery-library`instead of `gallery-edit` state.
 
