@@ -211,7 +211,7 @@ class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
-		const toolbarEditButton = ( open ) => (
+		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<Toolbar>
 					<ToolbarButton
@@ -288,7 +288,7 @@ class ImageEdit extends React.Component {
 					{ getInspectorControls() }
 					{ getMediaOptions() }
 					{ ( ! this.state.isCaptionSelected ) &&
-							toolbarEditButton( openMediaOptions )
+						getToolbarEditButton( openMediaOptions )
 					}
 					<InspectorControls>
 						<ToolbarButton
@@ -318,10 +318,10 @@ class ImageEdit extends React.Component {
 
 							return (
 								<View style={ { flex: 1 } } >
-									{ ! imageWidthWithinContainer && 
+									{ ! imageWidthWithinContainer &&
 										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
 											{ this.getIcon( false ) }
-										</View>}
+										</View> }
 									<ImageBackground
 										accessible={ true }
 										disabled={ ! isSelected }
