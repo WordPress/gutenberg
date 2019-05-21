@@ -14,7 +14,7 @@ import { FlatList, Text, TouchableHighlight, View } from 'react-native';
  */
 import { SVG, Dashicon } from '@wordpress/components';
 import { BottomSheet } from '@wordpress/block-editor';
-import { Component } from '@wordpress/element';
+import { Component, createElement } from '@wordpress/element';
 import { getBlockTypes, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 
 /**
@@ -87,6 +87,11 @@ export default class BlockPicker extends Component<PropsType> {
 					{ icon.src.props.children }
 				</SVG>
 			);
+		} else if ( 'function' === typeof icon.src ) {
+			if ( icon.src.prototype instanceof Component ) {
+				return createElement( icon.src, { fill: color, size: styles.modalIcon.width } );
+			}
+			return icon.src( { fill: color, size: styles.modalIcon.width } );
 		}
 	}
 
