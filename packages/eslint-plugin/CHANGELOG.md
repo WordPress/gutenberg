@@ -1,4 +1,4 @@
-## x.x.x (Unreleased)
+## 2.2.0 (2019-05-21)
 
 ### New Features
 
