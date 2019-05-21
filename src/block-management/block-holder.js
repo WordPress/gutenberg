@@ -25,9 +25,10 @@ import {
  */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { addAction, removeAction, hasAction } from '@wordpress/hooks';
+import { addAction, hasAction, removeAction } from '@wordpress/hooks';
+import { getBlockType } from '@wordpress/blocks';
 import { BlockEdit } from '@wordpress/block-editor';
-
+import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -43,7 +44,6 @@ type PropsType = BlockType & {
 	isLastBlock: boolean,
 	showTitle: boolean,
 	borderStyle: Object,
-	testID: string,
 	focusedBorderColor: string,
 	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
 	getPreviousBlockClientId: ( clientId: string ) => string,
@@ -93,7 +93,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 			removeAction( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks' );
 			requestImageUploadCancel( mediaId );
 		}
-	}
+	};
 
 	onInlineToolbarButtonPressed = ( button: number ) => {
 		Keyboard.dismiss();
@@ -155,6 +155,17 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		);
 	}
 
+	getAccessibilityLabelForBlock() {
+		const { clientId, rootClientId } = this.props;
+		const order = this.props.getBlockIndex( clientId, rootClientId );
+		const name = this.props.getBlockName( clientId );
+		let blockTitle = getBlockType( name ).title;
+
+		blockTitle = blockTitle === 'Unrecognized Block' ? blockTitle : `${ blockTitle } Block`;
+
+		return sprintf( __( '%s. Row %d.' ), blockTitle, order + 1 ); // Use one indexing for better accessibility
+	}
+
 	renderBlockTitle() {
 		return (
 			<View style={ styles.blockTitle }>
@@ -168,19 +179,20 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
+		const accessibilityLabel = this.getAccessibilityLabelForBlock();
+
 		return (
 			// accessible prop needs to be false to access children
 			// https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
 			<TouchableWithoutFeedback
 				accessible={ false }
-				accessibilityLabel="block-container"
 				onPress={ this.onFocus } >
 
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View
 						accessibile={ true }
-						accessibilityLabel={ this.props.testID }
+						accessibilityLabel={ accessibilityLabel }
 						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
 						{ this.getBlockForType() }
 					</View>
