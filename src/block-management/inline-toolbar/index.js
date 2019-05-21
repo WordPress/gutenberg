@@ -69,7 +69,7 @@ export class InlineToolbar extends React.Component<PropsType> {
 
 		const removeButtonTitle = sprintf(
 			/* translators: accessibility text. %s: current block position (number). */
-			__( 'Remove block at row row %s' ),
+			__( 'Remove block at row %s' ),
 			order );
 
 		return (
