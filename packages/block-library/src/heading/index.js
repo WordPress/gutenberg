@@ -13,7 +13,6 @@ import { RichText } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -31,7 +30,7 @@ const supports = {
 export const settings = {
 	title: __( 'Heading' ),
 	description: __( 'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.' ),
-	icon,
+	icon: 'heading',
 	keywords: [ __( 'title' ), __( 'subtitle' ) ],
 	supports,
 	transforms,

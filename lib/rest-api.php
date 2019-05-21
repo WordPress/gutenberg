@@ -67,6 +67,17 @@ function gutenberg_register_rest_widget_updater_routes() {
 	$widgets_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_widget_updater_routes' );
+
+/**
+ * Registers the widget area REST API routes.
+ *
+ * @since 5.7.0
+ */
+function gutenberg_register_rest_widget_areas() {
+	$widget_areas_controller = new WP_REST_Widget_Areas_Controller();
+	$widget_areas_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
 /**
  * End: Include for phase 2
  */
