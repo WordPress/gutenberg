@@ -34,7 +34,7 @@ wp.hooks.addFilter( 'editor.PostPreview.interstitialMarkup', 'my-plugin/custom-p
 ### `block_editor_settings`
 This is a PHP filter which is applied before sending settings to the WordPress block editor.
 
-You may find details about this filter [on its WordPress Code Reference page](wp-admin/edit-form-blocks.php).
+You may find details about this filter [on its WordPress Code Reference page](https://developer.wordpress.org/reference/hooks/block_editor_settings/).
 
 The filter will send any setting to the initialized Editor, which means any editor setting that is used to configure the editor at initialisation can be filtered by a PHP WordPress plugin before being sent. 
 
