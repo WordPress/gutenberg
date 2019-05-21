@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Exit if any command fails
+set -e
+
+npm ci
+
+npm run build
+
 # Set up environment variables
 . "$(dirname "$0")/bootstrap-env.sh"
 
@@ -31,7 +38,7 @@ else
 
 	# Run the build because otherwise there will be a bunch of warnings about
 	# failed `stat` calls from `filemtime()`.
-	composer install || exit 1
+	composer install
 fi
 
 echo Running with the following versions:
@@ -45,9 +52,9 @@ fi
 
 # Run PHPUnit tests
 if [[ $DOCKER = "true" ]]; then
-	npm run test-php || exit 1
-	npm run test-unit-php-multisite || exit 1
+	npm run test-php
+	npm run test-unit-php-multisite
 else
-	phpunit || exit 1
-	WP_MULTISITE=1 phpunit || exit 1
+	phpunit
+	WP_MULTISITE=1 phpunit
 fi

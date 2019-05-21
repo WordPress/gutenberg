@@ -3,6 +3,10 @@
 # Exit if any command fails
 set -e
 
+npm ci
+
+npm run build
+
 # Set up environment variables
 . "$(dirname "$0")/bootstrap-env.sh"
 
@@ -21,6 +25,4 @@ echo -e $(status_message "Starting Docker containers...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS up -d --remove-orphans mysql wordpress_e2e_tests cli_e2e_tests >/dev/null
 
 # Set up WordPress Development site.
-# Note: we don't bother installing the test site right now, because that's
-# done on every time `npm run test-e2e` is run.
 . "$(dirname "$0")/install-wordpress.sh" --e2e_tests
