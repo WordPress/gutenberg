@@ -92,7 +92,7 @@ export default class EditorPage {
 
 		let blockLocator = `${ parentLocator }/following-sibling::*`;
 		blockLocator += isAndroid() ? '' : '//*';
-		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Move up from row ${ position } to row ${ position - 1 }"]`;
+		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Move block up from row ${ position } to row ${ position - 1 }"]`;
 		const moveUpButton = await this.driver.elementByXPath( blockLocator );
 		await moveUpButton.click();
 	}
@@ -110,7 +110,7 @@ export default class EditorPage {
 
 		let blockLocator = `${ parentLocator }/following-sibling::*`;
 		blockLocator += isAndroid() ? '' : '//*';
-		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Move down from row ${ position } to row ${ position + 1 }"]`;
+		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Move block down from row ${ position } to row ${ position + 1 }"]`;
 		const moveDownButton = await this.driver.elementByXPath( blockLocator );
 		await moveDownButton.click();
 	}
@@ -129,7 +129,7 @@ export default class EditorPage {
 
 		let removeBlockLocator = `${ parentLocator }/following-sibling::*`;
 		removeBlockLocator += isAndroid() ? '' : '//*';
-		let removeButtonIdentifier = `Remove row ${ position }`;
+		let removeButtonIdentifier = `Remove block at row ${ position }`;
 
 		if ( isAndroid() ) {
 			removeButtonIdentifier += ', Double tap to remove the block';
