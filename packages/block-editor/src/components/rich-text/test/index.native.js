@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { RichText } from '../index.native';
+import { RichText } from '../index';
 
 describe( 'RichText Native', () => {
 	let richText;
