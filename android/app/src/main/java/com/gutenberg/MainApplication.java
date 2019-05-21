@@ -35,20 +35,21 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
-            public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback) {
-            }
-
-            @Override
-            public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback) {
-            }
-
-            @Override
-            public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {
-            }
-
-            @Override
             public void requestMediaImport(String url, MediaSelectedCallback mediaSelectedCallback) {
             }
+
+            @Override
+            public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback, MediaType mediaType) {
+            }
+
+            @Override
+            public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback, MediaType mediaType) {
+            }
+
+            @Override
+            public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, MediaType mediaType) {
+            }
+
 
             @Override
             public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {
