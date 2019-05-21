@@ -109,10 +109,10 @@ There are currently seven available SlotFills in the `edit-post` package. please
 
 There are currently four available SlotFills in the `block-editor` package.
 
-* [BlockControls]
-* [BlockFormatControls]
-* [InspectorAdvancedControls]
-* [InspectorControls]
+* BlockControls
+* BlockFormatControls
+* InspectorAdvancedControls
+* InspectorControls
 
 
 
