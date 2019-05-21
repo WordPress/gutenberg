@@ -57,18 +57,18 @@ export class InlineToolbar extends React.Component<PropsType> {
 		const { order } = this.props;
 		const moveUpButtonTitle = this.props.canMoveUp ? sprintf(
 			/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-			__( 'Move up from row %1$s to row %2$s' ),
+			__( 'Move block up from row %1$s to row %2$s' ),
 			order,
-			order - 1 ) : __( 'Move up' );
+			order - 1 ) : __( 'Move block up' );
 
 		const moveDownButtonTitle = this.props.canMoveUp ? sprintf(
 			/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-			__( 'Move down from row %1$s to row %2$s' ),
+			__( 'Move block down from row %1$s to row %2$s' ),
 			order,
-			order + 1 ) : __( 'Move down' );
+			order + 1 ) : __( 'Move block down' );
 
 		const removeButtonTitle = sprintf(
-			/* translators: accessibility text. %1: current block position (number). */
+			/* translators: accessibility text. %s: current block position (number). */
 			__( 'Remove block at row row %s' ),
 			order );
 
