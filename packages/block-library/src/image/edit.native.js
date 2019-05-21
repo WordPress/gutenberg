@@ -2,11 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-<<<<<<< HEAD
-import { View, ImageBackground, TextInput, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
-=======
 import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
->>>>>>> master
 import {
 	requestMediaImport,
 	mediaUploadSync,
