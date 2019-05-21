@@ -1,4 +1,5 @@
 # PluginPostStatusInfo
+
 This slots allows for the insertion of items in the Status & Visibility panel of the document sidebar.
 
 ## Example

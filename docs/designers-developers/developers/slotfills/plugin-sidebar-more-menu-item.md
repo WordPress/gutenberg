@@ -4,6 +4,7 @@ This slot allows the creation of a`<PluginSidebar>` with a menu item that when c
 This is done my setting the `target` on `<PluginSidebarMoreMenuItem>` to match the `name` on the `<PluginSidebar>`
 
 ** Notes: It does not seem possible to mirror the same interaction by using `<PluginSidebar>` and `<PluginMoreMenuItem>` separately.
+
 ## Example
 
 ```js
@@ -37,6 +38,7 @@ registerPlugin( 'plugin-sidebar-expanded-test', { render: PluginSidebarMoreMenuI
 ```
 
 ## Location
+
 ![Interaction](../../assets/plugin-sidebar-more-menu-item.gif?raw=true)
 
 

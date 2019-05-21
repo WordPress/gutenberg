@@ -1,4 +1,5 @@
 # PluginPrePublishPanel
+
 This slot allows for injecting items into the bottom of the pre-publish panel that appears to confirm publishing after the user clicks "Publish'.
 
 ## Example

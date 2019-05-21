@@ -1,4 +1,5 @@
 # PluginPostPublishPanel
+
 This slot allows for injecting items into the bottom of the post-publish panel that appears after a post is published.
 
 ## Example
