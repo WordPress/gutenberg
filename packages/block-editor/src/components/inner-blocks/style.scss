@@ -9,16 +9,3 @@
 		z-index: z-index(".block-editor-inner-blocks.has-overlay::after");
 	}
 }
-
-// Visual overlay style to indicate nesting.
-// We should revisit this with the nested block outlines,
-.block-editor-block-list__block.is-hovered .block-editor-inner-blocks.has-overlay {
-	&::after {
-		background: rgba($blue-medium-500, 0.1);
-	}
-
-	// Stop propogating beyond one level
-	.block-editor-inner-blocks.has-overlay::after {
-		background: none;
-	}
-}
