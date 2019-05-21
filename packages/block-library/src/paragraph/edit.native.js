@@ -96,6 +96,7 @@ class ParagraphEdit extends Component {
 			attributes,
 			setAttributes,
 			mergeBlocks,
+			onReplace,
 			style,
 		} = this.props;
 
@@ -133,9 +134,19 @@ class ParagraphEdit extends Component {
 							content: nextContent,
 						} );
 					} }
-					onSplit={ this.splitBlock }
+					onSplit={ ( value ) => {
+						if ( ! value ) {
+							return createBlock( name );
+						}
+
+						return createBlock( name, {
+							...attributes,
+							content: value,
+						} );
+					} }
 					onMerge={ mergeBlocks }
-					onReplace={ this.onReplace }
+					onReplace={ onReplace }
+					onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 					placeholder={ placeholder || __( 'Start writing…' ) }
 				/>
 			</View>
