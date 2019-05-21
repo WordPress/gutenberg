@@ -694,9 +694,6 @@ export default class Dashicon extends Component {
 			case 'randomize':
 				path = 'M18 6.01L14 9V7h-4l-5 8H2v-2h2l5-8h5V3zM2 5h3l1.15 2.17-1.12 1.8L4 7H2V5zm16 9.01L14 17v-2H9l-1.15-2.17 1.12-1.8L10 13h4v-2z';
 				break;
-			case 'retry':
-				path = 'M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z';
-				break;
 			case 'redo':
 				path = 'M8 5h5V2l6 4-6 4V7H8c-2.2 0-4 1.8-4 4s1.8 4 4 4h5v2H8c-3.3 0-6-2.7-6-6s2.7-6 6-6z';
 				break;

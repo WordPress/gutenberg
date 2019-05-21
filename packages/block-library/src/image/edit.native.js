@@ -15,7 +15,6 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import {
-	Icon,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -37,7 +36,8 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import styles from './styles.scss';
 import MediaUploadProgress from './media-upload-progress';
-import icon from './icon';
+import SvgIcon from './icon';
+import SvgIconRetry from './icon-retry';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
@@ -192,10 +192,11 @@ class ImageEdit extends React.Component {
 	}
 
 	getIcon( isRetryIcon ) {
-		const iconValue = isRetryIcon ? 'retry' : icon;
-		const iconStyles = isRetryIcon ? styles.iconRetry : styles.icon;
+		if ( isRetryIcon ) {
+			return <SvgIconRetry fill={ styles.iconRetry.fill } />;
+		}
 
-		return <Icon icon={ iconValue } style={ iconStyles } />;
+		return <SvgIcon fill={ styles.icon.fill } />;
 	}
 
 	render() {
@@ -315,11 +316,11 @@ class ImageEdit extends React.Component {
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
 						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
-							const blockIcon = this.getIcon( isUploadFailed );
+							const icon = this.getIcon( isUploadFailed );
 
 							const iconContainer = (
 								<View style={ styles.modalIcon }>
-									{ blockIcon }
+									{ icon }
 								</View>
 							);
 
