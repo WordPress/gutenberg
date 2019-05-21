@@ -17,6 +17,7 @@ import styles from './styles.scss';
 import Button from './button';
 import Cell from './cell';
 import PickerCell from './picker-cell';
+import SwitchCell from './switch-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 class BottomSheet extends Component {
@@ -163,5 +164,6 @@ BottomSheet.getWidth = getWidth;
 BottomSheet.Button = Button;
 BottomSheet.Cell = Cell;
 BottomSheet.PickerCell = PickerCell;
+BottomSheet.SwitchCell = SwitchCell;
 
 export default BottomSheet;

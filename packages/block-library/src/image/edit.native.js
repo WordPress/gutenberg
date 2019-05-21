@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -17,7 +17,6 @@ import { isEmpty } from 'lodash';
 import {
 	Toolbar,
 	ToolbarButton,
-	Dashicon,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -37,9 +36,14 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import styles from './styles.scss';
 import MediaUploadProgress from './media-upload-progress';
+import SvgIcon from './icon';
+import SvgIconRetry from './icon-retry';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
+
+// Default Image ratio 4:3
+const IMAGE_ASPECT_RATIO = 4 / 3;
 
 class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -65,6 +69,14 @@ class ImageEdit extends React.Component {
 
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
+
+		// This will warn when we have `id` defined, while `url` is undefined.
+		// This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
+		// where a cancelled image upload was resulting in a subsequent crash.
+		if ( attributes.id && ! attributes.url ) {
+			// eslint-disable-next-line no-console
+			console.warn( 'Attributes has id with no url.' );
+		}
 
 		if ( attributes.id && attributes.url && ! isURL( attributes.url ) ) {
 			if ( attributes.url.indexOf( 'file:' ) === 0 ) {
@@ -179,6 +191,14 @@ class ImageEdit extends React.Component {
 		}
 	}
 
+	getIcon( isRetryIcon ) {
+		if ( isRetryIcon ) {
+			return <SvgIconRetry fill={ styles.iconRetry.fill } />;
+		}
+
+		return <SvgIcon fill={ styles.icon.fill } />;
+	}
+
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption, height, width, alt, href, id } = attributes;
@@ -191,10 +211,9 @@ class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
-		const toolbarEditButton = ( open, getMediaOptions ) => (
+		const toolbarEditButton = ( open ) => (
 			<BlockControls>
 				<Toolbar>
-					{ getMediaOptions() }
 					<ToolbarButton
 						title={ __( 'Edit image' ) }
 						icon="edit"
@@ -218,6 +237,7 @@ class ImageEdit extends React.Component {
 					onChangeValue={ this.onSetLinkDestination }
 					autoCapitalize="none"
 					autoCorrect={ false }
+					keyboardType="url"
 				/>
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
@@ -242,11 +262,14 @@ class ImageEdit extends React.Component {
 					<MediaPlaceholder
 						mediaType={ MEDIA_TYPE_IMAGE }
 						onSelectURL={ this.onSelectMediaUploadOption }
+						icon={ this.getIcon( false ) }
+						onFocus={ this.props.onFocus }
 					/>
 				</View>
 			);
 		}
 
+		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
@@ -256,16 +279,16 @@ class ImageEdit extends React.Component {
 					alt,
 					caption
 				) }
-				accessibilityHint={ __( 'Double tap and hold to edit the image' ) }
-				accessibilityRole={ 'imagebutton' }
+				accessibilityRole={ 'button' }
 				onPress={ this.onImagePressed }
-				onLongPress={ url && openMediaOptions }
+				onLongPress={ openMediaOptions }
 				disabled={ ! isSelected }
 			>
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
+					{ getMediaOptions() }
 					{ ( ! this.state.isCaptionSelected ) &&
-							toolbarEditButton(openMediaOptions, getMediaOptions)
+							toolbarEditButton( openMediaOptions )
 					}
 					<InspectorControls>
 						<ToolbarButton
@@ -283,31 +306,39 @@ class ImageEdit extends React.Component {
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryIconName, retryMessage } ) => {
+						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
+							const icon = this.getIcon( isUploadFailed );
+
+							const iconContainer = (
+								<View style={ styles.modalIcon }>
+									{ icon }
+								</View>
+							);
+
 							return (
 								<View style={ { flex: 1 } } >
-									{ ! imageWidthWithinContainer && (
-										<View style={ styles.imageContainer } >
-											<Dashicon icon={ 'format-image' } size={ 300 } />
-										</View>
-									) }
+									{ ! imageWidthWithinContainer && 
+										<View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
+											{ this.getIcon( false ) }
+										</View>}
 									<ImageBackground
 										accessible={ true }
 										disabled={ ! isSelected }
 										accessibilityLabel={ alt }
-										accessibilityRole={ 'image' }
+										accessibilityHint={ __( 'Double tap and hold to edit' ) }
+										accessibilityRole={ 'imagebutton' }
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
 										source={ { uri: url } }
 										key={ url }
 									>
-									{ isUploadFailed &&
-										<View style={ styles.imageContainer } >
-											<Dashicon icon={ retryIconName } ariaPressed={ 'dashicon-active' } />
-											<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
-										</View>
-									}
+										{ isUploadFailed &&
+											<View style={ [ styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
+												{ iconContainer }
+												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
+											</View>
+										}
 									</ImageBackground>
 								</View>
 							);

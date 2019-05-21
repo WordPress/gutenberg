@@ -77,9 +77,9 @@
 /packages/plugins                               @youknowriad @gziolo @aduth @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @youknowriad @aduth @ellatrix @jorgefilipecosta
-/packages/rich-text                             @youknowriad @aduth @ellatrix @jorgefilipecosta
-/packages/block-editor/src/components/rich-text @youknowriad @aduth @ellatrix @jorgefilipecosta
+/packages/format-library                        @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao
+/packages/rich-text                             @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao
+/packages/block-editor/src/components/rich-text @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao
 
 # PHP
 /lib                                            @youknowriad @gziolo @aduth
