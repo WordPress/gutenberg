@@ -9,7 +9,6 @@ $z-layers: (
 	".block-library-classic__toolbar": 10,
 	".block-editor-block-list__layout .reusable-block-indicator": 1,
 	".block-editor-block-list__breadcrumb": 2,
-	".editor-inner-blocks .block-editor-block-list__breadcrumb": 22,
 	".components-form-toggle__input": 1,
 	".components-panel__header.edit-post-sidebar__panel-tabs": -1,
 	".edit-post-sidebar .components-panel": -2,
@@ -63,6 +62,7 @@ $z-layers: (
 
 	// The toolbar, when contextual, should be above any adjacent nested block click overlays.
 	".block-editor-block-contextual-toolbar": 121,
+	".editor-inner-blocks .block-editor-block-list__breadcrumb": 122,
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }

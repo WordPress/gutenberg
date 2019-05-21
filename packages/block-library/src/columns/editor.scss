@@ -166,3 +166,11 @@ div.block-core-columns.is-vertically-aligned-bottom {
 	right: 0;
 	left: auto;
 }
+
+/**
+ * Make single Column overlay not extend past boundaries of parent
+ */
+.block-core-columns > .block-editor-inner-blocks.has-overlay::after {
+	left: 0;
+	right: 0;
+}

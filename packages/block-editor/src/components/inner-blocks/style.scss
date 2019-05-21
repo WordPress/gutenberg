@@ -1,27 +1,20 @@
-.block-editor-inner-blocks.has-overlay::after {
-	content: "";
-	position: absolute;
-	top: -$block-padding;
-	right: 0;
-	bottom: -$block-padding;
-	left: 0;
-	z-index: z-index(".block-editor-inner-blocks.has-overlay::after");
-}
-
-// These are temporary debug colors.
-/*.block-editor-inner-blocks.has-overlay {
-	background-color: #00a0d2;
-
-	.block-editor-inner-blocks.has-overlay {
-		background-color: #4ab866;
+.block-editor-inner-blocks.has-overlay {
+	&::after {
+		content: "";
+		position: absolute;
+		top: -$block-padding;
+		right: -$block-padding;
+		bottom: -$block-padding;
+		left: -$block-padding;
+		z-index: z-index(".block-editor-inner-blocks.has-overlay::after");
 	}
 }
-*/
 
-// Temporary hover style for testing
+// Visual overlay style to indicate nesting.
+// We should revisit this with the nested block outlines,
 .block-editor-block-list__block.is-hovered .block-editor-inner-blocks.has-overlay {
 	&::after {
-		background: rgba($blue-medium-500, 0.5);
+		background: rgba($blue-medium-500, 0.1);
 	}
 
 	// Stop propogating beyond one level
