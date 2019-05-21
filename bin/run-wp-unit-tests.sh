@@ -9,6 +9,14 @@ cd "$(dirname "$0")/../"
 export PATH="$HOME/.composer/vendor/bin:$PATH"
 if [[ $DOCKER = "true" ]]; then
 	bin/setup-local-env.sh
+
+	# Install the PHPUnit test scaffolding.
+	echo -e $(status_message "Installing PHPUnit test scaffolding...")
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root example mysql $WP_VERSION false > /dev/null
+
+	# Install Composer. This is only used to run WordPress Coding Standards checks.
+	echo -e $(status_message "Installing and updating Composer modules...")
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm composer install
 else
 	bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
 	source bin/install-php-phpunit.sh
