@@ -191,22 +191,17 @@ class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
-		const toolbarEditButton = (
-			<MediaUpload mediaType={ MEDIA_TYPE_IMAGE }
-				onSelectURL={ this.onSelectMediaUploadOption }
-				render={ ( { open, getMediaOptions } ) => {
-					return (
-						<Toolbar>
-							{ getMediaOptions() }
-							<ToolbarButton
-								title={ __( 'Edit image' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						</Toolbar>
-					);
-				} } >
-			</MediaUpload>
+		const toolbarEditButton = ( open, getMediaOptions ) => (
+			<BlockControls>
+				<Toolbar>
+					{ getMediaOptions() }
+					<ToolbarButton
+						title={ __( 'Edit image' ) }
+						icon="edit"
+						onClick={ open }
+					/>
+				</Toolbar>
+			</BlockControls>
 		);
 
 		const getInspectorControls = () => (
@@ -252,26 +247,25 @@ class ImageEdit extends React.Component {
 			);
 		}
 
-		return (
+		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
-
 				accessibilityLabel={ sprintf(
 					/* translators: accessibility text. 1: image alt text. 2: image caption. */
 					__( 'Image block. %1$s. %2$s' ),
 					alt,
 					caption
 				) }
-				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Double tap and hold to edit the image' ) }
+				accessibilityRole={ 'imagebutton' }
 				onPress={ this.onImagePressed }
+				onLongPress={ url && openMediaOptions }
 				disabled={ ! isSelected }
 			>
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
 					{ ( ! this.state.isCaptionSelected ) &&
-						<BlockControls>
-							{ toolbarEditButton }
-						</BlockControls>
+							toolbarEditButton(openMediaOptions, getMediaOptions)
 					}
 					<InspectorControls>
 						<ToolbarButton
@@ -353,6 +347,15 @@ class ImageEdit extends React.Component {
 					) }
 				</View>
 			</TouchableWithoutFeedback>
+		);
+
+		return (
+			<MediaUpload mediaType={ MEDIA_TYPE_IMAGE }
+				onSelectURL={ this.onSelectMediaUploadOption }
+				render={ ( { open, getMediaOptions } ) => {
+					return getImageComponent( open, getMediaOptions );
+				} }
+			/>
 		);
 	}
 }
