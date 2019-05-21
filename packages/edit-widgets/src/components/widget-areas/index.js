@@ -10,8 +10,12 @@ import { withSelect } from '@wordpress/data';
 import WidgetArea from '../widget-area';
 
 function WidgetAreas( { areas } ) {
-	return areas.map( ( area, index ) => (
-		<WidgetArea key={ area.id } area={ area } initialOpen={ index === 0 } />
+	return areas.map( ( { id }, index ) => (
+		<WidgetArea
+			key={ id }
+			widgetAreaId={ id }
+			initialOpen={ index === 0 }
+		/>
 	) );
 }
 

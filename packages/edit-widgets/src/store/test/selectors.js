@@ -3,6 +3,7 @@
  */
 import {
 	getBlocksFromWidgetArea,
+	getWidgetArea,
 	getWidgetAreas,
 } from '../selectors';
 
@@ -28,6 +29,35 @@ describe( 'selectors', () => {
 					id: 'footer-1',
 				},
 			] );
+		} );
+	} );
+
+	describe( 'getWidgetArea', () => {
+		it( 'should return an object with the widget area', () => {
+			const state = {
+				widgetAreas: {
+					'sidebar-1': {
+						id: 'sidebar-1',
+						name: 'Sidebar',
+					},
+					'footer-1': {
+						id: 'footer-1',
+						description: 'a footer',
+					},
+				},
+			};
+
+			expect( getWidgetArea( state, 'sidebar-1' ) ).toEqual( {
+				id: 'sidebar-1',
+				name: 'Sidebar',
+			} );
+
+			expect( getWidgetArea( state, 'footer-1' ) ).toEqual( {
+				id: 'footer-1',
+				description: 'a footer',
+			} );
+
+			expect( getWidgetArea( state, 'footer-3' ) ).toEqual( undefined );
 		} );
 	} );
 

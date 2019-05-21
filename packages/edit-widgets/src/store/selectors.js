@@ -16,6 +16,17 @@ export const getWidgetAreas = createSelector(
 );
 
 /**
+ * Returns a widget area object.
+ *
+ * @param {Object} state        Widget editor state.
+ * @param {string} widgetAreaId Id of the widget area.
+ * @return {Object} Array of widget areas.
+ */
+export function getWidgetArea( state, widgetAreaId ) {
+	return state.widgetAreas[ widgetAreaId ];
+}
+
+/**
  * Returns an array of blocks part of a widget area.
  *
  * @param {Object} state        Widget editor state.

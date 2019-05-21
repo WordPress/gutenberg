@@ -9,11 +9,16 @@ import {
 } from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 
-function WidgetArea( { area, initialOpen, blocks, updateBlocks } ) {
+function WidgetArea( {
+	blocks,
+	initialOpen,
+	updateBlocks,
+	widgetAreaName,
+} ) {
 	return (
 		<Panel className="edit-widgets-widget-area">
 			<PanelBody
-				title={ area.name }
+				title={ widgetAreaName }
 				initialOpen={ initialOpen }
 			>
 				<BlockEditorProvider
@@ -29,18 +34,23 @@ function WidgetArea( { area, initialOpen, blocks, updateBlocks } ) {
 }
 
 export default compose( [
-	withSelect( ( select, { area } ) => {
-		const { getBlocksFromWidgetArea } = select( 'core/edit-widgets' );
-		const blocks = getBlocksFromWidgetArea( area.id );
+	withSelect( ( select, { widgetAreaId } ) => {
+		const {
+			getBlocksFromWidgetArea,
+			getWidgetArea,
+		} = select( 'core/edit-widgets' );
+		const blocks = getBlocksFromWidgetArea( widgetAreaId );
+		const widgetAreaName = ( getWidgetArea( widgetAreaId ) || {} ).name;
 		return {
 			blocks,
+			widgetAreaName,
 		};
 	} ),
-	withDispatch( ( dispatch, { area } ) => {
+	withDispatch( ( dispatch, { widgetAreaId } ) => {
 		return {
 			updateBlocks( blocks ) {
 				const { updateBlocksInWidgetArea } = dispatch( 'core/edit-widgets' );
-				updateBlocksInWidgetArea( area.id, blocks );
+				updateBlocksInWidgetArea( widgetAreaId, blocks );
 			},
 		};
 	} ),

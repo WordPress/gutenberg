@@ -1,12 +1,14 @@
 /**
  * WordPress dependencies
  */
+import { createBlock, serialize } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
  */
 import {
+	saveWidgetAreas,
 	setupWidgetAreas,
 	updateBlocksInWidgetArea,
 } from '../actions';
@@ -17,7 +19,7 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'setupWidgetAreas', () => {
-		it( 'should return SETUP_WIDGET_AREAS action', () => {
+		it( 'should yield SETUP_WIDGET_AREAS action', () => {
 			const setupWidgetAreasGen = setupWidgetAreas();
 			setupWidgetAreasGen.next();
 			expect(
@@ -80,6 +82,107 @@ describe( 'actions', () => {
 						},
 					},
 				],
+			} );
+		} );
+	} );
+
+	describe( 'saveWidgetAreas', () => {
+		it( 'should yield the actions to save a widget area', () => {
+			const saveWidgetAreasGen = saveWidgetAreas();
+
+			expect(
+				saveWidgetAreasGen.next()
+			).toEqual( {
+				done: false,
+				value: {
+					type: 'SELECT',
+					storeKey: 'core/edit-widgets',
+					selectorName: 'getWidgetAreas',
+					args: [],
+				},
+			} );
+
+			expect(
+				saveWidgetAreasGen.next( [
+					{
+						id: 'sidebar-1',
+						blocks: [ {
+							name: 'core/paragraph',
+							attributes: {
+								content: 'Test block',
+							},
+						} ],
+					},
+					{
+						id: 'footer-1',
+						blocks: [],
+					},
+				] )
+			).toEqual( {
+				done: false,
+				value: {
+					type: 'SELECT',
+					storeKey: 'core/edit-widgets',
+					selectorName: 'getBlocksFromWidgetArea',
+					args: [ 'sidebar-1' ],
+				},
+			} );
+
+			expect(
+				saveWidgetAreasGen.next( [
+					createBlock( 'core/paragraph', { content: 'Content' } ),
+				] )
+			).toEqual( {
+				done: false,
+				value: {
+					type: 'DISPATCH',
+					storeKey: 'core',
+					actionName: 'saveWidgetArea',
+					args: [ {
+						id: 'sidebar-1',
+						content: serialize(
+							createBlock( 'core/paragraph', { content: 'Content' } )
+						),
+					} ],
+				},
+			} );
+
+			expect(
+				saveWidgetAreasGen.next()
+			).toEqual( {
+				done: false,
+				value: {
+					type: 'SELECT',
+					storeKey: 'core/edit-widgets',
+					selectorName: 'getBlocksFromWidgetArea',
+					args: [ 'footer-1' ],
+				},
+			} );
+
+			expect(
+				saveWidgetAreasGen.next( [
+					createBlock( 'core/button', { text: 'My Button' } ),
+				] )
+			).toEqual( {
+				done: false,
+				value: {
+					type: 'DISPATCH',
+					storeKey: 'core',
+					actionName: 'saveWidgetArea',
+					args: [ {
+						id: 'footer-1',
+						content: serialize(
+							createBlock( 'core/button', { text: 'My Button' } )
+						),
+					} ],
+				},
+			} );
+
+			expect(
+				saveWidgetAreasGen.next()
+			).toEqual( {
+				done: true,
+				value: undefined,
 			} );
 		} );
 	} );
