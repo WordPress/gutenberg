@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
 
-
 # Set up environment variables
 . "$(dirname "$0")/bootstrap-env.sh"
+
+# Include useful functions
+. "$(dirname "$0")/includes.sh"
 
 cd "$(dirname "$0")/../"
 
 export PATH="$HOME/.composer/vendor/bin:$PATH"
 if [[ $DOCKER = "true" ]]; then
-	bin/setup-local-env.sh
+	# Download image updates.
+	echo -e $(status_message "Downloading Docker image updates...")
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS pull composer mysql wordpress_phpunit
+
+	# Launch the containers.
+	echo -e $(status_message "Starting Docker containers...")
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS up -d composer mysql wordpress_phpunit >/dev/null
 
 	# Install the PHPUnit test scaffolding.
 	echo -e $(status_message "Installing PHPUnit test scaffolding...")
@@ -24,10 +32,7 @@ else
 	# Run the build because otherwise there will be a bunch of warnings about
 	# failed `stat` calls from `filemtime()`.
 	composer install || exit 1
-	npm install || exit 1
 fi
-
-npm run build || exit 1
 
 echo Running with the following versions:
 if [[ $DOCKER = "true" ]]; then
