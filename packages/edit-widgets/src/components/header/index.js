@@ -34,13 +34,16 @@ export default compose( [
 	withDispatch( ( dispatch, props, { select } ) => {
 		return {
 			saveWidgetAreas() {
-				const { getWidgetAreas, getWidgetAreaBlocks } = select( 'core/edit-widgets' );
+				const {
+					getWidgetAreas,
+					getBlocksFromWidgetArea,
+				} = select( 'core/edit-widgets' );
 				const widgetAreas = getWidgetAreas();
 				const { saveWidgetArea } = dispatch( 'core' );
 				widgetAreas.forEach( ( { id } ) => {
 					saveWidgetArea( {
 						id,
-						content: serialize( getWidgetAreaBlocks( id ) ),
+						content: serialize( getBlocksFromWidgetArea( id ) ),
 					} );
 				} );
 			},

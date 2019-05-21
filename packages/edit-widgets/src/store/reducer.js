@@ -8,7 +8,15 @@ import { keyBy, mapValues, pick } from 'lodash';
  */
 import { combineReducers } from '@wordpress/data';
 
-export function widgetAreas( state = {}, action ) {
+/**
+ * Reducer storing some properties of each widget area.
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Array} Updated state.
+ */
+export function widgetAreas( state = {}, action = {} ) {
 	switch ( action.type ) {
 		case 'SETUP_WIDGET_AREAS':
 			return mapValues(
@@ -24,27 +32,30 @@ export function widgetAreas( state = {}, action ) {
 	return state;
 }
 
-export function widgetAreaEditors( state = {}, action ) {
+/**
+ * Reducer storing the blocks part of each widget area.
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Array} Updated state.
+ */
+export function widgetAreaBlocks( state = {}, action = {} ) {
 	switch ( action.type ) {
 		case 'SETUP_WIDGET_AREAS':
 			return mapValues(
 				keyBy( action.widgetAreas, 'id' ),
-				( value ) => pick( value, [
-					'blocks',
-				] )
+				( value ) => value.blocks
 			);
 		case 'UPDATE_BLOCKS_IN_WIDGET_AREA': {
-			const area = state[ action.widgetAreaId ] || {};
+			const blocks = state[ action.widgetAreaId ] || [];
 			// check if change is required
-			if ( area.blocks === action.blocks ) {
+			if ( blocks === action.blocks ) {
 				return state;
 			}
 			return {
 				...state,
-				[ action.widgetAreaId ]: {
-					...area,
-					blocks: action.blocks,
-				},
+				[ action.widgetAreaId ]: action.blocks,
 			};
 		}
 	}
@@ -54,5 +65,5 @@ export function widgetAreaEditors( state = {}, action ) {
 
 export default combineReducers( {
 	widgetAreas,
-	widgetAreaEditors,
+	widgetAreaBlocks,
 } );

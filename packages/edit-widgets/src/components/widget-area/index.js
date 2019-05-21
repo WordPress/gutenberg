@@ -30,8 +30,8 @@ function WidgetArea( { area, initialOpen, blocks, updateBlocks } ) {
 
 export default compose( [
 	withSelect( ( select, { area } ) => {
-		const { getWidgetAreaBlocks } = select( 'core/edit-widgets' );
-		const blocks = getWidgetAreaBlocks( area.id );
+		const { getBlocksFromWidgetArea } = select( 'core/edit-widgets' );
+		const blocks = getBlocksFromWidgetArea( area.id );
 		return {
 			blocks,
 		};

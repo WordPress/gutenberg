@@ -2,12 +2,26 @@
  * External dependencies
  */
 import { toArray } from 'lodash';
+import createSelector from 'rememo';
 
-export function getWidgetAreas( state ) {
-	return toArray( state.widgetAreas );
-}
+/**
+ * Returns an array of widget areas.
+ *
+ * @param {Object} state Widget editor state.
+ * @return {Object[]} Array of widget areas.
+ */
+export const getWidgetAreas = createSelector(
+	( state ) => ( toArray( state.widgetAreas ) ),
+	( state ) => [ state.widgetAreas ]
+);
 
-export function getWidgetAreaBlocks( state, widgetAreaId ) {
-	return state.widgetAreaEditors[ widgetAreaId ] &&
-		state.widgetAreaEditors[ widgetAreaId ].blocks;
+/**
+ * Returns an array of blocks part of a widget area.
+ *
+ * @param {Object} state        Widget editor state.
+ * @param {string} widgetAreaId Id of the widget area.
+ * @return {Object[]} Array of blocks.
+ */
+export function getBlocksFromWidgetArea( state, widgetAreaId ) {
+	return state.widgetAreaBlocks[ widgetAreaId ];
 }

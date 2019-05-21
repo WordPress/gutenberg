@@ -25,7 +25,7 @@ function Layout( { areas } ) {
 				tabIndex="-1"
 			>
 				{ areas.map( ( area, index ) => (
-					<div key={ index } className="edit-widgets-layout__area">
+					<div key={ area.id } className="edit-widgets-layout__area">
 						<WidgetArea area={ area } initialOpen={ index === 0 } />
 					</div>
 				) ) }
