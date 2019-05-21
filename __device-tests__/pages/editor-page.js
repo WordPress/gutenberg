@@ -15,13 +15,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { isAndroid, swipeUp, typeString } from '../helpers/utils';
+import { isAndroid, swipeUp, typeString, toggleHtmlMode } from '../helpers/utils';
 
 export default class EditorPage {
 	driver: wd.PromiseChainWebdriver;
 	accessibilityIdKey: string;
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
+	listBlockName = 'List';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
@@ -211,5 +212,69 @@ export default class EditorPage {
 		block = await this.getParagraphBlockAtPosition( position );
 		const text = await this.getTextForParagraphBlock( block );
 		return text.toString();
+	}
+
+	// =========================
+	// List Block functions
+	// =========================
+
+	async addNewListBlock() {
+		await this.addNewBlock( this.listBlockName );
+	}
+
+	async getListBlockAtPosition( position: number ) {
+		return this.getBlockAtPosition( position, this.listBlockName );
+	}
+
+	async hasListBlockAtPosition( position: number ) {
+		return await this.hasBlockAtPosition( position, this.listBlockName );
+	}
+
+	async getTextViewForListBlock( block: wd.PromiseChainWebdriver.Element ) {
+		let textViewElementName = 'XCUIElementTypeTextView';
+		if ( isAndroid() ) {
+			textViewElementName = 'android.widget.EditText';
+		}
+
+		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//${ textViewElementName }`;
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async sendTextToListBlock( block: wd.PromiseChainWebdriver.Element, text: string ) {
+		const textViewElement = await this.getTextViewForListBlock( block );
+		return await typeString( this.driver, textViewElement, text );
+	}
+
+	async getTextForListBlock( block: wd.PromiseChainWebdriver.Element ) {
+		const textViewElement = await this.getTextViewForListBlock( block );
+		const text = await textViewElement.text();
+		return text.toString();
+	}
+
+	async removeListBlockAtPosition( position: number ) {
+		return await this.removeBlockAtPosition( position, this.listBlockName );
+	}
+
+	async getTextForListBlockAtPosition( position: number ) {
+		const block = await this.getListBlockAtPosition( position );
+		const text = await this.getTextForListBlock( block );
+		return text.toString();
+	}
+
+	async getTextViewForHtmlViewContent() {
+		const accessibilityId = 'html-view-content';
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async verifyHtmlContent( html: string ) {
+		await toggleHtmlMode( this.driver );
+
+		const htmlContentView = await this.getTextViewForHtmlViewContent();
+		const text = await htmlContentView.text();
+		expect( text ).toBe( html );
+
+		await toggleHtmlMode( this.driver );
 	}
 }

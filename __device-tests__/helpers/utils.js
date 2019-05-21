@@ -209,6 +209,24 @@ const swipeUp = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseCha
 	await action.perform();
 };
 
+const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver ) => {
+	if ( isAndroid() ) {
+		// Hit the "Menu" key
+		await driver.pressKeycode( 82 );
+
+		// Go at the end of the popup to hit the "Show html"
+		// TODO: c'mon, find a more robust way to hit that item! :(
+		for ( let i = 0; i < 10; i++ ) {
+			await driver.pressKeycode( 20 );
+		}
+
+		// hit Enter
+		await driver.pressKeycode( 66 );
+	} else {
+		// TODO: toggle html mode in iOS
+	}
+};
+
 module.exports = {
 	timer,
 	setupDriver,
@@ -219,4 +237,5 @@ module.exports = {
 	clickBeginningOfElement,
 	swipeUp,
 	stopDriver,
+	toggleHtmlMode,
 };
