@@ -6,7 +6,6 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 
-
 function Header( { saveWidgetAreas } ) {
 	return (
 		<div

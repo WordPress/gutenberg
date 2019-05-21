@@ -13,7 +13,7 @@ function WidgetAreas( { areas } ) {
 	return areas.map( ( { id }, index ) => (
 		<WidgetArea
 			key={ id }
-			widgetAreaId={ id }
+			id={ id }
 			initialOpen={ index === 0 }
 		/>
 	) );

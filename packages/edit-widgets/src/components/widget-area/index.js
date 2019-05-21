@@ -34,23 +34,23 @@ function WidgetArea( {
 }
 
 export default compose( [
-	withSelect( ( select, { widgetAreaId } ) => {
+	withSelect( ( select, { id } ) => {
 		const {
 			getBlocksFromWidgetArea,
 			getWidgetArea,
 		} = select( 'core/edit-widgets' );
-		const blocks = getBlocksFromWidgetArea( widgetAreaId );
-		const widgetAreaName = ( getWidgetArea( widgetAreaId ) || {} ).name;
+		const blocks = getBlocksFromWidgetArea( id );
+		const widgetAreaName = ( getWidgetArea( id ) || {} ).name;
 		return {
 			blocks,
 			widgetAreaName,
 		};
 	} ),
-	withDispatch( ( dispatch, { widgetAreaId } ) => {
+	withDispatch( ( dispatch, { id } ) => {
 		return {
 			updateBlocks( blocks ) {
 				const { updateBlocksInWidgetArea } = dispatch( 'core/edit-widgets' );
-				updateBlocksInWidgetArea( widgetAreaId, blocks );
+				updateBlocksInWidgetArea( id, blocks );
 			},
 		};
 	} ),
