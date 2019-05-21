@@ -39,14 +39,27 @@ export default function useSelect( mapSelect ) {
 	const latestMapSelect = useRef();
 	const latestIsAsync = useRef( isAsync );
 	const latestMapOutput = useRef();
+	const latestMapOutputError = useRef();
 	const isMounted = useRef();
 
 	let mapOutput;
 
-	if ( latestMapSelect.current !== mapSelect ) {
-		mapOutput = mapSelect( registry.select, registry );
-	} else {
-		mapOutput = latestMapOutput.current;
+	try {
+		if ( latestMapSelect.current !== mapSelect || latestMapOutputError.current ) {
+			mapOutput = mapSelect( registry.select, registry );
+		} else {
+			mapOutput = latestMapOutput.current;
+		}
+	} catch ( error ) {
+		let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
+
+		if ( latestMapOutputError.current ) {
+			errorMessage += `\nThe error may be correlated with this previous error:\n`;
+			errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
+			errorMessage += 'Original stack trace:';
+
+			throw new Error( errorMessage );
+		}
 	}
 
 	useIsomorphicLayoutEffect( () => {
@@ -56,17 +69,27 @@ export default function useSelect( mapSelect ) {
 			renderQueue.flush( queueContext );
 		}
 		latestMapOutput.current = mapOutput;
+		latestMapOutputError.current = undefined;
 		isMounted.current = true;
 	} );
 
 	useIsomorphicLayoutEffect( () => {
 		const onStoreChange = () => {
 			if ( isMounted.current ) {
-				const newMapOutput = latestMapSelect.current( registry.select, registry );
-				if ( ! isShallowEqualObjects( latestMapOutput.current, newMapOutput ) ) {
+				try {
+					const newMapOutput = latestMapSelect.current(
+						registry.select,
+						registry
+					);
+					if ( isShallowEqualObjects( latestMapOutput.current, newMapOutput ) ) {
+						return;
+					}
 					latestMapOutput.current = newMapOutput;
-					forceRender();
+				} catch ( error ) {
+					latestMapOutputError.current = error;
 				}
+
+				forceRender( {} );
 			}
 		};
 
