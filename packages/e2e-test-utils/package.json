@@ -36,7 +36,7 @@
 	},
 	"peerDependencies": {
 		"jest": ">=24",
-		"puppeteer": ">=1.15"
+		"puppeteer": ">=1.16"
 	},
 	"publishConfig": {
 		"access": "public"
