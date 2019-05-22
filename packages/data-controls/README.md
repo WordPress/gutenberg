@@ -45,7 +45,7 @@ _Returns_
 
 -   `Object`: The control descriptor.
 
-<a name="default" href="#default">#</a> **default**
+<a name="controls" href="#controls">#</a> **controls**
 
 The default export is what you use to register the controls with your custom
 store.
@@ -54,7 +54,7 @@ _Usage_
 
 ```js
 // WordPress dependencies
-import controls from '@wordpress/data-controls';
+import { controls } from '@wordpress/data-controls';
 import { registerStore } from '@wordpress/data';
 
 // Internal dependencies
