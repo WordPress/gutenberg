@@ -82,3 +82,11 @@ An optional additional class name to apply to the rendered icon.
 - Type: `String`
 - Required: No
 - Default: `null`
+
+### style
+
+An optional additional object containing svg styles.
+
+- Type: `Object`
+- Required: No
+- Default: `null`
