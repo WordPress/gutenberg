@@ -120,8 +120,15 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// If multiple blocks are selected, only multi block transforms
 	// or wildcard transforms are allowed.
 	const isMultiBlock = blocks.length > 1;
+	const firstBlockName = first( blocks ).name;
 	const isValidForMultiBlocks = isWildCardBlockTransform( transform ) || ! isMultiBlock || transform.isMultiBlock;
 	if ( ! isValidForMultiBlocks ) {
+		return false;
+	}
+
+	// Check non-wildcard transforms to ensure that transform is valid
+	// for a block selection of multiple blocks of different types
+	if ( ! isWildCardBlockTransform( transform ) && ! every( blocks, { name: firstBlockName } ) ) {
 		return false;
 	}
 
