@@ -14,6 +14,7 @@ export const start = ( localAppiumPort: number ) => new Promise < childProcess.C
 		'--port', localAppiumPort.toString(),
 		'--log', './appium-out.log',
 		'--log-no-colors',
+		'--relaxed-security', // Needed for mobile:shell commend for text entry on Android
 	] );
 
 	let appiumOutputBuffer = '';

@@ -85,6 +85,7 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 			<HTMLInputContainer parentHeight={ this.props.parentHeight }>
 				<TextInput
 					autoCorrect={ false }
+					accessibilityLabel="html-view-title"
 					textAlignVertical="center"
 					numberOfLines={ 1 }
 					style={ styles.htmlViewTitle }
@@ -94,6 +95,7 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 				/>
 				<TextInput
 					autoCorrect={ false }
+					accessibilityLabel="html-view-content"
 					textAlignVertical="top"
 					multiline
 					style={ styles.htmlView }
