@@ -16,22 +16,6 @@ exports[`Block Grouping Group creation creates a group from multiple blocks of d
 <!-- /wp:group -->"
 `;
 
-exports[`Block Grouping Group creation creates a group from multiple blocks of different types via options toolbar 1`] = `
-"<!-- wp:group -->
-<div class=\\"wp-block-group\\"><!-- wp:heading -->
-<h2>Group Heading</h2>
-<!-- /wp:heading -->
-
-<!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
-<!-- /wp:image -->
-
-<!-- wp:paragraph -->
-<p>Some paragraph</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->"
-`;
-
 exports[`Block Grouping Group creation creates a group from multiple blocks of the same type via block transforms 1`] = `
 "<!-- wp:group -->
 <div class=\\"wp-block-group\\"><!-- wp:paragraph -->
@@ -124,36 +108,6 @@ exports[`Block Grouping Keyboard shortcuts groups and ungroups using keyboard sh
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Block Grouping Keyboard shortcuts groups using keyboard shortcut 1`] = `
-"<!-- wp:group -->
-<div class=\\"wp-block-group\\"><!-- wp:heading -->
-<h2>Group Heading</h2>
-<!-- /wp:heading -->
-
-<!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
-<!-- /wp:image -->
-
-<!-- wp:paragraph -->
-<p>Some paragraph</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->"
-`;
-
-exports[`Block Grouping Keyboard shortcuts ungroups using keyboard shortcut 1`] = `
-"<!-- wp:heading -->
-<h2>Group Heading</h2>
-<!-- /wp:heading -->
-
-<!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
-<!-- /wp:image -->
-
-<!-- wp:paragraph -->
-<p>Some paragraph</p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`Block Grouping Preserving selected blocks attributes preserves width alignment settings of selected blocks 1`] = `
 "<!-- wp:group {\\"align\\":\\"full\\"} -->
 <div class=\\"wp-block-group alignfull\\"><!-- wp:heading -->
@@ -172,18 +126,4 @@ exports[`Block Grouping Preserving selected blocks attributes preserves width al
 <p>Some paragraph</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->"
-`;
-
-exports[`Block Grouping Ungrouping ungroups an existing group via options menu 1`] = `
-"<!-- wp:heading -->
-<h2>Group Heading</h2>
-<!-- /wp:heading -->
-
-<!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
-<!-- /wp:image -->
-
-<!-- wp:paragraph -->
-<p>Some paragraph</p>
-<!-- /wp:paragraph -->"
 `;
