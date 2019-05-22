@@ -11,7 +11,7 @@ import Header from '../header';
 import Sidebar from '../sidebar';
 import WidgetAreas from '../widget-areas';
 
-function Layout() {
+function Layout( { blockEditorSettings } ) {
 	return (
 		<>
 			<Header />
@@ -22,7 +22,9 @@ function Layout() {
 				aria-label={ __( 'Widgets screen content' ) }
 				tabIndex="-1"
 			>
-				<WidgetAreas />
+				<WidgetAreas
+					blockEditorSettings={ blockEditorSettings }
+				/>
 			</div>
 		</>
 	);
