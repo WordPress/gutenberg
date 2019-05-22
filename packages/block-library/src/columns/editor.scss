@@ -159,10 +159,10 @@ div.block-core-columns.is-vertically-aligned-bottom {
 }
 
 /**
- * Fixes single Column breadcrumb to RHS of Block boundary
+ * Fixes single Column breadcrumb position.
  */
 [data-type="core/column"] > .editor-block-list__block-edit > .editor-block-list__breadcrumb {
-	right: 0;
+	left: -$block-left-border-width;
 }
 
 /**
