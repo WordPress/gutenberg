@@ -165,19 +165,14 @@ export class PostPublishButton extends Component {
 			onClick: this.createOnClick( onClickToggle ),
 		};
 
-		let toggleChildren;
-		if ( 'private' === visibility ) {
-			toggleChildren = __( 'Publish Privately…' );
-		} else if ( isBeingScheduled ) {
-			toggleChildren = __( 'Schedule…' );
-		} else {
-			toggleChildren = __( 'Publish…' );
-		}
+		const toggleChildren = isBeingScheduled
+			? __( 'Schedule…' )
+			: __( 'Publish…' );
 		const buttonChildren = (
 			<PublishButtonLabel
 				forceIsSaving={ forceIsSaving }
 				hasNonPostEntityChanges={ hasNonPostEntityChanges }
-			/>;
+			/>
 		);
 
 		const componentProps = isToggle ? toggleProps : buttonProps;
