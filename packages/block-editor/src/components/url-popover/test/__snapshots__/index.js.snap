@@ -4,7 +4,6 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
 <Popover
   className="editor-url-popover block-editor-url-popover"
   focusOnMount="firstElement"
-  noArrow={false}
   position="bottom center"
 >
   <div
@@ -28,7 +27,6 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
 <Popover
   className="editor-url-popover block-editor-url-popover"
   focusOnMount="firstElement"
-  noArrow={false}
   position="bottom center"
 >
   <div
@@ -59,7 +57,6 @@ exports[`URLPopover matches the snapshot when there are no settings 1`] = `
 <Popover
   className="editor-url-popover block-editor-url-popover"
   focusOnMount="firstElement"
-  noArrow={false}
   position="bottom center"
 >
   <div

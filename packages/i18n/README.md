@@ -21,7 +21,7 @@ sprintf( _n( '%d hat', '%d hats', 4, 'text-domain' ), 4 );
 // 4 hats
 ```
 
-For a complete example, see the [Internationalization section of the Gutenberg Handbook](https://wordpress.org/gutenberg/handbook/designers-developers/developers/internationalization/).
+For a complete example, see the [Internationalization section of the Block Editor Handbook](https://developer.wordpress.org/block-editor/developers/internationalization/).
 
 ## API
 

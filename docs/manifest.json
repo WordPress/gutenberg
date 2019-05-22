@@ -288,6 +288,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/data-controls",
+		"slug": "packages-data-controls",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/data-controls/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/data",
 		"slug": "packages-data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/data/README.md",
