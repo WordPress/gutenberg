@@ -75,7 +75,6 @@ module.exports = {
 			'redux-routine',
 			'token-list',
 			'shortcode',
-			'data-controls',
 		].map( camelCaseDash ) ),
 		new CopyWebpackPlugin(
 			gutenbergPackages.map( ( packageName ) => ( {
