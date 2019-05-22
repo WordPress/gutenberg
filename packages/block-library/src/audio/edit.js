@@ -48,7 +48,7 @@ class AudioEdit extends Component {
 		// edit component has its own src in the state so it can be edited
 		// without setting the actual value outside of the edit UI
 		this.state = {
-			editing: ! this.props.attributes.src,
+			isEditing: ! this.props.attributes.src,
 		};
 
 		this.toggleAttribute = this.toggleAttribute.bind( this );
@@ -70,7 +70,7 @@ class AudioEdit extends Component {
 					},
 					onError: ( e ) => {
 						setAttributes( { src: undefined, id: undefined } );
-						this.setState( { editing: true } );
+						this.setState( { isEditing: true } );
 						noticeOperations.createErrorNotice( e );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
@@ -90,7 +90,7 @@ class AudioEdit extends Component {
 		const { src } = attributes;
 
 		// Set the block's src from the edit component's state, and toggle off
-		// the editing UI.
+		// the isEditing UI.
 		if ( newSrc !== src ) {
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock(
@@ -103,7 +103,7 @@ class AudioEdit extends Component {
 			setAttributes( { src: newSrc, id: undefined } );
 		}
 
-		this.setState( { editing: false } );
+		this.setState( { isEditing: false } );
 	}
 
 	getAutoplayHelp( checked ) {
@@ -113,25 +113,25 @@ class AudioEdit extends Component {
 	render() {
 		const { autoplay, caption, loop, preload, src } = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
-		const { editing } = this.state;
-		const toggleEditing = () => {
-			this.setState( { editing: ! this.state.editing } );
+		const { isEditing } = this.state;
+		const toggleIsEditing = () => {
+			this.setState( { isEditing: ! this.state.isEditing } );
 		};
 		const onSelectAudio = ( media ) => {
 			if ( ! media || ! media.url ) {
-				// in this case there was an error and we should continue in the editing state
+				// in this case there was an error and we should continue in the isEditing state
 				// previous attributes should be removed because they may be temporary blob urls
 				setAttributes( { src: undefined, id: undefined } );
-				toggleEditing();
+				toggleIsEditing();
 				return;
 			}
 			// sets the block's attribute and updates the edit component from the
-			// selected media, then toggles off the editing UI
+			// selected media, then toggles off the isEditing UI
 			setAttributes( { src: media.url, id: media.id } );
-			this.setState( { src: media.url, editing: false } );
+			this.setState( { src: media.url, isEditing: false } );
 		};
 		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
-		if ( editing ) {
+		if ( isEditing ) {
 			return (
 				<Fragment>
 					<BlockControls>
@@ -139,7 +139,7 @@ class AudioEdit extends Component {
 							<IconButton
 								className={ classnames( 'components-toolbar__control is-active' ) }
 								label={ __( 'Edit audio' ) }
-								onClick={ toggleEditing }
+								onClick={ toggleIsEditing }
 								icon={ editImageIcon }
 							/>
 						</Toolbar> ) }
@@ -147,7 +147,7 @@ class AudioEdit extends Component {
 					<MediaPlaceholder
 						icon={ <BlockIcon icon={ icon } /> }
 						className={ className }
-						onCancel={ !! src && toggleEditing }
+						onCancel={ !! src && toggleIsEditing }
 						onSelect={ onSelectAudio }
 						onSelectURL={ this.onSelectURL }
 						accept="audio/*"
@@ -168,7 +168,7 @@ class AudioEdit extends Component {
 						<IconButton
 							class={ classnames( 'components-toolbar__control' ) }
 							label={ __( 'Edit audio' ) }
-							onClick={ toggleEditing }
+							onClick={ toggleIsEditing }
 							icon={ editImageIcon }
 						/>
 					</Toolbar>
