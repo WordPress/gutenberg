@@ -30,7 +30,8 @@ const useIsomorphicLayoutEffect =
 
 const renderQueue = createQueue();
 
-export default function useSelect( mapSelect ) {
+export default function useSelect( _mapSelect, deps ) {
+	const mapSelect = useMemo( () => _mapSelect, deps );
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
 	const queueContext = useMemo( () => ( { queue: true } ), [ registry ] );
@@ -63,7 +64,7 @@ export default function useSelect( mapSelect ) {
 	}
 
 	useIsomorphicLayoutEffect( () => {
-		latestMapSelect.current = mapSelect;
+		latestMapSelect.current = _mapSelect;
 		if ( latestIsAsync.current !== isAsync ) {
 			latestIsAsync.current = isAsync;
 			renderQueue.flush( queueContext );
