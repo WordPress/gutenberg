@@ -637,7 +637,13 @@ export function selectionChange( clientId, attributeKey, startOffset, endOffset 
  * @return {Object} Action object
  */
 export function insertDefaultBlock( attributes, rootClientId, index ) {
-	const block = createBlock( getDefaultBlockName(), attributes );
+	// Abort if there is no default block type (if it has been unregistered).
+	const defaultBlockName = getDefaultBlockName();
+	if ( ! defaultBlockName ) {
+		return;
+	}
+
+	const block = createBlock( defaultBlockName, attributes );
 
 	return insertBlock( block, index, rootClientId );
 }
