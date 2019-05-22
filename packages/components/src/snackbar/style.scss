@@ -5,7 +5,7 @@
 	border-radius: $radius-round-rectangle;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 	color: $white;
-	padding: 8px 16px;
+	padding: 16px 24px;
 
 	&:hover {
 		background-color: $dark-gray-900;
@@ -38,7 +38,7 @@
 
 .components-snackbar__content {
 	display: flex;
-	align-items: center;
+	align-items: baseline;
 	justify-content: space-between;
 	line-height: $default-line-height;
 }
