@@ -24,14 +24,26 @@ const addThreeParagraphsToNewPost = async () => {
 };
 
 /**
- * Note Puppeteer has a problem clicking on items in the Popover that require
- * scrolling the Popover to be visible. To work around this we use the keyboard
- * to select the "Remove Block" button
+ * Due to an issue with the Popover component not being scrollable
+ * under certain conditions, Pupeteer cannot "see" the "Remove Block"
+ * button. This is a workaround until that issue is resolved.
+ *
+ * see: https://github.com/WordPress/gutenberg/pull/14908#discussion_r284725956
  */
 const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
+	let isRemoveButton = false;
+
 	await clickBlockToolbarButton( 'More options' );
 
-	await pressKeyTimes( 'Tab', 7 );
+	while ( false === isRemoveButton ) {
+		await page.keyboard.press( 'Tab' );
+
+		isRemoveButton = await page.evaluate( () => {
+			return document.activeElement.innerText.includes( 'Remove Block' );
+		} );
+	}
+
+	await expect( isRemoveButton ).toBe( true );
 
 	await pressKeyTimes( 'Enter', 1 );
 };
