@@ -228,7 +228,7 @@ _Note:_ While it is possible to return a string value from `save`, it _will be e
 
 _Note:_ The save function should be a pure function that depends only on the attributes used to invoke it.
 It can not have any side effect or retrieve information from another source, e.g. it is not possible to use the data module inside it `wp.data.select...`.
-If the function uses external information when the external information changes for the same attribute values, the save result may vary, and when that happens, the block will be considered invalid by the editor.
+This is because if the external information changes, the block may be flagged as invalid when the post is later edited ([read more about Validation](#validation)).
 If there is a need to have other information as part of the save, developers can consider one of these two alternatives:
  - Use [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md) and dynamically retrieve the required information on the server.
  - Add another attribute value that contains the needed value that the save function depends on and dynamically update that value in the `edit` component which can depend on external information and contain side effects to update the attribute when the external information changes.
