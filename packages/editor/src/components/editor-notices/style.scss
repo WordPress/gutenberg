@@ -34,5 +34,19 @@
 
 .components-editor-notices__snackbar {
 	bottom: 20px;
-	left: 20px;
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	// Width needs to accommodate sidebar for centred positioning to work across all screens.
+	@include break-medium() {
+		width: calc(100% - #{ $admin-sidebar-width-big });
+
+		body.folded & {
+			width: calc(100% - #{ $admin-sidebar-width-collapsed });
+		}
+	}
+
+	@include break-large() {
+		width: calc(100% - #{ $admin-sidebar-width });
+	}
 }

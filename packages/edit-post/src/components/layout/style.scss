@@ -30,7 +30,8 @@
 @include editor-left(".edit-post-layout__content .components-editor-notices__snackbar");
 .edit-post-layout__content .components-editor-notices__snackbar {
 	position: fixed;
-	padding-left: 20px;
+	padding-left: 16px;
+	padding-right: 16px;
 }
 
 .edit-post-layout__content {

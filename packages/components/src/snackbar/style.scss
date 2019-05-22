@@ -6,8 +6,7 @@
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 	color: $white;
 	padding: 16px 24px;
-	// Where is this 20px value coming from?
-	width: calc(100% - 20px);
+	width: 100%;
 	max-width: 800px;
 
 	@include break-small() {
@@ -54,13 +53,4 @@
 	position: absolute;
 	z-index: z-index(".components-snackbar-list");
 	width: 100%;
-
-	@include break-small() {
-		width: auto;
-		max-width: 800px;
-	}
-
-	.components-snackbar {
-		margin-top: 10px;
-	}
 }
