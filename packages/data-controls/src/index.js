@@ -131,7 +131,7 @@ const resolveSelect = ( registry, { storeKey, selectorName, args } ) => {
  * @example
  * ```js
  * // WordPress dependencies
- * import controls from '@wordpress/data-controls';
+ * import { controls } from '@wordpress/data-controls';
  * import { registerStore } from '@wordpress/data';
  *
  * // Internal dependencies
@@ -152,7 +152,7 @@ const resolveSelect = ( registry, { storeKey, selectorName, args } ) => {
  * @return {Object} An object for registering the default controls with the
  *                  store.
  */
-export default {
+export const controls = {
 	API_FETCH( { request } ) {
 		return triggerFetch( request );
 	},
