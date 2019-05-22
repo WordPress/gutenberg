@@ -222,12 +222,14 @@ export function toggleSelection( isSelectionEnabled = true ) {
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
- * @param {(string|string[])} clientIds Block client ID(s) to replace.
- * @param {(Object|Object[])} blocks    Replacement block(s).
+ * @param {(string|string[])} clientIds     Block client ID(s) to replace.
+ * @param {(Object|Object[])} blocks        Replacement block(s).
+ * @param {number}            indexToSelect Index of replacement block to
+ *                                          select.
  *
  * @yields {Object} Action object.
  */
-export function* replaceBlocks( clientIds, blocks ) {
+export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 	clientIds = castArray( clientIds );
 	blocks = castArray( blocks );
 	const rootClientId = yield select(
@@ -253,6 +255,7 @@ export function* replaceBlocks( clientIds, blocks ) {
 		clientIds,
 		blocks,
 		time: Date.now(),
+		indexToSelect,
 	};
 	yield* ensureDefaultBlock();
 }

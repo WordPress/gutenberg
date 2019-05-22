@@ -1,6 +1,6 @@
-## Master
+## 1.2.0 (2019-05-21)
 
-### Enhancements
+### Enhancement
 
 - Docblocks including a `@private` tag will be omitted from the generated result.
 

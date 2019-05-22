@@ -10,13 +10,15 @@ import { default as VideoPlayer } from 'react-native-video';
 import styles from './video-player.scss';
 
 const Video = ( props ) => {
+	const { isSelected, ...videoProps } = props;
+
 	return (
 		<View style={ styles.videoContainer }>
 			<VideoPlayer
-				{ ...props }
+				{ ...videoProps }
 				// We are using built-in player controls becasue manually
 				// calling presentFullscreenPlayer() is not working for android
-				controls={ true }
+				controls={ isSelected }
 			/>
 		</View>
 	);
