@@ -227,7 +227,7 @@ For most blocks, the return value of `save` should be an [instance of WordPress 
 _Note:_ While it is possible to return a string value from `save`, it _will be escaped_. If the string includes HTML markup, the markup will be shown on the front of the site verbatim, not as the equivalent HTML node content. If you must return raw HTML from `save`, use `wp.element.RawHTML`. As the name implies, this is prone to [cross-site scripting](https://en.wikipedia.org/wiki/Cross-site_scripting) and therefore is discouraged in favor of a WordPress Element hierarchy whenever possible.
 
 _Note:_ The save function should be a pure function that depends only on the attributes used to invoke it.
-It can not have any side effect or retrieve information from another source, e.g. it is not possible to use the data module inside it `wp.data.select...`.
+It can not have any side effect or retrieve information from another source, e.g. it is not possible to use the data module inside it `select( store ).selector( ... )`.
 This is because if the external information changes, the block may be flagged as invalid when the post is later edited ([read more about Validation](#validation)).
 If there is a need to have other information as part of the save, developers can consider one of these two alternatives:
  - Use [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md) and dynamically retrieve the required information on the server.
