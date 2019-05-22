@@ -7,9 +7,9 @@ const BlockQuote = ( props ) => {
 			{
 				React.cloneElement( children[ 0 ], { tagName: 'blockquote' } )
 			}
-			{
+			{ ( children.length > 1 && (
 				React.cloneElement( children[ 1 ], { tagName: 'cite' } )
-			}
+			) ) } 
 		</>
 	);
 }
