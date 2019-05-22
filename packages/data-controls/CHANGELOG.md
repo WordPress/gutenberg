@@ -1,3 +1,3 @@
-# 1.0.0 (Unreleased)
+# Master
 
 Initial release of the @wordpress/data-controls package.
