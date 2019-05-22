@@ -87,7 +87,7 @@ jobs:
         - ./bin/setup-travis-e2e-tests.sh
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin with plugins) (2/4)
       env: WP_VERSION=latest SCRIPT_DEBUG=false POPULAR_PLUGINS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
@@ -95,7 +95,7 @@ jobs:
         - ./bin/setup-travis-e2e-tests.sh
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin with plugins) (3/4)
       env: WP_VERSION=latest SCRIPT_DEBUG=false POPULAR_PLUGINS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
@@ -103,7 +103,7 @@ jobs:
         - ./bin/setup-travis-e2e-tests.sh
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin with plugins) (4/4)
       env: WP_VERSION=latest SCRIPT_DEBUG=false POPULAR_PLUGINS=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
@@ -111,7 +111,7 @@ jobs:
         - ./bin/setup-travis-e2e-tests.sh
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author without plugins) (1/4)
       env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
@@ -119,7 +119,7 @@ jobs:
         - ./bin/setup-travis-e2e-tests.sh
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author without plugins) (2/4)
       env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
@@ -127,7 +127,7 @@ jobs:
         - ./bin/setup-travis-e2e-tests.sh
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author without plugins) (3/4)
       env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
@@ -135,7 +135,7 @@ jobs:
         - ./bin/setup-travis-e2e-tests.sh
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author without plugins) (4/4)
       env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
@@ -143,7 +143,7 @@ jobs:
         - ./bin/setup-travis-e2e-tests.sh
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
   allow_failures:
     - name: PHP unit tests (PHP 5.3)
