@@ -7,7 +7,8 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 /**
  * Internal dependencies
  */
-import Layout from './components/layout';
+import './store';
+import EditWidgetsInitializer from './components/edit-widgets-initializer';
 
 /**
  * Initilizes the widgets screen
@@ -17,7 +18,7 @@ import Layout from './components/layout';
 export function initialize( id ) {
 	registerCoreBlocks();
 	render(
-		<Layout />,
+		<EditWidgetsInitializer />,
 		document.getElementById( id )
 	);
 }
