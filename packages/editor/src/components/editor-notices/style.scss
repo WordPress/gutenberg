@@ -41,7 +41,8 @@
 	@include break-medium() {
 		width: calc(100% - #{ $admin-sidebar-width-big });
 
-		body.folded & {
+		body.folded &,
+		body.auto-fold & {
 			width: calc(100% - #{ $admin-sidebar-width-collapsed });
 		}
 	}
