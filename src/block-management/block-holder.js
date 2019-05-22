@@ -175,7 +175,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	render() {
-		const { isSelected, borderStyle, focusedBorderColor } = this.props;
+		const { isSelected, borderStyle, focusedBorderColor, isValid } = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
@@ -186,15 +186,19 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 			// https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
 			<TouchableWithoutFeedback
 				accessible={ false }
-				onPress={ this.onFocus } >
-
+				onPress={ this.onFocus }
+			>
+					
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View
 						accessibile={ true }
 						accessibilityLabel={ accessibilityLabel }
 						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
-						{ this.getBlockForType() }
+							{ isValid && this.getBlockForType() }
+							{ ! isValid &&
+								<Text>ERROR</Text>
+							}
 					</View>
 					{ this.renderToolbar() }
 				</View>
@@ -207,20 +211,23 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
-			getBlockAttributes,
+			// getBlockAttributes,
 			getBlockName,
 			getBlockIndex,
 			getBlocks,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
 			isBlockSelected,
+			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
-		const name = getBlockName( clientId );
-		const attributes = getBlockAttributes( clientId );
+		// const name = getBlockName( clientId );
+		// const attributes = getBlockAttributes( clientId );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
 		const isFirstBlock = order === 0;
 		const isLastBlock = order === getBlocks().length - 1;
+		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+		const { name, attributes, isValid } = block || {};
 
 		return {
 			attributes,
@@ -232,6 +239,7 @@ export default compose( [
 			isLastBlock,
 			isSelected,
 			name,
+			isValid,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId }, { select } ) => {
