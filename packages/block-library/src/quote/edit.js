@@ -24,7 +24,6 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 			<BlockQuote className={ className } style={ { textAlign: align } }>
 				<RichText
 					identifier="value"
-					tagName="blockquote"
 					multiline
 					value={ value }
 					onChange={
@@ -47,7 +46,6 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
 						identifier="citation"
-						tagName="cite"
 						value={ citation }
 						onChange={
 							( nextCitation ) => setAttributes( {
