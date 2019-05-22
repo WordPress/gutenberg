@@ -59,7 +59,7 @@ function render_block_core_latest_posts( $attributes ) {
 			$trimmed_excerpt = esc_html( wp_trim_words( $post_excerpt, $excerpt_length, ' &hellip; ' ) );
 
 			$list_items_markup .= sprintf(
-				'<div class="wp-block-latest-posts____post-excerpt">%1$s',
+				'<div class="wp-block-latest-posts__post-excerpt">%1$s',
 				$trimmed_excerpt
 			);
 

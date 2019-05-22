@@ -50,35 +50,33 @@ When creating a new package, you need to provide at least the following:
 
 ### Maintaining Changelogs
 
-Maintaining dozens of npm packages is difficult—it can be tough to keep track of changes. That's why we use `CHANGELOG.md` files for each package to simplify the release process. All packages should follow the [Semantic Versioning (`semver`) specification](https://semver.org/).
+In maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Master") changes, if any exist.
 
-The developer who proposes a change (pull request) is responsible for choosing the correct version increment (`major`, `minor`, or `patch`) according to the following guidelines:
-
-- Major version X (X.y.z | X > 0) should be changed with any backward incompatible/"breaking" change. This will usually occur at the final stage of deprecating and removing of a feature.
-- Minor version Y (x.Y.z | x > 0) should be changed when you add functionality or change functionality in a backward compatible manner. It must be incremented if any public API functionality is marked as deprecated.
-- Patch version Z (x.y.Z | x > 0) should be incremented when you make backward compatible bug fixes.
-
-When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
+For each pull request, you should always include relevant changes in a "Master" heading at the top of the file. You should add the heading if it doesn't already exist.
 
 _Example:_
 
 ```md
-## v1.2.2 (Unreleased)
+## Master
 
 ### Bug Fix
 
-- ...
-- ...
+- Fixed an off-by-one error with the `sum` function.
 ```
 
-- If you need to add something considered a bug fix, you add the item to `Bug Fix` section and leave the version as 1.2.2.
-- If it's a new feature, you add the item to `New Feature` section and change version to 1.3.0.
-- If it's a breaking change you want to introduce, add the item to `Breaking Change` section and bump the version to 2.0.0.
-- If you struggle to classify a change as one of the above, then it might be not necessary to include it.
+There are a number of common release subsections you can follow. Each is intended to align to a specific meaning in the context of the [Semantic Versioning (`semver`) specification](https://semver.org/) the project adheres to. It is important that you describe your changes accurately, since this is used in the packages release process to help determine the version of the next release.
 
-The version bump is only necessary if one of the following applies:
- - There are no other unreleased changes.
- - The type of change you're introducing is incompatible (more severe) than the other unreleased changes.
+- "Breaking Change" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump).
+- "New Feature" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor verison bump).
+- "Enhancement" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
+- "Bug Fix" - Resolutions to existing buggy behavior (requires a patch version bump).
+- "Internal" - Changes which do not have an impact on the public interface or behavior of the module (requires a patch version bump).
+
+While other section naming can be used when appropriate, it's important that are expressed clearly to avoid confusion for both the packages releaser and third-party consumers.
+
+When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
+
+If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
 
 ### Releasing Packages
 
@@ -124,5 +122,5 @@ NPM_CONFIG_OTP=123456 npm run publish:prod
 
 Choose the correct version based on `CHANGELOG.md` files, confirm your choices and let Lerna do its magic.
 
-[lerna]: https://lernajs.io/
+[lerna]: https://lerna.js.org/
 [npm]: https://www.npmjs.com/

@@ -110,9 +110,9 @@ Every pull request goes through a manual code review, in addition to automated t
 
 ### Design Review
 
-If your pull request impacts the design, you can ask for a designer to review. Most pull requests that have an impact on design are reviewed. However, you can request a design review on something by adding the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label. As a guide, this could be:
+If your pull request impacts the design, you should ask for a design review. To request a design review add the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label to your PR. As a guide, changes that should be reviewed:
 
-- Something based on a previous design, to check is as that design.
+- A change based on a previous design, to confirm the design is still valid with the change.
 - Anything that changes something visually.
 - If you just want design feedback on an idea or exploration.
 
@@ -149,6 +149,16 @@ If you’d like a template to follow:
 > I’m closing this pull request because ____. To clarify further, ____.
 >
 > For more details, please see ____ and ____.
+
+## Teams
+
+Two GitHub teams are used in the project.
+
+* [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core): A team composed of people that are actively involved in the project: attending meetings regularly, participating in triage sessions, performing reviews regularly, working on features and bug fixes and performing plugin and npm releases.
+
+* [Gutenberg](https://github.com/orgs/WordPress/teams/gutenberg): A team composed of contributors with at least 2–3 meaningful contributions to the project.
+
+If you meet this criteria of several meaningful contributions having been accepted into the repository and would like to be added to the Gutenberg team, feel free to ask in the [#core-editor Slack channel](https://make.wordpress.org/chat/).
 
 ## Projects
 

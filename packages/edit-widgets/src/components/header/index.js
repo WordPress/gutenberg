@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
+import { compose } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { withDispatch } from '@wordpress/data';
 
-function Header() {
+function Header( { saveWidgetAreas } ) {
 	return (
 		<div
 			className="edit-widgets-header"
@@ -17,7 +19,7 @@ function Header() {
 			</h1>
 
 			<div className="edit-widgets-header__actions">
-				<Button isPrimary isLarge>
+				<Button isPrimary isLarge onClick={ saveWidgetAreas }>
 					{ __( 'Update' ) }
 				</Button>
 			</div>
@@ -25,4 +27,12 @@ function Header() {
 	);
 }
 
-export default Header;
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { saveWidgetAreas } = dispatch( 'core/edit-widgets' );
+		return {
+			saveWidgetAreas,
+		};
+	} ),
+] )( Header );
+
