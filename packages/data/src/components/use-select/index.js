@@ -9,7 +9,7 @@ import {
 	useEffect,
 	useReducer,
 } from '@wordpress/element';
-import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
+import { isShallowEqualObjects, isShallowEqualArrays } from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -30,8 +30,7 @@ const useIsomorphicLayoutEffect =
 
 const renderQueue = createQueue();
 
-export default function useSelect( _mapSelect, deps = [] ) {
-	const mapSelect = useMemo( () => _mapSelect, [ _mapSelect, ...deps ] );
+export default function useSelect( mapSelect, deps ) {
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
 	const queueContext = useMemo( () => ( { queue: true } ), [ registry ] );
@@ -41,12 +40,23 @@ export default function useSelect( _mapSelect, deps = [] ) {
 	const latestIsAsync = useRef( isAsync );
 	const latestMapOutput = useRef();
 	const latestMapOutputError = useRef();
+	const latestDependencies = useRef();
 	const isMounted = useRef();
 
 	let mapOutput;
 
+	const hasSameMapSelect = latestMapSelect.current === mapSelect;
+	const hasSameDependencies = isShallowEqualArrays(
+		latestDependencies.current,
+		deps
+	);
+
 	try {
-		if ( latestMapSelect.current !== mapSelect || latestMapOutputError.current ) {
+		if (
+			! hasSameMapSelect ||
+			! hasSameDependencies ||
+			latestMapOutputError.current
+		) {
 			mapOutput = mapSelect( registry.select, registry );
 		} else {
 			mapOutput = latestMapOutput.current;
@@ -65,6 +75,7 @@ export default function useSelect( _mapSelect, deps = [] ) {
 
 	useIsomorphicLayoutEffect( () => {
 		latestMapSelect.current = mapSelect;
+		latestDependencies.current = deps;
 		if ( latestIsAsync.current !== isAsync ) {
 			latestIsAsync.current = isAsync;
 			renderQueue.flush( queueContext );
