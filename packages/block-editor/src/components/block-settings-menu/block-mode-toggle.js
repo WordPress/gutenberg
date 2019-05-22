@@ -12,8 +12,8 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-export function BlockModeToggle( { blockType, mode, onToggleMode, small = false } ) {
-	if ( ! hasBlockSupport( blockType, 'html', true ) ) {
+export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, isCodeEditingEnabled = true } ) {
+	if ( ! hasBlockSupport( blockType, 'html', true ) || ! isCodeEditingEnabled ) {
 		return null;
 	}
 
@@ -36,10 +36,12 @@ export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlock, getBlockMode } = select( 'core/block-editor' );
 		const block = getBlock( clientId );
+		const isCodeEditingEnabled = select( 'core/editor' ).getEditorSettings().codeEditingEnabled;
 
 		return {
 			mode: getBlockMode( clientId ),
 			blockType: block ? getBlockType( block.name ) : null,
+			isCodeEditingEnabled,
 		};
 	} ),
 	withDispatch( ( dispatch, { onToggle = noop, clientId } ) => ( {
