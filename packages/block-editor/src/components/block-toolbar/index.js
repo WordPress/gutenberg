@@ -35,9 +35,7 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 					<BlockFormatControls.Slot />
 				</>
 			) }
-			{ isValid && (
-				<BlockSettingsMenu clientIds={ blockClientIds } />
-			) }
+			<BlockSettingsMenu clientIds={ blockClientIds } />
 		</div>
 	);
 }
