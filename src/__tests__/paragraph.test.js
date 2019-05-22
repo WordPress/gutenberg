@@ -11,7 +11,6 @@ import Paragraph from '../../gutenberg/packages/block-library/src/paragraph/edit
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
 jest.mock( '@wordpress/blocks' );
 
 const getTestComponentWithContent = ( content ) => {
@@ -23,10 +22,6 @@ const getTestComponentWithContent = ( content ) => {
 			insertBlocksAfter={ jest.fn() }
 		/>
 	);
-};
-
-const getTestInstanceWithContent = ( content ) => {
-	return getTestComponentWithContent( content ).instance();
 };
 
 describe( 'Paragraph block', () => {
