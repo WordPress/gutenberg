@@ -1028,11 +1028,6 @@
 		}
 	}
 
-	// Position this above the toolbar of parent blocks.
-	.editor-inner-blocks & {
-		z-index: z-index(".editor-inner-blocks .block-editor-block-list__breadcrumb");
-	}
-
 	// Remove negative left breadcrumb position for left aligned blocks.
 	[data-align="left"] & {
 		left: 0;
