@@ -8,6 +8,7 @@
 	padding: 16px 24px;
 	width: 100%;
 	max-width: 800px;
+	margin: 8px auto 0;
 
 	@include break-small() {
 		width: fit-content;
@@ -53,4 +54,6 @@
 	position: absolute;
 	z-index: z-index(".components-snackbar-list");
 	width: 100%;
+	display: flex;
+	flex-direction: column;
 }
