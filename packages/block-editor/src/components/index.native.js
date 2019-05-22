@@ -25,3 +25,5 @@ export { default as BlockEditorProvider } from './provider';
 // Mobile Editor Related Components
 export { default as BottomSheet } from './mobile/bottom-sheet';
 export { default as Picker } from './mobile/picker';
+
+export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
