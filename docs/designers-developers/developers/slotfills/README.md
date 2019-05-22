@@ -1,7 +1,7 @@
 # SlotFills
 
 Slot and Fill are components that have been exposed to allow developers to inject items into some predefined places in the Gutenberg admin experience.
-Please see the [official docs](https://wordpress.org/gutenberg/handbook/designers-developers/developers/components/slot-fill/) for more details.
+Please see the [SlotFill component docs](https://wordpress.org/gutenberg/handbook/designers-developers/developers/components/slot-fill/) for more details.
 
 In order to use them, we must leverage the [@wordpress/plugins](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-plugins/) api to register a plugin that will inject our items.
 
