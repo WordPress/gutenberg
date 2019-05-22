@@ -1,6 +1,6 @@
 /** @format */
 
-.invalidBlock {
+.container {
 	background-color: #e9eff3; // grey lighten 30
 	padding-top: 24;
 	padding-bottom: 24;
@@ -10,7 +10,11 @@
 	justify-content: center;
 }
 
-.invalidBlockMessage {
+.icon {
+	color: $gray-dark;
+}
+
+.message {
 	margin-top: 2;
 	text-align: center;
 	color: $gray-dark;
