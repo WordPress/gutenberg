@@ -27,7 +27,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { addAction, hasAction, removeAction } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
-import { BlockEdit } from '@wordpress/block-editor';
+import { BlockEdit, BlockInvalidWarning } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
@@ -197,7 +197,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
 							{ isValid && this.getBlockForType() }
 							{ ! isValid &&
-								<Text>ERROR</Text>
+								<BlockInvalidWarning />
 							}
 					</View>
 					{ this.renderToolbar() }
