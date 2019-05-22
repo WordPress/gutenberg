@@ -17,6 +17,7 @@ import {
  * WordPress dependencies
  */
 import {
+	Icon,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -130,10 +131,10 @@ class VideoEdit extends React.Component {
 
 	getIcon( isRetryIcon, isUploadInProgress ) {
 		if ( isRetryIcon ) {
-			return <SvgIconRetry fill={ style.icon.fill } />;
+			return <Icon icon={ SvgIconRetry } style={ style.icon } />;
 		}
 
-		return <SvgIcon fill={ isUploadInProgress ? style.iconUploading.fill : style.icon.fill } />;
+		return <Icon icon={ SvgIcon } style={ isUploadInProgress ? style.iconUploading : style.icon } />;
 	}
 
 	render() {

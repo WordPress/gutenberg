@@ -25,7 +25,7 @@ function Icon( { icon = null, size, className, style } ) {
 			return createElement( icon, { className, style, size: iconSize } );
 		}
 
-		return icon( { style } );
+		return icon( { className, style, size: iconSize } );
 	}
 
 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
