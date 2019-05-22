@@ -737,16 +737,22 @@ export class RichText extends Component {
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = false;
+			selection = { start: this.props.selectionStart, end: this.props.selectionEnd };
 
-			// Aztec performs some html text cleanup while parsing it so, its internal representation gets out-of-sync with the
-			// representation of the format-lib on the RN side. We need to avoid trying to set the caret position because it may
-			// be outside the text bounds and crash Aztec, at least on Android.
-			if ( ! this.isIOS && this.willTrimSpaces( html ) ) {
-				// the html will get trimmed by the cleaning up functions in Aztec and caret position will get out-of-sync.
-				// So, skip forcing it, let Aztec just do its best and just log the fact.
-				console.warn( 'RichText value will be trimmed for spaces! Avoiding setting the caret position manually.' );
-			} else {
-				selection = { start: this.props.selectionStart, end: this.props.selectionEnd };
+			// On AztecAndroid, setting the caret to an out-of-bounds position will crash the editor so, let's check for some cases.
+			if ( ! this.isIOS ) {
+				// Aztec performs some html text cleanup while parsing it so, its internal representation gets out-of-sync with the
+				// representation of the format-lib on the RN side. We need to avoid trying to set the caret position because it may
+				// be outside the text bounds and crash Aztec, at least on Android.
+				if ( this.willTrimSpaces( html ) ) {
+					// the html will get trimmed by the cleaning up functions in Aztec and caret position will get out-of-sync.
+					// So, skip forcing it, let Aztec just do its best and just log the fact.
+					console.warn( 'RichText value will be trimmed for spaces! Avoiding setting the caret position manually.' );
+					selection = null;
+				} else if ( this.props.selectionStart > record.text.length || this.props.selectionEnd > record.text.length ) {
+					console.warn( 'Oops, selection will land outside the text, skipping setting it...' );
+					selection = null;
+				}
 			}
 		}
 

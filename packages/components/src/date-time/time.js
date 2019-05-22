@@ -189,7 +189,10 @@ class TimePicker extends Component {
 	}
 
 	onChangeMinutes( event ) {
-		this.setState( { minutes: event.target.value } );
+		const minutes = event.target.value;
+		this.setState( {
+			minutes: ( minutes === '' ) ? '' : ( '0' + minutes ).slice( -2 ),
+		} );
 	}
 
 	renderMonth( month ) {

@@ -20,6 +20,7 @@ export const INITIAL_EDITS_DEFAULTS = {};
  *
  *  allowedBlockTypes  boolean|Array Allowed block types
  *  richEditingEnabled boolean       Whether rich editing is enabled or not
+ *  codeEditingEnabled boolean       Whether code editing is enabled or not
  *  enableCustomFields boolean       Whether the WordPress custom fields are enabled or not
  *  autosaveInterval   number        Autosave Interval
  *  availableTemplates array?        The available post templates
@@ -31,6 +32,7 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	...SETTINGS_DEFAULTS,
 
 	richEditingEnabled: true,
+	codeEditingEnabled: true,
 	enableCustomFields: false,
 };
 
