@@ -609,13 +609,6 @@ export class RichText extends Component {
 		return value;
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( nextProps.value !== this.value ) {
-			this.value = this.props.value;
-			this.lastEventCount = undefined;
-		}
-	}
-
 	forceSelectionUpdate( start, end ) {
 		if ( ! this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = true;
@@ -681,6 +674,10 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		if ( this.props.value !== this.value ) {
+			this.value = this.props.value;
+			this.lastEventCount = undefined;
+		}
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this._editor.focus();
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
