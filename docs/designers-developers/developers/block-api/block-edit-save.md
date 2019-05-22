@@ -231,7 +231,7 @@ It can not have any side effect or retrieve information from another source, e.g
 This is because if the external information changes, the block may be flagged as invalid when the post is later edited ([read more about Validation](#validation)).
 If there is a need to have other information as part of the save, developers can consider one of these two alternatives:
  - Use [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md) and dynamically retrieve the required information on the server.
- - Add another attribute value that contains the needed value that the save function depends on and dynamically update that value in the `edit` component which can depend on external information and contain side effects to update the attribute when the external information changes.
+ - Store the external value as an attribute which is dynamically updated in the block's `edit` function as changes occur.
 
 For [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md), the return value of `save` could represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled.
 
