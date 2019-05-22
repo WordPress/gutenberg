@@ -102,6 +102,17 @@ export function getUnregisteredFallbackBlockName( state ) {
 }
 
 /**
+ * Returns the name of the block for handling unregistered blocks.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string?} Name of the block for handling unregistered blocks.
+ */
+export function getGroupingBlockName( state ) {
+	return state.groupingBlockName;
+}
+
+/**
  * Returns an array with the child blocks of a given block.
  *
  * @param {Object} state     Data state.

@@ -200,6 +200,15 @@ export function getFreeformContentHandlerName() {
 }
 
 /**
+ * Retrieves name of block used for handling grouping interactions
+ *
+ * @return {?string} Blog name.
+ */
+export function getGroupingBlockName() {
+	return select( 'core/blocks' ).getGroupingBlockName();
+}
+
+/**
  * Assigns name of block handling unregistered block types.
  *
  * @param {string} blockName Block name.
@@ -225,6 +234,15 @@ export function getUnregisteredTypeHandlerName() {
  */
 export function setDefaultBlockName( name ) {
 	dispatch( 'core/blocks' ).setDefaultBlockName( name );
+}
+
+/**
+ * Assigns the grouping block name.
+ *
+ * @param {string} name Block name.
+ */
+export function setGroupingBlockName( name ) {
+	dispatch( 'core/blocks' ).setGroupingBlockName( name );
 }
 
 /**
