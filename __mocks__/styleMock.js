@@ -58,4 +58,13 @@ module.exports = {
 	modalIcon: {
 		fill: 'gray',
 	},
+	icon: {
+		fill: 'gray',
+	},
+	iconRetry: {
+		fill: 'gray',
+	},
+	iconUploading: {
+		fill: 'gray',
+	},
 };
