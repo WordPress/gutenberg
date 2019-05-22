@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -41,6 +42,7 @@ function Snackbar( {
 			tabIndex="0"
 			role="button"
 			onKeyPress={ onRemove }
+			label={ __( 'Dismiss this notice' ) }
 		>
 			<div className="components-snackbar__content">
 				{ children }
