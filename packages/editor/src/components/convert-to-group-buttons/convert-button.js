@@ -21,7 +21,7 @@ import { Group, UnGroup } from './icons';
 
 export function ConvertToGroupButton( {
 	onConvertToGroup,
-	onUnCovertFromGroup,
+	onConvertFromGroup,
 	isGroupable = false,
 	isUnGroupable = false,
 } ) {
@@ -41,7 +41,7 @@ export function ConvertToGroupButton( {
 				<MenuItem
 					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 					icon={ UnGroup }
-					onClick={ onUnCovertFromGroup }
+					onClick={ onConvertFromGroup }
 					shortcut={ displayShortcut.secondary( 'g' ) }
 				>
 					{ _x( 'Ungroup', 'Ungrouping blocks from within a Group block back into individual blocks within the Editor ' ) }
@@ -107,7 +107,7 @@ export default compose( [
 
 				onToggle();
 			},
-			onUnCovertFromGroup() {
+			onConvertFromGroup() {
 				if ( ! blocksSelection.length ) {
 					return;
 				}
