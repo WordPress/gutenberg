@@ -4,6 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import BlockQuote from './blockquote';
+
 export default function QuoteEdit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
 	const { align, value, citation } = attributes;
 	return (
@@ -16,9 +21,10 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 					} }
 				/>
 			</BlockControls>
-			<blockquote className={ className } style={ { textAlign: align } }>
+			<BlockQuote className={ className } style={ { textAlign: align } }>
 				<RichText
 					identifier="value"
+					tagName="blockquote"
 					multiline
 					value={ value }
 					onChange={
@@ -41,6 +47,7 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
 						identifier="citation"
+						tagName="cite"
 						value={ citation }
 						onChange={
 							( nextCitation ) => setAttributes( {
@@ -54,7 +61,7 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 						className="wp-block-quote__citation"
 					/>
 				) }
-			</blockquote>
+			</BlockQuote>
 		</>
 	);
 }
