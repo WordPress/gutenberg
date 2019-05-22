@@ -8,7 +8,7 @@ jest.mock( '@wordpress/api-fetch' );
 /**
  * Internal dependencies
  */
-import controls from '../index';
+import { controls } from '../index';
 
 describe( 'controls', () => {
 	describe( 'API_FETCH', () => {
