@@ -6,6 +6,13 @@
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 	color: $white;
 	padding: 16px 24px;
+	// Where is this 20px value coming from?
+	width: calc(100% - 20px);
+	max-width: 800px;
+
+	@include break-small() {
+		width: fit-content;
+	}
 
 	&:hover {
 		background-color: $dark-gray-900;
