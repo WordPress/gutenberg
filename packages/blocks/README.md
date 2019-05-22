@@ -374,8 +374,7 @@ _Returns_
 
 <a name="getGroupingBlockName" href="#getGroupingBlockName">#</a> **getGroupingBlockName**
 
-Retrieves name of block used for handling grouping interactions, or undefined if no
-handler has been defined.
+Retrieves name of block used for handling grouping interactions
 
 _Returns_
 
@@ -669,6 +668,14 @@ _Parameters_
 
 -   _blockName_ `string`: Block name.
 
+<a name="setGroupingBlockName" href="#setGroupingBlockName">#</a> **setGroupingBlockName**
+
+Assigns the grouping block name.
+
+_Parameters_
+
+-   _name_ `string`: Block name.
+
 <a name="setUnregisteredTypeHandlerName" href="#setUnregisteredTypeHandlerName">#</a> **setUnregisteredTypeHandlerName**
 
 Assigns name of block handling unregistered block types.
@@ -676,14 +683,6 @@ Assigns name of block handling unregistered block types.
 _Parameters_
 
 -   _blockName_ `string`: Block name.
-
-<a name="setGroupingBlockName" href="#setGroupingBlockName">#</a> **setGroupingBlockName**
-
-Assigns the name of the block used in grouping interactions.
-
-_Parameters_
-
--   _name_ `string`: Block name.
 
 <a name="switchToBlockType" href="#switchToBlockType">#</a> **switchToBlockType**
 
