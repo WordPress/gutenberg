@@ -39,6 +39,7 @@ import icon from './icon';
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import { speak } from '@wordpress/a11y';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -116,6 +117,11 @@ class AudioEdit extends Component {
 		const { isEditing } = this.state;
 		const toggleIsEditing = () => {
 			this.setState( { isEditing: ! this.state.isEditing } );
+			if ( this.state.isEditing ) {
+				speak( __( 'You can now listen to the audio in the audio block.' ) );
+			} else {
+				speak( __( 'You are now editing the audio in the audio block.' ) );
+			}
 		};
 		const onSelectAudio = ( media ) => {
 			if ( ! media || ! media.url ) {
