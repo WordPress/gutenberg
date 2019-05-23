@@ -14,7 +14,7 @@ import { normalizeIconObject } from '@wordpress/blocks';
  */
 import styles from './style.scss';
 
-function Warning( { title, icon, iconClass, ...viewProps } ) {
+function Warning( { title, message, icon, iconClass, ...viewProps } ) {
 		icon = icon && normalizeIconObject( icon );
 		return (
 			<View
@@ -22,9 +22,15 @@ function Warning( { title, icon, iconClass, ...viewProps } ) {
 				{ ...viewProps }
 			>
 				{ icon && (
-					<Icon className={ iconClass } icon={ icon && icon.src ? icon.src : icon } />
-				)}
-				<Text style={ styles.message }>{ title }</Text>
+					<View style={ styles.icon }>
+						<Icon
+							className={ iconClass }
+							icon={ icon && icon.src ? icon.src : icon }
+						/>
+					</View>
+				) }
+				<Text style={ styles.title }>{ title }</Text>
+				<Text style={ styles.message }>{ message }</Text>
 			</View>
 		);
 }

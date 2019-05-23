@@ -9,16 +9,15 @@ import { __ } from '@wordpress/i18n';
  */
 import Warning from '../warning';
 
-export default class BlockInvalidWarning extends Component {
-	render() {
-		const title = __( 'Problem displaying block' );
-		return (
-			<Warning
-				title={ title }
-				icon={ this.props.icon }
-				accessible={ true }
-				accessibilityLabel={ title }
-			/>
-		);
-	}
+export default function BlockInvalidWarning ( { title, icon }) {
+	const accessibilityLabel = __( "This block has problems ");
+	return (
+		<Warning
+			title={ title }
+			message={ __( 'Problem displaying block' ) }
+			icon={ icon }
+			accessible={ true }
+			accessibilityLabel={ accessibilityLabel }
+		/>
+	);
 }

@@ -11,7 +11,18 @@
 }
 
 .icon {
-	color: $gray-dark;
+	width: 24px;
+	height: 24px;
+	fill: $gray-dark;
+}
+
+.title {
+	text-align: center;
+	margin-top: 8;
+	margin-bottom: 10;
+	font-size: 16;
+	font-weight: bold;
+	color: #2e4453;
 }
 
 .message {
