@@ -237,7 +237,7 @@ program
 
 			console.log( '>> The Github release has been created succesfully.' );
 		} );
-		abortMessage = 'Aborting! Make sure to remove the remote release branch, the git tag and the Github release.';
+		abortMessage = 'Aborting! Make sure to remove the remote release branch, the git tag and the GitHub release.';
 
 		// Uploading the Gutenberg Zip to the release
 		await runStep( 'Uploading the plugin zip', abortMessage, async () => {
