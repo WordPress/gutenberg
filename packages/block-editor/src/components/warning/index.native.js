@@ -29,8 +29,12 @@ function Warning( { title, message, icon, iconClass, ...viewProps } ) {
 					/>
 				</View>
 			) }
-			<Text style={ styles.title }>{ title }</Text>
-			<Text style={ styles.message }>{ message }</Text>
+			{ title && (
+				<Text style={ styles.title }>{ title }</Text>
+			)}
+			{ message && (
+				<Text style={ styles.message }>{ message }</Text>
+			)}
 		</View>
 	);
 }
