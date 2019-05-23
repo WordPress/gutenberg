@@ -218,7 +218,7 @@ program
 			const { token } = await inquirer.prompt( [ {
 				type: 'input',
 				name: 'token',
-				message: 'Please provide a Github personal authentication token. (Navigate to ' + success( 'https://github.com/settings/tokens' ) + ' to create one with admin:org, repo and write:packages rights)',
+				message: 'Please provide a GitHub personal authentication token. Navigate to ' + success( 'https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages' ) + ' to create one.',
 			} ] );
 
 			octokit = new Octokit( {
