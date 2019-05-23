@@ -70,7 +70,8 @@ This new Slot is then exposed in the editor. The example below is from core and 
 As we can see, the `<PluginPostStatusInfo.Slot>` is wrapping all of the items that will appear in the panel.
 Any items that have been added via the SlotFill ( see the example above ), will be included in the `fills` parameter and be displayed betwee the `<PostAuthor/>` and `<PostTrash/>` components.
 
-**Core**
+See [core code](https://github.com/WordPress/gutenberg/tree/master/packages/edit-post/src/components/sidebar/post-status/index.js#L26).
+
 ```js
 function PostStatus( { isOpened, onTogglePanel } ) {
 	return (
