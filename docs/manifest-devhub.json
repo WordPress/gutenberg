@@ -90,15 +90,15 @@
 		"parent": "filters"
 	},
 	{
-		"title": "SlotFills",
+		"title": "SlotFills Reference",
 		"slug": "slotfills",
 		"markdown_source": "../docs/designers-developers/developers/slotfills/README.md",
 		"parent": "developers"
 	},
 	{
-		"title": "PluginSidebar",
-		"slug": "plugin-sidebar",
-		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-sidebar.md",
+		"title": "PluginBlockSettingsMenuItem",
+		"slug": "plugin-block-settings-menu-item",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-block-settings-menu-item.md",
 		"parent": "slotfills"
 	},
 	{
@@ -108,9 +108,9 @@
 		"parent": "slotfills"
 	},
 	{
-		"title": "PluginSidebarMoreMenuItem",
-		"slug": "plugin-sidebar-more-menu-item",
-		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-sidebar-more-menu-item.md",
+		"title": "PluginPostPublishPanel",
+		"slug": "plugin-post-publish-panel",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-post-publish-panel.md",
 		"parent": "slotfills"
 	},
 	{
@@ -120,21 +120,21 @@
 		"parent": "slotfills"
 	},
 	{
-		"title": "PluginBlockSettingsMenuItem",
-		"slug": "plugin-block-settings-menu-item",
-		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-block-settings-menu-item.md",
-		"parent": "slotfills"
-	},
-	{
 		"title": "PluginPrePublishPanel",
 		"slug": "plugin-pre-publish-panel",
 		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-pre-publish-panel.md",
 		"parent": "slotfills"
 	},
 	{
-		"title": "PluginPostPublishPanel",
-		"slug": "plugin-post-publish-panel",
-		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-post-publish-panel.md",
+		"title": "PluginSidebar",
+		"slug": "plugin-sidebar",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-sidebar.md",
+		"parent": "slotfills"
+	},
+	{
+		"title": "PluginSidebarMoreMenuItem",
+		"slug": "plugin-sidebar-more-menu-item",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-sidebar-more-menu-item.md",
 		"parent": "slotfills"
 	},
 	{
