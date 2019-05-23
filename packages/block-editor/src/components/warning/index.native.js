@@ -24,7 +24,7 @@ function Warning( { title, message, icon, iconClass, ...viewProps } ) {
 				{ icon && (
 					<View style={ styles.icon }>
 						<Icon
-							className={ iconClass }
+							className={ iconClass || "warning-icon" }
 							icon={ icon && icon.src ? icon.src : icon }
 						/>
 					</View>
