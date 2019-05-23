@@ -28,7 +28,8 @@ import { compose } from '@wordpress/compose';
 import { addAction, removeAction, hasAction } from '@wordpress/hooks';
 import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { BlockEdit } from '@wordpress/block-editor';
-import { sprintf, _x } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
+import { coreBlocks } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -169,12 +170,18 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		const { title, attributes, name } = this.props;
 
 		if ( name === getUnregisteredTypeHandlerName() ) { // is the block unrecognized?
-			return title; //already localized
+			const blockType = coreBlocks[ attributes.originalName ];
+			const title = blockType ? blockType.settings.title : attributes.originalName;
+			return sprintf(
+				/* translators: accessibility text. %s: unsupported block type. */
+				__( 'Unsupported block: %s' ),
+				title
+			);
 		}
 
 		const blockName = sprintf(
 			/* translators: accessibility text. %s: block name. */
-			_x( '%1$s block' ),
+			__( '%s block' ),
 			title, //already localized
 		);
 
