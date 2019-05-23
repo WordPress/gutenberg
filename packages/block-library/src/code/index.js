@@ -23,13 +23,6 @@ export const settings = {
 	supports: {
 		html: false,
 	},
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-			selector: 'pre code',
-		},
-	},
 	transforms,
 	edit,
 	save,

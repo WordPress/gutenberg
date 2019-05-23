@@ -38,6 +38,11 @@ describe( 'core/code', () => {
 			expect( text ).toBe( '&' );
 		} );
 
+		it( 'should unescape escaped less than and greater than characters', () => {
+			const text = unescape( '&lt;button&gt;Click&lt;/button>' );
+			expect( text ).toBe( '<button>Click</button>' );
+		} );
+
 		it( 'should unescape escaped opening square brackets', () => {
 			const text = unescape( '&#91;shortcode]&#91;/shortcode]' );
 			expect( text ).toBe( '[shortcode][/shortcode]' );

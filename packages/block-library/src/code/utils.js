@@ -12,7 +12,6 @@ import { flow } from 'lodash';
 export function escape( content ) {
 	return flow(
 		escapeAmpersands,
-		escapeTagDelimiters,
 		escapeOpeningSquareBrackets,
 		escapeProtocolInIsolatedUrls
 	)( content || '' );
@@ -54,18 +53,6 @@ function escapeAmpersands( content ) {
  */
 function unescapeAmpersands( content ) {
 	return content.replace( /&amp;/g, '&' );
-}
-
-/**
- * Returns the given content with all < and > characters converted into
- * their HTML entity counterparts: &lt; and &gt;
- *
- * @param {string}  content The content of a code block.
- * @return {string} The given content with all < and > characters converted
- *                  into their HTML entity counterparts: &lt; and &gt;
- */
-function escapeTagDelimiters( content ) {
-	return content.replace( /</g, '&lt;' ).replace( />/g, '&gt;' );
 }
 
 /**
