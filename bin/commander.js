@@ -205,7 +205,7 @@ program
 		let release;
 		await runStep( 'Creating the Github release', abortMessage, async () => {
 			await askForConfirmationToContinue(
-				'Proceed with the creation of the Github release?',
+				'Proceed with the creation of the GitHub release?',
 				true,
 				abortMessage
 			);
