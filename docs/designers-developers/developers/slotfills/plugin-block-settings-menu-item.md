@@ -1,6 +1,6 @@
 # PluginBlockSettingsMenuItem
 
-This slot appears allows for adding a new item in to the More Options area. 
+This slot allows for adding a new item into the More Options area. 
 This will either appear in the controls for each block or at the Top Toolbar depending on the users setting.
 
 
