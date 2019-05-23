@@ -31,10 +31,10 @@ function Warning( { title, message, icon, iconClass, ...viewProps } ) {
 			) }
 			{ title && (
 				<Text style={ styles.title }>{ title }</Text>
-			)}
+			) }
 			{ message && (
 				<Text style={ styles.message }>{ message }</Text>
-			)}
+			) }
 		</View>
 	);
 }
