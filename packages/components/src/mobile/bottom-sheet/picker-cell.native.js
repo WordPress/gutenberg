@@ -4,7 +4,7 @@
 import Cell from './cell';
 import Picker from '../picker';
 
-export default function PickerCell( props ) {
+export default function BottomSheetPickerCell( props ) {
 	const {
 		options,
 		onChangeValue,
