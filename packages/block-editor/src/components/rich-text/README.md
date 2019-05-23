@@ -25,9 +25,13 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 *Optional.* By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to create new paragraphs on <kbd>Enter</kbd>.
 
+### `onSplit( value: String ): Function`
+
+*Optional.* Called when the content can be split, where `value` is a piece of content being split off. Here you should create a new block with that content and return it. Note that you also need to provide `onReplace` in order for this to take any effect.
+
 ### `onReplace( blocks: Array ): Function`
 
-*Optional.* Called when the `RichText` instance is empty and it can be replaced with the given blocks.
+*Optional.* Called when the `RichText` instance can be replaced with the given blocks.
 
 ### `onMerge( forward: Boolean ): Function`
 

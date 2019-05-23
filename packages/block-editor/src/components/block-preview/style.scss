@@ -29,6 +29,17 @@
 	}
 }
 
+.block-editor-block-preview__content {
+	// Resetting the block editor paddings and margins
+	.block-editor-block-list__layout,
+	.block-editor-block-list__block {
+		padding: 0;
+	}
+	.editor-block-list__block-edit [data-block] {
+		margin-top: 0;
+	}
+}
+
 .block-editor-block-preview__title {
 	margin-bottom: 10px;
 	color: $dark-gray-300;

@@ -15,17 +15,18 @@ class Picker extends Component {
 		const labels = options.map( ( { label } ) => label );
 		const fullOptions = [ __( 'Cancel' ) ].concat( labels );
 
-		ActionSheetIOS.showActionSheetWithOptions( {
-			options: fullOptions,
-			cancelButtonIndex: 0,
-		},
-		( buttonIndex ) => {
-			if ( buttonIndex === 0 ) {
-				return;
-			}
-			const selected = options[ buttonIndex - 1 ];
-			onChange( selected.value );
-		},
+		ActionSheetIOS.showActionSheetWithOptions(
+			{
+				options: fullOptions,
+				cancelButtonIndex: 0,
+			},
+			( buttonIndex ) => {
+				if ( buttonIndex === 0 ) {
+					return;
+				}
+				const selected = options[ buttonIndex - 1 ];
+				onChange( selected.value );
+			},
 		);
 	}
 

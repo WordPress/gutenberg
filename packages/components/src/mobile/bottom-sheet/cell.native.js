@@ -2,12 +2,14 @@
  * External dependencies
  */
 import { TouchableOpacity, Text, View, TextInput, I18nManager } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Dashicon } from '@wordpress/components';
 import { Component } from '@wordpress/element';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -15,7 +17,7 @@ import { Component } from '@wordpress/element';
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
 
-export default class Cell extends Component {
+export default class BottomSheetCell extends Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.state = {
@@ -31,6 +33,9 @@ export default class Cell extends Component {
 
 	render() {
 		const {
+			accessibilityLabel,
+			accessibilityHint,
+			accessibilityRole,
 			onPress,
 			label,
 			value,
@@ -118,8 +123,38 @@ export default class Cell extends Component {
 			);
 		};
 
+		const getAccessibilityLabel = () => {
+			if ( accessibilityLabel || ! showValue ) {
+				return accessibilityLabel || label;
+			}
+			return isEmpty( value ) ?
+				sprintf(
+					/* translators: accessibility text. Empty state of a inline textinput cell. %s: The cell's title */
+					_x( '%s. Empty', 'inline textinput cell' ),
+					label
+				) :
+				// Separating by ',' is necessary to make a pause on urls (non-capitalized text)
+				sprintf(
+					/* translators: accessibility text. Inline textinput title and value.%1: Cell title, %2: cell value. */
+					_x( '%1$s, %2$s', 'inline textinput cell' ),
+					label,
+					value
+				);
+		};
+
 		return (
-			<TouchableOpacity onPress={ onCellPress } style={ { ...styles.clipToBounds, ...style } } >
+			<TouchableOpacity
+				accessible={ ! this.state.isEditingValue }
+				accessibilityLabel={ getAccessibilityLabel() }
+				accessibilityRole={ accessibilityRole || 'button' }
+				accessibilityHint={ isValueEditable ?
+					/* translators: accessibility text */
+					__( 'Double tap to edit this value' ) :
+					accessibilityHint
+				}
+				onPress={ onCellPress }
+				style={ { ...styles.clipToBounds, ...style } }
+			>
 				<View style={ styles.cellContainer }>
 					<View style={ styles.cellRowContainer }>
 						{ icon && (
