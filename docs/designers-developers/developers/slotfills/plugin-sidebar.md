@@ -23,6 +23,7 @@ const PluginSidebarTest = () => {
 registerPlugin( 'plugin-sidebar-test', { render: PluginSidebarTest } );
 
 ```
+
 ## Location
 
 ### Closed State
