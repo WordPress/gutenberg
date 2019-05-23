@@ -1,9 +1,8 @@
 # PluginSidebarMoreMenuItem
 
 This slot allows the creation of a `<PluginSidebar>` with a menu item that when clicked will expand the sidebar to the appropriate Plugin section.
-This is done my setting the `target` on `<PluginSidebarMoreMenuItem>` to match the `name` on the `<PluginSidebar>`
+This is done by setting the `target` on `<PluginSidebarMoreMenuItem>` to match the `name` on the `<PluginSidebar>`
 
-** Notes: It does not seem possible to mirror the same interaction by using `<PluginSidebar>` and `<PluginMoreMenuItem>` separately.
 
 ## Example
 
