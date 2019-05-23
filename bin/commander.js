@@ -87,7 +87,7 @@ program
 
 		// This is a variable that contains the abort message shown when the script is aborted.
 		let abortMessage = 'Aborting!';
-		await askForConfirmationToContinue( 'Ready go go? ' );
+		await askForConfirmationToContinue( 'Ready to go? ' );
 
 		// Cloning the repository
 		await runStep( 'Cloning the repository', abortMessage, async () => {
