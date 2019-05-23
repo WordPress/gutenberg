@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -17,7 +17,6 @@ import { isEmpty } from 'lodash';
 import {
 	Toolbar,
 	ToolbarButton,
-	Dashicon,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -37,9 +36,14 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import styles from './styles.scss';
 import MediaUploadProgress from './media-upload-progress';
+import SvgIcon from './icon';
+import SvgIconRetry from './icon-retry';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
+
+// Default Image ratio 4:3
+const IMAGE_ASPECT_RATIO = 4 / 3;
 
 class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -187,6 +191,14 @@ class ImageEdit extends React.Component {
 		}
 	}
 
+	getIcon( isRetryIcon ) {
+		if ( isRetryIcon ) {
+			return <SvgIconRetry fill={ styles.iconRetry.fill } />;
+		}
+
+		return <SvgIcon fill={ styles.icon.fill } />;
+	}
+
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption, height, width, alt, href, id } = attributes;
@@ -256,10 +268,14 @@ class ImageEdit extends React.Component {
 					<MediaPlaceholder
 						mediaType={ MEDIA_TYPE_IMAGE }
 						onSelectURL={ this.onSelectMediaUploadOption }
+						icon={ this.getIcon( false ) }
+						onFocus={ this.props.onFocus }
 					/>
 				</View>
 			);
 		}
+
+		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 
 		return (
 			<TouchableWithoutFeedback
@@ -298,12 +314,20 @@ class ImageEdit extends React.Component {
 						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryIconName, retryMessage } ) => {
+						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
+							const icon = this.getIcon( isUploadFailed );
+
+							const iconContainer = (
+								<View style={ styles.modalIcon }>
+									{ icon }
+								</View>
+							);
+
 							return (
 								<View style={ { flex: 1 } } >
-									{ ! imageWidthWithinContainer && <View style={ styles.imageContainer } >
-										<Dashicon icon={ 'format-image' } size={ 300 } />
+									{ ! imageWidthWithinContainer && <View style={ [ styles.imageContainer, { height: imageContainerHeight } ] } >
+										{ this.getIcon( false ) }
 									</View> }
 									<ImageBackground
 										style={ { width: finalWidth, height: finalHeight, opacity } }
@@ -314,8 +338,8 @@ class ImageEdit extends React.Component {
 										accessibilityLabel={ alt }
 									>
 										{ isUploadFailed &&
-											<View style={ styles.imageContainer } >
-												<Dashicon icon={ retryIconName } ariaPressed={ 'dashicon-active' } />
+											<View style={ [ styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
+												{ iconContainer }
 												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
 											</View>
 										}

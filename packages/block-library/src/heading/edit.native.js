@@ -31,10 +31,10 @@ class HeadingEdit extends Component {
 	render() {
 		const {
 			attributes,
-			insertBlocksAfter,
 			setAttributes,
 			mergeBlocks,
 			style,
+			onReplace,
 		} = this.props;
 
 		const {
@@ -80,17 +80,18 @@ class HeadingEdit extends Component {
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					onChange={ ( value ) => setAttributes( { content: value } ) }
 					onMerge={ mergeBlocks }
-					unstableOnSplit={
-						insertBlocksAfter ?
-							( before, after, ...blocks ) => {
-								setAttributes( { content: before } );
-								insertBlocksAfter( [
-									...blocks,
-									createBlock( 'core/paragraph', { content: after } ),
-								] );
-							} :
-							undefined
-					}
+					onSplit={ ( value ) => {
+						if ( ! value ) {
+							return createBlock( 'core/paragraph' );
+						}
+
+						return createBlock( 'core/heading', {
+							...attributes,
+							content: value,
+						} );
+					} }
+					onReplace={ onReplace }
+					onRemove={ () => onReplace( [] ) }
 					placeholder={ placeholder || __( 'Write heading…' ) }
 				/>
 			</View>

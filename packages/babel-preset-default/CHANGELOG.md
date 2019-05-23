@@ -1,4 +1,4 @@
-## Unreleased
+## 4.2.0 (2019-05-21)
 
 ### New Features
 
@@ -7,7 +7,7 @@
 
 ## 4.0.0 (2019-03-06)
 
-### Breaking Change
+### Breaking Changes
 
 - Removed `babel-core` dependency acting as Babel 7 bridge ([#13922](https://github.com/WordPress/gutenberg/pull/13922). Ensure all references to `babel-core` are replaced with `@babel/core` .
 - Preset updated to include `@wordpress/babel-plugin-import-jsx-pragma` plugin integration ([#13540](https://github.com/WordPress/gutenberg/pull/13540)). It should no longer be explicitly included in your Babel config.

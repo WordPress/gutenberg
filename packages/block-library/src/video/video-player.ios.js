@@ -41,7 +41,7 @@ class Video extends Component {
 	}
 
 	render() {
-		const { style } = this.props;
+		const { isSelected, style } = this.props;
 		const { isLoaded } = this.state;
 
 		return (
@@ -59,7 +59,7 @@ class Video extends Component {
 					onLoadStart={ this.onLoadStart }
 				/>
 				{ isLoaded &&
-				<TouchableOpacity onPress={ this.onPressPlay } style={ [ style, styles.overlay ] }>
+				<TouchableOpacity disabled={ ! isSelected } onPress={ this.onPressPlay } style={ [ style, styles.overlay ] }>
 					<View style={ styles.playIcon }>
 						<Dashicon icon={ 'controls-play' } ariaPressed={ 'dashicon-active' } size={ styles.playIcon.width } />
 					</View>

@@ -93,13 +93,7 @@ export class RichText extends Component {
 		if ( this.multilineTag === 'li' ) {
 			this.multilineWrapperTags = [ 'ul', 'ol' ];
 		}
-
-		if ( this.props.onSplit ) {
-			this.onSplit = this.props.onSplit;
-		} else if ( this.props.unstableOnSplit ) {
-			this.onSplit = this.props.unstableOnSplit;
-		}
-
+		this.onSplit = this.onSplit.bind( this );
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
 		this.onChange = this.onChange.bind( this );
@@ -187,55 +181,61 @@ export class RichText extends Component {
 		};
 	}
 
-	/*
-	 * Splits the content at the location of the selection.
+	/**
+	 * Signals to the RichText owner that the block can be replaced with two
+	 * blocks as a result of splitting the block by pressing enter, or with
+	 * blocks as a result of splitting the block by pasting block content in the
+	 * instance.
 	 *
-	 * Replaces the content of the editor inside this element with the contents
-	 * before the selection. Sends the elements after the selection to the `onSplit`
-	 * handler.
-	 *
+	 * @param  {Object} record       The rich text value to split.
+	 * @param  {Array}  pastedBlocks The pasted blocks to insert, if any.
 	 */
-	splitContent( currentRecord, blocks = [], isPasted = false ) {
-		if ( ! this.onSplit ) {
+	onSplit( record, pastedBlocks = [] ) {
+		const {
+			onReplace,
+			onSplit,
+			__unstableOnSplitMiddle: onSplitMiddle,
+		} = this.props;
+
+		if ( ! onReplace || ! onSplit ) {
 			return;
 		}
 
-		// TODO : Fix the index position in AztecNative for Android
-		let [ before, after ] = split( currentRecord );
+		const blocks = [];
+		const [ before, after ] = split( record );
+		const hasPastedBlocks = pastedBlocks.length > 0;
 
-		// In case split occurs at the trailing or leading edge of the field,
-		// assume that the before/after values respectively reflect the current
-		// value. This also provides an opportunity for the parent component to
-		// determine whether the before/after value has changed using a trivial
-		//  strict equality operation.
-		if ( isEmpty( after ) && before.text.length === currentRecord.text.length ) {
-			before = currentRecord;
-		} else if ( isEmpty( before ) && after.text.length === currentRecord.text.length ) {
-			after = currentRecord;
+		// Create a block with the content before the caret if there's no pasted
+		// blocks, or if there are pasted blocks and the value is not empty.
+		// We do not want a leading empty block on paste, but we do if split
+		// with e.g. the enter key.
+		if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
+			blocks.push( onSplit( this.valueToFormat( before ) ) );
 		}
 
-		// If pasting and the split would result in no content other than the
-		// pasted blocks, remove the before and after blocks.
-		if ( isPasted ) {
-			before = isEmpty( before ) ? null : before;
-			after = isEmpty( after ) ? null : after;
+		if ( hasPastedBlocks ) {
+			blocks.push( ...pastedBlocks );
+		} else if ( onSplitMiddle ) {
+			blocks.push( onSplitMiddle() );
 		}
 
-		if ( before ) {
-			before = this.valueToFormat( before );
+		// If there's pasted blocks, append a block with the content after the
+		// caret. Otherwise, do append and empty block if there is no
+		// `onSplitMiddle` prop, but if there is and the content is empty, the
+		// middle block is enough to set focus in.
+		if ( hasPastedBlocks || ! onSplitMiddle || ! isEmpty( after ) ) {
+			blocks.push( onSplit( this.valueToFormat( after ) ) );
 		}
 
-		if ( after ) {
-			after = this.valueToFormat( after );
-		}
-
+		// If there are pasted blocks, set the selection to the last one.
+		// Otherwise, set the selection to the second block.
+		const indexToSelect = hasPastedBlocks ? blocks.length - 1 : 1;
 		// The onSplit event can cause a content update event for this block.  Such event should
 		// definitely be processed by our native components, since they have no knowledge of
 		// how the split works.  Setting lastEventCount to undefined forces the native component to
 		// always update when provided with new content.
 		this.lastEventCount = undefined;
-
-		this.onSplit( before, after, ...blocks );
+		onReplace( blocks, indexToSelect );
 	}
 
 	valueToFormat( value ) {
@@ -364,7 +364,7 @@ export class RichText extends Component {
 				const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
 				this.onFormatChangeForceChild( insertedLineBreak );
 			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
-				this.splitContent( currentRecord );
+				this.onSplit( currentRecord );
 			} else {
 				this.needsSelectionUpdate = true;
 				const insertedLineSeparator = { ...insertLineSeparator( currentRecord ) };
@@ -375,7 +375,7 @@ export class RichText extends Component {
 			const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
 			this.onFormatChangeForceChild( insertedLineBreak );
 		} else {
-			this.splitContent( currentRecord );
+			this.onSplit( currentRecord );
 		}
 		this.lastAztecEventType = 'input';
 	}
@@ -414,7 +414,6 @@ export class RichText extends Component {
 	 * @param {PasteEvent} event The paste event which wraps `nativeEvent`.
 	 */
 	onPaste( event ) {
-		const isPasted = true;
 		const { onSplit } = this.props;
 
 		const { pastedText, pastedHtml, files } = event.nativeEvent;
@@ -440,7 +439,7 @@ export class RichText extends Component {
 			if ( shouldReplace ) {
 				this.props.onReplace( content );
 			} else {
-				this.splitContent( currentRecord, content, isPasted );
+				this.onSplit( currentRecord, content );
 			}
 
 			return;
@@ -507,7 +506,7 @@ export class RichText extends Component {
 			if ( shouldReplace ) {
 				this.props.onReplace( pastedContent );
 			} else {
-				this.splitContent( currentRecord, pastedContent, isPasted );
+				this.onSplit( currentRecord, pastedContent );
 			}
 		}
 	}
@@ -610,13 +609,6 @@ export class RichText extends Component {
 		return value;
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( nextProps.value !== this.value ) {
-			this.value = this.props.value;
-			this.lastEventCount = undefined;
-		}
-	}
-
 	forceSelectionUpdate( start, end ) {
 		if ( ! this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = true;
@@ -682,6 +674,10 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		if ( this.props.value !== this.value ) {
+			this.value = this.props.value;
+			this.lastEventCount = undefined;
+		}
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this._editor.focus();
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
