@@ -5,7 +5,7 @@ import { View } from 'react-native';
 /**
  * Internal dependencies
  */
-import styles from './style';
+import styles from './style.scss';
 
 export const Blockquote = ( props ) => {
 	return (
