@@ -26,9 +26,11 @@ import {
 	split,
 	toHTMLString,
 	insert,
+	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	__unstableInsertLineSeparator as insertLineSeparator,
 	__unstableIsEmptyLine as isEmptyLine,
 	isCollapsed,
+	remove,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
@@ -104,7 +106,6 @@ export class RichText extends Component {
 		this.onBlur = this.onBlur.bind( this );
 		this.onTextUpdate = this.onTextUpdate.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
-		this.onFormatChangeForceChild = this.onFormatChangeForceChild.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
 		this.formatToValue = memize(
 			this.formatToValue.bind( this ),
@@ -157,14 +158,9 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Creates a RichText value "record" from native content and selection
+	 * Creates a RichText value "record" from the current content and selection
 	 * information
 	 *
-	 * @param {string} currentContent The content (usually an HTML string) from
-	 *                                the native component.
-	 * @param {number}    selectionStart The start of the selection.
-	 * @param {number}      selectionEnd The end of the selection (same as start if
-	 *                                cursor instead of selection).
 	 *
 	 * @return {Object} A RichText value with formats and selection.
 	 */
@@ -254,10 +250,6 @@ export class RichText extends Component {
 		return formatTypes.map( ( { name } ) => name ).filter( ( name ) => {
 			return getActiveFormat( record, name ) !== undefined;
 		} ).map( ( name ) => gutenbergFormatNamesToAztec[ name ] ).filter( Boolean );
-	}
-
-	onFormatChangeForceChild( record ) {
-		this.onFormatChange( record, true );
 	}
 
 	onFormatChange( record ) {
@@ -362,18 +354,18 @@ export class RichText extends Component {
 			if ( event.shiftKey ) {
 				this.needsSelectionUpdate = true;
 				const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
-				this.onFormatChangeForceChild( insertedLineBreak );
+				this.onFormatChange( insertedLineBreak );
 			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
 				this.onSplit( currentRecord );
 			} else {
 				this.needsSelectionUpdate = true;
 				const insertedLineSeparator = { ...insertLineSeparator( currentRecord ) };
-				this.onFormatChange( insertedLineSeparator, ! this.firedAfterTextChanged );
+				this.onFormatChange( insertedLineSeparator );
 			}
 		} else if ( event.shiftKey || ! this.onSplit ) {
 			this.needsSelectionUpdate = true;
 			const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
-			this.onFormatChangeForceChild( insertedLineBreak );
+			this.onFormatChange( insertedLineBreak );
 		} else {
 			this.onSplit( currentRecord );
 		}
@@ -389,6 +381,78 @@ export class RichText extends Component {
 
 		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
 		const isReverse = keyCode === BACKSPACE;
+
+		this.lastEventCount = event.nativeEvent.eventCount;
+		this.comesFromAztec = true;
+		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
+		const value = this.createRecord();
+		const { replacements, text, start, end } = value;
+		let newValue;
+
+		// Always handle full content deletion ourselves.
+		if ( start === 0 && end !== 0 && end >= value.text.length ) {
+			newValue = remove( value, start, end );
+			this.props.onChange( newValue );
+			this.forceSelectionUpdate( 0, 0 );
+			return;
+		}
+
+		if ( this.multilineTag ) {
+			if ( keyCode === BACKSPACE ) {
+				const index = start - 1;
+
+				if ( text[ index ] === LINE_SEPARATOR ) {
+					const collapsed = isCollapsed( value );
+
+					// If the line separator that is about te be removed
+					// contains wrappers, remove the wrappers first.
+					if ( collapsed && replacements[ index ] && replacements[ index ].length ) {
+						const newReplacements = replacements.slice();
+
+						newReplacements[ index ] = replacements[ index ].slice( 0, -1 );
+						newValue = {
+							...value,
+							replacements: newReplacements,
+						};
+					} else {
+						newValue = remove(
+							value,
+							// Only remove the line if the selection is
+							// collapsed, otherwise remove the selection.
+							collapsed ? start - 1 : start,
+							end
+						);
+					}
+				}
+			} else if ( text[ end ] === LINE_SEPARATOR ) {
+				const collapsed = isCollapsed( value );
+
+				// If the line separator that is about te be removed
+				// contains wrappers, remove the wrappers first.
+				if ( collapsed && replacements[ end ] && replacements[ end ].length ) {
+					const newReplacements = replacements.slice();
+
+					newReplacements[ end ] = replacements[ end ].slice( 0, -1 );
+					newValue = {
+						...value,
+						replacements: newReplacements,
+					};
+				} else {
+					newValue = remove(
+						value,
+						start,
+						// Only remove the line if the selection is
+						// collapsed, otherwise remove the selection.
+						collapsed ? end + 1 : end,
+					);
+				}
+			}
+
+			if ( newValue ) {
+				this.onFormatChange( newValue );
+				return;
+			}
+		}
 
 		const empty = this.isEmpty();
 
@@ -764,7 +828,7 @@ export class RichText extends Component {
 						onTagNameChange={ onTagNameChange }
 						tagName={ tagName }
 						value={ record }
-						onChange={ this.onFormatChangeForceChild }
+						onChange={ this.onFormatChange }
 					/>
 				) }
 				{ isSelected && (
