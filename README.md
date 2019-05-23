@@ -141,6 +141,8 @@ and for android run,
 
 Note, you might experience problems that seem to be related to the tests starting the Appium server, for example errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. Sorry about that this is still a WIP, you can manually start the Appium server via [appium desktop](https://github.com/appium/appium-desktop) or the cli, then change the port number in the tests while optionally commenting out related code in the `beforeAll` and `afterAll` block. 
 
+For a more detailed outline of the UI tests and how to get started writing one please visit the [Project Wiki](https://github.com/wordpress-mobile/gutenberg-mobile/wiki/Getting-started-with-UI-tests)
+
 ## Static analysis and code style
 
 The project includes a linter (`eslint`) to perform codestyle and static analysis of the code. The configuration used is the same as [the one in the Gutenberg project](https://github.com/WordPress/gutenberg/blob/master/eslint/config.js). To perform the check, run:
