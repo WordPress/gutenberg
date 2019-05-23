@@ -3,11 +3,6 @@
  * */
 
 /**
- * External dependencies
- */
-import { Platform } from 'react-native';
-
-/**
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
@@ -57,12 +52,8 @@ describe( 'Gutenberg Editor tests', () => {
 		// Send the second list item text
 		await editorPage.sendTextToListBlock( listBlockElement, testData.listItem2 );
 
-		if ( Platform.OS === 'android' ) {
-			// switch to html and verify html
-			await editorPage.verifyHtmlContent( testData.listHtml );
-		} else {
-			// TODO: implement html verification on iOS too
-		}
+		// switch to html and verify html
+		await editorPage.verifyHtmlContent( testData.listHtml );
 	} );
 
 	afterAll( async () => {
