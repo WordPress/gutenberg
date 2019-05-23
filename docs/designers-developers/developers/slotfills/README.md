@@ -37,7 +37,8 @@ registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 
 SlotFills are created using `createSlotFill`. This creates two components, `Slot` and `Fill` which are then used to create a new component that is exported on the `wp.plugins` global.
 
-**Definition of the `PluginPostStatusInfo` SlotFill**
+**Definition of the `PluginPostStatusInfo` SlotFill** ([see core code](https://github.com/WordPress/gutenberg/blob/master/packages/edit-post/src/components/sidebar/plugin-post-status-info/index.js#L54))
+
 ```js
 /**
  * Defines as extensibility slot for the Status & Visibility panel.
