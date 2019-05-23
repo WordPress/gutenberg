@@ -188,7 +188,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				accessible={ false }
 				onPress={ this.onFocus }
 			>
-					
+
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View
