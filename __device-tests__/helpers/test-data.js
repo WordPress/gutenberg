@@ -10,3 +10,10 @@ exports.listItem2 = `Honey`;
 exports.listHtml = `<!-- wp:list -->
 <ul><li>Milk</li><li>Honey</li></ul>
 <!-- /wp:list -->`;
+exports.listEndedHtml = `<!-- wp:list -->
+<ul><li>Milk</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->`;

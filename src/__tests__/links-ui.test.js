@@ -53,7 +53,7 @@ describe( 'LinksUI', () => {
 
 		// Simulate user typing on the URL Cell.
 		const bottomSheet = wrapper.find( 'BottomSheet' ).first();
-		const cell = bottomSheet.find( 'Cell' ).first();
+		const cell = bottomSheet.find( 'BottomSheetCell' ).first();
 		cell.simulate( 'changeValue', 'wordpress.com' );
 
 		// Close the BottomSheet
