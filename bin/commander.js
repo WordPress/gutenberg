@@ -235,7 +235,7 @@ program
 			} );
 			release = releaseData.data;
 
-			console.log( '>> The Github release has been created succesfully.' );
+			console.log( '>> The GitHub release has been created succesfully.' );
 		} );
 		abortMessage = 'Aborting! Make sure to remove the remote release branch, the git tag and the GitHub release.';
 
