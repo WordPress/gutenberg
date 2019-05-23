@@ -15,24 +15,24 @@ import { normalizeIconObject } from '@wordpress/blocks';
 import styles from './style.scss';
 
 function Warning( { title, message, icon, iconClass, ...viewProps } ) {
-		icon = icon && normalizeIconObject( icon );
-		return (
-			<View
-				style={ styles.container }
-				{ ...viewProps }
-			>
-				{ icon && (
-					<View style={ styles.icon }>
-						<Icon
-							className={ iconClass || "warning-icon" }
-							icon={ icon && icon.src ? icon.src : icon }
-						/>
-					</View>
-				) }
-				<Text style={ styles.title }>{ title }</Text>
-				<Text style={ styles.message }>{ message }</Text>
-			</View>
-		);
+	icon = icon && normalizeIconObject( icon );
+	return (
+		<View
+			style={ styles.container }
+			{ ...viewProps }
+		>
+			{ icon && (
+				<View style={ styles.icon }>
+					<Icon
+						className={ iconClass || 'warning-icon' }
+						icon={ icon && icon.src ? icon.src : icon }
+					/>
+				</View>
+			) }
+			<Text style={ styles.title }>{ title }</Text>
+			<Text style={ styles.message }>{ message }</Text>
+		</View>
+	);
 }
 
 export default Warning;

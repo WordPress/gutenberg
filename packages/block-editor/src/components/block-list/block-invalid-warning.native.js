@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -9,8 +8,8 @@ import { __ } from '@wordpress/i18n';
  */
 import Warning from '../warning';
 
-export default function BlockInvalidWarning ( { title, icon }) {
-	const accessibilityLabel = __( "This block has problems ");
+export default function BlockInvalidWarning( { title, icon } ) {
+	const accessibilityLabel = __( 'This block has problems ' );
 	return (
 		<Warning
 			title={ title }
