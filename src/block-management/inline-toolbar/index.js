@@ -10,8 +10,10 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
+import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 import { ToolbarButton } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 
 /**
@@ -23,13 +25,13 @@ import InlineToolbarActions from './actions';
 export { InlineToolbarActions };
 
 type PropsType = {
-	clientId: string,
 	canMoveUp: boolean,
 	canMoveDown: boolean,
 	onButtonPressed: ( button: number ) => void,
+	order: number,
 };
 
-export default class InlineToolbar extends React.Component<PropsType> {
+export class InlineToolbar extends React.Component<PropsType> {
 	constructor() {
 		super( ...arguments );
 		// Flow gets picky about reassigning methods on classes
@@ -52,11 +54,28 @@ export default class InlineToolbar extends React.Component<PropsType> {
 	}
 
 	render() {
+		const { order } = this.props;
+		const moveUpButtonTitle = this.props.canMoveUp ? sprintf(
+			/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+			__( 'Move block up from row %1$s to row %2$s' ),
+			order,
+			order - 1 ) : __( 'Move block up' );
+
+		const moveDownButtonTitle = this.props.canMoveUp ? sprintf(
+			/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+			__( 'Move block down from row %1$s to row %2$s' ),
+			order,
+			order + 1 ) : __( 'Move block down' );
+
+		const removeButtonTitle = sprintf(
+			/* translators: accessibility text. %s: current block position (number). */
+			__( 'Remove block at row %s' ),
+			order );
+
 		return (
 			<View style={ styles.toolbar } >
 				<ToolbarButton
-					accessibilityLabel={ __( 'Move up' ) }
-					title={ __( 'Move up' ) }
+					title={ __( moveUpButtonTitle ) }
 					isDisabled={ ! this.props.canMoveUp }
 					onClick={ this.onUpPressed }
 					icon="arrow-up-alt"
@@ -64,7 +83,7 @@ export default class InlineToolbar extends React.Component<PropsType> {
 				/>
 
 				<ToolbarButton
-					title={ __( 'Move down' ) }
+					title={ __( moveDownButtonTitle ) }
 					isDisabled={ ! this.props.canMoveDown }
 					onClick={ this.onDownPressed }
 					icon="arrow-down-alt"
@@ -76,7 +95,7 @@ export default class InlineToolbar extends React.Component<PropsType> {
 				<InspectorControls.Slot />
 
 				<ToolbarButton
-					title={ __( 'Remove' ) }
+					title={ __( removeButtonTitle ) }
 					onClick={ this.onDeletePressed }
 					icon="trash"
 					extraProps={ { hint: __( 'Double tap to remove the block' ) } }
@@ -85,3 +104,15 @@ export default class InlineToolbar extends React.Component<PropsType> {
 		);
 	}
 }
+
+export default compose( [
+	withSelect( ( select, { clientId } ) => {
+		const {
+			getBlockIndex,
+		} = select( 'core/block-editor' );
+
+		return {
+			order: getBlockIndex( clientId ) + 1,
+		};
+	} ),
+] )( InlineToolbar );
