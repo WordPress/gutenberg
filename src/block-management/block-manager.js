@@ -320,7 +320,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderItem( value: { item: string, index: number } ) {
 		const clientId = value.item;
-		const testID = `block-${ value.index }-${ this.props.getBlockName( clientId ) }`;
 
 		return (
 			<ReadableContentView>
@@ -328,7 +327,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					key={ clientId }
 					showTitle={ false }
 					clientId={ clientId }
-					testID={ testID }
 					rootClientId={ this.props.rootClientId }
 					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 					borderStyle={ this.blockHolderBorderStyle() }
