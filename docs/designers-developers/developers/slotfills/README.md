@@ -103,7 +103,7 @@ There are currently seven available SlotFills in the `edit-post` package. Please
 * [PluginMoreMenuItem](./plugin-more-menu-item.md)
 * [PluginPostPublishPanel](./plugin-post-publish-panel.md)
 * [PluginPostStatusInfo](./plugin-post-status-info.md)
-* [PluginPrePublishPanel](./plugin-pre-post-publish-panel.md)
+* [PluginPrePublishPanel](./plugin-pre-publish-panel.md)
 * [PluginSidebar](./plugin-sidebar.md)
 * [PluginSidebarMoreMenuItem](./plugin-sidebar-more-menu-item.md)
 
