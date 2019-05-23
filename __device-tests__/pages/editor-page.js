@@ -6,6 +6,7 @@
  * External dependencies
  */
 import wd from 'wd';
+import { Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -269,6 +270,14 @@ export default class EditorPage {
 	}
 
 	async verifyHtmlContent( html: string ) {
+		if ( Platform.OS === 'android' ) {
+			await this.verifyHtmlContentAndroid( html );
+		} else {
+			// TODO: implement html verification on iOS too
+		}
+	}
+
+	async verifyHtmlContentAndroid( html: string ) {
 		await toggleHtmlMode( this.driver );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
