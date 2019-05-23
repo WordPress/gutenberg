@@ -96,7 +96,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 ```
 ## Currently available SlotFills and examples
 
-There are currently seven available SlotFills in the `edit-post` package. please refer to the individual items below for usage and example details:
+There are currently seven available SlotFills in the `edit-post` package. Please refer to the individual items below for usage and example details:
 
 * [PluginBlockSettingsMenuItem](./plugin-block-settings-menu-item.md)
 * [PluginMoreMenuItem](./plugin-more-menu-item.md)
