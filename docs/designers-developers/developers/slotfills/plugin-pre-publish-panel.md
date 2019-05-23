@@ -19,6 +19,7 @@ const PluginPrePublishPanelTest = () => {
 registerPlugin( 'pre-publish-panel-test', { render: PluginPrePublishPanelTest } );
 
 ```
+
 ## Location
 
 ![Prepublish panel](/docs/designers-developers/assets/plugin-pre-publish-panel.png?raw=true)
