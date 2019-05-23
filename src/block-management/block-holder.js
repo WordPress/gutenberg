@@ -194,11 +194,12 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 					<View
 						accessibile={ true }
 						accessibilityLabel={ accessibilityLabel }
-						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
-							{ isValid && this.getBlockForType() }
-							{ ! isValid &&
-								<BlockInvalidWarning blockTitle={ blockType.title } icon={ blockType.icon } />
-							}
+						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
+					>
+						{ isValid && this.getBlockForType() }
+						{ ! isValid &&
+							<BlockInvalidWarning blockTitle={ blockType.title } icon={ blockType.icon } />
+						}
 					</View>
 					{ this.renderToolbar() }
 				</View>
@@ -211,7 +212,6 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
-			// getBlockAttributes,
 			getBlockName,
 			getBlockIndex,
 			getBlocks,
@@ -220,8 +220,6 @@ export default compose( [
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
-		// const name = getBlockName( clientId );
-		// const attributes = getBlockAttributes( clientId );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
 		const isFirstBlock = order === 0;
