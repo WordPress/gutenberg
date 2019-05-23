@@ -27,12 +27,29 @@
 }
 
 // Adjust the position of the notices
-@include editor-left(".edit-post-layout__content .components-editor-notices__snackbar");
 .edit-post-layout__content .components-editor-notices__snackbar {
 	position: fixed;
 	padding-left: 16px;
 	padding-right: 16px;
 }
+
+// Because the sidebar overlaps the editor canvas, we need to adjust
+// the width of the snackbar container div to accommodate the sidebar.
+.components-editor-notices__snackbar {
+	@include break-medium() {
+		width: calc(100% - #{ $admin-sidebar-width-big });
+
+		body.folded &,
+		body.auto-fold & {
+			width: calc(100% - #{ $admin-sidebar-width-collapsed });
+		}
+	}
+
+	@include break-large() {
+		width: calc(100% - #{ $admin-sidebar-width });
+	}
+}
+
 
 .edit-post-layout__content {
 	display: flex;

@@ -37,17 +37,4 @@
 	display: flex;
 	justify-content: center;
 	width: 100%;
-	// Width needs to accommodate sidebar for centred positioning to work across all screens.
-	@include break-medium() {
-		width: calc(100% - #{ $admin-sidebar-width-big });
-
-		body.folded &,
-		body.auto-fold & {
-			width: calc(100% - #{ $admin-sidebar-width-collapsed });
-		}
-	}
-
-	@include break-large() {
-		width: calc(100% - #{ $admin-sidebar-width });
-	}
 }
