@@ -172,7 +172,7 @@ class AudioEdit extends Component {
 				<BlockControls>
 					<Toolbar>
 						<IconButton
-							class={ classnames( 'components-toolbar__control' ) }
+							class={ 'components-toolbar__control' }
 							label={ __( 'Edit audio' ) }
 							onClick={ toggleIsEditing }
 							icon={ editImageIcon }
