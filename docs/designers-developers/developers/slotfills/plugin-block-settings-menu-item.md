@@ -20,6 +20,7 @@ const PluginBlockSettingsMenuGroupTest = () => (
 
 registerPlugin( 'block-settings-menu-group-test', { render: PluginBlockSettingsMenuGroupTest } );
 ```
+
 ## Location
 
 ![Alt text](/docs/designers-developers/assets/plugin-block-settings-menu-item-screenshot.png?raw=true "PluginBlockSettingsMenuItem Location")
