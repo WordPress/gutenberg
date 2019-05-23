@@ -178,10 +178,8 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		const { isSelected, borderStyle, focusedBorderColor, isValid, name } = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
-
 		const accessibilityLabel = this.getAccessibilityLabelForBlock();
 		const blockType = getBlockType( name );
-		const title = getBlockType( name ).title;
 
 		return (
 			// accessible prop needs to be false to access children
@@ -199,7 +197,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
 							{ isValid && this.getBlockForType() }
 							{ ! isValid &&
-								<BlockInvalidWarning title={ blockType.title } icon={ blockType.icon } />
+								<BlockInvalidWarning blockTitle={ blockType.title } icon={ blockType.icon } />
 							}
 					</View>
 					{ this.renderToolbar() }
