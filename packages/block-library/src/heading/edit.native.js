@@ -18,7 +18,6 @@ import { createBlock } from '@wordpress/blocks';
 
 const HeadingEdit = ( {
 	attributes,
-	insertBlocksAfter,
 	isSelected,
 	mergeBlocks,
 	onBlur,
@@ -50,15 +49,15 @@ const HeadingEdit = ( {
 			onChange={ ( value ) => setAttributes( { content: value } ) }
 			onMerge={ mergeBlocks }
 			onSplit={ ( value ) => {
-						if ( ! value ) {
-							return createBlock( 'core/paragraph' );
-						}
+				if ( ! value ) {
+					return createBlock( 'core/paragraph' );
+				}
 
-						return createBlock( 'core/heading', {
-							...attributes,
-							content: value,
-						} );
-					} }
+				return createBlock( 'core/heading', {
+					...attributes,
+					content: value,
+				} );
+			} }
 			onReplace={ onReplace }
 			onRemove={ () => onReplace( [] ) }
 			placeholder={ attributes.placeholder || __( 'Write heading…' ) }
