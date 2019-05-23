@@ -8,18 +8,16 @@ import { controls } from '@wordpress/data-controls';
  * Internal dependencies
  */
 import reducer from './reducer';
-import applyMiddlewares from './middlewares';
-import * as selectors from './selectors';
 import * as actions from './actions';
-import { STORE_KEY } from './constants';
+import * as selectors from './selectors';
 
-const store = registerStore( STORE_KEY, {
+const store = registerStore( 'core/edit-widgets', {
 	reducer,
-	selectors,
 	actions,
+	selectors,
 	controls,
-	persist: [ 'preferences' ],
 } );
-applyMiddlewares( store );
+
+store.dispatch( { type: 'INIT' } );
 
 export default store;

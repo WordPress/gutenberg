@@ -9,15 +9,9 @@ import { navigateRegions } from '@wordpress/components';
  */
 import Header from '../header';
 import Sidebar from '../sidebar';
-import WidgetArea from '../widget-area';
+import WidgetAreas from '../widget-areas';
 
 function Layout() {
-	const areas = [
-		__( 'Sidebar' ),
-		__( 'Footer' ),
-		__( 'Header' ),
-	];
-
 	return (
 		<>
 			<Header />
@@ -28,11 +22,7 @@ function Layout() {
 				aria-label={ __( 'Widgets screen content' ) }
 				tabIndex="-1"
 			>
-				{ areas.map( ( area, index ) => (
-					<div key={ index } className="edit-widgets-layout__area">
-						<WidgetArea title={ area } initialOpen={ index === 0 } />
-					</div>
-				) ) }
+				<WidgetAreas />
 			</div>
 		</>
 	);

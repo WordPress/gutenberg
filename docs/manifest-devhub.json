@@ -1128,6 +1128,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/data-controls",
+		"slug": "packages-data-controls",
+		"markdown_source": "../packages/data-controls/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/data",
 		"slug": "packages-data",
 		"markdown_source": "../packages/data/README.md",
