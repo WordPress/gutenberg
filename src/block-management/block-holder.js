@@ -171,11 +171,10 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 
 		if ( name === getUnregisteredTypeHandlerName() ) { // is the block unrecognized?
 			const blockType = coreBlocks[ attributes.originalName ];
-			const title = blockType ? blockType.settings.title : attributes.originalName;
 			return sprintf(
 				/* translators: accessibility text. %s: unsupported block type. */
 				__( 'Unsupported block: %s' ),
-				title
+				blockType ? blockType.settings.title : attributes.originalName
 			);
 		}
 
