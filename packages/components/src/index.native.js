@@ -18,3 +18,7 @@ export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+
+// Mobile Components
+export { default as BottomSheet } from './mobile/bottom-sheet';
+export { default as Picker } from './mobile/picker';

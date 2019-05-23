@@ -131,7 +131,9 @@ export function* selectPreviousBlock( clientId ) {
 		clientId
 	);
 
-	yield selectBlock( previousBlockClientId, -1 );
+	if ( previousBlockClientId ) {
+		yield selectBlock( previousBlockClientId, -1 );
+	}
 }
 
 /**
@@ -147,7 +149,9 @@ export function* selectNextBlock( clientId ) {
 		clientId
 	);
 
-	yield selectBlock( nextBlockClientId );
+	if ( nextBlockClientId ) {
+		yield selectBlock( nextBlockClientId );
+	}
 }
 
 /**
@@ -633,7 +637,13 @@ export function selectionChange( clientId, attributeKey, startOffset, endOffset 
  * @return {Object} Action object
  */
 export function insertDefaultBlock( attributes, rootClientId, index ) {
-	const block = createBlock( getDefaultBlockName(), attributes );
+	// Abort if there is no default block type (if it has been unregistered).
+	const defaultBlockName = getDefaultBlockName();
+	if ( ! defaultBlockName ) {
+		return;
+	}
+
+	const block = createBlock( defaultBlockName, attributes );
 
 	return insertBlock( block, index, rootClientId );
 }

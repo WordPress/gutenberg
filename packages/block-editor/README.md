@@ -56,7 +56,7 @@ In the example above, there's no registered block type, in order to use the bloc
 ```js
 import { registerCoreBlocks } from '@wordpress/block-library';
 
-registerCoreBlockTypes();
+registerCoreBlocks();
 
 // Make sure to load the block stylesheets too
 // import '@wordpress/block-library/build-style/style.css';

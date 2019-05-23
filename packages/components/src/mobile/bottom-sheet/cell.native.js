@@ -17,7 +17,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
 
-export default class Cell extends Component {
+export default class BottomSheetCell extends Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.state = {
