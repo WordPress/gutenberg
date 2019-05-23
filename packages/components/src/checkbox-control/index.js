@@ -1,5 +1,5 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
 import { withInstanceId } from '@wordpress/compose';
 

@@ -17,7 +17,8 @@ describe( 'RichText', () => {
 	it( 'should handle change in tag name gracefully', async () => {
 		// Regression test: The heading block changes the tag name of its
 		// RichText element. Historically this has been prone to breakage,
-		// specifically in destroying / reinitializing the TinyMCE instance.
+		// because the Editable component prevents rerenders, so React cannot
+		// update the element by itself.
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/3091
 		await insertBlock( 'Heading' );
@@ -57,6 +58,47 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should apply multiple formats when selection is collapsed', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '.' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not highlight more than one format', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( ' 2' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'b' );
+
+		const count = await page.evaluate( () => document.querySelectorAll(
+			'*[data-rich-text-format-boundary]'
+		).length );
+
+		expect( count ).toBe( 1 );
+	} );
+
+	it( 'should return focus when pressing formatting button', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'Some ' );
+		await page.keyboard.press( 'Escape' );
+		await page.click( '[aria-label="Bold"]' );
+		await page.keyboard.type( 'bold' );
+		await page.keyboard.press( 'Escape' );
+		await page.click( '[aria-label="Bold"]' );
+		await page.keyboard.type( '.' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should transform backtick to code', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'A `backtick`' );
@@ -64,6 +106,13 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not format text after code backtick', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'A `backtick` and more.' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -135,6 +184,42 @@ describe( 'RichText', () => {
 
 			window.unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
 		} );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not lose selection direction', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '23' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.up( 'Shift' );
+
+		// There should be no selection. The following should insert "-" without
+		// deleting the numbers.
+		await page.keyboard.type( '-' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should handle Home and End keys', async () => {
+		await page.keyboard.press( 'Enter' );
+
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '12' );
+		await pressKeyWithModifier( 'primary', 'b' );
+
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.type( '-' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '+' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

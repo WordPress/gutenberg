@@ -1,4 +1,4 @@
-# Register a new format
+# Register a New Format
 
 The first thing you're going to do in this tutorial is to register the new format that the plugin intends to apply. WordPress has the [`registerFormatType`](/packages/rich-text/README.md#registerFormatType) function to do so.
 
@@ -39,9 +39,9 @@ Then add a new file named `my-custom-format.js` with the following contents:
 } )( window.wp );
 ```
 
-Make that plugin available in your WordPress setup and activate it. Then, load a new page/post. 
+Make that plugin available in your WordPress setup and activate it. Then, load a new page/post.
 
-The list of available format types is maintained in the `core/rich-text` store. You can query the store to check that your custom format is now avaliable. To do so, run this code in your browser's console:
+The list of available format types is maintained in the `core/rich-text` store. You can query the store to check that your custom format is now available. To do so, run this code in your browser's console:
 
 	wp.data.select( 'core/rich-text' ).getFormatTypes();
 

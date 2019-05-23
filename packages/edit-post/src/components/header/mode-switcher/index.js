@@ -50,13 +50,13 @@ function ModeSwitcher( { onSwitch, mode } ) {
 export default compose( [
 	withSelect( ( select ) => ( {
 		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+		isCodeEditingEnabled: select( 'core/editor' ).getEditorSettings().codeEditingEnabled,
 		mode: select( 'core/edit-post' ).getEditorMode(),
 	} ) ),
-	ifCondition( ( { isRichEditingEnabled } ) => isRichEditingEnabled ),
-	withDispatch( ( dispatch, ownProps ) => ( {
+	ifCondition( ( { isRichEditingEnabled, isCodeEditingEnabled } ) => isRichEditingEnabled && isCodeEditingEnabled ),
+	withDispatch( ( dispatch ) => ( {
 		onSwitch( mode ) {
 			dispatch( 'core/edit-post' ).switchEditorMode( mode );
-			ownProps.onSelect( mode );
 		},
 	} ) ),
 ] )( ModeSwitcher );

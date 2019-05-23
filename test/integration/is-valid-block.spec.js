@@ -1,5 +1,5 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
 import { isValidBlockContent } from '@wordpress/blocks';
 import { createElement } from '@wordpress/element';

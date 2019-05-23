@@ -10,7 +10,13 @@ import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { PostTaxonomies, PostExcerptCheck, PageAttributesCheck, PostFeaturedImageCheck, PostTypeSupportCheck } from '@wordpress/editor';
+import {
+	PostTaxonomies,
+	PostExcerptCheck,
+	PageAttributesCheck,
+	PostFeaturedImageCheck,
+	PostTypeSupportCheck,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -33,7 +39,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 	return (
 		<Modal
 			className="edit-post-options-modal"
-			title={ <span className="edit-post-options-modal__title">{ __( 'Options' ) }</span> }
+			title={ __( 'Options' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ closeModal }
 		>

@@ -40,23 +40,28 @@ const mapKeyCombination = ( keyCombination ) => keyCombination.map( ( character,
 } );
 
 const ShortcutList = ( { shortcuts } ) => (
-	<dl className="edit-post-keyboard-shortcut-help__shortcut-list">
+	/*
+	 * Disable reason: The `list` ARIA role is redundant but
+	 * Safari+VoiceOver won't announce the list otherwise.
+	 */
+	/* eslint-disable jsx-a11y/no-redundant-roles */
+	<ul className="edit-post-keyboard-shortcut-help__shortcut-list" role="list">
 		{ shortcuts.map( ( { keyCombination, description, ariaLabel }, index ) => (
-			<div
+			<li
 				className="edit-post-keyboard-shortcut-help__shortcut"
 				key={ index }
 			>
-				<dt className="edit-post-keyboard-shortcut-help__shortcut-term">
+				<div className="edit-post-keyboard-shortcut-help__shortcut-description">
+					{ description }
+				</div>
+				<div className="edit-post-keyboard-shortcut-help__shortcut-term">
 					<kbd className="edit-post-keyboard-shortcut-help__shortcut-key-combination" aria-label={ ariaLabel }>
 						{ mapKeyCombination( castArray( keyCombination ) ) }
 					</kbd>
-				</dt>
-				<dd className="edit-post-keyboard-shortcut-help__shortcut-description">
-					{ description }
-				</dd>
-			</div>
+				</div>
+			</li>
 		) ) }
-	</dl>
+	</ul>
 );
 
 const ShortcutSection = ( { title, shortcuts } ) => (
@@ -69,12 +74,6 @@ const ShortcutSection = ( { title, shortcuts } ) => (
 );
 
 export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
-	const title = (
-		<span className="edit-post-keyboard-shortcut-help__title">
-			{ __( 'Keyboard Shortcuts' ) }
-		</span>
-	);
-
 	return (
 		<Fragment>
 			<KeyboardShortcuts
@@ -86,7 +85,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 			{ isModalActive && (
 				<Modal
 					className="edit-post-keyboard-shortcut-help"
-					title={ title }
+					title={ __( 'Keyboard Shortcuts' ) }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ toggleModal }
 				>

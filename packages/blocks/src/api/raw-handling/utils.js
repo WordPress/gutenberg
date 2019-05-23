@@ -7,11 +7,11 @@ import { mapValues, mergeWith, includes, noop } from 'lodash';
  * WordPress dependencies
  */
 import { unwrap, insertAfter, remove } from '@wordpress/dom';
-import { hasBlockSupport } from '..';
 
 /**
  * Internal dependencies
  */
+import { hasBlockSupport } from '..';
 import { isPhrasingContent } from './phrasing-content';
 
 /**
@@ -185,11 +185,17 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
 		) {
 			if ( node.nodeType === ELEMENT_NODE ) {
-				const { attributes = [], classes = [], children, require = [] } = schema[ tag ];
+				const {
+					attributes = [],
+					classes = [],
+					children,
+					require = [],
+					allowEmpty,
+				} = schema[ tag ];
 
 				// If the node is empty and it's supposed to have children,
 				// remove the node.
-				if ( isEmpty( node ) && children ) {
+				if ( children && ! allowEmpty && isEmpty( node ) ) {
 					remove( node );
 					return;
 				}
@@ -203,7 +209,9 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 					} );
 
 					// Strip invalid classes.
-					if ( node.classList.length ) {
+					// In jsdom-jscore, 'node.classList' can be undefined.
+					// TODO: Explore patching this in jsdom-jscore.
+					if ( node.classList && node.classList.length ) {
 						const mattchers = classes.map( ( item ) => {
 							if ( typeof item === 'string' ) {
 								return ( className ) => className === item;
@@ -239,9 +247,21 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 						if ( require.length && ! node.querySelector( require.join( ',' ) ) ) {
 							cleanNodeList( node.childNodes, doc, schema, inline );
 							unwrap( node );
-						}
+						// If the node is at the top, phrasing content, and
+						// contains children that are block content, unwrap
+						// the node because it is invalid.
+						} else if (
+							node.parentNode.nodeName === 'BODY' &&
+							isPhrasingContent( node )
+						) {
+							cleanNodeList( node.childNodes, doc, schema, inline );
 
-						cleanNodeList( node.childNodes, doc, children, inline );
+							if ( Array.from( node.childNodes ).some( ( child ) => ! isPhrasingContent( child ) ) ) {
+								unwrap( node );
+							}
+						} else {
+							cleanNodeList( node.childNodes, doc, children, inline );
+						}
 					// Remove children if the node is not supposed to have any.
 					} else {
 						while ( node.firstChild ) {

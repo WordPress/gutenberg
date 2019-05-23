@@ -1,4 +1,16 @@
 /**
+ * External dependencies
+ */
+import { castArray } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import { __unstableSubscribe } from './controls';
+import { onChangeListener } from './utils';
+import { STORE_KEY, VIEW_AS_LINK_SELECTOR } from './constants';
+
+/**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
  * @param {string} name Sidebar name to be opened.
@@ -161,6 +173,36 @@ export function togglePinnedPluginItem( pluginName ) {
 }
 
 /**
+ * Returns an action object used in signalling that block types by the given
+ * name(s) should be hidden.
+ *
+ * @param {string[]} blockNames Names of block types to hide.
+ *
+ * @return {Object} Action object.
+ */
+export function hideBlockTypes( blockNames ) {
+	return {
+		type: 'HIDE_BLOCK_TYPES',
+		blockNames: castArray( blockNames ),
+	};
+}
+
+/**
+ * Returns an action object used in signalling that block types by the given
+ * name(s) should be shown.
+ *
+ * @param {string[]} blockNames Names of block types to show.
+ *
+ * @return {Object} Action object.
+ */
+export function showBlockTypes( blockNames ) {
+	return {
+		type: 'SHOW_BLOCK_TYPES',
+		blockNames: castArray( blockNames ),
+	};
+}
+
+/**
  * Returns an action object used in signaling
  * what Meta boxes are available in which location.
  *
@@ -195,5 +237,76 @@ export function metaBoxUpdatesSuccess() {
 	return {
 		type: 'META_BOX_UPDATES_SUCCESS',
 	};
+}
+
+/**
+ * Returns an action generator used to initialize some subscriptions for the
+ * post editor:
+ *
+ * - subscription for toggling the `edit-post/block` general sidebar when a
+ *   block is selected.
+ * - subscription for hiding/showing the sidebar depending on size of viewport.
+ * - subscription for updating the "View Post" link in the admin bar when
+ *   permalink is updated.
+ */
+export function* __unstableInitialize() {
+	// Select the block settings tab when the selected block changes
+	yield __unstableSubscribe( ( registry ) => onChangeListener(
+		() => !! registry.select( 'core/block-editor' )
+			.getBlockSelectionStart(),
+		( hasBlockSelection ) => {
+			if ( ! registry.select( 'core/edit-post' ).isEditorSidebarOpened() ) {
+				return;
+			}
+			if ( hasBlockSelection ) {
+				registry.dispatch( STORE_KEY )
+					.openGeneralSidebar( 'edit-post/block' );
+			} else {
+				registry.dispatch( STORE_KEY )
+					.openGeneralSidebar( 'edit-post/document' );
+			}
+		}
+	) );
+	// hide/show the sidebar depending on size of viewport.
+	yield __unstableSubscribe( ( registry ) => onChangeListener(
+		() => registry.select( 'core/viewport' )
+			.isViewportMatch( '< medium' ),
+		( () => {
+			let sidebarToReOpenOnExpand = null;
+			return ( isSmall ) => {
+				const { getActiveGeneralSidebarName } = registry.select( STORE_KEY );
+				const {
+					closeGeneralSidebar: closeSidebar,
+					openGeneralSidebar: openSidebar,
+				} = registry.dispatch( STORE_KEY );
+				if ( isSmall ) {
+					sidebarToReOpenOnExpand = getActiveGeneralSidebarName();
+					if ( sidebarToReOpenOnExpand ) {
+						closeSidebar();
+					}
+				} else if (
+					sidebarToReOpenOnExpand &&
+					! getActiveGeneralSidebarName()
+				) {
+					openSidebar( sidebarToReOpenOnExpand );
+				}
+			};
+		} )(),
+		true
+	) );
+	// Update View Post link in the admin bar when permalink is updated.
+	yield __unstableSubscribe( ( registry ) => onChangeListener(
+		() => registry.select( 'core/editor' ).getCurrentPost().link,
+		( newPermalink ) => {
+			if ( ! newPermalink ) {
+				return;
+			}
+			const nodeToUpdate = document.querySelector( VIEW_AS_LINK_SELECTOR );
+			if ( ! nodeToUpdate ) {
+				return;
+			}
+			nodeToUpdate.setAttribute( 'href', newPermalink );
+		}
+	) );
 }
 

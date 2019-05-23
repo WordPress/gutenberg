@@ -16,6 +16,7 @@
 
 .edit-post-text-editor {
 	width: 100%;
+	max-width: calc(100% - #{$grid-size-large * 2});
 	margin-left: $grid-size-large;
 	margin-right: $grid-size-large;
 
@@ -29,8 +30,19 @@
 	.editor-post-title__block {
 		textarea {
 			border: $border-width solid $light-gray-500;
-			margin-bottom: 4px;
+			margin-bottom: $block-spacing;
 			padding: $block-padding;
+
+			&:focus {
+				border: $border-width solid $light-gray-500;
+			}
+		}
+
+		// Hide the thick left border in the code editor.
+		&:not(.is-focus-mode):not(.has-fixed-toolbar):not(.is-selected) .editor-post-title__input:hover,
+		&:not(.is-focus-mode):not(.has-fixed-toolbar).is-selected .editor-post-title__input {
+			box-shadow: none;
+			border-left-width: $border-width;
 		}
 
 		textarea:hover,
@@ -40,9 +52,12 @@
 	}
 
 	.editor-post-permalink {
-		left: 0;
-		right: 0;
 		margin-top: -6px;
+
+		// Hide the thick left border in the code editor.
+		box-shadow: none;
+		border: none;
+		outline: $border-width solid $light-gray-800;
 	}
 
 	@include break-small() {

@@ -5,26 +5,27 @@
 import { isFormatEqual } from './is-format-equal';
 
 /**
- * Normalises formats: ensures subsequent equal formats have the same reference.
+ * Normalises formats: ensures subsequent adjacent equal formats have the same
+ * reference.
  *
- * @param  {Object} value Value to normalise formats of.
+ * @param {Object} value Value to normalise formats of.
  *
  * @return {Object} New value with normalised formats.
  */
-export function normaliseFormats( { formats, text, start, end } ) {
-	const newFormats = formats.slice( 0 );
+export function normaliseFormats( value ) {
+	const newFormats = value.formats.slice();
 
 	newFormats.forEach( ( formatsAtIndex, index ) => {
-		const lastFormatsAtIndex = newFormats[ index - 1 ];
+		const formatsAtPreviousIndex = newFormats[ index - 1 ];
 
-		if ( lastFormatsAtIndex ) {
-			const newFormatsAtIndex = formatsAtIndex.slice( 0 );
+		if ( formatsAtPreviousIndex ) {
+			const newFormatsAtIndex = formatsAtIndex.slice();
 
 			newFormatsAtIndex.forEach( ( format, formatIndex ) => {
-				const lastFormat = lastFormatsAtIndex[ formatIndex ];
+				const previousFormat = formatsAtPreviousIndex[ formatIndex ];
 
-				if ( isFormatEqual( format, lastFormat ) ) {
-					newFormatsAtIndex[ formatIndex ] = lastFormat;
+				if ( isFormatEqual( format, previousFormat ) ) {
+					newFormatsAtIndex[ formatIndex ] = previousFormat;
 				}
 			} );
 
@@ -32,5 +33,8 @@ export function normaliseFormats( { formats, text, start, end } ) {
 		}
 	} );
 
-	return { formats: newFormats, text, start, end };
+	return {
+		...value,
+		formats: newFormats,
+	};
 }

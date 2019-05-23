@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dom",
-	"version": "2.0.8",
+	"version": "2.3.0",
 	"description": "DOM utilities module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -12,16 +12,18 @@
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/dom/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git"
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/dom"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0",
-		"lodash": "^4.17.10"
+		"@babel/runtime": "^7.4.4",
+		"lodash": "^4.17.11"
 	},
 	"publishConfig": {
 		"access": "public"

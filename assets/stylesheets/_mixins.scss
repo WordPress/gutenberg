@@ -180,8 +180,8 @@
 
 @mixin input-style__focus() {
 	color: $dark-gray-900;
-	border-color: $blue-medium-500;
-	box-shadow: 0 0 0 1px $blue-medium-500;
+	border-color: $blue-medium-focus;
+	box-shadow: 0 0 0 1px $blue-medium-focus;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
@@ -195,8 +195,8 @@
 
 @mixin square-style__focus() {
 	color: $dark-gray-900;
-	outline: 1px solid $dark-gray-300;
-	box-shadow: none;
+	outline-offset: -1px;
+	outline: 1px dotted $dark-gray-500;
 }
 
 // Menu items.
@@ -209,6 +209,7 @@
 	color: $dark-gray-900;
 	border: none;
 	box-shadow: none;
+	background: $light-gray-200;
 }
 
 @mixin menu-style__focus() {
@@ -226,7 +227,7 @@
 }
 
 @mixin block-style__hover {
-	background: $light-gray-100;
+	background: $light-gray-200;
 	color: $dark-gray-900;
 }
 
@@ -278,7 +279,7 @@
 		}
 	}
 
-	/* In small screens with resposive menu expanded there is small white space. */
+	/* In small screens with responsive menu expanded there is small white space. */
 	@media (max-width: #{ ($break-small) }) {
 		.auto-fold .wp-responsive-open #{$selector} {
 			margin-left: -18px;
@@ -309,12 +310,11 @@
  * Styles that are reused verbatim in a few places
  */
 
-@mixin caption-style() {
-	margin-top: 0.5em;
-	margin-bottom: 1em;
+// These are additional styles for all captions, when the theme opts in to block styles.
+@mixin caption-style-theme() {
 	color: $dark-gray-500;
-	text-align: center;
 	font-size: $default-font-size;
+	text-align: center;
 }
 
 @mixin dropdown-arrow() {
@@ -325,10 +325,240 @@
 	height: 0;
 	border-left: 3px solid transparent;
 	border-right: 3px solid transparent;
-	border-top: 5px solid currentColor;
+	border-top: 5px solid;
 	margin-left: $grid-size-small;
 
 	// This gives the icon space on the right side consistent with the material
 	// icon standards.
 	margin-right: 2px;
+}
+
+/**
+ * Allows users to opt-out of animations via OS-level preferences.
+ */
+
+@mixin reduce-motion {
+	@media (prefers-reduced-motion: reduce) {
+		animation-duration: 1ms !important;
+	}
+}
+
+/**
+ * Reset default styles for JavaScript UI based pages.
+ * This is a WP-admin agnostic reset
+ */
+@mixin reset {
+	box-sizing: border-box;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: inherit;
+	}
+
+	select {
+		font-size: $default-font-size;
+		color: $dark-gray-500;
+	}
+
+	.input-control, // Upstream name is `.regular-text`.
+	input[type="text"],
+	input[type="search"],
+	input[type="radio"],
+	input[type="tel"],
+	input[type="time"],
+	input[type="url"],
+	input[type="week"],
+	input[type="password"],
+	input[type="checkbox"],
+	input[type="color"],
+	input[type="date"],
+	input[type="datetime"],
+	input[type="datetime-local"],
+	input[type="email"],
+	input[type="month"],
+	input[type="number"],
+	select,
+	textarea {
+		font-family: $default-font;
+		padding: 6px 8px;
+		@include input-style__neutral();
+
+		/* Fonts smaller than 16px causes mobile safari to zoom. */
+		font-size: $mobile-text-min-font-size;
+		@include break-small {
+			font-size: $default-font-size;
+		}
+
+		&:focus {
+			@include input-style__focus();
+		}
+	}
+
+	input[type="number"] {
+		padding-left: 4px;
+		padding-right: 4px;
+	}
+
+	select {
+		padding: 2px;
+
+		&:focus {
+			border-color: $blue-medium-600;
+			// Windows High Contrast mode will show this outline
+			outline: 2px solid transparent;
+			outline-offset: 0;
+		}
+	}
+
+	input[type="checkbox"],
+	input[type="radio"] {
+		border: $border-width + 1 solid $dark-gray-300;
+		margin-right: 12px;
+		transition: none;
+
+		&:focus {
+			border-color: $dark-gray-300;
+			box-shadow: 0 0 0 1px $dark-gray-300;
+		}
+
+		&:checked {
+			background: theme(toggle);
+			border-color: theme(toggle);
+		}
+
+		&:checked:focus {
+			box-shadow: 0 0 0 2px $dark-gray-500;
+		}
+	}
+
+	input[type="checkbox"] {
+		border-radius: $radius-round-rectangle / 2;
+
+		&:checked::before,
+		&[aria-checked="mixed"]::before {
+			margin: -3px -5px;
+			color: $white;
+
+			@include break-medium() {
+				margin: -4px 0 0 -5px;
+			}
+		}
+
+		&[aria-checked="mixed"] {
+			background: theme(toggle);
+			border-color: theme(toggle);
+
+			&::before {
+				// Inherited from `forms.css`.
+				// See: https://github.com/WordPress/wordpress-develop/tree/5.1.1/src/wp-admin/css/forms.css#L122-L132
+				content: "\f460";
+				float: left;
+				display: inline-block;
+				vertical-align: middle;
+				width: 16px;
+				/* stylelint-disable */
+				font: normal 30px/1 dashicons;
+				/* stylelint-enable */
+				speak: none;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+
+				@include break-medium() {
+					float: none;
+					font-size: 21px;
+				}
+			}
+
+			&:focus {
+				box-shadow: 0 0 0 2px $dark-gray-500;
+			}
+		}
+	}
+
+	input[type="radio"] {
+		border-radius: $radius-round;
+
+		&:checked::before {
+			margin: 6px 0 0 6px;
+			background-color: $white;
+
+			@include break-medium() {
+				margin: 3px 0 0 3px;
+			}
+		}
+	}
+
+	// Placeholder colors
+	input,
+	textarea {
+		// Use opacity to work in various editor styles.
+		&::-webkit-input-placeholder {
+			color: $dark-opacity-300;
+		}
+
+		&::-moz-placeholder {
+			opacity: 1; // Necessary because Firefox reduces this from 1.
+			color: $dark-opacity-300;
+		}
+
+		&:-ms-input-placeholder {
+			color: $dark-opacity-300;
+		}
+
+		.is-dark-theme & {
+			&::-webkit-input-placeholder {
+				color: $light-opacity-300;
+			}
+
+			&::-moz-placeholder {
+				opacity: 1; // Necessary because Firefox reduces this from 1.
+				color: $light-opacity-300;
+			}
+
+			&:-ms-input-placeholder {
+				color: $light-opacity-300;
+			}
+		}
+	}
+}
+
+/**
+ * Reset the WP Admin page styles for Gutenberg-like pages.
+ */
+@mixin wp-admin-reset( $content-container ) {
+	background: $white;
+
+	#wpcontent {
+		padding-left: 0;
+	}
+
+	#wpbody-content {
+		padding-bottom: 0;
+	}
+
+	/* We hide legacy notices in Gutenberg Based Pages, because they were not designed in a way that scaled well.
+	   Plugins can use Gutenberg notices if they need to pass on information to the user when they are editing. */
+	#wpbody-content > div:not(#{ $content-container }):not(#screen-meta) {
+		display: none;
+	}
+
+	#wpfooter {
+		display: none;
+	}
+
+	.a11y-speak-region {
+		left: -1px;
+		top: -1px;
+	}
+
+	ul#adminmenu a.wp-has-current-submenu::after,
+	ul#adminmenu > li.current > a.current::after {
+		border-right-color: $white;
+	}
+
+	.media-frame select.attachment-filters:last-of-type {
+		width: auto;
+		max-width: 100%;
+	}
 }

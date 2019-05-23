@@ -4,7 +4,7 @@ Prior to the block editor, custom meta boxes were used to extend the editor. Wit
 
 The new block editor does support most existing meta boxes, see [this backward compatibility article](/docs/designers-developers/developers/backward-compatibility/meta-box.md) for more support details .
 
-Here are two mini-tutorials for creating similar functionality to meta boxes in the Block Editor.
+Here are two mini-tutorials for creating similar functionality to meta boxes in the block editor.
 
 ## Use Blocks to Store Meta
 

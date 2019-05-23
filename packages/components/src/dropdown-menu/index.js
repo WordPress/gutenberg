@@ -22,6 +22,7 @@ function DropdownMenu( {
 	menuLabel,
 	controls,
 	className,
+	position,
 } ) {
 	if ( ! controls || ! controls.length ) {
 		return null;
@@ -37,6 +38,7 @@ function DropdownMenu( {
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
 			contentClassName="components-dropdown-menu__popover"
+			position={ position }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {

@@ -5,11 +5,11 @@ It turns out that writing the simplest possible block which contains only static
 - [zgordon/gutenberg-course](https://github.com/zgordon/gutenberg-course) - a repository for Zac Gordon's Gutenberg Development Course
 - [ahmadawais/create-guten-block](https://github.com/ahmadawais/create-guten-block) - A zero-configuration developer toolkit for building WordPress Gutenberg block plugins
 
-It might be also a good idea to browse the folder with [all core blocks](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src) to see how they are implemented.
+It might be also a good idea to browse the folder with [all core blocks](/packages/block-library/src) to see how they are implemented.
 
 ## WP-CLI
 
-Another way of making developer's life easier is to use [WP-CLI](http://wp-cli.org/), which provides a command-line interface for many actions you might perform on the WordPress instance. One of the commands generates all the code required to register a Gutenberg block for a plugin or theme.
+Another way of making a developer's life easier is to use [WP-CLI](http://wp-cli.org/), which provides a command-line interface for many actions you might perform on the WordPress instance. One of the commands generates all the code required to register a Gutenberg block for a plugin or theme.
 
 ### Installing
 
@@ -62,7 +62,7 @@ This will generate 4 files inside the `movies` plugin directory. All files conta
  * Registers all block assets so that they can be enqueued through Gutenberg in
  * the corresponding context.
  *
- * @see https://wordpress.org/gutenberg/handbook/blocks/writing-your-first-block-type/#enqueuing-block-scripts
+ * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/writing-your-first-block-type/
  */
 function movie_block_init() {
 	$dir = dirname( __FILE__ );
@@ -109,23 +109,23 @@ add_action( 'init', 'movie_block_init' );
 ( function( wp ) {
 	/**
 	 * Registers a new block provided a unique name and an object defining its behavior.
-	 * @see https://github.com/WordPress/gutenberg/tree/master/blocks#api
+	 * @see https://developer.wordpress.org/block-editor/developers/block-api/block-registration/
 	 */
 	var registerBlockType = wp.blocks.registerBlockType;
 	/**
 	 * Returns a new element of given type. Element is an abstraction layer atop React.
-	 * @see https://github.com/WordPress/gutenberg/tree/master/packages/element#element
+	 * @see https://developer.wordpress.org/block-editor/packages/packages-element/
 	 */
 	var el = wp.element.createElement;
 	/**
 	 * Retrieves the translation of text.
-	 * @see https://github.com/WordPress/gutenberg/tree/master/i18n#api
+	 * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
 	 */
 	var __ = wp.i18n.__;
 
 	/**
 	 * Every block starts by registering a new block type definition.
-	 * @see https://wordpress.org/gutenberg/handbook/block-api/
+	 * @see https://developer.wordpress.org/block-editor/developers/block-api/block-registration/
 	 */
 	registerBlockType( 'movies/movie', {
 		/**
@@ -151,7 +151,7 @@ add_action( 'init', 'movie_block_init' );
 		/**
 		 * The edit function describes the structure of your block in the context of the editor.
 		 * This represents what the editor will render when the block is used.
-		 * @see https://wordpress.org/gutenberg/handbook/block-edit-save/#edit
+		 * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/
 		 *
 		 * @param {Object} [props] Properties passed from the editor.
 		 * @return {Element}       Element to render.
@@ -167,7 +167,7 @@ add_action( 'init', 'movie_block_init' );
 		/**
 		 * The save function defines the way in which the different attributes should be combined
 		 * into the final markup, which is then serialized by Gutenberg into `post_content`.
-		 * @see https://wordpress.org/gutenberg/handbook/block-edit-save/#save
+		 * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#save
 		 *
 		 * @return {Element}       Element to render.
 		 */

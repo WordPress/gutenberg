@@ -8,20 +8,19 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Component,
-	Fragment,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	RichText,
 	ContrastChecker,
 	InspectorControls,
 	withColors,
 	PanelColorSettings,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
-export const SOLID_COLOR_STYLE_NAME = 'solid-color';
-export const SOLID_COLOR_CLASS = `is-style-${ SOLID_COLOR_STYLE_NAME }`;
+/**
+ * Internal dependencies
+ */
+import { SOLID_COLOR_CLASS } from './shared';
 
 class PullQuoteEdit extends Component {
 	constructor( props ) {
@@ -74,7 +73,7 @@ class PullQuoteEdit extends Component {
 			[ textColor.class ]: textColor.class,
 		} ) : undefined;
 		return (
-			<Fragment>
+			<>
 				<figure style={ figureStyle } className={ classnames(
 					className, {
 						[ mainColor.class ]: isSolidColorStyle && mainColor.class,
@@ -138,7 +137,7 @@ class PullQuoteEdit extends Component {
 						) }
 					</PanelColorSettings>
 				</InspectorControls>
-			</Fragment>
+			</>
 		);
 	}
 }

@@ -1,8 +1,4 @@
 .edit-post-keyboard-shortcut-help {
-	&__title {
-		font-size: 1rem;
-		font-weight: 600;
-	}
 
 	&__section {
 		margin: 0 0 2rem 0;
@@ -19,6 +15,7 @@
 		align-items: center;
 		padding: 0.6rem 0;
 		border-top: 1px solid $light-gray-500;
+		margin-bottom: 0;
 
 		&:last-child {
 			border-bottom: 1px solid $light-gray-500;
@@ -26,14 +23,12 @@
 	}
 
 	&__shortcut-term {
-		order: 1;
 		font-weight: 600;
 		margin: 0 0 0 1rem;
 	}
 
 	&__shortcut-description {
 		flex: 1;
-		order: 0;
 		margin: 0;
 
 		// IE 11 flex item fix - ensure the item does not collapse

@@ -1,0 +1,101 @@
+{
+	"type": "ExportDefaultDeclaration",
+	"start": 38,
+	"end": 78,
+	"loc": {
+		"start": {
+			"line": 4,
+			"column": 0
+		},
+		"end": {
+			"line": 4,
+			"column": 40
+		}
+	},
+	"range": [
+		38,
+		78
+	],
+	"declaration": {
+		"type": "ClassDeclaration",
+		"start": 53,
+		"end": 78,
+		"loc": {
+			"start": {
+				"line": 4,
+				"column": 15
+			},
+			"end": {
+				"line": 4,
+				"column": 40
+			}
+		},
+		"range": [
+			53,
+			78
+		],
+		"id": {
+			"type": "Identifier",
+			"start": 59,
+			"end": 75,
+			"loc": {
+				"start": {
+					"line": 4,
+					"column": 21
+				},
+				"end": {
+					"line": 4,
+					"column": 37
+				}
+			},
+			"range": [
+				59,
+				75
+			],
+			"name": "ClassDeclaration"
+		},
+		"superClass": null,
+		"body": {
+			"type": "ClassBody",
+			"start": 76,
+			"end": 78,
+			"loc": {
+				"start": {
+					"line": 4,
+					"column": 38
+				},
+				"end": {
+					"line": 4,
+					"column": 40
+				}
+			},
+			"range": [
+				76,
+				78
+			],
+			"body": []
+		}
+	},
+	"leadingComments": [
+		{
+			"type": "Block",
+			"value": "*\n * Class declaration example.\n ",
+			"start": 0,
+			"end": 37,
+			"range": [
+				0,
+				37
+			],
+			"loc": {
+				"start": {
+					"line": 1,
+					"column": 0
+				},
+				"end": {
+					"line": 3,
+					"column": 3
+				}
+			}
+		}
+	]
+}

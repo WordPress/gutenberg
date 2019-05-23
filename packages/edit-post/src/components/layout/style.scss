@@ -13,48 +13,35 @@
 		color: $dark-gray-900;
 
 		@include break-small {
-			position: fixed;
-			top: inherit;
+			top: 0;
 		}
 
-		.components-notice {
-			margin: 0 0 5px;
-			padding: 6px 12px;
-			min-height: $panel-header-height;
-
-			.components-notice__dismiss {
-				margin: 10px 5px;
-			}
+		// Non-dismissible notices.
+		&.is-pinned {
+			position: relative;
+			left: 0;
+			top: 0;
 		}
 	}
 
-	// On mobile, toolbars behave differently.
+	.components-notice {
+		margin: 0 0 5px;
+		padding: 6px 12px;
+		min-height: $panel-header-height;
+
+		.components-notice__dismiss {
+			margin: 10px 5px;
+		}
+	}
+
+	// Beyond the mobile breakpoint, the editor bar is fixed, so make room for it eabove the layout content.
 	@include break-small {
 		padding-top: $header-height;
 	}
 
-	&.has-fixed-toolbar {
-		.edit-post-layout__content {
-			padding-top: $block-controls-height;
-		}
-
-		// On mobile, toolbars behave differently.
-		@include break-small {
-			padding-top: $header-height + $block-toolbar-height;
-
-			.edit-post-layout__content {
-				padding-top: 0;
-			}
-		}
-
-		@include break-large {
-			padding-top: $header-height;
-		}
-	}
+	// Beyond the medium breakpoint, the main scrolling area itself becomes fixed so the padding then becomes
+	// unnecessary, but until then it's still needed.
 }
-
-@include editor-left(".components-notice-list");
-@include editor-right(".components-notice-list");
 
 .edit-post-layout__metaboxes:not(:empty) {
 	border-top: $border-width solid $light-gray-500;
@@ -121,16 +108,33 @@
 		}
 	}
 
+	// For users with the Top Toolbar option enabled, special rules apply to the height of the content area.
+	.has-fixed-toolbar & {
+		// From the medium breakpoint it sits below the editor bar.
+		@include break-medium() {
+			top: $header-height + $admin-bar-height + $block-controls-height;
+		}
+
+		// From the xlarge breakpoint it sits in the editor bar.
+		@include break-xlarge() {
+			top: $header-height + $admin-bar-height;
+		}
+	}
+
 	// Pad the scroll box so content on the bottom can be scrolled up.
 	padding-bottom: 50vh;
 	@include break-small {
 		padding-bottom: 0;
 	}
 
-	// On mobile the main content area has to scroll otherwise you can invoke
-	// the overscroll bounce on the non-scrolling container, causing
-	// (ノಠ益ಠ)ノ彡┻━┻
-	overflow-y: auto;
+	// On mobile the main content (html or body) area has to scroll.
+	// If, like we do on the desktop, scroll an element (.edit-post-layout__content) you can invoke
+	// the overscroll bounce on the non-scrolling container, causing for a frustrating scrolling experience.
+	// The following rule enables this scrolling beyond the mobile breakpoint, because on the desktop
+	// breakpoints scrolling an isolated element helps avoid scroll bleed.
+	@include break-small() {
+		overflow-y: auto;
+	}
 	-webkit-overflow-scrolling: touch;
 
 	// This rule ensures that if you've scrolled to the end of a container,
@@ -173,15 +177,21 @@
 		width: $sidebar-width;
 		border-left: $border-width solid $light-gray-500;
 		transform: translateX(+100%);
-		animation: edit-post-layout__slide-in-animation 0.1s forwards;
+		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
+		@include reduce-motion;
 
 		body.is-fullscreen-mode & {
 			top: 0;
 		}
+
+		// Keep it open on focus to avoid conflict with navigate-regions animation.
+		.is-focusing-regions & {
+			transform: translateX(0%);
+		}
 	}
 }
 
-@keyframes edit-post-layout__slide-in-animation {
+@keyframes edit-post-post-publish-panel__slide-in-animation {
 	100% {
 		transform: translateX(0%);
 	}
@@ -202,28 +212,41 @@
 }
 
 .edit-post-toggle-publish-panel {
-	position: absolute;
-	bottom: 0;
+	position: fixed;
+	top: -9999em;
+	bottom: auto;
+	left: auto;
 	right: 0;
 	z-index: z-index(".edit-post-toggle-publish-panel");
+	padding: 10px 10px 10px 0;
 	width: $sidebar-width;
-	height: 0;
-	overflow: hidden;
-	&:focus-within {
-		height: auto;
-		padding: 20px 0 0 0;
+	background-color: $white;
+
+	&:focus {
+		top: auto;
+		bottom: 0;
 	}
 
 	.edit-post-toggle-publish-panel__button {
-		float: right;
 		width: auto;
 		height: auto;
+		display: block;
 		font-size: 14px;
 		font-weight: 600;
+		margin: 0 0 0 auto;
 		padding: 15px 23px 14px;
 		line-height: normal;
 		text-decoration: none;
 		outline: none;
 		background: #f1f1f1;
+		color: theme(secondary);
+
+		&:focus {
+			position: fixed;
+			top: auto;
+			right: 10px;
+			bottom: 10px;
+			left: auto;
+		}
 	}
 }

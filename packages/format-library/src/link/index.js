@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSpokenMessages } from '@wordpress/components';
 import {
 	getTextContent,
@@ -10,8 +10,8 @@ import {
 	removeFormat,
 	slice,
 } from '@wordpress/rich-text';
-import { isURL } from '@wordpress/url';
-import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/editor';
+import { isURL, isEmail } from '@wordpress/url';
+import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -19,10 +19,11 @@ import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/editor';
 import InlineLinkUI from './inline';
 
 const name = 'core/link';
+const title = __( 'Link' );
 
 export const link = {
 	name,
-	title: __( 'Link' ),
+	title,
 	tagName: 'a',
 	className: null,
 	attributes: {
@@ -47,6 +48,8 @@ export const link = {
 
 			if ( text && isURL( text ) ) {
 				onChange( applyFormat( value, { type: name, attributes: { url: text } } ) );
+			} else if ( text && isEmail( text ) ) {
+				onChange( applyFormat( value, { type: name, attributes: { url: `mailto:${ text }` } } ) );
 			} else {
 				this.setState( { addingLink: true } );
 			}
@@ -67,7 +70,7 @@ export const link = {
 			const { isActive, activeAttributes, value, onChange } = this.props;
 
 			return (
-				<Fragment>
+				<>
 					<RichTextShortcut
 						type="access"
 						character="a"
@@ -100,7 +103,7 @@ export const link = {
 					{ ! isActive && <RichTextToolbarButton
 						name="link"
 						icon="admin-links"
-						title={ __( 'Link' ) }
+						title={ title }
 						onClick={ this.addLink }
 						isActive={ isActive }
 						shortcutType="primary"
@@ -114,7 +117,7 @@ export const link = {
 						value={ value }
 						onChange={ onChange }
 					/>
-				</Fragment>
+				</>
 			);
 		}
 	} ),

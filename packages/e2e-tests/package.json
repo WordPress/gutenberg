@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/e2e-tests",
-	"version": "1.0.0-alpha.0",
+	"version": "1.2.1",
 	"description": "End-To-End (E2E) tests for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -12,20 +12,25 @@
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/e2e-tests/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git"
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/e2e-tests"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=8"
+	},
 	"dependencies": {
 		"@wordpress/e2e-test-utils": "file:../e2e-test-utils",
 		"@wordpress/jest-console": "file:../jest-console",
+		"@wordpress/jest-puppeteer-axe": "file:../jest-puppeteer-axe",
 		"@wordpress/scripts": "file:../scripts",
-		"expect-puppeteer": "^3.2.0",
-		"lodash": "^4.17.10"
+		"expect-puppeteer": "^4.0.0",
+		"lodash": "^4.17.11"
 	},
 	"peerDependencies": {
-		"jest": ">=23",
+		"jest": ">=24",
 		"puppeteer": ">=1.6"
 	},
 	"publishConfig": {

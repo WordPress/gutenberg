@@ -8,7 +8,7 @@ exports[`core/embed block edit matches snapshot 1`] = `
     class="components-placeholder__label"
   >
     <span
-      class="editor-block-icon has-colors"
+      class="editor-block-icon block-editor-block-icon has-colors"
     >
       <svg
         aria-hidden="true"

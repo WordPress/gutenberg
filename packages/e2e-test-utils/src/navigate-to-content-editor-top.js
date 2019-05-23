@@ -2,6 +2,9 @@
  * Navigate to the top of the content editor using the keyboard
  */
 
+/**
+ * Internal dependencies
+ */
 import { pressKeyWithModifier } from './press-key-with-modifier';
 
 export async function navigateToContentEditorTop() {

@@ -14,18 +14,14 @@ npm install @wordpress/jest-puppeteer-axe --save-dev
 
 ### Setup
 
-The simplest setup is to use Jest's `setupTestFrameworkScriptFile` config option:
+The simplest setup is to use Jest's `setupFilesAfterEnv` config option:
 
 ```js
 "jest": {
-  "setupTestFrameworkScriptFile": "./node_modules/@wordpress/jest-puppeteer-axe/build/index.js"
+  "setupFilesAfterEnv": [
+    "@wordpress/jest-puppeteer-axe"
+  ]
 },
-```
-
-If your project already has a script file which sets up the test framework, you will need the following import statement:
-
-```js
-import '@wordpress/jest-puppeteer-axe';
 ```
 
 ## Usage
@@ -42,8 +38,9 @@ test( 'checks the test page with Axe', async () => {
 ```
 
 It is also possible to pass optional Axe API options to perform customized check:
-- `include` - CSS selector to to add the list of elements to include in analysis.
-- `exclude` - CSS selector to to add the list of elements to exclude from analysis.
+- `include` - CSS selector(s) to to add the list of elements to include in analysis.
+- `exclude` - CSS selector(s) to to add the list of elements to exclude from analysis.
+- `disabledRules` - the list of [Axe rules](https://github.com/dequelabs/axe-core/blob/master/doc/rule-descriptions.md) to skip from verification.
 
 ```js
 test( 'checks the test component with Axe excluding some button', async () => {
@@ -54,6 +51,7 @@ test( 'checks the test component with Axe excluding some button', async () => {
 	await expect( page ).toPassAxeTests( {
 		include: '.test-component',
 		exclude: '.some-button',
+		disabledRules: [ 'aria-allowed-role' ],
 	} );
 } );
 ```

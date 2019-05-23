@@ -1,4 +1,6 @@
 .components-notice {
+	font-family: $default-font;
+	font-size: $default-font-size;
 	background-color: $blue-medium-100;
 	border-left: 4px solid $blue-medium-500;
 	margin: 5px 15px 2px;
@@ -33,6 +35,9 @@
 	&,
 	&.is-link {
 		margin-left: 4px;
+	}
+	&.is-default {
+		vertical-align: initial;
 	}
 }
 

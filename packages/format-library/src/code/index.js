@@ -3,24 +3,35 @@
  */
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextShortcut } from '@wordpress/editor';
+import { RichTextShortcut, RichTextToolbarButton } from '@wordpress/block-editor';
 
 const name = 'core/code';
+const title = __( 'Inline Code' );
 
 export const code = {
 	name,
-	title: __( 'Code' ),
+	title,
 	tagName: 'code',
 	className: null,
-	edit( { value, onChange } ) {
+	edit( { value, onChange, isActive } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
 
 		return (
-			<RichTextShortcut
-				type="access"
-				character="x"
-				onUse={ onToggle }
-			/>
+			<>
+				<RichTextShortcut
+					type="access"
+					character="x"
+					onUse={ onToggle }
+				/>
+				<RichTextToolbarButton
+					icon="editor-code"
+					title={ title }
+					onClick={ onToggle }
+					isActive={ isActive }
+					shortcutType="access"
+					shortcutCharacter="x"
+				/>
+			</>
 		);
 	},
 };

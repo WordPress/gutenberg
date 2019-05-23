@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import validateNamespace from './validateNamespace.js';
 import validateHookName from './validateHookName.js';
 import { doAction } from './';

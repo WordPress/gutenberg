@@ -14,11 +14,12 @@ import { DotTip } from '@wordpress/nux';
 /**
  * Internal dependencies
  */
-import MoreMenu from './more-menu';
+import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
+import MoreMenu from './more-menu';
 import PinnedPlugins from './pinned-plugins';
-import shortcuts from '../../keyboard-shortcuts';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
+import shortcuts from '../../keyboard-shortcuts';
 
 function Header( {
 	closeGeneralSidebar,
@@ -38,7 +39,10 @@ function Header( {
 			className="edit-post-header"
 			tabIndex="-1"
 		>
-			<HeaderToolbar />
+			<div className="edit-post-header__toolbar">
+				<FullscreenModeClose />
+				<HeaderToolbar />
+			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
@@ -69,7 +73,7 @@ function Header( {
 						shortcut={ shortcuts.toggleSidebar }
 					/>
 					<DotTip tipId="core/editor.settings">
-						{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
+						{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click the cog icon to toggle the sidebar open and closed.' ) }
 					</DotTip>
 				</div>
 				<PinnedPlugins.Slot />
@@ -87,7 +91,7 @@ export default compose(
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 	} ) ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
-		const { getBlockSelectionStart } = select( 'core/editor' );
+		const { getBlockSelectionStart } = select( 'core/block-editor' );
 		const { openGeneralSidebar, closeGeneralSidebar } = dispatch( 'core/edit-post' );
 
 		return {

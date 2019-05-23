@@ -10,10 +10,10 @@ import {
 	searchForBlock,
 } from '@wordpress/e2e-test-utils';
 
-const INSERTER_BUTTON_SELECTOR = '.components-popover__content .editor-block-types-list__item';
-const INSERTER_ICON_WRAPPER_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .editor-block-types-list__item-icon`;
-const INSERTER_ICON_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .editor-block-icon`;
-const INSPECTOR_ICON_SELECTOR = '.edit-post-sidebar .editor-block-icon';
+const INSERTER_BUTTON_SELECTOR = '.components-popover__content .block-editor-block-types-list__item';
+const INSERTER_ICON_WRAPPER_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .block-editor-block-types-list__item-icon`;
+const INSERTER_ICON_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .block-editor-block-icon`;
+const INSPECTOR_ICON_SELECTOR = '.edit-post-sidebar .block-editor-block-icon';
 
 async function getInnerHTML( selector ) {
 	return await page.$eval( selector, ( element ) => element.innerHTML );
@@ -37,7 +37,7 @@ async function getFirstInserterIcon() {
 
 async function selectFirstBlock() {
 	await pressKeyWithModifier( 'access', 'o' );
-	const navButtons = await page.$$( '.editor-block-navigation__item-button' );
+	const navButtons = await page.$$( '.block-editor-block-navigation__item-button' );
 	await navButtons[ 0 ].click();
 }
 

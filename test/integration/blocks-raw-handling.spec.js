@@ -36,6 +36,26 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should ignore Google Docs UID tag', () => {
+		const filtered = pasteHandler( {
+			HTML: '<b id="docs-internal-guid-0"><em>test</em></b>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<p><em>test</em></p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should ignore Google Docs UID tag in inline mode', () => {
+		const filtered = pasteHandler( {
+			HTML: '<b id="docs-internal-guid-0"><em>test</em></b>',
+			mode: 'INLINE',
+		} );
+
+		expect( filtered ).toBe( '<em>test</em>' );
+		expect( console ).toHaveLogged();
+	} );
+
 	it( 'should parse Markdown', () => {
 		const filtered = pasteHandler( {
 			HTML: '* one<br>* two<br>* three',
@@ -201,12 +221,23 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should paste gutenberg content from plain text', () => {
+		const block = '<!-- wp:latest-posts /-->';
+		expect( serialize( pasteHandler( {
+			plainText: block,
+			mode: 'AUTO',
+		} ) ) ).toBe( block );
+	} );
+
 	describe( 'pasteHandler', () => {
 		[
 			'plain',
 			'classic',
 			'apple',
 			'google-docs',
+			'google-docs-table',
+			'google-docs-table-with-comments',
+			'google-docs-with-comments',
 			'ms-word',
 			'ms-word-styled',
 			'ms-word-online',

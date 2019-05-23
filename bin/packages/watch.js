@@ -2,7 +2,8 @@
  * External dependencies
  */
 const fs = require( 'fs' );
-const { execSync } = require( 'child_process' );
+const watch = require( 'node-watch' );
+const { spawn } = require( 'child_process' );
 const path = require( 'path' );
 const chalk = require( 'chalk' );
 
@@ -11,7 +12,7 @@ const chalk = require( 'chalk' );
  */
 const getPackages = require( './get-packages' );
 
-const BUILD_CMD = `node ${ path.resolve( __dirname, './build.js' ) }`;
+const BUILD_SCRIPT = path.resolve( __dirname, './build.js' );
 
 let filesToBuild = new Map();
 
@@ -22,9 +23,11 @@ const exists = ( filename ) => {
 	return false;
 };
 
-// Exclude deceitful source-like files, such as editor swap files.
+// Exclude test files including .js files inside of __tests__ or test folders
+// and files with a suffix of .test or .spec (e.g. blocks.test.js),
+// and deceitful source-like files, such as editor swap files.
 const isSourceFile = ( filename ) => {
-	return /.\.(js|scss)$/.test( filename );
+	return ! [ /\/(__tests__|test)\/.+.js$/, /.\.(spec|test)\.js$/ ].some( ( regex ) => regex.test( filename ) ) && /.\.(js|json|scss)$/.test( filename );
 };
 
 const rebuild = ( filename ) => filesToBuild.set( filename, true );
@@ -33,13 +36,13 @@ getPackages().forEach( ( p ) => {
 	const srcDir = path.resolve( p, 'src' );
 	try {
 		fs.accessSync( srcDir, fs.F_OK );
-		fs.watch( path.resolve( p, 'src' ), { recursive: true }, ( event, filename ) => {
+		watch( path.resolve( p, 'src' ), { recursive: true }, ( event, filename ) => {
 			if ( ! isSourceFile( filename ) ) {
 				return;
 			}
 
 			const filePath = path.resolve( srcDir, filename );
-			if ( ( event === 'change' || event === 'rename' ) && exists( filePath ) ) {
+			if ( ( event === 'update' ) && exists( filePath ) ) {
 				// eslint-disable-next-line no-console
 				console.log( chalk.green( '->' ), `${ event }: ${ filename }` );
 				rebuild( filePath );
@@ -66,7 +69,7 @@ setInterval( () => {
 	if ( files.length ) {
 		filesToBuild = new Map();
 		try {
-			execSync( `${ BUILD_CMD } ${ files.join( ' ' ) }`, { stdio: [ 0, 1, 2 ] } );
+			spawn( 'node', [ BUILD_SCRIPT, ...files ], { stdio: [ 0, 1, 2 ] } );
 		} catch ( e ) {}
 	}
 }, 100 );

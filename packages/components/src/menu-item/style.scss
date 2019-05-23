@@ -1,7 +1,7 @@
 .components-menu-item__button,
 .components-menu-item__button.components-icon-button {
 	width: 100%;
-	padding: 8px;
+	padding: $grid-size ($grid-size-large - $border-width);
 	text-align: left;
 	color: $dark-gray-600;
 
@@ -24,6 +24,10 @@
 		@include break-medium() {
 			@include menu-style__hover;
 		}
+
+		.components-menu-item__shortcut {
+			opacity: 1;
+		}
 	}
 
 	&:focus:not(:disabled):not([aria-disabled="true"]) {
@@ -39,15 +43,15 @@
 .components-menu-item__info {
 	margin-top: $grid-size-small;
 	font-size: $default-font-size - 1px;
-	opacity: 0.82;
+	opacity: 0.84;
 }
 
 .components-menu-item__shortcut {
 	align-self: center;
-	opacity: 0.5;
+	opacity: 0.84;
 	margin-right: 0;
 	margin-left: auto;
-	padding-left: 8px;
+	padding-left: $grid-size;
 
 	// Hide the keyboard shortcuts on mobile, because they aren't super-useful
 	// for most mobile users and it frees up screen space for any item

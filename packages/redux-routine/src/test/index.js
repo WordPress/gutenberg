@@ -143,4 +143,21 @@ describe( 'createMiddleware', () => {
 
 		expect( store.getState() ).toBe( 2 );
 	} );
+
+	it( 'does not recurse when action like object returns from a sync ' +
+		'control', () => {
+		const post = { type: 'post' };
+		const middleware = createMiddleware( {
+			UPDATE: () => post,
+		} );
+		const store = createStoreWithMiddleware( middleware );
+		function* getPostAction() {
+			const nextState = yield { type: 'UPDATE' };
+			return { type: 'CHANGE', nextState };
+		}
+
+		store.dispatch( getPostAction() );
+
+		expect( store.getState() ).toEqual( post );
+	} );
 } );

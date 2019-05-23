@@ -12,6 +12,9 @@ import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
 import FlatTermSelector from '../post-taxonomies/flat-term-selector';
 
 const TagsPanel = () => {

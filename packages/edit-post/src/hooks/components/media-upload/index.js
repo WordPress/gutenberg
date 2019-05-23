@@ -1,5 +1,5 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import { castArray, defaults, pick } from 'lodash';
 
@@ -16,7 +16,7 @@ const getGalleryDetailsMediaFrame = () => {
 	/**
 	 * Custom gallery details frame.
 	 *
-	 * @link https://github.com/xwp/wp-core-media-widgets/blob/905edbccfc2a623b73a93dac803c5335519d7837/wp-admin/js/widgets/media-gallery-widget.js
+	 * @see https://github.com/xwp/wp-core-media-widgets/blob/905edbccfc2a623b73a93dac803c5335519d7837/wp-admin/js/widgets/media-gallery-widget.js
 	 * @class GalleryDetailsMediaFrame
 	 * @constructor
 	 */
@@ -78,11 +78,10 @@ const getAttachmentsCollection = ( ids ) => {
 class MediaUpload extends Component {
 	constructor( {
 		allowedTypes,
-		multiple = false,
 		gallery = false,
-		title = __( 'Select or Upload Media' ),
 		modalClass,
-		value,
+		multiple = false,
+		title = __( 'Select or Upload Media' ),
 	} ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
@@ -92,21 +91,7 @@ class MediaUpload extends Component {
 		this.onClose = this.onClose.bind( this );
 
 		if ( gallery ) {
-			const currentState = value ? 'gallery-edit' : 'gallery';
-			const GalleryDetailsMediaFrame = getGalleryDetailsMediaFrame();
-			const attachments = getAttachmentsCollection( value );
-			const selection = new wp.media.model.Selection( attachments.models, {
-				props: attachments.props.toJSON(),
-				multiple,
-			} );
-			this.frame = new GalleryDetailsMediaFrame( {
-				mimeType: allowedTypes,
-				state: currentState,
-				multiple,
-				selection,
-				editing: ( value ) ? true : false,
-			} );
-			wp.media.frame = this.frame;
+			this.buildAndSetGalleryFrame();
 		} else {
 			const frameConfig = {
 				title,
@@ -126,11 +111,60 @@ class MediaUpload extends Component {
 			this.frame.$el.addClass( modalClass );
 		}
 
+		this.initializeListeners();
+	}
+
+	initializeListeners() {
 		// When an image is selected in the media frame...
 		this.frame.on( 'select', this.onSelect );
 		this.frame.on( 'update', this.onUpdate );
 		this.frame.on( 'open', this.onOpen );
 		this.frame.on( 'close', this.onClose );
+	}
+
+	buildAndSetGalleryFrame() {
+		const {
+			addToGallery = false,
+			allowedTypes,
+			multiple = false,
+			value = null,
+		} = this.props;
+		// If the value did not changed there is no need to rebuild the frame,
+		// we can continue to use the existing one.
+		if ( value === this.lastGalleryValue ) {
+			return;
+		}
+
+		this.lastGalleryValue = value;
+
+		// If a frame already existed remove it.
+		if ( this.frame ) {
+			this.frame.remove();
+		}
+		let currentState;
+		if ( addToGallery ) {
+			currentState = 'gallery-library';
+		} else {
+			currentState = value ? 'gallery-edit' : 'gallery';
+		}
+		if ( ! this.GalleryDetailsMediaFrame ) {
+			this.GalleryDetailsMediaFrame = getGalleryDetailsMediaFrame();
+		}
+
+		const attachments = getAttachmentsCollection( value );
+		const selection = new wp.media.model.Selection( attachments.models, {
+			props: attachments.props.toJSON(),
+			multiple,
+		} );
+		this.frame = new this.GalleryDetailsMediaFrame( {
+			mimeType: allowedTypes,
+			state: currentState,
+			multiple,
+			selection,
+			editing: ( value ) ? true : false,
+		} );
+		wp.media.frame = this.frame;
+		this.initializeListeners();
 	}
 
 	componentWillUnmount() {
@@ -172,10 +206,11 @@ class MediaUpload extends Component {
 		}
 		if ( ! this.props.gallery ) {
 			const selection = this.frame.state().get( 'selection' );
-			castArray( this.props.value ).map( ( id ) => {
+			castArray( this.props.value ).forEach( ( id ) => {
 				selection.add( wp.media.attachment( id ) );
 			} );
 		}
+
 		// load the images so they are available in the media modal.
 		getAttachmentsCollection( castArray( this.props.value ) ).more();
 	}
@@ -205,6 +240,13 @@ class MediaUpload extends Component {
 	}
 
 	openModal() {
+		if (
+			this.props.gallery &&
+			this.props.value &&
+			this.props.value.length > 0
+		) {
+			this.buildAndSetGalleryFrame();
+		}
 		this.frame.open();
 	}
 

@@ -75,7 +75,7 @@ Here, every line has different phrasing (some start with a verb, some with a nou
 
 Reading this list takes more work because the reader has to parse each bullet anew. They can’t assume each bullet will contain similar information.
 
-Note: this doesn't mean every bullet has to be super short and start with an action verb! “Predicable” doesn’t have to mean “simple.” It just means that each bullet should have the same sentence structure. This list would also be fine:
+Note: this doesn't mean every bullet has to be super short and start with an action verb! “Predictable” doesn’t have to mean “simple.” It just means that each bullet should have the same sentence structure. This list would also be fine:
 
 > What can you do with this block? Lots of things!
 > * Try adding a quote. Sometimes someone else said things best!

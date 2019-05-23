@@ -1,4 +1,4 @@
-.editor-block-list__block[data-type="core/table"] {
+.block-editor-block-list__block[data-type="core/table"] {
 	&[data-align="left"],
 	&[data-align="right"],
 	&[data-align="center"] {
@@ -27,7 +27,7 @@
 	td,
 	th {
 		padding: 0;
-		border: $border-width solid $black;
+		border: $border-width solid;
 	}
 
 	td.is-selected,

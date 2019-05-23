@@ -145,7 +145,7 @@ class TimePicker extends Component {
 		const { onChange } = this.props;
 		const { year, date } = this.state;
 		const value = parseInt( year, 10 );
-		if ( ! isInteger( value ) || value < 1970 || value > 9999 ) {
+		if ( ! isInteger( value ) || value < 0 || value > 9999 ) {
 			this.syncState( this.props );
 			return;
 		}
@@ -189,7 +189,10 @@ class TimePicker extends Component {
 	}
 
 	onChangeMinutes( event ) {
-		this.setState( { minutes: event.target.value } );
+		const minutes = event.target.value;
+		this.setState( {
+			minutes: ( minutes === '' ) ? '' : ( '0' + minutes ).slice( -2 ),
+		} );
 	}
 
 	renderMonth( month ) {

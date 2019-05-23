@@ -68,7 +68,7 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	describe( 'can be converted to paragraphs', async () => {
+	describe( 'can be converted to paragraphs', () => {
 		it( 'and renders one paragraph block per <p> within quote', async () => {
 			await insertBlock( 'Quote' );
 			await page.keyboard.type( 'one' );
@@ -116,7 +116,40 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'can be converted to headings', async () => {
+	it( 'is transformed to an empty heading if the quote is empty', async () => {
+		await insertBlock( 'Quote' );
+		await transformBlockTo( 'Heading' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'is transformed to a heading if the quote just contains one paragraph', async () => {
+		await insertBlock( 'Quote' );
+		await page.keyboard.type( 'one' );
+		await transformBlockTo( 'Heading' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'is transformed to a heading and a quote if the quote contains multiple paragraphs', async () => {
+		await insertBlock( 'Quote' );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'three' );
+		await transformBlockTo( 'Heading' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'is transformed to a heading and a quote if the quote contains a citation', async () => {
+		await insertBlock( 'Quote' );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( 'cite' );
+		await transformBlockTo( 'Heading' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'the resuling quote after transforming to a heading can be transformed again', async () => {
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );

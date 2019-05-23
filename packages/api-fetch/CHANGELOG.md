@@ -1,7 +1,12 @@
-## 2.3.0 (Unreleased)
+## 3.0.0 (2019-03-06)
+
+### Breaking Changes
+
+- A created nonce middleware will no longer automatically listen for `heartbeat.tick` actions. Assign to the new `nonce` middleware property instead.
 
 ### New Feature
 
+- The function returned by `createNonceMiddleware` includes an assignable `nonce` property corresponding to the active nonce to be used.
 - Default fetch handler can be overridden with a custom fetch handler
 
 ## 2.2.6 (2018-12-12)

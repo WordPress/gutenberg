@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import createAddHook from './createAddHook';
 import createRemoveHook from './createRemoveHook';
 import createHasHook from './createHasHook';

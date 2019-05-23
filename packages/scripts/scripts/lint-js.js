@@ -26,8 +26,11 @@ const hasLintConfig = hasCliArg( '-c' ) ||
 	hasProjectFile( '.eslintrc' ) ||
 	hasPackageProp( 'eslintConfig' );
 
+// When a configuration is not provided by the project, use from the default
+// provided with the scripts module. Instruct ESLint to avoid discovering via
+// the `--no-eslintrc` flag, as otherwise it will still merge with inherited.
 const config = ! hasLintConfig ?
-	[ '--config', fromConfigRoot( '.eslintrc.js' ) ] :
+	[ '--no-eslintrc', '--config', fromConfigRoot( '.eslintrc.js' ) ] :
 	[];
 
 const result = spawn(

@@ -121,9 +121,13 @@ class PostLockedModal extends Component {
 		data.append( 'post_ID', postId );
 		data.append( 'active_post_lock', activePostLock );
 
-		const xhr = new window.XMLHttpRequest();
-		xhr.open( 'POST', postLockUtils.ajaxUrl, false );
-		xhr.send( data );
+		if ( window.navigator.sendBeacon ) {
+			window.navigator.sendBeacon( postLockUtils.ajaxUrl, data );
+		} else {
+			const xhr = new window.XMLHttpRequest();
+			xhr.open( 'POST', postLockUtils.ajaxUrl, false );
+			xhr.send( data );
+		}
 	}
 
 	render() {
@@ -145,7 +149,7 @@ class PostLockedModal extends Component {
 		const allPostsUrl = getWPAdminURL( 'edit.php', {
 			post_type: get( postType, [ 'slug' ] ),
 		} );
-		const allPostsLabel = get( postType, [ 'labels', 'all_items' ] );
+		const allPostsLabel = __( 'Exit the Editor' );
 		return (
 			<Modal
 				title={ isTakeover ? __( 'Someone else has taken over this post.' ) : __( 'This post is already being edited.' ) }
@@ -214,13 +218,13 @@ class PostLockedModal extends Component {
 export default compose(
 	withSelect( ( select ) => {
 		const {
-			getEditorSettings,
 			isPostLocked,
 			isPostLockTakeover,
 			getPostLockUser,
 			getCurrentPostId,
 			getActivePostLock,
 			getEditedPostAttribute,
+			getEditorSettings,
 		} = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 		return {

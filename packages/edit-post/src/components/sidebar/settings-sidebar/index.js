@@ -4,11 +4,10 @@
 import { Panel, PanelBody } from '@wordpress/components';
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { BlockInspector } from '@wordpress/editor';
-import { Fragment } from '@wordpress/element';
+import { BlockInspector } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import Sidebar from '../';
 import SettingsHeader from '../settings-header';
@@ -30,7 +29,7 @@ const SettingsSidebar = ( { sidebarName } ) => (
 		<SettingsHeader sidebarName={ sidebarName } />
 		<Panel>
 			{ sidebarName === 'edit-post/document' && (
-				<Fragment>
+				<>
 					<PostStatus />
 					<LastRevision />
 					<PostLink />
@@ -40,7 +39,7 @@ const SettingsSidebar = ( { sidebarName } ) => (
 					<DiscussionPanel />
 					<PageAttributes />
 					<MetaBoxes location="side" />
-				</Fragment>
+				</>
 			) }
 			{ sidebarName === 'edit-post/block' && (
 				<PanelBody className="edit-post-settings-sidebar__panel-block">

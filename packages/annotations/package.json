@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/annotations",
-	"version": "1.0.6",
+	"version": "1.3.0",
 	"description": "Annotate content in the Gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -11,7 +11,8 @@
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/annotations/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress/gutenberg.git"
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/annotations"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -20,13 +21,12 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0",
+		"@babel/runtime": "^7.4.4",
 		"@wordpress/data": "file:../data",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/rich-text": "file:../rich-text",
-		"lodash": "^4.17.10",
-		"memize": "^1.0.5",
+		"lodash": "^4.17.11",
 		"rememo": "^3.0.0",
 		"uuid": "^3.3.2"
 	},

@@ -1,10 +1,10 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import { get } from 'lodash';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
 import { IconButton, Toolbar } from '@wordpress/components';
@@ -19,12 +19,12 @@ function FullscreenModeClose( { isActive, postType } ) {
 	return (
 		<Toolbar className="edit-post-fullscreen-mode-close__toolbar">
 			<IconButton
-				icon="exit"
+				icon="arrow-left-alt2"
 				href={ addQueryArgs( 'edit.php', { post_type: postType.slug } ) }
 				label={ get(
 					postType,
 					[ 'labels', 'view_items' ],
-					__( 'View Posts' )
+					__( 'Back' )
 				) }
 			/>
 		</Toolbar>

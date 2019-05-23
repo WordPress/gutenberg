@@ -7,9 +7,9 @@ import { select } from '@wordpress/data';
  * Internal dependencies
  */
 
-import { isEmpty } from './is-empty';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
+import { mergePair } from './concat';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
@@ -22,7 +22,11 @@ import {
 const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 function createEmptyValue() {
-	return { formats: [], text: '' };
+	return {
+		formats: [],
+		replacements: [],
+		text: '',
+	};
 }
 
 function simpleFindKey( object, value ) {
@@ -57,6 +61,13 @@ function toFormat( { type, attributes } ) {
 		return attributes ? { type, attributes } : { type };
 	}
 
+	if (
+		formatType.__experimentalCreatePrepareEditableTree &&
+		! formatType.__experimentalCreateOnChangeEditableValue
+	) {
+		return null;
+	}
+
 	if ( ! attributes ) {
 		return { type: formatType.name };
 	}
@@ -89,23 +100,35 @@ function toFormat( { type, attributes } ) {
  * `multilineTag` will be separated by two newlines. The optional functions can
  * be used to filter out content.
  *
- * @param {?Object}   $1                      Optional named argements.
- * @param {?Element}  $1.element              Element to create value from.
- * @param {?string}   $1.text                 Text to create value from.
- * @param {?string}   $1.html                 HTML to create value from.
- * @param {?Range}    $1.range                Range to create value from.
- * @param {?string}   $1.multilineTag         Multiline tag if the structure is
+ * A value will have the following shape, which you are strongly encouraged not
+ * to modify without the use of helper functions:
+ *
+ * ```js
+ * {
+ *   text: string,
+ *   formats: Array,
+ *   replacements: Array,
+ *   ?start: number,
+ *   ?end: number,
+ * }
+ * ```
+ *
+ * As you can see, text and formatting are separated. `text` holds the text,
+ * including any replacement characters for objects and lines. `formats`,
+ * `objects` and `lines` are all sparse arrays of the same length as `text`. It
+ * holds information about the formatting at the relevant text indices. Finally
+ * `start` and `end` state which text indices are selected. They are only
+ * provided if a `Range` was given.
+ *
+ * @param {Object}  [$1]                      Optional named arguments.
+ * @param {Element} [$1.element]              Element to create value from.
+ * @param {string}  [$1.text]                 Text to create value from.
+ * @param {string}  [$1.html]                 HTML to create value from.
+ * @param {Range}   [$1.range]                Range to create value from.
+ * @param {string}  [$1.multilineTag]         Multiline tag if the structure is
  *                                            multiline.
- * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
+ * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
  *                                            nesting is possible.
- * @param {?Function} $1.removeNode           Function to declare whether the
- *                                            given node should be removed.
- * @param {?Function} $1.unwrapNode           Function to declare whether the
- *                                            given node should be unwrapped.
- * @param {?Function} $1.filterString         Function to filter the given
- *                                            string.
- * @param {?Function} $1.removeAttribute      Wether to remove an attribute
- *                                            based on the name.
  *
  * @return {Object} A rich text value.
  */
@@ -116,14 +139,12 @@ export function create( {
 	range,
 	multilineTag,
 	multilineWrapperTags,
-	removeNode,
-	unwrapNode,
-	filterString,
-	removeAttribute,
+	__unstableIsEditableTree: isEditableTree,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
 			formats: Array( text.length ),
+			replacements: Array( text.length ),
 			text,
 		};
 	}
@@ -140,10 +161,7 @@ export function create( {
 		return createFromElement( {
 			element,
 			range,
-			removeNode,
-			unwrapNode,
-			filterString,
-			removeAttribute,
+			isEditableTree,
 		} );
 	}
 
@@ -152,10 +170,7 @@ export function create( {
 		range,
 		multilineTag,
 		multilineWrapperTags,
-		removeNode,
-		unwrapNode,
-		filterString,
-		removeAttribute,
+		isEditableTree,
 	} );
 }
 
@@ -252,6 +267,12 @@ function filterRange( node, range, filter ) {
 	return { startContainer, startOffset, endContainer, endOffset };
 }
 
+function filterString( string ) {
+	// Reduce any whitespace used for HTML formatting to one space
+	// character, because it will also be displayed as such by the browser.
+	return string.replace( /[\n\r\t]+/g, ' ' );
+}
+
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
@@ -262,14 +283,6 @@ function filterRange( node, range, filter ) {
  *                                            multiline.
  * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
  *                                            nesting is possible.
- * @param {?Function} $1.removeNode           Function to declare whether the
- *                                            given node should be removed.
- * @param {?Function} $1.unwrapNode           Function to declare whether the
- *                                            given node should be unwrapped.
- * @param {?Function} $1.filterString         Function to filter the given
- *                                            string.
- * @param {?Function} $1.removeAttribute      Wether to remove an attribute
- *                                            based on the name.
  *
  * @return {Object} A rich text value.
  */
@@ -279,10 +292,7 @@ function createFromElement( {
 	multilineTag,
 	multilineWrapperTags,
 	currentWrapperTags = [],
-	removeNode,
-	unwrapNode,
-	filterString,
-	removeAttribute,
+	isEditableTree,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -297,31 +307,20 @@ function createFromElement( {
 
 	const length = element.childNodes.length;
 
-	const filterStringComplete = ( string ) => {
-		// Reduce any whitespace used for HTML formatting to one space
-		// character, because it will also be displayed as such by the browser.
-		string = string.replace( /[\n\r\t]+/g, ' ' );
-
-		if ( filterString ) {
-			string = filterString( string );
-		}
-
-		return string;
-	};
-
 	// Optimise for speed.
 	for ( let index = 0; index < length; index++ ) {
 		const node = element.childNodes[ index ];
 		const type = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === TEXT_NODE ) {
-			const text = filterStringComplete( node.nodeValue );
-			range = filterRange( node, range, filterStringComplete );
+			const text = filterString( node.nodeValue );
+			range = filterRange( node, range, filterString );
 			accumulateSelection( accumulator, node, range, { text } );
-			accumulator.text += text;
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
 			accumulator.formats.length += text.length;
+			accumulator.replacements.length += text.length;
+			accumulator.text += text;
 			continue;
 		}
 
@@ -330,8 +329,8 @@ function createFromElement( {
 		}
 
 		if (
-			( removeNode && removeNode( node ) ) ||
-			( unwrapNode && unwrapNode( node ) && ! node.hasChildNodes() )
+			node.getAttribute( 'data-rich-text-padding' ) ||
+			( isEditableTree && type === 'br' && ! node.getAttribute( 'data-rich-text-line-break' ) )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
@@ -339,108 +338,60 @@ function createFromElement( {
 
 		if ( type === 'br' ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
-			accumulator.text += '\n';
-			accumulator.formats.length += 1;
+			mergePair( accumulator, create( { text: '\n' } ) );
 			continue;
 		}
 
 		const lastFormats = accumulator.formats[ accumulator.formats.length - 1 ];
 		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
-		let format;
-		let value;
-
-		if ( ! unwrapNode || ! unwrapNode( node ) ) {
-			const newFormat = toFormat( {
-				type,
-				attributes: getAttributes( {
-					element: node,
-					removeAttribute,
-				} ),
-			} );
-
-			if ( newFormat ) {
-				// Reuse the last format if it's equal.
-				if ( isFormatEqual( newFormat, lastFormat ) ) {
-					format = lastFormat;
-				} else {
-					format = newFormat;
-				}
-			}
-		}
+		const newFormat = toFormat( {
+			type,
+			attributes: getAttributes( { element: node } ),
+		} );
+		const format = isFormatEqual( newFormat, lastFormat ) ? lastFormat : newFormat;
 
 		if ( multilineWrapperTags && multilineWrapperTags.indexOf( type ) !== -1 ) {
-			value = createFromMultilineElement( {
+			const value = createFromMultilineElement( {
 				element: node,
 				range,
 				multilineTag,
 				multilineWrapperTags,
-				removeNode,
-				unwrapNode,
-				filterString,
-				removeAttribute,
 				currentWrapperTags: [ ...currentWrapperTags, format ],
+				isEditableTree,
 			} );
-			format = undefined;
-		} else {
-			value = createFromElement( {
-				element: node,
-				range,
-				multilineTag,
-				multilineWrapperTags,
-				removeNode,
-				unwrapNode,
-				filterString,
-				removeAttribute,
-			} );
-		}
 
-		const text = value.text;
-		const start = accumulator.text.length;
-
-		accumulateSelection( accumulator, node, range, value );
-
-		// Don't apply the element as formatting if it has no content.
-		if ( isEmpty( value ) && format && ! format.attributes ) {
+			accumulateSelection( accumulator, node, range, value );
+			mergePair( accumulator, value );
 			continue;
 		}
 
-		const { formats } = accumulator;
+		const value = createFromElement( {
+			element: node,
+			range,
+			multilineTag,
+			multilineWrapperTags,
+			isEditableTree,
+		} );
 
-		if ( format && format.attributes && text.length === 0 ) {
-			format.object = true;
-			accumulator.text += OBJECT_REPLACEMENT_CHARACTER;
+		accumulateSelection( accumulator, node, range, value );
 
-			if ( formats[ start ] ) {
-				formats[ start ].unshift( format );
-			} else {
-				formats[ start ] = [ format ];
+		if ( ! format ) {
+			mergePair( accumulator, value );
+		} else if ( value.text.length === 0 ) {
+			if ( format.attributes ) {
+				mergePair( accumulator, {
+					formats: [ , ],
+					replacements: [ format ],
+					text: OBJECT_REPLACEMENT_CHARACTER,
+				} );
 			}
 		} else {
-			accumulator.text += text;
-			accumulator.formats.length += text.length;
-
-			let i = value.formats.length;
-
-			// Optimise for speed.
-			while ( i-- ) {
-				const formatIndex = start + i;
-
-				if ( format ) {
-					if ( formats[ formatIndex ] ) {
-						formats[ formatIndex ].push( format );
-					} else {
-						formats[ formatIndex ] = [ format ];
-					}
-				}
-
-				if ( value.formats[ i ] ) {
-					if ( formats[ formatIndex ] ) {
-						formats[ formatIndex ].push( ...value.formats[ i ] );
-					} else {
-						formats[ formatIndex ] = value.formats[ i ];
-					}
-				}
-			}
+			mergePair( accumulator, {
+				...value,
+				formats: Array.from( value.formats, ( formats ) =>
+					formats ? [ format, ...formats ] : [ format ]
+				),
+			} );
 		}
 	}
 
@@ -458,14 +409,6 @@ function createFromElement( {
  *                                            multiline.
  * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
  *                                            nesting is possible.
- * @param {?Function} $1.removeNode           Function to declare whether the
- *                                            given node should be removed.
- * @param {?Function} $1.unwrapNode           Function to declare whether the
- *                                            given node should be unwrapped.
- * @param {?Function} $1.filterString         Function to filter the given
- *                                            string.
- * @param {?Function} $1.removeAttribute      Wether to remove an attribute
- *                                            based on the name.
  * @param {boolean}   $1.currentWrapperTags   Whether to prepend a line
  *                                            separator.
  *
@@ -476,11 +419,8 @@ function createFromMultilineElement( {
 	range,
 	multilineTag,
 	multilineWrapperTags,
-	removeNode,
-	unwrapNode,
-	filterString,
-	removeAttribute,
 	currentWrapperTags = [],
+	isEditableTree,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -498,46 +438,26 @@ function createFromMultilineElement( {
 			continue;
 		}
 
-		let value = createFromElement( {
+		const value = createFromElement( {
 			element: node,
 			range,
 			multilineTag,
 			multilineWrapperTags,
 			currentWrapperTags,
-			removeNode,
-			unwrapNode,
-			filterString,
-			removeAttribute,
+			isEditableTree,
 		} );
 
-		// If a line consists of one single line break (invisible), consider the
-		// line empty, wether this is the browser's doing or not.
-		if ( value.text === '\n' ) {
-			const start = value.start;
-			const end = value.end;
-
-			value = createEmptyValue();
-
-			if ( start !== undefined ) {
-				value.start = 0;
-			}
-
-			if ( end !== undefined ) {
-				value.end = 0;
-			}
-		}
-
-		// Multiline value text should be separated by a double line break.
+		// Multiline value text should be separated by a line separator.
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
-			const formats = currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ];
-			accumulator.formats = accumulator.formats.concat( formats );
-			accumulator.text += LINE_SEPARATOR;
+			mergePair( accumulator, {
+				formats: [ , ],
+				replacements: currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ],
+				text: LINE_SEPARATOR,
+			} );
 		}
 
 		accumulateSelection( accumulator, node, range, value );
-
-		accumulator.formats = accumulator.formats.concat( value.formats );
-		accumulator.text += value.text;
+		mergePair( accumulator, value );
 	}
 
 	return accumulator;
@@ -548,16 +468,11 @@ function createFromMultilineElement( {
  *
  * @param {Object}    $1                 Named argements.
  * @param {Element}   $1.element         Element to get attributes from.
- * @param {?Function} $1.removeAttribute Wether to remove an attribute based on
- *                                       the name.
  *
  * @return {?Object} Attribute object or `undefined` if the element has no
  *                   attributes.
  */
-function getAttributes( {
-	element,
-	removeAttribute,
-} ) {
+function getAttributes( { element } ) {
 	if ( ! element.hasAttributes() ) {
 		return;
 	}
@@ -569,7 +484,7 @@ function getAttributes( {
 	for ( let i = 0; i < length; i++ ) {
 		const { name, value } = element.attributes[ i ];
 
-		if ( removeAttribute && removeAttribute( name ) ) {
+		if ( name.indexOf( 'data-rich-text-' ) === 0 ) {
 			continue;
 		}
 

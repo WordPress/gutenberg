@@ -1,6 +1,4 @@
 .wp-block-freeform.block-library-rich-text__tinymce {
-	overflow: hidden;
-
 	p,
 	li {
 		line-height: $editor-line-height;
@@ -24,30 +22,6 @@
 		font-family: $editor-html-font;
 		font-size: $text-editor-font-size;
 		color: $dark-gray-800;
-	}
-
-	h1 {
-		font-size: 2em;
-	}
-
-	h2 {
-		font-size: 1.6em;
-	}
-
-	h3 {
-		font-size: 1.4em;
-	}
-
-	h4 {
-		font-size: 1.2em;
-	}
-
-	h5 {
-		font-size: 1.1em;
-	}
-
-	h6 {
-		font-size: 1em;
 	}
 
 	> *:first-child {
@@ -109,23 +83,111 @@
 
 	.wp-more-tag {
 		width: 96%;
-		height: 0;
+		height: 20px;
 		display: block;
 		margin: 15px auto;
 		outline: 0;
 		cursor: default;
-		border: 2px dashed rgb(186, 186, 186);
+		background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAADtgAAAAoBAMAAAA86gLBAAAAJFBMVEVMaXG7u7vBwcHDw8POzs68vLzGxsbMzMy+vr7AwMDQ0NDGxsYKLGzpAAAADHRSTlMA///zWf+/f///TMxNVGuqAAABwklEQVR4Ae3dMXLaQBTH4bfj8UCpx8hq0vgKvgFNemhT6Qo6gg6R+0ZahM2QLmyBJ99XWP9V5+o3jIUcLQEAAAAAAAAAAAAAAAAAAAAAAABQ8j0WL9lfTtlt18uNXAUA8O/KVtfa1tdcrOdSh9gCQAMlh1hMNbZZ1bsrsQWABsrhLRbz7z5in/32UbfUMUbkMQCAh5RfGYv82UdMdZ6HS2wjT2ILAI8r3XmM2B3WvM59vfO2xXYW2yYAENuPU8S+X/N67mKxzy225yaxBQCxLV392UdcvwV0jPVUj98ntkBWT7C7+9u2/V/vGtvXIWJ6/4rtbottWa6Ri0NUT/u72LYttrb97LHdvUXMxxrb8TO2W2TF1rYbbLG1bbGNjMi4+2Sbi1FsbbvNFlvbFtt5fDnE3d9sP1/XeIyV2Nr2U2/guZUuptNrH/dPI9eLB6SaAEBs6wPJf3/PNk9tYgsAYrv/8TFuzx/fvkFqGtrEFgDEdpcZUb7ejXy6ntrEFgDENvL6gsas4vbdyKt4DACI7TxElJv/Z7udpqFNbAFAbKduy2uU2trttM/x28UWAAAAAAAAAAAAAAAAAAAAAAAAAADgDyPwGmGTCZp7AAAAAElFTkSuQmCC);
+		background-size: 1900px 20px;
+		background-repeat: no-repeat;
+		background-position: center;
 	}
 
-	/**
-	* The following gallery styles were replicated
-	* from the styles applied in the tinymce skin,
-	* /wp-includes/js/tinymce/skins/wordpress/wp-content.css.
-	*/
-	.wpview-type-gallery::after {
-		content: "";
-		display: table;
+	/* Remove blue highlighting of selected images in WebKit */
+	img::selection {
+		background-color: transparent;
+	}
+
+	div.mceTemp {
+		-ms-user-select: element;
+	}
+
+	/* Image captions */
+	dl.wp-caption {
+		margin: 0; /* dl browser reset */
+		max-width: 100%;
+
+		a,
+		img {
+			display: block;
+		}
+
+		&,
+		& * {
+			-webkit-user-drag: none;
+		}
+
+		.wp-caption-dd {
+			padding-top: 0.5em;
+			margin: 0; /* browser dd reset */
+		}
+	}
+
+	/* WP Views */
+	.wpview {
+		width: 99.99%; /* All IE need hasLayout, incl. 11 (ugh, not again!!) */
+		position: relative;
 		clear: both;
+		margin-bottom: 16px;
+		border: 1px solid transparent;
+
+		iframe {
+			display: block;
+			max-width: 100%;
+			background: transparent;
+		}
+
+		.mce-shim {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+		}
+
+		&[data-mce-selected="2"] .mce-shim {
+			display: none;
+		}
+
+		.loading-placeholder {
+			border: 1px dashed $light-gray-400;
+			padding: 10px;
+		}
+
+		.wpview-error {
+			border: 1px solid $light-gray-400;
+			padding: 1em 0;
+			margin: 0;
+			word-wrap: break-word;
+
+			p {
+				margin: 0;
+				text-align: center;
+			}
+		}
+
+		&[data-mce-selected] .loading-placeholder,
+		&[data-mce-selected] .wpview-error {
+			border-color: transparent;
+		}
+
+		.dashicons {
+			display: block;
+			margin: 0 auto;
+			width: 32px;
+			height: 32px;
+			font-size: 32px;
+		}
+
+		// The following gallery styles were replicated
+		// from the styles applied in the tinymce skin,
+		// /wp-includes/js/tinymce/skins/wordpress/wp-content.css.
+		&.wpview-type-gallery::after {
+			content: "";
+			display: table;
+			clear: both;
+		}
 	}
 
 	.gallery img[data-mce-selected]:focus {
@@ -177,9 +239,42 @@
 	}
 }
 
-.editor-block-list__layout .editor-block-list__block[data-type="core/freeform"] {
+div[data-type="core/freeform"] {
+	.block-editor-block-list__block-edit::before {
+		transition: border-color 0.1s linear, box-shadow 0.1s linear;
+		border: $border-width solid $light-gray-500;
 
-	// Not sure why this is necessary, there seems to be a skin file that overrides this upstream.
+		// Windows High Contrast mode will show this outline.
+		outline: $border-width solid transparent;
+	}
+
+	&.is-selected .block-editor-block-list__block-edit::before {
+		border-color: $light-gray-800;
+		border-left-color: transparent;
+	}
+
+	// Don't show block type label for classic block
+	&.is-hovered .block-editor-block-list__breadcrumb {
+		display: none;
+	}
+
+	.editor-block-contextual-toolbar + div {
+		margin-top: 0;
+		padding-top: 0;
+	}
+
+	// Ensure aligned blocks at end are within the selected block.
+	&.is-selected .block-library-rich-text__tinymce::after {
+		content: "";
+		display: table;
+		clear: both;
+	}
+}
+
+// mce global styles: the toolbars may get appended to <body>
+.mce-toolbar-grp {
+	// Not sure why this is necessary, there seems to be a skin file that
+	// overrides this upstream.
 	.mce-btn.mce-active button,
 	.mce-btn.mce-active:hover button,
 	.mce-btn.mce-active i,
@@ -187,29 +282,16 @@
 		color: $dark-gray-800;
 	}
 
+	// Prevent toolbar clipping on heading style in RTL languages
+	.mce-rtl .mce-flow-layout-item.mce-last {
+		margin-right: 0;
+		margin-left: 8px;
+	}
+
 	// Prevent i tags in buttons from picking up theme editor styles.
 	.mce-btn i {
 		font-style: normal;
 	}
-
-	// Adjust padding to not cause a jump.
-	.mce-toolbar-grp > div {
-		padding: 1px 3px;
-	}
-
-	.editor-block-list__block-edit::before {
-		outline: $border-width solid #e2e4e7;
-	}
-
-	// Don't show block type label for classic block
-	&.is-hovered .editor-block-list__breadcrumb {
-		display: none;
-	}
-}
-
-div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
-	margin-top: 0;
-	padding-top: 0;
 }
 
 .block-library-classic__toolbar {
@@ -219,73 +301,86 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	z-index: z-index(".block-library-classic__toolbar");
 	top: $block-padding;
 	transform: translateY(-$block-padding);
+	border: $border-width solid $light-gray-500;
+	border-bottom: none;
 
 	// On mobile, toolbars go edge to edge.
 	padding: 0 $block-padding;
 
+	.is-selected & {
+		border-color: $light-gray-800;
+		border-left-color: transparent;
+	}
+
 	@include break-small() {
 		padding: 0;
 	}
-}
 
-.block-library-classic__toolbar:empty {
-	height: $block-toolbar-height;
-	background: #f5f5f5;
-	border-bottom: $border-width solid #e2e4e7;
+	&:empty {
+		height: $block-toolbar-height;
+		background: #f5f5f5;
+		border-bottom: $border-width solid #e2e4e7;
 
-	&::before {
-		font-family: $default-font;
-		font-size: $default-font-size;
-		content: attr(data-placeholder);
-		color: #555d66;
-		line-height: 37px;
-		padding: $block-padding;
+		&::before {
+			font-family: $default-font;
+			font-size: $default-font-size;
+			content: attr(data-placeholder);
+			color: #555d66;
+			line-height: 37px;
+			padding: $block-padding;
+		}
 	}
-}
 
-// Overwrite inline styles.
-.block-library-classic__toolbar .mce-tinymce-inline,
-.block-library-classic__toolbar .mce-tinymce-inline > div,
-.block-library-classic__toolbar div.mce-toolbar-grp,
-.block-library-classic__toolbar div.mce-toolbar-grp > div,
-.block-library-classic__toolbar .mce-menubar,
-.block-library-classic__toolbar .mce-menubar > div {
-	height: auto !important;
-	width: 100% !important;
-}
+	// Overwrite inline styles.
+	.mce-tinymce-inline,
+	.mce-tinymce-inline > div,
+	div.mce-toolbar-grp,
+	div.mce-toolbar-grp > div,
+	.mce-menubar,
+	.mce-menubar > div {
+		height: auto !important;
+		width: 100% !important;
+	}
 
-.block-library-classic__toolbar .mce-container-body.mce-abs-layout {
-	overflow: visible;
-}
+	.mce-container-body.mce-abs-layout {
+		overflow: visible;
+	}
 
-.block-library-classic__toolbar .mce-menubar,
-.block-library-classic__toolbar div.mce-toolbar-grp {
-	position: static;
-}
+	.mce-menubar,
+	div.mce-toolbar-grp {
+		position: static;
+	}
 
-.block-library-classic__toolbar .mce-toolbar-grp .mce-toolbar:not(:first-child) {
-	display: none;
-}
+	// Adjust padding to not cause a jump.
+	.mce-toolbar-grp > div {
+		padding: 1px 3px;
+	}
 
-.block-library-classic__toolbar.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
-	display: block;
+	.mce-toolbar-grp .mce-toolbar:not(:first-child) {
+		display: none;
+	}
+
+	&.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
+		display: block;
+	}
 }
 
 // We don't want the ellipsis to overlap the classic toolbar, which it will due to position sticky.
 // So we move it to the right, and make room for it.
 @include break-small() {
-	.editor-block-list__block[data-type="core/freeform"] {
-		.editor-block-switcher__no-switcher-icon {
+	.block-editor-block-list__block[data-type="core/freeform"] {
+		.block-editor-block-switcher__no-switcher-icon {
 			display: none;
 		}
-		.editor-block-contextual-toolbar {
+		.block-editor-block-contextual-toolbar {
 			float: right;
-			margin-right: $icon-button-size - $block-padding + $border-width;
+			margin-right: $icon-button-size - $block-padding + ($border-width * 3);
 			transform: translateY(-#{ $block-padding - $border-width });
 			top: $block-padding;
 
-			.editor-block-toolbar {
+			.block-editor-block-toolbar {
 				border: none;
+				box-shadow: none;
 
 				// Match the TinyMCE "mobile" breakpoint buttons alignment.
 				margin-top: 3px;
@@ -299,6 +394,10 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 					border-left: 1px solid $light-gray-500;
 					margin-top: $grid-size-small;
 					margin-bottom: $grid-size-small;
+				}
+
+				.components-toolbar__control.components-button:hover {
+					background-color: transparent;
 				}
 			}
 

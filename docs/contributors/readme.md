@@ -1,4 +1,4 @@
-# Contributors Guide
+# Contributor Documentation
 
 Welcome to the Gutenberg Project Contributors Guide.
 
@@ -6,7 +6,7 @@ The following guidelines are in place to create consistency across the project a
 
 ## Philosophy
 
-* [Architecturial and UX Principles of Gutenberg](/docs/contributors/principles.md)
+* [Architectural and UX Principles of Gutenberg](/docs/contributors/principles.md)
 
 ## Sections
 

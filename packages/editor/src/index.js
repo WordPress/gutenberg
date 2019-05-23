@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import '@wordpress/block-editor';
 import '@wordpress/blocks';
 import '@wordpress/core-data';
 import '@wordpress/notices';

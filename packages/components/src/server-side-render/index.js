@@ -1,10 +1,10 @@
 /**
- * External dependencies.
+ * External dependencies
  */
 import { isEqual, debounce } from 'lodash';
 
 /**
- * WordPress dependencies.
+ * WordPress dependencies
  */
 import {
 	Component,
@@ -15,7 +15,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 import Placeholder from '../placeholder';
 import Spinner from '../spinner';
@@ -68,7 +68,7 @@ export class ServerSideRender extends Component {
 		// check if it is the current request, to avoid race conditions on slow networks.
 		const fetchRequest = this.currentFetchRequest = apiFetch( { path } )
 			.then( ( response ) => {
-				if ( this.isStillMounted && fetchRequest === this.currentFetchRequest && response && response.rendered ) {
+				if ( this.isStillMounted && fetchRequest === this.currentFetchRequest && response ) {
 					this.setState( { response: response.rendered } );
 				}
 			} )
@@ -85,24 +85,42 @@ export class ServerSideRender extends Component {
 
 	render() {
 		const response = this.state.response;
-		if ( ! response ) {
+		const { className } = this.props;
+		if ( response === '' ) {
 			return (
-				<Placeholder><Spinner /></Placeholder>
+				<Placeholder
+					className={ className }
+				>
+					{ __( 'Block rendered as empty.' ) }
+				</Placeholder>
+			);
+		} else if ( ! response ) {
+			return (
+				<Placeholder
+					className={ className }
+				>
+					<Spinner />
+				</Placeholder>
 			);
 		} else if ( response.error ) {
 			// translators: %s: error message describing the problem
 			const errorMessage = sprintf( __( 'Error loading block: %s' ), response.errorMsg );
 			return (
-				<Placeholder>{ errorMessage }</Placeholder>
-			);
-		} else if ( ! response.length ) {
-			return (
-				<Placeholder>{ __( 'No results found.' ) }</Placeholder>
+				<Placeholder
+					className={ className }
+				>
+					{ errorMessage }
+				</Placeholder>
 			);
 		}
 
 		return (
-			<RawHTML key="html">{ response }</RawHTML>
+			<RawHTML
+				key="html"
+				className={ className }
+			>
+				{ response }
+			</RawHTML>
 		);
 	}
 }

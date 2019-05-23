@@ -1,0 +1,211 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Webpack \`dynamic-import\` should produce expected output: Dependencies JSON should match snapshot 1`] = `
+Array [
+  "lodash",
+  "wp-blob",
+]
+`;
+
+exports[`Webpack \`dynamic-import\` should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "blob",
+      ],
+    },
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": "lodash",
+    },
+    "userRequest": "lodash",
+  },
+]
+`;
+
+exports[`Webpack \`function-output-filename\` should produce expected output: Dependencies JSON should match snapshot 1`] = `
+Array [
+  "lodash",
+  "wp-blob",
+]
+`;
+
+exports[`Webpack \`function-output-filename\` should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "blob",
+      ],
+    },
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": "lodash",
+    },
+    "userRequest": "lodash",
+  },
+]
+`;
+
+exports[`Webpack \`no-default\` should produce expected output: Dependencies JSON should match snapshot 1`] = `Array []`;
+
+exports[`Webpack \`no-default\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
+
+exports[`Webpack \`no-deps\` should produce expected output: Dependencies JSON should match snapshot 1`] = `Array []`;
+
+exports[`Webpack \`no-deps\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
+
+exports[`Webpack \`overrides\` should produce expected output: Dependencies JSON should match snapshot 1`] = `
+Array [
+  "wp-blob",
+  "wp-script-handle-for-rxjs",
+  "wp-url",
+]
+`;
+
+exports[`Webpack \`overrides\` should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "blob",
+      ],
+    },
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "url",
+      ],
+    },
+    "userRequest": "@wordpress/url",
+  },
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "rxjs",
+        "operators",
+      ],
+    },
+    "userRequest": "rxjs/operators",
+  },
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": "rxjs",
+    },
+    "userRequest": "rxjs",
+  },
+]
+`;
+
+exports[`Webpack \`with-externs\` should produce expected output: Dependencies JSON should match snapshot 1`] = `
+Array [
+  "wp-url",
+]
+`;
+
+exports[`Webpack \`with-externs\` should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "var",
+    "request": "wp.blob",
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "url",
+      ],
+    },
+    "userRequest": "@wordpress/url",
+  },
+  Object {
+    "externalType": "var",
+    "request": "rxjs.operators",
+    "userRequest": "rxjs/operators",
+  },
+  Object {
+    "externalType": "var",
+    "request": "rxjs",
+    "userRequest": "rxjs",
+  },
+]
+`;
+
+exports[`Webpack \`wordpress\` should produce expected output: Dependencies JSON should match snapshot 1`] = `
+Array [
+  "lodash",
+  "wp-blob",
+]
+`;
+
+exports[`Webpack \`wordpress\` should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "blob",
+      ],
+    },
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": "lodash",
+    },
+    "userRequest": "lodash",
+  },
+]
+`;
+
+exports[`Webpack \`wordpress-require\` should produce expected output: Dependencies JSON should match snapshot 1`] = `
+Array [
+  "lodash",
+  "wp-blob",
+]
+`;
+
+exports[`Webpack \`wordpress-require\` should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": Array [
+        "wp",
+        "blob",
+      ],
+    },
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "this",
+    "request": Object {
+      "this": "lodash",
+    },
+    "userRequest": "lodash",
+  },
+]
+`;

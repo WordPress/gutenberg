@@ -1,9 +1,13 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * Internal dependencies
  */
 import plugin, {
 	createPersistenceInterface,
-	withInitialState,
 	withLazySameState,
 } from '../';
 import objectStorage from '../storage/object';
@@ -37,6 +41,137 @@ describe( 'persistence', () => {
 		registry.registerStore( 'test', options );
 	} );
 
+	it( 'should load a persisted value as initialState', () => {
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( { test: { a: 1 } } ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: true,
+			reducer: ( state = {} ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toEqual( { a: 1 } );
+	} );
+
+	it( 'should load a persisted subset value as initialState', () => {
+		const DEFAULT_STATE = { a: null, b: null };
+
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( { test: { a: 1 } } ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: [ 'a' ],
+			reducer: ( state = DEFAULT_STATE ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toEqual( { a: 1, b: null } );
+	} );
+
+	it( 'should merge persisted value with default if object-like', () => {
+		const DEFAULT_STATE = deepFreeze( { preferences: { useFoo: true, useBar: true } } );
+
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( {
+					test: {
+						preferences: {
+							useFoo: false,
+						},
+					},
+				} ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: [ 'preferences' ],
+			reducer: ( state = DEFAULT_STATE ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toEqual( {
+			preferences: {
+				useFoo: false,
+				useBar: true,
+			},
+		} );
+	} );
+
+	it( 'should defer to persisted state if mismatch of object-like (persisted object-like)', () => {
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( { test: { persisted: true } } ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: true,
+			reducer: ( state = null ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toEqual( { persisted: true } );
+	} );
+
+	it( 'should defer to persisted state if mismatch of object-like (initial object-like)', () => {
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( { test: null } ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: true,
+			reducer: ( state = {} ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toBe( null );
+	} );
+
+	it( 'should be reasonably tolerant to a non-object persisted state', () => {
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( {
+					test: 1,
+				} ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: true,
+			reducer: ( state = null ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toBe( 1 );
+	} );
+
 	it( 'override values passed to registerStore', () => {
 		const options = { persist: true, reducer() {} };
 
@@ -46,8 +181,6 @@ describe( 'persistence', () => {
 			persist: true,
 			reducer: expect.any( Function ),
 		} );
-		// Replaced reducer:
-		expect( originalRegisterStore.mock.calls[ 0 ][ 1 ].reducer ).not.toBe( options.reducer );
 	} );
 
 	it( 'should not persist if option not passed', () => {
@@ -205,22 +338,6 @@ describe( 'persistence', () => {
 				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{}}' );
 				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{},"test2":{}}' );
 			} );
-		} );
-	} );
-
-	describe( 'withInitialState', () => {
-		it( 'should return a reducer function', () => {
-			const reducer = ( state = 1 ) => state;
-			const enhanced = withInitialState( reducer );
-
-			expect( enhanced() ).toBe( 1 );
-		} );
-
-		it( 'should assign a default state by argument', () => {
-			const reducer = ( state = 1 ) => state;
-			const enhanced = withInitialState( reducer, 2 );
-
-			expect( enhanced() ).toBe( 2 );
 		} );
 	} );
 

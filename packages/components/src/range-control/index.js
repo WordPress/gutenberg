@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withInstanceId } from '@wordpress/compose';
+import { compose, withInstanceId, withState } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,6 +17,7 @@ import { BaseControl, Button, Dashicon } from '../';
 
 function RangeControl( {
 	className,
+	currentInput,
 	label,
 	value,
 	instanceId,
@@ -26,19 +27,46 @@ function RangeControl( {
 	help,
 	allowReset,
 	initialPosition,
+	min,
+	max,
+	setState,
 	...props
 } ) {
 	const id = `inspector-range-control-${ instanceId }`;
-	const resetValue = () => onChange();
+	const currentInputValue = currentInput === null ? value : currentInput;
+	const resetValue = () => {
+		resetCurrentInput();
+		onChange();
+	};
+	const resetCurrentInput = () => {
+		if ( currentInput !== null ) {
+			setState( {
+				currentInput: null,
+			} );
+		}
+	};
+
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
-		if ( newValue === '' ) {
-			resetValue();
+		// If the input value is invalid temporarily save it to the state,
+		// without calling on change.
+		if ( ! event.target.checkValidity() ) {
+			setState( {
+				currentInput: newValue,
+			} );
 			return;
 		}
-		onChange( Number( newValue ) );
+		// The input is valid, reset the local state property used to temporaly save the value,
+		// and call onChange with the new value as a number.
+		resetCurrentInput();
+		onChange( ( newValue === '' ) ?
+			undefined :
+			parseFloat( newValue )
+		);
 	};
-	const initialSliderValue = isFinite( value ) ? value : initialPosition || '';
+	const initialSliderValue = isFinite( currentInputValue ) ?
+		currentInputValue :
+		initialPosition || '';
 
 	return (
 		<BaseControl
@@ -55,6 +83,8 @@ function RangeControl( {
 				value={ initialSliderValue }
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? id + '__help' : undefined }
+				min={ min }
+				max={ max }
 				{ ...props } />
 			{ afterIcon && <Dashicon icon={ afterIcon } /> }
 			<input
@@ -62,16 +92,30 @@ function RangeControl( {
 				type="number"
 				onChange={ onChangeValue }
 				aria-label={ label }
-				value={ value }
+				value={ currentInputValue }
+				min={ min }
+				max={ max }
+				onBlur={ resetCurrentInput }
 				{ ...props }
 			/>
-			{ allowReset &&
-				<Button onClick={ resetValue } disabled={ value === undefined }>
+			{ allowReset && (
+				<Button
+					onClick={ resetValue }
+					disabled={ value === undefined }
+					isSmall
+					isDefault
+					className="components-range-control__reset"
+				>
 					{ __( 'Reset' ) }
 				</Button>
-			}
+			) }
 		</BaseControl>
 	);
 }
 
-export default withInstanceId( RangeControl );
+export default compose( [
+	withInstanceId,
+	withState( {
+		currentInput: null,
+	} ),
+] )( RangeControl );

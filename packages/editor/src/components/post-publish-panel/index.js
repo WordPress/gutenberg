@@ -19,7 +19,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import PostPublishButton from '../post-publish-button';
 import PostPublishPanelPrepublish from './prepublish';

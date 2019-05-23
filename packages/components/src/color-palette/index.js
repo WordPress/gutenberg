@@ -8,7 +8,6 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import Dashicon from '../dashicon';
 
 /**
  * Internal dependencies
@@ -17,6 +16,7 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 import ColorPicker from '../color-picker';
+import Dashicon from '../dashicon';
 
 export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, className } ) {
 	function applyOrUnset( color ) {
@@ -55,42 +55,41 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 				);
 			} ) }
 
-			{ ! disableCustomColors &&
-				<Dropdown
-					className="components-color-palette__item-wrapper components-color-palette__custom-color"
-					contentClassName="components-color-palette__picker"
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Tooltip text={ customColorPickerLabel }>
-							<button
-								type="button"
+			<div className="components-color-palette__custom-clear-wrapper">
+				{ ! disableCustomColors &&
+					<Dropdown
+						className="components-color-palette__custom-color"
+						contentClassName="components-color-palette__picker"
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<Button
 								aria-expanded={ isOpen }
-								className="components-color-palette__item"
 								onClick={ onToggle }
 								aria-label={ customColorPickerLabel }
+								isLink
 							>
-								<span className="components-color-palette__custom-color-gradient" />
-							</button>
-						</Tooltip>
-					) }
-					renderContent={ () => (
-						<ColorPicker
-							color={ value }
-							onChangeComplete={ ( color ) => onChange( color.hex ) }
-							disableAlpha
-						/>
-					) }
-				/>
-			}
+								{ __( 'Custom Color' ) }
+							</Button>
+						) }
+						renderContent={ () => (
+							<ColorPicker
+								color={ value }
+								onChangeComplete={ ( color ) => onChange( color.hex ) }
+								disableAlpha
+							/>
+						) }
+					/>
+				}
 
-			<Button
-				className="components-color-palette__clear"
-				type="button"
-				onClick={ () => onChange( undefined ) }
-				isSmall
-				isDefault
-			>
-				{ __( 'Clear' ) }
-			</Button>
+				<Button
+					className="components-color-palette__clear"
+					type="button"
+					onClick={ () => onChange( undefined ) }
+					isSmall
+					isDefault
+				>
+					{ __( 'Clear' ) }
+				</Button>
+			</div>
 		</div>
 	);
 }

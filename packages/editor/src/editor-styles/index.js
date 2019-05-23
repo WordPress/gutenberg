@@ -9,7 +9,7 @@ import { map } from 'lodash';
 import { compose } from '@wordpress/compose';
 
 /**
- * External dependencies
+ * Internal dependencies
  */
 import traverse from './traverse';
 import urlRewrite from './transforms/url-rewrite';

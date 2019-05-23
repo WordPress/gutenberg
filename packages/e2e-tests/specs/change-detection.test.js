@@ -18,9 +18,9 @@ describe( 'Change detection', () => {
 		await createNewPost();
 	} );
 
-	afterEach( () => {
+	afterEach( async () => {
 		if ( handleInterceptedRequest ) {
-			releaseSaveIntercept();
+			await releaseSaveIntercept();
 		}
 	} );
 
@@ -287,5 +287,22 @@ describe( 'Change detection', () => {
 		] );
 
 		await assertIsDirty( true );
+	} );
+
+	it( 'should not prompt when receiving reusable blocks', async () => {
+		// Regression Test: Verify that non-modifying behaviors does not incur
+		// dirtiness. Previously, this could occur as a result of either (a)
+		// selecting a block, (b) opening the inserter, or (c) editing a post
+		// which contained a reusable block. The root issue was changes in
+		// block editor state as a result of reusable blocks data having been
+		// received, reflected here in this test.
+		//
+		// TODO: This should be considered a temporary test, existing only so
+		// long as the experimental reusable blocks fetching data flow exists.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/14766
+		await page.evaluate( () => window.wp.data.dispatch( 'core/editor' ).__experimentalReceiveReusableBlocks( [] ) );
+
+		await assertIsDirty( false );
 	} );
 } );

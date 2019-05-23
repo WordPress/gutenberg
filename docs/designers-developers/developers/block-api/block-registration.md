@@ -1,10 +1,10 @@
-# Block Registration 
+# Block Registration
 
 ## `register_block_type`
 
 * **Type:** `Function`
 
-Every block starts by registering a new block type definition. The function `registerBlockType` takes two arguments, a block `name` and a block configuration object.
+Every block starts by registering a new block type definition. To register, you use the `registerBlockType` function from the [`wp-blocks` package](/packages/blocks/README.md#registerBlockType). The function takes two arguments, a block `name` and a block configuration object.
 
 ### Block Name
 
@@ -66,7 +66,7 @@ The core provided categories are:
 category: 'widgets',
 ```
 
-Plugins and Themes can also register [custom block categories](../docs/extensibility/extending-blocks/#managing-block-categories).
+Plugins and Themes can also register [custom block categories](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories).
 
 #### Icon (optional)
 
@@ -82,7 +82,7 @@ icon: 'book-alt',
 icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
 ```
 
-**Note:** Custom SVG icons are automatically wrapped in the [`wp.components.SVG` component](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/primitives/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
+**Note:** Custom SVG icons are automatically wrapped in the [`wp.components.SVG` component](/packages/components/src/primitives/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
 Besides src the object can contain background and foreground colors, this colors will appear with the icon
@@ -104,7 +104,7 @@ icon: {
 
 * **Type:** `Array`
 
-Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated). It is only allowed to add as much as three terms per block.
+Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated).
 
 ```js
 // Make it easier to discover a block with keyword aliases.
@@ -138,7 +138,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](../docs/extensibility/extending-blocks/#block-style-variations) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) for existing blocks.
 
 #### Attributes (optional)
 
@@ -166,7 +166,7 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](../docs/block-api/attributes.md).**
+* **See: [Attributes](/docs/designers-developers/developers/block-api/block-attributes.md).**
 
 #### Transforms (optional)
 
@@ -174,7 +174,7 @@ attributes: {
 
 Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
 
-For example, a paragraph block can be transformed into a heading block.
+For example, a paragraph block can be transformed into a heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock)
 
 {% codetabs %}
 {% ES5 %}
@@ -304,6 +304,39 @@ transforms: {
                 return createBlock( 'core/paragraph', {
                     content,
                 } );
+            },
+        },
+    ],
+},
+```
+{% end %}
+
+A block with innerBlocks can also be transformed from and to another block with innerBlocks.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'some/block-with-innerblocks' ],
+            transform: function( attributes, innerBlocks ) {
+                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks );
+            },
+        },
+    ],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'some/block-with-innerblocks' ],
+            transform: ( attributes, innerBlocks ) => {
+                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks);
             },
         },
     ],
@@ -453,7 +486,7 @@ transforms: {
 
 * **Type:** `Array`
 
-Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/packages/editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks.
 
@@ -492,7 +525,7 @@ attributes: {
 }
 ```
 
-- `alignWide` (default `true`): This property allows to enable [wide alignment](../docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
+- `alignWide` (default `true`): This property allows to enable [wide alignment](/docs/designers-developers/developers/themes/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
 
 ```js
 // Remove the support for wide alignment.
@@ -513,21 +546,21 @@ anchor: true,
 customClassName: false,
 ```
 
-- `className` (default `true`): By default, Gutenberg adds a class with the form `.wp-block-your-block-name` to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
+- `className` (default `true`): By default, the class `.wp-block-your-block-name` is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
 
 ```js
 // Remove the support for the generated className.
 className: false,
 ```
 
-- `html` (default `true`): By default, Gutenberg will allow a block's markup to be edited individually. To disable this behavior, set `html` to `false`.
+- `html` (default `true`): By default, a block's markup can be edited individually. To disable this behavior, set `html` to `false`.
 
 ```js
 // Remove support for an HTML mode.
 html: false,
 ```
 
-- `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
+- `inserter` (default `true`): By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
 
 ```js
 // Hide this block from the inserter.

@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
-import { Component, createRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Component, createRef, useMemo } from '@wordpress/element';
 import {
 	ExternalLink,
 	IconButton,
@@ -15,6 +15,7 @@ import {
 	withSpokenMessages,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { getRectangleFromRange } from '@wordpress/dom';
 import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import {
 	create,
@@ -24,44 +25,14 @@ import {
 	getTextContent,
 	slice,
 } from '@wordpress/rich-text';
-import { URLInput, URLPopover } from '@wordpress/editor';
+import { URLInput, URLPopover } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import PositionedAtSelection from './positioned-at-selection';
-import { isValidHref } from './utils';
+import { createLinkFormat, isValidHref } from './utils';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
-
-/**
- * Generates the format object that will be applied to the link text.
- *
- * @param {string}  url              The href of the link.
- * @param {boolean} opensInNewWindow Whether this link will open in a new window.
- * @param {Object}  text             The text that is being hyperlinked.
- *
- * @return {Object} The final format object.
- */
-function createLinkFormat( { url, opensInNewWindow, text } ) {
-	const format = {
-		type: 'core/link',
-		attributes: {
-			url,
-		},
-	};
-
-	if ( opensInNewWindow ) {
-		// translators: accessibility label for external links, where the argument is the link text
-		const label = sprintf( __( '%s (opens in a new tab)' ), text );
-
-		format.attributes.target = '_blank';
-		format.attributes.rel = 'noreferrer noopener';
-		format.attributes[ 'aria-label' ] = label;
-	}
-
-	return format;
-}
 
 function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
@@ -71,7 +42,7 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 	<form
-		className="editor-format-toolbar__link-container-content"
+		className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 		onKeyPress={ stopKeyPropagation }
 		onKeyDown={ onKeyDown }
 		onSubmit={ submitLink }
@@ -88,7 +59,7 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 
 const LinkViewerUrl = ( { url } ) => {
 	const prependedURL = prependHTTP( url );
-	const linkClassName = classnames( 'editor-format-toolbar__link-container-value', {
+	const linkClassName = classnames( 'editor-format-toolbar__link-container-value block-editor-format-toolbar__link-container-value', {
 		'has-invalid-link': ! isValidHref( prependedURL ),
 	} );
 
@@ -106,12 +77,46 @@ const LinkViewerUrl = ( { url } ) => {
 	);
 };
 
+const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
+	const anchorRect = useMemo( () => {
+		const selection = window.getSelection();
+		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
+		if ( ! range ) {
+			return;
+		}
+
+		if ( addingLink ) {
+			return getRectangleFromRange( range );
+		}
+
+		let element = range.startContainer;
+
+		// If the caret is right before the element, select the next element.
+		element = element.nextElementSibling || element;
+
+		while ( element.nodeType !== window.Node.ELEMENT_NODE ) {
+			element = element.parentNode;
+		}
+
+		const closest = element.closest( 'a' );
+		if ( closest ) {
+			return closest.getBoundingClientRect();
+		}
+	}, [ isActive, addingLink, value.start, value.end ] );
+
+	if ( ! anchorRect ) {
+		return null;
+	}
+
+	return <URLPopover anchorRect={ anchorRect } { ...props } />;
+};
+
 const LinkViewer = ( { url, editLink } ) => {
 	return (
 		// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		<div
-			className="editor-format-toolbar__link-container-content"
+			className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 			onKeyPress={ stopKeyPropagation }
 		>
 			<LinkViewerUrl url={ url } />
@@ -250,37 +255,36 @@ class InlineLinkUI extends Component {
 		const showInput = isShowingInput( this.props, this.state );
 
 		return (
-			<PositionedAtSelection
-				key={ `${ value.start }${ value.end }` /* Used to force rerender on selection change */ }
+			<URLPopoverAtLink
+				value={ value }
+				isActive={ isActive }
+				addingLink={ addingLink }
+				onClickOutside={ this.onClickOutside }
+				onClose={ this.resetState }
+				focusOnMount={ showInput ? 'firstElement' : false }
+				renderSettings={ () => (
+					<ToggleControl
+						label={ __( 'Open in New Tab' ) }
+						checked={ opensInNewWindow }
+						onChange={ this.setLinkTarget }
+					/>
+				) }
 			>
-				<URLPopover
-					onClickOutside={ this.onClickOutside }
-					onClose={ this.resetState }
-					focusOnMount={ showInput ? 'firstElement' : false }
-					renderSettings={ () => (
-						<ToggleControl
-							label={ __( 'Open in New Tab' ) }
-							checked={ opensInNewWindow }
-							onChange={ this.setLinkTarget }
-						/>
-					) }
-				>
-					{ showInput ? (
-						<LinkEditor
-							value={ inputValue }
-							onChangeInputValue={ this.onChangeInputValue }
-							onKeyDown={ this.onKeyDown }
-							submitLink={ this.submitLink }
-							autocompleteRef={ this.autocompleteRef }
-						/>
-					) : (
-						<LinkViewer
-							url={ url }
-							editLink={ this.editLink }
-						/>
-					) }
-				</URLPopover>
-			</PositionedAtSelection>
+				{ showInput ? (
+					<LinkEditor
+						value={ inputValue }
+						onChangeInputValue={ this.onChangeInputValue }
+						onKeyDown={ this.onKeyDown }
+						submitLink={ this.submitLink }
+						autocompleteRef={ this.autocompleteRef }
+					/>
+				) : (
+					<LinkViewer
+						url={ url }
+						editLink={ this.editLink }
+					/>
+				) }
+			</URLPopoverAtLink>
 		);
 	}
 }

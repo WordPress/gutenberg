@@ -7,12 +7,11 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import PostVisibility from '../post-visibility';
 import PostVisibilityLabel from '../post-visibility/label';
@@ -44,7 +43,7 @@ function PostPublishPanelPrepublish( {
 			<div><strong>{ prePublishTitle }</strong></div>
 			<p>{ prePublishBodyText }</p>
 			{ hasPublishAction && (
-				<Fragment>
+				<>
 					<PanelBody initialOpen={ false } title={ [
 						__( 'Visibility:' ),
 						<span className="editor-post-publish-panel__link" key="label"><PostVisibilityLabel /></span>,
@@ -60,7 +59,7 @@ function PostPublishPanelPrepublish( {
 					<MaybePostFormatPanel />
 					<MaybeTagsPanel />
 					{ children }
-				</Fragment>
+				</>
 			) }
 		</div>
 	);
