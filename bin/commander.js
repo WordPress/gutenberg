@@ -203,7 +203,7 @@ program
 		// Creating the GitHub Release
 		let octokit;
 		let release;
-		await runStep( 'Creating the Github release', abortMessage, async () => {
+		await runStep( 'Creating the GitHub release', abortMessage, async () => {
 			await askForConfirmationToContinue(
 				'Proceed with the creation of the GitHub release?',
 				true,
