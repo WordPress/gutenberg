@@ -1,5 +1,5 @@
 /**
- * Navigate to the top of the content editor using the keyboard
+ * Navigates to the top of the content editor using the keyboard.
  */
 
 /**

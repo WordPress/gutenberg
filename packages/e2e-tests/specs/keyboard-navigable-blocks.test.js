@@ -22,7 +22,7 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	// Tab causes 'add block' button to receive focus
 	await page.keyboard.press( 'Tab' );
 	const isFocusedParagraphInserterToggle = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'editor-inserter__toggle' )
+		document.activeElement.classList.contains( 'block-editor-inserter__toggle' )
 	);
 	await expect( isFocusedParagraphInserterToggle ).toBe( true );
 

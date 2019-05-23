@@ -300,6 +300,10 @@ _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
 
+<a name="navigateToContentEditorTop" href="#navigateToContentEditorTop">#</a> **navigateToContentEditorTop**
+
+Undocumented declaration.
+
 <a name="observeFocusLoss" href="#observeFocusLoss">#</a> **observeFocusLoss**
 
 Binds to the document on page load which throws an error if a `focusout`
@@ -453,6 +457,14 @@ running the test is not already the admin user).
 
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
+
+<a name="tabThroughBlockMoverControl" href="#tabThroughBlockMoverControl">#</a> **tabThroughBlockMoverControl**
+
+Navigate through the block mover control using the keyboard
+
+<a name="tabThroughBlockToolbar" href="#tabThroughBlockToolbar">#</a> **tabThroughBlockToolbar**
+
+Navigate through a block's toolbar using the keyboard
 
 <a name="toggleScreenOption" href="#toggleScreenOption">#</a> **toggleScreenOption**
 
