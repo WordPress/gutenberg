@@ -1,4 +1,4 @@
-# SlotFills
+# SlotFills Reference
 
 Slot and Fill are components that have been exposed to allow developers to inject items into some predefined places in the Gutenberg admin experience.
 Please see the [SlotFill component docs](https://wordpress.org/gutenberg/handbook/designers-developers/developers/components/slot-fill/) for more details.
