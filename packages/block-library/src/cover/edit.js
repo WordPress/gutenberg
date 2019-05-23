@@ -27,7 +27,6 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUploadCheck,
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
@@ -125,9 +124,7 @@ class CoverEdit extends Component {
 				} );
 			}
 
-			this.setState( {
-				isEditing: false,
-			} );
+			this.toggleIsEditing();
 		};
 
 		const onSelectMedia = ( media ) => {
@@ -165,9 +162,7 @@ class CoverEdit extends Component {
 				),
 			} );
 
-			this.setState( {
-				isEditing: false,
-			} );
+			this.toggleIsEditing();
 		};
 
 		const toggleParallax = () => {
@@ -196,19 +191,15 @@ class CoverEdit extends Component {
 			<>
 				<BlockControls>
 					{ !! url && (
-						<>
-							<MediaUploadCheck>
-								<Toolbar>
-									<IconButton
-										className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
-										aria-pressed={ this.state.isEditing }
-										label={ __( 'Edit media' ) }
-										icon={ editImageIcon }
-										onClick={ this.toggleIsEditing }
-									/>
-								</Toolbar>
-							</MediaUploadCheck>
-						</>
+						<Toolbar>
+							<IconButton
+								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
+								aria-pressed={ isEditing }
+								label={ __( 'Edit media' ) }
+								icon={ editImageIcon }
+								onClick={ this.toggleIsEditing }
+							/>
+						</Toolbar>
 					) }
 				</BlockControls>
 				{ !! url && (
@@ -254,7 +245,7 @@ class CoverEdit extends Component {
 			</>
 		);
 
-		if ( isEditing || ! url ) {
+		if ( isEditing ) {
 			const labels = {
 				title: __( 'Cover' ),
 				instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
