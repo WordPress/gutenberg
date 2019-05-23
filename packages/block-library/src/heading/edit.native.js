@@ -17,11 +17,7 @@ import { RichText, BlockControls } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
 const HeadingEdit = ( {
-	attributes: {
-		level,
-		placeholder,
-		content,
-	},
+	attributes,
 	insertBlocksAfter,
 	isSelected,
 	mergeBlocks,
@@ -36,14 +32,14 @@ const HeadingEdit = ( {
 			<HeadingToolbar
 				minLevel={ 2 }
 				maxLevel={ 5 }
-				selectedLevel={ level }
+				selectedLevel={ attributes.level }
 				onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) }
 			/>
 		</BlockControls>
 		<RichText
 			identifier="content"
-			tagName={ 'h' + level }
-			value={ content }
+			tagName={ 'h' + attributes.level }
+			value={ attributes.content }
 			isSelected={ isSelected }
 			style={ {
 				...style,
@@ -65,7 +61,7 @@ const HeadingEdit = ( {
 					} }
 			onReplace={ onReplace }
 			onRemove={ () => onReplace( [] ) }
-			placeholder={ placeholder || __( 'Write heading…' ) }
+			placeholder={ attributes.placeholder || __( 'Write heading…' ) }
 		/>
 	</View>
 );
