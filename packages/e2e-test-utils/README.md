@@ -460,11 +460,11 @@ running the tests as (if we're not already that user).
 
 <a name="tabThroughBlockMoverControl" href="#tabThroughBlockMoverControl">#</a> **tabThroughBlockMoverControl**
 
-Navigate through the block mover control using the keyboard
+Navigates through the block mover control using the keyboard. Asserts that the 'move up' and 'move down' controls receive focus.
 
 <a name="tabThroughBlockToolbar" href="#tabThroughBlockToolbar">#</a> **tabThroughBlockToolbar**
 
-Navigate through a block's toolbar using the keyboard
+Navigate through a block's toolbar using the keyboard. Asserts that each button receives focus.
 
 <a name="toggleScreenOption" href="#toggleScreenOption">#</a> **toggleScreenOption**
 
