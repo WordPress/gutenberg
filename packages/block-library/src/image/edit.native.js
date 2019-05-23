@@ -15,6 +15,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import {
+	BottomSheet,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -25,7 +26,6 @@ import {
 	RichText,
 	BlockControls,
 	InspectorControls,
-	BottomSheet,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';

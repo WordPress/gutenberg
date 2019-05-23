@@ -1,10 +1,10 @@
-## Master
+## 7.4.0 (2019-05-21)
 
-### New Features
+### New Feature
 
 - Added a new `HorizontalRule` component.
 
-### Bug Fixes
+### Bug Fix
 
 - Fixed display of reset button when using RangeControl `allowReset` prop.
 - Fixed minutes field of `DateTimePicker` missed '0' before single digit values.

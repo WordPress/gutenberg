@@ -17,7 +17,7 @@ SITE_TITLE='Gutenberg Dev'
 # If we're installing/re-installing the test site, change the containers used.
 if [ "$1" == '--e2e_tests' ]; then
 	CLI="${CLI}_e2e_tests"
-	CONTAINER="${CONTAINER}_e2e_tests"
+	CONTAINER='wordpress_e2e_tests'
 	SITE_TITLE='Gutenberg Testing'
 
 	if ! docker ps | grep -q $CONTAINER; then
