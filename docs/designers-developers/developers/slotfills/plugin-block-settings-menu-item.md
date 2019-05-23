@@ -1,6 +1,6 @@
 # PluginBlockSettingsMenuItem
 
-This slot appears allows for adding a new item in to the More Options area. 
+This slot allows for adding a new item into the More Options area. 
 This will either appear in the controls for each block or at the Top Toolbar depending on the users setting.
 
 
@@ -12,7 +12,7 @@ const { PluginBlockSettingsMenuItem } = wp.editPost;
 
 const PluginBlockSettingsMenuGroupTest = () => (
 	<PluginBlockSettingsMenuItem
-		allowedBlockNames='core/paragraph'
+		allowedBlocks=['core/paragraph']
 		icon='smiley'
 		label='Menu item text'
 		onClick={ () => { alert( 'clicked' )} } />
@@ -20,6 +20,7 @@ const PluginBlockSettingsMenuGroupTest = () => (
 
 registerPlugin( 'block-settings-menu-group-test', { render: PluginBlockSettingsMenuGroupTest } );
 ```
+
 ## Location
 
 ![Alt text](/docs/designers-developers/assets/plugin-block-settings-menu-item-screenshot.png?raw=true "PluginBlockSettingsMenuItem Location")

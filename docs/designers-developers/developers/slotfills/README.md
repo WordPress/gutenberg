@@ -1,4 +1,4 @@
-# SlotFills
+# SlotFills Reference
 
 Slot and Fill are components that have been exposed to allow developers to inject items into some predefined places in the Gutenberg admin experience.
 Please see the [SlotFill component docs](https://wordpress.org/gutenberg/handbook/designers-developers/developers/components/slot-fill/) for more details.
@@ -37,7 +37,8 @@ registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 
 SlotFills are created using `createSlotFill`. This creates two components, `Slot` and `Fill` which are then used to create a new component that is exported on the `wp.plugins` global.
 
-**Definition of the `PluginPostStatusInfo` SlotFill**
+**Definition of the `PluginPostStatusInfo` SlotFill** ([see core code](https://github.com/WordPress/gutenberg/blob/master/packages/edit-post/src/components/sidebar/plugin-post-status-info/index.js#L54))
+
 ```js
 /**
  * Defines as extensibility slot for the Status & Visibility panel.
@@ -69,7 +70,8 @@ This new Slot is then exposed in the editor. The example below is from core and 
 As we can see, the `<PluginPostStatusInfo.Slot>` is wrapping all of the items that will appear in the panel.
 Any items that have been added via the SlotFill ( see the example above ), will be included in the `fills` parameter and be displayed betwee the `<PostAuthor/>` and `<PostTrash/>` components.
 
-**Core**
+See [core code](https://github.com/WordPress/gutenberg/tree/master/packages/edit-post/src/components/sidebar/post-status/index.js#L26).
+
 ```js
 function PostStatus( { isOpened, onTogglePanel } ) {
 	return (
@@ -92,17 +94,18 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 	);
 }
 ```
+
 ## Currently available SlotFills and examples
 
-There are currently seven available SlotFills in the `edit-post` package. please refer to the individual items below for usage and example details:
+There are currently seven available SlotFills in the `edit-post` package. Please refer to the individual items below for usage and example details:
 
 * [PluginBlockSettingsMenuItem](./plugin-block-settings-menu-item.md)
 * [PluginMoreMenuItem](./plugin-more-menu-item.md)
 * [PluginPostPublishPanel](./plugin-post-publish-panel.md)
 * [PluginPostStatusInfo](./plugin-post-status-info.md)
-* [PluginPrePublishPanel](./plugin-pre-post-publish-panel.md)
+* [PluginPrePublishPanel](./plugin-pre-publish-panel.md)
 * [PluginSidebar](./plugin-sidebar.md)
-* [PluginSidebarMoreMenu](./plugin-sidebar-more-menu-item.md)
+* [PluginSidebarMoreMenuItem](./plugin-sidebar-more-menu-item.md)
 
 
 

@@ -19,6 +19,7 @@ const PluginPostStatusInfoTest = () => {
 
 registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 ```
+
 ## Location
 
 ![Location in the Status & Visibility panel](/docs/designers-developers/assets/plugin-post-status-info-location.png?raw=true)

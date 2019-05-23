@@ -1,6 +1,6 @@
 # PluginSidebar
 
-This slot allows for adding items into the Gutenberg Toolbar. This is most commonly used for plugins and a great example is the Yoast SEO plugin.
+This slot allows for adding items into the Gutenberg Toolbar.
 Using this slot will add an icon to the bar that, when clicked, will open a sidebar with the content of the items wrapped in the `<PluginSidebar />` component.
 
 ## Example
@@ -23,6 +23,7 @@ const PluginSidebarTest = () => {
 registerPlugin( 'plugin-sidebar-test', { render: PluginSidebarTest } );
 
 ```
+
 ## Location
 
 ### Closed State
