@@ -193,7 +193,7 @@ class RCTAztecView: Aztec.TextView {
     }
 
     private func cleanHTML() -> String {
-        let html = getHTML(prettify: false).replacingOccurrences(of: "\n", with: "")
+        let html = getHTML(prettify: false)
         return html
     }
 
@@ -289,7 +289,7 @@ class RCTAztecView: Aztec.TextView {
     }
     
     private func interceptBackspace() -> Bool {
-        guard selectedRange.location == 0 && selectedRange.length == 0,
+        guard isNewLineBeforeSelection() || (selectedRange.location == 0 && selectedRange.length == 0),
             let onBackspace = onBackspace else {
                 return false
         }
@@ -299,6 +299,13 @@ class RCTAztecView: Aztec.TextView {
         return true
     }
 
+    private func isNewLineBeforeSelection() -> Bool {
+        guard let currentLocation = text.indexFromLocation(selectedRange.location) else {
+            return false
+        }
+
+        return text.isStartOfParagraph(at: currentLocation)
+    }
     override var keyCommands: [UIKeyCommand]? {
         // Remove defautls Tab and Shift+Tab commands, leaving just Shift+Enter command.
         return [carriageReturnKeyCommand]
@@ -326,7 +333,7 @@ class RCTAztecView: Aztec.TextView {
             (start, end) = (end, start)
         }
         
-        var result: [AnyHashable : Any] = packForRN(getHTML(prettify: false), withName: "text")
+        var result: [AnyHashable : Any] = packForRN(cleanHTML(), withName: "text")
 
         result["selectionStart"] = start
         result["selectionEnd"] = end
