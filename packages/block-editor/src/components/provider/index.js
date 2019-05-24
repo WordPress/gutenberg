@@ -138,9 +138,14 @@ export default compose( [
 			resetBlocks,
 		} = dispatch( 'core/block-editor' );
 
+		const {
+			getEditorSettings,
+		} = dispatch( 'core/editor' );
+
 		return {
 			updateSettings,
 			resetBlocks,
+			getEditorSettings,
 		};
 	} ),
 ] )( BlockEditorProvider );
