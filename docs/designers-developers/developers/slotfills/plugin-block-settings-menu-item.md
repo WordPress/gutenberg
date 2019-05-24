@@ -23,5 +23,5 @@ registerPlugin( 'block-settings-menu-group-test', { render: PluginBlockSettingsM
 
 ## Location
 
-![Alt text](/docs/designers-developers/assets/plugin-block-settings-menu-item-screenshot.png?raw=true "PluginBlockSettingsMenuItem Location")
+![Location](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/plugin-block-settings-menu-item-screenshot.png?raw=true "PluginBlockSettingsMenuItem Location")
 

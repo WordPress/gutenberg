@@ -1,5 +1,5 @@
 # Documentation
-/docs                                           @youknowriad @chrisvanpatten @mkaz @ajitbohra @notnownikki
+/docs                                           @youknowriad @chrisvanpatten @ajitbohra @notnownikki
 /docs/designers-developers/developers           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @notnownikki
 /docs/designers-developers/designers            @youknowriad @chrisvanpatten @mkaz @ajitbohra @notnownikki
 
@@ -29,13 +29,13 @@
 
 # Tooling
 /bin                                            @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
-/docs/tool                                      @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
+/docs/tool                                      @youknowriad @gziolo @chrisvanpatten @ajitbohra @nosolosw @notnownikki
 /packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/babel-plugin-makepot                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/browserslist-config                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/custom-templated-path-webpack-plugin  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
-/packages/docgen                                @nosolosw @mkaz @gziolo
+/packages/docgen                                @nosolosw @gziolo
 /packages/e2e-test-utils                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @talldan
 /packages/eslint-plugin                         @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
@@ -45,7 +45,7 @@
 /packages/library-export-default-webpack-plugin @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/npm-package-json-lint-config          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/postcss-themes                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
-/packages/scripts                               @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw @mkaz
+/packages/scripts                               @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 
 # UI Components
 /packages/components                            @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @chrisvanpatten

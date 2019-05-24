@@ -4,6 +4,7 @@ export { default as BlockEdit } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
 export * from './colors';
 export * from './font-sizes';
+export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as InspectorControls } from './inspector-controls';
 export { default as PlainText } from './plain-text';
 export {

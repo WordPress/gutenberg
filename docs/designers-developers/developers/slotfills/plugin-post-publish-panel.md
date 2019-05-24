@@ -22,5 +22,5 @@ registerPlugin( 'post-publish-panel-test', { render: PluginPostPublishPanelTest 
 
 ## Location
 
-![post publish panel](/docs/designers-developers/assets/plugin-post-publish-panel.png?raw=true)
+![post publish panel](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/plugin-post-publish-panel.png?raw=true)
 
