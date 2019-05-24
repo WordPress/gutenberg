@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /**
  * External dependencies
  */
@@ -65,8 +67,12 @@ let ended = false,
 	complete = 0;
 
 stream
-	.on( 'data', ( file ) => worker( file, () => {
+	.on( 'data', ( file ) => worker( file, ( error ) => {
 		onFileComplete();
+
+		if ( error ) {
+			console.log( error );
+		}
 
 		if ( ended && ++complete === files.length ) {
 			workerFarm.end( worker );

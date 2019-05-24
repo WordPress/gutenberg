@@ -145,9 +145,15 @@ const BUILD_TASK_BY_EXTENSION = {
 module.exports = async ( file, callback ) => {
 	const extension = path.extname( file );
 	const task = BUILD_TASK_BY_EXTENSION[ extension ];
-	if ( task ) {
-		await task( file );
+
+	if ( ! task ) {
+		return;
 	}
 
-	callback();
+	try {
+		await task( file );
+		callback();
+	} catch ( error ) {
+		callback( error );
+	}
 };
