@@ -6,11 +6,21 @@
  */
 
 /**
+ * Checks if a screen containing the block editor is being loaded.
+ *
+ * @return boolean True if a screen containing the block editor is being loaded.
+ */
+function gutenberg_is_block_editor() {
+	$screen = get_current_screen();
+	return $screen->is_block_editor() || 'gutenberg_page_gutenberg-widgets' === $screen->id;
+}
+
+/**
  * Emulates the Widgets screen `admin_print_styles` when at the block editor
  * screen.
  */
 function gutenberg_block_editor_admin_print_styles() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		/** This action is documented in wp-admin/admin-footer.php */
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_print_styles-widgets.php' );
@@ -23,7 +33,7 @@ add_action( 'admin_print_styles', 'gutenberg_block_editor_admin_print_styles' );
  * screen.
  */
 function gutenberg_block_editor_admin_print_scripts() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_print_scripts-widgets.php' );
 	}
@@ -35,7 +45,7 @@ add_action( 'admin_print_scripts', 'gutenberg_block_editor_admin_print_scripts' 
  * editor screen.
  */
 function gutenberg_block_editor_admin_print_footer_scripts() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		/** This action is documented in wp-admin/admin-footer.php */
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_print_footer_scripts-widgets.php' );
@@ -47,7 +57,7 @@ add_action( 'admin_print_footer_scripts', 'gutenberg_block_editor_admin_print_fo
  * Emulates the Widgets screen `admin_footer` when at the block editor screen.
  */
 function gutenberg_block_editor_admin_footer() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		/** This action is documented in wp-admin/admin-footer.php */
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_footer-widgets.php' );
