@@ -1,7 +1,7 @@
 /** @format */
 
 .container {
-	background-color: #e9eff3; // grey lighten 30
+	background-color: $gray-lighten-30;
 	padding-top: 24;
 	padding-bottom: 24;
 	padding-left: 8;
@@ -13,21 +13,19 @@
 .icon {
 	width: 24px;
 	height: 24px;
+	margin-bottom: 4;
 	fill: $gray-dark;
 }
 
 .title {
 	text-align: center;
-	margin-top: 8;
-	margin-bottom: 10;
-	font-size: 16;
-	font-weight: bold;
-	color: #2e4453;
+	margin-bottom: 6;
+	font-size: 14;
+	color: $gray-dark;
 }
 
 .message {
-	margin-top: 2;
 	text-align: center;
-	color: $gray-dark;
-	font-size: 14;
+	color: $gray-text-min;
+	font-size: 12;
 }
