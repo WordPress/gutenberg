@@ -4,10 +4,14 @@
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
+ * WordPress dependencies
+ */
+import { select, dispatch, apiFetch } from '@wordpress/data-controls';
+
+/**
  * Internal dependencies
  */
 import * as actions from '../actions';
-import { select, dispatch, apiFetch, resolveSelect } from '../controls';
 import {
 	STORE_KEY,
 	SAVE_POST_NOTICE_ID,
@@ -15,22 +19,18 @@ import {
 	POST_UPDATE_TRANSACTION_ID,
 } from '../constants';
 
-jest.mock( '../controls' );
+jest.mock( '@wordpress/data-controls' );
 
 select.mockImplementation( ( ...args ) => {
-	const { select: actualSelect } = jest.requireActual( '../controls' );
+	const { select: actualSelect } = jest
+		.requireActual( '@wordpress/data-controls' );
 	return actualSelect( ...args );
 } );
 
 dispatch.mockImplementation( ( ...args ) => {
-	const { dispatch: actualDispatch } = jest.requireActual( '../controls' );
+	const { dispatch: actualDispatch } = jest
+		.requireActual( '@wordpress/data-controls' );
 	return actualDispatch( ...args );
-} );
-
-resolveSelect.mockImplementation( ( ...args ) => {
-	const { resolveSelect: selectResolver } = jest
-		.requireActual( '../controls' );
-	return selectResolver( ...args );
 } );
 
 const apiFetchThrowError = ( error ) => {
@@ -43,7 +43,8 @@ const apiFetchThrowError = ( error ) => {
 const apiFetchDoActual = () => {
 	apiFetch.mockClear();
 	apiFetch.mockImplementation( ( ...args ) => {
-		const { apiFetch: fetch } = jest.requireActual( '../controls' );
+		const { apiFetch: fetch } = jest
+			.requireActual( '@wordpress/data-controls' );
 		return fetch( ...args );
 	} );
 };
@@ -212,7 +213,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next( postTypeSlug );
 					expect( value ).toEqual(
-						resolveSelect( 'core', 'getPostType', postTypeSlug )
+						select( 'core', 'getPostType', postTypeSlug )
 					);
 				},
 			],
@@ -278,7 +279,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
-						resolveSelect( 'core', 'getCurrentUser' )
+						select( 'core', 'getCurrentUser' )
 					);
 				},
 			],
@@ -288,7 +289,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next( currentUser );
 					expect( value ).toEqual(
-						resolveSelect(
+						select(
 							'core',
 							'getAutosave',
 							postTypeSlug,
@@ -533,7 +534,7 @@ describe( 'Post generator actions', () => {
 		);
 		it( 'yields expected action for selecting the post type object', () => {
 			const { value } = fulfillment.next( postTypeSlug );
-			expect( value ).toEqual( resolveSelect(
+			expect( value ).toEqual( select(
 				'core',
 				'getPostType',
 				postTypeSlug
@@ -611,7 +612,7 @@ describe( 'Post generator actions', () => {
 		} );
 		it( 'yields expected action for selecting the post type object', () => {
 			const { value } = fulfillment.next( postTypeSlug );
-			expect( value ).toEqual( resolveSelect(
+			expect( value ).toEqual( select(
 				'core',
 				'getPostType',
 				postTypeSlug

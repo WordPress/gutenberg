@@ -15,15 +15,10 @@ export {
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from './media-upload';
 export { default as URLInput } from './url-input';
+export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
 
 // Content Related Components
 export { default as DefaultBlockAppender } from './default-block-appender';
 
 // State Related Components
 export { default as BlockEditorProvider } from './provider';
-
-// Mobile Editor Related Components
-export { default as BottomSheet } from './mobile/bottom-sheet';
-export { default as Picker } from './mobile/picker';
-
-export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
