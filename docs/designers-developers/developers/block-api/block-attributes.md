@@ -6,13 +6,13 @@ Attribute sources are used to define how the block attribute values are extracte
 
 If no attribute source is specified, the attribute will be saved to (and read from) the block's [comment delimiter](/docs/designers-developers/key-concepts.md#delimiters-and-parsing-expression-grammar).
 
-The keys specified in the attributes source object are named as you see fit. The result of the attribute source definition will be assigned as a value to each key.
+The keys specified in the attributes source object are named as you see fit. The result of the attribute source definition is assigned as a value to each key.
 
 If no selector argument is specified, the source definition runs against the block's root node. If a selector argument is specified, it will run against the specified element(s) contained within the block.
 
-The selector specified can be an HTML tag, but also anything queryable such as a class or id attribute, see examples below.
+The selector specified can be an HTML tag, or anything queryable such as a class or id attribute, see examples below.
 
-Under the hood, attribute sources are a superset of functionality provided by [hpq](https://github.com/aduth/hpq), a small library used to parse and query HTML markup into an object shape. 
+Under the hood, attribute sources are a superset of the functionality provided by [hpq](https://github.com/aduth/hpq), a small library used to parse and query HTML markup into an object shape.
 
 
 ### `attribute`
