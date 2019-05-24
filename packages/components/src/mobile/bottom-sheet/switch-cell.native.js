@@ -12,7 +12,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
  */
 import Cell from './cell';
 
-export default function SwitchCell( props ) {
+export default function BottomSheetSwitchCell( props ) {
 	const {
 		value,
 		onValueChange,

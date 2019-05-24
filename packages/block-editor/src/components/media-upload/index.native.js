@@ -12,7 +12,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Picker } from '@wordpress/block-editor';
+import { Picker } from '@wordpress/components';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
