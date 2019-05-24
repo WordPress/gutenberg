@@ -81,7 +81,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 		{ "name": "default", "label": "Default", "isDefault": true }, 
 		{ "name": "other", "label": "Other" }
 	],
-	"editorScript": "file:build/editor.assets.json",
+	"editorScript": "file:build/editor.asset.json",
 	"script": {
 		"handle": "my-plugin-notice",
 		"file": "index.js",
@@ -172,7 +172,7 @@ Setting `parent` lets a block require that it is only available when nested with
 
 ### Icon
 
-* Type: `string``
+* Type: `string`
 * Optional
 * Localized: No
 * Property: `icon`
@@ -281,7 +281,7 @@ Plugins and Themes can also register [custom block style](/docs/designers-develo
 * Property: `editorScript`
 
 ```json
-{ "editorScript": "file:build/editor.assets.json" }
+{ "editorScript": "file:build/editor.asset.json" }
 ```
 
 Block type editor script definition. It will only be enqueued in the context of the editor.
@@ -412,7 +412,7 @@ An asset can also be defined as an object which takes the following shape:
 - `handle` (`string`) - the name of the script.
 - `file` (`string`) - full URL of the script, or path of the script relative to the WordPress root directory.
 - `dependencies` (`string[]` - optional) - an array of registered script handles this script depends on.  Default value: `array()`.
-- `version` (`string`|`bool`|`null` - optional) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
+- `version` (`string`|`false`|`null` - optional) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
 
 When a block is registered with PHP, it will also automatically register all scripts and styles that are found in the `block.json` file.
 
