@@ -35,11 +35,7 @@ describe( 'Gutenberg Editor tests', () => {
 		editorPage = new EditorPage( driver );
 	} );
 
-	it( 'should be able to see visual editor', async () => {
-		await expect( editorPage.getBlockList() ).resolves.toBe( true );
-	} );
-
-	it( 'should be able to add a new List block', async () => {
+	it( 'should be able to end a List block', async () => {
 		await editorPage.addNewListBlock();
 		const listBlockElement = await editorPage.getListBlockAtPosition( 1 );
 
@@ -49,11 +45,10 @@ describe( 'Gutenberg Editor tests', () => {
 		// send an Enter
 		await editorPage.sendTextToParagraphBlock( listBlockElement, '\n' );
 
-		// Send the second list item text
-		await editorPage.sendTextToListBlock( listBlockElement, testData.listItem2 );
+		// send an Enter
+		await editorPage.sendTextToParagraphBlock( listBlockElement, '\n' );
 
-		// switch to html and verify html
-		await editorPage.verifyHtmlContent( testData.listHtml );
+		await editorPage.verifyHtmlContent( testData.listEndedHtml );
 	} );
 
 	afterAll( async () => {
