@@ -42,6 +42,8 @@ type PropsType = {
 	rootClientId: ?string,
 	blockClientIds: Array<string>,
 	blockCount: number,
+	clearSelectedBlock: () => void,
+	focusBlock: ( clientId: string ) => void,
 	selectBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
 	replaceBlock: ( string, BlockType ) => mixed,
@@ -253,7 +255,10 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderList() {
 		return (
-			<View style={ { flex: 1 } } >
+			<View
+				style={ { flex: 1 } }
+				onAccessibilityEscape={ this.props.clearSelectedBlock }
+			>
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
@@ -379,9 +384,11 @@ export default compose( [
 			insertBlock,
 			replaceBlock,
 			selectBlock,
+			clearSelectedBlock,
 		} = dispatch( 'core/block-editor' );
 
 		return {
+			clearSelectedBlock,
 			insertBlock,
 			selectBlock,
 			replaceBlock,
