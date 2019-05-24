@@ -35,9 +35,6 @@ function gutenberg_widgets_init( $hook ) {
 		$max_upload_size = 0;
 	}
 
-	$color_palette = current( (array) get_theme_support( 'editor-color-palette' ) );
-	$font_sizes    = current( (array) get_theme_support( 'editor-font-sizes' ) );
-
 	$settings = array_merge(
 		array(
 			'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
@@ -46,6 +43,9 @@ function gutenberg_widgets_init( $hook ) {
 		),
 		gutenberg_get_legacy_widget_settings()
 	);
+
+	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
+	list( $font_sizes, )    = (array) get_theme_support( 'editor-font-sizes' );
 
 	if ( false !== $color_palette ) {
 		$settings['colors'] = $color_palette;
