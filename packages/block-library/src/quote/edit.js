@@ -3,10 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
-/**
- * Internal dependencies
- */
-import { BlockQuotation } from './blockquotation';
+import { BlockQuotation } from '@wordpress/components';
 
 export default function QuoteEdit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
 	const { align, value, citation } = attributes;
