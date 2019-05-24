@@ -83,9 +83,7 @@ class MediaTextEdit extends Component {
 			} );
 		}
 
-		this.setState( {
-			isEditing: false,
-		} );
+		this.toggleIsEditing();
 	}
 
 	onSelectMedia( media ) {
@@ -111,9 +109,7 @@ class MediaTextEdit extends Component {
 			src = get( media, [ 'sizes', 'large', 'url' ] ) || get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
 		}
 
-		this.setState( {
-			isEditing: false,
-		} );
+		this.toggleIsEditing();
 
 		setAttributes( {
 			mediaAlt: media.alt,
