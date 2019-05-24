@@ -15,7 +15,7 @@
 class Experimental_WP_Widget_Blocks_Manager {
 
 	/**
-	 * Array of sidebar_widgets as it was before the filter gutenberg_swap_out_sidebars_blocks_for_block_widgets was ever executed.
+	 * Array of sidebar_widgets as it was before the filter swap_out_sidebars_blocks_for_block_widgets was ever executed.
 	 *
 	 * @var array
 	 */
@@ -59,7 +59,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	}
 
 	/**
-	 * Returns the result of wp_get_sidebars_widgets without gutenberg_swap_out_sidebars_blocks_for_block_widgets filter being applied.
+	 * Returns the result of wp_get_sidebars_widgets without swap_out_sidebars_blocks_for_block_widgets filter being applied.
 	 *
 	 * @since 5.7.0
 	 */
@@ -299,7 +299,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 * @param array $options   Widget options.
 	 * @param array $arguments Arguments array.
 	 */
-	public static function gutenberg_output_blocks_widget( $options, $arguments ) {
+	public static function output_blocks_widget( $options, $arguments ) {
 		echo $options['before_widget'];
 		foreach ( $arguments['blocks'] as $block ) {
 			echo render_block( $block );
@@ -312,7 +312,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 *
 	 * @param array $blocks   Array of blocks.
 	 */
-	public static function gutenberg_blocks_to_widget( $blocks ) {
+	public static function convert_blocks_to_widget( $blocks ) {
 		$widget_id = 'blocks-widget-' . md5( Experimental_WP_Widget_Blocks_Manager::serialize_block( $blocks ) );
 		global $wp_registered_widgets;
 		if ( isset( $wp_registered_widgets[ $widget_id ] ) ) {
@@ -321,7 +321,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 		wp_register_sidebar_widget(
 			$widget_id,
 			__( 'Blocks Area ', 'gutenberg' ),
-			'Experimental_WP_Widget_Blocks_Manager::gutenberg_output_blocks_widget',
+			'Experimental_WP_Widget_Blocks_Manager::output_blocks_widget',
 			array(
 				'classname'   => 'widget-area',
 				'description' => __( 'Displays a set of blocks', 'gutenberg' ),
@@ -338,7 +338,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 *
 	 * @param array $sidebars_widgets_input An associative array of sidebars and their widgets.
 	 */
-	public static function gutenberg_swap_out_sidebars_blocks_for_block_widgets( $sidebars_widgets_input ) {
+	public static function swap_out_sidebars_blocks_for_block_widgets( $sidebars_widgets_input ) {
 		global $sidebars_widgets;
 		if ( null === self::$unfiltered_sidebar_widgets ) {
 			self::$unfiltered_sidebar_widgets = $sidebars_widgets;
@@ -364,7 +364,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 					isset( $block['attrs']['identifier'] )
 				) {
 					if ( ! empty( $last_set_of_blocks ) ) {
-						$filtered_widgets[] = self::gutenberg_blocks_to_widget( $last_set_of_blocks );
+						$filtered_widgets[] = self::convert_blocks_to_widget( $last_set_of_blocks );
 						$last_set_of_blocks = array();
 					}
 					$filtered_widgets[] = $block['attrs']['identifier'];
@@ -373,7 +373,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 				}
 			}
 			if ( ! empty( $last_set_of_blocks ) ) {
-				$filtered_widgets[] = self::gutenberg_blocks_to_widget( $last_set_of_blocks );
+				$filtered_widgets[] = self::convert_blocks_to_widget( $last_set_of_blocks );
 			}
 
 			$filtered_sidebar_widgets[ $sidebar_id ] = $filtered_widgets;
