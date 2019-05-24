@@ -262,7 +262,7 @@ async function releasePluginRC() {
 		await askForConfirmationToContinue(
 			'The plugin RC is now released. Proceed with the version bump in the master branch?',
 			true,
-			'test'
+			abortMessage
 		);
 		await simpleGit.fetch();
 		await simpleGit.checkout( 'master' );
