@@ -352,7 +352,7 @@ Undocumented declaration.
 <a name="SETTINGS_DEFAULTS" href="#SETTINGS_DEFAULTS">#</a> **SETTINGS_DEFAULTS**
 
 The default editor settings
-
+```
  alignWide                     boolean       Enable/Disable Wide/Full Alignments
  availableLegacyWidgets        Array         Array of objects representing the legacy widgets available.
  colors                        Array         Palette colors
@@ -369,6 +369,8 @@ The default editor settings
  isRTL                         boolean       Whether the editor is in RTL mode
  bodyPlaceholder               string        Empty post placeholder
  titlePlaceholder              string        Empty title placeholder
+ codeEditingEnabled            boolean       Whether or not the user can switch to the code editor 
+```
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
