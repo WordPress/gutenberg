@@ -367,15 +367,15 @@ The following properties are going to be supported for backward compatibility re
 **Example**:
 ```js
 wp.blocks.registerBlockType( 'my-block/name', {
-    edit: function() {
-    	// Edit definition goes here.
-    },
-    save: function() {
-    	// Save definition goes here.
-    },
-    supports: {
-        html: false
-    }
+	edit: function() {
+		// Edit definition goes here.
+	},
+	save: function() {
+		// Save definition goes here.
+	},
+	supports: {
+		html: false
+	}
 } );
 ``` 
 
@@ -422,11 +422,11 @@ In `block.json`:
 ```json
 {
 	"editorScript": {
-        "handle": "my-plugin-notice-editor",
-        "file": "build/editor.js",
-        "dependencies": [ "wp-blocks","wp-element", "wp-i18n" ],
-        "version": "3.0.0"
-    }
+		"handle": "my-plugin-notice-editor",
+		"file": "build/editor.js",
+		"dependencies": [ "wp-blocks","wp-element", "wp-i18n" ],
+		"version": "3.0.0"
+	}
 }
 ```
 
