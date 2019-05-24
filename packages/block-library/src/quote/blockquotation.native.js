@@ -7,7 +7,7 @@ import { View } from 'react-native';
  */
 import styles from './style.scss';
 
-export const Blockquote = ( props ) => {
+export const BlockQuotation = ( props ) => {
 	return (
 		<View style={ styles.wpBlockQuote } >
 			{ props.children }
