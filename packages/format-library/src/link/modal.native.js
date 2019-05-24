@@ -59,7 +59,7 @@ class ModalLinkUI extends Component {
 		this.setState( {
 			inputValue: url || '',
 			text: getTextContent( slice( this.props.value ) ),
-			opensInNewWindow: opensInNewWindow,
+			opensInNewWindow,
 		} );
 	}
 
