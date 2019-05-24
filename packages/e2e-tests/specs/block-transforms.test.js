@@ -153,7 +153,12 @@ describe( 'Block transforms', () => {
 			)
 		);
 
-		it.each( testTable )(
+		// Group is an available transform on all Blocks. Testing each transform adds
+		// significant overhead to the tests. Therefore we filter these out and test
+		// Group transforms separately.
+		const testTableWithoutGroup = testTable.filter( ( transform ) => ! transform.includes( 'Group' ) );
+
+		it.each( testTableWithoutGroup )(
 			'block %s in fixture %s into the %s block',
 			async ( originalBlock, fixture, destinationBlock ) => {
 				const { content } = transformStructure[ fixture ];
@@ -162,5 +167,19 @@ describe( 'Block transforms', () => {
 				).toMatchSnapshot();
 			}
 		);
+
+		// Test one of the Group transforms separately to avoid creating unecessary tests
+		it( 'correctly transforms one of the available blocks into a group block', async () => {
+			// Get the first available block fixture which supports a transform to Group
+			const firstTransformWithGroup = testTable.find( ( transform ) => {
+				return transform[ 2 ] === 'Group';
+			} );
+
+			const { content } = transformStructure[ firstTransformWithGroup[ 1 ] ];
+
+			expect(
+				await getTransformResult( content, firstTransformWithGroup[ 2 ] )
+			).toMatchSnapshot();
+		} );
 	} );
 } );
