@@ -144,6 +144,7 @@ class MediaTextEdit extends Component {
 
 	renderMediaArea() {
 		const { attributes } = this.props;
+
 		const {
 			mediaAlt,
 			mediaId,
@@ -154,6 +155,7 @@ class MediaTextEdit extends Component {
 			imageFill,
 			focalPoint,
 		} = attributes;
+
 		return (
 			<MediaContainer
 				className="block-library-media-text__media-container"
@@ -177,6 +179,7 @@ class MediaTextEdit extends Component {
 			setAttributes,
 			setBackgroundColor,
 		} = this.props;
+
 		const {
 			isStackedOnMobile,
 			mediaAlt,
@@ -188,7 +191,9 @@ class MediaTextEdit extends Component {
 			imageFill,
 			focalPoint,
 		} = attributes;
+
 		const temporaryMediaWidth = this.state.mediaWidth;
+
 		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-selected': isSelected,
@@ -197,16 +202,20 @@ class MediaTextEdit extends Component {
 			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 			'is-image-fill': imageFill,
 		} );
+
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
+
 		const style = {
 			gridTemplateColumns: 'right' === mediaPosition ? `auto ${ widthString }` : `${ widthString } auto`,
 			backgroundColor: backgroundColor.color,
 		};
+
 		const colorSettings = [ {
 			value: backgroundColor.color,
 			onChange: setBackgroundColor,
 			label: __( 'Background Color' ),
 		} ];
+
 		const toolbarControls = [ {
 			icon: 'align-pull-left',
 			title: __( 'Show media on left' ),
@@ -218,12 +227,15 @@ class MediaTextEdit extends Component {
 			isActive: mediaPosition === 'right',
 			onClick: () => setAttributes( { mediaPosition: 'right' } ),
 		} ];
+
 		const onMediaAltChange = ( newMediaAlt ) => {
 			setAttributes( { mediaAlt: newMediaAlt } );
 		};
+
 		const onVerticalAlignmentChange = ( alignment ) => {
 			setAttributes( { verticalAlignment: alignment } );
 		};
+
 		const mediaTextGeneralSettings = (
 			<PanelBody title={ __( 'Media & Text Settings' ) }>
 				<ToggleControl
@@ -261,6 +273,7 @@ class MediaTextEdit extends Component {
 				/> ) }
 			</PanelBody>
 		);
+
 		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 
 		return (
