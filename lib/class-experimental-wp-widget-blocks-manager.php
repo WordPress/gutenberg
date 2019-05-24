@@ -313,7 +313,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 	 * @param array $blocks   Array of blocks.
 	 */
 	public static function convert_blocks_to_widget( $blocks ) {
-		$widget_id = 'blocks-widget-' . md5( Experimental_WP_Widget_Blocks_Manager::serialize_block( $blocks ) );
+		$widget_id = 'blocks-widget-' . md5( self::serialize_blocks( $blocks ) );
 		global $wp_registered_widgets;
 		if ( isset( $wp_registered_widgets[ $widget_id ] ) ) {
 			return $widget_id;
