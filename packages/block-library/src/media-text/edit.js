@@ -80,6 +80,9 @@ class MediaTextEdit extends Component {
 			this.props.setAttributes( {
 				mediaUrl: newURL,
 				mediaId: undefined,
+				mediaAlt: undefined,
+				imageFill: undefined,
+				focalPoint: undefined,
 			} );
 		}
 
