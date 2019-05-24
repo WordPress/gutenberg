@@ -81,9 +81,27 @@
 	color: $dark-gray-500;
 	height: 0;
 	overflow: hidden;
-	width: 100%;
-	@include break-small() {
-		width: 300px;
+	max-width: 290px;
+
+	&-input__suggestions {
+		max-width: 290px;
+	}
+
+	@media (min-width: #{ ($break-medium) }) {
+		max-width: 260px;
+
+		&-input__suggestions {
+			max-width: 260px;
+		}
+
+	}
+	@media (min-width: #{ ($break-large) }) {
+		max-width: 290px;
+
+		&-input__suggestions {
+			max-width: 290px;
+		}
+
 	}
 
 	.is-selected &,

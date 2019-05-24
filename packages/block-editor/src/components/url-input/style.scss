@@ -36,6 +36,18 @@ $input-size: 300px;
 		border-radius: 4px;
 	}
 
+	&.is-full-width {
+		width: 100%;
+
+		input[type="text"] {
+			width: 100%;
+		}
+
+		&__suggestions {
+			width: 100%;
+		}
+	}
+
 	.components-spinner {
 		position: absolute;
 		right: $input-padding;
