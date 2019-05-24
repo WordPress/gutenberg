@@ -153,26 +153,12 @@ describe( 'Block transforms', () => {
 			)
 		);
 
-		// Group is an available transform on all Blocks. Testing each transform adds
-		// significant overhead to the tests. Therefore we filter these out and test
-		// Group transforms separately.
-		const testTableWithoutGroup = testTable.filter( ( transform ) => ! transform.includes( 'Group' ) );
-
-		// Select Paragraph and Image Blocks (only) to test the Group transform
-		const testTableWithSomeGroupsFiltered = testTable.filter( ( transform ) => ( transform[ 2 ] === 'Group' && ( transform[ 1 ] === 'core__paragraph__align-right' || transform[ 1 ] === 'core__image' ) ) );
-
-		it.each( testTableWithoutGroup )(
-			'block %s in fixture %s into the %s block',
-			async ( originalBlock, fixture, destinationBlock ) => {
-				const { content } = transformStructure[ fixture ];
-				expect(
-					await getTransformResult( content, destinationBlock )
-				).toMatchSnapshot();
-			}
-		);
+		// Filter out Group transforms for perf reasons, expect for x2 tests
+		// (core/paragraph and core/image)
+		const testTableWithSomeGroupsFiltered = testTable.filter( ( transform ) => ( transform[ 2 ] !== 'Group' || transform[ 1 ] === 'core__paragraph__align-right' || transform[ 1 ] === 'core__image' ) );
 
 		it.each( testTableWithSomeGroupsFiltered )(
-			'block %s in fixture %s into the group block',
+			'block %s in fixture %s into the %s block',
 			async ( originalBlock, fixture, destinationBlock ) => {
 				const { content } = transformStructure[ fixture ];
 				expect(
