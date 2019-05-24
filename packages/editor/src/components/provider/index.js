@@ -78,6 +78,7 @@ class EditorProvider extends Component {
 				'allowedBlockTypes',
 				'availableLegacyWidgets',
 				'bodyPlaceholder',
+				'codeEditingEnabled',
 				'colors',
 				'disableCustomColors',
 				'disableCustomFontSizes',
