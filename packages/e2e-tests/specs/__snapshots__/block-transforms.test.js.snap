@@ -104,6 +104,14 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 <!-- /wp:media-text -->"
 `;
 
+exports[`Block transforms correctly transform block Image in fixture core__image into the group block 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure>
+<!-- /wp:image --></div>
+<!-- /wp:group -->"
+`;
+
 exports[`Block transforms correctly transform block Image in fixture core__image__attachment-link into the Cover block 1`] = `
 "<!-- wp:cover {\\"url\\":\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\"} -->
 <div class=\\"wp-block-cover has-background-dim\\" style=\\"background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==)\\"><div class=\\"wp-block-cover__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"center\\",\\"placeholder\\":\\"Write title…\\",\\"fontSize\\":\\"large\\"} -->
@@ -382,6 +390,14 @@ exports[`Block transforms correctly transform block Paragraph in fixture core__p
 <!-- /wp:verse -->"
 `;
 
+exports[`Block transforms correctly transform block Paragraph in fixture core__paragraph__align-right into the group block 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph {\\"align\\":\\"right\\"} -->
+<p style=\\"text-align:right\\">... like this one, which is separate from the above and right aligned.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->"
+`;
+
 exports[`Block transforms correctly transform block Preformatted in fixture core__preformatted into the Paragraph block 1`] = `
 "<!-- wp:paragraph -->
 <p>Some <em>preformatted</em> text...<br>And more!</p>
@@ -490,10 +506,4 @@ exports[`Block transforms correctly transform block Video in fixture core__video
 <p class=\\"has-large-font-size\\"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
-`;
-
-exports[`Block transforms correctly transform correctly transforms one of the available blocks into a group block 1`] = `
-"<!-- wp:group -->
-<div class=\\"wp-block-group\\"><!-- wp:archives /--></div>
-<!-- /wp:group -->"
 `;

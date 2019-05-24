@@ -158,6 +158,9 @@ describe( 'Block transforms', () => {
 		// Group transforms separately.
 		const testTableWithoutGroup = testTable.filter( ( transform ) => ! transform.includes( 'Group' ) );
 
+		// Select Paragraph and Image Blocks (only) to test the Group transform
+		const testTableWithSomeGroupsFiltered = testTable.filter( ( transform ) => ( transform[ 2 ] === 'Group' && ( transform[ 1 ] === 'core__paragraph__align-right' || transform[ 1 ] === 'core__image' ) ) );
+
 		it.each( testTableWithoutGroup )(
 			'block %s in fixture %s into the %s block',
 			async ( originalBlock, fixture, destinationBlock ) => {
@@ -168,18 +171,14 @@ describe( 'Block transforms', () => {
 			}
 		);
 
-		// Test one of the Group transforms separately to avoid creating unecessary tests
-		it( 'correctly transforms one of the available blocks into a group block', async () => {
-			// Get the first available block fixture which supports a transform to Group
-			const firstTransformWithGroup = testTable.find( ( transform ) => {
-				return transform[ 2 ] === 'Group';
-			} );
-
-			const { content } = transformStructure[ firstTransformWithGroup[ 1 ] ];
-
-			expect(
-				await getTransformResult( content, firstTransformWithGroup[ 2 ] )
-			).toMatchSnapshot();
-		} );
+		it.each( testTableWithSomeGroupsFiltered )(
+			'block %s in fixture %s into the group block',
+			async ( originalBlock, fixture, destinationBlock ) => {
+				const { content } = transformStructure[ fixture ];
+				expect(
+					await getTransformResult( content, destinationBlock )
+				).toMatchSnapshot();
+			}
+		);
 	} );
 } );
