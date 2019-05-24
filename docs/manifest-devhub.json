@@ -834,6 +834,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "BlockQuotation",
+		"slug": "block-quotation",
+		"markdown_source": "../packages/components/src/primitives/block-quotation/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "HorizontalRule",
 		"slug": "horizontal-rule",
 		"markdown_source": "../packages/components/src/primitives/horizontal-rule/README.md",
