@@ -10,6 +10,7 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 
 function WidgetArea( {
+	blockEditorSettings,
 	blocks,
 	initialOpen,
 	updateBlocks,
@@ -25,6 +26,7 @@ function WidgetArea( {
 					value={ blocks }
 					onInput={ updateBlocks }
 					onChange={ updateBlocks }
+					settings={ blockEditorSettings }
 				>
 					<BlockList />
 				</BlockEditorProvider>

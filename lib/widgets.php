@@ -65,14 +65,14 @@ function gutenberg_block_editor_admin_footer() {
 }
 add_action( 'admin_footer', 'gutenberg_block_editor_admin_footer' );
 
+
 /**
- * Extends default editor settings with values supporting legacy widgets.
+ * Returns the settings required by legacy widgets blocks.
  *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
+ * @return array Legacy widget settings.
  */
-function gutenberg_legacy_widget_settings( $settings ) {
+function gutenberg_get_legacy_widget_settings() {
+	$settings = array();
 	/**
 	 * TODO: The hardcoded array should be replaced with a mechanism to allow
 	 * core and third party blocks to specify they already have equivalent
@@ -134,6 +134,17 @@ function gutenberg_legacy_widget_settings( $settings ) {
 	$settings['availableLegacyWidgets']        = $available_legacy_widgets;
 
 	return $settings;
+}
+
+/**
+ * Extends default editor settings with values supporting legacy widgets.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_legacy_widget_settings( $settings ) {
+	return array_merge( $settings, gutenberg_get_legacy_widget_settings() );
 }
 add_filter( 'block_editor_settings', 'gutenberg_legacy_widget_settings' );
 
