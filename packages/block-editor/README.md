@@ -369,6 +369,7 @@ The default editor settings
  isRTL                         boolean       Whether the editor is in RTL mode
  bodyPlaceholder               string        Empty post placeholder
  titlePlaceholder              string        Empty title placeholder
+ codeEditingEnabled            string        Whether or not the user can switch to the code editor
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
