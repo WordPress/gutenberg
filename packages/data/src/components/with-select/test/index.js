@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { withSelect } from '../';
+import withSelect from '../';
 import withDispatch from '../../with-dispatch';
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
