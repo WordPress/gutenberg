@@ -93,10 +93,17 @@ export default function useSelect( _mapSelect, deps ) {
 				} catch ( error ) {
 					latestMapOutputError.current = error;
 				}
-
 				forceRender( {} );
 			}
 		};
+
+		// catch any possible state changes during mount before the subscription
+		// could be set.
+		if ( latestIsAsync.current ) {
+			renderQueue.add( queueContext, onStoreChange );
+		} else {
+			onStoreChange();
+		}
 
 		const unsubscribe = registry.subscribe( () => {
 			if ( latestIsAsync.current ) {
