@@ -76,7 +76,7 @@ class Tooltip extends Component {
 			// quickly blur/mouseleave before delayedSetIsOver is called
 			this.delayedSetIsOver.cancel();
 
-			const isOver = includes( [ 'focus', 'mouseenter', 'keydown' ], event.type );
+			const isOver = includes( [ 'focus', 'mouseenter' ], event.type );
 			if ( isOver === this.state.isOver ) {
 				return;
 			}
@@ -111,7 +111,14 @@ class Tooltip extends Component {
 			onFocus: this.createToggleIsOver( 'onFocus' ),
 			onBlur: this.createToggleIsOver( 'onBlur' ),
 			children: concatChildren(
-				child.props.children,
+				<KeyboardShortcuts
+					shortcuts={ {
+						escape: this.createToggleIsOver,
+					} }
+				>
+					{ child.props.children }
+				</KeyboardShortcuts>
+				,
 				isOver && (
 					<Popover
 						focusOnMount={ false }
@@ -120,13 +127,7 @@ class Tooltip extends Component {
 						aria-hidden="true"
 						animate={ false }
 					>
-						<KeyboardShortcuts
-							shortcuts={ {
-								escape: this.createToggleIsOver( 'onKeyDown' ),
-							} }
-						>
-							{ text }
-						</KeyboardShortcuts>
+						{ text }
 						<Shortcut className="components-tooltip__shortcut" shortcut={ shortcut } />
 					</Popover>
 				),
