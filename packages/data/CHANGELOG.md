@@ -1,3 +1,13 @@
+## Master
+
+### New Feature
+
+- Expose `useSelect` hook for usage in functional components. ([#15737](https://github.com/WordPress/gutenberg/pull/15737))
+
+### Enhancements
+
+- `withSelect` internally uses the new `useSelect` hook. ([#15737](https://github.com/WordPress/gutenberg/pull/15737).  **Note:** This _could_ impact performance of code using `withSelect` in edge-cases. To avoid impact, memoize passed in `mapSelectToProps` callbacks or implement `useSelect` directly with dependencies.
+
 ## 4.5.0 (2019-05-21)
 
 ### Bug Fix
