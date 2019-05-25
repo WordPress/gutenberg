@@ -51,4 +51,4 @@ curl \
 	-H "Authorization: token $GITHUB_TOKEN" \
 	-H "Content-Type: application/json" \
 	-d "{\"milestone\":$number}" \
-	"https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$pr"
+	"https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$pr" > /dev/null
