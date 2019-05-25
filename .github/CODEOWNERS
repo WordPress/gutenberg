@@ -1,26 +1,26 @@
 # Documentation
-/docs                                           @youknowriad @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
-/docs/designers-developers/developers           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
-/docs/designers-developers/designers            @youknowriad @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
+/docs                                           @youknowriad @chrisvanpatten @ajitbohra @notnownikki
+/docs/designers-developers/developers           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @notnownikki
+/docs/designers-developers/designers            @youknowriad @chrisvanpatten @mkaz @ajitbohra @notnownikki
 
 # Data
 /packages/api-fetch                             @youknowriad @aduth @nerrad @mmtr
-/packages/core-data                             @youknowriad @gziolo @aduth @nerrad @noisysocks
+/packages/core-data                             @youknowriad @gziolo @aduth @nerrad
 /packages/data                                  @youknowriad @aduth @nerrad @coderkevin
 /packages/redux-routine                         @youknowriad @aduth @nerrad
 
 # Blocks
-/packages/block-library                         @youknowriad @gziolo @Soean @ajitbohra @jorgefilipecosta @talldan @noisysocks @notnownikki
+/packages/block-library                         @youknowriad @gziolo @Soean @ajitbohra @jorgefilipecosta @talldan @notnownikki
 
 # Editor
 /packages/annotations                           @youknowriad @aduth @atimmer @ellatrix
 /packages/autop                                 @youknowriad @aduth
-/packages/block-editor                          @youknowriad @gziolo @talldan @noisysocks @ellatrix
+/packages/block-editor                          @youknowriad @gziolo @talldan @ellatrix
 /packages/block-serialization-spec-parser       @youknowriad @gziolo @aduth @dmsnell
 /packages/block-serialization-default-parser    @youknowriad @gziolo @aduth @dmsnell
-/packages/blocks                                @youknowriad @gziolo @aduth @noisysocks @ellatrix
-/packages/edit-post                             @youknowriad @talldan @noisysocks
-/packages/editor                                @youknowriad @talldan @noisysocks
+/packages/blocks                                @youknowriad @gziolo @aduth @ellatrix
+/packages/edit-post                             @youknowriad @talldan
+/packages/editor                                @youknowriad @talldan
 /packages/list-reusable-blocks                  @youknowriad @aduth @noisysocks
 /packages/shortcode                             @youknowriad @aduth
 
@@ -28,32 +28,32 @@
 /packages/edit-widgets                          @youknowriad
 
 # Tooling
-/bin                                            @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/docs/tool                                      @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
+/bin                                            @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/docs/tool                                      @youknowriad @gziolo @chrisvanpatten @ajitbohra @nosolosw @notnownikki
 /packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/babel-plugin-makepot                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
-/packages/browserslist-config                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/custom-templated-path-webpack-plugin  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/docgen                                @nosolosw @mkaz @gziolo
+/packages/browserslist-config                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/custom-templated-path-webpack-plugin  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/docgen                                @nosolosw @gziolo
 /packages/e2e-test-utils                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @talldan
-/packages/eslint-plugin                         @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/eslint-plugin                         @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/jest-console                          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/jest-puppeteer-axe                    @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/library-export-default-webpack-plugin @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/npm-package-json-lint-config          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/postcss-themes                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/scripts                               @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw @mkaz
+/packages/library-export-default-webpack-plugin @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/npm-package-json-lint-config          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/postcss-themes                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/scripts                               @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 
 # UI Components
-/packages/components                            @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks @chrisvanpatten
-/packages/compose                               @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
-/packages/element                               @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
-/packages/notices                               @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/components                            @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @chrisvanpatten
+/packages/compose                               @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
+/packages/element                               @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
+/packages/notices                               @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
 /packages/nux                                   @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
-/packages/viewport                              @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/viewport                              @youknowriad @gziolo @aduth @ajitbohra @jaymanpandya @jorgefilipecosta @talldan
 
 # Utilities
 /packages/a11y                                  @youknowriad @gziolo @aduth
@@ -77,15 +77,13 @@
 /packages/plugins                               @youknowriad @gziolo @aduth @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @youknowriad @aduth @ellatrix @jorgefilipecosta
-/packages/rich-text                             @youknowriad @aduth @ellatrix @jorgefilipecosta
-/packages/block-editor/src/components/rich-text @youknowriad @aduth @ellatrix @jorgefilipecosta
+/packages/format-library                        @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao
+/packages/rich-text                             @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao
+/packages/block-editor/src/components/rich-text @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao
 
 # PHP
 /lib                                            @youknowriad @gziolo @aduth
-
-# Styles
-*.scss                                          @chrisvanpatten
+*-controller.php                                @youknowriad @gziolo @aduth @timothybjacobs
 
 # Native (Unowned)
 *.native.js                                     @ghost

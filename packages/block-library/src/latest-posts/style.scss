@@ -7,11 +7,13 @@
 		/*rtl:ignore*/
 		margin-left: 2em;
 	}
+	&.wp-block-latest-posts__list {
+		list-style: none;
+	}
 	&.is-grid {
 		display: flex;
 		flex-wrap: wrap;
 		padding: 0;
-		list-style: none;
 
 		li {
 			margin: 0 16px 16px 0;
@@ -34,3 +36,7 @@
 	font-size: $default-font-size;
 }
 
+.wp-block-latest-posts__post-excerpt {
+	margin-top: $grid-size;
+	margin-bottom: $grid-size-large;
+}

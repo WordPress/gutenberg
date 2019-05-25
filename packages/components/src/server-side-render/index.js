@@ -68,7 +68,7 @@ export class ServerSideRender extends Component {
 		// check if it is the current request, to avoid race conditions on slow networks.
 		const fetchRequest = this.currentFetchRequest = apiFetch( { path } )
 			.then( ( response ) => {
-				if ( this.isStillMounted && fetchRequest === this.currentFetchRequest && response && response.rendered ) {
+				if ( this.isStillMounted && fetchRequest === this.currentFetchRequest && response ) {
 					this.setState( { response: response.rendered } );
 				}
 			} )
@@ -86,7 +86,15 @@ export class ServerSideRender extends Component {
 	render() {
 		const response = this.state.response;
 		const { className } = this.props;
-		if ( ! response ) {
+		if ( response === '' ) {
+			return (
+				<Placeholder
+					className={ className }
+				>
+					{ __( 'Block rendered as empty.' ) }
+				</Placeholder>
+			);
+		} else if ( ! response ) {
 			return (
 				<Placeholder
 					className={ className }
@@ -102,14 +110,6 @@ export class ServerSideRender extends Component {
 					className={ className }
 				>
 					{ errorMessage }
-				</Placeholder>
-			);
-		} else if ( ! response.length ) {
-			return (
-				<Placeholder
-					className={ className }
-				>
-					{ __( 'No results found.' ) }
 				</Placeholder>
 			);
 		}

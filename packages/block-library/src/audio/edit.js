@@ -19,7 +19,7 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { mediaUpload } from '@wordpress/editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -99,10 +99,15 @@ class AudioEdit extends Component {
 		this.setState( { editing: false } );
 	}
 
+
 	onUploadError( message ) {
 		const { noticeOperations } = this.props;
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
+  }
+
+	getAutoplayHelp( checked ) {
+		return checked ? __( 'Note: Autoplaying audio may cause usability issues for some visitors.' ) : null;
 	}
 
 	render() {
@@ -143,7 +148,7 @@ class AudioEdit extends Component {
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar>
 						<IconButton
@@ -160,6 +165,7 @@ class AudioEdit extends Component {
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ this.getAutoplayHelp }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }
@@ -197,7 +203,7 @@ class AudioEdit extends Component {
 						/>
 					) }
 				</figure>
-			</Fragment>
+			</>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}

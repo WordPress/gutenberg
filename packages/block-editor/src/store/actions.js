@@ -131,7 +131,9 @@ export function* selectPreviousBlock( clientId ) {
 		clientId
 	);
 
-	yield selectBlock( previousBlockClientId, -1 );
+	if ( previousBlockClientId ) {
+		yield selectBlock( previousBlockClientId, -1 );
+	}
 }
 
 /**
@@ -147,7 +149,9 @@ export function* selectNextBlock( clientId ) {
 		clientId
 	);
 
-	yield selectBlock( nextBlockClientId );
+	if ( nextBlockClientId ) {
+		yield selectBlock( nextBlockClientId );
+	}
 }
 
 /**
@@ -218,12 +222,14 @@ export function toggleSelection( isSelectionEnabled = true ) {
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
- * @param {(string|string[])} clientIds Block client ID(s) to replace.
- * @param {(Object|Object[])} blocks    Replacement block(s).
+ * @param {(string|string[])} clientIds     Block client ID(s) to replace.
+ * @param {(Object|Object[])} blocks        Replacement block(s).
+ * @param {number}            indexToSelect Index of replacement block to
+ *                                          select.
  *
  * @yields {Object} Action object.
  */
-export function* replaceBlocks( clientIds, blocks ) {
+export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 	clientIds = castArray( clientIds );
 	blocks = castArray( blocks );
 	const rootClientId = yield select(
@@ -249,6 +255,7 @@ export function* replaceBlocks( clientIds, blocks ) {
 		clientIds,
 		blocks,
 		time: Date.now(),
+		indexToSelect,
 	};
 	yield* ensureDefaultBlock();
 }
@@ -298,7 +305,7 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  *
  * @yields {Object} Action object.
  */
-export function* moveBlockToPosition( clientId, fromRootClientId, toRootClientId, index ) {
+export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootClientId = '', index ) {
 	const templateLock = yield select(
 		'core/block-editor',
 		'getTemplateLock',
@@ -630,7 +637,13 @@ export function selectionChange( clientId, attributeKey, startOffset, endOffset 
  * @return {Object} Action object
  */
 export function insertDefaultBlock( attributes, rootClientId, index ) {
-	const block = createBlock( getDefaultBlockName(), attributes );
+	// Abort if there is no default block type (if it has been unregistered).
+	const defaultBlockName = getDefaultBlockName();
+	if ( ! defaultBlockName ) {
+		return;
+	}
+
+	const block = createBlock( defaultBlockName, attributes );
 
 	return insertBlock( block, index, rootClientId );
 }

@@ -7,6 +7,7 @@ import {
 	createNewPost,
 	isInDefaultBlock,
 	pressKeyWithModifier,
+	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
 const addThreeParagraphsToNewPost = async () => {
@@ -30,7 +31,7 @@ describe( 'block deletion -', () => {
 	beforeEach( addThreeParagraphsToNewPost );
 
 	describe( 'deleting the third block using the Remove Block menu item', () => {
-		it.skip( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
+		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
 			// The blocks can't be empty to trigger the toolbar
 			await page.keyboard.type( 'Paragraph to remove' );
 
@@ -129,5 +130,35 @@ describe( 'deleting all blocks', () => {
 
 		// And focus is retained:
 		expect( await isInDefaultBlock() ).toBe( true );
+	} );
+
+	it( 'gracefully removes blocks when the default block is not available', async () => {
+		// Regression Test: Previously, removing a block would not clear
+		// selection state when there were no other blocks to select.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/15458
+		// See: https://github.com/WordPress/gutenberg/pull/15543
+		await createNewPost();
+
+		// Unregister default block type. This may happen if the editor is
+		// configured to not allow the default (paragraph) block type, either
+		// by plugin editor settings filtering or user block preferences.
+		await page.evaluate( () => {
+			const defaultBlockName = wp.data.select( 'core/blocks' ).getDefaultBlockName();
+			wp.data.dispatch( 'core/blocks' ).removeBlockTypes( defaultBlockName );
+		} );
+
+		// Add and remove a block.
+		await insertBlock( 'Image' );
+		await page.keyboard.press( 'Backspace' );
+
+		// Verify there is no selected block.
+		// TODO: There should be expectations around where focus is placed in
+		// this scenario. Currently, a focus loss occurs (not acceptable).
+		const selectedBlocksCount = await page.evaluate( () => {
+			return wp.data.select( 'core/block-editor' ).getSelectedBlockClientIds().length;
+		} );
+
+		expect( selectedBlocksCount ).toBe( 0 );
 	} );
 } );

@@ -44,7 +44,7 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { mediaUpload } from '@wordpress/editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -401,40 +401,41 @@ class ImageEdit extends Component {
 				) }
 			</BlockControls>
 		);
+		const src = isExternal ? url : undefined;
+		const labels = {
+			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
+			instructions: __( 'Drag an image to upload, select a file from your library or add one from an URL.' ),
+		};
+		const mediaPreview = ( !! url && <img
+			alt={ __( 'Edit image' ) }
+			title={ __( 'Edit image' ) }
+			className={ 'edit-image-preview' }
+			src={ url }
+		/> );
+		const mediaPlaceholder = (
+			<MediaPlaceholder
+				icon={ <BlockIcon icon={ icon } /> }
+				className={ className }
+				labels={ labels }
+				onSelect={ this.onSelectImage }
+				onSelectURL={ this.onSelectURL }
+				onDoubleClick={ this.toggleIsEditing }
+				onCancel={ !! url && this.toggleIsEditing }
+				notices={ noticeUI }
+				onError={ this.onUploadError }
+				accept="image/*"
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ { id, src } }
+				mediaPreview={ mediaPreview }
+				dropZoneUIOnly={ ! isEditing && url }
+			/>
+		);
 		if ( isEditing || ! url ) {
-			const src = isExternal ? url : undefined;
-
-			const labels = {
-				title: ! url ? __( 'Image' ) : __( 'Edit image' ),
-				instructions: __( 'Drag an image to upload, select a file from your library or add one from an URL.' ),
-			};
-
-			const mediaPreview = ( !! url && <img
-				alt={ __( 'Edit image' ) }
-				title={ __( 'Edit image' ) }
-				className={ 'edit-image-preview' }
-				src={ url }
-			/> );
-
 			return (
-				<Fragment>
+				<>
 					{ controls }
-					<MediaPlaceholder
-						icon={ <BlockIcon icon={ icon } /> }
-						className={ className }
-						labels={ labels }
-						onSelect={ this.onSelectImage }
-						onSelectURL={ this.onSelectURL }
-						onDoubleClick={ this.toggleIsEditing }
-						onCancel={ !! url && this.toggleIsEditing }
-						notices={ noticeUI }
-						onError={ this.onUploadError }
-						accept="image/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ { id, src } }
-						mediaPreview={ mediaPreview }
-					/>
-				</Fragment>
+					{ mediaPlaceholder }
+				</>
 			);
 		}
 
@@ -456,12 +457,12 @@ class ImageEdit extends Component {
 						value={ alt }
 						onChange={ this.updateAlt }
 						help={
-							<Fragment>
+							<>
 								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 									{ __( 'Describe the purpose of the image' ) }
 								</ExternalLink>
 								{ __( 'Leave empty if the image is purely decorative.' ) }
-							</Fragment>
+							</>
 						}
 					/>
 					{ ! isEmpty( imageSizeOptions ) && (
@@ -482,7 +483,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ width !== undefined ? width : imageWidth }
+									value={ width || imageWidth || '' }
 									min={ 1 }
 									onChange={ this.updateWidth }
 								/>
@@ -490,7 +491,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ height !== undefined ? height : imageHeight }
+									value={ height || imageHeight || '' }
 									min={ 1 }
 									onChange={ this.updateHeight }
 								/>
@@ -534,7 +535,7 @@ class ImageEdit extends Component {
 						onChange={ this.onSetLinkDestination }
 					/>
 					{ linkDestination !== LINK_DESTINATION_NONE && (
-						<Fragment>
+						<>
 							<TextControl
 								label={ __( 'Link URL' ) }
 								value={ href || '' }
@@ -556,7 +557,7 @@ class ImageEdit extends Component {
 								value={ rel || '' }
 								onChange={ this.onSetLinkRel }
 							/>
-						</Fragment>
+						</>
 					) }
 				</PanelBody>
 			</InspectorControls>
@@ -565,7 +566,7 @@ class ImageEdit extends Component {
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<Fragment>
+			<>
 				{ controls }
 				<figure className={ classes }>
 					<ImageSize src={ url } dirtynessTrigger={ align }>
@@ -591,7 +592,7 @@ class ImageEdit extends Component {
 								// Disable reason: Image itself is not meant to be interactive, but
 								// should direct focus to block.
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-								<Fragment>
+								<>
 									<img
 										src={ url }
 										alt={ defaultedAlt }
@@ -600,18 +601,18 @@ class ImageEdit extends Component {
 										onError={ () => this.onImageError( url ) }
 									/>
 									{ isBlobURL( url ) && <Spinner /> }
-								</Fragment>
+								</>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 							);
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
-									<Fragment>
+									<>
 										{ getInspectorControls( imageWidth, imageHeight ) }
 										<div style={ { width, height } }>
 											{ img }
 										</div>
-									</Fragment>
+									</>
 								);
 							}
 
@@ -659,7 +660,7 @@ class ImageEdit extends Component {
 							/* eslint-enable no-lonely-if */
 
 							return (
-								<Fragment>
+								<>
 									{ getInspectorControls( imageWidth, imageHeight ) }
 									<ResizableBox
 										size={
@@ -692,7 +693,7 @@ class ImageEdit extends Component {
 									>
 										{ img }
 									</ResizableBox>
-								</Fragment>
+								</>
 							);
 						} }
 					</ImageSize>
@@ -708,7 +709,8 @@ class ImageEdit extends Component {
 						/>
 					) }
 				</figure>
-			</Fragment>
+				{ mediaPlaceholder }
+			</>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}

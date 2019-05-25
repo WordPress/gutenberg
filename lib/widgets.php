@@ -6,11 +6,21 @@
  */
 
 /**
+ * Checks if a screen containing the block editor is being loaded.
+ *
+ * @return boolean True if a screen containing the block editor is being loaded.
+ */
+function gutenberg_is_block_editor() {
+	$screen = get_current_screen();
+	return $screen->is_block_editor() || 'gutenberg_page_gutenberg-widgets' === $screen->id;
+}
+
+/**
  * Emulates the Widgets screen `admin_print_styles` when at the block editor
  * screen.
  */
 function gutenberg_block_editor_admin_print_styles() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		/** This action is documented in wp-admin/admin-footer.php */
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_print_styles-widgets.php' );
@@ -23,7 +33,7 @@ add_action( 'admin_print_styles', 'gutenberg_block_editor_admin_print_styles' );
  * screen.
  */
 function gutenberg_block_editor_admin_print_scripts() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_print_scripts-widgets.php' );
 	}
@@ -35,7 +45,7 @@ add_action( 'admin_print_scripts', 'gutenberg_block_editor_admin_print_scripts' 
  * editor screen.
  */
 function gutenberg_block_editor_admin_print_footer_scripts() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		/** This action is documented in wp-admin/admin-footer.php */
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_print_footer_scripts-widgets.php' );
@@ -47,7 +57,7 @@ add_action( 'admin_print_footer_scripts', 'gutenberg_block_editor_admin_print_fo
  * Emulates the Widgets screen `admin_footer` when at the block editor screen.
  */
 function gutenberg_block_editor_admin_footer() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		/** This action is documented in wp-admin/admin-footer.php */
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_footer-widgets.php' );
@@ -55,14 +65,14 @@ function gutenberg_block_editor_admin_footer() {
 }
 add_action( 'admin_footer', 'gutenberg_block_editor_admin_footer' );
 
+
 /**
- * Extends default editor settings with values supporting legacy widgets.
+ * Returns the settings required by legacy widgets blocks.
  *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
+ * @return array Legacy widget settings.
  */
-function gutenberg_legacy_widget_settings( $settings ) {
+function gutenberg_get_legacy_widget_settings() {
+	$settings = array();
 	/**
 	 * TODO: The hardcoded array should be replaced with a mechanism to allow
 	 * core and third party blocks to specify they already have equivalent
@@ -125,4 +135,72 @@ function gutenberg_legacy_widget_settings( $settings ) {
 
 	return $settings;
 }
+
+/**
+ * Extends default editor settings with values supporting legacy widgets.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_legacy_widget_settings( $settings ) {
+	return array_merge( $settings, gutenberg_get_legacy_widget_settings() );
+}
 add_filter( 'block_editor_settings', 'gutenberg_legacy_widget_settings' );
+
+/**
+ * Registers a wp_area post type.
+ */
+function gutenberg_create_wp_area_post_type() {
+	register_post_type(
+		'wp_area',
+		array(
+			'description'  => __( 'Experimental custom post type that will store block areas referenced by themes.', 'gutenberg' ),
+			'labels'       => array(
+				'name'                     => _x( 'Block Area (Experimental)', 'post type general name', 'gutenberg' ),
+				'singular_name'            => _x( 'Block Area (Experimental)', 'post type singular name', 'gutenberg' ),
+				'menu_name'                => _x( 'Block Areas', 'admin menu', 'gutenberg' ),
+				'name_admin_bar'           => _x( 'Block Area', 'add new on admin bar', 'gutenberg' ),
+				'add_new'                  => _x( 'Add New', 'Block', 'gutenberg' ),
+				'add_new_item'             => __( 'Add New Block Area', 'gutenberg' ),
+				'new_item'                 => __( 'New Block Area', 'gutenberg' ),
+				'edit_item'                => __( 'Edit Block Area', 'gutenberg' ),
+				'view_item'                => __( 'View Block Area', 'gutenberg' ),
+				'all_items'                => __( 'All Block Areas', 'gutenberg' ),
+				'search_items'             => __( 'Search Block Areas', 'gutenberg' ),
+				'not_found'                => __( 'No block area found.', 'gutenberg' ),
+				'not_found_in_trash'       => __( 'No block areas found in Trash.', 'gutenberg' ),
+				'filter_items_list'        => __( 'Filter block areas list', 'gutenberg' ),
+				'items_list_navigation'    => __( 'Block areas list navigation', 'gutenberg' ),
+				'items_list'               => __( 'Block areas list', 'gutenberg' ),
+				'item_published'           => __( 'Block area published.', 'gutenberg' ),
+				'item_published_privately' => __( 'Block area published privately.', 'gutenberg' ),
+				'item_reverted_to_draft'   => __( 'Block area reverted to draft.', 'gutenberg' ),
+				'item_scheduled'           => __( 'Block area scheduled.', 'gutenberg' ),
+				'item_updated'             => __( 'Block area updated.', 'gutenberg' ),
+			),
+			'public'       => false,
+			'show_ui'      => false,
+			'show_in_menu' => false,
+			'show_in_rest' => true,
+			'rest_base'    => '__experimental/block-areas',
+			'capabilities' => array(
+				'read'                   => 'edit_posts',
+				'create_posts'           => 'edit_theme_options',
+				'edit_posts'             => 'edit_theme_options',
+				'edit_published_posts'   => 'edit_theme_options',
+				'delete_published_posts' => 'edit_theme_options',
+				'edit_others_posts'      => 'edit_theme_options',
+				'delete_others_posts'    => 'edit_theme_options',
+			),
+			'map_meta_cap' => true,
+			'supports'     => array(
+				'title',
+				'editor',
+			),
+		)
+	);
+}
+add_action( 'init', 'gutenberg_create_wp_area_post_type' );
+
+add_filter( 'sidebars_widgets', 'Experimental_WP_Widget_Blocks_Manager::swap_out_sidebars_blocks_for_block_widgets' );
