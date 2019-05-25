@@ -13,6 +13,7 @@ minor=${parts[1]}
 
 if [ minor == '9' ]; then
 	major=$((major+1))
+	minor="0"
 else
 	minor=$((minor+1))
 fi
