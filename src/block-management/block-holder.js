@@ -289,8 +289,8 @@ export default compose( [
 			onChange: ( attributes: Object ) => {
 				updateBlockAttributes( clientId, attributes );
 			},
-			onReplace( blocks: Array<Object> ) {
-				replaceBlocks( [ clientId ], blocks );
+			onReplace( blocks: Array<Object>, indexToSelect: number ) {
+				replaceBlocks( [ clientId ], blocks, indexToSelect );
 			},
 		};
 	} ),
