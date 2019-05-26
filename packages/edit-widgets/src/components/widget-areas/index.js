@@ -9,9 +9,10 @@ import { withSelect } from '@wordpress/data';
  */
 import WidgetArea from '../widget-area';
 
-function WidgetAreas( { areas } ) {
+function WidgetAreas( { areas, blockEditorSettings } ) {
 	return areas.map( ( { id }, index ) => (
 		<WidgetArea
+			blockEditorSettings={ blockEditorSettings }
 			key={ id }
 			id={ id }
 			initialOpen={ index === 0 }

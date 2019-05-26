@@ -10,11 +10,15 @@ import { withDispatch } from '@wordpress/data';
  */
 import Layout from '../layout';
 
-function EditWidgetsInitializer( { setupWidgetAreas } ) {
+function EditWidgetsInitializer( { setupWidgetAreas, settings } ) {
 	useEffect( () => {
 		setupWidgetAreas();
 	}, [] );
-	return <Layout />;
+	return (
+		<Layout
+			blockEditorSettings={ settings }
+		/>
+	);
 }
 
 export default compose( [
