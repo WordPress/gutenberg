@@ -1,3 +1,9 @@
+## Master
+
+### New Feature
+
+- Add new `BlockQuotation` block to the primitives folder to support blockquote in a multiplatform way. [#15482](https://github.com/WordPress/gutenberg/pull/15482).
+
 ## 7.4.0 (2019-05-21)
 
 ### New Feature

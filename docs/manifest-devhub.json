@@ -90,6 +90,54 @@
 		"parent": "filters"
 	},
 	{
+		"title": "SlotFills Reference",
+		"slug": "slotfills",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/README.md",
+		"parent": "developers"
+	},
+	{
+		"title": "PluginBlockSettingsMenuItem",
+		"slug": "plugin-block-settings-menu-item",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-block-settings-menu-item.md",
+		"parent": "slotfills"
+	},
+	{
+		"title": "PluginMoreMenuItem",
+		"slug": "plugin-more-menu-item",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-more-menu-item.md",
+		"parent": "slotfills"
+	},
+	{
+		"title": "PluginPostPublishPanel",
+		"slug": "plugin-post-publish-panel",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-post-publish-panel.md",
+		"parent": "slotfills"
+	},
+	{
+		"title": "PluginPostStatusInfo",
+		"slug": "plugin-post-status-info",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-post-status-info.md",
+		"parent": "slotfills"
+	},
+	{
+		"title": "PluginPrePublishPanel",
+		"slug": "plugin-pre-publish-panel",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-pre-publish-panel.md",
+		"parent": "slotfills"
+	},
+	{
+		"title": "PluginSidebar",
+		"slug": "plugin-sidebar",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-sidebar.md",
+		"parent": "slotfills"
+	},
+	{
+		"title": "PluginSidebarMoreMenuItem",
+		"slug": "plugin-sidebar-more-menu-item",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-sidebar-more-menu-item.md",
+		"parent": "slotfills"
+	},
+	{
 		"title": "Internationalization",
 		"slug": "internationalization",
 		"markdown_source": "../docs/designers-developers/developers/internationalization.md",
@@ -783,6 +831,12 @@
 		"title": "Popover",
 		"slug": "popover",
 		"markdown_source": "../packages/components/src/popover/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "BlockQuotation",
+		"slug": "block-quotation",
+		"markdown_source": "../packages/components/src/primitives/block-quotation/README.md",
 		"parent": "components"
 	},
 	{
