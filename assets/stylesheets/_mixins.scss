@@ -176,6 +176,7 @@
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-round-rectangle;
 	border: $border-width solid $dark-gray-150;
+	@include reduce-motion;
 }
 
 @mixin input-style__focus() {
@@ -340,6 +341,7 @@
 @mixin reduce-motion {
 	@media (prefers-reduced-motion: reduce) {
 		animation-duration: 1ms !important;
+		transition-duration: 0s !important;
 	}
 }
 
