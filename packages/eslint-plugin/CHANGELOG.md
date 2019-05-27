@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fix
+
+- Fixed custom regular expression for the `no-restricted-syntax` rule. [#15839](https://github.com/WordPress/gutenberg/pull/15839)
+
 ## 2.2.0 (2019-05-21)
 
 ### New Features
