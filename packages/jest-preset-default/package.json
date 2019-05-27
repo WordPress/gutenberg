@@ -26,8 +26,10 @@
 	},
 	"files": [
 		"scripts",
+		"index.js",
 		"jest-preset.json"
 	],
+	"type": "commonjs",
 	"main": "index.js",
 	"dependencies": {
 		"@wordpress/jest-console": "file:../jest-console",

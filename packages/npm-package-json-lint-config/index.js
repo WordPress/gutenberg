@@ -53,6 +53,7 @@ const defaultConfig = {
 				'engines',
 				'directories',
 				'files',
+				'type',
 				'main',
 				'module',
 				'bin',

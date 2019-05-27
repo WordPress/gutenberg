@@ -21,8 +21,10 @@
 	},
 	"files": [
 		"arrays.js",
+		"index.js",
 		"objects.js"
 	],
+	"type": "commonjs",
 	"main": "index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.4.4"

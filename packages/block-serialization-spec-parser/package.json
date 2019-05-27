@@ -19,6 +19,7 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"type": "commonjs",
 	"main": "parser.js",
 	"dependencies": {
 		"pegjs": "^0.10.0"

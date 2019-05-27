@@ -1,3 +1,9 @@
+## Master
+
+### New Feature
+
+- Added `type` to the order of preferred properties. 
+
 ## 1.2.0 (2019-03-06)
 
 ### Internal

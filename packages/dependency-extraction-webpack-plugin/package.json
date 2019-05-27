@@ -22,6 +22,7 @@
 		"index.js",
 		"util.js"
 	],
+	"type": "commonjs",
 	"main": "index.js",
 	"dependencies": {
 		"webpack": "^4.8.3",

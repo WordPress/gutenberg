@@ -25,6 +25,21 @@ function isDirectory( file ) {
 }
 
 /**
+ * Returns true if the given packages has type "module".
+ *
+ * @see https://medium.com/@nodejs/announcing-a-new-experimental-modules-1be8d2d6c2ff
+ *
+ * @param {string} file Packages directory file.
+ *
+ * @return {boolean} Whether file is a directory.
+ */
+function isModuleType( file ) {
+	const { type = 'module' } = require( path.resolve( PACKAGES_DIR, file, 'package.json' ) );
+
+	return type === 'module';
+}
+
+/**
  * Filter predicate, returning true if the given base file name is to be
  * included in the build.
  *
@@ -32,7 +47,7 @@ function isDirectory( file ) {
  *
  * @return {boolean} Whether to include file in build.
  */
-const filterPackages = overEvery( isDirectory );
+const filterPackages = overEvery( isDirectory, isModuleType );
 
 /**
  * Returns the absolute path of all WordPress packages

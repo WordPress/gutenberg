@@ -28,6 +28,7 @@
 		"scripts",
 		"utils"
 	],
+	"type": "commonjs",
 	"bin": {
 		"wp-scripts": "./bin/wp-scripts.js"
 	},

@@ -26,6 +26,7 @@
 	"files": [
 		"index.js"
 	],
+	"type": "commonjs",
 	"main": "index.js",
 	"peerDependencies": {
 		"@babel/core": "^7.0.0"

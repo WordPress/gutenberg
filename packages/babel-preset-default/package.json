@@ -25,6 +25,7 @@
 	"files": [
 		"index.js"
 	],
+	"type": "commonjs",
 	"main": "index.js",
 	"dependencies": {
 		"@babel/core": "^7.4.4",

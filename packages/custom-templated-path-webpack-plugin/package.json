@@ -24,6 +24,8 @@
 	"files": [
 		"index.js"
 	],
+	"type": "commonjs",
+	"main": "index.js",
 	"dependencies": {
 		"escape-string-regexp": "^1.0.5"
 	},

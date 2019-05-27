@@ -27,6 +27,7 @@
 	"files": [
 		"index.js"
 	],
+	"type": "commonjs",
 	"main": "index.js",
 	"dependencies": {
 		"autoprefixer": "^9.4.5",
