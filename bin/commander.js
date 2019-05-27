@@ -74,51 +74,59 @@ async function runStep( name, abortMessage, handler ) {
 }
 
 /**
- * Command used to release an RC version of the plugin
+ * Clone the Gutenberg repository to the working directory.
+ *
+ * @param {string} abortMessage Abort message.
  */
-async function releasePluginRC() {
-	console.log(
-		chalk.bold( '💃 Time to release Gutenberg 🕺\n\n' ),
-		'Welcome! This tool is going to help you release a new RC version of the Gutenberg Plugin.\n',
-		'It goes throught different steps : creating the release branch, bumping the plugin version, tagging and creating the github release, building the zip...\n',
-		'To perform a release you\'ll have to be a member of the Gutenberg Core Team.\n'
-	);
-
-	// This is a variable that contains the abort message shown when the script is aborted.
-	let abortMessage = 'Aborting!';
-	await askForConfirmationToContinue( 'Ready to go? ' );
-
+async function runRepositoryCloneStep( abortMessage ) {
 	// Cloning the repository
 	await runStep( 'Cloning the repository', abortMessage, async () => {
 		console.log( '>> Cloning the repository' );
 		const simpleGit = SimpleGit();
-		await simpleGit.clone( repoURL, workingDirectoryPath, [ '--depth=1' ] );
+		await simpleGit.clone( repoURL, workingDirectoryPath );
 		console.log( '>> The gutenberg repository has been successfully cloned in the following temporary folder: ' + success( workingDirectoryPath ) );
 	} );
+}
 
-	// Creating the release branch
-	const simpleGit = SimpleGit( workingDirectoryPath );
-	let nextVersion;
-	let nextVersionLabel;
-	let releaseBranch;
-	const packageJson = require( packageJsonPath );
-	const packageLock = require( packageLockPath );
+/**
+ * Clean the working directory.
+ *
+ * @param {string} abortMessage Abort message.
+ */
+async function runCleanLocalCloneStep( abortMessage ) {
+	await runStep( 'Cleaning the temporary folder', abortMessage, async () => {
+		await fs.remove( workingDirectoryPath );
+	} );
+}
+
+/**
+ * Creates a new release branch based on the last package.json version
+ * and chooses the next RC version number.
+ *
+ * @param {string} abortMessage Abort Message.
+ *
+ * @return {Object} chosen version and versionLabels.
+ */
+async function runReleaseBranchCreationStep( abortMessage ) {
+	let version, releaseBranch, versionLabel;
 	await runStep( 'Creating the release branch', abortMessage, async () => {
+		const simpleGit = SimpleGit( workingDirectoryPath );
+		const packageJson = require( packageJsonPath );
 		const parsedVersion = semver.parse( packageJson.version );
 
 		// Follow the WordPress version guidelines to compute the version to be used
 		// By default, increase the "minor" number but if we reach 9, bump to the next major.
 		if ( parsedVersion.minor === 9 ) {
-			nextVersion = ( parsedVersion.major + 1 ) + '.0.0-rc.1';
+			version = ( parsedVersion.major + 1 ) + '.0.0-rc.1';
 			releaseBranch = 'release/' + ( parsedVersion.major + 1 ) + '.0';
-			nextVersionLabel = ( parsedVersion.major + 1 ) + '.0.0 RC1';
+			versionLabel = ( parsedVersion.major + 1 ) + '.0.0 RC1';
 		} else {
-			nextVersion = parsedVersion.major + '.' + ( parsedVersion.minor + 1 ) + '.0-rc.1';
+			version = parsedVersion.major + '.' + ( parsedVersion.minor + 1 ) + '.0-rc.1';
 			releaseBranch = 'release/' + parsedVersion.major + '.' + ( parsedVersion.minor + 1 );
-			nextVersionLabel = parsedVersion.major + '.' + ( parsedVersion.minor + 1 ) + '.0 RC1';
+			versionLabel = parsedVersion.major + '.' + ( parsedVersion.minor + 1 ) + '.0 RC1';
 		}
 		await askForConfirmationToContinue(
-			'The RC Version to be applied is ' + success( nextVersion ) + '. Proceed with the creation of the release branch?',
+			'The Plugin version to be used is ' + success( version ) + '. Proceed with the creation of the release branch?',
 			true,
 			abortMessage
 		);
@@ -128,21 +136,80 @@ async function releasePluginRC() {
 		console.log( '>> The local release branch ' + success( releaseBranch ) + ' has been successfully created.' );
 	} );
 
-	// Bumping the version in the different files (package.json, package-lock.json, gutenberg.php)
+	return {
+		version,
+		versionLabel,
+	};
+}
+
+/**
+ * Checkouts out the release branch and chooses a stable version number.
+ *
+ * @param {string} abortMessage Abort Message.
+ *
+ * @return {Object} chosen version and versionLabels.
+ */
+async function runReleaseBranchCheckoutStep( abortMessage ) {
+	let releaseBranch, version;
+	await runStep( 'Getting into the release branch', abortMessage, async () => {
+		const simpleGit = SimpleGit( workingDirectoryPath );
+		const masterPackageJson = require( packageJsonPath );
+		const masterParsedVersion = semver.parse( masterPackageJson.version );
+		releaseBranch = 'release/' + masterParsedVersion.major + '.' + masterParsedVersion.minor;
+
+		// Creating the release branch
+		await simpleGit.checkout( releaseBranch );
+		console.log( '>> The local release branch ' + success( releaseBranch ) + ' has been successfully checked out.' );
+
+		const releaseBranchPackageJson = require( packageJsonPath );
+		const releaseBranchParsedVersion = semver.parse( releaseBranchPackageJson.version );
+
+		if ( releaseBranchParsedVersion.prerelease && releaseBranchParsedVersion.prerelease.length ) {
+			version = releaseBranchParsedVersion.major + '.' + releaseBranchParsedVersion.minor + '.' + releaseBranchParsedVersion.patch;
+		} else {
+			version = releaseBranchParsedVersion.major + '.' + releaseBranchParsedVersion.minor + '.' + ( releaseBranchParsedVersion.patch + 1 );
+		}
+
+		await askForConfirmationToContinue(
+			'The Version to release is ' + success( version ) + '. Proceed?',
+			true,
+			abortMessage
+		);
+	} );
+
+	return {
+		version,
+		versionLabel: version,
+	};
+}
+
+/**
+ * Bump the version in the different files (package.json, package-lock.json, gutenberg.php)
+ * and commit the changes.
+ *
+ * @param {string} version      Version to use.
+ * @param {string} abortMessage Abort message.
+ *
+ * @return {string} hash of the version bump commit.
+ */
+async function runBumpPluginVersionAndCommitStep( version, abortMessage ) {
 	let commitHash;
 	await runStep( 'Updating the plugin version', abortMessage, async () => {
+		const simpleGit = SimpleGit( workingDirectoryPath );
+		const packageJson = require( packageJsonPath );
+		const packageLock = require( packageLockPath );
 		const newPackageJson = {
 			...packageJson,
-			version: nextVersion,
+			version,
 		};
 		fs.writeFileSync( packageJsonPath, JSON.stringify( newPackageJson, null, '\t' ) + '\n' );
 		const newPackageLock = {
 			...packageLock,
-			version: nextVersion,
+			version,
 		};
 		fs.writeFileSync( packageLockPath, JSON.stringify( newPackageLock, null, '\t' ) + '\n' );
 		const content = fs.readFileSync( pluginFilePath, 'utf8' );
-		fs.writeFileSync( pluginFilePath, content.replace( ' * Version: ' + packageJson.version, ' * Version: ' + nextVersion ) );
+		fs.writeFileSync( pluginFilePath, content.replace( ' * Version: ' + packageJson.version, ' * Version: ' + version ) );
 		console.log( '>> The plugin version has been updated successfully.' );
 
 		// Commit the version bump
@@ -156,12 +223,20 @@ async function releasePluginRC() {
 			packageLockPath,
 			pluginFilePath,
 		] );
-		const commitData = await simpleGit.commit( 'Bump plugin version to ' + nextVersion );
+		const commitData = await simpleGit.commit( 'Bump plugin version to ' + version );
 		commitHash = commitData.commit;
 		console.log( '>> The plugin version bump has been commited succesfully.' );
 	} );
 
-	// Plugin ZIP creation
+	return commitHash;
+}
+
+/**
+ * Run the Plugin ZIP Creation step.
+ *
+ * @param {string} abortMessage Abort message.
+ */
+async function runPluginZIPCreationStep( abortMessage ) {
 	await runStep( 'Plugin ZIP creation', abortMessage, async () => {
 		await askForConfirmationToContinue(
 			'Proceed and build the plugin zip? (It takes a few minutes)',
@@ -179,30 +254,56 @@ async function releasePluginRC() {
 
 		console.log( '>> The plugin zip has been built succesfully. Path: ' + success( gutenbergZipPath ) );
 	} );
+}
 
-	// Creating the git tag
+/**
+ * Create a local Git Tag.
+ *
+ * @param {string} version      Version to use.
+ * @param {string} abortMessage Abort message.
+ */
+async function runCreateGitTagStep( version, abortMessage ) {
 	await runStep( 'Creating the git tag', abortMessage, async () => {
+		const simpleGit = SimpleGit( workingDirectoryPath );
 		await askForConfirmationToContinue(
 			'Proceed with the creation of the git tag?',
 			true,
 			abortMessage
 		);
-		await simpleGit.addTag( 'v' + nextVersion );
-		console.log( '>> The ' + success( 'v' + nextVersion ) + ' tag has been created succesfully.' );
+		await simpleGit.addTag( 'v' + version );
+		console.log( '>> The ' + success( 'v' + version ) + ' tag has been created succesfully.' );
 	} );
+}
 
+/**
+ * Push the local Git Changes and Tags to the remote repository.
+ *
+ * @param {string} abortMessage Abort message.
+ */
+async function runPushGitChangesStep( abortMessage ) {
 	await runStep( 'Pushing the release branch and the tag', abortMessage, async () => {
+		const simpleGit = SimpleGit( workingDirectoryPath );
 		await askForConfirmationToContinue(
 			'The release branch and the tag are going to be pushed to the remote repository. Continue?',
 			true,
 			abortMessage
 		);
-		await simpleGit.push( 'origin', releaseBranch );
+		await simpleGit.push( 'origin' );
 		await simpleGit.pushTags( 'origin' );
 	} );
-	abortMessage = 'Aborting! Make sure to remove remote release branch and tag.';
+}
 
-	// Creating the GitHub Release
+/**
+ * Creates the github release and uploads the Gutenberg ZIP file into it.
+ *
+ * @param {string}  version      Released version.
+ * @param {string}  versionLabel Label of the released Version.
+ * @param {boolean} isPrerelease is a pre-release.
+ * @param {string}  abortMessage Abort message.
+ *
+ * @return {Object} Github release object.
+ */
+async function runGithubReleaseStep( version, versionLabel, isPrerelease, abortMessage ) {
 	let octokit;
 	let release;
 	await runStep( 'Creating the GitHub release', abortMessage, async () => {
@@ -230,16 +331,16 @@ async function releasePluginRC() {
 		const releaseData = await octokit.repos.createRelease( {
 			owner: repoOwner,
 			repo: 'gutenberg',
-			tag_name: 'v' + nextVersion,
-			name: nextVersionLabel,
+			tag_name: 'v' + version,
+			name: versionLabel,
 			body: changelog,
-			prerelease: true,
+			prerelease: isPrerelease,
 		} );
 		release = releaseData.data;
 
 		console.log( '>> The GitHub release has been created succesfully.' );
 	} );
-	abortMessage = 'Aborting! Make sure to remove the remote release branch, the git tag and the GitHub release.';
+	abortMessage = abortMessage + ' Make sure to remove the the GitHub release as well.';
 
 	// Uploading the Gutenberg Zip to the release
 	await runStep( 'Uploading the plugin zip', abortMessage, async () => {
@@ -255,12 +356,21 @@ async function releasePluginRC() {
 		} );
 		console.log( '>> The plugin zip has been succesfully uploaded.' );
 	} );
-	abortMessage = 'Aborting! Make sure to manually cherry-pick the ' + success( commitHash ) + ' commit to the master branch.';
 
-	// Cherry-picking the bump commit into master
+	return release;
+}
+
+/**
+ * Cherry-picks the version bump commit into master.
+ *
+ * @param {string} commitHash   Commit to cherry-pick.
+ * @param {string} abortMessage Abort message.
+ */
+async function runCherrypickBumpCommitIntoMasterStep( commitHash, abortMessage ) {
 	await runStep( 'Cherry-picking the bump commit into master', abortMessage, async () => {
+		const simpleGit = SimpleGit( workingDirectoryPath );
 		await askForConfirmationToContinue(
-			'The plugin RC is now released. Proceed with the version bump in the master branch?',
+			'The plugin is now released. Proceed with the version bump in the master branch?',
 			true,
 			abortMessage
 		);
@@ -271,23 +381,94 @@ async function releasePluginRC() {
 		await simpleGit.raw( [ 'cherry-pick', commitHash ] );
 		await simpleGit.push( 'origin', 'master' );
 	} );
+}
+
+/**
+ * Release a new Gutenberg version.
+ *
+ * @param {boolean} isRC Whether it's an RC release or not.
+ *
+ * @return {Object} Github release object.
+ */
+async function releasePlugin( isRC = true ) {
+	// This is a variable that contains the abort message shown when the script is aborted.
+	let abortMessage = 'Aborting!';
+	await askForConfirmationToContinue( 'Ready to go? ' );
+
+	// Cloning the repository
+	await runRepositoryCloneStep( abortMessage );
+
+	// Creating the release branch
+	const { version, versionLabel } = isRC ?
+		await runReleaseBranchCreationStep( abortMessage ) :
+		await runReleaseBranchCheckoutStep( abortMessage );
+
+	// Bumping the version and commit.
+	const commitHash = await runBumpPluginVersionAndCommitStep( version, abortMessage );
+
+	// Plugin ZIP creation
+	await runPluginZIPCreationStep();
+
+	// Creating the git tag
+	await runCreateGitTagStep( version, abortMessage );
+
+	// Push the local changes
+	await runPushGitChangesStep( abortMessage );
+	abortMessage = 'Aborting! Make sure to ' + isRC ? 'remove' : 'reset' + ' the remote release branch and remove the git tag.';
+
+	// Creating the GitHub Release
+	const release = await runGithubReleaseStep( version, versionLabel, isRC, abortMessage );
+	abortMessage = 'Aborting! Make sure to manually cherry-pick the ' + success( commitHash ) + ' commit to the master branch.';
+
+	// Cherry-picking the bump commit into master
+	await runCherrypickBumpCommitIntoMasterStep( commitHash, abortMessage );
 
 	abortMessage = 'Aborting! The release is finished though.';
-	await runStep( 'Cleaning the temporary folder', abortMessage, async () => {
-		await fs.remove( workingDirectoryPath );
-	} );
+	await runCleanLocalCloneStep( abortMessage );
 
-	console.log(
-		'\n>> 🎉 The Gutenberg ' + success( nextVersionLabel ) + '  has been successfully released.\n',
-		'You can access the Github release here: ' + success( release.html_url ) + '\n',
-		'Thanks for performing the release!'
-	);
+	return release;
 }
 
 program
 	.command( 'release-plugin-rc' )
 	.alias( 'rc' )
 	.description( 'Release an RC version of the plugin (supports only rc.1 for now)' )
-	.action( releasePluginRC );
+	.action( async () => {
+		console.log(
+			chalk.bold( '💃 Time to release Gutenberg 🕺\n\n' ),
+			'Welcome! This tool is going to help you release a new RC version of the Gutenberg Plugin.\n',
+			'It goes throught different steps : creating the release branch, bumping the plugin version, tagging and creating the github release, building the zip...\n',
+			'To perform a release you\'ll have to be a member of the Gutenberg Core Team.\n'
+		);
+
+		const release = await releasePlugin( true );
+
+		console.log(
+			'\n>> 🎉 The Gutenberg ' + success( release.name ) + ' has been successfully released.\n',
+			'You can access the Github release here: ' + success( release.html_url ) + '\n',
+			'Thanks for performing the release!'
+		);
+	} );
+
+program
+	.command( 'release-plugin-stable' )
+	.alias( 'stable' )
+	.description( 'Release a stable version of the plugin' )
+	.action( async () => {
+		console.log(
+			chalk.bold( '💃 Time to release Gutenberg 🕺\n\n' ),
+			'Welcome! This tool is going to help you release a new stable version of the Gutenberg Plugin.\n',
+			'It goes throught different steps : bumping the plugin version, tagging and creating the github release, building the zip, pushing the release to the SVN repository...\n',
+			'To perform a release you\'ll have to be a member of the Gutenberg Core Team.\n'
+		);
+
+		const release = await releasePlugin( false );
+
+		console.log(
+			'\n>> 🎉 The Gutenberg ' + success( release.name ) + ' has been successfully released.\n',
+			'You can access the Github release here: ' + success( release.html_url ) + '\n',
+			'Thanks for performing the release!'
+		);
+	} );
 
 program.parse( process.argv );
