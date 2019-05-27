@@ -1,3 +1,4 @@
 1.6.0
 ------
+- A new block is available: video block.
 * Added UI to display a warning when a block has invalid content.
