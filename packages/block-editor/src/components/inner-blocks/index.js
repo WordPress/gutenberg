@@ -139,12 +139,13 @@ InnerBlocks = compose( [
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
+		const block = getBlock( clientId );
 		const rootClientId = getBlockRootClientId( clientId );
 
 		return {
-			block: getBlock( clientId ),
+			block,
 			blockListSettings: getBlockListSettings( clientId ),
-			hasOverlay: ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
+			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
 		};
 	} ),
