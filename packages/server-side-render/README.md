@@ -20,7 +20,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Usage
 
-The props accepted by the component are described bellow.
+The props accepted by the component are described below.
 
 
 ## Props
