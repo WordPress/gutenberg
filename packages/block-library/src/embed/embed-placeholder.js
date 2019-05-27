@@ -6,7 +6,8 @@ import { Button, Placeholder } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 
 const EmbedPlaceholder = ( props ) => {
-	const { icon, label, value, onSubmit, onChange, switchBackToURLInput, cannotEmbed, fallback, tryAgain } = props;
+	const { icon, label, value, onSubmit, onChange, switchBackToURLInput, cannotEmbed, fallback, tryAgain, hasEmbed } = props;
+
 	return (
 		<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
 			<>
@@ -30,7 +31,7 @@ const EmbedPlaceholder = ( props ) => {
 					</p>
 					}
 				</form>
-				{ value && <div className="components-placeholder__cancel">
+				{ hasEmbed && <div className="components-placeholder__cancel">
 					<Button
 						className="block-editor-embed-placeholder__cancel-button"
 						title={ __( 'Cancel' ) }

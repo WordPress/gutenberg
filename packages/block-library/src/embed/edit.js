@@ -153,6 +153,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 							getResponsiveHelp={ this.getResponsiveHelp }
 							toggleResponsive={ this.toggleResponsive }
 							switchBackToURLInput={ this.switchBackToURLInput }
+							hasEmbed={ this.props.preview }
 						/>
 						<EmbedPlaceholder
 							icon={ icon }
@@ -166,6 +167,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 							switchBackToURLInput={ this.switchBackToURLInput }
 							editingURL={ this.state.editingURL }
 							url={ this.state.url }
+							hasEmbed={ this.props.preview }
 						/>
 					</>
 				);
@@ -195,6 +197,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						getResponsiveHelp={ this.getResponsiveHelp }
 						toggleResponsive={ this.toggleResponsive }
 						switchBackToURLInput={ this.switchBackToURLInput }
+						hasEmbed={ this.props.preview }
 					/>
 					<EmbedPreview
 						preview={ preview }
