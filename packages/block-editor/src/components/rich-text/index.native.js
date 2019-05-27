@@ -923,11 +923,6 @@ const RichTextContainer = compose( [
 				selectionStart.clientId === clientId &&
 				selectionStart.attributeKey === identifier
 			);
-		} else {
-			isSelected = isSelected && (
-				selectionStart.clientId === clientId &&
-				selectionStart.attributeKey === identifier
-			);
 		}
 
 		return {
