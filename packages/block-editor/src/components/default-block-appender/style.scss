@@ -12,6 +12,7 @@
 		width: 100%;
 		outline: $border-width solid transparent;
 		transition: 0.2s outline;
+		@include reduce-motion;
 		resize: none;
 		margin-top: $default-block-margin;
 		margin-bottom: $default-block-margin;
@@ -32,6 +33,7 @@
 	.block-editor-inserter__toggle:not([aria-expanded="true"]) {
 		opacity: 0;
 		transition: opacity 0.2s;
+		@include reduce-motion;
 	}
 
 	&:hover {

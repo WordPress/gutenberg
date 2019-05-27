@@ -36,6 +36,7 @@ $toggle-border-width: 2px;
 		height: $toggle-height;
 		border-radius: $toggle-height / 2;
 		transition: 0.2s background ease;
+		@include reduce-motion;
 	}
 
 	.components-form-toggle__thumb {
@@ -48,6 +49,7 @@ $toggle-border-width: 2px;
 		height: $toggle-height - ($toggle-border-width * 4);
 		border-radius: 50%;
 		transition: 0.1s transform ease;
+		@include reduce-motion;
 		background-color: $dark-gray-300;
 		border: 5px solid $dark-gray-300; // Has explicit border to act as a fill in Windows High Contrast Mode.
 	}

@@ -21,6 +21,7 @@ $color-palette-circle-spacing: 14px;
 	vertical-align: top;
 	transform: scale(1);
 	transition: 100ms transform ease;
+	@include reduce-motion;
 	&:hover {
 		transform: scale(1.2);
 	}
@@ -42,6 +43,7 @@ $color-palette-circle-spacing: 14px;
 	background: transparent;
 	box-shadow: inset 0 0 0 ($color-palette-circle-size / 2);
 	transition: 100ms box-shadow ease;
+	@include reduce-motion;
 	cursor: pointer;
 
 	&.is-active {

@@ -39,6 +39,7 @@
 	top: calc(50% - 4px);
 	right: calc(50% - 4px);
 	transition: transform 0.1s ease-in;
+	@include reduce-motion;
 	opacity: 0;
 }
 

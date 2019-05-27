@@ -20,6 +20,7 @@
 	border-radius: $radius-round-rectangle;
 	border: $border-width solid transparent;
 	transition: all 0.05s ease-in-out;
+	@include reduce-motion;
 	position: relative;
 
 	&:disabled {
@@ -71,6 +72,7 @@
 	border-radius: $radius-round-rectangle;
 	color: $dark-gray-500;
 	transition: all 0.05s ease-in-out;
+	@include reduce-motion;
 
 	.block-editor-block-icon {
 		margin-left: auto;

@@ -134,6 +134,7 @@
 	line-height: 24px;
 	background: $light-gray-500;
 	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
+	@include reduce-motion;
 }
 
 .components-form-token-field__token-text {
@@ -164,6 +165,7 @@
 	max-height: 9em;
 	overflow-y: scroll;
 	transition: all 0.15s ease-in-out;
+	@include reduce-motion;
 	list-style: none;
 	border-top: $border-width solid $dark-gray-300;
 	margin: $grid-size-small (-$grid-size-small) (-$grid-size-small);
