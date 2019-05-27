@@ -139,6 +139,7 @@ class VideoEdit extends Component {
 	}
 
 	render() {
+		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		const {
 			autoplay,
 			caption,
@@ -159,7 +160,7 @@ class VideoEdit extends Component {
 			setAttributes,
 		} = this.props;
 		const { editing } = this.state;
-		const switchToEditing = () => {
+		const toggleIsEditing = () => {
 			this.setState( { editing: ! this.state.editing } );
 		};
 		const onSelectVideo = ( media ) => {
@@ -167,7 +168,7 @@ class VideoEdit extends Component {
 				// in this case there was an error and we should continue in the editing state
 				// previous attributes should be removed because they may be temporary blob urls
 				setAttributes( { src: undefined, id: undefined } );
-				switchToEditing();
+				toggleIsEditing();
 				return;
 			}
 			// sets the block's attribute and updates the edit component from the
@@ -176,7 +177,6 @@ class VideoEdit extends Component {
 			this.setState( { src: media.url, editing: false } );
 		};
 
-		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		if ( editing ) {
 			return (
 				<>
@@ -186,7 +186,7 @@ class VideoEdit extends Component {
 								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.editing } ) }
 								aria-pressed={ this.state.editing }
 								label={ __( 'Edit video' ) }
-								onClick={ switchToEditing }
+								onClick={ toggleIsEditing }
 								icon={ editImageIcon }
 							/>
 						</Toolbar> ) }
@@ -196,7 +196,7 @@ class VideoEdit extends Component {
 						className={ className }
 						onSelect={ onSelectVideo }
 						onSelectURL={ this.onSelectURL }
-						onCancel={ !! src && switchToEditing }
+						onCancel={ !! src && toggleIsEditing }
 						accept="video/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ this.props.attributes }
@@ -216,7 +216,7 @@ class VideoEdit extends Component {
 						<IconButton
 							className="components-icon-button components-toolbar__control"
 							label={ __( 'Edit video' ) }
-							onClick={ switchToEditing }
+							onClick={ toggleIsEditing }
 							icon={ editImageIcon }
 						/>
 					</Toolbar>
