@@ -24,6 +24,7 @@
 	"files": [
 		"index.js"
 	],
+	"main": "index.js",
 	"dependencies": {
 		"lodash": "^4.17.11",
 		"webpack-sources": "^1.1.0"

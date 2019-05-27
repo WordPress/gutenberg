@@ -26,6 +26,7 @@
 	},
 	"files": [
 		"scripts",
+		"index.js",
 		"jest-preset.json"
 	],
 	"main": "index.js",
