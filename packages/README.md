@@ -102,10 +102,10 @@ You can check your package configs by running `npm run lint-pkg-json`.
 
 #### Development Release
 
-Run the following command to release a dev version of the outdated packages, replacing `123456` with your 2FA code. Make sure you're using a freshly generated 2FA code, rather than one that's about to timeout. This is a little cumbersome but helps to prevent the release process from dying mid-deploy.
+Run the following command to release a dev version of the outdated packages.
 
 ```bash
-NPM_CONFIG_OTP=123456 npm run publish:dev
+npm run publish:dev
 ```
 
 Lerna will ask you which version number you want to choose for each package. For a `dev` release, you'll more likely want to choose the "prerelease" option. Repeat the same for all the outdated packages and confirm your version updates.
@@ -114,10 +114,10 @@ Lerna will then publish to [npm], commit the `package.json` changes and create t
 
 #### Production Release
 
-To release a production version for the outdated packages, run the following command, replacing `123456` with your (freshly generated, as above) 2FA code:
+To release a production version for the outdated packages, run the following command:
 
 ```bash
-NPM_CONFIG_OTP=123456 npm run publish:prod
+npm run publish:prod
 ```
 
 Choose the correct version based on `CHANGELOG.md` files, confirm your choices and let Lerna do its magic.
