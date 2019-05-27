@@ -6,6 +6,7 @@ This list is manually curated to include valuable contributions by volunteers th
 
 | GitHub Username | WordPress.org Username|
 | --------------- | --------------------- |
+| @softowaha | @chntito |
 | @youknowriad | @youknowriad |
 | @aduth | @aduth |
 | @jasmussen | @joen |
