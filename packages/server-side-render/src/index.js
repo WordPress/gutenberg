@@ -29,7 +29,7 @@ export default withSelect(
 	}
 )(
 	( { urlQueryArgs = EMPTY_OBJECT, currentPostId, ...props } ) => {
-		urlQueryArgs = useMemo( () => {
+		const newUrlQueryArgs = useMemo( () => {
 			if ( ! currentPostId ) {
 				return urlQueryArgs;
 			}
@@ -40,7 +40,7 @@ export default withSelect(
 		}, [ currentPostId, urlQueryArgs ] );
 
 		return (
-			<ServerSideRender urlQueryArgs={ urlQueryArgs } { ...props } />
+			<ServerSideRender urlQueryArgs={ newUrlQueryArgs } { ...props } />
 		);
 	}
 );
