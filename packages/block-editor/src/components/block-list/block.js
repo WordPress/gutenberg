@@ -163,22 +163,37 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	setAttributes( attributes ) {
+	setAttributes( newAttributes ) {
 		const { clientId, name, onChange } = this.props;
 		const type = getBlockType( name );
-		onChange( clientId, attributes );
 
-		const metaAttributes = reduce(
-			attributes,
-			( result, value, key ) => {
-				if ( get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
-					result[ type.attributes[ key ].meta ] = value;
-				}
+		function isMetaAttribute( key ) {
+			return get( type, [ 'attributes', key, 'source' ] ) === 'meta';
+		}
 
-				return result;
-			},
-			{}
-		);
+		// Partition new attributes to delegate update behavior by source.
+		//
+		// TODO: A consolidated approach to external attributes sourcing
+		// should be devised to avoid specific handling for meta, enable
+		// additional attributes sources.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/2759
+		const {
+			blockAttributes,
+			metaAttributes,
+		} = reduce( newAttributes, ( result, value, key ) => {
+			if ( isMetaAttribute( key ) ) {
+				result.metaAttributes[ type.attributes[ key ].meta ] = value;
+			} else {
+				result.blockAttributes[ key ] = value;
+			}
+
+			return result;
+		}, { blockAttributes: {}, metaAttributes: {} } );
+
+		if ( size( blockAttributes ) ) {
+			onChange( clientId, blockAttributes );
+		}
 
 		if ( size( metaAttributes ) ) {
 			this.props.onMetaChange( metaAttributes );
