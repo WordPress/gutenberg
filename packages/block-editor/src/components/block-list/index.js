@@ -194,6 +194,7 @@ class BlockList extends Component {
 			rootClientId,
 			isDraggable,
 			selectedBlockClientId,
+			selectedBlockRootClientId,
 			multiSelectedBlockClientIds,
 			hasMultiSelection,
 			renderAppender,
@@ -204,7 +205,7 @@ class BlockList extends Component {
 				{ map( blockClientIds, ( clientId ) => {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :
-						selectedBlockClientId === clientId;
+						[ selectedBlockRootClientId, selectedBlockClientId ].includes( clientId );
 
 					return (
 						<AsyncModeProvider
@@ -212,6 +213,7 @@ class BlockList extends Component {
 							value={ ! isBlockInSelection }
 						>
 							<BlockListBlock
+								className={ isBlockInSelection ? 'is-sync' : 'is-async' }
 								clientId={ clientId }
 								blockRef={ this.setBlockRef }
 								onSelectionStart={ this.onSelectionStart }
@@ -239,6 +241,7 @@ export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
 			getBlockOrder,
+			getBlockHierarchyRootClientId,
 			isSelectionEnabled,
 			isMultiSelecting,
 			getMultiSelectedBlocksStartClientId,
@@ -249,6 +252,7 @@ export default compose( [
 		} = select( 'core/block-editor' );
 
 		const { rootClientId } = ownProps;
+		const selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
@@ -256,7 +260,8 @@ export default compose( [
 			selectionEnd: getMultiSelectedBlocksEndClientId(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
-			selectedBlockClientId: getSelectedBlockClientId(),
+			selectedBlockClientId,
+			selectedBlockRootClientId: getBlockHierarchyRootClientId( selectedBlockClientId ),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
 		};

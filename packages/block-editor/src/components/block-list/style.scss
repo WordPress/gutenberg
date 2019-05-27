@@ -211,6 +211,10 @@
  */
 
 .block-editor-block-list__layout .block-editor-block-list__block {
+	&.is-sync {
+		background-color: $alert-red;
+	}
+
 	&.has-warning {
 		min-height: ( $block-padding + $block-spacing ) * 2;
 	}
