@@ -23,7 +23,6 @@ export function initializeEditor() {
 	if ( typeof __DEV__ === 'undefined' || ! __DEV__ ) {
 		unregisterBlockType( 'core/code' );
 		unregisterBlockType( 'core/more' );
-		unregisterBlockType( 'core/video' );
 	}
 }
 
