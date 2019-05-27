@@ -883,6 +883,7 @@ export class RichText extends Component {
 RichText.defaultProps = {
 	formattingControls: [ 'bold', 'italic', 'link', 'strikethrough' ],
 	format: 'string',
+	tagName: 'div',
 };
 
 const RichTextContainer = compose( [
