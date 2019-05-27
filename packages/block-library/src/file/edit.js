@@ -115,6 +115,8 @@ class FileEdit extends Component {
 			this.props.setAttributes( {
 				href: newURL,
 				id: undefined,
+				fileName: newURL,
+				textLinkHref: newURL,
 			} );
 		}
 
