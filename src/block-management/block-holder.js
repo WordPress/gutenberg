@@ -40,6 +40,7 @@ import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
 
 type PropsType = BlockType & {
 	name: string,
+	order: number,
 	title: string,
 	attributes: mixed,
 	clientId: string,
@@ -50,7 +51,6 @@ type PropsType = BlockType & {
 	showTitle: boolean,
 	borderStyle: Object,
 	focusedBorderColor: string,
-	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
 	onChange: ( attributes: mixed ) => void,
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
 	onCaretVerticalPositionChange: ( targetId: number, caretY: number, previousCaretY: ?number ) => void,
@@ -116,8 +116,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	};
 
 	insertBlocksAfter = ( blocks: Array<Object> ) => {
-		const order = this.props.getBlockIndex( this.props.clientId, this.props.rootClientId );
-		this.props.onInsertBlocks( blocks, order + 1 );
+		this.props.onInsertBlocks( blocks, this.props.order + 1 );
 
 		if ( blocks[ 0 ] ) {
 			// focus on the first block inserted
@@ -158,8 +157,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	getAccessibilityLabelForBlock() {
-		const { clientId, name, rootClientId } = this.props;
-		const order = this.props.getBlockIndex( clientId, rootClientId );
+		const { name, order } = this.props;
 		let blockTitle = getBlockType( name ).title;
 
 		blockTitle = blockTitle === 'Unrecognized Block' ? blockTitle : `${ blockTitle } Block`;
@@ -253,9 +251,9 @@ export default compose( [
 
 		return {
 			name,
+			order,
 			title,
 			attributes,
-			getBlockIndex,
 			isFirstBlock,
 			isLastBlock,
 			isSelected,
