@@ -265,8 +265,8 @@ async function releasePluginRC() {
 			abortMessage
 		);
 		await simpleGit.fetch();
-		await simpleGit.checkout( 'master' );
 		await simpleGit.reset( 'hard' );
+		await simpleGit.checkout( 'master' );
 		await simpleGit.pull( 'origin', 'master' );
 		await simpleGit.raw( [ 'cherry-pick', commitHash ] );
 		await simpleGit.push( 'origin', 'master' );
