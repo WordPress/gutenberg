@@ -131,7 +131,7 @@ export default class EditorPage {
 	// =========================
 
 	async addNewParagraphBlock() {
-		return this.addNewBlock( this.paragraphBlockName );
+		await this.addNewBlock( this.paragraphBlockName );
 	}
 
 	async getParagraphBlockAtPosition( position: number ) {
@@ -198,15 +198,15 @@ export default class EditorPage {
 	// =========================
 
 	async addNewListBlock() {
-		return await this.addNewBlock( this.listBlockName );
+		await this.addNewBlock( this.listBlockName );
 	}
 
 	async getListBlockAtPosition( position: number ) {
-		return await this.getBlockAtPosition( position, this.listBlockName );
+		return this.getBlockAtPosition( position, this.listBlockName );
 	}
 
 	async hasListBlockAtPosition( position: number ) {
-		return await this.hasBlockAtPosition( position, this.listBlockName );
+		return this.hasBlockAtPosition( position, this.listBlockName );
 	}
 
 	async getTextViewForListBlock( block: wd.PromiseChainWebdriver.Element ) {
