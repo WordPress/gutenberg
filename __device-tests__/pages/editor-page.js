@@ -40,7 +40,8 @@ export default class EditorPage {
 	// position uses one based numbering
 	async getBlockAtPosition( position: number, blockName: string ) {
 		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
-		return await this.driver.elementByXPath( blockLocator );
+		const elements = await this.driver.elementsByXPath( blockLocator );
+		return elements[ 0 ];
 	}
 
 	async hasBlockAtPosition( position: number, blockName: string = '' ) {
@@ -155,6 +156,7 @@ export default class EditorPage {
 	async sendTextToParagraphBlock( block: wd.PromiseChainWebdriver.Element, text: string ) {
 		const textViewElement = await this.getTextViewForParagraphBlock( block );
 		await typeString( this.driver, textViewElement, text );
+		await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
 	}
 
 	async sendTextToParagraphBlockAtPosition( position: number, text: string ) {
