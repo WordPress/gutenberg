@@ -1,3 +1,5 @@
+/*eslint no-shadow: ["error", { "allow": ["className", "selector"] }]*/
+
 /**
  * WordPress dependencies
  */
@@ -13,41 +15,47 @@ import {
  * External dependencies
  */
 
-const externalWrapperHasFocus = async ( blockType ) => {
-	// The block external focusable wrapper has focus
-	const isFocusedBlock = await page.evaluate(
+const activeElementDataType = async ( ) => {
+	return await page.evaluate(
 		() => document.activeElement.dataset.type
 	);
-	await expect( isFocusedBlock ).toEqual( blockType );
+};
+
+const activeElementClasslistContains = async ( className ) => {
+	return await page.evaluate( ( className ) => {
+		return document.activeElement.classList.contains( className );
+	}, className );
+};
+
+const externalWrapperHasFocus = async ( blockType ) => {
+	const result = await activeElementDataType();
+	await expect( result ).toEqual( blockType );
 };
 
 const inserterToggleHasFocus = async () => {
-	const isFocusedInserterToggle = await page.evaluate( () =>
-		document.activeElement.classList.contains( 'block-editor-inserter__toggle' )
-	);
+	const isFocusedInserterToggle = await activeElementClasslistContains( 'block-editor-inserter__toggle' );
 	await expect( isFocusedInserterToggle ).toBe( true );
 };
 
 const textContentAreas = async () => {
-	return await page.evaluate( () => {
+	return await getElementList( '.wp-block.is-selected [contenteditable], .wp-block.is-typing [contenteditable]' );
+};
+
+const getElementList = async ( selector ) => {
+	return await page.evaluate( ( selector ) => {
 		// return an array with the classNames of the block toolbar's buttons
 		return [].slice
 			.call(
 				document.querySelectorAll(
-					'.wp-block.is-selected [contenteditable], .wp-block.is-typing [contenteditable]'
+					selector
 				)
 			)
 			.map( ( elem ) => elem.className );
-	} );
+	}, selector );
 };
 
-export async function tabThroughPlaceholderButtons() {
-	const placeholderButtons = await page.evaluate( () => {
-		// return an array with the classNames of the block toolbar's buttons
-		return [].slice.call(
-			document.querySelectorAll( '.wp-block.is-selected .block-editor-media-placeholder button:not([disabled])' )
-		).map( ( elem ) => elem.className );
-	} );
+const tabThroughPlaceholderButtons = async () => {
+	const placeholderButtons = await getElementList( '.wp-block.is-selected .block-editor-media-placeholder button:not([disabled])' );
 
 	for ( const buttonClassName of placeholderButtons ) {
 		await page.keyboard.press( 'Tab' );
@@ -56,44 +64,25 @@ export async function tabThroughPlaceholderButtons() {
 		);
 		await expect( focusePlaceholderButton ).toEqual( buttonClassName );
 	}
-}
+};
+
 const textContentAreasHaveFocus = async ( content ) => {
 	const blocks = await textContentAreas();
-	const isFocusedTextContentArea = async () => {
-		return await page.evaluate( () => document.activeElement.contentEditable );
-	};
-	const textContentAreaContent = async () => {
-		return await page.evaluate( () => document.activeElement.innerHTML );
-	};
+	const isFocusedTextContentArea = await page.evaluate( () => document.activeElement.contentEditable );
+	const textContentAreaContent = await page.evaluate( () => document.activeElement.innerHTML );
+
 	for ( let i = 0; i < blocks.length; i++ ) {
 		if ( i > 0 ) {
 			await page.keyboard.press( 'Tab' );
 		}
 
 		// The value of 'contentEditable' should be the string 'true'
-		await expect( await isFocusedTextContentArea() ).toBe( 'true' );
-		await expect( await textContentAreaContent() ).toContain( content );
+		await expect( isFocusedTextContentArea ).toBe( 'true' );
+		await expect( textContentAreaContent ).toContain( content );
 	}
 };
 
-const tabThroughTextBlock = async ( content, blockType ) => {
-	// Tab to the next paragraph block
-	await page.keyboard.press( 'Tab' );
-	await externalWrapperHasFocus( blockType );
-
-	// Tab causes 'add block' button to receive focus
-	await page.keyboard.press( 'Tab' );
-	await inserterToggleHasFocus();
-
-	await tabThroughBlockMoverControl();
-	await tabThroughBlockToolbar();
-
-	// Tab causes the paragraph content to receive focus
-	await page.keyboard.press( 'Tab' );
-	await textContentAreasHaveFocus( content );
-};
-
-const tabThroughFileBlock = async ( content, blockType ) => {
+const tabThroughBlock = async ( content, blockType ) => {
 	// Tab to the next block
 	await page.keyboard.press( 'Tab' );
 	await externalWrapperHasFocus( blockType );
@@ -104,6 +93,18 @@ const tabThroughFileBlock = async ( content, blockType ) => {
 
 	await tabThroughBlockMoverControl();
 	await tabThroughBlockToolbar();
+};
+
+const tabThroughTextBlock = async ( content, blockType ) => {
+	await tabThroughBlock( content, blockType );
+
+	// Tab causes the block text content to receive focus
+	await page.keyboard.press( 'Tab' );
+	await textContentAreasHaveFocus( content );
+};
+
+const tabThroughFileBlock = async ( content, blockType ) => {
+	await tabThroughBlock( content, blockType );
 	await tabThroughPlaceholderButtons();
 };
 
@@ -112,6 +113,8 @@ const insertAndPopulateBlock = async ( blockName, content ) => {
 	await page.keyboard.type( content );
 
 	const blocks = await textContentAreas();
+
+	// the first contentEditable has focus - tab through and populate the rest:
 	for ( let i = 0; i < blocks.length - 1; i++ ) {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( content );
