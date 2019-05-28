@@ -24,8 +24,11 @@ const useDispatchWithMap = ( _dispatchMap, deps ) => {
 				if ( typeof dispatcher !== 'function' ) {
 					// eslint-disable-next-line no-console
 					console.warn(
-						`Property ${ propName } returned from mapDispatchToProps in withDispatch must be a function.`
+						`Property ${ propName } returned from dispatchMap in useDispatchWithMap must be a function.`
 					);
+					// only functions should be the values of properties returned from
+					// the map.
+					return () => void 0;
 				}
 				return dispatcher;
 			}
