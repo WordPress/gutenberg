@@ -40,8 +40,7 @@ export default class EditorPage {
 	// position uses one based numbering
 	async getBlockAtPosition( position: number, blockName: string ) {
 		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
-		const elements = await this.driver.elementsByXPath( blockLocator );
-		return elements[0];
+		return await this.driver.elementByXPath( blockLocator );
 	}
 
 	async hasBlockAtPosition( position: number, blockName: string = '' ) {
@@ -76,8 +75,7 @@ export default class EditorPage {
 			throw Error( `No Block at position ${ position }` );
 		}
 
-		let parentLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ blockName } Block. Row ${ position }."]`;
-
+		const parentLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ blockName } Block. Row ${ position }."]`;
 		let blockLocator = `${ parentLocator }/following-sibling::*`;
 		blockLocator += isAndroid() ? '' : '//*';
 		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Move block up from row ${ position } to row ${ position - 1 }"]`;

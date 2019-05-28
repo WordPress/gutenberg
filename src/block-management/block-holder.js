@@ -39,10 +39,11 @@ import styles from './block-holder.scss';
 import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
 
 type PropsType = BlockType & {
-	icon: ?mixed,
+	icon: mixed,
 	name: string,
 	order: number,
 	title: string,
+	originalBlockTitle: string,
 	attributes: mixed,
 	clientId: string,
 	rootClientId: string,
@@ -61,6 +62,7 @@ type PropsType = BlockType & {
 	moveBlockUp: () => void,
 	moveBlockDown: () => void,
 	removeBlock: () => void,
+	getAccessibilityLabelExtra: ( attributes: mixed ) => string
 };
 
 type StateType = {
@@ -166,30 +168,29 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	getAccessibilityLabel() {
-		const { attributes, name, order, blockType, originalBlockType } = this.props;
+		const { attributes, name, order, title, originalBlockTitle, getAccessibilityLabelExtra } = this.props;
 
 		let blockName = '';
 
 		if ( name === 'core/missing' ) { // is the block unrecognized?
-			const usupportedBlockName = originalBlockType && originalBlockType.settings.title || attributes.originalName;
-			blockName = blockType.title + '. ' + usupportedBlockName;
+			blockName = title + '. ' + originalBlockTitle;
 		} else {
 			blockName = sprintf(
 				/* translators: accessibility text. %s: block name. */
 				__( '%s Block' ),
-				blockType.title, //already localized
+				title, //already localized
 			);
 		}
 
 		blockName += '. ' + sprintf( __( 'Row %d.' ), order + 1 );
 
 		// Disable adding any specific block accessibility information when running e2e tests
-		if ( blockType.__experimentalGetAccessibilityLabel ) {
-			const blockAccessibilityLabel = blockType.__experimentalGetAccessibilityLabel( attributes ) || '';
-			blockName += blockAccessibilityLabel ? ' ' + blockAccessibilityLabel : '' ;
+		if ( getAccessibilityLabelExtra ) {
+			const blockAccessibilityLabel = getAccessibilityLabelExtra( attributes );
+			blockName += blockAccessibilityLabel ? ' ' + blockAccessibilityLabel : '';
 		}
 
-		return blockName ; // Use one indexing for better accessibility
+		return blockName; // Use one indexing for better accessibility
 	}
 
 	render() {
@@ -241,18 +242,28 @@ export default compose( [
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
 		const blockType = getBlockType( name );
+		const title = blockType.title;
+		const icon = blockType.icon;
+		const getAccessibilityLabelExtra = blockType.__experimentalGetAccessibilityLabel;
 		const originalBlockType = attributes && attributes.originalName && coreBlocks[ attributes.originalName ];
+		let originalBlockTitle = '';
+		if ( originalBlockType ) {
+			originalBlockTitle = originalBlockType.settings.title || attributes.originalName;
+		}
 
 		return {
+			icon,
+			name,
+			order,
+			title,
 			attributes,
 			blockType,
 			isFirstBlock,
 			isLastBlock,
 			isSelected,
 			isValid,
-			name,
-			order,
-			originalBlockType,
+			originalBlockTitle,
+			getAccessibilityLabelExtra,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId }, { select } ) => {
