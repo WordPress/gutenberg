@@ -71,7 +71,7 @@ stream
 		onFileComplete();
 
 		if ( error ) {
-			console.log( error );
+			console.error( error );
 		}
 
 		if ( ended && ++complete === files.length ) {
