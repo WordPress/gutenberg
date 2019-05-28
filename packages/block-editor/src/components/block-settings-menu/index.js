@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	Toolbar,
 	DropdownMenu,
-	DropdownMenuSeparator,
+	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
 
@@ -45,69 +45,72 @@ export function BlockSettingsMenu( { clientIds } ) {
 					>
 						{ ( { onClose } ) => (
 							<>
-								<__experimentalBlockSettingsMenuFirstItem.Slot
-									fillProps={ { onClose } }
-								/>
-								{ count === 1 && (
-									<BlockUnknownConvertButton
-										clientId={ firstBlockClientId }
+								<MenuGroup>
+									<__experimentalBlockSettingsMenuFirstItem.Slot
+										fillProps={ { onClose } }
 									/>
-								) }
-								{ count === 1 && (
-									<BlockHTMLConvertButton
-										clientId={ firstBlockClientId }
-									/>
-								) }
-								{ ! isLocked && canDuplicate && (
-									<MenuItem
-										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-										onClick={ flow( onClose, onDuplicate ) }
-										icon="admin-page"
-										shortcut={ shortcuts.duplicate.display }
-									>
-										{ __( 'Duplicate' ) }
-									</MenuItem>
-								) }
-								{ ! isLocked && (
-									<>
+									{ count === 1 && (
+										<BlockUnknownConvertButton
+											clientId={ firstBlockClientId }
+										/>
+									) }
+									{ count === 1 && (
+										<BlockHTMLConvertButton
+											clientId={ firstBlockClientId }
+										/>
+									) }
+									{ ! isLocked && canDuplicate && (
 										<MenuItem
 											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-											onClick={ flow( onClose, onInsertBefore ) }
-											icon="insert-before"
-											shortcut={ shortcuts.insertBefore.display }
+											onClick={ flow( onClose, onDuplicate ) }
+											icon="admin-page"
+											shortcut={ shortcuts.duplicate.display }
 										>
-											{ __( 'Insert Before' ) }
+											{ __( 'Duplicate' ) }
 										</MenuItem>
+									) }
+									{ ! isLocked && (
+										<>
+											<MenuItem
+												className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+												onClick={ flow( onClose, onInsertBefore ) }
+												icon="insert-before"
+												shortcut={ shortcuts.insertBefore.display }
+											>
+												{ __( 'Insert Before' ) }
+											</MenuItem>
+											<MenuItem
+												className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+												onClick={ flow( onClose, onInsertAfter ) }
+												icon="insert-after"
+												shortcut={ shortcuts.insertAfter.display }
+											>
+												{ __( 'Insert After' ) }
+											</MenuItem>
+										</>
+									) }
+									{ count === 1 && (
+										<BlockModeToggle
+											clientId={ firstBlockClientId }
+											onToggle={ onClose }
+										/>
+									) }
+									<__experimentalBlockSettingsMenuPluginsExtension.Slot
+										fillProps={ { clientIds, onClose } }
+									/>
+								</MenuGroup>
+								<MenuGroup>
+									{ ! isLocked && (
 										<MenuItem
 											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-											onClick={ flow( onClose, onInsertAfter ) }
-											icon="insert-after"
-											shortcut={ shortcuts.insertAfter.display }
+											onClick={ flow( onClose, onRemove ) }
+											icon="trash"
+											shortcut={ shortcuts.removeBlock.display }
 										>
-											{ __( 'Insert After' ) }
+											{ __( 'Remove Block' ) }
 										</MenuItem>
-									</>
-								) }
-								{ count === 1 && (
-									<BlockModeToggle
-										clientId={ firstBlockClientId }
-										onToggle={ onClose }
-									/>
-								) }
-								<__experimentalBlockSettingsMenuPluginsExtension.Slot
-									fillProps={ { clientIds, onClose } }
-								/>
-								<DropdownMenuSeparator />
-								{ ! isLocked && (
-									<MenuItem
-										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-										onClick={ flow( onClose, onRemove ) }
-										icon="trash"
-										shortcut={ shortcuts.removeBlock.display }
-									>
-										{ __( 'Remove Block' ) }
-									</MenuItem>
-								) }
+									) }
+								</MenuGroup>
 							</>
 						) }
 					</DropdownMenu>

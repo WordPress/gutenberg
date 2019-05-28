@@ -1,7 +1,11 @@
-.block-editor-block-settings-menu__toggle .dashicon {
-	transform: rotate(90deg);
+.block-editor-block-settings-menu__content {
+	padding: 0;
+
+	.components-menu-group:not(:last-child) {
+		border-bottom: $border-width solid $light-gray-500;
+	}
 }
 
-.block-editor-block-settings-menu .components-icon-button.has-text svg {
-	margin-right: 0;
+.block-editor-block-settings-menu__toggle .dashicon {
+	transform: rotate(90deg);
 }

@@ -95,16 +95,3 @@
 		}
 	}
 }
-
-.components-dropdown-menu__separator {
-	margin-top: $grid-size;
-	margin-bottom: $grid-size;
-	margin-left: 0;
-	margin-right: 0;
-	border-top: $border-width solid $light-gray-500;
-
-	// Check if the separator is the last child in the node and if so, hide itself
-	&:last-child {
-		display: none;
-	}
-}

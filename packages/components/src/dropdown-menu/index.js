@@ -12,7 +12,6 @@ import { DOWN } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import DropdownMenuSeparator from './separator';
 import IconButton from '../icon-button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
@@ -80,7 +79,7 @@ function DropdownMenu( {
 					<NavigableMenu
 						className={ classnames( 'components-dropdown-menu__menu', __unstableMenuClassName ) }
 						role="menu"
-						aria-label={ menuLabel }
+						aria-label={ menuLabel || label }
 					>
 						{
 							isFunction( children ) ?
@@ -119,7 +118,5 @@ function DropdownMenu( {
 		/>
 	);
 }
-
-export { DropdownMenuSeparator };
 
 export default DropdownMenu;

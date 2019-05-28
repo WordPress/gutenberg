@@ -91,11 +91,11 @@ const MyDropdownMenu = () => (
 );
 ```
 
-Alternatively, specify a `children` function which returns elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, `MenuGroup`, or `DropdownMenuSeparator`.
+Alternatively, specify a `children` function which returns elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`.
 
 ```jsx
 import { Fragment } from '@wordpress/element';
-import { DropdownMenu, DropdownMenuSeparator, MenuItem } from '@wordpress/components';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 
 const MyDropdownMenu = () => (
 	<DropdownMenu
@@ -104,25 +104,28 @@ const MyDropdownMenu = () => (
 	>
 		{ ( { onClose } ) => (
 			<Fragment>
-				<MenuItem
-					icon="arrow-up-alt"
-					onClick={ onClose }
-				>
-					Move Up
-				</MenuItem>
-				<MenuItem
-					icon="arrow-down-alt"
-					onClick={ onClose }
-				>
-					Move Down
-				</MenuItem>
-				<DropdownMenuSeparator />
-				<MenuItem
-					icon="trash"
-					onClick={ onClose }
-				>
-					Remove
-				</MenuItem>
+				<MenuGroup>
+					<MenuItem
+						icon="arrow-up-alt"
+						onClick={ onClose }
+					>
+						Move Up
+					</MenuItem>
+					<MenuItem
+						icon="arrow-down-alt"
+						onClick={ onClose }
+					>
+						Move Down
+					</MenuItem>
+				</MenuGroup>
+				<MenuGroup>
+					<MenuItem
+						icon="trash"
+						onClick={ onClose }
+					>
+						Remove
+					</MenuItem>
+				</MenuGroup>
 			</Fragment>
 		) }
 	</DropdownMenu>
@@ -178,7 +181,7 @@ A valid DropdownMenu must specify one or the other of a `controls` or `children`
 
 #### children
 
-A [function render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) which should return an element or elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, `MenuGroup`, or `DropdownMenuSeparator`. Its first argument is a props object including the same values as given to a [`Dropdown`'s `renderContent`](/packages/components/src/dropdown#rendercontent) (`isOpen`, `onToggle`, `onClose`).
+A [function render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) which should return an element or elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`. Its first argument is a props object including the same values as given to a [`Dropdown`'s `renderContent`](/packages/components/src/dropdown#rendercontent) (`isOpen`, `onToggle`, `onClose`).
 
 A valid DropdownMenu must specify one or the other of a `controls` or `children` prop.
 

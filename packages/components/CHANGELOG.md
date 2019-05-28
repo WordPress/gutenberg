@@ -4,7 +4,15 @@
 
 - Add new `BlockQuotation` block to the primitives folder to support blockquote in a multiplatform way. [#15482](https://github.com/WordPress/gutenberg/pull/15482).
 - `DropdownMenu` now supports passing a [render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) as children for more advanced customization.
-- Added a new `DropdownMenuSeparator` component to be used in the new `DropdownMenu` children function option.
+
+### Internal
+
+- `MenuGroup` no longer uses `NavigableMenu` internally. It needs to be explicitly wrapped with `NavigableMenu` to bring back the same behavior.
+
+### Documentation
+
+- Added missing documentation for `DropdownMenu` props `menuLabel`, `position`, `className`.
+
 
 ## 7.4.0 (2019-05-21)
 
@@ -18,14 +26,6 @@
 - Fixed display of reset button when using RangeControl `allowReset` prop.
 - Fixed minutes field of `DateTimePicker` missed '0' before single digit values.
 
-### Internal
-
-- `MenuGroup` no longer uses `NavigableMenu` internally. It needs to be explicitly wrapped with `NavigableMenu` to bring back the same behavior.
-
-### Documentation
-
-- Added missing documentation for `DropdownMenu` props `menuLabel`, `position`, `className`.
-
 ## 7.3.0 (2019-04-16)
 
 ### New Features
@@ -33,7 +33,7 @@
 - Added a new `render` property to `FormFileUpload` component. Allowing users of the component to custom the UI for their needs.
 - Added a new `BaseControl.VisualLabel` component.
 - Added a new `preview` prop to the `Placeholder` component which allows to display a preview, for example a media preview when the Placeholder is used in media editing contexts.
-- `DropdownMenu` now supports passing a [render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) as children for more advanced customization.
+- Added a new `anchorRect` prop to `Popover` which enables a developer to provide a custom `DOMRect` object at which to position the popover.
 
 ### Bug fixes
 
