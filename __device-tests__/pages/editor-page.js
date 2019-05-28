@@ -41,7 +41,7 @@ export default class EditorPage {
 	async getBlockAtPosition( position: number, blockName: string ) {
 		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
 		const elements = await this.driver.elementsByXPath( blockLocator );
-		return elements[ 0 ];
+		return elements[ elements.length - 1 ];
 	}
 
 	async hasBlockAtPosition( position: number, blockName: string = '' ) {
@@ -121,7 +121,6 @@ export default class EditorPage {
 		}
 
 		removeBlockLocator += `[@${ this.accessibilityIdXPathAttrib }="${ removeButtonIdentifier }"]`;
-
 		const removeButton = await this.driver.elementByXPath( removeBlockLocator );
 		await removeButton.click();
 	}
