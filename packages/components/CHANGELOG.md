@@ -1,12 +1,19 @@
 ## Master
 
-### New Features
+### New Feature
+
+- Add new `BlockQuotation` block to the primitives folder to support blockquote in a multiplatform way. [#15482](https://github.com/WordPress/gutenberg/pull/15482).
+
+## 7.4.0 (2019-05-21)
+
+### New Feature
 
 - Added a new `HorizontalRule` component.
 
-### Bug Fixes
+### Bug Fix
 
 - Fixed display of reset button when using RangeControl `allowReset` prop.
+- Fixed minutes field of `DateTimePicker` missed '0' before single digit values.
 
 ## 7.3.0 (2019-04-16)
 
