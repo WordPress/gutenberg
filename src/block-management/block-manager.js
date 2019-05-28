@@ -123,9 +123,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			const insertionIndex = indexAfterSelected || this.props.blockCount;
 			this.props.insertBlock( newBlock, insertionIndex );
 		}
-
-		// now set the focus
-		this.props.selectBlock( newBlock.clientId );
 	}
 
 	onSafeAreaInsetsUpdate( result: Object ) {
