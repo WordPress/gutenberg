@@ -77,11 +77,11 @@ To register a new block type, start by creating a `block.json` file. This file:
 			"selector": ".meessage"
 		}
 	},
-	"styles": [ 
+	"styleVariations": [ 
 		{ "name": "default", "label": "Default", "isDefault": true }, 
 		{ "name": "other", "label": "Other" }
 	],
-	"editorScript": "file:build/editor.asset.json",
+	"editorScript": "build/editor.asset.json",
 	"script": {
 		"handle": "my-plugin-notice",
 		"file": "index.js",
@@ -94,7 +94,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 		"dependencies": [ "wp-edit-blocks" ]
 	},
 	"style": "my-plugin-notice",
-	"renderCallback": "file:my-render-callback.php"
+	"renderCallback": "my-render-callback.php"
 }
 ```
 
@@ -255,14 +255,15 @@ See the [the attributes documentation](/docs/designers-developers/developers/blo
 
 ### Style Variations
 
-*   Type: `array`
-*   Optional
-*   Localized: Yes (`label`)
-*   Property: `styles`
+* Type: `array`
+* Optional
+* Localized: Yes (`label`)
+* Property: `styleVariations`
+* Alias: `styles`
 
 ```json
 { 
-	"styles": [ 
+	"styleVariations": [ 
 		{ "name": "default", "label": "Default", "isDefault": true }, 
 		{ "name": "other", "label": "Other" }
 	]
@@ -281,7 +282,7 @@ Plugins and Themes can also register [custom block style](/docs/designers-develo
 * Property: `editorScript`
 
 ```json
-{ "editorScript": "file:build/editor.asset.json" }
+{ "editorScript": "build/editor.js" }
 ```
 
 Block type editor script definition. It will only be enqueued in the context of the editor.
@@ -333,7 +334,7 @@ Block type editor style definition. It will only be enqueued in the context of t
 * Property: `style`
 
 ```json
-{ "style": "my-plugin-notice" }
+{ "style": "build/style.css" }
 ```
 
 Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
@@ -346,7 +347,7 @@ Block type frontend style definition. It will be enqueued both in the editor and
 * Property: `renderCallback`
 
 ```json
-{ "renderCallback": "file:my-render-callback.php" }
+{ "renderCallback": "my-render-callback.php" }
 ```
 
 This is a pointer to a php file returning a render callback php function. The render callback is function called when the block is rendered on the frontend. It's used to generate the frontend markup dynamically.
@@ -383,38 +384,26 @@ wp.blocks.registerBlockType( 'my-block/name', {
 
 ### `WPDefinedAsset`
 
-The `WPDefinedAsset` type mirrors the shape of params necessary to register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings. There are three ways you can use them with `block.json` metadata.
-
-#### Handle
-
-First, in WordPress context, it's possible to register a script or style with a regular PHP function call and then assign the handle (`string`) to the corresponding property in `block.json` file.
+The `WPDefinedAsset` type is either a subtype of string, where the value must represent an absolute or relative path to a JavaScript or CSS file, or an object.
 
 **Example:**
 
-In `index.php`:
-```php
-wp_register_script(
-	'my-plugin-notice-editor',
-	plugins_url( 'build/editor.js', __FILE__ ),
-	array( 'wp-blocks', 'wp-element', 'wp-i18n' ),
-	'3.0.0'
-);
-```
-
 In `block.json`:
 ```json
-{ "editorScript": "my-plugin-notice-editor"  }
+{ "editorScript": "build/editor.js" }
 ```
+
+In the context of WordPress, the `WPDefinedAsset` type has to mirror also the shape of params necessary to register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings. There are two ways you can use `WPDefinedAsset` with `block.json` metadata.
 
 #### Object
 
-An asset can also be defined as an object which takes the following shape:
+An asset can be defined as an object which takes the following shape:
 - `handle` (`string`) - the name of the script.
 - `file` (`string`) - full URL of the script, or path of the script relative to the WordPress root directory.
 - `dependencies` (`string[]` - optional) - an array of registered script handles this script depends on.  Default value: `array()`.
 - `version` (`string`|`false`|`null` - optional) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
 
-When a block is registered with PHP, it will also automatically register all scripts and styles that are found in the `block.json` file.
+When a block is registered with PHP, it will automatically register all scripts and styles that are found in the `block.json` file.
 
 **Example:**
 
@@ -432,23 +421,28 @@ In `block.json`:
 
 #### File reference
 
-It's almost identical to the `object` option. The only difference is that it is stored inside its JSON file and referenced in `block.json` with __"file:"__ prefix (this mirrors how [local paths](https://docs.npmjs.com/files/package.json#local-paths) work in npm). This option is the preferred one as we are going to provide a way to auto-generate those asset files with `@wordpress/scripts` package.
+It's very similar to the `object` option. The only difference is that the definition is stored inside separate JSON file which ends with `.asset.json` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as we are going to provide a way to auto-generate those asset files with `@wordpress/scripts` package.
 
 **Example:**
+
+```
+build/
+├─ editor.js
+└─ editor.asset.json
+```
+
+In `block.json`:
+```json
+{ "editorScript": "build/editor.js" }
+```
 
 In `build/editor.asset.json`:
 ```json
 {
 	"handle": "my-plugin-notice-editor",
-	"file": "build/editor.js",
 	"dependencies": [ "wp-blocks","wp-element", "wp-i18n" ],
 	"version": "3.0.0"
 }
-```
-
-In `block.json`:
-```json
-{ "editorScript": "file:build/editor.asset.json" }
 ```
 
 ### `WPDefinedPropertyFile`
@@ -469,7 +463,7 @@ return 'render_block_my_block';
 
 In `block.json`:
 ```json
-{ "renderCallback": "file:render-callback.php" }
+{ "renderCallback": "render-callback.php" }
 ```
 
 ## Internationalization
