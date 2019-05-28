@@ -36,7 +36,7 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import styles from './styles.scss';
 import MediaUploadProgress from './media-upload-progress';
-import SvgIcon from './icon';
+import { SvgIcon } from './icon';
 import SvgIconRetry from './icon-retry';
 
 const LINK_DESTINATION_CUSTOM = 'custom';

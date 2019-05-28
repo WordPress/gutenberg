@@ -37,7 +37,7 @@ import { doAction, hasAction } from '@wordpress/hooks';
  */
 import MediaUploadProgress from '../image/media-upload-progress';
 import style from './style.scss';
-import SvgIcon from './icon';
+import { SvgIcon } from './icon';
 import SvgIconRetry from './icon-retry';
 
 const VIDEO_ASPECT_RATIO = 1.7;
