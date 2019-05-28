@@ -726,7 +726,10 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 				previousSelection: omit( state, [ 'previousSelection' ] ),
 			};
 		case 'RESTORE_SELECTED_BLOCK':
-			return state.previousSelection;
+			return {
+				...BLOCK_SELECTION_INITIAL_STATE,
+				...state.previousSelection,
+			};
 		case 'START_MULTI_SELECT':
 			if ( state.isMultiSelecting ) {
 				return state;
