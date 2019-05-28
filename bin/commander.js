@@ -15,14 +15,14 @@ const Octokit = require( '@octokit/rest' );
 const os = require( 'os' );
 const uuid = require( 'uuid/v4' );
 
-// Common info
-const workingDirectoryPath = path.join( os.tmpdir(), uuid() );
-const packageJsonPath = workingDirectoryPath + '/package.json';
-const packageLockPath = workingDirectoryPath + '/package-lock.json';
-const pluginFilePath = workingDirectoryPath + '/gutenberg.php';
-const gutenbergZipPath = workingDirectoryPath + '/gutenberg.zip';
-const repoOwner = 'WordPress';
-const repoURL = 'git@github.com:' + repoOwner + '/gutenberg.git';
+// Config
+const gitRepoOwner = 'WordPress';
+const gitRepoURL = 'git@github.com:' + gitRepoOwner + '/gutenberg.git';
+const svnRepoURL = 'https://plugins.svn.wordpress.org/gutenberg';
+
+// Working Directories
+const gitWorkingDirectoryPath = path.join( os.tmpdir(), uuid() );
+const svnWorkingDirectoryPath = path.join( os.tmpdir(), uuid() );
 
 // UI
 const error = chalk.bold.red;
@@ -74,17 +74,154 @@ async function runStep( name, abortMessage, handler ) {
 }
 
 /**
+ * Utility to run a child script
+ *
+ * @param {string} script Script to run.
+ * @param {string} cwd    Working directory.
+ */
+function runShellScript( script, cwd ) {
+	childProcess.execSync( script, {
+		cwd,
+		env: {
+			NO_CHECKS: true,
+			PATH: process.env.PATH,
+		},
+		stdio: [ 'inherit', 'ignore', 'inherit' ],
+	} );
+}
+
+// Steps
+
+/**
  * Clone the Gutenberg repository to the working directory.
  *
  * @param {string} abortMessage Abort message.
  */
-async function runRepositoryCloneStep( abortMessage ) {
+async function runGitRepositoryCloneStep( abortMessage ) {
 	// Cloning the repository
-	await runStep( 'Cloning the repository', abortMessage, async () => {
-		console.log( '>> Cloning the repository' );
+	await runStep( 'Cloning the Git repository', abortMessage, async () => {
+		console.log( '>> Cloning the Git repository' );
 		const simpleGit = SimpleGit();
-		await simpleGit.clone( repoURL, workingDirectoryPath );
-		console.log( '>> The gutenberg repository has been successfully cloned in the following temporary folder: ' + success( workingDirectoryPath ) );
+		await simpleGit.clone( gitRepoURL, gitWorkingDirectoryPath );
+		console.log( '>> The Gutenberg Git repository has been successfully cloned in the following temporary folder: ' + success( gitWorkingDirectoryPath ) );
+	} );
+}
+
+/**
+ * Fetching the SVN Gutenberg repository to the working directory.
+ *
+ * @param {string} abortMessage Abort message.
+ */
+async function runSvnRepositoryCloneStep( abortMessage ) {
+	// Cloning the repository
+	await runStep( 'Fetching the SVN repository', abortMessage, async () => {
+		console.log( '>> Fetching the SVN repository' );
+		runShellScript( 'svn checkout ' + svnRepoURL + '/trunk ' + svnWorkingDirectoryPath );
+		console.log( '>> The Gutenberg SVN repository has been successfully fetched in the following temporary folder: ' + success( svnWorkingDirectoryPath ) );
+	} );
+}
+
+/**
+ * Updates and commits the content of the SVN repo using the new plugin zip.
+ *
+ * @param {string} version      Version.
+ * @param {string} changelog    Changelog.
+ * @param {string} abortMessage Abort Message.
+ */
+async function runUpdateTrunkContentStep( version, changelog, abortMessage ) {
+	// Updating the content of the svn
+	await runStep( 'Updating trunk content', abortMessage, async () => {
+		console.log( '>> Replacing trunk content using the new plugin zip' );
+
+		// Delete everything except readme.txt and changelog.txt
+		runShellScript( 'find . -maxdepth 1 -not -name "changelog.txt" -not -name "readme.txt" -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +', svnWorkingDirectoryPath );
+
+		// Update the content using the plugin zip
+		const gutenbergZipPath = gitWorkingDirectoryPath + '/gutenberg.zip';
+		runShellScript( 'unzip ' + gutenbergZipPath + ' -d ' + svnWorkingDirectoryPath );
+
+		console.log( '>> Updating the changelog in readme.txt and changelog.txt' );
+
+		// Update the content of the readme.txt file
+		const readmePath = svnWorkingDirectoryPath + '/readme.txt';
+		const readmeFileContent = fs.readFileSync( readmePath, 'utf8' );
+		const newReadmeContent =
+			readmeFileContent.substr( 0, readmeFileContent.indexOf( '== Changelog ==' ) ) +
+			'== Changelog ==\n\n' +
+			changelog + '\n';
+		fs.writeFileSync( readmePath, newReadmeContent );
+
+		// Update the content of the changelog.txt file
+		const changelogPath = svnWorkingDirectoryPath + '/changelog.txt';
+		const changelogFileContent = fs.readFileSync( changelogPath, 'utf8' );
+		const newChangelogContent =
+			'== Changelog ==\n\n' +
+			'= ' + version + ' =\n\n' +
+			changelog +
+			changelogFileContent.substr( changelogFileContent.indexOf( '== Changelog ==' ) + 16 );
+		fs.writeFileSync( changelogPath, newChangelogContent );
+
+		// Commit the content changes
+		runShellScript( "svn st | grep '^\?' | awk '{print $2}' | xargs svn add", svnWorkingDirectoryPath );
+		runShellScript( "svn st | grep '^!' | awk '{print $2}' | xargs svn rm", svnWorkingDirectoryPath );
+		await askForConfirmationToContinue(
+			'Trunk content has been updated, please check the SVN diff. Commit the changes?',
+			true,
+			abortMessage
+		);
+
+		runShellScript( 'svn commit -m "Committing Gutenberg version ' + version + '"', svnWorkingDirectoryPath );
+
+		console.log( '>> Trunk has been successfully updated' );
+	} );
+}
+
+/**
+ * Creates a new SVN Tag
+ *
+ * @param {string} version      Version.
+ * @param {string} abortMessage Abort Message.
+ */
+async function runSvnTagStep( version, abortMessage ) {
+	await runStep( 'Creating the SVN Tag', abortMessage, async () => {
+		await askForConfirmationToContinue(
+			'Proceed with the creation of the SVN Tag?',
+			true,
+			abortMessage
+		);
+		runShellScript( 'svn cp ' + svnRepoURL + '/trunk ' + svnRepoURL + '/tags/' + version + ' -m "Tagging Gutenberg version ' + version + '"' );
+
+		console.log( '>> The SVN ' + success( version ) + ' tag has been successfully created' );
+	} );
+}
+
+/**
+ * Updates the stable version of the plugin in the SVN repository.
+ *
+ * @param {string} version      Version.
+ * @param {string} abortMessage Abort Message.
+ */
+async function updateThePluginStableVersion( version, abortMessage ) {
+	// Updating the content of the svn
+	await runStep( 'Updating the plugin\'s stable version', abortMessage, async () => {
+		const readmePath = svnWorkingDirectoryPath + '/readme.txt';
+		const readmeFileContent = fs.readFileSync( readmePath, 'utf8' );
+		const newReadmeContent = readmeFileContent.replace(
+			/Stable tag: [0-9]+.[0-9]+.[0-9]+\s*\n/,
+			'Stable tag: ' + version + '\n'
+		);
+		fs.writeFileSync( readmePath, newReadmeContent );
+
+		// Commit the content changes
+		await askForConfirmationToContinue(
+			'The stable version is updated in the readme.txt file. Commit the changes?',
+			true,
+			abortMessage
+		);
+
+		runShellScript( 'svn commit -m "Releasing Gutenberg version ' + version + '"', svnWorkingDirectoryPath );
+
+		console.log( '>> Stable version updated successfully' );
 	} );
 }
 
@@ -95,7 +232,8 @@ async function runRepositoryCloneStep( abortMessage ) {
  */
 async function runCleanLocalCloneStep( abortMessage ) {
 	await runStep( 'Cleaning the temporary folder', abortMessage, async () => {
-		await fs.remove( workingDirectoryPath );
+		await fs.remove( gitWorkingDirectoryPath );
+		await fs.remove( svnWorkingDirectoryPath );
 	} );
 }
 
@@ -110,7 +248,8 @@ async function runCleanLocalCloneStep( abortMessage ) {
 async function runReleaseBranchCreationStep( abortMessage ) {
 	let version, releaseBranch, versionLabel;
 	await runStep( 'Creating the release branch', abortMessage, async () => {
-		const simpleGit = SimpleGit( workingDirectoryPath );
+		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
 		const packageJson = require( packageJsonPath );
 		const parsedVersion = semver.parse( packageJson.version );
 
@@ -152,7 +291,8 @@ async function runReleaseBranchCreationStep( abortMessage ) {
 async function runReleaseBranchCheckoutStep( abortMessage ) {
 	let releaseBranch, version;
 	await runStep( 'Getting into the release branch', abortMessage, async () => {
-		const simpleGit = SimpleGit( workingDirectoryPath );
+		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
 		const masterPackageJson = require( packageJsonPath );
 		const masterParsedVersion = semver.parse( masterPackageJson.version );
 		releaseBranch = 'release/' + masterParsedVersion.major + '.' + masterParsedVersion.minor;
@@ -195,7 +335,10 @@ async function runReleaseBranchCheckoutStep( abortMessage ) {
 async function runBumpPluginVersionAndCommitStep( version, abortMessage ) {
 	let commitHash;
 	await runStep( 'Updating the plugin version', abortMessage, async () => {
-		const simpleGit = SimpleGit( workingDirectoryPath );
+		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
+		const packageLockPath = gitWorkingDirectoryPath + '/package-lock.json';
+		const pluginFilePath = gitWorkingDirectoryPath + '/gutenberg.php';
 		const packageJson = require( packageJsonPath );
 		const packageLock = require( packageLockPath );
 		const newPackageJson = {
@@ -225,7 +368,7 @@ async function runBumpPluginVersionAndCommitStep( version, abortMessage ) {
 		] );
 		const commitData = await simpleGit.commit( 'Bump plugin version to ' + version );
 		commitHash = commitData.commit;
-		console.log( '>> The plugin version bump has been commited succesfully.' );
+		console.log( '>> The plugin version bump has been commited successfully.' );
 	} );
 
 	return commitHash;
@@ -238,21 +381,15 @@ async function runBumpPluginVersionAndCommitStep( version, abortMessage ) {
  */
 async function runPluginZIPCreationStep( abortMessage ) {
 	await runStep( 'Plugin ZIP creation', abortMessage, async () => {
+		const gutenbergZipPath = gitWorkingDirectoryPath + '/gutenberg.zip';
 		await askForConfirmationToContinue(
 			'Proceed and build the plugin zip? (It takes a few minutes)',
 			true,
 			abortMessage
 		);
-		childProcess.execSync( '/bin/bash bin/build-plugin-zip.sh', {
-			cwd: workingDirectoryPath,
-			env: {
-				NO_CHECKS: true,
-				PATH: process.env.PATH,
-			},
-			stdio: [ 'inherit', 'ignore', 'inherit' ],
-		} );
+		runShellScript( '/bin/bash bin/build-plugin-zip.sh', gitWorkingDirectoryPath );
 
-		console.log( '>> The plugin zip has been built succesfully. Path: ' + success( gutenbergZipPath ) );
+		console.log( '>> The plugin zip has been built successfully. Path: ' + success( gutenbergZipPath ) );
 	} );
 }
 
@@ -264,14 +401,14 @@ async function runPluginZIPCreationStep( abortMessage ) {
  */
 async function runCreateGitTagStep( version, abortMessage ) {
 	await runStep( 'Creating the git tag', abortMessage, async () => {
-		const simpleGit = SimpleGit( workingDirectoryPath );
+		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 		await askForConfirmationToContinue(
 			'Proceed with the creation of the git tag?',
 			true,
 			abortMessage
 		);
 		await simpleGit.addTag( 'v' + version );
-		console.log( '>> The ' + success( 'v' + version ) + ' tag has been created succesfully.' );
+		console.log( '>> The ' + success( 'v' + version ) + ' tag has been created successfully.' );
 	} );
 }
 
@@ -282,7 +419,7 @@ async function runCreateGitTagStep( version, abortMessage ) {
  */
 async function runPushGitChangesStep( abortMessage ) {
 	await runStep( 'Pushing the release branch and the tag', abortMessage, async () => {
-		const simpleGit = SimpleGit( workingDirectoryPath );
+		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 		await askForConfirmationToContinue(
 			'The release branch and the tag are going to be pushed to the remote repository. Continue?',
 			true,
@@ -329,7 +466,7 @@ async function runGithubReleaseStep( version, versionLabel, isPrerelease, abortM
 		} );
 
 		const releaseData = await octokit.repos.createRelease( {
-			owner: repoOwner,
+			owner: gitRepoOwner,
 			repo: 'gutenberg',
 			tag_name: 'v' + version,
 			name: versionLabel,
@@ -338,12 +475,13 @@ async function runGithubReleaseStep( version, versionLabel, isPrerelease, abortM
 		} );
 		release = releaseData.data;
 
-		console.log( '>> The GitHub release has been created succesfully.' );
+		console.log( '>> The GitHub release has been created.' );
 	} );
 	abortMessage = abortMessage + ' Make sure to remove the the GitHub release as well.';
 
 	// Uploading the Gutenberg Zip to the release
 	await runStep( 'Uploading the plugin zip', abortMessage, async () => {
+		const gutenbergZipPath = gitWorkingDirectoryPath + '/gutenberg.zip';
 		const filestats = fs.statSync( gutenbergZipPath );
 		await octokit.repos.uploadReleaseAsset( {
 			url: release.upload_url,
@@ -354,8 +492,10 @@ async function runGithubReleaseStep( version, versionLabel, isPrerelease, abortM
 			name: 'gutenberg.zip',
 			file: fs.createReadStream( gutenbergZipPath ),
 		} );
-		console.log( '>> The plugin zip has been succesfully uploaded.' );
+		console.log( '>> The plugin zip has been successfully uploaded.' );
 	} );
+
+	console.log( '>> The Github release is available here: ' + success( release.html_url ) );
 
 	return release;
 }
@@ -368,7 +508,7 @@ async function runGithubReleaseStep( version, versionLabel, isPrerelease, abortM
  */
 async function runCherrypickBumpCommitIntoMasterStep( commitHash, abortMessage ) {
 	await runStep( 'Cherry-picking the bump commit into master', abortMessage, async () => {
-		const simpleGit = SimpleGit( workingDirectoryPath );
+		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 		await askForConfirmationToContinue(
 			'The plugin is now released. Proceed with the version bump in the master branch?',
 			true,
@@ -395,8 +535,8 @@ async function releasePlugin( isRC = true ) {
 	let abortMessage = 'Aborting!';
 	await askForConfirmationToContinue( 'Ready to go? ' );
 
-	// Cloning the repository
-	await runRepositoryCloneStep( abortMessage );
+	// Cloning the Git repository
+	await runGitRepositoryCloneStep( abortMessage );
 
 	// Creating the release branch
 	const { version, versionLabel } = isRC ?
@@ -419,9 +559,30 @@ async function releasePlugin( isRC = true ) {
 	// Creating the GitHub Release
 	const release = await runGithubReleaseStep( version, versionLabel, isRC, abortMessage );
 	abortMessage = 'Aborting! Make sure to manually cherry-pick the ' + success( commitHash ) + ' commit to the master branch.';
+	if ( ! isRC ) {
+		abortMessage += ' Make sure to perform the SVN release manually as well.';
+	}
 
 	// Cherry-picking the bump commit into master
 	await runCherrypickBumpCommitIntoMasterStep( commitHash, abortMessage );
+
+	if ( ! isRC ) {
+		abortMessage = 'Aborting! The Github release is done. Make sure to perform the SVN release manually.';
+
+		await askForConfirmationToContinue( 'The Gihub release is complete. Proceed with the SVN release? ', abortMessage );
+
+		// Fetching the SVN repository
+		await runSvnRepositoryCloneStep( abortMessage );
+
+		// Updating the SVN trunk content
+		await runUpdateTrunkContentStep( version, release.body, abortMessage );
+
+		abortMessage = 'Aborting! The Github release is done, SVN trunk updated. Make sure to create the SVN tag and update the stable version manually.';
+		await runSvnTagStep( version, abortMessage );
+
+		abortMessage = 'Aborting! The Github release is done, SVN tagged. Make sure to update the stable version manually.';
+		await updateThePluginStableVersion( version, abortMessage );
+	}
 
 	abortMessage = 'Aborting! The release is finished though.';
 	await runCleanLocalCloneStep( abortMessage );
@@ -467,7 +628,8 @@ program
 		console.log(
 			'\n>> 🎉 The Gutenberg ' + success( release.name ) + ' has been successfully released.\n',
 			'You can access the Github release here: ' + success( release.html_url ) + '\n',
-			'Thanks for performing the release!'
+			'In a few seconds, you\'ll be able to update the plugin from the WordPress repository.\n',
+			'Thanks for performing the release! and don\'t forget to publish the release post.'
 		);
 	} );
 
