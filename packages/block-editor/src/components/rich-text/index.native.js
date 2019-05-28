@@ -617,15 +617,6 @@ export class RichText extends Component {
 		}
 	}
 
-	forceSelectionUpdate( start, end ) {
-		if ( ! this.needsSelectionUpdate ) {
-			this.needsSelectionUpdate = true;
-			this.selectionStart = start;
-			this.selectionEnd = end;
-			this.forceUpdate();
-		}
-	}
-
 	shouldComponentUpdate( nextProps ) {
 		if ( nextProps.tagName !== this.props.tagName ) {
 			this.lastEventCount = undefined;
