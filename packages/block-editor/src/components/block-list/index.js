@@ -24,6 +24,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { getBlockDOMNode } from '../../utils/dom';
@@ -193,34 +194,25 @@ class BlockList extends Component {
 			blockClientIds,
 			rootClientId,
 			isDraggable,
-			selectedBlockClientId,
-			selectedBlockRootClientId,
-			multiSelectedBlockClientIds,
-			hasMultiSelection,
 			renderAppender,
 		} = this.props;
 
 		return (
 			<div className="editor-block-list__layout block-editor-block-list__layout">
 				{ map( blockClientIds, ( clientId ) => {
-					const isBlockInSelection = hasMultiSelection ?
-						multiSelectedBlockClientIds.includes( clientId ) :
-						[ selectedBlockRootClientId, selectedBlockClientId ].includes( clientId );
-
 					return (
-						<AsyncModeProvider
+						<BlockAsyncModeProvider
 							key={ 'block-' + clientId }
-							value={ ! isBlockInSelection }
+							clientId={ clientId }
 						>
 							<BlockListBlock
-								className={ isBlockInSelection ? 'is-sync' : 'is-async' }
 								clientId={ clientId }
 								blockRef={ this.setBlockRef }
 								onSelectionStart={ this.onSelectionStart }
 								rootClientId={ rootClientId }
 								isDraggable={ isDraggable }
 							/>
-						</AsyncModeProvider>
+						</BlockAsyncModeProvider>
 					);
 				} ) }
 
@@ -241,18 +233,13 @@ export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
 			getBlockOrder,
-			getBlockHierarchyRootClientId,
 			isSelectionEnabled,
 			isMultiSelecting,
 			getMultiSelectedBlocksStartClientId,
 			getMultiSelectedBlocksEndClientId,
-			getSelectedBlockClientId,
-			getMultiSelectedBlockClientIds,
-			hasMultiSelection,
 		} = select( 'core/block-editor' );
 
 		const { rootClientId } = ownProps;
-		const selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
@@ -260,10 +247,6 @@ export default compose( [
 			selectionEnd: getMultiSelectedBlocksEndClientId(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
-			selectedBlockClientId,
-			selectedBlockRootClientId: getBlockHierarchyRootClientId( selectedBlockClientId ),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			hasMultiSelection: hasMultiSelection(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
