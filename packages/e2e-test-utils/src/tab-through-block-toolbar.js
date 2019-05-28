@@ -6,7 +6,7 @@ export async function tabThroughBlockToolbar() {
 	const blockToolbarButtons = await page.evaluate( () => {
 		// return an array with the classNames of the block toolbar's buttons
 		return [].slice.call(
-			document.querySelectorAll( '.block-editor-block-contextual-toolbar button' )
+			document.querySelectorAll( '.block-editor-block-contextual-toolbar button:not([disabled])' )
 		).map( ( elem ) => elem.className );
 	} );
 
