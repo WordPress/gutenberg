@@ -26,8 +26,8 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { addAction, hasAction, removeAction } from '@wordpress/hooks';
-import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
-import { BlockEdit } from '@wordpress/block-editor';
+import { getBlockType } from '@wordpress/blocks';
+import { BlockEdit, BlockInvalidWarning } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { coreBlocks } from '@wordpress/block-library';
 
@@ -39,6 +39,7 @@ import styles from './block-holder.scss';
 import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
 
 type PropsType = BlockType & {
+	icon: ?mixed,
 	name: string,
 	order: number,
 	title: string,
@@ -156,15 +157,6 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		);
 	}
 
-	getAccessibilityLabelForBlock() {
-		const { name, order } = this.props;
-		let blockTitle = getBlockType( name ).title;
-
-		blockTitle = blockTitle === 'Unrecognized Block' ? blockTitle : `${ blockTitle } Block`;
-
-		return sprintf( __( '%s. Row %d.' ), blockTitle, order + 1 ); // Use one indexing for better accessibility
-	}
-
 	renderBlockTitle() {
 		return (
 			<View style={ styles.blockTitle }>
@@ -174,55 +166,57 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	getAccessibilityLabel() {
-		const { title, attributes, name } = this.props;
+		const { attributes, name, order, blockType, originalBlockType } = this.props;
 
-		if ( name === getUnregisteredTypeHandlerName() ) { // is the block unrecognized?
-			const blockType = coreBlocks[ attributes.originalName ];
-			return sprintf(
-				/* translators: accessibility text. %s: unsupported block type. */
-				__( 'Unsupported block: %s' ),
-				blockType ? blockType.settings.title : attributes.originalName
+		let blockName = '';
+
+		if ( name === 'core/missing' ) { // is the block unrecognized?
+			const usupportedBlockName = originalBlockType && originalBlockType.settings.title || attributes.originalName;
+			blockName = blockType.title + '. ' + usupportedBlockName;
+		} else {
+			blockName = sprintf(
+				/* translators: accessibility text. %s: block name. */
+				__( '%s Block' ),
+				blockType.title, //already localized
 			);
 		}
 
-		const blockName = sprintf(
-			/* translators: accessibility text. %s: block name. */
-			__( '%s block' ),
-			title, //already localized
-		);
+		blockName += '. ' + sprintf( __( 'Row %d.' ), order + 1 );
 
-		const blockType = getBlockType( name );
+		// Disable adding any specific block accessibility information when running e2e tests
 		if ( blockType.__experimentalGetAccessibilityLabel ) {
 			const blockAccessibilityLabel = blockType.__experimentalGetAccessibilityLabel( attributes ) || '';
-			return blockName + ( blockAccessibilityLabel ? '. ' + blockAccessibilityLabel : '' );
+			blockName += blockAccessibilityLabel ? ' ' + blockAccessibilityLabel : '' ;
 		}
 
-		return blockName;
+		return blockName ; // Use one indexing for better accessibility
 	}
 
 	render() {
-		const { isSelected, borderStyle, focusedBorderColor } = this.props;
+		const { isSelected, borderStyle, focusedBorderColor, isValid, title, icon } = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
-		const accessibilityLabel = this.getAccessibilityLabelForBlock();
+		const accessibilityLabel = this.getAccessibilityLabel();
 
 		return (
 			// accessible prop needs to be false to access children
 			// https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
 			<TouchableWithoutFeedback
-				accessible={ ! isSelected }
-				accessibilityLabel={ this.getAccessibilityLabel() }
-				accessibilityRole={ 'button' }
-				onPress={ this.onFocus } >
-
+				onPress={ this.onFocus }
+			>
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View
-						accessibile={ true }
+						accessible={ ! isSelected }
 						accessibilityLabel={ accessibilityLabel }
-						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
-						{ this.getBlockForType() }
+						accessibilityRole={ 'button' }
+						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
+					>
+						{ isValid && this.getBlockForType() }
+						{ ! isValid &&
+							<BlockInvalidWarning blockTitle={ title } icon={ icon } />
+						}
 					</View>
 					{ this.renderToolbar() }
 				</View>
@@ -235,28 +229,30 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
-			getBlockAttributes,
-			getBlockName,
 			getBlockIndex,
 			getBlocks,
 			isBlockSelected,
+			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
-		const name = getBlockName( clientId );
-		const attributes = getBlockAttributes( clientId );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
 		const isFirstBlock = order === 0;
 		const isLastBlock = order === getBlocks().length - 1;
-		const title = getBlockType( name ) !== undefined ? getBlockType( name ).title : '';
+		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+		const { name, attributes, isValid } = block || {};
+		const blockType = getBlockType( name );
+		const originalBlockType = attributes && attributes.originalName && coreBlocks[ attributes.originalName ];
 
 		return {
-			name,
-			order,
-			title,
 			attributes,
+			blockType,
 			isFirstBlock,
 			isLastBlock,
 			isSelected,
+			isValid,
+			name,
+			order,
+			originalBlockType,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId }, { select } ) => {
@@ -308,8 +304,8 @@ export default compose( [
 			onChange: ( attributes: Object ) => {
 				updateBlockAttributes( clientId, attributes );
 			},
-			onReplace( blocks: Array<Object> ) {
-				replaceBlocks( [ clientId ], blocks );
+			onReplace( blocks: Array<Object>, indexToSelect: number ) {
+				replaceBlocks( [ clientId ], blocks, indexToSelect );
 			},
 		};
 	} ),

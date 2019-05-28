@@ -9,6 +9,7 @@
 import childProcess from 'child_process';
 import wd from 'wd';
 import crypto from 'crypto';
+import path from 'path';
 
 /**
  * Internal dependencies
@@ -72,7 +73,7 @@ const setupDriver = async () => {
 	if ( isAndroid() ) {
 		desiredCaps = _.clone( android8 );
 		if ( isLocalEnvironment() ) {
-			desiredCaps.app = localAndroidAppPath;
+			desiredCaps.app = path.resolve( localAndroidAppPath );
 			try {
 				const androidVersion = childProcess
 					.execSync( 'adb shell getprop ro.build.version.release' )
@@ -92,7 +93,7 @@ const setupDriver = async () => {
 	} else {
 		desiredCaps = _.clone( ios12 );
 		if ( isLocalEnvironment() ) {
-			desiredCaps.app = localIOSAppPath;
+			desiredCaps.app = path.resolve( localIOSAppPath );
 		} else {
 			desiredCaps.app = 'sauce-storage:Gutenberg.app.zip'; // App should be preloaded to sauce storage, this can also be a URL
 		}
