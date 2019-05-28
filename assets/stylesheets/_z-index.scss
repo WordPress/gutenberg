@@ -49,10 +49,6 @@ $z-layers: (
 	".components-drop-zone": 100,
 	".components-drop-zone__content": 110,
 
-	// The block mover, particularly in nested contexts,
-	// should overlap most block content.
-	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 80,
-
 	// The block mover for floats should overlap the controls of adjacent blocks.
 	".block-editor-block-list__block {core/image aligned left or right}": 81,
 
@@ -64,6 +60,10 @@ $z-layers: (
 	".block-editor-block-list__layout .reusable-block-edit-panel": 121,
 	".block-editor-block-contextual-toolbar": 121,
 	".editor-inner-blocks .block-editor-block-list__breadcrumb": 122,
+
+	// The block mover, particularly in nested contexts,
+	// should overlap most block content.
+	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 121,
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
