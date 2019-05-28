@@ -147,4 +147,11 @@
 			justify-content: center;
 		}
 	}
+
+	// Align the gallery images vertically if images vary in height.
+	&.alignitemscenter {
+		.blocks-gallery-item figure {
+			align-items: center;
+		}
+	}
 }
