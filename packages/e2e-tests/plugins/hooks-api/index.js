@@ -58,28 +58,4 @@
 		addResetBlockButton,
 		100
 	);
-
-	var withInspectorControls = wp.compose.createHigherOrderComponent( function( BlockEdit ) {
-		return function( props ) {
-			return el(
-				Fragment,
-				{},
-				el(
-					BlockEdit,
-					props
-				),
-				el(
-					InspectorControls,
-					{},
-					el(
-						wp.components.PanelBody,
-						{},
-						'My custom control'
-					)
-				)
-			);
-		};
-	}, 'withInspectorControls' );
-
-	addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
 } )();
