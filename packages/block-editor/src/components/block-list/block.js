@@ -79,6 +79,7 @@ function BlockListBlock( {
 	className,
 	name,
 	isValid,
+	isLast,
 	attributes,
 	initialPosition,
 	wrapperProps,
@@ -343,8 +344,7 @@ function BlockListBlock( {
 
 				// If the block is selected and we're typing the block should not appear.
 				// Empty paragraph blocks should always show up as unselected.
-				const showEmptyBlockSideInserter =
-					( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
+				const showEmptyBlockSideInserter = ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
 				const shouldAppearSelected =
 					! isFocusMode &&
 					! showEmptyBlockSideInserter &&
@@ -580,6 +580,8 @@ const applyWithSelect = withSelect(
 			getSettings,
 			hasSelectedInnerBlock,
 			getTemplateLock,
+			getBlockIndex,
+			getBlockOrder,
 			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
@@ -587,6 +589,8 @@ const applyWithSelect = withSelect(
 		const { hasFixedToolbar, focusMode } = getSettings();
 		const templateLock = getTemplateLock( rootClientId );
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
+		const index = getBlockIndex( clientId, rootClientId );
+		const blockOrder = getBlockOrder( rootClientId );
 
 		// The fallback to `{}` is a temporary fix.
 		// This function should never be called when a block is not present in the state.
@@ -611,6 +615,7 @@ const applyWithSelect = withSelect(
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
+			isLast: index === blockOrder.length - 1,
 
 			// Users of the editor.BlockListBlock filter used to be able to access the block prop
 			// Ideally these blocks would rely on the clientId prop only.
