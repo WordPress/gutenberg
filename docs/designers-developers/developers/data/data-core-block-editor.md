@@ -826,6 +826,10 @@ _Returns_
 
 Returns an action object used in signalling that the block selection is cleared.
 
+_Parameters_
+
+-   _type_ `Object`: Object specifying if the clearing is destructive or not, default { destructive: false }.
+
 _Returns_
 
 -   `Object`: Action object.
