@@ -2,7 +2,8 @@
 
 ### Bug Fix
 
-- Fixed custom regular expression for the `no-restricted-syntax` rule. [#15839](https://github.com/WordPress/gutenberg/pull/15839)
+- Fixed custom regular expression for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
+- Fixed arguments checking of `_nx` for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
 
 ## 2.2.0 (2019-05-21)
 
