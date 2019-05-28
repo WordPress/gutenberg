@@ -725,7 +725,11 @@ export class RichText extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.isSelected ) {
+		// Request focus if wrapping block is selected and parent hasn't inhibited the focus request. This method of focusing
+		//  is trying to implement the web-side counterpart of BlockList's `focusTabbable` where the BlockList is focusing an
+		//  inputbox by searching the DOM. We don't have the DOM in RN so, using the combination of blockIsSelected and noFocusOnMount
+		//  to determine if we should focus the RichText.
+		if ( this.props.blockIsSelected && ! this.props.noFocusOnMount ) {
 			this._editor.focus();
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
 		}
@@ -889,16 +893,13 @@ RichText.defaultProps = {
 const RichTextContainer = compose( [
 	withInstanceId,
 	withBlockEditContext( ( { clientId, onFocus, onCaretVerticalPositionChange, isSelected }, ownProps ) => {
-		// ownProps.onFocus and isSelected needs precedence over the block edit context
-		if ( ownProps.isSelected !== undefined ) {
-			isSelected = ownProps.isSelected;
-		}
+		// ownProps.onFocus and needs precedence over the block edit context
 		if ( ownProps.onFocus !== undefined ) {
 			onFocus = ownProps.onFocus;
 		}
 		return {
-			isSelected,
 			clientId,
+			blockIsSelected: ownProps.isSelected !== undefined ? ownProps.isSelected : isSelected,
 			onFocus,
 			onCaretVerticalPositionChange,
 		};
@@ -908,6 +909,7 @@ const RichTextContainer = compose( [
 		instanceId,
 		identifier = instanceId,
 		isSelected,
+		blockIsSelected,
 	} ) => {
 		const { getFormatTypes } = select( 'core/rich-text' );
 		const {
@@ -930,6 +932,7 @@ const RichTextContainer = compose( [
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
+			blockIsSelected,
 		};
 	} ),
 	withDispatch( ( dispatch, {
