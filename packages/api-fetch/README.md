@@ -63,6 +63,20 @@ apiFetch.use( ( options, next ) => {
 } );
 ```
 
+Using global `fetch` options like `method`:
+
+```js
+apiFetch( { url, data, method: 'POST' } ).then( data => {
+	newState = { foo: data.foo };
+} ).catch( error => {
+	newState = { error };
+	console.error( `My Plugin error: ${newState.error}` );
+} ).finally( () => {
+	newState.loading = false;
+	this.setstate( newState );
+} );
+```
+
 ### Built-in middlewares
 
 The `api-fetch` package provides built-in middlewares you can use to provide a `nonce` and a custom `rootURL`.
