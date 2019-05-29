@@ -10,7 +10,7 @@ import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 
 export { default as withSelect } from './components/with-select';
-export { default as withDispatch } from './components/with-dispatch';
+export { default as withDispatch } from './components/with-dispatch/with-dispatch-new';
 export { default as withRegistry } from './components/with-registry';
 export {
 	RegistryProvider,
