@@ -71,6 +71,15 @@ stream
 		onFileComplete();
 
 		if ( error ) {
+			// If an error occurs, the process can't be ended immediately since
+			// other workers are likely pending. Optimally, it would end at the
+			// earliest opportunity (after the current round of workers has had
+			// the chance to complete), but this is not made directly possible
+			// through `worker-farm`. Instead, ensure at least that when the
+			// process does exit, it exits with a non-zero code to reflect the
+			// fact that an error had occurred.
+			process.exitCode = 1;
+
 			console.error( error );
 		}
 
