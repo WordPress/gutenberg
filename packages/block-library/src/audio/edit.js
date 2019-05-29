@@ -99,12 +99,11 @@ class AudioEdit extends Component {
 		this.setState( { editing: false } );
 	}
 
-
 	onUploadError( message ) {
 		const { noticeOperations } = this.props;
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
-  }
+	}
 
 	getAutoplayHelp( checked ) {
 		return checked ? __( 'Note: Autoplaying audio may cause usability issues for some visitors.' ) : null;

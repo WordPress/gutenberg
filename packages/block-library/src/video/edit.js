@@ -131,7 +131,7 @@ class VideoEdit extends Component {
 		const { noticeOperations } = this.props;
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
-  }
+	}
 
 	getAutoplayHelp( checked ) {
 		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
