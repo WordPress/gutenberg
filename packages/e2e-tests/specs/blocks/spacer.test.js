@@ -22,7 +22,7 @@ describe( 'Spacer', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'can be resized using the drag handle and remains selected being dragged', async () => {
+	it( 'can be resized using the drag handle and remains selected after being dragged', async () => {
 		// Create a spacer with the slash block shortcut.
 		await clickBlockAppender();
 		await page.keyboard.type( '/spacer' );
