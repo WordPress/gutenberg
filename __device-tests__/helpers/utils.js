@@ -162,7 +162,7 @@ const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.Promise
 			}
 		}
 	} else {
-		return await element.type( str );
+		return await element.sendKeys( str );
 	}
 };
 
