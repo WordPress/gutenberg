@@ -63,12 +63,15 @@ apiFetch.use( ( options, next ) => {
 } );
 ```
 
-Using global `fetch` options like `method`:
+Making a request to a 3rd party server using `url` instead of `path`, and using global `fetch` options like `method`:
 
 ```js
+const url = `https://api.example.org/v1/example?key=${ apiKey }`;
+const data = { foo: bar };
 let newState = {};
+
 apiFetch( { url, data, method: 'POST' } ).then( data => {
-	newState = { foo: data.foo };
+	newState = { bax: data.quix };
 } ).catch( error => {
 	newState = { error };
 	console.error( `My Plugin error: ${newState.error}` );
