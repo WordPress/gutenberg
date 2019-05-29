@@ -252,7 +252,7 @@ export default compose( [
 
 		return {
 			icon,
-			name: name || 'core/missing' ,
+			name: name || 'core/missing',
 			order,
 			title,
 			attributes,
