@@ -35,7 +35,9 @@ import {
 	startsWith,
 	kebabCase,
 	isPlainObject,
+	noop,
 } from 'lodash';
+import { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from 'react';
 
 /**
  * WordPress dependencies
@@ -53,6 +55,20 @@ import {
 import RawHTML from './raw-html';
 
 const { Provider, Consumer } = createContext();
+
+const Dispatcher = {
+	readContext: noop,
+	useContext: noop,
+	useMemo: noop,
+	useReducer: () => [],
+	useRef: () => ( { current: '' } ),
+	useState: () => [],
+	useLayoutEffect: noop,
+	useCallback: noop,
+	useImperativeHandle: noop,
+	useEffect: noop,
+	useDebugValue: noop,
+};
 
 /**
  * Valid attribute types.
@@ -396,8 +412,14 @@ export function renderElement( element, context, legacyContext = {} ) {
 			if ( type.prototype && typeof type.prototype.render === 'function' ) {
 				return renderComponent( type, props, context, legacyContext );
 			}
-
-			return renderElement( type( props, legacyContext ), context, legacyContext );
+			const prevDispatcher = __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentDispatcher;
+			__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentDispatcher.current = Dispatcher;
+			const value = renderElement( type( props, legacyContext ),
+				context,
+				legacyContext
+			);
+			__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentDispatcher = prevDispatcher;
+			return value;
 	}
 
 	switch ( type && type.$$typeof ) {
