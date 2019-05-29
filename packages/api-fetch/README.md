@@ -66,6 +66,7 @@ apiFetch.use( ( options, next ) => {
 Using global `fetch` options like `method`:
 
 ```js
+let newState = {};
 apiFetch( { url, data, method: 'POST' } ).then( data => {
 	newState = { foo: data.foo };
 } ).catch( error => {
@@ -73,7 +74,7 @@ apiFetch( { url, data, method: 'POST' } ).then( data => {
 	console.error( `My Plugin error: ${newState.error}` );
 } ).finally( () => {
 	newState.loading = false;
-	this.setstate( newState );
+	this.setState( newState );
 } );
 ```
 
