@@ -48,7 +48,7 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 								citation: nextCitation,
 							} )
 						}
-						noFocusOnMount={ true }
+						noFocusOnMount
 						placeholder={
 							// translators: placeholder text used for the citation
 							__( 'Write citation…' )
