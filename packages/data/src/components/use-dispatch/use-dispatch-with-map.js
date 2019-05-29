@@ -4,6 +4,11 @@
 import { mapValues } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { useMemo } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import useRegistry from '../registry-provider/use-registry';
@@ -15,7 +20,7 @@ function proxyDispatch( propName, registry, ...args ) {
 const useDispatchWithMap = ( dispatchMap ) => {
 	const registry = useRegistry();
 	const currentDispatchProps = dispatchMap( registry.dispatch, registry );
-	return mapValues(
+	return useMemo( () => mapValues(
 		currentDispatchProps,
 		( dispatcher, propName ) => {
 			if ( typeof dispatcher !== 'function' ) {
@@ -26,7 +31,7 @@ const useDispatchWithMap = ( dispatchMap ) => {
 			}
 			return proxyDispatch.bind( dispatchMap, propName, registry );
 		}
-	);
+	), [ dispatchMap ] );
 };
 
 export default useDispatchWithMap;
