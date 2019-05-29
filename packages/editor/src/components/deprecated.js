@@ -5,7 +5,7 @@
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
 import {
-	Autocomplete as RootAutocompete,
+	Autocomplete as RootAutocomplete,
 	AlignmentToolbar as RootAlignmentToolbar,
 	BlockAlignmentToolbar as RootBlockAlignmentToolbar,
 	BlockControls as RootBlockControls,
@@ -84,7 +84,7 @@ function deprecateFunction( name, func ) {
 	};
 }
 
-export const Autocomplete = deprecateComponent( 'Autocomplete', RootAutocompete );
+export const Autocomplete = deprecateComponent( 'Autocomplete', RootAutocomplete );
 export const AlignmentToolbar = deprecateComponent( 'AlignmentToolbar', RootAlignmentToolbar );
 export const BlockAlignmentToolbar = deprecateComponent( 'BlockAlignmentToolbar', RootBlockAlignmentToolbar );
 export const BlockControls = deprecateComponent( 'BlockControls', RootBlockControls );
