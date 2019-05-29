@@ -138,9 +138,6 @@ const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
 	}
 };
 
-// attempts to type a string to a given element, need for this stems from
-// https://github.com/appium/appium/issues/12285#issuecomment-471872239
-// https://github.com/facebook/WebDriverAgent/issues/1084
 const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean = false ) => {
 	if ( clear ) {
 		await element.clear();
@@ -162,7 +159,7 @@ const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.Promise
 			}
 		}
 	} else {
-		return await element.sendKeys( str );
+		return await element.type( str );
 	}
 };
 
