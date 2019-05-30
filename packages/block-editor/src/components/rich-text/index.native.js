@@ -552,14 +552,14 @@ export class RichText extends Component {
 
 		if ( typeof pastedContent === 'string' ) {
 			const recordToInsert = create( { html: pastedContent } );
-			const insertedContent = insert( currentRecord, recordToInsert );
-			const newContent = this.valueToFormat( insertedContent );
+			const resultingRecord = insert( currentRecord, recordToInsert );
+			const resultingContent = this.valueToFormat( resultingRecord );
 
 			this.lastEventCount = undefined;
-			this.value = newContent;
+			this.value = resultingContent;
 
 			// explicitly set selection after inline paste
-			this.forceSelectionUpdate( insertedContent.start, insertedContent.end );
+			this.onSelectionChange( resultingRecord.start, resultingRecord.end );
 
 			this.props.onChange( this.value );
 		} else if ( onSplit ) {
@@ -671,15 +671,6 @@ export class RichText extends Component {
 		}
 
 		return value;
-	}
-
-	forceSelectionUpdate( start, end ) {
-		if ( ! this.needsSelectionUpdate ) {
-			this.needsSelectionUpdate = true;
-			this.selectionStart = start;
-			this.selectionEnd = end;
-			this.forceUpdate();
-		}
 	}
 
 	shouldComponentUpdate( nextProps ) {
