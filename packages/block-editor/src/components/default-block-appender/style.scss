@@ -32,6 +32,7 @@
 	.block-editor-inserter__toggle:not([aria-expanded="true"]) {
 		opacity: 0;
 		transition: opacity 0.2s;
+		will-change: opacity;
 	}
 
 	&:hover {
