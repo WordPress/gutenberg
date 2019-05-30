@@ -36,7 +36,7 @@ After you have updated both JavaScript and PHP files, go to the block editor and
 
 Add a quote block, and in the right sidebar under Styles, you will see your new Fancy Quote style listed.  
 
-Click the Fancy Quote to select and apply that style to your quote block
+Click the Fancy Quote to select and apply that style to your quote block:
 
 
 ![Fancy Quote Style in Inspector](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/fancy-quote-in-inspector.png)
@@ -61,7 +61,7 @@ function myguten_stylesheet() {
 add_action( 'enqueue_block_assets', 'myguten_stylesheet' );
 ```
 
-Now when you view in the editor and publish, you will see your Fancy Quote style = a delicious tomato color text:
+Now when you view in the editor and publish, you will see your Fancy Quote style, a delicious tomato color text:
 
 ![Fancy Quote with Style](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/fancy-quote-with-style.png)
 
