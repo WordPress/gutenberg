@@ -29,7 +29,7 @@ export const KeyboardAwareFlatList = ( {
 		} }
 		onKeyboardDidHide={ () => {
 			setTimeout( () => {
-				if ( ! ( this: any ).keyboardWillShowIndicator &&
+				if ( ! this.keyboardWillShowIndicator &&
 					this.latestContentOffsetY !== undefined &&
 					! shouldPreventAutomaticScroll() ) {
 					// Reset the content position if keyboard is still closed
@@ -40,7 +40,7 @@ export const KeyboardAwareFlatList = ( {
 		onKeyboardWillShow={ () => {
 			this.keyboardWillShowIndicator = true;
 		} }
-		onScroll={ ( event: Object ) => {
+		onScroll={ ( event ) => {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
 		} } >
 		<FlatList { ...listProps } />
