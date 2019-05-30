@@ -6,7 +6,7 @@ import { mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,6 +15,12 @@ import useRegistry from '../registry-provider/use-registry';
 
 const useDispatchWithMap = ( dispatchMap ) => {
 	const registry = useRegistry();
+	const currentDispatchMap = useRef( dispatchMap );
+
+	useEffect( () => {
+		currentDispatchMap.current = dispatchMap;
+	} );
+
 	return useMemo( () => {
 		const currentDispatchProps = dispatchMap( registry.dispatch, registry );
 		return mapValues(
@@ -26,7 +32,9 @@ const useDispatchWithMap = ( dispatchMap ) => {
 						`Property ${ propName } returned from dispatchMap in useDispatchWithMap must be a function.`
 					);
 				}
-				return dispatcher;
+				return ( ...args ) => {
+					return currentDispatchMap.current( registry.dispatch, registry )[ propName ]( ...args );
+				};
 			}
 		);
 	}, [ dispatchMap, registry ] );
