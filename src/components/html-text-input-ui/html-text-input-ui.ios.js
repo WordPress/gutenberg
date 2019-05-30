@@ -10,10 +10,14 @@ import * as React from 'react';
 import { UIManager, PanResponder } from 'react-native';
 
 /**
+ * WordPress dependencies
+ */
+import { KeyboardAvoidingView } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import styles from './html-text-input-ui.scss';
-import KeyboardAvoidingView from '../keyboard-avoiding-view';
 
 type PropsType = {
 	parentHeight: number,
