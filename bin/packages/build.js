@@ -7,7 +7,7 @@ const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const ProgressBar = require( 'progress' );
 const workerFarm = require( 'worker-farm' );
-const { Readable } = require( 'stream' );
+const { Readable, Transform } = require( 'stream' );
 
 const files = process.argv.slice( 2 );
 
@@ -18,6 +18,52 @@ const files = process.argv.slice( 2 );
  */
 const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
 
+/**
+ * Get the package name for a specified file
+ *
+ * @param  {string} file File name
+ * @return {string}      Package name
+ */
+function getPackageName( file ) {
+	return path.relative( PACKAGES_DIR, file ).split( path.sep )[ 0 ];
+}
+
+/**
+ * Returns a stream transform which maps an individual stylesheet to its
+ * package entrypoint. Unlike JavaScript which uses an external bundler to
+ * efficiently manage rebuilds by entrypoints, stylesheets are rebuilt fresh
+ * in their entirety from the build script.
+ *
+ * @return {Transform} Stream transform instance.
+ */
+function createStyleEntryTransform() {
+	const packages = new Set;
+
+	return new Transform( {
+		objectMode: true,
+		async transform( file, encoding, callback ) {
+			// Only stylesheets are subject to this transform.
+			if ( path.extname( file ) !== '.scss' ) {
+				this.push( file );
+				callback();
+				return;
+			}
+
+			// Only operate once per package, assuming entries are common.
+			const packageName = getPackageName( file );
+			if ( packages.has( packageName ) ) {
+				callback();
+				return;
+			}
+
+			packages.add( packageName );
+			const entries = await glob( path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' ) );
+			entries.forEach( ( entry ) => this.push( entry ) );
+			callback();
+		},
+	} );
+}
+
 let onFileComplete = () => {};
 
 let stream;
@@ -26,6 +72,7 @@ if ( files.length ) {
 	stream = new Readable( { encoding: 'utf8' } );
 	files.forEach( ( file ) => stream.push( file ) );
 	stream.push( null );
+	stream = stream.pipe( createStyleEntryTransform() );
 } else {
 	const bar = new ProgressBar( 'Build Progress: [:bar] :percent', {
 		width: 30,
