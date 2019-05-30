@@ -9,6 +9,7 @@
 	width: 100%;
 	max-width: 600px;
 	margin: 8px 0 0;
+	cursor: pointer;
 
 	@include break-small() {
 		width: fit-content;
