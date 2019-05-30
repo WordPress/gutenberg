@@ -40,4 +40,10 @@
 	&__cell-content {
 		padding: 0.5em;
 	}
+
+	&__placeholder-form {
+		text-align: left;
+		flex-direction: column;
+		align-items: center;
+	}
 }

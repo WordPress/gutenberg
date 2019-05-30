@@ -421,8 +421,13 @@ export class TableEdit extends Component {
 
 		if ( isEmpty ) {
 			return (
-				<Placeholder label={ __( 'Table' ) } icon={ <BlockIcon icon={ icon } showColors /> } isColumnLayout>
-					<form onSubmit={ this.onCreateTable }>
+				<Placeholder
+					label={ __( 'Table' ) }
+					icon={ <BlockIcon icon={ icon } showColors /> }
+					instructions={ __( 'Insert a table for sharing data' ) }
+					isColumnLayout
+				>
+					<form className="wp-block-table__placeholder-form" onSubmit={ this.onCreateTable }>
 						<TextControl
 							type="number"
 							label={ __( 'Column Count' ) }
@@ -437,7 +442,7 @@ export class TableEdit extends Component {
 							onChange={ this.onChangeInitialRowCount }
 							min="1"
 						/>
-						<Button isPrimary type="submit">{ __( 'Create' ) }</Button>
+						<Button isDefault type="submit">{ __( 'Create Table' ) }</Button>
 					</form>
 				</Placeholder>
 			);
