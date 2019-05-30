@@ -8,6 +8,9 @@ import useMediaQuery from '../use-media-query';
  *
  * @return {boolean} Reduced motion preference value.
  */
-export default function useReducedMotion() {
-	return useMediaQuery( '(prefers-reduced-motion: reduce)' );
-}
+const useReducedMotion =
+	process.env.FORCE_REDUCED_MOTION ?
+		() => true :
+		() => useMediaQuery( '(prefers-reduced-motion: reduce)' );
+
+export default useReducedMotion;
