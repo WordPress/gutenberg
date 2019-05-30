@@ -421,7 +421,7 @@ export class TableEdit extends Component {
 
 		if ( isEmpty ) {
 			return (
-				<Placeholder label={ __( 'Table' ) } icon={ <BlockIcon icon={ icon } showColors /> }>
+				<Placeholder label={ __( 'Table' ) } icon={ <BlockIcon icon={ icon } showColors /> } isColumnLayout>
 					<form onSubmit={ this.onCreateTable }>
 						<TextControl
 							type="number"
