@@ -32,9 +32,8 @@ const useDispatchWithMap = ( dispatchMap ) => {
 						`Property ${ propName } returned from dispatchMap in useDispatchWithMap must be a function.`
 					);
 				}
-				return ( ...args ) => {
-					return currentDispatchMap.current( registry.dispatch, registry )[ propName ]( ...args );
-				};
+				return ( ...args ) => currentDispatchMap
+					.current( registry.dispatch, registry )[ propName ]( ...args );
 			}
 		);
 	}, [ dispatchMap, registry ] );
