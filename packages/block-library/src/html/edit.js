@@ -3,8 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { BlockControls, PlainText } from '@wordpress/block-editor';
-import { transformStyles } from '@wordpress/editor';
+import {
+	BlockControls,
+	PlainText,
+	__experimentalTransformStyles,
+} from '@wordpress/block-editor';
 import { Disabled, SandBox, ResizableBox } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -35,7 +38,7 @@ class HTMLEdit extends Component {
 
 		this.setState( { styles: [
 			defaultStyles,
-			...transformStyles( styles ),
+			...__experimentalTransformStyles( styles ),
 		] } );
 	}
 

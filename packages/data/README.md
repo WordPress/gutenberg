@@ -19,8 +19,8 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 Use the `registerStore` function to add your own store to the centralized data registry. This function accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
 
 ```js
-const { data, apiFetch } = wp;
-const { registerStore } = data;
+const { apiFetch } = wp;
+const { registerStore } = wp.data;
 
 const DEFAULT_STATE = {
 	prices: {},
@@ -166,17 +166,20 @@ import existingSelectors from './existing-app/selectors';
 import existingActions from './existing-app/actions';
 import createStore from './existing-app/store';
 
+const { registerGenericStore } = wp.data;
+
 const reduxStore = createStore();
 
-const mappedSelectors = existingSelectors.map( ( selector ) => {
-	return ( ...args ) => selector( reduxStore.getState(), ...args );
-} );
+const mappedSelectors = Object.keys( existingSelectors ).reduce( ( acc, selectorKey ) => {
+	acc[ selectorKey ] = ( ...args ) =>
+		existingSelectors[ selectorKey ]( reduxStore.getState(), ...args );
+	return acc;
+}, {} );
 
-const mappedActions = existingActions.map( ( action ) => {
-	return actions.map( ( action ) => {
-		return ( ...args ) => reduxStore.dispatch( action( ...args ) );
-	} );
-} );
+const mappedActions = Object.keys( existingActions ).reduce( ( acc, actionKey ) => {
+	acc[ actionKey ] = ( ...args ) => reduxStore.dispatch( existingActions[ actionKey ]( ...args ) );
+	return acc;
+}, {} );
 
 const genericStore = {
 	getSelectors() {
@@ -185,10 +188,10 @@ const genericStore = {
 	getActions() {
 		return mappedActions;
 	},
-	subscribe: reduxStore.subscribe;
+	subscribe: reduxStore.subscribe,
 };
 
-registry.registerGenericStore( 'existing-app', genericStore );
+registerGenericStore( 'existing-app', genericStore );
 ```
 
 It is also possible to implement a completely custom store from scratch:
@@ -196,18 +199,20 @@ It is also possible to implement a completely custom store from scratch:
 _Example:_
 
 ```js
+const { registerGenericStore } = wp.data;
+
 function createCustomStore() {
 	let storeChanged = () => {};
 	const prices = { hammer: 7.50 };
 
 	const selectors = {
-		getPrice( itemName ): {
+		getPrice( itemName ) {
 			return prices[ itemName ];
 		},
 	};
 
 	const actions = {
-		setPrice( itemName, price ): {
+		setPrice( itemName, price ) {
 			prices[ itemName ] = price;
 			storeChanged();
 		},
@@ -226,7 +231,7 @@ function createCustomStore() {
 	};
 }
 
-registry.registerGenericStore( 'custom-data', createCustomStore() );
+registerGenericStore( 'custom-data', createCustomStore() );
 ```
 
 ## Comparison with Redux
@@ -379,11 +384,43 @@ _Returns_
 
 <a name="RegistryConsumer" href="#RegistryConsumer">#</a> **RegistryConsumer**
 
-Undocumented declaration.
+A custom react Context consumer exposing the provided `registry` to
+children components. Used along with the RegistryProvider.
+
+You can read more about the react context api here:
+<https://reactjs.org/docs/context.html#contextprovider>
+
+_Usage_
+
+````js
+const {
+  RegistryProvider,
+  RegistryConsumer,
+  createRegistry
+} = wp.data;
+
+const registry = createRegistry( {} );
+
+const App = ( { props } ) => {
+  return <RegistryProvider value={ registry }>
+    <div>Hello There</div>
+    <RegistryConsumer>
+      { ( registry ) => (
+        <ComponentUsingRegistry
+        		{ ...props }
+        	  registry={ registry }
+      ) }
+    </RegistryConsumer>
+  </RegistryProvider>
+}
 
 <a name="RegistryProvider" href="#RegistryProvider">#</a> **RegistryProvider**
 
-Undocumented declaration.
+A custom Context provider for exposing the provided `registry` to children
+components via a consumer.
+
+See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for
+example.
 
 <a name="select" href="#select">#</a> **select**
 
@@ -391,13 +428,13 @@ Given the name of a registered store, returns an object of the store's selectors
 The selector functions are been pre-bound to pass the current state automatically.
 As a consumer, you need only pass arguments of the selector, if applicable.
 
-_Usage_
+*Usage*
 
 ```js
 const { select } = wp.data;
 
 select( 'my-shop' ).getPrice( 'hammer' );
-```
+````
 
 _Parameters_
 
@@ -434,6 +471,91 @@ _Parameters_
 <a name="use" href="#use">#</a> **use**
 
 Undocumented declaration.
+
+<a name="useRegistry" href="#useRegistry">#</a> **useRegistry**
+
+A custom react hook exposing the registry context for use.
+
+This exposes the `registry` value provided via the
+<a href="#RegistryProvider">Registry Provider</a> to a component implementing
+this hook.
+
+It acts similarly to the `useContext` react hook.
+
+Note: Generally speaking, `useRegistry` is a low level hook that in most cases
+won't be needed for implementation. Most interactions with the wp.data api
+can be performed via the `useSelect` hook,  or the `withSelect` and
+`withDispatch` higher order components.
+
+_Usage_
+
+```js
+const {
+  RegistryProvider,
+  createRegistry,
+  useRegistry,
+} = wp.data
+
+const registry = createRegistry( {} );
+
+const SomeChildUsingRegistry = ( props ) => {
+  const registry = useRegistry( registry );
+  // ...logic implementing the registry in other react hooks.
+};
+
+
+const ParentProvidingRegistry = ( props ) => {
+  return <RegistryProvider value={ registry }>
+    <SomeChildUsingRegistry { ...props } />
+  </RegistryProvider>
+};
+```
+
+_Returns_
+
+-   `Function`: A custom react hook exposing the registry context value.
+
+<a name="useSelect" href="#useSelect">#</a> **useSelect**
+
+Custom react hook for retrieving props from registered selectors.
+
+In general, this custom React hook follows the
+[rules of hooks](https://reactjs.org/docs/hooks-rules.html).
+
+_Usage_
+
+```js
+const { useSelect } = wp.data;
+
+function HammerPriceDisplay( { currency } ) {
+  const price = useSelect( ( select ) => {
+    return select( 'my-shop' ).getPrice( 'hammer', currency )
+  }, [ currency ] );
+  return new Intl.NumberFormat( 'en-US', {
+    style: 'currency',
+    currency,
+  } ).format( price );
+}
+
+// Rendered in the application:
+// <HammerPriceDisplay currency="USD" />
+```
+
+In the above example, when `HammerPriceDisplay` is rendered into an
+application, the price will be retrieved from the store state using the
+`mapSelect` callback on `useSelect`. If the currency prop changes then
+any price in the state for that currency is retrieved. If the currency prop
+doesn't change and other props are passed in that do change, the price will
+not change because the dependency is just the currency.
+
+_Parameters_
+
+-   _\_mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument.
+-   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
+
+_Returns_
+
+-   `Function`: A custom react hook.
 
 <a name="withDispatch" href="#withDispatch">#</a> **withDispatch**
 
@@ -545,7 +667,10 @@ const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
 //  <HammerPriceDisplay currency="USD" />
 ```
 
-In the above example, when `HammerPriceDisplay` is rendered into an application, it will pass the price into the underlying `PriceDisplay` component and update automatically if the price of a hammer ever changes in the store.
+In the above example, when `HammerPriceDisplay` is rendered into an
+application, it will pass the price into the underlying `PriceDisplay`
+component and update automatically if the price of a hammer ever changes in
+the store.
 
 _Parameters_
 

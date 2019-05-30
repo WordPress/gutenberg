@@ -8,16 +8,15 @@ import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+import { dispatch, select, apiFetch } from '@wordpress/data-controls';
+import {
+	parse,
+	synchronizeBlocksWithTemplate,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import {
-	dispatch,
-	select,
-	resolveSelect,
-	apiFetch,
-} from './controls';
 import {
 	getPostRawValue,
 } from './reducer';
@@ -33,14 +32,6 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-
-/**
- * WordPress dependencies
- */
-import {
-	parse,
-	synchronizeBlocksWithTemplate,
-} from '@wordpress/blocks';
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -323,7 +314,7 @@ export function* savePost( options = {} ) {
 		'getCurrentPostType'
 	);
 
-	const postType = yield resolveSelect(
+	const postType = yield select(
 		'core',
 		'getPostType',
 		currentPostType
@@ -347,9 +338,9 @@ export function* savePost( options = {} ) {
 	let path = `/wp/v2/${ postType.rest_base }/${ post.id }`;
 	let method = 'PUT';
 	if ( isAutosave ) {
-		const currentUser = yield resolveSelect( 'core', 'getCurrentUser' );
+		const currentUser = yield select( 'core', 'getCurrentUser' );
 		const currentUserId = currentUser ? currentUser.id : undefined;
-		const autosavePost = yield resolveSelect( 'core', 'getAutosave', post.type, post.id, currentUserId );
+		const autosavePost = yield select( 'core', 'getAutosave', post.type, post.id, currentUserId );
 		const mappedAutosavePost = mapValues( pick( autosavePost, AUTOSAVE_PROPERTIES ), getPostRawValue );
 
 		// Ensure autosaves contain all expected fields, using autosave or
@@ -365,12 +356,12 @@ export function* savePost( options = {} ) {
 		yield dispatch(
 			'core/notices',
 			'removeNotice',
-			SAVE_POST_NOTICE_ID,
+			SAVE_POST_NOTICE_ID
 		);
 		yield dispatch(
 			'core/notices',
 			'removeNotice',
-			'autosave-exists',
+			'autosave-exists'
 		);
 	}
 
@@ -448,7 +439,7 @@ export function* refreshPost() {
 		STORE_KEY,
 		'getCurrentPostType'
 	);
-	const postType = yield resolveSelect(
+	const postType = yield select(
 		'core',
 		'getPostType',
 		postTypeSlug
@@ -476,7 +467,7 @@ export function* trashPost() {
 		STORE_KEY,
 		'getCurrentPostType'
 	);
-	const postType = yield resolveSelect(
+	const postType = yield select(
 		'core',
 		'getPostType',
 		postTypeSlug

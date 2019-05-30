@@ -1,3 +1,9 @@
+## Master
+
+### New Features
+
+- Support a new `snackbar` notice type in the `createNotice` action.
+
 ## 1.1.2 (2019-01-03)
 
 ## 1.1.1 (2018-12-12)

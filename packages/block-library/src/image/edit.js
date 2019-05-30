@@ -482,7 +482,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ width !== undefined ? width : imageWidth }
+									value={ width || imageWidth || '' }
 									min={ 1 }
 									onChange={ this.updateWidth }
 								/>
@@ -490,7 +490,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ height !== undefined ? height : imageHeight }
+									value={ height || imageHeight || '' }
 									min={ 1 }
 									onChange={ this.updateHeight }
 								/>

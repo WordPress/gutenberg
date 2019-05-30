@@ -8,7 +8,7 @@ import TestRenderer from 'react-test-renderer';
  */
 import withDispatch from '../';
 import { createRegistry } from '../../../registry';
-import RegistryProvider from '../../registry-provider';
+import { RegistryProvider } from '../../registry-provider';
 
 describe( 'withDispatch', () => {
 	let registry;

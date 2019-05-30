@@ -173,7 +173,7 @@
 		opacity: 0.3;
 	}
 
-	&:focus:enabled {
+	&:focus:not(:disabled) {
 		@include button-style__focus-active;
 	}
 
