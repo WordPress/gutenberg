@@ -9,10 +9,8 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Heading', () => {
-	const BACKGROUND_COLOR_TEXT = 'Background Color';
 	const TEXT_COLOR_TEXT = 'Text Color';
 	const CUSTOM_COLOR_TEXT = 'Custom Color';
-	const BACKGROUND_COLOR_UI_X_SELECTOR = `//div[./span[contains(text(),'${ BACKGROUND_COLOR_TEXT }')]]`;
 	const TEXT_COLOR_UI_X_SELECTOR = `//div[./span[contains(text(),'${ TEXT_COLOR_TEXT }')]]`;
 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `//button[contains(text(),'${ CUSTOM_COLOR_TEXT }')]`;
 	const COLOR_INPUT_FIELD_SELECTOR = '.components-color-palette__picker .components-text-control__input';
@@ -60,16 +58,6 @@ describe( 'Heading', () => {
 		await page.keyboard.type( '### Heading' );
 		const [ colorPanelToggle ] = await page.$x( COLOR_PANEL_TOGGLE_X_SELECTOR );
 		await colorPanelToggle.click();
-		const [ customBackgroundColorButton ] = await page.$x(
-			`${ BACKGROUND_COLOR_UI_X_SELECTOR }${ CUSTOM_COLOR_BUTTON_X_SELECTOR }`
-		);
-		await customBackgroundColorButton.click();
-		await page.click( COLOR_INPUT_FIELD_SELECTOR );
-		await pressKeyWithModifier( 'primary', 'A' );
-		await page.keyboard.type( '#ab4567' );
-		await page.click( '.wp-block-heading' );
-		await page.waitForSelector( '.component-color-indicator[aria-label="(background color: #ab4567)"]' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		const [ customTextColorButton ] = await page.$x(
 			`${ TEXT_COLOR_UI_X_SELECTOR }${ CUSTOM_COLOR_BUTTON_X_SELECTOR }`
@@ -88,12 +76,6 @@ describe( 'Heading', () => {
 		await page.keyboard.type( '## Heading' );
 		const [ colorPanelToggle ] = await page.$x( COLOR_PANEL_TOGGLE_X_SELECTOR );
 		await colorPanelToggle.click();
-		const primaryColorButtonSelector = `${ BACKGROUND_COLOR_UI_X_SELECTOR }//button[@aria-label='Color: Primary']`;
-		const [ primaryColorButton ] = await page.$x( primaryColorButtonSelector );
-		await primaryColorButton.click();
-		await page.click( '.wp-block-heading' );
-		await page.waitForXPath( `${ primaryColorButtonSelector }[@aria-pressed='true']` );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		const whiteColorButtonSelector = `${ TEXT_COLOR_UI_X_SELECTOR }//button[@aria-label='Color: White']`;
 		const [ whiteColorButton ] = await page.$x( whiteColorButtonSelector );
