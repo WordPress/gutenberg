@@ -1727,6 +1727,24 @@ describe( 'state', () => {
 			expect( state1 ).toBe( original );
 		} );
 
+		it( 'should maintain selection when toggling multi-selection', () => {
+			const original = deepFreeze( {
+				start: { clientId: 'ribs' },
+				end: { clientId: 'ribs' },
+			} );
+
+			const state = blockSelection( original, {
+				type: 'TOGGLE_SELECTION',
+				isSelectionEnabled: false,
+			} );
+
+			expect( state ).toEqual( {
+				start: { clientId: 'ribs' },
+				end: { clientId: 'ribs' },
+				isEnabled: false,
+			} );
+		} );
+
 		it( 'should unset multi selection', () => {
 			const original = deepFreeze( { start: { clientId: 'ribs' }, end: { clientId: 'chicken' } } );
 
