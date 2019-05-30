@@ -893,7 +893,7 @@ RichText.defaultProps = {
 const RichTextContainer = compose( [
 	withInstanceId,
 	withBlockEditContext( ( { clientId, onFocus, onCaretVerticalPositionChange, isSelected }, ownProps ) => {
-		// ownProps.onFocus and needs precedence over the block edit context
+		// ownProps.onFocus needs precedence over the block edit context
 		if ( ownProps.onFocus !== undefined ) {
 			onFocus = ownProps.onFocus;
 		}
