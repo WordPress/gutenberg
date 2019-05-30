@@ -43,7 +43,7 @@ $input-size: 300px;
 .block-editor-url-input__suggestions {
 	max-height: 200px;
 	transition: all 0.15s ease-in-out;
-	@include reduce-motion;
+	@include reduce-motion("transition");
 	padding: 4px 0;
 	// To match the url-input width: input width + padding + 2 buttons.
 	width: $input-size + 2;

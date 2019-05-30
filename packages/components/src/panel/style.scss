@@ -64,7 +64,7 @@
 	margin-top: 0;
 	margin-bottom: 0;
 	transition: 0.1s background ease-in-out;
-	@include reduce-motion;
+	@include reduce-motion("transition");
 }
 .components-panel__body.is-opened > .components-panel__body-title {
 	margin: -1 * $panel-padding;
@@ -87,7 +87,7 @@
 	color: $dark-gray-900;
 	@include menu-style__neutral;
 	transition: 0.1s background ease-in-out;
-	@include reduce-motion;
+	@include reduce-motion("transition");
 
 	&:focus:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__focus;
@@ -101,7 +101,7 @@
 		color: $dark-gray-900;
 		fill: currentColor;
 		transition: 0.1s color ease-in-out;
-		@include reduce-motion;
+		@include reduce-motion("transition");
 	}
 
 	// mirror the arrow horizontally in RTL languages

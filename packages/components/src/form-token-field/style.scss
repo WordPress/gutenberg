@@ -165,7 +165,7 @@
 	max-height: 9em;
 	overflow-y: scroll;
 	transition: all 0.15s ease-in-out;
-	@include reduce-motion;
+	@include reduce-motion("transition");
 	list-style: none;
 	border-top: $border-width solid $dark-gray-300;
 	margin: $grid-size-small (-$grid-size-small) (-$grid-size-small);

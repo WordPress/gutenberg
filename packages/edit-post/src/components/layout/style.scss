@@ -178,7 +178,7 @@
 		border-left: $border-width solid $light-gray-500;
 		transform: translateX(+100%);
 		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
-		@include reduce-motion;
+		@include reduce-motion("animation");
 
 		body.is-fullscreen-mode & {
 			top: 0;

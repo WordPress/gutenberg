@@ -167,7 +167,7 @@
 .components-color-picker__hue-pointer,
 .components-color-picker__saturation-pointer {
 	transition: box-shadow 0.1s linear;
-	@include reduce-motion;
+	@include reduce-motion("transition");
 }
 
 .components-color-picker__saturation-pointer:focus {

@@ -32,7 +32,7 @@ $block-inserter-search-height: 38px;
 	border: none;
 	outline: none;
 	transition: color 0.2s ease;
-	@include reduce-motion;
+	@include reduce-motion("transition");
 }
 
 .block-editor-inserter__menu {
