@@ -12,6 +12,30 @@ exports[`Heading can be created by prefixing number sign and a space 1`] = `
 <!-- /wp:heading -->"
 `;
 
+exports[`Heading it should correctly apply custom colors 1`] = `
+"<!-- wp:heading {\\"level\\":3,\\"customBackgroundColor\\":\\"#ab4567\\"} -->
+<h3 class=\\"has-background\\" style=\\"background-color:#ab4567\\">Heading</h3>
+<!-- /wp:heading -->"
+`;
+
+exports[`Heading it should correctly apply custom colors 2`] = `
+"<!-- wp:heading {\\"level\\":3,\\"customTextColor\\":\\"#181717\\",\\"customBackgroundColor\\":\\"#ab4567\\"} -->
+<h3 class=\\"has-background\\" style=\\"background-color:#ab4567;color:#181717\\">Heading</h3>
+<!-- /wp:heading -->"
+`;
+
+exports[`Heading it should correctly apply named colors 1`] = `
+"<!-- wp:heading {\\"backgroundColor\\":\\"primary\\"} -->
+<h2 class=\\"has-background has-primary-background-color\\">Heading</h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`Heading it should correctly apply named colors 2`] = `
+"<!-- wp:heading {\\"textColor\\":\\"white\\",\\"backgroundColor\\":\\"primary\\"} -->
+<h2 class=\\"has-background has-white-color has-primary-background-color\\">Heading</h2>
+<!-- /wp:heading -->"
+`;
+
 exports[`Heading should create a paragraph block above when pressing enter at the start 1`] = `
 "<!-- wp:paragraph -->
 <p></p>
