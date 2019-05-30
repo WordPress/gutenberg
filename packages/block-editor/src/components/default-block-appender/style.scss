@@ -34,6 +34,7 @@
 		opacity: 0;
 		transition: opacity 0.2s;
 		@include reduce-motion("transition");
+		will-change: opacity;
 	}
 
 	&:hover {
@@ -93,6 +94,9 @@
 	right: $grid-size; // Show to the right on mobile.
 
 	@include break-small {
+		display: flex;
+		align-items: center;
+		height: 100%;
 		left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
 		right: auto;
 	}
@@ -126,7 +130,9 @@
 	z-index: z-index(".block-editor-inserter-with-shortcuts"); // Elevate above the sibling inserter.
 
 	@include break-small {
-		right: 0;
 		display: flex;
+		align-items: center;
+		height: 100%;
+		right: 0;
 	}
 }

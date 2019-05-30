@@ -76,6 +76,10 @@ $z-layers: (
 	// .edit-post-header { z-index: 30 }
 	".components-notice-list": 29,
 
+
+	// Show snackbars above everything (similar to popovers)
+	".components-snackbar-list": 100000,
+
 	// Show modal under the wp-admin menus and the popover
 	".components-modal__screen-overlay": 100000,
 

@@ -370,6 +370,7 @@ class ImageEdit extends React.Component {
 								onFocus={ this.onFocusCaption }
 								onBlur={ this.props.onBlur } // always assign onBlur as props
 								isSelected={ this.state.isCaptionSelected }
+								__unstableMobileNoFocusOnMount
 								fontSize={ 14 }
 								underlineColorAndroid="transparent"
 								textAlign={ 'center' }
