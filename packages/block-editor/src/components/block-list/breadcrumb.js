@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { Toolbar } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -54,10 +54,10 @@ export class BlockBreadcrumb extends Component {
 			<div className={ 'editor-block-list__breadcrumb block-editor-block-list__breadcrumb' }>
 				<Toolbar>
 					{ rootClientId && (
-						<Fragment>
+						<>
 							<BlockTitle clientId={ rootClientId } />
 							<span className="editor-block-list__descendant-arrow block-editor-block-list__descendant-arrow" />
-						</Fragment>
+						</>
 					) }
 					<BlockTitle clientId={ clientId } />
 				</Toolbar>

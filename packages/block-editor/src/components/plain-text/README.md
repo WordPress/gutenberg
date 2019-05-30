@@ -14,6 +14,10 @@ Render an auto-growing textarea allow users to fill any textual content.
 
 You can also pass any extra prop to the textarea rendered by this component.
 
+### `ref: Object`
+
+*Optional.* The component forwards the `ref` property to the `TextareaAutosize` component.
+
 ## Example
 
 {% codetabs %}

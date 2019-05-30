@@ -1,10 +1,10 @@
-# Block Registration 
+# Block Registration
 
 ## `register_block_type`
 
 * **Type:** `Function`
 
-Every block starts by registering a new block type definition. The function `registerBlockType` takes two arguments, a block `name` and a block configuration object.
+Every block starts by registering a new block type definition. To register, you use the `registerBlockType` function from the [`wp-blocks` package](/packages/blocks/README.md#registerBlockType). The function takes two arguments, a block `name` and a block configuration object.
 
 ### Block Name
 
@@ -174,7 +174,7 @@ attributes: {
 
 Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
 
-For example, a paragraph block can be transformed into a heading block.
+For example, a paragraph block can be transformed into a heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock)
 
 {% codetabs %}
 {% ES5 %}
@@ -486,7 +486,7 @@ transforms: {
 
 * **Type:** `Array`
 
-Blocks are able to be inserted into blocks that use [`InnerBlocks`](/packages/editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks.
 
@@ -546,21 +546,21 @@ anchor: true,
 customClassName: false,
 ```
 
-- `className` (default `true`): By default, Gutenberg adds a class with the form `.wp-block-your-block-name` to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
+- `className` (default `true`): By default, the class `.wp-block-your-block-name` is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
 
 ```js
 // Remove the support for the generated className.
 className: false,
 ```
 
-- `html` (default `true`): By default, Gutenberg will allow a block's markup to be edited individually. To disable this behavior, set `html` to `false`.
+- `html` (default `true`): By default, a block's markup can be edited individually. To disable this behavior, set `html` to `false`.
 
 ```js
 // Remove support for an HTML mode.
 html: false,
 ```
 
-- `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
+- `inserter` (default `true`): By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
 
 ```js
 // Hide this block from the inserter.

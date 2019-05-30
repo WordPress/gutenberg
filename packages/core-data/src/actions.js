@@ -30,6 +30,20 @@ export function receiveUserQuery( queryID, users ) {
 }
 
 /**
+ * Returns an action used in signalling that the current user has been received.
+ *
+ * @param {Object} currentUser Current user object.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveCurrentUser( currentUser ) {
+	return {
+		type: 'RECEIVE_CURRENT_USER',
+		currentUser,
+	};
+}
+
+/**
  * Returns an action object used in adding new entities.
  *
  * @param {Array} entities  Entities received.
@@ -157,5 +171,22 @@ export function receiveUserPermission( key, isAllowed ) {
 		type: 'RECEIVE_USER_PERMISSION',
 		key,
 		isAllowed,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the autosaves for a
+ * post have been received.
+ *
+ * @param {number}       postId    The id of the post that is parent to the autosave.
+ * @param {Array|Object} autosaves An array of autosaves or singular autosave object.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveAutosaves( postId, autosaves ) {
+	return {
+		type: 'RECEIVE_AUTOSAVES',
+		postId,
+		autosaves: castArray( autosaves ),
 	};
 }

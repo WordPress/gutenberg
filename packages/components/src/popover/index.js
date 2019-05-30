@@ -69,7 +69,7 @@ class Popover extends Component {
 	}
 
 	componentDidMount() {
-		this.toggleAutoRefresh( true );
+		this.toggleAutoRefresh( ! this.props.hasOwnProperty( 'anchorRect' ) );
 		this.refresh();
 
 		/*
@@ -86,6 +86,15 @@ class Popover extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.position !== this.props.position ) {
 			this.computePopoverPosition( this.state.popoverSize, this.anchorRect );
+		}
+
+		if ( prevProps.anchorRect !== this.props.anchorRect ) {
+			this.refreshOnAnchorMove();
+		}
+
+		const hasAnchorRect = this.props.hasOwnProperty( 'anchorRect' );
+		if ( hasAnchorRect !== prevProps.hasOwnProperty( 'anchorRect' ) ) {
+			this.toggleAutoRefresh( ! hasAnchorRect );
 		}
 	}
 
@@ -129,8 +138,7 @@ class Popover extends Component {
 	 * will only refresh the popover position if the anchor moves.
 	 */
 	refreshOnAnchorMove() {
-		const { getAnchorRect = this.getAnchorRect } = this.props;
-		const anchorRect = getAnchorRect( this.anchorNode.current );
+		const anchorRect = this.getAnchorRect( this.anchorNode.current );
 		const didAnchorRectChange = ! isShallowEqual( anchorRect, this.anchorRect );
 		if ( didAnchorRectChange ) {
 			this.anchorRect = anchorRect;
@@ -144,8 +152,7 @@ class Popover extends Component {
 	 * position.
 	 */
 	refresh() {
-		const { getAnchorRect = this.getAnchorRect } = this.props;
-		const anchorRect = getAnchorRect( this.anchorNode.current );
+		const anchorRect = this.getAnchorRect( this.anchorNode.current );
 		const contentRect = this.contentNode.current.getBoundingClientRect();
 		const popoverSize = {
 			width: contentRect.width,
@@ -191,6 +198,16 @@ class Popover extends Component {
 	}
 
 	getAnchorRect( anchor ) {
+		const { getAnchorRect, anchorRect } = this.props;
+
+		if ( anchorRect ) {
+			return anchorRect;
+		}
+
+		if ( getAnchorRect ) {
+			return getAnchorRect( anchor );
+		}
+
 		if ( ! anchor || ! anchor.parentNode ) {
 			return;
 		}
@@ -265,6 +282,7 @@ class Popover extends Component {
 			getAnchorRect,
 			expandOnMobile,
 			animate = true,
+			anchorRect,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;

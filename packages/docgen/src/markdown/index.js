@@ -24,10 +24,10 @@ const appendOrEmbedContents = ( { options, newContents } ) => {
 	};
 };
 
-module.exports = function( options, processDir, doc, filteredIr, headingTitle ) {
+module.exports = function( options, processDir, doc, filteredIR, headingTitle ) {
 	if ( options.toSection || options.toToken ) {
 		const currentReadmeFile = fs.readFileSync( options.output, 'utf8' );
-		const newContents = unified().use( remarkParser ).parse( formatter( processDir, doc, filteredIr, null ) );
+		const newContents = unified().use( remarkParser ).parse( formatter( processDir, doc, filteredIR, null ) );
 		remark()
 			.use( { settings: { commonmark: true } } )
 			.use( appendOrEmbedContents, { options, newContents } )
@@ -38,7 +38,7 @@ module.exports = function( options, processDir, doc, filteredIr, headingTitle ) 
 				fs.writeFileSync( doc, file );
 			} );
 	} else {
-		const output = formatter( processDir, doc, filteredIr, headingTitle );
+		const output = formatter( processDir, doc, filteredIR, headingTitle );
 		fs.writeFileSync( doc, output );
 	}
 };

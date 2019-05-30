@@ -22,10 +22,7 @@ export function unregisterFormatType( name ) {
 		return;
 	}
 
-	if (
-		oldFormat.__experimentalCreatePrepareEditableTree &&
-		oldFormat.__experimentalGetPropsForEditableTreePreparation
-	) {
+	if ( oldFormat.__experimentalCreatePrepareEditableTree ) {
 		removeFilter( 'experimentalRichText', name );
 	}
 

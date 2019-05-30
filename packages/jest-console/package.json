@@ -29,8 +29,8 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.3.1",
-		"jest-matcher-utils": "^24.0.0",
+		"@babel/runtime": "^7.4.4",
+		"jest-matcher-utils": "^24.7.0",
 		"lodash": "^4.17.11"
 	},
 	"peerDependencies": {

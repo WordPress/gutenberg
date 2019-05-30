@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "6.2.0",
+	"version": "6.2.4",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,7 +21,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.3.1",
+		"@babel/runtime": "^7.4.4",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
@@ -38,7 +38,7 @@
 		"lodash": "^4.17.11",
 		"rememo": "^3.0.0",
 		"showdown": "^1.8.6",
-		"simple-html-tokenizer": "^0.4.1",
+		"simple-html-tokenizer": "^0.5.7",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^3.3.2"
 	},

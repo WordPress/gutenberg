@@ -43,11 +43,23 @@ const runInBand = ! hasRunInBand ?
 	[ '--runInBand' ] :
 	[];
 
-const cleanUpPrefixes = [ '--puppeteer-' ];
-
 if ( hasCliArg( '--puppeteer-interactive' ) ) {
 	process.env.PUPPETEER_HEADLESS = 'false';
 	process.env.PUPPETEER_SLOWMO = getCliArg( '--puppeteer-slowmo' ) || 80;
 }
+
+const configsMapping = {
+	WP_BASE_URL: '--wordpress-base-url',
+	WP_USERNAME: '--wordpress-username',
+	WP_PASSWORD: '--wordpress-password',
+};
+
+Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
+	if ( hasCliArg( argName ) ) {
+		process.env[ envKey ] = getCliArg( argName );
+	}
+} );
+
+const cleanUpPrefixes = [ '--puppeteer-', '--wordpress-' ];
 
 jest.run( [ ...config, ...runInBand, ...getCliArgs( cleanUpPrefixes ) ] );

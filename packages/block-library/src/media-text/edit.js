@@ -10,18 +10,20 @@ import { get } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
 import {
 	BlockControls,
+	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	InspectorControls,
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	PanelBody,
 	TextareaControl,
 	ToggleControl,
 	Toolbar,
 	ExternalLink,
+	FocalPointPicker,
 } from '@wordpress/components';
 /**
  * Internal dependencies
@@ -76,6 +78,8 @@ class MediaTextEdit extends Component {
 			mediaId: media.id,
 			mediaType,
 			mediaUrl: src || media.url,
+			imageFill: undefined,
+			focalPoint: undefined,
 		} );
 	}
 
@@ -98,7 +102,7 @@ class MediaTextEdit extends Component {
 
 	renderMediaArea() {
 		const { attributes } = this.props;
-		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth } = attributes;
+		const { mediaAlt, mediaId, mediaPosition, mediaType, mediaUrl, mediaWidth, imageFill, focalPoint } = attributes;
 
 		return (
 			<MediaContainer
@@ -106,7 +110,7 @@ class MediaTextEdit extends Component {
 				onSelectMedia={ this.onSelectMedia }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
-				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth } }
+				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint } }
 			/>
 		);
 	}
@@ -126,6 +130,10 @@ class MediaTextEdit extends Component {
 			mediaPosition,
 			mediaType,
 			mediaWidth,
+			verticalAlignment,
+			mediaUrl,
+			imageFill,
+			focalPoint,
 		} = attributes;
 		const temporaryMediaWidth = this.state.mediaWidth;
 		const classNames = classnames( className, {
@@ -133,6 +141,8 @@ class MediaTextEdit extends Component {
 			'is-selected': isSelected,
 			[ backgroundColor.class ]: backgroundColor.class,
 			'is-stacked-on-mobile': isStackedOnMobile,
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+			'is-image-fill': imageFill,
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 		const style = {
@@ -158,6 +168,9 @@ class MediaTextEdit extends Component {
 		const onMediaAltChange = ( newMediaAlt ) => {
 			setAttributes( { mediaAlt: newMediaAlt } );
 		};
+		const onVerticalAlignmentChange = ( alignment ) => {
+			setAttributes( { verticalAlignment: alignment } );
+		};
 		const mediaTextGeneralSettings = (
 			<PanelBody title={ __( 'Media & Text Settings' ) }>
 				<ToggleControl
@@ -167,23 +180,36 @@ class MediaTextEdit extends Component {
 						isStackedOnMobile: ! isStackedOnMobile,
 					} ) }
 				/>
+				{ mediaType === 'image' && ( <ToggleControl
+					label={ __( 'Crop image to fill entire column' ) }
+					checked={ imageFill }
+					onChange={ () => setAttributes( {
+						imageFill: ! imageFill,
+					} ) }
+				/> ) }
+				{ imageFill && ( <FocalPointPicker
+					label={ __( 'Focal Point Picker' ) }
+					url={ mediaUrl }
+					value={ focalPoint }
+					onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
+				/> ) }
 				{ mediaType === 'image' && ( <TextareaControl
 					label={ __( 'Alt Text (Alternative Text)' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={
-						<Fragment>
+						<>
 							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 								{ __( 'Describe the purpose of the image' ) }
 							</ExternalLink>
 							{ __( 'Leave empty if the image is purely decorative.' ) }
-						</Fragment>
+						</>
 					}
 				/> ) }
 			</PanelBody>
 		);
 		return (
-			<Fragment>
+			<>
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
 					<PanelColorSettings
@@ -196,6 +222,10 @@ class MediaTextEdit extends Component {
 					<Toolbar
 						controls={ toolbarControls }
 					/>
+					<BlockVerticalAlignmentToolbar
+						onChange={ onVerticalAlignmentChange }
+						value={ verticalAlignment }
+					/>
 				</BlockControls>
 				<div className={ classNames } style={ style } >
 					{ this.renderMediaArea() }
@@ -205,7 +235,7 @@ class MediaTextEdit extends Component {
 						templateInsertUpdatesSelection={ false }
 					/>
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 }

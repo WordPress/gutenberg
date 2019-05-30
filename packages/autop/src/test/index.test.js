@@ -3,6 +3,7 @@
  */
 import {
 	autop,
+	removep,
 } from '../';
 
 test( 'empty string', () => {
@@ -501,4 +502,13 @@ test( 'that autop correctly adds a start and end tag when followed by a div', ()
 	const expected = '<p>Testing autop with a div</p>\n<div class="wp-some-class">content</div>';
 
 	expect( autop( content ).trim() ).toBe( expected );
+} );
+
+describe( 'removep', () => {
+	test( 'preserves paragraphs with attributes', () => {
+		const content = '<p style="text-align: center">\nHello World\n</p>';
+		const expected = '<p style="text-align: center">\nHello World</p>';
+
+		expect( removep( content ) ).toBe( expected );
+	} );
 } );

@@ -27,13 +27,28 @@ import {
 	hasChildBlocksWithInserterSupport,
 } from '@wordpress/blocks';
 
-/***
- * Module constants
+// Module constants
+
+/**
+ * @private
  */
 export const INSERTER_UTILITY_HIGH = 3;
+
+/**
+ * @private
+ */
 export const INSERTER_UTILITY_MEDIUM = 2;
+
+/**
+ * @private
+ */
 export const INSERTER_UTILITY_LOW = 1;
+
+/**
+ * @private
+ */
 export const INSERTER_UTILITY_NONE = 0;
+
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
@@ -319,6 +334,38 @@ export function getBlockCount( state, rootClientId ) {
 }
 
 /**
+ * @typedef {WPBlockSelection} A block selection object.
+ *
+ * @property {string} clientId     The selected block client ID.
+ * @property {string} attributeKey The selected block attribute key.
+ * @property {number} offset       The selected block attribute offset.
+ */
+
+/**
+ * Returns the current selection start block client ID, attribute key and text
+ * offset.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {WPBlockSelection} Selection start information.
+ */
+export function getSelectionStart( state ) {
+	return state.blockSelection.start;
+}
+
+/**
+ * Returns the current selection end block client ID, attribute key and text
+ * offset.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {WPBlockSelection} Selection end information.
+ */
+export function getSelectionEnd( state ) {
+	return state.blockSelection.end;
+}
+
+/**
  * Returns the current block selection start. This value may be null, and it
  * may represent either a singular block selection or multi-selection start.
  * A selection is singular if its start and end match.
@@ -328,7 +375,7 @@ export function getBlockCount( state, rootClientId ) {
  * @return {?string} Client ID of block selection start.
  */
 export function getBlockSelectionStart( state ) {
-	return state.blockSelection.start;
+	return state.blockSelection.start.clientId;
 }
 
 /**
@@ -341,7 +388,7 @@ export function getBlockSelectionStart( state ) {
  * @return {?string} Client ID of block selection end.
  */
 export function getBlockSelectionEnd( state ) {
-	return state.blockSelection.end;
+	return state.blockSelection.end.clientId;
 }
 
 /**
@@ -358,7 +405,7 @@ export function getSelectedBlockCount( state ) {
 		return multiSelectedBlockCount;
 	}
 
-	return state.blockSelection.start ? 1 : 0;
+	return state.blockSelection.start.clientId ? 1 : 0;
 }
 
 /**
@@ -370,7 +417,7 @@ export function getSelectedBlockCount( state ) {
  */
 export function hasSelectedBlock( state ) {
 	const { start, end } = state.blockSelection;
-	return !! start && start === end;
+	return !! start.clientId && start.clientId === end.clientId;
 }
 
 /**
@@ -386,7 +433,7 @@ export function getSelectedBlockClientId( state ) {
 	// We need to check the block exists because the current blockSelection
 	// reducer doesn't take into account when blocks are reset via undo. To be
 	// removed when that's fixed.
-	return start && start === end && !! state.blocks.byClientId[ start ] ? start : null;
+	return start.clientId && start.clientId === end.clientId && !! state.blocks.byClientId[ start.clientId ] ? start.clientId : null;
 }
 
 /**
@@ -552,7 +599,8 @@ export function getNextBlockClientId( state, startClientId ) {
  */
 export function getSelectedBlocksInitialCaretPosition( state ) {
 	const { start, end } = state.blockSelection;
-	if ( start !== end || ! start ) {
+
+	if ( start.clientId !== end.clientId || ! start.clientId ) {
 		return null;
 	}
 
@@ -569,25 +617,26 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
 export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { start, end } = state.blockSelection;
-		if ( start === null || end === null ) {
+
+		if ( start.clientId === undefined || end.clientId === undefined ) {
 			return EMPTY_ARRAY;
 		}
 
-		if ( start === end ) {
-			return [ start ];
+		if ( start.clientId === end.clientId ) {
+			return [ start.clientId ];
 		}
 
 		// Retrieve root client ID to aid in retrieving relevant nested block
 		// order, being careful to allow the falsey empty string top-level root
 		// by explicitly testing against null.
-		const rootClientId = getBlockRootClientId( state, start );
+		const rootClientId = getBlockRootClientId( state, start.clientId );
 		if ( rootClientId === null ) {
 			return EMPTY_ARRAY;
 		}
 
 		const blockOrder = getBlockOrder( state, rootClientId );
-		const startIndex = blockOrder.indexOf( start );
-		const endIndex = blockOrder.indexOf( end );
+		const startIndex = blockOrder.indexOf( start.clientId );
+		const endIndex = blockOrder.indexOf( end.clientId );
 
 		if ( startIndex > endIndex ) {
 			return blockOrder.slice( endIndex, startIndex + 1 );
@@ -597,8 +646,8 @@ export const getSelectedBlockClientIds = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
-		state.blockSelection.start,
-		state.blockSelection.end,
+		state.blockSelection.start.clientId,
+		state.blockSelection.end.clientId,
 	],
 );
 
@@ -612,7 +661,8 @@ export const getSelectedBlockClientIds = createSelector(
  */
 export function getMultiSelectedBlockClientIds( state ) {
 	const { start, end } = state.blockSelection;
-	if ( start === end ) {
+
+	if ( start.clientId === end.clientId ) {
 		return EMPTY_ARRAY;
 	}
 
@@ -741,8 +791,8 @@ export const isAncestorMultiSelected = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
-		state.blockSelection.start,
-		state.blockSelection.end,
+		state.blockSelection.start.clientId,
+		state.blockSelection.end.clientId,
 	],
 );
 /**
@@ -759,10 +809,10 @@ export const isAncestorMultiSelected = createSelector(
  */
 export function getMultiSelectedBlocksStartClientId( state ) {
 	const { start, end } = state.blockSelection;
-	if ( start === end ) {
+	if ( start.clientId === end.clientId ) {
 		return null;
 	}
-	return start || null;
+	return start.clientId || null;
 }
 
 /**
@@ -779,10 +829,10 @@ export function getMultiSelectedBlocksStartClientId( state ) {
  */
 export function getMultiSelectedBlocksEndClientId( state ) {
 	const { start, end } = state.blockSelection;
-	if ( start === end ) {
+	if ( start.clientId === end.clientId ) {
 		return null;
 	}
-	return end || null;
+	return end.clientId || null;
 }
 
 /**
@@ -825,11 +875,11 @@ export function getBlockIndex( state, clientId, rootClientId ) {
 export function isBlockSelected( state, clientId ) {
 	const { start, end } = state.blockSelection;
 
-	if ( start !== end ) {
+	if ( start.clientId !== end.clientId ) {
 		return false;
 	}
 
-	return start === clientId;
+	return start.clientId === clientId;
 }
 
 /**
@@ -883,7 +933,7 @@ export function isBlockWithinSelection( state, clientId ) {
  */
 export function hasMultiSelection( state ) {
 	const { start, end } = state.blockSelection;
-	return start !== end;
+	return start.clientId !== end.clientId;
 }
 
 /**
@@ -964,9 +1014,9 @@ export function getBlockInsertionPoint( state ) {
 	}
 
 	const { end } = blockSelection;
-	if ( end ) {
-		rootClientId = getBlockRootClientId( state, end ) || undefined;
-		index = getBlockIndex( state, end, rootClientId ) + 1;
+	if ( end.clientId ) {
+		rootClientId = getBlockRootClientId( state, end.clientId ) || undefined;
+		index = getBlockIndex( state, end.clientId, rootClientId ) + 1;
 	} else {
 		index = getBlockOrder( state ).length;
 	}
@@ -1385,6 +1435,24 @@ export function getSettings( state ) {
  */
 export function isLastBlockChangePersistent( state ) {
 	return state.blocks.isPersistentChange;
+}
+
+/**
+ * Returns true if the most recent block change is be considered ignored, or
+ * false otherwise. An ignored change is one not to be committed by
+ * BlockEditorProvider, neither via `onChange` nor `onInput`.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {boolean} Whether the most recent block change was ignored.
+ */
+export function __unstableIsLastBlockChangeIgnored( state ) {
+	// TODO: Removal Plan: Changes incurred by RECEIVE_BLOCKS should not be
+	// ignored if in-fact they result in a change in blocks state. The current
+	// need to ignore changes not a result of user interaction should be
+	// accounted for in the refactoring of reusable blocks as occurring within
+	// their own separate block editor / state (#7119).
+	return state.blocks.isIgnoredChange;
 }
 
 /**

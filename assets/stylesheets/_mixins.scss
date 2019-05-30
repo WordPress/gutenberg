@@ -180,8 +180,8 @@
 
 @mixin input-style__focus() {
 	color: $dark-gray-900;
-	border-color: $blue-medium-500;
-	box-shadow: 0 0 0 1px $blue-medium-500;
+	border-color: $blue-medium-focus;
+	box-shadow: 0 0 0 1px $blue-medium-focus;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
@@ -325,7 +325,7 @@
 	height: 0;
 	border-left: 3px solid transparent;
 	border-right: 3px solid transparent;
-	border-top: 5px solid currentColor;
+	border-top: 5px solid;
 	margin-left: $grid-size-small;
 
 	// This gives the icon space on the right side consistent with the material

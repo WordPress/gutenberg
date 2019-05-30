@@ -8,7 +8,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 } from '@wordpress/block-editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -20,6 +20,15 @@ import icon from './media-container-icon';
  * Constants
  */
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+
+export function imageFillStyles( url, focalPoint ) {
+	return url ?
+		{
+			backgroundImage: `url(${ url })`,
+			backgroundPosition: focalPoint ? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%` : `50% 50%`,
+		} :
+		{};
+}
 
 class MediaContainer extends Component {
 	renderToolbarEditButton() {
@@ -46,26 +55,27 @@ class MediaContainer extends Component {
 	}
 
 	renderImage() {
-		const { mediaAlt, mediaUrl, className } = this.props;
+		const { mediaAlt, mediaUrl, className, imageFill, focalPoint } = this.props;
+		const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
 		return (
-			<Fragment>
+			<>
 				{ this.renderToolbarEditButton() }
-				<figure className={ className }>
+				<figure className={ className } style={ backgroundStyles }>
 					<img src={ mediaUrl } alt={ mediaAlt } />
 				</figure>
-			</Fragment>
+			</>
 		);
 	}
 
 	renderVideo() {
 		const { mediaUrl, className } = this.props;
 		return (
-			<Fragment>
+			<>
 				{ this.renderToolbarEditButton() }
 				<figure className={ className }>
 					<video controls src={ mediaUrl } />
 				</figure>
-			</Fragment>
+			</>
 		);
 	}
 

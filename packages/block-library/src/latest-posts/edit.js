@@ -7,11 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	Component,
-	Fragment,
-	RawHTML,
-} from '@wordpress/element';
+import { Component, RawHTML } from '@wordpress/element';
 import {
 	PanelBody,
 	Placeholder,
@@ -20,6 +16,7 @@ import {
 	Spinner,
 	ToggleControl,
 	Toolbar,
+	RadioControl,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -45,7 +42,6 @@ class LatestPostsEdit extends Component {
 		this.state = {
 			categoriesList: [],
 		};
-		this.toggleDisplayPostDate = this.toggleDisplayPostDate.bind( this );
 	}
 
 	componentDidMount() {
@@ -71,21 +67,50 @@ class LatestPostsEdit extends Component {
 		this.isStillMounted = false;
 	}
 
-	toggleDisplayPostDate() {
-		const { displayPostDate } = this.props.attributes;
-		const { setAttributes } = this.props;
-
-		setAttributes( { displayPostDate: ! displayPostDate } );
-	}
-
 	render() {
 		const { attributes, setAttributes, latestPosts } = this.props;
 		const { categoriesList } = this.state;
-		const { displayPostDate, postLayout, columns, order, orderBy, categories, postsToShow } = attributes;
+		const { displayPostContentRadio, displayPostContent, displayPostDate, postLayout, columns, order, orderBy, categories, postsToShow, excerptLength } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
-				<PanelBody title={ __( 'Latest Posts Settings' ) }>
+				<PanelBody title={ __( 'Post Content Settings' ) }>
+					<ToggleControl
+						label={ __( 'Post Content' ) }
+						checked={ displayPostContent }
+						onChange={ ( value ) => setAttributes( { displayPostContent: value } ) }
+					/>
+					{ displayPostContent &&
+					<RadioControl
+						label="Show:"
+						selected={ displayPostContentRadio }
+						options={ [
+							{ label: 'Excerpt', value: 'excerpt' },
+							{ label: 'Full Post', value: 'full_post' },
+						] }
+						onChange={ ( value ) => setAttributes( { displayPostContentRadio: value } ) }
+					/>
+					}
+					{ displayPostContent && displayPostContentRadio === 'excerpt' &&
+						<RangeControl
+							label={ __( 'Max number of words in excerpt' ) }
+							value={ excerptLength }
+							onChange={ ( value ) => setAttributes( { excerptLength: value } ) }
+							min={ 10 }
+							max={ 100 }
+						/>
+					}
+				</PanelBody>
+
+				<PanelBody title={ __( 'Post Meta Settings' ) }>
+					<ToggleControl
+						label={ __( 'Display post date' ) }
+						checked={ displayPostDate }
+						onChange={ ( value ) => setAttributes( { displayPostDate: value } ) }
+					/>
+				</PanelBody>
+
+				<PanelBody title={ __( 'Sorting and Filtering' ) }>
 					<QueryControls
 						{ ...{ order, orderBy } }
 						numberOfItems={ postsToShow }
@@ -95,11 +120,6 @@ class LatestPostsEdit extends Component {
 						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
 						onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
 						onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
-					/>
-					<ToggleControl
-						label={ __( 'Display post date' ) }
-						checked={ displayPostDate }
-						onChange={ this.toggleDisplayPostDate }
 					/>
 					{ postLayout === 'grid' &&
 						<RangeControl
@@ -118,7 +138,7 @@ class LatestPostsEdit extends Component {
 		const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
 		if ( ! hasPosts ) {
 			return (
-				<Fragment>
+				<>
 					{ inspectorControls }
 					<Placeholder
 						icon="admin-post"
@@ -129,7 +149,7 @@ class LatestPostsEdit extends Component {
 							__( 'No posts found.' )
 						}
 					</Placeholder>
-				</Fragment>
+				</>
 			);
 		}
 
@@ -156,13 +176,14 @@ class LatestPostsEdit extends Component {
 		const dateFormat = __experimentalGetSettings().formats.date;
 
 		return (
-			<Fragment>
+			<>
 				{ inspectorControls }
 				<BlockControls>
 					<Toolbar controls={ layoutControls } />
 				</BlockControls>
 				<ul
 					className={ classnames( this.props.className, {
+						'wp-block-latest-posts__list': true,
 						'is-grid': postLayout === 'grid',
 						'has-dates': displayPostDate,
 						[ `columns-${ columns }` ]: postLayout === 'grid',
@@ -170,6 +191,13 @@ class LatestPostsEdit extends Component {
 				>
 					{ displayPosts.map( ( post, i ) => {
 						const titleTrimmed = post.title.rendered.trim();
+						let excerpt = post.excerpt.rendered;
+						if ( post.excerpt.raw === '' ) {
+							excerpt = post.content.raw;
+						}
+						const excerptElement = document.createElement( 'div' );
+						excerptElement.innerHTML = excerpt;
+						excerpt = excerptElement.textContent || excerptElement.innerText || '';
 						return (
 							<li key={ i }>
 								<a href={ post.link } target="_blank" rel="noreferrer noopener">
@@ -186,11 +214,31 @@ class LatestPostsEdit extends Component {
 										{ dateI18n( dateFormat, post.date_gmt ) }
 									</time>
 								}
+								{ displayPostContent && displayPostContentRadio === 'excerpt' &&
+								<div className="wp-block-latest-posts__post-excerpt">
+									<RawHTML
+										key="html"
+									>
+										{ excerptLength < excerpt.trim().split( ' ' ).length ?
+											excerpt.trim().split( ' ', excerptLength ).join( ' ' ) + ' ... <a href=' + post.link + 'target="_blank" rel="noopener noreferrer">Read More</a>' :
+											excerpt.trim().split( ' ', excerptLength ).join( ' ' ) }
+									</RawHTML>
+								</div>
+								}
+								{ displayPostContent && displayPostContentRadio === 'full_post' &&
+								<div className="wp-block-latest-posts__post-full-content">
+									<RawHTML
+										key="html"
+									>
+										{ post.content.raw.trim() }
+									</RawHTML>
+								</div>
+								}
 							</li>
 						);
 					} ) }
 				</ul>
-			</Fragment>
+			</>
 		);
 	}
 }

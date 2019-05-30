@@ -218,6 +218,20 @@ exports[`List should split indented list item 1`] = `
 <!-- /wp:list -->"
 `;
 
+exports[`List should split into two ordered lists with paragraph 1`] = `
+"<!-- wp:list {\\"ordered\\":true} -->
+<ol><li>one</li></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {\\"ordered\\":true} -->
+<ol><li>two</li></ol>
+<!-- /wp:list -->"
+`;
+
 exports[`List should split into two with paragraph and merge lists 1`] = `
 "<!-- wp:list -->
 <ul><li>one</li><li></li><li>two</li></ul>
@@ -240,7 +254,7 @@ exports[`List should split into two with paragraph and merge lists 2`] = `
 
 exports[`List should split into two with paragraph and merge lists 3`] = `
 "<!-- wp:list -->
-<ul><li>one</li></ul>
+<ul><li>one</li><li></li></ul>
 <!-- /wp:list -->
 
 <!-- wp:list -->

@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const watch = require( 'node-watch' );
-const { execSync } = require( 'child_process' );
+const { spawn } = require( 'child_process' );
 const path = require( 'path' );
 const chalk = require( 'chalk' );
 
@@ -12,7 +12,7 @@ const chalk = require( 'chalk' );
  */
 const getPackages = require( './get-packages' );
 
-const BUILD_CMD = `node ${ path.resolve( __dirname, './build.js' ) }`;
+const BUILD_SCRIPT = path.resolve( __dirname, './build.js' );
 
 let filesToBuild = new Map();
 
@@ -27,7 +27,7 @@ const exists = ( filename ) => {
 // and files with a suffix of .test or .spec (e.g. blocks.test.js),
 // and deceitful source-like files, such as editor swap files.
 const isSourceFile = ( filename ) => {
-	return ! [ /\/(__tests__|test)\/.+.js$/, /.\.(spec|test)\.js$/ ].some( ( regex ) => regex.test( filename ) ) && /.\.(js|scss)$/.test( filename );
+	return ! [ /\/(__tests__|test)\/.+.js$/, /.\.(spec|test)\.js$/ ].some( ( regex ) => regex.test( filename ) ) && /.\.(js|json|scss)$/.test( filename );
 };
 
 const rebuild = ( filename ) => filesToBuild.set( filename, true );
@@ -69,7 +69,7 @@ setInterval( () => {
 	if ( files.length ) {
 		filesToBuild = new Map();
 		try {
-			execSync( `${ BUILD_CMD } ${ files.join( ' ' ) }`, { stdio: [ 0, 1, 2 ] } );
+			spawn( 'node', [ BUILD_SCRIPT, ...files ], { stdio: [ 0, 1, 2 ] } );
 		} catch ( e ) {}
 	}
 }, 100 );

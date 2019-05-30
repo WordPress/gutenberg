@@ -2,14 +2,16 @@
  * External dependencies
  */
 import { View } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -81,6 +83,14 @@ class ParagraphEdit extends Component {
 		) ) );
 	}
 
+	plainTextContent( html ) {
+		const result = create( { html } );
+		if ( result ) {
+			return result.text;
+		}
+		return '';
+	}
+
 	render() {
 		const {
 			attributes,
@@ -95,14 +105,27 @@ class ParagraphEdit extends Component {
 		} = attributes;
 
 		return (
-			<View>
+			<View
+				accessible={ ! this.props.isSelected }
+				accessibilityLabel={
+					isEmpty( content ) ?
+						/* translators: accessibility text. empty paragraph block. */
+						__( 'Paragraph block. Empty' ) :
+						sprintf(
+							/* translators: accessibility text. %s: text content of the paragraph block. */
+							__( 'Paragraph block. %s' ),
+							this.plainTextContent( content )
+						)
+				}
+				onAccessibilityTap={ this.props.onFocus }
+			>
 				<RichText
 					tagName="p"
 					value={ content }
 					isSelected={ this.props.isSelected }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
-					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
+					deleteEnter={ true }
 					style={ style }
 					onChange={ ( nextContent ) => {
 						setAttributes( {

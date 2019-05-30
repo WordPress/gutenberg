@@ -43,8 +43,8 @@ describe( 'Classic', () => {
 		await page.keyboard.type( 'test' );
 
 		// Click the image button.
-		await page.waitForSelector( 'div[aria-label="Add Media"]' );
-		await page.click( 'div[aria-label="Add Media"]' );
+		await page.waitForSelector( 'div[aria-label^="Add Media"]' );
+		await page.click( 'div[aria-label^="Add Media"]' );
 
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );

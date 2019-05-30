@@ -28,20 +28,24 @@ import {
 	MediaUploadCheck,
 	PanelColorSettings,
 	withColors,
-} from '@wordpress/editor';
-import { Component, createRef, Fragment } from '@wordpress/element';
+} from '@wordpress/block-editor';
+import { Component, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import icon from './icon';
+import {
+	IMAGE_BACKGROUND_TYPE,
+	VIDEO_BACKGROUND_TYPE,
+	backgroundImageStyles,
+	dimRatioToClass,
+} from './shared';
 
 /**
  * Module Constants
  */
-export const IMAGE_BACKGROUND_TYPE = 'image';
-export const VIDEO_BACKGROUND_TYPE = 'video';
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 const INNER_BLOCKS_TEMPLATE = [
 	[ 'core/paragraph', {
@@ -57,18 +61,6 @@ function retrieveFastAverageColor() {
 		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
 	}
 	return retrieveFastAverageColor.fastAverageColor;
-}
-
-export function backgroundImageStyles( url ) {
-	return url ?
-		{ backgroundImage: `url(${ url })` } :
-		{};
-}
-
-export function dimRatioToClass( ratio ) {
-	return ( ratio === 0 || ratio === 50 ) ?
-		null :
-		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
 }
 
 class CoverEdit extends Component {
@@ -137,9 +129,19 @@ class CoverEdit extends Component {
 				url: media.url,
 				id: media.id,
 				backgroundType: mediaType,
+				...( mediaType === VIDEO_BACKGROUND_TYPE ?
+					{ focalPoint: undefined, hasParallax: undefined } :
+					{}
+				),
 			} );
 		};
-		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
+
+		const toggleParallax = () => {
+			setAttributes( {
+				hasParallax: ! hasParallax,
+				...( ! hasParallax ? { focalPoint: undefined } : {} ),
+			} );
+		};
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
 
 		const style = {
@@ -156,10 +158,10 @@ class CoverEdit extends Component {
 		}
 
 		const controls = (
-			<Fragment>
+			<>
 				<BlockControls>
 					{ !! url && (
-						<Fragment>
+						<>
 							<MediaUploadCheck>
 								<Toolbar>
 									<MediaUpload
@@ -177,7 +179,7 @@ class CoverEdit extends Component {
 									/>
 								</Toolbar>
 							</MediaUploadCheck>
-						</Fragment>
+						</>
 					) }
 				</BlockControls>
 				{ !! url && (
@@ -220,7 +222,7 @@ class CoverEdit extends Component {
 						</PanelBody>
 					</InspectorControls>
 				) }
-			</Fragment>
+			</>
 		);
 
 		if ( ! url ) {
@@ -228,7 +230,7 @@ class CoverEdit extends Component {
 			const label = __( 'Cover' );
 
 			return (
-				<Fragment>
+				<>
 					{ controls }
 					<MediaPlaceholder
 						icon={ placeholderIcon }
@@ -243,7 +245,7 @@ class CoverEdit extends Component {
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
 					/>
-				</Fragment>
+				</>
 			);
 		}
 
@@ -258,7 +260,7 @@ class CoverEdit extends Component {
 		);
 
 		return (
-			<Fragment>
+			<>
 				{ controls }
 				<div
 					data-url={ url }
@@ -294,7 +296,7 @@ class CoverEdit extends Component {
 						/>
 					</div>
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 

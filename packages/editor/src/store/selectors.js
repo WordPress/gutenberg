@@ -6,6 +6,9 @@ import {
 	get,
 	has,
 	map,
+	pick,
+	mapValues,
+	includes,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -22,6 +25,7 @@ import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
 import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -32,7 +36,9 @@ import {
 	POST_UPDATE_TRANSACTION_ID,
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
+	AUTOSAVE_PROPERTIES,
 } from './constants';
+import { getPostRawValue } from './reducer';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -320,21 +326,34 @@ export function getEditedPostAttribute( state, attributeName ) {
  * Returns an attribute value of the current autosave revision for a post, or
  * null if there is no autosave for the post.
  *
+ * @deprecated since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector
+ * 			   from the '@wordpress/core-data' package and access properties on the returned
+ * 			   autosave object using getPostRawValue.
+ *
  * @param {Object} state         Global application state.
  * @param {string} attributeName Autosave attribute name.
  *
  * @return {*} Autosave attribute value.
  */
-export function getAutosaveAttribute( state, attributeName ) {
-	if ( ! hasAutosave( state ) ) {
-		return null;
+export const getAutosaveAttribute = createRegistrySelector( ( select ) => ( state, attributeName ) => {
+	deprecated( '`wp.data.select( \'core/editor\' ).getAutosaveAttribute( attributeName )`', {
+		alternative: '`wp.data.select( \'core\' ).getAutosave( postType, postId, userId )`',
+		plugin: 'Gutenberg',
+	} );
+
+	if ( ! includes( AUTOSAVE_PROPERTIES, attributeName ) ) {
+		return;
 	}
 
-	const autosave = getAutosave( state );
-	if ( autosave.hasOwnProperty( attributeName ) ) {
-		return autosave[ attributeName ];
+	const postType = getCurrentPostType( state );
+	const postId = getCurrentPostId( state );
+	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
+	const autosave = select( 'core' ).getAutosave( postType, postId, currentUserId );
+
+	if ( autosave ) {
+		return getPostRawValue( autosave[ attributeName ] );
 	}
-}
+} );
 
 /**
  * Returns the current visibility of the post being edited, preferring the
@@ -495,18 +514,36 @@ export function isEditedPostEmpty( state ) {
 /**
  * Returns true if the post can be autosaved, or false otherwise.
  *
- * @param  {Object}  state Global application state.
+ * @param {Object} state    Global application state.
+ * @param {Object} autosave A raw autosave object from the REST API.
  *
  * @return {boolean} Whether the post can be autosaved.
  */
-export function isEditedPostAutosaveable( state ) {
+export const isEditedPostAutosaveable = createRegistrySelector( ( select ) => function( state ) {
 	// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
 	if ( ! isEditedPostSaveable( state ) ) {
 		return false;
 	}
 
+	const postType = getCurrentPostType( state );
+	const postId = getCurrentPostId( state );
+	const hasFetchedAutosave = select( 'core' ).hasFetchedAutosaves( postType, postId );
+	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
+
+	// Disable reason - this line causes the side-effect of fetching the autosave
+	// via a resolver, moving below the return would result in the autosave never
+	// being fetched.
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const autosave = select( 'core' ).getAutosave( postType, postId, currentUserId );
+
+	// If any existing autosaves have not yet been fetched, this function is
+	// unable to determine if the post is autosaveable, so return false.
+	if ( ! hasFetchedAutosave ) {
+		return false;
+	}
+
 	// If we don't already have an autosave, the post is autosaveable.
-	if ( ! hasAutosave( state ) ) {
+	if ( ! autosave ) {
 		return true;
 	}
 
@@ -518,36 +555,58 @@ export function isEditedPostAutosaveable( state ) {
 		return true;
 	}
 
-	// If the title, excerpt or content has changed, the post is autosaveable.
-	const autosave = getAutosave( state );
+	// If the title or excerpt has changed, the post is autosaveable.
 	return [ 'title', 'excerpt' ].some( ( field ) => (
-		autosave[ field ] !== getEditedPostAttribute( state, field )
+		getPostRawValue( autosave[ field ] ) !== getEditedPostAttribute( state, field )
 	) );
-}
+} );
 
 /**
  * Returns the current autosave, or null if one is not set (i.e. if the post
  * has yet to be autosaved, or has been saved or published since the last
  * autosave).
  *
+ * @deprecated since 5.6. Callers should use the `getAutosave( postType, postId, userId )`
+ * 			   selector from the '@wordpress/core-data' package.
+ *
  * @param {Object} state Editor state.
  *
  * @return {?Object} Current autosave, if exists.
  */
-export function getAutosave( state ) {
-	return state.autosave;
-}
+export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
+	deprecated( '`wp.data.select( \'core/editor\' ).getAutosave()`', {
+		alternative: '`wp.data.select( \'core\' ).getAutosave( postType, postId, userId )`',
+		plugin: 'Gutenberg',
+	} );
+
+	const postType = getCurrentPostType( state );
+	const postId = getCurrentPostId( state );
+	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
+	const autosave = select( 'core' ).getAutosave( postType, postId, currentUserId );
+	return mapValues( pick( autosave, AUTOSAVE_PROPERTIES ), getPostRawValue );
+} );
 
 /**
  * Returns the true if there is an existing autosave, otherwise false.
+ *
+ * @deprecated since 5.6. Callers should use the `getAutosave( postType, postId, userId )` selector
+ *             from the '@wordpress/core-data' package and check for a truthy value.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether there is an existing autosave.
  */
-export function hasAutosave( state ) {
-	return !! getAutosave( state );
-}
+export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
+	deprecated( '`wp.data.select( \'core/editor\' ).hasAutosave()`', {
+		alternative: '`!! wp.data.select( \'core\' ).getAutosave( postType, postId, userId )`',
+		plugin: 'Gutenberg',
+	} );
+
+	const postType = getCurrentPostType( state );
+	const postId = getCurrentPostId( state );
+	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
+	return !! select( 'core' ).getAutosave( postType, postId, currentUserId );
+} );
 
 /**
  * Return true if the post being edited is being scheduled. Preferring the
@@ -574,7 +633,7 @@ export function isEditedPostBeingScheduled( state ) {
  * infer that a post is set to publish "Immediately" we check whether the date
  * and modified date are the same.
  *
- * @param  {Object}  state Editor state.
+ * @param {Object} state Editor state.
  *
  * @return {boolean} Whether the edited post has a floating date value.
  */
@@ -1105,56 +1164,267 @@ function getBlockEditorSelector( name ) {
 	} );
 }
 
+/**
+ * @see getBlockDependantsCacheBust in core/block-editor store.
+ */
 export const getBlockDependantsCacheBust = getBlockEditorSelector( 'getBlockDependantsCacheBust' );
+
+/**
+ * @see getBlockName in core/block-editor store.
+ */
 export const getBlockName = getBlockEditorSelector( 'getBlockName' );
+
+/**
+ * @see isBlockValid in core/block-editor store.
+ */
 export const isBlockValid = getBlockEditorSelector( 'isBlockValid' );
+
+/**
+ * @see getBlockAttributes in core/block-editor store.
+ */
 export const getBlockAttributes = getBlockEditorSelector( 'getBlockAttributes' );
+
+/**
+ * @see getBlock in core/block-editor store.
+ */
 export const getBlock = getBlockEditorSelector( 'getBlock' );
+
+/**
+ * @see getBlocks in core/block-editor store.
+ */
 export const getBlocks = getBlockEditorSelector( 'getBlocks' );
+
+/**
+ * @see __unstableGetBlockWithoutInnerBlocks in core/block-editor store.
+ */
 export const __unstableGetBlockWithoutInnerBlocks = getBlockEditorSelector( '__unstableGetBlockWithoutInnerBlocks' );
+
+/**
+ * @see getClientIdsOfDescendants in core/block-editor store.
+ */
 export const getClientIdsOfDescendants = getBlockEditorSelector( 'getClientIdsOfDescendants' );
+
+/**
+ * @see getClientIdsWithDescendants in core/block-editor store.
+ */
 export const getClientIdsWithDescendants = getBlockEditorSelector( 'getClientIdsWithDescendants' );
+
+/**
+ * @see getGlobalBlockCount in core/block-editor store.
+ */
 export const getGlobalBlockCount = getBlockEditorSelector( 'getGlobalBlockCount' );
+
+/**
+ * @see getBlocksByClientId in core/block-editor store.
+ */
 export const getBlocksByClientId = getBlockEditorSelector( 'getBlocksByClientId' );
+
+/**
+ * @see getBlockCount in core/block-editor store.
+ */
 export const getBlockCount = getBlockEditorSelector( 'getBlockCount' );
+
+/**
+ * @see getBlockSelectionStart in core/block-editor store.
+ */
 export const getBlockSelectionStart = getBlockEditorSelector( 'getBlockSelectionStart' );
+
+/**
+ * @see getBlockSelectionEnd in core/block-editor store.
+ */
 export const getBlockSelectionEnd = getBlockEditorSelector( 'getBlockSelectionEnd' );
+
+/**
+ * @see getSelectedBlockCount in core/block-editor store.
+ */
 export const getSelectedBlockCount = getBlockEditorSelector( 'getSelectedBlockCount' );
+
+/**
+ * @see hasSelectedBlock in core/block-editor store.
+ */
 export const hasSelectedBlock = getBlockEditorSelector( 'hasSelectedBlock' );
+
+/**
+ * @see getSelectedBlockClientId in core/block-editor store.
+ */
 export const getSelectedBlockClientId = getBlockEditorSelector( 'getSelectedBlockClientId' );
+
+/**
+ * @see getSelectedBlock in core/block-editor store.
+ */
 export const getSelectedBlock = getBlockEditorSelector( 'getSelectedBlock' );
+
+/**
+ * @see getBlockRootClientId in core/block-editor store.
+ */
 export const getBlockRootClientId = getBlockEditorSelector( 'getBlockRootClientId' );
+
+/**
+ * @see getBlockHierarchyRootClientId in core/block-editor store.
+ */
 export const getBlockHierarchyRootClientId = getBlockEditorSelector( 'getBlockHierarchyRootClientId' );
+
+/**
+ * @see getAdjacentBlockClientId in core/block-editor store.
+ */
 export const getAdjacentBlockClientId = getBlockEditorSelector( 'getAdjacentBlockClientId' );
+
+/**
+ * @see getPreviousBlockClientId in core/block-editor store.
+ */
 export const getPreviousBlockClientId = getBlockEditorSelector( 'getPreviousBlockClientId' );
+
+/**
+ * @see getNextBlockClientId in core/block-editor store.
+ */
 export const getNextBlockClientId = getBlockEditorSelector( 'getNextBlockClientId' );
+
+/**
+ * @see getSelectedBlocksInitialCaretPosition in core/block-editor store.
+ */
 export const getSelectedBlocksInitialCaretPosition = getBlockEditorSelector( 'getSelectedBlocksInitialCaretPosition' );
+
+/**
+ * @see getMultiSelectedBlockClientIds in core/block-editor store.
+ */
 export const getMultiSelectedBlockClientIds = getBlockEditorSelector( 'getMultiSelectedBlockClientIds' );
+
+/**
+ * @see getMultiSelectedBlocks in core/block-editor store.
+ */
 export const getMultiSelectedBlocks = getBlockEditorSelector( 'getMultiSelectedBlocks' );
+
+/**
+ * @see getFirstMultiSelectedBlockClientId in core/block-editor store.
+ */
 export const getFirstMultiSelectedBlockClientId = getBlockEditorSelector( 'getFirstMultiSelectedBlockClientId' );
+
+/**
+ * @see getLastMultiSelectedBlockClientId in core/block-editor store.
+ */
 export const getLastMultiSelectedBlockClientId = getBlockEditorSelector( 'getLastMultiSelectedBlockClientId' );
+
+/**
+ * @see isFirstMultiSelectedBlock in core/block-editor store.
+ */
 export const isFirstMultiSelectedBlock = getBlockEditorSelector( 'isFirstMultiSelectedBlock' );
+
+/**
+ * @see isBlockMultiSelected in core/block-editor store.
+ */
 export const isBlockMultiSelected = getBlockEditorSelector( 'isBlockMultiSelected' );
+
+/**
+ * @see isAncestorMultiSelected in core/block-editor store.
+ */
 export const isAncestorMultiSelected = getBlockEditorSelector( 'isAncestorMultiSelected' );
+
+/**
+ * @see getMultiSelectedBlocksStartClientId in core/block-editor store.
+ */
 export const getMultiSelectedBlocksStartClientId = getBlockEditorSelector( 'getMultiSelectedBlocksStartClientId' );
+
+/**
+ * @see getMultiSelectedBlocksEndClientId in core/block-editor store.
+ */
 export const getMultiSelectedBlocksEndClientId = getBlockEditorSelector( 'getMultiSelectedBlocksEndClientId' );
+
+/**
+ * @see getBlockOrder in core/block-editor store.
+ */
 export const getBlockOrder = getBlockEditorSelector( 'getBlockOrder' );
+
+/**
+ * @see getBlockIndex in core/block-editor store.
+ */
 export const getBlockIndex = getBlockEditorSelector( 'getBlockIndex' );
+
+/**
+ * @see isBlockSelected in core/block-editor store.
+ */
 export const isBlockSelected = getBlockEditorSelector( 'isBlockSelected' );
+
+/**
+ * @see hasSelectedInnerBlock in core/block-editor store.
+ */
 export const hasSelectedInnerBlock = getBlockEditorSelector( 'hasSelectedInnerBlock' );
+
+/**
+ * @see isBlockWithinSelection in core/block-editor store.
+ */
 export const isBlockWithinSelection = getBlockEditorSelector( 'isBlockWithinSelection' );
+
+/**
+ * @see hasMultiSelection in core/block-editor store.
+ */
 export const hasMultiSelection = getBlockEditorSelector( 'hasMultiSelection' );
+
+/**
+ * @see isMultiSelecting in core/block-editor store.
+ */
 export const isMultiSelecting = getBlockEditorSelector( 'isMultiSelecting' );
+
+/**
+ * @see isSelectionEnabled in core/block-editor store.
+ */
 export const isSelectionEnabled = getBlockEditorSelector( 'isSelectionEnabled' );
+
+/**
+ * @see getBlockMode in core/block-editor store.
+ */
 export const getBlockMode = getBlockEditorSelector( 'getBlockMode' );
+
+/**
+ * @see isTyping in core/block-editor store.
+ */
 export const isTyping = getBlockEditorSelector( 'isTyping' );
+
+/**
+ * @see isCaretWithinFormattedText in core/block-editor store.
+ */
 export const isCaretWithinFormattedText = getBlockEditorSelector( 'isCaretWithinFormattedText' );
+
+/**
+ * @see getBlockInsertionPoint in core/block-editor store.
+ */
 export const getBlockInsertionPoint = getBlockEditorSelector( 'getBlockInsertionPoint' );
+
+/**
+ * @see isBlockInsertionPointVisible in core/block-editor store.
+ */
 export const isBlockInsertionPointVisible = getBlockEditorSelector( 'isBlockInsertionPointVisible' );
+
+/**
+ * @see isValidTemplate in core/block-editor store.
+ */
 export const isValidTemplate = getBlockEditorSelector( 'isValidTemplate' );
+
+/**
+ * @see getTemplate in core/block-editor store.
+ */
 export const getTemplate = getBlockEditorSelector( 'getTemplate' );
+
+/**
+ * @see getTemplateLock in core/block-editor store.
+ */
 export const getTemplateLock = getBlockEditorSelector( 'getTemplateLock' );
+
+/**
+ * @see canInsertBlockType in core/block-editor store.
+ */
 export const canInsertBlockType = getBlockEditorSelector( 'canInsertBlockType' );
+
+/**
+ * @see getInserterItems in core/block-editor store.
+ */
 export const getInserterItems = getBlockEditorSelector( 'getInserterItems' );
+
+/**
+ * @see hasInserterItems in core/block-editor store.
+ */
 export const hasInserterItems = getBlockEditorSelector( 'hasInserterItems' );
+
+/**
+ * @see getBlockListSettings in core/block-editor store.
+ */
 export const getBlockListSettings = getBlockEditorSelector( 'getBlockListSettings' );

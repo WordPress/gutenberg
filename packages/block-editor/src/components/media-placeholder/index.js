@@ -22,7 +22,7 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
@@ -154,6 +154,8 @@ export class MediaPlaceholder extends Component {
 			icon,
 			isAppender,
 			labels = {},
+			onDoubleClick,
+			mediaPreview,
 			notices,
 			onSelectURL,
 			mediaUpload,
@@ -212,6 +214,8 @@ export class MediaPlaceholder extends Component {
 				className={ placeholderClassName }
 				notices={ notices }
 				onClick={ onClick }
+				onDoubleClick={ onDoubleClick }
+				preview={ mediaPreview }
 			>
 				{ content }
 			</Placeholder>
@@ -225,6 +229,22 @@ export class MediaPlaceholder extends Component {
 				onFilesDrop={ this.onFilesUpload }
 				onHTMLDrop={ onHTMLDrop }
 			/>
+		);
+	}
+
+	renderCancelLink() {
+		const {
+			onCancel,
+		} = this.props;
+		return ( onCancel &&
+			<Button
+				className="block-editor-media-placeholder__cancel-button"
+				title={ __( 'Cancel' ) }
+				isLink
+				onClick={ onCancel }
+			>
+				{ __( 'Cancel' ) }
+			</Button>
 		);
 	}
 
@@ -307,7 +327,7 @@ export class MediaPlaceholder extends Component {
 
 		if ( mediaUpload && isAppender ) {
 			return (
-				<Fragment>
+				<>
 					{ this.renderDropZone() }
 					<FormFileUpload
 						onChange={ this.onUpload }
@@ -315,7 +335,7 @@ export class MediaPlaceholder extends Component {
 						multiple={ multiple }
 						render={ ( { openFileDialog } ) => {
 							const content = (
-								<Fragment>
+								<>
 									<IconButton
 										isLarge
 										className={ classnames(
@@ -329,17 +349,18 @@ export class MediaPlaceholder extends Component {
 									</IconButton>
 									{ mediaLibraryButton }
 									{ this.renderUrlSelectionUI() }
-								</Fragment>
+									{ this.renderCancelLink() }
+								</>
 							);
 							return this.renderPlaceholder( content, openFileDialog );
 						} }
 					/>
-				</Fragment>
+				</>
 			);
 		}
 		if ( mediaUpload ) {
 			const content = (
-				<Fragment>
+				<>
 					{ this.renderDropZone() }
 					<FormFileUpload
 						isLarge
@@ -356,7 +377,8 @@ export class MediaPlaceholder extends Component {
 					</FormFileUpload>
 					{ mediaLibraryButton }
 					{ this.renderUrlSelectionUI() }
-				</Fragment>
+					{ this.renderCancelLink() }
+				</>
 			);
 			return this.renderPlaceholder( content );
 		}
@@ -394,6 +416,9 @@ const applyWithSelect = withSelect( ( select ) => {
 	};
 } );
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md
+ */
 export default compose(
 	applyWithSelect,
 	withFilters( 'editor.MediaPlaceholder' ),

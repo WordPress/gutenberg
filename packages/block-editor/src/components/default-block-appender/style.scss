@@ -13,6 +13,8 @@
 		outline: $border-width solid transparent;
 		transition: 0.2s outline;
 		resize: none;
+		margin-top: $default-block-margin;
+		margin-bottom: $default-block-margin;
 
 		// Emulate the dimensions of a paragraph block.
 		// On mobile and in nested contexts, the plus to add blocks shows up on the right.
@@ -74,6 +76,12 @@
 
 	.block-editor-inserter__toggle {
 		margin-right: 0;
+
+		// Hide the box shadow that appears on hover.
+		// All the :not() rules are needed to override default iconButton styles.
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+			box-shadow: none;
+		}
 	}
 }
 

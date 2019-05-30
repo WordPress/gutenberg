@@ -6,7 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	Button,
 	IconButton,
@@ -99,15 +99,15 @@ class LegacyWidgetEdit extends Component {
 		);
 		if ( ! hasPermissionsToManageWidgets ) {
 			return (
-				<Fragment>
+				<>
 					{ inspectorControls }
 					{ this.renderWidgetPreview() }
-				</Fragment>
+				</>
 			);
 		}
 
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar>
 						<IconButton
@@ -117,7 +117,7 @@ class LegacyWidgetEdit extends Component {
 						>
 						</IconButton>
 						{ ! isCallbackWidget && (
-							<Fragment>
+							<>
 								<Button
 									className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
 									onClick={ this.switchToEdit }
@@ -130,7 +130,7 @@ class LegacyWidgetEdit extends Component {
 								>
 									<span>{ __( 'Preview' ) }</span>
 								</Button>
-							</Fragment>
+							</>
 						) }
 					</Toolbar>
 				</BlockControls>
@@ -150,7 +150,7 @@ class LegacyWidgetEdit extends Component {
 					/>
 				) }
 				{ ( isPreview || isCallbackWidget ) && this.renderWidgetPreview() }
-			</Fragment>
+			</>
 		);
 	}
 

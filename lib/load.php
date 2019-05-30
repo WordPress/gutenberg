@@ -26,7 +26,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/client-assets.php';
-require dirname( __FILE__ ) . '/i18n.php';
 require dirname( __FILE__ ) . '/demo.php';
 require dirname( __FILE__ ) . '/widgets.php';
 require dirname( __FILE__ ) . '/widgets-page.php';
