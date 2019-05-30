@@ -127,6 +127,7 @@
 		"shallow-equals": "1.0.0",
 		"shallowequal": "1.1.0",
 		"simple-git": "1.113.0",
+		"source-map-loader": "0.2.4",
 		"sprintf-js": "1.1.1",
 		"stylelint-config-wordpress": "13.1.0",
 		"uuid": "3.3.2",
