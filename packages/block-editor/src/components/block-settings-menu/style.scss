@@ -1,9 +1,5 @@
 .block-editor-block-settings-menu__content {
 	padding: 0;
-
-	.components-menu-group:not(:last-child) {
-		border-bottom: $border-width solid $light-gray-500;
-	}
 }
 
 .block-editor-block-settings-menu__toggle .dashicon {
