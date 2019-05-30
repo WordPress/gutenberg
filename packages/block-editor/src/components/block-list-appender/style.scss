@@ -1,3 +1,5 @@
+// These styles are only applied to the appender when it appears inside of a block.
+// Otherwise the default appender may be improperly positioned in some themes.
 .block-editor-block-list__block .block-list-appender {
 	margin: $block-padding;
 
