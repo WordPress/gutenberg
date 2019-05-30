@@ -3,13 +3,14 @@
  */
 import {
 	map,
+	isEmpty,
 	pickBy,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, useMemo } from '@wordpress/element';
 import {
 	Button,
 	IconButton,
@@ -32,6 +33,51 @@ import { ServerSideRender } from '@wordpress/editor';
  */
 import LegacyWidgetEditHandler from './handler';
 
+const LegacyWidgetPlaceholder = ( {
+	availableLegacyWidgets,
+	currentWidget,
+	hasPermissionsToManageWidgets,
+	onChangeWidget,
+} ) => {
+	const visibleLegacyWidgets = useMemo(
+		() => pickBy(
+			availableLegacyWidgets,
+			( { isHidden } ) => ! isHidden
+		),
+		[ availableLegacyWidgets ]
+	);
+	let placeholderContent;
+	if ( ! hasPermissionsToManageWidgets ) {
+		placeholderContent = __( 'You don\'t have permissions to use widgets on this site.' );
+	}
+	if ( isEmpty( visibleLegacyWidgets ) ) {
+		placeholderContent = __( 'There are no widgets available.' );
+	}
+	placeholderContent = (
+		<SelectControl
+			label={ __( 'Select a legacy widget to display:' ) }
+			value={ currentWidget || 'none' }
+			onChange={ onChangeWidget }
+			options={ [ { value: 'none', label: 'Select widget' } ].concat(
+				map( visibleLegacyWidgets, ( widget, key ) => {
+					return {
+						value: key,
+						label: widget.name,
+					};
+				} )
+			) }
+		/>
+	);
+	return (
+		<Placeholder
+			icon={ <BlockIcon icon="admin-customizer" /> }
+			label={ __( 'Legacy Widget' ) }
+		>
+			{ placeholderContent }
+		</Placeholder>
+	);
+};
+
 class LegacyWidgetEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -50,49 +96,21 @@ class LegacyWidgetEdit extends Component {
 			hasPermissionsToManageWidgets,
 			setAttributes,
 		} = this.props;
-		const visibleLegacyWidgets = pickBy(
-			availableLegacyWidgets,
-			( { isHidden } ) => ! isHidden
-		);
 		const { isPreview } = this.state;
 		const { identifier, isCallbackWidget } = attributes;
 		const widgetObject = identifier && availableLegacyWidgets[ identifier ];
 		if ( ! widgetObject ) {
-			let placeholderContent;
-
-			if ( ! hasPermissionsToManageWidgets ) {
-				placeholderContent = __( 'You don\'t have permissions to use widgets on this site.' );
-			} else if ( visibleLegacyWidgets.length === 0 ) {
-				placeholderContent = __( 'There are no widgets available.' );
-			} else {
-				placeholderContent = (
-					<SelectControl
-						label={ __( 'Select a legacy widget to display:' ) }
-						value={ identifier || 'none' }
-						onChange={ ( value ) => setAttributes( {
-							instance: {},
-							identifier: value,
-							isCallbackWidget: availableLegacyWidgets[ value ].isCallbackWidget,
-						} ) }
-						options={ [ { value: 'none', label: 'Select widget' } ].concat(
-							map( visibleLegacyWidgets, ( widget, key ) => {
-								return {
-									value: key,
-									label: widget.name,
-								};
-							} )
-						) }
-					/>
-				);
-			}
-
 			return (
-				<Placeholder
-					icon={ <BlockIcon icon="admin-customizer" /> }
-					label={ __( 'Legacy Widget' ) }
-				>
-					{ placeholderContent }
-				</Placeholder>
+				<LegacyWidgetPlaceholder
+					availableLegacyWidgets={ availableLegacyWidgets }
+					currentWidget={ identifier }
+					hasPermissionsToManageWidgets={ hasPermissionsToManageWidgets }
+					onChangeWidget={ ( newWidget ) => setAttributes( {
+						instance: {},
+						identifier: newWidget,
+						isCallbackWidget: availableLegacyWidgets[ newWidget ].isCallbackWidget,
+					} ) }
+				/>
 			);
 		}
 
