@@ -19,7 +19,6 @@
 	},
 	"files": [
 		"configs",
-		"docs",
 		"rules",
 		"index.js"
 	],

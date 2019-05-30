@@ -1,6 +1,6 @@
 ## Master
 
-### New Feature
+### Braking Change
 
 - Added `type` and `react-native` to the order of preferred properties. 
 
