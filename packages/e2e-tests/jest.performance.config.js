@@ -1,5 +1,8 @@
 module.exports = {
 	...require( '@wordpress/scripts/config/jest-e2e.config' ),
+	testMatch: [
+		'**/performance.test.js',
+	],
 	setupFiles: [
 		'<rootDir>/config/gutenberg-phase.js',
 	],
@@ -9,7 +12,12 @@ module.exports = {
 		'@wordpress/jest-puppeteer-axe',
 		'expect-puppeteer',
 	],
-	testPathIgnorePatterns: [
-		'e2e-tests/specs/performance.test.js',
+	transformIgnorePatterns: [
+		'node_modules',
+		'scripts/config/puppeteer.config.js',
+	],
+	reporters: [
+		'default',
+		'<rootDir>/config/performance-reporter.js',
 	],
 };

@@ -888,6 +888,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Snackbar",
+		"slug": "snackbar",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/snackbar/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Spinner",
 		"slug": "spinner",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/spinner/README.md",
