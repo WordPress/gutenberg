@@ -809,7 +809,7 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 		}
 		case 'TOGGLE_SELECTION':
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
+				...state,
 				isEnabled: action.isSelectionEnabled,
 			};
 		case 'SELECTION_CHANGE':
