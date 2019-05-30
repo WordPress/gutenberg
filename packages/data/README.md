@@ -19,8 +19,8 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 Use the `registerStore` function to add your own store to the centralized data registry. This function accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
 
 ```js
-const { data, apiFetch } = wp;
-const { registerStore } = data;
+const { apiFetch } = wp;
+const { registerStore } = wp.data;
 
 const DEFAULT_STATE = {
 	prices: {},
@@ -166,17 +166,20 @@ import existingSelectors from './existing-app/selectors';
 import existingActions from './existing-app/actions';
 import createStore from './existing-app/store';
 
+const { registerGenericStore } = wp.data;
+
 const reduxStore = createStore();
 
-const mappedSelectors = existingSelectors.map( ( selector ) => {
-	return ( ...args ) => selector( reduxStore.getState(), ...args );
-} );
+const mappedSelectors = Object.keys( existingSelectors ).reduce( ( acc, selectorKey ) => {
+	acc[ selectorKey ] = ( ...args ) =>
+		existingSelectors[ selectorKey ]( reduxStore.getState(), ...args );
+	return acc;
+}, {} );
 
-const mappedActions = existingActions.map( ( action ) => {
-	return actions.map( ( action ) => {
-		return ( ...args ) => reduxStore.dispatch( action( ...args ) );
-	} );
-} );
+const mappedActions = Object.keys( existingActions ).reduce( ( acc, actionKey ) => {
+	acc[ actionKey ] = ( ...args ) => reduxStore.dispatch( existingActions[ actionKey ]( ...args ) );
+	return acc;
+}, {} );
 
 const genericStore = {
 	getSelectors() {
@@ -185,10 +188,10 @@ const genericStore = {
 	getActions() {
 		return mappedActions;
 	},
-	subscribe: reduxStore.subscribe;
+	subscribe: reduxStore.subscribe,
 };
 
-registry.registerGenericStore( 'existing-app', genericStore );
+registerGenericStore( 'existing-app', genericStore );
 ```
 
 It is also possible to implement a completely custom store from scratch:
@@ -196,18 +199,20 @@ It is also possible to implement a completely custom store from scratch:
 _Example:_
 
 ```js
+const { registerGenericStore } = wp.data;
+
 function createCustomStore() {
 	let storeChanged = () => {};
 	const prices = { hammer: 7.50 };
 
 	const selectors = {
-		getPrice( itemName ): {
+		getPrice( itemName ) {
 			return prices[ itemName ];
 		},
 	};
 
 	const actions = {
-		setPrice( itemName, price ): {
+		setPrice( itemName, price ) {
 			prices[ itemName ] = price;
 			storeChanged();
 		},
@@ -226,7 +231,7 @@ function createCustomStore() {
 	};
 }
 
-registry.registerGenericStore( 'custom-data', createCustomStore() );
+registerGenericStore( 'custom-data', createCustomStore() );
 ```
 
 ## Comparison with Redux

@@ -912,6 +912,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Snackbar",
+		"slug": "snackbar",
+		"markdown_source": "../packages/components/src/snackbar/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Spinner",
 		"slug": "spinner",
 		"markdown_source": "../packages/components/src/spinner/README.md",

@@ -42,7 +42,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
 
 		// Select all of the text in the title field by triple-clicking on it. We
@@ -84,7 +84,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
 
 		// Save the reusable block
@@ -184,7 +184,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Wait for deletion to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block deleted."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block deleted."]'
 		);
 
 		// Check that we have an empty post again
@@ -221,7 +221,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
 
 		// Select all of the text in the title field by triple-clicking on it. We
