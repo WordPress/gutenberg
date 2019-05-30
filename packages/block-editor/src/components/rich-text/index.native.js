@@ -718,9 +718,9 @@ export class RichText extends Component {
 	componentDidMount() {
 		// Request focus if wrapping block is selected and parent hasn't inhibited the focus request. This method of focusing
 		//  is trying to implement the web-side counterpart of BlockList's `focusTabbable` where the BlockList is focusing an
-		//  inputbox by searching the DOM. We don't have the DOM in RN so, using the combination of blockIsSelected and noFocusOnMount
+		//  inputbox by searching the DOM. We don't have the DOM in RN so, using the combination of blockIsSelected and __unstableMobileNoFocusOnMount
 		//  to determine if we should focus the RichText.
-		if ( this.props.blockIsSelected && ! this.props.noFocusOnMount ) {
+		if ( this.props.blockIsSelected && ! this.props.__unstableMobileNoFocusOnMount ) {
 			this._editor.focus();
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
 		}
