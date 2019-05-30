@@ -70,7 +70,7 @@ function DropdownMenu( {
 						labelPosition={ __unstableLabelPosition }
 						tooltip={ label }
 					>
-						{ icon !== 'ellipsis' && <span className="components-dropdown-menu__indicator" /> }
+						{ ! icon && <span className="components-dropdown-menu__indicator" /> }
 					</IconButton>
 				);
 			} }
