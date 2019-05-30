@@ -44,7 +44,6 @@ type PropsType = {
 	blockCount: number,
 	clearSelectedBlock: () => void,
 	focusBlock: ( clientId: string ) => void,
-	selectBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
 	replaceBlock: ( string, BlockType ) => mixed,
 	getBlockName: string => string,
@@ -123,9 +122,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			const insertionIndex = indexAfterSelected || this.props.blockCount;
 			this.props.insertBlock( newBlock, insertionIndex );
 		}
-
-		// now set the focus
-		this.props.selectBlock( newBlock.clientId );
 	}
 
 	onSafeAreaInsetsUpdate( result: Object ) {
@@ -383,14 +379,12 @@ export default compose( [
 		const {
 			insertBlock,
 			replaceBlock,
-			selectBlock,
 			clearSelectedBlock,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			clearSelectedBlock,
 			insertBlock,
-			selectBlock,
 			replaceBlock,
 		};
 	} ),
