@@ -39,9 +39,9 @@
 		background: none;
 		outline: none;
 		border-radius: 0;
-		color: $dark-gray-500;
 		text-align: left;
 		cursor: pointer;
+		color: $dark-gray-600;
 		@include menu-style__neutral;
 
 		&:hover:not(:disabled):not([aria-disabled="true"]) {
