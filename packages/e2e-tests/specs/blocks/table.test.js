@@ -3,6 +3,8 @@
  */
 import { createNewPost, insertBlock, getEditedPostContent } from '@wordpress/e2e-test-utils';
 
+const buttonSelector = "//div[@data-type='core/table']//button[text()='Create Table']";
+
 describe( 'Table', () => {
 	beforeEach( async () => {
 		await createNewPost();
@@ -34,7 +36,7 @@ describe( 'Table', () => {
 		await page.keyboard.type( '10' );
 
 		// // Create the table.
-		const createButton = await page.$x( "//div[@data-type='core/table']//button[text()='Create']" );
+		const createButton = await page.$x( buttonSelector );
 		await createButton[ 0 ].click();
 
 		// // Expect the post content to have a correctly sized table.
@@ -45,7 +47,7 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		// Create the table.
-		const createButton = await page.$x( "//div[@data-type='core/table']//button[text()='Create']" );
+		const createButton = await page.$x( buttonSelector );
 		await createButton[ 0 ].click();
 
 		// Click the first cell and add some text.
@@ -81,7 +83,7 @@ describe( 'Table', () => {
 		expect( footerSwitch ).toHaveLength( 0 );
 
 		// Create the table.
-		const createButton = await page.$x( "//div[@data-type='core/table']//button[text()='Create']" );
+		const createButton = await page.$x( buttonSelector );
 		await createButton[ 0 ].click();
 
 		// Expect the header and footer switches to be present now that the table has been created.
