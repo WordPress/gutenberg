@@ -44,7 +44,6 @@ type PropsType = {
 	blockCount: number,
 	clearSelectedBlock: () => void,
 	focusBlock: ( clientId: string ) => void,
-	selectBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
 	replaceBlock: ( string, BlockType ) => mixed,
 	getBlockName: string => string,
@@ -380,14 +379,12 @@ export default compose( [
 		const {
 			insertBlock,
 			replaceBlock,
-			selectBlock,
 			clearSelectedBlock,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			clearSelectedBlock,
 			insertBlock,
-			selectBlock,
 			replaceBlock,
 		};
 	} ),
