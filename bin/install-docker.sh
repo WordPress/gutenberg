@@ -10,7 +10,7 @@ set -e
 
 # Check that Docker is installed.
 if ! command_exists "docker"; then
-	echo -e $(error_message "Docker doesn't seem to be installed. Please head on over to the Docker site to download it: $(action_format "https://www.docker.com/community-edition#/download")")
+	echo -e $(error_message "Docker doesn't seem to be installed. Please head on over to the Docker site to download it: $(action_format "https://www.docker.com/products/docker-desktop")")
 	exit 1
 fi
 
