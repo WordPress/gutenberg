@@ -10,8 +10,22 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 
 class Picker extends Component {
+	componentDidMount() {
+		const { isOpen } = this.props;
+		if ( isOpen ) {
+			this.presentPicker();
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		const { isOpen } = this.props;
+		if ( ! prevProps.isOpen && isOpen ) {
+			this.presentPicker();
+		}
+	}
+
 	presentPicker() {
-		const { options, onChange } = this.props;
+		const { options, onChange, onClose } = this.props;
 		const labels = options.map( ( { label } ) => label );
 		const fullOptions = [ __( 'Cancel' ) ].concat( labels );
 
@@ -22,7 +36,7 @@ class Picker extends Component {
 			},
 			( buttonIndex ) => {
 				if ( buttonIndex === 0 ) {
-					return;
+					return onClose();
 				}
 				const selected = options[ buttonIndex - 1 ];
 				onChange( selected.value );

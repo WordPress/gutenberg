@@ -1,33 +1,37 @@
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import Cell from './cell';
 import Picker from '../picker';
 
-export default function BottomSheetPickerCell( props ) {
-	const {
-		options,
-		onChangeValue,
-		...cellProps
-	} = props;
-
-	let picker;
-
-	const onCellPress = () => {
-		picker.presentPicker();
-	};
-
-	const onChange = ( newValue ) => {
-		onChangeValue( newValue );
+const BottomSheetPickerCell = ( {
+	options,
+	onChangeValue,
+	...cellProps
+} ) => {
+	const [ isPickerOpen, showPicker ] = useState( false );
+	const openPicker = () => showPicker( true );
+	const closePicker = () => showPicker( false );
+	const onChange = ( value ) => {
+		onChangeValue( value );
+		closePicker();
 	};
 
 	return (
-		<Cell onPress={ onCellPress } editable={ false } { ...cellProps } >
+		<Cell onPress={ openPicker } editable={ false } { ...cellProps }>
 			<Picker
-				ref={ ( instance ) => picker = instance }
+				isOpen={ isPickerOpen }
 				options={ options }
 				onChange={ onChange }
+				onClose={ closePicker }
 			/>
 		</Cell>
 	);
-}
+};
+
+export default BottomSheetPickerCell;

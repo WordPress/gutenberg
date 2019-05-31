@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import {
 	requestMediaPickFromMediaLibrary,
 	requestMediaPickFromDeviceLibrary,
@@ -12,6 +11,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
 import { Picker } from '@wordpress/components';
 
 export const MEDIA_TYPE_IMAGE = 'image';
@@ -24,7 +24,21 @@ export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_med
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 
-export class MediaUpload extends React.Component {
+export class MediaUpload extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.onPickerOpen = this.onPickerOpen.bind( this );
+		this.onPickerClose = this.onPickerClose.bind( this );
+		this.onMediaLibraryButtonPressed = this.onMediaLibraryButtonPressed.bind( this );
+		this.onMediaUploadButtonPressed = this.onMediaUploadButtonPressed.bind( this );
+		this.onMediaCaptureButtonPressed = this.onMediaCaptureButtonPressed.bind( this );
+
+		this.state = {
+			showModal: false,
+		};
+	}
+
 	getTakeMediaLabel() {
 		const { mediaType } = this.props;
 
@@ -61,58 +75,66 @@ export class MediaUpload extends React.Component {
 		return 'wordpress-alt';
 	}
 
-	render() {
+	onPickerOpen() {
+		this.setState( { showModal: true } );
+	}
+
+	onPickerClose() {
+		this.setState( { showModal: false } );
+	}
+
+	onMediaLibraryButtonPressed() {
 		const { mediaType } = this.props;
 
-		const onMediaLibraryButtonPressed = () => {
-			requestMediaPickFromMediaLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
-				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
-				}
-			} );
-		};
+		requestMediaPickFromMediaLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
+			if ( mediaId ) {
+				this.props.onSelectURL( mediaId, mediaUrl );
+			}
+		} );
+	}
 
-		const onMediaUploadButtonPressed = () => {
-			requestMediaPickFromDeviceLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
-				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
-				}
-			} );
-		};
+	onMediaUploadButtonPressed() {
+		const { mediaType } = this.props;
 
-		const onMediaCaptureButtonPressed = () => {
-			requestMediaPickFromDeviceCamera( [ mediaType ], ( mediaId, mediaUrl ) => {
-				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
-				}
-			} );
-		};
+		requestMediaPickFromDeviceLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
+			if ( mediaId ) {
+				this.props.onSelectURL( mediaId, mediaUrl );
+			}
+		} );
+	}
 
+	onMediaCaptureButtonPressed() {
+		const { mediaType } = this.props;
+
+		requestMediaPickFromDeviceCamera( [ mediaType ], ( mediaId, mediaUrl ) => {
+			if ( mediaId ) {
+				this.props.onSelectURL( mediaId, mediaUrl );
+			}
+		} );
+	}
+
+	render() {
 		const mediaOptions = this.getMediaOptionsItems();
-
-		let picker;
-
-		const onPickerPresent = () => {
-			picker.presentPicker();
-		};
 
 		const getMediaOptions = () => (
 			<Picker
+				isOpen={ this.state.showModal }
 				hideCancelButton={ true }
-				ref={ ( instance ) => picker = instance }
 				options={ mediaOptions }
 				onChange={ ( value ) => {
 					if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
-						onMediaUploadButtonPressed();
+						this.onMediaUploadButtonPressed();
 					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA ) {
-						onMediaCaptureButtonPressed();
+						this.onMediaCaptureButtonPressed();
 					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
-						onMediaLibraryButtonPressed();
+						this.onMediaLibraryButtonPressed();
 					}
+					this.onPickerClose();
 				} }
+				onClose={ this.onPickerClose }
 			/>
 		);
-		return this.props.render( { open: onPickerPresent, getMediaOptions } );
+		return this.props.render( { open: this.onPickerOpen, getMediaOptions } );
 	}
 }
 
