@@ -121,14 +121,14 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// or wildcard transforms are allowed.
 	const isMultiBlock = blocks.length > 1;
 	const firstBlockName = first( blocks ).name;
-	const isValidForMultiBlocks = isWildCardBlockTransform( transform ) || ! isMultiBlock || transform.isMultiBlock;
+	const isValidForMultiBlocks = isWildcardBlockTransform( transform ) || ! isMultiBlock || transform.isMultiBlock;
 	if ( ! isValidForMultiBlocks ) {
 		return false;
 	}
 
 	// Check non-wildcard transforms to ensure that transform is valid
 	// for a block selection of multiple blocks of different types
-	if ( ! isWildCardBlockTransform( transform ) && ! every( blocks, { name: firstBlockName } ) ) {
+	if ( ! isWildcardBlockTransform( transform ) && ! every( blocks, { name: firstBlockName } ) ) {
 		return false;
 	}
 
@@ -141,7 +141,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// Check if the transform's block name matches the source block (or is a wildcard)
 	// only if this is a transform 'from'.
 	const sourceBlock = first( blocks );
-	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1 || isWildCardBlockTransform( transform );
+	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1 || isWildcardBlockTransform( transform );
 	if ( ! hasMatchingName ) {
 		return false;
 	}
@@ -239,7 +239,7 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
  * @param  {Object} t Block transform object
  * @return {boolean}   whether transform is a wildcard transform
  */
-const isWildCardBlockTransform = ( t ) => t && t.type === 'block' && t.blocks.length && t.blocks[ 0 ] === '*';
+const isWildcardBlockTransform = ( t ) => t && t.type === 'block' && t.blocks.length && t.blocks[ 0 ] === '*';
 
 /**
  * Determines whether the given Block is the core Block which
@@ -385,11 +385,11 @@ export function switchToBlockType( blocks, name ) {
 	const transformation =
 		findTransform(
 			transformationsTo,
-			( t ) => t.type === 'block' && ( ( isWildCardBlockTransform( t ) ) || t.blocks.indexOf( name ) !== -1 ) && ( ! isMultiBlock || t.isMultiBlock )
+			( t ) => t.type === 'block' && ( ( isWildcardBlockTransform( t ) ) || t.blocks.indexOf( name ) !== -1 ) && ( ! isMultiBlock || t.isMultiBlock )
 		) ||
 		findTransform(
 			transformationsFrom,
-			( t ) => t.type === 'block' && ( ( isWildCardBlockTransform( t ) ) || t.blocks.indexOf( sourceName ) !== -1 ) && ( ! isMultiBlock || t.isMultiBlock )
+			( t ) => t.type === 'block' && ( ( isWildcardBlockTransform( t ) ) || t.blocks.indexOf( sourceName ) !== -1 ) && ( ! isMultiBlock || t.isMultiBlock )
 		);
 
 	// Stop if there is no valid transformation.
