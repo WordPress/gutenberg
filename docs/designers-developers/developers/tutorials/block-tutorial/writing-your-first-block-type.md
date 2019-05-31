@@ -90,16 +90,16 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 	icon: 'universal-access-alt',
 	category: 'layout',
 	edit() {
-		return <div style={ blockStyle }>Basic example with JSX! (editor)</div>;
+		return <div style={ blockStyle }>Hello World, step 1 (from the editor).</div>;
 	},
 	save() {
-		return <div style={ blockStyle }>Basic example with JSX! (front)</div>;
+		return <div style={ blockStyle }>Hello World, step 1 (from the frontend).</div>;
 	},
 } );
 ```
 {% end %}
 
-_By now you should be able to see `Hello editor` in the admin side and `Hello saved content` on the frontend side._
+_By now you should be able to see `Hello World, step 1 (from the editor).` in the admin side and `Hello World, step 1 (from the frontend).` on the frontend side._
 
 Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](/docs/designers-developers/developers/block-api/block-registration.md#icon-optional).
 
