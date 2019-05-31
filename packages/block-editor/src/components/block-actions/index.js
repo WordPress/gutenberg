@@ -16,7 +16,7 @@ function BlockActions( {
 	onInsertBefore,
 	onInsertAfter,
 	onGroup,
-	onUnGroup,
+	onUngroup,
 	isLocked,
 	canDuplicate,
 	children,
@@ -27,7 +27,7 @@ function BlockActions( {
 		onInsertAfter,
 		onInsertBefore,
 		onGroup,
-		onUnGroup,
+		onUngroup,
 		isLocked,
 		canDuplicate,
 	} );
@@ -129,7 +129,7 @@ export default compose( [
 				);
 			},
 
-			onUnGroup() {
+			onUngroup() {
 				if ( ! blocks.length ) {
 					return;
 				}

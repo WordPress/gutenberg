@@ -100,7 +100,7 @@ class BlockEditorKeyboardShortcuts extends Component {
 				/>
 				{ selectedBlockClientIds.length > 0 && (
 					<BlockActions clientIds={ selectedBlockClientIds }>
-						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, onGroup, onUnGroup } ) => (
+						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, onGroup, onUngroup } ) => (
 							<KeyboardShortcuts
 								bindGlobal
 								shortcuts={ {
@@ -125,7 +125,7 @@ class BlockEditorKeyboardShortcuts extends Component {
 
 									// Does not clash with any known browser/native shortcuts, but preventDefault
 									// is used to prevent any obscure unknown shortcuts from triggering.
-									[ shortcuts.ungroup.raw ]: flow( preventDefault, onUnGroup ),
+									[ shortcuts.ungroup.raw ]: flow( preventDefault, onUngroup ),
 								} }
 							/>
 						) }
