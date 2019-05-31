@@ -434,6 +434,7 @@ export class TableEdit extends Component {
 							value={ initialColumnCount }
 							onChange={ this.onChangeInitialColumnCount }
 							min="1"
+							className="wp-block-table__placeholder-input"
 						/>
 						<TextControl
 							type="number"
@@ -441,8 +442,9 @@ export class TableEdit extends Component {
 							value={ initialRowCount }
 							onChange={ this.onChangeInitialRowCount }
 							min="1"
+							className="wp-block-table__placeholder-input"
 						/>
-						<Button isDefault type="submit">{ __( 'Create Table' ) }</Button>
+						<Button className="wp-block-table__placeholder-button" isDefault type="submit">{ __( 'Create Table' ) }</Button>
 					</form>
 				</Placeholder>
 			);
