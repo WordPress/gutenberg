@@ -256,6 +256,7 @@ class CoverEdit extends Component {
 				'is-dark-theme': this.state.isDark,
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
+				[ overlayColor.class ]: overlayColor.class,
 			}
 		);
 
