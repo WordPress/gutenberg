@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -29,7 +28,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 		<PanelBody className="edit-post-post-status" title={ __( 'Status & Visibility' ) } opened={ isOpened } onToggle={ onTogglePanel }>
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
-					<Fragment>
+					<>
 						<PostVisibility />
 						<PostSchedule />
 						<PostFormat />
@@ -38,7 +37,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 						<PostAuthor />
 						{ fills }
 						<PostTrash />
-					</Fragment>
+					</>
 				) }
 			</PluginPostStatusInfo.Slot>
 		</PanelBody>

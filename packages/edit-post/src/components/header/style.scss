@@ -59,6 +59,10 @@
 
 @include editor-left(".edit-post-header");
 
+.edit-post-header__toolbar {
+	display: flex;
+}
+
 .edit-post-header__settings {
 	display: inline-flex;
 	align-items: center;

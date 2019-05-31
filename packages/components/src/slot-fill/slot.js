@@ -15,7 +15,6 @@ import {
 	Children,
 	Component,
 	cloneElement,
-	Fragment,
 	isEmptyElement,
 } from '@wordpress/element';
 
@@ -65,7 +64,7 @@ class SlotComponent extends Component {
 
 		const fills = map( getFills( name, this ), ( fill ) => {
 			const fillKey = fill.occurrence;
-			const fillChildren = isFunction( fill.props.children ) ? fill.props.children( fillProps ) : fill.props.children;
+			const fillChildren = isFunction( fill.children ) ? fill.children( fillProps ) : fill.children;
 
 			return Children.map( fillChildren, ( child, childIndex ) => {
 				if ( ! child || isString( child ) ) {
@@ -83,9 +82,9 @@ class SlotComponent extends Component {
 		);
 
 		return (
-			<Fragment>
+			<>
 				{ isFunction( children ) ? children( fills ) : fills }
-			</Fragment>
+			</>
 		);
 	}
 }

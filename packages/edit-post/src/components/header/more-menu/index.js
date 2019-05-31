@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,7 +31,7 @@ const MoreMenu = () => (
 			/>
 		) }
 		renderContent={ ( { onClose } ) => (
-			<Fragment>
+			<>
 				<WritingMenu />
 				<ModeSwitcher />
 				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
@@ -40,7 +39,7 @@ const MoreMenu = () => (
 				<MenuGroup>
 					<OptionsMenuItem onSelect={ onClose } />
 				</MenuGroup>
-			</Fragment>
+			</>
 		) }
 	/>
 );

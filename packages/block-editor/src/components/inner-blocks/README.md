@@ -71,7 +71,7 @@ The previous code block restricts all blocks, so only child blocks explicitly re
 * **Type:** `Array<Array<Object>>`
 
 The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc. Block templates allow specifying a default initial state for an InnerBlocks area.
-More information about templates can be found in [template docs](https://wordpress.org/gutenberg/handbook/templates/).
+More information about templates can be found in [template docs](/docs/developers/block-api/block-templates.md).
 
 ```jsx
 const TEMPLATE = [ [ 'core/columns', {}, [
@@ -100,14 +100,14 @@ If false the selection should not be updated when child blocks specified in the 
 ### `templateLock`
 * **Type:** `String|Boolean`
 
-Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](https://wordpress.org/gutenberg/handbook/templates/#locking).
+Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/developers/block-api/block-templates.md#locking).
 
 Template locking allows locking the `InnerBlocks` area for the current template.
 *Options:*
 
-- `all` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
-- `insert` — prevents inserting or removing blocks, but allows moving existing ones.
-- `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking.
+- `'all'` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
+- `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
+- `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
 
 If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.
 

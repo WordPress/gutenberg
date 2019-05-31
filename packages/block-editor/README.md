@@ -16,7 +16,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ```js
 import {
-	BlockEditorProvider
+	BlockEditorProvider,
 	BlockList
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
@@ -56,7 +56,7 @@ In the example above, there's no registered block type, in order to use the bloc
 ```js
 import { registerCoreBlocks } from '@wordpress/block-library';
 
-registerCoreBlockTypes();
+registerCoreBlocks();
 
 // Make sure to load the block stylesheets too
 // import '@wordpress/block-library/build-style/style.css';
@@ -369,6 +369,7 @@ The default editor settings
  isRTL                         boolean       Whether the editor is in RTL mode
  bodyPlaceholder               string        Empty post placeholder
  titlePlaceholder              string        Empty title placeholder
+ codeEditingEnabled            string        Whether or not the user can switch to the code editor
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 

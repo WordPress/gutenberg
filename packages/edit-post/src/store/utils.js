@@ -4,10 +4,15 @@
  *
  * @param  {function} selector Selector.
  * @param  {function} listener Listener.
+ * @param  {boolean}  initial  Flags whether listener should be invoked on
+ *                             initial call.
  * @return {function}          Listener creator.
  */
-export const onChangeListener = ( selector, listener ) => {
+export const onChangeListener = ( selector, listener, initial = false ) => {
 	let previousValue = selector();
+	if ( initial ) {
+		listener( selector() );
+	}
 	return () => {
 		const selectedValue = selector();
 		if ( selectedValue !== previousValue ) {

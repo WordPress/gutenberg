@@ -8,16 +8,15 @@ import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+import { dispatch, select, apiFetch } from '@wordpress/data-controls';
+import {
+	parse,
+	synchronizeBlocksWithTemplate,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import {
-	dispatch,
-	select,
-	resolveSelect,
-	apiFetch,
-} from './controls';
 import {
 	getPostRawValue,
 } from './reducer';
@@ -33,14 +32,6 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-
-/**
- * WordPress dependencies
- */
-import {
-	parse,
-	synchronizeBlocksWithTemplate,
-} from '@wordpress/blocks';
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -323,7 +314,7 @@ export function* savePost( options = {} ) {
 		'getCurrentPostType'
 	);
 
-	const postType = yield resolveSelect(
+	const postType = yield select(
 		'core',
 		'getPostType',
 		currentPostType
@@ -347,9 +338,9 @@ export function* savePost( options = {} ) {
 	let path = `/wp/v2/${ postType.rest_base }/${ post.id }`;
 	let method = 'PUT';
 	if ( isAutosave ) {
-		const currentUser = yield resolveSelect( 'core', 'getCurrentUser' );
+		const currentUser = yield select( 'core', 'getCurrentUser' );
 		const currentUserId = currentUser ? currentUser.id : undefined;
-		const autosavePost = yield resolveSelect( 'core', 'getAutosave', post.type, post.id, currentUserId );
+		const autosavePost = yield select( 'core', 'getAutosave', post.type, post.id, currentUserId );
 		const mappedAutosavePost = mapValues( pick( autosavePost, AUTOSAVE_PROPERTIES ), getPostRawValue );
 
 		// Ensure autosaves contain all expected fields, using autosave or
@@ -365,12 +356,12 @@ export function* savePost( options = {} ) {
 		yield dispatch(
 			'core/notices',
 			'removeNotice',
-			SAVE_POST_NOTICE_ID,
+			SAVE_POST_NOTICE_ID
 		);
 		yield dispatch(
 			'core/notices',
 			'removeNotice',
-			'autosave-exists',
+			'autosave-exists'
 		);
 	}
 
@@ -448,7 +439,7 @@ export function* refreshPost() {
 		STORE_KEY,
 		'getCurrentPostType'
 	);
-	const postType = yield resolveSelect(
+	const postType = yield select(
 		'core',
 		'getPostType',
 		postTypeSlug
@@ -476,7 +467,7 @@ export function* trashPost() {
 		STORE_KEY,
 		'getCurrentPostType'
 	);
-	const postType = yield resolveSelect(
+	const postType = yield select(
 		'core',
 		'getPostType',
 		postTypeSlug
@@ -769,33 +760,157 @@ const getBlockEditorAction = ( name ) => function* ( ...args ) {
 	yield dispatch( 'core/block-editor', name, ...args );
 };
 
+/**
+ * @see resetBlocks in core/block-editor store.
+ */
 export const resetBlocks = getBlockEditorAction( 'resetBlocks' );
+
+/**
+ * @see receiveBlocks in core/block-editor store.
+ */
 export const receiveBlocks = getBlockEditorAction( 'receiveBlocks' );
+
+/**
+ * @see updateBlock in core/block-editor store.
+ */
 export const updateBlock = getBlockEditorAction( 'updateBlock' );
+
+/**
+ * @see updateBlockAttributes in core/block-editor store.
+ */
 export const updateBlockAttributes = getBlockEditorAction( 'updateBlockAttributes' );
+
+/**
+ * @see selectBlock in core/block-editor store.
+ */
 export const selectBlock = getBlockEditorAction( 'selectBlock' );
+
+/**
+ * @see startMultiSelect in core/block-editor store.
+ */
 export const startMultiSelect = getBlockEditorAction( 'startMultiSelect' );
+
+/**
+ * @see stopMultiSelect in core/block-editor store.
+ */
 export const stopMultiSelect = getBlockEditorAction( 'stopMultiSelect' );
+
+/**
+ * @see multiSelect in core/block-editor store.
+ */
 export const multiSelect = getBlockEditorAction( 'multiSelect' );
+
+/**
+ * @see clearSelectedBlock in core/block-editor store.
+ */
 export const clearSelectedBlock = getBlockEditorAction( 'clearSelectedBlock' );
+
+/**
+ * @see toggleSelection in core/block-editor store.
+ */
 export const toggleSelection = getBlockEditorAction( 'toggleSelection' );
+
+/**
+ * @see replaceBlocks in core/block-editor store.
+ */
 export const replaceBlocks = getBlockEditorAction( 'replaceBlocks' );
+
+/**
+ * @see replaceBlock in core/block-editor store.
+ */
+export const replaceBlock = getBlockEditorAction( 'replaceBlock' );
+
+/**
+ * @see moveBlocksDown in core/block-editor store.
+ */
 export const moveBlocksDown = getBlockEditorAction( 'moveBlocksDown' );
+
+/**
+ * @see moveBlocksUp in core/block-editor store.
+ */
 export const moveBlocksUp = getBlockEditorAction( 'moveBlocksUp' );
+
+/**
+ * @see moveBlockToPosition in core/block-editor store.
+ */
 export const moveBlockToPosition = getBlockEditorAction( 'moveBlockToPosition' );
+
+/**
+ * @see insertBlock in core/block-editor store.
+ */
 export const insertBlock = getBlockEditorAction( 'insertBlock' );
+
+/**
+ * @see insertBlocks in core/block-editor store.
+ */
 export const insertBlocks = getBlockEditorAction( 'insertBlocks' );
+
+/**
+ * @see showInsertionPoint in core/block-editor store.
+ */
 export const showInsertionPoint = getBlockEditorAction( 'showInsertionPoint' );
+
+/**
+ * @see hideInsertionPoint in core/block-editor store.
+ */
 export const hideInsertionPoint = getBlockEditorAction( 'hideInsertionPoint' );
+
+/**
+ * @see setTemplateValidity in core/block-editor store.
+ */
 export const setTemplateValidity = getBlockEditorAction( 'setTemplateValidity' );
+
+/**
+ * @see synchronizeTemplate in core/block-editor store.
+ */
 export const synchronizeTemplate = getBlockEditorAction( 'synchronizeTemplate' );
+
+/**
+ * @see mergeBlocks in core/block-editor store.
+ */
 export const mergeBlocks = getBlockEditorAction( 'mergeBlocks' );
+
+/**
+ * @see removeBlocks in core/block-editor store.
+ */
 export const removeBlocks = getBlockEditorAction( 'removeBlocks' );
+
+/**
+ * @see removeBlock in core/block-editor store.
+ */
 export const removeBlock = getBlockEditorAction( 'removeBlock' );
+
+/**
+ * @see toggleBlockMode in core/block-editor store.
+ */
 export const toggleBlockMode = getBlockEditorAction( 'toggleBlockMode' );
+
+/**
+ * @see startTyping in core/block-editor store.
+ */
 export const startTyping = getBlockEditorAction( 'startTyping' );
+
+/**
+ * @see stopTyping in core/block-editor store.
+ */
 export const stopTyping = getBlockEditorAction( 'stopTyping' );
+
+/**
+ * @see enterFormattedText in core/block-editor store.
+ */
 export const enterFormattedText = getBlockEditorAction( 'enterFormattedText' );
+
+/**
+ * @see exitFormattedText in core/block-editor store.
+ */
 export const exitFormattedText = getBlockEditorAction( 'exitFormattedText' );
+
+/**
+ * @see insertDefaultBlock in core/block-editor store.
+ */
 export const insertDefaultBlock = getBlockEditorAction( 'insertDefaultBlock' );
+
+/**
+ * @see updateBlockListSettings in core/block-editor store.
+ */
 export const updateBlockListSettings = getBlockEditorAction( 'updateBlockListSettings' );

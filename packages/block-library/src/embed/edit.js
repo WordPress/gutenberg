@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isFromWordPress, createUpgradedEmbedBlock, getClassNames, fallback } from './util';
+import { createUpgradedEmbedBlock, getClassNames, fallback, getAttributesFromPreview } from './util';
 import EmbedControls from './embed-controls';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
@@ -10,13 +10,13 @@ import EmbedPreview from './embed-preview';
 /**
  * External dependencies
  */
-import { kebabCase, toLower } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 export function getEmbedEditComponent( title, icon, responsive = true ) {
 	return class extends Component {
@@ -24,8 +24,8 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			super( ...arguments );
 			this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
 			this.setUrl = this.setUrl.bind( this );
-			this.getAttributesFromPreview = this.getAttributesFromPreview.bind( this );
-			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
+			this.getMergedAttributes = this.getMergedAttributes.bind( this );
+			this.setMergedAttributes = this.setMergedAttributes.bind( this );
 			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
 			this.toggleResponsive = this.toggleResponsive.bind( this );
 			this.handleIncomingPreview = this.handleIncomingPreview.bind( this );
@@ -41,14 +41,15 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		}
 
 		handleIncomingPreview() {
-			const { allowResponsive } = this.props.attributes;
-			this.setAttributesFromPreview();
-			const upgradedBlock = createUpgradedEmbedBlock(
-				this.props,
-				this.getAttributesFromPreview( this.props.preview, allowResponsive )
-			);
-			if ( upgradedBlock ) {
-				this.props.onReplace( upgradedBlock );
+			this.setMergedAttributes();
+			if ( this.props.onReplace ) {
+				const upgradedBlock = createUpgradedEmbedBlock(
+					this.props,
+					this.getMergedAttributes()
+				);
+				if ( upgradedBlock ) {
+					this.props.onReplace( upgradedBlock );
+				}
 			}
 		}
 
@@ -90,42 +91,20 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		}
 
 		/***
-		 * Gets block attributes based on the preview and responsive state.
-		 *
-		 * @param {string} preview The preview data.
-		 * @param {boolean} allowResponsive Apply responsive classes to fixed size content.
-		 * @return {Object} Attributes and values.
+		 * @return {Object} Attributes derived from the preview, merged with the current attributes.
 		 */
-		getAttributesFromPreview( preview, allowResponsive = true ) {
-			const attributes = {};
-			// Some plugins only return HTML with no type info, so default this to 'rich'.
-			let { type = 'rich' } = preview;
-			// If we got a provider name from the API, use it for the slug, otherwise we use the title,
-			// because not all embed code gives us a provider name.
-			const { html, provider_name: providerName } = preview;
-			const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
-
-			if ( isFromWordPress( html ) ) {
-				type = 'wp-embed';
-			}
-
-			if ( html || 'photo' === type ) {
-				attributes.type = type;
-				attributes.providerNameSlug = providerNameSlug;
-			}
-
-			attributes.className = getClassNames( html, this.props.attributes.className, responsive && allowResponsive );
-
-			return attributes;
+		getMergedAttributes() {
+			const { preview } = this.props;
+			const { className, allowResponsive } = this.props.attributes;
+			return { ...this.props.attributes, ...getAttributesFromPreview( preview, title, className, responsive, allowResponsive ) };
 		}
 
 		/***
-		 * Sets block attributes based on the preview data.
+		 * Sets block attributes based on the current attributes and preview data.
 		 */
-		setAttributesFromPreview() {
-			const { setAttributes, preview } = this.props;
-			const { allowResponsive } = this.props.attributes;
-			setAttributes( this.getAttributesFromPreview( preview, allowResponsive ) );
+		setMergedAttributes() {
+			const { setAttributes } = this.props;
+			setAttributes( this.getMergedAttributes() );
 		}
 
 		switchBackToURLInput() {
@@ -151,8 +130,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 
 		render() {
 			const { url, editingURL } = this.state;
-			const { caption, type, allowResponsive } = this.props.attributes;
-			const { fetching, setAttributes, isSelected, className, preview, cannotEmbed, themeSupportsResponsive, tryAgain } = this.props;
+			const { fetching, setAttributes, isSelected, preview, cannotEmbed, themeSupportsResponsive, tryAgain } = this.props;
 
 			if ( fetching ) {
 				return (
@@ -179,8 +157,20 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 				);
 			}
 
+			// Even though we set attributes that get derived from the preview,
+			// we don't access them directly because for the initial render,
+			// the `setAttributes` call will not have taken effect. If we're
+			// rendering responsive content, setting the responsive classes
+			// after the preview has been rendered can result in unwanted
+			// clipping or scrollbars. The `getAttributesFromPreview` function
+			// that `getMergedAttributes` uses is memoized so that we're not
+			// calculating them on every render.
+			const previewAttributes = this.getMergedAttributes();
+			const { caption, type, allowResponsive } = previewAttributes;
+			const className = classnames( previewAttributes.className, this.props.className );
+
 			return (
-				<Fragment>
+				<>
 					<EmbedControls
 						showEditButton={ preview && ! cannotEmbed }
 						themeSupportsResponsive={ themeSupportsResponsive }
@@ -201,7 +191,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						icon={ icon }
 						label={ label }
 					/>
-				</Fragment>
+				</>
 			);
 		}
 	};

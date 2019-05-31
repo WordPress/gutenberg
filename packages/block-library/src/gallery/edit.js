@@ -23,7 +23,7 @@ import {
 	MediaUpload,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -50,6 +50,9 @@ class GalleryEdit extends Component {
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
+		this.onMove = this.onMove.bind( this );
+		this.onMoveForward = this.onMoveForward.bind( this );
+		this.onMoveBackward = this.onMoveBackward.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
@@ -81,6 +84,32 @@ class GalleryEdit extends Component {
 					selectedImage: index,
 				} );
 			}
+		};
+	}
+
+	onMove( oldIndex, newIndex ) {
+		const images = [ ...this.props.attributes.images ];
+		images.splice( newIndex, 1, this.props.attributes.images[ oldIndex ] );
+		images.splice( oldIndex, 1, this.props.attributes.images[ newIndex ] );
+		this.setState( { selectedImage: newIndex } );
+		this.setAttributes( { images } );
+	}
+
+	onMoveForward( oldIndex ) {
+		return () => {
+			if ( oldIndex === this.props.attributes.images.length - 1 ) {
+				return;
+			}
+			this.onMove( oldIndex, oldIndex + 1 );
+		};
+	}
+
+	onMoveBackward( oldIndex ) {
+		return () => {
+			if ( oldIndex === 0 ) {
+				return;
+			}
+			this.onMove( oldIndex, oldIndex - 1 );
 		};
 	}
 
@@ -201,15 +230,15 @@ class GalleryEdit extends Component {
 
 		if ( ! hasImages ) {
 			return (
-				<Fragment>
+				<>
 					{ controls }
 					{ mediaPlaceholder }
-				</Fragment>
+				</>
 			);
 		}
 
 		return (
-			<Fragment>
+			<>
 				{ controls }
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery Settings' ) }>
@@ -256,7 +285,11 @@ class GalleryEdit extends Component {
 									url={ img.url }
 									alt={ img.alt }
 									id={ img.id }
+									isFirstItem={ index === 0 }
+									isLastItem={ ( index + 1 ) === images.length }
 									isSelected={ isSelected && this.state.selectedImage === index }
+									onMoveBackward={ this.onMoveBackward( index ) }
+									onMoveForward={ this.onMoveForward( index ) }
 									onRemove={ this.onRemoveImage( index ) }
 									onSelect={ this.onSelectImage( index ) }
 									setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
@@ -268,7 +301,7 @@ class GalleryEdit extends Component {
 					} ) }
 				</ul>
 				{ mediaPlaceholder }
-			</Fragment>
+			</>
 		);
 	}
 }

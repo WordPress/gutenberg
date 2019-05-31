@@ -208,4 +208,19 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should handle Home and End keys', async () => {
+		await page.keyboard.press( 'Enter' );
+
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '12' );
+		await pressKeyWithModifier( 'primary', 'b' );
+
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.type( '-' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '+' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
