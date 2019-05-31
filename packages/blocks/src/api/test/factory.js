@@ -15,6 +15,7 @@ import {
 	getBlockTransforms,
 	findTransform,
 	isWildcardBlockTransform,
+	isContainerGroupBlock,
 } from '../factory';
 import {
 	getBlockType,
@@ -1450,6 +1451,16 @@ describe( 'block factory', () => {
 			};
 
 			expect( isWildcardBlockTransform( invalidWildcardBlockTransform ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isContainerGroupBlock', () => {
+		it( 'should return true when passed block name matches "core/group"', () => {
+			expect( isContainerGroupBlock( 'core/group' ) ).toBe( true );
+		} );
+
+		it( 'should return false when passed block name does not match "core/group"', () => {
+			expect( isContainerGroupBlock( 'core/some-test-name' ) ).toBe( false );
 		} );
 	} );
 } );

@@ -248,7 +248,7 @@ export const isWildcardBlockTransform = ( t ) => t && t.type === 'block' && t.bl
  * @param  {string} name the name of the Block to test against
  * @return {boolean}      whether or not the Block is the container Block type
  */
-const isContainerGroupBlock = ( name ) => name === 'core/group';
+export const isContainerGroupBlock = ( name ) => name === 'core/group';
 
 /**
  * Determines whether the provided Blocks are a multi Block selection
