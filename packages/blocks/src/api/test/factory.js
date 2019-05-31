@@ -2,7 +2,7 @@
  * External dependencies
  */
 import deepFreeze from 'deep-freeze';
-import { noop } from 'lodash';
+import { noop, times } from 'lodash';
 
 /**
  * Internal dependencies
@@ -775,6 +775,81 @@ describe( 'block factory', () => {
 			getPossibleBlockTransformations( [ meatBlock, cheeseBlock ] );
 
 			expect( isMatch ).toHaveBeenCalledWith( [ { value: 'ribs' }, { value: 'halloumi' } ] );
+		} );
+
+		describe( 'wildcard block transforms', () => {
+			beforeEach( () => {
+				registerBlockType( 'core/group', {
+					attributes: {
+						value: {
+							type: 'string',
+						},
+					},
+					transforms: {
+						from: [ {
+							type: 'block',
+							blocks: [ '*' ],
+							transform: noop,
+						} ],
+					},
+					save: noop,
+					category: 'common',
+					title: 'A block that groups other blocks.',
+				} );
+			} );
+
+			it( 'should should show wildcard "from" transformation as available for multiple blocks of the same type', () => {
+				registerBlockType( 'core/text-block', defaultBlockSettings );
+				registerBlockType( 'core/image-block', defaultBlockSettings );
+
+				const textBlocks = times( 4, ( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				} );
+
+				const availableBlocks = getPossibleBlockTransformations( textBlocks );
+
+				expect( availableBlocks ).toHaveLength( 1 );
+				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
+			} );
+
+			it( 'should should show wildcard "from" transformation as available for multiple blocks of different types', () => {
+				registerBlockType( 'core/text-block', defaultBlockSettings );
+				registerBlockType( 'core/image-block', defaultBlockSettings );
+
+				const textBlocks = times( 2, ( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				} );
+
+				const imageBlocks = times( 2, ( index ) => {
+					return createBlock( 'core/image-block', {
+						value: `imageBlock${ index + 1 }`,
+					} );
+				} );
+
+				const availableBlocks = getPossibleBlockTransformations( [ ...textBlocks, ...imageBlocks ] );
+
+				expect( availableBlocks ).toHaveLength( 1 );
+				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
+			} );
+
+			it( 'should should show wildcard "from" transformation as available for single blocks', () => {
+				registerBlockType( 'core/text-block', defaultBlockSettings );
+
+				const blocks = times( 1, ( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				} );
+
+				const availableBlocks = getPossibleBlockTransformations( blocks );
+
+				expect( availableBlocks ).toHaveLength( 1 );
+				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
+			} );
 		} );
 	} );
 
