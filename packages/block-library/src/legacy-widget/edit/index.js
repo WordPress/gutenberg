@@ -1,29 +1,17 @@
 /**
- * External dependencies
- */
-import {
-	map,
-	isEmpty,
-	pickBy,
-} from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Component, useMemo } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	Button,
 	IconButton,
 	PanelBody,
-	Placeholder,
-	SelectControl,
 	Toolbar,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import {
 	BlockControls,
-	BlockIcon,
 	InspectorControls,
 } from '@wordpress/block-editor';
 import { ServerSideRender } from '@wordpress/editor';
@@ -32,51 +20,7 @@ import { ServerSideRender } from '@wordpress/editor';
  * Internal dependencies
  */
 import LegacyWidgetEditHandler from './handler';
-
-const LegacyWidgetPlaceholder = ( {
-	availableLegacyWidgets,
-	currentWidget,
-	hasPermissionsToManageWidgets,
-	onChangeWidget,
-} ) => {
-	const visibleLegacyWidgets = useMemo(
-		() => pickBy(
-			availableLegacyWidgets,
-			( { isHidden } ) => ! isHidden
-		),
-		[ availableLegacyWidgets ]
-	);
-	let placeholderContent;
-	if ( ! hasPermissionsToManageWidgets ) {
-		placeholderContent = __( 'You don\'t have permissions to use widgets on this site.' );
-	}
-	if ( isEmpty( visibleLegacyWidgets ) ) {
-		placeholderContent = __( 'There are no widgets available.' );
-	}
-	placeholderContent = (
-		<SelectControl
-			label={ __( 'Select a legacy widget to display:' ) }
-			value={ currentWidget || 'none' }
-			onChange={ onChangeWidget }
-			options={ [ { value: 'none', label: 'Select widget' } ].concat(
-				map( visibleLegacyWidgets, ( widget, key ) => {
-					return {
-						value: key,
-						label: widget.name,
-					};
-				} )
-			) }
-		/>
-	);
-	return (
-		<Placeholder
-			icon={ <BlockIcon icon="admin-customizer" /> }
-			label={ __( 'Legacy Widget' ) }
-		>
-			{ placeholderContent }
-		</Placeholder>
-	);
-};
+import LegacyWidgetPlaceholder from './placeholder';
 
 class LegacyWidgetEdit extends Component {
 	constructor() {
