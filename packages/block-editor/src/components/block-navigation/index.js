@@ -12,6 +12,7 @@ import { Button, NavigableMenu } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,10 +36,25 @@ function BlockNavigationList( {
 				const blockType = getBlockType( block.name );
 				const isSelected = block.clientId === selectedBlockClientId;
 
+				/* HTML equivalent code
+				 * document.getElementsByClassName("editor-block-navigation__container")[0].closest(".components-popover__content").scrollTop
+				 *		= document.getElementsByClassName("components-button is-selected")[0].offsetTop
+				 */
+
+				const blockEl = useRef( null );
+
+				// similar to componentDidMount and componentDidUpdate
+				useEffect( () => {
+					if ( isSelected ) {
+						blockEl.current.closest( '.components-popover__content' ).scrollTop = block.offsetTop;
+					}
+				} );
+
 				return (
 					<li key={ block.clientId }>
 						<div className="editor-block-navigation__item block-editor-block-navigation__item">
 							<Button
+								ref={ blockEl }
 								className={ classnames( 'editor-block-navigation__item-button block-editor-block-navigation__item-button', {
 									'is-selected': isSelected,
 								} ) }
