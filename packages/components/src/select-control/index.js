@@ -31,9 +31,7 @@ function SelectControl( {
 			onChange( newValues );
 			return;
 		}
-		const dataSet = event.target[ event.target.selectedIndex ].dataset;
-		const elementData = JSON.parse( JSON.stringify( dataSet ) );
-		onChange( event.target.value, elementData );
+		onChange( event.target.value );
 	};
 
 	// Disable reason: A select with an onchange throws a warning
@@ -53,7 +51,6 @@ function SelectControl( {
 					<option
 						key={ `${ option.label }-${ option.value }-${ index }` }
 						value={ option.value }
-						{ ...option.data }
 					>
 						{ option.label }
 					</option>

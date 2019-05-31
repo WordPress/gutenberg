@@ -163,13 +163,7 @@ class ImageEdit extends Component {
 				captionFocused: false,
 			} );
 		}
-		let mediaSizeClass = this.props.attributes.mediaSizeClass;
-		if ( ! mediaSizeClass ) {
-			mediaSizeClass = 'size-' + this.getImageSizeByURL();
-			this.props.setAttributes( {
-				mediaSizeClass,
-			} );
-		}
+		this.updateImageURL( url );
 	}
 
 	onUploadError( message ) {
@@ -199,7 +193,6 @@ class ImageEdit extends Component {
 			...pickRelevantMediaFiles( media ),
 			width: undefined,
 			height: undefined,
-			mediaSizeClass: 'size-large',
 		} );
 	}
 
@@ -303,12 +296,12 @@ class ImageEdit extends Component {
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
-	updateImageURL( url, data ) {
+	updateImageURL( url ) {
 		this.props.setAttributes( {
 			url,
 			width: undefined,
 			height: undefined,
-			mediaSizeClass: 'size-' + data.slug,
+			sizeSlug: this.getImageSizeByURL( url ),
 		} );
 	}
 
@@ -363,14 +356,12 @@ class ImageEdit extends Component {
 			return {
 				value: sizeUrl,
 				label: name,
-				data: { 'data-slug': slug },
 			};
 		} ) );
 	}
 
-	getImageSizeByURL() {
+	getImageSizeByURL( url ) {
 		const { image } = this.props;
-		const { url } = this.props.attributes;
 		const imageSizes = get( image, [ 'media_details', 'sizes' ] );
 		const imageSize = findKey( imageSizes, { source_url: url } );
 		return imageSize;
@@ -402,8 +393,9 @@ class ImageEdit extends Component {
 			width,
 			height,
 			linkTarget,
-			mediaSizeClass,
+			sizeSlug,
 		} = attributes;
+
 		const isExternal = isExternalImage( id, url );
 		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		const controls = (
@@ -463,12 +455,17 @@ class ImageEdit extends Component {
 			);
 		}
 
-		const classNameWithoutSize = className.replace( /(\s+?)size-(.*?)(\s+?)/, '' );
-		const classes = classnames( classNameWithoutSize.value, {
+		let classes = classnames( {
 			'is-transient': isBlobURL( url ),
 			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
-		}, mediaSizeClass );
+		} );
+
+		if ( sizeSlug ) {
+			const mediaSizeClass = 'size-' + sizeSlug;
+			const classNameWithoutSize = classes.replace( /(\s+?)size-(.*?)(\s+?)/, '' );
+			classes = classnames( classNameWithoutSize, mediaSizeClass );
+		}
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;

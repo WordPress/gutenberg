@@ -21,13 +21,18 @@ export default function save( { attributes } ) {
 		height,
 		id,
 		linkTarget,
-		mediaSizeClass,
+		sizeSlug,
 	} = attributes;
 
-	const classes = classnames( {
+	let classes = classnames( {
 		[ `align${ align }` ]: align,
 		'is-resized': width || height,
-	}, mediaSizeClass );
+	} );
+
+	if ( sizeSlug ) {
+		const mediaSizeClass = 'size-' + sizeSlug;
+		classes = classnames( classes, mediaSizeClass );
+	}
 
 	const image = (
 		<img

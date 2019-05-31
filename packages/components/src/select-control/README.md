@@ -144,13 +144,12 @@ If this property is added, multiple values can be selected. The value passed sho
 An array of objects containing the following properties:
 - `label`: (string) The label to be shown to the user.
 - `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
-- `data`: (Object) The data set that will be applied to the option. For each item in `data` there will be a corresponding `data-` attribute with the value of the item.
 - Type: `Array`
 - Required: No
 
 #### onChange
 
-A function that receives the value, and the dataset if any, of the new option that is being selected as input.
+A function that receives the value of the new option that is being selected as input.
 If multiple is true the value received is an array of the selected value.
 If multiple is false the value received is a single value with the new selected value.
 - Type: `function`
