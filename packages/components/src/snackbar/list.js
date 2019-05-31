@@ -27,41 +27,42 @@ import Snackbar from './';
 * @return {Object}                The rendered notices list.
 */
 function SnackbarList( { notices, className, children, onRemove = noop } ) {
-	className = classnames( 'components-snackbar-list', className );
-	const removeNotice = ( id ) => () => onRemove( id );
-
 	const isReducedMotion = useReducedMotion();
 	const [ refMap ] = useState( () => new WeakMap() );
-	const [ cancelMap ] = useState( () => new WeakMap() );
 	const transitions = useTransition(
 		notices,
 		( notice ) => notice.id,
 		{
 			from: { opacity: 0, height: 0 },
 			enter: ( item ) => async ( next ) => await next( { opacity: 1, height: refMap.get( item ).offsetHeight } ),
-			leave: ( item ) => async ( next, cancel ) => {
-				cancelMap.set( item, cancel );
-				// await next( { life: '0%' } );
+			leave: () => async ( next ) => {
 				await next( { opacity: 0 } );
 				await next( { height: 0 } );
 			},
-			config: { tension: 300 },
 			immediate: isReducedMotion,
+			config: { tension: 300 },
 		}
 	);
+
+	className = classnames( 'components-snackbar-list', className );
+	const removeNotice = ( notice ) => () => onRemove( notice.id );
 
 	return (
 		<div className={ className }>
 			{ children }
 			{ transitions.map( ( { item: notice, key, props: style } ) => (
 				<animated.div key={ key } style={ style }>
-					<Snackbar
+					<div
+						className="components-snackbar-list__notice-container"
 						ref={ ( ref ) => ref && refMap.set( notice, ref ) }
-						{ ...omit( notice, [ 'content' ] ) }
-						onRemove={ removeNotice( notice.id ) }
 					>
-						{ notice.content }
-					</Snackbar>
+						<Snackbar
+							{ ...omit( notice, [ 'content' ] ) }
+							onRemove={ removeNotice( notice ) }
+						>
+							{ notice.content }
+						</Snackbar>
+					</div>
 				</animated.div>
 			) ) }
 		</div>
