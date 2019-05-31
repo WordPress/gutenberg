@@ -34,7 +34,7 @@ export function ConvertToGroupButton( {
 					onClick={ onConvertToGroup }
 					shortcut={ displayShortcut.primaryAlt( 'g' ) }
 				>
-					{ _x( 'Group', 'Grouping a selection of blocks together within the Editor' ) }
+					{ _x( 'Group', 'verb' ) }
 				</MenuItem>
 			) }
 			{ isUnGroupable && (
