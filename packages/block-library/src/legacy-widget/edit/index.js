@@ -134,12 +134,13 @@ class LegacyWidgetEdit extends Component {
 			<>
 				<BlockControls>
 					<Toolbar>
-						<IconButton
-							onClick={ this.changeWidget }
-							label={ __( 'Change widget' ) }
-							icon="update"
-						>
-						</IconButton>
+						{ ! widgetObject.isHidden && (
+							<IconButton
+								onClick={ this.changeWidget }
+								label={ __( 'Change widget' ) }
+								icon="update"
+							/>
+						) }
 						{ ! isCallbackWidget && (
 							<>
 								<Button
