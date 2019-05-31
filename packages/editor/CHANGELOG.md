@@ -1,3 +1,9 @@
+## Master
+
+### New Features
+
+- The `PostPermalink` component is now exported and available as any other component.
+
 ## 9.3.0 (2019-05-21)
 
 ### Deprecations
