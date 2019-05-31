@@ -153,8 +153,9 @@ describe( 'Block transforms', () => {
 			)
 		);
 
-		// Filter out Group transforms for perf reasons, expect for x2 tests
-		// (core/paragraph and core/image)
+		// As Group is available as a transform on *all* blocks this would create a lot of
+		// tests which would impact on the performance of the e2e test suite.
+		// To avoid this, we remove `core/group` from test table for all but 2 block types.
 		const testTableWithSomeGroupsFiltered = testTable.filter( ( transform ) => ( transform[ 2 ] !== 'Group' || transform[ 1 ] === 'core__paragraph__align-right' || transform[ 1 ] === 'core__image' ) );
 
 		it.each( testTableWithSomeGroupsFiltered )(
