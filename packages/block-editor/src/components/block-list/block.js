@@ -344,6 +344,7 @@ function BlockListBlock( {
 
 				// If the block is selected and we're typing the block should not appear.
 				// Empty paragraph blocks should always show up as unselected.
+				const showInserterShortcuts = ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
 				const showEmptyBlockSideInserter = ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
 				const shouldAppearSelected =
 					! isFocusMode &&
@@ -538,24 +539,24 @@ function BlockListBlock( {
 								{ !! hasError && <BlockCrashWarning /> }
 							</IgnoreNestedEvents>
 						</div>
+						{ showInserterShortcuts && (
+							<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
+								<InserterWithShortcuts
+									clientId={ clientId }
+									rootClientId={ rootClientId }
+									onToggle={ selectOnOpen }
+								/>
+							</div>
+						) }
 						{ showEmptyBlockSideInserter && (
-							<>
-								<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
-									<InserterWithShortcuts
-										clientId={ clientId }
-										rootClientId={ rootClientId }
-										onToggle={ selectOnOpen }
-									/>
-								</div>
-								<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
-									<Inserter
-										position="top right"
-										onToggle={ selectOnOpen }
-										rootClientId={ rootClientId }
-										clientId={ clientId }
-									/>
-								</div>
-							</>
+							<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
+								<Inserter
+									position="top right"
+									onToggle={ selectOnOpen }
+									rootClientId={ rootClientId }
+									clientId={ clientId }
+								/>
+							</div>
 						) }
 					</IgnoreNestedEvents>
 				);
@@ -642,7 +643,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		mergeBlocks,
 		replaceBlocks,
 		toggleSelection,
-
 	} = dispatch( 'core/block-editor' );
 
 	return {
