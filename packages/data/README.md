@@ -358,7 +358,15 @@ _Returns_
 
 <a name="plugins" href="#plugins">#</a> **plugins**
 
-Undocumented declaration.
+Object of available plugins to use with a registry.
+
+_Related_
+
+-   [use](#use)
+
+_Type_
+
+-   `Object` 
 
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 
@@ -470,7 +478,13 @@ _Parameters_
 
 <a name="use" href="#use">#</a> **use**
 
-Undocumented declaration.
+Extends a registry to inherit functionality provided by a given plugin. A
+plugin is an object with properties aligning to that of a registry, merged
+to extend the default registry behavior.
+
+_Parameters_
+
+-   _plugin_ `Object`: Plugin object.
 
 <a name="useRegistry" href="#useRegistry">#</a> **useRegistry**
 
