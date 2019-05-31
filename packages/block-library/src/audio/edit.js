@@ -1,22 +1,12 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 import {
 	Disabled,
-	IconButton,
 	PanelBody,
-	Path,
-	Rect,
 	SelectControl,
-	SVG,
 	ToggleControl,
-	Toolbar,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -34,6 +24,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import icon from './icon';
+import AudioToolbar from './audio-toolbar';
 
 /**
  * Internal dependencies
@@ -136,23 +127,14 @@ class AudioEdit extends Component {
 			setAttributes( { src: media.url, id: media.id } );
 			this.setState( { src: media.url, isEditing: false } );
 		};
-		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
-		const getEditToolbar = ( isActive ) => {
-			return <Toolbar>
-				<IconButton
-					className={ classnames( 'components-toolbar__control', { 'is-active': isActive } ) }
-					label={ __( 'Edit audio' ) }
-					onClick={ toggleIsEditing }
-					icon={ editImageIcon }
-				/>
-			</Toolbar>;
-		};
 
 		if ( isEditing ) {
 			return (
 				<Fragment>
 					<BlockControls>
-						{ !! src && getEditToolbar( true ) }
+						{ !! src &&
+							<AudioToolbar isEditing={ isEditing } onClick={ toggleIsEditing } />
+						}
 					</BlockControls>
 					<MediaPlaceholder
 						icon={ <BlockIcon icon={ icon } /> }
@@ -174,7 +156,7 @@ class AudioEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					{ getEditToolbar( false ) }
+					<AudioToolbar isEditing={ isEditing } onClick={ toggleIsEditing } />
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Audio Settings' ) }>
