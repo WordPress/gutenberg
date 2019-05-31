@@ -16,6 +16,8 @@ import {
 	findTransform,
 	isWildcardBlockTransform,
 	isContainerGroupBlock,
+	isBlockSelectionOfSameType,
+	isMultiBlockSelection,
 } from '../factory';
 import {
 	getBlockType,
@@ -1461,6 +1463,62 @@ describe( 'block factory', () => {
 
 		it( 'should return false when passed block name does not match "core/group"', () => {
 			expect( isContainerGroupBlock( 'core/some-test-name' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isMultiBlockSelection', () => {
+		it( 'should return false when there is one block or less', () => {
+			const singleBlock = [
+				{
+					name: 'core/test-block',
+				},
+			];
+
+			expect( isMultiBlockSelection( [] ) ).toBe( false );
+			expect( isMultiBlockSelection( singleBlock ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isBlockSelectionOfSameType', () => {
+		it( 'should return false when all blocks do not match the name of the first block', () => {
+			const blocks = [
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/another-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+			];
+
+			expect( isBlockSelectionOfSameType( blocks ) ).toBe( false );
+		} );
+
+		it( 'should return true when all blocks match the name of the first block', () => {
+			const blocks = [
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+			];
+
+			expect( isBlockSelectionOfSameType( blocks ) ).toBe( true );
 		} );
 	} );
 } );

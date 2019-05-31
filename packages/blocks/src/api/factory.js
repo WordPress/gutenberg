@@ -251,20 +251,29 @@ export const isWildcardBlockTransform = ( t ) => t && t.type === 'block' && t.bl
 export const isContainerGroupBlock = ( name ) => name === 'core/group';
 
 /**
- * Determines whether the provided Blocks are a multi Block selection
- * and of the same type (eg: all `core/paragraph`).
+ * Determines whether the provided Blocks are of the same type
+ * (eg: all `core/paragraph`).
  *
  * @param  {Array}  blocksArray the Block definitions
  * @return {boolean}             whether or not the given Blocks pass the criteria
  */
-const isMultiBlockSelectionOfSameType = ( blocksArray = [] ) => {
-	// Is it a Multi Block selection?
-	if ( ! blocksArray.length > 1 ) {
+export const isBlockSelectionOfSameType = ( blocksArray = [] ) => {
+	if ( ! blocksArray.length ) {
 		return false;
 	}
 	const sourceName = blocksArray[ 0 ].name;
 
-	return ! every( blocksArray, ( block ) => ( block.name === sourceName ) );
+	return every( blocksArray, [ 'name', sourceName ] );
+};
+
+/**
+ * Determines whether the provided Blocks constitute
+ * a multi-block selection (ie: more than 1)
+ * @param  {Array}  blocksArray [description]
+ * @return {boolean}             [description]
+ */
+export const isMultiBlockSelection = ( blocksArray = [] ) => {
+	return blocksArray.length > 1;
 };
 
 /**
@@ -366,14 +375,14 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
  */
 export function switchToBlockType( blocks, name ) {
 	const blocksArray = castArray( blocks );
-	const isMultiBlock = blocksArray.length > 1;
+	const isMultiBlock = isMultiBlockSelection( blocksArray );
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
 
-	// Unless it's a `core/group` Block then check
-	// that all Blocks are of the same type otherwise
+	// Unless it's a `core/group` Block then for multi block selections
+	// check that all Blocks are of the same type otherwise
 	// we can't run a conversion
-	if ( ! isContainerGroupBlock( name ) && isMultiBlockSelectionOfSameType( blocksArray ) ) {
+	if ( ! isContainerGroupBlock( name ) && isMultiBlock && ! isBlockSelectionOfSameType( blocksArray ) ) {
 		return null;
 	}
 
