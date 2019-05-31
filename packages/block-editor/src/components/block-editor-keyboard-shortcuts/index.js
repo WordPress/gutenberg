@@ -119,12 +119,8 @@ class BlockEditorKeyboardShortcuts extends Component {
 									// is used to prevent any obscure unknown shortcuts from triggering.
 									[ shortcuts.insertAfter.raw ]: flow( preventDefault, onInsertAfter ),
 
-									// Does not clash with any known browser/native shortcuts, but preventDefault
-									// is used to prevent any obscure unknown shortcuts from triggering.
 									[ shortcuts.group.raw ]: flow( preventDefault, onGroup ),
 
-									// Does not clash with any known browser/native shortcuts, but preventDefault
-									// is used to prevent any obscure unknown shortcuts from triggering.
 									[ shortcuts.ungroup.raw ]: flow( preventDefault, onUngroup ),
 								} }
 							/>
