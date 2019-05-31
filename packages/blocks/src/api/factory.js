@@ -239,7 +239,7 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
  * @param  {Object} t Block transform object
  * @return {boolean}   whether transform is a wildcard transform
  */
-const isWildcardBlockTransform = ( t ) => t && t.type === 'block' && t.blocks.length && t.blocks[ 0 ] === '*';
+export const isWildcardBlockTransform = ( t ) => t && t.type === 'block' && t.blocks.length && t.blocks.includes( '*' );
 
 /**
  * Determines whether the given Block is the core Block which

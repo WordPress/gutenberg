@@ -14,6 +14,7 @@ import {
 	switchToBlockType,
 	getBlockTransforms,
 	findTransform,
+	isWildcardBlockTransform,
 } from '../factory';
 import {
 	getBlockType,
@@ -1409,6 +1410,46 @@ describe( 'block factory', () => {
 			const transform = findTransform( transforms, () => false );
 
 			expect( transform ).toBe( null );
+		} );
+	} );
+
+	describe( 'isWildcardBlockTransform', () => {
+		it( 'should return true for transforms with type of block and "*" alias as blocks', () => {
+			const validWildcardBlockTransform = {
+				type: 'block',
+				blocks: [
+					'core/some-other-block-first', // unlikely to happen but...
+					'*',
+				],
+				blockName: 'core/test-block',
+			};
+
+			expect( isWildcardBlockTransform( validWildcardBlockTransform ) ).toBe( true );
+		} );
+
+		it( 'should return false for transforms with a type which is not "block"', () => {
+			const invalidWildcardBlockTransform = {
+				type: 'file',
+				blocks: [
+					'*',
+				],
+				blockName: 'core/test-block',
+			};
+
+			expect( isWildcardBlockTransform( invalidWildcardBlockTransform ) ).toBe( false );
+		} );
+
+		it( 'should return false for transforms which do not include "*" alias in "block" array', () => {
+			const invalidWildcardBlockTransform = {
+				type: 'block',
+				blocks: [
+					'core/some-block',
+					'core/another-block',
+				],
+				blockName: 'core/test-block',
+			};
+
+			expect( isWildcardBlockTransform( invalidWildcardBlockTransform ) ).toBe( false );
 		} );
 	} );
 } );
