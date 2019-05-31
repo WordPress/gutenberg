@@ -362,7 +362,7 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
  * @param {Array|Object} blocks Blocks array or block object.
  * @param {string}       name   Block name.
  *
- * @return {Array} Array of blocks.
+ * @return {?Array} Array of blocks or null.
  */
 export function switchToBlockType( blocks, name ) {
 	const blocksArray = castArray( blocks );
