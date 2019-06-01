@@ -526,7 +526,7 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeName_ `?string`: Optionally provide the name of the store from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeName_ `[string]`: Optionally provide the name of the store from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
