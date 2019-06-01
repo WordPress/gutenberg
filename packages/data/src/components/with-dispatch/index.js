@@ -80,7 +80,7 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 				ownProps,
 				registry
 			);
-			const dispatchProps = useDispatchWithMap( mapDispatch );
+			const dispatchProps = useDispatchWithMap( mapDispatch, [] );
 			return <WrappedComponent { ...ownProps } { ...dispatchProps } />;
 		}
 	),

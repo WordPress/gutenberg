@@ -35,10 +35,11 @@ const useIsomorphicLayoutEffect =
  *                                the first argument and the `registry` object
  *                                as the second argument.  Should return an
  *                                object mapping props to functions.
+ * @param {Array}    deps         An array of dependencies for the hook.
  * @return {Object}  An object mapping props to functions created by the passed
  *                   in dispatchMap.
  */
-const useDispatchWithMap = ( dispatchMap ) => {
+const useDispatchWithMap = ( dispatchMap, deps ) => {
 	const registry = useRegistry();
 	const currentDispatchMap = useRef( dispatchMap );
 
@@ -64,7 +65,7 @@ const useDispatchWithMap = ( dispatchMap ) => {
 					.current( registry.dispatch, registry )[ propName ]( ...args );
 			}
 		);
-	}, [ dispatchMap, registry ] );
+	}, [ registry, ...deps ] );
 };
 
 export default useDispatchWithMap;
