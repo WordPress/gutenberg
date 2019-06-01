@@ -31,7 +31,8 @@ export default function save( { attributes } ) {
 
 	if ( sizeSlug ) {
 		const mediaSizeClass = 'size-' + sizeSlug;
-		classes = classnames( classes, mediaSizeClass );
+		const classNameWithoutSize = classes.replace( /(\s+?)size-(.*?)(\s+?)/, '' );
+		classes = classnames( classNameWithoutSize, mediaSizeClass );
 	}
 
 	const image = (

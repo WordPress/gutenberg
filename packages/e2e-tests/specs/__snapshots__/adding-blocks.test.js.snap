@@ -10,7 +10,7 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 <!-- /wp:quote -->
 
 <!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<figure class=\\"wp-block-image\\"><img src=\\"\\" alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
