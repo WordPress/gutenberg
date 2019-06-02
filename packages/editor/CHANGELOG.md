@@ -2,7 +2,7 @@
 
 ### New Features
 
-- The `PostPermalink` component is now exported and available as any other component.
+- Exposed the `PostPermalink` component (see [#15943](https://github.com/WordPress/gutenberg/pull/15943)).
 
 ## 9.3.0 (2019-05-21)
 
