@@ -8,20 +8,20 @@ The RichText component is extremely powerful because it provides built-in functi
 * **Cohesive Placeholder Text:** Before the user writes their content, it's easy to include placeholder text that's already styled to match the rest of the block editor.
 * **Control Over Formatting Options:** It's possible to dictate exactly which formatting options you want to allow for the RichText field. For example, you can dictate whether to allow the user to make text bold, italics or both.
 
-Unlike other components that exist in the [Component Reference](https://developer.wordpress.org/block-editor/components/) section, RichText lives separately because it only makes sense within the block editor, and not within other areas of WordPress.
+Unlike other components that exist in the [Component Reference](/packages/components/README.md) section, RichText lives separately because it only makes sense within the block editor, and not within other areas of WordPress.
 
 ## Property Reference
 
-For a list of the possible properties to pass your RichText component, [check out the component documentation on Github](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/rich-text).
+For a list of the possible properties to pass your RichText component, [check out the component documentation on Github](/packages/block-editor/src/components/rich-text/README.md).
 
 ## Core Blocks Using the RichText Component
 
 There are a number of core blocks using the RichText component. The JavaScript edit function linked below for each block can be used as a best practice reference while creating your own blocks.
 
-* **[Button](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/button/edit.js):** RichText is used to enter the button's text.
-* **[Heading](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/heading/edit.js):** RichText is used to enter the heading's text.
-* **[Quote](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/quote/edit.js):** RichText is in two places, for both the quotation and citation text.
-* **[Search](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/search/edit.js):** RichText is used in two places, for both the label above the search field and the submit button text.
+* **[Button](/packages/block-library/src/button/edit.js):** RichText is used to enter the button's text.
+* **[Heading](/packages/block-library/src/heading/edit.js):** RichText is used to enter the heading's text.
+* **[Quote](/packages/block-library/src/quote/edit.js):** RichText is in two places, for both the quotation and citation text.
+* **[Search](/packages/block-library/src/search/edit.js):** RichText is used in two places, for both the label above the search field and the submit button text.
 
 ## Example
 
