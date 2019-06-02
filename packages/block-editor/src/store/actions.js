@@ -195,17 +195,23 @@ export function multiSelect( start, end ) {
 /**
  * Returns an action object used in signalling that the block selection is cleared.
  *
+ * @return {Object} Action object.
+ */
+export function wipeSelectedBlock() {
+	return {
+		type: 'WIPE_SELECTED_BLOCK',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the block selection is cleared.
+ *
  * @param {Object} type   Object specifying if the clearing is destructive or not, default
  * 						  { destructive: false }.
  *
  * @return {Object} Action object.
  */
-export function clearSelectedBlock( type = { destructive: false } ) {
-	if ( type.destructive === true ) {
-		return {
-			type: 'DESTRUCTIVELY_CLEAR_SELECTED_BLOCK',
-		};
-	}
+export function clearSelectedBlock() {
 	return {
 		type: 'CLEAR_SELECTED_BLOCK',
 	};

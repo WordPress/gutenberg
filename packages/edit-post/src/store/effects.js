@@ -109,7 +109,7 @@ const effects = {
 	SWITCH_MODE( action ) {
 		// Unselect blocks when we switch to the code editor.
 		if ( action.mode !== 'visual' ) {
-			dispatch( 'core/block-editor' ).clearSelectedBlock( { destructive: true } );
+			dispatch( 'core/block-editor' ).wipeSelectedBlock();
 		}
 
 		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );

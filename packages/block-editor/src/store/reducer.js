@@ -717,7 +717,7 @@ const BLOCK_SELECTION_INITIAL_STATE = {
  */
 export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
 	switch ( action.type ) {
-		case 'DESTRUCTIVELY_CLEAR_SELECTED_BLOCK':
+		case 'WIPE_SELECTED_BLOCK':
 			return BLOCK_SELECTION_INITIAL_STATE;
 		case 'CLEAR_SELECTED_BLOCK':
 			if ( isEqual( state, BLOCK_SELECTION_INITIAL_STATE ) ) {
