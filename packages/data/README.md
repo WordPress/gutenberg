@@ -508,15 +508,15 @@ function Button( { onClick, children } ) {
 }
 
 const SaleButton = ( { children } ) => {
-	const { stockNumber } = useSelect(
-		( select ) => select( 'my-shop' ).getStockNumber()
-	);
-	const { startSale } = useDispatch( 'my-shop' );
-	const onClick = useCallback( () => {
-		const discountPercent = stockNumber > 50 ? 10: 20;
-		startSale( discountPercent );
-	}, [ stockNumber ] );
-	return <Button onClick={ onClick }>{ children }</Button>
+  const { stockNumber } = useSelect(
+    ( select ) => select( 'my-shop' ).getStockNumber()
+  );
+  const { startSale } = useDispatch( 'my-shop' );
+  const onClick = useCallback( () => {
+    const discountPercent = stockNumber > 50 ? 10: 20;
+    startSale( discountPercent );
+  }, [ stockNumber ] );
+  return <Button onClick={ onClick }>{ children }</Button>
 }
 
 // Rendered somewhere in the application:
@@ -626,20 +626,20 @@ _Usage_
 
 ```jsx
 function Button( { onClick, children } ) {
-	return <button type="button" onClick={ onClick }>{ children }</button>;
+    return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
 const { withDispatch } = wp.data;
 
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
-	const { startSale } = dispatch( 'my-shop' );
-	const { discountPercent } = ownProps;
+    const { startSale } = dispatch( 'my-shop' );
+    const { discountPercent } = ownProps;
 
-	return {
-		onClick() {
-			startSale( discountPercent );
-		},
-	};
+    return {
+        onClick() {
+            startSale( discountPercent );
+        },
+    };
 } )( Button );
 
 // Rendered in the application:
@@ -662,22 +662,21 @@ only.
 
 ```jsx
 function Button( { onClick, children } ) {
-	return <button type="button" onClick={ onClick }>{ children }</button>;
+    return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
 const { withDispatch } = wp.data;
 
 const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
-	// Stock number changes frequently.
-	const { getStockNumber } = select( 'my-shop' );
-	const { startSale } = dispatch( 'my-shop' );
-
-	return {
-		onClick() {
-			const dicountPercent = getStockNumber() > 50 ? 10 : 20;
-			startSale( discountPercent );
-		},
-	};
+   // Stock number changes frequently.
+   const { getStockNumber } = select( 'my-shop' );
+   const { startSale } = dispatch( 'my-shop' );
+   return {
+       onClick() {
+           const discountPercent = getStockNumber() > 50 ? 10 : 20;
+           startSale( discountPercent );
+       },
+   };
 } )( Button );
 
 // Rendered in the application:

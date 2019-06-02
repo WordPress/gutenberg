@@ -22,20 +22,20 @@ import { useDispatchWithMap } from '../use-dispatch';
  * @example
  * ```jsx
  * function Button( { onClick, children } ) {
- * 	return <button type="button" onClick={ onClick }>{ children }</button>;
+ *     return <button type="button" onClick={ onClick }>{ children }</button>;
  * }
  *
  * const { withDispatch } = wp.data;
  *
  * const SaleButton = withDispatch( ( dispatch, ownProps ) => {
- * 	const { startSale } = dispatch( 'my-shop' );
- * 	const { discountPercent } = ownProps;
+ *     const { startSale } = dispatch( 'my-shop' );
+ *     const { discountPercent } = ownProps;
  *
- * 	return {
- * 		onClick() {
- * 			startSale( discountPercent );
- * 		},
- * 	};
+ *     return {
+ *         onClick() {
+ *             startSale( discountPercent );
+ *         },
+ *     };
  * } )( Button );
  *
  * // Rendered in the application:
@@ -59,22 +59,21 @@ import { useDispatchWithMap } from '../use-dispatch';
  *
  * ```jsx
  * function Button( { onClick, children } ) {
- * 	return <button type="button" onClick={ onClick }>{ children }</button>;
+ *     return <button type="button" onClick={ onClick }>{ children }</button>;
  * }
  *
  * const { withDispatch } = wp.data;
  *
  * const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
- * 	// Stock number changes frequently.
- * 	const { getStockNumber } = select( 'my-shop' );
- * 	const { startSale } = dispatch( 'my-shop' );
- *
- * 	return {
- * 		onClick() {
- * 			const dicountPercent = getStockNumber() > 50 ? 10 : 20;
- * 			startSale( discountPercent );
- * 		},
- * 	};
+ *    // Stock number changes frequently.
+ *    const { getStockNumber } = select( 'my-shop' );
+ *    const { startSale } = dispatch( 'my-shop' );
+ *    return {
+ *        onClick() {
+ *            const discountPercent = getStockNumber() > 50 ? 10 : 20;
+ *            startSale( discountPercent );
+ *        },
+ *    };
  * } )( Button );
  *
  * // Rendered in the application:

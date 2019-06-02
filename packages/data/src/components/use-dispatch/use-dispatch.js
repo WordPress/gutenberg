@@ -28,15 +28,15 @@ import useRegistry from '../registry-provider/use-registry';
  * }
  *
  * const SaleButton = ( { children } ) => {
- *		const { stockNumber } = useSelect(
- *			( select ) => select( 'my-shop' ).getStockNumber()
- *		);
- *		const { startSale } = useDispatch( 'my-shop' );
- *		const onClick = useCallback( () => {
- *			const discountPercent = stockNumber > 50 ? 10: 20;
- *			startSale( discountPercent );
- *		}, [ stockNumber ] );
- *		return <Button onClick={ onClick }>{ children }</Button>
+ *   const { stockNumber } = useSelect(
+ *     ( select ) => select( 'my-shop' ).getStockNumber()
+ *   );
+ *   const { startSale } = useDispatch( 'my-shop' );
+ *   const onClick = useCallback( () => {
+ *     const discountPercent = stockNumber > 50 ? 10: 20;
+ *     startSale( discountPercent );
+ *   }, [ stockNumber ] );
+ *   return <Button onClick={ onClick }>{ children }</Button>
  * }
  *
  * // Rendered somewhere in the application:
