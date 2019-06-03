@@ -5,7 +5,6 @@ import {
 	insertBlock,
 	getEditedPostContent,
 	createNewPost,
-	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Button', () => {
@@ -25,9 +24,6 @@ describe( 'Button', () => {
 		await page.keyboard.type( 'WordPress' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( 'https://wordpress.org' );
-		await pressKeyWithModifier( 'shift', 'Tab' );
-		await pressKeyWithModifier( 'alt', 'ArrowRight' );
-		await page.keyboard.type( '.org' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

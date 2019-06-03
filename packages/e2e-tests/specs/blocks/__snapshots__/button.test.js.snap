@@ -2,7 +2,7 @@
 
 exports[`Button can jump focus back & forth 1`] = `
 "<!-- wp:button -->
-<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\" href=\\"https://wordpress.org\\">WordPress.org</a></div>
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\" href=\\"https://wordpress.org\\">WordPress</a></div>
 <!-- /wp:button -->"
 `;
 
