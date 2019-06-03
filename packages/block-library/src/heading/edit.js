@@ -61,7 +61,13 @@ function HeadingEdit( {
 	return (
 		<>
 			<BlockControls>
-				<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+				<HeadingToolbar
+					isCollapsed
+					minLevel={ 1 }
+					maxLevel={ 7 }
+					selectedLevel={ level }
+					onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) }
+				/>
 				<AlignmentToolbar
 					value={ align }
 					onChange={ ( nextAlign ) => {
