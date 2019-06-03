@@ -3,8 +3,8 @@
 exports[`MoreMenu should match snapshot 1`] = `
 <MoreMenu>
   <DropdownMenu
-    __unstablePopoverClassName="edit-post-more-menu__content"
     className="edit-post-more-menu"
+    contentClassName="edit-post-more-menu__content"
     icon="ellipsis"
     label="More tools & options"
     position="bottom left"
@@ -25,13 +25,13 @@ exports[`MoreMenu should match snapshot 1`] = `
           className="components-dropdown-menu__toggle"
           icon="ellipsis"
           label="More tools & options"
-          labelPosition="bottom"
+          labelPosition="bottom left"
           onClick={[Function]}
           onKeyDown={[Function]}
           tooltip="More tools & options"
         >
           <Tooltip
-            position="bottom"
+            position="bottom left"
             text="More tools & options"
           >
             <ForwardRef(Button)

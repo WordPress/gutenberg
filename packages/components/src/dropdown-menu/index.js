@@ -19,15 +19,13 @@ import { NavigableMenu } from '../navigable-container';
 function DropdownMenu( {
 	children,
 	className,
+	contentClassName,
 	controls,
 	hasArrowIndicator = false,
 	icon = 'menu',
 	label,
 	menuLabel,
 	position,
-	__unstableMenuClassName,
-	__unstablePopoverClassName,
-	__unstableToggleClassName,
 } ) {
 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
@@ -45,7 +43,7 @@ function DropdownMenu( {
 	return (
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
-			contentClassName={ classnames( 'components-dropdown-menu__popover', __unstablePopoverClassName ) }
+			contentClassName={ classnames( 'components-dropdown-menu__popover', contentClassName ) }
 			position={ position }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
@@ -58,7 +56,7 @@ function DropdownMenu( {
 
 				return (
 					<IconButton
-						className={ classnames( 'components-dropdown-menu__toggle', __unstableToggleClassName, {
+						className={ classnames( 'components-dropdown-menu__toggle', {
 							'is-opened': isOpen,
 						} ) }
 						icon={ icon }
@@ -77,7 +75,7 @@ function DropdownMenu( {
 			renderContent={ ( props ) => {
 				return (
 					<NavigableMenu
-						className={ classnames( 'components-dropdown-menu__menu', __unstableMenuClassName ) }
+						className="components-dropdown-menu__menu"
 						role="menu"
 						aria-label={ menuLabel || label }
 					>

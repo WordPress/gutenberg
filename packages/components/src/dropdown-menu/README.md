@@ -202,7 +202,14 @@ See also: [https://developer.wordpress.org/resource/dashicons/](https://develope
 
 #### className
 
-A class name to apply to the dropdown wrapper element.
+A class name to apply to the dropdown menu's toggle element wrapper.
+
+- Type: `String`
+- Required: No
+
+#### contentClassName
+
+If you want to target the dropdown menu's popover for styling purposes, you need to provide a `contentClassName` because it's not being rendered as a children of the container node.
 
 - Type: `String`
 - Required: No

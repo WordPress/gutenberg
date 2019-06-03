@@ -47,9 +47,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 						label={ __( 'More options' ) }
 						position="bottom right"
 						className="block-editor-block-settings-menu"
-						__unstableToggleClassName="block-editor-block-settings-menu__toggle editor-block-settings-menu__toggle"
-						__unstableMenuClassName="block-editor-block-settings-menu__content editor-block-settings-menu__content"
-						__unstablePopoverClassName="block-editor-block-settings-menu__popover editor-block-settings-menu__popover"
+						contentClassName="block-editor-block-settings-menu__popover editor-block-settings-menu__popover"
 					>
 						{ ( { onClose } ) => (
 							<>
