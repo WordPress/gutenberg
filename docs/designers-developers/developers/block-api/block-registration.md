@@ -311,6 +311,40 @@ transforms: {
 ```
 {% end %}
 
+In addition to accepting an array of known block types, the `blocks` option also accepts a "wildcard" (`"*"`). This allows for transformations which apply to _all_ block types (eg: all blocks can transform into `core/group`):
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ '*' ], // wildcard - match any block
+            transform: function( attributes, innerBlocks ) {
+                // transform logic here
+            },
+        },
+    ],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: blocks: [ '*' ], // wildcard - match any block
+            transform: ( attributes, innerBlocks ) => {
+                // transform logic here
+            },
+        },
+    ],
+},
+```
+{% end %}
+
+
 A block with innerBlocks can also be transformed from and to another block with innerBlocks.
 
 {% codetabs %}
