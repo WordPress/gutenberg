@@ -10,10 +10,14 @@ import * as React from 'react';
 import { ScrollView } from 'react-native';
 
 /**
+ * WordPress dependencies
+ */
+import { KeyboardAvoidingView } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import styles from './html-text-input-ui.scss';
-import KeyboardAvoidingView from '../keyboard-avoiding-view';
 
 type PropsType = {
 	parentHeight: number,
