@@ -18,6 +18,7 @@ export {
 	useRegistry,
 } from './components/registry-provider';
 export { default as useSelect } from './components/use-select';
+export { useDispatch } from './components/use-dispatch';
 export {
 	AsyncModeProvider as __experimentalAsyncModeProvider,
 } from './components/async-mode-provider';
