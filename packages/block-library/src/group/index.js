@@ -12,9 +12,10 @@ import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 
-const { name } = metadata;
-
-export { metadata, name };
+export const info = {
+	...metadata,
+	name: metadata.name,
+};
 
 export const settings = {
 	title: __( 'Group' ),
@@ -33,26 +34,30 @@ export const settings = {
 				type: 'block',
 				isMultiBlock: true,
 				blocks: [ '*' ],
-				transform: ( attributes, innerBlocks, names ) => {
+				*transform( blocks ) {
 					// Avoid transforming a single `core/group` Block
-					if ( names.length === 1 && names[ 0 ] === 'core/group' ) {
+					if ( blocks.length === 1 && blocks[ 0 ].name === 'core/group' ) {
 						return;
 					}
 
 					const alignments = [ 'wide', 'full' ];
 
-					let widestAlignment;
+					// Determine the widest setting of all the blocks to be grouped
+					const widestAlignment = blocks.reduce( ( result, block ) => {
+						const { align } = block.attributes;
+						return alignments.indexOf( align ) > alignments.indexOf( result ) ? align : result;
+					}, undefined );
 
-					const groupInnerBlocks = attributes.map( ( attrs, index ) => {
-						// Determines the widest setting of all the blocks to be grouped
-						const currBlockAlignment = attrs.align;
-						widestAlignment = alignments.indexOf( currBlockAlignment ) > alignments.indexOf( widestAlignment ) ? currBlockAlignment : widestAlignment;
-
-						// Creates the new Block
-						return createBlock( names[ index ], attrs, innerBlocks[ index ] );
+					// Clone the Blocks to be Grouped
+					// Failing to create new block references causes the original blocks
+					// to be replaced in the switchToBlockType call thereby meaning they
+					// are removed both from their original location and within the
+					// new group block.
+					const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
+						return createBlock( name, attributes, innerBlocks );
 					} );
 
-					return createBlock( 'core/group', {
+					yield createBlock( 'core/group', {
 						align: widestAlignment,
 					}, groupInnerBlocks );
 				},

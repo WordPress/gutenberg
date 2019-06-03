@@ -1301,6 +1301,48 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ].innerBlocks ).toHaveLength( 1 );
 			expect( transformedBlocks[ 1 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after1' );
 		} );
+
+		it( 'should pass entire block object to transform functions which are generators', () => {
+			registerBlockType( 'core/test-group-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ '*' ],
+						isMultiBlock: true,
+						*transform( blocks ) {
+							const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
+								return createBlock( name, attributes, innerBlocks );
+							} );
+
+							yield createBlock( 'core/test-group-block', {}, groupInnerBlocks );
+						},
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'Test Group Block',
+			} );
+
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const numOfBlocksToGroup = 4;
+			const blocks = times( numOfBlocksToGroup, ( index ) => {
+				return createBlock( 'core/text-block', {
+					value: `textBlock${ index + 1 }`,
+				} );
+			} );
+
+			const transformedBlocks = switchToBlockType( blocks, 'core/test-group-block' );
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ].name ).toBe( 'core/test-group-block' );
+			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( numOfBlocksToGroup );
+		} );
 	} );
 
 	describe( 'getBlockTransforms', () => {

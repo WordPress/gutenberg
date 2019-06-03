@@ -28,6 +28,16 @@ import { getBlockType, getBlockTypes } from './registration';
 import { normalizeBlockType } from './utils';
 
 /**
+ * Determines whether a function is a Generator function
+ * @param  {Function} fn the function to test
+ * @return {boolean}     whether or not the function is a generator
+ */
+function isGenerator( fn ) {
+	const sampleGenerator = function*() {};
+	return fn.constructor.name === 'GeneratorFunction' && fn.constructor === sampleGenerator.constructor;
+}
+
+/**
  * Returns a block object given its type and attributes.
  *
  * @param {string} name        Block name.
@@ -408,14 +418,23 @@ export function switchToBlockType( blocks, name ) {
 
 	let transformationResults;
 
+	// Progressively enhancing the function signature using Generators
+	// Generator based transform functions are passed the entire Block object
 	if ( transformation.isMultiBlock ) {
-		transformationResults = transformation.transform(
-			blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
-			blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks ),
-			blocksArray.map( ( currentBlock ) => currentBlock.name ),
-		);
+		if ( isGenerator( transformation.transform ) ) {
+			const gen = transformation.transform( blocksArray );
+			transformationResults = Array.from( gen );
+		} else {
+			transformationResults = transformation.transform(
+				blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
+				blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks ),
+			);
+		}
+	} else if ( isGenerator( transformation.transform ) ) {
+		const gen = transformation.transform( [ firstBlock ] );
+		transformationResults = Array.from( gen );
 	} else {
-		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks, firstBlock.name );
+		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks );
 	}
 
 	// Ensure that the transformation function returned an object or an array
@@ -442,7 +461,7 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	return transformationResults.map( ( result, index ) => {
+	const rtn = transformationResults.map( ( result, index ) => {
 		const transformedBlock = {
 			...result,
 			// The first transformed block whose type matches the "destination"
@@ -460,4 +479,6 @@ export function switchToBlockType( blocks, name ) {
 		 */
 		return applyFilters( 'blocks.switchToBlockType.transformedBlock', transformedBlock, blocks );
 	} );
+
+	return rtn;
 }
