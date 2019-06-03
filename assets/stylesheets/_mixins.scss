@@ -418,6 +418,8 @@
 	input[type="number"] {
 		padding-left: 4px;
 		padding-right: 4px;
+		height: auto;
+		min-height: 28px;
 	}
 
 	select {
