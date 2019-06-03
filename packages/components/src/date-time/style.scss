@@ -47,11 +47,25 @@
 		font-size: $default-font-size;
 	}
 
+	// Seperate borders so that border respect border radius
+	.CalendarMonth_table {
+		border-collapse: separate;
+		border-spacing: 1px;
+	}
+
 	.CalendarDay {
 		font-size: $default-font-size;
-		border: 1px solid transparent;
+		border: 2px solid transparent;
 		border-radius: $radius-round;
 		text-align: center;
+		transition: border 100ms linear, background 100ms linear;
+
+		&:focus {
+			outline: 2px solid transparent;
+			border: 2px solid theme(primary);
+			border-radius: 50px;
+
+		}
 	}
 
 	.CalendarDay__selected {
@@ -59,6 +73,11 @@
 
 		&:hover {
 			background: color(theme(primary) shade(15%));
+		}
+
+		&:focus {
+			background: color(theme(primary) shade(15%));
+			border-color: transparent;
 		}
 	}
 
