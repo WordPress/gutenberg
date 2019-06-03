@@ -3,6 +3,8 @@
 ### New Feature
 
 - Added a default implementation for `save` setting in `registerBlockType` which saves no markup in the post content.
+- Added wildcard block transforms which allows for transforming all/any blocks in another block.
+- Added `apply()` method option to `transforms` definition. It receives complete block object(s) as it's argument(s). It is now preferred over the older `transform()` (note that `transform()` is still fully supported).
 
 ## 6.1.0 (2019-03-06)
 
