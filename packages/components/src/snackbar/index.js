@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -22,12 +22,12 @@ function Snackbar( {
 	children,
 	actions = [],
 	onRemove = noop,
-} ) {
+}, ref ) {
 	useEffect( () => {
 		// This rule doesn't account yet for React Hooks
 		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
 		const timeoutHandle = setTimeout( () => {
-			onRemove();
+			// onRemove();
 		}, NOTICE_TIMEOUT );
 
 		return () => clearTimeout( timeoutHandle );
@@ -37,6 +37,7 @@ function Snackbar( {
 
 	return (
 		<div
+			ref={ ref }
 			className={ classes }
 			onClick={ onRemove }
 			tabIndex="0"
@@ -83,4 +84,4 @@ function Snackbar( {
 	);
 }
 
-export default Snackbar;
+export default forwardRef( Snackbar );
