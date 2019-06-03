@@ -8,6 +8,6 @@ const replaceMediaUpload = () => MediaUpload;
 
 addFilter(
 	'editor.MediaUpload',
-	'core/edit-post/replace-media-upload',
+	'core/edit-widgets/replace-media-upload',
 	replaceMediaUpload
 );

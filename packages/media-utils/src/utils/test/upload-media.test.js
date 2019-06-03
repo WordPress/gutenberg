@@ -7,7 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { mediaUpload, getMimeTypesArray } from '../media-upload';
+import { uploadMedia, getMimeTypesArray } from '../upload-media';
 
 jest.mock( '@wordpress/blob', () => ( {
 	createBlobURL: jest.fn(),
@@ -18,11 +18,11 @@ jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 const xmlFile = new window.File( [ 'fake_file' ], 'test.xml', { type: 'text/xml' } );
 const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', { type: 'image/jpeg' } );
 
-describe( 'mediaUpload', () => {
+describe( 'uploadMedia', () => {
 	it( 'should do nothing on no files', async () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await mediaUpload( {
+		await uploadMedia( {
 			filesList: [],
 			onError,
 			onFileChange,
@@ -35,7 +35,7 @@ describe( 'mediaUpload', () => {
 	it( 'should error if allowedTypes contains a partial mime type and the validation fails', async () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await mediaUpload( {
+		await uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ xmlFile ],
 			onError,
@@ -51,7 +51,7 @@ describe( 'mediaUpload', () => {
 	it( 'should error if allowedTypes contains a complete mime type and the validation fails', async () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await mediaUpload( {
+		await uploadMedia( {
 			allowedTypes: [ 'image/gif' ],
 			filesList: [ imageFile ],
 			onError,
@@ -70,7 +70,7 @@ describe( 'mediaUpload', () => {
 
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await mediaUpload( {
+		await uploadMedia( {
 			allowedTypes: [ 'image/jpeg' ],
 			filesList: [ imageFile ],
 			onError,
@@ -84,7 +84,7 @@ describe( 'mediaUpload', () => {
 	it( 'should error if allowedTypes contains multiple types and the validation fails', async () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await mediaUpload( {
+		await uploadMedia( {
 			allowedTypes: [ 'video', 'image' ],
 			filesList: [ xmlFile ],
 			onError,
@@ -103,7 +103,7 @@ describe( 'mediaUpload', () => {
 
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await mediaUpload( {
+		await uploadMedia( {
 			allowedTypes: [ 'video', 'image' ],
 			filesList: [ imageFile ],
 			onError,
@@ -120,7 +120,7 @@ describe( 'mediaUpload', () => {
 
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await mediaUpload( {
+		await uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ imageFile, xmlFile ],
 			onError,
@@ -137,7 +137,7 @@ describe( 'mediaUpload', () => {
 	it( 'should error if the file size is greater than the maximum', async () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await mediaUpload( {
+		await uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ imageFile ],
 			maxUploadFileSize: 1,
@@ -154,7 +154,7 @@ describe( 'mediaUpload', () => {
 	it( 'should call error handler with the correct error object if file type is not allowed for user', async () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
-		await mediaUpload( {
+		await uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ imageFile ],
 			onError,
