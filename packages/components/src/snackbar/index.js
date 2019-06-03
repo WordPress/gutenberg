@@ -27,7 +27,7 @@ function Snackbar( {
 		// This rule doesn't account yet for React Hooks
 		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
 		const timeoutHandle = setTimeout( () => {
-			// onRemove();
+			onRemove();
 		}, NOTICE_TIMEOUT );
 
 		return () => clearTimeout( timeoutHandle );
