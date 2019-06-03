@@ -2,6 +2,9 @@
 	"name": "core/list",
 	"category": "common",
 	"attributes": {
+		"align": {
+			"type": "string"
+		},
 		"ordered": {
 			"type": "boolean",
 			"default": false

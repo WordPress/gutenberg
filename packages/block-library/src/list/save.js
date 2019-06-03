@@ -4,10 +4,14 @@
 import { RichText } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { ordered, values } = attributes;
+	const { align, ordered, values } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
+	const styles = {
+		textAlign: align,
+		listStylePosition: 'inside',
+	};
 
 	return (
-		<RichText.Content tagName={ tagName } value={ values } multiline="li" />
+		<RichText.Content tagName={ tagName } style={ styles } value={ values } multiline="li" />
 	);
 }
