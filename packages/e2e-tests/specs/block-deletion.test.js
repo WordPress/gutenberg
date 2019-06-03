@@ -9,7 +9,6 @@ import {
 	isInDefaultBlock,
 	pressKeyWithModifier,
 	pressKeyTimes,
-	clickBlockToolbarButton,
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
