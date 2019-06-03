@@ -92,7 +92,7 @@
 	&.editor-post-publish-button,
 	&.editor-post-publish-panel__toggle {
 		margin: 2px;
-		height: 33px;
+		min-height: 33px;
 		line-height: 32px;
 		font-size: $default-font-size;
 	}
