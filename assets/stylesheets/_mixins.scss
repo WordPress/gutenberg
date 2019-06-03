@@ -377,6 +377,8 @@
 	select {
 		font-size: $default-font-size;
 		color: $dark-gray-500;
+		height: auto;
+		min-height: 28px;
 	}
 
 	.input-control, // Upstream name is `.regular-text`.
