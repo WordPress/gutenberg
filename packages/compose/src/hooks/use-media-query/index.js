@@ -14,9 +14,10 @@ export default function useMediaQuery( query ) {
 	useEffect( () => {
 		const updateMatch = () => setMatch( window.matchMedia( query ).matches );
 		updateMatch();
-		window.matchMedia( query ).addEventListener( 'change', updateMatch );
+		const list = window.matchMedia( query );
+		list.addListener( updateMatch );
 		return () => {
-			window.matchMedia( query ).removeEventListener( 'change', updateMatch );
+			list.removeListener( updateMatch );
 		};
 	}, [ query ] );
 

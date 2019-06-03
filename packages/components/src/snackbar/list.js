@@ -40,7 +40,6 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 				await next( { height: 0 } );
 			},
 			immediate: isReducedMotion,
-			config: { tension: 300 },
 		}
 	);
 
