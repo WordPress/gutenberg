@@ -94,13 +94,7 @@ const getTransformResult = async ( blockContent, transformName ) => {
 	return getEditedPostContent();
 };
 
-// Skipping all the tests when plugins are enabled
-// makes sure the tests are not executed, and no unused snapshots errors are thrown.
-const maybeDescribe = process.env.POPULAR_PLUGINS ?
-	describe.skip :
-	describe;
-
-maybeDescribe( 'Block transforms', () => {
+describe( 'Block transforms', () => {
 	const fileBasenames = getAvailableBlockFixturesBasenames();
 
 	const transformStructure = {};
