@@ -11,7 +11,7 @@
 	&.is-button {
 		padding: 0 10px 1px;
 		line-height: 26px;
-		height: 28px;
+		min-height: 28px;
 		border-radius: 3px;
 		white-space: nowrap;
 		border-width: $border-width;
@@ -189,13 +189,13 @@
 	}
 
 	&.is-large {
-		height: 30px;
+		min-height: 30px;
 		line-height: 28px;
 		padding: 0 12px 2px;
 	}
 
 	&.is-small {
-		height: 24px;
+		min-height: 24px;
 		line-height: 22px;
 		padding: 0 8px 1px;
 		font-size: 11px;
@@ -208,7 +208,7 @@
 		// Matches default button in hit area. See line 11.
 		padding: 0 10px;
 		line-height: 26px;
-		height: 28px;
+		min-height: 28px;
 
 		.dashicon {
 			display: inline-block;
