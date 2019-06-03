@@ -3,10 +3,12 @@
 ### New Feature
 
 - Expose `useSelect` hook for usage in functional components. ([#15737](https://github.com/WordPress/gutenberg/pull/15737))
+- Expose `useDispatch` hook for usage in functional components. ([#15896](https://github.com/WordPress/gutenberg/pull/15896))
 
 ### Enhancements
 
 - `withSelect` internally uses the new `useSelect` hook. ([#15737](https://github.com/WordPress/gutenberg/pull/15737).  **Note:** This _could_ impact performance of code using `withSelect` in edge-cases. To avoid impact, memoize passed in `mapSelectToProps` callbacks or implement `useSelect` directly with dependencies.
+- `withDispatch` internally uses a new `useDispatchWithMap` hook (an internal only api) ([#15896](https://github.com/WordPress/gutenberg/pull/15896))
 
 ## 4.5.0 (2019-05-21)
 
