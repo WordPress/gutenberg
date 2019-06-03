@@ -31,7 +31,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 
 	let mediaWidth, mediaHeight, mediaSourceUrl;
 	if ( media ) {
-		const mediaSize = applyFilters( 'editor.PostFeaturedImage.imageSize', 'post-thumbnail', media.id, currentPostId );
+		const mediaSize = applyFilters( 'editor.PostFeaturedImage.imageSize', 'medium', media.id, currentPostId );
 		if ( has( media, [ 'media_details', 'sizes', mediaSize ] ) ) {
 			mediaWidth = media.media_details.sizes[ mediaSize ].width;
 			mediaHeight = media.media_details.sizes[ mediaSize ].height;
