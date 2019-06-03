@@ -206,9 +206,6 @@ export function wipeSelectedBlock() {
 /**
  * Returns an action object used in signalling that the block selection is cleared.
  *
- * @param {Object} type   Object specifying if the clearing is destructive or not, default
- * 						  { destructive: false }.
- *
  * @return {Object} Action object.
  */
 export function clearSelectedBlock() {
