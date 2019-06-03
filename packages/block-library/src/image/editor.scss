@@ -53,6 +53,7 @@
 	.block-library-image__dimensions__row {
 		display: flex;
 		justify-content: space-between;
+		align-items: flex-start;
 
 		.block-library-image__dimensions__width,
 		.block-library-image__dimensions__height {
