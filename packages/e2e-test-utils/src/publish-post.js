@@ -16,5 +16,5 @@ export async function publishPost() {
 	await page.click( '.editor-post-publish-button' );
 
 	// A success notice should show up
-	return page.waitForSelector( '.components-notice.is-success' );
+	return page.waitForSelector( '.components-snackbar' );
 }

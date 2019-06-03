@@ -3,12 +3,23 @@
 ### New Feature
 
 - Add new `BlockQuotation` block to the primitives folder to support blockquote in a multiplatform way. [#15482](https://github.com/WordPress/gutenberg/pull/15482).
+- `DropdownMenu` now supports passing a [render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) as children for more advanced customization.
+
+### Internal
+
+- `MenuGroup` no longer uses `NavigableMenu` internally. It needs to be explicitly wrapped with `NavigableMenu` to bring back the same behavior.
+
+### Documentation
+
+- Added missing documentation for `DropdownMenu` props `menuLabel`, `position`, `className`.
+
 
 ## 7.4.0 (2019-05-21)
 
 ### New Feature
 
 - Added a new `HorizontalRule` component.
+- Added a new `Snackbar` component.
 
 ### Bug Fix
 

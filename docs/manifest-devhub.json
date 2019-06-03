@@ -912,6 +912,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Snackbar",
+		"slug": "snackbar",
+		"markdown_source": "../packages/components/src/snackbar/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Spinner",
 		"slug": "spinner",
 		"markdown_source": "../packages/components/src/spinner/README.md",
@@ -1293,6 +1299,12 @@
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "../packages/list-reusable-blocks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/media-utils",
+		"slug": "packages-media-utils",
+		"markdown_source": "../packages/media-utils/README.md",
 		"parent": "packages"
 	},
 	{
