@@ -49,11 +49,12 @@ describe( 'anchor', () => {
 				attributes: {
 					anchor: {
 						type: 'string',
+						default: 'testAnchor',
 					},
 				},
 			} );
 
-			expect( settings.attributes.anchor ).not.toHaveProperty( 'source' );
+			expect( settings.attributes.anchor ).toEqual( { type: 'string', default: 'testAnchor' } );
 		} );
 	} );
 
