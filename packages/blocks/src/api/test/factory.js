@@ -1302,7 +1302,7 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after1' );
 		} );
 
-		it( 'should pass entire block object to transform functions which are generators', () => {
+		it( 'should pass the entire block object to the "apply" method if defined', () => {
 			registerBlockType( 'core/test-group-block', {
 				attributes: {
 					value: {
@@ -1314,12 +1314,12 @@ describe( 'block factory', () => {
 						type: 'block',
 						blocks: [ '*' ],
 						isMultiBlock: true,
-						*transform( blocks ) {
+						apply( blocks ) {
 							const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
 								return createBlock( name, attributes, innerBlocks );
 							} );
 
-							yield createBlock( 'core/test-group-block', {}, groupInnerBlocks );
+							return createBlock( 'core/test-group-block', {}, groupInnerBlocks );
 						},
 					} ],
 				},
@@ -1342,6 +1342,52 @@ describe( 'block factory', () => {
 			expect( transformedBlocks ).toHaveLength( 1 );
 			expect( transformedBlocks[ 0 ].name ).toBe( 'core/test-group-block' );
 			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( numOfBlocksToGroup );
+		} );
+
+		it( 'should prefer "apply" method over "transform" method when running a transformation', () => {
+			const applySpy = jest.fn( ( blocks ) => {
+				const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
+					return createBlock( name, attributes, innerBlocks );
+				} );
+
+				return createBlock( 'core/test-group-block', {}, groupInnerBlocks );
+			} );
+			const transformSpy = jest.fn();
+
+			registerBlockType( 'core/test-group-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ '*' ],
+						isMultiBlock: true,
+						apply: applySpy,
+						transform: transformSpy,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'Test Group Block',
+			} );
+
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const numOfBlocksToGroup = 4;
+			const blocks = times( numOfBlocksToGroup, ( index ) => {
+				return createBlock( 'core/text-block', {
+					value: `textBlock${ index + 1 }`,
+				} );
+			} );
+
+			const transformedBlocks = switchToBlockType( blocks, 'core/test-group-block' );
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( applySpy.mock.calls ).toHaveLength( 1 );
+			expect( transformSpy.mock.calls ).toHaveLength( 0 );
 		} );
 	} );
 

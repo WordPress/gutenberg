@@ -12,10 +12,9 @@ import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 
-export const info = {
-	...metadata,
-	name: metadata.name,
-};
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Group' ),
@@ -34,7 +33,7 @@ export const settings = {
 				type: 'block',
 				isMultiBlock: true,
 				blocks: [ '*' ],
-				*transform( blocks ) {
+				apply( blocks ) {
 					// Avoid transforming a single `core/group` Block
 					if ( blocks.length === 1 && blocks[ 0 ].name === 'core/group' ) {
 						return;
@@ -53,11 +52,11 @@ export const settings = {
 					// to be replaced in the switchToBlockType call thereby meaning they
 					// are removed both from their original location and within the
 					// new group block.
-					const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
-						return createBlock( name, attributes, innerBlocks );
+					const groupInnerBlocks = blocks.map( ( block ) => {
+						return createBlock( block.name, block.attributes, block.innerBlocks );
 					} );
 
-					yield createBlock( 'core/group', {
+					return createBlock( 'core/group', {
 						align: widestAlignment,
 					}, groupInnerBlocks );
 				},

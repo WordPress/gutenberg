@@ -11,6 +11,7 @@ import {
 	filter,
 	first,
 	flatMap,
+	has,
 	uniq,
 	isFunction,
 	isEmpty,
@@ -26,16 +27,6 @@ import { createHooks, applyFilters } from '@wordpress/hooks';
  */
 import { getBlockType, getBlockTypes } from './registration';
 import { normalizeBlockType } from './utils';
-
-/**
- * Determines whether a function is a Generator function
- * @param  {Function} fn the function to test
- * @return {boolean}     whether or not the function is a generator
- */
-function isGenerator( fn ) {
-	const sampleGenerator = function*() {};
-	return fn.constructor.name === 'GeneratorFunction' && fn.constructor === sampleGenerator.constructor;
-}
 
 /**
  * Returns a block object given its type and attributes.
@@ -418,21 +409,17 @@ export function switchToBlockType( blocks, name ) {
 
 	let transformationResults;
 
-	// Progressively enhancing the function signature using Generators
-	// Generator based transform functions are passed the entire Block object
 	if ( transformation.isMultiBlock ) {
-		if ( isGenerator( transformation.transform ) ) {
-			const gen = transformation.transform( blocksArray );
-			transformationResults = Array.from( gen );
+		if ( has( transformation, 'apply' ) ) {
+			transformationResults = transformation.apply( blocksArray );
 		} else {
 			transformationResults = transformation.transform(
 				blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
 				blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks ),
 			);
 		}
-	} else if ( isGenerator( transformation.transform ) ) {
-		const gen = transformation.transform( [ firstBlock ] );
-		transformationResults = Array.from( gen );
+	} else if ( has( transformation, 'apply' ) ) {
+		transformationResults = transformation.apply( [ firstBlock ] );
 	} else {
 		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks );
 	}
