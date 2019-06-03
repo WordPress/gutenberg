@@ -7,7 +7,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../create-higher-order-component';
+import createHigherOrderComponent from '../../utils/create-higher-order-component';
 
 /**
  * Given a component returns the enhanced component augmented with a component

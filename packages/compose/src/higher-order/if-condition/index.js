@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../create-higher-order-component';
+import createHigherOrderComponent from '../../utils/create-higher-order-component';
 
 /**
  * Higher-order component creator, creating a new component which renders if
