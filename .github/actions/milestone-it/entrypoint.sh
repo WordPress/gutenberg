@@ -28,7 +28,7 @@ curl \
 	-X POST \
 	-H "Authorization: token $GITHUB_TOKEN" \
 	-H "Content-Type: application/json" \
-	-d "{\"title\":\"$milestone\"}" \
+	-d "{\"title\":\"$milestone\",description:\"Tasks to be included in the $milestone plugin release.\"}" \
 	"https://api.github.com/repos/$GITHUB_REPOSITORY/milestones" > /dev/null
 
 # 4. Find milestone number. This could be improved to allow for non-open status
