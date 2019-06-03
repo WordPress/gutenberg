@@ -100,7 +100,8 @@ class PostTitle extends Component {
 					} }
 					placeholder={ decodedPlaceholder }
 					value={ title }
-					onSplit={ this.props.onEnterPress }
+					onSplit={ () => { } }
+					onReplace={ this.props.onEnterPress }
 					disableEditingMenu={ true }
 					setRef={ ( ref ) => {
 						this.titleViewRef = ref;
