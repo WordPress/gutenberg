@@ -3,7 +3,6 @@
 exports[`MoreMenu should match snapshot 1`] = `
 <MoreMenu>
   <DropdownMenu
-    __unstableLabelPosition="bottom"
     __unstablePopoverClassName="edit-post-more-menu__content"
     className="edit-post-more-menu"
     icon="ellipsis"

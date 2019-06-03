@@ -19,7 +19,6 @@ const MoreMenu = () => (
 		position="bottom left"
 		icon="ellipsis"
 		label={ __( 'More tools & options' ) }
-		__unstableLabelPosition="bottom"
 		__unstablePopoverClassName="edit-post-more-menu__content"
 	>
 		{ ( { onClose } ) => (
