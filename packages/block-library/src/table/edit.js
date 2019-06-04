@@ -13,6 +13,7 @@ import {
 	RichText,
 	PanelColorSettings,
 	createCustomColorsHOC,
+	BlockIcon,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -22,6 +23,7 @@ import {
 	Button,
 	Toolbar,
 	DropdownMenu,
+	Placeholder,
 } from '@wordpress/components';
 
 /**
@@ -36,6 +38,7 @@ import {
 	deleteColumn,
 	toggleSection,
 } from './state';
+import icon from './icon';
 
 const BACKGROUND_COLORS = [
 	{
@@ -418,23 +421,32 @@ export class TableEdit extends Component {
 
 		if ( isEmpty ) {
 			return (
-				<form onSubmit={ this.onCreateTable }>
-					<TextControl
-						type="number"
-						label={ __( 'Column Count' ) }
-						value={ initialColumnCount }
-						onChange={ this.onChangeInitialColumnCount }
-						min="1"
-					/>
-					<TextControl
-						type="number"
-						label={ __( 'Row Count' ) }
-						value={ initialRowCount }
-						onChange={ this.onChangeInitialRowCount }
-						min="1"
-					/>
-					<Button isPrimary type="submit">{ __( 'Create' ) }</Button>
-				</form>
+				<Placeholder
+					label={ __( 'Table' ) }
+					icon={ <BlockIcon icon={ icon } showColors /> }
+					instructions={ __( 'Insert a table for sharing data.' ) }
+					isColumnLayout
+				>
+					<form className="wp-block-table__placeholder-form" onSubmit={ this.onCreateTable }>
+						<TextControl
+							type="number"
+							label={ __( 'Column Count' ) }
+							value={ initialColumnCount }
+							onChange={ this.onChangeInitialColumnCount }
+							min="1"
+							className="wp-block-table__placeholder-input"
+						/>
+						<TextControl
+							type="number"
+							label={ __( 'Row Count' ) }
+							value={ initialRowCount }
+							onChange={ this.onChangeInitialRowCount }
+							min="1"
+							className="wp-block-table__placeholder-input"
+						/>
+						<Button className="wp-block-table__placeholder-button" isDefault type="submit">{ __( 'Create Table' ) }</Button>
+					</form>
+				</Placeholder>
 			);
 		}
 
