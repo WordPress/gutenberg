@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -104,9 +104,8 @@ export function getNotificationArgumentsForSaveFail( data ) {
 		__( 'Updating failed.' );
 
 	if ( ! ( /<\/?[^>]*>/.test( error.message ) ) ) {
-		noticeMessage = noticeMessage + ' ' + error.message;
+		noticeMessage = sprintf( '%1$s %2$s', noticeMessage, error.message );
 	}
-
 	return [ noticeMessage, { id: SAVE_POST_NOTICE_ID } ];
 }
 
