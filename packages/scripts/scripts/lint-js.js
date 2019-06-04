@@ -17,6 +17,7 @@ const {
 
 const args = getCliArgs();
 
+// See: https://eslint.org/docs/user-guide/configuring#using-configuration-files-1.
 const hasLintConfig = hasCliArg( '-c' ) ||
 	hasCliArg( '--config' ) ||
 	hasProjectFile( '.eslintrc.js' ) ||
@@ -33,9 +34,17 @@ const config = ! hasLintConfig ?
 	[ '--no-eslintrc', '--config', fromConfigRoot( '.eslintrc.js' ) ] :
 	[];
 
+// See: https://eslint.org/docs/user-guide/configuring#ignoring-files-and-directories.
+const hasIgnoredFiles = hasCliArg( '--ignore-path' ) ||
+	hasProjectFile( '.eslintignore' );
+
+const defaultIgnoreArgs = ! hasIgnoredFiles ?
+	[ '--ignore-path', fromConfigRoot( '.eslintignore' ) ] :
+	[];
+
 const result = spawn(
 	resolveBin( 'eslint' ),
-	[ ...config, ...args ],
+	[ ...config, ...defaultIgnoreArgs, ...args ],
 	{ stdio: 'inherit' }
 );
 
