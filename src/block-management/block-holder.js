@@ -27,7 +27,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { addAction, hasAction, removeAction } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
-import { BlockEdit } from '@wordpress/block-editor';
+import { BlockEdit, BlockInvalidWarning } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
@@ -175,26 +175,31 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	render() {
-		const { isSelected, borderStyle, focusedBorderColor } = this.props;
+		const { isSelected, borderStyle, focusedBorderColor, isValid, name } = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
-
 		const accessibilityLabel = this.getAccessibilityLabelForBlock();
+		const blockType = getBlockType( name );
 
 		return (
 			// accessible prop needs to be false to access children
 			// https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
 			<TouchableWithoutFeedback
 				accessible={ false }
-				onPress={ this.onFocus } >
+				onPress={ this.onFocus }
+			>
 
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View
 						accessibile={ true }
 						accessibilityLabel={ accessibilityLabel }
-						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>
-						{ this.getBlockForType() }
+						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
+					>
+						{ isValid && this.getBlockForType() }
+						{ ! isValid &&
+							<BlockInvalidWarning blockTitle={ blockType.title } icon={ blockType.icon } />
+						}
 					</View>
 					{ this.renderToolbar() }
 				</View>
@@ -207,20 +212,20 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
-			getBlockAttributes,
 			getBlockName,
 			getBlockIndex,
 			getBlocks,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
 			isBlockSelected,
+			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
-		const name = getBlockName( clientId );
-		const attributes = getBlockAttributes( clientId );
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
 		const isFirstBlock = order === 0;
 		const isLastBlock = order === getBlocks().length - 1;
+		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+		const { name, attributes, isValid } = block || {};
 
 		return {
 			attributes,
@@ -232,6 +237,7 @@ export default compose( [
 			isLastBlock,
 			isSelected,
 			name,
+			isValid,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId }, { select } ) => {
