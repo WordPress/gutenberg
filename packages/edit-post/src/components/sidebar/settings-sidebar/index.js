@@ -31,22 +31,18 @@ const SettingsSidebar = ( { sidebarName } ) => (
 		<SettingsHeader sidebarName={ sidebarName } />
 		<Panel>
 			{ sidebarName === 'edit-post/document' && (
-				<PluginDocumentSetting.Slot>
-					{ ( fills ) => (
-						<Fragment>
-							<PostStatus />
-							{ fills }
-							<LastRevision />
-							<PostLink />
-							<PostTaxonomies />
-							<FeaturedImage />
-							<PostExcerpt />
-							<DiscussionPanel />
-							<PageAttributes />
-							<MetaBoxes location="side" />
-						</Fragment>
-					) }
-				</PluginDocumentSetting.Slot>
+				<Fragment>
+					<PostStatus />
+					<PluginDocumentSetting.Slot />
+					<LastRevision />
+					<PostLink />
+					<PostTaxonomies />
+					<FeaturedImage />
+					<PostExcerpt />
+					<DiscussionPanel />
+					<PageAttributes />
+					<MetaBoxes location="side" />
+				</Fragment>
 			) }
 			{ sidebarName === 'edit-post/block' && (
 				<PanelBody className="edit-post-settings-sidebar__panel-block">
