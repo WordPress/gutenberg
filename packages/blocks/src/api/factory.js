@@ -419,7 +419,7 @@ export function switchToBlockType( blocks, name ) {
 			);
 		}
 	} else if ( has( transformation, 'convert' ) ) {
-		transformationResults = transformation.convert( [ firstBlock ] );
+		transformationResults = transformation.convert( firstBlock );
 	} else {
 		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks );
 	}

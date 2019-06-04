@@ -1302,7 +1302,7 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after1' );
 		} );
 
-		it( 'should pass the entire block object to the "convert" method if defined', () => {
+		it( 'should pass entire block object(s) to the "convert" method if defined', () => {
 			registerBlockType( 'core/test-group-block', {
 				attributes: {
 					value: {
