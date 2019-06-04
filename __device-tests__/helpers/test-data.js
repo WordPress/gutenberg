@@ -17,3 +17,13 @@ exports.listEndedHtml = `<!-- wp:list -->
 <!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->`;
+
+exports.pastePlainText = `Hello paste`;
+
+const pastedHtmlText = `<!-- wp:paragraph -->
+<p><strong>Hello</strong> paste</p>
+<!-- /wp:paragraph -->`;
+
+exports.pasteHtmlText = pastedHtmlText;
+
+exports.pasteHtmlTextResult = `${ pastedHtmlText }\n\n${ pastedHtmlText }`;
