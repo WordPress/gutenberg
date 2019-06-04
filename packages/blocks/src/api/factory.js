@@ -448,7 +448,7 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	const rtn = transformationResults.map( ( result, index ) => {
+	return transformationResults.map( ( result, index ) => {
 		const transformedBlock = {
 			...result,
 			// The first transformed block whose type matches the "destination"
@@ -466,6 +466,4 @@ export function switchToBlockType( blocks, name ) {
 		 */
 		return applyFilters( 'blocks.switchToBlockType.transformedBlock', transformedBlock, blocks );
 	} );
-
-	return rtn;
 }
