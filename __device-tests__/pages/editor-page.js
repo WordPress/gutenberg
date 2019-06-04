@@ -24,6 +24,7 @@ export default class EditorPage {
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
 	listBlockName = 'List';
+	imageBlockName = 'Image';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
@@ -57,6 +58,14 @@ export default class EditorPage {
 		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "Block. Row ${ position }.")]`;
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		return elements.length > 0;
+	}
+
+	async dismissKeyboard() {
+		if ( isAndroid() ) {
+			return await this.driver.hideDeviceKeyboard();
+		}
+		const hideKeyboardToolbarButton = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Hide keyboard"]' );
+		await hideKeyboardToolbarButton.click();
 	}
 
 	// =========================
@@ -285,5 +294,39 @@ export default class EditorPage {
 		expect( text ).toBe( html );
 
 		await toggleHtmlMode( this.driver );
+	}
+
+	// =========================
+	// Image Block functions
+	// =========================
+
+	async addNewImageBlock() {
+		await this.addNewBlock( this.imageBlockName );
+	}
+
+	async getImageBlockAtPosition( position: number ) {
+		return this.getBlockAtPosition( position, this.imageBlockName );
+	}
+
+	async selectEmptyImageBlock( block: wd.PromiseChainWebdriver.Element ) {
+		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
+		const imageBlockInnerElement = await this.driver.elementByXPath( blockLocator );
+		await imageBlockInnerElement.click();
+	}
+
+	async chooseMediaLibrary() {
+		const mediaLibraryButton = await this.driver.elementByAccessibilityId( 'WordPress Media Library' );
+		await mediaLibraryButton.click();
+	}
+
+	async enterCaptionToSelectedImageBlock( caption: string ) {
+		const imageBlockCaptionField = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Image caption. Empty"]' );
+		await imageBlockCaptionField.click();
+		await typeString( this.driver, imageBlockCaptionField, caption );
+	}
+
+	async removeImageBlockAtPosition( position: number ) {
+		return await this.removeBlockAtPosition( position, this.imageBlockName );
 	}
 }
