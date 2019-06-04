@@ -17,6 +17,12 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"files": [
+		"configs",
+		"rules",
+		"index.js"
+	],
+	"main": "index.js",
 	"dependencies": {
 		"babel-eslint": "^10.0.1",
 		"eslint-plugin-jsx-a11y": "^6.2.1",

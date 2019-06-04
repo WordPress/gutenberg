@@ -59,6 +59,7 @@
 		display: flex;
 		align-items: center;
 		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
+		@include reduce-motion("transition");
 	}
 
 	// Add a dropdown arrow indicator.

@@ -2,13 +2,18 @@
 
 ## Common Sources
 
-Attribute sources are used to define the strategy by which block attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
+Attribute sources are used to define how the block attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
 
 If no attribute source is specified, the attribute will be saved to (and read from) the block's [comment delimiter](/docs/designers-developers/key-concepts.md#delimiters-and-parsing-expression-grammar).
 
-Each source accepts an optional selector as the first argument. If a selector is specified, the source behavior will be run against the corresponding element(s) contained within the block. Otherwise it will be run against the block's root node.
+The keys specified in the attributes source object are named as you see fit. The result of the attribute source definition is assigned as a value to each key.
 
-Under the hood, attribute sources are a superset of functionality provided by [hpq](https://github.com/aduth/hpq), a small library used to parse and query HTML markup into an object shape. In an object of attributes sources, you can name the keys as you see fit. The resulting object will assign as a value to each key the result of its attribute source.
+If no selector argument is specified, the source definition runs against the block's root node. If a selector argument is specified, it will run against the specified element(s) contained within the block.
+
+The selector specified can be an HTML tag, or anything queryable such as a class or id attribute, see examples below.
+
+Under the hood, attribute sources are a superset of the functionality provided by [hpq](https://github.com/aduth/hpq), a small library used to parse and query HTML markup into an object shape.
+
 
 ### `attribute`
 
@@ -41,6 +46,19 @@ Use `text` to extract the inner text from markup.
 	}
 }
 // { "content": "The inner text of the figcaption element" }
+```
+
+Another example, using `text` as the source, and using `.my-content` class as the selector to extract text:
+
+```js
+{
+	content: {
+		type: 'string',
+		source: 'text',
+		selector: '.my-content',
+	}
+}
+// { "content": "The inner text of .my-content class" }
 ```
 
 ### `html`

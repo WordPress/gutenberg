@@ -1,0 +1,31 @@
+/** @format */
+
+.container {
+	background-color: $gray-lighten-30;
+	padding-top: 24;
+	padding-bottom: 24;
+	padding-left: 8;
+	padding-right: 8;
+	align-items: center;
+	justify-content: center;
+}
+
+.icon {
+	width: 24px;
+	height: 24px;
+	margin-bottom: 4;
+	fill: $gray-dark;
+}
+
+.title {
+	text-align: center;
+	margin-bottom: 6;
+	font-size: 14;
+	color: $gray-dark;
+}
+
+.message {
+	text-align: center;
+	color: $gray-text-min;
+	font-size: 12;
+}

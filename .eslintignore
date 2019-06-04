@@ -4,3 +4,5 @@ node_modules
 packages/e2e-tests/plugins
 vendor
 packages/block-serialization-spec-parser/parser.js
+
+!.eslintrc.js

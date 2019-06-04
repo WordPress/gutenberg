@@ -5,6 +5,7 @@ exports[`PluginMoreMenuItem renders menu item as button properly 1`] = `
   className="components-menu-group"
 >
   <div
+    aria-hidden="true"
     className="components-menu-group__label"
     id="components-menu-group-label-0"
   >
@@ -12,9 +13,7 @@ exports[`PluginMoreMenuItem renders menu item as button properly 1`] = `
   </div>
   <div
     aria-labelledby="components-menu-group-label-0"
-    aria-orientation="vertical"
-    onKeyDown={[Function]}
-    role="menu"
+    role="group"
   >
     <button
       className="components-button components-icon-button components-menu-item__button has-icon has-text"

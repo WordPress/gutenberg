@@ -3,13 +3,14 @@
  */
 import {
 	activatePlugin,
+	clickBlockToolbarButton,
 	clickOnMoreMenuItem,
 	createNewPost,
 	deactivatePlugin,
 } from '@wordpress/e2e-test-utils';
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
-	await expect( page ).toClick( '.block-editor-block-settings-menu__toggle' );
+	await clickBlockToolbarButton( 'More options' );
 	const itemButton = ( await page.$x( `//*[contains(@class, "block-editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
 	await itemButton.click();
 };

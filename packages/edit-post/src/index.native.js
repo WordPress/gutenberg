@@ -24,6 +24,7 @@ export function initializeEditor() {
 		unregisterBlockType( 'core/code' );
 		unregisterBlockType( 'core/more' );
 		unregisterBlockType( 'core/video' );
+		unregisterBlockType( 'core/quote' );
 	}
 }
 
