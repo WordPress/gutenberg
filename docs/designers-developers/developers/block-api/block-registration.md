@@ -334,7 +334,7 @@ transforms: {
     from: [
         {
             type: 'block',
-            blocks: blocks: [ '*' ], // wildcard - match any block
+            blocks: [ '*' ], // wildcard - match any block
             transform: ( attributes, innerBlocks ) => {
                 // transform logic here
             },
