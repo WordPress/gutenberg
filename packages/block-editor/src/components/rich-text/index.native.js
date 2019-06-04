@@ -862,7 +862,7 @@ export class RichText extends Component {
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || styles[ 'block-editor-rich-text' ].fontFamily }
-					fontSize={ this.props.fontSize }
+					fontSize={ this.props.fontSize || ( style && style.fontSize ) }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ this.props.disableEditingMenu }
