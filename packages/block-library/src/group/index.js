@@ -33,7 +33,7 @@ export const settings = {
 				type: 'block',
 				isMultiBlock: true,
 				blocks: [ '*' ],
-				apply( blocks ) {
+				convert( blocks ) {
 					// Avoid transforming a single `core/group` Block
 					if ( blocks.length === 1 && blocks[ 0 ].name === 'core/group' ) {
 						return;

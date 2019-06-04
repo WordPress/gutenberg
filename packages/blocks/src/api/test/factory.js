@@ -1302,7 +1302,7 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after1' );
 		} );
 
-		it( 'should pass the entire block object to the "apply" method if defined', () => {
+		it( 'should pass the entire block object to the "convert" method if defined', () => {
 			registerBlockType( 'core/test-group-block', {
 				attributes: {
 					value: {
@@ -1314,7 +1314,7 @@ describe( 'block factory', () => {
 						type: 'block',
 						blocks: [ '*' ],
 						isMultiBlock: true,
-						apply( blocks ) {
+						convert( blocks ) {
 							const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
 								return createBlock( name, attributes, innerBlocks );
 							} );
@@ -1344,8 +1344,8 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( numOfBlocksToGroup );
 		} );
 
-		it( 'should prefer "apply" method over "transform" method when running a transformation', () => {
-			const applySpy = jest.fn( ( blocks ) => {
+		it( 'should prefer "convert" method over "transform" method when running a transformation', () => {
+			const convertSpy = jest.fn( ( blocks ) => {
 				const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
 					return createBlock( name, attributes, innerBlocks );
 				} );
@@ -1365,7 +1365,7 @@ describe( 'block factory', () => {
 						type: 'block',
 						blocks: [ '*' ],
 						isMultiBlock: true,
-						apply: applySpy,
+						convert: convertSpy,
 						transform: transformSpy,
 					} ],
 				},
@@ -1386,7 +1386,7 @@ describe( 'block factory', () => {
 			const transformedBlocks = switchToBlockType( blocks, 'core/test-group-block' );
 
 			expect( transformedBlocks ).toHaveLength( 1 );
-			expect( applySpy.mock.calls ).toHaveLength( 1 );
+			expect( convertSpy.mock.calls ).toHaveLength( 1 );
 			expect( transformSpy.mock.calls ).toHaveLength( 0 );
 		} );
 	} );
