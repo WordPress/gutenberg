@@ -202,9 +202,9 @@ class VideoEdit extends React.Component {
 								</View>
 							);
 
-							const videoStyle = {
+							const videoContainerStyle = {
+								...style.videoContainer,
 								height: videoContainerHeight,
-								...style.video,
 							};
 
 							const containerStyle = showVideo && isSelected ? style.containerFocused : style.container;
@@ -214,14 +214,14 @@ class VideoEdit extends React.Component {
 									{ showVideo && isURL( src ) &&
 										<Video
 											isSelected={ isSelected }
-											style={ videoStyle }
+											style={ { ...videoContainerStyle } }
 											source={ { uri: src } }
 											paused={ true }
 											muted={ true }
 										/>
 									}
 									{ ! showVideo &&
-										<View style={ { ...videoStyle, ...style.placeholder } }>
+										<View style={ { height: videoContainerHeight, width: '100%', ...style.placeholder } }>
 											{ videoContainerHeight > 0 && iconContainer }
 											{ isUploadFailed && <Text style={ style.uploadFailedText }>{ retryMessage }</Text> }
 										</View>
