@@ -39,15 +39,6 @@ export const shortcuts = {
 		raw: rawShortcut.primaryAlt( 'y' ),
 		display: displayShortcut.primaryAlt( 'y' ),
 	},
-	group: {
-		raw: rawShortcut.primaryAlt( 'g' ),
-		display: displayShortcut.primaryAlt( 'g' ),
-	},
-	ungroup: {
-		raw: rawShortcut.secondary( 'g' ),
-		display: displayShortcut.secondary( 'g' ),
-	},
-
 };
 
 class BlockEditorKeyboardShortcuts extends Component {
@@ -100,7 +91,7 @@ class BlockEditorKeyboardShortcuts extends Component {
 				/>
 				{ selectedBlockClientIds.length > 0 && (
 					<BlockActions clientIds={ selectedBlockClientIds }>
-						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, onGroup, onUngroup } ) => (
+						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore } ) => (
 							<KeyboardShortcuts
 								bindGlobal
 								shortcuts={ {
@@ -118,10 +109,6 @@ class BlockEditorKeyboardShortcuts extends Component {
 									// Does not clash with any known browser/native shortcuts, but preventDefault
 									// is used to prevent any obscure unknown shortcuts from triggering.
 									[ shortcuts.insertAfter.raw ]: flow( preventDefault, onInsertAfter ),
-
-									[ shortcuts.group.raw ]: flow( preventDefault, onGroup ),
-
-									[ shortcuts.ungroup.raw ]: flow( preventDefault, onUngroup ),
 								} }
 							/>
 						) }

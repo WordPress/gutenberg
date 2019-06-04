@@ -12,7 +12,6 @@ import { _x } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -32,7 +31,6 @@ export function ConvertToGroupButton( {
 					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 					icon={ Group }
 					onClick={ onConvertToGroup }
-					shortcut={ displayShortcut.primaryAlt( 'g' ) }
 				>
 					{ _x( 'Group', 'verb' ) }
 				</MenuItem>
@@ -42,7 +40,6 @@ export function ConvertToGroupButton( {
 					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 					icon={ UnGroup }
 					onClick={ onConvertFromGroup }
-					shortcut={ displayShortcut.secondary( 'g' ) }
 				>
 					{ _x( 'Ungroup', 'Ungrouping blocks from within a Group block back into individual blocks within the Editor ' ) }
 				</MenuItem>
