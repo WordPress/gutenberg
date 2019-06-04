@@ -74,6 +74,6 @@ Please see <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUT
 - <a href="https://developer.wordpress.org/block-editor/contributors/design/">Design Principles and block design best practices</a>
 - <a href="https://github.com/Automattic/wp-post-grammar">WP Post Grammar Parser</a>
 - <a href="https://make.wordpress.org/core/tag/gutenberg/">Development updates on make.wordpress.org</a>
-- <a href="https://wordpress.org/gutenberg/handbook/">Documentation: Creating Blocks, Reference, and Guidelines</a>
+- <a href="https://developer.wordpress.org/block-editor/">Documentation: Creating Blocks, Reference, and Guidelines</a>
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

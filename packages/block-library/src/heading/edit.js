@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * Internal dependencies
  */
 import HeadingToolbar from './heading-toolbar';
@@ -8,20 +13,47 @@ import HeadingToolbar from './heading-toolbar';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import {
-	RichText,
+	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
-	AlignmentToolbar,
+	RichText,
+	withColors,
+	PanelColorSettings,
 } from '@wordpress/block-editor';
+import { memo } from '@wordpress/element';
 
-export default function HeadingEdit( {
+const HeadingColorUI = memo(
+	function( {
+		textColorValue,
+		setTextColor,
+	} ) {
+		return (
+			<PanelColorSettings
+				title={ __( 'Color Settings' ) }
+				initialOpen={ false }
+				colorSettings={ [
+					{
+						value: textColorValue,
+						onChange: setTextColor,
+						label: __( 'Text Color' ),
+					},
+				] }
+			/>
+		);
+	}
+);
+
+function HeadingEdit( {
 	attributes,
 	setAttributes,
 	mergeBlocks,
 	onReplace,
 	className,
+	textColor,
+	setTextColor,
 } ) {
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
@@ -43,6 +75,10 @@ export default function HeadingEdit( {
 						} }
 					/>
 				</PanelBody>
+				<HeadingColorUI
+					setTextColor={ setTextColor }
+					textColorValue={ textColor.color }
+				/>
 			</InspectorControls>
 			<RichText
 				identifier="content"
@@ -63,10 +99,20 @@ export default function HeadingEdit( {
 				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
-				style={ { textAlign: align } }
-				className={ className }
+				className={ classnames( className, {
+					'has-text-color': textColor.color,
+					[ textColor.class ]: textColor.class,
+				} ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
+				style={ {
+					color: textColor.color,
+					textAlign: align,
+				} }
 			/>
 		</>
 	);
 }
+
+export default compose( [
+	withColors( 'backgroundColor', { textColor: 'color' } ),
+] )( HeadingEdit );

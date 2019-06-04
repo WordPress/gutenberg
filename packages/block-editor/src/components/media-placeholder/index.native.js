@@ -7,7 +7,6 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Dashicon } from '@wordpress/components';
 import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
 
 /**
@@ -31,21 +30,12 @@ function MediaPlaceholder( props ) {
 		}
 	}
 
-	let placeholderIcon = icon;
-	if ( placeholderIcon === undefined ) {
-		if ( isImage ) {
-			placeholderIcon = 'format-image';
-		} else if ( isVideo ) {
-			placeholderIcon = 'format-video';
-		}
-	}
-
 	let instructions = labels.instructions;
 	if ( instructions === undefined ) {
 		if ( isImage ) {
-			instructions = __( 'CHOOSE IMAGE' );
+			instructions = __( 'ADD IMAGE' );
 		} else if ( isVideo ) {
-			instructions = __( 'CHOOSE VIDEO' );
+			instructions = __( 'ADD VIDEO' );
 		}
 	}
 
@@ -70,11 +60,16 @@ function MediaPlaceholder( props ) {
 						) }
 						accessibilityRole={ 'button' }
 						accessibilityHint={ accessibilityHint }
-						onPress={ open }
+						onPress={ ( event ) => {
+							props.onFocus( event );
+							open();
+						} }
 					>
 						<View style={ styles.emptyStateContainer }>
 							{ getMediaOptions() }
-							<Dashicon icon={ placeholderIcon } />
+							<View style={ styles.modalIcon }>
+								{ icon }
+							</View>
 							<Text style={ styles.emptyStateTitle }>
 								{ placeholderTitle }
 							</Text>

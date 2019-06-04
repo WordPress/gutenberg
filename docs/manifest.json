@@ -288,6 +288,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/data-controls",
+		"slug": "packages-data-controls",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/data-controls/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/data",
 		"slug": "packages-data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/data/README.md",
@@ -441,6 +447,12 @@
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/list-reusable-blocks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/media-utils",
+		"slug": "packages-media-utils",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/media-utils/README.md",
 		"parent": "packages"
 	},
 	{
@@ -879,6 +891,12 @@
 		"title": "SlotFill",
 		"slug": "slot-fill",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/slot-fill/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Snackbar",
+		"slug": "snackbar",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/snackbar/README.md",
 		"parent": "components"
 	},
 	{

@@ -1,3 +1,9 @@
+## Master
+
+### Braking Change
+
+- Added `type` and `react-native` to the order of preferred properties. 
+
 ## 1.2.0 (2019-03-06)
 
 ### Internal
