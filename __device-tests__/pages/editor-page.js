@@ -286,4 +286,14 @@ export default class EditorPage {
 
 		await toggleHtmlMode( this.driver );
 	}
+
+	// set html editor content explicitly
+	async setHtmlContentAndroid( html: string ) {
+		await toggleHtmlMode( this.driver );
+
+		const htmlContentView = await this.getTextViewForHtmlViewContent();
+		await htmlContentView.setText( html );
+
+		await toggleHtmlMode( this.driver );
+	}
 }
