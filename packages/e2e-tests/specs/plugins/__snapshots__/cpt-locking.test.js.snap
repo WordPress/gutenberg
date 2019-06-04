@@ -48,7 +48,7 @@ exports[`cpt locking template_lock false should allow blocks to be moved 1`] = `
 
 exports[`cpt locking template_lock false should allow blocks to be removed 1`] = `
 "<!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img src=\\"\\" alt=\\"\\"/></figure>
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
 <!-- wp:quote -->

@@ -6,7 +6,7 @@ exports[`Navigating the block hierarchy should appear and function even without 
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img src=\\"\\" alt=\\"\\"/></figure>
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->"
 `;
 
