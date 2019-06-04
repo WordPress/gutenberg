@@ -2,7 +2,7 @@
  * Clicks an element, drags a particular distance and releases the mouse button.
  *
  * @param {Object} element The puppeteer element handle.
- * @param {number} delta   Object containing movement distances.
+ * @param {Object} delta   Object containing movement distances.
  * @param {number} delta.x Horizontal distance to drag.
  * @param {number} delta.y Vertical distance to drag.
  *
