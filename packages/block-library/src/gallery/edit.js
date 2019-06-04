@@ -63,6 +63,7 @@ class GalleryEdit extends Component {
 
 		this.state = {
 			selectedImage: null,
+			attachmentCaptions: null,
 		};
 	}
 
@@ -153,16 +154,20 @@ class GalleryEdit extends Component {
 	}
 
 	onSelectImages( newImages ) {
-		const { columns, images, attachmentCaptions } = this.props.attributes;
-
+		const { columns, images } = this.props.attributes;
+		const { attachmentCaptions } = this.state;
+		this.setState(
+			{
+				attachmentCaptions: newImages.map( ( newImage ) => ( {
+					id: newImage.id,
+					caption: newImage.caption,
+				} ) ),
+			}
+		);
 		this.setAttributes( {
 			images: newImages.map( ( newImage ) => ( {
 				...pickRelevantMediaFiles( newImage ),
 				caption: this.selectCaption( newImage, images, attachmentCaptions ),
-			} ) ),
-			attachmentCaptions: newImages.map( ( newImage ) => ( {
-				id: newImage.id,
-				caption: newImage.caption,
 			} ) ),
 			columns: columns ? Math.min( newImages.length, columns ) : columns,
 		} );

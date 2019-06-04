@@ -50,10 +50,6 @@
 		"linkTo": {
 			"type": "string",
 			"default": "none"
-		},
-		"attachmentCaptions": {
-			"type": "array",
-			"default": []
 		}
 	}
 }
