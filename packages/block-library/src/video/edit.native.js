@@ -134,7 +134,7 @@ class VideoEdit extends React.Component {
 			return <Icon icon={ SvgIconRetry } { ...style.icon } />;
 		}
 
-		return <Icon icon={ SvgIcon } { isUploadInProgress ? ...style.iconUploading : ...style.icon } />;
+		return <Icon icon={ SvgIcon } { ...( isUploadInProgress ? style.iconUploading : style.icon ) } />;
 	}
 
 	render() {
