@@ -455,17 +455,12 @@ class ImageEdit extends Component {
 			);
 		}
 
-		let classes = classnames( {
+		const classes = classnames( {
 			'is-transient': isBlobURL( url ),
 			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
+			[ `size-${ sizeSlug }` ]: sizeSlug,
 		} );
-
-		if ( sizeSlug ) {
-			const mediaSizeClass = 'size-' + sizeSlug;
-			const classNameWithoutSize = classes.replace( /(\s+?)size-(.*?)(\s+?)/, '' );
-			classes = classnames( classNameWithoutSize, mediaSizeClass );
-		}
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;

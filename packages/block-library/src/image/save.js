@@ -24,15 +24,11 @@ export default function save( { attributes } ) {
 		sizeSlug,
 	} = attributes;
 
-	let classes = classnames( {
+	const classes = classnames( {
 		[ `align${ align }` ]: align,
+		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
 	} );
-
-	if ( sizeSlug ) {
-		const mediaSizeClass = 'size-' + sizeSlug;
-		classes = classnames( classes, mediaSizeClass );
-	}
 
 	const image = (
 		<img
