@@ -194,10 +194,10 @@ class ImageEdit extends React.Component {
 
 	getIcon( isRetryIcon ) {
 		if ( isRetryIcon ) {
-			return <Icon icon={ SvgIconRetry } style={ styles.iconRetry } />;
+			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 		}
 
-		return <Icon icon={ SvgIcon } style={ styles.icon } />;
+		return <Icon icon={ SvgIcon } { ...styles.icon } />;
 	}
 
 	render() {
