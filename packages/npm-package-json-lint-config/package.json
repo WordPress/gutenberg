@@ -21,6 +21,9 @@
 	"engines": {
 		"node": ">=8"
 	},
+	"files": [
+		"index.js"
+	],
 	"main": "index.js",
 	"peerDependencies": {
 		"npm-package-json-lint": ">=3.6.0"

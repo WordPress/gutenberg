@@ -552,14 +552,14 @@ export class RichText extends Component {
 
 		if ( typeof pastedContent === 'string' ) {
 			const recordToInsert = create( { html: pastedContent } );
-			const insertedContent = insert( currentRecord, recordToInsert );
-			const newContent = this.valueToFormat( insertedContent );
+			const resultingRecord = insert( currentRecord, recordToInsert );
+			const resultingContent = this.valueToFormat( resultingRecord );
 
 			this.lastEventCount = undefined;
-			this.value = newContent;
+			this.value = resultingContent;
 
 			// explicitly set selection after inline paste
-			this.forceSelectionUpdate( insertedContent.start, insertedContent.end );
+			this.onSelectionChange( resultingRecord.start, resultingRecord.end );
 
 			this.props.onChange( this.value );
 		} else if ( onSplit ) {
@@ -673,15 +673,6 @@ export class RichText extends Component {
 		return value;
 	}
 
-	forceSelectionUpdate( start, end ) {
-		if ( ! this.needsSelectionUpdate ) {
-			this.needsSelectionUpdate = true;
-			this.selectionStart = start;
-			this.selectionEnd = end;
-			this.forceUpdate();
-		}
-	}
-
 	shouldComponentUpdate( nextProps ) {
 		if ( nextProps.tagName !== this.props.tagName ) {
 			this.lastEventCount = undefined;
@@ -725,7 +716,11 @@ export class RichText extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.isSelected ) {
+		// Request focus if wrapping block is selected and parent hasn't inhibited the focus request. This method of focusing
+		//  is trying to implement the web-side counterpart of BlockList's `focusTabbable` where the BlockList is focusing an
+		//  inputbox by searching the DOM. We don't have the DOM in RN so, using the combination of blockIsSelected and __unstableMobileNoFocusOnMount
+		//  to determine if we should focus the RichText.
+		if ( this.props.blockIsSelected && ! this.props.__unstableMobileNoFocusOnMount ) {
 			this._editor.focus();
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
 		}
@@ -883,21 +878,19 @@ export class RichText extends Component {
 RichText.defaultProps = {
 	formattingControls: [ 'bold', 'italic', 'link', 'strikethrough' ],
 	format: 'string',
+	tagName: 'div',
 };
 
 const RichTextContainer = compose( [
 	withInstanceId,
 	withBlockEditContext( ( { clientId, onFocus, onCaretVerticalPositionChange, isSelected }, ownProps ) => {
-		// ownProps.onFocus and isSelected needs precedence over the block edit context
-		if ( ownProps.isSelected !== undefined ) {
-			isSelected = ownProps.isSelected;
-		}
+		// ownProps.onFocus needs precedence over the block edit context
 		if ( ownProps.onFocus !== undefined ) {
 			onFocus = ownProps.onFocus;
 		}
 		return {
-			isSelected,
 			clientId,
+			blockIsSelected: ownProps.isSelected !== undefined ? ownProps.isSelected : isSelected,
 			onFocus,
 			onCaretVerticalPositionChange,
 		};
@@ -907,6 +900,7 @@ const RichTextContainer = compose( [
 		instanceId,
 		identifier = instanceId,
 		isSelected,
+		blockIsSelected,
 	} ) => {
 		const { getFormatTypes } = select( 'core/rich-text' );
 		const {
@@ -929,6 +923,7 @@ const RichTextContainer = compose( [
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
+			blockIsSelected,
 		};
 	} ),
 	withDispatch( ( dispatch, {

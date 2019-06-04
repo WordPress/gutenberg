@@ -6,11 +6,21 @@
  */
 
 /**
+ * Checks if a screen containing the block editor is being loaded.
+ *
+ * @return boolean True if a screen containing the block editor is being loaded.
+ */
+function gutenberg_is_block_editor() {
+	$screen = get_current_screen();
+	return $screen->is_block_editor() || 'gutenberg_page_gutenberg-widgets' === $screen->id;
+}
+
+/**
  * Emulates the Widgets screen `admin_print_styles` when at the block editor
  * screen.
  */
 function gutenberg_block_editor_admin_print_styles() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		/** This action is documented in wp-admin/admin-footer.php */
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_print_styles-widgets.php' );
@@ -23,7 +33,7 @@ add_action( 'admin_print_styles', 'gutenberg_block_editor_admin_print_styles' );
  * screen.
  */
 function gutenberg_block_editor_admin_print_scripts() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_print_scripts-widgets.php' );
 	}
@@ -35,7 +45,7 @@ add_action( 'admin_print_scripts', 'gutenberg_block_editor_admin_print_scripts' 
  * editor screen.
  */
 function gutenberg_block_editor_admin_print_footer_scripts() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		/** This action is documented in wp-admin/admin-footer.php */
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_print_footer_scripts-widgets.php' );
@@ -47,7 +57,7 @@ add_action( 'admin_print_footer_scripts', 'gutenberg_block_editor_admin_print_fo
  * Emulates the Widgets screen `admin_footer` when at the block editor screen.
  */
 function gutenberg_block_editor_admin_footer() {
-	if ( get_current_screen()->is_block_editor() ) {
+	if ( gutenberg_is_block_editor() ) {
 		/** This action is documented in wp-admin/admin-footer.php */
 		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 		do_action( 'admin_footer-widgets.php' );
@@ -55,14 +65,14 @@ function gutenberg_block_editor_admin_footer() {
 }
 add_action( 'admin_footer', 'gutenberg_block_editor_admin_footer' );
 
+
 /**
- * Extends default editor settings with values supporting legacy widgets.
+ * Returns the settings required by legacy widgets blocks.
  *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
+ * @return array Legacy widget settings.
  */
-function gutenberg_legacy_widget_settings( $settings ) {
+function gutenberg_get_legacy_widget_settings() {
+	$settings = array();
 	/**
 	 * TODO: The hardcoded array should be replaced with a mechanism to allow
 	 * core and third party blocks to specify they already have equivalent
@@ -92,18 +102,17 @@ function gutenberg_legacy_widget_settings( $settings ) {
 	$available_legacy_widgets          = array();
 	global $wp_widget_factory, $wp_registered_widgets;
 	foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
-		if ( ! in_array( $class, $core_widgets ) ) {
-			$available_legacy_widgets[ $class ] = array(
-				'name'             => html_entity_decode( $widget_obj->name ),
-				// wp_widget_description is not being used because its input parameter is a Widget Id.
-				// Widgets id's reference to a specific widget instance.
-				// Here we are iterating on all the available widget classes even if no widget instance exists for them.
-				'description'      => isset( $widget_obj->widget_options['description'] ) ?
-					html_entity_decode( $widget_obj->widget_options['description'] ) :
-					null,
-				'isCallbackWidget' => false,
-			);
-		}
+		$available_legacy_widgets[ $class ] = array(
+			'name'             => html_entity_decode( $widget_obj->name ),
+			// wp_widget_description is not being used because its input parameter is a Widget Id.
+			// Widgets id's reference to a specific widget instance.
+			// Here we are iterating on all the available widget classes even if no widget instance exists for them.
+			'description'      => isset( $widget_obj->widget_options['description'] ) ?
+				html_entity_decode( $widget_obj->widget_options['description'] ) :
+				null,
+			'isCallbackWidget' => false,
+			'isHidden'         => in_array( $class, $core_widgets, true ),
+		);
 	}
 	foreach ( $wp_registered_widgets as $widget_id => $widget_obj ) {
 		if (
@@ -124,6 +133,17 @@ function gutenberg_legacy_widget_settings( $settings ) {
 	$settings['availableLegacyWidgets']        = $available_legacy_widgets;
 
 	return $settings;
+}
+
+/**
+ * Extends default editor settings with values supporting legacy widgets.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_legacy_widget_settings( $settings ) {
+	return array_merge( $settings, gutenberg_get_legacy_widget_settings() );
 }
 add_filter( 'block_editor_settings', 'gutenberg_legacy_widget_settings' );
 
@@ -181,3 +201,5 @@ function gutenberg_create_wp_area_post_type() {
 	);
 }
 add_action( 'init', 'gutenberg_create_wp_area_post_type' );
+
+add_filter( 'sidebars_widgets', 'Experimental_WP_Widget_Blocks_Manager::swap_out_sidebars_blocks_for_block_widgets' );

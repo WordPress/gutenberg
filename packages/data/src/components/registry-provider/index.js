@@ -1,15 +1,2 @@
-/**
- * WordPress dependencies
- */
-import { createContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import defaultRegistry from '../../default-registry';
-
-const { Consumer, Provider } = createContext( defaultRegistry );
-
-export const RegistryConsumer = Consumer;
-
-export default Provider;
+export { default as RegistryProvider, RegistryConsumer } from './context';
+export { default as useRegistry } from './use-registry';
