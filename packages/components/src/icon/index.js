@@ -22,10 +22,10 @@ function Icon( { icon = null, size, className, ...additionalProps } ) {
 
 	if ( 'function' === typeof icon ) {
 		if ( icon.prototype instanceof Component ) {
-			return createElement( icon, { className, additionalProps, size: iconSize } );
+			return createElement( icon, { className, ...additionalProps, size: iconSize } );
 		}
 
-		return icon( { className, additionalProps, size: iconSize } );
+		return icon( { className, ...additionalProps, size: iconSize } );
 	}
 
 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
@@ -43,7 +43,7 @@ function Icon( { icon = null, size, className, ...additionalProps } ) {
 	if ( isValidElement( icon ) ) {
 		return cloneElement( icon, {
 			className,
-			additionalProps,
+			...additionalProps,
 			size: iconSize,
 		} );
 	}
