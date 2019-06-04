@@ -51,6 +51,7 @@ function SelectControl( {
 					<option
 						key={ `${ option.label }-${ option.value }-${ index }` }
 						value={ option.value }
+						disabled={ option.disabled }
 					>
 						{ option.label }
 					</option>

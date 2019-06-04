@@ -107,6 +107,7 @@ Render a user interface to select multiple users from a list.
             value={ this.state.users } // e.g: value = [ 'a', 'c' ]
             onChange={ ( users ) => { this.setState( { users } ) } }
             options={ [
+                { value: null, label: 'Select a User', disabled: true },
                 { value: 'a', label: 'User A' },
                 { value: 'b', label: 'User B' },
                 { value: 'c', label: 'User c' },
@@ -114,7 +115,6 @@ Render a user interface to select multiple users from a list.
         />
 
 ### Props
-
 
 - The set of props accepted by the component will be specified below.
 - Props not included in this set will be applied to the select element.
@@ -144,6 +144,7 @@ If this property is added, multiple values can be selected. The value passed sho
 An array of objects containing the following properties:
 - `label`: (string) The label to be shown to the user.
 - `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
+- `disabled`: (boolean) Whether or not the option should have the disabled attribute.
 - Type: `Array`
 - Required: No
 

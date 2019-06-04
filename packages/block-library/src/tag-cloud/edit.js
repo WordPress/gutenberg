@@ -34,6 +34,7 @@ class TagCloudEdit extends Component {
 		const selectOption = {
 			label: __( '- Select -' ),
 			value: '',
+			disabled: true,
 		};
 		const taxonomyOptions = map( taxonomies, ( taxonomy ) => {
 			return {
