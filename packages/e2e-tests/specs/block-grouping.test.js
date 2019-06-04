@@ -104,32 +104,6 @@ describe( 'Block Grouping', () => {
 		} );
 	} );
 
-	describe( 'Keyboard shortcuts', () => {
-		it( 'groups and ungroups using keyboard shortcuts', async () => {
-			let allBlocks;
-
-			await insertBlocksOfMultipleTypes();
-			await pressKeyWithModifier( 'primary', 'a' );
-			await pressKeyWithModifier( 'primary', 'a' );
-
-			// Group
-			await pressKeyWithModifier( 'primaryAlt', 'g' );
-
-			allBlocks = await getAllBlocks();
-
-			expect( allBlocks[ 0 ].name ).toBe( 'core/group' );
-			expect( await getEditedPostContent() ).toMatchSnapshot();
-
-			// Ungroup (Primary, Shift, Alt)
-			await pressKeyWithModifier( 'secondary', 'g' );
-
-			allBlocks = await getAllBlocks();
-
-			expect( allBlocks[ 0 ].name ).not.toBe( 'core/group' );
-			expect( await getEditedPostContent() ).toMatchSnapshot();
-		} );
-	} );
-
 	describe( 'Container Block availability', () => {
 		beforeEach( async () => {
 			// Disable the Group block

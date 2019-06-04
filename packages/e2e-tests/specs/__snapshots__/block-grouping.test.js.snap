@@ -78,36 +78,6 @@ exports[`Block Grouping Group creation groups and ungroups multiple blocks of di
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Block Grouping Keyboard shortcuts groups and ungroups using keyboard shortcuts 1`] = `
-"<!-- wp:group -->
-<div class=\\"wp-block-group\\"><!-- wp:heading -->
-<h2>Group Heading</h2>
-<!-- /wp:heading -->
-
-<!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
-<!-- /wp:image -->
-
-<!-- wp:paragraph -->
-<p>Some paragraph</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->"
-`;
-
-exports[`Block Grouping Keyboard shortcuts groups and ungroups using keyboard shortcuts 2`] = `
-"<!-- wp:heading -->
-<h2>Group Heading</h2>
-<!-- /wp:heading -->
-
-<!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
-<!-- /wp:image -->
-
-<!-- wp:paragraph -->
-<p>Some paragraph</p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`Block Grouping Preserving selected blocks attributes preserves width alignment settings of selected blocks 1`] = `
 "<!-- wp:group {\\"align\\":\\"full\\"} -->
 <div class=\\"wp-block-group alignfull\\"><!-- wp:heading -->
