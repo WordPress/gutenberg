@@ -237,17 +237,20 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
  * and if so whether it is a "wildcard" transform
  * ie: targets "any" block type
  *
- * @param  {Object} t Block transform object
- * @return {boolean}   whether transform is a wildcard transform
+ * @param  {Object} t the Block transform object
+ *
+ * @return {boolean} whether transform is a wildcard transform
  */
 export const isWildcardBlockTransform = ( t ) => t && t.type === 'block' && t.blocks.length && t.blocks.includes( '*' );
 
 /**
  * Determines whether the given Block is the core Block which
  * acts as a container Block for other Blocks as part of the
- * Grouping mechanocs
+ * Grouping mechanics
+ *
  * @param  {string} name the name of the Block to test against
- * @return {boolean}      whether or not the Block is the container Block type
+ *
+ * @return {boolean} whether or not the Block is the container Block type
  */
 export const isContainerGroupBlock = ( name ) => name === 'core/group';
 
@@ -256,7 +259,8 @@ export const isContainerGroupBlock = ( name ) => name === 'core/group';
  * (eg: all `core/paragraph`).
  *
  * @param  {Array}  blocksArray the Block definitions
- * @return {boolean}             whether or not the given Blocks pass the criteria
+ *
+ * @return {boolean} whether or not the given Blocks pass the criteria
  */
 export const isBlockSelectionOfSameType = ( blocksArray = [] ) => {
 	if ( ! blocksArray.length ) {
@@ -270,8 +274,10 @@ export const isBlockSelectionOfSameType = ( blocksArray = [] ) => {
 /**
  * Determines whether the provided Blocks constitute
  * a multi-block selection (ie: more than 1)
- * @param  {Array}  blocksArray [description]
- * @return {boolean}             [description]
+ *
+ * @param  {Array}  blocksArray the array of blocks to test
+ *
+ * @return {boolean} whether or not the blocks consistute a multi-selection
  */
 export const isMultiBlockSelection = ( blocksArray = [] ) => {
 	return blocksArray.length > 1;
