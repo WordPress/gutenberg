@@ -39,6 +39,7 @@
 	top: calc(50% - 4px);
 	right: calc(50% - 4px);
 	transition: transform 0.1s ease-in;
+	@include reduce-motion("transition");
 	opacity: 0;
 }
 
@@ -87,7 +88,7 @@
 .components-resizable-box__side-handle.components-resizable-box__handle-bottom:active::before {
 	animation: components-resizable-box__top-bottom-animation 0.1s ease-out 0s;
 	animation-fill-mode: forwards;
-	@include reduce-motion;
+	@include reduce-motion("animation");
 }
 
 .components-resizable-box__side-handle.components-resizable-box__handle-left:hover::before,
@@ -96,7 +97,7 @@
 .components-resizable-box__side-handle.components-resizable-box__handle-right:active::before {
 	animation: components-resizable-box__left-right-animation 0.1s ease-out 0s;
 	animation-fill-mode: forwards;
-	@include reduce-motion;
+	@include reduce-motion("animation");
 }
 
 @keyframes components-resizable-box__top-bottom-animation {

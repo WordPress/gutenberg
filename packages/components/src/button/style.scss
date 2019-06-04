@@ -144,6 +144,7 @@
 		transition-property: border, background, color;
 		transition-duration: 0.05s;
 		transition-timing-function: ease-in-out;
+		@include reduce-motion("transition");
 
 		&:hover,
 		&:active {
