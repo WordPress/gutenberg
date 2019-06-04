@@ -358,7 +358,15 @@ _Returns_
 
 <a name="plugins" href="#plugins">#</a> **plugins**
 
-Undocumented declaration.
+Object of available plugins to use with a registry.
+
+_Related_
+
+-   [use](#use)
+
+_Type_
+
+-   `Object` 
 
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 
@@ -470,7 +478,59 @@ _Parameters_
 
 <a name="use" href="#use">#</a> **use**
 
-Undocumented declaration.
+Extends a registry to inherit functionality provided by a given plugin. A
+plugin is an object with properties aligning to that of a registry, merged
+to extend the default registry behavior.
+
+_Parameters_
+
+-   _plugin_ `Object`: Plugin object.
+
+<a name="useDispatch" href="#useDispatch">#</a> **useDispatch**
+
+A custom react hook returning the current registry dispatch actions creators.
+
+Note: The component using this hook must be within the context of a
+RegistryProvider.
+
+_Usage_
+
+This illustrates a pattern where you may need to retrieve dynamic data from
+the server via the `useSelect` hook to use in combination with the dispatch
+action.
+
+```jsx
+const { useDispatch, useSelect } = wp.data;
+const { useCallback } = wp.element;
+
+function Button( { onClick, children } ) {
+  return <button type="button" onClick={ onClick }>{ children }</button>
+}
+
+const SaleButton = ( { children } ) => {
+  const { stockNumber } = useSelect(
+    ( select ) => select( 'my-shop' ).getStockNumber()
+  );
+  const { startSale } = useDispatch( 'my-shop' );
+  const onClick = useCallback( () => {
+    const discountPercent = stockNumber > 50 ? 10: 20;
+    startSale( discountPercent );
+  }, [ stockNumber ] );
+  return <Button onClick={ onClick }>{ children }</Button>
+}
+
+// Rendered somewhere in the application:
+//
+// <SaleButton>Start Sale!</SaleButton>
+```
+
+_Parameters_
+
+-   _storeName_ `[string]`: Optionally provide the name of the store from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+
+_Returns_
+
+-   `Function`: A custom react hook.
 
 <a name="useRegistry" href="#useRegistry">#</a> **useRegistry**
 
@@ -559,53 +619,64 @@ _Returns_
 
 <a name="withDispatch" href="#withDispatch">#</a> **withDispatch**
 
-Higher-order component used to add dispatch props using registered action creators.
+Higher-order component used to add dispatch props using registered action
+creators.
 
 _Usage_
 
 ```jsx
 function Button( { onClick, children } ) {
-	return <button type="button" onClick={ onClick }>{ children }</button>;
+    return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
 const { withDispatch } = wp.data;
 
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
-	const { startSale } = dispatch( 'my-shop' );
-	const { discountPercent } = ownProps;
+    const { startSale } = dispatch( 'my-shop' );
+    const { discountPercent } = ownProps;
 
-	return {
-		onClick() {
-			startSale( discountPercent );
-		},
-	};
+    return {
+        onClick() {
+            startSale( discountPercent );
+        },
+    };
 } )( Button );
 
 // Rendered in the application:
 //
-//  <SaleButton discountPercent="20">Start Sale!</SaleButton>
+// <SaleButton discountPercent="20">Start Sale!</SaleButton>
 ```
 
-In the majority of cases, it will be sufficient to use only two first params passed to `mapDispatchToProps` as illustrated in the previous example. However, there might be some very advanced use cases where using the `registry` object might be used as a tool to optimize the performance of your component. Using `select` function from the registry might be useful when you need to fetch some dynamic data from the store at the time when the event is fired, but at the same time, you never use it to render your component. In such scenario, you can avoid using the `withSelect` higher order component to compute such prop, which might lead to unnecessary re-renders of your component caused by its frequent value change. Keep in mind, that `mapDispatchToProps` must return an object with functions only.
+In the majority of cases, it will be sufficient to use only two first params
+passed to `mapDispatchToProps` as illustrated in the previous example.
+However, there might be some very advanced use cases where using the
+`registry` object might be used as a tool to optimize the performance of
+your component. Using `select` function from the registry might be useful
+when you need to fetch some dynamic data from the store at the time when the
+event is fired, but at the same time, you never use it to render your
+component. In such scenario, you can avoid using the `withSelect` higher
+order component to compute such prop, which might lead to unnecessary
+re-renders of your component caused by its frequent value change.
+Keep in mind, that `mapDispatchToProps` must return an object with functions
+only.
 
 ```jsx
 function Button( { onClick, children } ) {
-	return <button type="button" onClick={ onClick }>{ children }</button>;
+    return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
 const { withDispatch } = wp.data;
 
 const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
-	// Stock number changes frequently.
-	const { getStockNumber } = select( 'my-shop' );
-	const { startSale } = dispatch( 'my-shop' );
-
-	return {
-		onClick() {
-			const dicountPercent = getStockNumber() > 50 ? 10 : 20;
-			startSale( discountPercent );
-		},
-	};
+   // Stock number changes frequently.
+   const { getStockNumber } = select( 'my-shop' );
+   const { startSale } = dispatch( 'my-shop' );
+   return {
+       onClick() {
+           const discountPercent = getStockNumber() > 50 ? 10 : 20;
+           startSale( discountPercent );
+       },
+   };
 } )( Button );
 
 // Rendered in the application:
@@ -613,11 +684,9 @@ const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
 //  <SaleButton>Start Sale!</SaleButton>
 ```
 
-_Note:_ It is important that the `mapDispatchToProps` function always returns an object with the same keys. For example, it should not contain conditions under which a different value would be returned.
-
 _Parameters_
 
--   _mapDispatchToProps_ `Object`: Object of prop names where value is a dispatch-bound action creator, or a function to be called with the component's props and returning an action creator.
+-   _mapDispatchToProps_ `Function`: A function of returning an object of prop names where value is a dispatch-bound action creator, or a function to be called with the component's props and returning an action creator.
 
 _Returns_
 

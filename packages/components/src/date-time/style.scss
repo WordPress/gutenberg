@@ -19,6 +19,21 @@
 		margin-right: $grid-size;
 		margin-top: 0.5em;
 	}
+
+	fieldset {
+		border: 0;
+		padding: 0;
+		margin: 0;
+	}
+
+	select,
+	input {
+		box-sizing: border-box;
+		height: 28px;
+		vertical-align: middle;
+		padding: 0;
+		@include input-style__neutral();
+	}
 }
 
 .components-datetime__date {

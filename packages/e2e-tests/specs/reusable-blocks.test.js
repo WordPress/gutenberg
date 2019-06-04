@@ -155,7 +155,7 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Surprised greeting block' );
 
 		// Convert block to a regular block
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const convertButton = await page.waitForXPath(
 			'//button[text()="Convert to Regular Block"]'
 		);
@@ -178,7 +178,7 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Surprised greeting block' );
 
 		// Delete the block and accept the confirmation dialog
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const deleteButton = await page.waitForXPath( '//button[text()="Remove from Reusable Blocks"]' );
 		await Promise.all( [ waitForAndAcceptDialog(), deleteButton.click() ] );
 
@@ -214,8 +214,7 @@ describe( 'Reusable Blocks', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Convert block to a reusable block
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
@@ -256,7 +255,7 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Multi-selection reusable block' );
 
 		// Convert block to a regular block
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const convertButton = await page.waitForXPath(
 			'//button[text()="Convert to Regular Block"]'
 		);

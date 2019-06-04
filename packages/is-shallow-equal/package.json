@@ -21,6 +21,7 @@
 	},
 	"files": [
 		"arrays.js",
+		"index.js",
 		"objects.js"
 	],
 	"main": "index.js",

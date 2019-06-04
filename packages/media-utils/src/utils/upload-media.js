@@ -61,7 +61,7 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
  * @param   {Function} $0.onFileChange       Function called each time a file or a temporary representation of the file is available.
  * @param   {?Object}  $0.wpAllowedMimeTypes List of allowed mime types and file extensions.
  */
-export async function mediaUpload( {
+export async function uploadMedia( {
 	allowedTypes,
 	additionalData = {},
 	filesList,

@@ -1302,6 +1302,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/media-utils",
+		"slug": "packages-media-utils",
+		"markdown_source": "../packages/media-utils/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/notices",
 		"slug": "packages-notices",
 		"markdown_source": "../packages/notices/README.md",

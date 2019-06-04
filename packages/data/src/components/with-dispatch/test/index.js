@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import TestRenderer from 'react-test-renderer';
+import TestRenderer, { act } from 'react-test-renderer';
 
 /**
  * Internal dependencies
@@ -45,27 +45,34 @@ describe( 'withDispatch', () => {
 			};
 		} )( ( props ) => <button onClick={ props.increment } /> );
 
-		const testRenderer = TestRenderer.create(
-			<RegistryProvider value={ registry }>
-				<Component count={ 0 } />
-			</RegistryProvider>
-		);
+		let testRenderer;
+		act( () => {
+			testRenderer = TestRenderer.create(
+				<RegistryProvider value={ registry }>
+					<Component count={ 0 } />
+				</RegistryProvider>
+			);
+		} );
 		const testInstance = testRenderer.root;
 
 		const incrementBeforeSetProps = testInstance.findByType( 'button' ).props.onClick;
 
 		// Verify that dispatch respects props at the time of being invoked by
 		// changing props after the initial mount.
-		testRenderer.update(
-			<RegistryProvider value={ registry }>
-				<Component count={ 2 } />
-			</RegistryProvider>
-		);
+		act( () => {
+			testRenderer.update(
+				<RegistryProvider value={ registry }>
+					<Component count={ 2 } />
+				</RegistryProvider>
+			);
+		} );
 
 		// Function value reference should not have changed in props update.
 		expect( testInstance.findByType( 'button' ).props.onClick ).toBe( incrementBeforeSetProps );
 
-		incrementBeforeSetProps();
+		act( () => {
+			incrementBeforeSetProps();
+		} );
 
 		expect( store.getState() ).toBe( 2 );
 	} );
@@ -95,14 +102,19 @@ describe( 'withDispatch', () => {
 			};
 		} )( ( props ) => <button onClick={ props.noop } /> );
 
-		const testRenderer = TestRenderer.create(
-			<RegistryProvider value={ firstRegistry }>
-				<Component />
-			</RegistryProvider>
-		);
+		let testRenderer;
+		act( () => {
+			testRenderer = TestRenderer.create(
+				<RegistryProvider value={ firstRegistry }>
+					<Component />
+				</RegistryProvider>
+			);
+		} );
 		const testInstance = testRenderer.root;
 
-		testInstance.findByType( 'button' ).props.onClick();
+		act( () => {
+			testInstance.findByType( 'button' ).props.onClick();
+		} );
 		expect( firstRegistryAction ).toHaveBeenCalledTimes( 2 );
 		expect( secondRegistryAction ).toHaveBeenCalledTimes( 0 );
 
@@ -114,13 +126,16 @@ describe( 'withDispatch', () => {
 			},
 		} );
 
-		testRenderer.update(
-			<RegistryProvider value={ secondRegistry }>
-				<Component />
-			</RegistryProvider>
-		);
-
-		testInstance.findByType( 'button' ).props.onClick();
+		act( () => {
+			testRenderer.update(
+				<RegistryProvider value={ secondRegistry }>
+					<Component />
+				</RegistryProvider>
+			);
+		} );
+		act( () => {
+			testInstance.findByType( 'button' ).props.onClick();
+		} );
 		expect( firstRegistryAction ).toHaveBeenCalledTimes( 2 );
 		expect( secondRegistryAction ).toHaveBeenCalledTimes( 2 );
 	} );
@@ -159,21 +174,30 @@ describe( 'withDispatch', () => {
 			};
 		} )( ( props ) => <button onClick={ props.update } /> );
 
-		const testRenderer = TestRenderer.create(
-			<RegistryProvider value={ registry }>
-				<Component />
-			</RegistryProvider>
-		);
+		let testRenderer;
+		act( () => {
+			testRenderer = TestRenderer.create(
+				<RegistryProvider value={ registry }>
+					<Component />
+				</RegistryProvider>
+			);
+		} );
 
 		const counterUpdateHandler = testRenderer.root.findByType( 'button' ).props.onClick;
 
-		counterUpdateHandler();
+		act( () => {
+			counterUpdateHandler();
+		} );
 		expect( store.getState() ).toBe( 1 );
 
-		counterUpdateHandler();
+		act( () => {
+			counterUpdateHandler();
+		} );
 		expect( store.getState() ).toBe( 2 );
 
-		counterUpdateHandler();
+		act( () => {
+			counterUpdateHandler();
+		} );
 		expect( store.getState() ).toBe( 3 );
 	} );
 
@@ -184,13 +208,15 @@ describe( 'withDispatch', () => {
 			};
 		} )( () => null );
 
-		TestRenderer.create(
-			<RegistryProvider value={ registry }>
-				<Component />
-			</RegistryProvider>
-		);
+		act( () => {
+			TestRenderer.create(
+				<RegistryProvider value={ registry }>
+					<Component />
+				</RegistryProvider>
+			);
+		} );
 		expect( console ).toHaveWarnedWith(
-			'Property count returned from mapDispatchToProps in withDispatch must be a function.'
+			'Property count returned from dispatchMap in useDispatchWithMap must be a function.'
 		);
 	} );
 } );

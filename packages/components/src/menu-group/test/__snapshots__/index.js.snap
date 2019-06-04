@@ -5,18 +5,19 @@ exports[`MenuGroup should match snapshot 1`] = `
   className="components-menu-group"
 >
   <div
+    aria-hidden="true"
     className="components-menu-group__label"
     id="components-menu-group-label-1"
   >
     My group
   </div>
-  <ForwardRef(NavigableMenu)
+  <div
     aria-labelledby="components-menu-group-label-1"
-    orientation="vertical"
+    role="group"
   >
     <p>
       My item
     </p>
-  </ForwardRef(NavigableMenu)>
+  </div>
 </div>
 `;
