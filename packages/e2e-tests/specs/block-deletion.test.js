@@ -31,21 +31,29 @@ const addThreeParagraphsToNewPost = async () => {
  * see: https://github.com/WordPress/gutenberg/pull/14908#discussion_r284725956
  */
 const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
-	let isRemoveButton = false;
-
 	await clickBlockToolbarButton( 'More options' );
 
-	while ( false === isRemoveButton ) {
+	let isRemoveButton = false;
+
+	let numButtons = await page.$$eval( '.block-editor-block-toolbar button', ( btns ) => btns.length );
+
+	// Limit by the number of buttons available
+	while ( --numButtons ) {
 		await page.keyboard.press( 'Tab' );
 
 		isRemoveButton = await page.evaluate( () => {
 			return document.activeElement.innerText.includes( 'Remove Block' );
 		} );
+
+		// Stop looping once we find the button
+		if ( isRemoveButton ) {
+			await pressKeyTimes( 'Enter', 1 );
+			break;
+		}
 	}
 
+	// Makes failures more explicit
 	await expect( isRemoveButton ).toBe( true );
-
-	await pressKeyTimes( 'Enter', 1 );
 };
 
 describe( 'block deletion -', () => {
