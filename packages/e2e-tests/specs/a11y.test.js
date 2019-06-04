@@ -32,7 +32,15 @@ describe( 'a11y', () => {
 
 	it( 'checks persistent selection', async () => {
 		await clickBlockAppender();
+
+		// adding one Paragraph block which contains a focusable RichText
 		await page.keyboard.type( 'Testing editor selection persistence' );
+
+		let isFocusedRichText = await page.$eval( ':focus', ( focusedElement ) => {
+			return focusedElement.classList.contains( 'block-editor-rich-text__editable' );
+		} );
+
+		expect( isFocusedRichText ).toBe( true );
 
 		// moving focus backwards using keyboard shortcuts
 		// twice to get to the inspector tabs
@@ -49,11 +57,11 @@ describe( 'a11y', () => {
 
 		await page.keyboard.press( 'Space' );
 
-		let isFocusedParagraphBlock = await page.$eval( ':focus', ( focusedElement ) => {
+		isFocusedRichText = await page.$eval( ':focus', ( focusedElement ) => {
 			return focusedElement.classList.contains( 'block-editor-rich-text__editable' );
 		} );
 
-		expect( isFocusedParagraphBlock ).toBe( false );
+		expect( isFocusedRichText ).toBe( false );
 
 		await page.keyboard.press( 'Tab' );
 
@@ -65,11 +73,11 @@ describe( 'a11y', () => {
 
 		await page.keyboard.press( 'Space' );
 
-		isFocusedParagraphBlock = await page.$eval( ':focus', ( focusedElement ) => {
+		isFocusedRichText = await page.$eval( ':focus', ( focusedElement ) => {
 			return focusedElement.classList.contains( 'block-editor-rich-text__editable' );
 		} );
 
-		expect( isFocusedParagraphBlock ).toBe( true );
+		expect( isFocusedRichText ).toBe( true );
 	} );
 
 	it( 'constrains focus to a modal when tabbing', async () => {
