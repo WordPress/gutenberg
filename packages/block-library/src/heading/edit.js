@@ -12,7 +12,7 @@ import HeadingToolbar from './heading-toolbar';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, withFallbackStyles } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import {
@@ -22,31 +22,13 @@ import {
 	RichText,
 	withColors,
 	PanelColorSettings,
-	ContrastChecker,
 } from '@wordpress/block-editor';
 import { memo } from '@wordpress/element';
 
-const { getComputedStyle } = window;
-const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor, fontSize, customFontSize } = ownProps.attributes;
-	const editableNode = node.querySelector( '[contenteditable="true"]' );
-	//verify if editableNode is available, before using getComputedStyle.
-	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;
-	return {
-		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
-		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
-		fallbackFontSize: fontSize || customFontSize || ! computedStyles ? undefined : parseInt( computedStyles.fontSize ) || undefined,
-	};
-} );
-
 const HeadingColorUI = memo(
 	function( {
-		backgroundColorValue,
-		setBackgroundColor,
 		textColorValue,
 		setTextColor,
-		fallbackTextColor,
-		fallbackBackgroundColor,
 	} ) {
 		return (
 			<PanelColorSettings
@@ -54,27 +36,12 @@ const HeadingColorUI = memo(
 				initialOpen={ false }
 				colorSettings={ [
 					{
-						value: backgroundColorValue,
-						onChange: setBackgroundColor,
-						label: __( 'Background Color' ),
-					},
-					{
 						value: textColorValue,
 						onChange: setTextColor,
 						label: __( 'Text Color' ),
 					},
 				] }
-			>
-				<ContrastChecker
-					{ ...{
-						textColor: textColorValue,
-						backgroundColor: backgroundColorValue,
-						fallbackTextColor,
-						fallbackBackgroundColor,
-					} }
-					isLargeText
-				/>
-			</PanelColorSettings>
+			/>
 		);
 	}
 );
@@ -85,12 +52,8 @@ function HeadingEdit( {
 	mergeBlocks,
 	onReplace,
 	className,
-	backgroundColor,
 	textColor,
-	setBackgroundColor,
 	setTextColor,
-	fallbackBackgroundColor,
-	fallbackTextColor,
 } ) {
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
@@ -113,10 +76,6 @@ function HeadingEdit( {
 					/>
 				</PanelBody>
 				<HeadingColorUI
-					backgroundColorValue={ backgroundColor.color }
-					fallbackBackgroundColor={ fallbackBackgroundColor }
-					fallbackTextColor={ fallbackTextColor }
-					setBackgroundColor={ setBackgroundColor }
 					setTextColor={ setTextColor }
 					textColorValue={ textColor.color }
 				/>
@@ -141,14 +100,11 @@ function HeadingEdit( {
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
 				className={ classnames( className, {
-					'has-background': backgroundColor.color,
 					'has-text-color': textColor.color,
-					[ backgroundColor.class ]: backgroundColor.class,
 					[ textColor.class ]: textColor.class,
 				} ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 				style={ {
-					backgroundColor: backgroundColor.color,
 					color: textColor.color,
 					textAlign: align,
 				} }
@@ -159,5 +115,4 @@ function HeadingEdit( {
 
 export default compose( [
 	withColors( 'backgroundColor', { textColor: 'color' } ),
-	applyFallbackStyles,
 ] )( HeadingEdit );

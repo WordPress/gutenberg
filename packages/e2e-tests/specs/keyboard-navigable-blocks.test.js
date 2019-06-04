@@ -100,9 +100,7 @@ const tabThroughBlockToolbar = async () => {
 	// Tab to focus on the 'More formatting' dropdown toggle
 	await page.keyboard.press( 'Tab' );
 	const isFocusedBlockSettingsDropdown = await page.evaluate( () =>
-		document.activeElement.classList.contains(
-			'block-editor-block-settings-menu__toggle'
-		)
+		document.activeElement.classList.contains( 'components-dropdown-menu__toggle' )
 	);
 	await expect( isFocusedBlockSettingsDropdown ).toBe( true );
 };

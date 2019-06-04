@@ -7,18 +7,22 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 /**
  * Internal dependencies
  */
+import './hooks';
 import './store';
 import EditWidgetsInitializer from './components/edit-widgets-initializer';
 
 /**
  * Initilizes the widgets screen
  *
- * @param {string} id Id of the root element to render the screen.
+ * @param {string} id       Id of the root element to render the screen.
+ * @param {Object} settings Id of the root element to render the screen.
  */
-export function initialize( id ) {
+export function initialize( id, settings ) {
 	registerCoreBlocks();
 	render(
-		<EditWidgetsInitializer />,
+		<EditWidgetsInitializer
+			settings={ settings }
+		/>,
 		document.getElementById( id )
 	);
 }

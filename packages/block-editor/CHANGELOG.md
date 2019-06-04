@@ -1,3 +1,9 @@
+## Master
+
+### Internal
+
+- Refactored `BlockSettingsMenu` to use `DropdownMenu` from `@wordpress/components`.
+
 ## 2.0.0 (2019-04-16)
 
 ### New Features

@@ -21,6 +21,9 @@
 	"engines": {
 		"node": ">=8"
 	},
+	"files": [
+		"index.js"
+	],
 	"main": "index.js",
 	"publishConfig": {
 		"access": "public"

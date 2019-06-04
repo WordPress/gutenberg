@@ -53,10 +53,13 @@ class ModalLinkUI extends Component {
 			return;
 		}
 
+		const { activeAttributes: { url, target } } = this.props;
+		const opensInNewWindow = target === '_blank';
+
 		this.setState( {
-			inputValue: this.props.activeAttributes.url || '',
+			inputValue: url || '',
 			text: getTextContent( slice( this.props.value ) ),
-			opensInNewWindow: false,
+			opensInNewWindow,
 		} );
 	}
 

@@ -3,6 +3,7 @@
  */
 import {
 	clickBlockAppender,
+	clickBlockToolbarButton,
 	getEditedPostContent,
 	createNewPost,
 	isInDefaultBlock,
@@ -22,7 +23,7 @@ const addThreeParagraphsToNewPost = async () => {
 };
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
-	await expect( page ).toClick( '.block-editor-block-settings-menu__toggle' );
+	await clickBlockToolbarButton( 'More options' );
 	const itemButton = ( await page.$x( `//*[contains(@class, "block-editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
 	await itemButton.click();
 };

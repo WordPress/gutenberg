@@ -42,7 +42,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
 
 		// Select all of the text in the title field by triple-clicking on it. We
@@ -84,7 +84,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
 
 		// Save the reusable block
@@ -155,7 +155,7 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Surprised greeting block' );
 
 		// Convert block to a regular block
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const convertButton = await page.waitForXPath(
 			'//button[text()="Convert to Regular Block"]'
 		);
@@ -178,13 +178,13 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Surprised greeting block' );
 
 		// Delete the block and accept the confirmation dialog
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const deleteButton = await page.waitForXPath( '//button[text()="Remove from Reusable Blocks"]' );
 		await Promise.all( [ waitForAndAcceptDialog(), deleteButton.click() ] );
 
 		// Wait for deletion to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block deleted."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block deleted."]'
 		);
 
 		// Check that we have an empty post again
@@ -214,14 +214,13 @@ describe( 'Reusable Blocks', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Convert block to a reusable block
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
 
 		// Select all of the text in the title field by triple-clicking on it. We
@@ -256,7 +255,7 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Multi-selection reusable block' );
 
 		// Convert block to a regular block
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const convertButton = await page.waitForXPath(
 			'//button[text()="Convert to Regular Block"]'
 		);

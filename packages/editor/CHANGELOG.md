@@ -1,4 +1,4 @@
-## 9.2.0 (Unreleased)
+## 9.3.0 (2019-05-21)
 
 ### Deprecations
 - The `getAutosave`, `getAutosaveAttribute`, and `hasAutosave` selectors are deprecated. Please use the `getAutosave` selector in the `@wordpress/core-data` package.
