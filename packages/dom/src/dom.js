@@ -264,7 +264,8 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 	}
 
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
-		container.focus();
+		container.focus( { preventScroll: true } );
+
 		if ( isReverse ) {
 			container.selectionStart = container.value.length;
 			container.selectionEnd = container.value.length;
@@ -275,7 +276,7 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 		return;
 	}
 
-	container.focus();
+	container.focus( { preventScroll: true } );
 
 	if ( ! container.isContentEditable ) {
 		return;
