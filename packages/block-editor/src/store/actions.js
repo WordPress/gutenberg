@@ -193,7 +193,8 @@ export function multiSelect( start, end ) {
 }
 
 /**
- * Returns an action object used in signalling that the block selection is cleared.
+ * Returns an action object used in signaling that the block selection is wiped.
+ * This will remove block selection so that `restoreSelectedBlock` will have no effect.
  *
  * @return {Object} Action object.
  */
@@ -204,7 +205,9 @@ export function wipeSelectedBlock() {
 }
 
 /**
- * Returns an action object used in signalling that the block selection is cleared.
+ * Returns an action object used in signaling that the block selection is cleared.
+ * This will save the current selection in a state called `previousSelection` and
+ * `restoreSelectedBlock` will be able to restore the selection.
  *
  * @return {Object} Action object.
  */
