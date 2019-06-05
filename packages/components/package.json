@@ -44,6 +44,7 @@
 		"re-resizable": "^4.7.1",
 		"react-click-outside": "^3.0.0",
 		"react-dates": "^17.1.1",
+		"react-spring": "^8.0.20",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^3.3.2"

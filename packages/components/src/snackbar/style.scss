@@ -8,7 +8,7 @@
 	padding: 16px 24px;
 	width: 100%;
 	max-width: 600px;
-	margin: 8px 0 0;
+	cursor: pointer;
 
 	@include break-small() {
 		width: fit-content;
@@ -54,4 +54,9 @@
 	position: absolute;
 	z-index: z-index(".components-snackbar-list");
 	width: 100%;
+}
+
+.components-snackbar-list__notice-container {
+	position: relative;
+	padding-top: 8px;
 }

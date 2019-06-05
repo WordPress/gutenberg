@@ -58,6 +58,7 @@ module.exports = {
 			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
 			// eslint-disable-next-line @wordpress/gutenberg-phase
 			'process.env.GUTENBERG_PHASE': JSON.stringify( parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1 ),
+			'process.env.FORCE_REDUCED_MOTION': JSON.stringify( process.env.FORCE_REDUCED_MOTION ),
 		} ),
 		new CustomTemplatedPathPlugin( {
 			basename( path, data ) {

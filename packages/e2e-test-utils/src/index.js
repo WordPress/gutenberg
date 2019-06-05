@@ -10,6 +10,7 @@ export { createNewPost } from './create-new-post';
 export { createURL } from './create-url';
 export { deactivatePlugin } from './deactivate-plugin';
 export { disablePrePublishChecks } from './disable-pre-publish-checks';
+export { dragAndResize } from './drag-and-resize';
 export { enablePageDialogAccept } from './enable-page-dialog-accept';
 export { enablePrePublishChecks } from './enable-pre-publish-checks';
 export { ensureSidebarOpened } from './ensure-sidebar-opened';
