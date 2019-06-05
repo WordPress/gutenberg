@@ -313,24 +313,14 @@ export default class EditorPage {
 
 	// Assumes Heading Block is empty
 	async sendTextToHeadingBlock( block: wd.PromiseChainWebdriver.Element, text: string ) {
-		const textViewElement = await this.getTextViewForListBlock( block, true );
+		const textViewElement = await this.getTextViewForHeadingBlock( block, true );
 		return await typeString( this.driver, textViewElement, text );
 	}
 
 	// Fails if Heading block is not empty
 	async getTextForHeadingBlock( block: wd.PromiseChainWebdriver.Element ) {
-		const textViewElement = await this.getTextViewForListBlock( block, false );
+		const textViewElement = await this.getTextViewForHeadingBlock( block, false );
 		const text = await textViewElement.text();
 		return text.toString();
 	}
 }
-
-/*
-let el1 = await driver.elementByXPath("//XCUIElementTypeButton[@name=\"Add block\"]");
-await el1.click();
-let el2 = await driver.elementByAccessibilityId("Heading");
-await el2.click();
-let el3 = await driver.elementByXPath("//XCUIElementTypeStaticText[@name=\"Write heading…\"]");
-await el3.sendKeys("Lorem Ipsum");
-
- */
