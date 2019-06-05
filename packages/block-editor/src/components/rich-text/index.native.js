@@ -26,9 +26,9 @@ import {
 	split,
 	toHTMLString,
 	insert,
-	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	__unstableInsertLineSeparator as insertLineSeparator,
 	__unstableIsEmptyLine as isEmptyLine,
+	__unstableRemoveLineSeparator as removeLineSeparator,
 	isCollapsed,
 	remove,
 } from '@wordpress/rich-text';
@@ -386,7 +386,7 @@ export class RichText extends Component {
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
 		const value = this.createRecord();
-		const { replacements, text, start, end } = value;
+		const { start, end } = value;
 		let newValue;
 
 		// Always handle full content deletion ourselves.
@@ -398,56 +398,7 @@ export class RichText extends Component {
 		}
 
 		if ( this.multilineTag ) {
-			if ( keyCode === BACKSPACE ) {
-				const index = start - 1;
-
-				if ( text[ index ] === LINE_SEPARATOR ) {
-					const collapsed = isCollapsed( value );
-
-					// If the line separator that is about te be removed
-					// contains wrappers, remove the wrappers first.
-					if ( collapsed && replacements[ index ] && replacements[ index ].length ) {
-						const newReplacements = replacements.slice();
-
-						newReplacements[ index ] = replacements[ index ].slice( 0, -1 );
-						newValue = {
-							...value,
-							replacements: newReplacements,
-						};
-					} else {
-						newValue = remove(
-							value,
-							// Only remove the line if the selection is
-							// collapsed, otherwise remove the selection.
-							collapsed ? start - 1 : start,
-							end
-						);
-					}
-				}
-			} else if ( text[ end ] === LINE_SEPARATOR ) {
-				const collapsed = isCollapsed( value );
-
-				// If the line separator that is about te be removed
-				// contains wrappers, remove the wrappers first.
-				if ( collapsed && replacements[ end ] && replacements[ end ].length ) {
-					const newReplacements = replacements.slice();
-
-					newReplacements[ end ] = replacements[ end ].slice( 0, -1 );
-					newValue = {
-						...value,
-						replacements: newReplacements,
-					};
-				} else {
-					newValue = remove(
-						value,
-						start,
-						// Only remove the line if the selection is
-						// collapsed, otherwise remove the selection.
-						collapsed ? end + 1 : end,
-					);
-				}
-			}
-
+			newValue = removeLineSeparator( value, keyCode === BACKSPACE );
 			if ( newValue ) {
 				this.onFormatChange( newValue );
 				return;

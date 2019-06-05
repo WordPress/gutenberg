@@ -20,6 +20,7 @@ export { remove } from './remove';
 export { replace } from './replace';
 export { insert } from './insert';
 export { insertLineSeparator as __unstableInsertLineSeparator } from './insert-line-separator';
+export { removeLineSeparator as __unstableRemoveLineSeparator } from './remove-line-separator';
 export { insertObject } from './insert-object';
 export { slice } from './slice';
 export { split } from './split';
