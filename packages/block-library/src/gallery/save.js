@@ -17,14 +17,23 @@ export default function save( { attributes } ) {
 
 				switch ( linkTo ) {
 					case 'media':
-						href = image.url;
+						href = image.fullUrl || image.url;
 						break;
 					case 'attachment':
 						href = image.link;
 						break;
 				}
 
-				const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } className={ image.id ? `wp-image-${ image.id }` : null } />;
+				const img = (
+					<img
+						src={ image.url }
+						alt={ image.alt }
+						data-id={ image.id }
+						data-full-url={ image.fullUrl }
+						data-link={ image.link }
+						className={ image.id ? `wp-image-${ image.id }` : null }
+					/>
+				);
 
 				return (
 					<li key={ image.id || image.url } className="blocks-gallery-item">
