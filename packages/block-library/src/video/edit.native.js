@@ -180,11 +180,11 @@ class VideoEdit extends React.Component {
 						{ toolbarEditButton }
 					</BlockControls>
 					<InspectorControls>
-						<ToolbarButton
+						{ false && <ToolbarButton //Not rendering settings button until it has an action
 							label={ __( 'Video Settings' ) }
 							icon="admin-generic"
 							onClick={ () => ( null ) }
-						/>
+						/> }
 					</InspectorControls>
 					<MediaUploadProgress
 						mediaId={ id }
