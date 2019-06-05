@@ -578,9 +578,17 @@ export class RichText extends Component {
 	onFocus() {
 		this.isTouched = true;
 
-		if ( this.props.onFocus ) {
-			this.props.onFocus();
+		const { unstableOnFocus } = this.props;
+
+		if ( unstableOnFocus ) {
+			unstableOnFocus();
 		}
+
+		// We know for certain that on focus, the old selection is invalid. It
+		// will be recalculated on `selectionchange`.
+		const index = undefined;
+
+		this.props.onSelectionChange( index, index );
 
 		this.lastAztecEventType = 'focus';
 	}
@@ -737,7 +745,7 @@ export class RichText extends Component {
 
 	componentWillUnmount() {
 		if ( this._editor.isFocused() ) {
-			this._editor.blur();
+			// this._editor.blur();
 		}
 	}
 
@@ -751,7 +759,7 @@ export class RichText extends Component {
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
 			// if its internal value hasn't change. When created, default value is 0, 0
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
-		} else if ( ! this.props.isSelected && prevProps.isSelected && this.isIOS ) {
+		} else if ( ! this.props.isSelected && prevProps.isSelected ) {
 			this._editor.blur();
 		}
 	}
@@ -866,7 +874,6 @@ export class RichText extends Component {
 					onContentSizeChange={ this.onContentSizeChange }
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					onSelectionChange={ this.onSelectionChangeFromAztec }
-					isSelected={ isSelected }
 					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
@@ -892,15 +899,10 @@ RichText.defaultProps = {
 
 const RichTextContainer = compose( [
 	withInstanceId,
-	withBlockEditContext( ( { clientId, onFocus, onCaretVerticalPositionChange, isSelected }, ownProps ) => {
-		// ownProps.onFocus and needs precedence over the block edit context
-		if ( ownProps.onFocus !== undefined ) {
-			onFocus = ownProps.onFocus;
-		}
+	withBlockEditContext( ( { clientId, onCaretVerticalPositionChange, isSelected }, ownProps ) => {
 		return {
 			clientId,
 			blockIsSelected: ownProps.isSelected !== undefined ? ownProps.isSelected : isSelected,
-			onFocus,
 			onCaretVerticalPositionChange,
 		};
 	} ),

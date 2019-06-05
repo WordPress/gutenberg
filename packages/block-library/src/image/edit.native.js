@@ -367,7 +367,7 @@ class ImageEdit extends React.Component {
 								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
 								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-								onFocus={ this.onFocusCaption }
+								unstableOnFocus={ this.onFocusCaption }
 								onBlur={ this.props.onBlur } // always assign onBlur as props
 								isSelected={ this.state.isCaptionSelected }
 								noFocusOnMount
