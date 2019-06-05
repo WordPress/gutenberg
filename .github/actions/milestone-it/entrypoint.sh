@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # 1. Determine if milestone already exists (don't replace one which has already
