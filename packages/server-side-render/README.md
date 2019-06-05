@@ -8,6 +8,23 @@ ServerSideRender should be regarded as a fallback or legacy mechanism, it is not
 
 New blocks should be built in conjunction with any necessary REST API endpoints, so that JavaScript can be used for rendering client-side in the `edit` function. This gives the best user experience, instead of relying on using the PHP `render_callback`. The logic necessary for rendering should be included in the endpoint, so that both the client-side JavaScript and server-side PHP logic should require a minimal amount of differences.
 
+> This package is meant to be used only with WordPress core. Feel free to use it in your own project but please keep in mind that it might never get fully documented.
+
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/server-side-render --save
+```
+
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
+## Usage
+
+The props accepted by the component are described below.
+
+
 ## Props
 
 ### attributes
@@ -43,7 +60,7 @@ E.g: `{ post_id: 12 }`.
 Render core/archives preview.
 
 ```jsx
-import { ServerSideRender } from '@wordpress/components';
+import { ServerSideRender } from '@wordpress/server-side-render';
 
 const MyServerSideRender = () => (
 	<ServerSideRender

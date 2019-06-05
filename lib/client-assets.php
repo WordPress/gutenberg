@@ -289,6 +289,21 @@ function gutenberg_register_scripts_and_styles() {
 		)
 	);
 
+	// Add back compatibility for calls to wp.components.ServerSideRender.
+	wp_add_inline_script(
+		'wp-server-side-render',
+		implode(
+			"\n",
+			array(
+				'( function() {',
+				'	if ( wp && wp.components && wp.serverSideRender && ! wp.components.ServerSideRender ) {',
+				'		wp.components.ServerSideRender = wp.serverSideRender;',
+				'	};',
+				'} )();',
+			)
+		)
+	);
+
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backward compatibility.
 	gutenberg_override_style( 'wp-blocks', false );
