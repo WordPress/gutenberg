@@ -13,5 +13,6 @@ import './store';
 import './hooks';
 
 export * from './components';
+export * from './utils';
 
 export { SETTINGS_DEFAULTS } from './store/defaults';

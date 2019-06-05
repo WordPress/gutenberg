@@ -409,7 +409,7 @@ describe( 'Post generator actions', () => {
 							'createSuccessNotice',
 							...[
 								savedPostMessage,
-								{ actions: [], id: 'SAVE_POST_NOTICE_ID' },
+								{ actions: [], id: 'SAVE_POST_NOTICE_ID', type: 'snackbar' },
 							]
 						);
 					expect( value ).toEqual( expected );

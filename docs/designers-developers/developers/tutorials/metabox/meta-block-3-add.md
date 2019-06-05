@@ -60,7 +60,6 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 ```
 {% ESNext %}
 ```jsx
-
 const { registerBlockType } = wp.blocks;
 const { TextControl } = wp.components;
 

@@ -82,8 +82,7 @@
 /packages/block-editor/src/components/rich-text @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao
 
 # PHP
-/lib                                            @youknowriad @gziolo @aduth
-*-controller.php                                @youknowriad @gziolo @aduth @timothybjacobs
+/lib                                            @youknowriad @gziolo @aduth @timothybjacobs
 
 # Native (Unowned)
 *.native.js                                     @ghost

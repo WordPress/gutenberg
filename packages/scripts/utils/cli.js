@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const minimist = require( 'minimist' );
 const spawn = require( 'cross-spawn' );
 
 /**
@@ -25,6 +26,8 @@ const getCliArg = ( arg ) => {
 };
 
 const hasCliArg = ( arg ) => getCliArg( arg ) !== undefined;
+
+const hasFileInCliArgs = () => minimist( getCliArgs() )._.length > 0;
 
 const handleSignal = ( signal ) => {
 	if ( signal === 'SIGKILL' ) {
@@ -81,5 +84,6 @@ module.exports = {
 	getCliArg,
 	getCliArgs,
 	hasCliArg,
+	hasFileInCliArgs,
 	spawnScript,
 };

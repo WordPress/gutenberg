@@ -1,15 +1,19 @@
 {
 	"name": "gutenberg",
-	"version": "5.8.0-rc.1",
+	"version": "5.8.0",
 	"private": true,
-	"description": "A new WordPress editor experience",
-	"repository": "git+https://github.com/WordPress/gutenberg.git",
+	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"WordPress",
 		"editor"
 	],
+	"homepage": "https://github.com/WordPress/gutenberg/",
+	"repository": "git+https://github.com/WordPress/gutenberg.git",
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
 	"config": {
 		"GUTENBERG_PHASE": 2
 	},
@@ -45,6 +49,7 @@
 		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
 		"@wordpress/keycodes": "file:packages/keycodes",
 		"@wordpress/list-reusable-blocks": "file:packages/list-reusable-blocks",
+		"@wordpress/media-utils": "file:packages/media-utils",
 		"@wordpress/notices": "file:packages/notices",
 		"@wordpress/nux": "file:packages/nux",
 		"@wordpress/plugins": "file:packages/plugins",
@@ -90,12 +95,12 @@
 		"core-js": "3.0.1",
 		"cross-env": "3.2.4",
 		"cssnano": "4.1.10",
-		"deasync": "0.1.14",
 		"deep-freeze": "0.0.1",
 		"doctrine": "2.1.0",
 		"enzyme": "3.9.0",
 		"eslint-plugin-jest": "21.5.0",
 		"espree": "4.0.0",
+		"fast-glob": "2.2.7",
 		"fbjs": "0.8.17",
 		"fs-extra": "8.0.1",
 		"glob": "7.1.2",
@@ -106,6 +111,7 @@
 		"lerna": "3.14.1",
 		"lint-staged": "8.1.5",
 		"lodash": "4.17.11",
+		"make-dir": "3.0.0",
 		"mkdirp": "0.5.1",
 		"node-sass": "4.12.0",
 		"node-watch": "0.6.0",
@@ -113,6 +119,7 @@
 		"pegjs": "0.10.0",
 		"phpegjs": "1.0.0-beta7",
 		"postcss": "7.0.13",
+		"progress": "2.0.3",
 		"react": "16.8.4",
 		"react-dom": "16.8.4",
 		"react-test-renderer": "16.8.4",
@@ -125,10 +132,12 @@
 		"shallow-equals": "1.0.0",
 		"shallowequal": "1.1.0",
 		"simple-git": "1.113.0",
+		"source-map-loader": "0.2.4",
 		"sprintf-js": "1.1.1",
 		"stylelint-config-wordpress": "13.1.0",
 		"uuid": "3.3.2",
-		"webpack": "4.8.3"
+		"webpack": "4.8.3",
+		"worker-farm": "1.7.0"
 	},
 	"npmPackageJsonLintConfig": {
 		"extends": "@wordpress/npm-package-json-lint-config",
@@ -177,7 +186,7 @@
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
-		"lint-js": "wp-scripts lint-js .",
+		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
 		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
@@ -193,6 +202,7 @@
 		"pretest-e2e": "cross-env SCRIPT_DEBUG=false ./bin/reset-local-e2e-tests.sh",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
+		"test-performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
 		"test-unit:update": "npm run test-unit -- --updateSnapshot",

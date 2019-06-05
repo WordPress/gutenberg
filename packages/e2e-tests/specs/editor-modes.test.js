@@ -3,6 +3,7 @@
  */
 import {
 	clickBlockAppender,
+	clickBlockToolbarButton,
 	createNewPost,
 	switchEditorModeTo,
 } from '@wordpress/e2e-test-utils';
@@ -23,8 +24,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "Visual" to "HTML".
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		let changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 
@@ -36,8 +36,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "HTML" back to "Visual".
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		changeModeButton = await page.waitForXPath( '//button[text()="Edit visually"]' );
 		await changeModeButton.click();
 
@@ -51,8 +50,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "Visual" to "HTML".
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 
@@ -67,8 +65,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "Visual" to "HTML".
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 
@@ -101,7 +98,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		// Switch to Code Editor and hide More Menu
 		await switchEditorModeTo( 'Code' );
 		await page.click(
-			'.edit-post-more-menu [aria-label="Hide more tools & options"]'
+			'.edit-post-more-menu [aria-label="More tools & options"]'
 		);
 
 		// The Block inspector should not be active anymore
