@@ -217,7 +217,6 @@ class VideoEdit extends React.Component {
 											style={ videoStyle }
 											source={ { uri: src } }
 											paused={ true }
-											muted={ true }
 										/>
 									}
 									{ ! showVideo &&
