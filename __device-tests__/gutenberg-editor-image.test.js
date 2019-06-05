@@ -45,14 +45,13 @@ describe( 'Gutenberg Editor tests', () => {
 		await editorPage.addNewImageBlock();
 		let imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 
-		if ( isAndroid() ) { // TODO: handle Android issue with adding image
-			return;
+		if ( ! isAndroid() ) {
+			await editorPage.selectEmptyImageBlock( imageBlock );
+			await editorPage.chooseMediaLibrary();
+			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
+			await imageBlock.click();
+			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
 		}
-		await editorPage.selectEmptyImageBlock( imageBlock );
-		await editorPage.chooseMediaLibrary();
-		imageBlock = await editorPage.getImageBlockAtPosition( 1 );
-		await imageBlock.click();
-		await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
 		await editorPage.removeImageBlockAtPosition( 1 );
 	} );
 
@@ -60,15 +59,14 @@ describe( 'Gutenberg Editor tests', () => {
 		await editorPage.addNewImageBlock();
 		let imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 
-		if ( isAndroid() ) { // TODO: handle Android issue with adding image
-			return;
+		if ( ! isAndroid() ) {
+			await editorPage.selectEmptyImageBlock( imageBlock );
+			await editorPage.chooseMediaLibrary();
+			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
+			await imageBlock.click();
+			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
+			await editorPage.dismissKeyboard();
 		}
-		await editorPage.selectEmptyImageBlock( imageBlock );
-		await editorPage.chooseMediaLibrary();
-		imageBlock = await editorPage.getImageBlockAtPosition( 1 );
-		await imageBlock.click();
-		await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
-		await editorPage.dismissKeyboard();
 
 		await editorPage.addNewParagraphBlock();
 		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
@@ -77,8 +75,10 @@ describe( 'Gutenberg Editor tests', () => {
 		}
 		await editorPage.sendTextToParagraphBlockAtPosition( 2, testData.longText );
 
-		// check HTML
-		await editorPage.verifyHtmlContent( testData.imageCompletehtml );
+		// check HTML for iOS, android missing image
+		if ( ! isAndroid() ) {
+			await editorPage.verifyHtmlContent( testData.imageCompletehtml );
+		}
 	} );
 
 	afterAll( async () => {
