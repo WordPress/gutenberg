@@ -11,11 +11,14 @@ const {
 	fromConfigRoot,
 	getCliArgs,
 	hasCliArg,
+	hasFileInCliArgs,
 	hasPackageProp,
 	hasProjectFile,
 } = require( '../utils' );
 
 const args = getCliArgs();
+
+const defaultFilesArgs = ! hasFileInCliArgs ? [ '.' ] : [];
 
 // See: https://eslint.org/docs/user-guide/configuring#using-configuration-files-1.
 const hasLintConfig = hasCliArg( '-c' ) ||
@@ -30,7 +33,7 @@ const hasLintConfig = hasCliArg( '-c' ) ||
 // When a configuration is not provided by the project, use from the default
 // provided with the scripts module. Instruct ESLint to avoid discovering via
 // the `--no-eslintrc` flag, as otherwise it will still merge with inherited.
-const config = ! hasLintConfig ?
+const defaultConfigArgs = ! hasLintConfig ?
 	[ '--no-eslintrc', '--config', fromConfigRoot( '.eslintrc.js' ) ] :
 	[];
 
@@ -44,7 +47,7 @@ const defaultIgnoreArgs = ! hasIgnoredFiles ?
 
 const result = spawn(
 	resolveBin( 'eslint' ),
-	[ ...config, ...defaultIgnoreArgs, ...args ],
+	[ ...defaultConfigArgs, ...defaultIgnoreArgs, ...args, ...defaultFilesArgs ],
 	{ stdio: 'inherit' }
 );
 
