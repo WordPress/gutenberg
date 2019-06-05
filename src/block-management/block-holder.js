@@ -206,11 +206,11 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				onPress={ this.onFocus }
 				accessible={ ! isSelected }
 				accessibilityRole={ 'button' }
-				accessibilityLabel={ accessibilityLabel }
 			>
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View
+						accessibilityLabel={ accessibilityLabel }
 						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
 					>
 						{ isValid && this.getBlockForType() }
