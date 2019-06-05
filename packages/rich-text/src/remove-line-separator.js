@@ -7,14 +7,13 @@ import { isCollapsed } from './is-collapsed';
 import { remove } from './remove';
 
 /**
- * Removes a line break character into a Rich Text value at the current
- * indices. If the Any content between `startIndex` and `endIndex` will be
- * removed. Indices are retrieved from the selection if none are provided.
+ * Removes a line separator character, if existing, from a Rich Text value at the current
+ * indices. If no line separator exists on the indices it will return undefined.
  *
  * @param {Object} value Value to modify.
  * @param {boolean} backward indicates if are removing from the start index or the end index.
  *
- * @return {Object} A new value with the line separator removed. Or undefined if no line separator is found on the position.
+ * @return {Object|undefined} A new value with the line separator removed. Or undefined if no line separator is found on the position.
  */
 export function removeLineSeparator(
 	value,
@@ -32,7 +31,7 @@ export function removeLineSeparator(
 	}
 
 	if ( text[ index ] !== LINE_SEPARATOR ) {
-		return undefined;
+		return;
 	}
 
 	let newValue;
