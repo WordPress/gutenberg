@@ -4,6 +4,10 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.ResultReceiver;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputType;
@@ -11,6 +15,7 @@ import android.text.Spannable;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 
 import com.facebook.infer.annotation.Assertions;
@@ -84,6 +89,7 @@ public class ReactAztecText extends AztecText {
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
 
+        Log.i("qwe", "new ReactAztecText " + this.toString());
         setGutenbergMode(true);
 
         // don't auto-focus when Aztec becomes visible.
@@ -178,6 +184,7 @@ public class ReactAztecText extends AztecText {
     @Override
     public void clearFocus() {
         setFocusableInTouchMode(false);
+        setFocusable(false);
         super.clearFocus();
         hideSoftKeyboard();
     }
@@ -195,13 +202,30 @@ public class ReactAztecText extends AztecText {
             return false;
         }*/
         setFocusableInTouchMode(true);
+        setFocusable(true);
         boolean focused = super.requestFocus(direction, previouslyFocusedRect);
-        showSoftKeyboard();
+//        showSoftKeyboard();
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                                     @Override
+                                                     public void run() {
+                                                         showSoftKeyboard();
+                                                     }
+                                                 });
         return focused;
     }
 
     private boolean showSoftKeyboard() {
+        Log.i("qwe", "showing keyb for " + this.toString());
         return mInputMethodManager.showSoftInput(this, 0);
+//        Context context = getContext();
+//        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+//        return imm.showSoftInput(this, 0, new ResultReceiver(null) {
+//            @Override
+//            protected void onReceiveResult(int resultCode, Bundle resultData) {
+//                super.onReceiveResult(resultCode, resultData);
+//                Log.i("qwe", "result: " + resultCode);
+//            }
+//        });
     }
 
     private void hideSoftKeyboard() {

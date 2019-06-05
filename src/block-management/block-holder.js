@@ -53,7 +53,7 @@ type PropsType = BlockType & {
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
 	onCaretVerticalPositionChange: ( targetId: number, caretY: number, previousCaretY: ?number ) => void,
 	onReplace: ( blocks: Array<Object> ) => void,
-	onSelect: ( clientId: string ) => void,
+	onSelect: ( clientId?: string ) => void,
 	mergeBlocks: ( clientId: string, clientId: string ) => void,
 	moveBlockUp: () => void,
 	moveBlockDown: () => void,
@@ -73,18 +73,10 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		};
 	}
 
-	onFocus = ( event: NativeSyntheticEvent<NativeTouchEvent> ) => {
-		if ( event ) {
-			// == Hack for the Alpha ==
-			// When moving the focus from a TextInput field to another kind of field the call that hides the keyboard is not invoked
-			// properly, resulting in keyboard up when it should not be there.
-			// The code below dismisses the keyboard (calling blur on the last TextInput field) when the field that now gets the focus is a non-textual field
-			const currentlyFocusedTextInput = TextInputState.currentlyFocusedField();
-			if ( event.nativeEvent.target !== currentlyFocusedTextInput && ! TextInputState.isTextInput( event.nativeEvent.target ) ) {
-				TextInputState.blurTextInput( currentlyFocusedTextInput );
-			}
+	onFocus = () => {
+		if ( ! this.props.isSelected ) {
+			this.props.onSelect();
 		}
-		this.props.onSelect( this.props.clientId );
 	};
 
 	onRemoveBlockCheckUpload = ( mediaId: number ) => {
@@ -240,7 +232,7 @@ export default compose( [
 			isValid,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, rootClientId }, { select } ) => {
+	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
 			insertBlocks,
 			mergeBlocks,
@@ -254,6 +246,7 @@ export default compose( [
 
 		return {
 			mergeBlocks( forward ) {
+				const { clientId } = ownProps;
 				const {
 					getPreviousBlockClientId,
 					getNextBlockClientId,
@@ -272,25 +265,25 @@ export default compose( [
 				}
 			},
 			moveBlockDown() {
-				moveBlocksDown( clientId );
+				moveBlocksDown( ownProps.clientId );
 			},
 			moveBlockUp() {
-				moveBlocksUp( clientId );
+				moveBlocksUp( ownProps.clientId );
 			},
 			removeBlock() {
-				removeBlock( clientId );
+				removeBlock( ownProps.clientId );
 			},
 			onInsertBlocks( blocks: Array<Object>, index: number ) {
-				insertBlocks( blocks, index, rootClientId );
+				insertBlocks( blocks, index, ownProps.rootClientId );
 			},
-			onSelect: ( selectedClientId: string ) => {
-				selectBlock( selectedClientId );
+			onSelect( clientId = ownProps.clientId, initialPosition ) {
+				selectBlock( clientId, initialPosition );
 			},
 			onChange: ( attributes: Object ) => {
-				updateBlockAttributes( clientId, attributes );
+				updateBlockAttributes( ownProps.clientId, attributes );
 			},
 			onReplace( blocks: Array<Object>, indexToSelect: number ) {
-				replaceBlocks( [ clientId ], blocks, indexToSelect );
+				replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
 			},
 		};
 	} ),
