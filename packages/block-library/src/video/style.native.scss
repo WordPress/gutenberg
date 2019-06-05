@@ -1,7 +1,12 @@
 // @format
 
-.videoContainer {
+.video {
 	width: 100%;
+}
+
+.videoContainer {
+	flex: 1;
+	background-color: #000;
 }
 
 .placeholder {

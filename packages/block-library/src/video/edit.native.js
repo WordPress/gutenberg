@@ -202,9 +202,9 @@ class VideoEdit extends React.Component {
 								</View>
 							);
 
-							const videoContainerStyle = {
-								...style.videoContainer,
+							const videoStyle = {
 								height: videoContainerHeight,
+								...style.video,
 							};
 
 							const containerStyle = showVideo && isSelected ? style.containerFocused : style.container;
@@ -212,13 +212,15 @@ class VideoEdit extends React.Component {
 							return (
 								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
 									{ showVideo && isURL( src ) &&
-										<Video
-											isSelected={ isSelected }
-											style={ { ...videoContainerStyle } }
-											source={ { uri: src } }
-											paused={ true }
-											muted={ true }
-										/>
+										<View style={ style.videoContainer }>
+											<Video
+												isSelected={ isSelected }
+												style={ videoStyle }
+												source={ { uri: src } }
+												paused={ true }
+												muted={ true }
+											/>
+										</View>
 									}
 									{ ! showVideo &&
 										<View style={ { height: videoContainerHeight, width: '100%', ...style.placeholder } }>
