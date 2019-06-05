@@ -37,6 +37,8 @@ export default class MoreEdit extends Component {
 			>
 				<Hr
 					text={ content }
+					marginLeft={ 0 }
+					marginRight={ 0 }
 					textStyle={ styles[ 'block-library-more__text' ] }
 					lineStyle={ styles[ 'block-library-more__line' ] }
 				/>
