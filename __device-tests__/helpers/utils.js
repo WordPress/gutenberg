@@ -227,6 +227,10 @@ const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver ) => {
 	}
 };
 
+const rotateDevice = async ( driver: wd.PromiseChainWebdriver ) => {
+	driver.rotateDevice( { x: 114, y: 198, duration: 5, radius: 3, rotation: 220, touchCount: 2 } );
+};
+
 module.exports = {
 	timer,
 	setupDriver,
@@ -238,4 +242,5 @@ module.exports = {
 	swipeUp,
 	stopDriver,
 	toggleHtmlMode,
+	rotateDevice,
 };
