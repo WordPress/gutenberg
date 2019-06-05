@@ -17,6 +17,7 @@ const {
 
 const args = getCliArgs();
 
+// See: https://github.com/tclindner/npm-package-json-lint/wiki/configuration#configuration.
 const hasLintConfig = hasCliArg( '-c' ) ||
 	hasCliArg( '--configFile' ) ||
 	hasProjectFile( '.npmpackagejsonlintrc.json' ) ||
@@ -27,9 +28,17 @@ const config = ! hasLintConfig ?
 	[ '--configFile', fromConfigRoot( 'npmpackagejsonlint.json' ) ] :
 	[];
 
+// See: https://github.com/tclindner/npm-package-json-lint/#cli-commands-and-configuration.
+const hasIgnoredFiles = hasCliArg( '--ignorePath' ) ||
+	hasProjectFile( '.npmpackagejsonlintignore' );
+
+const defaultIgnoreArgs = ! hasIgnoredFiles ?
+	[ '--ignorePath', fromConfigRoot( '.npmpackagejsonlintignore' ) ] :
+	[];
+
 const result = spawn(
 	resolveBin( 'npm-package-json-lint', { executable: 'npmPkgJsonLint' } ),
-	[ ...config, ...args ],
+	[ ...config, ...defaultIgnoreArgs, ...args ],
 	{ stdio: 'inherit' }
 );
 

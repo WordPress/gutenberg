@@ -717,8 +717,21 @@ const BLOCK_SELECTION_INITIAL_STATE = {
  */
 export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
 	switch ( action.type ) {
-		case 'CLEAR_SELECTED_BLOCK':
+		case 'WIPE_SELECTED_BLOCK':
 			return BLOCK_SELECTION_INITIAL_STATE;
+		case 'CLEAR_SELECTED_BLOCK':
+			if ( isEqual( state, BLOCK_SELECTION_INITIAL_STATE ) ) {
+				return BLOCK_SELECTION_INITIAL_STATE;
+			}
+			return {
+				...BLOCK_SELECTION_INITIAL_STATE,
+				previousSelection: omit( state, [ 'previousSelection' ] ),
+			};
+		case 'RESTORE_SELECTED_BLOCK':
+			return {
+				...BLOCK_SELECTION_INITIAL_STATE,
+				...state.previousSelection,
+			};
 		case 'START_MULTI_SELECT':
 			if ( state.isMultiSelecting ) {
 				return state;
