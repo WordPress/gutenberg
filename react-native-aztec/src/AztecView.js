@@ -56,6 +56,10 @@ class AztecView extends React.Component {
   }
 
   _onEnter = (event) => {
+    if (!this.isFocused()) {
+      return;
+    }
+
     if (!this.props.onEnter) {
       return;
     }
