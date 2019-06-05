@@ -6,7 +6,7 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"server side",
+		"server-side",
 		"render"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/server-side-render/README.md",
@@ -23,6 +23,7 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
+		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/components": "file:../components",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
