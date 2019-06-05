@@ -16,6 +16,7 @@ import { isEmpty } from 'lodash';
  */
 import {
 	BottomSheet,
+	Icon,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -193,10 +194,10 @@ class ImageEdit extends React.Component {
 
 	getIcon( isRetryIcon ) {
 		if ( isRetryIcon ) {
-			return <SvgIconRetry fill={ styles.iconRetry.fill } />;
+			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 		}
 
-		return <SvgIcon fill={ styles.icon.fill } />;
+		return <Icon icon={ SvgIcon } { ...styles.icon } />;
 	}
 
 	render() {
