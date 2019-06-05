@@ -50,8 +50,6 @@ due=$(date -u --iso-8601=seconds -d "$(date -d @$(echo $reference_date)) + $(ech
 
 # 5. Create milestone. This may fail for duplicates, which is expected and
 #    ignored.
-#
-echo "{\"title\":\"$milestone\",\"due_on\":\"$due\",\"description:\"Tasks to be included in the $milestone plugin release.\"}"
 
 curl \
 	--silent \
