@@ -10,13 +10,13 @@ import {
 	setupDriver,
 	isLocalEnvironment,
 	stopDriver,
-	isAndroid,
+	isAndroid, rotateDevice,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
 
-describe( 'Gutenberg Editor tests', () => {
+xdescribe( 'Gutenberg Editor tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
@@ -41,25 +41,20 @@ describe( 'Gutenberg Editor tests', () => {
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
-	it( 'should be able to add blocks , rotate device and continue adding blocks', async () => {
-		await editorPage.addNewListBlock();
-		const listBlockElement = await editorPage.getListBlockAtPosition( 1 );
-
-		// Click List block on Android to force EditText focus
+	it.only( 'should be able to add blocks , rotate device and continue adding blocks', async () => {
+		await editorPage.addNewParagraphBlock();
+		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
-			await listBlockElement.click();
+			await paragraphBlockElement.click();
 		}
 
-		// Send the first list item text
-		await editorPage.sendTextToListBlock( listBlockElement, testData.listItem1 );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
-		// send an Enter
-		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
+		await rotateDevice(driver);
 
-		// send an Enter
-		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
-
-		await editorPage.verifyHtmlContent( testData.listEndedHtml );
+		await editorPage.addNewParagraphBlock();
+		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 	} );
 
 	afterAll( async () => {
