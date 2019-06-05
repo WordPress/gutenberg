@@ -11,11 +11,8 @@ import {
 	View,
 	Text,
 	TouchableWithoutFeedback,
-	NativeSyntheticEvent,
-	NativeTouchEvent,
 	Keyboard,
 } from 'react-native';
-import TextInputState from 'react-native/lib/TextInputState';
 import {
 	requestImageUploadCancel,
 } from 'react-native-gutenberg-bridge';
