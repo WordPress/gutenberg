@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { rendererPath } from '../index';
+import { rendererPath } from '../server-side-render';
 
 describe( 'rendererPath', function() {
 	test( 'should return an base path for empty input', function() {

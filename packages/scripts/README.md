@@ -25,10 +25,10 @@ _Example:_
 	"scripts": {
 		"build": "wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
-		"check-licenses": "wp-scripts check-licenses --production",
-		"lint:css": "wp-scripts lint-style '**/*.css'",
-		"lint:js": "wp-scripts lint-js .",
-		"lint:pkg-json": "wp-scripts lint-pkg-json .",
+		"check-licenses": "wp-scripts check-licenses",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"start": "wp-scripts start",
 		"test:e2e": "wp-scripts test-e2e",
 		"test:unit": "wp-scripts test-unit-js"
@@ -101,7 +101,7 @@ _Example:_
 _Flags_:
 
 - `--prod` (or `--production`): When present, validates only `dependencies` and not `devDependencies`
-- `--dev` (or `--development`): When present, validates both `dependencies` and `devDependencies`
+- `--dev` (or `--development`): When present, validates only `devDependencies` and not `dependencies`
 - `--gpl2`: Validates against [GPLv2 license compatibility](https://www.gnu.org/licenses/license-list.en.html)
 - `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency's `license` field is malformed. It's assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
 
@@ -114,7 +114,8 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"lint:js": "wp-scripts lint-js ."
+		"lint:js": "wp-scripts lint-js",
+		"lint:js:src": "wp-scripts lint-js ./src"
 	}
 }
 ```
@@ -122,6 +123,11 @@ _Example:_
 This is how you execute the script with presented setup:
 
 * `npm run lint:js` - lints JavaScript files in the entire project's directories.
+* `npm run lint:js:src` - lints JavaScript files in the project's `src` subfolder's directories.
+
+When you run commands similar to the `npm run lint:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
+
+By default, files located in `build` and `node_modules` folders are ignored.
 
 #### Advanced information
 
@@ -136,14 +142,20 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"lint:pkg-json": "wp-scripts lint-pkg-json ."
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"lint:pkg-json:src": "wp-scripts lint-pkg-json ./src"
 	}
 }
 ```
 
 This is how you execute those scripts using the presented setup:
 
-* `npm run lint:pkg-json` - lints `package.json` file in the project's root folder.
+* `npm run lint:pkg-json` - lints `package.json` file in the entire project's directories.
+* `npm run lint:pkg-json:src` - lints `package.json` file in the project's `src` subfolder's directories.
+
+When you run commands similar to the `npm run lint:pkg-json:src` example above, you can provide one or multiple directories to scan as well. See [more examples](https://github.com/tclindner/npm-package-json-lint/blob/HEAD/README.md#examples).
+
+By default, files located in `build` and `node_modules` folders are ignored.
 
 #### Advanced information
 
@@ -158,14 +170,20 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"lint:css": "wp-scripts lint-style '**/*.css'"
+		"lint:style": "wp-scripts lint-style",
+		"lint:css:src": "wp-scripts lint-style 'src/**/*.css'"
 	}
 }
 ```
 
 This is how you execute the script with presented setup:
 
-* `npm run lint:css` - lints CSS files in the whole project's directory.
+* `npm run lint:style` - lints CSS and SCSS files in the entire project's directories.
+* `npm run lint:css:src` - lints only CSS files in the project's `src` subfolder's directories.
+
+When you run commands similar to the `npm run lint:css:src` example above, be sure to include the quotation marks around file globs. This ensures that you can use the powers of [globby](https://github.com/sindresorhus/globby) (like the `**` globstar) regardless of your shell. See [more examples](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/cli.md#examples).
+
+By default, files located in `build` and `node_modules` folders are ignored.
 
 #### Advanced information
 

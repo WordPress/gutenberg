@@ -117,3 +117,4 @@ export {
 	withColors,
 	withFontSizes,
 };
+export { default as ServerSideRender } from '@wordpress/server-side-render';
