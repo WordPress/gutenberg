@@ -272,18 +272,6 @@ export const isBlockSelectionOfSameType = ( blocksArray = [] ) => {
 };
 
 /**
- * Determines whether the provided Blocks constitute
- * a multi-block selection (ie: more than 1)
- *
- * @param  {Array}  blocksArray the array of blocks to test
- *
- * @return {boolean} whether or not the blocks consistute a multi-selection
- */
-export const isMultiBlockSelection = ( blocksArray = [] ) => {
-	return blocksArray.length > 1;
-};
-
-/**
  * Returns an array of block types that the set of blocks received as argument
  * can be transformed into.
  *
@@ -382,7 +370,7 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
  */
 export function switchToBlockType( blocks, name ) {
 	const blocksArray = castArray( blocks );
-	const isMultiBlock = isMultiBlockSelection( blocksArray );
+	const isMultiBlock = blocksArray.length > 1;
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
 
