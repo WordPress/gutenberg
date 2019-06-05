@@ -212,16 +212,18 @@ class VideoEdit extends React.Component {
 							return (
 								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
 									{ showVideo && isURL( src ) &&
-										<Video
-											isSelected={ isSelected }
-											style={ videoStyle }
-											source={ { uri: src } }
-											paused={ true }
-											muted={ true }
-										/>
+										<View style={ style.videoContainer }>
+											<Video
+												isSelected={ isSelected }
+												style={ videoStyle }
+												source={ { uri: src } }
+												paused={ true }
+												muted={ true }
+											/>
+										</View>
 									}
 									{ ! showVideo &&
-										<View style={ { ...videoStyle, ...style.placeholder } }>
+										<View style={ { height: videoContainerHeight, width: '100%', ...style.placeholder } }>
 											{ videoContainerHeight > 0 && iconContainer }
 											{ isUploadFailed && <Text style={ style.uploadFailedText }>{ retryMessage }</Text> }
 										</View>
