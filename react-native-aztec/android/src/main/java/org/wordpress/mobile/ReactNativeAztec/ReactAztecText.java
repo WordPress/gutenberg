@@ -253,18 +253,12 @@ public class ReactAztecText extends AztecText {
 
     private void onContentSizeChange() {
         if (mContentSizeWatcher != null) {
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            if (mContentSizeWatcher != null) {
-                                mContentSizeWatcher.onLayout();
-
-                            }
-                        }
-                    },
-                    300
-            );
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    mContentSizeWatcher.onLayout();
+                }
+            });
         }
         setIntrinsicContentSize();
     }
