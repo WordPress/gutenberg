@@ -52,15 +52,19 @@ describe( 'Gutenberg Editor tests', () => {
 
 		await editorPage.addNewParagraphBlock();
 		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
 		await editorPage.addNewParagraphBlock();
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3 );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
 		await editorPage.addNewHeadingBlock();
 		headingBlockElement = await editorPage.getHeadingBlockAtPosition( 4 );
 		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading );
+
+		await editorPage.addNewParagraphBlock();
+		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 5 );
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 	} );
 
 	afterAll( async () => {
