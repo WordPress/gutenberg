@@ -237,7 +237,7 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
  * and if so whether it is a "wildcard" transform
  * ie: targets "any" block type
  *
- * @param  {Object} t the Block transform object
+ * @param {Object} t the Block transform object
  *
  * @return {boolean} whether transform is a wildcard transform
  */
