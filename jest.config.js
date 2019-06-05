@@ -21,11 +21,15 @@ module.exports = {
 		'<rootDir>/enzyme.config.js',
 	],
 	testEnvironment: 'jsdom',
+	testMatch: [
+		'**/test/*.native.[jt]s?(x)',
+		'<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
+		'<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
+	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
 		'<rootDir>/gutenberg/gutenberg-mobile/',
 		'/gutenberg/test/',
-		'/gutenberg/packages/',
 		'/__device-tests__/',
 	],
 	testURL: 'http://localhost/',
