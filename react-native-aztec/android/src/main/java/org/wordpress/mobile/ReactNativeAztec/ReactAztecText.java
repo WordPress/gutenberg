@@ -174,14 +174,14 @@ public class ReactAztecText extends AztecText {
     public void requestFocusFromJS() {
         mIsJSSettingFocus = true;
         requestFocus();
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
                 Rect r = new Rect();
                 getDrawingRect(r);
                 requestRectangleOnScreen(r);
             }
-        });
+        }, 500);
         mIsJSSettingFocus = false;
     }
 
@@ -250,10 +250,18 @@ public class ReactAztecText extends AztecText {
 
     private void onContentSizeChange() {
         if (mContentSizeWatcher != null) {
-            if (mContentSizeWatcher != null) {
-                mContentSizeWatcher.onLayout();
+            new java.util.Timer().schedule(
+                    new java.util.TimerTask() {
+                        @Override
+                        public void run() {
+                            if (mContentSizeWatcher != null) {
+                                mContentSizeWatcher.onLayout();
 
-            }
+                            }
+                        }
+                    },
+                    300
+            );
         }
         setIntrinsicContentSize();
     }
