@@ -8,6 +8,7 @@ import {
 	createNewPost,
 	isInDefaultBlock,
 	pressKeyWithModifier,
+	pressKeyTimes,
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
@@ -22,10 +23,37 @@ const addThreeParagraphsToNewPost = async () => {
 	await page.keyboard.press( 'Enter' );
 };
 
-const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
+/**
+ * Due to an issue with the Popover component not being scrollable
+ * under certain conditions, Pupeteer cannot "see" the "Remove Block"
+ * button. This is a workaround until that issue is resolved.
+ *
+ * see: https://github.com/WordPress/gutenberg/pull/14908#discussion_r284725956
+ */
+const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
 	await clickBlockToolbarButton( 'More options' );
-	const itemButton = ( await page.$x( `//*[contains(@class, "block-editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
-	await itemButton.click();
+
+	let isRemoveButton = false;
+
+	let numButtons = await page.$$eval( '.block-editor-block-toolbar button', ( btns ) => btns.length );
+
+	// Limit by the number of buttons available
+	while ( --numButtons ) {
+		await page.keyboard.press( 'Tab' );
+
+		isRemoveButton = await page.evaluate( () => {
+			return document.activeElement.innerText.includes( 'Remove Block' );
+		} );
+
+		// Stop looping once we find the button
+		if ( isRemoveButton ) {
+			await pressKeyTimes( 'Enter', 1 );
+			break;
+		}
+	}
+
+	// Makes failures more explicit
+	await expect( isRemoveButton ).toBe( true );
 };
 
 describe( 'block deletion -', () => {
@@ -39,7 +67,8 @@ describe( 'block deletion -', () => {
 			// Press Escape to show the block toolbar
 			await page.keyboard.press( 'Escape' );
 
-			await clickOnBlockSettingsMenuItem( 'Remove Block' );
+			await clickOnBlockSettingsMenuRemoveBlockButton();
+
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
 			// Type additional text and assert that caret position is correct by comparing to snapshot.
@@ -121,7 +150,7 @@ describe( 'deleting all blocks', () => {
 
 		await page.keyboard.press( 'Escape' );
 
-		await clickOnBlockSettingsMenuItem( 'Remove Block' );
+		await clickOnBlockSettingsMenuRemoveBlockButton();
 
 		// There is a default block:
 		expect( await page.$$( '.block-editor-block-list__block' ) ).toHaveLength( 1 );

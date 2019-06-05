@@ -679,7 +679,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: Array of blocks.
+-   `?Array`: Array of blocks or null.
 
 <a name="synchronizeBlocksWithTemplate" href="#synchronizeBlocksWithTemplate">#</a> **synchronizeBlocksWithTemplate**
 

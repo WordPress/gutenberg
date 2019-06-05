@@ -900,12 +900,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "ServerSideRender",
-		"slug": "server-side-render",
-		"markdown_source": "../packages/components/src/server-side-render/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "SlotFill",
 		"slug": "slot-fill",
 		"markdown_source": "../packages/components/src/slot-fill/README.md",
@@ -1359,6 +1353,12 @@
 		"title": "@wordpress/scripts",
 		"slug": "packages-scripts",
 		"markdown_source": "../packages/scripts/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/server-side-render",
+		"slug": "packages-server-side-render",
+		"markdown_source": "../packages/server-side-render/README.md",
 		"parent": "packages"
 	},
 	{

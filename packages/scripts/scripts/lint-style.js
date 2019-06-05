@@ -11,13 +11,17 @@ const {
 	fromConfigRoot,
 	getCliArgs,
 	hasCliArg,
+	hasFileInCliArgs,
 	hasProjectFile,
 	hasPackageProp,
 } = require( '../utils' );
 
 const args = getCliArgs();
 
-const hasStylelintConfig = hasCliArg( '--config' ) ||
+const defaultFilesArgs = ! hasFileInCliArgs ? [ '**/*.{css,scss}' ] : [];
+
+// See: https://github.com/stylelint/stylelint/blob/master/docs/user-guide/configuration.md#loading-the-configuration-object.
+const hasLintConfig = hasCliArg( '--config' ) ||
 	hasProjectFile( '.stylelintrc' ) ||
 	hasProjectFile( '.stylelintrc.js' ) ||
 	hasProjectFile( '.stylelintrc.json' ) ||
@@ -26,13 +30,21 @@ const hasStylelintConfig = hasCliArg( '--config' ) ||
 	hasProjectFile( '.stylelint.config.js' ) ||
 	hasPackageProp( 'stylelint' );
 
-const config = ! hasStylelintConfig ?
+const defaultConfigArgs = ! hasLintConfig ?
 	[ '--config', fromConfigRoot( '.stylelintrc.json' ) ] :
+	[];
+
+// See: https://github.com/stylelint/stylelint/blob/master/docs/user-guide/configuration.md#stylelintignore.
+const hasIgnoredFiles = hasCliArg( '--ignore-path' ) ||
+	hasProjectFile( '.stylelintignore' );
+
+const defaultIgnoreArgs = ! hasIgnoredFiles ?
+	[ '--ignore-path', fromConfigRoot( '.stylelintignore' ) ] :
 	[];
 
 const result = spawn(
 	resolveBin( 'stylelint' ),
-	[ ...config, ...args ],
+	[ ...defaultConfigArgs, ...defaultIgnoreArgs, ...args, ...defaultFilesArgs ],
 	{ stdio: 'inherit' }
 );
 

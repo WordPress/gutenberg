@@ -1,131 +1,166 @@
 export const EXPECTED_TRANSFORMS = {
 	core__archives: {
 		originalBlock: 'Archives',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__archives__showPostCounts: {
 		originalBlock: 'Archives',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__audio: {
 		originalBlock: 'Audio',
 		availableTransforms: [
 			'File',
+			'Group',
 		],
 	},
 	core__button__center: {
 		originalBlock: 'Button',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__calendar: {
 		originalBlock: 'Calendar',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__media-text': {
 		originalBlock: 'Media & Text',
 		availableTransforms: [
+			'Group',
 			'Image',
 		],
 	},
 	'core__media-text__image-alt-no-align': {
 		originalBlock: 'Media & Text',
 		availableTransforms: [
+			'Group',
 			'Image',
 		],
 	},
 	'core__media-text__image-fill-no-focal-point-selected': {
 		originalBlock: 'Media & Text',
 		availableTransforms: [
+			'Group',
 			'Image',
 		],
 	},
 	'core__media-text__image-fill-with-focal-point-selected': {
 		originalBlock: 'Media & Text',
 		availableTransforms: [
+			'Group',
 			'Image',
 		],
 	},
 	'core__media-text__is-stacked-on-mobile': {
 		originalBlock: 'Media & Text',
 		availableTransforms: [
+			'Group',
 			'Video',
 		],
 	},
 	'core__media-text__media-right-custom-width': {
 		originalBlock: 'Media & Text',
 		availableTransforms: [
+			'Group',
 			'Video',
 		],
 	},
 	'core__media-text__vertical-align-bottom': {
 		originalBlock: 'Media & Text',
 		availableTransforms: [
+			'Group',
 			'Image',
 		],
 	},
 	'core__media-text__video': {
 		originalBlock: 'Media & Text',
 		availableTransforms: [
+			'Group',
 			'Video',
 		],
 	},
 	core__categories: {
 		originalBlock: 'Categories',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__code: {
 		originalBlock: 'Code',
 		availableTransforms: [
+			'Group',
 			'Preformatted',
 		],
 	},
 	core__columns: {
 		originalBlock: 'Columns',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__cover: {
 		availableTransforms: [
+			'Group',
 			'Image',
 		],
 		originalBlock: 'Cover',
 	},
 	core__cover__video: {
 		availableTransforms: [
+			'Group',
 			'Video',
 		],
 		originalBlock: 'Cover',
 	},
 	'core__cover__video-overlay': {
 		availableTransforms: [
+			'Group',
 			'Video',
 		],
 		originalBlock: 'Cover',
 	},
 	core__embed: {
 		originalBlock: 'Embed',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__file__new-window': {
 		originalBlock: 'File',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__file__no-download-button': {
 		originalBlock: 'File',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__file__no-text-link': {
 		originalBlock: 'File',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__gallery: {
 		originalBlock: 'Gallery',
 		availableTransforms: [
+			'Group',
 			'Image',
 		],
 	},
 	core__gallery__columns: {
 		originalBlock: 'Gallery',
 		availableTransforms: [
+			'Group',
 			'Image',
 		],
 	},
@@ -137,6 +172,7 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Heading',
 		availableTransforms: [
 			'Quote',
+			'Group',
 			'Paragraph',
 		],
 	},
@@ -144,12 +180,15 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Heading',
 		availableTransforms: [
 			'Quote',
+			'Group',
 			'Paragraph',
 		],
 	},
 	core__html: {
 		originalBlock: 'Custom HTML',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__image: {
 		originalBlock: 'Image',
@@ -157,6 +196,7 @@ export const EXPECTED_TRANSFORMS = {
 			'Gallery',
 			'Cover',
 			'File',
+			'Group',
 			'Media & Text',
 		],
 	},
@@ -166,6 +206,7 @@ export const EXPECTED_TRANSFORMS = {
 			'Gallery',
 			'Cover',
 			'File',
+			'Group',
 			'Media & Text',
 		],
 	},
@@ -175,6 +216,7 @@ export const EXPECTED_TRANSFORMS = {
 			'Gallery',
 			'Cover',
 			'File',
+			'Group',
 			'Media & Text',
 		],
 	},
@@ -184,6 +226,7 @@ export const EXPECTED_TRANSFORMS = {
 			'Gallery',
 			'Cover',
 			'File',
+			'Group',
 			'Media & Text',
 		],
 	},
@@ -193,6 +236,7 @@ export const EXPECTED_TRANSFORMS = {
 			'Gallery',
 			'Cover',
 			'File',
+			'Group',
 			'Media & Text',
 		],
 	},
@@ -202,6 +246,7 @@ export const EXPECTED_TRANSFORMS = {
 			'Gallery',
 			'Cover',
 			'File',
+			'Group',
 			'Media & Text',
 		],
 	},
@@ -211,43 +256,59 @@ export const EXPECTED_TRANSFORMS = {
 			'Gallery',
 			'Cover',
 			'File',
+			'Group',
 			'Media & Text',
 		],
 	},
 	'core__latest-comments': {
 		originalBlock: 'Latest Comments',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__latest-posts': {
 		originalBlock: 'Latest Posts',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__latest-posts__displayPostDate': {
 		originalBlock: 'Latest Posts',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__legacy-widget': {
 		originalBlock: 'Legacy Widget (Experimental)',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__list__ul: {
 		originalBlock: 'List',
 		availableTransforms: [
+			'Group',
 			'Paragraph',
 			'Quote',
 		],
 	},
 	core__more: {
 		originalBlock: 'More',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__more__custom-text-teaser': {
 		originalBlock: 'More',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__nextpage: {
 		originalBlock: 'Page Break',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__paragraph__align-right': {
 		originalBlock: 'Paragraph',
@@ -255,6 +316,7 @@ export const EXPECTED_TRANSFORMS = {
 			'Heading',
 			'List',
 			'Quote',
+			'Group',
 			'Preformatted',
 			'Verse',
 		],
@@ -262,6 +324,7 @@ export const EXPECTED_TRANSFORMS = {
 	core__preformatted: {
 		originalBlock: 'Preformatted',
 		availableTransforms: [
+			'Group',
 			'Paragraph',
 		],
 	},
@@ -269,18 +332,21 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Pullquote',
 		availableTransforms: [
 			'Quote',
+			'Group',
 		],
 	},
 	'core__pullquote__multi-paragraph': {
 		originalBlock: 'Pullquote',
 		availableTransforms: [
 			'Quote',
+			'Group',
 		],
 	},
 	'core__quote__style-1': {
 		originalBlock: 'Quote',
 		availableTransforms: [
 			'List',
+			'Group',
 			'Paragraph',
 			'Heading',
 			'Pullquote',
@@ -290,6 +356,7 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Quote',
 		availableTransforms: [
 			'List',
+			'Group',
 			'Paragraph',
 			'Heading',
 			'Pullquote',
@@ -297,44 +364,62 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	core__rss: {
 		originalBlock: 'RSS',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__search: {
 		originalBlock: 'Search',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__search__custom-text': {
 		originalBlock: 'Search',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__separator: {
 		originalBlock: 'Separator',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__shortcode: {
 		originalBlock: 'Shortcode',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__spacer: {
 		originalBlock: 'Spacer',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	core__table: {
 		originalBlock: 'Table',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__tag-cloud': {
 		originalBlock: 'Tag Cloud',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__tag-cloud__showTagCounts': {
 		originalBlock: 'Tag Cloud',
 		availableTransforms: [
+			'Group',
 		],
 	},
 	core__verse: {
 		originalBlock: 'Verse',
 		availableTransforms: [
+			'Group',
 			'Paragraph',
 		],
 	},
@@ -343,6 +428,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [
 			'Cover',
 			'File',
+			'Group',
 			'Media & Text',
 		],
 	},

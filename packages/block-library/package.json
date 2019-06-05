@@ -36,6 +36,7 @@
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
 		"fast-average-color": "4.3.0",
