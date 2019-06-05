@@ -13,12 +13,10 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
-import Placeholder from '../placeholder';
-import Spinner from '../spinner';
+import {
+	Placeholder,
+	Spinner,
+} from '@wordpress/components';
 
 export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {
