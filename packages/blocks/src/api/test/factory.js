@@ -1542,6 +1542,16 @@ describe( 'block factory', () => {
 
 			expect( isWildcardBlockTransform( invalidWildcardBlockTransform ) ).toBe( false );
 		} );
+
+		it( 'should return false for transforms which do not provide an array as the "blocks" option', () => {
+			const invalidWildcardBlockTransform = {
+				type: 'block',
+				blocks: noop,
+				blockName: 'core/test-block',
+			};
+
+			expect( isWildcardBlockTransform( invalidWildcardBlockTransform ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'isContainerGroupBlock', () => {
