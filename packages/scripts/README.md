@@ -127,7 +127,6 @@ This is how you execute the script with presented setup:
 
 When you run commands similar to the `npm run lint:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
 
-
 By default, files located in `build` and `node_modules` folders are ignored.
 
 #### Advanced information
