@@ -102,12 +102,6 @@ describe( 'Icon', () => {
 			[ 'svg element', { icon: svg } ],
 			[ 'component', { icon: MyComponent } ],
 		] )( '%s', ( label, props ) => {
-			it( 'should pass through a className', () => {
-				const wrapper = shallow( <Icon { ...props } className={ className } /> );
-
-				expect( wrapper.prop( 'className' ) ).toBe( 'example-class' );
-			} );
-
 			it( 'should pass through size', () => {
 				if ( label === 'svg element' ) {
 					// Custom logic for SVG elements tested separately.
@@ -122,9 +116,10 @@ describe( 'Icon', () => {
 			} );
 
 			it( 'should pass through all other props', () => {
-				const wrapper = shallow( <Icon { ...props } style={ style } /> );
+				const wrapper = shallow( <Icon { ...props } style={ style } className={ className } /> );
 
 				expect( wrapper.prop( 'style' ) ).toBe( style );
+				expect( wrapper.prop( 'className' ) ).toBe( className );
 			} );
 		} );
 	} );
