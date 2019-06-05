@@ -223,7 +223,15 @@ const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver ) => {
 		// hit Enter
 		await driver.pressKeycode( 66 );
 	} else {
-		// TODO: toggle html mode in iOS
+		const menuButton = await driver.elementByAccessibilityId( '...' );
+		await menuButton.click();
+		let toggleHtmlButton;
+		try {
+			toggleHtmlButton = await driver.elementByAccessibilityId( 'Switch to HTML' );
+		} catch ( err ) {
+			toggleHtmlButton = await driver.elementByAccessibilityId( 'Switch To Visual' );
+		}
+		await toggleHtmlButton.click();
 	}
 };
 

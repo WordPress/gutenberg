@@ -59,6 +59,44 @@ export default class EditorPage {
 		return elements.length > 0;
 	}
 
+	async verifyHtmlContent( html: string ) {
+		if ( Platform.OS === 'android' ) {
+			await this.verifyHtmlContentAndroid( html );
+		} else {
+			await this.verifyHtmlContentIOS( html );
+		}
+	}
+
+	async getTextViewForHtmlViewContent() {
+		const accessibilityId = 'html-view-content';
+		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
+
+		if ( ! isAndroid() ) {
+			blockLocator += '//XCUIElementTypeTextView';
+		}
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async verifyHtmlContentAndroid( html: string ) {
+		await toggleHtmlMode( this.driver );
+
+		const htmlContentView = await this.getTextViewForHtmlViewContent();
+		const text = await htmlContentView.text();
+		expect( text ).toBe( html );
+
+		await toggleHtmlMode( this.driver );
+	}
+
+	async verifyHtmlContentIOS( html: string ) {
+		await toggleHtmlMode( this.driver );
+
+		const htmlContentView = await this.getTextViewForHtmlViewContent();
+		const text = await htmlContentView.text();
+		expect( text ).toBe( html );
+
+		await toggleHtmlMode( this.driver );
+	}
+
 	// =========================
 	// Block toolbar functions
 	// =========================
@@ -261,29 +299,5 @@ export default class EditorPage {
 		const block = await this.getListBlockAtPosition( position );
 		const text = await this.getTextForListBlock( block );
 		return text.toString();
-	}
-
-	async getTextViewForHtmlViewContent() {
-		const accessibilityId = 'html-view-content';
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
-		return await this.driver.elementByXPath( blockLocator );
-	}
-
-	async verifyHtmlContent( html: string ) {
-		if ( Platform.OS === 'android' ) {
-			await this.verifyHtmlContentAndroid( html );
-		} else {
-			// TODO: implement html verification on iOS too
-		}
-	}
-
-	async verifyHtmlContentAndroid( html: string ) {
-		await toggleHtmlMode( this.driver );
-
-		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		const text = await htmlContentView.text();
-		expect( text ).toBe( html );
-
-		await toggleHtmlMode( this.driver );
 	}
 }
