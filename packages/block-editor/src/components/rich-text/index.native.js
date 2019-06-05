@@ -350,15 +350,15 @@ export class RichText extends Component {
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
-
+		const { onReplace, onSplit } = this.props;
+		const canSplit = onReplace && onSplit;
 		const currentRecord = this.createRecord();
-
 		if ( this.multilineTag ) {
 			if ( event.shiftKey ) {
 				this.needsSelectionUpdate = true;
 				const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
 				this.onFormatChange( insertedLineBreak );
-			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
+			} else if ( canSplit && isEmptyLine( currentRecord ) ) {
 				this.onSplit( currentRecord );
 			} else {
 				this.needsSelectionUpdate = true;
