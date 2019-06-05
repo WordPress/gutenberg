@@ -184,7 +184,7 @@ public class ReactAztecText extends AztecText {
                 getLineBounds(lineNumber, caretLineRect);
                 requestRectangleOnScreen(caretLineRect);
             }
-        }, 500);
+        }, 100);
         mIsJSSettingFocus = false;
     }
 
