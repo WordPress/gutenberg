@@ -24,6 +24,7 @@ export default class EditorPage {
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
 	listBlockName = 'List';
+	headingBlockName = 'Heading';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
@@ -57,6 +58,24 @@ export default class EditorPage {
 		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "Block. Row ${ position }.")]`;
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		return elements.length > 0;
+	}
+
+	async verifyHtmlContent( html: string ) {
+		if ( Platform.OS === 'android' ) {
+			await this.verifyHtmlContentAndroid( html );
+		} else {
+			// TODO: implement html verification on iOS too
+		}
+	}
+
+	async verifyHtmlContentAndroid( html: string ) {
+		await toggleHtmlMode( this.driver );
+
+		const htmlContentView = await this.getTextViewForHtmlViewContent();
+		const text = await htmlContentView.text();
+		expect( text ).toBe( html );
+
+		await toggleHtmlMode( this.driver );
 	}
 
 	// =========================
@@ -269,21 +288,49 @@ export default class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	async verifyHtmlContent( html: string ) {
-		if ( Platform.OS === 'android' ) {
-			await this.verifyHtmlContentAndroid( html );
-		} else {
-			// TODO: implement html verification on iOS too
-		}
+	// =========================
+	// Heading Block functions
+	// =========================
+	async addNewHeadingBlock() {
+		await this.addNewBlock( this.headingBlockName );
 	}
 
-	async verifyHtmlContentAndroid( html: string ) {
-		await toggleHtmlMode( this.driver );
+	async getHeadingBlockAtPosition( position: number ) {
+		return this.getBlockAtPosition( position, this.headingBlockName );
+	}
 
-		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		const text = await htmlContentView.text();
-		expect( text ).toBe( html );
+	// Inner element changes on iOS if Heading Block is empty
+	async getTextViewForHeadingBlock( block: wd.PromiseChainWebdriver.Element, empty: boolean ) {
+		let textViewElementName = empty ? 'XCUIElementTypeStaticText' : 'XCUIElementTypeTextView';
+		if ( isAndroid() ) {
+			textViewElementName = 'android.widget.EditText';
+		}
 
-		await toggleHtmlMode( this.driver );
+		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//${ textViewElementName }`;
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	// Assumes Heading Block is empty
+	async sendTextToHeadingBlock( block: wd.PromiseChainWebdriver.Element, text: string ) {
+		const textViewElement = await this.getTextViewForListBlock( block, true );
+		return await typeString( this.driver, textViewElement, text );
+	}
+
+	// Fails if Heading block is not empty
+	async getTextForHeadingBlock( block: wd.PromiseChainWebdriver.Element ) {
+		const textViewElement = await this.getTextViewForListBlock( block, false );
+		const text = await textViewElement.text();
+		return text.toString();
 	}
 }
+
+/*
+let el1 = await driver.elementByXPath("//XCUIElementTypeButton[@name=\"Add block\"]");
+await el1.click();
+let el2 = await driver.elementByAccessibilityId("Heading");
+await el2.click();
+let el3 = await driver.elementByXPath("//XCUIElementTypeStaticText[@name=\"Write heading…\"]");
+await el3.sendKeys("Lorem Ipsum");
+
+ */
