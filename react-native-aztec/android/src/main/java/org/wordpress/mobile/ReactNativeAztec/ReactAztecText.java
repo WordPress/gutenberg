@@ -174,6 +174,14 @@ public class ReactAztecText extends AztecText {
     public void requestFocusFromJS() {
         mIsJSSettingFocus = true;
         requestFocus();
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Rect r = new Rect();
+                getDrawingRect(r);
+                requestRectangleOnScreen(r);
+            }
+        });
         mIsJSSettingFocus = false;
     }
 
