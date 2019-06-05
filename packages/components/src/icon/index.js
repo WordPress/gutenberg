@@ -22,10 +22,10 @@ function Icon( { icon = null, size, ...additionalProps } ) {
 
 	if ( 'function' === typeof icon ) {
 		if ( icon.prototype instanceof Component ) {
-			return createElement( icon, { ...additionalProps, size: iconSize } );
+			return createElement( icon, { size: iconSize, ...additionalProps } );
 		}
 
-		return icon( { ...additionalProps, size: iconSize } );
+		return icon( { size: iconSize, ...additionalProps } );
 	}
 
 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
@@ -41,8 +41,8 @@ function Icon( { icon = null, size, ...additionalProps } ) {
 
 	if ( isValidElement( icon ) ) {
 		return cloneElement( icon, {
-			...additionalProps,
 			size: iconSize,
+			...additionalProps,
 		} );
 	}
 
