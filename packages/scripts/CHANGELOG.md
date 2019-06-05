@@ -1,3 +1,9 @@
+## Master
+
+### New Features
+
+- The `lint-js`, `lint-pkg-json` and `lint-style` commands ignore now files located in `build` and `node_modules` folders by default ([15977](https://github.com/WordPress/gutenberg/pull/15977)).
+
 ## 3.2.0 (2019-05-21)
 
 ### New Feature

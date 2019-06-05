@@ -123,6 +123,9 @@ This is how you execute the script with presented setup:
 
 * `npm run lint:js` - lints JavaScript files in the entire project's directories.
 
+
+By default, files located in `build` and `node_modules` folders are ignored.
+
 #### Advanced information
 
 It uses [eslint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. You can override default rules with your own as described in [eslint docs](https://eslint.org/docs/rules/). Learn more in the [Advanced Usage](#advanced-usage) section.
@@ -145,6 +148,8 @@ This is how you execute those scripts using the presented setup:
 
 * `npm run lint:pkg-json` - lints `package.json` file in the project's root folder.
 
+By default, files located in `build` and `node_modules` folders are ignored.
+
 #### Advanced information
 
 It uses [npm-package-json-lint](https://www.npmjs.com/package/npm-package-json-lint) with the set of recommended rules defined in [@wordpress/npm-package-json-lint-config](https://www.npmjs.com/package/@wordpress/npm-package-json-lint-config) npm package. You can override default rules with your own as described in [npm-package-json-lint wiki](https://github.com/tclindner/npm-package-json-lint/wiki). Learn more in the [Advanced Usage](#advanced-usage) section.
@@ -166,6 +171,8 @@ _Example:_
 This is how you execute the script with presented setup:
 
 * `npm run lint:css` - lints CSS files in the whole project's directory.
+
+By default, files located in `build` and `node_modules` folders are ignored.
 
 #### Advanced information
 
