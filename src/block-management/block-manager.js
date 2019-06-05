@@ -20,6 +20,7 @@ import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { PostTitle } from '@wordpress/editor';
 import { DefaultBlockAppender } from '@wordpress/block-editor';
 import { sendNativeEditorDidLayout, subscribeSetFocusOnTitle, subscribeMediaAppend } from 'react-native-gutenberg-bridge';
+import { KeyboardAvoidingView, KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -33,10 +34,7 @@ import toolbarStyles from './block-toolbar.scss';
 import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
 import BlockToolbar from './block-toolbar';
-import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
-import { KeyboardAwareFlatList, handleCaretVerticalPositionChange } from '../components/keyboard-aware-flat-list';
 import SafeArea from 'react-native-safe-area';
-import ReadableContentView from '../components/readable-content-view';
 
 type PropsType = {
 	rootClientId: ?string,
@@ -44,7 +42,6 @@ type PropsType = {
 	blockCount: number,
 	clearSelectedBlock: () => void,
 	focusBlock: ( clientId: string ) => void,
-	selectBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
 	replaceBlock: ( string, BlockType ) => mixed,
 	getBlockName: string => string,
@@ -206,7 +203,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	onCaretVerticalPositionChange( targetId: number, caretY: number, previousCaretY: ?number ) {
-		handleCaretVerticalPositionChange( this.scrollViewRef, targetId, caretY, previousCaretY );
+		KeyboardAwareFlatList.handleCaretVerticalPositionChange( this.scrollViewRef, targetId, caretY, previousCaretY );
 	}
 
 	scrollViewInnerRef( ref: Object ) {
@@ -380,14 +377,12 @@ export default compose( [
 		const {
 			insertBlock,
 			replaceBlock,
-			selectBlock,
 			clearSelectedBlock,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			clearSelectedBlock,
 			insertBlock,
-			selectBlock,
 			replaceBlock,
 		};
 	} ),
