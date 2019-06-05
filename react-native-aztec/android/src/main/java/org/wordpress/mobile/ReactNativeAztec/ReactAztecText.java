@@ -204,28 +204,19 @@ public class ReactAztecText extends AztecText {
         setFocusableInTouchMode(true);
         setFocusable(true);
         boolean focused = super.requestFocus(direction, previouslyFocusedRect);
-//        showSoftKeyboard();
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                                     @Override
-                                                     public void run() {
-                                                         showSoftKeyboard();
-                                                     }
-                                                 });
+        showSoftKeyboard();
         return focused;
     }
 
-    private boolean showSoftKeyboard() {
-        Log.i("qwe", "showing keyb for " + this.toString());
-        return mInputMethodManager.showSoftInput(this, 0);
-//        Context context = getContext();
-//        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-//        return imm.showSoftInput(this, 0, new ResultReceiver(null) {
-//            @Override
-//            protected void onReceiveResult(int resultCode, Bundle resultData) {
-//                super.onReceiveResult(resultCode, resultData);
-//                Log.i("qwe", "result: " + resultCode);
-//            }
-//        });
+    private void showSoftKeyboard() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                if (mInputMethodManager != null) {
+                    mInputMethodManager.showSoftInput(ReactAztecText.this, 0);
+                }
+            }
+        });
     }
 
     private void hideSoftKeyboard() {
