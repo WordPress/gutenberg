@@ -16,13 +16,13 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { Group, UnGroup } from './icons';
+import { Group, Ungroup } from './icons';
 
 export function ConvertToGroupButton( {
 	onConvertToGroup,
 	onConvertFromGroup,
 	isGroupable = false,
-	isUnGroupable = false,
+	isUngroupable = false,
 } ) {
 	return (
 		<Fragment>
@@ -35,10 +35,10 @@ export function ConvertToGroupButton( {
 					{ _x( 'Group', 'verb' ) }
 				</MenuItem>
 			) }
-			{ isUnGroupable && (
+			{ isUngroupable && (
 				<MenuItem
 					className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
-					icon={ UnGroup }
+					icon={ Ungroup }
 					onClick={ onConvertFromGroup }
 				>
 					{ _x( 'Ungroup', 'Ungrouping blocks from within a Group block back into individual blocks within the Editor ' ) }
@@ -73,11 +73,11 @@ export default compose( [
 		);
 
 		// Do we have a single Group Block selected?
-		const isUnGroupable = isSingleContainerBlock;
+		const isUngroupable = isSingleContainerBlock;
 
 		return {
 			isGroupable,
-			isUnGroupable,
+			isUngroupable,
 			blocksSelection,
 		};
 	} ),
