@@ -188,7 +188,7 @@ const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
 			return !! findTransform(
 				fromTransforms,
 				( transform ) => {
-					return transform && isPossibleTransformForSource( transform, 'from', blocks );
+					return isPossibleTransformForSource( transform, 'from', blocks );
 				}
 			);
 		},
