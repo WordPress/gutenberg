@@ -177,9 +177,12 @@ public class ReactAztecText extends AztecText {
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                Rect r = new Rect();
-                getDrawingRect(r);
-                requestRectangleOnScreen(r);
+                // let's pinpoint the caret line to ask the system to bring that line into the viewport
+                int lineNumber = getLayout().getLineForOffset(getSelectionStart());
+
+                Rect caretLineRect = new Rect();
+                getLineBounds(lineNumber, caretLineRect);
+                requestRectangleOnScreen(caretLineRect);
             }
         }, 500);
         mIsJSSettingFocus = false;
