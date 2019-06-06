@@ -27,13 +27,20 @@ export const settings = {
 	},
 	getEditWrapperProps( attributes ) {
 		const { width } = attributes;
+
+		// A column should act as a "pass-through", meaning that it cannot be
+		// selected by typical focus interactions. A block becomes selected by
+		// virtue of its focus handler, and by nullifying its tabIndex, it will
+		// no longer handle focus events.
+		const props = { tabIndex: undefined };
+
 		if ( Number.isFinite( width ) ) {
-			return {
-				style: {
-					flexBasis: width + '%',
-				},
+			props.style = {
+				flexBasis: width + '%',
 			};
 		}
+
+		return props;
 	},
 	edit,
 	save,
