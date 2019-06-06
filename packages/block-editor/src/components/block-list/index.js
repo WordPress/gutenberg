@@ -24,6 +24,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { getBlockDOMNode } from '../../utils/dom';
@@ -207,9 +208,10 @@ class BlockList extends Component {
 						selectedBlockClientId === clientId;
 
 					return (
-						<AsyncModeProvider
+						<BlockAsyncModeProvider
 							key={ 'block-' + clientId }
-							value={ ! isBlockInSelection }
+							clientId={ clientId }
+							isBlockInSelection={ isBlockInSelection }
 						>
 							<BlockListBlock
 								clientId={ clientId }
@@ -218,7 +220,7 @@ class BlockList extends Component {
 								rootClientId={ rootClientId }
 								isDraggable={ isDraggable }
 							/>
-						</AsyncModeProvider>
+						</BlockAsyncModeProvider>
 					);
 				} ) }
 
