@@ -57,6 +57,7 @@ class Video extends Component {
 					controls={ false }
 					onLoad={ this.onLoad }
 					onLoadStart={ this.onLoadStart }
+					ignoreSilentSwitch={ 'ignore' }
 				/>
 				{ isLoaded &&
 				<TouchableOpacity disabled={ ! isSelected } onPress={ this.onPressPlay } style={ [ style, styles.overlay ] }>
