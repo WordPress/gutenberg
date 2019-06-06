@@ -813,7 +813,7 @@ export class RichText extends Component {
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					isSelected={ isSelected }
 					blockType={ { tag: tagName } }
-					color={ 'black' }
+					color={ styles[ 'block-editor-rich-text' ].color }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || styles[ 'block-editor-rich-text' ].fontFamily }
 					fontSize={ this.props.fontSize || ( style && style.fontSize ) }
