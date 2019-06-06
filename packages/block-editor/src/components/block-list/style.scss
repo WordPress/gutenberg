@@ -109,8 +109,9 @@
 			border: $border-width solid transparent;
 			border-left: none;
 			box-shadow: none;
-			transition: border-color 0.1s linear, box-shadow 0.1s linear;
 			pointer-events: none;
+			transition: border-color 0.1s linear, box-shadow 0.1s linear;
+			@include reduce-motion("transition");
 
 			// Include a transparent outline for Windows High Contrast mode.
 			outline: $border-width solid transparent;
@@ -160,6 +161,7 @@
 	&.is-focus-mode:not(.is-multi-selected) {
 		opacity: 0.5;
 		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
 
 		&:not(.is-focused) .block-editor-block-list__block,
 		&.is-focused {
@@ -297,13 +299,11 @@
 	}
 
 	// Appender
-	&.is-typing .block-editor-block-list__empty-block-inserter,
 	&.is-typing .block-editor-block-list__side-inserter {
 		opacity: 0;
 		animation: none;
 	}
 
-	.block-editor-block-list__empty-block-inserter,
 	.block-editor-block-list__side-inserter {
 		@include edit-post__fade-in-animation;
 	}
@@ -327,6 +327,20 @@
 			border-left-color: transparent;
 		}
 	}
+
+	// Reusable Blocks clickthrough overlays
+	&.is-reusable > .block-editor-block-list__block-edit .block-editor-inner-blocks.has-overlay {
+		// Remove only the top click overlay.
+		&::after {
+			display: none;
+		}
+
+		// Restore it for subsequent.
+		.block-editor-inner-blocks.has-overlay::after {
+			display: block;
+		}
+	}
+
 
 	// Alignments
 	&[data-align="left"],
@@ -431,36 +445,34 @@
 		z-index: z-index(".block-editor-block-list__block {core/image aligned wide or fullwide}");
 
 		// Mover and settings above
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			// This moves the menu up by the height of the button + border + padding.
 			top: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
 			bottom: auto;
 			min-height: 0;
 			height: auto;
 			width: auto;
-			z-index: inherit;
 
 			&::before {
 				content: none;
 			}
 		}
 
-		> .block-editor-block-mover .block-editor-block-mover__control {
+		&.is-multi-selected > .block-editor-block-mover .block-editor-block-mover__control,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover .block-editor-block-mover__control {
 			float: left;
 		}
 
-		// Position hover label on the right
-		> .block-editor-block-list__breadcrumb {
-			right: -$border-width;
-		}
-
 		// Hide mover until wide breakpoints, or it might be covered by toolbar
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			display: none;
 		}
 
 		@include break-wide() {
-			> .block-editor-block-mover {
+			&.is-multi-selected > .block-editor-block-mover,
+			> .block-editor-block-list__block-edit > .block-editor-block-mover {
 				display: block;
 			}
 		}
@@ -472,12 +484,18 @@
 				display: inline-flex;
 			}
 		}
+
+		// If the block movers are visible, push the breadcrumb down to make room for them.
+		.block-editor-block-mover.is-visible + .block-editor-block-list__breadcrumb {
+			top: (-$block-padding - $block-left-border-width - ($grid-size-small / 2));
+		}
 	}
 
 	// Wide
 	&[data-align="wide"] {
 		// Position mover
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			left: -$block-padding + $border-width;
 		}
 	}
@@ -519,7 +537,8 @@
 		}
 
 		// Position mover
-		> .block-editor-block-mover {
+		&.is-multi-selected > .block-editor-block-mover,
+		> .block-editor-block-list__block-edit > .block-editor-block-mover {
 			left: $border-width;
 		}
 	}
@@ -772,6 +791,7 @@
 	// Hide both the button until hovered.
 	opacity: 0;
 	transition: opacity 0.1s linear;
+	@include reduce-motion("transition");
 
 	&:hover,
 	&.is-visible {
@@ -835,6 +855,7 @@
 	font-size: $text-editor-font-size;
 	line-height: 150%;
 	transition: padding 0.2s linear;
+	@include reduce-motion("transition");
 
 	&:focus {
 		box-shadow: none;
@@ -929,10 +950,6 @@
 	}
 }
 
-.block-editor-block-list__block.is-focus-mode:not(.is-multi-selected) > .block-editor-block-contextual-toolbar {
-	margin-left: -$block-side-ui-width;
-}
-
 // Enable toolbar footprint collapsing
 .block-editor-block-contextual-toolbar {
 	// Position the contextual toolbar above the block.
@@ -1007,7 +1024,6 @@
 	top: (($block-padding * -2) - $block-left-border-width);
 
 	.components-toolbar {
-		padding: 0;
 		border: none;
 		line-height: 1;
 		font-family: $default-font;

@@ -181,15 +181,3 @@ div.block-core-columns.is-vertically-aligned-bottom {
 	left: 0;
 	right: 0;
 }
-
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/columns"].is-selected,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/columns"].has-child-selected {
-
-	.block-editor-block-list__block[data-type="core/column"]:not(.is-selected) > .block-editor-block-list__block-edit::before {
-		border: none;
-	}
-
-	.block-core-columns > .block-editor-inner-blocks {
-		padding: 0;
-	}
-}
