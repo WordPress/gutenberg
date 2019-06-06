@@ -4,18 +4,14 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Rect;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.ResultReceiver;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 
 import com.facebook.infer.annotation.Assertions;
@@ -89,7 +85,6 @@ public class ReactAztecText extends AztecText {
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
 
-        Log.i("qwe", "new ReactAztecText " + this.toString());
         setGutenbergMode(true);
 
         // don't auto-focus when Aztec becomes visible.
