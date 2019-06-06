@@ -396,7 +396,6 @@ export class RichText extends Component {
 		if ( start === 0 && end !== 0 && end >= value.text.length ) {
 			newValue = remove( value, start, end );
 			this.props.onChange( newValue );
-			this.forceSelectionUpdate( 0, 0 );
 			return;
 		}
 
