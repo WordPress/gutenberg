@@ -6,7 +6,6 @@
  * External dependencies
  */
 import wd from 'wd';
-import { Platform } from 'react-native';
 
 /**
  * Internal dependencies
