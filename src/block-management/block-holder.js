@@ -26,6 +26,8 @@ import { addAction, hasAction, removeAction } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
 import { BlockEdit, BlockInvalidWarning } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
+import { coreBlocks } from '@wordpress/block-library';
+
 /**
  * Internal dependencies
  */
@@ -34,6 +36,12 @@ import styles from './block-holder.scss';
 import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
 
 type PropsType = BlockType & {
+	icon: mixed,
+	name: string,
+	order: number,
+	title: string,
+	originalBlockTitle: string,
+	attributes: mixed,
 	clientId: string,
 	rootClientId: string,
 	isSelected: boolean,
@@ -42,10 +50,6 @@ type PropsType = BlockType & {
 	showTitle: boolean,
 	borderStyle: Object,
 	focusedBorderColor: string,
-	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
-	getPreviousBlockClientId: ( clientId: string ) => string,
-	getNextBlockClientId: ( clientId: string ) => string,
-	getBlockName: ( clientId: string ) => string,
 	onChange: ( attributes: mixed ) => void,
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
 	onCaretVerticalPositionChange: ( targetId: number, caretY: number, previousCaretY: ?number ) => void,
@@ -55,6 +59,7 @@ type PropsType = BlockType & {
 	moveBlockUp: () => void,
 	moveBlockDown: () => void,
 	removeBlock: () => void,
+	getAccessibilityLabelExtra: ( attributes: mixed ) => string
 };
 
 type StateType = {
@@ -103,8 +108,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	};
 
 	insertBlocksAfter = ( blocks: Array<Object> ) => {
-		const order = this.props.getBlockIndex( this.props.clientId, this.props.rootClientId );
-		this.props.onInsertBlocks( blocks, order + 1 );
+		this.props.onInsertBlocks( blocks, this.props.order + 1 );
 
 		if ( blocks[ 0 ] ) {
 			// focus on the first block inserted
@@ -144,17 +148,6 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		);
 	}
 
-	getAccessibilityLabelForBlock() {
-		const { clientId, rootClientId } = this.props;
-		const order = this.props.getBlockIndex( clientId, rootClientId );
-		const name = this.props.getBlockName( clientId );
-		let blockTitle = getBlockType( name ).title;
-
-		blockTitle = blockTitle === 'Unrecognized Block' ? blockTitle : `${ blockTitle } Block`;
-
-		return sprintf( __( '%s. Row %d.' ), blockTitle, order + 1 ); // Use one indexing for better accessibility
-	}
-
 	renderBlockTitle() {
 		return (
 			<View style={ styles.blockTitle }>
@@ -163,31 +156,55 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		);
 	}
 
+	getAccessibilityLabel() {
+		const { attributes, name, order, title, originalBlockTitle, getAccessibilityLabelExtra } = this.props;
+
+		let blockName = '';
+
+		if ( name === 'core/missing' ) { // is the block unrecognized?
+			blockName = title + '. ' + originalBlockTitle;
+		} else {
+			blockName = sprintf(
+				/* translators: accessibility text. %s: block name. */
+				__( '%s Block' ),
+				title, //already localized
+			);
+		}
+
+		blockName += '. ' + sprintf( __( 'Row %d.' ), order + 1 );
+
+		if ( getAccessibilityLabelExtra ) {
+			const blockAccessibilityLabel = getAccessibilityLabelExtra( attributes );
+			blockName += blockAccessibilityLabel ? ' ' + blockAccessibilityLabel : '';
+		}
+
+		return blockName;
+	}
+
 	render() {
-		const { isSelected, borderStyle, focusedBorderColor, isValid, name } = this.props;
+		const { isSelected, borderStyle, focusedBorderColor, isValid, title, icon } = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
-		const accessibilityLabel = this.getAccessibilityLabelForBlock();
-		const blockType = getBlockType( name );
+
+		const accessibilityLabel = this.getAccessibilityLabel();
 
 		return (
 			// accessible prop needs to be false to access children
 			// https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
 			<TouchableWithoutFeedback
-				accessible={ false }
 				onPress={ this.onFocus }
+				accessible={ ! isSelected }
+				accessibilityRole={ 'button' }
 			>
-
 				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View
-						accessibile={ true }
 						accessibilityLabel={ accessibilityLabel }
 						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
 					>
 						{ isValid && this.getBlockForType() }
 						{ ! isValid &&
-							<BlockInvalidWarning blockTitle={ blockType.title } icon={ blockType.icon } />
+							<BlockInvalidWarning blockTitle={ title } icon={ icon } />
 						}
 					</View>
 					{ this.renderToolbar() }
@@ -201,11 +218,8 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
-			getBlockName,
 			getBlockIndex,
 			getBlocks,
-			getPreviousBlockClientId,
-			getNextBlockClientId,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
@@ -215,18 +229,29 @@ export default compose( [
 		const isLastBlock = order === getBlocks().length - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
+		const blockType = getBlockType( name || 'core/missing' );
+		const title = blockType.title;
+		const icon = blockType.icon;
+		const getAccessibilityLabelExtra = blockType.__experimentalGetAccessibilityLabel;
+		const originalBlockType = attributes && attributes.originalName && coreBlocks[ attributes.originalName ];
+		let originalBlockTitle = '';
+		if ( originalBlockType ) {
+			originalBlockTitle = originalBlockType.settings.title || attributes.originalName;
+		}
 
 		return {
+			icon,
+			name: name || 'core/missing',
+			order,
+			title,
 			attributes,
-			getBlockIndex,
-			getBlockName,
-			getPreviousBlockClientId,
-			getNextBlockClientId,
+			blockType,
 			isFirstBlock,
 			isLastBlock,
 			isSelected,
-			name,
 			isValid,
+			originalBlockTitle,
+			getAccessibilityLabelExtra,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
