@@ -20,6 +20,7 @@ RCT_EXPORT_VIEW_PROPERTY(onActiveFormatAttributesChange, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(placeholder, NSString)
 RCT_EXPORT_VIEW_PROPERTY(placeholderTextColor, UIColor)
 RCT_REMAP_VIEW_PROPERTY(color, textColor, UIColor)
+RCT_EXPORT_VIEW_PROPERTY(linkTextColor, UIColor)
 
 RCT_EXPORT_VIEW_PROPERTY(fontFamily, NSString)
 RCT_EXPORT_VIEW_PROPERTY(fontSize, CGFloat)
