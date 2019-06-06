@@ -58,6 +58,7 @@ class Video extends Component {
 					controls={ false }
 					onLoad={ this.onLoad }
 					onLoadStart={ this.onLoadStart }
+					ignoreSilentSwitch={ 'ignore' }
 					paused={ ! isFullScreen }
 					onFullscreenPlayerWillPresent={ () => {
 						this.setState( { isFullScreen: true } );
