@@ -6,22 +6,12 @@ import {
 	useSelect,
 } from '@wordpress/data';
 
-const BlockAsyncModeProvider = ( { children, clientId } ) => {
-	const isSyncModeForced = useSelect( ( select ) => {
-		const {
-			hasSelectedInnerBlock,
-			isAncestorMultiSelected,
-			isBlockMultiSelected,
-			isBlockSelected,
-		} = select( 'core/block-editor' );
-
-		const isSelected = isBlockSelected( clientId );
-		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
-		const isPartOfMultiSelection = isBlockMultiSelected( clientId ) ||
-			isAncestorMultiSelected( clientId );
-
-		return isSelected || isParentOfSelectedBlock || isPartOfMultiSelection;
+const BlockAsyncModeProvider = ( { children, clientId, isBlockInSelection } ) => {
+	const isParentOfSelectedBlock = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).hasSelectedInnerBlock( clientId, true );
 	} );
+
+	const isSyncModeForced = isBlockInSelection || isParentOfSelectedBlock;
 
 	return (
 		<AsyncModeProvider value={ ! isSyncModeForced }>

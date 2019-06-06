@@ -194,16 +194,24 @@ class BlockList extends Component {
 			blockClientIds,
 			rootClientId,
 			isDraggable,
+			selectedBlockClientId,
+			multiSelectedBlockClientIds,
+			hasMultiSelection,
 			renderAppender,
 		} = this.props;
 
 		return (
 			<div className="editor-block-list__layout block-editor-block-list__layout">
 				{ map( blockClientIds, ( clientId ) => {
+					const isBlockInSelection = hasMultiSelection ?
+						multiSelectedBlockClientIds.includes( clientId ) :
+						selectedBlockClientId === clientId;
+
 					return (
 						<BlockAsyncModeProvider
 							key={ 'block-' + clientId }
 							clientId={ clientId }
+							isBlockInSelection={ isBlockInSelection }
 						>
 							<BlockListBlock
 								clientId={ clientId }
@@ -237,6 +245,9 @@ export default compose( [
 			isMultiSelecting,
 			getMultiSelectedBlocksStartClientId,
 			getMultiSelectedBlocksEndClientId,
+			getSelectedBlockClientId,
+			getMultiSelectedBlockClientIds,
+			hasMultiSelection,
 		} = select( 'core/block-editor' );
 
 		const { rootClientId } = ownProps;
@@ -247,6 +258,9 @@ export default compose( [
 			selectionEnd: getMultiSelectedBlocksEndClientId(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
+			selectedBlockClientId: getSelectedBlockClientId(),
+			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+			hasMultiSelection: hasMultiSelection(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
