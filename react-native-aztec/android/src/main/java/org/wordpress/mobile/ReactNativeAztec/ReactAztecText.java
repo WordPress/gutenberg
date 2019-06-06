@@ -251,7 +251,9 @@ public class ReactAztecText extends AztecText {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    mContentSizeWatcher.onLayout();
+                    if (mContentSizeWatcher != null) {
+                        mContentSizeWatcher.onLayout();
+                    }
                 }
             });
         }
