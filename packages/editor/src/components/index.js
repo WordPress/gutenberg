@@ -1,6 +1,5 @@
 // Block Creation Components
 export * from './autocompleters';
-export { default as ServerSideRender } from './server-side-render';
 
 // Post Related Components
 export { default as AutosaveMonitor } from './autosave-monitor';

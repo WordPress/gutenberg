@@ -684,6 +684,10 @@ const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
 //  <SaleButton>Start Sale!</SaleButton>
 ```
 
+_Note:_ It is important that the `mapDispatchToProps` function always
+returns an object with the same keys. For example, it should not contain
+conditions under which a different value would be returned.
+
 _Parameters_
 
 -   _mapDispatchToProps_ `Function`: A function of returning an object of prop names where value is a dispatch-bound action creator, or a function to be called with the component's props and returning an action creator.
