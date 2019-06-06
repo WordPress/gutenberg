@@ -48,14 +48,6 @@ export default class EditorPage {
 		return undefined !== await this.getBlockAtPosition( position, blockName );
 	}
 
-	async verifyHtmlContent( html: string ) {
-		if ( Platform.OS === 'android' ) {
-			await this.verifyHtmlContentAndroid( html );
-		} else {
-			await this.verifyHtmlContentIOS( html );
-		}
-	}
-
 	async getTextViewForHtmlViewContent() {
 		const accessibilityId = 'html-view-content';
 		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
@@ -66,17 +58,7 @@ export default class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	async verifyHtmlContentAndroid( html: string ) {
-		await toggleHtmlMode( this.driver );
-
-		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		const text = await htmlContentView.text();
-		expect( text ).toBe( html );
-
-		await toggleHtmlMode( this.driver );
-	}
-
-	async verifyHtmlContentIOS( html: string ) {
+	async verifyHtmlContent( html: string ) {
 		await toggleHtmlMode( this.driver );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
