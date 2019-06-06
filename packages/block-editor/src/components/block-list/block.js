@@ -23,7 +23,10 @@ import {
 } from '@wordpress/blocks';
 import { KeyboardShortcuts, withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { withDispatch, withSelect } from '@wordpress/data';
+import {
+	withDispatch,
+	withSelect,
+} from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure } from '@wordpress/compose';
 

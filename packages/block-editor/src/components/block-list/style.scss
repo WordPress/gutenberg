@@ -303,6 +303,20 @@
 		}
 	}
 
+	// Reusable Blocks clickthrough overlays
+	&.is-reusable > .block-editor-block-list__block-edit .block-editor-inner-blocks.has-overlay {
+		// Remove only the top click overlay.
+		&::after {
+			display: none;
+		}
+
+		// Restore it for subsequent.
+		.block-editor-inner-blocks.has-overlay::after {
+			display: block;
+		}
+	}
+
+
 	// Alignments
 	&[data-align="left"],
 	&[data-align="right"] {
