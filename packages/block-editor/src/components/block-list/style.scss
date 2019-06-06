@@ -316,6 +316,16 @@
 		}
 	}
 
+	// Disable clickthrough overlay for blocks which aren't focusable, since
+	// overlay depends on dismissal by selection. This effectively treats the
+	// block as a "pass-through", one which is not intended to be selected
+	// through standard focus interactions.
+	&[tabindex="-1"],
+	&:not([tabindex]) {
+		> .block-editor-block-list__block-edit .block-editor-inner-blocks.has-overlay::after {
+			display: none;
+		}
+	}
 
 	// Alignments
 	&[data-align="left"],

@@ -400,6 +400,15 @@ function BlockListBlock( {
 		className
 	);
 
+	// By default, a block is focusable, which enables it to be set as the
+	// selected block when the user interacts within its content. Through
+	// assignment of its wrapper props, however, a block can opt-out of this
+	// behavior to effectively treat the block as a "pass-through", one which
+	// is not intended to be directly selected under normal circumstances.
+	// Often this occurs in the context of deep block nesting, where focus
+	// selection instead occurs by one of the ancestor blocks.
+	let isFocusable = true;
+
 	// Determine whether the block has props to apply to the wrapper.
 	let blockWrapperProps = wrapperProps;
 	if ( blockType.getEditWrapperProps ) {
@@ -407,6 +416,11 @@ function BlockListBlock( {
 			...blockWrapperProps,
 			...blockType.getEditWrapperProps( attributes ),
 		};
+
+		isFocusable = ! ( 'tabIndex' in blockWrapperProps ) || (
+			isFinite( blockWrapperProps.tabIndex ) &&
+			Number( blockWrapperProps.tabIndex ) !== '-1'
+		);
 	}
 	const blockElementId = `block-${ clientId }`;
 
@@ -452,7 +466,7 @@ function BlockListBlock( {
 			className={ wrapperClassName }
 			data-type={ name }
 			onTouchStart={ onTouchStart }
-			onFocus={ onFocus }
+			onFocus={ isFocusable ? onFocus : null }
 			onClick={ onTouchStop }
 			onKeyDown={ deleteOrInsertAfterWrapper }
 			tabIndex="0"
