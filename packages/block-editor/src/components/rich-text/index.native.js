@@ -814,6 +814,7 @@ export class RichText extends Component {
 					isSelected={ isSelected }
 					blockType={ { tag: tagName } }
 					color={ styles[ 'block-editor-rich-text' ].color }
+					linkTextColor={ styles[ 'block-editor-rich-text' ].textDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || styles[ 'block-editor-rich-text' ].fontFamily }
 					fontSize={ this.props.fontSize || ( style && style.fontSize ) }
