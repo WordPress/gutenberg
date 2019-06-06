@@ -67,7 +67,7 @@ number=$(
 		--silent \
 		-H "Authorization: token $GITHUB_TOKEN" \
 		"https://api.github.com/repos/$GITHUB_REPOSITORY/milestones" \
-		| jq ".[0] | select(.title == \"$milestone\") | .number"
+		| jq ".[] | select(.title == \"$milestone\") | .number"
 )
 
 # 7. Assign pull request to milestone.
