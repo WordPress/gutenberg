@@ -93,8 +93,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 		"file": "editor.css",
 		"dependencies": [ "wp-edit-blocks" ]
 	},
-	"style": "my-plugin-notice",
-	"renderCallback": "my-render-callback.php"
+	"style": "build/style.css"
 }
 ```
 
@@ -339,21 +338,6 @@ Block type editor style definition. It will only be enqueued in the context of t
 
 Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
 
-### Render Callback
-
-* Type: `string` ([WPDefinedPropertyFile](#WPDefinedPropertyFile))
-* Optional
-* Localized: No
-* Property: `renderCallback`
-
-```json
-{ "renderCallback": "my-render-callback.php" }
-```
-
-This is a pointer to a php file returning a render callback php function. The render callback is function called when the block is rendered on the frontend. It's used to generate the frontend markup dynamically.
-
-See the [dynamic blocks documentation](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md) for more details.
-
 ## Backward compatibility
 
 The following properties are going to be supported for backward compatibility reasons on the client-side only. Some of them might be replaced with alternative APIs in the future:
@@ -379,6 +363,8 @@ wp.blocks.registerBlockType( 'my-block/name', {
 	}
 } );
 ``` 
+
+In the case of [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should be still possible to register `render_callback` property using [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function on the server.
 
 ## Assets
 
@@ -443,27 +429,6 @@ In `build/editor.asset.json`:
 	"dependencies": [ "wp-blocks","wp-element", "wp-i18n" ],
 	"version": "3.0.0"
 }
-```
-
-### `WPDefinedPropertyFile`
-
-The `WPDefinedPropertyFile` type is a subtype of string, where the value must represent an absolute or relative path to a PHP file by which a dynamic value can be interpreted. This file should return a function or a callback of type [callable](https://www.php.net/manual/en/language.types.callable.php).
-
-**Example:**
-
-In `render-callback.php`:
-
-```php
-<?php
-function render_block_my_block() {
-	return 'My block.';
-}
-return 'render_block_my_block';
-```
-
-In `block.json`:
-```json
-{ "renderCallback": "render-callback.php" }
 ```
 
 ## Internationalization
