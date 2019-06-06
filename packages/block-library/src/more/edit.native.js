@@ -30,11 +30,7 @@ export default class MoreEdit extends Component {
 		const content = customText || defaultText;
 
 		return (
-			<View
-				accessible={ ! this.props.isSelected }
-				accessibilityLabel={ __( 'More block' ) }
-				onAccessibilityTap={ this.props.onFocus }
-			>
+			<View>
 				<Hr
 					text={ content }
 					marginLeft={ 0 }
