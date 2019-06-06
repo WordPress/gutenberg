@@ -23,7 +23,10 @@ import {
 } from '@wordpress/blocks';
 import { KeyboardShortcuts, withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { withDispatch, withSelect } from '@wordpress/data';
+import {
+	withDispatch,
+	withSelect,
+} from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure } from '@wordpress/compose';
 
@@ -79,6 +82,7 @@ function BlockListBlock( {
 	className,
 	name,
 	isValid,
+	isLast,
 	attributes,
 	initialPosition,
 	wrapperProps,
@@ -343,8 +347,8 @@ function BlockListBlock( {
 
 				// If the block is selected and we're typing the block should not appear.
 				// Empty paragraph blocks should always show up as unselected.
-				const showEmptyBlockSideInserter =
-					( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
+				const showInserterShortcuts = ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
+				const showEmptyBlockSideInserter = ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
 				const shouldAppearSelected =
 					! isFocusMode &&
 					! showEmptyBlockSideInserter &&
@@ -538,24 +542,24 @@ function BlockListBlock( {
 								{ !! hasError && <BlockCrashWarning /> }
 							</IgnoreNestedEvents>
 						</div>
+						{ showInserterShortcuts && (
+							<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
+								<InserterWithShortcuts
+									clientId={ clientId }
+									rootClientId={ rootClientId }
+									onToggle={ selectOnOpen }
+								/>
+							</div>
+						) }
 						{ showEmptyBlockSideInserter && (
-							<>
-								<div className="editor-block-list__side-inserter block-editor-block-list__side-inserter">
-									<InserterWithShortcuts
-										clientId={ clientId }
-										rootClientId={ rootClientId }
-										onToggle={ selectOnOpen }
-									/>
-								</div>
-								<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
-									<Inserter
-										position="top right"
-										onToggle={ selectOnOpen }
-										rootClientId={ rootClientId }
-										clientId={ clientId }
-									/>
-								</div>
-							</>
+							<div className="editor-block-list__empty-block-inserter block-editor-block-list__empty-block-inserter">
+								<Inserter
+									position="top right"
+									onToggle={ selectOnOpen }
+									rootClientId={ rootClientId }
+									clientId={ clientId }
+								/>
+							</div>
 						) }
 					</IgnoreNestedEvents>
 				);
@@ -580,6 +584,8 @@ const applyWithSelect = withSelect(
 			getSettings,
 			hasSelectedInnerBlock,
 			getTemplateLock,
+			getBlockIndex,
+			getBlockOrder,
 			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
@@ -587,6 +593,8 @@ const applyWithSelect = withSelect(
 		const { hasFixedToolbar, focusMode } = getSettings();
 		const templateLock = getTemplateLock( rootClientId );
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
+		const index = getBlockIndex( clientId, rootClientId );
+		const blockOrder = getBlockOrder( rootClientId );
 
 		// The fallback to `{}` is a temporary fix.
 		// This function should never be called when a block is not present in the state.
@@ -611,6 +619,7 @@ const applyWithSelect = withSelect(
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
+			isLast: index === blockOrder.length - 1,
 
 			// Users of the editor.BlockListBlock filter used to be able to access the block prop
 			// Ideally these blocks would rely on the clientId prop only.
@@ -637,7 +646,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		mergeBlocks,
 		replaceBlocks,
 		toggleSelection,
-
 	} = dispatch( 'core/block-editor' );
 
 	return {

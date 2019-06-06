@@ -88,6 +88,7 @@ module.exports = {
 			'dom-ready',
 			'redux-routine',
 			'token-list',
+			'server-side-render',
 			'shortcode',
 		].map( camelCaseDash ) ),
 		new CopyWebpackPlugin(

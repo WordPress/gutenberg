@@ -13,6 +13,10 @@
 
 - Added missing documentation for `DropdownMenu` props `menuLabel`, `position`, `className`.
 
+### Breaking Change
+
+- `ServerSideRender` is no longer part of components. It was extracted to an independent package `@wordpress/server-side-render`.
+
 
 ## 7.4.0 (2019-05-21)
 

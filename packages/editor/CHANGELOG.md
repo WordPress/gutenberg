@@ -3,6 +3,9 @@
 ### Deprecations
 - The `getAutosave`, `getAutosaveAttribute`, and `hasAutosave` selectors are deprecated. Please use the `getAutosave` selector in the `@wordpress/core-data` package.
 - The `resetAutosave` action is deprecated. An equivalent action `receiveAutosaves` has been added to the `@wordpress/core-data` package.
+- `ServerSideRender` component was deprecated. The component is now available in `@wordpress/server-side-render`.
+
+
 
 ### Internal
 
