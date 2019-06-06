@@ -20,6 +20,7 @@ class Video extends Component {
 		super( ...arguments );
 		this.state = {
 			isLoaded: false,
+			isFullScreen: false,
 		};
 		this.onPressPlay = this.onPressPlay.bind( this );
 		this.onLoad = this.onLoad.bind( this );
@@ -42,7 +43,7 @@ class Video extends Component {
 
 	render() {
 		const { isSelected, style } = this.props;
-		const { isLoaded } = this.state;
+		const { isLoaded, isFullScreen } = this.state;
 
 		return (
 			<View style={ styles.videoContainer }>
@@ -58,6 +59,13 @@ class Video extends Component {
 					onLoad={ this.onLoad }
 					onLoadStart={ this.onLoadStart }
 					ignoreSilentSwitch={ 'ignore' }
+					paused={ ! isFullScreen }
+					onFullscreenPlayerWillPresent={ () => {
+						this.setState( { isFullScreen: true } );
+					} }
+					onFullscreenPlayerDidDismiss={ () => {
+						this.setState( { isFullScreen: false } );
+					} }
 				/>
 				{ isLoaded &&
 				<TouchableOpacity disabled={ ! isSelected } onPress={ this.onPressPlay } style={ [ style, styles.overlay ] }>
