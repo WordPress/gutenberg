@@ -250,7 +250,12 @@ class CoverEdit extends Component {
 				title: __( 'Cover' ),
 				instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
 			};
-
+			const mediaPreview = ( !! url && IMAGE_BACKGROUND_TYPE === backgroundType && <img
+				alt={ __( 'Edit background' ) }
+				title={ __( 'Edit background' ) }
+				className={ 'edit-background-preview' }
+				src={ url }
+			/> );
 			return (
 				<>
 					{ controls }
@@ -265,6 +270,7 @@ class CoverEdit extends Component {
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
 						accept="image/*,video/*"
+						mediaPreview={ mediaPreview }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 					/>
 				</>
