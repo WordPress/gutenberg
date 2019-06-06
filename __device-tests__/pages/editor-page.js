@@ -59,13 +59,13 @@ export default class EditorPage {
 	}
 
 	async verifyHtmlContent( html: string ) {
-		await toggleHtmlMode( this.driver );
+		await toggleHtmlMode( this.driver, true );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 		const text = await htmlContentView.text();
 		expect( text ).toBe( html );
 
-		await toggleHtmlMode( this.driver );
+		await toggleHtmlMode( this.driver, false );
 	}
 
 	// =========================

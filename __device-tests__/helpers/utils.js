@@ -207,7 +207,7 @@ const swipeUp = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseCha
 	await action.perform();
 };
 
-const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver ) => {
+const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver, toggleOn: boolean ) => {
 	if ( isAndroid() ) {
 		// Hit the "Menu" key
 		await driver.pressKeycode( 82 );
@@ -224,9 +224,9 @@ const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver ) => {
 		const menuButton = await driver.elementByAccessibilityId( '...' );
 		await menuButton.click();
 		let toggleHtmlButton;
-		try {
+		if ( toggleOn ) {
 			toggleHtmlButton = await driver.elementByAccessibilityId( 'Switch to HTML' );
-		} catch ( err ) {
+		} else {
 			toggleHtmlButton = await driver.elementByAccessibilityId( 'Switch To Visual' );
 		}
 		await toggleHtmlButton.click();
