@@ -274,13 +274,11 @@
 	}
 
 	// Appender
-	&.is-typing .block-editor-block-list__empty-block-inserter,
 	&.is-typing .block-editor-block-list__side-inserter {
 		opacity: 0;
 		animation: none;
 	}
 
-	.block-editor-block-list__empty-block-inserter,
 	.block-editor-block-list__side-inserter {
 		@include edit-post__fade-in-animation;
 	}
