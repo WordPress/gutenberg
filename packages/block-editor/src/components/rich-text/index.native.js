@@ -26,9 +26,9 @@ import {
 	split,
 	toHTMLString,
 	insert,
-	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	__unstableInsertLineSeparator as insertLineSeparator,
 	__unstableIsEmptyLine as isEmptyLine,
+	__unstableRemoveLineSeparator as removeLineSeparator,
 	isCollapsed,
 	remove,
 } from '@wordpress/rich-text';
@@ -165,7 +165,7 @@ export class RichText extends Component {
 	 * @return {Object} A RichText value with formats and selection.
 	 */
 	createRecord() {
-		return {
+		const value = {
 			start: this.selectionStart,
 			end: this.selectionEnd,
 			...create( {
@@ -175,6 +175,9 @@ export class RichText extends Component {
 				multilineWrapperTags: this.multilineWrapperTags,
 			} ),
 		};
+		const start = Math.min( this.selectionStart, value.text.length );
+		const end = Math.min( this.selectionEnd, value.text.length );
+		return { ...value, start, end };
 	}
 
 	/**
@@ -347,15 +350,15 @@ export class RichText extends Component {
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
-
+		const { onReplace, onSplit } = this.props;
+		const canSplit = onReplace && onSplit;
 		const currentRecord = this.createRecord();
-
 		if ( this.multilineTag ) {
 			if ( event.shiftKey ) {
 				this.needsSelectionUpdate = true;
 				const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
 				this.onFormatChange( insertedLineBreak );
-			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
+			} else if ( canSplit && isEmptyLine( currentRecord ) ) {
 				this.onSplit( currentRecord );
 			} else {
 				this.needsSelectionUpdate = true;
@@ -386,68 +389,18 @@ export class RichText extends Component {
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
 		const value = this.createRecord();
-		const { replacements, text, start, end } = value;
+		const { start, end } = value;
 		let newValue;
 
 		// Always handle full content deletion ourselves.
 		if ( start === 0 && end !== 0 && end >= value.text.length ) {
 			newValue = remove( value, start, end );
 			this.props.onChange( newValue );
-			this.forceSelectionUpdate( 0, 0 );
 			return;
 		}
 
 		if ( this.multilineTag ) {
-			if ( keyCode === BACKSPACE ) {
-				const index = start - 1;
-
-				if ( text[ index ] === LINE_SEPARATOR ) {
-					const collapsed = isCollapsed( value );
-
-					// If the line separator that is about te be removed
-					// contains wrappers, remove the wrappers first.
-					if ( collapsed && replacements[ index ] && replacements[ index ].length ) {
-						const newReplacements = replacements.slice();
-
-						newReplacements[ index ] = replacements[ index ].slice( 0, -1 );
-						newValue = {
-							...value,
-							replacements: newReplacements,
-						};
-					} else {
-						newValue = remove(
-							value,
-							// Only remove the line if the selection is
-							// collapsed, otherwise remove the selection.
-							collapsed ? start - 1 : start,
-							end
-						);
-					}
-				}
-			} else if ( text[ end ] === LINE_SEPARATOR ) {
-				const collapsed = isCollapsed( value );
-
-				// If the line separator that is about te be removed
-				// contains wrappers, remove the wrappers first.
-				if ( collapsed && replacements[ end ] && replacements[ end ].length ) {
-					const newReplacements = replacements.slice();
-
-					newReplacements[ end ] = replacements[ end ].slice( 0, -1 );
-					newValue = {
-						...value,
-						replacements: newReplacements,
-					};
-				} else {
-					newValue = remove(
-						value,
-						start,
-						// Only remove the line if the selection is
-						// collapsed, otherwise remove the selection.
-						collapsed ? end + 1 : end,
-					);
-				}
-			}
-
+			newValue = removeLineSeparator( value, keyCode === BACKSPACE );
 			if ( newValue ) {
 				this.onFormatChange( newValue );
 				return;
@@ -862,7 +815,7 @@ export class RichText extends Component {
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || styles[ 'block-editor-rich-text' ].fontFamily }
-					fontSize={ this.props.fontSize }
+					fontSize={ this.props.fontSize || ( style && style.fontSize ) }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ this.props.disableEditingMenu }

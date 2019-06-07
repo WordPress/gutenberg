@@ -19,6 +19,7 @@ import {
 import {
 	BottomSheet,
 	MediaPicker,
+	Icon,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -200,10 +201,10 @@ class ImageEdit extends Component {
 
 	getIcon( isRetryIcon ) {
 		if ( isRetryIcon ) {
-			return <SvgIconRetry fill={ styles.iconRetry.fill } />;
+			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 		}
 
-		return <SvgIcon fill={ styles.icon.fill } />;
+		return <Icon icon={ SvgIcon } { ...styles.icon } />;
 	}
 
 	onImageSettingsButtonPressed() {
@@ -295,13 +296,6 @@ class ImageEdit extends Component {
 		return (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
-				accessibilityLabel={ sprintf(
-					/* translators: accessibility text. 1: image alt text. 2: image caption. */
-					__( 'Image block. %1$s. %2$s' ),
-					alt,
-					caption
-				) }
-				accessibilityRole={ 'button' }
 				onPress={ this.onImagePressed }
 				onLongPress={ this.onMediaOptionsButtonPressed }
 				disabled={ ! isSelected }

@@ -3,6 +3,23 @@
 ### New Feature
 
 - Add new `BlockQuotation` block to the primitives folder to support blockquote in a multiplatform way. [#15482](https://github.com/WordPress/gutenberg/pull/15482).
+- `DropdownMenu` now supports passing a [render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) as children for more advanced customization.
+
+### Internal
+
+- `MenuGroup` no longer uses `NavigableMenu` internally. It needs to be explicitly wrapped with `NavigableMenu` to bring back the same behavior.
+
+### Documentation
+
+- Added missing documentation for `DropdownMenu` props `menuLabel`, `position`, `className`.
+
+### Breaking Change
+
+- `ServerSideRender` is no longer part of components. It was extracted to an independent package `@wordpress/server-side-render`.
+
+### Bug Fix
+
+- Although `DateTimePicker` does not allow picking the seconds, passed the current seconds as the selected value for seconds when calling `onChange`. Now it passes zero.
 
 ## 7.4.0 (2019-05-21)
 

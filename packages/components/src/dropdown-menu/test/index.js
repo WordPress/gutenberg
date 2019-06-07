@@ -1,21 +1,22 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-import TestUtils from 'react-dom/test-utils';
+import { shallow, mount } from 'enzyme';
 
 /**
  * WordPress dependencies
  */
 import { DOWN } from '@wordpress/keycodes';
-import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import DropdownMenu from '../';
+import { IconButton, MenuItem, NavigableMenu } from '../../';
 
 describe( 'DropdownMenu', () => {
+	const children = ( { onClose } ) => <MenuItem onClick={ onClose } />;
+
 	let controls;
 	beforeEach( () => {
 		controls = [
@@ -43,42 +44,48 @@ describe( 'DropdownMenu', () => {
 	} );
 
 	describe( 'basic rendering', () => {
-		it( 'should render a null element when controls are not assigned', () => {
+		it( 'should render a null element when neither controls nor children are assigned', () => {
 			const wrapper = shallow( <DropdownMenu /> );
 
 			expect( wrapper.type() ).toBeNull();
 		} );
 
-		it( 'should render a null element when controls are empty', () => {
+		it( 'should render a null element when controls are empty and children is not specified', () => {
 			const wrapper = shallow( <DropdownMenu controls={ [] } /> );
 
 			expect( wrapper.type() ).toBeNull();
 		} );
 
-		it( 'should open menu on arrow down', () => {
-			// needed because TestUtils.renderIntoDocument returns null for stateless
-			// components
-			class Menu extends Component {
-				render() {
-					return <DropdownMenu { ...this.props } />;
-				}
-			}
-			const wrapper = TestUtils.renderIntoDocument( <Menu controls={ controls } /> );
-			const buttonElement = TestUtils.findRenderedDOMComponentWithClass(
-				wrapper,
-				'components-dropdown-menu__toggle'
-			);
-			// Close menu by keyup
-			TestUtils.Simulate.keyDown(
-				buttonElement,
-				{
-					stopPropagation: () => {},
-					preventDefault: () => {},
-					keyCode: DOWN,
-				}
-			);
+		it( 'should open menu on arrow down (controls)', () => {
+			const wrapper = mount( <DropdownMenu controls={ controls } /> );
+			const button = wrapper.find( IconButton ).filter( '.components-dropdown-menu__toggle' );
 
-			expect( TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' ) ).toHaveLength( 1 );
+			button.simulate( 'keydown', {
+				stopPropagation: () => {},
+				preventDefault: () => {},
+				keyCode: DOWN,
+			} );
+
+			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
+			expect( wrapper.find( IconButton ).filter( '.components-dropdown-menu__menu-item' ) ).toHaveLength( controls.length );
+		} );
+
+		it( 'should open menu on arrow down (children)', () => {
+			const wrapper = mount( <DropdownMenu children={ children } /> );
+			const button = wrapper.find( IconButton ).filter( '.components-dropdown-menu__toggle' );
+
+			button.simulate( 'keydown', {
+				stopPropagation: () => {},
+				preventDefault: () => {},
+				keyCode: DOWN,
+			} );
+
+			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
+
+			wrapper.find( MenuItem ).props().onClick();
+			wrapper.update();
+
+			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 0 );
 		} );
 	} );
 } );

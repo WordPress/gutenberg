@@ -8,6 +8,7 @@
 	visibility: hidden;
 	opacity: 0;
 	transition: 0.3s opacity, 0.3s background-color, 0s visibility 0.3s;
+	@include reduce-motion("transition");
 	border: 2px solid $blue-dark-900;
 	border-radius: 2px;
 
@@ -15,6 +16,7 @@
 		opacity: 1;
 		visibility: visible;
 		transition: 0.3s opacity, 0.3s background-color;
+		@include reduce-motion("transition");
 	}
 
 	&.is-dragging-over-element {
@@ -33,6 +35,7 @@
 	text-align: center;
 	color: $white;
 	transition: transform 0.2s ease-in-out;
+	@include reduce-motion("transition");
 }
 
 .components-drop-zone.is-dragging-over-element .components-drop-zone__content {

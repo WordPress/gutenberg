@@ -12,6 +12,7 @@
 		width: 100%;
 		outline: $border-width solid transparent;
 		transition: 0.2s outline;
+		@include reduce-motion("transition");
 		resize: none;
 		margin-top: $default-block-margin;
 		margin-bottom: $default-block-margin;
@@ -28,19 +29,9 @@
 		}
 	}
 
-	// Don't show the inserter until mousing over.
-	.block-editor-inserter__toggle:not([aria-expanded="true"]) {
-		opacity: 0;
-		transition: opacity 0.2s;
-	}
-
 	&:hover {
 		.block-editor-inserter-with-shortcuts {
 			@include edit-post__fade-in-animation;
-		}
-
-		.block-editor-inserter__toggle {
-			opacity: 1;
 		}
 	}
 
