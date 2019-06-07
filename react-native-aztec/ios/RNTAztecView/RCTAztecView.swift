@@ -178,15 +178,31 @@ class RCTAztecView: Aztec.TextView {
     }
     
     // MARK: - Paste handling
+    private func read(from pasteboard: UIPasteboard, uti: String, documentType: DocumentType) -> String? {
+        guard let data = pasteboard.data(forPasteboardType: uti as String),
+            let attributedString = try? NSAttributedString(data: data, options: [.documentType: documentType], documentAttributes: nil),
+            let storage = self.textStorage as? TextStorage else {
+                return nil
+        }
+        return  storage.getHTML(from: attributedString)
+    }
+
     private func readHTML(from pasteboard: UIPasteboard) -> String? {
-        if let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String) {
-            return String(data: data, encoding: .utf8)
+
+        if let flatRTFDString = read(from: pasteboard, uti: kUTTypeFlatRTFD as String, documentType: DocumentType.rtfd) {
+            return  flatRTFDString
         }
 
-        if let data = pasteboard.data(forPasteboardType: kUTTypeRTF as String),
-            let attributedString = try? NSAttributedString(data: data, options: [.documentType: DocumentType.rtf], documentAttributes: nil),
-            let storage = self.textStorage as? TextStorage {
-                return  storage.getHTML(from: attributedString)
+        if let rtfString = read(from: pasteboard, uti: kUTTypeRTF as String, documentType: DocumentType.rtf) {
+            return  rtfString
+        }
+
+        if let rtfdString = read(from: pasteboard, uti: kUTTypeRTFD as String, documentType: DocumentType.rtfd) {
+            return  rtfdString
+        }
+
+        if let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String) {
+            return String(data: data, encoding: .utf8)
         }
 
         return nil
