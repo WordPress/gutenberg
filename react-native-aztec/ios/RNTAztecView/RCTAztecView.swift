@@ -190,11 +190,7 @@ class RCTAztecView: Aztec.TextView {
     }
     
     private func readText(from pasteboard: UIPasteboard) -> String? {
-        if let data = pasteboard.data(forPasteboardType: kUTTypeUTF8PlainText as String) {
-            return String(data: data, encoding: .utf8)
-        }
-        
-        return nil
+        return pasteboard.string        
     }
 
     func saveToDisk(image: UIImage) -> URL? {
