@@ -9,7 +9,7 @@ action "Filter merged" {
 }
 
 action "Milestone It" {
-  uses = "./actions/milestone-it/Dockerfile"
+  uses = "./.github/actions/milestone-it"
   needs = ["Filter merged"]
   secrets = ["GITHUB_TOKEN"]
 }
