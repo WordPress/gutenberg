@@ -237,7 +237,7 @@ const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver, toggleOn: boole
 
 const toggleOrientation = async ( driver: wd.PromiseChainWebdriver ) => {
 	const orientation = await driver.getOrientation();
-	if (orientation === 'LANDSCAPE' ) {
+	if ( orientation === 'LANDSCAPE' ) {
 		await driver.setOrientation( 'PORTRAIT' );
 	} else {
 		await driver.setOrientation( 'LANDSCAPE' );
