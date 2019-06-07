@@ -13,7 +13,7 @@ exports[`Heading can be created by prefixing number sign and a space 1`] = `
 `;
 
 exports[`Heading it should correctly apply custom colors 1`] = `
-"<!-- wp:heading {\\"level\\":3,\\"customTextColor\\":\\"#181717\\"} -->
+"<!-- wp:heading {\\"customTextColor\\":\\"#181717\\",\\"level\\":3} -->
 <h3 style=\\"color:#181717\\">Heading</h3>
 <!-- /wp:heading -->"
 `;

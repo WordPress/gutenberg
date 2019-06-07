@@ -30,6 +30,7 @@ class HeadingToolbar extends Component {
 				controls={ range( minLevel, maxLevel ).map( ( index ) => this.createLevelControl( index, selectedLevel, onChange ) ) }
 				icon="heading"
 				isCollapsed={ ! isLargeViewport }
+				label={ __( 'Change level' ) }
 			/>
 		);
 	}
