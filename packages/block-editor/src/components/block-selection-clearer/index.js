@@ -33,12 +33,12 @@ class BlockSelectionClearer extends Component {
 		const {
 			hasSelectedBlock,
 			hasMultiSelection,
-			wipeSelectedBlock,
+			clearSelectedBlock,
 		} = this.props;
 
 		const hasSelection = ( hasSelectedBlock || hasMultiSelection );
 		if ( event.target === this.container && hasSelection ) {
-			wipeSelectedBlock();
+			clearSelectedBlock();
 		}
 	}
 
@@ -68,7 +68,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { wipeSelectedBlock } = dispatch( 'core/block-editor' );
-		return { wipeSelectedBlock };
+		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
+		return { clearSelectedBlock };
 	} ),
 ] )( BlockSelectionClearer );
