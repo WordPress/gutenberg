@@ -7,7 +7,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { withViewportMatch } from '@wordpress/viewport';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
@@ -106,14 +105,13 @@ class InnerBlocks extends Component {
 	render() {
 		const {
 			clientId,
-			isSmallScreen,
-			isSelectedBlockInRoot,
+			hasOverlay,
 			renderAppender,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
-			'has-overlay': isSmallScreen && ! isSelectedBlockInRoot,
+			'has-overlay': hasOverlay,
 		} );
 
 		return (
@@ -131,7 +129,6 @@ class InnerBlocks extends Component {
 
 InnerBlocks = compose( [
 	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
-	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withSelect( ( select, ownProps ) => {
 		const {
 			isBlockSelected,
@@ -142,12 +139,13 @@ InnerBlocks = compose( [
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
+		const block = getBlock( clientId );
 		const rootClientId = getBlockRootClientId( clientId );
 
 		return {
-			isSelectedBlockInRoot: isBlockSelected( clientId ) || hasSelectedInnerBlock( clientId ),
-			block: getBlock( clientId ),
+			block,
 			blockListSettings: getBlockListSettings( clientId ),
+			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
 		};
 	} ),

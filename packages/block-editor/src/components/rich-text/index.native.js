@@ -165,7 +165,7 @@ export class RichText extends Component {
 	 * @return {Object} A RichText value with formats and selection.
 	 */
 	createRecord() {
-		return {
+		const value = {
 			start: this.selectionStart,
 			end: this.selectionEnd,
 			...create( {
@@ -175,6 +175,9 @@ export class RichText extends Component {
 				multilineWrapperTags: this.multilineWrapperTags,
 			} ),
 		};
+		const start = Math.min( this.selectionStart, value.text.length );
+		const end = Math.min( this.selectionEnd, value.text.length );
+		return { ...value, start, end };
 	}
 
 	/**
@@ -347,15 +350,15 @@ export class RichText extends Component {
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
-
+		const { onReplace, onSplit } = this.props;
+		const canSplit = onReplace && onSplit;
 		const currentRecord = this.createRecord();
-
 		if ( this.multilineTag ) {
 			if ( event.shiftKey ) {
 				this.needsSelectionUpdate = true;
 				const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
 				this.onFormatChange( insertedLineBreak );
-			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
+			} else if ( canSplit && isEmptyLine( currentRecord ) ) {
 				this.onSplit( currentRecord );
 			} else {
 				this.needsSelectionUpdate = true;
@@ -393,7 +396,6 @@ export class RichText extends Component {
 		if ( start === 0 && end !== 0 && end >= value.text.length ) {
 			newValue = remove( value, start, end );
 			this.props.onChange( newValue );
-			this.forceSelectionUpdate( 0, 0 );
 			return;
 		}
 
