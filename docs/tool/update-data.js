@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const { join } = require( 'path' );
 const spawnSync = require( 'child_process' ).spawnSync;
 
