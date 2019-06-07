@@ -797,7 +797,7 @@ export class RichText extends Component {
 						...style,
 						minHeight: Math.max( minHeight, this.state.height ),
 					} }
-					text={ { text: html, eventCount: this.lastEventCount, selection } }
+					text={ { text: html, eventCount: this.lastEventCount, selection, linkTextColor: styles[ 'block-editor-rich-text' ].textDecorationColor } }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].textDecorationColor }
 					deleteEnter={ this.props.deleteEnter }
