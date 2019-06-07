@@ -236,14 +236,6 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             ],
           },
           Object {
-            "description": "Underline the selected text.",
-            "keyCombination": Array [
-              "Ctrl",
-              "+",
-              "U",
-            ],
-          },
-          Object {
             "description": "Convert the selected text into a link.",
             "keyCombination": Array [
               "Ctrl",
@@ -262,23 +254,11 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             ],
           },
           Object {
-            "description": "Add a strikethrough to the selected text.",
+            "description": "Underline the selected text.",
             "keyCombination": Array [
-              "Shift",
+              "Ctrl",
               "+",
-              "Alt",
-              "+",
-              "D",
-            ],
-          },
-          Object {
-            "description": "Display the selected text in a monospaced font.",
-            "keyCombination": Array [
-              "Shift",
-              "+",
-              "Alt",
-              "+",
-              "X",
+              "U",
             ],
           },
         ]
