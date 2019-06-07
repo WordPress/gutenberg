@@ -112,7 +112,7 @@ Pressing the ESC key while one of the snackbar’s child elements has focus (e.g
 
 ### Copy 
 
-Copy within the snackbar should be clear and concise. (Maybe we can suggest a format here, like `verb + noun` or similar... along with an example. This is especially important when the message will only be shown for a limited time.)
+Since this message will only be shown for a short time, copy within the snackbar should be clear and concise.
 
 ## Development guidelines
 
