@@ -3,8 +3,6 @@
  */
 import {
 	clearSelectedBlock,
-	wipeSelectedBlock,
-	restoreSelectedBlock,
 	enterFormattedText,
 	exitFormattedText,
 	hideInsertionPoint,
@@ -114,22 +112,6 @@ describe( 'actions', () => {
 		it( 'should return CLEAR_SELECTED_BLOCK action', () => {
 			expect( clearSelectedBlock() ).toEqual( {
 				type: 'CLEAR_SELECTED_BLOCK',
-			} );
-		} );
-	} );
-
-	describe( 'wipeSelectedBlock', () => {
-		it( 'should return WIPE_SELECTED_BLOCK action', () => {
-			expect( wipeSelectedBlock() ).toEqual( {
-				type: 'WIPE_SELECTED_BLOCK',
-			} );
-		} );
-	} );
-
-	describe( 'restoreSelectedBlock', () => {
-		it( 'should return RESTORE_SELECTED_BLOCK action', () => {
-			expect( restoreSelectedBlock() ).toEqual( {
-				type: 'RESTORE_SELECTED_BLOCK',
 			} );
 		} );
 	} );
