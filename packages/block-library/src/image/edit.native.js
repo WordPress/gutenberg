@@ -276,14 +276,16 @@ class ImageEdit extends Component {
 
 	renderPlaceholder() {
 		return (
-			<MediaPlaceholder
-				mediaType={ MediaPicker.MEDIA_TYPE_IMAGE }
-				icon={ this.getIcon( false ) }
-				onPress={ ( event ) => {
-					this.props.onFocus( event );
-					this.onMediaOptionsButtonPressed();
-				} }
-			/>
+			<View style={ { flex: 1 } }>
+				<MediaPlaceholder
+					mediaType={ MediaPicker.MEDIA_TYPE_IMAGE }
+					icon={ this.getIcon( false ) }
+					onPress={ ( event ) => {
+						this.props.onFocus( event );
+						this.onMediaOptionsButtonPressed();
+					} }
+				/>
+			</View>
 		);
 	}
 
