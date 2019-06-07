@@ -10,13 +10,14 @@ import {
 	setupDriver,
 	isLocalEnvironment,
 	stopDriver,
-	isAndroid, rotateDevice,
+	isAndroid,
+	toggleOrientation,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
 
-xdescribe( 'Gutenberg Editor tests', () => {
+describe( 'Gutenberg Editor tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
@@ -50,11 +51,12 @@ xdescribe( 'Gutenberg Editor tests', () => {
 
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
-		await rotateDevice(driver);
+		await toggleOrientation( driver );
 
 		await editorPage.addNewParagraphBlock();
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await toggleOrientation( driver );
 	} );
 
 	afterAll( async () => {
