@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import {
 	requestMediaImport,
@@ -15,14 +14,16 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import {
+	Component,
+} from '@wordpress/element';
+import {
 	BottomSheet,
+	MediaPicker,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
-	MediaUpload,
-	MEDIA_TYPE_IMAGE,
 	RichText,
 	BlockControls,
 	InspectorControls,
@@ -45,12 +46,13 @@ const LINK_DESTINATION_NONE = 'none';
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
 
-class ImageEdit extends React.Component {
+class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.state = {
 			showSettings: false,
+			showMediaOptions: false,
 			isCaptionSelected: false,
 		};
 
@@ -65,6 +67,10 @@ class ImageEdit extends React.Component {
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.onImageSettingsButtonPressed = this.onImageSettingsButtonPressed.bind( this );
+		this.onImageSettingsClose = this.onImageSettingsClose.bind( this );
+		this.onMediaOptionsButtonPressed = this.onMediaOptionsButtonPressed.bind( this );
+		this.onMediaOptionsClose = this.onMediaOptionsClose.bind( this );
 	}
 
 	componentDidMount() {
@@ -178,6 +184,7 @@ class ImageEdit extends React.Component {
 	onSelectMediaUploadOption( mediaId, mediaUrl ) {
 		const { setAttributes } = this.props;
 		setAttributes( { url: mediaUrl, id: mediaId } );
+		this.onMediaOptionsClose();
 	}
 
 	onFocusCaption() {
@@ -199,34 +206,29 @@ class ImageEdit extends React.Component {
 		return <SvgIcon fill={ styles.icon.fill } />;
 	}
 
-	render() {
-		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption, height, width, alt, href, id } = attributes;
+	onImageSettingsButtonPressed() {
+		this.setState( { showSettings: true } );
+	}
 
-		const onImageSettingsButtonPressed = () => {
-			this.setState( { showSettings: true } );
-		};
+	onImageSettingsClose() {
+		this.setState( { showSettings: false } );
+	}
 
-		const onImageSettingsClose = () => {
-			this.setState( { showSettings: false } );
-		};
+	onMediaOptionsButtonPressed() {
+		this.setState( { showMediaOptions: true } );
+	}
 
-		const getToolbarEditButton = ( open ) => (
-			<BlockControls>
-				<Toolbar>
-					<ToolbarButton
-						title={ __( 'Edit image' ) }
-						icon="edit"
-						onClick={ open }
-					/>
-				</Toolbar>
-			</BlockControls>
-		);
+	onMediaOptionsClose() {
+		this.setState( { showMediaOptions: false } );
+	}
 
-		const getInspectorControls = () => (
+	renderInspectorControls() {
+		const { attributes: { href, alt } } = this.props;
+
+		return (
 			<BottomSheet
 				isVisible={ this.state.showSettings }
-				onClose={ onImageSettingsClose }
+				onClose={ this.onImageSettingsClose }
 				hideHeader
 			>
 				<BottomSheet.Cell
@@ -255,22 +257,42 @@ class ImageEdit extends React.Component {
 				/>
 			</BottomSheet>
 		);
+	}
 
-		if ( ! url ) {
-			return (
-				<View style={ { flex: 1 } } >
-					<MediaPlaceholder
-						mediaType={ MEDIA_TYPE_IMAGE }
-						onSelectURL={ this.onSelectMediaUploadOption }
-						icon={ this.getIcon( false ) }
-						onFocus={ this.props.onFocus }
+	renderToolbarEditButton() {
+		return (
+			<BlockControls>
+				<Toolbar>
+					<ToolbarButton
+						title={ __( 'Edit image' ) }
+						icon="edit"
+						onClick={ this.onMediaOptionsButtonPressed }
 					/>
-				</View>
-			);
-		}
+				</Toolbar>
+			</BlockControls>
+		);
+	}
+
+	renderPlaceholder() {
+		return (
+			<MediaPlaceholder
+				mediaType={ MediaPicker.MEDIA_TYPE_IMAGE }
+				icon={ this.getIcon( false ) }
+				onPress={ ( event ) => {
+					this.props.onFocus( event );
+					this.onMediaOptionsButtonPressed();
+				} }
+			/>
+		);
+	}
+
+	renderImage() {
+		const { attributes, isSelected, setAttributes } = this.props;
+		const { url, caption, height, width, alt, id } = attributes;
 
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
-		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
+
+		return (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
 				accessibilityLabel={ sprintf(
@@ -281,20 +303,19 @@ class ImageEdit extends React.Component {
 				) }
 				accessibilityRole={ 'button' }
 				onPress={ this.onImagePressed }
-				onLongPress={ openMediaOptions }
+				onLongPress={ this.onMediaOptionsButtonPressed }
 				disabled={ ! isSelected }
 			>
 				<View style={ { flex: 1 } }>
-					{ getInspectorControls() }
-					{ getMediaOptions() }
-					{ ( ! this.state.isCaptionSelected ) &&
-						getToolbarEditButton( openMediaOptions )
+					{ this.renderInspectorControls() }
+					{ ! this.state.isCaptionSelected &&
+						this.renderToolbarEditButton()
 					}
 					<InspectorControls>
 						<ToolbarButton
 							title={ __( 'Image Settings' ) }
 							icon="admin-generic"
-							onClick={ onImageSettingsButtonPressed }
+							onClick={ this.onImageSettingsButtonPressed }
 						/>
 					</InspectorControls>
 					<MediaUploadProgress
@@ -380,14 +401,21 @@ class ImageEdit extends React.Component {
 				</View>
 			</TouchableWithoutFeedback>
 		);
+	}
+
+	render() {
+		const { attributes: { url } } = this.props;
 
 		return (
-			<MediaUpload mediaType={ MEDIA_TYPE_IMAGE }
-				onSelectURL={ this.onSelectMediaUploadOption }
-				render={ ( { open, getMediaOptions } ) => {
-					return getImageComponent( open, getMediaOptions );
-				} }
-			/>
+			<>
+				{ ! url ? this.renderPlaceholder() : this.renderImage() }
+				<MediaPicker
+					isOpen={ this.state.showMediaOptions }
+					mediaType={ MediaPicker.MEDIA_TYPE_IMAGE }
+					onSelectURL={ this.onSelectMediaUploadOption }
+					onClose={ this.onMediaOptionsClose }
+				/>
+			</>
 		);
 	}
 }

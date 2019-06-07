@@ -7,18 +7,16 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { MediaUpload, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
+import { MediaPicker } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
 
-function MediaPlaceholder( props ) {
-	const { mediaType, labels = {}, icon, onSelectURL } = props;
-
-	const isImage = MEDIA_TYPE_IMAGE === mediaType;
-	const isVideo = MEDIA_TYPE_VIDEO === mediaType;
+function MediaPlaceholder( { mediaType, labels = {}, icon, onPress } ) {
+	const isImage = MediaPicker.MEDIA_TYPE_IMAGE === mediaType;
+	const isVideo = MediaPicker.MEDIA_TYPE_VIDEO === mediaType;
 
 	let placeholderTitle = labels.title;
 	if ( placeholderTitle === undefined ) {
@@ -47,39 +45,30 @@ function MediaPlaceholder( props ) {
 	}
 
 	return (
-		<MediaUpload
-			mediaType={ mediaType }
-			onSelectURL={ onSelectURL }
-			render={ ( { open, getMediaOptions } ) => {
-				return (
-					<TouchableWithoutFeedback
-						accessibilityLabel={ sprintf(
-							/* translators: accessibility text for the media block empty state. %s: media type */
-							__( '%s block. Empty' ),
-							placeholderTitle
-						) }
-						accessibilityRole={ 'button' }
-						accessibilityHint={ accessibilityHint }
-						onPress={ ( event ) => {
-							props.onFocus( event );
-							open();
-						} }
-					>
-						<View style={ styles.emptyStateContainer }>
-							{ getMediaOptions() }
-							<View style={ styles.modalIcon }>
-								{ icon }
-							</View>
-							<Text style={ styles.emptyStateTitle }>
-								{ placeholderTitle }
-							</Text>
-							<Text style={ styles.emptyStateDescription }>
-								{ instructions }
-							</Text>
-						</View>
-					</TouchableWithoutFeedback>
-				);
-			} } />
+		<TouchableWithoutFeedback
+			accessibilityLabel={
+				sprintf(
+					/* translators: accessibility text for the media block empty state. %s: media type */
+					__( '%s block. Empty' ),
+					placeholderTitle
+				)
+			}
+			accessibilityRole={ 'button' }
+			accessibilityHint={ accessibilityHint }
+			onPress={ onPress }
+		>
+			<View style={ styles.emptyStateContainer }>
+				<View style={ styles.modalIcon }>
+					{ icon }
+				</View>
+				<Text style={ styles.emptyStateTitle }>
+					{ placeholderTitle }
+				</Text>
+				<Text style={ styles.emptyStateDescription }>
+					{ instructions }
+				</Text>
+			</View>
+		</TouchableWithoutFeedback>
 	);
 }
 

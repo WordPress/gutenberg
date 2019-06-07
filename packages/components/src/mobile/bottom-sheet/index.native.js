@@ -28,6 +28,7 @@ class BottomSheet extends Component {
 			safeAreaBottomInset: 0,
 		};
 
+		this._isMounted = true;
 		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
 	}
 
@@ -36,6 +37,7 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
+		this._isMounted = false;
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
@@ -49,7 +51,7 @@ class BottomSheet extends Component {
 			return;
 		}
 		const { safeAreaInsets } = result;
-		if ( this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
+		if ( this._isMounted && this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
 			this.setState( { safeAreaBottomInset: safeAreaInsets.bottom } );
 		}
 	}
@@ -151,7 +153,6 @@ class BottomSheet extends Component {
 					<View style={ { height: this.state.safeAreaBottomInset } } />
 				</KeyboardAvoidingView>
 			</Modal>
-
 		);
 	}
 }

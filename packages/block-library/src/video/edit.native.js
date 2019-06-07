@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, TextInput, TouchableWithoutFeedback, Text } from 'react-native';
 /**
  * Internal dependencies
@@ -17,13 +16,15 @@ import {
  * WordPress dependencies
  */
 import {
+	Component,
+} from '@wordpress/element';
+import {
+	MediaPicker,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
-	MediaUpload,
-	MEDIA_TYPE_VIDEO,
 	RichText,
 	BlockControls,
 	InspectorControls,
@@ -42,7 +43,7 @@ import SvgIconRetry from './icon-retry';
 
 const VIDEO_ASPECT_RATIO = 1.7;
 
-class VideoEdit extends React.Component {
+class VideoEdit extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -59,6 +60,8 @@ class VideoEdit extends React.Component {
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.onVideoPressed = this.onVideoPressed.bind( this );
 		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
+		this.onShowSettings = this.onShowSettings.bind( this );
+		this.onHideSettings = this.onHideSettings.bind( this );
 	}
 
 	componentDidMount() {
@@ -117,7 +120,7 @@ class VideoEdit extends React.Component {
 	onSelectMediaUploadOption( mediaId, mediaUrl ) {
 		const { setAttributes } = this.props;
 		setAttributes( { id: mediaId, src: mediaUrl } );
-		this.setState( { isMediaRequested: true } );
+		this.setState( { isMediaRequested: true, showSettings: false } );
 	}
 
 	onVideoContanerLayout( event ) {
@@ -128,6 +131,14 @@ class VideoEdit extends React.Component {
 		}
 	}
 
+	onShowSettings() {
+		this.setState( { showSettings: true } );
+	}
+
+	onHideSettings() {
+		this.setState( { showSettings: false } );
+	}
+
 	getIcon( isRetryIcon, isUploadInProgress ) {
 		if ( isRetryIcon ) {
 			return <SvgIconRetry fill={ style.icon.fill } />;
@@ -136,47 +147,37 @@ class VideoEdit extends React.Component {
 		return <SvgIcon fill={ isUploadInProgress ? style.iconUploading.fill : style.icon.fill } />;
 	}
 
-	render() {
+	renderPlaceholder() {
+		return (
+			<View style={ { flex: 1 } }>
+				<MediaPlaceholder
+					mediaType={ MediaPicker.MEDIA_TYPE_VIDEO }
+					icon={ this.getIcon( false ) }
+					onPress={ ( event ) => {
+						this.props.onFocus( event );
+						this.onShowSettings();
+					} }
+				/>
+			</View>
+		);
+	}
+
+	renderVideo() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { caption, id, src } = attributes;
-		const { isMediaRequested, videoContainerHeight } = this.state;
-
-		const toolbarEditButton = (
-			<MediaUpload mediaType={ MEDIA_TYPE_VIDEO }
-				onSelectURL={ this.onSelectMediaUploadOption }
-				render={ ( { open, getMediaOptions } ) => {
-					return (
-						<Toolbar>
-							{ getMediaOptions() }
-							<ToolbarButton
-								label={ __( 'Edit video' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						</Toolbar>
-					);
-				} } >
-			</MediaUpload>
-		);
-
-		if ( ! isMediaRequested && ! src ) {
-			return (
-				<View style={ { flex: 1 } } >
-					<MediaPlaceholder
-						mediaType={ MEDIA_TYPE_VIDEO }
-						onSelectURL={ this.onSelectMediaUploadOption }
-						icon={ this.getIcon( false ) }
-						onFocus={ this.props.onFocus }
-					/>
-				</View>
-			);
-		}
+		const { videoContainerHeight } = this.state;
 
 		return (
 			<TouchableWithoutFeedback onPress={ this.onVideoPressed } disabled={ ! isSelected }>
 				<View style={ { flex: 1 } }>
 					<BlockControls>
-						{ toolbarEditButton }
+						<Toolbar>
+							<ToolbarButton
+								label={ __( 'Edit video' ) }
+								icon="edit"
+								onClick={ this.onShowSettings }
+							/>
+						</Toolbar>
 					</BlockControls>
 					<InspectorControls>
 						<ToolbarButton
@@ -244,6 +245,32 @@ class VideoEdit extends React.Component {
 					) }
 				</View>
 			</TouchableWithoutFeedback>
+		);
+	}
+
+	renderSettings() {
+		return (
+			<MediaPicker
+				isOpen={ this.state.showSettings }
+				mediaType={ MediaPicker.MEDIA_TYPE_VIDEO }
+				onSelectURL={ this.onSelectMediaUploadOption }
+				onClose={ this.onHideSettings }
+			/>
+		);
+	}
+
+	render() {
+		const { attributes: { src } } = this.props;
+		const { isMediaRequested } = this.state;
+
+		return (
+			<>
+				{ ! isMediaRequested && ! src ?
+					this.renderPlaceholder() :
+					this.renderVideo()
+				}
+				{ this.renderSettings() }
+			</>
 		);
 	}
 }

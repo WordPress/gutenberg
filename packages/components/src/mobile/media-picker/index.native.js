@@ -24,19 +24,13 @@ export const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_med
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 
-export class MediaUpload extends Component {
+export class MediaPicker extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onPickerOpen = this.onPickerOpen.bind( this );
-		this.onPickerClose = this.onPickerClose.bind( this );
 		this.onMediaLibraryButtonPressed = this.onMediaLibraryButtonPressed.bind( this );
 		this.onMediaUploadButtonPressed = this.onMediaUploadButtonPressed.bind( this );
 		this.onMediaCaptureButtonPressed = this.onMediaCaptureButtonPressed.bind( this );
-
-		this.state = {
-			showModal: false,
-		};
 	}
 
 	getTakeMediaLabel() {
@@ -75,14 +69,6 @@ export class MediaUpload extends Component {
 		return 'wordpress-alt';
 	}
 
-	onPickerOpen() {
-		this.setState( { showModal: true } );
-	}
-
-	onPickerClose() {
-		this.setState( { showModal: false } );
-	}
-
 	onMediaLibraryButtonPressed() {
 		const { mediaType } = this.props;
 
@@ -114,11 +100,12 @@ export class MediaUpload extends Component {
 	}
 
 	render() {
+		const { isOpen, onClose } = this.props;
 		const mediaOptions = this.getMediaOptionsItems();
 
-		const getMediaOptions = () => (
+		return (
 			<Picker
-				isOpen={ this.state.showModal }
+				isOpen={ isOpen }
 				hideCancelButton={ true }
 				options={ mediaOptions }
 				onChange={ ( value ) => {
@@ -129,13 +116,21 @@ export class MediaUpload extends Component {
 					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
 						this.onMediaLibraryButtonPressed();
 					}
-					this.onPickerClose();
 				} }
-				onClose={ this.onPickerClose }
+				onClose={ onClose }
 			/>
 		);
-		return this.props.render( { open: this.onPickerOpen, getMediaOptions } );
 	}
 }
 
-export default MediaUpload;
+MediaPicker.MEDIA_TYPE_IMAGE = MEDIA_TYPE_IMAGE;
+MediaPicker.MEDIA_TYPE_VIDEO = MEDIA_TYPE_VIDEO;
+
+MediaPicker.MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE;
+MediaPicker.MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA = MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA;
+MediaPicker.MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY;
+
+MediaPicker.OPTION_TAKE_VIDEO = OPTION_TAKE_VIDEO;
+MediaPicker.OPTION_TAKE_PHOTO = OPTION_TAKE_PHOTO;
+
+export default MediaPicker;
