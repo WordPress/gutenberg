@@ -268,7 +268,6 @@ export default class EditorPage {
 		return text.toString();
 	}
 
-
 	// =========================
 	// Image Block functions
 	// =========================
