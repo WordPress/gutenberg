@@ -75,13 +75,15 @@ export function* saveWidgetAreas() {
 				content: serialize( blocks ),
 			}
 		);
-		yield dispatch(
-			'core/notices',
-			'createSuccessNotice',
-			__( 'Block areas saved succesfully.' ),
-			{
-				id: WIDGET_AREAS_SAVE_NOTICE_ID,
-				type: 'snackbar',
-			} );
 	}
+
+	yield dispatch(
+		'core/notices',
+		'createSuccessNotice',
+		__( 'Block areas saved succesfully.' ),
+		{
+			id: WIDGET_AREAS_SAVE_NOTICE_ID,
+			type: 'snackbar',
+		}
+	);
 }
