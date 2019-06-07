@@ -189,6 +189,13 @@ class RCTAztecView: Aztec.TextView {
 
     private func readHTML(from pasteboard: UIPasteboard) -> String? {
 
+        if let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String), let html = String(data: data, encoding: .utf8) {
+            // Make sure we are not getting a full HTML DOC. We only want inner content
+            if !html.hasPrefix("<!DOCTYPE html") {
+                return html
+            }
+        }
+
         if let flatRTFDString = read(from: pasteboard, uti: kUTTypeFlatRTFD as String, documentType: DocumentType.rtfd) {
             return  flatRTFDString
         }
@@ -201,15 +208,11 @@ class RCTAztecView: Aztec.TextView {
             return  rtfdString
         }
 
-        if let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String) {
-            return String(data: data, encoding: .utf8)
-        }
-
         return nil
     }
     
     private func readText(from pasteboard: UIPasteboard) -> String? {
-        return pasteboard.string        
+        return pasteboard.string
     }
 
     func saveToDisk(image: UIImage) -> URL? {
