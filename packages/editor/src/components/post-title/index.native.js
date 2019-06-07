@@ -95,6 +95,7 @@ class PostTitle extends Component {
 					style={ style }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
+					deleteEnter={ true }
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
