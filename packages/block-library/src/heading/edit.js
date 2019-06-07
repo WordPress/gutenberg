@@ -55,25 +55,24 @@ function HeadingEdit( {
 	textColor,
 	setTextColor,
 } ) {
-	const { align, content, level, placeholder } = attributes;
+	const { content, level, placeholder, textAlign } = attributes;
 	const tagName = 'h' + level;
 
 	return (
 		<>
 			<BlockControls>
 				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+				<AlignmentToolbar
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading Settings' ) }>
 					<p>{ __( 'Level' ) }</p>
 					<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-					<p>{ __( 'Text Alignment' ) }</p>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
 				</PanelBody>
 				<HeadingColorUI
 					setTextColor={ setTextColor }
@@ -100,13 +99,13 @@ function HeadingEdit( {
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
 				className={ classnames( className, {
+					[ `has-text-align-${ textAlign }` ]: textAlign,
 					'has-text-color': textColor.color,
 					[ textColor.class ]: textColor.class,
 				} ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 				style={ {
 					color: textColor.color,
-					textAlign: align,
 				} }
 			/>
 		</>
