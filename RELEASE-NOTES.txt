@@ -1,9 +1,9 @@
 1.7.0
 ------
 * Fixed keyboard flickering issue after pressing Enter repeatedly on the Post Title.
+* New blocks are available: video/quote/more
 
 1.6.0
 ------
 * Fixed issue with link settings where “Open in New Tab” was always OFF on open.
-- A new block is available: video block.
 * Added UI to display a warning when a block has invalid content.

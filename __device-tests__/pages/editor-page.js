@@ -6,7 +6,6 @@
  * External dependencies
  */
 import wd from 'wd';
-import { Platform } from 'react-native';
 
 /**
  * Internal dependencies
@@ -46,6 +45,26 @@ export default class EditorPage {
 
 	async hasBlockAtPosition( position: number, blockName: string = '' ) {
 		return undefined !== await this.getBlockAtPosition( position, blockName );
+	}
+
+	async getTextViewForHtmlViewContent() {
+		const accessibilityId = 'html-view-content';
+		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
+
+		if ( ! isAndroid() ) {
+			blockLocator += '//XCUIElementTypeTextView';
+		}
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async verifyHtmlContent( html: string ) {
+		await toggleHtmlMode( this.driver, true );
+
+		const htmlContentView = await this.getTextViewForHtmlViewContent();
+		const text = await htmlContentView.text();
+		expect( text ).toBe( html );
+
+		await toggleHtmlMode( this.driver, false );
 	}
 
 	// =========================
@@ -238,29 +257,5 @@ export default class EditorPage {
 		const block = await this.getListBlockAtPosition( position );
 		const text = await this.getTextForListBlock( block );
 		return text.toString();
-	}
-
-	async getTextViewForHtmlViewContent() {
-		const accessibilityId = 'html-view-content';
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }=${ JSON.stringify( accessibilityId ) }]`;
-		return await this.driver.elementByXPath( blockLocator );
-	}
-
-	async verifyHtmlContent( html: string ) {
-		if ( Platform.OS === 'android' ) {
-			await this.verifyHtmlContentAndroid( html );
-		} else {
-			// TODO: implement html verification on iOS too
-		}
-	}
-
-	async verifyHtmlContentAndroid( html: string ) {
-		await toggleHtmlMode( this.driver );
-
-		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		const text = await htmlContentView.text();
-		expect( text ).toBe( html );
-
-		await toggleHtmlMode( this.driver );
 	}
 }
