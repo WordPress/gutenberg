@@ -1301,7 +1301,7 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after1' );
 		} );
 
-		it( 'should pass entire block object(s) to the "convert" method if defined', () => {
+		it( 'should pass entire block object(s) to the "__experimentalConvert" method if defined', () => {
 			registerBlockType( 'core/test-group-block', {
 				attributes: {
 					value: {
@@ -1313,7 +1313,7 @@ describe( 'block factory', () => {
 						type: 'block',
 						blocks: [ '*' ],
 						isMultiBlock: true,
-						convert( blocks ) {
+						__experimentalConvert( blocks ) {
 							const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
 								return createBlock( name, attributes, innerBlocks );
 							} );
@@ -1343,7 +1343,7 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( numOfBlocksToGroup );
 		} );
 
-		it( 'should prefer "convert" method over "transform" method when running a transformation', () => {
+		it( 'should prefer "__experimentalConvert" method over "transform" method when running a transformation', () => {
 			const convertSpy = jest.fn( ( blocks ) => {
 				const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
 					return createBlock( name, attributes, innerBlocks );
@@ -1364,7 +1364,7 @@ describe( 'block factory', () => {
 						type: 'block',
 						blocks: [ '*' ],
 						isMultiBlock: true,
-						convert: convertSpy,
+						__experimentalConvert: convertSpy,
 						transform: transformSpy,
 					} ],
 				},
