@@ -675,6 +675,9 @@ export class RichText extends Component {
 
 	forceSelectionUpdate( start, end ) {
 		if ( ! this.needsSelectionUpdate ) {
+			if ( isNaN( start ) || isNaN( end ) ) {
+				return;
+			} 
 			this.needsSelectionUpdate = true;
 			this.selectionStart = start;
 			this.selectionEnd = end;
