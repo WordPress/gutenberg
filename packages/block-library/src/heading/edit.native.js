@@ -39,13 +39,10 @@ const HeadingEdit = ( {
 			identifier="content"
 			tagName={ 'h' + attributes.level }
 			value={ attributes.content }
-			isSelected={ isSelected }
 			style={ {
 				...style,
 				minHeight: styles[ 'wp-block-heading' ].minHeight,
 			} }
-			onFocus={ onFocus } // always assign onFocus as a props
-			onBlur={ onBlur } // always assign onBlur as a props
 			onChange={ ( value ) => setAttributes( { content: value } ) }
 			onMerge={ mergeBlocks }
 			onSplit={ ( value ) => {
