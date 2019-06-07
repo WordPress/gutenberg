@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Platform } from 'react-native';
+import { View } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -31,8 +31,6 @@ class PostTitle extends Component {
 		this.state = {
 			isSelected: false,
 		};
-
-		this.isIOS = Platform.OS === 'ios';
 	}
 
 	componentDidMount() {
@@ -97,11 +95,8 @@ class PostTitle extends Component {
 					style={ style }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
+					deleteEnter={ true }
 					onChange={ ( value ) => {
-						if ( ! this.isIOS ) {
-							const extraBRTagRegexp = RegExp( '<br>$', 'gim' );
-							value = value.replace( extraBRTagRegexp, '' );
-						}
 						this.props.onUpdate( value );
 					} }
 					placeholder={ decodedPlaceholder }
