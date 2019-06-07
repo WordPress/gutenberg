@@ -9,6 +9,7 @@ import { range } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { Toolbar } from '@wordpress/components';
+import { withViewportMatch } from '@wordpress/viewport';
 
 class HeadingToolbar extends Component {
 	createLevelControl( targetLevel, selectedLevel, onChange ) {
@@ -23,11 +24,15 @@ class HeadingToolbar extends Component {
 	}
 
 	render() {
-		const { minLevel, maxLevel, selectedLevel, onChange } = this.props;
+		const { isLargeViewport, minLevel, maxLevel, onChange, selectedLevel } = this.props;
 		return (
-			<Toolbar controls={ range( minLevel, maxLevel ).map( ( index ) => this.createLevelControl( index, selectedLevel, onChange ) ) } />
+			<Toolbar
+				controls={ range( minLevel, maxLevel ).map( ( index ) => this.createLevelControl( index, selectedLevel, onChange ) ) }
+				icon="heading"
+				isCollapsed={ ! isLargeViewport }
+			/>
 		);
 	}
 }
 
-export default HeadingToolbar;
+export default withViewportMatch( { isLargeViewport: 'medium' } )( HeadingToolbar );
