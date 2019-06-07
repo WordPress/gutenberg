@@ -132,6 +132,9 @@ class RCTAztecView: Aztec.TextView {
         textContainerInset = .zero
         contentInset = .zero
         addPlaceholder()
+        if #available(iOS 11.0, *) {
+            textDragInteraction?.isEnabled = false
+        }
     }
 
     func addPlaceholder() {
@@ -289,7 +292,7 @@ class RCTAztecView: Aztec.TextView {
     }
     
     private func interceptBackspace() -> Bool {
-        guard isNewLineBeforeSelection() || (selectedRange.location == 0 && selectedRange.length == 0),
+        guard (isNewLineBeforeSelectionAndNotEndOfContent() && selectedRange.length == 0) || (selectedRange.location == 0 && selectedRange.length == 0),
             let onBackspace = onBackspace else {
                 return false
         }
@@ -299,12 +302,12 @@ class RCTAztecView: Aztec.TextView {
         return true
     }
 
-    private func isNewLineBeforeSelection() -> Bool {
+    private func isNewLineBeforeSelectionAndNotEndOfContent() -> Bool {
         guard let currentLocation = text.indexFromLocation(selectedRange.location) else {
             return false
         }
 
-        return text.isStartOfParagraph(at: currentLocation)
+        return text.isStartOfParagraph(at: currentLocation) && !(text.endIndex == currentLocation)
     }
     override var keyCommands: [UIKeyCommand]? {
         // Remove defautls Tab and Shift+Tab commands, leaving just Shift+Enter command.
