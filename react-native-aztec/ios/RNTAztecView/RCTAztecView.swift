@@ -292,7 +292,7 @@ class RCTAztecView: Aztec.TextView {
     }
     
     private func interceptBackspace() -> Bool {
-        guard isNewLineBeforeSelectionAndNotEndOfContent() || (selectedRange.location == 0 && selectedRange.length == 0),
+        guard (isNewLineBeforeSelectionAndNotEndOfContent() && selectedRange.length == 0) || (selectedRange.location == 0 && selectedRange.length == 0),
             let onBackspace = onBackspace else {
                 return false
         }
