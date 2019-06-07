@@ -183,6 +183,15 @@ class RCTAztecView: Aztec.TextView {
         
         return String(data: data, encoding: .utf8)
     }
+
+    private func htmlFromAttributedString(from pasteboard: UIPasteboard) -> String? {
+        guard let data = pasteboard.data(forPasteboardType: kUTTypeRTF as String),
+            let attributedString = try? NSAttributedString(data: data, options: [.documentType: DocumentType.rtf], documentAttributes: nil),
+            let storage = self.textStorage as? TextStorage else {
+            return nil
+        }
+        return  storage.getHTML(from: attributedString)
+    }
     
     private func text(from pasteboard: UIPasteboard) -> String? {
         guard let data = pasteboard.data(forPasteboardType: kUTTypePlainText as String) else {
@@ -227,7 +236,10 @@ class RCTAztecView: Aztec.TextView {
         
         let pasteboard = UIPasteboard.general
         let text = self.text(from: pasteboard) ?? ""
-        let html = self.html(from: pasteboard) ?? ""
+        var html = self.html(from: pasteboard) ?? ""
+        if html.isEmpty {
+            html = htmlFromAttributedString(from: pasteboard) ?? ""
+        }
         let imagesURLs = self.images(from: pasteboard)
 
         onPaste?([
