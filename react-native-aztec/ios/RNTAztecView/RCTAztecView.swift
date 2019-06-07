@@ -193,15 +193,7 @@ class RCTAztecView: Aztec.TextView {
         if let data = pasteboard.data(forPasteboardType: kUTTypeUTF8PlainText as String) {
             return String(data: data, encoding: .utf8)
         }
-
-        if let data = pasteboard.data(forPasteboardType: kUTTypePlainText as String) {
-            return String(data: data, encoding: .ascii)
-        }
-
-        if let data = pasteboard.data(forPasteboardType: kUTTypeText as String) {
-            return String(data: data, encoding: .ascii)
-        }
-
+        
         return nil
     }
 
