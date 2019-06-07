@@ -666,7 +666,9 @@ export class RichText extends Component {
 		}
 
 		if ( ! this.comesFromAztec ) {
-			if ( nextProps.selectionStart !== this.props.selectionStart &&
+			if ( ( typeof nextProps.selectionStart !== 'undefined' ) &&
+					( typeof nextProps.selectionEnd !== 'undefined' ) &&
+					nextProps.selectionStart !== this.props.selectionStart &&
 					nextProps.selectionStart !== this.selectionStart &&
 					nextProps.isSelected ) {
 				this.needsSelectionUpdate = true;
