@@ -42,7 +42,7 @@ describe( 'Gutenberg Editor tests', () => {
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
-	it.only( 'should be able to add blocks , rotate device and continue adding blocks', async () => {
+	it( 'should be able to add blocks , rotate device and continue adding blocks', async () => {
 		await editorPage.addNewParagraphBlock();
 		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
@@ -52,6 +52,9 @@ describe( 'Gutenberg Editor tests', () => {
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
 		await toggleOrientation( driver );
+		if ( isAndroid() ) {
+			await driver.hideDeviceKeyboard();
+		}
 
 		await editorPage.addNewParagraphBlock();
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
