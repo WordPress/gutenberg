@@ -31,6 +31,7 @@ import {
 	__unstableRemoveLineSeparator as removeLineSeparator,
 	isCollapsed,
 	remove,
+	__unstableFormatEdit as FormatEdit,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
@@ -44,7 +45,6 @@ import { isURL } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
 import { ListEdit } from './list-edit';
