@@ -54,7 +54,7 @@ __Note:__ The value of each shortcut should be a consistent function reference, 
 
 __Note:__ The `KeyboardShortcuts` component will not update to reflect a changed `shortcuts` prop. If you need to change shortcuts, mount a separate `KeyboardShortcuts` element, which can be achieved by assigning a unique `key` prop.
 
-## bindGlobal
+### bindGlobal
 
 By default, a callback will not be invoked if the key combination occurs in an editable field. Pass `bindGlobal` as `true` if the key events should be observed globally, including within editable fields.
 
@@ -63,9 +63,9 @@ By default, a callback will not be invoked if the key combination occurs in an e
 
 _Tip:_ If you need some but not all keyboard events to be observed globally, simply render two distinct `KeyboardShortcuts` elements, one with and one without the `bindGlobal` prop.
 
-## event
+### eventName
 
-By default, a callback is invoked in response to the `keydown` event. To override this, pass `event` with the name of a specific keyboard event.
+By default, a callback is invoked in response to the `keydown` event. To override this, pass `eventName` with the name of a specific keyboard event.
 
 - Type: `String`
 - Required: No
