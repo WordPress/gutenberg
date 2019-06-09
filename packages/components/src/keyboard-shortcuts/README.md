@@ -48,7 +48,7 @@ Elements to render, upon whom key events are to be monitored.
 An object of shortcut bindings, where each key is a keyboard combination, the value of which is the callback to be invoked when the key combination is pressed.
 
 - Type: `Object`
-- Required: No
+- Required: Yes
 
 __Note:__ The value of each shortcut should be a consistent function reference, not an anonymous function. Otherwise, the callback will not be correctly unbound when the component unmounts.
 
