@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, reduce, size, first, last } from 'lodash';
+import { first, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -649,42 +649,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 
 	return {
 		setAttributes( newAttributes ) {
-			const { name, clientId } = ownProps;
-			const type = getBlockType( name );
-
-			function isMetaAttribute( key ) {
-				return get( type, [ 'attributes', key, 'source' ] ) === 'meta';
-			}
-
-			// Partition new attributes to delegate update behavior by source.
-			//
-			// TODO: A consolidated approach to external attributes sourcing
-			// should be devised to avoid specific handling for meta, enable
-			// additional attributes sources.
-			//
-			// See: https://github.com/WordPress/gutenberg/issues/2759
-			const {
-				blockAttributes,
-				metaAttributes,
-			} = reduce( newAttributes, ( result, value, key ) => {
-				if ( isMetaAttribute( key ) ) {
-					result.metaAttributes[ type.attributes[ key ].meta ] = value;
-				} else {
-					result.blockAttributes[ key ] = value;
-				}
-
-				return result;
-			}, { blockAttributes: {}, metaAttributes: {} } );
-
-			if ( size( blockAttributes ) ) {
-				updateBlockAttributes( clientId, blockAttributes );
-			}
-
-			if ( size( metaAttributes ) ) {
-				const { getSettings } = select( 'core/block-editor' );
-				const onChangeMeta = getSettings().__experimentalMetaSource.onChange;
-				onChangeMeta( metaAttributes );
-			}
+			const { clientId } = ownProps;
+			updateBlockAttributes( clientId, newAttributes );
 		},
 		onSelect( clientId = ownProps.clientId, initialPosition ) {
 			selectBlock( clientId, initialPosition );

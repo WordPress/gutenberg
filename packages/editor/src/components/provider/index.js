@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, pick, defaultTo } from 'lodash';
+import { map, pick, defaultTo, get } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -71,7 +71,7 @@ class EditorProvider extends Component {
 		}
 	}
 
-	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions ) {
+	getBlockEditorSettings( settings, reusableBlocks, hasUploadPermissions, getEditedPostAttribute ) {
 		return {
 			...pick( settings, [
 				'alignWide',
@@ -94,10 +94,14 @@ class EditorProvider extends Component {
 				'templateLock',
 				'titlePlaceholder',
 			] ),
-			__experimentalMetaSource: {
-				value: meta,
-				onChange: onMetaChange,
-			},
+			__experimentalSources: [
+				{
+					sourceName: 'meta',
+					getDefaultValue( attributeConfig ) {
+						return get( getEditedPostAttribute( 'meta' ), [ attributeConfig.meta ] );
+					},
+				},
+			],
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
@@ -132,14 +136,13 @@ class EditorProvider extends Component {
 		const {
 			children,
 			blocks,
-			resetEditorBlocks,
 			isReady,
 			settings,
-			meta,
-			onMetaChange,
-			reusableBlocks,
-			resetEditorBlocksWithoutUndoLevel,
+			getEditedPostAttribute,
 			hasUploadPermissions,
+			onInput,
+			onChange,
+			reusableBlocks,
 		} = this.props;
 
 		if ( ! isReady ) {
@@ -147,14 +150,14 @@ class EditorProvider extends Component {
 		}
 
 		const editorSettings = this.getBlockEditorSettings(
-			settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions
+			settings, reusableBlocks, hasUploadPermissions, getEditedPostAttribute
 		);
 
 		return (
 			<BlockEditorProvider
 				value={ blocks }
-				onInput={ resetEditorBlocksWithoutUndoLevel }
-				onChange={ resetEditorBlocks }
+				onInput={ onInput }
+				onChange={ onChange }
 				settings={ editorSettings }
 				useSubRegistry={ false }
 			>
@@ -179,9 +182,9 @@ export default compose( [
 		return {
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
-			meta: getEditedPostAttribute( 'meta' ),
 			reusableBlocks: __experimentalGetReusableBlocks(),
 			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
+			meta: getEditedPostAttribute( 'meta' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -198,11 +201,16 @@ export default compose( [
 			setupEditor,
 			updatePostLock,
 			createWarningNotice,
-			resetEditorBlocks,
+			onChange( blocks, lastChanges ) {
+				resetEditorBlocks( blocks, {
+					__unstableLastChanges: lastChanges,
+				} );
+			},
 			updateEditorSettings,
-			resetEditorBlocksWithoutUndoLevel( blocks ) {
+			onInput( blocks, lastChanges ) {
 				resetEditorBlocks( blocks, {
 					__unstableShouldCreateUndoLevel: false,
+					__unstableLastChanges: lastChanges,
 				} );
 			},
 			onMetaChange( meta ) {

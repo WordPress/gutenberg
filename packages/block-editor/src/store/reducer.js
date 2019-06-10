@@ -656,6 +656,31 @@ export const blocks = flow(
 
 		return state;
 	},
+
+	lastAttributesChanges( state, action ) {
+		switch ( action.type ) {
+			case 'UPDATE_BLOCK':
+				if ( ! action.updates.attributes ) {
+					return null;
+				}
+				return {
+					[ action.clientId ]: action.updates.attributes,
+				};
+
+			case 'UPDATE_BLOCK_ATTRIBUTES':
+				return {
+					[ action.clientId ]: action.attributes,
+				};
+
+			case 'RESET_BLOCKS':
+			case 'INSERT_BLOCKS':
+			case 'RECEIVE_BLOCKS':
+			case 'REPLACE_BLOCKS':
+				return getFlattenedBlockAttributes( action.blocks );
+		}
+
+		return null;
+	},
 } );
 
 /**

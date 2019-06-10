@@ -65,14 +65,6 @@ const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
 const EMPTY_ARRAY = [];
 
 /**
- * Shared reference to an empty object for cases where it is important to avoid
- * returning a new object reference on every invocation.
- *
- * @type {Object}
- */
-const EMPTY_OBJECT = {};
-
-/**
  * Returns a new reference when the inner blocks of a given block client ID
  * change. This is used exclusively as a memoized selector dependant, relying
  * on this selector's shared return value and recursively those of its inner
@@ -137,33 +129,11 @@ export const getBlockAttributes = createSelector(
 			return null;
 		}
 
-		let attributes = state.blocks.attributes[ clientId ];
-
-		// Inject custom source attribute values.
-		//
-		// TODO: Create generic external sourcing pattern, not explicitly
-		// targeting meta attributes.
-		const type = getBlockType( block.name );
-		if ( type ) {
-			attributes = reduce( type.attributes, ( result, value, key ) => {
-				if ( value.source === 'meta' ) {
-					if ( result === attributes ) {
-						result = { ...result };
-					}
-
-					result[ key ] = getPostMeta( state, value.meta );
-				}
-
-				return result;
-			}, attributes );
-		}
-
-		return attributes;
+		return state.blocks.attributes[ clientId ];
 	},
 	( state, clientId ) => [
 		state.blocks.byClientId[ clientId ],
 		state.blocks.attributes[ clientId ],
-		getPostMeta( state ),
 	]
 );
 
@@ -314,7 +284,6 @@ export const getBlocksByClientId = createSelector(
 		( clientId ) => getBlock( state, clientId )
 	),
 	( state ) => [
-		getPostMeta( state ),
 		state.blocks.byClientId,
 		state.blocks.order,
 		state.blocks.attributes,
@@ -691,7 +660,6 @@ export const getMultiSelectedBlocks = createSelector(
 		state.blocks.byClientId,
 		state.blocks.order,
 		state.blocks.attributes,
-		getPostMeta( state ),
 	]
 );
 
@@ -1438,6 +1406,17 @@ export function isLastBlockChangePersistent( state ) {
 }
 
 /**
+ * Returns an object describing the last block attributes changes
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {Object} the clientId and the block attributes changes
+ */
+export function getLastBlockAttributesChange( state ) {
+	return state.blocks.lastAttributesChanges;
+}
+
+/**
  * Returns true if the most recent block change is be considered ignored, or
  * false otherwise. An ignored change is one not to be committed by
  * BlockEditorProvider, neither via `onChange` nor `onInput`.
@@ -1453,22 +1432,6 @@ export function __unstableIsLastBlockChangeIgnored( state ) {
 	// accounted for in the refactoring of reusable blocks as occurring within
 	// their own separate block editor / state (#7119).
 	return state.blocks.isIgnoredChange;
-}
-
-/**
- * Returns the value of a post meta from the editor settings.
- *
- * @param {Object} state Global application state.
- * @param {string} key   Meta Key to retrieve
- *
- * @return {*} Meta value
- */
-function getPostMeta( state, key ) {
-	if ( key === undefined ) {
-		return get( state, [ 'settings', '__experimentalMetaSource', 'value' ], EMPTY_OBJECT );
-	}
-
-	return get( state, [ 'settings', '__experimentalMetaSource', 'value', key ] );
 }
 
 /**

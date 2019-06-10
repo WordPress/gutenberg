@@ -35,9 +35,7 @@ class BlockEditorProvider extends Component {
 			this.attachChangeObserver( registry );
 		}
 
-		if ( this.isSyncingOutcomingValue ) {
-			this.isSyncingOutcomingValue = false;
-		} else if ( value !== prevProps.value ) {
+		if ( value !== prevProps.value ) {
 			this.isSyncingIncomingValue = true;
 			resetBlocks( value );
 		}
@@ -69,6 +67,7 @@ class BlockEditorProvider extends Component {
 		const {
 			getBlocks,
 			isLastBlockChangePersistent,
+			getLastBlockAttributesChange,
 			__unstableIsLastBlockChangeIgnored,
 		} = registry.select( 'core/block-editor' );
 
@@ -99,19 +98,14 @@ class BlockEditorProvider extends Component {
 				// This happens when a previous input is explicitely marked as persistent.
 				( newIsPersistent && ! isPersistent )
 			) {
-				// When knowing the blocks value is changing, assign instance
-				// value to skip reset in subsequent `componentDidUpdate`.
-				if ( newBlocks !== blocks ) {
-					this.isSyncingOutcomingValue = true;
-				}
-
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
+				const lastChanges = getLastBlockAttributesChange();
 
 				if ( isPersistent ) {
-					onChange( blocks );
+					onChange( blocks, lastChanges );
 				} else {
-					onInput( blocks );
+					onInput( blocks, lastChanges );
 				}
 			}
 		} );
