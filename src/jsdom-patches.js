@@ -10,6 +10,9 @@
 * WrongDocumentError exception disabled.
 *
 * Element.prototype.matches is aliased to Element.prototype.matchesSelector.
+*
+* Getters are defined on the Node.prototype for the following properties:
+* parentElement, previousElementSibling, nextElementSibling.
 */
 
 /**
@@ -22,7 +25,7 @@ import jsdomLevel1Core from 'jsdom-jscore/lib/jsdom/level1/core';
 jsdom.html( '', null, null );
 
 const { core } = jsdomLevel1Core.dom.level1;
-const { Node, Element } = core;
+const { Node, Element, CharacterData } = core;
 
 // Exception codes
 const {
@@ -147,3 +150,78 @@ Node.prototype.insertBefore = function( /* Node */ newChild, /* Node*/ refChild 
  * expectation that this is implemented (as it is in the browser environment).
  */
 Element.prototype.matches = Element.prototype.matchesSelector;
+
+/**
+ * Helper function to check if a node implements the NonDocumentTypeChildNode
+ * interface
+ * @param {Object} node Node to check
+ * @return {boolean} true if node is a NonDocumentTypeChildNode, false otherwise
+ *
+ * This function is needed to implement the previousElementSibling and
+ * nextElementSibling properties.
+ * See: https://dom.spec.whatwg.org/#interface-nondocumenttypechildnode
+ */
+function isNonDocumentTypeChildNode( node ) {
+	return node instanceof Element || node instanceof CharacterData;
+}
+
+// $FlowFixMe
+Object.defineProperties( Node.prototype, {
+	/*
+	* This defines parentElement property on the Node prototype using a getter.
+	* See: https://dom.spec.whatwg.org/#parent-element
+	*/
+	parentElement: {
+		get() {
+			const parent = this.parentNode;
+
+			if ( parent && parent.nodeType === Node.ELEMENT_NODE ) {
+				return parent;
+			}
+
+			return null;
+		},
+	},
+	/*
+	* This defines previousElementSibling property on the Node prototype using a
+	* getter.
+	* See: https://dom.spec.whatwg.org/#dom-nondocumenttypechildnode-previouselementsibling
+	*/
+	previousElementSibling: {
+		get() {
+			// Property is undefined if node is not a NonDocumentTypeChildNode
+			if ( ! isNonDocumentTypeChildNode( this ) ) {
+				return;
+			}
+
+			let sibling = this.previousSibling;
+
+			while ( sibling && sibling.nodeType !== Node.ELEMENT_NODE ) {
+				sibling = sibling.previousSibling;
+			}
+
+			return sibling;
+		},
+	},
+	/*
+	* This defines nextElementSibling property on the Node prototype using a
+	* getter.
+	* See: https://dom.spec.whatwg.org/#dom-nondocumenttypechildnode-nextelementsibling
+	*/
+	nextElementSibling: {
+		get() {
+			// Property is undefined if node is not a NonDocumentTypeChildNode
+			if ( ! isNonDocumentTypeChildNode( this ) ) {
+				return;
+			}
+
+			let sibling = this.nextSibling;
+
+			while ( sibling && sibling.nodeType !== Node.ELEMENT_NODE ) {
+				sibling = sibling.nextSibling;
+			}
+
+			return sibling;
+		},
+	},
+} );
