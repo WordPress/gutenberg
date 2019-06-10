@@ -419,7 +419,7 @@ function BlockListBlock( {
 
 		isFocusable = ! ( 'tabIndex' in blockWrapperProps ) || (
 			isFinite( blockWrapperProps.tabIndex ) &&
-			Number( blockWrapperProps.tabIndex ) !== '-1'
+			Number( blockWrapperProps.tabIndex ) !== -1
 		);
 	}
 	const blockElementId = `block-${ clientId }`;
