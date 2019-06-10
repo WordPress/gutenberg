@@ -20,7 +20,7 @@ import {
 	withDispatch,
 	__experimentalAsyncModeProvider as AsyncModeProvider,
 } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -43,7 +43,11 @@ const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } 
 	const [ resetAnimation, updateReset ] = useState( false );
 	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
 	const previous = ref.current ? ref.current.getBoundingClientRect() : null;
+	const prefersReducedMotion = useReducedMotion();
 	useLayoutEffect( () => {
+		if ( prefersReducedMotion ) {
+			return;
+		}
 		ref.current.style.transform = 'none';
 		const destination = ref.current.getBoundingClientRect();
 		const newTransform = {
@@ -73,6 +77,7 @@ const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } 
 		},
 		reset: resetAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
+		immediate: prefersReducedMotion,
 	} );
 
 	return (
@@ -107,51 +112,6 @@ const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } 
 				{ ...props }
 			/>
 		</animated.div>
-	);
-};
-
-const BlockListUI = ( {
-	blockClientIds,
-	rootClientId,
-	isDraggable,
-	selectedBlockClientId,
-	multiSelectedBlockClientIds,
-	hasMultiSelection,
-	renderAppender,
-	setBlockRef,
-	onSelectionStart,
-} ) => {
-	return (
-		<div className="editor-block-list__layout block-editor-block-list__layout" style={ { position: 'relative' } }>
-			{ blockClientIds.map( ( clientId ) => {
-				const isBlockInSelection = hasMultiSelection ?
-					multiSelectedBlockClientIds.includes( clientId ) :
-					selectedBlockClientId === clientId;
-
-				return (
-					<BlockAsyncModeProvider
-						key={ 'block-' + clientId }
-						clientId={ clientId }
-						isBlockInSelection={ isBlockInSelection }
-					>
-						<BlockListItemWrapper
-							rootClientId={ rootClientId }
-							clientId={ clientId }
-							blockRef={ setBlockRef }
-							onSelectionStart={ onSelectionStart }
-							isDraggable={ isDraggable }
-							blockClientIds={ blockClientIds }
-							isBlockInSelection={ isBlockInSelection }
-						/>
-					</BlockAsyncModeProvider>
-				);
-			} ) }
-
-			<BlockListAppender
-				rootClientId={ rootClientId }
-				renderAppender={ renderAppender }
-			/>
-		</div>
 	);
 };
 
@@ -309,12 +269,47 @@ class BlockList extends Component {
 	}
 
 	render() {
+		const {
+			blockClientIds,
+			rootClientId,
+			isDraggable,
+			selectedBlockClientId,
+			multiSelectedBlockClientIds,
+			hasMultiSelection,
+			renderAppender,
+		} = this.props;
+
 		return (
-			<BlockListUI
-				{ ...this.props }
-				setBlockRef={ this.setBlockRef }
-				onSelectionStart={ this.onSelectionStart }
-			/>
+			<div className="editor-block-list__layout block-editor-block-list__layout" style={ { position: 'relative' } }>
+				{ blockClientIds.map( ( clientId ) => {
+					const isBlockInSelection = hasMultiSelection ?
+						multiSelectedBlockClientIds.includes( clientId ) :
+						selectedBlockClientId === clientId;
+
+					return (
+						<BlockAsyncModeProvider
+							key={ 'block-' + clientId }
+							clientId={ clientId }
+							isBlockInSelection={ isBlockInSelection }
+						>
+							<BlockListItemWrapper
+								rootClientId={ rootClientId }
+								clientId={ clientId }
+								blockRef={ this.setBlockRef }
+								onSelectionStart={ this.onSelectionStart }
+								isDraggable={ isDraggable }
+								blockClientIds={ blockClientIds }
+								isBlockInSelection={ isBlockInSelection }
+							/>
+						</BlockAsyncModeProvider>
+					);
+				} ) }
+
+				<BlockListAppender
+					rootClientId={ rootClientId }
+					renderAppender={ renderAppender }
+				/>
+			</div>
 		);
 	}
 }
