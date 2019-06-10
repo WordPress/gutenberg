@@ -3,7 +3,7 @@
 	var Fragment = wp.element.Fragment;
 	var Button = wp.components.Button;
 	var PanelBody = wp.components.PanelBody;
-	var InspectorControls = wp.editor.InspectorControls;
+	var InspectorControls = wp.blockEditor.InspectorControls;
 	var addFilter = wp.hooks.addFilter;
 	var createBlock = wp.blocks.createBlock;
 	var __ = wp.i18n.__;

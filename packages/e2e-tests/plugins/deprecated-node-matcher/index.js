@@ -1,6 +1,6 @@
 ( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
-	var RichText = wp.editor.RichText;
+	var RichText = wp.blockEditor.RichText;
 	var el = wp.element.createElement;
 	var el = wp.element.createElement;
 
