@@ -178,26 +178,41 @@ class RCTAztecView: Aztec.TextView {
     }
     
     // MARK: - Paste handling
-    
-    private func html(from pasteboard: UIPasteboard) -> String? {
-        guard let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String) else {
-            return nil
+    private func read(from pasteboard: UIPasteboard, uti: CFString, documentType: DocumentType) -> String? {
+        guard let data = pasteboard.data(forPasteboardType: uti as String),
+            let attributedString = try? NSAttributedString(data: data, options: [.documentType: documentType], documentAttributes: nil),
+            let storage = self.textStorage as? TextStorage else {
+                return nil
         }
-        
-        return String(data: data, encoding: .utf8)
-    }
-    
-    private func text(from pasteboard: UIPasteboard) -> String? {
-        guard let data = pasteboard.data(forPasteboardType: kUTTypePlainText as String) else {
-            return nil
-        }
-        
-        return String(data: data, encoding: .utf8)
+        return  storage.getHTML(from: attributedString)
     }
 
-    private func cleanHTML() -> String {
-        let html = getHTML(prettify: false)
-        return html
+    private func readHTML(from pasteboard: UIPasteboard) -> String? {
+
+        if let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String), let html = String(data: data, encoding: .utf8) {
+            // Make sure we are not getting a full HTML DOC. We only want inner content
+            if !html.hasPrefix("<!DOCTYPE html") {
+                return html
+            }
+        }
+
+        if let flatRTFDString = read(from: pasteboard, uti: kUTTypeFlatRTFD, documentType: DocumentType.rtfd) {
+            return  flatRTFDString
+        }
+
+        if let rtfString = read(from: pasteboard, uti: kUTTypeRTF, documentType: DocumentType.rtf) {
+            return  rtfString
+        }
+
+        if let rtfdString = read(from: pasteboard, uti: kUTTypeRTFD, documentType: DocumentType.rtfd) {
+            return  rtfdString
+        }
+
+        return nil
+    }
+    
+    private func readText(from pasteboard: UIPasteboard) -> String? {
+        return pasteboard.string
     }
 
     func saveToDisk(image: UIImage) -> URL? {
@@ -216,7 +231,7 @@ class RCTAztecView: Aztec.TextView {
         return fileURL
     }
 
-    private func images(from pasteboard: UIPasteboard) -> [String] {
+    private func readImages(from pasteboard: UIPasteboard) -> [String] {
         guard let images = pasteboard.images else {
             return []
         }
@@ -229,9 +244,9 @@ class RCTAztecView: Aztec.TextView {
         let end = selectedRange.location + selectedRange.length
         
         let pasteboard = UIPasteboard.general
-        let text = self.text(from: pasteboard) ?? ""
-        let html = self.html(from: pasteboard) ?? ""
-        let imagesURLs = self.images(from: pasteboard)
+        let text = readText(from: pasteboard) ?? ""
+        let html = readHTML(from: pasteboard) ?? ""
+        let imagesURLs = readImages(from: pasteboard)
 
         onPaste?([
             "currentContent": cleanHTML(),
@@ -315,6 +330,11 @@ class RCTAztecView: Aztec.TextView {
     }
 
     // MARK: - Native-to-RN Value Packing Logic
+
+    private func cleanHTML() -> String {
+        let html = getHTML(prettify: false)
+        return html
+    }
     
     func packForRN(_ text: String, withName name: String) -> [AnyHashable: Any] {
         return [name: text,
