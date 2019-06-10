@@ -18,7 +18,7 @@ const {
 
 const args = getCliArgs();
 
-const defaultFilesArgs = ! hasFileInCliArgs ? [ '**/*.{css,scss}' ] : [];
+const defaultFilesArgs = hasFileInCliArgs() ? [] : [ '**/*.{css,scss}' ];
 
 // See: https://github.com/stylelint/stylelint/blob/master/docs/user-guide/configuration.md#loading-the-configuration-object.
 const hasLintConfig = hasCliArg( '--config' ) ||

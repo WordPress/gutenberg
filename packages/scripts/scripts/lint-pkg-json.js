@@ -18,7 +18,7 @@ const {
 
 const args = getCliArgs();
 
-const defaultFilesArgs = ! hasFileInCliArgs ? [ '.' ] : [];
+const defaultFilesArgs = hasFileInCliArgs() ? [] : [ '.' ];
 
 // See: https://github.com/tclindner/npm-package-json-lint/wiki/configuration#configuration.
 const hasLintConfig = hasCliArg( '-c' ) ||
