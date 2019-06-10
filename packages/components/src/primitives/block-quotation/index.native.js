@@ -16,6 +16,9 @@ export const BlockQuotation = ( props ) => {
 		if ( child && child.props.identifier === 'citation' ) {
 			return cloneElement( child, { style: styles.wpBlockQuoteCitation } );
 		}
+		if ( child && child.props.identifier === 'value' ) {
+			return cloneElement( child, { rootTagsToEliminate: [ 'div' ] } );
+		}
 		return child;
 	} );
 	return (
