@@ -45,12 +45,6 @@ const deprecated = [
 	{
 		supports: blockSupports,
 		attributes: blockAttributes,
-		migrate( { align, ...attributes } ) {
-			return {
-				...attributes,
-				textAlign: align,
-			};
-		},
 		save( { attributes } ) {
 			const {
 				align,

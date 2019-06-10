@@ -13,10 +13,10 @@ import {
 
 export default function save( { attributes } ) {
 	const {
+		align,
 		content,
 		customTextColor,
 		level,
-		textAlign,
 		textColor,
 	} = attributes;
 	const tagName = 'h' + level;
@@ -25,7 +25,7 @@ export default function save( { attributes } ) {
 
 	const className = classnames( {
 		[ textClass ]: textClass,
-		[ `has-text-align-${ textAlign }` ]: textAlign,
+		[ `has-text-align-${ align }` ]: align,
 	} );
 
 	return (

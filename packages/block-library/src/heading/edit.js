@@ -55,7 +55,7 @@ function HeadingEdit( {
 	textColor,
 	setTextColor,
 } ) {
-	const { content, level, placeholder, textAlign } = attributes;
+	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
 
 	return (
@@ -63,9 +63,9 @@ function HeadingEdit( {
 			<BlockControls>
 				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				<AlignmentToolbar
-					value={ textAlign }
+					value={ align }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
+						setAttributes( { align: nextAlign } );
 					} }
 				/>
 			</BlockControls>
@@ -99,7 +99,7 @@ function HeadingEdit( {
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
 				className={ classnames( className, {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
+					[ `has-text-align-${ align }` ]: align,
 					'has-text-color': textColor.color,
 					[ textColor.class ]: textColor.class,
 				} ) }
