@@ -57,6 +57,7 @@ class VideoEdit extends Component {
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onSelectPoster = this.onSelectPoster.bind( this );
 		this.onRemovePoster = this.onRemovePoster.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 	}
 
 	componentDidMount() {
@@ -126,6 +127,12 @@ class VideoEdit extends Component {
 		this.posterImageButton.current.focus();
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	getAutoplayHelp( checked ) {
 		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
 	}
@@ -146,7 +153,6 @@ class VideoEdit extends Component {
 			className,
 			instanceId,
 			isSelected,
-			noticeOperations,
 			noticeUI,
 			setAttributes,
 		} = this.props;
@@ -179,7 +185,7 @@ class VideoEdit extends Component {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ this.props.attributes }
 					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
+					onError={ this.onUploadError }
 				/>
 			);
 		}

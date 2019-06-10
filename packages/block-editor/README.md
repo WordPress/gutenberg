@@ -375,6 +375,18 @@ The default editor settings
 
 Undocumented declaration.
 
+<a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
+
+Block editor data store configuration.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore>
+
+_Type_
+
+-   `Object` 
+
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 
 _Related_

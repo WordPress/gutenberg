@@ -54,6 +54,7 @@ class GalleryEdit extends Component {
 		this.onMoveForward = this.onMoveForward.bind( this );
 		this.onMoveBackward = this.onMoveBackward.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 
@@ -133,6 +134,12 @@ class GalleryEdit extends Component {
 		} );
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	setLinkTo( value ) {
 		this.setAttributes( { linkTo: value } );
 	}
@@ -178,7 +185,7 @@ class GalleryEdit extends Component {
 	}
 
 	render() {
-		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
+		const { attributes, isSelected, className, noticeUI } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
 		const hasImages = !! images.length;
@@ -223,7 +230,7 @@ class GalleryEdit extends Component {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple
 				value={ hasImages ? images : undefined }
-				onError={ noticeOperations.createErrorNotice }
+				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 			/>
 		);
