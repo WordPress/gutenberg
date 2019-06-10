@@ -92,6 +92,13 @@ export function blockStyles( state = {}, action ) {
 					( style ) => action.styleNames.indexOf( style.name ) === -1,
 				),
 			};
+		case 'SET_DEFAULT_BLOCK_STYLE':
+			return {
+				...state,
+				[ action.blockName ]: get( state, action.blockName ).map(
+					( style ) => ( { ...style, isDefault: style.name === action.styleName } )
+				),
+			};
 	}
 
 	return state;

@@ -64,6 +64,22 @@ export function removeBlockStyles( blockName, styleNames ) {
 }
 
 /**
+ * Return an action object used to set the default block style.
+ *
+ * @param {string} blockName Block name.
+ * @param {string} styleName Block style name to be used as default.
+ *
+ * @return {Object} Action object.
+ */
+export function setDefaultBlockStyle( blockName, styleName ) {
+	return {
+		type: 'SET_DEFAULT_BLOCK_STYLE',
+		blockName,
+		styleName,
+	};
+}
+
+/**
  * Returns an action object used to set the default block name.
  *
  * @param {string} name Block name.

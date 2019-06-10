@@ -133,6 +133,28 @@ describe( 'blockStyles', () => {
 			],
 		} );
 	} );
+
+	it( 'should set default styles', () => {
+		const original = { 'core/list': [
+			{ name: 'default', label: 'Default', isDefault: true },
+			{ name: 'none', label: 'None', isDefault: false },
+			{ name: 'checkbox', label: 'Checkbox' },
+		] };
+
+		const newState = blockStyles( original, {
+			type: 'SET_DEFAULT_BLOCK_STYLE',
+			blockName: 'core/list',
+			styleName: 'none',
+		} );
+
+		expect( newState ).toEqual( {
+			'core/list': [
+				{ name: 'default', label: 'Default', isDefault: false },
+				{ name: 'none', label: 'None', isDefault: true },
+				{ name: 'checkbox', label: 'Checkbox', isDefault: false },
+			],
+		} );
+	} );
 } );
 
 describe( 'defaultBlockName', () => {
