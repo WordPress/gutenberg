@@ -41,7 +41,7 @@ const defaultIgnoreArgs = ! hasIgnoredFiles ?
 
 const result = spawn(
 	resolveBin( 'npm-package-json-lint', { executable: 'npmPkgJsonLint' } ),
-	[ ...defaultConfigArgs, ...defaultIgnoreArgs, ...args, defaultFilesArgs ],
+	[ ...defaultConfigArgs, ...defaultIgnoreArgs, ...args, ...defaultFilesArgs ],
 	{ stdio: 'inherit' }
 );
 
