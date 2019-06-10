@@ -7,8 +7,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.views.textinput.ReactTextInputShadowNode;
 
 public class ReactAztecTextShadowNode extends ReactTextInputShadowNode {
-    private @Nullable
-    ReadableMap mTextMap = null;
+    private @Nullable ReadableMap mTextMap = null;
     private @Nullable Integer mColor = null;
 
     @ReactProp(name = PROP_TEXT)
