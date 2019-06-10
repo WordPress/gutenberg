@@ -819,7 +819,7 @@ export class RichText extends Component {
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }
 					placeholder={ this.props.placeholder }
-					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].placeholderColor }
+					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text-placeholder' ].color }
 					deleteEnter={ this.props.deleteEnter }
 					onChange={ this.onChange }
 					onFocus={ this.onFocus }
