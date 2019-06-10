@@ -17,7 +17,7 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { mediaUpload } from '@wordpress/editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -128,37 +128,27 @@ class AudioEdit extends Component {
 			this.setState( { src: media.url, isEditing: false } );
 		};
 
-		if ( isEditing ) {
-			return (
-				<Fragment>
-					<BlockControls>
-						{ !! src &&
-							<AudioToolbar isEditing={ isEditing } onClick={ toggleIsEditing } />
-						}
-					</BlockControls>
-					<MediaPlaceholder
-						icon={ <BlockIcon icon={ icon } /> }
-						className={ className }
-						onCancel={ !! src && toggleIsEditing }
-						onSelect={ onSelectAudio }
-						onSelectURL={ this.onSelectURL }
-						accept="audio/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ this.props.attributes }
-						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
-					/>
-				</Fragment>
-			);
-		}
-
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<>
 				<BlockControls>
+					{ !! src &&
 					<AudioToolbar isEditing={ isEditing } onClick={ toggleIsEditing } />
+					}
 				</BlockControls>
-				<InspectorControls>
+				{ isEditing && <MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					className={ className }
+					onCancel={ !! src && toggleIsEditing }
+					onSelect={ onSelectAudio }
+					onSelectURL={ this.onSelectURL }
+					accept="audio/*"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ this.props.attributes }
+					notices={ noticeUI }
+					onError={ noticeOperations.createErrorNotice }
+				/> }
+				{ ! isEditing && <InspectorControls>
 					<PanelBody title={ __( 'Audio Settings' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
@@ -183,8 +173,8 @@ class AudioEdit extends Component {
 							] }
 						/>
 					</PanelBody>
-				</InspectorControls>
-				<figure className={ className }>
+				</InspectorControls> }
+				{ ! isEditing && <figure className={ className }>
 					{ /*
 						Disable the audio tag so the user clicking on it won't play the
 						file or change the position slider when the controls are enabled.
@@ -201,7 +191,7 @@ class AudioEdit extends Component {
 							inlineToolbar
 						/>
 					) }
-				</figure>
+				</figure> }
 			</>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
