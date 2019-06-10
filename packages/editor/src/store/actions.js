@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, pick, mapValues, has } from 'lodash';
+import { castArray, pick, mapValues, has, forEach, find } from 'lodash';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
@@ -12,6 +12,7 @@ import { dispatch, select, apiFetch } from '@wordpress/data-controls';
 import {
 	parse,
 	synchronizeBlocksWithTemplate,
+	getBlockType,
 } from '@wordpress/blocks';
 
 /**
@@ -32,6 +33,35 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import metaSource from '../sources/meta';
+
+/**
+ * Function used to travers a list of block, calling a mapping function on each block
+ * The list is only updated if at least one block is updated.
+ *
+ * @param {Array}    blocks   Block Array.
+ * @param {function} callback Mapping function.
+ *
+ * @return {Array} Updated Blocks.
+ */
+function mapBlocks( blocks, callback ) {
+	let hasUpdatedBlock = false;
+	const updatedBlocks = blocks.map( ( block ) => {
+		const updatedBlock = callback( block );
+		const updatedInnerBlocks = mapBlocks( block.innerBlocks, callback );
+
+		if ( updatedBlock !== block || updatedInnerBlocks !== block.innerBlocks ) {
+			hasUpdatedBlock = true;
+		}
+
+		return {
+			...updatedBlock,
+			innerBlocks: updatedInnerBlocks,
+		};
+	} );
+
+	return hasUpdatedBlock ? updatedBlocks : blocks;
+}
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -59,7 +89,11 @@ export function* setupEditor( post, edits, template ) {
 		content = post.content.raw;
 	}
 
+	// Parse content blocks
 	let blocks = parse( content );
+
+	// Augment with post attributes
+	blocks = mapBlocks( blocks, ( block ) => metaSource.synchronize( block, post.meta ) );
 
 	// Apply a template for new posts only, if exists.
 	const isNewPost = post.status === 'auto-draft';
@@ -727,15 +761,45 @@ export function unlockPostSaving( lockName ) {
  *
  * @param {Array}   blocks  Block Array.
  * @param {?Object} options Optional options.
- *
- * @return {Object} Action object
  */
-export function resetEditorBlocks( blocks, options = {} ) {
-	return {
+export function* resetEditorBlocks( blocks, options = {} ) {
+	// Handle meta sources
+	let hasMetaChanges = false;
+	let updatedBlocks = blocks;
+	const postEdits = {
+		meta: {},
+	};
+	if ( options.__unstableLastChanges ) {
+		const meta = yield select( 'core/editor', 'getEditedPostAttribute', 'meta' );
+		forEach( options.__unstableLastChanges, ( newAttributes, clientId ) => {
+			const changedBlock = find( blocks, ( current ) => current.clientId === clientId );
+			if ( changedBlock ) {
+				const blockType = getBlockType( changedBlock.name );
+				forEach( newAttributes, ( newValue, key ) => {
+					const attributeConfig = blockType.attributes[ key ];
+					if ( attributeConfig.source === 'meta' && newValue !== meta[ attributeConfig.meta ] ) {
+						postEdits.meta[ attributeConfig.meta ] = newValue;
+						hasMetaChanges = true;
+					}
+				} );
+			}
+		} );
+
+		// Update all the references to this metaValue
+		if ( hasMetaChanges ) {
+			updatedBlocks = mapBlocks( blocks, ( block ) => metaSource.synchronize( block, postEdits.meta ) );
+		}
+	}
+
+	yield {
 		type: 'RESET_EDITOR_BLOCKS',
-		blocks,
+		blocks: updatedBlocks,
 		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
 	};
+
+	if ( hasMetaChanges ) {
+		yield editPost( postEdits );
+	}
 }
 
 /*
