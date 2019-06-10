@@ -37,6 +37,7 @@ import com.facebook.react.views.textinput.ReactTextInputEvent;
 import com.facebook.react.views.textinput.ReactTextInputManager;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
+import org.wordpress.aztec.formatting.LinkFormatter;
 import org.wordpress.aztec.glideloader.GlideImageLoader;
 import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
 import org.wordpress.aztec.plugins.CssUnderlinePlugin;
@@ -94,6 +95,10 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         aztecText.setFocusableInTouchMode(false);
         aztecText.setFocusable(false);
         aztecText.setCalypsoMode(false);
+        aztecText.setLinkFormatter(new LinkFormatter(aztecText,
+                new LinkFormatter.LinkStyle(
+                        Color.parseColor("#016087"), true)
+        ));
         return aztecText;
     }
 
