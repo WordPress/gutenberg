@@ -819,7 +819,7 @@ export class RichText extends Component {
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }
 					placeholder={ this.props.placeholder }
-					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].textDecorationColor }
+					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text-placeholder' ].color }
 					deleteEnter={ this.props.deleteEnter }
 					onChange={ this.onChange }
 					onFocus={ this.onFocus }
@@ -832,7 +832,8 @@ export class RichText extends Component {
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
-					color={ 'black' }
+					color={ styles[ 'block-editor-rich-text' ].color }
+					linkTextColor={ styles[ 'block-editor-rich-text' ].textDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || styles[ 'block-editor-rich-text' ].fontFamily }
 					fontSize={ this.props.fontSize || ( style && style.fontSize ) }
