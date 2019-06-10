@@ -83,7 +83,7 @@ const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } 
 	return (
 		<animated.div
 			ref={ ref }
-			className={ classnames( 'animated-container', {
+			className={ classnames( 'editor-block-list__block-animated-container', {
 				'is-in-selection': isBlockInSelection,
 			} ) }
 			data-client-id={ props.clientId }
