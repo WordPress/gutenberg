@@ -177,35 +177,6 @@ class VideoEdit extends Component {
 			this.setState( { src: media.url, editing: false } );
 		};
 
-		if ( editing ) {
-			return (
-				<>
-					<BlockControls>
-						{ !! src && ( <Toolbar>
-							<IconButton
-								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.editing } ) }
-								aria-pressed={ this.state.editing }
-								label={ __( 'Edit video' ) }
-								onClick={ toggleIsEditing }
-								icon={ editImageIcon }
-							/>
-						</Toolbar> ) }
-					</BlockControls>
-					<MediaPlaceholder
-						icon={ <BlockIcon icon={ icon } /> }
-						className={ className }
-						onSelect={ onSelectVideo }
-						onSelectURL={ this.onSelectURL }
-						onCancel={ !! src && toggleIsEditing }
-						accept="video/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ this.props.attributes }
-						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
-					/>
-				</>
-			);
-		}
 		const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -214,14 +185,27 @@ class VideoEdit extends Component {
 				<BlockControls>
 					<Toolbar>
 						<IconButton
-							className="components-icon-button components-toolbar__control"
+							className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': ( this.state.editing && !! src ) } ) }
+							aria-pressed={ ( this.state.editing && !! src ) }
 							label={ __( 'Edit video' ) }
 							onClick={ toggleIsEditing }
 							icon={ editImageIcon }
 						/>
 					</Toolbar>
 				</BlockControls>
-				<InspectorControls>
+				{ editing && <MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					className={ className }
+					onSelect={ onSelectVideo }
+					onSelectURL={ this.onSelectURL }
+					onCancel={ !! src && toggleIsEditing }
+					accept="video/*"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ this.props.attributes }
+					notices={ noticeUI }
+					onError={ noticeOperations.createErrorNotice }
+				/> }
+				{ ! editing && <InspectorControls>
 					<PanelBody title={ __( 'Video Settings' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
@@ -291,15 +275,15 @@ class VideoEdit extends Component {
 									}
 								</p>
 								{ !! this.props.attributes.poster &&
-									<Button onClick={ this.onRemovePoster } isLink isDestructive>
-										{ __( 'Remove Poster Image' ) }
-									</Button>
+								<Button onClick={ this.onRemovePoster } isLink isDestructive>
+									{ __( 'Remove Poster Image' ) }
+								</Button>
 								}
 							</BaseControl>
 						</MediaUploadCheck>
 					</PanelBody>
-				</InspectorControls>
-				<figure className={ className }>
+				</InspectorControls> }
+				{ ! editing && <figure className={ className }>
 					{ /*
 						Disable the video tag so the user clicking on it won't play the
 						video when the controls are enabled.
@@ -321,7 +305,7 @@ class VideoEdit extends Component {
 							inlineToolbar
 						/>
 					) }
-				</figure>
+				</figure> }
 			</>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
