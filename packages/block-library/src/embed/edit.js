@@ -130,48 +130,8 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			const { url, editingURL } = this.state;
 			const { fetching, setAttributes, isSelected, preview, cannotEmbed, themeSupportsResponsive, tryAgain } = this.props;
 
-			if ( fetching ) {
-				return (
-					<EmbedLoading />
-				);
-			}
-
 			// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
 			const label = sprintf( __( '%s URL' ), title );
-
-			// No preview, or we can't embed the current URL, or we've clicked the edit button.
-			if ( ! preview || cannotEmbed || editingURL ) {
-				return (
-					<>
-						<EmbedControls
-							showEditButton={ preview && ! cannotEmbed }
-							editingURL={ this.state.editingURL }
-							url={ this.state.url }
-							themeSupportsResponsive={ themeSupportsResponsive }
-							blockSupportsResponsive={ responsive }
-							allowResponsive={ allowResponsive }
-							getResponsiveHelp={ this.getResponsiveHelp }
-							toggleResponsive={ this.toggleResponsive }
-							switchBackToURLInput={ this.switchBackToURLInput }
-							hasEmbed={ this.props.preview }
-						/>
-						<EmbedPlaceholder
-							icon={ icon }
-							label={ label }
-							onSubmit={ this.setUrl }
-							value={ url }
-							cannotEmbed={ cannotEmbed }
-							onChange={ ( event ) => this.setState( { url: event.target.value } ) }
-							fallback={ () => fallback( url, this.props.onReplace ) }
-							tryAgain={ tryAgain }
-							switchBackToURLInput={ this.switchBackToURLInput }
-							editingURL={ this.state.editingURL }
-							url={ this.state.url }
-							hasEmbed={ this.props.preview }
-						/>
-					</>
-				);
-			}
 
 			// Even though we set attributes that get derived from the preview,
 			// we don't access them directly because for the initial render,
@@ -188,7 +148,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			return (
 				<>
 					<EmbedControls
-						showEditButton={ preview && ! cannotEmbed }
+						showEditButton={ ! cannotEmbed }
 						editingURL={ this.state.editingURL }
 						url={ this.state.url }
 						themeSupportsResponsive={ themeSupportsResponsive }
@@ -199,6 +159,25 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						switchBackToURLInput={ this.switchBackToURLInput }
 						hasEmbed={ this.props.preview }
 					/>
+					{ fetching && <EmbedLoading /> }
+					{ /*No preview, or we can't embed the current URL, or we've clicked the edit button.*/ }
+					{ ! fetching && ( ! preview || cannotEmbed || editingURL ) &&
+					<EmbedPlaceholder
+						icon={ icon }
+						label={ label }
+						onSubmit={ this.setUrl }
+						value={ url }
+						cannotEmbed={ cannotEmbed }
+						onChange={ ( event ) => this.setState( { url: event.target.value } ) }
+						fallback={ () => fallback( url, this.props.onReplace ) }
+						tryAgain={ tryAgain }
+						switchBackToURLInput={ this.switchBackToURLInput }
+						editingURL={ this.state.editingURL }
+						url={ this.state.url }
+						hasEmbed={ this.props.preview }
+					/>
+					}
+					{ ! fetching && preview && ! editingURL &&
 					<EmbedPreview
 						preview={ preview }
 						className={ className }
@@ -210,6 +189,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						icon={ icon }
 						label={ label }
 					/>
+					}
 				</>
 			);
 		}

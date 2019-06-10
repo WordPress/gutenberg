@@ -25,15 +25,15 @@ const EmbedControls = ( props ) => {
 	return (
 		<>
 			<BlockControls>
-				{ !! hasEmbed && ( <Toolbar>
+				<Toolbar>
 					<IconButton
-						className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': editingURL } ) }
+						className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': ( editingURL || ! hasEmbed ) } ) }
 						aria-pressed={ editingURL }
 						label={ __( 'Edit URL' ) }
 						icon={ editImageIcon }
 						onClick={ switchBackToURLInput }
 					/>
-				</Toolbar> ) }
+				</Toolbar>
 			</BlockControls>
 			{ themeSupportsResponsive && blockSupportsResponsive && (
 				<InspectorControls>
