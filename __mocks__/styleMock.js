@@ -23,6 +23,9 @@ module.exports = {
 		fontFamily: 'serif',
 		minHeight: 30,
 	},
+	'block-editor-rich-text-placeholder': {
+		color: '',
+	},
 	'block-editor-plain-text': {
 		fontFamily: 'serif',
 	},
