@@ -1740,7 +1740,6 @@ describe( 'state', () => {
 				initialPosition: null,
 				isMultiSelecting: false,
 				isEnabled: true,
-				previousSelection: original,
 			} );
 		} );
 
