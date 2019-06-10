@@ -91,8 +91,8 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     @Override
     protected ReactAztecText createViewInstance(ThemedReactContext reactContext) {
         ReactAztecText aztecText = new ReactAztecText(reactContext);
-        aztecText.setFocusableInTouchMode(true);
-        aztecText.setFocusable(true);
+        aztecText.setFocusableInTouchMode(false);
+        aztecText.setFocusable(false);
         aztecText.setCalypsoMode(false);
         return aztecText;
     }
@@ -400,17 +400,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
             // we need to restart the editor now
             String content = view.toHtml(view.getText(), false);
             view.fromHtml(content, false);
-        }
-    }
-
-    /*
-     * This property/method is used to tell the native AztecText to grab the focus when isSelected is true
-     *
-     */
-    @ReactProp(name = "isSelected", defaultBoolean = false)
-    public void isSelected(final ReactAztecText view, boolean selected) {
-        if (selected) {
-            view.requestFocus();
         }
     }
 
