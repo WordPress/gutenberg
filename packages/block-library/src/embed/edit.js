@@ -177,7 +177,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						hasEmbed={ this.props.preview }
 					/>
 					}
-					{ ! fetching && preview && ! editingURL &&
+					{ preview && ! cannotEmbed && ! fetching && ! editingURL &&
 					<EmbedPreview
 						preview={ preview }
 						className={ className }
