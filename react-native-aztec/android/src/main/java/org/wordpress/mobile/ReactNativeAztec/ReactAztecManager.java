@@ -95,6 +95,8 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         aztecText.setFocusableInTouchMode(false);
         aztecText.setFocusable(false);
         aztecText.setCalypsoMode(false);
+        // This is a temporary hack that sets the correct GB link color and underline
+        // see: https://github.com/wordpress-mobile/gutenberg-mobile/pull/1109
         aztecText.setLinkFormatter(new LinkFormatter(aztecText,
                 new LinkFormatter.LinkStyle(
                         Color.parseColor("#016087"), true)
