@@ -178,7 +178,7 @@ class RCTAztecView: Aztec.TextView {
     }
     
     // MARK: - Paste handling
-    private func read(from pasteboard: UIPasteboard, uti: String, documentType: DocumentType) -> String? {
+    private func read(from pasteboard: UIPasteboard, uti: CFString, documentType: DocumentType) -> String? {
         guard let data = pasteboard.data(forPasteboardType: uti as String),
             let attributedString = try? NSAttributedString(data: data, options: [.documentType: documentType], documentAttributes: nil),
             let storage = self.textStorage as? TextStorage else {
@@ -196,15 +196,15 @@ class RCTAztecView: Aztec.TextView {
             }
         }
 
-        if let flatRTFDString = read(from: pasteboard, uti: kUTTypeFlatRTFD as String, documentType: DocumentType.rtfd) {
+        if let flatRTFDString = read(from: pasteboard, uti: kUTTypeFlatRTFD, documentType: DocumentType.rtfd) {
             return  flatRTFDString
         }
 
-        if let rtfString = read(from: pasteboard, uti: kUTTypeRTF as String, documentType: DocumentType.rtf) {
+        if let rtfString = read(from: pasteboard, uti: kUTTypeRTF, documentType: DocumentType.rtf) {
             return  rtfString
         }
 
-        if let rtfdString = read(from: pasteboard, uti: kUTTypeRTFD as String, documentType: DocumentType.rtfd) {
+        if let rtfdString = read(from: pasteboard, uti: kUTTypeRTFD, documentType: DocumentType.rtfd) {
             return  rtfdString
         }
 
