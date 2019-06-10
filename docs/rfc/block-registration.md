@@ -81,18 +81,9 @@ To register a new block type, start by creating a `block.json` file. This file:
 		{ "name": "default", "label": "Default", "isDefault": true }, 
 		{ "name": "other", "label": "Other" }
 	],
-	"editorScript": "build/editor.asset.json",
-	"script": {
-		"handle": "my-plugin-notice",
-		"file": "index.js",
-		"dependencies": [ "wp-element", "wp-components" ],
-		"version": "3.0.0"
-	},
-	"editorStyle": {
-		"handle": "my-plugin-notice-editor",
-		"file": "editor.css",
-		"dependencies": [ "wp-edit-blocks" ]
-	},
+	"editorScript": "build/editor.js",
+	"script": "build/main.js",
+	"editorStyle": "build/editor.css",
 	"style": "build/style.css"
 }
 ```
@@ -257,8 +248,8 @@ See the [the attributes documentation](/docs/designers-developers/developers/blo
 * Type: `array`
 * Optional
 * Localized: Yes (`label`)
-* Property: `styleVariations`
-* Alias: `styles`
+* Property: `styles`
+* Alias: `styleVariations`
 
 ```json
 { 
@@ -275,7 +266,7 @@ Plugins and Themes can also register [custom block style](/docs/designers-develo
 
 ### Editor Script
 
-* Type: `string|object` ([WPDefinedAsset](#WPDefinedAsset))
+* Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
 * Optional
 * Localized: No
 * Property: `editorScript`
@@ -288,46 +279,33 @@ Block type editor script definition. It will only be enqueued in the context of 
 
 ### Script
 
-* Type: `string|object` ([WPDefinedAsset](#WPDefinedAsset))
+* Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
 * Optional
 * Localized: No
 * Property: `script`
 
 ```json
-{
-	"script": {
-		"handle": "my-plugin-notice",
-		"file": "index.js",
-		"dependencies": [ "wp-element", "wp-components" ],
-		"version": "3.0.0"
-	}
-}
+{ "script": "build/main.js" }
 ```
 
 Block type frontend script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
 
 ### Editor Style
 
-* Type: `string|object` ([WPDefinedAsset](#WPDefinedAsset))
+* Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
 * Optional
 * Localized: No
 * Property: `editorStyle`
 
 ```json
-{
-	"editorStyle": {
-		"handle": "my-plugin-notice-editor",
-		"file": "editor.css",
-		"dependencies": [ "wp-edit-blocks" ]
-	}
-}
+{ "editorStyle": "build/editor.css" }
 ```
 
 Block type editor style definition. It will only be enqueued in the context of the editor.
 
 ### Style
 
-* Type: `string|object` ([WPDefinedAsset](#WPDefinedAsset))
+* Type: `string` ([WPDefinedAsset](#WPDefinedAsset))
 * Optional
 * Localized: No
 * Property: `style`
@@ -370,7 +348,7 @@ In the case of [dynamic blocks](/docs/designers-developers/developers/tutorials/
 
 ### `WPDefinedAsset`
 
-The `WPDefinedAsset` type is either a subtype of string, where the value must represent an absolute or relative path to a JavaScript or CSS file, or an object.
+The `WPDefinedAsset` type is a subtype of string, where the value must represent an absolute or relative path to a JavaScript or CSS file.
 
 **Example:**
 
@@ -379,35 +357,18 @@ In `block.json`:
 { "editorScript": "build/editor.js" }
 ```
 
-In the context of WordPress, the `WPDefinedAsset` type has to mirror also the shape of params necessary to register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings. There are two ways you can use `WPDefinedAsset` with `block.json` metadata.
+#### WordPress context
 
-#### Object
+In the context of WordPress, when a block is registered with PHP, it will automatically register all scripts and styles that are found in the `block.json` file.
 
-An asset can be defined as an object which takes the following shape:
-- `handle` (`string`) - the name of the script.
-- `file` (`string`) - full URL of the script, or path of the script relative to the WordPress root directory.
-- `dependencies` (`string[]` - optional) - an array of registered script handles this script depends on.  Default value: `array()`.
-- `version` (`string`|`false`|`null` - optional) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
+That's why, the `WPDefinedAsset` type has to offer a way to mirror also the shape of params necessary to register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings.
 
-When a block is registered with PHP, it will automatically register all scripts and styles that are found in the `block.json` file.
+It's possible to provide an object which takes the following shape:
+- `handle` (`string`) - the name of the script. If omitted, it will be auto-generated.
+- `dependencies` (`string[]`) - an array of registered script handles this script depends on.  Default value: `array()`.
+- `version` (`string`|`false`|`null`) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
 
-**Example:**
-
-In `block.json`:
-```json
-{
-	"editorScript": {
-		"handle": "my-plugin-notice-editor",
-		"file": "build/editor.js",
-		"dependencies": [ "wp-blocks","wp-element", "wp-i18n" ],
-		"version": "3.0.0"
-	}
-}
-```
-
-#### File reference
-
-It's very similar to the `object` option. The only difference is that the definition is stored inside separate JSON file which ends with `.asset.json` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as we are going to provide a way to auto-generate those asset files with `@wordpress/scripts` package.
+The definition is stored inside separate JSON file which ends with `.asset.json` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as we are going to provide a way to auto-generate those asset files with `@wordpress/scripts` package.
 
 **Example:**
 
