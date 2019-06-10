@@ -2,12 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { dropRight } from 'lodash';
+import { dropRight, forEach, find, difference } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	PanelBody,
 	RangeControl,
@@ -18,7 +18,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -30,6 +30,9 @@ import {
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
+	getTotalColumnsWidth,
+	getColumnWidths,
+	getAdjacentBlocks,
 } from './utils';
 
 /**
@@ -44,16 +47,22 @@ import {
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
 export function ColumnsEdit( {
+	clientId,
 	attributes,
 	className,
 	updateAlignment,
 	updateColumns,
+	updateColumnWidth,
 } ) {
 	const { columns, verticalAlignment } = attributes;
 
 	const classes = classnames( className, `has-${ columns }-columns`, {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
+
+	const columnBlocks = useSelect( ( select ) => (
+		select( 'core/block-editor' ).getBlocks( clientId )
+	) );
 
 	return (
 		<>
@@ -66,6 +75,27 @@ export function ColumnsEdit( {
 						min={ 2 }
 						max={ 6 }
 					/>
+				</PanelBody>
+				<PanelBody title={ __( 'Column Settings' ) }>
+					{ columnBlocks.map( ( columnBlock, index ) => (
+						<fieldset
+							key={ columnBlock.clientId }
+							className="wp-block-columns__column-settings-column"
+						>
+							<legend>{ sprintf( __( 'Column %d' ), index + 1 ) }</legend>
+							<RangeControl
+								label={ __( 'Percentage width' ) }
+								value={ columnBlock.attributes.width || '' }
+								onChange={ ( nextWidth ) => {
+									updateColumnWidth( columnBlock.clientId, nextWidth );
+								} }
+								min={ 0 }
+								max={ 100 }
+								required
+								allowReset
+							/>
+						</fieldset>
+					) ) }
 				</PanelBody>
 			</InspectorControls>
 			<BlockControls>
@@ -113,10 +143,12 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 	 * Updates the column count, including necessary revisions to child Column
 	 * blocks to grant required or redistribute available space.
 	 *
-	 * @param {number} columns New column count.
+	 * @param {string} clientId Client ID of column block for which to update
+	 *                          width attribute.
+	 * @param {number} columns  New column count.
 	 */
-	updateColumns( columns ) {
-		const { clientId, setAttributes, attributes } = ownProps;
+	updateColumns( clientId, columns ) {
+		const { setAttributes, attributes } = ownProps;
 		const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
 		const { getBlocks } = registry.select( 'core/block-editor' );
 
@@ -158,5 +190,38 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 		}
 
 		replaceInnerBlocks( clientId, innerBlocks, false );
+	},
+
+	updateColumnWidth( clientId, width ) {
+		const { updateBlockAttributes } = dispatch( 'core/block-editor' );
+		const { getBlockRootClientId, getBlocks } = registry.select( 'core/block-editor' );
+
+		// Constrain or expand siblings to account for gain or loss of
+		// total columns area.
+		const columns = getBlocks( getBlockRootClientId( clientId ) );
+		const adjacentColumns = getAdjacentBlocks( columns, clientId );
+
+		// The occupied width is calculated as the sum of the new width
+		// and the total width of blocks _not_ in the adjacent set.
+		const occupiedWidth = width + getTotalColumnsWidth(
+			difference( columns, [
+				find( columns, { clientId } ),
+				...adjacentColumns,
+			] )
+		);
+
+		// Compute _all_ next column widths, in case the updated column
+		// is in the middle of a set of columns which don't yet have
+		// any explicit widths assigned (include updates to those not
+		// part of the adjacent blocks).
+		const nextColumnWidths = {
+			...getColumnWidths( columns, columns.length ),
+			[ clientId ]: toWidthPrecision( width ),
+			...getRedistributedColumnWidths( adjacentColumns, 100 - occupiedWidth, columns.length ),
+		};
+
+		forEach( nextColumnWidths, ( nextColumnWidth, columnClientId ) => {
+			updateBlockAttributes( columnClientId, { width: nextColumnWidth } );
+		} );
 	},
 } ) )( ColumnsEdit );

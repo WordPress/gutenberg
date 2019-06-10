@@ -174,3 +174,11 @@ div.block-core-columns.is-vertically-aligned-bottom {
 	left: 0;
 	right: 0;
 }
+
+.wp-block-columns__column-settings-column {
+	legend {
+		font-weight: bold;
+		padding: 0;
+		margin-bottom: $grid-size-small;
+	}
+}
