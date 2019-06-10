@@ -299,12 +299,23 @@ export class RichText extends Component {
 				result = this.removeRootTag( element, result );
 			} );
 		}
+
+		if ( this.props.tagsToEliminate ) {
+			this.props.tagsToEliminate.forEach( ( element ) => {
+				result = this.removeTag( element, result );
+			} );
+		}
 		return result;
 	}
 
 	removeRootTag( tag, html ) {
 		const openingTagRegexp = RegExp( '^<' + tag + '>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>$', 'gim' );
+		return html.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
+	}
+	removeTag( tag, html ) {
+		const openingTagRegexp = RegExp( '<' + tag + '>', 'gim' );
+		const closingTagRegexp = RegExp( '</' + tag + '>', 'gim' );
 		return html.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
 	}
 
