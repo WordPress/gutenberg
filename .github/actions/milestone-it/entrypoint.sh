@@ -29,7 +29,7 @@ minor=${parts[1]}
 
 # 3. Determine next milestone.
 
-if [ minor == '9' ]; then
+if [[ $minor == 9* ]]; then
 	major=$((major+1))
 	minor="0"
 else
