@@ -1,11 +1,11 @@
-exports.shortText = `Hello Gutenberg! My name is Appium`;
+exports.shortText = `Rock music approaches at high velocity.`;
 
-exports.mediumText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam luctus velit et nunc tristique, ut tincidunt ipsum placerat. Maecenas placerat nec elit sit amet vulputate.`;
+exports.mediumText = `The finer continuum interprets the polynomial rabbit. When can the geology cheat? An astronomer runs. Should a communist consent?`;
 
-exports.longText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam luctus velit et nunc tristique, ut tincidunt ipsum placerat. Maecenas placerat nec elit sit amet vulputate. 
-Nam suscipit dolor eu arcu efficitur, nec faucibus sapien ullamcorper. Etiam nibh risus, tincidunt quis purus a, dictum porta dui. Phasellus lacinia iaculis odio, et eleifend d
-Nullam suscipit volutpat velit eget varius. Etiam diam ex, finibus eu turpis a, semper tempus ante. Vestibulum quis elit et felis sagittis mollis.
-Nullam porta aliquam nisi, eu dapibus mauris dignissim at. Praesent ut congue sem. Nullam a rhoncus metus.`;
+exports.longText = `Beneath the busy continuum blinks the ineffective husband. Why can't a metric bow outside the official subway? How can the prompt crop exhaust his tree? The sample rolls! After an across gasp overflows the ethical attorney. A riot pilots an excess goldfish. 
+Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. Its extraordinary twin shifts behind the listener. An enlightened specimen stalls. The weapon apologizes?
+The finer continuum interprets the polynomial rabbit. When can the geology cheat? An astronomer runs. Should a communist consent?
+A parody guns the suffering pipeline. How does the sliced device amuse the tutorial? When will the beating companion dispose our average? The skull complains? An ink irons a paranoid into the earned juvenile.`;
 
 exports.listItem1 = `Milk`;
 exports.listItem2 = `Honey`;
@@ -21,9 +21,9 @@ exports.listEndedHtml = `<!-- wp:list -->
 <!-- /wp:paragraph -->`;
 
 exports.deviceRotationHtml = `<!-- wp:paragraph -->
-<p>Loren ipsum Dolores sit amet, consectetur adipiscing elite. Etiam luctus velit etc nunc tristique, UT tincidunt ipsum placerat. Maecenas placerat NEC elite sit amet vulputate.</p>
+<p>The finer continuum interprets the polynomial rabbit. When can the geology cheat? An astronomer runs. Should a communist consent?</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Loren ipsum Dolores sit amet, consectetur adipiscing elite. Etiam luctus velit etc nunc tristique, UT tincidunt ipsum placerat. Maecenas placerat NEC elite sit amet vulputate.</p>
+<p>The finer continuum interprets the polynomial rabbit. When can the geology cheat? An astronomer runs. Should a communist consent?</p>
 <!-- /wp:paragraph -->`;
