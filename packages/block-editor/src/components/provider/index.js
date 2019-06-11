@@ -11,6 +11,10 @@ import { compose } from '@wordpress/compose';
 import withRegistryProvider from './with-registry-provider';
 
 class BlockEditorProvider extends Component {
+	constructor() {
+		super( ...arguments );
+		this.lastPersistedBlocks = [];
+	}
 	componentDidMount() {
 		this.props.updateSettings( this.props.settings );
 		this.props.resetBlocks( this.props.value );
@@ -34,9 +38,15 @@ class BlockEditorProvider extends Component {
 			this.attachChangeObserver( registry );
 		}
 
-		if ( value !== prevProps.value && value !== this.lastBlocksValue ) {
+		if ( value !== prevProps.value && this.lastPersistedBlocks.indexOf( value ) === -1 ) {
 			this.isSyncingIncomingValue = true;
 			resetBlocks( value );
+			this.lastPersistedBlocks = [];
+		}
+
+		// Reset the last persisted values once the last change is performed
+		if ( value === this.lastPersistedBlocks[ 0 ] ) {
+			this.lastPersistedBlocks = [];
 		}
 	}
 
@@ -100,7 +110,7 @@ class BlockEditorProvider extends Component {
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
 				const lastChanges = getLastBlockAttributesChange();
-				this.lastBlocksValue = blocks;
+				this.lastPersistedBlocks.push( blocks );
 
 				if ( isPersistent ) {
 					onChange( blocks, lastChanges );
