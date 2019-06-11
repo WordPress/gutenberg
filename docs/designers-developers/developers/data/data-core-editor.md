@@ -1047,10 +1047,6 @@ _Parameters_
 
 -   _edits_ `Object`: Post attributes to edit.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="enablePublishSidebar" href="#enablePublishSidebar">#</a> **enablePublishSidebar**
 
 Returns an action object used in signalling that the user has enabled the
@@ -1210,10 +1206,6 @@ _Parameters_
 
 -   _blocks_ `Array`: Block Array.
 -   _options_ `?Object`: Optional options.
-
-_Returns_
-
--   `Object`: Action object
 
 <a name="resetPost" href="#resetPost">#</a> **resetPost**
 
