@@ -90,11 +90,13 @@ $blue-wordpress: #0087be;
 $blue-light: #78dcfa;
 $blue-medium: #00aadc;
 $blue-dark: #005082;
+$blue-500: #016087;
 
 // Grays
 $gray: #87a6bc;
 $gray-light: lighten( $gray, 33% ); //#f3f6f8
 $gray-dark: darken( $gray, 38% ); //#2e4453
+$gray-900: #1A1A1A;
 
 // $gray-text: ideal for standard, non placeholder text
 // $gray-text-min: minimum contrast needed for WCAG 2.0 AA on white background
