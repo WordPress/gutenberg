@@ -1,9 +1,11 @@
-exports.shortText = `Hello Gutenberg! My name is Appium`;
+exports.shortText = `Rock music approaches at high velocity.`;
 
-exports.longText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam luctus velit et nunc tristique, ut tincidunt ipsum placerat. Maecenas placerat nec elit sit amet vulputate. 
-Nam suscipit dolor eu arcu efficitur, nec faucibus sapien ullamcorper. Etiam nibh risus, tincidunt quis purus a, dictum porta dui. Phasellus lacinia iaculis odio, et eleifend d
-Nullam suscipit volutpat velit eget varius. Etiam diam ex, finibus eu turpis a, semper tempus ante. Vestibulum quis elit et felis sagittis mollis.
-Nullam porta aliquam nisi, eu dapibus mauris dignissim at. Praesent ut congue sem. Nullam a rhoncus metus.`;
+exports.mediumText = `The finer continuum interprets the polynomial rabbit. When can the geology cheat? An astronomer runs. Should a communist consent?`;
+
+exports.longText = `Beneath the busy continuum blinks the ineffective husband. Why a metric bow outside the official subway? How can the prompt crop exhaust his tree? The sample rolls! After an across gasp overflows the ethical attorney. A riot pilots an excess goldfish. 
+Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. Its extraordinary twin shifts behind the listener. An enlightened specimen stalls. The weapon apologizes?
+The finer continuum interprets the polynomial rabbit. When can the geology cheat? An astronomer runs. Should a communist consent?
+A parody guns the suffering pipeline. How does the sliced device amuse the tutorial? When will the beating companion dispose our average? The skull complains? An ink irons a paranoid into the earned juvenile.`;
 
 exports.listItem1 = `Milk`;
 exports.listItem2 = `Honey`;
@@ -18,6 +20,14 @@ exports.listEndedHtml = `<!-- wp:list -->
 <p></p>
 <!-- /wp:paragraph -->`;
 
+exports.deviceRotationHtml = `<!-- wp:paragraph -->
+<p>The finer continuum interprets the polynomial rabbit. When can the geology cheat? An astronomer runs. Should a communist consent?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The finer continuum interprets the polynomial rabbit. When can the geology cheat? An astronomer runs. Should a communist consent?</p>
+<!-- /wp:paragraph -->`;
+
 exports.imageCaption = `C'est la vie my friends`;
 
 exports.imageCompletehtml = `<!-- wp:image {"id":1} -->
@@ -25,17 +35,17 @@ exports.imageCompletehtml = `<!-- wp:image {"id":1} -->
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam luctus velit et nunc tristique, ut tincidunt ipsum placerat. Maecenas placerat nec elit sit amet vulputate. </p>
+<p>Beneath the busy continuum blinks the ineffective husband. Why a metric bow outside the official subway? How can the prompt crop exhaust his tree? The sample rolls! After an across gasp overflows the ethical attorney. A riot pilots an excess goldfish. </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Nam suscipit dolor eu arcu efficitur, nec faucibus sapien ullamcorper. Etiam nibh risus, tincidunt quis purus a, dictum porta dui. Phasellus lacinia iaculis odio, et eleifend d</p>
+<p>Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. Its extraordinary twin shifts behind the listener. An enlightened specimen stalls. The weapon apologizes?</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Nullam suscipit volutpat velit eget varius. Etiam diam ex, finibus eu turpis a, semper tempus ante. Vestibulum quis elit et felis sagittis mollis.</p>
+<p>The finer continuum interprets the polynomial rabbit. When can the geology cheat? An astronomer runs. Should a communist consent?</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Nullam porta aliquam nisi, eu dapibus mauris dignissim at. Praesent ut congue sem. Nullam a rhoncus metus.</p>
+<p>A parody guns the suffering pipeline. How does the sliced device amuse the tutorial? When will the beating companion dispose our average? The skull complains? An ink irons a paranoid into the earned juvenile.</p>
 <!-- /wp:paragraph -->`;
