@@ -676,8 +676,8 @@ export class RichText extends Component {
 	forceSelectionUpdate( start, end ) {
 		if ( ! this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = true;
-			this.selectionStart = start;
-			this.selectionEnd = end;
+			this.selectionStart = isNaN( start ) ? 0 : start;
+			this.selectionEnd = isNaN( end ) ? 0 : end;
 			this.forceUpdate();
 		}
 	}
@@ -797,7 +797,10 @@ export class RichText extends Component {
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = false;
-			selection = { start: this.props.selectionStart, end: this.props.selectionEnd };
+			selection = { 
+				start: isNaN( this.props.selectionStart ) ? 0 : this.props.selectionStart,
+				end: isNaN( this.props.selectionEnd ) ? 0 : this.props.selectionEnd
+			};
 
 			// On AztecAndroid, setting the caret to an out-of-bounds position will crash the editor so, let's check for some cases.
 			if ( ! this.isIOS ) {
