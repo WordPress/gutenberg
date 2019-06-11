@@ -52,7 +52,7 @@ describe( 'MediaUpload component', () => {
 				);
 			} } />
 		);
-		expect( wrapper.find( 'Picker' ).length ).toEqual( 1 );
+		expect( wrapper.find( 'Picker' ) ).toHaveLength( 1 );
 	} );
 
 	it( 'shows right media capture option for media type', () => {
@@ -68,7 +68,7 @@ describe( 'MediaUpload component', () => {
 						);
 					} } />
 			);
-			expect( wrapper.find( 'Picker' ).props().options.filter( ( item ) => item.label === expectedOption ).length ).toEqual( 1 );
+			expect( wrapper.find( 'Picker' ).props().options.filter( ( item ) => item.label === expectedOption ) ).toHaveLength( 1 );
 		};
 		expectOptionForMediaType( MEDIA_TYPE_IMAGE, OPTION_TAKE_PHOTO );
 		expectOptionForMediaType( MEDIA_TYPE_VIDEO, OPTION_TAKE_VIDEO );

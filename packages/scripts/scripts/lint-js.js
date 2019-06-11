@@ -18,7 +18,7 @@ const {
 
 const args = getCliArgs();
 
-const defaultFilesArgs = ! hasFileInCliArgs ? [ '.' ] : [];
+const defaultFilesArgs = hasFileInCliArgs() ? [] : [ '.' ];
 
 // See: https://eslint.org/docs/user-guide/configuring#using-configuration-files-1.
 const hasLintConfig = hasCliArg( '-c' ) ||
