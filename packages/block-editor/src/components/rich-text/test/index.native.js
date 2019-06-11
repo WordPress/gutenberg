@@ -32,11 +32,11 @@ describe( 'RichText Native', () => {
 
 	describe( 'Adds new line on Enter', () => {
 		let newValue;
-		const wrapper = shallow( <RichText 
+		const wrapper = shallow( <RichText
 			rootTagsToEliminate={ [ 'p' ] }
-			value={ "" }
+			value=""
 			onChange={ ( value ) => {
-				newValue = value
+				newValue = value;
 			} }
 			formatTypes={ [] }
 			onSelectionChange={ jest.fn() }
@@ -45,12 +45,12 @@ describe( 'RichText Native', () => {
 		const event = {
 			nativeEvent: {
 				eventCount: 0,
-			}
+			},
 		};
-		wrapper.instance().onEnter(event);
+		wrapper.instance().onEnter( event );
 
 		it( ' Adds <br> tag to content after pressing Enter key', () => {
-			expect( newValue ).toEqual( "<br>" );
-		});
+			expect( newValue ).toEqual( '<br>' );
+		} );
 	} );
 } );
