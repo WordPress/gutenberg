@@ -2,11 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { filter, map } from 'lodash';
+import { every, filter, forEach, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { compose } from '@wordpress/compose';
 import {
 	IconButton,
 	PanelBody,
@@ -25,6 +26,8 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -174,6 +177,20 @@ class GalleryEdit extends Component {
 		} );
 	}
 
+	componentDidMount() {
+		const { attributes, mediaUpload } = this.props;
+		const { images } = attributes;
+		if ( every( images, ( { url } ) => isBlobURL( url ) ) ) {
+			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
+			forEach( images, ( { url } ) => revokeBlobURL( url ) );
+			mediaUpload( {
+				filesList,
+				onFileChange: this.onSelectImages,
+				allowedTypes: [ 'image' ],
+			} );
+		}
+	}
+
 	componentDidUpdate( prevProps ) {
 		// Deselect images when deselecting the block
 		if ( ! this.props.isSelected && prevProps.isSelected ) {
@@ -312,5 +329,16 @@ class GalleryEdit extends Component {
 		);
 	}
 }
+export default compose( [
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		const {
+			__experimentalMediaUpload,
+		} = getSettings();
 
-export default withNotices( GalleryEdit );
+		return {
+			mediaUpload: __experimentalMediaUpload,
+		};
+	} ),
+	withNotices,
+] )( GalleryEdit );

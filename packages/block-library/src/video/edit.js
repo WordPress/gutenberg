@@ -22,7 +22,6 @@ import {
 	MediaUploadCheck,
 	RichText,
 } from '@wordpress/block-editor';
-import { mediaUpload } from '@wordpress/editor';
 import { Component, createRef } from '@wordpress/element';
 import {
 	__,
@@ -32,6 +31,9 @@ import {
 	compose,
 	withInstanceId,
 } from '@wordpress/compose';
+import {
+	withSelect,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -61,7 +63,12 @@ class VideoEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, noticeOperations, setAttributes } = this.props;
+		const {
+			attributes,
+			mediaUpload,
+			noticeOperations,
+			setAttributes,
+		} = this.props;
 		const { id, src = '' } = attributes;
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
@@ -312,6 +319,13 @@ class VideoEdit extends Component {
 }
 
 export default compose( [
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		const { __experimentalMediaUpload } = getSettings();
+		return {
+			mediaUpload: __experimentalMediaUpload,
+		};
+	} ),
 	withNotices,
 	withInstanceId,
 ] )( VideoEdit );
