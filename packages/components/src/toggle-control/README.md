@@ -53,7 +53,7 @@ If no value is passed the toggle will be unchecked.
 A function that receives the checked state (boolean) as input.
 
 - Type: `function`
-- Required: Yes
+- Required: No
 
 ### className
 
