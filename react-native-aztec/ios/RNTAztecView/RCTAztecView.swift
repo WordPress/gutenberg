@@ -212,7 +212,10 @@ class RCTAztecView: Aztec.TextView {
     }
     
     private func readText(from pasteboard: UIPasteboard) -> String? {
-        return pasteboard.string
+        var text = pasteboard.string
+        // Text that comes from Aztec will have paragraphSeparator instead of line feed AKA as \n. The paste methods in GB are expecting \n so this line will fix that.
+        text = text?.replacingOccurrences(of: String(.paragraphSeparator), with: String(.lineFeed))
+        return text
     }
 
     func saveToDisk(image: UIImage) -> URL? {
@@ -332,7 +335,7 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Native-to-RN Value Packing Logic
 
     private func cleanHTML() -> String {
-        let html = getHTML(prettify: false)
+        let html = getHTML(prettify: false).replacingOccurrences(of: String(.paragraphSeparator), with: String(.lineFeed))
         return html
     }
     
