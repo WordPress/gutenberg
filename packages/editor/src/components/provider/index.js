@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, pick, defaultTo, get } from 'lodash';
+import { map, pick, defaultTo } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -71,7 +71,7 @@ class EditorProvider extends Component {
 		}
 	}
 
-	getBlockEditorSettings( settings, reusableBlocks, hasUploadPermissions, getEditedPostAttribute ) {
+	getBlockEditorSettings( settings, reusableBlocks, hasUploadPermissions ) {
 		return {
 			...pick( settings, [
 				'alignWide',
@@ -94,14 +94,6 @@ class EditorProvider extends Component {
 				'templateLock',
 				'titlePlaceholder',
 			] ),
-			__experimentalSources: [
-				{
-					sourceName: 'meta',
-					getDefaultValue( attributeConfig ) {
-						return get( getEditedPostAttribute( 'meta' ), [ attributeConfig.meta ] );
-					},
-				},
-			],
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
@@ -138,7 +130,6 @@ class EditorProvider extends Component {
 			blocks,
 			isReady,
 			settings,
-			getEditedPostAttribute,
 			hasUploadPermissions,
 			onInput,
 			onChange,
@@ -150,7 +141,7 @@ class EditorProvider extends Component {
 		}
 
 		const editorSettings = this.getBlockEditorSettings(
-			settings, reusableBlocks, hasUploadPermissions, getEditedPostAttribute
+			settings, reusableBlocks, hasUploadPermissions
 		);
 
 		return (
@@ -174,7 +165,6 @@ export default compose( [
 		const {
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
-			getEditedPostAttribute,
 			__experimentalGetReusableBlocks,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
@@ -184,7 +174,6 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			reusableBlocks: __experimentalGetReusableBlocks(),
 			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
-			meta: getEditedPostAttribute( 'meta' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -192,7 +181,6 @@ export default compose( [
 			setupEditor,
 			updatePostLock,
 			resetEditorBlocks,
-			editPost,
 			updateEditorSettings,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
@@ -212,9 +200,6 @@ export default compose( [
 					__unstableShouldCreateUndoLevel: false,
 					__unstableLastChanges: lastChanges,
 				} );
-			},
-			onMetaChange( meta ) {
-				editPost( { meta } );
 			},
 		};
 	} ),
