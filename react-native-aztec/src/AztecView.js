@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager, ColorPropType, TouchableWithoutFeedback, Platform} from 'react-native';
+import ReactNative, {requireNativeComponent, TextViewPropTypes, UIManager, ColorPropType, TouchableWithoutFeedback, Platform} from 'react-native';
 import TextInputState from 'react-native/lib/TextInputState';
 
 const AztecManager = UIManager.getViewManagerConfig('RCTAztecView');
@@ -17,6 +17,7 @@ class AztecView extends React.Component {
     placeholder: PropTypes.string,
     placeholderTextColor: ColorPropType,
     color: ColorPropType,
+    linkTextColor: ColorPropType,
     maxImagesWidth: PropTypes.number,
     minImagesWidth: PropTypes.number,
     onChange: PropTypes.func,
@@ -30,7 +31,7 @@ class AztecView extends React.Component {
     onHTMLContentWithCursor: PropTypes.func,
     onCaretVerticalPositionChange: PropTypes.func,
 	blockType: PropTypes.object,	
-    ...ViewPropTypes, // include the default view properties
+    ...TextViewPropTypes, // include the default view properties
   }
 
   dispatch(command, params) {
@@ -56,6 +57,10 @@ class AztecView extends React.Component {
   }
 
   _onEnter = (event) => {
+    if (!this.isFocused()) {
+      return;
+    }
+
     if (!this.props.onEnter) {
       return;
     }

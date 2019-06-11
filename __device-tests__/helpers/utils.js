@@ -9,6 +9,7 @@
 import childProcess from 'child_process';
 import wd from 'wd';
 import crypto from 'crypto';
+import path from 'path';
 
 /**
  * Internal dependencies
@@ -72,7 +73,7 @@ const setupDriver = async () => {
 	if ( isAndroid() ) {
 		desiredCaps = _.clone( android8 );
 		if ( isLocalEnvironment() ) {
-			desiredCaps.app = localAndroidAppPath;
+			desiredCaps.app = path.resolve( localAndroidAppPath );
 			try {
 				const androidVersion = childProcess
 					.execSync( 'adb shell getprop ro.build.version.release' )
@@ -92,7 +93,7 @@ const setupDriver = async () => {
 	} else {
 		desiredCaps = _.clone( ios12 );
 		if ( isLocalEnvironment() ) {
-			desiredCaps.app = localIOSAppPath;
+			desiredCaps.app = path.resolve( localIOSAppPath );
 		} else {
 			desiredCaps.app = 'sauce-storage:Gutenberg.app.zip'; // App should be preloaded to sauce storage, this can also be a URL
 		}
@@ -113,6 +114,8 @@ const setupDriver = async () => {
 
 	await driver.setImplicitWaitTimeout( 2000 );
 	await timer( 3000 );
+
+	await driver.setOrientation( 'PORTRAIT' );
 	return driver;
 };
 
@@ -137,9 +140,6 @@ const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
 	}
 };
 
-// attempts to type a string to a given element, need for this stems from
-// https://github.com/appium/appium/issues/12285#issuecomment-471872239
-// https://github.com/facebook/WebDriverAgent/issues/1084
 const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean = false ) => {
 	if ( clear ) {
 		await element.clear();
@@ -209,7 +209,7 @@ const swipeUp = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseCha
 	await action.perform();
 };
 
-const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver ) => {
+const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver, toggleOn: boolean ) => {
 	if ( isAndroid() ) {
 		// Hit the "Menu" key
 		await driver.pressKeycode( 82 );
@@ -223,7 +223,24 @@ const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver ) => {
 		// hit Enter
 		await driver.pressKeycode( 66 );
 	} else {
-		// TODO: toggle html mode in iOS
+		const menuButton = await driver.elementByAccessibilityId( '...' );
+		await menuButton.click();
+		let toggleHtmlButton;
+		if ( toggleOn ) {
+			toggleHtmlButton = await driver.elementByAccessibilityId( 'Switch to HTML' );
+		} else {
+			toggleHtmlButton = await driver.elementByAccessibilityId( 'Switch To Visual' );
+		}
+		await toggleHtmlButton.click();
+	}
+};
+
+const toggleOrientation = async ( driver: wd.PromiseChainWebdriver ) => {
+	const orientation = await driver.getOrientation();
+	if ( orientation === 'LANDSCAPE' ) {
+		await driver.setOrientation( 'PORTRAIT' );
+	} else {
+		await driver.setOrientation( 'LANDSCAPE' );
 	}
 };
 
@@ -238,4 +255,5 @@ module.exports = {
 	swipeUp,
 	stopDriver,
 	toggleHtmlMode,
+	toggleOrientation,
 };

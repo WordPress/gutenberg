@@ -12,8 +12,8 @@ import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BottomSheet, Dashicon, SVG } from '@wordpress/components';
-import { Component, createElement } from '@wordpress/element';
+import { BottomSheet, Icon } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 import { getBlockTypes, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 
 /**
@@ -63,7 +63,7 @@ export default class BlockPicker extends Component<PropsType> {
 							<View style={ styles.modalItem }>
 								<View style={ styles.modalIconWrapper }>
 									<View style={ styles.modalIcon }>
-										{ this.iconWithUpdatedFillColor( styles.modalIcon.fill, item.icon ) }
+										<Icon icon={ item.icon.src } fill={ styles.modalIcon.fill } size={ styles.modalIcon.width } />
 									</View>
 								</View>
 								<Text style={ styles.modalItemLabel }>{ item.title }</Text>
@@ -73,25 +73,6 @@ export default class BlockPicker extends Component<PropsType> {
 				/>
 			</BottomSheet>
 		);
-	}
-
-	iconWithUpdatedFillColor( color: string, icon: Object ) {
-		if ( 'string' === typeof icon.src ) {
-			return (
-				<Dashicon icon={ icon.src } fill={ color } size={ styles.modalIcon.width } />
-			);
-		} else if ( icon.src && ( icon.src.type === 'svg' || icon.src.type === SVG ) ) {
-			return (
-				<SVG viewBox={ icon.src.props.viewBox } xmlns={ icon.src.props.xmlns } style={ { fill: color } }>
-					{ icon.src.props.children }
-				</SVG>
-			);
-		} else if ( 'function' === typeof icon.src ) {
-			if ( icon.src.prototype instanceof Component ) {
-				return createElement( icon.src, { fill: color, size: styles.modalIcon.width } );
-			}
-			return icon.src( { fill: color, size: styles.modalIcon.width } );
-		}
 	}
 
 	calculateNumberOfColumns() {

@@ -19,8 +19,9 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
+import com.facebook.react.uimanager.BaseViewManager;
+import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.PixelUtil;
-import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.ViewDefaults;
@@ -31,12 +32,14 @@ import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.facebook.react.views.text.DefaultStyleValuesUtil;
 import com.facebook.react.views.text.ReactFontManager;
+import com.facebook.react.views.text.ReactTextUpdate;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
 import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
 import com.facebook.react.views.textinput.ReactTextInputManager;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
+import org.wordpress.aztec.formatting.LinkFormatter;
 import org.wordpress.aztec.glideloader.GlideImageLoader;
 import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
 import org.wordpress.aztec.plugins.CssUnderlinePlugin;
@@ -51,7 +54,7 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
+public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutShadowNode> {
 
     public static final String REACT_CLASS = "RCTAztecView";
 
@@ -91,10 +94,26 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     @Override
     protected ReactAztecText createViewInstance(ThemedReactContext reactContext) {
         ReactAztecText aztecText = new ReactAztecText(reactContext);
-        aztecText.setFocusableInTouchMode(true);
-        aztecText.setFocusable(true);
+        aztecText.setFocusableInTouchMode(false);
+        aztecText.setFocusable(false);
         aztecText.setCalypsoMode(false);
+        // This is a temporary hack that sets the correct GB link color and underline
+        // see: https://github.com/wordpress-mobile/gutenberg-mobile/pull/1109
+        aztecText.setLinkFormatter(new LinkFormatter(aztecText,
+                new LinkFormatter.LinkStyle(
+                        Color.parseColor("#016087"), true)
+        ));
         return aztecText;
+    }
+
+    @Override
+    public LayoutShadowNode createShadowNodeInstance() {
+        return new ReactAztecTextShadowNode();
+    }
+
+    @Override
+    public Class<? extends LayoutShadowNode> getShadowNodeClass() {
+        return ReactAztecTextShadowNode.class;
     }
 
     @Nullable
@@ -403,17 +422,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         }
     }
 
-    /*
-     * This property/method is used to tell the native AztecText to grab the focus when isSelected is true
-     *
-     */
-    @ReactProp(name = "isSelected", defaultBoolean = false)
-    public void isSelected(final ReactAztecText view, boolean selected) {
-        if (selected) {
-            view.requestFocus();
-        }
-    }
-
     @ReactProp(name = "onContentSizeChange", defaultBoolean = false)
     public void setOnContentSizeChange(final ReactAztecText view, boolean onContentSizeChange) {
         if (onContentSizeChange) {
@@ -505,6 +513,19 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         
         // Don't think we need to add setOnEditorActionListener here (intercept Enter for example), but
         // in case check ReactTextInputManager
+    }
+
+    @Override
+    public void updateExtraData(ReactAztecText view, Object extraData) {
+        if (extraData instanceof ReactTextUpdate) {
+            ReactTextUpdate update = (ReactTextUpdate) extraData;
+
+            view.setPadding(
+                    (int) update.getPaddingLeft(),
+                    (int) update.getPaddingTop(),
+                    (int) update.getPaddingRight(),
+                    (int) update.getPaddingBottom());
+        }
     }
 
     private class AztecTextWatcher implements TextWatcher {
