@@ -290,13 +290,13 @@ class MediaTextEdit extends Component {
 						controls={ toolbarControls }
 					/>
 					<Toolbar>
-						{ mediaUrl && <IconButton
+						<IconButton
 							className={ classnames( 'components-toolbar__control', { 'is-active': this.state.isEditing } ) }
 							label={ __( 'Edit Media' ) }
 							aria-pressed={ this.state.isEditing }
-							onClick={ this.toggleIsEditing }
+							onClick={ mediaUrl && this.toggleIsEditing }
 							icon={ editImageIcon }
-						/> }
+						/>
 					</Toolbar>
 					<BlockVerticalAlignmentToolbar
 						onChange={ onVerticalAlignmentChange }
