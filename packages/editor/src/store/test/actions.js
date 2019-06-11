@@ -744,7 +744,8 @@ describe( 'Editor actions', () => {
 	describe( 'editPost', () => {
 		it( 'should return EDIT_POST action', () => {
 			const edits = { format: 'sample' };
-			expect( actions.editPost( edits ) ).toEqual( {
+			const gen = actions.editPost( edits );
+			expect( gen.next( edits ).value ).toEqual( {
 				type: 'EDIT_POST',
 				edits,
 			} );
