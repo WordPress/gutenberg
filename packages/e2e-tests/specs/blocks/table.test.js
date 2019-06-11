@@ -153,7 +153,7 @@ describe( 'Table', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'allows a caption to be added', async () => {
+	it( 'allows a caption to be added and supports positioning the caption below the table', async () => {
 		await insertBlock( 'Table' );
 
 		// Create the table.
@@ -164,7 +164,15 @@ describe( 'Table', () => {
 		await page.click( '.wp-block-table__caption-content' );
 		await page.keyboard.type( 'Caption!' );
 
-		// Expect the post to have the correct written content inside the table.
+		// Expect the post to have the correct table caption.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Toggle the position of the caption.
+		await clickBlockToolbarButton( 'Edit table' );
+		const captionPositioningButton = await page.$x( "//button[text()='Show Caption Below Table']" );
+		await captionPositioningButton[ 0 ].click();
+
+		// Expect the caption to be below the table (an additional classname should be added to the table).
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

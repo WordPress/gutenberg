@@ -15,6 +15,10 @@
 			"selector": "caption",
 			"default": ""
 		},
+		"captionPosition": {
+			"type": "string",
+			"default": "top"
+		},
 		"head": {
 			"type": "array",
 			"default": [],

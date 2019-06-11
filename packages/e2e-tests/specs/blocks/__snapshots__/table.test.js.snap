@@ -1,8 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Table allows a caption to be added 1`] = `
+exports[`Table allows a caption to be added and supports positioning the caption below the table 1`] = `
 "<!-- wp:table -->
 <table class=\\"wp-block-table\\"><caption>Caption!</caption><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table>
+<!-- /wp:table -->"
+`;
+
+exports[`Table allows a caption to be added and supports positioning the caption below the table 2`] = `
+"<!-- wp:table {\\"captionPosition\\":\\"bottom\\"} -->
+<table class=\\"wp-block-table has-bottom-caption\\"><caption>Caption!</caption><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table>
 <!-- /wp:table -->"
 `;
 

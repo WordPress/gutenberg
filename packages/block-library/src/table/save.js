@@ -16,6 +16,7 @@ export default function save( { attributes } ) {
 		foot,
 		backgroundColor,
 		caption,
+		captionPosition,
 	} = attributes;
 	const isEmpty = ! head.length && ! body.length && ! foot.length;
 
@@ -28,6 +29,7 @@ export default function save( { attributes } ) {
 	const classes = classnames( backgroundClass, {
 		'has-fixed-layout': hasFixedLayout,
 		'has-background': !! backgroundClass,
+		'has-bottom-caption': captionPosition === 'bottom',
 	} );
 
 	const Section = ( { type, rows } ) => {

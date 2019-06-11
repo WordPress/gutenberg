@@ -9,8 +9,11 @@
 	}
 
 	caption {
-		caption-side: bottom;
-		margin-top: 0.5em;
+		margin-bottom: 0.5em;
 		@include caption-style-theme();
+	}
+
+	&.has-bottom-caption caption {
+		margin-top: 0.5em;
 	}
 }
