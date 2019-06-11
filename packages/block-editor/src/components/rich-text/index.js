@@ -933,7 +933,11 @@ export class RichText extends Component {
 	formatToValue( value ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
-			value = children.toHTML( value );
+			return create( {
+				html: children.toHTML( value ),
+				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
+			} );
 		}
 
 		if ( this.props.format === 'string' ) {
