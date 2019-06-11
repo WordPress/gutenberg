@@ -20,20 +20,9 @@ class Video extends Component {
 		super( ...arguments );
 		this.isIOS = Platform.OS === 'ios';
 		this.state = {
-			isLoaded: false,
 			isFullScreen: false,
 		};
 		this.onPressPlay = this.onPressPlay.bind( this );
-		this.onLoad = this.onLoad.bind( this );
-		this.onLoadStart = this.onLoadStart.bind( this );
-	}
-
-	onLoad() {
-		this.setState( { isLoaded: true } );
-	}
-
-	onLoadStart() {
-		this.setState( { isLoaded: false } );
 	}
 
 	onPressPlay() {
@@ -62,7 +51,7 @@ class Video extends Component {
 
 	render() {
 		const { isSelected, style } = this.props;
-		const { isLoaded, isFullScreen } = this.state;
+		const { isFullScreen } = this.state;
 
 		return (
 			<View style={ styles.videoContainer }>
@@ -86,13 +75,11 @@ class Video extends Component {
 						this.setState( { isFullScreen: false } );
 					} }
 				/>
-				{ isLoaded &&
 				<TouchableOpacity disabled={ ! isSelected } onPress={ this.onPressPlay } style={ [ style, styles.overlay ] }>
 					<View style={ styles.playIcon }>
 						<Dashicon icon={ 'controls-play' } ariaPressed={ 'dashicon-active' } size={ styles.playIcon.width } />
 					</View>
 				</TouchableOpacity>
-				}
 			</View>
 		);
 	}
