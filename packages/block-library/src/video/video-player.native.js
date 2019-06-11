@@ -7,7 +7,7 @@ import { Dashicon } from '@wordpress/components';
 /**
  * External dependencies
  */
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Platform, Linking } from 'react-native';
 import { default as VideoPlayer } from 'react-native-video';
 
 /**
@@ -18,6 +18,7 @@ import styles from './video-player.scss';
 class Video extends Component {
 	constructor() {
 		super( ...arguments );
+		this.isIOS = Platform.OS === 'ios';
 		this.state = {
 			isLoaded: false,
 			isFullScreen: false,
@@ -36,9 +37,27 @@ class Video extends Component {
 	}
 
 	onPressPlay() {
-		if ( this.player ) {
-			this.player.presentFullscreenPlayer();
+		if ( this.isIOS ) {
+			if ( this.player ) {
+				this.player.presentFullscreenPlayer();
+			}
+		} else {
+			const { source } = this.props;
+			if ( source && source.uri ) {
+				this.openURL( source.uri )
+			}
 		}
+	}
+
+	// Tries opening the URL outside of the app
+	openURL( url ) {
+		Linking.canOpenURL(url).then(( supported ) => {
+			if ( !supported ) {
+				console.warn("Can't open the video URL: " + url);
+			} else {
+				return Linking.openURL(url);
+			}
+		}).catch((err) => console.error('An error occurred while opening the video URL: ' + url, err));
 	}
 
 	render() {
