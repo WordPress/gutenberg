@@ -190,17 +190,15 @@ class CoverEdit extends Component {
 		const controls = (
 			<>
 				<BlockControls>
-					{ !! url && (
-						<Toolbar>
-							<IconButton
-								className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.isEditing } ) }
-								aria-pressed={ isEditing }
-								label={ __( 'Edit media' ) }
-								icon={ editImageIcon }
-								onClick={ this.toggleIsEditing }
-							/>
-						</Toolbar>
-					) }
+					<Toolbar>
+						<IconButton
+							className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': ! url || this.state.isEditing } ) }
+							aria-pressed={ isEditing }
+							label={ __( 'Edit media' ) }
+							icon={ editImageIcon }
+							onClick={ url && this.toggleIsEditing }
+						/>
+					</Toolbar>
 				</BlockControls>
 				{ !! url && (
 					<InspectorControls>
