@@ -14,7 +14,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, useEffect, useLayoutEffect, useState, useRef } from '@wordpress/element';
+import { Component, useLayoutEffect, useState, useRef } from '@wordpress/element';
 import {
 	withSelect,
 	withDispatch,
@@ -58,7 +58,7 @@ const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } 
 		updateReset( true );
 		setTransform( newTransform );
 	}, [ blockClientIds ] );
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( resetAnimation ) {
 			updateReset( false );
 		}
