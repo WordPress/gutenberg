@@ -62,7 +62,7 @@ export default class EditorPage {
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 		const text = await htmlContentView.text();
-		expect( text ).toBe( html );
+		expect( text.toLowerCase() ).toBe( html.toLowerCase() );
 
 		await toggleHtmlMode( this.driver, false );
 	}

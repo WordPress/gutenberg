@@ -61,6 +61,8 @@ describe( 'Gutenberg Editor tests', () => {
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 		await toggleOrientation( driver );
+
+		await editorPage.verifyHtmlContent( testData.deviceRotationHtml );
 	} );
 
 	afterAll( async () => {

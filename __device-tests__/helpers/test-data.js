@@ -19,3 +19,11 @@ exports.listEndedHtml = `<!-- wp:list -->
 <!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->`;
+
+exports.deviceRotationHtml = `<!-- wp:paragraph -->
+<p>Loren ipsum Dolores sit amet, consectetur adipiscing elite. Etiam luctus velit etc nunc tristique, UT tincidunt ipsum placerat. Maecenas placerat NEC elite sit amet vulputate.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Loren ipsum Dolores sit amet, consectetur adipiscing elite. Etiam luctus velit etc nunc tristique, UT tincidunt ipsum placerat. Maecenas placerat NEC elite sit amet vulputate.</p>
+<!-- /wp:paragraph -->`;
