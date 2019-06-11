@@ -64,6 +64,36 @@ function mapBlocks( blocks, callback ) {
 }
 
 /**
+ * Returns an action object used to signal that attributes of some post edits should be applied to the state.
+ *
+ * @param {Object} edits Post attributes to edit.
+ *
+ * @return {Object} Action object.
+ */
+function getEditPostAction( edits ) {
+	return {
+		type: 'EDIT_POST',
+		edits,
+	};
+}
+
+/**
+ * Returns an action object used to signal that the blocks have been updated.
+ *
+ * @param {Array}   blocks  Block Array.
+ * @param {?Object} options Optional options.
+ *
+ * @return {Object} Action object.
+ */
+function getResetBlocksAction( blocks, options = {} ) {
+	return {
+		type: 'RESET_EDITOR_BLOCKS',
+		blocks,
+		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
+	};
+}
+
+/**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
@@ -259,14 +289,15 @@ export function setupEditorState( post ) {
  * been edited.
  *
  * @param {Object} edits Post attributes to edit.
- *
- * @return {Object} Action object.
  */
-export function editPost( edits ) {
-	return {
-		type: 'EDIT_POST',
-		edits,
-	};
+export function* editPost( edits ) {
+	if ( edits && edits.meta ) {
+		const blocks = yield select( 'core/editor', 'getEditorBlocks' );
+		const updatedBlocks = mapBlocks( blocks, ( block ) => metaSource.synchronize( block, edits.meta ) );
+		yield getResetBlocksAction( updatedBlocks );
+	}
+
+	yield getEditPostAction( edits );
 }
 
 /**
@@ -791,14 +822,10 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		}
 	}
 
-	yield {
-		type: 'RESET_EDITOR_BLOCKS',
-		blocks: updatedBlocks,
-		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
-	};
+	yield getResetBlocksAction( updatedBlocks, options );
 
 	if ( hasMetaChanges ) {
-		yield editPost( postEdits );
+		yield getEditPostAction( postEdits );
 	}
 }
 
