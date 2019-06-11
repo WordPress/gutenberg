@@ -473,54 +473,6 @@ describe( 'selectors', () => {
 				} ],
 			} );
 		} );
-
-		it( 'should merge meta attributes for the block', () => {
-			registerBlockType( 'core/meta-block', {
-				save: ( props ) => props.attributes.text,
-				category: 'common',
-				title: 'test block',
-				attributes: {
-					foo: {
-						type: 'string',
-						source: 'meta',
-						meta: 'foo',
-					},
-				},
-			} );
-
-			const state = {
-				settings: {
-					__experimentalMetaSource: {
-						value: {
-							foo: 'bar',
-						},
-					},
-				},
-				blocks: {
-					byClientId: {
-						123: { clientId: 123, name: 'core/meta-block' },
-					},
-					attributes: {
-						123: {},
-					},
-					order: {
-						'': [ 123 ],
-						123: [],
-					},
-				},
-			};
-
-			expect( getBlock( state, 123 ) ).toEqual( {
-				clientId: 123,
-				name: 'core/meta-block',
-				attributes: {
-					foo: 'bar',
-				},
-				innerBlocks: [],
-			} );
-
-			unregisterBlockType( 'core/meta-block' );
-		} );
 	} );
 
 	describe( 'getBlocks', () => {
