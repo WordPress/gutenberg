@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import getBlockData from '@wordpress/blocks/macro';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -9,19 +10,15 @@ import { __ } from '@wordpress/i18n';
 import deprecated from './deprecated';
 import edit from './edit';
 import icon from './icon';
-import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
 
-const { name } = metadata;
+const { name, ...metadata } = getBlockData( './block.json' );
 
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Paragraph' ),
-	description: __( 'Start with the building block of all narrative.' ),
 	icon,
-	keywords: [ __( 'text' ) ],
 	example: {
 		attributes: {
 			content: __( 'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.' ),

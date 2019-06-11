@@ -71,6 +71,7 @@ module.exports = function( api ) {
 			} ],
 			require.resolve( '@babel/plugin-proposal-async-generator-functions' ),
 			maybeGetPluginTransformRuntime(),
+			require.resolve( 'babel-plugin-macros' ),
 		].filter( Boolean ),
 	};
 };

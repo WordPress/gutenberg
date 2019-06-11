@@ -1,6 +1,10 @@
 {
 	"name": "core/paragraph",
+	"title": "Paragraph",
 	"category": "common",
+	"description": "Start with the building block of all narrative.",
+	"keywords": [ "text" ],
+	"textDomain": "default",
 	"attributes": {
 		"align": {
 			"type": "string"

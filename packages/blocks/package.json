@@ -23,6 +23,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/autop": "file:../autop",
+		"@wordpress/babel-plugin-block": "file:../babel-plugin-block",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
 		"@wordpress/compose": "file:../compose",

@@ -1,0 +1,13 @@
+{
+	"name": "my-plugin/notice",
+	"title": "Notice",
+	"category": "common",
+	"description": "Shows warning, error or success notices  ...",
+	"keywords": [ "alert", "message" ],
+	"textDomain": "default",
+	"attributes": {},
+	"styleVariations": [
+		{ "name": "default", "label": "Default", "isDefault": true },
+		{ "name": "other", "label": "Other" }
+	]
+}

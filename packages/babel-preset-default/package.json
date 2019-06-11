@@ -37,6 +37,7 @@
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:../babel-plugin-import-jsx-pragma",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/element": "file:../element",
+		"babel-plugin-macros": "^2.6.1",
 		"core-js": "^3.1.4"
 	},
 	"publishConfig": {

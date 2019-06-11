@@ -49,7 +49,7 @@ module.exports = {
 			// we'll get a `SyntaxError` (Invalid regular expression: \ at end of pattern)
 			// here. That's why we use \\u002F in the regexes below.
 			{
-				selector: 'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
+				selector: 'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F(?!macro)/]',
 				message: 'Path access on WordPress dependencies is not allowed.',
 			},
 			{

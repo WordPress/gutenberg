@@ -1,0 +1,97 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`macros valid metadata file with i18n support and default text domain: valid metadata file with i18n support and default text domain 1`] = `
+"
+import getBlockData from '../macro';
+const metadata = getBlockData( './fixtures/block-i18n-default.json' );
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+\\"use strict\\";
+
+var _i18n = require(\\"@wordpress/i18n\\");
+
+const metadata = {
+  name: \\"my-plugin/notice\\",
+  title: (0, _i18n._x)(\\"Notice\\", \\"block title\\", \\"my-plugin\\"),
+  category: \\"common\\",
+  description: (0, _i18n._x)(\\"Shows warning, error or success notices  ...\\", \\"block description\\", \\"my-plugin\\"),
+  keywords: [(0, _i18n._x)(\\"alert\\", \\"block keywords\\", \\"my-plugin\\"), (0, _i18n._x)(\\"message\\", \\"block keywords\\", \\"my-plugin\\")],
+  attributes: {},
+  styles: [{
+    name: \\"default\\",
+    label: (0, _i18n._x)(\\"Default\\", \\"block styles\\", \\"my-plugin\\"),
+    isDefault: true
+  }, {
+    name: \\"other\\",
+    label: (0, _i18n._x)(\\"Other\\", \\"block styles\\", \\"my-plugin\\")
+  }]
+};
+"
+`;
+
+exports[`macros valid metadata file with i18n support: valid metadata file with i18n support 1`] = `
+"
+import getBlockData from '../macro';
+const metadata = getBlockData( './fixtures/block-i18n.json' );
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+\\"use strict\\";
+
+var _i18n = require(\\"@wordpress/i18n\\");
+
+const metadata = {
+  name: \\"my-plugin/notice\\",
+  title: (0, _i18n._x)(\\"Notice\\", \\"block title\\"),
+  category: \\"common\\",
+  description: (0, _i18n._x)(\\"Shows warning, error or success notices  ...\\", \\"block description\\"),
+  keywords: [(0, _i18n._x)(\\"alert\\", \\"block keywords\\"), (0, _i18n._x)(\\"message\\", \\"block keywords\\")],
+  attributes: {},
+  styles: [{
+    name: \\"default\\",
+    label: (0, _i18n._x)(\\"Default\\", \\"block styles\\"),
+    isDefault: true
+  }, {
+    name: \\"other\\",
+    label: (0, _i18n._x)(\\"Other\\", \\"block styles\\")
+  }]
+};
+"
+`;
+
+exports[`macros valid metadata file: valid metadata file 1`] = `
+"
+import getBlockData from '../macro';
+const metadata = getBlockData( './fixtures/block.json' );
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+\\"use strict\\";
+
+const metadata = {
+  name: \\"my-plugin/notice\\",
+  title: \\"Notice\\",
+  category: \\"common\\",
+  parent: [\\"core/group\\"],
+  icon: \\"star\\",
+  description: \\"Shows warning, error or success notices  ...\\",
+  keywords: [\\"alert\\", \\"message\\"],
+  attributes: {
+    message: {
+      type: \\"string\\",
+      source: \\"html\\",
+      selector: \\".meessage\\"
+    }
+  },
+  styles: [{
+    name: \\"default\\",
+    label: \\"Default\\",
+    isDefault: true
+  }, {
+    name: \\"other\\",
+    label: \\"Other\\"
+  }]
+};
+"
+`;

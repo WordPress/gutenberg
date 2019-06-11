@@ -1104,6 +1104,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/babel-plugin-block",
+		"slug": "packages-babel-plugin-block",
+		"markdown_source": "../packages/babel-plugin-block/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/babel-plugin-import-jsx-pragma",
 		"slug": "packages-babel-plugin-import-jsx-pragma",
 		"markdown_source": "../packages/babel-plugin-import-jsx-pragma/README.md",
