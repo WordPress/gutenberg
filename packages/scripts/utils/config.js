@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const { hasCliArg, getCliArgs } = require( './cli' );
+const { hasArgInCLI, getArgsFromCLI } = require( './cli' );
 const { fromConfigRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
 
@@ -12,18 +12,18 @@ const hasBabelConfig = () =>
 	hasPackageProp( 'babel' );
 
 const hasJestConfig = () =>
-	hasCliArg( '-c' ) ||
-	hasCliArg( '--config' ) ||
+	hasArgInCLI( '-c' ) ||
+	hasArgInCLI( '--config' ) ||
 	hasProjectFile( 'jest.config.js' ) ||
 	hasProjectFile( 'jest.config.json' ) ||
 	hasPackageProp( 'jest' );
 
-const hasWebpackConfig = () => hasCliArg( '--config' ) ||
+const hasWebpackConfig = () => hasArgInCLI( '--config' ) ||
 	hasProjectFile( 'webpack.config.js' ) ||
 	hasProjectFile( 'webpack.config.babel.js' );
 
 const getWebpackArgs = ( additionalArgs = [] ) => {
-	const webpackArgs = getCliArgs();
+	const webpackArgs = getArgsFromCLI();
 	if ( ! hasWebpackConfig() ) {
 		webpackArgs.push( '--config', fromConfigRoot( 'webpack.config.js' ) );
 	}

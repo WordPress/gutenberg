@@ -13,11 +13,11 @@ const {
 } = require( './file' );
 const {
 	exit,
-	getCliArgs,
+	getArgsFromCLI,
 } = require( './process' );
 
-const getCliArg = ( arg ) => {
-	for ( const cliArg of getCliArgs() ) {
+const getArgFromCLI = ( arg ) => {
+	for ( const cliArg of getArgsFromCLI() ) {
 		const [ name, value ] = cliArg.split( '=' );
 		if ( name === arg ) {
 			return value || null;
@@ -25,9 +25,9 @@ const getCliArg = ( arg ) => {
 	}
 };
 
-const hasCliArg = ( arg ) => getCliArg( arg ) !== undefined;
+const hasArgInCLI = ( arg ) => getArgFromCLI( arg ) !== undefined;
 
-const hasFileInCliArgs = () => minimist( getCliArgs() )._.length > 0;
+const hasFileArgInCLI = () => minimist( getArgsFromCLI() )._.length > 0;
 
 const handleSignal = ( signal ) => {
 	if ( signal === 'SIGKILL' ) {
@@ -81,9 +81,9 @@ const spawnScript = ( scriptName, args = [] ) => {
 };
 
 module.exports = {
-	getCliArg,
-	getCliArgs,
-	hasCliArg,
-	hasFileInCliArgs,
+	getArgFromCLI,
+	getArgsFromCLI,
+	hasArgInCLI,
+	hasFileArgInCLI,
 	spawnScript,
 };
