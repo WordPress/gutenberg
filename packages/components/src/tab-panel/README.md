@@ -114,15 +114,15 @@ The function called when a tab has been selected. It is passed the `tabName` as 
 
 #### tabs
 
-A list of tabs where each tab is defined by an object with the following fields:
+An array of objects containing the following properties:
 
-1. name: String. Defines the key for the tab
-2. title: String. Defines the translated text for the tab
-3. className: String. Defines the class to put on the tab.
+- `name`: `(string)` Defines the key for the tab.
+- `title`:`(string)` Defines the translated text for the tab.
+- `className`:`(string)` Optional. Defines the class to put on the tab.
 
-Other fields may be added to the object and accessed from the child function if desired.
+>> **Note:** Other fields may be added to the object and accessed from the child function if desired.
 
-- Type: Array
+- Type: `Array`
 - Required: Yes
 
 #### activeClass
