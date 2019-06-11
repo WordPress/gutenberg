@@ -1413,7 +1413,7 @@ export function isLastBlockChangePersistent( state ) {
  * @return {Object} the clientId and the block attributes changes
  */
 export function getLastBlockAttributesChange( state ) {
-	return state.blocks.lastAttributesChanges;
+	return state.lastBlockAttributesChanges;
 }
 
 /**

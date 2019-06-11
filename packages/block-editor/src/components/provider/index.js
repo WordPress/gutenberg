@@ -35,7 +35,7 @@ class BlockEditorProvider extends Component {
 			this.attachChangeObserver( registry );
 		}
 
-		if ( value !== prevProps.value ) {
+		if ( value !== prevProps.value && value !== this.lastBlocksValue ) {
 			this.isSyncingIncomingValue = true;
 			resetBlocks( value );
 		}
@@ -101,6 +101,7 @@ class BlockEditorProvider extends Component {
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
 				const lastChanges = getLastBlockAttributesChange();
+				this.lastBlocksValue = blocks;
 
 				if ( isPersistent ) {
 					onChange( blocks, lastChanges );
