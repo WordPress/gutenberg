@@ -34,7 +34,11 @@ function Snackbar( {
 	}, [] );
 
 	const classes = classnames( className, 'components-snackbar' );
-
+	if ( actions && actions.length > 1 ) {
+		// we need to inform developers that snackbar only accepts 1 action
+		// return first element only while keeping it inside an array
+		actions = [ actions[ 0 ] ];
+	}
 	return (
 		<div
 			ref={ ref }
@@ -50,7 +54,6 @@ function Snackbar( {
 				{ actions.map(
 					(
 						{
-							className: buttonCustomClasses,
 							label,
 							onClick,
 							url,
@@ -68,10 +71,9 @@ function Snackbar( {
 										onClick( event );
 									}
 								} }
-								className={ classnames(
-									'components-snackbar__action',
-									buttonCustomClasses
-								) }
+								className={
+									'components-snackbar__action'
+								}
 							>
 								{ label }
 							</Button>
