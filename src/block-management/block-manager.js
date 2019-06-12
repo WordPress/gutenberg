@@ -18,7 +18,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { PostTitle } from '@wordpress/editor';
-import { DefaultBlockAppender } from '@wordpress/block-editor';
+import { DefaultBlockAppender, Inserter } from '@wordpress/block-editor';
 import { sendNativeEditorDidLayout, subscribeSetFocusOnTitle, subscribeMediaAppend } from 'react-native-gutenberg-bridge';
 import { KeyboardAvoidingView, KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
 
@@ -31,7 +31,6 @@ import styles from './block-manager.scss';
 import blockHolderStyles from './block-holder.scss';
 import inlineToolbarStyles from './inline-toolbar/style.scss';
 import toolbarStyles from './block-toolbar.scss';
-import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
 import BlockToolbar from './block-toolbar';
 import SafeArea from 'react-native-safe-area';
@@ -299,7 +298,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 						this.renderList()
 				}
 				{ this.state.blockTypePickerVisible && (
-					<BlockPicker
+					<Inserter
 						onDismiss={ () => this.showBlockTypePicker( false ) }
 						onValueSelected={ this.onBlockTypeSelected }
 						isReplacement={ this.isReplaceable( this.props.selectedBlock ) }
