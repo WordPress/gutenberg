@@ -106,7 +106,7 @@
 			background: color(theme(button));
 			border-color: color(theme(button) shade(7%));
 			box-shadow: none;
-			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1);
+			text-shadow: none;
 		}
 
 		&.is-busy,
