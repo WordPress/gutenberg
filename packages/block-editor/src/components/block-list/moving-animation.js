@@ -62,7 +62,6 @@ function useMovingAnimation( ref, triggerAnimationOnChange ) {
 	} );
 
 	return {
-		position: 'relative',
 		transformOrigin: 'center',
 		transform: interpolate(
 			[
