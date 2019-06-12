@@ -30,16 +30,23 @@ class OpenInNewTabToggle extends Component {
 				...attributes,
 			} );
 		} else {
-			if ( typeof attributes.rel === 'string' ) {
+			if ( typeof attributes.rel === 'string' && attributes.rel.length > 0 ) {
 				attributes.rel = attributes.rel.split( ' ' ).filter( ( relItem ) => {
 					return relItem !== 'noopener' && relItem !== 'noreferrer';
 				} ).join( ' ' ).trim();
-			} else {
-				delete attributes.rel;
+
+				if ( attributes.rel.length === 0 ) {
+					delete attributes.rel;
+				}
 			}
 
 			delete attributes.target;
-			attributes[ 'aria-label' ] = label;
+
+			if ( typeof label === 'string' && label.length > 0 ) {
+				attributes[ 'aria-label' ] = label;
+			} else {
+				delete attributes[ 'aria-label' ];
+			}
 
 			setLinkAttributes( attributes );
 		}
