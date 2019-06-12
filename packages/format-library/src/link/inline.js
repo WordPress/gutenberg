@@ -203,7 +203,6 @@ class InlineLinkUI extends Component {
 				onClickOutside={ this.onClickOutside }
 				onClose={ this.resetState }
 				focusOnMount={ showInput ? 'firstElement' : false }
-				className="editor-format-toolbar__link-settings-container"
 				renderSettings={ () => (
 					<div className="editor-format-toolbar__link-settings-container">
 						<Slot
