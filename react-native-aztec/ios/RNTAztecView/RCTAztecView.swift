@@ -135,6 +135,7 @@ class RCTAztecView: Aztec.TextView {
         if #available(iOS 11.0, *) {
             textDragInteraction?.isEnabled = false
         }
+        self.shouldNotifyOfNonUserChanges = false
     }
 
     func addPlaceholder() {
