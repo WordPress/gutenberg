@@ -3,11 +3,12 @@
  */
 import { Component } from '@wordpress/element';
 import { Dashicon } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * External dependencies
  */
-import { View, TouchableOpacity, Platform, Linking } from 'react-native';
+import { View, TouchableOpacity, Platform, Linking, Alert } from 'react-native';
 import { default as VideoPlayer } from 'react-native-video';
 
 /**
@@ -33,20 +34,24 @@ class Video extends Component {
 		} else {
 			const { source } = this.props;
 			if ( source && source.uri ) {
-				this.openURL( source.uri )
+				this.openURL( source.uri );
 			}
 		}
 	}
 
 	// Tries opening the URL outside of the app
 	openURL( url ) {
-		Linking.canOpenURL(url).then(( supported ) => {
-			if ( !supported ) {
-				console.warn("Can't open the video URL: " + url);
+		Linking.canOpenURL( url ).then( ( supported ) => {
+			if ( ! supported ) {
+				Alert.alert( __( 'Problem opening the video' ), __( 'No application can handle this request. Please install a Web browser.' ) );
+				window.console.warn( 'No application found that can open the video with URL: ' + url );
 			} else {
-				return Linking.openURL(url);
+				return Linking.openURL( url );
 			}
-		}).catch((err) => console.error('An error occurred while opening the video URL: ' + url, err));
+		} ).catch( ( err ) => {
+			Alert.alert( __( 'Problem opening the video' ), __( 'An unknown error occurred. Please try again.' ) );
+			window.console.warn( 'An error occurred while opening the video URL: ' + url, err );
+		} );
 	}
 
 	render() {
