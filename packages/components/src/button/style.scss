@@ -171,7 +171,6 @@
 	&:disabled,
 	&[aria-disabled="true"] {
 		cursor: default;
-		//opacity: 0.3;
 	}
 
 	&:focus:not(:disabled) {
