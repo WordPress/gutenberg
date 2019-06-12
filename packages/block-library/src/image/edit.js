@@ -408,7 +408,7 @@ class ImageEdit extends Component {
 		const src = isExternal ? url : undefined;
 		const labels = {
 			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
-			instructions: __( 'Drag an image to upload, select a file from your library or add one from an URL.' ),
+			instructions: __( 'Upload an image, pick one from your media library, or add one with a URL.' ),
 		};
 		const mediaPreview = ( !! url && <img
 			alt={ __( 'Edit image' ) }
