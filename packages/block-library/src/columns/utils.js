@@ -12,6 +12,10 @@ import { times, findIndex, sumBy, merge, mapValues } from 'lodash';
  * @return {Object[]} Columns layout configuration.
  */
 export const getColumnsTemplate = memoize( ( columns ) => {
+	if ( columns === undefined ) {
+		return null;
+	}
+
 	return times( columns, () => [ 'core/column' ] );
 } );
 

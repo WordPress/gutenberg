@@ -7,6 +7,11 @@ import {
 } from '@wordpress/block-editor';
 
 /**
+ * Internal dependencies
+ */
+import save from './save';
+
+/**
  * Given an HTML string for a deprecated columns inner block, returns the
  * column index to which the migrated inner block should be assigned. Returns
  * undefined if the inner block was not assigned to a column.
@@ -95,5 +100,28 @@ export default [
 				</div>
 			);
 		},
+	},
+	{
+		attributes: {
+			columns: {
+				type: 'number',
+				default: 2,
+			},
+		},
+		isEligible( attributes, innerBlocks ) {
+			return (
+				! attributes.hasOwnProperty( 'columns' ) &&
+				innerBlocks.length
+			);
+		},
+		migrate( attributes, innerBlocks ) {
+			attributes = {
+				...attributes,
+				columns: innerBlocks.length,
+			};
+
+			return [ attributes, innerBlocks ];
+		},
+		save,
 	},
 ];

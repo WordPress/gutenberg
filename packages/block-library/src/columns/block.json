@@ -3,8 +3,7 @@
 	"category": "layout",
 	"attributes": {
 		"columns": {
-			"type": "number",
-			"default": 2
+			"type": "number"
 		},
 		"verticalAlignment": {
 			"type": "string"
