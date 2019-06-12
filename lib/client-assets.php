@@ -282,9 +282,17 @@ function gutenberg_register_scripts_and_styles() {
 			"\n",
 			array(
 				'( function() {',
-				'	if ( wp && wp.components && wp.serverSideRender && ! wp.components.ServerSideRender ) {',
-				'		wp.components.ServerSideRender = wp.serverSideRender;',
-				'	};',
+				'	if ( wp && wp.components && wp.serverSideRender ) {',
+				'		wp.components.ServerSideRender = wp.element.forwardRef( function( props, ref ) {',
+				'			wp.deprecated( \'wp.components.ServerSideRender\', {',
+				'				alternative: \'wp.serverSideRender\',',
+				'			} );',
+				'			return wp.element.createElement(',
+				'				wp.serverSideRender,',
+				'				Object.assign( { ref: ref }, props )',
+				'			);',
+				'		} );',
+				'	}',
 				'} )();',
 			)
 		)
