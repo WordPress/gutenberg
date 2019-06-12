@@ -24,13 +24,11 @@ import DefaultBlockAppender from './default-block-appender';
  */
 import BlockList from '../block-list';
 import { withBlockEditContext } from '../block-edit/context';
+import TemplatePicker from './template-picker';
 
 class InnerBlocks extends Component {
 	constructor() {
 		super( ...arguments );
-		this.state = {
-			templateInProcess: !! this.props.template,
-		};
 		this.updateNestedSettings();
 	}
 
@@ -47,11 +45,6 @@ class InnerBlocks extends Component {
 		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
 		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
 			this.synchronizeBlocksWithTemplate();
-		}
-		if ( this.state.templateInProcess ) {
-			this.setState( {
-				templateInProcess: false,
-			} );
 		}
 	}
 
@@ -107,21 +100,30 @@ class InnerBlocks extends Component {
 			clientId,
 			hasOverlay,
 			renderAppender,
+			template,
+			templateOptions,
+			onSelectTemplateOption,
+			allowTemplateOptionSkip,
 		} = this.props;
-		const { templateInProcess } = this.state;
+
+		const isPlaceholder = template === null && !! templateOptions;
 
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
-			'has-overlay': hasOverlay,
+			'has-overlay': hasOverlay && ! isPlaceholder,
 		} );
 
 		return (
 			<div className={ classes }>
-				{ ! templateInProcess && (
+				{ isPlaceholder ?
+					<TemplatePicker
+						options={ templateOptions }
+						onSelect={ onSelectTemplateOption }
+						allowSkip={ allowTemplateOptionSkip }
+					/> :
 					<BlockList
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
-					/>
-				) }
+					/> }
 			</div>
 		);
 	}
