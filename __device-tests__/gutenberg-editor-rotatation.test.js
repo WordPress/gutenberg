@@ -58,6 +58,11 @@ describe( 'Gutenberg Editor tests', () => {
 		}
 
 		await editorPage.addNewParagraphBlock();
+
+		if ( isAndroid() ) {
+			await driver.hideDeviceKeyboard();
+		}
+
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 		await toggleOrientation( driver );

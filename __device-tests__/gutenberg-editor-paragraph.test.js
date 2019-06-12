@@ -114,7 +114,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		}
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 
-		for ( let i = 4; i > 0; i-- ) {
+		for ( let i = 3; i > 0; i-- ) {
 			await editorPage.removeParagraphBlockAtPosition( i );
 		}
 	} );
