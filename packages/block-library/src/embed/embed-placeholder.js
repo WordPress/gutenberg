@@ -8,10 +8,12 @@ import { BlockIcon } from '@wordpress/block-editor';
 const EmbedPlaceholder = ( props ) => {
 	const { icon, label, value, onSubmit, onChange, cannotEmbed, fallback, tryAgain } = props;
 	return (
-		<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
-			<div className="components-placeholder__instructions">
-				{ __( 'Paste a link to the content you want to display on your site.' ) }
-			</div>
+		<Placeholder
+			icon={ <BlockIcon icon={ icon } showColors /> }
+			label={ label }
+			className="wp-block-embed"
+			instructions={ __( 'Paste a link to the content you want to display on your site.' ) }
+		>
 			<form onSubmit={ onSubmit }>
 				<input
 					type="url"
