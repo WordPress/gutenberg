@@ -22,8 +22,17 @@ class Video extends Component {
 		this.isIOS = Platform.OS === 'ios';
 		this.state = {
 			isFullScreen: false,
+			videoContainerHeight: 0,
 		};
 		this.onPressPlay = this.onPressPlay.bind( this );
+		this.onVideoLayout = this.onVideoLayout.bind( this );
+	}
+
+	onVideoLayout( event ) {
+		const { height } = event.nativeEvent.layout;
+		if ( height !== this.state.videoContainerHeight ) {
+			this.setState( { videoContainerHeight: height } );
+		}
 	}
 
 	onPressPlay() {
@@ -56,7 +65,8 @@ class Video extends Component {
 
 	render() {
 		const { isSelected, style } = this.props;
-		const { isFullScreen } = this.state;
+		const { isFullScreen, videoContainerHeight } = this.state;
+		const showPlayButton = videoContainerHeight > 0;
 
 		return (
 			<View style={ styles.videoContainer }>
@@ -69,10 +79,9 @@ class Video extends Component {
 					// So we are setting controls=false and adding a play button that
 					// will trigger presentFullscreenPlayer()
 					controls={ false }
-					onLoad={ this.onLoad }
-					onLoadStart={ this.onLoadStart }
 					ignoreSilentSwitch={ 'ignore' }
 					paused={ ! isFullScreen }
+					onLayout={ this.onVideoLayout }
 					onFullscreenPlayerWillPresent={ () => {
 						this.setState( { isFullScreen: true } );
 					} }
@@ -80,11 +89,15 @@ class Video extends Component {
 						this.setState( { isFullScreen: false } );
 					} }
 				/>
+				{ showPlayButton &&
+				// If we add the play icon as a subview to VideoPlayer then react-native-video decides to show control buttons
+				// even if we set controls={ false }, so we are adding our play button as a sibling overlay view.
 				<TouchableOpacity disabled={ ! isSelected } onPress={ this.onPressPlay } style={ [ style, styles.overlay ] }>
 					<View style={ styles.playIcon }>
 						<Dashicon icon={ 'controls-play' } ariaPressed={ 'dashicon-active' } size={ styles.playIcon.width } />
 					</View>
 				</TouchableOpacity>
+				}
 			</View>
 		);
 	}
