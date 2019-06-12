@@ -127,6 +127,9 @@ function BlockStyles( {
 								blocks={ cloneBlock( block, {
 									className: styleClassName,
 								} ) }
+								srcWidth={ 400 }
+								srcHeight={ 300 }
+								destWidth={ 124 }
 							/>
 						</div>
 						<div className="editor-block-styles__item-label block-editor-block-styles__item-label">
