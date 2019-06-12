@@ -192,7 +192,7 @@ export class PostPreviewButton extends Component {
 					}
 				</span>
 				<DotTip tipId="core/editor.preview">
-					{ __( 'Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.' ) }
+					{ __( 'Once you have some content drafted, click the “Preview” button to make sure you’re happy with how your blocks look on your site.' ) }
 				</DotTip>
 			</Button>
 		);
