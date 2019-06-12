@@ -11,7 +11,7 @@ import {
  * Data component used for initializing the editor and re-initializes
  * when postId changes or unmount.
  *
- * @param {number} postId
+ * @param {number} postId  The id of the post.
  * @return {null} This is a data component so does not render any ui.
  */
 export default function( { postId } ) {
