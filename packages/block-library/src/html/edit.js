@@ -6,7 +6,7 @@ import { Component } from '@wordpress/element';
 import {
 	BlockControls,
 	PlainText,
-	__experimentalTransformStyles,
+	transformStyles,
 } from '@wordpress/block-editor';
 import { Disabled, SandBox } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
@@ -38,7 +38,7 @@ class HTMLEdit extends Component {
 
 		this.setState( { styles: [
 			defaultStyles,
-			...__experimentalTransformStyles( styles ),
+			...transformStyles( styles ),
 		] } );
 	}
 
