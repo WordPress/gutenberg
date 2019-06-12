@@ -12,7 +12,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 
-const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, instanceId } ) => {
+const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId } ) => {
 	const { height } = attributes;
 	const id = `block-spacer-height-input-${ instanceId }`;
 	const [ inputHeightValue, setInputHeightValue ] = useState( height );
@@ -44,10 +44,6 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, i
 						height: spacerHeight,
 					} );
 					setInputHeightValue( spacerHeight );
-					toggleSelection( true );
-				} }
-				onResizeStart={ () => {
-					toggleSelection( false );
 				} }
 			/>
 			<InspectorControls>

@@ -72,16 +72,6 @@ export const link = {
 			return (
 				<>
 					<RichTextShortcut
-						type="access"
-						character="a"
-						onUse={ this.addLink }
-					/>
-					<RichTextShortcut
-						type="access"
-						character="s"
-						onUse={ this.onRemoveFormat }
-					/>
-					<RichTextShortcut
 						type="primary"
 						character="k"
 						onUse={ this.addLink }

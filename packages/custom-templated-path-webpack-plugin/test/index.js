@@ -19,7 +19,7 @@ const unlinkAsync = promisify( unlink );
 const webpackAsync = promisify( webpack );
 
 describe( 'CustomTemplatedPathPlugin', () => {
-	const outputFile = path.join( __dirname, '/fixtures/build/entry.js' );
+	const outputFile = path.join( __dirname, '/fixtures/build/entry-42.js' );
 
 	beforeAll( async () => {
 		// Remove output file so as not to report false positive from previous

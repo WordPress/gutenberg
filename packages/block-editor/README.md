@@ -56,7 +56,7 @@ In the example above, there's no registered block type, in order to use the bloc
 ```js
 import { registerCoreBlocks } from '@wordpress/block-library';
 
-registerCoreBlockTypes();
+registerCoreBlocks();
 
 // Make sure to load the block stylesheets too
 // import '@wordpress/block-library/build-style/style.css';
@@ -208,7 +208,7 @@ _Parameters_
 
 _Returns_
 
--   `string`: String with the class corresponding to the color in the provided context.
+-   `?string`: String with the class corresponding to the color in the provided context. Returns undefined if either colorContextName or colorSlug are not provided.
 
 <a name="getColorObjectByAttributeValues" href="#getColorObjectByAttributeValues">#</a> **getColorObjectByAttributeValues**
 
@@ -223,7 +223,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: If definedColor is passed and the name is found in colors, the color object exactly as set by the theme or editor defaults is returned. Otherwise, an object that just sets the color is defined.
+-   `?Object`: If definedColor is passed and the name is found in colors, the color object exactly as set by the theme or editor defaults is returned. Otherwise, an object that just sets the color is defined.
 
 <a name="getColorObjectByColorValue" href="#getColorObjectByColorValue">#</a> **getColorObjectByColorValue**
 
@@ -236,7 +236,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Returns the color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
+-   `?Object`: Color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
 
 <a name="getFontSize" href="#getFontSize">#</a> **getFontSize**
 
@@ -369,6 +369,7 @@ The default editor settings
  isRTL                         boolean       Whether the editor is in RTL mode
  bodyPlaceholder               string        Empty post placeholder
  titlePlaceholder              string        Empty title placeholder
+ codeEditingEnabled            string        Whether or not the user can switch to the code editor
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 

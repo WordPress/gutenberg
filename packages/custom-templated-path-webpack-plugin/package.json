@@ -22,13 +22,10 @@
 		"node": ">=8"
 	},
 	"files": [
-		"build",
-		"build-module"
+		"index.js"
 	],
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"main": "index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
 		"escape-string-regexp": "^1.0.5"
 	},
 	"peerDependencies": {
