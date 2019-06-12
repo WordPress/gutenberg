@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -90,16 +90,17 @@ export const useUpdatePostLinkListener = ( postId ) => {
 		} ),
 		[ postId ]
 	);
-
-	const nodeToUpdate = useMemo(
-		() => document.querySelector( VIEW_AS_PREVIEW_LINK_SELECTOR ) ||
-			document.querySelector( VIEW_AS_LINK_SELECTOR )
-	);
+	const nodeToUpdate = useRef();
 
 	useEffect( () => {
-		if ( ! newPermalink || ! nodeToUpdate ) {
+		nodeToUpdate.current = document.querySelector( VIEW_AS_PREVIEW_LINK_SELECTOR ) ||
+			document.querySelector( VIEW_AS_LINK_SELECTOR );
+	}, [ postId ] );
+
+	useEffect( () => {
+		if ( ! newPermalink || ! nodeToUpdate.current ) {
 			return;
 		}
-		nodeToUpdate.setAttribute( 'href', newPermalink );
+		nodeToUpdate.current.setAttribute( 'href', newPermalink );
 	}, [ newPermalink ] );
 };
