@@ -18,9 +18,7 @@ import { createBlock } from '@wordpress/blocks';
 
 const HeadingEdit = ( {
 	attributes,
-	isSelected,
 	mergeBlocks,
-	onBlur,
 	onFocus,
 	onReplace,
 	setAttributes,

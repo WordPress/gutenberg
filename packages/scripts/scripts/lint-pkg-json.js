@@ -18,7 +18,7 @@ const {
 
 const args = getCliArgs();
 
-const defaultFilesArgs = ! hasFileInCliArgs ? [ '.' ] : [];
+const defaultFilesArgs = hasFileInCliArgs() ? [] : [ '.' ];
 
 // See: https://github.com/tclindner/npm-package-json-lint/wiki/configuration#configuration.
 const hasLintConfig = hasCliArg( '-c' ) ||
@@ -41,7 +41,7 @@ const defaultIgnoreArgs = ! hasIgnoredFiles ?
 
 const result = spawn(
 	resolveBin( 'npm-package-json-lint', { executable: 'npmPkgJsonLint' } ),
-	[ ...defaultConfigArgs, ...defaultIgnoreArgs, ...args, defaultFilesArgs ],
+	[ ...defaultConfigArgs, ...defaultIgnoreArgs, ...args, ...defaultFilesArgs ],
 	{ stdio: 'inherit' }
 );
 
