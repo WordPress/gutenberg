@@ -358,6 +358,12 @@ export class RichText extends Component {
 
 	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
+		let { onEnter } = this.props;
+		if ( this.props.onEnter ) {
+			this.props.onEnter();
+			return;
+		}
+
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
