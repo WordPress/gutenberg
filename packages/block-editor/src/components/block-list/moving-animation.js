@@ -1,0 +1,77 @@
+/**
+ * External dependencies
+ */
+import { useSpring, interpolate } from 'react-spring';
+
+/**
+ * WordPress dependencies
+ */
+import { useState, useLayoutEffect } from '@wordpress/element';
+import { useReducedMotion } from '@wordpress/compose';
+
+/**
+ * Hook used to compute the styles required to move a div into a new position.
+ *
+ * The way this animation works is the following:
+ *  - It first renders the element as if there was no animation.
+ *  - It takes a snapshot of the position of the block to use it
+ *    as a destination point for the animation.
+ *  - It restores the element to the previous position using a CSS transform
+ *  - It uses the "resetAnimation" flag to reset the animation
+ *    from the beginning in order to animate to the new destination point.
+ *
+ * @param {Object} ref                      Reference to the element to animate
+ * @param {*}      triggerAnimationOnChange Variable used to trigger the animation if it changes
+ *
+ * @return {Object} Style object.
+ */
+function useMovingAnimation( ref, triggerAnimationOnChange ) {
+	const prefersReducedMotion = useReducedMotion();
+	const [ resetAnimation, setResetAnimation ] = useState( false );
+	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
+
+	const previous = ref.current ? ref.current.getBoundingClientRect() : null;
+	useLayoutEffect( () => {
+		if ( prefersReducedMotion ) {
+			return;
+		}
+		ref.current.style.transform = 'none';
+		const destination = ref.current.getBoundingClientRect();
+		const newTransform = {
+			x: previous ? previous.left - destination.left : 0,
+			y: previous ? previous.top - destination.top : 0,
+		};
+		ref.current.style.transform = `translate3d(${ newTransform.x }px,${ newTransform.y }px,0)`;
+		setResetAnimation( true );
+		setTransform( newTransform );
+	}, [ triggerAnimationOnChange ] );
+	useLayoutEffect( () => {
+		if ( resetAnimation ) {
+			setResetAnimation( false );
+		}
+	}, [ resetAnimation ] );
+	const animationProps = useSpring( {
+		from: transform,
+		to: {
+			x: 0,
+			y: 0,
+		},
+		reset: resetAnimation,
+		config: { mass: 5, tension: 2000, friction: 200 },
+		immediate: prefersReducedMotion,
+	} );
+
+	return {
+		position: 'relative',
+		transformOrigin: 'center',
+		transform: interpolate(
+			[
+				animationProps.x,
+				animationProps.y,
+			],
+			( x, y ) => `translate3d(${ x }px,${ y }px,0)`
+		),
+	};
+}
+
+export default useMovingAnimation;

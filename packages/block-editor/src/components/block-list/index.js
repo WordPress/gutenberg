@@ -8,19 +8,19 @@ import {
 	sortBy,
 	throttle,
 } from 'lodash';
-import { useSpring, animated, interpolate } from 'react-spring';
+import { animated } from 'react-spring';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Component, useLayoutEffect, useState, useRef } from '@wordpress/element';
+import { Component, useRef } from '@wordpress/element';
 import {
 	withSelect,
 	withDispatch,
 	__experimentalAsyncModeProvider as AsyncModeProvider,
 } from '@wordpress/data';
-import { compose, useReducedMotion } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,6 +29,7 @@ import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { getBlockDOMNode } from '../../utils/dom';
+import useMovingAnimation from './moving-animation';
 
 const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
 	return (
@@ -40,39 +41,7 @@ const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
 
 const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } ) => {
 	const ref = useRef( null );
-	const [ resetAnimation, updateReset ] = useState( false );
-	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
-	const previous = ref.current ? ref.current.getBoundingClientRect() : null;
-	const prefersReducedMotion = useReducedMotion();
-	useLayoutEffect( () => {
-		if ( prefersReducedMotion ) {
-			return;
-		}
-		ref.current.style.transform = 'none';
-		const destination = ref.current.getBoundingClientRect();
-		const newTransform = {
-			x: previous ? previous.left - destination.left : 0,
-			y: previous ? previous.top - destination.top : 0,
-		};
-		ref.current.style.transform = `translate3d(${ newTransform.x }px,${ newTransform.y }px,0)`;
-		updateReset( true );
-		setTransform( newTransform );
-	}, [ blockClientIds ] );
-	useLayoutEffect( () => {
-		if ( resetAnimation ) {
-			updateReset( false );
-		}
-	}, [ resetAnimation ] );
-	const animationProps = useSpring( {
-		from: transform,
-		to: {
-			x: 0,
-			y: 0,
-		},
-		reset: resetAnimation,
-		config: { mass: 5, tension: 2000, friction: 200 },
-		immediate: prefersReducedMotion,
-	} );
+	const style = useMovingAnimation( ref, blockClientIds );
 
 	return (
 		<animated.div
@@ -80,18 +49,7 @@ const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } 
 			className={ classnames( 'editor-block-list__block-animated-container', {
 				'is-in-selection': isBlockInSelection,
 			} ) }
-			data-client-id={ props.clientId }
-			style={ {
-				position: 'relative',
-				transformOrigin: 'center',
-				transform: interpolate(
-					[
-						animationProps.x,
-						animationProps.y,
-					],
-					( x, y ) => `translate3d(${ x }px,${ y }px,0)`
-				),
-			} }
+			style={ style }
 		>
 			<BlockListBlock
 				{ ...props }
