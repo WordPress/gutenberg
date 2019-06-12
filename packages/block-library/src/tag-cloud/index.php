@@ -30,7 +30,7 @@ function render_block_core_tag_cloud( $attributes ) {
 	$tag_cloud = wp_tag_cloud( $args );
 
 	if ( ! $tag_cloud ) {
-		$labels = get_taxonomy_labels( get_taxonomy( $attributes['taxonomy'] ) );
+		$labels    = get_taxonomy_labels( get_taxonomy( $attributes['taxonomy'] ) );
 		$tag_cloud = esc_html( sprintf( __( 'Your site doesn&#8217;t have any %s, so there&#8217;s nothing to display here at the moment.' ), strtolower( $labels->name ) ) );
 	}
 
