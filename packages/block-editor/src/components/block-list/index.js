@@ -64,16 +64,10 @@ const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } 
 		}
 	}, [ resetAnimation ] );
 	const animationProps = useSpring( {
-		from: {
-			...transform,
-		//	opacity: 0,
-		//	scale: 0,
-		},
+		from: transform,
 		to: {
 			x: 0,
 			y: 0,
-		//	scale: isBlockInSelection ? 1 : 0,
-		//	opacity: isBlockInSelection ? 0 : 1,
 		},
 		reset: resetAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
@@ -90,21 +84,12 @@ const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } 
 			style={ {
 				position: 'relative',
 				transformOrigin: 'center',
-				/* opacity: animationProps.opacity.interpolate( {
-					range: [ 0, 0.2, 0.8, 1 ],
-					output: [ 1, 0.5, 0.5, 1 ],
-				} ), */
 				transform: interpolate(
 					[
 						animationProps.x,
-						// eslint-disable-next-line
-						animationProps.y
-						/*	animationProps.scale.interpolate( {
-							range: [ 0, 0.2, 0.8, 1 ],
-							output: [ 1, 1.02, 1.02, 1 ],
-						} ),*/
+						animationProps.y,
 					],
-					( x, y/*, scale*/ ) => `translate3d(${ x }px,${ y }px,0)` // +  `scale(${ scale })`
+					( x, y ) => `translate3d(${ x }px,${ y }px,0)`
 				),
 			} }
 		>
