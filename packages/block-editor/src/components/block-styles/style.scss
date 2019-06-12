@@ -30,29 +30,15 @@
 	}
 }
 
+// Show a little preview thumbnail for style variations.
 .block-editor-block-styles__item-preview {
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
-	border: 1px solid rgba($dark-gray-900, 0.2);
-	overflow: hidden;
 	padding: 0;
-	text-align: initial;
+	border: $border-width solid rgba($dark-gray-900, 0.2);
 	border-radius: $radius-round-rectangle;
 	display: flex;
-	height: 60px;
+	overflow: hidden;
 	background: $white;
-
-	// Actual preview contents.
-	.block-editor-block-preview__content {
-		transform: scale(0.7);
-		transform-origin: center center;
-		width: 100%;
-
-		// Unset some of the styles that might be inherited from the editor style.
-		margin: 0;
-		padding: 0;
-		overflow: visible;
-		min-height: auto;
-	}
 }
 
 .block-editor-block-styles__item-label {
