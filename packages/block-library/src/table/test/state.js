@@ -8,6 +8,8 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	createTable,
+	getCellAttribute,
+	updateCellAttribute,
 	updateCellContent,
 	insertRow,
 	deleteRow,
@@ -76,11 +78,68 @@ const tableWithContent = deepFreeze( {
 	],
 } );
 
+const tableWithAttribute = deepFreeze( {
+	body: [
+		{
+			cells: [
+				{
+					content: '',
+					tag: 'td',
+				},
+				{
+					content: '',
+					tag: 'td',
+				},
+			],
+		},
+		{
+			cells: [
+				{
+					content: '',
+					tag: 'td',
+				},
+				{
+					testAttr: 'testVal',
+					content: '',
+					tag: 'td',
+				},
+			],
+		},
+	],
+} );
+
 describe( 'createTable', () => {
 	it( 'should create a table', () => {
 		const state = createTable( { rowCount: 2, columnCount: 2 } );
 
 		expect( state ).toEqual( table );
+	} );
+} );
+
+describe( 'getCellAttribute', () => {
+	it( 'should get the cell attribute', () => {
+		const state = getCellAttribute( tableWithAttribute, {
+			section: 'body',
+			rowIndex: 1,
+			columnIndex: 1,
+			attributeName: 'testAttr',
+		} );
+
+		expect( state ).toBe( 'testVal' );
+	} );
+} );
+
+describe( 'updateCellAttribute', () => {
+	it( 'should update cell attribute', () => {
+		const state = updateCellAttribute( table, {
+			section: 'body',
+			rowIndex: 1,
+			columnIndex: 1,
+			attributeName: 'testAttr',
+			value: 'testVal',
+		} );
+
+		expect( state ).toEqual( tableWithAttribute );
 	} );
 } );
 
