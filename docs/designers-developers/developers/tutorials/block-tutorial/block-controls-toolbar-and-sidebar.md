@@ -1,8 +1,8 @@
-# Block Controls: Toolbars and Inspector
+# Block Controls: Block Toolbar and Settings Sidebar
 
 To simplify block customization and ensure a consistent experience for users, there are a number of built-in UI patterns to help generate the editor preview. Like with the `RichText` component covered in the previous chapter, the `wp.editor` global includes a few other common components to render editing interfaces. In this chapter, we'll explore toolbars and the block inspector.
 
-## Toolbar
+## Block Toolbar
 
 ![Screenshot of the rich text toolbar applied to a paragraph block inside the block editor](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/toolbar-text.png)
 
@@ -169,10 +169,10 @@ Note that `BlockControls` is only visible when the block is currently selected a
 
 ![Screenshot of the inspector panel focused on the settings for a paragraph block](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/inspector.png)
 
-The inspector is used to display less-often-used settings or settings that require more screen space. The inspector should be used for **block-level settings only**.
+The Settings Sidebar is used to display less-often-used settings or settings that require more screen space. The Settings Sidebar should be used for **block-level settings only**.
 
-If you have settings that affects only selected content inside a block (example: the "bold" setting for selected text inside a paragraph): **do not place it inside the inspector**. The inspector is displayed even when editing a block in HTML mode, so it should only contain block-level settings.
+If you have settings that affects only selected content inside a block (example: the "bold" setting for selected text inside a paragraph): **do not place it inside the Settings Sidebar**. The Settings Sidebar is displayed even when editing a block in HTML mode, so it should only contain block-level settings.
 
-The inspector region is shown in place of the post settings sidebar when a block is selected.
+The Block Tab is shown in place of the Document Tab when a block is selected.
 
-Similar to rendering a toolbar, if you include an `InspectorControls` element in the return value of your block type's `edit` function, those controls will be shown in the inspector region.
+Similar to rendering a toolbar, if you include an `InspectorControls` element in the return value of your block type's `edit` function, those controls will be shown in the Settings Sidebar region.
