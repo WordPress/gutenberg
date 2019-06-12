@@ -50,7 +50,7 @@ class Video extends Component {
 			}
 		} ).catch( ( err ) => {
 			Alert.alert( __( 'Problem opening the video' ), __( 'An unknown error occurred. Please try again.' ) );
-			window.console.warn( 'An error occurred while opening the video URL: ' + url, err );
+			window.console.error( 'An error occurred while opening the video URL: ' + url, err );
 		} );
 	}
 
