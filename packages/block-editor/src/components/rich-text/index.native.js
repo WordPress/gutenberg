@@ -13,6 +13,9 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
+import {
+	isUnmodifiedDefaultBlock,
+} from '@wordpress/blocks';
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { BlockFormatControls } from '@wordpress/block-editor';
@@ -701,8 +704,8 @@ export class RichText extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this._editor.isFocused() ) {
-			// this._editor.blur();
+		if ( this._editor.isFocused() && this.props.shouldBlurOnUnmount ) {
+			this._editor.blur();
 		}
 	}
 
@@ -875,6 +878,7 @@ const RichTextContainer = compose( [
 		const {
 			getSelectionStart,
 			getSelectionEnd,
+			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
 
 		const selectionStart = getSelectionStart();
@@ -887,12 +891,19 @@ const RichTextContainer = compose( [
 			);
 		}
 
+		// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
+		// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
+		// This apparently assumes functionality the BlockHlder actually 
+		const block = clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
+		const shouldBlurOnUnmount = block && isSelected && isUnmodifiedDefaultBlock( block );
+
 		return {
 			formatTypes: getFormatTypes(),
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
 			blockIsSelected,
+			shouldBlurOnUnmount,
 		};
 	} ),
 	withDispatch( ( dispatch, {
