@@ -102,7 +102,57 @@ _Returns_
 
 <a name="PluginDocumentSetting" href="#PluginDocumentSetting">#</a> **PluginDocumentSetting**
 
-Undocumented declaration.
+Renders items below the Status & Availability panel in the Document Sidebar.
+
+_Usage_
+
+```js
+// Using ES5 syntax
+var el = wp.element.createElement;
+var __ = wp.i18n.__;
+var registerPlugin = wp.plugins.registerPlugin;
+var PluginDocumentSetting = wp.editPost.PluginPostStatusInfo;
+
+function MyDocumentSettingPlugin() {
+	return el(
+		PluginDocumentSetting,
+	{
+			className: 'my-document-setting-plugin',
+		},
+			__( 'My Document Setting Panel' )
+		);
+	};
+
+	registerPlugin( 'my-document-setting-plugin', {
+	render: MyDocumentSettingPlugin
+	} );
+```
+
+```jsx
+// Using ESNext syntax
+const { registerPlugin } = wp.plugins;
+const { PluginDocumentSetting } = wp.editPost;
+
+const MyDocumentSettingTest = () => (
+		<PluginDocumentSetting className="my-document-setting-plugin">
+		<p>My Document Setting Panel</p>
+	</PluginDocumentSetting>
+);
+
+ registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.className_ `[string]`: An optional class name added to the row.
+-   _props.title_ `[string]`: The title of the panel
+-   _props.isOpen_ `[boolean]`: The open state of the panel. Optional.
+-   _props.onTogglePanel_ `[func]`: The function that is run when the panel is toggled. Optional
+
+_Returns_
+
+-   `WPElement`: The WPElement to be rendered.
 
 <a name="PluginMoreMenuItem" href="#PluginMoreMenuItem">#</a> **PluginMoreMenuItem**
 
