@@ -18,7 +18,7 @@ exports[`PostPreviewButton render() should render currentPostLink otherwise 1`] 
   <WithSelect(WithDispatch(DotTip))
     tipId="core/editor.preview"
   >
-    Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.
+    Once you’ve drafted some content, use the “Preview” button to see how it will look to readers. When you’re ready to add it to your site, use the “Publish” button.
   </WithSelect(WithDispatch(DotTip))>
 </ForwardRef(Button)>
 `;
@@ -41,7 +41,7 @@ exports[`PostPreviewButton render() should render previewLink if provided 1`] = 
   <WithSelect(WithDispatch(DotTip))
     tipId="core/editor.preview"
   >
-    Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.
+    Once you’ve drafted some content, use the “Preview” button to see how it will look to readers. When you’re ready to add it to your site, use the “Publish” button.
   </WithSelect(WithDispatch(DotTip))>
 </ForwardRef(Button)>
 `;
