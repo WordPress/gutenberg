@@ -7,22 +7,20 @@ import { render } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import PluginDocumentSetting from '../';
-
-jest.mock( '../../../../../../components/src/button' );
+import PluginDocumentSettingPanel from '../';
 
 describe( 'PluginDocumentSetting', () => {
 	test( 'renders fill properly', () => {
 		const div = document.createElement( 'div' );
 		render(
 			<SlotFillProvider>
-				<PluginDocumentSetting
+				<PluginDocumentSettingPanel
 					className="my-plugin-settings-sidebar"
 					title="My panel title"
 					initialOpen={ true }>
 					My panel content
-				</PluginDocumentSetting>
-				<PluginDocumentSetting.Slot />
+				</PluginDocumentSettingPanel>
+				<PluginDocumentSettingPanel.Slot />
 			</SlotFillProvider>,
 			div
 		);
