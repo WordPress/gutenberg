@@ -89,7 +89,6 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
 /**
  * @callback FnGetOptionCompletion
  * @param {CompleterOption} value the value of the completer option.
- * @param {Range} range the nodes included in the autocomplete trigger and query.
  * @param {String} query the text value of the autocomplete query.
  *
  * @returns {(OptionCompletion|OptionCompletionValue)} the completion for the given option. If an
