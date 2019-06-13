@@ -21,6 +21,7 @@ function SelectControl( {
 	onChange,
 	options = [],
 	className,
+	hideLabel,
 	...props
 } ) {
 	const id = `inspector-select-control-${ instanceId }`;
@@ -38,7 +39,7 @@ function SelectControl( {
 
 	/* eslint-disable jsx-a11y/no-onchange */
 	return ! isEmpty( options ) && (
-		<BaseControl label={ label } id={ id } help={ help } className={ className }>
+		<BaseControl label={ label } hideLabel={ hideLabel } id={ id } help={ help } className={ className }>
 			<select
 				id={ id }
 				className="components-select-control__input"
