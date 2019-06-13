@@ -2,11 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { filter, map } from 'lodash';
+import { every, filter, forEach, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { compose } from '@wordpress/compose';
 import {
 	IconButton,
 	PanelBody,
@@ -25,6 +26,8 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -54,6 +57,7 @@ class GalleryEdit extends Component {
 		this.onMoveForward = this.onMoveForward.bind( this );
 		this.onMoveBackward = this.onMoveBackward.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 
@@ -133,6 +137,12 @@ class GalleryEdit extends Component {
 		} );
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	setLinkTo( value ) {
 		this.setAttributes( { linkTo: value } );
 	}
@@ -167,6 +177,20 @@ class GalleryEdit extends Component {
 		} );
 	}
 
+	componentDidMount() {
+		const { attributes, mediaUpload } = this.props;
+		const { images } = attributes;
+		if ( every( images, ( { url } ) => isBlobURL( url ) ) ) {
+			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
+			forEach( images, ( { url } ) => revokeBlobURL( url ) );
+			mediaUpload( {
+				filesList,
+				onFileChange: this.onSelectImages,
+				allowedTypes: [ 'image' ],
+			} );
+		}
+	}
+
 	componentDidUpdate( prevProps ) {
 		// Deselect images when deselecting the block
 		if ( ! this.props.isSelected && prevProps.isSelected ) {
@@ -178,7 +202,7 @@ class GalleryEdit extends Component {
 	}
 
 	render() {
-		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
+		const { attributes, isSelected, className, noticeUI } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
 		const hasImages = !! images.length;
@@ -223,7 +247,7 @@ class GalleryEdit extends Component {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple
 				value={ hasImages ? images : undefined }
-				onError={ noticeOperations.createErrorNotice }
+				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 			/>
 		);
@@ -305,5 +329,16 @@ class GalleryEdit extends Component {
 		);
 	}
 }
+export default compose( [
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		const {
+			__experimentalMediaUpload,
+		} = getSettings();
 
-export default withNotices( GalleryEdit );
+		return {
+			mediaUpload: __experimentalMediaUpload,
+		};
+	} ),
+	withNotices,
+] )( GalleryEdit );

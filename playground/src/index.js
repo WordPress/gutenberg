@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import '@babel/polyfill';
-
-/**
  * WordPress dependencies
  */
 import '@wordpress/editor'; // This shouldn't be necessary

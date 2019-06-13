@@ -4,6 +4,11 @@
 	width: 100%;
 }
 
+.videoContainer {
+	flex: 1;
+	background-color: #000;
+}
+
 .placeholder {
 	flex: 1;
 	justify-content: center;
@@ -54,8 +59,12 @@
 
 .icon {
 	fill: $gray-dark;
+	width: 100%;
+	height: 100%;
 }
 
 .iconUploading {
 	fill: $gray-lighten-20;
+	width: 100%;
+	height: 100%;
 }

@@ -1,15 +1,19 @@
 {
 	"name": "gutenberg",
-	"version": "5.8.0",
+	"version": "5.9.0",
 	"private": true,
-	"description": "A new WordPress editor experience",
-	"repository": "git+https://github.com/WordPress/gutenberg.git",
+	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"WordPress",
 		"editor"
 	],
+	"homepage": "https://github.com/WordPress/gutenberg/",
+	"repository": "git+https://github.com/WordPress/gutenberg.git",
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
 	"config": {
 		"GUTENBERG_PHASE": 2
 	},
@@ -52,6 +56,7 @@
 		"@wordpress/priority-queue": "file:packages/priority-queue",
 		"@wordpress/redux-routine": "file:packages/redux-routine",
 		"@wordpress/rich-text": "file:packages/rich-text",
+		"@wordpress/server-side-render": "file:packages/server-side-render",
 		"@wordpress/shortcode": "file:packages/shortcode",
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/url": "file:packages/url",
@@ -83,7 +88,7 @@
 		"@wordpress/scripts": "file:packages/scripts",
 		"babel-plugin-inline-json-import": "0.3.2",
 		"benchmark": "2.1.4",
-		"browserslist": "4.4.1",
+		"browserslist": "4.6.2",
 		"chalk": "2.4.1",
 		"commander": "2.20.0",
 		"concurrently": "3.5.0",
@@ -182,7 +187,7 @@
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
-		"lint-js": "wp-scripts lint-js .",
+		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
 		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",

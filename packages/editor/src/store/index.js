@@ -13,11 +13,22 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import { STORE_KEY } from './constants';
 
-const store = registerStore( STORE_KEY, {
+/**
+ * Post editor data store configuration.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ *
+ * @type {Object}
+ */
+export const storeConfig = {
 	reducer,
 	selectors,
 	actions,
 	controls,
+};
+
+const store = registerStore( STORE_KEY, {
+	...storeConfig,
 	persist: [ 'preferences' ],
 } );
 applyMiddlewares( store );

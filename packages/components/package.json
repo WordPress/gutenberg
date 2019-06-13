@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "7.4.0",
+	"version": "8.0.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,7 +23,6 @@
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
