@@ -401,7 +401,9 @@ class RCTAztecView: Aztec.TextView {
 
     @objc var placeholder: String {
         set {
-            placeholderLabel.text = newValue
+            var placeholderAttributes = typingAttributes
+            placeholderAttributes[.foregroundColor] = placeholderTextColor
+            placeholderLabel.attributedText = NSAttributedString(string: newValue, attributes: placeholderAttributes)
         }
 
         get {
@@ -435,7 +437,7 @@ class RCTAztecView: Aztec.TextView {
     }
     
     func updatePlaceholderVisibility() {
-        placeholderLabel.isHidden = !self.text.isEmpty
+        placeholderLabel.isHidden = !self.text.replacingOccurrences(of: String(.zeroWidthSpace), with: "").isEmpty
     }
     
     // MARK: - Font Setters
