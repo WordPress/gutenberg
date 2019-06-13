@@ -13,9 +13,6 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
-import {
-	isUnmodifiedDefaultBlock,
-} from '@wordpress/blocks';
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { BlockFormatControls } from '@wordpress/block-editor';
@@ -37,7 +34,11 @@ import {
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
-import { pasteHandler, children } from '@wordpress/blocks';
+import {
+	children,
+	isUnmodifiedDefaultBlock,
+	pasteHandler
+} from '@wordpress/blocks';
 import { isURL } from '@wordpress/url';
 
 /**
