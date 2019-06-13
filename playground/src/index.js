@@ -10,7 +10,11 @@ import {
 	WritingFlow,
 	ObserveTyping,
 } from '@wordpress/block-editor';
-import { Popover, SlotFillProvider } from '@wordpress/components';
+import {
+	Popover,
+	SlotFillProvider,
+	DropZoneProvider,
+} from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
 
@@ -38,20 +42,22 @@ function App() {
 			</div>
 			<div className="playground__body">
 				<SlotFillProvider>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ updateBlocks }
-						onChange={ updateBlocks }
-					>
-						<div className="editor-styles-wrapper">
-							<WritingFlow>
-								<ObserveTyping>
-									<BlockList />
-								</ObserveTyping>
-							</WritingFlow>
-						</div>
-						<Popover.Slot />
-					</BlockEditorProvider>
+					<DropZoneProvider>
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ updateBlocks }
+							onChange={ updateBlocks }
+						>
+							<div className="editor-styles-wrapper">
+								<WritingFlow>
+									<ObserveTyping>
+										<BlockList />
+									</ObserveTyping>
+								</WritingFlow>
+							</div>
+							<Popover.Slot />
+						</BlockEditorProvider>
+					</DropZoneProvider>
 				</SlotFillProvider>
 			</div>
 		</Fragment>
