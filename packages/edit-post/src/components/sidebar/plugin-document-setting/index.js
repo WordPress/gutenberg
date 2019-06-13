@@ -9,7 +9,21 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
 
-export const { Fill, Slot } = createSlotFill( 'PluginDocumentSetting' );
+export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
+
+const PluginDocumentSettingFill = ( { className, title, children, isOpened, onTogglePanel, ...props } ) => (
+	<Fill>
+		<PanelBody
+			className={ className }
+			title={ title }
+			opened={ isOpened }
+			onToggle={ onTogglePanel }
+			{ ...props }
+		>
+			{ children }
+		</PanelBody>
+	</Fill>
+);
 
 /**
  * Renders items below the Status & Availability panel in the Document Sidebar.
@@ -60,21 +74,7 @@ export const { Fill, Slot } = createSlotFill( 'PluginDocumentSetting' );
  *
  * @return {WPElement} The WPElement to be rendered.
  */
-const PluginDocumentSettingFill = ( { className, title, children, isOpened, onTogglePanel, ...props } ) => (
-	<Fill>
-		<PanelBody
-			className={ className }
-			title={ title }
-			opened={ isOpened }
-			onToggle={ onTogglePanel }
-			{ ...props }
-		>
-			{ children }
-		</PanelBody>
-	</Fill>
-);
-
-const PluginDocumentSetting = compose(
+const PluginDocumentSettingPanel = compose(
 	withPluginContext( ( context, ownProps ) => {
 		return {
 			icon: ownProps.icon || context.icon,
@@ -82,5 +82,5 @@ const PluginDocumentSetting = compose(
 	} ),
 )( PluginDocumentSettingFill );
 
-PluginDocumentSetting.Slot = Slot;
-export default PluginDocumentSetting;
+PluginDocumentSettingPanel.Slot = Slot;
+export default PluginDocumentSettingPanel;
