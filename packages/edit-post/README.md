@@ -111,11 +111,11 @@ _Usage_
 var el = wp.element.createElement;
 var __ = wp.i18n.__;
 var registerPlugin = wp.plugins.registerPlugin;
-var PluginDocumentSetting = wp.editPost.PluginPostStatusInfo;
+var PluginDocumentSettingPanel = wp.editPost.PluginDocumentSettingPanel;
 
 function MyDocumentSettingPlugin() {
 	return el(
-		PluginDocumentSetting,
+		PluginDocumentSettingPanel,
 	{
 			className: 'my-document-setting-plugin',
 		},
@@ -131,10 +131,10 @@ function MyDocumentSettingPlugin() {
 ```jsx
 // Using ESNext syntax
 const { registerPlugin } = wp.plugins;
-const { PluginDocumentSetting } = wp.editPost;
+const { PluginDocumentSettingPanel } = wp.editPost;
 
 const MyDocumentSettingTest = () => (
-		<PluginDocumentSetting className="my-document-setting-plugin">
+		<PluginDocumentSettingPanel className="my-document-setting-plugin">
 		<p>My Document Setting Panel</p>
 	</PluginDocumentSetting>
 );
