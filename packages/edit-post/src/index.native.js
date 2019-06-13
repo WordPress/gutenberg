@@ -22,6 +22,11 @@ export function initializeEditor() {
 	// eslint-disable-next-line no-undef
 	if ( typeof __DEV__ === 'undefined' || ! __DEV__ ) {
 		unregisterBlockType( 'core/code' );
+
+		// Disable Video block on Android for now.
+		if ( platform.OS === 'android' ) {
+			unregisterBlockType( 'core/video' );
+		}
 	}
 }
 
