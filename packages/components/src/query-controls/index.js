@@ -8,19 +8,23 @@ import { __ } from '@wordpress/i18n';
  */
 import { RangeControl, SelectControl } from '../';
 import CategorySelect from './category-select';
+import AuthorSelect from './author-select';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
 
 export default function QueryControls( {
 	categoriesList,
+	authorList,
 	selectedCategoryId,
+	selectedAuthorId,
 	numberOfItems,
 	order,
 	orderBy,
 	maxItems = DEFAULT_MAX_ITEMS,
 	minItems = DEFAULT_MIN_ITEMS,
 	onCategoryChange,
+	onAuthorChange,
 	onNumberOfItemsChange,
 	onOrderChange,
 	onOrderByChange,
@@ -70,6 +74,15 @@ export default function QueryControls( {
 				noOptionLabel={ __( 'All' ) }
 				selectedCategoryId={ selectedCategoryId }
 				onChange={ onCategoryChange }
+			/> ),
+		onAuthorChange && (
+			<AuthorSelect
+				key="query-controls-author-select"
+				authorList={ authorList }
+				label={ __( 'Author' ) }
+				noOptionLabel={ __( 'All' ) }
+				selectedAuthorId={ selectedAuthorId }
+				onChange={ onAuthorChange }
 			/> ),
 		onNumberOfItemsChange && (
 			<RangeControl

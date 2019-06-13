@@ -24,6 +24,9 @@ function render_block_core_latest_posts( $attributes ) {
 	if ( isset( $attributes['categories'] ) ) {
 		$args['category'] = $attributes['categories'];
 	}
+	if ( isset( $attributes['users'] ) ) {
+		$args['author'] = $attributes['users'];
+	}
 
 	$recent_posts = get_posts( $args );
 
@@ -170,6 +173,9 @@ function register_block_core_latest_posts() {
 				'orderBy'                 => array(
 					'type'    => 'string',
 					'default' => 'date',
+				),
+				'users'                   => array(
+					'type' => 'string',
 				),
 			),
 			'render_callback' => 'render_block_core_latest_posts',

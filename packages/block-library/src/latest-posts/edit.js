@@ -34,6 +34,9 @@ import { withSelect } from '@wordpress/data';
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
 };
+const USERS_LIST_QUERY = {
+	per_page: -1,
+};
 const MAX_POSTS_COLUMNS = 6;
 
 class LatestPostsEdit extends Component {
@@ -41,6 +44,7 @@ class LatestPostsEdit extends Component {
 		super( ...arguments );
 		this.state = {
 			categoriesList: [],
+			authorList: [],
 		};
 	}
 
@@ -61,6 +65,21 @@ class LatestPostsEdit extends Component {
 				}
 			}
 		);
+		this.fetchRequest = apiFetch( {
+			path: addQueryArgs( `/wp/v2/users`, USERS_LIST_QUERY ),
+		} ).then(
+			( authorList ) => {
+				if ( this.isStillMounted ) {
+					this.setState( { authorList } );
+				}
+			}
+		).catch(
+			() => {
+				if ( this.isStillMounted ) {
+					this.setState( { authorList: [] } );
+				}
+			}
+		);
 	}
 
 	componentWillUnmount() {
@@ -69,8 +88,8 @@ class LatestPostsEdit extends Component {
 
 	render() {
 		const { attributes, setAttributes, latestPosts } = this.props;
-		const { categoriesList } = this.state;
-		const { displayPostContentRadio, displayPostContent, displayPostDate, postLayout, columns, order, orderBy, categories, postsToShow, excerptLength } = attributes;
+		const { categoriesList, authorList } = this.state;
+		const { displayPostContentRadio, displayPostContent, displayPostDate, postLayout, columns, order, orderBy, categories, users, postsToShow, excerptLength } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -115,9 +134,12 @@ class LatestPostsEdit extends Component {
 						{ ...{ order, orderBy } }
 						numberOfItems={ postsToShow }
 						categoriesList={ categoriesList }
+						authorList={ authorList }
+						selectedAuthorId={ users }
 						selectedCategoryId={ categories }
 						onOrderChange={ ( value ) => setAttributes( { order: value } ) }
 						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
+						onAuthorChange={ ( value ) => setAttributes( { users: '' !== value ? value : undefined } ) }
 						onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
 						onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
 					/>
@@ -244,10 +266,11 @@ class LatestPostsEdit extends Component {
 }
 
 export default withSelect( ( select, props ) => {
-	const { postsToShow, order, orderBy, categories } = props.attributes;
+	const { postsToShow, order, orderBy, categories, users } = props.attributes;
 	const { getEntityRecords } = select( 'core' );
 	const latestPostsQuery = pickBy( {
 		categories,
+		author: users,
 		order,
 		orderby: orderBy,
 		per_page: postsToShow,
