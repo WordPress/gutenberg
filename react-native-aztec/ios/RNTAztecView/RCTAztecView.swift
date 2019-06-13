@@ -135,6 +135,7 @@ class RCTAztecView: Aztec.TextView {
         if #available(iOS 11.0, *) {
             textDragInteraction?.isEnabled = false
         }
+        storage.htmlConverter.characterToReplaceLastEmtpyLine = Character(.zeroWidthSpace)
     }
 
     func addPlaceholder() {
@@ -335,7 +336,7 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Native-to-RN Value Packing Logic
 
     private func cleanHTML() -> String {
-        let html = getHTML(prettify: false).replacingOccurrences(of: String(.paragraphSeparator), with: String(.lineFeed))
+        let html = getHTML(prettify: false).replacingOccurrences(of: String(.paragraphSeparator), with: String(.lineFeed)).replacingOccurrences(of: String(.zeroWidthSpace), with: "")
         return html
     }
     
