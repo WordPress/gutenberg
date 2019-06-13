@@ -330,7 +330,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 					borderStyle={ this.blockHolderBorderStyle() }
 					focusedBorderColor={ styles.blockHolderFocused.borderColor }
-					isReplaceable={
+					unstableShouldBlurOnUnmount={
 						this.props.selectedBlock &&
 						this.props.selectedBlock.clientId === clientId &&
 						this.isReplaceable( this.props.selectedBlock ) }
