@@ -204,7 +204,6 @@ const tapSelectAllAboveElement = async ( driver: wd.PromiseChainWebdriver, eleme
 	const x = location.x + 300;
 	const y = location.y - 50;
 	action.press( { x, y } );
-	//action.wait( 1000 );
 	action.release();
 	await action.perform();
 };
@@ -216,7 +215,6 @@ const tapCopyAboveElement = async ( driver: wd.PromiseChainWebdriver, element: w
 	const x = location.x + 220;
 	const y = location.y - 50;
 	action.press( { x, y } );
-	//action.wait( 1000 );
 	action.release();
 	await action.perform();
 };
@@ -226,7 +224,6 @@ const tapPasteAboveElement = async ( driver: wd.PromiseChainWebdriver, element: 
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
 	action.press( { x: location.x + 100, y: location.y - 50 } );
-	//action.wait( 1000 );
 	action.release();
 	await action.perform();
 };
