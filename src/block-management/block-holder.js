@@ -47,7 +47,6 @@ type PropsType = BlockType & {
 	isSelected: boolean,
 	isFirstBlock: boolean,
 	isLastBlock: boolean,
-	unstableShouldBlurOnUnmount: boolean,
 	showTitle: boolean,
 	borderStyle: Object,
 	focusedBorderColor: string,
@@ -145,7 +144,6 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				mergeBlocks={ this.props.mergeBlocks }
 				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 				clientId={ this.props.clientId }
-				unstableShouldBlurOnUnmount={ this.props.unstableShouldBlurOnUnmount }
 			/>
 		);
 	}
