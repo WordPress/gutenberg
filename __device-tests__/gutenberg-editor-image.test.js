@@ -11,7 +11,7 @@ import {
 	isLocalEnvironment,
 	stopDriver,
 	isAndroid,
-	clickMiddleOfElement
+	clickMiddleOfElement,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
@@ -52,7 +52,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 
 			// Workaround because of #952
 			const titleElement = await editorPage.getTitleElement();
-			await clickMiddleOfElement(driver, titleElement);
+			await clickMiddleOfElement( driver, titleElement );
 			await editorPage.dismissKeyboard();
 			// end workaround
 
@@ -70,13 +70,6 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 		if ( ! isAndroid() ) {
 			await editorPage.selectEmptyImageBlock( imageBlock );
 			await editorPage.chooseMediaLibrary();
-			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
-
-			// Workaround because of #952
-			const titleElement = await editorPage.getTitleElement();
-			await clickMiddleOfElement(driver, titleElement);
-			await editorPage.dismissKeyboard();
-			// end workaround
 
 			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 			await imageBlock.click();
