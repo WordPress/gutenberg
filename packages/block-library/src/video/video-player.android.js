@@ -19,6 +19,7 @@ const Video = ( props ) => {
 				// We are using built-in player controls becasue manually
 				// calling presentFullscreenPlayer() is not working for android
 				controls={ isSelected }
+				muted={ ! isSelected }
 			/>
 		</View>
 	);

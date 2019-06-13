@@ -88,7 +88,7 @@ function PostLink( {
 					/>
 					<p>
 						{ __( 'The last part of the URL. ' ) }
-						<ExternalLink href="https://codex.wordpress.org/Posts_Add_New_Screen">
+						<ExternalLink href="https://wordpress.org/support/article/writing-posts/#post-field-descriptions">
 							{ __( 'Read about permalinks' ) }
 						</ExternalLink>
 					</p>

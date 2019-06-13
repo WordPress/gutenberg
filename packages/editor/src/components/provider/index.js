@@ -19,8 +19,10 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
+import withRegistryProvider from './with-registry-provider';
 import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
+import ConvertToGroupButtons from '../convert-to-group-buttons';
 
 const fetchLinkSuggestions = async ( search ) => {
 	const posts = await apiFetch( {
@@ -159,12 +161,14 @@ class EditorProvider extends Component {
 			>
 				{ children }
 				<ReusableBlocksButtons />
+				<ConvertToGroupButtons />
 			</BlockEditorProvider>
 		);
 	}
 }
 
 export default compose( [
+	withRegistryProvider,
 	withSelect( ( select ) => {
 		const {
 			__unstableIsEditorReady: isEditorReady,

@@ -1,7 +1,7 @@
 ( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
-	var InnerBlocks = wp.editor.InnerBlocks;
+	var InnerBlocks = wp.blockEditor.InnerBlocks;
     var circle = el( 'circle', { cx: 10, cy: 10, r: 10, fill: 'red', stroke: 'blue', strokeWidth: '10' } );
     var svg = el( 'svg', { width: 20, height: 20, viewBox: '0 0 20 20' }, circle );
 
