@@ -4,12 +4,13 @@
 	padding: $grid-size ($grid-size-large - $border-width);
 	text-align: left;
 	color: $dark-gray-600;
+	@include menu-style__neutral;
 
 	// Target plugin icons that can have arbitrary classes by using an aggressive selector.
 	.dashicon,
 	.components-menu-items__item-icon,
 	> span > svg {
-		margin-right: 4px;
+		margin-right: 5px;
 	}
 
 	.components-menu-items__item-icon {
@@ -18,7 +19,6 @@
 	}
 
 	&:hover:not(:disabled):not([aria-disabled="true"]) {
-		color: $dark-gray-500;
 		// Disable hover style on mobile to prevent odd scroll behaviour.
 		// See: https://github.com/WordPress/gutenberg/pull/10333
 		@include break-medium() {
@@ -26,7 +26,7 @@
 		}
 
 		.components-menu-item__shortcut {
-			opacity: 1;
+			color: $dark-gray-600;
 		}
 	}
 
@@ -43,12 +43,12 @@
 .components-menu-item__info {
 	margin-top: $grid-size-small;
 	font-size: $default-font-size - 1px;
-	opacity: 0.84;
+	color: $dark-gray-300;
 }
 
 .components-menu-item__shortcut {
 	align-self: center;
-	opacity: 0.84;
+	color: $dark-gray-300;
 	margin-right: 0;
 	margin-left: auto;
 	padding-left: $grid-size;

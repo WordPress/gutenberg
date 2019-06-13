@@ -8,6 +8,6 @@ export async function setPostContent( content ) {
 	return await page.evaluate( ( _content ) => {
 		const { dispatch } = window.wp.data;
 		const blocks = wp.blocks.parse( _content );
-		dispatch( 'core/editor' ).resetBlocks( blocks );
+		dispatch( 'core/block-editor' ).resetBlocks( blocks );
 	}, content );
 }

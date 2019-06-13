@@ -29,16 +29,7 @@
 		max-width: $break-mobile;
 	}
 
-	.components-menu-group:not(:last-child),
-	> div:not(:last-child) .components-menu-group {
-		border-bottom: $border-width solid $light-gray-500;
-	}
-
-	.components-menu-item__button {
-		padding-left: 2rem;
-
-		&.has-icon {
-			padding-left: 0.5rem;
-		}
+	.components-dropdown-menu__menu {
+		padding: 0;
 	}
 }

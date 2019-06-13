@@ -1,4 +1,4 @@
-## Unreleased
+## 2.0.0 (2019-05-21)
 
 ### Requirements
 

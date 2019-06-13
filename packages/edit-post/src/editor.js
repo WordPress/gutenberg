@@ -91,6 +91,7 @@ class Editor extends Component {
 					settings={ editorSettings }
 					post={ post }
 					initialEdits={ initialEdits }
+					useSubRegistry={ false }
 					{ ...props }
 				>
 					<ErrorBoundary onError={ onError }>

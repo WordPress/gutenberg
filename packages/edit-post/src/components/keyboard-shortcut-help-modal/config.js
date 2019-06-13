@@ -133,10 +133,6 @@ const textFormattingShortcuts = {
 			description: __( 'Make the selected text italic.' ),
 		},
 		{
-			keyCombination: primary( 'u' ),
-			description: __( 'Underline the selected text.' ),
-		},
-		{
 			keyCombination: primary( 'k' ),
 			description: __( 'Convert the selected text into a link.' ),
 		},
@@ -145,12 +141,8 @@ const textFormattingShortcuts = {
 			description: __( 'Remove a link.' ),
 		},
 		{
-			keyCombination: access( 'd' ),
-			description: __( 'Add a strikethrough to the selected text.' ),
-		},
-		{
-			keyCombination: access( 'x' ),
-			description: __( 'Display the selected text in a monospaced font.' ),
+			keyCombination: primary( 'u' ),
+			description: __( 'Underline the selected text.' ),
 		},
 	],
 };

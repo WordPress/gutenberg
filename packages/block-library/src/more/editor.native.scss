@@ -1,23 +1,13 @@
 // @format
 
-.block-library-more__container {
-	align-items: center;
-	padding: 4px;
-	flex-direction: row;
-}
-
 .block-library-more__line {
-	background-color: #555d66;
+	background-color: $gray-lighten-20;
 	height: 2;
-	flex: 1;
 }
 
 .block-library-more__text {
+	color: $gray;
 	text-decoration-style: solid;
-	flex: 0;
-	width: 200;
-	text-align: center;
-	margin-left: 15;
-	margin-right: 15;
-	margin-bottom: 5;
+	text-transform: uppercase;
 }
+

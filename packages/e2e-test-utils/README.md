@@ -141,6 +141,21 @@ _Parameters_
 
 Disables Pre-publish checks.
 
+<a name="dragAndResize" href="#dragAndResize">#</a> **dragAndResize**
+
+Clicks an element, drags a particular distance and releases the mouse button.
+
+_Parameters_
+
+-   _element_ `Object`: The puppeteer element handle.
+-   _delta_ `Object`: Object containing movement distances.
+-   _delta.x_ `number`: Horizontal distance to drag.
+-   _delta.y_ `number`: Vertical distance to drag.
+
+_Returns_
+
+-   `Promise`: Promise resolving when drag completes.
+
 <a name="enablePageDialogAccept" href="#enablePageDialogAccept">#</a> **enablePageDialogAccept**
 
 Enables even listener which accepts a page dialog which
@@ -192,7 +207,7 @@ _Returns_
 
 <a name="getAllBlocks" href="#getAllBlocks">#</a> **getAllBlocks**
 
-Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/editor' ).getBlocks();
+Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/block-editor' ).getBlocks();
 
 _Returns_
 

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -11,23 +6,21 @@ import {
 	Button,
 	IconButton,
 	PanelBody,
-	Placeholder,
-	SelectControl,
 	Toolbar,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import {
 	BlockControls,
-	BlockIcon,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { ServerSideRender } from '@wordpress/editor';
+import ServerSideRender from '@wordpress/server-side-render';
 
 /**
  * Internal dependencies
  */
 import LegacyWidgetEditHandler from './handler';
+import LegacyWidgetPlaceholder from './placeholder';
 
 class LegacyWidgetEdit extends Component {
 	constructor() {
@@ -51,41 +44,17 @@ class LegacyWidgetEdit extends Component {
 		const { identifier, isCallbackWidget } = attributes;
 		const widgetObject = identifier && availableLegacyWidgets[ identifier ];
 		if ( ! widgetObject ) {
-			let placeholderContent;
-
-			if ( ! hasPermissionsToManageWidgets ) {
-				placeholderContent = __( 'You don\'t have permissions to use widgets on this site.' );
-			} else if ( availableLegacyWidgets.length === 0 ) {
-				placeholderContent = __( 'There are no widgets available.' );
-			} else {
-				placeholderContent = (
-					<SelectControl
-						label={ __( 'Select a legacy widget to display:' ) }
-						value={ identifier || 'none' }
-						onChange={ ( value ) => setAttributes( {
-							instance: {},
-							identifier: value,
-							isCallbackWidget: availableLegacyWidgets[ value ].isCallbackWidget,
-						} ) }
-						options={ [ { value: 'none', label: 'Select widget' } ].concat(
-							map( availableLegacyWidgets, ( widget, key ) => {
-								return {
-									value: key,
-									label: widget.name,
-								};
-							} )
-						) }
-					/>
-				);
-			}
-
 			return (
-				<Placeholder
-					icon={ <BlockIcon icon="admin-customizer" /> }
-					label={ __( 'Legacy Widget' ) }
-				>
-					{ placeholderContent }
-				</Placeholder>
+				<LegacyWidgetPlaceholder
+					availableLegacyWidgets={ availableLegacyWidgets }
+					currentWidget={ identifier }
+					hasPermissionsToManageWidgets={ hasPermissionsToManageWidgets }
+					onChangeWidget={ ( newWidget ) => setAttributes( {
+						instance: {},
+						identifier: newWidget,
+						isCallbackWidget: availableLegacyWidgets[ newWidget ].isCallbackWidget,
+					} ) }
+				/>
 			);
 		}
 
@@ -109,12 +78,13 @@ class LegacyWidgetEdit extends Component {
 			<>
 				<BlockControls>
 					<Toolbar>
-						<IconButton
-							onClick={ this.changeWidget }
-							label={ __( 'Change widget' ) }
-							icon="update"
-						>
-						</IconButton>
+						{ ! widgetObject.isHidden && (
+							<IconButton
+								onClick={ this.changeWidget }
+								label={ __( 'Change widget' ) }
+								icon="update"
+							/>
+						) }
 						{ ! isCallbackWidget && (
 							<>
 								<Button

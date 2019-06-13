@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "0.2.0",
+	"version": "0.4.0",
 	"private": true,
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
