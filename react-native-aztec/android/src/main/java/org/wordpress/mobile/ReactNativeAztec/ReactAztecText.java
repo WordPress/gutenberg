@@ -4,11 +4,12 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
@@ -168,6 +169,17 @@ public class ReactAztecText extends AztecText {
     public void requestFocusFromJS() {
         mIsJSSettingFocus = true;
         requestFocus();
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // let's pinpoint the caret line to ask the system to bring that line into the viewport
+                int lineNumber = getLayout().getLineForOffset(getSelectionStart());
+
+                Rect caretLineRect = new Rect();
+                getLineBounds(lineNumber, caretLineRect);
+                requestRectangleOnScreen(caretLineRect);
+            }
+        }, 100);
         mIsJSSettingFocus = false;
     }
 
@@ -178,6 +190,7 @@ public class ReactAztecText extends AztecText {
     @Override
     public void clearFocus() {
         setFocusableInTouchMode(false);
+        setFocusable(false);
         super.clearFocus();
         hideSoftKeyboard();
     }
@@ -195,13 +208,21 @@ public class ReactAztecText extends AztecText {
             return false;
         }*/
         setFocusableInTouchMode(true);
+        setFocusable(true);
         boolean focused = super.requestFocus(direction, previouslyFocusedRect);
         showSoftKeyboard();
         return focused;
     }
 
-    private boolean showSoftKeyboard() {
-        return mInputMethodManager.showSoftInput(this, 0);
+    private void showSoftKeyboard() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                if (mInputMethodManager != null) {
+                    mInputMethodManager.showSoftInput(ReactAztecText.this, 0);
+                }
+            }
+        });
     }
 
     private void hideSoftKeyboard() {
@@ -227,18 +248,14 @@ public class ReactAztecText extends AztecText {
 
     private void onContentSizeChange() {
         if (mContentSizeWatcher != null) {
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            if (mContentSizeWatcher != null) {
-                                mContentSizeWatcher.onLayout();
-
-                            }
-                        }
-                    },
-                    500
-            );
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    if (mContentSizeWatcher != null) {
+                        mContentSizeWatcher.onLayout();
+                    }
+                }
+            });
         }
         setIntrinsicContentSize();
     }

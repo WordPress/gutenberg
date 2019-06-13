@@ -16,7 +16,7 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 250000;
 
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	let driver;
@@ -114,7 +114,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		}
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 
-		for ( let i = 4; i > 0; i-- ) {
+		for ( let i = 3; i > 0; i-- ) {
 			await editorPage.removeParagraphBlockAtPosition( i );
 		}
 	} );

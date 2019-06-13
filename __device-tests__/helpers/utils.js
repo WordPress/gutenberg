@@ -114,6 +114,8 @@ const setupDriver = async () => {
 
 	await driver.setImplicitWaitTimeout( 2000 );
 	await timer( 3000 );
+
+	await driver.setOrientation( 'PORTRAIT' );
 	return driver;
 };
 
@@ -278,6 +280,15 @@ const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver, toggleOn: boole
 	}
 };
 
+const toggleOrientation = async ( driver: wd.PromiseChainWebdriver ) => {
+	const orientation = await driver.getOrientation();
+	if ( orientation === 'LANDSCAPE' ) {
+		await driver.setOrientation( 'PORTRAIT' );
+	} else {
+		await driver.setOrientation( 'LANDSCAPE' );
+	}
+};
+
 module.exports = {
 	timer,
 	setupDriver,
@@ -293,4 +304,5 @@ module.exports = {
 	swipeUp,
 	stopDriver,
 	toggleHtmlMode,
+	toggleOrientation,
 };
