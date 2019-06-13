@@ -140,6 +140,21 @@ const BUILD_TASK_BY_EXTENSION = {
 			] );
 		}
 	},
+
+	async '.json'( file ) {
+		// Currently, only building block library block.json files is supported.
+		// See https://github.com/WordPress/gutenberg/issues/16104 for further info.
+		if ( ! /block-library.*block\.json$/.test( file ) ) {
+			return;
+		}
+
+		// The block.json file is inlined into the block's index.js when building.
+		// The following code rebuilds the index.js relative to the block.json so
+		// that this inlining happens again.
+		const blockIndexFile = file.replace( 'block.json', 'index.js' );
+		const task = BUILD_TASK_BY_EXTENSION[ '.js' ];
+		await task( blockIndexFile );
+	},
 };
 
 module.exports = async ( file, callback ) => {
