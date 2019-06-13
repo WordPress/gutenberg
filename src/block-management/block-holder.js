@@ -47,6 +47,7 @@ type PropsType = BlockType & {
 	isSelected: boolean,
 	isFirstBlock: boolean,
 	isLastBlock: boolean,
+	isReplaceable: boolean,
 	showTitle: boolean,
 	borderStyle: Object,
 	focusedBorderColor: string,
