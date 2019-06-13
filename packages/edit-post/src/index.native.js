@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { Platform } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import '@wordpress/core-data';
@@ -23,8 +28,8 @@ export function initializeEditor() {
 	if ( typeof __DEV__ === 'undefined' || ! __DEV__ ) {
 		unregisterBlockType( 'core/code' );
 
-		// Disable Video block on Android for now.
-		if ( platform.OS === 'android' ) {
+		// Disable Video block except for iOS for now.
+		if ( Platform.OS !== 'ios' ) {
 			unregisterBlockType( 'core/video' );
 		}
 	}
