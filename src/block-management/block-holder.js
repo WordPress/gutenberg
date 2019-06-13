@@ -144,6 +144,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				mergeBlocks={ this.props.mergeBlocks }
 				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 				clientId={ this.props.clientId }
+				isReplaceable={ this.props.isReplaceable }
 			/>
 		);
 	}
