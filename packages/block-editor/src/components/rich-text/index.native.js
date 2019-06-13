@@ -702,7 +702,7 @@ export class RichText extends Component {
 
 	componentWillUnmount() {
 		if ( this._editor.isFocused() ) {
-			// this._editor.blur();
+			this._editor.blur();
 		}
 	}
 
