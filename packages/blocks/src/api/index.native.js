@@ -21,8 +21,12 @@ export {
 	getUnregisteredTypeHandlerName,
 	getBlockType,
 	getBlockTypes,
+	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
+	getChildBlockNames,
+	hasChildBlocks,
+	hasChildBlocksWithInserterSupport,
 	setDefaultBlockName,
 	getDefaultBlockName,
 } from './registration';

@@ -20,6 +20,7 @@ export { default as BlockInvalidWarning } from './block-list/block-invalid-warni
 
 // Content Related Components
 export { default as DefaultBlockAppender } from './default-block-appender';
+export { default as Inserter } from './inserter';
 
 // State Related Components
 export { default as BlockEditorProvider } from './provider';
