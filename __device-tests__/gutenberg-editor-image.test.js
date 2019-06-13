@@ -11,12 +11,13 @@ import {
 	isLocalEnvironment,
 	stopDriver,
 	isAndroid,
+	clickMiddleOfElement
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
 
-describe( 'Gutenberg Editor tests', () => {
+describe( 'Gutenberg Editor Image Block tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
@@ -48,6 +49,13 @@ describe( 'Gutenberg Editor tests', () => {
 		if ( ! isAndroid() ) {
 			await editorPage.selectEmptyImageBlock( imageBlock );
 			await editorPage.chooseMediaLibrary();
+
+			// Workaround because of #952
+			const titleElement = await editorPage.getTitleElement();
+			await clickMiddleOfElement(driver, titleElement);
+			await editorPage.dismissKeyboard();
+			// end workaround
+
 			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 			await imageBlock.click();
 			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
@@ -62,6 +70,14 @@ describe( 'Gutenberg Editor tests', () => {
 		if ( ! isAndroid() ) {
 			await editorPage.selectEmptyImageBlock( imageBlock );
 			await editorPage.chooseMediaLibrary();
+			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
+
+			// Workaround because of #952
+			const titleElement = await editorPage.getTitleElement();
+			await clickMiddleOfElement(driver, titleElement);
+			await editorPage.dismissKeyboard();
+			// end workaround
+
 			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 			await imageBlock.click();
 			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );

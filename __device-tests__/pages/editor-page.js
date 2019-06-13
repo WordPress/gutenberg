@@ -58,6 +58,10 @@ export default class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
+	async getTitleElement() {
+		return await this.driver.elementByXPath( '//XCUIElementTypeOther[@name="Add title"]/XCUIElementTypeTextView' );
+	}
+
 	// Converts to lower case and checks for a match to lowercased html content
 	// Ensure to take additional steps to handle text being changed by auto correct
 	async verifyHtmlContent( html: string ) {
