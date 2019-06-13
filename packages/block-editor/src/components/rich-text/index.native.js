@@ -701,7 +701,7 @@ export class RichText extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this._editor.isFocused() && this.props.isReplaceable ) {
+		if ( this._editor.isFocused() && this.props.unstableShouldBlurOnUnmount ) {
 			this._editor.blur();
 		}
 	}
@@ -857,12 +857,12 @@ RichText.defaultProps = {
 
 const RichTextContainer = compose( [
 	withInstanceId,
-	withBlockEditContext( ( { clientId, onCaretVerticalPositionChange, isReplaceable, isSelected }, ownProps ) => {
+	withBlockEditContext( ( { clientId, onCaretVerticalPositionChange, unstableShouldBlurOnUnmount, isSelected }, ownProps ) => {
 		return {
 			clientId,
 			blockIsSelected: ownProps.isSelected !== undefined ? ownProps.isSelected : isSelected,
 			onCaretVerticalPositionChange,
-			isReplaceable,
+			unstableShouldBlurOnUnmount,
 		};
 	} ),
 	withSelect( ( select, {
