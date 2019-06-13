@@ -74,7 +74,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 		"message": {
 			"type": "string",
 			"source": "html",
-			"selector": ".meessage"
+			"selector": ".message"
 		}
 	},
 	"styleVariations": [ 
@@ -365,10 +365,10 @@ That's why, the `WPDefinedAsset` type has to offer a way to mirror also the shap
 
 It's possible to provide an object which takes the following shape:
 - `handle` (`string`) - the name of the script. If omitted, it will be auto-generated.
-- `dependencies` (`string[]`) - an array of registered script handles this script depends on.  Default value: `array()`.
+- `dependencies` (`string[]`) - an array of registered script handles this script depends on.  Default value: `[]`.
 - `version` (`string`|`false`|`null`) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
 
-The definition is stored inside separate JSON file which ends with `.asset.json` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as we are going to provide a way to auto-generate those asset files with `@wordpress/scripts` package.
+The definition is stored inside separate JSON file which ends with `.asset.json` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as it is expected it will become an option to auto-generate those asset files with `@wordpress/scripts` package.
 
 **Example:**
 
