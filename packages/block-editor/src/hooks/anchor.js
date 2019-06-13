@@ -7,7 +7,7 @@ import { assign, has } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { TextControl } from '@wordpress/components';
+import { TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -71,7 +71,16 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 					<InspectorAdvancedControls>
 						<TextControl
 							label={ __( 'HTML Anchor' ) }
-							help={ __( 'Anchors lets you link directly to a section on a page.' ) }
+							help={ (
+							    <>
+							        { __( 'Enter a word or two — without spaces — to make a unique web address just for this heading, called an "anchor." Then, you’ll be able link directly to this section of your page.' ) }
+							        <div className="components-placeholder__learn-more">
+							            <ExternalLink href={ __( 'https://wordpress.org/support/article/#/' ) }>
+							                { __( 'Learn more about anchors' ) }
+							            </ExternalLink>
+							        </div>
+							    </>
+							) }
 							value={ props.attributes.anchor || '' }
 							onChange={ ( nextValue ) => {
 								nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
