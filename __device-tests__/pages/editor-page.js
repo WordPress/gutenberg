@@ -59,7 +59,10 @@ export default class EditorPage {
 	}
 
 	async getTitleElement() {
-		return await this.driver.elementByXPath( '//XCUIElementTypeOther[@name="Add title"]/XCUIElementTypeTextView' );
+		//TODO: Improve the identifier for this element
+		return isAndroid() ?
+			await this.driver.elementByXPath( '//android.view.ViewGroup[@content-desc="Post title. Welcome to Gutenberg!"]/android.widget.EditText' ) :
+			await this.driver.elementByXPath( '//XCUIElementTypeOther[@name="Add title"]/XCUIElementTypeTextView' );
 	}
 
 	// Converts to lower case and checks for a match to lowercased html content
