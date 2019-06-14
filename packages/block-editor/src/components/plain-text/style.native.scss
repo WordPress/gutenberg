@@ -2,9 +2,8 @@
 .block-editor-plain-text {
 	font-family: $default-regular-font;
 	box-shadow: none;
-
+	min-height: $min-height-paragraph;
 	border-width: 0;
-
 	padding: 0;
 	margin: 0;
 }
