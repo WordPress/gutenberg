@@ -11,6 +11,11 @@ import { Component } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withBlockEditContext } from '../block-edit/context';
+import {
+	create,
+	split,
+	insert,
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -24,6 +29,8 @@ export default class PlainText extends Component {
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind( this );
+		this.onPaste = this.onPaste.bind( this );
+		this.insertPastedText = this.insertPastedText.bind( this );
 
 		this.selection = {
 			start: 0,
@@ -66,13 +73,23 @@ export default class PlainText extends Component {
 		this.props.onChange( value );
 	}
 
-	onPaste( event ) {
-
+	onPaste( { nativeEvent } ) {
+		const finalRecord = this.insertPastedText( nativeEvent.pastedText );
+		this.setSelection( finalRecord.start, finalRecord.end );
+		this.props.onChange( finalRecord.text );
 	}
 
-	/*
-	* Handles any case where the content of the AztecRN instance has changed in size
-	*/
+	insertPastedText( pastedText ) {
+		const { value, multiline } = this.props;
+		const finalPastedText = multiline ? pastedText : this.removeNewLines( pastedText );
+		const currentRecord = create( { text: value } );
+		return insert( currentRecord, finalPastedText, this.selection.start, this.selection.end );
+	}
+
+	removeNewLines( text ) {
+		return text.trim().replace(/(\r\n|\n|\r)/gm, " ");
+	}
+
 	onContentSizeChange( contentSize ) {
 		const height = contentSize.height;
 		this.setState( { height } );
