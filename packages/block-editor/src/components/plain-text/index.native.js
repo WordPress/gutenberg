@@ -107,7 +107,6 @@ export default class PlainText extends Component {
 				onFocus={ this.props.onFocus }
 				onBlur={ this.props.onBlur }
 				fontFamily={ this.props.fontFamily || ( styles[ 'block-editor-plain-text' ].fontFamily ) }
-
 				style={ {
 					minHeight: this.state.height,
 				} }
@@ -120,7 +119,7 @@ export default class PlainText extends Component {
 				onContentSizeChange={ this.onContentSizeChange }
 				onSelectionChange={ this.onSelectionChangeFromAztec }
 				maxImagesWidth={ 200 }
-				isMultiline={ true }
+				isMultiline={ this.props.multiline }
 			/>
 		);
 	}
