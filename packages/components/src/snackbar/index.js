@@ -41,6 +41,7 @@ function Snackbar( {
 		// return first element only while keeping it inside an array
 		actions = [ actions[ 0 ] ];
 	}
+
 	return (
 		<div
 			ref={ ref }
@@ -73,9 +74,8 @@ function Snackbar( {
 										onClick( event );
 									}
 								} }
-								className={
-									'components-snackbar__action'
-								}
+								className="components-snackbar__action"
+
 							>
 								{ label }
 							</Button>
