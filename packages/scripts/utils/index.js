@@ -4,6 +4,7 @@
 const {
 	getArgFromCLI,
 	getArgsFromCLI,
+	getFileArgsFromCLI,
 	hasArgInCLI,
 	hasFileArgInCLI,
 	spawnScript,
@@ -29,6 +30,7 @@ module.exports = {
 	fromConfigRoot,
 	getArgFromCLI,
 	getArgsFromCLI,
+	getFileArgsFromCLI,
 	getWebpackArgs,
 	hasBabelConfig,
 	hasArgInCLI,
