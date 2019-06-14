@@ -135,7 +135,7 @@ class RCTAztecView: Aztec.TextView {
         if #available(iOS 11.0, *) {
             textDragInteraction?.isEnabled = false
         }
-        storage.htmlConverter.characterToReplaceLastEmtpyLine = Character(.zeroWidthSpace)
+        storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
     }
 
     func addPlaceholder() {
