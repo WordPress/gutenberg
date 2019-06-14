@@ -101,7 +101,9 @@
 		}
 
 		&:disabled,
-		&[aria-disabled="true"] {
+		&:disabled:active:enabled,
+		&[aria-disabled="true"],
+		&[aria-disabled="true"]:active:enabled {
 			color: color(theme(button) tint(40%));
 			background: color(theme(button));
 			border-color: color(theme(button) shade(7%));
