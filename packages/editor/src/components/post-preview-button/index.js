@@ -192,7 +192,7 @@ export class PostPreviewButton extends Component {
 					}
 				</span>
 				<DotTip tipId="core/editor.preview">
-					{ __( 'Once you\’ve drafted some content, use the “Preview” button to see how it will look to readers. When you\’re ready to add it to your site, use the “Publish” button.' ) }
+					{ __( 'Once you’ve drafted some content, use the “Preview” button to see how it will look to readers. When you’re ready to add it to your site, use the “Publish” button.' ) }
 				</DotTip>
 			</Button>
 		);
