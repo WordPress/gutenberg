@@ -9,12 +9,14 @@ import EditorPage from './pages/editor-page';
 import {
 	setupDriver,
 	isLocalEnvironment,
-	stopDriver } from './helpers/utils';
+	stopDriver,
+	isAndroid,
+} from './helpers/utils';
 import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
 
-describe( 'Gutenberg Editor tests', () => {
+describe( 'Gutenberg Editor tests for List block (end)', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
@@ -35,18 +37,27 @@ describe( 'Gutenberg Editor tests', () => {
 		editorPage = new EditorPage( driver );
 	} );
 
+	it( 'should be able to see visual editor', async () => {
+		await expect( editorPage.getBlockList() ).resolves.toBe( true );
+	} );
+
 	it( 'should be able to end a List block', async () => {
 		await editorPage.addNewListBlock();
 		const listBlockElement = await editorPage.getListBlockAtPosition( 1 );
+
+		// Click List block on Android to force EditText focus
+		if ( isAndroid() ) {
+			await listBlockElement.click();
+		}
 
 		// Send the first list item text
 		await editorPage.sendTextToListBlock( listBlockElement, testData.listItem1 );
 
 		// send an Enter
-		await editorPage.sendTextToParagraphBlock( listBlockElement, '\n' );
+		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
 
 		// send an Enter
-		await editorPage.sendTextToParagraphBlock( listBlockElement, '\n' );
+		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
 
 		await editorPage.verifyHtmlContent( testData.listEndedHtml );
 	} );
