@@ -62,17 +62,18 @@ function HeadingEdit( {
 		<>
 			<BlockControls>
 				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-				<AlignmentToolbar
-					value={ align }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
-					} }
-				/>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading Settings' ) }>
 					<p>{ __( 'Level' ) }</p>
 					<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+					<p>{ __( 'Text Alignment' ) }</p>
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
 				</PanelBody>
 				<HeadingColorUI
 					setTextColor={ setTextColor }
