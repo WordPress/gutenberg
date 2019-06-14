@@ -68,17 +68,9 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	constructor( props: PropsType ) {
 		super( props );
 
-		addAction( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks', requestImageUploadCancel );
-
 		this.state = {
 			isFullyBordered: false,
 		};
-	}
-
-	componentWillUnmount() {
-		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) ) {
-			removeAction( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks' );
-		}
 	}
 
 	onFocus = () => {

@@ -29,11 +29,12 @@ import BlockHolder from './block-holder';
 import type { BlockType } from '../store/types';
 import styles from './block-manager.scss';
 import blockHolderStyles from './block-holder.scss';
-import inlineToolbarStyles from './inline-toolbar/style.scss';
 import toolbarStyles from './block-toolbar.scss';
 import HTMLTextInput from '../components/html-text-input';
 import BlockToolbar from './block-toolbar';
 import SafeArea from 'react-native-safe-area';
+
+const blockMobileToolbarHeight = 44;
 
 type PropsType = {
 	rootClientId: ?string,
@@ -257,7 +258,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					accessibilityLabel="block-list"
 					innerRef={ this.scrollViewInnerRef }
 					blockToolbarHeight={ toolbarStyles.container.height }
-					innerToolbarHeight={ inlineToolbarStyles.toolbar.height }
+					innerToolbarHeight={ blockMobileToolbarHeight }
 					safeAreaBottomInset={ this.state.safeAreaBottomInset }
 					parentHeight={ this.state.rootViewHeight }
 					keyboardShouldPersistTaps="always"
