@@ -15,11 +15,6 @@ exports[`PostPreviewButton render() should render currentPostLink otherwise 1`] 
   >
     (opens in a new tab)
   </span>
-  <WithSelect(WithDispatch(DotTip))
-    tipId="core/editor.preview"
-  >
-    Once you’ve drafted some content, use the “Preview” button to see how it will look to readers. When you’re ready to add it to your site, use the “Publish” button.
-  </WithSelect(WithDispatch(DotTip))>
 </ForwardRef(Button)>
 `;
 
@@ -38,10 +33,5 @@ exports[`PostPreviewButton render() should render previewLink if provided 1`] = 
   >
     (opens in a new tab)
   </span>
-  <WithSelect(WithDispatch(DotTip))
-    tipId="core/editor.preview"
-  >
-    Once you’ve drafted some content, use the “Preview” button to see how it will look to readers. When you’re ready to add it to your site, use the “Publish” button.
-  </WithSelect(WithDispatch(DotTip))>
 </ForwardRef(Button)>
 `;

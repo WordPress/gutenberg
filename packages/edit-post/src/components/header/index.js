@@ -55,14 +55,19 @@ function Header( {
 						forceIsSaving={ isSaving }
 					/>
 				) }
-				<PostPreviewButton
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
-				<PostPublishButtonOrToggle
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-				/>
+				<div>
+					<PostPreviewButton
+						forceIsAutosaveable={ hasActiveMetaboxes }
+						forcePreviewLink={ isSaving ? null : undefined }
+					/>
+					<PostPublishButtonOrToggle
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+					/>
+					<DotTip tipId="core/editor.preview">
+						{ __( 'Once you’ve drafted some content, use the “Preview” button to see how it will look to readers. When you’re ready to add it to your site, use the “Publish” button.' ) }
+					</DotTip>
+				</div>
 				<div>
 					<IconButton
 						icon="admin-generic"
