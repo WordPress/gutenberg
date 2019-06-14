@@ -27,7 +27,9 @@ const getArgFromCLI = ( arg ) => {
 
 const hasArgInCLI = ( arg ) => getArgFromCLI( arg ) !== undefined;
 
-const hasFileArgInCLI = () => minimist( getArgsFromCLI() )._.length > 0;
+const getFileArgsFromCLI = () => minimist( getArgsFromCLI() )._;
+
+const hasFileArgInCLI = () => getFileArgsFromCLI().length > 0;
 
 const handleSignal = ( signal ) => {
 	if ( signal === 'SIGKILL' ) {
@@ -83,6 +85,7 @@ const spawnScript = ( scriptName, args = [] ) => {
 module.exports = {
 	getArgFromCLI,
 	getArgsFromCLI,
+	getFileArgsFromCLI,
 	hasArgInCLI,
 	hasFileArgInCLI,
 	spawnScript,
