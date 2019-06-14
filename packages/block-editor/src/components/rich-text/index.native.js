@@ -37,7 +37,7 @@ import { BACKSPACE } from '@wordpress/keycodes';
 import {
 	children,
 	isUnmodifiedDefaultBlock,
-	pasteHandler
+	pasteHandler,
 } from '@wordpress/blocks';
 import { isURL } from '@wordpress/url';
 
