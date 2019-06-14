@@ -8,7 +8,7 @@ import {
 	PlainText,
 	__experimentalTransformStyles,
 } from '@wordpress/block-editor';
-import { Disabled, SandBox, ResizableBox } from '@wordpress/components';
+import { Disabled, SandBox } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 class HTMLEdit extends Component {
@@ -50,7 +50,7 @@ class HTMLEdit extends Component {
 		this.setState( { isPreview: false } );
 	}
 
-	renderHTML() {
+	render() {
 		const { attributes, setAttributes } = this.props;
 		const { isPreview, styles } = this.state;
 
@@ -82,6 +82,7 @@ class HTMLEdit extends Component {
 								onChange={ ( content ) => setAttributes( { content } ) }
 								placeholder={ __( 'Write HTML…' ) }
 								aria-label={ __( 'HTML' ) }
+								rows={ 3 }
 							/>
 						)
 					) }
@@ -89,19 +90,8 @@ class HTMLEdit extends Component {
 			</div>
 		);
 	}
-
-	render() {
-		return (
-			<ResizableBox
-				minWidth="10%"
-				maxWidth="100%"
-				axis="x"
-			>
-				{ this.renderHTML() }
-			</ResizableBox>
-		);
-	}
 }
+
 export default withSelect( ( select ) => {
 	const { getSettings } = select( 'core/block-editor' );
 	return {
