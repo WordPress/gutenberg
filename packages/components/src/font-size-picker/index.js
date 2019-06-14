@@ -15,7 +15,7 @@ import Button from '../button';
 import RangeControl from '../range-control';
 import SelectControl from '../select-control';
 
-function getInitialSlug( fontSizes, value ) {
+function getInitialSelectValue( fontSizes, value ) {
 	if ( value ) {
 		const initialValue = fontSizes.find( ( font ) => font.size === value );
 		return initialValue ? initialValue.slug : 'custom';
@@ -32,7 +32,7 @@ function FontSizePicker( {
 	withSlider = false,
 } ) {
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const [ currentSlug, setCurrentSlug ] = useState( getInitialSlug( fontSizes, value ) );
+	const [ currentSelectValue, setCurrentSelectValue ] = useState( getInitialSelectValue( fontSizes, value ) );
 
 	if ( disableCustomFontSizes && ! fontSizes.length ) {
 		return null;
@@ -44,20 +44,18 @@ function FontSizePicker( {
 			onChange( undefined );
 			return;
 		}
-		setCurrentSlug( getInitialSlug( fontSizes, Number( newValue ) ) );
+		setCurrentSelectValue( getInitialSelectValue( fontSizes, Number( newValue ) ) );
 		onChange( Number( newValue ) );
 	};
 
 	const onSelectChangeValue = ( eventValue ) => {
-		setCurrentSlug( eventValue );
+		setCurrentSelectValue( eventValue );
 		const selectedFont = fontSizes.find( ( font ) => font.slug === eventValue );
 
 		if ( selectedFont ) {
 			onChange( selectedFont.size );
 		}
 	};
-
-	// const defaultFont = fontSizes.find( ( font ) => font.slug === 'normal' );
 
 	return (
 		<fieldset>
@@ -70,7 +68,7 @@ function FontSizePicker( {
 						className={ 'components-font-size-picker__select' }
 						label={ 'Choose preset' }
 						hideLabel={ true }
-						value={ currentSlug }
+						value={ currentSelectValue }
 						onChange={ onSelectChangeValue }
 						options={ [
 							{ value: fontSizes[ 0 ].slug, label: __( 'Small' ) },
