@@ -68,13 +68,15 @@ export default class PlainText extends Component {
 		this._input.blur();
 	}
 
-	onChange( event ) {
-		const value = event.nativeEvent.plainText;
+	onChange( { nativeEvent } ) {
+		const value = nativeEvent.plainText;
+		this.lastEventCount = nativeEvent.eventCount;
 		this.props.onChange( value );
 	}
 
 	onPaste( { nativeEvent } ) {
 		const finalRecord = this.insertPastedText( nativeEvent.pastedText );
+		this.lastEventCount = undefined;
 		this.setSelection( finalRecord.start, finalRecord.end );
 		this.props.onChange( finalRecord.text );
 	}
@@ -112,7 +114,11 @@ export default class PlainText extends Component {
 	}
 
 	render() {
-		let minHeight = styles[ 'block-editor-plain-text' ].minHeight;
+		const textEvent = {
+			text: this.props.value,
+			eventCount: this.lastEventCount,
+			selection: this.selection,
+		}
 
 		return (
 			<RCTAztecView
@@ -124,13 +130,8 @@ export default class PlainText extends Component {
 				onFocus={ this.props.onFocus }
 				onBlur={ this.props.onBlur }
 				fontFamily={ this.props.fontFamily || ( styles[ 'block-editor-plain-text' ].fontFamily ) }
-				style={ {
-					minHeight: this.state.height,
-				} }
-				plainText={ {
-					text: this.props.value,
-					selection: this.selection,
-				} }
+				style={ { minHeight: this.state.height } }
+				plainText={ textEvent }
 				onChange={ this.onChange }
 				onPaste={ this.onPaste }
 				onContentSizeChange={ this.onContentSizeChange }
