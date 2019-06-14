@@ -110,17 +110,6 @@ export class PostPublishButton extends Component {
 
 		const componentProps = isToggle ? toggleProps : buttonProps;
 		const componentChildren = isToggle ? toggleChildren : buttonChildren;
-		return (
-			<Button
-				ref={ this.buttonNode }
-				{ ...componentProps }
-			>
-				{ componentChildren }
-				<DotTip tipId="core/editor.publish">
-					{ __( 'Finished writing? That’s great, let’s get this published right now. Just click “Publish” and you’re good to go.' ) }
-				</DotTip>
-			</Button>
-		);
 	}
 }
 
