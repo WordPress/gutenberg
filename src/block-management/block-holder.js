@@ -12,16 +12,12 @@ import {
 	Text,
 	TouchableWithoutFeedback,
 } from 'react-native';
-import {
-	requestImageUploadCancel,
-} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { addAction, hasAction, removeAction } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
 import { BlockEdit, BlockInvalidWarning, BlockMobileToolbar } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
