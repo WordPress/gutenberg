@@ -30,7 +30,6 @@ export default function( { postId } ) {
 			'core/editor.inserter',
 			'core/editor.settings',
 			'core/editor.preview',
-			'core/editor.publish',
 		] );
 	}, [ triggerGuide ] );
 	return null;
