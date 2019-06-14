@@ -47,6 +47,12 @@ export default class EditorPage {
 		return undefined !== await this.getBlockAtPosition( position, blockName );
 	}
 
+	async getTitleElement() {
+		//TODO: Improve the identifier for this element
+		const elements = await this.driver.elementsByXPath( `//*[contains(@${ this.accessibilityIdXPathAttrib }, "Post title.")]` );
+		return elements[ elements.length - 1 ];
+	}
+
 	async getTextViewForHtmlViewContent() {
 		const accessibilityId = 'html-view-content';
 		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
