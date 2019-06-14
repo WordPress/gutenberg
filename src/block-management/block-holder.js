@@ -11,7 +11,6 @@ import {
 	View,
 	Text,
 	TouchableWithoutFeedback,
-	Keyboard,
 } from 'react-native';
 import {
 	requestImageUploadCancel,
@@ -173,7 +172,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 							<BlockInvalidWarning blockTitle={ title } icon={ icon } />
 						}
 					</View>
-					{ isSelected && <BlockMobileToolbar clientId={ clientId }/> }
+					{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
 				</View>
 
 			</TouchableWithoutFeedback>
