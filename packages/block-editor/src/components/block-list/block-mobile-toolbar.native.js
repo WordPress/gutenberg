@@ -38,12 +38,15 @@ const BlockMobileToolbar = ( {
 );
 
 export default compose(
-	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
+	withDispatch( ( dispatch, { clientId, rootClientId, onDelete } ) => {
 		const { removeBlock } = dispatch( 'core/block-editor' );
 		return {
-			onDelete: () => {
+			onDelete() {
 				Keyboard.dismiss();
 				removeBlock( clientId, rootClientId );
+				if ( onDelete ) {
+					onDelete( clientId );
+				}
 			},
 		};
 	} ),
