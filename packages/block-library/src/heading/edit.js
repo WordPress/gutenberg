@@ -100,13 +100,13 @@ function HeadingEdit( {
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
 				className={ classnames( className, {
+					[ `has-text-align-${ align }` ]: align,
 					'has-text-color': textColor.color,
 					[ textColor.class ]: textColor.class,
 				} ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 				style={ {
 					color: textColor.color,
-					textAlign: align,
 				} }
 			/>
 		</>

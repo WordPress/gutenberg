@@ -5,9 +5,9 @@
         "isValid": true,
         "attributes": {
             "content": "The <em>Inserter</em> Tool",
-            "level": 2
+            "level": 4
         },
         "innerBlocks": [],
-        "originalContent": "<h2>The <em>Inserter</em> Tool</h2>"
+        "originalContent": "<h4>The <em>Inserter</em> Tool</h4>"
     }
 ]

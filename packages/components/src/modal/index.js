@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -166,7 +165,6 @@ Modal.defaultProps = {
 	bodyOpenClassName: 'modal-open',
 	role: 'dialog',
 	title: null,
-	onRequestClose: noop,
 	focusOnMount: true,
 	shouldCloseOnEsc: true,
 	shouldCloseOnClickOutside: true,

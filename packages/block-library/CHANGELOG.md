@@ -1,4 +1,4 @@
-## Master
+## ## 2.6.0 (2019-06-12)
 
 - Fixed an issue with creating upgraded embed blocks that are not registered ([#15883](https://github.com/WordPress/gutenberg/issues/15883)).
 

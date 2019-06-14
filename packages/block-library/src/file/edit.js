@@ -27,7 +27,6 @@ import {
 	MediaPlaceholder,
 	RichText,
 } from '@wordpress/block-editor';
-import { mediaUpload } from '@wordpress/editor';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 
@@ -56,7 +55,12 @@ class FileEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, noticeOperations, setAttributes } = this.props;
+		const {
+			attributes,
+			mediaUpload,
+			noticeOperations,
+			setAttributes,
+		} = this.props;
 		const { downloadButtonText, href } = attributes;
 
 		// Upload a file drag-and-dropped into the editor
@@ -157,7 +161,7 @@ class FileEdit extends Component {
 					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
 						title: __( 'File' ),
-						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
+						instructions: __( 'Upload a file or pick one from your media library.' ),
 					} }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }
@@ -248,9 +252,12 @@ class FileEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
+		const { getSettings } = select( 'core/block-editor' );
+		const { __experimentalMediaUpload } = getSettings();
 		const { id } = props.attributes;
 		return {
 			media: id === undefined ? undefined : getMedia( id ),
+			mediaUpload: __experimentalMediaUpload,
 		};
 	} ),
 	withNotices,

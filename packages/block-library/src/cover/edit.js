@@ -243,7 +243,7 @@ class CoverEdit extends Component {
 						className={ className }
 						labels={ {
 							title: label,
-							instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
+							instructions: __( 'Upload an image or video file, or pick one from your media library.' ),
 						} }
 						onSelect={ onSelectMedia }
 						accept="image/*,video/*"

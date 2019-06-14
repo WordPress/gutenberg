@@ -41,7 +41,6 @@ import {
 	RichText as RootRichText,
 	RichTextShortcut as RootRichTextShortcut,
 	RichTextToolbarButton as RootRichTextToolbarButton,
-	RichTextInserterItem as RootRichTextInserterItem,
 	__unstableRichTextInputEvent as __unstableRootRichTextInputEvent,
 	MediaPlaceholder as RootMediaPlaceholder,
 	MediaUpload as RootMediaUpload,
@@ -64,14 +63,23 @@ import {
 
 export { default as ServerSideRender } from '@wordpress/server-side-render';
 
-function deprecateComponent( name, Wrapped ) {
-	return forwardRef( ( props, ref ) => {
+function deprecateComponent( name, Wrapped, staticsToHoist = [] ) {
+	const Component = forwardRef( ( props, ref ) => {
 		deprecated( 'wp.editor.' + name, {
 			alternative: 'wp.blockEditor.' + name,
 		} );
 
 		return <Wrapped ref={ ref }{ ...props } />;
 	} );
+
+	staticsToHoist.forEach( ( staticName ) => {
+		Component[ staticName ] = deprecateComponent(
+			name + '.' + staticName,
+			Wrapped[ staticName ]
+		);
+	} );
+
+	return Component;
 }
 
 function deprecateFunction( name, func ) {
@@ -84,13 +92,17 @@ function deprecateFunction( name, func ) {
 	};
 }
 
+const RichText = deprecateComponent( 'RichText', RootRichText, [ 'Content' ] );
+RichText.isEmpty = deprecateFunction( 'RichText.isEmpty', RootRichText.isEmpty );
+
+export { RichText };
 export const Autocomplete = deprecateComponent( 'Autocomplete', RootAutocomplete );
 export const AlignmentToolbar = deprecateComponent( 'AlignmentToolbar', RootAlignmentToolbar );
 export const BlockAlignmentToolbar = deprecateComponent( 'BlockAlignmentToolbar', RootBlockAlignmentToolbar );
-export const BlockControls = deprecateComponent( 'BlockControls', RootBlockControls );
+export const BlockControls = deprecateComponent( 'BlockControls', RootBlockControls, [ 'Slot' ] );
 export const BlockEdit = deprecateComponent( 'BlockEdit', RootBlockEdit );
 export const BlockEditorKeyboardShortcuts = deprecateComponent( 'BlockEditorKeyboardShortcuts', RootBlockEditorKeyboardShortcuts );
-export const BlockFormatControls = deprecateComponent( 'BlockFormatControls', RootBlockFormatControls );
+export const BlockFormatControls = deprecateComponent( 'BlockFormatControls', RootBlockFormatControls, [ 'Slot' ] );
 export const BlockIcon = deprecateComponent( 'BlockIcon', RootBlockIcon );
 export const BlockInspector = deprecateComponent( 'BlockInspector', RootBlockInspector );
 export const BlockList = deprecateComponent( 'BlockList', RootBlockList );
@@ -106,15 +118,13 @@ export const CopyHandler = deprecateComponent( 'CopyHandler', RootCopyHandler );
 export const DefaultBlockAppender = deprecateComponent( 'DefaultBlockAppender', RootDefaultBlockAppender );
 export const FontSizePicker = deprecateComponent( 'FontSizePicker', RootFontSizePicker );
 export const Inserter = deprecateComponent( 'Inserter', RootInserter );
-export const InnerBlocks = deprecateComponent( 'InnerBlocks', RootInnerBlocks );
-export const InspectorAdvancedControls = deprecateComponent( 'InspectorAdvancedControls', RootInspectorAdvancedControls );
-export const InspectorControls = deprecateComponent( 'InspectorControls', RootInspectorControls );
+export const InnerBlocks = deprecateComponent( 'InnerBlocks', RootInnerBlocks, [ 'ButtonBlockAppender', 'DefaultBlockAppender', 'Content' ] );
+export const InspectorAdvancedControls = deprecateComponent( 'InspectorAdvancedControls', RootInspectorAdvancedControls, [ 'Slot' ] );
+export const InspectorControls = deprecateComponent( 'InspectorControls', RootInspectorControls, [ 'Slot' ] );
 export const PanelColorSettings = deprecateComponent( 'PanelColorSettings', RootPanelColorSettings );
 export const PlainText = deprecateComponent( 'PlainText', RootPlainText );
-export const RichText = deprecateComponent( 'RichText', RootRichText );
 export const RichTextShortcut = deprecateComponent( 'RichTextShortcut', RootRichTextShortcut );
 export const RichTextToolbarButton = deprecateComponent( 'RichTextToolbarButton', RootRichTextToolbarButton );
-export const RichTextInserterItem = deprecateComponent( 'RichTextInserterItem', RootRichTextInserterItem );
 export const __unstableRichTextInputEvent = deprecateComponent( '__unstableRichTextInputEvent', __unstableRootRichTextInputEvent );
 export const MediaPlaceholder = deprecateComponent( 'MediaPlaceholder', RootMediaPlaceholder );
 export const MediaUpload = deprecateComponent( 'MediaUpload', RootMediaUpload );

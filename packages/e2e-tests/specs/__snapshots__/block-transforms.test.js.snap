@@ -64,13 +64,13 @@ exports[`Block transforms correctly transform block Heading in fixture core__hea
 <!-- /wp:quote -->"
 `;
 
-exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-em into the Paragraph block 1`] = `
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h4-em into the Paragraph block 1`] = `
 "<!-- wp:paragraph -->
 <p>The <em>Inserter</em> Tool</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-em into the Quote block 1`] = `
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h4-em into the Quote block 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p>The <em>Inserter</em> Tool</p></blockquote>
 <!-- /wp:quote -->"
