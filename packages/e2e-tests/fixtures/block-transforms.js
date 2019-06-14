@@ -168,7 +168,7 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Group',
 		availableTransforms: [],
 	},
-	'core__heading__h2-em': {
+	'core__heading__h4-em': {
 		originalBlock: 'Heading',
 		availableTransforms: [
 			'Quote',

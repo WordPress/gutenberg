@@ -1,11 +1,13 @@
 [
     {
         "blockName": "core/heading",
-        "attrs": {},
+        "attrs": {
+            "level": 4
+        },
         "innerBlocks": [],
-        "innerHTML": "\n<h2>The <em>Inserter</em> Tool</h2>\n",
+        "innerHTML": "\n<h4>The <em>Inserter</em> Tool</h4>\n",
         "innerContent": [
-            "\n<h2>The <em>Inserter</em> Tool</h2>\n"
+            "\n<h4>The <em>Inserter</em> Tool</h4>\n"
         ]
     },
     {
