@@ -147,8 +147,6 @@ _Parameters_
 -   _props_ `Object`: Component properties.
 -   _props.className_ `[string]`: An optional class name added to the row.
 -   _props.title_ `[string]`: The title of the panel
--   _props.isOpen_ `[boolean]`: The open state of the panel. Optional.
--   _props.onTogglePanel_ `[func]`: The function that is run when the panel is toggled. Optional
 
 _Returns_
 
