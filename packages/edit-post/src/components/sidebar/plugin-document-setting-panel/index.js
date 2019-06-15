@@ -12,18 +12,23 @@ import { withDispatch, withSelect } from '@wordpress/data';
 
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
-const PluginDocumentSettingFill = ( { name, className, title, children, ...props } ) => (
-	<Fill>
-		<PanelBody
-			name={ name }
-			className={ className }
-			title={ title }
-			{ ...props }
-		>
-			{ children }
-		</PanelBody>
-	</Fill>
-);
+const PluginDocumentSettingFill = ( { isEnabled, name, className, title, children, ...props } ) => {
+	if ( ! isEnabled ) {
+		return null;
+	}
+	return (
+		<Fill>
+			<PanelBody
+				name={ name }
+				className={ className }
+				title={ title }
+				{ ...props }
+			>
+				{ children }
+			</PanelBody>
+		</Fill>
+	);
+};
 
 /**
  * Renders items below the Status & Availability panel in the Document Sidebar.
@@ -82,7 +87,10 @@ const PluginDocumentSettingPanel = compose(
 	} ),
 	withSelect( ( select, { panelName } ) => {
 		return (
-			{ opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ) }
+			{
+				opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ),
+				isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled( panelName ),
+			}
 		);
 	} ),
 	withDispatch( ( dispatch, { panelName } ) => ( {
