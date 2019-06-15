@@ -37,7 +37,11 @@ jobs:
 
     - name: Build artifacts
       install:
-        - npm ci
+        # A "full" install is executed, since `npm ci` does not always exit
+        # with an error status code if the lock file is inaccurate.
+        #
+        # See: https://github.com/WordPress/gutenberg/issues/16157
+        - npm install
       script:
         - npm run check-local-changes
 
