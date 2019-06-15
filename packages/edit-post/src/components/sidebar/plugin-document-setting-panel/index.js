@@ -12,12 +12,12 @@ import { withDispatch, withSelect } from '@wordpress/data';
 
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
-const PluginDocumentSettingFill = ( { className, title, children, onTogglePanel, ...props } ) => (
+const PluginDocumentSettingFill = ( { name, className, title, children, ...props } ) => (
 	<Fill>
 		<PanelBody
+			name={ name }
 			className={ className }
 			title={ title }
-			onToggle={ onTogglePanel }
 			{ ...props }
 		>
 			{ children }
@@ -31,8 +31,6 @@ const PluginDocumentSettingFill = ( { className, title, children, onTogglePanel,
  * @param {Object} props Component properties.
  * @param {string} [props.className] An optional class name added to the row.
  * @param {string} [props.title] The title of the panel
- * @param {boolean} [props.isOpen] The open state of the panel. Optional.
- * @param {func} [props.onTogglePanel] The function that is run when the panel is toggled. Optional
  *
  * @example <caption>ES5</caption>
  * ```js
@@ -83,11 +81,11 @@ const PluginDocumentSettingPanel = compose(
 	} ),
 	withSelect( ( select, { panelName } ) => {
 		return (
-			{ isOpened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ) }
+			{ opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ) }
 		);
 	} ),
 	withDispatch( ( dispatch, { panelName } ) => ( {
-		onTogglePanel() {
+		onToggle() {
 			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened( panelName );
 		},
 	} ) ),
