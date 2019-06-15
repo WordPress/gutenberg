@@ -145,6 +145,7 @@ const MyDocumentSettingTest = () => (
 _Parameters_
 
 -   _props_ `Object`: Component properties.
+-   _props.name_ `[string]`: The machine-friendly name for the panel.
 -   _props.className_ `[string]`: An optional class name added to the row.
 -   _props.title_ `[string]`: The title of the panel
 
