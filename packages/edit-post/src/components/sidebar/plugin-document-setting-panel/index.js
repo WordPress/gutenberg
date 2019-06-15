@@ -8,15 +8,15 @@
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
-const PluginDocumentSettingFill = ( { className, title, children, isOpened, onTogglePanel, ...props } ) => (
+const PluginDocumentSettingFill = ( { className, title, children, onTogglePanel, ...props } ) => (
 	<Fill>
 		<PanelBody
 			className={ className }
 			title={ title }
-			opened={ isOpened }
 			onToggle={ onTogglePanel }
 			{ ...props }
 		>
@@ -78,8 +78,19 @@ const PluginDocumentSettingPanel = compose(
 	withPluginContext( ( context, ownProps ) => {
 		return {
 			icon: ownProps.icon || context.icon,
+			panelName: `${ context.name }/${ ownProps.name }`,
 		};
 	} ),
+	withSelect( ( select, { panelName } ) => {
+		return (
+			{ isOpened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ) }
+		);
+	} ),
+	withDispatch( ( dispatch, { panelName } ) => ( {
+		onTogglePanel() {
+			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened( panelName );
+		},
+	} ) ),
 )( PluginDocumentSettingFill );
 
 PluginDocumentSettingPanel.Slot = Slot;

@@ -17,7 +17,9 @@ describe( 'PluginDocumentSetting', () => {
 				<PluginDocumentSettingPanel
 					className="my-plugin-settings-sidebar"
 					title="My panel title"
-					initialOpen={ true }>
+					initialOpen={ true }
+					icon="smiley"
+				>
 					My panel content
 				</PluginDocumentSettingPanel>
 				<PluginDocumentSettingPanel.Slot />

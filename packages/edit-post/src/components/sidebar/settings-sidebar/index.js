@@ -20,7 +20,7 @@ import PostLink from '../post-link';
 import DiscussionPanel from '../discussion-panel';
 import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
-import PluginDocumentSetting from '../plugin-document-setting';
+import PluginDocumentSetting from '../plugin-document-setting-panel';
 
 const SettingsSidebar = ( { sidebarName } ) => (
 	<Sidebar

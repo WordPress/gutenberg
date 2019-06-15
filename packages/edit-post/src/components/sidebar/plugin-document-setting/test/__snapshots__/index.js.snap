@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`PluginDocumentSetting renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-settings-sidebar is-opened\\"><h2 class=\\"components-panel__body-title\\"></h2>My panel content</div>"`;

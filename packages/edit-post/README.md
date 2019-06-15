@@ -100,7 +100,7 @@ _Returns_
 
 -   `WPElement`: The WPElement to be rendered.
 
-<a name="PluginDocumentSetting" href="#PluginDocumentSetting">#</a> **PluginDocumentSetting**
+<a name="PluginDocumentSettingPanel" href="#PluginDocumentSettingPanel">#</a> **PluginDocumentSettingPanel**
 
 Renders items below the Status & Availability panel in the Document Sidebar.
 
