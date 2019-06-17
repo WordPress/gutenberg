@@ -32,6 +32,9 @@ function RichTextWraper( {
 	tagName,
 	value: passedValue,
 	onChange: passedOnChange,
+	selectionStart,
+	selectionEnd,
+	onSelectionChange,
 	multiline,
 	onTagNameChange,
 	inlineToolbar,
@@ -42,7 +45,14 @@ function RichTextWraper( {
 	onRemove,
 	onMerge,
 	onSplit,
-	...props
+	isCaretWithinFormattedText,
+	onEnterFormattedText,
+	onExitFormattedText,
+	canUserUseUnfilteredHTML,
+	isSelected: _isSelected,
+	onCreateUndoLevel,
+	placeholder,
+	keepPlaceholderOnFocus,
 } ) {
 	let adjustedValue = passedValue;
 	let adjustedOnChange = passedOnChange;
@@ -57,10 +67,12 @@ function RichTextWraper( {
 
 	return (
 		<RichText
-			{ ...props }
 			tagName={ tagName }
 			value={ adjustedValue }
 			onChange={ adjustedOnChange }
+			selectionStart={ selectionStart }
+			selectionEnd={ selectionEnd }
+			onSelectionChange={ onSelectionChange }
 			wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
 			className={ classnames( classes, className ) }
 			__unstablePatterns={ getPatterns() }
@@ -73,6 +85,14 @@ function RichTextWraper( {
 			__unstableOnMerge={ onMerge }
 			__unstableOnSplit={ onSplit }
 			__unstableMultiline={ multiline }
+			__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
+			__unstableOnEnterFormattedText={ onEnterFormattedText }
+			__unstableOnExitFormattedText={ onExitFormattedText }
+			__unstableCanUserUseUnfilteredHTML={ canUserUseUnfilteredHTML }
+			onCreateUndoLevel={ onCreateUndoLevel }
+			isSelected={ _isSelected }
+			placeholder={ placeholder }
+			keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
 		>
 			{ ( { isSelected, value, onChange } ) =>
 				<>
