@@ -14,6 +14,13 @@ body.gutenberg_page_gutenberg-widgets {
 	@include wp-admin-reset( ".blocks-widgets-container" );
 }
 
+#customize-theme-controls #sub-accordion-section-gutenberg_widget_blocks {
+	.blocks-widgets-container {
+		min-height: initial;
+		position: initial;
+	}
+}
+
 .blocks-widgets-container,
 // The modals are shown outside the .blocks-widgets-container wrapper, they need these styles
 .components-modal__frame {

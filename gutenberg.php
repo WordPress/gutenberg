@@ -69,6 +69,32 @@ function gutenberg_menu() {
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
+ * Gutenberg's Customize Register.
+ *
+ * Adds a section to the Customizer for editing widgets with Gutenberg.
+ *
+ * @param \WP_Customize_Manager $wp_customize An instance of the class that controls most of the Theme Customization API for WordPress 3.4 and newer.
+ * @since x.x.x
+ */
+function gutenberg_customize_register( $wp_customize ) {
+	require dirname( __FILE__ ) . '/lib/class-wp-customize-widget-blocks-control.php';
+	$wp_customize->add_setting( 'gutenberg_widget_blocks' );
+	$wp_customize->add_section(
+		'gutenberg_widget_blocks',
+		array( 'title' => __( 'Widget Blocks', 'gutenberg' ) )
+	);
+	$wp_customize->add_control( new WP_Customize_Widget_Blocks_Control(
+		$wp_customize,
+		'gutenberg_widget_blocks',
+		array(
+			'section'  => 'gutenberg_widget_blocks',
+			'settings' => 'gutenberg_widget_blocks',
+		)
+	) );
+}
+add_action( 'customize_register', 'gutenberg_customize_register' );
+
+/**
  * Display a version notice and deactivate the Gutenberg plugin.
  *
  * @since 0.1.0
