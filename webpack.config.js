@@ -153,6 +153,7 @@ module.exports = {
 	],
 	resolve: {
 		alias: {
+			// Added for compatibility with IE.
 			'react-spring$': 'react-spring/web.cjs',
 		},
 	},
