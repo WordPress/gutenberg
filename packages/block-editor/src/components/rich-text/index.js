@@ -33,17 +33,9 @@ class RichTextWraper extends Component {
 		super( ...arguments );
 
 		this.usedDeprecatedChildrenSource = Array.isArray( value );
-		this.onChangeChildren = this.onChangeChildren.bind( this );
-	}
-
-	onChangeChildren( value ) {
-		return children.fromDOM(
-			__unstableCreateElement( document, value ).childNodes
-		);
 	}
 
 	render() {
-		let { value: _value, onChange: _onChange } = this.props;
 		const {
 			tagName,
 			multiline,
@@ -53,9 +45,14 @@ class RichTextWraper extends Component {
 			className,
 		} = this.props;
 
+		let _value = this.props.value;
+		let _onChange = this.props.onChange;
+
 		if ( this.usedDeprecatedChildrenSource ) {
-			_value = children.toHTML( _value );
-			_onChange = this.onChangeChildren;
+			_value = children.toHTML( this.props.value );
+			_onChange = ( newValue ) => this.props.onChange( children.fromDOM(
+				__unstableCreateElement( document, newValue ).childNodes
+			) );
 		}
 
 		return (
