@@ -10,12 +10,14 @@ import { navigateRegions } from '@wordpress/components';
 import Header from '../header';
 import Sidebar from '../sidebar';
 import WidgetAreas from '../widget-areas';
+import Notices from '../notices';
 
 function Layout( { blockEditorSettings } ) {
 	return (
 		<>
 			<Header />
 			<Sidebar />
+			<Notices />
 			<div
 				className="edit-widgets-layout__content"
 				role="region"
