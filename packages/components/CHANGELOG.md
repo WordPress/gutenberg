@@ -1,4 +1,4 @@
-## Master
+## 8.0.0 (2019-06-12)
 
 ### New Feature
 
@@ -17,6 +17,9 @@
 
 - `ServerSideRender` is no longer part of components. It was extracted to an independent package `@wordpress/server-side-render`.
 
+### Bug Fix
+
+- Although `DateTimePicker` does not allow picking the seconds, passed the current seconds as the selected value for seconds when calling `onChange`. Now it passes zero.
 
 ## 7.4.0 (2019-05-21)
 

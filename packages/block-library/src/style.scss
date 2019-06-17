@@ -17,6 +17,7 @@
 @import "./rss/style.scss";
 @import "./search/style.scss";
 @import "./separator/style.scss";
+@import "./spacer/style.scss";
 @import "./subhead/style.scss";
 @import "./table/style.scss";
 @import "./text-columns/style.scss";
@@ -146,6 +147,18 @@
 	font-size: 42px;
 }
 
+// Text alignments.
+.has-text-align-center {
+	text-align: center;
+}
+
+.has-text-align-left {
+	text-align: left;
+}
+
+.has-text-align-right {
+	text-align: right;
+}
 
 /**
  * Vanilla Block Styles

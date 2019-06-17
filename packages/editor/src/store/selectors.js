@@ -1160,6 +1160,10 @@ export function getEditorSettings( state ) {
 
 function getBlockEditorSelector( name ) {
 	return createRegistrySelector( ( select ) => ( state, ...args ) => {
+		deprecated( '`wp.data.select( \'core/editor\' ).' + name + '`', {
+			alternative: '`wp.data.select( \'core/block-editor\' ).' + name + '`',
+		} );
+
 		return select( 'core/block-editor' )[ name ]( ...args );
 	} );
 }

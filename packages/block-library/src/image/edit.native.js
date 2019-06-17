@@ -274,13 +274,6 @@ class ImageEdit extends React.Component {
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
-				accessibilityLabel={ sprintf(
-					/* translators: accessibility text. 1: image alt text. 2: image caption. */
-					__( 'Image block. %1$s. %2$s' ),
-					alt,
-					caption
-				) }
-				accessibilityRole={ 'button' }
 				onPress={ this.onImagePressed }
 				onLongPress={ openMediaOptions }
 				disabled={ ! isSelected }
@@ -368,7 +361,7 @@ class ImageEdit extends React.Component {
 								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
 								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-								onFocus={ this.onFocusCaption }
+								unstableOnFocus={ this.onFocusCaption }
 								onBlur={ this.props.onBlur } // always assign onBlur as props
 								isSelected={ this.state.isCaptionSelected }
 								__unstableMobileNoFocusOnMount

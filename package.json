@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "5.8.0",
+	"version": "5.9.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -88,7 +88,7 @@
 		"@wordpress/scripts": "file:packages/scripts",
 		"babel-plugin-inline-json-import": "0.3.2",
 		"benchmark": "2.1.4",
-		"browserslist": "4.4.1",
+		"browserslist": "4.6.2",
 		"chalk": "2.4.1",
 		"commander": "2.20.0",
 		"concurrently": "3.5.0",

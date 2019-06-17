@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	clickBlockAppender,
 	createNewPost,
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
@@ -28,56 +27,6 @@ describe( 'a11y', () => {
 		} );
 
 		expect( isFocusedToggle ).toBe( true );
-	} );
-
-	it( 'checks persistent selection', async () => {
-		await clickBlockAppender();
-
-		// adding one Paragraph block which contains a focusable RichText
-		await page.keyboard.type( 'Testing editor selection persistence' );
-
-		let isFocusedRichText = await page.$eval( ':focus', ( focusedElement ) => {
-			return focusedElement.classList.contains( 'block-editor-rich-text__editable' );
-		} );
-
-		expect( isFocusedRichText ).toBe( true );
-
-		// moving focus backwards using keyboard shortcuts
-		// twice to get to the inspector tabs
-		await pressKeyWithModifier( 'ctrlShift', '`' );
-		await pressKeyWithModifier( 'ctrlShift', '`' );
-
-		await page.keyboard.press( 'Tab' );
-
-		const isFocusedInspectorDocumentTab = await page.$eval( ':focus', ( focusedElement ) => {
-			return focusedElement.getAttribute( 'data-label' );
-		} );
-
-		expect( isFocusedInspectorDocumentTab ).toEqual( 'Document' );
-
-		await page.keyboard.press( 'Space' );
-
-		isFocusedRichText = await page.$eval( ':focus', ( focusedElement ) => {
-			return focusedElement.classList.contains( 'block-editor-rich-text__editable' );
-		} );
-
-		expect( isFocusedRichText ).toBe( false );
-
-		await page.keyboard.press( 'Tab' );
-
-		const isFocusedInspectorBlockTab = await page.$eval( ':focus', ( focusedElement ) => {
-			return focusedElement.getAttribute( 'data-label' );
-		} );
-
-		expect( isFocusedInspectorBlockTab ).toEqual( 'Block' );
-
-		await page.keyboard.press( 'Space' );
-
-		isFocusedRichText = await page.$eval( ':focus', ( focusedElement ) => {
-			return focusedElement.classList.contains( 'block-editor-rich-text__editable' );
-		} );
-
-		expect( isFocusedRichText ).toBe( true );
 	} );
 
 	it( 'constrains focus to a modal when tabbing', async () => {

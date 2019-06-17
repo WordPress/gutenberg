@@ -72,6 +72,7 @@ class CoverEdit extends Component {
 		this.imageRef = createRef();
 		this.videoRef = createRef();
 		this.changeIsDarkIfRequired = this.changeIsDarkIfRequired.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 	}
 
 	componentDidMount() {
@@ -82,12 +83,17 @@ class CoverEdit extends Component {
 		this.handleBackgroundMode( prevProps );
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	render() {
 		const {
 			attributes,
 			setAttributes,
 			className,
-			noticeOperations,
 			noticeUI,
 			overlayColor,
 			setOverlayColor,
@@ -237,13 +243,13 @@ class CoverEdit extends Component {
 						className={ className }
 						labels={ {
 							title: label,
-							instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
+							instructions: __( 'Upload an image or video file, or pick one from your media library.' ),
 						} }
 						onSelect={ onSelectMedia }
 						accept="image/*,video/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
+						onError={ this.onUploadError }
 					/>
 				</>
 			);

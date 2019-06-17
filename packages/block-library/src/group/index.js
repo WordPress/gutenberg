@@ -7,6 +7,7 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import deprecated from './deprecated';
 import edit from './edit';
 import icon from './icon';
 import metadata from './block.json';
@@ -33,7 +34,7 @@ export const settings = {
 				type: 'block',
 				isMultiBlock: true,
 				blocks: [ '*' ],
-				convert( blocks ) {
+				__experimentalConvert( blocks ) {
 					// Avoid transforming a single `core/group` Block
 					if ( blocks.length === 1 && blocks[ 0 ].name === 'core/group' ) {
 						return;
@@ -67,4 +68,5 @@ export const settings = {
 
 	edit,
 	save,
+	deprecated,
 };

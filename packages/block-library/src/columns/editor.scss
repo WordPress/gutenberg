@@ -21,7 +21,7 @@
 
 // Fullwide: show margin left/right to ensure there's room for the side UI.
 // This is not a 1:1 preview with the front-end where these margins would presumably be zero.
-.editor-block-list__block[data-align="full"] [data-type="core/columns"][data-align="full"] .wp-block-columns > .editor-inner-blocks {
+[data-type="core/columns"][data-align="full"] .wp-block-columns > .editor-inner-blocks {
 	padding-left: $block-padding;
 	padding-right: $block-padding;
 

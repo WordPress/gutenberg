@@ -9,19 +9,19 @@ const { sync: resolveBin } = require( 'resolve-bin' );
  */
 const {
 	fromConfigRoot,
-	getCliArgs,
-	hasCliArg,
-	hasFileInCliArgs,
+	getArgsFromCLI,
+	hasArgInCLI,
+	hasFileArgInCLI,
 	hasProjectFile,
 	hasPackageProp,
 } = require( '../utils' );
 
-const args = getCliArgs();
+const args = getArgsFromCLI();
 
-const defaultFilesArgs = ! hasFileInCliArgs ? [ '**/*.{css,scss}' ] : [];
+const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '**/*.{css,scss}' ];
 
 // See: https://github.com/stylelint/stylelint/blob/master/docs/user-guide/configuration.md#loading-the-configuration-object.
-const hasLintConfig = hasCliArg( '--config' ) ||
+const hasLintConfig = hasArgInCLI( '--config' ) ||
 	hasProjectFile( '.stylelintrc' ) ||
 	hasProjectFile( '.stylelintrc.js' ) ||
 	hasProjectFile( '.stylelintrc.json' ) ||
@@ -35,7 +35,7 @@ const defaultConfigArgs = ! hasLintConfig ?
 	[];
 
 // See: https://github.com/stylelint/stylelint/blob/master/docs/user-guide/configuration.md#stylelintignore.
-const hasIgnoredFiles = hasCliArg( '--ignore-path' ) ||
+const hasIgnoredFiles = hasArgInCLI( '--ignore-path' ) ||
 	hasProjectFile( '.stylelintignore' );
 
 const defaultIgnoreArgs = ! hasIgnoredFiles ?
