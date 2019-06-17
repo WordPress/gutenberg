@@ -912,13 +912,6 @@ class RichText extends Component {
 	 * @return {Object} An internal rich-text value.
 	 */
 	formatToValue( value ) {
-		const { __unstableChildrenToHTML: childrenToHTML } = this.props;
-
-		// Handle deprecated `children` and `node` sources.
-		if ( childrenToHTML && Array.isArray( value ) ) {
-			value = childrenToHTML( value );
-		}
-
 		if ( this.props.format === 'string' ) {
 			const prepare = createPrepareEditableTree( this.props, 'format_value_functions' );
 
@@ -970,18 +963,7 @@ class RichText extends Component {
      * @return {*} The external data format, data type depends on props.
      */
 	valueToFormat( value ) {
-		const { __unstableChildrenFromDom: childrenFromDom } = this.props;
-
 		value = this.removeEditorOnlyFormats( value );
-
-		// Handle deprecated `children` and `node` sources.
-		if ( this.usedDeprecatedChildrenSource && childrenFromDom ) {
-			return childrenFromDom( toDom( {
-				value,
-				multilineTag: this.multilineTag,
-				isEditableTree: false,
-			} ).body.childNodes );
-		}
 
 		if ( this.props.format === 'string' ) {
 			return toHTMLString( {
