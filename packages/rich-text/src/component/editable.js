@@ -193,6 +193,7 @@ export default class Editable extends Component {
 			contentEditable: true,
 			[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
 			ref: this.bindEditorNode,
+			style,
 			suppressContentEditableWarning: true,
 			dangerouslySetInnerHTML: { __html: valueToEditableHTML( record ) },
 			...remainingProps,
