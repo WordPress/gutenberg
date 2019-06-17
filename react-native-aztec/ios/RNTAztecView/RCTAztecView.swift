@@ -135,6 +135,8 @@ class RCTAztecView: Aztec.TextView {
         if #available(iOS 11.0, *) {
             textDragInteraction?.isEnabled = false
         }
+        storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
+        shouldNotifyOfNonUserChanges = false
     }
 
     func addPlaceholder() {
@@ -335,7 +337,7 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Native-to-RN Value Packing Logic
 
     private func cleanHTML() -> String {
-        let html = getHTML(prettify: false).replacingOccurrences(of: String(.paragraphSeparator), with: String(.lineFeed))
+        let html = getHTML(prettify: false).replacingOccurrences(of: String(.paragraphSeparator), with: String(.lineFeed)).replacingOccurrences(of: String(.zeroWidthSpace), with: "")
         return html
     }
     
@@ -400,7 +402,9 @@ class RCTAztecView: Aztec.TextView {
 
     @objc var placeholder: String {
         set {
-            placeholderLabel.text = newValue
+            var placeholderAttributes = typingAttributes
+            placeholderAttributes[.foregroundColor] = placeholderTextColor
+            placeholderLabel.attributedText = NSAttributedString(string: newValue, attributes: placeholderAttributes)
         }
 
         get {
@@ -434,7 +438,7 @@ class RCTAztecView: Aztec.TextView {
     }
     
     func updatePlaceholderVisibility() {
-        placeholderLabel.isHidden = !self.text.isEmpty
+        placeholderLabel.isHidden = !self.text.replacingOccurrences(of: String(.zeroWidthSpace), with: "").isEmpty
     }
     
     // MARK: - Font Setters
