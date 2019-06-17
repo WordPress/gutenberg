@@ -110,7 +110,7 @@ _Returns_
 
 <a name="getGroupingBlockName" href="#getGroupingBlockName">#</a> **getGroupingBlockName**
 
-Returns the name of the block for handling unregistered blocks.
+Returns the name of the block for handling the grouping of blocks.
 
 _Parameters_
 
@@ -118,7 +118,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Name of the block for handling unregistered blocks.
+-   `?string`: Name of the block for handling grouping blocks.
 
 <a name="getUnregisteredFallbackBlockName" href="#getUnregisteredFallbackBlockName">#</a> **getUnregisteredFallbackBlockName**
 

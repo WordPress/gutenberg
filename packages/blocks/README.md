@@ -670,7 +670,7 @@ _Parameters_
 
 <a name="setGroupingBlockName" href="#setGroupingBlockName">#</a> **setGroupingBlockName**
 
-Assigns the grouping block name.
+Assigns name of block for handling block grouping interactions.
 
 _Parameters_
 

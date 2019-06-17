@@ -237,7 +237,7 @@ export function setDefaultBlockName( name ) {
 }
 
 /**
- * Assigns the grouping block name.
+ * Assigns name of block for handling block grouping interactions.
  *
  * @param {string} name Block name.
  */
