@@ -21,7 +21,7 @@ const BlockMover = ( {
 } ) => (
 	<>
 		<ToolbarButton
-			label={ ! isFirst ?
+			title={ ! isFirst ?
 				sprintf(
 					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
 					__( 'Move block up from row %1$s to row %2$s' ),
@@ -37,7 +37,7 @@ const BlockMover = ( {
 		/>
 
 		<ToolbarButton
-			label={ ! isLast ?
+			title={ ! isLast ?
 				sprintf(
 					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
 					__( 'Move block down from row %1$s to row %2$s' ),

@@ -31,7 +31,7 @@ const BlockMobileToolbar = ( {
 		<InspectorControls.Slot />
 
 		<ToolbarButton
-			label={
+			title={
 				sprintf(
 					/* translators: accessibility text. %s: current block position (number). */
 					__( 'Remove block at row %s' ),
