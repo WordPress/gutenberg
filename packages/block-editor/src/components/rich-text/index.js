@@ -37,6 +37,11 @@ function RichTextWraper( {
 	inlineToolbar,
 	wrapperClassName,
 	className,
+	autocompleters,
+	onReplace,
+	onRemove,
+	onMerge,
+	onSplit,
 	...props
 } ) {
 	let adjustedValue = passedValue;
@@ -54,7 +59,6 @@ function RichTextWraper( {
 		<RichText
 			{ ...props }
 			tagName={ tagName }
-			multiline={ multiline }
 			value={ adjustedValue }
 			onChange={ adjustedOnChange }
 			wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
@@ -63,6 +67,12 @@ function RichTextWraper( {
 			__unstableEnterPatterns={ getEnterPatterns() }
 			__unstablePasteHandler={ pasteHandler }
 			__unstableAutocomplete={ Autocomplete }
+			__unstableAutocompleters={ autocompleters }
+			__unstableOnReplace={ onReplace }
+			__unstableOnRemove={ onRemove }
+			__unstableOnMerge={ onMerge }
+			__unstableOnSplit={ onSplit }
+			__unstableMultiline={ multiline }
 		>
 			{ ( { isSelected, value, onChange } ) =>
 				<>

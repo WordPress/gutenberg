@@ -88,7 +88,12 @@ function createPrepareEditableTree( props, prefix ) {
 }
 
 class RichText extends Component {
-	constructor( { value, multiline, selectionStart, selectionEnd } ) {
+	constructor( {
+		value,
+		__unstableMultiline: multiline,
+		selectionStart,
+		selectionEnd,
+	} ) {
 		super( ...arguments );
 
 		if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
@@ -198,7 +203,13 @@ class RichText extends Component {
 	 * @param {PasteEvent} event The paste event.
 	 */
 	onPaste( event ) {
-		const { __unstablePasteHandler: pasteHandler } = this.props;
+		const {
+			tagName,
+			canUserUseUnfilteredHTML,
+			__unstablePasteHandler: pasteHandler,
+			__unstableOnReplace: onReplace,
+			__unstableOnSplit: onSplit,
+		} = this.props;
 		const clipboardData = event.clipboardData;
 		let { items, files } = clipboardData;
 
@@ -243,15 +254,15 @@ class RichText extends Component {
 			const content = pasteHandler( {
 				HTML: `<img src="${ createBlobURL( file ) }">`,
 				mode: 'BLOCKS',
-				tagName: this.props.tagName,
+				tagName,
 			} );
-			const shouldReplace = this.props.onReplace && this.isEmpty();
+			const shouldReplace = onReplace && this.isEmpty();
 
 			// Allows us to ask for this information when we get a report.
 			window.console.log( 'Received item:\n\n', file );
 
 			if ( shouldReplace ) {
-				this.props.onReplace( content );
+				onReplace( content );
 			} else if ( this.onSplit ) {
 				this.onSplit( record, content );
 			}
@@ -279,8 +290,8 @@ class RichText extends Component {
 			}
 		}
 
-		const canReplace = this.props.onReplace && this.isEmpty();
-		const canSplit = this.props.onReplace && this.props.onSplit;
+		const canReplace = onReplace && this.isEmpty();
+		const canSplit = onReplace && onSplit;
 
 		let mode = 'INLINE';
 
@@ -294,8 +305,8 @@ class RichText extends Component {
 			HTML: html,
 			plainText,
 			mode,
-			tagName: this.props.tagName,
-			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
+			tagName,
+			canUserUseUnfilteredHTML,
 		} );
 
 		if ( typeof content === 'string' ) {
@@ -310,7 +321,7 @@ class RichText extends Component {
 			this.onChange( insert( record, valueToInsert ) );
 		} else if ( content.length > 0 ) {
 			if ( canReplace ) {
-				this.props.onReplace( content );
+				onReplace( content );
 			} else {
 				this.onSplit( record, content );
 			}
@@ -408,11 +419,16 @@ class RichText extends Component {
 
 		this.onChange( change, { withoutHistory: true } );
 
-		if ( this.props.__unstablePatterns ) {
-			const transformed = this.props.__unstablePatterns.reduce(
+		const {
+			__unstablePatterns: patterns,
+			__unstableOnReplace: onReplace,
+		} = this.props;
+
+		if ( patterns ) {
+			const transformed = patterns.reduce(
 				( accumlator, transform ) => transform(
 					accumlator,
-					this.props.onReplace,
+					onReplace,
 					this.valueToFormat
 				),
 				change
@@ -548,7 +564,7 @@ class RichText extends Component {
 	 * @param {KeyboardEvent} event Keydown event.
 	 */
 	onDeleteKeyDown( event ) {
-		const { onMerge, onRemove } = this.props;
+		const { __unstableOnMerge: onMerge, __unstableOnRemove: onRemove } = this.props;
 		if ( ! onMerge && ! onRemove ) {
 			return;
 		}
@@ -595,7 +611,12 @@ class RichText extends Component {
 	 */
 	onKeyDown( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-		const { onReplace, onSplit } = this.props;
+		const {
+			__unstableOnReplace: onReplace,
+			__unstableOnSplit: onSplit,
+			__unstableEnterPatterns: enterPatterns,
+		} = this.props;
+
 		const canSplit = onReplace && onSplit;
 
 		if (
@@ -648,10 +669,10 @@ class RichText extends Component {
 
 			const record = this.createRecord();
 
-			if ( this.props.__unstableEnterPatterns ) {
-				if ( this.props.__unstableEnterPatterns(
+			if ( enterPatterns ) {
+				if ( enterPatterns(
 					record,
-					this.props.onReplace,
+					onReplace,
 					this.valueToFormat,
 				) !== record ) {
 					return;
@@ -782,8 +803,8 @@ class RichText extends Component {
 	 */
 	onSplit( record, pastedBlocks = [] ) {
 		const {
-			onReplace,
-			onSplit,
+			__unstableOnReplace: onReplace,
+			__unstableOnSplit: onSplit,
 			__unstableOnSplitMiddle: onSplitMiddle,
 		} = this.props;
 
@@ -984,10 +1005,11 @@ class RichText extends Component {
 			placeholder,
 			keepPlaceholderOnFocus = false,
 			isSelected,
-			autocompleters,
 			children,
 			// To do: move autocompletion logic to rich-text.
+			__unstableAutocompleters: autocompleters,
 			__unstableAutocomplete: Autocomplete = ( { children: ch } ) => ch( {} ),
+			__unstableOnReplace: onReplace,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -1038,7 +1060,7 @@ class RichText extends Component {
 
 		const content = (
 			<Autocomplete
-				onReplace={ this.props.onReplace }
+				onReplace={ onReplace }
 				completers={ autocompleters }
 				record={ record }
 				onChange={ this.onChange }
