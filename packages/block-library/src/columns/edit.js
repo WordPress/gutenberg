@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { dropRight } from 'lodash';
+import { dropRight, times } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -57,8 +57,8 @@ const TEMPLATE_OPTIONS = [
 		title: __( 'Two columns; equal split' ),
 		icon: <SVG width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><Path fillRule="evenodd" clipRule="evenodd" d="M39 12C40.1046 12 41 12.8954 41 14V34C41 35.1046 40.1046 36 39 36H9C7.89543 36 7 35.1046 7 34V14C7 12.8954 7.89543 12 9 12H39ZM39 34V14H25V34H39ZM23 34H9V14H23V34Z" /></SVG>,
 		template: [
-			[ 'core/column', { width: 50 } ],
-			[ 'core/column', { width: 50 } ],
+			[ 'core/column' ],
+			[ 'core/column' ],
 		],
 	},
 	{
@@ -81,9 +81,9 @@ const TEMPLATE_OPTIONS = [
 		title: __( 'Three columns; equal split' ),
 		icon: <SVG width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><Path fillRule="evenodd" d="M41 14a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h30a2 2 0 0 0 2-2V14zM28.5 34h-9V14h9v20zm2 0V14H39v20h-8.5zm-13 0H9V14h8.5v20z" /></SVG>,
 		template: [
-			[ 'core/column', { width: 33.33 } ],
-			[ 'core/column', { width: 33.33 } ],
-			[ 'core/column', { width: 33.33 } ],
+			[ 'core/column' ],
+			[ 'core/column' ],
+			[ 'core/column' ],
 		],
 	},
 	{
@@ -202,15 +202,13 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 		setAttributes( { columns } );
 
 		let innerBlocks = getBlocks( clientId );
-		if ( ! hasExplicitColumnWidths( innerBlocks ) ) {
-			return;
-		}
+		const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
 
 		// Redistribute available width for existing inner blocks.
 		const { columns: previousColumns } = attributes;
 		const isAddingColumn = columns > previousColumns;
 
-		if ( isAddingColumn ) {
+		if ( isAddingColumn && hasExplicitWidths ) {
 			// If adding a new column, assign width to the new column equal to
 			// as if it were `1 / columns` of the total available space.
 			const newColumnWidth = toWidthPrecision( 100 / columns );
@@ -221,18 +219,29 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 
 			innerBlocks = [
 				...getMappedColumnWidths( innerBlocks, widths ),
-				createBlock( 'core/column', {
-					width: newColumnWidth,
+				...times( columns - previousColumns, () => {
+					return createBlock( 'core/column', {
+						width: newColumnWidth,
+					} );
+				} ),
+			];
+		} else if ( isAddingColumn ) {
+			innerBlocks = [
+				...innerBlocks,
+				...times( columns - previousColumns, () => {
+					return createBlock( 'core/column', );
 				} ),
 			];
 		} else {
 			// The removed column will be the last of the inner blocks.
-			innerBlocks = dropRight( innerBlocks );
+			innerBlocks = dropRight( innerBlocks, previousColumns - columns );
 
-			// Redistribute as if block is already removed.
-			const widths = getRedistributedColumnWidths( innerBlocks, 100 );
+			if ( hasExplicitWidths ) {
+				// Redistribute as if block is already removed.
+				const widths = getRedistributedColumnWidths( innerBlocks, 100 );
 
-			innerBlocks = getMappedColumnWidths( innerBlocks, widths );
+				innerBlocks = getMappedColumnWidths( innerBlocks, widths );
+			}
 		}
 
 		replaceInnerBlocks( clientId, innerBlocks, false );

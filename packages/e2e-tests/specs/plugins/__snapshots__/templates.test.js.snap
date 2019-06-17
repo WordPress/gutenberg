@@ -13,7 +13,7 @@ exports[`templates Using a CPT with a predefined template Should add a custom po
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
 <!-- /wp:quote -->
 
-<!-- wp:columns -->
+<!-- wp:columns {\\"columns\\":2} -->
 <div class=\\"wp-block-columns has-2-columns\\"><!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:image -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
@@ -39,7 +39,7 @@ exports[`templates Using a CPT with a predefined template Should respect user ed
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
 <!-- /wp:quote -->
 
-<!-- wp:columns -->
+<!-- wp:columns {\\"columns\\":2} -->
 <div class=\\"wp-block-columns has-2-columns\\"><!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:image -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
