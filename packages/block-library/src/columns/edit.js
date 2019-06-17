@@ -95,16 +95,6 @@ const TEMPLATE_OPTIONS = [
 			[ 'core/column', { width: 25 } ],
 		],
 	},
-	{
-		title: __( 'Four columns; equal split' ),
-		icon: <SVG width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><Path fillRule="evenodd" d="M41 14a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h30a2 2 0 0 0 2-2V14zM31 34h-6V14h6v20zm2 0V14h6v20h-6zm-10 0h-6V14h6v20zm-8 0H9V14h6v20z" /></SVG>,
-		template: [
-			[ 'core/column', { width: 25 } ],
-			[ 'core/column', { width: 25 } ],
-			[ 'core/column', { width: 25 } ],
-			[ 'core/column', { width: 25 } ],
-		],
-	},
 ];
 
 /**
