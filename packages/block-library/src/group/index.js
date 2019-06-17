@@ -19,7 +19,7 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Group' ),
 	icon,
-	description: __( 'A block that contains other blocks.' ),
+	description: __( 'Combine two (or more!) blocks into a single block for easy manipulation.' ),
 	keywords: [ __( 'container' ), __( 'wrapper' ), __( 'row' ), __( 'section' ) ],
 	supports: {
 		align: [ 'wide', 'full' ],
