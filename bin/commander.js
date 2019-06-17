@@ -278,6 +278,7 @@ async function runReleaseBranchCreationStep( abortMessage ) {
 	return {
 		version,
 		versionLabel,
+		releaseBranch,
 	};
 }
 
@@ -320,6 +321,7 @@ async function runReleaseBranchCheckoutStep( abortMessage ) {
 	return {
 		version,
 		versionLabel: version,
+		releaseBranch,
 	};
 }
 
@@ -415,9 +417,10 @@ async function runCreateGitTagStep( version, abortMessage ) {
 /**
  * Push the local Git Changes and Tags to the remote repository.
  *
- * @param {string} abortMessage Abort message.
+ * @param {string} releaseBranch  Release branch name.
+ * @param {string} abortMessage   Abort message.
  */
-async function runPushGitChangesStep( abortMessage ) {
+async function runPushGitChangesStep( releaseBranch, abortMessage ) {
 	await runStep( 'Pushing the release branch and the tag', abortMessage, async () => {
 		const simpleGit = SimpleGit( gitWorkingDirectoryPath );
 		await askForConfirmationToContinue(
@@ -425,7 +428,7 @@ async function runPushGitChangesStep( abortMessage ) {
 			true,
 			abortMessage
 		);
-		await simpleGit.push( 'origin' );
+		await simpleGit.push( 'origin', releaseBranch );
 		await simpleGit.pushTags( 'origin' );
 	} );
 }
@@ -539,7 +542,7 @@ async function releasePlugin( isRC = true ) {
 	await runGitRepositoryCloneStep( abortMessage );
 
 	// Creating the release branch
-	const { version, versionLabel } = isRC ?
+	const { version, versionLabel, releaseBranch } = isRC ?
 		await runReleaseBranchCreationStep( abortMessage ) :
 		await runReleaseBranchCheckoutStep( abortMessage );
 
@@ -553,7 +556,7 @@ async function releasePlugin( isRC = true ) {
 	await runCreateGitTagStep( version, abortMessage );
 
 	// Push the local changes
-	await runPushGitChangesStep( abortMessage );
+	await runPushGitChangesStep( releaseBranch, abortMessage );
 	abortMessage = 'Aborting! Make sure to ' + isRC ? 'remove' : 'reset' + ' the remote release branch and remove the git tag.';
 
 	// Creating the GitHub Release

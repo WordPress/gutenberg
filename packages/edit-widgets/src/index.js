@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import '@wordpress/notices';
 import { render } from '@wordpress/element';
 import { registerCoreBlocks } from '@wordpress/block-library';
 

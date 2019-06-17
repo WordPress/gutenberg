@@ -19,11 +19,7 @@
 	}
 
 	&:hover:not(:disabled):not([aria-disabled="true"]) {
-		// Disable hover style on mobile to prevent odd scroll behaviour.
-		// See: https://github.com/WordPress/gutenberg/pull/10333
-		@include break-medium() {
-			@include menu-style__hover;
-		}
+		@include menu-style__hover;
 
 		.components-menu-item__shortcut {
 			color: $dark-gray-600;

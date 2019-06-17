@@ -26,15 +26,19 @@ import {
 	split,
 	toHTMLString,
 	insert,
-	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	__unstableInsertLineSeparator as insertLineSeparator,
 	__unstableIsEmptyLine as isEmptyLine,
+	__unstableRemoveLineSeparator as removeLineSeparator,
 	isCollapsed,
 	remove,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
-import { pasteHandler, children } from '@wordpress/blocks';
+import {
+	children,
+	isUnmodifiedDefaultBlock,
+	pasteHandler,
+} from '@wordpress/blocks';
 import { isURL } from '@wordpress/url';
 
 /**
@@ -165,7 +169,7 @@ export class RichText extends Component {
 	 * @return {Object} A RichText value with formats and selection.
 	 */
 	createRecord() {
-		return {
+		const value = {
 			start: this.selectionStart,
 			end: this.selectionEnd,
 			...create( {
@@ -175,6 +179,9 @@ export class RichText extends Component {
 				multilineWrapperTags: this.multilineWrapperTags,
 			} ),
 		};
+		const start = Math.min( this.selectionStart, value.text.length );
+		const end = Math.min( this.selectionEnd, value.text.length );
+		return { ...value, start, end };
 	}
 
 	/**
@@ -296,12 +303,23 @@ export class RichText extends Component {
 				result = this.removeRootTag( element, result );
 			} );
 		}
+
+		if ( this.props.tagsToEliminate ) {
+			this.props.tagsToEliminate.forEach( ( element ) => {
+				result = this.removeTag( element, result );
+			} );
+		}
 		return result;
 	}
 
 	removeRootTag( tag, html ) {
 		const openingTagRegexp = RegExp( '^<' + tag + '>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>$', 'gim' );
+		return html.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
+	}
+	removeTag( tag, html ) {
+		const openingTagRegexp = RegExp( '<' + tag + '>', 'gim' );
+		const closingTagRegexp = RegExp( '</' + tag + '>', 'gim' );
 		return html.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
 	}
 
@@ -344,25 +362,30 @@ export class RichText extends Component {
 
 	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
+		if ( this.props.onEnter ) {
+			this.props.onEnter();
+			return;
+		}
+
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
-
+		const { onReplace, onSplit } = this.props;
+		const canSplit = onReplace && onSplit;
 		const currentRecord = this.createRecord();
-
 		if ( this.multilineTag ) {
 			if ( event.shiftKey ) {
 				this.needsSelectionUpdate = true;
 				const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
 				this.onFormatChange( insertedLineBreak );
-			} else if ( this.onSplit && isEmptyLine( currentRecord ) ) {
+			} else if ( canSplit && isEmptyLine( currentRecord ) ) {
 				this.onSplit( currentRecord );
 			} else {
 				this.needsSelectionUpdate = true;
 				const insertedLineSeparator = { ...insertLineSeparator( currentRecord ) };
 				this.onFormatChange( insertedLineSeparator );
 			}
-		} else if ( event.shiftKey || ! this.onSplit ) {
+		} else if ( event.shiftKey || ! onSplit ) {
 			this.needsSelectionUpdate = true;
 			const insertedLineBreak = { ...insert( currentRecord, '\n' ) };
 			this.onFormatChange( insertedLineBreak );
@@ -386,68 +409,18 @@ export class RichText extends Component {
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
 		const value = this.createRecord();
-		const { replacements, text, start, end } = value;
+		const { start, end } = value;
 		let newValue;
 
 		// Always handle full content deletion ourselves.
 		if ( start === 0 && end !== 0 && end >= value.text.length ) {
 			newValue = remove( value, start, end );
 			this.props.onChange( newValue );
-			this.forceSelectionUpdate( 0, 0 );
 			return;
 		}
 
 		if ( this.multilineTag ) {
-			if ( keyCode === BACKSPACE ) {
-				const index = start - 1;
-
-				if ( text[ index ] === LINE_SEPARATOR ) {
-					const collapsed = isCollapsed( value );
-
-					// If the line separator that is about te be removed
-					// contains wrappers, remove the wrappers first.
-					if ( collapsed && replacements[ index ] && replacements[ index ].length ) {
-						const newReplacements = replacements.slice();
-
-						newReplacements[ index ] = replacements[ index ].slice( 0, -1 );
-						newValue = {
-							...value,
-							replacements: newReplacements,
-						};
-					} else {
-						newValue = remove(
-							value,
-							// Only remove the line if the selection is
-							// collapsed, otherwise remove the selection.
-							collapsed ? start - 1 : start,
-							end
-						);
-					}
-				}
-			} else if ( text[ end ] === LINE_SEPARATOR ) {
-				const collapsed = isCollapsed( value );
-
-				// If the line separator that is about te be removed
-				// contains wrappers, remove the wrappers first.
-				if ( collapsed && replacements[ end ] && replacements[ end ].length ) {
-					const newReplacements = replacements.slice();
-
-					newReplacements[ end ] = replacements[ end ].slice( 0, -1 );
-					newValue = {
-						...value,
-						replacements: newReplacements,
-					};
-				} else {
-					newValue = remove(
-						value,
-						start,
-						// Only remove the line if the selection is
-						// collapsed, otherwise remove the selection.
-						collapsed ? end + 1 : end,
-					);
-				}
-			}
-
+			newValue = removeLineSeparator( value, keyCode === BACKSPACE );
 			if ( newValue ) {
 				this.onFormatChange( newValue );
 				return;
@@ -578,9 +551,17 @@ export class RichText extends Component {
 	onFocus() {
 		this.isTouched = true;
 
-		if ( this.props.onFocus ) {
-			this.props.onFocus();
+		const { unstableOnFocus } = this.props;
+
+		if ( unstableOnFocus ) {
+			unstableOnFocus();
 		}
+
+		// We know for certain that on focus, the old selection is invalid. It
+		// will be recalculated on `selectionchange`.
+		const index = undefined;
+
+		this.props.onSelectionChange( index, index );
 
 		this.lastAztecEventType = 'focus';
 	}
@@ -704,7 +685,9 @@ export class RichText extends Component {
 		}
 
 		if ( ! this.comesFromAztec ) {
-			if ( nextProps.selectionStart !== this.props.selectionStart &&
+			if ( ( typeof nextProps.selectionStart !== 'undefined' ) &&
+					( typeof nextProps.selectionEnd !== 'undefined' ) &&
+					nextProps.selectionStart !== this.props.selectionStart &&
 					nextProps.selectionStart !== this.selectionStart &&
 					nextProps.isSelected ) {
 				this.needsSelectionUpdate = true;
@@ -727,7 +710,7 @@ export class RichText extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this._editor.isFocused() ) {
+		if ( this._editor.isFocused() && this.props.shouldBlurOnUnmount ) {
 			this._editor.blur();
 		}
 	}
@@ -742,7 +725,7 @@ export class RichText extends Component {
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
 			// if its internal value hasn't change. When created, default value is 0, 0
 			this.onSelectionChange( this.props.selectionStart || 0, this.props.selectionEnd || 0 );
-		} else if ( ! this.props.isSelected && prevProps.isSelected && this.isIOS ) {
+		} else if ( ! this.props.isSelected && prevProps.isSelected ) {
 			this._editor.blur();
 		}
 	}
@@ -845,7 +828,7 @@ export class RichText extends Component {
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }
 					placeholder={ this.props.placeholder }
-					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text' ].textDecorationColor }
+					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text-placeholder' ].color }
 					deleteEnter={ this.props.deleteEnter }
 					onChange={ this.onChange }
 					onFocus={ this.onFocus }
@@ -857,9 +840,9 @@ export class RichText extends Component {
 					onContentSizeChange={ this.onContentSizeChange }
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					onSelectionChange={ this.onSelectionChangeFromAztec }
-					isSelected={ isSelected }
 					blockType={ { tag: tagName } }
-					color={ 'black' }
+					color={ styles[ 'block-editor-rich-text' ].color }
+					linkTextColor={ styles[ 'block-editor-rich-text' ].textDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || styles[ 'block-editor-rich-text' ].fontFamily }
 					fontSize={ this.props.fontSize || ( style && style.fontSize ) }
@@ -883,15 +866,10 @@ RichText.defaultProps = {
 
 const RichTextContainer = compose( [
 	withInstanceId,
-	withBlockEditContext( ( { clientId, onFocus, onCaretVerticalPositionChange, isSelected }, ownProps ) => {
-		// ownProps.onFocus needs precedence over the block edit context
-		if ( ownProps.onFocus !== undefined ) {
-			onFocus = ownProps.onFocus;
-		}
+	withBlockEditContext( ( { clientId, onCaretVerticalPositionChange, isSelected }, ownProps ) => {
 		return {
 			clientId,
 			blockIsSelected: ownProps.isSelected !== undefined ? ownProps.isSelected : isSelected,
-			onFocus,
 			onCaretVerticalPositionChange,
 		};
 	} ),
@@ -906,6 +884,7 @@ const RichTextContainer = compose( [
 		const {
 			getSelectionStart,
 			getSelectionEnd,
+			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
 
 		const selectionStart = getSelectionStart();
@@ -918,12 +897,19 @@ const RichTextContainer = compose( [
 			);
 		}
 
+		// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
+		// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
+		// This apparently assumes functionality the BlockHlder actually
+		const block = clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
+		const shouldBlurOnUnmount = block && isSelected && isUnmodifiedDefaultBlock( block );
+
 		return {
 			formatTypes: getFormatTypes(),
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
 			blockIsSelected,
+			shouldBlurOnUnmount,
 		};
 	} ),
 	withDispatch( ( dispatch, {

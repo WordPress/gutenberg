@@ -8,6 +8,9 @@ import { get, map } from 'lodash';
  */
 import { parse, serialize } from '@wordpress/blocks';
 import { dispatch, select } from '@wordpress/data-controls';
+import { __ } from '@wordpress/i18n';
+
+const WIDGET_AREAS_SAVE_NOTICE_ID = 'WIDGET_AREAS_SAVE_NOTICE_ID';
 
 /**
  * Yields an action object that setups the widget areas.
@@ -73,4 +76,14 @@ export function* saveWidgetAreas() {
 			}
 		);
 	}
+
+	yield dispatch(
+		'core/notices',
+		'createSuccessNotice',
+		__( 'Block areas saved succesfully.' ),
+		{
+			id: WIDGET_AREAS_SAVE_NOTICE_ID,
+			type: 'snackbar',
+		}
+	);
 }

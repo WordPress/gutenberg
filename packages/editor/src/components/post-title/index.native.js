@@ -89,19 +89,20 @@ class PostTitle extends Component {
 				<RichText
 					tagName={ 'p' }
 					rootTagsToEliminate={ [ 'strong' ] }
-					onFocus={ this.onSelect }
+					unstableOnFocus={ this.onSelect }
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }
 					style={ style }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
+					deleteEnter={ true }
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
 					placeholder={ decodedPlaceholder }
 					value={ title }
 					onSplit={ () => { } }
-					onReplace={ this.props.onEnterPress }
+					onEnter={ this.props.onEnterPress }
 					disableEditingMenu={ true }
 					setRef={ ( ref ) => {
 						this.titleViewRef = ref;

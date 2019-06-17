@@ -12,6 +12,7 @@ import {
 	createElement,
 	Fragment,
 	StrictMode,
+	forwardRef,
 } from '../react';
 import RawHTML from '../raw-html';
 import serialize, {
@@ -81,6 +82,20 @@ describe( 'serialize()', () => {
 		expect( result ).toBe(
 			'FunctionComponent: Hello!' +
 			'ClassComponent: Hello!'
+		);
+	} );
+
+	it( 'should render with forwardRef', () => {
+		const ForwardedComponent = forwardRef( () => {
+			return <div>test</div>;
+		} );
+
+		const result = serialize(
+			<ForwardedComponent />
+		);
+
+		expect( result ).toBe(
+			'<div>test</div>'
 		);
 	} );
 

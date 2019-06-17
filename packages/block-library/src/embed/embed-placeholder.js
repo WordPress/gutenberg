@@ -2,13 +2,18 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { Button, Placeholder } from '@wordpress/components';
+import { Button, Placeholder, ExternalLink } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 
 const EmbedPlaceholder = ( props ) => {
 	const { icon, label, value, onSubmit, onChange, cannotEmbed, fallback, tryAgain } = props;
 	return (
-		<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
+		<Placeholder
+			icon={ <BlockIcon icon={ icon } showColors /> }
+			label={ label }
+			className="wp-block-embed"
+			instructions={ __( 'Paste a link to the content you want to display on your site.' ) }
+		>
 			<form onSubmit={ onSubmit }>
 				<input
 					type="url"
@@ -29,6 +34,11 @@ const EmbedPlaceholder = ( props ) => {
 					</p>
 				}
 			</form>
+			<div className="components-placeholder__learn-more">
+				<ExternalLink href={ __( 'https://wordpress.org/support/article/embeds/' ) }>
+					{ __( 'Learn more about embeds' ) }
+				</ExternalLink>
+			</div>
 		</Placeholder>
 	);
 };
