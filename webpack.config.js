@@ -151,5 +151,10 @@ module.exports = {
 		] ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	],
+	resolve: {
+		alias: {
+			'react-spring$': 'react-spring/web.cjs',
+		},
+	},
 	devtool,
 };
