@@ -7,7 +7,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, RawHTML } from '@wordpress/element';
+import { RawHTML } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
@@ -28,71 +28,67 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
 
-class RichTextWraper extends Component {
-	constructor( { value } ) {
-		super( ...arguments );
+function RichTextWraper( {
+	tagName,
+	value: passedValue,
+	onChange: passedOnChange,
+	multiline,
+	onTagNameChange,
+	inlineToolbar,
+	wrapperClassName,
+	className,
+	...props
+} ) {
+	let adjustedValue = passedValue;
+	let adjustedOnChange = passedOnChange;
 
-		this.usedDeprecatedChildrenSource = Array.isArray( value );
+	// Handle deprecated format.
+	if ( Array.isArray( passedValue ) ) {
+		adjustedValue = children.toHTML( passedValue );
+		adjustedOnChange = ( newValue ) => passedOnChange( children.fromDOM(
+			__unstableCreateElement( document, newValue ).childNodes
+		) );
 	}
 
-	render() {
-		const {
-			tagName,
-			multiline,
-			onTagNameChange,
-			inlineToolbar,
-			wrapperClassName,
-			className,
-		} = this.props;
-
-		let _value = this.props.value;
-		let _onChange = this.props.onChange;
-
-		if ( this.usedDeprecatedChildrenSource ) {
-			_value = children.toHTML( this.props.value );
-			_onChange = ( newValue ) => this.props.onChange( children.fromDOM(
-				__unstableCreateElement( document, newValue ).childNodes
-			) );
-		}
-
-		return (
-			<RichText
-				{ ...this.props }
-				value={ _value }
-				onChange={ _onChange }
-				wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
-				className={ classnames( classes, className ) }
-				__unstablePatterns={ getPatterns() }
-				__unstableEnterPatterns={ getEnterPatterns() }
-				__unstablePasteHandler={ pasteHandler }
-				__unstableAutocomplete={ Autocomplete }
-			>
-				{ ( { isSelected, value, onChange } ) => (
-					<>
-						{ isSelected && multiline === 'li' && (
-							<ListEdit
-								onTagNameChange={ onTagNameChange }
-								tagName={ tagName }
-								value={ value }
-								onChange={ onChange }
-							/>
-						) }
-						{ isSelected && ! inlineToolbar && (
-							<BlockFormatControls>
-								<FormatToolbar />
-							</BlockFormatControls>
-						) }
-						{ inlineToolbar && (
-							<IsolatedEventContainer>
-								<FormatToolbar />
-							</IsolatedEventContainer>
-						) }
-						{ isSelected && <RemoveBrowserShortcuts /> }
-					</>
-				) }
-			</RichText>
-		);
-	}
+	return (
+		<RichText
+			{ ...props }
+			tagName={ tagName }
+			multiline={ multiline }
+			value={ adjustedValue }
+			onChange={ adjustedOnChange }
+			wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
+			className={ classnames( classes, className ) }
+			__unstablePatterns={ getPatterns() }
+			__unstableEnterPatterns={ getEnterPatterns() }
+			__unstablePasteHandler={ pasteHandler }
+			__unstableAutocomplete={ Autocomplete }
+		>
+			{ ( { isSelected, value, onChange } ) =>
+				<>
+					{ isSelected && multiline === 'li' && (
+						<ListEdit
+							onTagNameChange={ onTagNameChange }
+							tagName={ tagName }
+							value={ value }
+							onChange={ onChange }
+						/>
+					) }
+					{ isSelected && ! inlineToolbar && (
+						<BlockFormatControls>
+							<FormatToolbar />
+						</BlockFormatControls>
+					) }
+					{ inlineToolbar && (
+						<IsolatedEventContainer>
+							<FormatToolbar />
+						</IsolatedEventContainer>
+					) }
+					{ isSelected && <RemoveBrowserShortcuts /> }
+				</>
+			}
+		</RichText>
+	);
 }
 
 const RichTextContainer = compose( [
