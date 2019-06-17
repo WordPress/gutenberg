@@ -136,7 +136,7 @@ class RCTAztecView: Aztec.TextView {
             textDragInteraction?.isEnabled = false
         }
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
-        self.shouldNotifyOfNonUserChanges = false
+        shouldNotifyOfNonUserChanges = false
     }
 
     func addPlaceholder() {
