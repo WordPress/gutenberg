@@ -73,6 +73,11 @@ const deprecated = [
 				/>
 			);
 		},
+		isEligible( { style } ) {
+			if ( style && style.textAlign ) {
+				return true;
+			}
+		},
 	},
 ];
 
