@@ -86,7 +86,7 @@ else:
 <!-- /wp:spacer -->
 
 <!-- wp:heading {"align":"left"} -->
-<h2 style="text-align:left">Meet your new best friends, Blocks</h2>
+<h2 class="has-text-align-left">Meet your new best friends, Blocks</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"align":"left"} -->
@@ -110,7 +110,7 @@ else:
 <!-- /wp:spacer -->
 
 <!-- wp:heading {"align":"left"} -->
-<h2 style="text-align:left">Be your own builder</h2>
+<h2 class="has-text-align-left">Be your own builder</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"align":"left"} -->
@@ -126,7 +126,7 @@ else:
 <!-- /wp:spacer -->
 
 <!-- wp:heading {"align":"left"} -->
-<h2 style="text-align:left">Gutenberg ❤️ Developers</h2>
+<h2 class="has-text-align-left">Gutenberg ❤️ Developers</h2>
 <!-- /wp:heading -->
 
 <!-- wp:columns {"className":"gutenberg-landing\u002d\u002ddevelopers-columns"} -->
@@ -164,7 +164,7 @@ else:
 <!-- /wp:spacer -->
 
 <!-- wp:heading {"align":"left"} -->
-<h2 style="text-align:left">The editor is just the beginning</h2>
+<h2 class="has-text-align-left">The editor is just the beginning</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"align":"left"} -->
@@ -200,7 +200,7 @@ else:
 <!-- /wp:spacer -->
 
 <!-- wp:heading {"align":"left"} -->
-<h2 style="text-align:left">Dig in deeper</h2>
+<h2 class="has-text-align-left">Dig in deeper</h2>
 <!-- /wp:heading -->
 
 <!-- wp:list -->
