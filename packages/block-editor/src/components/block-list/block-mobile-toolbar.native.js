@@ -7,8 +7,8 @@ import { Keyboard, View } from 'react-native';
  * WordPress dependencies
  */
 import { ToolbarButton } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { withDispatch } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -21,6 +21,7 @@ import InspectorControls from '../inspector-controls';
 const BlockMobileToolbar = ( {
 	clientId,
 	onDelete,
+	order,
 } ) => (
 	<View style={ styles.toolbar }>
 		<BlockMover clientIds={ [ clientId ] } />
@@ -30,14 +31,30 @@ const BlockMobileToolbar = ( {
 		<InspectorControls.Slot />
 
 		<ToolbarButton
-			label={ __( 'Remove' ) }
+			label={
+				sprintf(
+					/* translators: accessibility text. %s: current block position (number). */
+					__( 'Remove block at row %s' ),
+					order + 1
+				)
+			}
 			onClick={ onDelete }
 			icon="trash"
+			extraProps={ { hint: __( 'Double tap to remove the block' ) } }
 		/>
 	</View>
 );
 
 export default compose(
+	withSelect( ( select, { clientId } ) => {
+		const {
+			getBlockIndex,
+		} = select( 'core/block-editor' );
+
+		return {
+			order: getBlockIndex( clientId ),
+		};
+	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId, onDelete } ) => {
 		const { removeBlock } = dispatch( 'core/block-editor' );
 		return {

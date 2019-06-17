@@ -7,7 +7,7 @@ import { first, last, partial, castArray } from 'lodash';
  * WordPress dependencies
  */
 import { ToolbarButton } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 
@@ -16,21 +16,40 @@ const BlockMover = ( {
 	isLast,
 	onMoveDown,
 	onMoveUp,
+	firstIndex,
+	lastIndex,
 } ) => (
 	<>
 		<ToolbarButton
-			accessibilityLabel={ __( 'Move up' ) }
-			label={ __( 'Move up' ) }
+			label={ ! isFirst ?
+				sprintf(
+					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+					__( 'Move block up from row %1$s to row %2$s' ),
+					firstIndex + 1,
+					firstIndex
+				) :
+				__( 'Move block up' )
+			}
 			isDisabled={ isFirst }
 			onClick={ onMoveUp }
 			icon="arrow-up-alt"
+			extraProps={ { hint: __( 'Double tap to move the block up' ) } }
 		/>
 
 		<ToolbarButton
-			label={ __( 'Move down' ) }
+			label={ ! isLast ?
+				sprintf(
+					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+					__( 'Move block down from row %1$s to row %2$s' ),
+					lastIndex + 1,
+					lastIndex
+				) :
+				__( 'Move block down' )
+			}
 			isDisabled={ isLast }
 			onClick={ onMoveDown }
 			icon="arrow-down-alt"
+			extraProps={ { hint: __( 'Double tap to move the block down' ) } }
 		/>
 	</>
 );
@@ -46,6 +65,8 @@ export default compose(
 		const lastIndex = getBlockIndex( last( normalizedClientIds ), rootClientId );
 
 		return {
+			firstIndex,
+			lastIndex,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 		};
