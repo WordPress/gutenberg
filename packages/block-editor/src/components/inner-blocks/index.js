@@ -101,9 +101,9 @@ class InnerBlocks extends Component {
 			hasOverlay,
 			renderAppender,
 			template,
-			templateOptions,
-			onSelectTemplateOption,
-			allowTemplateOptionSkip,
+			__experimentalTemplateOptions: templateOptions,
+			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
+			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
 		} = this.props;
 
 		const isPlaceholder = template === null && !! templateOptions;

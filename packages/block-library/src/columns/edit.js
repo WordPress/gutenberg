@@ -144,8 +144,8 @@ export function ColumnsEdit( {
 			) }
 			<div className={ classes }>
 				<InnerBlocks
-					templateOptions={ TEMPLATE_OPTIONS }
-					onSelectTemplateOption={ ( nextTemplate ) => {
+					__experimentalTemplateOptions={ TEMPLATE_OPTIONS }
+					__experimentalOnSelectTemplateOption={ ( nextTemplate ) => {
 						if ( nextTemplate === undefined ) {
 							nextTemplate = getColumnsTemplate( SKIPPED_TEMPLATE_DEFAULT_COLUMNS );
 						}
@@ -153,7 +153,7 @@ export function ColumnsEdit( {
 						updateColumns( nextTemplate.length );
 						setTemplate( nextTemplate );
 					} }
-					allowTemplateOptionSkip
+					__experimentalAllowTemplateOptionSkip
 					template={ template }
 					templateLock="all"
 					allowedBlocks={ ALLOWED_BLOCKS } />

@@ -90,7 +90,7 @@ const TEMPLATE = [ [ 'core/columns', {}, [
 
 The previous example creates an InnerBlocks area containing two columns one with an image and the other with a paragraph.
 
-### `templateOptions`
+### `__experimentaltemplateOptions`
 
 * **Type:** `Array<Object>`
 
@@ -140,13 +140,13 @@ function edit() {
 }
 ```
 
-### `onSelectTemplateOption`
+### `__experimentalOnSelectTemplateOption`
 
 * **Type:** `Function`
 
 Callback function invoked when the user makes a template selection, used in combination with the `templateOptions` props. The selected template is passed as the first and only argument. The value of the template may be `undefined` if the `allowTemplateOptionSkip` prop is passed to `InnerBlocks` and the user opts to skip template selection.
 
-### `allowTemplateOptionSkip`
+### `__experimentalAllowTemplateOptionSkip`
 
 * **Type:** `Boolean`
 * **Default:** `false`
