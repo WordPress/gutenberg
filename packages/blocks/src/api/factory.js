@@ -11,6 +11,7 @@ import {
 	filter,
 	first,
 	flatMap,
+	has,
 	uniq,
 	isFunction,
 	isEmpty,
@@ -117,10 +118,18 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		return false;
 	}
 
-	// If multiple blocks are selected, only multi block transforms are allowed.
+	// If multiple blocks are selected, only multi block transforms
+	// or wildcard transforms are allowed.
 	const isMultiBlock = blocks.length > 1;
-	const isValidForMultiBlocks = ! isMultiBlock || transform.isMultiBlock;
+	const firstBlockName = first( blocks ).name;
+	const isValidForMultiBlocks = isWildcardBlockTransform( transform ) || ! isMultiBlock || transform.isMultiBlock;
 	if ( ! isValidForMultiBlocks ) {
+		return false;
+	}
+
+	// Check non-wildcard transforms to ensure that transform is valid
+	// for a block selection of multiple blocks of different types
+	if ( ! isWildcardBlockTransform( transform ) && ! every( blocks, { name: firstBlockName } ) ) {
 		return false;
 	}
 
@@ -130,10 +139,17 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		return false;
 	}
 
-	// Check if the transform's block name matches the source block only if this is a transform 'from'.
+	// Check if the transform's block name matches the source block (or is a wildcard)
+	// only if this is a transform 'from'.
 	const sourceBlock = first( blocks );
-	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1;
+	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1 || isWildcardBlockTransform( transform );
 	if ( ! hasMatchingName ) {
+		return false;
+	}
+
+	// Don't allow single 'core/group' blocks to be transformed into
+	// a 'core/group' block.
+	if ( ! isMultiBlock && isContainerGroupBlock( sourceBlock.name ) && isContainerGroupBlock( transform.blockName ) ) {
 		return false;
 	}
 
@@ -171,7 +187,9 @@ const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
 
 			return !! findTransform(
 				fromTransforms,
-				( transform ) => isPossibleTransformForSource( transform, 'from', blocks )
+				( transform ) => {
+					return isPossibleTransformForSource( transform, 'from', blocks );
+				}
 			);
 		},
 	);
@@ -199,7 +217,9 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	// filter all 'to' transforms to find those that are possible.
 	const possibleTransforms = filter(
 		transformsTo,
-		( transform ) => isPossibleTransformForSource( transform, 'to', blocks )
+		( transform ) => {
+			return transform && isPossibleTransformForSource( transform, 'to', blocks );
+		}
 	);
 
 	// Build a list of block names using the possible 'to' transforms.
@@ -213,6 +233,45 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 };
 
 /**
+ * Determines whether transform is a "block" type
+ * and if so whether it is a "wildcard" transform
+ * ie: targets "any" block type
+ *
+ * @param {Object} t the Block transform object
+ *
+ * @return {boolean} whether transform is a wildcard transform
+ */
+export const isWildcardBlockTransform = ( t ) => t && t.type === 'block' && Array.isArray( t.blocks ) && t.blocks.includes( '*' );
+
+/**
+ * Determines whether the given Block is the core Block which
+ * acts as a container Block for other Blocks as part of the
+ * Grouping mechanics
+ *
+ * @param  {string} name the name of the Block to test against
+ *
+ * @return {boolean} whether or not the Block is the container Block type
+ */
+export const isContainerGroupBlock = ( name ) => name === 'core/group';
+
+/**
+ * Determines whether the provided Blocks are of the same type
+ * (eg: all `core/paragraph`).
+ *
+ * @param  {Array}  blocksArray the Block definitions
+ *
+ * @return {boolean} whether or not the given Blocks pass the criteria
+ */
+export const isBlockSelectionOfSameType = ( blocksArray = [] ) => {
+	if ( ! blocksArray.length ) {
+		return false;
+	}
+	const sourceName = blocksArray[ 0 ].name;
+
+	return every( blocksArray, [ 'name', sourceName ] );
+};
+
+/**
  * Returns an array of block types that the set of blocks received as argument
  * can be transformed into.
  *
@@ -222,12 +281,6 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
  */
 export function getPossibleBlockTransformations( blocks ) {
 	if ( isEmpty( blocks ) ) {
-		return [];
-	}
-
-	const sourceBlock = first( blocks );
-	const isMultiBlock = blocks.length > 1;
-	if ( isMultiBlock && ! every( blocks, { name: sourceBlock.name } ) ) {
 		return [];
 	}
 
@@ -313,7 +366,7 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
  * @param {Array|Object} blocks Blocks array or block object.
  * @param {string}       name   Block name.
  *
- * @return {Array} Array of blocks.
+ * @return {?Array} Array of blocks or null.
  */
 export function switchToBlockType( blocks, name ) {
 	const blocksArray = castArray( blocks );
@@ -321,7 +374,10 @@ export function switchToBlockType( blocks, name ) {
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
 
-	if ( isMultiBlock && ! every( blocksArray, ( block ) => ( block.name === sourceName ) ) ) {
+	// Unless it's a `core/group` Block then for multi block selections
+	// check that all Blocks are of the same type otherwise
+	// we can't run a conversion
+	if ( ! isContainerGroupBlock( name ) && isMultiBlock && ! isBlockSelectionOfSameType( blocksArray ) ) {
 		return null;
 	}
 
@@ -329,14 +385,15 @@ export function switchToBlockType( blocks, name ) {
 	// transformation.
 	const transformationsFrom = getBlockTransforms( 'from', name );
 	const transformationsTo = getBlockTransforms( 'to', sourceName );
+
 	const transformation =
 		findTransform(
 			transformationsTo,
-			( t ) => t.type === 'block' && t.blocks.indexOf( name ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
+			( t ) => t.type === 'block' && ( ( isWildcardBlockTransform( t ) ) || t.blocks.indexOf( name ) !== -1 ) && ( ! isMultiBlock || t.isMultiBlock )
 		) ||
 		findTransform(
 			transformationsFrom,
-			( t ) => t.type === 'block' && t.blocks.indexOf( sourceName ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
+			( t ) => t.type === 'block' && ( ( isWildcardBlockTransform( t ) ) || t.blocks.indexOf( sourceName ) !== -1 ) && ( ! isMultiBlock || t.isMultiBlock )
 		);
 
 	// Stop if there is no valid transformation.
@@ -345,11 +402,18 @@ export function switchToBlockType( blocks, name ) {
 	}
 
 	let transformationResults;
+
 	if ( transformation.isMultiBlock ) {
-		transformationResults = transformation.transform(
-			blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
-			blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks )
-		);
+		if ( has( transformation, '__experimentalConvert' ) ) {
+			transformationResults = transformation.__experimentalConvert( blocksArray );
+		} else {
+			transformationResults = transformation.transform(
+				blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
+				blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks ),
+			);
+		}
+	} else if ( has( transformation, '__experimentalConvert' ) ) {
+		transformationResults = transformation.__experimentalConvert( firstBlock );
 	} else {
 		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks );
 	}

@@ -28,6 +28,11 @@ exports[`core/embed block edit matches snapshot 1`] = `
     Embed URL
   </div>
   <div
+    class="components-placeholder__instructions"
+  >
+    Paste a link to the content you want to display on your site.
+  </div>
+  <div
     class="components-placeholder__fieldset"
   >
     <form>
@@ -45,6 +50,37 @@ exports[`core/embed block edit matches snapshot 1`] = `
         Embed
       </button>
     </form>
+    <div
+      class="components-placeholder__learn-more"
+    >
+      <a
+        class="components-external-link"
+        href="https://wordpress.org/support/article/embeds/"
+        rel="external noreferrer noopener"
+        target="_blank"
+      >
+        Learn more about embeds
+        <span
+          class="screen-reader-text"
+        >
+          (opens in a new tab)
+        </span>
+        <svg
+          aria-hidden="true"
+          class="dashicon dashicons-external components-external-link__icon"
+          focusable="false"
+          height="20"
+          role="img"
+          viewBox="0 0 20 20"
+          width="20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M9 3h8v8l-2-1V6.92l-5.6 5.59-1.41-1.41L14.08 5H10zm3 12v-3l2-2v7H3V6h8L9 8H5v7h7z"
+          />
+        </svg>
+      </a>
+    </div>
   </div>
 </div>
 `;

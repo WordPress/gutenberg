@@ -43,7 +43,6 @@ import {
 	MediaPlaceholder,
 	RichText,
 } from '@wordpress/block-editor';
-import { mediaUpload } from '@wordpress/editor';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
@@ -126,7 +125,12 @@ class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes, noticeOperations } = this.props;
+		const {
+			attributes,
+			mediaUpload,
+			noticeOperations,
+			setAttributes,
+		} = this.props;
 		const { id, url = '' } = attributes;
 
 		if ( isTemporaryImage( id, url ) ) {
@@ -165,6 +169,7 @@ class ImageEdit extends Component {
 
 	onUploadError( message ) {
 		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
 		this.setState( {
 			isEditing: true,
@@ -403,7 +408,7 @@ class ImageEdit extends Component {
 		const src = isExternal ? url : undefined;
 		const labels = {
 			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
-			instructions: __( 'Drag an image to upload, select a file from your library or add one from an URL.' ),
+			instructions: __( 'Upload an image, pick one from your media library, or add one with a URL.' ),
 		};
 		const mediaPreview = ( !! url && <img
 			alt={ __( 'Edit image' ) }
@@ -482,7 +487,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ width !== undefined ? width : imageWidth }
+									value={ width || imageWidth || '' }
 									min={ 1 }
 									onChange={ this.updateWidth }
 								/>
@@ -490,7 +495,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ height !== undefined ? height : imageHeight }
+									value={ height || imageHeight || '' }
 									min={ 1 }
 									onChange={ this.updateHeight }
 								/>
@@ -720,13 +725,19 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getSettings } = select( 'core/block-editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL, imageSizes } = getSettings();
+		const {
+			__experimentalMediaUpload,
+			imageSizes,
+			isRTL,
+			maxWidth,
+		} = getSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
 			imageSizes,
+			mediaUpload: __experimentalMediaUpload,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),

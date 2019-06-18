@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { escapeRegExp, map } = require( 'lodash' );
+const { escapeRegExp } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -36,6 +36,18 @@ module.exports = {
 			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
 				message: 'Deprecated functions must be removed before releasing this version.',
+			},
+			{
+				selector: 'CallExpression[callee.name=/^(__|_n|_nx|_x)$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])',
+				message: 'Translate function arguments must be string literals.',
+			},
+			{
+				selector: 'CallExpression[callee.name=/^(_n|_nx|_x)$/]:not([arguments.1.type=/^Literal|BinaryExpression$/])',
+				message: 'Translate function arguments must be string literals.',
+			},
+			{
+				selector: 'CallExpression[callee.name=_nx]:not([arguments.3.type=/^Literal|BinaryExpression$/])',
+				message: 'Translate function arguments must be string literals.',
 			},
 			{
 				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',

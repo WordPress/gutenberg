@@ -17,6 +17,7 @@
 		line-height: $default-line-height;
 		color: $dark-gray-900;
 		transition: border 0.1s ease-out, box-shadow 0.1s linear;
+		@include reduce-motion("transition");
 		padding: #{ $block-padding + 5px } $block-padding;
 		word-break: keep-all;
 
@@ -94,6 +95,7 @@
 	&.is-focus-mode .editor-post-title__input {
 		opacity: 0.5;
 		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
 
 		&:focus {
 			opacity: 1;

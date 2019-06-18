@@ -17,9 +17,9 @@ import {
  * WordPress dependencies
  */
 import {
+	Icon,
 	Toolbar,
 	ToolbarButton,
-	Dashicon,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -36,9 +36,10 @@ import { doAction, hasAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import styles from '../image/styles.scss';
 import MediaUploadProgress from '../image/media-upload-progress';
 import style from './style.scss';
+import SvgIcon from './icon';
+import SvgIconRetry from './icon-retry';
 
 const VIDEO_ASPECT_RATIO = 1.7;
 
@@ -128,6 +129,14 @@ class VideoEdit extends React.Component {
 		}
 	}
 
+	getIcon( isRetryIcon, isUploadInProgress ) {
+		if ( isRetryIcon ) {
+			return <Icon icon={ SvgIconRetry } { ...style.icon } />;
+		}
+
+		return <Icon icon={ SvgIcon } { ...( isUploadInProgress ? style.iconUploading : style.icon ) } />;
+	}
+
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { caption, id, src } = attributes;
@@ -157,6 +166,8 @@ class VideoEdit extends React.Component {
 					<MediaPlaceholder
 						mediaType={ MEDIA_TYPE_VIDEO }
 						onSelectURL={ this.onSelectMediaUploadOption }
+						icon={ this.getIcon( false ) }
+						onFocus={ this.props.onFocus }
 					/>
 				</View>
 			);
@@ -169,11 +180,11 @@ class VideoEdit extends React.Component {
 						{ toolbarEditButton }
 					</BlockControls>
 					<InspectorControls>
-						<ToolbarButton
+						{ false && <ToolbarButton //Not rendering settings button until it has an action
 							label={ __( 'Video Settings' ) }
 							icon="admin-generic"
 							onClick={ () => ( null ) }
-						/>
+						/> }
 					</InspectorControls>
 					<MediaUploadProgress
 						mediaId={ id }
@@ -181,29 +192,39 @@ class VideoEdit extends React.Component {
 						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
 						onUpdateMediaProgress={ this.updateMediaProgress }
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( { isUploadInProgress, isUploadFailed, retryIconName, retryMessage } ) => {
-							const opacity = ( isUploadInProgress || isUploadFailed ) ? 0.3 : 1;
+						renderContent={ ( { isUploadInProgress, isUploadFailed, retryMessage } ) => {
 							const showVideo = src && ! isUploadInProgress && ! isUploadFailed;
-							const iconName = isUploadFailed ? retryIconName : 'format-video';
+							const icon = this.getIcon( isUploadFailed, isUploadInProgress );
+							const styleIconContainer = isUploadFailed ? style.modalIconRetry : style.modalIcon;
+
+							const iconContainer = (
+								<View style={ styleIconContainer }>
+									{ icon }
+								</View>
+							);
 
 							const videoStyle = {
 								height: videoContainerHeight,
 								...style.video,
 							};
 
+							const containerStyle = showVideo && isSelected ? style.containerFocused : style.container;
+
 							return (
-								<View onLayout={ this.onVideoContanerLayout } style={ { flex: 1 } }>
-									{ showVideo &&
-										<Video
-											source={ { uri: src } }
-											style={ videoStyle }
-											paused={ true }
-											muted={ true }
-										/>
+								<View onLayout={ this.onVideoContanerLayout } style={ containerStyle }>
+									{ showVideo && isURL( src ) &&
+										<View style={ style.videoContainer }>
+											<Video
+												isSelected={ isSelected }
+												style={ videoStyle }
+												source={ { uri: src } }
+												paused={ true }
+											/>
+										</View>
 									}
 									{ ! showVideo &&
-										<View style={ { ...videoStyle, ...style.placeholder, opacity } }>
-											{ videoContainerHeight > 0 && <Dashicon icon={ iconName } size={ 80 } style={ style.placeholderIcon } /> }
+										<View style={ { height: videoContainerHeight, width: '100%', ...style.placeholder } }>
+											{ videoContainerHeight > 0 && iconContainer }
 											{ isUploadFailed && <Text style={ style.uploadFailedText }>{ retryMessage }</Text> }
 										</View>
 									}
@@ -212,10 +233,10 @@ class VideoEdit extends React.Component {
 						} }
 					/>
 					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View style={ { padding: 12, flex: 1 } }>
+						<View style={ { paddingTop: 8, paddingBottom: 0, flex: 1 } }>
 							<TextInput
 								style={ { textAlign: 'center' } }
-								fontFamily={ this.props.fontFamily || ( styles[ 'caption-text' ].fontFamily ) }
+								fontFamily={ this.props.fontFamily || ( style[ 'caption-text' ].fontFamily ) }
 								underlineColorAndroid="transparent"
 								value={ caption }
 								placeholder={ __( 'Write caption…' ) }
