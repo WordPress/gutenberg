@@ -232,6 +232,7 @@ describe( 'Blocks raw handling', () => {
 	describe( 'pasteHandler', () => {
 		[
 			'plain',
+			'plain-like',
 			'classic',
 			'apple',
 			'google-docs',
