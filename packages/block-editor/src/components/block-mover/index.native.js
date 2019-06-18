@@ -17,7 +17,6 @@ const BlockMover = ( {
 	onMoveDown,
 	onMoveUp,
 	firstIndex,
-	lastIndex,
 } ) => (
 	<>
 		<ToolbarButton
@@ -41,8 +40,8 @@ const BlockMover = ( {
 				sprintf(
 					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
 					__( 'Move block down from row %1$s to row %2$s' ),
-					lastIndex + 1,
-					lastIndex
+					firstIndex + 1,
+					firstIndex + 2
 				) :
 				__( 'Move block down' )
 			}
@@ -66,7 +65,6 @@ export default compose(
 
 		return {
 			firstIndex,
-			lastIndex,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 		};
