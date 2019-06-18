@@ -20,7 +20,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 
@@ -110,9 +110,15 @@ export function ColumnsEdit( {
 	className,
 	updateAlignment,
 	updateColumns,
+	clientId,
 } ) {
 	const { columns, verticalAlignment } = attributes;
 
+	const { count } = useSelect( ( select ) => {
+		return {
+			count: select( 'core/block-editor' ).getBlockCount( clientId ),
+		};
+	} );
 	const [ template, setTemplate ] = useState( getColumnsTemplate( columns ) );
 
 	const classes = classnames( className, `has-${ columns }-columns`, {
@@ -150,11 +156,13 @@ export function ColumnsEdit( {
 							nextTemplate = getColumnsTemplate( DEFAULT_COLUMNS );
 						}
 
-						updateColumns( nextTemplate.length );
 						setTemplate( nextTemplate );
+						updateColumns( nextTemplate.length );
 					} }
 					__experimentalAllowTemplateOptionSkip
-					template={ template }
+					// setting the template to null when the inner blocks
+					// are empty allows to reset to the placeholder state.
+					template={ count === 0 ? null : template }
 					templateLock="all"
 					allowedBlocks={ ALLOWED_BLOCKS } />
 			</div>
@@ -198,14 +206,11 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 		const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
 		const { getBlocks } = registry.select( 'core/block-editor' );
 
-		// Update columns count.
-		setAttributes( { columns } );
-
 		let innerBlocks = getBlocks( clientId );
 		const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
 
 		// Redistribute available width for existing inner blocks.
-		const { columns: previousColumns } = attributes;
+		const { columns: previousColumns = 0 } = attributes;
 		const isAddingColumn = columns > previousColumns;
 
 		if ( isAddingColumn && hasExplicitWidths ) {
@@ -245,5 +250,8 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 		}
 
 		replaceInnerBlocks( clientId, innerBlocks, false );
+
+		// Update columns count.
+		setAttributes( { columns } );
 	},
 } ) )( ColumnsEdit );
