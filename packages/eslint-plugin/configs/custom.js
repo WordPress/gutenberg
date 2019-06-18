@@ -8,6 +8,7 @@ module.exports = {
 		'@wordpress/no-unused-vars-before-return': 'error',
 		'@wordpress/valid-sprintf': 'error',
 		'@wordpress/no-base-control-with-label-without-id': 'error',
+		'@wordpress/avoid-unguarded-getrangeat': 'error',
 		'no-restricted-syntax': [
 			'error',
 			{

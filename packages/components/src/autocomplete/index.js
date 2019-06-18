@@ -139,7 +139,8 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 }
 
 function getCaretRect() {
-	const range = window.getSelection().getRangeAt( 0 );
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( range ) {
 		return getRectangleFromRange( range );
