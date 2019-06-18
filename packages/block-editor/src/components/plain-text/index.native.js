@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { TextInput, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import RNPlainText from 'react-native-plain-text';
 
 /**
  * WordPress dependencies
@@ -38,7 +39,7 @@ export default class PlainText extends Component {
 
 	render() {
 		return (
-			<TextInput
+			<RNPlainText
 				{ ...this.props }
 				ref={ ( x ) => this._input = x }
 				className={ [ styles[ 'block-editor-plain-text' ], this.props.className ] }
