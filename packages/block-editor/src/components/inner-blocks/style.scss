@@ -37,19 +37,24 @@
 	}
 }
 
-.block-editor-inner-blocks__template-picker-options {
+.block-editor-inner-blocks__template-picker-options.block-editor-inner-blocks__template-picker-options {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
 	width: 100%;
 	margin: $grid-size-large 0;
+	list-style: none;
+
+	> li {
+		flex-basis: 100%;
+		flex-shrink: 1;
+		margin: 0 $grid-size;
+		max-width: 100px;
+	}
 }
 
 .block-editor-inner-blocks__template-picker-option {
-	flex-basis: 100%;
-	flex-shrink: 1;
-	max-width: 100px;
-	margin: 0 $grid-size;
+	width: 100%;
 
 	&.components-icon-button {
 		// Override default styles inherited from <IconButton /> to center

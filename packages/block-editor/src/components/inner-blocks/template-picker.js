@@ -29,18 +29,27 @@ function InnerBlocksTemplatePicker( {
 			instructions={ instructions }
 			className={ classes }
 		>
-			<div className="block-editor-inner-blocks__template-picker-options">
+			{
+				/*
+				* Disable reason: The `list` ARIA role is redundant but
+				* Safari+VoiceOver won't announce the list otherwise.
+				*/
+				/* eslint-disable jsx-a11y/no-redundant-roles */
+			}
+			<ul className="block-editor-inner-blocks__template-picker-options" role="list">
 				{ options.map( ( templateOption, index ) => (
-					<IconButton
-						key={ index }
-						isLarge
-						icon={ templateOption.icon }
-						onClick={ () => onSelect( templateOption.template ) }
-						className="block-editor-inner-blocks__template-picker-option"
-						label={ templateOption.title }
-					/>
+					<li key={ index }>
+						<IconButton
+							isLarge
+							icon={ templateOption.icon }
+							onClick={ () => onSelect( templateOption.template ) }
+							className="block-editor-inner-blocks__template-picker-option"
+							label={ templateOption.title }
+						/>
+					</li>
 				) ) }
-			</div>
+			</ul>
+			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			{ allowSkip && (
 				<div className="block-editor-inner-blocks__template-picker-skip">
 					<Button
