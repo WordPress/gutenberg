@@ -13,6 +13,8 @@ import { Panel, PanelBody } from '@wordpress/components';
 import {
 	BlockEditorProvider,
 	BlockList,
+	ObserveTyping,
+	WritingFlow,
 } from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 
@@ -57,7 +59,11 @@ function WidgetArea( {
 					onChange={ updateBlocks }
 					settings={ settings }
 				>
-					<BlockList />
+					<WritingFlow>
+						<ObserveTyping>
+							<BlockList />
+						</ObserveTyping>
+					</WritingFlow>
 				</BlockEditorProvider>
 			</PanelBody>
 		</Panel>
