@@ -181,3 +181,13 @@ div.block-core-columns.is-vertically-aligned-bottom {
 	left: 0;
 	right: 0;
 }
+
+/**
+ * Add extra padding when the parent block is selected, for easier interaction.
+ */
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/columns"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/columns"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/column"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/column"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks {
+	padding: $block-padding;
+}

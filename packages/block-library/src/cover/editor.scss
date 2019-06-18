@@ -45,8 +45,3 @@
 		width: 100%;
 	}
 }
-
-// Disable nested block padding for this block.
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/cover"] > .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks {
-	padding: 0;
-}

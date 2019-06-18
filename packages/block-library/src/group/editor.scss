@@ -86,11 +86,18 @@
 	}
 }
 
-// Adjust selected state margins for better visual compatibility with the additional borders and padding for nested blocks.
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/group"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > .wp-block-group:not(.has-background) > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/group"].is-selected > .block-editor-block-list__block-edit > [data-block] > .wp-block-group:not(.has-background) > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout {
-	margin-top: -$block-padding * 2;
-	margin-bottom: -$block-padding * 2;
+// Add padding when the block is selected, for easier interaction.
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/group"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > .wp-block-group,
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/group"].is-selected > .block-editor-block-list__block-edit > [data-block] > .wp-block-group {
+
+	> .wp-block-group__inner-container > .block-editor-inner-blocks {
+		padding: $block-padding;
+	}
+
+	&:not(.has-background) > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout {
+		margin-top: -$block-padding * 2;
+		margin-bottom: -$block-padding * 2;
+	}
 }
 
 // Place block list appender in the same place content will appear.
