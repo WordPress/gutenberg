@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { RichText } from '@wordpress/block-editor';
+import { RichText, PlainText } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
@@ -86,10 +86,11 @@ class PostTitle extends Component {
 						)
 				}
 			>
-				<RichText
+				<PlainText
 					tagName={ 'p' }
 					rootTagsToEliminate={ [ 'strong' ] }
-					unstableOnFocus={ this.onSelect }
+                    onFocus={ this.onSelect }
+                    
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }
 					style={ style }
@@ -104,11 +105,10 @@ class PostTitle extends Component {
 					onSplit={ () => { } }
 					onEnter={ this.props.onEnterPress }
 					disableEditingMenu={ true }
-					setRef={ ( ref ) => {
+					ref={ ( ref ) => {
 						this.titleViewRef = ref;
 					} }
-				>
-				</RichText>
+				/>
 			</View>
 		);
 	}
