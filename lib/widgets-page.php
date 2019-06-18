@@ -58,13 +58,14 @@ function gutenberg_widgets_init( $hook ) {
 	wp_add_inline_script(
 		'wp-edit-widgets',
 		sprintf(
-			'window.addEventListener( "load", function() {
+			'wp.domReady( function() {
 				wp.editWidgets.initialize( "widgets-editor", %s );
 			} );',
 			wp_json_encode( $settings )
 		)
 	);
 
+	// TODO: Figure out the best way for `get_block_editor_server_block_settings` to be available in the Customizer.
 	if ( 'gutenberg_customizer' !== $hook ) { // `get_block_editor_server_block_settings` is undefined in the Customizer.
 		// Preload server-registered block schemas.
 		wp_add_inline_script(

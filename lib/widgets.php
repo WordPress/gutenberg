@@ -213,23 +213,3 @@ function gutenberg_create_wp_area_post_type() {
 add_action( 'init', 'gutenberg_create_wp_area_post_type' );
 
 add_filter( 'sidebars_widgets', 'Experimental_WP_Widget_Blocks_Manager::swap_out_sidebars_blocks_for_block_widgets' );
-
-/**
- * Filters the Customizer widget settings arguments.
- * This is needed because the Customizer registers settings for the raw registered widgets, without going through the `sidebars_widgets` filter.
- * The `WP_Customize_Widgets` class expects sidebars to have an array of widgets registered, not a post ID.
- * This results in the value passed to `sanitize_js_callback` being `null` and throwing an error.
- *
- * @param array  $args Array of Customizer setting arguments.
- * @param string $id Widget setting ID.
- * @return array Maybe modified array of Customizer setting arguments.
- */
-function filter_widget_customizer_setting_args( $args, $id = null ) {
-	// Posts won't have a settings ID like widgets. We can use that to remove the sanitization callback.
-	if ( ! isset( $id ) ) {
-		unset( $args['sanitize_js_callback'] );
-	}
-
-	return $args;
-}
-add_filter( 'widget_customizer_setting_args', 'filter_widget_customizer_setting_args' );
