@@ -23,6 +23,13 @@ function getInitialSelectValue( fontSizes, value ) {
 	return 'normal';
 }
 
+function getSelectOptions( optionsArray ) {
+	return [
+		...optionsArray.map( ( option ) => ( { value: option.slug, label: option.name } ) ),
+		{ value: 'custom', label: __( 'Custom' ) },
+	];
+}
+
 function FontSizePicker( {
 	fallbackFontSize,
 	fontSizes = [],
@@ -40,18 +47,17 @@ function FontSizePicker( {
 
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
+		setCurrentSelectValue( getInitialSelectValue( fontSizes, Number( newValue ) ) );
 		if ( newValue === '' ) {
 			onChange( undefined );
 			return;
 		}
-		setCurrentSelectValue( getInitialSelectValue( fontSizes, Number( newValue ) ) );
 		onChange( Number( newValue ) );
 	};
 
 	const onSelectChangeValue = ( eventValue ) => {
 		setCurrentSelectValue( eventValue );
 		const selectedFont = fontSizes.find( ( font ) => font.slug === eventValue );
-
 		if ( selectedFont ) {
 			onChange( selectedFont.size );
 		}
@@ -67,18 +73,11 @@ function FontSizePicker( {
 					<SelectControl
 						className={ 'components-font-size-picker__select' }
 						label={ 'Choose preset' }
-						hideLabel={ true }
+						hideLabelFromVision={ true }
 						value={ currentSelectValue }
 						onChange={ onSelectChangeValue }
-						options={ [
-							{ value: fontSizes[ 0 ].slug, label: __( 'Small' ) },
-							{ value: fontSizes[ 1 ].slug, label: __( 'Normal' ) },
-							{ value: fontSizes[ 2 ].slug, label: __( 'Large' ) },
-							{ value: fontSizes[ 3 ].slug, label: __( 'Huge' ) },
-							{ value: 'custom', label: __( 'Custom' ) },
-						] }
+						options={ getSelectOptions( fontSizes ) }
 					/>
-
 				}
 				{ ( ! withSlider && ! disableCustomFontSizes ) &&
 					<input
@@ -93,7 +92,10 @@ function FontSizePicker( {
 					className="components-color-palette__clear"
 					type="button"
 					disabled={ value === undefined }
-					onClick={ () => onChange( undefined ) }
+					onClick={ () => {
+						onChange( undefined );
+						setCurrentSelectValue( getInitialSelectValue( fontSizes, undefined ) );
+					} }
 					isSmall
 					isDefault
 				>
