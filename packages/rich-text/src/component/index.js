@@ -205,7 +205,7 @@ class RichText extends Component {
 	onPaste( event ) {
 		const {
 			tagName,
-			canUserUseUnfilteredHTML,
+			__unstableCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 			__unstablePasteHandler: pasteHandler,
 			__unstableOnReplace: onReplace,
 			__unstableOnSplit: onSplit,
@@ -461,7 +461,11 @@ class RichText extends Component {
 		const value = this.getRecord();
 
 		if ( start !== value.start || end !== value.end ) {
-			const { isCaretWithinFormattedText } = this.props;
+			const {
+				__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
+				__unstableOnEnterFormattedText: onEnterFormattedText,
+				__unstableOnExitFormattedText: onExitFormattedText,
+			} = this.props;
 			const newValue = {
 				...value,
 				start,
@@ -476,9 +480,9 @@ class RichText extends Component {
 			newValue.activeFormats = activeFormats;
 
 			if ( ! isCaretWithinFormattedText && activeFormats.length ) {
-				this.props.onEnterFormattedText();
+				onEnterFormattedText();
 			} else if ( isCaretWithinFormattedText && ! activeFormats.length ) {
-				this.props.onExitFormattedText();
+				onExitFormattedText();
 			}
 
 			// It is important that the internal value is updated first,
@@ -550,7 +554,7 @@ class RichText extends Component {
 			return;
 		}
 
-		this.props.onCreateUndoLevel();
+		this.props.__unstableOnCreateUndoLevel();
 		this.lastHistoryValue = this.value;
 	}
 
@@ -872,7 +876,13 @@ class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { tagName, value, selectionStart, selectionEnd, isSelected } = this.props;
+		const {
+			tagName,
+			value,
+			selectionStart,
+			selectionEnd,
+			__unstableIsSelected: isSelected,
+		} = this.props;
 
 		// Check if the content changed.
 		let shouldReapply = (
@@ -1004,7 +1014,7 @@ class RichText extends Component {
 			className,
 			placeholder,
 			keepPlaceholderOnFocus = false,
-			isSelected,
+			__unstableIsSelected: isSelected,
 			children,
 			// To do: move autocompletion logic to rich-text.
 			__unstableAutocompleters: autocompleters,

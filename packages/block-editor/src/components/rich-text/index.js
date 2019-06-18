@@ -30,8 +30,8 @@ const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
 
 function RichTextWraper( {
 	tagName,
-	value: passedValue,
-	onChange: passedOnChange,
+	value: originalValue,
+	onChange: originalOnChange,
 	selectionStart,
 	selectionEnd,
 	onSelectionChange,
@@ -49,32 +49,38 @@ function RichTextWraper( {
 	onEnterFormattedText,
 	onExitFormattedText,
 	canUserUseUnfilteredHTML,
-	isSelected: _isSelected,
+	isSelected: originalIsSelected,
 	onCreateUndoLevel,
 	placeholder,
 	keepPlaceholderOnFocus,
+	// From experimental filter.
+	...experimentalProps
 } ) {
-	let adjustedValue = passedValue;
-	let adjustedOnChange = passedOnChange;
+	let adjustedValue = originalValue;
+	let adjustedOnChange = originalOnChange;
 
 	// Handle deprecated format.
-	if ( Array.isArray( passedValue ) ) {
-		adjustedValue = children.toHTML( passedValue );
-		adjustedOnChange = ( newValue ) => passedOnChange( children.fromDOM(
+	if ( Array.isArray( originalValue ) ) {
+		adjustedValue = children.toHTML( originalValue );
+		adjustedOnChange = ( newValue ) => originalOnChange( children.fromDOM(
 			__unstableCreateElement( document, newValue ).childNodes
 		) );
 	}
 
 	return (
 		<RichText
-			tagName={ tagName }
+			{ ...experimentalProps }
 			value={ adjustedValue }
 			onChange={ adjustedOnChange }
 			selectionStart={ selectionStart }
 			selectionEnd={ selectionEnd }
 			onSelectionChange={ onSelectionChange }
+			tagName={ tagName }
 			wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
 			className={ classnames( classes, className ) }
+			placeholder={ placeholder }
+			keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
+			__unstableIsSelected={ originalIsSelected }
 			__unstablePatterns={ getPatterns() }
 			__unstableEnterPatterns={ getEnterPatterns() }
 			__unstablePasteHandler={ pasteHandler }
@@ -89,10 +95,7 @@ function RichTextWraper( {
 			__unstableOnEnterFormattedText={ onEnterFormattedText }
 			__unstableOnExitFormattedText={ onExitFormattedText }
 			__unstableCanUserUseUnfilteredHTML={ canUserUseUnfilteredHTML }
-			onCreateUndoLevel={ onCreateUndoLevel }
-			isSelected={ _isSelected }
-			placeholder={ placeholder }
-			keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
+			__unstableOnCreateUndoLevel={ onCreateUndoLevel }
 		>
 			{ ( { isSelected, value, onChange } ) =>
 				<>
