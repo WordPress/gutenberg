@@ -11,20 +11,15 @@ import {
 	View,
 	Text,
 	TouchableWithoutFeedback,
-	Keyboard,
 } from 'react-native';
-import {
-	requestImageUploadCancel,
-} from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { addAction, hasAction, removeAction } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
-import { BlockEdit, BlockInvalidWarning } from '@wordpress/block-editor';
+import { BlockEdit, BlockInvalidWarning, BlockMobileToolbar } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { coreBlocks } from '@wordpress/block-library';
 
@@ -33,7 +28,6 @@ import { coreBlocks } from '@wordpress/block-library';
  */
 import type { BlockType } from '../store/types';
 import styles from './block-holder.scss';
-import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
 
 type PropsType = BlockType & {
 	icon: mixed,
@@ -81,32 +75,6 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		}
 	};
 
-	onRemoveBlockCheckUpload = ( mediaId: number ) => {
-		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) ) {
-			// now remove the action as it's  a one-shot use and won't be needed anymore
-			removeAction( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks' );
-			requestImageUploadCancel( mediaId );
-		}
-	};
-
-	onInlineToolbarButtonPressed = ( button: number ) => {
-		Keyboard.dismiss();
-		switch ( button ) {
-			case InlineToolbarActions.UP:
-				this.props.moveBlockUp();
-				break;
-			case InlineToolbarActions.DOWN:
-				this.props.moveBlockDown();
-				break;
-			case InlineToolbarActions.DELETE:
-				// adding a action that will exist for as long as it takes for the block to be removed and the component unmounted
-				// this acts as a flag for the code using the action to know of its existence
-				addAction( 'blocks.onRemoveBlockCheckUpload', 'gutenberg-mobile/blocks', this.onRemoveBlockCheckUpload );
-				this.props.removeBlock();
-				break;
-		}
-	};
-
 	insertBlocksAfter = ( blocks: Array<Object> ) => {
 		this.props.onInsertBlocks( blocks, this.props.order + 1 );
 
@@ -115,21 +83,6 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 			this.props.onSelect( blocks[ 0 ].clientId );
 		}
 	};
-
-	renderToolbar() {
-		if ( ! this.props.isSelected ) {
-			return null;
-		}
-
-		return (
-			<InlineToolbar
-				clientId={ this.props.clientId }
-				onButtonPressed={ this.onInlineToolbarButtonPressed }
-				canMoveUp={ ! this.props.isFirstBlock }
-				canMoveDown={ ! this.props.isLastBlock }
-			/>
-		);
-	}
 
 	getBlockForType() {
 		return (
@@ -182,7 +135,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	render() {
-		const { isSelected, borderStyle, focusedBorderColor, isValid, title, icon } = this.props;
+		const { clientId, isSelected, borderStyle, focusedBorderColor, isValid, title, icon } = this.props;
 
 		const borderColor = isSelected ? focusedBorderColor : 'transparent';
 
@@ -207,7 +160,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 							<BlockInvalidWarning blockTitle={ title } icon={ icon } />
 						}
 					</View>
-					{ this.renderToolbar() }
+					{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
 				</View>
 
 			</TouchableWithoutFeedback>
@@ -258,9 +211,6 @@ export default compose( [
 		const {
 			insertBlocks,
 			mergeBlocks,
-			moveBlocksDown,
-			moveBlocksUp,
-			removeBlock,
 			replaceBlocks,
 			selectBlock,
 			updateBlockAttributes,
@@ -285,15 +235,6 @@ export default compose( [
 						mergeBlocks( previousBlockClientId, clientId );
 					}
 				}
-			},
-			moveBlockDown() {
-				moveBlocksDown( ownProps.clientId );
-			},
-			moveBlockUp() {
-				moveBlocksUp( ownProps.clientId );
-			},
-			removeBlock() {
-				removeBlock( ownProps.clientId );
 			},
 			onInsertBlocks( blocks: Array<Object>, index: number ) {
 				insertBlocks( blocks, index, ownProps.rootClientId );
