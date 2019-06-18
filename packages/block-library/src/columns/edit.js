@@ -103,7 +103,7 @@ const TEMPLATE_OPTIONS = [
  *
  * @type {Number}
  */
-const SKIPPED_TEMPLATE_DEFAULT_COLUMNS = 2;
+const DEFAULT_COLUMNS = 2;
 
 export function ColumnsEdit( {
 	attributes,
@@ -147,7 +147,7 @@ export function ColumnsEdit( {
 					__experimentalTemplateOptions={ TEMPLATE_OPTIONS }
 					__experimentalOnSelectTemplateOption={ ( nextTemplate ) => {
 						if ( nextTemplate === undefined ) {
-							nextTemplate = getColumnsTemplate( SKIPPED_TEMPLATE_DEFAULT_COLUMNS );
+							nextTemplate = getColumnsTemplate( DEFAULT_COLUMNS );
 						}
 
 						updateColumns( nextTemplate.length );
