@@ -12,7 +12,6 @@ phpcs.xml
 yarn.lock
 docker-compose.override.yml
 /wordpress
-.vscode
 
 playground/dist
 .cache

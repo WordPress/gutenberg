@@ -74,7 +74,7 @@ add_action( 'admin_menu', 'gutenberg_menu' );
  * Adds a section to the Customizer for editing widgets with Gutenberg.
  *
  * @param \WP_Customize_Manager $wp_customize An instance of the class that controls most of the Theme Customization API for WordPress 3.4 and newer.
- * @since x.x.x
+ * @since 6.0.0
  */
 function gutenberg_customize_register( $wp_customize ) {
 	require dirname( __FILE__ ) . '/lib/class-wp-customize-widget-blocks-control.php';
