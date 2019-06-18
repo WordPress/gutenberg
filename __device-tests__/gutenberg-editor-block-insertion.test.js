@@ -11,6 +11,7 @@ import {
 	isLocalEnvironment,
 	stopDriver,
 	isAndroid,
+	clickMiddleOfElement,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
@@ -62,7 +63,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 		for ( let i = 0; i < 4; i++ ) {
 			paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
-			await paragraphBlockElement.click();
+			await clickMiddleOfElement( driver, paragraphBlockElement );
 			await editorPage.removeParagraphBlockAtPosition( 1 );
 		}
 	} );
@@ -76,15 +77,19 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point
 
+		if ( isAndroid() ) {
+			await driver.hideDeviceKeyboard();
+		}
+
 		const titleElement = await editorPage.getTitleElement();
 		await titleElement.click();
 		await titleElement.click();
 
 		await editorPage.addNewParagraphBlock();
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 4 );
-		await paragraphBlockElement.click();
+		await clickMiddleOfElement( driver, paragraphBlockElement );
 		await editorPage.sendTextToParagraphBlockAtPosition( 4, testData.mediumText );
-
+		await paragraphBlockElement.click();
 		await editorPage.verifyHtmlContent( testData.blockInsertionHtml );
 	} );
 
