@@ -87,6 +87,10 @@ function createPrepareEditableTree( props, prefix ) {
 	}, value.formats );
 }
 
+/**
+ * Renders a rich content input, providing users with the option to format the
+ * content.
+ */
 class RichText extends Component {
 	constructor( {
 		value,
