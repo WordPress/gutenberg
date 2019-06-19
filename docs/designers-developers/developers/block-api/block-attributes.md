@@ -43,7 +43,6 @@ Accepted values in the `type` field of an `attribute` MUST be one of the followi
 * number
 * string
 * integer
-	- Matches any number with a zero fractional part
 
 See [WordPress's REST API documentation](https://developer.wordpress.org/rest-api/extending-the-rest-api/schema/) for additional details.
 
