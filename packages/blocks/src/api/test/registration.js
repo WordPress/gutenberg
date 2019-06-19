@@ -22,6 +22,8 @@ import {
 	getUnregisteredTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	getGroupingBlockName,
+	setGroupingBlockName,
 	getBlockType,
 	getBlockTypes,
 	getBlockSupport,
@@ -412,6 +414,20 @@ describe( 'blocks', () => {
 	describe( 'getDefaultBlockName()', () => {
 		it( 'defaults to undefined', () => {
 			expect( getDefaultBlockName() ).toBeNull();
+		} );
+	} );
+
+	describe( 'getGroupingBlockName()', () => {
+		it( 'defaults to undefined', () => {
+			expect( getGroupingBlockName() ).toBeNull();
+		} );
+	} );
+
+	describe( 'setGroupingBlockName()', () => {
+		it( 'assigns default block name', () => {
+			setGroupingBlockName( 'core/test-block' );
+
+			expect( getGroupingBlockName() ).toBe( 'core/test-block' );
 		} );
 	} );
 

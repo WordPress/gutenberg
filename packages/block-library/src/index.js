@@ -9,6 +9,7 @@ import {
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
+	setGroupingBlockName,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 
@@ -139,4 +140,8 @@ export const registerCoreBlocks = () => {
 		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );
+
+	if ( group ) {
+		setGroupingBlockName( group.name );
+	}
 };
