@@ -1,4 +1,9 @@
-const requestIdleCallback = window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
+const requestIdleCallback = ( function() {
+	if ( typeof window !== 'undefined' ) {
+		return window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
+	}
+	return setTimeout;
+}() );
 
 /**
  * Creates a context-aware queue that only executes
