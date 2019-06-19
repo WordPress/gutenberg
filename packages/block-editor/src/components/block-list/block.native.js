@@ -204,16 +204,16 @@ export default compose( [
 					}
 				}
 			},
-			onInsertBlocks( blocks: Array<Object>, index: number ) {
+			onInsertBlocks( blocks, index ) {
 				insertBlocks( blocks, index, ownProps.rootClientId );
 			},
 			onSelect( clientId = ownProps.clientId, initialPosition ) {
 				selectBlock( clientId, initialPosition );
 			},
-			onChange: ( attributes: Object ) => {
+			onChange: ( attributes ) => {
 				updateBlockAttributes( ownProps.clientId, attributes );
 			},
-			onReplace( blocks: Array<Object>, indexToSelect: number ) {
+			onReplace( blocks, indexToSelect ) {
 				replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
 			},
 		};
