@@ -71,7 +71,7 @@ const gutenbergFormatNamesToAztec = {
 };
 
 export class RichText extends Component {
-	constructor( { value, multiline, selectionStart, selectionEnd } ) {
+	constructor( { value, __unstableMultiline: multiline, selectionStart, selectionEnd } ) {
 		super( ...arguments );
 
 		this.isMultiline = false;
