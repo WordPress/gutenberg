@@ -32,6 +32,7 @@ _Example_: Extract the `src` attribute from an image found in the block's markup
 }
 // { "url": "https://lorempixel.com/1200/800/" }
 ```
+
 #### `attribute` Type Validation
 
 Accepted values in the `type` field of an `attribute` MUST be one of the following:
