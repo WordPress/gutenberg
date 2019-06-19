@@ -19,11 +19,8 @@ import { RichText } from '@wordpress/rich-text';
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
-//import { getPatterns, getEnterPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { ListEdit } from './list-edit';
-//import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
-import styles from './style.scss';
 
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
@@ -88,7 +85,6 @@ function RichTextWraper( {
 			__unstableOnExitFormattedText={ onExitFormattedText }
 			__unstableCanUserUseUnfilteredHTML={ canUserUseUnfilteredHTML }
 			__unstableOnCreateUndoLevel={ onCreateUndoLevel }
-			styles={ styles }
 		>
 			{ ( { isSelected, value, onChange } ) =>
 				<View>

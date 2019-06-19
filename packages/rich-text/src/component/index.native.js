@@ -37,6 +37,7 @@ import { insertLineSeparator } from '../insert-line-separator';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
+import styles from './style.scss';
 
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
@@ -770,17 +771,26 @@ export class RichText extends Component {
 			tagName,
 			style,
 			__unstableIsSelected: isSelected,
-			styles,
 			children,
 		} = this.props;
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
 
-		let minHeight = styles[ 'block-editor-rich-text' ].minHeight;
+		let minHeight = styles[ 'rich-text' ].minHeight;
 		if ( style && style.minHeight ) {
 			minHeight = style.minHeight;
 		}
+
+		const {
+			color: defaultPlaceholderTextColor,
+		} = styles[ 'rich-text-placeholder' ];
+
+		const {
+			color: defaultColor,
+			textDecorationColor: defaultTextDecorationColor,
+			fontFamily: defaultFontFamily,
+		} = styles[ 'rich-text' ];
 
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
@@ -830,7 +840,7 @@ export class RichText extends Component {
 					} }
 					text={ { text: html, eventCount: this.lastEventCount, selection } }
 					placeholder={ this.props.placeholder }
-					placeholderTextColor={ this.props.placeholderTextColor || styles[ 'block-editor-rich-text-placeholder' ].color }
+					placeholderTextColor={ this.props.placeholderTextColor || defaultPlaceholderTextColor }
 					deleteEnter={ this.props.deleteEnter }
 					onChange={ this.onChange }
 					onFocus={ this.onFocus }
@@ -843,10 +853,10 @@ export class RichText extends Component {
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
-					color={ styles[ 'block-editor-rich-text' ].color }
-					linkTextColor={ styles[ 'block-editor-rich-text' ].textDecorationColor }
+					color={ defaultColor }
+					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
-					fontFamily={ this.props.fontFamily || styles[ 'block-editor-rich-text' ].fontFamily }
+					fontFamily={ this.props.fontFamily || defaultFontFamily }
 					fontSize={ this.props.fontSize || ( style && style.fontSize ) }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
