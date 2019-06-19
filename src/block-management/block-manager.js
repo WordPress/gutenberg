@@ -20,7 +20,7 @@ import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { PostTitle } from '@wordpress/editor';
 import { BlockToolbar, DefaultBlockAppender, Inserter } from '@wordpress/block-editor';
 import { sendNativeEditorDidLayout, subscribeSetFocusOnTitle, subscribeMediaAppend } from 'react-native-gutenberg-bridge';
-import { KeyboardAvoidingView, KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
+import { HTMLTextInput, KeyboardAvoidingView, KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -29,7 +29,6 @@ import BlockHolder from './block-holder';
 import type { BlockType } from '../store/types';
 import styles from './block-manager.scss';
 import blockHolderStyles from './block-holder.scss';
-import HTMLTextInput from '../components/html-text-input';
 import SafeArea from 'react-native-safe-area';
 
 const blockMobileToolbarHeight = 44;
