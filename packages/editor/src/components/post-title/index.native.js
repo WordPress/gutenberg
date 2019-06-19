@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { RichText } from '@wordpress/block-editor';
+import { RichText } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
@@ -93,6 +93,7 @@ class PostTitle extends Component {
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }
 					style={ style }
+					styles={ styles }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
 					deleteEnter={ true }
@@ -101,7 +102,7 @@ class PostTitle extends Component {
 					} }
 					placeholder={ decodedPlaceholder }
 					value={ title }
-					onSplit={ () => { } }
+					onSelectionChange={ () => { } }
 					onEnter={ this.props.onEnterPress }
 					disableEditingMenu={ true }
 					setRef={ ( ref ) => {
