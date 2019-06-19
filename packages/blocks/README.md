@@ -370,15 +370,15 @@ handler has been defined.
 
 _Returns_
 
--   `?string`: Blog name.
+-   `?string`: Block name.
 
 <a name="getGroupingBlockName" href="#getGroupingBlockName">#</a> **getGroupingBlockName**
 
-Retrieves name of block used for handling grouping interactions
+Retrieves name of block used for handling grouping interactions.
 
 _Returns_
 
--   `?string`: Blog name.
+-   `?string`: Block name.
 
 <a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
 
@@ -442,7 +442,7 @@ handler has been defined.
 
 _Returns_
 
--   `?string`: Blog name.
+-   `?string`: Block name.
 
 <a name="hasBlockSupport" href="#hasBlockSupport">#</a> **hasBlockSupport**
 

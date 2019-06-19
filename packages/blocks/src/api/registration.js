@@ -193,16 +193,16 @@ export function setFreeformContentHandlerName( blockName ) {
  * Retrieves name of block handling non-block content, or undefined if no
  * handler has been defined.
  *
- * @return {?string} Blog name.
+ * @return {?string} Block name.
  */
 export function getFreeformContentHandlerName() {
 	return select( 'core/blocks' ).getFreeformFallbackBlockName();
 }
 
 /**
- * Retrieves name of block used for handling grouping interactions
+ * Retrieves name of block used for handling grouping interactions.
  *
- * @return {?string} Blog name.
+ * @return {?string} Block name.
  */
 export function getGroupingBlockName() {
 	return select( 'core/blocks' ).getGroupingBlockName();
@@ -221,7 +221,7 @@ export function setUnregisteredTypeHandlerName( blockName ) {
  * Retrieves name of block handling unregistered block types, or undefined if no
  * handler has been defined.
  *
- * @return {?string} Blog name.
+ * @return {?string} Block name.
  */
 export function getUnregisteredTypeHandlerName() {
 	return select( 'core/blocks' ).getUnregisteredFallbackBlockName();
