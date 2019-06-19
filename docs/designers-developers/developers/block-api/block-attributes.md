@@ -45,6 +45,8 @@ Accepted values in the `type` field of an `attribute` MUST be one of the followi
 * integer
 	- Matches any number with a zero fractional part
 
+Additional details are found in the documentation for Wordpress's REST API [here](https://developer.wordpress.org/rest-api/extending-the-rest-api/schema/).
+
 ### `text`
 
 Use `text` to extract the inner text from markup.
