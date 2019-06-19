@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -31,6 +31,8 @@ class PostTitle extends Component {
 		this.state = {
 			isSelected: false,
 		};
+
+		this.isIOS = Platform.OS === 'ios';
 	}
 
 	componentDidMount() {
@@ -70,7 +72,7 @@ class PostTitle extends Component {
 
 		const decodedPlaceholder = decodeEntities( placeholder );
 		const borderColor = this.state.isSelected ? focusedBorderColor : 'transparent';
-
+		
 		return (
 			<View
 				style={ [ styles.titleContainer, borderStyle, { borderColor } ] }
@@ -98,6 +100,7 @@ class PostTitle extends Component {
 					} }
 					placeholder={ decodedPlaceholder }
 					value={ title }
+					returnKeyType={ this.isIOS ? 'default' : 'none' }
 					onEnter={ this.props.onEnterPress }
 					ref={ ( ref ) => {
 						this.titleViewRef = ref;
