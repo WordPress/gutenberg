@@ -6,12 +6,6 @@ import { toTree } from './to-tree';
 import { createElement } from './create-element';
 
 /**
- * Browser dependencies
- */
-
-const { TEXT_NODE } = window.Node;
-
-/**
  * Creates a path as an array of indices from the given root node to the given
  * node.
  *
@@ -101,7 +95,7 @@ function getParent( { parentNode } ) {
 	return parentNode;
 }
 
-function isText( { nodeType } ) {
+function isText( { nodeType, TEXT_NODE } ) {
 	return nodeType === TEXT_NODE;
 }
 
@@ -199,7 +193,7 @@ export function applyValue( future, current ) {
 		} else if ( ! currentChild.isEqualNode( futureChild ) ) {
 			if (
 				currentChild.nodeName !== futureChild.nodeName ||
-				( currentChild.nodeType === TEXT_NODE && currentChild.data !== futureChild.data )
+				( currentChild.nodeType === currentChild.TEXT_NODE && currentChild.data !== futureChild.data )
 			) {
 				current.replaceChild( futureChild, currentChild );
 			} else {

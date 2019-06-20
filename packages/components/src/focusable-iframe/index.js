@@ -9,12 +9,6 @@ import { omit } from 'lodash';
 import { Component, createRef } from '@wordpress/element';
 import { withGlobalEvents } from '@wordpress/compose';
 
-/**
- * Browser dependencies
- */
-
-const { FocusEvent } = window;
-
 class FocusableIframe extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -35,7 +29,7 @@ class FocusableIframe extends Component {
 			return;
 		}
 
-		const focusEvent = new FocusEvent( 'focus', { bubbles: true } );
+		const focusEvent = new window.FocusEvent( 'focus', { bubbles: true } );
 		iframe.dispatchEvent( focusEvent );
 
 		const { onFocus } = this.props;

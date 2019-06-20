@@ -4,18 +4,6 @@
 import { includes } from 'lodash';
 
 /**
- * Browser dependencies
- */
-
-const { getComputedStyle } = window;
-const {
-	TEXT_NODE,
-	ELEMENT_NODE,
-	DOCUMENT_POSITION_PRECEDING,
-	DOCUMENT_POSITION_FOLLOWING,
-} = window.Node;
-
-/**
  * Returns true if the given selection object is in the forward direction, or
  * false otherwise.
  *
@@ -40,11 +28,11 @@ function isSelectionForward( selection ) {
 	/* eslint-disable no-bitwise */
 	// Compare whether anchor node precedes focus node. If focus node (where
 	// end of selection occurs) is after the anchor node, it is forward.
-	if ( position & DOCUMENT_POSITION_PRECEDING ) {
+	if ( position & anchorNode.DOCUMENT_POSITION_PRECEDING ) {
 		return false;
 	}
 
-	if ( position & DOCUMENT_POSITION_FOLLOWING ) {
+	if ( position & anchorNode.DOCUMENT_POSITION_FOLLOWING ) {
 		return true;
 	}
 	/* eslint-enable no-bitwise */
@@ -409,11 +397,11 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 
 	// Check if the closest text node is actually further away.
 	// If so, attempt to get the range again with the y position adjusted to get the right offset.
-	if ( range.startContainer.nodeType === TEXT_NODE ) {
+	if ( range.startContainer.nodeType === range.startContainer.TEXT_NODE ) {
 		const parentNode = range.startContainer.parentNode;
 		const parentRect = parentNode.getBoundingClientRect();
 		const side = isReverse ? 'bottom' : 'top';
-		const padding = parseInt( getComputedStyle( parentNode ).getPropertyValue( `padding-${ side }` ), 10 ) || 0;
+		const padding = parseInt( window.getComputedStyle( parentNode ).getPropertyValue( `padding-${ side }` ), 10 ) || 0;
 		const actualY = isReverse ? ( parentRect.bottom - padding - buffer ) : ( parentRect.top + padding + buffer );
 
 		if ( y !== actualY ) {
@@ -516,7 +504,7 @@ export function isEntirelySelected( element ) {
 	}
 
 	const lastChild = element.lastChild;
-	const lastChildContentLength = lastChild.nodeType === TEXT_NODE ?
+	const lastChildContentLength = lastChild.nodeType === lastChild.TEXT_NODE ?
 		lastChild.data.length :
 		lastChild.childNodes.length;
 
@@ -569,7 +557,7 @@ export function getOffsetParent( node ) {
 	// an element node, so find the closest element node.
 	let closestElement;
 	while ( ( closestElement = node.parentNode ) ) {
-		if ( closestElement.nodeType === ELEMENT_NODE ) {
+		if ( closestElement.nodeType === closestElement.ELEMENT_NODE ) {
 			break;
 		}
 	}
@@ -580,7 +568,7 @@ export function getOffsetParent( node ) {
 
 	// If the closest element is already positioned, return it, as offsetParent
 	// does not otherwise consider the node itself.
-	if ( getComputedStyle( closestElement ).position !== 'static' ) {
+	if ( window.getComputedStyle( closestElement ).position !== 'static' ) {
 		return closestElement;
 	}
 

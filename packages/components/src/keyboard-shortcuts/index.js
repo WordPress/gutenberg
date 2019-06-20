@@ -2,7 +2,10 @@
  * External dependencies
  */
 import Mousetrap from 'mousetrap';
-import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
+if ( typeof window !== 'undefined' ) {
+	// only initialize the global bind if we're in a browser environment
+	require( 'mousetrap/plugins/global-bind/mousetrap-global-bind' );
+}
 import { forEach } from 'lodash';
 
 /**

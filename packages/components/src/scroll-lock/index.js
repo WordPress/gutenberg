@@ -15,7 +15,7 @@ import { Component } from '@wordpress/element';
  * @return {Component} The bound ScrollLock component.
  */
 export function createScrollLockComponent( {
-	htmlDocument = document,
+	htmlDocument = typeof document !== 'undefined' ? document : undefined,
 	className = 'lockscroll',
 } = {} ) {
 	let lockCounter = 0;
