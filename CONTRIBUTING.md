@@ -22,7 +22,7 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 
 *Triage* is the practice of reviewing existing issues to make sure they’re relevant, actionable, and have all the information they need. Triaging is a very important contribution because it allows the community to focus on and prioritise issues, feature proposals, discussions and so on.
 
-If you want to learn more about triage, and why it it important, please see the [repository management section](/docs/contributors/repository-management.md) of the Contributor Handbook.
+If you want to learn more about triage, and why it it important, please see the [repository management section](docs/contributors/repository-management.md#triaging-issues) of the Contributor Handbook.
 
 ## Contribute to the Documentation
 

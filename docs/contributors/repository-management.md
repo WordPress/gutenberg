@@ -60,7 +60,7 @@ To keep the issue list healthy, it needs to be triaged regularly. *Triage* is th
 
 Anyone can help triage, although you’ll need contributor permission on the Gutenberg repository to modify an issue’s labels or edit its title.
 
-To start simply choose from one of these filtered lisst of issues:
+To start simply choose from one of these filtered lists of issues:
 
 - [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel). Triaging by simply adding labels is helping people focused on certain aspects find the issues easier and start working on them.
 - [The least recently updated Gutenberg issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc). Triaging issues that are getting old and possibly out of date keeps important work from being overlooked.
