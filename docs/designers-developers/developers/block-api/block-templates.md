@@ -15,11 +15,11 @@ Planned additions:
 
 ## API
 
-Templates can be declared in JS or in PHP as an array of blockTypes (block name and optional attributes).
+Templates can be declared in JS or in PHP as an array of blockTypes, which consist of a block name and optional attributes.
 
-The first example in PHP creates a template for posts that includes an image block to start, you can add as many or as few blocks to your template as needed.
-
-PHP example:
+**PHP Example**  
+The following example in PHP creates a template for posts that includes an image block and a paragraph to start. For the paragraph in this example, the placeholder is defined as 'Image Details'. 
+You can add as many or as few blocks to your template as needed.
 
 ```php
 <?php
@@ -27,12 +27,20 @@ function myplugin_register_template() {
     $post_type_object = get_post_type_object( 'post' );
     $post_type_object->template = array(
         array( 'core/image' ),
+	    array( 
+		    'core/paragraph', 
+		    array( 
+			    'placeholder' => 'Image Details' ),
+		    )
     );
 }
 add_action( 'init', 'myplugin_register_template' );
 ```
+The optional attributes that can be set vary per block type. For a quick overview of the attributes of core block type, you can often check the block type's accompanying block.json file. For example, [these lines](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/audio/block.json#L4-L37) describe the attributes of the `core/audio` block.
 
-The following example in JavaScript creates a new block using [InnerBlocks](/packages/block-editor/src/components/inner-blocks/README.md) and templates, when inserted creates a set of blocks based off the template.
+**JS example:**  
+The following example in JavaScript creates a new custom block using [InnerBlocks](/packages/block-editor/src/components/inner-blocks/README.md) and templates. When this block is inserted, this block creates a set of blocks based off the template.
+
 
 ```js
 const el = wp.element.createElement;
@@ -59,7 +67,8 @@ registerBlockType( 'myplugin/template', {
 });
 ```
 
-See the [Meta Block Tutorial](/docs/designers-developers/developers/tutorials/metabox/meta-block-5-finishing.md) for a full example of a template in use.
+Templates are especially useful in combination with blocks that store custom post_meta to a post type. See the [Meta Block Tutorial](/docs/designers-developers/developers/tutorials/metabox/meta-block-5-finishing.md).
+for more information. 
 
 ## Custom Post types
 
@@ -112,8 +121,7 @@ add_action( 'init', 'myplugin_register_template' );
 
 ## Nested Templates
 
-Container blocks like the columns blocks also support templates. This is achieved by assigning a nested template to the block.
-
+Container blocks like the columns block also support templates. This makes it possible to define which block types are used by default in each column, by adding a nested template to the block type array like so:
 ```php
 $template = array(
 	array( 'core/paragraph', array(
