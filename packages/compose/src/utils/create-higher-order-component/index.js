@@ -4,17 +4,22 @@
 import { camelCase, upperFirst } from 'lodash';
 
 /**
- * Given a function mapping a component to an enhanced component and modifier
+ * Internal dependencies
+ */
+import pure from '../../higher-order/pure';
+
+/**
+ * Given a function mapping a component to an enhanced component, and a modifier
  * name, returns the enhanced component augmented with a generated displayName.
  *
  * @param {Function} mapComponentToEnhancedComponent Function mapping component
- *                                                   to enhanced component.
+ *                                                    to enhanced component.
  * @param {string}   modifierName                    Seed name from which to
- *                                                   generated display name.
+ *                                                    generate display name.
  *
  * @return {WPComponent} Component class with generated display name assigned.
  */
-function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
+export default function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
 	return ( OriginalComponent ) => {
 		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
 		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
@@ -24,4 +29,28 @@ function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierNa
 	};
 }
 
-export default createHigherOrderComponent;
+/**
+ * Given a function that returns an object, and a modifier
+ * name, returns an enhanced pure component that calls
+ * the function and merges the returned object into its props.
+ * This is useful for making higher order components from hooks.
+ *
+ * @param {Function} getMergeProps Function that returns the object to merge into props.
+ *
+ * @param {string}   modifierName  Seed name from which to generate display name.
+ *
+ * @return {WPComponent} Component class, with generated display name assigned, that
+ *                        merges the result of `getMergeProps` with its own props.
+ */
+export function createHigherOrderComponentWithMergeProps(
+	getMergeProps,
+	modifierName
+) {
+	return createHigherOrderComponent(
+		( WrappedComponent ) =>
+			pure( ( ownProps ) => (
+				<WrappedComponent { ...ownProps } { ...getMergeProps( ownProps ) } />
+			) ),
+		modifierName
+	);
+}

@@ -80,17 +80,33 @@ _Returns_
 
 <a name="createHigherOrderComponent" href="#createHigherOrderComponent">#</a> **createHigherOrderComponent**
 
-Given a function mapping a component to an enhanced component and modifier
+Given a function mapping a component to an enhanced component, and a modifier
 name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
 -   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
--   _modifierName_ `string`: Seed name from which to generated display name.
+-   _modifierName_ `string`: Seed name from which to generate display name.
 
 _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
+
+<a name="createHigherOrderComponentWithMergeProps" href="#createHigherOrderComponentWithMergeProps">#</a> **createHigherOrderComponentWithMergeProps**
+
+Given a function that returns an object, and a modifier
+name, returns an enhanced pure component that calls
+the function and merges the returned object into its props.
+This is useful for making higher order components from hooks.
+
+_Parameters_
+
+-   _getMergeProps_ `Function`: Function that returns the object to merge into props.
+-   _modifierName_ `string`: Seed name from which to generate display name.
+
+_Returns_
+
+-   `WPComponent`: Component class, with generated display name assigned, that merges the result of `getMergeProps` with its own props.
 
 <a name="ifCondition" href="#ifCondition">#</a> **ifCondition**
 
@@ -119,6 +135,48 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useCustomCompareDep" href="#useCustomCompareDep">#</a> **useCustomCompareDep**
+
+Takes a value to be used as a dependency in a hooks dependency array
+and a custom compare function and memoizes the value for as long
+as the compare function dictates that it hasn't changed. This
+lets you use non-primitives in hooks dependency arrays.
+
+_Usage_
+
+```js
+useMemo( expensiveComputation, [ useCustomCompareDep( mutableObject, _.isEqual ) ] );
+```
+
+_Parameters_
+
+-   _value_ `*`: Value to memoize.
+-   _compare_ `Function`: Custom compare function for diffing `value`.
+
+_Returns_
+
+-   `*`: The memoized `value`.
+
+<a name="useDeepCompareDep" href="#useDeepCompareDep">#</a> **useDeepCompareDep**
+
+Takes a value to be used as a dependency in a hooks dependency array
+and memoizes it for as long as it is deeply unchanged.
+This lets you use non-primitives in hooks dependency arrays.
+
+_Usage_
+
+```js
+useMemo( expensiveComputation, [ useDeepCompareDep( deeplyMutableObject ) ] );
+```
+
+_Parameters_
+
+-   _value_ `*`: Value to memoize.
+
+_Returns_
+
+-   `*`: The memoized `value`.
+
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
 
 Runs a media query and returns its value when it changes.
@@ -138,6 +196,26 @@ Hook returning whether the user has a preference for reduced motion.
 _Returns_
 
 -   `boolean`: Reduced motion preference value.
+
+<a name="useShallowCompareDep" href="#useShallowCompareDep">#</a> **useShallowCompareDep**
+
+Takes a value to be used as a dependency in a hooks dependency array
+and memoizes it for as long as it is shallowly unchanged.
+This lets you use non-primitives in hooks dependency arrays.
+
+_Usage_
+
+```js
+useMemo( expensiveComputation, [ useShallowCompareDep( shallowlyMutableObject ) ] );
+```
+
+_Parameters_
+
+-   _value_ `*`: Value to memoize.
+
+_Returns_
+
+-   `*`: The memoized `value`.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
 

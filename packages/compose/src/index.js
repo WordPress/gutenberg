@@ -4,7 +4,10 @@
 import { flowRight } from 'lodash';
 
 // Utils
-export { default as createHigherOrderComponent } from './utils/create-higher-order-component';
+export {
+	default as createHigherOrderComponent,
+	createHigherOrderComponentWithMergeProps,
+} from './utils/create-higher-order-component';
 
 /**
  * Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
@@ -25,5 +28,10 @@ export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
 export { default as withState } from './higher-order/with-state';
 
 // Hooks
+export {
+	default as useCustomCompareDep,
+	useShallowCompareDep,
+	useDeepCompareDep,
+} from './hooks/use-custom-compare-dep';
 export { default as useMediaQuery } from './hooks/use-media-query';
 export { default as useReducedMotion } from './hooks/use-reduced-motion';
