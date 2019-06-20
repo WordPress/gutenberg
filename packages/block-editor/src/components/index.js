@@ -2,6 +2,7 @@
  * Block Creation Components
  */
 
+export * from './block-edit';
 export * from './colors';
 export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';

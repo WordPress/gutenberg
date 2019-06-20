@@ -90,6 +90,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="BlockEditContextProvider" href="#BlockEditContextProvider">#</a> **BlockEditContextProvider**
+
+Undocumented declaration.
+
 <a name="BlockEditorKeyboardShortcuts" href="#BlockEditorKeyboardShortcuts">#</a> **BlockEditorKeyboardShortcuts**
 
 Undocumented declaration.
@@ -404,6 +408,111 @@ _Related_
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
+
+<a name="useAttributePicker" href="#useAttributePicker">#</a> **useAttributePicker**
+
+Low level hook that takes an options object that has a list of attributes to manage, values that they can be set to,
+and functions for customizing how values are compared, saved, and returned. It also handles setting attributes to
+custom values and provides an easy way to bind utilities.
+It returns an object with mapped attributes, attribute setters, and bound utilities.
+It can be used to write hooks like `useColors`.
+
+_Related_
+
+-   [useColors](/packages/block-editor/README.md#useColors)
+
+_Parameters_
+
+-   _attributePickerOptions_ `Object`: The options object.
+-   _attributePickerOptions.names_ `Array<string>`: The list of attributes to manage.
+-   _attributePickerOptions.valuesEnum_ `Array<*>`: The list of values attributes can be set to. Setting an attribute to a custom value not on this list will set the attribute's value to `undefined` and the corresponding `custom${ upperFirst( name ) }` attribute to the custom value.
+-   _attributePickerOptions.findEnumValue_ `[Function]`: Function for comparing an enum value to the value passed to the setter, when looking for the value in the enum. Defaults to shallow comparison.
+-   _attributePickerOptions.mapEnumValue_ `[Function]`: Function for mapping the enum value found with `findEnumValue` before saving it, if found. Otherwise, the value is assumed to be custom and saved as is.
+-   _attributePickerOptions.findAndMapEnumValueDeps_ `[Array<*>]`: List of items that, if they fail a shallow equality test, will cause new setters to be returned. Useful if your `findEnumValue` or `mapEnumValue` have closures.
+-   _attributePickerOptions.mapAttribute_ `[Function]`: Function for mapping attributes before returning them, called with the attribute's or custom attribute's value and the name.
+-   _attributePickerOptions.mapAttributeDeps_ `[Array<*>]`: List of items that, if they fail a shallow equality test, will cause attributes to be mapped again. Useful if your `mapAttribute` has closures.
+-   _attributePickerOptions.utilsToBind_ `[undefined]`: Object with functions to bind to `valuesEnum` and merge into the returned object. Useful for utilities that need to be bound.
+-   _attributePickerOptions.utilsToBindDeps_ `[Array<*>]`: List of items that, if they fail a shallow equality test, will cause `utilsToBind` to be bound again. Useful if any of your utils has closures.
+
+_Returns_
+
+-   `Object`: The object with mapped attributes and attribute setters.
+
+<a name="useColors" href="#useColors">#</a> **useColors**
+
+Like `useCustomColors`, but uses the color palette from
+the editor's settings.
+
+_Related_
+
+-   [useCustomColors](/packages/block-editor/README.md#useCustomColors)
+
+_Usage_
+
+```jsx
+const MyColorfulComponent = () => {
+	const { backgroundColor, setBackgroundColor } = useColors( [
+		'backgroundColor',
+	] );
+
+	//...
+};
+```
+
+_Parameters_
+
+-   _colorTypes_ `Array<(Object|string)>`: The color types passed to `useCustomColors`.
+
+_Returns_
+
+-   `Object`: The object with color objects and color setters.
+
+<a name="useCustomColors" href="#useCustomColors">#</a> **useCustomColors**
+
+A hook that returns an object with color objects and color
+block attribute setters for a given list of color types and
+a custom color palette.
+
+_Usage_
+
+Calling it with a color type `"backgroundColor"` will return an object
+with a color object `backgroundColor`, and a function `setBackgroundColor`.
+`setBackgroundColor` can be called with any color value. If the value
+equals the `color` property of an object in the `colorPalette`,
+`backgroundColor` will be set to that object merged with a custom
+`class` property. If it's not, it will be set to a custom object
+with just a `color` property set to the value.
+
+```jsx
+const CUSTOM_COLORS = [
+	{ name: 'Red', slug: 'red', color: '#ff0000' },
+	{ name: 'Blue', slug: 'blue', color: '#0000ff' },
+];
+
+const MyColorfulComponent = () => {
+	const { backgroundColor, setBackgroundColor } = useCustomColors(
+		[ 'backgroundColor' ],
+		CUSTOM_COLORS
+	);
+	// setBackgroundColor( '#ff0000' );
+	// _.isEqual(
+	// 	{ ...CUSTOM_COLORS[ 0 ], class: 'has-red-background-color' },
+	// 	backgroundColor
+	//	);
+	// setBackgroundColor( '#000000' );
+	// _.isEqual( { color: '#000000' }, backgroundColor );
+	//...
+};
+```
+
+_Parameters_
+
+-   _colorTypes_ `Array<(Object|string)>`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string, the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
+-   _colorPalette_ `Array<Object>`: The array of color objects (name, slug, color, etc... ).
+
+_Returns_
+
+-   `Object`: The object with color objects and color setters.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 

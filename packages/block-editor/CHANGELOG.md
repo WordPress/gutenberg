@@ -4,6 +4,10 @@
 
 - `BlockEditorProvider` no longer renders a wrapping `SlotFillProvider` or `DropZoneProvider` (from `@wordpress/components`). For custom block editors, you should render your own as wrapping the `BlockEditorProvider`. A future release will include a new `BlockEditor` component for simple, standard usage. `BlockEditorProvider` will serve the simple purpose of establishing its own context for block editors.
 
+### New Features
+
+- Added the `useAttributePicker` hook to abstract away common block code and used it to refactor the color higher order components. They are now written with the new exported hooks, `useColors` and `useCustomColors`.
+
 ## 2.2.0 (2019-06-12)
 
 ### Internal

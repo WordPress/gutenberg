@@ -14,7 +14,7 @@ import { Component } from '@wordpress/element';
 import Edit from './edit';
 import { BlockEditContextProvider } from './context';
 
-class BlockEdit extends Component {
+export default class BlockEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -27,13 +27,13 @@ class BlockEdit extends Component {
 		);
 	}
 
-	propsToContext( name, isSelected, clientId, onFocus, onCaretVerticalPositionChange ) {
-		return { name, isSelected, clientId, onFocus, onCaretVerticalPositionChange };
+	propsToContext( name, isSelected, clientId, onFocus, onCaretVerticalPositionChange, attributes, setAttributes ) {
+		return { name, isSelected, clientId, onFocus, onCaretVerticalPositionChange, attributes, setAttributes };
 	}
 
 	render() {
-		const { name, isSelected, clientId, onFocus, onCaretVerticalPositionChange } = this.props;
-		const value = this.propsToContext( name, isSelected, clientId, onFocus, onCaretVerticalPositionChange );
+		const { name, isSelected, clientId, onFocus, onCaretVerticalPositionChange, attributes, setAttributes } = this.props;
+		const value = this.propsToContext( name, isSelected, clientId, onFocus, onCaretVerticalPositionChange, attributes, setAttributes );
 
 		return (
 			<BlockEditContextProvider value={ value }>
@@ -43,4 +43,5 @@ class BlockEdit extends Component {
 	}
 }
 
-export default BlockEdit;
+export { BlockEditContextProvider };
+export { default as useAttributePicker } from './use-attribute-picker';

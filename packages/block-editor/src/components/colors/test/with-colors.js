@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { mount } from 'enzyme';
 
 /**
  * Internal dependencies
  */
+import { BlockEditContextProvider } from '../../block-edit';
 import { createCustomColorsHOC } from '../with-colors';
 
 describe( 'createCustomColorsHOC', () => {
@@ -15,11 +16,15 @@ describe( 'createCustomColorsHOC', () => {
 			<div />
 		) );
 
-		const wrapper = shallow(
-			<EnhancedComponent attributes={ { backgroundColor: null } } />
+		const wrapper = mount(
+			<BlockEditContextProvider
+				value={ { attributes: { backgroundColor: null } } }
+			>
+				<EnhancedComponent />
+			</BlockEditContextProvider>
 		);
 
-		expect( wrapper.dive() ).toMatchSnapshot();
+		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	it( 'setting the color to a value in the provided custom color array updated the backgroundColor attribute', () => {
@@ -31,7 +36,11 @@ describe( 'createCustomColorsHOC', () => {
 		const setAttributes = jest.fn();
 
 		const wrapper = mount(
-			<EnhancedComponent attributes={ { backgroundColor: null } } setAttributes={ setAttributes } />
+			<BlockEditContextProvider
+				value={ { attributes: { backgroundColor: null }, setAttributes } }
+			>
+				<EnhancedComponent />
+			</BlockEditContextProvider>
 		);
 
 		wrapper.find( 'button' ).simulate( 'click' );
@@ -47,7 +56,11 @@ describe( 'createCustomColorsHOC', () => {
 		const setAttributes = jest.fn();
 
 		const wrapper = mount(
-			<EnhancedComponent attributes={ { backgroundColor: null } } setAttributes={ setAttributes } />
+			<BlockEditContextProvider
+				value={ { attributes: { backgroundColor: null }, setAttributes } }
+			>
+				<EnhancedComponent />
+			</BlockEditContextProvider>
 		);
 
 		wrapper.find( 'button' ).simulate( 'click' );
