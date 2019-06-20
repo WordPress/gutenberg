@@ -19,6 +19,7 @@ export { default as URLInput } from './url-input';
 export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
 
 // Content Related Components
+export { default as BlockListBlock } from './block-list/block';
 export { default as BlockMobileToolbar } from './block-list/block-mobile-toolbar';
 export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';
