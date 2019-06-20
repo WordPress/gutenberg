@@ -63,6 +63,15 @@
 	border-right-width: 1px;
 }
 
+
+.blockContainerFocused {
+	background-color: white;
+	padding-left: 16;
+	padding-right: 16;
+	padding-top: 12;
+	padding-bottom: 0; // will be flushed into inline toolbar height
+}
+
 .blockHolderFocused {
 	border-color: $gray-lighten-30;
 }

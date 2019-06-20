@@ -16,7 +16,7 @@ import { dispatch, select } from '@wordpress/data';
  */
 import { bootstrapEditor } from '..';
 import App from './App';
-import BlockHolder from '../block-management/block-holder';
+import { BlockListBlock } from '@wordpress/block-editor';
 
 describe( 'App', () => {
 	beforeAll( bootstrapEditor );
@@ -40,7 +40,7 @@ describe( 'App', () => {
 	it( 'Code block is a TextInput', () => {
 		const app = renderer.create( <App /> );
 
-		app.root.findAllByType( BlockHolder )
+		app.root.findAllByType( BlockListBlock )
 			.forEach( ( blockHolder ) => {
 				if ( 'core/code' === blockHolder.props.name ) {
 					// TODO: hardcoded indices are ugly and error prone. Can we do better here?
@@ -59,7 +59,7 @@ describe( 'App', () => {
 
 	it( 'Heading block test', () => {
 		const app = renderer.create( <App /> );
-		app.root.findAllByType( BlockHolder )
+		app.root.findAllByType( BlockListBlock )
 			.forEach( ( blockHolder ) => {
 				if ( 'core/heading' === blockHolder.props.name ) {
 					const aztec = blockHolder.findByType( 'RCTAztecView' );
