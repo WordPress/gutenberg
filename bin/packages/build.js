@@ -64,6 +64,36 @@ function createStyleEntryTransform() {
 	} );
 }
 
+function createBlockJsonEntryTransform() {
+	const blocks = new Set;
+
+	return new Transform( {
+		objectMode: true,
+		async transform( file, encoding, callback ) {
+			const matches = /block-library\/src\/(.*)\/block.json$/.exec( file );
+			const blockName = matches ? matches[ 1 ] : undefined;
+
+			// Only block.json files in the block-library folder are subject to this transform.
+			if ( ! blockName ) {
+				this.push( file );
+				callback();
+				return;
+			}
+
+			// Only operate once per block, assuming entries are common.
+			if ( blockName && blocks.has( blockName ) ) {
+				callback();
+				return;
+			}
+
+			blocks.add( blockName );
+			const entries = await glob( path.resolve( PACKAGES_DIR, 'block-library/src/', blockName, 'index.js' ) );
+			entries.forEach( ( entry ) => this.push( entry ) );
+			callback();
+		},
+	} );
+}
+
 let onFileComplete = () => {};
 
 let stream;
@@ -72,7 +102,9 @@ if ( files.length ) {
 	stream = new Readable( { encoding: 'utf8' } );
 	files.forEach( ( file ) => stream.push( file ) );
 	stream.push( null );
-	stream = stream.pipe( createStyleEntryTransform() );
+	stream = stream
+		.pipe( createStyleEntryTransform() )
+		.pipe( createBlockJsonEntryTransform() );
 } else {
 	const bar = new ProgressBar( 'Build Progress: [:bar] :percent', {
 		width: 30,
