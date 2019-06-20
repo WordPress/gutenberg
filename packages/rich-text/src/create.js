@@ -15,12 +15,6 @@ import {
 	OBJECT_REPLACEMENT_CHARACTER,
 } from './special-characters';
 
-/**
- * Browser dependencies
- */
-
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
-
 function createEmptyValue() {
 	return {
 		formats: [],
@@ -196,7 +190,7 @@ function accumulateSelection( accumulator, node, range, value ) {
 	if ( value.start !== undefined ) {
 		accumulator.start = currentLength + value.start;
 	// Range indicates that the current node has selection.
-	} else if ( node === startContainer && node.nodeType === TEXT_NODE ) {
+	} else if ( node === startContainer && node.nodeType === node.TEXT_NODE ) {
 		accumulator.start = currentLength + startOffset;
 	// Range indicates that the current node is selected.
 	} else if (
@@ -219,7 +213,7 @@ function accumulateSelection( accumulator, node, range, value ) {
 	if ( value.end !== undefined ) {
 		accumulator.end = currentLength + value.end;
 	// Range indicates that the current node has selection.
-	} else if ( node === endContainer && node.nodeType === TEXT_NODE ) {
+	} else if ( node === endContainer && node.nodeType === node.TEXT_NODE ) {
 		accumulator.end = currentLength + endOffset;
 	// Range indicates that the current node is selected.
 	} else if (
@@ -312,7 +306,7 @@ function createFromElement( {
 		const node = element.childNodes[ index ];
 		const type = node.nodeName.toLowerCase();
 
-		if ( node.nodeType === TEXT_NODE ) {
+		if ( node.nodeType === node.TEXT_NODE ) {
 			const text = filterString( node.nodeValue );
 			range = filterRange( node, range, filterString );
 			accumulateSelection( accumulator, node, range, { text } );
@@ -324,7 +318,7 @@ function createFromElement( {
 			continue;
 		}
 
-		if ( node.nodeType !== ELEMENT_NODE ) {
+		if ( node.nodeType !== node.ELEMENT_NODE ) {
 			continue;
 		}
 
