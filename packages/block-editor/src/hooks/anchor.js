@@ -74,7 +74,7 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 							help={ (
 								<>
 									<p>
-										{ __( 'Enter a word or two — without spaces — to make a unique web address just for this heading, called an "anchor." Then, you\'ll be able link directly to this section of your page.' ) }
+										{ __( 'Enter a word or two — without spaces — to make a unique web address just for this heading, called an “anchor.” Then, you’ll be able to link directly to this section of your page.' ) }
 									</p>
 									<p className="components-base-control__learn-more">
 										<ExternalLink href={ __( 'https://wordpress.org/support/article/#/' ) }>
