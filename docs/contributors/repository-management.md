@@ -60,12 +60,16 @@ To keep the issue list healthy, it needs to be triaged regularly. *Triage* is th
 
 Anyone can help triage, although you’ll need contributor permission on the Gutenberg repository to modify an issue’s labels or edit its title.
 
-Here are a couple places you can start:
+To start simply choose from one of these filtered lisst of issues:
 
-- [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel).
-- [The least recently updated Gutenberg issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc).
+- [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel). Triaging by simply adding labels is helping people focused on certain aspects find the issues easier and start working on them.
+- [The least recently updated Gutenberg issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc). Triaging issues that are getting old and possibly out of date keeps important work from being overlooked.
+- [All Gutenberg issues with no comments](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps in keeping important bugs or suggestions fall become outdated before being considered.
+- [The least commented on issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps the community figure out things like traction for certain proposals. 
 
-When reviewing issues, here are some steps you can perform:
+You can also create your own custom set of filters on GuiHub.
+
+When triaging, either one of the lists above or issues in general, here are some steps you can perform:
 
 - First search for duplicates. If the issue is duplicate, close it by commenting with “Duplicate of #<original-id>” and add any relevant new details to the existing issue.
 - If the issue is missing labels, add some to better categorize it (requires proper permissions).
@@ -78,6 +82,10 @@ When reviewing issues, here are some steps you can perform:
   - Check that the bug report is valid by debugging it to see if you can track down the technical specifics.
   - Check if the issue is missing some detail and see if you can fill in those details. For instance, if a bug report is missing visual detail, it’s helpful to reproduce the issue locally and upload a screenshot or GIF.
 
+For triaging there are some labels which are very useful:
+- `Needs Technical Feedback` - you can apply them when you see new features or API changes proposed
+- `Needs More Info` - when it’s not clear what the issue is or it would help to provide additional details
+- `Needs Testing` - it’s useful for old bugs where it seems like they are no longer relevant
 
 ## Pull Requests
 
