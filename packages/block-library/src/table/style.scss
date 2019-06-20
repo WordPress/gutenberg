@@ -81,3 +81,7 @@
 		border-bottom: 1px solid $light-gray-200;
 	}
 }
+
+.wp-block-table__wrapper {
+	overflow-x: scroll;
+}

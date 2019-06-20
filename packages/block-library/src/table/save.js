@@ -54,10 +54,12 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<table className={ classes }>
-			<Section type="head" rows={ head } />
-			<Section type="body" rows={ body } />
-			<Section type="foot" rows={ foot } />
-		</table>
+		<div className="wp-block-table__wrapper">
+			<table className={ classes }>
+				<Section type="head" rows={ head } />
+				<Section type="body" rows={ body } />
+				<Section type="foot" rows={ foot } />
+			</table>
+		</div>
 	);
 }
