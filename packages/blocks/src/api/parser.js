@@ -9,7 +9,7 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
  */
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
-import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
+import { parse as parseHTML2BlockObjects } from '@wordpress/block-serialization-default-parser';
 
 /**
  * Internal dependencies
@@ -409,82 +409,110 @@ export function getMigratedBlock( block, parsedAttributes ) {
 }
 
 /**
- * Creates a block with fallback to the unknown type handler.
- *
- * @param {Object} blockNode Parsed block node.
- *
- * @return {?Object} An initialized block object (if possible).
+ * @typedef {Object} ParsedBlock
+ * @property {?string} blockName name indicating namespaced block type: e.g. myplugin/my-block (note that `core/` may be omitted)
+ * @property {Object} attrs attributes stored in JSON form in the block comment delimiters
+ * @property {Array<ParsedBlock>} innerBlocks nested block objects; may be empty
+ * @property {Array<string|null>} innerContent indicates arrangement of text chunks and inner blocks within serialized form
+ * @property {string} innerHTML Deprecated! Full text inside block boundaries ignoring inner blocks
  */
-export function createBlockWithFallback( blockNode ) {
-	const { blockName: originalName } = blockNode;
-	let {
-		attrs: attributes,
-		innerBlocks = [],
-		innerHTML,
-	} = blockNode;
-	const freeformContentFallbackBlock = getFreeformContentHandlerName();
-	const unregisteredFallbackBlock = getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
 
-	attributes = attributes || {};
+/**
+ * @typedef {Object} BlockImplementation a "block type" with code that provides `edit()` and `save()` functionality
+ * @property {string} name name of block type
+ */
 
-	// Trim content to avoid creation of intermediary freeform segments.
-	innerHTML = innerHTML.trim();
+/**
+ * Transforms a parsed block object into a runnable Gutenberg Block
+ *
+ * A runnable block is a parsed block object paired with a matching
+ * block implementation. The implementation provides `edit()` and
+ * `save()` functionality.
+ *
+ * For block objects where no suitable implementation can be found we
+ * return one of two types of "failure wrappers":
+ *  - a "freeform" block for unstructured non-block content
+ *  - an "unregistered" block for blocks with no matching implementation
+ *
+ * @param {ParsedBlock} parsedBlock Block object as returned from the first stage parser
+ *
+ * @return {?BlockImplementation} An initialized block object (if possible).
+ */
+export function parseBlockObject2Blocks( parsedBlock ) {
+	const {
+		blockName: rawName,
+		attrs: rawAttributes,
+		innerBlocks: rawInnerBlocks,
+		innerHTML: rawInnerHTML,
+	} = parsedBlock;
 
-	// Use type from block content if available. Otherwise, default to the
-	// freeform content fallback.
-	let name = originalName || freeformContentFallbackBlock;
+	const freeformName = getFreeformContentHandlerName();
+	const fallbackName = getUnregisteredTypeHandlerName() || freeformName;
 
-	// Convert 'core/cover-image' block in existing content to 'core/cover'.
-	if ( 'core/cover-image' === name ) {
-		name = 'core/cover';
+	let attributes = rawAttributes || {};
+
+	/* eslint-disable no-nested-ternary, indent */
+	/** @type {string} nominative block type name - this may end up invalid if we fail to find a block implementation for the name */
+	const desiredName = (
+		// freeform blocks don't have their own blockName, so use the registered one (it may not exist, more on that later)
+		null === rawName ? freeformName :
+		// convert these relics from earlier versions of Gutenberg
+		'core/cover-image' === rawName ? 'core/cover' :
+		'core/text' === rawName || 'core/cover-text' === rawName ? 'core/paragraph' :
+		// if no other intentional transforms exist then use the given block name
+		rawName
+	);
+	/* eslint-enable no-nested-ternary, indent */
+
+	/** @type {?BlockImplementation} block implementation matching desired block name if it exists */
+	const foundBlockImplementation = getBlockType( desiredName );
+
+	/** @type {?BlockImplementation} block implementation matching desired block name or if not found, unregistered, if it exists */
+	const blockImplementation = foundBlockImplementation || getBlockType( fallbackName );
+
+	// if we can't find a block implementation for our parsed block object
+	// and if we don't have any fallback blocks like `core/missing` to use
+	// then just abort and reject this block from the list
+	if ( ! blockImplementation ) {
+		return null;
 	}
 
-	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
-	if ( 'core/text' === name || 'core/cover-text' === name ) {
-		name = 'core/paragraph';
+	/** @type {string} name of block type from matched block implementation */
+	const blockName = blockImplementation.name;
+
+	const isFallback = freeformName === blockName || fallbackName === blockName;
+
+	// Trim content to avoid creation of intermediary freeform segments.
+	let innerHTML = rawInnerHTML.trim();
+
+	// if we have a fallback block with no content then also reject it
+	// there's nothing there to render
+	// @TODO this seems like an existing bug - can we not have unsupported void blocks?
+	if ( isFallback && ! innerHTML ) {
+		return null;
 	}
 
 	// Fallback content may be upgraded from classic editor expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
 	// meaning there are no negative consequences to repeated autop calls.
-	if ( name === freeformContentFallbackBlock ) {
+	if ( blockName === freeformName ) {
 		innerHTML = autop( innerHTML ).trim();
 	}
 
-	// Try finding the type for known block name, else fall back again.
-	let blockType = getBlockType( name );
-
-	if ( ! blockType ) {
-		// Preserve undelimited content for use by the unregistered type handler.
-		const originalUndelimitedContent = innerHTML;
-
+	if ( blockName === fallbackName ) {
 		// If detected as a block which is not registered, preserve comment
 		// delimiters in content of unregistered type handler.
-		if ( name ) {
-			innerHTML = getCommentDelimitedContent( name, attributes, innerHTML );
-		}
+		innerHTML = getCommentDelimitedContent( rawName, attributes, innerHTML );
 
-		name = unregisteredFallbackBlock;
-		attributes = { originalName, originalUndelimitedContent };
-		blockType = getBlockType( name );
+		attributes = { originalName: rawName, originalUndelimitedContent: rawInnerHTML };
 	}
 
 	// Coerce inner blocks from parsed form to canonical form.
-	innerBlocks = innerBlocks.map( createBlockWithFallback );
-
-	const isFallbackBlock = (
-		name === freeformContentFallbackBlock ||
-		name === unregisteredFallbackBlock
-	);
-
-	// Include in set only if type was determined.
-	if ( ! blockType || ( ! innerHTML && isFallbackBlock ) ) {
-		return;
-	}
+	const innerBlocks = ( rawInnerBlocks || [] ).map( parseBlockObject2Blocks );
 
 	let block = createBlock(
-		name,
-		getBlockAttributes( blockType, innerHTML, attributes ),
+		blockName,
+		getBlockAttributes( blockImplementation, innerHTML, attributes ),
 		innerBlocks
 	);
 
@@ -492,8 +520,8 @@ export function createBlockWithFallback( blockNode ) {
 	// provided there are no changes in attributes. The validation procedure thus compares the
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
-	if ( ! isFallbackBlock ) {
-		block.isValid = isValidBlockContent( blockType, block.attributes, innerHTML );
+	if ( ! isFallback ) {
+		block.isValid = isValidBlockContent( blockImplementation, block.attributes, innerHTML );
 	}
 
 	// Preserve original content for future use in case the block is parsed as
@@ -506,28 +534,48 @@ export function createBlockWithFallback( blockNode ) {
 }
 
 /**
- * Creates a parse implementation for the post content which returns a list of blocks.
+ * Transforms an HTML document into a list of Gutenberg Blocks
  *
- * @param {Function} parseImplementation Parse implementation.
+ * Parsing is performed in two stage:
+ *  - stage one: transforms an HTML document into parsed block objects
+ *               these objects contain only those attributes of a block
+ *               which can be directly inferred from the serialized HTML
+ *               without additional processing
  *
- * @return {Function} An implementation which parses the post content.
+ *  - stage two: matches block implementation with each parsed block object
+ *               this stage performs additional attribute parsing and may
+ *               make other arbitrary transformations of the block's data
+ *               as well as upgrade older blocks with registered deprecations
+ *               it's free to exclude a block entirely from the final list
+ *
+ * Failure behaviors are the responsibility of the second stage of parsing
+ *  - No supported block implementation can be found for a block: e.g. missing plugin
+ *  - Non-block content is found inside the document: e.g. freeform content between blocks
+ *  - Failure to validate block implementation given parsed block attributes: e.g. corrupt document
+ *
+ * The second-stage parser should attempt to preserve or gracefully handle failures.
+ *
+ * @param {string} content HTML string which may contain serialized Gutenberg Blocks
+ *
+ * @return {Array<Object>} List of blocks attached to their implementations: e.g. a paragraph block
  */
-const createParse = ( parseImplementation ) =>
-	( content ) => parseImplementation( content ).reduce( ( memo, blockNode ) => {
-		const block = createBlockWithFallback( blockNode );
-		if ( block ) {
-			memo.push( block );
+export const blockParser = ( content ) => {
+	const blockObjects = parseHTML2BlockObjects( content );
+
+	const blocks = [];
+	for ( const blockObject of blockObjects ) {
+		const block = parseBlockObject2Blocks( blockObject );
+
+		// it's possible for the second stage parser to reject
+		// a block entirely: e.g. whitespace-only freeform blocks
+		if ( ! block ) {
+			continue;
 		}
-		return memo;
-	}, [] );
 
-/**
- * Parses the post content with a PegJS grammar and returns a list of blocks.
- *
- * @param {string} content The post content.
- *
- * @return {Array} Block list.
- */
-export const parseWithGrammar = createParse( defaultParse );
+		blocks.push( block );
+	}
 
-export default parseWithGrammar;
+	return blocks;
+};
+
+export default blockParser;

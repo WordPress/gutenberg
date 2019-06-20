@@ -11,7 +11,7 @@ import {
 	getBlockAttribute,
 	getBlockAttributes,
 	asType,
-	createBlockWithFallback,
+	parseBlockObject2Blocks,
 	getMigratedBlock,
 	default as parsePegjs,
 	parseWithAttributeSchema,
@@ -675,11 +675,11 @@ describe( 'block parser', () => {
 		} );
 	} );
 
-	describe( 'createBlockWithFallback', () => {
+	describe( 'parseBlockObject2Blocks', () => {
 		it( 'should create the requested block if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = createBlockWithFallback( {
+			const block = parseBlockObject2Blocks( {
 				blockName: 'core/test-block',
 				innerHTML: 'Bananas',
 				attrs: { fruit: 'Bananas' },
@@ -691,7 +691,7 @@ describe( 'block parser', () => {
 		it( 'should create the requested block with no attributes if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = createBlockWithFallback( {
+			const block = parseBlockObject2Blocks( {
 				blockName: 'core/test-block',
 				innerHTML: '',
 			} );
@@ -703,7 +703,7 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/unregistered-block', unknownBlockSettings );
 			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
 
-			const block = createBlockWithFallback( {
+			const block = parseBlockObject2Blocks( {
 				blockName: 'core/test-block',
 				innerHTML: 'Bananas',
 				attrs: { fruit: 'Bananas' },
@@ -716,7 +716,7 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/freeform-block', unknownBlockSettings );
 			setFreeformContentHandlerName( 'core/freeform-block' );
 
-			const block = createBlockWithFallback( {
+			const block = parseBlockObject2Blocks( {
 				innerHTML: 'content',
 			} );
 			expect( block.name ).toEqual( 'core/freeform-block' );
@@ -724,7 +724,7 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should not create a block if no unknown type handler', () => {
-			const block = createBlockWithFallback( {
+			const block = parseBlockObject2Blocks( {
 				blockName: 'core/test-block',
 				innerHTML: '',
 			} );
@@ -757,7 +757,7 @@ describe( 'block parser', () => {
 				],
 			} );
 
-			const block = createBlockWithFallback( {
+			const block = parseBlockObject2Blocks( {
 				blockName: 'core/test-block',
 				innerHTML: '<span>Bananas</span>',
 				attrs: { fruit: 'Bananas' },
