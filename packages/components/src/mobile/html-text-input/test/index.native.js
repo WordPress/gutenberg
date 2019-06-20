@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import HTMLInputView from '..';
+import { HTMLTextInput } from '..';
 
 // Utility to find a TextInput in a ShallowWrapper
 const findTextInputInWrapper = ( wrapper, matchingProps ) => {
@@ -33,19 +33,19 @@ const findTitleTextInput = ( wrapper ) => {
 	return findTextInputInWrapper( wrapper, { placeholder } );
 };
 
-describe( 'HTMLInputView', () => {
-	it( 'HTMLInput renders', () => {
+describe( 'HTMLTextInput', () => {
+	it( 'HTMLTextInput renders', () => {
 		const wrapper = shallow(
-			<HTMLInputView />
+			<HTMLTextInput />
 		);
 		expect( wrapper ).toBeTruthy();
 	} );
 
-	it( 'HTMLInputView updates store and state on HTML text change', () => {
+	it( 'HTMLTextInput updates store and state on HTML text change', () => {
 		const onChange = jest.fn();
 
 		const wrapper = shallow(
-			<HTMLInputView
+			<HTMLTextInput
 				onChange={ onChange }
 			/>
 		);
@@ -64,11 +64,11 @@ describe( 'HTMLInputView', () => {
 		expect( wrapper.instance().state.value ).toEqual( 'text' );
 	} );
 
-	it( 'HTMLInputView persists changes in HTML text input on blur', () => {
+	it( 'HTMLTextInput persists changes in HTML text input on blur', () => {
 		const onPersist = jest.fn();
 
 		const wrapper = shallow(
-			<HTMLInputView
+			<HTMLTextInput
 				onPersist={ onPersist }
 				onChange={ jest.fn() }
 			/>
@@ -95,11 +95,11 @@ describe( 'HTMLInputView', () => {
 		expect( wrapper.instance().state.value ).toEqual( 'text' );
 	} );
 
-	it( 'HTMLInputView propagates title changes to store', () => {
+	it( 'HTMLTextInput propagates title changes to store', () => {
 		const setTitleAction = jest.fn();
 
 		const wrapper = shallow(
-			<HTMLInputView
+			<HTMLTextInput
 				setTitleAction={ setTitleAction }
 			/>
 		);
