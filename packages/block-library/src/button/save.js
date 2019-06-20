@@ -21,7 +21,7 @@ export default function save( { attributes } ) {
 		customBackgroundColor,
 		customTextColor,
 		linkTarget,
-		linkRel,
+		rel,
 	} = attributes;
 
 	const textClass = getColorClassName( 'color', textColor );
@@ -49,7 +49,7 @@ export default function save( { attributes } ) {
 				style={ buttonStyle }
 				value={ text }
 				target={ linkTarget }
-				rel={ linkRel }
+				rel={ rel }
 			/>
 		</div>
 	);
