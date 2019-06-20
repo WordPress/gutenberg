@@ -6,7 +6,7 @@
 
 ### New Features
 
-- Added the `useAttributePicker` hook to abstract away common block code and used it to refactor the color higher order components. They are now written with the new exported hooks, `useColors` and `useCustomColors`.
+- Added the `useAttributePicker` hook to abstract away common block code and used it to refactor the color and font size higher order components. They are now written with the new exported hooks, `useColors`, `useCustomColors`, and `useFontSizes`.
 
 ## 2.2.0 (2019-06-12)
 

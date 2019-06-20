@@ -498,7 +498,7 @@ const MyColorfulComponent = () => {
 	// _.isEqual(
 	// 	{ ...CUSTOM_COLORS[ 0 ], class: 'has-red-background-color' },
 	// 	backgroundColor
-	//	);
+	// );
 	// setBackgroundColor( '#000000' );
 	// _.isEqual( { color: '#000000' }, backgroundColor );
 	//...
@@ -513,6 +513,56 @@ _Parameters_
 _Returns_
 
 -   `Object`: The object with color objects and color setters.
+
+<a name="useFontSizes" href="#useFontSizes">#</a> **useFontSizes**
+
+A hook that returns an object with font size objects and font size
+block attribute setters for a given list of font size names.
+It uses the font size object list from the editor's settings as a palette.
+
+_Usage_
+
+Calling it with a font size name `"paragraphFontSize"` will return an object
+with a font size object `paragraphFontSize`, and a function `setParagraphFontSize`.
+`setParagraphFontSize` can be called with any font size value. If the value
+equals the `size` property of an object in the `fontSizes` list from the editor's settings,
+`paragraphFontSize` will be set to that object merged with a custom
+`class` property. If it's not, it will be set to a custom object
+with just a `size` property set to the value.
+
+```jsx
+// const FONT_SIZES = [
+// 	{
+// 		name: 'Small',
+// 		size: 13,
+// 		slug: 'small',
+// 	},
+// 	// ...
+// ];
+// _.isEqual( FONT_SIZES, select( 'core/block-editor' ).getSettings().fontSizes );
+
+const MyFontSizeableComponent = () => {
+	const { paragraphFontSize, setParagraphFontSize } = useFontSizes( [
+		'paragraphFontSize',
+	] );
+
+	// setParagraphFontSize( 13 );
+	// _.isEqual(
+	// 	{ ...FONT_SIZES[ 0 ], class: 'has-small-font-size' },
+	// 	paragraphFontSize
+	// );
+	// setParagraphFontSize( 14 );
+	// _.isEqual( { size: 14 }, paragraphFontSize );
+};
+```
+
+_Parameters_
+
+-   _fontSizeNames_ `Array<string>`: The list of font size names.
+
+_Returns_
+
+-   `Object`: The object with font size objects and font size setters.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 
@@ -552,7 +602,7 @@ font size value retrieval, and font size change handling.
 
 _Parameters_
 
--   _args_ `...(object|string)`: The arguments should all be strings Each string contains the font size attribute name e.g: 'fontSize'.
+-   _fontSizeNames_ `...string`: The arguments should all be strings. Each string contains the font size attribute name e.g.: 'fontSize'.
 
 _Returns_
 

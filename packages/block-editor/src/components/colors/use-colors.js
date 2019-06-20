@@ -43,7 +43,7 @@ import { getMostReadableColor } from './utils';
  * 	// _.isEqual(
  * 	// 	{ ...CUSTOM_COLORS[ 0 ], class: 'has-red-background-color' },
  * 	// 	backgroundColor
- * 	//	);
+ * 	// );
  * 	// setBackgroundColor( '#000000' );
  * 	// _.isEqual( { color: '#000000' }, backgroundColor );
  * 	//...
