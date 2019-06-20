@@ -1,6 +1,6 @@
 # Frequently Asked Questions
 
-This initial set of questions were created when the Gutenberg project was relatively new, for a more recent set of questions, please see Matt's November 2018 post [WordPress 5.0: A Gutenberg FAQ](https://ma.tt/2018/11/a-gutenberg-faq/).
+This initial set of questions was created when the Gutenberg project was relatively new, for a more recent set of questions, please see Matt's November 2018 post [WordPress 5.0: A Gutenberg FAQ](https://ma.tt/2018/11/a-gutenberg-faq/).
 
 ## What is Gutenberg?
 
