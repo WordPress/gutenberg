@@ -82,6 +82,7 @@ describe( 'Using Plugins API', () => {
 			await openDocumentSettingsSidebar();
 			const pluginDocumentSettingsText = await page.$eval( '.edit-post-sidebar .my-document-setting-plugin', ( el ) => el.innerText );
 			expect( pluginDocumentSettingsText ).toBe( 'My Document Setting Panel' );
+			expect( pluginDocumentSettingsText ).toMatchSnapshot();
 		} );
 	} );
 } );
