@@ -55,7 +55,7 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<div className="wp-block-table__wrapper">
+		<div>
 			<table className={ classes }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />

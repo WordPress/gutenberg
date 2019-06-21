@@ -4,15 +4,17 @@
 	$subtle-pale-blue: #e7f5fe;
 	$subtle-pale-pink: #fcf0ef;
 
+	overflow-x: scroll;
+
 	// Fixed layout toggle
-	&.has-fixed-layout {
+	.has-fixed-layout {
 		table-layout: fixed;
 		width: 100%;
 	}
 
-	&.alignleft,
-	&.aligncenter,
-	&.alignright {
+	.alignleft,
+	.aligncenter,
+	.alignright {
 		// Override default display property for align styles.
 		// The table element needs to be kept as display table
 		// for table features to work reliably.
@@ -23,24 +25,24 @@
 		width: auto;
 	}
 
-	&.has-subtle-light-gray-background-color {
+	.has-subtle-light-gray-background-color {
 		background-color: $subtle-light-gray;
 	}
 
-	&.has-subtle-pale-green-background-color {
+	.has-subtle-pale-green-background-color {
 		background-color: $subtle-pale-green;
 	}
 
-	&.has-subtle-pale-blue-background-color {
+	.has-subtle-pale-blue-background-color {
 		background-color: $subtle-pale-blue;
 	}
 
-	&.has-subtle-pale-pink-background-color {
+	.has-subtle-pale-pink-background-color {
 		background-color: $subtle-pale-pink;
 	}
 
 	// "Stripes" style variation.
-	&.is-style-stripes {
+	.is-style-stripes {
 		border-spacing: 0;
 		border-collapse: inherit;
 		background-color: transparent;
@@ -80,8 +82,4 @@
 
 		border-bottom: 1px solid $light-gray-200;
 	}
-}
-
-.wp-block-table__wrapper {
-	overflow-x: scroll;
 }
