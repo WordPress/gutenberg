@@ -4,8 +4,12 @@
 	$subtle-pale-blue: #e7f5fe;
 	$subtle-pale-pink: #fcf0ef;
 
+	display: block;
+	overflow-x: scroll;
+
 	// Fixed layout toggle
 	&.has-fixed-layout {
+		display: table;
 		table-layout: fixed;
 		width: 100%;
 	}

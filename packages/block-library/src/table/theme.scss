@@ -7,6 +7,14 @@
 	th {
 		padding: 0.5em;
 		border: 1px solid;
-		word-break: break-all;
+	}
+	&.has-fixed-layout,
+	&.alignleft,
+	&.aligncenter,
+	&.alignright {
+		td,
+		th {
+			word-break: break-all;
+		}
 	}
 }
