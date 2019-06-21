@@ -1,9 +1,4 @@
 /**
- * @format
- * @flow
- */
-
-/**
  * External dependencies
  */
 import { identity } from 'lodash';
