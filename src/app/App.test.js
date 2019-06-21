@@ -41,7 +41,7 @@ describe( 'App', () => {
 		const app = renderer.create( <App /> );
 
 		app.root.findAllByType( BlockListBlock )
-			.forEach( ( BlockEdit ) => {
+			.forEach( ( blockHolder ) => {
 				if ( 'core/code' === blockHolder.props.name ) {
 					// TODO: hardcoded indices are ugly and error prone. Can we do better here?
 					const blockHolderContainer = blockHolder.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ];
