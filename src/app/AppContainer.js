@@ -167,6 +167,8 @@ class AppContainer extends React.Component<PropsType> {
 
 	toggleMode() {
 		const { mode, switchMode } = this.props;
+		// refresh html content first
+		this.serializeToNativeAction();
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
 	}
 
