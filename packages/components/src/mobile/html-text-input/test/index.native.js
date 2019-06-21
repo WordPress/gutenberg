@@ -96,11 +96,11 @@ describe( 'HTMLTextInput', () => {
 	} );
 
 	it( 'HTMLTextInput propagates title changes to store', () => {
-		const setTitleAction = jest.fn();
+		const editTitle = jest.fn();
 
 		const wrapper = shallow(
 			<HTMLTextInput
-				setTitleAction={ setTitleAction }
+				editTitle={ editTitle }
 			/>
 		);
 
@@ -109,8 +109,8 @@ describe( 'HTMLTextInput', () => {
 		textInput.simulate( 'changeText', 'text' );
 
 		//Check if the setTitleAction is called
-		expect( setTitleAction ).toHaveBeenCalledTimes( 1 );
-		expect( setTitleAction ).toHaveBeenCalledWith( 'text' );
+		expect( editTitle ).toHaveBeenCalledTimes( 1 );
+		expect( editTitle ).toHaveBeenCalledWith( 'text' );
 	} );
 } );
 
