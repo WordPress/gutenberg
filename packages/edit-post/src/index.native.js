@@ -11,6 +11,8 @@ import { unregisterBlockType } from '@wordpress/blocks';
  */
 import './store';
 
+export { default as VisualEditor } from './components/visual-editor';
+
 /**
  * Initializes the Editor.
  */
