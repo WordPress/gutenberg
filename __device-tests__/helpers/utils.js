@@ -56,6 +56,7 @@ const isLocalEnvironment = () => {
 
 // Initialises the driver and desired capabilities for appium
 const setupDriver = async () => {
+	const branch = process.env.CIRCLE_BRANCH || '';
 	if ( isLocalEnvironment() ) {
 		try {
 			appiumProcess = await AppiumLocal.start( localAppiumPort );
@@ -87,14 +88,14 @@ const setupDriver = async () => {
 				// ignore error
 			}
 		} else {
-			desiredCaps.app = 'sauce-storage:Gutenberg.apk'; // App should be preloaded to sauce storage, this can also be a URL
+			desiredCaps.app = `sauce-storage:Gutenberg-${ branch }.apk`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	} else {
 		desiredCaps = _.clone( ios12 );
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = path.resolve( localIOSAppPath );
 		} else {
-			desiredCaps.app = 'sauce-storage:Gutenberg.app.zip'; // App should be preloaded to sauce storage, this can also be a URL
+			desiredCaps.app = `sauce-storage:Gutenberg-${ branch }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	}
 
