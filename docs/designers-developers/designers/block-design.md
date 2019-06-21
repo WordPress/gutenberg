@@ -110,7 +110,7 @@ The “Block” tab of the Settings Sidebar can contain additional block options
 
 ![A screenshot of the paragraph block's advanced settings in the sidebar](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/advanced-settings-do.png)
 **Do:**
-Because the Drop Cap feature is not necessary for the basic operation of the block, you can put it ub the Block tab as optional configuration.
+Because the Drop Cap feature is not necessary for the basic operation of the block, you can put it to the Block tab as optional configuration.
 
 ### Consider mobile
 

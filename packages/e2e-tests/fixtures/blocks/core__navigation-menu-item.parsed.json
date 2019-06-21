@@ -1,0 +1,23 @@
+[
+    {
+        "blockName": "core/navigation-menu-item",
+        "attrs": {
+            "label": "WordPress",
+            "destination": "https://wordpress.org/"
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>\n",
+        "innerContent": [
+            "\n<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]
