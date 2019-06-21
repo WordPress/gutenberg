@@ -14,13 +14,15 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
-import { BlockEdit, BlockInvalidWarning, BlockMobileToolbar } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import styles from './block.scss';
+import BlockEdit from '../block-edit';
+import BlockInvalidWarning from './block-invalid-warning';
+import BlockMobileToolbar from './block-mobile-toolbar';
 
 class BlockListBlock extends Component {
 	constructor() {

@@ -70,7 +70,7 @@ export class HTMLTextInput extends Component {
 					style={ styles.htmlViewTitle }
 					value={ this.props.title }
 					placeholder={ __( 'Add title' ) }
-					onChangeText={ this.props.setTitleAction }
+					onChangeText={ this.props.editTitle }
 				/>
 				<TextInput
 					autoCorrect={ false }
@@ -92,10 +92,12 @@ export class HTMLTextInput extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const {
+			getEditedPostAttribute,
 			getEditedPostContent,
 		} = select( 'core/editor' );
 
 		return {
+			title: getEditedPostAttribute( 'title' ),
 			value: getEditedPostContent(),
 		};
 	} ),
@@ -103,6 +105,9 @@ export default compose( [
 		const { resetBlocks } = dispatch( 'core/block-editor' );
 		const { editPost } = dispatch( 'core/editor' );
 		return {
+			editTitle( title ) {
+				editPost( { title } );
+			},
 			onChange( content ) {
 				editPost( { content } );
 			},
