@@ -148,6 +148,7 @@ _Parameters_
 -   _props.name_ `[string]`: The machine-friendly name for the panel.
 -   _props.className_ `[string]`: An optional class name added to the row.
 -   _props.title_ `[string]`: The title of the panel
+-   _props.icon_ `[(string|Element)]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
 
 _Returns_
 
