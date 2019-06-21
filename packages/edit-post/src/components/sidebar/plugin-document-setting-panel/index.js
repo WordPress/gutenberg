@@ -12,17 +12,18 @@ import { withDispatch, withSelect } from '@wordpress/data';
 
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
-const PluginDocumentSettingFill = ( { isEnabled, name, className, title, children, ...props } ) => {
+const PluginDocumentSettingFill = ( { isEnabled, opened, onToggle, className, title, icon, children } ) => {
 	if ( ! isEnabled ) {
 		return null;
 	}
 	return (
 		<Fill>
 			<PanelBody
-				name={ name }
 				className={ className }
 				title={ title }
-				{ ...props }
+				icon={ icon }
+				opened={ opened }
+				onToggle={ onToggle }
 			>
 				{ children }
 			</PanelBody>
@@ -37,6 +38,7 @@ const PluginDocumentSettingFill = ( { isEnabled, name, className, title, childre
  * @param {string} [props.name] The machine-friendly name for the panel.
  * @param {string} [props.className] An optional class name added to the row.
  * @param {string} [props.title] The title of the panel
+ * @param {string|Element} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
  * @example <caption>ES5</caption>
  * ```js
