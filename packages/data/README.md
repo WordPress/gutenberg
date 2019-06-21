@@ -131,8 +131,6 @@ The `resolvers` option should be passed as an object where each key is the name 
 
 #### `controls`
 
-_**Note:** Controls are an opt-in feature, enabled via `use` (the [Plugins API](/packages/data/src/plugins/README.md))._
-
 A **control** defines the execution flow behavior associated with a specific action type. This can be particularly useful in implementing asynchronous data flows for your store. By defining your action creator or resolvers as a generator which yields specific controlled action types, the execution will proceed as defined by the control handler.
 
 The `controls` option should be passed as an object where each key is the name of the action type to act upon, the value a function which receives the original action object. It should returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.

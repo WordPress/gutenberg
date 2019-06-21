@@ -3,7 +3,7 @@
  */
 import classnames from 'classnames';
 import { omit, noop } from 'lodash';
-import { useTransition, animated } from 'react-spring';
+import { useTransition, animated } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies

@@ -108,6 +108,18 @@ _Returns_
 
 -   `?string`: Name of the block for handling non-block content.
 
+<a name="getGroupingBlockName" href="#getGroupingBlockName">#</a> **getGroupingBlockName**
+
+Returns the name of the block for handling unregistered blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+
+_Returns_
+
+-   `?string`: Name of the block for handling unregistered blocks.
+
 <a name="getUnregisteredFallbackBlockName" href="#getUnregisteredFallbackBlockName">#</a> **getUnregisteredFallbackBlockName**
 
 Returns the name of the block for handling unregistered blocks.
@@ -261,6 +273,20 @@ _Returns_
 
 Returns an action object used to set the name of the block used as a fallback
 for non-block content.
+
+_Parameters_
+
+-   _name_ `string`: Block name.
+
+_Returns_
+
+-   `Object`: Action object.
+
+<a name="setGroupingBlockName" href="#setGroupingBlockName">#</a> **setGroupingBlockName**
+
+Returns an action object used to set the name of the block used
+when grouping other blocks
+eg: in "Group/Ungroup" interactions
 
 _Parameters_
 
