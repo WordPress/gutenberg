@@ -79,11 +79,10 @@ const setupDriver = async () => {
 					.execSync( 'adb shell getprop ro.build.version.release' )
 					.toString()
 					.replace( /^\s+|\s+$/g, '' );
-				if ( ! isNaN( androidVersion ) ) {
-					delete desiredCaps.platformVersion;
-					// eslint-disable-next-line no-console
-					console.log( 'Detected Android device running Android %s', androidVersion );
-				}
+				delete desiredCaps.platformVersion;
+				desiredCaps.deviceName = 'Android Emulator';
+				// eslint-disable-next-line no-console
+				console.log( 'Detected Android device running Android %s', androidVersion );
 			} catch ( error ) {
 				// ignore error
 			}
