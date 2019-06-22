@@ -13,7 +13,6 @@ describe( 'cleanForSlug()', () => {
 	} );
 
 	it( 'Should return an empty string for falsy argument', () => {
-		expect( cleanForSlug(null) ).toBe( '' );
+		expect( cleanForSlug( null ) ).toBe( '' );
 	} );
-
 } );
