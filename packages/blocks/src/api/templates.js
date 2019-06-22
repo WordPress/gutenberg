@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, map, get, mapValues, isArray, omitBy } from 'lodash';
+import { every, map, get, mapValues, isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -69,11 +69,7 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 				// either the template is given without any block attributes (this means the template doesn't care about the content).
 				! attributes ||
 				// or the attributes are same as what is given in the template.
-				isShallowEqual(
-					// ignore falsy attributes from the template.
-					omitBy( attributes, ( attr ) => ! attr ),
-					block.attributes
-				)
+				isShallowEqual( attributes, block.attributes )
 			)
 		) {
 			const innerBlocks = synchronizeBlocksWithTemplate( block.innerBlocks, innerBlocksTemplate );
