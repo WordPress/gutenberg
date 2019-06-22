@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { every, map, get, mapValues, isArray } from 'lodash';
+import { every, map, get, mapValues, isArray, omitBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -57,7 +58,24 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 	return map( template, ( [ name, attributes, innerBlocksTemplate ], index ) => {
 		const block = blocks[ index ];
 
-		if ( block && block.name === name ) {
+		// Return the same block,
+		if (
+			// if block exists,
+			block &&
+			// and the name of the block is same,
+			block.name === name &&
+			// and
+			(
+				// either the template is given without any block attributes (this means the template doesn't care about the content).
+				! attributes ||
+				// or the attributes are same as what is given in the template.
+				isShallowEqual(
+					// ignore falsy attributes from the template.
+					omitBy( attributes, ( attr ) => ! attr ),
+					block.attributes
+				)
+			)
+		) {
 			const innerBlocks = synchronizeBlocksWithTemplate( block.innerBlocks, innerBlocksTemplate );
 			return { ...block, innerBlocks };
 		}

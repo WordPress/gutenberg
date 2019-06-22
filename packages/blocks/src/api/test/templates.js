@@ -36,6 +36,16 @@ describe( 'templates', () => {
 			category: 'common',
 			title: 'test block',
 		} );
+
+		registerBlockType( 'core/test-block-with-attrs', {
+			attributes: {
+				attr1: { type: 'string' },
+				attr2: { type: 'number' },
+			},
+			save: noop,
+			category: 'common',
+			title: 'test block',
+		} );
 	} );
 
 	describe( 'doBlocksMatchTemplate', () => {
@@ -163,6 +173,50 @@ describe( 'templates', () => {
 				block1,
 				{ name: 'core/test-block-2' },
 				{ name: 'core/test-block-2' },
+			] );
+		} );
+
+		it( 'should replace blocks if block attributes are not matched', () => {
+			const template = [
+				[ 'core/test-block-with-attrs' ],
+				[
+					'core/test-block-with-attrs',
+					{
+						attr1: 'attr1',
+						attr2: 100,
+					},
+				],
+				[
+					'core/test-block-with-attrs',
+					{
+						attr1: 'attr1 - 2',
+						attr2: 200,
+					},
+				],
+				[
+					'core/test-block-with-attrs',
+					{
+						attr1: 'attr1 - 3',
+						// falsy attributes from the template, will be ignored.
+						attr2: undefined,
+					},
+				],
+			];
+
+			const block1 = createBlock( 'core/test-block-with-attrs' );
+			const block2 = createBlock( 'core/test-block-with-attrs', { attr1: 'attr1', attr2: 100 } );
+			const block3 = createBlock( 'core/test-block-with-attrs', { attr1: 'attr1 - 2.1', attr2: 201 } );
+			const block4 = createBlock( 'core/test-block-with-attrs', { attr1: 'attr1 - 3' } );
+			const blockList = [ block1, block2, block3, block4 ];
+
+			expect( synchronizeBlocksWithTemplate( blockList, template ) ).toMatchObject( [
+				block1,
+				block2,
+				{
+					name: 'core/test-block-with-attrs',
+					attributes: { attr1: 'attr1 - 2', attr2: 200 },
+				},
+				block4,
 			] );
 		} );
 
