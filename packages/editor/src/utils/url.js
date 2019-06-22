@@ -40,7 +40,7 @@ export function getWPAdminURL( page, query ) {
  */
 export function cleanForSlug( string ) {
 	if ( ! string ) {
-		return;
+		return '';
 	}
 	return toLower( deburr( trim( string.replace( /[\s\./_]+/g, '-' ), '-' ) ) );
 }
