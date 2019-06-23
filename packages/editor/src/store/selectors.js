@@ -525,6 +525,11 @@ export const isEditedPostAutosaveable = createRegistrySelector( ( select ) => fu
 		return false;
 	}
 
+	// A post is not autosavable when there is a post autosave lock.
+	if ( isPostAutosavingLocked() ) {
+		return false;
+	}
+
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
 	const hasFetchedAutosave = select( 'core' ).hasFetchedAutosaves( postType, postId );
