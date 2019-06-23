@@ -23,37 +23,35 @@ branches:
     - master
 
 before_install:
-  - nvm install
+  - nvm install --latest-npm
+
+env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 jobs:
   include:
     - name: Lint
-      before_install:
-        - nvm install --latest-npm
       install:
         - npm ci
       script:
         - npm run lint
 
     - name: Build artifacts
-      before_install:
-        - nvm install --latest-npm
       install:
-        - npm ci
+        # A "full" install is executed, since `npm ci` does not always exit
+        # with an error status code if the lock file is inaccurate.
+        #
+        # See: https://github.com/WordPress/gutenberg/issues/16157
+        - npm install
       script:
         - npm run check-local-changes
 
     - name: License compatibility
-      before_install:
-        - nvm install --latest-npm
       install:
         - npm ci
       script:
         - npm run check-licenses
 
     - name: JavaScript unit tests
-      before_install:
-        - nvm install --latest-npm
       install:
         - npm ci
       script:
@@ -87,77 +85,69 @@ jobs:
       script:
         - ./bin/run-wp-unit-tests.sh
 
-    - name: E2E tests (Admin with plugins) (1/4)
-      env: WP_VERSION=latest SCRIPT_DEBUG=false POPULAR_PLUGINS=true
+    - name: E2E tests (Admin) (1/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       install:
-        - ./bin/setup-local-env.sh
+        - ./bin/setup-travis-e2e-tests.sh
       script:
-        - npm run build
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
-    - name: E2E tests (Admin with plugins) (2/4)
-      env: WP_VERSION=latest SCRIPT_DEBUG=false POPULAR_PLUGINS=true
+    - name: E2E tests (Admin) (2/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       install:
-        - ./bin/setup-local-env.sh
+        - ./bin/setup-travis-e2e-tests.sh
       script:
-        - npm run build
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
-    - name: E2E tests (Admin with plugins) (3/4)
-      env: WP_VERSION=latest SCRIPT_DEBUG=false POPULAR_PLUGINS=true
+    - name: E2E tests (Admin) (3/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       install:
-        - ./bin/setup-local-env.sh
+        - ./bin/setup-travis-e2e-tests.sh
       script:
-        - npm run build
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
-    - name: E2E tests (Admin with plugins) (4/4)
-      env: WP_VERSION=latest SCRIPT_DEBUG=false POPULAR_PLUGINS=true
+    - name: E2E tests (Admin) (4/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       install:
-        - ./bin/setup-local-env.sh
+        - ./bin/setup-travis-e2e-tests.sh
       script:
-        - npm run build
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
-    - name: E2E tests (Author without plugins) (1/4)
-      env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author
+    - name: E2E tests (Author) (1/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       install:
-        - ./bin/setup-local-env.sh
+        - ./bin/setup-travis-e2e-tests.sh
       script:
-        - npm run build
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
-    - name: E2E tests (Author without plugins) (2/4)
-      env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author
+    - name: E2E tests (Author) (2/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       install:
-        - ./bin/setup-local-env.sh
+        - ./bin/setup-travis-e2e-tests.sh
       script:
-        - npm run build
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
-    - name: E2E tests (Author without plugins) (3/4)
-      env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author
+    - name: E2E tests (Author) (3/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       install:
-        - ./bin/setup-local-env.sh
+        - ./bin/setup-travis-e2e-tests.sh
       script:
-        - npm run build
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
-    - name: E2E tests (Author without plugins) (4/4)
-      env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author
+    - name: E2E tests (Author) (4/4)
+      env: WP_VERSION=latest SCRIPT_DEBUG=false E2E_ROLE=author PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
       install:
-        - ./bin/setup-local-env.sh
+        - ./bin/setup-travis-e2e-tests.sh
       script:
-        - npm run build
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
   allow_failures:
     - name: PHP unit tests (PHP 5.3)
@@ -170,4 +160,3 @@ jobs:
       env: WP_VERSION=latest SWITCH_TO_PHP=5.2
       script:
         - ./bin/run-wp-unit-tests.sh
-

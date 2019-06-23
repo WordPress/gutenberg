@@ -36,6 +36,7 @@ describe( 'reducer', () => {
 					status: 'error',
 					isDismissible: true,
 					actions: [],
+					type: 'default',
 				},
 			],
 		} );
@@ -53,6 +54,7 @@ describe( 'reducer', () => {
 					status: 'error',
 					isDismissible: true,
 					actions: [],
+					type: 'default',
 				},
 			],
 		} );
@@ -73,6 +75,7 @@ describe( 'reducer', () => {
 					status: 'error',
 					isDismissible: true,
 					actions: [],
+					type: 'default',
 				},
 				{
 					id: expect.any( String ),
@@ -80,6 +83,7 @@ describe( 'reducer', () => {
 					status: 'success',
 					isDismissible: true,
 					actions: [],
+					type: 'default',
 				},
 			],
 		} );
@@ -134,6 +138,7 @@ describe( 'reducer', () => {
 					status: 'error',
 					isDismissible: true,
 					actions: [],
+					type: 'default',
 				},
 			],
 		} );

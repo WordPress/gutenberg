@@ -2,7 +2,7 @@
  * External dependencies
  */
 import deepFreeze from 'deep-freeze';
-import { noop } from 'lodash';
+import { noop, times } from 'lodash';
 
 /**
  * Internal dependencies
@@ -14,6 +14,9 @@ import {
 	switchToBlockType,
 	getBlockTransforms,
 	findTransform,
+	isWildcardBlockTransform,
+	isContainerGroupBlock,
+	isBlockSelectionOfSameType,
 } from '../factory';
 import {
 	getBlockType,
@@ -776,6 +779,81 @@ describe( 'block factory', () => {
 
 			expect( isMatch ).toHaveBeenCalledWith( [ { value: 'ribs' }, { value: 'halloumi' } ] );
 		} );
+
+		describe( 'wildcard block transforms', () => {
+			beforeEach( () => {
+				registerBlockType( 'core/group', {
+					attributes: {
+						value: {
+							type: 'string',
+						},
+					},
+					transforms: {
+						from: [ {
+							type: 'block',
+							blocks: [ '*' ],
+							transform: noop,
+						} ],
+					},
+					save: noop,
+					category: 'common',
+					title: 'A block that groups other blocks.',
+				} );
+			} );
+
+			it( 'should should show wildcard "from" transformation as available for multiple blocks of the same type', () => {
+				registerBlockType( 'core/text-block', defaultBlockSettings );
+				registerBlockType( 'core/image-block', defaultBlockSettings );
+
+				const textBlocks = times( 4, ( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				} );
+
+				const availableBlocks = getPossibleBlockTransformations( textBlocks );
+
+				expect( availableBlocks ).toHaveLength( 1 );
+				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
+			} );
+
+			it( 'should should show wildcard "from" transformation as available for multiple blocks of different types', () => {
+				registerBlockType( 'core/text-block', defaultBlockSettings );
+				registerBlockType( 'core/image-block', defaultBlockSettings );
+
+				const textBlocks = times( 2, ( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				} );
+
+				const imageBlocks = times( 2, ( index ) => {
+					return createBlock( 'core/image-block', {
+						value: `imageBlock${ index + 1 }`,
+					} );
+				} );
+
+				const availableBlocks = getPossibleBlockTransformations( [ ...textBlocks, ...imageBlocks ] );
+
+				expect( availableBlocks ).toHaveLength( 1 );
+				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
+			} );
+
+			it( 'should should show wildcard "from" transformation as available for single blocks', () => {
+				registerBlockType( 'core/text-block', defaultBlockSettings );
+
+				const blocks = times( 1, ( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				} );
+
+				const availableBlocks = getPossibleBlockTransformations( blocks );
+
+				expect( availableBlocks ).toHaveLength( 1 );
+				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
+			} );
+		} );
 	} );
 
 	describe( 'switchToBlockType()', () => {
@@ -1222,6 +1300,94 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ].innerBlocks ).toHaveLength( 1 );
 			expect( transformedBlocks[ 1 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after1' );
 		} );
+
+		it( 'should pass entire block object(s) to the "__experimentalConvert" method if defined', () => {
+			registerBlockType( 'core/test-group-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ '*' ],
+						isMultiBlock: true,
+						__experimentalConvert( blocks ) {
+							const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
+								return createBlock( name, attributes, innerBlocks );
+							} );
+
+							return createBlock( 'core/test-group-block', {}, groupInnerBlocks );
+						},
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'Test Group Block',
+			} );
+
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const numOfBlocksToGroup = 4;
+			const blocks = times( numOfBlocksToGroup, ( index ) => {
+				return createBlock( 'core/text-block', {
+					value: `textBlock${ index + 1 }`,
+				} );
+			} );
+
+			const transformedBlocks = switchToBlockType( blocks, 'core/test-group-block' );
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ].name ).toBe( 'core/test-group-block' );
+			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( numOfBlocksToGroup );
+		} );
+
+		it( 'should prefer "__experimentalConvert" method over "transform" method when running a transformation', () => {
+			const convertSpy = jest.fn( ( blocks ) => {
+				const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
+					return createBlock( name, attributes, innerBlocks );
+				} );
+
+				return createBlock( 'core/test-group-block', {}, groupInnerBlocks );
+			} );
+			const transformSpy = jest.fn();
+
+			registerBlockType( 'core/test-group-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ '*' ],
+						isMultiBlock: true,
+						__experimentalConvert: convertSpy,
+						transform: transformSpy,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'Test Group Block',
+			} );
+
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const numOfBlocksToGroup = 4;
+			const blocks = times( numOfBlocksToGroup, ( index ) => {
+				return createBlock( 'core/text-block', {
+					value: `textBlock${ index + 1 }`,
+				} );
+			} );
+
+			const transformedBlocks = switchToBlockType( blocks, 'core/test-group-block' );
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( convertSpy.mock.calls ).toHaveLength( 1 );
+			expect( transformSpy.mock.calls ).toHaveLength( 0 );
+		} );
 	} );
 
 	describe( 'getBlockTransforms', () => {
@@ -1334,6 +1500,109 @@ describe( 'block factory', () => {
 			const transform = findTransform( transforms, () => false );
 
 			expect( transform ).toBe( null );
+		} );
+	} );
+
+	describe( 'isWildcardBlockTransform', () => {
+		it( 'should return true for transforms with type of block and "*" alias as blocks', () => {
+			const validWildcardBlockTransform = {
+				type: 'block',
+				blocks: [
+					'core/some-other-block-first', // unlikely to happen but...
+					'*',
+				],
+				blockName: 'core/test-block',
+			};
+
+			expect( isWildcardBlockTransform( validWildcardBlockTransform ) ).toBe( true );
+		} );
+
+		it( 'should return false for transforms with a type which is not "block"', () => {
+			const invalidWildcardBlockTransform = {
+				type: 'file',
+				blocks: [
+					'*',
+				],
+				blockName: 'core/test-block',
+			};
+
+			expect( isWildcardBlockTransform( invalidWildcardBlockTransform ) ).toBe( false );
+		} );
+
+		it( 'should return false for transforms which do not include "*" alias in "block" array', () => {
+			const invalidWildcardBlockTransform = {
+				type: 'block',
+				blocks: [
+					'core/some-block',
+					'core/another-block',
+				],
+				blockName: 'core/test-block',
+			};
+
+			expect( isWildcardBlockTransform( invalidWildcardBlockTransform ) ).toBe( false );
+		} );
+
+		it( 'should return false for transforms which do not provide an array as the "blocks" option', () => {
+			const invalidWildcardBlockTransform = {
+				type: 'block',
+				blocks: noop,
+				blockName: 'core/test-block',
+			};
+
+			expect( isWildcardBlockTransform( invalidWildcardBlockTransform ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isContainerGroupBlock', () => {
+		it( 'should return true when passed block name matches "core/group"', () => {
+			expect( isContainerGroupBlock( 'core/group' ) ).toBe( true );
+		} );
+
+		it( 'should return false when passed block name does not match "core/group"', () => {
+			expect( isContainerGroupBlock( 'core/some-test-name' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isBlockSelectionOfSameType', () => {
+		it( 'should return false when all blocks do not match the name of the first block', () => {
+			const blocks = [
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/another-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+			];
+
+			expect( isBlockSelectionOfSameType( blocks ) ).toBe( false );
+		} );
+
+		it( 'should return true when all blocks match the name of the first block', () => {
+			const blocks = [
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+				{
+					name: 'core/test-block',
+				},
+			];
+
+			expect( isBlockSelectionOfSameType( blocks ) ).toBe( true );
 		} );
 	} );
 } );

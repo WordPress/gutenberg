@@ -27,15 +27,6 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should apply formatting with access shortcut', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'test' );
-		await pressKeyWithModifier( 'primary', 'a' );
-		await pressKeyWithModifier( 'access', 'd' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'should apply formatting with primary shortcut', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );

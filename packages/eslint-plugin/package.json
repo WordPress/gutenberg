@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "2.1.0",
+	"version": "2.3.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -17,6 +17,12 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"files": [
+		"configs",
+		"rules",
+		"index.js"
+	],
+	"main": "index.js",
 	"dependencies": {
 		"babel-eslint": "^10.0.1",
 		"eslint-plugin-jsx-a11y": "^6.2.1",

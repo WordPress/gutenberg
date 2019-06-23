@@ -2,39 +2,34 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { navigateRegions } from '@wordpress/components';
+import { navigateRegions, Popover, SlotFillProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import Header from '../header';
 import Sidebar from '../sidebar';
-import WidgetArea from '../widget-area';
+import WidgetAreas from '../widget-areas';
+import Notices from '../notices';
 
-function Layout() {
-	const areas = [
-		__( 'Sidebar' ),
-		__( 'Footer' ),
-		__( 'Header' ),
-	];
-
+function Layout( { blockEditorSettings } ) {
 	return (
-		<>
+		<SlotFillProvider>
 			<Header />
 			<Sidebar />
+			<Notices />
 			<div
 				className="edit-widgets-layout__content"
 				role="region"
 				aria-label={ __( 'Widgets screen content' ) }
 				tabIndex="-1"
 			>
-				{ areas.map( ( area, index ) => (
-					<div key={ index } className="edit-widgets-layout__area">
-						<WidgetArea title={ area } initialOpen={ index === 0 } />
-					</div>
-				) ) }
+				<WidgetAreas
+					blockEditorSettings={ blockEditorSettings }
+				/>
 			</div>
-		</>
+			<Popover.Slot />
+		</SlotFillProvider>
 	);
 }
 

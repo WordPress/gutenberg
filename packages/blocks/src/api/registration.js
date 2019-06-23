@@ -150,7 +150,7 @@ export function registerBlockType( name, settings ) {
 	if ( ! isValidIcon( settings.icon.src ) ) {
 		console.error(
 			'The icon passed is invalid. ' +
-			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/block-registration/#icon-optional'
+			'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'
 		);
 		return;
 	}
@@ -193,10 +193,19 @@ export function setFreeformContentHandlerName( blockName ) {
  * Retrieves name of block handling non-block content, or undefined if no
  * handler has been defined.
  *
- * @return {?string} Blog name.
+ * @return {?string} Block name.
  */
 export function getFreeformContentHandlerName() {
 	return select( 'core/blocks' ).getFreeformFallbackBlockName();
+}
+
+/**
+ * Retrieves name of block used for handling grouping interactions.
+ *
+ * @return {?string} Block name.
+ */
+export function getGroupingBlockName() {
+	return select( 'core/blocks' ).getGroupingBlockName();
 }
 
 /**
@@ -212,7 +221,7 @@ export function setUnregisteredTypeHandlerName( blockName ) {
  * Retrieves name of block handling unregistered block types, or undefined if no
  * handler has been defined.
  *
- * @return {?string} Blog name.
+ * @return {?string} Block name.
  */
 export function getUnregisteredTypeHandlerName() {
 	return select( 'core/blocks' ).getUnregisteredFallbackBlockName();
@@ -225,6 +234,15 @@ export function getUnregisteredTypeHandlerName() {
  */
 export function setDefaultBlockName( name ) {
 	dispatch( 'core/blocks' ).setDefaultBlockName( name );
+}
+
+/**
+ * Assigns name of block for handling block grouping interactions.
+ *
+ * @param {string} name Block name.
+ */
+export function setGroupingBlockName( name ) {
+	dispatch( 'core/blocks' ).setGroupingBlockName( name );
 }
 
 /**

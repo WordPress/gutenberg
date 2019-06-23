@@ -2,10 +2,9 @@
  * External dependencies
  */
 const { DefinePlugin } = require( 'webpack' );
-const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const postcss = require( 'postcss' );
-const { get, escapeRegExp } = require( 'lodash' );
+const { get, escapeRegExp, compact } = require( 'lodash' );
 const { basename, sep } = require( 'path' );
 
 /**
@@ -13,13 +12,18 @@ const { basename, sep } = require( 'path' );
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
-const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const { camelCaseDash } = require( '@wordpress/scripts/utils' );
 
 /**
  * Internal dependencies
  */
 const { dependencies } = require( './package' );
+
+const {
+	NODE_ENV: mode = 'development',
+	WP_DEVTOOL: devtool = ( mode === 'production' ? false : 'source-map' ),
+} = process.env;
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
 
@@ -28,7 +32,7 @@ const gutenbergPackages = Object.keys( dependencies )
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
 module.exports = {
-	...defaultConfig,
+	mode,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
 		const name = camelCaseDash( packageName );
 		memo[ name ] = `./packages/${ packageName }`;
@@ -40,17 +44,21 @@ module.exports = {
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
 	},
+	module: {
+		rules: compact( [
+			mode !== 'production' && {
+				test: /\.js$/,
+				use: require.resolve( 'source-map-loader' ),
+				enforce: 'pre',
+			},
+		] ),
+	},
 	plugins: [
-		...defaultConfig.plugins,
 		new DefinePlugin( {
 			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
 			// eslint-disable-next-line @wordpress/gutenberg-phase
 			'process.env.GUTENBERG_PHASE': JSON.stringify( parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1 ),
-		} ),
-		// Create RTL files with a -rtl suffix
-		new WebpackRTLPlugin( {
-			suffix: '-rtl',
-			minify: defaultConfig.mode === 'production' ? { safe: true } : false,
+			'process.env.FORCE_REDUCED_MOTION': JSON.stringify( process.env.FORCE_REDUCED_MOTION ),
 		} ),
 		new CustomTemplatedPathPlugin( {
 			basename( path, data ) {
@@ -80,6 +88,7 @@ module.exports = {
 			'dom-ready',
 			'redux-routine',
 			'token-list',
+			'server-side-render',
 			'shortcode',
 		].map( camelCaseDash ) ),
 		new CopyWebpackPlugin(
@@ -88,7 +97,7 @@ module.exports = {
 				to: `./build/${ packageName }/`,
 				flatten: true,
 				transform: ( content ) => {
-					if ( defaultConfig.mode === 'production' ) {
+					if ( mode === 'production' ) {
 						return postcss( [
 							require( 'cssnano' )( {
 								preset: [ 'default', {
@@ -140,5 +149,7 @@ module.exports = {
 				},
 			},
 		] ),
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	],
+	devtool,
 };

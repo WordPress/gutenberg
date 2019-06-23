@@ -1008,6 +1008,7 @@ _Parameters_
 
 -   _clientIds_ `(string|Array<string>)`: Block client ID(s) to replace.
 -   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
+-   _indexToSelect_ `number`: Index of replacement block to select.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
 

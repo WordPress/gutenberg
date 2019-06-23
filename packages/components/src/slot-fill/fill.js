@@ -6,7 +6,7 @@ import { isFunction } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createPortal } from '@wordpress/element';
+import { createPortal, useLayoutEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,64 +15,56 @@ import { Consumer } from './context';
 
 let occurrences = 0;
 
-class FillComponent extends Component {
-	constructor() {
-		super( ...arguments );
-		this.occurrence = ++occurrences;
+function FillComponent( { name, getSlot, children, registerFill, unregisterFill } ) {
+	// Random state used to rerender the component if needed, ideally we don't need this
+	const [ , updateRerenderState ] = useState( {} );
+	const rerender = () => updateRerenderState( {} );
+
+	const ref = useRef( {
+		name,
+		children,
+	} );
+
+	if ( ! ref.current.occurrence ) {
+		ref.current.occurrence = ++occurrences;
 	}
 
-	componentDidMount() {
-		const { registerFill } = this.props;
+	useLayoutEffect( () => {
+		ref.current.forceUpdate = rerender;
+		registerFill( name, ref.current );
+		return () => unregisterFill( name, ref.current );
+	}, [] );
 
-		registerFill( this.props.name, this );
-	}
-
-	componentWillUpdate() {
-		if ( ! this.occurrence ) {
-			this.occurrence = ++occurrences;
-		}
-		const { getSlot } = this.props;
-		const slot = getSlot( this.props.name );
+	useLayoutEffect( () => {
+		ref.current.children = children;
+		const slot = getSlot( name );
 		if ( slot && ! slot.props.bubblesVirtually ) {
 			slot.forceUpdate();
 		}
-	}
+	}, [ children ] );
 
-	componentWillUnmount() {
-		const { unregisterFill } = this.props;
-
-		unregisterFill( this.props.name, this );
-	}
-
-	componentDidUpdate( prevProps ) {
-		const { name, unregisterFill, registerFill } = this.props;
-
-		if ( prevProps.name !== name ) {
-			unregisterFill( prevProps.name, this );
-			registerFill( name, this );
+	useLayoutEffect( () => {
+		if ( name === ref.current.name ) {
+			// ignore initial effect
+			return;
 		}
+		unregisterFill( ref.current.name, ref.current );
+		ref.current.name = name;
+		registerFill( name, ref.current );
+	}, [ name ] );
+
+	const slot = getSlot( name );
+
+	if ( ! slot || ! slot.node || ! slot.props.bubblesVirtually ) {
+		return null;
 	}
 
-	resetOccurrence() {
-		this.occurrence = null;
+	// If a function is passed as a child, provide it with the fillProps.
+	if ( isFunction( children ) ) {
+		children = children( slot.props.fillProps );
 	}
 
-	render() {
-		const { name, getSlot } = this.props;
-		let { children } = this.props;
-		const slot = getSlot( name );
-
-		if ( ! slot || ! slot.node || ! slot.props.bubblesVirtually ) {
-			return null;
-		}
-
-		// If a function is passed as a child, provide it with the fillProps.
-		if ( isFunction( children ) ) {
-			children = children( slot.props.fillProps );
-		}
-
-		return createPortal( children, slot.node );
-	}
+	return createPortal( children, slot.node );
 }
 
 const Fill = ( props ) => (
