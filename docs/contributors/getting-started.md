@@ -13,6 +13,8 @@ nvm install
 nvm use
 ```
 
+**If you want to skip the setup and installation for NVM**, you can pass `--skip-nvm-setup` flag to the script, `./bin/setup-local-env.sh --skip-nvm-setup`. This can be needed, if you already have Node installed manually or via any other version manager like [nodenv](https://github.com/nodenv/nodenv/) or [asdf](https://github.com/asdf-vm/asdf-nodejs).
+
 You also should have the latest release of [npm installed][npm]. npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need also to update your npm installation. To update npm, type this into your terminal: `npm install npm@latest -g`
 
 To test the plugin, or to contribute to it, you can clone this repository and build the plugin files using Node. How you do that depends on whether you're developing locally or uploading the plugin to a remote host.
