@@ -412,6 +412,27 @@ export function postSavingLock( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Post autosaving lock.
+ *
+ * When post autosaving is locked, the post will not autosave.
+ *
+ * @param {PostAutosavingLockState} state  Current state.
+ * @param {Object}                  action Dispatched action.
+ *
+ * @return {PostLockState} Updated state.
+ */
+export function postAutosavingLock( state = {}, action ) {
+	switch ( action.type ) {
+		case 'LOCK_POST_AUTOSAVING':
+			return { ...state, [ action.lockName ]: true };
+
+		case 'UNLOCK_POST_AUTOSAVING':
+			return omit( state, action.lockName );
+	}
+	return state;
+}
+
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {

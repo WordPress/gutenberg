@@ -66,6 +66,7 @@ const {
 	getPermalink,
 	getPermalinkParts,
 	isPostSavingLocked,
+	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
 } = selectors;
 
@@ -1094,6 +1095,28 @@ describe( 'selectors', () => {
 			};
 
 			expect( isPostSavingLocked( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isPostAutosavingLocked', () => {
+		it( 'should return true if the post has postAutosavingLocks', () => {
+			const state = {
+				postAutosavingLock: { example: true },
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostAutosavingLocked( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if the post has no postAutosavingLocks', () => {
+			const state = {
+				postAutosavingLock: {},
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostAutosavingLocked( state ) ).toBe( false );
 		} );
 	} );
 

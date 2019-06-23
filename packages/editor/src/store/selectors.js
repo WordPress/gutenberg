@@ -1065,6 +1065,17 @@ export function isPostSavingLocked( state ) {
 }
 
 /**
+ * Returns whether post autosaving is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostAutosavingLocked( state ) {
+	return Object.keys( state.postAutosavingLock ).length > 0;
+}
+
+/**
  * Returns whether the edition of the post has been taken over.
  *
  * @param {Object} state Global application state.
