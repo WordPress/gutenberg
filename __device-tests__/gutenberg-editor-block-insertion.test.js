@@ -61,10 +61,12 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 		await editorPage.verifyHtmlContent( testData.blockInsertionHtml );
 
-		for ( let i = 0; i < 4; i++ ) {
-			paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
+		await editorPage.removeParagraphBlockAtPosition( 3 );
+
+		for ( let i = 3; i > 0; i-- ) {
+			paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( i );
 			await clickMiddleOfElement( driver, paragraphBlockElement );
-			await editorPage.removeParagraphBlockAtPosition( 1 );
+			await editorPage.removeParagraphBlockAtPosition( i );
 		}
 	} );
 
