@@ -21,8 +21,8 @@ import {
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { createBlock, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
-import { useState } from '@wordpress/element';
+import { createBlock } from '@wordpress/blocks';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -110,7 +110,6 @@ export function ColumnsEdit( {
 	className,
 	updateAlignment,
 	updateColumns,
-	updateTemplate,
 	clientId,
 } ) {
 	const { verticalAlignment } = attributes;
@@ -121,6 +120,16 @@ export function ColumnsEdit( {
 		};
 	} );
 	const [ template, setTemplate ] = useState( getColumnsTemplate( count ) );
+	const [ forceUseTemplate, setForceUseTemplate ] = useState( false );
+
+	// This is used to force the usage of the template even if the count doesn't match the template
+	// The count doesn't match the template once you use undo/redo (this is used to reset to the placeholder state).
+	useEffect( () => {
+		// Once the template is applied, reset it.
+		if ( forceUseTemplate ) {
+			setForceUseTemplate( false );
+		}
+	}, [ forceUseTemplate ] );
 
 	const classes = classnames( className, {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
@@ -158,12 +167,12 @@ export function ColumnsEdit( {
 						}
 
 						setTemplate( nextTemplate );
-						updateTemplate( nextTemplate );
+						setForceUseTemplate( true );
 					} }
 					__experimentalAllowTemplateOptionSkip
 					// setting the template to null when the inner blocks
 					// are empty allows to reset to the placeholder state.
-					template={ count === 0 ? null : template }
+					template={ count === 0 && ! forceUseTemplate ? null : template }
 					templateLock="all"
 					allowedBlocks={ ALLOWED_BLOCKS } />
 			</div>
@@ -251,14 +260,5 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 		}
 
 		replaceInnerBlocks( clientId, innerBlocks, false );
-	},
-
-	updateTemplate( template ) {
-		const { clientId } = ownProps;
-		const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
-		const { getBlocks } = registry.select( 'core/block-editor' );
-		const innerBlocks = getBlocks( clientId );
-		const nextBlocks = synchronizeBlocksWithTemplate( innerBlocks, template );
-		replaceInnerBlocks( clientId, nextBlocks, false );
 	},
 } ) )( ColumnsEdit );

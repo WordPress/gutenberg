@@ -108,12 +108,6 @@ export default [
 				default: 2,
 			},
 		},
-		isEligible( attributes, innerBlocks ) {
-			return (
-				! attributes.hasOwnProperty( 'columns' ) &&
-				innerBlocks.length
-			);
-		},
 		migrate( attributes, innerBlocks ) {
 			attributes = {
 				...attributes,
