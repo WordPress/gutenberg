@@ -60,7 +60,7 @@ jobs:
           path: ./reports/test-results
   android-device-checks:
     docker:
-    - image: circleci/android:api-29-node8-alpha
+    - image: circleci/android:api-29-node
     steps:
       - checkout
       - run:
