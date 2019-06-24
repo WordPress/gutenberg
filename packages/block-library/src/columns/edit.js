@@ -21,7 +21,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 
 /**
@@ -110,18 +110,19 @@ export function ColumnsEdit( {
 	className,
 	updateAlignment,
 	updateColumns,
+	updateTemplate,
 	clientId,
 } ) {
-	const { columns, verticalAlignment } = attributes;
+	const { verticalAlignment } = attributes;
 
 	const { count } = useSelect( ( select ) => {
 		return {
 			count: select( 'core/block-editor' ).getBlockCount( clientId ),
 		};
 	} );
-	const [ template, setTemplate ] = useState( getColumnsTemplate( columns ) );
+	const [ template, setTemplate ] = useState( getColumnsTemplate( count ) );
 
-	const classes = classnames( className, `has-${ columns }-columns`, {
+	const classes = classnames( className, {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
@@ -133,8 +134,8 @@ export function ColumnsEdit( {
 						<PanelBody>
 							<RangeControl
 								label={ __( 'Columns' ) }
-								value={ columns }
-								onChange={ updateColumns }
+								value={ count }
+								onChange={ ( value ) => updateColumns( count, value ) }
 								min={ 2 }
 								max={ 6 }
 							/>
@@ -157,7 +158,7 @@ export function ColumnsEdit( {
 						}
 
 						setTemplate( nextTemplate );
-						updateColumns( nextTemplate.length );
+						updateTemplate( nextTemplate );
 					} }
 					__experimentalAllowTemplateOptionSkip
 					// setting the template to null when the inner blocks
@@ -199,10 +200,11 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 	 * Updates the column count, including necessary revisions to child Column
 	 * blocks to grant required or redistribute available space.
 	 *
-	 * @param {number} columns New column count.
+	 * @param {number} previousColumns Previous column count.
+	 * @param {number} newColumns      New column count.
 	 */
-	updateColumns( columns ) {
-		const { clientId, setAttributes, attributes } = ownProps;
+	updateColumns( previousColumns, newColumns ) {
+		const { clientId } = ownProps;
 		const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
 		const { getBlocks } = registry.select( 'core/block-editor' );
 
@@ -210,13 +212,12 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 		const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
 
 		// Redistribute available width for existing inner blocks.
-		const { columns: previousColumns = 0 } = attributes;
-		const isAddingColumn = columns > previousColumns;
+		const isAddingColumn = newColumns > previousColumns;
 
 		if ( isAddingColumn && hasExplicitWidths ) {
 			// If adding a new column, assign width to the new column equal to
 			// as if it were `1 / columns` of the total available space.
-			const newColumnWidth = toWidthPrecision( 100 / columns );
+			const newColumnWidth = toWidthPrecision( 100 / newColumns );
 
 			// Redistribute in consideration of pending block insertion as
 			// constraining the available working width.
@@ -224,7 +225,7 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 
 			innerBlocks = [
 				...getMappedColumnWidths( innerBlocks, widths ),
-				...times( columns - previousColumns, () => {
+				...times( newColumns - previousColumns, () => {
 					return createBlock( 'core/column', {
 						width: newColumnWidth,
 					} );
@@ -233,13 +234,13 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 		} else if ( isAddingColumn ) {
 			innerBlocks = [
 				...innerBlocks,
-				...times( columns - previousColumns, () => {
+				...times( newColumns - previousColumns, () => {
 					return createBlock( 'core/column', );
 				} ),
 			];
 		} else {
 			// The removed column will be the last of the inner blocks.
-			innerBlocks = dropRight( innerBlocks, previousColumns - columns );
+			innerBlocks = dropRight( innerBlocks, previousColumns - newColumns );
 
 			if ( hasExplicitWidths ) {
 				// Redistribute as if block is already removed.
@@ -250,8 +251,14 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 		}
 
 		replaceInnerBlocks( clientId, innerBlocks, false );
+	},
 
-		// Update columns count.
-		setAttributes( { columns } );
+	updateTemplate( template ) {
+		const { clientId } = ownProps;
+		const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+		const { getBlocks } = registry.select( 'core/block-editor' );
+		const innerBlocks = getBlocks( clientId );
+		const nextBlocks = synchronizeBlocksWithTemplate( innerBlocks, template );
+		replaceInnerBlocks( clientId, nextBlocks, false );
 	},
 } ) )( ColumnsEdit );

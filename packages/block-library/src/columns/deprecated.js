@@ -1,15 +1,15 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
 import {
 	InnerBlocks,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import save from './save';
 
 /**
  * Given an HTML string for a deprecated columns inner block, returns the
@@ -122,6 +122,18 @@ export default [
 
 			return [ attributes, innerBlocks ];
 		},
-		save,
+		save( { attributes } ) {
+			const { verticalAlignment, columns } = attributes;
+
+			const wrapperClasses = classnames( `has-${ columns }-columns`, {
+				[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+			} );
+
+			return (
+				<div className={ wrapperClasses }>
+					<InnerBlocks.Content />
+				</div>
+			);
+		},
 	},
 ];
