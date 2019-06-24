@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -107,6 +108,11 @@ export default [
 				type: 'number',
 				default: 2,
 			},
+		},
+		migrate( attributes, innerBlocks ) {
+			attributes = omit( attributes, [ 'columns' ] );
+
+			return [ attributes, innerBlocks ];
 		},
 		save( { attributes } ) {
 			const { verticalAlignment, columns } = attributes;
