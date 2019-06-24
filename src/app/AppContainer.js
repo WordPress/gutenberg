@@ -5,12 +5,14 @@
  * External dependencies
  */
 import React from 'react';
-import type { EmitterSubscription } from 'react-native';
+import { type EmitterSubscription, type InputText } from 'react-native';
 import RNReactNativeGutenbergBridge, {
 	subscribeParentGetHtml,
 	subscribeParentToggleHTMLMode,
-	subscribeSetTitle,
 	subscribeUpdateHtml,
+	subscribeSetFocusOnTitle,
+	subscribeSetTitle,
+	sendNativeEditorDidLayout,
 } from 'react-native-gutenberg-bridge';
 import { isEmpty } from 'lodash';
 
@@ -20,32 +22,35 @@ import { isEmpty } from 'lodash';
 import { parse, serialize, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { BlockEditorProvider } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import type { BlockType } from '../store/types';
-import BlockManager from '../block-management/block-manager';
+import MainScreen from './MainScreen';
+
+type PostType = {
+	id: number;
+	title: { raw: string };
+	content: { raw: string };
+	type: string;
+};
 
 type PropsType = {
 	initialHtmlModeEnabled: boolean,
-	editorMode: string,
-	editedPostContent: string,
-	title: string,
 	initialTitle: string,
 	initialHtml: string,
-	editTitle: string => mixed,
-	resetEditorBlocks: Array<BlockType> => mixed,
 	resetEditorBlocksWithoutUndoLevel: Array<BlockType> => mixed,
 	setupEditor: ( mixed, ?mixed ) => mixed,
 	toggleEditorMode: ?string => mixed,
-	blocks: Array<BlockType>,
 	isReady: boolean,
 	mode: string,
-	post: ?mixed,
+	post: ?PostType,
+	getEditorBlocks: () => Array<BlockType>,
+	getEditedPostAttribute: ( string ) => string,
 	getEditedPostContent: () => string,
 	switchMode: string => mixed,
+	editTitle: string => void,
 };
 
 /*
@@ -54,17 +59,20 @@ type PropsType = {
  * - `gutenberg/packages/edit-post/src/components/layout/index.js`
  */
 class AppContainer extends React.Component<PropsType> {
-	lastHtml: ?string;
-	lastTitle: ?string;
+	post: PostType;
+	postTitleRef: ?InputText;
 	subscriptionParentGetHtml: ?EmitterSubscription;
 	subscriptionParentToggleHTMLMode: ?EmitterSubscription;
 	subscriptionParentSetTitle: ?EmitterSubscription;
 	subscriptionParentUpdateHtml: ?EmitterSubscription;
+	subscriptionParentSetFocusOnTitle: ?EmitterSubscription;
 
 	constructor( props: PropsType ) {
 		super( props );
 
-		const post = props.post || {
+		( this: any ).setTitleRef = this.setTitleRef.bind( this );
+
+		this.post = props.post || {
 			id: 1,
 			title: {
 				raw: props.initialTitle,
@@ -75,9 +83,12 @@ class AppContainer extends React.Component<PropsType> {
 			type: 'draft',
 		};
 
-		props.setupEditor( post );
-		this.lastHtml = serialize( parse( props.initialHtml || '' ) );
-		this.lastTitle = props.initialTitle;
+		props.setupEditor( this.post );
+
+		// make sure the post content is in sync with gutenberg store
+		// to avoid marking the post as modified when simply loaded
+		// For now, let's assume: serialize( parse( html ) ) !== html
+		this.post.content.raw = serialize( this.props.getEditorBlocks() );
 
 		if ( props.initialHtmlModeEnabled && props.mode === 'visual' ) {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
@@ -101,20 +112,33 @@ class AppContainer extends React.Component<PropsType> {
 		this.subscriptionParentUpdateHtml = subscribeUpdateHtml( ( payload ) => {
 			this.updateHtmlAction( payload.html );
 		} );
+
+		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle( () => {
+			if ( this.postTitleRef ) {
+				this.postTitleRef.focus();
+			}
+		} );
 	}
 
 	componentWillUnmount() {
 		if ( this.subscriptionParentGetHtml ) {
 			this.subscriptionParentGetHtml.remove();
 		}
+
 		if ( this.subscriptionParentToggleHTMLMode ) {
 			this.subscriptionParentToggleHTMLMode.remove();
 		}
+
 		if ( this.subscriptionParentSetTitle ) {
 			this.subscriptionParentSetTitle.remove();
 		}
+
 		if ( this.subscriptionParentUpdateHtml ) {
 			this.subscriptionParentUpdateHtml.remove();
+		}
+
+		if ( this.subscriptionParentSetFocusOnTitle ) {
+			this.subscriptionParentSetFocusOnTitle.remove();
 		}
 	}
 
@@ -123,15 +147,17 @@ class AppContainer extends React.Component<PropsType> {
 			this.updateHtmlAction( this.props.getEditedPostContent() );
 		}
 
-		const html = serialize( this.props.blocks );
-		const title = this.props.title;
+		const html = serialize( this.props.getEditorBlocks() );
+		const title = this.props.getEditedPostAttribute( 'title' );
 
-		const hasChanges = title !== this.lastTitle || html !== this.lastHtml;
+		const hasChanges = title !== this.post.title.raw || html !== this.post.content.raw;
 
 		RNReactNativeGutenbergBridge.provideToNative_Html( html, title, hasChanges );
 
-		this.lastTitle = title;
-		this.lastHtml = html;
+		if ( hasChanges ) {
+			this.post.title.raw = title;
+			this.post.content.raw = html;
+		}
 	}
 
 	updateHtmlAction( html: string = '' ) {
@@ -141,12 +167,14 @@ class AppContainer extends React.Component<PropsType> {
 
 	toggleMode() {
 		const { mode, switchMode } = this.props;
+		// refresh html content first
+		this.serializeToNativeAction();
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( ! prevProps.isReady && ( prevProps.isReady !== this.props.isReady ) ) {
-			const { blocks } = this.props;
+		if ( ! prevProps.isReady && this.props.isReady ) {
+			const blocks = this.props.getEditorBlocks();
 			const isUnsupportedBlock = ( { name } ) => name === getUnregisteredTypeHandlerName();
 			const unsupportedBlocks = blocks.filter( isUnsupportedBlock );
 			const hasUnsupportedBlocks = ! isEmpty( unsupportedBlocks );
@@ -155,34 +183,16 @@ class AppContainer extends React.Component<PropsType> {
 		}
 	}
 
+	setTitleRef( titleRef: ?InputText ) {
+		this.postTitleRef = titleRef;
+	}
+
 	render() {
-		const {
-			blocks,
-			editTitle,
-			isReady,
-			mode,
-			resetEditorBlocks,
-			resetEditorBlocksWithoutUndoLevel,
-			title,
-		} = this.props;
-
-		if ( ! isReady ) {
-			return null;
-		}
-
 		return (
-			<BlockEditorProvider
-				value={ blocks }
-				onInput={ resetEditorBlocksWithoutUndoLevel }
-				onChange={ resetEditorBlocks }
-				settings={ null }
-			>
-				<BlockManager
-					title={ title }
-					setTitleAction={ editTitle }
-					showHtml={ mode === 'text' }
-				/>
-			</BlockEditorProvider>
+			<MainScreen
+				setTitleRef={ this.setTitleRef }
+				onNativeEditorDidLayout={ sendNativeEditorDidLayout }
+			/>
 		);
 	}
 }
@@ -200,10 +210,10 @@ export default compose( [
 		} = select( 'core/edit-post' );
 
 		return {
-			isReady: isEditorReady(),
-			blocks: getEditorBlocks(),
 			mode: getEditorMode(),
-			title: getEditedPostAttribute( 'title' ),
+			isReady: isEditorReady(),
+			getEditorBlocks,
+			getEditedPostAttribute,
 			getEditedPostContent,
 		};
 	} ),
@@ -221,7 +231,6 @@ export default compose( [
 			editTitle( title ) {
 				editPost( { title } );
 			},
-			resetEditorBlocks,
 			resetEditorBlocksWithoutUndoLevel( blocks ) {
 				resetEditorBlocks( blocks, {
 					__unstableShouldCreateUndoLevel: false,
