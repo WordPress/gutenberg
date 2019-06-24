@@ -133,7 +133,7 @@ function BlockStyles( {
 								innerBlocks={ block.innerBlocks }
 								srcWidth={ 400 }
 								srcHeight={ 300 }
-								destWidth={ 124 }
+
 							/>
 						</div>
 						<div className="editor-block-styles__item-label block-editor-block-styles__item-label">

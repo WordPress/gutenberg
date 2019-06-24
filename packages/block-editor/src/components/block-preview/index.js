@@ -1,10 +1,15 @@
 /**
  * WordPress dependencies
  */
+/**
+ * External dependencies
+ */
+import React from 'react';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { useLayoutEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,32 +28,49 @@ function BlockPreview( props ) {
 	return (
 		<div className="editor-block-preview block-editor-block-preview">
 			<div className="editor-block-preview__title block-editor-block-preview__title">{ __( 'Preview' ) }</div>
-			<BlockPreviewContent { ...props } srcWidth={ 280 } srcHeight={ 300 } destWidth={ 280 } />
+			<BlockPreviewContent { ...props } srcWidth={ 560 } srcHeight={ 600 } />
 		</div>
 	);
 }
 
-export function BlockPreviewContent( { name, attributes, innerBlocks, settings, srcWidth, srcHeight, destWidth } ) {
-	// Todo: It would be nice if destWidth could be calculated here, that's the only missing piece ot making this fully responsive.
+export function BlockPreviewContent( { name, attributes, innerBlocks, settings, srcWidth, srcHeight } = {} ) {
+	// Calculated the destination width.
+	const previewRef = React.createRef();
 
-	// Calculate the scale factor necessary to size down the preview thumbnail.
-	const scale = Math.min( destWidth / srcWidth );
-	const previewDimensions = {
-		width: srcWidth ? srcWidth : 400 + 'px', // 400x300 is provided as a 4:3 aspect ratio fallback.
-		height: srcHeight ? srcHeight : 300 + 'px',
-		transform: 'scale(' + scale + ')',
-	};
+	// Fallback dimensions.
+	const [ previewDimensions, setPreviewDimensions ] = useState( {
+		width: 400,
+		height: 300,
+		transform: 'scale(1)',
+	} );
 
-	// We use a top-padding to create a responsively sized element with the same aspect ratio as the preview.
-	// The preview is then absolutely positioned on top of this, creating a visual unit.
-	const aspectPadding = Math.round( srcHeight / srcWidth * 100 );
-	const previewAspect = {
-		paddingTop: aspectPadding + '%',
-	};
+	const [ previewAspect, setPreviewAspect ] = useState( {
+		paddingTop: '75%',
+	} );
+
+	useLayoutEffect( () => {
+		const destWidth = previewRef.current.offsetWidth;
+
+		// Calculate the scale factor necessary to size down the preview thumbnail.
+		const scale = Math.min( destWidth / srcWidth ) || 1;
+
+		setPreviewDimensions( {
+			width: srcWidth ? srcWidth : 400 + 'px', // 400x300 is provided as a 4:3 aspect ratio fallback.
+			height: srcHeight ? srcHeight : 300 + 'px',
+			transform: 'scale(' + scale + ')',
+		} );
+
+		// We use a top-padding to create a responsively sized element with the same aspect ratio as the preview.
+		// The preview is then absolutely positioned on top of this, creating a visual unit.
+		const aspectPadding = Math.round( srcHeight / srcWidth * 100 );
+		setPreviewAspect( {
+			paddingTop: aspectPadding + '%',
+		} );
+	}, [] );
 
 	const block = createBlock( name, attributes, innerBlocks );
 	return (
-		<div style={ previewAspect } className="editor-block-preview__container" aria-hidden>
+		<div ref={ previewRef } style={ previewAspect } className="editor-block-preview__container" aria-hidden>
 			<Disabled style={ previewDimensions } className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper">
 				<BlockEditorProvider
 					value={ [ block ] }

@@ -30,6 +30,10 @@
 	// In the component, a top padding is provided as an inline style to provid an aspect-ratio.
 	// This positioning enables the content to sit on top of that padding to fit.
 	position: relative;
+
+	// The preview component measures the pixel width of this item, so as to calculate the scale factor.
+	// But without this baseline width, it collapses to 0.
+	width: 100%;
 }
 
 .block-editor-block-preview__content {
