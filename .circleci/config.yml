@@ -6,13 +6,13 @@ commands:
       - restore_cache:
           name: Restore Yarn Cache
           keys:
-            - yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
+            - yarn-v3-{{ arch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
           command: YARN_CACHE_FOLDER=~/.cache/yarn yarn install --frozen-lockfile
       - save_cache:
           name: Save Yarn Cache
-          key: yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
+          key: yarn-v3-{{ arch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
   checkout-gutenberg:
@@ -104,16 +104,16 @@ jobs:
     - restore_cache:
         name: Restore Dependencies Cache
         keys:
-        - dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+        - dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
           checksum "yarn.lock" }}
-        - dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}
-        - dependencies-
+        - dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}
+        - dependencies-v2-
     - run:
         name: Yarn preios
         command: yarn preios
     - save_cache:
         name: Save Dependencies Cache
-        key: dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+        key: dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
           checksum "yarn.lock" }}
         paths:
         - react-native-aztec/ios/Carthage
