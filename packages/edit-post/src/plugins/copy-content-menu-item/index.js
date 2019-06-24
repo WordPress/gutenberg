@@ -2,17 +2,27 @@
  * WordPress dependencies
  */
 import { ClipboardButton } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { withState, compose } from '@wordpress/compose';
 
-function CopyContentMenuItem( { editedPostContent, hasCopied, setState } ) {
+function CopyContentMenuItem( { createNotice, editedPostContent, hasCopied, setState } ) {
 	return (
 		<ClipboardButton
 			text={ editedPostContent }
 			role="menuitem"
 			className="components-menu-item__button"
-			onCopy={ () => setState( { hasCopied: true } ) }
+			onCopy={ () => {
+				setState( { hasCopied: true } );
+				createNotice(
+					'info',
+					'Content copied.',
+					{
+						isDismissible: true,
+						type: 'snackbar',
+					}
+				);
+			} }
 			onFinishCopy={ () => setState( { hasCopied: false } ) }
 		>
 			{ hasCopied ?
@@ -26,5 +36,14 @@ export default compose(
 	withSelect( ( select ) => ( {
 		editedPostContent: select( 'core/editor' ).getEditedPostAttribute( 'content' ),
 	} ) ),
+	withDispatch( ( dispatch ) => {
+		const {
+			createNotice,
+		} = dispatch( 'core/notices' );
+
+		return {
+			createNotice,
+		};
+	} ),
 	withState( { hasCopied: false } )
 )( CopyContentMenuItem );
