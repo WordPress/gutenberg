@@ -1,6 +1,3 @@
-/** @flow
- * @format */
-
 /**
  * External dependencies
  */
