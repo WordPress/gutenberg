@@ -46,6 +46,7 @@
 	list-style: none;
 
 	> li {
+		list-style: none;
 		flex-basis: 100%;
 		flex-shrink: 1;
 		margin: 0 $grid-size;
