@@ -244,7 +244,7 @@ export default withDispatch( ( dispatch, ownProps, registry ) => ( {
 			innerBlocks = [
 				...innerBlocks,
 				...times( newColumns - previousColumns, () => {
-					return createBlock( 'core/column', );
+					return createBlock( 'core/column' );
 				} ),
 			];
 		} else {
