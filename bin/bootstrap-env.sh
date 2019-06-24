@@ -22,4 +22,4 @@ while getopts ":-:" opt; do
 			esac;;
 	esac
 done
-shift $((OPTIND - 1))
+
