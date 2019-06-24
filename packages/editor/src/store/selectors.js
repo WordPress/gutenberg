@@ -94,6 +94,7 @@ export function isEditedPostNew( state ) {
 export function hasChangedContent( state ) {
 	return (
 		state.editor.present.blocks.isDirty ||
+		state.attributelessBlocks.isDirty ||
 
 		// `edits` is intended to contain only values which are different from
 		// the saved post, so the mere presence of a property is an indicator

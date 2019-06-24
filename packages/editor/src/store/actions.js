@@ -753,6 +753,19 @@ export function updateEditorSettings( settings ) {
 }
 
 /**
+ * Returns an action object used in signalling that a custom block
+ * without attributes has changed.
+ *
+ *
+ * @return {Object} Action object.
+ */
+export function setAttributelessBlockHasChanged( ) {
+	return {
+		type: 'ATTRIBUTELESS_BLOCK_HAS_CHANGED',
+	};
+}
+
+/**
  * Backward compatibility
  */
 
