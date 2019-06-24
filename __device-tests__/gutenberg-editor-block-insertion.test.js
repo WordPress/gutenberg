@@ -61,14 +61,22 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 		await editorPage.verifyHtmlContent( testData.blockInsertionHtml );
 
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3 );
-		await paragraphBlockElement.click();
-		await editorPage.removeParagraphBlockAtPosition( 3 );
-
-		for ( let i = 3; i > 0; i-- ) {
-			paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( i );
-			await clickMiddleOfElement( driver, paragraphBlockElement );
-			await editorPage.removeParagraphBlockAtPosition( i );
+		// Workaround for now since deleting the first element causes a crash on CI for Android
+		if ( isAndroid() ) {
+			paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3 );
+			await paragraphBlockElement.click();
+			await editorPage.removeParagraphBlockAtPosition( 3 );
+			for ( let i = 3; i > 0; i-- ) {
+				paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( i );
+				await clickMiddleOfElement( driver, paragraphBlockElement );
+				await editorPage.removeParagraphBlockAtPosition( i );
+			}
+		} else {
+			for ( let i = 4; i > 0; i-- ) {
+				paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
+				await clickMiddleOfElement( driver, paragraphBlockElement );
+				await editorPage.removeParagraphBlockAtPosition( 1 );
+			}
 		}
 	} );
 
