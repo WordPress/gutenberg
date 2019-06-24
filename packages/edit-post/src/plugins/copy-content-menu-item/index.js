@@ -16,7 +16,7 @@ function CopyContentMenuItem( { createNotice, editedPostContent, hasCopied, setS
 				setState( { hasCopied: true } );
 				createNotice(
 					'info',
-					'Content copied.',
+					'All content copied.',
 					{
 						isDismissible: true,
 						type: 'snackbar',
