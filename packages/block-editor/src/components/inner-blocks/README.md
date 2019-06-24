@@ -90,7 +90,7 @@ const TEMPLATE = [ [ 'core/columns', {}, [
 
 The previous example creates an InnerBlocks area containing two columns one with an image and the other with a paragraph.
 
-### `__experimentaltemplateOptions`
+### `__experimentalTemplateOptions`
 
 * **Type:** `Array<Object>`
 
@@ -102,7 +102,7 @@ A template option is an object consisting of the following properties:
 - `icon` (`WPElement|string`): An element or [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug to show as a visual approximation of the template.
 - `template` (`Array<Array>`): The template to apply when the option has been selected. See [`template` documentation](#template) for more information.
 
-For the template placeholder selection to be displayed, you must render `InnerBlocks` with a `template` prop value of `null`. You may track this as state of your component, updating its value when receiving the selected template via `onSelectTemplateOption`.
+For the template placeholder selection to be displayed, you must render `InnerBlocks` with a `template` prop value of `null`. You may track this as state of your component, updating its value when receiving the selected template via `__experimentalOnSelectTemplateOption`.
 
 ```jsx
 import { useState } from '@wordpress/element';
@@ -133,8 +133,8 @@ function edit() {
 	return (
 		<InnerBlocks
 			template={ template }
-		    templateOptions={ TEMPLATE_OPTIONS }
-		    onSelectTemplateOption={ setTemplate }
+		    __experimentalTemplateOptions={ TEMPLATE_OPTIONS }
+		    __experimentalOnSelectTemplateOption={ setTemplate }
 		/>
 	);
 }
@@ -144,14 +144,14 @@ function edit() {
 
 * **Type:** `Function`
 
-Callback function invoked when the user makes a template selection, used in combination with the `templateOptions` props. The selected template is passed as the first and only argument. The value of the template may be `undefined` if the `allowTemplateOptionSkip` prop is passed to `InnerBlocks` and the user opts to skip template selection.
+Callback function invoked when the user makes a template selection, used in combination with the `__experimentalTemplateOptions` props. The selected template is passed as the first and only argument. The value of the template may be `undefined` if the `__experimentalAllowTemplateOptionSkip` prop is passed to `InnerBlocks` and the user opts to skip template selection.
 
 ### `__experimentalAllowTemplateOptionSkip`
 
 * **Type:** `Boolean`
 * **Default:** `false`
 
-Whether to include a button in the template selection placeholder to allow the user to skip selection, used in combination with the `templateOptions` prop. When clicked, the `onSelectTemplateOption` callback will be passed an `undefined` value as the template.
+Whether to include a button in the template selection placeholder to allow the user to skip selection, used in combination with the `__experimentalTemplateOptions` prop. When clicked, the `__experimentalOnSelectTemplateOption` callback will be passed an `undefined` value as the template.
 
 ### `templateInsertUpdatesSelection`
 * **Type:** `Boolean`
