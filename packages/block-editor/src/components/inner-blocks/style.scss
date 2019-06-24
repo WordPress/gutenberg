@@ -60,6 +60,10 @@
 		// Override default styles inherited from <IconButton /> to center
 		// icon horizontally.
 		justify-content: center;
+
+		&.is-default {
+			background-color: $white;
+		}
 	}
 
 	&.components-button {

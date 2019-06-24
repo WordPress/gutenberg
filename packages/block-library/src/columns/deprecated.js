@@ -88,7 +88,7 @@ export default [
 			) );
 
 			return [
-				attributes,
+				omit( attributes, [ 'columns' ] ),
 				migratedInnerBlocks,
 			];
 		},
