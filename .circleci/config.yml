@@ -79,7 +79,8 @@ jobs:
       - run:
           name: Upload apk to sauce labs
           command: |
-            curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg-$CIRCLE_BRANCH.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
+            source bin/sauce-pre-upload.sh
+            curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg-$SAUCE_FILENAME.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
       - run:
           name: Run Device Tests
           command: yarn device-tests
@@ -123,7 +124,8 @@ jobs:
     - run:
         name: Upload .app to sauce labs
         command: |
-          curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg-$CIRCLE_BRANCH.app.zip?overwrite=true --data-binary @./ios/Gutenberg.app.zip
+          source bin/sauce-pre-upload.sh
+          curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg-$SAUCE_FILENAME.app.zip?overwrite=true --data-binary @./ios/Gutenberg.app.zip
     - run:
         name: Run Device Tests
         command: |
