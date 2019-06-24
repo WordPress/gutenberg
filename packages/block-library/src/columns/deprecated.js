@@ -108,14 +108,6 @@ export default [
 				default: 2,
 			},
 		},
-		migrate( attributes, innerBlocks ) {
-			attributes = {
-				...attributes,
-				columns: innerBlocks.length,
-			};
-
-			return [ attributes, innerBlocks ];
-		},
 		save( { attributes } ) {
 			const { verticalAlignment, columns } = attributes;
 
