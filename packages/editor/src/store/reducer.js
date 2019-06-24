@@ -155,6 +155,15 @@ export const editor = flow( [
 
 		return state;
 	} ),
+	forceIsDirty( state = false, action ) {
+		switch ( action.type ) {
+			case 'FORCE_EDITOR_IS_DIRTY':
+				return true;
+			case 'REQUEST_POST_UPDATE_SUCCESS':
+				return false;
+		}
+		return state;
+	},
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
@@ -583,25 +592,6 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
-/**
- * Reducer returning attributeless blocks state.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function attributelessBlocks( state = {}, action ) {
-	switch ( action.type ) {
-		case 'ATTRIBUTELESS_BLOCK_HAS_CHANGED':
-			return { ...state, isDirty: true };
-		case 'REQUEST_POST_UPDATE_SUCCESS':
-			return { };
-	}
-
-	return state;
-}
-
 export default optimist( combineReducers( {
 	editor,
 	initialEdits,
@@ -615,5 +605,4 @@ export default optimist( combineReducers( {
 	postSavingLock,
 	isReady,
 	editorSettings,
-	attributelessBlocks,
 } ) );

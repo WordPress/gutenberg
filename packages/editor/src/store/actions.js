@@ -753,15 +753,15 @@ export function updateEditorSettings( settings ) {
 }
 
 /**
- * Returns an action object used in signalling that a custom block
- * without attributes has changed.
- *
+ * Returns an action object used in signalling that editor is forced to dirty
+ * state. This should only be used by custom blocks that have no attributes
+ * or meta fields to indicate dirty state to editor
  *
  * @return {Object} Action object.
  */
-export function setAttributelessBlockHasChanged( ) {
+export function forceEditorIsDirty( ) {
 	return {
-		type: 'ATTRIBUTELESS_BLOCK_HAS_CHANGED',
+		type: 'FORCE_EDITOR_IS_DIRTY',
 	};
 }
 
