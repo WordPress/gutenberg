@@ -255,7 +255,7 @@ It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all
 
 _Alias_: `test-unit-jest`
 
-Launches the unit test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api).
+Launches the unit test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api). You can place tests files inside of the `/src` directory. Test filenames should end with `.test.js`. For example, if testing a component called `Tacos` you would name your test file `Tacos.test.js`.
 
 _Example:_
 
