@@ -61,6 +61,8 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 		await editorPage.verifyHtmlContent( testData.blockInsertionHtml );
 
+		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3 );
+		await paragraphBlockElement.click();
 		await editorPage.removeParagraphBlockAtPosition( 3 );
 
 		for ( let i = 3; i > 0; i-- ) {
