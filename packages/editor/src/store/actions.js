@@ -754,12 +754,12 @@ export function updateEditorSettings( settings ) {
 
 /**
  * Returns an action object used in signalling that editor is forced to dirty
- * state. This should only be used by custom blocks that have no attributes
+ * state. This should only be used by custom blocks that have no content, attributes
  * or meta fields to indicate dirty state to editor
  *
  * @return {Object} Action object.
  */
-export function forceEditorIsDirty( ) {
+export function __experimentalForceEditorIsDirty( ) {
 	return {
 		type: 'FORCE_EDITOR_IS_DIRTY',
 	};
