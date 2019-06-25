@@ -62,7 +62,7 @@ Anyone can help triage, although you’ll need contributor permission on the Gut
 
 To start simply choose from one of these filtered lists of issues:
 
-- [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel). Triaging by simply adding labels is helping people focused on certain aspects find the issues easier and start working on them.
+- [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel). Triaging by simply adding labels helps people focused on certain aspects of Gutenberg find relevant issues easier and start working on them.
 - [The least recently updated Gutenberg issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc). Triaging issues that are getting old and possibly out of date keeps important work from being overlooked.
 - [All Gutenberg issues with no comments](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps in keeping important bugs or suggestions fall become outdated before being considered.
 - [The least commented on issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps the community figure out things like traction for certain proposals. 
