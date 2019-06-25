@@ -67,7 +67,7 @@ To start simply choose from one of these filtered lists of issues:
 - [All Gutenberg issues with no comments](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps in keeping important bugs or suggestions fall become outdated before being considered.
 - [The least commented on issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps the community figure out things like traction for certain proposals. 
 
-You can also create your own custom set of filters on GuiHub.
+You can also create your own custom set of filters on GitHub. If you have a filter you think might be useful for the community, feel free to submit a PR to add it to this list.
 
 When triaging, either one of the lists above or issues in general, here are some steps you can perform:
 
