@@ -106,13 +106,14 @@
 .editor-post-title .editor-post-permalink {
 	font-size: $default-font-size;
 	color: $dark-gray-900;
-	position: absolute;
-	top: -$block-toolbar-height + $border-width + $border-width + 1px; // Shift this element upward the same height as the block toolbar, minus the border size
-	left: 0;
-	right: 0;
+	flex-wrap: wrap;
+	height: auto;
 
-	@include break-small() {
+	@include break-mobile() {
+		position: absolute;
+		top: -$block-toolbar-height + $border-width + $border-width + 1px; // Shift this element upward the same height as the block toolbar, minus the border size
 		left: $block-side-ui-clearance;
 		right: $block-side-ui-clearance;
+		flex-wrap: nowrap;
 	}
 }
