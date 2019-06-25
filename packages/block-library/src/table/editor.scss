@@ -3,6 +3,7 @@
 	&[data-align="right"],
 	&[data-align="center"] {
 		table {
+			// Display value is "block" for unaligned tables so they can scroll; reset to "table" when aligned.
 			display: table;
 			// Ensure the table element is not full-width when aligned.
 			width: auto;
