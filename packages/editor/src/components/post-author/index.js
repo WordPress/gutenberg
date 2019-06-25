@@ -118,7 +118,9 @@ export class PostAuthor extends Component {
 			return null;
 		}
 
-		if ( authors.length < 50 ) {
+		// If there are a small number of users, use a regular select element; once the list grows to a certain size, switch
+		// to an accessible auto-complete component.
+		if ( authors.length < 99 ) {
 			// Disable reason: A select with an onchange throws a warning.
 			/* eslint-disable jsx-a11y/no-onchange */
 			selector =
