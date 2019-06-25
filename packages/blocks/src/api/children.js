@@ -84,7 +84,7 @@ export function concat( ...blockNodes ) {
  * Given an iterable set of DOM nodes, returns equivalent block children.
  * Ignores any non-element/text nodes included in set.
  *
- * @param {Iterable.<Node>} domNodes Iterable set of DOM nodes to convert.
+ * @param {ArrayLike<Node>} domNodes list of DOM nodes to convert.
  *
  * @return {WPBlockChildren} Block children equivalent to DOM nodes.
  */

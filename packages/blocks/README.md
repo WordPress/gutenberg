@@ -349,7 +349,7 @@ Returns an array with the child blocks of a given block.
 
 _Parameters_
 
--   _blockName_ `string`: Name of block (example: “latest-posts”).
+-   _blockName_ `string`: Name of block (example: 'core/columns').
 
 _Returns_
 
@@ -464,7 +464,7 @@ Returns a boolean indicating if a block has child blocks or not.
 
 _Parameters_
 
--   _blockName_ `string`: Name of block (example: “latest-posts”).
+-   _blockName_ `string`: Name of block (example: 'core/latest-posts').
 
 _Returns_
 
@@ -614,7 +614,7 @@ Registers a new block style variation for the given block.
 
 _Parameters_
 
--   _blockName_ `string`: Name of block (example: “core/latest-posts”).
+-   _blockName_ `string`: Name of block (example: 'core/paragraph').
 -   _styleVariation_ `Object`: Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
 
 <a name="registerBlockType" href="#registerBlockType">#</a> **registerBlockType**

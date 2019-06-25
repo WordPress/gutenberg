@@ -62,7 +62,6 @@ export function isUnmodifiedDefaultBlock( block ) {
  *
  * @return {boolean} True if the parameter is a valid icon and false otherwise.
  */
-
 export function isValidIcon( icon ) {
 	return !! icon && (
 		isString( icon ) ||
