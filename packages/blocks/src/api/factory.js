@@ -25,7 +25,7 @@ import { createHooks, applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { getBlockType, getBlockTypes } from './registration';
+import { getBlockType, getBlockTypes, getGroupingBlockName } from './registration';
 import { normalizeBlockType } from './utils';
 
 /**
@@ -252,7 +252,7 @@ export const isWildcardBlockTransform = ( t ) => t && t.type === 'block' && Arra
  *
  * @return {boolean} whether or not the Block is the container Block type
  */
-export const isContainerGroupBlock = ( name ) => name === 'core/group';
+export const isContainerGroupBlock = ( name ) => name === getGroupingBlockName();
 
 /**
  * Determines whether the provided Blocks are of the same type
