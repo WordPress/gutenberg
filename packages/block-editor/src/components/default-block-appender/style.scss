@@ -1,0 +1,126 @@
+.block-editor-default-block-appender {
+	clear: both; // The appender doesn't scale well to sit next to floats, so clear them.
+
+	textarea.block-editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
+		font-family: $editor-font;
+		font-size: $editor-font-size; // It should match the default paragraph size.
+		border: none;
+		background: none;
+		box-shadow: none;
+		display: block;
+		cursor: text;
+		width: 100%;
+		outline: $border-width solid transparent;
+		transition: 0.2s outline;
+		@include reduce-motion("transition");
+		resize: none;
+		margin-top: $default-block-margin;
+		margin-bottom: $default-block-margin;
+
+		// Emulate the dimensions of a paragraph block.
+		// On mobile and in nested contexts, the plus to add blocks shows up on the right.
+		// The rightmost padding makes sure it doesn't overlap text.
+		padding: 0 #{ $block-padding + $icon-button-size } 0 $block-padding;
+
+		// Use opacity to work in various editor styles.
+		color: $dark-opacity-300;
+		.is-dark-theme & {
+			color: $light-opacity-300;
+		}
+	}
+
+	&:hover {
+		.block-editor-inserter-with-shortcuts {
+			@include edit-post__fade-in-animation;
+		}
+	}
+
+	// Dropzone.
+	.components-drop-zone__content-icon {
+		display: none;
+	}
+}
+
+// Quick shortcuts, left and right.
+.block-editor-block-list__empty-block-inserter, // Empty paragraph
+.block-editor-default-block-appender .block-editor-inserter, // Empty appender
+.block-editor-inserter-with-shortcuts { // Right side quick shortcuts
+	position: absolute;
+	top: 0;
+
+	// Change the size of the buttons to match that of the default paragraph height.
+	.components-icon-button {
+		width: $block-side-ui-width;
+		height: $block-side-ui-width;
+		margin-right: 12px;
+		padding: 0;
+	}
+
+	.block-editor-block-icon {
+		margin: auto;
+	}
+
+	.components-icon-button svg {
+		display: block;
+		margin: auto;
+	}
+
+	.block-editor-inserter__toggle {
+		margin-right: 0;
+
+		// Hide the box shadow that appears on hover.
+		// All the :not() rules are needed to override default iconButton styles.
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+			box-shadow: none;
+		}
+	}
+}
+
+// Left side.
+.block-editor-block-list__empty-block-inserter,
+.block-editor-default-block-appender .block-editor-inserter {
+	right: $grid-size; // Show to the right on mobile.
+
+	@include break-small {
+		display: flex;
+		align-items: center;
+		height: 100%;
+		left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
+		right: auto;
+	}
+
+	&:disabled {
+		display: none;
+	}
+
+	.block-editor-inserter__toggle {
+		border-radius: 50%;
+		width: $block-side-ui-width;
+		height: $block-side-ui-width;
+		padding: 0;
+
+		// Use opacity to work in various editor styles.
+		&:not(:hover) {
+			color: $dark-opacity-500;
+			.is-dark-theme & {
+				color: $light-opacity-500;
+			}
+		}
+	}
+}
+
+// Quick block insertion icons on the right side.
+// Needs specificity to styles from the component itself.
+.block-editor-block-list__side-inserter .block-editor-inserter-with-shortcuts,
+.block-editor-default-block-appender .block-editor-inserter-with-shortcuts {
+	right: $block-padding;
+	display: none; // Don't show on mobile.
+	z-index: z-index(".block-editor-inserter-with-shortcuts"); // Elevate above the sibling inserter.
+
+	@include break-small {
+		display: flex;
+		align-items: center;
+		height: 100%;
+		right: 0;
+	}
+}

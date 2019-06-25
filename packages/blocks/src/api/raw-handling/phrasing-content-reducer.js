@@ -23,7 +23,7 @@ export default function( node, doc ) {
 		}
 
 		if ( textDecorationLine === 'line-through' ) {
-			wrap( doc.createElement( 'del' ), node );
+			wrap( doc.createElement( 's' ), node );
 		}
 
 		if ( verticalAlign === 'super' ) {

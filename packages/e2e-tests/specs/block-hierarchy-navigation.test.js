@@ -20,31 +20,41 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate using the block hierarchy dropdown menu', async () => {
 		await insertBlock( 'Columns' );
+		await page.click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
+		await pressKeyTimes( 'Tab', 5 ); // Tab to inserter.
+		await page.keyboard.press( 'Enter' ); // Activate inserter.
+		await page.keyboard.type( 'Paragraph' );
+		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks.
 		await page.click( '[aria-label="Block Navigation"]' );
-		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-navigation__item') and contains(text(), 'Columns')]" ) )[ 0 ];
+		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]" ) )[ 0 ];
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
 		await page.focus( '.edit-post-settings-sidebar__panel-block .components-range-control__number[aria-label="Columns"]' );
-		page.keyboard.down( 'Shift' );
-		page.keyboard.press( 'ArrowLeft' );
-		page.keyboard.up( 'Shift' );
-		page.keyboard.type( '3' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.type( '3' );
 
 		// Navigate to the last column block.
 		await page.click( '[aria-label="Block Navigation"]' );
 		const lastColumnsBlockMenuItem = ( await page.$x(
-			"//button[contains(@class,'editor-block-navigation__item') and contains(text(), 'Column')]"
+			"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
 		) )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
 
 		// Insert text in the last column block.
-		await pressKeyTimes( 'Tab', 2 ); // Navigate to the appender.
+		await pressKeyTimes( 'Tab', 5 ); // Tab to inserter.
+		await page.keyboard.press( 'Enter' ); // Activate inserter.
+		await page.keyboard.type( 'Paragraph' );
+		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'Third column' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -52,8 +62,14 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate block hierarchy using only the keyboard', async () => {
 		await insertBlock( 'Columns' );
+		await page.click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
+		await pressKeyTimes( 'Tab', 5 ); // Tab to inserter.
+		await page.keyboard.press( 'Enter' ); // Activate inserter.
+		await page.keyboard.type( 'Paragraph' );
+		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks using the keyboard.
@@ -68,7 +84,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await pressKeyTimes( 'Tab', 4 );
 
 		// Tweak the columns count by increasing it by one.
-		page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
 
 		// Navigate to the last column in the columns block.
 		await openBlockNavigator();
@@ -76,17 +92,23 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Insert text in the last column block
-		await pressKeyTimes( 'Tab', 2 ); // Navigate to the appender.
+		await pressKeyTimes( 'Tab', 5 ); // Tab to inserter.
+		await page.keyboard.press( 'Enter' ); // Activate inserter.
+		await page.keyboard.type( 'Paragraph' );
+		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'Third column' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should appear and function even without nested blocks', async () => {
+		const textString = 'You say goodbye';
+
 		await insertBlock( 'Paragraph' );
 
 		// Add content so there is a block in the hierachy.
-		await page.keyboard.type( 'You say goodbye' );
+		await page.keyboard.type( textString );
 
 		// Create an image block too.
 		await page.keyboard.press( 'Enter' );
@@ -94,10 +116,11 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Return to first block.
 		await openBlockNavigator();
+		await page.waitForSelector( '.editor-block-navigation__container' );
 		await page.keyboard.press( 'Space' );
 
 		// Replace its content.
-		await pressKeyWithModifier( 'primary', 'A' );
+		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'and I say hello' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

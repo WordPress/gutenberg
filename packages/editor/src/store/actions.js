@@ -1,30 +1,74 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray, pick, mapValues, has } from 'lodash';
+import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
+
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+import { dispatch, select, apiFetch } from '@wordpress/data-controls';
+import {
+	parse,
+	synchronizeBlocksWithTemplate,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { dispatch } from './controls';
+import {
+	getPostRawValue,
+} from './reducer';
+import {
+	STORE_KEY,
+	POST_UPDATE_TRANSACTION_ID,
+	SAVE_POST_NOTICE_ID,
+	TRASH_POST_NOTICE_ID,
+	AUTOSAVE_PROPERTIES,
+} from './constants';
+import {
+	getNotificationArgumentsForSaveSuccess,
+	getNotificationArgumentsForSaveFail,
+	getNotificationArgumentsForTrashFail,
+} from './utils/notice-builder';
 
 /**
- * Returns an action object used in signalling that editor has initialized with
+ * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
  * @param {Object} post      Post object.
  * @param {Object} edits     Initial edited attributes object.
  * @param {Array?} template  Block Template.
- *
- * @return {Object} Action object.
  */
-export function setupEditor( post, edits, template ) {
-	return {
+export function* setupEditor( post, edits, template ) {
+	yield {
 		type: 'SETUP_EDITOR',
 		post,
 		edits,
 		template,
 	};
+
+	// In order to ensure maximum of a single parse during setup, edits are
+	// included as part of editor setup action. Assume edited content as
+	// canonical if provided, falling back to post.
+	let content;
+	if ( has( edits, [ 'content' ] ) ) {
+		content = edits.content;
+	} else {
+		content = post.content.raw;
+	}
+
+	let blocks = parse( content );
+
+	// Apply a template for new posts only, if exists.
+	const isNewPost = post.status === 'auto-draft';
+	if ( isNewPost && template ) {
+		blocks = synchronizeBlocksWithTemplate( blocks, template );
+	}
+
+	yield resetEditorBlocks( blocks );
+	yield setupEditorState( post );
 }
 
 /**
@@ -46,14 +90,103 @@ export function resetPost( post ) {
  * Returns an action object used in signalling that the latest autosave of the
  * post has been received, by initialization or autosave.
  *
- * @param {Object} post Autosave post object.
+ * @deprecated since 5.6. Callers should use the `receiveAutosaves( postId, autosave )`
+ * 			   selector from the '@wordpress/core-data' package.
+ *
+ * @param {Object} newAutosave Autosave post object.
  *
  * @return {Object} Action object.
  */
-export function resetAutosave( post ) {
+export function* resetAutosave( newAutosave ) {
+	deprecated( 'resetAutosave action (`core/editor` store)', {
+		alternative: 'receiveAutosaves action (`core` store)',
+		plugin: 'Gutenberg',
+	} );
+
+	const postId = yield select( STORE_KEY, 'getCurrentPostId' );
+	yield dispatch( 'core', 'receiveAutosaves', postId, newAutosave );
+
+	return { type: '__INERT__' };
+}
+
+/**
+ * Optimistic action for dispatching that a post update request has started.
+ *
+ * @param {Object} options
+ *
+ * @return {Object} An action object
+ */
+export function __experimentalRequestPostUpdateStart( options = {} ) {
 	return {
-		type: 'RESET_AUTOSAVE',
+		type: 'REQUEST_POST_UPDATE_START',
+		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
+		options,
+	};
+}
+
+/**
+ * Optimistic action for indicating that the request post update has completed
+ * successfully.
+ *
+ * @param {Object}  data                The data for the action.
+ * @param {Object}  data.previousPost   The previous post prior to update.
+ * @param {Object}  data.post           The new post after update
+ * @param {boolean} data.isRevision     Whether the post is a revision or not.
+ * @param {Object}  data.options        Options passed through from the original
+ *                                      action dispatch.
+ * @param {Object}  data.postType       The post type object.
+ *
+ * @return {Object}	Action object.
+ */
+export function __experimentalRequestPostUpdateSuccess( {
+	previousPost,
+	post,
+	isRevision,
+	options,
+	postType,
+} ) {
+	return {
+		type: 'REQUEST_POST_UPDATE_SUCCESS',
+		previousPost,
 		post,
+		optimist: {
+			// Note: REVERT is not a failure case here. Rather, it
+			// is simply reversing the assumption that the updates
+			// were applied to the post proper, such that the post
+			// treated as having unsaved changes.
+			type: isRevision ? REVERT : COMMIT,
+			id: POST_UPDATE_TRANSACTION_ID,
+		},
+		options,
+		postType,
+	};
+}
+
+/**
+ * Optimistic action for indicating that the request post update has completed
+ * with a failure.
+ *
+ * @param {Object}  data          The data for the action
+ * @param {Object}  data.post     The post that failed updating.
+ * @param {Object}  data.edits    The fields that were being updated.
+ * @param {*}       data.error    The error from the failed call.
+ * @param {Object}  data.options  Options passed through from the original
+ *                                action dispatch.
+ * @return {Object} An action object
+ */
+export function __experimentalRequestPostUpdateFailure( {
+	post,
+	edits,
+	error,
+	options,
+} ) {
+	return {
+		type: 'REQUEST_POST_UPDATE_FAILURE',
+		optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+		post,
+		edits,
+		error,
+		options,
 	};
 }
 
@@ -73,7 +206,8 @@ export function updatePost( edits ) {
 }
 
 /**
- * Returns an action object used to setup the editor state when first opening an editor.
+ * Returns an action object used to setup the editor state when first opening
+ * an editor.
  *
  * @param {Object} post   Post object.
  *
@@ -102,43 +236,286 @@ export function editPost( edits ) {
 }
 
 /**
- * Returns an action object to save the post.
+ * Returns action object produced by the updatePost creator augmented by
+ * an optimist option that signals optimistically applying updates.
  *
- * @param {Object}  options          Options for the save.
- * @param {boolean} options.isAutosave Perform an autosave if true.
+ * @param {Object} edits  Updated post fields.
  *
  * @return {Object} Action object.
  */
-export function savePost( options = {} ) {
+export function __experimentalOptimisticUpdatePost( edits ) {
 	return {
-		type: 'REQUEST_POST_UPDATE',
-		options,
-	};
-}
-
-export function refreshPost() {
-	return {
-		type: 'REFRESH_POST',
-	};
-}
-
-export function trashPost( postId, postType ) {
-	return {
-		type: 'TRASH_POST',
-		postId,
-		postType,
+		...updatePost( edits ),
+		optimist: { id: POST_UPDATE_TRANSACTION_ID },
 	};
 }
 
 /**
- * Returns an action object used in signalling that the post should autosave.
+ * Action generator for saving the current post in the editor.
+ *
+ * @param {Object} options
+ */
+export function* savePost( options = {} ) {
+	const isEditedPostSaveable = yield select(
+		STORE_KEY,
+		'isEditedPostSaveable'
+	);
+	if ( ! isEditedPostSaveable ) {
+		return;
+	}
+	let edits = yield select(
+		STORE_KEY,
+		'getPostEdits'
+	);
+	const isAutosave = !! options.isAutosave;
+
+	if ( isAutosave ) {
+		edits = pick( edits, AUTOSAVE_PROPERTIES );
+	}
+
+	const isEditedPostNew = yield select(
+		STORE_KEY,
+		'isEditedPostNew',
+	);
+
+	// New posts (with auto-draft status) must be explicitly assigned draft
+	// status if there is not already a status assigned in edits (publish).
+	// Otherwise, they are wrongly left as auto-draft. Status is not always
+	// respected for autosaves, so it cannot simply be included in the pick
+	// above. This behavior relies on an assumption that an auto-draft post
+	// would never be saved by anyone other than the owner of the post, per
+	// logic within autosaves REST controller to save status field only for
+	// draft/auto-draft by current user.
+	//
+	// See: https://core.trac.wordpress.org/ticket/43316#comment:88
+	// See: https://core.trac.wordpress.org/ticket/43316#comment:89
+	if ( isEditedPostNew ) {
+		edits = { status: 'draft', ...edits };
+	}
+
+	const post = yield select(
+		STORE_KEY,
+		'getCurrentPost'
+	);
+
+	const editedPostContent = yield select(
+		STORE_KEY,
+		'getEditedPostContent'
+	);
+
+	let toSend = {
+		...edits,
+		content: editedPostContent,
+		id: post.id,
+	};
+
+	const currentPostType = yield select(
+		STORE_KEY,
+		'getCurrentPostType'
+	);
+
+	const postType = yield select(
+		'core',
+		'getPostType',
+		currentPostType
+	);
+
+	yield dispatch(
+		STORE_KEY,
+		'__experimentalRequestPostUpdateStart',
+		options,
+	);
+
+	// Optimistically apply updates under the assumption that the post
+	// will be updated. See below logic in success resolution for revert
+	// if the autosave is applied as a revision.
+	yield dispatch(
+		STORE_KEY,
+		'__experimentalOptimisticUpdatePost',
+		toSend
+	);
+
+	let path = `/wp/v2/${ postType.rest_base }/${ post.id }`;
+	let method = 'PUT';
+	if ( isAutosave ) {
+		const currentUser = yield select( 'core', 'getCurrentUser' );
+		const currentUserId = currentUser ? currentUser.id : undefined;
+		const autosavePost = yield select( 'core', 'getAutosave', post.type, post.id, currentUserId );
+		const mappedAutosavePost = mapValues( pick( autosavePost, AUTOSAVE_PROPERTIES ), getPostRawValue );
+
+		// Ensure autosaves contain all expected fields, using autosave or
+		// post values as fallback if not otherwise included in edits.
+		toSend = {
+			...pick( post, AUTOSAVE_PROPERTIES ),
+			...mappedAutosavePost,
+			...toSend,
+		};
+		path += '/autosaves';
+		method = 'POST';
+	} else {
+		yield dispatch(
+			'core/notices',
+			'removeNotice',
+			SAVE_POST_NOTICE_ID
+		);
+		yield dispatch(
+			'core/notices',
+			'removeNotice',
+			'autosave-exists'
+		);
+	}
+
+	try {
+		const newPost = yield apiFetch( {
+			path,
+			method,
+			data: toSend,
+		} );
+
+		if ( isAutosave ) {
+			yield dispatch( 'core', 'receiveAutosaves', post.id, newPost );
+		} else {
+			yield dispatch( STORE_KEY, 'resetPost', newPost );
+		}
+
+		yield dispatch(
+			STORE_KEY,
+			'__experimentalRequestPostUpdateSuccess',
+			{
+				previousPost: post,
+				post: newPost,
+				options,
+				postType,
+				// An autosave may be processed by the server as a regular save
+				// when its update is requested by the author and the post was
+				// draft or auto-draft.
+				isRevision: newPost.id !== post.id,
+			}
+		);
+
+		const notifySuccessArgs = getNotificationArgumentsForSaveSuccess( {
+			previousPost: post,
+			post: newPost,
+			postType,
+			options,
+		} );
+		if ( notifySuccessArgs.length > 0 ) {
+			yield dispatch(
+				'core/notices',
+				'createSuccessNotice',
+				...notifySuccessArgs
+			);
+		}
+	} catch ( error ) {
+		yield dispatch(
+			STORE_KEY,
+			'__experimentalRequestPostUpdateFailure',
+			{ post, edits, error, options }
+		);
+		const notifyFailArgs = getNotificationArgumentsForSaveFail( {
+			post,
+			edits,
+			error,
+		} );
+		if ( notifyFailArgs.length > 0 ) {
+			yield dispatch(
+				'core/notices',
+				'createErrorNotice',
+				...notifyFailArgs
+			);
+		}
+	}
+}
+
+/**
+ * Action generator for handling refreshing the current post.
+ */
+export function* refreshPost() {
+	const post = yield select(
+		STORE_KEY,
+		'getCurrentPost'
+	);
+	const postTypeSlug = yield select(
+		STORE_KEY,
+		'getCurrentPostType'
+	);
+	const postType = yield select(
+		'core',
+		'getPostType',
+		postTypeSlug
+	);
+	const newPost = yield apiFetch(
+		{
+			// Timestamp arg allows caller to bypass browser caching, which is
+			// expected for this specific function.
+			path: `/wp/v2/${ postType.rest_base }/${ post.id }` +
+				`?context=edit&_timestamp=${ Date.now() }`,
+		}
+	);
+	yield dispatch(
+		STORE_KEY,
+		'resetPost',
+		newPost
+	);
+}
+
+/**
+ * Action generator for trashing the current post in the editor.
+ */
+export function* trashPost() {
+	const postTypeSlug = yield select(
+		STORE_KEY,
+		'getCurrentPostType'
+	);
+	const postType = yield select(
+		'core',
+		'getPostType',
+		postTypeSlug
+	);
+	yield dispatch(
+		'core/notices',
+		'removeNotice',
+		TRASH_POST_NOTICE_ID
+	);
+	try {
+		const post = yield select(
+			STORE_KEY,
+			'getCurrentPost'
+		);
+		yield apiFetch(
+			{
+				path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
+				method: 'DELETE',
+			}
+		);
+
+		// TODO: This should be an updatePost action (updating subsets of post
+		// properties), but right now editPost is tied with change detection.
+		yield dispatch(
+			STORE_KEY,
+			'resetPost',
+			{ ...post, status: 'trash' }
+		);
+	} catch ( error ) {
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			...getNotificationArgumentsForTrashFail( { error } ),
+		);
+	}
+}
+
+/**
+ * Action generator used in signalling that the post should autosave.
  *
  * @param {Object?} options Extra flags to identify the autosave.
- *
- * @return {Object} Action object.
  */
-export function autosave( options ) {
-	return savePost( { isAutosave: true, ...options } );
+export function* autosave( options ) {
+	yield dispatch(
+		STORE_KEY,
+		'savePost',
+		{ isAutosave: true, ...options }
+	);
 }
 
 /**
@@ -264,7 +641,8 @@ export function __experimentalUpdateReusableBlockTitle( id, title ) {
 }
 
 /**
- * Returns an action object used to convert a reusable block into a static block.
+ * Returns an action object used to convert a reusable block into a static
+ * block.
  *
  * @param {string} clientId The client ID of the block to attach.
  *
@@ -278,7 +656,8 @@ export function __experimentalConvertBlockToStatic( clientId ) {
 }
 
 /**
- * Returns an action object used to convert a static block into a reusable block.
+ * Returns an action object used to convert a static block into a reusable
+ * block.
  *
  * @param {string} clientIds The client IDs of the block to detach.
  *
@@ -292,7 +671,8 @@ export function __experimentalConvertBlockToReusable( clientIds ) {
 }
 
 /**
- * Returns an action object used in signalling that the user has enabled the publish sidebar.
+ * Returns an action object used in signalling that the user has enabled the
+ * publish sidebar.
  *
  * @return {Object} Action object
  */
@@ -303,7 +683,8 @@ export function enablePublishSidebar() {
 }
 
 /**
- * Returns an action object used in signalling that the user has disabled the publish sidebar.
+ * Returns an action object used in signalling that the user has disabled the
+ * publish sidebar.
  *
  * @return {Object} Action object
  */
@@ -357,42 +738,182 @@ export function resetEditorBlocks( blocks, options = {} ) {
 	};
 }
 
+/*
+ * Returns an action object used in signalling that the post editor settings have been updated.
+ *
+ * @param {Object} settings Updated settings
+ *
+ * @return {Object} Action object
+ */
+export function updateEditorSettings( settings ) {
+	return {
+		type: 'UPDATE_EDITOR_SETTINGS',
+		settings,
+	};
+}
+
 /**
  * Backward compatibility
  */
 
 const getBlockEditorAction = ( name ) => function* ( ...args ) {
+	deprecated( '`wp.data.dispatch( \'core/editor\' ).' + name + '`', {
+		alternative: '`wp.data.dispatch( \'core/block-editor\' ).' + name + '`',
+	} );
 	yield dispatch( 'core/block-editor', name, ...args );
 };
 
+/**
+ * @see resetBlocks in core/block-editor store.
+ */
 export const resetBlocks = getBlockEditorAction( 'resetBlocks' );
+
+/**
+ * @see receiveBlocks in core/block-editor store.
+ */
 export const receiveBlocks = getBlockEditorAction( 'receiveBlocks' );
+
+/**
+ * @see updateBlock in core/block-editor store.
+ */
 export const updateBlock = getBlockEditorAction( 'updateBlock' );
+
+/**
+ * @see updateBlockAttributes in core/block-editor store.
+ */
 export const updateBlockAttributes = getBlockEditorAction( 'updateBlockAttributes' );
+
+/**
+ * @see selectBlock in core/block-editor store.
+ */
 export const selectBlock = getBlockEditorAction( 'selectBlock' );
+
+/**
+ * @see startMultiSelect in core/block-editor store.
+ */
 export const startMultiSelect = getBlockEditorAction( 'startMultiSelect' );
+
+/**
+ * @see stopMultiSelect in core/block-editor store.
+ */
 export const stopMultiSelect = getBlockEditorAction( 'stopMultiSelect' );
+
+/**
+ * @see multiSelect in core/block-editor store.
+ */
 export const multiSelect = getBlockEditorAction( 'multiSelect' );
+
+/**
+ * @see clearSelectedBlock in core/block-editor store.
+ */
 export const clearSelectedBlock = getBlockEditorAction( 'clearSelectedBlock' );
+
+/**
+ * @see toggleSelection in core/block-editor store.
+ */
 export const toggleSelection = getBlockEditorAction( 'toggleSelection' );
+
+/**
+ * @see replaceBlocks in core/block-editor store.
+ */
 export const replaceBlocks = getBlockEditorAction( 'replaceBlocks' );
+
+/**
+ * @see replaceBlock in core/block-editor store.
+ */
+export const replaceBlock = getBlockEditorAction( 'replaceBlock' );
+
+/**
+ * @see moveBlocksDown in core/block-editor store.
+ */
 export const moveBlocksDown = getBlockEditorAction( 'moveBlocksDown' );
+
+/**
+ * @see moveBlocksUp in core/block-editor store.
+ */
 export const moveBlocksUp = getBlockEditorAction( 'moveBlocksUp' );
+
+/**
+ * @see moveBlockToPosition in core/block-editor store.
+ */
 export const moveBlockToPosition = getBlockEditorAction( 'moveBlockToPosition' );
+
+/**
+ * @see insertBlock in core/block-editor store.
+ */
 export const insertBlock = getBlockEditorAction( 'insertBlock' );
+
+/**
+ * @see insertBlocks in core/block-editor store.
+ */
 export const insertBlocks = getBlockEditorAction( 'insertBlocks' );
+
+/**
+ * @see showInsertionPoint in core/block-editor store.
+ */
 export const showInsertionPoint = getBlockEditorAction( 'showInsertionPoint' );
+
+/**
+ * @see hideInsertionPoint in core/block-editor store.
+ */
 export const hideInsertionPoint = getBlockEditorAction( 'hideInsertionPoint' );
+
+/**
+ * @see setTemplateValidity in core/block-editor store.
+ */
 export const setTemplateValidity = getBlockEditorAction( 'setTemplateValidity' );
+
+/**
+ * @see synchronizeTemplate in core/block-editor store.
+ */
 export const synchronizeTemplate = getBlockEditorAction( 'synchronizeTemplate' );
+
+/**
+ * @see mergeBlocks in core/block-editor store.
+ */
 export const mergeBlocks = getBlockEditorAction( 'mergeBlocks' );
+
+/**
+ * @see removeBlocks in core/block-editor store.
+ */
 export const removeBlocks = getBlockEditorAction( 'removeBlocks' );
+
+/**
+ * @see removeBlock in core/block-editor store.
+ */
 export const removeBlock = getBlockEditorAction( 'removeBlock' );
+
+/**
+ * @see toggleBlockMode in core/block-editor store.
+ */
 export const toggleBlockMode = getBlockEditorAction( 'toggleBlockMode' );
+
+/**
+ * @see startTyping in core/block-editor store.
+ */
 export const startTyping = getBlockEditorAction( 'startTyping' );
+
+/**
+ * @see stopTyping in core/block-editor store.
+ */
 export const stopTyping = getBlockEditorAction( 'stopTyping' );
+
+/**
+ * @see enterFormattedText in core/block-editor store.
+ */
 export const enterFormattedText = getBlockEditorAction( 'enterFormattedText' );
+
+/**
+ * @see exitFormattedText in core/block-editor store.
+ */
 export const exitFormattedText = getBlockEditorAction( 'exitFormattedText' );
+
+/**
+ * @see insertDefaultBlock in core/block-editor store.
+ */
 export const insertDefaultBlock = getBlockEditorAction( 'insertDefaultBlock' );
+
+/**
+ * @see updateBlockListSettings in core/block-editor store.
+ */
 export const updateBlockListSettings = getBlockEditorAction( 'updateBlockListSettings' );
-export const updateEditorSettings = getBlockEditorAction( 'updateEditorSettings' );

@@ -6,7 +6,7 @@ import { map, filter } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	PanelBody,
 	ToggleControl,
@@ -15,7 +15,7 @@ import {
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/editor';
+import { InspectorControls } from '@wordpress/block-editor';
 
 class TagCloudEdit extends Component {
 	constructor() {
@@ -82,14 +82,14 @@ class TagCloudEdit extends Component {
 		);
 
 		return (
-			<Fragment>
+			<>
 				{ inspectorControls }
 				<ServerSideRender
 					key="tag-cloud"
 					block="core/tag-cloud"
 					attributes={ attributes }
 				/>
-			</Fragment>
+			</>
 		);
 	}
 }

@@ -6,15 +6,21 @@ exports[`RichText should apply formatting when selection is collapsed 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`RichText should apply formatting with access shortcut 1`] = `
-"<!-- wp:paragraph -->
-<p><del>test</del></p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`RichText should apply formatting with primary shortcut 1`] = `
 "<!-- wp:paragraph -->
 <p><strong>test</strong></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should apply multiple formats when selection is collapsed 1`] = `
+"<!-- wp:paragraph -->
+<p><strong><em>1</em></strong>.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should handle Home and End keys 1`] = `
+"<!-- wp:paragraph -->
+<p>-<strong>12</strong>+</p>
 <!-- /wp:paragraph -->"
 `;
 

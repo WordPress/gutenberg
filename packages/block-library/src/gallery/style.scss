@@ -126,14 +126,6 @@
 		margin-right: 0;
 	}
 
-	// Make the "Add new Gallery item" button full-width (so it always appears
-	// below other items).
-	.blocks-gallery-item {
-		&.has-add-item-button {
-			width: 100%;
-		}
-	}
-
 	// Apply max-width to floated items that have no intrinsic width.
 	&.alignleft,
 	&.alignright {

@@ -8,6 +8,11 @@ import {
 	publishPost,
 } from '@wordpress/e2e-test-utils';
 
+/**
+ * Module constants
+ */
+const TAG_TOKEN_SELECTOR = '.components-form-token-field__token-text span:not(.screen-reader-text)';
+
 describe( 'Taxonomies', () => {
 	const canCreatTermInTaxonomy = ( taxonomy ) => {
 		return page.evaluate(
@@ -38,13 +43,13 @@ describe( 'Taxonomies', () => {
 
 	const getCurrentTags = async () => {
 		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
-		return page.evaluate( ( node ) => {
+		return page.evaluate( ( node, selector ) => {
 			return Array.from( node.querySelectorAll(
-				'.components-form-token-field__token-text span:not(.screen-reader-text)'
+				selector
 			) ).map( ( field ) => {
 				return field.innerText;
 			} );
-		}, tagsPanel );
+		}, tagsPanel, TAG_TOKEN_SELECTOR );
 	};
 
 	it( 'should be able to open the categories panel and create a new main category if the user has the right capabilities', async () => {
@@ -105,7 +110,10 @@ describe( 'Taxonomies', () => {
 		expect( selectedCategories[ 0 ] ).toEqual( 'z rand category 1' );
 	} );
 
-	it( 'should be able to open the tags panel and create a new tag if the user has the right capabilities', async () => {
+	// This test isn't reliable locally because repeated execution of the test triggers 400 network
+	// because of the tag's duplication. Also, it randomly doesn't add a new tag after pressing enter.
+	// See: https://github.com/WordPress/gutenberg/pull/15211.
+	it.skip( 'should be able to open the tags panel and create a new tag if the user has the right capabilities', async () => {
 		await createNewPost();
 
 		await openDocumentSettingsSidebar();
@@ -123,6 +131,13 @@ describe( 'Taxonomies', () => {
 		// Open the tags panel.
 		await tagsPanel.click( 'button' );
 
+		// At the start there are no tag tokens
+		expect(
+			await page.$$(
+				TAG_TOKEN_SELECTOR
+			)
+		).toHaveLength( 0 );
+
 		const tagInput = await tagsPanel.$( '.components-form-token-field__input' );
 
 		// Click the tag input field.
@@ -134,7 +149,7 @@ describe( 'Taxonomies', () => {
 		// Press enter to create a new tag.
 		await tagInput.press( 'Enter' );
 
-		await page.waitForSelector( '.components-form-token-field__token' );
+		await page.waitForSelector( TAG_TOKEN_SELECTOR );
 
 		// Get an array with the tags of the post.
 		let tags = await getCurrentTags();
@@ -153,7 +168,7 @@ describe( 'Taxonomies', () => {
 		await page.reload();
 
 		// Wait for the tags to load.
-		page.waitForSelector( '.components-form-token-field__token' );
+		await page.waitForSelector( '.components-form-token-field__token' );
 
 		tags = await getCurrentTags();
 

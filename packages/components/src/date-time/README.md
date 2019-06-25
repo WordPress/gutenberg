@@ -52,8 +52,7 @@ The current date and time at initialization. Optionally pass in a `null` value t
 The function called when a new date or time has been selected. It is passed the `currentDate` as an argument.
 
 - Type: `Function`
-- Required: No
-- Default: `noop`
+- Required: Yes
 
 ### is12Hour
 

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { mapKeys } from 'lodash';
-import memize from 'memize';
 
 /**
  * WordPress dependencies
@@ -12,25 +11,18 @@ import { addFilter } from '@wordpress/hooks';
 import { compose } from '@wordpress/compose';
 
 /**
- * Shared reference to an empty array for cases where it is important to avoid
- * returning a new array reference on every invocation, as in a connected or
- * other pure component which performs `shouldComponentUpdate` check on props.
- * This should be used as a last resort, since the normalized data should be
- * maintained by the reducer result in state.
- *
- * @type {Array}
- */
-const EMPTY_ARRAY = [];
-
-/**
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
- * @param {string} name     Format name.
- * @param {Object} settings Format settings.
+ * @param {string}   name                 Format name.
+ * @param {Object}   settings             Format settings.
+ * @param {string}   settings.tagName     The HTML tag this format will wrap the selection with.
+ * @param {string}   [settings.className] A class to match the format.
+ * @param {string}   settings.title       Name of the format.
+ * @param {Function} settings.edit        Should return a component for the user to interact with the new registered format.
  *
- * @return {?WPFormat} The format, if it has been successfully registered;
- *                     otherwise `undefined`.
+ * @return {WPFormat|undefined} The format, if it has been successfully registered;
+ *                              otherwise `undefined`.
  */
 export function registerFormatType( name, settings ) {
 	settings = {
@@ -131,97 +123,78 @@ export function registerFormatType( name, settings ) {
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
 
-	const getFunctionStackMemoized = memize( ( previousStack = EMPTY_ARRAY, newFunction ) => {
-		return [
-			...previousStack,
-			newFunction,
-		];
-	} );
-
-	if (
-		settings.__experimentalGetPropsForEditableTreePreparation
-	) {
+	if ( settings.__experimentalCreatePrepareEditableTree ) {
 		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
-			let Component = OriginalComponent;
-			if (
-				settings.__experimentalCreatePrepareEditableTree ||
-				settings.__experimentalCreateFormatToValue ||
-				settings.__experimentalCreateValueToFormat
-			) {
-				Component = ( props ) => {
-					const additionalProps = {};
+			const selectPrefix = `format_prepare_props_(${ name })_`;
+			const dispatchPrefix = `format_on_change_props_(${ name })_`;
 
-					if ( settings.__experimentalCreatePrepareEditableTree ) {
-						additionalProps.prepareEditableTree = getFunctionStackMemoized(
-							props.prepareEditableTree,
-							settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ], {
-								richTextIdentifier: props.identifier,
-								blockClientId: props.clientId,
-							} )
-						);
+			const Component = ( props ) => {
+				const newProps = { ...props };
+				const propsByPrefix = Object.keys( props ).reduce( ( accumulator, key ) => {
+					if ( key.startsWith( selectPrefix ) ) {
+						accumulator[ key.slice( selectPrefix.length ) ] = props[ key ];
 					}
 
-					if ( settings.__experimentalCreateOnChangeEditableValue ) {
-						const dispatchProps = Object.keys( props ).reduce( ( accumulator, propKey ) => {
-							const propValue = props[ propKey ];
-							const keyPrefix = `format_${ name }_dispatch_`;
-							if ( propKey.startsWith( keyPrefix ) ) {
-								const realKey = propKey.replace( keyPrefix, '' );
-
-								accumulator[ realKey ] = propValue;
-							}
-
-							return accumulator;
-						}, {} );
-
-						additionalProps.onChangeEditableValue = getFunctionStackMemoized(
-							props.onChangeEditableValue,
-							settings.__experimentalCreateOnChangeEditableValue( {
-								...props[ `format_${ name }` ],
-								...dispatchProps,
-							}, {
-								richTextIdentifier: props.identifier,
-								blockClientId: props.clientId,
-							} )
-						);
+					if ( key.startsWith( dispatchPrefix ) ) {
+						accumulator[ key.slice( dispatchPrefix.length ) ] = props[ key ];
 					}
 
-					return <OriginalComponent
-						{ ...props }
-						{ ...additionalProps }
-					/>;
+					return accumulator;
+				}, {} );
+				const args = {
+					richTextIdentifier: props.identifier,
+					blockClientId: props.clientId,
 				};
-			}
 
-			const hocs = [
-				withSelect( ( sel, { clientId, identifier } ) => ( {
-					[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation(
-						sel,
-						{
+				if ( settings.__experimentalCreateOnChangeEditableValue ) {
+					newProps[ `format_value_functions_(${ name })` ] =
+						settings.__experimentalCreatePrepareEditableTree(
+							propsByPrefix,
+							args
+						);
+					newProps[ `format_on_change_functions_(${ name })` ] =
+						settings.__experimentalCreateOnChangeEditableValue(
+							propsByPrefix,
+							args
+						);
+				} else {
+					newProps[ `format_prepare_functions_(${ name })` ] =
+						settings.__experimentalCreatePrepareEditableTree(
+							propsByPrefix,
+							args
+						);
+				}
+
+				return <OriginalComponent { ...newProps } />;
+			};
+
+			const hocs = [];
+
+			if ( settings.__experimentalGetPropsForEditableTreePreparation ) {
+				hocs.push( withSelect( ( sel, { clientId, identifier } ) =>
+					mapKeys(
+						settings.__experimentalGetPropsForEditableTreePreparation( sel, {
 							richTextIdentifier: identifier,
 							blockClientId: clientId,
-						}
-					),
-				} ) ),
-			];
+						} ),
+						( value, key ) => selectPrefix + key
+					)
+				) );
+			}
 
 			if ( settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
-				hocs.push( withDispatch( ( disp, { clientId, identifier } ) => {
-					const dispatchProps = settings.__experimentalGetPropsForEditableTreeChangeHandler(
-						disp,
-						{
+				hocs.push( withDispatch( ( disp, { clientId, identifier } ) =>
+					mapKeys(
+						settings.__experimentalGetPropsForEditableTreeChangeHandler( disp, {
 							richTextIdentifier: identifier,
 							blockClientId: clientId,
-						}
-					);
-
-					return mapKeys( dispatchProps, ( value, key ) => {
-						return `format_${ name }_dispatch_${ key }`;
-					} );
-				} ) );
+						} ),
+						( value, key ) => dispatchPrefix + key
+					)
+				) );
 			}
 
-			return compose( hocs )( Component );
+			return hocs.length ? compose( hocs )( Component ) : Component;
 		} );
 	}
 

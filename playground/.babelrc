@@ -1,0 +1,9 @@
+{
+	"presets": ["@wordpress/babel-preset-default"],
+	"plugins": [
+		[ "@babel/plugin-transform-react-jsx", {
+			"pragma": "createElement"
+		} ],
+		"babel-plugin-inline-json-import"
+	]
+}

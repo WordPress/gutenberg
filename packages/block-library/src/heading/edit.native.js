@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import HeadingToolbar from './heading-toolbar';
+import styles from './editor.scss';
 
 /**
  * External dependencies
@@ -12,76 +13,51 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { RichText, BlockControls } from '@wordpress/editor';
+import { RichText, BlockControls } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import './editor.scss';
+const HeadingEdit = ( {
+	attributes,
+	mergeBlocks,
+	onFocus,
+	onReplace,
+	setAttributes,
+	style,
+} ) => (
+	<View onAccessibilityTap={ onFocus }>
+		<BlockControls>
+			<HeadingToolbar
+				minLevel={ 2 }
+				maxLevel={ 5 }
+				selectedLevel={ attributes.level }
+				onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) }
+			/>
+		</BlockControls>
+		<RichText
+			identifier="content"
+			tagName={ 'h' + attributes.level }
+			value={ attributes.content }
+			style={ {
+				...style,
+				minHeight: styles[ 'wp-block-heading' ].minHeight,
+			} }
+			onChange={ ( value ) => setAttributes( { content: value } ) }
+			onMerge={ mergeBlocks }
+			onSplit={ ( value ) => {
+				if ( ! value ) {
+					return createBlock( 'core/paragraph' );
+				}
 
-const minHeight = 24;
+				return createBlock( 'core/heading', {
+					...attributes,
+					content: value,
+				} );
+			} }
+			onReplace={ onReplace }
+			onRemove={ () => onReplace( [] ) }
+			placeholder={ attributes.placeholder || __( 'Write heading…' ) }
+		/>
+	</View>
+);
 
-class HeadingEdit extends Component {
-	constructor( props ) {
-		super( props );
-
-		this.state = {
-			aztecHeight: 0,
-		};
-	}
-
-	render() {
-		const {
-			attributes,
-			setAttributes,
-			mergeBlocks,
-			insertBlocksAfter,
-		} = this.props;
-
-		const {
-			level,
-			placeholder,
-			content,
-		} = attributes;
-
-		const tagName = 'h' + level;
-		return (
-			<View>
-				<BlockControls>
-					<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-				</BlockControls>
-				<RichText
-					tagName={ tagName }
-					value={ content }
-					isSelected={ this.props.isSelected }
-					onFocus={ this.props.onFocus } // always assign onFocus as a props
-					onBlur={ this.props.onBlur } // always assign onBlur as a props
-					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
-					style={ {
-						minHeight: Math.max( minHeight, this.state.aztecHeight ),
-					} }
-					onChange={ ( value ) => setAttributes( { content: value } ) }
-					onMerge={ mergeBlocks }
-					onSplit={
-						insertBlocksAfter ?
-							( before, after, ...blocks ) => {
-								setAttributes( { content: before } );
-								insertBlocksAfter( [
-									...blocks,
-									createBlock( 'core/paragraph', { content: after } ),
-								] );
-							} :
-							undefined
-					}
-					onContentSizeChange={ ( event ) => {
-						this.setState( { aztecHeight: event.aztecHeight } );
-					} }
-					placeholder={ placeholder || __( 'Write heading…' ) }
-				/>
-			</View>
-		);
-	}
-}
 export default HeadingEdit;

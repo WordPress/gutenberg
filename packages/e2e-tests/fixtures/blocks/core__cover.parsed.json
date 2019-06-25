@@ -2,13 +2,29 @@
     {
         "blockName": "core/cover",
         "attrs": {
-            "url": "https://cldup.com/uuUqE_dXzy.jpg",
+            "url": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
             "dimRatio": 40
         },
-        "innerBlocks": [],
-        "innerHTML": "\n<div class=\"wp-block-cover has-background-dim-40 has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <p class=\"wp-block-cover-text\">Guten Berg!</p>\n</div>\n",
+        "innerBlocks": [
+            {
+                "blockName": "core/paragraph",
+                "attrs": {
+                    "align": "center",
+                    "placeholder": "Write title…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "innerHTML": "\n\t\t<p style=\"text-align:center\" class=\"has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>\n\t\t",
+                "innerContent": [
+                    "\n\t\t<p style=\"text-align:center\" class=\"has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>\n\t\t"
+                ]
+            }
+        ],
+        "innerHTML": "\n<div\n\tclass=\"wp-block-cover has-background-dim-40 has-background-dim\"\n\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=)\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-cover has-background-dim-40 has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <p class=\"wp-block-cover-text\">Guten Berg!</p>\n</div>\n"
+            "\n<div\n\tclass=\"wp-block-cover has-background-dim-40 has-background-dim\"\n\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=)\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t",
+            null,
+            "\n\t</div>\n</div>\n"
         ]
     },
     {

@@ -1,0 +1,14 @@
+{
+	"name": "core/column",
+	"category": "common",
+	"attributes": {
+		"verticalAlignment": {
+			"type": "string"
+		},
+		"width": {
+			"type": "number",
+			"min": 0,
+			"max": 100
+		}
+	}
+}

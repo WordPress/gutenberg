@@ -81,6 +81,7 @@ describe( 'create', () => {
 
 		expect( value ).toEqual( {
 			formats: [ [ em ], [ em ], [ em, strong ], [ em, strong ] ],
+			replacements: [ , , , , ],
 			text: 'test',
 		} );
 

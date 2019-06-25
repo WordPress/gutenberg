@@ -48,14 +48,9 @@ function RangeControl( {
 
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
-		const newNumericValue = parseInt( newValue, 10 );
 		// If the input value is invalid temporarily save it to the state,
 		// without calling on change.
-		if (
-			isNaN( newNumericValue ) ||
-			( min !== undefined && newNumericValue < min ) ||
-			( max !== undefined && newNumericValue > max )
-		) {
+		if ( ! event.target.checkValidity() ) {
 			setState( {
 				currentInput: newValue,
 			} );
@@ -64,9 +59,12 @@ function RangeControl( {
 		// The input is valid, reset the local state property used to temporaly save the value,
 		// and call onChange with the new value as a number.
 		resetCurrentInput();
-		onChange( newNumericValue );
+		onChange( ( newValue === '' ) ?
+			undefined :
+			parseFloat( newValue )
+		);
 	};
-	const initialSliderValue = isFinite( value ) ?
+	const initialSliderValue = isFinite( currentInputValue ) ?
 		currentInputValue :
 		initialPosition || '';
 
@@ -100,11 +98,17 @@ function RangeControl( {
 				onBlur={ resetCurrentInput }
 				{ ...props }
 			/>
-			{ allowReset &&
-				<Button onClick={ resetValue } disabled={ value === undefined }>
+			{ allowReset && (
+				<Button
+					onClick={ resetValue }
+					disabled={ value === undefined }
+					isSmall
+					isDefault
+					className="components-range-control__reset"
+				>
 					{ __( 'Reset' ) }
 				</Button>
-			}
+			) }
 		</BaseControl>
 	);
 }

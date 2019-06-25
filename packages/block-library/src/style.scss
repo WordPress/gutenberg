@@ -1,6 +1,4 @@
 @import "./audio/style.scss";
-@import "./block/edit-panel/style.scss";
-@import "./block/indicator/style.scss";
 @import "./button/style.scss";
 @import "./calendar/style.scss";
 @import "./categories/style.scss";
@@ -19,108 +17,119 @@
 @import "./rss/style.scss";
 @import "./search/style.scss";
 @import "./separator/style.scss";
+@import "./spacer/style.scss";
 @import "./subhead/style.scss";
 @import "./table/style.scss";
 @import "./text-columns/style.scss";
 @import "./verse/style.scss";
 @import "./video/style.scss";
 
-// Class names are doubled to increase specificity to assure colors take effect
-// over another base class color.
+// The following selectors have increased specificity (using the :root prefix)
+// to assure colors take effect over another base class color, mainly to let
+// the colors override the added specificity by link states such as :hover.
 
-.has-pale-pink-background-color.has-pale-pink-background-color {
-	background-color: #f78da7;
+:root {
+	// Background colors.
+
+	.has-pale-pink-background-color {
+		background-color: #f78da7;
+	}
+
+	.has-vivid-red-background-color {
+		background-color: #cf2e2e;
+	}
+
+	.has-luminous-vivid-orange-background-color {
+		background-color: #ff6900;
+	}
+
+	.has-luminous-vivid-amber-background-color {
+		background-color: #fcb900;
+	}
+
+	.has-light-green-cyan-background-color {
+		background-color: #7bdcb5;
+	}
+
+	.has-vivid-green-cyan-background-color {
+		background-color: #00d084;
+	}
+
+	.has-pale-cyan-blue-background-color {
+		background-color: #8ed1fc;
+	}
+
+	.has-vivid-cyan-blue-background-color {
+		background-color: #0693e3;
+	}
+
+	.has-very-light-gray-background-color {
+		background-color: #eee;
+	}
+
+	.has-cyan-bluish-gray-background-color {
+		background-color: #abb8c3;
+	}
+
+	.has-very-dark-gray-background-color {
+		background-color: #313131;
+	}
+
+	// Foreground colors.
+
+	.has-pale-pink-color {
+		color: #f78da7;
+	}
+
+	.has-vivid-red-color {
+		color: #cf2e2e;
+	}
+
+	.has-luminous-vivid-orange-color {
+		color: #ff6900;
+	}
+
+	.has-luminous-vivid-amber-color {
+		color: #fcb900;
+	}
+
+	.has-light-green-cyan-color {
+		color: #7bdcb5;
+	}
+
+	.has-vivid-green-cyan-color {
+		color: #00d084;
+	}
+
+	.has-pale-cyan-blue-color {
+		color: #8ed1fc;
+	}
+
+	.has-vivid-cyan-blue-color {
+		color: #0693e3;
+	}
+
+	.has-very-light-gray-color {
+		color: #eee;
+	}
+
+	.has-cyan-bluish-gray-color {
+		color: #abb8c3;
+	}
+
+	.has-very-dark-gray-color {
+		color: #313131;
+	}
 }
 
-.has-vivid-red-background-color.has-vivid-red-background-color {
-	background-color: #cf2e2e;
-}
 
-.has-luminous-vivid-orange-background-color.has-luminous-vivid-orange-background-color {
-	background-color: #ff6900;
-}
-
-.has-luminous-vivid-amber-background-color.has-luminous-vivid-amber-background-color {
-	background-color: #fcb900;
-}
-
-.has-light-green-cyan-background-color.has-light-green-cyan-background-color {
-	background-color: #7bdcb5;
-}
-
-.has-vivid-green-cyan-background-color.has-vivid-green-cyan-background-color {
-	background-color: #00d084;
-}
-
-.has-pale-cyan-blue-background-color.has-pale-cyan-blue-background-color {
-	background-color: #8ed1fc;
-}
-
-.has-vivid-cyan-blue-background-color.has-vivid-cyan-blue-background-color {
-	background-color: #0693e3;
-}
-
-.has-very-light-gray-background-color.has-very-light-gray-background-color {
-	background-color: #eee;
-}
-
-.has-cyan-bluish-gray-background-color.has-cyan-bluish-gray-background-color {
-	background-color: #abb8c3;
-}
-
-.has-very-dark-gray-background-color.has-very-dark-gray-background-color {
-	background-color: #313131;
-}
-
-.has-pale-pink-color.has-pale-pink-color {
-	color: #f78da7;
-}
-
-.has-vivid-red-color.has-vivid-red-color {
-	color: #cf2e2e;
-}
-
-.has-luminous-vivid-orange-color.has-luminous-vivid-orange-color {
-	color: #ff6900;
-}
-
-.has-luminous-vivid-amber-color.has-luminous-vivid-amber-color {
-	color: #fcb900;
-}
-
-.has-light-green-cyan-color.has-light-green-cyan-color {
-	color: #7bdcb5;
-}
-
-.has-vivid-green-cyan-color.has-vivid-green-cyan-color {
-	color: #00d084;
-}
-
-.has-pale-cyan-blue-color.has-pale-cyan-blue-color {
-	color: #8ed1fc;
-}
-
-.has-vivid-cyan-blue-color.has-vivid-cyan-blue-color {
-	color: #0693e3;
-}
-
-.has-very-light-gray-color.has-very-light-gray-color {
-	color: #eee;
-}
-
-.has-cyan-bluish-gray-color.has-cyan-bluish-gray-color {
-	color: #abb8c3;
-}
-
-.has-very-dark-gray-color.has-very-dark-gray-color {
-	color: #313131;
-}
+// Font sizes.
 
 .has-small-font-size {
 	font-size: 13px;
 }
 
-.has-regular-font-size, // not used now, kept because of backward compatibility.
+.has-regular-font-size, // Not used now, kept because of backward compatibility.
 .has-normal-font-size {
 	font-size: 16px;
 }
@@ -133,7 +142,44 @@
 	font-size: 36px;
 }
 
-.has-larger-font-size, // not used now, kept because of backward compatibility.
+.has-larger-font-size, // Not used now, kept because of backward compatibility.
 .has-huge-font-size {
 	font-size: 42px;
+}
+
+// Text alignments.
+.has-text-align-center {
+	text-align: center;
+}
+
+.has-text-align-left {
+	text-align: left;
+}
+
+.has-text-align-right {
+	text-align: right;
+}
+
+/**
+ * Vanilla Block Styles
+ * These are base styles that apply across blocks, meant to provide a baseline.
+ * They are applied both to the editor and the theme, so we should have as few of these as possible.
+ * Please note that some styles are stored in packages/editor/src/editor-styles.scss, as they pertain to CSS bleed for the editor only.
+ */
+
+// Caption styles.
+// Supply these even if the theme hasn't opted in, because the figcaption element is not likely to be styled in the majority of existing themes.
+// By providing a minimum of margin styles, we ensure it doesn't look broken or unstyled in those themes.
+figcaption {
+	margin-top: 0.5em;
+}
+
+// Apply some base styles to blocks that need them.
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+iframe {
+	width: 100%;
 }

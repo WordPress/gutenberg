@@ -9,8 +9,8 @@ import { times, unescape } from 'lodash';
 import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { InspectorControls } from '@wordpress/editor';
-import { Component, Fragment } from '@wordpress/element';
+import { InspectorControls } from '@wordpress/block-editor';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 class CategoriesEdit extends Component {
@@ -86,7 +86,7 @@ class CategoriesEdit extends Component {
 
 		return (
 			<li key={ category.id }>
-				<a href={ category.link } target="_blank">{ this.renderCategoryName( category ) }</a>
+				<a href={ category.link } target="_blank" rel="noreferrer noopener">{ this.renderCategoryName( category ) }</a>
 				{ showPostCounts &&
 					<span className="wp-block-categories__post-count">
 						{ ' ' }({ category.count })
@@ -112,14 +112,14 @@ class CategoriesEdit extends Component {
 		const categories = this.getCategories( parentId );
 		const selectId = `blocks-category-select-${ instanceId }`;
 		return (
-			<Fragment>
+			<>
 				<label htmlFor={ selectId } className="screen-reader-text">
 					{ __( 'Categories' ) }
 				</label>
 				<select id={ selectId } className="wp-block-categories__dropdown">
 					{ categories.map( ( category ) => this.renderCategoryDropdownItem( category, 0 ) ) }
 				</select>
-			</Fragment>
+			</>
 		);
 	}
 
@@ -172,7 +172,7 @@ class CategoriesEdit extends Component {
 
 		if ( isRequesting ) {
 			return (
-				<Fragment>
+				<>
 					{ inspectorControls }
 					<Placeholder
 						icon="admin-post"
@@ -180,12 +180,12 @@ class CategoriesEdit extends Component {
 					>
 						<Spinner />
 					</Placeholder>
-				</Fragment>
+				</>
 			);
 		}
 
 		return (
-			<Fragment>
+			<>
 				{ inspectorControls }
 				<div className={ this.props.className }>
 					{
@@ -194,7 +194,7 @@ class CategoriesEdit extends Component {
 							this.renderCategoryList()
 					}
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 }

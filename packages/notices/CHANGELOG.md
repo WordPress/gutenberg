@@ -1,3 +1,9 @@
+## 1.5.0 (2019-06-12)
+
+### New Features
+
+- Support a new `snackbar` notice type in the `createNotice` action.
+
 ## 1.1.2 (2019-01-03)
 
 ## 1.1.1 (2018-12-12)
@@ -6,7 +12,6 @@
 
 ### New Feature
 
-- The `createNotice` can now optionally accept a WPNotice object as the sole argument.
 - New option `speak` enables control as to whether the notice content is announced to screen readers (defaults to `true`)
 
 ### Bug Fixes

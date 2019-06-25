@@ -7,15 +7,15 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, createRef } from '@wordpress/element';
+import { Component, createRef, useMemo } from '@wordpress/element';
 import {
 	ExternalLink,
 	IconButton,
 	ToggleControl,
 	withSpokenMessages,
-	PositionedAtSelection,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { getRectangleFromRange } from '@wordpress/dom';
 import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import {
 	create,
@@ -25,7 +25,7 @@ import {
 	getTextContent,
 	slice,
 } from '@wordpress/rich-text';
-import { URLInput, URLPopover } from '@wordpress/editor';
+import { URLInput, URLPopover } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -42,7 +42,7 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 	<form
-		className="editor-format-toolbar__link-container-content"
+		className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 		onKeyPress={ stopKeyPropagation }
 		onKeyDown={ onKeyDown }
 		onSubmit={ submitLink }
@@ -59,7 +59,7 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 
 const LinkViewerUrl = ( { url } ) => {
 	const prependedURL = prependHTTP( url );
-	const linkClassName = classnames( 'editor-format-toolbar__link-container-value', {
+	const linkClassName = classnames( 'editor-format-toolbar__link-container-value block-editor-format-toolbar__link-container-value', {
 		'has-invalid-link': ! isValidHref( prependedURL ),
 	} );
 
@@ -77,12 +77,46 @@ const LinkViewerUrl = ( { url } ) => {
 	);
 };
 
+const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
+	const anchorRect = useMemo( () => {
+		const selection = window.getSelection();
+		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
+		if ( ! range ) {
+			return;
+		}
+
+		if ( addingLink ) {
+			return getRectangleFromRange( range );
+		}
+
+		let element = range.startContainer;
+
+		// If the caret is right before the element, select the next element.
+		element = element.nextElementSibling || element;
+
+		while ( element.nodeType !== window.Node.ELEMENT_NODE ) {
+			element = element.parentNode;
+		}
+
+		const closest = element.closest( 'a' );
+		if ( closest ) {
+			return closest.getBoundingClientRect();
+		}
+	}, [ isActive, addingLink, value.start, value.end ] );
+
+	if ( ! anchorRect ) {
+		return null;
+	}
+
+	return <URLPopover anchorRect={ anchorRect } { ...props } />;
+};
+
 const LinkViewer = ( { url, editLink } ) => {
 	return (
 		// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		<div
-			className="editor-format-toolbar__link-container-content"
+			className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 			onKeyPress={ stopKeyPropagation }
 		>
 			<LinkViewerUrl url={ url } />
@@ -221,37 +255,36 @@ class InlineLinkUI extends Component {
 		const showInput = isShowingInput( this.props, this.state );
 
 		return (
-			<PositionedAtSelection
-				key={ `${ value.start }${ value.end }` /* Used to force rerender on selection change */ }
+			<URLPopoverAtLink
+				value={ value }
+				isActive={ isActive }
+				addingLink={ addingLink }
+				onClickOutside={ this.onClickOutside }
+				onClose={ this.resetState }
+				focusOnMount={ showInput ? 'firstElement' : false }
+				renderSettings={ () => (
+					<ToggleControl
+						label={ __( 'Open in New Tab' ) }
+						checked={ opensInNewWindow }
+						onChange={ this.setLinkTarget }
+					/>
+				) }
 			>
-				<URLPopover
-					onClickOutside={ this.onClickOutside }
-					onClose={ this.resetState }
-					focusOnMount={ showInput ? 'firstElement' : false }
-					renderSettings={ () => (
-						<ToggleControl
-							label={ __( 'Open in New Tab' ) }
-							checked={ opensInNewWindow }
-							onChange={ this.setLinkTarget }
-						/>
-					) }
-				>
-					{ showInput ? (
-						<LinkEditor
-							value={ inputValue }
-							onChangeInputValue={ this.onChangeInputValue }
-							onKeyDown={ this.onKeyDown }
-							submitLink={ this.submitLink }
-							autocompleteRef={ this.autocompleteRef }
-						/>
-					) : (
-						<LinkViewer
-							url={ url }
-							editLink={ this.editLink }
-						/>
-					) }
-				</URLPopover>
-			</PositionedAtSelection>
+				{ showInput ? (
+					<LinkEditor
+						value={ inputValue }
+						onChangeInputValue={ this.onChangeInputValue }
+						onKeyDown={ this.onKeyDown }
+						submitLink={ this.submitLink }
+						autocompleteRef={ this.autocompleteRef }
+					/>
+				) : (
+					<LinkViewer
+						url={ url }
+						editLink={ this.editLink }
+					/>
+				) }
+			</URLPopoverAtLink>
 		);
 	}
 }

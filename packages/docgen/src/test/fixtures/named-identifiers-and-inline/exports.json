@@ -1,0 +1,290 @@
+[
+	{
+		"type": "ExportNamedDeclaration",
+		"start": 141,
+		"end": 190,
+		"loc": {
+			"start": {
+				"line": 11,
+				"column": 0
+			},
+			"end": {
+				"line": 11,
+				"column": 49
+			}
+		},
+		"range": [
+			141,
+			190
+		],
+		"declaration": null,
+		"specifiers": [
+			{
+				"type": "ExportSpecifier",
+				"start": 150,
+				"end": 169,
+				"loc": {
+					"start": {
+						"line": 11,
+						"column": 9
+					},
+					"end": {
+						"line": 11,
+						"column": 28
+					}
+				},
+				"range": [
+					150,
+					169
+				],
+				"local": {
+					"type": "Identifier",
+					"start": 150,
+					"end": 169,
+					"loc": {
+						"start": {
+							"line": 11,
+							"column": 9
+						},
+						"end": {
+							"line": 11,
+							"column": 28
+						}
+					},
+					"range": [
+						150,
+						169
+					],
+					"name": "functionDeclaration"
+				},
+				"exported": {
+					"type": "Identifier",
+					"start": 150,
+					"end": 169,
+					"loc": {
+						"start": {
+							"line": 11,
+							"column": 9
+						},
+						"end": {
+							"line": 11,
+							"column": 28
+						}
+					},
+					"range": [
+						150,
+						169
+					],
+					"name": "functionDeclaration"
+				}
+			},
+			{
+				"type": "ExportSpecifier",
+				"start": 171,
+				"end": 187,
+				"loc": {
+					"start": {
+						"line": 11,
+						"column": 30
+					},
+					"end": {
+						"line": 11,
+						"column": 46
+					}
+				},
+				"range": [
+					171,
+					187
+				],
+				"local": {
+					"type": "Identifier",
+					"start": 171,
+					"end": 187,
+					"loc": {
+						"start": {
+							"line": 11,
+							"column": 30
+						},
+						"end": {
+							"line": 11,
+							"column": 46
+						}
+					},
+					"range": [
+						171,
+						187
+					],
+					"name": "ClassDeclaration"
+				},
+				"exported": {
+					"type": "Identifier",
+					"start": 171,
+					"end": 187,
+					"loc": {
+						"start": {
+							"line": 11,
+							"column": 30
+						},
+						"end": {
+							"line": 11,
+							"column": 46
+						}
+					},
+					"range": [
+						171,
+						187
+					],
+					"name": "ClassDeclaration"
+				}
+			}
+		],
+		"source": null,
+		"trailingComments": [
+			{
+				"type": "Block",
+				"value": "*\n * Variable declaration example.\n ",
+				"start": 192,
+				"end": 232,
+				"range": [
+					192,
+					232
+				],
+				"loc": {
+					"start": {
+						"line": 13,
+						"column": 0
+					},
+					"end": {
+						"line": 15,
+						"column": 3
+					}
+				}
+			}
+		]
+	},
+	{
+		"type": "ExportNamedDeclaration",
+		"start": 233,
+		"end": 273,
+		"loc": {
+			"start": {
+				"line": 16,
+				"column": 0
+			},
+			"end": {
+				"line": 16,
+				"column": 40
+			}
+		},
+		"range": [
+			233,
+			273
+		],
+		"declaration": {
+			"type": "VariableDeclaration",
+			"start": 240,
+			"end": 273,
+			"loc": {
+				"start": {
+					"line": 16,
+					"column": 7
+				},
+				"end": {
+					"line": 16,
+					"column": 40
+				}
+			},
+			"range": [
+				240,
+				273
+			],
+			"declarations": [
+				{
+					"type": "VariableDeclarator",
+					"start": 246,
+					"end": 272,
+					"loc": {
+						"start": {
+							"line": 16,
+							"column": 13
+						},
+						"end": {
+							"line": 16,
+							"column": 39
+						}
+					},
+					"range": [
+						246,
+						272
+					],
+					"id": {
+						"type": "Identifier",
+						"start": 246,
+						"end": 265,
+						"loc": {
+							"start": {
+								"line": 16,
+								"column": 13
+							},
+							"end": {
+								"line": 16,
+								"column": 32
+							}
+						},
+						"range": [
+							246,
+							265
+						],
+						"name": "variableDeclaration"
+					},
+					"init": {
+						"type": "Literal",
+						"start": 268,
+						"end": 272,
+						"loc": {
+							"start": {
+								"line": 16,
+								"column": 35
+							},
+							"end": {
+								"line": 16,
+								"column": 39
+							}
+						},
+						"range": [
+							268,
+							272
+						],
+						"value": true,
+						"raw": "true"
+					}
+				}
+			],
+			"kind": "const"
+		},
+		"specifiers": [],
+		"source": null,
+		"leadingComments": [
+			{
+				"type": "Block",
+				"value": "*\n * Variable declaration example.\n ",
+				"start": 192,
+				"end": 232,
+				"range": [
+					192,
+					232
+				],
+				"loc": {
+					"start": {
+						"line": 13,
+						"column": 0
+					},
+					"end": {
+						"line": 15,
+						"column": 3
+					}
+				}
+			}
+		]
+	}
+]

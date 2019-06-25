@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data",
-	"version": "4.2.1",
+	"version": "4.6.0",
 	"description": "Data module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,8 +22,9 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.3.1",
+		"@babel/runtime": "^7.4.4",
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/priority-queue": "file:../priority-queue",

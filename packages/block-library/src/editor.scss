@@ -9,14 +9,17 @@
 @import "./file/editor.scss";
 @import "./classic/editor.scss";
 @import "./gallery/editor.scss";
-@import "./heading/editor.scss";
+@import "./group/editor.scss";
 @import "./html/editor.scss";
 @import "./image/editor.scss";
 @import "./latest-comments/editor.scss";
 @import "./latest-posts/editor.scss";
+@import "./legacy-widget/editor.scss";
 @import "./media-text/editor.scss";
 @import "./list/editor.scss";
 @import "./more/editor.scss";
+@import "./navigation-menu/editor.scss";
+@import "./navigation-menu-item/editor.scss";
 @import "./nextpage/editor.scss";
 @import "./paragraph/editor.scss";
 @import "./preformatted/editor.scss";
@@ -32,3 +35,23 @@
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
+
+/**
+ * Import styles from internal editor components used by the blocks.
+ */
+@import "./block/edit-panel/editor.scss";
+@import "./block/indicator/editor.scss";
+
+/**
+ * Editor Normalization Styles
+ *
+ * These are only output in the editor, but styles here are NOT prefixed .editor-styles-wrapper.
+ * This allows us to create normalization styles that are easily overridden by editor styles.
+ */
+
+// Provide every block with a default base margin. This margin provides a consistent spacing
+// between blocks in the editor.
+[data-block] {
+	margin-top: $default-block-margin;
+	margin-bottom: $default-block-margin;
+}

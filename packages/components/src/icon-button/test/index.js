@@ -2,6 +2,12 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
+
+/**
+ * WordPress dependencies
+ */
+import { createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -49,9 +55,11 @@ describe( 'IconButton', () => {
 			expect( iconButton.hasClass( 'test' ) ).toBe( true );
 		} );
 
-		it( 'should add an additonal prop to the IconButton element', () => {
-			const iconButton = shallow( <IconButton test="test" /> );
-			expect( iconButton.props().test ).toBe( 'test' );
+		it( 'should pass additional props to the underlying button', () => {
+			const iconButton = shallow( <IconButton disabled aria-pressed="true" /> );
+
+			expect( iconButton.find( 'ForwardRef(Button)' ).prop( 'aria-pressed' ) ).toBe( 'true' );
+			expect( iconButton.find( 'ForwardRef(Button)' ).prop( 'disabled' ) ).toBe( true );
 		} );
 
 		it( 'should allow custom tooltip text', () => {
@@ -71,6 +79,13 @@ describe( 'IconButton', () => {
 			const iconButton = shallow( <IconButton label="WordPress" children={ [] } /> );
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
+		} );
+
+		it( 'forwards ref', () => {
+			const ref = createRef();
+
+			TestUtils.renderIntoDocument( <IconButton ref={ ref } /> );
+			expect( ref.current.type ).toBe( 'button' );
 		} );
 	} );
 } );

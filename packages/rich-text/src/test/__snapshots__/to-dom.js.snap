@@ -36,6 +36,7 @@ exports[`recordToDom should create a value with formatting with attributes 1`] =
 
 exports[`recordToDom should create a value with image object 1`] = `
 <body>
+  
   <img
     src=""
   />
@@ -45,7 +46,10 @@ exports[`recordToDom should create a value with image object 1`] = `
 
 exports[`recordToDom should create a value with image object and formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
+    
     <img
       src=""
     />
@@ -57,7 +61,10 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
+    
     <img
       src=""
     />
@@ -132,8 +139,13 @@ exports[`recordToDom should filter format boundary attributes 1`] = `
 exports[`recordToDom should handle br 1`] = `
 <body>
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
+  <br
+    data-rich-text-padding="true"
+  />
 </body>
 `;
 
@@ -143,17 +155,24 @@ exports[`recordToDom should handle br with formatting 1`] = `
     data-rich-text-format-boundary="true"
   >
     
-    <br />
+    <br
+      data-rich-text-line-break="true"
+    />
     
   </em>
   
+  <br
+    data-rich-text-padding="true"
+  />
 </body>
 `;
 
 exports[`recordToDom should handle br with text 1`] = `
 <body>
   te
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   st
 </body>
 `;
@@ -161,9 +180,13 @@ exports[`recordToDom should handle br with text 1`] = `
 exports[`recordToDom should handle double br 1`] = `
 <body>
   a
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   b
 </body>
 `;
@@ -197,12 +220,14 @@ exports[`recordToDom should handle middle empty list value 1`] = `
     <br
       data-rich-text-padding="true"
     />
+    
   </li>
   <li>
     
     <br
       data-rich-text-padding="true"
     />
+    
   </li>
   <li>
     
@@ -276,6 +301,7 @@ exports[`recordToDom should handle multiline value with empty 1`] = `
 exports[`recordToDom should handle nested empty list value 1`] = `
 <body>
   <li>
+    
     <br
       data-rich-text-padding="true"
     />
@@ -294,9 +320,13 @@ exports[`recordToDom should handle nested empty list value 1`] = `
 exports[`recordToDom should handle selection before br 1`] = `
 <body>
   a
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   
-  <br />
+  <br
+    data-rich-text-line-break="true"
+  />
   b
 </body>
 `;

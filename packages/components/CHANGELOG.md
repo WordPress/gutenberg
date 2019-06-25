@@ -1,4 +1,69 @@
-## 7.1.0 (Unreleased)
+## Next release
+
+### New Features
+
+- Added a new `popoverProps` prop to the `Dropdown` component which allows users of the `Dropdown` component to pass props directly to the `PopOver` component.
+
+
+## 8.0.0 (2019-06-12)
+
+### New Feature
+
+- Add new `BlockQuotation` block to the primitives folder to support blockquote in a multiplatform way. [#15482](https://github.com/WordPress/gutenberg/pull/15482).
+- `DropdownMenu` now supports passing a [render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) as children for more advanced customization.
+
+### Internal
+
+- `MenuGroup` no longer uses `NavigableMenu` internally. It needs to be explicitly wrapped with `NavigableMenu` to bring back the same behavior.
+
+### Documentation
+
+- Added missing documentation for `DropdownMenu` props `menuLabel`, `position`, `className`.
+
+### Breaking Change
+
+- `ServerSideRender` is no longer part of components. It was extracted to an independent package `@wordpress/server-side-render`.
+
+### Bug Fix
+
+- Although `DateTimePicker` does not allow picking the seconds, passed the current seconds as the selected value for seconds when calling `onChange`. Now it passes zero.
+
+## 7.4.0 (2019-05-21)
+
+### New Feature
+
+- Added a new `HorizontalRule` component.
+- Added a new `Snackbar` component.
+
+### Bug Fix
+
+- Fixed display of reset button when using RangeControl `allowReset` prop.
+- Fixed minutes field of `DateTimePicker` missed '0' before single digit values.
+
+## 7.3.0 (2019-04-16)
+
+### New Features
+
+- Added a new `render` property to `FormFileUpload` component. Allowing users of the component to custom the UI for their needs.
+- Added a new `BaseControl.VisualLabel` component.
+- Added a new `preview` prop to the `Placeholder` component which allows to display a preview, for example a media preview when the Placeholder is used in media editing contexts.
+- Added a new `anchorRect` prop to `Popover` which enables a developer to provide a custom `DOMRect` object at which to position the popover.
+
+### Bug fixes
+
+- Fix `instanceId` prop passed through to `Button` component via `MenuItems` producing React console error. Fixed by removing the unnecessary use of `withInstanceId` on the `MenuItems` component [#14599](https://github.com/WordPress/gutenberg/pull/14599)
+
+## 7.2.0 (2019-03-20)
+
+### Improvements
+
+- Make `RangeControl` validation rely on the `checkValidity` provided by the browsers instead of using our own validation.
+
+### Bug Fixes
+
+- Fix a problem that made `RangeControl` not work as expected with float values.
+
+## 7.1.0 (2019-03-06)
 
 ### New Features
 

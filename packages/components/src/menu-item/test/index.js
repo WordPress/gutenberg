@@ -54,7 +54,7 @@ describe( 'MenuItem', () => {
 
 	it( 'should match snapshot when info is provided', () => {
 		const wrapper = shallow(
-			<MenuItem info="Extended description of My Item" instanceId={ 1 }>
+			<MenuItem info="Extended description of My Item">
 				My item
 			</MenuItem>
 		);

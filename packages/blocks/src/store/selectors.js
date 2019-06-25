@@ -2,7 +2,22 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { filter, get, includes, map, some } from 'lodash';
+import { filter, get, includes, map, some, flow, deburr } from 'lodash';
+
+/**
+ * Given a block name or block type object, returns the corresponding
+ * normalized block type object.
+ *
+ * @param {Object}          state      Blocks state.
+ * @param {(string|Object)} nameOrType Block name or type object
+ *
+ * @return {Object} Block type object.
+ */
+const getNormalizedBlockType = ( state, nameOrType ) => (
+	'string' === typeof nameOrType ?
+		getBlockType( state, nameOrType ) :
+		nameOrType
+);
 
 /**
  * Returns all the available block types.
@@ -87,6 +102,17 @@ export function getUnregisteredFallbackBlockName( state ) {
 }
 
 /**
+ * Returns the name of the block for handling unregistered blocks.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string?} Name of the block for handling unregistered blocks.
+ */
+export function getGroupingBlockName( state ) {
+	return state.groupingBlockName;
+}
+
+/**
  * Returns an array with the child blocks of a given block.
  *
  * @param {Object} state     Data state.
@@ -120,9 +146,7 @@ export const getChildBlockNames = createSelector(
  * @return {?*} Block support value
  */
 export const getBlockSupport = ( state, nameOrType, feature, defaultSupports ) => {
-	const blockType = 'string' === typeof nameOrType ?
-		getBlockType( state, nameOrType ) :
-		nameOrType;
+	const blockType = getNormalizedBlockType( state, nameOrType );
 
 	return get( blockType, [
 		'supports',
@@ -143,6 +167,50 @@ export const getBlockSupport = ( state, nameOrType, feature, defaultSupports ) =
  */
 export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
 	return !! getBlockSupport( state, nameOrType, feature, defaultSupports );
+}
+
+/**
+ * Returns true if the block type by the given name or object value matches a
+ * search term, or false otherwise.
+ *
+ * @param {Object}          state      Blocks state.
+ * @param {(string|Object)} nameOrType Block name or type object.
+ * @param {string}          searchTerm Search term by which to filter.
+ *
+ * @return {Object[]} Wheter block type matches search term.
+ */
+export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
+	const blockType = getNormalizedBlockType( state, nameOrType );
+
+	const getNormalizedSearchTerm = flow( [
+		// Disregard diacritics.
+		//  Input: "média"
+		deburr,
+
+		// Lowercase.
+		//  Input: "MEDIA"
+		( term ) => term.toLowerCase(),
+
+		// Strip leading and trailing whitespace.
+		//  Input: " media "
+		( term ) => term.trim(),
+	] );
+
+	const normalizedSearchTerm = getNormalizedSearchTerm( searchTerm );
+
+	const isSearchMatch = flow( [
+		getNormalizedSearchTerm,
+		( normalizedCandidate ) => includes(
+			normalizedCandidate,
+			normalizedSearchTerm
+		),
+	] );
+
+	return (
+		isSearchMatch( blockType.title ) ||
+		some( blockType.keywords, isSearchMatch ) ||
+		isSearchMatch( blockType.category )
+	);
 }
 
 /**

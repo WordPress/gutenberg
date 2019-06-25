@@ -4,14 +4,27 @@
         "name": "core/cover",
         "isValid": true,
         "attributes": {
-            "title": "Guten Berg!",
-            "url": "https://cldup.com/uuUqE_dXzy.jpg",
-            "contentAlign": "center",
+            "url": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
             "hasParallax": false,
             "dimRatio": 40,
             "backgroundType": "image"
         },
-        "innerBlocks": [],
-        "originalContent": "<div class=\"wp-block-cover has-background-dim-40 has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <p class=\"wp-block-cover-text\">Guten Berg!</p>\n</div>"
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "align": "center",
+                    "content": "\n\t\t\tGuten Berg!\n\t\t",
+                    "dropCap": false,
+                    "placeholder": "Write title…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "originalContent": "<p style=\"text-align:center\" class=\"has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>"
+            }
+        ],
+        "originalContent": "<div\n\tclass=\"wp-block-cover has-background-dim-40 has-background-dim\"\n\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=)\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
     }
 ]

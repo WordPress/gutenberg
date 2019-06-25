@@ -6,8 +6,10 @@
  */
 
 ?>
-<!-- wp:cover {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->
-<div class="wp-block-cover has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><p class="wp-block-cover-text"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p></div>
+<!-- wp:cover {"url":"https://cldup.com/Fz-ASbo2s3.jpg","className":"alignwide"} -->
+<div class="wp-block-cover has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<p style="text-align:center" class="has-large-font-size"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p>
+<!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
 
 <!-- wp:paragraph -->

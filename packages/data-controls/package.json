@@ -1,0 +1,31 @@
+{
+	"name": "@wordpress/data-controls",
+	"version": "1.0.0",
+	"description": "A set of common controls for the @wordpress/data api.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"data",
+		"controls"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/data-controls/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/data-controls"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/data": "file:../data"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

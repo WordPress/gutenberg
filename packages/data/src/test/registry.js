@@ -541,7 +541,7 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'dispatch', () => {
-		it( 'registers actions to the public API', () => {
+		it( 'registers actions to the public API', async () => {
 			const increment = ( count = 1 ) => ( { type: 'increment', count } );
 			const store = registry.registerStore( 'counter', {
 				reducer: ( state = 0, action ) => {
@@ -554,8 +554,14 @@ describe( 'createRegistry', () => {
 					increment,
 				},
 			} );
-
-			registry.dispatch( 'counter' ).increment(); // state = 1
+			// state = 1
+			const dispatchResult = await registry.dispatch( 'counter' ).increment();
+			await expect( dispatchResult ).toEqual(
+				{
+					type: 'increment',
+					count: 1,
+				}
+			);
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
 		} );
@@ -602,6 +608,54 @@ describe( 'createRegistry', () => {
 			registry.use( plugin, { value: 10 } );
 
 			expect( registry.select() ).toBe( 10 );
+		} );
+	} );
+
+	describe( 'parent registry', () => {
+		it( 'should call parent registry selectors/actions if defined', () => {
+			const mySelector = jest.fn();
+			const myAction = jest.fn();
+			const getSelectors = () => ( { mySelector } );
+			const getActions = () => ( { myAction } );
+			const subscribe = () => {};
+			registry.registerGenericStore( 'store', { getSelectors, getActions, subscribe } );
+			const subRegistry = createRegistry( {}, registry );
+
+			subRegistry.select( 'store' ).mySelector();
+			subRegistry.dispatch( 'store' ).myAction();
+
+			expect( mySelector ).toHaveBeenCalled();
+			expect( myAction ).toHaveBeenCalled();
+		} );
+
+		it( 'should override existing store in parent registry', () => {
+			const mySelector = jest.fn();
+			const myAction = jest.fn();
+			const getSelectors = () => ( { mySelector } );
+			const getActions = () => ( { myAction } );
+			const subscribe = () => {};
+			registry.registerGenericStore( 'store', { getSelectors, getActions, subscribe } );
+
+			const subRegistry = createRegistry( {}, registry );
+			const mySelector2 = jest.fn();
+			const myAction2 = jest.fn();
+			const getSelectors2 = () => ( { mySelector: mySelector2 } );
+			const getActions2 = () => ( { myAction: myAction2 } );
+			const subscribe2 = () => {};
+			subRegistry.registerGenericStore( 'store', {
+				getSelectors: getSelectors2,
+				getActions: getActions2,
+				subscribe: subscribe2,
+			} );
+
+			subRegistry.select( 'store' ).mySelector();
+			subRegistry.dispatch( 'store' ).myAction();
+
+			expect( mySelector ).not.toHaveBeenCalled();
+			expect( myAction ).not.toHaveBeenCalled();
+
+			expect( mySelector2 ).toHaveBeenCalled();
+			expect( myAction2 ).toHaveBeenCalled();
 		} );
 	} );
 } );

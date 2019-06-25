@@ -6,6 +6,7 @@
 @import "./components/header/pinned-plugins/style.scss";
 @import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/layout/style.scss";
+@import "./components/manage-blocks-modal/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/last-revision/style.scss";
@@ -57,62 +58,18 @@ html.wp-toolbar {
 }
 
 body.block-editor-page {
-	background: $white;
-
-	#wpcontent {
-		padding-left: 0;
-	}
-
-	#wpbody-content {
-		padding-bottom: 0;
-	}
-
-	/* We hide legacy notices in Gutenberg, because they were not designed in a way that scaled well.
-	   Plugins can use Gutenberg notices if they need to pass on information to the user when they are editing. */
-	#wpbody-content > div:not(.block-editor):not(#screen-meta) {
-		display: none;
-	}
-
-	#wpfooter {
-		display: none;
-	}
-
-	.a11y-speak-region {
-		left: -1px;
-		top: -1px;
-	}
-
-	ul#adminmenu a.wp-has-current-submenu::after,
-	ul#adminmenu > li.current > a.current::after {
-		border-right-color: $white;
-	}
-
-	.media-frame select.attachment-filters:last-of-type {
-		width: auto;
-		max-width: 100%;
-	}
+	@include wp-admin-reset( ".block-editor" );
 }
 
 .block-editor,
 // The modals are shown outside the .block-editor wrapper, they need these styles
 .components-modal__frame {
-	box-sizing: border-box;
-
-	*,
-	*::before,
-	*::after {
-		box-sizing: inherit;
-	}
-
-	select {
-		font-size: $default-font-size;
-		color: $dark-gray-500;
-	}
+	@include reset;
 }
 
 .block-editor__container {
-	// on mobile the main content area has to scroll
-	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	// On mobile the main content area has to scroll, otherwise you can invoke
+	// the overscroll bounce on the non-scrolling container, for a bad experience.
 	@include break-small {
 		position: absolute;
 		top: 0;
@@ -122,7 +79,7 @@ body.block-editor-page {
 		min-height: calc(100vh - #{ $admin-bar-height-big });
 	}
 
-	// The WP header height changes at this breakpoint
+	// The WP header height changes at this breakpoint.
 	@include break-medium {
 		min-height: calc(100vh - #{ $admin-bar-height });
 
@@ -131,156 +88,13 @@ body.block-editor-page {
 		}
 	}
 
-	img {
-		max-width: 100%;
-		height: auto;
-	}
-
-	iframe {
-		width: 100%;
-	}
-
 	.components-navigate-regions {
 		height: 100%;
 	}
 }
 
-// Override core input styles to provide styles consistent with Gutenberg.
-// Upstream ticket for redesigned input and styles in general: https://core.trac.wordpress.org/ticket/44749
-// Upstream ticket for redesigned checkbox: https://core.trac.wordpress.org/ticket/35596
-.editor-post-permalink,
-.edit-post-sidebar,
-.editor-post-publish-panel,
-.editor-block-list__block,
-.components-popover,
-.components-modal__content {
-	.input-control, // Upstream name is `.regular-text`.
-	input[type="text"],
-	input[type="search"],
-	input[type="radio"],
-	input[type="tel"],
-	input[type="time"],
-	input[type="url"],
-	input[type="week"],
-	input[type="password"],
-	input[type="checkbox"],
-	input[type="color"],
-	input[type="date"],
-	input[type="datetime"],
-	input[type="datetime-local"],
-	input[type="email"],
-	input[type="month"],
-	input[type="number"],
-	select,
-	textarea {
-		font-family: $default-font;
-		padding: 6px 8px;
-		@include input-style__neutral();
 
-		/* Fonts smaller than 16px causes mobile safari to zoom. */
-		font-size: $mobile-text-min-font-size;
-		@include break-small {
-			font-size: $default-font-size;
-		}
-
-		&:focus {
-			@include input-style__focus();
-		}
-	}
-
-	input[type="number"] {
-		padding-left: 4px;
-		padding-right: 4px;
-	}
-
-	select {
-		padding: 2px;
-
-		&:focus {
-			border-color: $blue-medium-600;
-			// Windows High Contrast mode will show this outline
-			outline: 2px solid transparent;
-			outline-offset: 0;
-		}
-	}
-
-	input[type="checkbox"],
-	input[type="radio"] {
-		border: $border-width + 1 solid $dark-gray-300;
-		margin-right: 12px;
-		transition: none;
-
-		&:focus {
-			border-color: $dark-gray-300;
-			box-shadow: 0 0 0 1px $dark-gray-300;
-		}
-
-		&:checked {
-			background: theme(toggle);
-			border-color: theme(toggle);
-		}
-
-		&:checked:focus {
-			box-shadow: 0 0 0 2px $dark-gray-500;
-		}
-	}
-
-	input[type="checkbox"] {
-		border-radius: $radius-round-rectangle / 2;
-
-		&:checked::before {
-			margin: -4px 0 0 -5px;
-			color: $white;
-		}
-	}
-
-	input[type="radio"] {
-		border-radius: $radius-round;
-
-		&:checked::before {
-			margin: 3px 0 0 3px;
-			background-color: $white;
-		}
-	}
-}
-
-// Placeholder colors
-.editor-post-title,
-.editor-block-list__block {
-	input,
-	textarea {
-		// Use opacity to work in various editor styles.
-		&::-webkit-input-placeholder {
-			color: $dark-opacity-300;
-		}
-
-		&::-moz-placeholder {
-			opacity: 1; // Necessary because Firefox reduces this from 1.
-			color: $dark-opacity-300;
-		}
-
-		&:-ms-input-placeholder {
-			color: $dark-opacity-300;
-		}
-
-		.is-dark-theme & {
-			&::-webkit-input-placeholder {
-				color: $light-opacity-300;
-			}
-
-			&::-moz-placeholder {
-				opacity: 1; // Necessary because Firefox reduces this from 1.
-				color: $light-opacity-300;
-			}
-
-			&:-ms-input-placeholder {
-				color: $light-opacity-300;
-			}
-		}
-	}
-}
-
-// These are default editor styles in case the theme doesn't provide them.
+// These are default block editor styles in case the theme doesn't provide them.
 .wp-block {
 	max-width: $content-width;
 

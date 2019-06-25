@@ -30,6 +30,8 @@ module.exports = {
 };
 ```
 
+_Note:_ `@wordpress/babel-plugin-import-jsx-pragma` is included in `@wordpress/babel-preset-default` (default preset for WordPress development) starting from `v4.0.0`. If you are using this preset, you shouldn't include this plugin in your Babel config. 
+
 ## Options
 
 As the `@babel/transform-react-jsx` plugin offers options to customize the `pragma` to which the transform references, there are equivalent options to assign for customizing the imports generated.
@@ -42,11 +44,13 @@ module.exports = {
 	plugins: [
 		[ '@wordpress/babel-plugin-import-jsx-pragma', {
 			scopeVariable: 'createElement',
+			scopeVariableFrag: 'Fragment',
 			source: '@wordpress/element',
 			isDefault: false,
 		} ],
 		[ '@babel/transform-react-jsx', {
 			pragma: 'createElement',
+			pragmaFrag: 'Fragment',
 		} ],
 	],
 };
@@ -58,6 +62,13 @@ _Type:_ String
 
 Name of variable required to be in scope for use by the JSX pragma. For the default pragma of React.createElement, the React variable must be within scope.
 
+### `scopeVariableFrag`
+
+_Type:_ String
+
+Name of variable required to be in scope for `<></>` `Fragment` JSX. Named `<Fragment />` elements
+expect Fragment to be in scope and will not add the import.
+
 ### `source`
 
 _Type:_ String
@@ -68,6 +79,7 @@ The module from which the scope variable is to be imported when missing.
 
 _Type:_ Boolean
 
-Whether the scopeVariable is the default import of the source module.
+Whether the scopeVariable is the default import of the source module. Note that this has no impact
+on `scopeVariableFrag`.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

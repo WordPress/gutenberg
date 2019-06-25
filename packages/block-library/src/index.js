@@ -9,6 +9,8 @@ import {
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
+	setGroupingBlockName,
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 
 /**
@@ -26,14 +28,17 @@ import * as calendar from './calendar';
 import * as categories from './categories';
 import * as code from './code';
 import * as columns from './columns';
-import * as column from './columns/column';
+import * as column from './column';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
 import * as html from './html';
 import * as mediaText from './media-text';
+import * as navigationMenu from './navigation-menu';
+import * as navigationMenuItem from './navigation-menu-item';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
+import * as legacyWidget from './legacy-widget';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -43,6 +48,7 @@ import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
 import * as rss from './rss';
 import * as search from './search';
+import * as group from './group';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
@@ -56,6 +62,16 @@ import * as tagCloud from './tag-cloud';
 
 import * as classic from './classic';
 
+/**
+ * Function to register core blocks provided by the block editor.
+ *
+ * @example
+ * ```js
+ * import { registerCoreBlocks } from '@wordpress/block-library';
+ *
+ * registerCoreBlocks();
+ * ```
+ */
 export const registerCoreBlocks = () => {
 	[
 		// Common blocks are grouped at the top to prioritize their display
@@ -82,13 +98,17 @@ export const registerCoreBlocks = () => {
 		...embed.common,
 		...embed.others,
 		file,
+		group,
 		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
 		html,
 		mediaText,
 		latestComments,
 		latestPosts,
+		process.env.GUTENBERG_PHASE === 2 ? legacyWidget : null,
 		missing,
 		more,
+		process.env.GUTENBERG_PHASE === 2 ? navigationMenu : null,
+		process.env.GUTENBERG_PHASE === 2 ? navigationMenuItem : null,
 		nextpage,
 		preformatted,
 		pullquote,
@@ -108,7 +128,10 @@ export const registerCoreBlocks = () => {
 		if ( ! block ) {
 			return;
 		}
-		const { name, settings } = block;
+		const { metadata, settings, name } = block;
+		if ( metadata ) {
+			unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } ); // eslint-disable-line camelcase
+		}
 		registerBlockType( name, settings );
 	} );
 
@@ -117,4 +140,8 @@ export const registerCoreBlocks = () => {
 		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );
+
+	if ( group ) {
+		setGroupingBlockName( group.name );
+	}
 };

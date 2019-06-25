@@ -22,7 +22,7 @@ describe( 'InserterMenu', () => {
 			</FormFileUpload>
 		);
 
-		const iconButton = wrapper.find( 'IconButton' );
+		const iconButton = wrapper.find( 'ForwardRef(IconButton)' );
 		const input = wrapper.find( 'input' );
 		expect( iconButton.prop( 'children' ) ).toBe( 'My Upload Button' );
 		expect( input.prop( 'style' ).display ).toBe( 'none' );

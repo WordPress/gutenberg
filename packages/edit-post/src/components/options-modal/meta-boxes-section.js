@@ -34,7 +34,7 @@ export function MetaBoxesSection( { areCustomFieldsRegistered, metaBoxes, ...sec
 }
 
 export default withSelect( ( select ) => {
-	const { getEditorSettings } = select( 'core/block-editor' );
+	const { getEditorSettings } = select( 'core/editor' );
 	const { getAllMetaBoxes } = select( 'core/edit-post' );
 
 	return {

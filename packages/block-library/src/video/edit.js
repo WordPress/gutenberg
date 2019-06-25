@@ -21,10 +21,19 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 	RichText,
-	mediaUpload,
-} from '@wordpress/editor';
-import { Component, Fragment, createRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+} from '@wordpress/block-editor';
+import { Component, createRef } from '@wordpress/element';
+import {
+	__,
+	sprintf,
+} from '@wordpress/i18n';
+import {
+	compose,
+	withInstanceId,
+} from '@wordpress/compose';
+import {
+	withSelect,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -50,10 +59,16 @@ class VideoEdit extends Component {
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onSelectPoster = this.onSelectPoster.bind( this );
 		this.onRemovePoster = this.onRemovePoster.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 	}
 
 	componentDidMount() {
-		const { attributes, noticeOperations, setAttributes } = this.props;
+		const {
+			attributes,
+			mediaUpload,
+			noticeOperations,
+			setAttributes,
+		} = this.props;
 		const { id, src = '' } = attributes;
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
@@ -119,6 +134,16 @@ class VideoEdit extends Component {
 		this.posterImageButton.current.focus();
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
+	getAutoplayHelp( checked ) {
+		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
+	}
+
 	render() {
 		const {
 			autoplay,
@@ -126,11 +151,18 @@ class VideoEdit extends Component {
 			controls,
 			loop,
 			muted,
+			playsInline,
 			poster,
 			preload,
 			src,
 		} = this.props.attributes;
-		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
+		const {
+			className,
+			instanceId,
+			isSelected,
+			noticeUI,
+			setAttributes,
+		} = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
 			this.setState( { editing: true } );
@@ -160,14 +192,15 @@ class VideoEdit extends Component {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ this.props.attributes }
 					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
+					onError={ this.onUploadError }
 				/>
 			);
 		}
+		const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar>
 						<IconButton
@@ -184,6 +217,7 @@ class VideoEdit extends Component {
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ this.getAutoplayHelp }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }
@@ -200,6 +234,11 @@ class VideoEdit extends Component {
 							onChange={ this.toggleAttribute( 'controls' ) }
 							checked={ controls }
 						/>
+						<ToggleControl
+							label={ __( 'Play inline' ) }
+							onChange={ this.toggleAttribute( 'playsInline' ) }
+							checked={ playsInline }
+						/>
 						<SelectControl
 							label={ __( 'Preload' ) }
 							value={ preload }
@@ -213,8 +252,10 @@ class VideoEdit extends Component {
 						<MediaUploadCheck>
 							<BaseControl
 								className="editor-video-poster-control"
-								label={ __( 'Poster Image' ) }
 							>
+								<BaseControl.VisualLabel>
+									{ __( 'Poster Image' ) }
+								</BaseControl.VisualLabel>
 								<MediaUpload
 									title={ __( 'Select Poster Image' ) }
 									onSelect={ this.onSelectPoster }
@@ -224,11 +265,21 @@ class VideoEdit extends Component {
 											isDefault
 											onClick={ open }
 											ref={ this.posterImageButton }
+											aria-describedby={ videoPosterDescription }
 										>
 											{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
 										</Button>
 									) }
 								/>
+								<p
+									id={ videoPosterDescription }
+									hidden
+								>
+									{ this.props.attributes.poster ?
+										sprintf( __( 'The current poster image url is %s' ), this.props.attributes.poster ) :
+										__( 'There is no poster image currently selected' )
+									}
+								</p>
 								{ !! this.props.attributes.poster &&
 									<Button onClick={ this.onRemovePoster } isLink isDestructive>
 										{ __( 'Remove Poster Image' ) }
@@ -261,10 +312,20 @@ class VideoEdit extends Component {
 						/>
 					) }
 				</figure>
-			</Fragment>
+			</>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 
-export default withNotices( VideoEdit );
+export default compose( [
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		const { __experimentalMediaUpload } = getSettings();
+		return {
+			mediaUpload: __experimentalMediaUpload,
+		};
+	} ),
+	withNotices,
+	withInstanceId,
+] )( VideoEdit );

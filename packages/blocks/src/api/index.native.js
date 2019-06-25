@@ -21,13 +21,18 @@ export {
 	getUnregisteredTypeHandlerName,
 	getBlockType,
 	getBlockTypes,
+	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
+	getChildBlockNames,
+	hasChildBlocks,
+	hasChildBlocksWithInserterSupport,
 	setDefaultBlockName,
 	getDefaultBlockName,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,
+	normalizeIconObject,
 } from './utils';
 export { pasteHandler, getPhrasingContentSchema } from './raw-handling';
 export { default as children } from './children';

@@ -32,17 +32,6 @@ MenuItem supports the following props. Any additional props are passed through t
 
 Element to render as child of button.
 
-Element
-
-### `label`
-
-- Type: `string`
-- Required: No
-
-String to use as primary button label text, applied as `aria-label`. Useful in cases where an `info` prop is passed, where `label` should be the minimal text of the button, described in further detail by `info`.
-
-Defaults to the value of `children`, if `children` is passed as a string.
-
 ### `info`
 
 - Type: `string`
@@ -58,6 +47,13 @@ Refer to documentation for [`label`](#label).
 - Required: No
 
 Refer to documentation for [IconButton's `icon` prop](/packages/components/src/icon-button/README.md#icon).
+
+### `isSelected`
+
+- Type: `boolean`
+- Required: No
+
+Whether or not the menu item is currently selected.
 
 ### `shortcut`
 

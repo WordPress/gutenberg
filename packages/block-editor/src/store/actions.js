@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray, first } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,25 @@ import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { select } from './controls';
+
+/**
+ * Generator which will yield a default block insert action if there
+ * are no other blocks at the root of the editor. This generator should be used
+ * in actions which may result in no blocks remaining in the editor (removal,
+ * replacement, etc).
+ */
+function* ensureDefaultBlock() {
+	const count = yield select(
+		'core/block-editor',
+		'getBlockCount',
+	);
+
+	// To avoid a focus loss when removing the last block, assure there is
+	// always a default block if the last of the blocks have been removed.
+	if ( count === 0 ) {
+		yield insertDefaultBlock();
+	}
+}
 
 /**
  * Returns an action object used in signalling that blocks state should be
@@ -107,12 +126,14 @@ export function selectBlock( clientId, initialPosition = null ) {
  */
 export function* selectPreviousBlock( clientId ) {
 	const previousBlockClientId = yield select(
-		'core/editor',
+		'core/block-editor',
 		'getPreviousBlockClientId',
 		clientId
 	);
 
-	yield selectBlock( previousBlockClientId, -1 );
+	if ( previousBlockClientId ) {
+		yield selectBlock( previousBlockClientId, -1 );
+	}
 }
 
 /**
@@ -123,12 +144,14 @@ export function* selectPreviousBlock( clientId ) {
  */
 export function* selectNextBlock( clientId ) {
 	const nextBlockClientId = yield select(
-		'core/editor',
+		'core/block-editor',
 		'getNextBlockClientId',
 		clientId
 	);
 
-	yield selectBlock( nextBlockClientId );
+	if ( nextBlockClientId ) {
+		yield selectBlock( nextBlockClientId );
+	}
 }
 
 /**
@@ -199,18 +222,42 @@ export function toggleSelection( isSelectionEnabled = true ) {
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
- * @param {(string|string[])} clientIds Block client ID(s) to replace.
- * @param {(Object|Object[])} blocks    Replacement block(s).
+ * @param {(string|string[])} clientIds     Block client ID(s) to replace.
+ * @param {(Object|Object[])} blocks        Replacement block(s).
+ * @param {number}            indexToSelect Index of replacement block to
+ *                                          select.
  *
- * @return {Object} Action object.
+ * @yields {Object} Action object.
  */
-export function replaceBlocks( clientIds, blocks ) {
-	return {
+export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
+	clientIds = castArray( clientIds );
+	blocks = castArray( blocks );
+	const rootClientId = yield select(
+		'core/block-editor',
+		'getBlockRootClientId',
+		first( clientIds )
+	);
+	// Replace is valid if the new blocks can be inserted in the root block.
+	for ( let index = 0; index < blocks.length; index++ ) {
+		const block = blocks[ index ];
+		const canInsertBlock = yield select(
+			'core/block-editor',
+			'canInsertBlockType',
+			block.name,
+			rootClientId
+		);
+		if ( ! canInsertBlock ) {
+			return;
+		}
+	}
+	yield {
 		type: 'REPLACE_BLOCKS',
-		clientIds: castArray( clientIds ),
-		blocks: castArray( blocks ),
+		clientIds,
+		blocks,
 		time: Date.now(),
+		indexToSelect,
 	};
+	yield* ensureDefaultBlock();
 }
 
 /**
@@ -256,16 +303,51 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * @param  {?string} toRootClientId   Root client ID destination.
  * @param  {number}  index            The index to move the block into.
  *
- * @return {Object} Action object.
+ * @yields {Object} Action object.
  */
-export function moveBlockToPosition( clientId, fromRootClientId, toRootClientId, index ) {
-	return {
+export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootClientId = '', index ) {
+	const templateLock = yield select(
+		'core/block-editor',
+		'getTemplateLock',
+		fromRootClientId
+	);
+
+	// If locking is equal to all on the original clientId (fromRootClientId),
+	// it is not possible to move the block to any other position.
+	if ( templateLock === 'all' ) {
+		return;
+	}
+
+	const action = {
 		type: 'MOVE_BLOCK_TO_POSITION',
 		fromRootClientId,
 		toRootClientId,
 		clientId,
 		index,
 	};
+	// If moving inside the same root block the move is always possible.
+	if ( fromRootClientId === toRootClientId ) {
+		yield action;
+		return;
+	}
+
+	const blockName = yield select(
+		'core/block-editor',
+		'getBlockName',
+		clientId
+	);
+
+	const canInsertBlock = yield select(
+		'core/block-editor',
+		'canInsertBlockType',
+		blockName,
+		toRootClientId
+	);
+
+	// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
+	if ( canInsertBlock ) {
+		yield action;
+	}
 }
 
 /**
@@ -279,8 +361,18 @@ export function moveBlockToPosition( clientId, fromRootClientId, toRootClientId,
  *
  * @return {Object} Action object.
  */
-export function insertBlock( block, index, rootClientId, updateSelection = true ) {
-	return insertBlocks( [ block ], index, rootClientId, updateSelection );
+export function insertBlock(
+	block,
+	index,
+	rootClientId,
+	updateSelection = true,
+) {
+	return insertBlocks(
+		[ block ],
+		index,
+		rootClientId,
+		updateSelection
+	);
 }
 
 /**
@@ -292,17 +384,37 @@ export function insertBlock( block, index, rootClientId, updateSelection = true 
  * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
  * @param {?boolean} updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
  *
- * @return {Object} Action object.
+ *  @return {Object} Action object.
  */
-export function insertBlocks( blocks, index, rootClientId, updateSelection = true ) {
-	return {
-		type: 'INSERT_BLOCKS',
-		blocks: castArray( blocks ),
-		index,
-		rootClientId,
-		time: Date.now(),
-		updateSelection,
-	};
+export function* insertBlocks(
+	blocks,
+	index,
+	rootClientId,
+	updateSelection = true
+) {
+	blocks = castArray( blocks );
+	const allowedBlocks = [];
+	for ( const block of blocks ) {
+		const isValid = yield select(
+			'core/block-editor',
+			'canInsertBlockType',
+			block.name,
+			rootClientId
+		);
+		if ( isValid ) {
+			allowedBlocks.push( block );
+		}
+	}
+	if ( allowedBlocks.length ) {
+		return {
+			type: 'INSERT_BLOCKS',
+			blocks: allowedBlocks,
+			index,
+			rootClientId,
+			time: Date.now(),
+			updateSelection,
+		};
+	}
 }
 
 /**
@@ -393,6 +505,10 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 		type: 'REMOVE_BLOCKS',
 		clientIds,
 	};
+
+	// To avoid a focus loss when removing the last block, assure there is
+	// always a default block if the last of the blocks have been removed.
+	yield* ensureDefaultBlock();
 }
 
 /**
@@ -407,6 +523,26 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
  */
 export function removeBlock( clientId, selectPrevious ) {
 	return removeBlocks( [ clientId ], selectPrevious );
+}
+
+/**
+ * Returns an action object used in signalling that the inner blocks with the
+ * specified client ID should be replaced.
+ *
+ * @param {string}   rootClientId    Client ID of the block whose InnerBlocks will re replaced.
+ * @param {Object[]} blocks          Block objects to insert as new InnerBlocks
+ * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ *
+ * @return {Object} Action object.
+ */
+export function replaceInnerBlocks( rootClientId, blocks, updateSelection = true ) {
+	return {
+		type: 'REPLACE_INNER_BLOCKS',
+		rootClientId,
+		blocks,
+		updateSelection,
+		time: Date.now(),
+	};
 }
 
 /**
@@ -469,6 +605,27 @@ export function exitFormattedText() {
 }
 
 /**
+ * Returns an action object used in signalling that the user caret has changed
+ * position.
+ *
+ * @param {string} clientId     The selected block client ID.
+ * @param {string} attributeKey The selected block attribute key.
+ * @param {number} startOffset  The start offset.
+ * @param {number} endOffset    The end offset.
+ *
+ * @return {Object} Action object.
+ */
+export function selectionChange( clientId, attributeKey, startOffset, endOffset ) {
+	return {
+		type: 'SELECTION_CHANGE',
+		clientId,
+		attributeKey,
+		startOffset,
+		endOffset,
+	};
+}
+
+/**
  * Returns an action object used in signalling that a new block of the default
  * type should be added to the block list.
  *
@@ -480,7 +637,13 @@ export function exitFormattedText() {
  * @return {Object} Action object
  */
 export function insertDefaultBlock( attributes, rootClientId, index ) {
-	const block = createBlock( getDefaultBlockName(), attributes );
+	// Abort if there is no default block type (if it has been unregistered).
+	const defaultBlockName = getDefaultBlockName();
+	if ( ! defaultBlockName ) {
+		return;
+	}
+
+	const block = createBlock( defaultBlockName, attributes );
 
 	return insertBlock( block, index, rootClientId );
 }
@@ -503,15 +666,15 @@ export function updateBlockListSettings( clientId, settings ) {
 }
 
 /*
- * Returns an action object used in signalling that the editor settings have been updated.
+ * Returns an action object used in signalling that the block editor settings have been updated.
  *
  * @param {Object} settings Updated settings
  *
  * @return {Object} Action object
  */
-export function updateEditorSettings( settings ) {
+export function updateSettings( settings ) {
 	return {
-		type: 'UPDATE_EDITOR_SETTINGS',
+		type: 'UPDATE_SETTINGS',
 		settings,
 	};
 }

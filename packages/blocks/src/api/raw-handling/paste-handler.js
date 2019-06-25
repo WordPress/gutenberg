@@ -11,6 +11,7 @@ import { getBlockContent } from '../serializer';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
+import commentRemover from './comment-remover';
 import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
 import headRemover from './head-remover';
@@ -44,7 +45,7 @@ const { console } = window;
  * @return {string} HTML only containing phrasing content.
  */
 function filterInlineHTML( HTML ) {
-	HTML = deepFilterHTML( HTML, [ googleDocsUIDRemover, phrasingContentReducer ] );
+	HTML = deepFilterHTML( HTML, [ googleDocsUIDRemover, phrasingContentReducer, commentRemover ] );
 	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema(), { inline: true } );
 
 	// Allows us to ask for this information when we get a report.
@@ -127,9 +128,14 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
-	// If we detect block delimiters, parse entirely as blocks.
-	if ( mode !== 'INLINE' && HTML.indexOf( '<!-- wp:' ) !== -1 ) {
-		return parseWithGrammar( HTML );
+	// If we detect block delimiters in HTML, parse entirely as blocks.
+	if ( mode !== 'INLINE' ) {
+		// Check plain text if there is no HTML.
+		const content = HTML ? HTML : plainText;
+
+		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
+			return parseWithGrammar( content );
+		}
 	}
 
 	// Normalize unicode to use composed characters.
@@ -199,6 +205,7 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 			imageCorrector,
 			phrasingContentReducer,
 			specialCommentConverter,
+			commentRemover,
 			figureContentReducer,
 			blockquoteNormaliser,
 		];

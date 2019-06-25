@@ -6,7 +6,7 @@ exports[`adding blocks Should navigate inner blocks with arrow keys 1`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:columns -->
-<div class=\\"wp-block-columns has-2-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:paragraph -->
 <p>First col</p>
 <!-- /wp:paragraph --></div>
@@ -72,7 +72,7 @@ exports[`adding blocks should create valid paragraph blocks when rapidly pressin
 
 exports[`adding blocks should insert line break at end 1`] = `
 "<!-- wp:paragraph -->
-<p>a<br><br></p>
+<p>a<br></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -90,13 +90,19 @@ exports[`adding blocks should insert line break at start 1`] = `
 
 exports[`adding blocks should insert line break in empty container 1`] = `
 "<!-- wp:paragraph -->
-<p><br><br></p>
+<p><br></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`adding blocks should insert line break mid text 1`] = `
 "<!-- wp:paragraph -->
 <p>a<br>b</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should merge forwards 1`] = `
+"<!-- wp:paragraph -->
+<p>123</p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -124,6 +130,32 @@ exports[`adding blocks should navigate around nested inline boundaries 2`] = `
 "<!-- wp:paragraph -->
 <p>a<strong>b<em>c1d</em>e f<em>g2h</em>i</strong>j</p>
 <!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should navigate contenteditable with padding 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should navigate empty paragraph 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should not create extra line breaks in multiline value 1`] = `
+"<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
+<!-- /wp:quote -->"
 `;
 
 exports[`adding blocks should not delete surrounding space when deleting a selected word 1`] = `
@@ -159,5 +191,35 @@ exports[`adding blocks should not delete surrounding space when deleting a word 
 exports[`adding blocks should not delete surrounding space when deleting a word with Backspace 2`] = `
 "<!-- wp:paragraph -->
 <p>1 2 3</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should not prematurely multi-select 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should preserve horizontal position when navigating vertically between blocks 1`] = `
+"<!-- wp:paragraph -->
+<p>abc</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>123</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should remember initial vertical position 1`] = `
+"<!-- wp:paragraph -->
+<p>1x</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><br>2</p>
 <!-- /wp:paragraph -->"
 `;

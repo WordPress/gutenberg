@@ -1,0 +1,46 @@
+.block-editor-block-preview {
+	pointer-events: none;
+	padding: 10px;
+	overflow: hidden;
+	display: none;
+
+	@include break-medium {
+		display: block;
+	}
+
+	.block-editor-block-preview__content {
+		padding: $block-padding;
+		border: $border-width solid $light-gray-500;
+		font-family: $editor-font;
+
+		> div {
+			transform: scale(0.9);
+			transform-origin: center top;
+			font-family: $editor-font;
+		}
+
+		> div section {
+			height: auto;
+		}
+
+		> .reusable-block-indicator {
+			display: none;
+		}
+	}
+}
+
+.block-editor-block-preview__content {
+	// Resetting the block editor paddings and margins
+	.block-editor-block-list__layout,
+	.block-editor-block-list__block {
+		padding: 0;
+	}
+	.editor-block-list__block-edit [data-block] {
+		margin-top: 0;
+	}
+}
+
+.block-editor-block-preview__title {
+	margin-bottom: 10px;
+	color: $dark-gray-300;
+}

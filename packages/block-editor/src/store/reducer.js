@@ -26,7 +26,7 @@ import { isReusableBlock } from '@wordpress/blocks';
  */
 import {
 	PREFERENCES_DEFAULTS,
-	EDITOR_SETTINGS_DEFAULTS,
+	SETTINGS_DEFAULTS,
 } from './defaults';
 import { insertAt, moveTo } from './array';
 
@@ -188,16 +188,6 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 
-	/**
-	 * Set of action types for which a blocks state change should be considered
-	 * non-persistent.
-	 *
-	 * @type {Set}
-	 */
-	const IGNORED_ACTION_TYPES = new Set( [
-		'RECEIVE_BLOCKS',
-	] );
-
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
 
@@ -206,19 +196,14 @@ function withPersistentBlockChange( reducer ) {
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
 		if ( state === nextState && ! isExplicitPersistentChange ) {
-			return {
-				...nextState,
-				isPersistentChange: get( state, [ 'isPersistentChange' ], true ),
-			};
-		}
+			const nextIsPersistentChange = get( state, [ 'isPersistentChange' ], true );
+			if ( state.isPersistentChange === nextIsPersistentChange ) {
+				return state;
+			}
 
-		// Some state changes should not be considered persistent, namely those
-		// which are not a direct result of user interaction.
-		const isIgnoredActionType = IGNORED_ACTION_TYPES.has( action.type );
-		if ( isIgnoredActionType ) {
 			return {
 				...nextState,
-				isPersistentChange: false,
+				isPersistentChange: nextIsPersistentChange,
 			};
 		}
 
@@ -234,6 +219,37 @@ function withPersistentBlockChange( reducer ) {
 		// would have qualified as one which would have been ignored or not
 		// have resulted in a changed state.
 		lastAction = action;
+
+		return nextState;
+	};
+}
+
+/**
+ * Higher-order reducer intended to augment the blocks reducer, assigning an
+ * `isIgnoredChange` property value corresponding to whether a change in state
+ * can be considered as ignored. A change is considered ignored when the result
+ * of an action not incurred by direct user interaction.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+function withIgnoredBlockChange( reducer ) {
+	/**
+	 * Set of action types for which a blocks state change should be ignored.
+	 *
+	 * @type {Set}
+	 */
+	const IGNORED_ACTION_TYPES = new Set( [
+		'RECEIVE_BLOCKS',
+	] );
+
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
+
+		if ( nextState !== state ) {
+			nextState.isIgnoredChange = IGNORED_ACTION_TYPES.has( action.type );
+		}
 
 		return nextState;
 	};
@@ -298,6 +314,38 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 
 /**
  * Higher-order reducer which targets the combined blocks reducer and handles
+ * the `REPLACE_INNER_BLOCKS` action. When dispatched, this action the state should become equivalent
+ * to the execution of a `REMOVE_BLOCKS` action containing all the child's of the root block followed by
+ * the execution of `INSERT_BLOCKS` with the new blocks.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
+	if ( action.type !== 'REPLACE_INNER_BLOCKS' ) {
+		return reducer( state, action );
+	}
+	let stateAfterBlocksRemoval = state;
+	if ( state.order[ action.rootClientId ] ) {
+		stateAfterBlocksRemoval = reducer( stateAfterBlocksRemoval, {
+			type: 'REMOVE_BLOCKS',
+			clientIds: state.order[ action.rootClientId ],
+		} );
+	}
+	let stateAfterInsert = stateAfterBlocksRemoval;
+	if ( action.blocks.length ) {
+		stateAfterInsert = reducer( stateAfterInsert, {
+			...action,
+			type: 'INSERT_BLOCKS',
+			index: 0,
+		} );
+	}
+	return stateAfterInsert;
+};
+
+/**
+ * Higher-order reducer which targets the combined blocks reducer and handles
  * the `SAVE_REUSABLE_BLOCK_SUCCESS` action. This action can't be handled by
  * regular reducers and needs a higher-order reducer since it needs access to
  * both `byClientId` and `attributes` simultaneously.
@@ -344,9 +392,11 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 export const blocks = flow(
 	combineReducers,
 	withInnerBlocksRemoveCascade,
+	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
 	withBlockReset,
 	withSaveReusableBlock,
 	withPersistentBlockChange,
+	withIgnoredBlockChange,
 )( {
 	byClientId( state = {}, action ) {
 		switch ( action.type ) {
@@ -648,6 +698,15 @@ export function isCaretWithinFormattedText( state = false, action ) {
 	return state;
 }
 
+const BLOCK_SELECTION_EMPTY_OBJECT = {};
+const BLOCK_SELECTION_INITIAL_STATE = {
+	start: BLOCK_SELECTION_EMPTY_OBJECT,
+	end: BLOCK_SELECTION_EMPTY_OBJECT,
+	isMultiSelecting: false,
+	isEnabled: true,
+	initialPosition: null,
+};
+
 /**
  * Reducer returning the block selection's state.
  *
@@ -656,26 +715,10 @@ export function isCaretWithinFormattedText( state = false, action ) {
  *
  * @return {Object} Updated state.
  */
-export function blockSelection( state = {
-	start: null,
-	end: null,
-	isMultiSelecting: false,
-	isEnabled: true,
-	initialPosition: null,
-}, action ) {
+export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
-			if ( state.start === null && state.end === null && ! state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				start: null,
-				end: null,
-				isMultiSelecting: false,
-				initialPosition: null,
-			};
+			return BLOCK_SELECTION_INITIAL_STATE;
 		case 'START_MULTI_SELECT':
 			if ( state.isMultiSelecting ) {
 				return state;
@@ -698,69 +741,90 @@ export function blockSelection( state = {
 			};
 		case 'MULTI_SELECT':
 			return {
-				...state,
-				start: action.start,
-				end: action.end,
-				initialPosition: null,
+				...BLOCK_SELECTION_INITIAL_STATE,
+				isMultiSelecting: state.isMultiSelecting,
+				start: { clientId: action.start },
+				end: { clientId: action.end },
 			};
 		case 'SELECT_BLOCK':
-			if ( action.clientId === state.start && action.clientId === state.end ) {
+			if (
+				action.clientId === state.start.clientId &&
+				action.clientId === state.end.clientId
+			) {
 				return state;
 			}
+
 			return {
-				...state,
-				start: action.clientId,
-				end: action.clientId,
+				...BLOCK_SELECTION_INITIAL_STATE,
 				initialPosition: action.initialPosition,
+				start: { clientId: action.clientId },
+				end: { clientId: action.clientId },
 			};
+		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
 		case 'INSERT_BLOCKS': {
 			if ( action.updateSelection ) {
 				return {
-					...state,
-					start: action.blocks[ 0 ].clientId,
-					end: action.blocks[ 0 ].clientId,
-					initialPosition: null,
-					isMultiSelecting: false,
+					...BLOCK_SELECTION_INITIAL_STATE,
+					start: { clientId: action.blocks[ 0 ].clientId },
+					end: { clientId: action.blocks[ 0 ].clientId },
 				};
 			}
+
 			return state;
 		}
 		case 'REMOVE_BLOCKS':
-			if ( ! action.clientIds || ! action.clientIds.length || action.clientIds.indexOf( state.start ) === -1 ) {
+			if (
+				! action.clientIds ||
+				! action.clientIds.length ||
+				action.clientIds.indexOf( state.start.clientId ) === -1
+			) {
 				return state;
 			}
+
+			return BLOCK_SELECTION_INITIAL_STATE;
+		case 'REPLACE_BLOCKS': {
+			if ( action.clientIds.indexOf( state.start.clientId ) === -1 ) {
+				return state;
+			}
+
+			const indexToSelect = action.indexToSelect || action.blocks.length - 1;
+			const blockToSelect = action.blocks[ indexToSelect ];
+
+			if ( ! blockToSelect ) {
+				return BLOCK_SELECTION_INITIAL_STATE;
+			}
+
+			if (
+				blockToSelect.clientId === state.start.clientId &&
+				blockToSelect.clientId === state.end.clientId
+			) {
+				return state;
+			}
+
 			return {
-				...state,
-				start: null,
-				end: null,
-				initialPosition: null,
-				isMultiSelecting: false,
+				...BLOCK_SELECTION_INITIAL_STATE,
+				start: { clientId: blockToSelect.clientId },
+				end: { clientId: blockToSelect.clientId },
 			};
-		case 'REPLACE_BLOCKS':
-			if ( action.clientIds.indexOf( state.start ) === -1 ) {
-				return state;
-			}
-
-			// If there are replacement blocks, assign last block as the next
-			// selected block, otherwise set to null.
-			const lastBlock = last( action.blocks );
-			const nextSelectedBlockClientId = lastBlock ? lastBlock.clientId : null;
-
-			if ( nextSelectedBlockClientId === state.start && nextSelectedBlockClientId === state.end ) {
-				return state;
-			}
-
-			return {
-				...state,
-				start: nextSelectedBlockClientId,
-				end: nextSelectedBlockClientId,
-				initialPosition: null,
-				isMultiSelecting: false,
-			};
+		}
 		case 'TOGGLE_SELECTION':
 			return {
-				...state,
+				...BLOCK_SELECTION_INITIAL_STATE,
 				isEnabled: action.isSelectionEnabled,
+			};
+		case 'SELECTION_CHANGE':
+			return {
+				...BLOCK_SELECTION_INITIAL_STATE,
+				start: {
+					clientId: action.clientId,
+					attributeKey: action.attributeKey,
+					offset: action.startOffset,
+				},
+				end: {
+					clientId: action.clientId,
+					attributeKey: action.attributeKey,
+					offset: action.endOffset,
+				},
 			};
 	}
 
@@ -830,9 +894,9 @@ export function template( state = { isValid: true }, action ) {
  *
  * @return {Object} Updated state.
  */
-export function settings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
+export function settings( state = SETTINGS_DEFAULTS, action ) {
 	switch ( action.type ) {
-		case 'UPDATE_EDITOR_SETTINGS':
+		case 'UPDATE_SETTINGS':
 			return {
 				...state,
 				...action.settings,

@@ -10,6 +10,7 @@
 	position: relative;
 
 	&::before {
+		/* rtl:begin:ignore */
 		content: "";
 		position: absolute;
 		background-color: $white;
@@ -20,6 +21,7 @@
 		border-radius: 100%;
 		transform-origin: 6px 6px;
 		animation: components-spinner__animation 1s infinite linear;
+		/* rtl:end:ignore */
 	}
 }
 

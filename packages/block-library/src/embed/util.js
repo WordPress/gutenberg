@@ -7,14 +7,15 @@ import { DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK, ASPECT_RATIOS } from './con
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { includes, kebabCase, toLower } from 'lodash';
 import classnames from 'classnames/dedupe';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 
 /**
  * Returns true if any of the regular expressions match the URL.
@@ -46,7 +47,7 @@ export const findBlock = ( url ) => {
 };
 
 export const isFromWordPress = ( html ) => {
-	return includes( html, 'class="wp-embedded-content" data-secret' );
+	return includes( html, 'class="wp-embedded-content"' );
 };
 
 export const getPhotoHtml = ( photo ) => {
@@ -80,6 +81,10 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 	}
 
 	const matchingBlock = findBlock( url );
+
+	if ( ! getBlockType( matchingBlock ) ) {
+		return;
+	}
 
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
@@ -178,3 +183,40 @@ export function fallback( url, onReplace ) {
 		createBlock( 'core/paragraph', { content: renderToString( link ) } )
 	);
 }
+
+/***
+ * Gets block attributes based on the preview and responsive state.
+ *
+ * @param {Object} preview The preview data.
+ * @param {string} title The block's title, e.g. Twitter.
+ * @param {Object} currentClassNames The block's current class names.
+ * @param {boolean} isResponsive Boolean indicating if the block supports responsive content.
+ * @param {boolean} allowResponsive Apply responsive classes to fixed size content.
+ * @return {Object} Attributes and values.
+ */
+export const getAttributesFromPreview = memoize( ( preview, title, currentClassNames, isResponsive, allowResponsive = true ) => {
+	if ( ! preview ) {
+		return {};
+	}
+
+	const attributes = {};
+	// Some plugins only return HTML with no type info, so default this to 'rich'.
+	let { type = 'rich' } = preview;
+	// If we got a provider name from the API, use it for the slug, otherwise we use the title,
+	// because not all embed code gives us a provider name.
+	const { html, provider_name: providerName } = preview;
+	const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
+
+	if ( isFromWordPress( html ) ) {
+		type = 'wp-embed';
+	}
+
+	if ( html || 'photo' === type ) {
+		attributes.type = type;
+		attributes.providerNameSlug = providerNameSlug;
+	}
+
+	attributes.className = getClassNames( html, currentClassNames, isResponsive && allowResponsive );
+
+	return attributes;
+} );

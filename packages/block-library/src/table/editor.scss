@@ -1,4 +1,4 @@
-.editor-block-list__block[data-type="core/table"] {
+.block-editor-block-list__block[data-type="core/table"] {
 	&[data-align="left"],
 	&[data-align="right"],
 	&[data-align="center"] {
@@ -27,7 +27,7 @@
 	td,
 	th {
 		padding: 0;
-		border: $border-width solid $black;
+		border: $border-width solid;
 	}
 
 	td.is-selected,
@@ -39,5 +39,17 @@
 
 	&__cell-content {
 		padding: 0.5em;
+	}
+	// Extra specificity to override default Placeholder styles.
+	&__placeholder-form.wp-block-table__placeholder-form {
+		text-align: left;
+		align-items: center;
+	}
+	&__placeholder-input {
+		width: 100px;
+	}
+	&__placeholder-button {
+		min-width: 100px;
+		justify-content: center;
 	}
 }

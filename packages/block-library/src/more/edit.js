@@ -3,8 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, ToggleControl } from '@wordpress/components';
-import { Component, Fragment } from '@wordpress/element';
-import { InspectorControls } from '@wordpress/editor';
+import { Component } from '@wordpress/element';
+import { InspectorControls } from '@wordpress/block-editor';
 import { ENTER } from '@wordpress/keycodes';
 import {
 	getDefaultBlockName,
@@ -56,7 +56,7 @@ export default class MoreEdit extends Component {
 		const inputLength = value.length + 1;
 
 		return (
-			<Fragment>
+			<>
 				<InspectorControls>
 					<PanelBody>
 						<ToggleControl
@@ -76,7 +76,7 @@ export default class MoreEdit extends Component {
 						onKeyDown={ this.onKeyDown }
 					/>
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 }

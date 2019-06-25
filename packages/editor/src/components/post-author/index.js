@@ -11,6 +11,7 @@ import { sprintf, __, _n } from '@wordpress/i18n';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -111,6 +112,7 @@ export class PostAuthor extends Component {
 		const { postAuthor } = this.state;
 		const { postAuthorId, instanceId, authors } = this.props;
 		const selectId = `post-author-selector-${ instanceId }`;
+
 		let selector;
 		if ( ! postAuthor ) {
 			return null;
@@ -123,11 +125,11 @@ export class PostAuthor extends Component {
 				<select
 					id={ selectId }
 					value={ postAuthorId }
-					className="editor-post-author__select"
 					onChange={ this.setAuthorId }
+					className="editor-post-author__select"
 				>
 					{ authors.map( ( author ) => (
-						<option key={ author.id } value={ author.id }>{ author.name }</option>
+						<option key={ author.id } value={ author.id }>{ decodeEntities( author.name ) }</option>
 					) ) }
 				</select>;
 		} else {

@@ -4,6 +4,7 @@
 import {
 	insertBlock,
 	createNewPost,
+	clickBlockToolbarButton,
 	pressKeyWithModifier,
 	searchForBlock,
 	getEditedPostContent,
@@ -23,9 +24,9 @@ describe( 'Reusable Blocks', () => {
 	beforeEach( async () => {
 		// Remove all blocks from the post so that we're working with a clean slate
 		await page.evaluate( () => {
-			const blocks = wp.data.select( 'core/editor' ).getBlocks();
+			const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
 			const clientIds = blocks.map( ( block ) => block.clientId );
-			wp.data.dispatch( 'core/editor' ).removeBlocks( clientIds );
+			wp.data.dispatch( 'core/block-editor' ).removeBlocks( clientIds );
 		} );
 	} );
 
@@ -34,25 +35,18 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 
-		// Trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		await clickBlockToolbarButton( 'More options' );
 
-		// Convert block to a reusable block
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
 
-		// Select all of the text in the title field by triple-clicking on it. We
-		// triple-click because, on Mac, Mod+A doesn't work. This step can be removed
-		// when https://github.com/WordPress/gutenberg/issues/7972 is fixed
-		await page.click( '.reusable-block-edit-panel__title', { clickCount: 3 } );
+		// Select all of the text in the title field.
+		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Give the reusable block a title
 		await page.keyboard.type( 'Greeting block' );
@@ -65,7 +59,7 @@ describe( 'Reusable Blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
@@ -81,19 +75,14 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 
-		// Trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
+		await clickBlockToolbarButton( 'More options' );
 
-		// Convert block to a reusable block
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
 
 		// Save the reusable block
@@ -104,7 +93,7 @@ describe( 'Reusable Blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that it is untitled
@@ -141,7 +130,7 @@ describe( 'Reusable Blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
@@ -153,7 +142,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Check that its content is up to date
 		const text = await page.$eval(
-			'.editor-block-list__block[data-type="core/block"] .editor-rich-text',
+			'.block-editor-block-list__block[data-type="core/block"] .block-editor-rich-text',
 			( element ) => element.innerText
 		);
 		expect( text ).toMatch( 'Oh! Hello there!' );
@@ -164,19 +153,19 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Surprised greeting block' );
 
 		// Convert block to a regular block
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const convertButton = await page.waitForXPath(
 			'//button[text()="Convert to Regular Block"]'
 		);
 		await convertButton.click();
 
 		// Check that we have a paragraph block on the page
-		const block = await page.$( '.editor-block-list__block[data-type="core/paragraph"]' );
+		const block = await page.$( '.block-editor-block-list__block[data-type="core/paragraph"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that its content is up to date
 		const text = await page.$eval(
-			'.editor-block-list__block[data-type="core/paragraph"] .editor-rich-text',
+			'.block-editor-block-list__block[data-type="core/paragraph"] .block-editor-rich-text',
 			( element ) => element.innerText
 		);
 		expect( text ).toMatch( 'Oh! Hello there!' );
@@ -187,13 +176,13 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Surprised greeting block' );
 
 		// Delete the block and accept the confirmation dialog
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const deleteButton = await page.waitForXPath( '//button[text()="Remove from Reusable Blocks"]' );
 		await Promise.all( [ waitForAndAcceptDialog(), deleteButton.click() ] );
 
 		// Wait for deletion to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block deleted."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block deleted."]'
 		);
 
 		// Check that we have an empty post again
@@ -204,7 +193,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Check that we couldn't find it
 		const items = await page.$$(
-			'.editor-block-types-list__item[aria-label="Surprised greeting block"]'
+			'.block-editor-block-types-list__item[aria-label="Surprised greeting block"]'
 		);
 		expect( items ).toHaveLength( 0 );
 	} );
@@ -222,25 +211,18 @@ describe( 'Reusable Blocks', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
 
-		// Trigger isTyping = false
-		await page.mouse.move( 200, 300, { steps: 10 } );
-		await page.mouse.move( 250, 350, { steps: 10 } );
-
 		// Convert block to a reusable block
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
 		// Wait for creation to finish
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
 
-		// Select all of the text in the title field by triple-clicking on it. We
-		// triple-click because, on Mac, Mod+A doesn't work. This step can be removed
-		// when https://github.com/WordPress/gutenberg/issues/7972 is fixed
-		await page.click( '.reusable-block-edit-panel__title', { clickCount: 3 } );
+		// Select all of the text in the title field.
+		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Give the reusable block a title
 		await page.keyboard.type( 'Multi-selection reusable block' );
@@ -253,7 +235,7 @@ describe( 'Reusable Blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page
-		const block = await page.$( '.editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
@@ -269,7 +251,7 @@ describe( 'Reusable Blocks', () => {
 		await insertBlock( 'Multi-selection reusable block' );
 
 		// Convert block to a regular block
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const convertButton = await page.waitForXPath(
 			'//button[text()="Convert to Regular Block"]'
 		);

@@ -6,7 +6,6 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -89,7 +88,7 @@ function PostLink( {
 					/>
 					<p>
 						{ __( 'The last part of the URL. ' ) }
-						<ExternalLink href="https://codex.wordpress.org/Posts_Add_New_Screen">
+						<ExternalLink href="https://wordpress.org/support/article/writing-posts/#post-field-descriptions">
 							{ __( 'Read about permalinks' ) }
 						</ExternalLink>
 					</p>
@@ -104,9 +103,9 @@ function PostLink( {
 				target="_blank"
 			>
 				{ isEditable ?
-					( <Fragment>
+					( <>
 						{ prefixElement }{ postNameElement }{ suffixElement }
-					</Fragment> ) :
+					</> ) :
 					postLink
 				}
 			</ExternalLink>

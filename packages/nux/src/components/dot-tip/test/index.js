@@ -46,7 +46,7 @@ describe( 'DotTip', () => {
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
-		wrapper.find( 'IconButton[label="Disable tips"]' ).first().simulate( 'click' );
+		wrapper.find( 'ForwardRef(IconButton)[label="Disable tips"]' ).first().simulate( 'click' );
 		expect( onDisable ).toHaveBeenCalled();
 	} );
 } );

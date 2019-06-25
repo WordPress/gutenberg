@@ -1,17 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 import { rawShortcut } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import SaveShortcut from './save-shortcut';
-import BlockEditorKeyboardShortcuts from './block-editor-shortcuts';
 
 class VisualEditorGlobalKeyboardShortcuts extends Component {
 	constructor() {
@@ -33,7 +33,7 @@ class VisualEditorGlobalKeyboardShortcuts extends Component {
 
 	render() {
 		return (
-			<Fragment>
+			<>
 				<BlockEditorKeyboardShortcuts />
 				<KeyboardShortcuts
 					shortcuts={ {
@@ -42,7 +42,7 @@ class VisualEditorGlobalKeyboardShortcuts extends Component {
 					} }
 				/>
 				<SaveShortcut />
-			</Fragment>
+			</>
 		);
 	}
 }

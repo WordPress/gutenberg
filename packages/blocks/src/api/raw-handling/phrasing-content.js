@@ -6,6 +6,7 @@ import { omit } from 'lodash';
 const phrasingContentSchema = {
 	strong: {},
 	em: {},
+	s: {},
 	del: {},
 	ins: {},
 	a: { attributes: [ 'href', 'target', 'rel' ] },
@@ -20,7 +21,7 @@ const phrasingContentSchema = {
 // Recursion is needed.
 // Possible: strong > em > strong.
 // Impossible: strong > strong.
-[ 'strong', 'em', 'del', 'ins', 'a', 'code', 'abbr', 'sub', 'sup' ].forEach( ( tag ) => {
+[ 'strong', 'em', 's', 'del', 'ins', 'a', 'code', 'abbr', 'sub', 'sup' ].forEach( ( tag ) => {
 	phrasingContentSchema[ tag ].children = omit( phrasingContentSchema, tag );
 } );
 

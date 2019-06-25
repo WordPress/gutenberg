@@ -66,8 +66,7 @@ export default compose( [
 			isAutosavingPost,
 		} = select( 'core/editor' );
 
-		// This settings should not live in the block editor.
-		const { autosaveInterval } = select( 'core/block-editor' ).getEditorSettings();
+		const { autosaveInterval } = select( 'core/editor' ).getEditorSettings();
 
 		return {
 			isDirty: isEditedPostDirty(),

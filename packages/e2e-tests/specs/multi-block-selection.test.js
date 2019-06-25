@@ -6,6 +6,8 @@ import {
 	insertBlock,
 	createNewPost,
 	pressKeyWithModifier,
+	pressKeyTimes,
+	getEditedPostContent,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Multi-block selection', () => {
@@ -136,5 +138,69 @@ describe( 'Multi-block selection', () => {
 		// inserts text into.
 		const speakTextContent = await page.$eval( '#a11y-speak-assertive', ( element ) => element.textContent );
 		expect( speakTextContent.trim() ).toEqual( '3 blocks selected.' );
+	} );
+
+	// See #14448: an incorrect buffer may trigger multi-selection too soon.
+	it( 'should only trigger multi-selection when at the end', async () => {
+		// Create a paragraph with four lines.
+		await clickBlockAppender();
+		await page.keyboard.type( '1.' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '2.' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '3.' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '4.' );
+		// Create a second block.
+		await page.keyboard.press( 'Enter' );
+		// Move to the middle of the first line.
+		await pressKeyTimes( 'ArrowUp', 4 );
+		await page.keyboard.press( 'ArrowRight' );
+		// Select mid line one to mid line four.
+		await pressKeyWithModifier( 'shift', 'ArrowDown' );
+		await pressKeyWithModifier( 'shift', 'ArrowDown' );
+		await pressKeyWithModifier( 'shift', 'ArrowDown' );
+		// Delete the text to see if the selection was correct.
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should use selection direction to determine vertical edge', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'ArrowDown' );
+
+		// Should type at the end of the paragraph.
+		await page.keyboard.type( '.' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should always expand single line selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '12' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowRight' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		// This delete all blocks.
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should allow selecting outer edge if there is no sibling block', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		// This should replace the content.
+		await page.keyboard.type( '2' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

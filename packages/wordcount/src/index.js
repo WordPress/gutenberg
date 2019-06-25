@@ -95,6 +95,12 @@ function matchCharacters( text, regex, settings ) {
  * @param {String} type         The type of count. Accepts ;words', 'characters_excluding_spaces', or 'characters_including_spaces'.
  * @param {Object} userSettings Custom settings object.
  *
+ * @example
+ * ```js
+ * import { count } from '@wordpress/wordcount';
+ * const numberOfWords = count( 'Words to count', 'words', {} )
+ * ```
+ *
  * @return {Number} The word or character count.
  */
 

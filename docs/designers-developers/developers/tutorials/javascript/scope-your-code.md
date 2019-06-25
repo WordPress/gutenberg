@@ -28,7 +28,7 @@ This behavior can be problematic, and is the reason we need to scope the code. B
 
 ## Scoping Code Within a Function
 
-In JavaScript, you can scope your code by writing it within a function. Functions have "local scope", or a scope that is specific only to that function. Aditionally, in JavaScript you can write anonymous functions, functions without a name, which will also prevent your function name from being overridden in the global scope.
+In JavaScript, you can scope your code by writing it within a function. Functions have "local scope", or a scope that is specific only to that function. Additionally, in JavaScript you can write anonymous functions, functions without a name, which will also prevent your function name from being overridden in the global scope.
 
 Taking advantage of these two JavaScript features, `first.js` could be scoped as:
 

@@ -3,17 +3,6 @@ module.exports = function( api ) {
 
 	return {
 		presets: [ '@wordpress/babel-preset-default' ],
-		env: {
-			production: {
-				plugins: [
-					[
-						'@wordpress/babel-plugin-makepot',
-						{
-							output: 'languages/gutenberg.pot',
-						},
-					],
-				],
-			},
-		},
+		plugins: [ 'babel-plugin-inline-json-import' ],
 	};
 };

@@ -30,7 +30,7 @@ If your code is registered and enqueued correctly, you should see a message in y
 
 ![Console Log Message Success](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/js-tutorial-console-log-success.png)
 
-**Note for Theme Developers:**  The above method of enqueing is used for plugins. If you are extending the Block Editor for your theme there is a minor difference, you will use the `get_template_directory_uri()` function instead of `plugins_url()`. So for a theme, the enqueue example is:
+**Note for Theme Developers:**  The above method of enqueuing is used for plugins. If you are extending the block editor for your theme there is a minor difference, you will use the `get_template_directory_uri()` function instead of `plugins_url()`. So for a theme, the enqueue example is:
 
 ```php
 function myguten_enqueue() {
@@ -46,4 +46,4 @@ add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
 
 At this point, you have a plugin in the directory `wp-content/plugins/myguten-plugin` with two files: the PHP server-side code in `myguten-plugin.php`, and the JavaScript which runs in the browser in `myguten.js`.
 
-This puts all the initial pieces in place for you to start extending the Block Editor.
+This puts all the initial pieces in place for you to start extending the block editor.

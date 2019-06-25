@@ -42,13 +42,23 @@ describe( 'RangeControl', () => {
 			TestUtils.Simulate.change(
 				rangeInputElement(),
 				{
-					target: { value: '5' },
+					target: {
+						value: '5',
+						checkValidity() {
+							return true;
+						},
+					},
 				}
 			);
 			TestUtils.Simulate.change(
 				numberInputElement(),
 				{
-					target: { value: '10' },
+					target: {
+						value: '10',
+						checkValidity() {
+							return true;
+						},
+					},
 				}
 			);
 
@@ -96,7 +106,12 @@ describe( 'RangeControl', () => {
 			TestUtils.Simulate.change(
 				numberInputElement(),
 				{
-					target: { value: '10' },
+					target: {
+						value: '10',
+						checkValidity() {
+							return false;
+						},
+					},
 				}
 			);
 
@@ -116,7 +131,12 @@ describe( 'RangeControl', () => {
 			TestUtils.Simulate.change(
 				numberInputElement(),
 				{
-					target: { value: '21' },
+					target: {
+						value: '21',
+						checkValidity() {
+							return false;
+						},
+					},
 				}
 			);
 
@@ -136,14 +156,24 @@ describe( 'RangeControl', () => {
 			TestUtils.Simulate.change(
 				numberInputElement(),
 				{
-					target: { value: '10' },
+					target: {
+						value: '10',
+						checkValidity() {
+							return false;
+						},
+					},
 				}
 			);
 
 			TestUtils.Simulate.change(
 				numberInputElement(),
 				{
-					target: { value: '21' },
+					target: {
+						value: '21',
+						checkValidity() {
+							return false;
+						},
+					},
 				}
 			);
 
@@ -152,7 +182,12 @@ describe( 'RangeControl', () => {
 			TestUtils.Simulate.change(
 				numberInputElement(),
 				{
-					target: { value: '14' },
+					target: {
+						value: '14',
+						checkValidity() {
+							return true;
+						},
+					},
 				}
 			);
 
@@ -171,7 +206,12 @@ describe( 'RangeControl', () => {
 			TestUtils.Simulate.change(
 				numberInputElement(),
 				{
-					target: { value: '1' },
+					target: {
+						value: '1',
+						checkValidity() {
+							return false;
+						},
+					},
 				}
 			);
 
@@ -190,7 +230,12 @@ describe( 'RangeControl', () => {
 			TestUtils.Simulate.change(
 				numberInputElement(),
 				{
-					target: { value: '-101' },
+					target: {
+						value: '-101',
+						checkValidity() {
+							return false;
+						},
+					},
 				}
 			);
 
@@ -199,7 +244,12 @@ describe( 'RangeControl', () => {
 			TestUtils.Simulate.change(
 				numberInputElement(),
 				{
-					target: { value: '-49' },
+					target: {
+						value: '-49',
+						checkValidity() {
+							return false;
+						},
+					},
 				}
 			);
 
@@ -208,11 +258,53 @@ describe( 'RangeControl', () => {
 			TestUtils.Simulate.change(
 				numberInputElement(),
 				{
-					target: { value: '-50' },
+					target: {
+						value: '-50',
+						checkValidity() {
+							return true;
+						},
+					},
 				}
 			);
 
-			expect( onChange ).toHaveBeenCalled();
+			expect( onChange ).toHaveBeenCalledWith( -50 );
+		} );
+		it( 'takes into account the step starting from min', () => {
+			const onChange = jest.fn();
+			const wrapper = getWrapper( { onChange, min: 0.1, step: 0.125, value: 0.1 } );
+
+			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__number'
+			);
+
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: {
+						value: '0.125',
+						checkValidity() {
+							return false;
+						},
+					},
+				}
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: {
+						value: '0.225',
+						checkValidity() {
+							return true;
+						},
+					},
+				}
+			);
+
+			expect( onChange ).toHaveBeenCalledWith( 0.225 );
 		} );
 	} );
 } );

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 export default function SearchEdit( { className, attributes, setAttributes } ) {

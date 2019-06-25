@@ -16,7 +16,7 @@ import classnames from 'classnames/dedupe';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
-import { RichText, BlockIcon } from '@wordpress/editor';
+import { RichText, BlockIcon } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 
 /**
@@ -69,8 +69,7 @@ class EmbedPreview extends Component {
 		// Disabled because the overlay div doesn't actually have a role or functionality
 		// as far as the user is concerned. We're just catching the first click so that
 		// the block can be selected without interacting with the embed preview that the overlay covers.
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-static-element-interactions */
 		const embedWrapper = 'wp-embed' === type ? (
 			<WpEmbedPreview
 				html={ html }
@@ -89,15 +88,19 @@ class EmbedPreview extends Component {
 					onMouseUp={ this.hideOverlay } /> }
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-static-element-interactions */
 
 		return (
 			<figure className={ classnames( className, 'wp-block-embed', { 'is-type-video': 'video' === type } ) }>
 				{ ( cannotPreview ) ? (
 					<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label }>
 						<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
-						<p className="components-placeholder__error">{ __( 'Sorry, this embedded content cannot be previewed in the editor.' ) }</p>
+						<p className="components-placeholder__error">
+							{
+								/* translators: %s: host providing embed content e.g: www.youtube.com */
+								sprintf( __( "Embedded content from %s can't be previewed in the editor." ), parsedHostBaseUrl )
+							}
+						</p>
 					</Placeholder>
 				) : embedWrapper }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (

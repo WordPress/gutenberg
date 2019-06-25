@@ -27,15 +27,6 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should apply formatting with access shortcut', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'test' );
-		await pressKeyWithModifier( 'primary', 'a' );
-		await pressKeyWithModifier( 'access', 'd' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'should apply formatting with primary shortcut', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
@@ -56,6 +47,34 @@ describe( 'RichText', () => {
 		await page.keyboard.type( '.' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should apply multiple formats when selection is collapsed', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '.' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not highlight more than one format', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( ' 2' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'b' );
+
+		const count = await page.evaluate( () => document.querySelectorAll(
+			'*[data-rich-text-format-boundary]'
+		).length );
+
+		expect( count ).toBe( 1 );
 	} );
 
 	it( 'should return focus when pressing formatting button', async () => {
@@ -177,6 +196,21 @@ describe( 'RichText', () => {
 		// There should be no selection. The following should insert "-" without
 		// deleting the numbers.
 		await page.keyboard.type( '-' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should handle Home and End keys', async () => {
+		await page.keyboard.press( 'Enter' );
+
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '12' );
+		await pressKeyWithModifier( 'primary', 'b' );
+
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.type( '-' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '+' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

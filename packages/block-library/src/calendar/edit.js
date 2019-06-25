@@ -61,7 +61,20 @@ class CalendarEdit extends Component {
 }
 
 export default withSelect( ( select ) => {
+	const coreEditorSelect = select( 'core/editor' );
+	if ( ! coreEditorSelect ) {
+		return;
+	}
+	const {
+		getEditedPostAttribute,
+	} = coreEditorSelect;
+	const postType = getEditedPostAttribute( 'type' );
+	// Dates are used to overwrite year and month used on the calendar.
+	// This overwrite should only happen for 'post' post types.
+	// For other post types the calendar always displays the current month.
 	return {
-		date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
+		date: postType === 'post' ?
+			getEditedPostAttribute( 'date' ) :
+			undefined,
 	};
 } )( CalendarEdit );

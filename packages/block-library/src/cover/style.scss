@@ -6,7 +6,6 @@
 	background-position: center center;
 	min-height: 430px;
 	width: 100%;
-	margin: 0 0 1.5em 0;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -63,6 +62,11 @@
 		@supports (-webkit-overflow-scrolling: touch) {
 			background-attachment: scroll;
 		}
+
+		// Remove the appearance of scrolling based on OS-level animation preferences.
+		@media (prefers-reduced-motion: reduce) {
+			background-attachment: scroll;
+		}
 	}
 
 	&.has-background-dim::before {
@@ -109,6 +113,23 @@
 	&.alignleft,
 	&.alignright {
 		display: flex;
+	}
+
+	.wp-block-cover__inner-container {
+		width: calc(100% - 70px);
+		z-index: z-index(".wp-block-cover__inner-container");
+		color: $light-gray-100;
+	}
+
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	.wp-block-subhead {
+		color: inherit;
 	}
 }
 

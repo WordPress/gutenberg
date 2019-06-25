@@ -1,3 +1,25 @@
+## 2.4.0 (2019-05-21)
+
+### New Features
+
+- Added `lazy` feautre (see: https://reactjs.org/docs/react-api.html#reactlazy).
+- Added `Suspense` component (see: https://reactjs.org/docs/react-api.html#reactsuspense).
+
+## 2.3.0 (2019-03-06)
+
+### New Features
+
+- Added `useCallback` hook (see: https://reactjs.org/docs/hooks-reference.html#usecallback).
+- Added `useContext` hook (see: https://reactjs.org/docs/hooks-reference.html#usecontext).
+- Added `useDebugValue` hook (see: https://reactjs.org/docs/hooks-reference.html#usedebugvalue).
+- Added `useEffect` hook (see: https://reactjs.org/docs/hooks-reference.html#useeffect).
+- Added `useImperativeHandle` hook (see: https://reactjs.org/docs/hooks-reference.html#useimperativehandle).
+- Added `useLayoutEffect` hook (see: https://reactjs.org/docs/hooks-reference.html#uselayouteffect).
+- Added `useMemo` hook (see: https://reactjs.org/docs/hooks-reference.html#usememo).
+- Added `useReducer` hook (see: https://reactjs.org/docs/hooks-reference.html#usereducer).
+- Added `useRef` hook (see: https://reactjs.org/docs/hooks-reference.html#useref).
+- Added `useState` hook (see: https://reactjs.org/docs/hooks-reference.html#usestate).
+
 ## 2.1.8 (2018-11-15)
 
 ## 2.1.7 (2018-11-09)

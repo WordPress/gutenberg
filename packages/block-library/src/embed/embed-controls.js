@@ -2,9 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import { IconButton, Toolbar, PanelBody, ToggleControl } from '@wordpress/components';
-import { BlockControls, InspectorControls } from '@wordpress/editor';
+import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 
 const EmbedControls = ( props ) => {
 	const {
@@ -17,7 +16,7 @@ const EmbedControls = ( props ) => {
 		switchBackToURLInput,
 	} = props;
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<Toolbar>
 					{ showEditButton && (
@@ -42,7 +41,7 @@ const EmbedControls = ( props ) => {
 					</PanelBody>
 				</InspectorControls>
 			) }
-		</Fragment>
+		</>
 	);
 };
 

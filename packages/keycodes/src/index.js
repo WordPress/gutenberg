@@ -24,24 +24,82 @@ import { __ } from '@wordpress/i18n';
  */
 import { isAppleOS } from './platform';
 
+/**
+ * Keycode for BACKSPACE key.
+ */
 export const BACKSPACE = 8;
+/**
+ * Keycode for TAB key.
+ */
 export const TAB = 9;
+/**
+ * Keycode for ENTER key.
+ */
 export const ENTER = 13;
+/**
+ * Keycode for ESCAPE key.
+ */
 export const ESCAPE = 27;
+/**
+ * Keycode for SPACE key.
+ */
 export const SPACE = 32;
+/**
+ * Keycode for LEFT key.
+ */
 export const LEFT = 37;
+/**
+ * Keycode for UP key.
+ */
 export const UP = 38;
+/**
+ * Keycode for RIGHT key.
+ */
 export const RIGHT = 39;
+/**
+ * Keycode for DOWN key.
+ */
 export const DOWN = 40;
+/**
+ * Keycode for DELETE key.
+ */
 export const DELETE = 46;
-
+/**
+ * Keycode for F10 key.
+ */
 export const F10 = 121;
-
+/**
+ * Keycode for ALT key.
+ */
 export const ALT = 'alt';
+/**
+ * Keycode for CTRL key.
+ */
 export const CTRL = 'ctrl';
+/**
+ * Keycode for COMMAND/META key.
+ */
 export const COMMAND = 'meta';
+/**
+ * Keycode for SHIFT key.
+ */
 export const SHIFT = 'shift';
 
+/**
+ * Object that contains functions that return the available modifier
+ * depending on platform.
+ *
+ * - `primary`: takes a isApple function as a parameter.
+ * - `primaryShift`: takes a isApple function as a parameter.
+ * - `primaryAlt`: takes a isApple function as a parameter.
+ * - `secondary`: takes a isApple function as a parameter.
+ * - `access`: takes a isApple function as a parameter.
+ * - `ctrl`
+ * - `alt`
+ * - `ctrlShift`
+ * - `shift`
+ * - `shiftAlt`
+ */
 export const modifiers = {
 	primary: ( _isApple ) => _isApple() ? [ COMMAND ] : [ CTRL ],
 	primaryShift: ( _isApple ) => _isApple() ? [ SHIFT, COMMAND ] : [ CTRL, SHIFT ],

@@ -197,11 +197,11 @@ const addListItem = ( newListItem ) => {
 ```
 {% end %}
 
-Why do this? In JavaScript, arrays and objects are passed by reference, so this practice ensures changes won't affect other code that might hold references to the same data. Furthermore, Gutenberg follows the philosophy of the Redux library that [state should be immutable](https://redux.js.org/faq/immutable-data#what-are-the-benefits-of-immutability)—data should not be changed directly, but instead a new version of the data created containing the changes.
+Why do this? In JavaScript, arrays and objects are passed by reference, so this practice ensures changes won't affect other code that might hold references to the same data. Furthermore, the Gutenberg project follows the philosophy of the Redux library that [state should be immutable](https://redux.js.org/faq/immutable-data#what-are-the-benefits-of-immutability)—data should not be changed directly, but instead a new version of the data created containing the changes.
 
 ## Save
 
-The `save` function defines the way in which the different attributes should be combined into the final markup, which is then serialized by Gutenberg into `post_content`.
+The `save` function defines the way in which the different attributes should be combined into the final markup, which is then serialized into `post_content`.
 
 {% codetabs %}
 {% ES5 %}
@@ -226,7 +226,16 @@ For most blocks, the return value of `save` should be an [instance of WordPress 
 
 _Note:_ While it is possible to return a string value from `save`, it _will be escaped_. If the string includes HTML markup, the markup will be shown on the front of the site verbatim, not as the equivalent HTML node content. If you must return raw HTML from `save`, use `wp.element.RawHTML`. As the name implies, this is prone to [cross-site scripting](https://en.wikipedia.org/wiki/Cross-site_scripting) and therefore is discouraged in favor of a WordPress Element hierarchy whenever possible.
 
-For [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md), the return value of `save` could either represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled. Alternatively, return a `null` (empty) value to save no markup in post content for the dynamic block, instead deferring this to always be calculated when the block is shown on the front of the site.
+_Note:_ The save function should be a pure function that depends only on the attributes used to invoke it.
+It can not have any side effect or retrieve information from another source, e.g. it is not possible to use the data module inside it `select( store ).selector( ... )`.
+This is because if the external information changes, the block may be flagged as invalid when the post is later edited ([read more about Validation](#validation)).
+If there is a need to have other information as part of the save, developers can consider one of these two alternatives:
+ - Use [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md) and dynamically retrieve the required information on the server.
+ - Store the external value as an attribute which is dynamically updated in the block's `edit` function as changes occur.
+
+For [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md), the return value of `save` could represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled.
+
+If left unspecified, the default implementation will save no markup in post content for the dynamic block, instead deferring this to always be calculated when the block is shown on the front of the site.
 
 ### attributes
 
@@ -406,4 +415,4 @@ When a block is detected as invalid, a warning will be logged into your browser'
 
 **I've changed my block's `save` behavior and old content now includes invalid blocks. How can I fix this?**
 
-Refer to the guide on [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecations.md) to learn more about how to accommodate legacy content in intentional markup changes.
+Refer to the guide on [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecation.md) to learn more about how to accommodate legacy content in intentional markup changes.

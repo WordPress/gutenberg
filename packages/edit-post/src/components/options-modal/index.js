@@ -10,7 +10,13 @@ import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { PostTaxonomies, PostExcerptCheck, PageAttributesCheck, PostFeaturedImageCheck, PostTypeSupportCheck } from '@wordpress/editor';
+import {
+	PostTaxonomies,
+	PostExcerptCheck,
+	PageAttributesCheck,
+	PostFeaturedImageCheck,
+	PostTypeSupportCheck,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

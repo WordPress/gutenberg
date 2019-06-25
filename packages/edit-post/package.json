@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "3.1.11",
+	"version": "3.5.0",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,9 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.3.1",
+		"@babel/runtime": "^7.4.4",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
@@ -32,7 +33,6 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
-		"@wordpress/format-library": "file:../format-library",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",

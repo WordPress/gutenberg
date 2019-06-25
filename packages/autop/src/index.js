@@ -117,6 +117,13 @@ function replaceInHtmlTags( haystack, replacePairs ) {
  * @param  {string}    text The text which has to be formatted.
  * @param  {boolean}   br   Optional. If set, will convert all remaining line-
  *                          breaks after paragraphing. Default true.
+ *
+ * @example
+ *```js
+ * import { autop } from '@wordpress/autop';
+ * autop( 'my text' ); // "<p>my text</p>"
+ * ```
+ *
  * @return {string}         Text which has been converted into paragraph tags.
  */
 export function autop( text, br = true ) {
@@ -284,6 +291,13 @@ export function autop( text, br = true ) {
  * Unifies whitespace. Indents `<li>`, `<dt>` and `<dd>` for better readability.
  *
  * @param  {string} html The content from the editor.
+ *
+ * @example
+ * ```js
+ * import { removep } from '@wordpress/autop';
+ * removep( '<p>my text</p>' ); // "my text"
+ * ```
+ *
  * @return {string}      The content with stripped paragraph tags.
  */
 export function removep( html ) {
@@ -329,7 +343,7 @@ export function removep( html ) {
 	html = html.replace( new RegExp( '\\s*<((?:' + blocklist1 + ')(?: [^>]*)?)>', 'g' ), '\n<$1>' );
 
 	// Mark </p> if it has any attributes.
-	html = html.replace( /(<p [^>]+>.*?)<\/p>/g, '$1</p#>' );
+	html = html.replace( /(<p [^>]+>[\s\S]*?)<\/p>/g, '$1</p#>' );
 
 	// Preserve the first <p> inside a <div>.
 	html = html.replace( /<div( [^>]*)?>\s*<p>/gi, '<div$1>\n\n' );

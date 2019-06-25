@@ -38,7 +38,7 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 
 export default compose(
 	withSelect( ( select ) => ( {
-		isRichEditingEnabled: select( 'core/block-editor' ).getEditorSettings().richEditingEnabled,
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		return {

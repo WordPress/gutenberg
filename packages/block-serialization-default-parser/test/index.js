@@ -12,7 +12,7 @@ import { jsTester, phpTester } from '@wordpress/block-serialization-spec-parser/
 /**
  * Internal dependencies
  */
-import { parse } from '../';
+import { parse } from '../src';
 
 describe( 'block-serialization-default-parser-js', jsTester( parse ) );
 

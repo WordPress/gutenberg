@@ -6,11 +6,11 @@ import { noop, partial } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEdit } from '@wordpress/editor';
+import { BlockEdit } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -124,7 +124,7 @@ class ReusableBlockEdit extends Component {
 		}
 
 		return (
-			<Fragment>
+			<>
 				{ ( isSelected || isEditing ) && (
 					<ReusableBlockEditPanel
 						isEditing={ isEditing }
@@ -139,7 +139,7 @@ class ReusableBlockEdit extends Component {
 				) }
 				{ ! isSelected && ! isEditing && <ReusableBlockIndicator title={ reusableBlock.title } /> }
 				{ element }
-			</Fragment>
+			</>
 		);
 	}
 }

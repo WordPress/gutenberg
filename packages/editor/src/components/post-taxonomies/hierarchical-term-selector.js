@@ -302,7 +302,7 @@ class HierarchicalTermSelector extends Component {
 
 			// If the term's name contains the filterValue, or it has children
 			// (i.e. some child matched at some point in the tree) then return it.
-			if ( -1 !== term.name.toLowerCase().indexOf( filterValue ) || term.children.length > 0 ) {
+			if ( -1 !== term.name.toLowerCase().indexOf( filterValue.toLowerCase() ) || term.children.length > 0 ) {
 				return term;
 			}
 
@@ -370,21 +370,15 @@ class HierarchicalTermSelector extends Component {
 		const newTermSubmitLabel = newTermButtonLabel;
 		const inputId = `editor-post-taxonomies__hierarchical-terms-input-${ instanceId }`;
 		const filterInputId = `editor-post-taxonomies__hierarchical-terms-filter-${ instanceId }`;
-		const filterLabel = sprintf(
-			_x( 'Search %s', 'term' ),
-			get(
-				this.props.taxonomy,
-				[ 'name' ],
-				slug === 'category' ? __( 'Categories' ) : __( 'Terms' )
-			)
+		const filterLabel = get(
+			this.props.taxonomy,
+			[ 'labels', 'search_items' ],
+			__( 'Search Terms' )
 		);
-		const groupLabel = sprintf(
-			_x( 'Available %s', 'term' ),
-			get(
-				this.props.taxonomy,
-				[ 'name' ],
-				slug === 'category' ? __( 'Categories' ) : __( 'Terms' )
-			)
+		const groupLabel = get(
+			this.props.taxonomy,
+			[ 'name' ],
+			__( 'Terms' )
 		);
 		const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
 

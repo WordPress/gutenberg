@@ -24,7 +24,6 @@ describe( 'recordToDom', () => {
 	spec.forEach( ( {
 		description,
 		multilineTag,
-		multilineWrapperTags,
 		record,
 		startPath,
 		endPath,
@@ -33,7 +32,6 @@ describe( 'recordToDom', () => {
 			const { body, selection } = toDom( {
 				value: record,
 				multilineTag,
-				multilineWrapperTags,
 			} );
 			expect( body ).toMatchSnapshot();
 			expect( selection ).toEqual( { startPath, endPath } );
@@ -60,6 +58,42 @@ describe( 'applyValue', () => {
 			future: 'test',
 			movedCount: 0,
 			description: 'should not modify',
+		},
+		{
+			current: '<span data-1="">b</span>',
+			future: '<span>b</span>',
+			movedCount: 0,
+			description: 'should remove attribute',
+		},
+		{
+			current: '<span data-1="" data-2="">b</span>',
+			future: '<span>b</span>',
+			movedCount: 0,
+			description: 'should remove attributes',
+		},
+		{
+			current: '<span>a</span>',
+			future: '<span data-1="">c</span>',
+			movedCount: 0,
+			description: 'should add attribute',
+		},
+		{
+			current: '<span>a</span>',
+			future: '<span data-1="" data-2="">c</span>',
+			movedCount: 0,
+			description: 'should add attributes',
+		},
+		{
+			current: '<span data-1="i">a</span>',
+			future: '<span data-1="ii">a</span>',
+			movedCount: 0,
+			description: 'should update attribute',
+		},
+		{
+			current: '<span data-1="i" data-2="ii">a</span>',
+			future: '<span data-1="ii" data-2="i">a</span>',
+			movedCount: 0,
+			description: 'should update attributes',
 		},
 	];
 

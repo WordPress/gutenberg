@@ -7,10 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Component,
-	Fragment,
-} from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import {
 	Dashicon,
@@ -24,7 +21,7 @@ import {
 	InspectorControls,
 	withColors,
 	PanelColorSettings,
-} from '@wordpress/editor';
+} from '@wordpress/block-editor';
 
 const { getComputedStyle } = window;
 
@@ -75,7 +72,7 @@ class ButtonEdit extends Component {
 		} = attributes;
 
 		return (
-			<Fragment>
+			<>
 				<div className={ className } title={ title } ref={ this.bindRef }>
 					<RichText
 						placeholder={ __( 'Add text…' ) }
@@ -133,12 +130,16 @@ class ButtonEdit extends Component {
 						<Dashicon icon="admin-links" />
 						<URLInput
 							value={ url }
+							/* eslint-disable jsx-a11y/no-autofocus */
+							// Disable Reason: The rule is meant to prevent enabling auto-focus, not disabling it.
+							autoFocus={ false }
+							/* eslint-enable jsx-a11y/no-autofocus */
 							onChange={ ( value ) => setAttributes( { url: value } ) }
 						/>
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
 				) }
-			</Fragment>
+			</>
 		);
 	}
 }

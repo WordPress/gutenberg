@@ -2,7 +2,7 @@
 
 **Note: This API is experimental, that means it is subject to non-backward compatible changes or removal in any future version.**
 
-Annotations are a way to highlight a specific piece in a Gutenberg post. Examples of this include commenting on a piece of text and spellchecking. Both can use the annotations API to mark a piece of text.
+Annotations are a way to highlight a specific piece in a post created with the block editor. Examples of this include commenting on a piece of text and spellchecking. Both can use the annotations API to mark a piece of text.
 
 ## API
 
@@ -28,7 +28,11 @@ The start and the end of the range should be calculated based only on the text o
 
 To help with determining the correct positions, the `wp.richText.create` method can be used. This will split a piece of HTML into text and formats.
 
-All available properties can be found in the API documentation of the `addAnnotation` action. 
+All available properties can be found in the API documentation of the `addAnnotation` action.
+
+The property `richTextIdentifier` is the identifier of the RichText instance the annotation applies to. This is necessary because blocks may have multiple rich text instances that are used to manage data for different attributes, so you need to pass this in order to highlight text within the correct one.
+
+For example the paragraph block only has a single RichText instance, with the identifer `content`. The quote block type has 2 RichText instances, so if you wish to highlight text in the citation, you need to pass `citation` as the `richTextIdentifier` when adding an annotation. To target the quote content, you need to use the identifier `value`. Refer to the source code of the block type to find the correct identifier.
 
 ## Block annotation
 

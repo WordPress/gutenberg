@@ -20,11 +20,8 @@ export function PageAttributesCheck( { availableTemplates, postType, children } 
 }
 
 export default withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
-	const { getEditorSettings } = select( 'core/block-editor' );
+	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
-
-	// This setting should not live in the block-editor module.
 	const { availableTemplates } = getEditorSettings();
 	return {
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),

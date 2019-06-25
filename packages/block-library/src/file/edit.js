@@ -26,10 +26,9 @@ import {
 	MediaUploadCheck,
 	MediaPlaceholder,
 	RichText,
-	mediaUpload,
-} from '@wordpress/editor';
-import { Component, Fragment } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+} from '@wordpress/block-editor';
+import { Component } from '@wordpress/element';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -47,6 +46,7 @@ class FileEdit extends Component {
 		this.changeLinkDestinationOption = this.changeLinkDestinationOption.bind( this );
 		this.changeOpenInNewWindow = this.changeOpenInNewWindow.bind( this );
 		this.changeShowDownloadButton = this.changeShowDownloadButton.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 
 		this.state = {
 			hasError: false,
@@ -55,8 +55,13 @@ class FileEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, noticeOperations } = this.props;
-		const { href } = attributes;
+		const {
+			attributes,
+			mediaUpload,
+			noticeOperations,
+			setAttributes,
+		} = this.props;
+		const { downloadButtonText, href } = attributes;
 
 		// Upload a file drag-and-dropped into the editor
 		if ( isBlobURL( href ) ) {
@@ -72,6 +77,12 @@ class FileEdit extends Component {
 			} );
 
 			revokeBlobURL( href );
+		}
+
+		if ( downloadButtonText === undefined ) {
+			setAttributes( {
+				downloadButtonText: _x( 'Download', 'button label' ),
+			} );
 		}
 	}
 
@@ -92,6 +103,12 @@ class FileEdit extends Component {
 				id: media.id,
 			} );
 		}
+	}
+
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
 	}
 
 	confirmCopyURL() {
@@ -124,7 +141,6 @@ class FileEdit extends Component {
 			attributes,
 			setAttributes,
 			noticeUI,
-			noticeOperations,
 			media,
 		} = this.props;
 		const {
@@ -145,11 +161,11 @@ class FileEdit extends Component {
 					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
 						title: __( 'File' ),
-						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
+						instructions: __( 'Upload a file or pick one from your media library.' ),
 					} }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
+					onError={ this.onUploadError }
 					accept="*"
 				/>
 			);
@@ -160,7 +176,7 @@ class FileEdit extends Component {
 		} );
 
 		return (
-			<Fragment>
+			<>
 				<FileBlockInspector
 					hrefs={ { href, textLinkHref, attachmentPage } }
 					{ ...{
@@ -228,7 +244,7 @@ class FileEdit extends Component {
 						</ClipboardButton>
 					}
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 }
@@ -236,9 +252,12 @@ class FileEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
+		const { getSettings } = select( 'core/block-editor' );
+		const { __experimentalMediaUpload } = getSettings();
 		const { id } = props.attributes;
 		return {
 			media: id === undefined ? undefined : getMedia( id ),
+			mediaUpload: __experimentalMediaUpload,
 		};
 	} ),
 	withNotices,

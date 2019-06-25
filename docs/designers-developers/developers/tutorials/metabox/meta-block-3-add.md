@@ -6,7 +6,7 @@ For this block, you will use the TextControl component, which is similar to an H
 
 Attributes are the information displayed in blocks. As shown in the block tutorial, the source of attributes come from the text or HTML a user writes in the editor. For your meta block, the attribute will come from the post meta field.
 
-By specifying the source of the attributes as `meta`, the Block Editor automatically handles the loading and storing of the data; no REST API or data functions are needed.
+By specifying the source of the attributes as `meta`, the block editor automatically handles the loading and storing of the data; no REST API or data functions are needed.
 
 Add this code to your JavaScript file (this tutorial will call the file `myguten.js`):
 
@@ -60,7 +60,6 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 ```
 {% ESNext %}
 ```jsx
-
 const { registerBlockType } = wp.blocks;
 const { TextControl } = wp.components;
 

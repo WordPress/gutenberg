@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+import { compose } from '@wordpress/compose';
 import {
 	Disabled,
 	IconButton,
@@ -17,10 +18,10 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	RichText,
-	mediaUpload,
-} from '@wordpress/editor';
-import { Component, Fragment } from '@wordpress/element';
+} from '@wordpress/block-editor';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -45,10 +46,16 @@ class AudioEdit extends Component {
 
 		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 	}
 
 	componentDidMount() {
-		const { attributes, noticeOperations, setAttributes } = this.props;
+		const {
+			attributes,
+			mediaUpload,
+			noticeOperations,
+			setAttributes,
+		} = this.props;
 		const { id, src = '' } = attributes;
 
 		if ( ! id && isBlobURL( src ) ) {
@@ -98,9 +105,19 @@ class AudioEdit extends Component {
 		this.setState( { editing: false } );
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
+	getAutoplayHelp( checked ) {
+		return checked ? __( 'Note: Autoplaying audio may cause usability issues for some visitors.' ) : null;
+	}
+
 	render() {
 		const { autoplay, caption, loop, preload, src } = this.props.attributes;
-		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
+		const { setAttributes, isSelected, className, noticeUI } = this.props;
 		const { editing } = this.state;
 		const switchToEditing = () => {
 			this.setState( { editing: true } );
@@ -129,14 +146,14 @@ class AudioEdit extends Component {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ this.props.attributes }
 					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
+					onError={ this.onUploadError }
 				/>
 			);
 		}
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar>
 						<IconButton
@@ -153,6 +170,7 @@ class AudioEdit extends Component {
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ this.getAutoplayHelp }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }
@@ -190,10 +208,18 @@ class AudioEdit extends Component {
 						/>
 					) }
 				</figure>
-			</Fragment>
+			</>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
-
-export default withNotices( AudioEdit );
+export default compose( [
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		const { __experimentalMediaUpload } = getSettings();
+		return {
+			mediaUpload: __experimentalMediaUpload,
+		};
+	} ),
+	withNotices,
+] )( AudioEdit );

@@ -7,11 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { mediaUpload } from './media-upload';
+import { uploadMedia } from '@wordpress/media-utils';
 
 /**
  * Upload a media file when the file upload button is activated.
@@ -33,14 +29,11 @@ export default function( {
 	onError = noop,
 	onFileChange,
 } ) {
-	const { getCurrentPostId } = select( 'core/editor' );
-	const { getEditorSettings } = select( 'core/block-editor' );
-
-	// These settings should not live in the block editor's store.
+	const { getCurrentPostId, getEditorSettings } = select( 'core/editor' );
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	maxUploadFileSize = maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 
-	mediaUpload( {
+	uploadMedia( {
 		allowedTypes,
 		filesList,
 		onFileChange,

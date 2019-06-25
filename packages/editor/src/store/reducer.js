@@ -9,7 +9,6 @@ import {
 	mapValues,
 	keys,
 	isEqual,
-	last,
 } from 'lodash';
 
 /**
@@ -24,6 +23,7 @@ import { addQueryArgs } from '@wordpress/url';
 import {
 	PREFERENCES_DEFAULTS,
 	INITIAL_EDITS_DEFAULTS,
+	EDITOR_SETTINGS_DEFAULTS,
 } from './defaults';
 import { EDIT_MERGE_PROPERTIES } from './constants';
 import withChangeDetection from '../utils/with-change-detection';
@@ -279,200 +279,6 @@ export function currentPost( state = {}, action ) {
 }
 
 /**
- * Reducer returning typing state.
- *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {boolean} Updated state.
- */
-export function isTyping( state = false, action ) {
-	switch ( action.type ) {
-		case 'START_TYPING':
-			return true;
-
-		case 'STOP_TYPING':
-			return false;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning whether the caret is within formatted text.
- *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {boolean} Updated state.
- */
-export function isCaretWithinFormattedText( state = false, action ) {
-	switch ( action.type ) {
-		case 'ENTER_FORMATTED_TEXT':
-			return true;
-
-		case 'EXIT_FORMATTED_TEXT':
-			return false;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the block selection's state.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function blockSelection( state = {
-	start: null,
-	end: null,
-	isMultiSelecting: false,
-	isEnabled: true,
-	initialPosition: null,
-}, action ) {
-	switch ( action.type ) {
-		case 'CLEAR_SELECTED_BLOCK':
-			if ( state.start === null && state.end === null && ! state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				start: null,
-				end: null,
-				isMultiSelecting: false,
-				initialPosition: null,
-			};
-		case 'START_MULTI_SELECT':
-			if ( state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				isMultiSelecting: true,
-				initialPosition: null,
-			};
-		case 'STOP_MULTI_SELECT':
-			if ( ! state.isMultiSelecting ) {
-				return state;
-			}
-
-			return {
-				...state,
-				isMultiSelecting: false,
-				initialPosition: null,
-			};
-		case 'MULTI_SELECT':
-			return {
-				...state,
-				start: action.start,
-				end: action.end,
-				initialPosition: null,
-			};
-		case 'SELECT_BLOCK':
-			if ( action.clientId === state.start && action.clientId === state.end ) {
-				return state;
-			}
-			return {
-				...state,
-				start: action.clientId,
-				end: action.clientId,
-				initialPosition: action.initialPosition,
-			};
-		case 'INSERT_BLOCKS': {
-			if ( action.updateSelection ) {
-				return {
-					...state,
-					start: action.blocks[ 0 ].clientId,
-					end: action.blocks[ 0 ].clientId,
-					initialPosition: null,
-					isMultiSelecting: false,
-				};
-			}
-			return state;
-		}
-		case 'REMOVE_BLOCKS':
-			if ( ! action.clientIds || ! action.clientIds.length || action.clientIds.indexOf( state.start ) === -1 ) {
-				return state;
-			}
-			return {
-				...state,
-				start: null,
-				end: null,
-				initialPosition: null,
-				isMultiSelecting: false,
-			};
-		case 'REPLACE_BLOCKS':
-			if ( action.clientIds.indexOf( state.start ) === -1 ) {
-				return state;
-			}
-
-			// If there are replacement blocks, assign last block as the next
-			// selected block, otherwise set to null.
-			const lastBlock = last( action.blocks );
-			const nextSelectedBlockClientId = lastBlock ? lastBlock.clientId : null;
-
-			if ( nextSelectedBlockClientId === state.start && nextSelectedBlockClientId === state.end ) {
-				return state;
-			}
-
-			return {
-				...state,
-				start: nextSelectedBlockClientId,
-				end: nextSelectedBlockClientId,
-				initialPosition: null,
-				isMultiSelecting: false,
-			};
-		case 'TOGGLE_SELECTION':
-			return {
-				...state,
-				isEnabled: action.isSelectionEnabled,
-			};
-	}
-
-	return state;
-}
-
-export function blocksMode( state = {}, action ) {
-	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
-		const { clientId } = action;
-		return {
-			...state,
-			[ clientId ]: state[ clientId ] && state[ clientId ] === 'html' ? 'visual' : 'html',
-		};
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the block insertion point visibility, either null if there
- * is not an explicit insertion point assigned, or an object of its `index` and
- * `rootClientId`.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function insertionPoint( state = null, action ) {
-	switch ( action.type ) {
-		case 'SHOW_INSERTION_POINT':
-			const { rootClientId, index } = action;
-			return { rootClientId, index };
-
-		case 'HIDE_INSERTION_POINT':
-			return null;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning whether the post blocks match the defined template or not.
  *
  * @param {Object} state  Current state.
@@ -709,77 +515,9 @@ export const reusableBlocks = combineReducers( {
 } );
 
 /**
- * Reducer returning an object where each key is a block client ID, its value
- * representing the settings for its nested blocks.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export const blockListSettings = ( state = {}, action ) => {
-	switch ( action.type ) {
-		// Even if the replaced blocks have the same client ID, our logic
-		// should correct the state.
-		case 'REPLACE_BLOCKS' :
-		case 'REMOVE_BLOCKS': {
-			return omit( state, action.clientIds );
-		}
-		case 'UPDATE_BLOCK_LIST_SETTINGS': {
-			const { clientId } = action;
-			if ( ! action.settings ) {
-				if ( state.hasOwnProperty( clientId ) ) {
-					return omit( state, clientId );
-				}
-
-				return state;
-			}
-
-			if ( isEqual( state[ clientId ], action.settings ) ) {
-				return state;
-			}
-
-			return {
-				...state,
-				[ clientId ]: action.settings,
-			};
-		}
-	}
-	return state;
-};
-
-/**
- * Reducer returning the most recent autosave.
- *
- * @param  {Object} state  The autosave object.
- * @param  {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function autosave( state = null, action ) {
-	switch ( action.type ) {
-		case 'RESET_AUTOSAVE':
-			const { post } = action;
-			const [ title, excerpt, content ] = [
-				'title',
-				'excerpt',
-				'content',
-			].map( ( field ) => getPostRawValue( post[ field ] ) );
-
-			return {
-				title,
-				excerpt,
-				content,
-			};
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning the post preview link.
  *
- * @param {string?} state  The preview link
+ * @param {string?} state  The preview link.
  * @param {Object}  action Dispatched action.
  *
  * @return {string?} Updated state.
@@ -825,6 +563,26 @@ export function isReady( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the post editor setting.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_EDITOR_SETTINGS':
+			return {
+				...state,
+				...action.settings,
+			};
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	initialEdits,
@@ -834,8 +592,8 @@ export default optimist( combineReducers( {
 	postLock,
 	reusableBlocks,
 	template,
-	autosave,
 	previewLink,
 	postSavingLock,
 	isReady,
+	editorSettings,
 } ) );

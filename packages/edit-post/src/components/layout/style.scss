@@ -6,34 +6,6 @@
 .edit-post-layout {
 	position: relative;
 
-	.components-notice-list {
-		position: sticky;
-		top: $header-height;
-		right: 0;
-		color: $dark-gray-900;
-
-		@include break-small {
-			top: 0;
-		}
-
-		// Non-dismissible notices.
-		&.is-pinned {
-			position: relative;
-			left: 0;
-			top: 0;
-		}
-	}
-
-	.components-notice {
-		margin: 0 0 5px;
-		padding: 6px 12px;
-		min-height: $panel-header-height;
-
-		.components-notice__dismiss {
-			margin: 10px 5px;
-		}
-	}
-
 	// Beyond the mobile breakpoint, the editor bar is fixed, so make room for it eabove the layout content.
 	@include break-small {
 		padding-top: $header-height;
@@ -53,6 +25,16 @@
 		margin: auto 20px;
 	}
 }
+
+// Adjust the position of the notices
+.edit-post-layout__content .components-editor-notices__snackbar {
+	position: fixed;
+	right: 0;
+	bottom: 20px;
+	padding-left: 16px;
+	padding-right: 16px;
+}
+@include editor-left(".edit-post-layout__content .components-editor-notices__snackbar");
 
 .edit-post-layout__content {
 	display: flex;
@@ -178,6 +160,7 @@
 		border-left: $border-width solid $light-gray-500;
 		transform: translateX(+100%);
 		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
+		@include reduce-motion("animation");
 
 		body.is-fullscreen-mode & {
 			top: 0;

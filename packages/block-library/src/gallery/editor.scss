@@ -1,8 +1,15 @@
-// Override the default list style type _only in the editor_
-// to avoid :not() selector specificity issues.
-// See https://github.com/WordPress/gutenberg/pull/10358
-ul.wp-block-gallery li {
-	list-style-type: none;
+ul.wp-block-gallery {
+	// Override the default list style type _only in the editor_
+	// to avoid :not() selector specificity issues.
+	// See https://github.com/WordPress/gutenberg/pull/10358
+	li {
+		list-style-type: none;
+	}
+
+	// Override the bottom margin every block gets.
+	.is-selected & {
+		margin-bottom: 0;
+	}
 }
 
 .blocks-gallery-item {
@@ -12,7 +19,6 @@ ul.wp-block-gallery li {
 		outline: none;
 	}
 
-	img:focus,
 	.is-selected {
 		outline: 4px solid theme(primary);
 	}
@@ -21,7 +27,7 @@ ul.wp-block-gallery li {
 		opacity: 0.3;
 	}
 
-	.editor-rich-text {
+	.block-editor-rich-text {
 		position: absolute;
 		bottom: 0;
 		width: 100%;
@@ -29,12 +35,12 @@ ul.wp-block-gallery li {
 		overflow-y: auto;
 	}
 
-	.editor-rich-text figcaption:not([data-is-placeholder-visible="true"]) {
+	.block-editor-rich-text figcaption:not([data-is-placeholder-visible="true"]) {
 		position: relative;
 		overflow: hidden;
 	}
 
-	.is-selected .editor-rich-text {
+	.is-selected .block-editor-rich-text {
 		// IE calculates this incorrectly, so leave it to modern browsers.
 		@supports (position: sticky) {
 			right: 0;
@@ -43,7 +49,7 @@ ul.wp-block-gallery li {
 		}
 
 		// Override negative margins so this toolbar isn't hidden by overflow. Overflow is needed for long captions.
-		.editor-rich-text__inline-toolbar {
+		.block-editor-rich-text__inline-toolbar {
 			top: 0;
 		}
 
@@ -53,66 +59,54 @@ ul.wp-block-gallery li {
 		}
 	}
 
-	.components-form-file-upload,
-	.components-button.block-library-gallery-add-item-button {
-		width: 100%;
-		height: 100%;
-	}
+	.is-selected .block-library-gallery-item__move-menu,
+	.is-selected .block-library-gallery-item__inline-menu {
+		background-color: theme(primary);
 
-	.components-button.block-library-gallery-add-item-button {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		box-shadow: none;
-		border: none;
-		border-radius: 0;
-		min-height: 100px;
-
-		& .dashicon {
-			margin-top: 10px;
-		}
-
-		&:hover,
-		&:focus {
-			border: $border-width solid $dark-gray-500;
-		}
-	}
-
-	.editor-rich-text figcaption {
-		a {
+		.components-button {
 			color: $white;
 		}
 
-		&:focus a[data-rich-text-format-boundary] {
-			color: rgba(0, 0, 0, 0.2);
+		.components-button:focus {
+			color: inherit;
+		}
+
+	}
+
+	.block-editor-rich-text figcaption {
+		a {
+			color: $white;
 		}
 	}
 }
 
+.block-library-gallery-item__move-menu,
 .block-library-gallery-item__inline-menu {
 	padding: 2px;
-	position: absolute;
-	top: -2px;
-	right: -2px;
-	background-color: theme(primary);
 	display: inline-flex;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
 
 	.components-button {
-		color: $white;
-		&:hover,
-		&:focus {
-			color: $white;
-		}
+		color: transparent;
 	}
 }
 
+.block-library-gallery-item__inline-menu {
+	position: absolute;
+	top: -2px;
+	right: -2px;
+}
+
+.block-library-gallery-item__move-menu {
+	position: absolute;
+	top: -2px;
+	left: -2px;
+}
+
+.blocks-gallery-item__move-backward,
+.blocks-gallery-item__move-forward,
 .blocks-gallery-item__remove {
 	padding: 0;
-
-	&.components-button:focus {
-		color: inherit;
-	}
 }
 
 .blocks-gallery-item .components-spinner {
@@ -121,15 +115,4 @@ ul.wp-block-gallery li {
 	left: 50%;
 	margin-top: -9px;
 	margin-left: -9px;
-}
-
-// Last item always needs margins reset.
-// When block is selected, only reset the right margin of the 2nd to last item.
-.wp-block-gallery {
-	.is-selected & .blocks-gallery-image:nth-last-child(2),
-	.is-selected & .blocks-gallery-item:nth-last-child(2),
-	.is-typing & .blocks-gallery-image:nth-last-child(2),
-	.is-typing & .blocks-gallery-item:nth-last-child(2) {
-		margin-right: 0;
-	}
 }

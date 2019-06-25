@@ -3,7 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { BlockControls, PlainText, transformStyles } from '@wordpress/editor';
+import {
+	BlockControls,
+	PlainText,
+	__experimentalTransformStyles,
+} from '@wordpress/block-editor';
 import { Disabled, SandBox } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -34,7 +38,7 @@ class HTMLEdit extends Component {
 
 		this.setState( { styles: [
 			defaultStyles,
-			...transformStyles( styles ),
+			...__experimentalTransformStyles( styles ),
 		] } );
 	}
 
@@ -87,8 +91,8 @@ class HTMLEdit extends Component {
 	}
 }
 export default withSelect( ( select ) => {
-	const { getEditorSettings } = select( 'core/block-editor' );
+	const { getSettings } = select( 'core/block-editor' );
 	return {
-		styles: getEditorSettings().styles,
+		styles: getSettings().styles,
 	};
 } )( HTMLEdit );

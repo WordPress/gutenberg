@@ -17,7 +17,7 @@ exports[`Notice should match snapshot 1`] = `
       View
     </ForwardRef(Button)>
   </div>
-  <IconButton
+  <ForwardRef(IconButton)
     className="components-notice__dismiss"
     icon="no"
     label="Dismiss this notice"

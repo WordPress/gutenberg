@@ -2,35 +2,17 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
-import { withDispatch, RegistryConsumer } from '@wordpress/data';
-import { createHigherOrderComponent, compose } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
- * Higher-order component which renders the original component with the current
- * registry context passed as its `registry` prop.
- *
- * @param {WPComponent} OriginalComponent Original component.
- *
- * @return {WPComponent} Enhanced component.
+ * Internal dependencies
  */
-const withRegistry = createHigherOrderComponent(
-	( OriginalComponent ) => ( props ) => (
-		<RegistryConsumer>
-			{ ( registry ) => (
-				<OriginalComponent
-					{ ...props }
-					registry={ registry }
-				/>
-			) }
-		</RegistryConsumer>
-	),
-	'withRegistry'
-);
+import withRegistryProvider from './with-registry-provider';
 
 class BlockEditorProvider extends Component {
 	componentDidMount() {
-		this.props.updateEditorSettings( this.props.settings );
+		this.props.updateSettings( this.props.settings );
 		this.props.resetBlocks( this.props.value );
 		this.attachChangeObserver( this.props.registry );
 	}
@@ -38,14 +20,14 @@ class BlockEditorProvider extends Component {
 	componentDidUpdate( prevProps ) {
 		const {
 			settings,
-			updateEditorSettings,
+			updateSettings,
 			value,
 			resetBlocks,
 			registry,
 		} = this.props;
 
 		if ( settings !== prevProps.settings ) {
-			updateEditorSettings( settings );
+			updateSettings( settings );
 		}
 
 		if ( registry !== prevProps.registry ) {
@@ -86,6 +68,7 @@ class BlockEditorProvider extends Component {
 		const {
 			getBlocks,
 			isLastBlockChangePersistent,
+			__unstableIsLastBlockChangeIgnored,
 		} = registry.select( 'core/block-editor' );
 
 		let blocks = getBlocks();
@@ -98,7 +81,12 @@ class BlockEditorProvider extends Component {
 			} = this.props;
 			const newBlocks = getBlocks();
 			const newIsPersistent = isLastBlockChangePersistent();
-			if ( newBlocks !== blocks && this.isSyncingIncomingValue ) {
+			if (
+				newBlocks !== blocks && (
+					this.isSyncingIncomingValue ||
+					__unstableIsLastBlockChangeIgnored()
+				)
+			) {
 				this.isSyncingIncomingValue = false;
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
@@ -110,10 +98,15 @@ class BlockEditorProvider extends Component {
 				// This happens when a previous input is explicitely marked as persistent.
 				( newIsPersistent && ! isPersistent )
 			) {
+				// When knowing the blocks value is changing, assign instance
+				// value to skip reset in subsequent `componentDidUpdate`.
+				if ( newBlocks !== blocks ) {
+					this.isSyncingOutcomingValue = true;
+				}
+
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
 
-				this.isSyncingOutcomingValue = true;
 				if ( isPersistent ) {
 					onChange( blocks );
 				} else {
@@ -126,27 +119,21 @@ class BlockEditorProvider extends Component {
 	render() {
 		const { children } = this.props;
 
-		return (
-			<SlotFillProvider>
-				<DropZoneProvider>
-					{ children }
-				</DropZoneProvider>
-			</SlotFillProvider>
-		);
+		return children;
 	}
 }
 
 export default compose( [
+	withRegistryProvider,
 	withDispatch( ( dispatch ) => {
 		const {
-			updateEditorSettings,
+			updateSettings,
 			resetBlocks,
 		} = dispatch( 'core/block-editor' );
 
 		return {
-			updateEditorSettings,
+			updateSettings,
 			resetBlocks,
 		};
 	} ),
-	withRegistry,
 ] )( BlockEditorProvider );

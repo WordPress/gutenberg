@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap } from 'lodash';
+import { flatMap, isEmpty, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,26 +17,36 @@ import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 
 function DropdownMenu( {
+	children,
+	className,
+	controls,
 	icon = 'menu',
 	label,
 	menuLabel,
-	controls,
-	className,
+	position,
+	__unstableLabelPosition,
+	__unstableMenuClassName,
+	__unstablePopoverClassName,
+	__unstableToggleClassName,
 } ) {
-	if ( ! controls || ! controls.length ) {
+	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
-	let controlSets = controls;
-	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
-		controlSets = [ controlSets ];
+	let controlSets;
+	if ( ! isEmpty( controls ) ) {
+		controlSets = controls;
+		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
+			controlSets = [ controlSets ];
+		}
 	}
 
 	return (
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
-			contentClassName="components-dropdown-menu__popover"
+			contentClassName={ classnames( 'components-dropdown-menu__popover', __unstablePopoverClassName ) }
+			position={ position }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
@@ -45,35 +55,44 @@ function DropdownMenu( {
 						onToggle();
 					}
 				};
+
 				return (
 					<IconButton
-						className="components-dropdown-menu__toggle"
+						className={ classnames( 'components-dropdown-menu__toggle', __unstableToggleClassName, {
+							'is-opened': isOpen,
+						} ) }
 						icon={ icon }
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
+						labelPosition={ __unstableLabelPosition }
 						tooltip={ label }
 					>
-						<span className="components-dropdown-menu__indicator" />
+						{ ! icon && <span className="components-dropdown-menu__indicator" /> }
 					</IconButton>
 				);
 			} }
-			renderContent={ ( { onClose } ) => {
+			renderContent={ ( props ) => {
 				return (
 					<NavigableMenu
-						className="components-dropdown-menu__menu"
+						className={ classnames( 'components-dropdown-menu__menu', __unstableMenuClassName ) }
 						role="menu"
-						aria-label={ menuLabel }
+						aria-label={ menuLabel || label }
 					>
+						{
+							isFunction( children ) ?
+								children( props ) :
+								null
+						}
 						{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 							controlSet.map( ( control, indexOfControl ) => (
 								<IconButton
 									key={ [ indexOfSet, indexOfControl ].join() }
 									onClick={ ( event ) => {
 										event.stopPropagation();
-										onClose();
+										props.onClose();
 										if ( control.onClick ) {
 											control.onClick();
 										}

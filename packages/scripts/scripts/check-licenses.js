@@ -9,7 +9,7 @@ const chalk = require( 'chalk' );
 /**
  * Internal dependencies
  */
-const { getCliArg, hasCliArg } = require( '../utils' );
+const { getArgFromCLI, hasArgInCLI } = require( '../utils' );
 
 /*
  * WARNING: Changes to this file may inadvertently cause us to distribute code that
@@ -22,11 +22,11 @@ const { getCliArg, hasCliArg } = require( '../utils' );
 
 const ERROR = chalk.reset.inverse.bold.red( ' ERROR ' );
 
-const prod = hasCliArg( '--prod' ) || hasCliArg( '--production' );
-const dev = hasCliArg( '--dev' ) || hasCliArg( '--development' );
-const gpl2 = hasCliArg( '--gpl2' );
-const ignored = hasCliArg( '--ignore' ) ?
-	getCliArg( '--ignore' )
+const prod = hasArgInCLI( '--prod' ) || hasArgInCLI( '--production' );
+const dev = hasArgInCLI( '--dev' ) || hasArgInCLI( '--development' );
+const gpl2 = hasArgInCLI( '--gpl2' );
+const ignored = hasArgInCLI( '--ignore' ) ?
+	getArgFromCLI( '--ignore' )
 		// "--ignore=a, b" -> "[ 'a', ' b' ]"
 		.split( ',' )
 		// "[ 'a', ' b' ]" -> "[ 'a', 'b' ]"
@@ -47,7 +47,6 @@ const gpl2CompatibleLicenses = [
 	'BSD-3-Clause',
 	'BSD-3-Clause-W3C',
 	'BSD-like',
-	'CC-BY-3.0',
 	'CC-BY-4.0',
 	'CC0-1.0',
 	'GPL-2.0',
@@ -79,6 +78,8 @@ const otherOssLicenses = [
 	'Apache 2.0',
 	'Apache License, Version 2.0',
 	'Apache version 2.0',
+	'CC-BY-3.0',
+	'LGPL',
 ];
 
 const licenses = [
@@ -258,6 +259,7 @@ modules.forEach( ( path ) => {
 					}, stringDetectedType );
 				}, detectedType );
 			}
+			return detectedType;
 		}, false );
 	}
 
