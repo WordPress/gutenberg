@@ -214,10 +214,10 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId } ) {
-		const reversedContent = this.isReplaceable( this.props.selectedBlock );
+		const shouldReverseContent = this.isReplaceable( this.props.selectedBlock );
 
 		return (
-			<ReadableContentView reversed={ reversedContent }>
+			<ReadableContentView reversed={ shouldReverseContent }>
 				<BlockListBlock
 					key={ clientId }
 					showTitle={ false }
