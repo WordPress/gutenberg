@@ -11,8 +11,8 @@ exports[`Navigating the block hierarchy should appear and function even without 
 `;
 
 exports[`Navigating the block hierarchy should navigate block hierarchy using only the keyboard 1`] = `
-"<!-- wp:columns {\\"columns\\":3} -->
-<div class=\\"wp-block-columns has-3-columns\\"><!-- wp:column -->
+"<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:paragraph -->
 <p>First column</p>
 <!-- /wp:paragraph --></div>
@@ -31,8 +31,8 @@ exports[`Navigating the block hierarchy should navigate block hierarchy using on
 `;
 
 exports[`Navigating the block hierarchy should navigate using the block hierarchy dropdown menu 1`] = `
-"<!-- wp:columns {\\"columns\\":3} -->
-<div class=\\"wp-block-columns has-3-columns\\"><!-- wp:column -->
+"<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:paragraph -->
 <p>First column</p>
 <!-- /wp:paragraph --></div>
