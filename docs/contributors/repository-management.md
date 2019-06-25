@@ -64,7 +64,7 @@ To start simply choose from one of these filtered lists of issues:
 
 - [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel). Triaging by simply adding labels helps people focused on certain aspects of Gutenberg find relevant issues easier and start working on them.
 - [The least recently updated Gutenberg issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc). Triaging issues that are getting old and possibly out of date keeps important work from being overlooked.
-- [All Gutenberg issues with no comments](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps in keeping important bugs or suggestions fall become outdated before being considered.
+- [All Gutenberg issues with no comments](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps make sure all issues are acknowledged, and can help identify issues that may need more information or discussion before they are actionable.
 - [The least commented on issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Acomments-asc) Triaging this list helps the community figure out things like traction for certain proposals. 
 
 You can also create your own custom set of filters on GitHub. If you have a filter you think might be useful for the community, feel free to submit a PR to add it to this list.
