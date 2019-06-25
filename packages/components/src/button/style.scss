@@ -80,6 +80,11 @@
 			background: color(theme(button) shade(5%));
 			border-color: color(theme(button) shade(50%));
 			color: $white;
+			/* Keep the disabled text color when focused */
+			&:disabled,
+			&[aria-disabled="true"] {
+				color: color(theme(button) tint(40%));
+			}
 		}
 
 		&:hover {
