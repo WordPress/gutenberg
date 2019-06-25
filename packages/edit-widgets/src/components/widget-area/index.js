@@ -14,6 +14,7 @@ import {
 	BlockInspector,
 	BlockEditorProvider,
 	BlockList,
+	Inserter as BlockInserter,
 	WritingFlow,
 	ObserveTyping,
 } from '@wordpress/block-editor';
@@ -24,6 +25,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
  */
 import Sidebar from '../sidebar';
 import SelectionObserver from './selection-observer';
+import Inserter from '../inserter';
 
 function getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ) {
 	if ( ! hasUploadPermissions ) {
@@ -68,6 +70,11 @@ function WidgetArea( {
 					onChange={ updateBlocks }
 					settings={ settings }
 				>
+					{ isSelectedArea && (
+						<Inserter>
+							<BlockInserter />
+						</Inserter>
+					) }
 					<SelectionObserver
 						isSelectedArea={ isSelectedArea }
 						onBlockSelected={ onBlockSelected }
