@@ -103,8 +103,9 @@ export function getNotificationArgumentsForSaveFail( data ) {
 		messages[ edits.status ] :
 		__( 'Updating failed.' );
 
+	// Check if message string contains html tags. It is unsafe to inject unfiltered html here.
 	if ( ! ( /<\/?[^>]*>/.test( error.message ) ) ) {
-		noticeMessage = sprintf( '%1$s %2$s', noticeMessage, error.message );
+		noticeMessage = sprintf( __( '%1$s Error message: %2$s' ), noticeMessage, error.message );
 	}
 	return [ noticeMessage, { id: SAVE_POST_NOTICE_ID } ];
 }
