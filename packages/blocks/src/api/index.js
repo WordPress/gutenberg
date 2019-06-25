@@ -1,62 +1,82 @@
 export {
-	createBlock,
-	cloneBlock,
-	getPossibleBlockTransformations,
-	switchToBlockType,
-	getBlockTransforms,
-	findTransform,
-} from './factory';
-export {
-	default as parse,
-	getBlockAttributes,
-	parseWithAttributeSchema,
-} from './parser';
-export { pasteHandler, rawHandler, getPhrasingContentSchema } from './raw-handling';
-export {
-	default as serialize,
-	getBlockContent,
-	getBlockDefaultClassName,
-	getBlockMenuDefaultClassName,
-	getSaveElement,
-	getSaveContent,
-} from './serializer';
-export { isValidBlockContent } from './validation';
-export {
 	getCategories,
 	setCategories,
 	updateCategory,
 } from './categories';
+
 export {
-	registerBlockType,
-	unregisterBlockType,
-	setFreeformContentHandlerName,
-	getFreeformContentHandlerName,
-	setUnregisteredTypeHandlerName,
-	getUnregisteredTypeHandlerName,
-	setDefaultBlockName,
-	getDefaultBlockName,
-	setGroupingBlockName,
-	getGroupingBlockName,
+	default as children,
+} from './children';
+
+export {
+	cloneBlock,
+	createBlock,
+	findTransform,
+	getBlockTransforms,
+	getPossibleBlockTransformations,
+	switchToBlockType,
+} from './factory';
+
+export {
+	default as node,
+} from './node';
+
+export {
+	getBlockAttributes,
+	default as parse,
+	parseWithAttributeSchema,
+} from './parser';
+
+export {
+	getPhrasingContentSchema,
+	pasteHandler,
+	rawHandler,
+} from './raw-handling';
+
+export {
+	getBlockSupport,
 	getBlockType,
 	getBlockTypes,
-	getBlockSupport,
-	hasBlockSupport,
-	isReusableBlock,
 	getChildBlockNames,
+	getDefaultBlockName,
+	getFreeformContentHandlerName,
+	getGroupingBlockName,
+	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 	hasChildBlocks,
 	hasChildBlocksWithInserterSupport,
-	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+	isReusableBlock,
 	registerBlockStyle,
+	registerBlockType,
+	setDefaultBlockName,
+	setFreeformContentHandlerName,
+	setGroupingBlockName,
+	setUnregisteredTypeHandlerName,
 	unregisterBlockStyle,
+	unregisterBlockType,
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from './registration';
+
 export {
-	isUnmodifiedDefaultBlock,
-	normalizeIconObject,
-	isValidIcon,
-} from './utils';
+	getBlockContent,
+	getBlockDefaultClassName,
+	getBlockMenuDefaultClassName,
+	getSaveContent,
+	getSaveElement,
+	default as serialize,
+} from './serializer';
+
 export {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from './templates';
-export { default as children } from './children';
-export { default as node } from './node';
+
+export {
+	isUnmodifiedDefaultBlock,
+	isValidIcon,
+	normalizeIconObject,
+} from './utils';
+
+export {
+	isValidBlockContent,
+} from './validation';

@@ -130,8 +130,8 @@ export function matcher( selector ) {
  * @private
  */
 export default {
-	isNodeOfType,
 	fromDOM,
-	toHTML,
+	isNodeOfType,
 	matcher,
+	toHTML,
 };
