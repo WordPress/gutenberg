@@ -183,8 +183,7 @@ export default class Editable extends Component {
 		// > left at its default value.
 		// >
 		// > https://html.spec.whatwg.org/multipage/interaction.html#best-practices-for-in-page-editors
-
-		style.whiteSpace = 'pre-wrap';
+		const whiteSpace = 'pre-wrap';
 
 		return createElement( tagName, {
 			role: 'textbox',
@@ -193,7 +192,10 @@ export default class Editable extends Component {
 			contentEditable: true,
 			[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
 			ref: this.bindEditorNode,
-			style,
+			style: {
+				...style,
+				whiteSpace,
+			},
 			suppressContentEditableWarning: true,
 			dangerouslySetInnerHTML: { __html: valueToEditableHTML( record ) },
 			...remainingProps,
