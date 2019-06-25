@@ -9,10 +9,21 @@
  * The main entry point for the Gutenberg widgets page.
  *
  * @since 5.2.0
+ *
+ * @param string $page Page.
  */
-function the_gutenberg_widgets() {
+function the_gutenberg_widgets( $page ) {
 	?>
-	<div id="widgets-editor" class="blocks-widgets-container">
+	<div
+		id="widgets-editor"
+		class="blocks-widgets-container
+		<?php
+		echo 'gutenberg_customizer' === $page
+			? ' is-in-customizer'
+			: '';
+		?>
+		"
+	>
 	</div>
 	<?php
 }
@@ -28,6 +39,10 @@ function gutenberg_widgets_init( $hook ) {
 	if ( 'gutenberg_page_gutenberg-widgets' !== $hook && 'gutenberg_customizer' !== $hook ) {
 			return;
 	}
+
+	$initializer_name = 'gutenberg_page_gutenberg-widgets' === $hook
+		? 'initialize'
+		: 'customizerInitialize';
 
 	// Media settings.
 	$max_upload_size = wp_max_upload_size();
@@ -59,8 +74,9 @@ function gutenberg_widgets_init( $hook ) {
 		'wp-edit-widgets',
 		sprintf(
 			'wp.domReady( function() {
-				wp.editWidgets.initialize( "widgets-editor", %s );
+				wp.editWidgets.%s( "widgets-editor", %s );
 			} );',
+			$initializer_name,
 			wp_json_encode( $settings )
 		)
 	);

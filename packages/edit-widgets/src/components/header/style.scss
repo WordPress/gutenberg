@@ -23,10 +23,6 @@
 	@include break-medium() {
 		top: $admin-bar-height;
 	}
-
-	#sub-accordion-section-gutenberg_widget_blocks & {
-		display: none;
-	}
 }
 @include editor-left(".edit-widgets-header");
 

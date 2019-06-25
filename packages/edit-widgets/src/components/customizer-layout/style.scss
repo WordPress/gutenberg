@@ -1,0 +1,22 @@
+.edit-widgets-customizer-layout__content {
+	background: #f1f1f1;
+	margin: 0;
+	min-height: 100%;
+	padding: 30px 0;
+
+	.block-editor {
+		&-block-list {
+			&__layout {
+				padding: 0 0 0 18px;
+			}
+
+			&__empty-block-inserter {
+				left: -18px;
+			}
+		}
+
+		&-rich-text__editable[data-is-placeholder-visible="true"] + .block-editor-rich-text__editable.wp-block-paragraph {
+			padding: 0;
+		}
+	}
+}

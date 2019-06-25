@@ -1,5 +1,6 @@
 @import "./components/header/style.scss";
 @import "./components/layout/style.scss";
+@import "./components/customizer-layout/style.scss";
 @import "./components/notices/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/widget-area/style.scss";
@@ -12,13 +13,6 @@ html.wp-toolbar {
 
 body.gutenberg_page_gutenberg-widgets {
 	@include wp-admin-reset( ".blocks-widgets-container" );
-}
-
-#customize-theme-controls #sub-accordion-section-gutenberg_widget_blocks {
-	.blocks-widgets-container {
-		min-height: initial;
-		position: initial;
-	}
 }
 
 .blocks-widgets-container,
@@ -47,6 +41,11 @@ body.gutenberg_page_gutenberg-widgets {
 
 	> .components-navigate-regions {
 		height: 100%;
+	}
+
+	&.is-in-customizer {
+		min-height: initial;
+		position: initial;
 	}
 }
 
