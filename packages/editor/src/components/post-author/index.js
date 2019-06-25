@@ -79,7 +79,7 @@ export class PostAuthor extends Component {
 
 	resolveResults( results ) {
 		this.authors = results;
-		return results.map( ( author ) => ( author.name ) );
+		return results.map( ( author ) => ( `${ author.name } (${ author.slug })` ) );
 	}
 
 	getCurrentAuthor( authorId ) {
@@ -99,9 +99,11 @@ export class PostAuthor extends Component {
 		if ( typeof selection === 'string' ) {
 			// Author name from the autocompleter.
 			const author = this.authors.find( ( singleAuthor ) => {
-				return singleAuthor.name === selection;
+				return `${ singleAuthor.name } (${ singleAuthor.slug })` === selection;
 			} );
-			onUpdateAuthor( Number( author.id ) );
+			if ( author ) {
+				onUpdateAuthor( Number( author.id ) );
+			}
 		} else {
 			// Author ID from the select.
 			onUpdateAuthor( Number( selection.target.value ) );
@@ -140,7 +142,7 @@ export class PostAuthor extends Component {
 					id={ selectId }
 					minLength={ 2 }
 					showAllValues={ true }
-					defaultValue={ postAuthor ? postAuthor.name : '' }
+					defaultValue={ postAuthor ? `${ postAuthor.name } (${ postAuthor.slug })` : '' }
 					displayMenu="overlay"
 					onConfirm={ this.setAuthorId }
 					source={ this.suggestAuthor }
