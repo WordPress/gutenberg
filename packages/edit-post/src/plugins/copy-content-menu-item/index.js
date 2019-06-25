@@ -4,16 +4,15 @@
 import { ClipboardButton } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { withState, compose } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 
-function CopyContentMenuItem( { createNotice, editedPostContent, hasCopied, setState } ) {
+function CopyContentMenuItem( { createNotice, editedPostContent } ) {
 	return (
 		<ClipboardButton
 			text={ editedPostContent }
 			role="menuitem"
 			className="components-menu-item__button"
 			onCopy={ () => {
-				setState( { hasCopied: true } );
 				createNotice(
 					'info',
 					'All content copied.',
@@ -23,11 +22,8 @@ function CopyContentMenuItem( { createNotice, editedPostContent, hasCopied, setS
 					}
 				);
 			} }
-			onFinishCopy={ () => setState( { hasCopied: false } ) }
 		>
-			{ hasCopied ?
-				__( 'Copied!' ) :
-				__( 'Copy All Content' ) }
+			{ __( 'Copy All Content' ) }
 		</ClipboardButton>
 	);
 }
@@ -45,5 +41,4 @@ export default compose(
 			createNotice,
 		};
 	} ),
-	withState( { hasCopied: false } )
 )( CopyContentMenuItem );
