@@ -28,7 +28,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 		link: 'some_link',
 	};
 	const post = { ...previousPost };
-	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID, actions: [], type: 'snackbar' };
+	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID, actions: [] };
 	[
 		[
 			'when previous post is not published and post will not be published',
@@ -108,25 +108,25 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'when post is not published and edits is published',
 			'',
 			[ 'draft', 'publish' ],
-			[ 'Publishing failed', defaultExpectedAction ],
+			[ 'Publishing failed.', defaultExpectedAction ],
 		],
 		[
 			'when post is published and edits is privately published',
 			'',
 			[ 'draft', 'private' ],
-			[ 'Publishing failed', defaultExpectedAction ],
+			[ 'Publishing failed.', defaultExpectedAction ],
 		],
 		[
 			'when post is published and edits is scheduled to be published',
 			'',
 			[ 'draft', 'future' ],
-			[ 'Scheduling failed', defaultExpectedAction ],
+			[ 'Scheduling failed.', defaultExpectedAction ],
 		],
 		[
 			'when post is published and edits is published',
 			'',
 			[ 'publish', 'publish' ],
-			[ 'Updating failed', defaultExpectedAction ],
+			[ 'Updating failed.', defaultExpectedAction ],
 		],
 	].forEach( ( [
 		description,

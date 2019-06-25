@@ -109,7 +109,6 @@ export function getNotificationArgumentsForSaveFail( data ) {
 	if ( error.message && ! ( /<\/?[^>]*>/.test( error.message ) ) ) {
 		noticeMessage = sprintf( __( '%1$s Error message: %2$s' ), noticeMessage, error.message );
 	}
-  
 	return [ noticeMessage, {
 		id: SAVE_POST_NOTICE_ID,
 	} ];
