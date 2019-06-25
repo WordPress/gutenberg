@@ -1,4 +1,10 @@
 /**
+ * WordPress dependencies
+ */
+import { useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,12 +12,6 @@ import {
 	useBlockSelectionListener,
 	useUpdatePostLinkListener,
 } from './listener-hooks';
-
-/**
- * WordPress dependencies
- */
-import { useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
 
 /**
  * Data component used for initializing the editor and re-initializes
