@@ -46,6 +46,7 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
+		"accessible-autocomplete": "1.6.2",
 		"classnames": "^2.2.5",
 		"dom-scroll-into-view": "^1.2.1",
 		"inherits": "^2.0.3",
