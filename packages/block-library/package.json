@@ -42,7 +42,6 @@
 		"fast-average-color": "4.3.0",
 		"lodash": "^4.17.11",
 		"memize": "^1.0.5",
-		"slugify": "^1.3.4",
 		"url": "^0.11.0"
 	},
 	"publishConfig": {

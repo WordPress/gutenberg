@@ -14,7 +14,7 @@ export default function save( props ) {
 
 	Utils.updateHeadingBlockAnchors();
 	return (
-		<div className={ props.className }>
+		<nav className={ props.className }>
 			<ListLevel
 				edit={ false }
 				attributes={ attributes }
@@ -22,6 +22,6 @@ export default function save( props ) {
 			>
 				{ Utils.linearToNestedList( headings ) }
 			</ListLevel>
-		</div>
+		</nav>
 	);
 }

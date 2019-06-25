@@ -9,6 +9,7 @@ import ListLevel from './ListLevel';
  */
 import { Component } from '@wordpress/element';
 import { subscribe } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import {
 	IconButton,
 	Toolbar,
@@ -77,7 +78,7 @@ class TOCEdit extends Component {
 		const { autosync } = attributes;
 		const headings = attributes.headings || [];
 		if ( headings.length === 0 ) {
-			return ( <p>Start adding headings to generate Table of Contents</p> );
+			return ( <p>{ __( 'Start adding headings to generate Table of Contents' ) }</p> );
 		}
 
 		Utils.updateHeadingBlockAnchors();
@@ -88,7 +89,7 @@ class TOCEdit extends Component {
 					<BlockControls>
 						<Toolbar>
 							<IconButton
-								label={ 'Update' }
+								label={ __( 'Update' ) }
 								aria-pressed={ this.state.isEditing }
 								onClick={ this.refresh }
 								icon="update"
@@ -98,9 +99,9 @@ class TOCEdit extends Component {
 				}
 				{
 					<InspectorControls>
-						<PanelBody title={ 'Table of Contents Settings' }>
+						<PanelBody title={ __( 'Table of Contents Settings' ) }>
 							<ToggleControl
-								label={ 'Auto Sync' }
+								label={ __( 'Auto Sync' ) }
 								checked={ autosync }
 								onChange={ () => {
 									if ( ! autosync ) {

@@ -1,13 +1,8 @@
-
-/**
- * External dependencies
- */
-import slugify from 'slugify';
-
 /**
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
+import { cleanForSlug } from '@wordpress/editor';
 
 export function linearToNestedList( array, index = 0 ) {
 	const returnValue = [];
@@ -62,7 +57,7 @@ export function getPageHeadings() {
 }
 
 export function getHeadingBlocks() {
-	const editor = select( 'core/editor' );
+	const editor = select( 'core/block-editor' );
 	return editor.getBlocks().filter( ( block ) => block.name === 'core/heading' );
 }
 
@@ -83,7 +78,7 @@ export function convertHeadingBlocksToAttributes( headingBlocks ) {
 		let anchor = contentDiv.textContent || contentDiv.innerText || '';
 
 		if ( anchor !== '' && anchor.indexOf( '#' ) === -1 ) {
-			anchor = '#' + slugify( anchor, { remove: /[^\w\s-]/g } );
+			anchor = '#' + cleanForSlug( anchor );
 		}
 
 		return { content, anchor, level };
@@ -98,7 +93,7 @@ export function updateHeadingBlockAnchors() {
 		const headingDefaultAnchor = ( ! headingAnchorEmpty && heading.attributes.anchor.indexOf( key + '-' ) === 0 );
 
 		if ( ! headingContentEmpty && ( headingAnchorEmpty || headingDefaultAnchor ) ) {
-			heading.attributes.anchor = key + '-' + slugify( heading.attributes.content.toString(), { remove: /[^\w\s-]/g } );
+			heading.attributes.anchor = key + '-' + cleanForSlug( heading.attributes.content.toString() );
 		}
 	} );
 }

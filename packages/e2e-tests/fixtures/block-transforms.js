@@ -418,11 +418,9 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	'core__table-of-contents': {
 		originalBlock: 'Table of Contents',
-		availableTransforms: [],
-	},
-	'core__table-of-contents': {
-		originalBlock: 'Table of Contents',
-		availableTransforms: [],
+		availableTransforms: [
+			'Group',
+		],
 	},
 	'core__tag-cloud': {
 		originalBlock: 'Tag Cloud',
