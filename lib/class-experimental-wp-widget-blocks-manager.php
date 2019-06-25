@@ -308,9 +308,9 @@ class Experimental_WP_Widget_Blocks_Manager {
 	}
 
 	/**
-	 * Registers of a widget that should represent a set of blocks and returns its id.
+	 * Registers a widget that should represent a set of blocks and returns its ID.
 	 *
-	 * @param array $blocks   Array of blocks.
+	 * @param array $blocks Array of blocks.
 	 */
 	public static function convert_blocks_to_widget( $blocks ) {
 		$widget_id = 'blocks-widget-' . md5( self::serialize_blocks( $blocks ) );
@@ -329,6 +329,12 @@ class Experimental_WP_Widget_Blocks_Manager {
 			array(
 				'blocks' => $blocks,
 			)
+		);
+		wp_register_widget_control(
+			$widget_id,
+			__( 'Blocks Area ', 'gutenberg' ),
+			'noop',
+			array( 'id_base' => 'blocks-widget' )
 		);
 		return $widget_id;
 	}
