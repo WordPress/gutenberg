@@ -88,8 +88,7 @@ function createPrepareEditableTree( props, prefix ) {
 }
 
 /**
- * Renders a rich content input, providing users with the option to format the
- * content.
+ * See export statement below.
  */
 class RichText extends Component {
 	constructor( {
@@ -1105,6 +1104,10 @@ RichText.defaultProps = {
 	value: '',
 };
 
+/**
+ * Renders a rich content input, providing users with the option to format the
+ * content.
+ */
 export default compose( [
 	withSelect( ( select ) => ( {
 		formatTypes: select( 'core/rich-text' ).getFormatTypes(),

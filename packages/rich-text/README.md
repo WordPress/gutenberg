@@ -275,7 +275,8 @@ _Returns_
 
 <a name="RichText" href="#RichText">#</a> **RichText**
 
-Undocumented declaration.
+Renders a rich content input, providing users with the option to format the
+content.
 
 <a name="slice" href="#slice">#</a> **slice**
 
