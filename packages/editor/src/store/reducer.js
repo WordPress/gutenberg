@@ -617,4 +617,5 @@ export default optimist( combineReducers( {
 	postSavingLock,
 	isReady,
 	editorSettings,
+	postAutosavingLock,
 } ) );
