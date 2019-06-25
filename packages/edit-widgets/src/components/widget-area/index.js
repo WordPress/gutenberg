@@ -24,6 +24,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
  */
 import Sidebar from '../sidebar';
 import SelectionObserver from './selection-observer';
+import { withWPCustomize } from '../../utils';
 
 function getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ) {
 	if ( ! hasUploadPermissions ) {
@@ -108,6 +109,10 @@ export default compose( [
 					updateBlocksInWidgetArea,
 				} = dispatch( 'core/edit-widgets' );
 				updateBlocksInWidgetArea( id, blocks );
+				withWPCustomize( ( { previewBlocksInWidgetArea, saveButton } ) => {
+					previewBlocksInWidgetArea( id, blocks );
+					saveButton.disabled = false;
+				} );
 			},
 		};
 	} ),
