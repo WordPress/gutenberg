@@ -95,16 +95,16 @@ class Editor extends Component {
 			<StrictMode>
 				<SlotFillProvider>
 					<DropZoneProvider>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ post }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<ErrorBoundary onError={ onError }>
-						<EditorInitialization postId={ postId } />
-						<Layout />
+						<EditorProvider
+							settings={ editorSettings }
+							post={ post }
+							initialEdits={ initialEdits }
+							useSubRegistry={ false }
+							{ ...props }
+						>
+							<ErrorBoundary onError={ onError }>
+								<EditorInitialization postId={ postId } />
+								<Layout />
 								<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
 							</ErrorBoundary>
 							<PostLockedModal />
