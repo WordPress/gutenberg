@@ -238,7 +238,7 @@ export function matcherFromSource( sourceConfig ) {
 		case 'tag':
 			return flow( [
 				prop( sourceConfig.selector, 'nodeName' ),
-				( value ) => value.toLowerCase(),
+				( nodeName ) => nodeName ? nodeName.toLowerCase() : undefined,
 			] );
 		default:
 			// eslint-disable-next-line no-console
