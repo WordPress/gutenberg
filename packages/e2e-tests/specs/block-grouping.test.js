@@ -10,18 +10,9 @@ import {
 	transformBlockTo,
 	getAllBlocks,
 	getAvailableBlockTransforms,
+	activatePlugin,
+	deactivatePlugin,
 } from '@wordpress/e2e-test-utils';
-
-import {
-	registerBlockType,
-	createBlock,
-	setGroupingBlockName,
-} from '@wordpress/blocks';
-
-/**
- * External dependencies
- */
-import { noop } from 'lodash';
 
 async function insertBlocksOfSameType() {
 	await insertBlock( 'Paragraph' );
@@ -193,35 +184,19 @@ describe( 'Block Grouping', () => {
 	} );
 
 	describe( 'Registering alternative Blocks to handle Grouping interactions', () => {
+		beforeAll( async () => {
+			await activatePlugin( 'gutenberg-test-custom-grouping-block' );
+		} );
+
+		afterAll( async () => {
+			await deactivatePlugin( 'gutenberg-test-custom-grouping-block' );
+		} );
+
 		it( 'should use registered grouping block for grouping interactions', async () => {
-			registerBlockType( 'test/alternative-group-block', {
-				attributes: {
-					value: {
-						type: 'string',
-					},
-				},
-				transforms: {
-					from: [ {
-						type: 'block',
-						blocks: [ '*' ],
-						isMultiBlock: true,
-						__experimentalConvert( blocks ) {
-							const groupInnerBlocks = blocks.map( ( { name, attributes, innerBlocks } ) => {
-								return createBlock( name, attributes, innerBlocks );
-							} );
-
-							return createBlock( 'core/alternative-group-block', {}, groupInnerBlocks );
-						},
-					} ],
-				},
-				save: noop,
-				category: 'common',
-				title: 'Alternative Group Block',
-			} );
-			registerBlockType( 'test/alternative-group-block' );
-
 			// Set custom Block as the Block to use for Grouping
-			setGroupingBlockName( 'test/alternative-group-block' );
+			await page.evaluate( () => {
+				window.wp.blocks.setGroupingBlockName( 'test/alternative-group-block' );
+			} );
 
 			// Creating test blocks
 			await insertBlocksOfSameType();
@@ -230,7 +205,12 @@ describe( 'Block Grouping', () => {
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 
-			await transformBlockTo( 'Alternative Group Block' );
+			// Group - this will use whichever Block is registered as the Grouping Block
+			// as opposed to "transformTo()" which uses whatever is passed to it. To
+			// ensure this test is meaningful we must rely on what is registered.
+			await clickBlockToolbarButton( 'More options' );
+			const groupButton = await page.waitForXPath( '//button[text()="Group"]' );
+			await groupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );

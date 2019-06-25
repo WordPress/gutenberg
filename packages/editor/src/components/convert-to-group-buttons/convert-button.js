@@ -9,7 +9,7 @@ import { noop } from 'lodash';
 import { Fragment } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
-import { switchToBlockType } from '@wordpress/blocks';
+import { switchToBlockType, getGroupingBlockName } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -55,11 +55,13 @@ export default compose( [
 			canInsertBlockType,
 		} = select( 'core/block-editor' );
 
-		const containerBlockAvailable = canInsertBlockType( 'core/group' );
+		const groupingBlockName = getGroupingBlockName();
+
+		const groupingBlockAvailable = canInsertBlockType( groupingBlockName );
 
 		const blocksSelection = getBlocksByClientId( clientIds );
 
-		const isSingleContainerBlock = blocksSelection.length === 1 && blocksSelection[ 0 ] && blocksSelection[ 0 ].name === 'core/group';
+		const isSingleGroupingBlock = blocksSelection.length === 1 && blocksSelection[ 0 ] && blocksSelection[ 0 ].name === groupingBlockName;
 
 		// Do we have
 		// 1. Container block available to be inserted?
@@ -67,9 +69,9 @@ export default compose( [
 		// (we allow single Blocks to become groups unless
 		// they are a soltiary group block themselves)
 		const isGroupable = (
-			containerBlockAvailable &&
+			groupingBlockAvailable &&
 			blocksSelection.length &&
-			! isSingleContainerBlock
+			! isSingleGroupingBlock
 		);
 
 		// Do we have a single Group Block selected and does that group have inner blocks?
@@ -86,6 +88,8 @@ export default compose( [
 			replaceBlocks,
 		} = dispatch( 'core/block-editor' );
 
+		const groupingBlockName = getGroupingBlockName();
+
 		return {
 			onConvertToGroup() {
 				if ( ! blocksSelection.length ) {
@@ -93,7 +97,7 @@ export default compose( [
 				}
 
 				// Activate the `transform` on `core/group` which does the conversion
-				const newBlocks = switchToBlockType( blocksSelection, 'core/group' );
+				const newBlocks = switchToBlockType( blocksSelection, groupingBlockName );
 
 				if ( newBlocks ) {
 					replaceBlocks(
