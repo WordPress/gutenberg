@@ -61,13 +61,6 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
  */
 
 /**
- * @callback FnAllowNode
- * @param {Node} textNode check if the completer can handle this text node.
- *
- * @returns {boolean} true if the completer can handle this text node.
- */
-
-/**
  * @callback FnAllowContext
  * @param {string} before the string before the auto complete trigger and query.
  * @param {string} after  the string after the autocomplete trigger and query.
@@ -105,7 +98,6 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
  * @property {?FnGetOptionKeywords} getOptionKeywords get the keywords for a given option.
  * @property {?FnIsOptionDisabled} isOptionDisabled get whether or not the given option is disabled.
  * @property {FnGetOptionLabel} getOptionLabel get the label for a given option.
- * @property {?FnAllowNode} allowNode filter the allowed text nodes in the autocomplete.
  * @property {?FnAllowContext} allowContext filter the context under which the autocomplete activates.
  * @property {FnGetOptionCompletion} getOptionCompletion get the completion associated with a given option.
  */
