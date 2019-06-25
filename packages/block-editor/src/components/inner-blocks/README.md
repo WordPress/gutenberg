@@ -71,7 +71,7 @@ The previous code block restricts all blocks, so only child blocks explicitly re
 * **Type:** `Array<Array<Object>>`
 
 The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc. Block templates allow specifying a default initial state for an InnerBlocks area.
-More information about templates can be found in [template docs](https://wordpress.org/gutenberg/handbook/templates/).
+More information about templates can be found in [template docs](/docs/developers/block-api/block-templates.md).
 
 ```jsx
 const TEMPLATE = [ [ 'core/columns', {}, [
@@ -90,6 +90,69 @@ const TEMPLATE = [ [ 'core/columns', {}, [
 
 The previous example creates an InnerBlocks area containing two columns one with an image and the other with a paragraph.
 
+### `__experimentalTemplateOptions`
+
+* **Type:** `Array<Object>`
+
+To present the user with a set of template choices for the inner blocks, you may provide an array of template options.
+
+A template option is an object consisting of the following properties:
+
+- `title` (`string`): A human-readable label which describes the template. 
+- `icon` (`WPElement|string`): An element or [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug to show as a visual approximation of the template.
+- `template` (`Array<Array>`): The template to apply when the option has been selected. See [`template` documentation](#template) for more information.
+
+For the template placeholder selection to be displayed, you must render `InnerBlocks` with a `template` prop value of `null`. You may track this as state of your component, updating its value when receiving the selected template via `__experimentalOnSelectTemplateOption`.
+
+```jsx
+import { useState } from '@wordpress/element';
+
+const TEMPLATE_OPTIONS = [
+	{
+		title: 'Two Columns',
+		icon: <svg />,
+		template: [
+			[ 'core/column', { width: 50 } ],
+			[ 'core/column', { width: 50 } ],
+		],
+	},
+	{
+		title: 'Three Columns',
+		icon: <svg />,
+		template: [
+			[ 'core/column', { width: 33.33 } ],
+			[ 'core/column', { width: 33.33 } ],
+			[ 'core/column', { width: 33.33 } ],
+		],
+	},
+];
+
+function edit() {
+	const [ template, setTemplate ] = useState( null );
+
+	return (
+		<InnerBlocks
+			template={ template }
+		    __experimentalTemplateOptions={ TEMPLATE_OPTIONS }
+		    __experimentalOnSelectTemplateOption={ setTemplate }
+		/>
+	);
+}
+```
+
+### `__experimentalOnSelectTemplateOption`
+
+* **Type:** `Function`
+
+Callback function invoked when the user makes a template selection, used in combination with the `__experimentalTemplateOptions` props. The selected template is passed as the first and only argument. The value of the template may be `undefined` if the `__experimentalAllowTemplateOptionSkip` prop is passed to `InnerBlocks` and the user opts to skip template selection.
+
+### `__experimentalAllowTemplateOptionSkip`
+
+* **Type:** `Boolean`
+* **Default:** `false`
+
+Whether to include a button in the template selection placeholder to allow the user to skip selection, used in combination with the `__experimentalTemplateOptions` prop. When clicked, the `__experimentalOnSelectTemplateOption` callback will be passed an `undefined` value as the template.
+
 ### `templateInsertUpdatesSelection`
 * **Type:** `Boolean`
 * **Default:** `true`
@@ -100,7 +163,7 @@ If false the selection should not be updated when child blocks specified in the 
 ### `templateLock`
 * **Type:** `String|Boolean`
 
-Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](https://wordpress.org/gutenberg/handbook/templates/#locking).
+Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/developers/block-api/block-templates.md#locking).
 
 Template locking allows locking the `InnerBlocks` area for the current template.
 *Options:*

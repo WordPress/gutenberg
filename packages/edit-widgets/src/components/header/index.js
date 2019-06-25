@@ -1,8 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import SaveButton from '../save-button';
 
 function Header() {
 	return (
@@ -17,9 +21,7 @@ function Header() {
 			</h1>
 
 			<div className="edit-widgets-header__actions">
-				<Button isPrimary isLarge>
-					{ __( 'Update' ) }
-				</Button>
+				<SaveButton />
 			</div>
 		</div>
 	);

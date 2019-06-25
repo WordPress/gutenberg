@@ -7,7 +7,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { withViewportMatch } from '@wordpress/viewport';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
@@ -25,6 +24,7 @@ import DefaultBlockAppender from './default-block-appender';
  */
 import BlockList from '../block-list';
 import { withBlockEditContext } from '../block-edit/context';
+import TemplatePicker from './template-picker';
 
 class InnerBlocks extends Component {
 	constructor() {
@@ -49,6 +49,7 @@ class InnerBlocks extends Component {
 		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
 			this.synchronizeBlocksWithTemplate();
 		}
+
 		if ( this.state.templateInProcess ) {
 			this.setState( {
 				templateInProcess: false,
@@ -106,23 +107,34 @@ class InnerBlocks extends Component {
 	render() {
 		const {
 			clientId,
-			isSmallScreen,
-			isSelectedBlockInRoot,
+			hasOverlay,
 			renderAppender,
+			template,
+			__experimentalTemplateOptions: templateOptions,
+			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
+			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
+		const isPlaceholder = template === null && !! templateOptions;
+
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
-			'has-overlay': isSmallScreen && ! isSelectedBlockInRoot,
+			'has-overlay': hasOverlay && ! isPlaceholder,
 		} );
 
 		return (
 			<div className={ classes }>
 				{ ! templateInProcess && (
-					<BlockList
-						rootClientId={ clientId }
-						renderAppender={ renderAppender }
-					/>
+					isPlaceholder ?
+						<TemplatePicker
+							options={ templateOptions }
+							onSelect={ onSelectTemplateOption }
+							allowSkip={ allowTemplateOptionSkip }
+						/> :
+						<BlockList
+							rootClientId={ clientId }
+							renderAppender={ renderAppender }
+						/>
 				) }
 			</div>
 		);
@@ -131,7 +143,6 @@ class InnerBlocks extends Component {
 
 InnerBlocks = compose( [
 	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
-	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withSelect( ( select, ownProps ) => {
 		const {
 			isBlockSelected,
@@ -142,12 +153,13 @@ InnerBlocks = compose( [
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
+		const block = getBlock( clientId );
 		const rootClientId = getBlockRootClientId( clientId );
 
 		return {
-			isSelectedBlockInRoot: isBlockSelected( clientId ) || hasSelectedInnerBlock( clientId ),
-			block: getBlock( clientId ),
+			block,
 			blockListSettings: getBlockListSettings( clientId ),
+			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
 		};
 	} ),

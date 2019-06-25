@@ -9,4 +9,7 @@ module.exports = {
 		'@wordpress/jest-puppeteer-axe',
 		'expect-puppeteer',
 	],
+	testPathIgnorePatterns: [
+		'e2e-tests/specs/performance.test.js',
+	],
 };

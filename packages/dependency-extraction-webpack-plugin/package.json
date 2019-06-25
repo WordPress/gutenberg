@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dependency-extraction-webpack-plugin",
-	"version": "1.0.0-alpha.0",
+	"version": "1.0.1",
 	"description": "Extract WordPress script dependencies from webpack bundles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"files": [
-		"index.js"
+		"index.js",
+		"util.js"
 	],
 	"main": "index.js",
 	"dependencies": {

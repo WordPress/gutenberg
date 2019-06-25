@@ -17,4 +17,9 @@ import './hooks';
 
 export * from './components';
 export * from './utils';
-export { default as transformStyles } from './editor-styles';
+export { storeConfig } from './store';
+
+/*
+ * Backward compatibility
+ */
+export { __experimentalTransformStyles as transformStyles } from '@wordpress/block-editor';

@@ -130,6 +130,10 @@ class ButtonEdit extends Component {
 						<Dashicon icon="admin-links" />
 						<URLInput
 							value={ url }
+							/* eslint-disable jsx-a11y/no-autofocus */
+							// Disable Reason: The rule is meant to prevent enabling auto-focus, not disabling it.
+							autoFocus={ false }
+							/* eslint-enable jsx-a11y/no-autofocus */
 							onChange={ ( value ) => setAttributes( { url: value } ) }
 						/>
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />

@@ -2,16 +2,16 @@
  * External dependencies
  */
 import React from 'react';
-import { Switch, Platform } from 'react-native';
+import { Platform } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { BottomSheet } from '@wordpress/block-editor';
 import { prependHTTP } from '@wordpress/url';
 import {
+	BottomSheet,
 	withSpokenMessages,
 } from '@wordpress/components';
 import {
@@ -53,10 +53,13 @@ class ModalLinkUI extends Component {
 			return;
 		}
 
+		const { activeAttributes: { url, target } } = this.props;
+		const opensInNewWindow = target === '_blank';
+
 		this.setState( {
-			inputValue: this.props.activeAttributes.url || '',
+			inputValue: url || '',
 			text: getTextContent( slice( this.props.value ) ),
-			opensInNewWindow: false,
+			opensInNewWindow,
 		} );
 	}
 
@@ -122,6 +125,7 @@ class ModalLinkUI extends Component {
 
 	render() {
 		const { isVisible } = this.props;
+		const { text } = this.state;
 
 		return (
 			<BottomSheet
@@ -129,36 +133,33 @@ class ModalLinkUI extends Component {
 				onClose={ this.onDismiss }
 				hideHeader
 			>
-				{ /* eslint-disable jsx-a11y/no-autofocus */ }
-				<BottomSheet.Cell
-					icon={ 'admin-links' }
-					label={ __( 'URL' ) }
-					value={ this.state.inputValue }
-					placeholder={ __( 'Add URL' ) }
-					autoCapitalize="none"
-					autoCorrect={ false }
-					keyboardType="url"
-					onChangeValue={ this.onChangeInputValue }
-					autoFocus={ Platform.OS === 'ios' }
-				/>
-				{ /* eslint-enable jsx-a11y/no-autofocus */ }
+				{ /* eslint-disable jsx-a11y/no-autofocus */
+					<BottomSheet.Cell
+						icon={ 'admin-links' }
+						label={ __( 'URL' ) }
+						value={ this.state.inputValue }
+						placeholder={ __( 'Add URL' ) }
+						autoCapitalize="none"
+						autoCorrect={ false }
+						keyboardType="url"
+						onChangeValue={ this.onChangeInputValue }
+						autoFocus={ Platform.OS === 'ios' }
+					/>
+				/* eslint-enable jsx-a11y/no-autofocus */ }
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
 					label={ __( 'Link Text' ) }
-					value={ this.state.text }
+					value={ text }
 					placeholder={ __( 'Add Link Text' ) }
 					onChangeValue={ this.onChangeText }
 				/>
-				<BottomSheet.Cell
+				<BottomSheet.SwitchCell
 					icon={ 'external' }
 					label={ __( 'Open in New Tab' ) }
-					value={ '' }
-				>
-					<Switch
-						value={ this.state.opensInNewWindow }
-						onValueChange={ this.onChangeOpensInNewWindow }
-					/>
-				</BottomSheet.Cell>
+					value={ this.state.opensInNewWindow }
+					onValueChange={ this.onChangeOpensInNewWindow }
+					separatorType={ 'fullWidth' }
+				/>
 				<BottomSheet.Cell
 					label={ __( 'Remove Link' ) }
 					labelStyle={ styles.clearLinkButton }

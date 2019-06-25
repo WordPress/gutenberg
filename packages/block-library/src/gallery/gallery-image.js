@@ -86,7 +86,7 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isSelected, caption, onRemove, setAttributes, 'aria-label': ariaLabel } = this.props;
+		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption, onRemove, onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel } = this.props;
 
 		let href;
 
@@ -128,11 +128,28 @@ class GalleryImage extends Component {
 		return (
 			<figure className={ className }>
 				{ href ? <a href={ href }>{ img }</a> : img }
+				<div className="block-library-gallery-item__move-menu">
+					<IconButton
+						icon="arrow-left"
+						onClick={ isFirstItem ? undefined : onMoveBackward }
+						className="blocks-gallery-item__move-backward"
+						label={ __( 'Move Image Backward' ) }
+						aria-disabled={ isFirstItem }
+						disabled={ ! isSelected }
+					/>
+					<IconButton
+						icon="arrow-right"
+						onClick={ isLastItem ? undefined : onMoveForward }
+						className="blocks-gallery-item__move-forward"
+						label={ __( 'Move Image Forward' ) }
+						aria-disabled={ isLastItem }
+						disabled={ ! isSelected }
+					/>
+				</div>
 				<div className="block-library-gallery-item__inline-menu">
 					<IconButton
 						icon="no-alt"
 						onClick={ onRemove }
-						onFocus={ this.onSelectImage }
 						className="blocks-gallery-item__remove"
 						label={ __( 'Remove Image' ) }
 						disabled={ ! isSelected }

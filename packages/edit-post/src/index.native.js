@@ -11,6 +11,8 @@ import { unregisterBlockType } from '@wordpress/blocks';
  */
 import './store';
 
+export { default as VisualEditor } from './components/visual-editor';
+
 /**
  * Initializes the Editor.
  */
@@ -18,12 +20,10 @@ export function initializeEditor() {
 	// register and setup blocks
 	registerCoreBlocks();
 
-	// disable Code and More blocks for the release
+	// disable Code block for the release
 	// eslint-disable-next-line no-undef
 	if ( typeof __DEV__ === 'undefined' || ! __DEV__ ) {
 		unregisterBlockType( 'core/code' );
-		unregisterBlockType( 'core/more' );
-		unregisterBlockType( 'core/video' );
 	}
 }
 

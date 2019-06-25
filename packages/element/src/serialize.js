@@ -49,10 +49,14 @@ import {
 	createContext,
 	Fragment,
 	StrictMode,
+	forwardRef,
 } from './react';
 import RawHTML from './raw-html';
 
 const { Provider, Consumer } = createContext();
+const ForwardRef = forwardRef( () => {
+	return null;
+} );
 
 /**
  * Valid attribute types.
@@ -406,6 +410,9 @@ export function renderElement( element, context, legacyContext = {} ) {
 
 		case Consumer.$$typeof:
 			return renderElement( props.children( context || type._currentValue ), context, legacyContext );
+
+		case ForwardRef.$$typeof:
+			return renderElement( type.render( props ), context, legacyContext );
 	}
 
 	return '';

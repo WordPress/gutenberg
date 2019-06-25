@@ -4,8 +4,9 @@
 	width: 100%;
 	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
-	transition: border-color 0.1s linear, box-shadow 0.1s linear;
 	border-left: $border-width solid $light-gray-800;
+	transition: border-color 0.1s linear, box-shadow 0.1s linear;
+	@include reduce-motion("transition");
 
 	@include break-small() {
 		// Allow overflow on desktop.
