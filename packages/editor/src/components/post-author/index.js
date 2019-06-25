@@ -150,7 +150,8 @@ export class PostAuthor extends Component {
 						sprintf( __( 'Type in %d or more characters for results' ), minQueryLength )
 					}
 					tStatusNoResults={ () => __( 'No search results' ) }
-					tStatusSelectedOption={ ( selectedOption, length ) => __( `${ selectedOption } (1 of ${ length }) is selected` ) }
+					// translators: 1: the index of thre serlrcted result. 2: The total number of results.
+					tStatusSelectedOption={ ( selectedOption, length ) => sprintf( __( '%1$s (1 of %2$s) is selected' ), selectedOption, length ) }
 					tStatusResults={ ( length, contentSelectedOption ) => {
 						return (
 							_n( '%d result is available.', '%d results are available.', length ) +
