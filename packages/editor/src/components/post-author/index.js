@@ -65,6 +65,16 @@ export class PostAuthor extends Component {
 	}
 
 	/**
+	 * Construct a unique author string from an author object in the form `${ author.name } (${ author.slug })`.
+	 *
+	 * @param {Object} author An author object.
+	 *
+	 * @return {string} An author name for display.
+	 */
+	authorUniqueName( author ) {
+		return `${ author.name } (${ author.slug })`;
+	}
+	/**
 	 * Search for authors that match the passed query, passing them to a callback function when resolved.
 	 *
 	 * @param {string} query             The search query.
@@ -92,13 +102,13 @@ export class PostAuthor extends Component {
 	 */
 	resolveResults( results ) {
 		this.authors = results;
-		return results.map( ( author ) => ( `${ author.name } (${ author.slug })` ) );
+		return results.map( ( author ) => ( this.authorUniqueName( author ) ) );
 	}
 
 	/**
 	 * Retrieve the author object by id and set in state.
 	 *
-	 * @param {int} authorId The id of the author to fetch.
+	 * @param {number} authorId The id of the author to fetch.
 	 */
 	getCurrentAuthor( authorId ) {
 		if ( ! authorId ) {
@@ -113,7 +123,7 @@ export class PostAuthor extends Component {
 	 * Set the current author based on the selection. Handles strings passed from the HTML
 	 * select element or strings passed from the autcomplete component.
 	 *
-	 * @param {int|string} selection The author id or name that was selected.
+	 * @param {number|string} selection The author id or name that was selected.
 	 */
 	setAuthorId( selection ) {
 		if ( ! selection ) {
@@ -123,7 +133,7 @@ export class PostAuthor extends Component {
 		if ( typeof selection === 'string' ) {
 			// Author name from the autocompleter.
 			const author = this.authors.find( ( singleAuthor ) => {
-				return `${ singleAuthor.name } (${ singleAuthor.slug })` === selection;
+				return this.authorUniqueName( singleAuthor ) === selection;
 			} );
 			if ( author ) {
 				onUpdateAuthor( Number( author.id ) );
