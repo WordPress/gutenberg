@@ -1,6 +1,6 @@
 <?php
 /**
- * Start: Include for phase 2
+ * Customizer Widget Blocks Section: WP_Customize_Widget_Blocks_Control class.
  *
  * @package gutenberg
  * @since 6.0.0

@@ -320,7 +320,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 		}
 		wp_register_sidebar_widget(
 			$widget_id,
-			__( 'Blocks Area ', 'gutenberg' ),
+			__( 'Blocks Area', 'gutenberg' ),
 			'Experimental_WP_Widget_Blocks_Manager::output_blocks_widget',
 			array(
 				'classname'   => 'widget-area',
@@ -332,7 +332,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 		);
 		wp_register_widget_control(
 			$widget_id,
-			__( 'Blocks Area ', 'gutenberg' ),
+			__( 'Blocks Area', 'gutenberg' ),
 			'noop',
 			array( 'id_base' => 'blocks-widget' )
 		);

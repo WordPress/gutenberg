@@ -10,9 +10,9 @@
  *
  * @since 5.2.0
  *
- * @param string $page Page.
+ * @param string $page The page name the function is being called for, `'gutenberg_customizer'` for the Customizer.
  */
-function the_gutenberg_widgets( $page ) {
+function the_gutenberg_widgets( $page = 'gutenberg_page_gutenberg-widgets' ) {
 	?>
 	<div
 		id="widgets-editor"
