@@ -83,6 +83,10 @@
 			/* Keep the disabled text color when focused */
 			&:disabled,
 			&[aria-disabled="true"] {
+				border-color: color(theme(button) shade(7%));
+				box-shadow:
+					0 0 0 1px $white,
+					0 0 0 3px $blue-medium-focus;
 				color: color(theme(button) tint(40%));
 			}
 		}
