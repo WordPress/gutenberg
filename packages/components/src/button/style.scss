@@ -110,6 +110,14 @@
 			box-shadow: none;
 			text-shadow: none;
 
+			// This specificity is needed to override alternate color schemes in WP-Admin.
+			&.is-button,
+			&.is-button:hover,
+			&:active:enabled {
+				box-shadow: none;
+				text-shadow: none;
+			}
+
 			&:focus:enabled {
 				color: color(theme(button) tint(40%));
 				border-color: color(theme(button) shade(7%));
