@@ -114,6 +114,7 @@ export const registerCoreBlocks = () => {
 		separator,
 		list,
 		quote,
+		mediaText,
 	].forEach( ( { metadata, name, settings } ) => {
 		registerBlockType( name, {
 			...metadata,

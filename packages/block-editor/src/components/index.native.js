@@ -2,9 +2,11 @@
 export { default as BlockControls } from './block-controls';
 export { default as BlockEdit } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
+export { default as BlockIcon } from './block-icon';
 export * from './colors';
 export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
+export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorControls } from './inspector-controls';
 export { default as PlainText } from './plain-text';
 export {
