@@ -40,8 +40,8 @@ export class PostAuthor extends Component {
 		};
 	}
 
+	// Get the initial author from props if available.
 	getInitialPostAuthor() {
-		// Get the initial author from props if available.
 		return this.props.postAuthor;
 	}
 
@@ -64,6 +64,12 @@ export class PostAuthor extends Component {
 		}
 	}
 
+	/**
+	 * Search for authors that match the passed query, passing them to a callback function when resolved.
+	 *
+	 * @param {string} query             The search query.
+	 * @param {Function} populateResults A callback function which receives the results.
+	 */
 	suggestAuthor( query, populateResults ) {
 		if ( query.length < 2 ) {
 			return;
@@ -77,11 +83,23 @@ export class PostAuthor extends Component {
 		this.requestResults( query, populateResults );
 	}
 
+	/**
+	 * Resolve the author objects into strings for display.
+	 *
+	 * @param {Array} results The array of suthors that matched the search.
+	 *
+	 * @return {Array} an array of strings ready for displaying.
+	 */
 	resolveResults( results ) {
 		this.authors = results;
 		return results.map( ( author ) => ( `${ author.name } (${ author.slug })` ) );
 	}
 
+	/**
+	 * Retrieve the author object by id and set in state.
+	 *
+	 * @param {int} authorId The id of the author to fetch.
+	 */
 	getCurrentAuthor( authorId ) {
 		if ( ! authorId ) {
 			return;
@@ -91,6 +109,12 @@ export class PostAuthor extends Component {
 		} );
 	}
 
+	/**
+	 * Set the current author based on the selection. Handles strings passed from the HTML
+	 * select element or strings passed from the autcomplete component.
+	 *
+	 * @param {int|string} selection The author id or name that was selected.
+	 */
 	setAuthorId( selection ) {
 		if ( ! selection ) {
 			return;
