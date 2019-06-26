@@ -275,6 +275,7 @@ class RichTextWraper extends Component {
 			onCreateUndoLevel,
 			placeholder,
 			keepPlaceholderOnFocus,
+			withoutInteractiveFormatting,
 			// eslint-disable-next-line no-unused-vars
 			onRemove,
 			// eslint-disable-next-line no-unused-vars
@@ -317,6 +318,7 @@ class RichTextWraper extends Component {
 				className={ classnames( classes, className ) }
 				placeholder={ placeholder }
 				keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
+				withoutInteractiveFormatting={ withoutInteractiveFormatting }
 				onEnter={ this.onEnter }
 				onDelete={ this.onDelete }
 				onPaste={ this.onPaste }

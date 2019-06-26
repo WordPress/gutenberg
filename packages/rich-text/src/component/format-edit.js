@@ -9,11 +9,41 @@ import { withSelect } from '@wordpress/data';
 import { getActiveFormat } from '../get-active-format';
 import { getActiveObject } from '../get-active-object';
 
-const FormatEdit = ( { formatTypes, onChange, value } ) => {
+/**
+ * Set of all interactive content tags.
+ *
+ * @see https://html.spec.whatwg.org/multipage/dom.html#interactive-content
+ */
+const interactiveContentTags = new Set( [
+	'a',
+	'audio',
+	'button',
+	'details',
+	'embed',
+	'iframe',
+	'input',
+	'label',
+	'select',
+	'textarea',
+	'video',
+] );
+
+const FormatEdit = ( { formatTypes, onChange, value, withoutInteractiveFormatting } ) => {
 	return (
 		<>
-			{ formatTypes.map( ( { name, edit: Edit } ) => {
+			{ formatTypes.map( ( {
+				name,
+				edit: Edit,
+				tagName,
+			} ) => {
 				if ( ! Edit ) {
+					return null;
+				}
+
+				if (
+					withoutInteractiveFormatting &&
+					interactiveContentTags.has( tagName )
+				) {
 					return null;
 				}
 

@@ -864,6 +864,7 @@ class RichText extends Component {
 			__unstableAutocompleters: autocompleters,
 			__unstableAutocomplete: Autocomplete = ( { children: ch } ) => ch( {} ),
 			__unstableOnReplace: onReplace,
+			withoutInteractiveFormatting,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -908,7 +909,11 @@ class RichText extends Component {
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
-				{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
+				{ isSelected && <FormatEdit
+					withoutInteractiveFormatting={ withoutInteractiveFormatting }
+					value={ record }
+					onChange={ this.onChange }
+				/> }
 			</>
 		);
 

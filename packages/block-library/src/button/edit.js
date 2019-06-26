@@ -114,7 +114,7 @@ class ButtonEdit extends Component {
 					placeholder={ __( 'Add text…' ) }
 					value={ text }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
-					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+					withoutInteractiveFormatting
 					className={ classnames(
 						'wp-block-button__link', {
 							'has-background': backgroundColor.color,
