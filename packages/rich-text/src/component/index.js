@@ -112,7 +112,6 @@ class RichText extends Component {
 		this.getRecord = this.getRecord.bind( this );
 		this.createRecord = this.createRecord.bind( this );
 		this.applyRecord = this.applyRecord.bind( this );
-		this.isEmpty = this.isEmpty.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
@@ -183,10 +182,6 @@ class RichText extends Component {
 			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
 			__unstableDomOnly: domOnly,
 		} );
-	}
-
-	isEmpty() {
-		return isEmpty( this.record );
 	}
 
 	/**
@@ -887,8 +882,8 @@ class RichText extends Component {
 		const key = Tagname;
 		const MultilineTag = this.multilineTag;
 		const ariaProps = pickAriaProps( this.props );
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
 		const record = this.getRecord();
+		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && isEmpty( record );
 
 		const autoCompleteContent = ( { listBoxId, activeId } ) => (
 			<>
