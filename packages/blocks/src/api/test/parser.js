@@ -286,7 +286,7 @@ describe( 'block parser', () => {
 		describe( 'source: tag', () => {
 			it( 'returns tag name of matching selector', () => {
 				const value = parseWithAttributeSchema(
-					'<div>',
+					'<div></div>',
 					{
 						source: 'tag',
 						selector: ':nth-child(1)',
@@ -298,7 +298,7 @@ describe( 'block parser', () => {
 
 			it( 'returns undefined when no element matches selector', () => {
 				const value = parseWithAttributeSchema(
-					'<div>',
+					'<div></div>',
 					{
 						source: 'tag',
 						selector: ':nth-child(2)',
