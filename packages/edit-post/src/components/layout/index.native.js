@@ -19,8 +19,6 @@ import styles from './style.scss';
 import VisualEditor from '../visual-editor';
 
 class Layout extends Component {
-	_isMounted: boolean;
-
 	constructor() {
 		super( ...arguments );
 
