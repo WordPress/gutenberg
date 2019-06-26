@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../avoid-unguarded-getrangeat';
+import rule from '../avoid-unguarded-get-range-at';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -14,7 +14,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'avoid-unguarded-getrangeat', rule, {
+ruleTester.run( 'avoid-unguarded-get-range-at', rule, {
 	valid: [
 		{
 			code: `const selection = window.getSelection(); const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;`,
