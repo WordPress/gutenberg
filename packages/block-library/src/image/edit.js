@@ -450,7 +450,7 @@ class ImageEdit extends Component {
 			);
 		}
 
-		const classes = classnames( {
+		const classes = classnames( className, {
 			'is-transient': isBlobURL( url ),
 			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
