@@ -95,8 +95,7 @@ function createBlockJsonEntryTransform() {
 			}
 
 			blocks.add( blockName );
-			const entries = await glob( path.resolve( PACKAGES_DIR, 'block-library/src/', blockName, 'index.js' ) );
-			entries.forEach( ( entry ) => this.push( entry ) );
+			this.push( file.replace( 'block.json', 'index.js' ) );
 			callback();
 		},
 	} );
