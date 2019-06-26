@@ -1,3 +1,9 @@
+## Master
+
+### New Features
+
+- New Rule: [`@wordpress/avoid-unguarded-get-range-at`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/avoid-unguarded-get-range-at.md)
+
 ## 2.3.0 (2019-06-12)
 
 ### Bug Fix
