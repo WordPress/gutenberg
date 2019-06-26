@@ -37,6 +37,8 @@ export class PostAuthor extends Component {
 		this.searchCache = [];
 		this.state = {
 			postAuthor: false,
+			initialAuthors: [],
+			currentSelection: '',
 		};
 	}
 
@@ -50,7 +52,12 @@ export class PostAuthor extends Component {
 
 		// Load the initial post author.
 		const postAuthor = this.getInitialPostAuthor();
-		this.setState( { postAuthor } );
+		if ( postAuthor ) {
+			this.setState( {
+				postAuthor,
+				currentSelection: this.authorUniqueName( postAuthor ),
+			} );
+		}
 
 		const authorInAuthors = authors.find( ( singleAuthor ) => {
 			return singleAuthor.id === postAuthorId;
@@ -58,10 +65,16 @@ export class PostAuthor extends Component {
 
 		// Set or fetch the current author.
 		if ( authorInAuthors ) {
-			this.setState( { postAuthor: authorInAuthors } );
+			this.setState( {
+				postAuthor: authorInAuthors,
+				currentSelection: this.authorUniqueName( authorInAuthors ),
+			} );
 		} else {
 			this.getCurrentAuthor( postAuthorId );
 		}
+
+		// Store a set of authors for display as initial results when uysing an autocomplete.
+		this.setState( { initialAuthors: authors.slice( 0, 9 ) } );
 	}
 
 	/**
@@ -72,8 +85,12 @@ export class PostAuthor extends Component {
 	 * @return {string} An author name for display.
 	 */
 	authorUniqueName( author ) {
+		if ( ! author || ! author.name || ! author.slug ) {
+			return '';
+		}
 		return `${ author.name } (${ author.slug })`;
 	}
+
 	/**
 	 * Search for authors that match the passed query, passing them to a callback function when resolved.
 	 *
@@ -81,7 +98,18 @@ export class PostAuthor extends Component {
 	 * @param {Function} populateResults A callback function which receives the results.
 	 */
 	suggestAuthor( query, populateResults ) {
+		// If the query is the current selection, return the first 10 users.
+		const {
+			initialAuthors,
+			currentSelection,
+		} = this.state;
+		if ( query === currentSelection ) {
+			populateResults( this.resolveResults( initialAuthors ) );
+			return;
+		}
+
 		if ( query.length < 2 ) {
+			populateResults( this.resolveResults( initialAuthors ) );
 			return;
 		}
 
@@ -115,7 +143,10 @@ export class PostAuthor extends Component {
 			return;
 		}
 		apiFetch( { path: `/wp/v2/users/${ encodeURIComponent( authorId ) }` } ).then( ( results ) => {
-			this.setState( { postAuthor: results } );
+			this.setState( {
+				postAuthor: results,
+				currentSelection: this.authorUniqueName( results ),
+			} );
 		} );
 	}
 
@@ -136,6 +167,7 @@ export class PostAuthor extends Component {
 				return this.authorUniqueName( singleAuthor ) === selection;
 			} );
 			if ( author ) {
+				this.setState( { currentSelection: selection } );
 				onUpdateAuthor( Number( author.id ) );
 			}
 		} else {
@@ -148,7 +180,6 @@ export class PostAuthor extends Component {
 		const { postAuthor } = this.state;
 		const { postAuthorId, instanceId, authors } = this.props;
 		const selectId = `post-author-selector-${ instanceId }`;
-
 		let selector;
 		if ( ! postAuthor ) {
 			return null;
@@ -176,11 +207,12 @@ export class PostAuthor extends Component {
 					id={ selectId }
 					minLength={ 2 }
 					showAllValues={ true }
-					defaultValue={ postAuthor ? `${ postAuthor.name } (${ postAuthor.slug })` : '' }
+					defaultValue={ postAuthor ? this.authorUniqueName( postAuthor ) : '' }
 					displayMenu="overlay"
 					onConfirm={ this.setAuthorId }
 					source={ this.suggestAuthor }
-					showNoResultsFound={ false }
+					showNoOptionsFound={ false }
+					preserveNullOptions={ true }
 					tStatusQueryTooShort={ ( minQueryLength ) =>
 						// translators: %d: the number characters required to initiate an author search.
 						sprintf( __( 'Type in %d or more characters for results' ), minQueryLength )
