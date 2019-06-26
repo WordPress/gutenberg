@@ -64,6 +64,14 @@ function createStyleEntryTransform() {
 	} );
 }
 
+/**
+ * Returns a stream transform which maps an individual block.json to the
+ * index.js that imports it. Presently, babel resolves the import of json
+ * files by inlining them as a JavaScript primitive in the importing file.
+ * This transform ensures the importing file is rebuilt.
+ *
+ * @return {Transform} Stream transform instance.
+ */
 function createBlockJsonEntryTransform() {
 	const blocks = new Set;
 
