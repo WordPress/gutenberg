@@ -43,6 +43,9 @@ function getPackageName( file ) {
  * @return {Transform} Stream transform instance.
  */
 function createEntryTransform( mappingFunc ) {
+	// Track any already built files to avoid duplication.
+	const fileSet = new Set;
+
 	return new Transform( {
 		objectMode: true,
 		async transform( file, encoding, callback ) {
@@ -54,15 +57,24 @@ function createEntryTransform( mappingFunc ) {
 				return;
 			}
 
-			if ( isString( mapped ) ) {
+			if ( isString( mapped ) && ! fileSet.has( mapped ) ) {
 				// Handle a single path.
 				this.push( mapped );
-			} else if ( Array.isArray( mapped ) ) {
-				// Handle an array of mapped paths.
-				mapped.forEach( ( filePath ) => this.push( filePath ) );
+				fileSet.add( mapped );
+				callback();
+				return;
 			}
 
-			callback();
+			if ( Array.isArray( mapped ) ) {
+				// Handle an array of mapped paths.
+				mapped.forEach( ( filePath ) => {
+					if ( ! fileSet.has( filePath ) ) {
+						this.push( filePath );
+						fileSet.add( mapped );
+					}
+				} );
+				callback();
+			}
 		},
 	} );
 }
@@ -76,22 +88,16 @@ function createEntryTransform( mappingFunc ) {
  * @return {Transform} Stream transform instance.
  */
 function createStyleEntryTransform() {
-	const packages = new Set;
-
 	return createEntryTransform( async ( file ) => {
 		// Only stylesheets are subject to this transform.
 		if ( path.extname( file ) !== '.scss' ) {
 			return file;
 		}
 
-		// Only operate once per package, assuming entries are common.
+		// Build all root level stylesheets for the package.
 		const packageName = getPackageName( file );
-		if ( packages.has( packageName ) ) {
-			return;
-		}
-
-		packages.add( packageName );
-		return glob( path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' ) );
+		const rootScssFiles = await glob( path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' ) );
+		return rootScssFiles;
 	} );
 }
 
@@ -104,20 +110,13 @@ function createStyleEntryTransform() {
  * @return {Transform} Stream transform instance.
  */
 function createBlockJsonEntryTransform() {
-	const blockFiles = new Set;
-
 	return createEntryTransform( async ( file ) => {
 		// Only block.json files in the block-library folder are subject to this transform.
 		if ( ! /block-library[\/\\]src[\/\\].*[\/\\]block.json$/.test( file ) ) {
 			return file;
 		}
 
-		// Prevent multiple rebuilds of the same file.
-		if ( blockFiles.has( file ) ) {
-			return;
-		}
-
-		blockFiles.add( file );
+		// Build the block's index.js.
 		return file.replace( 'block.json', 'index.js' );
 	} );
 }
