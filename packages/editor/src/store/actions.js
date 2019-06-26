@@ -59,7 +59,11 @@ export function* setupEditor( post, edits, template ) {
 		content = post.content.raw;
 	}
 
-	let blocks = parse( content );
+	let blocks = parse( content, {
+		sources: {
+			meta: ( schema ) => post.meta[ schema.meta ],
+		},
+	} );
 
 	// Apply a template for new posts only, if exists.
 	const isNewPost = post.status === 'auto-draft';
