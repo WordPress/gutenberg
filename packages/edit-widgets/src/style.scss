@@ -15,12 +15,6 @@ body.gutenberg_page_gutenberg-widgets {
 	@include wp-admin-reset( ".blocks-widgets-container" );
 }
 
-// Allow block toolbar to overflow into preview.
-.section-open:not(.busy) .wp-full-overlay-sidebar-content,
-#sub-accordion-section-gutenberg_widget_blocks {
-	overflow: visible !important;
-}
-
 .blocks-widgets-container,
 // The modals are shown outside the .blocks-widgets-container wrapper, they need these styles
 .components-modal__frame {

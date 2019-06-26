@@ -12,14 +12,12 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Notices from '../notices';
 import WidgetAreas from '../widget-areas';
 import { withWPCustomize } from '../../utils';
 
 function CustomizerLayout( { blockEditorSettings } ) {
 	return (
 		<SlotFillProvider>
-			<Notices />
 			<div
 				className="edit-widgets-customizer-layout__content"
 				role="region"
