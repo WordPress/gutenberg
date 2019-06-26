@@ -3,13 +3,8 @@
 	&[data-align="right"],
 	&[data-align="center"] {
 		table {
-			display: table;
 			// Ensure the table element is not full-width when aligned.
 			width: auto;
-		}
-		td,
-		th {
-			word-break: break-all;
 		}
 	}
 
@@ -24,6 +19,11 @@
 
 
 .wp-block-table {
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
 	td,
 	th {
 		padding: 0;
