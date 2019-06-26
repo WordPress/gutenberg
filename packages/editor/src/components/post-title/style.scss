@@ -108,12 +108,20 @@
 	color: $dark-gray-900;
 	flex-wrap: wrap;
 	height: auto;
+	position: relative;
+	left: $block-left-border-width;
+	top: -2px;
+	width: calc(100% - #{$block-left-border-width});
 
 	@include break-mobile() {
 		position: absolute;
 		top: -$block-toolbar-height + $border-width + $border-width + 1px; // Shift this element upward the same height as the block toolbar, minus the border size
+		right: 0;
+		flex-wrap: nowrap;
+		width: auto;
+	}
+	@include break-small() {
 		left: $block-side-ui-clearance;
 		right: $block-side-ui-clearance;
-		flex-wrap: nowrap;
 	}
 }
