@@ -1,0 +1,27 @@
+.container {
+	height: 44px;
+	flex-direction: row;
+	background-color: #fff;
+	border-top-color: #e9eff3;
+	border-top-width: 1px;
+}
+
+.scrollableContent {
+	flex-grow: 1; // Fixes RTL issue on Android.
+}
+
+.keyboardHideContainer {
+	padding-right: 0;
+	padding-left: 0;
+	padding-top: 4px;
+	width: 44px;
+	justify-content: center;
+	align-items: center;
+}
+
+.addBlockButton {
+	color: $blue-wordpress;
+	border: 2px;
+	border-radius: 10px;
+	border-color: $blue-wordpress;
+}

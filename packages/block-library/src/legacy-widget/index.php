@@ -60,9 +60,6 @@ function register_block_core_legacy_widget() {
 		'core/legacy-widget',
 		array(
 			'attributes'      => array(
-				'className'        => array(
-					'type' => 'string',
-				),
 				'identifier'       => array(
 					'type' => 'string',
 				),
