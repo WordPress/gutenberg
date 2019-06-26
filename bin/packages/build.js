@@ -3,6 +3,7 @@
 /**
  * External dependencies
  */
+const { isString } = require( 'lodash' );
 const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const ProgressBar = require( 'progress' );
@@ -29,6 +30,44 @@ function getPackageName( file ) {
 }
 
 /**
+ * Helper higher order function for creating stream transforms that map from
+ * one input file to none, one, or multiple output files.
+ *
+ * @param {Function} mappingFunc An async mapping function that receives a file
+ * 								 path and returns either a falsy to indicate
+ * 								 the file should not be built, a string file
+ * 								 path to indicate that this single file should
+ * 								 be built, or an array of strings to indicate
+ * 								 multiple files should be built.
+ *
+ * @return {Transform} Stream transform instance.
+ */
+function createEntryTransform( mappingFunc ) {
+	return new Transform( {
+		objectMode: true,
+		async transform( file, encoding, callback ) {
+			const mapped = await mappingFunc( file );
+
+			// Ignore this file when a falsey is provided.
+			if ( ! mapped ) {
+				callback();
+				return;
+			}
+
+			if ( isString( mapped ) ) {
+				// Handle a single path.
+				this.push( mapped );
+			} else if ( Array.isArray( mapped ) ) {
+				// Handle an array of mapped paths.
+				mapped.forEach( ( filePath ) => this.push( filePath ) );
+			}
+
+			callback();
+		},
+	} );
+}
+
+/**
  * Returns a stream transform which maps an individual stylesheet to its
  * package entrypoint. Unlike JavaScript which uses an external bundler to
  * efficiently manage rebuilds by entrypoints, stylesheets are rebuilt fresh
@@ -39,28 +78,20 @@ function getPackageName( file ) {
 function createStyleEntryTransform() {
 	const packages = new Set;
 
-	return new Transform( {
-		objectMode: true,
-		async transform( file, encoding, callback ) {
-			// Only stylesheets are subject to this transform.
-			if ( path.extname( file ) !== '.scss' ) {
-				this.push( file );
-				callback();
-				return;
-			}
+	return createEntryTransform( async ( file ) => {
+		// Only stylesheets are subject to this transform.
+		if ( path.extname( file ) !== '.scss' ) {
+			return file;
+		}
 
-			// Only operate once per package, assuming entries are common.
-			const packageName = getPackageName( file );
-			if ( packages.has( packageName ) ) {
-				callback();
-				return;
-			}
+		// Only operate once per package, assuming entries are common.
+		const packageName = getPackageName( file );
+		if ( packages.has( packageName ) ) {
+			return;
+		}
 
-			packages.add( packageName );
-			const entries = await glob( path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' ) );
-			entries.forEach( ( entry ) => this.push( entry ) );
-			callback();
-		},
+		packages.add( packageName );
+		return glob( path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' ) );
 	} );
 }
 
@@ -73,31 +104,21 @@ function createStyleEntryTransform() {
  * @return {Transform} Stream transform instance.
  */
 function createBlockJsonEntryTransform() {
-	const blocks = new Set;
+	const blockFiles = new Set;
 
-	return new Transform( {
-		objectMode: true,
-		async transform( file, encoding, callback ) {
-			const matches = /block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec( file );
-			const blockName = matches ? matches[ 1 ] : undefined;
+	return createEntryTransform( async ( file ) => {
+		// Only block.json files in the block-library folder are subject to this transform.
+		if ( ! /block-library[\/\\]src[\/\\].*[\/\\]block.json$/.test( file ) ) {
+			return file;
+		}
 
-			// Only block.json files in the block-library folder are subject to this transform.
-			if ( ! blockName ) {
-				this.push( file );
-				callback();
-				return;
-			}
+		// Prevent multiple rebuilds of the same file.
+		if ( blockFiles.has( file ) ) {
+			return;
+		}
 
-			// Only operate once per block, assuming entries are common.
-			if ( blockName && blocks.has( blockName ) ) {
-				callback();
-				return;
-			}
-
-			blocks.add( blockName );
-			this.push( file.replace( 'block.json', 'index.js' ) );
-			callback();
-		},
+		blockFiles.add( file );
+		return file.replace( 'block.json', 'index.js' );
 	} );
 }
 
