@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
+import { flow, castArray, mapValues, omit, stubFalse, has } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,6 +24,26 @@ import { isValidBlockContent } from './validation';
 import { getCommentDelimitedContent } from './serializer';
 import { attr, html, text, query, node, children, prop } from './matchers';
 import { normalizeBlockType } from './utils';
+
+/**
+ * Options for parse.
+ *
+ * @property {Object<string,Function>} sources An object defining custom source
+ *                                             types for a parse, where the key
+ *                                             corresponds to the source name,
+ *                                             the value a function receiving
+ *                                             an attribute schema and expected
+ *                                             to return the desired value.
+ *
+ * @typedef {Object} WPBlocksParseOptions
+ */
+
+/**
+ * Default options for parse.
+ *
+ * @type {WPBlocksParseOptions}
+ */
+const DEFAULT_PARSE_OPTIONS = {};
 
 /**
  * Sources which are guaranteed to return a string value.
@@ -225,14 +245,15 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
  * commentAttributes returns the attribute value depending on its source
  * definition of the given attribute key.
  *
- * @param {string} attributeKey      Attribute key.
- * @param {Object} attributeSchema   Attribute's schema.
- * @param {string} innerHTML         Block's raw content.
- * @param {Object} commentAttributes Block's comment attributes.
+ * @param {string}               attributeKey      Attribute key.
+ * @param {Object}               attributeSchema   Attribute's schema.
+ * @param {string}               innerHTML         Block's raw content.
+ * @param {Object}               commentAttributes Block's comment attributes.
+ * @param {WPBlocksParseOptions} parseOptions      Parser options.
  *
  * @return {*} Attribute value.
  */
-export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
+export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes, parseOptions ) {
 	const { type, enum: enumSet } = attributeSchema;
 	let value;
 
@@ -241,6 +262,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case undefined:
 			value = commentAttributes ? commentAttributes[ attributeKey ] : undefined;
 			break;
+
 		case 'attribute':
 		case 'property':
 		case 'html':
@@ -251,6 +273,11 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'tag':
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 			break;
+
+		default:
+			if ( has( parseOptions.sources, attributeSchema.source ) ) {
+				value = parseOptions.sources[ attributeSchema.source ]( attributeSchema );
+			}
 	}
 
 	if ( ! isValidByType( value, type ) || ! isValidByEnum( value, enumSet ) ) {
@@ -269,16 +296,18 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 /**
  * Returns the block attributes of a registered block node given its type.
  *
- * @param {string|Object} blockTypeOrName Block type or name.
- * @param {string}        innerHTML       Raw block content.
- * @param {?Object}       attributes      Known block attributes (from delimiters).
+ * @param {string|Object}        blockTypeOrName Block type or name.
+ * @param {string}               innerHTML       Raw block content.
+ * @param {?Object}              attributes      Known block attributes (from
+ *                                               delimiters).
+ * @param {WPBlocksParseOptions} parseOptions    Parser options.
  *
  * @return {Object} All block attributes.
  */
-export function getBlockAttributes( blockTypeOrName, innerHTML, attributes = {} ) {
+export function getBlockAttributes( blockTypeOrName, innerHTML, attributes = {}, parseOptions ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
-		return getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
+		return getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes, parseOptions );
 	} );
 
 	return applyFilters(
@@ -372,11 +401,12 @@ export function getMigratedBlock( block, parsedAttributes ) {
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param {Object} blockNode Parsed block node.
+ * @param {Object}               blockNode    Parsed block node.
+ * @param {WPBlocksParseOptions} parseOptions Parser options.
  *
  * @return {?Object} An initialized block object (if possible).
  */
-export function createBlockWithFallback( blockNode ) {
+export function createBlockWithFallback( blockNode, parseOptions ) {
 	const { blockName: originalName } = blockNode;
 	let {
 		attrs: attributes,
@@ -445,7 +475,7 @@ export function createBlockWithFallback( blockNode ) {
 
 	let block = createBlock(
 		name,
-		getBlockAttributes( blockType, innerHTML, attributes ),
+		getBlockAttributes( blockType, innerHTML, attributes, parseOptions ),
 		innerBlocks
 	);
 
@@ -473,14 +503,18 @@ export function createBlockWithFallback( blockNode ) {
  *
  * @return {Function} An implementation which parses the post content.
  */
-const createParse = ( parseImplementation ) =>
-	( content ) => parseImplementation( content ).reduce( ( memo, blockNode ) => {
-		const block = createBlockWithFallback( blockNode );
-		if ( block ) {
-			memo.push( block );
-		}
-		return memo;
-	}, [] );
+function createParse( parseImplementation ) {
+	return ( content, options = DEFAULT_PARSE_OPTIONS ) => {
+		return parseImplementation( content ).reduce( ( memo, blockNode ) => {
+			const block = createBlockWithFallback( blockNode, options );
+			if ( block ) {
+				memo.push( block );
+			}
+
+			return memo;
+		}, [] );
+	};
+}
 
 /**
  * Parses the post content with a PegJS grammar and returns a list of blocks.
