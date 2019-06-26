@@ -23,6 +23,7 @@ import {
 	split,
 	LINE_SEPARATOR,
 	toHTMLString,
+	slice,
 } from '@wordpress/rich-text';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
 import { createBlobURL } from '@wordpress/blob';
@@ -33,7 +34,6 @@ import { createBlobURL } from '@wordpress/blob';
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
-import { getInputRule } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { ListEdit } from './list-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
@@ -216,6 +216,37 @@ class RichTextWraper extends Component {
 		onReplace( blocks, indexToSelect );
 	}
 
+	inputRule( value, valueToFormat ) {
+		const { onReplace } = this.props;
+
+		if ( ! onReplace ) {
+			return;
+		}
+
+		const { start, text } = value;
+		const characterBefore = text.slice( start - 1, start );
+
+		if ( ! /\s/.test( characterBefore ) ) {
+			return;
+		}
+
+		const trimmedTextBefore = text.slice( 0, start ).trim();
+		const prefixTransforms = getBlockTransforms( 'from' )
+			.filter( ( { type } ) => type === 'prefix' );
+		const transformation = findTransform( prefixTransforms, ( { prefix } ) => {
+			return trimmedTextBefore === prefix;
+		} );
+
+		if ( ! transformation ) {
+			return;
+		}
+
+		const content = valueToFormat( slice( value, start, text.length ) );
+		const block = transformation.transform( content );
+
+		onReplace( [ block ] );
+	}
+
 	render() {
 		const {
 			tagName,
@@ -274,7 +305,7 @@ class RichTextWraper extends Component {
 				onDelete={ this.onDelete }
 				onPaste={ this.onPaste }
 				__unstableIsSelected={ originalIsSelected }
-				__unstableInputRule={ getInputRule( onReplace ) }
+				__unstableInputRule={ this.inputRule }
 				__unstableAutocomplete={ Autocomplete }
 				__unstableAutocompleters={ autocompleters }
 				__unstableOnReplace={ onReplace }
