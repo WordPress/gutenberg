@@ -136,7 +136,7 @@
     "moment": "^2.22.1",
     "moment-timezone": "^0.5.16",
     "node-libs-react-native": "^1.0.2",
-    "node-sass": "^4.8.3",
+    "node-sass": "^4.12.0",
     "react": "16.8.3",
     "react-native": "0.59.3",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
