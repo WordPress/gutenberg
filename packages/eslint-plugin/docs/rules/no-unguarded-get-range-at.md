@@ -1,4 +1,4 @@
-# Avoid unguarded getRangeAt (avoid-unguarded-get-range-at)
+# Avoid unguarded getRangeAt (no-unguarded-get-range-at)
 
 Some browsers (e.g. Safari) will throw an error when `getRangeAt` is called and there are no ranges in the selection.
 
