@@ -243,6 +243,32 @@ describe( 'block parser', () => {
 			);
 			expect( value ).toBe( false );
 		} );
+
+		describe( 'source: tag', () => {
+			it( 'returns tag name of matching selector', () => {
+				const value = parseWithAttributeSchema(
+					'<div></div>',
+					{
+						source: 'tag',
+						selector: ':nth-child(1)',
+					}
+				);
+
+				expect( value ).toBe( 'div' );
+			} );
+
+			it( 'returns undefined when no element matches selector', () => {
+				const value = parseWithAttributeSchema(
+					'<div></div>',
+					{
+						source: 'tag',
+						selector: ':nth-child(2)',
+					}
+				);
+
+				expect( value ).toBe( undefined );
+			} );
+		} );
 	} );
 
 	describe( 'getBlockAttribute', () => {
