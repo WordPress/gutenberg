@@ -20,7 +20,7 @@ import { withFilters, IsolatedEventContainer } from '@wordpress/components';
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
-import { getPatterns, getEnterPatterns } from './patterns';
+import { getInputRule, getEnterRule } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { ListEdit } from './list-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
@@ -81,8 +81,8 @@ function RichTextWraper( {
 			placeholder={ placeholder }
 			keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
 			__unstableIsSelected={ originalIsSelected }
-			__unstablePatterns={ getPatterns() }
-			__unstableEnterPatterns={ getEnterPatterns() }
+			__unstableInputRule={ getInputRule( onReplace ) }
+			__unstableEnterRule={ getEnterRule( onReplace ) }
 			__unstablePasteHandler={ pasteHandler }
 			__unstableAutocomplete={ Autocomplete }
 			__unstableAutocompleters={ autocompleters }

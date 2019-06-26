@@ -17,8 +17,6 @@ import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { withSafeTimeout, compose } from '@wordpress/compose';
-import { isURL } from '@wordpress/url';
-import { decodeEntities } from '@wordpress/html-entities';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -30,7 +28,6 @@ import { pickAriaProps } from './aria';
 import { isEmpty, isEmptyLine } from '../is-empty';
 import { create } from '../create';
 import { apply, toDom } from '../to-dom';
-import { applyFormat } from '../apply-format';
 import { split } from '../split';
 import { toHTMLString } from '../to-html-string';
 import { insert } from '../insert';
@@ -208,6 +205,7 @@ class RichText extends Component {
 	onPaste( event ) {
 		const {
 			tagName,
+			formatTypes,
 			__unstableCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 			__unstablePasteHandler: pasteHandler,
 			__unstableOnReplace: onReplace,
@@ -273,22 +271,26 @@ class RichText extends Component {
 			return;
 		}
 
-		// There is a selection, check if a URL is pasted.
-		if ( ! isCollapsed( record ) ) {
-			const pastedText = ( html || plainText ).replace( /<[^>]+>/g, '' ).trim();
+		const pasteRules = formatTypes.reduce( ( accumlator, { __unstablePasteRule } ) => {
+			if ( __unstablePasteRule ) {
+				accumlator.push( __unstablePasteRule );
+			}
 
-			// A URL was pasted, turn the selection into a link
-			if ( isURL( pastedText ) ) {
-				this.onChange( applyFormat( record, {
-					type: 'a',
-					attributes: {
-						href: decodeEntities( pastedText ),
-					},
-				} ) );
+			return accumlator;
+		}, [] );
 
-				// Allows us to ask for this information when we get a report.
-				window.console.log( 'Created link:\n\n', pastedText );
+		if ( pasteRules.length ) {
+			const transformed = pasteRules.reduce( ( accumlator, transform ) => {
+				// Only allow one transform.
+				if ( accumlator === record ) {
+					accumlator = transform( record, { html, plainText } );
+				}
 
+				return accumlator;
+			}, record );
+
+			if ( transformed !== record ) {
+				this.onChange( transformed );
 				return;
 			}
 		}
@@ -422,18 +424,23 @@ class RichText extends Component {
 
 		this.onChange( change, { withoutHistory: true } );
 
-		const {
-			__unstablePatterns: patterns,
-			__unstableOnReplace: onReplace,
-		} = this.props;
+		const { __unstableInputRule: inputRule, formatTypes } = this.props;
 
-		if ( patterns ) {
-			const transformed = patterns.reduce(
-				( accumlator, transform ) => transform(
-					accumlator,
-					onReplace,
-					this.valueToFormat
-				),
+		if ( inputRule ) {
+			inputRule( change, this.valueToFormat );
+		}
+
+		const inputRules = formatTypes.reduce( ( accumlator, { __unstableInputRule } ) => {
+			if ( __unstableInputRule ) {
+				accumlator.push( __unstableInputRule );
+			}
+
+			return accumlator;
+		}, [] );
+
+		if ( inputRules.length ) {
+			const transformed = inputRules.reduce(
+				( accumlator, transform ) => transform( accumlator ),
 				change
 			);
 
@@ -621,7 +628,7 @@ class RichText extends Component {
 		const {
 			__unstableOnReplace: onReplace,
 			__unstableOnSplit: onSplit,
-			__unstableEnterPatterns: enterPatterns,
+			__unstableEnterRule: enterRule,
 		} = this.props;
 
 		const canSplit = onReplace && onSplit;
@@ -676,10 +683,9 @@ class RichText extends Component {
 
 			const record = this.createRecord();
 
-			if ( enterPatterns ) {
-				if ( enterPatterns(
+			if ( enterRule ) {
+				if ( enterRule(
 					record,
-					onReplace,
 					this.valueToFormat,
 				) !== record ) {
 					return;
