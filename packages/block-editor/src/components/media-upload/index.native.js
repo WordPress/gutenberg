@@ -67,7 +67,7 @@ export class MediaUpload extends React.Component {
 		const onMediaLibraryButtonPressed = () => {
 			requestMediaPickFromMediaLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
 				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
+					this.props.onSelectURL( mediaId, mediaUrl, MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY );
 				}
 			} );
 		};
@@ -75,7 +75,7 @@ export class MediaUpload extends React.Component {
 		const onMediaUploadButtonPressed = () => {
 			requestMediaPickFromDeviceLibrary( [ mediaType ], ( mediaId, mediaUrl ) => {
 				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
+					this.props.onSelectURL( mediaId, mediaUrl, MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE );
 				}
 			} );
 		};
@@ -83,7 +83,7 @@ export class MediaUpload extends React.Component {
 		const onMediaCaptureButtonPressed = () => {
 			requestMediaPickFromDeviceCamera( [ mediaType ], ( mediaId, mediaUrl ) => {
 				if ( mediaId ) {
-					this.props.onSelectURL( mediaId, mediaUrl );
+					this.props.onSelectURL( mediaId, mediaUrl, MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_MEDIA );
 				}
 			} );
 		};
