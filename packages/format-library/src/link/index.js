@@ -50,7 +50,7 @@ export const link = {
 		return applyFormat( value, {
 			type: name,
 			attributes: {
-				href: decodeEntities( pastedText ),
+				url: decodeEntities( pastedText ),
 			},
 		} );
 	},
