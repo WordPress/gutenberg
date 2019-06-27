@@ -46,14 +46,6 @@ describe( 'isShallowEqual', () => {
 		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
-	it( 'returns false if b object has different key than a', () => {
-		const a = { foo: 1, baz: 2 };
-		const b = { foo: 1, bar: 2 };
-
-		expect( isShallowEqual( a, b ) ).toBe( false );
-		expect( isShallowEqual( b, a ) ).toBe( false );
-	} );
-
 	it( 'returns true if a object has same values as b', () => {
 		const a = { foo: 1, bar: 2 };
 		const b = { foo: 1, bar: 2 };
