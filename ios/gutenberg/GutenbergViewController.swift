@@ -159,6 +159,8 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             print("Warn: \(message)")
         case .error:
             print("Error: \(message)")
+        case .fatal:
+            print("Fatal: \(message)")
         }
     }
 }
