@@ -28,7 +28,7 @@ function BlockPreview( props ) {
 	return (
 		<div className="editor-block-preview block-editor-block-preview">
 			<div className="editor-block-preview__title block-editor-block-preview__title">{ __( 'Preview' ) }</div>
-			<BlockPreviewContent { ...props } srcWidth={ 560 } srcHeight={ 600 } />
+			<BlockPreviewContent { ...props } srcWidth={ 560 } srcHeight={ 700 } />
 		</div>
 	);
 }
