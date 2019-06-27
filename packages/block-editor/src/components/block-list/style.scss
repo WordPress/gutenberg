@@ -1095,7 +1095,8 @@
 	}
 }
 
-
-.editor-block-list__block-animated-container.is-in-selection {
+// Increase the z-index of the block being moved during the animation.
+.block-editor-block-list__block.is-selected,
+.block-editor-block-list__block.is-multi-selected {
 	z-index: 1;
 }

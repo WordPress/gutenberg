@@ -8,13 +8,11 @@ import {
 	sortBy,
 	throttle,
 } from 'lodash';
-import { animated } from 'react-spring/web.cjs';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Component, useRef } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	withSelect,
 	withDispatch,
@@ -29,32 +27,12 @@ import BlockAsyncModeProvider from './block-async-mode-provider';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { getBlockDOMNode } from '../../utils/dom';
-import useMovingAnimation from './moving-animation';
 
 const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
 	return (
 		<AsyncModeProvider value={ false }>
 			<WrappedComponent { ...props } />
 		</AsyncModeProvider>
-	);
-};
-
-const BlockListItemWrapper = ( { blockClientIds, isBlockInSelection, ...props } ) => {
-	const ref = useRef( null );
-	const style = useMovingAnimation( ref, blockClientIds );
-
-	return (
-		<animated.div
-			ref={ ref }
-			className={ classnames( 'editor-block-list__block-animated-container', {
-				'is-in-selection': isBlockInSelection,
-			} ) }
-			style={ style }
-		>
-			<BlockListBlock
-				{ ...props }
-			/>
-		</animated.div>
 	);
 };
 
@@ -235,14 +213,18 @@ class BlockList extends Component {
 							clientId={ clientId }
 							isBlockInSelection={ isBlockInSelection }
 						>
-							<BlockListItemWrapper
+							<BlockListBlock
 								rootClientId={ rootClientId }
 								clientId={ clientId }
 								blockRef={ this.setBlockRef }
 								onSelectionStart={ this.onSelectionStart }
 								isDraggable={ isDraggable }
-								blockClientIds={ blockClientIds }
 								isBlockInSelection={ isBlockInSelection }
+
+								// This prop is explicitely computed and passed down
+								// to avoid being impacted by the async mode
+								// otherwise there might be a small delay to trigger the animation.
+								animateOnChange={ blockClientIds }
 							/>
 						</BlockAsyncModeProvider>
 					);

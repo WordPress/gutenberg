@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { get, reduce, size, first, last } from 'lodash';
+import { animated } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies
@@ -50,6 +51,7 @@ import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import useHoveredArea from './hover-area';
 import { isInsideRootBlock } from '../../utils/dom';
+import useMovingAnimation from './moving-animation';
 
 /**
  * Prevents default dragging behavior within a block to allow for multi-
@@ -97,6 +99,7 @@ function BlockListBlock( {
 	toggleSelection,
 	onShiftSelection,
 	onSelectionStart,
+	animateOnChange,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -246,6 +249,9 @@ function BlockListBlock( {
 			wrapper.current.focus();
 		}
 	}, [ isFirstMultiSelected ] );
+
+	// Block Reordering animation
+	const style = useMovingAnimation( wrapper, animateOnChange );
 
 	// Other event handlers
 
@@ -458,6 +464,8 @@ function BlockListBlock( {
 			tabIndex="0"
 			aria-label={ blockLabel }
 			childHandledEvents={ [ 'onDragStart', 'onMouseDown' ] }
+			tagName={ animated.div }
+			style={ style }
 			{ ...blockWrapperProps }
 		>
 			{ shouldShowInsertionPoint && (
