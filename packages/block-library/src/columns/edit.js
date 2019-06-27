@@ -34,6 +34,7 @@ import {
 	getRedistributedColumnWidths,
 	toWidthPrecision,
 } from './utils';
+import ColumnsResizer from './resizer';
 
 /**
  * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
@@ -111,6 +112,8 @@ export function ColumnsEdit( {
 	updateAlignment,
 	updateColumns,
 	clientId,
+	isSelected,
+	toggleSelection,
 } ) {
 	const { verticalAlignment } = attributes;
 
@@ -175,6 +178,12 @@ export function ColumnsEdit( {
 					template={ count === 0 && ! forceUseTemplate ? null : template }
 					templateLock="all"
 					allowedBlocks={ ALLOWED_BLOCKS } />
+				{ isSelected && (
+					<ColumnsResizer
+						clientId={ clientId }
+						toggleSelection={ toggleSelection }
+					/>
+				) }
 			</div>
 		</>
 	);
