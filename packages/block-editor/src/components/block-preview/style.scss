@@ -34,6 +34,10 @@
 	// The preview component measures the pixel width of this item, so as to calculate the scale factor.
 	// But without this baseline width, it collapses to 0.
 	width: 100%;
+
+	// This ensures that content evne if it overlaps the preview container is properly clipped.
+	// This is mostly for previews that include arbitrary content.
+	overflow: hidden;
 }
 
 .block-editor-block-preview__content {
