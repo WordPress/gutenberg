@@ -15,10 +15,9 @@ import { withSelect } from '@wordpress/data';
 import Section from './section';
 import { EnableCustomFieldsOption, EnablePanelOption } from './options';
 
-export function MetaBoxesSection( { metaBoxes, postType, ...sectionProps } ) {
+export function MetaBoxesSection( { metaBoxes, supportsCustomFields, ...sectionProps } ) {
 	// The 'Custom Fields' meta box is a special case that we handle separately.
 	const thirdPartyMetaBoxes = filter( metaBoxes, ( { id } ) => id !== 'postcustom' );
-	const supportsCustomFields = get( postType, [ 'supports', 'custom-fields' ], false );
 
 	if ( ! supportsCustomFields && thirdPartyMetaBoxes.length === 0 ) {
 		return null;
@@ -38,9 +37,10 @@ export default withSelect( ( select ) => {
 	const { getPostType } = select( 'core' );
 	const { getEditedPostAttribute } = select( 'core/editor' );
 	const { getAllMetaBoxes } = select( 'core/edit-post' );
+	const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 	return {
 		metaBoxes: getAllMetaBoxes(),
-		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		supportsCustomFields: get( postType, [ 'supports', 'custom-fields' ], false ),
 	};
 } )( MetaBoxesSection );
