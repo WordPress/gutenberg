@@ -18,7 +18,6 @@ import { EnableCustomFieldsOption, EnablePanelOption } from './options';
 export function MetaBoxesSection( { metaBoxes, postType, ...sectionProps } ) {
 	// The 'Custom Fields' meta box is a special case that we handle separately.
 	const thirdPartyMetaBoxes = filter( metaBoxes, ( { id } ) => id !== 'postcustom' );
-
 	const supportsCustomFields = get( postType, [ 'supports', 'custom-fields' ], false );
 
 	if ( ! supportsCustomFields && thirdPartyMetaBoxes.length === 0 ) {
