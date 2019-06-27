@@ -3,6 +3,7 @@
 Dynamic blocks are blocks that build their structure and content on the fly when the block is rendered on the front end.
 
 There are two primary uses for dynamic blocks:
+
 1. Blocks where content should change even if a post has not been updated. One example from WordPress itself is the latest posts block. This block will update everywhere it is used when a new post is published.
 2. Blocks where updates to the code (HTML, CSS, JS) should be immediately shown on the front end of the website. For example, if you update the HTML structure of a block by adding a new class, adding a div, or changing the layout in any other way, if you want these changes to be applied immediately on all occurrences of that block across the site, a dynamic block should be used. (If a dynamic block is not used then when block code is updated Guterberg's [validation process](https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#validation) applies, causing users to see the validation message, "This block appears to have been modified externally").
 
