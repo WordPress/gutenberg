@@ -48,6 +48,7 @@ class RichTextWraper extends Component {
 		this.onSplit = this.onSplit.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onDelete = this.onDelete.bind( this );
+		this.inputRule = this.inputRule.bind( this );
 	}
 
 	onEnter( { value, onChange, shiftKey } ) {
