@@ -15,9 +15,9 @@ import {
 	RichText,
 	__unstableCreateElement,
 	isEmpty,
-	isEmptyLine,
+	__unstableIsEmptyLine as isEmptyLine,
 	insert,
-	insertLineSeparator,
+	__unstableInsertLineSeparator as insertLineSeparator,
 	create,
 	replace,
 	split,
@@ -100,7 +100,7 @@ class RichTextWraper extends Component {
 		}
 	}
 
-	onPaste( { value, html, plainText, image } ) {
+	onPaste( { value, onChange, html, plainText, image } ) {
 		const { onReplace, onSplit, tagName, canUserUseUnfilteredHTML } = this.props;
 
 		if ( image && ! html ) {
@@ -152,7 +152,7 @@ class RichTextWraper extends Component {
 				valueToInsert = replace( valueToInsert, /\n+/g, LINE_SEPARATOR );
 			}
 
-			this.onChange( insert( value, valueToInsert ) );
+			onChange( insert( value, valueToInsert ) );
 		} else if ( content.length > 0 ) {
 			if ( canReplace ) {
 				onReplace( content );
@@ -172,7 +172,12 @@ class RichTextWraper extends Component {
 	 * @param  {Array}  pastedBlocks The pasted blocks to insert, if any.
 	 */
 	onSplit( record, pastedBlocks = [] ) {
-		const { onReplace, onSplit, onSplitMiddle, multiline } = this.props;
+		const {
+			onReplace,
+			onSplit,
+			__unstableOnSplitMiddle: onSplitMiddle,
+			multiline,
+		} = this.props;
 
 		if ( ! onReplace || ! onSplit ) {
 			return;
@@ -263,18 +268,28 @@ class RichTextWraper extends Component {
 			className,
 			autocompleters,
 			onReplace,
-			// onRemove,
-			// onMerge,
-			// onSplit,
 			isCaretWithinFormattedText,
 			onEnterFormattedText,
 			onExitFormattedText,
-			// canUserUseUnfilteredHTML,
 			isSelected: originalIsSelected,
 			onCreateUndoLevel,
 			placeholder,
 			keepPlaceholderOnFocus,
-			// From experimental filter.
+			// eslint-disable-next-line no-unused-vars
+			onRemove,
+			// eslint-disable-next-line no-unused-vars
+			onMerge,
+			// eslint-disable-next-line no-unused-vars
+			onSplit,
+			// eslint-disable-next-line no-unused-vars
+			canUserUseUnfilteredHTML,
+			// eslint-disable-next-line no-unused-vars
+			clientId,
+			// eslint-disable-next-line no-unused-vars
+			identifier,
+			// eslint-disable-next-line no-unused-vars
+			instanceId,
+			// From experimental filter. To do: pick props instead.
 			...experimentalProps
 		} = this.props;
 

@@ -260,7 +260,13 @@ class RichText extends Component {
 				/^image\/(?:jpe?g|png|gif)$/.test( type )
 			);
 
-			onPaste( { value: this.removeEditorOnlyFormats( record ), html, plainText, image } );
+			onPaste( {
+				value: this.removeEditorOnlyFormats( record ),
+				onChange: this.onChange,
+				html,
+				plainText,
+				image,
+			} );
 		}
 	}
 
