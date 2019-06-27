@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useSpring, interpolate } from 'react-spring';
+import { useSpring, interpolate } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies

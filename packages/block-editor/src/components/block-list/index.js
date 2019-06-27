@@ -8,7 +8,7 @@ import {
 	sortBy,
 	throttle,
 } from 'lodash';
-import { animated } from 'react-spring';
+import { animated } from 'react-spring/web.cjs';
 import classnames from 'classnames';
 
 /**
