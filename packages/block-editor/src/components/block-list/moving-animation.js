@@ -68,7 +68,7 @@ function useMovingAnimation( ref, triggerAnimationOnChange ) {
 				animationProps.x,
 				animationProps.y,
 			],
-			( x, y ) => `translate3d(${ x }px,${ y }px,0)`
+			( x, y ) => x === 0 && y === 0 ? '' : `translate3d(${ x }px,${ y }px,0)`
 		),
 	};
 }
