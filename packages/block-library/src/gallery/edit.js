@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, filter, forEach, map } from 'lodash';
+import { every, filter, forEach, map, debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,6 +28,7 @@ import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withSelect } from '@wordpress/data';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -59,6 +60,7 @@ class GalleryEdit extends Component {
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
+		this.saveImageAttributes = debounce( this.saveImageAttributes.bind( this ), 1000 );
 		this.setAttributes = this.setAttributes.bind( this );
 
 		this.state = {
@@ -165,6 +167,9 @@ class GalleryEdit extends Component {
 		if ( ! images[ index ] ) {
 			return;
 		}
+		if ( images[ index ].id ) {
+			this.saveImageAttributes( images[ index ].id, attributes );
+		}
 		setAttributes( {
 			images: [
 				...images.slice( 0, index ),
@@ -174,6 +179,16 @@ class GalleryEdit extends Component {
 				},
 				...images.slice( index + 1 ),
 			],
+		} );
+	}
+
+	saveImageAttributes( id, attributes ) {
+		const data = new window.FormData();
+		forEach( attributes, ( ( value, key ) => data.append( key, value ) ) );
+		apiFetch( {
+			path: '/wp/v2/media/' + id,
+			body: data,
+			method: 'POST',
 		} );
 	}
 
