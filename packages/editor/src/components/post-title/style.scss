@@ -113,12 +113,22 @@
 	top: -2px;
 	width: calc(100% - #{$block-left-border-width});
 
+	> * {
+		margin-top: $grid-size-small;
+		margin-bottom: $grid-size-small;
+	}
+
 	@include break-mobile() {
 		position: absolute;
 		top: -$block-toolbar-height + $border-width + $border-width + 1px; // Shift this element upward the same height as the block toolbar, minus the border size
 		right: 0;
 		flex-wrap: nowrap;
 		width: auto;
+
+		> * {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
 	}
 	@include break-small() {
 		left: $block-side-ui-clearance;
