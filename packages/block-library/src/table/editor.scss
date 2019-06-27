@@ -2,6 +2,9 @@
 	&[data-align="left"],
 	&[data-align="right"],
 	&[data-align="center"] {
+		// Stop table block from collapsing when tables are floated.
+		height: auto;
+
 		table {
 			// Ensure the table element is not full-width when aligned.
 			width: auto;
