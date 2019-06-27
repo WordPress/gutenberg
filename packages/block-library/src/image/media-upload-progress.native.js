@@ -120,7 +120,7 @@ export class MediaUploadProgress extends React.Component {
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
 		const retryMessage = __( 'Failed to insert media.\nPlease tap for options.' );
-		console.log(`isUploadInProgress: ${ isUploadInProgress }`);
+
 		return (
 			<View style={ styles.mediaUploadProgress }>
 				{ showSpinner && <Spinner progress={ progress } /> }
