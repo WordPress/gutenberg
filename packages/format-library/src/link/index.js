@@ -9,6 +9,7 @@ import {
 	applyFormat,
 	removeFormat,
 	slice,
+	isCollapsed,
 } from '@wordpress/rich-text';
 import { isURL, isEmail } from '@wordpress/url';
 import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor';
@@ -32,6 +33,10 @@ export const link = {
 		target: 'target',
 	},
 	__unstablePasteRule( value, { html, plainText } ) {
+		if ( isCollapsed( value ) ) {
+			return value;
+		}
+
 		const pastedText = ( html || plainText ).replace( /<[^>]+>/g, '' ).trim();
 
 		// A URL was pasted, turn the selection into a link

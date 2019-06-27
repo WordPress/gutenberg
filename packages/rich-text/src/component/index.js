@@ -228,29 +228,18 @@ class RichText extends Component {
 		window.console.log( 'Received plain text:\n\n', plainText );
 
 		const record = this.getRecord();
-
-		const pasteRules = formatTypes.reduce( ( accumlator, { __unstablePasteRule } ) => {
-			if ( __unstablePasteRule ) {
-				accumlator.push( __unstablePasteRule );
+		const transformed = formatTypes.reduce( ( accumlator, { __unstablePasteRule } ) => {
+			// Only allow one transform.
+			if ( __unstablePasteRule && accumlator === record ) {
+				accumlator = __unstablePasteRule( record, { html, plainText } );
 			}
 
 			return accumlator;
-		}, [] );
+		}, record );
 
-		if ( pasteRules.length ) {
-			const transformed = pasteRules.reduce( ( accumlator, transform ) => {
-				// Only allow one transform.
-				if ( accumlator === record ) {
-					accumlator = transform( record, { html, plainText } );
-				}
-
-				return accumlator;
-			}, record );
-
-			if ( transformed !== record ) {
-				this.onChange( transformed );
-				return;
-			}
+		if ( transformed !== record ) {
+			this.onChange( transformed );
+			return;
 		}
 
 		if ( onPaste ) {
@@ -367,24 +356,17 @@ class RichText extends Component {
 			inputRule( change, this.valueToFormat );
 		}
 
-		const inputRules = formatTypes.reduce( ( accumlator, { __unstableInputRule } ) => {
+		const transformed = formatTypes.reduce( ( accumlator, { __unstableInputRule } ) => {
 			if ( __unstableInputRule ) {
-				accumlator.push( __unstableInputRule );
+				accumlator = __unstableInputRule( accumlator );
 			}
 
 			return accumlator;
-		}, [] );
+		}, change );
 
-		if ( inputRules.length ) {
-			const transformed = inputRules.reduce(
-				( accumlator, transform ) => transform( accumlator ),
-				change
-			);
-
-			if ( transformed !== change ) {
-				this.onCreateUndoLevel();
-				this.onChange( { ...transformed, activeFormats } );
-			}
+		if ( transformed !== change ) {
+			this.onCreateUndoLevel();
+			this.onChange( { ...transformed, activeFormats } );
 		}
 
 		// Create an undo level when input stops for over a second.
