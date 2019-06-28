@@ -16,9 +16,9 @@
                 ]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-group alignfull has-lighter-blue-background-color has-background\">\n\t\n</div>\n",
+        "innerHTML": "\n<div class=\"wp-block-group alignfull has-lighter-blue-background-color has-background\" id=\"test-anchor\">\n\t\n</div>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-group alignfull has-lighter-blue-background-color has-background\">\n\t",
+            "\n<div class=\"wp-block-group alignfull has-lighter-blue-background-color has-background\" id=\"test-anchor\">\n\t",
             null,
             "\n</div>\n"
         ]
