@@ -55,15 +55,12 @@ export default compose(
 			order: getBlockIndex( clientId ),
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, rootClientId, onDelete } ) => {
+	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
 		const { removeBlock } = dispatch( 'core/block-editor' );
 		return {
-			onDelete() {
+			onDelete: () => {
 				Keyboard.dismiss();
 				removeBlock( clientId, rootClientId );
-				if ( onDelete ) {
-					onDelete( clientId );
-				}
 			},
 		};
 	} ),
