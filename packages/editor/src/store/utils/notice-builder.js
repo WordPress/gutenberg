@@ -105,7 +105,8 @@ export function getNotificationArgumentsForSaveFail( data ) {
 		messages[ edits.status ] :
 		__( 'Updating failed.' );
 
-	// Check if message string contains html tags. It is unsafe to inject unfiltered html here.
+	// Check if message string contains HTML. Notice text is currently only
+	// supported as plaintext, and stripping the tags may muddle the meaning.
 	if ( error.message && ! ( /<\/?[^>]*>/.test( error.message ) ) ) {
 		noticeMessage = sprintf( __( '%1$s Error message: %2$s' ), noticeMessage, error.message );
 	}
