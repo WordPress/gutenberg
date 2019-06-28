@@ -1,29 +1,34 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import {
+	SlotFillProvider,
+	Popover,
+	navigateRegions,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { withWPCustomize } from '../../utils';
-import CustomizerLayout from '../customizer-layout';
+import WidgetAreas from '../widget-areas';
 
-export default function CustomizerEditWidgetsInitializer( { settings } ) {
-	const { setupWidgetAreas, saveWidgetAreas } = useDispatch( 'core/edit-widgets' );
+import './sync-customizer';
 
-	useEffect( () => {
-		setupWidgetAreas();
-		return withWPCustomize( ( { customize, saveButton } ) => {
-			const listener = () => {
-				saveWidgetAreas();
-				customize.previewer.refresh();
-			};
-			saveButton.addEventListener( 'click', listener );
-			return () => saveButton.removeEventListener( 'click', listener );
-		} );
-	}, [] );
-
-	return <CustomizerLayout blockEditorSettings={ settings } />;
+function CustomizerEditWidgetsInitializer( { settings } ) {
+	return (
+		<SlotFillProvider>
+			<div
+				className="edit-widgets-customizer-edit-widgets-initializer__content"
+				role="region"
+				aria-label={ __( 'Widgets screen content' ) }
+				tabIndex="-1"
+			>
+				<WidgetAreas blockEditorSettings={ settings } />
+			</div>
+			<Popover.Slot />
+		</SlotFillProvider>
+	);
 }
+
+export default navigateRegions( CustomizerEditWidgetsInitializer );

@@ -27,6 +27,14 @@ class WP_Customize_Widget_Blocks_Control extends WP_Customize_Control {
 	 * @since 6.0.0
 	 */
 	public function render_content() {
+		?>
+			<input
+				id="_customize-input-gutenberg_widget_blocks"
+				type="hidden"
+				value="<?php echo esc_attr( $this->value() ); ?>"
+				<?php $this->link(); ?>
+			/>
+		<?php
 		the_gutenberg_widgets( 'gutenberg_customizer' );
 	}
 }

@@ -10,7 +10,7 @@ import { withSelect } from '@wordpress/data';
  */
 import WidgetArea from '../widget-area';
 
-function WidgetAreas( { areas, blockEditorSettings, onUpdateBlocks } ) {
+function WidgetAreas( { areas, blockEditorSettings } ) {
 	const [ selectedArea, setSelectedArea ] = useState( 0 );
 	const onBlockSelectedInArea = useMemo(
 		() => areas.map( ( value, index ) => ( () => {
@@ -24,7 +24,6 @@ function WidgetAreas( { areas, blockEditorSettings, onUpdateBlocks } ) {
 			isSelectedArea={ index === selectedArea }
 			onBlockSelected={ onBlockSelectedInArea[ index ] }
 			blockEditorSettings={ blockEditorSettings }
-			onUpdateBlocks={ onUpdateBlocks }
 			key={ id }
 			id={ id }
 			initialOpen={ index === 0 }

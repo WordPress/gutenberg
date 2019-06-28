@@ -101,17 +101,13 @@ export default compose( [
 			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
 		};
 	} ),
-	withDispatch( ( dispatch, { onUpdateBlocks, id } ) => {
+	withDispatch( ( dispatch, { id } ) => {
 		return {
 			updateBlocks( blocks ) {
 				const {
 					updateBlocksInWidgetArea,
 				} = dispatch( 'core/edit-widgets' );
 				updateBlocksInWidgetArea( id, blocks );
-
-				if ( onUpdateBlocks ) {
-					onUpdateBlocks( id, blocks );
-				}
 			},
 		};
 	} ),
