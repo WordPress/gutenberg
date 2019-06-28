@@ -22,12 +22,13 @@ import { useReducedMotion } from '@wordpress/compose';
  *
  * @param {Object}  ref                      Reference to the element to animate.
  * @param {boolean} isSelected               Whether it's the current block or not.
+ * @param {boolean} enableAnimation          Enable/Disable animation.
  * @param {*}       triggerAnimationOnChange Variable used to trigger the animation if it changes.
  *
  * @return {Object} Style object.
  */
-function useMovingAnimation( ref, isSelected, triggerAnimationOnChange ) {
-	const prefersReducedMotion = useReducedMotion();
+function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationOnChange ) {
+	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
 	const [ resetAnimation, setResetAnimation ] = useState( false );
 	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
 

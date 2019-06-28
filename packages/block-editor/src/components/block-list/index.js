@@ -28,6 +28,8 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { getBlockDOMNode } from '../../utils/dom';
 
+const BLOCK_ANIMATION_THRESHOLD = 200;
+
 const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
 	return (
 		<AsyncModeProvider value={ false }>
@@ -198,6 +200,7 @@ class BlockList extends Component {
 			multiSelectedBlockClientIds,
 			hasMultiSelection,
 			renderAppender,
+			enableAnimation,
 		} = this.props;
 
 		return (
@@ -224,6 +227,7 @@ class BlockList extends Component {
 								// to avoid being impacted by the async mode
 								// otherwise there might be a small delay to trigger the animation.
 								animateOnChange={ blockClientIds }
+								enableAnimation={ enableAnimation }
 							/>
 						</BlockAsyncModeProvider>
 					);
@@ -253,6 +257,7 @@ export default compose( [
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
+			getGlobalBlockCount,
 		} = select( 'core/block-editor' );
 
 		const { rootClientId } = ownProps;
@@ -266,6 +271,7 @@ export default compose( [
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
+			enableAnimation: getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -99,7 +99,9 @@ function BlockListBlock( {
 	toggleSelection,
 	onShiftSelection,
 	onSelectionStart,
+
 	animateOnChange,
+	enableAnimation,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -251,7 +253,7 @@ function BlockListBlock( {
 	}, [ isFirstMultiSelected ] );
 
 	// Block Reordering animation
-	const style = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, animateOnChange );
+	const style = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, enableAnimation, animateOnChange );
 
 	// Other event handlers
 
