@@ -64,9 +64,9 @@ function isSelectionForward( selection ) {
  * horizontal position by default. Set `onlyVertical` to true to check only
  * vertically.
  *
- * @param {Element} container    Focusable element.
- * @param {boolean} isReverse    Set to true to check left, false to check right.
- * @param {boolean} onlyVertical Set to true to check only vertical position.
+ * @param {HTMLElement} container    Focusable element.
+ * @param {boolean}     isReverse    Set to true to check left, false to check right.
+ * @param {boolean}     onlyVertical Set to true to check only vertical position.
  *
  * @return {boolean} True if at the edge, false if not.
  */
@@ -169,8 +169,8 @@ function isEdge( container, isReverse, onlyVertical ) {
 /**
  * Check whether the selection is horizontally at the edge of the container.
  *
- * @param {Element} container Focusable element.
- * @param {boolean} isReverse Set to true to check left, false for right.
+ * @param {HTMLElement} container Focusable element.
+ * @param {boolean}     isReverse Set to true to check left, false for right.
  *
  * @return {boolean} True if at the horizontal edge, false if not.
  */
@@ -181,7 +181,7 @@ export function isHorizontalEdge( container, isReverse ) {
 /**
  * Check whether the selection is vertically at the edge of the container.
  *
- * @param {Element} container Focusable element.
+ * @param {HTMLElement} container Focusable element.
  * @param {boolean} isReverse Set to true to check top, false for bottom.
  *
  * @return {boolean} True if at the vertical edge, false if not.
@@ -255,8 +255,8 @@ export function computeCaretRect() {
 /**
  * Places the caret at start or end of a given element.
  *
- * @param {Element} container Focusable element.
- * @param {boolean} isReverse True for end, false for start.
+ * @param {HTMLElement|undefined} container Focusable element.
+ * @param {boolean}               isReverse True for end, false for start.
  */
 export function placeCaretAtHorizontalEdge( container, isReverse ) {
 	if ( ! container ) {
@@ -364,10 +364,10 @@ function hiddenCaretRangeFromPoint( doc, x, y, container ) {
 /**
  * Places the caret at the top or bottom of a given element.
  *
- * @param {Element} container           Focusable element.
- * @param {boolean} isReverse           True for bottom, false for top.
- * @param {DOMRect} [rect]              The rectangle to position the caret with.
- * @param {boolean} [mayUseScroll=true] True to allow scrolling, false to disallow.
+ * @param {HTMLElement|undefined} container           Focusable element.
+ * @param {boolean}               isReverse           True for bottom, false for top.
+ * @param {DOMRect}               [rect]              The rectangle to position the caret with.
+ * @param {boolean}               [mayUseScroll=true] True to allow scrolling, false to disallow.
  */
 export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScroll = true ) {
 	if ( ! container ) {
@@ -484,7 +484,7 @@ export function documentHasSelection() {
  * Check whether the contents of the element have been entirely selected.
  * Returns true if there is no possibility of selection.
  *
- * @param {Element} element The element to check.
+ * @param {HTMLElement} element The element to check.
  *
  * @return {boolean} True if entirely selected, false if not.
  */
@@ -529,28 +529,28 @@ export function isEntirelySelected( element ) {
 }
 
 /**
- * Given a DOM node, finds the closest scrollable container node.
+ * Given a DOM element, finds the closest scrollable container element.
  *
- * @param {Element} node Node from which to start.
+ * @param {Element} element Element from which to start.
  *
- * @return {?Element} Scrollable container node, if found.
+ * @return {Element|undefined} Scrollable container node, if found.
  */
-export function getScrollContainer( node ) {
-	if ( ! node ) {
+export function getScrollContainer( element ) {
+	if ( ! element ) {
 		return;
 	}
 
 	// Scrollable if scrollable height exceeds displayed...
-	if ( node.scrollHeight > node.clientHeight ) {
+	if ( element.scrollHeight > element.clientHeight ) {
 		// ...except when overflow is defined to be hidden or visible
-		const { overflowY } = window.getComputedStyle( node );
+		const { overflowY } = window.getComputedStyle( element );
 		if ( /(auto|scroll)/.test( overflowY ) ) {
-			return node;
+			return element;
 		}
 	}
 
 	// Continue traversing
-	return getScrollContainer( node.parentNode );
+	return getScrollContainer( element.parentElement );
 }
 
 /**
@@ -562,7 +562,7 @@ export function getScrollContainer( node ) {
  *
  * @param {Node} node Node from which to find offset parent.
  *
- * @return {?Node} Offset parent.
+ * @return {Element|null} Offset parent.
  */
 export function getOffsetParent( node ) {
 	// Cannot retrieve computed style or offset parent only anything other than
@@ -590,9 +590,8 @@ export function getOffsetParent( node ) {
 /**
  * Given two DOM nodes, replaces the former with the latter in the DOM.
  *
- * @param {Element} processedNode Node to be removed.
- * @param {Element} newNode       Node to be inserted in its place.
- * @return {void}
+ * @param {Node} processedNode Node to be removed.
+ * @param {Node} newNode       Node to be inserted in its place.
  */
 export function replace( processedNode, newNode ) {
 	insertAfter( newNode, processedNode.parentNode );
@@ -602,8 +601,7 @@ export function replace( processedNode, newNode ) {
 /**
  * Given a DOM node, removes it from the DOM.
  *
- * @param {Element} node Node to be removed.
- * @return {void}
+ * @param {Node} node Node to be removed.
  */
 export function remove( node ) {
 	node.parentNode.removeChild( node );
@@ -613,9 +611,8 @@ export function remove( node ) {
  * Given two DOM nodes, inserts the former in the DOM as the next sibling of
  * the latter.
  *
- * @param {Element} newNode       Node to be inserted.
- * @param {Element} referenceNode Node after which to perform the insertion.
- * @return {void}
+ * @param {Node} newNode       Node to be inserted.
+ * @param {Node} referenceNode Node after which to perform the insertion.
  */
 export function insertAfter( newNode, referenceNode ) {
 	referenceNode.parentNode.insertBefore( newNode, referenceNode.nextSibling );
@@ -625,8 +622,6 @@ export function insertAfter( newNode, referenceNode ) {
  * Unwrap the given node. This means any child nodes are moved to the parent.
  *
  * @param {Node} node The node to unwrap.
- *
- * @return {void}
  */
 export function unwrap( node ) {
 	const parent = node.parentNode;
@@ -638,13 +633,15 @@ export function unwrap( node ) {
 	parent.removeChild( node );
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Replaces the given node with a new node with the given tag name.
  *
- * @param {Element}  node    The node to replace
- * @param {string}   tagName The new tag name.
+ * @template {keyof HTMLElementTagNameMap} T
+ * @param {Node} node    The node to replace.
+ * @param {T}    tagName The new tag name.
  *
- * @return {Element} The new node.
+ * @return {HTMLElementTagNameMap[T]} The new node.
  */
 export function replaceTag( node, tagName ) {
 	const newNode = node.ownerDocument.createElement( tagName );
@@ -661,8 +658,8 @@ export function replaceTag( node, tagName ) {
 /**
  * Wraps the given node with a new node with the given tag name.
  *
- * @param {Element} newNode       The node to insert.
- * @param {Element} referenceNode The node to wrap.
+ * @param {Node} newNode       The node to insert.
+ * @param {Node} referenceNode The node to wrap.
  */
 export function wrap( newNode, referenceNode ) {
 	referenceNode.parentNode.insertBefore( newNode, referenceNode );

@@ -35,7 +35,7 @@ const SELECTOR = [
  * Returns true if the specified element is visible (i.e. neither display: none
  * nor visibility: hidden).
  *
- * @param {Element} element DOM element to test.
+ * @param {HTMLElement} element DOM element to test.
  *
  * @return {boolean} Whether element is visible.
  */
@@ -69,7 +69,7 @@ function isValidFocusableArea( element ) {
 /**
  * Returns all focusable elements within a given context.
  *
- * @param {Element} context Element in which to search.
+ * @param {ParentNode} context Element in which to search.
  *
  * @return {Element[]} Focusable elements.
  */

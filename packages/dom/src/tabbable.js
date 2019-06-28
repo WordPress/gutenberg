@@ -9,6 +9,12 @@ import { without } from 'lodash';
 import { find as findFocusable } from './focusable';
 
 /**
+ * @typedef {Object} ObjectTabbable
+ * @prop {Element} element Element to be indexed.
+ * @prop {number}  index   Index of the element.
+ */
+
+/**
  * Returns the tab index of the given element. In contrast with the tabIndex
  * property, this normalizes the default (0) to avoid browser inconsistencies,
  * operating under the assumption that this function is only ever called with a
@@ -86,7 +92,7 @@ function createStatefulCollapseRadioGroup() {
  * @param {Element} element Element.
  * @param {number}  index   Array index of element.
  *
- * @return {Object} Mapped object with element, index.
+ * @return {ObjectTabbable} Mapped object with element, index.
  */
 function mapElementToObjectTabbable( element, index ) {
 	return { element, index };
@@ -96,7 +102,7 @@ function mapElementToObjectTabbable( element, index ) {
  * An array map callback, returning an element of the given mapped object's
  * element value.
  *
- * @param {Object} object Mapped object with index.
+ * @param {ObjectTabbable} object Mapped object with index.
  *
  * @return {Element} Mapped object element.
  */
@@ -109,8 +115,8 @@ function mapObjectTabbableToElement( object ) {
  *
  * @see mapElementToObjectTabbable
  *
- * @param {Object} a First object to compare.
- * @param {Object} b Second object to compare.
+ * @param {ObjectTabbable} a First object to compare.
+ * @param {ObjectTabbable} b Second object to compare.
  *
  * @return {number} Comparator result.
  */
@@ -125,6 +131,15 @@ function compareObjectTabbables( a, b ) {
 	return aTabIndex - bTabIndex;
 }
 
+/**
+ * Returns a filtered array of tabbable elements, where at most one radio
+ * input is selected for a given name, giving priority to checked input,
+ * falling back to the first encountered.
+ *
+ * @param {ParentNode} context Element in which to search.
+ *
+ * @return {Element[]} Tabbable elements.
+ */
 export function find( context ) {
 	return findFocusable( context )
 		.filter( isTabbableIndex )
