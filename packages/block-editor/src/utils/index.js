@@ -1,4 +1,1 @@
-/**
- * Internal dependencies
- */
-export { default as __experimentalTransformStyles } from './transform-styles';
+export { default as transformStyles } from './transform-styles';
