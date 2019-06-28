@@ -45,7 +45,7 @@ export default function save( { attributes } ) {
 								tagName={ tag }
 								value={ content }
 								key={ cellIndex }
-								scope={ scope }
+								scope={ tag === 'th' ? scope : undefined }
 							/>
 						) }
 					</tr>

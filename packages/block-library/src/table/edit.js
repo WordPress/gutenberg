@@ -382,7 +382,7 @@ export class TableEdit extends Component {
 								<CellTag
 									key={ columnIndex }
 									className={ cellClasses }
-									scope={ scope }
+									scope={ CellTag === 'th' ? scope : undefined }
 								>
 									<RichText
 										className="wp-block-table__cell-content"
