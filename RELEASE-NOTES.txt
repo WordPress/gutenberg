@@ -1,3 +1,9 @@
+1.8.0
+------
+* Fix pasting simple text on Post Title
+* Remove editable empty line after list on the List block
+* Performance improvements on rich text editing
+
 1.7.0
 ------
 * Fixed keyboard flickering issue after pressing Enter repeatedly on the Post Title.
