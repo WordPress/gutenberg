@@ -14,7 +14,7 @@ import applyMiddlewares from '../../store/middlewares';
 const withRegistryProvider = createHigherOrderComponent( ( WrappedComponent ) => {
 	return withRegistry( ( { useSubRegistry = true, registry, ...props } ) => {
 		if ( ! useSubRegistry ) {
-			return <WrappedComponent registry={ registry } { ...props } />;
+			return <WrappedComponent { ...props } />;
 		}
 
 		const [ subRegistry, setSubRegistry ] = useState( null );
@@ -32,7 +32,7 @@ const withRegistryProvider = createHigherOrderComponent( ( WrappedComponent ) =>
 
 		return (
 			<RegistryProvider value={ subRegistry }>
-				<WrappedComponent registry={ subRegistry } { ...props } />
+				<WrappedComponent { ...props } />
 			</RegistryProvider>
 		);
 	} );
