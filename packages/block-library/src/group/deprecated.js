@@ -18,6 +18,12 @@ const deprecated = [
 			customBackgroundColor: {
 				type: 'string',
 			},
+			anchor: {
+				type: 'string',
+				source: 'attribute',
+				attribute: 'id',
+				selector: '*',
+			},
 		},
 		supports: {
 			align: [ 'wide', 'full' ],
