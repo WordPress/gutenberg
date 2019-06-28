@@ -201,7 +201,7 @@ class BlockList extends Component {
 		} = this.props;
 
 		return (
-			<div className="editor-block-list__layout block-editor-block-list__layout" style={ { position: 'relative' } }>
+			<div className="editor-block-list__layout block-editor-block-list__layout">
 				{ blockClientIds.map( ( clientId ) => {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :
@@ -219,7 +219,6 @@ class BlockList extends Component {
 								blockRef={ this.setBlockRef }
 								onSelectionStart={ this.onSelectionStart }
 								isDraggable={ isDraggable }
-								isBlockInSelection={ isBlockInSelection }
 
 								// This prop is explicitely computed and passed down
 								// to avoid being impacted by the async mode
