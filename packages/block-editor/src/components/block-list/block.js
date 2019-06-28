@@ -251,7 +251,7 @@ function BlockListBlock( {
 	}, [ isFirstMultiSelected ] );
 
 	// Block Reordering animation
-	const style = useMovingAnimation( wrapper, animateOnChange );
+	const style = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, animateOnChange );
 
 	// Other event handlers
 

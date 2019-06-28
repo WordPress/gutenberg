@@ -20,12 +20,13 @@ import { useReducedMotion } from '@wordpress/compose';
  *  - It uses the "resetAnimation" flag to reset the animation
  *    from the beginning in order to animate to the new destination point.
  *
- * @param {Object} ref                      Reference to the element to animate
- * @param {*}      triggerAnimationOnChange Variable used to trigger the animation if it changes
+ * @param {Object}  ref                      Reference to the element to animate.
+ * @param {boolean} isSelected               Whether it's the current block or not.
+ * @param {*}       triggerAnimationOnChange Variable used to trigger the animation if it changes.
  *
  * @return {Object} Style object.
  */
-function useMovingAnimation( ref, triggerAnimationOnChange ) {
+function useMovingAnimation( ref, isSelected, triggerAnimationOnChange ) {
 	const prefersReducedMotion = useReducedMotion();
 	const [ resetAnimation, setResetAnimation ] = useState( false );
 	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
@@ -68,7 +69,14 @@ function useMovingAnimation( ref, triggerAnimationOnChange ) {
 				animationProps.x,
 				animationProps.y,
 			],
-			( x, y ) => x === 0 && y === 0 ? '' : `translate3d(${ x }px,${ y }px,0)`
+			( x, y ) => x === 0 && y === 0 ? undefined : `translate3d(${ x }px,${ y }px,0)`
+		),
+		zIndex: interpolate(
+			[
+				animationProps.x,
+				animationProps.y,
+			],
+			( x, y ) => ! isSelected || ( x === 0 && y === 0 ) ? undefined : `1`
 		),
 	};
 }
