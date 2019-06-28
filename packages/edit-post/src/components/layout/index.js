@@ -19,7 +19,7 @@ import {
 	AutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
-	PostPublishPanel,
+	PostPublishModal,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginArea } from '@wordpress/plugins';
@@ -101,7 +101,7 @@ function Layout( {
 				</div>
 			</div>
 			{ publishSidebarOpened ? (
-				<PostPublishPanel
+				<PostPublishModal
 					{ ...publishLandmarkProps }
 					onClose={ closePublishSidebar }
 					forceIsDirty={ hasActiveMetaboxes }

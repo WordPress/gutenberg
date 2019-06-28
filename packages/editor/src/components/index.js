@@ -37,6 +37,7 @@ export { default as PostPreviewButton } from './post-preview-button';
 export { default as PostPublishButton } from './post-publish-button';
 export { default as PostPublishButtonLabel } from './post-publish-button/label';
 export { default as PostPublishPanel } from './post-publish-panel';
+export { default as PostPublishModal } from './post-publish-modal';
 export { default as PostSavedState } from './post-saved-state';
 export { default as PostSchedule } from './post-schedule';
 export { default as PostScheduleCheck } from './post-schedule/check';

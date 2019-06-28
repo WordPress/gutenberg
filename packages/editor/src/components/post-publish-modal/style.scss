@@ -1,0 +1,33 @@
+.editor-post-publish-modal {
+	min-width: 600px;
+}
+.editor-post-publish-modal-panel {
+	padding: 16px 0;
+}
+.editor-post-publish-modal-panel__heading {
+	font-size: 13px;
+	line-height: 18px;
+	letter-spacing: -0.006px;
+	color: $dark-gray-300;
+	font-weight: 400;
+}
+
+.editor-post-publish-modal-panel__value {
+	font-size: 21px;
+	line-height: 18px;
+	letter-spacing: -0.006px;
+	color: $dark-gray-800;
+	margin: 4px 0;
+}
+
+.editor-post-publish-modal-panel__detail {
+	font-size: 13px;
+	line-height: 18px;
+	letter-spacing: -0.006px;
+	color: $dark-gray-800;
+	clear: both;
+}
+
+.post-publish-modal__postpublish-post-address .components-text-control__input {
+	width: 80%;
+}
