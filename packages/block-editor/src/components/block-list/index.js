@@ -28,6 +28,10 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { getBlockDOMNode } from '../../utils/dom';
 
+/**
+ * If the block count exceeds the threshold, we disable the reordering animation
+ * to avoid laginess.
+ */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
 const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {

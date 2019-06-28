@@ -99,7 +99,6 @@ function BlockListBlock( {
 	toggleSelection,
 	onShiftSelection,
 	onSelectionStart,
-
 	animateOnChange,
 	enableAnimation,
 } ) {
