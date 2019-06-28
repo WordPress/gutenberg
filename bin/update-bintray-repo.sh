@@ -56,6 +56,7 @@ jfrog bt config
 echo "Running yarn install in '${TMP_WORKING_DIRECTORY}'..."
 cp "package.json" "${TMP_WORKING_DIRECTORY}/"
 cp "yarn.lock" "${TMP_WORKING_DIRECTORY}/"
+cp -Ra "i18n-cache" "${TMP_WORKING_DIRECTORY}/"
 cd "${TMP_WORKING_DIRECTORY}"
 yarn install --silent
 
