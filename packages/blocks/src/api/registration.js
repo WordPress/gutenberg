@@ -99,6 +99,11 @@ export function registerBlockType( name, settings ) {
 	}
 
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
+
+	if ( settings.deprecated ) {
+		settings.deprecated = settings.deprecated.map( ( deprecation ) => applyFilters( 'blocks.registerBlockType', deprecation, name ) );
+	}
+
 	if ( ! isPlainObject( settings ) ) {
 		console.error(
 			'Block settings must be a valid object.'
