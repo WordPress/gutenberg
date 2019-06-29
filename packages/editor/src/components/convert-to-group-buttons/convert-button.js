@@ -72,8 +72,8 @@ export default compose( [
 			! isSingleContainerBlock
 		);
 
-		// Do we have a single Group Block selected?
-		const isUngroupable = isSingleContainerBlock;
+		// Do we have a single Group Block selected and does that group have inner blocks?
+		const isUngroupable = isSingleContainerBlock && !! blocksSelection[ 0 ].innerBlocks.length;
 
 		return {
 			isGroupable,
