@@ -1,12 +1,11 @@
 /**
  * External dependencies
  */
-import { assign } from 'lodash';
+import { assign, has } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -34,6 +33,10 @@ const ANCHOR_REGEX = /[\s#]/g;
  * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
+	// allow blocks to specify their own attribute definition with default values if needed.
+	if ( has( settings.attributes, [ 'anchor', 'type' ] ) ) {
+		return settings;
+	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
 		// Use Lodash's assign to gracefully handle if attributes are undefined
 		settings.attributes = assign( settings.attributes, {
@@ -63,7 +66,7 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 
 		if ( hasAnchor && props.isSelected ) {
 			return (
-				<Fragment>
+				<>
 					<BlockEdit { ...props } />
 					<InspectorAdvancedControls>
 						<TextControl
@@ -77,7 +80,7 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 								} );
 							} } />
 					</InspectorAdvancedControls>
-				</Fragment>
+				</>
 			);
 		}
 

@@ -787,25 +787,24 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 				return state;
 			}
 
-			// If there are replacement blocks, assign last block as the next
-			// selected block, otherwise set to null.
-			const lastBlock = last( action.blocks );
+			const indexToSelect = action.indexToSelect || action.blocks.length - 1;
+			const blockToSelect = action.blocks[ indexToSelect ];
 
-			if ( ! lastBlock ) {
+			if ( ! blockToSelect ) {
 				return BLOCK_SELECTION_INITIAL_STATE;
 			}
 
 			if (
-				lastBlock.clientId === state.start.clientId &&
-				lastBlock.clientId === state.end.clientId
+				blockToSelect.clientId === state.start.clientId &&
+				blockToSelect.clientId === state.end.clientId
 			) {
 				return state;
 			}
 
 			return {
 				...BLOCK_SELECTION_INITIAL_STATE,
-				start: { clientId: lastBlock.clientId },
-				end: { clientId: lastBlock.clientId },
+				start: { clientId: blockToSelect.clientId },
+				end: { clientId: blockToSelect.clientId },
 			};
 		}
 		case 'TOGGLE_SELECTION':

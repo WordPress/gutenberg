@@ -27,14 +27,36 @@ Use this plugin as you would other webpack plugins:
 
 ```js
 // webpack.config.js
-const WordPressExternalDependenciesPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 
 module.exports = {
   // …snip
   plugins: [
-    new WordPressExternalDependenciesPlugin(),
+    new DependencyExtractionWebpackPlugin(),
   ]
 }
+```
+
+**Note:** Multiple instances of the plugin are not supported and may produced unexpected results. If
+you plan to extend the webpack configuration from `@wordpress/scripts` with your own `DependencyExtractionWebpackPlugin`, be sure to
+remove the default instance of the plugin:
+
+```js
+const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
+const config = {
+  ...defaultConfig,
+  plugins: [
+    ...defaultConfig.plugins.filter(
+      plugin => plugin.constructor.name !== 'DependencyExtractionWebpackPlugin',
+    ),
+    new DependencyExtractionWebpackPlugin( {
+      injectPolyfill: true,
+      requestToExternal(request) {
+        /* My externals */
+      },
+    } ),
+  ],
+};
 ```
 
 Each entrypoint in the webpack bundle will include JSON file that declares the WordPress script dependencies that should be enqueued.
@@ -59,7 +81,6 @@ By default, the following module requests are handled:
 | `@babel/runtime/regenerator` | `regeneratorRuntime` | `wp-polyfill` |
 | `@wordpress/*` | `wp['*']` | `wp-*` |
 | `jquery` | `jQuery` | `jquery` |
-| `jquery` | `jQuery` | `jquery` |
 | `lodash-es` | `lodash` | `lodash` |
 | `lodash` | `lodash` | `lodash` |
 | `moment` | `moment` | `moment` |
@@ -83,7 +104,7 @@ An object can be passed to the constructor to customize the behavior, for exampl
 ```js
 module.exports = {
   plugins: [
-    new WordPressExternalDependenciesPlugin( { injectPolyfill: true } ),
+    new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
   ]
 }
 ```
@@ -134,7 +155,7 @@ function requestToExternal( request ) {
 
 module.exports = {
   plugins: [
-    new WordPressExternalDependenciesPlugin( { requestToExternal } ),
+    new DependencyExtractionWebpackPlugin( { requestToExternal } ),
   ]
 }
 ```
@@ -162,14 +183,14 @@ function requestToHandle( request ) {
 
   // Handle imports like `import myModule from 'my-module'`
   if ( request === 'my-module' ) {
-    // Expect to find `my-module` as myModule in the global scope:
+    // `my-module` depends on the script with the 'my-module-script-handle' handle.
     return 'my-module-script-handle';
   }
 }
 
 module.exports = {
   plugins: [
-    new WordPressExternalDependenciesPlugin( { requestToExternal } ),
+    new DependencyExtractionWebpackPlugin( { requestToExternal } ),
   ]
 }
 ```
@@ -194,3 +215,5 @@ $script_dependencies = file_exists( $script_deps_path )
 $script_url = plugins_url( $script_path, __FILE__ );
 wp_enqueue_script( 'script', $script_url, $script_dependencies );
 ```
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

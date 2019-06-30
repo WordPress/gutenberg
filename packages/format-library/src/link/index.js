@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSpokenMessages } from '@wordpress/components';
 import {
 	getTextContent,
@@ -19,10 +19,11 @@ import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/block-editor
 import InlineLinkUI from './inline';
 
 const name = 'core/link';
+const title = __( 'Link' );
 
 export const link = {
 	name,
-	title: __( 'Link' ),
+	title,
 	tagName: 'a',
 	className: null,
 	attributes: {
@@ -69,17 +70,7 @@ export const link = {
 			const { isActive, activeAttributes, value, onChange } = this.props;
 
 			return (
-				<Fragment>
-					<RichTextShortcut
-						type="access"
-						character="a"
-						onUse={ this.addLink }
-					/>
-					<RichTextShortcut
-						type="access"
-						character="s"
-						onUse={ this.onRemoveFormat }
-					/>
+				<>
 					<RichTextShortcut
 						type="primary"
 						character="k"
@@ -102,7 +93,7 @@ export const link = {
 					{ ! isActive && <RichTextToolbarButton
 						name="link"
 						icon="admin-links"
-						title={ __( 'Link' ) }
+						title={ title }
 						onClick={ this.addLink }
 						isActive={ isActive }
 						shortcutType="primary"
@@ -116,7 +107,7 @@ export const link = {
 						value={ value }
 						onChange={ onChange }
 					/>
-				</Fragment>
+				</>
 			);
 		}
 	} ),

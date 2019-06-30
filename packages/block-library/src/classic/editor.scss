@@ -24,30 +24,6 @@
 		color: $dark-gray-800;
 	}
 
-	h1 {
-		font-size: 2em;
-	}
-
-	h2 {
-		font-size: 1.6em;
-	}
-
-	h3 {
-		font-size: 1.4em;
-	}
-
-	h4 {
-		font-size: 1.2em;
-	}
-
-	h5 {
-		font-size: 1.1em;
-	}
-
-	h6 {
-		font-size: 1em;
-	}
-
 	> *:first-child {
 		margin-top: 0;
 	}
@@ -266,6 +242,7 @@
 div[data-type="core/freeform"] {
 	.block-editor-block-list__block-edit::before {
 		transition: border-color 0.1s linear, box-shadow 0.1s linear;
+		@include reduce-motion("transition");
 		border: $border-width solid $light-gray-500;
 
 		// Windows High Contrast mode will show this outline.

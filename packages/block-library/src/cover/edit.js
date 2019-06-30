@@ -28,8 +28,8 @@ import {
 	MediaUploadCheck,
 	PanelColorSettings,
 	withColors,
-} from '@wordpress/editor';
-import { Component, createRef, Fragment } from '@wordpress/element';
+} from '@wordpress/block-editor';
+import { Component, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -72,6 +72,7 @@ class CoverEdit extends Component {
 		this.imageRef = createRef();
 		this.videoRef = createRef();
 		this.changeIsDarkIfRequired = this.changeIsDarkIfRequired.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 	}
 
 	componentDidMount() {
@@ -82,12 +83,17 @@ class CoverEdit extends Component {
 		this.handleBackgroundMode( prevProps );
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
 	render() {
 		const {
 			attributes,
 			setAttributes,
 			className,
-			noticeOperations,
 			noticeUI,
 			overlayColor,
 			setOverlayColor,
@@ -158,10 +164,10 @@ class CoverEdit extends Component {
 		}
 
 		const controls = (
-			<Fragment>
+			<>
 				<BlockControls>
 					{ !! url && (
-						<Fragment>
+						<>
 							<MediaUploadCheck>
 								<Toolbar>
 									<MediaUpload
@@ -179,7 +185,7 @@ class CoverEdit extends Component {
 									/>
 								</Toolbar>
 							</MediaUploadCheck>
-						</Fragment>
+						</>
 					) }
 				</BlockControls>
 				{ !! url && (
@@ -222,7 +228,7 @@ class CoverEdit extends Component {
 						</PanelBody>
 					</InspectorControls>
 				) }
-			</Fragment>
+			</>
 		);
 
 		if ( ! url ) {
@@ -230,22 +236,22 @@ class CoverEdit extends Component {
 			const label = __( 'Cover' );
 
 			return (
-				<Fragment>
+				<>
 					{ controls }
 					<MediaPlaceholder
 						icon={ placeholderIcon }
 						className={ className }
 						labels={ {
 							title: label,
-							instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
+							instructions: __( 'Upload an image or video file, or pick one from your media library.' ),
 						} }
 						onSelect={ onSelectMedia }
 						accept="image/*,video/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
+						onError={ this.onUploadError }
 					/>
-				</Fragment>
+				</>
 			);
 		}
 
@@ -256,11 +262,12 @@ class CoverEdit extends Component {
 				'is-dark-theme': this.state.isDark,
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
+				[ overlayColor.class ]: overlayColor.class,
 			}
 		);
 
 		return (
-			<Fragment>
+			<>
 				{ controls }
 				<div
 					data-url={ url }
@@ -296,7 +303,7 @@ class CoverEdit extends Component {
 						/>
 					</div>
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 

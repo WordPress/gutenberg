@@ -2,7 +2,7 @@
 	const { withSelect } = wp.data;
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;
-	const { InnerBlocks } = wp.editor;
+	const { InnerBlocks } = wp.blockEditor;
 	const __ = wp.i18n.__;
 	const divProps = { className: 'product', style: { outline: '1px solid gray', padding: 5 } };
 	const template = [
@@ -64,7 +64,7 @@
 		category: 'common',
 
 		edit: withSelect( function( select, ownProps ) {
-			var getBlockOrder = select( 'core/editor' ).getBlockOrder;
+			var getBlockOrder = select( 'core/block-editor' ).getBlockOrder;
 			return {
 				numberOfChildren: getBlockOrder( ownProps.clientId ).length,
 			};

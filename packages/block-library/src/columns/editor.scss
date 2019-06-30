@@ -21,7 +21,7 @@
 
 // Fullwide: show margin left/right to ensure there's room for the side UI.
 // This is not a 1:1 preview with the front-end where these margins would presumably be zero.
-.editor-block-list__block[data-align="full"] [data-type="core/columns"][data-align="full"] .wp-block-columns > .editor-inner-blocks {
+[data-type="core/columns"][data-align="full"] .wp-block-columns > .editor-inner-blocks {
 	padding-left: $block-padding;
 	padding-right: $block-padding;
 
@@ -164,28 +164,13 @@ div.block-core-columns.is-vertically-aligned-bottom {
  */
 [data-type="core/column"] > .editor-block-list__block-edit > .editor-block-list__breadcrumb {
 	right: 0;
+	left: auto;
 }
 
-// The empty state of a columns block has the default appenders.
-// Since those appenders are not blocks, the parent, actual block, appears "hovered" when hovering the appenders.
-// Because the column shouldn't be hovered as part of this temporary passthrough, we unset the hover style.
-.wp-block-columns [data-type="core/column"].is-hovered {
-	> .block-editor-block-list__block-edit::before {
-		content: none;
-	}
-
-	.block-editor-block-list__breadcrumb {
-		display: none;
-	}
-}
-
-// In absence of making the individual columns resizable, we prevent them from being clickable.
-// This makes them less fiddly. @todo: This should be revisited as the interface is refined.
-.wp-block-columns [data-type="core/column"] {
-	pointer-events: none;
-
-	// This selector re-enables clicking on any child of a column block.
-	.block-core-columns .block-editor-block-list__layout {
-		pointer-events: all;
-	}
+/**
+ * Make single Column overlay not extend past boundaries of parent
+ */
+.block-core-columns > .block-editor-inner-blocks.has-overlay::after {
+	left: 0;
+	right: 0;
 }

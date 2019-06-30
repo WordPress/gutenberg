@@ -22,8 +22,7 @@ import {
 	MediaUploadCheck,
 	RichText,
 } from '@wordpress/block-editor';
-import { mediaUpload } from '@wordpress/editor';
-import { Component, Fragment, createRef } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	__,
 	sprintf,
@@ -32,6 +31,9 @@ import {
 	compose,
 	withInstanceId,
 } from '@wordpress/compose';
+import {
+	withSelect,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -57,10 +59,16 @@ class VideoEdit extends Component {
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onSelectPoster = this.onSelectPoster.bind( this );
 		this.onRemovePoster = this.onRemovePoster.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 	}
 
 	componentDidMount() {
-		const { attributes, noticeOperations, setAttributes } = this.props;
+		const {
+			attributes,
+			mediaUpload,
+			noticeOperations,
+			setAttributes,
+		} = this.props;
 		const { id, src = '' } = attributes;
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
@@ -126,6 +134,16 @@ class VideoEdit extends Component {
 		this.posterImageButton.current.focus();
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
+	getAutoplayHelp( checked ) {
+		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
+	}
+
 	render() {
 		const {
 			autoplay,
@@ -142,7 +160,6 @@ class VideoEdit extends Component {
 			className,
 			instanceId,
 			isSelected,
-			noticeOperations,
 			noticeUI,
 			setAttributes,
 		} = this.props;
@@ -175,7 +192,7 @@ class VideoEdit extends Component {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ this.props.attributes }
 					notices={ noticeUI }
-					onError={ noticeOperations.createErrorNotice }
+					onError={ this.onUploadError }
 				/>
 			);
 		}
@@ -183,7 +200,7 @@ class VideoEdit extends Component {
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar>
 						<IconButton
@@ -200,6 +217,7 @@ class VideoEdit extends Component {
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ this.getAutoplayHelp }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }
@@ -294,13 +312,20 @@ class VideoEdit extends Component {
 						/>
 					) }
 				</figure>
-			</Fragment>
+			</>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 
 export default compose( [
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		const { __experimentalMediaUpload } = getSettings();
+		return {
+			mediaUpload: __experimentalMediaUpload,
+		};
+	} ),
 	withNotices,
 	withInstanceId,
 ] )( VideoEdit );

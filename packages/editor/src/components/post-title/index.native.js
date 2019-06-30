@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View } from 'react-native';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,6 +13,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -70,22 +72,37 @@ class PostTitle extends Component {
 		const borderColor = this.state.isSelected ? focusedBorderColor : 'transparent';
 
 		return (
-			<View style={ [ styles.titleContainer, borderStyle, { borderColor } ] }>
+			<View
+				style={ [ styles.titleContainer, borderStyle, { borderColor } ] }
+				accessible={ ! this.state.isSelected }
+				accessibilityLabel={
+					isEmpty( title ) ?
+						/* translators: accessibility text. empty post title. */
+						__( 'Post title. Empty' ) :
+						sprintf(
+							/* translators: accessibility text. %s: text content of the post title. */
+							__( 'Post title. %s' ),
+							title
+						)
+				}
+			>
 				<RichText
 					tagName={ 'p' }
 					rootTagsToEliminate={ [ 'strong' ] }
-					onFocus={ this.onSelect }
+					unstableOnFocus={ this.onSelect }
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }
 					style={ style }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
+					deleteEnter={ true }
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
 					placeholder={ decodedPlaceholder }
 					value={ title }
-					onSplit={ this.props.onEnterPress }
+					onSplit={ () => { } }
+					onEnter={ this.props.onEnterPress }
 					disableEditingMenu={ true }
 					setRef={ ( ref ) => {
 						this.titleViewRef = ref;

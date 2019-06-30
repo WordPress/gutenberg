@@ -12,6 +12,7 @@
 		width: 100%;
 		outline: $border-width solid transparent;
 		transition: 0.2s outline;
+		@include reduce-motion("transition");
 		resize: none;
 		margin-top: $default-block-margin;
 		margin-bottom: $default-block-margin;
@@ -28,19 +29,9 @@
 		}
 	}
 
-	// Don't show the inserter until mousing over.
-	.block-editor-inserter__toggle:not([aria-expanded="true"]) {
-		opacity: 0;
-		transition: opacity 0.2s;
-	}
-
 	&:hover {
 		.block-editor-inserter-with-shortcuts {
 			@include edit-post__fade-in-animation;
-		}
-
-		.block-editor-inserter__toggle {
-			opacity: 1;
 		}
 	}
 
@@ -91,6 +82,9 @@
 	right: $grid-size; // Show to the right on mobile.
 
 	@include break-small {
+		display: flex;
+		align-items: center;
+		height: 100%;
 		left: -$block-side-ui-width - $block-padding - $block-side-ui-clearance;
 		right: auto;
 	}
@@ -124,7 +118,9 @@
 	z-index: z-index(".block-editor-inserter-with-shortcuts"); // Elevate above the sibling inserter.
 
 	@include break-small {
-		right: 0;
 		display: flex;
+		align-items: center;
+		height: 100%;
+		right: 0;
 	}
 }

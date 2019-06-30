@@ -311,6 +311,40 @@ transforms: {
 ```
 {% end %}
 
+In addition to accepting an array of known block types, the `blocks` option also accepts a "wildcard" (`"*"`). This allows for transformations which apply to _all_ block types (eg: all blocks can transform into `core/group`):
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ '*' ], // wildcard - match any block
+            transform: function( attributes, innerBlocks ) {
+                // transform logic here
+            },
+        },
+    ],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ '*' ], // wildcard - match any block
+            transform: ( attributes, innerBlocks ) => {
+                // transform logic here
+            },
+        },
+    ],
+},
+```
+{% end %}
+
+
 A block with innerBlocks can also be transformed from and to another block with innerBlocks.
 
 {% codetabs %}
@@ -546,21 +580,21 @@ anchor: true,
 customClassName: false,
 ```
 
-- `className` (default `true`): By default, Gutenberg adds a class with the form `.wp-block-your-block-name` to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
+- `className` (default `true`): By default, the class `.wp-block-your-block-name` is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
 
 ```js
 // Remove the support for the generated className.
 className: false,
 ```
 
-- `html` (default `true`): By default, Gutenberg will allow a block's markup to be edited individually. To disable this behavior, set `html` to `false`.
+- `html` (default `true`): By default, a block's markup can be edited individually. To disable this behavior, set `html` to `false`.
 
 ```js
 // Remove support for an HTML mode.
 html: false,
 ```
 
-- `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
+- `inserter` (default `true`): By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
 
 ```js
 // Hide this block from the inserter.

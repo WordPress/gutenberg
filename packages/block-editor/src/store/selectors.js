@@ -27,13 +27,28 @@ import {
 	hasChildBlocksWithInserterSupport,
 } from '@wordpress/blocks';
 
-/***
- * Module constants
+// Module constants
+
+/**
+ * @private
  */
 export const INSERTER_UTILITY_HIGH = 3;
+
+/**
+ * @private
+ */
 export const INSERTER_UTILITY_MEDIUM = 2;
+
+/**
+ * @private
+ */
 export const INSERTER_UTILITY_LOW = 1;
+
+/**
+ * @private
+ */
 export const INSERTER_UTILITY_NONE = 0;
+
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;

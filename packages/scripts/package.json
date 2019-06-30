@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "3.1.0",
+	"version": "3.3.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,9 +41,10 @@
 		"chalk": "^2.4.1",
 		"check-node-version": "^3.1.1",
 		"cross-spawn": "^5.1.0",
-		"eslint": "^5.12.1",
+		"eslint": "^5.16.0",
 		"jest": "^24.7.1",
 		"jest-puppeteer": "^4.0.0",
+		"minimist": "^1.2.0",
 		"npm-package-json-lint": "^3.6.0",
 		"puppeteer": "1.6.1",
 		"read-pkg-up": "^1.0.1",
@@ -53,7 +54,7 @@
 		"stylelint-config-wordpress": "^13.1.0",
 		"thread-loader": "^2.1.2",
 		"webpack": "4.8.3",
-		"webpack-bundle-analyzer": "^3.0.3",
+		"webpack-bundle-analyzer": "^3.3.2",
 		"webpack-cli": "^3.1.2",
 		"webpack-livereload-plugin": "^2.2.0"
 	},

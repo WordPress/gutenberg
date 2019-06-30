@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/deprecated",
-	"version": "2.2.0",
+	"version": "2.4.0",
 	"description": "Deprecation utility for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,7 +21,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.3.1",
+		"@babel/runtime": "^7.4.4",
 		"@wordpress/hooks": "file:../hooks"
 	},
 	"publishConfig": {

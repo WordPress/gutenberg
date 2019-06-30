@@ -1,8 +1,9 @@
-## x.x.x (Unreleased)
+## 6.3.0 (2019-05-21)
 
 ### New Feature
 
 - Added a default implementation for `save` setting in `registerBlockType` which saves no markup in the post content.
+- Added wildcard block transforms which allows for transforming all/any blocks in another block.
 
 ## 6.1.0 (2019-03-06)
 

@@ -176,12 +176,13 @@
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-round-rectangle;
 	border: $border-width solid $dark-gray-150;
+	@include reduce-motion("transition");
 }
 
 @mixin input-style__focus() {
 	color: $dark-gray-900;
-	border-color: $blue-medium-500;
-	box-shadow: 0 0 0 1px $blue-medium-500;
+	border-color: $blue-medium-focus;
+	box-shadow: 0 0 0 1px $blue-medium-focus;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
@@ -337,10 +338,27 @@
  * Allows users to opt-out of animations via OS-level preferences.
  */
 
-@mixin reduce-motion {
-	@media (prefers-reduced-motion: reduce) {
-		animation-duration: 1ms !important;
+@mixin reduce-motion($property: "") {
+
+	@if $property == "transition" {
+		@media (prefers-reduced-motion: reduce) {
+			transition-duration: 0s;
+		}
 	}
+
+	@else if $property == "animation" {
+		@media (prefers-reduced-motion: reduce) {
+			animation-duration: 1ms;
+		}
+	}
+
+	@else {
+		@media (prefers-reduced-motion: reduce) {
+			transition-duration: 0s;
+			animation-duration: 1ms;
+		}
+	}
+
 }
 
 /**
