@@ -85,7 +85,7 @@ export const SocialLinksEdit = function( { attributes, setAttributes, className,
 						isLarge
 						label={ __( 'Add link' ) }
 						icon="insert"
-						onClick={ () => addLink() } >
+						onClick={ addLink } >
 						{ __( 'Add link' ) }
 					</IconButton>
 				</div>
@@ -98,19 +98,27 @@ const DEFAULT_EMPTY_ARRAY = [];
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {
-		const { getBlocksByClientId } = select( 'core/editor' );
+		const { getBlocksByClientId } = select( 'core/block-editor' );
 		const [ block ] = getBlocksByClientId( clientId );
 
 		return {
 			childLinks: block ? block.innerBlocks : DEFAULT_EMPTY_ARRAY,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, childLinks } ) => {
-		return {
-			addLink() {
-				const created = createBlock( 'core/social-link', { verticalAlignment: 'top' } );
-				dispatch( 'core/editor' ).insertBlock( created, undefined, clientId );
-			},
-		};
-	} ),
+	withDispatch( ( dispatch, ownProps, registry ) => ( {
+		addLink() {
+			const { clientId } = ownProps;
+			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+			const { getBlocks } = registry.select( 'core/block-editor' );
+
+			let innerBlocks = getBlocks( clientId );
+			innerBlocks = [
+				...innerBlocks,
+				createBlock( 'core/social-link', { verticalAlignment: 'top' } ),
+			];
+
+			replaceInnerBlocks( clientId, innerBlocks, false );
+		},
+	} )
+	),
 )( SocialLinksEdit );
