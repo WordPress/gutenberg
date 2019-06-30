@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import {
-	compact,
 	get,
 	isEmpty,
 	map,
@@ -66,6 +65,7 @@ const LINK_DESTINATION_ATTACHMENT = 'attachment';
 const LINK_DESTINATION_CUSTOM = 'custom';
 const NEW_TAB_REL = 'noreferrer noopener';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const DEFAULT_SIZE_SLUG = 'large';
 
 export const pickRelevantMediaFiles = ( image ) => {
 	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
@@ -104,7 +104,7 @@ class ImageEdit extends Component {
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
-		this.updateImageURL = this.updateImageURL.bind( this );
+		this.updateImage = this.updateImage.bind( this );
 		this.updateWidth = this.updateWidth.bind( this );
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
@@ -195,6 +195,7 @@ class ImageEdit extends Component {
 			...pickRelevantMediaFiles( media ),
 			width: undefined,
 			height: undefined,
+			sizeSlug: DEFAULT_SIZE_SLUG,
 		} );
 	}
 
@@ -224,6 +225,7 @@ class ImageEdit extends Component {
 			this.props.setAttributes( {
 				url: newURL,
 				id: undefined,
+				sizeSlug: DEFAULT_SIZE_SLUG,
 			} );
 		}
 
@@ -298,8 +300,20 @@ class ImageEdit extends Component {
 		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
-	updateImageURL( url ) {
-		this.props.setAttributes( { url, width: undefined, height: undefined } );
+	updateImage( sizeSlug ) {
+		const { image } = this.props;
+
+		const url = get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
+		if ( ! url ) {
+			return null;
+		}
+
+		this.props.setAttributes( {
+			url,
+			width: undefined,
+			height: undefined,
+			sizeSlug,
+		} );
 	}
 
 	updateWidth( width ) {
@@ -344,17 +358,8 @@ class ImageEdit extends Component {
 	}
 
 	getImageSizeOptions() {
-		const { imageSizes, image } = this.props;
-		return compact( map( imageSizes, ( { name, slug } ) => {
-			const sizeUrl = get( image, [ 'media_details', 'sizes', slug, 'source_url' ] );
-			if ( ! sizeUrl ) {
-				return null;
-			}
-			return {
-				value: sizeUrl,
-				label: name,
-			};
-		} ) );
+		const { imageSizes } = this.props;
+		return map( imageSizes, ( { name, slug } ) => ( { value: slug, label: name } ) );
 	}
 
 	render() {
@@ -383,7 +388,9 @@ class ImageEdit extends Component {
 			width,
 			height,
 			linkTarget,
+			sizeSlug,
 		} = attributes;
+
 		const isExternal = isExternalImage( id, url );
 		const editImageIcon = ( <SVG width={ 20 } height={ 20 } viewBox="0 0 20 20"><Rect x={ 11 } y={ 3 } width={ 7 } height={ 5 } rx={ 1 } /><Rect x={ 2 } y={ 12 } width={ 7 } height={ 5 } rx={ 1 } /><Path d="M13,12h1a3,3,0,0,1-3,3v2a5,5,0,0,0,5-5h1L15,9Z" /><Path d="M4,8H3l2,3L7,8H6A3,3,0,0,1,9,5V3A5,5,0,0,0,4,8Z" /></SVG> );
 		const controls = (
@@ -408,7 +415,7 @@ class ImageEdit extends Component {
 		const src = isExternal ? url : undefined;
 		const labels = {
 			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
-			instructions: __( 'Upload an image, pick one from your media library, or add one with a URL.' ),
+			instructions: __( 'Upload an image file, pick one from your media library, or add one with a URL.' ),
 		};
 		const mediaPreview = ( !! url && <img
 			alt={ __( 'Edit image' ) }
@@ -447,6 +454,7 @@ class ImageEdit extends Component {
 			'is-transient': isBlobURL( url ),
 			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
+			[ `size-${ sizeSlug }` ]: sizeSlug,
 		} );
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
@@ -472,9 +480,9 @@ class ImageEdit extends Component {
 					{ ! isEmpty( imageSizeOptions ) && (
 						<SelectControl
 							label={ __( 'Image Size' ) }
-							value={ url }
+							value={ sizeSlug }
 							options={ imageSizeOptions }
-							onChange={ this.updateImageURL }
+							onChange={ this.updateImage }
 						/>
 					) }
 					{ isResizable && (

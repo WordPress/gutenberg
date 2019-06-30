@@ -24,8 +24,6 @@ function Snackbar( {
 	onRemove = noop,
 }, ref ) {
 	useEffect( () => {
-		// This rule doesn't account yet for React Hooks
-		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
 		const timeoutHandle = setTimeout( () => {
 			onRemove();
 		}, NOTICE_TIMEOUT );

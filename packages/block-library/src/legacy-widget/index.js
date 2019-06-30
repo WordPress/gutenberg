@@ -18,6 +18,7 @@ export const settings = {
 	category: 'widgets',
 	supports: {
 		html: false,
+		customClassName: false,
 	},
 	edit,
 };

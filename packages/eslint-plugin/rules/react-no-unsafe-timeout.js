@@ -48,7 +48,10 @@ module.exports = {
 
 				// If the result of a `setTimeout` call is assigned to a
 				// variable, assume the timer ID is handled by a cancellation.
-				const hasAssignment = node.parent.type === 'AssignmentExpression';
+				const hasAssignment = (
+					node.parent.type === 'AssignmentExpression' ||
+					node.parent.type === 'VariableDeclarator'
+				);
 				if ( hasAssignment ) {
 					return;
 				}

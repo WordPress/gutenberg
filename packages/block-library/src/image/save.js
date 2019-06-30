@@ -21,10 +21,12 @@ export default function save( { attributes } ) {
 		height,
 		id,
 		linkTarget,
+		sizeSlug,
 	} = attributes;
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
+		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
 	} );
 

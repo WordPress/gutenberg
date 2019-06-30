@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { navigateRegions } from '@wordpress/components';
+import {
+	navigateRegions,
+	Popover,
+	SlotFillProvider,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -14,7 +18,7 @@ import Notices from '../notices';
 
 function Layout( { blockEditorSettings } ) {
 	return (
-		<>
+		<SlotFillProvider>
 			<Header />
 			<Sidebar />
 			<Notices />
@@ -28,7 +32,8 @@ function Layout( { blockEditorSettings } ) {
 					blockEditorSettings={ blockEditorSettings }
 				/>
 			</div>
-		</>
+			<Popover.Slot />
+		</SlotFillProvider>
 	);
 }
 
