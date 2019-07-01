@@ -13,6 +13,7 @@ import {
 	isEqual,
 	isEmpty,
 	get,
+	identity,
 } from 'lodash';
 
 /**
@@ -54,6 +55,18 @@ function mapBlockOrder( blocks, rootClientId = '' ) {
 	return result;
 }
 
+function mapBlockParents( blocks, rootClientId = '' ) {
+	let result = {};
+	blocks.forEach( ( block ) => {
+		result = {
+			...mapBlockParents( block.innerBlocks, block.clientId ),
+			[ block.clientId ]: rootClientId,
+		};
+	} );
+
+	return result;
+}
+
 /**
  * Helper method to iterate through all blocks, recursing into inner blocks,
  * applying a transformation function to each one.
@@ -64,7 +77,7 @@ function mapBlockOrder( blocks, rootClientId = '' ) {
  *
  * @return {Object} Flattened object.
  */
-function flattenBlocks( blocks, transform ) {
+function flattenBlocks( blocks, transform = identity ) {
 	const result = {};
 
 	const stack = [ ...blocks ];
@@ -381,6 +394,108 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
+const withBlockCache = ( reducer ) => ( state = {}, action ) => {
+	const newState = reducer( state, action );
+	const previousParents = state.parents;
+	if ( newState === state ) {
+		return state;
+	}
+	newState.cache = newState.cache || {};
+
+	const addParentBlocks = ( clientIds ) => {
+		const result = [];
+		clientIds.forEach( ( clientId ) => {
+			let current = clientId;
+			do {
+				result.push( current );
+				current = previousParents[ current ];
+			} while ( current );
+		} );
+		return result;
+	};
+
+	const fillKeysWithEmptyObject = ( clientIds ) => {
+		return clientIds.reduce( ( ret, key ) => {
+			ret[ key ] = {};
+			return ret;
+		}, {} );
+	};
+
+	switch ( action.type ) {
+		case 'RESET_BLOCKS':
+			newState.cache = mapValues( flattenBlocks( action.blocks ), () => ( {} ) );
+			break;
+		case 'RECEIVE_BLOCKS':
+		case 'INSERT_BLOCKS':
+			newState.cache = {
+				...newState.cache,
+				...fillKeysWithEmptyObject(
+					addParentBlocks( keys( flattenBlocks( action.blocks ) ) ),
+				),
+			};
+			break;
+		case 'UPDATE_BLOCK':
+		case 'UPDATE_BLOCK_ATTRIBUTES':
+			newState.cache = {
+				...newState.cache,
+				...fillKeysWithEmptyObject(
+					addParentBlocks( [ action.clientId ] ),
+				),
+			};
+			break;
+		case 'REPLACE_BLOCKS':
+			newState.cache = {
+				// We should remove nested clientIds as well
+				...omit( newState.cache, action.clientIds ),
+				...fillKeysWithEmptyObject(
+					addParentBlocks( keys( flattenBlocks( action.blocks ) ) ),
+				),
+			};
+			break;
+		case 'REMOVE_BLOCKS':
+			newState.cache = {
+				// We should remove nested clientIds as well
+				...omit( newState.cache, action.clientIds ),
+				...fillKeysWithEmptyObject(
+					addParentBlocks( action.clientIds ),
+				),
+			};
+			break;
+		case 'MOVE_BLOCK_TO_POSITION': {
+			const updatedBlockUids = [ action.clientId ];
+			if ( action.fromRootClientId ) {
+				updatedBlockUids.push( action.fromRootClientId );
+			}
+			if ( action.toRootClientId ) {
+				updatedBlockUids.push( action.toRootClientId );
+			}
+			newState.cache = {
+				...newState.cache,
+				...fillKeysWithEmptyObject(
+					addParentBlocks( updatedBlockUids )
+				),
+			};
+			break;
+		}
+		case 'MOVE_BLOCKS_UP':
+		case 'MOVE_BLOCKS_DOWN': {
+			const updatedBlockUids = [ ...action.clientIds ];
+			if ( action.rootClientId ) {
+				updatedBlockUids.push( action.rootClientId );
+			}
+			newState.cache = {
+				...newState.cache,
+				...fillKeysWithEmptyObject(
+					addParentBlocks( updatedBlockUids )
+				),
+			};
+			break;
+		}
+	}
+
+	return newState;
+};
+
 /**
  * Reducer returning the blocks state.
  *
@@ -397,6 +512,7 @@ export const blocks = flow(
 	withSaveReusableBlock,
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
+	withBlockCache,
 )( {
 	byClientId( state = {}, action ) {
 		switch ( action.type ) {
@@ -652,6 +768,45 @@ export const blocks = flow(
 						without( subState, ...action.clientIds )
 					) ),
 				] )( state );
+		}
+
+		return state;
+	},
+	// This is the opposite of order. It's duplicated data used for performance reasons.
+	parents( state = {}, action ) {
+		switch ( action.type ) {
+			case 'RESET_BLOCKS':
+				return mapBlockParents( action.blocks );
+
+			case 'RECEIVE_BLOCKS':
+				return {
+					...state,
+					...mapBlockParents( action.blocks ),
+				};
+
+			case 'INSERT_BLOCKS':
+				return {
+					...state,
+					...mapBlockParents( action.blocks, action.rootClientId || '' ),
+				};
+
+			case 'MOVE_BLOCK_TO_POSITION': {
+				return {
+					...state,
+					[ action.clientId ]: action.toRootClientId || '',
+				};
+			}
+
+			case 'REPLACE_BLOCKS':
+				return {
+					// This should include the parents as well to avoid memory leak
+					...omit( state, action.clientIds ),
+					...mapBlockParents( action.blocks, state[ action.clientIds[ 0 ] ] ),
+				};
+
+			case 'REMOVE_BLOCKS':
+				// This should include the parents as well to avoid memory leak
+				return omit( state, action.clientIds );
 		}
 
 		return state;
