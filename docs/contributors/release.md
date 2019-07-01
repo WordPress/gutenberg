@@ -18,7 +18,7 @@ Release candidates should be versioned incrementally, starting with `-rc.1`, the
 
 Two days after the first release candidate, the stable version is created based on the last release candidate and any necessary regression fixes.
 
-Once the stable version is release, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a performance audit should be published.
+Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a performance audit should be published.
 
 If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
 
