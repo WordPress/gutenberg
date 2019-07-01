@@ -56,10 +56,6 @@
 	.block-editor-inner-blocks__template-picker-option {
 		padding: $grid-size;
 	}
-
-	@include break-medium() {
-		flex-wrap: nowrap;
-	}
 }
 
 .block-editor-inner-blocks__template-picker-option {
