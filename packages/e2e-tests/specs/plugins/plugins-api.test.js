@@ -81,7 +81,6 @@ describe( 'Using Plugins API', () => {
 		it( 'Should render a custom panel inside Document Setting sidebar', async () => {
 			await openDocumentSettingsSidebar();
 			const pluginDocumentSettingsText = await page.$eval( '.edit-post-sidebar .my-document-setting-plugin', ( el ) => el.innerText );
-			expect( pluginDocumentSettingsText ).toBe( 'My Document Setting Panel' );
 			expect( pluginDocumentSettingsText ).toMatchSnapshot();
 		} );
 	} );
