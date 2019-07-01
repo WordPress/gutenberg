@@ -14,7 +14,6 @@ import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import { pasteHandler } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -73,7 +72,7 @@ class PostTitle extends Component {
 
 		const decodedPlaceholder = decodeEntities( placeholder );
 		const borderColor = this.state.isSelected ? focusedBorderColor : 'transparent';
-		
+
 		return (
 			<View
 				style={ [ styles.titleContainer, borderStyle, { borderColor } ] }
