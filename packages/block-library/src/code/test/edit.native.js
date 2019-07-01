@@ -6,6 +6,9 @@ import renderer from 'react-test-renderer';
 /**
  * Internal dependencies
  */
+/**
+ * WordPress dependencies
+ */
 import { PlainText } from '@wordpress/block-editor';
 import Code from '../edit';
 
