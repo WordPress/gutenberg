@@ -39,18 +39,26 @@
 
 .block-editor-inner-blocks__template-picker-options.block-editor-inner-blocks__template-picker-options {
 	display: flex;
+	justify-content: center;
 	flex-direction: row;
-	flex-wrap: nowrap;
+	flex-wrap: wrap;
 	width: 100%;
-	margin: $grid-size-large 0;
+	margin: $grid-size-small 0;
 	list-style: none;
 
 	> li {
 		list-style: none;
-		flex-basis: 100%;
+		margin: $grid-size;
 		flex-shrink: 1;
-		margin: 0 $grid-size;
 		max-width: 100px;
+	}
+
+	.block-editor-inner-blocks__template-picker-option {
+		padding: $grid-size;
+	}
+
+	@include break-medium() {
+		flex-wrap: nowrap;
 	}
 }
 
