@@ -402,7 +402,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 	if ( newState === state ) {
 		return state;
 	}
-	newState.cache = newState.cache || {};
+	newState.cache = state.cache ? state.cache : {};
 
 	const addParentBlocks = ( clientIds ) => {
 		const result = [];
