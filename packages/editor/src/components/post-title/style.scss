@@ -106,17 +106,11 @@
 .editor-post-title .editor-post-permalink {
 	font-size: $default-font-size;
 	color: $dark-gray-900;
-	flex-wrap: wrap;
 	height: auto;
 	position: relative;
 	left: $block-left-border-width;
 	top: -2px;
 	width: calc(100% - #{$block-left-border-width});
-
-	> * {
-		margin-top: $grid-size-small;
-		margin-bottom: $grid-size-small;
-	}
 
 	@include break-mobile() {
 		position: absolute;
@@ -124,11 +118,6 @@
 		right: 0;
 		flex-wrap: nowrap;
 		width: auto;
-
-		> * {
-			margin-top: 0;
-			margin-bottom: 0;
-		}
 	}
 	@include break-small() {
 		left: $block-side-ui-clearance;
