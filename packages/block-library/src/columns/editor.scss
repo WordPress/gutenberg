@@ -190,4 +190,10 @@ div.block-core-columns.is-vertically-aligned-bottom {
 .block-editor-block-list__layout .block-editor-block-list__block[data-type="core/column"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
 .block-editor-block-list__layout .block-editor-block-list__block[data-type="core/column"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks {
 	padding: $block-padding;
+
+	// Negate this padding for the placeholder.
+	> .components-placeholder {
+		margin: -$block-padding;
+		width: calc(100% + #{$block-padding * 2});
+	}
 }
