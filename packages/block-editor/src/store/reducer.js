@@ -699,6 +699,27 @@ export function isCaretWithinFormattedText( state = false, action ) {
 }
 
 const BLOCK_SELECTION_EMPTY_OBJECT = {};
+
+/**
+ * Initial state object for block selection.
+ *
+ * @property {Object}  start            Block anchor from which the selection
+ *                                      begins.
+ * @property {Object}  end              Block extent to which the selection
+ *                                      ends.
+ * @property {boolean} isMultiSelecting Flag representing whether a multi-
+ *                                      selection interaction is in progress.
+ * @property {boolean} isEnabled        Flag representing whether multi-
+ *                                      selection is currently allowed.
+ * @property {number?} initialPosition  For a changed selection, the position
+ *                                      at which the caret should be placed.
+ *                                      Either null (default position) or -1
+ *                                      (at the end of the block).
+ *
+ * @typedef {WPBlockSelectionState}
+ *
+ * @type {Object}
+ */
 const BLOCK_SELECTION_INITIAL_STATE = {
 	start: BLOCK_SELECTION_EMPTY_OBJECT,
 	end: BLOCK_SELECTION_EMPTY_OBJECT,
@@ -710,10 +731,10 @@ const BLOCK_SELECTION_INITIAL_STATE = {
 /**
  * Reducer returning the block selection's state.
  *
- * @param {Object} state  Current state.
+ * @param {WPBlockSelectionState} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {WPBlockSelectionState} Updated state.
  */
 export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
 	switch ( action.type ) {
