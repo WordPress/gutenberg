@@ -14,19 +14,28 @@
 	.has-fixed-layout {
 		table-layout: fixed;
 		width: 100%;
+
+		td,
+		th {
+			word-break: break-all;
+		}
 	}
 
-	.alignleft,
-	.aligncenter,
-	.alignright {
+	&.alignleft,
+	&.aligncenter,
+	&.alignright {
 		// Override default display property for align styles.
 		// The table element needs to be kept as display table
 		// for table features to work reliably.
 		display: table;
-
 		// Table cannot be 100% width if it is aligned, so set
 		// width as auto.
 		width: auto;
+
+		td,
+		th {
+			word-break: break-all;
+		}
 	}
 
 	.has-subtle-light-gray-background-color {
