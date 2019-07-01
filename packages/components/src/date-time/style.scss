@@ -135,6 +135,9 @@
 
 		.components-datetime__time-field {
 
+			/*rtl:ignore*/
+			direction: ltr;
+
 			&.am-pm button {
 				font-size: 11px;
 				font-weight: 600;
