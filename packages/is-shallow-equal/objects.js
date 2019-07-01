@@ -31,6 +31,11 @@ function isShallowEqualObjects( a, b ) {
 		aValue = a[ key ];
 
 		if (
+			// In iterating only the keys of the first object after verifying
+			// equal lengths, account for the case that an explicit `undefined`
+			// value in the first is implicitly undefined in the second.
+			//
+			// Example: isShallowEqualObjects( { a: undefined }, { b: 5 } )
 			( aValue === undefined && ! b.hasOwnProperty( key ) ) ||
 			aValue !== b[ key ]
 		) {
