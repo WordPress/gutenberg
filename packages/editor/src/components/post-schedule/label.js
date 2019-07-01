@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { dateI18n, __experimentalGetSettings } from '@wordpress/date';
+import { dateI18n } from '@wordpress/date';
 import { withSelect } from '@wordpress/data';
 
 export function PostScheduleLabel( { date, isFloating } ) {
