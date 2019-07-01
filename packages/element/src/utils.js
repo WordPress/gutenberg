@@ -24,3 +24,4 @@ export const isEmptyElement = ( element ) => {
 
 	return ! element;
 };
+

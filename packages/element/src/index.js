@@ -1,3 +1,4 @@
+export * from './components';
 export * from './react';
 export * from './react-platform';
 export * from './utils';
