@@ -7,19 +7,28 @@ import { Platform } from 'react-native';
  * WordPress dependencies
  */
 import '@wordpress/core-data';
+import '@wordpress/block-editor';
+import '@wordpress/editor';
 import '@wordpress/notices';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { unregisterBlockType } from '@wordpress/blocks';
+import '@wordpress/format-library';
 
 /**
  * Internal dependencies
  */
 import './store';
 
+let blocksRegistered = false;
+
 /**
  * Initializes the Editor.
  */
 export function initializeEditor() {
+	if ( blocksRegistered ) {
+		return;
+	}
+
 	// register and setup blocks
 	registerCoreBlocks();
 
@@ -33,5 +42,8 @@ export function initializeEditor() {
 			unregisterBlockType( 'core/video' );
 		}
 	}
+
+	blocksRegistered = true;
 }
 
+export { default as Editor } from './editor';

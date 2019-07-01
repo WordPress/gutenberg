@@ -9,7 +9,6 @@ import '@wordpress/viewport';
 import '@wordpress/notices';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -75,14 +74,6 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 		// eslint-disable-next-line no-console
 		console.warn( "Your browser is using Quirks Mode. \nThis can cause rendering issues such as blocks overlaying meta boxes in the editor. Quirks Mode can be triggered by PHP errors or HTML code appearing before the opening <!DOCTYPE html>. Try checking the raw page source or your site's PHP error log and resolving errors there, removing any HTML before the doctype, or disabling plugins." );
 	}
-
-	dispatch( 'core/edit-post' ).__unstableInitialize();
-	dispatch( 'core/nux' ).triggerGuide( [
-		'core/editor.inserter',
-		'core/editor.settings',
-		'core/editor.preview',
-		'core/editor.publish',
-	] );
 
 	render(
 		<Editor
