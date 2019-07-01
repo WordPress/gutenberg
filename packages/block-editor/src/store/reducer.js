@@ -491,6 +491,14 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			};
 			break;
 		}
+		case 'REPLACE_INNER_BLOCKS': {
+			newState.cache = {
+				...newState.cache,
+				...fillKeysWithEmptyObject(
+					addParentBlocks( [ action.rootClientId ].concat( keys( flattenBlocks( action.blocks ) ) ) ),
+				),
+			};
+		}
 	}
 
 	return newState;
@@ -807,6 +815,13 @@ export const blocks = flow(
 			case 'REMOVE_BLOCKS':
 				// This should include the parents as well to avoid memory leak
 				return omit( state, action.clientIds );
+
+			case 'REPLACE_INNER_BLOCKS':
+				return {
+					// Inner blocks removed should be omitted from the state
+					...state,
+					...mapBlockParents( action.blocks, action.rootClientId ),
+				};
 		}
 
 		return state;
