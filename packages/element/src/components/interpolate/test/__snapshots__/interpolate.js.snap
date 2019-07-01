@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Interpolate renders expected result from component 1`] = `
+Array [
+  "This is an awesome cheeseburger ",
+  "and fries",
+  "! Go ",
+  <a
+    href="https://example.org"
+  >
+    here
+  </a>,
+  " to eat at the ",
+  "bar",
+  ".",
+]
+`;
