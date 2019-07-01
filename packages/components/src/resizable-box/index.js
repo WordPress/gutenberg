@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import ReResizableBox from 're-resizable';
+import { Resizable } from 're-resizable';
 
 function ResizableBox( { className, ...props } ) {
 	// Removes the inline styles in the drag handles.
@@ -20,7 +20,7 @@ function ResizableBox( { className, ...props } ) {
 	const cornerHandleClassName = 'components-resizable-box__corner-handle';
 
 	return (
-		<ReResizableBox
+		<Resizable
 			className={ classnames(
 				'components-resizable-box__container',
 				className,

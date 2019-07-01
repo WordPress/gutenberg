@@ -387,6 +387,19 @@ _Type_
 
 -   `Object` 
 
+<a name="transformStyles" href="#transformStyles">#</a> **transformStyles**
+
+Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
+
+_Parameters_
+
+-   _styles_ `Array`: CSS rules.
+-   _wrapperClassName_ `string`: Wrapper Class Name.
+
+_Returns_
+
+-   `Array`: converted rules.
+
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 
 _Related_

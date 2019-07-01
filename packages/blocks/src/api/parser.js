@@ -170,45 +170,6 @@ export function isAmbiguousStringSource( attributeSchema ) {
 }
 
 /**
- * Returns value coerced to the specified JSON schema type string.
- *
- * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
- *
- * @param {*}      value Original value.
- * @param {string} type  Type to coerce.
- *
- * @return {*} Coerced value.
- */
-export function asType( value, type ) {
-	switch ( type ) {
-		case 'string':
-			return String( value );
-
-		case 'boolean':
-			return Boolean( value );
-
-		case 'object':
-			return Object( value );
-
-		case 'null':
-			return null;
-
-		case 'array':
-			if ( Array.isArray( value ) ) {
-				return value;
-			}
-
-			return Array.from( value );
-
-		case 'integer':
-		case 'number':
-			return Number( value );
-	}
-
-	return value;
-}
-
-/**
  * Returns an hpq matcher given a source object.
  *
  * @param {Object} sourceConfig Attribute Source object.
@@ -238,7 +199,7 @@ export function matcherFromSource( sourceConfig ) {
 		case 'tag':
 			return flow( [
 				prop( sourceConfig.selector, 'nodeName' ),
-				( value ) => value.toLowerCase(),
+				( nodeName ) => nodeName ? nodeName.toLowerCase() : undefined,
 			] );
 		default:
 			// eslint-disable-next-line no-console
