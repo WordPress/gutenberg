@@ -56,12 +56,10 @@ function mapBlockOrder( blocks, rootClientId = '' ) {
 }
 
 function mapBlockParents( blocks, rootClientId = '' ) {
-	let result = {};
+	const result = {};
 	blocks.forEach( ( block ) => {
-		result = {
-			...mapBlockParents( block.innerBlocks, block.clientId ),
-			[ block.clientId ]: rootClientId,
-		};
+		result[ block.clientId ] = rootClientId;
+		Object.assign( result, mapBlockParents( block.innerBlocks, block.clientId ) );
 	} );
 
 	return result;
@@ -319,6 +317,10 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 				...omit( state.order, visibleClientIds ),
 				...mapBlockOrder( action.blocks ),
 			},
+			parents: {
+				...omit( state.parents, visibleClientIds ),
+				...mapBlockParents( action.blocks ),
+			},
 		};
 	}
 
@@ -426,14 +428,19 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			newState.cache = mapValues( flattenBlocks( action.blocks ), () => ( {} ) );
 			break;
 		case 'RECEIVE_BLOCKS':
-		case 'INSERT_BLOCKS':
+		case 'INSERT_BLOCKS': {
+			const updatedBlockUids = keys( flattenBlocks( action.blocks ) );
+			if ( action.rootClientId ) {
+				updatedBlockUids.push( action.rootClientId );
+			}
 			newState.cache = {
 				...newState.cache,
 				...fillKeysWithEmptyObject(
-					addParentBlocks( keys( flattenBlocks( action.blocks ) ) ),
+					addParentBlocks( updatedBlockUids ),
 				),
 			};
 			break;
+		}
 		case 'UPDATE_BLOCK':
 		case 'UPDATE_BLOCK_ATTRIBUTES':
 			newState.cache = {
