@@ -9,12 +9,12 @@ import {
 	slice,
 } from '@wordpress/rich-text';
 
-export function getPatterns( { onReplace, valueToFormat } ) {
+export function getPatterns() {
 	const prefixTransforms = getBlockTransforms( 'from' )
 		.filter( ( { type } ) => type === 'prefix' );
 
 	return [
-		( record ) => {
+		( record, onReplace, valueToFormat ) => {
 			if ( ! onReplace ) {
 				return record;
 			}
@@ -75,4 +75,24 @@ export function getPatterns( { onReplace, valueToFormat } ) {
 			return record;
 		},
 	];
+}
+
+export function getEnterPatterns() {
+	const transforms = getBlockTransforms( 'from' )
+		.filter( ( { type } ) => type === 'enter' );
+
+	return ( record, onReplace ) => {
+		const text = getTextContent( record );
+		const transformation = findTransform( transforms, ( item ) => {
+			return item.regExp.test( text );
+		} );
+
+		if ( ! transformation ) {
+			return record;
+		}
+
+		onReplace( [
+			transformation.transform( { content: text } ),
+		] );
+	};
 }

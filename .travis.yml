@@ -160,3 +160,16 @@ jobs:
       env: WP_VERSION=latest SWITCH_TO_PHP=5.2
       script:
         - ./bin/run-wp-unit-tests.sh
+
+before_deploy:
+  - npm install
+  - npm run playground:build -- --public-url '/gutenberg'
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  local_dir: playground/dist
+  on:
+    branch: master

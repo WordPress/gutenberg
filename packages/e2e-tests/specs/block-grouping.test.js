@@ -102,6 +102,13 @@ describe( 'Block Grouping', () => {
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
+
+		it( 'does not allow ungrouping a group block that has no children', async () => {
+			await insertBlock( 'Group' );
+			await clickBlockToolbarButton( 'More options' );
+			const ungroupButtons = await page.$x( '//button[text()="Ungroup"]' );
+			expect( ungroupButtons ).toHaveLength( 0 );
+		} );
 	} );
 
 	describe( 'Container Block availability', () => {

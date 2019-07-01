@@ -398,7 +398,7 @@ You can read more about the react context api here:
 
 _Usage_
 
-````js
+```js
 const {
   RegistryProvider,
   RegistryConsumer,
@@ -419,6 +419,7 @@ const App = ( { props } ) => {
     </RegistryConsumer>
   </RegistryProvider>
 }
+```
 
 <a name="RegistryProvider" href="#RegistryProvider">#</a> **RegistryProvider**
 
@@ -434,13 +435,13 @@ Given the name of a registered store, returns an object of the store's selectors
 The selector functions are been pre-bound to pass the current state automatically.
 As a consumer, you need only pass arguments of the selector, if applicable.
 
-*Usage*
+_Usage_
 
 ```js
 const { select } = wp.data;
 
 select( 'my-shop' ).getPrice( 'hammer' );
-````
+```
 
 _Parameters_
 
