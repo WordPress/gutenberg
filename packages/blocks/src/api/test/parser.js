@@ -10,7 +10,6 @@ import deepFreeze from 'deep-freeze';
 import {
 	getBlockAttribute,
 	getBlockAttributes,
-	asType,
 	createBlockWithFallback,
 	getMigratedBlock,
 	default as parsePegjs,
@@ -101,44 +100,6 @@ describe( 'block parser', () => {
 
 			expect( originalMatcher( node ) ).toBe( 'disabled' );
 			expect( enhancedMatcher( node ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'asType()', () => {
-		it( 'gracefully handles undefined type', () => {
-			expect( asType( 5 ) ).toBe( 5 );
-		} );
-
-		it( 'gracefully handles unhandled type', () => {
-			expect( asType( 5, '__UNHANDLED__' ) ).toBe( 5 );
-		} );
-
-		it( 'returns expected coerced values', () => {
-			const arr = [];
-			const obj = {};
-
-			expect( asType( '5', 'string' ) ).toBe( '5' );
-			expect( asType( 5, 'string' ) ).toBe( '5' );
-
-			expect( asType( 5, 'integer' ) ).toBe( 5 );
-			expect( asType( '5', 'integer' ) ).toBe( 5 );
-
-			expect( asType( 5, 'number' ) ).toBe( 5 );
-			expect( asType( '5', 'number' ) ).toBe( 5 );
-
-			expect( asType( true, 'boolean' ) ).toBe( true );
-			expect( asType( false, 'boolean' ) ).toBe( false );
-			expect( asType( '5', 'boolean' ) ).toBe( true );
-			expect( asType( 0, 'boolean' ) ).toBe( false );
-
-			expect( asType( null, 'null' ) ).toBe( null );
-			expect( asType( 0, 'null' ) ).toBe( null );
-
-			expect( asType( arr, 'array' ) ).toBe( arr );
-			expect( asType( new Set( [ 1, 2, 3 ] ), 'array' ) ).toEqual( [ 1, 2, 3 ] );
-
-			expect( asType( obj, 'object' ) ).toBe( obj );
-			expect( asType( {}, 'object' ) ).toEqual( {} );
 		} );
 	} );
 
@@ -281,6 +242,32 @@ describe( 'block parser', () => {
 				},
 			);
 			expect( value ).toBe( false );
+		} );
+
+		describe( 'source: tag', () => {
+			it( 'returns tag name of matching selector', () => {
+				const value = parseWithAttributeSchema(
+					'<div></div>',
+					{
+						source: 'tag',
+						selector: ':nth-child(1)',
+					}
+				);
+
+				expect( value ).toBe( 'div' );
+			} );
+
+			it( 'returns undefined when no element matches selector', () => {
+				const value = parseWithAttributeSchema(
+					'<div></div>',
+					{
+						source: 'tag',
+						selector: ':nth-child(2)',
+					}
+				);
+
+				expect( value ).toBe( undefined );
+			} );
 		} );
 	} );
 

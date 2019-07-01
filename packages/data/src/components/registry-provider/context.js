@@ -41,6 +41,7 @@ const { Consumer, Provider } = Context;
  *     </RegistryConsumer>
  *   </RegistryProvider>
  * }
+ * ```
  */
 export const RegistryConsumer = Consumer;
 

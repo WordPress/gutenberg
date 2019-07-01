@@ -32,6 +32,7 @@ export class BlockList extends Component {
 		super( ...arguments );
 
 		this.renderItem = this.renderItem.bind( this );
+		this.renderAddBlockSeparator = this.renderAddBlockSeparator.bind( this );
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
 		this.renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
 		this.onBlockTypeSelected = this.onBlockTypeSelected.bind( this );
@@ -213,8 +214,10 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId } ) {
+		const shouldReverseContent = this.isReplaceable( this.props.selectedBlock );
+
 		return (
-			<ReadableContentView>
+			<ReadableContentView reversed={ shouldReverseContent }>
 				<BlockListBlock
 					key={ clientId }
 					showTitle={ false }
@@ -224,14 +227,18 @@ export class BlockList extends Component {
 					borderStyle={ this.blockHolderBorderStyle() }
 					focusedBorderColor={ styles.blockHolderFocused.borderColor }
 				/>
-				{ this.state.blockTypePickerVisible && this.props.isBlockSelected( clientId ) && (
-					<View style={ styles.containerStyleAddHere } >
-						<View style={ styles.lineStyleAddHere }></View>
-						<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
-						<View style={ styles.lineStyleAddHere }></View>
-					</View>
-				) }
+				{ this.state.blockTypePickerVisible && this.props.isBlockSelected( clientId ) && this.renderAddBlockSeparator() }
 			</ReadableContentView>
+		);
+	}
+
+	renderAddBlockSeparator() {
+		return (
+			<View style={ styles.containerStyleAddHere } >
+				<View style={ styles.lineStyleAddHere }></View>
+				<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
+				<View style={ styles.lineStyleAddHere }></View>
+			</View>
 		);
 	}
 

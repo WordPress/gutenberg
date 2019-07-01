@@ -236,9 +236,9 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
-* `npm run test:e2e` - runs all unit tests.
-* `npm run test:e2e:help` - prints all available options to configure unit tests runner.
-* `npm run test-e2e -- --puppeteer-interactive` - runs all unit tests interactively.
+* `npm run test:e2e` - runs all e2e tests.
+* `npm run test:e2e:help` - prints all available options to configure e2e test runner.
+* `npm run test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
 * `npm run test-e2e FILE_NAME -- --puppeteer-interactive ` - runs one test file interactively.
 * `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
 
