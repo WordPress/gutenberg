@@ -94,7 +94,6 @@ class PostTitle extends Component {
 					onBlur={ this.props.onBlur }
 					multiline={ false }
 					style={ style }
-					styles={ styles }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
 					onChange={ ( value ) => {
