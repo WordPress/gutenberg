@@ -51,16 +51,16 @@ const PluginDocumentSettingFill = ( { isEnabled, opened, onToggle, className, ti
  * function MyDocumentSettingPlugin() {
  * 	return el(
  * 		PluginDocumentSettingPanel,
- *		{
+ * 		{
  * 			className: 'my-document-setting-plugin',
  * 		},
- * 			__( 'My Document Setting Panel' )
- * 		);
- * 	};
+ * 		__( 'My Document Setting Panel' )
+ * 	);
+ * }
  *
- * 	registerPlugin( 'my-document-setting-plugin', {
- * 	render: MyDocumentSettingPlugin
- * 	} );
+ * registerPlugin( 'my-document-setting-plugin', {
+ * 		render: MyDocumentSettingPlugin
+ * } );
  * ```
  *
  * @example <caption>ESNext</caption>
