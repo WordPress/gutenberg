@@ -24,7 +24,7 @@ If critical bugs are discovered on stable versions of the plugin, patch versions
 
 ### Release Tool
 
-The plugin release process is entirely automated. to release the RC version of the plugin, run the following command and follow the instructions: (Note that at the time of writing, the tool doesn't support releasing multiple consecutive RC releases)
+The plugin release process is entirely automated. To release the RC version of the plugin, run the following command and follow the instructions: (Note that at the time of writing, the tool doesn't support releasing multiple consecutive RC releases)
 
 ```bash
 ./bin/commander.js rc
