@@ -14,6 +14,7 @@ import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
+import { pasteHandler } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -93,6 +94,7 @@ class PostTitle extends Component {
 					onBlur={ this.props.onBlur }
 					multiline={ false }
 					style={ style }
+					styles={ styles }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
 					onChange={ ( value ) => {

@@ -15,7 +15,6 @@
 		},
 		category: 'formatting',
 		edit: function( { attributes, setAttributes } ) {
-			console.log(  attributes.value )
 			return el( RichText, {
 				tagName: 'p',
 				value: attributes.value,

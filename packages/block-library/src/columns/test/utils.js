@@ -24,6 +24,12 @@ describe( 'getColumnsTemplate', () => {
 			[ 'core/column' ],
 		] );
 	} );
+
+	it( 'should return null if columns count is not defined', () => {
+		const template = getColumnsTemplate( undefined );
+
+		expect( template ).toBe( null );
+	} );
 } );
 
 describe( 'toWidthPrecision', () => {

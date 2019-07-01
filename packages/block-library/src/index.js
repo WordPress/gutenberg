@@ -9,6 +9,7 @@ import {
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
+	setGroupingBlockName,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 
@@ -33,6 +34,8 @@ import * as embed from './embed';
 import * as file from './file';
 import * as html from './html';
 import * as mediaText from './media-text';
+import * as navigationMenu from './navigation-menu';
+import * as navigationMenuItem from './navigation-menu-item';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as legacyWidget from './legacy-widget';
@@ -104,6 +107,8 @@ export const registerCoreBlocks = () => {
 		process.env.GUTENBERG_PHASE === 2 ? legacyWidget : null,
 		missing,
 		more,
+		process.env.GUTENBERG_PHASE === 2 ? navigationMenu : null,
+		process.env.GUTENBERG_PHASE === 2 ? navigationMenuItem : null,
 		nextpage,
 		preformatted,
 		pullquote,
@@ -135,4 +140,8 @@ export const registerCoreBlocks = () => {
 		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );
+
+	if ( group ) {
+		setGroupingBlockName( group.name );
+	}
 };
