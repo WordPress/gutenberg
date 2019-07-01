@@ -55,7 +55,7 @@
 	}
 
 	// "Stripes" style variation.
-	.is-style-stripes {
+	&.is-style-stripes {
 		border-spacing: 0;
 		border-collapse: inherit;
 		background-color: transparent;
