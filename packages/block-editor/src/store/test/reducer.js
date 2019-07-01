@@ -1731,6 +1731,27 @@ describe( 'state', () => {
 			const original = deepFreeze( {
 				start: { clientId: 'ribs' },
 				end: { clientId: 'ribs' },
+				isMultiSelecting: false,
+			} );
+
+			const state = blockSelection( original, {
+				type: 'TOGGLE_SELECTION',
+				isSelectionEnabled: false,
+			} );
+
+			expect( state ).toEqual( {
+				start: { clientId: 'ribs' },
+				end: { clientId: 'ribs' },
+				isMultiSelecting: false,
+				isEnabled: false,
+			} );
+		} );
+
+		it( 'should cancel multi-selection when disabling multi-selection', () => {
+			const original = deepFreeze( {
+				start: { clientId: 'ribs' },
+				end: { clientId: 'ribs' },
+				isMultiSelecting: true,
 			} );
 
 			const state = blockSelection( original, {
@@ -1742,6 +1763,29 @@ describe( 'state', () => {
 				start: { clientId: 'ribs' },
 				end: { clientId: 'ribs' },
 				isEnabled: false,
+				isMultiSelecting: false,
+			} );
+		} );
+
+		it( 'should preserve multi-selection when enabling multi-selection', () => {
+			[ true, false ].forEach( ( isMultiSelecting ) => {
+				const original = deepFreeze( {
+					start: { clientId: 'ribs' },
+					end: { clientId: 'ribs' },
+					isMultiSelecting,
+				} );
+
+				const state = blockSelection( original, {
+					type: 'TOGGLE_SELECTION',
+					isSelectionEnabled: true,
+				} );
+
+				expect( state ).toEqual( {
+					start: { clientId: 'ribs' },
+					end: { clientId: 'ribs' },
+					isEnabled: true,
+					isMultiSelecting,
+				} );
 			} );
 		} );
 

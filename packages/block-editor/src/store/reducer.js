@@ -811,6 +811,9 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			return {
 				...state,
 				isEnabled: action.isSelectionEnabled,
+				isMultiSelecting: action.isSelectionEnabled ?
+					state.isMultiSelecting :
+					false,
 			};
 		case 'SELECTION_CHANGE':
 			return {
