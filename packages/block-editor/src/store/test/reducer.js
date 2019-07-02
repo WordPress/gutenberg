@@ -193,27 +193,31 @@ describe( 'state', () => {
 			it( 'can replace a child block', () => {
 				const existingState = deepFreeze( {
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
 						},
-						'clicken-child': {
+						'chicken-child': {
 							clientId: 'chicken-child',
 							name: 'core/test-child-block',
 							isValid: true,
 						},
 					},
 					attributes: {
-						clicken: {},
-						'clicken-child': {
+						chicken: {},
+						'chicken-child': {
 							attr: true,
 						},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ 'clicken-child' ],
-						'clicken-child': [],
+						'': [ 'chicken' ],
+						chicken: [ 'chicken-child' ],
+						'chicken-child': [],
+					},
+					parents: {
+						chicken: '',
+						'chicken-child': 'chicken',
 					},
 				} );
 
@@ -226,7 +230,7 @@ describe( 'state', () => {
 
 				const action = {
 					type: 'REPLACE_INNER_BLOCKS',
-					rootClientId: 'clicken',
+					rootClientId: 'chicken',
 					blocks: [ newChildBlock ],
 				};
 
@@ -236,7 +240,7 @@ describe( 'state', () => {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
@@ -248,16 +252,20 @@ describe( 'state', () => {
 						},
 					},
 					attributes: {
-						clicken: {},
+						chicken: {},
 						[ newChildBlockId ]: {
 							attr: false,
 							attr2: 'perfect',
 						},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ newChildBlockId ],
+						'': [ 'chicken' ],
+						chicken: [ newChildBlockId ],
 						[ newChildBlockId ]: [],
+					},
+					parents: {
+						[ newChildBlockId ]: 'chicken',
+						chicken: '',
 					},
 				} );
 			} );
@@ -265,18 +273,21 @@ describe( 'state', () => {
 			it( 'can insert a child block', () => {
 				const existingState = deepFreeze( {
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
 						},
 					},
 					attributes: {
-						clicken: {},
+						chicken: {},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [],
+						'': [ 'chicken' ],
+						chicken: [],
+					},
+					parents: {
+						chicken: '',
 					},
 				} );
 
@@ -289,7 +300,7 @@ describe( 'state', () => {
 
 				const action = {
 					type: 'REPLACE_INNER_BLOCKS',
-					rootClientId: 'clicken',
+					rootClientId: 'chicken',
 					blocks: [ newChildBlock ],
 				};
 
@@ -299,7 +310,7 @@ describe( 'state', () => {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
@@ -311,16 +322,20 @@ describe( 'state', () => {
 						},
 					},
 					attributes: {
-						clicken: {},
+						chicken: {},
 						[ newChildBlockId ]: {
 							attr: false,
 							attr2: 'perfect',
 						},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ newChildBlockId ],
+						'': [ 'chicken' ],
+						chicken: [ newChildBlockId ],
 						[ newChildBlockId ]: [],
+					},
+					parents: {
+						[ newChildBlockId ]: 'chicken',
+						chicken: '',
 					},
 				} );
 			} );
@@ -328,36 +343,41 @@ describe( 'state', () => {
 			it( 'can replace multiple child blocks', () => {
 				const existingState = deepFreeze( {
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
 						},
-						'clicken-child': {
+						'chicken-child': {
 							clientId: 'chicken-child',
 							name: 'core/test-child-block',
 							isValid: true,
 						},
-						'clicken-child-2': {
+						'chicken-child-2': {
 							clientId: 'chicken-child',
 							name: 'core/test-child-block',
 							isValid: true,
 						},
 					},
 					attributes: {
-						clicken: {},
-						'clicken-child': {
+						chicken: {},
+						'chicken-child': {
 							attr: true,
 						},
-						'clicken-child-2': {
+						'chicken-child-2': {
 							attr2: 'ok',
 						},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ 'clicken-child', 'clicken-child-2' ],
-						'clicken-child': [],
-						'clicken-child-2': [],
+						'': [ 'chicken' ],
+						chicken: [ 'chicken-child', 'chicken-child-2' ],
+						'chicken-child': [],
+						'chicken-child-2': [],
+					},
+					parents: {
+						chicken: '',
+						'chicken-child': 'chicken',
+						'chicken-child-2': 'chicken',
 					},
 				} );
 
@@ -381,7 +401,7 @@ describe( 'state', () => {
 
 				const action = {
 					type: 'REPLACE_INNER_BLOCKS',
-					rootClientId: 'clicken',
+					rootClientId: 'chicken',
 					blocks: [ newChildBlock1, newChildBlock2, newChildBlock3 ],
 				};
 
@@ -391,7 +411,7 @@ describe( 'state', () => {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
@@ -413,7 +433,7 @@ describe( 'state', () => {
 						},
 					},
 					attributes: {
-						clicken: {},
+						chicken: {},
 						[ newChildBlockId1 ]: {
 							attr: false,
 							attr2: 'perfect',
@@ -427,11 +447,17 @@ describe( 'state', () => {
 						},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ newChildBlockId1, newChildBlockId2, newChildBlockId3 ],
+						'': [ 'chicken' ],
+						chicken: [ newChildBlockId1, newChildBlockId2, newChildBlockId3 ],
 						[ newChildBlockId1 ]: [],
 						[ newChildBlockId2 ]: [],
 						[ newChildBlockId3 ]: [],
+					},
+					parents: {
+						chicken: '',
+						[ newChildBlockId1 ]: 'chicken',
+						[ newChildBlockId2 ]: 'chicken',
+						[ newChildBlockId3 ]: 'chicken',
 					},
 				} );
 			} );
@@ -439,32 +465,37 @@ describe( 'state', () => {
 			it( 'can replace a child block that has other children', () => {
 				const existingState = deepFreeze( {
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
 						},
-						'clicken-child': {
+						'chicken-child': {
 							clientId: 'chicken-child',
 							name: 'core/test-child-block',
 							isValid: true,
 						},
-						'clicken-grand-child': {
+						'chicken-grand-child': {
 							clientId: 'chicken-child',
 							name: 'core/test-block',
 							isValid: true,
 						},
 					},
 					attributes: {
-						clicken: {},
-						'clicken-child': {},
-						'clicken-grand-child': {},
+						chicken: {},
+						'chicken-child': {},
+						'chicken-grand-child': {},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ 'clicken-child' ],
-						'clicken-child': [ 'clicken-grand-child' ],
-						'clicken-grand-child': [],
+						'': [ 'chicken' ],
+						chicken: [ 'chicken-child' ],
+						'chicken-child': [ 'chicken-grand-child' ],
+						'chicken-grand-child': [],
+					},
+					parents: {
+						chicken: '',
+						'chicken-child': 'chicken',
+						'chicken-grand-child': 'chicken-cchild',
 					},
 				} );
 
@@ -474,7 +505,7 @@ describe( 'state', () => {
 
 				const action = {
 					type: 'REPLACE_INNER_BLOCKS',
-					rootClientId: 'clicken',
+					rootClientId: 'chicken',
 					blocks: [ newChildBlock ],
 				};
 
@@ -484,7 +515,7 @@ describe( 'state', () => {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
@@ -496,13 +527,17 @@ describe( 'state', () => {
 						},
 					},
 					attributes: {
-						clicken: {},
+						chicken: {},
 						[ newChildBlockId ]: {},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ newChildBlockId ],
+						'': [ 'chicken' ],
+						chicken: [ newChildBlockId ],
 						[ newChildBlockId ]: [],
+					},
+					parents: {
+						chicken: '',
+						[ newChildBlockId ]: 'chicken',
 					},
 				} );
 			} );
@@ -515,6 +550,7 @@ describe( 'state', () => {
 				byClientId: {},
 				attributes: {},
 				order: {},
+				parents: {},
 				isPersistentChange: true,
 				isIgnoredChange: false,
 			} );
