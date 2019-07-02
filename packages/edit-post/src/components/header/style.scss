@@ -12,7 +12,7 @@
 	right: 0;
 
 	// Make toolbar sticky on larger breakpoints
-	@include break-mobile {
+	@include break-zoomedin {
 		height: $header-height;
 		top: 0;
 		position: sticky;

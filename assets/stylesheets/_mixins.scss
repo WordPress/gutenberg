@@ -44,6 +44,12 @@
 	}
 }
 
+@mixin break-zoomedin() {
+	@media (min-width: #{ ($break-zoomedin) }) {
+		@content;
+	}
+}
+
 
 /**
  * Long content fade mixin
