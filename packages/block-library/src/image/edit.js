@@ -415,7 +415,7 @@ class ImageEdit extends Component {
 		const src = isExternal ? url : undefined;
 		const labels = {
 			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
-			instructions: __( 'Upload an image, pick one from your media library, or add one with a URL.' ),
+			instructions: __( 'Upload an image file, pick one from your media library, or add one with a URL.' ),
 		};
 		const mediaPreview = ( !! url && <img
 			alt={ __( 'Edit image' ) }
@@ -450,7 +450,7 @@ class ImageEdit extends Component {
 			);
 		}
 
-		const classes = classnames( {
+		const classes = classnames( className, {
 			'is-transient': isBlobURL( url ),
 			'is-resized': !! width || !! height,
 			'is-focused': isSelected,

@@ -11,11 +11,11 @@ import { orderBy } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
 
-const FormatToolbar = ( { controls } ) => {
+const FormatToolbar = () => {
 	return (
 		<div className="editor-format-toolbar block-editor-format-toolbar">
 			<Toolbar>
-				{ controls.map( ( format ) =>
+				{ [ 'bold', 'italic', 'link' ].map( ( format ) =>
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
 				) }
 				<Slot name="RichText.ToolbarControls">

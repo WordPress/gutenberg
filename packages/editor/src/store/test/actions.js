@@ -337,7 +337,7 @@ describe( 'Post generator actions', () => {
 						dispatch(
 							'core/notices',
 							'createErrorNotice',
-							...[ 'Updating failed', { id: 'SAVE_POST_NOTICE_ID' } ]
+							...[ 'Updating failed.', { id: 'SAVE_POST_NOTICE_ID' } ]
 						)
 					);
 				},
