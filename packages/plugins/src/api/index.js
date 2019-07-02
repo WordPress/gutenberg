@@ -155,6 +155,7 @@ export function registerPlugin( name, settings ) {
 		name,
 		icon: 'admin-plugins',
 		priority,
+		...settings,
 	};
 
 	doAction( 'plugins.pluginRegistered', settings, name );
