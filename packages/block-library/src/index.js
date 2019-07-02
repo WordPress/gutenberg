@@ -62,6 +62,9 @@ import * as tagCloud from './tag-cloud';
 
 import * as classic from './classic';
 
+// Top-level template blocks.
+import * as postTitle from './post-title';
+
 /**
  * Function to register core blocks provided by the block editor.
  *
@@ -124,6 +127,9 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
+
+		// Register top-level template blocks.
+		postTitle,
 	].forEach( ( block ) => {
 		if ( ! block ) {
 			return;
