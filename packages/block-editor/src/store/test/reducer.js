@@ -495,7 +495,7 @@ describe( 'state', () => {
 					parents: {
 						chicken: '',
 						'chicken-child': 'chicken',
-						'chicken-grand-child': 'chicken-cchild',
+						'chicken-grand-child': 'chicken-child',
 					},
 				} );
 
@@ -648,6 +648,47 @@ describe( 'state', () => {
 				'': [ 'wings' ],
 				wings: [],
 			} );
+			expect( state.parents ).toEqual( {
+				wings: '',
+			} );
+		} );
+		it( 'should replace the block and remove references to its inner blocks', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					clientId: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [
+						{
+							clientId: 'child',
+							name: 'core/test-block',
+							attributes: {},
+							innerBlocks: [],
+						},
+					],
+				} ],
+			} );
+			const state = blocks( original, {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken' ],
+				blocks: [ {
+					clientId: 'wings',
+					name: 'core/freeform',
+					innerBlocks: [],
+				} ],
+			} );
+
+			// This is commented because we have a memory leak in the byClientId and order reduces
+			// When removing blocks with innerBlocks.
+			// expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
+			// expect( state.order ).toEqual( {
+			// 	 '': [ 'wings' ],
+			//	 wings: [],
+			// } );
+			expect( state.parents ).toEqual( {
+				wings: '',
+			} );
 		} );
 
 		it( 'should replace the nested block', () => {
@@ -669,6 +710,10 @@ describe( 'state', () => {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ replacementBlock.clientId ],
 				[ replacementBlock.clientId ]: [],
+			} );
+			expect( state.parents ).toEqual( {
+				[ wrapperBlock.clientId ]: '',
+				[ replacementBlock.clientId ]: wrapperBlock.clientId,
 			} );
 		} );
 
@@ -1060,6 +1105,9 @@ describe( 'state', () => {
 
 			expect( state.order[ '' ] ).toEqual( [ 'ribs' ] );
 			expect( state.order ).not.toHaveProperty( 'chicken' );
+			expect( state.parents ).toEqual( {
+				ribs: '',
+			} );
 			expect( state.byClientId ).toEqual( {
 				ribs: {
 					clientId: 'ribs',
@@ -1099,6 +1147,9 @@ describe( 'state', () => {
 			expect( state.order[ '' ] ).toEqual( [ 'ribs' ] );
 			expect( state.order ).not.toHaveProperty( 'chicken' );
 			expect( state.order ).not.toHaveProperty( 'veggies' );
+			expect( state.parents ).toEqual( {
+				ribs: '',
+			} );
 			expect( state.byClientId ).toEqual( {
 				ribs: {
 					clientId: 'ribs',
@@ -1131,6 +1182,7 @@ describe( 'state', () => {
 			expect( state.order ).toEqual( {
 				'': [],
 			} );
+			expect( state.parents ).toEqual( {} );
 		} );
 
 		it( 'should insert at the specified index', () => {
