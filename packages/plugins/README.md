@@ -118,10 +118,14 @@ registerPlugin( 'plugin-name', {
 	icon: moreIcon,
 	render: Component,
 <<<<<<< HEAD
+<<<<<<< HEAD
 	scope: 'my-page',
 =======
 	priority: 5
 >>>>>>> 0950f3cb07 (Adds priority property to the settings object with a default of 10. Sorts the registered plugins by priority before rendering them in PluginArea)
+=======
+	priority: 5
+>>>>>>> f5ea38a261 (Adds priority property to the settings object with a default of 10. Sorts the registered plugins by priority before rendering them in PluginArea)
 } );
 ```
 
@@ -146,17 +150,28 @@ registerPlugin( 'plugin-name', {
 	icon: more,
 	render: Component,
 <<<<<<< HEAD
+<<<<<<< HEAD
 	scope: 'my-page',
 =======
 	priority: 5
 >>>>>>> 0950f3cb07 (Adds priority property to the settings object with a default of 10. Sorts the registered plugins by priority before rendering them in PluginArea)
+=======
+	priority: 5
+>>>>>>> f5ea38a261 (Adds priority property to the settings object with a default of 10. Sorts the registered plugins by priority before rendering them in PluginArea)
 } );
 ```
 
 _Parameters_
 
 -   _name_ `string`: A string identifying the plugin. Must be unique across all registered plugins.
+<<<<<<< HEAD
 -   _settings_ `PluginSettings`: The settings for this plugin.
+=======
+-   _settings_ `Object`: The settings for this plugin.
+-   _settings.icon_ `(string|WPElement|Function)`: An icon to be shown in the UI. It can be a slug of the Dashicon, or an element (or function returning an element) if you choose to render your own SVG.
+-   _settings.render_ `Function`: A component containing the UI elements to be rendered.
+-   _settings.priority_ `number`: Allows for controlling the display order of this plugin. Default is 10.
+>>>>>>> f5ea38a261 (Adds priority property to the settings object with a default of 10. Sorts the registered plugins by priority before rendering them in PluginArea)
 
 _Returns_
 

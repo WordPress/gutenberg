@@ -38,9 +38,12 @@ const plugins = {};
 /**
  * Registers a plugin to the editor.
  *
- * @param {string}   name     A string identifying the plugin.Must be
- *                            unique across all registered plugins.
- * @param {WPPlugin} settings The settings for this plugin.
+ * @param {string}                    name            A string identifying the plugin. Must be unique across all registered plugins.
+ * @param {Object}                    settings        The settings for this plugin.
+ * @param {string|WPElement|Function} settings.icon   An icon to be shown in the UI. It can be a slug of the Dashicon,
+ * or an element (or function returning an element) if you choose to render your own SVG.
+ * @param {Function}                  settings.render A component containing the UI elements to be rendered.
+ * @param {number}                       settings.priority Allows for controlling the display order of this plugin. Default is 10.
  *
  * @example <caption>ES5</caption>
  * ```js
@@ -112,22 +115,15 @@ const plugins = {};
  */
 export function registerPlugin( name, settings ) {
 	if ( typeof settings !== 'object' ) {
-		console.error(
-			'No settings object provided!'
-		);
+		console.error( 'No settings object provided!' );
 		return null;
 	}
 	if ( typeof name !== 'string' ) {
-		console.error(
-			'Plugin names must be strings.'
-		);
+		console.error( 'Plugin names must be strings.' );
 		return null;
 	}
-	const { priority = 10 } = settings;
-	if ( ! Number.isInteger( priority ) ) {
-		console.error(
-			'The "priority" property must be a number'
-		);
+	if ( settings.priority && typeof settings.priority !== 'number' ) {
+		console.error( 'The "priority" property must be a number' );
 		return null;
 	}
 	if ( ! /^[a-z][a-z0-9-]*$/.test( name ) ) {
@@ -137,9 +133,7 @@ export function registerPlugin( name, settings ) {
 		return null;
 	}
 	if ( plugins[ name ] ) {
-		console.error(
-			`Plugin "${ name }" is already registered.`
-		);
+		console.error( `Plugin "${ name }" is already registered.` );
 	}
 
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
@@ -154,7 +148,7 @@ export function registerPlugin( name, settings ) {
 	plugins[ name ] = {
 		name,
 		icon: 'admin-plugins',
-		priority,
+		priority: 10,
 		...settings,
 	};
 
@@ -189,9 +183,7 @@ export function registerPlugin( name, settings ) {
  */
 export function unregisterPlugin( name ) {
 	if ( ! plugins[ name ] ) {
-		console.error(
-			'Plugin "' + name + '" is not registered.'
-		);
+		console.error( 'Plugin "' + name + '" is not registered.' );
 		return;
 	}
 	const oldPlugin = plugins[ name ];

@@ -59,8 +59,8 @@ class PluginArea extends Component {
 	}
 
 	getCurrentPluginsState() {
-		const plugins = compose(
-			( list ) => map( list, ( { icon, name, render, priority } ) => {
+		return {
+			plugins: map( sortBy( getPlugins(), [ 'priority' ] ), ( { icon, name, render, priority } ) => {
 				return {
 					Plugin: render,
 					context: {
