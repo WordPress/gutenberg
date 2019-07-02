@@ -1,0 +1,9 @@
+{
+	"name": "core/post-title",
+	"category": "common",
+	"attributes": {
+		"title": {
+			"type": "string"
+		}
+	}
+}
