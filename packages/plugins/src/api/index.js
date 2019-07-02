@@ -123,7 +123,9 @@ export function registerPlugin( name, settings ) {
 		);
 		return null;
 	}
-	if ( settings.priority && typeof settings.priority !== 'number' ) {
+
+	const { priority = 10 } = settings;
+	if ( priority !== 0 && ( priority.length === 0 || typeof priority !== 'number' ) ) {
 		console.error(
 			'The "priority" property must be a number'
 		);
@@ -153,7 +155,7 @@ export function registerPlugin( name, settings ) {
 	plugins[ name ] = {
 		name,
 		icon: 'admin-plugins',
-		priority: 10,
+		priority,
 		...settings,
 	};
 
