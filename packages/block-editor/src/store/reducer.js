@@ -55,6 +55,25 @@ function mapBlockOrder( blocks, rootClientId = '' ) {
 }
 
 /**
+ * Given an array of blocks, returns an object where each key contains
+ * the clientId of the block and the value is the parent of the block.
+ *
+ * @param {Array}   blocks       Blocks to map.
+ * @param {?string} rootClientId Assumed root client ID.
+ *
+ * @return {Object} Block order map object.
+ */
+function mapBlockParents( blocks, rootClientId = '' ) {
+	const result = {};
+	blocks.forEach( ( block ) => {
+		result[ block.clientId ] = rootClientId;
+		Object.assign( result, mapBlockParents( block.innerBlocks, block.clientId ) );
+	} );
+
+	return result;
+}
+
+/**
  * Helper method to iterate through all blocks, recursing into inner blocks,
  * applying a transformation function to each one.
  * Returns a flattened object with the transformed blocks.
@@ -305,6 +324,10 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			order: {
 				...omit( state.order, visibleClientIds ),
 				...mapBlockOrder( action.blocks ),
+			},
+			parents: {
+				...omit( state.parents, visibleClientIds ),
+				...mapBlockParents( action.blocks ),
 			},
 		};
 	}
@@ -652,6 +675,54 @@ export const blocks = flow(
 						without( subState, ...action.clientIds )
 					) ),
 				] )( state );
+		}
+
+		return state;
+	},
+
+	// This is the opposite of the order property.
+	//  It's duplicated data used for performance reasons.
+	parents( state = {}, action ) {
+		switch ( action.type ) {
+			case 'RESET_BLOCKS':
+				return mapBlockParents( action.blocks );
+
+			case 'RECEIVE_BLOCKS':
+				return {
+					...state,
+					...mapBlockParents( action.blocks ),
+				};
+
+			case 'INSERT_BLOCKS':
+				return {
+					...state,
+					...mapBlockParents( action.blocks, action.rootClientId || '' ),
+				};
+
+			case 'MOVE_BLOCK_TO_POSITION': {
+				return {
+					...state,
+					[ action.clientId ]: action.toRootClientId || '',
+				};
+			}
+
+			case 'REPLACE_BLOCKS':
+				return {
+					// This should include the parents as well to avoid memory leak
+					...omit( state, action.clientIds ),
+					...mapBlockParents( action.blocks, state[ action.clientIds[ 0 ] ] ),
+				};
+
+			case 'REMOVE_BLOCKS':
+				// This should include the parents as well to avoid memory leak
+				return omit( state, action.clientIds );
+
+			case 'REPLACE_INNER_BLOCKS':
+				return {
+					// Inner blocks removed should be omitted from the state
+					...state,
+					...mapBlockParents( action.blocks, action.rootClientId ),
+				};
 		}
 
 		return state;
