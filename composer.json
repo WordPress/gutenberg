@@ -11,10 +11,10 @@
 		"issues": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"require-dev": {
-		"dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
-		"squizlabs/php_codesniffer": "^3.1",
-		"wimg/php-compatibility": "^8",
-		"wp-coding-standards/wpcs": "^1.0.0"
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
+		"squizlabs/php_codesniffer": "^3.4.2",
+		"phpcompatibility/php-compatibility": "^9.2.0",
+		"wp-coding-standards/wpcs": "^2.1.1"
 	},
 	"require": {
 		"composer/installers": "~1.0"
