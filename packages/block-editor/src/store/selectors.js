@@ -65,14 +65,6 @@ const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
 const EMPTY_ARRAY = [];
 
 /**
- * Shared reference to an empty object for cases where it is important to avoid
- * returning a new object reference on every invocation.
- *
- * @type {Object}
- */
-const EMPTY_OBJECT = {};
-
-/**
  * Returns a block's name given its client ID, or null if no block exists with
  * the client ID.
  *
@@ -108,42 +100,14 @@ export function isBlockValid( state, clientId ) {
  *
  * @return {Object?} Block attributes.
  */
-export const getBlockAttributes = createSelector(
-	( state, clientId ) => {
-		const block = state.blocks.byClientId[ clientId ];
-		if ( ! block ) {
-			return null;
-		}
+export function getBlockAttributes( state, clientId ) {
+	const block = state.blocks.byClientId[ clientId ];
+	if ( ! block ) {
+		return null;
+	}
 
-		let attributes = state.blocks.attributes[ clientId ];
-
-		// Inject custom source attribute values.
-		//
-		// TODO: Create generic external sourcing pattern, not explicitly
-		// targeting meta attributes.
-		const type = getBlockType( block.name );
-		if ( type ) {
-			attributes = reduce( type.attributes, ( result, value, key ) => {
-				if ( value.source === 'meta' ) {
-					if ( result === attributes ) {
-						result = { ...result };
-					}
-
-					result[ key ] = getPostMeta( state, value.meta );
-				}
-
-				return result;
-			}, attributes );
-		}
-
-		return attributes;
-	},
-	( state, clientId ) => [
-		state.blocks.byClientId[ clientId ],
-		state.blocks.attributes[ clientId ],
-		getPostMeta( state ),
-	]
-);
+	return state.blocks.attributes[ clientId ];
+}
 
 /**
  * Returns a block given its client ID. This is a parsed copy of the block,
@@ -193,7 +157,7 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 	},
 	( state, clientId ) => [
 		state.blocks.byClientId[ clientId ],
-		...getBlockAttributes.getDependants( state, clientId ),
+		state.blocks.attributes[ clientId ],
 	]
 );
 
@@ -296,7 +260,6 @@ export const getBlocksByClientId = createSelector(
 		( clientId ) => getBlock( state, clientId )
 	),
 	( state ) => [
-		getPostMeta( state ),
 		state.blocks.byClientId,
 		state.blocks.order,
 		state.blocks.attributes,
@@ -656,7 +619,6 @@ export const getMultiSelectedBlocks = createSelector(
 		state.blocks.byClientId,
 		state.blocks.order,
 		state.blocks.attributes,
-		getPostMeta( state ),
 	]
 );
 
@@ -1420,20 +1382,8 @@ export function __unstableIsLastBlockChangeIgnored( state ) {
 	return state.blocks.isIgnoredChange;
 }
 
-/**
- * Returns the value of a post meta from the editor settings.
- *
- * @param {Object} state Global application state.
- * @param {string} key   Meta Key to retrieve
- *
- * @return {*} Meta value
- */
-function getPostMeta( state, key ) {
-	if ( key === undefined ) {
-		return get( state, [ 'settings', '__experimentalMetaSource', 'value' ], EMPTY_OBJECT );
-	}
-
-	return get( state, [ 'settings', '__experimentalMetaSource', 'value', key ] );
+export function getLastBlockAttributesChange( state ) {
+	return state.lastBlockAttributesChange;
 }
 
 /**

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, pick, mapValues, has } from 'lodash';
+import { find, castArray, pick, mapValues, has } from 'lodash';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
@@ -32,6 +32,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import * as sources from './block-sources';
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -67,8 +68,28 @@ export function* setupEditor( post, edits, template ) {
 		blocks = synchronizeBlocksWithTemplate( blocks, template );
 	}
 
-	yield resetEditorBlocks( blocks );
 	yield setupEditorState( post );
+	yield resetEditorBlocks( blocks );
+}
+
+/**
+ * Action generator function used in signalling that sources are to be updated
+ * in response to a single block attributes update.
+ *
+ * @param {string} clientId   Client ID of updated block.
+ * @param {Object} attributes Object of updated attributes values.
+ *
+ * @yield {Object} Yielded action objects.
+ */
+export function* updateBlockSources( clientId, attributes ) {
+	const block = find( yield select( 'core/editor', 'getEditorBlocks' ), { clientId } );
+	const blockType = yield select( 'core/blocks', 'getBlockType', block.name );
+
+	for ( const [ attributeName, schema ] of Object.entries( blockType.attributes ) ) {
+		if ( attributes.hasOwnProperty( attributeName ) && sources[ schema.source ] ) {
+			yield* sources[ schema.source ].update( schema, attributes[ attributeName ] );
+		}
+	}
 }
 
 /**
@@ -730,7 +751,19 @@ export function unlockPostSaving( lockName ) {
  *
  * @return {Object} Action object
  */
-export function resetEditorBlocks( blocks, options = {} ) {
+export function* resetEditorBlocks( blocks, options = {} ) {
+	for ( const source in Object.values( sources ) ) {
+		if ( typeof source.applyAll === 'function' ) {
+			blocks = yield* source.applyAll( blocks );
+		}
+
+		if ( typeof source.apply === 'function' ) {
+			for ( let i = 0; i < blocks.length; i++ ) {
+				blocks[ i ] = yield* source.apply( blocks[ i ] );
+			}
+		}
+	}
+
 	return {
 		type: 'RESET_EDITOR_BLOCKS',
 		blocks,

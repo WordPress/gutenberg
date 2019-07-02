@@ -74,8 +74,6 @@ class EditorProvider extends Component {
 
 	getBlockEditorSettings(
 		settings,
-		meta,
-		onMetaChange,
 		reusableBlocks,
 		hasUploadPermissions,
 		canUserUseUnfilteredHTML
@@ -102,10 +100,6 @@ class EditorProvider extends Component {
 				'templateLock',
 				'titlePlaceholder',
 			] ),
-			__experimentalMetaSource: {
-				value: meta,
-				onChange: onMetaChange,
-			},
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
@@ -143,10 +137,9 @@ class EditorProvider extends Component {
 			children,
 			blocks,
 			resetEditorBlocks,
+			updateBlockSources,
 			isReady,
 			settings,
-			meta,
-			onMetaChange,
 			reusableBlocks,
 			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
@@ -158,8 +151,6 @@ class EditorProvider extends Component {
 
 		const editorSettings = this.getBlockEditorSettings(
 			settings,
-			meta,
-			onMetaChange,
 			reusableBlocks,
 			hasUploadPermissions,
 			canUserUseUnfilteredHTML
@@ -170,6 +161,7 @@ class EditorProvider extends Component {
 				value={ blocks }
 				onInput={ resetEditorBlocksWithoutUndoLevel }
 				onChange={ resetEditorBlocks }
+				onBlockAttributesChange={ updateBlockSources }
 				settings={ editorSettings }
 				useSubRegistry={ false }
 			>
@@ -188,7 +180,6 @@ export default compose( [
 			canUserUseUnfilteredHTML,
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
-			getEditedPostAttribute,
 			__experimentalGetReusableBlocks,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
@@ -197,7 +188,6 @@ export default compose( [
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
-			meta: getEditedPostAttribute( 'meta' ),
 			reusableBlocks: __experimentalGetReusableBlocks(),
 			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
 		};
@@ -207,8 +197,8 @@ export default compose( [
 			setupEditor,
 			updatePostLock,
 			resetEditorBlocks,
-			editPost,
 			updateEditorSettings,
+			updateBlockSources,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
@@ -218,13 +208,11 @@ export default compose( [
 			createWarningNotice,
 			resetEditorBlocks,
 			updateEditorSettings,
+			updateBlockSources,
 			resetEditorBlocksWithoutUndoLevel( blocks ) {
 				resetEditorBlocks( blocks, {
 					__unstableShouldCreateUndoLevel: false,
 				} );
-			},
-			onMetaChange( meta ) {
-				editPost( { meta } );
 			},
 		};
 	} ),

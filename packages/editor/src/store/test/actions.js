@@ -655,10 +655,6 @@ describe( 'Editor actions', () => {
 				post: { content: { raw: '' }, status: 'publish' },
 			} );
 		} );
-		it( 'should yield action object for resetEditorBlocks', () => {
-			const { value } = fulfillment.next();
-			expect( value ).toEqual( actions.resetEditorBlocks( [] ) );
-		} );
 		it( 'should yield action object for setupEditorState', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual(
@@ -666,6 +662,10 @@ describe( 'Editor actions', () => {
 					{ content: { raw: '' }, status: 'publish' }
 				)
 			);
+		} );
+		it( 'should yield action object for resetEditorBlocks', () => {
+			const { value } = fulfillment.next();
+			expect( value ).toEqual( actions.resetEditorBlocks( [] ) );
 		} );
 	} );
 
