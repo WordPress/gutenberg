@@ -56,6 +56,7 @@ const previewBlocksInWidgetArea = throttle( ( id, blocks ) => {
 	);
 	if ( widgetArea ) {
 		widgetArea.innerHTML = serialize( blocks );
+		widgetArea.parentElement.innerHTML = widgetArea.outerHTML;
 	}
 }, 1000 );
 
@@ -91,29 +92,34 @@ if ( window.wp && window.wp.customize && window.wp.data ) {
 					value[ id ] = parse( widgetAreas[ id ] );
 					return value;
 				}, {} );
-			} catch ( err ) {}
-			// This will setup widget areas as normal, but content for a sidebar
-			// that we pass here will take precedence over its published content.
-			window.wp.data.dispatch( 'core/edit-widgets' ).setupWidgetAreas( widgetAreas );
+			} catch ( err ) {
+				widgetAreas = {};
+			}
 
-			// Subscribe to registry changes so that we can update the preview
-			// and the hidden input's value when any of the widget areas change.
-			widgetAreas = getWidgetAreasObject();
-			window.wp.data.subscribe( () => {
-				const nextWidgetAreas = getWidgetAreasObject();
+			// Wait for setup to finish before overwriting sidebars with changeset data,
+			// if any, and subscribe to registry changes after that so that we can preview
+			// changes and update the hidden input's value when any of the widget areas change.
+			const { setupWidgetAreas, updateBlocksInWidgetArea } = window.wp.data
+				.dispatch( 'core/edit-widgets' );
+			setupWidgetAreas().then( () => {
+				Object.keys( widgetAreas ).forEach( ( id ) => updateBlocksInWidgetArea( id, widgetAreas[ id ] ) );
+				widgetAreas = getWidgetAreasObject();
+				window.wp.data.subscribe( () => {
+					const nextWidgetAreas = getWidgetAreasObject();
 
-				let didUpdate = false;
-				for ( const id of Object.keys( nextWidgetAreas ) ) {
-					if ( widgetAreas[ id ] !== nextWidgetAreas[ id ] ) {
-						previewBlocksInWidgetArea( id, nextWidgetAreas[ id ] );
-						didUpdate = true;
+					let didUpdate = false;
+					for ( const id of Object.keys( nextWidgetAreas ) ) {
+						if ( widgetAreas[ id ] !== nextWidgetAreas[ id ] ) {
+							previewBlocksInWidgetArea( id, nextWidgetAreas[ id ] );
+							didUpdate = true;
+						}
 					}
-				}
 
-				if ( didUpdate ) {
-					updateSettingInputValue( nextWidgetAreas );
-				}
-				widgetAreas = nextWidgetAreas;
+					if ( didUpdate ) {
+						updateSettingInputValue( nextWidgetAreas );
+					}
+					widgetAreas = nextWidgetAreas;
+				} );
 			} );
 		} )
 	);

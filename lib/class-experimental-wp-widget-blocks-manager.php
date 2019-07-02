@@ -333,7 +333,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 		wp_register_widget_control(
 			$widget_id,
 			__( 'Blocks Area', 'gutenberg' ),
-			'noop',
+			'echo',
 			array( 'id_base' => 'blocks-widget' )
 		);
 		return $widget_id;
@@ -351,7 +351,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 			self::$unfiltered_sidebar_widgets = $sidebars_widgets;
 		}
 		$changeset_data = null;
-		if ( is_customize_preview() ) {
+		if ( function_exists( 'is_customize_preview' ) && is_customize_preview() ) {
 			$changeset_data = $wp_customize->changeset_data();
 			if ( isset( $changeset_data['gutenberg_widget_blocks']['value'] ) ) {
 				$changeset_data = json_decode( $changeset_data['gutenberg_widget_blocks']['value'] );

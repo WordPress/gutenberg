@@ -15,11 +15,9 @@ const WIDGET_AREAS_SAVE_NOTICE_ID = 'WIDGET_AREAS_SAVE_NOTICE_ID';
 /**
  * Yields an action object that setups the widget areas.
  *
- * @param {Object} savedWidgetAreas Mapping from area ID to array of blocks for overriding published content with drafts and other ongoing changesets.
- *
  * @yields {Object} Action object.
  */
-export function* setupWidgetAreas( savedWidgetAreas ) {
+export function* setupWidgetAreas() {
 	const widgetAreas = yield select(
 		'core',
 		'getEntityRecords',
@@ -28,11 +26,10 @@ export function* setupWidgetAreas( savedWidgetAreas ) {
 	);
 	yield {
 		type: 'SETUP_WIDGET_AREAS',
-		widgetAreas: map( widgetAreas, ( { id, content, ...widgetAreaProperties } ) => {
+		widgetAreas: map( widgetAreas, ( { content, ...widgetAreaProperties } ) => {
 			return {
 				...widgetAreaProperties,
-				id,
-				blocks: ( savedWidgetAreas && savedWidgetAreas[ id ] ) || parse( get( content, [ 'raw' ], '' ) ),
+				blocks: parse( get( content, [ 'raw' ], '' ) ),
 			};
 		} ),
 	};

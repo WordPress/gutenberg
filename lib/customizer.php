@@ -57,7 +57,7 @@ function gutenberg_customize_register( $wp_customize ) {
 	);
 	$wp_customize->add_section(
 		'gutenberg_widget_blocks',
-		array( 'title' => __( 'Widget Blocks', 'gutenberg' ) )
+		array( 'title' => __( 'Widget Blocks (Experimental)', 'gutenberg' ) )
 	);
 	$wp_customize->add_control( new WP_Customize_Widget_Blocks_Control(
 		$wp_customize,
