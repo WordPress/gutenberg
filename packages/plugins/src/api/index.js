@@ -123,7 +123,6 @@ export function registerPlugin( name, settings ) {
 		);
 		return null;
 	}
-
 	const { priority = 10 } = settings;
 	if ( priority !== 0 && ( priority.length === 0 || typeof priority !== 'number' ) ) {
 		console.error(
@@ -156,7 +155,6 @@ export function registerPlugin( name, settings ) {
 		name,
 		icon: 'admin-plugins',
 		priority,
-		...settings,
 	};
 
 	doAction( 'plugins.pluginRegistered', settings, name );
