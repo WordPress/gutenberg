@@ -8,6 +8,7 @@ import { map, sortBy } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -58,8 +59,8 @@ class PluginArea extends Component {
 	}
 
 	getCurrentPluginsState() {
-		return {
-			plugins: map( sortBy( getPlugins(), [ 'priority' ] ), ( { icon, name, render, priority } ) => {
+		const plugins = compose(
+			( list ) => map( list, ( { icon, name, render, priority } ) => {
 				return {
 					Plugin: render,
 					context: {
@@ -69,6 +70,11 @@ class PluginArea extends Component {
 					},
 				};
 			} ),
+			( list ) => sortBy( list, [ 'priority' ] ),
+		)( getPlugins() );
+
+		return {
+			plugins,
 		};
 	}
 
