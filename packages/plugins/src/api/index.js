@@ -122,7 +122,6 @@ export function registerPlugin( name, settings ) {
 		console.error( 'Plugin names must be strings.' );
 		return null;
 	}
-
 	const { priority = 10 } = settings;
 	if (
 		priority !== 0 &&
@@ -154,7 +153,6 @@ export function registerPlugin( name, settings ) {
 		name,
 		icon: 'admin-plugins',
 		priority,
-		...settings,
 	};
 
 	doAction( 'plugins.pluginRegistered', settings, name );
