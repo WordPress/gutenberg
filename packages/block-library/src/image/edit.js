@@ -675,12 +675,10 @@ class ImageEdit extends Component {
 								<>
 									{ getInspectorControls( imageWidth, imageHeight ) }
 									<ResizableBox
-										size={
-											width && height ? {
-												width,
-												height,
-											} : undefined
-										}
+										size={ {
+											width,
+											height,
+										} }
 										minWidth={ minWidth }
 										maxWidth={ maxWidthBuffer }
 										minHeight={ minHeight }
