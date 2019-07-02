@@ -1,13 +1,10 @@
 // Dismissible notices.
 .components-editor-notices__dismissible {
 	position: sticky;
-	top: 0;
+	top: $header-height;
 	right: 0;
 	color: $dark-gray-900;
 
-	@include break-mobile {
-		top: $header-height;
-	}
 	@include break-small {
 		top: 0;
 	}
