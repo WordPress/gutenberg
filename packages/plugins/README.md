@@ -117,7 +117,11 @@ function Component() {
 registerPlugin( 'plugin-name', {
 	icon: moreIcon,
 	render: Component,
+<<<<<<< HEAD
 	scope: 'my-page',
+=======
+	priority: 5
+>>>>>>> 0950f3cb07 (Adds priority property to the settings object with a default of 10. Sorts the registered plugins by priority before rendering them in PluginArea)
 } );
 ```
 
@@ -141,7 +145,11 @@ const Component = () => (
 registerPlugin( 'plugin-name', {
 	icon: more,
 	render: Component,
+<<<<<<< HEAD
 	scope: 'my-page',
+=======
+	priority: 5
+>>>>>>> 0950f3cb07 (Adds priority property to the settings object with a default of 10. Sorts the registered plugins by priority before rendering them in PluginArea)
 } );
 ```
 
