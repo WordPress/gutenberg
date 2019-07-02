@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Fill, ToggleControl } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 class OpenInNewTabToggle extends Component {
@@ -73,14 +73,4 @@ class OpenInNewTabToggle extends Component {
 	}
 }
 
-const OpenInNewTabToggleWrapper = () => {
-	return (
-		<Fill name="LinkSettings">
-			{ ( props ) => (
-				<OpenInNewTabToggle { ...props } />
-			) }
-		</Fill>
-	);
-};
-
-export default OpenInNewTabToggleWrapper;
+export default OpenInNewTabToggle;

@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import { Component, createRef, useMemo } from '@wordpress/element';
 import {
 	withSpokenMessages,
-	Slot,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { getRectangleFromRange } from '@wordpress/dom';
@@ -25,6 +24,7 @@ import { URLPopover } from '@wordpress/block-editor';
  */
 import { createLinkFormat, isValidHref } from './utils';
 import OpenInNewTabToggle from './open-in-new-tab-toggle';
+import NoFollowToggle from './no-follow-toggle';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -205,16 +205,18 @@ class InlineLinkUI extends Component {
 				focusOnMount={ showInput ? 'firstElement' : false }
 				renderSettings={ () => (
 					<div className="editor-format-toolbar__link-settings-container">
-						<Slot
-							name="LinkSettings"
-							fillProps={ {
-								url,
-								text: selectedText,
-								attributes: this.state.attributes,
-								setLinkAttributes: this.setLinkAttributes,
-							} }
+						<OpenInNewTabToggle
+							url={ url }
+							text={ selectedText }
+							attributes={ this.state.attributes }
+							setLinkAttributes={ this.setLinkAttributes }
 						/>
-						<OpenInNewTabToggle />
+						<NoFollowToggle
+							url={ url }
+							text={ selectedText }
+							attributes={ this.state.attributes }
+							setLinkAttributes={ this.setLinkAttributes }
+						/>
 					</div>
 				) }
 			>
