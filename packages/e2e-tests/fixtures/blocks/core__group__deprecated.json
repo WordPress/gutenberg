@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "backgroundColor": "lighter-blue",
-            "className": "alignfull"
+            "align": "full"
         },
         "innerBlocks": [
             {
