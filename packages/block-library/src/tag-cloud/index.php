@@ -31,13 +31,7 @@ function render_block_core_tag_cloud( $attributes ) {
 
 	if ( ! $tag_cloud ) {
 		$labels    = get_taxonomy_labels( get_taxonomy( $attributes['taxonomy'] ) );
-		$tag_cloud = esc_html(
-			sprintf(
-				/* translators: %s: taxonomy name */
-				__( 'Your site doesn&#8217;t have any %s, so there&#8217;s nothing to display here at the moment.' ),
-				$labels->name
-			)
-		);
+		$tag_cloud = esc_html( __( 'There\'s no content to show here yet.' ) );
 	}
 
 	return sprintf(
