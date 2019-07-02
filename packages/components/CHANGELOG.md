@@ -1,4 +1,11 @@
-## Master
+## Next release
+
+### New Features
+
+- Added a new `popoverProps` prop to the `Dropdown` component which allows users of the `Dropdown` component to pass props directly to the `PopOver` component.
+
+
+## 8.0.0 (2019-06-12)
 
 ### New Feature
 

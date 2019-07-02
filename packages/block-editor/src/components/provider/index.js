@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -120,13 +119,7 @@ class BlockEditorProvider extends Component {
 	render() {
 		const { children } = this.props;
 
-		return (
-			<SlotFillProvider>
-				<DropZoneProvider>
-					{ children }
-				</DropZoneProvider>
-			</SlotFillProvider>
-		);
+		return children;
 	}
 }
 

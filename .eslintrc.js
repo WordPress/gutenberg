@@ -34,6 +34,10 @@ module.exports = {
 				message: 'Path access on WordPress dependencies is not allowed.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb\.cjs)/]',
+				message: 'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
+			},
+			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},

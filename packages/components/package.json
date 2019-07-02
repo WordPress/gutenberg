@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "7.4.0",
+	"version": "8.0.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -40,7 +40,7 @@
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",
 		"mousetrap": "^1.6.2",
-		"re-resizable": "^4.7.1",
+		"re-resizable": "^5.0.1",
 		"react-click-outside": "^3.0.0",
 		"react-dates": "^17.1.1",
 		"react-spring": "^8.0.20",

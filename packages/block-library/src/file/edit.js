@@ -161,7 +161,7 @@ class FileEdit extends Component {
 					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
 						title: __( 'File' ),
-						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
+						instructions: __( 'Upload a file or pick one from your media library.' ),
 					} }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }

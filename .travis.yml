@@ -37,7 +37,11 @@ jobs:
 
     - name: Build artifacts
       install:
-        - npm ci
+        # A "full" install is executed, since `npm ci` does not always exit
+        # with an error status code if the lock file is inaccurate.
+        #
+        # See: https://github.com/WordPress/gutenberg/issues/16157
+        - npm install
       script:
         - npm run check-local-changes
 
@@ -156,3 +160,16 @@ jobs:
       env: WP_VERSION=latest SWITCH_TO_PHP=5.2
       script:
         - ./bin/run-wp-unit-tests.sh
+
+before_deploy:
+  - npm install
+  - npm run playground:build -- --public-url '/gutenberg'
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  local_dir: playground/dist
+  on:
+    branch: master
