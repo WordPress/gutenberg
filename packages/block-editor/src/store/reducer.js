@@ -402,6 +402,69 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
+// While technically redundant data as the inverse of `order`, it serves as
+// an optimization for the selectors which derive the ancestry of a block.
+const withBlockParents = ( reducer ) => ( state = {}, action ) => {
+	const newState = reducer( state, action );
+	if ( newState === state ) {
+		return newState;
+	}
+	newState.parents = newState.parents ? newState.parents : {};
+
+	const getAllPreviousChildren = ( clientIds ) => {
+		let children = [];
+		clientIds.forEach( ( clientId ) => {
+			children = children.concat( state.order[ clientId ] );
+		} );
+		return children.length ?
+			clientIds.concat( getAllPreviousChildren( children ) ) :
+			clientIds;
+	};
+
+	switch ( action.type ) {
+		case 'RESET_BLOCKS':
+			newState.parents = mapBlockParents( action.blocks );
+			break;
+		case 'RECEIVE_BLOCKS':
+			newState.parents = {
+				...newState.parents,
+				...mapBlockParents( action.blocks ),
+			};
+			break;
+		case 'INSERT_BLOCKS':
+			newState.parents = {
+				...newState.parents,
+				...mapBlockParents( action.blocks, action.rootClientId || '' ),
+			};
+			break;
+		case 'MOVE_BLOCK_TO_POSITION': {
+			newState.parents = {
+				...newState.parents,
+				[ action.clientId ]: action.toRootClientId || '',
+			};
+			break;
+		}
+		case 'REPLACE_BLOCKS':
+			newState.parents = {
+				...omit( newState.parents, getAllPreviousChildren( action.clientIds ) ),
+				...mapBlockParents( action.blocks, state[ action.clientIds[ 0 ] ] ),
+			};
+			break;
+		case 'REMOVE_BLOCKS':
+			newState.parents = omit( newState.parents, getAllPreviousChildren( action.clientIds ) );
+			break;
+		case 'REPLACE_INNER_BLOCKS':
+			newState.parents = {
+				// Inner blocks removed should be omitted from the state
+				...omit( newState.parents, getAllPreviousChildren( state.order[ action.rootClientId ] ) ),
+				...mapBlockParents( action.blocks, action.rootClientId ),
+			};
+			break;
+	}
+
+	return newState;
+};
+
 /**
  * Reducer returning the blocks state.
  *
@@ -414,6 +477,7 @@ export const blocks = flow(
 	combineReducers,
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
+	withBlockParents,
 	withBlockReset,
 	withSaveReusableBlock,
 	withPersistentBlockChange,
