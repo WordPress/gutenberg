@@ -64,13 +64,11 @@ function mapBlockOrder( blocks, rootClientId = '' ) {
  * @return {Object} Block order map object.
  */
 function mapBlockParents( blocks, rootClientId = '' ) {
-	const result = {};
-	blocks.forEach( ( block ) => {
-		result[ block.clientId ] = rootClientId;
-		Object.assign( result, mapBlockParents( block.innerBlocks, block.clientId ) );
-	} );
-
-	return result;
+	return blocks.reduce( ( result, block ) => Object.assign(
+		result,
+		{ [ block.clientId ]: rootClientId },
+		mapBlockParents( block.innerBlocks, block.clientId )
+	), {} );
 }
 
 /**
@@ -680,8 +678,8 @@ export const blocks = flow(
 		return state;
 	},
 
-	// This is the opposite of the order property.
-	//  It's duplicated data used for performance reasons.
+	// While technically redundant data as the inverse of `order`, it serves as
+	// an optimization for the selectors which derive the ancestry of a block.
 	parents( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
