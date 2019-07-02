@@ -471,7 +471,7 @@ const withBlockParents = ( reducer ) => ( state = {}, action ) => {
 		case 'REPLACE_BLOCKS':
 			newState.parents = {
 				...omit( newState.parents, getAllPreviousChildren( action.clientIds ) ),
-				...mapBlockParents( action.blocks, state[ action.clientIds[ 0 ] ] ),
+				...mapBlockParents( action.blocks, state.parents[ action.clientIds[ 0 ] ] ),
 			};
 			break;
 		case 'REMOVE_BLOCKS':
