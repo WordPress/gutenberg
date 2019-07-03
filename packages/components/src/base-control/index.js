@@ -7,7 +7,10 @@ function BaseControl( { id, label, hideLabelFromVision, help, className, childre
 	return (
 		<div className={ classnames( 'components-base-control', className ) }>
 			<div className="components-base-control__field">
-				{ label && id && <label className={ classnames( 'components-base-control__label', hideLabelFromVision && 'screen-reader-text' ) } htmlFor={ id }>{ label }</label> }
+				{ label && id && <label
+					className={ classnames( 'components-base-control__label', { 'screen-reader-text': hideLabelFromVision } ) }
+					htmlFor={ id }>{ label }
+				</label> }
 				{ label && ! id && <BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel> }
 				{ children }
 			</div>

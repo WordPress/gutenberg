@@ -3,9 +3,6 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,10 +12,10 @@ import Button from '../button';
 import RangeControl from '../range-control';
 import SelectControl from '../select-control';
 
-function getInitialSelectValue( fontSizes, value ) {
+function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
-		const initialValue = fontSizes.find( ( font ) => font.size === value );
-		return initialValue ? initialValue.slug : 'custom';
+		const fontSizeValue = fontSizes.find( ( font ) => font.size === value );
+		return fontSizeValue ? fontSizeValue.slug : 'custom';
 	}
 	return 'normal';
 }
@@ -39,7 +36,7 @@ function FontSizePicker( {
 	withSlider = false,
 } ) {
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const [ currentSelectValue, setCurrentSelectValue ] = useState( getInitialSelectValue( fontSizes, value ) );
+	const [ currentSelectValue, setCurrentSelectValue ] = useState( getSelectValueFromFontSize( fontSizes, value ) );
 
 	if ( disableCustomFontSizes && ! fontSizes.length ) {
 		return null;
@@ -47,7 +44,7 @@ function FontSizePicker( {
 
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
-		setCurrentSelectValue( getInitialSelectValue( fontSizes, Number( newValue ) ) );
+		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, Number( newValue ) ) );
 		if ( newValue === '' ) {
 			onChange( undefined );
 			return;
@@ -94,7 +91,7 @@ function FontSizePicker( {
 					disabled={ value === undefined }
 					onClick={ () => {
 						onChange( undefined );
-						setCurrentSelectValue( getInitialSelectValue( fontSizes, undefined ) );
+						setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, undefined ) );
 					} }
 					isSmall
 					isDefault
