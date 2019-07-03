@@ -28,6 +28,7 @@ import {
 	isReusableBlock,
 	createBlock,
 	isUnmodifiedDefaultBlock,
+	getBlockTypes,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -90,6 +91,32 @@ export const normalizeTerm = ( term ) => {
 	term = term.trim();
 
 	return term;
+};
+
+/**
+ * Dynamically loads script
+ *
+ * @param {Object} asset The asset object as described in block.json.
+ * @param {Function} onLoad The callback function when script is loaded.
+ */
+export const loadScipt = ( asset, onLoad ) => {
+	const script = document.createElement( 'script' );
+	script.src = asset.src;
+	script.onload = onLoad;
+	document.body.appendChild( script );
+};
+
+/**
+ * Dynamically loads stylesheets
+ *
+ * @param {Object} asset The asset object as described in block.json.
+ * @param {Function} onLoad The callback function when script is loaded.
+ */
+export const loadStyle = ( asset ) => {
+	const link = document.createElement( 'link' );
+	link.rel = 'stylesheet';
+	link.href = asset.src;
+	document.body.appendChild( link );
 };
 
 export class InserterMenu extends Component {
@@ -485,16 +512,39 @@ export default compose(
 				} = select( 'core/block-editor' );
 				const { isAppender } = ownProps;
 				const { name, initialAttributes } = item;
-				const selectedBlock = getSelectedBlock();
-				const insertedBlock = createBlock( name, initialAttributes );
-				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
-					replaceBlocks( selectedBlock.clientId, insertedBlock );
+
+				if ( item.assets ) {
+					let scriptsCount = 0;
+					const onLoad = () => {
+						scriptsCount--;
+						if ( scriptsCount > 0 ) {
+							return;
+						}
+						const registeredBlocks = getBlockTypes();
+						if ( registeredBlocks.length ) {
+							const block = createBlock( registeredBlocks[ registeredBlocks.length - 1 ].name );
+							insertBlock( block );
+						}
+					};
+					if ( item.assets.editor_script ) {
+						scriptsCount++;
+						loadScipt( item.assets.editor_script, onLoad );
+					}
+					if ( item.assets.style ) {
+						loadStyle( item.assets.style );
+					}
 				} else {
-					insertBlock(
-						insertedBlock,
-						getInsertionIndex(),
-						ownProps.destinationRootClientId
-					);
+					const selectedBlock = getSelectedBlock();
+					const insertedBlock = createBlock( name, initialAttributes );
+					if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+						replaceBlocks( selectedBlock.clientId, insertedBlock );
+					} else {
+						insertBlock(
+							insertedBlock,
+							getInsertionIndex(),
+							ownProps.destinationRootClientId
+						);
+					}
 				}
 
 				ownProps.onSelect();
