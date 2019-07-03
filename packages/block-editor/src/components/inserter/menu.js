@@ -361,7 +361,7 @@ export class InserterMenu extends Component {
 					ref={ this.inserterResults }
 					tabIndex="0"
 					role="region"
-					aria-label={ __( 'Discover block types' ) }
+					aria-label={ __( 'Available block types' ) }
 				>
 
 					<ChildBlocks
