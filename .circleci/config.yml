@@ -6,15 +6,16 @@ commands:
       - restore_cache:
           name: Restore Yarn Cache
           keys:
-            - yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
+            - yarn-v3-{{ arch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
           command: YARN_CACHE_FOLDER=~/.cache/yarn yarn install --frozen-lockfile
       - save_cache:
           name: Save Yarn Cache
-          key: yarn-v2-{{ arch }}-{{ checksum "yarn.lock" }}
+          key: yarn-v3-{{ arch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
+            - i18n-cache/data
   checkout-gutenberg:
     steps:
       - run:
