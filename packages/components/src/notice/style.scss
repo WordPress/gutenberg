@@ -60,7 +60,7 @@
 }
 
 .components-notice-list {
-	// The notice should never be wider than the viewport, or the close button might be hidden. Especially relevant at high zoom levels.
+	// The notice should never be wider than the viewport, or the close button might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
 	max-width: 100vw;
 	z-index: z-index(".components-notice-list");
 }
