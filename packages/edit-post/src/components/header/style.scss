@@ -6,13 +6,14 @@
 	flex-wrap: wrap;
 	justify-content: space-between;
 	align-items: center;
+	// The header should never be wider than the viewport, or buttons might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
 	max-width: 100vw;
 	z-index: z-index(".edit-post-header");
 	left: 0;
 	right: 0;
 
 	// Make toolbar sticky on larger breakpoints
-	@include break-zoomedin {
+	@include break-zoomed-in {
 		height: $header-height;
 		top: 0;
 		position: sticky;

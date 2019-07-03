@@ -44,8 +44,8 @@
 	}
 }
 
-@mixin break-zoomedin() {
-	@media (min-width: #{ ($break-zoomedin) }) {
+@mixin break-zoomed-in() {
+	@media (min-width: #{ ($break-zoomed-in) }) {
 		@content;
 	}
 }
