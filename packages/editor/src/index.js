@@ -22,4 +22,4 @@ export { storeConfig } from './store';
 /*
  * Backward compatibility
  */
-export { __experimentalTransformStyles as transformStyles } from '@wordpress/block-editor';
+export { transformStyles } from '@wordpress/block-editor';

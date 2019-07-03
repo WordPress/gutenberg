@@ -112,8 +112,10 @@ function RichTextWraper( {
 							<FormatToolbar />
 						</BlockFormatControls>
 					) }
-					{ inlineToolbar && (
-						<IsolatedEventContainer>
+					{ isSelected && inlineToolbar && (
+						<IsolatedEventContainer
+							className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar"
+						>
 							<FormatToolbar />
 						</IsolatedEventContainer>
 					) }

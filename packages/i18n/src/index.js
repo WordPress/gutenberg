@@ -13,7 +13,7 @@ import sprintfjs from 'sprintf-js';
  */
 const DEFAULT_LOCALE_DATA = {
 	'': {
-		plural_forms: 'plural=(n!=1)',
+		plural_forms: ( n ) => n === 1 ? 0 : 1,
 	},
 };
 

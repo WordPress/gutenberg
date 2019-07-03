@@ -8,27 +8,29 @@ import { withState, compose } from '@wordpress/compose';
 
 function CopyContentMenuItem( { createNotice, editedPostContent, hasCopied, setState } ) {
 	return (
-		<ClipboardButton
-			text={ editedPostContent }
-			role="menuitem"
-			className="components-menu-item__button"
-			onCopy={ () => {
-				setState( { hasCopied: true } );
-				createNotice(
-					'info',
-					'All content copied.',
-					{
-						isDismissible: true,
-						type: 'snackbar',
-					}
-				);
-			} }
-			onFinishCopy={ () => setState( { hasCopied: false } ) }
-		>
-			{ hasCopied ?
-				__( 'Copied!' ) :
-				__( 'Copy All Content' ) }
-		</ClipboardButton>
+		editedPostContent.length > 0 && (
+			<ClipboardButton
+				text={ editedPostContent }
+				role="menuitem"
+				className="components-menu-item__button"
+				onCopy={ () => {
+					setState( { hasCopied: true } );
+					createNotice(
+						'info',
+						'All content copied.',
+						{
+							isDismissible: true,
+							type: 'snackbar',
+						}
+					);
+				} }
+				onFinishCopy={ () => setState( { hasCopied: false } ) }
+			>
+				{ hasCopied ?
+					__( 'Copied!' ) :
+					__( 'Copy All Content' ) }
+			</ClipboardButton>
+		)
 	);
 }
 
