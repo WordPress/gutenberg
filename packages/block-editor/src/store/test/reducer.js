@@ -679,13 +679,11 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			// This is commented because we have a memory leak in the byClientId and order reduces
-			// When removing blocks with innerBlocks.
-			// expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-			// expect( state.order ).toEqual( {
-			// 	 '': [ 'wings' ],
-			//	 wings: [],
-			// } );
+			expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
+			expect( state.order ).toEqual( {
+				'': [ 'wings' ],
+				wings: [],
+			} );
 			expect( state.parents ).toEqual( {
 				wings: '',
 			} );

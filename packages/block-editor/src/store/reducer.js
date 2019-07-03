@@ -281,16 +281,34 @@ function withIgnoredBlockChange( reducer ) {
  * @return {Function} Enhanced reducer function.
  */
 const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
-	if ( state && action.type === 'REMOVE_BLOCKS' ) {
-		const clientIds = [ ...action.clientIds ];
+	const getAllChildren = ( clientIds ) => {
+		const result = [ ...clientIds ];
 
 		// For each removed client ID, include its inner blocks to remove,
 		// recursing into those so long as inner blocks exist.
-		for ( let i = 0; i < clientIds.length; i++ ) {
-			clientIds.push( ...state.order[ clientIds[ i ] ] );
+		for ( let i = 0; i < result.length; i++ ) {
+			if ( state.order[ result[ i ] ] ) {
+				result.push( ...state.order[ result[ i ] ] );
+			}
 		}
+		return result;
+	};
 
-		action = { ...action, clientIds };
+	if ( state ) {
+		switch ( action.type ) {
+			case 'REMOVE_BLOCKS':
+				action = {
+					...action,
+					removedClientIds: getAllChildren( action.clientIds ),
+				};
+				break;
+			case 'REPLACE_BLOCKS':
+				action = {
+					...action,
+					replacedClientIds: getAllChildren( action.clientIds ),
+				};
+				break;
+		}
 	}
 
 	return reducer( state, action );
@@ -402,69 +420,6 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
-// While technically redundant data as the inverse of `order`, it serves as
-// an optimization for the selectors which derive the ancestry of a block.
-const withBlockParents = ( reducer ) => ( state = {}, action ) => {
-	const newState = reducer( state, action );
-	if ( newState === state ) {
-		return newState;
-	}
-	newState.parents = newState.parents ? newState.parents : {};
-
-	const getAllPreviousChildren = ( clientIds ) => {
-		let children = [];
-		clientIds.forEach( ( clientId ) => {
-			children = children.concat( state.order[ clientId ] );
-		} );
-		return children.length ?
-			clientIds.concat( getAllPreviousChildren( children ) ) :
-			clientIds;
-	};
-
-	switch ( action.type ) {
-		case 'RESET_BLOCKS':
-			newState.parents = mapBlockParents( action.blocks );
-			break;
-		case 'RECEIVE_BLOCKS':
-			newState.parents = {
-				...newState.parents,
-				...mapBlockParents( action.blocks ),
-			};
-			break;
-		case 'INSERT_BLOCKS':
-			newState.parents = {
-				...newState.parents,
-				...mapBlockParents( action.blocks, action.rootClientId || '' ),
-			};
-			break;
-		case 'MOVE_BLOCK_TO_POSITION': {
-			newState.parents = {
-				...newState.parents,
-				[ action.clientId ]: action.toRootClientId || '',
-			};
-			break;
-		}
-		case 'REPLACE_BLOCKS':
-			newState.parents = {
-				...omit( newState.parents, getAllPreviousChildren( action.clientIds ) ),
-				...mapBlockParents( action.blocks, state.parents[ action.clientIds[ 0 ] ] ),
-			};
-			break;
-		case 'REMOVE_BLOCKS':
-			newState.parents = omit( newState.parents, getAllPreviousChildren( action.clientIds ) );
-			break;
-		case 'REPLACE_INNER_BLOCKS':
-			newState.parents = {
-				// Inner blocks removed should be omitted from the state
-				...omit( newState.parents, getAllPreviousChildren( state.order[ action.rootClientId ] ) ),
-				...mapBlockParents( action.blocks, action.rootClientId ),
-			};
-			break;
-	}
-
-	return newState;
-};
-
 /**
  * Reducer returning the blocks state.
  *
@@ -477,7 +432,6 @@ export const blocks = flow(
 	combineReducers,
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
-	withBlockParents,
 	withBlockReset,
 	withSaveReusableBlock,
 	withPersistentBlockChange,
@@ -526,12 +480,12 @@ export const blocks = flow(
 				}
 
 				return {
-					...omit( state, action.clientIds ),
+					...omit( state, action.replacedClientIds ),
 					...getFlattenedBlocksWithoutAttributes( action.blocks ),
 				};
 
 			case 'REMOVE_BLOCKS':
-				return omit( state, action.clientIds );
+				return omit( state, action.removedClientIds );
 		}
 
 		return state;
@@ -602,12 +556,12 @@ export const blocks = flow(
 				}
 
 				return {
-					...omit( state, action.clientIds ),
+					...omit( state, action.replacedClientIds ),
 					...getFlattenedBlockAttributes( action.blocks ),
 				};
 
 			case 'REMOVE_BLOCKS':
-				return omit( state, action.clientIds );
+				return omit( state, action.removedClientIds );
 		}
 
 		return state;
@@ -703,7 +657,7 @@ export const blocks = flow(
 				const mappedBlocks = mapBlockOrder( action.blocks );
 
 				return flow( [
-					( nextState ) => omit( nextState, clientIds ),
+					( nextState ) => omit( nextState, action.replacedClientIds ),
 					( nextState ) => ( {
 						...nextState,
 						...omit( mappedBlocks, '' ),
@@ -730,11 +684,11 @@ export const blocks = flow(
 			case 'REMOVE_BLOCKS':
 				return flow( [
 					// Remove inner block ordering for removed blocks
-					( nextState ) => omit( nextState, action.clientIds ),
+					( nextState ) => omit( nextState, action.removedClientIds ),
 
 					// Remove deleted blocks from other blocks' orderings
 					( nextState ) => mapValues( nextState, ( subState ) => (
-						without( subState, ...action.clientIds )
+						without( subState, ...action.removedClientIds )
 					) ),
 				] )( state );
 		}
@@ -770,21 +724,12 @@ export const blocks = flow(
 
 			case 'REPLACE_BLOCKS':
 				return {
-					// This should include the parents as well to avoid memory leak
-					...omit( state, action.clientIds ),
+					...omit( state, action.replacedClientIds ),
 					...mapBlockParents( action.blocks, state[ action.clientIds[ 0 ] ] ),
 				};
 
 			case 'REMOVE_BLOCKS':
-				// This should include the parents as well to avoid memory leak
-				return omit( state, action.clientIds );
-
-			case 'REPLACE_INNER_BLOCKS':
-				return {
-					// Inner blocks removed should be omitted from the state
-					...state,
-					...mapBlockParents( action.blocks, action.rootClientId ),
-				};
+				return omit( state, action.removedClientIds );
 		}
 
 		return state;
