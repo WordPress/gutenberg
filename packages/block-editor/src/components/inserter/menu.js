@@ -236,8 +236,8 @@ export class InserterMenu extends Component {
 		const reusableItems = filter( filteredItems, { category: 'reusable' } );
 
 		const discoverItems = [ {
-			id: 'boxer-block',
-			name: 'boxer-block',
+			id: 'boxer/boxer',
+			name: 'boxer/boxer',
 			title: 'Boxer',
 			icon: 'archive',
 			description: 'Boxer puts your WordPress posts into boxes.',
@@ -513,6 +513,19 @@ export default compose(
 				const { isAppender } = ownProps;
 				const { name, initialAttributes } = item;
 
+				const handleInsertBlock = ( insertedBlock ) => {
+					const selectedBlock = getSelectedBlock();
+					if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+						replaceBlocks( selectedBlock.clientId, insertedBlock );
+					} else {
+						insertBlock(
+							insertedBlock,
+							getInsertionIndex(),
+							ownProps.destinationRootClientId
+						);
+					}
+				};
+
 				if ( item.assets ) {
 					let scriptsCount = 0;
 					const onLoad = () => {
@@ -522,8 +535,8 @@ export default compose(
 						}
 						const registeredBlocks = getBlockTypes();
 						if ( registeredBlocks.length ) {
-							const block = createBlock( registeredBlocks[ registeredBlocks.length - 1 ].name );
-							insertBlock( block );
+							const block = createBlock( item.name );
+							handleInsertBlock( block );
 						}
 					};
 					if ( item.assets.editor_script ) {
@@ -534,17 +547,8 @@ export default compose(
 						loadStyle( item.assets.style );
 					}
 				} else {
-					const selectedBlock = getSelectedBlock();
 					const insertedBlock = createBlock( name, initialAttributes );
-					if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
-						replaceBlocks( selectedBlock.clientId, insertedBlock );
-					} else {
-						insertBlock(
-							insertedBlock,
-							getInsertionIndex(),
-							ownProps.destinationRootClientId
-						);
-					}
+					handleInsertBlock( insertedBlock );
 				}
 
 				ownProps.onSelect();
