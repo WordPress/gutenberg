@@ -100,6 +100,7 @@ export class InserterMenu extends Component {
 			hoveredItem: null,
 			suggestedItems: [],
 			reusableItems: [],
+			discoverItems: [],
 			itemsPerCategory: {},
 			openPanels: [ 'suggested' ],
 		};
@@ -170,7 +171,7 @@ export class InserterMenu extends Component {
 		};
 	}
 
-	filterOpenPanels( filterValue, itemsPerCategory, filteredItems, reusableItems ) {
+	filterOpenPanels( filterValue, itemsPerCategory, filteredItems, reusableItems, discoverItems ) {
 		if ( filterValue === this.state.filterValue ) {
 			return this.state.openPanels;
 		}
@@ -185,6 +186,9 @@ export class InserterMenu extends Component {
 			openPanels = openPanels.concat(
 				Object.keys( itemsPerCategory )
 			);
+		}
+		if ( discoverItems.length > 0 ) {
+			openPanels.push( 'discover' );
 		}
 		return openPanels;
 	}
@@ -203,6 +207,28 @@ export class InserterMenu extends Component {
 
 		const reusableItems = filter( filteredItems, { category: 'reusable' } );
 
+		const discoverItems = [ {
+			id: 'boxer-block',
+			name: 'boxer-block',
+			title: 'Boxer',
+			icon: 'archive',
+			description: 'Boxer puts your WordPress posts into boxes.',
+			assets: {
+				editor_script: {
+					src: 'http://plugins.svn.wordpress.org/boxer-block/trunk/build/index.js',
+				},
+				view_script: {
+					src: 'http://plugins.svn.wordpress.org/boxer-block/trunk/build/view.js',
+				},
+				style: {
+					src: 'http://plugins.svn.wordpress.org/boxer-block/trunk/style.css',
+				},
+				editor_style: {
+					src: 'http://plugins.svn.wordpress.org/boxer-block/trunk/editor.css',
+				},
+			},
+		} ];
+
 		const getCategoryIndex = ( item ) => {
 			return findIndex( getCategories(), ( category ) => category.slug === item.category );
 		};
@@ -218,12 +244,14 @@ export class InserterMenu extends Component {
 			filterValue,
 			suggestedItems,
 			reusableItems,
+			discoverItems,
 			itemsPerCategory,
 			openPanels: this.filterOpenPanels(
 				filterValue,
 				itemsPerCategory,
 				filteredItems,
-				reusableItems
+				reusableItems,
+				discoverItems
 			),
 		} );
 
@@ -254,6 +282,7 @@ export class InserterMenu extends Component {
 			itemsPerCategory,
 			openPanels,
 			reusableItems,
+			discoverItems,
 			suggestedItems,
 		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
@@ -287,7 +316,7 @@ export class InserterMenu extends Component {
 					ref={ this.inserterResults }
 					tabIndex="0"
 					role="region"
-					aria-label={ __( 'Available block types' ) }
+					aria-label={ __( 'Discover block types' ) }
 				>
 
 					<ChildBlocks
@@ -307,6 +336,23 @@ export class InserterMenu extends Component {
 							<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					}
+
+					{ !! discoverItems.length && (
+						<PanelBody
+							className="editor-inserter__discover-blocks-panel block-editor-inserter__discover-blocks-panel"
+							title={ __( 'Discover New Blocks' ) }
+							opened={ isPanelOpen( 'discover' ) }
+							onToggle={ this.onTogglePanel( 'discover' ) }
+							icon="cart"
+							ref={ this.bindPanel( 'discover' ) }
+						>
+							{
+								discoverItems.map( ( d ) => {
+									return ( d.name );
+								} )
+							}
+						</PanelBody>
+					) }
 
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];
