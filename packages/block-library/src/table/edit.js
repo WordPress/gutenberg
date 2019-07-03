@@ -37,6 +37,7 @@ import {
 	insertColumn,
 	deleteColumn,
 	toggleSection,
+	isEmptyTableSection,
 } from './state';
 import icon from './icon';
 
@@ -241,11 +242,10 @@ export class TableEdit extends Component {
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, columnIndex } = selectedCell;
+		const { columnIndex } = selectedCell;
 
 		this.setState( { selectedCell: null } );
 		setAttributes( insertColumn( attributes, {
-			section,
 			columnIndex: columnIndex + delta,
 		} ) );
 	}
@@ -352,7 +352,7 @@ export class TableEdit extends Component {
 	 * @return {Object} React element for the section.
 	 */
 	renderSection( { type, rows } ) {
-		if ( ! rows.length ) {
+		if ( isEmptyTableSection( rows ) ) {
 			return null;
 		}
 
@@ -416,7 +416,7 @@ export class TableEdit extends Component {
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const { hasFixedLayout, head, body, foot } = attributes;
-		const isEmpty = ! head.length && ! body.length && ! foot.length;
+		const isEmpty = isEmptyTableSection( head ) && isEmptyTableSection( body ) && isEmptyTableSection( foot );
 		const Section = this.renderSection;
 
 		if ( isEmpty ) {

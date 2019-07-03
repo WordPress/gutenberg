@@ -14,6 +14,8 @@ import {
 	insertColumn,
 	deleteColumn,
 	toggleSection,
+	isEmptyTableSection,
+	isEmptyRow,
 } from '../state';
 
 const table = deepFreeze( {
@@ -250,9 +252,46 @@ describe( 'insertRow', () => {
 } );
 
 describe( 'insertColumn', () => {
-	it( 'should insert column', () => {
+	it( 'inserts before existing content by default', () => {
+		const tableWithHead = {
+			head: [
+				{
+					cells: [
+						{
+							content: 'test',
+							tag: 'th',
+						},
+					],
+				},
+			],
+		};
+
+		const state = insertColumn( tableWithHead, {
+			columnIndex: 0,
+		} );
+
+		const expected = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+						{
+							content: 'test',
+							tag: 'th',
+						},
+					],
+				},
+			],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
+
+	it( 'inserts a column for table sections that have existing cells', () => {
 		const state = insertColumn( tableWithContent, {
-			section: 'body',
 			columnIndex: 2,
 		} );
 
@@ -311,7 +350,6 @@ describe( 'insertColumn', () => {
 		};
 
 		const state = insertColumn( tableWithHead, {
-			section: 'head',
 			columnIndex: 1,
 		} );
 
@@ -326,6 +364,230 @@ describe( 'insertColumn', () => {
 						{
 							content: '',
 							tag: 'th',
+						},
+					],
+				},
+			],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
+
+	it( 'avoids adding cells to empty rows', () => {
+		const tableWithHead = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+				{
+					cells: [],
+				},
+			],
+		};
+
+		const state = insertColumn( tableWithHead, {
+			columnIndex: 0,
+		} );
+
+		const expected = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+				{
+					cells: [],
+				},
+			],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
+
+	it( 'adds cells across table sections that already have cells', () => {
+		const tableWithHead = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+			],
+			body: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+			foot: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		const state = insertColumn( tableWithHead, {
+			columnIndex: 1,
+		} );
+
+		const expected = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+			],
+			body: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+			foot: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
+
+	it( 'adds cells only to rows that have enough cells when rows have an unequal number of cells', () => {
+		const tableWithHead = {
+			head: [
+				{
+					cells: [
+						{
+							content: '0',
+							tag: 'th',
+						},
+					],
+				},
+			],
+			body: [
+				{
+					cells: [
+						{
+							content: '0',
+							tag: 'td',
+						},
+						{
+							content: '1',
+							tag: 'td',
+						},
+						{
+							content: '2',
+							tag: 'td',
+						},
+					],
+				},
+			],
+			foot: [
+				{
+					cells: [
+						{
+							content: '0',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		const state = insertColumn( tableWithHead, {
+			columnIndex: 3,
+		} );
+
+		const expected = {
+			head: [
+				{
+					cells: [
+						{
+							content: '0',
+							tag: 'th',
+						},
+					],
+				},
+			],
+			body: [
+				{
+					cells: [
+						{
+							content: '0',
+							tag: 'td',
+						},
+						{
+							content: '1',
+							tag: 'td',
+						},
+						{
+							content: '2',
+							tag: 'td',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+			foot: [
+				{
+					cells: [
+						{
+							content: '0',
+							tag: 'td',
 						},
 					],
 				},
@@ -523,5 +785,76 @@ describe( 'toggleSection', () => {
 		};
 
 		expect( state ).toEqual( expected );
+	} );
+} );
+
+describe( 'isEmptyTableSection', () => {
+	it( 'considers a section empty if it has no rows', () => {
+		const tableSection = [];
+		expect( isEmptyTableSection( tableSection ) ).toBe( true );
+	} );
+
+	it( 'considers a section empty if it has a single row with no cells', () => {
+		const tableSection = [
+			{
+				cells: [],
+			},
+		];
+
+		expect( isEmptyTableSection( tableSection ) ).toBe( true );
+	} );
+
+	it( 'considers a section empty if it has multiple empty rows', () => {
+		const tableSection = [
+			{
+				cells: [],
+			},
+			{
+				cells: [],
+			},
+		];
+
+		expect( isEmptyTableSection( tableSection ) ).toBe( true );
+	} );
+
+	it( 'considers a section not empty if it has a mixture of empty and non-empty rows', () => {
+		const tableSection = [
+			{
+				cells: [],
+			},
+			{
+				cells: [
+					{
+						content: '',
+						tag: 'td',
+					},
+				],
+			},
+		];
+
+		expect( isEmptyTableSection( tableSection ) ).toBe( false );
+	} );
+} );
+
+describe( 'isEmptyRow', () => {
+	it( 'considers a row empty if it has undefined cells', () => {
+		expect( isEmptyRow( {} ) ).toBe( true );
+	} );
+
+	it( 'considers a row empty if it has a zero length array of cells', () => {
+		expect( isEmptyRow( { cells: [] } ) ).toBe( true );
+	} );
+
+	it( 'considers a row not empty if it has a cell', () => {
+		const row = {
+			cells: [
+				{
+					content: '',
+					tag: 'td',
+				},
+			],
+		};
+
+		expect( isEmptyRow( row ) ).toBe( false );
 	} );
 } );

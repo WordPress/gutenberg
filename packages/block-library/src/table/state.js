@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times, get } from 'lodash';
+import { times, get, mapValues, every } from 'lodash';
 
 /**
  * Creates a table state.
@@ -122,21 +122,33 @@ export function deleteRow( state, {
  * @return {Object} New table state.
  */
 export function insertColumn( state, {
-	section,
 	columnIndex,
 } ) {
-	return {
-		[ section ]: state[ section ].map( ( row ) => ( {
-			cells: [
-				...row.cells.slice( 0, columnIndex ),
-				{
-					content: '',
-					tag: section === 'head' ? 'th' : 'td',
-				},
-				...row.cells.slice( columnIndex ),
-			],
-		} ) ),
-	};
+	return mapValues( state, ( section, sectionName ) => {
+		// Bail early if the table section is empty.
+		if ( isEmptyTableSection( section ) ) {
+			return section;
+		}
+
+		return section.map( ( row ) => {
+			// Bail early if the row is empty or it's an attempt to insert past
+			// the last possible index of the array.
+			if ( isEmptyRow( row ) || row.cells.length < columnIndex ) {
+				return row;
+			}
+
+			return {
+				cells: [
+					...row.cells.slice( 0, columnIndex ),
+					{
+						content: '',
+						tag: sectionName === 'head' ? 'th' : 'td',
+					},
+					...row.cells.slice( columnIndex ),
+				],
+			};
+		} );
+	} );
 }
 
 /**
@@ -169,7 +181,7 @@ export function deleteColumn( state, {
  */
 export function toggleSection( state, section ) {
 	// Section exists, replace it with an empty row to remove it.
-	if ( state[ section ] && state[ section ].length ) {
+	if ( ! isEmptyTableSection( state[ section ] ) ) {
 		return { [ section ]: [] };
 	}
 
@@ -178,4 +190,26 @@ export function toggleSection( state, section ) {
 
 	// Section doesn't exist, insert an empty row to create the section.
 	return insertRow( state, { section, rowIndex: 0, columnCount } );
+}
+
+/**
+ * Determines whether a table section is empty.
+ *
+ * @param {Object} sectionRows Table section state.
+ *
+ * @return {boolean} True if the table section is empty, false otherwise.
+ */
+export function isEmptyTableSection( sectionRows ) {
+	return ! sectionRows || ! sectionRows.length || every( sectionRows, isEmptyRow );
+}
+
+/**
+ * Determines whether a table row is empty.
+ *
+ * @param {Object} row Table row state.
+ *
+ * @return {boolean} True if the table section is empty, false otherwise.
+ */
+export function isEmptyRow( row ) {
+	return ! ( row.cells && row.cells.length );
 }
