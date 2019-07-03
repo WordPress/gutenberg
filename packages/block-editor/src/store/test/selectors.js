@@ -19,7 +19,6 @@ import { RawHTML } from '@wordpress/element';
 import * as selectors from '../selectors';
 
 const {
-	getBlockDependantsCacheBust,
 	getBlockName,
 	getBlock,
 	getBlocks,
@@ -136,274 +135,6 @@ describe( 'selectors', () => {
 		setFreeformContentHandlerName( undefined );
 	} );
 
-	describe( 'getBlockDependantsCacheBust', () => {
-		const rootBlock = { clientId: 123, name: 'core/paragraph' };
-		const rootBlockAttributes = {};
-		const rootOrder = [ 123 ];
-
-		it( 'returns an unchanging reference', () => {
-			const rootBlockOrder = [];
-
-			const state = {
-				blocks: {
-					byClientId: {
-						123: rootBlock,
-					},
-					attributes: {
-						123: rootBlockAttributes,
-					},
-					order: {
-						'': rootOrder,
-						123: rootBlockOrder,
-					},
-					parents: {
-						123: '',
-					},
-				},
-			};
-
-			const nextState = {
-				blocks: {
-					byClientId: {
-						123: rootBlock,
-					},
-					attributes: {
-						123: rootBlockAttributes,
-					},
-					order: {
-						'': rootOrder,
-						123: rootBlockOrder,
-					},
-					parents: {
-						123: '',
-					},
-				},
-			};
-
-			expect(
-				getBlockDependantsCacheBust( state, 123 )
-			).toBe( getBlockDependantsCacheBust( nextState, 123 ) );
-		} );
-
-		it( 'returns a new reference on added inner block', () => {
-			const state = {
-				blocks: {
-					byClientId: {
-						123: rootBlock,
-					},
-					attributes: {
-						123: rootBlockAttributes,
-					},
-					order: {
-						'': rootOrder,
-						123: [],
-					},
-					parents: {
-						123: '',
-					},
-				},
-			};
-
-			const nextState = {
-				blocks: {
-					byClientId: {
-						123: rootBlock,
-						456: { clientId: 456, name: 'core/paragraph' },
-					},
-					attributes: {
-						123: rootBlockAttributes,
-						456: {},
-					},
-					order: {
-						'': rootOrder,
-						123: [ 456 ],
-						456: [],
-					},
-					parents: {
-						123: '',
-						456: 123,
-					},
-				},
-			};
-
-			expect(
-				getBlockDependantsCacheBust( state, 123 )
-			).not.toBe( getBlockDependantsCacheBust( nextState, 123 ) );
-		} );
-
-		it( 'returns an unchanging reference on unchanging inner block', () => {
-			const rootBlockOrder = [ 456 ];
-			const childBlock = { clientId: 456, name: 'core/paragraph' };
-			const childBlockAttributes = {};
-			const childBlockOrder = [];
-
-			const state = {
-				blocks: {
-					byClientId: {
-						123: rootBlock,
-						456: childBlock,
-					},
-					attributes: {
-						123: rootBlockAttributes,
-						456: childBlockAttributes,
-					},
-					order: {
-						'': rootOrder,
-						123: rootBlockOrder,
-						456: childBlockOrder,
-					},
-					parents: {
-						123: '',
-						456: 123,
-					},
-				},
-			};
-
-			const nextState = {
-				blocks: {
-					byClientId: {
-						123: rootBlock,
-						456: childBlock,
-					},
-					attributes: {
-						123: rootBlockAttributes,
-						456: childBlockAttributes,
-					},
-					order: {
-						'': rootOrder,
-						123: rootBlockOrder,
-						456: childBlockOrder,
-					},
-					parents: {
-						123: '',
-						456: 123,
-					},
-				},
-			};
-
-			expect(
-				getBlockDependantsCacheBust( state, 123 )
-			).toBe( getBlockDependantsCacheBust( nextState, 123 ) );
-		} );
-
-		it( 'returns a new reference on updated inner block', () => {
-			const rootBlockOrder = [ 456 ];
-			const childBlockOrder = [];
-
-			const state = {
-				blocks: {
-					byClientId: {
-						123: rootBlock,
-						456: { clientId: 456, name: 'core/paragraph' },
-					},
-					attributes: {
-						123: rootBlockAttributes,
-						456: {},
-					},
-					order: {
-						'': rootOrder,
-						123: rootBlockOrder,
-						456: childBlockOrder,
-					},
-					parents: {
-						123: '',
-						456: 123,
-					},
-				},
-			};
-
-			const nextState = {
-				blocks: {
-					byClientId: {
-						123: rootBlock,
-						456: { clientId: 456, name: 'core/paragraph' },
-					},
-					attributes: {
-						123: rootBlockAttributes,
-						456: { content: [ 'foo' ] },
-					},
-					order: {
-						'': rootOrder,
-						123: rootBlockOrder,
-						456: childBlockOrder,
-					},
-					parents: {
-						123: '',
-						456: 123,
-					},
-				},
-			};
-
-			expect(
-				getBlockDependantsCacheBust( state, 123 )
-			).not.toBe( getBlockDependantsCacheBust( nextState, 123 ) );
-		} );
-
-		it( 'returns a new reference on updated grandchild inner block', () => {
-			const rootBlockOrder = [ 456 ];
-			const childBlock = { clientId: 456, name: 'core/paragraph' };
-			const childBlockAttributes = {};
-			const childBlockOrder = [ 789 ];
-			const grandChildBlockOrder = [];
-
-			const state = {
-				blocks: {
-					byClientId: {
-						123: rootBlock,
-						456: childBlock,
-						789: { clientId: 789, name: 'core/paragraph' },
-					},
-					attributes: {
-						123: rootBlockAttributes,
-						456: childBlockAttributes,
-						789: {},
-					},
-					order: {
-						'': rootOrder,
-						123: rootBlockOrder,
-						456: childBlockOrder,
-						789: grandChildBlockOrder,
-					},
-					parents: {
-						123: '',
-						456: 123,
-						789: 456,
-					},
-				},
-			};
-
-			const nextState = {
-				blocks: {
-					byClientId: {
-						123: rootBlock,
-						456: childBlock,
-						789: { clientId: 789, name: 'core/paragraph' },
-					},
-					attributes: {
-						123: rootBlockAttributes,
-						456: childBlockAttributes,
-						789: { content: [ 'foo' ] },
-					},
-					order: {
-						'': rootOrder,
-						123: rootBlockOrder,
-						456: childBlockOrder,
-						789: grandChildBlockOrder,
-					},
-					parents: {
-						123: '',
-						456: 123,
-						789: 456,
-					},
-				},
-			};
-
-			expect(
-				getBlockDependantsCacheBust( state, 123 )
-			).not.toBe( getBlockDependantsCacheBust( nextState, 123 ) );
-		} );
-	} );
-
 	describe( 'getBlockName', () => {
 		it( 'returns null if no block by clientId', () => {
 			const state = {
@@ -465,6 +196,9 @@ describe( 'selectors', () => {
 					parents: {
 						123: '',
 					},
+					cache: {
+						123: {},
+					},
 				},
 			};
 
@@ -483,6 +217,7 @@ describe( 'selectors', () => {
 					attributes: {},
 					order: {},
 					parents: {},
+					cache: {},
 				},
 			};
 
@@ -508,6 +243,10 @@ describe( 'selectors', () => {
 					parents: {
 						123: '',
 						456: 123,
+					},
+					cache: {
+						123: {},
+						456: {},
 					},
 				},
 			};
@@ -561,6 +300,9 @@ describe( 'selectors', () => {
 					parents: {
 						123: '',
 					},
+					cache: {
+						123: {},
+					},
 				},
 			};
 
@@ -595,6 +337,10 @@ describe( 'selectors', () => {
 					parents: {
 						123: '',
 						23: '',
+					},
+					cache: {
+						123: {},
+						23: {},
 					},
 				},
 			};
@@ -1015,6 +761,9 @@ describe( 'selectors', () => {
 					parents: {
 						123: '',
 						23: '',
+					},
+					cache: {
+						23: {},
 					},
 				},
 				blockSelection: { start: { clientId: 23 }, end: { clientId: 23 } },
@@ -2246,6 +1995,7 @@ describe( 'selectors', () => {
 					},
 					order: {},
 					parents: {},
+					cache: {},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -2319,6 +2069,9 @@ describe( 'selectors', () => {
 					parents: {
 						block1ref: '',
 					},
+					cache: {
+						block1ref: {},
+					},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -2384,6 +2137,11 @@ describe( 'selectors', () => {
 						childReferredBlock2: 'referredBlock2',
 						grandchildReferredBlock2: 'childReferredBlock2',
 					},
+					cache: {
+						block2ref: {},
+						childReferredBlock2: {},
+						grandchildReferredBlock2: {},
+					},
 				},
 
 				settings: {
@@ -2428,6 +2186,7 @@ describe( 'selectors', () => {
 					},
 					order: {},
 					parents: {},
+					cache: {},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -2474,6 +2233,12 @@ describe( 'selectors', () => {
 					parents: {
 						block3: '',
 						block4: '',
+					},
+					cache: {
+						block1: {},
+						block2: {},
+						block3: {},
+						block4: {},
 					},
 				},
 				settings: {
@@ -2534,6 +2299,9 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 'block1' ],
 					},
+					cache: {
+						block1: {},
+					},
 				},
 				preferences: {
 					insertUsage: {},
@@ -2553,6 +2321,7 @@ describe( 'selectors', () => {
 					attributes: {},
 					order: {},
 					parents: {},
+					cache: {},
 				},
 				preferences: {
 					insertUsage: {},
@@ -2572,6 +2341,7 @@ describe( 'selectors', () => {
 					attributes: {},
 					order: {},
 					parents: {},
+					cache: {},
 				},
 				preferences: {
 					insertUsage: {
@@ -2601,6 +2371,9 @@ describe( 'selectors', () => {
 					},
 					parents: {
 						block1: '',
+					},
+					cache: {
+						block1: {},
 					},
 				},
 				preferences: {

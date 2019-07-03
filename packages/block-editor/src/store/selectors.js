@@ -73,28 +73,6 @@ const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
 
 /**
- * Returns a new reference when the inner blocks of a given block client ID
- * change. This is used exclusively as a memoized selector dependant, relying
- * on this selector's shared return value and recursively those of its inner
- * blocks defined as dependencies. This abuses mechanics of the selector
- * memoization to return from the original selector function only when
- * dependants change.
- *
- * @param {Object} state    Editor state.
- * @param {string} clientId Block client ID.
- *
- * @return {*} A value whose reference will change only when inner blocks of
- *             the given block client ID change.
- */
-export const getBlockDependantsCacheBust = createSelector(
-	() => [],
-	( state, clientId ) => map(
-		getBlockOrder( state, clientId ),
-		( innerBlockClientId ) => getBlock( state, innerBlockClientId ),
-	),
-);
-
-/**
  * Returns a block's name given its client ID, or null if no block exists with
  * the client ID.
  *
@@ -192,8 +170,7 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, clientId ) => [
-		...getBlockAttributes.getDependants( state, clientId ),
-		getBlockDependantsCacheBust( state, clientId ),
+		state.blocks.cache[ clientId ],
 	]
 );
 

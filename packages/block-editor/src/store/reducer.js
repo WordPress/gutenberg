@@ -13,6 +13,9 @@ import {
 	isEqual,
 	isEmpty,
 	get,
+	identity,
+	difference,
+	omitBy,
 } from 'lodash';
 
 /**
@@ -81,7 +84,7 @@ function mapBlockParents( blocks, rootClientId = '' ) {
  *
  * @return {Object} Flattened object.
  */
-function flattenBlocks( blocks, transform ) {
+function flattenBlocks( blocks, transform = identity ) {
 	const result = {};
 
 	const stack = [ ...blocks ];
@@ -191,6 +194,156 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 		hasSameKeys( action.attributes, lastAction.attributes )
 	);
 }
+
+/**
+ * Higher-order reducer intended to reset the cache key of all blocks
+ * whenever the post meta values change.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withPostMetaUpdateCacheReset = ( reducer ) => ( state, action ) => {
+	const newState = reducer( state, action );
+	const previousMetaValues = get( state, [ 'settings', '__experimentalMetaSource', 'value' ] );
+	const nextMetaValues = get( newState, [ 'settings', '__experimentalMetaSource', 'value' ] );
+	// If post meta values change, reset the cache key for all blocks
+	if ( previousMetaValues !== nextMetaValues ) {
+		newState.blocks = {
+			...newState.blocks,
+			cache: mapValues( newState.blocks.cache, () => ( {} ) ),
+		};
+	}
+
+	return newState;
+};
+
+/**
+ * Higher-order reducer intended to compute a cache key for each block in the post.
+ * A new instance of the cache key (empty object) is created each time the block object
+ * needs to be refreshed (for any change in the block or its children).
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withBlockCache = ( reducer ) => ( state = {}, action ) => {
+	const newState = reducer( state, action );
+	const previousParents = state.parents;
+
+	if ( newState === state ) {
+		return state;
+	}
+	newState.cache = state.cache ? state.cache : {};
+
+	const addParentBlocks = ( clientIds ) => {
+		const result = [];
+		clientIds.forEach( ( clientId ) => {
+			let current = clientId;
+			do {
+				result.push( current );
+				current = previousParents[ current ];
+			} while ( current );
+		} );
+		return result;
+	};
+
+	const fillKeysWithEmptyObject = ( clientIds ) => {
+		return clientIds.reduce( ( ret, key ) => {
+			ret[ key ] = {};
+			return ret;
+		}, {} );
+	};
+
+	switch ( action.type ) {
+		case 'RESET_BLOCKS':
+			newState.cache = mapValues( flattenBlocks( action.blocks ), () => ( {} ) );
+			break;
+		case 'RECEIVE_BLOCKS':
+		case 'INSERT_BLOCKS': {
+			const updatedBlockUids = keys( flattenBlocks( action.blocks ) );
+			if ( action.rootClientId ) {
+				updatedBlockUids.push( action.rootClientId );
+			}
+			newState.cache = {
+				...newState.cache,
+				...fillKeysWithEmptyObject(
+					addParentBlocks( updatedBlockUids ),
+				),
+			};
+			break;
+		}
+		case 'UPDATE_BLOCK':
+		case 'UPDATE_BLOCK_ATTRIBUTES':
+			newState.cache = {
+				...newState.cache,
+				...fillKeysWithEmptyObject(
+					addParentBlocks( [ action.clientId ] ),
+				),
+			};
+			break;
+		case 'REPLACE_BLOCKS':
+			newState.cache = {
+				...omit( newState.cache, action.replacedClientIds ),
+				...fillKeysWithEmptyObject(
+					addParentBlocks( keys( flattenBlocks( action.blocks ) ) ),
+				),
+			};
+			break;
+		case 'REMOVE_BLOCKS':
+			newState.cache = {
+				...omit( newState.cache, action.removedClientIds ),
+				...fillKeysWithEmptyObject(
+					difference( addParentBlocks( action.clientIds ), action.clientIds ),
+				),
+			};
+			break;
+		case 'MOVE_BLOCK_TO_POSITION': {
+			const updatedBlockUids = [ action.clientId ];
+			if ( action.fromRootClientId ) {
+				updatedBlockUids.push( action.fromRootClientId );
+			}
+			if ( action.toRootClientId ) {
+				updatedBlockUids.push( action.toRootClientId );
+			}
+			newState.cache = {
+				...newState.cache,
+				...fillKeysWithEmptyObject(
+					addParentBlocks( updatedBlockUids )
+				),
+			};
+			break;
+		}
+		case 'MOVE_BLOCKS_UP':
+		case 'MOVE_BLOCKS_DOWN': {
+			const updatedBlockUids = [];
+			if ( action.rootClientId ) {
+				updatedBlockUids.push( action.rootClientId );
+			}
+			newState.cache = {
+				...newState.cache,
+				...fillKeysWithEmptyObject(
+					addParentBlocks( updatedBlockUids )
+				),
+			};
+			break;
+		}
+		case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
+			const updatedBlockUids = keys( omitBy( newState.attributes, ( attributes, clientId ) => {
+				return newState.byClientId[ clientId ].name !== 'core/block' || attributes.ref !== action.updatedId;
+			} ) );
+
+			newState.cache = {
+				...newState.cache,
+				...fillKeysWithEmptyObject(
+					addParentBlocks( updatedBlockUids )
+				),
+			};
+		}
+	}
+
+	return newState;
+};
 
 /**
  * Higher-order reducer intended to augment the blocks reducer, assigning an
@@ -350,6 +503,10 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 				...omit( state.parents, visibleClientIds ),
 				...mapBlockParents( action.blocks ),
 			},
+			cache: {
+				...omit( state.cache, visibleClientIds ),
+				...mapValues( flattenBlocks( action.blocks ), () => ( {} ) ),
+			},
 		};
 	}
 
@@ -435,10 +592,11 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
  */
 export const blocks = flow(
 	combineReducers,
+	withSaveReusableBlock, // needs to be before withBlockCache
+	withBlockCache, // needs to be before withInnerBlocksRemoveCascade
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
 	withBlockReset,
-	withSaveReusableBlock,
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
 )( {
@@ -1066,15 +1224,17 @@ export const blockListSettings = ( state = {}, action ) => {
 	return state;
 };
 
-export default combineReducers( {
-	blocks,
-	isTyping,
-	isCaretWithinFormattedText,
-	blockSelection,
-	blocksMode,
-	blockListSettings,
-	insertionPoint,
-	template,
-	settings,
-	preferences,
-} );
+export default withPostMetaUpdateCacheReset(
+	combineReducers( {
+		blocks,
+		isTyping,
+		isCaretWithinFormattedText,
+		blockSelection,
+		blocksMode,
+		blockListSettings,
+		insertionPoint,
+		template,
+		settings,
+		preferences,
+	} )
+);
