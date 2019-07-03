@@ -308,6 +308,11 @@ class Experimental_WP_Widget_Blocks_Manager {
 	}
 
 	/**
+	 * Noop block widget control output function for the necessary call to `wp_register_widget_control`.
+	 */
+	public static function output_blocks_widget_control() {}
+
+	/**
 	 * Registers a widget that should represent a set of blocks and returns its ID.
 	 *
 	 * @param array $blocks Array of blocks.
@@ -333,7 +338,7 @@ class Experimental_WP_Widget_Blocks_Manager {
 		wp_register_widget_control(
 			$widget_id,
 			__( 'Blocks Area', 'gutenberg' ),
-			'echo',
+			'Experimental_WP_Widget_Blocks_Manager::output_blocks_widget_control',
 			array( 'id_base' => 'blocks-widget' )
 		);
 		return $widget_id;
