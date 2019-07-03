@@ -6,13 +6,13 @@ commands:
       - restore_cache:
           name: Restore Yarn Cache
           keys:
-            - yarn-i18n-v1-{{ arch }}-{{ checksum "yarn.lock" }}
+            - yarn-i18n-v1-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
           command: yarn install --frozen-lockfile --prefer-offline
       - save_cache:
           name: Save Yarn Cache
-          key: yarn-i18n-v1-{{ arch }}-{{ checksum "yarn.lock" }}
+          key: yarn-i18n-v1-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - i18n-cache/data
