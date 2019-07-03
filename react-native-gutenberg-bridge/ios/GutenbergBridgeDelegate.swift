@@ -19,6 +19,32 @@ public enum LogLevel: Int {
     case info
     case warn
     case error
+    case fatal
+}
+
+// Avoid possible future problems due to log level int value changes.
+extension LogLevel {
+    init (_ rnLogLevel: RCTLogLevel) {
+        switch rnLogLevel {
+        case .trace: self = .trace
+        case .info: self = .info
+        case .warning: self = .warn
+        case .error: self = .error
+        case .fatal: self = .fatal
+        }
+    }
+}
+
+extension RCTLogLevel {
+    init(_ logLevel: LogLevel) {
+        switch logLevel {
+        case .trace: self = .trace
+        case .info: self = .info
+        case .warn: self = .warning
+        case .error: self = .error
+        case .fatal: self = .fatal
+        }
+    }
 }
 
 public protocol GutenbergBridgeDelegate: class {

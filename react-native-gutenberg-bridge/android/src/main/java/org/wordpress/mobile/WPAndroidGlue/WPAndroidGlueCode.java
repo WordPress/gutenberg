@@ -130,7 +130,13 @@ public class WPAndroidGlueCode {
                 // This code is called twice. When getTitle and getContent are called.
                 // Make sure mContentChanged has the correct value (true) if one of the call returned with changes.
                 mContentChanged = mContentChanged || changed;
-                mGetContentCountDownLatch.countDown();
+
+                // Gutenberg mobile sends us html response even without we asking for it so, check if the latch is there.
+                //  This is probably an indication of a bug on the RN side of things though.
+                //  Related: https://github.com/WordPress/gutenberg/pull/16260#issuecomment-506727286
+                if (mGetContentCountDownLatch != null) {
+                    mGetContentCountDownLatch.countDown();
+                }
             }
 
             @Override
