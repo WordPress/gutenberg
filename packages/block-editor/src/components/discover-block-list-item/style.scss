@@ -1,0 +1,51 @@
+.block-editor-discover-blocks-list__list-item {
+	width: 100%;
+	padding: 0 4px;
+	margin: 0 0 12px;
+	width: 100%;
+}
+
+.discover-blocks-list__item {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	font-size: $default-font-size;
+	color: $dark-gray-700;
+	padding: 0;
+	align-items: flex-start;
+	justify-content: center;
+	cursor: pointer;
+	background: transparent;
+	word-break: break-word;
+	border-radius: $radius-round-rectangle;
+	border: $border-width solid transparent;
+	transition: all 0.05s ease-in-out;
+	@include reduce-motion("transition");
+	position: relative;
+	text-align: left;
+}
+
+.discover-blocks-list__item-icon {
+	.block-editor-block-icon {
+		width: 48px;
+		height: 48px;
+		font-size: 48px;
+		background-color: $light-gray-300;
+	}
+}
+
+.discover-blocks-list__item-panel {
+	display: flex;
+	flex-grow: 1;
+	flex-direction: column;
+	margin-left: 1.5em;
+}
+
+.discover-blocks-list__item-title {
+	font-weight: 600;
+}
+
+.discover-blocks-list__item-description {
+	color: $dark-gray-400;
+	margin-top: 4px;
+}

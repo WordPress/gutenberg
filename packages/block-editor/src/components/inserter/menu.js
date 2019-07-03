@@ -40,6 +40,7 @@ import { addQueryArgs } from '@wordpress/url';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
+import DiscoverBlocksList from '../discover-blocks-list';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -346,11 +347,7 @@ export class InserterMenu extends Component {
 							icon="cart"
 							ref={ this.bindPanel( 'discover' ) }
 						>
-							{
-								discoverItems.map( ( d ) => {
-									return ( d.name );
-								} )
-							}
+							<DiscoverBlocksList items={ discoverItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					) }
 
