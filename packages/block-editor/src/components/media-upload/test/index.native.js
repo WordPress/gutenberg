@@ -98,7 +98,7 @@ describe( 'MediaUpload component', () => {
 		expect( requestFunction ).toHaveBeenCalledTimes( 1 );
 
 		expect( onSelectURL ).toHaveBeenCalledTimes( 1 );
-		expect( onSelectURL ).toHaveBeenCalledWith( MEDIA_ID, MEDIA_URL, option );
+		expect( onSelectURL ).toHaveBeenCalledWith( MEDIA_ID, MEDIA_URL );
 	};
 
 	it( 'can select media from device library', () => {

@@ -25,7 +25,6 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MEDIA_TYPE_VIDEO,
-	MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY,
 	RichText,
 	BlockControls,
 	InspectorControls,
@@ -86,7 +85,11 @@ class VideoEdit extends React.Component {
 		}
 	}
 
-	updateMediaProgress() {
+	updateMediaProgress( payload ) {
+		const { setAttributes } = this.props;
+		if ( payload.mediaUrl ) {
+			setAttributes( { url: payload.mediaUrl } );
+		}
 		if ( ! this.state.isUploadInProgress ) {
 			this.setState( { isUploadInProgress: true } );
 		}
@@ -110,12 +113,9 @@ class VideoEdit extends React.Component {
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	onSelectMediaUploadOption( mediaId, mediaUrl, choice ) {
+	onSelectMediaUploadOption( mediaId, mediaUrl ) {
 		const { setAttributes } = this.props;
-		if ( choice === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
-			setAttributes( { src: mediaUrl } );
-		}
-		setAttributes( { id: mediaId } );
+		setAttributes( { id: mediaId, src: mediaUrl } );
 	}
 
 	onVideoContanerLayout( event ) {
