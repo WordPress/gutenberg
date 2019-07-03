@@ -255,6 +255,23 @@ export class InserterMenu extends Component {
 					src: 'http://plugins.svn.wordpress.org/boxer-block/trunk/editor.css',
 				},
 			},
+		}, {
+			id: 'lez-library/listicles',
+			name: 'lez-library/listicles',
+			title: 'Listicle',
+			icon: 'excerpt-view',
+			description: 'A block for listicles. You can add items, remove them, and flip them in reverse.',
+			assets: {
+				editor_script: {
+					src: 'http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.build.js',
+				},
+				style: {
+					src: 'http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.style.build.css',
+				},
+				editor_style: {
+					src: 'http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.editor.build.css',
+				},
+			},
 		} ];
 
 		const getCategoryIndex = ( item ) => {
