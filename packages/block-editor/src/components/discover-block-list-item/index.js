@@ -42,7 +42,7 @@ function DiscoverBlockListItem( {
 					className="discover-blocks-list__item-icon"
 					style={ itemIconStyle }
 				>
-					<BlockIcon icon={ icon } showColors size={ 24 } />
+					<BlockIcon icon={ icon } showColors size={ 48 } />
 				</span>
 				<div className="discover-blocks-list__item-panel">
 					<span className="discover-blocks-list__item-title">
