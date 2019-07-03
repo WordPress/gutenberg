@@ -9,7 +9,7 @@ import { noop } from 'lodash';
 import { Fragment } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
-import { switchToBlockType, getGroupingBlockName } from '@wordpress/blocks';
+import { switchToBlockType } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -55,6 +55,10 @@ export default compose( [
 			canInsertBlockType,
 		} = select( 'core/block-editor' );
 
+		const {
+			getGroupingBlockName,
+		} = select( 'core/blocks' );
+
 		const groupingBlockName = getGroupingBlockName();
 
 		const groupingBlockAvailable = canInsertBlockType( groupingBlockName );
@@ -81,14 +85,13 @@ export default compose( [
 			isGroupable,
 			isUngroupable,
 			blocksSelection,
+			groupingBlockName,
 		};
 	} ),
-	withDispatch( ( dispatch, { clientIds, onToggle = noop, blocksSelection = [] } ) => {
+	withDispatch( ( dispatch, { clientIds, onToggle = noop, blocksSelection = [], groupingBlockName } ) => {
 		const {
 			replaceBlocks,
 		} = dispatch( 'core/block-editor' );
-
-		const groupingBlockName = getGroupingBlockName();
 
 		return {
 			onConvertToGroup() {
