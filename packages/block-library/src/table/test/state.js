@@ -689,6 +689,144 @@ describe( 'deleteColumn', () => {
 
 		expect( state ).toEqual( expected );
 	} );
+
+	it( 'deletes columns across table sections', () => {
+		const tableWithOneColumn = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+			],
+			body: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+				{
+					cells: [
+						{
+							content: 'test',
+							tag: 'td',
+						},
+					],
+				},
+			],
+			foot: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+		const state = deleteColumn( tableWithOneColumn, {
+			section: 'body',
+			columnIndex: 0,
+		} );
+
+		const expected = {
+			head: [],
+			body: [],
+			foot: [],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
+
+	it( 'deletes columns across table sections when there are missing columns', () => {
+		const tableWithOneColumn = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+			],
+			body: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+			foot: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		const state = deleteColumn( tableWithOneColumn, {
+			section: 'body',
+			columnIndex: 1,
+		} );
+
+		const expected = {
+			head: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'th',
+						},
+					],
+				},
+			],
+			body: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+			foot: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		expect( state ).toEqual( expected );
+	} );
 } );
 
 describe( 'toggleSection', () => {

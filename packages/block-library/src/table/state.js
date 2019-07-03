@@ -161,14 +161,18 @@ export function insertColumn( state, {
  * @return {Object} New table state.
  */
 export function deleteColumn( state, {
-	section,
 	columnIndex,
 } ) {
-	return {
-		[ section ]: state[ section ].map( ( row ) => ( {
-			cells: row.cells.filter( ( cell, index ) => index !== columnIndex ),
-		} ) ).filter( ( row ) => row.cells.length ),
-	};
+	return mapValues( state, ( section ) => {
+		// Bail early if the table section is empty.
+		if ( isEmptyTableSection( section ) ) {
+			return section;
+		}
+
+		return section.map( ( row ) => ( {
+			cells: row.cells.length >= columnIndex ? row.cells.filter( ( cell, index ) => index !== columnIndex ) : row.cells,
+		} ) ).filter( ( row ) => row.cells.length );
+	} );
 }
 
 /**
