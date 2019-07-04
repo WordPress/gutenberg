@@ -363,7 +363,7 @@ export class TableEdit extends Component {
 			<Tag>
 				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
-						{ cells.map( ( { content, tag: CellTag }, columnIndex ) => {
+						{ cells.map( ( { content, tag: CellTag, scope }, columnIndex ) => {
 							const isSelected = selectedCell && (
 								type === selectedCell.section &&
 								rowIndex === selectedCell.rowIndex &&
@@ -382,6 +382,7 @@ export class TableEdit extends Component {
 								<CellTag
 									key={ columnIndex }
 									className={ cellClasses }
+									scope={ CellTag === 'th' ? scope : undefined }
 								>
 									<RichText
 										className="wp-block-table__cell-content"
