@@ -93,11 +93,13 @@ describe( 'effects', () => {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'chicken' },
+				innerBlocks: [],
 			};
 			const blockB = {
 				clientId: 'ribs',
 				name: 'core/test-block',
 				attributes: { content: 'ribs' },
+				innerBlocks: [],
 			};
 			selectors.getBlock = ( state, clientId ) => {
 				return blockA.clientId === clientId ? blockA : blockB;
@@ -155,11 +157,13 @@ describe( 'effects', () => {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'chicken' },
+				innerBlocks: [],
 			};
 			const blockB = {
 				clientId: 'ribs',
 				name: 'core/test-block-2',
 				attributes: { content: 'ribs' },
+				innerBlocks: [],
 			};
 			selectors.getBlock = ( state, clientId ) => {
 				return blockA.clientId === clientId ? blockA : blockB;
@@ -220,11 +224,13 @@ describe( 'effects', () => {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: { content: 'chicken' },
+				innerBlocks: [],
 			};
 			const blockB = {
 				clientId: 'ribs',
 				name: 'core/test-block-2',
 				attributes: { content2: 'ribs' },
+				innerBlocks: [],
 			};
 			selectors.getBlock = ( state, clientId ) => {
 				return blockA.clientId === clientId ? blockA : blockB;
