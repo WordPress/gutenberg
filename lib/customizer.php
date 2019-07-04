@@ -41,7 +41,7 @@ function gutenberg_customize_sanitize( $value ) {
  * Adds a section to the Customizer for editing widgets with Gutenberg.
  *
  * @param \WP_Customize_Manager $wp_customize An instance of the class that controls most of the Theme Customization API for WordPress 3.4 and newer.
- * @since 6.0.0
+ * @since 6.1.0
  */
 function gutenberg_customize_register( $wp_customize ) {
 	require dirname( __FILE__ ) . '/class-wp-customize-widget-blocks-control.php';
@@ -59,14 +59,16 @@ function gutenberg_customize_register( $wp_customize ) {
 		'gutenberg_widget_blocks',
 		array( 'title' => __( 'Widget Blocks (Experimental)', 'gutenberg' ) )
 	);
-	$wp_customize->add_control( new WP_Customize_Widget_Blocks_Control(
-		$wp_customize,
-		'gutenberg_widget_blocks',
-		array(
-			'section'  => 'gutenberg_widget_blocks',
-			'settings' => 'gutenberg_widget_blocks',
+	$wp_customize->add_control(
+		new WP_Customize_Widget_Blocks_Control(
+			$wp_customize,
+			'gutenberg_widget_blocks',
+			array(
+				'section'  => 'gutenberg_widget_blocks',
+				'settings' => 'gutenberg_widget_blocks',
+			)
 		)
-	) );
+	);
 }
 add_action( 'customize_register', 'gutenberg_customize_register' );
 
