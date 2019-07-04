@@ -68,7 +68,7 @@ export default compose( [
 		const isSingleGroupingBlock = blocksSelection.length === 1 && blocksSelection[ 0 ] && blocksSelection[ 0 ].name === groupingBlockName;
 
 		// Do we have
-		// 1. Container block available to be inserted?
+		// 1. Grouping block available to be inserted?
 		// 2. One or more blocks selected
 		// (we allow single Blocks to become groups unless
 		// they are a soltiary group block themselves)
@@ -79,7 +79,7 @@ export default compose( [
 		);
 
 		// Do we have a single Group Block selected and does that group have inner blocks?
-		const isUngroupable = isSingleContainerBlock && !! blocksSelection[ 0 ].innerBlocks.length;
+		const isUngroupable = isSingleGroupingBlock && !! blocksSelection[ 0 ].innerBlocks.length;
 
 		return {
 			isGroupable,
