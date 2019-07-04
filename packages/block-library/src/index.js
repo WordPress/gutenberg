@@ -64,6 +64,7 @@ import * as classic from './classic';
 
 // Top-level template blocks.
 import * as postTitle from './post-title';
+import * as postContent from './post-content';
 
 /**
  * Function to register core blocks provided by the block editor.
@@ -130,6 +131,7 @@ export const registerCoreBlocks = () => {
 
 		// Register top-level template blocks.
 		postTitle,
+		postContent,
 	].forEach( ( block ) => {
 		if ( ! block ) {
 			return;
