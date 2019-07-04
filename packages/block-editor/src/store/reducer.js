@@ -205,8 +205,8 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
  */
 const withPostMetaUpdateCacheReset = ( reducer ) => ( state, action ) => {
 	const newState = reducer( state, action );
-	const previousMetaValues = get( state, [ 'settings', '__experimentalMetaSource', 'value' ] );
-	const nextMetaValues = get( newState, [ 'settings', '__experimentalMetaSource', 'value' ] );
+	const previousMetaValues = get( state.settings.__experimentalMetaSource, [ 'value' ] );
+	const nextMetaValues = get( newState.settings.__experimentalMetaSource, [ 'value' ] );
 	// If post meta values change, reset the cache key for all blocks
 	if ( previousMetaValues !== nextMetaValues ) {
 		newState.blocks = {
@@ -229,7 +229,6 @@ const withPostMetaUpdateCacheReset = ( reducer ) => ( state, action ) => {
  */
 const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 	const newState = reducer( state, action );
-	const previousParents = state.parents;
 
 	if ( newState === state ) {
 		return state;
@@ -237,21 +236,20 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 	newState.cache = state.cache ? state.cache : {};
 
 	const addParentBlocks = ( clientIds ) => {
-		const result = [];
-		clientIds.forEach( ( clientId ) => {
+		return clientIds.reduce( ( result, clientId ) => {
 			let current = clientId;
 			do {
 				result.push( current );
-				current = previousParents[ current ];
+				current = state.parents[ current ];
 			} while ( current );
-		} );
-		return result;
+			return result;
+		}, [] );
 	};
 
 	const fillKeysWithEmptyObject = ( clientIds ) => {
-		return clientIds.reduce( ( ret, key ) => {
-			ret[ key ] = {};
-			return ret;
+		return clientIds.reduce( ( result, key ) => {
+			result[ key ] = {};
+			return result;
 		}, {} );
 	};
 
