@@ -23,7 +23,6 @@
 // When the block switcher does not have any transformations, we show it but as disabled.
 // The background and opacity change helps make the icon legible, despite being disabled.
 .components-button.block-editor-block-switcher__no-switcher-icon:disabled {
-	background: $light-gray-200;
 	border-radius: 0;
 	opacity: 0.84;
 
@@ -32,6 +31,7 @@
 	// and should be overridden when disabled.
 	.block-editor-block-icon.has-colors {
 		color: $dark-gray-500 !important;
+		background: $light-gray-200 !important;
 	}
 }
 
