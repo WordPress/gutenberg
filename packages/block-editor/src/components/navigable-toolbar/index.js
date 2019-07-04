@@ -65,6 +65,12 @@ class NavigableToolbar extends Component {
 		if ( this.props.focusOnMount ) {
 			this.focusToolbar();
 		}
+
+		this.toolbar.current.addEventListener( 'keydown', this.switchOnKeyDown );
+	}
+
+	componentwillUnmount() {
+		this.toolnar.current.removeEventListener( 'keydown', this.switchOnKeyDown );
 	}
 
 	render() {
@@ -74,7 +80,6 @@ class NavigableToolbar extends Component {
 				orientation="horizontal"
 				role="toolbar"
 				ref={ this.toolbar }
-				onKeyDown={ this.switchOnKeyDown }
 				{ ...omit( props, [
 					'focusOnMount',
 				] ) }
