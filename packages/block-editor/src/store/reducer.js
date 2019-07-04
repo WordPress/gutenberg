@@ -983,6 +983,25 @@ export const blockListSettings = ( state = {}, action ) => {
 	return state;
 };
 
+/**
+ * Reducer returning an array of discover blocks.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const discoverBlocks = ( state = { items: [] }, action ) => {
+	switch ( action.type ) {
+		case 'SET_DISCOVER_BLOCKS' :
+			return {
+				...state,
+				items: action.discoverBlocks,
+			};
+	}
+	return state;
+};
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -994,4 +1013,5 @@ export default combineReducers( {
 	template,
 	settings,
 	preferences,
+	discoverBlocks,
 } );

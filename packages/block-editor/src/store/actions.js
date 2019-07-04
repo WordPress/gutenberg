@@ -705,3 +705,11 @@ export function __unstableMarkLastChangeAsPersistent() {
 	return { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' };
 }
 
+/** Returns an action object used in signalling that the discover blocks have been updated.
+ * @param {Array} discoverBlocks Discoverable blocks.
+ *
+ * @return {Object} Action object.
+ */
+export function setDiscoverBlocks( discoverBlocks ) {
+	return { type: 'SET_DISCOVER_BLOCKS', discoverBlocks };
+}

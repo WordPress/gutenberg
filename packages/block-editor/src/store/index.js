@@ -10,6 +10,7 @@ import reducer from './reducer';
 import applyMiddlewares from './middlewares';
 import * as selectors from './selectors';
 import * as actions from './actions';
+import resolvers from './resolvers';
 import controls from './controls';
 
 /**
@@ -29,6 +30,7 @@ export const storeConfig = {
 	selectors,
 	actions,
 	controls,
+	resolvers,
 };
 
 const store = registerStore( MODULE_KEY, {

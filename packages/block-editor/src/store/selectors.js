@@ -1481,3 +1481,14 @@ function getPostMeta( state, key ) {
 function getReusableBlocks( state ) {
 	return get( state, [ 'settings', '__experimentalReusableBlocks' ], EMPTY_ARRAY );
 }
+
+/**
+ * Returns the available uninstalled blocks
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} Discoverable blocks
+ */
+export function getDiscoverBlocks( state ) {
+	return state.discoverBlocks.items;
+}

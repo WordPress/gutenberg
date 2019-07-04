@@ -223,6 +223,7 @@ export class InserterMenu extends Component {
 
 	filter( filterValue = '' ) {
 		const { debouncedSpeak, items, rootChildBlocks } = this.props;
+
 		const filteredItems = searchItems( items, filterValue );
 
 		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
@@ -235,44 +236,7 @@ export class InserterMenu extends Component {
 
 		const reusableItems = filter( filteredItems, { category: 'reusable' } );
 
-		const discoverItems = [ {
-			id: 'boxer/boxer',
-			name: 'boxer/boxer',
-			title: 'Boxer',
-			icon: 'archive',
-			description: 'Boxer puts your WordPress posts into boxes.',
-			assets: {
-				editor_script: {
-					src: 'http://plugins.svn.wordpress.org/boxer-block/trunk/build/index.js',
-				},
-				view_script: {
-					src: 'http://plugins.svn.wordpress.org/boxer-block/trunk/build/view.js',
-				},
-				style: {
-					src: 'http://plugins.svn.wordpress.org/boxer-block/trunk/style.css',
-				},
-				editor_style: {
-					src: 'http://plugins.svn.wordpress.org/boxer-block/trunk/editor.css',
-				},
-			},
-		}, {
-			id: 'lez-library/listicles',
-			name: 'lez-library/listicles',
-			title: 'Listicle',
-			icon: 'excerpt-view',
-			description: 'A block for listicles. You can add items, remove them, and flip them in reverse.',
-			assets: {
-				editor_script: {
-					src: 'http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.build.js',
-				},
-				style: {
-					src: 'http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.style.build.css',
-				},
-				editor_style: {
-					src: 'http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.editor.build.css',
-				},
-			},
-		} ];
+		const discoverItems = filter( filteredItems, { category: 'discover' } );
 
 		const getCategoryIndex = ( item ) => {
 			return findIndex( getCategories(), ( category ) => category.slug === item.category );
@@ -453,6 +417,7 @@ export default compose(
 			getBlockName,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
+			getDiscoverBlocks,
 		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
@@ -467,9 +432,13 @@ export default compose(
 		}
 		const destinationRootBlockName = getBlockName( destinationRootClientId );
 
+		let items = getInserterItems( destinationRootClientId );
+		const discoverBlocks = getDiscoverBlocks();
+		items = items.concat( discoverBlocks );
+
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-			items: getInserterItems( destinationRootClientId ),
+			items,
 			destinationRootClientId,
 		};
 	} ),
