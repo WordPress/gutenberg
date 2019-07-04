@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	PostTitle,
-	VisualEditorGlobalKeyboardShortcuts,
-} from '@wordpress/editor';
+import { VisualEditorGlobalKeyboardShortcuts } from '@wordpress/editor';
 import {
 	WritingFlow,
 	ObserveTyping,
@@ -30,7 +27,6 @@ function VisualEditor() {
 			<WritingFlow>
 				<ObserveTyping>
 					<CopyHandler>
-						<PostTitle />
 						<BlockList />
 					</CopyHandler>
 				</ObserveTyping>
