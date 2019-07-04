@@ -1,22 +1,15 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component, createRef, useMemo } from '@wordpress/element';
 import {
-	ExternalLink,
-	IconButton,
 	ToggleControl,
 	withSpokenMessages,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { getRectangleFromRange } from '@wordpress/dom';
-import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
+import { prependHTTP } from '@wordpress/url';
 import {
 	create,
 	insert,
@@ -25,7 +18,7 @@ import {
 	getTextContent,
 	slice,
 } from '@wordpress/rich-text';
-import { URLInput, URLPopover } from '@wordpress/block-editor';
+import { URLPopover } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -37,45 +30,6 @@ const stopKeyPropagation = ( event ) => event.stopPropagation();
 function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
 }
-
-const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocompleteRef } ) => (
-	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-	<form
-		className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
-		onKeyPress={ stopKeyPropagation }
-		onKeyDown={ onKeyDown }
-		onSubmit={ submitLink }
-	>
-		<URLInput
-			value={ value }
-			onChange={ onChangeInputValue }
-			autocompleteRef={ autocompleteRef }
-		/>
-		<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-	</form>
-	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-);
-
-const LinkViewerUrl = ( { url } ) => {
-	const prependedURL = prependHTTP( url );
-	const linkClassName = classnames( 'editor-format-toolbar__link-container-value block-editor-format-toolbar__link-container-value', {
-		'has-invalid-link': ! isValidHref( prependedURL ),
-	} );
-
-	if ( ! url ) {
-		return <span className={ linkClassName }></span>;
-	}
-
-	return (
-		<ExternalLink
-			className={ linkClassName }
-			href={ url }
-		>
-			{ filterURLForDisplay( safeDecodeURI( url ) ) }
-		</ExternalLink>
-	);
-};
 
 const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
 	const anchorRect = useMemo( () => {
@@ -109,21 +63,6 @@ const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
 	}
 
 	return <URLPopover anchorRect={ anchorRect } { ...props } />;
-};
-
-const LinkViewer = ( { url, editLink } ) => {
-	return (
-		// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		<div
-			className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
-			onKeyPress={ stopKeyPropagation }
-		>
-			<LinkViewerUrl url={ url } />
-			<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
-		</div>
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
-	);
 };
 
 class InlineLinkUI extends Component {
@@ -271,17 +210,22 @@ class InlineLinkUI extends Component {
 				) }
 			>
 				{ showInput ? (
-					<LinkEditor
+					<URLPopover.__experimentalLinkEditor
+						className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 						value={ inputValue }
 						onChangeInputValue={ this.onChangeInputValue }
 						onKeyDown={ this.onKeyDown }
-						submitLink={ this.submitLink }
+						onKeyPress={ stopKeyPropagation }
+						onSubmit={ this.submitLink }
 						autocompleteRef={ this.autocompleteRef }
 					/>
 				) : (
-					<LinkViewer
+					<URLPopover.__experimentalLinkViewer
+						className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
+						onKeyPress={ stopKeyPropagation }
 						url={ url }
 						editLink={ this.editLink }
+						linkClassName={ isValidHref( prependHTTP( url ) ) ? undefined : 'has-invalid-link' }
 					/>
 				) }
 			</URLPopoverAtLink>

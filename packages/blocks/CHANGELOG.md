@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fixes
+
+- The `'blocks.registerBlockType'` filter is now applied to each of a block's deprecated settings as well as the block's main settings. Ensures `supports` settings like `anchor` work for deprecations.
+
 ## 6.3.0 (2019-05-21)
 
 ### New Feature
