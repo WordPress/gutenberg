@@ -458,11 +458,11 @@ export function getSelectedBlock( state ) {
  *
  * @return {?string} Root client ID, if exists
  */
-export const getBlockRootClientId = ( state, clientId ) => {
+export function getBlockRootClientId( state, clientId ) {
 	return state.blocks.parents[ clientId ] !== undefined ?
 		state.blocks.parents[ clientId ] :
 		null;
-};
+}
 
 /**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -472,7 +472,7 @@ export const getBlockRootClientId = ( state, clientId ) => {
  *
  * @return {string} Root client ID
  */
-export const getBlockHierarchyRootClientId = ( state, clientId ) => {
+export function getBlockHierarchyRootClientId( state, clientId ) {
 	let current = clientId;
 	let parent;
 	do {
@@ -480,7 +480,7 @@ export const getBlockHierarchyRootClientId = ( state, clientId ) => {
 		current = state.blocks.parents[ current ];
 	} while ( current );
 	return parent;
-};
+}
 
 /**
  * Returns the client ID of the block adjacent one at the given reference

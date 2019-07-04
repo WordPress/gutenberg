@@ -282,15 +282,19 @@ function withIgnoredBlockChange( reducer ) {
  */
 const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
 	const getAllChildren = ( clientIds ) => {
-		const result = [ ...clientIds ];
-
-		// For each removed client ID, include its inner blocks to remove,
-		// recursing into those so long as inner blocks exist.
+		let result = clientIds;
 		for ( let i = 0; i < result.length; i++ ) {
-			if ( state.order[ result[ i ] ] ) {
-				result.push( ...state.order[ result[ i ] ] );
+			if ( ! state.order[ result[ i ] ] ) {
+				continue;
 			}
+
+			if ( result === clientIds ) {
+				result = [ ...result ];
+			}
+
+			result.push( ...state.order[ result[ i ] ] );
 		}
+
 		return result;
 	};
 
