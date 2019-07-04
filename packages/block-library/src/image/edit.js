@@ -261,7 +261,7 @@ const ImageURLInputUI = ( {
 	);
 };
 
-class ImageEdit extends Component {
+export class ImageEdit extends Component {
 	constructor( { attributes } ) {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
@@ -357,11 +357,23 @@ class ImageEdit extends Component {
 			isEditing: false,
 		} );
 
+		const { id, url } = this.props.attributes;
+		let additionalAttributes;
+		// Reset the dimension attributes if changing to a different image.
+		if ( ! media.id || media.id !== id ) {
+			additionalAttributes = {
+				width: undefined,
+				height: undefined,
+				sizeSlug: DEFAULT_SIZE_SLUG,
+			};
+		} else {
+			// Keep the same url when selecting the same file, so "Image Size" option is not changed.
+			additionalAttributes = { url };
+		}
+
 		this.props.setAttributes( {
 			...pickRelevantMediaFiles( media ),
-			width: undefined,
-			height: undefined,
-			sizeSlug: DEFAULT_SIZE_SLUG,
+			...additionalAttributes,
 		} );
 	}
 
