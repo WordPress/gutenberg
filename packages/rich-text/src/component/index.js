@@ -156,7 +156,12 @@ class RichText extends Component {
 			}
 
 			this.editableRef = node;
+
+			// This uses a native event listener because WritingFlow uses native event listener as well
+			// Event bubbling won't work properly otherwise between the two components.
+			this.editableRef.addEventListener( 'keydown', this.onKeyDown );
 		} else {
+			this.editableRef.removeEventListener( 'keydown', this.onKeyDown );
 			delete this.editableRef;
 		}
 	}
@@ -1052,7 +1057,6 @@ class RichText extends Component {
 					onPaste={ this.onPaste }
 					onInput={ this.onInput }
 					onCompositionEnd={ this.onCompositionEnd }
-					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onMouseDown={ this.onPointerDown }
