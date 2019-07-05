@@ -72,7 +72,7 @@ export default compose(
 		return {
 			isCollapsed: isCollapsed || ! isLargeViewport || (
 				! getSettings().hasFixedToolbar &&
-				getBlockRootClientId( clientId )
+				!! getBlockRootClientId( clientId )
 			),
 		};
 	} ),
