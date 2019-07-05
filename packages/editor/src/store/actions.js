@@ -73,6 +73,16 @@ export function* setupEditor( post, edits, template ) {
 }
 
 /**
+ * Returns an action object signalling that the editor is being destroyed and
+ * that any necessary state or side-effect cleanup should occur.
+ *
+ * @return {Object} Action object.
+ */
+export function tearDownEditor() {
+	return { type: 'TEAR_DOWN_EDITOR' };
+}
+
+/**
  * Action generator function used in signalling that sources are to be updated
  * in response to a single block attributes update.
  *

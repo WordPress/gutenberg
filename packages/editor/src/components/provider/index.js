@@ -131,6 +131,10 @@ class EditorProvider extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		this.props.tearDownEditor();
+	}
+
 	render() {
 		const {
 			canUserUseUnfilteredHTML,
@@ -199,6 +203,7 @@ export default compose( [
 			resetEditorBlocks,
 			updateEditorSettings,
 			updateBlockSources,
+			tearDownEditor,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
@@ -209,6 +214,7 @@ export default compose( [
 			resetEditorBlocks,
 			updateEditorSettings,
 			updateBlockSources,
+			tearDownEditor,
 			resetEditorBlocksWithoutUndoLevel( blocks ) {
 				resetEditorBlocks( blocks, {
 					__unstableShouldCreateUndoLevel: false,
