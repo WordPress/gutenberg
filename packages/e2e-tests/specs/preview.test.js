@@ -70,8 +70,10 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 	);
 
 	if ( isChecked !== shouldBeChecked ) {
-		const navigationCompleted = page.waitForNavigation();
 		await checkboxHandle.click();
+		const [ saveButton ] = await page.$x( '//button[text()="Save & Reload"]' );
+		const navigationCompleted = page.waitForNavigation();
+		saveButton.click();
 		await navigationCompleted;
 		return;
 	}
