@@ -303,12 +303,14 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
 			case 'REMOVE_BLOCKS':
 				action = {
 					...action,
+					type: 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN',
 					removedClientIds: getAllChildren( action.clientIds ),
 				};
 				break;
 			case 'REPLACE_BLOCKS':
 				action = {
 					...action,
+					type: 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN',
 					replacedClientIds: getAllChildren( action.clientIds ),
 				};
 				break;
@@ -478,7 +480,7 @@ export const blocks = flow(
 					...getFlattenedBlocksWithoutAttributes( action.blocks ),
 				};
 
-			case 'REPLACE_BLOCKS':
+			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				if ( ! action.blocks ) {
 					return state;
 				}
@@ -488,7 +490,7 @@ export const blocks = flow(
 					...getFlattenedBlocksWithoutAttributes( action.blocks ),
 				};
 
-			case 'REMOVE_BLOCKS':
+			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				return omit( state, action.removedClientIds );
 		}
 
@@ -554,7 +556,7 @@ export const blocks = flow(
 					...getFlattenedBlockAttributes( action.blocks ),
 				};
 
-			case 'REPLACE_BLOCKS':
+			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				if ( ! action.blocks ) {
 					return state;
 				}
@@ -564,7 +566,7 @@ export const blocks = flow(
 					...getFlattenedBlockAttributes( action.blocks ),
 				};
 
-			case 'REMOVE_BLOCKS':
+			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				return omit( state, action.removedClientIds );
 		}
 
@@ -652,7 +654,7 @@ export const blocks = flow(
 				};
 			}
 
-			case 'REPLACE_BLOCKS': {
+			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
 				const { clientIds } = action;
 				if ( ! action.blocks ) {
 					return state;
@@ -685,7 +687,7 @@ export const blocks = flow(
 				] )( state );
 			}
 
-			case 'REMOVE_BLOCKS':
+			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				return flow( [
 					// Remove inner block ordering for removed blocks
 					( nextState ) => omit( nextState, action.removedClientIds ),
@@ -726,13 +728,13 @@ export const blocks = flow(
 				};
 			}
 
-			case 'REPLACE_BLOCKS':
+			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				return {
 					...omit( state, action.replacedClientIds ),
 					...mapBlockParents( action.blocks, state[ action.clientIds[ 0 ] ] ),
 				};
 
-			case 'REMOVE_BLOCKS':
+			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				return omit( state, action.removedClientIds );
 		}
 
