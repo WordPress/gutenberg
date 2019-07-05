@@ -205,7 +205,7 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
  */
 const withPostMetaUpdateCacheReset = ( reducer ) => ( state, action ) => {
 	const newState = reducer( state, action );
-	const previousMetaValues = get( state.settings.__experimentalMetaSource, [ 'value' ] );
+	const previousMetaValues = get( state, [ 'settings', '__experimentalMetaSource', 'value' ] );
 	const nextMetaValues = get( newState.settings.__experimentalMetaSource, [ 'value' ] );
 	// If post meta values change, reset the cache key for all blocks
 	if ( previousMetaValues !== nextMetaValues ) {
