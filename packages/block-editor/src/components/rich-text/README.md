@@ -41,9 +41,9 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 *Optional.* Called when the block can be removed. `forward` is true when the selection is expected to move to the next block, false to the previous block.
 
-### `formattingControls: Array`
+### `withoutInteractiveFormatting: Boolean`
 
-*Optional.* By default, all formatting controls are present. This setting can be used to fine-tune formatting controls. Possible items: `[ 'bold', 'italic', 'strikethrough', 'link' ]`.
+*Optional.* By default, all formatting controls are present. This setting can be used to remove formatting controls that would make content [interactive](https://html.spec.whatwg.org/multipage/dom.html#interactive-content). This is useful if you want to make content that is already interactive editable.
 
 ### `isSelected: Boolean`
 
