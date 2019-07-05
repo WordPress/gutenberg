@@ -9,28 +9,31 @@ import { select } from '@wordpress/data-controls';
 import { editPost } from '../actions';
 
 /**
- * Store control which, given an array of blocks, modifies block entries which
- * source from meta properties to assign the attribute values.
+ * Store control invoked upon a state changes, responsible for returning an
+ * object of dependencies. When a change in dependencies occurs (by shallow
+ * equality of the returned object), blocks are reset to apply the new sourced
+ * value.
  *
- * @param {WPBlock[]} blocks Blocks array.
- *
- * @yield  {Object}    Yielded action objects or store controls.
- * @return {WPBlock[]} Modified blocks array.
+ * @yield {Object} Optional yielded controls.
+ * @return {Object} Dependencies as object.
  */
-export function* applyAll( blocks ) {
-	const meta = yield select( 'core/editor', 'getEditedPostAttribute', 'meta' );
+export function* getDependencies() {
+	return {
+		meta: yield select( 'core/editor', 'getEditedPostAttribute', 'meta' ),
+	};
+}
 
-	for ( let i = 0; i < blocks.length; i++ ) {
-		const block = blocks[ i ];
-		const blockType = yield select( 'core/blocks', 'getBlockType', block.name );
-		for ( const [ attributeName, schema ] of Object.entries( blockType.attributes ) ) {
-			if ( schema.source === 'meta' ) {
-				blocks[ i ].attributes[ attributeName ] = meta[ schema.meta ];
-			}
-		}
-	}
-
-	return blocks;
+/**
+ * Given an attribute schema and dependencies data, returns a source value.
+ *
+ * @param {Object} schema            Block type attribute schema.
+ * @param {Object} dependencies      Source dependencies.
+ * @param {Object} dependencies.meta Post meta.
+ *
+ * @return {Object} Block attribute value.
+ */
+export function apply( schema, { meta } ) {
+	return meta[ schema.meta ];
 }
 
 /**

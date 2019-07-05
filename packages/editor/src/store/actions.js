@@ -13,6 +13,7 @@ import {
 	parse,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -32,7 +33,60 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import { awaitNextStateChange } from './controls';
 import * as sources from './block-sources';
+
+/**
+ * Given a blocks array, returns a blocks array with sourced attribute values
+ * applied. The reference will remain consistent with the original argument if
+ * no attribute values must be overridden. If sourced values are applied, the
+ * return value will be a modified copy of the original array.
+ *
+ * @param {WPBlock[]} blocks Original blocks array.
+ *
+ * @return {WPBlock[]} Blocks array with sourced values applied.
+ */
+function* getBlocksWithSourcedAttributes( blocks ) {
+	let workingBlocks = blocks;
+	for ( let i = 0; i < blocks.length; i++ ) {
+		const block = blocks[ i ];
+		const blockType = yield select( 'core/blocks', 'getBlockType', block.name );
+
+		for ( const [ attributeName, schema ] of Object.entries( blockType.attributes ) ) {
+			if ( ! sources[ schema.source ] || ! sources[ schema.source ].apply ) {
+				continue;
+			}
+
+			// TODO: This should ideally leverage the `subscribeSources` cache,
+			// or at worst at least be cached here one-per-source.
+			const dependencies = yield* sources[ schema.source ].getDependencies();
+
+			const sourcedAttributeValue = sources[ schema.source ].apply( schema, dependencies );
+
+			// It's only necessary to apply the value if it differs from the
+			// block's locally-assigned value, to avoid needlessly resetting
+			// the block editor.
+			if ( sourcedAttributeValue === block.attributes[ attributeName ] ) {
+				continue;
+			}
+
+			// Create a shallow clone to mutate, leaving the original intact.
+			if ( workingBlocks === blocks ) {
+				workingBlocks = [ ...workingBlocks ];
+			}
+
+			workingBlocks.splice( i, 1, {
+				...block,
+				attributes: {
+					...block.attributes,
+					[ attributeName ]: sourcedAttributeValue,
+				},
+			} );
+		}
+	}
+
+	return workingBlocks;
+}
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -70,6 +124,7 @@ export function* setupEditor( post, edits, template ) {
 
 	yield setupEditorState( post );
 	yield resetEditorBlocks( blocks );
+	yield* subscribeSources();
 }
 
 /**
@@ -81,6 +136,50 @@ export function* setupEditor( post, edits, template ) {
 export function tearDownEditor() {
 	return { type: 'TEAR_DOWN_EDITOR' };
 }
+
+/**
+ * Returns an action generator which loops to await the next state change,
+ * calling to reset blocks when a block source dependencies change.
+ *
+ * @yield {Object} Action object.
+ */
+export const subscribeSources = ( () => {
+	const lastDependencies = new WeakMap();
+
+	return function* () {
+		while ( true ) {
+			yield awaitNextStateChange();
+
+			// The bailout case: If the editor becomes unmounted, it will flag
+			// itself as non-ready. Effectively unsubscribes from the registry.
+			const isStillReady = yield select( 'core/editor', '__unstableIsEditorReady' );
+			if ( ! isStillReady ) {
+				break;
+			}
+
+			let reset = false;
+			for ( const source of Object.values( sources ) ) {
+				if ( ! source.getDependencies ) {
+					continue;
+				}
+
+				const dependencies = yield* source.getDependencies();
+				if ( ! isShallowEqual( dependencies, lastDependencies.get( source ) ) ) {
+					// Allow the loop to continue in order to assign latest
+					// dependencies values, but mark for reset. Avoid reset
+					// from the first assignment.
+					reset = reset || lastDependencies.has( source );
+
+					lastDependencies.set( source, dependencies );
+				}
+			}
+
+			if ( reset ) {
+				yield resetEditorBlocks( yield select( 'core/editor', 'getEditorBlocks' ) );
+			}
+		}
+	};
+} )();
 
 /**
  * Action generator function used in signalling that sources are to be updated
@@ -762,21 +861,9 @@ export function unlockPostSaving( lockName ) {
  * @return {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
-	for ( const source in Object.values( sources ) ) {
-		if ( typeof source.applyAll === 'function' ) {
-			blocks = yield* source.applyAll( blocks );
-		}
-
-		if ( typeof source.apply === 'function' ) {
-			for ( let i = 0; i < blocks.length; i++ ) {
-				blocks[ i ] = yield* source.apply( blocks[ i ] );
-			}
-		}
-	}
-
 	return {
 		type: 'RESET_EDITOR_BLOCKS',
-		blocks,
+		blocks: yield* getBlocksWithSourcedAttributes( blocks ),
 		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
 	};
 }
