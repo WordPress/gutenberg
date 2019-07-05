@@ -1070,47 +1070,47 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockHierarchyRootClientId( state, 56 ) ).toBe( 56 );
+			expect( getBlockHierarchyRootClientId( state, '56' ) ).toBe( '56' );
 		} );
 
 		it( 'should return root ClientId relative the block ClientId', () => {
 			const state = {
 				blocks: {
 					order: {
-						'': [ 123, 23 ],
-						123: [ 456, 56 ],
+						'': [ 'a', 'b' ],
+						a: [ 'c', 'd' ],
 					},
 					parents: {
-						123: '',
-						23: '',
-						456: 123,
-						56: 123,
+						a: '',
+						b: '',
+						c: 'a',
+						d: 'a',
 					},
 				},
 			};
 
-			expect( getBlockHierarchyRootClientId( state, 56 ) ).toBe( 123 );
+			expect( getBlockHierarchyRootClientId( state, 'c' ) ).toBe( 'a' );
 		} );
 
 		it( 'should return the top level root ClientId relative the block ClientId', () => {
 			const state = {
 				blocks: {
 					order: {
-						'': [ '123', '23' ],
-						123: [ '456', '56' ],
-						56: [ '12' ],
+						'': [ 'a', 'b' ],
+						a: [ 'c', 'd' ],
+						d: [ 'e' ],
 					},
 					parents: {
-						123: '',
-						23: '',
-						456: 123,
-						56: 123,
-						12: 56,
+						a: '',
+						b: '',
+						c: 'a',
+						d: 'a',
+						e: 'd',
 					},
 				},
 			};
 
-			expect( getBlockHierarchyRootClientId( state, '12' ) ).toBe( 123 );
+			expect( getBlockHierarchyRootClientId( state, 'e' ) ).toBe( 'a' );
 		} );
 	} );
 
