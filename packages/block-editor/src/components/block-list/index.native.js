@@ -40,6 +40,7 @@ export class BlockList extends Component {
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
+		this.getNewBlockInsertionIndex = this.getNewBlockInsertionIndex.bind( this );
 
 		this.state = {
 			blockTypePickerVisible: false,
@@ -69,10 +70,20 @@ export class BlockList extends Component {
 			// do replace here
 			this.props.replaceBlock( this.props.selectedBlockClientId, newBlock );
 		} else {
-			const indexAfterSelected = this.props.selectedBlockOrder + 1;
-			const insertionIndex = indexAfterSelected || this.props.blockCount;
-			this.props.insertBlock( newBlock, insertionIndex );
+			this.props.insertBlock( newBlock, this.getNewBlockInsertionIndex() );
 		}
+	}
+
+	getNewBlockInsertionIndex() {
+		if ( this.props.isPostTitleSelected ) {
+			// if post title selected, insert at top of post
+			return 0;
+		} else if ( this.props.selectedBlockOrder === -1 ) {
+			// if no block selected, insert at end of post
+			return this.blockCount;
+		}
+		// insert after selected block
+		return this.props.selectedBlockOrder + 1;
 	}
 
 	blockHolderBorderStyle() {
