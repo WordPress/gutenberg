@@ -156,6 +156,9 @@ describe( 'selectors', () => {
 						'': rootOrder,
 						123: rootBlockOrder,
 					},
+					parents: {
+						123: '',
+					},
 				},
 			};
 
@@ -170,6 +173,9 @@ describe( 'selectors', () => {
 					order: {
 						'': rootOrder,
 						123: rootBlockOrder,
+					},
+					parents: {
+						123: '',
 					},
 				},
 			};
@@ -192,6 +198,9 @@ describe( 'selectors', () => {
 						'': rootOrder,
 						123: [],
 					},
+					parents: {
+						123: '',
+					},
 				},
 			};
 
@@ -209,6 +218,10 @@ describe( 'selectors', () => {
 						'': rootOrder,
 						123: [ 456 ],
 						456: [],
+					},
+					parents: {
+						123: '',
+						456: 123,
 					},
 				},
 			};
@@ -239,6 +252,10 @@ describe( 'selectors', () => {
 						123: rootBlockOrder,
 						456: childBlockOrder,
 					},
+					parents: {
+						123: '',
+						456: 123,
+					},
 				},
 			};
 
@@ -256,6 +273,10 @@ describe( 'selectors', () => {
 						'': rootOrder,
 						123: rootBlockOrder,
 						456: childBlockOrder,
+					},
+					parents: {
+						123: '',
+						456: 123,
 					},
 				},
 			};
@@ -284,6 +305,10 @@ describe( 'selectors', () => {
 						123: rootBlockOrder,
 						456: childBlockOrder,
 					},
+					parents: {
+						123: '',
+						456: 123,
+					},
 				},
 			};
 
@@ -301,6 +326,10 @@ describe( 'selectors', () => {
 						'': rootOrder,
 						123: rootBlockOrder,
 						456: childBlockOrder,
+					},
+					parents: {
+						123: '',
+						456: 123,
 					},
 				},
 			};
@@ -335,6 +364,11 @@ describe( 'selectors', () => {
 						456: childBlockOrder,
 						789: grandChildBlockOrder,
 					},
+					parents: {
+						123: '',
+						456: 123,
+						789: 456,
+					},
 				},
 			};
 
@@ -356,6 +390,11 @@ describe( 'selectors', () => {
 						456: childBlockOrder,
 						789: grandChildBlockOrder,
 					},
+					parents: {
+						123: '',
+						456: 123,
+						789: 456,
+					},
 				},
 			};
 
@@ -372,6 +411,7 @@ describe( 'selectors', () => {
 					byClientId: {},
 					attributes: {},
 					order: {},
+					parents: {},
 				},
 			};
 
@@ -396,6 +436,9 @@ describe( 'selectors', () => {
 						'': [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': [],
 					},
+					parents: {
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': '',
+					},
 				},
 			};
 
@@ -419,6 +462,9 @@ describe( 'selectors', () => {
 						'': [ 123 ],
 						123: [],
 					},
+					parents: {
+						123: '',
+					},
 				},
 			};
 
@@ -436,6 +482,7 @@ describe( 'selectors', () => {
 					byClientId: {},
 					attributes: {},
 					order: {},
+					parents: {},
 				},
 			};
 
@@ -457,6 +504,10 @@ describe( 'selectors', () => {
 						'': [ 123 ],
 						123: [ 456 ],
 						456: [],
+					},
+					parents: {
+						123: '',
+						456: 123,
 					},
 				},
 			};
@@ -507,6 +558,9 @@ describe( 'selectors', () => {
 						'': [ 123 ],
 						123: [],
 					},
+					parents: {
+						123: '',
+					},
 				},
 			};
 
@@ -537,6 +591,10 @@ describe( 'selectors', () => {
 					},
 					order: {
 						'': [ 123, 23 ],
+					},
+					parents: {
+						123: '',
+						23: '',
 					},
 				},
 			};
@@ -602,6 +660,20 @@ describe( 'selectors', () => {
 						'uuid-24': [ 'uuid-26', 'uuid-28' ],
 						'uuid-26': [ ],
 						'uuid-28': [ 'uuid-30' ],
+					},
+					parents: {
+						'uuid-6': '',
+						'uuid-8': '',
+						'uuid-10': '',
+						'uuid-22': '',
+						'uuid-12': 'uuid-10',
+						'uuid-14': 'uuid-10',
+						'uuid-16': 'uuid-12',
+						'uuid-18': 'uuid-14',
+						'uuid-24': 'uuid-18',
+						'uuid-26': 'uuid-24',
+						'uuid-28': 'uuid-24',
+						'uuid-30': 'uuid-28',
 					},
 				},
 			};
@@ -673,6 +745,20 @@ describe( 'selectors', () => {
 						'uuid-26': [ ],
 						'uuid-28': [ 'uuid-30' ],
 					},
+					parents: {
+						'uuid-6': '',
+						'uuid-8': '',
+						'uuid-10': '',
+						'uuid-22': '',
+						'uuid-12': 'uuid-10',
+						'uuid-14': 'uuid-10',
+						'uuid-16': 'uuid-12',
+						'uuid-18': 'uuid-14',
+						'uuid-24': 'uuid-18',
+						'uuid-26': 'uuid-24',
+						'uuid-28': 'uuid-24',
+						'uuid-30': 'uuid-28',
+					},
 				},
 			};
 			expect( getClientIdsWithDescendants( state ) ).toEqual( [
@@ -729,6 +815,11 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 123 ],
 						123: [ 456, 789 ],
+					},
+					parents: {
+						123: '',
+						456: 123,
+						789: 123,
 					},
 				},
 			};
@@ -788,6 +879,10 @@ describe( 'selectors', () => {
 				order: {
 					'': [ 123, 456 ],
 				},
+				parents: {
+					123: '',
+					456: '',
+				},
 			},
 		};
 
@@ -805,6 +900,7 @@ describe( 'selectors', () => {
 					byClientId: {},
 					attributes: {},
 					order: {},
+					parents: {},
 				},
 			};
 			expect( getGlobalBlockCount( emptyState ) ).toBe( 0 );
@@ -862,6 +958,10 @@ describe( 'selectors', () => {
 						23: [],
 						123: [],
 					},
+					parents: {
+						23: '',
+						123: '',
+					},
 				},
 				blockSelection: { start: {}, end: {} },
 			};
@@ -884,6 +984,10 @@ describe( 'selectors', () => {
 						'': [ 23, 123 ],
 						23: [],
 						123: [],
+					},
+					parents: {
+						123: '',
+						23: '',
 					},
 				},
 				blockSelection: { start: { clientId: 23 }, end: { clientId: 123 } },
@@ -908,6 +1012,10 @@ describe( 'selectors', () => {
 						23: [],
 						123: [],
 					},
+					parents: {
+						123: '',
+						23: '',
+					},
 				},
 				blockSelection: { start: { clientId: 23 }, end: { clientId: 23 } },
 			};
@@ -926,6 +1034,7 @@ describe( 'selectors', () => {
 			const state = {
 				blocks: {
 					order: {},
+					parents: {},
 				},
 			};
 
@@ -939,10 +1048,16 @@ describe( 'selectors', () => {
 						'': [ 123, 23 ],
 						123: [ 456, 56 ],
 					},
+					parents: {
+						123: '',
+						23: '',
+						456: 123,
+						56: 123,
+					},
 				},
 			};
 
-			expect( getBlockRootClientId( state, 56 ) ).toBe( '123' );
+			expect( getBlockRootClientId( state, 56 ) ).toBe( 123 );
 		} );
 	} );
 
@@ -951,37 +1066,51 @@ describe( 'selectors', () => {
 			const state = {
 				blocks: {
 					order: {},
+					parents: {},
 				},
 			};
 
-			expect( getBlockHierarchyRootClientId( state, 56 ) ).toBe( 56 );
+			expect( getBlockHierarchyRootClientId( state, '56' ) ).toBe( '56' );
 		} );
 
 		it( 'should return root ClientId relative the block ClientId', () => {
 			const state = {
 				blocks: {
 					order: {
-						'': [ 123, 23 ],
-						123: [ 456, 56 ],
+						'': [ 'a', 'b' ],
+						a: [ 'c', 'd' ],
+					},
+					parents: {
+						a: '',
+						b: '',
+						c: 'a',
+						d: 'a',
 					},
 				},
 			};
 
-			expect( getBlockHierarchyRootClientId( state, 56 ) ).toBe( '123' );
+			expect( getBlockHierarchyRootClientId( state, 'c' ) ).toBe( 'a' );
 		} );
 
 		it( 'should return the top level root ClientId relative the block ClientId', () => {
 			const state = {
 				blocks: {
 					order: {
-						'': [ '123', '23' ],
-						123: [ '456', '56' ],
-						56: [ '12' ],
+						'': [ 'a', 'b' ],
+						a: [ 'c', 'd' ],
+						d: [ 'e' ],
+					},
+					parents: {
+						a: '',
+						b: '',
+						c: 'a',
+						d: 'a',
+						e: 'd',
 					},
 				},
 			};
 
-			expect( getBlockHierarchyRootClientId( state, '12' ) ).toBe( '123' );
+			expect( getBlockHierarchyRootClientId( state, 'e' ) ).toBe( 'a' );
 		} );
 	} );
 
@@ -991,6 +1120,10 @@ describe( 'selectors', () => {
 				blocks: {
 					order: {
 						'': [ 123, 23 ],
+					},
+					parents: {
+						123: '',
+						23: '',
 					},
 				},
 				blockSelection: { start: {}, end: {} },
@@ -1005,6 +1138,13 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
 					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
+					},
 				},
 				blockSelection: { start: { clientId: 2 }, end: { clientId: 2 } },
 			};
@@ -1017,6 +1157,13 @@ describe( 'selectors', () => {
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
+					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
 					},
 				},
 				blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
@@ -1031,6 +1178,17 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
 						4: [ 9, 8, 7, 6 ],
+					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
+						6: 4,
+						7: 4,
+						8: 4,
+						9: 4,
 					},
 				},
 				blockSelection: { start: { clientId: 7 }, end: { clientId: 9 } },
@@ -1047,6 +1205,10 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 123, 23 ],
 					},
+					parents: {
+						23: '',
+						123: '',
+					},
 				},
 				blockSelection: { start: {}, end: {} },
 			};
@@ -1059,6 +1221,13 @@ describe( 'selectors', () => {
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
+					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
 					},
 				},
 				blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
@@ -1073,6 +1242,17 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
 						4: [ 9, 8, 7, 6 ],
+					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
+						6: 4,
+						7: 4,
+						8: 4,
+						9: 4,
 					},
 				},
 				blockSelection: { start: { clientId: 7 }, end: { clientId: 9 } },
@@ -1089,6 +1269,7 @@ describe( 'selectors', () => {
 					byClientId: {},
 					attributes: {},
 					order: {},
+					parents: {},
 				},
 				blockSelection: { start: {}, end: {} },
 			};
@@ -1142,6 +1323,10 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 123, 23 ],
 					},
+					parents: {
+						23: '',
+						123: '',
+					},
 				},
 			};
 
@@ -1154,6 +1339,11 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 123, 23 ],
 						123: [ 456 ],
+					},
+					parents: {
+						23: '',
+						123: '',
+						456: 123,
 					},
 				},
 			};
@@ -1169,6 +1359,10 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 123, 23 ],
 					},
+					parents: {
+						23: '',
+						123: '',
+					},
 				},
 			};
 
@@ -1181,6 +1375,12 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 123, 23 ],
 						123: [ 456, 56 ],
+					},
+					parents: {
+						23: '',
+						123: '',
+						56: 123,
+						456: 123,
 					},
 				},
 			};
@@ -1196,6 +1396,10 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 123, 23 ],
 					},
+					parents: {
+						23: '',
+						123: '',
+					},
 				},
 			};
 
@@ -1209,6 +1413,12 @@ describe( 'selectors', () => {
 						'': [ 123, 23 ],
 						123: [ 456, 56 ],
 					},
+					parents: {
+						23: '',
+						123: '',
+						456: 123,
+						56: 123,
+					},
 				},
 			};
 
@@ -1220,6 +1430,10 @@ describe( 'selectors', () => {
 				blocks: {
 					order: {
 						'': [ 123, 23 ],
+					},
+					parents: {
+						23: '',
+						123: '',
 					},
 				},
 			};
@@ -1233,6 +1447,12 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 123, 23 ],
 						123: [ 456, 56 ],
+					},
+					parents: {
+						23: '',
+						123: '',
+						456: 123,
+						56: 123,
 					},
 				},
 			};
@@ -1248,6 +1468,10 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 123, 23 ],
 					},
+					parents: {
+						23: '',
+						123: '',
+					},
 				},
 			};
 
@@ -1261,6 +1485,12 @@ describe( 'selectors', () => {
 						'': [ 123, 23 ],
 						123: [ 456, 56 ],
 					},
+					parents: {
+						23: '',
+						123: '',
+						456: 123,
+						56: 123,
+					},
 				},
 			};
 
@@ -1272,6 +1502,10 @@ describe( 'selectors', () => {
 				blocks: {
 					order: {
 						'': [ 123, 23 ],
+					},
+					parents: {
+						23: '',
+						123: '',
 					},
 				},
 			};
@@ -1285,6 +1519,12 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 123, 23 ],
 						123: [ 456, 56 ],
+					},
+					parents: {
+						23: '',
+						123: '',
+						456: 123,
+						56: 123,
 					},
 				},
 			};
@@ -1327,6 +1567,11 @@ describe( 'selectors', () => {
 					order: {
 						4: [ 3, 2, 1 ],
 					},
+					parents: {
+						1: 4,
+						2: 4,
+						3: 4,
+					},
 				},
 			};
 
@@ -1340,6 +1585,11 @@ describe( 'selectors', () => {
 					order: {
 						4: [ 3, 2, 1 ],
 					},
+					parents: {
+						1: 4,
+						2: 4,
+						3: 4,
+					},
 				},
 			};
 
@@ -1351,6 +1601,13 @@ describe( 'selectors', () => {
 				blocks: {
 					order: {
 						6: [ 5, 4, 3, 2, 1 ],
+					},
+					parents: {
+						1: 6,
+						2: 6,
+						3: 6,
+						4: 6,
+						5: 6,
 					},
 				},
 				blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
@@ -1364,6 +1621,12 @@ describe( 'selectors', () => {
 					order: {
 						3: [ 2, 1 ],
 						6: [ 5, 4 ],
+					},
+					parents: {
+						1: 3,
+						2: 3,
+						4: 6,
+						5: 6,
 					},
 				},
 				blockSelection: { start: { clientId: 5 }, end: { clientId: 4 } },
@@ -1380,6 +1643,13 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
 					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
+					},
 				},
 			};
 
@@ -1392,6 +1662,13 @@ describe( 'selectors', () => {
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
+					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
 					},
 				},
 			};
@@ -1406,6 +1683,13 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
 					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
+					},
 				},
 			};
 
@@ -1418,6 +1702,13 @@ describe( 'selectors', () => {
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
+					},
+					parents: {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
 					},
 				},
 			};
@@ -1467,6 +1758,13 @@ describe( 'selectors', () => {
 				order: {
 					'': [ 5, 4, 3, 2, 1 ],
 				},
+				parents: {
+					1: '',
+					2: '',
+					3: '',
+					4: '',
+					5: '',
+				},
 			},
 			blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
 		};
@@ -1485,6 +1783,13 @@ describe( 'selectors', () => {
 			blocks: {
 				order: {
 					'': [ 5, 4, 3, 2, 1 ],
+				},
+				parents: {
+					1: '',
+					2: '',
+					3: '',
+					4: '',
+					5: '',
 				},
 			},
 			blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
@@ -1598,6 +1903,10 @@ describe( 'selectors', () => {
 						clientId1: [ 'clientId2' ],
 						clientId2: [],
 					},
+					parents: {
+						clientId1: '',
+						clientId2: 'clientId1',
+					},
 				},
 				insertionPoint: {
 					rootClientId: undefined,
@@ -1627,6 +1936,9 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 'clientId1' ],
 						clientId1: [],
+					},
+					parents: {
+						clientId1: '',
 					},
 				},
 				insertionPoint: null,
@@ -1658,6 +1970,10 @@ describe( 'selectors', () => {
 						clientId1: [ 'clientId2' ],
 						clientId2: [],
 					},
+					parents: {
+						clientId1: '',
+						clientId2: 'clientId1',
+					},
 				},
 				insertionPoint: null,
 			};
@@ -1688,6 +2004,10 @@ describe( 'selectors', () => {
 						clientId1: [],
 						clientId2: [],
 					},
+					parents: {
+						clientId1: '',
+						clientId2: '',
+					},
 				},
 				insertionPoint: null,
 			};
@@ -1717,6 +2037,10 @@ describe( 'selectors', () => {
 						'': [ 'clientId1', 'clientId2' ],
 						clientId1: [],
 						clientId2: [],
+					},
+					parents: {
+						clientId1: '',
+						clientId2: '',
 					},
 				},
 				insertionPoint: null,
@@ -1921,6 +2245,7 @@ describe( 'selectors', () => {
 						block1: {},
 					},
 					order: {},
+					parents: {},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -1991,6 +2316,9 @@ describe( 'selectors', () => {
 					order: {
 						'': [ 'block1ref' ],
 					},
+					parents: {
+						block1ref: '',
+					},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -2051,6 +2379,11 @@ describe( 'selectors', () => {
 						referredBlock2: [ 'childReferredBlock2' ],
 						childReferredBlock2: [ 'grandchildReferredBlock2' ],
 					},
+					parents: {
+						block2ref: '',
+						childReferredBlock2: 'referredBlock2',
+						grandchildReferredBlock2: 'childReferredBlock2',
+					},
 				},
 
 				settings: {
@@ -2094,6 +2427,7 @@ describe( 'selectors', () => {
 						block2: {},
 					},
 					order: {},
+					parents: {},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -2136,6 +2470,10 @@ describe( 'selectors', () => {
 					},
 					order: {
 						'': [ 'block3', 'block4' ],
+					},
+					parents: {
+						block3: '',
+						block4: '',
 					},
 				},
 				settings: {
@@ -2214,6 +2552,7 @@ describe( 'selectors', () => {
 					byClientId: {},
 					attributes: {},
 					order: {},
+					parents: {},
 				},
 				preferences: {
 					insertUsage: {},
@@ -2232,6 +2571,7 @@ describe( 'selectors', () => {
 					byClientId: {},
 					attributes: {},
 					order: {},
+					parents: {},
 				},
 				preferences: {
 					insertUsage: {
@@ -2258,6 +2598,9 @@ describe( 'selectors', () => {
 					},
 					order: {
 						'': [ 'block1' ],
+					},
+					parents: {
+						block1: '',
 					},
 				},
 				preferences: {
