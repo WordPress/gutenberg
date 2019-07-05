@@ -56,10 +56,10 @@ class SlotComponent extends Component {
 	}
 
 	render() {
-		const { children, name, bubblesVirtually = false, fillProps = {}, getFills, ...props } = this.props;
+		const { children, name, bubblesVirtually = false, fillProps = {}, getFills, className } = this.props;
 
 		if ( bubblesVirtually ) {
-			return <div ref={ this.bindNode } { ...props } />;
+			return <div ref={ this.bindNode } className={ className } />;
 		}
 
 		const fills = map( getFills( name, this ), ( fill ) => {
