@@ -499,13 +499,13 @@ export class TableEdit extends Component {
 						] }
 					/>
 				</InspectorControls>
-				<div className={ className }>
+				<figure className={ className }>
 					<table className={ tableClasses }>
 						<Section type="head" rows={ head } />
 						<Section type="body" rows={ body } />
 						<Section type="foot" rows={ foot } />
 					</table>
-				</div>
+				</figure>
 			</>
 		);
 	}

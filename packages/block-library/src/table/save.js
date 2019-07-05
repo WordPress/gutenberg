@@ -55,12 +55,12 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<div>
+		<figure>
 			<table className={ classes }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />
 			</table>
-		</div>
+		</figure>
 	);
 }
