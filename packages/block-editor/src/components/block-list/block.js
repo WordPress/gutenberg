@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, reduce, size, first, last } from 'lodash';
+import { get, reduce, size, first } from 'lodash';
 import { animated } from 'react-spring/web.cjs';
 
 /**
@@ -87,7 +87,6 @@ function BlockListBlock( {
 	isValid,
 	isLast,
 	attributes,
-	initialPosition,
 	wrapperProps,
 	setAttributes,
 	onReplace,
@@ -224,15 +223,14 @@ function BlockListBlock( {
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
-		const isReverse = -1 === initialPosition;
-		const target = ( isReverse ? last : first )( textInputs );
+		const target = first( textInputs );
 
 		if ( ! target ) {
 			wrapper.current.focus();
 			return;
 		}
 
-		placeCaretAtHorizontalEdge( target, isReverse );
+		placeCaretAtHorizontalEdge( target, false );
 	};
 
 	// Focus the selected block's wrapper or inner input on mount and update
