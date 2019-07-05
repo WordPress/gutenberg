@@ -54,7 +54,7 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 		return blocks;
 	}
 
-	return map( template, ( [ name, attributes, innerBlocksTemplate ], index ) => {
+	return map( template, ( { name, attributes, innerBlocks: innerBlocksTemplate }, index ) => {
 		const block = blocks[ index ];
 
 		if ( block && block.name === name ) {

@@ -170,9 +170,8 @@ export function* setupEditor( post, edits, template ) {
 	let blocks = parse( content );
 
 	// Apply a template for new posts only, if exists.
-	const isNewPost = post.status === 'auto-draft';
-	if ( isNewPost && template ) {
-		blocks = synchronizeBlocksWithTemplate( blocks, template );
+	if ( template ) {
+		blocks = synchronizeBlocksWithTemplate( blocks, parse( template.post_content ) );
 	}
 
 	yield resetPost( post );
@@ -474,10 +473,22 @@ export function* savePost( options = {} ) {
 		'getCurrentPost'
 	);
 
-	const editedPostContent = yield select(
+	let editedPostContent = yield select(
 		STORE_KEY,
 		'getEditedPostContent'
 	);
+
+	const template = ( yield select( STORE_KEY, 'getEditorSettings' ) ).template;
+	if ( template ) {
+		yield apiFetch( {
+			path: `/wp/v2/${ template.post_type }/${ template.ID }`,
+			method: 'PUT',
+			data: {
+				content: editedPostContent,
+			},
+		} );
+		editedPostContent = '';
+	}
 
 	let toSend = {
 		...edits,
