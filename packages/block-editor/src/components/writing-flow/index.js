@@ -91,16 +91,6 @@ class WritingFlow extends Component {
 		this.verticalRect = null;
 	}
 
-	componentDidMount() {
-		this.container.addEventListener( 'keydown', this.onKeyDown );
-		this.container.addEventListener( 'mousedown', this.clearVerticalRect );
-	}
-
-	componentWillUnmount() {
-		this.container.removeEventListener( 'keydown', this.onKeyDown );
-		this.container.removeEventListener( 'mousedown', this.clearVerticalRect );
-	}
-
 	bindContainer( ref ) {
 		this.container = ref;
 	}
@@ -264,7 +254,7 @@ class WritingFlow extends Component {
 		}
 
 		// This logic inside this condition needs to be checked before
-		// the check for event.defaultPrevented.
+		// the check for event.nativeEvent.defaultPrevented.
 		// The logic handles meta+a keypress and this event is default prevented
 		// by RichText.
 		if ( ! isNav ) {
@@ -293,7 +283,7 @@ class WritingFlow extends Component {
 
 		// Abort if navigation has already been handled (e.g. RichText inline
 		// boundaries).
-		if ( event.defaultPrevented ) {
+		if ( event.nativeEvent.defaultPrevented ) {
 			return;
 		}
 
@@ -365,6 +355,8 @@ class WritingFlow extends Component {
 			<div className="editor-writing-flow block-editor-writing-flow">
 				<div
 					ref={ this.bindContainer }
+					onKeyDown={ this.onKeyDown }
+					onMouseDown={ this.clearVerticalRect }
 				>
 					{ children }
 				</div>
