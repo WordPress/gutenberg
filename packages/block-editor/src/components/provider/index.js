@@ -34,10 +34,10 @@ class BlockEditorProvider extends Component {
 			this.attachChangeObserver( registry );
 		}
 
-		if ( this.isSyncingOutcomingValue ) {
-			this.isSyncingOutcomingValue = false;
+		if ( this.isSyncingOutcomingValue === value ) {
+			this.isSyncingOutcomingValue = null;
 		} else if ( value !== prevProps.value ) {
-			this.isSyncingIncomingValue = true;
+			this.isSyncingIncomingValue = value;
 			resetBlocks( value );
 		}
 	}
@@ -93,7 +93,7 @@ class BlockEditorProvider extends Component {
 					__unstableIsLastBlockChangeIgnored()
 				)
 			) {
-				this.isSyncingIncomingValue = false;
+				this.isSyncingIncomingValue = null;
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
 				lastBlockAttributesChange = newLastBlockAttributesChange;
@@ -117,7 +117,7 @@ class BlockEditorProvider extends Component {
 				// When knowing the blocks value is changing, assign instance
 				// value to skip reset in subsequent `componentDidUpdate`.
 				if ( newBlocks !== blocks ) {
-					this.isSyncingOutcomingValue = true;
+					this.isSyncingOutcomingValue = newBlocks;
 				}
 
 				blocks = newBlocks;
