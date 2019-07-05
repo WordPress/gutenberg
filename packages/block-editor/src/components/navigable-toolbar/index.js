@@ -70,7 +70,7 @@ class NavigableToolbar extends Component {
 	}
 
 	componentwillUnmount() {
-		this.toolnar.current.removeEventListener( 'keydown', this.switchOnKeyDown );
+		this.toolbar.current.removeEventListener( 'keydown', this.switchOnKeyDown );
 	}
 
 	render() {
