@@ -10,26 +10,26 @@ import renderer from 'react-test-renderer';
  * WordPress dependencies
  */
 import { dispatch, select } from '@wordpress/data';
+import { BlockListBlock } from '@wordpress/block-editor';
+import { initializeEditor } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
  */
-import { bootstrapEditor } from '..';
-import App from './App';
-import { BlockListBlock } from '@wordpress/block-editor';
+import { RootComponent } from './index';
 
-describe( 'App', () => {
-	beforeAll( bootstrapEditor );
+describe( 'RootComponent', () => {
+	beforeAll( initializeEditor );
 
 	it( 'renders without crashing', () => {
-		const app = renderer.create( <App /> );
+		const app = renderer.create( <RootComponent /> );
 		const rendered = app.toJSON();
 		expect( rendered ).toBeTruthy();
 		app.unmount();
 	} );
 
 	it( 'renders without crashing with a block focused', () => {
-		const app = renderer.create( <App /> );
+		const app = renderer.create( <RootComponent /> );
 		const blocks = select( 'core/block-editor' ).getBlocks();
 		dispatch( 'core/block-editor' ).selectBlock( blocks[ 0 ].clientId );
 		const rendered = app.toJSON();
@@ -38,7 +38,7 @@ describe( 'App', () => {
 	} );
 
 	it( 'Code block is a TextInput', () => {
-		const app = renderer.create( <App /> );
+		const app = renderer.create( <RootComponent /> );
 
 		app.root.findAllByType( BlockListBlock )
 			.forEach( ( blockHolder ) => {
@@ -58,7 +58,7 @@ describe( 'App', () => {
 	} );
 
 	it( 'Heading block test', () => {
-		const app = renderer.create( <App /> );
+		const app = renderer.create( <RootComponent /> );
 		app.root.findAllByType( BlockListBlock )
 			.forEach( ( blockHolder ) => {
 				if ( 'core/heading' === blockHolder.props.name ) {
