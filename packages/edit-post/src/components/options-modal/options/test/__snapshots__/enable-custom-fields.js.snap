@@ -1,17 +1,151 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`EnableCustomFieldsOption renders properly when checked 1`] = `
-<BaseOption
-  isChecked={true}
-  label="Custom Fields"
-  onChange={[Function]}
-/>
+exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation message when toggled on 1`] = `
+<div
+  className="edit-post-options-modal__option"
+>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <input
+        checked={true}
+        className="components-checkbox-control__input"
+        id="inspector-checkbox-control-3"
+        onChange={[Function]}
+        type="checkbox"
+        value="1"
+      />
+      <label
+        className="components-checkbox-control__label"
+        htmlFor="inspector-checkbox-control-3"
+      />
+    </div>
+  </div>
+  <div
+    className="edit-post-options-modal__custom-fields-confirmation"
+  >
+    <div
+      className="components-notice is-warning"
+    >
+      <div
+        className="components-notice__content"
+      >
+        Page reload is required for this change.
+      </div>
+    </div>
+    <button
+      className="components-button is-button is-default"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      Save & Reload
+    </button>
+  </div>
+</div>
 `;
 
-exports[`EnableCustomFieldsOption renders properly when unchecked 1`] = `
-<BaseOption
-  isChecked={false}
-  label="Custom Fields"
-  onChange={[Function]}
-/>
+exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields are enabled 1`] = `
+<div
+  className="edit-post-options-modal__option"
+>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <input
+        checked={true}
+        className="components-checkbox-control__input"
+        id="inspector-checkbox-control-0"
+        onChange={[Function]}
+        type="checkbox"
+        value="1"
+      />
+      <label
+        className="components-checkbox-control__label"
+        htmlFor="inspector-checkbox-control-0"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmation message when toggled off 1`] = `
+<div
+  className="edit-post-options-modal__option"
+>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <input
+        checked={false}
+        className="components-checkbox-control__input"
+        id="inspector-checkbox-control-2"
+        onChange={[Function]}
+        type="checkbox"
+        value="1"
+      />
+      <label
+        className="components-checkbox-control__label"
+        htmlFor="inspector-checkbox-control-2"
+      />
+    </div>
+  </div>
+  <div
+    className="edit-post-options-modal__custom-fields-confirmation"
+  >
+    <div
+      className="components-notice is-warning"
+    >
+      <div
+        className="components-notice__content"
+      >
+        Page reload is required for this change.
+      </div>
+    </div>
+    <button
+      className="components-button is-button is-default"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      Save & Reload
+    </button>
+  </div>
+</div>
+`;
+
+exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fields are disabled 1`] = `
+<div
+  className="edit-post-options-modal__option"
+>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <input
+        checked={false}
+        className="components-checkbox-control__input"
+        id="inspector-checkbox-control-1"
+        onChange={[Function]}
+        type="checkbox"
+        value="1"
+      />
+      <label
+        className="components-checkbox-control__label"
+        htmlFor="inspector-checkbox-control-1"
+      />
+    </div>
+  </div>
+</div>
 `;

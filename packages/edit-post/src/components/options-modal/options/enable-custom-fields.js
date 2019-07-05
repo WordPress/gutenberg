@@ -1,7 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Notice, Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -9,39 +11,43 @@ import { withSelect } from '@wordpress/data';
  */
 import BaseOption from './base';
 
-export class EnableCustomFieldsOption extends Component {
-	constructor( { isChecked } ) {
-		super( ...arguments );
+export function CustomFieldsConfirmation() {
+	const [ isReloading, setIsReloading ] = useState( false );
 
-		this.toggleCustomFields = this.toggleCustomFields.bind( this );
+	return (
+		<div className="edit-post-options-modal__custom-fields-confirmation">
+			<Notice status="warning" isDismissible={ false }>
+				{ __( 'Page reload is required for this change.' ) }
+			</Notice>
+			<Button
+				isDefault
+				isBusy={ isReloading }
+				disabled={ isReloading }
+				onClick={ () => {
+					setIsReloading( true );
+					document.getElementById( 'toggle-custom-fields-form' ).submit();
+				} }
+			>
+				{ __( 'Save & Reload' ) }
+			</Button>
+		</div>
+	);
+}
 
-		this.state = { isChecked };
-	}
+export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
+	const [ isChecked, setIsChecked ] = useState( areCustomFieldsEnabled );
 
-	toggleCustomFields() {
-		// Submit a hidden form which triggers the toggle_custom_fields admin action.
-		// This action will toggle the setting and reload the editor with the meta box
-		// assets included on the page.
-		document.getElementById( 'toggle-custom-fields-form' ).submit();
-
-		// Make it look like something happened while the page reloads.
-		this.setState( { isChecked: ! this.props.isChecked } );
-	}
-
-	render() {
-		const { label } = this.props;
-		const { isChecked } = this.state;
-
-		return (
-			<BaseOption
-				label={ label }
-				isChecked={ isChecked }
-				onChange={ this.toggleCustomFields }
-			/>
-		);
-	}
+	return (
+		<BaseOption
+			label={ label }
+			isChecked={ isChecked }
+			onChange={ ( nextIsChecked ) => setIsChecked( nextIsChecked ) }
+		>
+			{ isChecked !== areCustomFieldsEnabled && <CustomFieldsConfirmation /> }
+		</BaseOption>
+	);
 }
 
 export default withSelect( ( select ) => ( {
-	isChecked: !! select( 'core/editor' ).getEditorSettings().enableCustomFields,
+	areCustomFieldsEnabled: !! select( 'core/editor' ).getEditorSettings().enableCustomFields,
 } ) )( EnableCustomFieldsOption );
