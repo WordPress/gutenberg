@@ -219,6 +219,10 @@ describe( 'state', () => {
 						chicken: '',
 						'chicken-child': 'chicken',
 					},
+					cache: {
+						chicken: {},
+						'chicken-child': {},
+					},
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -267,7 +271,12 @@ describe( 'state', () => {
 						[ newChildBlockId ]: 'chicken',
 						chicken: '',
 					},
+					cache: {
+						chicken: {},
+						[ newChildBlockId ]: {},
+					},
 				} );
+				expect( state.cache.chicken ).not.toBe( existingState.cache.chicken );
 			} );
 
 			it( 'can insert a child block', () => {
@@ -289,6 +298,9 @@ describe( 'state', () => {
 					parents: {
 						chicken: '',
 					},
+					cache: {
+						chicken: {},
+					},
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -337,7 +349,12 @@ describe( 'state', () => {
 						[ newChildBlockId ]: 'chicken',
 						chicken: '',
 					},
+					cache: {
+						chicken: {},
+						[ newChildBlockId ]: {},
+					},
 				} );
+				expect( state.cache.chicken ).not.toBe( existingState.cache.chicken );
 			} );
 
 			it( 'can replace multiple child blocks', () => {
@@ -378,6 +395,11 @@ describe( 'state', () => {
 						chicken: '',
 						'chicken-child': 'chicken',
 						'chicken-child-2': 'chicken',
+					},
+					cache: {
+						chicken: {},
+						'chicken-child': {},
+						'chicken-child-2': {},
 					},
 				} );
 
@@ -459,6 +481,12 @@ describe( 'state', () => {
 						[ newChildBlockId2 ]: 'chicken',
 						[ newChildBlockId3 ]: 'chicken',
 					},
+					cache: {
+						chicken: {},
+						[ newChildBlockId1 ]: {},
+						[ newChildBlockId2 ]: {},
+						[ newChildBlockId3 ]: {},
+					},
 				} );
 			} );
 
@@ -496,6 +524,11 @@ describe( 'state', () => {
 						chicken: '',
 						'chicken-child': 'chicken',
 						'chicken-grand-child': 'chicken-child',
+					},
+					cache: {
+						chicken: {},
+						'chicken-child': {},
+						'chicken-grand-child': {},
 					},
 				} );
 
@@ -539,7 +572,14 @@ describe( 'state', () => {
 						chicken: '',
 						[ newChildBlockId ]: 'chicken',
 					},
+					cache: {
+						chicken: {},
+						[ newChildBlockId ]: {},
+					},
 				} );
+
+				// the cache key of the parent should be updated
+				expect( existingState.cache.chicken ).not.toBe( state.cache.chicken );
 			} );
 		} );
 
@@ -553,6 +593,7 @@ describe( 'state', () => {
 				parents: {},
 				isPersistentChange: true,
 				isIgnoredChange: false,
+				cache: {},
 			} );
 		} );
 
@@ -572,6 +613,9 @@ describe( 'state', () => {
 					'': [ 'bananas' ],
 					bananas: [],
 				} );
+				expect( state.cache ).toEqual( {
+					bananas: {},
+				} );
 			} );
 		} );
 
@@ -590,6 +634,10 @@ describe( 'state', () => {
 				'': [ 'bananas' ],
 				apples: [],
 				bananas: [ 'apples' ],
+			} );
+			expect( state.cache ).toEqual( {
+				bananas: {},
+				apples: {},
 			} );
 		} );
 
@@ -619,6 +667,12 @@ describe( 'state', () => {
 				chicken: [],
 				ribs: [],
 			} );
+			expect( state.cache ).toEqual( {
+				chicken: {},
+				ribs: {},
+			} );
+			// The cache key is the same because the block has not been modified.
+			expect( original.cache.chicken ).toBe( state.cache.chicken );
 		} );
 
 		it( 'should replace the block', () => {
@@ -650,6 +704,9 @@ describe( 'state', () => {
 			} );
 			expect( state.parents ).toEqual( {
 				wings: '',
+			} );
+			expect( state.cache ).toEqual( {
+				wings: {},
 			} );
 		} );
 		it( 'should replace the block and remove references to its inner blocks', () => {
@@ -687,6 +744,9 @@ describe( 'state', () => {
 			expect( state.parents ).toEqual( {
 				wings: '',
 			} );
+			expect( state.cache ).toEqual( {
+				wings: {},
+			} );
 		} );
 
 		it( 'should replace the nested block', () => {
@@ -712,6 +772,10 @@ describe( 'state', () => {
 			expect( state.parents ).toEqual( {
 				[ wrapperBlock.clientId ]: '',
 				[ replacementBlock.clientId ]: wrapperBlock.clientId,
+			} );
+			expect( state.cache ).toEqual( {
+				[ wrapperBlock.clientId ]: {},
+				[ replacementBlock.clientId ]: {},
 			} );
 		} );
 
@@ -743,6 +807,10 @@ describe( 'state', () => {
 				'': [ 'chicken' ],
 				chicken: [],
 			} );
+			expect( replacedState.cache ).toEqual( {
+				chicken: {},
+			} );
+			expect( originalState.cache.chicken ).not.toBe( replacedState.cache.chicken );
 
 			const nestedBlock = {
 				clientId: 'chicken',
@@ -808,6 +876,11 @@ describe( 'state', () => {
 			expect( state.attributes.chicken ).toEqual( {
 				content: 'ribs',
 			} );
+
+			expect( state.cache ).toEqual( {
+				chicken: {},
+			} );
+			expect( state.cache.chicken ).not.toBe( original.cache.chicken );
 		} );
 
 		it( 'should update the reusable block reference if the temporary id is swapped', () => {
@@ -839,6 +912,10 @@ describe( 'state', () => {
 			expect( state.attributes.chicken ).toEqual( {
 				ref: 3,
 			} );
+			expect( state.cache ).toEqual( {
+				chicken: {},
+			} );
+			expect( state.cache.chicken ).not.toBe( original.cache.chicken );
 		} );
 
 		it( 'should move the block up', () => {
@@ -862,6 +939,8 @@ describe( 'state', () => {
 			} );
 
 			expect( state.order[ '' ] ).toEqual( [ 'ribs', 'chicken' ] );
+			expect( state.cache.ribs ).toBe( original.cache.ribs );
+			expect( state.cache.chicken ).toBe( original.cache.chicken );
 		} );
 
 		it( 'should move the nested block up', () => {
@@ -884,6 +963,9 @@ describe( 'state', () => {
 				[ movedBlock.clientId ]: [],
 				[ siblingBlock.clientId ]: [],
 			} );
+			expect( state.cache[ wrapperBlock.clientId ] ).not.toBe( original.cache[ wrapperBlock.clientId ] );
+			expect( state.cache[ movedBlock.clientId ] ).toBe( original.cache[ movedBlock.clientId ] );
+			expect( state.cache[ siblingBlock.clientId ] ).toBe( original.cache[ siblingBlock.clientId ] );
 		} );
 
 		it( 'should move multiple blocks up', () => {
@@ -1113,6 +1195,9 @@ describe( 'state', () => {
 				},
 			} );
 			expect( state.attributes ).toEqual( {
+				ribs: {},
+			} );
+			expect( state.cache ).toEqual( {
 				ribs: {},
 			} );
 		} );
@@ -1607,7 +1692,8 @@ describe( 'state', () => {
 
 			describe( 'isIgnoredChange', () => {
 				it( 'should consider received blocks as ignored change', () => {
-					const state = blocks( undefined, {
+					const resetState = blocks( undefined, { type: 'random action' } );
+					const state = blocks( resetState, {
 						type: 'RECEIVE_BLOCKS',
 						blocks: [ {
 							clientId: 'kumquat',
