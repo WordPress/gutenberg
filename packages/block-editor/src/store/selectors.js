@@ -170,6 +170,11 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, clientId ) => [
+		// Normally, we'd have both  `getBlockAttributes` dependancies and
+		// `getBlocks` (children) dependancies here but for performance reasons
+		// we use a denormalized cache key computed in the reducer that takes both
+		// the attributes and inner blocks into account. The value of the cache key
+		// is being changed whenever one of these dependencies is out of date.
 		state.blocks.cache[ clientId ],
 	]
 );

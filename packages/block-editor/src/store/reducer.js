@@ -219,6 +219,19 @@ const withPostMetaUpdateCacheReset = ( reducer ) => ( state, action ) => {
 };
 
 /**
+ * Utility returning an object with an empty object value for each key.
+ *
+ * @param {Array} objectKeys Keys to fill.
+ * @return {Object} Object filled with empty object as values for each clientId.
+ */
+const fillKeysWithEmptyObject = ( objectKeys ) => {
+	return objectKeys.reduce( ( result, key ) => {
+		result[ key ] = {};
+		return result;
+	}, {} );
+};
+
+/**
  * Higher-order reducer intended to compute a cache key for each block in the post.
  * A new instance of the cache key (empty object) is created each time the block object
  * needs to be refreshed (for any change in the block or its children).
@@ -235,7 +248,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 	}
 	newState.cache = state.cache ? state.cache : {};
 
-	const addParentBlocks = ( clientIds ) => {
+	const getBlocksWithParentsClientIds = ( clientIds ) => {
 		return clientIds.reduce( ( result, clientId ) => {
 			let current = clientId;
 			do {
@@ -244,13 +257,6 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			} while ( current );
 			return result;
 		}, [] );
-	};
-
-	const fillKeysWithEmptyObject = ( clientIds ) => {
-		return clientIds.reduce( ( result, key ) => {
-			result[ key ] = {};
-			return result;
-		}, {} );
 	};
 
 	switch ( action.type ) {
@@ -266,7 +272,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			newState.cache = {
 				...newState.cache,
 				...fillKeysWithEmptyObject(
-					addParentBlocks( updatedBlockUids ),
+					getBlocksWithParentsClientIds( updatedBlockUids ),
 				),
 			};
 			break;
@@ -276,7 +282,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			newState.cache = {
 				...newState.cache,
 				...fillKeysWithEmptyObject(
-					addParentBlocks( [ action.clientId ] ),
+					getBlocksWithParentsClientIds( [ action.clientId ] ),
 				),
 			};
 			break;
@@ -284,7 +290,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			newState.cache = {
 				...omit( newState.cache, action.replacedClientIds ),
 				...fillKeysWithEmptyObject(
-					addParentBlocks( keys( flattenBlocks( action.blocks ) ) ),
+					getBlocksWithParentsClientIds( keys( flattenBlocks( action.blocks ) ) ),
 				),
 			};
 			break;
@@ -292,7 +298,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			newState.cache = {
 				...omit( newState.cache, action.removedClientIds ),
 				...fillKeysWithEmptyObject(
-					difference( addParentBlocks( action.clientIds ), action.clientIds ),
+					difference( getBlocksWithParentsClientIds( action.clientIds ), action.clientIds ),
 				),
 			};
 			break;
@@ -307,7 +313,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			newState.cache = {
 				...newState.cache,
 				...fillKeysWithEmptyObject(
-					addParentBlocks( updatedBlockUids )
+					getBlocksWithParentsClientIds( updatedBlockUids )
 				),
 			};
 			break;
@@ -321,7 +327,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			newState.cache = {
 				...newState.cache,
 				...fillKeysWithEmptyObject(
-					addParentBlocks( updatedBlockUids )
+					getBlocksWithParentsClientIds( updatedBlockUids )
 				),
 			};
 			break;
@@ -334,7 +340,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			newState.cache = {
 				...newState.cache,
 				...fillKeysWithEmptyObject(
-					addParentBlocks( updatedBlockUids )
+					getBlocksWithParentsClientIds( updatedBlockUids )
 				),
 			};
 		}
