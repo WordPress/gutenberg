@@ -20,6 +20,7 @@ import {
 	PanelBody,
 	ToggleControl,
 	TextControl,
+	IconButton,
 	Button,
 	Toolbar,
 	DropdownMenu,
@@ -38,6 +39,15 @@ import {
 	deleteColumn,
 	toggleSection,
 	isEmptyTableSection,
+	getVerticalSelectionRangeStart,
+	getVerticalSelectionRangeEnd,
+	getHorizontalSelectionRangeStart,
+	getHorizontalSelectionRangeEnd,
+	isCellInSelectionRange,
+	isTopOfSelectionRange,
+	isBottomOfSelectionRange,
+	isRightOfSelectionRange,
+	isLeftOfSelectionRange,
 } from './state';
 import icon from './icon';
 
@@ -87,11 +97,14 @@ export class TableEdit extends Component {
 		this.onDeleteColumn = this.onDeleteColumn.bind( this );
 		this.onToggleHeaderSection = this.onToggleHeaderSection.bind( this );
 		this.onToggleFooterSection = this.onToggleFooterSection.bind( this );
+		this.onSelectTable = this.onSelectTable.bind( this );
+		this.onSelectRow = this.onSelectRow.bind( this );
+		this.onSelectColumn = this.onSelectColumn.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
 			initialColumnCount: 2,
-			selectedCell: null,
+			selection: null,
 		};
 	}
 
@@ -149,14 +162,14 @@ export class TableEdit extends Component {
 	 * @param {Array} content A RichText content value.
 	 */
 	onChange( content ) {
-		const { selectedCell } = this.state;
+		const { selection } = this.state;
 
-		if ( ! selectedCell ) {
+		if ( ! selection ) {
 			return;
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex, columnIndex } = selectedCell;
+		const { section, rowIndex, columnIndex } = selection;
 
 		setAttributes( updateCellContent( attributes, {
 			section,
@@ -172,16 +185,16 @@ export class TableEdit extends Component {
 	 * @param {number} delta Offset for selected row index at which to insert.
 	 */
 	onInsertRow( delta ) {
-		const { selectedCell } = this.state;
+		const { selection } = this.state;
 
-		if ( ! selectedCell ) {
+		if ( ! selection ) {
 			return;
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex } = selectedCell;
+		const { section, rowIndex } = selection;
 
-		this.setState( { selectedCell: null } );
+		this.setState( { selection: null } );
 		setAttributes( insertRow( attributes, {
 			section,
 			rowIndex: rowIndex + delta,
@@ -216,16 +229,16 @@ export class TableEdit extends Component {
 	 * Deletes the currently selected row.
 	 */
 	onDeleteRow() {
-		const { selectedCell } = this.state;
+		const { selection } = this.state;
 
-		if ( ! selectedCell ) {
+		if ( ! selection ) {
 			return;
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex } = selectedCell;
+		const { section, rowIndex } = selection;
 
-		this.setState( { selectedCell: null } );
+		this.setState( { selection: null } );
 		setAttributes( deleteRow( attributes, { section, rowIndex } ) );
 	}
 
@@ -235,16 +248,16 @@ export class TableEdit extends Component {
 	 * @param {number} delta Offset for selected column index at which to insert.
 	 */
 	onInsertColumn( delta = 0 ) {
-		const { selectedCell } = this.state;
+		const { selection } = this.state;
 
-		if ( ! selectedCell ) {
+		if ( ! selection ) {
 			return;
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { columnIndex } = selectedCell;
+		const { columnIndex } = selection;
 
-		this.setState( { selectedCell: null } );
+		this.setState( { selection: null } );
 		setAttributes( insertColumn( attributes, {
 			columnIndex: columnIndex + delta,
 		} ) );
@@ -268,30 +281,72 @@ export class TableEdit extends Component {
 	 * Deletes the currently selected column.
 	 */
 	onDeleteColumn() {
-		const { selectedCell } = this.state;
+		const { selection } = this.state;
 
-		if ( ! selectedCell ) {
+		if ( ! selection ) {
 			return;
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, columnIndex } = selectedCell;
+		const { section, columnIndex } = selection;
 
-		this.setState( { selectedCell: null } );
+		this.setState( { selection: null } );
 		setAttributes( deleteColumn( attributes, { section, columnIndex } ) );
+	}
+
+	onSelectTable() {
+		const {
+			attributes,
+		} = this.props;
+
+		this.setState( {
+			selection: {
+				type: 'range',
+				from: getVerticalSelectionRangeStart( attributes ),
+				to: getVerticalSelectionRangeEnd( attributes ),
+			},
+		} );
+	}
+
+	onSelectColumn( columnIndex ) {
+		const {
+			attributes,
+		} = this.props;
+
+		this.setState( {
+			selection: {
+				type: 'range',
+				from: getVerticalSelectionRangeStart( attributes, columnIndex ),
+				to: getVerticalSelectionRangeEnd( attributes, columnIndex ),
+			},
+		} );
+	}
+
+	onSelectRow( section, rowIndex ) {
+		const {
+			attributes,
+		} = this.props;
+
+		this.setState( {
+			selection: {
+				type: 'range',
+				from: getHorizontalSelectionRangeStart( attributes, section, rowIndex ),
+				to: getHorizontalSelectionRangeEnd( attributes, section, rowIndex ),
+			},
+		} );
 	}
 
 	/**
 	 * Creates an onFocus handler for a specified cell.
 	 *
-	 * @param {Object} selectedCell Object with `section`, `rowIndex`, and
-	 *                              `columnIndex` properties.
+	 * @param {Object} selection Object with `section`, `rowIndex`, and
+	 *                           `columnIndex` properties.
 	 *
 	 * @return {Function} Function to call on focus.
 	 */
-	createOnFocus( selectedCell ) {
+	createOnFocus( selection ) {
 		return () => {
-			this.setState( { selectedCell } );
+			this.setState( { selection } );
 		};
 	}
 
@@ -301,43 +356,43 @@ export class TableEdit extends Component {
 	 * @return {Array} Table controls.
 	 */
 	getTableControls() {
-		const { selectedCell } = this.state;
+		const { selection } = this.state;
 
 		return [
 			{
 				icon: 'table-row-before',
 				title: __( 'Add Row Before' ),
-				isDisabled: ! selectedCell,
+				isDisabled: ! selection,
 				onClick: this.onInsertRowBefore,
 			},
 			{
 				icon: 'table-row-after',
 				title: __( 'Add Row After' ),
-				isDisabled: ! selectedCell,
+				isDisabled: ! selection,
 				onClick: this.onInsertRowAfter,
 			},
 			{
 				icon: 'table-row-delete',
 				title: __( 'Delete Row' ),
-				isDisabled: ! selectedCell,
+				isDisabled: ! selection,
 				onClick: this.onDeleteRow,
 			},
 			{
 				icon: 'table-col-before',
 				title: __( 'Add Column Before' ),
-				isDisabled: ! selectedCell,
+				isDisabled: ! selection,
 				onClick: this.onInsertColumnBefore,
 			},
 			{
 				icon: 'table-col-after',
 				title: __( 'Add Column After' ),
-				isDisabled: ! selectedCell,
+				isDisabled: ! selection,
 				onClick: this.onInsertColumnAfter,
 			},
 			{
 				icon: 'table-col-delete',
 				title: __( 'Delete Column' ),
-				isDisabled: ! selectedCell,
+				isDisabled: ! selection,
 				onClick: this.onDeleteColumn,
 			},
 		];
@@ -346,37 +401,44 @@ export class TableEdit extends Component {
 	/**
 	 * Renders a table section.
 	 *
-	 * @param {string} options.type Section type: head, body, or foot.
-	 * @param {Array}  options.rows The rows to render.
+	 * @param {string} options.section Section type: head, body, or foot.
+	 * @param {Array}  options.rows        The rows to render.
 	 *
 	 * @return {Object} React element for the section.
 	 */
-	renderSection( { type, rows } ) {
+	renderSection( { type: section, rows, isFirstTableSection } ) {
 		if ( isEmptyTableSection( rows ) ) {
 			return null;
 		}
 
-		const Tag = `t${ type }`;
-		const { selectedCell } = this.state;
+		const Tag = `t${ section }`;
+		const { selection } = this.state;
 
 		return (
 			<Tag>
 				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
 						{ cells.map( ( { content, tag: CellTag, scope }, columnIndex ) => {
-							const isSelected = selectedCell && (
-								type === selectedCell.section &&
-								rowIndex === selectedCell.rowIndex &&
-								columnIndex === selectedCell.columnIndex
+							const isSelectedCell = selection && (
+								'cell' === selection.type &&
+								section === selection.section &&
+								rowIndex === selection.rowIndex &&
+								columnIndex === selection.columnIndex
 							);
 
-							const cell = {
-								section: type,
-								rowIndex,
-								columnIndex,
-							};
+							const isInSelectedRange = selection && (
+								'range' === selection.type &&
+								isCellInSelectionRange( selection, section, rowIndex, columnIndex )
+							);
 
-							const cellClasses = classnames( { 'is-selected': isSelected } );
+							const cellClasses = classnames( {
+								'is-selected-cell': isSelectedCell,
+								'is-in-selected-range': isInSelectedRange,
+								'is-range-selection-top': isInSelectedRange && isTopOfSelectionRange( selection, section, rowIndex ),
+								'is-range-selection-right': isInSelectedRange && isRightOfSelectionRange( selection, section, columnIndex ),
+								'is-range-selection-bottom': isInSelectedRange && isBottomOfSelectionRange( selection, section, rowIndex ),
+								'is-range-selection-left': isInSelectedRange && isLeftOfSelectionRange( selection, section, columnIndex ),
+							} );
 
 							return (
 								<CellTag
@@ -384,11 +446,40 @@ export class TableEdit extends Component {
 									className={ cellClasses }
 									scope={ CellTag === 'th' ? scope : undefined }
 								>
+									{ isFirstTableSection && rowIndex === 0 && columnIndex === 0 && (
+										<IconButton
+											className="wp-block-table__table-selection-button"
+											label={ __( 'Select all' ) }
+											icon="grid-view"
+											onClick={ this.onSelectTable }
+										/>
+									) }
+									{ columnIndex === 0 && (
+										<IconButton
+											className="wp-block-table__row-selection-button"
+											label={ __( 'Select row' ) }
+											icon="arrow-right"
+											onClick={ () => this.onSelectRow( section, rowIndex ) }
+										/>
+									) }
+									{ isFirstTableSection && rowIndex === 0 && (
+										<IconButton
+											className="wp-block-table__column-selection-button"
+											label={ __( 'Select column' ) }
+											icon="arrow-down"
+											onClick={ () => this.onSelectColumn( columnIndex ) }
+										/>
+									) }
 									<RichText
 										className="wp-block-table__cell-content"
 										value={ content }
 										onChange={ this.onChange }
-										unstableOnFocus={ this.createOnFocus( cell ) }
+										unstableOnFocus={ this.createOnFocus( {
+											type: 'cell',
+											section,
+											rowIndex,
+											columnIndex,
+										} ) }
 									/>
 								</CellTag>
 							);
@@ -401,10 +492,10 @@ export class TableEdit extends Component {
 
 	componentDidUpdate() {
 		const { isSelected } = this.props;
-		const { selectedCell } = this.state;
+		const { selection } = this.state;
 
-		if ( ! isSelected && selectedCell ) {
-			this.setState( { selectedCell: null } );
+		if ( ! isSelected && selection ) {
+			this.setState( { selection: null } );
 		}
 	}
 
@@ -417,7 +508,10 @@ export class TableEdit extends Component {
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const { hasFixedLayout, head, body, foot } = attributes;
-		const isEmpty = isEmptyTableSection( head ) && isEmptyTableSection( body ) && isEmptyTableSection( foot );
+		const isEmptyHead = isEmptyTableSection( head );
+		const isEmptyBody = isEmptyTableSection( body );
+		const isEmptyFoot = isEmptyTableSection( foot );
+		const isEmpty = isEmptyHead && isEmptyBody && isEmptyFoot;
 		const Section = this.renderSection;
 
 		if ( isEmpty ) {
@@ -501,9 +595,9 @@ export class TableEdit extends Component {
 				</InspectorControls>
 				<figure className={ className }>
 					<table className={ tableClasses }>
-						<Section type="head" rows={ head } />
-						<Section type="body" rows={ body } />
-						<Section type="foot" rows={ foot } />
+						<Section type="head" rows={ head } isFirstTableSection={ true } />
+						<Section type="body" rows={ body } isFirstTableSection={ isEmptyHead } />
+						<Section type="foot" rows={ foot } isLastTableSection={ true } />
 					</table>
 				</figure>
 			</>
