@@ -8,28 +8,33 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { InnerBlocks } from '@wordpress/block-editor';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-/**
- * Constants
- */
-const ALLOWED_BLOCKS = [ 'core/code' ];
-
-const TEMPLATE = [ [ 'core/code', { placeholder: 'Add URL...' } ] ];
-
-const SocialLinkEdit = ( { attributes } ) => {
+const SocialLinkEdit = ( { attributes, setUrl } ) => {
 	return (
 		<Fragment>
-			<InnerBlocks
-				allowedBlocks={ ALLOWED_BLOCKS }
-				template={ TEMPLATE }
-				templateInsertUpdatesSelection={ false }
-			/>
+			<form >
+				<input
+					type="url"
+					value={ ( attributes && attributes.url ) || '' }
+					onChange={ ( event ) => setUrl( event.target.value ) }
+					placeholder={ __( 'example.com/username' ) }
+				/>
+			</form>
 		</Fragment>
 	);
 };
 
-export default SocialLinkEdit;
+export default compose(
+	withDispatch( ( ownProps ) => {
+		return {
+			setUrl( url ) {
+				const { setAttributes } = ownProps;
+
+				setAttributes( { url } );
+			},
+		};
+	} )
+)( SocialLinkEdit );
 

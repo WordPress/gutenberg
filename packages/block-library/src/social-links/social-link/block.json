@@ -2,7 +2,7 @@
 	"name": "core/social-link",
 	"category": "widgets",
 	"attributes": {
-		"verticalAlignment": {
+		"url": {
 			"type": "string"
 		}
 	}
