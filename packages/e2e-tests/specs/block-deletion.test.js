@@ -110,8 +110,8 @@ describe( 'block deletion -', () => {
 			// Click on something that's not a block.
 			await page.click( '.editor-post-title' );
 
-			// Click on the third (image) block so that its wrapper is selected and backspace to delete it.
-			await page.click( '.block-editor-block-list__block:nth-child(3) .components-placeholder__label' );
+			// Click on the image block so that its wrapper is selected and backspace to delete it.
+			await page.click( '.wp-block[data-type="core/image"] .components-placeholder__label' );
 			await page.keyboard.press( 'Backspace' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();

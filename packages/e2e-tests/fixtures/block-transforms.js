@@ -304,6 +304,18 @@ export const EXPECTED_TRANSFORMS = {
 			'Group',
 		],
 	},
+	'core__navigation-menu': {
+		originalBlock: 'Navigation Menu (Experimental)',
+		availableTransforms: [
+			'Group',
+		],
+	},
+	'core__navigation-menu-item': {
+		originalBlock: 'Menu Item (Experimental)',
+		availableTransforms: [
+			'Group',
+		],
+	},
 	core__nextpage: {
 		originalBlock: 'Page Break',
 		availableTransforms: [
@@ -399,6 +411,12 @@ export const EXPECTED_TRANSFORMS = {
 		],
 	},
 	core__table: {
+		originalBlock: 'Table',
+		availableTransforms: [
+			'Group',
+		],
+	},
+	'core__table__scope-attribute': {
 		originalBlock: 'Table',
 		availableTransforms: [
 			'Group',

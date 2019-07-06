@@ -1,5 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Table allows adding and deleting columns across the table header, body and footer 1`] = `
+"<!-- wp:table -->
+<table class=\\"wp-block-table\\"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody><tfoot><tr><td></td><td></td></tr></tfoot></table>
+<!-- /wp:table -->"
+`;
+
+exports[`Table allows adding and deleting columns across the table header, body and footer 2`] = `
+"<!-- wp:table -->
+<table class=\\"wp-block-table\\"><thead><tr><th></th></tr></thead><tbody><tr><td></td></tr><tr><td></td></tr></tbody><tfoot><tr><td></td></tr></tfoot></table>
+<!-- /wp:table -->"
+`;
+
 exports[`Table allows header and footer rows to be switched on and off 1`] = `
 "<!-- wp:table -->
 <table class=\\"wp-block-table\\"><thead><tr><th>header</th><th></th></tr></thead><tbody><tr><td>body</td><td></td></tr><tr><td></td><td></td></tr></tbody><tfoot><tr><td>footer</td><td></td></tr></tfoot></table>

@@ -33,6 +33,20 @@ _Example_: Extract the `src` attribute from an image found in the block's markup
 // { "url": "https://lorempixel.com/1200/800/" }
 ```
 
+#### `attribute` Type Validation
+
+Accepted values in the `type` field of an `attribute` MUST be one of the following:
+
+* null
+* boolean
+* object
+* array
+* number
+* string
+* integer
+
+See [WordPress's REST API documentation](https://developer.wordpress.org/rest-api/extending-the-rest-api/schema/) for additional details.
+
 ### `text`
 
 Use `text` to extract the inner text from markup.

@@ -22,6 +22,8 @@ import {
 	getUnregisteredTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	getGroupingBlockName,
+	setGroupingBlockName,
 	getBlockType,
 	getBlockTypes,
 	getBlockSupport,
@@ -335,6 +337,42 @@ describe( 'blocks', () => {
 				expect( console ).toHaveErroredWith( 'Block settings must be a valid object.' );
 				expect( block ).toBeUndefined();
 			} );
+
+			it( 'should apply the blocks.registerBlockType filter to each of the deprecated settings as well as the main block settings', () => {
+				const blockSettingsWithDeprecations = {
+					...defaultBlockSettings,
+					deprecated: [
+						{
+							save() {
+								return 1;
+							},
+						},
+						{
+							save() {
+								return 2;
+							},
+						},
+					],
+				};
+
+				addFilter( 'blocks.registerBlockType', 'core/blocks/without-title', ( settings ) => {
+					return {
+						...settings,
+						attributes: {
+							...settings.attributes,
+							id: {
+								type: 'string',
+							},
+						},
+					};
+				} );
+
+				const block = registerBlockType( 'my-plugin/fancy-block-13', blockSettingsWithDeprecations );
+
+				expect( block.attributes.id ).toEqual( { type: 'string' } );
+				expect( block.deprecated[ 0 ].attributes.id ).toEqual( { type: 'string' } );
+				expect( block.deprecated[ 1 ].attributes.id ).toEqual( { type: 'string' } );
+			} );
 		} );
 	} );
 
@@ -412,6 +450,20 @@ describe( 'blocks', () => {
 	describe( 'getDefaultBlockName()', () => {
 		it( 'defaults to undefined', () => {
 			expect( getDefaultBlockName() ).toBeNull();
+		} );
+	} );
+
+	describe( 'getGroupingBlockName()', () => {
+		it( 'defaults to undefined', () => {
+			expect( getGroupingBlockName() ).toBeNull();
+		} );
+	} );
+
+	describe( 'setGroupingBlockName()', () => {
+		it( 'assigns default block name', () => {
+			setGroupingBlockName( 'core/test-block' );
+
+			expect( getGroupingBlockName() ).toBe( 'core/test-block' );
 		} );
 	} );
 
