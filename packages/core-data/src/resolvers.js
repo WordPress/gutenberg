@@ -96,7 +96,7 @@ export function* getThemeSupports() {
 }
 
 /**
- * Requests a preview from the from the Embed API.
+ * Requests a preview from the Embed API.
  *
  * @param {string} url   URL to get the preview for.
  */

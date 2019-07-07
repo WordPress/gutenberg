@@ -68,9 +68,9 @@ class LatestPostsEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, latestPosts } = this.props;
+		const { attributes, setAttributes, getFeaturedMediaSourceUrl, latestPosts } = this.props;
 		const { categoriesList } = this.state;
-		const { displayPostContentRadio, displayPostContent, displayPostDate, postLayout, columns, order, orderBy, categories, postsToShow, excerptLength } = attributes;
+		const { displayPostFeaturedImage, displayPostContentRadio, displayPostContent, displayPostDate, postLayout, columns, order, orderBy, categories, postsToShow, excerptLength } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -132,6 +132,14 @@ class LatestPostsEdit extends Component {
 						/>
 					}
 				</PanelBody>
+				<PanelBody title={ __( 'Featured Image Settings' ) }>
+					<ToggleControl
+						label={ __( 'Featured image' ) }
+						checked={ displayPostFeaturedImage }
+						onChange={ ( value ) => setAttributes( { displayPostFeaturedImage: value } ) }
+					/>
+				</PanelBody>
+
 			</InspectorControls>
 		);
 
@@ -198,8 +206,12 @@ class LatestPostsEdit extends Component {
 						const excerptElement = document.createElement( 'div' );
 						excerptElement.innerHTML = excerpt;
 						excerpt = excerptElement.textContent || excerptElement.innerText || '';
+						const featuredMediaSourceUrl = getFeaturedMediaSourceUrl( post.featured_media );
+
 						return (
 							<li key={ i }>
+								{ displayPostFeaturedImage && featuredMediaSourceUrl && <img src={ featuredMediaSourceUrl } alt="" /> }
+
 								<a href={ post.link } target="_blank" rel="noreferrer noopener">
 									{ titleTrimmed ? (
 										<RawHTML>
@@ -253,6 +265,15 @@ export default withSelect( ( select, props ) => {
 		per_page: postsToShow,
 	}, ( value ) => ! isUndefined( value ) );
 	return {
+		getFeaturedMediaSourceUrl( featuredImageId ) {
+			const { getMedia } = select( 'core' );
+
+			if ( featuredImageId ) {
+				const media = getMedia( featuredImageId );
+				return media.media_details.sizes.thumbnail.source_url;
+			}
+			return null;
+		},
 		latestPosts: getEntityRecords( 'postType', 'post', latestPostsQuery ),
 	};
 } )( LatestPostsEdit );
