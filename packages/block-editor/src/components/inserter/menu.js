@@ -242,7 +242,7 @@ export class InserterMenu extends Component {
 			return findIndex( getCategories(), ( category ) => category.slug === item.category );
 		};
 		const itemsPerCategory = flow(
-			( itemList ) => filter( itemList, ( item ) => item.category !== 'reusable' ),
+			( itemList ) => filter( itemList, ( item ) => item.category !== 'reusable' && item.category !== 'discover' ),
 			( itemList ) => sortBy( itemList, getCategoryIndex ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( filteredItems );
@@ -346,19 +346,6 @@ export class InserterMenu extends Component {
 						</PanelBody>
 					}
 
-					{ !! discoverItems.length && (
-						<PanelBody
-							className="editor-inserter__discover-blocks-panel block-editor-inserter__discover-blocks-panel"
-							title={ __( 'Discover New Blocks' ) }
-							opened={ isPanelOpen( 'discover' ) }
-							onToggle={ this.onTogglePanel( 'discover' ) }
-							icon="cart"
-							ref={ this.bindPanel( 'discover' ) }
-						>
-							<DiscoverBlocksList items={ discoverItems } onSelect={ onSelect } onHover={ this.onHover } />
-						</PanelBody>
-					) }
-
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];
 						if ( ! categoryItems || ! categoryItems.length ) {
@@ -397,7 +384,14 @@ export class InserterMenu extends Component {
 						</PanelBody>
 					) }
 					{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
-						<p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+						isEmpty( discoverItems ) ?
+							( <p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p> ) :
+							(
+								<fragment>
+									<p className="editor-inserter__no-results-with-discover-items block-editor-inserter__no-results-with-discover-items">{ __( 'No blocks found in your library. We did find these blocks available for download:' ) }</p>
+									<DiscoverBlocksList items={ discoverItems } onSelect={ onSelect } onHover={ this.onHover } />
+								</fragment>
+							)
 					) }
 				</div>
 
