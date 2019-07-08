@@ -68,10 +68,10 @@ function DiscoverBlockListItem( {
 					</span>
 					<div>
 						<div>
-							<span className="dashicons dashicons-chart-line"></span>XX active installations
+							<BlockIcon icon={ 'chart-line' } size={ 16 }></BlockIcon>XX active installations
 						</div>
 						<div>
-							<span className="dashicons dashicons-update"></span>Updated X week ago.
+							<BlockIcon icon={ 'update' } size={ 16 }></BlockIcon>Updated X week ago.
 						</div>
 					</div>
 				</div>

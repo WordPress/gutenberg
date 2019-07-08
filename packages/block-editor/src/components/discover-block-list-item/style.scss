@@ -71,12 +71,21 @@
 		display: flex;
 		justify-content: space-between;
 		color: $dark-gray-400;
-		.dashicons {
-			font-size: 16px;
+		margin-top: 8px;
+		> div {
+			display: flex;
+			.dashicons {
+				font-size: 16px;
+			}
+			.dashicons-chart-line {
+				font-weight: 900;
+			}
 		}
-		.dashicons-chart-line {
-			font-weight: 900;
-		}
+	}
+	.block-editor-block-icon {
+		width: 16px;
+		height: 16px;
+		margin-right: 4px;
 	}
 }
 
