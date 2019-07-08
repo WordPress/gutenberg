@@ -29,7 +29,7 @@
 <dd>A type of block where the content of which may change and cannot be determined at the time of saving a post, instead calculated any time the post is shown on the front of a site. These blocks may save fallback content or no content at all in their JavaScript implementation, instead deferring to a PHP block implementation for runtime rendering.</dd>
 
 <dt>Inspector</dt>
-<dd>Deprecated term. See Settings Sidebar.</dd>
+<dd>Deprecated term. See <a href="#settings-sidebar">Settings Sidebar.</a></dd>
 
 <dt>Post settings</dt>
 <dd>A sidebar region containing metadata fields for the post, including scheduling, visibility, terms, and featured image.</dd>
@@ -40,7 +40,7 @@
 <dt>Reusable block</dt>
 <dd>A block that is saved and then can be shared as a reusable, repeatable piece of content.</dd>
 
-<dt>Settings Sidebar</dt>
+<dt id="settings-sidebar">Settings Sidebar</dt>
 <dd>The panel on the right that contains the document and block settings. The sidebar is toggled using the Settings gear icon. Block settings are shown when a block is selected, otherwise document settings are shown.</dd>
 
 <dt>Serialization</dt>
