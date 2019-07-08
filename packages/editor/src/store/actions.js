@@ -54,6 +54,8 @@ const lastBlockSourceDependenciesByRegistry = new WeakMap;
  * @return {WPBlock[]} Blocks array with sourced values applied.
  */
 function* getBlocksWithSourcedAttributes( blocks ) {
+	const registry = yield getRegistry();
+
 	let workingBlocks = blocks;
 	for ( let i = 0; i < blocks.length; i++ ) {
 		const block = blocks[ i ];
@@ -64,7 +66,6 @@ function* getBlocksWithSourcedAttributes( blocks ) {
 				continue;
 			}
 
-			const registry = yield getRegistry();
 			if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
 				continue;
 			}
