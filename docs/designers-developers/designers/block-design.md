@@ -52,9 +52,15 @@ In most cases, a block’s setup state is only shown once and then further custo
 
 ## Do's and Don'ts
 
-### Blocks
+### Block Identification
 
 A block should have a straightforward, short name so users can easily find it in the Block Library. A block named "YouTube" is easy to find and understand. The same block, named "Embedded Video (YouTube)", would be less clear and harder to find in the Block Library.
+
+When referring to a block in documentation or UI, use title case for the block title, and lowercase for the "block" descriptor. For example:
+
+- Paragraph block
+- Latest Posts block
+- Media & Text block
 
 Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://material.io/tools/icons/). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
 
