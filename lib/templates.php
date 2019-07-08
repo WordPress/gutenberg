@@ -41,6 +41,12 @@ function gutenberg_register_templates() {
 		$template = $template[0];
 	}
 
+	if ( isset( $_GET['gutenberg-demo'] ) ) {
+		ob_start();
+		include gutenberg_dir_path() . 'post-content.php';
+		$template->post_content = ob_get_clean();
+	}
+
 	$post_type_object           = get_post_type_object( 'post' );
 	$post_type_object->template = $template;
 }
