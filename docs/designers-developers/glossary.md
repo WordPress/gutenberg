@@ -29,7 +29,7 @@
 <dd>A type of block where the content of which may change and cannot be determined at the time of saving a post, instead calculated any time the post is shown on the front of a site. These blocks may save fallback content or no content at all in their JavaScript implementation, instead deferring to a PHP block implementation for runtime rendering.</dd>
 
 <dt>Inspector</dt>
-<dd>Deprecated term. See Settings Sidebar</dd>
+<dd>Deprecated term. See Settings Sidebar.</dd>
 
 <dt>Post settings</dt>
 <dd>A sidebar region containing metadata fields for the post, including scheduling, visibility, terms, and featured image.</dd>
