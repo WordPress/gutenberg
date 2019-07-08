@@ -42,7 +42,7 @@ title: __( 'Book' )
 
 * **Type:** `String`
 
-This is a short description for your block, which can be translated with our translation functions. This will be shown in the block settings sidebar.
+This is a short description for your block, which can be translated with our translation functions. This will be shown in the Block Tab in the Settings Sidebar.
 
 ```js
 description: __( 'Block showing a Book card.' )
