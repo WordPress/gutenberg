@@ -11,7 +11,7 @@ import { setDiscoverBlocks } from './actions';
 export default {
 	* getDiscoverBlocks() {
 		const discoverblocks = yield apiFetch( {
-			path: 'https://requestloggerbin.herokuapp.com/bin/6f2b14b8-d04d-4880-b9ff-7d30eb396c0a',
+			path: 'http://www.mocky.io/v2/5d23c7c32e0000b7a6c3f1ee',
 		} );
 		return setDiscoverBlocks( discoverblocks );
 	},
