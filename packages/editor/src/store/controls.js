@@ -13,6 +13,16 @@ export function awaitNextStateChange() {
 	return { type: 'AWAIT_NEXT_STATE_CHANGE' };
 }
 
+/**
+ * Returns an control descriptor signalling to resolve with the current data
+ * registry.
+ *
+ * @return {Object} Control descriptor.
+ */
+export function getRegistry() {
+	return { type: 'GET_REGISTRY' };
+}
+
 const controls = {
 	AWAIT_NEXT_STATE_CHANGE: createRegistryControl(
 		( registry ) => () => new Promise( ( resolve ) => {
@@ -22,6 +32,7 @@ const controls = {
 			} );
 		} )
 	),
+	GET_REGISTRY: createRegistryControl( ( registry ) => () => registry ),
 };
 
 export default controls;

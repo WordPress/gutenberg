@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, castArray, pick, mapValues, has } from 'lodash';
+import { castArray, pick, mapValues, has } from 'lodash';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
@@ -33,7 +33,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-import { awaitNextStateChange } from './controls';
+import { awaitNextStateChange, getRegistry } from './controls';
 import * as sources from './block-sources';
 
 /**
@@ -64,10 +64,17 @@ function* getBlocksWithSourcedAttributes( blocks ) {
 				continue;
 			}
 
-			// TODO: This should ideally leverage the `subscribeSources` cache,
-			// or at worst at least be cached here one-per-source.
-			const dependencies = yield* sources[ schema.source ].getDependencies();
+			const registry = yield getRegistry();
+			if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+				continue;
+			}
 
+			const blockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
+			if ( ! blockSourceDependencies.has( sources[ schema.source ] ) ) {
+				continue;
+			}
+
+			const dependencies = blockSourceDependencies.get( sources[ schema.source ] );
 			const sourcedAttributeValue = sources[ schema.source ].apply( schema, dependencies );
 
 			// It's only necessary to apply the value if it differs from the
@@ -93,6 +100,32 @@ function* getBlocksWithSourcedAttributes( blocks ) {
 	}
 
 	return workingBlocks;
+}
+
+/**
+ * Refreshes the last block source dependencies, optionally for a given subset
+ * of sources (defaults to the full set of sources).
+ *
+ * @param {?Array} sourcesToUpdate Optional subset of sources to reset.
+ *
+ * @yield {Object} Yielded actions or control descriptors.
+ */
+function* resetLastBlockSourceDependencies( sourcesToUpdate = Object.values( sources ) ) {
+	if ( ! sourcesToUpdate.length ) {
+		return;
+	}
+
+	const registry = yield getRegistry();
+
+	for ( const source of sourcesToUpdate ) {
+		if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+			lastBlockSourceDependenciesByRegistry.set( registry, new WeakMap );
+		}
+
+		const lastBlockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
+		const dependencies = yield* source.getDependencies();
+		lastBlockSourceDependencies.set( source, dependencies );
+	}
 }
 
 /**
@@ -123,6 +156,7 @@ export function* setupEditor( post, edits, template ) {
 	}
 
 	yield resetPost( post );
+	yield* resetLastBlockSourceDependencies();
 	yield resetEditorBlocks( blocks );
 	yield setupEditorState( post );
 	yield {
@@ -177,37 +211,16 @@ export function* subscribeSources() {
 			const lastDependencies = lastBlockSourceDependencies.get( source );
 
 			if ( ! isShallowEqual( dependencies, lastDependencies ) ) {
-				// Allow the loop to continue in order to assign latest
-				// dependencies values, but mark for reset. Avoid reset
-				// from the first assignment.
-				reset = reset || lastDependencies !== undefined;
-
 				lastBlockSourceDependencies.set( source, dependencies );
+
+				// Allow the loop to continue in order to assign latest
+				// dependencies values, but mark for reset.
+				reset = true;
 			}
 		}
 
 		if ( reset ) {
 			yield resetEditorBlocks( yield select( 'core/editor', 'getEditorBlocks' ) );
-		}
-	}
-}
-
-/**
- * Action generator function used in signalling that sources are to be updated
- * in response to a single block attributes update.
- *
- * @param {string} clientId   Client ID of updated block.
- * @param {Object} attributes Object of updated attributes values.
- *
- * @yield {Object} Yielded action objects.
- */
-export function* updateBlockSources( clientId, attributes ) {
-	const block = find( yield select( 'core/editor', 'getEditorBlocks' ), { clientId } );
-	const blockType = yield select( 'core/blocks', 'getBlockType', block.name );
-
-	for ( const [ attributeName, schema ] of Object.entries( blockType.attributes ) ) {
-		if ( attributes.hasOwnProperty( attributeName ) && sources[ schema.source ] ) {
-			yield* sources[ schema.source ].update( schema, attributes[ attributeName ] );
 		}
 	}
 }
@@ -872,10 +885,42 @@ export function unlockPostSaving( lockName ) {
  * @return {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
+	const {
+		__unstableLastBlockAttributesChange: lastBlockAttributesChange,
+		__unstableShouldCreateUndoLevel: shouldCreateUndoLevel = true,
+	} = options;
+
+	// Sync to sources from block attributes updates.
+	if ( lastBlockAttributesChange ) {
+		const updatedSources = new Set;
+
+		for ( let i = 0; i < blocks.length; i++ ) {
+			const block = blocks[ i ];
+			if ( ! lastBlockAttributesChange.hasOwnProperty( block.clientId ) ) {
+				continue;
+			}
+
+			const blockType = yield select( 'core/blocks', 'getBlockType', block.name );
+			const changedAttributes = lastBlockAttributesChange[ block.clientId ];
+
+			for ( const [ attributeName, schema ] of Object.entries( blockType.attributes ) ) {
+				if ( changedAttributes.hasOwnProperty( attributeName ) && sources[ schema.source ] && sources[ schema.source ].update ) {
+					yield* sources[ schema.source ].update( schema, changedAttributes[ attributeName ] );
+					updatedSources.add( sources[ schema.source ] );
+				}
+			}
+		}
+
+		// Dependencies are reset so that source dependencies subscription
+		// skips a reset which would otherwise occur by dependencies change.
+		// This assures that at most one reset occurs per block change.
+		yield* resetLastBlockSourceDependencies( Array.from( updatedSources ) );
+	}
+
 	return {
 		type: 'RESET_EDITOR_BLOCKS',
 		blocks: yield* getBlocksWithSourcedAttributes( blocks ),
-		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
+		shouldCreateUndoLevel,
 	};
 }
 
