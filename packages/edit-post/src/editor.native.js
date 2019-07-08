@@ -9,7 +9,6 @@ import RNReactNativeGutenbergBridge, {
 	subscribeSetTitle,
 	sendNativeEditorDidLayout,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
