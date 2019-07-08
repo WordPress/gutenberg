@@ -8,90 +8,10 @@ import classnames from 'classnames';
  */
 import { RichText, getColorClassName } from '@wordpress/block-editor';
 
-const blockAttributes = {
-	hasFixedLayout: {
-		type: 'boolean',
-		default: false,
-	},
-	backgroundColor: {
-		type: 'string',
-	},
-	head: {
-		type: 'array',
-		default: [],
-		source: 'query',
-		selector: 'thead tr',
-		query: {
-			cells: {
-				type: 'array',
-				default: [],
-				source: 'query',
-				selector: 'td,th',
-				query: {
-					content: {
-						type: 'string',
-						source: 'html',
-					},
-					tag: {
-						type: 'string',
-						default: 'td',
-						source: 'tag',
-					},
-				},
-			},
-		},
-	},
-	body: {
-		type: 'array',
-		default: [],
-		source: 'query',
-		selector: 'tbody tr',
-		query: {
-			cells: {
-				type: 'array',
-				default: [],
-				source: 'query',
-				selector: 'td,th',
-				query: {
-					content: {
-						type: 'string',
-						source: 'html',
-					},
-					tag: {
-						type: 'string',
-						default: 'td',
-						source: 'tag',
-					},
-				},
-			},
-		},
-	},
-	foot: {
-		type: 'array',
-		default: [],
-		source: 'query',
-		selector: 'tfoot tr',
-		query: {
-			cells: {
-				type: 'array',
-				default: [],
-				source: 'query',
-				selector: 'td,th',
-				query: {
-					content: {
-						type: 'string',
-						source: 'html',
-					},
-					tag: {
-						type: 'string',
-						default: 'td',
-						source: 'tag',
-					},
-				},
-			},
-		},
-	},
-};
+/**
+ * Internal dependencies
+ */
+import metadata from './block.json';
 
 const supports = {
 	align: true,
@@ -99,7 +19,7 @@ const supports = {
 
 const deprecated = [
 	{
-		attributes: blockAttributes,
+		attributes: metadata.attributes,
 		supports,
 		save( { attributes } ) {
 			const {
