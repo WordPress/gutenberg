@@ -58,7 +58,7 @@ function* getBlocksWithSourcedAttributes( blocks ) {
 
 	let workingBlocks = blocks;
 	for ( let i = 0; i < blocks.length; i++ ) {
-		const block = blocks[ i ];
+		let block = blocks[ i ];
 		const blockType = yield select( 'core/blocks', 'getBlockType', block.name );
 
 		for ( const [ attributeName, schema ] of Object.entries( blockType.attributes ) ) {
@@ -90,13 +90,32 @@ function* getBlocksWithSourcedAttributes( blocks ) {
 				workingBlocks = [ ...workingBlocks ];
 			}
 
-			workingBlocks.splice( i, 1, {
+			block = {
 				...block,
 				attributes: {
 					...block.attributes,
 					[ attributeName ]: sourcedAttributeValue,
 				},
-			} );
+			};
+
+			workingBlocks.splice( i, 1, block );
+		}
+
+		// Recurse to apply source attributes to inner blocks.
+		if ( block.innerBlocks.length ) {
+			const appliedInnerBlocks = yield* getBlocksWithSourcedAttributes( block.innerBlocks );
+			if ( appliedInnerBlocks !== block.innerBlocks ) {
+				if ( workingBlocks === blocks ) {
+					workingBlocks = [ ...workingBlocks ];
+				}
+
+				block = {
+					...block,
+					innerBlocks: appliedInnerBlocks,
+				};
+
+				workingBlocks.splice( i, 1, block );
+			}
 		}
 	}
 
@@ -895,8 +914,16 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	if ( lastBlockAttributesChange ) {
 		const updatedSources = new Set;
 
-		for ( let i = 0; i < blocks.length; i++ ) {
-			const block = blocks[ i ];
+		const blockStack = [ ...blocks ];
+
+		for ( let i = 0; i < blockStack.length; i++ ) {
+			const block = blockStack[ i ];
+
+			// Account for changes occurring within nested block.
+			if ( block.innerBlocks.length ) {
+				blockStack.push( ...block.innerBlocks );
+			}
+
 			if ( ! lastBlockAttributesChange.hasOwnProperty( block.clientId ) ) {
 				continue;
 			}
