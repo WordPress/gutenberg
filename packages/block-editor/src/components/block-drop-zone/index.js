@@ -52,6 +52,7 @@ class BlockDropZone extends Component {
 		this.onFilesDrop = this.onFilesDrop.bind( this );
 		this.onHTMLDrop = this.onHTMLDrop.bind( this );
 		this.onDrop = this.onDrop.bind( this );
+		this.onDragOver = this.onDragOver.bind( this );
 	}
 
 	getInsertIndex( position ) {
@@ -84,8 +85,26 @@ class BlockDropZone extends Component {
 	}
 
 	onDrop( event, position ) {
-		const { rootClientId: dstRootClientId, clientId: dstClientId, getClientIdsOfDescendants, getBlockIndex } = this.props;
-		const { srcRootClientId, srcClientId, srcIndex, type } = parseDropEvent( event );
+		this.moveBlock( parseDropEvent( event ), position );
+	}
+
+	onDragOver( event, position ) {
+		if ( event.type !== 'default' ) {
+			return;
+		}
+		this.moveBlock( event.data, position );
+	}
+
+	moveBlock( data, position ) {
+		const {
+			rootClientId: dstRootClientId,
+			clientId: dstClientId,
+			getClientIdsOfDescendants,
+			getBlockIndex,
+			getBlockRootClientId,
+		} = this.props;
+
+		const { clientId, type } = data;
 
 		const isBlockDropType = ( dropType ) => dropType === 'block';
 		const isSameLevel = ( srcRoot, dstRoot ) => {
@@ -97,17 +116,20 @@ class BlockDropZone extends Component {
 		const isSrcBlockAnAncestorOfDstBlock = ( src, dst ) => getClientIdsOfDescendants( [ src ] ).some( ( id ) => id === dst );
 
 		if ( ! isBlockDropType( type ) ||
-			isSameBlock( srcClientId, dstClientId ) ||
-			isSrcBlockAnAncestorOfDstBlock( srcClientId, dstClientId || dstRootClientId ) ) {
+				isSameBlock( clientId, dstClientId ) ||
+				isSrcBlockAnAncestorOfDstBlock( clientId, dstClientId || dstRootClientId ) ) {
 			return;
 		}
 
 		const dstIndex = dstClientId ? getBlockIndex( dstClientId, dstRootClientId ) : undefined;
 		const positionIndex = this.getInsertIndex( position );
+		const srcRootClientId = getBlockRootClientId( clientId );
+		const srcIndex = getBlockIndex( clientId, srcRootClientId );
+
 		// If the block is kept at the same level and moved downwards,
 		// subtract to account for blocks shifting upward to occupy its old position.
 		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel( srcRootClientId, dstRootClientId ) ? positionIndex - 1 : positionIndex;
-		this.props.moveBlockToPosition( srcClientId, srcRootClientId, insertIndex );
+		this.props.moveBlockToPosition( clientId, srcRootClientId, insertIndex );
 	}
 
 	render() {
@@ -126,6 +148,7 @@ class BlockDropZone extends Component {
 					onFilesDrop={ this.onFilesDrop }
 					onHTMLDrop={ this.onHTMLDrop }
 					onDrop={ this.onDrop }
+					onDragOver={ this.onDragOver }
 				/>
 			</MediaUploadCheck>
 		);
@@ -156,11 +179,17 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { rootClientId } ) => {
-		const { getClientIdsOfDescendants, getTemplateLock, getBlockIndex } = select( 'core/block-editor' );
+		const {
+			getClientIdsOfDescendants,
+			getTemplateLock,
+			getBlockIndex,
+			getBlockRootClientId,
+		} = select( 'core/block-editor' );
 		return {
 			isLockedAll: getTemplateLock( rootClientId ) === 'all',
 			getClientIdsOfDescendants,
 			getBlockIndex,
+			getBlockRootClientId,
 		};
 	} ),
 	withFilters( 'editor.BlockDropZone' )

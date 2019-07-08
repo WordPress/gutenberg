@@ -12,6 +12,8 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 const { Provider, Consumer } = createContext( {
 	addDropZone: () => {},
 	removeDropZone: () => {},
+	getDragData: () => {},
+	setDragData: () => {},
 } );
 
 const getDragEventType = ( { dataTransfer } ) => {
@@ -57,6 +59,8 @@ class DropZoneProvider extends Component {
 		// Context methods so this component can receive data from consumers
 		this.addDropZone = this.addDropZone.bind( this );
 		this.removeDropZone = this.removeDropZone.bind( this );
+		this.setDragData = this.setDragData.bind( this );
+		this.getDragData = this.getDragData.bind( this );
 		// Utility methods
 		this.resetDragState = this.resetDragState.bind( this );
 		this.toggleDraggingOverDocument = throttle( this.toggleDraggingOverDocument.bind( this ), 200 );
@@ -65,11 +69,14 @@ class DropZoneProvider extends Component {
 		this.dropZoneCallbacks = {
 			addDropZone: this.addDropZone,
 			removeDropZone: this.removeDropZone,
+			setDragData: this.setDragData,
+			getDragData: this.getDragData,
 		};
 		this.state = {
 			hoveredDropZone: -1,
 			isDraggingOverDocument: false,
 			position: null,
+			dragData: {},
 		};
 	}
 
@@ -89,6 +96,14 @@ class DropZoneProvider extends Component {
 
 	removeDropZone( dropZone ) {
 		this.dropZones = filter( this.dropZones, ( dz ) => dz !== dropZone );
+	}
+
+	setDragData( dragData ) {
+		this.setState( { dragData } );
+	}
+
+	getDragData() {
+		return this.state.dragData;
 	}
 
 	resetDragState() {
@@ -114,7 +129,9 @@ class DropZoneProvider extends Component {
 		} ) );
 	}
 
-	toggleDraggingOverDocument( event, dragEventType ) {
+	toggleDraggingOverDocument( event ) {
+		const normalizedDragEvent = this.getNormalizedDragEvent( event );
+
 		// In some contexts, it may be necessary to capture and redirect the
 		// drag event (e.g. atop an `iframe`). To accommodate this, you can
 		// create an instance of CustomEvent with the original event specified
@@ -125,7 +142,7 @@ class DropZoneProvider extends Component {
 
 		// Index of hovered dropzone.
 		const hoveredDropZones = filter( this.dropZones, ( dropZone ) =>
-			isTypeSupportedByDropZone( dragEventType, dropZone ) &&
+			isTypeSupportedByDropZone( normalizedDragEvent.type, dropZone ) &&
 			isWithinElementBounds( dropZone.element, detail.clientX, detail.clientY )
 		);
 
@@ -172,10 +189,10 @@ class DropZoneProvider extends Component {
 			const index = this.dropZones.indexOf( dropZone );
 			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
 			dropZone.setState( {
-				isDraggingOverDocument: isTypeSupportedByDropZone( dragEventType, dropZone ),
+				isDraggingOverDocument: isTypeSupportedByDropZone( normalizedDragEvent.type, dropZone ),
 				isDraggingOverElement: isDraggingOverDropZone,
 				position: isDraggingOverDropZone ? position : null,
-				type: isDraggingOverDropZone ? dragEventType : null,
+				type: isDraggingOverDropZone ? normalizedDragEvent.type : null,
 			} );
 		} );
 
@@ -184,13 +201,40 @@ class DropZoneProvider extends Component {
 			hoveredDropZone: hoveredDropZoneIndex,
 			position,
 		};
+
 		if ( ! isShallowEqual( newState, this.state ) ) {
 			this.setState( newState );
+
+			const dropZone = this.dropZones[ hoveredDropZoneIndex ];
+			if ( !! dropZone ) {
+				dropZone.onDragOver( normalizedDragEvent, position );
+			}
+		}
+	}
+
+	getNormalizedDragEvent( event ) {
+		const type = getDragEventType( event );
+		switch ( type ) {
+			case 'file':
+				return {
+					files: event.dataTransfer.files,
+					type,
+				};
+			case 'html':
+				return {
+					html: event.dataTransfer.getData( 'text/html' ),
+					type,
+				};
+			case 'default':
+				return {
+					data: this.getDragData(),
+					type,
+				};
 		}
 	}
 
 	onDragOver( event ) {
-		this.toggleDraggingOverDocument( event, getDragEventType( event ) );
+		this.toggleDraggingOverDocument( event );
 		event.preventDefault();
 	}
 
@@ -200,21 +244,23 @@ class DropZoneProvider extends Component {
 		event.dataTransfer && event.dataTransfer.files.length; // eslint-disable-line no-unused-expressions
 
 		const { position, hoveredDropZone } = this.state;
-		const dragEventType = getDragEventType( event );
+		const normalizedDragEvent = this.getNormalizedDragEvent( event );
 		const dropZone = this.dropZones[ hoveredDropZone ];
 		this.resetDragState();
 
 		if ( dropZone ) {
-			switch ( dragEventType ) {
+			switch ( normalizedDragEvent.type ) {
 				case 'file':
-					dropZone.onFilesDrop( [ ...event.dataTransfer.files ], position );
+					dropZone.onFilesDrop( [ ...normalizedDragEvent.files ], position );
 					break;
 				case 'html':
-					dropZone.onHTMLDrop( event.dataTransfer.getData( 'text/html' ), position );
+					dropZone.onHTMLDrop( normalizedDragEvent.html, position );
 					break;
 				case 'default':
 					dropZone.onDrop( event, position );
 			}
+
+			dropZone.onUniversalDrop( normalizedDragEvent, position );
 		}
 
 		event.stopPropagation();
@@ -233,4 +279,14 @@ class DropZoneProvider extends Component {
 }
 
 export default DropZoneProvider;
-export { Consumer as DropZoneConsumer };
+
+export const withDropZoneProvider = ( WrappedComponent ) => ( props ) => (
+	<Consumer>
+		{ ( dropZoneProvider ) => (
+			<WrappedComponent
+				dropZoneProvider={ dropZoneProvider }
+				{ ...props }
+			/>
+		) }
+	</Consumer>
+);

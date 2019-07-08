@@ -9,6 +9,11 @@ import { noop } from 'lodash';
 import { Component } from '@wordpress/element';
 import { withSafeTimeout } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { withDropZoneProvider } from '../drop-zone/provider';
+
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
 const cloneHeightTransformationBreakpoint = 700;
@@ -70,7 +75,7 @@ class Draggable extends Component {
 	 * @param  {Object} transferData The data to be set to the event's dataTransfer - to be accessible in any later drop logic.
 	 */
 	onDragStart( event ) {
-		const { elementId, transferData, onDragStart = noop } = this.props;
+		const { elementId, transferData, onDragStart = noop, dropZoneProvider } = this.props;
 		const element = document.getElementById( elementId );
 		if ( ! element ) {
 			event.preventDefault();
@@ -91,6 +96,7 @@ class Draggable extends Component {
 			} );
 		}
 
+		dropZoneProvider.setDragData( transferData );
 		event.dataTransfer.setData( 'text', JSON.stringify( transferData ) );
 
 		// Prepare element clone and append to element wrapper.
@@ -159,4 +165,4 @@ class Draggable extends Component {
 	}
 }
 
-export default withSafeTimeout( Draggable );
+export default withSafeTimeout( withDropZoneProvider( Draggable ) );

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,21 +14,9 @@ import { Component, createRef } from '@wordpress/element';
  * Internal dependencies
  */
 import Dashicon from '../dashicon';
-import { DropZoneConsumer } from './provider';
+import { withDropZoneProvider } from './provider';
 
-const DropZone = ( props ) => (
-	<DropZoneConsumer>
-		{ ( { addDropZone, removeDropZone } ) => (
-			<DropZoneComponent
-				addDropZone={ addDropZone }
-				removeDropZone={ removeDropZone }
-				{ ...props }
-			/>
-		) }
-	</DropZoneConsumer>
-);
-
-class DropZoneComponent extends Component {
+class DropZone extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -37,6 +26,8 @@ class DropZoneComponent extends Component {
 			onDrop: this.props.onDrop,
 			onFilesDrop: this.props.onFilesDrop,
 			onHTMLDrop: this.props.onHTMLDrop,
+			onUniversalDrop: this.props.onUniversalDrop || noop,
+			onDragOver: this.props.onDragOver || noop,
 			setState: this.setState.bind( this ),
 		};
 		this.state = {
@@ -50,11 +41,11 @@ class DropZoneComponent extends Component {
 	componentDidMount() {
 		// Set element after the component has a node assigned in the DOM
 		this.dropZone.element = this.dropZoneElement.current;
-		this.props.addDropZone( this.dropZone );
+		this.props.dropZoneProvider.addDropZone( this.dropZone );
 	}
 
 	componentWillUnmount() {
-		this.props.removeDropZone( this.dropZone );
+		this.props.dropZoneProvider.removeDropZone( this.dropZone );
 	}
 
 	render() {
@@ -95,4 +86,4 @@ class DropZoneComponent extends Component {
 	}
 }
 
-export default DropZone;
+export default withDropZoneProvider( DropZone );
