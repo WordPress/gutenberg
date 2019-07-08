@@ -75,7 +75,13 @@ class Draggable extends Component {
 	 * @param  {Object} transferData The data to be set to the event's dataTransfer - to be accessible in any later drop logic.
 	 */
 	onDragStart( event ) {
-		const { elementId, transferData, onDragStart = noop, dropZoneProvider } = this.props;
+		const {
+			elementId,
+			transferData,
+			onDragStart = noop,
+			showClone = true,
+			dropZoneProvider,
+		} = this.props;
 		const element = document.getElementById( elementId );
 		if ( ! element ) {
 			event.preventDefault();
@@ -99,35 +105,37 @@ class Draggable extends Component {
 		dropZoneProvider.setDragData( transferData );
 		event.dataTransfer.setData( 'text', JSON.stringify( transferData ) );
 
-		// Prepare element clone and append to element wrapper.
-		const elementRect = element.getBoundingClientRect();
-		const elementWrapper = element.parentNode;
-		const elementTopOffset = parseInt( elementRect.top, 10 );
-		const elementLeftOffset = parseInt( elementRect.left, 10 );
-		const clone = element.cloneNode( true );
-		clone.id = `clone-${ elementId }`;
-		this.cloneWrapper = document.createElement( 'div' );
-		this.cloneWrapper.classList.add( cloneWrapperClass );
-		this.cloneWrapper.style.width = `${ elementRect.width + ( clonePadding * 2 ) }px`;
+		if ( showClone ) {
+			// Prepare element clone and append to element wrapper.
+			const elementRect = element.getBoundingClientRect();
+			const elementWrapper = element.parentNode;
+			const elementTopOffset = parseInt( elementRect.top, 10 );
+			const elementLeftOffset = parseInt( elementRect.left, 10 );
+			const clone = element.cloneNode( true );
+			clone.id = `clone-${ elementId }`;
+			this.cloneWrapper = document.createElement( 'div' );
+			this.cloneWrapper.classList.add( cloneWrapperClass );
+			this.cloneWrapper.style.width = `${ elementRect.width + ( clonePadding * 2 ) }px`;
 
-		if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
+			if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
 			// Scale down clone if original element is larger than 700px.
-			this.cloneWrapper.style.transform = 'scale(0.5)';
-			this.cloneWrapper.style.transformOrigin = 'top left';
-			// Position clone near the cursor.
-			this.cloneWrapper.style.top = `${ event.clientY - 100 }px`;
-			this.cloneWrapper.style.left = `${ event.clientX }px`;
-		} else {
+				this.cloneWrapper.style.transform = 'scale(0.5)';
+				this.cloneWrapper.style.transformOrigin = 'top left';
+				// Position clone near the cursor.
+				this.cloneWrapper.style.top = `${ event.clientY - 100 }px`;
+				this.cloneWrapper.style.left = `${ event.clientX }px`;
+			} else {
 			// Position clone right over the original element (20px padding).
-			this.cloneWrapper.style.top = `${ elementTopOffset - clonePadding }px`;
-			this.cloneWrapper.style.left = `${ elementLeftOffset - clonePadding }px`;
+				this.cloneWrapper.style.top = `${ elementTopOffset - clonePadding }px`;
+				this.cloneWrapper.style.left = `${ elementLeftOffset - clonePadding }px`;
+			}
+
+			// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
+			[ ...clone.querySelectorAll( 'iframe' ) ].forEach( ( child ) => child.parentNode.removeChild( child ) );
+
+			this.cloneWrapper.appendChild( clone );
+			elementWrapper.appendChild( this.cloneWrapper );
 		}
-
-		// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
-		[ ...clone.querySelectorAll( 'iframe' ) ].forEach( ( child ) => child.parentNode.removeChild( child ) );
-
-		this.cloneWrapper.appendChild( clone );
-		elementWrapper.appendChild( this.cloneWrapper );
 
 		// Mark the current cursor coordinates.
 		this.cursorLeft = event.clientX;

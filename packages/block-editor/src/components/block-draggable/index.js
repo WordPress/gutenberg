@@ -15,6 +15,7 @@ const BlockDraggable = ( { children, clientId, blockElementId, onDragStart, onDr
 			transferData={ transferData }
 			onDragStart={ onDragStart }
 			onDragEnd={ onDragEnd }
+			showClone={ false }
 		>
 			{
 				( { onDraggableStart, onDraggableEnd } ) => {

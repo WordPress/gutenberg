@@ -10,14 +10,13 @@
 
 	&.is-close-to-bottom {
 		background: none;
-		border-bottom: 3px solid theme(primary);
+		border: none;
 	}
 
 	&.is-close-to-top,
 	&.is-appender.is-close-to-top,
 	&.is-appender.is-close-to-bottom {
 		background: none;
-		border-top: 3px solid theme(primary);
-		border-bottom: none;
+		border: none;
 	}
 }
