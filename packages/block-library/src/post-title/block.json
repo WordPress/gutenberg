@@ -3,7 +3,9 @@
 	"category": "common",
 	"attributes": {
 		"title": {
-			"type": "string"
+			"type": "string",
+			"source": "post",
+			"attribute": "title"
 		}
 	}
 }

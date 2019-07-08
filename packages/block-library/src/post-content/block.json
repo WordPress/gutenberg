@@ -1,4 +1,7 @@
 {
 	"name": "core/post-content",
-	"category": "common"
+	"category": "common",
+	"supports": {
+		"multiple": false
+	}
 }

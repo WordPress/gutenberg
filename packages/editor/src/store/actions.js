@@ -12,6 +12,7 @@ import { dispatch, select, apiFetch } from '@wordpress/data-controls';
 import {
 	parse,
 	synchronizeBlocksWithTemplate,
+	serialize,
 } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -487,7 +488,8 @@ export function* savePost( options = {} ) {
 				content: editedPostContent,
 			},
 		} );
-		editedPostContent = '';
+		const postContentBlock = ( yield select( STORE_KEY, 'getBlocksForSerialization' ) ).find( ( block ) => block.name === 'core/post-content' );
+		editedPostContent = postContentBlock ? serialize( postContentBlock.innerBlocks ) : '';
 	}
 
 	let toSend = {
