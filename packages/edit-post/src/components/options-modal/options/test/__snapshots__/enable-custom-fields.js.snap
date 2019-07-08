@@ -27,15 +27,11 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   <div
     className="edit-post-options-modal__custom-fields-confirmation"
   >
-    <div
-      className="components-notice is-warning"
+    <p
+      className="edit-post-options-modal__custom-fields-confirmation-message"
     >
-      <div
-        className="components-notice__content"
-      >
-        Page reload is required for this change.
-      </div>
-    </div>
+      Page reload is required for this change.
+    </p>
     <button
       className="components-button is-button is-default"
       disabled={false}
@@ -102,15 +98,11 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   <div
     className="edit-post-options-modal__custom-fields-confirmation"
   >
-    <div
-      className="components-notice is-warning"
+    <p
+      className="edit-post-options-modal__custom-fields-confirmation-message"
     >
-      <div
-        className="components-notice__content"
-      >
-        Page reload is required for this change.
-      </div>
-    </div>
+      Page reload is required for this change.
+    </p>
     <button
       className="components-button is-button is-default"
       disabled={false}

@@ -28,19 +28,9 @@
 	}
 
 	&__custom-fields-confirmation {
-		margin-left: 48px;
-
-		@include break-medium() {
-			margin-left: 38px;
-		}
-
-		.components-notice,
+		&-message,
 		.components-button {
-			margin: 0.2rem 0;
-		}
-
-		.components-notice__content {
-			margin: 0;
+			margin: 0 0 0.6rem;
 		}
 	}
 }

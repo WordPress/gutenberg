@@ -3,7 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Notice, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -16,9 +16,9 @@ export function CustomFieldsConfirmation() {
 
 	return (
 		<div className="edit-post-options-modal__custom-fields-confirmation">
-			<Notice status="warning" isDismissible={ false }>
+			<p className="edit-post-options-modal__custom-fields-confirmation-message">
 				{ __( 'Page reload is required for this change.' ) }
-			</Notice>
+			</p>
 			<Button
 				isDefault
 				isBusy={ isReloading }
