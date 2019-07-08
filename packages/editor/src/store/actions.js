@@ -104,13 +104,6 @@ function* getBlocksWithSourcedAttributes( blocks ) {
  * @param {Array?} template  Block Template.
  */
 export function* setupEditor( post, edits, template ) {
-	yield {
-		type: 'SETUP_EDITOR',
-		post,
-		edits,
-		template,
-	};
-
 	// In order to ensure maximum of a single parse during setup, edits are
 	// included as part of editor setup action. Assume edited content as
 	// canonical if provided, falling back to post.
@@ -132,6 +125,12 @@ export function* setupEditor( post, edits, template ) {
 	yield resetPost( post );
 	yield resetEditorBlocks( blocks );
 	yield setupEditorState( post );
+	yield {
+		type: 'SETUP_EDITOR',
+		post,
+		edits,
+		template,
+	};
 	yield* subscribeSources();
 }
 
