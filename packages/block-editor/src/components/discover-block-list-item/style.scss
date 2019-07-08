@@ -1,6 +1,6 @@
 .discover-blocks-list__list-item {
 	width: 100%;
-	padding: 12px;
+	padding: 0;
 	margin: 0 0 12px;
 	display: flex;
 	flex-direction: row;
@@ -21,6 +21,7 @@
 .discover-blocks-list__item-header {
 	display: flex;
 	flex-direction: row;
+	padding: 12px 12px 0;
 	align-items: start;
 	> div {
 		display: flex;
@@ -58,6 +59,41 @@
 	}
 }
 
+.discover-blocks-list__item-body {
+	display: flex;
+	flex-direction: column;
+	padding: 12px;
+	.discover-blocks-list__item-description {
+		color: $dark-gray-400;
+		margin-top: 4px;
+	}
+	> div {
+		display: flex;
+		justify-content: space-between;
+		color: $dark-gray-400;
+		.dashicons {
+			font-size: 16px;
+		}
+		.dashicons-chart-line {
+			font-weight: 900;
+		}
+	}
+}
+
+.discover-blocks-list__item-footer {
+	display: flex;
+	flex-direction: column;
+	padding: 12px;
+	background-color: $light-gray-500;
+	> span {
+		margin-bottom: 4px;
+	}
+	.discover-blocks-list__item-author-info,
+	.discover-blocks-list__item-support-time {
+		color: $dark-gray-400;
+	}
+}
+
 .discover-blocks-list__item {
 	font-size: $default-font-size;
 	color: $dark-gray-700;
@@ -67,9 +103,4 @@
 	display: flex;
 	flex-grow: 1;
 	flex-direction: column;
-}
-
-.discover-blocks-list__item-description {
-	color: $dark-gray-400;
-	margin-top: 4px;
 }

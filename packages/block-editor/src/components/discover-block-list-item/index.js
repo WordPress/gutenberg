@@ -45,7 +45,7 @@ function DiscoverBlockListItem( {
 									<span className="dashicons dashicons-star-filled"></span>
 								</div>
 								<span className="rating-count">
-									(213)
+									(XXX)
 								</span>
 							</div>
 						</div>
@@ -62,9 +62,30 @@ function DiscoverBlockListItem( {
 						Add
 					</Button>
 				</div>
-				<span className="discover-blocks-list__item-description">
-					{ description }
-				</span>
+				<div className="discover-blocks-list__item-body">
+					<span className="discover-blocks-list__item-description">
+						{ description }
+					</span>
+					<div>
+						<div>
+							<span className="dashicons dashicons-chart-line"></span>XX active installations
+						</div>
+						<div>
+							<span className="dashicons dashicons-update"></span>Updated X week ago.
+						</div>
+					</div>
+				</div>
+				<div className="discover-blocks-list__item-footer">
+					<span className="discover-blocks-list__item-author-by">
+						Authored by <strong>XXX</strong>
+					</span>
+					<span className="discover-blocks-list__item-author-info">
+						This author has <strong>X</strong> blocks, with an average rating of <strong>X.X</strong>.
+					</span>
+					<span className="discover-blocks-list__item-support-time">
+						They have an average support time of <strong>X days</strong>.
+					</span>
+				</div>
 			</div>
 		</li>
 	);
