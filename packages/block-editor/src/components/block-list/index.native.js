@@ -80,7 +80,7 @@ export class BlockList extends Component {
 			return 0;
 		} else if ( this.props.selectedBlockOrder === -1 ) {
 			// if no block selected, insert at end of post
-			return this.blockCount;
+			return this.props.blockCount;
 		}
 		// insert after selected block
 		return this.props.selectedBlockOrder + 1;
