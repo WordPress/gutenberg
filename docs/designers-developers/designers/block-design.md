@@ -74,7 +74,9 @@ Avoid long, multi-line block names.
 
 ### Block Description
 
-Every block should include a description attribute in the [registerBlockType function](/docs/designers-developers/developers/block-api/block-registration/). The description will display in the Settings sidebar and should explain your block's function clearly.
+Every block should include a description that clearly explains the block's function. The description will display in the Settings Sidebar.
+
+You can add a description by using the description attribute in the [registerBlockType function](/docs/designers-developers/developers/block-api/block-registration/). 
 
 Stick to a single imperative sentence with an action + subject format. Examples:
 
