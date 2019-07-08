@@ -174,7 +174,7 @@ attributes: {
 
 Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
 
-For example, a paragraph block can be transformed into a heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock)
+For example, a Paragraph block can be transformed into a Heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock)
 
 {% codetabs %}
 {% ES5 %}
@@ -274,7 +274,7 @@ transforms: {
 ```
 {% end %}
 
-A block can also be transformed into another block type. For example, a heading block can be transformed into a paragraph block.
+A block can also be transformed into another block type. For example, a Heading block can be transformed into a Paragraph block.
 
 {% codetabs %}
 {% ES5 %}
@@ -345,7 +345,7 @@ transforms: {
 {% end %}
 
 
-A block with innerBlocks can also be transformed from and to another block with innerBlocks.
+A block with InnerBlocks can also be transformed from and to another block with InnerBlocks.
 
 {% codetabs %}
 {% ES5 %}
@@ -478,7 +478,7 @@ transforms: {
 ```
 {% end %}
 
-A prefix transform is a transform that will be applied if the user prefixes some text in e.g. the paragraph block with a given pattern and a trailing space.
+A prefix transform is a transform that will be applied if the user prefixes some text in e.g. the Paragraph block with a given pattern and a trailing space.
 
 {% codetabs %}
 {% ES5 %}
