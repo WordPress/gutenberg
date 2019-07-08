@@ -129,8 +129,9 @@ export function* setupEditor( post, edits, template ) {
 		blocks = synchronizeBlocksWithTemplate( blocks, template );
 	}
 
-	yield setupEditorState( post );
+	yield resetPost( post );
 	yield resetEditorBlocks( blocks );
+	yield setupEditorState( post );
 	yield* subscribeSources();
 }
 
