@@ -55,14 +55,6 @@ class BlockDropZone extends Component {
 		this.onDragOver = this.onDragOver.bind( this );
 	}
 
-	getInsertIndex( position ) {
-		const { clientId, rootClientId, getBlockIndex } = this.props;
-		if ( clientId !== undefined ) {
-			const index = getBlockIndex( clientId, rootClientId );
-			return position.y === 'top' ? index : index + 1;
-		}
-	}
-
 	onFilesDrop( files, position ) {
 		const transformation = findTransform(
 			getBlockTransforms( 'from' ),
@@ -84,18 +76,18 @@ class BlockDropZone extends Component {
 		}
 	}
 
-	onDrop( event, position ) {
-		this.moveBlock( parseDropEvent( event ), position );
+	onDrop( event ) {
+		this.moveBlock( parseDropEvent( event ) );
 	}
 
-	onDragOver( event, position ) {
+	onDragOver( event ) {
 		if ( event.type !== 'default' ) {
 			return;
 		}
-		this.moveBlock( event.data, position );
+		this.moveBlock( event.data );
 	}
 
-	moveBlock( data, position ) {
+	moveBlock( data ) {
 		const {
 			rootClientId: dstRootClientId,
 			clientId: dstClientId,
@@ -107,11 +99,6 @@ class BlockDropZone extends Component {
 		const { clientId, type } = data;
 
 		const isBlockDropType = ( dropType ) => dropType === 'block';
-		const isSameLevel = ( srcRoot, dstRoot ) => {
-			// Note that rootClientId of top-level blocks will be undefined OR a void string,
-			// so we also need to account for that case separately.
-			return ( srcRoot === dstRoot ) || ( ! srcRoot === true && ! dstRoot === true );
-		};
 		const isSameBlock = ( src, dst ) => src === dst;
 		const isSrcBlockAnAncestorOfDstBlock = ( src, dst ) => getClientIdsOfDescendants( [ src ] ).some( ( id ) => id === dst );
 
@@ -121,15 +108,9 @@ class BlockDropZone extends Component {
 			return;
 		}
 
-		const dstIndex = dstClientId ? getBlockIndex( dstClientId, dstRootClientId ) : undefined;
-		const positionIndex = this.getInsertIndex( position );
+		const dstIndex = getBlockIndex( dstClientId, dstRootClientId );
 		const srcRootClientId = getBlockRootClientId( clientId );
-		const srcIndex = getBlockIndex( clientId, srcRootClientId );
-
-		// If the block is kept at the same level and moved downwards,
-		// subtract to account for blocks shifting upward to occupy its old position.
-		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel( srcRootClientId, dstRootClientId ) ? positionIndex - 1 : positionIndex;
-		this.props.moveBlockToPosition( clientId, srcRootClientId, insertIndex );
+		this.props.moveBlockToPosition( clientId, srcRootClientId, dstIndex );
 	}
 
 	render() {
