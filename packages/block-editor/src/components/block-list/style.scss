@@ -530,8 +530,8 @@
 		margin: 0 $block-padding;
 	}
 
-	// Hide appender shortcuts in nested blocks
-	// This essentially duplicates the mobile styles for the appender component
+	// Hide appender shortcuts in nested blocks.
+	// This essentially duplicates the mobile styles for the appender component.
 	// It would be nice to be able to use element queries in that component instead https://github.com/tomhodgins/element-queries-spec
 	.block-editor-block-list__layout {
 		.block-editor-inserter-with-shortcuts {
@@ -544,6 +544,38 @@
 			right: $grid-size;
 		}
 	}
+}
+
+
+/**
+ * Styles that affect inner-block containers (nested blocks).
+ */
+
+// Hide trailing appender for non-empty blocks, until selected.
+.block-editor-inner-blocks {
+	.block-editor-block-list__block + .block-list-appender {
+		display: none;
+
+		// When a parent container is selected, show the appender.
+		.is-selected & {
+			display: block;
+		}
+	}
+
+	// When a child of a parent is selected, show the adjacent appender.
+	.block-editor-block-list__block.is-selected + .block-list-appender {
+		display: block;
+	}
+
+	/* @todo:
+	The two rules above can be simplified & combined when https://github.com/WordPress/gutenberg/pull/14961 is merged,
+	into the following:
+
+	.is-selected &,
+	.has-child-selected & {
+		display: block;
+	}
+	*/
 }
 
 
