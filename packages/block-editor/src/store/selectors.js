@@ -73,28 +73,6 @@ const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
 
 /**
- * Returns a new reference when the inner blocks of a given block client ID
- * change. This is used exclusively as a memoized selector dependant, relying
- * on this selector's shared return value and recursively those of its inner
- * blocks defined as dependencies. This abuses mechanics of the selector
- * memoization to return from the original selector function only when
- * dependants change.
- *
- * @param {Object} state    Editor state.
- * @param {string} clientId Block client ID.
- *
- * @return {*} A value whose reference will change only when inner blocks of
- *             the given block client ID change.
- */
-export const getBlockDependantsCacheBust = createSelector(
-	() => [],
-	( state, clientId ) => map(
-		getBlockOrder( state, clientId ),
-		( innerBlockClientId ) => getBlock( state, innerBlockClientId ),
-	),
-);
-
-/**
  * Returns a block's name given its client ID, or null if no block exists with
  * the client ID.
  *
@@ -192,8 +170,12 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, clientId ) => [
-		...getBlockAttributes.getDependants( state, clientId ),
-		getBlockDependantsCacheBust( state, clientId ),
+		// Normally, we'd have both  `getBlockAttributes` dependancies and
+		// `getBlocks` (children) dependancies here but for performance reasons
+		// we use a denormalized cache key computed in the reducer that takes both
+		// the attributes and inner blocks into account. The value of the cache key
+		// is being changed whenever one of these dependencies is out of date.
+		state.blocks.cache[ clientId ],
 	]
 );
 
@@ -458,22 +440,11 @@ export function getSelectedBlock( state ) {
  *
  * @return {?string} Root client ID, if exists
  */
-export const getBlockRootClientId = createSelector(
-	( state, clientId ) => {
-		const { order } = state.blocks;
-
-		for ( const rootClientId in order ) {
-			if ( includes( order[ rootClientId ], clientId ) ) {
-				return rootClientId;
-			}
-		}
-
-		return null;
-	},
-	( state ) => [
-		state.blocks.order,
-	]
-);
+export function getBlockRootClientId( state, clientId ) {
+	return state.blocks.parents[ clientId ] !== undefined ?
+		state.blocks.parents[ clientId ] :
+		null;
+}
 
 /**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -483,21 +454,15 @@ export const getBlockRootClientId = createSelector(
  *
  * @return {string} Root client ID
  */
-export const getBlockHierarchyRootClientId = createSelector(
-	( state, clientId ) => {
-		let rootClientId = clientId;
-		let current = clientId;
-		while ( rootClientId ) {
-			current = rootClientId;
-			rootClientId = getBlockRootClientId( state, current );
-		}
-
-		return current;
-	},
-	( state ) => [
-		state.blocks.order,
-	]
-);
+export function getBlockHierarchyRootClientId( state, clientId ) {
+	let current = clientId;
+	let parent;
+	do {
+		parent = current;
+		current = state.blocks.parents[ current ];
+	} while ( current );
+	return parent;
+}
 
 /**
  * Returns the client ID of the block adjacent one at the given reference
