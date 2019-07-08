@@ -74,7 +74,13 @@ Avoid long, multi-line block names.
 
 ### Block Description
 
-Every block should include a description in the “Block” tab of the Settings sidebar. This description should explain your block's function clearly. Keep it to a single sentence.
+Every block should include a description in the “Block” tab of the Settings sidebar. This description should explain your block's function clearly.
+
+Stick to a single imperative sentence with an action + subject format. Examples:
+
+- Start with the building block of all narrative.
+- Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.
+- Create a bulleted or numbered list.
 
 ![A screenshot of a short block description](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/block-descriptions-do.png)
 **Do:**
