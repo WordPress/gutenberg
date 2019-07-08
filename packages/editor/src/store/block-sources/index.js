@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import * as post from './post';
 import * as meta from './meta';
 
-export { meta };
+export { post, meta };

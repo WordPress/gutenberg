@@ -1,4 +1,5 @@
 {
 	"name": "core/post-content",
-	"category": "common"
+	"category": "common",
+	"multiple": false
 }
