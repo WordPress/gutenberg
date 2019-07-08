@@ -278,6 +278,18 @@ _Returns_
 
 -   `Array`: ids of top-level and descendant blocks.
 
+<a name="getDiscoverBlocks" href="#getDiscoverBlocks">#</a> **getDiscoverBlocks**
+
+Returns the available uninstalled blocks
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Array`: Discoverable blocks
+
 <a name="getFirstMultiSelectedBlockClientId" href="#getFirstMultiSelectedBlockClientId">#</a> **getFirstMultiSelectedBlockClientId**
 
 Returns the client ID of the first block in the multi-selection set, or null
@@ -1070,6 +1082,10 @@ clientId should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+
+<a name="setDiscoverBlocks" href="#setDiscoverBlocks">#</a> **setDiscoverBlocks**
+
+Undocumented declaration.
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
