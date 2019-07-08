@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { identity } from 'lodash';
-import { Text, View, Keyboard, SafeAreaView, Platform } from 'react-native';
+import { Text, View, Keyboard, SafeAreaView, Platform, TouchableWithoutFeedback } from 'react-native';
 import { subscribeMediaAppend } from 'react-native-gutenberg-bridge';
 
 /**
@@ -33,6 +33,7 @@ export class BlockList extends Component {
 
 		this.renderItem = this.renderItem.bind( this );
 		this.renderAddBlockSeparator = this.renderAddBlockSeparator.bind( this );
+		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
 		this.renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
 		this.onBlockTypeSelected = this.onBlockTypeSelected.bind( this );
@@ -171,6 +172,7 @@ export class BlockList extends Component {
 					title={ this.props.title }
 					ListHeaderComponent={ this.props.header }
 					ListEmptyComponent={ this.renderDefaultBlockAppender }
+					ListFooterComponent={ this.renderBlockListFooter }
 				/>
 				<SafeAreaView>
 					<View style={ { height: toolbarHeight } } />
@@ -239,6 +241,17 @@ export class BlockList extends Component {
 				<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
 				<View style={ styles.lineStyleAddHere }></View>
 			</View>
+		);
+	}
+
+	renderBlockListFooter() {
+		const paragraphBlock = createBlock( 'core/paragraph' );
+		return (
+			<TouchableWithoutFeedback onPress={ () => {
+				this.finishBlockAppendingOrReplacing( paragraphBlock );
+			} } >
+				<View style={ styles.blockListFooter } />
+			</TouchableWithoutFeedback>
 		);
 	}
 
