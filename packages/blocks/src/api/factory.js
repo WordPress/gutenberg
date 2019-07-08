@@ -147,8 +147,8 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		return false;
 	}
 
-	// Don't allow single 'core/group' blocks to be transformed into
-	// a 'core/group' block.
+	// Don't allow single Grouping blocks to be transformed into
+	// a Grouping block.
 	if ( ! isMultiBlock && isContainerGroupBlock( sourceBlock.name ) && isContainerGroupBlock( transform.blockName ) ) {
 		return false;
 	}
@@ -374,7 +374,7 @@ export function switchToBlockType( blocks, name ) {
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
 
-	// Unless it's a `core/group` Block then for multi block selections
+	// Unless it's a Grouping Block then for multi block selections
 	// check that all Blocks are of the same type otherwise
 	// we can't run a conversion
 	if ( ! isContainerGroupBlock( name ) && isMultiBlock && ! isBlockSelectionOfSameType( blocksArray ) ) {

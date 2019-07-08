@@ -99,7 +99,7 @@ export default compose( [
 					return;
 				}
 
-				// Activate the `transform` on `core/group` which does the conversion
+				// Activate the `transform` on the Grouping Block which does the conversion
 				const newBlocks = switchToBlockType( blocksSelection, groupingBlockName );
 
 				if ( newBlocks ) {
