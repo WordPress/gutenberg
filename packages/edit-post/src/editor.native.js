@@ -135,8 +135,8 @@ class Editor extends Component {
 		if ( ! prevProps.isReady && this.props.isReady ) {
 			const blocks = this.props.getEditorBlocks();
 			const isUnsupportedBlock = ( { name } ) => name === getUnregisteredTypeHandlerName();
-			const unsupportedBlocksName = blocks.filter( isUnsupportedBlock ).map( ( block ) => block.attributes.originalName );
-			RNReactNativeGutenbergBridge.editorDidMount( unsupportedBlocksName );
+			const unsupportedBlockNames = blocks.filter( isUnsupportedBlock ).map( ( block ) => block.attributes.originalName );
+			RNReactNativeGutenbergBridge.editorDidMount( unsupportedBlockNames );
 		}
 	}
 
