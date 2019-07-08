@@ -37,6 +37,13 @@ import { awaitNextStateChange } from './controls';
 import * as sources from './block-sources';
 
 /**
+ * Map of Registry instance to WeakMap of dependencies by custom source.
+ *
+ * @type WeakMap<WPDataRegistry,WeakMap<WPBlockAttributeSource,Object>>
+ */
+const lastBlockSourceDependenciesByRegistry = new WeakMap;
+
+/**
  * Given a blocks array, returns a blocks array with sourced attribute values
  * applied. The reference will remain consistent with the original argument if
  * no attribute values must be overridden. If sourced values are applied, the
@@ -143,43 +150,47 @@ export function tearDownEditor() {
  *
  * @yield {Object} Action object.
  */
-export const subscribeSources = ( () => {
-	const lastDependencies = new WeakMap();
+export function* subscribeSources() {
+	while ( true ) {
+		const registry = yield awaitNextStateChange();
 
-	return function* () {
-		while ( true ) {
-			yield awaitNextStateChange();
+		// The bailout case: If the editor becomes unmounted, it will flag
+		// itself as non-ready. Effectively unsubscribes from the registry.
+		const isStillReady = yield select( 'core/editor', '__unstableIsEditorReady' );
+		if ( ! isStillReady ) {
+			break;
+		}
 
-			// The bailout case: If the editor becomes unmounted, it will flag
-			// itself as non-ready. Effectively unsubscribes from the registry.
-			const isStillReady = yield select( 'core/editor', '__unstableIsEditorReady' );
-			if ( ! isStillReady ) {
-				break;
+		let reset = false;
+		for ( const source of Object.values( sources ) ) {
+			if ( ! source.getDependencies ) {
+				continue;
 			}
 
-			let reset = false;
-			for ( const source of Object.values( sources ) ) {
-				if ( ! source.getDependencies ) {
-					continue;
-				}
+			const dependencies = yield* source.getDependencies();
 
-				const dependencies = yield* source.getDependencies();
-				if ( ! isShallowEqual( dependencies, lastDependencies.get( source ) ) ) {
-					// Allow the loop to continue in order to assign latest
-					// dependencies values, but mark for reset. Avoid reset
-					// from the first assignment.
-					reset = reset || lastDependencies.has( source );
-
-					lastDependencies.set( source, dependencies );
-				}
+			if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+				lastBlockSourceDependenciesByRegistry.set( registry, new WeakMap );
 			}
 
-			if ( reset ) {
-				yield resetEditorBlocks( yield select( 'core/editor', 'getEditorBlocks' ) );
+			const lastBlockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
+			const lastDependencies = lastBlockSourceDependencies.get( source );
+
+			if ( ! isShallowEqual( dependencies, lastDependencies ) ) {
+				// Allow the loop to continue in order to assign latest
+				// dependencies values, but mark for reset. Avoid reset
+				// from the first assignment.
+				reset = reset || lastDependencies !== undefined;
+
+				lastBlockSourceDependencies.set( source, dependencies );
 			}
 		}
-	};
-} )();
+
+		if ( reset ) {
+			yield resetEditorBlocks( yield select( 'core/editor', 'getEditorBlocks' ) );
+		}
+	}
+}
 
 /**
  * Action generator function used in signalling that sources are to be updated

@@ -18,7 +18,7 @@ const controls = {
 		( registry ) => () => new Promise( ( resolve ) => {
 			const unsubscribe = registry.subscribe( () => {
 				unsubscribe();
-				resolve();
+				resolve( registry );
 			} );
 		} )
 	),
