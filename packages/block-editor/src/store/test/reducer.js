@@ -28,6 +28,7 @@ import {
 	insertionPoint,
 	template,
 	blockListSettings,
+	lastBlockAttributesChange,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -2388,6 +2389,62 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'lastBlockAttributesChange', () => {
+		it( 'is a tuple, defaulting to null values', () => {
+			const state = lastBlockAttributesChange( undefined, {} );
+
+			expect( state ).toEqual( [ null, null ] );
+		} );
+
+		it( 'does not return updated value when block update does not include attributes', () => {
+			const original = deepFreeze( [ null, null ] );
+
+			const state = lastBlockAttributesChange( original, {
+				type: 'UPDATE_BLOCK',
+				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				updates: {},
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
+		it( 'returns updated value when block update includes attributes', () => {
+			const original = deepFreeze( [ null, null ] );
+
+			const state = lastBlockAttributesChange( original, {
+				type: 'UPDATE_BLOCK',
+				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				updates: {
+					attributes: {
+						food: 'banana',
+					},
+				},
+			} );
+
+			expect( state ).toEqual( [
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				{ food: 'banana' },
+			] );
+		} );
+
+		it( 'returns updated value when explicit block attributes update', () => {
+			const original = deepFreeze( [ null, null ] );
+
+			const state = lastBlockAttributesChange( original, {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					food: 'banana',
+				},
+			} );
+
+			expect( state ).toEqual( [
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				{ food: 'banana' },
+			] );
 		} );
 	} );
 } );
