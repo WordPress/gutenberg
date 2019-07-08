@@ -53,11 +53,12 @@ const deprecated = [
 					<Tag>
 						{ rows.map( ( { cells }, rowIndex ) => (
 							<tr key={ rowIndex }>
-								{ cells.map( ( { content, tag }, cellIndex ) =>
+								{ cells.map( ( { content, tag, scope }, cellIndex ) =>
 									<RichText.Content
 										tagName={ tag }
 										value={ content }
 										key={ cellIndex }
+										scope={ tag === 'th' ? scope : undefined }
 									/>
 								) }
 							</tr>
