@@ -22,7 +22,6 @@ export function PostSchedule() {
 								className="edit-post-post-schedule__toggle"
 								onClick={ onToggle }
 								aria-expanded={ isOpen }
-								aria-live="polite"
 								isLink
 							>
 								<PostScheduleLabel />
