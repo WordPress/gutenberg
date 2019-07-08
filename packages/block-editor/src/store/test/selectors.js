@@ -58,6 +58,7 @@ const {
 	getTemplate,
 	getTemplateLock,
 	getBlockListSettings,
+	getLastBlockAttributesChange,
 	INSERTER_UTILITY_HIGH,
 	INSERTER_UTILITY_MEDIUM,
 	INSERTER_UTILITY_LOW,
@@ -2436,6 +2437,16 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockListSettings( state, 'chicken' ) ).toBe( undefined );
+		} );
+	} );
+
+	describe( 'getLastBlockAttributesChange', () => {
+		it( 'returns the last block attributes change', () => {
+			const state = { lastBlockAttributesChange: [ null, null ] };
+
+			const result = getLastBlockAttributesChange( state );
+
+			expect( result ).toEqual( [ null, null ] );
 		} );
 	} );
 } );
