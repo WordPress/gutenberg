@@ -9,13 +9,13 @@ These sources are implemented here using a uniform interface for applying and re
 
 ## Source API
 
+### `getDependencies`
+
+Store control called on every store change, expected to return an object whose values represent the data blocks assigned this source depend. When these values change, all blocks assigned this source are automatically updated. The value returned from this function is passed as the second argument of the source's `apply` function, where it is expected to be used as shared data relevant for sourcing the attribute value.
+
 ### `apply`
 
-Store control called when the editor blocks value is changed. Given a block object, returns a new block with the sourced attribute value assigned.
-
-### `applyAll`
-
-Store control called when the editor blocks value is changed. Given an array of blocks, modifies block entries which source from a sourced property, responsible for returning a new block array with attribute values assigned.
+Function called to retrieve an attribute value for a block. Given the attribute schema and the dependencies defined by the source's `getDependencies`, the function should return the expected attribute value.
 
 ### `update`
 
