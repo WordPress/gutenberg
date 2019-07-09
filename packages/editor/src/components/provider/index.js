@@ -41,35 +41,12 @@ const fetchLinkSuggestions = async ( search ) => {
 };
 
 class EditorProvider extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 
 		this.getBlockEditorSettings = memize( this.getBlockEditorSettings, {
 			maxSize: 1,
 		} );
-
-		// Assume that we don't need to initialize in the case of an error recovery.
-		if ( props.recovery ) {
-			return;
-		}
-
-		props.updatePostLock( props.settings.postLock );
-		props.setupEditor( props.post, props.initialEdits, props.settings.template );
-
-		if ( props.settings.autosave ) {
-			props.createWarningNotice(
-				__( 'There is an autosave of this post that is more recent than the version below.' ),
-				{
-					id: 'autosave-exists',
-					actions: [
-						{
-							label: __( 'View the autosave' ),
-							url: props.settings.autosave.editLink,
-						},
-					],
-				}
-			);
-		}
 	}
 
 	getBlockEditorSettings(
@@ -108,6 +85,29 @@ class EditorProvider extends Component {
 	}
 
 	componentDidMount() {
+		// Assume that we don't need to initialize in the case of an error recovery.
+		if ( this.props.recovery ) {
+			return;
+		}
+
+		this.props.updatePostLock( this.props.settings.postLock );
+		this.props.setupEditor( this.props.post, this.props.initialEdits, this.props.settings.template );
+
+		if ( this.props.settings.autosave ) {
+			this.props.createWarningNotice(
+				__( 'There is an autosave of this post that is more recent than the version below.' ),
+				{
+					id: 'autosave-exists',
+					actions: [
+						{
+							label: __( 'View the autosave' ),
+							url: this.props.settings.autosave.editLink,
+						},
+					],
+				}
+			);
+		}
+
 		this.props.updateEditorSettings( this.props.settings );
 
 		if ( ! this.props.settings.styles ) {
@@ -148,10 +148,6 @@ class EditorProvider extends Component {
 			hasUploadPermissions,
 		} = this.props;
 
-		if ( ! isReady ) {
-			return null;
-		}
-
 		const editorSettings = this.getBlockEditorSettings(
 			settings,
 			reusableBlocks,
@@ -166,6 +162,7 @@ class EditorProvider extends Component {
 				onChange={ resetEditorBlocks }
 				settings={ editorSettings }
 				useSubRegistry={ false }
+				isReady={ isReady }
 			>
 				{ children }
 				<ReusableBlocksButtons />
