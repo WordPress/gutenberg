@@ -34,19 +34,22 @@ class BlockEditorProvider extends Component {
 			this.attachChangeObserver( registry );
 		}
 
-		// Reset a changing value, but only if the new value is not a result of
-		// an outbound sync initiated by this component. Even when the render
-		// results from an outbound sync, a reset may still occur if the value
-		// is modified (not equal by reference), to allow that the consumer may
-		// apply modifications to reflect back on the editor.
-		if ( value !== prevProps.value && this.isSyncingOutcomingValue !== value ) {
+		if ( this.isSyncingOutcomingValue !== null && this.isSyncingOutcomingValue === value ) {
+			// Skip block reset if the value matches expected outbound sync
+			// triggered by this component by a preceding change detection.
+			// Only skip if the value matches expectation, since a reset should
+			// still occur if the value is modified (not equal by reference),
+			// to allow that the consumer may apply modifications to reflect
+			// back on the editor.
+			this.isSyncingOutcomingValue = null;
+		} else if ( value !== prevProps.value ) {
+			// Reset changing value in all other cases than the sync described
+			// above. Since this can be reached in an update following an out-
+			// bound sync, unset the outbound value to avoid considering it in
+			// subsequent renders.
+			this.isSyncingOutcomingValue = null;
 			this.isSyncingIncomingValue = value;
 			resetBlocks( value );
-		}
-
-		// Unset expected outbound value to avoid considering in future render.
-		if ( this.isSyncingOutcomingValue ) {
-			this.isSyncingOutcomingValue = null;
 		}
 	}
 
