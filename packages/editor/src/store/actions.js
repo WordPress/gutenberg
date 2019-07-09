@@ -177,14 +177,14 @@ export function* setupEditor( post, edits, template ) {
 
 	yield resetPost( post );
 	yield* resetLastBlockSourceDependencies();
-	yield resetEditorBlocks( blocks );
-	yield setupEditorState( post );
 	yield {
 		type: 'SETUP_EDITOR',
 		post,
 		edits,
 		template,
 	};
+	yield resetEditorBlocks( blocks );
+	yield setupEditorState( post );
 	yield* subscribeSources();
 }
 
