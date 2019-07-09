@@ -1302,11 +1302,25 @@ _Related_
 
 -   stopTyping in core/block-editor store.
 
+<a name="subscribeSources" href="#subscribeSources">#</a> **subscribeSources**
+
+Returns an action generator which loops to await the next state change,
+calling to reset blocks when a block source dependencies change.
+
 <a name="synchronizeTemplate" href="#synchronizeTemplate">#</a> **synchronizeTemplate**
 
 _Related_
 
 -   synchronizeTemplate in core/block-editor store.
+
+<a name="tearDownEditor" href="#tearDownEditor">#</a> **tearDownEditor**
+
+Returns an action object signalling that the editor is being destroyed and
+that any necessary state or side-effect cleanup should occur.
+
+_Returns_
+
+-   `Object`: Action object.
 
 <a name="toggleBlockMode" href="#toggleBlockMode">#</a> **toggleBlockMode**
 
