@@ -21,7 +21,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  * WordPress dependencies
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { Component, createRef } from '@wordpress/element';
+import { Component, Fragment, createRef } from '@wordpress/element';
 import { withSpokenMessages, PanelBody } from '@wordpress/components';
 import {
 	getCategories,
@@ -387,10 +387,10 @@ export class InserterMenu extends Component {
 						isEmpty( discoverItems ) ?
 							( <p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p> ) :
 							(
-								<fragment>
+								<Fragment>
 									<p className="editor-inserter__no-results-with-discover-items block-editor-inserter__no-results-with-discover-items">{ __( 'No blocks found in your library. We did find these blocks available for download:' ) }</p>
 									<DiscoverBlocksList items={ discoverItems } onSelect={ onSelect } onHover={ this.onHover } />
-								</fragment>
+								</Fragment>
 							)
 					) }
 				</div>
