@@ -31,12 +31,21 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 
 	let mediaWidth, mediaHeight, mediaSourceUrl;
 	if ( media ) {
-		const mediaSize = applyFilters( 'editor.PostFeaturedImage.imageSize', 'thumbnail', media.id, currentPostId );
+		const mediaSize = applyFilters( 'editor.PostFeaturedImage.imageSize', 'post-thumbnail', media.id, currentPostId );
+		const fallbackMediaSize = applyFilters( 'editor.PostFeaturedImage.fallbackImageSize', 'thumbnail', media.id, currentPostId );
+
 		if ( has( media, [ 'media_details', 'sizes', mediaSize ] ) ) {
+			// use mediaSize when available
 			mediaWidth = media.media_details.sizes[ mediaSize ].width;
 			mediaHeight = media.media_details.sizes[ mediaSize ].height;
 			mediaSourceUrl = media.media_details.sizes[ mediaSize ].source_url;
+		} else if ( has( media, [ 'media_details', 'sizes', fallbackMediaSize ] ) ) {
+			// use fallbackMediaSize when mediaSize is not available
+			mediaWidth = media.media_details.sizes[ fallbackMediaSize ].width;
+			mediaHeight = media.media_details.sizes[ fallbackMediaSize ].height;
+			mediaSourceUrl = media.media_details.sizes[ fallbackMediaSize ].source_url;
 		} else {
+			// use full image size when mediaFallbackSize and mediaSize are not available
 			mediaWidth = media.media_details.width;
 			mediaHeight = media.media_details.height;
 			mediaSourceUrl = media.source_url;
