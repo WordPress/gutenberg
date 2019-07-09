@@ -43,11 +43,11 @@ export class AutosaveMonitor extends Component {
 
 	toggleTimer( isPendingSave ) {
 		clearTimeout( this.pendingSave );
-		const { autosaveInterval } = this.props;
+		const { interval } = this.props;
 		if ( isPendingSave ) {
 			this.pendingSave = setTimeout(
 				() => this.props.autosave(),
-				autosaveInterval * 1000
+				interval * 1000
 			);
 		}
 	}
@@ -58,25 +58,29 @@ export class AutosaveMonitor extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, ownProps ) => {
 		const {
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
 			getReferenceByDistinctEdits,
 			isAutosavingPost,
+			getEditorSettings,
 		} = select( 'core/editor' );
 
-		const { autosaveInterval } = select( 'core/editor' ).getEditorSettings();
+		const { interval = getEditorSettings().autosaveInterval } = ownProps;
 
 		return {
 			isDirty: isEditedPostDirty(),
 			isAutosaveable: isEditedPostAutosaveable(),
 			editsReference: getReferenceByDistinctEdits(),
 			isAutosaving: isAutosavingPost(),
-			autosaveInterval,
+			interval,
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		autosave: dispatch( 'core/editor' ).autosave,
+	withDispatch( ( dispatch, ownProps ) => ( {
+		autosave() {
+			const { autosave = dispatch( 'core/editor' ).autosave } = ownProps;
+			autosave();
+		},
 	} ) ),
 ] )( AutosaveMonitor );
