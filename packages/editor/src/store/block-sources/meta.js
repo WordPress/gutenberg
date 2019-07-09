@@ -14,7 +14,7 @@ import { editPost } from '../actions';
  * equality of the returned object), blocks are reset to apply the new sourced
  * value.
  *
- * @yield {Object} Optional yielded controls.
+ * @yield  {Object} Optional yielded controls.
  * @return {Object} Dependencies as object.
  */
 export function* getDependencies() {
