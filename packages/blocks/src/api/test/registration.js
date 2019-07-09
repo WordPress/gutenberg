@@ -95,6 +95,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
+				keywords: [],
 				save: noop,
 				category: 'common',
 				title: 'block title',
@@ -111,6 +113,8 @@ describe( 'blocks', () => {
 		it( 'should reject blocks with invalid save function', () => {
 			const block = registerBlockType( 'my-plugin/fancy-block-5', {
 				...defaultBlockSettings,
+				attributes: {},
+				keywords: [],
 				save: 'invalid',
 			} );
 			expect( console ).toHaveErroredWith( 'The "save" property must be a valid function.' );
@@ -159,6 +163,25 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
+		it( 'should assign default settings', () => {
+			registerBlockType( 'core/test-block-with-defaults', {
+				title: 'block title',
+				category: 'common',
+			} );
+
+			expect( getBlockType( 'core/test-block-with-defaults' ) ).toEqual( {
+				name: 'core/test-block-with-defaults',
+				title: 'block title',
+				category: 'common',
+				icon: {
+					src: 'block-default',
+				},
+				attributes: {},
+				keywords: [],
+				save: expect.any( Function ),
+			} );
+		} );
+
 		it( 'should default to browser-initialized global attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
 			unstable__bootstrapServerSideBlockDefinitions( {
@@ -181,6 +204,7 @@ describe( 'blocks', () => {
 						type: 'boolean',
 					},
 				},
+				keywords: [],
 			} );
 		} );
 
@@ -218,6 +242,8 @@ describe( 'blocks', () => {
 							fill="red" stroke="blue" strokeWidth="10" />
 					</svg> ),
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
@@ -237,6 +263,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'foo',
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
@@ -262,6 +290,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: MyTestIcon,
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
@@ -293,6 +323,8 @@ describe( 'blocks', () => {
 							fill="red" stroke="blue" strokeWidth="10" />
 					</svg> ),
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
@@ -309,6 +341,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
@@ -394,6 +428,8 @@ describe( 'blocks', () => {
 					icon: {
 						src: 'block-default',
 					},
+					attributes: {},
+					keywords: [],
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
@@ -406,6 +442,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
+				keywords: [],
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -478,6 +516,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
@@ -493,6 +533,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 	} );
@@ -515,6 +557,8 @@ describe( 'blocks', () => {
 					icon: {
 						src: 'block-default',
 					},
+					attributes: {},
+					keywords: [],
 				},
 				{
 					name: 'core/test-block-with-settings',
@@ -525,6 +569,8 @@ describe( 'blocks', () => {
 					icon: {
 						src: 'block-default',
 					},
+					attributes: {},
+					keywords: [],
 				},
 			] );
 		} );
