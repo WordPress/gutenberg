@@ -1,9 +1,5 @@
 ## Master
 
-### Improvements
-
-- Omitting `attributes` or `keywords` settings will now stub default values (an empty object or empty array, respectively).
-
 ### Bug Fixes
 
 - The `'blocks.registerBlockType'` filter is now applied to each of a block's deprecated settings as well as the block's main settings. Ensures `supports` settings like `anchor` work for deprecations.

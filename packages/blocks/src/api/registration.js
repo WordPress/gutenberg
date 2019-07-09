@@ -22,71 +22,29 @@ import { select, dispatch } from '@wordpress/data';
 import { isValidIcon, normalizeIconObject } from './utils';
 
 /**
- * Render behavior of a block type icon; one of a Dashicon slug, an element,
- * or a component.
- *
- * @typedef {(string|WPElement|WPComponent)} WPBlockTypeIconRender
- *
- * @see https://developer.wordpress.org/resource/dashicons/
- */
-
-/**
- * An object describing a normalized block type icon.
- *
- * @typedef {WPBlockTypeIconDescriptor}
- *
- * @property {WPBlockTypeIconRender} src         Render behavior of the icon,
- *                                               one of a Dashicon slug, an
- *                                               element, or a component.
- * @property {string}                background  Optimal background hex string
- *                                               color when displaying icon.
- * @property {string}                foreground  Optimal foreground hex string
- *                                               color when displaying icon.
- * @property {string}                shadowColor Optimal shadow hex string
- *                                               color when displaying icon.
- */
-
-/**
- * Value to use to render the icon for a block type in an editor interface,
- * either a Dashicon slug, an element, a component, or an object describing
- * the icon.
- *
- * @typedef {(WPBlockTypeIconDescriptor|WPBlockTypeIconRender)} WPBlockTypeIcon
- */
-
-/**
  * Defined behavior of a block type.
  *
  * @typedef {WPBlockType}
  *
- * @property {string}           name       Block type's namespaced name.
- * @property {string}           title      Human-readable block type label.
- * @property {string}           category   Block type category classification,
- *                                         used in search interfaces to arrange
- *                                         block types by category.
- * @property {?WPBlockTypeIcon} icon       Block type icon.
- * @property {?string[]}        keywords   Additional keywords to produce block
- *                                         type as result in search interfaces.
- * @property {?Object}          attributes Block type attributes.
- * @property {?WPComponent}     save       Optional component describing
- *                                         serialized markup structure of a
- *                                         block type.
- * @property {WPComponent}      edit       Component rendering an element to
- *                                         manipulate the attributes of a block
- *                                         in the context of an editor.
+ * @property {string}                    name       Block's namespaced name.
+ * @property {string}                    title      Human-readable label for a block.
+ *                                                  Shown in the block inserter.
+ * @property {string}                    category   Category classification of block,
+ *                                                  impacting where block is shown in
+ *                                                  inserter results.
+ * @property {(Object|string|WPElement)} icon       Slug of the Dashicon to be shown
+ *                                                  as the icon for the block in the
+ *                                                  inserter, or element or an object describing the icon.
+ * @property {?string[]}                 keywords   Additional keywords to produce
+ *                                                  block as inserter search result.
+ * @property {?Object}                   attributes Block attributes.
+ * @property {?Function}                 save       Serialize behavior of a block,
+ *                                                  returning an element describing
+ *                                                  structure of the block's post
+ *                                                  content markup.
+ * @property {WPComponent}               edit       Component rendering element to be
+ *                                                  interacted with in an editor.
  */
-
-/**
- * Default values to assign for omitted optional block type settings.
- *
- * @type {Object}
- */
-const DEFAULT_BLOCK_TYPE_SETTINGS = {
-	icon: 'block-default',
-	attributes: {},
-	keywords: [],
-	save: () => null,
-};
 
 let serverSideBlockDefinitions = {};
 
@@ -116,7 +74,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
-		...DEFAULT_BLOCK_TYPE_SETTINGS,
+		save: () => null,
 		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};
