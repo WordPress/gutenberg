@@ -11,7 +11,7 @@ These sources are implemented here using a uniform interface for applying and re
 
 ### `getDependencies`
 
-Store control called on every store change, expected to return an object whose values represent the data blocks assigned this source depend. When these values change, all blocks assigned this source are automatically updated. The value returned from this function is passed as the second argument of the source's `apply` function, where it is expected to be used as shared data relevant for sourcing the attribute value.
+Store control called on every store change, expected to return an object whose values represent the data blocks assigned this source depend on. When these values change, all blocks assigned this source are automatically updated. The value returned from this function is passed as the second argument of the source's `apply` function, where it is expected to be used as shared data relevant for sourcing the attribute value.
 
 ### `apply`
 
