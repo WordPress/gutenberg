@@ -257,7 +257,7 @@ describe( 'block serializer', () => {
 			setFreeformContentHandlerName( 'core/freeform-block' );
 			const block = createBlock( 'core/freeform-block', { fruit: 'Bananas' } );
 
-			const content = serializeBlock( block, { isNested: true } );
+			const content = serializeBlock( block, { isInnerBlocks: true } );
 
 			expect( content ).toBe(
 				'<!-- wp:freeform-block {\"fruit\":\"Bananas\"} -->\n' +

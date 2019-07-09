@@ -639,7 +639,7 @@ Takes a block or set of blocks and returns the serialized post content.
 _Parameters_
 
 -   _blocks_ `Array`: Block(s) to serialize.
--   _options_ `Object`: Serialization options.
+-   _options_ `WPBlockSerializationOptions`: Serialization options.
 
 _Returns_
 
