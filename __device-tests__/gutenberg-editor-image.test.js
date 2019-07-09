@@ -46,6 +46,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 		await editorPage.addNewImageBlock();
 		let imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 
+		// Can only add image from media library on iOS
 		if ( ! isAndroid() ) {
 			await editorPage.selectEmptyImageBlock( imageBlock );
 			await editorPage.chooseMediaLibrary();
@@ -67,6 +68,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 		await editorPage.addNewImageBlock();
 		let imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 
+		// Can only add image from media library on iOS
 		if ( ! isAndroid() ) {
 			await editorPage.selectEmptyImageBlock( imageBlock );
 			await editorPage.chooseMediaLibrary();
@@ -84,7 +86,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 		}
 		await editorPage.sendTextToParagraphBlockAtPosition( 2, testData.longText );
 
-		// check HTML for iOS, android missing image
+		// skip HTML check for Android since we couldn't add image from media library
 		if ( ! isAndroid() ) {
 			await editorPage.verifyHtmlContent( testData.imageCompletehtml );
 		}
