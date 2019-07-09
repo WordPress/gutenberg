@@ -96,8 +96,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void editorDidMount(boolean hasUnsupportedBlocks) {
-        mGutenbergBridgeJS2Parent.editorDidMount(hasUnsupportedBlocks);
+    public void editorDidMount(ReadableArray unsupportedBlockNames) {
+        mGutenbergBridgeJS2Parent.editorDidMount(unsupportedBlockNames);
     }
 
     @ReactMethod

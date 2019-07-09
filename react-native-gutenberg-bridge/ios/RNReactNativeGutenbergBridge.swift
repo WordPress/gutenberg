@@ -85,9 +85,10 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func editorDidMount(_ hasUnsupportedBlocks: Bool) {
+    func editorDidMount(_ unsupportedBlockNames: [AnyObject]) {
+        let unsupportedNames = unsupportedBlockNames.compactMap { $0 as? String }
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidMount(hasUnsupportedBlocks: hasUnsupportedBlocks)
+            self.delegate?.gutenbergDidMount(unsupportedBlockNames: unsupportedNames)
         }
     }
 

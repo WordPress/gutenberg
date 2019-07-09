@@ -21,6 +21,7 @@ import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -114,7 +115,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnEditorMountListener {
-        void onEditorDidMount(boolean hasUnsupportedBlocks);
+        void onEditorDidMount(ReadableArray unsupportedBlockNames);
     }
 
     public interface OnAuthHeaderRequestedListener {
@@ -200,8 +201,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void editorDidMount(boolean hasUnsupportedBlocks) {
-                mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
+            public void editorDidMount(ReadableArray unsupportedBlockNames) {
+                mOnEditorMountListener.onEditorDidMount(unsupportedBlockNames);
                 mIsEditorMounted = true;
                 if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
                     setFocusOnTitle();
