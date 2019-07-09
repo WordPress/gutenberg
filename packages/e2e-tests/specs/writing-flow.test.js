@@ -34,7 +34,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
-		await page.keyboard.type( 'First col' );
+		await page.keyboard.type( '1st col' );
 
 		// TODO: ArrowDown should traverse into the second column. In slower
 		// CPUs, it can sometimes remain in the first column paragraph. This
@@ -55,7 +55,7 @@ describe( 'adding blocks', () => {
 		// Arrow up into nested context focuses last text input
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
-		expect( activeElementText ).toBe( 'Second col' );
+		expect( activeElementText ).toBe( '2nd col' );
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
 		// (2) text fields.
