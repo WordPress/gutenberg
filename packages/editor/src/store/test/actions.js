@@ -658,6 +658,13 @@ describe( 'Editor actions', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual( actions.resetPost( post ) );
 		} );
+		it( 'should yield the SETUP_EDITOR action', () => {
+			const { value } = fulfillment.next();
+			expect( value ).toEqual( {
+				type: 'SETUP_EDITOR',
+				post: { content: { raw: '' }, status: 'publish' },
+			} );
+		} );
 		it( 'should yield action object for resetEditorBlocks', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual( actions.resetEditorBlocks( [] ) );
@@ -669,13 +676,6 @@ describe( 'Editor actions', () => {
 					{ content: { raw: '' }, status: 'publish' }
 				)
 			);
-		} );
-		it( 'should yield the SETUP_EDITOR action', () => {
-			const { value } = fulfillment.next();
-			expect( value ).toEqual( {
-				type: 'SETUP_EDITOR',
-				post: { content: { raw: '' }, status: 'publish' },
-			} );
 		} );
 	} );
 
