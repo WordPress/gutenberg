@@ -255,17 +255,18 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
  * Returns the content of a block, including comment delimiters, determining
  * serialized attributes and content form from the current state of the block.
  *
- * @param {Object} block Block instance.
+ * @param {Object} block   Block instance.
+ * @param {Object} options Serialization options.
  *
  * @return {string} Serialized block.
  */
-export function serializeBlock( block ) {
+export function serializeBlock( block, { isNested = false } = {} ) {
 	const blockName = block.name;
 	const saveContent = getBlockContent( block );
 
-	switch ( blockName ) {
-		case getFreeformContentHandlerName():
-		case getUnregisteredTypeHandlerName():
+	switch ( true ) {
+		case ! isNested && blockName === getFreeformContentHandlerName():
+		case blockName === getUnregisteredTypeHandlerName():
 			return saveContent;
 
 		default: {
@@ -280,9 +281,12 @@ export function serializeBlock( block ) {
  * Takes a block or set of blocks and returns the serialized post content.
  *
  * @param {Array} blocks Block(s) to serialize.
+ * @param {Object} options Serialization options.
  *
  * @return {string} The post content.
  */
-export default function serialize( blocks ) {
-	return castArray( blocks ).map( serializeBlock ).join( '\n\n' );
+export default function serialize( blocks, options ) {
+	return castArray( blocks )
+		.map( ( block ) => serializeBlock( block, options ) )
+		.join( '\n\n' );
 }
