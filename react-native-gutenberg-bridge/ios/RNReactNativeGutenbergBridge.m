@@ -10,7 +10,7 @@ RCT_EXTERN_METHOD(requestImageUploadCancelDialog:(int)mediaID)
 RCT_EXTERN_METHOD(requestImageUploadCancel:(int)mediaID)
 RCT_EXTERN_METHOD(requestMediaImport:(NSString *)sourceURL callback:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(editorDidLayout)
-RCT_EXTERN_METHOD(editorDidMount:(BOOL)hasUnsupportedBlocks)
+RCT_EXTERN_METHOD(editorDidMount:(NSArray *)unsupportedBlockNames)
 RCT_EXTERN_METHOD(editorDidEmitLog:(NSString *)message logLevel:(int)logLevel)
 
 @end
