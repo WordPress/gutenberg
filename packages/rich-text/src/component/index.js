@@ -142,6 +142,7 @@ class RichText extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+		window.cancelAnimationFrame( this.rafId );
 	}
 
 	setRef( node ) {
@@ -371,6 +372,10 @@ class RichText extends Component {
 		this.props.onSelectionChange( index, index );
 		this.setState( { activeFormats } );
 
+		// The next animation frame is the first point in time where the
+		// selection is known.
+		this.rafId = window.requestAnimationFrame( this.onSelectionChange );
+
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
@@ -460,6 +465,21 @@ class RichText extends Component {
 	 * Handles the `selectionchange` event: sync the selection to local state.
 	 */
 	onSelectionChange() {
+		const selection = getSelection();
+
+		if ( ! selection.rangeCount ) {
+			return;
+		}
+
+		const range = selection.getRangeAt( 0 );
+
+		// The selection hasn't changes if the range is the same.
+		if ( range === this.onSelectionChange.lastRange ) {
+			return;
+		}
+
+		this.onSelectionChange.lastRange = range;
+
 		const { start, end } = this.createRecord();
 		const value = this.getRecord();
 
@@ -699,6 +719,10 @@ class RichText extends Component {
 			} else {
 				this.onSplit( record );
 			}
+		}
+
+		if ( ! event.defaultPrevented ) {
+			this.rafId = window.requestAnimationFrame( this.onSelectionChange );
 		}
 	}
 
