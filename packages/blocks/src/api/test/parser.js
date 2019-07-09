@@ -761,23 +761,30 @@ describe( 'block parser', () => {
 	describe( 'serializeBlockNode', () => {
 		it( 'reserializes block nodes', () => {
 			const expected = `<!-- wp:columns -->
-<div class="wp-block-columns has-2-columns">
-<!-- wp:column -->
-<div class="wp-block-column">
-<!-- wp:paragraph -->
-<p>A</p>
-<!-- /wp:paragraph -->
-</div>
-<!-- /wp:column -->
-<!-- wp:column -->
-<div class="wp-block-column">
-<!-- wp:list -->
-<ul><li>B</li><li>C</li></ul>
-<!-- /wp:list -->
-</div>
-<!-- /wp:column -->
-</div>
-<!-- /wp:columns -->`;
+				<div class="wp-block-columns has-2-columns">
+					<!-- wp:column -->
+					<div class="wp-block-column">
+						<!-- wp:paragraph -->
+						<p>A</p>
+						<!-- /wp:paragraph -->
+					</div>
+					<!-- /wp:column -->
+					<!-- wp:column -->
+					<div class="wp-block-column">
+						<!-- wp:group -->
+						<div class="wp-block-group"><div class="wp-block-group__inner-container">
+							<!-- wp:list -->
+							<ul><li>B</li><li>C</li></ul>
+							<!-- /wp:list -->
+							<!-- wp:paragraph -->
+							<p>D</p>
+							<!-- /wp:paragraph -->
+						</div></div>
+						<!-- /wp:group -->
+					</div>
+					<!-- /wp:column -->
+				</div>
+				<!-- /wp:columns -->`.replace( /\t/g, '' );
 			const input = {
 				blockName: 'core/columns',
 				attrs: {},
@@ -806,11 +813,31 @@ describe( 'block parser', () => {
 						attrs: {},
 						innerBlocks: [
 							{
-								blockName: 'core/list',
+								blockName: 'core/group',
 								attrs: {},
-								innerBlocks: [],
-								innerHTML: '<ul><li>B</li><li>C</li></ul>',
-								innerContent: [ '<ul><li>B</li><li>C</li></ul>' ],
+								innerBlocks: [
+									{
+										blockName: 'core/list',
+										attrs: {},
+										innerBlocks: [],
+										innerHTML: '<ul><li>B</li><li>C</li></ul>',
+										innerContent: [ '<ul><li>B</li><li>C</li></ul>' ],
+									},
+									{
+										blockName: 'core/paragraph',
+										attrs: {},
+										innerBlocks: [],
+										innerHTML: '<p>D</p>',
+										innerContent: [ '<p>D</p>' ],
+									},
+								],
+								innerHTML: '<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+								innerContent: [
+									'<div class="wp-block-group"><div class="wp-block-group__inner-container">',
+									null,
+									'',
+									null,
+									'</div></div>' ],
 							},
 						],
 						innerHTML: '<div class="wp-block-column"></div>',
