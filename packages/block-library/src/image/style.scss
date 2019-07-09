@@ -59,3 +59,10 @@
 		margin-right: auto;
 	}
 }
+
+// Variations
+.is-style-circle-crop img {
+	// We use an absolute pixel to prevent the oval shape that a value of 50% would give
+	// to rectangular images. A pill-shape is better than otherwise.
+	border-radius: 9999px;
+}

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,6 +24,10 @@ export const settings = {
 	keywords: [
 		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
 		__( 'photo' ),
+	],
+	styles: [
+		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
+		{ name: 'circle-crop', label: _x( 'Circle Crop', 'block style' ) },
 	],
 	transforms,
 	getEditWrapperProps( attributes ) {
