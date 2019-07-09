@@ -1,6 +1,7 @@
 1.9.0
 ------
 * Tapping on an empty editor area will create a new paragraph block
+* Fix content loss issue when loading unsupported blocks containing inner blocks.
 
 1.8.0
 ------
