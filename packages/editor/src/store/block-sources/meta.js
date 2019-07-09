@@ -9,7 +9,7 @@ import { select } from '@wordpress/data-controls';
 import { editPost } from '../actions';
 
 /**
- * Store control invoked upon a state changes, responsible for returning an
+ * Store control invoked upon a state change, responsible for returning an
  * object of dependencies. When a change in dependencies occurs (by shallow
  * equality of the returned object), blocks are reset to apply the new sourced
  * value.
