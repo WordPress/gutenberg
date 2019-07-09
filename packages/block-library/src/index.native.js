@@ -114,7 +114,8 @@ export const registerCoreBlocks = () => {
 		separator,
 		list,
 		quote,
-		mediaText,
+		// eslint-disable-next-line no-undef
+		typeof __DEV__ !== 'undefined' && __DEV__ ? mediaText : null,
 	].forEach( ( { metadata, name, settings } ) => {
 		registerBlockType( name, {
 			...metadata,
