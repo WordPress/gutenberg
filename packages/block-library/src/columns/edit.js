@@ -135,9 +135,11 @@ export function ColumnsEdit( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
+	const showTemplateSelector = ( count === 0 && ! forceUseTemplate ) || ! template;
+
 	return (
 		<>
-			{ template && (
+			{ ! showTemplateSelector && (
 				<>
 					<InspectorControls>
 						<PanelBody>
@@ -170,9 +172,7 @@ export function ColumnsEdit( {
 						setForceUseTemplate( true );
 					} }
 					__experimentalAllowTemplateOptionSkip
-					// setting the template to null when the inner blocks
-					// are empty allows to reset to the placeholder state.
-					template={ count === 0 && ! forceUseTemplate ? null : template }
+					template={ showTemplateSelector ? null : template }
 					templateLock="all"
 					allowedBlocks={ ALLOWED_BLOCKS } />
 			</div>
