@@ -43,17 +43,8 @@
 				font-weight: 600;
 				margin-left: 12px;
 			}
-			.plugin-rating {
+			.block-ratings {
 				margin-left: 12px;
-				width: 100%;
-				display: flex;
-				.dashicons {
-					font-size: 1.2em;
-					width: 1.1em;
-				}
-				.rating-count {
-					color: $dark-gray-400;
-				}
 			}
 		}
 	}

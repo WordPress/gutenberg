@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import BlockRatings from '../block-ratings';
 
 /**
  * WordPress dependencies
@@ -36,18 +37,7 @@ function DiscoverBlockListItem( {
 							<span className="discover-blocks-list__item-title">
 								{ title }
 							</span>
-							<div className="plugin-rating">
-								<div className="wporg-ratings" aria-label="5 out of 5 stars" style={ { color: '#ffb900' } }>
-									<span className="dashicons dashicons-star-filled"></span>
-									<span className="dashicons dashicons-star-filled"></span>
-									<span className="dashicons dashicons-star-filled"></span>
-									<span className="dashicons dashicons-star-filled"></span>
-									<span className="dashicons dashicons-star-filled"></span>
-								</div>
-								<span className="rating-count">
-									(XXX)
-								</span>
-							</div>
+							<BlockRatings rating={ 4.5 } ratingCount={ 110 } />
 						</div>
 					</div>
 					<Button
