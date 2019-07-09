@@ -923,12 +923,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 			for ( const [ attributeName, schema ] of Object.entries( blockType.attributes ) ) {
 				const source = sources[ schema.source ];
 
-				if (
-					attributes.hasOwnProperty( attributeName ) &&
-					source &&
-					source.update &&
-					! updatedSources.has( source )
-				) {
+				if ( attributes.hasOwnProperty( attributeName ) && source && source.update ) {
 					yield* source.update( schema, attributes[ attributeName ] );
 					updatedSources.add( source );
 				}
