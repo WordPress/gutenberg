@@ -18,6 +18,7 @@ export default class EditorPage {
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
 	listBlockName = 'List';
+	imageBlockName = 'Image';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
@@ -57,6 +58,13 @@ export default class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
+	async getTitleElement() {
+		//TODO: Improve the identifier for this element
+		const titleIdentifier = isAndroid() ? '//android.view.ViewGroup[@content-desc="Post title. Welcome to Gutenberg!"]/android.widget.EditText' :
+			'//XCUIElementTypeOther[@name="Add title"]/XCUIElementTypeTextView';
+		return await this.driver.elementByXPath( titleIdentifier );
+	}
+
 	// Converts to lower case and checks for a match to lowercased html content
 	// Ensure to take additional steps to handle text being changed by auto correct
 	async verifyHtmlContent( html: string ) {
@@ -77,6 +85,14 @@ export default class EditorPage {
 		await htmlContentView.setText( html );
 
 		await toggleHtmlMode( this.driver, false );
+	}
+
+	async dismissKeyboard() {
+		if ( isAndroid() ) {
+			return await this.driver.hideDeviceKeyboard();
+		}
+		const hideKeyboardToolbarButton = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Hide keyboard"]' );
+		await hideKeyboardToolbarButton.click();
 	}
 
 	// =========================
@@ -236,7 +252,7 @@ export default class EditorPage {
 	}
 
 	async hasListBlockAtPosition( position: number ) {
-		return this.hasBlockAtPosition( position, this.listBlockName );
+		return await this.hasBlockAtPosition( position, this.listBlockName );
 	}
 
 	async getTextViewForListBlock( block: wd.PromiseChainWebdriver.Element ) {
@@ -269,5 +285,39 @@ export default class EditorPage {
 		const block = await this.getListBlockAtPosition( position );
 		const text = await this.getTextForListBlock( block );
 		return text.toString();
+	}
+
+	// =========================
+	// Image Block functions
+	// =========================
+
+	async addNewImageBlock() {
+		await this.addNewBlock( this.imageBlockName );
+	}
+
+	async getImageBlockAtPosition( position: number ) {
+		return this.getBlockAtPosition( position, this.imageBlockName );
+	}
+
+	async selectEmptyImageBlock( block: wd.PromiseChainWebdriver.Element ) {
+		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
+		const imageBlockInnerElement = await this.driver.elementByXPath( blockLocator );
+		await imageBlockInnerElement.click();
+	}
+
+	async chooseMediaLibrary() {
+		const mediaLibraryButton = await this.driver.elementByAccessibilityId( 'WordPress Media Library' );
+		await mediaLibraryButton.click();
+	}
+
+	async enterCaptionToSelectedImageBlock( caption: string ) {
+		const imageBlockCaptionField = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Image caption. Empty"]' );
+		await imageBlockCaptionField.click();
+		await typeString( this.driver, imageBlockCaptionField, caption );
+	}
+
+	async removeImageBlockAtPosition( position: number ) {
+		return await this.removeBlockAtPosition( position, this.imageBlockName );
 	}
 }
