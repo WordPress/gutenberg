@@ -52,9 +52,15 @@ In most cases, a block’s setup state is only shown once and then further custo
 
 ## Do's and Don'ts
 
-### Blocks
+### Block Identification
 
 A block should have a straightforward, short name so users can easily find it in the Block Library. A block named "YouTube" is easy to find and understand. The same block, named "Embedded Video (YouTube)", would be less clear and harder to find in the Block Library.
+
+When referring to a block in documentation or UI, use title case for the block title, and lowercase for the "block" descriptor. For example:
+
+- Paragraph block
+- Latest Posts block
+- Media & Text block
 
 Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://material.io/tools/icons/). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
 
@@ -68,7 +74,15 @@ Avoid long, multi-line block names.
 
 ### Block Description
 
-Every block should include a description in the “Block” tab of the Settings sidebar. This description should explain your block's function clearly. Keep it to a single sentence.
+Every block should include a description that clearly explains the block's function. The description will display in the Settings Sidebar.
+
+You can add a description by using the description attribute in the [registerBlockType function](/docs/designers-developers/developers/block-api/block-registration/). 
+
+Stick to a single imperative sentence with an action + subject format. Examples:
+
+- Start with the building block of all narrative.
+- Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.
+- Create a bulleted or numbered list.
 
 ![A screenshot of a short block description](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/block-descriptions-do.png)
 **Do:**
