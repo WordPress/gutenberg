@@ -19,6 +19,16 @@ exports.listEndedHtml = `<!-- wp:list -->
 <p></p>
 <!-- /wp:paragraph -->`;
 
+exports.pastePlainText = `Hello paste`;
+
+const pastedHtmlText = `<!-- wp:paragraph -->
+<p><strong>Hello</strong> paste</p>
+<!-- /wp:paragraph -->`;
+
+exports.pasteHtmlText = pastedHtmlText;
+
+exports.pasteHtmlTextResult = `${ pastedHtmlText }\n\n${ pastedHtmlText }`;
+
 exports.deviceRotationHtml = `<!-- wp:paragraph -->
 <p>The finer continuum interprets the polynomial rabbit. When can the geology cheat? An astronomer runs. Should a communist consent?</p>
 <!-- /wp:paragraph -->

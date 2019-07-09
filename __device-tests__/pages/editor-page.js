@@ -60,9 +60,9 @@ export default class EditorPage {
 
 	async getTitleElement() {
 		//TODO: Improve the identifier for this element
-		return isAndroid() ?
-			await this.driver.elementByXPath( '//android.view.ViewGroup[@content-desc="Post title. Welcome to Gutenberg!"]/android.widget.EditText' ) :
-			await this.driver.elementByXPath( '//XCUIElementTypeOther[@name="Add title"]/XCUIElementTypeTextView' );
+		const titleIdentifier = isAndroid() ? '//android.view.ViewGroup[@content-desc="Post title. Welcome to Gutenberg!"]/android.widget.EditText' :
+			'//XCUIElementTypeOther[@name="Add title"]/XCUIElementTypeTextView';
+		return await this.driver.elementByXPath( titleIdentifier );
 	}
 
 	// Converts to lower case and checks for a match to lowercased html content
@@ -73,6 +73,16 @@ export default class EditorPage {
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 		const text = await htmlContentView.text();
 		expect( text.toLowerCase() ).toBe( html.toLowerCase() );
+
+		await toggleHtmlMode( this.driver, false );
+	}
+
+	// set html editor content explicitly
+	async setHtmlContentAndroid( html: string ) {
+		await toggleHtmlMode( this.driver, true );
+
+		const htmlContentView = await this.getTextViewForHtmlViewContent();
+		await htmlContentView.setText( html );
 
 		await toggleHtmlMode( this.driver, false );
 	}

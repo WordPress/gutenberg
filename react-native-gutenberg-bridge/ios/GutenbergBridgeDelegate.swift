@@ -19,6 +19,32 @@ public enum LogLevel: Int {
     case info
     case warn
     case error
+    case fatal
+}
+
+// Avoid possible future problems due to log level int value changes.
+extension LogLevel {
+    init (_ rnLogLevel: RCTLogLevel) {
+        switch rnLogLevel {
+        case .trace: self = .trace
+        case .info: self = .info
+        case .warning: self = .warn
+        case .error: self = .error
+        case .fatal: self = .fatal
+        }
+    }
+}
+
+extension RCTLogLevel {
+    init(_ logLevel: LogLevel) {
+        switch logLevel {
+        case .trace: self = .trace
+        case .info: self = .info
+        case .warn: self = .warning
+        case .error: self = .error
+        case .fatal: self = .fatal
+        }
+    }
 }
 
 public protocol GutenbergBridgeDelegate: class {
@@ -69,8 +95,10 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidLayout()
 
     /// Tells the delegate that the editor view has completed the initial render.
+    /// - Parameters:
+    ///   - unsupportedBlockNames: A list of loaded block names that are not supported.
     ///
-    func gutenbergDidMount(hasUnsupportedBlocks: Bool)
+    func gutenbergDidMount(unsupportedBlockNames: [String])
 
     /// Tells the delegate that logger method is called.
     ///

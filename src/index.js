@@ -14,6 +14,7 @@ import { setLocaleData } from '@wordpress/i18n';
  */
 import './globals';
 import { getTranslation } from '../i18n-cache';
+import initialHtml from './initial-html';
 
 const gutenbergSetup = () => {
 	const apiFetch = require( '@wordpress/api-fetch' ).default;
@@ -26,13 +27,6 @@ const gutenbergSetup = () => {
 	const userId = 1;
 	const storageKey = 'WP_DATA_USER_' + userId;
 	wpData.use( wpData.plugins.persistence, { storageKey } );
-};
-
-const editorSetup = () => {
-	require( '@wordpress/format-library' );
-	const editPost = require( '@wordpress/edit-post' );
-
-	editPost.initializeEditor();
 };
 
 const setupLocale = ( locale, extraTranslations ) => {
@@ -57,16 +51,26 @@ export class RootComponent extends React.Component {
 	constructor( props ) {
 		super( props );
 		setupLocale( props.locale, props.translations );
-		bootstrapEditor();
+		require( '@wordpress/edit-post' ).initializeEditor();
 	}
 
 	render() {
-		// eslint-disable-next-line no-unused-vars
-		const { locale, translations, ...otherProps } = this.props;
-		// Need to wait for everything to be setup before requiring our App
-		const App = require( './app/App' ).default;
+		const { initialHtmlModeEnabled } = this.props;
+		let initialData = this.props.initialData;
+		let initialTitle = this.props.initialTitle;
+		if ( initialData === undefined && __DEV__ ) {
+			initialData = initialHtml;
+		}
+		if ( initialTitle === undefined ) {
+			initialTitle = 'Welcome to Gutenberg!';
+		}
+		const Editor = require( '@wordpress/edit-post' ).Editor;
 		return (
-			<App { ...otherProps } />
+			<Editor
+				initialHtml={ initialData }
+				initialHtmlModeEnabled={ initialHtmlModeEnabled }
+				initialTitle={ initialTitle }
+			/>
 		);
 	}
 }
@@ -75,10 +79,7 @@ export function registerApp() {
 	// Disable require circle warnings showing up in the app (they will still be visible in the console)
 	YellowBox.ignoreWarnings( [ 'Require cycle:' ] );
 
-	AppRegistry.registerComponent( 'gutenberg', () => RootComponent );
-}
-
-export function bootstrapEditor() {
 	gutenbergSetup();
-	editorSetup();
+
+	AppRegistry.registerComponent( 'gutenberg', () => RootComponent );
 }

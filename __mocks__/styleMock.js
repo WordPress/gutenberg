@@ -19,12 +19,12 @@ module.exports = {
 	blockCode: {
 		fontFamily: 'serif',
 	},
-	'block-editor-rich-text': {
+	'rich-text': {
 		fontFamily: 'serif',
 		minHeight: 30,
 	},
-	'block-editor-rich-text-placeholder': {
-		color: '',
+	'rich-text-placeholder': {
+		color: 'gray',
 	},
 	'block-editor-plain-text': {
 		fontFamily: 'serif',
