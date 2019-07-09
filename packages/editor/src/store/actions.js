@@ -910,28 +910,27 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	// Sync to sources from block attributes updates.
 	if ( lastBlockAttributesChange ) {
 		const updatedSources = new Set;
-
-		const blockStack = [ ...blocks ];
-
-		for ( let i = 0; i < blockStack.length; i++ ) {
-			const block = blockStack[ i ];
-
-			// Account for changes occurring within nested block.
-			if ( block.innerBlocks.length ) {
-				blockStack.push( ...block.innerBlocks );
-			}
-
-			if ( ! lastBlockAttributesChange.hasOwnProperty( block.clientId ) ) {
+		const updatedBlockTypes = new Set;
+		for ( const [ clientId, attributes ] of Object.entries( lastBlockAttributesChange ) ) {
+			const blockName = yield select( 'core/block-editor', 'getBlockName', clientId );
+			if ( updatedBlockTypes.has( blockName ) ) {
 				continue;
 			}
 
-			const blockType = yield select( 'core/blocks', 'getBlockType', block.name );
-			const changedAttributes = lastBlockAttributesChange[ block.clientId ];
+			updatedBlockTypes.add( blockName );
+			const blockType = yield select( 'core/blocks', 'getBlockType', blockName );
 
 			for ( const [ attributeName, schema ] of Object.entries( blockType.attributes ) ) {
-				if ( changedAttributes.hasOwnProperty( attributeName ) && sources[ schema.source ] && sources[ schema.source ].update ) {
-					yield* sources[ schema.source ].update( schema, changedAttributes[ attributeName ] );
-					updatedSources.add( sources[ schema.source ] );
+				const source = sources[ schema.source ];
+
+				if (
+					attributes.hasOwnProperty( attributeName ) &&
+					source &&
+					source.update &&
+					! updatedSources.has( source )
+				) {
+					yield* source.update( schema, attributes[ attributeName ] );
+					updatedSources.add( source );
 				}
 			}
 		}
