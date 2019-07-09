@@ -59,8 +59,16 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 
 			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 			await imageBlock.click();
+			let keyboardShown = await driver.isKeyboardShown();
+			while ( keyboardShown ) {
+				await imageBlock.click();
+				keyboardShown = await driver.isKeyboardShown();
+			}
+			await driver.isKeyboardShown();
 			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
+			await editorPage.dismissKeyboard();
 		}
+		await imageBlock.click();
 		await editorPage.removeImageBlockAtPosition( 1 );
 	} );
 
@@ -75,6 +83,11 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 
 			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 			await imageBlock.click();
+			let keyboardShown = await driver.isKeyboardShown();
+			while ( keyboardShown ) {
+				await imageBlock.click();
+				keyboardShown = await driver.isKeyboardShown();
+			}
 			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
 			await editorPage.dismissKeyboard();
 		}
