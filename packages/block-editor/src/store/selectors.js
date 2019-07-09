@@ -1383,16 +1383,13 @@ export function __unstableIsLastBlockChangeIgnored( state ) {
 }
 
 /**
- * Returns the last block attributes changed. This is not guaranteed to be a
- * result of the most recent action dispatched, so the onus is on the consumer
- * to subscribe and compare to own local reference if only interested in the
- * most recent action.
+ * Returns the block attributes changed as a result of the last dispatched
+ * action.
  *
  * @param {Object} state Block editor state.
  *
- * @return {[string,Object]} Most recent block attributes changed, a tuple of
- *                           the clientId of the block and the partial object
- *                           of updated attributes values.
+ * @return {Object<string,Object>} Subsets of block attributes changed, keyed
+ *                                 by block client ID.
  */
 export function getLastBlockAttributesChange( state ) {
 	return state.lastBlockAttributesChange;

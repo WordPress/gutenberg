@@ -2393,14 +2393,14 @@ describe( 'state', () => {
 	} );
 
 	describe( 'lastBlockAttributesChange', () => {
-		it( 'is a tuple, defaulting to null values', () => {
+		it( 'defaults to null', () => {
 			const state = lastBlockAttributesChange( undefined, {} );
 
-			expect( state ).toEqual( [ null, null ] );
+			expect( state ).toBe( null );
 		} );
 
 		it( 'does not return updated value when block update does not include attributes', () => {
-			const original = deepFreeze( [ null, null ] );
+			const original = null;
 
 			const state = lastBlockAttributesChange( original, {
 				type: 'UPDATE_BLOCK',
@@ -2412,7 +2412,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'returns updated value when block update includes attributes', () => {
-			const original = deepFreeze( [ null, null ] );
+			const original = null;
 
 			const state = lastBlockAttributesChange( original, {
 				type: 'UPDATE_BLOCK',
@@ -2424,14 +2424,13 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( state ).toEqual( [
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
-				{ food: 'banana' },
-			] );
+			expect( state ).toEqual( {
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
+			} );
 		} );
 
 		it( 'returns updated value when explicit block attributes update', () => {
-			const original = deepFreeze( [ null, null ] );
+			const original = null;
 
 			const state = lastBlockAttributesChange( original, {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
@@ -2441,10 +2440,21 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( state ).toEqual( [
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
-				{ food: 'banana' },
-			] );
+			expect( state ).toEqual( {
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
+			} );
+		} );
+
+		it( 'returns null on anything other than block attributes update', () => {
+			const original = deepFreeze( {
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
+			} );
+
+			const state = lastBlockAttributesChange( original, {
+				type: '__INERT__',
+			} );
+
+			expect( state ).toBe( null );
 		} );
 	} );
 } );

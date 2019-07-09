@@ -905,10 +905,7 @@ export function unlockPostSaving( lockName ) {
  * @return {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
-	const {
-		__unstableLastBlockAttributesChange: lastBlockAttributesChange,
-		__unstableShouldCreateUndoLevel: shouldCreateUndoLevel = true,
-	} = options;
+	const lastBlockAttributesChange = yield select( 'core/block-editor', 'getLastBlockAttributesChange' );
 
 	// Sync to sources from block attributes updates.
 	if ( lastBlockAttributesChange ) {
@@ -948,7 +945,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	return {
 		type: 'RESET_EDITOR_BLOCKS',
 		blocks: yield* getBlocksWithSourcedAttributes( blocks ),
-		shouldCreateUndoLevel,
+		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
 	};
 }
 

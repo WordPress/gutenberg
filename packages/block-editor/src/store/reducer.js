@@ -1207,28 +1207,30 @@ export const blockListSettings = ( state = {}, action ) => {
 
 /**
  * Reducer return an updated state representing the most recent block attribute
- * update. The state is structured as a tuple of the clientId of the block and
- * the partial object of updated attributes values.
+ * update. The state is structured as an object where the keys represent the
+ * client IDs of blocks, the values a subset of attributes from the most recent
+ * block update. The state is always reset to null if the last action is
+ * anything other than an attributes update.
  *
- * @param {[string,Object]} state  Current state.
- * @param {Object}          action Action object.
+ * @param {Object<string,Object>} state  Current state.
+ * @param {Object}                action Action object.
  *
  * @return {[string,Object]} Updated state.
  */
-export function lastBlockAttributesChange( state = [ null, null ], action ) {
+export function lastBlockAttributesChange( state, action ) {
 	switch ( action.type ) {
 		case 'UPDATE_BLOCK':
 			if ( ! action.updates.attributes ) {
 				break;
 			}
 
-			return [ action.clientId, action.updates.attributes ];
+			return { [ action.clientId ]: action.updates.attributes };
 
 		case 'UPDATE_BLOCK_ATTRIBUTES':
-			return [ action.clientId, action.attributes ];
+			return { [ action.clientId ]: action.attributes };
 	}
 
-	return state;
+	return null;
 }
 
 export default combineReducers( {

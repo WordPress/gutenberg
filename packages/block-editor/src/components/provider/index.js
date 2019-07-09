@@ -76,24 +76,20 @@ class BlockEditorProvider extends Component {
 		const {
 			getBlocks,
 			isLastBlockChangePersistent,
-			getLastBlockAttributesChange,
 			__unstableIsLastBlockChangeIgnored,
 		} = registry.select( 'core/block-editor' );
 
 		let blocks = getBlocks();
 		let isPersistent = isLastBlockChangePersistent();
-		let lastBlockAttributesChange = getLastBlockAttributesChange();
 
 		this.unsubscribe = registry.subscribe( () => {
 			const {
 				onChange,
 				onInput,
-				onBlockAttributesChange,
 			} = this.props;
 
 			const newBlocks = getBlocks();
 			const newIsPersistent = isLastBlockChangePersistent();
-			const newLastBlockAttributesChange = getLastBlockAttributesChange();
 
 			if (
 				newBlocks !== blocks && (
@@ -104,17 +100,7 @@ class BlockEditorProvider extends Component {
 				this.isSyncingIncomingValue = null;
 				blocks = newBlocks;
 				isPersistent = newIsPersistent;
-				lastBlockAttributesChange = newLastBlockAttributesChange;
 				return;
-			}
-
-			if ( newLastBlockAttributesChange !== lastBlockAttributesChange ) {
-				lastBlockAttributesChange = newLastBlockAttributesChange;
-
-				if ( onBlockAttributesChange ) {
-					const [ clientId, attributes ] = newLastBlockAttributesChange;
-					onBlockAttributesChange( clientId, attributes );
-				}
 			}
 
 			if (

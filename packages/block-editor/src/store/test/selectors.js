@@ -2442,11 +2442,17 @@ describe( 'selectors', () => {
 
 	describe( 'getLastBlockAttributesChange', () => {
 		it( 'returns the last block attributes change', () => {
-			const state = { lastBlockAttributesChange: [ null, null ] };
+			const state = {
+				lastBlockAttributesChange: {
+					block1: { fruit: 'bananas' },
+				},
+			};
 
 			const result = getLastBlockAttributesChange( state );
 
-			expect( result ).toEqual( [ null, null ] );
+			expect( result ).toEqual( {
+				block1: { fruit: 'bananas' },
+			} );
 		} );
 	} );
 } );

@@ -44,9 +44,6 @@ class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		this.setLastBlockAttributesChange = this.setLastBlockAttributesChange.bind( this );
-		this.resetEditorBlocks = this.resetEditorBlocks.bind( this );
-		this.resetEditorBlocksWithoutUndoLevel = this.resetEditorBlocksWithoutUndoLevel.bind( this );
 		this.getBlockEditorSettings = memize( this.getBlockEditorSettings, {
 			maxSize: 1,
 		} );
@@ -138,60 +135,16 @@ class EditorProvider extends Component {
 		this.props.tearDownEditor();
 	}
 
-	/**
-	 * Sets an instance property ahead of a subsequent onChange or onInput
-	 * callback to merge into options an inference that the change resulted
-	 * from the block change.
-	 *
-	 * @param {string} clientId   Updated block client ID.
-	 * @param {Object} attributes Subset of updated attributes.
-	 */
-	setLastBlockAttributesChange( clientId, attributes ) {
-		this.lastBlockAttributesChange = {
-			...this.lastBlockAttributesChange,
-			[ clientId ]: attributes,
-		};
-	}
-
-	/**
-	 * Handles block resetting with optional options.
-	 *
-	 * @param {Array<WPBlock>} blocks  New blocks value.
-	 * @param {?Object}        options Optional options.
-	 */
-	resetEditorBlocks( blocks, options ) {
-		if ( this.lastBlockAttributesChange ) {
-			options = {
-				...options,
-				__unstableLastBlockAttributesChange: this.lastBlockAttributesChange,
-			};
-
-			delete this.lastBlockAttributesChange;
-		}
-
-		this.props.resetEditorBlocks( blocks, options );
-	}
-
-	/**
-	 * Handles block resetting with optional options, marking update as to
-	 * avoid creation of an undo level.
-	 *
-	 * @param {Array<WPBlock>} blocks New blocks value.
-	 */
-	resetEditorBlocksWithoutUndoLevel( blocks ) {
-		this.resetEditorBlocks( blocks, {
-			__unstableShouldCreateUndoLevel: true,
-		} );
-	}
-
 	render() {
 		const {
 			canUserUseUnfilteredHTML,
 			children,
 			blocks,
+			resetEditorBlocks,
 			isReady,
 			settings,
 			reusableBlocks,
+			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
 		} = this.props;
 
@@ -209,9 +162,8 @@ class EditorProvider extends Component {
 		return (
 			<BlockEditorProvider
 				value={ blocks }
-				onInput={ this.resetEditorBlocksWithoutUndoLevel }
-				onChange={ this.resetEditorBlocks }
-				onBlockAttributesChange={ this.setLastBlockAttributesChange }
+				onInput={ resetEditorBlocksWithoutUndoLevel }
+				onChange={ resetEditorBlocks }
 				settings={ editorSettings }
 				useSubRegistry={ false }
 			>
@@ -258,6 +210,11 @@ export default compose( [
 			createWarningNotice,
 			resetEditorBlocks,
 			updateEditorSettings,
+			resetEditorBlocksWithoutUndoLevel( blocks ) {
+				resetEditorBlocks( blocks, {
+					__unstableShouldCreateUndoLevel: false,
+				} );
+			},
 			tearDownEditor,
 		};
 	} ),

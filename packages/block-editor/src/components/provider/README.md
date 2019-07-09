@@ -32,13 +32,6 @@ In the context of an editor, an example usage of this distinction is for managin
 
 A callback invoked when the blocks have been modified in a non-persistent manner. Contrasted with `onChange`, a "non-persistent" change is one which is part of a composed input. Any sequence of updates to the same block attribute are treated as non-persistent, except for the first.
 
-### `onBlockAttributesChange`
-
-* **Type:** `Function`
-* **Required** `no`
-
-A callback to be invoked when a single block's attributes have been updated. The callback is passed the block's `clientId` and an `attributes` object containing only the updated properties of the attributes. The callback is invoked immediately before `onChange` or `onInput`.
-
 ### `children`
 
 * **Type:** `WPElement`
