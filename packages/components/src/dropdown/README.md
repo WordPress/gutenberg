@@ -10,11 +10,12 @@ and uses render props to render the button and the content.
 ```jsx
 import { Button, Dropdown } from '@wordpress/components';
 
-const MyDropdown = () => (
+export const MyDropdown = () => (
 	<Dropdown
 		className="my-container-class-name"
 		contentClassName="my-popover-content-classname"
 		position="bottom right"
+		isInline={ true }
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
 				Toggle Popover!
@@ -91,7 +92,7 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Type: `String`
  - Required: No
  
- ### focusOnMount
+### focusOnMount
  
  By default, the *first tabblable element* in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
  
@@ -101,10 +102,18 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Required: No
  - Default: `"firstElement"`
 
- ### popoverProps
+### popoverProps
  
 Properties of popoverProps object will be passed as props to the `Popover` component.
 Use this o object to access properties/feature if the `Popover` component that are not already exposed in the `Dropdown`component, e.g.: the hability to have the popover without an arrow. 
  
  - Type: `Object`
  - Required: No
+
+### isInline
+ 
+A flag that sets the dropdown container to display as an `inline-block` element
+ 
+ - Type: `Boolean`
+ - Required: No
+ - Default: `false`

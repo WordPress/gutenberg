@@ -4,6 +4,11 @@
 import { Component, createRef } from '@wordpress/element';
 
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * Internal dependencies
  */
 import Popover from '../popover';
@@ -75,12 +80,14 @@ class Dropdown extends Component {
 			headerTitle,
 			focusOnMount,
 			popoverProps,
+			isInline,
 		} = this.props;
 
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
+		const containerClasses = classnames( className, { [ `components-dropdown__inline` ]: isInline } );
 
 		return (
-			<div className={ className } ref={ this.containerRef }>
+			<div className={ containerClasses } ref={ this.containerRef }>
 				{ renderToggle( args ) }
 				{ isOpen && (
 					<Popover
