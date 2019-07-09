@@ -14,7 +14,7 @@ export function awaitNextStateChange() {
 }
 
 /**
- * Returns an control descriptor signalling to resolve with the current data
+ * Returns a control descriptor signalling to resolve with the current data
  * registry.
  *
  * @return {Object} Control descriptor.
