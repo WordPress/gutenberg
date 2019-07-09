@@ -95,8 +95,10 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidLayout()
 
     /// Tells the delegate that the editor view has completed the initial render.
+    /// - Parameters:
+    ///   - unsupportedBlockNames: A list of loaded block names that are not supported.
     ///
-    func gutenbergDidMount(hasUnsupportedBlocks: Bool)
+    func gutenbergDidMount(unsupportedBlockNames: [String])
 
     /// Tells the delegate that logger method is called.
     ///

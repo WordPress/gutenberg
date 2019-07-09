@@ -50,8 +50,8 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         gutenberg.setFocusOnTitle()
     }
 
-    func gutenbergDidMount(hasUnsupportedBlocks: Bool) {
-        print("gutenbergDidMount(hasUnsupportedBlocks: \(hasUnsupportedBlocks))")
+    func gutenbergDidMount(unsupportedBlockNames: [String]) {
+        print("gutenbergDidMount(unsupportedBlockNames: \(unsupportedBlockNames))")
     }
 
     func gutenbergDidProvideHTML(title: String, html: String, changed: Bool) {

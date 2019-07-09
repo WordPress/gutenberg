@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.facebook.react.ReactApplication;
 import com.brentvatne.react.ReactVideoPackage;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.devsupport.interfaces.DevOptionHandler;
 import com.facebook.react.devsupport.interfaces.DevSupportManager;
 import com.horcrux.svg.SvgPackage;
@@ -69,7 +70,7 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
-            public void editorDidMount(boolean hasUnsupportedBlocks) {
+            public void editorDidMount(ReadableArray unsupportedBlockNames) {
             }
 
             @Override
