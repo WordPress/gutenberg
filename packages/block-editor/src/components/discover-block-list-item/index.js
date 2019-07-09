@@ -6,7 +6,7 @@ import BlockIcon from '../block-icon';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, Icon } from '@wordpress/components';
 
 function DiscoverBlockListItem( {
 	icon,
@@ -30,7 +30,7 @@ function DiscoverBlockListItem( {
 							className="discover-blocks-list__item-icon"
 							style={ itemIconStyle }
 						>
-							<BlockIcon icon={ icon } showColors size={ 48 } />
+							<BlockIcon icon={ icon } showColors />
 						</span>
 						<div>
 							<span className="discover-blocks-list__item-title">
@@ -68,10 +68,10 @@ function DiscoverBlockListItem( {
 					</span>
 					<div>
 						<div>
-							<BlockIcon icon={ 'chart-line' } size={ 16 }></BlockIcon>XX active installations
+							<Icon icon={ 'chart-line' }></Icon>XX active installations
 						</div>
 						<div>
-							<BlockIcon icon={ 'update' } size={ 16 }></BlockIcon>Updated X week ago.
+							<Icon icon={ 'update' }></Icon>Updated X week ago.
 						</div>
 					</div>
 				</div>
