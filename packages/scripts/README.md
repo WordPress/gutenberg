@@ -312,7 +312,7 @@ To extend the provided webpack config, or replace subsections within the provide
 In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://github.com/webpack-contrib/url-loader):
 
 ```javascript
-const defaultConfig = require("./node_modules/@wordpress/scripts/config/webpack.config");
+const defaultConfig = require("@wordpress/scripts/config/webpack.config");
 
 module.exports = {
   ...defaultConfig,

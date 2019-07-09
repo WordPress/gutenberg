@@ -11,17 +11,17 @@ Since the block itself represents what will actually appear on the site, interac
 1. The placeholder content in the content area of the block can be thought of as a guide or interface for users to follow a set of instructions or “fill in the blanks”. For example, a block that embeds content from a 3rd-party service might contain controls for signing in to that service in the placeholder.
 2. After the user has added content, selecting the block can reveal additional controls to adjust or edit that content. For example, a signup block might reveal a control for hiding/showing subscriber count. However, this should be done in minimal ways, so as to avoid dramatically changing the size and display of a block when a user selects it (this could be disorienting or annoying).
 
-### The block toolbar is a secondary place for required options & controls
+### The Block Toolbar is a secondary place for required options & controls
 
-Basic block settings won’t always make sense in the context of the placeholder/content UI. As a secondary option, options that are critical to the functionality of a block can live in the block toolbar. The block toolbar is still highly contextual and visible on all screen sizes. One notable constraint with the block toolbar is that it is icon-based UI, so any controls that live in the block toolbar need to be ones that can effectively be communicated via an icon or icon group.
+Basic block settings won’t always make sense in the context of the placeholder/content UI. As a secondary option, options that are critical to the functionality of a block can live in the block toolbar. The Block Toolbar is still highly contextual and visible on all screen sizes. One notable constraint with the Block Toolbar is that it is icon-based UI, so any controls that live in the Block Toolbar need to be ones that can effectively be communicated via an icon or icon group.
 
-### The block sidebar should only be used for advanced, tertiary controls
+### The Settings Sidebar should only be used for advanced, tertiary controls
 
-The sidebar is not visible by default on a small / mobile screen, and may also be collapsed in a desktop view. Therefore, it should not be relied on for anything that is necessary for the basic operation of the block. Pick good defaults, make important actions available in the block toolbar, and think of the sidebar as something that most users should not need to open.
+The Settings Sidebar is not visible by default on a small / mobile screen, and may also be collapsed in a desktop view. Therefore, it should not be relied on for anything that is necessary for the basic operation of the block. Pick good defaults, make important actions available in the block toolbar, and think of the Settings Sidebar as something that most users should not need to open.
 
-In addition, use sections and headers in the block sidebar if there are more than a handful of options, in order to allow users to easily scan and understand the options available. 
+In addition, use sections and headers in the Settings Sidebar if there are more than a handful of options, in order to allow users to easily scan and understand the options available.
 
-Each block sidebar comes with an "Advanced" section by default. This area houses an "Additional CSS Class" field, and should be used to house other power user controls. 
+Each Settings Sidebar comes with an "Advanced" section by default. This area houses an "Additional CSS Class" field, and should be used to house other power user controls.
 
 ## Setup state vs. live preview state
 
@@ -52,9 +52,15 @@ In most cases, a block’s setup state is only shown once and then further custo
 
 ## Do's and Don'ts
 
-### Blocks
+### Block Identification
 
 A block should have a straightforward, short name so users can easily find it in the Block Library. A block named "YouTube" is easy to find and understand. The same block, named "Embedded Video (YouTube)", would be less clear and harder to find in the Block Library.
+
+When referring to a block in documentation or UI, use title case for the block title, and lowercase for the "block" descriptor. For example:
+
+- Paragraph block
+- Latest Posts block
+- Media & Text block
 
 Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://material.io/tools/icons/). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
 
@@ -68,7 +74,15 @@ Avoid long, multi-line block names.
 
 ### Block Description
 
-Every block should include a description in the “Block” tab of the Settings sidebar. This description should explain your block's function clearly. Keep it to a single sentence.
+Every block should include a description that clearly explains the block's function. The description will display in the Settings Sidebar.
+
+You can add a description by using the description attribute in the [registerBlockType function](/docs/designers-developers/developers/block-api/block-registration/). 
+
+Stick to a single imperative sentence with an action + subject format. Examples:
+
+- Start with the building block of all narrative.
+- Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.
+- Create a bulleted or numbered list.
 
 ![A screenshot of a short block description](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/block-descriptions-do.png)
 **Do:**

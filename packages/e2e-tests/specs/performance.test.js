@@ -34,7 +34,7 @@ describe( 'Performance', () => {
 				}
 			} );
 
-			dispatch( 'core/editor' ).resetBlocks( blocks );
+			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		}, html );
 		await saveDraft();
 

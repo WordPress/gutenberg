@@ -5,7 +5,8 @@
         "isValid": true,
         "attributes": {
             "backgroundColor": "lighter-blue",
-            "className": "alignfull"
+            "align": "full",
+            "anchor": "test-id"
         },
         "innerBlocks": [
             {
@@ -20,6 +21,6 @@
                 "originalContent": "<p>test</p>"
             }
         ],
-        "originalContent": "<div class=\"wp-block-group alignfull has-lighter-blue-background-color has-background\">\n\t\n</div>"
+        "originalContent": "<div class=\"wp-block-group alignfull has-lighter-blue-background-color has-background\" id=\"test-id\">\n\t\n</div>"
     }
 ]

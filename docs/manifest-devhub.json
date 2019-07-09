@@ -426,9 +426,9 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Block Controls: Toolbars and Inspector",
-		"slug": "block-controls-toolbars-and-inspector",
-		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbars-and-inspector.md",
+		"title": "Block Controls: Block Toolbar and Settings Sidebar",
+		"slug": "block-controls-toolbar-and-sidebar",
+		"markdown_source": "../docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbar-and-sidebar.md",
 		"parent": "block-tutorial"
 	},
 	{
