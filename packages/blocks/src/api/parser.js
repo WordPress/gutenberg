@@ -383,6 +383,7 @@ export function createBlockWithFallback( blockNode ) {
 		innerBlocks = [],
 		innerHTML,
 	} = blockNode;
+	const { innerContent } = blockNode;
 	const freeformContentFallbackBlock = getFreeformContentHandlerName();
 	const unregisteredFallbackBlock = getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
 
@@ -416,17 +417,39 @@ export function createBlockWithFallback( blockNode ) {
 	let blockType = getBlockType( name );
 
 	if ( ! blockType ) {
-		// Preserve undelimited content for use by the unregistered type handler.
-		const originalUndelimitedContent = innerHTML;
+		// Since the constituents of the block node are extracted at the start
+		// of the present function, construct a new object rather than reuse
+		// `blockNode`.
+		const reconstitutedBlockNode = {
+			attrs: attributes,
+			blockName: originalName,
+			innerBlocks,
+			innerContent,
+		};
+
+		// Preserve undelimited content for use by the unregistered type
+		// handler. A block node's `innerHTML` isn't enough, as that field only
+		// carries the block's own HTML and not its nested blocks'.
+		const originalUndelimitedContent = serializeBlockNode(
+			reconstitutedBlockNode,
+			{ isCommentDelimited: false }
+		);
+
+		// Preserve full block content for use by the unregistered type
+		// handler, block boundaries included.
+		const originalContent = serializeBlockNode(
+			reconstitutedBlockNode,
+			{ isCommentDelimited: true }
+		);
 
 		// If detected as a block which is not registered, preserve comment
 		// delimiters in content of unregistered type handler.
 		if ( name ) {
-			innerHTML = getCommentDelimitedContent( name, attributes, innerHTML );
+			innerHTML = originalContent;
 		}
 
 		name = unregisteredFallbackBlock;
-		attributes = { originalName, originalUndelimitedContent };
+		attributes = { originalName, originalContent, originalUndelimitedContent };
 		blockType = getBlockType( name );
 	}
 
@@ -457,13 +480,51 @@ export function createBlockWithFallback( blockNode ) {
 		block.isValid = isValidBlockContent( blockType, block.attributes, innerHTML );
 	}
 
-	// Preserve original content for future use in case the block is parsed as
-	// invalid, or future serialization attempt results in an error.
-	block.originalContent = innerHTML;
+	// Preserve original content for future use in case the block is parsed
+	// as invalid, or future serialization attempt results in an error.
+	block.originalContent = block.originalContent || innerHTML;
 
 	block = getMigratedBlock( block, attributes );
 
 	return block;
+}
+
+/**
+ * Serializes a block node into the native HTML-comment-powered block format.
+ * CAVEAT: This function is intended for reserializing blocks as parsed by
+ * valid parsers and skips any validation steps. This is NOT a generic
+ * serialization function for in-memory blocks. For most purposes, see the
+ * following functions available in the `@wordpress/blocks` package:
+ *
+ * @see serializeBlock
+ * @see serialize
+ *
+ * For more on the format of block nodes as returned by valid parsers:
+ *
+ * @see `@wordpress/block-serialization-default-parser` package
+ * @see `@wordpress/block-serialization-spec-parser` package
+ *
+ * @param {Object}   blockNode                  A block node as returned by a valid parser.
+ * @param {?Object}  options                    Serialization options.
+ * @param {?boolean} options.isCommentDelimited Whether to output HTML comments around blocks.
+ *
+ * @return {string} An HTML string representing a block.
+ */
+export function serializeBlockNode( blockNode, options = {} ) {
+	const { isCommentDelimited = true } = options;
+	const { blockName, attrs = {}, innerBlocks = [], innerContent = [] } = blockNode;
+
+	let childIndex = 0;
+	const content = innerContent.map( ( item ) =>
+		// `null` denotes a nested block, otherwise we have an HTML fragment
+		item !== null ?
+			item :
+			serializeBlockNode( innerBlocks[ childIndex++ ], options )
+	).join( '\n' ).replace( /\n+/g, '\n' ).trim();
+
+	return isCommentDelimited ?
+		getCommentDelimitedContent( blockName, attrs, content ) :
+		content;
 }
 
 /**
