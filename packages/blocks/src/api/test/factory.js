@@ -23,6 +23,7 @@ import {
 	getBlockTypes,
 	registerBlockType,
 	unregisterBlockType,
+	setGroupingBlockName,
 } from '../registration';
 
 describe( 'block factory', () => {
@@ -1554,12 +1555,34 @@ describe( 'block factory', () => {
 	} );
 
 	describe( 'isContainerGroupBlock', () => {
-		it( 'should return true when passed block name matches "core/group"', () => {
-			expect( isContainerGroupBlock( 'core/group' ) ).toBe( true );
+		beforeEach( () => {
+			registerBlockType( 'core/registered-grouping-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ '*' ],
+						transform: noop,
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'A Block with InnerBlocks that supports grouping',
+			} );
 		} );
 
-		it( 'should return false when passed block name does not match "core/group"', () => {
-			expect( isContainerGroupBlock( 'core/some-test-name' ) ).toBe( false );
+		it( 'should return true when passed block name that matches the registered "Grouping" Block', () => {
+			setGroupingBlockName( 'registered-grouping-block' );
+			expect( isContainerGroupBlock( 'registered-grouping-block' ) ).toBe( true );
+		} );
+
+		it( 'should return false when passed block name does not match the registered "Grouping" Block', () => {
+			setGroupingBlockName( 'registered-grouping-block' );
+			expect( isContainerGroupBlock( 'core/group' ) ).toBe( false );
 		} );
 	} );
 
