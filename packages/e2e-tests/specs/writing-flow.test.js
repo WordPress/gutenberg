@@ -45,7 +45,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
-		await page.keyboard.type( 'Second col' );
+		await page.keyboard.type( '2nd col' );
 
 		// Arrow down from last of layouts exits nested context to default
 		// appender of root level.
@@ -63,7 +63,7 @@ describe( 'adding blocks', () => {
 		await page.waitForSelector( '.is-selected[data-type="core/column"]:focus' );
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
-		expect( activeElementText ).toBe( 'First col' );
+		expect( activeElementText ).toBe( '1st col' );
 
 		// Arrow up from first text field in nested context focuses column and
 		// columns wrappers before escaping out.
