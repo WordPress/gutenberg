@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -40,10 +40,30 @@ export const settings = {
 						return;
 					}
 
+					// Determine which Blocks have grouping support and which don't
+					const { supportedBlocks, unSupportedBlocks } = blocks.reduce( ( acc, block ) => {
+						const groupingBlockSupportDefault = true;
+
+						if ( getBlockSupport( block.name, 'grouping', groupingBlockSupportDefault ) ) {
+							acc.supportedBlocks.push( block );
+						} else {
+							acc.unSupportedBlocks.push( block );
+						}
+						return acc;
+					}, {
+						supportedBlocks: [],
+						unSupportedBlocks: [],
+					} );
+
+					// If no blocks support grouping then bale out!
+					if ( ! supportedBlocks.length ) {
+						return;
+					}
+
 					const alignments = [ 'wide', 'full' ];
 
 					// Determine the widest setting of all the blocks to be grouped
-					const widestAlignment = blocks.reduce( ( result, block ) => {
+					const widestAlignment = supportedBlocks.reduce( ( result, block ) => {
 						const { align } = block.attributes;
 						return alignments.indexOf( align ) > alignments.indexOf( result ) ? align : result;
 					}, undefined );
@@ -53,13 +73,17 @@ export const settings = {
 					// to be replaced in the switchToBlockType call thereby meaning they
 					// are removed both from their original location and within the
 					// new group block.
-					const groupInnerBlocks = blocks.map( ( block ) => {
+					const groupInnerBlocks = supportedBlocks.map( ( block ) => {
 						return createBlock( block.name, block.attributes, block.innerBlocks );
 					} );
 
-					return createBlock( 'core/group', {
+					const groupBlock = createBlock( 'core/group', {
 						align: widestAlignment,
 					}, groupInnerBlocks );
+
+					// Return the blocks that have been Grouped
+					// plus any that were unable to be Grouped
+					return [ ...unSupportedBlocks, groupBlock ];
 				},
 			},
 
