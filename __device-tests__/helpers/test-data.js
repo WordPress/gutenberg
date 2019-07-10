@@ -18,6 +18,7 @@ exports.listEndedHtml = `<!-- wp:list -->
 <!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->`;
+exports.heading = 'Lorem Ipsum';
 
 exports.pastePlainText = `Hello paste`;
 

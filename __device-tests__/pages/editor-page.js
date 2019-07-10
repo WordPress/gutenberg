@@ -18,6 +18,7 @@ export default class EditorPage {
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
 	listBlockName = 'List';
+	headingBlockName = 'Heading';
 	imageBlockName = 'Image';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
@@ -319,5 +320,39 @@ export default class EditorPage {
 
 	async removeImageBlockAtPosition( position: number ) {
 		return await this.removeBlockAtPosition( position, this.imageBlockName );
+	}
+
+	// =========================
+	// Heading Block functions
+	// =========================
+	async addNewHeadingBlock() {
+		await this.addNewBlock( this.headingBlockName );
+	}
+
+	async getHeadingBlockAtPosition( position: number ) {
+		return this.getBlockAtPosition( position, this.headingBlockName );
+	}
+
+	// Inner element changes on iOS if Heading Block is empty
+	async getTextViewForHeadingBlock( block: wd.PromiseChainWebdriver.Element, empty: boolean ) {
+		let textViewElementName = empty ? 'XCUIElementTypeStaticText' : 'XCUIElementTypeTextView';
+		if ( isAndroid() ) {
+			textViewElementName = 'android.widget.EditText';
+		}
+
+		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//${ textViewElementName }`;
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async sendTextToHeadingBlock( block: wd.PromiseChainWebdriver.Element, text: string ) {
+		const textViewElement = await this.getTextViewForHeadingBlock( block, true );
+		return await typeString( this.driver, textViewElement, text );
+	}
+
+	async getTextForHeadingBlock( block: wd.PromiseChainWebdriver.Element ) {
+		const textViewElement = await this.getTextViewForHeadingBlock( block, false );
+		const text = await textViewElement.text();
+		return text.toString();
 	}
 }
