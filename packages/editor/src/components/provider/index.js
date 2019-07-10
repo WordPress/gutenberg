@@ -200,7 +200,7 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			updateEditorSettings,
-			tearDownEditor,
+			__experimentalTearDownEditor,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
@@ -215,7 +215,7 @@ export default compose( [
 					__unstableShouldCreateUndoLevel: false,
 				} );
 			},
-			tearDownEditor,
+			tearDownEditor: __experimentalTearDownEditor,
 		};
 	} ),
 ] )( EditorProvider );

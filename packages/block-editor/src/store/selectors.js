@@ -1391,7 +1391,7 @@ export function __unstableIsLastBlockChangeIgnored( state ) {
  * @return {Object<string,Object>} Subsets of block attributes changed, keyed
  *                                 by block client ID.
  */
-export function getLastBlockAttributesChange( state ) {
+export function __experimentalGetLastBlockAttributesChange( state ) {
 	return state.lastBlockAttributesChange;
 }
 

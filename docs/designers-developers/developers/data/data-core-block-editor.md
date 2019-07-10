@@ -335,19 +335,6 @@ _Returns_
 
 -   `Array<Editor.InserterItem>`: Items that appear in inserter.
 
-<a name="getLastBlockAttributesChange" href="#getLastBlockAttributesChange">#</a> **getLastBlockAttributesChange**
-
-Returns the block attributes changed as a result of the last dispatched
-action.
-
-_Parameters_
-
--   _state_ `Object`: Block editor state.
-
-_Returns_
-
--   `Object<string,Object>`: Subsets of block attributes changed, keyed by block client ID.
-
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
 Returns the client ID of the last block in the multi-selection set, or null

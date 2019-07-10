@@ -185,7 +185,7 @@ export function* setupEditor( post, edits, template ) {
 	};
 	yield resetEditorBlocks( blocks );
 	yield setupEditorState( post );
-	yield* subscribeSources();
+	yield* __experimentalSubscribeSources();
 }
 
 /**
@@ -194,7 +194,7 @@ export function* setupEditor( post, edits, template ) {
  *
  * @return {Object} Action object.
  */
-export function tearDownEditor() {
+export function __experimentalTearDownEditor() {
 	return { type: 'TEAR_DOWN_EDITOR' };
 }
 
@@ -204,7 +204,7 @@ export function tearDownEditor() {
  *
  * @yield {Object} Action object.
  */
-export function* subscribeSources() {
+export function* __experimentalSubscribeSources() {
 	while ( true ) {
 		const registry = yield awaitNextStateChange();
 
@@ -905,7 +905,7 @@ export function unlockPostSaving( lockName ) {
  * @return {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
-	const lastBlockAttributesChange = yield select( 'core/block-editor', 'getLastBlockAttributesChange' );
+	const lastBlockAttributesChange = yield select( 'core/block-editor', '__experimentalGetLastBlockAttributesChange' );
 
 	// Sync to sources from block attributes updates.
 	if ( lastBlockAttributesChange ) {
