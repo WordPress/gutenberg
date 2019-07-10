@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { noop, omit, pick } from 'lodash';
+import { noop, get, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,7 +29,9 @@ import {
 	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
+	serverSideBlockDefinitions,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+	DEFAULT_BLOCK_TYPE_SETTINGS,
 } from '../registration';
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
 
@@ -397,8 +399,15 @@ describe( 'blocks', () => {
 					// settings with deprecation keys omitted and the deprecation entry.
 					if ( i > 0 ) {
 						expect( settings ).toEqual( {
-							name,
-							...omit( blockSettingsWithDeprecations, DEPRECATED_ENTRY_KEYS ),
+							...omit(
+								{
+									name,
+									...DEFAULT_BLOCK_TYPE_SETTINGS,
+									...get( serverSideBlockDefinitions, name ),
+									...blockSettingsWithDeprecations,
+								},
+								DEPRECATED_ENTRY_KEYS
+							),
 							...blockSettingsWithDeprecations.deprecated[ i - 1 ],
 						} );
 					}

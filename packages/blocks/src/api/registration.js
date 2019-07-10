@@ -84,14 +84,14 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @type {Object}
  */
-const DEFAULT_BLOCK_TYPE_SETTINGS = {
+export const DEFAULT_BLOCK_TYPE_SETTINGS = {
 	icon: 'block-default',
 	attributes: {},
 	keywords: [],
 	save: () => null,
 };
 
-let serverSideBlockDefinitions = {};
+export let serverSideBlockDefinitions = {};
 
 /**
  * Sets the server side block definition of blocks.
