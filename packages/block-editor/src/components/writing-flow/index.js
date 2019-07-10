@@ -6,7 +6,7 @@ import { overEvery, find, findLast, reverse, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -17,7 +17,7 @@ import {
 	placeCaretAtVerticalEdge,
 	isEntirelySelected,
 } from '@wordpress/dom';
-import { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, TAB, isKeyboardEvent } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -80,6 +80,7 @@ class WritingFlow extends Component {
 		this.bindContainer = this.bindContainer.bind( this );
 		this.clearVerticalRect = this.clearVerticalRect.bind( this );
 		this.focusLastTextField = this.focusLastTextField.bind( this );
+		this.switchToEditMode = this.switchToEditMode.bind( this );
 
 		/**
 		 * Here a rectangle is stored while moving the caret vertically so
@@ -89,6 +90,19 @@ class WritingFlow extends Component {
 		 * @type {?DOMRect}
 		 */
 		this.verticalRect = null;
+
+		this.lastClientY = null;
+		this.lastClientX = null;
+
+		this.appender = createRef();
+	}
+
+	componentDidMount() {
+		window.addEventListener( 'mousemove', this.switchToEditMode );
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'mousemove', this.switchToEditMode );
 	}
 
 	bindContainer( ref ) {
@@ -97,6 +111,20 @@ class WritingFlow extends Component {
 
 	clearVerticalRect() {
 		this.verticalRect = null;
+	}
+
+	switchToEditMode( { clientY, clientX } ) {
+		// Safari triggers mousemove even if we didn't really move the mouse
+		// On shift press for instance.
+		// To ensure we really moved the mouse, we compare the mouse position
+		if ( this.props.keyboardMode !== 'edit' &&
+			( this.lastClientX !== null && this.lastClientY !== null ) &&
+			( clientY !== this.lastClientY || clientX !== this.lastClientX )
+		) {
+			this.props.setKeyboardMode( 'edit' );
+		}
+		this.lastClientY = clientY;
+		this.lastClientX = clientX;
 	}
 
 	/**
@@ -224,8 +252,10 @@ class WritingFlow extends Component {
 			hasMultiSelection,
 			onMultiSelect,
 			blocks,
+			selectedBlockClientId,
 			selectionBeforeEndClientId,
 			selectionAfterEndClientId,
+			keyboardMode,
 		} = this.props;
 
 		const { keyCode, target } = event;
@@ -233,6 +263,7 @@ class WritingFlow extends Component {
 		const isDown = keyCode === DOWN;
 		const isLeft = keyCode === LEFT;
 		const isRight = keyCode === RIGHT;
+		const isTab = keyCode === TAB;
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
@@ -240,6 +271,30 @@ class WritingFlow extends Component {
 		const isShift = event.shiftKey;
 		const hasModifier = isShift || event.ctrlKey || event.altKey || event.metaKey;
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
+
+		// In navigation mode, tab and arrows navigate from block to blocks
+		if ( keyboardMode === 'navigation' ) {
+			const navigateUp = ( isTab && isShift ) || isUp;
+			const navigateDown = ( isTab && ! isShift ) || isDown;
+
+			if (
+				( navigateDown && selectionAfterEndClientId ) ||
+				( navigateUp && selectionBeforeEndClientId )
+			) {
+				event.preventDefault();
+				const focusedBlockUid = navigateUp ? selectionBeforeEndClientId : selectionAfterEndClientId;
+				if ( focusedBlockUid ) {
+					this.props.onSelectBlock( focusedBlockUid );
+				}
+			}
+
+			// Special case when reaching the end of the blocks (navigate to the next tabbable outside of the writing flow)
+			if ( navigateDown && selectedBlockClientId && ! selectionAfterEndClientId && [ UP, DOWN ].indexOf( keyCode ) === -1 ) {
+				this.props.clearSelectedBlock();
+				this.appender.current.focus();
+			}
+			return;
+		}
 
 		// When presing any key other than up or down, the initial vertical
 		// position must ALWAYS be reset. The vertical position is saved so it
@@ -361,6 +416,7 @@ class WritingFlow extends Component {
 					{ children }
 				</div>
 				<div
+					ref={ this.appender }
 					aria-hidden
 					tabIndex={ -1 }
 					onClick={ this.focusLastTextField }
@@ -384,6 +440,7 @@ export default compose( [
 			getLastMultiSelectedBlockClientId,
 			hasMultiSelection,
 			getBlockOrder,
+			getKeyboardMode,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -399,13 +456,16 @@ export default compose( [
 			selectedLastClientId: getLastMultiSelectedBlockClientId(),
 			hasMultiSelection: hasMultiSelection(),
 			blocks: getBlockOrder(),
+			keyboardMode: getKeyboardMode(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { multiSelect, selectBlock } = dispatch( 'core/block-editor' );
+		const { multiSelect, selectBlock, setKeyboardMode, clearSelectedBlock } = dispatch( 'core/block-editor' );
 		return {
 			onMultiSelect: multiSelect,
 			onSelectBlock: selectBlock,
+			setKeyboardMode,
+			clearSelectedBlock,
 		};
 	} ),
 ] )( WritingFlow );

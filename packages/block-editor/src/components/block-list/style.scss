@@ -1047,12 +1047,6 @@
 			background: $dark-gray-600;
 			color: $white;
 		}
-
-		// Animate in
-		.block-editor-block-list__block:hover & {
-			opacity: 0;
-			@include edit-post__fade-in-animation(60ms, 0.5s);
-		}
 	}
 
 	// Position this above the toolbar of parent blocks.

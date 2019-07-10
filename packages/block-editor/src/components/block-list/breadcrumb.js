@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { Toolbar } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { Toolbar, Button } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,62 +16,31 @@ import BlockTitle from '../block-title';
  * the root block.
  *
  * @param {string}   props.clientId        Client ID of block.
- * @param {string}   props.rootClientId    Client ID of block's root.
- * @param {Function} props.selectRootBlock Callback to select root block.
+ * @return {WPElement} Block Breadcrumb.
  */
-export class BlockBreadcrumb extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			isFocused: false,
-		};
-		this.onFocus = this.onFocus.bind( this );
-		this.onBlur = this.onBlur.bind( this );
-	}
-
-	onFocus( event ) {
-		this.setState( {
-			isFocused: true,
-		} );
-
-		// This is used for improved interoperability
-		// with the block's `onFocus` handler which selects the block, thus conflicting
-		// with the intention to select the root block.
-		event.stopPropagation();
-	}
-
-	onBlur() {
-		this.setState( {
-			isFocused: false,
-		} );
-	}
-
-	render() {
-		const { clientId, rootClientId } = this.props;
-
-		return (
-			<div className={ 'editor-block-list__breadcrumb block-editor-block-list__breadcrumb' }>
-				<Toolbar>
-					{ rootClientId && (
-						<>
-							<BlockTitle clientId={ rootClientId } />
-							<span className="editor-block-list__descendant-arrow block-editor-block-list__descendant-arrow" />
-						</>
-					) }
-					<BlockTitle clientId={ clientId } />
-				</Toolbar>
-			</div>
-		);
-	}
-}
-
-export default compose( [
-	withSelect( ( select, ownProps ) => {
-		const { getBlockRootClientId } = select( 'core/block-editor' );
-		const { clientId } = ownProps;
-
+const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
+	const { setKeyboardMode } = useDispatch( 'core/block-editor' );
+	const { rootClientId } = useSelect( ( select ) => {
 		return {
-			rootClientId: getBlockRootClientId( clientId ),
+			rootClientId: select( 'core/block-editor' ).getBlockRootClientId( clientId ),
 		};
-	} ),
-] )( BlockBreadcrumb );
+	} );
+
+	return (
+		<div className={ 'editor-block-list__breadcrumb block-editor-block-list__breadcrumb' }>
+			<Toolbar>
+				{ rootClientId && (
+				<>
+					<BlockTitle clientId={ rootClientId } />
+					<span className="editor-block-list__descendant-arrow block-editor-block-list__descendant-arrow" />
+				</>
+				) }
+				<Button ref={ ref }onClick={ () => setKeyboardMode( 'edit' ) }>
+					<BlockTitle clientId={ clientId } />
+				</Button>
+			</Toolbar>
+		</div>
+	);
+} );
+
+export default BlockBreadcrumb;

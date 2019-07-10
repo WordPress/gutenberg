@@ -8,13 +8,13 @@ import { animated } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useLayoutEffect, useState } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, ESCAPE } from '@wordpress/keycodes';
 import {
 	getBlockType,
 	getSaveElement,
@@ -101,6 +101,8 @@ function BlockListBlock( {
 	onSelectionStart,
 	animateOnChange,
 	enableAnimation,
+	keyboardMode,
+	onChangeKeyboardMode,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -117,6 +119,8 @@ function BlockListBlock( {
 
 	// Hovered area of the block
 	const hoverArea = useHoveredArea( wrapper );
+
+	const breadcrumb = useRef();
 
 	// Keep track of touchstart to disable hover on iOS
 	const hadTouchStart = useRef( false );
@@ -254,6 +258,18 @@ function BlockListBlock( {
 	// Block Reordering animation
 	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, enableAnimation, animateOnChange );
 
+	// Focus the breadcrumb if the wrapper is focused on navigation mode.
+	// Focus the first editable or the wrapper if edit mode.
+	useLayoutEffect( () => {
+		if ( isSelected ) {
+			if ( keyboardMode === 'navigation' ) {
+				breadcrumb.current.focus();
+			} else {
+				focusTabbable( true );
+			}
+		}
+	}, [ isSelected, keyboardMode ] );
+
 	// Other event handlers
 
 	/**
@@ -275,33 +291,41 @@ function BlockListBlock( {
 	 *
 	 * @param {KeyboardEvent} event Keydown event.
 	 */
-	const deleteOrInsertAfterWrapper = ( event ) => {
+	const onKeyDown = ( event ) => {
 		const { keyCode, target } = event;
 
-		// These block shortcuts should only trigger if the wrapper of the block is selected
-		// And when it's not a multi-selection to avoid conflicting with RichText/Inputs and multiselection.
-		if (
-			! isSelected ||
-			target !== wrapper.current ||
-			isLocked
-		) {
-			return;
-		}
-
-		switch ( keyCode ) {
-			case ENTER:
-				// Insert default block after current block if enter and event
-				// not already handled by descendant.
-				onInsertDefaultBlockAfter();
-				event.preventDefault();
-				break;
-
-			case BACKSPACE:
-			case DELETE:
-				// Remove block on backspace.
-				onRemove( clientId );
-				event.preventDefault();
-				break;
+		if ( keyboardMode === 'edit' ) {
+			// ENTER/BACKSPACE Shortcuts are only available if the wrapper is focused
+			// and the block is not locked.
+			const canUseShortcuts = (
+				isSelected &&
+				target === wrapper.current &&
+				! isLocked
+			);
+			switch ( keyCode ) {
+				case ENTER:
+					if ( canUseShortcuts ) {
+						// Insert default block after current block if enter and event
+						// not already handled by descendant.
+						onInsertDefaultBlockAfter();
+						event.preventDefault();
+					}
+					break;
+				case BACKSPACE:
+				case DELETE:
+					if ( canUseShortcuts ) {
+					// Remove block on backspace.
+						onRemove( clientId );
+						event.preventDefault();
+					}
+					break;
+				case ESCAPE:
+					if ( isSelected ) {
+						onChangeKeyboardMode( 'navigation' );
+						wrapper.current.focus();
+					}
+					break;
+			}
 		}
 	};
 
@@ -357,8 +381,9 @@ function BlockListBlock( {
 
 	// If the block is selected and we're typing the block should not appear.
 	// Empty paragraph blocks should always show up as unselected.
-	const showInserterShortcuts = ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
-	const showEmptyBlockSideInserter = ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
+	const isKeyboardEditMode = keyboardMode === 'edit';
+	const showInserterShortcuts = isKeyboardEditMode && ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
+	const showEmptyBlockSideInserter = isKeyboardEditMode && ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
 		! isFocusMode &&
 		! showEmptyBlockSideInserter &&
@@ -371,20 +396,23 @@ function BlockListBlock( {
 		! isEmptyDefaultBlock;
 	// We render block movers and block settings to keep them tabbale even if hidden
 	const shouldRenderMovers =
+		isKeyboardEditMode &&
 		( isSelected || hoverArea === ( isRTL ? 'right' : 'left' ) ) &&
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
 	const shouldShowBreadcrumb =
-		! isFocusMode && isHovered && ! isEmptyDefaultBlock;
+		( isSelected && ! isKeyboardEditMode ) ||
+		( ! isFocusMode && isHovered && ! isEmptyDefaultBlock );
 	const shouldShowContextualToolbar =
+		isKeyboardEditMode &&
 		! hasFixedToolbar &&
 		! showEmptyBlockSideInserter &&
 		(
 			( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
 			isFirstMultiSelected
 		);
-	const shouldShowMobileToolbar = shouldAppearSelected;
+	const shouldShowMobileToolbar = isKeyboardEditMode && shouldAppearSelected;
 
 	// Insertion point can only be made visible if the block is at the
 	// the extent of a multi-selection, or not in a multi-selection.
@@ -464,7 +492,7 @@ function BlockListBlock( {
 			onTouchStart={ onTouchStart }
 			onFocus={ onFocus }
 			onClick={ onTouchStop }
-			onKeyDown={ deleteOrInsertAfterWrapper }
+			onKeyDown={ onKeyDown }
 			tabIndex="0"
 			aria-label={ blockLabel }
 			childHandledEvents={ [ 'onDragStart', 'onMouseDown' ] }
@@ -509,9 +537,7 @@ function BlockListBlock( {
 				{ shouldShowBreadcrumb && (
 					<BlockBreadcrumb
 						clientId={ clientId }
-						isHidden={
-							! ( isHovered || isSelected ) || hoverArea !== ( isRTL ? 'right' : 'left' )
-						}
+						ref={ breadcrumb }
 					/>
 				) }
 				{ ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
@@ -604,6 +630,7 @@ const applyWithSelect = withSelect(
 			getBlockIndex,
 			getBlockOrder,
 			__unstableGetBlockWithoutInnerBlocks,
+			getKeyboardMode,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
@@ -637,6 +664,7 @@ const applyWithSelect = withSelect(
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 			isLast: index === blockOrder.length - 1,
+			keyboardMode: getKeyboardMode(),
 			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to access the block prop
@@ -664,6 +692,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		mergeBlocks,
 		replaceBlocks,
 		toggleSelection,
+		setKeyboardMode,
 	} = dispatch( 'core/block-editor' );
 
 	return {
@@ -736,6 +765,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );
+		},
+		onChangeKeyboardMode( mode ) {
+			setKeyboardMode( mode );
 		},
 	};
 } );

@@ -1208,6 +1208,22 @@ export const blockListSettings = ( state = {}, action ) => {
 };
 
 /**
+ * Reducer returning the current keyboard mode (navigation or edit).
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function keyboardMode( state = 'navigation', action ) {
+	if ( action.type === 'SET_KEYBOARD_MODE' ) {
+		return action.mode;
+	}
+
+	return state;
+}
+
+/**
  * Reducer return an updated state representing the most recent block attribute
  * update. The state is structured as an object where the keys represent the
  * client IDs of blocks, the values a subset of attributes from the most recent
@@ -1247,4 +1263,5 @@ export default combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
+	keyboardMode,
 } );

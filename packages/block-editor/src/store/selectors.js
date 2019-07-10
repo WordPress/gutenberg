@@ -1405,3 +1405,14 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
 function getReusableBlocks( state ) {
 	return get( state, [ 'settings', '__experimentalReusableBlocks' ], EMPTY_ARRAY );
 }
+
+/*
+ * Returns the current keyboard mode.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string}      Keyboard Mode
+ */
+export function getKeyboardMode( state ) {
+	return state.keyboardMode;
+}
