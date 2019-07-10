@@ -27,7 +27,7 @@ export const settings = {
 	],
 	styles: [
 		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
-		{ name: 'circle-crop', label: _x( 'Circle Crop', 'block style' ) },
+		{ name: 'circle-mask', label: _x( 'Circle Mask', 'block style' ) },
 	],
 	transforms,
 	getEditWrapperProps( attributes ) {
