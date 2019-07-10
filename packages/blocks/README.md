@@ -548,11 +548,11 @@ in the codebase.
 
 _Parameters_
 
--   _icon_ `(Object|string|WPElement)`: Slug of the Dashicon to be shown as the icon for the block in the inserter, or element or an object describing the icon.
+-   _icon_ `WPBlockTypeIconRender`: Render behavior of a block type icon; one of a Dashicon slug, an element, or a component.
 
 _Returns_
 
--   `Object`: Object describing the icon.
+-   `WPBlockTypeIconDescriptor`: Object describing the icon.
 
 <a name="parse" href="#parse">#</a> **parse**
 

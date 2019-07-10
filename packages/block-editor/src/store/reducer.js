@@ -196,29 +196,6 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 }
 
 /**
- * Higher-order reducer intended to reset the cache key of all blocks
- * whenever the post meta values change.
- *
- * @param {Function} reducer Original reducer function.
- *
- * @return {Function} Enhanced reducer function.
- */
-const withPostMetaUpdateCacheReset = ( reducer ) => ( state, action ) => {
-	const newState = reducer( state, action );
-	const previousMetaValues = get( state, [ 'settings', '__experimentalMetaSource', 'value' ] );
-	const nextMetaValues = get( newState.settings.__experimentalMetaSource, [ 'value' ] );
-	// If post meta values change, reset the cache key for all blocks
-	if ( previousMetaValues !== nextMetaValues ) {
-		newState.blocks = {
-			...newState.blocks,
-			cache: mapValues( newState.blocks.cache, () => ( {} ) ),
-		};
-	}
-
-	return newState;
-};
-
-/**
  * Utility returning an object with an empty object value for each key.
  *
  * @param {Array} objectKeys Keys to fill.
@@ -1228,17 +1205,44 @@ export const blockListSettings = ( state = {}, action ) => {
 	return state;
 };
 
-export default withPostMetaUpdateCacheReset(
-	combineReducers( {
-		blocks,
-		isTyping,
-		isCaretWithinFormattedText,
-		blockSelection,
-		blocksMode,
-		blockListSettings,
-		insertionPoint,
-		template,
-		settings,
-		preferences,
-	} )
-);
+/**
+ * Reducer return an updated state representing the most recent block attribute
+ * update. The state is structured as an object where the keys represent the
+ * client IDs of blocks, the values a subset of attributes from the most recent
+ * block update. The state is always reset to null if the last action is
+ * anything other than an attributes update.
+ *
+ * @param {Object<string,Object>} state  Current state.
+ * @param {Object}                action Action object.
+ *
+ * @return {[string,Object]} Updated state.
+ */
+export function lastBlockAttributesChange( state, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_BLOCK':
+			if ( ! action.updates.attributes ) {
+				break;
+			}
+
+			return { [ action.clientId ]: action.updates.attributes };
+
+		case 'UPDATE_BLOCK_ATTRIBUTES':
+			return { [ action.clientId ]: action.attributes };
+	}
+
+	return null;
+}
+
+export default combineReducers( {
+	blocks,
+	isTyping,
+	isCaretWithinFormattedText,
+	blockSelection,
+	blocksMode,
+	blockListSettings,
+	insertionPoint,
+	template,
+	settings,
+	preferences,
+	lastBlockAttributesChange,
+} );
