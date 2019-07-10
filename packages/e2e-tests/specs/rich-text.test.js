@@ -7,11 +7,13 @@ import {
 	insertBlock,
 	clickBlockAppender,
 	pressKeyWithModifier,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'should handle change in tag name gracefully', async () => {
@@ -80,10 +82,12 @@ describe( 'RichText', () => {
 	it( 'should return focus when pressing formatting button', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Some ' );
-		await page.keyboard.press( 'Escape' );
+		await page.mouse.move( 0, 0 );
+		await page.mouse.move( 10, 10 );
 		await page.click( '[aria-label="Bold"]' );
 		await page.keyboard.type( 'bold' );
-		await page.keyboard.press( 'Escape' );
+		await page.mouse.move( 0, 0 );
+		await page.mouse.move( 10, 10 );
 		await page.click( '[aria-label="Bold"]' );
 		await page.keyboard.type( '.' );
 

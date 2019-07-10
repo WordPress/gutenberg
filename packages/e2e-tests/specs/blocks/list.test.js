@@ -10,11 +10,13 @@ import {
 	transformBlockTo,
 	pressKeyWithModifier,
 	insertBlock,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'List', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'can be created by using an asterisk at the start of a paragraph block', async () => {

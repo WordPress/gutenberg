@@ -7,11 +7,13 @@ import {
 	createNewPost,
 	insertBlock,
 	clickButton,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Preformatted', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'should preserve character newlines', async () => {

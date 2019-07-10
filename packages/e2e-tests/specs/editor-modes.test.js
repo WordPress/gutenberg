@@ -6,11 +6,13 @@ import {
 	clickBlockToolbarButton,
 	createNewPost,
 	switchEditorModeTo,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 		await clickBlockAppender();
 		await page.keyboard.type( 'Hello world!' );
 	} );

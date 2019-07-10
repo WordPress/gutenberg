@@ -14,6 +14,7 @@ import {
 	saveDraft,
 	clickOnMoreMenuItem,
 	pressKeyWithModifier,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 async function openPreviewPage( editorPage ) {
@@ -82,6 +83,7 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 describe( 'Preview', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'should open a preview window for a new post', async () => {
@@ -203,6 +205,7 @@ describe( 'Preview with Custom Fields enabled', () => {
 	beforeEach( async () => {
 		await createNewPost();
 		await toggleCustomFieldsOption( true );
+		await switchToEditMode();
 	} );
 
 	afterEach( async () => {

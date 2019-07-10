@@ -10,6 +10,7 @@ import {
 	getEditedPostContent,
 	pressKeyWithModifier,
 	clickButton,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Using Format API', () => {
@@ -23,6 +24,7 @@ describe( 'Using Format API', () => {
 
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'Clicking the control wraps the selected text properly with HTML code', async () => {

@@ -8,11 +8,13 @@ import {
 	pressKeyWithModifier,
 	pressKeyTimes,
 	getEditedPostContent,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Multi-block selection', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'Should select/unselect multiple blocks', async () => {

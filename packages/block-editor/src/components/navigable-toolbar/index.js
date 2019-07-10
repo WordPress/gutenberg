@@ -40,13 +40,19 @@ class NavigableToolbar extends Component {
 	/**
 	 * Programmatically shifts focus to the element where the current selection
 	 * exists, if there is a selection.
+	 *
+	 * @param {Event} event KeyDown Event.
 	 */
-	focusSelection() {
+	focusSelection( event ) {
 		// Ensure that a selection exists.
 		const selection = getSelection();
 		if ( ! selection ) {
 			return;
 		}
+
+		// We need to stop propagation to avoid triggering the keybaord mode
+		// in BlockListBlock component.
+		event.stopPropagation();
 
 		// Focus node may be a text node, which cannot be focused directly.
 		// Find its parent element instead.

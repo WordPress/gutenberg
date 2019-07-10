@@ -12,6 +12,7 @@ import {
 	switchUserToAdmin,
 	switchUserToTest,
 	visitAdminPage,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'templates', () => {
@@ -22,6 +23,7 @@ describe( 'templates', () => {
 
 		beforeEach( async () => {
 			await createNewPost( { postType: 'book' } );
+			await switchToEditMode();
 		} );
 
 		afterAll( async () => {

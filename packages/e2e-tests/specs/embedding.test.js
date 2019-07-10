@@ -12,6 +12,7 @@ import {
 	clickButton,
 	insertBlock,
 	publishPost,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
@@ -188,6 +189,7 @@ describe( 'Embedding content', () => {
 	beforeEach( async () => {
 		await setUpResponseMocking( MOCK_RESPONSES );
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'should render embeds in the correct state', async () => {

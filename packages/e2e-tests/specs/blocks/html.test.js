@@ -5,11 +5,13 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	createNewPost,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'HTML block', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'can be created by typing "/html"', async () => {

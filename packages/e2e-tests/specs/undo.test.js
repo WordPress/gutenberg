@@ -9,11 +9,13 @@ import {
 	selectBlockByClientId,
 	getAllBlocks,
 	saveDraft,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'undo', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'should undo typing after a pause', async () => {
@@ -79,6 +81,7 @@ describe( 'undo', () => {
 		await page.keyboard.type( 'original' );
 		await saveDraft();
 		await page.reload();
+		await switchToEditMode();
 
 		// Issue is demonstrated by forcing state merges (multiple inputs) on
 		// an existing text after a fresh reload.

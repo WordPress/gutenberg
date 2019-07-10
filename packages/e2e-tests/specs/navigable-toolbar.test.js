@@ -6,7 +6,7 @@ import { forEach } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
+import { createNewPost, pressKeyWithModifier, switchToEditMode } from '@wordpress/e2e-test-utils';
 
 describe( 'block toolbar', () => {
 	forEach( {
@@ -23,6 +23,8 @@ describe( 'block toolbar', () => {
 					dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
 				}
 			}, isUnifiedToolbar );
+
+			await switchToEditMode();
 		} );
 
 		const isInRichTextEditable = () => page.evaluate( () => (

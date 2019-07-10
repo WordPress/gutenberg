@@ -15,11 +15,13 @@ import {
 	createNewPost,
 	clickBlockToolbarButton,
 	clickButton,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding inline tokens', () => {
-	beforeAll( async () => {
+	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'should insert inline image', async () => {

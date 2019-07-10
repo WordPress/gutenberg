@@ -8,6 +8,7 @@ import {
 	createNewPost,
 	pressKeyWithModifier,
 	insertBlock,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -19,6 +20,7 @@ import {
 describe( 'Links', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	const waitForAutoFocus = async () => {
@@ -238,8 +240,9 @@ describe( 'Links', () => {
 		// Make a collapsed selection inside the link
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowRight' );
-		// Press escape to show the block toolbar
-		await page.keyboard.press( 'Escape' );
+		// Move the mouse to show the block toolbar
+		await page.mouse.move( 0, 0 );
+		await page.mouse.move( 10, 10 );
 		await page.click( 'button[aria-label="Edit"]' );
 		await waitForAutoFocus();
 		await page.keyboard.type( '/handbook' );

@@ -5,11 +5,13 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	clickBlockAppender,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'autocomplete mentions', () => {
 	beforeAll( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'should insert mention', async () => {

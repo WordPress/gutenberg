@@ -6,11 +6,13 @@ import {
 	insertBlock,
 	getEditedPostContent,
 	pressKeyTimes,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding blocks', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	/**

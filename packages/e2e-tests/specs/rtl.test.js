@@ -5,6 +5,7 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	pressKeyWithModifier,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 // Avoid using three, as it looks too much like two with some fonts.
@@ -15,6 +16,7 @@ const ARABIC_TWO = '٢';
 describe( 'RTL', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'should arrow navigate', async () => {

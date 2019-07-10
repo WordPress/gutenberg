@@ -10,10 +10,12 @@ import {
 	pressKeyWithModifier,
 	pressKeyTimes,
 	insertBlock,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 const addThreeParagraphsToNewPost = async () => {
 	await createNewPost();
+	await switchToEditMode();
 
 	// Add demo content
 	await clickBlockAppender();
@@ -143,8 +145,12 @@ describe( 'block deletion -', () => {
 } );
 
 describe( 'deleting all blocks', () => {
-	it( 'results in the default block getting selected', async () => {
+	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
+	} );
+
+	it( 'results in the default block getting selected', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph' );
 
@@ -168,7 +174,6 @@ describe( 'deleting all blocks', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/15458
 		// See: https://github.com/WordPress/gutenberg/pull/15543
-		await createNewPost();
 
 		// Unregister default block type. This may happen if the editor is
 		// configured to not allow the default (paragraph) block type, either

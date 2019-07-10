@@ -459,6 +459,14 @@ _Parameters_
 
 -   _mode_ `string`: String editor mode.
 
+<a name="switchToEditMode" href="#switchToEditMode">#</a> **switchToEditMode**
+
+Move the mouse to trigger Edit Mode
+
+_Returns_
+
+-   `Promise`: Promise resolving after enabling the keyboard edit mode.
+
 <a name="switchUserToAdmin" href="#switchUserToAdmin">#</a> **switchUserToAdmin**
 
 Switches the current user to the admin user (if the user

@@ -5,11 +5,13 @@ import {
 	createNewPost,
 	clickBlockAppender,
 	clickBlockToolbarButton,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'invalid blocks', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'Should show an invalid block message with clickable options', async () => {

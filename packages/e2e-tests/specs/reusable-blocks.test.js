@@ -8,6 +8,7 @@ import {
 	pressKeyWithModifier,
 	searchForBlock,
 	getEditedPostContent,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
 function waitForAndAcceptDialog() {
@@ -19,6 +20,7 @@ function waitForAndAcceptDialog() {
 describe( 'Reusable Blocks', () => {
 	beforeAll( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	beforeEach( async () => {

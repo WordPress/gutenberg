@@ -8,11 +8,13 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	insertBlock,
+	switchToEditMode,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'adding blocks', () => {
+describe( 'Writing Flow', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await switchToEditMode();
 	} );
 
 	it( 'Should navigate inner blocks with arrow keys', async () => {
