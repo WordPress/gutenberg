@@ -25,7 +25,7 @@ Each Settings Sidebar comes with an "Advanced" section by default. This area hou
 
 ## Setup state vs. live preview state
 
-Setup states, sometimes referred to as "placeholders", can be used to walk users through an initial process before showing the live preview state of the block. The setup process gathers information from the user that is needed to render the block. A block’s setup state is indicated with a grey background to provide clear differentiation for the user. Not all blocks have setup states — for example, the paragraph block.
+Setup states, sometimes referred to as "placeholders", can be used to walk users through an initial process before showing the live preview state of the block. The setup process gathers information from the user that is needed to render the block. A block’s setup state is indicated with a grey background to provide clear differentiation for the user. Not all blocks have setup states — for example, the Paragraph block.
 
 ![An example of a gallery block’s setup state on a grey background](https://make.wordpress.org/design/files/2018/12/gallery-setup.png)
 
@@ -122,7 +122,7 @@ Do not put controls that are essential to the block in the sidebar, or the block
 
 The “Block” tab of the Settings Sidebar can contain additional block options and configuration. Keep in mind that a user can dismiss the sidebar and never use it. You should not put critical options in the Sidebar.
 
-![A screenshot of the paragraph block's advanced settings in the sidebar](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/advanced-settings-do.png)
+![A screenshot of the Paragraph block's advanced settings in the sidebar](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/advanced-settings-do.png)
 **Do:**
 Because the Drop Cap feature is not necessary for the basic operation of the block, you can put it to the Block tab as optional configuration.
 
@@ -140,9 +140,9 @@ To demonstrate some of these practices, here are a few annotated examples of def
 
 ### Paragraph
 
-The most basic unit of the editor. The paragraph block is a simple input field.
+The most basic unit of the editor. The Paragraph block is a simple input field.
 
-![Paragraph Block](https://cldup.com/HVJe5bGZ8H-3000x3000.png)
+![Paragraph block](https://cldup.com/HVJe5bGZ8H-3000x3000.png)
 
 ### Placeholder:
 
@@ -158,7 +158,7 @@ The most basic unit of the editor. The paragraph block is a simple input field.
 
 Basic image block.
 
-![Image Block Placeholder](https://cldup.com/w6FNywNsj1-3000x3000.png)
+![Image block placeholder](https://cldup.com/w6FNywNsj1-3000x3000.png)
 
 ### Placeholder:
 
