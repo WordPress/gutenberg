@@ -23,8 +23,8 @@ module.exports = {
 	testEnvironment: 'jsdom',
 	testMatch: [
 		'**/test/*.native.[jt]s?(x)',
-		// '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
-		// '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
+		'<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
+		'<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
 	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
