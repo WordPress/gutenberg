@@ -223,9 +223,9 @@ class URLInput extends Component {
 		this.inputRef.current.focus();
 	}
 
-	static getDerivedStateFromProps( { showSuggestionsOverride }, { showSuggestions } ) {
+	static getDerivedStateFromProps( { disableSuggestions }, { showSuggestions } ) {
 		return {
-			showSuggestions: showSuggestionsOverride !== undefined ? showSuggestionsOverride : showSuggestions,
+			showSuggestions: disableSuggestions === true ? false : showSuggestions,
 		};
 	}
 
