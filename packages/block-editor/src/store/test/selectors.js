@@ -58,7 +58,7 @@ const {
 	getTemplate,
 	getTemplateLock,
 	getBlockListSettings,
-	__experimentalGetLastBlockAttributesChange,
+	__experimentalGetLastBlockAttributeChanges,
 	INSERTER_UTILITY_HIGH,
 	INSERTER_UTILITY_MEDIUM,
 	INSERTER_UTILITY_LOW,
@@ -2440,7 +2440,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( '__experimentalGetLastBlockAttributesChange', () => {
+	describe( '__experimentalGetLastBlockAttributeChanges', () => {
 		it( 'returns the last block attributes change', () => {
 			const state = {
 				lastBlockAttributesChange: {
@@ -2448,7 +2448,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const result = __experimentalGetLastBlockAttributesChange( state );
+			const result = __experimentalGetLastBlockAttributeChanges( state );
 
 			expect( result ).toEqual( {
 				block1: { fruit: 'bananas' },

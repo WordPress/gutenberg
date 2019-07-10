@@ -905,7 +905,7 @@ export function unlockPostSaving( lockName ) {
  * @return {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
-	const lastBlockAttributesChange = yield select( 'core/block-editor', '__experimentalGetLastBlockAttributesChange' );
+	const lastBlockAttributesChange = yield select( 'core/block-editor', '__experimentalGetLastBlockAttributeChanges' );
 
 	// Sync to sources from block attributes updates.
 	if ( lastBlockAttributesChange ) {
