@@ -83,9 +83,9 @@ export class ServerSideRender extends Component {
 
 	render() {
 		const response = this.state.response;
-		const { className } = this.props;
+		const { className, onEmptyResponse, onErrorResponse, onNullResponse } = this.props;
 		if ( response === '' ) {
-			return (
+			return !! onEmptyResponse ? onEmptyResponse( this ) : (
 				<Placeholder
 					className={ className }
 				>
@@ -93,7 +93,7 @@ export class ServerSideRender extends Component {
 				</Placeholder>
 			);
 		} else if ( ! response ) {
-			return (
+			return !! onNullResponse ? onNullResponse( this ) : (
 				<Placeholder
 					className={ className }
 				>
@@ -103,7 +103,7 @@ export class ServerSideRender extends Component {
 		} else if ( response.error ) {
 			// translators: %s: error message describing the problem
 			const errorMessage = sprintf( __( 'Error loading block: %s' ), response.errorMsg );
-			return (
+			return !! onErrorResponse ? onErrorResponse( this, errorMessage ) : (
 				<Placeholder
 					className={ className }
 				>
