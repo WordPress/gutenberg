@@ -72,7 +72,14 @@ class EditorProvider extends Component {
 		}
 	}
 
-	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions ) {
+	getBlockEditorSettings(
+		settings,
+		meta,
+		onMetaChange,
+		reusableBlocks,
+		hasUploadPermissions,
+		canUserUseUnfilteredHTML
+	) {
 		return {
 			...pick( settings, [
 				'alignWide',
@@ -102,6 +109,7 @@ class EditorProvider extends Component {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
+			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 		};
 	}
 
@@ -131,6 +139,7 @@ class EditorProvider extends Component {
 
 	render() {
 		const {
+			canUserUseUnfilteredHTML,
 			children,
 			blocks,
 			resetEditorBlocks,
@@ -148,7 +157,12 @@ class EditorProvider extends Component {
 		}
 
 		const editorSettings = this.getBlockEditorSettings(
-			settings, meta, onMetaChange, reusableBlocks, hasUploadPermissions
+			settings,
+			meta,
+			onMetaChange,
+			reusableBlocks,
+			hasUploadPermissions,
+			canUserUseUnfilteredHTML
 		);
 
 		return (
@@ -171,6 +185,7 @@ export default compose( [
 	withRegistryProvider,
 	withSelect( ( select ) => {
 		const {
+			canUserUseUnfilteredHTML,
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
 			getEditedPostAttribute,
@@ -179,6 +194,7 @@ export default compose( [
 		const { canUser } = select( 'core' );
 
 		return {
+			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isReady: isEditorReady(),
 			blocks: getEditorBlocks(),
 			meta: getEditedPostAttribute( 'meta' ),
