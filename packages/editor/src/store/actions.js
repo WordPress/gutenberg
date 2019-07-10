@@ -206,7 +206,7 @@ export function __experimentalTearDownEditor() {
  */
 export function* __experimentalSubscribeSources() {
 	while ( true ) {
-		const registry = yield awaitNextStateChange();
+		yield awaitNextStateChange();
 
 		// The bailout case: If the editor becomes unmounted, it will flag
 		// itself as non-ready. Effectively unsubscribes from the registry.
@@ -214,6 +214,8 @@ export function* __experimentalSubscribeSources() {
 		if ( ! isStillReady ) {
 			break;
 		}
+
+		const registry = yield getRegistry();
 
 		let reset = false;
 		for ( const source of Object.values( sources ) ) {
