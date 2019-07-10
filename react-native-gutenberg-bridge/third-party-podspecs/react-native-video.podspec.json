@@ -16,7 +16,7 @@
   },
   "static_framework": true,
   "dependencies": {
-    "React": [
+    "React-Core": [
 
     ]
   },

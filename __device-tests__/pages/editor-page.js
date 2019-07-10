@@ -21,6 +21,12 @@ export default class EditorPage {
 	headingBlockName = 'Heading';
 	imageBlockName = 'Image';
 
+	// This is needed to adapt to changes in the way accessibility ids are being
+	// assigned after migrating to AndroidX and React Native 0.60. See:
+	// https://github.com/wordpress-mobile/gutenberg-mobile/pull/1112#issuecomment-501165250
+	// for more details.
+	accessibilityIdSuffix = '';
+
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
 		this.accessibilityIdKey = 'name';
@@ -29,6 +35,7 @@ export default class EditorPage {
 		if ( isAndroid() ) {
 			this.accessibilityIdXPathAttrib = 'content-desc';
 			this.accessibilityIdKey = 'contentDescription';
+			this.accessibilityIdSuffix = ', ';
 		}
 	}
 
@@ -50,7 +57,7 @@ export default class EditorPage {
 	}
 
 	async getTextViewForHtmlViewContent() {
-		const accessibilityId = 'html-view-content';
+		const accessibilityId = `html-view-content${ this.accessibilityIdSuffix }`;
 		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
 
 		if ( ! isAndroid() ) {
@@ -123,11 +130,13 @@ export default class EditorPage {
 		if ( ! await this.hasBlockAtPosition( position, blockName ) ) {
 			throw Error( `No Block at position ${ position }` );
 		}
+		const parentId = `${ blockName } Block. Row ${ position }.${ this.accessibilityIdSuffix }`;
+		const parentLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ parentId }"]`;
 
-		const parentLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ blockName } Block. Row ${ position }."]`;
+		const blockId = `Move block up from row ${ position } to row ${ position - 1 }${ this.accessibilityIdSuffix }`;
 		let blockLocator = `${ parentLocator }/following-sibling::*`;
 		blockLocator += isAndroid() ? '' : '//*';
-		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Move block up from row ${ position } to row ${ position - 1 }"]`;
+		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="${ blockId }"]`;
 		const moveUpButton = await this.driver.elementByXPath( blockLocator );
 		await moveUpButton.click();
 	}
@@ -138,10 +147,13 @@ export default class EditorPage {
 			throw Error( `No Block at position ${ position }` );
 		}
 
-		const parentLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
+		const parentId = `${ blockName } Block. Row ${ position }.`;
+		const parentLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ parentId }")]`;
+
+		const blockId = `Move block down from row ${ position } to row ${ position + 1 }${ this.accessibilityIdSuffix }`;
 		let blockLocator = `${ parentLocator }/following-sibling::*`;
 		blockLocator += isAndroid() ? '' : '//*';
-		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Move block down from row ${ position } to row ${ position + 1 }"]`;
+		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="${ blockId }"]`;
 		const moveDownButton = await this.driver.elementByXPath( blockLocator );
 		await moveDownButton.click();
 	}
@@ -153,13 +165,14 @@ export default class EditorPage {
 			throw Error( `No Block at position ${ position }` );
 		}
 
-		const parentLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
+		const parentId = `${ blockName } Block. Row ${ position }.`;
+		const parentLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ parentId }")]`;
 		let removeBlockLocator = `${ parentLocator }/following-sibling::*`;
 		removeBlockLocator += isAndroid() ? '' : '//*';
 		let removeButtonIdentifier = `Remove block at row ${ position }`;
 
 		if ( isAndroid() ) {
-			removeButtonIdentifier += ', Double tap to remove the block';
+			removeButtonIdentifier += `, Double tap to remove the block${ this.accessibilityIdSuffix }`;
 			const block = await this.getBlockAtPosition( position, blockName );
 			let checkList = await this.driver.elementsByXPath( removeBlockLocator );
 			while ( checkList.length === 0 ) {

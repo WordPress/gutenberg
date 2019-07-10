@@ -1,17 +1,17 @@
 {
   "name": "yoga",
-  "version": "0.59.3.React",
+  "version": "0.60.0-patched.React",
   "license": {
     "type": "MIT"
   },
-  "homepage": "https://facebook.github.io/yoga/",
-  "documentation_url": "https://facebook.github.io/yoga/docs/api/c/",
+  "homepage": "https://yogalayout.com",
+  "documentation_url": "https://yogalayout.com/docs/",
   "summary": "Yoga is a cross-platform layout engine which implements Flexbox.",
   "description": "Yoga is a cross-platform layout engine enabling maximum collaboration within your team by implementing an API many designers are familiar with, and opening it up to developers across different platforms.",
   "authors": "Facebook",
   "source": {
-    "git": "https://github.com/facebook/react-native.git",
-    "tag": "v0.59.3"
+    "git": "https://github.com/jtreanor/react-native.git",
+    "tag": "v0.60.0-patched"
   },
   "module_name": "yoga",
   "requires_arc": false,
@@ -27,6 +27,7 @@
     "ios": "9.0",
     "tvos": "9.2"
   },
-  "source_files": "ReactCommon/yoga/yoga/**/*.{cpp,h}",
-  "public_header_files": "ReactCommon/yoga/yoga/{Yoga,YGEnums,YGMacros,YGValue}.h"
+  "source_files": "yoga/**/*.{cpp,h}",
+  "public_header_files": "yoga/{Yoga,YGEnums,YGMacros,YGValue}.h",
+  "prepare_command": "TMP_DIR=$(mktemp -d); mv * $TMP_DIR; cp -R \"$TMP_DIR/ReactCommon/yoga\"/* . && true"
 }

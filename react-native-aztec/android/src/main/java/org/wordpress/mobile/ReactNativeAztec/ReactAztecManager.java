@@ -4,7 +4,7 @@ package org.wordpress.mobile.ReactNativeAztec;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.TextUtils;
