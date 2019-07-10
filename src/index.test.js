@@ -33,9 +33,9 @@ describe( 'RootComponent', () => {
 		const blocks = select( 'core/block-editor' ).getBlocks();
 
 		// Methods that modify state are required to be called inside `act`
-		renderer.act(() => {
+		renderer.act( () => {
 			dispatch( 'core/block-editor' ).selectBlock( blocks[ 0 ].clientId );
-		});
+		} );
 
 		const rendered = app.toJSON();
 		expect( rendered ).toBeTruthy();
