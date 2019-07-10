@@ -21,11 +21,13 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 	};
 } );
 
-jest.mock( 'react-native-aztec', () => () => 'RCTAztecView' );
+jest.mock( 'react-native-modal', () => () => 'Modal' );
+
+jest.mock( 'react-native-hr', () => () => 'Hr' );
 
 jest.mock( 'react-native-svg', () => {
 	return {
-		SVG: () => 'SVG',
+		Svg: () => 'Svg',
 		Path: () => 'Path',
 		Circle: () => 'Circle',
 		G: () => 'G',
