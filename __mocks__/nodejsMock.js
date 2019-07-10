@@ -1,4 +1,0 @@
-/** @flow
- * @format */
-
-module.exports = {};

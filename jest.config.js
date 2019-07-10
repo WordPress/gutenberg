@@ -17,14 +17,14 @@ module.exports = {
 	clearMocks: true,
 	preset: 'react-native',
 	setupFiles: [
-		'./jest/setup.js',
-		'<rootDir>/enzyme.config.js',
+		'<rootDir>/gutenberg/test/native/setup.js',
+		'<rootDir>/gutenberg/test/native/enzyme.config.js',
 	],
 	testEnvironment: 'jsdom',
 	testMatch: [
 		'**/test/*.native.[jt]s?(x)',
-		'<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
-		'<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
+		// '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
+		// '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
 	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
@@ -37,7 +37,7 @@ module.exports = {
 	moduleDirectories: [ 'node_modules', 'symlinked-packages' ],
 	moduleNameMapper: {
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
-		'\\.(scss)$': '<rootDir>/__mocks__/styleMock.js',
+		'\\.(scss)$': '<rootDir>/gutenberg/test/native/__mocks__/styleMock.js',
 	},
 	haste: {
 		defaultPlatform: rnPlatform,
