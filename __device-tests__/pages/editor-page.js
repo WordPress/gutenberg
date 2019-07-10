@@ -345,13 +345,11 @@ export default class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	// Assumes Heading Block is empty
 	async sendTextToHeadingBlock( block: wd.PromiseChainWebdriver.Element, text: string ) {
 		const textViewElement = await this.getTextViewForHeadingBlock( block, true );
 		return await typeString( this.driver, textViewElement, text );
 	}
 
-	// Assumes Heading Block is empty
 	async getTextForHeadingBlock( block: wd.PromiseChainWebdriver.Element ) {
 		const textViewElement = await this.getTextViewForHeadingBlock( block, false );
 		const text = await textViewElement.text();
