@@ -21,7 +21,7 @@ fi
 
 # 2. Read current version.
 
-version=$(jq -r '.version' package.json)
+version=$(git show master:package.json | jq -r '.version')
 
 IFS='.' read -ra parts <<< "$version"
 major=${parts[0]}
