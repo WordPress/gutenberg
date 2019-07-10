@@ -16,7 +16,7 @@ current_milestone=$(
 
 if [ "$current_milestone" != 'null' ]; then
 	echo 'Milestone already applied. Aborting.'
-	exit 1;
+	exit 78;
 fi
 
 # 2. Read current version.
