@@ -920,11 +920,16 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 			updatedBlockTypes.add( blockName );
 			const blockType = yield select( 'core/blocks', 'getBlockType', blockName );
 
-			for ( const [ attributeName, schema ] of Object.entries( blockType.attributes ) ) {
+			for ( const [ attributeName, newAttributeValue ] of Object.entries( attributes ) ) {
+				if ( ! blockType.attributes.hasOwnProperty( attributeName ) ) {
+					continue;
+				}
+
+				const schema = blockType.attributes[ attributeName ];
 				const source = sources[ schema.source ];
 
 				if ( attributes.hasOwnProperty( attributeName ) && source && source.update ) {
-					yield* source.update( schema, attributes[ attributeName ] );
+					yield* source.update( schema, newAttributeValue );
 					updatedSources.add( source );
 				}
 			}
