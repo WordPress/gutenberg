@@ -23,7 +23,8 @@
 		}
 	}
 
-	.block-editor-warning__message {
+	.block-editor-warning__message,
+	.block-editor-warning__message p {
 		line-height: $default-line-height;
 		font-family: $default-font;
 		font-size: $default-font-size;
