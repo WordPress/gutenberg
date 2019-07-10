@@ -65,9 +65,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "7.4.4",
-		"@babel/plugin-proposal-async-generator-functions": "7.2.0",
 		"@babel/plugin-syntax-jsx": "7.2.0",
-		"@babel/runtime": "7.5.4",
 		"@babel/runtime-corejs3": "7.4.4",
 		"@babel/traverse": "7.4.4",
 		"@octokit/rest": "16.26.0",
