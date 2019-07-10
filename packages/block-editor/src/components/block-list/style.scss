@@ -459,11 +459,6 @@
 				display: inline-flex;
 			}
 		}
-
-		// If the block movers are visible, push the breadcrumb down to make room for them.
-		.block-editor-block-mover.is-visible + .block-editor-block-list__breadcrumb {
-			top: (-$block-padding - $block-left-border-width - ($grid-size-small / 2));
-		}
 	}
 
 	// Wide
@@ -477,10 +472,6 @@
 
 	// Full-wide
 	&[data-align="full"] {
-		// Position hover label on the left for the top level block.
-		> .block-editor-block-list__block-edit > .block-editor-block-list__breadcrumb {
-			left: 0;
-		}
 
 		// Compensate for main container padding and subtract border.
 		@include break-small() {
@@ -981,58 +972,6 @@
 		position: absolute;
 		left: $border-width;
 		top: $border-width;
-	}
-}
-
-
-/**
- * Hover label
- */
-
-.block-editor-block-list__breadcrumb {
-	position: absolute;
-	line-height: 1;
-	z-index: z-index(".block-editor-block-list__breadcrumb");
-
-	// Position in the top left of the border.
-	left: -$block-padding - $block-left-border-width;
-	top: (($block-padding * -2) - $block-left-border-width);
-
-	.components-toolbar {
-		border: none;
-		line-height: 1;
-		font-family: $default-font;
-		font-size: 11px;
-		padding: 4px 4px;
-		background: $light-gray-500;
-		color: $dark-gray-900;
-
-		.is-dark-theme & {
-			background: $dark-gray-600;
-			color: $white;
-		}
-
-		// Animate in
-		.block-editor-block-list__block:hover & {
-			opacity: 0;
-			@include edit-post__fade-in-animation(60ms, 0.5s);
-		}
-	}
-
-	// Position this above the toolbar of parent blocks.
-	.editor-inner-blocks & {
-		z-index: z-index(".editor-inner-blocks .block-editor-block-list__breadcrumb");
-	}
-
-	// Remove negative left breadcrumb position for left aligned blocks.
-	[data-align="left"] & {
-		left: 0;
-	}
-
-	// Right-align the breadcrumb for right-aligned blocks.
-	[data-align="right"] & {
-		left: auto;
-		right: 0;
 	}
 }
 
