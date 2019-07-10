@@ -432,6 +432,7 @@ function BlockListBlock( {
 		{
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': shouldAppearSelected,
+			'is-navigation': ! isKeyboardEditMode,
 			'is-multi-selected': isPartOfMultiSelection,
 			'is-hovered': shouldAppearHovered,
 			'is-reusable': isReusableBlock( blockType ),
