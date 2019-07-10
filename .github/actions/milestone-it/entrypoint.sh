@@ -33,7 +33,7 @@ fi
 version=$(
 	curl \
 		--silent \
-		"https://raw.githubusercontent.com/$GITHUB_REPOSITORY/master/package.json"
+		"https://raw.githubusercontent.com/$GITHUB_REPOSITORY/master/package.json" \
 		| jq -r '.version'
 )
 
