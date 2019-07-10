@@ -219,6 +219,11 @@ function BlockListBlock( {
 			return;
 		}
 
+		if ( keyboardMode === 'navigation' ) {
+			breadcrumb.current.focus();
+			return;
+		}
+
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable
 			.find( blockNodeRef.current )
@@ -294,38 +299,38 @@ function BlockListBlock( {
 	const onKeyDown = ( event ) => {
 		const { keyCode, target } = event;
 
-		if ( keyboardMode === 'edit' ) {
-			// ENTER/BACKSPACE Shortcuts are only available if the wrapper is focused
-			// and the block is not locked.
-			const canUseShortcuts = (
-				isSelected &&
-				target === wrapper.current &&
-				! isLocked
-			);
-			switch ( keyCode ) {
-				case ENTER:
-					if ( canUseShortcuts ) {
-						// Insert default block after current block if enter and event
-						// not already handled by descendant.
-						onInsertDefaultBlockAfter();
-						event.preventDefault();
-					}
-					break;
-				case BACKSPACE:
-				case DELETE:
-					if ( canUseShortcuts ) {
+		// ENTER/BACKSPACE Shortcuts are only available if the wrapper is focused
+		// and the block is not locked.
+		const canUseShortcuts = (
+			isSelected &&
+				! isLocked &&
+				( target === wrapper.current || target === breadcrumb.current )
+		);
+		const isEditMode = keyboardMode === 'edit';
+
+		switch ( keyCode ) {
+			case ENTER:
+				if ( canUseShortcuts && isEditMode ) {
+					// Insert default block after current block if enter and event
+					// not already handled by descendant.
+					onInsertDefaultBlockAfter();
+					event.preventDefault();
+				}
+				break;
+			case BACKSPACE:
+			case DELETE:
+				if ( canUseShortcuts ) {
 					// Remove block on backspace.
-						onRemove( clientId );
-						event.preventDefault();
-					}
-					break;
-				case ESCAPE:
-					if ( isSelected ) {
-						onChangeKeyboardMode( 'navigation' );
-						wrapper.current.focus();
-					}
-					break;
-			}
+					onRemove( clientId );
+					event.preventDefault();
+				}
+				break;
+			case ESCAPE:
+				if ( isSelected && isEditMode ) {
+					onChangeKeyboardMode( 'navigation' );
+					wrapper.current.focus();
+				}
+				break;
 		}
 	};
 
