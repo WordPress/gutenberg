@@ -148,10 +148,15 @@ export function registerBlockType( name, settings ) {
 
 	if ( settings.deprecated ) {
 		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
-			pick(
+			pick( // Only keep valid deprecation keys.
 				applyFilters(
 					'blocks.registerBlockType',
+					// Merge deprecation keys with pre-filter settings
+					// so that filters that depend on specific keys being
+					// present don't fail.
 					{
+						// Omit deprecation keys here so that deprecations
+						// can opt out of specific keys like "supports".
 						...omit( preFilterSettings, DEPRECATED_ENTRY_KEYS ),
 						...deprecation,
 					},
