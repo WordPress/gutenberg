@@ -30,7 +30,12 @@ fi
 
 # 3. Read current version.
 
-version=$(git show master:package.json | jq -r '.version')
+version=$(
+	curl \
+		--silent \
+		"https://raw.githubusercontent.com/$GITHUB_REPOSITORY/master/package.json" \
+		| jq -r '.version'
+)
 
 IFS='.' read -ra parts <<< "$version"
 major=${parts[0]}
