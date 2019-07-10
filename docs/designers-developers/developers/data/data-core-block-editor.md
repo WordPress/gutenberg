@@ -335,6 +335,10 @@ _Returns_
 
 -   `Array<Editor.InserterItem>`: Items that appear in inserter.
 
+<a name="getKeyboardMode" href="#getKeyboardMode">#</a> **getKeyboardMode**
+
+Undocumented declaration.
+
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
 Returns the client ID of the last block in the multi-selection set, or null
@@ -1070,6 +1074,10 @@ clientId should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+
+<a name="setKeyboardMode" href="#setKeyboardMode">#</a> **setKeyboardMode**
+
+Undocumented declaration.
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
