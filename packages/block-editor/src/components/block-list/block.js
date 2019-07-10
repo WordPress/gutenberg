@@ -554,6 +554,7 @@ function BlockListBlock( {
 					/>
 				) }
 				{
+					isKeyboardEditMode &&
 					! shouldShowContextualToolbar &&
 					isSelected &&
 					! hasFixedToolbar &&

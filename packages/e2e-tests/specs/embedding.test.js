@@ -264,6 +264,7 @@ describe( 'Embedding content', () => {
 
 		// Start a new post, embed the previous post.
 		await createNewPost();
+		await switchToEditMode();
 		await clickBlockAppender();
 		await page.keyboard.type( '/embed' );
 		await page.keyboard.press( 'Enter' );
