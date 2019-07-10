@@ -36,14 +36,6 @@
 		}
 	}
 
-	.editor-post-switch-to-draft + .editor-post-preview {
-		display: none;
-
-		@include break-small {
-			display: inline-flex;
-		}
-	}
-
 	// Some browsers, most notably IE11, honor an older version of the flexbox spec
 	// which takes absolutely positioned items into account when calculating `space-between`.
 	// https://www.w3.org/TR/2012/WD-css3-flexbox-20120612/#abspos-flex-items
