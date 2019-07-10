@@ -41,7 +41,6 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
@@ -372,8 +371,6 @@ function BlockListBlock( {
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
-	const shouldShowBreadcrumb =
-		! isFocusMode && isHovered && ! isEmptyDefaultBlock;
 	const shouldShowContextualToolbar =
 		! hasFixedToolbar &&
 		! showEmptyBlockSideInserter &&
@@ -494,14 +491,6 @@ function BlockListBlock( {
 						}
 						onDragStart={ onDragStart }
 						onDragEnd={ onDragEnd }
-					/>
-				) }
-				{ shouldShowBreadcrumb && (
-					<BlockBreadcrumb
-						clientId={ clientId }
-						isHidden={
-							! ( isHovered || isSelected ) || hoverArea !== ( isRTL ? 'right' : 'left' )
-						}
 					/>
 				) }
 				{ ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
