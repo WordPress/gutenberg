@@ -5,6 +5,8 @@
  */
 import {
 	get,
+	omit,
+	pick,
 	isFunction,
 	isPlainObject,
 	some,
@@ -20,6 +22,7 @@ import { select, dispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { isValidIcon, normalizeIconObject } from './utils';
+import { DEPRECATED_ENTRY_KEYS } from './constants';
 
 /**
  * Render behavior of a block type icon; one of a Dashicon slug, an element,
@@ -140,10 +143,23 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
+	const preFilterSettings = settings;
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
 	if ( settings.deprecated ) {
-		settings.deprecated = settings.deprecated.map( ( deprecation ) => applyFilters( 'blocks.registerBlockType', deprecation, name ) );
+		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
+			pick(
+				applyFilters(
+					'blocks.registerBlockType',
+					{
+						...omit( preFilterSettings, DEPRECATED_ENTRY_KEYS ),
+						...deprecation,
+					},
+					name
+				),
+				DEPRECATED_ENTRY_KEYS
+			)
+		);
 	}
 
 	if ( ! isPlainObject( settings ) ) {
