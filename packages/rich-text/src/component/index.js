@@ -13,12 +13,9 @@ import {
  */
 import { Component } from '@wordpress/element';
 import { isHorizontalEdge } from '@wordpress/dom';
-import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { withSafeTimeout, compose } from '@wordpress/compose';
-import { isURL } from '@wordpress/url';
-import { decodeEntities } from '@wordpress/html-entities';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -27,14 +24,10 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import FormatEdit from './format-edit';
 import Editable from './editable';
 import { pickAriaProps } from './aria';
-import { isEmpty, isEmptyLine } from '../is-empty';
+import { isEmpty } from '../is-empty';
 import { create } from '../create';
 import { apply, toDom } from '../to-dom';
-import { applyFormat } from '../apply-format';
-import { split } from '../split';
 import { toHTMLString } from '../to-html-string';
-import { insert } from '../insert';
-import { insertLineSeparator } from '../insert-line-separator';
 import { remove } from '../remove';
 import { removeFormat } from '../remove-format';
 import { isCollapsed } from '../is-collapsed';
@@ -42,7 +35,6 @@ import { LINE_SEPARATOR } from '../special-characters';
 import { indentListItems } from '../indent-list-items';
 import { getActiveFormats } from '../get-active-formats';
 import { updateFormats } from '../update-formats';
-import { replace } from '../replace';
 import { removeLineSeparator } from '../remove-line-separator';
 
 /**
@@ -120,14 +112,12 @@ class RichText extends Component {
 		this.getRecord = this.getRecord.bind( this );
 		this.createRecord = this.createRecord.bind( this );
 		this.applyRecord = this.applyRecord.bind( this );
-		this.isEmpty = this.isEmpty.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.formatToValue = this.formatToValue.bind( this );
-		this.onSplit = this.onSplit.bind( this );
 
 		this.state = {};
 
@@ -194,10 +184,6 @@ class RichText extends Component {
 		} );
 	}
 
-	isEmpty() {
-		return isEmpty( this.record );
-	}
-
 	/**
 	 * Handles a paste event.
 	 *
@@ -206,13 +192,7 @@ class RichText extends Component {
 	 * @param {PasteEvent} event The paste event.
 	 */
 	onPaste( event ) {
-		const {
-			tagName,
-			__unstableCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
-			__unstablePasteHandler: pasteHandler,
-			__unstableOnReplace: onReplace,
-			__unstableOnSplit: onSplit,
-		} = this.props;
+		const { formatTypes, onPaste } = this.props;
 		const clipboardData = event.clipboardData;
 		let { items, files } = clipboardData;
 
@@ -247,87 +227,35 @@ class RichText extends Component {
 		window.console.log( 'Received HTML:\n\n', html );
 		window.console.log( 'Received plain text:\n\n', plainText );
 
-		// Only process file if no HTML is present.
-		// Note: a pasted file may have the URL as plain text.
-		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 		const record = this.getRecord();
-
-		if ( item && ! html ) {
-			const file = item.getAsFile ? item.getAsFile() : item;
-			const content = pasteHandler( {
-				HTML: `<img src="${ createBlobURL( file ) }">`,
-				mode: 'BLOCKS',
-				tagName,
-			} );
-			const shouldReplace = onReplace && this.isEmpty();
-
-			// Allows us to ask for this information when we get a report.
-			window.console.log( 'Received item:\n\n', file );
-
-			if ( shouldReplace ) {
-				onReplace( content );
-			} else if ( this.onSplit ) {
-				this.onSplit( record, content );
+		const transformed = formatTypes.reduce( ( accumlator, { __unstablePasteRule } ) => {
+			// Only allow one transform.
+			if ( __unstablePasteRule && accumlator === record ) {
+				accumlator = __unstablePasteRule( record, { html, plainText } );
 			}
 
+			return accumlator;
+		}, record );
+
+		if ( transformed !== record ) {
+			this.onChange( transformed );
 			return;
 		}
 
-		// There is a selection, check if a URL is pasted.
-		if ( ! isCollapsed( record ) ) {
-			const pastedText = ( html || plainText ).replace( /<[^>]+>/g, '' ).trim();
+		if ( onPaste ) {
+			// Only process file if no HTML is present.
+			// Note: a pasted file may have the URL as plain text.
+			const image = find( [ ...items, ...files ], ( { type } ) =>
+				/^image\/(?:jpe?g|png|gif)$/.test( type )
+			);
 
-			// A URL was pasted, turn the selection into a link
-			if ( isURL( pastedText ) ) {
-				this.onChange( applyFormat( record, {
-					type: 'a',
-					attributes: {
-						href: decodeEntities( pastedText ),
-					},
-				} ) );
-
-				// Allows us to ask for this information when we get a report.
-				window.console.log( 'Created link:\n\n', pastedText );
-
-				return;
-			}
-		}
-
-		const canReplace = onReplace && this.isEmpty();
-		const canSplit = onReplace && onSplit;
-
-		let mode = 'INLINE';
-
-		if ( canReplace ) {
-			mode = 'BLOCKS';
-		} else if ( canSplit ) {
-			mode = 'AUTO';
-		}
-
-		const content = pasteHandler( {
-			HTML: html,
-			plainText,
-			mode,
-			tagName,
-			canUserUseUnfilteredHTML,
-		} );
-
-		if ( typeof content === 'string' ) {
-			let valueToInsert = create( { html: content } );
-
-			// If the content should be multiline, we should process text
-			// separated by a line break as separate lines.
-			if ( this.multilineTag ) {
-				valueToInsert = replace( valueToInsert, /\n+/g, LINE_SEPARATOR );
-			}
-
-			this.onChange( insert( record, valueToInsert ) );
-		} else if ( content.length > 0 ) {
-			if ( canReplace ) {
-				onReplace( content );
-			} else {
-				this.onSplit( record, content );
-			}
+			onPaste( {
+				value: this.removeEditorOnlyFormats( record ),
+				onChange: this.onChange,
+				html,
+				plainText,
+				image,
+			} );
 		}
 	}
 
@@ -422,25 +350,23 @@ class RichText extends Component {
 
 		this.onChange( change, { withoutHistory: true } );
 
-		const {
-			__unstablePatterns: patterns,
-			__unstableOnReplace: onReplace,
-		} = this.props;
+		const { __unstableInputRule: inputRule, formatTypes } = this.props;
 
-		if ( patterns ) {
-			const transformed = patterns.reduce(
-				( accumlator, transform ) => transform(
-					accumlator,
-					onReplace,
-					this.valueToFormat
-				),
-				change
-			);
+		if ( inputRule ) {
+			inputRule( change, this.valueToFormat );
+		}
 
-			if ( transformed !== change ) {
-				this.onCreateUndoLevel();
-				this.onChange( { ...transformed, activeFormats } );
+		const transformed = formatTypes.reduce( ( accumlator, { __unstableInputRule } ) => {
+			if ( __unstableInputRule ) {
+				accumlator = __unstableInputRule( accumlator );
 			}
+
+			return accumlator;
+		}, change );
+
+		if ( transformed !== change ) {
+			this.onCreateUndoLevel();
+			this.onChange( { ...transformed, activeFormats } );
 		}
 
 		// Create an undo level when input stops for over a second.
@@ -571,44 +497,36 @@ class RichText extends Component {
 	 * @param {KeyboardEvent} event Keydown event.
 	 */
 	onDeleteKeyDown( event ) {
-		const { __unstableOnMerge: onMerge, __unstableOnRemove: onRemove } = this.props;
-		if ( ! onMerge && ! onRemove ) {
+		const { onDelete } = this.props;
+
+		if ( ! onDelete ) {
 			return;
 		}
 
 		const { keyCode } = event;
 		const isReverse = keyCode === BACKSPACE;
+		const record = this.createRecord();
 
 		// Only process delete if the key press occurs at uncollapsed edge.
-		if ( ! isCollapsed( this.createRecord() ) ) {
+		if ( ! isCollapsed( record ) ) {
 			return;
 		}
-
-		const empty = this.isEmpty();
 
 		// It is important to consider emptiness because an empty container
 		// will include a padding BR node _after_ the caret, so in a forward
 		// deletion the isHorizontalEdge function will incorrectly interpret the
 		// presence of the BR node as not being at the edge.
-		const isEdge = ( empty || isHorizontalEdge( this.editableRef, isReverse ) );
+		const isEdge = ( isEmpty( record ) || isHorizontalEdge( this.editableRef, isReverse ) );
 
 		if ( ! isEdge ) {
 			return;
 		}
 
-		if ( onMerge ) {
-			onMerge( ! isReverse );
-		}
-
-		// Only handle remove on Backspace. This serves dual-purpose of being
-		// an intentional user interaction distinguishing between Backspace and
-		// Delete to remove the empty field, but also to avoid merge & remove
-		// causing destruction of two fields (merge, then removed merged).
-		if ( onRemove && empty && isReverse ) {
-			onRemove( ! isReverse );
-		}
-
 		event.preventDefault();
+
+		if ( onDelete ) {
+			onDelete( { isReverse, value: record } );
+		}
 	}
 
 	/**
@@ -618,13 +536,7 @@ class RichText extends Component {
 	 */
 	onKeyDown( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-		const {
-			__unstableOnReplace: onReplace,
-			__unstableOnSplit: onSplit,
-			__unstableEnterPatterns: enterPatterns,
-		} = this.props;
-
-		const canSplit = onReplace && onSplit;
+		const { onEnter } = this.props;
 
 		if (
 			// Only override left and right keys without modifiers pressed.
@@ -674,30 +586,12 @@ class RichText extends Component {
 		} else if ( keyCode === ENTER ) {
 			event.preventDefault();
 
-			const record = this.createRecord();
-
-			if ( enterPatterns ) {
-				if ( enterPatterns(
-					record,
-					onReplace,
-					this.valueToFormat,
-				) !== record ) {
-					return;
-				}
-			}
-
-			if ( this.multilineTag ) {
-				if ( event.shiftKey ) {
-					this.onChange( insert( record, '\n' ) );
-				} else if ( canSplit && isEmptyLine( record ) ) {
-					this.onSplit( record );
-				} else {
-					this.onChange( insertLineSeparator( record ) );
-				}
-			} else if ( event.shiftKey || ! canSplit ) {
-				this.onChange( insert( record, '\n' ) );
-			} else {
-				this.onSplit( record );
+			if ( onEnter ) {
+				onEnter( {
+					value: this.removeEditorOnlyFormats( this.createRecord() ),
+					onChange: this.onChange,
+					shiftKey: event.shiftKey,
+				} );
 			}
 		}
 	}
@@ -797,59 +691,6 @@ class RichText extends Component {
 		this.applyRecord( newValue );
 		this.props.onSelectionChange( newPos, newPos );
 		this.setState( { activeFormats: newActiveFormats } );
-	}
-
-	/**
-	 * Signals to the RichText owner that the block can be replaced with two
-	 * blocks as a result of splitting the block by pressing enter, or with
-	 * blocks as a result of splitting the block by pasting block content in the
-	 * instance.
-	 *
-	 * @param  {Object} record       The rich text value to split.
-	 * @param  {Array}  pastedBlocks The pasted blocks to insert, if any.
-	 */
-	onSplit( record, pastedBlocks = [] ) {
-		const {
-			__unstableOnReplace: onReplace,
-			__unstableOnSplit: onSplit,
-			__unstableOnSplitMiddle: onSplitMiddle,
-		} = this.props;
-
-		if ( ! onReplace || ! onSplit ) {
-			return;
-		}
-
-		const blocks = [];
-		const [ before, after ] = split( record );
-		const hasPastedBlocks = pastedBlocks.length > 0;
-
-		// Create a block with the content before the caret if there's no pasted
-		// blocks, or if there are pasted blocks and the value is not empty.
-		// We do not want a leading empty block on paste, but we do if split
-		// with e.g. the enter key.
-		if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
-			blocks.push( onSplit( this.valueToFormat( before ) ) );
-		}
-
-		if ( hasPastedBlocks ) {
-			blocks.push( ...pastedBlocks );
-		} else if ( onSplitMiddle ) {
-			blocks.push( onSplitMiddle() );
-		}
-
-		// If there's pasted blocks, append a block with the content after the
-		// caret. Otherwise, do append and empty block if there is no
-		// `onSplitMiddle` prop, but if there is and the content is empty, the
-		// middle block is enough to set focus in.
-		if ( hasPastedBlocks || ! onSplitMiddle || ! isEmpty( after ) ) {
-			blocks.push( onSplit( this.valueToFormat( after ) ) );
-		}
-
-		// If there are pasted blocks, set the selection to the last one.
-		// Otherwise, set the selection to the second block.
-		const indexToSelect = hasPastedBlocks ? blocks.length - 1 : 1;
-
-		onReplace( blocks, indexToSelect );
 	}
 
 	/**
@@ -1031,8 +872,8 @@ class RichText extends Component {
 		const key = Tagname;
 		const MultilineTag = this.multilineTag;
 		const ariaProps = pickAriaProps( this.props );
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
 		const record = this.getRecord();
+		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && isEmpty( record );
 
 		const autoCompleteContent = ( { listBoxId, activeId } ) => (
 			<>
