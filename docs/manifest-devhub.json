@@ -138,6 +138,12 @@
 		"parent": "slotfills"
 	},
 	{
+		"title": "RichText Reference",
+		"slug": "richtext",
+		"markdown_source": "../docs/designers-developers/developers/richtext.md",
+		"parent": "developers"
+	},
+	{
 		"title": "Internationalization",
 		"slug": "internationalization",
 		"markdown_source": "../docs/designers-developers/developers/internationalization.md",
