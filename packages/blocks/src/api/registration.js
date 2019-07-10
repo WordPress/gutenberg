@@ -143,7 +143,7 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
-	const preFilterSettings = settings;
+	const preFilterSettings = { ...settings };
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
 	if ( settings.deprecated ) {
