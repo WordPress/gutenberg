@@ -408,7 +408,7 @@ function BlockListBlock( {
 		! isTypingWithinBlock;
 	const shouldShowBreadcrumb =
 		( isSelected && ! isKeyboardEditMode ) ||
-		( ! isFocusMode && isHovered && ! isEmptyDefaultBlock );
+		( isKeyboardEditMode && ! isFocusMode && isHovered && ! isEmptyDefaultBlock );
 	const shouldShowContextualToolbar =
 		isKeyboardEditMode &&
 		! hasFixedToolbar &&

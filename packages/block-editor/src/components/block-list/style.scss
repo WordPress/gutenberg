@@ -158,7 +158,7 @@
 	}
 
 	// Hover style.
-	&.is-hovered > .block-editor-block-list__block-edit::before {
+	&.is-hovered:not(.is-navigation) > .block-editor-block-list__block-edit::before {
 		box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
 
 		.is-dark-theme & {
