@@ -83,7 +83,7 @@
     "test": "cross-env NODE_ENV=test jest --verbose --config jest.config.js",
     "test:inside-gb": "cross-env NODE_ENV=test jest --verbose --config jest_gb.config.js",
     "test:debug": "cross-env NODE_ENV=test node --inspect-brk jest --runInBand --verbose --config jest.config.js",
-    "device-tests": "cross-env NODE_ENV=test jest --no-cache --reporters=default --reporters=jest-junit --detectOpenHandles --verbose --config jest_ui.config.js",
+    "device-tests": "cross-env NODE_ENV=test jest --no-cache --maxWorkers=5 --reporters=default --reporters=jest-junit --detectOpenHandles --verbose --config jest_ui.config.js",
     "device-tests:local": "cross-env NODE_ENV=test jest --runInBand --reporters=default --reporters=jest-junit --detectOpenHandles --verbose --config jest_ui.config.js",
     "device-tests:debug": "cross-env NODE_ENV=test node $NODE_DEBUG_OPTION --inspect-brk node_modules/jest/bin/jest --runInBand --reporters=default --reporters=jest-junit --detectOpenHandles --verbose --config jest_ui.config.js",
     "test:e2e": "yarn test:e2e:android && yarn test:e2e:ios",
