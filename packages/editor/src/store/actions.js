@@ -172,7 +172,10 @@ export function* setupEditor( post, edits, template ) {
 
 	// Apply a template for new posts only, if exists.
 	if ( template ) {
-		blocks = synchronizeBlocksWithTemplate( blocks, parse( template.post_content ) );
+		blocks = synchronizeBlocksWithTemplate(
+			blocks,
+			template.post_content ? parse( template.post_content ) : template
+		);
 	}
 
 	yield resetPost( post );
@@ -480,7 +483,7 @@ export function* savePost( options = {} ) {
 	);
 
 	const template = ( yield select( STORE_KEY, 'getEditorSettings' ) ).template;
-	if ( template ) {
+	if ( template && template.post_content ) {
 		yield apiFetch( {
 			path: `/wp/v2/${ template.post_type }/${ template.ID }`,
 			method: 'PUT',
