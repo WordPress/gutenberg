@@ -122,6 +122,8 @@ const MyButton = () => (
 
 The presence of a `href` prop determines whether an `anchor` element is rendered instead of a `button`.
 
+Props not included in this set will be applied to the `a` or `button` element.
+
 Name | Type | Default | Description
 --- | --- | --- | ---
 `disabled` | `bool` | `false` | Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
