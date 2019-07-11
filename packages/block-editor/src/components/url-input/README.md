@@ -141,7 +141,7 @@ If you are not conditionally rendering this component set this property to `fals
 
 When hiding the URLInput using CSS (as is sometimes done for accessibility purposes), the suggestions can still be displayed. This is because they're rendered in a popover in a different part of the DOM, so any styles applied to the URLInput's container won't affect the popover.
 
-This prop allows the suggestions list to be progrmatically not rendered by passing a boolean—it can be `true` to make sure suggestions aren't rendered, or `false`/`undefined` to fall back to the default behaviour of showing suggestions when matching autocompletion items are found.
+This prop allows the suggestions list to be programmatically not rendered by passing a boolean—it can be `true` to make sure suggestions aren't rendered, or `false`/`undefined` to fall back to the default behaviour of showing suggestions when matching autocompletion items are found.
 
 ## Example
 
