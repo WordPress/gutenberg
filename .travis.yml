@@ -61,7 +61,7 @@ jobs:
         - npx lerna run build
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
-    - name: JavaScript native tests
+    - name: JavaScript native mobile tests
       install:
         - npm ci
       script:
@@ -160,7 +160,7 @@ jobs:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
   allow_failures:
-    - name: JavaScript native tests
+    - name: JavaScript native mobile tests
     - name: PHP unit tests (PHP 5.3)
       env: WP_VERSION=latest SWITCH_TO_PHP=5.3
       script:
