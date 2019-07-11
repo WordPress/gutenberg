@@ -1,6 +1,6 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableArray;
