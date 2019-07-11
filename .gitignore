@@ -15,3 +15,6 @@ docker-compose.override.yml
 
 playground/dist
 .cache
+
+# Report generated from jest-junit
+test/native/junit.xml
