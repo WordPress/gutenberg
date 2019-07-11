@@ -27,10 +27,12 @@
 		}
 	}
 
-	&__custom-fields-confirmation {
-		&-message,
-		.components-button {
-			margin: 0 0 0.6rem;
+	&__custom-fields-confirmation-message,
+	&__custom-fields-confirmation-button {
+		margin: 0 0 0.6rem 48px;
+
+		@include break-medium() {
+			margin-left: 38px;
 		}
 	}
 }

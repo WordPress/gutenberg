@@ -24,23 +24,19 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
       />
     </div>
   </div>
-  <div
-    className="edit-post-options-modal__custom-fields-confirmation"
+  <p
+    className="edit-post-options-modal__custom-fields-confirmation-message"
   >
-    <p
-      className="edit-post-options-modal__custom-fields-confirmation-message"
-    >
-      Page reload is required for this change.
-    </p>
-    <button
-      className="components-button is-button is-default"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
-    >
-      Save & Reload
-    </button>
-  </div>
+    Page reload is required for this change.
+  </p>
+  <button
+    className="components-button edit-post-options-modal__custom-fields-confirmation-button is-button is-default"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Save & Reload
+  </button>
 </div>
 `;
 
@@ -95,23 +91,19 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
       />
     </div>
   </div>
-  <div
-    className="edit-post-options-modal__custom-fields-confirmation"
+  <p
+    className="edit-post-options-modal__custom-fields-confirmation-message"
   >
-    <p
-      className="edit-post-options-modal__custom-fields-confirmation-message"
-    >
-      Page reload is required for this change.
-    </p>
-    <button
-      className="components-button is-button is-default"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
-    >
-      Save & Reload
-    </button>
-  </div>
+    Page reload is required for this change.
+  </p>
+  <button
+    className="components-button edit-post-options-modal__custom-fields-confirmation-button is-button is-default"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Save & Reload
+  </button>
 </div>
 `;
 

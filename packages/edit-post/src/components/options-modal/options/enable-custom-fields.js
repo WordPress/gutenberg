@@ -15,11 +15,12 @@ export function CustomFieldsConfirmation() {
 	const [ isReloading, setIsReloading ] = useState( false );
 
 	return (
-		<div className="edit-post-options-modal__custom-fields-confirmation">
+		<>
 			<p className="edit-post-options-modal__custom-fields-confirmation-message">
 				{ __( 'Page reload is required for this change.' ) }
 			</p>
 			<Button
+				className="edit-post-options-modal__custom-fields-confirmation-button"
 				isDefault
 				isBusy={ isReloading }
 				disabled={ isReloading }
@@ -30,7 +31,7 @@ export function CustomFieldsConfirmation() {
 			>
 				{ __( 'Save & Reload' ) }
 			</Button>
-		</div>
+		</>
 	);
 }
 
