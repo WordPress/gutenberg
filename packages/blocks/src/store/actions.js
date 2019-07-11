@@ -4,11 +4,27 @@
 import { castArray } from 'lodash';
 
 /**
+ * @typedef {import('redux').AnyAction} Action
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').BlockConfiguration<any>} BlockConfiguration
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').BlockStyle} BlockStyle
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').Category} Category
+ */
+
+/**
  * Returns an action object used in signalling that block types have been added.
  *
- * @param {Array|Object} blockTypes Block types received.
+ * @param {BlockConfiguration|BlockConfiguration[]} blockTypes Block types received.
  *
- * @return {Object} Action object.
+ * @return {Action} Action object.
  */
 export function addBlockTypes( blockTypes ) {
 	return {
@@ -20,9 +36,9 @@ export function addBlockTypes( blockTypes ) {
 /**
  * Returns an action object used to remove a registered block type.
  *
- * @param {string|Array} names Block name.
+ * @param {string|string[]} names Block name.
  *
- * @return {Object} Action object.
+ * @return {Action} Action object.
  */
 export function removeBlockTypes( names ) {
 	return {
@@ -34,10 +50,10 @@ export function removeBlockTypes( names ) {
 /**
  * Returns an action object used in signalling that new block styles have been added.
  *
- * @param {string}       blockName  Block name.
- * @param {Array|Object} styles     Block styles.
+ * @param {string}                  blockName Block name.
+ * @param {BlockStyle|BlockStyle[]} styles    Block styles.
  *
- * @return {Object} Action object.
+ * @return {Action} Action object.
  */
 export function addBlockStyles( blockName, styles ) {
 	return {
@@ -50,10 +66,10 @@ export function addBlockStyles( blockName, styles ) {
 /**
  * Returns an action object used in signalling that block styles have been removed.
  *
- * @param {string}       blockName  Block name.
- * @param {Array|string} styleNames Block style names.
+ * @param {string}          blockName  Block name.
+ * @param {string|string[]} styleNames Block style names.
  *
- * @return {Object} Action object.
+ * @return {Action} Action object.
  */
 export function removeBlockStyles( blockName, styleNames ) {
 	return {
@@ -68,7 +84,7 @@ export function removeBlockStyles( blockName, styleNames ) {
  *
  * @param {string} name Block name.
  *
- * @return {Object} Action object.
+ * @return {Action} Action object.
  */
 export function setDefaultBlockName( name ) {
 	return {
@@ -83,7 +99,7 @@ export function setDefaultBlockName( name ) {
  *
  * @param {string} name Block name.
  *
- * @return {Object} Action object.
+ * @return {Action} Action object.
  */
 export function setFreeformFallbackBlockName( name ) {
 	return {
@@ -98,7 +114,7 @@ export function setFreeformFallbackBlockName( name ) {
  *
  * @param {string} name Block name.
  *
- * @return {Object} Action object.
+ * @return {Action} Action object.
  */
 export function setUnregisteredFallbackBlockName( name ) {
 	return {
@@ -114,7 +130,7 @@ export function setUnregisteredFallbackBlockName( name ) {
  *
  * @param {string} name Block name.
  *
- * @return {Object} Action object.
+ * @return {Action} Action object.
  */
 export function setGroupingBlockName( name ) {
 	return {
@@ -126,9 +142,9 @@ export function setGroupingBlockName( name ) {
 /**
  * Returns an action object used to set block categories.
  *
- * @param {Object[]} categories Block categories.
+ * @param {Category[]} categories Block categories.
  *
- * @return {Object} Action object.
+ * @return {Action} Action object.
  */
 export function setCategories( categories ) {
 	return {
@@ -140,10 +156,10 @@ export function setCategories( categories ) {
 /**
  * Returns an action object used to update a category.
  *
- * @param {string} slug     Block category slug.
- * @param {Object} category Object containing the category properties that should be updated.
+ * @param {string}            slug     Block category slug.
+ * @param {Partial<Category>} category Object containing the category properties that should be updated.
  *
- * @return {Object} Action object.
+ * @return {Action} Action object.
  */
 export function updateCategory( slug, category ) {
 	return {

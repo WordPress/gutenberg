@@ -20,8 +20,42 @@ import { combineReducers } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
+ * @typedef {import('@wordpress/blocks').Block<Record<string,any>>} BlockType
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').BlockStyle} BlockStyle
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').Category} Category
+ */
+
+/**
+ * @typedef {import('redux').AnyAction} Action
+ */
+
+/**
+ * @template S
+ * @template {Action} A
+ * @typedef {import('redux').Reducer<S,A>} Reducer
+ */
+
+/**
+ * @typedef {Object} State
+ * @prop {Record<string,BlockType>}    blockTypes
+ * @prop {Record<string,BlockStyle[]>} blockStyles
+ * @prop {Category[]}                  categories
+ * @prop {string|undefined}            defaultBlockName
+ * @prop {string|undefined}            freeformFallbackBlockName
+ * @prop {string|undefined}            groupingBlockName
+ * @prop {string|undefined}            unregisteredFallbackBlockName
+ */
+
+/**
  * Module Constants
  */
+/** @type {Category[]} */
 export const DEFAULT_CATEGORIES = [
 	{ slug: 'common', title: __( 'Common Blocks' ) },
 	{ slug: 'formatting', title: __( 'Formatting' ) },
@@ -31,24 +65,27 @@ export const DEFAULT_CATEGORIES = [
 	{ slug: 'reusable', title: __( 'Reusable Blocks' ) },
 ];
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Reducer managing the block types
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {State['blockTypes']} state  Current state.
+ * @param {Action}              action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {State['blockTypes']} Updated state.
  */
 export function blockTypes( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_TYPES':
-			return {
-				...state,
-				...keyBy(
-					map( action.blockTypes, ( blockType ) => omit( blockType, 'styles ' ) ),
-					'name'
-				),
-			};
+			return /** @type {State['blockTypes']} */ (
+				{
+					...state,
+					...keyBy(
+						map( action.blockTypes, ( blockType ) => omit( blockType, 'styles ' ) ),
+						'name'
+					),
+				}
+			);
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
 	}
@@ -56,13 +93,14 @@ export function blockTypes( state = {}, action ) {
 	return state;
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Reducer managing the block style variations.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {State['blockStyles']} state  Current state.
+ * @param {Action}               action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {State['blockStyles']} Updated state.
  */
 export function blockStyles( state = {}, action ) {
 	switch ( action.type ) {
@@ -102,7 +140,7 @@ export function blockStyles( state = {}, action ) {
  *
  * @param {string} setActionType  Action type.
  *
- * @return {function} Reducer.
+ * @return {Reducer<any,Action>} Reducer.
  */
 export function createBlockNameSetterReducer( setActionType ) {
 	return ( state = null, action ) => {
@@ -126,13 +164,14 @@ export const freeformFallbackBlockName = createBlockNameSetterReducer( 'SET_FREE
 export const unregisteredFallbackBlockName = createBlockNameSetterReducer( 'SET_UNREGISTERED_FALLBACK_BLOCK_NAME' );
 export const groupingBlockName = createBlockNameSetterReducer( 'SET_GROUPING_BLOCK_NAME' );
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Reducer managing the categories
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {State['categories']} state  Current state.
+ * @param {Action}              action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {State['categories']} Updated state.
  */
 export function categories( state = DEFAULT_CATEGORIES, action ) {
 	switch ( action.type ) {

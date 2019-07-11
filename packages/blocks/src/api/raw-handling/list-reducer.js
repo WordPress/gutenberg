@@ -13,6 +13,10 @@ function shallowTextContent( element ) {
 		.join( '' );
 }
 
+// eslint-disable-next-line valid-jsdoc
+/**
+ * @type {import('./').NodeFilterFunc}
+ */
 export default function( node ) {
 	if ( ! isList( node ) ) {
 		return;

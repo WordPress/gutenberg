@@ -3,6 +3,10 @@
  */
 import { omit } from 'lodash';
 
+/**
+ * @typedef {import('@wordpress/blocks').PhrasingContentSchema} PhrasingContentSchema
+ */
+
 const phrasingContentSchema = {
 	strong: {},
 	em: {},
@@ -30,10 +34,10 @@ const phrasingContentSchema = {
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content
  *
- * @return {Object} Schema.
+ * @return {PhrasingContentSchema} Schema.
  */
 export function getPhrasingContentSchema() {
-	return phrasingContentSchema;
+	return /** @type {any} */( phrasingContentSchema );
 }
 
 /**
@@ -41,7 +45,7 @@ export function getPhrasingContentSchema() {
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content
  *
- * @param {Element} node The node to test.
+ * @param {Node} node The node to test.
  *
  * @return {boolean} True if phrasing content, false if not.
  */

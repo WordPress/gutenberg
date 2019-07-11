@@ -9,6 +9,19 @@ import { createContext, RawHTML } from '@wordpress/element';
  */
 import { serialize } from '../api';
 
+/**
+ * @typedef {import('@wordpress/blocks').BlockInstance<any>} BlockInstance
+ */
+
+/**
+ * @template T
+ * @typedef {import('@wordpress/element').ComponentType<T>} ComponentType
+ */
+
+/**
+ * @typedef {import('@wordpress/element').ReactNode} ReactNode
+ */
+
 const { Consumer, Provider } = createContext( () => {} );
 
 /**
@@ -19,14 +32,17 @@ const { Consumer, Provider } = createContext( () => {} );
  * `InnerBlocks.Content` component to render block content.
  *
  * @example
- *
  * ```jsx
  * <BlockContentProvider innerBlocks={ innerBlocks }>
  * 	{ blockSaveElement }
  * </BlockContentProvider>
  * ```
  *
- * @return {WPElement} Element with BlockContent injected via context.
+ * @param {Object}          props
+ * @param {ReactNode}       props.children
+ * @param {BlockInstance[]} props.innerBlocks
+ *
+ * @return {JSX.Element} Element with BlockContent injected via context.
  */
 const BlockContentProvider = ( { children, innerBlocks } ) => {
 	const BlockContent = () => {
@@ -48,7 +64,9 @@ const BlockContentProvider = ( { children, innerBlocks } ) => {
  * A Higher Order Component used to inject BlockContent using context to the
  * wrapped component.
  *
- * @return {Component} Enhanced component with injected BlockContent as prop.
+ * @param {ComponentType<any>} OriginalComponent
+ *
+ * @return {ComponentType<any>} Enhanced component with injected BlockContent as prop.
  */
 export const withBlockContentContext = createHigherOrderComponent( ( OriginalComponent ) => {
 	return ( props ) => (

@@ -23,6 +23,22 @@ import { getSaveContent } from './serializer';
 import { normalizeBlockType } from './utils';
 
 /**
+ * @typedef {import('@wordpress/blocks').Block<Record<string,any>>} BlockType
+ */
+
+/**
+ * @typedef {(message: string, ...args: any[]) => void} Logger
+ */
+
+/**
+ * @typedef {import('simple-html-tokenizer').StartTag} StartTag
+ */
+
+/**
+ * @typedef {import('simple-html-tokenizer').Token} Token
+ */
+
+/**
  * Globally matches any consecutive whitespace
  *
  * @type {RegExp}
@@ -56,7 +72,7 @@ const REGEXP_STYLE_URL_TYPE = /^url\s*\(['"\s]*(.*?)['"\s]*\)$/;
  *         [ tr.firstChild.textContent.trim() ]: true
  *     } ), {} ) ).sort();
  *
- * @type {Array}
+ * @type {readonly string[]}
  */
 const BOOLEAN_ATTRIBUTES = [
 	'allowfullscreen',
@@ -97,13 +113,15 @@ const BOOLEAN_ATTRIBUTES = [
  * See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#enumerated-attribute
  * Extracted from: https://html.spec.whatwg.org/multipage/indices.html#attributes-3
  *
+ * ```js
  * Object.keys( [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
  *     .filter( ( tr ) => /^("(.+?)";?\s*)+/.test( tr.lastChild.textContent.trim() ) )
  *     .reduce( ( result, tr ) => Object.assign( result, {
  *         [ tr.firstChild.textContent.trim() ]: true
  *     } ), {} ) ).sort();
+ * ```
  *
- * @type {Array}
+ * @type {readonly string[]}
  */
 const ENUMERATED_ATTRIBUTES = [
 	'autocapitalize',
@@ -134,7 +152,7 @@ const ENUMERATED_ATTRIBUTES = [
  * Meaningful attributes are those who cannot be safely ignored when omitted in
  * one HTML markup string and not another.
  *
- * @type {Array}
+ * @type {readonly string[]}
  */
 const MEANINGFUL_ATTRIBUTES = [
 	...BOOLEAN_ATTRIBUTES,
@@ -146,7 +164,7 @@ const MEANINGFUL_ATTRIBUTES = [
  * behavior for consideration in text token equivalence, carefully ordered from
  * least-to-most expensive operations.
  *
- * @type {Array}
+ * @type {ReadonlyArray<(text: string) => string>}
  */
 const TEXT_NORMALIZATIONS = [
 	identity,
@@ -163,7 +181,7 @@ const TEXT_NORMALIZATIONS = [
  *
  * Tested aginst "12.5 Named character references":
  *
- * ```
+ * ```js
  * const references = [ ...document.querySelectorAll(
  *     '#named-character-references-table tr[id^=entity-] td:first-child'
  * ) ].map( ( code ) => code.textContent )
@@ -233,12 +251,12 @@ export class DecodeEntityParser {
 	 *
 	 * @param {string} entity Entity fragment discovered in HTML.
 	 *
-	 * @return {?string} Entity substitute value.
+	 * @return {string|undefined} Entity substitute value.
 	 */
 	parse( entity ) {
-		if ( isValidCharacterReference( entity ) ) {
-			return decodeEntities( '&' + entity + ';' );
-		}
+		return isValidCharacterReference( entity ) ?
+			decodeEntities( '&' + entity + ';' ) :
+			undefined;
 	}
 }
 
@@ -249,9 +267,9 @@ const log = ( () => {
 	/**
 	 * Creates a logger with block validation prefix.
 	 *
-	 * @param {Function} logger Original logger function.
+	 * @param {Logger} logger Original logger function.
 	 *
-	 * @return {Function} Augmented logger function.
+	 * @return {Logger} Augmented logger function.
 	 */
 	function createLogger( logger ) {
 		// In test environments, pre-process the sprintf message to improve
@@ -301,6 +319,7 @@ export function getTextWithCollapsedWhitespace( text ) {
 	return getTextPiecesSplitOnWhitespace( text ).join( ' ' );
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Returns attribute pairs of the given StartTag token, including only pairs
  * where the value is non-empty or the attribute is a boolean attribute, an
@@ -308,9 +327,9 @@ export function getTextWithCollapsedWhitespace( text ) {
  *
  * @see MEANINGFUL_ATTRIBUTES
  *
- * @param {Object} token StartTag token.
+ * @param {StartTag} token StartTag token.
  *
- * @return {Array[]} Attribute pairs.
+ * @return {StartTag['attributes']} Attribute pairs.
  */
 export function getMeaningfulAttributePairs( token ) {
 	return token.attributes.filter( ( pair ) => {
@@ -375,9 +394,12 @@ export function getNormalizedStyleValue( value ) {
  *
  * @param {string} text Style attribute.
  *
- * @return {Object} Style properties.
+ * @return {Record<string,string>} Style properties.
  */
 export function getStyleProperties( text ) {
+	/**
+	 * @type {Array<[string,string]>}
+	 */
 	const pairs = text
 		// Trim ending semicolon (avoid including in split)
 		.replace( /;?\s*$/, '' )
@@ -404,25 +426,43 @@ export function getStyleProperties( text ) {
  * @type {Object}
  */
 export const isEqualAttributesOfName = {
+	/**
+	 * Return whether or not two class attributes are equal.
+	 *
+	 * @param {string} actual
+	 * @param {string} expected
+	 *
+	 * @return {boolean} `true` if attrbutes are equal, `false` otherwise.
+	 */
 	class: ( actual, expected ) => {
 		// Class matches if members are the same, even if out of order or
 		// superfluous whitespace between.
 		return ! xor( ...[ actual, expected ].map( getTextPiecesSplitOnWhitespace ) ).length;
 	},
+	/**
+	 * Return whether or not two style attributes are equal.
+	 *
+	 * @param {string} actual
+	 * @param {string} expected
+	 *
+	 * @return {boolean} `true` if attrbutes are equal, `false` otherwise.
+	 */
 	style: ( actual, expected ) => {
-		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
+		const [ a, e ] = [ actual, expected ].map( getStyleProperties );
+		return isEqual( a, e );
 	},
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.
 	...fromPairs( BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, stubTrue ] ) ),
 };
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Given two sets of attribute tuples, returns true if the attribute sets are
  * equivalent.
  *
- * @param {Array[]} actual   Actual attributes tuples.
- * @param {Array[]} expected Expected attributes tuples.
+ * @param {StartTag['attributes']} actual   Actual attributes tuples.
+ * @param {StartTag['attributes']} expected Expected attributes tuples.
  *
  * @return {boolean} Whether attributes are equivalent.
  */
@@ -467,8 +507,6 @@ export function isEqualTagAttributePairs( actual, expected ) {
 
 /**
  * Token-type-specific equality handlers
- *
- * @type {Object}
  */
 export const isEqualTokensOfType = {
 	StartTag: ( actual, expected ) => {
@@ -477,9 +515,8 @@ export const isEqualTokensOfType = {
 			return false;
 		}
 
-		return isEqualTagAttributePairs(
-			...[ actual, expected ].map( getMeaningfulAttributePairs )
-		);
+		const [ a, e ] = [ actual, expected ].map( getMeaningfulAttributePairs );
+		return isEqualTagAttributePairs( a, e );
 	},
 	Chars: isEquivalentTextTokens,
 	Comment: isEquivalentTextTokens,
@@ -491,11 +528,14 @@ export const isEqualTokensOfType = {
  *
  * Mutates the tokens array.
  *
- * @param {Object[]} tokens Set of tokens to search.
+ * @param {Token[]} tokens Set of tokens to search.
  *
- * @return {Object} Next non-whitespace token.
+ * @return {Token|void} Next non-whitespace token.
  */
 export function getNextNonWhitespaceToken( tokens ) {
+	/**
+	 * @type {Token|undefined}
+	 */
 	let token;
 	while ( ( token = tokens.shift() ) ) {
 		if ( token.type !== 'Chars' ) {
@@ -514,7 +554,7 @@ export function getNextNonWhitespaceToken( tokens ) {
  *
  * @param {string} html HTML string to tokenize.
  *
- * @return {Object[]|null} Array of valid tokenized HTML elements, or null on error
+ * @return {Token[]|null} Array of valid tokenized HTML elements, or null on error
  */
 function getHTMLTokens( html ) {
 	try {
@@ -529,10 +569,10 @@ function getHTMLTokens( html ) {
 /**
  * Returns true if the next HTML token closes the current token.
  *
- * @param {Object} currentToken Current token to compare with.
- * @param {Object|undefined} nextToken Next token to compare against.
+ * @param {Token}           currentToken Current token to compare with.
+ * @param {Token|undefined} nextToken    Next token to compare against.
  *
- * @return {boolean} true if `nextToken` closes `currentToken`, false otherwise
+ * @return {boolean} `true` if `nextToken` closes `currentToken`, `false` otherwise
  */
 export function isClosedByToken( currentToken, nextToken ) {
 	// Ensure this is a self closed token
@@ -620,9 +660,9 @@ export function isEquivalentHTML( actual, expected ) {
  *
  * Logs to console in development environments when invalid.
  *
- * @param {string|Object} blockTypeOrName      Block type.
- * @param {Object}        attributes           Parsed block attributes.
- * @param {string}        originalBlockContent Original block content.
+ * @param {string|BlockType}   blockTypeOrName      Block type.
+ * @param {Record<string,any>} attributes           Parsed block attributes.
+ * @param {string}             originalBlockContent Original block content.
  *
  * @return {boolean} Whether block is valid.
  */

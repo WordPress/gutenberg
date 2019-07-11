@@ -1,13 +1,11 @@
+/* global Node */
+
 /**
  * WordPress dependencies
  */
 import { remove, replace } from '@wordpress/dom';
 
-/**
- * Browser dependencies
- */
-const { COMMENT_NODE } = window.Node;
-
+// eslint-disable-next-line valid-jsdoc
 /**
  * Looks for `<!--nextpage-->` and `<!--more-->` comments, as well as the
  * `<!--more Some text-->` variant and its `<!--noteaser-->` companion,
@@ -20,12 +18,10 @@ const { COMMENT_NODE } = window.Node;
  * The custom element is then expected to be recognized by any registered
  * block's `raw` transform.
  *
- * @param {Node}     node The node to be processed.
- * @param {Document} doc  The document of the node.
- * @return {void}
+ * @type {import('./').NodeFilterFunc}
  */
 export default function( node, doc ) {
-	if ( node.nodeType !== COMMENT_NODE ) {
+	if ( node.nodeType !== Node.COMMENT_NODE ) {
 		return;
 	}
 
@@ -47,7 +43,7 @@ export default function( node, doc ) {
 		let noTeaser = false;
 		while ( ( sibling = sibling.nextSibling ) ) {
 			if (
-				sibling.nodeType === COMMENT_NODE &&
+				sibling.nodeType === Node.COMMENT_NODE &&
 				sibling.nodeValue === 'noteaser'
 			) {
 				noTeaser = true;

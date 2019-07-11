@@ -5,13 +5,33 @@ import createSelector from 'rememo';
 import { filter, get, includes, map, some, flow, deburr } from 'lodash';
 
 /**
+ * @typedef {import('@wordpress/blocks').Block<Record<string,any>>} BlockType
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').BlockStyle} BlockStyle
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').BlockSupports} BlockSupports
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').Category} Category
+ */
+
+/**
+ * @typedef {import('./reducer').State} State
+ */
+
+/**
  * Given a block name or block type object, returns the corresponding
  * normalized block type object.
  *
- * @param {Object}          state      Blocks state.
- * @param {(string|Object)} nameOrType Block name or type object
+ * @param {State}            state      Blocks state.
+ * @param {string|BlockType} nameOrType Block name or type object
  *
- * @return {Object} Block type object.
+ * @return {BlockType} Block type object.
  */
 const getNormalizedBlockType = ( state, nameOrType ) => (
 	'string' === typeof nameOrType ?
@@ -22,9 +42,9 @@ const getNormalizedBlockType = ( state, nameOrType ) => (
 /**
  * Returns all the available block types.
  *
- * @param {Object} state Data state.
+ * @param {State} state Data state.
  *
- * @return {Array} Block Types.
+ * @return {Block[]} Block Types.
  */
 export const getBlockTypes = createSelector(
 	( state ) => Object.values( state.blockTypes ),
@@ -36,10 +56,10 @@ export const getBlockTypes = createSelector(
 /**
  * Returns a block type by name.
  *
- * @param {Object} state Data state.
+ * @param {State} state Data state.
  * @param {string} name Block type name.
  *
- * @return {Object?} Block Type.
+ * @return {BlockType|undefined} Block Type.
  */
 export function getBlockType( state, name ) {
 	return state.blockTypes[ name ];
@@ -48,10 +68,10 @@ export function getBlockType( state, name ) {
 /**
  * Returns block styles by block name.
  *
- * @param {Object} state Data state.
+ * @param {State}  state Data state.
  * @param {string} name  Block type name.
  *
- * @return {Array?} Block Styles.
+ * @return {BlockStyle[]|undefined} Block Styles.
  */
 export function getBlockStyles( state, name ) {
 	return state.blockStyles[ name ];
@@ -60,9 +80,9 @@ export function getBlockStyles( state, name ) {
 /**
  * Returns all the available categories.
  *
- * @param {Object} state Data state.
+ * @param {State} state Data state.
  *
- * @return {Array} Categories list.
+ * @return {Category[]} Categories list.
  */
 export function getCategories( state ) {
 	return state.categories;
@@ -71,9 +91,9 @@ export function getCategories( state ) {
 /**
  * Returns the name of the default block name.
  *
- * @param {Object} state Data state.
+ * @param {State} state Data state.
  *
- * @return {string?} Default block name.
+ * @return {string|undefined} Default block name.
  */
 export function getDefaultBlockName( state ) {
 	return state.defaultBlockName;
@@ -82,9 +102,9 @@ export function getDefaultBlockName( state ) {
 /**
  * Returns the name of the block for handling non-block content.
  *
- * @param {Object} state Data state.
+ * @param {State} state Data state.
  *
- * @return {string?} Name of the block for handling non-block content.
+ * @return {string|undefined} Name of the block for handling non-block content.
  */
 export function getFreeformFallbackBlockName( state ) {
 	return state.freeformFallbackBlockName;
@@ -93,9 +113,9 @@ export function getFreeformFallbackBlockName( state ) {
 /**
  * Returns the name of the block for handling unregistered blocks.
  *
- * @param {Object} state Data state.
+ * @param {State} state Data state.
  *
- * @return {string?} Name of the block for handling unregistered blocks.
+ * @return {string|undefined} Name of the block for handling unregistered blocks.
  */
 export function getUnregisteredFallbackBlockName( state ) {
 	return state.unregisteredFallbackBlockName;
@@ -104,9 +124,9 @@ export function getUnregisteredFallbackBlockName( state ) {
 /**
  * Returns the name of the block for handling unregistered blocks.
  *
- * @param {Object} state Data state.
+ * @param {State} state Data state.
  *
- * @return {string?} Name of the block for handling unregistered blocks.
+ * @return {string|undefined} Name of the block for handling unregistered blocks.
  */
 export function getGroupingBlockName( state ) {
 	return state.groupingBlockName;
@@ -115,10 +135,10 @@ export function getGroupingBlockName( state ) {
 /**
  * Returns an array with the child blocks of a given block.
  *
- * @param {Object} state     Data state.
+ * @param {State}  state     Data state.
  * @param {string} blockName Block type name.
  *
- * @return {Array} Array of child block names.
+ * @return {string[]} Array of child block names.
  */
 export const getChildBlockNames = createSelector(
 	( state, blockName ) => {
@@ -134,16 +154,16 @@ export const getChildBlockNames = createSelector(
 	]
 );
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Returns the block support value for a feature, if defined.
  *
- * @param  {Object}          state           Data state.
- * @param  {(string|Object)} nameOrType      Block name or type object
- * @param  {string}          feature         Feature to retrieve
- * @param  {*}               defaultSupports Default value to return if not
- *                                           explicitly defined
+ * @param {State}               state             Data state.
+ * @param {string|BlockType}    nameOrType        Block name or type object
+ * @param {keyof BlockSupports} feature           Feature to retrieve
+ * @param {any}                 [defaultSupports] Default value to return if not explicitly defined
  *
- * @return {?*} Block support value
+ * @return {any} Block support value
  */
 export const getBlockSupport = ( state, nameOrType, feature, defaultSupports ) => {
 	const blockType = getNormalizedBlockType( state, nameOrType );
@@ -154,14 +174,14 @@ export const getBlockSupport = ( state, nameOrType, feature, defaultSupports ) =
 	], defaultSupports );
 };
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Returns true if the block defines support for a feature, or false otherwise.
  *
- * @param  {Object}         state           Data state.
- * @param {(string|Object)} nameOrType      Block name or type object.
- * @param {string}          feature         Feature to test.
- * @param {boolean}         defaultSupports Whether feature is supported by
- *                                          default if not explicitly defined.
+ * @param {State}               state             Data state.
+ * @param {string|BlockType}    nameOrType        Block name or type object.
+ * @param {keyof BlockSupports} feature           Feature to test.
+ * @param {boolean}             [defaultSupports] Whether feature is supported by default if not explicitly defined.
  *
  * @return {boolean} Whether block supports feature.
  */
@@ -173,9 +193,9 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
  * Returns true if the block type by the given name or object value matches a
  * search term, or false otherwise.
  *
- * @param {Object}          state      Blocks state.
- * @param {(string|Object)} nameOrType Block name or type object.
- * @param {string}          searchTerm Search term by which to filter.
+ * @param {State}            state      Blocks state.
+ * @param {string|BlockType} nameOrType Block name or type object.
+ * @param {string}           searchTerm Search term by which to filter.
  *
  * @return {boolean} Whether block type matches search term.
  */
@@ -216,10 +236,10 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 /**
  * Returns a boolean indicating if a block has child blocks or not.
  *
- * @param {Object} state     Data state.
+ * @param {State}  state     Data state.
  * @param {string} blockName Block type name.
  *
- * @return {boolean} True if a block contains child blocks and false otherwise.
+ * @return {boolean} `true` if a block contains child blocks and `false` otherwise.
  */
 export const hasChildBlocks = ( state, blockName ) => {
 	return getChildBlockNames( state, blockName ).length > 0;
@@ -228,11 +248,11 @@ export const hasChildBlocks = ( state, blockName ) => {
 /**
  * Returns a boolean indicating if a block has at least one child block with inserter support.
  *
- * @param {Object} state     Data state.
+ * @param {State}  state     Data state.
  * @param {string} blockName Block type name.
  *
- * @return {boolean} True if a block contains at least one child blocks with inserter support
- *                   and false otherwise.
+ * @return {boolean} `true` if a block contains at least one child blocks with
+ *                    inserter support and `false` otherwise.
  */
 export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
 	return some( getChildBlockNames( state, blockName ), ( childBlockName ) => {

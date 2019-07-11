@@ -16,21 +16,32 @@ import { getBlockType, getDefaultBlockName } from './registration';
 import { createBlock } from './factory';
 
 /**
+ * @typedef {import('@wordpress/blocks').Block<Record<string,any>>} BlockType
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').BlockIcon} BlockIcon
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').BlockInstance<Record<string,any>>} BlockInstance
+ */
+
+/**
  * Array of icon colors containing a color to be used if the icon color
  * was not explicitly set but the icon background color was.
  *
- * @type {Object}
+ * @type {readonly string[]}
  */
 const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
 
 /**
- * Determines whether the block is a default block
- * and its attributes are equal to the default attributes
- * which means the block is unmodified.
+ * Determines whether the block is a default block and its attributes are equal
+ * to the default attributes which means the block is unmodified.
  *
- * @param  {WPBlock} block Block Object
+ * @param  {BlockInstance} block Block instance.
  *
- * @return {boolean}       Whether the block is an unmodified default block
+ * @return {boolean} Whether the block is an unmodified default block.
  */
 export function isUnmodifiedDefaultBlock( block ) {
 	const defaultBlockName = getDefaultBlockName();
@@ -50,7 +61,7 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const newDefaultBlock = isUnmodifiedDefaultBlock.block;
 	const blockType = getBlockType( defaultBlockName );
 
-	return every( blockType.attributes, ( value, key ) =>
+	return every( blockType.attributes, ( _, key ) =>
 		newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);
 }
@@ -58,7 +69,7 @@ export function isUnmodifiedDefaultBlock( block ) {
 /**
  * Function that checks if the parameter is a valid icon.
  *
- * @param {*} icon  Parameter to be checked.
+ * @param {any} icon  Parameter to be checked.
  *
  * @return {boolean} True if the parameter is a valid icon and false otherwise.
  */
@@ -76,18 +87,18 @@ export function isValidIcon( icon ) {
  * and returns a new icon object that is normalized so we can rely on just on possible icon structure
  * in the codebase.
  *
- * @param {WPBlockTypeIconRender} icon Render behavior of a block type icon;
- *                                     one of a Dashicon slug, an element, or a
- *                                     component.
+ * @param {BlockIcon} icon  Slug of the Dashicon to be shown
+ *                                          as the icon for the block in the
+ *                                          inserter, or element or an object describing the icon.
  *
- * @return {WPBlockTypeIconDescriptor} Object describing the icon.
+ * @return {BlockIcon} Object describing the icon.
  */
 export function normalizeIconObject( icon ) {
 	if ( isValidIcon( icon ) ) {
 		return { src: icon };
 	}
 
-	if ( has( icon, [ 'background' ] ) ) {
+	if ( typeof icon === 'object' && has( icon, [ 'background' ] ) ) {
 		const tinyBgColor = tinycolor( icon.background );
 
 		return {
@@ -109,9 +120,9 @@ export function normalizeIconObject( icon ) {
  * it converts it to the matching block type object.
  * It passes the original object otherwise.
  *
- * @param {string|Object} blockTypeOrName  Block type or name.
+ * @param {string|BlockType} blockTypeOrName  Block type or name.
  *
- * @return {?Object} Block type.
+ * @return {BlockType|undefined} Block type.
  */
 export function normalizeBlockType( blockTypeOrName ) {
 	if ( isString( blockTypeOrName ) ) {

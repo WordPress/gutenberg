@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { some, castArray, first, mapValues, pickBy, includes } from 'lodash';
+import { some, castArray, mapValues, pickBy, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,21 +15,26 @@ import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
 import { getBlockAttributes } from '../parser';
 
+/**
+ * @typedef {import('@wordpress/blocks').TransformShortcode<Record<string,any>>} TransformShortcode
+ */
+
 function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 	// Get all matches.
 	const transformsFrom = getBlockTransforms( 'from' );
 
-	const transformation = findTransform( transformsFrom, ( transform ) => (
-		transform.type === 'shortcode' &&
-		some( castArray( transform.tag ), ( tag ) => regexp( tag ).test( HTML ) )
-	) );
+	const transformation = /** @type {TransformShortcode|null} */ (
+		findTransform( transformsFrom, ( transform ) => (
+			transform.type === 'shortcode' &&
+			some( castArray( transform.tag ), ( tag ) => regexp( tag ).test( HTML ) )
+		) )
+	);
 
 	if ( ! transformation ) {
 		return [ HTML ];
 	}
 
-	const transformTags = castArray( transformation.tag );
-	const transformTag = first( transformTags );
+	const transformTag = castArray( transformation.tag )[ 0 ];
 
 	let match;
 

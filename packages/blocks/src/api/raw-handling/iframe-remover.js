@@ -3,12 +3,9 @@
  */
 import { remove } from '@wordpress/dom';
 
+// eslint-disable-next-line valid-jsdoc
 /**
- * Removes iframes.
- *
- * @param {Node} node The node to check.
- *
- * @return {void}
+ * @type {import('./').NodeFilterFunc}
  */
 export default function( node ) {
 	if ( node.nodeName === 'IFRAME' ) {

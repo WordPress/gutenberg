@@ -22,8 +22,24 @@ import {
 export { getPhrasingContentSchema } from './phrasing-content';
 export { pasteHandler } from './paste-handler';
 
+/**
+ * @callback NodeFilterFunc A function that can mutate a given `ChildNode`.
+ * @param {ChildNode} node   Node to be mutated.
+ * @param {Document}  doc    The document containing the node.
+ * @param {Object}    schema The schema.
+ * @return {void} Node is mutated in place and should not be returned.
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').BlockInstance<Record<string,any>>} BlockInstance
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').TransformRaw<any>} TransformRaw
+ */
+
 function getRawTransformations() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } )
+	return /** @type {TransformRaw[]} */ ( filter( getBlockTransforms( 'from' ), { type: 'raw' } ) )
 		.map( ( transform ) => {
 			return transform.isMatch ? transform : {
 				...transform,
@@ -37,11 +53,11 @@ function getRawTransformations() {
  * top-level tag. The HTML should be filtered to not have any text between
  * top-level tags and formatted in a way that blocks can handle the HTML.
  *
- * @param  {Object} $1               Named parameters.
- * @param  {string} $1.html          HTML to convert.
- * @param  {Array}  $1.rawTransforms Transforms that can be used.
+ * @param {Object}         params               Named parameters.
+ * @param {string}         params.html          HTML to convert.
+ * @param {TransformRaw[]} params.rawTransforms Transforms that can be used.
  *
- * @return {Array} An array of blocks.
+ * @return {BlockInstance[]} An array of blocks.
  */
 function htmlToBlocks( { html, rawTransforms } ) {
 	const doc = document.implementation.createHTMLDocument( '' );
@@ -81,9 +97,10 @@ function htmlToBlocks( { html, rawTransforms } ) {
 /**
  * Converts an HTML string to known blocks.
  *
- * @param {string} $1.HTML The HTML to convert.
+ * @param {Object} options
+ * @param {string} options.HTML The HTML to convert.
  *
- * @return {Array} A list of blocks.
+ * @return {BlockInstance[]} A list of blocks.
  */
 export function rawHandler( { HTML = '' } ) {
 	// If we detect block delimiters, parse entirely as blocks.
@@ -106,6 +123,7 @@ export function rawHandler( { HTML = '' } ) {
 		// These filters are essential for some blocks to be able to transform
 		// from raw HTML. These filters move around some content or add
 		// additional tags, they do not remove any content.
+		/** @type {NodeFilterFunc[]} */
 		const filters = [
 			// Needed to adjust invalid lists.
 			listReducer,

@@ -38,6 +38,15 @@ import {
 const { console } = window;
 
 /**
+ * @template {Record<string,any>} T
+ * @typedef {import('@wordpress/blocks').BlockInstance<T>} BlockInstance
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').TransformRaw<any>} RawTransform
+ */
+
+/**
  * Filters HTML to only contain phrasing content.
  *
  * @param {string} HTML The HTML to filter.
@@ -55,13 +64,14 @@ function filterInlineHTML( HTML ) {
 }
 
 function getRawTransformations() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } )
-		.map( ( transform ) => {
-			return transform.isMatch ? transform : {
-				...transform,
-				isMatch: ( node ) => transform.selector && node.matches( transform.selector ),
-			};
-		} );
+	return /** @type {RawTransform[]} */ (
+		filter( getBlockTransforms( 'from' ), { type: 'raw' } )
+	).map( ( transform ) => {
+		return transform.isMatch ? transform : {
+			...transform,
+			isMatch: ( node ) => transform.selector && node.matches( transform.selector ),
+		};
+	} );
 }
 
 /**
@@ -69,11 +79,11 @@ function getRawTransformations() {
  * top-level tag. The HTML should be filtered to not have any text between
  * top-level tags and formatted in a way that blocks can handle the HTML.
  *
- * @param  {Object} $1               Named parameters.
- * @param  {string} $1.html          HTML to convert.
- * @param  {Array}  $1.rawTransforms Transforms that can be used.
+ * @param {Object}         params               Named parameters.
+ * @param {string}         params.html          HTML to convert.
+ * @param {RawTransform[]} params.rawTransforms Transforms that can be used.
  *
- * @return {Array} An array of blocks.
+ * @return {Array<BlockInstance<any>>} An array of blocks.
  */
 function htmlToBlocks( { html, rawTransforms } ) {
 	const doc = document.implementation.createHTMLDocument( '' );
@@ -81,7 +91,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
 	doc.body.innerHTML = html;
 
 	return Array.from( doc.body.children ).map( ( node ) => {
-		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) => isMatch( node ) );
+		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) => isMatch && isMatch( node ) );
 
 		if ( ! rawTransform ) {
 			return createBlock(
@@ -113,6 +123,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
 /**
  * Converts an HTML string to known blocks. Strips everything else.
  *
+ * @param {Object}  options
  * @param {string}  [options.HTML]                     The HTML to convert.
  * @param {string}  [options.plainText]                Plain text version.
  * @param {string}  [options.mode]                     Handle content as blocks or inline content.
@@ -122,7 +133,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
  * @param {Array}   [options.tagName]                  The tag into which content will be inserted.
  * @param {boolean} [options.canUserUseUnfilteredHTML] Whether or not the user can use unfiltered HTML.
  *
- * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
+ * @return {string|Array<BlockInstance<any>>} A list of blocks or a string, depending on `handlerMode`.
  */
 export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.

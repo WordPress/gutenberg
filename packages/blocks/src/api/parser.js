@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
+import { castArray, flow, mapValues, omit, stubFalse } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,17 +26,45 @@ import { attr, html, text, query, node, children, prop } from './matchers';
 import { normalizeBlockType } from './utils';
 
 /**
- * Sources which are guaranteed to return a string value.
- *
- * @type {Set}
+ * @typedef {import('@wordpress/blocks').Block<Record<string,any>>} BlockType
  */
-const STRING_SOURCES = new Set( [
+
+/**
+ * @typedef {import('@wordpress/blocks').BlockAttribute<any>} AttributeSchema
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').BlockInstance<Record<string,any>>} BlockInstance
+ */
+
+/**
+ * @typedef {import('@wordpress/block-serialization-default-parser').Block} BlockParsed
+ */
+
+/**
+ * @typedef {(content: string) => BlockInstance[]} BlockInstanceParser
+ */
+
+/**
+ * @typedef {import('@wordpress/block-serialization-default-parser').parse} BlockParser
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').Source<any>} Source
+ */
+
+/**
+ * Sources which are guaranteed to return a string value.
+ * @type {ReadonlyArray<string>}
+ */
+const STRING_SOURCES = [
 	'attribute',
 	'html',
 	'text',
 	'tag',
-] );
+];
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
  * or false depending on whether the original matcher returns undefined. This
@@ -44,7 +72,7 @@ const STRING_SOURCES = new Set( [
  * be technically falsey (empty string), though their mere presence should be
  * enough to infer as true.
  *
- * @param {Function} matcher Original hpq matcher.
+ * @param {(...args: any[]) => any} matcher Original hpq matcher.
  *
  * @return {Function} Enhanced hpq matcher.
  */
@@ -71,7 +99,7 @@ export const toBooleanAttributeMatcher = ( matcher ) => flow( [
  *
  * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
  *
- * @param {*}      value Value to test.
+ * @param {any}    value Value to test.
  * @param {string} type  Type to test.
  *
  * @return {boolean} Whether value is of type.
@@ -107,7 +135,7 @@ export function isOfType( value, type ) {
  *
  * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
  *
- * @param {*}        value Value to test.
+ * @param {any}      value Value to test.
  * @param {string[]} types Types to test.
  *
  * @return {boolean} Whether value is of types.
@@ -122,8 +150,8 @@ export function isOfTypes( value, types ) {
  *
  * @see https://json-schema.org/latest/json-schema-validation.html#rfc.section.6.1.1
  *
- * @param {*}                       value Value to test.
- * @param {?(Array<string>|string)} type  Block attribute schema type.
+ * @param {any}             value  Value to test.
+ * @param {string|string[]} [type] Block attribute schema type.
  *
  * @return {boolean} Whether value is valid.
  */
@@ -137,8 +165,8 @@ export function isValidByType( value, type ) {
  *
  * @see https://json-schema.org/latest/json-schema-validation.html#rfc.section.6.1.2
  *
- * @param {*}      value   Value to test.
- * @param {?Array} enumSet Block attribute schema enum.
+ * @param {any}   value     Value to test.
+ * @param {any[]} [enumSet] Block attribute schema enum.
  *
  * @return {boolean} Whether value is valid.
  */
@@ -155,7 +183,7 @@ export function isValidByEnum( value, enumSet ) {
  * attribute schema, since the string ambiguity makes it impossible to know the
  * correct type of multiple to which to cast.
  *
- * @param {Object} attributeSchema Attribute's schema.
+ * @param {AttributeSchema} attributeSchema Attribute's schema.
  *
  * @return {boolean} Whether attribute schema defines an ambiguous string
  *                   source.
@@ -163,7 +191,7 @@ export function isValidByEnum( value, enumSet ) {
 export function isAmbiguousStringSource( attributeSchema ) {
 	const { source, type } = attributeSchema;
 
-	const isStringSource = STRING_SOURCES.has( source );
+	const isStringSource = STRING_SOURCES.includes( source );
 	const isSingleType = typeof type === 'string';
 
 	return isStringSource && isSingleType;
@@ -174,7 +202,7 @@ export function isAmbiguousStringSource( attributeSchema ) {
  *
  * @param {Object} sourceConfig Attribute Source object.
  *
- * @return {Function} A hpq Matcher.
+ * @return {Function|void} A hpq Matcher.
  */
 export function matcherFromSource( sourceConfig ) {
 	switch ( sourceConfig.source ) {
@@ -211,10 +239,10 @@ export function matcherFromSource( sourceConfig ) {
  * Given a block's raw content and an attribute's schema returns the attribute's
  * value depending on its source.
  *
- * @param {string} innerHTML         Block's raw content.
- * @param {Object} attributeSchema   Attribute's schema.
+ * @param {string} innerHTML       Block's raw content.
+ * @param {Source} attributeSchema Attribute's schema.
  *
- * @return {*} Attribute value.
+ * @return {any} Attribute value.
  */
 export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
 	return hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
@@ -225,12 +253,12 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
  * commentAttributes returns the attribute value depending on its source
  * definition of the given attribute key.
  *
- * @param {string} attributeKey      Attribute key.
- * @param {Object} attributeSchema   Attribute's schema.
- * @param {string} innerHTML         Block's raw content.
- * @param {Object} commentAttributes Block's comment attributes.
+ * @param {string}                attributeKey      Attribute key.
+ * @param {Source}                attributeSchema   Attribute's schema.
+ * @param {string}                innerHTML         Block's raw content.
+ * @param {Record<string,string>} commentAttributes Block's comment attributes.
  *
- * @return {*} Attribute value.
+ * @return {any} Attribute value.
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	const { type, enum: enumSet } = attributeSchema;
@@ -269,11 +297,11 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 /**
  * Returns the block attributes of a registered block node given its type.
  *
- * @param {string|Object} blockTypeOrName Block type or name.
- * @param {string}        innerHTML       Raw block content.
- * @param {?Object}       attributes      Known block attributes (from delimiters).
+ * @param {string|BlockType}  blockTypeOrName Block type or name.
+ * @param {string}             innerHTML       Raw block content.
+ * @param {Record<string,any>} [attributes]    Known block attributes (from delimiters).
  *
- * @return {Object} All block attributes.
+ * @return {Record<string,any>} All block attributes.
  */
 export function getBlockAttributes( blockTypeOrName, innerHTML, attributes = {} ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
@@ -290,16 +318,20 @@ export function getBlockAttributes( blockTypeOrName, innerHTML, attributes = {} 
 	);
 }
 
+// FIXME: Cant' use `BlockInstance` here because it's being mutated in the
+// function and because this function assumes (likely by mistake) that
+// `BlockInstance` will always contain `originalContent`. This is likely a
+// bug.
 /**
  * Given a block object, returns a new copy of the block with any applicable
  * deprecated migrations applied, or the original block if it was both valid
  * and no eligible migrations exist.
  *
- * @param {WPBlock} block            Original block object.
+ * @param {Object} block            Original block object.
  * @param {Object}  parsedAttributes Attributes as parsed from the initial
  *                                   block markup.
  *
- * @return {WPBlock} Migrated block object.
+ * @return {Object} Migrated block object.
  */
 export function getMigratedBlock( block, parsedAttributes ) {
 	const blockType = getBlockType( block.name );
@@ -372,9 +404,9 @@ export function getMigratedBlock( block, parsedAttributes ) {
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param {Object} blockNode Parsed block node.
+ * @param {BlockParsed} blockNode Parsed block node.
  *
- * @return {?Object} An initialized block object (if possible).
+ * @return {BlockInstance|void} An initialized block object (if possible).
  */
 export function createBlockWithFallback( blockNode ) {
 	const { blockName: originalName } = blockNode;
@@ -504,9 +536,9 @@ export function createBlockWithFallback( blockNode ) {
  * @see `@wordpress/block-serialization-default-parser` package
  * @see `@wordpress/block-serialization-spec-parser` package
  *
- * @param {Object}   blockNode                  A block node as returned by a valid parser.
- * @param {?Object}  options                    Serialization options.
- * @param {?boolean} options.isCommentDelimited Whether to output HTML comments around blocks.
+ * @param {BlockParsed} blockNode                    A block node as returned by a valid parser.
+ * @param {Object}      options                      Serialization options.
+ * @param {boolean}     [options.isCommentDelimited] Whether to output HTML comments around blocks.
  *
  * @return {string} An HTML string representing a block.
  */
@@ -530,9 +562,9 @@ export function serializeBlockNode( blockNode, options = {} ) {
 /**
  * Creates a parse implementation for the post content which returns a list of blocks.
  *
- * @param {Function} parseImplementation Parse implementation.
+ * @param {BlockParser} parseImplementation Parse implementation.
  *
- * @return {Function} An implementation which parses the post content.
+ * @return {BlockInstanceParser} An implementation which parses the post content.
  */
 const createParse = ( parseImplementation ) =>
 	( content ) => parseImplementation( content ).reduce( ( memo, blockNode ) => {
@@ -541,14 +573,14 @@ const createParse = ( parseImplementation ) =>
 			memo.push( block );
 		}
 		return memo;
-	}, [] );
+	}, /** @type {BlockInstance[]} */( [] ) );
 
 /**
  * Parses the post content with a PegJS grammar and returns a list of blocks.
  *
  * @param {string} content The post content.
  *
- * @return {Array} Block list.
+ * @return {Array<BlockInstance<any>>} Block list.
  */
 export const parseWithGrammar = createParse( defaultParse );
 

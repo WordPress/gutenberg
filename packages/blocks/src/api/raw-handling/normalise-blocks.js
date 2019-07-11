@@ -1,3 +1,5 @@
+/* global Node */
+
 /**
  * Internal dependencies
  */
@@ -5,10 +7,10 @@ import { isEmpty } from './utils';
 import { isPhrasingContent } from './phrasing-content';
 
 /**
- * Browser dependencies
+ * @param {string} HTML HTML to parse.
+ *
+ * @return {string} Result.
  */
-const { ELEMENT_NODE, TEXT_NODE } = window.Node;
-
 export default function( HTML ) {
 	const decuDoc = document.implementation.createHTMLDocument( '' );
 	const accuDoc = document.implementation.createHTMLDocument( '' );
@@ -22,7 +24,7 @@ export default function( HTML ) {
 		const node = decu.firstChild;
 
 		// Text nodes: wrap in a paragraph, or append to previous.
-		if ( node.nodeType === TEXT_NODE ) {
+		if ( node.nodeType === Node.TEXT_NODE ) {
 			if ( ! node.nodeValue.trim() ) {
 				decu.removeChild( node );
 			} else {
@@ -33,7 +35,7 @@ export default function( HTML ) {
 				accu.lastChild.appendChild( node );
 			}
 		// Element nodes.
-		} else if ( node.nodeType === ELEMENT_NODE ) {
+		} else if ( node.nodeType === Node.ELEMENT_NODE ) {
 			// BR nodes: create a new paragraph on double, or append to previous.
 			if ( node.nodeName === 'BR' ) {
 				if ( node.nextSibling && node.nextSibling.nodeName === 'BR' ) {

@@ -1,21 +1,18 @@
+/* global Node */
+
 /**
  * WordPress dependencies
  */
 import { remove } from '@wordpress/dom';
 
-/**
- * Browser dependencies
- */
-const { COMMENT_NODE } = window.Node;
-
+// eslint-disable-next-line valid-jsdoc
 /**
  * Looks for comments, and removes them.
  *
- * @param {Node} node The node to be processed.
- * @return {void}
+ * @type {import('./').NodeFilterFunc}
  */
 export default function( node ) {
-	if ( node.nodeType === COMMENT_NODE ) {
+	if ( node.nodeType === Node.COMMENT_NODE ) {
 		remove( node );
 	}
 }

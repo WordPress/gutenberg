@@ -3,6 +3,10 @@
  */
 import { wrap, replaceTag } from '@wordpress/dom';
 
+// eslint-disable-next-line valid-jsdoc
+/**
+ * @type {import('./').NodeFilterFunc}
+ */
 export default function( node, doc ) {
 	// In jsdom-jscore, 'node.style' can be null.
 	// TODO: Explore fixing this by patching jsdom-jscore.

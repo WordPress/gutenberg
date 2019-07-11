@@ -22,9 +22,19 @@ import { normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
 
 /**
- * @typedef {Object} WPBlockSerializationOptions Serialization Options.
- *
- * @property {boolean} isInnerBlocks Whether we are serializing inner blocks.
+ * @typedef {import('@wordpress/blocks').Block<Record<string,any>>} BlockType
+ */
+
+/**
+ * @typedef {import('@wordpress/blocks').BlockInstance<Record<string,any>>} BlockInstance
+ */
+
+/**
+ * @typedef {import('@wordpress/element').ReactChild} ReactChild
+ */
+
+/**
+ * @typedef {import('@wordpress/element').ReactElement} ReactElement
  */
 
 /**
@@ -57,15 +67,16 @@ export function getBlockMenuDefaultClassName( blockName ) {
 	return applyFilters( 'blocks.getBlockMenuDefaultClassName', className, blockName );
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
- * @param {string|Object} blockTypeOrName   Block type or name.
- * @param {Object}        attributes        Block attributes.
- * @param {?Array}        innerBlocks       Nested blocks.
+ * @param {string|BlockType}         blockTypeOrName  Block type or name.
+ * @param {Record<string,any>}       attributes       Block attributes.
+ * @param {readonly BlockInstance[]} [innerBlocks=[]] Nested blocks.
  *
- * @return {Object|string} Save element or raw HTML string.
+ * @return {ReactChild} Save element or raw HTML string.
  */
 export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
@@ -85,9 +96,9 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 		/**
 		 * Filters the props applied to the block save result element.
 		 *
-		 * @param {Object}      props      Props applied to save element.
-		 * @param {WPBlockType} blockType  Block type definition.
-		 * @param {Object}      attributes Block attributes.
+		 * @param {Object}    props      Props applied to save element.
+		 * @param {BlockType} blockType  Block type definition.
+		 * @param {Object}    attributes Block attributes.
 		 */
 		const props = applyFilters(
 			'blocks.getSaveContent.extraProps',
@@ -104,9 +115,9 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 	/**
 	 * Filters the save result of a block during serialization.
 	 *
-	 * @param {WPElement}   element    Block save result.
-	 * @param {WPBlockType} blockType  Block type definition.
-	 * @param {Object}      attributes Block attributes.
+	 * @param {ReactElement} element    Block save result.
+	 * @param {BlockType}    blockType  Block type definition.
+	 * @param {Object}       attributes Block attributes.
 	 */
 	element = applyFilters( 'blocks.getSaveElement', element, blockType, attributes );
 
@@ -117,13 +128,14 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
 	);
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Given a block type containing a save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param {string|Object} blockTypeOrName Block type or name.
- * @param {Object}        attributes      Block attributes.
- * @param {?Array}        innerBlocks     Nested blocks.
+ * @param {string|BlockType}         blockTypeOrName Block type or name.
+ * @param {Record<string,any>}       attributes      Block attributes.
+ * @param {readonly BlockInstance[]} [innerBlocks]   Nested blocks.
  *
  * @return {string} Save content.
  */
@@ -144,10 +156,10 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  * This function returns only those attributes which are needed to persist and
  * which cannot be matched from the block content.
  *
- * @param {Object<string,*>} blockType     Block type.
- * @param {Object<string,*>} attributes Attributes from in-memory block data.
+ * @param {BlockType}          blockType  Block type.
+ * @param {Record<string,any>} attributes Attributes from in-memory block data.
  *
- * @return {Object<string,*>} Subset of attributes for comment serialization.
+ * @return {Record<string,any>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( blockType, attributes ) {
 	return reduce( blockType.attributes, ( result, attributeSchema, key ) => {
@@ -179,7 +191,7 @@ export function getCommentAttributes( blockType, attributes ) {
  * Given an attributes object, returns a string in the serialized attributes
  * format prepared for post content.
  *
- * @param {Object} attributes Attributes object.
+ * @param {Record<string,any>} attributes Attributes object.
  *
  * @return {string} Serialized attributes.
  */
@@ -203,7 +215,7 @@ export function serializeAttributes( attributes ) {
 /**
  * Given a block object, returns the Block's Inner HTML markup.
  *
- * @param {Object} block Block instance.
+ * @param {BlockInstance} block Block instance.
  *
  * @return {string} HTML.
  */
@@ -222,15 +234,15 @@ export function getBlockContent( block ) {
 		} catch ( error ) {}
 	}
 
-	return saveContent;
+	return saveContent || '';
 }
 
 /**
  * Returns the content of a block, including comment delimiters.
  *
- * @param {string} rawBlockName Block name.
- * @param {Object} attributes   Block attributes.
- * @param {string} content      Block save content.
+ * @param {string}             rawBlockName Block name.
+ * @param {Record<string,any>} attributes   Block attributes.
+ * @param {string}             content      Block save content.
  *
  * @return {string} Comment-delimited block content.
  */
@@ -261,8 +273,9 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
  * Returns the content of a block, including comment delimiters, determining
  * serialized attributes and content form from the current state of the block.
  *
- * @param {Object}                      block   Block instance.
- * @param {WPBlockSerializationOptions} options Serialization options.
+ * @param {BlockInstance} block Block instance.
+ * @param {Object}        [options={}]
+ * @param {boolean}       [options.isInnerBlocks=false]
  *
  * @return {string} Serialized block.
  */
@@ -282,11 +295,11 @@ export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Takes a block or set of blocks and returns the serialized post content.
  *
- * @param {Array}                       blocks  Block(s) to serialize.
- * @param {WPBlockSerializationOptions} options Serialization options.
+ * @param {readonly BlockInstance[]} blocks Block instance(s) to serialize.
  *
  * @return {string} The post content.
  */

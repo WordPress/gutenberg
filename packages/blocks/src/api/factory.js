@@ -9,7 +9,6 @@ import {
 	findIndex,
 	isObjectLike,
 	filter,
-	first,
 	flatMap,
 	has,
 	uniq,
@@ -29,13 +28,28 @@ import { getBlockType, getBlockTypes, getGroupingBlockName } from './registratio
 import { normalizeBlockType } from './utils';
 
 /**
- * Returns a block object given its type and attributes.
+ * @typedef {import('@wordpress/blocks').Block<Record<string,any>>} BlockType
+ */
+
+/**
+ * @template {Record<string, any>} T
+ * @typedef {import('@wordpress/blocks').BlockInstance<T>} BlockInstance
+ */
+
+/**
+ * @template {Record<string, any>} T
+ * @typedef {import('@wordpress/blocks').Transform<T>} Transform
+ */
+
+/**
+ * Returns a block instance given its type and attributes.
  *
- * @param {string} name        Block name.
- * @param {Object} attributes  Block attributes.
- * @param {?Array} innerBlocks Nested blocks.
+ * @template {Record<string, any>} T
+ * @param {string}                    name             Block name.
+ * @param {Partial<T>}                [attributes={}]  Block attributes.
+ * @param {Array<BlockInstance<any>>} [innerBlocks=[]] Nested blocks.
  *
- * @return {Object} Block object.
+ * @return {BlockInstance<T>} Block instance.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 	// Get the type definition associated with a registered block.
@@ -63,7 +77,7 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 		}
 
 		return result;
-	}, {} );
+	}, /** @type {any} */ ( {} ) );
 
 	const clientId = uuid();
 
@@ -82,11 +96,12 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
  * Given a block object, returns a copy of the block object, optionally merging
  * new attributes and/or replacing its inner blocks.
  *
- * @param {Object} block              Block instance.
- * @param {Object} mergeAttributes    Block attributes.
- * @param {?Array} newInnerBlocks     Nested blocks.
+ * @template {Record<string, any>} T
+ * @param {BlockInstance<T>}          block                Block instance.
+ * @param {Partial<T>}                [mergeAttributes={}] Block attributes.
+ * @param {Array<BlockInstance<any>>} [newInnerBlocks]     Nested blocks.
  *
- * @return {Object} A cloned block.
+ * @return {BlockInstance<T>} A cloned block.
  */
 export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 	const clientId = uuid();
@@ -107,9 +122,9 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
  * Returns a boolean indicating whether a transform is possible based on
  * various bits of context.
  *
- * @param {Object} transform The transform object to validate.
- * @param {string} direction Is this a 'from' or 'to' transform.
- * @param {Array} blocks The blocks to transform from.
+ * @param {Transform<any>} transform The transform object to validate.
+ * @param {'from'|'to'} direction Is this a 'from' or 'to' transform.
+ * @param {Array<BlockInstance<any>>} blocks The blocks to transform from.
  *
  * @return {boolean} Is the transform possible?
  */
@@ -121,7 +136,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// If multiple blocks are selected, only multi block transforms
 	// or wildcard transforms are allowed.
 	const isMultiBlock = blocks.length > 1;
-	const firstBlockName = first( blocks ).name;
+	const firstBlockName = blocks[ 0 ].name;
 	const isValidForMultiBlocks = isWildcardBlockTransform( transform ) || ! isMultiBlock || transform.isMultiBlock;
 	if ( ! isValidForMultiBlocks ) {
 		return false;
@@ -141,7 +156,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 
 	// Check if the transform's block name matches the source block (or is a wildcard)
 	// only if this is a transform 'from'.
-	const sourceBlock = first( blocks );
+	const sourceBlock = blocks[ 0 ];
 	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1 || isWildcardBlockTransform( transform );
 	if ( ! hasMatchingName ) {
 		return false;
@@ -168,9 +183,9 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
  * Returns block types that the 'blocks' can be transformed into, based on
  * 'from' transforms on other blocks.
  *
- * @param {Array}  blocks  The blocks to transform from.
+ * @param {Array<BlockInstance<any>>} blocks  The blocks to transform from.
  *
- * @return {Array} Block types that the blocks can be transformed into.
+ * @return {BlockType[]} Block types that the blocks can be transformed into.
  */
 const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
 	if ( isEmpty( blocks ) ) {
@@ -201,16 +216,16 @@ const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
  * Returns block types that the 'blocks' can be transformed into, based on
  * the source block's own 'to' transforms.
  *
- * @param {Array} blocks The blocks to transform from.
+ * @param {Array<BlockInstance<any>>} blocks The blocks to transform from.
  *
- * @return {Array} Block types that the source can be transformed into.
+ * @return {BlockType[]} Block types that the source can be transformed into.
  */
 const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	if ( isEmpty( blocks ) ) {
 		return [];
 	}
 
-	const sourceBlock = first( blocks );
+	const sourceBlock = blocks[ 0 ];
 	const blockType = getBlockType( sourceBlock.name );
 	const transformsTo = getBlockTransforms( 'to', blockType.name );
 
@@ -237,7 +252,7 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
  * and if so whether it is a "wildcard" transform
  * ie: targets "any" block type
  *
- * @param {Object} t the Block transform object
+ * @param {Transform<any>} t the Block transform object
  *
  * @return {boolean} whether transform is a wildcard transform
  */
@@ -258,7 +273,7 @@ export const isContainerGroupBlock = ( name ) => name === getGroupingBlockName()
  * Determines whether the provided Blocks are of the same type
  * (eg: all `core/paragraph`).
  *
- * @param  {Array}  blocksArray the Block definitions
+ * @param  {Array<BlockInstance<any>>} blocksArray the Block definitions
  *
  * @return {boolean} whether or not the given Blocks pass the criteria
  */
@@ -275,9 +290,9 @@ export const isBlockSelectionOfSameType = ( blocksArray = [] ) => {
  * Returns an array of block types that the set of blocks received as argument
  * can be transformed into.
  *
- * @param {Array} blocks Blocks array.
+ * @param {Array<BlockInstance<any>>} blocks Blocks array.
  *
- * @return {Array} Block types that the blocks argument can be transformed to.
+ * @return {BlockType[]} Block types that the blocks argument can be transformed to.
  */
 export function getPossibleBlockTransformations( blocks ) {
 	if ( isEmpty( blocks ) ) {
@@ -293,6 +308,7 @@ export function getPossibleBlockTransformations( blocks ) {
 	] );
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Given an array of transforms, returns the highest-priority transform where
  * the predicate function returns a truthy value. A higher-priority transform
@@ -300,10 +316,11 @@ export function getPossibleBlockTransformations( blocks ) {
  * null if the transforms set is empty or the predicate function returns a
  * falsey value for all entries.
  *
- * @param {Object[]} transforms Transforms to search.
- * @param {Function} predicate  Function returning true on matching transform.
+ * @template {Transform<any>} T
+ * @param {T[]}                       transforms Transforms to search.
+ * @param {(transform: T) => boolean} predicate  Function returning true on matching transform.
  *
- * @return {?Object} Highest-priority transform candidate.
+ * @return {Transform<Record<string,any>>|null} Highest-priority transform candidate.
  */
 export function findTransform( transforms, predicate ) {
 	// The hooks library already has built-in mechanisms for managing priority
@@ -326,16 +343,17 @@ export function findTransform( transforms, predicate ) {
 	return hooks.applyFilters( 'transform', null );
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Returns normal block transforms for a given transform direction, optionally
  * for a specific block by name, or an empty array if there are no transforms.
  * If no block name is provided, returns transforms for all blocks. A normal
  * transform object includes `blockName` as a property.
  *
- * @param {string}  direction Transform direction ("to", "from").
- * @param {string|Object} blockTypeOrName  Block type or name.
+ * @param {'to'|'from'}       direction         Transform direction.
+ * @param {string|BlockType} [blockTypeOrName] Block type or name.
  *
- * @return {Array} Block transforms for direction.
+ * @return {Array<Transform<any> & { blockName: string }>} Block transforms for direction.
  */
 export function getBlockTransforms( direction, blockTypeOrName ) {
 	// When retrieving transforms for all block types, recurse into self.
@@ -363,10 +381,10 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 /**
  * Switch one or more blocks into one or more blocks of the new block type.
  *
- * @param {Array|Object} blocks Blocks array or block object.
- * @param {string}       name   Block name.
+ * @param {BlockInstance<any>|Array<BlockInstance<any>>} blocks Blocks array or block object.
+ * @param {string}                                       name   Block name.
  *
- * @return {?Array} Array of blocks or null.
+ * @return {Array<BlockInstance<any>>|null} Array of blocks or null.
  */
 export function switchToBlockType( blocks, name ) {
 	const blocksArray = castArray( blocks );

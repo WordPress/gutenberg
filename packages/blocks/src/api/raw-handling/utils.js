@@ -1,3 +1,5 @@
+/* global Node */
+
 /**
  * External dependencies
  */
@@ -15,10 +17,10 @@ import { hasBlockSupport } from '..';
 import { isPhrasingContent } from './phrasing-content';
 
 /**
- * Browser dependencies
+ * @typedef {import('./').NodeFilterFunc} NodeFilterFunc
  */
-const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 
+// FIXME: The return type should be strongly typed. Need to discuss the exact interface of this.
 /**
  * Given raw transforms from blocks, merges all schemas into one.
  *
@@ -82,28 +84,28 @@ export function getBlockContentSchema( transforms ) {
  * Recursively checks if an element is empty. An element is not empty if it
  * contains text or contains elements with attributes such as images.
  *
- * @param {Element} element The element to check.
+ * @param {Node} node The node to check.
  *
  * @return {boolean} Wether or not the element is empty.
  */
-export function isEmpty( element ) {
-	if ( ! element.hasChildNodes() ) {
+export function isEmpty( node ) {
+	if ( ! node.hasChildNodes() ) {
 		return true;
 	}
 
-	return Array.from( element.childNodes ).every( ( node ) => {
-		if ( node.nodeType === TEXT_NODE ) {
-			return ! node.nodeValue.trim();
+	return Array.from( node.childNodes ).every( ( childNode ) => {
+		if ( childNode.nodeType === Node.TEXT_NODE ) {
+			return ! childNode.nodeValue.trim();
 		}
 
-		if ( node.nodeType === ELEMENT_NODE ) {
-			if ( node.nodeName === 'BR' ) {
+		if ( childNode.nodeType === Node.ELEMENT_NODE ) {
+			if ( childNode.nodeName === 'BR' ) {
 				return true;
-			} else if ( node.hasAttributes() ) {
+			} else if ( childNode.hasAttributes() ) {
 				return false;
 			}
 
-			return isEmpty( node );
+			return isEmpty( childNode );
 		}
 
 		return true;
@@ -125,10 +127,10 @@ export function isPlain( HTML ) {
 /**
  * Given node filters, deeply filters and mutates a NodeList.
  *
- * @param {NodeList} nodeList The nodeList to filter.
- * @param {Array}    filters  An array of functions that can mutate with the provided node.
- * @param {Document} doc      The document of the nodeList.
- * @param {Object}   schema   The schema to use.
+ * @param {NodeListOf<ChildNode>} nodeList The nodeList to filter.
+ * @param {NodeFilterFunc[]}      filters  An array of functions that can mutate the provided node.
+ * @param {Document}              doc      The document of the nodeList.
+ * @param {Object}                schema   The schema to use.
  */
 export function deepFilterNodeList( nodeList, filters, doc, schema ) {
 	Array.from( nodeList ).forEach( ( node ) => {
@@ -149,9 +151,9 @@ export function deepFilterNodeList( nodeList, filters, doc, schema ) {
  * Given node filters, deeply filters HTML tags.
  * Filters from the deepest nodes to the top.
  *
- * @param {string} HTML    The HTML to filter.
- * @param {Array}  filters An array of functions that can mutate with the provided node.
- * @param {Object} schema  The schema to use.
+ * @param {string}           HTML         The HTML to filter.
+ * @param {NodeFilterFunc[]} [filters=[]] An array of functions that can mutate with the provided node.
+ * @param {Object}           schema       The schema to use.
  *
  * @return {string} The filtered HTML.
  */
@@ -169,10 +171,10 @@ export function deepFilterHTML( HTML, filters = [], schema ) {
  * Given a schema, unwraps or removes nodes, attributes and classes on a node
  * list.
  *
- * @param {NodeList} nodeList The nodeList to filter.
- * @param {Document} doc      The document of the nodeList.
- * @param {Object}   schema   An array of functions that can mutate with the provided node.
- * @param {Object}   inline   Whether to clean for inline mode.
+ * @param {NodeListOf<ChildNode>} nodeList The nodeList to filter.
+ * @param {Document}              doc      The document of the nodeList.
+ * @param {Object}                schema   An array of functions that can mutate with the provided node.
+ * @param {boolean}               [inline] Whether to clean for inline mode.
  */
 function cleanNodeList( nodeList, doc, schema, inline ) {
 	Array.from( nodeList ).forEach( ( node ) => {
@@ -184,7 +186,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 			schema.hasOwnProperty( tag ) &&
 			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
 		) {
-			if ( node.nodeType === ELEMENT_NODE ) {
+			if ( node.nodeType === Node.ELEMENT_NODE ) {
 				const {
 					attributes = [],
 					classes = [],
@@ -288,9 +290,9 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 /**
  * Given a schema, unwraps or removes nodes, attributes and classes on HTML.
  *
- * @param {string} HTML   The HTML to clean up.
- * @param {Object} schema Schema for the HTML.
- * @param {Object} inline Whether to clean for inline mode.
+ * @param {string}  HTML     The HTML to clean up.
+ * @param {Object}  schema   Schema for the HTML.
+ * @param {boolean} [inline] Whether to clean for inline mode.
  *
  * @return {string} The cleaned up HTML.
  */

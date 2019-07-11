@@ -14,7 +14,7 @@ import { isPhrasingContent } from './phrasing-content';
  * @param {Node}   node   The node to check.
  * @param {Object} schema The schema to use.
  *
- * @return {boolean} True if figure content, false if not.
+ * @return {boolean} `true` if figure content, `false` if not.
  */
 function isFigureContent( node, schema ) {
 	const tag = node.nodeName.toLowerCase();
@@ -34,7 +34,7 @@ function isFigureContent( node, schema ) {
  * @param {Node}   node   The node to check.
  * @param {Object} schema The schema to use.
  *
- * @return {boolean} True if it can, false if not.
+ * @return {boolean} `true` if it can, `false` if not.
  */
 function canHaveAnchor( node, schema ) {
 	const tag = node.nodeName.toLowerCase();
@@ -42,15 +42,12 @@ function canHaveAnchor( node, schema ) {
 	return has( schema, [ 'figure', 'children', 'a', 'children', tag ] );
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * This filter takes figure content out of paragraphs, wraps it in a figure
  * element, and moves any anchors with it if needed.
  *
- * @param {Node}     node   The node to filter.
- * @param {Document} doc    The document of the node.
- * @param {Object}   schema The schema to use.
- *
- * @return {void}
+ * @type {import('./').NodeFilterFunc}
  */
 export default function( node, doc, schema ) {
 	if ( ! isFigureContent( node, schema ) ) {

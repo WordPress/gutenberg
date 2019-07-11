@@ -1,35 +1,29 @@
+/* global Element, Node */
+
 /**
  * Internal dependencies
  */
 import * as children from './children';
 
 /**
- * Browser dependencies
+ * @typedef {(domNode: Node & ParentNode) => ReactChild | null} HpqMatcher
  */
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 /**
- * A representation of a single node within a block's rich text value. If
- * representing a text node, the value is simply a string of the node value.
- * As representing an element node, it is an object of:
- *
- * 1. `type` (string): Tag name.
- * 2. `props` (object): Attributes and children array of WPBlockNode.
- *
- * @typedef {string|Object} WPBlockNode
+ * @typedef {import('@wordpress/element').ReactChild} ReactChild
  */
 
 /**
  * Given a single node and a node type (e.g. `'br'`), returns true if the node
  * corresponds to that type, false otherwise.
  *
- * @param {WPBlockNode} node Block node to test
- * @param {string} type      Node to type to test against.
+ * @param {ReactChild} node Block node to test
+ * @param {string}     type Node to type to test against.
  *
  * @return {boolean} Whether node is of intended type.
  */
 function isNodeOfType( node, type ) {
-	return node && node.type === type;
+	return typeof node === 'object' && node.type === type;
 }
 
 /**
@@ -40,9 +34,10 @@ function isNodeOfType( node, type ) {
  *
  * @param {NamedNodeMap} nodeMap NamedNodeMap to convert to object.
  *
- * @return {Object} Object equivalent value of NamedNodeMap.
+ * @return {Record<string,string>} Object equivalent value of NamedNodeMap.
  */
 export function getNamedNodeMapAsObject( nodeMap ) {
+	/** @type {Record<string,string>} */
 	const result = {};
 	for ( let i = 0; i < nodeMap.length; i++ ) {
 		const { name, value } = nodeMap[ i ];
@@ -58,19 +53,18 @@ export function getNamedNodeMapAsObject( nodeMap ) {
  *
  * @throws {TypeError} If non-element/text node is passed.
  *
- * @param {Node} domNode DOM node to convert.
+ * @param {Element|Node} domNode DOM node to convert.
  *
- * @return {WPBlockNode} Block node equivalent to DOM node.
+ * @return {ReactChild} Block node equivalent to DOM node.
  */
 export function fromDOM( domNode ) {
-	if ( domNode.nodeType === TEXT_NODE ) {
-		return domNode.nodeValue;
+	if ( domNode.nodeType === Node.TEXT_NODE ) {
+		return domNode.nodeValue || '';
 	}
 
-	if ( domNode.nodeType !== ELEMENT_NODE ) {
+	if ( ! ( domNode instanceof Element ) ) {
 		throw new TypeError(
-			'A block node can only be created from a node of type text or ' +
-			'element.'
+			'A block node can only be created from a node of type text or element.'
 		);
 	}
 
@@ -80,13 +74,14 @@ export function fromDOM( domNode ) {
 			...getNamedNodeMapAsObject( domNode.attributes ),
 			children: children.fromDOM( domNode.childNodes ),
 		},
+		key: null,
 	};
 }
 
 /**
  * Given a block node, returns its HTML string representation.
  *
- * @param {WPBlockNode} node Block node to convert to string.
+ * @param {ReactChild} node Block node to convert to string.
  *
  * @return {string} String HTML representation of block node.
  */
@@ -100,10 +95,13 @@ export function toHTML( node ) {
  *
  * @param {string} selector DOM selector.
  *
- * @return {Function} hpq matcher.
+ * @return {HpqMatcher} hpq matcher.
  */
 export function matcher( selector ) {
 	return ( domNode ) => {
+		/**
+		 * @type {Node & ParentNode | null}
+		 */
 		let match = domNode;
 
 		if ( selector ) {
@@ -111,8 +109,11 @@ export function matcher( selector ) {
 		}
 
 		try {
-			return fromDOM( match );
-		} catch ( error ) {
+			if ( match ) {
+				return fromDOM( match );
+			}
+			return null;
+		} catch {
 			return null;
 		}
 	};

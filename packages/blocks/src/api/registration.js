@@ -22,64 +22,24 @@ import { select, dispatch } from '@wordpress/data';
 import { isValidIcon, normalizeIconObject } from './utils';
 
 /**
- * Render behavior of a block type icon; one of a Dashicon slug, an element,
- * or a component.
- *
- * @typedef {(string|WPElement|WPComponent)} WPBlockTypeIconRender
- *
- * @see https://developer.wordpress.org/resource/dashicons/
+ * @typedef {import('@wordpress/blocks').Block<Record<string,any>>} BlockType
  */
 
 /**
- * An object describing a normalized block type icon.
- *
- * @typedef {WPBlockTypeIconDescriptor}
- *
- * @property {WPBlockTypeIconRender} src         Render behavior of the icon,
- *                                               one of a Dashicon slug, an
- *                                               element, or a component.
- * @property {string}                background  Optimal background hex string
- *                                               color when displaying icon.
- * @property {string}                foreground  Optimal foreground hex string
- *                                               color when displaying icon.
- * @property {string}                shadowColor Optimal shadow hex string
- *                                               color when displaying icon.
+ * @typedef {import('@wordpress/blocks').BlockInstance<Record<string,any>>} BlockInstance
  */
 
 /**
- * Value to use to render the icon for a block type in an editor interface,
- * either a Dashicon slug, an element, a component, or an object describing
- * the icon.
- *
- * @typedef {(WPBlockTypeIconDescriptor|WPBlockTypeIconRender)} WPBlockTypeIcon
+ * @template {Record<string,any>} T
+ * @typedef {import('@wordpress/blocks').BlockConfiguration<T>} BlockConfiguration
  */
 
 /**
- * Defined behavior of a block type.
- *
- * @typedef {WPBlockType}
- *
- * @property {string}           name       Block type's namespaced name.
- * @property {string}           title      Human-readable block type label.
- * @property {string}           category   Block type category classification,
- *                                         used in search interfaces to arrange
- *                                         block types by category.
- * @property {?WPBlockTypeIcon} icon       Block type icon.
- * @property {?string[]}        keywords   Additional keywords to produce block
- *                                         type as result in search interfaces.
- * @property {?Object}          attributes Block type attributes.
- * @property {?WPComponent}     save       Optional component describing
- *                                         serialized markup structure of a
- *                                         block type.
- * @property {WPComponent}      edit       Component rendering an element to
- *                                         manipulate the attributes of a block
- *                                         in the context of an editor.
+ * @typedef {import('@wordpress/blocks').BlockSupports} BlockSupports
  */
 
 /**
- * Default values to assign for omitted optional block type settings.
- *
- * @type {Object}
+ * @typedef {import('@wordpress/blocks').BlockStyle} BlockStyle
  */
 const DEFAULT_BLOCK_TYPE_SETTINGS = {
 	icon: 'block-default',
@@ -107,11 +67,12 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
  *
- * @param {string} name     Block name.
- * @param {Object} settings Block settings.
+ * @template {Record<string,any>} T
+ * @param {string}                name     Block name.
+ * @param {BlockConfiguration<T>} settings Block settings.
  *
- * @return {?WPBlock} The block, if it has been successfully registered;
- *                     otherwise `undefined`.
+ * @return {BlockConfiguration<T>|undefined} The block, if it has been successfully registered;
+ *                                           otherwise `undefined`.
  */
 export function registerBlockType( name, settings ) {
 	settings = {
@@ -212,8 +173,8 @@ export function registerBlockType( name, settings ) {
  *
  * @param {string} name Block name.
  *
- * @return {?WPBlock} The previous block value, if it has been successfully
- *                     unregistered; otherwise `undefined`.
+ * @return {BlockType|undefined} The previous block value, if it has been successfully
+ *                                unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {
 	const oldBlock = select( 'core/blocks' ).getBlockType( name );
@@ -240,7 +201,7 @@ export function setFreeformContentHandlerName( blockName ) {
  * Retrieves name of block handling non-block content, or undefined if no
  * handler has been defined.
  *
- * @return {?string} Block name.
+ * @return {string|undefined} Block name.
  */
 export function getFreeformContentHandlerName() {
 	return select( 'core/blocks' ).getFreeformFallbackBlockName();
@@ -249,7 +210,7 @@ export function getFreeformContentHandlerName() {
 /**
  * Retrieves name of block used for handling grouping interactions.
  *
- * @return {?string} Block name.
+ * @return {string|undefined} Block name.
  */
 export function getGroupingBlockName() {
 	return select( 'core/blocks' ).getGroupingBlockName();
@@ -268,7 +229,7 @@ export function setUnregisteredTypeHandlerName( blockName ) {
  * Retrieves name of block handling unregistered block types, or undefined if no
  * handler has been defined.
  *
- * @return {?string} Block name.
+ * @return {string|undefined} Block name.
  */
 export function getUnregisteredTypeHandlerName() {
 	return select( 'core/blocks' ).getUnregisteredFallbackBlockName();
@@ -295,7 +256,7 @@ export function setGroupingBlockName( name ) {
 /**
  * Retrieves the default block name.
  *
- * @return {?string} Block name.
+ * @return {string|undefined} Block name.
  */
 export function getDefaultBlockName() {
 	return select( 'core/blocks' ).getDefaultBlockName();
@@ -306,42 +267,45 @@ export function getDefaultBlockName() {
  *
  * @param {string} name Block name.
  *
- * @return {?Object} Block type.
+ * @return {BlockType|undefined} Block type.
  */
 export function getBlockType( name ) {
 	return select( 'core/blocks' ).getBlockType( name );
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Returns all registered blocks.
  *
- * @return {Array} Block settings.
+ * @return {readonly BlockType[]} Block settings.
  */
 export function getBlockTypes() {
 	return select( 'core/blocks' ).getBlockTypes();
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Returns the block support value for a feature, if defined.
  *
- * @param  {(string|Object)} nameOrType      Block name or type object
- * @param  {string}          feature         Feature to retrieve
- * @param  {*}               defaultSupports Default value to return if not
- *                                           explicitly defined
+ * @param {string|BlockType}    nameOrType        Block name or type object.
+ * @param {keyof BlockSupports} feature           Feature to retrieve.
+ * @param {any}                 [defaultSupports] Default value to return if not
+ *                                                explicitly defined.
  *
- * @return {?*} Block support value
+ * @return {any} Block support value.
  */
 export function getBlockSupport( nameOrType, feature, defaultSupports ) {
 	return select( 'core/blocks' ).getBlockSupport( nameOrType, feature, defaultSupports );
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Returns true if the block defines support for a feature, or false otherwise.
  *
- * @param {(string|Object)} nameOrType      Block name or type object.
- * @param {string}          feature         Feature to test.
- * @param {boolean}         defaultSupports Whether feature is supported by
- *                                          default if not explicitly defined.
+ * @param {string|BlockType}    nameOrType        Block name or type object.
+ * @param {keyof BlockSupports} feature           Feature to test.
+ * @param {boolean}             [defaultSupports] Whether feature is supported by default
+ *                                                if not explicitly defined.
  *
  * @return {boolean} Whether block supports feature.
  */
@@ -354,7 +318,7 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
  * special block type that is used to point to a global block stored via the
  * API.
  *
- * @param {Object} blockOrType Block or Block Type to test.
+ * @param {BlockInstance|BlockType} blockOrType Block or Block Type to test.
  *
  * @return {boolean} Whether the given block is a reusable block.
  */
@@ -367,7 +331,7 @@ export function isReusableBlock( blockOrType ) {
  *
  * @param {string} blockName Name of block (example: 'core/columns').
  *
- * @return {Array} Array of child block names.
+ * @return {string[]} Array of child block names.
  */
 export const getChildBlockNames = ( blockName ) => {
 	return select( 'core/blocks' ).getChildBlockNames( blockName );
@@ -399,10 +363,10 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
 /**
  * Registers a new block style variation for the given block.
  *
- * @param {string} blockName      Name of block (example: 'core/paragraph').
- * @param {Object} styleVariation Object containing `name` which is the class
- *                                name applied to the block and `label` which
- *                                identifies the variation to the user.
+ * @param {string}     blockName      Name of block (example: 'core/paragraph').
+ * @param {BlockStyle} styleVariation Object containing `name` which is the class
+ *                                    name applied to the block and `label` which
+ *                                    identifies the variation to the user.
  */
 export const registerBlockStyle = ( blockName, styleVariation ) => {
 	dispatch( 'core/blocks' ).addBlockStyles( blockName, styleVariation );
@@ -411,7 +375,7 @@ export const registerBlockStyle = ( blockName, styleVariation ) => {
 /**
  * Unregisters a block style variation for the given block.
  *
- * @param {string} blockName          Name of block (example: “core/latest-posts”).
+ * @param {string} blockName          Name of block (example: 'core/latest-posts').
  * @param {string} styleVariationName Name of class applied to the block.
  */
 export const unregisterBlockStyle = ( blockName, styleVariationName ) => {

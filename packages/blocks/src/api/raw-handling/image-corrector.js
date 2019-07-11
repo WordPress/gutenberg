@@ -1,3 +1,5 @@
+/* global File */
+
 /**
  * WordPress dependencies
  */
@@ -6,8 +8,12 @@ import { createBlobURL } from '@wordpress/blob';
 /**
  * Browser dependencies
  */
-const { atob, File } = window;
+const { atob } = window;
 
+// eslint-disable-next-line valid-jsdoc
+/**
+ * @type {import('./').NodeFilterFunc}
+ */
 export default function( node ) {
 	if ( node.nodeName !== 'IMG' ) {
 		return;

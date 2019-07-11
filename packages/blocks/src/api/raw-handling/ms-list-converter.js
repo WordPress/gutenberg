@@ -1,12 +1,11 @@
-/**
- * Browser dependencies
- */
-const { parseInt } = window;
-
 function isList( node ) {
 	return node.nodeName === 'OL' || node.nodeName === 'UL';
 }
 
+// eslint-disable-next-line valid-jsdoc
+/**
+ * @type {import('./').NodeFilterFunc}
+ */
 export default function( node, doc ) {
 	if ( node.nodeName !== 'P' ) {
 		return;

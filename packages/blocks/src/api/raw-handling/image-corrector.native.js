@@ -1,11 +1,10 @@
-
+// eslint-disable-next-line valid-jsdoc
 /**
- * This method check for copy pasted img elements to see if they don't have suspicious attributes.
+ * This method check for copy pasted img elements to see if they don't have
+ * suspicious attributes.
  *
- * @param {Node} node The node to check.
- *
- * @return {void}
-*/
+ * @type {import('./').NodeFilterFunc}
+ */
 export default function( node ) {
 	if ( node.nodeName !== 'IMG' ) {
 		return;
