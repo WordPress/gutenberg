@@ -9,9 +9,9 @@ import { _n, sprintf } from '@wordpress/i18n';
 import Stars from './stars';
 
 export const BlockRatings = ( { rating, ratingCount } ) => (
-	<div className="block-ratings">
+	<div className="block-editor-block-ratings">
 		<Stars rating={ rating } />
-		<span className="rating-count">
+		<span className="block-editor-block-ratings__rating-count">
 			{
 				// translators: %d: number of ratings (number).
 				sprintf( _n( '%d total rating', '%d total ratings', ratingCount ), ratingCount )

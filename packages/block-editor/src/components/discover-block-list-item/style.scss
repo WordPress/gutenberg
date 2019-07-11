@@ -1,4 +1,4 @@
-.discover-blocks-list__list-item {
+.block-editor-discover-blocks-list-item {
 	width: 100%;
 	padding: 0;
 	margin: 0 0 12px;
@@ -18,7 +18,13 @@
 	text-align: left;
 }
 
-.discover-blocks-list__item-header {
+.block-editor-discover-blocks-list-item-panel {
+	display: flex;
+	flex-grow: 1;
+	flex-direction: column;
+}
+
+.block-editor-discover-blocks-list-item-header {
 	display: flex;
 	flex-direction: row;
 	padding: 12px 12px 0;
@@ -27,7 +33,7 @@
 		display: flex;
 		flex-grow: 1;
 
-		.discover-blocks-list__item-icon {
+		.block-editor-discover-blocks-list-item__icon {
 			.block-editor-block-icon {
 				width: 36px;
 				height: 36px;
@@ -39,23 +45,22 @@
 		> div {
 			display: flex;
 			flex-direction: column;
-			.discover-blocks-list__item-title {
+			.block-editor-discover-blocks-list-item__title {
 				font-weight: 600;
 				margin-left: 12px;
 			}
-			.block-ratings {
+			.block-editor-block-ratings {
 				margin-left: 12px;
 			}
 		}
 	}
 }
 
-.discover-blocks-list__item-body {
+.block-editor-discover-blocks-list-item-body {
 	display: flex;
 	flex-direction: column;
 	padding: 12px;
-	.discover-blocks-list__item-description {
-		color: $dark-gray-400;
+	.block-editor-discover-blocks-list-item__content--description {
 		margin-top: 4px;
 	}
 	> div {
@@ -80,7 +85,7 @@
 	}
 }
 
-.discover-blocks-list__item-footer {
+.block-editor-discover-blocks-list-item-footer {
 	display: flex;
 	flex-direction: column;
 	padding: 12px;
@@ -88,19 +93,11 @@
 	> span {
 		margin-bottom: 4px;
 	}
-	.discover-blocks-list__item-author-info,
-	.discover-blocks-list__item-support-time {
+	.block-editor-discover-blocks-list-item__content--footer {
 		color: $dark-gray-400;
 	}
 }
 
-.discover-blocks-list__item {
-	font-size: $default-font-size;
-	color: $dark-gray-700;
-}
-
-.discover-blocks-list__item-panel {
-	display: flex;
-	flex-grow: 1;
-	flex-direction: column;
+.block-editor-discover-blocks-list-item__content {
+	color: $dark-gray-400;
 }

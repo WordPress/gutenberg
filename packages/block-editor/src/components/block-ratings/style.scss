@@ -1,4 +1,4 @@
-.block-ratings {
+.block-editor-block-ratings {
 	display: flex;
 	> div {
 		line-height: 1;
@@ -8,7 +8,7 @@
 		font-size: ms(-2);
 		width: 1.1em;
 	}
-	.rating-count {
+	.block-editor-block-ratings__rating-count {
 		color: $dark-gray-400;
 		font-size: ms(-2);
 	}

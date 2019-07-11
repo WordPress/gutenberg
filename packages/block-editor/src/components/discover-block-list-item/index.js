@@ -23,18 +23,18 @@ function DiscoverBlockListItem( {
 	} : {};
 
 	return (
-		<li className="discover-blocks-list__list-item">
-			<div className="discover-blocks-list__item-panel">
-				<div className="discover-blocks-list__item-header">
+		<li className="block-editor-discover-blocks-list-item">
+			<div className="block-editor-discover-blocks-list-item-panel">
+				<div className="block-editor-discover-blocks-list-item-header">
 					<div>
 						<span
-							className="discover-blocks-list__item-icon"
+							className="block-editor-discover-blocks-list-item__icon"
 							style={ itemIconStyle }
 						>
 							<BlockIcon icon={ icon } showColors />
 						</span>
 						<div>
-							<span className="discover-blocks-list__item-title">
+							<span className="block-editor-discover-blocks-list-item__title">
 								{ title }
 							</span>
 							<BlockRatings rating={ 4.5 } ratingCount={ 110 } />
@@ -52,8 +52,8 @@ function DiscoverBlockListItem( {
 						Add
 					</Button>
 				</div>
-				<div className="discover-blocks-list__item-body">
-					<span className="discover-blocks-list__item-description">
+				<div className="block-editor-discover-blocks-list-item-body">
+					<span className="block-editor-discover-blocks-list-item__content--description">
 						{ description }
 					</span>
 					<div>
@@ -65,14 +65,14 @@ function DiscoverBlockListItem( {
 						</div>
 					</div>
 				</div>
-				<div className="discover-blocks-list__item-footer">
-					<span className="discover-blocks-list__item-author-by">
+				<div className="block-editor-discover-blocks-list-item-footer">
+					<span className="block-editor-discover-blocks-list-item__content--footer">
 						Authored by <strong>XXX</strong>
 					</span>
-					<span className="discover-blocks-list__item-author-info">
+					<span className="block-editor-discover-blocks-list-item__content--footer">
 						This author has <strong>X</strong> blocks, with an average rating of <strong>X.X</strong>.
 					</span>
-					<span className="discover-blocks-list__item-support-time">
+					<span className="block-editor-discover-blocks-list-item__content--footer">
 						They have an average support time of <strong>X days</strong>.
 					</span>
 				</div>
