@@ -45,3 +45,5 @@ At the moment when running locally, the app attempts to fire up an appium server
 It's important to ensure that **metro is not running.** This would cause the value of the `__DEV__` variable to be true and load up the sample blocks. 
 
 The finally the test commands in the suite are executed. 
+
+To read more about writing your own tests please read the [contributing guide](https://github.com/wordpress-mobile/gutenberg-mobile/blob/add/test-documentation-readme/__device-tests__/CONTRIBUTING.md)
