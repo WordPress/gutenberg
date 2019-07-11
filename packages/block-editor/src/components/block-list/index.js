@@ -262,9 +262,12 @@ export default compose( [
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
 			getGlobalBlockCount,
+			getFirstAncestorWithZoomSupport,
 		} = select( 'core/block-editor' );
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const zoomedBlockId = getFirstAncestorWithZoomSupport( selectedBlockClientId );
 
-		const { rootClientId } = ownProps;
+		const rootClientId = ownProps.rootClientId || zoomedBlockId;
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
@@ -272,7 +275,7 @@ export default compose( [
 			selectionEnd: getMultiSelectedBlocksEndClientId(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
-			selectedBlockClientId: getSelectedBlockClientId(),
+			selectedBlockClientId,
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
 			enableAnimation: getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,

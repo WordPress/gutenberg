@@ -1405,3 +1405,38 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
 function getReusableBlocks( state ) {
 	return get( state, [ 'settings', '__experimentalReusableBlocks' ], EMPTY_ARRAY );
 }
+
+/**
+ * Returns the first ancestor of the specified block, that supports zoom.
+ * Returns null if there isn't one.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId The block's client ID.
+ *
+ * @return {?string} The zoom supporting ancestor's client ID or null if there isn't one.
+ */
+export const getFirstAncestorWithZoomSupport = createSelector(
+	( state, clientId ) => {
+		let ancestorClientId = clientId;
+		while ( ancestorClientId ) {
+			const blockName = getBlockName( state, ancestorClientId );
+			if ( ! blockName ) {
+				return null;
+			}
+
+			const blockType = getBlockType( blockName );
+			if ( ! blockType ) {
+				return null;
+			}
+
+			if ( hasBlockSupport( blockType, 'zoom', false ) ) {
+				return ancestorClientId;
+			}
+
+			ancestorClientId = getBlockRootClientId( state, ancestorClientId );
+		}
+
+		return ancestorClientId;
+	},
+	( state ) => [ state.blocks.byClientId, getBlockTypes(), state.blocks.parents ]
+);

@@ -1,5 +1,8 @@
 {
 	"name": "core/post-content",
 	"category": "common",
-	"multiple": false
+	"supports": {
+		"multiple": false,
+		"zoom": true
+	}
 }
