@@ -120,19 +120,20 @@ const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
 const { registerPlugin } = wp.plugins;
 
 const Component = () => (
-	<>
-		<PluginSidebarMoreMenuItem
-			target="sidebar-name"
-		>
-			My Sidebar
-		</PluginSidebarMoreMenuItem>
-		<PluginSidebar
-			name="sidebar-name"
-			title="My Sidebar"
-		>
-			Content of the sidebar
-		</PluginSidebar>
-	</>
+   <div className="edit-post-header__custom-sidebar">
+	<PluginSidebarMoreMenuItem 
+            target="sidebar-name" 
+        >
+	    My Sidebar
+	</PluginSidebarMoreMenuItem>
+
+	<PluginSidebar 
+            name="sidebar-name" 
+            title="My Sidebar" 
+        >
+	    Content of the sidebar
+	</PluginSidebar>
+    </div>
 );
 
 registerPlugin( 'plugin-name', {
