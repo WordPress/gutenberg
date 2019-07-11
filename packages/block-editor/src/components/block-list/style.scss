@@ -148,6 +148,7 @@
 		}
 
 		&.is-navigation > .block-editor-block-list__block-edit::before {
+			border-color: $blue-medium-focus;
 			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
 
 			@include break-small() {
@@ -1084,13 +1085,13 @@
 
 		.components-toolbar {
 			background: $white;
-			border: $border-width solid $dark-opacity-light-800;
+			border: $border-width solid $blue-medium-focus;
 			border-left: none;
 			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
 			height: $block-toolbar-height + $border-width;
 
 			.components-button {
-				border-radius: $radius-round-rectangle;
+				box-shadow: none;
 			}
 
 			.is-dark-theme & {
