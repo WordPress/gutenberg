@@ -3,7 +3,7 @@ exports.shortText = `Rock music approaches at high velocity.`;
 exports.mediumText = `The finer continuum interprets the polynomial rabbit. When can the geology runs? An astronomer runs. Should a communist consent?`;
 
 exports.longText = `Beneath the busy continuum blinks the ineffective husband. Why a metric now outside the official subway? How can the prompt crop exhaust his tree 
-Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. Its extraordinary twin shifts behind
+Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. extraordinary twin shifts behind
 The finer continuum interprets the polynomial rabbit. When can the geology runs? An astronomer runs. Should a communist consent?`;
 
 exports.listItem1 = `Milk`;
@@ -43,7 +43,7 @@ exports.blockInsertionHtml = `<!-- wp:paragraph -->
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. Its extraordinary twin shifts behind</p>
+<p>Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. extraordinary twin shifts behind</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -63,7 +63,7 @@ exports.blockInsertionHtmlFromTitle = `<!-- wp:paragraph -->
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. Its extraordinary twin shifts behind</p>
+<p>Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. extraordinary twin shifts behind</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -81,7 +81,7 @@ exports.imageCompletehtml = `<!-- wp:image {"id":1} -->
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. Its extraordinary twin shifts behind</p>
+<p>Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. extraordinary twin shifts behind</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
