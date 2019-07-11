@@ -72,7 +72,7 @@ const PluginDocumentSettingFill = ( { isEnabled, opened, onToggle, className, ti
  * const MyDocumentSettingTest = () => (
  * 		<PluginDocumentSettingPanel className="my-document-setting-plugin">
  *			<p>My Document Setting Panel</p>
- *		</PluginDocumentSetting>
+ *		</PluginDocumentSettingPanel>
  *	);
  *
  *  registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
