@@ -5,6 +5,8 @@
  */
 import {
 	get,
+	omit,
+	pick,
 	isFunction,
 	isPlainObject,
 	some,
@@ -20,6 +22,7 @@ import { select, dispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { isValidIcon, normalizeIconObject } from './utils';
+import { DEPRECATED_ENTRY_KEYS } from './constants';
 
 /**
  * Render behavior of a block type icon; one of a Dashicon slug, an element,
@@ -81,14 +84,14 @@ import { isValidIcon, normalizeIconObject } from './utils';
  *
  * @type {Object}
  */
-const DEFAULT_BLOCK_TYPE_SETTINGS = {
+export const DEFAULT_BLOCK_TYPE_SETTINGS = {
 	icon: 'block-default',
 	attributes: {},
 	keywords: [],
 	save: () => null,
 };
 
-let serverSideBlockDefinitions = {};
+export let serverSideBlockDefinitions = {};
 
 /**
  * Sets the server side block definition of blocks.
@@ -140,10 +143,28 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
+	const preFilterSettings = { ...settings };
 	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
 	if ( settings.deprecated ) {
-		settings.deprecated = settings.deprecated.map( ( deprecation ) => applyFilters( 'blocks.registerBlockType', deprecation, name ) );
+		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
+			pick( // Only keep valid deprecation keys.
+				applyFilters(
+					'blocks.registerBlockType',
+					// Merge deprecation keys with pre-filter settings
+					// so that filters that depend on specific keys being
+					// present don't fail.
+					{
+						// Omit deprecation keys here so that deprecations
+						// can opt out of specific keys like "supports".
+						...omit( preFilterSettings, DEPRECATED_ENTRY_KEYS ),
+						...deprecation,
+					},
+					name
+				),
+				DEPRECATED_ENTRY_KEYS
+			)
+		);
 	}
 
 	if ( ! isPlainObject( settings ) ) {
