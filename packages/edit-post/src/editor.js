@@ -48,7 +48,10 @@ class Editor extends Component {
 		settings = {
 			...settings,
 			__experimentalPreferredStyleVariations: {
-				value: preferredStyleVariations,
+				value: {
+					...( settings.themeAutoApplyStyles || {} ),
+					...preferredStyleVariations,
+				},
 				onChange: updatePreferredStyleVariations,
 			},
 			hasFixedToolbar,

@@ -36,10 +36,7 @@ export default function DefaultStylePicker( { blockName } ) {
 		[ blockName ]
 	);
 	const selectOptions = useMemo(
-		() => ( [
-			{ label: __( 'Not set' ), value: '' },
-			...styles.map( ( { label, name } ) => ( { label, value: name } ) ),
-		] ),
+		() => styles.map( ( { label, name } ) => ( { label, value: name } ) ),
 		[ styles ],
 	);
 	const selectOnChange = useCallback(
