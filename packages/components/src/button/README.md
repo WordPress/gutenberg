@@ -124,6 +124,7 @@ The presence of a `href` prop determines whether an `anchor` element is rendered
 
 Name | Type | Default | Description
 --- | --- | --- | ---
+`disabled` | `bool` | `false` | Whether the button is disabled.
 `href` | `string` | `undefined` | If provided, renders `a` instead of `button`.
 `isDefault` | `bool` | `false` | Renders a default button style.
 `isPrimary` | `bool` | `false` | Renders a primary button style.
