@@ -1,3 +1,7 @@
+1.10.0
+------
+* Adding a block from the post title now shows the add block here indicator.
+
 1.9.0
 ------
 * Enable video block on Android platform
