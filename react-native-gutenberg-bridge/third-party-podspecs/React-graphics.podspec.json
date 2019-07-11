@@ -1,0 +1,34 @@
+{
+  "name": "React-graphics",
+  "version": "0.60.0-patched",
+  "summary": "Fabric for React Native.",
+  "homepage": "http://facebook.github.io/react-native/",
+  "license": "MIT",
+  "authors": "Facebook, Inc. and its affiliates",
+  "platforms": {
+    "ios": "9.0",
+    "tvos": "9.2"
+  },
+  "source": {
+    "git": "https://github.com/jtreanor/react-native.git",
+    "tag": "v0.60.0-patched"
+  },
+  "libraries": "stdc++",
+  "compiler_flags": "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32",
+  "source_files": "**/*.{m,mm,cpp,h}",
+  "exclude_files": [
+    "**/tests/*",
+    "**/android/*"
+  ],
+  "header_dir": "react/graphics",
+  "pod_target_xcconfig": {
+    "USE_HEADERMAP": "NO",
+    "HEADER_SEARCH_PATHS": "\"$(PODS_TARGET_SRCROOT)/ReactCommon\" \"$(PODS_ROOT)/Folly\""
+  },
+  "dependencies": {
+    "Folly/Fabric": [
+      "2018.10.22.00"
+    ]
+  },
+  "prepare_command": "TMP_DIR=$(mktemp -d); mv * $TMP_DIR; cp -R \"$TMP_DIR/ReactCommon/fabric/graphics\"/* . && true"
+}
