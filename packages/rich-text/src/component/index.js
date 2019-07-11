@@ -523,11 +523,13 @@ class RichText extends Component {
 		}
 
 		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
-		const { start, end, text, activeFormats } = this.record;
+		const { activeFormats = [] } = this.state;
+		const value = this.createRecord();
+		const { start, end, text } = value;
 		const isReverse = keyCode === BACKSPACE;
 
 		if ( multilineTag ) {
-			const newValue = removeLineSeparator( this.record, isReverse );
+			const newValue = removeLineSeparator( value, isReverse );
 			if ( newValue ) {
 				this.onChange( newValue );
 				event.preventDefault();
@@ -536,7 +538,7 @@ class RichText extends Component {
 
 		// Always handle full content deletion ourselves.
 		if ( start === 0 && end !== 0 && end === text.length ) {
-			this.onChange( remove( this.record ) );
+			this.onChange( remove( value ) );
 			event.preventDefault();
 			return;
 		}
@@ -544,7 +546,7 @@ class RichText extends Component {
 		// Only process delete if the key press occurs at an uncollapsed edge.
 		if (
 			! onDelete ||
-			! isCollapsed( this.record ) ||
+			! isCollapsed( value ) ||
 			activeFormats.length ||
 			( isReverse && start !== 0 ) ||
 			( ! isReverse && end !== text.length )
@@ -552,7 +554,7 @@ class RichText extends Component {
 			return;
 		}
 
-		onDelete( { isReverse, isEmpty: isEmpty( this.record ) } );
+		onDelete( { isReverse, value } );
 		event.preventDefault();
 	}
 
@@ -589,15 +591,17 @@ class RichText extends Component {
 	handleSpace( event ) {
 		const { tagName, __unstableMultilineTag: multilineTag } = this.props;
 
-		if (
-			event.keyCode !== SPACE ||
-			multilineTag !== 'li' ||
-			! isCollapsed( this.record )
-		) {
+		if ( event.keyCode !== SPACE || multilineTag !== 'li' ) {
 			return;
 		}
 
-		const { text, start } = this.record;
+		const value = this.createRecord();
+
+		if ( ! isCollapsed( value ) ) {
+			return;
+		}
+
+		const { text, start } = value;
 		const characterBefore = text[ start - 1 ];
 
 		// The caret must be at the start of a line.
@@ -605,7 +609,7 @@ class RichText extends Component {
 			return;
 		}
 
-		this.onChange( indentListItems( this.record, { type: tagName } ) );
+		this.onChange( indentListItems( value, { type: tagName } ) );
 		event.preventDefault();
 	}
 
@@ -627,8 +631,9 @@ class RichText extends Component {
 			return;
 		}
 
-		const { text, formats, start, end, activeFormats = [] } = this.record;
-		const collapsed = isCollapsed( this.record );
+		const value = this.record;
+		const { text, formats, start, end, activeFormats = [] } = value;
+		const collapsed = isCollapsed( value );
 		// To do: ideally, we should look at visual position instead.
 		const { direction } = getComputedStyle( this.editableRef );
 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
@@ -693,7 +698,7 @@ class RichText extends Component {
 
 		if ( newActiveFormatsLength !== activeFormats.length ) {
 			const newActiveFormats = source.slice( 0, newActiveFormatsLength );
-			const newValue = { ...this.record, activeFormats: newActiveFormats };
+			const newValue = { ...value, activeFormats: newActiveFormats };
 			this.record = newValue;
 			this.applyRecord( newValue );
 			this.setState( { activeFormats: newActiveFormats } );
@@ -703,7 +708,7 @@ class RichText extends Component {
 		const newPos = start + ( isReverse ? -1 : 1 );
 		const newActiveFormats = isReverse ? formatsBefore : formatsAfter;
 		const newValue = {
-			...this.record,
+			...value,
 			start: newPos,
 			end: newPos,
 			activeFormats: newActiveFormats,
