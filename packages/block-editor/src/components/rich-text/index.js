@@ -42,6 +42,21 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
 
+/**
+ * Get the multiline tag based on the multiline prop.
+ *
+ * @param {?(string|boolean)} multiline The multiline prop.
+ *
+ * @return {?string} The multiline tag.
+ */
+function getMultilineTag( multiline ) {
+	if ( multiline !== true && multiline !== 'p' && multiline !== 'li' ) {
+		return;
+	}
+
+	return multiline === true ? 'p' : multiline;
+}
+
 class RichTextWrapper extends Component {
 	constructor() {
 		super( ...arguments );
@@ -85,7 +100,7 @@ class RichTextWrapper extends Component {
 		}
 	}
 
-	onDelete( { value, isReverse } ) {
+	onDelete( { isEmpty: isValueEmpty, isReverse } ) {
 		const { onMerge, onRemove } = this.props;
 
 		if ( onMerge ) {
@@ -96,13 +111,19 @@ class RichTextWrapper extends Component {
 		// an intentional user interaction distinguishing between Backspace and
 		// Delete to remove the empty field, but also to avoid merge & remove
 		// causing destruction of two fields (merge, then removed merged).
-		if ( onRemove && isEmpty( value ) && isReverse ) {
+		if ( onRemove && isValueEmpty && isReverse ) {
 			onRemove( ! isReverse );
 		}
 	}
 
 	onPaste( { value, onChange, html, plainText, image } ) {
-		const { onReplace, onSplit, tagName, canUserUseUnfilteredHTML } = this.props;
+		const {
+			onReplace,
+			onSplit,
+			tagName,
+			canUserUseUnfilteredHTML,
+			multiline,
+		} = this.props;
 
 		if ( image && ! html ) {
 			const file = image.getAsFile ? image.getAsFile() : image;
@@ -149,7 +170,7 @@ class RichTextWrapper extends Component {
 
 			// If the content should be multiline, we should process text
 			// separated by a line break as separate lines.
-			if ( this.multilineTag ) {
+			if ( multiline ) {
 				valueToInsert = replace( valueToInsert, /\n+/g, LINE_SEPARATOR );
 			}
 
@@ -187,6 +208,7 @@ class RichTextWrapper extends Component {
 		const blocks = [];
 		const [ before, after ] = split( record );
 		const hasPastedBlocks = pastedBlocks.length > 0;
+		const multilineTag = getMultilineTag( multiline );
 
 		// Create a block with the content before the caret if there's no pasted
 		// blocks, or if there are pasted blocks and the value is not empty.
@@ -195,7 +217,7 @@ class RichTextWrapper extends Component {
 		if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
 			blocks.push( onSplit( toHTMLString( {
 				value: before,
-				multilineTag: multiline,
+				multilineTag,
 			} ) ) );
 		}
 
@@ -212,7 +234,7 @@ class RichTextWrapper extends Component {
 		if ( hasPastedBlocks || ! onSplitMiddle || ! isEmpty( after ) ) {
 			blocks.push( onSplit( toHTMLString( {
 				value: after,
-				multilineTag: multiline,
+				multilineTag,
 			} ) ) );
 		}
 
@@ -313,6 +335,7 @@ class RichTextWrapper extends Component {
 			// From experimental filter. To do: pick props instead.
 			...experimentalProps
 		} = this.props;
+		const multilineTag = getMultilineTag( multiline );
 
 		const adjustedAllowedFormats = this.getAllowedFormats();
 		const hasFormats = ! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
@@ -349,7 +372,7 @@ class RichTextWrapper extends Component {
 				__unstableAutocomplete={ Autocomplete }
 				__unstableAutocompleters={ autocompleters }
 				__unstableOnReplace={ onReplace }
-				__unstableMultiline={ multiline }
+				__unstableMultilineTag={ multilineTag }
 				__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
 				__unstableOnEnterFormattedText={ onEnterFormattedText }
 				__unstableOnExitFormattedText={ onExitFormattedText }
@@ -357,7 +380,7 @@ class RichTextWrapper extends Component {
 			>
 				{ ( { isSelected, value, onChange } ) =>
 					<>
-						{ isSelected && multiline === 'li' && (
+						{ isSelected && multilineTag === 'li' && (
 							<ListEdit
 								onTagNameChange={ onTagNameChange }
 								tagName={ tagName }
@@ -445,16 +468,13 @@ const RichTextContainer = compose( [
 
 RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 	let html = value;
-	let MultilineTag;
-
-	if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
-		MultilineTag = multiline === true ? 'p' : multiline;
-	}
 
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
 		html = children.toHTML( value );
 	}
+
+	const MultilineTag = getMultilineTag( multiline );
 
 	if ( ! html && MultilineTag ) {
 		html = `<${ MultilineTag }></${ MultilineTag }>`;
