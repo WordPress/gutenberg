@@ -21,6 +21,7 @@ import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -114,7 +115,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnEditorMountListener {
-        void onEditorDidMount(boolean hasUnsupportedBlocks);
+        void onEditorDidMount(ReadableArray unsupportedBlockNames);
     }
 
     public interface OnAuthHeaderRequestedListener {
@@ -130,7 +131,13 @@ public class WPAndroidGlueCode {
                 // This code is called twice. When getTitle and getContent are called.
                 // Make sure mContentChanged has the correct value (true) if one of the call returned with changes.
                 mContentChanged = mContentChanged || changed;
-                mGetContentCountDownLatch.countDown();
+
+                // Gutenberg mobile sends us html response even without we asking for it so, check if the latch is there.
+                //  This is probably an indication of a bug on the RN side of things though.
+                //  Related: https://github.com/WordPress/gutenberg/pull/16260#issuecomment-506727286
+                if (mGetContentCountDownLatch != null) {
+                    mGetContentCountDownLatch.countDown();
+                }
             }
 
             @Override
@@ -194,8 +201,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void editorDidMount(boolean hasUnsupportedBlocks) {
-                mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
+            public void editorDidMount(ReadableArray unsupportedBlockNames) {
+                mOnEditorMountListener.onEditorDidMount(unsupportedBlockNames);
                 mIsEditorMounted = true;
                 if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
                     setFocusOnTitle();

@@ -4,8 +4,8 @@
 /**
  * External dependencies
  */
-import jsdom from 'jsdom-jscore';
-import jsdomLevel1Core from 'jsdom-jscore/lib/jsdom/level1/core';
+import jsdom from 'jsdom-jscore-rn';
+import jsdomLevel1Core from 'jsdom-jscore-rn/lib/jsdom/level1/core';
 import { nativeLoggingHook } from 'react-native-gutenberg-bridge';
 
 /**
@@ -53,6 +53,8 @@ if ( ! global.window.matchMedia ) {
 		removeListener: () => {},
 	} );
 }
+
+global.window.navigator.userAgent = [];
 
 // Leverages existing console polyfill from react-native
 global.nativeLoggingHook = nativeLoggingHook;

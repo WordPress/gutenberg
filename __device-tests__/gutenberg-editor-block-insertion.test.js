@@ -68,7 +68,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			await editorPage.removeParagraphBlockAtPosition( 3 );
 			for ( let i = 3; i > 0; i-- ) {
 				paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( i );
-				await clickMiddleOfElement( driver, paragraphBlockElement );
+				await paragraphBlockElement.click();
 				await editorPage.removeParagraphBlockAtPosition( i );
 			}
 		} else {
@@ -98,11 +98,11 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await titleElement.click();
 
 		await editorPage.addNewParagraphBlock();
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 4 );
+		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		await clickMiddleOfElement( driver, paragraphBlockElement );
-		await editorPage.sendTextToParagraphBlockAtPosition( 4, testData.mediumText );
+		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.mediumText );
 		await paragraphBlockElement.click();
-		await editorPage.verifyHtmlContent( testData.blockInsertionHtml );
+		await editorPage.verifyHtmlContent( testData.blockInsertionHtmlFromTitle );
 	} );
 
 	afterAll( async () => {

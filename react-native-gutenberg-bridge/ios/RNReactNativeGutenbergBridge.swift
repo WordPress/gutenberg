@@ -85,16 +85,27 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func editorDidMount(_ hasUnsupportedBlocks: Bool) {
+    func editorDidMount(_ unsupportedBlockNames: [AnyObject]) {
+        let unsupportedNames = unsupportedBlockNames.compactMap { $0 as? String }
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidMount(hasUnsupportedBlocks: hasUnsupportedBlocks)
+            self.delegate?.gutenbergDidMount(unsupportedBlockNames: unsupportedNames)
         }
     }
 
     @objc
     func editorDidEmitLog(_ message: String, logLevel: Int) {
-        guard let logLevel = LogLevel(rawValue: logLevel) else { return }
+        guard
+            shouldLog(with: logLevel),
+            let logLevel = LogLevel(rawValue: logLevel)
+        else {
+            return
+        }
+
         delegate?.gutenbergDidEmitLog(message: message, logLevel: logLevel)
+    }
+
+    private func shouldLog(with level: Int) -> Bool {
+        return level >= RCTGetLogThreshold().rawValue
     }
 
     override public func startObserving() {

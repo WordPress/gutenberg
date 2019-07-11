@@ -18,6 +18,8 @@ export default class EditorPage {
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
 	listBlockName = 'List';
+	headingBlockName = 'Heading';
+	imageBlockName = 'Image';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
@@ -83,6 +85,19 @@ export default class EditorPage {
 		await htmlContentView.setText( html );
 
 		await toggleHtmlMode( this.driver, false );
+	}
+
+	async dismissKeyboard() {
+		await this.driver.sleep( 1000 ); /// wait for any keyboard animations
+		const keyboardShown = await this.driver.isKeyboardShown();
+		if ( ! keyboardShown ) {
+			return;
+		}
+		if ( isAndroid() ) {
+			return await this.driver.hideDeviceKeyboard();
+		}
+		const hideKeyboardToolbarButton = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Hide keyboard"]' );
+		await hideKeyboardToolbarButton.click();
 	}
 
 	// =========================
@@ -242,7 +257,7 @@ export default class EditorPage {
 	}
 
 	async hasListBlockAtPosition( position: number ) {
-		return this.hasBlockAtPosition( position, this.listBlockName );
+		return await this.hasBlockAtPosition( position, this.listBlockName );
 	}
 
 	async getTextViewForListBlock( block: wd.PromiseChainWebdriver.Element ) {
@@ -274,6 +289,74 @@ export default class EditorPage {
 	async getTextForListBlockAtPosition( position: number ) {
 		const block = await this.getListBlockAtPosition( position );
 		const text = await this.getTextForListBlock( block );
+		return text.toString();
+	}
+
+	// =========================
+	// Image Block functions
+	// =========================
+
+	async addNewImageBlock() {
+		await this.addNewBlock( this.imageBlockName );
+	}
+
+	async getImageBlockAtPosition( position: number ) {
+		return this.getBlockAtPosition( position, this.imageBlockName );
+	}
+
+	async selectEmptyImageBlock( block: wd.PromiseChainWebdriver.Element ) {
+		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
+		const imageBlockInnerElement = await this.driver.elementByXPath( blockLocator );
+		await imageBlockInnerElement.click();
+	}
+
+	async chooseMediaLibrary() {
+		const mediaLibraryButton = await this.driver.elementByAccessibilityId( 'WordPress Media Library' );
+		await mediaLibraryButton.click();
+	}
+
+	async enterCaptionToSelectedImageBlock( caption: string ) {
+		const imageBlockCaptionField = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Image caption. Empty"]' );
+		await imageBlockCaptionField.click();
+		await typeString( this.driver, imageBlockCaptionField, caption );
+	}
+
+	async removeImageBlockAtPosition( position: number ) {
+		return await this.removeBlockAtPosition( position, this.imageBlockName );
+	}
+
+	// =========================
+	// Heading Block functions
+	// =========================
+	async addNewHeadingBlock() {
+		await this.addNewBlock( this.headingBlockName );
+	}
+
+	async getHeadingBlockAtPosition( position: number ) {
+		return this.getBlockAtPosition( position, this.headingBlockName );
+	}
+
+	// Inner element changes on iOS if Heading Block is empty
+	async getTextViewForHeadingBlock( block: wd.PromiseChainWebdriver.Element, empty: boolean ) {
+		let textViewElementName = empty ? 'XCUIElementTypeStaticText' : 'XCUIElementTypeTextView';
+		if ( isAndroid() ) {
+			textViewElementName = 'android.widget.EditText';
+		}
+
+		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//${ textViewElementName }`;
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async sendTextToHeadingBlock( block: wd.PromiseChainWebdriver.Element, text: string ) {
+		const textViewElement = await this.getTextViewForHeadingBlock( block, true );
+		return await typeString( this.driver, textViewElement, text );
+	}
+
+	async getTextForHeadingBlock( block: wd.PromiseChainWebdriver.Element ) {
+		const textViewElement = await this.getTextViewForHeadingBlock( block, false );
+		const text = await textViewElement.text();
 		return text.toString();
 	}
 }

@@ -6,15 +6,16 @@ commands:
       - restore_cache:
           name: Restore Yarn Cache
           keys:
-            - yarn-v3-{{ arch }}-{{ checksum "yarn.lock" }}
+            - yarn-i18n-v3-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
-          command: YARN_CACHE_FOLDER=~/.cache/yarn yarn install --frozen-lockfile
+          command: yarn install --frozen-lockfile --prefer-offline
       - save_cache:
           name: Save Yarn Cache
-          key: yarn-v3-{{ arch }}-{{ checksum "yarn.lock" }}
+          key: yarn-i18n-v3-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
           paths:
-            - ~/.cache/yarn
+            - node_modules
+            - i18n-cache/data
   checkout-gutenberg:
     steps:
       - run:
@@ -101,6 +102,13 @@ jobs:
         command: |
           echo 'export TEST_RN_PLATFORM=ios' >> $BASH_ENV
           echo 'export TEST_ENV=sauce' >> $BASH_ENV
+    - run:
+        name: Prepare build cache key
+        command: find yarn.lock ios react-native-aztec/ios react-native-gutenberg-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
+    - restore_cache:
+        name: Restore Build Cache
+        keys:
+          - ios-build-cache-{{ checksum "ios-checksums.txt" }}
     - restore_cache:
         name: Restore Dependencies Cache
         keys:
@@ -109,8 +117,8 @@ jobs:
         - dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}
         - dependencies-v2-
     - run:
-        name: Yarn preios
-        command: yarn preios
+        name: Yarn preios (if needed)
+        command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app || yarn preios
     - save_cache:
         name: Save Dependencies Cache
         key: dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
@@ -119,8 +127,14 @@ jobs:
         - react-native-aztec/ios/Carthage
         - ~/.rncache
     - run:
-        name: Bundle iOS and Generate debug .app file for testing
-        command: yarn test:e2e:build-app:ios
+        name: Build (if needed)
+        command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app || yarn react-native run-ios --configuration Release --no-packager
+    - run:
+        name: Bundle iOS
+        command: yarn test:e2e:bundle:ios
+    - run:
+        name: Generate .app file for testing
+        command: WORK_DIR=$(pwd) && cd ./ios/build/gutenberg/Build/Products/Release-iphonesimulator && zip -r $WORK_DIR/ios/Gutenberg.app.zip gutenberg.app
     - run:
         name: Upload .app to sauce labs
         command: |
@@ -134,6 +148,14 @@ jobs:
           JEST_JUNIT_OUTPUT: "reports/test-results/ios-test-results.xml"
     - store_test_results:
         path: ./reports/test-results
+    - run:
+        name: Prepare build cache
+        command: rm ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle
+    - save_cache:
+        name: Save Build Cache
+        key: ios-build-cache-{{ checksum "ios-checksums.txt" }}
+        paths:
+          - ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app
 
 workflows:
   gutenberg-mobile:
