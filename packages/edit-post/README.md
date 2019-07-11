@@ -135,7 +135,7 @@ const { PluginDocumentSettingPanel } = wp.editPost;
 
 const MyDocumentSettingTest = () => (
 	<PluginDocumentSettingPanel className="my-document-setting-plugin">
-	    <p>My Document Setting Panel</p>
+		<p>My Document Setting Panel</p>
 	</PluginDocumentSettingPanel>
 );
 
