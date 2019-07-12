@@ -80,7 +80,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		}
 	} );
 
-	it( 'should be able to insert block at the end of post from the title', async () => {
+	it( 'should be able to insert block at the beginning of post from the title', async () => {
 		await editorPage.addNewParagraphBlock();
 		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
