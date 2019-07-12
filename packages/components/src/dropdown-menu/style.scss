@@ -35,6 +35,12 @@
 			@include dropdown-arrow();
 		}
 	}
+
+	// Add a dropdown arrow indicator.
+	&.components-toolbar .components-dropdown-menu__toggle::after {
+		@include dropdown-arrow();
+	}
+
 }
 
 .components-dropdown-menu__popover .components-popover__content {

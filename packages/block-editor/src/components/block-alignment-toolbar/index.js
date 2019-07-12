@@ -74,15 +74,12 @@ export default compose(
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
-	withSelect( ( select, { clientId, isLargeViewport, isCollapsed } ) => {
-		const { getBlockRootClientId, getSettings } = select( 'core/block-editor' );
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
 		const settings = getSettings();
 		return {
 			wideControlsEnabled: settings.alignWide,
-			isCollapsed: isCollapsed || ! isLargeViewport || (
-				! settings.hasFixedToolbar &&
-				getBlockRootClientId( clientId )
-			),
+			isCollapsed: true,
 		};
 	} ),
 )( BlockAlignmentToolbar );
