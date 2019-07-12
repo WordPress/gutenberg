@@ -323,8 +323,8 @@ export class TableEdit extends Component {
 	getTableControls() {
 		const { selection } = this.state;
 
-		const canPerformRowOperations = selection && includes( selection.type, [ 'cell', 'row' ] );
-		const canPerformColumnOperations = selection && includes( selection.type, [ 'cell', 'column' ] );
+		const canPerformRowOperations = selection && includes( [ 'cell', 'row' ], selection.type );
+		const canPerformColumnOperations = selection && includes( [ 'cell', 'column' ], selection.type );
 
 		return [
 			{

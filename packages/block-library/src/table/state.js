@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import { times, get, mapValues, every, includes } from 'lodash';
-
-const MULTI_SELECTION_TYPES = [
-	'table',
-	'column',
-	'row',
-];
+import { times, get, mapValues, every } from 'lodash';
 
 /**
  * Creates a table state.
@@ -230,10 +224,10 @@ export function isEmptyRow( row ) {
  * @param {Object} cellLocation The cell to check
  * @param {Object} selection    The selection data
  *
- * @return {boolean} True if the cell is within a seleciton, false otherwise.
+ * @return {boolean} True if the cell is within a selection, false otherwise.
  */
 export function isCellInMultiSelection( cellLocation, selection ) {
-	if ( ! cellLocation || ! selection || includes( selection.type, MULTI_SELECTION_TYPES ) ) {
+	if ( ! cellLocation || ! selection ) {
 		return false;
 	}
 
@@ -241,10 +235,42 @@ export function isCellInMultiSelection( cellLocation, selection ) {
 		case 'table':
 			return true;
 		case 'row':
-			return cellLocation.section === selection.section && cellLocation.rowIndex === selection.rowIndex;
+			return isRowSelected( cellLocation, selection );
 		case 'column':
-			return cellLocation.columnIndex === selection.columnIndex;
+			return isColumnSelected( cellLocation, selection );
+		case 'cell':
+			return false;
 	}
+}
+
+/**
+ * Determines if a cell is within a row selection.
+ *
+ * @param {Object} cellLocation The cell to check
+ * @param {Object} selection    The selection data
+ *
+ * @return {boolean} True if the cell is within a selection, false otherwise.
+ */
+export function isRowSelected( cellLocation, selection ) {
+	if ( ! cellLocation || ! selection ) {
+		return false;
+	}
+	return selection.type === 'row' && cellLocation.section === selection.section && cellLocation.rowIndex === selection.rowIndex;
+}
+
+/**
+ * Determines if a cell is within a column selection.
+ *
+ * @param {Object} cellLocation The cell to check
+ * @param {Object} selection    The selection data
+ *
+ * @return {boolean} True if the cell is within a selection, false otherwise.
+ */
+export function isColumnSelected( cellLocation, selection ) {
+	if ( ! cellLocation || ! selection ) {
+		return false;
+	}
+	return selection.type === 'column' && cellLocation.columnIndex === selection.columnIndex;
 }
 
 /**
