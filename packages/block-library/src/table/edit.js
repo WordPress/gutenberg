@@ -41,6 +41,8 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 	isCellInMultiSelection,
+	isRowSelected,
+	isColumnSelected,
 	getCellAbove,
 	getCellBelow,
 	getCellToRight,
@@ -409,15 +411,20 @@ export class TableEdit extends Component {
 								>
 									{ showBlockSelectionControls && rowIndex === 0 && columnIndex === 0 && (
 										<IconButton
-											className="wp-block-table__table-selection-button"
+											className={ classnames( 'wp-block-table__table-selection-button', {
+												'is-selected': isInMultiCellSelection && selection.type === 'table',
+											} ) }
 											label={ __( 'Select all' ) }
 											icon="grid-view"
 											onClick={ () => this.setState( { selection: { type: 'table' } } ) }
+											aria-pressed={ isInMultiCellSelection && selection.type === 'table' }
 										/>
 									) }
 									{ columnIndex === 0 && (
 										<IconButton
-											className="wp-block-table__row-selection-button"
+											className={ classnames( 'wp-block-table__row-selection-button', {
+												'is-selected': isInMultiCellSelection && isRowSelected( cellLocation, selection ),
+											} ) }
 											label={ __( 'Select row' ) }
 											icon="arrow-right"
 											onClick={ () => this.setState( {
@@ -427,11 +434,14 @@ export class TableEdit extends Component {
 													rowIndex,
 												},
 											} ) }
+											aria-pressed={ isInMultiCellSelection && isRowSelected( cellLocation, selection ) }
 										/>
 									) }
 									{ showBlockSelectionControls && rowIndex === 0 && (
 										<IconButton
-											className="wp-block-table__column-selection-button"
+											className={ classnames( 'wp-block-table__column-selection-button', {
+												'is-selected': isInMultiCellSelection && isColumnSelected( cellLocation, selection ),
+											} ) }
 											label={ __( 'Select column' ) }
 											icon="arrow-down"
 											onClick={ () => this.setState( {
@@ -440,6 +450,7 @@ export class TableEdit extends Component {
 													columnIndex,
 												},
 											} ) }
+											aria-pressed={ isInMultiCellSelection && isColumnSelected( cellLocation, selection ) }
 										/>
 									) }
 									<RichText

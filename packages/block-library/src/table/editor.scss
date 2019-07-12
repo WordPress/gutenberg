@@ -111,10 +111,19 @@
 	&__row-selection-button,
 	&__column-selection-button {
 		position: absolute;
+		border-radius: 0;
 
 		// Ensure the icon is centered, even when the button is very narrow.
 		padding: 0;
 		justify-content: center;
+
+		&.is-selected,
+		&.is-selected:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
+		&.is-selected:focus,
+		&.is-selected:not(:disabled):not([aria-disabled="true"]):not(.is-default):active {
+			background: $blue-medium-500;
+			color: $white;
+		}
 
 		.dashicon {
 			margin: 0 auto;
