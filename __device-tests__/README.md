@@ -42,8 +42,10 @@ At the moment when running locally, the app attempts to fire up an appium server
 * on Android, a debug version of the app is bundled, built, and used. 
 * on iOS a release version is bundled built and used. 
 
-It's important to ensure that **metro is not running.** This would cause the value of the `__DEV__` variable to be true and load up the sample blocks. 
+**It's important to ensure that **metro is not running.** This would cause the value of the `__DEV__` variable to be true and load up the sample blocks.** 
 
-The finally the test commands in the suite are executed. 
+After the build is complete, an appium server is fired up on port 4723 and the device tests are ran on the connected device/simulator. 
+
+-----
 
 To read more about writing your own tests please read the [contributing guide](https://github.com/wordpress-mobile/gutenberg-mobile/blob/add/test-documentation-readme/__device-tests__/CONTRIBUTING.md)
