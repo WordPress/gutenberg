@@ -81,3 +81,10 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
 /**
  * End: Include for phase 2
  */
+
+
+function gutenberg_register_rest_blocks_search() {
+	$blocks_search_controller = new WP_REST_Blocks_Search_Controller();
+	$blocks_search_controller->register_routes();
+}
+add_filter( 'rest_api_init', 'gutenberg_register_rest_blocks_search' ); 

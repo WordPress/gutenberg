@@ -25,6 +25,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	/**
 	* End: Include for phase 2
 	*/
+
+	if ( ! class_exists( 'WP_REST_Blocks_Search_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-blocks-search-controller.php';
+	}
+
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
 

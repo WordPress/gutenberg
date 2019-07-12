@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createRegistryControl } from '@wordpress/data';
+import wpApiFetch from '@wordpress/api-fetch';
 
 /**
  * Calls a selector using the current state.
@@ -39,9 +40,7 @@ const controls = {
 		return registry.select( storeName )[ selectorName ]( ...args );
 	} ),
 	API_FETCH( { request } ) {
-		// todo: replace with wp.api-fetch for real implementation
-		return window.fetch( request.path )
-			.then( ( response ) => response.json() );
+		return wpApiFetch( { ... request } );
 	},
 };
 
