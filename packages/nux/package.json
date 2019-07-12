@@ -27,7 +27,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.14",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

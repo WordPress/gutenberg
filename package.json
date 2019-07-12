@@ -115,7 +115,7 @@
 		"jsdom": "11.12.0",
 		"lerna": "3.14.1",
 		"lint-staged": "8.1.5",
-		"lodash": "4.17.11",
+		"lodash": "4.17.14",
 		"make-dir": "3.0.0",
 		"metro-react-native-babel-preset": "0.55.0",
 		"metro-react-native-babel-transformer": "0.55.0",
