@@ -24,6 +24,7 @@ import { isValidBlockContent } from './validation';
 import { getCommentDelimitedContent } from './serializer';
 import { attr, html, text, query, node, children, prop } from './matchers';
 import { normalizeBlockType } from './utils';
+import { DEPRECATED_ENTRY_KEYS } from './constants';
 
 /**
  * Sources which are guaranteed to return a string value.
@@ -324,7 +325,7 @@ export function getMigratedBlock( block, parsedAttributes ) {
 		// parsing are not considered in the deprecated block type by default,
 		// and must be explicitly provided.
 		const deprecatedBlockType = Object.assign(
-			omit( blockType, [ 'attributes', 'save', 'supports' ] ),
+			omit( blockType, DEPRECATED_ENTRY_KEYS ),
 			deprecatedDefinitions[ i ]
 		);
 

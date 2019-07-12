@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, get, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,8 +29,10 @@ import {
 	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
+	serverSideBlockDefinitions,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '../registration';
+import { DEPRECATED_ENTRY_KEYS } from '../constants';
 
 describe( 'blocks', () => {
 	const defaultBlockSettings = { save: noop, category: 'common', title: 'block title' };
@@ -339,6 +341,7 @@ describe( 'blocks', () => {
 			} );
 
 			it( 'should apply the blocks.registerBlockType filter to each of the deprecated settings as well as the main block settings', () => {
+				const name = 'my-plugin/fancy-block-13';
 				const blockSettingsWithDeprecations = {
 					...defaultBlockSettings,
 					deprecated: [
@@ -355,7 +358,28 @@ describe( 'blocks', () => {
 					],
 				};
 
+				let i = 0;
 				addFilter( 'blocks.registerBlockType', 'core/blocks/without-title', ( settings ) => {
+					// Verify that for deprecations, the filter is called with a merge of pre-filter
+					// settings with deprecation keys omitted and the deprecation entry.
+					if ( i > 0 ) {
+						expect( settings ).toEqual( {
+							...omit(
+								{
+									name,
+									save() {
+										return null;
+									},
+									...get( serverSideBlockDefinitions, name ),
+									...blockSettingsWithDeprecations,
+								},
+								DEPRECATED_ENTRY_KEYS
+							),
+							...blockSettingsWithDeprecations.deprecated[ i - 1 ],
+						} );
+					}
+					i++;
+
 					return {
 						...settings,
 						attributes: {
@@ -367,11 +391,14 @@ describe( 'blocks', () => {
 					};
 				} );
 
-				const block = registerBlockType( 'my-plugin/fancy-block-13', blockSettingsWithDeprecations );
+				const block = registerBlockType( name, blockSettingsWithDeprecations );
 
 				expect( block.attributes.id ).toEqual( { type: 'string' } );
-				expect( block.deprecated[ 0 ].attributes.id ).toEqual( { type: 'string' } );
-				expect( block.deprecated[ 1 ].attributes.id ).toEqual( { type: 'string' } );
+				block.deprecated.forEach( ( deprecation ) => {
+					expect( deprecation.attributes.id ).toEqual( { type: 'string' } );
+					// Verify that the deprecation's keys are a subset of deprecation keys.
+					expect( deprecation ).toEqual( pick( deprecation, DEPRECATED_ENTRY_KEYS ) );
+				} );
 			} );
 		} );
 	} );
