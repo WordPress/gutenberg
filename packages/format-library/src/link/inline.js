@@ -210,7 +210,7 @@ class InlineLinkUI extends Component {
 				) }
 			>
 				{ showInput ? (
-					<URLPopover.__experimentalLinkEditor
+					<URLPopover.LinkEditor
 						className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 						value={ inputValue }
 						onChangeInputValue={ this.onChangeInputValue }
@@ -220,11 +220,11 @@ class InlineLinkUI extends Component {
 						autocompleteRef={ this.autocompleteRef }
 					/>
 				) : (
-					<URLPopover.__experimentalLinkViewer
+					<URLPopover.LinkViewer
 						className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
 						onKeyPress={ stopKeyPropagation }
 						url={ url }
-						editLink={ this.editLink }
+						onEditLinkClick={ this.editLink }
 						linkClassName={ isValidHref( prependHTTP( url ) ) ? undefined : 'has-invalid-link' }
 					/>
 				) }
