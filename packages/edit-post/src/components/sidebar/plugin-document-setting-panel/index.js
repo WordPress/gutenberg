@@ -53,6 +53,7 @@ const PluginDocumentSettingFill = ( { isEnabled, opened, onToggle, className, ti
  * 		PluginDocumentSettingPanel,
  * 		{
  * 			className: 'my-document-setting-plugin',
+ * 			title: 'My Panel',
  * 		},
  * 		__( 'My Document Setting Panel' )
  * 	);
@@ -70,7 +71,7 @@ const PluginDocumentSettingFill = ( { isEnabled, opened, onToggle, className, ti
  * const { PluginDocumentSettingPanel } = wp.editPost;
  *
  * const MyDocumentSettingTest = () => (
- * 		<PluginDocumentSettingPanel className="my-document-setting-plugin">
+ * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
  *			<p>My Document Setting Panel</p>
  *		</PluginDocumentSettingPanel>
  *	);
