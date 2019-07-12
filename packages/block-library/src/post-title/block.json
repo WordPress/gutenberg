@@ -6,6 +6,11 @@
 			"type": "string",
 			"source": "post",
 			"attribute": "title"
+		},
+		"slug": {
+			"type": "string",
+			"source": "post",
+			"attribute": "slug"
 		}
 	}
 }

@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
-/**
- * WordPress dependencies
- */
+import { cleanForSlug } from '@wordpress/editor';
 import { RichText } from '@wordpress/block-editor';
 
 export default function PostTitleEdit( {
@@ -15,7 +12,7 @@ export default function PostTitleEdit( {
 	return (
 		<RichText
 			value={ title }
-			onChange={ ( value ) => setAttributes( { title: value } ) }
+			onChange={ ( value ) => setAttributes( { title: value, slug: cleanForSlug( value ) } ) }
 			tagName="h1"
 			placeholder={ __( 'Title' ) }
 			formattingControls={ [] }
