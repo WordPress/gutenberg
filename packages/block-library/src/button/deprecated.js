@@ -2,11 +2,15 @@
  * External dependencies
  */
 import { omit } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import {
+	RichText,
+	getColorClassName,
+} from '@wordpress/block-editor';
 
 const colorsMigration = ( attributes ) => {
 	return omit( {
@@ -37,6 +41,67 @@ const blockAttributes = {
 };
 
 const deprecated = [
+	{
+		attributes: {
+			...blockAttributes,
+			align: {
+				type: 'string',
+				default: 'none',
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+			customBackgroundColor: {
+				type: 'string',
+			},
+			customTextColor: {
+				type: 'string',
+			},
+		},
+		save( { attributes } ) {
+			const {
+				url,
+				text,
+				title,
+				backgroundColor,
+				textColor,
+				customBackgroundColor,
+				customTextColor,
+			} = attributes;
+
+			const textClass = getColorClassName( 'color', textColor );
+			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+
+			const buttonClasses = classnames( 'wp-block-button__link', {
+				'has-text-color': textColor || customTextColor,
+				[ textClass ]: textClass,
+				'has-background': backgroundColor || customBackgroundColor,
+				[ backgroundClass ]: backgroundClass,
+			} );
+
+			const buttonStyle = {
+				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				color: textClass ? undefined : customTextColor,
+			};
+
+			return (
+				<div>
+					<RichText.Content
+						tagName="a"
+						className={ buttonClasses }
+						href={ url }
+						title={ title }
+						style={ buttonStyle }
+						value={ text }
+					/>
+				</div>
+			);
+		},
+		migrate: colorsMigration,
+	},
 	{
 		attributes: {
 			...blockAttributes,

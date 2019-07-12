@@ -15,6 +15,26 @@ import { ReadableContentView } from '@wordpress/components';
 import styles from './style.scss';
 
 class VisualEditor extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.onPostTitleSelect = this.onPostTitleSelect.bind( this );
+		this.onPostTitleUnselect = this.onPostTitleUnselect.bind( this );
+
+		this.state = {
+			isPostTitleSelected: false,
+		};
+	}
+
+	onPostTitleSelect() {
+		this.setState( { isPostTitleSelected: true } );
+		this.props.clearSelectedBlock();
+	}
+
+	onPostTitleUnselect() {
+		this.setState( { isPostTitleSelected: false } );
+	}
+
 	renderHeader() {
 		const {
 			editTitle,
@@ -28,6 +48,9 @@ class VisualEditor extends Component {
 					innerRef={ setTitleRef }
 					title={ title }
 					onUpdate={ editTitle }
+					onSelect={ this.onPostTitleSelect }
+					onUnselect={ this.onPostTitleUnselect }
+					isSelected={ this.state.isPostTitleSelected }
 					placeholder={ __( 'Add title' ) }
 					borderStyle={
 						this.props.isFullyBordered ?
@@ -63,6 +86,7 @@ class VisualEditor extends Component {
 					isFullyBordered={ isFullyBordered }
 					rootViewHeight={ rootViewHeight }
 					safeAreaBottomInset={ safeAreaBottomInset }
+					isPostTitleSelected={ this.state.isPostTitleSelected }
 				/>
 			</BlockEditorProvider>
 		);
@@ -87,7 +111,10 @@ export default compose( [
 			resetEditorBlocks,
 		} = dispatch( 'core/editor' );
 
+		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
+
 		return {
+			clearSelectedBlock,
 			editTitle( title ) {
 				editPost( { title } );
 			},

@@ -7,6 +7,7 @@
 		padding: 0.8em 1em;
 		border: 1px solid $light-gray-500;
 		border-radius: 4px;
+		max-height: 250px;
 
 		/* Fonts smaller than 16px causes mobile safari to zoom. */
 		font-size: $mobile-text-min-font-size;
