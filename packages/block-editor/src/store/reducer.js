@@ -587,6 +587,7 @@ export const blocks = flow(
 				return getFlattenedBlocksWithoutAttributes( action.blocks );
 
 			case 'RECEIVE_BLOCKS':
+			case 'INSERT_BLOCKS':
 				return {
 					...state,
 					...getFlattenedBlocksWithoutAttributes( action.blocks ),
@@ -612,12 +613,6 @@ export const blocks = flow(
 					},
 				};
 
-			case 'INSERT_BLOCKS':
-				return {
-					...state,
-					...getFlattenedBlocksWithoutAttributes( action.blocks ),
-				};
-
 			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				if ( ! action.blocks ) {
 					return state;
@@ -641,6 +636,7 @@ export const blocks = flow(
 				return getFlattenedBlockAttributes( action.blocks );
 
 			case 'RECEIVE_BLOCKS':
+			case 'INSERT_BLOCKS':
 				return {
 					...state,
 					...getFlattenedBlockAttributes( action.blocks ),
@@ -686,12 +682,6 @@ export const blocks = flow(
 				return {
 					...state,
 					[ action.clientId ]: nextAttributes,
-				};
-
-			case 'INSERT_BLOCKS':
-				return {
-					...state,
-					...getFlattenedBlockAttributes( action.blocks ),
 				};
 
 			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
