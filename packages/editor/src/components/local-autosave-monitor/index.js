@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { once, pickBy, negate, isUndefined, uniqueId, omit } from 'lodash';
+import { once, uniqueId, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -97,7 +97,7 @@ function useAutosaveNotice() {
 		}
 
 		const { post_title: title, content, excerpt } = autosave;
-		const edits = pickBy( { title, content, excerpt }, negate( isUndefined ) );
+		const edits = { title, content, excerpt };
 
 		// Only display a notice if there is a difference between what has been
 		// saved and that which is stored in localStorage.
