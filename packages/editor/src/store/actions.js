@@ -11,6 +11,7 @@ import deprecated from '@wordpress/deprecated';
 import { dispatch, select, apiFetch } from '@wordpress/data-controls';
 import {
 	parse,
+	validate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
@@ -35,6 +36,17 @@ import {
 } from './utils/notice-builder';
 import { awaitNextStateChange, getRegistry } from './controls';
 import * as sources from './block-sources';
+
+/**
+ * Default values for `resetEditorBlocks` action creator options.
+ *
+ * @typedef {Object} WPEditorResetEditorBlocksActionOptions
+ *
+ * @property {boolean} validate Whether to run validator over provided blocks.
+ */
+const DEFAULT_RESET_EDITOR_BLOCKS_OPTIONS = {
+	validate: false,
+};
 
 /**
  * Map of Registry instance to WeakMap of dependencies by custom source.
@@ -167,7 +179,7 @@ export function* setupEditor( post, edits, template ) {
 		content = post.content.raw;
 	}
 
-	let blocks = parse( content );
+	let blocks = parse( content, { validate: false } );
 
 	// Apply a template for new posts only, if exists.
 	const isNewPost = post.status === 'auto-draft';
@@ -183,7 +195,7 @@ export function* setupEditor( post, edits, template ) {
 		edits,
 		template,
 	};
-	yield resetEditorBlocks( blocks );
+	yield resetEditorBlocks( blocks, { validate: true } );
 	yield setupEditorState( post );
 	yield* __experimentalSubscribeSources();
 }
@@ -901,12 +913,16 @@ export function unlockPostSaving( lockName ) {
 /**
  * Returns an action object used to signal that the blocks have been updated.
  *
- * @param {Array}   blocks  Block Array.
- * @param {?Object} options Optional options.
+ * @param {Array}                                   blocks  Block Array.
+ * @param {?WPEditorResetEditorBlocksActionOptions} options Optional options.
  *
  * @return {Object} Action object
  */
-export function* resetEditorBlocks( blocks, options = {} ) {
+export function* resetEditorBlocks( blocks, options = DEFAULT_RESET_EDITOR_BLOCKS_OPTIONS ) {
+	if ( options !== DEFAULT_RESET_EDITOR_BLOCKS_OPTIONS ) {
+		options = { ...DEFAULT_RESET_EDITOR_BLOCKS_OPTIONS, ...options };
+	}
+
 	const lastBlockAttributesChange = yield select( 'core/block-editor', '__experimentalGetLastBlockAttributeChanges' );
 
 	// Sync to sources from block attributes updates.
@@ -941,6 +957,10 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		// skips a reset which would otherwise occur by dependencies change.
 		// This assures that at most one reset occurs per block change.
 		yield* resetLastBlockSourceDependencies( Array.from( updatedSources ) );
+	}
+
+	if ( options.validate ) {
+		validate( blocks );
 	}
 
 	return {

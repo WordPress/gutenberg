@@ -1203,7 +1203,7 @@ Returns an action object used to signal that the blocks have been updated.
 _Parameters_
 
 -   _blocks_ `Array`: Block Array.
--   _options_ `?Object`: Optional options.
+-   _options_ `?WPEditorResetEditorBlocksActionOptions`: Optional options.
 
 _Returns_
 

@@ -99,8 +99,8 @@ export default compose( [
 				editPost( { content } );
 			},
 			onPersist( content ) {
-				const blocks = parse( content );
-				resetEditorBlocks( blocks );
+				const blocks = parse( content, { validate: false } );
+				resetEditorBlocks( blocks, { validate: true } );
 			},
 		};
 	} ),
