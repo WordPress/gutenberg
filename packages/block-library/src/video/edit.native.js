@@ -238,6 +238,7 @@ class VideoEdit extends React.Component {
 								value={ caption }
 								placeholder={ __( 'Write caption…' ) }
 								onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+								onFocus={ this.props.onFocus }
 							/>
 						</View>
 					) }
