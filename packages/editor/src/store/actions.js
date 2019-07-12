@@ -170,8 +170,9 @@ export function* setupEditor( post, edits, template ) {
 
 	let blocks = parse( content );
 
-	// Apply a template for new posts only, if exists.
-	if ( template ) {
+	// If a template is supplied, apply it if it's editable
+	// or if it's static and the post is new.
+	if ( template && ( template.post_content || post.status === 'auto-draft' ) ) {
 		blocks = synchronizeBlocksWithTemplate(
 			blocks,
 			template.post_content ? parse( template.post_content ) : template
