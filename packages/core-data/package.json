@@ -28,7 +28,7 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/url": "file:../url",
 		"equivalent-key-map": "^0.2.2",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.14",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
