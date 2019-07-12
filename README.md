@@ -37,7 +37,7 @@ $ git submodule update
 Before running the demo app, you need to download and install the project dependencies. This is done via the following command:
 
 ```
-nvm install v8.12.0
+nvm install --latest-npm
 yarn install
 ```
 

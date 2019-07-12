@@ -1,6 +1,6 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableArray;
@@ -96,8 +96,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void editorDidMount(boolean hasUnsupportedBlocks) {
-        mGutenbergBridgeJS2Parent.editorDidMount(hasUnsupportedBlocks);
+    public void editorDidMount(ReadableArray unsupportedBlockNames) {
+        mGutenbergBridgeJS2Parent.editorDidMount(unsupportedBlockNames);
     }
 
     @ReactMethod

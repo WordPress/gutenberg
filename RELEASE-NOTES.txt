@@ -1,3 +1,10 @@
+1.9.0
+------
+* Enable video block on Android platform
+* Tapping on an empty editor area will create a new paragraph block
+* Fix content loss issue when loading unsupported blocks containing inner blocks.
+* Adding a block from the Post Title now inserts the block at the top of the Post.
+
 1.8.0
 ------
 * Fix pasting simple text on Post Title

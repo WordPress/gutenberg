@@ -7,7 +7,7 @@ import android.content.MutableContextWrapper;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +21,7 @@ import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -37,6 +38,7 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -114,7 +116,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnEditorMountListener {
-        void onEditorDidMount(boolean hasUnsupportedBlocks);
+        void onEditorDidMount(ArrayList<Object> unsupportedBlockNames);
     }
 
     public interface OnAuthHeaderRequestedListener {
@@ -200,8 +202,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void editorDidMount(boolean hasUnsupportedBlocks) {
-                mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
+            public void editorDidMount(ReadableArray unsupportedBlockNames) {
+                mOnEditorMountListener.onEditorDidMount(unsupportedBlockNames.toArrayList());
                 mIsEditorMounted = true;
                 if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
                     setFocusOnTitle();

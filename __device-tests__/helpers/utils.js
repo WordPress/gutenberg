@@ -114,9 +114,28 @@ const setupDriver = async () => {
 
 	await driver.setImplicitWaitTimeout( 2000 );
 	await timer( 3000 );
-
 	await driver.setOrientation( 'PORTRAIT' );
-	return driver;
+
+	// Proxy driver to patch functions on Android
+	// This is needed to adapt to changes in the way accessibility ids are being
+	// assigned after migrating to AndroidX and React Native 0.60. See:
+	// https://github.com/wordpress-mobile/gutenberg-mobile/pull/1112#issuecomment-501165250
+	// for more details.
+	return new Proxy( driver, {
+		get: ( original, property ) => {
+			const propertiesToPatch = [
+				'elementByAccessibilityId',
+				'hasElementByAccessibilityId',
+			];
+			if ( isAndroid() && ( propertiesToPatch.includes( property ) ) ) {
+				return async function( value, cb ) {
+					// Add a comma and a space to all ids
+					return await original[ property ]( `${ value }, `, cb );
+				};
+			}
+			return original[ property ];
+		},
+	} );
 };
 
 const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
@@ -216,7 +235,9 @@ const tapCopyAboveElement = async ( driver: wd.PromiseChainWebdriver, element: w
 	const action = await new wd.TouchAction( driver );
 	const x = location.x + 220;
 	const y = location.y - 50;
+	action.wait( 2000 );
 	action.press( { x, y } );
+	action.wait( 2000 );
 	action.release();
 	await action.perform();
 };
@@ -225,7 +246,9 @@ const tapCopyAboveElement = async ( driver: wd.PromiseChainWebdriver, element: w
 const tapPasteAboveElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
+	action.wait( 2000 );
 	action.press( { x: location.x + 100, y: location.y - 50 } );
+	action.wait( 2000 );
 	action.release();
 	await action.perform();
 };

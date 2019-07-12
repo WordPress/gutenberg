@@ -1,6 +1,8 @@
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 # Use the same RN version that the JS tools use
 react_native_version = package['dependencies']['react-native']
+# Extract the tagged version if package.json points to a tag
+react_native_version = react_native_version.split("#v").last if react_native_version.include? "#v"
 
 Pod::Spec.new do |s|
   s.name             = 'Gutenberg'
@@ -14,19 +16,11 @@ Pod::Spec.new do |s|
   s.source_files = 'react-native-gutenberg-bridge/ios/*.{h,m,swift}'
   s.requires_arc = true
   s.preserve_paths = 'bundle/ios/*'
+  s.swift_version = '4.2'
 
-  s.dependency 'React/Core', react_native_version
-  s.dependency 'React/CxxBridge', react_native_version
-  s.dependency 'React/RCTAnimation', react_native_version
-  s.dependency 'React/RCTImage', react_native_version
-  s.dependency 'React/RCTLinkingIOS', react_native_version
-  s.dependency 'React/RCTNetwork', react_native_version
-  s.dependency 'React/RCTText', react_native_version
-  s.dependency 'React/RCTActionSheet', react_native_version
-  s.dependency 'React/DevSupport', react_native_version
+  s.dependency 'React', react_native_version
+  s.dependency 'React-RCTImage', react_native_version
 
   s.dependency 'WordPress-Aztec-iOS'
   s.dependency 'RNTAztecView'
-
-  s.dependency 'yoga', "#{react_native_version}.React"
 end

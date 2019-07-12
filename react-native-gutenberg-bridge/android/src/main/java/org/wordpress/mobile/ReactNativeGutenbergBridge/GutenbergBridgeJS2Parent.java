@@ -1,9 +1,11 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
+import com.facebook.react.bridge.ReadableArray;
+
 public interface GutenbergBridgeJS2Parent {
     void responseHtml(String title, String html, boolean changed);
 
-    void editorDidMount(boolean hasUnsupportedBlocks);
+    void editorDidMount(ReadableArray unsupportedBlockNames);
 
     interface MediaSelectedCallback {
         void onMediaSelected(int mediaId, String mediaUrl);
