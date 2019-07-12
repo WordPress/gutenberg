@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -93,9 +94,6 @@ export class TableEdit extends Component {
 		this.onDeleteColumn = this.onDeleteColumn.bind( this );
 		this.onToggleHeaderSection = this.onToggleHeaderSection.bind( this );
 		this.onToggleFooterSection = this.onToggleFooterSection.bind( this );
-		this.onSelectTable = this.onSelectTable.bind( this );
-		this.onSelectRow = this.onSelectRow.bind( this );
-		this.onSelectColumn = this.onSelectColumn.bind( this );
 		this.getMultiSelectionClasses = this.getMultiSelectionClasses.bind( this );
 
 		this.state = {
@@ -291,33 +289,6 @@ export class TableEdit extends Component {
 		setAttributes( deleteColumn( attributes, { section, columnIndex } ) );
 	}
 
-	onSelectTable() {
-		this.setState( {
-			selection: {
-				type: 'table',
-			},
-		} );
-	}
-
-	onSelectColumn( columnIndex ) {
-		this.setState( {
-			selection: {
-				type: 'column',
-				columnIndex,
-			},
-		} );
-	}
-
-	onSelectRow( section, rowIndex ) {
-		this.setState( {
-			selection: {
-				type: 'row',
-				section,
-				rowIndex,
-			},
-		} );
-	}
-
 	getMultiSelectionClasses( cellLocation, selection ) {
 		const { attributes } = this.props;
 
@@ -352,41 +323,44 @@ export class TableEdit extends Component {
 	getTableControls() {
 		const { selection } = this.state;
 
+		const canPerformRowOperations = selection && includes( selection.type, [ 'cell', 'row' ] );
+		const canPerformColumnOperations = selection && includes( selection.type, [ 'cell', 'column' ] );
+
 		return [
 			{
 				icon: 'table-row-before',
 				title: __( 'Add Row Before' ),
-				isDisabled: ! selection,
+				isDisabled: ! canPerformRowOperations,
 				onClick: this.onInsertRowBefore,
 			},
 			{
 				icon: 'table-row-after',
 				title: __( 'Add Row After' ),
-				isDisabled: ! selection,
+				isDisabled: ! canPerformRowOperations,
 				onClick: this.onInsertRowAfter,
 			},
 			{
 				icon: 'table-row-delete',
 				title: __( 'Delete Row' ),
-				isDisabled: ! selection,
+				isDisabled: ! canPerformRowOperations,
 				onClick: this.onDeleteRow,
 			},
 			{
 				icon: 'table-col-before',
 				title: __( 'Add Column Before' ),
-				isDisabled: ! selection,
+				isDisabled: ! canPerformColumnOperations,
 				onClick: this.onInsertColumnBefore,
 			},
 			{
 				icon: 'table-col-after',
 				title: __( 'Add Column After' ),
-				isDisabled: ! selection,
+				isDisabled: ! canPerformColumnOperations,
 				onClick: this.onInsertColumnAfter,
 			},
 			{
 				icon: 'table-col-delete',
 				title: __( 'Delete Column' ),
-				isDisabled: ! selection,
+				isDisabled: ! canPerformColumnOperations,
 				onClick: this.onDeleteColumn,
 			},
 		];
@@ -438,7 +412,7 @@ export class TableEdit extends Component {
 											className="wp-block-table__table-selection-button"
 											label={ __( 'Select all' ) }
 											icon="grid-view"
-											onClick={ this.onSelectTable }
+											onClick={ () => this.setState( { selection: { type: 'table' } } ) }
 										/>
 									) }
 									{ columnIndex === 0 && (
@@ -446,7 +420,13 @@ export class TableEdit extends Component {
 											className="wp-block-table__row-selection-button"
 											label={ __( 'Select row' ) }
 											icon="arrow-right"
-											onClick={ () => this.onSelectRow( section, rowIndex ) }
+											onClick={ () => this.setState( {
+												selection: {
+													type: 'row',
+													section,
+													rowIndex,
+												},
+											} ) }
 										/>
 									) }
 									{ showBlockSelectionControls && rowIndex === 0 && (
@@ -454,7 +434,12 @@ export class TableEdit extends Component {
 											className="wp-block-table__column-selection-button"
 											label={ __( 'Select column' ) }
 											icon="arrow-down"
-											onClick={ () => this.onSelectColumn( columnIndex ) }
+											onClick={ () => this.setState( {
+												selection: {
+													type: 'column',
+													columnIndex,
+												},
+											} ) }
 										/>
 									) }
 									<RichText
@@ -463,9 +448,7 @@ export class TableEdit extends Component {
 										onChange={ this.onChange }
 										unstableOnFocus={ this.createOnFocus( {
 											type: 'cell',
-											section,
-											rowIndex,
-											columnIndex,
+											...cellLocation,
 										} ) }
 									/>
 								</CellTag>
