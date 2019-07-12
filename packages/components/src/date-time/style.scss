@@ -67,8 +67,7 @@
 		top: 20px;
 
 		&:focus {
-			border-color: $blue-medium-focus;
-			box-shadow: 0 0 0 1px $blue-medium-focus;
+			@include input-style__focus();
 		}
 	}
 
