@@ -746,6 +746,16 @@ _Parameters_
 -   _slug_ `string`: Block category slug.
 -   _category_ `Object`: Object containing the category properties that should be updated.
 
+<a name="validate" href="#validate">#</a> **validate**
+
+Given a block or array of blocks, assigns the `isValid` property of each
+block corresponding to the validation result. This mutates the original
+array or object.
+
+_Parameters_
+
+-   _blocks_ `(WPBlock|Array<WPBlock>)`: Block or array of blocks to validate.
+
 <a name="withBlockContentContext" href="#withBlockContentContext">#</a> **withBlockContentContext**
 
 A Higher Order Component used to inject BlockContent using context to the

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
+import validate, {
 	isValidCharacterReference,
 	DecodeEntityParser,
 	getTextPiecesSplitOnWhitespace,
@@ -660,6 +660,50 @@ describe( 'validation', () => {
 			);
 
 			expect( isValid ).toBe( true );
+		} );
+	} );
+
+	describe( 'validate', () => {
+		it( 'returns undefined', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const result = validate( [
+				{
+					name: 'core/test-block',
+					attributes: { fruit: 'Bananas' },
+					originalContent: 'Bananas',
+				},
+			] );
+
+			expect( result ).toBeUndefined();
+		} );
+
+		it( 'mutates the block with the validation result', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const block = {
+				name: 'core/test-block',
+				attributes: { fruit: 'Bananas' },
+				originalContent: 'Bananas',
+			};
+
+			validate( block );
+
+			expect( block.isValid ).toBe( true );
+		} );
+
+		it( 'mutates the blocks array with the validation result', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const block = {
+				name: 'core/test-block',
+				attributes: { fruit: 'Bananas' },
+				originalContent: 'Bananas',
+			};
+
+			validate( [ block ] );
+
+			expect( block.isValid ).toBe( true );
 		} );
 	} );
 } );

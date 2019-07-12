@@ -9,6 +9,7 @@ import {
 	isEqual,
 	includes,
 	stubTrue,
+	castArray,
 } from 'lodash';
 
 /**
@@ -21,6 +22,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { getSaveContent } from './serializer';
 import { normalizeBlockType } from './utils';
+import { getBlockType } from './registration';
 
 /**
  * Globally matches any consecutive whitespace
@@ -648,4 +650,24 @@ export function isValidBlockContent( blockTypeOrName, attributes, originalBlockC
 	}
 
 	return isValid;
+}
+
+/**
+ * Given a block or array of blocks, assigns the `isValid` property of each
+ * block corresponding to the validation result. This mutates the original
+ * array or object.
+ *
+ * @param {(WPBlock|WPBlock[])} blocks Block or array of blocks to validate.
+ */
+export default function validate( blocks ) {
+	// Normalize value to array (support singular argument).
+	blocks = castArray( blocks );
+
+	for ( const block of blocks ) {
+		block.isValid = isValidBlockContent(
+			getBlockType( block.name ),
+			block.attributes,
+			block.originalContent
+		);
+	}
 }

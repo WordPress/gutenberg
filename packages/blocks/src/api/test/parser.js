@@ -8,6 +8,7 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
+	DEFAULT_PARSE_OPTIONS,
 	getBlockAttribute,
 	getBlockAttributes,
 	createBlockWithFallback,
@@ -671,7 +672,7 @@ describe( 'block parser', () => {
 				blockName: 'core/test-block',
 				innerHTML: 'Bananas',
 				attrs: { fruit: 'Bananas' },
-			} );
+			}, DEFAULT_PARSE_OPTIONS );
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
@@ -682,7 +683,7 @@ describe( 'block parser', () => {
 			const block = createBlockWithFallback( {
 				blockName: 'core/test-block',
 				innerHTML: '',
-			} );
+			}, DEFAULT_PARSE_OPTIONS );
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( {} );
 		} );
@@ -695,7 +696,7 @@ describe( 'block parser', () => {
 				blockName: 'core/test-block',
 				innerHTML: 'Bananas',
 				attrs: { fruit: 'Bananas' },
-			} );
+			}, DEFAULT_PARSE_OPTIONS );
 			expect( block.name ).toBe( 'core/unregistered-block' );
 			expect( block.attributes.content ).toContain( 'wp:test-block' );
 		} );
@@ -706,7 +707,7 @@ describe( 'block parser', () => {
 
 			const block = createBlockWithFallback( {
 				innerHTML: 'content',
-			} );
+			}, DEFAULT_PARSE_OPTIONS );
 			expect( block.name ).toEqual( 'core/freeform-block' );
 			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
 		} );
@@ -715,7 +716,7 @@ describe( 'block parser', () => {
 			const block = createBlockWithFallback( {
 				blockName: 'core/test-block',
 				innerHTML: '',
-			} );
+			}, DEFAULT_PARSE_OPTIONS );
 			expect( block ).toBeUndefined();
 		} );
 
@@ -749,7 +750,7 @@ describe( 'block parser', () => {
 				blockName: 'core/test-block',
 				innerHTML: '<span>Bananas</span>',
 				attrs: { fruit: 'Bananas' },
-			} );
+			}, DEFAULT_PARSE_OPTIONS );
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
 			expect( block.isValid ).toBe( true );

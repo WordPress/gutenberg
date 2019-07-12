@@ -27,6 +27,24 @@ import { normalizeBlockType } from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
 
 /**
+ * Options for parse.
+ *
+ * @typedef {Object} WPBlocksParseOptions
+ *
+ * @property {boolean} validate Whether to validate and assign result as
+ *                              `isValid` on parsed block results.
+ */
+
+/**
+ * Default options for parse.
+ *
+ * @type {WPBlocksParseOptions}
+ */
+export const DEFAULT_PARSE_OPTIONS = {
+	validate: true,
+};
+
+/**
  * Sources which are guaranteed to return a string value.
  *
  * @type {Set}
@@ -373,11 +391,12 @@ export function getMigratedBlock( block, parsedAttributes ) {
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param {Object} blockNode Parsed block node.
+ * @param {Object}               blockNode    Parsed block node.
+ * @param {WPBlocksParseOptions} parseOptions Parser options.
  *
  * @return {?Object} An initialized block object (if possible).
  */
-export function createBlockWithFallback( blockNode ) {
+export function createBlockWithFallback( blockNode, parseOptions ) {
 	const { blockName: originalName } = blockNode;
 	let {
 		attrs: attributes,
@@ -477,7 +496,7 @@ export function createBlockWithFallback( blockNode ) {
 	// provided there are no changes in attributes. The validation procedure thus compares the
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
-	if ( ! isFallbackBlock ) {
+	if ( ! isFallbackBlock && parseOptions.validate ) {
 		block.isValid = isValidBlockContent( blockType, block.attributes, innerHTML );
 	}
 
@@ -535,14 +554,22 @@ export function serializeBlockNode( blockNode, options = {} ) {
  *
  * @return {Function} An implementation which parses the post content.
  */
-const createParse = ( parseImplementation ) =>
-	( content ) => parseImplementation( content ).reduce( ( memo, blockNode ) => {
-		const block = createBlockWithFallback( blockNode );
-		if ( block ) {
-			memo.push( block );
+function createParse( parseImplementation ) {
+	return ( content, options = DEFAULT_PARSE_OPTIONS ) => {
+		if ( options !== DEFAULT_PARSE_OPTIONS ) {
+			options = { ...DEFAULT_PARSE_OPTIONS, ...options };
 		}
-		return memo;
-	}, [] );
+
+		return parseImplementation( content ).reduce( ( memo, blockNode ) => {
+			const block = createBlockWithFallback( blockNode, options );
+			if ( block ) {
+				memo.push( block );
+			}
+
+			return memo;
+		}, [] );
+	};
+}
 
 /**
  * Parses the post content with a PegJS grammar and returns a list of blocks.

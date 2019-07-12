@@ -1,5 +1,10 @@
 ## Master
 
+### New Features
+
+- `parse` now accepts an options object. Current options include the ability to disable default validation (`validate`).
+- New function: `validate`. Given a block or array of blocks, assigns the `isValid` property of each block corresponding to the validation result.
+
 ### Improvements
 
 - Omitting `attributes` or `keywords` settings will now stub default values (an empty object or empty array, respectively).
