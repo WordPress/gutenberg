@@ -42,21 +42,17 @@
 .components-checkbox-control__label {
 	position: relative;
 	vertical-align: middle;
+	line-height: 1;
 }
 
-.components-checkbox-control__checked {
+svg.dashicon.components-checkbox-control__checked {
 	width: 21px;
 	height: 21px;
 	fill: #fff;
 	cursor: pointer;
 	position: absolute;
 	left: -31px;
-	top: -2px;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
+	bottom: -3px;
 	user-select: none;
 	pointer-events: none;
 }
@@ -67,10 +63,10 @@
 		height: 25px;
 	}
 
-	.components-checkbox-control__checked {
-		width: 30px;
-		height: 30px;
-		left: -40px;
-		top: -7px;
+	svg.dashicon.components-checkbox-control__checked {
+		width: 31px;
+		height: 31px;
+		left: -41px;
+		bottom: -9px;
 	}
 }
