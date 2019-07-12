@@ -21,7 +21,7 @@ const hasLocalStorageSupport = once( () => {
 	try {
 		// Private Browsing in Safari 10 and earlier will throw an error when
 		// attempting to set into localStorage. The test here is intentional in
-		// causing a thrown error as condition for using fallback object storage.
+		// causing a thrown error as condition bailing from local autosave.
 		window.localStorage.setItem( '__wpEditorTestLocalStorage', '' );
 		window.localStorage.removeItem( '__wpEditorTestLocalStorage' );
 		return true;
