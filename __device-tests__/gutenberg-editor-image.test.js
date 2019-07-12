@@ -16,7 +16,7 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 300000;
 
 describe( 'Gutenberg Editor Image Block tests', () => {
 	let driver;
@@ -63,6 +63,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await swipeUp( driver, imageBlock );
 			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
 			await editorPage.dismissKeyboard();
+			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 			await imageBlock.click();
 		}
 		await editorPage.removeImageBlockAtPosition( 1 );

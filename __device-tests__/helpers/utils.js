@@ -56,6 +56,8 @@ const isLocalEnvironment = () => {
 
 // Initialises the driver and desired capabilities for appium
 const setupDriver = async () => {
+	const branch = process.env.CIRCLE_BRANCH || '';
+	const safeBranchName = branch.replace( '/', '-' );
 	if ( isLocalEnvironment() ) {
 		try {
 			appiumProcess = await AppiumLocal.start( localAppiumPort );
@@ -79,28 +81,26 @@ const setupDriver = async () => {
 					.execSync( 'adb shell getprop ro.build.version.release' )
 					.toString()
 					.replace( /^\s+|\s+$/g, '' );
-				if ( ! isNaN( androidVersion ) ) {
-					delete desiredCaps.platformVersion;
-					// eslint-disable-next-line no-console
-					console.log( 'Detected Android device running Android %s', androidVersion );
-				}
+				delete desiredCaps.platformVersion;
+				desiredCaps.deviceName = 'Android Emulator';
+				// eslint-disable-next-line no-console
+				console.log( 'Detected Android device running Android %s', androidVersion );
 			} catch ( error ) {
 				// ignore error
 			}
 		} else {
-			desiredCaps.app = 'sauce-storage:Gutenberg.apk'; // App should be preloaded to sauce storage, this can also be a URL
+			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	} else {
 		desiredCaps = _.clone( ios12 );
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = path.resolve( localIOSAppPath );
 		} else {
-			desiredCaps.app = 'sauce-storage:Gutenberg.app.zip'; // App should be preloaded to sauce storage, this can also be a URL
+			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	}
 
 	if ( ! isLocalEnvironment() ) {
-		const branch = process.env.CIRCLE_BRANCH || '';
 		desiredCaps.name = `Gutenberg Editor Tests[${ rnPlatform }]-${ branch }`;
 		desiredCaps.tags = [ 'Gutenberg', branch ];
 	}

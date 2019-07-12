@@ -6,13 +6,13 @@ commands:
       - restore_cache:
           name: Restore Yarn Cache
           keys:
-            - yarn-i18n-v1-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
+            - yarn-i18n-v3-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
           command: yarn install --frozen-lockfile --prefer-offline
       - save_cache:
           name: Save Yarn Cache
-          key: yarn-i18n-v1-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
+          key: yarn-i18n-v3-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - i18n-cache/data
@@ -61,7 +61,7 @@ jobs:
           path: ./reports/test-results
   android-device-checks:
     docker:
-    - image: circleci/android:api-28-node8-alpha
+    - image: circleci/android:api-29-node
     steps:
       - checkout
       - run:
@@ -80,7 +80,8 @@ jobs:
       - run:
           name: Upload apk to sauce labs
           command: |
-            curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
+            source bin/sauce-pre-upload.sh
+            curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg-$SAUCE_FILENAME.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
       - run:
           name: Run Device Tests
           command: yarn device-tests
@@ -111,21 +112,21 @@ jobs:
     - restore_cache:
         name: Restore Dependencies Cache
         keys:
-        - dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+        - dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
           checksum "yarn.lock" }}
-        - dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}
-        - dependencies-
+        - dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}
+        - dependencies-v2-
     - run:
         name: Yarn preios (if needed)
         command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app || yarn preios
     - save_cache:
         name: Save Dependencies Cache
-        key: dependencies-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
+        key: dependencies-v2-{{ checksum "react-native-aztec/ios/Cartfile.resolved" }}-{{
           checksum "yarn.lock" }}
         paths:
         - react-native-aztec/ios/Carthage
         - ~/.rncache
-    - run: 
+    - run:
         name: Build (if needed)
         command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app || yarn react-native run-ios --configuration Release --no-packager
     - run:
@@ -137,7 +138,8 @@ jobs:
     - run:
         name: Upload .app to sauce labs
         command: |
-          curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg.app.zip?overwrite=true --data-binary @./ios/Gutenberg.app.zip
+          source bin/sauce-pre-upload.sh
+          curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg-$SAUCE_FILENAME.app.zip?overwrite=true --data-binary @./ios/Gutenberg.app.zip
     - run:
         name: Run Device Tests
         command: |
