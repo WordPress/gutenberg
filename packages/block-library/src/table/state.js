@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { times, get, mapValues, every } from 'lodash';
+import { times, get, mapValues, every, includes } from 'lodash';
 
-const SECTION_INDEX = {
-	head: 0,
-	body: 1,
-	foot: 2,
-};
+const MULTI_SELECTION_TYPES = [
+	'table',
+	'column',
+	'row',
+];
 
 /**
  * Creates a table state.
@@ -224,119 +224,162 @@ export function isEmptyRow( row ) {
 	return ! ( row.cells && row.cells.length );
 }
 
-export function isAxisInSelectionRange( selection, axisIndex, axisName ) {// Compute the selection at axis level.
-	const fromAxisIndex = selection.from[ axisName ];
-	const toAxisIndex = selection.to[ axisName ];
-
-	return fromAxisIndex <= axisIndex && toAxisIndex >= axisIndex;
-}
-
-export function isCellInSelectionRange( selection, section, rowIndex, columnIndex ) {
-	if ( ! selection || selection.type !== 'range' ) {
+/**
+ * Determines if a cell is within a multi-cell selection.
+ *
+ * @param {Object} cellLocation The cell to check
+ * @param {Object} selection    The selection data
+ *
+ * @return {boolean} True if the cell is within a seleciton, false otherwise.
+ */
+export function isCellInMultiSelection( cellLocation, selection ) {
+	if ( ! cellLocation || ! selection || includes( selection.type, MULTI_SELECTION_TYPES ) ) {
 		return false;
 	}
 
-	const cellSectionIndex = SECTION_INDEX[ section ];
-	const fromSectionIndex = SECTION_INDEX[ selection.from.section ];
-	const toSectionIndex = SECTION_INDEX[ selection.to.section ];
+	switch ( selection.type ) {
+		case 'table':
+			return true;
+		case 'row':
+			return cellLocation.section === selection.section && cellLocation.rowIndex === selection.rowIndex;
+		case 'column':
+			return cellLocation.columnIndex === selection.columnIndex;
+	}
+}
 
-	// Return early if section is not within the range.
-	if ( fromSectionIndex > cellSectionIndex || toSectionIndex < cellSectionIndex ) {
-		return false;
+/**
+ * Returns the location of the cell above.
+ *
+ * @param {Object} state        The table state.
+ * @param {Object} cellLocation The cell location (section, rowIndex, columnIndex).
+ *
+ * @return {?Object} The location of the cell above this one or undefined
+ *                   if this cell is at the table perimeter.
+ */
+export function getCellAbove( state, cellLocation ) {
+	const { section: sectionName, rowIndex, columnIndex } = cellLocation;
+	const isFirstRow = rowIndex === 0;
+
+	// This is the first row of the first section, return undefined early.
+	if ( sectionName === 'head' && isFirstRow ) {
+		return;
 	}
 
-	// All rows in the body have selected cells if the selection
-	// start is in the head and the selection end is in the foot.
-	const allRowsInSectionHaveSelection = fromSectionIndex < cellSectionIndex && toSectionIndex > cellSectionIndex;
+	// Handle getting the cell from the next section.
+	if ( isFirstRow ) {
+		const previousSectionName = sectionName === 'foot' ? 'body' : 'head';
+		const previousSection = state[ previousSectionName ];
 
-	// Compute individual cell selection.
-	const isRowSelected = allRowsInSectionHaveSelection || isAxisInSelectionRange( selection, rowIndex, 'rowIndex' );
-	const isColumnSelected = isAxisInSelectionRange( selection, columnIndex, 'columnIndex' );
+		// There is no previous section, return undefined early.
+		if ( isEmptyTableSection( previousSection ) ) {
+			return;
+		}
 
-	return isRowSelected && isColumnSelected;
-}
+		// The previous section doesn't have as many columns, return undefined early.
+		const columnCount = previousSection[ 0 ].cells.length;
+		if ( columnIndex > columnCount - 1 ) {
+			return;
+		}
 
-export function isStartOfSelectionRange( selection, section, axisIndex, axisName ) {
-	// The row is not the start of a selection if it's in a different section.
-	if ( axisName === 'rowIndex' && section !== selection.from.section ) {
-		return false;
-	}
+		const lastRowOfPreviousSection = previousSection.length - 1;
 
-	return selection.from[ axisName ] === axisIndex;
-}
-
-export function isEndOfSelectionRange( selection, section, axisIndex, axisName ) {
-	// The row is not the end of a selection if it's in a different section.
-	if ( axisName === 'rowIndex' && section !== selection.to.section ) {
-		return false;
-	}
-
-	return selection.to[ axisName ] === axisIndex;
-}
-
-export function isTopOfSelectionRange( selection, section, rowIndex ) {
-	return isStartOfSelectionRange( selection, section, rowIndex, 'rowIndex' );
-}
-
-export function isLeftOfSelectionRange( selection, section, columnIndex ) {
-	return isStartOfSelectionRange( selection, section, columnIndex, 'columnIndex' );
-}
-
-export function isBottomOfSelectionRange( selection, section, rowIndex ) {
-	return isEndOfSelectionRange( selection, section, rowIndex, 'rowIndex' );
-}
-
-export function isRightOfSelectionRange( selection, section, columnIndex ) {
-	return isEndOfSelectionRange( selection, section, columnIndex, 'columnIndex' );
-}
-
-export function getVerticalSelectionRangeStart( state, columnIndex = 0 ) {
-	const {
-		head,
-	} = state;
-	const isEmptyHead = isEmptyTableSection( head );
-
-	return {
-		section: isEmptyHead ? 'body' : 'head',
-		rowIndex: 0,
-		columnIndex,
-	};
-}
-
-export function getVerticalSelectionRangeEnd( state, columnIndex ) {
-	const {
-		body,
-		foot,
-	} = state;
-	const isEmptyFoot = isEmptyTableSection( foot );
-
-	const rows = isEmptyFoot ? body : foot;
-
-	if ( columnIndex === undefined ) {
-		columnIndex = isEmptyFoot ? rows[ 0 ].cells.length - 1 : rows[ 0 ].cells.length - 1;
+		return {
+			section: previousSectionName,
+			rowIndex: lastRowOfPreviousSection,
+			columnIndex,
+		};
 	}
 
 	return {
-		section: isEmptyFoot ? 'body' : 'foot',
-		rowIndex: isEmptyFoot ? rows.length - 1 : rows.length - 1,
-		columnIndex,
+		...cellLocation,
+		rowIndex: rowIndex - 1,
 	};
 }
 
-export function getHorizontalSelectionRangeStart( state, section, rowIndex ) {
+/**
+ * Returns the location of the cell below.
+ *
+ * @param {Object} state        The table state.
+ * @param {Object} cellLocation The cell location (section, rowIndex, columnIndex).
+ *
+ * @return {?Object} The location of the cell below this one or undefined
+ *                   if this cell is at the table perimeter.
+ */
+export function getCellBelow( state, cellLocation ) {
+	const { section: sectionName, rowIndex, columnIndex } = cellLocation;
+	const section = state[ sectionName ];
+	const rowCount = section.length;
+	const isLastRow = rowIndex === rowCount - 1;
+
+	// This is the last row of the last section, return undefined early.
+	if ( sectionName === 'foot' && isLastRow ) {
+		return;
+	}
+
+	// Handle getting the cell from the next section.
+	if ( isLastRow ) {
+		const nextSectionName = sectionName === 'head' ? 'body' : 'foot';
+		const nextSection = state[ nextSectionName ];
+
+		// There is no next section, return undefined early.
+		if ( isEmptyTableSection( nextSection ) ) {
+			return;
+		}
+
+		// The next section doesn't have as many columns, return undefined early.
+		const columnCount = nextSection[ 0 ].cells.length;
+		if ( columnIndex > columnCount - 1 ) {
+			return;
+		}
+
+		return {
+			section: nextSectionName,
+			rowIndex: 0,
+			columnIndex,
+		};
+	}
+
 	return {
-		section,
-		rowIndex,
-		columnIndex: 0,
+		...cellLocation,
+		rowIndex: rowIndex + 1,
 	};
 }
 
-export function getHorizontalSelectionRangeEnd( state, section, rowIndex ) {
-	const rows = state[ section ];
+/**
+ * Returns the location of the cell to the right.
+ *
+ * @param {Object} state        The table state.
+ * @param {Object} cellLocation The cell location (section, rowIndex, columnIndex).
+ *
+ * @return {?Object} The location of the cell to the right of this one or undefined
+ *                   if this cell is at the table perimeter.
+ */
+export function getCellToRight( state, cellLocation ) {
+	const { section: sectionName, rowIndex, columnIndex } = cellLocation;
+	const section = state[ sectionName ];
+	const columnCount = section[ rowIndex ].cells.length;
+	const hasCellToRight = columnIndex < columnCount - 1;
 
-	return {
-		section,
-		rowIndex,
-		columnIndex: rows[ 0 ].cells.length - 1,
-	};
+	return hasCellToRight ? {
+		...cellLocation,
+		columnIndex: columnIndex + 1,
+	} : undefined;
+}
+
+/**
+ * Returns the location of the cell to the left.
+ *
+ * @param {Object} cellLocation The cell location (section, rowIndex, columnIndex).
+ *
+ * @return {?Object} The location of the cell to the left of this one or undefined
+ *                   if this cell is at the table perimeter.
+ */
+export function getCellToLeft( cellLocation ) {
+	const { columnIndex } = cellLocation;
+	const hasCellToLeft = columnIndex > 0;
+
+	return hasCellToLeft ? {
+		...cellLocation,
+		columnIndex: columnIndex - 1,
+	} : undefined;
 }

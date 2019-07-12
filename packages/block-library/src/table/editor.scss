@@ -44,7 +44,7 @@
 		border: $border-width solid;
 
 		&.is-selected-cell,
-		&.is-in-selected-range {
+		&.is-multi-selected {
 			&::before {
 				content: "";
 				display: block;
@@ -58,26 +58,30 @@
 			}
 		}
 
-		&.is-in-selected-range {
+		&.is-multi-selected {
 			&::before {
 				border-width: 0;
 			}
-			&.is-range-selection-top {
+
+			&.is-multi-selection-top-edge {
 				&::before {
 					border-top-width: 3px;
 				}
 			}
-			&.is-range-selection-right {
+
+			&.is-multi-selection-right-edge {
 				&::before {
 					border-right-width: 3px;
 				}
 			}
-			&.is-range-selection-bottom {
+
+			&.is-multi-selection-bottom-edge {
 				&::before {
 					border-bottom-width: 3px;
 				}
 			}
-			&.is-range-selection-left {
+
+			&.is-multi-selection-left-edge {
 				&::before {
 					border-left-width: 3px;
 				}

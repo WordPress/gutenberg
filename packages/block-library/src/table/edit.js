@@ -39,15 +39,11 @@ import {
 	deleteColumn,
 	toggleSection,
 	isEmptyTableSection,
-	getVerticalSelectionRangeStart,
-	getVerticalSelectionRangeEnd,
-	getHorizontalSelectionRangeStart,
-	getHorizontalSelectionRangeEnd,
-	isCellInSelectionRange,
-	isTopOfSelectionRange,
-	isBottomOfSelectionRange,
-	isRightOfSelectionRange,
-	isLeftOfSelectionRange,
+	isCellInMultiSelection,
+	getCellAbove,
+	getCellBelow,
+	getCellToRight,
+	getCellToLeft,
 } from './state';
 import icon from './icon';
 
@@ -100,6 +96,7 @@ export class TableEdit extends Component {
 		this.onSelectTable = this.onSelectTable.bind( this );
 		this.onSelectRow = this.onSelectRow.bind( this );
 		this.onSelectColumn = this.onSelectColumn.bind( this );
+		this.getMultiSelectionClasses = this.getMultiSelectionClasses.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
@@ -295,45 +292,42 @@ export class TableEdit extends Component {
 	}
 
 	onSelectTable() {
-		const {
-			attributes,
-		} = this.props;
-
 		this.setState( {
 			selection: {
-				type: 'range',
-				from: getVerticalSelectionRangeStart( attributes ),
-				to: getVerticalSelectionRangeEnd( attributes ),
+				type: 'table',
 			},
 		} );
 	}
 
 	onSelectColumn( columnIndex ) {
-		const {
-			attributes,
-		} = this.props;
-
 		this.setState( {
 			selection: {
-				type: 'range',
-				from: getVerticalSelectionRangeStart( attributes, columnIndex ),
-				to: getVerticalSelectionRangeEnd( attributes, columnIndex ),
+				type: 'column',
+				columnIndex,
 			},
 		} );
 	}
 
 	onSelectRow( section, rowIndex ) {
-		const {
-			attributes,
-		} = this.props;
-
 		this.setState( {
 			selection: {
-				type: 'range',
-				from: getHorizontalSelectionRangeStart( attributes, section, rowIndex ),
-				to: getHorizontalSelectionRangeEnd( attributes, section, rowIndex ),
+				type: 'row',
+				section,
+				rowIndex,
 			},
 		} );
+	}
+
+	getMultiSelectionClasses( cellLocation, selection ) {
+		const { attributes } = this.props;
+
+		return {
+			'is-multi-selected': true,
+			'is-multi-selection-top-edge': ! isCellInMultiSelection( getCellAbove( attributes, cellLocation ), selection ),
+			'is-multi-selection-right-edge': ! isCellInMultiSelection( getCellToRight( attributes, cellLocation ), selection ),
+			'is-multi-selection-bottom-edge': ! isCellInMultiSelection( getCellBelow( attributes, cellLocation ), selection ),
+			'is-multi-selection-left-edge': ! isCellInMultiSelection( getCellToLeft( cellLocation ), selection ),
+		};
 	}
 
 	/**
@@ -406,7 +400,7 @@ export class TableEdit extends Component {
 	 *
 	 * @return {Object} React element for the section.
 	 */
-	renderSection( { type: section, rows, isFirstTableSection } ) {
+	renderSection( { type: section, rows, showBlockSelectionControls } ) {
 		if ( isEmptyTableSection( rows ) ) {
 			return null;
 		}
@@ -426,19 +420,12 @@ export class TableEdit extends Component {
 								columnIndex === selection.columnIndex
 							);
 
-							const isInSelectedRange = selection && (
-								'range' === selection.type &&
-								isCellInSelectionRange( selection, section, rowIndex, columnIndex )
-							);
-
+							const cellLocation = { section, rowIndex, columnIndex };
+							const isInMultiCellSelection = isCellInMultiSelection( cellLocation, selection );
+							const multiSelectionClasses = isInMultiCellSelection ? this.getMultiSelectionClasses( cellLocation, selection ) : undefined;
 							const cellClasses = classnames( {
 								'is-selected-cell': isSelectedCell,
-								'is-in-selected-range': isInSelectedRange,
-								'is-range-selection-top': isInSelectedRange && isTopOfSelectionRange( selection, section, rowIndex ),
-								'is-range-selection-right': isInSelectedRange && isRightOfSelectionRange( selection, section, columnIndex ),
-								'is-range-selection-bottom': isInSelectedRange && isBottomOfSelectionRange( selection, section, rowIndex ),
-								'is-range-selection-left': isInSelectedRange && isLeftOfSelectionRange( selection, section, columnIndex ),
-							} );
+							}, multiSelectionClasses );
 
 							return (
 								<CellTag
@@ -446,7 +433,7 @@ export class TableEdit extends Component {
 									className={ cellClasses }
 									scope={ CellTag === 'th' ? scope : undefined }
 								>
-									{ isFirstTableSection && rowIndex === 0 && columnIndex === 0 && (
+									{ showBlockSelectionControls && rowIndex === 0 && columnIndex === 0 && (
 										<IconButton
 											className="wp-block-table__table-selection-button"
 											label={ __( 'Select all' ) }
@@ -462,7 +449,7 @@ export class TableEdit extends Component {
 											onClick={ () => this.onSelectRow( section, rowIndex ) }
 										/>
 									) }
-									{ isFirstTableSection && rowIndex === 0 && (
+									{ showBlockSelectionControls && rowIndex === 0 && (
 										<IconButton
 											className="wp-block-table__column-selection-button"
 											label={ __( 'Select column' ) }
@@ -595,9 +582,9 @@ export class TableEdit extends Component {
 				</InspectorControls>
 				<figure className={ className }>
 					<table className={ tableClasses }>
-						<Section type="head" rows={ head } isFirstTableSection={ true } />
-						<Section type="body" rows={ body } isFirstTableSection={ isEmptyHead } />
-						<Section type="foot" rows={ foot } isLastTableSection={ true } />
+						<Section type="head" rows={ head } showBlockSelectionControls={ true } />
+						<Section type="body" rows={ body } showBlockSelectionControls={ isEmptyHead } />
+						<Section type="foot" rows={ foot } />
 					</table>
 				</figure>
 			</>
