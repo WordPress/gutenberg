@@ -12,6 +12,7 @@ import {
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import {
 	withSelect,
@@ -19,6 +20,7 @@ import {
 	__experimentalAsyncModeProvider as AsyncModeProvider,
 } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -204,11 +206,24 @@ class BlockList extends Component {
 			multiSelectedBlockClientIds,
 			hasMultiSelection,
 			renderAppender,
+			hasZoomedBlocks,
 			enableAnimation,
+			onZoomOut,
 		} = this.props;
 
 		return (
 			<div className="editor-block-list__layout block-editor-block-list__layout">
+				{ hasZoomedBlocks && (
+					<IconButton
+						className="block-editor-block-list__zoom-out"
+						onClick={ onZoomOut }
+						icon="search"
+						label={ __( 'Zoom Out' ) }
+					>
+						{ __( 'Zoom Out' ) }
+					</IconButton>
+				) }
+
 				{ blockClientIds.map( ( clientId ) => {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :
@@ -254,6 +269,7 @@ export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
 			getBlockOrder,
+			getZoomedBlockClientIds,
 			isSelectionEnabled,
 			isMultiSelecting,
 			getMultiSelectedBlocksStartClientId,
@@ -265,9 +281,17 @@ export default compose( [
 		} = select( 'core/block-editor' );
 
 		const { rootClientId } = ownProps;
+		let blockClientIds = rootClientId ?
+			getBlockOrder( rootClientId ) :
+			getZoomedBlockClientIds();
+		let hasZoomedBlocks = ! rootClientId;
+		if ( ! blockClientIds ) {
+			blockClientIds = getBlockOrder();
+			hasZoomedBlocks = false;
+		}
 
 		return {
-			blockClientIds: getBlockOrder( rootClientId ),
+			blockClientIds,
 			selectionStart: getMultiSelectedBlocksStartClientId(),
 			selectionEnd: getMultiSelectedBlocksEndClientId(),
 			isSelectionEnabled: isSelectionEnabled(),
@@ -275,6 +299,7 @@ export default compose( [
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
+			hasZoomedBlocks,
 			enableAnimation: getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 		};
 	} ),
@@ -283,12 +308,14 @@ export default compose( [
 			startMultiSelect,
 			stopMultiSelect,
 			multiSelect,
+			clearZoomedBlocks,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			onStartMultiSelect: startMultiSelect,
 			onStopMultiSelect: stopMultiSelect,
 			onMultiSelect: multiSelect,
+			onZoomOut: clearZoomedBlocks,
 		};
 	} ),
 ] )( BlockList );

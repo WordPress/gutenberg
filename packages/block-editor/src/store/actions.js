@@ -546,6 +546,31 @@ export function replaceInnerBlocks( rootClientId, blocks, updateSelection = true
 }
 
 /**
+ * Returns an action object that zooms the editor into a list of specified blocks.
+ *
+ * @param {string[]} clientIds Client IDs of the blocks to zoom into.
+ *
+ * @return {Object} Action object.
+ */
+export function zoomBlocks( clientIds ) {
+	return {
+		type: 'ZOOM_BLOCKS',
+		clientIds,
+	};
+}
+
+/**
+ * Returns an action object that zooms out from any zoomed in blocks.
+ *
+ * @return {Object} Action object.
+ */
+export function clearZoomedBlocks() {
+	return {
+		type: 'CLEAR_ZOOMED_BLOCKS',
+	};
+}
+
+/**
  * Returns an action object used to toggle the block editing mode between
  * visual and HTML modes.
  *

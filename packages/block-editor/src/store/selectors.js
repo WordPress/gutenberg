@@ -890,6 +890,17 @@ export function isSelectionEnabled( state ) {
 }
 
 /**
+ * Returns the zoomed block client IDs, if any.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?(string[])} Client IDs of zoomed blocks.
+ */
+export function getZoomedBlockClientIds( state ) {
+	return state.blockZoom;
+}
+
+/**
  * Returns the block's editing mode, defaulting to "visual" if not explicitly
  * assigned.
  *

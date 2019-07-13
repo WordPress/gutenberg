@@ -32,7 +32,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 
 	return (
 		<BlockActions clientIds={ clientIds }>
-			{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, canDuplicate, isLocked } ) => (
+			{ ( { onZoom, onDuplicate, onRemove, onInsertAfter, onInsertBefore, canDuplicate, isLocked } ) => (
 				<Toolbar>
 					<DropdownMenu
 						icon="ellipsis"
@@ -46,6 +46,13 @@ export function BlockSettingsMenu( { clientIds } ) {
 						{ ( { onClose } ) => (
 							<>
 								<MenuGroup>
+									<MenuItem
+										className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+										onClick={ flow( onClose, onZoom ) }
+										icon="search"
+									>
+										{ __( 'Zoom' ) }
+									</MenuItem>
 									<__experimentalBlockSettingsMenuFirstItem.Slot
 										fillProps={ { onClose } }
 									/>

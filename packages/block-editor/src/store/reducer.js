@@ -1043,6 +1043,25 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 	return state;
 }
 
+/**
+ * Reducer returning the block zoom's state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function blockZoom( state, action ) {
+	switch ( action.type ) {
+		case 'ZOOM_BLOCKS':
+			return action.clientIds;
+		case 'CLEAR_ZOOMED_BLOCKS':
+			return null;
+	}
+
+	return state;
+}
+
 export function blocksMode( state = {}, action ) {
 	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
 		const { clientId } = action;
@@ -1228,6 +1247,7 @@ export default combineReducers( {
 	isTyping,
 	isCaretWithinFormattedText,
 	blockSelection,
+	blockZoom,
 	blocksMode,
 	blockListSettings,
 	insertionPoint,

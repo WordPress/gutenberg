@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, first, last, every } from 'lodash';
+import { castArray, first, last, every, flatMap } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,6 +11,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { cloneBlock, hasBlockSupport, switchToBlockType } from '@wordpress/blocks';
 
 function BlockActions( {
+	onZoom,
 	onDuplicate,
 	onRemove,
 	onInsertBefore,
@@ -22,6 +23,7 @@ function BlockActions( {
 	children,
 } ) {
 	return children( {
+		onZoom,
 		onDuplicate,
 		onRemove,
 		onInsertAfter,
@@ -65,6 +67,7 @@ export default compose( [
 		} = props;
 
 		const {
+			zoomBlocks,
 			insertBlocks,
 			multiSelect,
 			removeBlocks,
@@ -73,6 +76,17 @@ export default compose( [
 		} = dispatch( 'core/block-editor' );
 
 		return {
+			onZoom() {
+				const { getSelectedBlockClientIds, getBlockOrder } = select(
+					'core/block-editor'
+				);
+				zoomBlocks(
+					flatMap( getSelectedBlockClientIds(), ( clientId ) => {
+						const descendants = getBlockOrder( clientId );
+						return descendants.length ? descendants : clientId;
+					} )
+				);
+			},
 			onDuplicate() {
 				if ( isLocked || ! canDuplicate ) {
 					return;

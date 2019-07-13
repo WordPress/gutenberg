@@ -40,8 +40,8 @@ function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationO
 		ref.current.style.transform = 'none';
 		const destination = ref.current.getBoundingClientRect();
 		const newTransform = {
-			x: previous ? previous.left - destination.left : 0,
-			y: previous ? previous.top - destination.top : 0,
+			x: previous ? previous.left - destination.left : -50,
+			y: previous ? previous.top - destination.top : -50,
 		};
 		ref.current.style.transform = newTransform.x === 0 && newTransform.y === 0 ?
 			undefined :
