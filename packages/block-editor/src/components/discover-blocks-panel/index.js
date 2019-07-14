@@ -14,7 +14,7 @@ import DiscoverBlocksList from '../discover-blocks-list';
 function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission } ) {
 	if ( ! hasPermission ) {
 		return (
-			<p className="editor-inserter__no-results-with-discover-items block-editor-inserter__no-results-with-discover-items">
+			<p className="block-editor-discover-blocks-panel__description--no-results">
 				{ __( 'No blocks found in your library.' ) }
 				<br />
 				{ __( 'Please contact your site administrator to install new blocks.' ) }
@@ -22,9 +22,19 @@ function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission 
 		);
 	}
 
+	if ( ! discoverItems.length ) {
+		return (
+			<p className="block-editor-discover-blocks-panel__description--no-results">
+				{ __( 'No blocks found in your library.' ) }
+				<br />
+				{ __( 'Check your spelling and try using more general keywords.' ) }
+			</p>
+		);
+	}
+
 	return (
 		<Fragment>
-			<p className="editor-inserter__no-results-with-discover-items block-editor-inserter__no-results-with-discover-items">
+			<p className="block-editor-discover-blocks-panel__description">
 				{ __( 'No blocks found in your library. We did find these blocks available for download:' ) }
 			</p>
 			<DiscoverBlocksList items={ discoverItems } onSelect={ onSelect } onHover={ onHover } />
