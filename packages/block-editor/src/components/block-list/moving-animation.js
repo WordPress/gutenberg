@@ -39,9 +39,10 @@ function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationO
 		}
 		ref.current.style.transform = 'none';
 		const destination = ref.current.getBoundingClientRect();
+		const defaultPosition = isSelected ? -50 : 0;
 		const newTransform = {
-			x: previous ? previous.left - destination.left : -50,
-			y: previous ? previous.top - destination.top : -50,
+			x: previous ? previous.left - destination.left : defaultPosition,
+			y: previous ? previous.top - destination.top : defaultPosition,
 		};
 		ref.current.style.transform = newTransform.x === 0 && newTransform.y === 0 ?
 			undefined :
