@@ -25,13 +25,7 @@ class PostTitle extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onSelect = this.onSelect.bind( this );
-		this.onUnselect = this.onUnselect.bind( this );
 		this.titleViewRef = null;
-
-		this.state = {
-			isSelected: false,
-		};
 	}
 
 	componentDidMount() {
@@ -41,23 +35,14 @@ class PostTitle extends Component {
 	}
 
 	handleFocusOutside() {
-		this.onUnselect();
+		this.props.onUnselect();
 	}
 
 	focus() {
 		if ( this.titleViewRef ) {
 			this.titleViewRef.focus();
-			this.setState( { isSelected: true } );
+			this.props.onSelect();
 		}
-	}
-
-	onSelect() {
-		this.setState( { isSelected: true } );
-		this.props.clearSelectedBlock();
-	}
-
-	onUnselect() {
-		this.setState( { isSelected: false } );
 	}
 
 	render() {
@@ -70,12 +55,12 @@ class PostTitle extends Component {
 		} = this.props;
 
 		const decodedPlaceholder = decodeEntities( placeholder );
-		const borderColor = this.state.isSelected ? focusedBorderColor : 'transparent';
+		const borderColor = this.props.isSelected ? focusedBorderColor : 'transparent';
 
 		return (
 			<View
 				style={ [ styles.titleContainer, borderStyle, { borderColor } ] }
-				accessible={ ! this.state.isSelected }
+				accessible={ ! this.props.isSelected }
 				accessibilityLabel={
 					isEmpty( title ) ?
 						/* translators: accessibility text. empty post title. */
@@ -90,7 +75,7 @@ class PostTitle extends Component {
 				<RichText
 					tagName={ 'p' }
 					rootTagsToEliminate={ [ 'strong' ] }
-					unstableOnFocus={ this.onSelect }
+					unstableOnFocus={ this.props.onSelect }
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }
 					style={ style }
@@ -125,7 +110,6 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 
 	const {
 		insertDefaultBlock,
-		clearSelectedBlock,
 	} = dispatch( 'core/block-editor' );
 
 	return {
@@ -134,7 +118,6 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 		},
 		onUndo: undo,
 		onRedo: redo,
-		clearSelectedBlock,
 	};
 } );
 

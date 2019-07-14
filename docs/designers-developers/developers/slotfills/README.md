@@ -68,7 +68,7 @@ export default PluginPostStatusInfo;
 This new Slot is then exposed in the editor. The example below is from core and represents the Status & Visibility panel.
 
 As we can see, the `<PluginPostStatusInfo.Slot>` is wrapping all of the items that will appear in the panel.
-Any items that have been added via the SlotFill ( see the example above ), will be included in the `fills` parameter and be displayed betwee the `<PostAuthor/>` and `<PostTrash/>` components.
+Any items that have been added via the SlotFill ( see the example above ), will be included in the `fills` parameter and be displayed between the `<PostAuthor/>` and `<PostTrash/>` components.
 
 See [core code](https://github.com/WordPress/gutenberg/tree/master/packages/edit-post/src/components/sidebar/post-status/index.js#L26).
 

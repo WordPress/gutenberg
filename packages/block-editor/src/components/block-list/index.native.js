@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { identity } from 'lodash';
-import { Text, View, Keyboard, SafeAreaView, Platform } from 'react-native';
+import { Text, View, Keyboard, SafeAreaView, Platform, TouchableWithoutFeedback } from 'react-native';
 import { subscribeMediaAppend } from 'react-native-gutenberg-bridge';
 
 /**
@@ -33,6 +33,7 @@ export class BlockList extends Component {
 
 		this.renderItem = this.renderItem.bind( this );
 		this.renderAddBlockSeparator = this.renderAddBlockSeparator.bind( this );
+		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
 		this.renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
 		this.onBlockTypeSelected = this.onBlockTypeSelected.bind( this );
@@ -40,6 +41,7 @@ export class BlockList extends Component {
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
+		this.getNewBlockInsertionIndex = this.getNewBlockInsertionIndex.bind( this );
 
 		this.state = {
 			blockTypePickerVisible: false,
@@ -69,10 +71,20 @@ export class BlockList extends Component {
 			// do replace here
 			this.props.replaceBlock( this.props.selectedBlockClientId, newBlock );
 		} else {
-			const indexAfterSelected = this.props.selectedBlockOrder + 1;
-			const insertionIndex = indexAfterSelected || this.props.blockCount;
-			this.props.insertBlock( newBlock, insertionIndex );
+			this.props.insertBlock( newBlock, this.getNewBlockInsertionIndex() );
 		}
+	}
+
+	getNewBlockInsertionIndex() {
+		if ( this.props.isPostTitleSelected ) {
+			// if post title selected, insert at top of post
+			return 0;
+		} else if ( this.props.selectedBlockOrder === -1 ) {
+			// if no block selected, insert at end of post
+			return this.props.blockCount;
+		}
+		// insert after selected block
+		return this.props.selectedBlockOrder + 1;
 	}
 
 	blockHolderBorderStyle() {
@@ -171,6 +183,7 @@ export class BlockList extends Component {
 					title={ this.props.title }
 					ListHeaderComponent={ this.props.header }
 					ListEmptyComponent={ this.renderDefaultBlockAppender }
+					ListFooterComponent={ this.renderBlockListFooter }
 				/>
 				<SafeAreaView>
 					<View style={ { height: toolbarHeight } } />
@@ -239,6 +252,17 @@ export class BlockList extends Component {
 				<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
 				<View style={ styles.lineStyleAddHere }></View>
 			</View>
+		);
+	}
+
+	renderBlockListFooter() {
+		const paragraphBlock = createBlock( 'core/paragraph' );
+		return (
+			<TouchableWithoutFeedback onPress={ () => {
+				this.finishBlockAppendingOrReplacing( paragraphBlock );
+			} } >
+				<View style={ styles.blockListFooter } />
+			</TouchableWithoutFeedback>
 		);
 	}
 

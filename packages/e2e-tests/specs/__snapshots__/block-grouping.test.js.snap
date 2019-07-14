@@ -97,3 +97,19 @@ exports[`Block Grouping Preserving selected blocks attributes preserves width al
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:group -->"
 `;
+
+exports[`Block Grouping Registering alternative Blocks to handle Grouping interactions should use registered grouping block for grouping interactions 1`] = `
+"<!-- wp:test/alternative-group-block -->
+<!-- wp:paragraph -->
+<p>First Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third Paragraph</p>
+<!-- /wp:paragraph -->
+<!-- /wp:test/alternative-group-block -->"
+`;
