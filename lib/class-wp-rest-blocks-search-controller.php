@@ -55,12 +55,12 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 	 * @return WP_Error|bool True if the request has read access, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( $request ) {
-		// if ( ! current_user_can( 'edit_theme_options' ) ) {
-		// 	return new WP_Error(
-		// 		'rest_user_cannot_view',
-		// 		__( 'Sorry, you are not allowed to read blocks.', 'gutenberg' )
-		// 	);
-		// }
+		if ( ! current_user_can( 'install_plugins' ) ) {
+			return new WP_Error(
+				'rest_user_cannot_view',
+				__( 'Sorry, you are not allowed to install blocks.', 'gutenberg' )
+			);
+		}
 
 		return true;
 	}

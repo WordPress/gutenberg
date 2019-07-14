@@ -1416,3 +1416,14 @@ function getReusableBlocks( state ) {
 export function getDiscoverBlocks( state ) {
 	return state.discoverBlocks.items;
 }
+
+/**
+ * Returns true if user has permission to install blocks.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} User has permission to install blocks.
+ */
+export function hasInstallBlocksPermission( state ) {
+	return state.discoverBlocks.hasPermission;
+}

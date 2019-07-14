@@ -713,3 +713,13 @@ export function __unstableMarkLastChangeAsPersistent() {
 export function setDiscoverBlocks( discoverBlocks ) {
 	return { type: 'SET_DISCOVER_BLOCKS', discoverBlocks };
 }
+
+/** Returns an action object used in signalling that the user does not have permission to install blocks.
+* @param {boolean} hasPermission User has permission to install blocks.
+*
+ * @return {Object} Action object.
+ */
+export function setInstallBlocksPermission( hasPermission ) {
+	return { type: 'SET_INSTALL_BLOCKS_PERMISSION', hasPermission };
+}
+
