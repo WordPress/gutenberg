@@ -21,7 +21,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  * WordPress dependencies
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { Component, Fragment, createRef } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withSpokenMessages, PanelBody } from '@wordpress/components';
 import {
 	getCategories,
@@ -41,9 +41,10 @@ import { addQueryArgs } from '@wordpress/url';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
-import DiscoverBlocksList from '../discover-blocks-list';
+import DiscoverBlocksPanel from '../discover-blocks-panel';
 
 const MAX_SUGGESTED_ITEMS = 9;
+const SHOW_DISCOVER_BLOCKS = true;
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -128,7 +129,6 @@ export class InserterMenu extends Component {
 			hoveredItem: null,
 			suggestedItems: [],
 			reusableItems: [],
-			discoverItems: [],
 			itemsPerCategory: {},
 			openPanels: [ 'suggested' ],
 		};
@@ -199,7 +199,7 @@ export class InserterMenu extends Component {
 		};
 	}
 
-	filterOpenPanels( filterValue, itemsPerCategory, filteredItems, reusableItems, discoverItems ) {
+	filterOpenPanels( filterValue, itemsPerCategory, filteredItems, reusableItems ) {
 		if ( filterValue === this.state.filterValue ) {
 			return this.state.openPanels;
 		}
@@ -214,9 +214,6 @@ export class InserterMenu extends Component {
 			openPanels = openPanels.concat(
 				Object.keys( itemsPerCategory )
 			);
-		}
-		if ( discoverItems.length > 0 ) {
-			openPanels.push( 'discover' );
 		}
 		return openPanels;
 	}
@@ -236,13 +233,11 @@ export class InserterMenu extends Component {
 
 		const reusableItems = filter( filteredItems, { category: 'reusable' } );
 
-		const discoverItems = filter( filteredItems, { category: 'discover' } );
-
 		const getCategoryIndex = ( item ) => {
 			return findIndex( getCategories(), ( category ) => category.slug === item.category );
 		};
 		const itemsPerCategory = flow(
-			( itemList ) => filter( itemList, ( item ) => item.category !== 'reusable' && item.category !== 'discover' ),
+			( itemList ) => filter( itemList, ( item ) => item.category !== 'reusable' ),
 			( itemList ) => sortBy( itemList, getCategoryIndex ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( filteredItems );
@@ -253,14 +248,12 @@ export class InserterMenu extends Component {
 			filterValue,
 			suggestedItems,
 			reusableItems,
-			discoverItems,
 			itemsPerCategory,
 			openPanels: this.filterOpenPanels(
 				filterValue,
 				itemsPerCategory,
 				filteredItems,
 				reusableItems,
-				discoverItems
 			),
 		} );
 
@@ -291,7 +284,6 @@ export class InserterMenu extends Component {
 			itemsPerCategory,
 			openPanels,
 			reusableItems,
-			discoverItems,
 			suggestedItems,
 		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
@@ -384,14 +376,11 @@ export class InserterMenu extends Component {
 						</PanelBody>
 					) }
 					{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
-						isEmpty( discoverItems ) ?
-							( <p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p> ) :
+						SHOW_DISCOVER_BLOCKS ?
 							(
-								<Fragment>
-									<p className="editor-inserter__no-results-with-discover-items block-editor-inserter__no-results-with-discover-items">{ __( 'No blocks found in your library. We did find these blocks available for download:' ) }</p>
-									<DiscoverBlocksList items={ discoverItems } onSelect={ onSelect } onHover={ this.onHover } />
-								</Fragment>
-							)
+								<DiscoverBlocksPanel onSelect={ onSelect } onHover={ this.onHover } filterValue={ this.state.filterValue } />
+							) :
+							( <p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p> )
 					) }
 				</div>
 
@@ -411,7 +400,6 @@ export default compose(
 			getBlockName,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
-			getDiscoverBlocks,
 		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
@@ -426,9 +414,7 @@ export default compose(
 		}
 		const destinationRootBlockName = getBlockName( destinationRootClientId );
 
-		let items = getInserterItems( destinationRootClientId );
-		const discoverBlocks = getDiscoverBlocks();
-		items = items.concat( discoverBlocks );
+		const items = getInserterItems( destinationRootClientId );
 
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
