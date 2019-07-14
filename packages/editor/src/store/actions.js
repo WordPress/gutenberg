@@ -709,7 +709,8 @@ export function redo() {
  *
  * @return {Object} Action object.
  */
-export function undo() {
+export function* undo() {
+	yield dispatch( 'core/block-editor', 'clearZoomedBlocks' );
 	return { type: 'UNDO' };
 }
 
