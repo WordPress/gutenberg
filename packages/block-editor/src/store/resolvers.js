@@ -9,9 +9,9 @@ import { apiFetch } from './controls';
 import { setDiscoverBlocks } from './actions';
 
 export default {
-	* getDiscoverBlocks() {
+	* getDiscoverBlocks( filterValue ) {
 		const discoverblocks = yield apiFetch( {
-			path: '__experimental/blocks',
+			path: `__experimental/blocks?search=${ filterValue }`,
 		} );
 		return setDiscoverBlocks( discoverblocks );
 	},

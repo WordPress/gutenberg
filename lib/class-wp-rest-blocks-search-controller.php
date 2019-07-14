@@ -74,7 +74,10 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		global $wp_registered_sidebars;
+
+		if (!isset($_GET['search'])) {
+			return rest_ensure_response( array() );
+		}
 
 		$data = json_decode(
 			'[ {
@@ -120,6 +123,19 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 			} ]'
 		);
 
-		return rest_ensure_response( $data );
+		function block_search( $item )
+		{
+			if(preg_match("/{$_GET['search']}/i", $item->title)) {
+				return true;
+			}
+			if(preg_match("/{$_GET['search']}/i", $item->description)) {
+				return true;
+			}
+			return false;
+		}
+
+		$filtered = array_filter( $data, "block_search" );
+
+		return rest_ensure_response( $filtered	 );
 	}
 }
