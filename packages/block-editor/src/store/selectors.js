@@ -1003,6 +1003,10 @@ export function getTemplate( state ) {
  * @return {?string} Block Template Lock
  */
 export function getTemplateLock( state, rootClientId ) {
+	if ( getZoomedBlockClientIds( state ) ) {
+		return 'all';
+	}
+
 	if ( ! rootClientId ) {
 		return state.settings.templateLock;
 	}
