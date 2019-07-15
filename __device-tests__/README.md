@@ -52,4 +52,4 @@ After the build is complete, an appium server is fired up on port 4723 and the d
 
 -----
 
-To read more about writing your own tests please read the [contributing guide](https://github.com/wordpress-mobile/gutenberg-mobile/blob/add/test-documentation-readme/__device-tests__/CONTRIBUTING.md)
+To read more about writing your own tests please read the [contributing guide](https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/__device-tests__/CONTRIBUTING.md)
