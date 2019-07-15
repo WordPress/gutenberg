@@ -31,6 +31,11 @@ class NavigableContainer extends Component {
 	}
 
 	componentDidMount() {
+		// We use DOM event listeners instead of React event listeners
+		// because we want to catch events from the underlying DOM tree
+		// The React Tree can be different from the DOM tree when using
+		// portals. Block Toolbars for instance are rendered in a separate
+		// React Trees.
 		this.container.addEventListener( 'keydown', this.onKeyDown );
 		this.container.addEventListener( 'focus', this.onFocus );
 	}
