@@ -326,7 +326,11 @@ function BlockListBlock( {
 				}
 				break;
 			case ESCAPE:
-				if ( isSelected && isEditMode && blockNodeRef.current.contains( document.activeElement ) ) {
+				if (
+					isSelected &&
+					isEditMode &&
+					( blockNodeRef.current.contains( document.activeElement ) || wrapper.current === document.activeElement )
+				) {
 					onChangeKeyboardMode( 'navigation' );
 					wrapper.current.focus();
 				}
