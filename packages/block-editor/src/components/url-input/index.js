@@ -259,6 +259,8 @@ class URLInput extends Component {
 			label,
 			instanceId,
 			className,
+			isFullWidth,
+			hasBorder,
 			__experimentalRenderSuggestions: renderSuggestions,
 			placeholder = __( 'Paste URL or type to search' ),
 			value = '',
@@ -297,11 +299,13 @@ class URLInput extends Component {
 			<BaseControl
 				label={ label }
 				id={ id }
-				className={ classnames( 'editor-url-input block-editor-url-input', className ) }
+				className={ classnames( 'editor-url-input block-editor-url-input', className, {
+					'is-full-width': isFullWidth,
+					'has-border': hasBorder,
+				} ) }
 			>
 				<input
 					autoFocus={ autoFocus }
-					id={ id }
 					type="text"
 					aria-label={ __( 'URL' ) }
 					required
