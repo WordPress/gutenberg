@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import { without, map } from 'lodash';
+import { includes, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { useContext, useMemo } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { CheckboxControl } from '@wordpress/components';
@@ -14,6 +15,7 @@ import { CheckboxControl } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockTypesChecklist from './checklist';
+import EditPostSettings from '../edit-post-settings';
 
 function BlockManagerCategory( {
 	instanceId,
@@ -23,6 +25,17 @@ function BlockManagerCategory( {
 	toggleVisible,
 	toggleAllVisible,
 } ) {
+	const settings = useContext( EditPostSettings );
+	const { allowedBlockTypes } = settings;
+	blockTypes = useMemo( () => {
+		if ( allowedBlockTypes === true ) {
+			return blockTypes;
+		}
+		return blockTypes.filter( ( { name } ) => {
+			return includes( allowedBlockTypes || [], name );
+		} );
+	} );
+
 	if ( ! blockTypes.length ) {
 		return null;
 	}

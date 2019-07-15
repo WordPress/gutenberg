@@ -22,6 +22,7 @@ import {
 import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
+import EditPostSettings from './components/edit-post-settings';
 
 class Editor extends Component {
 	constructor() {
@@ -93,24 +94,26 @@ class Editor extends Component {
 
 		return (
 			<StrictMode>
-				<SlotFillProvider>
-					<DropZoneProvider>
-						<EditorProvider
-							settings={ editorSettings }
-							post={ post }
-							initialEdits={ initialEdits }
-							useSubRegistry={ false }
-							{ ...props }
-						>
-							<ErrorBoundary onError={ onError }>
-								<EditorInitialization postId={ postId } />
-								<Layout />
-								<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
-							</ErrorBoundary>
-							<PostLockedModal />
-						</EditorProvider>
-					</DropZoneProvider>
-				</SlotFillProvider>
+				<EditPostSettings.Provider value={ settings }>
+					<SlotFillProvider>
+						<DropZoneProvider>
+							<EditorProvider
+								settings={ editorSettings }
+								post={ post }
+								initialEdits={ initialEdits }
+								useSubRegistry={ false }
+								{ ...props }
+							>
+								<ErrorBoundary onError={ onError }>
+									<EditorInitialization postId={ postId } />
+									<Layout />
+									<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
+								</ErrorBoundary>
+								<PostLockedModal />
+							</EditorProvider>
+						</DropZoneProvider>
+					</SlotFillProvider>
+				</EditPostSettings.Provider>
 			</StrictMode>
 		);
 	}
