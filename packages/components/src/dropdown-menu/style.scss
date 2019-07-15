@@ -106,4 +106,13 @@
 			padding-left: 0.5rem;
 		}
 	}
+
+	.components-dropdown-menu__menu-item,
+	.components-menu-item,
+	.components-menu-item__button {
+		&:disabled,
+		&[aria-disabled="true"] {
+			opacity: 0.3;
+		}
+	}
 }
