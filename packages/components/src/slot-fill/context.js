@@ -97,13 +97,12 @@ class SlotFillProvider extends Component {
 		if ( this.slots[ name ] !== slotInstance ) {
 			return [];
 		}
-
 		return sortBy( this.fills[ name ], 'occurrence' );
 	}
 
 	resetFillOccurrence( name ) {
 		forEach( this.fills[ name ], ( instance ) => {
-			instance.resetOccurrence();
+			instance.occurrence = undefined;
 		} );
 	}
 

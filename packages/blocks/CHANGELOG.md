@@ -1,8 +1,19 @@
-## x.x.x (Unreleased)
+## Master
+
+### Improvements
+
+- Omitting `attributes` or `keywords` settings will now stub default values (an empty object or empty array, respectively).
+
+### Bug Fixes
+
+- The `'blocks.registerBlockType'` filter is now applied to each of a block's deprecated settings as well as the block's main settings. Ensures `supports` settings like `anchor` work for deprecations.
+
+## 6.3.0 (2019-05-21)
 
 ### New Feature
 
 - Added a default implementation for `save` setting in `registerBlockType` which saves no markup in the post content.
+- Added wildcard block transforms which allows for transforming all/any blocks in another block.
 
 ## 6.1.0 (2019-03-06)
 

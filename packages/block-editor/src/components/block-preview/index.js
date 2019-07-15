@@ -1,19 +1,16 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { Disabled } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import BlockEdit from '../block-edit';
+import BlockEditorProvider from '../provider';
+import BlockList from '../block-list';
 
 /**
  * Block Preview Component: It renders a preview given a block name and attributes.
@@ -31,18 +28,22 @@ function BlockPreview( props ) {
 	);
 }
 
-export function BlockPreviewContent( { name, attributes } ) {
-	const block = createBlock( name, attributes );
+export function BlockPreviewContent( { name, attributes, innerBlocks, settings } ) {
+	const block = createBlock( name, attributes, innerBlocks );
 	return (
 		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
-			<BlockEdit
-				name={ name }
-				focus={ false }
-				attributes={ block.attributes }
-				setAttributes={ noop }
-			/>
+			<BlockEditorProvider
+				value={ [ block ] }
+				settings={ settings }
+			>
+				<BlockList />
+			</BlockEditorProvider>
 		</Disabled>
 	);
 }
 
-export default BlockPreview;
+export default withSelect( ( select ) => {
+	return {
+		settings: select( 'core/block-editor' ).getSettings(),
+	};
+} )( BlockPreview );

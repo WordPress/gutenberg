@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { assign } from 'lodash';
+import { assign, has } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { TextControl } from '@wordpress/components';
+import { TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -33,6 +33,10 @@ const ANCHOR_REGEX = /[\s#]/g;
  * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
+	// allow blocks to specify their own attribute definition with default values if needed.
+	if ( has( settings.attributes, [ 'anchor', 'type' ] ) ) {
+		return settings;
+	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
 		// Use Lodash's assign to gracefully handle if attributes are undefined
 		settings.attributes = assign( settings.attributes, {
@@ -66,8 +70,17 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 					<BlockEdit { ...props } />
 					<InspectorAdvancedControls>
 						<TextControl
+							className="html-anchor-control"
 							label={ __( 'HTML Anchor' ) }
-							help={ __( 'Anchors lets you link directly to a section on a page.' ) }
+							help={ (
+								<>
+									{ __( 'Enter a word or two — without spaces — to make a unique web address just for this heading, called an “anchor.” Then, you’ll be able to link directly to this section of your page.' ) }
+
+									<ExternalLink href={ 'https://wordpress.org/support/article/page-jumps/' }>
+										{ __( 'Learn more about anchors' ) }
+									</ExternalLink>
+								</>
+							) }
 							value={ props.attributes.anchor || '' }
 							onChange={ ( nextValue ) => {
 								nextValue = nextValue.replace( ANCHOR_REGEX, '-' );

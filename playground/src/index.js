@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import '@babel/polyfill';
-
-/**
  * WordPress dependencies
  */
 import '@wordpress/editor'; // This shouldn't be necessary
@@ -15,7 +10,11 @@ import {
 	WritingFlow,
 	ObserveTyping,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import {
+	Popover,
+	SlotFillProvider,
+	DropZoneProvider,
+} from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
 
@@ -42,20 +41,24 @@ function App() {
 				<h1 className="playground__logo">Gutenberg Playground</h1>
 			</div>
 			<div className="playground__body">
-				<BlockEditorProvider
-					value={ blocks }
-					onInput={ updateBlocks }
-					onChange={ updateBlocks }
-				>
-					<div className="editor-styles-wrapper">
-						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
-						</WritingFlow>
-					</div>
-					<Popover.Slot />
-				</BlockEditorProvider>
+				<SlotFillProvider>
+					<DropZoneProvider>
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ updateBlocks }
+							onChange={ updateBlocks }
+						>
+							<div className="editor-styles-wrapper">
+								<WritingFlow>
+									<ObserveTyping>
+										<BlockList />
+									</ObserveTyping>
+								</WritingFlow>
+							</div>
+							<Popover.Slot />
+						</BlockEditorProvider>
+					</DropZoneProvider>
+				</SlotFillProvider>
 			</div>
 		</Fragment>
 	);

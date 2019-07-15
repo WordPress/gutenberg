@@ -1,4 +1,12 @@
-## x.x.x (Unreleased)
+## 2.3.0 (2019-06-12)
+
+### Bug Fix
+
+- Fixed custom regular expression for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
+- Fixed arguments checking of `_nx` for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
+- Fixed false positive with `react-no-unsafe-timeout` which would wrongly flag errors when assigning `setTimeout` result to a variable (for example, in a `useEffect` hook).
+
+## 2.2.0 (2019-05-21)
 
 ### New Features
 

@@ -14,11 +14,12 @@ import { DotTip } from '@wordpress/nux';
 /**
  * Internal dependencies
  */
-import MoreMenu from './more-menu';
+import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
+import MoreMenu from './more-menu';
 import PinnedPlugins from './pinned-plugins';
-import shortcuts from '../../keyboard-shortcuts';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
+import shortcuts from '../../keyboard-shortcuts';
 
 function Header( {
 	closeGeneralSidebar,
@@ -38,7 +39,10 @@ function Header( {
 			className="edit-post-header"
 			tabIndex="-1"
 		>
-			<HeaderToolbar />
+			<div className="edit-post-header__toolbar">
+				<FullscreenModeClose />
+				<HeaderToolbar />
+			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.

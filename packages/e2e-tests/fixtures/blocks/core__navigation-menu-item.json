@@ -1,0 +1,15 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/navigation-menu-item",
+        "isValid": true,
+        "attributes": {
+            "label": "WordPress",
+            "destination": "https://wordpress.org/",
+            "nofollow": false,
+            "opensInNewTab": false
+        },
+        "innerBlocks": [],
+        "originalContent": "<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>"
+    }
+]

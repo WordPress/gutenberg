@@ -288,6 +288,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/data-controls",
+		"slug": "packages-data-controls",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/data-controls/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/data",
 		"slug": "packages-data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/data/README.md",
@@ -441,6 +447,12 @@
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/list-reusable-blocks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/media-utils",
+		"slug": "packages-media-utils",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/media-utils/README.md",
 		"parent": "packages"
 	},
 	{
@@ -882,6 +894,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Snackbar",
+		"slug": "snackbar",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/snackbar/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Spinner",
 		"slug": "spinner",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/spinner/README.md",
@@ -1038,9 +1056,9 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Block Controls: Toolbars and Inspector",
-		"slug": "block-controls-toolbars-and-inspector",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbars-and-inspector.md",
+		"title": "Block Controls: Block Toolbar and Settings Sidebar",
+		"slug": "block-controls-toolbar-and-sidebar",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbar-and-sidebar.md",
 		"parent": "block-tutorial"
 	},
 	{

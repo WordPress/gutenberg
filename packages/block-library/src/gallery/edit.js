@@ -2,11 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { filter, map } from 'lodash';
+import { every, filter, forEach, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { compose } from '@wordpress/compose';
 import {
 	IconButton,
 	PanelBody,
@@ -25,6 +26,8 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -50,7 +53,11 @@ class GalleryEdit extends Component {
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
+		this.onMove = this.onMove.bind( this );
+		this.onMoveForward = this.onMoveForward.bind( this );
+		this.onMoveBackward = this.onMoveBackward.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 
@@ -84,6 +91,32 @@ class GalleryEdit extends Component {
 		};
 	}
 
+	onMove( oldIndex, newIndex ) {
+		const images = [ ...this.props.attributes.images ];
+		images.splice( newIndex, 1, this.props.attributes.images[ oldIndex ] );
+		images.splice( oldIndex, 1, this.props.attributes.images[ newIndex ] );
+		this.setState( { selectedImage: newIndex } );
+		this.setAttributes( { images } );
+	}
+
+	onMoveForward( oldIndex ) {
+		return () => {
+			if ( oldIndex === this.props.attributes.images.length - 1 ) {
+				return;
+			}
+			this.onMove( oldIndex, oldIndex + 1 );
+		};
+	}
+
+	onMoveBackward( oldIndex ) {
+		return () => {
+			if ( oldIndex === 0 ) {
+				return;
+			}
+			this.onMove( oldIndex, oldIndex - 1 );
+		};
+	}
+
 	onRemoveImage( index ) {
 		return () => {
 			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
@@ -102,6 +135,12 @@ class GalleryEdit extends Component {
 			images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
 			columns: columns ? Math.min( images.length, columns ) : columns,
 		} );
+	}
+
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
 	}
 
 	setLinkTo( value ) {
@@ -138,6 +177,20 @@ class GalleryEdit extends Component {
 		} );
 	}
 
+	componentDidMount() {
+		const { attributes, mediaUpload } = this.props;
+		const { images } = attributes;
+		if ( every( images, ( { url } ) => isBlobURL( url ) ) ) {
+			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
+			forEach( images, ( { url } ) => revokeBlobURL( url ) );
+			mediaUpload( {
+				filesList,
+				onFileChange: this.onSelectImages,
+				allowedTypes: [ 'image' ],
+			} );
+		}
+	}
+
 	componentDidUpdate( prevProps ) {
 		// Deselect images when deselecting the block
 		if ( ! this.props.isSelected && prevProps.isSelected ) {
@@ -149,7 +202,7 @@ class GalleryEdit extends Component {
 	}
 
 	render() {
-		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
+		const { attributes, isSelected, className, noticeUI } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
 		const hasImages = !! images.length;
@@ -194,7 +247,7 @@ class GalleryEdit extends Component {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple
 				value={ hasImages ? images : undefined }
-				onError={ noticeOperations.createErrorNotice }
+				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 			/>
 		);
@@ -256,7 +309,11 @@ class GalleryEdit extends Component {
 									url={ img.url }
 									alt={ img.alt }
 									id={ img.id }
+									isFirstItem={ index === 0 }
+									isLastItem={ ( index + 1 ) === images.length }
 									isSelected={ isSelected && this.state.selectedImage === index }
+									onMoveBackward={ this.onMoveBackward( index ) }
+									onMoveForward={ this.onMoveForward( index ) }
 									onRemove={ this.onRemoveImage( index ) }
 									onSelect={ this.onSelectImage( index ) }
 									setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
@@ -272,5 +329,16 @@ class GalleryEdit extends Component {
 		);
 	}
 }
+export default compose( [
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		const {
+			__experimentalMediaUpload,
+		} = getSettings();
 
-export default withNotices( GalleryEdit );
+		return {
+			mediaUpload: __experimentalMediaUpload,
+		};
+	} ),
+	withNotices,
+] )( GalleryEdit );

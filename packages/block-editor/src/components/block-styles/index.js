@@ -71,6 +71,7 @@ function BlockStyles( {
 	name,
 	attributes,
 	type,
+	block,
 	onSwitch = noop,
 	onHoverClassName = noop,
 } ) {
@@ -129,6 +130,7 @@ function BlockStyles( {
 									...attributes,
 									className: styleClassName,
 								} }
+								innerBlocks={ block.innerBlocks }
 							/>
 						</div>
 						<div className="editor-block-styles__item-label block-editor-block-styles__item-label">
@@ -149,6 +151,7 @@ export default compose( [
 		const blockType = getBlockType( block.name );
 
 		return {
+			block,
 			name: block.name,
 			attributes: block.attributes,
 			className: block.attributes.className || '',

@@ -8,16 +8,16 @@ import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+import { dispatch, select, apiFetch } from '@wordpress/data-controls';
+import {
+	parse,
+	synchronizeBlocksWithTemplate,
+} from '@wordpress/blocks';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
-import {
-	dispatch,
-	select,
-	resolveSelect,
-	apiFetch,
-} from './controls';
 import {
 	getPostRawValue,
 } from './reducer';
@@ -33,14 +33,120 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import { awaitNextStateChange, getRegistry } from './controls';
+import * as sources from './block-sources';
 
 /**
- * WordPress dependencies
+ * Map of Registry instance to WeakMap of dependencies by custom source.
+ *
+ * @type WeakMap<WPDataRegistry,WeakMap<WPBlockAttributeSource,Object>>
  */
-import {
-	parse,
-	synchronizeBlocksWithTemplate,
-} from '@wordpress/blocks';
+const lastBlockSourceDependenciesByRegistry = new WeakMap;
+
+/**
+ * Given a blocks array, returns a blocks array with sourced attribute values
+ * applied. The reference will remain consistent with the original argument if
+ * no attribute values must be overridden. If sourced values are applied, the
+ * return value will be a modified copy of the original array.
+ *
+ * @param {WPBlock[]} blocks Original blocks array.
+ *
+ * @return {WPBlock[]} Blocks array with sourced values applied.
+ */
+function* getBlocksWithSourcedAttributes( blocks ) {
+	const registry = yield getRegistry();
+
+	let workingBlocks = blocks;
+	for ( let i = 0; i < blocks.length; i++ ) {
+		let block = blocks[ i ];
+		const blockType = yield select( 'core/blocks', 'getBlockType', block.name );
+
+		for ( const [ attributeName, schema ] of Object.entries( blockType.attributes ) ) {
+			if ( ! sources[ schema.source ] || ! sources[ schema.source ].apply ) {
+				continue;
+			}
+
+			if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+				continue;
+			}
+
+			const blockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
+			if ( ! blockSourceDependencies.has( sources[ schema.source ] ) ) {
+				continue;
+			}
+
+			const dependencies = blockSourceDependencies.get( sources[ schema.source ] );
+			const sourcedAttributeValue = sources[ schema.source ].apply( schema, dependencies );
+
+			// It's only necessary to apply the value if it differs from the
+			// block's locally-assigned value, to avoid needlessly resetting
+			// the block editor.
+			if ( sourcedAttributeValue === block.attributes[ attributeName ] ) {
+				continue;
+			}
+
+			// Create a shallow clone to mutate, leaving the original intact.
+			if ( workingBlocks === blocks ) {
+				workingBlocks = [ ...workingBlocks ];
+			}
+
+			block = {
+				...block,
+				attributes: {
+					...block.attributes,
+					[ attributeName ]: sourcedAttributeValue,
+				},
+			};
+
+			workingBlocks.splice( i, 1, block );
+		}
+
+		// Recurse to apply source attributes to inner blocks.
+		if ( block.innerBlocks.length ) {
+			const appliedInnerBlocks = yield* getBlocksWithSourcedAttributes( block.innerBlocks );
+			if ( appliedInnerBlocks !== block.innerBlocks ) {
+				if ( workingBlocks === blocks ) {
+					workingBlocks = [ ...workingBlocks ];
+				}
+
+				block = {
+					...block,
+					innerBlocks: appliedInnerBlocks,
+				};
+
+				workingBlocks.splice( i, 1, block );
+			}
+		}
+	}
+
+	return workingBlocks;
+}
+
+/**
+ * Refreshes the last block source dependencies, optionally for a given subset
+ * of sources (defaults to the full set of sources).
+ *
+ * @param {?Array} sourcesToUpdate Optional subset of sources to reset.
+ *
+ * @yield {Object} Yielded actions or control descriptors.
+ */
+function* resetLastBlockSourceDependencies( sourcesToUpdate = Object.values( sources ) ) {
+	if ( ! sourcesToUpdate.length ) {
+		return;
+	}
+
+	const registry = yield getRegistry();
+
+	for ( const source of sourcesToUpdate ) {
+		if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+			lastBlockSourceDependenciesByRegistry.set( registry, new WeakMap );
+		}
+
+		const lastBlockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
+		const dependencies = yield* source.getDependencies();
+		lastBlockSourceDependencies.set( source, dependencies );
+	}
+}
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -51,13 +157,6 @@ import {
  * @param {Array?} template  Block Template.
  */
 export function* setupEditor( post, edits, template ) {
-	yield {
-		type: 'SETUP_EDITOR',
-		post,
-		edits,
-		template,
-	};
-
 	// In order to ensure maximum of a single parse during setup, edits are
 	// included as part of editor setup action. Assume edited content as
 	// canonical if provided, falling back to post.
@@ -76,8 +175,76 @@ export function* setupEditor( post, edits, template ) {
 		blocks = synchronizeBlocksWithTemplate( blocks, template );
 	}
 
+	yield resetPost( post );
+	yield* resetLastBlockSourceDependencies();
+	yield {
+		type: 'SETUP_EDITOR',
+		post,
+		edits,
+		template,
+	};
 	yield resetEditorBlocks( blocks );
 	yield setupEditorState( post );
+	yield* __experimentalSubscribeSources();
+}
+
+/**
+ * Returns an action object signalling that the editor is being destroyed and
+ * that any necessary state or side-effect cleanup should occur.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalTearDownEditor() {
+	return { type: 'TEAR_DOWN_EDITOR' };
+}
+
+/**
+ * Returns an action generator which loops to await the next state change,
+ * calling to reset blocks when a block source dependencies change.
+ *
+ * @yield {Object} Action object.
+ */
+export function* __experimentalSubscribeSources() {
+	while ( true ) {
+		yield awaitNextStateChange();
+
+		// The bailout case: If the editor becomes unmounted, it will flag
+		// itself as non-ready. Effectively unsubscribes from the registry.
+		const isStillReady = yield select( 'core/editor', '__unstableIsEditorReady' );
+		if ( ! isStillReady ) {
+			break;
+		}
+
+		const registry = yield getRegistry();
+
+		let reset = false;
+		for ( const source of Object.values( sources ) ) {
+			if ( ! source.getDependencies ) {
+				continue;
+			}
+
+			const dependencies = yield* source.getDependencies();
+
+			if ( ! lastBlockSourceDependenciesByRegistry.has( registry ) ) {
+				lastBlockSourceDependenciesByRegistry.set( registry, new WeakMap );
+			}
+
+			const lastBlockSourceDependencies = lastBlockSourceDependenciesByRegistry.get( registry );
+			const lastDependencies = lastBlockSourceDependencies.get( source );
+
+			if ( ! isShallowEqual( dependencies, lastDependencies ) ) {
+				lastBlockSourceDependencies.set( source, dependencies );
+
+				// Allow the loop to continue in order to assign latest
+				// dependencies values, but mark for reset.
+				reset = true;
+			}
+		}
+
+		if ( reset ) {
+			yield resetEditorBlocks( yield select( 'core/editor', 'getEditorBlocks' ) );
+		}
+	}
 }
 
 /**
@@ -323,7 +490,7 @@ export function* savePost( options = {} ) {
 		'getCurrentPostType'
 	);
 
-	const postType = yield resolveSelect(
+	const postType = yield select(
 		'core',
 		'getPostType',
 		currentPostType
@@ -347,9 +514,9 @@ export function* savePost( options = {} ) {
 	let path = `/wp/v2/${ postType.rest_base }/${ post.id }`;
 	let method = 'PUT';
 	if ( isAutosave ) {
-		const currentUser = yield resolveSelect( 'core', 'getCurrentUser' );
+		const currentUser = yield select( 'core', 'getCurrentUser' );
 		const currentUserId = currentUser ? currentUser.id : undefined;
-		const autosavePost = yield resolveSelect( 'core', 'getAutosave', post.type, post.id, currentUserId );
+		const autosavePost = yield select( 'core', 'getAutosave', post.type, post.id, currentUserId );
 		const mappedAutosavePost = mapValues( pick( autosavePost, AUTOSAVE_PROPERTIES ), getPostRawValue );
 
 		// Ensure autosaves contain all expected fields, using autosave or
@@ -365,12 +532,12 @@ export function* savePost( options = {} ) {
 		yield dispatch(
 			'core/notices',
 			'removeNotice',
-			SAVE_POST_NOTICE_ID,
+			SAVE_POST_NOTICE_ID
 		);
 		yield dispatch(
 			'core/notices',
 			'removeNotice',
-			'autosave-exists',
+			'autosave-exists'
 		);
 	}
 
@@ -448,7 +615,7 @@ export function* refreshPost() {
 		STORE_KEY,
 		'getCurrentPostType'
 	);
-	const postType = yield resolveSelect(
+	const postType = yield select(
 		'core',
 		'getPostType',
 		postTypeSlug
@@ -476,7 +643,7 @@ export function* trashPost() {
 		STORE_KEY,
 		'getCurrentPostType'
 	);
-	const postType = yield resolveSelect(
+	const postType = yield select(
 		'core',
 		'getPostType',
 		postTypeSlug
@@ -739,10 +906,46 @@ export function unlockPostSaving( lockName ) {
  *
  * @return {Object} Action object
  */
-export function resetEditorBlocks( blocks, options = {} ) {
+export function* resetEditorBlocks( blocks, options = {} ) {
+	const lastBlockAttributesChange = yield select( 'core/block-editor', '__experimentalGetLastBlockAttributeChanges' );
+
+	// Sync to sources from block attributes updates.
+	if ( lastBlockAttributesChange ) {
+		const updatedSources = new Set;
+		const updatedBlockTypes = new Set;
+		for ( const [ clientId, attributes ] of Object.entries( lastBlockAttributesChange ) ) {
+			const blockName = yield select( 'core/block-editor', 'getBlockName', clientId );
+			if ( updatedBlockTypes.has( blockName ) ) {
+				continue;
+			}
+
+			updatedBlockTypes.add( blockName );
+			const blockType = yield select( 'core/blocks', 'getBlockType', blockName );
+
+			for ( const [ attributeName, newAttributeValue ] of Object.entries( attributes ) ) {
+				if ( ! blockType.attributes.hasOwnProperty( attributeName ) ) {
+					continue;
+				}
+
+				const schema = blockType.attributes[ attributeName ];
+				const source = sources[ schema.source ];
+
+				if ( source && source.update ) {
+					yield* source.update( schema, newAttributeValue );
+					updatedSources.add( source );
+				}
+			}
+		}
+
+		// Dependencies are reset so that source dependencies subscription
+		// skips a reset which would otherwise occur by dependencies change.
+		// This assures that at most one reset occurs per block change.
+		yield* resetLastBlockSourceDependencies( Array.from( updatedSources ) );
+	}
+
 	return {
 		type: 'RESET_EDITOR_BLOCKS',
-		blocks,
+		blocks: yield* getBlocksWithSourcedAttributes( blocks ),
 		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
 	};
 }
@@ -766,6 +969,9 @@ export function updateEditorSettings( settings ) {
  */
 
 const getBlockEditorAction = ( name ) => function* ( ...args ) {
+	deprecated( '`wp.data.dispatch( \'core/editor\' ).' + name + '`', {
+		alternative: '`wp.data.dispatch( \'core/block-editor\' ).' + name + '`',
+	} );
 	yield dispatch( 'core/block-editor', name, ...args );
 };
 

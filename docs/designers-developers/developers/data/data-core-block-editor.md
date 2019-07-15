@@ -80,24 +80,6 @@ _Returns_
 
 -   `number`: Number of blocks in the post.
 
-<a name="getBlockDependantsCacheBust" href="#getBlockDependantsCacheBust">#</a> **getBlockDependantsCacheBust**
-
-Returns a new reference when the inner blocks of a given block client ID
-change. This is used exclusively as a memoized selector dependant, relying
-on this selector's shared return value and recursively those of its inner
-blocks defined as dependencies. This abuses mechanics of the selector
-memoization to return from the original selector function only when
-dependants change.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _clientId_ `string`: Block client ID.
-
-_Returns_
-
--   `*`: A value whose reference will change only when inner blocks of the given block client ID change.
-
 <a name="getBlockHierarchyRootClientId" href="#getBlockHierarchyRootClientId">#</a> **getBlockHierarchyRootClientId**
 
 Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -1008,6 +990,7 @@ _Parameters_
 
 -   _clientIds_ `(string|Array<string>)`: Block client ID(s) to replace.
 -   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
+-   _indexToSelect_ `number`: Index of replacement block to select.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
 

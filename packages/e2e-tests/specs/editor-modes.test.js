@@ -3,6 +3,7 @@
  */
 import {
 	clickBlockAppender,
+	clickBlockToolbarButton,
 	createNewPost,
 	switchEditorModeTo,
 } from '@wordpress/e2e-test-utils';
@@ -23,8 +24,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "Visual" to "HTML".
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		let changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 
@@ -36,8 +36,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "HTML" back to "Visual".
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		changeModeButton = await page.waitForXPath( '//button[text()="Edit visually"]' );
 		await changeModeButton.click();
 
@@ -51,14 +50,13 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "Visual" to "HTML".
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 
 		// The font size picker for the paragraph block should appear, even in
 		// HTML editing mode.
-		const fontSizePicker = await page.$$( '.edit-post-sidebar .components-font-size-picker__buttons' );
+		const fontSizePicker = await page.$$( '.edit-post-sidebar .components-font-size-picker__controls' );
 		expect( fontSizePicker ).toHaveLength( 1 );
 	} );
 
@@ -67,8 +65,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Change editing mode from "Visual" to "HTML".
-		await page.waitForSelector( 'button[aria-label="More options"]' );
-		await page.click( 'button[aria-label="More options"]' );
+		await clickBlockToolbarButton( 'More options' );
 		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 
@@ -77,9 +74,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
 
 		// Change the font size using the sidebar.
-		await page.click( '.components-font-size-picker__selector' );
-		const changeSizeButton = await page.waitForSelector( '.components-button.is-font-large' );
-		await changeSizeButton.click();
+		await page.select( '.components-font-size-picker__select .components-select-control__input', 'large' );
 
 		// Make sure the HTML content updated.
 		htmlBlockContent = await page.$eval( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea', ( node ) => node.textContent );
@@ -101,7 +96,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		// Switch to Code Editor and hide More Menu
 		await switchEditorModeTo( 'Code' );
 		await page.click(
-			'.edit-post-more-menu [aria-label="Hide more tools & options"]'
+			'.edit-post-more-menu [aria-label="More tools & options"]'
 		);
 
 		// The Block inspector should not be active anymore

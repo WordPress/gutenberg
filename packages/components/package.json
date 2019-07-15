@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "7.3.1",
+	"version": "8.0.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,7 +23,6 @@
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
 		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
@@ -37,13 +36,14 @@
 		"clipboard": "^2.0.1",
 		"diff": "^3.5.0",
 		"dom-scroll-into-view": "^1.2.1",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.14",
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",
 		"mousetrap": "^1.6.2",
-		"re-resizable": "^4.7.1",
+		"re-resizable": "^5.0.1",
 		"react-click-outside": "^3.0.0",
 		"react-dates": "^17.1.1",
+		"react-spring": "^8.0.20",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^3.3.2"
