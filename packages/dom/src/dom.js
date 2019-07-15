@@ -259,7 +259,7 @@ export function computeCaretRect() {
  * @param {boolean} isReverse True for end, false for start.
  * @param {Object} focusOptions options that get passed to the focus() call.
  */
-export function placeCaretAtHorizontalEdge( container, isReverse, focusOptions = {} ) {
+export function placeCaretAtHorizontalEdge( container, isReverse, focusOptions = { preventScroll: false } ) {
 	if ( ! container ) {
 		return;
 	}
