@@ -1,41 +1,28 @@
 /**
+ * External dependencies
+ */
+import { times } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-
 function Stars( {
 	rating,
 } ) {
-	let counter = rating * 2;
-	const items = [];
-
-	for ( let i = 0; i < 5; i++ ) {
-		switch ( counter ) {
-			case 0:
-				items.push( <Icon key={ i } icon={ 'star-empty' } size={ 16 }></Icon> );
-				break;
-
-			case 1:
-				items.push( <Icon key={ i } icon={ 'star-half' } size={ 16 }></Icon> );
-				counter--;
-				break;
-
-			default:
-				items.push( <Icon key={ i } icon={ 'star-filled' } size={ 16 }></Icon> );
-				counter -= 2;
-		}
-	}
-
 	const stars = Math.round( rating / 0.5 ) * 0.5;
 
+	const fullStarCount = Math.floor( rating );
+	const halfStarCount = Math.ceil( rating - fullStarCount );
+	const emptyStarCount = 5 - ( fullStarCount + halfStarCount );
+
 	return (
-		<div aria-label={ sprintf( __( '%s out of 5 stars', stars ), stars ) } >
-			{ items }
+		<div aria-label={ sprintf( __( '%s out of 5 stars', stars ), stars ) }>
+			{ times( fullStarCount, ( i ) => <Icon key={ `full_stars_${ i }` } icon={ 'star-filled' } size={ 16 } /> ) }
+			{ times( halfStarCount, ( i ) => <Icon key={ `half_stars_${ i }` } icon={ 'star-half' } size={ 16 } /> ) }
+			{ times( emptyStarCount, ( i ) => <Icon key={ `empty_stars_${ i }` } icon={ 'star-empty' } size={ 16 } /> ) }
 		</div>
 	);
 }
