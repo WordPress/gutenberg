@@ -36,7 +36,6 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/nux": "file:../nux",
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",

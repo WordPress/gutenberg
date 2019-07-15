@@ -105,6 +105,10 @@ $block-inserter-search-height: 38px;
 	}
 }
 
+.block-editor-inserter__tip {
+	margin: 0 0 $grid-size-large 0;
+}
+
 .block-editor-inserter__popover .block-editor-block-types-list {
 	margin: 0 -8px;
 }

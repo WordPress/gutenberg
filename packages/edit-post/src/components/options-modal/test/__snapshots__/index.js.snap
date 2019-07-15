@@ -12,7 +12,7 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     <WithSelect(WithDispatch(IfViewportMatches(BaseOption)))
       label="Enable Pre-publish Checks"
     />
-    <WithSelect(WithDispatch(DeferredOption))
+    <WithSelect(WithDispatch(BaseOption))
       label="Enable Tips"
     />
   </Section>

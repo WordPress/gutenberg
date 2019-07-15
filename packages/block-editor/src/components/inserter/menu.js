@@ -22,7 +22,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
-import { withSpokenMessages, PanelBody } from '@wordpress/components';
+import { withSpokenMessages, PanelBody, ExternalLink } from '@wordpress/components';
 import {
 	getCategories,
 	isReusableBlock,
@@ -33,6 +33,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { addQueryArgs } from '@wordpress/url';
+import { InlineTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -289,6 +290,14 @@ export class InserterMenu extends Component {
 					role="region"
 					aria-label={ __( 'Available block types' ) }
 				>
+
+					<InlineTip tipId="core/editor.inserter" className="block-editor-inserter__tip">
+						{ __( 'There are Blocks for most types of content: text, headings, images, lists, and lots more!' ) }
+						{ ' ' }
+						<ExternalLink href="https://wordpress.org/support/article/wordpress-editor/#blocks">
+							{ __( 'Learn more' ) }
+						</ExternalLink>
+					</InlineTip>
 
 					<ChildBlocks
 						rootClientId={ rootClientId }

@@ -32,8 +32,4 @@ export async function createNewPost( {
 		const action = _enableTips ? 'enableTips' : 'disableTips';
 		wp.data.dispatch( 'core/nux' )[ action ]();
 	}, enableTips );
-
-	if ( enableTips ) {
-		await page.reload();
-	}
 }

@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { InlineTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -51,6 +52,9 @@ const BlockInspector = ( {
 
 	return (
 		<>
+			<InlineTip tipId="core/editor.blockInspector" className="block-editor-block-inspector__tip">
+				{ __( 'The block tab contains additional settings for the selected block.' ) }
+			</InlineTip>
 			<div className="editor-block-inspector__card block-editor-block-inspector__card">
 				<BlockIcon icon={ blockType.icon } showColors />
 				<div className="editor-block-inspector__card-content block-editor-block-inspector__card-content">

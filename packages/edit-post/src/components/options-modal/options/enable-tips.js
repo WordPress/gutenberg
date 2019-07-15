@@ -7,7 +7,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import DeferredOption from './deferred';
+import BaseOption from './base';
 
 export default compose(
 	withSelect( ( select ) => ( {
@@ -19,9 +19,4 @@ export default compose(
 			onChange: ( isEnabled ) => ( isEnabled ? enableTips() : disableTips() ),
 		};
 	} )
-)(
-	// Using DeferredOption here means enableTips() is called when the Options
-	// modal is dismissed. This stops the NUX guide from appearing above the
-	// Options modal, which looks totally weird.
-	DeferredOption
-);
+)( BaseOption );

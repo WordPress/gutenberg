@@ -2,179 +2,96 @@
  * WordPress dependencies
  */
 import {
-	clickBlockAppender,
-	clickOnMoreMenuItem,
 	createNewPost,
-	saveDraft,
+	insertBlock,
+	openGlobalBlockInserter,
 	toggleScreenOption,
 } from '@wordpress/e2e-test-utils';
 
+/**
+ * Queries the data store and returns whether or not NUX tips are enabled.
+ *
+ * @return {boolean} Whether or not NUX tips are enabled.
+ */
+async function areTipsEnabled() {
+	return await page.evaluate( () => wp.data.select( 'core/nux' ).areTipsEnabled() );
+}
+
 describe( 'New User Experience (NUX)', () => {
-	async function clickAllTips( page ) {
-		// Click through all available tips.
-		const tips = await getTips( page );
-		const numberOfTips = tips.tipIds.length;
-
-		for ( let i = 1; i < numberOfTips; i++ ) {
-			await page.click( '.nux-dot-tip .components-button.is-link' );
-		}
-
-		return { numberOfTips, tips };
-	}
-
-	async function getTips( page ) {
-		return await page.evaluate( () => {
-			return wp.data.select( 'core/nux' ).getAssociatedGuide( 'core/editor.inserter' );
-		} );
-	}
-
-	async function getTipsEnabled( page ) {
-		return await page.evaluate( () => {
-			return wp.data.select( 'core/nux' ).areTipsEnabled();
-		} );
-	}
-
 	beforeEach( async () => {
 		await createNewPost( { enableTips: true } );
 	} );
 
-	it( 'should show tips to a first-time user', async () => {
-		const firstTipText = await page.$eval( '.nux-dot-tip', ( element ) => element.innerText );
-		expect( firstTipText ).toContain( 'Welcome to the wonderful world of blocks!' );
+	it( 'should show a tip in the inserter', async () => {
+		// Open up the inserter.
+		await openGlobalBlockInserter();
 
-		const [ nextTipButton ] = await page.$x( "//button[contains(text(), 'See next tip')]" );
-		await nextTipButton.click();
-
-		const secondTipText = await page.$eval( '.nux-dot-tip', ( element ) => element.innerText );
-		expect( secondTipText ).toContain( 'You’ll find more settings for your page and blocks in the sidebar.' );
+		// Check there's a tip in the inserter.
+		const inserterTip = await page.$( '.block-editor-inserter__tip' );
+		expect( inserterTip ).not.toBeNull();
 	} );
 
-	it( 'should show "Got it" once all tips have been displayed', async () => {
-		await clickAllTips( page );
+	it( 'should show a tip in the block inspector', async () => {
+		// Insert any old block.
+		await insertBlock( 'Paragraph' );
 
-		// Make sure "Got it" button appears on the last tip.
-		const gotItButton = await page.$x( "//button[contains(text(), 'Got it')]" );
-		expect( gotItButton ).toHaveLength( 1 );
-
-		// Click the "Got it button".
-		await page.click( '.nux-dot-tip .components-button.is-link' );
-
-		// Verify no more tips are visible on the page.
-		const nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 0 );
-
-		// Tips should not be marked as disabled, but when the user has seen all
-		// of the available tips, they will not appear.
-		const areTipsEnabled = await getTipsEnabled( page );
-		expect( areTipsEnabled ).toEqual( true );
+		// Check there's a tip in the block inspector.
+		const blockInspectorTip = await page.$( '.block-editor-block-inspector__tip' );
+		expect( blockInspectorTip ).not.toBeNull();
 	} );
 
-	it( 'should hide and disable tips if "disable tips" button is clicked', async () => {
-		await page.click( '.nux-dot-tip__disable' );
+	it( 'should dismiss a single tip if X button is clicked and dialog is dismissed', async () => {
+		// We need to *dismiss* the upcoming confirm() dialog, so let's temporarily
+		// remove the listener that was added in by enablePageDialogAccept().
+		const listeners = page.rawListeners( 'dialog' );
+		page.removeAllListeners( 'dialog' );
 
-		// Verify no more tips are visible on the page.
-		let nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 0 );
+		// Open up the inserter.
+		await openGlobalBlockInserter();
 
-		// We should be disabling the tips so they don't appear again.
-		const areTipsEnabled = await getTipsEnabled( page );
-		expect( areTipsEnabled ).toEqual( false );
+		// Dismiss the upcoming confirm() dialog.
+		page.once( 'dialog', async ( dialog ) => {
+			await dialog.dismiss();
+		} );
 
-		// Refresh the page; tips should not show because they were disabled.
-		await page.reload();
+		// Click the tip's X button.
+		await page.click( '.block-editor-inserter__tip button[aria-label="Dismiss this notice"]' );
 
-		nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 0 );
+		// The tip should be gone.
+		const inserterTip = await page.$( '.block-editor-inserter__tip' );
+		expect( inserterTip ).toBeNull();
+
+		// Tips should still be enabled.
+		expect( await areTipsEnabled() ).toBe( true );
+
+		// Restore the listeners that we removed above.
+		for ( const listener of listeners ) {
+			page.addListener( 'dialog', listener );
+		}
 	} );
 
-	it( 'should enable tips when the "Enable tips" option is toggled on', async () => {
-		// Start by disabling tips.
-		await page.click( '.nux-dot-tip__disable' );
+	it( 'should disable all tips if X button is clicked and dialog is confirmed', async () => {
+		// Open up the inserter.
+		await openGlobalBlockInserter();
 
-		// Verify no more tips are visible on the page.
-		let nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 0 );
+		// Dismiss the tip. (The confirm() dialog will automatically be accepted.)
+		await page.click( '.block-editor-inserter__tip button[aria-label="Dismiss this notice"]' );
 
-		// Tips should be disabled in localStorage as well.
-		let areTipsEnabled = await getTipsEnabled( page );
-		expect( areTipsEnabled ).toEqual( false );
+		// The tip should be gone.
+		const inserterTip = await page.$( '.block-editor-inserter__tip' );
+		expect( inserterTip ).toBeNull();
 
-		// Toggle the 'Enable Tips' option to enable.
-		await toggleScreenOption( 'Enable Tips' );
-
-		// Tips should once again appear.
-		nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 1 );
-
-		// Tips should be enabled in localStorage as well.
-		areTipsEnabled = await getTipsEnabled( page );
-		expect( areTipsEnabled ).toEqual( true );
+		// Tips should now be disabled.
+		expect( await areTipsEnabled() ).toBe( false );
 	} );
 
-	// TODO: This test should be enabled once
-	// https://github.com/WordPress/gutenberg/issues/7458 is fixed.
-	it.skip( 'should show tips as disabled if all tips have been shown', async () => {
-		await clickAllTips( page );
+	it( 'should enable and disable tips when option is toggled', async () => {
+		// Toggling the option off should disable tips.
+		await toggleScreenOption( 'Enable Tips', false );
+		expect( await areTipsEnabled() ).toBe( false );
 
-		// Open the "More" menu to check the "Show Tips" element.
-		await page.click( '.edit-post-more-menu [aria-label="More tools & options"]' );
-		const showTipsButton = await page.$x( '//button[contains(text(), "Show Tips")][@aria-pressed="false"]' );
-
-		expect( showTipsButton ).toHaveLength( 1 );
-	} );
-
-	// TODO: This test should be enabled once
-	// https://github.com/WordPress/gutenberg/issues/7458 is fixed.
-	it.skip( 'should reset tips if all tips have been shown and show tips was unchecked', async () => {
-		const { numberOfTips } = await clickAllTips( page );
-
-		// Click again to re-enable tips; they should appear.
-		await clickOnMoreMenuItem( 'Show Tips' );
-
-		// Open the "More" menu to check the "Show Tips" element.
-		await page.click( '.edit-post-more-menu [aria-label="More tools & options"]' );
-		const showTipsButton = await page.$x( '//button[contains(text(), "Show Tips")][@aria-pressed="true"]' );
-
-		expect( showTipsButton ).toHaveLength( 1 );
-
-		// Tips should re-appear on the page.
-		const nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 1 );
-
-		// Tips should be enabled again.
-		const areTipsEnabled = await getTipsEnabled( page );
-		expect( areTipsEnabled ).toEqual( true );
-
-		// Dismissed tips should be reset and ready to be shown again.
-		const resetTips = await getTips( page );
-		const newNumberOfTips = resetTips.tipIds.length;
-		expect( newNumberOfTips ).toHaveLength( numberOfTips );
-	} );
-
-	// TODO: This test should be enabled once
-	// https://github.com/WordPress/gutenberg/issues/7753 is fixed.
-	// See: https://github.com/WordPress/gutenberg/issues/7753#issuecomment-403952816
-	it.skip( 'should show tips if "Show tips" was disabled on a draft and then enabled', async () => {
-		// Click the "Show tips" button (enabled by default) to disable tips.
-		await clickOnMoreMenuItem( 'Show Tips' );
-
-		// Let's type something so there's content in this post.
-		await page.click( '.editor-post-title__input' );
-		await page.keyboard.type( 'Post title' );
-		await clickBlockAppender();
-		await page.keyboard.type( 'Post content goes here.' );
-		await saveDraft();
-
-		// Refresh the page; tips should be disabled.
-		await page.reload();
-		let nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 0 );
-
-		// Clicking should re-enable tips.
-		await clickOnMoreMenuItem( 'Show Tips' );
-
-		// Tips should re-appear on the page.
-		nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 1 );
+		// Toggling the option on should enable tips.
+		await toggleScreenOption( 'Enable Tips', true );
+		expect( await areTipsEnabled() ).toBe( true );
 	} );
 } );

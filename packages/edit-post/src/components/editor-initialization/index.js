@@ -1,10 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import {
@@ -24,14 +18,5 @@ export default function( { postId } ) {
 	useAdjustSidebarListener( postId );
 	useBlockSelectionListener( postId );
 	useUpdatePostLinkListener( postId );
-	const { triggerGuide } = useDispatch( 'core/nux' );
-	useEffect( () => {
-		triggerGuide( [
-			'core/editor.inserter',
-			'core/editor.settings',
-			'core/editor.preview',
-			'core/editor.publish',
-		] );
-	}, [ triggerGuide ] );
 	return null;
 }

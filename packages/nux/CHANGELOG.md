@@ -1,3 +1,7 @@
+# 3.1.0 (Unreleased)
+
+- Adds the `InlineTip` component.
+
 ## 3.0.6 (2019-01-03)
 
 ## 3.0.5 (2018-12-12)
