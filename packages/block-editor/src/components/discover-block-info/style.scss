@@ -1,0 +1,18 @@
+.discover-block-info__content-description {
+	margin-top: 4px;
+}
+.discover-block-info-row {
+	display: flex;
+	justify-content: space-between;
+	color: $dark-gray-400;
+	margin-top: 8px;
+	.discover-block-info-column {
+		display: flex;
+		.dashicons {
+			font-size: 16px;
+		}
+		.dashicons-chart-line {
+			font-weight: 900;
+		}
+	}
+}

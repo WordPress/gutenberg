@@ -60,24 +60,6 @@
 	display: flex;
 	flex-direction: column;
 	padding: 12px;
-	.block-editor-discover-block-list-item__content-description {
-		margin-top: 4px;
-	}
-	> div {
-		display: flex;
-		justify-content: space-between;
-		color: $dark-gray-400;
-		margin-top: 8px;
-		> div {
-			display: flex;
-			.dashicons {
-				font-size: 16px;
-			}
-			.dashicons-chart-line {
-				font-weight: 900;
-			}
-		}
-	}
 }
 
 .block-editor-discover-block-list-item__footer {
@@ -85,12 +67,6 @@
 	flex-direction: column;
 	padding: 12px;
 	background-color: $light-gray-500;
-	> span {
-		margin-bottom: 4px;
-	}
-	.block-editor-discover-block-list-item__content-footer {
-		color: $dark-gray-400;
-	}
 }
 
 .block-editor-discover-block-list-item__content {
