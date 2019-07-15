@@ -456,7 +456,7 @@
 		@include break-mobile() {
 			.block-editor-block-toolbar {
 				/*!rtl:begin:ignore*/
-				left: $block-side-ui-width * 3;
+				left: $block-side-ui-width * 3 + ($grid-size-small * 1.5);
 				/*!rtl:end:ignore*/
 			}
 		}
