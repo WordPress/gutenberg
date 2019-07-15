@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { filter, map, find } from 'lodash';
+import { filter, forEach, map, find, every } from 'lodash';
 
 /**
  * WordPress dependencies
