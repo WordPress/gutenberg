@@ -135,6 +135,9 @@ export function ColumnsEdit( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
+	// The template selector is shown when we first insert the columns block (count === 0).
+	// or if there's no template available.
+	// The count === 0 trick is useful when you use undo/redo.
 	const showTemplateSelector = ( count === 0 && ! forceUseTemplate ) || ! template;
 
 	return (
