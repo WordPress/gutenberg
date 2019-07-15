@@ -1,3 +1,9 @@
+## Master
+
+### New Features
+
+- The `build` and `start` commands supports simplified syntax for multiple entry points: `wp-scripts build entry-one.js entry-two.js` ([15982](https://github.com/WordPress/gutenberg/pull/15982)).
+
 ## 3.3.0 (2019-06-12)
 
 ### New Features

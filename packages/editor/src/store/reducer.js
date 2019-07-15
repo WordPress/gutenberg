@@ -558,6 +558,9 @@ export function isReady( state = false, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
 			return true;
+
+		case 'TEAR_DOWN_EDITOR':
+			return false;
 	}
 
 	return state;

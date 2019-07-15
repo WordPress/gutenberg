@@ -64,13 +64,13 @@ exports[`Block transforms correctly transform block Heading in fixture core__hea
 <!-- /wp:quote -->"
 `;
 
-exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-em into the Paragraph block 1`] = `
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h4-em into the Paragraph block 1`] = `
 "<!-- wp:paragraph -->
 <p>The <em>Inserter</em> Tool</p>
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Block transforms correctly transform block Heading in fixture core__heading__h2-em into the Quote block 1`] = `
+exports[`Block transforms correctly transform block Heading in fixture core__heading__h4-em into the Quote block 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p>The <em>Inserter</em> Tool</p></blockquote>
 <!-- /wp:quote -->"
@@ -98,9 +98,9 @@ exports[`Block transforms correctly transform block Image in fixture core__image
 
 exports[`Block transforms correctly transform block Image in fixture core__image into the Group block 1`] = `
 "<!-- wp:group -->
-<div class=\\"wp-block-group\\"><!-- wp:image -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:image -->
 <figure class=\\"wp-block-image\\"><img src=\\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\\" alt=\\"\\"/></figure>
-<!-- /wp:image --></div>
+<!-- /wp:image --></div></div>
 <!-- /wp:group -->"
 `;
 
@@ -362,9 +362,9 @@ exports[`Block transforms correctly transform block Media & Text in fixture core
 
 exports[`Block transforms correctly transform block Paragraph in fixture core__paragraph__align-right into the Group block 1`] = `
 "<!-- wp:group -->
-<div class=\\"wp-block-group\\"><!-- wp:paragraph {\\"align\\":\\"right\\"} -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:paragraph {\\"align\\":\\"right\\"} -->
 <p style=\\"text-align:right\\">... like this one, which is separate from the above and right aligned.</p>
-<!-- /wp:paragraph --></div>
+<!-- /wp:paragraph --></div></div>
 <!-- /wp:group -->"
 `;
 

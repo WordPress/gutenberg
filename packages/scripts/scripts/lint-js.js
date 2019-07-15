@@ -9,20 +9,20 @@ const { sync: resolveBin } = require( 'resolve-bin' );
  */
 const {
 	fromConfigRoot,
-	getCliArgs,
-	hasCliArg,
-	hasFileInCliArgs,
+	getArgsFromCLI,
+	hasArgInCLI,
+	hasFileArgInCLI,
 	hasPackageProp,
 	hasProjectFile,
 } = require( '../utils' );
 
-const args = getCliArgs();
+const args = getArgsFromCLI();
 
-const defaultFilesArgs = hasFileInCliArgs() ? [] : [ '.' ];
+const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '.' ];
 
 // See: https://eslint.org/docs/user-guide/configuring#using-configuration-files-1.
-const hasLintConfig = hasCliArg( '-c' ) ||
-	hasCliArg( '--config' ) ||
+const hasLintConfig = hasArgInCLI( '-c' ) ||
+	hasArgInCLI( '--config' ) ||
 	hasProjectFile( '.eslintrc.js' ) ||
 	hasProjectFile( '.eslintrc.yaml' ) ||
 	hasProjectFile( '.eslintrc.yml' ) ||
@@ -38,7 +38,7 @@ const defaultConfigArgs = ! hasLintConfig ?
 	[];
 
 // See: https://eslint.org/docs/user-guide/configuring#ignoring-files-and-directories.
-const hasIgnoredFiles = hasCliArg( '--ignore-path' ) ||
+const hasIgnoredFiles = hasArgInCLI( '--ignore-path' ) ||
 	hasProjectFile( '.eslintignore' );
 
 const defaultIgnoreArgs = ! hasIgnoredFiles ?
