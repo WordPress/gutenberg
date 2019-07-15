@@ -109,6 +109,7 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 				"icon": "excerpt-view",
 				"description": "A block for listicles. You can add items, remove them, and flip them in reverse.",
 				"category": "discover",
+				"keywords": ["posts", "helloworld"],
 				"assets": {
 					"editor_script": {
 						"src": "http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.build.js"
@@ -122,20 +123,17 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 				}
 			} ]'
 		);
-
-		function block_search( $item )
-		{
+		$filtered = array();
+		
+		foreach ( $data as $item ) {
 			if(preg_match("/{$_GET['search']}/i", $item->title)) {
-				return true;
+				$filtered[] = $item;
 			}
-			if(preg_match("/{$_GET['search']}/i", $item->description)) {
-				return true;
+			else if(preg_match("/{$_GET['search']}/i", $item->description)) {
+				$filtered[] = $item;
 			}
-			return false;
 		}
 
-		$filtered = array_filter( $data, "block_search" );
-
-		return rest_ensure_response( $filtered	 );
+		return rest_ensure_response( $filtered );
 	}
 }
