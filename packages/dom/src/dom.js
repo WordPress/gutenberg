@@ -257,14 +257,15 @@ export function computeCaretRect() {
  *
  * @param {Element} container Focusable element.
  * @param {boolean} isReverse True for end, false for start.
+ * @param {Object} focusOptions options that get passed to the focus() call.
  */
-export function placeCaretAtHorizontalEdge( container, isReverse ) {
+export function placeCaretAtHorizontalEdge( container, isReverse, focusOptions = {} ) {
 	if ( ! container ) {
 		return;
 	}
 
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
-		container.focus( { preventScroll: true } );
+		container.focus( focusOptions );
 
 		if ( isReverse ) {
 			container.selectionStart = container.value.length;

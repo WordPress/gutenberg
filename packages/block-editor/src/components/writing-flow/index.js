@@ -341,7 +341,7 @@ class WritingFlow extends Component {
 		const focusableNodes = focus.focusable.find( this.container );
 		const target = findLast( focusableNodes, isTabbableTextField );
 		if ( target ) {
-			placeCaretAtHorizontalEdge( target, true );
+			placeCaretAtHorizontalEdge( target, true, { preventScroll: false } );
 		}
 	}
 
