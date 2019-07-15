@@ -28,7 +28,7 @@
 }
 
 .components-notice__content {
-	margin: 1em #{ $icon-button-size-small + $border-width } 1em 0;
+	margin: $grid-size-small #{ $icon-button-size-small + $border-width } $grid-size-small 0;
 }
 
 .components-notice__action.components-button {
