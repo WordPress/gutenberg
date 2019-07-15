@@ -20,7 +20,7 @@ function DiscoverBlockListItem( {
 	const itemIconStyle = icon ? {
 		backgroundColor: icon.background,
 		color: icon.foreground,
-	} : {};
+	} : undefined;
 
 	return (
 		<li className="block-editor-discover-block-list-item">
