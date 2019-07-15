@@ -1,7 +1,7 @@
 # Documentation
-/docs                                           @youknowriad @chrisvanpatten @ajitbohra @notnownikki
-/docs/designers-developers/developers           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @notnownikki
-/docs/designers-developers/designers            @youknowriad @chrisvanpatten @mkaz @ajitbohra @notnownikki
+/docs                                           @youknowriad @chrisvanpatten @ajitbohra
+/docs/designers-developers/developers           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra
+/docs/designers-developers/designers            @youknowriad @chrisvanpatten @mkaz @ajitbohra
 
 # Data
 /packages/api-fetch                             @youknowriad @aduth @nerrad @mmtr
@@ -10,7 +10,7 @@
 /packages/redux-routine                         @youknowriad @aduth @nerrad
 
 # Blocks
-/packages/block-library                         @youknowriad @gziolo @Soean @ajitbohra @jorgefilipecosta @talldan @notnownikki
+/packages/block-library                         @youknowriad @gziolo @Soean @ajitbohra @jorgefilipecosta @talldan
 
 # Editor
 /packages/annotations                           @youknowriad @aduth @atimmer @ellatrix
@@ -29,7 +29,7 @@
 
 # Tooling
 /bin                                            @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
-/docs/tool                                      @youknowriad @gziolo @chrisvanpatten @ajitbohra @nosolosw @notnownikki
+/docs/tool                                      @youknowriad @gziolo @chrisvanpatten @ajitbohra @nosolosw
 /packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /packages/babel-plugin-makepot                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
@@ -77,9 +77,9 @@
 /packages/plugins                               @youknowriad @gziolo @aduth @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao
-/packages/rich-text                             @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao
-/packages/block-editor/src/components/rich-text @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao
+/packages/format-library                        @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao @etoledom
+/packages/rich-text                             @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao @etoledom
+/packages/block-editor/src/components/rich-text @youknowriad @aduth @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao @etoledom
 
 # PHP
 /lib                                            @youknowriad @gziolo @aduth @timothybjacobs

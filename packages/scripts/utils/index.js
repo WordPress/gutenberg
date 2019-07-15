@@ -2,10 +2,11 @@
  * Internal dependencies
  */
 const {
-	getCliArg,
-	getCliArgs,
-	hasCliArg,
-	hasFileInCliArgs,
+	getArgFromCLI,
+	getArgsFromCLI,
+	getFileArgsFromCLI,
+	hasArgInCLI,
+	hasFileArgInCLI,
 	spawnScript,
 } = require( './cli' );
 const {
@@ -27,12 +28,13 @@ const {
 module.exports = {
 	camelCaseDash,
 	fromConfigRoot,
-	getCliArg,
-	getCliArgs,
+	getArgFromCLI,
+	getArgsFromCLI,
+	getFileArgsFromCLI,
 	getWebpackArgs,
 	hasBabelConfig,
-	hasCliArg,
-	hasFileInCliArgs,
+	hasArgInCLI,
+	hasFileArgInCLI,
 	hasJestConfig,
 	hasPackageProp,
 	hasProjectFile,

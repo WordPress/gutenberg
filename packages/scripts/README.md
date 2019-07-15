@@ -49,7 +49,8 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"build": "wp-scripts build"
+		"build": "wp-scripts build",
+		"build:custom": "wp-scripts build entry-one.js entry-two.js --output-path=custom"
 	}
 }
 ```
@@ -57,6 +58,7 @@ _Example:_
 This is how you execute the script with presented setup:
 
 * `npm run build` - builds the code for production.
+* `npm run build:custom` - builds the code for production with two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
 
 #### Advanced information
 
@@ -198,7 +200,8 @@ _Example:_
 ```json
 {
 	"scripts": {
-		"start": "wp-scripts start"
+		"start": "wp-scripts start",
+		"start:custom": "wp-scripts start entry-one.js entry-two.js --output-path=custom"
 	}
 }
 ```
@@ -206,6 +209,7 @@ _Example:_
 This is how you execute the script with presented setup:
 
 * `npm start` - starts the build for development.
+* `npm run start:custom` - starts the build for development which contains two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
 
 #### Advanced information
 
@@ -232,9 +236,9 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
-* `npm run test:e2e` - runs all unit tests.
-* `npm run test:e2e:help` - prints all available options to configure unit tests runner.
-* `npm run test-e2e -- --puppeteer-interactive` - runs all unit tests interactively.
+* `npm run test:e2e` - runs all e2e tests.
+* `npm run test:e2e:help` - prints all available options to configure e2e test runner.
+* `npm run test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
 * `npm run test-e2e FILE_NAME -- --puppeteer-interactive ` - runs one test file interactively.
 * `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
 
@@ -308,7 +312,7 @@ To extend the provided webpack config, or replace subsections within the provide
 In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://github.com/webpack-contrib/url-loader):
 
 ```javascript
-const defaultConfig = require("./node_modules/@wordpress/scripts/config/webpack.config");
+const defaultConfig = require("@wordpress/scripts/config/webpack.config");
 
 module.exports = {
   ...defaultConfig,

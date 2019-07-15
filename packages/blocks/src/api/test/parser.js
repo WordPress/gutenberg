@@ -10,7 +10,6 @@ import deepFreeze from 'deep-freeze';
 import {
 	getBlockAttribute,
 	getBlockAttributes,
-	asType,
 	createBlockWithFallback,
 	getMigratedBlock,
 	default as parsePegjs,
@@ -20,6 +19,7 @@ import {
 	isOfTypes,
 	isValidByType,
 	isValidByEnum,
+	serializeBlockNode,
 } from '../parser';
 import {
 	registerBlockType,
@@ -101,44 +101,6 @@ describe( 'block parser', () => {
 
 			expect( originalMatcher( node ) ).toBe( 'disabled' );
 			expect( enhancedMatcher( node ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'asType()', () => {
-		it( 'gracefully handles undefined type', () => {
-			expect( asType( 5 ) ).toBe( 5 );
-		} );
-
-		it( 'gracefully handles unhandled type', () => {
-			expect( asType( 5, '__UNHANDLED__' ) ).toBe( 5 );
-		} );
-
-		it( 'returns expected coerced values', () => {
-			const arr = [];
-			const obj = {};
-
-			expect( asType( '5', 'string' ) ).toBe( '5' );
-			expect( asType( 5, 'string' ) ).toBe( '5' );
-
-			expect( asType( 5, 'integer' ) ).toBe( 5 );
-			expect( asType( '5', 'integer' ) ).toBe( 5 );
-
-			expect( asType( 5, 'number' ) ).toBe( 5 );
-			expect( asType( '5', 'number' ) ).toBe( 5 );
-
-			expect( asType( true, 'boolean' ) ).toBe( true );
-			expect( asType( false, 'boolean' ) ).toBe( false );
-			expect( asType( '5', 'boolean' ) ).toBe( true );
-			expect( asType( 0, 'boolean' ) ).toBe( false );
-
-			expect( asType( null, 'null' ) ).toBe( null );
-			expect( asType( 0, 'null' ) ).toBe( null );
-
-			expect( asType( arr, 'array' ) ).toBe( arr );
-			expect( asType( new Set( [ 1, 2, 3 ] ), 'array' ) ).toEqual( [ 1, 2, 3 ] );
-
-			expect( asType( obj, 'object' ) ).toBe( obj );
-			expect( asType( {}, 'object' ) ).toEqual( {} );
 		} );
 	} );
 
@@ -281,6 +243,32 @@ describe( 'block parser', () => {
 				},
 			);
 			expect( value ).toBe( false );
+		} );
+
+		describe( 'source: tag', () => {
+			it( 'returns tag name of matching selector', () => {
+				const value = parseWithAttributeSchema(
+					'<div></div>',
+					{
+						source: 'tag',
+						selector: ':nth-child(1)',
+					}
+				);
+
+				expect( value ).toBe( 'div' );
+			} );
+
+			it( 'returns undefined when no element matches selector', () => {
+				const value = parseWithAttributeSchema(
+					'<div></div>',
+					{
+						source: 'tag',
+						selector: ':nth-child(2)',
+					}
+				);
+
+				expect( value ).toBe( undefined );
+			} );
 		} );
 	} );
 
@@ -767,6 +755,111 @@ describe( 'block parser', () => {
 			expect( block.isValid ).toBe( true );
 			expect( console ).toHaveErrored();
 			expect( console ).toHaveWarned();
+		} );
+	} );
+
+	describe( 'serializeBlockNode', () => {
+		it( 'reserializes block nodes', () => {
+			const expected = `<!-- wp:columns -->
+				<div class="wp-block-columns has-2-columns">
+					<!-- wp:column -->
+					<div class="wp-block-column">
+						<!-- wp:paragraph -->
+						<p>A</p>
+						<!-- /wp:paragraph -->
+					</div>
+					<!-- /wp:column -->
+					<!-- wp:column -->
+					<div class="wp-block-column">
+						<!-- wp:group -->
+						<div class="wp-block-group"><div class="wp-block-group__inner-container">
+							<!-- wp:list -->
+							<ul><li>B</li><li>C</li></ul>
+							<!-- /wp:list -->
+							<!-- wp:paragraph -->
+							<p>D</p>
+							<!-- /wp:paragraph -->
+						</div></div>
+						<!-- /wp:group -->
+					</div>
+					<!-- /wp:column -->
+				</div>
+				<!-- /wp:columns -->`.replace( /\t/g, '' );
+			const input = {
+				blockName: 'core/columns',
+				attrs: {},
+				innerBlocks: [
+					{
+						blockName: 'core/column',
+						attrs: {},
+						innerBlocks: [
+							{
+								blockName: 'core/paragraph',
+								attrs: {},
+								innerBlocks: [],
+								innerHTML: '<p>A</p>',
+								innerContent: [ '<p>A</p>' ],
+							},
+						],
+						innerHTML: '<div class="wp-block-column"></div>',
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
+					},
+					{
+						blockName: 'core/column',
+						attrs: {},
+						innerBlocks: [
+							{
+								blockName: 'core/group',
+								attrs: {},
+								innerBlocks: [
+									{
+										blockName: 'core/list',
+										attrs: {},
+										innerBlocks: [],
+										innerHTML: '<ul><li>B</li><li>C</li></ul>',
+										innerContent: [ '<ul><li>B</li><li>C</li></ul>' ],
+									},
+									{
+										blockName: 'core/paragraph',
+										attrs: {},
+										innerBlocks: [],
+										innerHTML: '<p>D</p>',
+										innerContent: [ '<p>D</p>' ],
+									},
+								],
+								innerHTML: '<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+								innerContent: [
+									'<div class="wp-block-group"><div class="wp-block-group__inner-container">',
+									null,
+									'',
+									null,
+									'</div></div>' ],
+							},
+						],
+						innerHTML: '<div class="wp-block-column"></div>',
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
+					},
+				],
+				innerHTML: '<div class="wp-block-columns has-2-columns"></div>',
+				innerContent: [
+					'<div class="wp-block-columns has-2-columns">',
+					null,
+					'',
+					null,
+					'</div>',
+				],
+			};
+			const actual = serializeBlockNode( input );
+
+			expect( actual ).toEqual( expected );
 		} );
 	} );
 

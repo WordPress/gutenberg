@@ -28,7 +28,7 @@ export function Button( props, ref ) {
 
 	const classes = classnames( 'components-button', className, {
 		'is-button': isDefault || isPrimary || isLarge || isSmall,
-		'is-default': isDefault || isLarge || isSmall,
+		'is-default': isDefault || ( ! isPrimary && ( isLarge || isSmall ) ),
 		'is-primary': isPrimary,
 		'is-large': isLarge,
 		'is-small': isSmall,

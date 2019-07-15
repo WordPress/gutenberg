@@ -40,7 +40,7 @@ You may also want to check that upon clicking the button the `toggle format` mes
 
 By default, the button is rendered on every rich text toolbar (image captions, buttons, paragraphs, etc).
 It is possible to render the button only on blocks of a certain type by using `wp.data.withSelect` together with `wp.compose.ifCondition`.
-The following sample code renders the previously shown button only on paragraph blocks:
+The following sample code renders the previously shown button only on Paragraph blocks:
 
 ```js
 ( function( wp ) {

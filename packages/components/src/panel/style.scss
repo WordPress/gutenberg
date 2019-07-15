@@ -117,6 +117,7 @@
 
 .components-panel__icon {
 	color: $dark-gray-500;
+	filter: grayscale(1) !important;
 	margin: -2px 0 -2px 6px;
 }
 

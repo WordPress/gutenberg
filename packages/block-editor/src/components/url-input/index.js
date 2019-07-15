@@ -223,8 +223,14 @@ class URLInput extends Component {
 		this.inputRef.current.focus();
 	}
 
+	static getDerivedStateFromProps( { disableSuggestions }, { showSuggestions } ) {
+		return {
+			showSuggestions: disableSuggestions === true ? false : showSuggestions,
+		};
+	}
+
 	render() {
-		const { label, value = '', autoFocus = true, instanceId, className } = this.props;
+		const { label, value = '', autoFocus = true, instanceId, className, id, isFullWidth, hasBorder } = this.props;
 		const { showSuggestions, suggestions, selectedSuggestion, loading } = this.state;
 		const id = `url-input-control-${ instanceId }`;
 
@@ -236,9 +242,13 @@ class URLInput extends Component {
 			<BaseControl
 				label={ label }
 				id={ id }
-				className={ classnames( 'editor-url-input block-editor-url-input', className ) }
+				className={ classnames( 'editor-url-input block-editor-url-input', className, {
+					'is-full-width': isFullWidth,
+					'has-border': hasBorder,
+				} ) }
 			>
 				<input
+					id={ id }
 					autoFocus={ autoFocus }
 					id={ id }
 					type="text"
@@ -260,9 +270,17 @@ class URLInput extends Component {
 				{ ( loading ) && <Spinner /> }
 
 				{ showSuggestions && !! suggestions.length &&
-					<Popover position="bottom" noArrow focusOnMount={ false }>
+					<Popover
+						position="bottom"
+						noArrow
+						focusOnMount={ false }
+					>
 						<div
-							className="editor-url-input__suggestions block-editor-url-input__suggestions"
+							className={ classnames(
+								'editor-url-input__suggestions',
+								'block-editor-url-input__suggestions',
+								`${ className }__suggestions`
+							) }
 							id={ suggestionsListboxId }
 							ref={ this.autocompleteRef }
 							role="listbox"

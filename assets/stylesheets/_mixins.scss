@@ -44,6 +44,12 @@
 	}
 }
 
+@mixin break-zoomed-in() {
+	@media (min-width: #{ ($break-zoomed-in) }) {
+		@content;
+	}
+}
+
 
 /**
  * Long content fade mixin
@@ -232,13 +238,31 @@
 	color: $dark-gray-900;
 }
 
-@mixin block-style__focus-active() {
+@mixin block-style__focus() {
 	color: $dark-gray-900;
-	box-shadow: 0 0 0 2px $blue-medium-500;
+	box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
 	outline-offset: -2px;
+}
+
+@mixin block-style__is-active() {
+	color: $dark-gray-900;
+	box-shadow: inset 0 0 0 2px $dark-gray-500;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+}
+
+@mixin block-style__is-active-focus() {
+	color: $dark-gray-900;
+	box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500, inset 0 0 0 2px $dark-gray-500;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 4px solid transparent;
+	outline-offset: -4px;
 }
 
 /**
