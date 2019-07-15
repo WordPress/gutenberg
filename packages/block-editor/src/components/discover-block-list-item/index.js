@@ -23,18 +23,18 @@ function DiscoverBlockListItem( {
 	} : {};
 
 	return (
-		<li className="block-editor-discover-blocks-list-item">
-			<div className="block-editor-discover-blocks-list-item-panel">
-				<div className="block-editor-discover-blocks-list-item-header">
+		<li className="block-editor-discover-block-list-item">
+			<div className="block-editor-discover-block-list-item__panel">
+				<div className="block-editor-discover-block-list-item__header">
 					<div>
 						<span
-							className="block-editor-discover-blocks-list-item__icon"
+							className="block-editor-discover-block-list-item__icon"
 							style={ itemIconStyle }
 						>
 							<BlockIcon icon={ icon } showColors />
 						</span>
 						<div>
-							<span className="block-editor-discover-blocks-list-item__title">
+							<span className="block-editor-discover-block-list-item__title">
 								{ title }
 							</span>
 							<BlockRatings rating={ 4.5 } ratingCount={ 110 } />
@@ -52,8 +52,8 @@ function DiscoverBlockListItem( {
 						Add
 					</Button>
 				</div>
-				<div className="block-editor-discover-blocks-list-item-body">
-					<span className="block-editor-discover-blocks-list-item__content--description">
+				<div className="block-editor-discover-block-list-item__body">
+					<span className="block-editor-discover-block-list-item__content-description">
 						{ description }
 					</span>
 					<div>
@@ -65,14 +65,14 @@ function DiscoverBlockListItem( {
 						</div>
 					</div>
 				</div>
-				<div className="block-editor-discover-blocks-list-item-footer">
-					<span className="block-editor-discover-blocks-list-item__content--footer">
+				<div className="block-editor-discover-block-list-item__footer">
+					<span className="block-editor-discover-block-list-item__content-footer">
 						Authored by <strong>XXX</strong>
 					</span>
-					<span className="block-editor-discover-blocks-list-item__content--footer">
+					<span className="block-editor-discover-block-list-item__content-footer">
 						This author has <strong>X</strong> blocks, with an average rating of <strong>X.X</strong>.
 					</span>
-					<span className="block-editor-discover-blocks-list-item__content--footer">
+					<span className="block-editor-discover-block-list-item__content-footer">
 						They have an average support time of <strong>X days</strong>.
 					</span>
 				</div>
