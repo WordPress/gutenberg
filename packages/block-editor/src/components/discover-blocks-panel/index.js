@@ -26,8 +26,6 @@ function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission 
 		return (
 			<p className="block-editor-discover-blocks-panel__description--no-results">
 				{ __( 'No blocks found in your library.' ) }
-				<br />
-				{ __( 'Check your spelling and try using more general keywords.' ) }
 			</p>
 		);
 	}
