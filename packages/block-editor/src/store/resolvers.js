@@ -14,7 +14,7 @@ export default {
 			const discoverblocks = yield apiFetch( {
 				path: `__experimental/blocks?search=${ filterValue }`,
 			} );
-			return setDiscoverBlocks( discoverblocks );
+			return setDiscoverBlocks( discoverblocks, filterValue );
 		} catch ( error ) {
 			if ( error.code === 'rest_user_cannot_view' ) {
 				return setInstallBlocksPermission( false );

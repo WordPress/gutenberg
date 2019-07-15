@@ -99,11 +99,13 @@ export const normalizeTerm = ( term ) => {
  *
  * @param {Object} asset The asset object as described in block.json.
  * @param {Function} onLoad The callback function when script is loaded.
+ * @param {Function} onError The callback function when script is error loading.
  */
-export const loadScipt = ( asset, onLoad ) => {
+export const loadScipt = ( asset, onLoad, onError ) => {
 	const script = document.createElement( 'script' );
 	script.src = asset.src;
 	script.onload = onLoad;
+	script.onerror = onError;
 	document.body.appendChild( script );
 };
 
@@ -474,6 +476,9 @@ export default compose(
 					insertBlock,
 				} = dispatch( 'core/block-editor' );
 				const {
+					createErrorNotice,
+				} = dispatch( 'core/notices' );
+				const {
 					getSelectedBlock,
 				} = select( 'core/block-editor' );
 				const { isAppender } = ownProps;
@@ -505,9 +510,12 @@ export default compose(
 							handleInsertBlock( block );
 						}
 					};
+					const onError = () => {
+						createErrorNotice( 'Block previews can\'t load.' );
+					};
 					if ( item.assets.editor_script ) {
 						scriptsCount++;
-						loadScipt( item.assets.editor_script, onLoad );
+						loadScipt( item.assets.editor_script, onLoad, onError );
 					}
 					if ( item.assets.style ) {
 						loadStyle( item.assets.style );

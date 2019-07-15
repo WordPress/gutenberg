@@ -707,11 +707,12 @@ export function __unstableMarkLastChangeAsPersistent() {
 
 /** Returns an action object used in signalling that the discover blocks have been updated.
  * @param {Array} discoverBlocks Discoverable blocks.
+ * @param {string} filterValue Search string.
  *
  * @return {Object} Action object.
  */
-export function setDiscoverBlocks( discoverBlocks ) {
-	return { type: 'SET_DISCOVER_BLOCKS', discoverBlocks };
+export function setDiscoverBlocks( discoverBlocks, filterValue ) {
+	return { type: 'SET_DISCOVER_BLOCKS', discoverBlocks, filterValue };
 }
 
 /** Returns an action object used in signalling that the user does not have permission to install blocks.

@@ -1231,12 +1231,14 @@ export function lastBlockAttributesChange( state, action ) {
  *
  * @return {Object} Updated state.
  */
-export const discoverBlocks = ( state = { items: [], hasPermission: undefined }, action ) => {
+export const discoverBlocks = ( state = { results: {}, hasPermission: undefined, filterValue: undefined }, action ) => {
 	switch ( action.type ) {
 		case 'SET_DISCOVER_BLOCKS' :
 			return {
 				...state,
-				items: action.discoverBlocks,
+				results: Object.assign( {}, state.results, {
+					[ action.filterValue ]: action.discoverBlocks,
+				} ),
 				hasPermission: true,
 			};
 		case 'SET_INSTALL_BLOCKS_PERMISSION' :

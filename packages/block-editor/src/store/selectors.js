@@ -1410,11 +1410,15 @@ function getReusableBlocks( state ) {
  * Returns the available uninstalled blocks
  *
  * @param {Object} state Global application state.
+ * @param {string} filterValue Search string.
  *
  * @return {Array} Discoverable blocks
  */
-export function getDiscoverBlocks( state ) {
-	return state.discoverBlocks.items;
+export function getDiscoverBlocks( state, filterValue ) {
+	if ( ! state.discoverBlocks.results[ filterValue ] ) {
+		return [];
+	}
+	return state.discoverBlocks.results[ filterValue ];
 }
 
 /**
