@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, createRef, useMemo } from '@wordpress/element';
+import { Component, createRef, useMemo, Fragment } from '@wordpress/element';
 import {
 	ToggleControl,
 	withSpokenMessages,
@@ -74,18 +74,20 @@ class InlineLinkUI extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
+		this.setNoFollow = this.setNoFollow.bind( this );
 		this.onClickOutside = this.onClickOutside.bind( this );
 		this.resetState = this.resetState.bind( this );
 		this.autocompleteRef = createRef();
 
 		this.state = {
 			opensInNewWindow: false,
+			noFollow: false,
 			inputValue: '',
 		};
 	}
 
 	static getDerivedStateFromProps( props, state ) {
-		const { activeAttributes: { url, target } } = props;
+		const { activeAttributes: { url, target, rel } } = props;
 		const opensInNewWindow = target === '_blank';
 
 		if ( ! isShowingInput( props, state ) ) {
@@ -95,6 +97,13 @@ class InlineLinkUI extends Component {
 
 			if ( opensInNewWindow !== state.opensInNewWindow ) {
 				return { opensInNewWindow };
+			}
+
+			if ( typeof rel === 'string' ) {
+				const noFollow = rel.split( ' ' ).includes( 'nofollow' );
+				if ( noFollow !== state.noFollow ) {
+					return { noFollow };
+				}
 			}
 		}
 
@@ -124,6 +133,25 @@ class InlineLinkUI extends Component {
 			onChange( applyFormat( value, createLinkFormat( {
 				url,
 				opensInNewWindow,
+				noFollow: this.state.noFollow,
+				text: selectedText,
+			} ) ) );
+		}
+	}
+
+	setNoFollow( noFollow ) {
+		const { activeAttributes: { url = '' }, value, onChange } = this.props;
+
+		this.setState( { noFollow } );
+
+		// Apply now if URL is not being edited.
+		if ( ! isShowingInput( this.props, this.state ) ) {
+			const selectedText = getTextContent( slice( value ) );
+
+			onChange( applyFormat( value, createLinkFormat( {
+				url,
+				noFollow,
+				opensInNewWindow: this.state.opensInNewWindow,
 				text: selectedText,
 			} ) ) );
 		}
@@ -190,7 +218,7 @@ class InlineLinkUI extends Component {
 			return null;
 		}
 
-		const { inputValue, opensInNewWindow } = this.state;
+		const { inputValue, opensInNewWindow, noFollow } = this.state;
 		const showInput = isShowingInput( this.props, this.state );
 
 		return (
@@ -202,11 +230,18 @@ class InlineLinkUI extends Component {
 				onClose={ this.resetState }
 				focusOnMount={ showInput ? 'firstElement' : false }
 				renderSettings={ () => (
-					<ToggleControl
-						label={ __( 'Open in New Tab' ) }
-						checked={ opensInNewWindow }
-						onChange={ this.setLinkTarget }
-					/>
+					<Fragment>
+						<ToggleControl
+							label={ __( 'Open in New Tab' ) }
+							checked={ opensInNewWindow }
+							onChange={ this.setLinkTarget }
+						/>
+						<ToggleControl
+							label={ __( 'No follow' ) }
+							checked={ noFollow }
+							onChange={ this.setNoFollow }
+						/>
+					</Fragment>
 				) }
 			>
 				{ showInput ? (

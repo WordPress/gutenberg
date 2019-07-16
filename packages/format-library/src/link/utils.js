@@ -85,11 +85,12 @@ export function isValidHref( href ) {
  *
  * @param {string}  url              The href of the link.
  * @param {boolean} opensInNewWindow Whether this link will open in a new window.
+ * @param {boolean} noFollow         Whether this link will have a nofollow rel attribute.
  * @param {Object}  text             The text that is being hyperlinked.
  *
  * @return {Object} The final format object.
  */
-export function createLinkFormat( { url, opensInNewWindow, text } ) {
+export function createLinkFormat( { url, opensInNewWindow, noFollow, text } ) {
 	const format = {
 		type: 'core/link',
 		attributes: {
@@ -97,13 +98,24 @@ export function createLinkFormat( { url, opensInNewWindow, text } ) {
 		},
 	};
 
+	const relAttributes = [];
+
 	if ( opensInNewWindow ) {
 		// translators: accessibility label for external links, where the argument is the link text
 		const label = sprintf( __( '%s (opens in a new tab)' ), text );
 
 		format.attributes.target = '_blank';
-		format.attributes.rel = 'noreferrer noopener';
 		format.attributes[ 'aria-label' ] = label;
+
+		relAttributes.push( 'noreferrer noopener' );
+	}
+
+	if ( noFollow ) {
+		relAttributes.push( 'nofollow' );
+	}
+
+	if ( relAttributes.length > 0 ) {
+		format.attributes.rel = relAttributes.join( ' ' );
 	}
 
 	return format;
