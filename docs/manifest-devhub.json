@@ -102,7 +102,7 @@
 		"parent": "slotfills"
 	},
 	{
-		"title": "PluginBlockSettingsMenuItem",
+		"title": "PluginDocumentSettingPanel",
 		"slug": "plugin-document-setting-panel",
 		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-document-setting-panel.md",
 		"parent": "slotfills"
