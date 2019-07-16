@@ -498,7 +498,9 @@ describe( 'Links', () => {
 		// Check the checkbox.
 		await page.keyboard.press( 'Space' );
 		// Navigate back to the input field.
-		await page.keyboard.press( 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		// Submit the form.
 		await page.keyboard.press( 'Enter' );
 
@@ -529,7 +531,7 @@ describe( 'Links', () => {
 		// Uncheck the checkbox.
 		await page.keyboard.press( 'Space' );
 		// Navigate back to the input field.
-		await page.keyboard.press( 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		// Submit the form.
 		await page.keyboard.press( 'Enter' );
 
