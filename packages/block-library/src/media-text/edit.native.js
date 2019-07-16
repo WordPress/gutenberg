@@ -1,24 +1,29 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import { get } from 'lodash';
 import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
+	BlockControls,
+	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	withColors,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
+import {
+	Toolbar,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import MediaContainer from './media-container';
+import styles from './style.scss';
 
 /**
  * Constants
@@ -99,10 +104,10 @@ class MediaTextEdit extends Component {
 
 		return (
 			<MediaContainer
-				className="block-library-media-text__media-container"
 				onSelectMedia={ this.onSelectMedia }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
+				onFocus={ this.props.onFocus }
 				{ ...{ mediaAlt, mediaId, mediaType, mediaUrl, mediaPosition, mediaWidth, imageFill, focalPoint } }
 			/>
 		);
@@ -111,40 +116,65 @@ class MediaTextEdit extends Component {
 	render() {
 		const {
 			attributes,
-			className,
 			backgroundColor,
-			isSelected,
+			setAttributes,
 		} = this.props;
 		const {
 			isStackedOnMobile,
 			mediaPosition,
 			mediaWidth,
 			verticalAlignment,
-			imageFill,
 		} = attributes;
-		const temporaryMediaWidth = this.state.mediaWidth;
-		const classNames = classnames( className, {
-			'has-media-on-the-right': 'right' === mediaPosition,
-			'is-selected': isSelected,
-			[ backgroundColor.class ]: backgroundColor.class,
-			'is-stacked-on-mobile': isStackedOnMobile,
-			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-			'is-image-fill': imageFill,
-		} );
-		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
-		const style = {
-			gridTemplateColumns: 'right' === mediaPosition ? `auto ${ widthString }` : `${ widthString } auto`,
+		const temporaryMediaWidth = this.state.mediaWidth || mediaWidth;
+		const widthString = `${ temporaryMediaWidth }%`;
+		const containerStyles = {
+			...styles[ 'wp-block-media-text' ],
+			...styles[ `is-vertically-aligned-${ verticalAlignment }` ],
+			...( isStackedOnMobile ? styles[ 'is-stacked-on-mobile' ] : {} ),
+			...( mediaPosition === 'right' ? styles[ 'has-media-on-the-right' ] : {} ),
 			backgroundColor: backgroundColor.color,
 		};
+		const innerBlockWidth = 100 - temporaryMediaWidth;
+		const innerBlockWidthString = `${ innerBlockWidth }%`;
+
+		const toolbarControls = [ {
+			icon: 'align-pull-left',
+			title: __( 'Show media on left' ),
+			isActive: mediaPosition === 'left',
+			onClick: () => setAttributes( { mediaPosition: 'left' } ),
+		}, {
+			icon: 'align-pull-right',
+			title: __( 'Show media on right' ),
+			isActive: mediaPosition === 'right',
+			onClick: () => setAttributes( { mediaPosition: 'right' } ),
+		} ];
+
+		const onVerticalAlignmentChange = ( alignment ) => {
+			setAttributes( { verticalAlignment: alignment } );
+		};
+
 		return (
 			<>
-				<View className={ classNames } style={ style } >
-					{ this.renderMediaArea() }
-					<InnerBlocks
-						allowedBlocks={ ALLOWED_BLOCKS }
-						template={ TEMPLATE }
-						templateInsertUpdatesSelection={ false }
+				<BlockControls>
+					<Toolbar
+						controls={ toolbarControls }
 					/>
+					<BlockVerticalAlignmentToolbar
+						onChange={ onVerticalAlignmentChange }
+						value={ verticalAlignment }
+					/>
+				</BlockControls>
+				<View style={ containerStyles }>
+					<View style={ { width: widthString } }>
+						{ this.renderMediaArea() }
+					</View>
+					<View style={ { width: innerBlockWidthString } }>
+						<InnerBlocks
+							allowedBlocks={ ALLOWED_BLOCKS }
+							template={ TEMPLATE }
+							templateInsertUpdatesSelection={ false }
+						/>
+					</View>
 				</View>
 			</>
 		);

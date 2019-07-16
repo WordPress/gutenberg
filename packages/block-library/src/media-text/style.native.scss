@@ -1,0 +1,38 @@
+.wp-block-media-text {
+	display: flex;
+	align-items: flex-start;
+	flex-direction: row;
+
+	&.has-media-on-the-right {
+		flex-direction: row-reverse;
+	}
+}
+
+.is-vertically-aligned-top {
+	align-items: flex-start;
+}
+
+.is-vertically-aligned-center {
+	align-items: center;
+}
+
+.is-vertically-aligned-bottom {
+	align-items: flex-end;
+}
+
+/*
+* Here we here not able to use a mobile first CSS approach.
+* Custom widths are set using inline styles, and on mobile,
+* we need 100% width, so we use important to overwrite the inline style.
+* If the style were set on mobile first, on desktop styles,
+* we would have no way of setting the style again to the inline style.
+*/
+@media (max-width: #{ ($break-small) }) {
+	.wp-block-media-text.is-stacked-on-mobile {
+		flex-direction: column;
+	}
+
+	.wp-block-media-text.is-stacked-on-mobile.has-media-on-the-right {
+		flex-direction: column-reverse;
+	}
+}

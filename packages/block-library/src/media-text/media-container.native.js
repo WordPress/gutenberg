@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { View, Image, ImageBackground } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import { IconButton, Toolbar, withNotices } from '@wordpress/components';
@@ -21,19 +26,30 @@ import icon from './media-container-icon';
  */
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 
-export function imageFillStyles( url, focalPoint ) {
-	return url ?
-		{
-			backgroundImage: `url(${ url })`,
-			backgroundPosition: focalPoint ? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%` : `50% 50%`,
-		} :
-		{};
+export function calculatePreferedImageSize( image, container ) {
+	const maxWidth = container.clientWidth;
+	const exceedMaxWidth = image.width > maxWidth;
+	const ratio = image.height / image.width;
+	const width = exceedMaxWidth ? maxWidth : image.width;
+	const height = exceedMaxWidth ? maxWidth * ratio : image.height;
+	return { width, height };
 }
 
 class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onUploadError = this.onUploadError.bind( this );
+		this.calculateSize = this.calculateSize.bind( this );
+		this.onLayout = this.onLayout.bind( this );
+
+		this.state = {
+			width: 0,
+			height: 0,
+		};
+
+		if ( this.props.mediaUrl ) {
+			this.onMediaChange();
+		}
 	}
 
 	onUploadError( message ) {
@@ -65,40 +81,82 @@ class MediaContainer extends Component {
 		);
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.mediaUrl !== this.props.mediaUrl ) {
+			this.onMediaChange();
+		}
+	}
+
+	onMediaChange() {
+		const mediaType = this.props.mediaType;
+		if ( mediaType === 'video' ) {
+
+		} else if ( mediaType === 'image' ) {
+			Image.getSize( this.props.mediaUrl, ( width, height ) => {
+				this.media = { width, height };
+				this.calculateSize();
+			} );
+		}
+	}
+
+	calculateSize() {
+		if ( this.media === undefined || this.container === undefined ) {
+			return;
+		}
+
+		const { width, height } = calculatePreferedImageSize( this.media, this.container );
+		this.setState( { width, height } );
+	}
+
+	onLayout( event ) {
+		const { width, height } = event.nativeEvent.layout;
+		this.container = {
+			clientWidth: width,
+			clientHeight: height,
+		};
+		this.calculateSize();
+	}
+
 	renderImage() {
-		const { mediaAlt, mediaUrl, className, imageFill, focalPoint } = this.props;
-		const backgroundStyles = imageFill ? imageFillStyles( mediaUrl, focalPoint ) : {};
+		const { mediaAlt, mediaUrl } = this.props;
+
 		return (
-			<>
-				{ this.renderToolbarEditButton() }
-				<figure className={ className } style={ backgroundStyles }>
-					<img src={ mediaUrl } alt={ mediaAlt } />
-				</figure>
-			</>
+			<View onLayout={ this.onLayout }>
+				<ImageBackground
+					accessible={ true }
+					//disabled={ ! isSelected }
+					accessibilityLabel={ mediaAlt }
+					accessibilityHint={ __( 'Double tap and hold to edit' ) }
+					accessibilityRole={ 'imagebutton' }
+					style={ { width: this.state.width, height: this.state.height } }
+					resizeMethod="scale"
+					source={ { uri: mediaUrl } }
+					key={ mediaUrl }
+				>
+				</ImageBackground>
+			</View>
 		);
 	}
 
 	renderVideo() {
-		const { mediaUrl, className } = this.props;
+		const style = { videoContainer: {} };
 		return (
-			<>
-				{ this.renderToolbarEditButton() }
-				<figure className={ className }>
-					<video controls src={ mediaUrl } />
-				</figure>
-			</>
+			<View onLayout={ this.onLayout }>
+				<View style={ style.videoContainer }>
+					{ /* TODO: show video preview */ }
+				</View>
+			</View>
 		);
 	}
 
 	renderPlaceholder() {
-		const { onSelectMedia, className, noticeUI } = this.props;
+		const { onSelectMedia, noticeUI } = this.props;
 		return (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
 				labels={ {
 					title: __( 'Media area' ),
 				} }
-				className={ className }
 				onSelect={ onSelectMedia }
 				accept="image/*,video/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }

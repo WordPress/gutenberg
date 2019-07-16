@@ -3,6 +3,7 @@ export { default as BlockControls } from './block-controls';
 export { default as BlockEdit } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
+export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
 export * from './colors';
 export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
