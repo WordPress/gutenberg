@@ -153,11 +153,12 @@ function* resetLastBlockSourceDependencies( sourcesToUpdate = Object.values( sou
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post      Post object.
- * @param {Object} edits     Initial edited attributes object.
- * @param {Array?} template  Block Template.
+ * @param {Object}  post         Post object.
+ * @param {Object}  edits        Initial edited attributes object.
+ * @param {Array?}  template     Block Template.
+ * @param {Object?} templatePost Post's template post object.
  */
-export function* setupEditor( post, edits, template ) {
+export function* setupEditor( post, edits, template, templatePost ) {
 	// In order to ensure maximum of a single parse during setup, edits are
 	// included as part of editor setup action. Assume edited content as
 	// canonical if provided, falling back to post.
@@ -168,15 +169,33 @@ export function* setupEditor( post, edits, template ) {
 		content = post.content.raw;
 	}
 
-	let blocks = parse( content );
+	let blocks = ( edits && edits.blocks ) || parse( content );
 
-	// If a template is supplied, apply it if it's editable
-	// or if it's static and the post is new.
-	if ( template && ( template.post_content || post.status === 'auto-draft' ) ) {
+	// Apply post template.
+	if ( templatePost ) {
 		blocks = synchronizeBlocksWithTemplate(
 			blocks,
-			template.post_content ? parse( template.post_content ) : template
+			parse( templatePost.post_content )
 		);
+	}
+
+	// Apply block (post content) template.
+	if ( template && 'auto-draft' === post.status ) {
+		if ( templatePost ) {
+			// Post content is nested inside a post content block.
+			const postContentBlock = blocks.find(
+				( block ) => block.name === 'core/post-content'
+			);
+			if ( postContentBlock ) {
+				postContentBlock.innerBlocks = synchronizeBlocksWithTemplate(
+					postContentBlock.innerBlocks,
+					template
+				);
+			}
+		} else {
+			// Post content is at the top level.
+			blocks = synchronizeBlocksWithTemplate( blocks, template );
+		}
 	}
 
 	yield resetPost( post );
@@ -483,10 +502,10 @@ export function* savePost( options = {} ) {
 		'getEditedPostContent'
 	);
 
-	const template = ( yield select( STORE_KEY, 'getEditorSettings' ) ).template;
-	if ( template && template.post_content ) {
+	const { editTemplatePost, templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
+	if ( editTemplatePost && templatePost ) {
 		yield apiFetch( {
-			path: `/wp/v2/${ template.post_type }/${ template.ID }`,
+			path: `/wp/v2/${ templatePost.post_type }/${ templatePost.ID }`,
 			method: 'PUT',
 			data: {
 				content: editedPostContent,

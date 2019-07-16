@@ -56,6 +56,7 @@ function Layout( {
 	isSaving,
 	isMobileViewport,
 	isRichEditingEnabled,
+	isEditingTemplatePost,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
@@ -91,7 +92,9 @@ function Layout( {
 				<ManageBlocksModal />
 				<OptionsModal />
 				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
-				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
+				{ isRichEditingEnabled && mode === 'visual' && (
+					<VisualEditor withPostTitle={ ! isEditingTemplatePost } />
+				) }
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="normal" />
 				</div>
@@ -135,16 +138,20 @@ function Layout( {
 }
 
 export default compose(
-	withSelect( ( select ) => ( {
-		mode: select( 'core/edit-post' ).getEditorMode(),
-		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
-		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-	} ) ),
+	withSelect( ( select ) => {
+		const editorSettings = select( 'core/editor' ).getEditorSettings();
+		return {
+			mode: select( 'core/edit-post' ).getEditorMode(),
+			editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
+			pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
+			publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			isRichEditingEnabled: editorSettings.richEditingEnabled,
+			isEditingTemplatePost: editorSettings.editTemplatePost,
+		};
+	} ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
 		return {

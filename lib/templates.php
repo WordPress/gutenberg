@@ -43,11 +43,30 @@ function gutenberg_register_templates() {
 
 	if ( isset( $_GET['gutenberg-demo'] ) ) {
 		ob_start();
+		echo '<!-- wp:post-title /--><!-- wp:post-content -->';
 		include gutenberg_dir_path() . 'post-content.php';
+		echo '<!-- /wp:post-content -->';
 		$template->post_content = ob_get_clean();
 	}
 
-	$post_type_object           = get_post_type_object( 'post' );
-	$post_type_object->template = $template;
+	$post_type_object                = get_post_type_object( 'post' );
+	$post_type_object->template_post = $template;
 }
 add_action( 'init', 'gutenberg_register_templates' );
+
+/**
+ * Filters the block editor settings object to add the post's template post.
+ *
+ * @param array    $editor_settings The block editor settings object.
+ * @param \WP_Post $post            The post object.
+ *
+ * @return array The maybe modified block editor settings object.
+ */
+function gutenberg_filter_block_editor_settings( $editor_settings, $post ) {
+	$post_type_object = get_post_type_object( get_post_type( $post ) );
+	if ( ! empty( $post_type_object->template_post ) ) {
+		$editor_settings['templatePost'] = $post_type_object->template_post;
+	}
+	return $editor_settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_filter_block_editor_settings', 10, 2 );

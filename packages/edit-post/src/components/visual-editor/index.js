@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { VisualEditorGlobalKeyboardShortcuts } from '@wordpress/editor';
+import {
+	PostTitle,
+	VisualEditorGlobalKeyboardShortcuts,
+} from '@wordpress/editor';
 import {
 	WritingFlow,
 	ObserveTyping,
@@ -19,7 +22,7 @@ import {
 import BlockInspectorButton from './block-inspector-button';
 import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-settings-menu-group';
 
-function VisualEditor() {
+function VisualEditor( { withPostTitle } ) {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
 			<VisualEditorGlobalKeyboardShortcuts />
@@ -27,6 +30,7 @@ function VisualEditor() {
 			<WritingFlow>
 				<ObserveTyping>
 					<CopyHandler>
+						{ withPostTitle && <PostTitle /> }
 						<BlockList />
 					</CopyHandler>
 				</ObserveTyping>

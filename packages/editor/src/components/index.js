@@ -12,6 +12,7 @@ export {
 export { default as TextEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/text-editor-shortcuts';
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
+export { default as ToggleEditTemplatePost } from './toggle-edit-template-post';
 export { default as EditorNotices } from './editor-notices';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as PageAttributesCheck } from './page-attributes/check';
