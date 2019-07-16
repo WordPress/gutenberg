@@ -102,6 +102,12 @@
 		"parent": "slotfills"
 	},
 	{
+		"title": "PluginBlockSettingsMenuItem",
+		"slug": "plugin-document-setting-panel",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-document-setting-panel.md",
+		"parent": "slotfills"
+	},
+	{
 		"title": "PluginMoreMenuItem",
 		"slug": "plugin-more-menu-item",
 		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-more-menu-item.md",
