@@ -23,3 +23,4 @@ const PluginDocumentSettingPanelDemo = () => (
 	</PluginDocumentSettingPanel>
 );
 registerPlugin( 'plugin-document-setting-panel-demo', { render: PluginDocumentSettingPanelDemo, icon: 'palmtree' } );
+```
