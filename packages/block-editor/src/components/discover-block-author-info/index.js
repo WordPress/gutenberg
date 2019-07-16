@@ -6,7 +6,7 @@ import { Fragment } from '@wordpress/element';
 function DiscoverBlockAuthorInfo() {
 	return (
 		<Fragment>
-			<span className="block-editor-discover-block-author-info__content">
+			<span className="block-editor-discover-block-author-info__content-author">
 				Authored by <strong>XXX</strong>
 			</span>
 			<span className="block-editor-discover-block-author-info__content">

@@ -1,16 +1,22 @@
-.discover-block-info__content-description {
-	margin-top: 4px;
+.block-editor-discover-block-info__content {
+	font-size: 14px;
 }
-.discover-block-info-row {
+
+.block-editor-discover-block-info__row {
 	display: flex;
 	justify-content: space-between;
 	color: $dark-gray-400;
 	margin-top: 8px;
-	.discover-block-info-column {
+
+	.block-editor-discover-block-info__column {
 		display: flex;
-		.dashicons {
+		align-items: flex-start;
+
+		.dashicon {
 			font-size: 16px;
+			margin-right: 4px;
 		}
+
 		.dashicons-chart-line {
 			font-weight: 900;
 		}
