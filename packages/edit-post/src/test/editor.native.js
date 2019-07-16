@@ -1,13 +1,16 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
 import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
-
+import { mount } from 'enzyme';
 /**
  * WordPress dependencies
  */
 import { registerCoreBlocks } from '@wordpress/block-library';
+// Force register 'core/editor' store.
+import { store } from '@wordpress/editor'; // eslint-disable-line no-unused-vars
+
+jest.mock( '../components/layout', () => () => 'Layout' );
 
 /**
  * Internal dependencies
@@ -37,7 +40,7 @@ describe( 'Editor', () => {
 
 // Utilities
 const renderEditorWith = ( content ) => {
-	return renderer.create(
+	return mount(
 		<Editor
 			initialHtml={ content }
 			initialHtmlModeEnabled={ false }

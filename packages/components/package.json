@@ -36,7 +36,7 @@
 		"clipboard": "^2.0.1",
 		"diff": "^3.5.0",
 		"dom-scroll-into-view": "^1.2.1",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.14",
 		"memize": "^1.0.5",
 		"moment": "^2.22.1",
 		"mousetrap": "^1.6.2",

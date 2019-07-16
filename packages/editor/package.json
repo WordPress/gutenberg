@@ -46,7 +46,7 @@
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
 		"inherits": "^2.0.3",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.14",
 		"memize": "^1.0.5",
 		"react-autosize-textarea": "^3.0.2",
 		"redux-optimist": "^1.0.0",

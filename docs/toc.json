@@ -25,6 +25,7 @@
 			{ "docs/designers-developers/developers/slotfills/plugin-sidebar.md": [] },
 			{ "docs/designers-developers/developers/slotfills/plugin-sidebar-more-menu-item.md": []  }
 		]},
+		{ "docs/designers-developers/developers/richtext.md": [] },
 		{ "docs/designers-developers/developers/internationalization.md": [] },
 		{ "docs/designers-developers/developers/accessibility.md": [] },
 		{ "docs/designers-developers/developers/feature-flags.md": [] },
