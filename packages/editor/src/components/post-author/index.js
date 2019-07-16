@@ -124,7 +124,7 @@ export class PostAuthor extends Component {
 	/**
 	 * Resolve the author objects into strings for display.
 	 *
-	 * @param {Array} results The array of suthors that matched the search.
+	 * @param {Array} results The array of authors that matched the search.
 	 *
 	 * @return {Array} an array of strings ready for displaying.
 	 */
