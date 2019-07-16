@@ -549,4 +549,33 @@ describe( 'Links', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should contain a nofollow rel attribute when the option is selected', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'This is WordPress' );
+		// Select "WordPress".
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'k' );
+		await waitForAutoFocus();
+		await page.keyboard.type( 'w.org' );
+		// Navigate to the settings toggle.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		// Open settings.
+		await page.keyboard.press( 'Space' );
+		// Navigate to the "No Follow" checkbox.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		// Check the checkbox.
+		await page.keyboard.press( 'Space' );
+		// Navigate back to the input field.
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		// Submit the form.
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

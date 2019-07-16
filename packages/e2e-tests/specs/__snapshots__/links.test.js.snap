@@ -53,3 +53,9 @@ exports[`Links should contain a label when it should open in a new tab 2`] = `
 <p>This is <a href=\\"http://wordpress.org\\">WordPress</a></p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`Links should contain a nofollow rel attribute when the option is selected 1`] = `
+"<!-- wp:paragraph -->
+<p>This is <a href=\\"http://w.org\\">WordPress</a></p>
+<!-- /wp:paragraph -->"
+`;
