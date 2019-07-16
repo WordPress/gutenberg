@@ -1409,7 +1409,7 @@ function getReusableBlocks( state ) {
 /**
  * Returns the available uninstalled blocks
  *
- * @param {Object} state Global application state.
+ * @param {Object} state       Global application state.
  * @param {string} filterValue Search string.
  *
  * @return {Array} Discoverable blocks
