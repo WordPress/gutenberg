@@ -1,4 +1,4 @@
-# PluginBlockSettingsMenuItem
+# PluginDocumentSettingPanel
 
 This SlotFill allows adding items below the Status & Availability panel in the Document Sidebar.
 
