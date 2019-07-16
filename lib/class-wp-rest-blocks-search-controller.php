@@ -75,7 +75,7 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 
-		if (!isset($_GET['search'])) {
+		if ( ! isset($_REQUEST[ 'search' ] ) ) {
 			return rest_ensure_response( array() );
 		}
 
@@ -123,13 +123,14 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 				}
 			} ]'
 		);
-		$filtered = array();
+		$filtered      = array();
+		$search_string = preg_quote( $_REQUEST[ 'search' ] );
 		
 		foreach ( $data as $item ) {
-			if(preg_match("/{$_GET['search']}/i", $item->title)) {
+			if( preg_match( "/{$search_string}/i", $item->title ) ) {
 				$filtered[] = $item;
 			}
-			else if(preg_match("/{$_GET['search']}/i", $item->description)) {
+			else if( preg_match( "/{$search_string}/i", $item->description ) ) {
 				$filtered[] = $item;
 			}
 		}
