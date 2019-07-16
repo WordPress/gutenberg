@@ -35,7 +35,6 @@ import BlockColorsStyleSelector from './block-colors-selector';
 
 function NavigationMenu( {
 	attributes,
-	setAttributes,
 	clientId,
 	pages,
 	isRequesting,
@@ -43,6 +42,7 @@ function NavigationMenu( {
 	textColor,
 	setBackgroundColor,
 	setTextColor,
+	setAttributes,
 } ) {
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator( clientId );
 	const defaultMenuItems = useMemo(
@@ -140,6 +140,7 @@ function NavigationMenu( {
 						template={ defaultMenuItems ? defaultMenuItems : null }
 						allowedBlocks={ [ 'core/navigation-menu-item' ] }
 						templateInsertUpdatesSelection={ false }
+						horizontalMover={ true }
 					/>
 				}
 			</div>
