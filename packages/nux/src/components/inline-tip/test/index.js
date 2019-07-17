@@ -32,7 +32,7 @@ describe( 'InlineTip', () => {
 		expect( renderer ).toMatchSnapshot();
 	} );
 
-	it( 'should call onRemove when the remove button is clicked', () => {
+	it( 'calls `onRemove` when the rendered notice is dismissed', () => {
 		const onRemove = jest.fn();
 		const renderer = TestRenderer.create(
 			<InlineTip isVisible onRemove={ onRemove }>
