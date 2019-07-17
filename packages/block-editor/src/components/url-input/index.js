@@ -230,9 +230,9 @@ class URLInput extends Component {
 	}
 
 	render() {
-		const { label, value = '', autoFocus = true, instanceId, className, isFullWidth, hasBorder } = this.props;
+		const { label, value = '', autoFocus = true, instanceId, className, id, isFullWidth, hasBorder } = this.props;
 		const { showSuggestions, suggestions, selectedSuggestion, loading } = this.state;
-		const id = `url-input-control-${ instanceId }`;
+		const baseControlId = `url-input-control-${ instanceId }`;
 
 		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
 		const suggestionOptionIdPrefix = `block-editor-url-input-suggestion-${ instanceId }`;
@@ -241,7 +241,7 @@ class URLInput extends Component {
 		return (
 			<BaseControl
 				label={ label }
-				id={ id }
+				id={ baseControlId }
 				className={ classnames( 'editor-url-input block-editor-url-input', className, {
 					'is-full-width': isFullWidth,
 					'has-border': hasBorder,
