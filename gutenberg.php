@@ -65,6 +65,15 @@ function gutenberg_menu() {
 			'https://developer.wordpress.org/block-editor/',
 		);
 	}
+
+	add_submenu_page(
+		'gutenberg',
+		__( 'Experiments', 'gutenberg' ),
+		__( 'Experiments', 'gutenberg' ),
+		'edit_posts',
+		'gutenberg-experiments',
+		'the_gutenberg_experiments'
+	);
 }
 add_action( 'admin_menu', 'gutenberg_menu' );
 
