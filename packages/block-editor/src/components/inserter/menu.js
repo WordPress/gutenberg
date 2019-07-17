@@ -33,7 +33,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { addQueryArgs } from '@wordpress/url';
-import { InlineTip } from '@wordpress/nux';
+import { __experimentalInlineTip as InlineTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies

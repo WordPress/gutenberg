@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { InlineTip } from '@wordpress/nux';
+import { __experimentalInlineTip as InlineTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
