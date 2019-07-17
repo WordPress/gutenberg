@@ -583,7 +583,7 @@ function BlockListBlock( {
 					</BlockCrashBoundary>
 					{ !! hasError && <BlockCrashWarning /> }
 					{ shouldShowMobileToolbar && (
-						<BlockMobileToolbar clientId={ clientId } />
+						<BlockMobileToolbar clientId={ clientId } horizontalMover={ horizontalMover } />
 					) }
 				</IgnoreNestedEvents>
 			</div>
