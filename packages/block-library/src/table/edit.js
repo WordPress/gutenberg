@@ -40,9 +40,9 @@ import {
 	deleteColumn,
 	toggleSection,
 	isEmptyTableSection,
-	isCellInMultiSelection,
-	isRowSelected,
-	isColumnSelected,
+	isCellSelected,
+	hasRowSelection,
+	hasColumnSelection,
 	getCellAbove,
 	getCellBelow,
 	getCellToRight,
@@ -96,7 +96,7 @@ export class TableEdit extends Component {
 		this.onDeleteColumn = this.onDeleteColumn.bind( this );
 		this.onToggleHeaderSection = this.onToggleHeaderSection.bind( this );
 		this.onToggleFooterSection = this.onToggleFooterSection.bind( this );
-		this.getMultiSelectionClasses = this.getMultiSelectionClasses.bind( this );
+		this.getCellSelectionClasses = this.getCellSelectionClasses.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
@@ -291,16 +291,25 @@ export class TableEdit extends Component {
 		setAttributes( deleteColumn( attributes, { section, columnIndex } ) );
 	}
 
-	getMultiSelectionClasses( cellLocation, selection ) {
+	getCellSelectionClasses( cellLocation, selection ) {
+		if ( ! selection ) {
+			return;
+		}
+
+		if ( selection.type === 'cell' ) {
+			return 'is-selected';
+		}
+
 		const { attributes } = this.props;
 
-		return {
-			'is-multi-selected': true,
-			'is-multi-selection-top-edge': ! isCellInMultiSelection( getCellAbove( attributes, cellLocation ), selection ),
-			'is-multi-selection-right-edge': ! isCellInMultiSelection( getCellToRight( attributes, cellLocation ), selection ),
-			'is-multi-selection-bottom-edge': ! isCellInMultiSelection( getCellBelow( attributes, cellLocation ), selection ),
-			'is-multi-selection-left-edge': ! isCellInMultiSelection( getCellToLeft( cellLocation ), selection ),
-		};
+		return classnames( {
+			'is-selected': true,
+			'is-multi-cell-selection': true,
+			'is-selection-top-edge': ! isCellSelected( getCellAbove( attributes, cellLocation ), selection ),
+			'is-selection-right-edge': ! isCellSelected( getCellToRight( attributes, cellLocation ), selection ),
+			'is-selection-bottom-edge': ! isCellSelected( getCellBelow( attributes, cellLocation ), selection ),
+			'is-selection-left-edge': ! isCellSelected( getCellToLeft( cellLocation ), selection ),
+		} );
 	}
 
 	/**
@@ -389,41 +398,31 @@ export class TableEdit extends Component {
 				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
 						{ cells.map( ( { content, tag: CellTag, scope }, columnIndex ) => {
-							const isSelectedCell = selection && (
-								'cell' === selection.type &&
-								section === selection.section &&
-								rowIndex === selection.rowIndex &&
-								columnIndex === selection.columnIndex
-							);
-
 							const cellLocation = { section, rowIndex, columnIndex };
-							const isInMultiCellSelection = isCellInMultiSelection( cellLocation, selection );
-							const multiSelectionClasses = isInMultiCellSelection ? this.getMultiSelectionClasses( cellLocation, selection ) : undefined;
-							const cellClasses = classnames( {
-								'is-selected-cell': isSelectedCell,
-							}, multiSelectionClasses );
+							const isSelected = isCellSelected( cellLocation, selection );
+							const classes = isSelected ? this.getCellSelectionClasses( cellLocation, selection ) : undefined;
 
 							return (
 								<CellTag
 									key={ columnIndex }
-									className={ cellClasses }
+									className={ classes }
 									scope={ CellTag === 'th' ? scope : undefined }
 								>
 									{ showBlockSelectionControls && rowIndex === 0 && columnIndex === 0 && (
 										<IconButton
 											className={ classnames( 'wp-block-table__table-selection-button', {
-												'is-selected': isInMultiCellSelection && selection.type === 'table',
+												'is-selected': isSelected && selection.type === 'table',
 											} ) }
 											label={ __( 'Select all' ) }
 											icon="grid-view"
 											onClick={ () => this.setState( { selection: { type: 'table' } } ) }
-											aria-pressed={ isInMultiCellSelection && selection.type === 'table' }
+											aria-pressed={ isSelected && selection.type === 'table' }
 										/>
 									) }
 									{ columnIndex === 0 && (
 										<IconButton
 											className={ classnames( 'wp-block-table__row-selection-button', {
-												'is-selected': isInMultiCellSelection && isRowSelected( cellLocation, selection ),
+												'is-selected': isSelected && hasRowSelection( cellLocation, selection ),
 											} ) }
 											label={ __( 'Select row' ) }
 											icon="arrow-right"
@@ -434,13 +433,13 @@ export class TableEdit extends Component {
 													rowIndex,
 												},
 											} ) }
-											aria-pressed={ isInMultiCellSelection && isRowSelected( cellLocation, selection ) }
+											aria-pressed={ isSelected && hasRowSelection( cellLocation, selection ) }
 										/>
 									) }
 									{ showBlockSelectionControls && rowIndex === 0 && (
 										<IconButton
 											className={ classnames( 'wp-block-table__column-selection-button', {
-												'is-selected': isInMultiCellSelection && isColumnSelected( cellLocation, selection ),
+												'is-selected': isSelected && hasColumnSelection( cellLocation, selection ),
 											} ) }
 											label={ __( 'Select column' ) }
 											icon="arrow-down"
@@ -450,7 +449,7 @@ export class TableEdit extends Component {
 													columnIndex,
 												},
 											} ) }
-											aria-pressed={ isInMultiCellSelection && isColumnSelected( cellLocation, selection ) }
+											aria-pressed={ isSelected && hasColumnSelection( cellLocation, selection ) }
 										/>
 									) }
 									<RichText

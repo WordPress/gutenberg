@@ -219,54 +219,74 @@ export function isEmptyRow( row ) {
 }
 
 /**
- * Determines if a cell is within a multi-cell selection.
+ * Determines if a cell is selected.
  *
- * @param {Object} cellLocation The cell to check
- * @param {Object} selection    The selection data
+ * @param {Object} cellLocation The cell to check.
+ * @param {Object} selection    The selection data.
  *
  * @return {boolean} True if the cell is within a selection, false otherwise.
  */
-export function isCellInMultiSelection( cellLocation, selection ) {
+export function isCellSelected( cellLocation, selection ) {
 	if ( ! cellLocation || ! selection ) {
 		return false;
 	}
 
 	switch ( selection.type ) {
+		case 'cell':
+			return hasSingleCellSelection( cellLocation, selection );
 		case 'table':
 			return true;
 		case 'row':
-			return isRowSelected( cellLocation, selection );
+			return hasRowSelection( cellLocation, selection );
 		case 'column':
-			return isColumnSelected( cellLocation, selection );
-		case 'cell':
-			return false;
+			return hasColumnSelection( cellLocation, selection );
 	}
+}
+
+/**
+ * Determines if a cell is the single cell selected.
+ *
+ * @param {Object} cellLocation The cell to check.
+ * @param {Object} selection    The selection data.
+ *
+ * @return {boolean} True if the cell is within a selection, false otherwise.
+ */
+export function hasSingleCellSelection( cellLocation, selection ) {
+	if ( ! cellLocation || ! selection ) {
+		return false;
+	}
+	return selection.type === 'cell' &&
+		cellLocation.section === selection.section &&
+		cellLocation.columnIndex === selection.columnIndex &&
+		cellLocation.rowIndex === selection.rowIndex;
 }
 
 /**
  * Determines if a cell is within a row selection.
  *
- * @param {Object} cellLocation The cell to check
- * @param {Object} selection    The selection data
+ * @param {Object} cellLocation The cell to check.
+ * @param {Object} selection    The selection data.
  *
  * @return {boolean} True if the cell is within a selection, false otherwise.
  */
-export function isRowSelected( cellLocation, selection ) {
+export function hasRowSelection( cellLocation, selection ) {
 	if ( ! cellLocation || ! selection ) {
 		return false;
 	}
-	return selection.type === 'row' && cellLocation.section === selection.section && cellLocation.rowIndex === selection.rowIndex;
+	return selection.type === 'row' &&
+		cellLocation.section === selection.section &&
+		cellLocation.rowIndex === selection.rowIndex;
 }
 
 /**
  * Determines if a cell is within a column selection.
  *
- * @param {Object} cellLocation The cell to check
- * @param {Object} selection    The selection data
+ * @param {Object} cellLocation The cell to check.
+ * @param {Object} selection    The selection data.
  *
  * @return {boolean} True if the cell is within a selection, false otherwise.
  */
-export function isColumnSelected( cellLocation, selection ) {
+export function hasColumnSelection( cellLocation, selection ) {
 	if ( ! cellLocation || ! selection ) {
 		return false;
 	}

@@ -41,8 +41,7 @@
 		padding: 0;
 		border: $border-width solid;
 
-		&.is-selected-cell,
-		&.is-multi-selected {
+		&.is-selected {
 			&::before {
 				content: "";
 				display: block;
@@ -56,30 +55,30 @@
 			}
 		}
 
-		&.is-multi-selected {
+		&.is-multi-cell-selection {
 			&::before {
 				border-width: 0;
 			}
 
-			&.is-multi-selection-top-edge {
+			&.is-selection-top-edge {
 				&::before {
 					border-top-width: 3px;
 				}
 			}
 
-			&.is-multi-selection-right-edge {
+			&.is-selection-right-edge {
 				&::before {
 					border-right-width: 3px;
 				}
 			}
 
-			&.is-multi-selection-bottom-edge {
+			&.is-selection-bottom-edge {
 				&::before {
 					border-bottom-width: 3px;
 				}
 			}
 
-			&.is-multi-selection-left-edge {
+			&.is-selection-left-edge {
 				&::before {
 					border-left-width: 3px;
 				}
