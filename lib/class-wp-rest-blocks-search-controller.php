@@ -79,62 +79,33 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 			return rest_ensure_response( array() );
 		}
 
-		$data = json_decode(
-			'[ {
-				"id": "boxer/boxer",
-				"name": "boxer/boxer",
-				"title": "Boxer",
-				"icon": "archive",
-				"description": "Boxer puts your WordPress posts into boxes.",
-				"category": "discover",
-				"keywords": ["posts", "helloworld"],
-				"assets": {
-					"editor_script": {
-						"src": "http://plugins.svn.wordpress.org/boxer-block/trunk/build/index.js"
-					},
-					"view_script": {
-						"src": "http://plugins.svn.wordpress.org/boxer-block/trunk/build/view.js"
-					},
-					"style": {
-						"src": "http://plugins.svn.wordpress.org/boxer-block/trunk/style.css"
-					},
-					"editor_style": {
-						"src": "http://plugins.svn.wordpress.org/boxer-block/trunk/editor.css"
-					}
-				}
-			}, {
-				"id": "lez-library/listicles",
-				"name": "lez-library/listicles",
-				"title": "Listicle",
-				"icon": "excerpt-view",
-				"description": "A block for listicles. You can add items, remove them, and flip them in reverse.",
-				"category": "discover",
-				"keywords": ["posts", "helloworld"],
-				"assets": {
-					"editor_script": {
-						"src": "http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.build.js"
-					},
-					"style": {
-						"src": "http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.style.build.css"
-					},
-					"editor_style": {
-						"src": "http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.editor.build.css"
-					}
-				}
-			} ]'
-		);
-		$filtered      = array();
 		$search_string = preg_quote( $_REQUEST[ 'search' ] );
-		
-		foreach ( $data as $item ) {
-			if( preg_match( "/{$search_string}/i", $item->title ) ) {
-				$filtered[] = $item;
-			}
-			else if( preg_match( "/{$search_string}/i", $item->description ) ) {
-				$filtered[] = $item;
-			}
-		}
 
-		return rest_ensure_response( $filtered );
+		include( ABSPATH . WPINC . '/version.php' );
+
+		$url = 'http://api.wordpress.org/plugins/info/1.2/';
+		$url = add_query_arg(
+			array(
+				'action'  => 'query_plugins',
+				'request[block]' => $search_string,
+				'request[wp_version]' => '5.3',
+				'request[per_page]' => '3'
+			),
+			$url
+		);
+		$http_url = $url;
+		$ssl      = wp_http_supports( array( 'ssl' ) );
+		if ( $ssl ) {
+			$url = set_url_scheme( $url, 'https' );
+		}
+		$http_args = array(
+			'timeout'    => 15,
+			'user-agent' => 'WordPress/' . $wp_version . '; ' . home_url( '/' ),
+		);
+
+		$request   = wp_remote_get( $url, $http_args );
+		$res       = json_decode( wp_remote_retrieve_body( $request ), true );
+
+		return rest_ensure_response( $res );
 	}
 }
