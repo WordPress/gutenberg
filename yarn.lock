@@ -1575,30 +1575,32 @@
     core-js "^2.5.7"
 
 "@react-native-community/cli-platform-android@^2.0.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@react-native-community/cli-platform-android/-/cli-platform-android-2.1.1.tgz#32e57988dbb7580d3aef3d2f9e35e9718d6e8077"
-  integrity sha512-M6HNSJYTPNAt8iV8RiclSySyBavo9dsMKAIvKsHJqwbIRNWbRPHONQ71hvw7PzxC+RTwFTHUFKMotWgjKGEKPw==
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@react-native-community/cli-platform-android/-/cli-platform-android-2.5.0.tgz#36071ebc07a1ef455eca1061d8b3d51f48ed73a6"
+  integrity sha512-Rh6FvaaUKIDbqcLfuo62GuT8aI38Qkya+3NyKRPhD265QeAGK00JGXl/tV2c2qCZT+QqMZ+/S4EFRoABZRHmyA==
   dependencies:
-    "@react-native-community/cli-tools" "^2.0.2"
+    "@react-native-community/cli-tools" "^2.4.1"
+    chalk "^2.4.2"
+    jetifier "^1.6.2"
     logkitty "^0.5.0"
     slash "^2.0.0"
     xmldoc "^0.4.0"
 
 "@react-native-community/cli-platform-ios@^2.0.1":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@react-native-community/cli-platform-ios/-/cli-platform-ios-2.2.0.tgz#8008eee0bee871b52182217f49d86068bdb80efe"
-  integrity sha512-rgqksYcolGZNkG4EnWEX2nECWyTxYRUZXRb+pXc4niBsCvNMU88sXoMTxFIHb3wOAaVT2Eix3nS78yG6TA7dnA==
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@react-native-community/cli-platform-ios/-/cli-platform-ios-2.4.1.tgz#99b38c6b3feecf061ecf1243fe41013f4112a51c"
+  integrity sha512-EKfnN+ubIcCHbCCo2a1SlYcd4jLZDT12HfoLHhFg8WXG3/zFWc/vMNpBi+omrvT7Hoktr8cTtROXPg9cIS7FCQ==
   dependencies:
-    "@react-native-community/cli-tools" "^2.0.2"
-    chalk "^1.1.1"
+    "@react-native-community/cli-tools" "^2.4.1"
+    chalk "^2.4.2"
     xcode "^2.0.0"
 
-"@react-native-community/cli-tools@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@react-native-community/cli-tools/-/cli-tools-2.0.2.tgz#1dc4055f27f1b2fe3d0493959a6fc20467e93fe0"
-  integrity sha512-6OOKrE1Sdq1Lmcdp2K68J5PsG5G80a9USa9I1Kv92wvPHUup6IRt+Dy7E8IZqxmskzC/mlOR62Oh1CB3sFm84g==
+"@react-native-community/cli-tools@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@react-native-community/cli-tools/-/cli-tools-2.4.1.tgz#5a23b92d0b486753add00a27d77d0ea9e8c331e1"
+  integrity sha512-3V5Atno3q5uBGseHcW8gM3d7Gpcr87LJvC3YbB6SwCCM7g93+94u+U1vm9j4KmHt2tnf3Q4urL4rUCrdxzvSfw==
   dependencies:
-    chalk "^1.1.1"
+    chalk "^2.4.2"
     lodash "^4.17.5"
     mime "^2.4.1"
     node-fetch "^2.5.0"
@@ -2191,9 +2193,9 @@ appium-idb@^0:
     teen_process "^1.11.0"
 
 appium-ios-device@^0:
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/appium-ios-device/-/appium-ios-device-0.2.5.tgz#38917f17701c257e469a4996c87d21f30f3bf587"
-  integrity sha512-Itgb+nINQnb3s/5ZXUJIgzf1oZlqz+KdBjTEfYfzJUmPfJF6z0omgZfPp8lNX81bX3N+mq8LZNFM6Lh558/ZFg==
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/appium-ios-device/-/appium-ios-device-0.3.0.tgz#26f0f16d7189e905d80f6aee4e6f0b4c9b0d2df0"
+  integrity sha512-C+YAPmqdnoiia/2NgK8IAXiMVeCowYpmo3RV4Vt8G1eUNaLjEoiFwcE/IuqwLgtoUf8Yy3Epoio6sRF2YYiL0A==
   dependencies:
     "@babel/runtime" "^7.0.0"
     appium-support "^2.30.0"
@@ -2391,9 +2393,9 @@ appium-uiautomator2-driver@1.x:
     yargs "^13.1.0"
 
 appium-uiautomator2-server@^3.4.0:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/appium-uiautomator2-server/-/appium-uiautomator2-server-3.7.0.tgz#3b82f9fb90a504637d9315fdd0be97d60cd1e53e"
-  integrity sha512-zb9pMslEe3R0CQo6mWKhglQZ7jIzeNZ+hPauLH6M7U9jLc6RnHQXot8laPmNIGgO3J/nN+t2rA92N/sYkHGFig==
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/appium-uiautomator2-server/-/appium-uiautomator2-server-3.8.0.tgz#ac06f81d8b617af8457092e01e7ed2a15a9affed"
+  integrity sha512-6JXVMCQy2t/s8YrIjKKD73YVexb5rZecZoh2Q5oeTgf5P43R7ISl6hOf3da8/vcQRr+yu1Fp0KaVzeAsKaawaw==
 
 appium-webdriveragent@^0:
   version "0.4.0"
@@ -2440,9 +2442,9 @@ appium-xcode@^3.1.0, appium-xcode@^3.8.0:
     teen_process "^1.3.0"
 
 appium-xcuitest-driver@2.x, appium-xcuitest-driver@^2.116.3:
-  version "2.121.0"
-  resolved "https://registry.yarnpkg.com/appium-xcuitest-driver/-/appium-xcuitest-driver-2.121.0.tgz#72a8ae129b575cd7e5662edb858bb3f83484eae8"
-  integrity sha512-hqKBXYBu7Yzh8XnnqZ050osKoFJQRl3UFhcBZbmNJ4qYPV1iQzRndN0j5ZUbajNcNzJtJCMmCnybP/5B9zFyqw==
+  version "2.122.0"
+  resolved "https://registry.yarnpkg.com/appium-xcuitest-driver/-/appium-xcuitest-driver-2.122.0.tgz#de4a4e73c588c2464dae52eba5c3ab85e2a797b3"
+  integrity sha512-ydD5Qt25nPdSiR4qoU1UmQxcEyXGzotY0cHyZqxqqYCju9ejsg7UBKSj0KgQryDz3fKOP80eLYkUyGZNLCC6Nw==
   dependencies:
     "@babel/runtime" "^7.0.0"
     appium-base-driver "^3.17.0"
@@ -3117,7 +3119,7 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-big-integer@^1.6.7:
+big-integer@^1.6.44, big-integer@^1.6.7:
   version "1.6.44"
   resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.44.tgz#4ee9ae5f5839fc11ade338fea216b4513454a539"
   integrity sha512-7MzElZPTyJ2fNvBkPxtFQ2fWIkVmuzw41+BZHSzpEq3ymB2MfeKp1+yXl/tS75xCx+WnyV+yb0kp+K1C3UNwmQ==
@@ -3192,12 +3194,19 @@ bplist-creator@0.0.8, bplist-creator@^0:
   dependencies:
     stream-buffers "~2.2.0"
 
-bplist-parser@0.1.1, bplist-parser@^0, bplist-parser@^0.1.1:
+bplist-parser@0.1.1, bplist-parser@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/bplist-parser/-/bplist-parser-0.1.1.tgz#d60d5dcc20cba6dc7e1f299b35d3e1f95dafbae6"
   integrity sha1-1g1dzCDLptx+HymbNdPh+V2vuuY=
   dependencies:
     big-integer "^1.6.7"
+
+bplist-parser@^0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/bplist-parser/-/bplist-parser-0.2.0.tgz#43a9d183e5bf9d545200ceac3e712f79ebbe8d0e"
+  integrity sha512-z0M+byMThzQmD9NILRniCUXYsYpjwnlO8N5uCFaCqIOpqRsJCrQL9NK3JsD67CN5a08nF5oIL2bD6loTdHOuKw==
+  dependencies:
+    big-integer "^1.6.44"
 
 brace-expansion@^1.1.7:
   version "1.1.11"
@@ -4532,9 +4541,9 @@ ee-first@1.1.1:
   integrity sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=
 
 electron-to-chromium@^1.3.188:
-  version "1.3.188"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.188.tgz#e28e1afe4bb229989e280bfd3b395c7ec03c8b7a"
-  integrity sha512-tEQcughYIMj8WDMc59EGEtNxdGgwal/oLLTDw+NEqJRJwGflQvH3aiyiexrWeZOETP4/ko78PVr6gwNhdozvuQ==
+  version "1.3.191"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.191.tgz#c451b422cd8b2eab84dedabab5abcae1eaefb6f0"
+  integrity sha512-jasjtY5RUy/TOyiUYM2fb4BDaPZfm6CXRFeJDMfFsXYADGxUN49RBqtgB7EL2RmJXeIRUk9lM1U6A5yk2YJMPQ==
 
 elliptic@^6.0.0:
   version "6.5.0"
@@ -6328,9 +6337,9 @@ inquirer@^3.0.6:
     through "^2.3.6"
 
 inquirer@^6.2.2:
-  version "6.4.1"
-  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-6.4.1.tgz#7bd9e5ab0567cd23b41b0180b68e0cfa82fc3c0b"
-  integrity sha512-/Jw+qPZx4EDYsaT6uz7F4GJRNFMRdKNeUZw3ZnKV8lyuUgz/YWRCSUAJMZSVhSq4Ec0R2oYnyi6b3d4JXcL5Nw==
+  version "6.5.0"
+  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-6.5.0.tgz#2303317efc9a4ea7ec2e2df6f86569b734accf42"
+  integrity sha512-scfHejeG/lVZSpvCXpsB4j/wQNPM5JC8kiElOI0OUTwmc1RTpXr4H32/HOlQHcZiYl2z2VElwuCVDRG8vFmbnA==
   dependencies:
     ansi-escapes "^3.2.0"
     chalk "^2.4.2"
@@ -6338,7 +6347,7 @@ inquirer@^6.2.2:
     cli-width "^2.0.0"
     external-editor "^3.0.3"
     figures "^2.0.0"
-    lodash "^4.17.11"
+    lodash "^4.17.12"
     mute-stream "0.0.7"
     run-async "^2.2.0"
     rxjs "^6.4.0"
@@ -7199,6 +7208,11 @@ jest@^24.1.0:
     import-local "^2.0.0"
     jest-cli "^24.8.0"
 
+jetifier@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/jetifier/-/jetifier-1.6.2.tgz#c1d8b7cc2af1d3a255963dbdaed3d56157e94712"
+  integrity sha512-KQKWmj7CNGcOztXwkWoZHoGHJqHBM2hI7YXRHv0tdSz5Gw063CU6z6o8sXaD1+ctTfYQOk+I87NPvPnX/3B3Kw==
+
 jimp@^0.5.3:
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/jimp/-/jimp-0.5.6.tgz#dd114decd060927ae439f2e0980df619c179f912"
@@ -7633,9 +7647,9 @@ locate-path@^3.0.0:
     path-exists "^3.0.0"
 
 lodash-es@^4.2.1:
-  version "4.17.13"
-  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.13.tgz#2a2df2acde25a8eebf886167f7d2b5d86a606db0"
-  integrity sha512-ktNCRrL41QyGAkjVQHG50QKiMAqum17Krw1hHl0nCLGeif+omPn5N6vPQq8cFTAKVf35MGvpa8Fgfq9jI4nS0w==
+  version "4.17.14"
+  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.14.tgz#12a95a963cc5955683cee3b74e85458954f37ecc"
+  integrity sha512-7zchRrGa8UZXjD/4ivUWP1867jDkhzTG2c/uj739utSd7O/pFFdxspCemIFKEEjErbcqRzn8nKnGsi7mvTgRPA==
 
 lodash.assign@^4.2.0:
   version "4.2.0"
@@ -7752,10 +7766,10 @@ lodash@4.17.11:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
   integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
 
-lodash@4.x, lodash@^4.0.0, lodash@^4.13.1, lodash@^4.15.0, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.17.9, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.6.1, lodash@^4.8.0, lodash@~4.17.10:
-  version "4.17.13"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.13.tgz#0bdc3a6adc873d2f4e0c4bac285df91b64fc7b93"
-  integrity sha512-vm3/XWXfWtRua0FkUyEHBZy8kCPjErNBT9fJx8Zvs+U6zjqPbTUOpkaoum3O5uiA8sm+yNMHXfYkTUHFoMxFNA==
+lodash@4.x, lodash@^4.0.0, lodash@^4.13.1, lodash@^4.15.0, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.12, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.17.9, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.6.1, lodash@^4.8.0, lodash@~4.17.10:
+  version "4.17.14"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.14.tgz#9ce487ae66c96254fe20b599f21b6816028078ba"
+  integrity sha512-mmKYbW3GLuJeX+iGP+Y7Gp1AiGHGbXHCOh/jZmrawMmsE7MS4znI3RL2FsjbqOyMayHInjOeykW7PEajUk1/xw==
 
 logform@^2.1.1:
   version "2.1.2"
@@ -9572,9 +9586,9 @@ pngjs@^3.0.0, pngjs@^3.3.3:
   integrity sha512-NCrCHhWmnQklfH4MtJMRjZ2a8c80qXeMlQMv2uVp9ISJMTt562SbGd6n2oq0PaPgKm7Z6pL9E2UlLIhC+SHL3w==
 
 portfinder@^1.0.13, portfinder@^1.0.6:
-  version "1.0.20"
-  resolved "https://registry.yarnpkg.com/portfinder/-/portfinder-1.0.20.tgz#bea68632e54b2e13ab7b0c4775e9b41bf270e44a"
-  integrity sha512-Yxe4mTyDzTd59PZJY4ojZR8F+E5e97iq2ZOHPz3HDgSvYC5siNad2tLooQ5y5QHyQhc3xVqvyk/eNA3wuoa7Sw==
+  version "1.0.21"
+  resolved "https://registry.yarnpkg.com/portfinder/-/portfinder-1.0.21.tgz#60e1397b95ac170749db70034ece306b9a27e324"
+  integrity sha512-ESabpDCzmBS3ekHbmpAIiESq3udRsCBGiBZLsC+HgBKv2ezb0R4oG+7RnYEVZ/ZCfhel5Tx3UzdNWA0Lox2QCA==
   dependencies:
     async "^1.5.2"
     debug "^2.2.0"
@@ -10830,7 +10844,7 @@ safe-buffer@5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"
   integrity sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==
 
-safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2:
+safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2, safe-buffer@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.0.tgz#b74daec49b1148f88c64b68d49b1e815c1f2f519"
   integrity sha512-fZEwUGbVl7kouZs1jCdMLdt95hdIv0ZeHg6L7qPeciMZhZ+/gdesW4wgTARkrFWEpspjEATAzUGPG8N2jJiwbg==
@@ -11319,9 +11333,9 @@ spdx-expression-parse@^3.0.0:
     spdx-license-ids "^3.0.0"
 
 spdx-license-ids@^3.0.0:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.4.tgz#75ecd1a88de8c184ef015eafb51b5b48bfd11bb1"
-  integrity sha512-7j8LYJLeY/Yb6ACbQ7F76qy5jHkp0U6jgBfJsk97bwWlVUnUWsAgpyaCvo17h0/RQGnQ036tVDomiwoI4pDkQA==
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.5.tgz#3694b5804567a458d3c8045842a6358632f62654"
+  integrity sha512-J+FWzZoynJEXGphVIS+XEh3kFSjZX/1i9gFBaWQcB+/tmpe2qUsSBABpcxqxnAxFdiUFEgAX1bjYGQvIZmoz9Q==
 
 split-string@^3.0.1, split-string@^3.0.2:
   version "3.1.0"
@@ -12338,9 +12352,9 @@ webdriver@^5.11.0:
     request "^2.83.0"
 
 webdriverio@^5.10.9:
-  version "5.11.0"
-  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-5.11.0.tgz#9447ffda514407ccf75fa5be004e65d230b17b09"
-  integrity sha512-lXZ4XKkXJt5KgnV+j7osvGvMgjGKqyer+z9kIPRyfurE4UkPsUFIT5Eg19ik8iju0p+cNY4+IuK/GXEK/uK6ag==
+  version "5.11.2"
+  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-5.11.2.tgz#1eb50623d8d1a8c31f238a34587e3ceafa2a6f68"
+  integrity sha512-r9z8CRGuUN7I83TM+pNQNkoieIeG42ymDCRkJMgpBBxMRnde+gMFH3MrYqgg5ViPHfwExuRqrI2MWY60czkAKw==
   dependencies:
     "@wdio/config" "^5.11.0"
     "@wdio/logger" "^5.11.0"
@@ -12354,6 +12368,7 @@ webdriverio@^5.10.9:
     lodash.zip "^4.2.0"
     resq "^1.5.0"
     rgb2hex "^0.1.0"
+    safe-buffer "^5.2.0"
     serialize-error "^4.1.0"
     webdriver "^5.11.0"
 
