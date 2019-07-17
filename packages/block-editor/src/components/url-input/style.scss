@@ -124,6 +124,11 @@ $input-size: 300px;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
 	background: $white;
+
+	.components-base-control:last-child,
+	.components-base-control:last-child .components-base-control__field {
+		margin-bottom: 0;
+	}
 }
 
 .block-editor-url-input__button-modal-line {
