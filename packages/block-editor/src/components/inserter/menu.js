@@ -101,7 +101,14 @@ export const normalizeTerm = ( term ) => {
  * @param {Function} onLoad The callback function when script is loaded.
  * @param {Function} onError The callback function when script is error loading.
  */
-export const loadScipt = ( asset, onLoad, onError ) => {
+const loadScipt = ( asset, onLoad, onError ) => {
+	if ( ! asset ) {
+		return;
+	}
+	const existing = document.querySelector( `script[src="${ asset.src }"]` );
+	if ( existing ) {
+		existing.parentNode.removeChild( existing );
+	}
 	const script = document.createElement( 'script' );
 	script.src = asset.src;
 	script.onload = onLoad;
@@ -115,7 +122,10 @@ export const loadScipt = ( asset, onLoad, onError ) => {
  * @param {Object} asset The asset object as described in block.json.
  * @param {Function} onLoad The callback function when script is loaded.
  */
-export const loadStyle = ( asset ) => {
+const loadStyle = ( asset ) => {
+	if ( ! asset ) {
+		return;
+	}
 	const link = document.createElement( 'link' );
 	link.rel = 'stylesheet';
 	link.href = asset.src;
@@ -477,6 +487,7 @@ export default compose(
 				} = dispatch( 'core/block-editor' );
 				const {
 					createErrorNotice,
+					removeNotice,
 				} = dispatch( 'core/notices' );
 				const {
 					getSelectedBlock,
@@ -498,12 +509,7 @@ export default compose(
 				};
 
 				if ( item.assets ) {
-					let scriptsCount = 0;
 					const onLoad = () => {
-						scriptsCount--;
-						if ( scriptsCount > 0 ) {
-							return;
-						}
 						const registeredBlocks = getBlockTypes();
 						if ( registeredBlocks.length ) {
 							const block = createBlock( item.name );
@@ -511,15 +517,22 @@ export default compose(
 						}
 					};
 					const onError = () => {
-						createErrorNotice( 'Block previews can\'t load.' );
+						createErrorNotice( __( 'Block previews can\'t load.' ), {
+							id: 'block-preview-error',
+							actions: [
+								{
+									label: __( 'Retry' ),
+									onClick: () => {
+										removeNotice( 'block-preview-error' );
+										loadScipt( item.assets.editor_script, onLoad, onError );
+										loadStyle( item.assets.style );
+									},
+								},
+							],
+						} );
 					};
-					if ( item.assets.editor_script ) {
-						scriptsCount++;
-						loadScipt( item.assets.editor_script, onLoad, onError );
-					}
-					if ( item.assets.style ) {
-						loadStyle( item.assets.style );
-					}
+					loadScipt( item.assets.editor_script, onLoad, onError );
+					loadStyle( item.assets.style );
 				} else {
 					const insertedBlock = createBlock( name, initialAttributes );
 					handleInsertBlock( insertedBlock );
