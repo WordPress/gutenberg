@@ -1,6 +1,7 @@
 // Components
 export * from './primitives';
 export { default as Dashicon } from './dashicon';
+export { default as Dropdown } from './dropdown';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as Icon } from './icon';

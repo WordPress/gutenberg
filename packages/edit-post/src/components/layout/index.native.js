@@ -10,12 +10,13 @@ import SafeArea from 'react-native-safe-area';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { HTMLTextInput, ReadableContentView } from '@wordpress/components';
+import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
+import Header from '../header';
 import VisualEditor from '../visual-editor';
 
 class Layout extends Component {
@@ -90,7 +91,7 @@ class Layout extends Component {
 		return (
 			<VisualEditor
 				isFullyBordered={ this.state.isFullyBordered }
-				rootViewHeight={ this.state.rootViewHeight }
+				rootViewHeight={ this.state.rootViewHeight - 40 }
 				safeAreaBottomInset={ this.state.safeAreaBottomInset }
 				setTitleRef={ this.props.setTitleRef }
 			/>
@@ -105,6 +106,11 @@ class Layout extends Component {
 		return (
 			<SafeAreaView style={ styles.container } onLayout={ this.onRootViewLayout }>
 				{ mode === 'text' ? this.renderHTML() : this.renderVisual() }
+				<KeyboardAvoidingView
+					style={ styles.toolbarKeyboardAvoidingView }
+					parentHeight={ this.state.rootViewHeight }>
+					<Header />
+				</KeyboardAvoidingView>
 			</SafeAreaView>
 		);
 	}
