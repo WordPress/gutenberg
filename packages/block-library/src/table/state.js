@@ -311,34 +311,34 @@ export function getCellAbove( state, cellLocation ) {
 		return;
 	}
 
+	let sectionNameForRowAbove, previousRowIndex;
+
 	// Handle getting the cell from the next section.
 	if ( isFirstRow ) {
-		const previousSectionName = sectionName === 'foot' ? 'body' : 'head';
-		const previousSection = state[ previousSectionName ];
+		sectionNameForRowAbove = sectionName === 'foot' ? 'body' : 'head';
+		const previousSection = state[ sectionNameForRowAbove ];
 
 		// There is no previous section, return undefined early.
 		if ( isEmptyTableSection( previousSection ) ) {
 			return;
 		}
 
-		// The previous section doesn't have as many columns, return undefined early.
-		const columnCount = previousSection[ 0 ].cells.length;
-		if ( columnIndex > columnCount - 1 ) {
-			return;
-		}
+		previousRowIndex = previousSection.length - 1;
+	} else {
+		sectionNameForRowAbove = sectionName;
+		previousRowIndex = rowIndex - 1;
+	}
 
-		const lastRowOfPreviousSection = previousSection.length - 1;
-
-		return {
-			section: previousSectionName,
-			rowIndex: lastRowOfPreviousSection,
-			columnIndex,
-		};
+	// The row above doesn't have as many columns, return undefined early.
+	const columnCountForRowAbove = state[ sectionNameForRowAbove ][ previousRowIndex ].cells.length;
+	if ( columnIndex > columnCountForRowAbove - 1 ) {
+		return;
 	}
 
 	return {
-		...cellLocation,
-		rowIndex: rowIndex - 1,
+		section: sectionNameForRowAbove,
+		rowIndex: previousRowIndex,
+		columnIndex,
 	};
 }
 
@@ -362,32 +362,34 @@ export function getCellBelow( state, cellLocation ) {
 		return;
 	}
 
+	let sectionNameForRowBelow, nextRowIndex;
+
 	// Handle getting the cell from the next section.
 	if ( isLastRow ) {
-		const nextSectionName = sectionName === 'head' ? 'body' : 'foot';
-		const nextSection = state[ nextSectionName ];
+		sectionNameForRowBelow = sectionName === 'head' ? 'body' : 'foot';
+		const nextSection = state[ sectionNameForRowBelow ];
 
 		// There is no next section, return undefined early.
 		if ( isEmptyTableSection( nextSection ) ) {
 			return;
 		}
 
-		// The next section doesn't have as many columns, return undefined early.
-		const columnCount = nextSection[ 0 ].cells.length;
-		if ( columnIndex > columnCount - 1 ) {
-			return;
-		}
+		nextRowIndex = 0;
+	} else {
+		sectionNameForRowBelow = sectionName;
+		nextRowIndex = rowIndex + 1;
+	}
 
-		return {
-			section: nextSectionName,
-			rowIndex: 0,
-			columnIndex,
-		};
+	// The row above doesn't have as many columns, return undefined early.
+	const columnCountForRowBelow = state[ sectionNameForRowBelow ][ nextRowIndex ].cells.length;
+	if ( columnIndex > columnCountForRowBelow - 1 ) {
+		return;
 	}
 
 	return {
-		...cellLocation,
-		rowIndex: rowIndex + 1,
+		section: sectionNameForRowBelow,
+		rowIndex: nextRowIndex,
+		columnIndex,
 	};
 }
 
