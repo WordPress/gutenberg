@@ -705,7 +705,8 @@
 			&.is-horizontal {
 				display: grid;
 				grid-template-columns: 1fr 1fr 1fr;
-				left: - $block-side-ui-width/2 + $block-side-ui-clearance + $block-padding - $border-width;
+				left: - $block-side-ui-width - $mover-icon-width * 3 - $block-side-ui-clearance - $block-padding - $border-width;
+				top: $block-side-ui-clearance + $block-padding + $border-width;
 			}
 		}
 	}
