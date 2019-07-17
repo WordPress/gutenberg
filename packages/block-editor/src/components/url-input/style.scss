@@ -125,8 +125,8 @@ $input-size: 300px;
 	border: 1px solid $light-gray-500;
 	background: $white;
 
-	.components-base-control:last-child,
-	.components-base-control:last-child .components-base-control__field {
+	.components-base-control,
+	.components-base-control .components-base-control__field {
 		margin-bottom: 0;
 	}
 }
