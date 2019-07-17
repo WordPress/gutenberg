@@ -1,7 +1,7 @@
 InlineTip
 =========
 
-`InlineTip` is a React component that renders a single _tip_ on the screen. It has the same appearance as a `Notice`. Each tip is uniquely identified by a string passed to `tipId`.
+`InlineTip` is a React component that renders a single _tip_ on the screen. It has the same appearance as a [`Notice`](https://developer.wordpress.org/block-editor/components/notice/). Each tip is uniquely identified by a string passed to `tipId`.
 
 ## Usage
 
