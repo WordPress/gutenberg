@@ -60,6 +60,12 @@
 		transform: rotate(180deg);
 	}
 }
+.block-editor-url-popover__input-container {
+	.components-base-control:last-child,
+	.components-base-control:last-child .components-base-control__field {
+		margin-bottom: 0;
+	}
+}
 
 .block-editor-url-popover__settings {
 	display: block;
