@@ -14,7 +14,6 @@ import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
 
-
 /**
  * Internal dependencies
  */
@@ -45,7 +44,7 @@ export class BlockList extends Component {
 			// do replace here
 			this.props.replaceBlock( this.props.selectedBlockClientId, newBlock );
 		} else {
-			this.props.insertBlock( newBlock, this.getNewBlockInsertionIndex(), this.props.rootClientId );
+			this.props.insertBlock( newBlock, this.getNewBlockInsertionIndex() );
 		}
 	}
 
