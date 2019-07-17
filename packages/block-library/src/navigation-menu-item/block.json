@@ -8,6 +8,10 @@
 		"destination": {
 			"type": "string"
 		},
+		"rel": {
+			"type": "string",
+			"default": ""
+		},
 		"nofollow": {
 			"type": "boolean",
 			"default": false

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { invoke } from 'lodash';
+import classnames from 'classnames/dedupe';
 
 /**
  * WordPress dependencies
@@ -39,13 +40,30 @@ function NavigationMenuItemEdit( {
 	setAttributes,
 } ) {
 	const plainTextRef = useRef( null );
-	const onEditLableClicked = useCallback(
+	const onEditLabelClicked = useCallback(
 		( onClose ) => () => {
 			onClose();
 			invoke( plainTextRef, [ 'current', 'textarea', 'focus' ] );
 		},
 		[ plainTextRef ]
 	);
+
+	const setTarget = ( opensInNewTab ) => {
+		const { rel } = attributes;
+
+		const updatedRel = classnames( rel, { noopener: opensInNewTab, noreferrer: opensInNewTab } );
+
+		setAttributes( { opensInNewTab, rel: updatedRel } );
+	};
+
+	const setNofollow = ( nofollow ) => {
+		const { rel } = attributes;
+
+		const updatedRel = classnames( rel, { nofollow } );
+
+		setAttributes( { nofollow, rel: updatedRel } );
+	};
+
 	let content;
 	if ( isSelected ) {
 		content = (
@@ -74,7 +92,7 @@ function NavigationMenuItemEdit( {
 						<MenuItemActions
 							clientId={ clientId }
 							destination={ attributes.destination }
-							onEditLableClicked={ onEditLableClicked( onClose ) }
+							onEditLableClicked={ onEditLabelClicked( onClose ) }
 						/>
 					) }
 				/>
@@ -83,6 +101,7 @@ function NavigationMenuItemEdit( {
 	} else {
 		content = attributes.label;
 	}
+
 	return (
 		<Fragment>
 			<InspectorControls>
@@ -91,9 +110,7 @@ function NavigationMenuItemEdit( {
 				>
 					<ToggleControl
 						checked={ attributes.opensInNewTab }
-						onChange={ ( opensInNewTab ) => {
-							setAttributes( { opensInNewTab } );
-						} }
+						onChange={ setTarget }
 						label={ __( 'Open in new tab' ) }
 					/>
 					<TextareaControl
@@ -117,9 +134,7 @@ function NavigationMenuItemEdit( {
 					/>
 					<ToggleControl
 						checked={ attributes.nofollow }
-						onChange={ ( nofollow ) => {
-							setAttributes( { nofollow } );
-						} }
+						onChange={ setNofollow }
 						label={ __( 'Add nofollow to menu item' ) }
 						help={ (
 							<Fragment>
