@@ -57,7 +57,7 @@
 
 		&.is-multi-cell-selection {
 			&::before {
-				border-width: 0;
+				border-width: 1px;
 			}
 
 			&.is-selection-top-edge {
