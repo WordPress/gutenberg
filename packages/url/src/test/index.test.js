@@ -367,6 +367,13 @@ describe( 'addQueryArgs', () => {
 		expect( addQueryArgs( url, args ) ).toBe( '?sun=true' );
 	} );
 
+	it( 'should add query args before URL’s fragment', () => {
+		const url = 'https://andalouses.example/beach/#fragment';
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach/?sun=true#fragment' );
+	} );
+
 	it( 'should return URL argument unaffected if no query arguments to append', () => {
 		[ '', 'https://example.com', 'https://example.com?' ].forEach( ( url ) => {
 			[ undefined, {} ].forEach( ( args ) => {
