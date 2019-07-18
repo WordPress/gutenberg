@@ -26,8 +26,8 @@ class VisualEditor extends Component {
 		};
 	}
 
-	static getDerivedStateFromProps( props, state ) {
-		if ( props.isAnyBlockSelected && state.isPostTitleSelected ) {
+	static getDerivedStateFromProps( props ) {
+		if ( props.isAnyBlockSelected ) {
 			return { isPostTitleSelected: false };
 		}
 		return null;
