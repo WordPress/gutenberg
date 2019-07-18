@@ -64,7 +64,7 @@ export const withLazySameState = ( reducer ) => ( state, action ) => {
  * @return {Function} Callback proxy, invoking the callback when available.
  */
 export const withIdleCallback = ( () => {
-	if ( 'requestIdleCallback' in window ) {
+	if ( typeof window !== 'undefined' && 'requestIdleCallback' in window ) {
 		return window.requestIdleCallback;
 	}
 
