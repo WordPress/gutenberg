@@ -8,12 +8,12 @@ import {
 	IconButton,
 	MenuItem,
 	NavigableMenu,
-	TextControl,
 } from '@wordpress/components';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
 import { isURL } from '@wordpress/url';
+import { createBlock } from '@wordpress/blocks';
+import { URLInput } from '@wordpress/block-editor';
 
 function MenuItemInserter( { insertMenuItem } ) {
 	const [ searchInput, setSearchInput ] = useState( '' );
@@ -38,10 +38,10 @@ function MenuItemInserter( { insertMenuItem } ) {
 			) }
 			renderContent={ () => (
 				<div className="wp-block-navigation-menu__inserter-content">
-					<TextControl
+					<URLInput
 						value={ searchInput }
-						label={ __( 'Search or paste a link' ) }
 						onChange={ setSearchInput }
+						isFullWidth
 					/>
 					{ isUrlInput && (
 						<NavigableMenu>
