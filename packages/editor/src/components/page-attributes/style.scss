@@ -18,3 +18,99 @@
 		width: 66px;
 	}
 }
+
+.components-parent-page__autocomplete__wrapper {
+	box-sizing: border-box;
+	position: relative;
+}
+
+.components-parent-page__autocomplete__hint,
+.components-parent-page__autocomplete__input {
+	-webkit-appearance: none;
+	border: 2px solid;
+	border-radius: 0; /* Safari 10 on iOS adds implicit border rounding. */
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	margin-bottom: 0; /* BUG: Safari 10 on macOS seems to add an implicit margin. */
+	width: 100%;
+}
+
+.components-parent-page__autocomplete__input {
+	background-color: transparent;
+	position: relative;
+}
+
+.components-parent-page__autocomplete__hint {
+	position: absolute;
+}
+
+.components-parent-page__autocomplete__dropdown-arrow-down {
+	display: none;
+}
+
+.components-parent-page__autocomplete__menu {
+	background: $white;
+	border-top: 0;
+	color: $dark-gray-300;
+	margin: 0;
+	padding: #{$grid-size-small / 2} 0;
+	overflow-x: overlay;
+	overflow-y: auto;
+	max-height: 96px;
+	transition: all 0.15s ease-in-out;
+	width: calc(100% + 2px);
+
+	&.components-parent-page__autocomplete__menu--visible {
+		display: block;
+	}
+
+	&.components-parent-page__autocomplete__menu--hidden {
+		display: none;
+	}
+}
+
+.components-parent-page__autocomplete__menu--overlay {
+	box-shadow: $shadow-popover;
+	border: $border-width solid $light-gray-500;
+	left: 0;
+	position: absolute;
+	top: 100%;
+	z-index: 100;
+}
+
+.components-parent-page__autocomplete__menu--inline {
+	position: relative;
+}
+
+.components-parent-page__autocomplete__option {
+	font-size: $default-font-size;
+	padding: #{$grid-size-small / 2} $grid-size;
+	margin-bottom: 0;
+	cursor: pointer;
+	display: block;
+	position: relative;
+
+	> * {
+		pointer-events: none;
+	}
+
+	&:hover {
+		background: $light-gray-500;
+	}
+
+	&:focus,
+	&.components-parent-page__autocomplete__option--focused
+	&.components-parent-page__autocomplete__option--focused:hover {
+		background: color(theme(primary) shade(15%));
+		color: $white;
+		outline: none;
+	}
+
+	&.components-parent-page__autocomplete__option--no-results,
+	&.components-parent-page__autocomplete__option--no-results:hover {
+		background: $white;
+		font-style: italic;
+		cursor: not-allowed;
+	}
+}

@@ -29,9 +29,14 @@ export function PageAttributes( { isEnabled, isOpened, onTogglePanel, postType }
 				onToggle={ onTogglePanel }
 			>
 				<PageTemplate />
-				<PageAttributesParent />
+				<PanelRow>
+					<PageAttributesParent />
+				</PanelRow>
 				<PanelRow>
 					<PageAttributesOrder />
+				</PanelRow>
+				<PanelRow>
+					<p />
 				</PanelRow>
 			</PanelBody>
 		</PageAttributesCheck>
