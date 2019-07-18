@@ -11,6 +11,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
 import { BACKSPACE, ENTER, UP, DOWN, LEFT, RIGHT, SPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -58,7 +59,7 @@ class FormTokenField extends Component {
 		}
 
 		const { suggestions, value } = this.props;
-		const suggestionsDidUpdate = suggestions !== prevProps.suggestions;
+		const suggestionsDidUpdate = ! isShallowEqual( suggestions, prevProps.suggestions );
 		if ( suggestionsDidUpdate || value !== prevProps.value ) {
 			this.updateSuggestions( suggestionsDidUpdate );
 		}
