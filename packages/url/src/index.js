@@ -261,7 +261,8 @@ export function addQueryArgs( url = '', args ) {
 		return url;
 	}
 
-	let baseUrl = url;
+	let baseUrl = url.replace( /#.*$/, '' );
+	const fragment = url.replace( /^[^#]*/, '' );
 
 	// Determine whether URL already had query arguments.
 	const queryStringIndex = url.indexOf( '?' );
@@ -276,7 +277,7 @@ export function addQueryArgs( url = '', args ) {
 		baseUrl = baseUrl.substr( 0, queryStringIndex );
 	}
 
-	return baseUrl + '?' + stringify( args );
+	return baseUrl + '?' + stringify( args ) + fragment;
 }
 
 /**
