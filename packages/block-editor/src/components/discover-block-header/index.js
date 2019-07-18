@@ -11,23 +11,23 @@ import { Fragment } from '@wordpress/element';
 import BlockIcon from '../block-icon';
 import BlockRatings from '../block-ratings';
 
-function DiscoverBlockHeader( { icon, title, onClick } ) {
-	const itemIconStyle = icon ? {
-		backgroundColor: icon.background,
-		color: icon.foreground,
-	} : undefined;
-
+function DiscoverBlockHeader( { icons, title, rating, ratingCount, onClick } ) {
 	return (
 		<Fragment>
 			<div className="block-editor-discover-block-header__row">
-				<span style={ itemIconStyle } >
-					<BlockIcon icon={ icon } showColors />
-				</span>
+				{
+					icons[ '1x' ] ?
+						<img src={ icons[ '1x' ] } alt="block icon" /> :
+						<span >
+							<BlockIcon icon={ 'block-default' } showColors />
+						</span>
+				}
+
 				<div className="block-editor-discover-block-header__column">
 					<span className="block-editor-discover-block-header__title">
 						{ title }
 					</span>
-					<BlockRatings rating={ 4.5 } ratingCount={ 110 } />
+					<BlockRatings rating={ rating } ratingCount={ ratingCount } />
 				</div>
 				<Button
 					isDefault

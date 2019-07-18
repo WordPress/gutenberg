@@ -6,22 +6,41 @@ import DiscoverBlockAuthorInfo from '../discover-block-author-info';
 import DiscoverBlockInfo from '../discover-block-info';
 
 function DiscoverBlockListItem( {
-	icon,
+	item,
 	onClick,
-	title,
-	description,
 } ) {
+	const {
+		icons,
+		title,
+		description,
+		rating,
+		activeInstalls,
+		ratingCount,
+		author,
+	} = item;
+
 	return (
 		<li className="block-editor-discover-block-list-item">
 			<div className="block-editor-discover-block-list-item__panel">
 				<div className="block-editor-discover-block-list-item__header">
-					<DiscoverBlockHeader icon={ icon } onClick={ onClick } title={ title } />
+					<DiscoverBlockHeader
+						icons={ icons }
+						onClick={ onClick }
+						title={ title }
+						rating={ rating }
+						ratingCount={ ratingCount }
+					/>
 				</div>
 				<div className="block-editor-discover-block-list-item__body">
-					<DiscoverBlockInfo description={ description } />
+					<DiscoverBlockInfo
+						activeInstalls={ activeInstalls }
+						description={ description }
+					/>
 				</div>
 				<div className="block-editor-discover-block-list-item__footer">
-					<DiscoverBlockAuthorInfo />
+					<DiscoverBlockAuthorInfo
+						author={ author }
+					/>
 				</div>
 			</div>
 		</li>

@@ -9,6 +9,11 @@
 		background-color: $light-gray-300;
 	}
 
+	img {
+		width: 36px;
+		height: 36px;
+	}
+
 	.block-editor-discover-block-header__column {
 		display: flex;
 		flex-direction: column;

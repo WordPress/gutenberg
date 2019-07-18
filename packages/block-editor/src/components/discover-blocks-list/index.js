@@ -20,7 +20,7 @@ function DiscoverBlocksList( { items, onSelect, onHover = () => {}, children } )
 				<DiscoverBlockListItem
 					key={ item.id }
 					className={ getBlockMenuDefaultClassName( item.id ) }
-					icon={ item.icon }
+					icons={ item.icons }
 					onClick={ () => {
 						onSelect( item );
 						onHover( null );
@@ -30,8 +30,7 @@ function DiscoverBlocksList( { items, onSelect, onHover = () => {}, children } )
 					onMouseLeave={ () => onHover( null ) }
 					onBlur={ () => onHover( null ) }
 					isDisabled={ item.isDisabled }
-					title={ item.title }
-					description={ item.description }
+					item={ item }
 				/>
 			) }
 			{ children }

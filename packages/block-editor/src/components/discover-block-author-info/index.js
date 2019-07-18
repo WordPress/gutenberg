@@ -3,11 +3,11 @@
  */
 import { Fragment } from '@wordpress/element';
 
-function DiscoverBlockAuthorInfo() {
+function DiscoverBlockAuthorInfo( { author } ) {
 	return (
 		<Fragment>
 			<span className="block-editor-discover-block-author-info__content-author">
-				Authored by <strong>XXX</strong>
+				Authored by <strong>{ author }</strong>
 			</span>
 			<span className="block-editor-discover-block-author-info__content">
 				This author has <strong>X</strong> blocks, with an average rating of <strong>X.X</strong>.
