@@ -74,6 +74,7 @@ function NavigationMenuItemEdit( {
 						<MenuItemActions
 							clientId={ clientId }
 							destination={ attributes.destination }
+							setDestination={ ( destination ) => setAttributes( { destination } ) }
 							onEditLableClicked={ onEditLableClicked( onClose ) }
 						/>
 					) }

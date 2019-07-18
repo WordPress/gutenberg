@@ -5,9 +5,11 @@ import {
 	MenuItem,
 	NavigableMenu,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { URLInput } from '@wordpress/block-editor';
 
 function MenuItemActions( {
 	destination,
@@ -16,14 +18,23 @@ function MenuItemActions( {
 	moveToEnd,
 	moveToStart,
 	onEditLableClicked,
+	setDestination,
 	remove,
 } ) {
+	const [ searchInput, setSearchInput ] = useState( destination );
+	const setNewDestination = ( value ) => {
+		setDestination( value );
+		setSearchInput( value );
+	};
+
 	return (
 		<NavigableMenu>
-			<MenuItem
-				icon="admin-links"
-			>
-				{ destination }
+			<MenuItem icon="admin-links" >
+				<URLInput
+					value={ searchInput }
+					onChange={ setNewDestination }
+					isFullWidth
+				/>
 			</MenuItem>
 			<MenuItem
 				onClick={ onEditLableClicked }
