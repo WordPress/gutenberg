@@ -10,13 +10,14 @@ function DiscoverBlockListItem( {
 	onClick,
 } ) {
 	const {
-		icons,
+		icon,
 		title,
 		description,
 		rating,
 		activeInstalls,
 		ratingCount,
 		author,
+		humanizedUpdated,
 	} = item;
 
 	return (
@@ -24,7 +25,7 @@ function DiscoverBlockListItem( {
 			<div className="block-editor-discover-block-list-item__panel">
 				<div className="block-editor-discover-block-list-item__header">
 					<DiscoverBlockHeader
-						icons={ icons }
+						icon={ icon }
 						onClick={ onClick }
 						title={ title }
 						rating={ rating }
@@ -35,6 +36,7 @@ function DiscoverBlockListItem( {
 					<DiscoverBlockInfo
 						activeInstalls={ activeInstalls }
 						description={ description }
+						humanizedUpdated={ humanizedUpdated }
 					/>
 				</div>
 				<div className="block-editor-discover-block-list-item__footer">

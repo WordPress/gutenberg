@@ -5,7 +5,7 @@ import { Fragment } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { _n, sprintf } from '@wordpress/i18n';
 
-function DiscoverBlockInfo( { description, activeInstalls } ) {
+function DiscoverBlockInfo( { description, activeInstalls, humanizedUpdated } ) {
 	return (
 		<Fragment>
 			<span className="block-editor-discover-block-info__content">
@@ -16,7 +16,7 @@ function DiscoverBlockInfo( { description, activeInstalls } ) {
 					<Icon icon={ 'chart-line' }></Icon>{ sprintf( _n( '%d active installation', '%d active installations', activeInstalls ), activeInstalls ) }
 				</div>
 				<div className="block-editor-discover-block-info__column">
-					<Icon icon={ 'update' }></Icon>Updated X week ago
+					<Icon icon={ 'update' }></Icon>{ humanizedUpdated }
 				</div>
 			</div>
 		</Fragment>

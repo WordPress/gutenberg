@@ -11,15 +11,15 @@ import { Fragment } from '@wordpress/element';
 import BlockIcon from '../block-icon';
 import BlockRatings from '../block-ratings';
 
-function DiscoverBlockHeader( { icons, title, rating, ratingCount, onClick } ) {
+function DiscoverBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
 	return (
 		<Fragment>
 			<div className="block-editor-discover-block-header__row">
 				{
-					icons[ '1x' ] ?
-						<img src={ icons[ '1x' ] } alt="block icon" /> :
+					icon.match( /\.(jpeg|jpg|gif|png)/ ) !== null ?
+						<img src={ icon } alt="block icon" /> :
 						<span >
-							<BlockIcon icon={ 'block-default' } showColors />
+							<BlockIcon icon={ icon } showColors />
 						</span>
 				}
 
