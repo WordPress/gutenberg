@@ -509,6 +509,7 @@ export function* savePost( options = {} ) {
 			method: 'PUT',
 			data: {
 				content: editedPostContent,
+				id: templatePost.ID,
 			},
 		} );
 		const postContentBlock = ( yield select( STORE_KEY, 'getBlocksForSerialization' ) ).find( ( block ) => block.name === 'core/post-content' );

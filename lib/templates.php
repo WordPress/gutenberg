@@ -70,3 +70,29 @@ function gutenberg_filter_block_editor_settings( $editor_settings, $post ) {
 	return $editor_settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_filter_block_editor_settings', 10, 2 );
+
+/**
+ * Filters template inclusion in pages to hijack the `single.php` template
+ * and load the Gutenberg editable counterpart instead.
+ *
+ * @param string $template The included template file name.
+ *
+ * @return string The passed in file name unless the process is hijacked.
+ */
+function gutenberg_filter_template_include( $template ) {
+	if ( ! preg_match( '/single\.php$/', $template ) ) {
+		return $template;
+	}
+
+	$template_query = new WP_Query(
+		array(
+			'post_type' => 'wp_template',
+			'name'      => 'single-post',
+		)
+	);
+	$template       = $template_query->get_posts();
+	$template       = $template[0];
+	echo wp_head() . apply_filters( 'the_content', $template->post_content ) . wp_footer();
+	exit;
+}
+add_filter( 'template_include', 'gutenberg_filter_template_include' );

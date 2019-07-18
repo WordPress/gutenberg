@@ -28,6 +28,8 @@ function gutenberg_reregister_core_block_types() {
 		'shortcode.php'       => 'core/shortcode',
 		'search.php'          => 'core/search',
 		'tag-cloud.php'       => 'core/tag-cloud',
+		'post-title.php'      => 'core/post-title',
+		'post-content.php'    => 'core/post-content',
 	);
 
 	$registry = WP_Block_Type_Registry::get_instance();
