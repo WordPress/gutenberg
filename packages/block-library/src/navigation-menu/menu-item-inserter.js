@@ -4,7 +4,6 @@
 import { compose } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 import {
-	Dropdown,
 	IconButton,
 	MenuItem,
 	NavigableMenu,
@@ -13,10 +12,15 @@ import { useState, useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { createBlock } from '@wordpress/blocks';
-import { URLInput } from '@wordpress/block-editor';
+import { URLPopover, URLInput } from '@wordpress/block-editor';
 
 function MenuItemInserter( { insertMenuItem } ) {
 	const [ searchInput, setSearchInput ] = useState( '' );
+	const [ isOpen, setIsOpen ] = useState( false );
+	const openLinkUI = useCallback( () => {
+		setIsOpen( ! isOpen );
+	} );
+
 	const isUrlInput = useMemo( () => isURL( searchInput ), [ searchInput ] );
 	const onMenuItemClick = useCallback( () => {
 		insertMenuItem( {
@@ -25,37 +29,35 @@ function MenuItemInserter( { insertMenuItem } ) {
 	}, [ insertMenuItem, searchInput ] );
 
 	return (
-		<Dropdown
-			className="wp-block-navigation-menu__inserter"
-			position="bottom center"
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<IconButton
-					icon="insert"
-					label={ __( 'Insert a new menu item' ) }
-					onClick={ onToggle }
-					aria-expanded={ isOpen }
-				/>
-			) }
-			renderContent={ () => (
-				<div className="wp-block-navigation-menu__inserter-content">
-					<URLInput
-						value={ searchInput }
-						onChange={ setSearchInput }
-						isFullWidth
-					/>
-					{ isUrlInput && (
-						<NavigableMenu>
+		<div>
+			<IconButton
+				icon="insert"
+				label={ __( 'Insert a new menu item' ) }
+				onClick={ openLinkUI }
+				aria-expanded={ isOpen }
+			/>
+			{ isOpen && (
+				<URLPopover>
+					<NavigableMenu>
+						<MenuItem>
+							<URLInput
+								value={ searchInput }
+								onChange={ setSearchInput }
+								isFullWidth
+							/>
+						</MenuItem>
+						{ isUrlInput && (
 							<MenuItem
 								onClick={ onMenuItemClick }
 								icon="admin-links"
 							>
 								{ searchInput }
 							</MenuItem>
-						</NavigableMenu>
-					) }
-				</div>
+						) }
+					</NavigableMenu>
+				</URLPopover>
 			) }
-		/>
+		</div>
 	);
 }
 
