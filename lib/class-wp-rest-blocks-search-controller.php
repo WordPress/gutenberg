@@ -117,23 +117,23 @@ function parse_block_metadata( $plugin ) {
 	// TODO: map to name in block.json
 	$block->name            = $plugin[ 'slug' ] === 'boxer-block' ? 'boxer/boxer': 'lez-library/listicles';
 
-	// DECIDE: Plugin's name or Title in block.json
+	// AMBIGUOUS: Plugin's name or Title in block.json
 	$block->title           = $plugin[ 'name' ];
 
-	// DECIDE: Plugin's description or description in block.json
+	// AMBIGUOUS: Plugin's description or description in block.json
 	$block->description     = wp_strip_all_tags( $plugin[ 'description' ] );
 
 	$block->rating          = $plugin[ 'rating' ];
 	$block->ratingCount     = $plugin[ 'num_ratings' ];
 	$block->activeInstalls  = $plugin[ 'active_installs' ];
 
-	// DECIDE: Plugin's author or author in block.json
+	// AMBIGUOUS: Plugin's author or author in block.json
 	$block->author          = wp_strip_all_tags( $plugin[ 'author' ] );
 
-	// DECIDE: Plugin's icons or icon in block.json
+	// AMBIGUOUS: Plugin's icons or icon in block.json
 	$block->icon            = isset( $plugin[ 'icons' ][ '1x' ] ) ? $plugin[ 'icons' ][ '1x' ] : 'block-default';
 
-	// TODO: map to name in block.json 
+	// TODO: map to assets in block.json 
 	// Note: asset property with dependencies proposal: https://github.com/WordPress/gutenberg/pull/13693#issuecomment-491814028
 	$block->assets          = $plugin[ 'slug' ] === 'boxer-block'
 	? json_decode( '{
