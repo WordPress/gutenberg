@@ -111,56 +111,31 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 }
 
 function parse_block_metadata( $plugin ) {
-	$block                  = new stdClass();
-	$block->id              = $plugin[ 'slug' ];
+	$block     = new stdClass();
+	$block->id = $plugin[ 'slug' ];
 
-	// TODO: map to name in block.json
-	$block->name            = $plugin[ 'slug' ] === 'boxer-block' ? 'boxer/boxer': 'lez-library/listicles';
-
-	// AMBIGUOUS: Plugin's name or Title in block.json
-	$block->title           = $plugin[ 'name' ];
+	// AMBIGUOUS: Only the first element in blocks is mapped
+	$block->name  = reset( $plugin[ 'blocks' ] )[ 'name' ];
+	$block->title = reset( $plugin[ 'blocks' ] )[ 'title' ];
 
 	// AMBIGUOUS: Plugin's description or description in block.json
-	$block->description     = wp_strip_all_tags( $plugin[ 'description' ] );
+	$block->description = wp_strip_all_tags( $plugin[ 'description' ] );
 
-	$block->rating          = $plugin[ 'rating' ];
-	$block->ratingCount     = $plugin[ 'num_ratings' ];
-	$block->activeInstalls  = $plugin[ 'active_installs' ];
+	$block->rating         = $plugin[ 'rating' ];
+	$block->ratingCount    = $plugin[ 'num_ratings' ];
+	$block->activeInstalls = $plugin[ 'active_installs' ];
 
 	// AMBIGUOUS: Plugin's author or author in block.json
-	$block->author          = wp_strip_all_tags( $plugin[ 'author' ] );
+	$block->author = wp_strip_all_tags( $plugin[ 'author' ] );
 
 	// AMBIGUOUS: Plugin's icons or icon in block.json
-	$block->icon            = isset( $plugin[ 'icons' ][ '1x' ] ) ? $plugin[ 'icons' ][ '1x' ] : 'block-default';
+	$block->icon = isset( $plugin[ 'icons' ][ '1x' ] ) ? $plugin[ 'icons' ][ '1x' ] : 'block-default';
 
 	// TODO: map to assets in block.json 
 	// Note: asset property with dependencies proposal: https://github.com/WordPress/gutenberg/pull/13693#issuecomment-491814028
-	$block->assets          = $plugin[ 'slug' ] === 'boxer-block'
-	? json_decode( '{
-		"editor_script": {
-			"src": "http://plugins.svn.wordpress.org/boxer-block/trunk/build/index.js"
-		},
-		"view_script": {
-			"src": "http://plugins.svn.wordpress.org/boxer-block/trunk/build/view.js"
-		},
-		"style": {
-			"src": "http://plugins.svn.wordpress.org/boxer-block/trunk/style.css"
-		},
-		"editor_style": {
-			"src": "http://plugins.svn.wordpress.org/boxer-block/trunk/editor.css"
-		}
-	}' )
-	: json_decode( '{
-		"editor_script": {
-			"src": "http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.build.js"
-		},
-		"style": {
-			"src": "http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.style.build.css"
-		},
-		"editor_style": {
-			"src": "http://plugins.svn.wordpress.org/listicles/trunk/dist/blocks.editor.build.css"
-		}
-	}' );
+	$block->assets = array_map( function( $asset ) use ( $plugin ) { 
+		return 'https://plugins.svn.wordpress.org/' . $plugin[ 'slug' ] . $asset;
+	}, $plugin[ 'block_assets' ] );
 
 	$block->humanizedUpdated = human_time_diff( strtotime( $plugin[ 'last_updated' ] ), current_time( 'timestamp' ) ) . __( ' ago' );
 

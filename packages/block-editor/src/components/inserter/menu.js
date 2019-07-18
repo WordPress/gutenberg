@@ -14,6 +14,7 @@ import {
 	without,
 	includes,
 	deburr,
+	forEach,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -110,7 +111,7 @@ const loadScipt = ( asset, onLoad, onError ) => {
 		existing.parentNode.removeChild( existing );
 	}
 	const script = document.createElement( 'script' );
-	script.src = asset.src;
+	script.src = typeof asset === 'string' ? asset : asset.src;
 	script.onload = onLoad;
 	script.onerror = onError;
 	document.body.appendChild( script );
@@ -120,7 +121,6 @@ const loadScipt = ( asset, onLoad, onError ) => {
  * Dynamically loads stylesheets
  *
  * @param {Object} asset The asset object as described in block.json.
- * @param {Function} onLoad The callback function when script is loaded.
  */
 const loadStyle = ( asset ) => {
 	if ( ! asset ) {
@@ -128,8 +128,37 @@ const loadStyle = ( asset ) => {
 	}
 	const link = document.createElement( 'link' );
 	link.rel = 'stylesheet';
-	link.href = asset.src;
+	link.href = typeof asset === 'string' ? asset : asset.src;
 	document.body.appendChild( link );
+};
+
+/**
+ * Loads block's assets
+ *
+ * @param {Object|Array} assets The asset object as described in block.json or array of URL of the
+ * @param {Function} onLoad The callback function when script is loaded.
+ * @param {Function} onError The callback function when script is error loading.
+  *
+ * @return {number} The number of scripts loaded.
+ */
+const handleBlockAssets = ( assets, onLoad, onError ) => {
+	let scriptsCount = 0;
+	if ( typeof assets === 'object' && assets.constructor === Array ) {
+		forEach( assets, ( asset ) => {
+			if ( asset.match( /\.js$/ ) !== null ) {
+				scriptsCount++;
+				onLoad.bind( scriptsCount );
+				loadScipt( asset, onLoad, onError, scriptsCount );
+			} else {
+				loadStyle( asset );
+			}
+		} );
+	} else {
+		scriptsCount++;
+		loadScipt( assets.editor_script, onLoad, onError );
+		loadStyle( assets.style );
+	}
+	return scriptsCount;
 };
 
 export class InserterMenu extends Component {
@@ -509,7 +538,12 @@ export default compose(
 				};
 
 				if ( item.assets ) {
+					let scriptsCount = 0;
 					const onLoad = () => {
+						scriptsCount--;
+						if ( scriptsCount > 0 ) {
+							return;
+						}
 						const registeredBlocks = getBlockTypes();
 						if ( registeredBlocks.length ) {
 							const block = createBlock( item.name );
@@ -524,15 +558,13 @@ export default compose(
 									label: __( 'Retry' ),
 									onClick: () => {
 										removeNotice( 'block-preview-error' );
-										loadScipt( item.assets.editor_script, onLoad, onError );
-										loadStyle( item.assets.style );
+										scriptsCount = handleBlockAssets( item.assets, onLoad, onError );
 									},
 								},
 							],
 						} );
 					};
-					loadScipt( item.assets.editor_script, onLoad, onError );
-					loadStyle( item.assets.style );
+					scriptsCount = handleBlockAssets( item.assets, onLoad, onError );
 				} else {
 					const insertedBlock = createBlock( name, initialAttributes );
 					handleInsertBlock( insertedBlock );
