@@ -1028,6 +1028,8 @@ content reflected as an edit in state.
 _Parameters_
 
 -   _blocks_ `Array`: Array of blocks.
+-   _selectionStart_ `Array`: Selection start object.
+-   _selectionEnd_ `Array`: Selection end object.
 
 _Returns_
 

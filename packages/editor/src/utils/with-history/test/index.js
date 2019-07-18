@@ -123,10 +123,10 @@ describe( 'withHistory', () => {
 		state = reducer( state, { type: 'INCREMENT' } );
 
 		expect( state ).toEqual( {
-			past: [ 0 ], // Needs at least one history
+			past: [],
 			present: 2,
 			future: [],
-			lastAction: { type: 'INCREMENT' },
+			lastAction: null,
 			shouldCreateUndoLevel: false,
 		} );
 	} );

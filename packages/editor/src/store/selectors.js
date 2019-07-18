@@ -1134,6 +1134,26 @@ export function getEditorBlocks( state ) {
 }
 
 /**
+ * Return the current selection start object.
+ *
+ * @param {Object} state
+ * @return {Array} Selection start object.
+ */
+export function getEditorSelectionStart( state ) {
+	return state.editor.present.selectionStart;
+}
+
+/**
+ * Return the current selection end object.
+ *
+ * @param {Object} state
+ * @return {Array} Selection end object.
+ */
+export function getEditorSelectionEnd( state ) {
+	return state.editor.present.selectionEnd;
+}
+
+/**
  * Is the editor ready
  *
  * @param {Object} state

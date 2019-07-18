@@ -922,15 +922,6 @@ export function isCaretWithinFormattedText( state = false, action ) {
 	return state;
 }
 
-const BLOCK_SELECTION_EMPTY_OBJECT = {};
-const BLOCK_SELECTION_INITIAL_STATE = {
-	start: BLOCK_SELECTION_EMPTY_OBJECT,
-	end: BLOCK_SELECTION_EMPTY_OBJECT,
-	isMultiSelecting: false,
-	isEnabled: true,
-	initialPosition: null,
-};
-
 /**
  * Reducer returning the block selection's state.
  *
@@ -939,34 +930,18 @@ const BLOCK_SELECTION_INITIAL_STATE = {
  *
  * @return {Object} Updated state.
  */
-export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) {
+export function blockSelection( state = { start: {}, end: {} }, action ) {
 	switch ( action.type ) {
-		case 'CLEAR_SELECTED_BLOCK':
-			return BLOCK_SELECTION_INITIAL_STATE;
-		case 'START_MULTI_SELECT':
-			if ( state.isMultiSelecting ) {
-				return state;
+		case 'CLEAR_SELECTED_BLOCK': {
+			if ( state.start.clientId || state.end.clientId ) {
+				return { start: {}, end: {} };
 			}
 
-			return {
-				...state,
-				isMultiSelecting: true,
-				initialPosition: null,
-			};
-		case 'STOP_MULTI_SELECT':
-			if ( ! state.isMultiSelecting ) {
-				return state;
-			}
+			return state;
+		}
 
-			return {
-				...state,
-				isMultiSelecting: false,
-				initialPosition: null,
-			};
 		case 'MULTI_SELECT':
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				isMultiSelecting: state.isMultiSelecting,
 				start: { clientId: action.start },
 				end: { clientId: action.end },
 			};
@@ -979,7 +954,6 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			}
 
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
 				initialPosition: action.initialPosition,
 				start: { clientId: action.clientId },
 				end: { clientId: action.clientId },
@@ -988,7 +962,6 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 		case 'INSERT_BLOCKS': {
 			if ( action.updateSelection ) {
 				return {
-					...BLOCK_SELECTION_INITIAL_STATE,
 					start: { clientId: action.blocks[ 0 ].clientId },
 					end: { clientId: action.blocks[ 0 ].clientId },
 				};
@@ -1005,7 +978,7 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 				return state;
 			}
 
-			return BLOCK_SELECTION_INITIAL_STATE;
+			return { start: {}, end: {} };
 		case 'REPLACE_BLOCKS': {
 			if ( action.clientIds.indexOf( state.start.clientId ) === -1 ) {
 				return state;
@@ -1015,7 +988,7 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			const blockToSelect = action.blocks[ indexToSelect ];
 
 			if ( ! blockToSelect ) {
-				return BLOCK_SELECTION_INITIAL_STATE;
+				return { start: {}, end: {} };
 			}
 
 			if (
@@ -1026,19 +999,12 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			}
 
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
 				start: { clientId: blockToSelect.clientId },
 				end: { clientId: blockToSelect.clientId },
 			};
 		}
-		case 'TOGGLE_SELECTION':
-			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
-				isEnabled: action.isSelectionEnabled,
-			};
 		case 'SELECTION_CHANGE':
 			return {
-				...BLOCK_SELECTION_INITIAL_STATE,
 				start: {
 					clientId: action.clientId,
 					attributeKey: action.attributeKey,
@@ -1050,6 +1016,51 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 					offset: action.endOffset,
 				},
 			};
+		case 'RESET_BLOCKS': {
+			const {
+				selectionStart: start = {},
+				selectionEnd: end = {},
+			} = action;
+
+			return { start, end };
+		}
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning whether the user is multi-selecting.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isMultiSelecting( state = false, action ) {
+	switch ( action.type ) {
+		case 'START_MULTI_SELECT':
+			return true;
+
+		case 'STOP_MULTI_SELECT':
+			return false;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning whether selection is enabled.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isSelectionEnabled( state = true, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_SELECTION':
+			return action.isSelectionEnabled;
 	}
 
 	return state;
@@ -1256,6 +1267,8 @@ export default combineReducers( {
 	isTyping,
 	isCaretWithinFormattedText,
 	blockSelection,
+	isMultiSelecting,
+	isSelectionEnabled,
 	blocksMode,
 	blockListSettings,
 	insertionPoint,

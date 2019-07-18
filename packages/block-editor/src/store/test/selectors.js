@@ -1559,9 +1559,7 @@ describe( 'selectors', () => {
 	describe( 'isSelectionEnabled', () => {
 		it( 'should return true if selection is enable', () => {
 			const state = {
-				blockSelection: {
-					isEnabled: true,
-				},
+				isSelectionEnabled: true,
 			};
 
 			expect( isSelectionEnabled( state ) ).toBe( true );
@@ -1569,9 +1567,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if selection is disabled', () => {
 			const state = {
-				blockSelection: {
-					isEnabled: false,
-				},
+				isSelectionEnabled: false,
 			};
 
 			expect( isSelectionEnabled( state ) ).toBe( false );

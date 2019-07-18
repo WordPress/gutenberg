@@ -943,10 +943,18 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		yield* resetLastBlockSourceDependencies( Array.from( updatedSources ) );
 	}
 
+	const {
+		selectionStart,
+		selectionEnd,
+		__unstableShouldCreateUndoLevel,
+	} = options;
+
 	return {
 		type: 'RESET_EDITOR_BLOCKS',
 		blocks: yield* getBlocksWithSourcedAttributes( blocks ),
-		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
+		selectionStart,
+		selectionEnd,
+		shouldCreateUndoLevel: __unstableShouldCreateUndoLevel !== false,
 	};
 }
 

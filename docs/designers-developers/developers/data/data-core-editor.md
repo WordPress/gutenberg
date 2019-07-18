@@ -358,6 +358,30 @@ _Returns_
 
 -   `Array`: Block list.
 
+<a name="getEditorSelectionEnd" href="#getEditorSelectionEnd">#</a> **getEditorSelectionEnd**
+
+Return the current selection end object.
+
+_Parameters_
+
+-   _state_ `Object`: 
+
+_Returns_
+
+-   `Array`: Selection end object.
+
+<a name="getEditorSelectionStart" href="#getEditorSelectionStart">#</a> **getEditorSelectionStart**
+
+Return the current selection start object.
+
+_Parameters_
+
+-   _state_ `Object`: 
+
+_Returns_
+
+-   `Array`: Selection start object.
+
 <a name="getEditorSettings" href="#getEditorSettings">#</a> **getEditorSettings**
 
 Returns the post editor settings.

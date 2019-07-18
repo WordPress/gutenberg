@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { overSome, includes, first, last, drop, dropRight } from 'lodash';
+import { includes, first, last, drop, dropRight } from 'lodash';
 
 /**
  * Default options for withHistory reducer enhancer. Refer to withHistory
@@ -36,12 +36,6 @@ const DEFAULT_OPTIONS = {
  */
 const withHistory = ( options = {} ) => ( reducer ) => {
 	options = { ...DEFAULT_OPTIONS, ...options };
-
-	// `ignoreTypes` is simply a convenience for `shouldOverwriteState`
-	options.shouldOverwriteState = overSome( [
-		options.shouldOverwriteState,
-		( action ) => includes( options.ignoreTypes, action.type ),
-	] );
 
 	const initialState = {
 		past: [],
@@ -120,9 +114,13 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 		let lastActionToSubmit = previousAction;
 
 		if (
-			shouldCreateUndoLevel ||
-			! past.length ||
-			! shouldOverwriteState( action, previousAction )
+			// Ignored action should never create an undo level, regardless of
+			// whether there is already history or not.
+			! includes( options.ignoreTypes, action.type ) && (
+				shouldCreateUndoLevel ||
+				! past.length ||
+				! shouldOverwriteState( action, previousAction )
+			)
 		) {
 			nextPast = [ ...past, present ];
 			lastActionToSubmit = action;
