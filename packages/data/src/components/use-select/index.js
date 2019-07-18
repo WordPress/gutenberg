@@ -10,13 +10,13 @@ import {
 	useEffect,
 	useReducer,
 } from '@wordpress/element';
-import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
+import isEqual from './utils';
 
 /**
  * Favor useLayoutEffect to ensure the store subscription callback always has
@@ -129,7 +129,7 @@ export default function useSelect( _mapSelect, deps ) {
 						registry.select,
 						registry
 					);
-					if ( isShallowEqualObjects( latestMapOutput.current, newMapOutput ) ) {
+					if ( isEqual( latestMapOutput.current, newMapOutput ) ) {
 						return;
 					}
 					latestMapOutput.current = newMapOutput;

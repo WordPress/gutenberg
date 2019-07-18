@@ -132,5 +132,89 @@ describe( 'useSelect', () => {
 			children: 'bar',
 		} );
 	} );
+	describe( 'rerenders as expected with various mapSelect return ' +
+		'types', () => {
+		const getComponent = ( mapSelectSpy, dependencyKey ) => ( props ) => {
+			const dependencies = props[ dependencyKey ];
+			mapSelectSpy.mockImplementation(
+				( select ) => select( 'testStore' ).testSelector( props.keyName )
+			);
+			const data = useSelect( mapSelectSpy, [ dependencies ] );
+			return <div>{ data }</div>;
+		};
+		let selectorSpy,
+			subscribedSpy,
+			subscriberSpy,
+			selectSpy,
+			TestComponent;
+		beforeEach( () => {
+			selectorSpy = jest.fn();
+			subscriberSpy = jest.fn().mockImplementation(
+				( subscription ) => {
+					subscribedSpy = subscription;
+				}
+			);
+			registry.registerStore( 'testStore', {
+				reducer: () => null,
+				selectors: {
+					testSelector: selectorSpy,
+				},
+			} );
+			registry.subscribe = subscriberSpy;
+			selectSpy = jest.fn();
+			TestComponent = jest.fn().mockImplementation(
+				getComponent( selectSpy, 'keyName' )
+			);
+		} );
+		[
+			[
+				'boolean',
+				[ false, true ],
+			],
+			[
+				'number',
+				[ 10, 20 ],
+			],
+			[
+				'string',
+				[ 'bar', 'cheese' ],
+			],
+			[
+				'array',
+				[ [ 10, 20 ], [ 10, 30 ] ],
+			],
+		].forEach(
+			( [ type, testValues ] ) => {
+				const [ valueA, valueB ] = testValues;
+				it( `renders as expected with ${ type } return values`, () => {
+					selectorSpy.mockReturnValue( valueA );
+					let renderer;
+					act( () => {
+						renderer = TestRenderer.create(
+							<RegistryProvider value={ registry }>
+								<TestComponent keyName="foo" />
+							</RegistryProvider>
+						);
+					} );
+					const testInstance = renderer.root;
+					// ensure expected state was rendered.
+					expect( testInstance.findByType( 'div' ).props ).toEqual( {
+						children: valueA,
+					} );
+
+					// update the reducer and trigger the subscription
+					// which should trigger a re-render.
+					act( () => {
+						selectorSpy.mockReturnValue( valueB );
+						subscribedSpy();
+					} );
+					expect( testInstance.findByType( 'div' ).props ).toEqual( {
+						children: valueB,
+					} );
+					expect( selectSpy ).toHaveBeenCalledTimes( 3 );
+				} );
+			}
+		);
+	} );
 } );
 
