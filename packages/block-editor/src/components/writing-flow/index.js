@@ -91,18 +91,15 @@ class WritingFlow extends Component {
 		 */
 		this.verticalRect = null;
 
-		this.lastClientY = null;
-		this.lastClientX = null;
-
 		this.appender = createRef();
 	}
 
 	componentDidMount() {
-		window.addEventListener( 'mousemove', this.switchToEditMode );
+		window.addEventListener( 'mousedown', this.switchToEditMode );
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'mousemove', this.switchToEditMode );
+		window.removeEventListener( 'mousedown', this.switchToEditMode );
 	}
 
 	bindContainer( ref ) {
@@ -113,18 +110,10 @@ class WritingFlow extends Component {
 		this.verticalRect = null;
 	}
 
-	switchToEditMode( { clientY, clientX } ) {
-		// Safari triggers mousemove even if we didn't really move the mouse
-		// On shift press for instance.
-		// To ensure we really moved the mouse, we compare the mouse position
-		if ( this.props.keyboardMode !== 'edit' &&
-			( this.lastClientX !== null && this.lastClientY !== null ) &&
-			( clientY !== this.lastClientY || clientX !== this.lastClientX )
-		) {
+	switchToEditMode() {
+		if ( this.props.keyboardMode !== 'edit' ) {
 			this.props.setKeyboardMode( 'edit' );
 		}
-		this.lastClientY = clientY;
-		this.lastClientX = clientX;
 	}
 
 	/**
