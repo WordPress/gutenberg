@@ -446,22 +446,30 @@ export class TableEdit extends Component {
 								rowIndex,
 								columnIndex,
 							};
-
 							const isSelected = isCellSelected( cellLocation, selectedCell );
 
 							const cellClasses = classnames(	{
 								'is-selected': isSelected,
 								[ `has-text-align-${ align }` ]: align,
 							} );
+							const richTextClassName = 'wp-block-table__cell-content';
 
 							return (
 								<CellTag
 									key={ columnIndex }
 									className={ cellClasses }
 									scope={ CellTag === 'th' ? scope : undefined }
+									onClick={ ( event ) => {
+										// When a cell is selected, forward focus to the child RichText. This solves an issue where the
+										// user may click inside a cell, but outside of the RichText, resulting in nothing happening.
+										const richTextElement = event && event.target && event.target.querySelector( `.${ richTextClassName }` );
+										if ( richTextElement ) {
+											richTextElement.focus();
+										}
+									} }
 								>
 									<RichText
-										className="wp-block-table__cell-content"
+										className={ richTextClassName }
 										value={ content }
 										onChange={ this.onChange }
 										unstableOnFocus={ this.createOnFocus( cellLocation ) }
