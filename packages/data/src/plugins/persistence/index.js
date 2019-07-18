@@ -55,6 +55,23 @@ export const withLazySameState = ( reducer ) => ( state, action ) => {
 };
 
 /**
+ * Returns a function which accepts a callback and, when called, invokes the
+ * callback at the earliest free moment, using `requestIdleCallback` if
+ * available, falling back to `setTimeout`.
+ *
+ * @param {Function} callback Callback to invoke.
+ *
+ * @return {Function} Callback proxy, invoking the callback when available.
+ */
+export const withIdleCallback = ( () => {
+	if ( 'requestIdleCallback' in window ) {
+		return window.requestIdleCallback;
+	}
+
+	return ( callback ) => setTimeout( callback, 0 );
+} )();
+
+/**
  * Creates a persistence interface, exposing getter and setter methods (`get`
  * and `set` respectively).
  *
@@ -153,13 +170,13 @@ const persistencePlugin = function( registry, pluginOptions ) {
 
 		let lastState = getPersistedState( undefined, { nextState: getState() } );
 
-		return () => {
+		return () => withIdleCallback( () => {
 			const state = getPersistedState( lastState, { nextState: getState() } );
 			if ( state !== lastState ) {
 				persistence.set( reducerKey, state );
 				lastState = state;
 			}
-		};
+		} );
 	}
 
 	return {
