@@ -75,9 +75,10 @@ class TabPanel extends Component {
 					className="components-tab-panel__tabs"
 				>
 					{ tabs.map( ( tab ) => (
-						<TabButton className={ classnames( tab.className, { [ activeClass ]: tab.name === selected } ) }
+						<TabButton className={ classnames( 'components-tab-panel__tabs-item', tab.className, { [ activeClass ]: tab.name === selected } ) }
 							tabId={ instanceId + '-' + tab.name }
 							aria-controls={ instanceId + '-' + tab.name + '-view' }
+							aria-label={ tab.ariaLabel }
 							selected={ tab.name === selected }
 							key={ tab.name }
 							onClick={ partial( this.handleClick, tab.name ) }
