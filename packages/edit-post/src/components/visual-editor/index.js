@@ -49,8 +49,8 @@ function VisualEditor( { hasPostTitle } ) {
 }
 
 export default withSelect( ( select ) => {
-	const editorSettings = select( 'core/editor' ).getEditorSettings();
+	const viewEditingMode = select( 'core/editor' ).getViewEditingMode();
 	return {
-		hasPostTitle: editorSettings.viewEditingMode === 'post-content',
+		hasPostTitle: viewEditingMode === 'post-content',
 	};
 } )( VisualEditor );

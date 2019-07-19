@@ -58,7 +58,7 @@ class EditorProvider extends Component {
 			props.post,
 			props.initialEdits,
 			props.settings.template,
-			props.settings.viewEditingMode === 'template' && props.settings.templatePost
+			props.viewEditingMode === 'template' && props.settings.templatePost
 		);
 
 		if ( props.settings.autosave ) {
@@ -188,6 +188,7 @@ export default compose( [
 			__unstableIsEditorReady: isEditorReady,
 			getEditorBlocks,
 			__experimentalGetReusableBlocks,
+			getViewEditingMode,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
 
@@ -197,6 +198,7 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			reusableBlocks: __experimentalGetReusableBlocks(),
 			hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
+			viewEditingMode: getViewEditingMode(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

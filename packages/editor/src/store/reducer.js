@@ -308,6 +308,12 @@ export function template( state = { isValid: true }, action ) {
  */
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
+		case 'UPDATE_VIEW_EDITING_MODE':
+			return {
+				...state,
+				viewEditingMode: action.viewEditingMode,
+			};
+
 		case 'ENABLE_PUBLISH_SIDEBAR':
 			return {
 				...state,

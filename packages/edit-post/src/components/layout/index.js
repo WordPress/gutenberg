@@ -138,7 +138,8 @@ function Layout( {
 
 export default compose(
 	withSelect( ( select ) => {
-		const editorSettings = select( 'core/editor' ).getEditorSettings();
+		const { getEditorSettings, getViewEditingMode } = select( 'core/editor' );
+		const editorSettings = getEditorSettings();
 		return {
 			contentEditingMode: select( 'core/edit-post' ).getEditorMode(),
 			editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
@@ -148,7 +149,7 @@ export default compose(
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
-			viewEditingMode: editorSettings.viewEditingMode,
+			viewEditingMode: getViewEditingMode(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

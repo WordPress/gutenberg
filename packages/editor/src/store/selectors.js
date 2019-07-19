@@ -1109,6 +1109,20 @@ export function canUserUseUnfilteredHTML( state ) {
 }
 
 /**
+ * Returns the currently selected view editing mode.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} The currently selected view editing mode.
+ */
+export function getViewEditingMode( state ) {
+	if ( state.preferences.hasOwnProperty( 'viewEditingMode' ) ) {
+		return state.preferences.viewEditingMode;
+	}
+	return PREFERENCES_DEFAULTS.viewEditingMode;
+}
+
+/**
  * Returns whether the pre-publish panel should be shown
  * or skipped when the user clicks the "publish" button.
  *

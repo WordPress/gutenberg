@@ -12,27 +12,27 @@ const options = [
 ];
 
 export default function ViewEditingModePicker() {
-	const { post, blocks, settings } = useSelect( ( select ) => {
+	const { post, blocks, settings, viewEditingMode } = useSelect( ( select ) => {
 		const {
 			getCurrentPost,
 			getBlocksForSerialization,
 			getEditorSettings,
+			getViewEditingMode,
 		} = select( 'core/editor' );
 		return {
 			post: getCurrentPost(),
 			blocks: getBlocksForSerialization(),
 			settings: getEditorSettings(),
+			viewEditingMode: getViewEditingMode(),
 		};
 	}, [] );
-	const { updateEditorSettings, setupEditor } = useDispatch( 'core/editor' );
+	const { setupEditor, updateViewEditingMode } = useDispatch( 'core/editor' );
 
-	const updateViewEditingMode = useCallback( ( viewEditingMode ) => {
-		updateEditorSettings( {
-			viewEditingMode,
-		} );
+	const updateViewEditingModeCallback = useCallback( ( newViewEditingMode ) => {
+		updateViewEditingMode( newViewEditingMode );
 
 		let newBlocks = blocks;
-		if ( viewEditingMode === 'post-content' ) { // Leaving template mode.
+		if ( newViewEditingMode === 'post-content' ) { // Leaving template mode.
 			const postContentBlock = blocks.find(
 				( block ) => block.name === 'core/post-content'
 			);
@@ -44,16 +44,16 @@ export default function ViewEditingModePicker() {
 				blocks: newBlocks,
 			},
 			settings.template,
-			viewEditingMode === 'template' && settings.templatePost
+			newViewEditingMode === 'template' && settings.templatePost
 		);
-	}, [ post, blocks, settings ] );
+	}, [ post, blocks, settings.template, settings.templatePost, viewEditingMode ] );
 
 	return (
 		<SelectControl
 			label={ __( 'View Editing Mode' ) }
 			options={ options }
-			value={ settings.viewEditingMode }
-			onChange={ updateViewEditingMode }
+			value={ viewEditingMode }
+			onChange={ updateViewEditingModeCallback }
 		/>
 	);
 }
