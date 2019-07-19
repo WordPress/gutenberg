@@ -32,7 +32,49 @@ function gutenberg_register_templates() {
 			array(
 				'post_type'    => 'wp_template',
 				'post_name'    => 'single-post',
-				'post_content' => '<!-- wp:post-title /--><!-- wp:post-content --><!-- wp:paragraph --><p></p><!-- /wp:paragraph --><!-- /wp:post-content -->',
+				'post_content' => '<!-- wp:navigation-menu {"align":"wide"} -->
+				<nav class="wp-block-navigation-menu alignwide"><!-- wp:navigation-menu-item {"label":"Home","destination":"http://yah.local/"} -->
+				<a href="http://yah.local/" class="wp-block-navigation-menu-item">Home</a>
+				<!-- /wp:navigation-menu-item -->
+
+				<!-- wp:navigation-menu-item {"label":"My best posts","destination":"http://yah.local/best"} -->
+				<a href="http://yah.local/best" class="wp-block-navigation-menu-item">My best posts</a>
+				<!-- /wp:navigation-menu-item --></nav>
+				<!-- /wp:navigation-menu -->
+
+				<!-- wp:columns {"align":"wide"} -->
+				<div class="wp-block-columns alignwide"><!-- wp:column {"width":66.66} -->
+				<div class="wp-block-column" style="flex-basis:66.66%"><!-- wp:post-title /-->
+
+				<!-- wp:post-date {"format":"datetime"} /-->
+
+				<!-- wp:post-content /--></div>
+				<!-- /wp:column -->
+
+				<!-- wp:column {"width":33.34} -->
+				<div class="wp-block-column" style="flex-basis:33.34%"><!-- wp:group {"backgroundColor":"very-dark-gray"} -->
+				<div class="wp-block-group has-very-dark-gray-background-color has-background"><div class="wp-block-group__inner-container"><!-- wp:paragraph {"textColor":"very-light-gray"} -->
+				<p class="has-text-color has-very-light-gray-color">This is a <strong>Sidebar</strong>.</p>
+				<!-- /wp:paragraph -->
+
+				<!-- wp:paragraph {"textColor":"very-light-gray"} -->
+				<p class="has-text-color has-very-light-gray-color">With some block widgets.</p>
+				<!-- /wp:paragraph -->
+
+				<!-- wp:tag-cloud /-->
+
+				<!-- wp:paragraph -->
+				<p><strong>You are now reading post:</strong></p>
+				<!-- /wp:paragraph -->
+
+				<!-- wp:post-title /-->
+
+				<!-- wp:spacer {"height":223} -->
+				<div style="height:223px" aria-hidden="true" class="wp-block-spacer"></div>
+				<!-- /wp:spacer --></div></div>
+				<!-- /wp:group --></div>
+				<!-- /wp:column --></div>
+				<!-- /wp:columns -->',
 			)
 		);
 		$template    = get_post( $template_id );
