@@ -16,6 +16,11 @@ const IS_IE = window.navigator.userAgent.indexOf( 'Trident' ) >= 0;
  * @type {boolean}
  */
 let FORCE_REDUCED_MOTION = false;
+
+// Prefer the try/catch to allow bundlers to replace `process.env.FORCE_REDUCED_MOTION` completely.
+// Checks like `typeof process === 'object' && …` will be safe, but may short-circuit if a bundler
+// has replaced `process.env.FORCE_REDUCED_MOTION` with `true`, but `window.process`
+// remains undefined.
 try {
 	FORCE_REDUCED_MOTION = !! process.env.FORCE_REDUCED_MOTION;
 } catch ( err ) {}
