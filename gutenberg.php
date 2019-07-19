@@ -128,3 +128,8 @@ function gutenberg_pre_init() {
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 }
+
+add_action( 'wp_ajax_gutenberg_rest_nonce', function() {
+	echo wp_create_nonce( 'wp_rest' );
+	die;
+} );
