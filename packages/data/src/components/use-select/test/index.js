@@ -149,11 +149,9 @@ describe( 'useSelect', () => {
 			TestComponent;
 		beforeEach( () => {
 			selectorSpy = jest.fn();
-			subscriberSpy = jest.fn().mockImplementation(
-				( subscription ) => {
-					subscribedSpy = subscription;
-				}
-			);
+			subscriberSpy = ( subscription ) => {
+				subscribedSpy = subscription;
+			};
 			registry.registerStore( 'testStore', {
 				reducer: () => null,
 				selectors: {
@@ -162,9 +160,7 @@ describe( 'useSelect', () => {
 			} );
 			registry.subscribe = subscriberSpy;
 			selectSpy = jest.fn();
-			TestComponent = jest.fn().mockImplementation(
-				getComponent( selectSpy, 'keyName' )
-			);
+			TestComponent = getComponent( selectSpy, 'keyName' );
 		} );
 		[
 			[
