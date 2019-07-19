@@ -7,7 +7,7 @@ import { filter } from 'lodash';
 /**
  * Internal dependencies
  */
-import { terms, entities, embedPreviews, userPermissions, autosaves, currentUser } from '../reducer';
+import { terms, entities, embedPreviews, userPermissions, autosaves, currentUser, siteOptions } from '../reducer';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -252,5 +252,56 @@ describe( 'currentUser', () => {
 		} );
 
 		expect( state ).toEqual( currentUserData );
+	} );
+} );
+
+describe( 'siteOptions', () => {
+	it( 'receives server data into both `remote` and `local`', () => {
+		const data = { soup: 'veggie' };
+		const state = siteOptions( {}, {
+			type: 'RECEIVE_SITE_OPTIONS',
+			siteOptions: data,
+		} );
+
+		expect( state ).toEqual( {
+			remote: data,
+			local: data,
+			isDirty: false,
+		} );
+	} );
+
+	it( 'receives client changes only into `local` and sets the dirty bit', () => {
+		const data = { soup: 'veggie', dessert: 'mousse' };
+		const cleanState = {
+			remote: data,
+			local: data,
+			isDirty: false,
+		};
+
+		expect( siteOptions( cleanState, {
+			type: 'UPDATE_SITE_OPTIONS',
+			siteOptions: { soup: 'fish' },
+		} ) ).toEqual( {
+			remote: data,
+			local: { soup: 'fish', dessert: 'mousse' },
+			isDirty: true,
+		} );
+	} );
+
+	it( 'clears dirty state upon receiving server data', () => {
+		const dirtyState = {
+			remote: { soup: 'veggie' },
+			local: { soup: 'fish' },
+			isDirty: true,
+		};
+
+		expect( siteOptions( dirtyState, {
+			type: 'RECEIVE_SITE_OPTIONS',
+			siteOptions: { soup: 'tomato' },
+		} ) ).toEqual( {
+			remote: { soup: 'tomato' },
+			local: { soup: 'tomato' },
+			isDirty: false,
+		} );
 	} );
 } );

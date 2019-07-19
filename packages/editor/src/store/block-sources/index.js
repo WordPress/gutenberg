@@ -2,5 +2,6 @@
  * Internal dependencies
  */
 import * as meta from './meta';
+import * as option from './option';
 
-export { meta };
+export { meta, option };
