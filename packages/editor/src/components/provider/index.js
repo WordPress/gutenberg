@@ -58,7 +58,7 @@ class EditorProvider extends Component {
 			props.post,
 			props.initialEdits,
 			props.settings.template,
-			props.viewEditingMode === 'template' && props.settings.templatePost
+			props.viewEditingMode !== 'post-content' && props.settings.templatePost
 		);
 
 		if ( props.settings.autosave ) {

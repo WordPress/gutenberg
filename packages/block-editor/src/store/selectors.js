@@ -220,6 +220,27 @@ export const getClientIdsWithDescendants = createSelector(
 );
 
 /**
+ * Checks whether a block is an ancestor of a given block type based on its name.
+ *
+ * @param {Object} state         Global application state.
+ * @param {string} clientId      Block client ID.
+ * @param {string} blockTypeName The name of the block type, e.g.' core/paragraph'.
+ *
+ * @return {Array} ids of top-level and descendant blocks.
+ */
+export const isAncestorOfBlockTypeName = createSelector(
+	( state, clientId, blockTypeName ) => {
+		return some( getBlockOrder( state, clientId ), ( innerClientId ) => {
+			return getBlockName( state, innerClientId ) === blockTypeName ||
+				isAncestorOfBlockTypeName( state, innerClientId, blockTypeName );
+		} );
+	},
+	( state ) => [
+		state.blocks.order,
+	]
+);
+
+/**
  * Returns the total number of blocks, or the total number of blocks with a specific name in a post.
  * The number returned includes nested blocks.
  *

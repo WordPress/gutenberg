@@ -503,7 +503,7 @@ export function* savePost( options = {} ) {
 	);
 
 	const { viewEditingMode } = yield select( STORE_KEY, 'getViewEditingMode' );
-	if ( viewEditingMode === 'template' ) {
+	if ( viewEditingMode !== 'post-content' ) {
 		const { templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
 		if ( templatePost ) {
 			yield apiFetch( {

@@ -8,6 +8,7 @@ import { SelectControl } from '@wordpress/components';
 
 const options = [
 	{ value: 'post-content', label: __( 'Post content' ) },
+	{ value: 'preview', label: __( 'Preview' ) },
 	{ value: 'template', label: __( 'Template' ) },
 ];
 
@@ -32,7 +33,7 @@ export default function ViewEditingModePicker() {
 		updateViewEditingMode( newViewEditingMode );
 
 		let newBlocks = blocks;
-		if ( newViewEditingMode === 'post-content' ) { // Leaving template mode.
+		if ( viewEditingMode !== 'post-content' ) { // Leaving template mode.
 			const postContentBlock = blocks.find(
 				( block ) => block.name === 'core/post-content'
 			);
@@ -44,12 +45,13 @@ export default function ViewEditingModePicker() {
 				blocks: newBlocks,
 			},
 			settings.template,
-			newViewEditingMode === 'template' && settings.templatePost
+			newViewEditingMode !== 'post-content' && settings.templatePost
 		);
 	}, [ post, blocks, settings.template, settings.templatePost, viewEditingMode ] );
 
 	return (
 		<SelectControl
+			className="editor-view-editing-mode-picker"
 			label={ __( 'View Editing Mode' ) }
 			hideLabelFromVision
 			options={ options }

@@ -56,10 +56,11 @@ function Layout( {
 	isSaving,
 	isMobileViewport,
 	isRichEditingEnabled,
+	viewEditingMode,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
-	const className = classnames( 'edit-post-layout', {
+	const className = classnames( 'edit-post-layout', `is-mode-${ viewEditingMode }`, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
@@ -84,6 +85,7 @@ function Layout( {
 				aria-label={ __( 'Editor content' ) }
 				tabIndex="-1"
 			>
+				<div className="edit-post-layout__overlay" />
 				<EditorNotices />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />

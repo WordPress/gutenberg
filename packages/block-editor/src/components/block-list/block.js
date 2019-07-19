@@ -101,6 +101,7 @@ function BlockListBlock( {
 	onSelectionStart,
 	animateOnChange,
 	enableAnimation,
+	isAncestorOfPostContent,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -403,6 +404,7 @@ function BlockListBlock( {
 			'is-typing': isTypingWithinBlock,
 			'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
+			'is-ancestor-of-post-content': isAncestorOfPostContent,
 		},
 		className
 	);
@@ -594,6 +596,7 @@ const applyWithSelect = withSelect(
 			getBlockIndex,
 			getBlockOrder,
 			__unstableGetBlockWithoutInnerBlocks,
+			isAncestorOfBlockTypeName,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
@@ -639,6 +642,7 @@ const applyWithSelect = withSelect(
 			isValid,
 			isSelected,
 			isParentOfSelectedBlock,
+			isAncestorOfPostContent: isAncestorOfBlockTypeName( clientId, 'core/post-content' ),
 		};
 	}
 );
