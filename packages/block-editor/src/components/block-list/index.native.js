@@ -226,11 +226,12 @@ export class BlockList extends Component {
 		return isUnmodifiedDefaultBlock( block );
 	}
 
-	renderItem( { item: clientId } ) {
-		const shouldReverseContent = this.isReplaceable( this.props.selectedBlock );
+	renderItem( { item: clientId, index } ) {
+		const shouldShowAddBlockSeparator = this.state.blockTypePickerVisible && ( this.props.isBlockSelected( clientId ) || ( index === 0 && this.props.isPostTitleSelected ) );
+		const shouldPutAddBlockSeparatorAboveBlock = this.isReplaceable( this.props.selectedBlock ) || this.props.isPostTitleSelected;
 
 		return (
-			<ReadableContentView reversed={ shouldReverseContent }>
+			<ReadableContentView reversed={ shouldPutAddBlockSeparatorAboveBlock }>
 				<BlockListBlock
 					key={ clientId }
 					showTitle={ false }
@@ -240,7 +241,7 @@ export class BlockList extends Component {
 					borderStyle={ this.blockHolderBorderStyle() }
 					focusedBorderColor={ styles.blockHolderFocused.borderColor }
 				/>
-				{ this.state.blockTypePickerVisible && this.props.isBlockSelected( clientId ) && this.renderAddBlockSeparator() }
+				{ shouldShowAddBlockSeparator && this.renderAddBlockSeparator() }
 			</ReadableContentView>
 		);
 	}

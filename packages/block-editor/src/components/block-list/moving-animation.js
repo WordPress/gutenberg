@@ -43,7 +43,9 @@ function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationO
 			x: previous ? previous.left - destination.left : 0,
 			y: previous ? previous.top - destination.top : 0,
 		};
-		ref.current.style.transform = `translate3d(${ newTransform.x }px,${ newTransform.y }px,0)`;
+		ref.current.style.transform = newTransform.x === 0 && newTransform.y === 0 ?
+			undefined :
+			`translate3d(${ newTransform.x }px,${ newTransform.y }px,0)`;
 		setResetAnimation( true );
 		setTransform( newTransform );
 	}, [ triggerAnimationOnChange ] );

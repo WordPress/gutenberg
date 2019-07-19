@@ -439,24 +439,28 @@
 			float: left;
 		}
 
-		// Hide mover until wide breakpoints, or it might be covered by toolbar
-		&.is-multi-selected > .block-editor-block-mover,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover {
-			display: none;
-		}
-
-		@include break-wide() {
-			&.is-multi-selected > .block-editor-block-mover,
-			> .block-editor-block-list__block-edit > .block-editor-block-mover {
-				display: block;
-			}
-		}
-
 		// Beyond the mobile breakpoint, wide images stretch outside of the column.
 		// To center the toolbar, we make it inline-flex so the toolbar is not full-wide.
 		@include break-small () {
 			.block-editor-block-toolbar {
 				display: inline-flex;
+			}
+		}
+
+		// Align block toolbar to floated content.
+		@include break-mobile() {
+			.block-editor-block-toolbar {
+				/*!rtl:begin:ignore*/
+				left: $block-side-ui-width * 3 + ($grid-size-small * 1.5);
+				/*!rtl:end:ignore*/
+			}
+		}
+
+		@include break-xlarge() {
+			.block-editor-block-toolbar {
+				/*!rtl:begin:ignore*/
+				left: $block-padding;
+				/*!rtl:end:ignore*/
 			}
 		}
 	}

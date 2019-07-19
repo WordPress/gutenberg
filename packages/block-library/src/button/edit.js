@@ -141,7 +141,7 @@ class ButtonEdit extends Component {
 						autoFocus={ false }
 						/* eslint-enable jsx-a11y/no-autofocus */
 						onChange={ ( value ) => setAttributes( { url: value } ) }
-						showSuggestionsOverride={ ! isSelected ? false : undefined }
+						disableSuggestions={ ! isSelected }
 						id={ linkId }
 						isFullWidth
 						hasBorder
