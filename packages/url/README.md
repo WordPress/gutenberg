@@ -82,7 +82,8 @@ _Usage_
 
 ```js
 const fragment1 = getFragment( 'http://localhost:8080/this/is/a/test?query=true#fragment' ); // '#fragment'
-const fragment2 = getFragment( 'https://wordpress.org#another-fragment?query=true' ); // '#another-fragment'
+const fragment2 = getFragment( 'https://wordpress.org#another-fragment?query=true' ); // '#another-fragment?query=true'
+const fragment3 = getFragment( 'https://wordpress.org' ); // undefined
 ```
 
 _Parameters_
@@ -158,7 +159,7 @@ _Usage_
 
 ```js
 const queryString1 = getQueryString( 'http://localhost:8080/this/is/a/test?query=true#fragment' ); // 'query=true'
-const queryString2 = getQueryString( 'https://wordpress.org#fragment?query=false&search=hello' ); // 'query=false&search=hello'
+const queryString2 = getQueryString( 'https://wordpress.org#fragment?query=false&search=hello' ); // undefined
 ```
 
 _Parameters_
@@ -251,7 +252,7 @@ _Usage_
 
 ```js
 const isValid = isValidFragment( '#valid-fragment' ); // true
-const isNotValid = isValidFragment( '#invalid-#fragment' ); // false
+const isNotValid = isValidFragment( '/#invalid-fragment' ); // false
 ```
 
 _Parameters_

@@ -167,13 +167,14 @@ export function isValidPath( path ) {
  * @example
  * ```js
  * const queryString1 = getQueryString( 'http://localhost:8080/this/is/a/test?query=true#fragment' ); // 'query=true'
- * const queryString2 = getQueryString( 'https://wordpress.org#fragment?query=false&search=hello' ); // 'query=false&search=hello'
+ * const queryString2 = getQueryString( 'https://wordpress.org#fragment?query=false&search=hello' ); // undefined
  * ```
  *
  * @return {?string} The query string part of the URL.
  */
 export function getQueryString( url ) {
-	const matches = /^\S+?\?([^\s#]+)/.exec( url );
+	const cleanUrl = removeFragment( url );
+	const matches = /^\S+?\?([^\s#]+)/.exec( cleanUrl );
 	if ( matches ) {
 		return matches[ 1 ];
 	}
@@ -207,16 +208,25 @@ export function isValidQueryString( queryString ) {
  * @example
  * ```js
  * const fragment1 = getFragment( 'http://localhost:8080/this/is/a/test?query=true#fragment' ); // '#fragment'
- * const fragment2 = getFragment( 'https://wordpress.org#another-fragment?query=true' ); // '#another-fragment'
+ * const fragment2 = getFragment( 'https://wordpress.org#another-fragment?query=true' ); // '#another-fragment?query=true'
+ * const fragment3 = getFragment( 'https://wordpress.org' ); // undefined
  * ```
  *
  * @return {?string} The fragment part of the URL.
  */
 export function getFragment( url ) {
-	const matches = /^\S+?(#[^\s\?]*)/.exec( url );
-	if ( matches ) {
-		return matches[ 1 ];
+	const fragment = url
+		.replace( /^[^#]*/, '' )
+		.replace( /\s*$/, '' );
+
+	if ( '' === fragment ) {
+		return;
 	}
+
+	return encodeURI( fragment )
+		.replace( /%5B/gi, '[' )
+		.replace( /%5D/gi, ']' )
+		.replace( /%25/g, '%' );
 }
 
 /**
@@ -227,7 +237,7 @@ export function getFragment( url ) {
  * @example
  * ```js
  * const isValid = isValidFragment( '#valid-fragment' ); // true
- * const isNotValid = isValidFragment( '#invalid-#fragment' ); // false
+ * const isNotValid = isValidFragment( '/#invalid-fragment' ); // false
  * ```
  *
  * @return {boolean} True if the argument contains a valid fragment.
@@ -236,7 +246,7 @@ export function isValidFragment( fragment ) {
 	if ( ! fragment ) {
 		return false;
 	}
-	return /^#[^\s#?\/]*$/.test( fragment );
+	return /^#.*$/.test( fragment );
 }
 
 /**
@@ -261,8 +271,8 @@ export function addQueryArgs( url = '', args ) {
 		return url;
 	}
 
-	let baseUrl = url.replace( /#.*$/, '' );
-	const fragment = url.replace( /^[^#]*/, '' );
+	let baseUrl = removeFragment( url );
+	const fragment = getFragment( url ) || '';
 
 	// Determine whether URL already had query arguments.
 	const queryStringIndex = url.indexOf( '?' );
@@ -294,8 +304,9 @@ export function addQueryArgs( url = '', args ) {
  * @return {Array|string} Query arg value.
  */
 export function getQueryArg( url, arg ) {
-	const queryStringIndex = url.indexOf( '?' );
-	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
+	const cleanUrl = removeFragment( url );
+	const queryStringIndex = cleanUrl.indexOf( '?' );
+	const query = queryStringIndex !== -1 ? parse( cleanUrl.substr( queryStringIndex + 1 ) ) : {};
 
 	return query[ arg ];
 }
@@ -314,7 +325,8 @@ export function getQueryArg( url, arg ) {
  * @return {boolean} Whether or not the URL contains the query arg.
  */
 export function hasQueryArg( url, arg ) {
-	return getQueryArg( url, arg ) !== undefined;
+	const cleanUrl = removeFragment( url );
+	return getQueryArg( cleanUrl, arg ) !== undefined;
 }
 
 /**
@@ -331,13 +343,20 @@ export function hasQueryArg( url, arg ) {
  * @return {string} Updated URL
  */
 export function removeQueryArgs( url, ...args ) {
-	const queryStringIndex = url.indexOf( '?' );
-	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
-	const baseUrl = queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
+	const cleanUrl = removeFragment( url );
+	const fragment = getFragment( url ) || '';
+
+	const queryStringIndex = cleanUrl.indexOf( '?' );
+	const query = queryStringIndex !== -1 ? parse( cleanUrl.substr( queryStringIndex + 1 ) ) : {};
+	const baseUrl = queryStringIndex !== -1 ? cleanUrl.substr( 0, queryStringIndex ) : cleanUrl;
 
 	args.forEach( ( arg ) => delete query[ arg ] );
 
-	return baseUrl + '?' + stringify( query );
+	const queryArgs = stringify( query );
+	if ( queryArgs.length ) {
+		return baseUrl + '?' + queryArgs + fragment;
+	}
+	return baseUrl + fragment;
 }
 
 /**
@@ -419,4 +438,15 @@ export function safeDecodeURIComponent( uriComponent ) {
 	} catch ( uriComponentError ) {
 		return uriComponent;
 	}
+}
+
+/**
+ * Removes the fragment from the given URL (if any).
+ *
+ * @param {string} url Original URL.
+ *
+ * @return {string} URL without its fragment (if any).
+ */
+function removeFragment( url ) {
+	return url.replace( /#.*$/, '' );
 }
