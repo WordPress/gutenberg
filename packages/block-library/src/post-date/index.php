@@ -34,7 +34,7 @@ function register_block_core_post_date() {
 				),
 			),
 			'render_callback' => 'render_block_core_post_date',
-		),
+		)
 	);
 }
 add_action( 'init', 'register_block_core_post_date' );
