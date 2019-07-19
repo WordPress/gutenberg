@@ -61,7 +61,7 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid $light-gray-500;
-	padding: 0 $grid-size-large;
+	padding: 0 ($grid-size * 3);
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -71,7 +71,7 @@
 	position: sticky;
 	top: 0;
 	z-index: z-index(".components-modal__header");
-	margin: 0 -#{ $grid-size-large } $grid-size-large;
+	margin: 0 -#{ $grid-size * 3 } #{ $grid-size * 3 };
 
 	// Rules inside this query are only run by Microsoft Edge.
 	// Edge has bugs around position: sticky;, so it needs a separate top rule.
@@ -114,7 +114,7 @@
 .components-modal__content {
 	box-sizing: border-box;
 	height: 100%;
-	padding: 0 $grid-size-large $grid-size-large;
+	padding: 0 ($grid-size * 3) ($grid-size * 3);
 
 	// Rules inside this query are only run by Microsoft Edge.
 	// This is a companion top padding to the fixed rule in line 77.
