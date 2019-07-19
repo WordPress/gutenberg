@@ -107,7 +107,8 @@ add_action( 'init', 'myplugin_register_template' );
 
 *Options:*
 
-- `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
+- `readonly` — prevents all operations. It is not possible to edit any blocks, insert new blocks, move or delete existing blocks.
+- `all` — prevents all block operations. It is not possible to insert new blocks, move or delete existing blocks.
 - `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
 
 ## Nested Templates

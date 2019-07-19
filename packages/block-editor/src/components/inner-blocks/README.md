@@ -98,7 +98,7 @@ To present the user with a set of template choices for the inner blocks, you may
 
 A template option is an object consisting of the following properties:
 
-- `title` (`string`): A human-readable label which describes the template. 
+- `title` (`string`): A human-readable label which describes the template.
 - `icon` (`WPElement|string`): An element or [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug to show as a visual approximation of the template.
 - `template` (`Array<Array>`): The template to apply when the option has been selected. See [`template` documentation](#template) for more information.
 
@@ -168,7 +168,8 @@ Template locking of `InnerBlocks` is similar to [Custom Post Type templates lock
 Template locking allows locking the `InnerBlocks` area for the current template.
 *Options:*
 
-- `'all'` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
+- `'readonly'` — prevents all operations. It is not possible to edit any blocks, insert new blocks, or move or delete existing blocks.
+- `'all'` — prevents all block operations. It is not possible to insert new blocks. Move existing blocks or delete them.
 - `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
 - `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
 
@@ -184,7 +185,7 @@ A 'render prop' function that can be used to customize the block's appender.
 
 #### Notes
 * For convenience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
-	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon button that, when clicked, displays the block picker menu. No default Block is inserted. 
+	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon button that, when clicked, displays the block picker menu. No default Block is inserted.
 	- `<InnerBlocks.DefaultBlockAppender />` - display the default block appender as set by `wp.blocks.setDefaultBlockName`. Typically this is the `paragraph` block.
 * Consumers are also free to pass any valid render function. This provides the full flexibility to define a bespoke block appender.
 
@@ -205,7 +206,3 @@ A 'render prop' function that can be used to customize the block's appender.
 	) }
 />
 ```
-
-
-
-

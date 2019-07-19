@@ -157,8 +157,10 @@ export default compose(
 	} ),
 	withSelect( ( select, { rootClientId } ) => {
 		const { getClientIdsOfDescendants, getTemplateLock, getBlockIndex } = select( 'core/block-editor' );
+		const templateLock = getTemplateLock( rootClientId );
+
 		return {
-			isLockedAll: getTemplateLock( rootClientId ) === 'all',
+			isLockedAll: templateLock === 'all' || templateLock === 'readonly',
 			getClientIdsOfDescendants,
 			getBlockIndex,
 		};

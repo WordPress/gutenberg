@@ -45,6 +45,38 @@ describe( 'cpt locking', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	};
 
+	describe( 'template_lock readonly', () => {
+		beforeEach( async () => {
+			await createNewPost( { postType: 'locked-readonly-post' } );
+		} );
+
+		it( 'should remove the inserter', shouldRemoveTheInserter );
+
+		it( 'should only allow block selection', async () => {
+			// Expect the title to be selected.
+			expect( await page.evaluate( () => {
+				return document.activeElement.matches( 'textarea' );
+			} ) ).toBe( true );
+
+			await page.keyboard.press( 'Enter' );
+
+			// Expect no content to be created.
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
+
+			// Expect the second block to be selected.
+			expect( await page.evaluate( () => {
+				return document.activeElement.matches( '[data-type="core/paragraph"]' );
+			} ) ).toBe( true );
+
+			await page.keyboard.press( 'Backspace' );
+
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+	} );
+
 	describe( 'template_lock all', () => {
 		beforeEach( async () => {
 			await createNewPost( { postType: 'locked-all-post' } );

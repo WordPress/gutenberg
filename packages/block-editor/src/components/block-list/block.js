@@ -69,6 +69,7 @@ function BlockListBlock( {
 	isFocusMode,
 	hasFixedToolbar,
 	isLocked,
+	isReadOnly,
 	clientId,
 	rootClientId,
 	isSelected,
@@ -433,6 +434,7 @@ function BlockListBlock( {
 			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
 			onReplace={ isLocked ? undefined : onReplace }
 			mergeBlocks={ isLocked ? undefined : onMerge }
+			isReadOnly={ isReadOnly }
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
@@ -514,7 +516,7 @@ function BlockListBlock( {
 						}
 					/>
 				) }
-				{ ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && (
+				{ ( shouldShowContextualToolbar || isForcingContextualToolbar.current ) && ! isReadOnly && (
 					<BlockContextualToolbar
 						// If the toolbar is being shown because of being forced
 						// it should focus the toolbar right after the mount.
@@ -632,8 +634,9 @@ const applyWithSelect = withSelect(
 			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
-			isMovable: 'all' !== templateLock,
+			isMovable: templateLock !== 'all' && templateLock !== 'readonly',
 			isLocked: !! templateLock,
+			isReadOnly: templateLock === 'readonly',
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 			isLast: index === blockOrder.length - 1,

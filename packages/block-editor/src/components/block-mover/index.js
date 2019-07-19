@@ -125,10 +125,11 @@ export default compose(
 		const blockOrder = getBlockOrder( rootClientId );
 		const firstIndex = getBlockIndex( firstClientId, rootClientId );
 		const lastIndex = getBlockIndex( last( normalizedClientIds ), rootClientId );
+		const templateLock = getTemplateLock( rootClientId );
 
 		return {
 			blockType: block ? getBlockType( block.name ) : null,
-			isLocked: getTemplateLock( rootClientId ) === 'all',
+			isLocked: templateLock === 'all' || templateLock === 'readonly',
 			rootClientId,
 			firstIndex,
 			isFirst: firstIndex === 0,

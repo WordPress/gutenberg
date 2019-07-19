@@ -445,7 +445,12 @@ const RichTextContainer = compose( [
 	withFilters( 'experimentalRichText' ),
 ] )( RichTextWrapper );
 
-RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
+RichTextContainer.Content = ( {
+	value,
+	tagName: Tag,
+	multiline,
+	...props
+} ) => {
 	let html = value;
 	let MultilineTag;
 
@@ -462,13 +467,16 @@ RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => 
 		html = `<${ MultilineTag }></${ MultilineTag }>`;
 	}
 
-	const content = <RawHTML>{ html }</RawHTML>;
-
-	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+	if ( ! Tag ) {
+		return <RawHTML>{ html }</RawHTML>;
 	}
 
-	return content;
+	return (
+		<Tag
+			{ ...omit( props, [ 'format' ] ) }
+			dangerouslySetInnerHTML={ { __html: html } }
+		/>
+	);
 };
 
 RichTextContainer.isEmpty = ( value = '' ) => {
