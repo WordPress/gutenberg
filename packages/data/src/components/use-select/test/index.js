@@ -208,8 +208,8 @@ describe( 'useSelect', () => {
 					// ensure expected state was rendered.
 					expect( testInstance.findByType( 'div' ).props.data ).toEqual( valueA );
 
-					// update the reducer and trigger the subscription
-					// which should trigger a re-render.
+					// update the returned valud from the selector and trigger the
+					// subscription which should in turn trigger a re-render.
 					act( () => {
 						selectorSpy.mockReturnValue( valueB );
 						subscribedSpy();
