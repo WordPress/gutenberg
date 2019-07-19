@@ -15,10 +15,10 @@ const IS_IE = window.navigator.userAgent.indexOf( 'Trident' ) >= 0;
  *
  * @type {boolean}
  */
-const FORCE_REDUCED_MOTION =
-	typeof process === 'object' &&
-	typeof process.env === 'object' &&
-	!! process.env.FORCE_REDUCED_MOTION;
+let FORCE_REDUCED_MOTION = false;
+try {
+	FORCE_REDUCED_MOTION = !! process.env.FORCE_REDUCED_MOTION;
+} catch ( err ) {}
 
 /**
  * Hook returning whether the user has a preference for reduced motion.
