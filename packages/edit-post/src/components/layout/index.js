@@ -85,7 +85,6 @@ function Layout( {
 				aria-label={ __( 'Editor content' ) }
 				tabIndex="-1"
 			>
-				<div className="edit-post-layout__overlay" />
 				<EditorNotices />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
