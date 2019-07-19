@@ -1054,6 +1054,12 @@
 		transition: box-shadow 0.1s linear;
 		@include reduce-motion("transition");
 
+		.components-button {
+			font-size: inherit;
+			line-height: inherit;
+			padding: 0;
+		}
+
 		.is-dark-theme & {
 			background: $dark-gray-600;
 			color: $white;
@@ -1089,6 +1095,10 @@
 			border-left: none;
 			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
 			height: $block-toolbar-height + $border-width;
+			font-size: $default-font-size;
+			line-height: $block-toolbar-height - $grid-size;
+			padding-left: $grid-size;
+			padding-right: $grid-size;
 
 			.components-button {
 				box-shadow: none;
