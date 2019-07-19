@@ -27,6 +27,7 @@ function gutenberg_reregister_core_block_types() {
 		'rss.php'             => 'core/rss',
 		'shortcode.php'       => 'core/shortcode',
 		'search.php'          => 'core/search',
+		'site-title.php'      => 'core/site-title',
 		'tag-cloud.php'       => 'core/tag-cloud',
 		'post-title.php'      => 'core/post-title',
 		'post-content.php'    => 'core/post-content',

@@ -99,6 +99,51 @@ export function receiveThemeSupports( themeSupports ) {
 }
 
 /**
+ * Returns an action object used in signalling that site options have been received.
+ *
+ * @param {Object} siteOptions Site options.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveSiteOptions( siteOptions ) {
+	return {
+		type: 'RECEIVE_SITE_OPTIONS',
+		siteOptions,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that site options have been locally updated.
+ *
+ * @param {Object} siteOptions Site options.
+ *
+ * @return {Object} Action object.
+ */
+export function updateSiteOptions( siteOptions ) {
+	return {
+		type: 'UPDATE_SITE_OPTIONS',
+		siteOptions,
+	};
+}
+
+/**
+ * Action triggered to save site options.
+ *
+ * @param {Object} siteOptions  Site options.
+ *
+ * @return {Object} Updated site options.
+ */
+export function* saveSiteOptions( siteOptions ) {
+	const updatedOptions = yield apiFetch( {
+		path: '/wp/v2/settings',
+		method: 'POST',
+		data: siteOptions,
+	} );
+	yield receiveSiteOptions( updatedOptions );
+	return updatedOptions;
+}
+
+/**
  * Returns an action object used in signalling that the preview data for
  * a given URl has been received.
  *

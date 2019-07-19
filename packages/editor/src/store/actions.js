@@ -508,6 +508,12 @@ export function* savePost( options = {} ) {
 		editedPostContent = postContentBlock ? serialize( postContentBlock.innerBlocks ) : '';
 	}
 
+	const shouldSaveSiteOptions = yield select( 'core', 'isSiteOptionsDirty' );
+	if ( shouldSaveSiteOptions ) {
+		const siteOptions = yield select( 'core', 'getSiteOptions' );
+		yield dispatch( 'core', 'saveSiteOptions', siteOptions );
+	}
+
 	let toSend = {
 		...edits,
 		content: editedPostContent,

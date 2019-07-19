@@ -17,6 +17,7 @@ import {
 	receiveCurrentUser,
 	receiveEntityRecords,
 	receiveThemeSupports,
+	receiveSiteOptions,
 	receiveEmbedPreview,
 	receiveUserPermission,
 	receiveAutosaves,
@@ -93,6 +94,11 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 export function* getThemeSupports() {
 	const activeThemes = yield apiFetch( { path: '/wp/v2/themes?status=active' } );
 	yield receiveThemeSupports( activeThemes[ 0 ].theme_supports );
+}
+
+export function *getSiteOptions() {
+	const siteOptions = yield apiFetch( { path: '/wp/v2/settings' } );
+	yield receiveSiteOptions( siteOptions );
 }
 
 /**

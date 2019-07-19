@@ -118,6 +118,42 @@ export function themeSupports( state = {}, action ) {
 	return state;
 }
 
+export const siteOptions = combineReducers( {
+	remote( state = {}, action ) {
+		switch ( action.type ) {
+			case 'RECEIVE_SITE_OPTIONS':
+				return {
+					...state,
+					...action.siteOptions,
+				};
+		}
+
+		return state;
+	},
+	local( state = {}, action ) {
+		switch ( action.type ) {
+			case 'RECEIVE_SITE_OPTIONS':
+			case 'UPDATE_SITE_OPTIONS':
+				return {
+					...state,
+					...action.siteOptions,
+				};
+		}
+
+		return state;
+	},
+	isDirty( state = false, action ) {
+		switch ( action.type ) {
+			case 'RECEIVE_SITE_OPTIONS':
+				return false;
+			case 'UPDATE_SITE_OPTIONS':
+				return true;
+		}
+
+		return state;
+	},
+} );
+
 /**
  * Higher Order Reducer for a given entity config. It supports:
  *
@@ -283,6 +319,7 @@ export default combineReducers( {
 	currentUser,
 	taxonomies,
 	themeSupports,
+	siteOptions,
 	entities,
 	embedPreviews,
 	userPermissions,

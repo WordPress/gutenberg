@@ -137,6 +137,31 @@ export function getThemeSupports( state ) {
 }
 
 /**
+ * Return site options as they exist locally.
+ *
+ * @see isSiteOptionsDirty
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Object}  Site options.
+ */
+export function getSiteOptions( state ) {
+	return state.siteOptions.local;
+}
+
+/**
+ * Return whether the client has local changes to site options which haven't
+ * yet been saved to the server.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {boolean} Whether or not the local site options state is dirty.
+ */
+export function isSiteOptionsDirty( state ) {
+	return state.siteOptions.isDirty;
+}
+
+/**
  * Returns the embed preview for the given URL.
  *
  * @param {Object} state    Data state.

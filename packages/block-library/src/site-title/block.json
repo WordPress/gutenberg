@@ -1,0 +1,11 @@
+{
+	"name": "core/site-title",
+	"category": "layout",
+	"attributes": {
+		"title": {
+			"type": "string",
+			"source": "option",
+			"option": "title"
+		}
+	}
+}

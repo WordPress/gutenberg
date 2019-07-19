@@ -50,6 +50,7 @@ import * as rss from './rss';
 import * as search from './search';
 import * as group from './group';
 import * as separator from './separator';
+import * as siteTitle from './site-title';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
 import * as subhead from './subhead';
@@ -120,6 +121,7 @@ export const registerCoreBlocks = () => {
 		rss,
 		search,
 		separator,
+		siteTitle,
 		reusableBlock,
 		spacer,
 		subhead,
