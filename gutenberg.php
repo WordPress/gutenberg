@@ -68,7 +68,7 @@ function gutenberg_menu() {
 
 	add_submenu_page(
 		'gutenberg',
-		__( 'Experiments', 'gutenberg' ),
+		__( 'Experiments Settings', 'gutenberg' ),
 		__( 'Experiments', 'gutenberg' ),
 		'edit_posts',
 		'gutenberg-experiments',

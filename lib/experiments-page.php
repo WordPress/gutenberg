@@ -16,8 +16,9 @@ function the_gutenberg_experiments( $page = 'gutenberg_page_gutenberg-experiment
 	?>
 	<div
 		id="experiments-editor"
-		class="blocks-experiments-container"
+		class="wrap"
 	>
+	<h1><?php echo __( 'Experiment settings', 'gutenberg' ); ?></h1>
 	<?php settings_errors(); ?>
 	<form method="post" action="options.php">
 		<?php settings_fields( 'gutenberg-experiments' ); ?>
@@ -36,30 +37,31 @@ function the_gutenberg_experiments( $page = 'gutenberg_page_gutenberg-experiment
 function gutenberg_initialize_experiments_settings() {
 	add_settings_section(
 		'gutenberg_experiments_section',
-		__( 'Experiment settings', 'gutenberg' ),
+		// The empty string ensures the render function won't output a h2.
+		'',
 		'gutenberg_display_experiment_section',
 		'gutenberg-experiments'
 	);
 	add_settings_field(
 		'gutenberg-widgets-screen',
-		__( 'Widgets Screen', 'gutenberg' ),
+		__( 'Enable Widgets Screen', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Widgets Screen', 'gutenberg' ),
-			'id'    => 'gutenberg-widgets-screen',
+			'label_for' => 'gutenberg-widgets-screen',
+			'id'        => 'gutenberg-widgets-screen',
 		)
 	);
 	add_settings_field(
 		'gutenberg-legacy-widget-block',
-		__( 'Legacy Widget Block', 'gutenberg' ),
+		__( 'Enable Legacy Widget Block', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Legacy Widget Block', 'gutenberg' ),
-			'id'    => 'gutenberg-legacy-widget-block',
+			'label_for' => 'gutenberg-legacy-widget-block',
+			'id'        => 'gutenberg-legacy-widget-block',
 		)
 	);
 	register_setting(
@@ -75,16 +77,13 @@ add_action( 'admin_init', 'gutenberg_initialize_experiments_settings' );
  *
  * @since 5.2.3
  *
- * @param array $args ( $label, $id ).
+ * @param array $args ( $label_for, $id ).
  */
 function gutenberg_display_experiment_field( $args ) {
 	$options = get_option( 'gutenberg-experiments' );
 	$value   = isset( $options[ $args['id'] ] ) ? 1 : 0;
 	?>
 		<input type="checkbox" name="<?php echo 'gutenberg-experiments[' . $args['id'] . ']'; ?>" id="<?php echo $args['id']; ?>" value="1" <?php checked( 1, $value ); ?> />
-		<label for="<?php echo $args['id']; ?>">
-			<?php echo $args['label']; ?>
-		</label>
 	<?php
 }
 
@@ -95,7 +94,7 @@ function gutenberg_display_experiment_field( $args ) {
  */
 function gutenberg_display_experiment_section() {
 
-	$markup = '<p>' . __( 'Gutenberg has a some experimental features you can turn on. Simply select each you would like to use.', 'gutenberg' ) . '</p>';
+	$markup = '<p>' . __( 'Gutenberg has some experimental features you can turn on. Simply select each you would like to use.', 'gutenberg' ) . '</p>';
 	echo $markup;
 
 }
