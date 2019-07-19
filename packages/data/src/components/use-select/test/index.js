@@ -140,7 +140,7 @@ describe( 'useSelect', () => {
 				( select ) => select( 'testStore' ).testSelector( props.keyName )
 			);
 			const data = useSelect( mapSelectSpy, [ dependencies ] );
-			return <div>{ data }</div>;
+			return <div data={ data } />;
 		};
 		let selectorSpy,
 			subscribedSpy,
@@ -179,6 +179,18 @@ describe( 'useSelect', () => {
 				'array',
 				[ [ 10, 20 ], [ 10, 30 ] ],
 			],
+			[
+				'object',
+				[ { foo: 'bar' }, { foo: 'cheese' } ],
+			],
+			[
+				'null',
+				[ null, 10 ],
+			],
+			[
+				'undefined',
+				[ undefined, 42 ],
+			],
 		].forEach(
 			( [ type, testValues ] ) => {
 				const [ valueA, valueB ] = testValues;
@@ -194,9 +206,7 @@ describe( 'useSelect', () => {
 					} );
 					const testInstance = renderer.root;
 					// ensure expected state was rendered.
-					expect( testInstance.findByType( 'div' ).props ).toEqual( {
-						children: valueA,
-					} );
+					expect( testInstance.findByType( 'div' ).props.data ).toEqual( valueA );
 
 					// update the reducer and trigger the subscription
 					// which should trigger a re-render.
@@ -204,9 +214,7 @@ describe( 'useSelect', () => {
 						selectorSpy.mockReturnValue( valueB );
 						subscribedSpy();
 					} );
-					expect( testInstance.findByType( 'div' ).props ).toEqual( {
-						children: valueB,
-					} );
+					expect( testInstance.findByType( 'div' ).props.data ).toEqual( valueB );
 					expect( selectSpy ).toHaveBeenCalledTimes( 3 );
 				} );
 			}
