@@ -45,7 +45,7 @@ import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import FullscreenMode from '../fullscreen-mode';
 
 function Layout( {
-	mode,
+	contentEditingMode,
 	editorSidebarOpened,
 	pluginSidebarOpened,
 	publishSidebarOpened,
@@ -56,11 +56,11 @@ function Layout( {
 	isSaving,
 	isMobileViewport,
 	isRichEditingEnabled,
-	isEditingTemplatePost,
+	viewEditingMode,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
-	const className = classnames( 'edit-post-layout', {
+	const className = classnames( 'edit-post-layout', `is-mode-${ viewEditingMode }`, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
@@ -91,9 +91,9 @@ function Layout( {
 				<KeyboardShortcutHelpModal />
 				<ManageBlocksModal />
 				<OptionsModal />
-				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
-				{ isRichEditingEnabled && mode === 'visual' && (
-					<VisualEditor withPostTitle={ ! isEditingTemplatePost } />
+				{ ( contentEditingMode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
+				{ isRichEditingEnabled && contentEditingMode === 'visual' && (
+					<VisualEditor />
 				) }
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="normal" />
@@ -139,9 +139,10 @@ function Layout( {
 
 export default compose(
 	withSelect( ( select ) => {
-		const editorSettings = select( 'core/editor' ).getEditorSettings();
+		const { getEditorSettings, getViewEditingMode } = select( 'core/editor' );
+		const editorSettings = getEditorSettings();
 		return {
-			mode: select( 'core/edit-post' ).getEditorMode(),
+			contentEditingMode: select( 'core/edit-post' ).getEditorMode(),
 			editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 			pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
 			publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
@@ -149,7 +150,7 @@ export default compose(
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
-			isEditingTemplatePost: editorSettings.editTemplatePost,
+			viewEditingMode: getViewEditingMode(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

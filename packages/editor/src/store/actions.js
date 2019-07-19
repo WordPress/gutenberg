@@ -494,18 +494,21 @@ export function* savePost( options = {} ) {
 		'getEditedPostContent'
 	);
 
-	const { editTemplatePost, templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
-	if ( editTemplatePost && templatePost ) {
-		yield apiFetch( {
-			path: `/wp/v2/${ templatePost.post_type }/${ templatePost.ID }`,
-			method: 'PUT',
-			data: {
-				content: editedPostContent,
-				id: templatePost.ID,
-			},
-		} );
-		const postContentBlock = ( yield select( STORE_KEY, 'getBlocksForSerialization' ) ).find( ( block ) => block.name === 'core/post-content' );
-		editedPostContent = postContentBlock ? serialize( postContentBlock.innerBlocks ) : '';
+	const { viewEditingMode } = yield select( STORE_KEY, 'getViewEditingMode' );
+	if ( viewEditingMode !== 'post-content' ) {
+		const { templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
+		if ( templatePost ) {
+			yield apiFetch( {
+				path: `/wp/v2/${ templatePost.post_type }/${ templatePost.ID }`,
+				method: 'PUT',
+				data: {
+					content: editedPostContent,
+					id: templatePost.ID,
+				},
+			} );
+			const postContentBlock = ( yield select( STORE_KEY, 'getBlocksForSerialization' ) ).find( ( block ) => block.name === 'core/post-content' );
+			editedPostContent = postContentBlock ? serialize( postContentBlock.innerBlocks ) : '';
+		}
 	}
 
 	const shouldSaveSiteOptions = yield select( 'core', 'isSiteOptionsDirty' );
@@ -902,6 +905,21 @@ export function enablePublishSidebar() {
 export function disablePublishSidebar() {
 	return {
 		type: 'DISABLE_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has changed
+ * the view editing mode.
+ *
+ * @param {string} viewEditingMode The name of the view editing mode.
+ *
+ * @return {Object} Action object.
+ */
+export function updateViewEditingMode( viewEditingMode ) {
+	return {
+		type: 'UPDATE_VIEW_EDITING_MODE',
+		viewEditingMode,
 	};
 }
 
