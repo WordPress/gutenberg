@@ -185,7 +185,7 @@ describe( 'useSelect', () => {
 			],
 			[
 				'null',
-				[ null, 10 ],
+				[ null, undefined ],
 			],
 			[
 				'undefined',
