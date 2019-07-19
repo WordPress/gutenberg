@@ -54,22 +54,12 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 		return blocks;
 	}
 
-	return map( template, ( templateBlock, index ) => {
-		const [ name, attributes, _innerBlocksTemplate ] = Array.isArray( templateBlock ) ?
-			templateBlock :
-			[ templateBlock.name, templateBlock.attributes, templateBlock.innerBlocks ];
+	return map( template, ( [ name, attributes, innerBlocksTemplate ], index ) => {
 		const block = blocks[ index ];
-		let innerBlocksTemplate = _innerBlocksTemplate;
 
-		if ( block ) {
-			if ( block.name === name ) {
-				const innerBlocks = synchronizeBlocksWithTemplate( block.innerBlocks, innerBlocksTemplate );
-				return { ...block, innerBlocks };
-			}
-
-			if ( 'core/post-content' === name ) {
-				innerBlocksTemplate = blocks;
-			}
+		if ( block && block.name === name ) {
+			const innerBlocks = synchronizeBlocksWithTemplate( block.innerBlocks, innerBlocksTemplate );
+			return { ...block, innerBlocks };
 		}
 
 		// To support old templates that were using the "children" format

@@ -170,32 +170,24 @@ export function* setupEditor( post, edits, template, templatePost ) {
 	}
 
 	let blocks = ( edits && edits.blocks ) || parse( content );
+	const isNewPost = 'auto-draft' === post.status;
 
-	// Apply post template.
-	if ( templatePost ) {
-		blocks = synchronizeBlocksWithTemplate(
-			blocks,
-			parse( templatePost.post_content )
+	if ( templatePost ) { // Apply template post.
+		const postContentInnerBlocks = blocks;
+		blocks = parse( templatePost.post_content );
+
+		// Post content is nested inside a post content block.
+		const postContentBlock = blocks.find(
+			( block ) => block.name === 'core/post-content'
 		);
-	}
-
-	// Apply block (post content) template.
-	if ( template && 'auto-draft' === post.status ) {
-		if ( templatePost ) {
-			// Post content is nested inside a post content block.
-			const postContentBlock = blocks.find(
-				( block ) => block.name === 'core/post-content'
-			);
-			if ( postContentBlock ) {
-				postContentBlock.innerBlocks = synchronizeBlocksWithTemplate(
-					postContentBlock.innerBlocks,
-					template
-				);
-			}
-		} else {
-			// Post content is at the top level.
-			blocks = synchronizeBlocksWithTemplate( blocks, template );
+		if ( postContentBlock ) {
+			postContentBlock.innerBlocks = isNewPost ? // Apply block (post content) template.
+				synchronizeBlocksWithTemplate( postContentInnerBlocks, template ) :
+				postContentInnerBlocks;
 		}
+	} else if ( isNewPost ) { // Apply block (post content) template.
+		// Post content is at the top level.
+		blocks = synchronizeBlocksWithTemplate( blocks, template );
 	}
 
 	yield resetPost( post );
