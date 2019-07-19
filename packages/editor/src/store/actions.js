@@ -502,8 +502,8 @@ export function* savePost( options = {} ) {
 		'getEditedPostContent'
 	);
 
-	const { editTemplatePost, templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
-	if ( editTemplatePost && templatePost ) {
+	const { viewEditingMode, templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
+	if ( viewEditingMode === 'template' && templatePost ) {
 		yield apiFetch( {
 			path: `/wp/v2/${ templatePost.post_type }/${ templatePost.ID }`,
 			method: 'PUT',

@@ -27,6 +27,7 @@ export const INITIAL_EDITS_DEFAULTS = {};
  *  disablePostFormats boolean       Whether or not the post formats are disabled
  *  allowedMimeTypes   array?        List of allowed mime types and file extensions
  *  maxUploadFileSize  number        Maximum upload file size
+ *  viewEditingMode    string        Name of view editing mode (post-content, template)
  */
 export const EDITOR_SETTINGS_DEFAULTS = {
 	...SETTINGS_DEFAULTS,
@@ -34,5 +35,6 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	richEditingEnabled: true,
 	codeEditingEnabled: true,
 	enableCustomFields: false,
+	viewEditingMode: 'post-content',
 };
 

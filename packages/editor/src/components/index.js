@@ -12,7 +12,6 @@ export {
 export { default as TextEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/text-editor-shortcuts';
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
-export { default as ToggleEditTemplatePost } from './toggle-edit-template-post';
 export { default as EditorNotices } from './editor-notices';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as PageAttributesCheck } from './page-attributes/check';
@@ -58,6 +57,7 @@ export { default as PostVisibilityCheck } from './post-visibility/check';
 export { default as TableOfContents } from './table-of-contents';
 export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
+export { default as ViewEditingModePicker } from './view-editing-mode-picker';
 
 // State Related Components
 export { default as EditorProvider } from './provider';

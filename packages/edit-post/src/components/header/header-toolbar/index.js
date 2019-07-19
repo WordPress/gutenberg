@@ -16,7 +16,6 @@ import {
 	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
-	ToggleEditTemplatePost,
 } from '@wordpress/editor';
 
 function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isTextModeEnabled } ) {
@@ -46,7 +45,6 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter, isText
 					<BlockToolbar />
 				</div>
 			) }
-			<ToggleEditTemplatePost />
 		</NavigableToolbar>
 	);
 }

@@ -45,7 +45,7 @@ import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import FullscreenMode from '../fullscreen-mode';
 
 function Layout( {
-	mode,
+	contentEditingMode,
 	editorSidebarOpened,
 	pluginSidebarOpened,
 	publishSidebarOpened,
@@ -56,7 +56,6 @@ function Layout( {
 	isSaving,
 	isMobileViewport,
 	isRichEditingEnabled,
-	isEditingTemplatePost,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
@@ -91,9 +90,9 @@ function Layout( {
 				<KeyboardShortcutHelpModal />
 				<ManageBlocksModal />
 				<OptionsModal />
-				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
-				{ isRichEditingEnabled && mode === 'visual' && (
-					<VisualEditor withPostTitle={ ! isEditingTemplatePost } />
+				{ ( contentEditingMode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
+				{ isRichEditingEnabled && contentEditingMode === 'visual' && (
+					<VisualEditor />
 				) }
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="normal" />
@@ -141,7 +140,7 @@ export default compose(
 	withSelect( ( select ) => {
 		const editorSettings = select( 'core/editor' ).getEditorSettings();
 		return {
-			mode: select( 'core/edit-post' ).getEditorMode(),
+			contentEditingMode: select( 'core/edit-post' ).getEditorMode(),
 			editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 			pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
 			publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
@@ -149,7 +148,7 @@ export default compose(
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
-			isEditingTemplatePost: editorSettings.editTemplatePost,
+			viewEditingMode: editorSettings.viewEditingMode,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

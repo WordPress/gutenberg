@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import {
+	withSelect,
+} from '@wordpress/data';
+import {
 	PostTitle,
 	VisualEditorGlobalKeyboardShortcuts,
 } from '@wordpress/editor';
@@ -22,7 +25,7 @@ import {
 import BlockInspectorButton from './block-inspector-button';
 import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-settings-menu-group';
 
-function VisualEditor( { withPostTitle } ) {
+function VisualEditor( { hasPostTitle } ) {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
 			<VisualEditorGlobalKeyboardShortcuts />
@@ -30,7 +33,7 @@ function VisualEditor( { withPostTitle } ) {
 			<WritingFlow>
 				<ObserveTyping>
 					<CopyHandler>
-						{ withPostTitle && <PostTitle /> }
+						{ hasPostTitle && <PostTitle /> }
 						<BlockList />
 					</CopyHandler>
 				</ObserveTyping>
@@ -45,4 +48,9 @@ function VisualEditor( { withPostTitle } ) {
 	);
 }
 
-export default VisualEditor;
+export default withSelect( ( select ) => {
+	const editorSettings = select( 'core/editor' ).getEditorSettings();
+	return {
+		hasPostTitle: editorSettings.viewEditingMode === 'post-content',
+	};
+} )( VisualEditor );

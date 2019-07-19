@@ -4,8 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import {
-	PostPreviewButton,
-	PostSavedState,
+	ViewEditingModePicker,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -18,15 +17,12 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PinnedPlugins from './pinned-plugins';
-import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
+import PublishControls from './publish-controls';
 import shortcuts from '../../keyboard-shortcuts';
 
 function Header( {
 	closeGeneralSidebar,
-	hasActiveMetaboxes,
 	isEditorSidebarOpened,
-	isPublishSidebarOpened,
-	isSaving,
 	openGeneralSidebar,
 } ) {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
@@ -44,25 +40,8 @@ function Header( {
 				<HeaderToolbar />
 			</div>
 			<div className="edit-post-header__settings">
-				{ ! isPublishSidebarOpened && (
-					// This button isn't completely hidden by the publish sidebar.
-					// We can't hide the whole toolbar when the publish sidebar is open because
-					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
-					// We track that DOM node to return focus to the PostPublishButtonOrToggle
-					// when the publish sidebar has been closed.
-					<PostSavedState
-						forceIsDirty={ hasActiveMetaboxes }
-						forceIsSaving={ isSaving }
-					/>
-				) }
-				<PostPreviewButton
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
-				<PostPublishButtonOrToggle
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-				/>
+				<ViewEditingModePicker />
+				<PublishControls />
 				<div>
 					<IconButton
 						icon="admin-generic"
@@ -85,10 +64,7 @@ function Header( {
 
 export default compose(
 	withSelect( ( select ) => ( {
-		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 	} ) ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const { getBlockSelectionStart } = select( 'core/block-editor' );
