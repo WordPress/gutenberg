@@ -286,7 +286,7 @@ describe( 'isValidQueryString', () => {
 describe( 'getFragment', () => {
 	it( 'returns the fragment of a URL', () => {
 		expect( getFragment( 'http://user:password@www.test-this.com:1020/test-path/file.extension?query=params&more#fragment' ) ).toBe( '#fragment' );
-		expect( getFragment( 'https://user:password@www.test-this.com:1020/test-path/file.extension#fragment?not-a-query=params&more' ) ).toBe( '#fragment?not-a-query=param&more' );
+		expect( getFragment( 'https://user:password@www.test-this.com:1020/test-path/file.extension#fragment?not-a-query=param&more' ) ).toBe( '#fragment?not-a-query=param&more' );
 		expect( getFragment( 'relative/url/#fragment' ) ).toBe( '#fragment' );
 		expect( getFragment( '/absolute/url/#fragment' ) ).toBe( '#fragment' );
 	} );
@@ -325,12 +325,12 @@ describe( 'isValidFragment', () => {
 		expect( isValidFragment( '#yes_it_is' ) ).toBe( true );
 		expect( isValidFragment( '#yes~it~is' ) ).toBe( true );
 		expect( isValidFragment( '#yes-it-is' ) ).toBe( true );
-		expect( isValidFragment( '#yes-it-is?' ) ).toBe( false );
+		expect( isValidFragment( '#yes-it-is?' ) ).toBe( true );
 		expect( isValidFragment( '#yes-it-is?not-a-query' ) ).toBe( true );
-		expect( isValidFragment( '#yes-it-is#' ) ).toBe( false );
-		expect( isValidFragment( '#yes-it-#is' ) ).toBe( false );
-		expect( isValidFragment( '#yes-it is' ) ).toBe( false );
-		expect( isValidFragment( '#yes-it-is/' ) ).toBe( false );
+		expect( isValidFragment( '#yes-it-is#' ) ).toBe( true );
+		expect( isValidFragment( '#yes-it-#is' ) ).toBe( true );
+		expect( isValidFragment( '#yes-it is' ) ).toBe( true );
+		expect( isValidFragment( '#yes-it-is/' ) ).toBe( true );
 	} );
 
 	it( 'returns false if the fragment is invalid', () => {
@@ -481,6 +481,13 @@ describe( 'removeQueryArgs', () => {
 		const url = 'https://andalouses.example/beach?foo[]=bar&foo[]=baz&bar=foobar';
 
 		expect( removeQueryArgs( url, 'foo' ) ).toEqual( 'https://andalouses.example/beach?bar=foobar' );
+	} );
+
+	it( 'shouldn’t add the URL’s fragment into the last query arg', () => {
+		const url = 'https://andalouses.example/beach?foo=bar&param=value#fragment';
+
+		expect( removeQueryArgs( url, 'foo' ) ).not.toEqual( 'https://andalouses.example/beach?param=value%23fragment' );
+		expect( removeQueryArgs( url, 'foo' ) ).toEqual( 'https://andalouses.example/beach?param=value#fragment' );
 	} );
 
 	it( 'shouldn’t remove what looks like a query arg but it’s actually part of the URL’s fragment', () => {
