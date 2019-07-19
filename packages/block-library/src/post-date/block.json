@@ -1,0 +1,15 @@
+{
+	"name": "core/post-date",
+	"category": "common",
+	"attributes": {
+		"date": {
+			"type": "string",
+			"source": "post",
+			"attribute": "date"
+		},
+		"format": {
+			"type": "string",
+			"default": "date"
+		}
+	}
+}
