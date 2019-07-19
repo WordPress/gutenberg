@@ -1,6 +1,6 @@
 {
 	"name": "core/post-content",
-	"category": "common",
+	"category": "theme",
 	"supports": {
 		"multiple": false
 	}

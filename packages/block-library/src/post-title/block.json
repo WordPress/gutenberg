@@ -1,6 +1,6 @@
 {
 	"name": "core/post-title",
-	"category": "common",
+	"category": "theme",
 	"attributes": {
 		"title": {
 			"type": "string",
