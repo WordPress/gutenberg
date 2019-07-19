@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { FlatList, View, Text, TouchableHighlight } from 'react-native';
+import { subscribeMediaAppend } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -22,8 +23,21 @@ import styles from './style.scss';
 
 export class InserterMenu extends Component {
 	componentDidMount() {
-		// This could be replaced by a resolver.
-		this.props.fetchReusableBlocks();
+		this.subscriptionParentMediaAppend = subscribeMediaAppend( ( payload ) => {
+			this.props.onSelect( {
+				name: 'core/' + payload.mediaType,
+				initialAttributes: {
+					id: payload.mediaId,
+					[ payload.mediaType === 'image' ? 'url' : 'src' ]: payload.mediaUrl,
+				},
+			} );
+		} );
+	}
+
+	componentWillUnmount() {
+		if ( this.subscriptionParentMediaAppend ) {
+			this.subscriptionParentMediaAppend.remove();
+		}
 	}
 
 	calculateNumberOfColumns() {
@@ -34,6 +48,23 @@ export class InserterMenu extends Component {
 		const itemTotalWidth = itemWidth + itemPaddingLeft + itemPaddingRight;
 		const containerTotalWidth = bottomSheetWidth - ( containerPaddingLeft + containerPaddingRight );
 		return Math.floor( containerTotalWidth / itemTotalWidth );
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( ! prevProps.isOpen && this.props.isOpen ) {
+			this.onOpen();
+		}
+		if ( prevProps.isOpen && ! this.props.isOpen ) {
+			this.onClose();
+		}
+	}
+
+	onOpen() {
+		this.props.showInsertionPoint();
+	}
+
+	onClose() {
+		this.props.hideInsertionPoint();
 	}
 
 	render() {
@@ -115,11 +146,6 @@ export default compose(
 			hideInsertionPoint,
 		} = dispatch( 'core/block-editor' );
 
-		// This should be an external action provided in the editor settings.
-		const {
-			__experimentalFetchReusableBlocks: fetchReusableBlocks,
-		} = dispatch( 'core/editor' );
-
 		// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
 		// This breaks the withDispatch not containing any logic rule.
 		// Since it's a function only called when the event handlers are called,
@@ -149,7 +175,6 @@ export default compose(
 		}
 
 		return {
-			fetchReusableBlocks,
 			showInsertionPoint() {
 				const index = getInsertionIndex();
 				showInsertionPoint( ownProps.destinationRootClientId, index );

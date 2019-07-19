@@ -11,6 +11,7 @@ import { RichText } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -28,7 +29,7 @@ export function DefaultBlockAppender( {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Start writing…' );
+	const value = typeof placeholder === 'string' ? decodeEntities( placeholder ) : __( 'Start writing…' );
 
 	return (
 		<TouchableWithoutFeedback
@@ -46,15 +47,15 @@ export function DefaultBlockAppender( {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getSettings, getTemplateLock } = select( 'core/block-editor' );
+		const { getBlockCount, getBlockName, isBlockValid, getTemplateLock } = select( 'core/block-editor' );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const { bodyPlaceholder } = getSettings();
+		const isLastBlockDefault = getBlockName( ownProps.lastBlockClientId ) === getDefaultBlockName();
+		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
 
 		return {
-			isVisible: isEmpty,
+			isVisible: isEmpty || ! isLastBlockDefault || ! isLastBlockValid,
 			isLocked: !! getTemplateLock( ownProps.rootClientId ),
-			placeholder: bodyPlaceholder,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

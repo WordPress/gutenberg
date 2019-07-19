@@ -1,35 +1,41 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { View } from 'react-native';
+import { withSelect } from '@wordpress/data';
 
 /**
  * WordPress dependencies
  */
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 import { BlockFormatControls, BlockControls } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import styles from './style.scss';
+export const BlockToolbar = ( { blockClientIds, isValid, mode } ) => {
+	if ( blockClientIds.length === 0 ) {
+		return null;
+	}
 
-export const BlockToolbar = () => (
-	<View style={ styles.container } >
-		<BlockControls.Slot />
-		<BlockFormatControls.Slot />
-	</View>
-);
+	return (
+		<>
+			{ mode === 'visual' && isValid && (
+				<>
+					<BlockControls.Slot />
+					<BlockFormatControls.Slot />
+				</>
+			) }
+		</>
+	);
+};
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		hasRedo: select( 'core/editor' ).hasEditorRedo(),
-		hasUndo: select( 'core/editor' ).hasEditorUndo(),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		redo: dispatch( 'core/editor' ).redo,
-		undo: dispatch( 'core/editor' ).undo,
-		clearSelectedBlock: dispatch( 'core/editor' ).clearSelectedBlock,
-	} ) ),
-] )( BlockToolbar );
+export default withSelect( ( select ) => {
+	const {
+		getBlockMode,
+		getSelectedBlockClientIds,
+		isBlockValid,
+	} = select( 'core/block-editor' );
+	const blockClientIds = getSelectedBlockClientIds();
+
+	return {
+		blockClientIds,
+		isValid: blockClientIds.length === 1 ? isBlockValid( blockClientIds[ 0 ] ) : null,
+		mode: blockClientIds.length === 1 ? getBlockMode( blockClientIds[ 0 ] ) : null,
+	};
+} )( BlockToolbar );

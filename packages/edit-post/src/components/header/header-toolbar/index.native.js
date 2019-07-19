@@ -7,17 +7,13 @@ import { ScrollView, Keyboard, Platform, View } from 'react-native';
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { __ } from '@wordpress/i18n';
 import {
 	Inserter,
 	BlockToolbar,
 } from '@wordpress/block-editor';
-import {
-	EditorHistoryRedo,
-	EditorHistoryUndo,
-} from '@wordpress/editor';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 
 /**
@@ -34,11 +30,15 @@ const hideKeyboard = () => {
 
 function HeaderToolbar( {
 	hasFixedToolbar,
+	hasRedo,
+	hasUndo,
+	redo,
+	undo,
 	showInserter,
 	showKeyboardHideButton,
 } ) {
 	return (
-		<View>
+		<View style={ styles.container }>
 			<ScrollView
 				horizontal={ true }
 				showsHorizontalScrollIndicator={ false }
@@ -46,11 +46,26 @@ function HeaderToolbar( {
 				alwaysBounceHorizontal={ false }
 				contentContainerStyle={ styles.scrollableContent }
 			>
-				<Inserter disabled={ ! showInserter } />
-				<EditorHistoryUndo />
-				<EditorHistoryRedo />
+				<Toolbar accessible={ false }>
+					<Inserter disabled={ ! showInserter } />
+					{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
+					<ToolbarButton
+						title={ __( 'Undo' ) }
+						icon="undo"
+						isDisabled={ ! hasUndo }
+						onClick={ undo }
+						extraProps={ { hint: __( 'Double tap to undo last change' ) } }
+					/>
+					<ToolbarButton
+						title={ __( 'Redo' ) }
+						icon="redo"
+						isDisabled={ ! hasRedo }
+						onClick={ redo }
+						extraProps={ { hint: __( 'Double tap to redo last change' ) } }
+					/>
+				</Toolbar>
 				{ hasFixedToolbar &&
-					<BlockToolbar showKeyboardHideButton={ true } />
+					<BlockToolbar />
 				}
 			</ScrollView>
 			{ showKeyboardHideButton &&
@@ -69,10 +84,17 @@ function HeaderToolbar( {
 
 export default compose( [
 	withSelect( ( select ) => ( {
+		hasRedo: select( 'core/editor' ).hasEditorRedo(),
+		hasUndo: select( 'core/editor' ).hasEditorUndo(),
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		// This setting (richEditingEnabled) should not live in the block editor's setting.
 		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		redo: dispatch( 'core/editor' ).redo,
+		undo: dispatch( 'core/editor' ).undo,
+		clearSelectedBlock: dispatch( 'core/editor' ).clearSelectedBlock,
 	} ) ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( HeaderToolbar );

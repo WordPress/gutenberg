@@ -3,6 +3,7 @@
  */
 import { SafeAreaView } from 'react-native';
 import SafeArea from 'react-native-safe-area';
+import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -61,7 +62,7 @@ class Layout extends Component {
 
 	setHeightState( event ) {
 		const { height } = event.nativeEvent.layout;
-		this.setState( { rootViewHeight: height }, this.props.onNativeEditorDidLayout );
+		this.setState( { rootViewHeight: height }, sendNativeEditorDidLayout );
 	}
 
 	setBorderStyleState() {

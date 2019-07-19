@@ -5,7 +5,7 @@ import HeaderToolbar from './header-toolbar';
 
 function Header() {
 	return (
-		<HeaderToolbar />
+		<HeaderToolbar showKeyboardHideButton={ true } />
 	);
 }
 

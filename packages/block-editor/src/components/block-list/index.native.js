@@ -2,17 +2,15 @@
  * External dependencies
  */
 import { identity } from 'lodash';
-import { Text, View, Platform, TouchableWithoutFeedback } from 'react-native';
-import { subscribeMediaAppend } from 'react-native-gutenberg-bridge';
+import { View, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
 
 /**
@@ -20,7 +18,7 @@ import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/component
  */
 import styles from './style.scss';
 import BlockListBlock from './block';
-import DefaultBlockAppender from '../default-block-appender';
+import BlockListAppender from '../block-list-appender';
 
 const blockMobileToolbarHeight = 44;
 const toolbarHeight = 44;
@@ -30,8 +28,6 @@ export class BlockList extends Component {
 		super( ...arguments );
 
 		this.renderItem = this.renderItem.bind( this );
-		this.renderAddBlockSeparator = this.renderAddBlockSeparator.bind( this );
-		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
 		this.renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
 		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
@@ -43,29 +39,9 @@ export class BlockList extends Component {
 
 	componentDidMount() {
 		this._isMounted = true;
-
-		this.subscriptionParentMediaAppend = subscribeMediaAppend( ( payload ) => {
-			// create an empty media block
-			const newMediaBlock = createBlock( 'core/' + payload.mediaType );
-
-			// now set the url and id
-			if ( payload.mediaType === 'image' ) {
-				newMediaBlock.attributes.url = payload.mediaUrl;
-			} else if ( payload.mediaType === 'video' ) {
-				newMediaBlock.attributes.src = payload.mediaUrl;
-			}
-
-			newMediaBlock.attributes.id = payload.mediaId;
-
-			// finally append or replace as appropriate
-			this.finishBlockAppendingOrReplacing( newMediaBlock );
-		} );
 	}
 
 	componentWillUnmount() {
-		if ( this.subscriptionParentMediaAppend ) {
-			this.subscriptionParentMediaAppend.remove();
-		}
 		this._isMounted = false;
 	}
 
@@ -80,14 +56,7 @@ export class BlockList extends Component {
 	renderDefaultBlockAppender() {
 		return (
 			<ReadableContentView>
-				<DefaultBlockAppender
-					rootClientId={ this.props.rootClientId }
-					containerStyle={ [
-						styles.blockContainerFocused,
-						this.blockHolderBorderStyle(),
-						{ borderColor: 'transparent' },
-					] }
-				/>
+				<BlockListAppender rootClientId={ this.props.rootClientId } />
 			</ReadableContentView>
 		);
 	}
@@ -115,8 +84,7 @@ export class BlockList extends Component {
 					shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
 					title={ this.props.title }
 					ListHeaderComponent={ this.props.header }
-					ListEmptyComponent={ this.renderDefaultBlockAppender }
-					ListFooterComponent={ this.renderBlockListFooter }
+					ListFooterComponent={ this.renderDefaultBlockAppender() }
 				/>
 			</View>
 		);
@@ -143,29 +111,7 @@ export class BlockList extends Component {
 					borderStyle={ this.blockHolderBorderStyle() }
 					focusedBorderColor={ styles.blockHolderFocused.borderColor }
 				/>
-				{ this.props.isBlockSelected( clientId ) && this.renderAddBlockSeparator() }
 			</ReadableContentView>
-		);
-	}
-
-	renderAddBlockSeparator() {
-		return (
-			<View style={ styles.containerStyleAddHere } >
-				<View style={ styles.lineStyleAddHere }></View>
-				<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
-				<View style={ styles.lineStyleAddHere }></View>
-			</View>
-		);
-	}
-
-	renderBlockListFooter() {
-		const paragraphBlock = createBlock( 'core/paragraph' );
-		return (
-			<TouchableWithoutFeedback onPress={ () => {
-				this.finishBlockAppendingOrReplacing( paragraphBlock );
-			} } >
-				<View style={ styles.blockListFooter } />
-			</TouchableWithoutFeedback>
 		);
 	}
 }
