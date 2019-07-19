@@ -74,6 +74,7 @@ class Inserter extends Component {
 			<InserterMenu
 				isOpen={ isOpen }
 				onSelect={ onClose }
+				onDismiss={ onClose }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				isAppender={ isAppender }
@@ -85,7 +86,6 @@ class Inserter extends Component {
 		return (
 			<Dropdown
 				onToggle={ this.onToggle }
-				expandOnMobile
 				headerTitle={ __( 'Add a block' ) }
 				renderToggle={ this.renderToggle }
 				renderContent={ this.renderContent }
