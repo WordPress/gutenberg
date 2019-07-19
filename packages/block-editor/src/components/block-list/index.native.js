@@ -36,6 +36,17 @@ export class BlockList extends Component {
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 	}
 
+	finishBlockAppendingOrReplacing( newBlock ) {
+		// now determine whether we need to replace the currently selected block (if it's empty)
+		// or just add a new block as usual
+		if ( this.isReplaceable( this.props.selectedBlock ) ) {
+			// do replace here
+			this.props.replaceBlock( this.props.selectedBlockClientId, newBlock );
+		} else {
+			this.props.insertBlock( newBlock, this.getNewBlockInsertionIndex() );
+		}
+	}
+
 	blockHolderBorderStyle() {
 		return this.props.isFullyBordered ? styles.blockHolderFullBordered : styles.blockHolderSemiBordered;
 	}

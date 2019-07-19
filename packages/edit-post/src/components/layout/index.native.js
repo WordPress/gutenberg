@@ -92,7 +92,7 @@ class Layout extends Component {
 		return (
 			<VisualEditor
 				isFullyBordered={ this.state.isFullyBordered }
-				rootViewHeight={ this.state.rootViewHeight - 40 }
+				rootViewHeight={ this.state.rootViewHeight }
 				safeAreaBottomInset={ this.state.safeAreaBottomInset }
 				setTitleRef={ this.props.setTitleRef }
 			/>
