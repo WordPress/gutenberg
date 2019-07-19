@@ -28,8 +28,8 @@ const transforms = {
 			attributes: {
 				src: {
 					type: 'string',
-					shortcode: ( { named: { src } } ) => {
-						return src;
+					shortcode: ( { named: { src, mp4, m4v, webm, ogv, flv } } ) => {
+						return src || mp4 || m4v || webm || ogv || flv;
 					},
 				},
 				poster: {

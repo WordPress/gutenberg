@@ -135,9 +135,14 @@ export function ColumnsEdit( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
+	// The template selector is shown when we first insert the columns block (count === 0).
+	// or if there's no template available.
+	// The count === 0 trick is useful when you use undo/redo.
+	const showTemplateSelector = ( count === 0 && ! forceUseTemplate ) || ! template;
+
 	return (
 		<>
-			{ template && (
+			{ ! showTemplateSelector && (
 				<>
 					<InspectorControls>
 						<PanelBody>
@@ -170,9 +175,7 @@ export function ColumnsEdit( {
 						setForceUseTemplate( true );
 					} }
 					__experimentalAllowTemplateOptionSkip
-					// setting the template to null when the inner blocks
-					// are empty allows to reset to the placeholder state.
-					template={ count === 0 && ! forceUseTemplate ? null : template }
+					template={ showTemplateSelector ? null : template }
 					templateLock="all"
 					allowedBlocks={ ALLOWED_BLOCKS } />
 			</div>

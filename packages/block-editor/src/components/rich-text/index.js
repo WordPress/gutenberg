@@ -41,7 +41,7 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
 const classes = 'editor-rich-text__editable block-editor-rich-text__editable';
 
-class RichTextWraper extends Component {
+class RichTextWrapper extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onEnter = this.onEnter.bind( this );
@@ -417,7 +417,7 @@ const RichTextContainer = compose( [
 		};
 	} ),
 	withFilters( 'experimentalRichText' ),
-] )( RichTextWraper );
+] )( RichTextWrapper );
 
 RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 	let html = value;
