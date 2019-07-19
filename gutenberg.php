@@ -130,6 +130,5 @@ function gutenberg_pre_init() {
 }
 
 add_action( 'wp_ajax_gutenberg_rest_nonce', function() {
-	echo wp_create_nonce( 'wp_rest' );
-	die;
+	exit( wp_create_nonce( 'wp_rest' ) );
 } );
