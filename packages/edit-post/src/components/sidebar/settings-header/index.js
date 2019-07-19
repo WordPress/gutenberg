@@ -12,22 +12,22 @@ import { useState, useEffect } from '@wordpress/element';
 import SidebarHeader from '../sidebar-header';
 
 const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName } ) => {
-	const documentAriaLabel = sidebarName === 'edit-post/document' ?
+	const [ documentAriaLabel, documentSettingsActive ] = sidebarName === 'edit-post/document' ?
 		// translators: ARIA label for the Document sidebar tab, selected.
-		__( 'Document (selected)' ) :
+		[ __( 'Document (selected)' ), true ] :
 		// translators: ARIA label for the Document sidebar tab, not selected.
-		__( 'Document' );
+		[ __( 'Document' ), false ];
 
-	const blockAriaLabel = sidebarName === 'edit-post/block' ?
+	const [ blockAriaLabel, blockSettingsActive ] = sidebarName === 'edit-post/block' ?
 		// translators: ARIA label for the Settings Sidebar tab, selected.
-		__( 'Block (selected)' ) :
+		[ __( 'Block (selected)' ), true ] :
 		// translators: ARIA label for the Settings Sidebar tab, not selected.
-		__( 'Block' );
+		[ __( 'Block' ), false ];
 
-	const [ selectedTabName, setSelectedTabName ] = useState( null );
+	const documentSettingsName = 'edit-post-settings__panel-tab-document';
+	const blockSettingsName = 'edit-post-settings__panel-tab-block';
 
-	const documentSettingsName = 'edit-post-sidebar__panel-tab-documents';
-	const blockSettingsName = 'edit-post-sidebar__panel-tab-block';
+	const [ selectedTabName, setSelectedTabName ] = useState( documentSettingsName );
 
 	const tabs = [
 		{
@@ -39,7 +39,6 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 			name: blockSettingsName,
 			title: __( 'Block' ),
 			ariaLabel: `${ blockAriaLabel }`,
-
 		},
 	];
 
@@ -54,11 +53,18 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 
 	useEffect(
 		() => {
-			if ( tabs.length ) {
-				setSelectedTabName( tabs[ 0 ].name );
+			if ( documentSettingsName ) {
+				setSelectedTabName( documentSettingsName );
 			}
-		},
-		[ tabs ]
+		}, [ documentSettingsActive ]
+	);
+
+	useEffect(
+		() => {
+			if ( blockSettingsActive ) {
+				setSelectedTabName( blockSettingsName );
+			}
+		}, [ blockSettingsActive ]
 	);
 
 	return (
@@ -67,10 +73,10 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 			closeLabel={ __( 'Close settings' ) }
 		>
 			<TabPanel
-				onSelect={ onSelect }
+				key={ selectedTabName }
 				tabs={ tabs }
-				activeClass="is-active"
-				initialTabName={ selectedTabName }
+				onSelect={ onSelect }
+				selectedTabName={ selectedTabName }
 			>
 				{ () => { } }
 			</TabPanel>
