@@ -51,6 +51,7 @@ export default function ViewEditingModePicker() {
 	return (
 		<SelectControl
 			label={ __( 'View Editing Mode' ) }
+			hideLabelFromVision
 			options={ options }
 			value={ viewEditingMode }
 			onChange={ updateViewEditingModeCallback }
