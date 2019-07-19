@@ -370,7 +370,8 @@ The default editor settings
  bodyPlaceholder                        string        Empty post placeholder
  titlePlaceholder                       string        Empty title placeholder
  codeEditingEnabled                     string        Whether or not the user can switch to the code editor
- \_\_experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+ **experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+ **experimentalEnableTips               boolean       Whether or not tips aimed at new users should appear in the UI.
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 

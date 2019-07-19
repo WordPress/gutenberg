@@ -28,9 +28,11 @@ export const PREFERENCES_DEFAULTS = {
  *  titlePlaceholder                       string        Empty title placeholder
  *  codeEditingEnabled                     string        Whether or not the user can switch to the code editor
  *  __experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+ *  __experimentalEnableTips               boolean       Whether or not tips aimed at new users should appear in the UI.
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
+
 	colors: [
 		{
 			name: __( 'Pale pink' ),
@@ -142,7 +144,11 @@ export const SETTINGS_DEFAULTS = {
 	allowedMimeTypes: null,
 
 	availableLegacyWidgets: {},
+
 	hasPermissionsToManageWidgets: false,
+
 	__experimentalCanUserUseUnfilteredHTML: false,
+
+	__experimentalEnableTips: false,
 };
 

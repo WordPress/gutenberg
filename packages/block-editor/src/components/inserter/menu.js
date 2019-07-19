@@ -248,7 +248,7 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootClientId } = this.props;
+		const { instanceId, onSelect, rootClientId, enableTips } = this.props;
 		const {
 			childItems,
 			hoveredItem,
@@ -291,13 +291,15 @@ export class InserterMenu extends Component {
 					aria-label={ __( 'Available block types' ) }
 				>
 
-					<InlineTip tipId="core/editor.inserter" className="block-editor-inserter__tip">
-						{ __( 'There are Blocks for most types of content: text, headings, images, lists, and lots more!' ) }
-						{ ' ' }
-						<ExternalLink href="https://wordpress.org/support/article/wordpress-editor/#blocks">
-							{ __( 'Learn more' ) }
-						</ExternalLink>
-					</InlineTip>
+					{ enableTips && (
+						<InlineTip tipId="core/editor.inserter" className="block-editor-inserter__tip">
+							{ __( 'There are Blocks for most types of content: text, headings, images, lists, and lots more!' ) }
+							{ ' ' }
+							<ExternalLink href="https://wordpress.org/support/article/wordpress-editor/#blocks">
+								{ __( 'Learn more' ) }
+							</ExternalLink>
+						</InlineTip>
+					) }
 
 					<ChildBlocks
 						rootClientId={ rootClientId }
@@ -375,6 +377,7 @@ export default compose(
 			getBlockName,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
+			getSettings,
 		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
@@ -388,11 +391,13 @@ export default compose(
 			}
 		}
 		const destinationRootBlockName = getBlockName( destinationRootClientId );
+		const { __experimentalEnableTips: enableTips } = getSettings();
 
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items: getInserterItems( destinationRootClientId ),
 			destinationRootClientId,
+			enableTips,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

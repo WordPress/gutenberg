@@ -28,6 +28,7 @@ const BlockInspector = ( {
 	selectedBlockClientId,
 	selectedBlockName,
 	showNoBlockSelectedMessage = true,
+	enableTips,
 } ) => {
 	if ( count > 1 ) {
 		return <MultiSelectionInspector />;
@@ -52,9 +53,11 @@ const BlockInspector = ( {
 
 	return (
 		<>
-			<InlineTip tipId="core/editor.blockInspector" className="block-editor-block-inspector__tip">
-				{ __( 'The block tab contains additional settings for the selected block.' ) }
-			</InlineTip>
+			{ enableTips && (
+				<InlineTip tipId="core/editor.blockInspector" className="block-editor-block-inspector__tip">
+					{ __( 'The block tab contains additional settings for the selected block.' ) }
+				</InlineTip>
+			) }
 			<div className="editor-block-inspector__card block-editor-block-inspector__card">
 				<BlockIcon icon={ blockType.icon } showColors />
 				<div className="editor-block-inspector__card-content block-editor-block-inspector__card-content">
@@ -95,18 +98,20 @@ const BlockInspector = ( {
 
 export default withSelect(
 	( select ) => {
-		const { getSelectedBlockClientId, getSelectedBlockCount, getBlockName } = select( 'core/block-editor' );
+		const { getSelectedBlockClientId, getSelectedBlockCount, getBlockName, getSettings } = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectedBlockName = selectedBlockClientId && getBlockName( selectedBlockClientId );
 		const blockType = selectedBlockClientId && getBlockType( selectedBlockName );
 		const blockStyles = selectedBlockClientId && getBlockStyles( selectedBlockName );
+		const { __experimentalEnableTips: enableTips } = getSettings();
 		return {
 			count: getSelectedBlockCount(),
 			hasBlockStyles: blockStyles && blockStyles.length > 0,
 			selectedBlockName,
 			selectedBlockClientId,
 			blockType,
+			enableTips,
 		};
 	}
 )( BlockInspector );
