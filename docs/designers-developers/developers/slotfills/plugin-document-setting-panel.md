@@ -1,6 +1,6 @@
 # PluginDocumentSettingPanel
 
-This SlotFill allows adding items below the Status & Availability panel in the Document Sidebar.
+This SlotFill allows registering a UI to edit Document settings.
 
 ## Available Props
 * __name__ `string`: A string identifying the panel.
