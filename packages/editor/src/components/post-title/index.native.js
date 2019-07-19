@@ -22,12 +22,6 @@ import { pasteHandler } from '@wordpress/blocks';
 import styles from './style.scss';
 
 class PostTitle extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.titleViewRef = null;
-	}
-
 	componentDidMount() {
 		if ( this.props.innerRef ) {
 			this.props.innerRef( this );
@@ -39,10 +33,7 @@ class PostTitle extends Component {
 	}
 
 	focus() {
-		if ( this.titleViewRef ) {
-			this.titleViewRef.focus();
-			this.props.onSelect();
-		}
+		this.props.onSelect();
 	}
 
 	render() {
@@ -91,10 +82,8 @@ class PostTitle extends Component {
 					onSelectionChange={ () => { } }
 					onEnter={ this.props.onEnterPress }
 					disableEditingMenu={ true }
-					setRef={ ( ref ) => {
-						this.titleViewRef = ref;
-					} }
 					__unstablePasteHandler={ pasteHandler }
+					__unstableIsSelected={ this.props.isSelected }
 				>
 				</RichText>
 			</View>
