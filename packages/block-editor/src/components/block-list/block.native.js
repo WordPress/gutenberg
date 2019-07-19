@@ -21,7 +21,6 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import styles from './block.scss';
 import BlockEdit from '../block-edit';
-import BlockInsertionPoint from './insertion-point';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from './block-mobile-toolbar';
 
@@ -110,7 +109,6 @@ class BlockListBlock extends Component {
 			icon,
 			isSelected,
 			isValid,
-			rootClientId,
 			showTitle,
 			title,
 		} = this.props;
@@ -120,37 +118,25 @@ class BlockListBlock extends Component {
 		const accessibilityLabel = this.getAccessibilityLabel();
 
 		return (
-			<>
-				<BlockInsertionPoint
-					clientId={ clientId }
-					rootClientId={ rootClientId }
-				/>
-				{ /*
-					accessible prop needs to be false to access children
-					https://facebook.github.io/react-native/docs/accessibility#accessible-ios-android
-				*/ }
-				<TouchableWithoutFeedback
-					onPress={ this.onFocus }
-					accessible={ ! isSelected }
-					accessibilityRole={ 'button' }
-				>
-					<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
-						{ showTitle && this.renderBlockTitle() }
-						<View
-							accessibilityLabel={ accessibilityLabel }
-							style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
-						>
-							{ isValid && this.getBlockForType() }
-							{ ! isValid &&
-							<BlockInvalidWarning blockTitle={ title } icon={ icon } />
-							}
-						</View>
-						{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
+			<TouchableWithoutFeedback
+				onPress={ this.onFocus }
+				accessible={ ! isSelected }
+				accessibilityRole={ 'button' }
+			>
+				<View style={ [ styles.blockHolder, borderStyle, { borderColor } ] }>
+					{ showTitle && this.renderBlockTitle() }
+					<View
+						accessibilityLabel={ accessibilityLabel }
+						style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }
+					>
+						{ isValid && this.getBlockForType() }
+						{ ! isValid &&
+						<BlockInvalidWarning blockTitle={ title } icon={ icon } />
+						}
 					</View>
-
-				</TouchableWithoutFeedback>
-			</>
-
+					{ isSelected && <BlockMobileToolbar clientId={ clientId } /> }
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }

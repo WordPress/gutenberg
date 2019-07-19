@@ -2,15 +2,16 @@
  * External dependencies
  */
 import { identity } from 'lodash';
-import { View, Platform } from 'react-native';
+import { Text, View, Platform, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/components';
 
 /**
@@ -18,7 +19,7 @@ import { KeyboardAwareFlatList, ReadableContentView } from '@wordpress/component
  */
 import styles from './style.scss';
 import BlockListBlock from './block';
-import BlockListAppender from '../block-list-appender';
+import DefaultBlockAppender from '../default-block-appender';
 
 const blockMobileToolbarHeight = 44;
 const toolbarHeight = 44;
@@ -28,6 +29,8 @@ export class BlockList extends Component {
 		super( ...arguments );
 
 		this.renderItem = this.renderItem.bind( this );
+		this.renderAddBlockSeparator = this.renderAddBlockSeparator.bind( this );
+		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
 		this.renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
 		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
@@ -35,14 +38,6 @@ export class BlockList extends Component {
 
 	blockHolderBorderStyle() {
 		return this.props.isFullyBordered ? styles.blockHolderFullBordered : styles.blockHolderSemiBordered;
-	}
-
-	componentDidMount() {
-		this._isMounted = true;
-	}
-
-	componentWillUnmount() {
-		this._isMounted = false;
 	}
 
 	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
@@ -56,7 +51,14 @@ export class BlockList extends Component {
 	renderDefaultBlockAppender() {
 		return (
 			<ReadableContentView>
-				<BlockListAppender rootClientId={ this.props.rootClientId } />
+				<DefaultBlockAppender
+					rootClientId={ this.props.rootClientId }
+					containerStyle={ [
+						styles.blockContainerFocused,
+						this.blockHolderBorderStyle(),
+						{ borderColor: 'transparent' },
+					] }
+				/>
 			</ReadableContentView>
 		);
 	}
@@ -84,7 +86,8 @@ export class BlockList extends Component {
 					shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
 					title={ this.props.title }
 					ListHeaderComponent={ this.props.header }
-					ListFooterComponent={ this.renderDefaultBlockAppender() }
+					ListEmptyComponent={ this.renderDefaultBlockAppender }
+					ListFooterComponent={ this.renderBlockListFooter }
 				/>
 			</View>
 		);
@@ -102,6 +105,7 @@ export class BlockList extends Component {
 
 		return (
 			<ReadableContentView reversed={ shouldReverseContent }>
+				{ this.props.shouldShowInsertionPoint( clientId ) && this.renderAddBlockSeparator() }
 				<BlockListBlock
 					key={ clientId }
 					showTitle={ false }
@@ -112,6 +116,27 @@ export class BlockList extends Component {
 					focusedBorderColor={ styles.blockHolderFocused.borderColor }
 				/>
 			</ReadableContentView>
+		);
+	}
+
+	renderAddBlockSeparator() {
+		return (
+			<View style={ styles.containerStyleAddHere } >
+				<View style={ styles.lineStyleAddHere }></View>
+				<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
+				<View style={ styles.lineStyleAddHere }></View>
+			</View>
+		);
+	}
+
+	renderBlockListFooter() {
+		const paragraphBlock = createBlock( 'core/paragraph' );
+		return (
+			<TouchableWithoutFeedback onPress={ () => {
+				this.finishBlockAppendingOrReplacing( paragraphBlock );
+			} } >
+				<View style={ styles.blockListFooter } />
+			</TouchableWithoutFeedback>
 		);
 	}
 }
@@ -126,15 +151,28 @@ export default compose( [
 			getSelectedBlock,
 			getSelectedBlockClientId,
 			isBlockSelected,
+			getBlockInsertionPoint,
+			isBlockInsertionPointVisible,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
+		const blockClientIds = getBlockOrder( rootClientId );
+		const insertionPoint = getBlockInsertionPoint();
+		const shouldShowInsertionPoint = ( clientId ) => {
+			return (
+				isBlockInsertionPointVisible() &&
+				insertionPoint.rootClientId === rootClientId &&
+				blockClientIds[ insertionPoint.index ] === clientId
+			);
+		};
+
 		return {
-			blockClientIds: getBlockOrder( rootClientId ),
+			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
 			getBlockName,
 			isBlockSelected,
+			shouldShowInsertionPoint,
 			selectedBlock: getSelectedBlock(),
 			selectedBlockClientId,
 			selectedBlockOrder: getBlockIndex( selectedBlockClientId ),
