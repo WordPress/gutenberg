@@ -21,7 +21,7 @@ Array [
     "line": 14,
     "rule": "scss/at-else-empty-line-before",
     "severity": "error",
-    "text": "Unxpected empty line before @else (scss/at-else-empty-line-before)",
+    "text": "Unexpected empty line before @else (scss/at-else-empty-line-before)",
   },
   Object {
     "column": 2,
