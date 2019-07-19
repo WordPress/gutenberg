@@ -1,6 +1,6 @@
 {
 	"name": "core/navigation-menu",
-	"category": "layout",
+	"category": "theme",
 	"attributes": {
 		"automaticallyAdd": {
 			"type": "boolean",

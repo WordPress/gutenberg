@@ -26,7 +26,6 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 		anchor: true,
 		html: false,
-		inserter: false,
 	},
 
 	edit,
