@@ -14,7 +14,6 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import IgnoreNestedEvents from '../ignore-nested-events';
 import DefaultBlockAppender from '../default-block-appender';
-import ButtonBlockAppender from '../button-block-appender';
 
 function BlockListAppender( {
 	blockClientIds,
@@ -53,14 +52,7 @@ function BlockListAppender( {
 
 	// Fallback in the case no renderAppender has been provided and the
 	// default block can't be inserted.
-	return (
-		<div className="block-list-appender">
-			<ButtonBlockAppender
-				rootClientId={ rootClientId }
-				className="block-list-appender__toggle"
-			/>
-		</div>
-	);
+	return null;
 }
 
 export default withSelect( ( select, { rootClientId } ) => {
@@ -73,6 +65,6 @@ export default withSelect( ( select, { rootClientId } ) => {
 	return {
 		isLocked: !! getTemplateLock( rootClientId ),
 		blockClientIds: getBlockOrder( rootClientId ),
-		canInsertDefaultBlock: canInsertBlockType( getDefaultBlockName(), rootClientId ),
+		canInsertDefaultBlock: ! rootClientId && canInsertBlockType( getDefaultBlockName() ),
 	};
 } )( BlockListAppender );
