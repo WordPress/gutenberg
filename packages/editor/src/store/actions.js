@@ -484,6 +484,40 @@ export function* savePost( options = {} ) {
 		edits = { status: 'draft', ...edits };
 	}
 
+	const allBlocks = yield select(
+		'core/block-editor',
+		'getBlocksByClientId',
+		yield select( 'core/block-editor', 'getClientIdsWithDescendants' )
+	);
+
+	const viewEditingMode = yield select( STORE_KEY, 'getViewEditingMode' );
+
+	if ( getModeConfig( viewEditingMode ).showTemplate ) {
+		for ( const block of allBlocks ) {
+			if ( block.name === 'core/template-part' ) {
+				const { innerBlocks, attributes } = block;
+				const templatePartContent = serialize( innerBlocks );
+				const savedPost = yield apiFetch( {
+					path: `/wp/v2/wp_template${ attributes.id ? `/${ attributes.id }` : '' }`,
+					method: attributes.id ? 'PUT' : 'POST',
+					data: {
+						content: templatePartContent,
+						id: attributes.id,
+						title: attributes.name,
+					},
+				} );
+				if ( ! attributes.id ) {
+					yield dispatch(
+						'core/block-editor',
+						'updateBlockAttributes', block.clientId, {
+							id: savedPost.id,
+						}
+					);
+				}
+			}
+		}
+	}
+
 	const post = yield select(
 		STORE_KEY,
 		'getCurrentPost'
@@ -494,12 +528,6 @@ export function* savePost( options = {} ) {
 		'getEditedPostContent'
 	);
 
-	const viewEditingMode = yield select( STORE_KEY, 'getViewEditingMode' );
-	const allBlocks = yield select(
-		'core/block-editor',
-		'getBlocksByClientId',
-		yield select( 'core/block-editor', 'getClientIdsWithDescendants' )
-	);
 	if ( getModeConfig( viewEditingMode ).showTemplate ) {
 		const { templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
 		if ( templatePost ) {
@@ -513,21 +541,6 @@ export function* savePost( options = {} ) {
 			} );
 			const postContentBlock = allBlocks.find( ( block ) => block.name === 'core/post-content' );
 			editedPostContent = postContentBlock ? serialize( postContentBlock.innerBlocks ) : '';
-		}
-		for ( const block of allBlocks ) {
-			if ( block.name === 'core/template-part' ) {
-				const { innerBlocks, attributes } = block;
-				const templatePartContent = serialize( innerBlocks );
-				yield apiFetch( {
-					path: `/wp/v2/${ templatePost.post_type }/${ attributes.id }`,
-					method: attributes.id ? 'PUT' : 'POST',
-					data: {
-						content: templatePartContent,
-						id: attributes.id,
-						title: attributes.name,
-					},
-				} );
-			}
 		}
 	}
 

@@ -22,7 +22,7 @@ export default function TemplatePartEdit( { attributes, clientId, setAttributes 
 		templatePartTitle,
 		hasInnerBlocks,
 	} = useSelect( ( select ) => {
-		const template = select( 'core' ).getEntityRecord( 'postType', 'wp_template', id );
+		const template = id && select( 'core' ).getEntityRecord( 'postType', 'wp_template', id );
 		return {
 			rawTemplatePartContent: get( template, [ 'content', 'raw' ] ),
 			newBlocks: select( 'core/block-editor' ).getBlocks( clientId ),
