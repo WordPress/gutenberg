@@ -132,8 +132,7 @@ describe( 'useSelect', () => {
 			children: 'bar',
 		} );
 	} );
-	describe( 'rerenders as expected with various mapSelect return ' +
-		'types', () => {
+	describe( 'rerenders as expected with various mapSelect return types', () => {
 		const getComponent = ( mapSelectSpy, dependencyKey ) => ( props ) => {
 			const dependencies = props[ dependencyKey ];
 			mapSelectSpy.mockImplementation(
