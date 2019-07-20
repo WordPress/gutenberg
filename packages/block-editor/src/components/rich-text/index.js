@@ -27,6 +27,7 @@ import {
 } from '@wordpress/rich-text';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
 import { createBlobURL } from '@wordpress/blob';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -253,6 +254,27 @@ class RichTextWraper extends Component {
 		onReplace( [ block ] );
 	}
 
+	getAllowedFormats() {
+		const { allowedFormats, formattingControls } = this.props;
+
+		if ( ! allowedFormats && ! formattingControls ) {
+			return;
+		}
+
+		if ( formattingControls ) {
+			deprecated( 'wp.blockEditor.RichText formattingControls prop', {
+				version: 'the future',
+				alternative: 'allowedFormats',
+			} );
+		}
+
+		if ( allowedFormats ) {
+			return allowedFormats;
+		}
+
+		return formattingControls.map( ( name ) => `core/${ name }` );
+	}
+
 	render() {
 		const {
 			tagName,
@@ -275,6 +297,7 @@ class RichTextWraper extends Component {
 			onCreateUndoLevel,
 			placeholder,
 			keepPlaceholderOnFocus,
+			// eslint-disable-next-line no-unused-vars
 			allowedFormats,
 			withoutInteractiveFormatting,
 			// eslint-disable-next-line no-unused-vars
@@ -295,6 +318,7 @@ class RichTextWraper extends Component {
 			...experimentalProps
 		} = this.props;
 
+		const adjustedAllowedFormats = this.getAllowedFormats();
 		let adjustedValue = originalValue;
 		let adjustedOnChange = originalOnChange;
 
@@ -319,7 +343,7 @@ class RichTextWraper extends Component {
 				className={ classnames( classes, className ) }
 				placeholder={ placeholder }
 				keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
-				allowedFormats={ allowedFormats }
+				allowedFormats={ adjustedAllowedFormats }
 				withoutInteractiveFormatting={ withoutInteractiveFormatting }
 				onEnter={ this.onEnter }
 				onDelete={ this.onDelete }
@@ -345,12 +369,12 @@ class RichTextWraper extends Component {
 								onChange={ onChange }
 							/>
 						) }
-						{ isSelected && ! inlineToolbar && allowedFormats.length > 0 && (
+						{ isSelected && ! inlineToolbar && adjustedAllowedFormats.length > 0 && (
 							<BlockFormatControls>
 								<FormatToolbar />
 							</BlockFormatControls>
 						) }
-						{ isSelected && inlineToolbar && allowedFormats.length > 0 && (
+						{ isSelected && inlineToolbar && adjustedAllowedFormats.length > 0 && (
 							<IsolatedEventContainer
 								className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar"
 							>
