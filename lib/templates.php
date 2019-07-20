@@ -28,6 +28,14 @@ function gutenberg_register_templates() {
 
 	$template;
 	if ( ! $template_query->have_posts() ) {
+		$footer_template_part_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template',
+				'post_name'    => 'footer-template-part',
+				'post_content' => "<!-- wp:paragraph -->\n<p>Template part</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:categories /-->",
+			)
+		);
+
 		$template_id = wp_insert_post(
 			array(
 				'post_type'    => 'wp_template',
@@ -74,7 +82,8 @@ function gutenberg_register_templates() {
 				<!-- /wp:spacer --></div></div>
 				<!-- /wp:group --></div>
 				<!-- /wp:column --></div>
-				<!-- /wp:columns -->',
+				<!-- /wp:columns -->
+				<!-- wp:template-part {"id":' . $footer_template_part_id . '} /-->',
 			)
 		);
 		$template    = get_post( $template_id );

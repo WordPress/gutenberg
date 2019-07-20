@@ -1,0 +1,9 @@
+{
+	"name": "core/template-part",
+	"category": "theme",
+	"attributes": {
+		"id": {
+			"type": "number"
+		}
+	}
+}
