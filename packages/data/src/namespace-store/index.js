@@ -26,9 +26,11 @@ import * as metadataActions from './metadata/actions';
 /**
  * Creates a namespace object with a store derived from the reducer given.
  *
- * @param {string} key              Identifying string used for namespace and redex dev tools.
- * @param {Object} options          Contains reducer, actions, selectors, and resolvers.
- * @param {Object} registry         Registry reference.
+ * @param {string}         key      Unique namespace identifier.
+ * @param {Object}         options  Registered store options, with properties
+ *                                  describing reducer, actions, selectors, and
+ *                                  resolvers.
+ * @param {WPDataRegistry} registry Registry reference.
  *
  * @return {Object} Store Object.
  */
@@ -102,10 +104,11 @@ export default function createNamespace( key, options, registry ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string} key      Part of the state shape to register the
- *                          selectors for.
- * @param {Object} options  Registered store options.
- * @param {Object} registry Registry reference, for resolver enhancer support.
+ * @param {string}         key      Unique namespace identifier.
+ * @param {Object}         options  Registered store options, with properties
+ *                                  describing reducer, actions, selectors, and
+ *                                  resolvers.
+ * @param {WPDataRegistry} registry Registry reference.
  *
  * @return {Object} Newly created redux store.
  */
@@ -143,15 +146,16 @@ function createReduxStore( key, options, registry ) {
 }
 
 /**
- * Maps selectors to a redux store.
+ * Maps selectors to a store.
  *
- * @param {Object} selectors  Selectors to register. Keys will be used as the
- *                            public facing API. Selectors will get passed the
- *                            state as first argument.
- * @param {Object} store      The redux store to which the selectors should be mapped.
- * @param {Object} registry   Registry reference.
+ * @param {Object}         selectors Selectors to register. Keys will be used as
+ *                                   the public facing API. Selectors will get
+ *                                   passed the state as first argument.
+ * @param {Object}         store     The store to which the selectors should be
+ *                                   mapped.
+ * @param {WPDataRegistry} registry  Registry reference.
  *
- * @return {Object}           Selectors mapped to the redux store provided.
+ * @return {Object} Selectors mapped to the provided store.
  */
 function mapSelectors( selectors, store, registry ) {
 	const createStateSelector = ( registeredSelector ) => {
