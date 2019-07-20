@@ -6,6 +6,12 @@
 			"type": "string",
 			"source": "option",
 			"option": "title"
+		},
+		"textColor": {
+			"type": "string"
+		},
+		"customTextColor": {
+			"type": "string"
 		}
 	}
 }
