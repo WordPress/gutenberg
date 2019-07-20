@@ -6,17 +6,10 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { SelectControl } from '@wordpress/components';
 
-const options = [
-	{ value: 'post-content', label: __( 'Writing' ) },
-	{ value: 'preview', label: __( 'Preview' ) },
-	{ value: 'full-site', label: __( 'Full Site Editing' ) },
-	{ value: 'design', label: __( 'Design' ) },
-	{ value: 'template', label: __( 'Template' ) },
-	{ value: '---', label: __( '---' ) },
-	{ value: 'header', label: __( 'Header' ) },
-	{ value: 'sidebar', label: __( 'Sidebar' ) },
-	{ value: 'footer', label: __( 'Footer' ) },
-];
+/**
+ * Internal dependencies
+ */
+import { getModeConfig, modes } from '../../editor-modes';
 
 export default function ViewEditingModePicker() {
 	const { post, blocks, settings, viewEditingMode } = useSelect( ( select ) => {
@@ -36,22 +29,25 @@ export default function ViewEditingModePicker() {
 	const { setupEditor, updateViewEditingMode } = useDispatch( 'core/editor' );
 
 	const updateViewEditingModeCallback = useCallback( ( newViewEditingMode ) => {
+		const currentModeConfig = getModeConfig( viewEditingMode );
+		const newModeConfig = getModeConfig( newViewEditingMode );
 		updateViewEditingMode( newViewEditingMode );
 
 		let newBlocks = blocks;
-		if ( viewEditingMode !== 'post-content' ) { // Leaving template mode.
+		if ( currentModeConfig.showTemplate ) { // Leaving template mode.
 			const postContentBlock = blocks.find(
 				( block ) => block.name === 'core/post-content'
 			);
 			newBlocks = postContentBlock ? postContentBlock.innerBlocks : [];
 		}
+
 		setupEditor(
 			post,
 			{
 				blocks: newBlocks,
 			},
 			settings.template,
-			newViewEditingMode !== 'post-content' && settings.templatePost
+			newModeConfig.showTemplate && settings.templatePost
 		);
 	}, [ post, blocks, settings.template, settings.templatePost, viewEditingMode ] );
 
@@ -60,7 +56,7 @@ export default function ViewEditingModePicker() {
 			className="editor-view-editing-mode-picker"
 			label={ __( 'View Editing Mode' ) }
 			hideLabelFromVision
-			options={ options }
+			options={ modes }
 			value={ viewEditingMode }
 			onChange={ updateViewEditingModeCallback }
 		/>

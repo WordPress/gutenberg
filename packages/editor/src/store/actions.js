@@ -36,6 +36,7 @@ import {
 } from './utils/notice-builder';
 import { awaitNextStateChange, getRegistry } from './controls';
 import * as sources from './block-sources';
+import { getModeConfig } from '../editor-modes';
 
 /**
  * Map of Registry instance to WeakMap of dependencies by custom source.
@@ -494,8 +495,8 @@ export function* savePost( options = {} ) {
 		'getEditedPostContent'
 	);
 
-	const { viewEditingMode } = yield select( STORE_KEY, 'getViewEditingMode' );
-	if ( viewEditingMode !== 'post-content' ) {
+	const viewEditingMode = yield select( STORE_KEY, 'getViewEditingMode' );
+	if ( getModeConfig( viewEditingMode ).showTemplate ) {
 		const { templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
 		if ( templatePost ) {
 			yield apiFetch( {

@@ -23,6 +23,7 @@ import withRegistryProvider from './with-registry-provider';
 import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
+import { getModeConfig } from '../../editor-modes';
 
 const fetchLinkSuggestions = async ( search ) => {
 	const posts = await apiFetch( {
@@ -58,7 +59,7 @@ class EditorProvider extends Component {
 			props.post,
 			props.initialEdits,
 			props.settings.template,
-			props.viewEditingMode !== 'post-content' && props.settings.templatePost
+			getModeConfig( props.viewEditingMode ).showTemplate && props.settings.templatePost
 		);
 
 		if ( props.settings.autosave ) {

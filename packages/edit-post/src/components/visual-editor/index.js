@@ -7,6 +7,7 @@ import {
 import {
 	PostTitle,
 	VisualEditorGlobalKeyboardShortcuts,
+	getModeConfig,
 } from '@wordpress/editor';
 import {
 	WritingFlow,
@@ -51,6 +52,6 @@ function VisualEditor( { hasPostTitle } ) {
 export default withSelect( ( select ) => {
 	const viewEditingMode = select( 'core/editor' ).getViewEditingMode();
 	return {
-		hasPostTitle: viewEditingMode === 'post-content',
+		hasPostTitle: ! getModeConfig( viewEditingMode ).showTemplate,
 	};
 } )( VisualEditor );

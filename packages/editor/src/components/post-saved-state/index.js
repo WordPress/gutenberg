@@ -21,6 +21,11 @@ import { withViewportMatch } from '@wordpress/viewport';
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 
 /**
+ * Internal dependencies
+ */
+import { getModeConfig } from '../../editor-modes';
+
+/**
  * Component showing whether the post is saved or not and displaying save links.
  *
  * @param   {Object}    Props Component Props.
@@ -99,7 +104,7 @@ export class PostSavedState extends Component {
 		}
 
 		let label = isPending ? __( 'Save Draft as Pending' ) : __( 'Save Draft' );
-		if ( viewEditingMode ) {
+		if ( getModeConfig( viewEditingMode ).showTemplate ) {
 			label += ' & Template';
 		}
 		if ( ! isLargeViewport ) {

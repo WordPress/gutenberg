@@ -17,6 +17,7 @@ import './hooks';
 
 export * from './components';
 export * from './utils';
+export * from './editor-modes';
 export { storeConfig } from './store';
 
 /*
