@@ -16,6 +16,7 @@ function gutenberg_register_templates() {
 				'name' => __( 'Templates', 'gutenberg' ),
 			),
 			'show_in_rest' => true,
+			'show_ui' => true,
 		)
 	);
 
