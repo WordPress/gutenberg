@@ -8,7 +8,6 @@ import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
-	requestImageUploadCancel,
 } from 'react-native-gutenberg-bridge';
 import { isEmpty } from 'lodash';
 
@@ -31,6 +30,7 @@ import {
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
+import { doAction, hasAction } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -92,17 +92,18 @@ class ImageEdit extends React.Component {
 	}
 
 	componentWillUnmount() {
-		if ( this.state.isUploadInProgress ) {
-			requestImageUploadCancel( this.props.attributes.id );
+		// this action will only exist if the user pressed the trash button on the block holder
+		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
+			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
 		}
 	}
 
-	componentWillReceiveProps( nextProps ) {
+	static getDerivedStateFromProps( props, state ) {
 		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
 		// is updated immediately any time the isSelected prop becomes false
-		this.setState( ( state ) => ( {
-			isCaptionSelected: nextProps.isSelected && state.isCaptionSelected,
-		} ) );
+		return {
+			isCaptionSelected: props.isSelected && state.isCaptionSelected,
+		};
 	}
 
 	onImagePressed() {

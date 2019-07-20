@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost, insertBlock, getEditedPostContent } from '@wordpress/e2e-test-utils';
+import {
+	clickBlockToolbarButton,
+	createNewPost,
+	getEditedPostContent,
+	insertBlock,
+} from '@wordpress/e2e-test-utils';
 
 const createButtonSelector = "//div[@data-type='core/table']//button[text()='Create Table']";
 
@@ -113,6 +118,38 @@ describe( 'Table', () => {
 		await footerSwitch[ 0 ].click();
 
 		// Expect the table to have only a body with written content.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'allows adding and deleting columns across the table header, body and footer', async () => {
+		await insertBlock( 'Table' );
+
+		// Create the table.
+		const createButton = await page.$x( createButtonSelector );
+		await createButton[ 0 ].click();
+
+		// Toggle on the switches and add some content.
+		const headerSwitch = await page.$x( "//label[text()='Header section']" );
+		const footerSwitch = await page.$x( "//label[text()='Footer section']" );
+		await headerSwitch[ 0 ].click();
+		await footerSwitch[ 0 ].click();
+
+		// Add a column.
+		await clickBlockToolbarButton( 'Edit table' );
+		const addColumnAfterButton = await page.$x( "//button[text()='Add Column After']" );
+		await addColumnAfterButton[ 0 ].click();
+
+		// Expect the table to have 3 columns across the header, body and footer.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.click( '.wp-block-table__cell-content' );
+
+		// Delete a column.
+		await clickBlockToolbarButton( 'Edit table' );
+		const deleteColumnButton = await page.$x( "//button[text()='Delete Column']" );
+		await deleteColumnButton[ 0 ].click();
+
+		// Expect the table to have 2 columns across the header, body and footer.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

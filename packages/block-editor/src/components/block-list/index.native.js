@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { identity } from 'lodash';
-import { Text, View, Keyboard, SafeAreaView, Platform } from 'react-native';
+import { Text, View, Keyboard, SafeAreaView, Platform, TouchableWithoutFeedback } from 'react-native';
 import { subscribeMediaAppend } from 'react-native-gutenberg-bridge';
 
 /**
@@ -32,6 +32,8 @@ export class BlockList extends Component {
 		super( ...arguments );
 
 		this.renderItem = this.renderItem.bind( this );
+		this.renderAddBlockSeparator = this.renderAddBlockSeparator.bind( this );
+		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
 		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
 		this.renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
 		this.onBlockTypeSelected = this.onBlockTypeSelected.bind( this );
@@ -39,6 +41,7 @@ export class BlockList extends Component {
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
+		this.getNewBlockInsertionIndex = this.getNewBlockInsertionIndex.bind( this );
 
 		this.state = {
 			blockTypePickerVisible: false,
@@ -58,20 +61,34 @@ export class BlockList extends Component {
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue );
 
-		this.finishBlockAppendingOrReplacing( newBlock );
+		this.finishInsertingOrReplacingBlock( newBlock );
 	}
 
-	finishBlockAppendingOrReplacing( newBlock ) {
-		// now determine whether we need to replace the currently selected block (if it's empty)
-		// or just add a new block as usual
+	finishInsertingOrReplacingBlock( newBlock ) {
 		if ( this.isReplaceable( this.props.selectedBlock ) ) {
-			// do replace here
+			// replace selected block
 			this.props.replaceBlock( this.props.selectedBlockClientId, newBlock );
+		} else if ( this.props.isPostTitleSelected && this.isReplaceable( this.props.firstBlock ) ) {
+			// replace first block in post: there is no selected block when the post title is selected,
+			// so replaceBlock does not select the new block and we need to manually select the new block
+			const { clientId: firstBlockId } = this.props.firstBlock;
+			this.props.replaceBlock( firstBlockId, newBlock );
+			this.props.selectBlock( newBlock.clientId );
 		} else {
-			const indexAfterSelected = this.props.selectedBlockOrder + 1;
-			const insertionIndex = indexAfterSelected || this.props.blockCount;
-			this.props.insertBlock( newBlock, insertionIndex );
+			this.props.insertBlock( newBlock, this.getNewBlockInsertionIndex() );
 		}
+	}
+
+	getNewBlockInsertionIndex() {
+		if ( this.props.isPostTitleSelected ) {
+			// if post title selected, insert at top of post
+			return 0;
+		} else if ( this.props.selectedBlockOrder === -1 ) {
+			// if no block selected, insert at end of post
+			return this.props.blockCount;
+		}
+		// insert after selected block
+		return this.props.selectedBlockOrder + 1;
 	}
 
 	blockHolderBorderStyle() {
@@ -97,7 +114,7 @@ export class BlockList extends Component {
 			newMediaBlock.attributes.id = payload.mediaId;
 
 			// finally append or replace as appropriate
-			this.finishBlockAppendingOrReplacing( newMediaBlock );
+			this.finishInsertingOrReplacingBlock( newMediaBlock );
 		} );
 	}
 
@@ -170,6 +187,7 @@ export class BlockList extends Component {
 					title={ this.props.title }
 					ListHeaderComponent={ this.props.header }
 					ListEmptyComponent={ this.renderDefaultBlockAppender }
+					ListFooterComponent={ this.renderBlockListFooter }
 				/>
 				<SafeAreaView>
 					<View style={ { height: toolbarHeight } } />
@@ -212,9 +230,12 @@ export class BlockList extends Component {
 		return isUnmodifiedDefaultBlock( block );
 	}
 
-	renderItem( { item: clientId } ) {
+	renderItem( { item: clientId, index } ) {
+		const shouldShowAddBlockSeparator = this.state.blockTypePickerVisible && ( this.props.isBlockSelected( clientId ) || ( index === 0 && this.props.isPostTitleSelected ) );
+		const shouldPutAddBlockSeparatorAboveBlock = this.isReplaceable( this.props.selectedBlock ) || this.props.isPostTitleSelected;
+
 		return (
-			<ReadableContentView>
+			<ReadableContentView reversed={ shouldPutAddBlockSeparatorAboveBlock }>
 				<BlockListBlock
 					key={ clientId }
 					showTitle={ false }
@@ -224,14 +245,29 @@ export class BlockList extends Component {
 					borderStyle={ this.blockHolderBorderStyle() }
 					focusedBorderColor={ styles.blockHolderFocused.borderColor }
 				/>
-				{ this.state.blockTypePickerVisible && this.props.isBlockSelected( clientId ) && (
-					<View style={ styles.containerStyleAddHere } >
-						<View style={ styles.lineStyleAddHere }></View>
-						<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
-						<View style={ styles.lineStyleAddHere }></View>
-					</View>
-				) }
+				{ shouldShowAddBlockSeparator && this.renderAddBlockSeparator() }
 			</ReadableContentView>
+		);
+	}
+
+	renderAddBlockSeparator() {
+		return (
+			<View style={ styles.containerStyleAddHere } >
+				<View style={ styles.lineStyleAddHere }></View>
+				<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
+				<View style={ styles.lineStyleAddHere }></View>
+			</View>
+		);
+	}
+
+	renderBlockListFooter() {
+		const paragraphBlock = createBlock( 'core/paragraph' );
+		return (
+			<TouchableWithoutFeedback onPress={ () => {
+				this.finishInsertingOrReplacingBlock( paragraphBlock );
+			} } >
+				<View style={ styles.blockListFooter } />
+			</TouchableWithoutFeedback>
 		);
 	}
 
@@ -245,6 +281,7 @@ export class BlockList extends Component {
 export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
+			getBlock,
 			getBlockCount,
 			getBlockName,
 			getBlockIndex,
@@ -255,13 +292,15 @@ export default compose( [
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
+		const blockClientIds = getBlockOrder( rootClientId );
 
 		return {
-			blockClientIds: getBlockOrder( rootClientId ),
+			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
 			getBlockName,
 			isBlockSelected,
 			selectedBlock: getSelectedBlock(),
+			firstBlock: getBlock( blockClientIds[ 0 ] ),
 			selectedBlockClientId,
 			selectedBlockOrder: getBlockIndex( selectedBlockClientId ),
 		};
@@ -271,12 +310,14 @@ export default compose( [
 			insertBlock,
 			replaceBlock,
 			clearSelectedBlock,
+			selectBlock,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
+			selectBlock,
 		};
 	} ),
 ] )( BlockList );

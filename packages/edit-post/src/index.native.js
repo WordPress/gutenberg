@@ -2,21 +2,28 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
+import '@wordpress/block-editor';
+import '@wordpress/editor';
 import '@wordpress/notices';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { unregisterBlockType } from '@wordpress/blocks';
+import '@wordpress/format-library';
 
 /**
  * Internal dependencies
  */
 import './store';
 
-export { default as VisualEditor } from './components/visual-editor';
+let blocksRegistered = false;
 
 /**
  * Initializes the Editor.
  */
 export function initializeEditor() {
+	if ( blocksRegistered ) {
+		return;
+	}
+
 	// register and setup blocks
 	registerCoreBlocks();
 
@@ -25,5 +32,8 @@ export function initializeEditor() {
 	if ( typeof __DEV__ === 'undefined' || ! __DEV__ ) {
 		unregisterBlockType( 'core/code' );
 	}
+
+	blocksRegistered = true;
 }
 
+export { default as Editor } from './editor';

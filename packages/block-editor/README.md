@@ -353,23 +353,24 @@ Undocumented declaration.
 
 The default editor settings
 
- alignWide                     boolean       Enable/Disable Wide/Full Alignments
- availableLegacyWidgets        Array         Array of objects representing the legacy widgets available.
- colors                        Array         Palette colors
- disableCustomColors           boolean       Whether or not the custom colors are disabled
- fontSizes                     Array         Available font sizes
- disableCustomFontSizes        boolean       Whether or not the custom font sizes are disabled
- imageSizes                    Array         Available image sizes
- maxWidth                      number        Max width to constraint resizing
- allowedBlockTypes             boolean|Array Allowed block types
- hasFixedToolbar               boolean       Whether or not the editor toolbar is fixed
- hasPermissionsToManageWidgets boolean       Whether or not the user is able to manage widgets.
- focusMode                     boolean       Whether the focus mode is enabled or not
- styles                        Array         Editor Styles
- isRTL                         boolean       Whether the editor is in RTL mode
- bodyPlaceholder               string        Empty post placeholder
- titlePlaceholder              string        Empty title placeholder
- codeEditingEnabled            string        Whether or not the user can switch to the code editor
+ alignWide                              boolean       Enable/Disable Wide/Full Alignments
+ availableLegacyWidgets                 Array         Array of objects representing the legacy widgets available.
+ colors                                 Array         Palette colors
+ disableCustomColors                    boolean       Whether or not the custom colors are disabled
+ fontSizes                              Array         Available font sizes
+ disableCustomFontSizes                 boolean       Whether or not the custom font sizes are disabled
+ imageSizes                             Array         Available image sizes
+ maxWidth                               number        Max width to constraint resizing
+ allowedBlockTypes                      boolean|Array Allowed block types
+ hasFixedToolbar                        boolean       Whether or not the editor toolbar is fixed
+ hasPermissionsToManageWidgets          boolean       Whether or not the user is able to manage widgets.
+ focusMode                              boolean       Whether the focus mode is enabled or not
+ styles                                 Array         Editor Styles
+ isRTL                                  boolean       Whether the editor is in RTL mode
+ bodyPlaceholder                        string        Empty post placeholder
+ titlePlaceholder                       string        Empty title placeholder
+ codeEditingEnabled                     string        Whether or not the user can switch to the code editor
+ \_\_experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
@@ -386,6 +387,19 @@ _Related_
 _Type_
 
 -   `Object` 
+
+<a name="transformStyles" href="#transformStyles">#</a> **transformStyles**
+
+Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
+
+_Parameters_
+
+-   _styles_ `Array`: CSS rules.
+-   _wrapperClassName_ `string`: Wrapper Class Name.
+
+_Returns_
+
+-   `Array`: converted rules.
 
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 

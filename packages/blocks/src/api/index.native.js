@@ -1,4 +1,5 @@
 export {
+	cloneBlock,
 	createBlock,
 	switchToBlockType,
 } from './factory';

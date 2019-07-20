@@ -92,7 +92,6 @@ export class PostPublishButton extends Component {
 			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
 			isBusy: isSaving && isPublished,
-			isLarge: true,
 			isPrimary: true,
 			onClick: onClickButton,
 		};

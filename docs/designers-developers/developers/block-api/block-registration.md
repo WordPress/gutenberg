@@ -42,7 +42,7 @@ title: __( 'Book' )
 
 * **Type:** `String`
 
-This is a short description for your block, which can be translated with our translation functions. This will be shown in the block inspector.
+This is a short description for your block, which can be translated with our translation functions. This will be shown in the Block Tab in the Settings Sidebar.
 
 ```js
 description: __( 'Block showing a Book card.' )
@@ -174,7 +174,7 @@ attributes: {
 
 Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node.
 
-For example, a paragraph block can be transformed into a heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock)
+For example, a Paragraph block can be transformed into a Heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock)
 
 {% codetabs %}
 {% ES5 %}
@@ -274,7 +274,7 @@ transforms: {
 ```
 {% end %}
 
-A block can also be transformed into another block type. For example, a heading block can be transformed into a paragraph block.
+A block can also be transformed into another block type. For example, a Heading block can be transformed into a Paragraph block.
 
 {% codetabs %}
 {% ES5 %}
@@ -345,7 +345,7 @@ transforms: {
 {% end %}
 
 
-A block with innerBlocks can also be transformed from and to another block with innerBlocks.
+A block with InnerBlocks can also be transformed from and to another block with InnerBlocks.
 
 {% codetabs %}
 {% ES5 %}
@@ -478,7 +478,7 @@ transforms: {
 ```
 {% end %}
 
-A prefix transform is a transform that will be applied if the user prefixes some text in e.g. the paragraph block with a given pattern and a trailing space.
+A prefix transform is a transform that will be applied if the user prefixes some text in e.g. the Paragraph block with a given pattern and a trailing space.
 
 {% codetabs %}
 {% ES5 %}
@@ -520,7 +520,7 @@ transforms: {
 
 * **Type:** `Array`
 
-Blocks are able to be inserted into blocks that use [`InnerBlocks`](/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks.
 

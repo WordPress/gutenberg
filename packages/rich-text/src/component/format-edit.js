@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import { getActiveFormat } from '../get-active-format';
+import { getActiveObject } from '../get-active-object';
 
 const FormatEdit = ( { formatTypes, onChange, value } ) => {
 	return (
