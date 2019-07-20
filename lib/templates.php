@@ -32,6 +32,7 @@ function gutenberg_register_templates() {
 		$footer_template_part_id = wp_insert_post(
 			array(
 				'post_type'    => 'wp_template',
+				'post_title'   => 'Footer',
 				'post_name'    => 'footer-template-part',
 				'post_content' => "<!-- wp:paragraph -->\n<p>Template part</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:categories /-->",
 			)

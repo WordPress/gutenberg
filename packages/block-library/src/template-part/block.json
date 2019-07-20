@@ -4,6 +4,11 @@
 	"attributes": {
 		"id": {
 			"type": "number"
+		},
+		"name": {
+			"type": "string",
+			"source": "html",
+			"selector": "none"
 		}
 	}
 }

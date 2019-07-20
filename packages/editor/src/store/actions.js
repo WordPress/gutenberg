@@ -517,16 +517,14 @@ export function* savePost( options = {} ) {
 		for ( const block of allBlocks ) {
 			if ( block.name === 'core/template-part' ) {
 				const { innerBlocks, attributes } = block;
-				if ( ! attributes.id ) {
-					continue;
-				}
 				const templatePartContent = serialize( innerBlocks );
 				yield apiFetch( {
 					path: `/wp/v2/${ templatePost.post_type }/${ attributes.id }`,
-					method: 'PUT',
+					method: attributes.id ? 'PUT' : 'POST',
 					data: {
 						content: templatePartContent,
 						id: attributes.id,
+						title: attributes.name,
 					},
 				} );
 			}

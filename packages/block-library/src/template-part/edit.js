@@ -6,24 +6,27 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import { InnerBlocks, InspectorControls } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useMemo } from '@wordpress/element';
 import { parse, serialize } from '@wordpress/blocks';
+import { TextControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-export default function TemplatePartEdit( { attributes, clientId } ) {
+export default function TemplatePartEdit( { attributes, clientId, setAttributes } ) {
 	const { id } = attributes;
 
 	const {
 		rawTemplatePartContent,
 		newBlocks,
+		templatePartTitle,
+		hasInnerBlocks,
 	} = useSelect( ( select ) => {
+		const template = select( 'core' ).getEntityRecord( 'postType', 'wp_template', id );
 		return {
-			rawTemplatePartContent: get(
-				select( 'core' ).getEntityRecord( 'postType', 'wp_template', id ),
-				[ 'content', 'raw' ]
-			),
+			rawTemplatePartContent: get( template, [ 'content', 'raw' ] ),
 			newBlocks: select( 'core/block-editor' ).getBlocks( clientId ),
+			templatePartTitle: get( template, [ 'title', 'raw' ] ),
 		};
 	}, [ id, clientId ] );
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
@@ -36,20 +39,31 @@ export default function TemplatePartEdit( { attributes, clientId } ) {
 		},
 		[ rawTemplatePartContent, replaceInnerBlocks ]
 	);
+	useEffect(
+		() => {
+			setAttributes( { name: templatePartTitle } );
+		},
+		[ templatePartTitle ]
+	);
 	const newRawTemplatePartContent = useMemo( () => ( serialize( newBlocks ) ), [ newBlocks ] );
 	const DEBUG = false;
 	const innerBlocks = (
 		<InnerBlocks
 			templateLock={ false }
+			renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
 		/>
 	);
-	if ( DEBUG ) {
-		return (
-			<div>
-				<div>{ newRawTemplatePartContent === rawTemplatePartContent ? 'IS NOT DIRTY' : 'IS DIRTY' }</div>
-				{ innerBlocks }
-			</div>
-		);
-	}
-	return innerBlocks;
+	return (
+		<div>
+			<InspectorControls>
+				<TextControl
+					label={ __( 'Template part name' ) }
+					value={ attributes.name }
+					onChange={ ( value ) => ( setAttributes( { name: value } ) ) }
+				/>
+			</InspectorControls>
+			{ DEBUG && ( <div>{ newRawTemplatePartContent === rawTemplatePartContent ? 'IS NOT DIRTY' : 'IS DIRTY' }</div> ) }
+			{ innerBlocks }
+		</div>
+	);
 }
