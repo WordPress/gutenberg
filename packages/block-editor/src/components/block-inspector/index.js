@@ -27,7 +27,12 @@ const BlockInspector = ( {
 	selectedBlockClientId,
 	selectedBlockName,
 	showNoBlockSelectedMessage = true,
+	isReadOnly,
 } ) => {
+	if ( isReadOnly ) {
+		return __( 'The selected block is read-only.' );
+	}
+
 	if ( count > 1 ) {
 		return <MultiSelectionInspector />;
 	}
@@ -91,18 +96,27 @@ const BlockInspector = ( {
 
 export default withSelect(
 	( select ) => {
-		const { getSelectedBlockClientId, getSelectedBlockCount, getBlockName } = select( 'core/block-editor' );
+		const {
+			getSelectedBlockClientId,
+			getSelectedBlockCount,
+			getBlockName,
+			getTemplateLock,
+			getBlockRootClientId,
+		} = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectedBlockName = selectedBlockClientId && getBlockName( selectedBlockClientId );
 		const blockType = selectedBlockClientId && getBlockType( selectedBlockName );
 		const blockStyles = selectedBlockClientId && getBlockStyles( selectedBlockName );
+		const rootClientId = getBlockRootClientId( selectedBlockClientId );
+		const isReadOnly = getTemplateLock( rootClientId ) === 'readonly';
 		return {
 			count: getSelectedBlockCount(),
 			hasBlockStyles: blockStyles && blockStyles.length > 0,
 			selectedBlockName,
 			selectedBlockClientId,
 			blockType,
+			isReadOnly,
 		};
 	}
 )( BlockInspector );

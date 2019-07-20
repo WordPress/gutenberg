@@ -62,11 +62,12 @@ export default class ClassicEdit extends Component {
 	}
 
 	initialize() {
-		const { clientId } = this.props;
+		const { clientId, isReadOnly } = this.props;
 		const { settings } = window.wpEditorL10n.tinymce;
 		wp.oldEditor.initialize( `editor-${ clientId }`, {
 			tinymce: {
 				...settings,
+				readonly: isReadOnly,
 				inline: true,
 				content_css: false,
 				fixed_toolbar_container: `#toolbar-${ clientId }`,
@@ -176,7 +177,7 @@ export default class ClassicEdit extends Component {
 	}
 
 	render() {
-		const { clientId } = this.props;
+		const { clientId, isReadOnly } = this.props;
 
 		// Disable reasons:
 		//
@@ -190,7 +191,7 @@ export default class ClassicEdit extends Component {
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 		return [
-			<div
+			! isReadOnly && <div
 				key="toolbar"
 				id={ `toolbar-${ clientId }` }
 				ref={ ( ref ) => this.ref = ref }
