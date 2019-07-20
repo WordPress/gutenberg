@@ -10,6 +10,7 @@ import { SelectControl } from '@wordpress/components';
  * Internal dependencies
  */
 import { getModeConfig, modes } from '../../editor-modes';
+import { findDeepBlock } from '../../utils';
 
 export default function ViewEditingModePicker() {
 	const { post, blocks, settings, viewEditingMode } = useSelect( ( select ) => {
@@ -35,9 +36,7 @@ export default function ViewEditingModePicker() {
 
 		let newBlocks = blocks;
 		if ( currentModeConfig.showTemplate ) { // Leaving template mode.
-			const postContentBlock = blocks.find(
-				( block ) => block.name === 'core/post-content'
-			);
+			const postContentBlock = findDeepBlock( blocks, 'core/post-content' );
 			newBlocks = postContentBlock ? postContentBlock.innerBlocks : [];
 		}
 

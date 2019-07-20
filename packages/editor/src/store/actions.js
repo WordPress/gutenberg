@@ -37,6 +37,7 @@ import {
 import { awaitNextStateChange, getRegistry } from './controls';
 import * as sources from './block-sources';
 import { getModeConfig } from '../editor-modes';
+import { findDeepBlock } from '../utils';
 
 /**
  * Map of Registry instance to WeakMap of dependencies by custom source.
@@ -178,9 +179,7 @@ export function* setupEditor( post, edits, template, templatePost ) {
 		blocks = parse( templatePost.post_content );
 
 		// Post content is nested inside a post content block.
-		const postContentBlock = blocks.find(
-			( block ) => block.name === 'core/post-content'
-		);
+		const postContentBlock = findDeepBlock( blocks, 'core/post-content' );
 		if ( postContentBlock ) {
 			postContentBlock.innerBlocks = isNewPost ? // Apply block (post content) template.
 				synchronizeBlocksWithTemplate( postContentInnerBlocks, template ) :
@@ -496,6 +495,11 @@ export function* savePost( options = {} ) {
 	);
 
 	const viewEditingMode = yield select( STORE_KEY, 'getViewEditingMode' );
+	const allBlocks = yield select(
+		'core/block-editor',
+		'getBlocksByClientId',
+		yield select( 'core/block-editor', 'getClientIdsWithDescendants' )
+	);
 	if ( getModeConfig( viewEditingMode ).showTemplate ) {
 		const { templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
 		if ( templatePost ) {
@@ -507,14 +511,9 @@ export function* savePost( options = {} ) {
 					id: templatePost.ID,
 				},
 			} );
-			const postContentBlock = ( yield select( STORE_KEY, 'getBlocksForSerialization' ) ).find( ( block ) => block.name === 'core/post-content' );
+			const postContentBlock = allBlocks.find( ( block ) => block.name === 'core/post-content' );
 			editedPostContent = postContentBlock ? serialize( postContentBlock.innerBlocks ) : '';
 		}
-		const allBlocks = yield select(
-			'core/block-editor',
-			'getBlocksByClientId',
-			yield select( 'core/block-editor', 'getClientIdsWithDescendants' )
-		);
 		for ( const block of allBlocks ) {
 			if ( block.name === 'core/template-part' ) {
 				const { innerBlocks, attributes } = block;
