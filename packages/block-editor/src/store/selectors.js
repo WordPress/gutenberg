@@ -226,7 +226,7 @@ export const getClientIdsWithDescendants = createSelector(
  * @param {string} clientId      Block client ID.
  * @param {string} blockTypeName The name of the block type, e.g.' core/paragraph'.
  *
- * @return {Array} ids of top-level and descendant blocks.
+ * @return {boolean} True when a block an ancestor of a given block type.
  */
 export const isAncestorOfBlockTypeName = createSelector(
 	( state, clientId, blockTypeName ) => {
@@ -239,6 +239,26 @@ export const isAncestorOfBlockTypeName = createSelector(
 		state.blocks.order,
 	]
 );
+
+/**
+ * Checks whether a block is an descendant of a given block type based on its name.
+ *
+ * @param {Object} state         Global application state.
+ * @param {string} clientId      Block client ID.
+ * @param {string} blockTypeName The name of the block type, e.g.' core/paragraph'.
+ *
+ * @return {boolean} True when a block an ancestor of a given block type.
+ */
+export function isDescendantOfBlockTypeName( state, clientId, blockTypeName ) {
+	let current = clientId;
+	do {
+		current = state.blocks.parents[ current ];
+		if ( getBlockName( state, current ) === blockTypeName ) {
+			return true;
+		}
+	} while ( current );
+	return false;
+}
 
 /**
  * Returns the total number of blocks, or the total number of blocks with a specific name in a post.

@@ -102,6 +102,9 @@ function BlockListBlock( {
 	animateOnChange,
 	enableAnimation,
 	isAncestorOfPostContent,
+	noInserters,
+	noMovers,
+	noToolbars,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -355,8 +358,12 @@ function BlockListBlock( {
 
 	// If the block is selected and we're typing the block should not appear.
 	// Empty paragraph blocks should always show up as unselected.
-	const showInserterShortcuts = ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
-	const showEmptyBlockSideInserter = ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
+	const showInserterShortcuts =
+		! noInserters &&
+		( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
+	const showEmptyBlockSideInserter =
+		! noInserters &&
+		( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
 		! isFocusMode &&
 		! showEmptyBlockSideInserter &&
@@ -369,6 +376,7 @@ function BlockListBlock( {
 		! isEmptyDefaultBlock;
 	// We render block movers and block settings to keep them tabbale even if hidden
 	const shouldRenderMovers =
+		! noMovers &&
 		( isSelected || hoverArea === ( isRTL ? 'right' : 'left' ) ) &&
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
@@ -376,13 +384,14 @@ function BlockListBlock( {
 	const shouldShowBreadcrumb =
 		! isFocusMode && isHovered && ! isEmptyDefaultBlock;
 	const shouldShowContextualToolbar =
+		! noToolbars &&
 		! hasFixedToolbar &&
 		! showEmptyBlockSideInserter &&
 		(
 			( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
 			isFirstMultiSelected
 		);
-	const shouldShowMobileToolbar = shouldAppearSelected;
+	const shouldShowMobileToolbar = ! noToolbars && shouldAppearSelected;
 
 	// Insertion point can only be made visible if the block is at the
 	// the extent of a multi-selection, or not in a multi-selection.
