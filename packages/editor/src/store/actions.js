@@ -497,8 +497,9 @@ export function* savePost( options = {} ) {
 	);
 
 	const viewEditingMode = yield select( STORE_KEY, 'getViewEditingMode' );
-
-	if ( getModeConfig( viewEditingMode ).showTemplate ) {
+	const { templateParts, templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
+	const viewEditingModeObject = getModeConfig( viewEditingMode, templateParts );
+	if ( viewEditingModeObject.showTemplate ) {
 		for ( const block of allBlocks ) {
 			if ( block.name === 'core/template-part' ) {
 				const { innerBlocks, attributes } = block;
@@ -535,8 +536,6 @@ export function* savePost( options = {} ) {
 		'getEditedPostContent'
 	);
 
-	const { templateParts, templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
-	const viewEditingModeObject = getModeConfig( viewEditingMode, templateParts );
 	if ( viewEditingModeObject.showTemplate && ! viewEditingModeObject.id && templatePost ) {
 		yield apiFetch( {
 			path: `/wp/v2/${ templatePost.post_type }/${ templatePost.ID }`,
