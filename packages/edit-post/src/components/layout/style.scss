@@ -257,12 +257,29 @@
 }
 
 .is-mode-template-part {
-	background: $light-gray-500;
+	background: $light-gray-300;
 
 	& > div > div:first-child {
 		background: $white;
+		border: 1px solid $light-gray-500;
+		margin: 0 200px;
 	}
 }
+
+.is-mode-sidebar {
+	.is-mode-template-part > div > div:first-child {
+		width: 500px;
+		margin: 0 auto 100px;
+	}
+}
+
+.is-mode-footer {
+	.is-mode-template-part > div > div:first-child {
+		width: 1300px;
+		margin: 0 auto 100px;
+	}
+}
+
 
 .is-mode-focus .block-editor-block-list__block {
 	opacity: 0.2;
