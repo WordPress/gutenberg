@@ -503,15 +503,16 @@ export function* savePost( options = {} ) {
 			if ( block.name === 'core/template-part' ) {
 				const { innerBlocks, attributes } = block;
 				const templatePartContent = serialize( innerBlocks );
-				const savedPost = yield apiFetch( {
-					path: `/wp/v2/wp_template${ attributes.id ? `/${ attributes.id }` : '' }`,
-					method: attributes.id ? 'PUT' : 'POST',
-					data: {
+				const savedPost = yield dispatch(
+					'core',
+					'saveEntityRecord',
+					'postType',
+					'wp_template', {
 						content: templatePartContent,
 						id: attributes.id,
 						title: attributes.name,
-					},
-				} );
+					}
+				);
 				if ( ! attributes.id ) {
 					yield dispatch(
 						'core/block-editor',
