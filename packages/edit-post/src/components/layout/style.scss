@@ -233,12 +233,12 @@
 	}
 }
 
-.is-mode-preview .block-editor-block-list__block {
+.is-mode-focus .block-editor-block-list__block {
 	opacity: 0.2;
 }
 
-.is-mode-preview .is-ancestor-of-post-content,
-.is-mode-preview [data-type="core/post-content"],
-.is-mode-preview [data-type="core/post-content"] .block-editor-block-list__block {
+.is-mode-focus .is-ancestor-of-post-content,
+.is-mode-focus [data-type="core/post-content"],
+.is-mode-focus [data-type="core/post-content"] .block-editor-block-list__block {
 	opacity: 1;
 }

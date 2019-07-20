@@ -21,33 +21,47 @@ export const withViewEditMode = createHigherOrderComponent( ( BlockListBlock ) =
 			};
 		}, [ clientId ] );
 
-		if ( viewEditingMode !== 'preview' ) {
-			return <BlockListBlock { ...props } />;
+		if ( viewEditingMode === 'focus' ) {
+			if ( isAncestorOfPostContent ) {
+				return (
+					<BlockListBlock { ...props }
+						noInserters={ true }
+						noMovers={ true }
+						noToolbars={ true }
+					/>
+				);
+			}
+
+			if ( name === 'core/post-content' ) {
+				return (
+					<BlockListBlock { ...props }
+						noInserters={ true }
+						noMovers={ true }
+					/>
+				);
+			}
+
+			if ( isDescendantOfPostContent ) {
+				return <BlockListBlock { ...props } />;
+			}
+
+			return (
+				<Disabled>
+					<BlockListBlock { ...props } />
+				</Disabled>
+			);
 		}
 
-		if ( isAncestorOfPostContent ) {
-			return <BlockListBlock { ...props }
-				noInserters={ true }
-				noMovers={ true }
-				noToolbars={ true }
-			/>;
-		}
-
-		if ( name === 'core/post-content' ) {
-			return <BlockListBlock { ...props }
-				noMovers={ true }
-				noInserters={ true }
-			/>;
-		}
-
-		if ( isDescendantOfPostContent ) {
-			return <BlockListBlock { ...props } />;
+		if ( viewEditingMode === 'preview' ) {
+			return (
+				<Disabled>
+					<BlockListBlock { ...props } />
+				</Disabled>
+			);
 		}
 
 		return (
-			<Disabled>
-				<BlockListBlock { ...props } />
-			</Disabled>
+			<BlockListBlock { ...props } />
 		);
 	};
 }, 'withViewEditMode' );

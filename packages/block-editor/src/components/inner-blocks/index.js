@@ -120,7 +120,8 @@ class InnerBlocks extends Component {
 		const isPlaceholder = template === null && !! templateOptions;
 
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
-			'has-overlay': hasOverlay && ! isPlaceholder,
+			// Disable overlay temporarily.
+			'has-overlay': false && hasOverlay && ! isPlaceholder,
 		} );
 
 		return (
