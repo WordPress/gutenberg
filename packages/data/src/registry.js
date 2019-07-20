@@ -17,11 +17,21 @@ import createCoreDataStore from './store';
  *
  * @typedef {WPDataRegistry}
  *
- * @property {Function} registerGenericStore
- * @property {Function} registerStore
- * @property {Function} subscribe
- * @property {Function} select
- * @property {Function} dispatch
+ * @property {Function} registerGenericStore Given a namespace key and settings
+ *                                           object, registers a new generic
+ *                                           store.
+ * @property {Function} registerStore        Given a namespace key and settings
+ *                                           object, registers a new namespace
+ *                                           store.
+ * @property {Function} subscribe            Given a function callback, invokes
+ *                                           the callback on any change to state
+ *                                           within any registered store.
+ * @property {Function} select               Given a namespace key, returns an
+ *                                           object of the  store's registered
+ *                                           selectors.
+ * @property {Function} dispatch             Given a namespace key, returns an
+ *                                           object of the store's registered
+ *                                           action dispatchers.
  */
 
 /**
