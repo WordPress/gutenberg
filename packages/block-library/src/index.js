@@ -64,6 +64,7 @@ import * as tagCloud from './tag-cloud';
 import * as classic from './classic';
 
 // Top-level template blocks.
+import * as post from './post';
 import * as templatePart from './template-part';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
@@ -134,6 +135,7 @@ export const registerCoreBlocks = () => {
 		video,
 
 		// Register top-level template blocks.
+		post,
 		postTitle,
 		postContent,
 		postDate,

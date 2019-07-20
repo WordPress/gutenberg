@@ -203,6 +203,7 @@ class BlockList extends Component {
 			selectedBlockClientId,
 			multiSelectedBlockClientIds,
 			hasMultiSelection,
+			showWireframes,
 			renderAppender,
 			enableAnimation,
 		} = this.props;
@@ -220,19 +221,22 @@ class BlockList extends Component {
 							clientId={ clientId }
 							isBlockInSelection={ isBlockInSelection }
 						>
-							<BlockListBlock
-								rootClientId={ rootClientId }
-								clientId={ clientId }
-								blockRef={ this.setBlockRef }
-								onSelectionStart={ this.onSelectionStart }
-								isDraggable={ isDraggable }
+							{ showWireframes && <div className="editor-block-list__wireframe"></div> }
+							{ ! showWireframes && (
+								<BlockListBlock
+									rootClientId={ rootClientId }
+									clientId={ clientId }
+									blockRef={ this.setBlockRef }
+									onSelectionStart={ this.onSelectionStart }
+									isDraggable={ isDraggable }
 
-								// This prop is explicitely computed and passed down
-								// to avoid being impacted by the async mode
-								// otherwise there might be a small delay to trigger the animation.
-								animateOnChange={ blockClientIds }
-								enableAnimation={ enableAnimation }
-							/>
+									// This prop is explicitely computed and passed down
+									// to avoid being impacted by the async mode
+									// otherwise there might be a small delay to trigger the animation.
+									animateOnChange={ blockClientIds }
+									enableAnimation={ enableAnimation }
+								/>
+							) }
 						</BlockAsyncModeProvider>
 					);
 				} ) }
