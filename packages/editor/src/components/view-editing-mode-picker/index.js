@@ -7,9 +7,15 @@ import { useCallback } from '@wordpress/element';
 import { SelectControl } from '@wordpress/components';
 
 const options = [
-	{ value: 'post-content', label: __( 'Post content' ) },
+	{ value: 'post-content', label: __( 'Writing' ) },
 	{ value: 'preview', label: __( 'Preview' ) },
+	{ value: 'full-site', label: __( 'Full Site Editing' ) },
+	{ value: 'design', label: __( 'Design' ) },
 	{ value: 'template', label: __( 'Template' ) },
+	{ value: '---', label: __( '---' ) },
+	{ value: 'header', label: __( 'Header' ) },
+	{ value: 'sidebar', label: __( 'Sidebar' ) },
+	{ value: 'footer', label: __( 'Footer' ) },
 ];
 
 export default function ViewEditingModePicker() {
