@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { KeyboardShortcuts, withFilters } from '@wordpress/components';
+import { Disabled, KeyboardShortcuts, withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
@@ -610,6 +610,9 @@ const applyWithSelect = withSelect(
 			__unstableGetBlockWithoutInnerBlocks,
 			isAncestorOfBlockTypeName,
 		} = select( 'core/block-editor' );
+		const {
+			getViewEditingMode,
+		} = select( 'core/editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
 		const { hasFixedToolbar, focusMode, isRTL } = getSettings();
@@ -655,6 +658,7 @@ const applyWithSelect = withSelect(
 			isSelected,
 			isParentOfSelectedBlock,
 			isAncestorOfPostContent: isAncestorOfBlockTypeName( clientId, 'core/post-content' ),
+			viewEditingMode: getViewEditingMode(),
 		};
 	}
 );
@@ -746,10 +750,18 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	};
 } );
 
+const applyDisabled = ( WrappedComponent ) => ( props ) =>
+	props.viewEditingMode === 'design' ?
+		<Disabled><WrappedComponent { ...props }
+			className={ ( props.className || '' ) + ' is-disabled' }
+		/></Disabled> :
+		<WrappedComponent { ...props } />;
+
 export default compose(
 	pure,
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	applyWithSelect,
 	applyWithDispatch,
-	withFilters( 'editor.BlockListBlock' )
+	withFilters( 'editor.BlockListBlock' ),
+	applyDisabled,
 )( BlockListBlock );

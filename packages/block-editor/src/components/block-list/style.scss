@@ -7,6 +7,13 @@
 	}
 }
 
+.block-editor-block-list__layout .block-editor-block-list__block.is-disabled {
+	background-color: rgba(200, 200, 200, 0.5);
+	> .block-editor-block-list__block-edit {
+		opacity: 0.5;
+	}
+}
+
 .block-editor-block-list__layout .block-editor-block-list__block.is-selected { // Needs specificity to override inherited styles.
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {
