@@ -233,6 +233,29 @@
 	}
 }
 
+/* Settings */
+:root {
+	--offset: 2rem;
+	--max_width: 72rem;
+	--columns: 5;
+	--gutter: 1rem;
+	--color: hsla(204, 80%, 72%, 0.15);
+}
+
+/* Helper variables */
+:root {
+	--repeating-width: calc(100% / var(--columns));
+	--column-width: calc((100% / var(--columns)) - var(--gutter));
+	--background-width: calc(100% + var(--gutter));
+	--background-columns: repeating-linear-gradient(to right, var(--color), var(--color) var(--column-width), transparent var(--column-width), transparent var(--repeating-width));
+}
+
+.edit-post-layout.is-mode-design {
+	background-image: var(--background-columns);
+	background-size: var(--background-width) 100%;
+	z-index: 1000;
+}
+
 .is-mode-template-part {
 	background: $light-gray-500;
 
