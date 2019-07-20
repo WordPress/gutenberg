@@ -65,6 +65,7 @@ function SiteTitleEdit( {
 				} ) }
 				style={ {
 					color: textColor.color,
+					fontSize: '28px',
 				} }
 			/>
 		</>
