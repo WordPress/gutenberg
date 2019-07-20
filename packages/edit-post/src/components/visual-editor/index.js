@@ -43,7 +43,7 @@ function VisualEditor( { viewEditingMode } ) {
 			<WritingFlow>
 				<ObserveTyping>
 					<CopyHandler>
-						{ viewEditingMode.showTemplate && <PostTitle /> }
+						{ ! viewEditingMode.showTemplate && <PostTitle /> }
 						<BlockList />
 					</CopyHandler>
 				</ObserveTyping>
