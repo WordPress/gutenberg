@@ -432,9 +432,9 @@ function BlockListBlock( {
 			isSelected={ isSelected }
 			attributes={ attributes }
 			setAttributes={ setAttributes }
-			insertBlocksAfter={ canInsert ? undefined : onInsertBlocksAfter }
-			onReplace={ isRemovable && canInsert ? undefined : onReplace }
-			mergeBlocks={ isRemovable ? undefined : onMerge }
+			insertBlocksAfter={ canInsert ? onInsertBlocksAfter : undefined }
+			onReplace={ isRemovable && canInsert ? onReplace : undefined }
+			mergeBlocks={ isRemovable ? onMerge : undefined }
 			isReadOnly={ isReadOnly }
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
@@ -635,9 +635,9 @@ const applyWithSelect = withSelect(
 			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
-			isMovable: templateLock.has( 'move' ),
-			isRemovable: templateLock.has( 'remove' ),
-			canInsert: templateLock.has( 'insert' ),
+			isMovable: ! templateLock.has( 'move' ),
+			isRemovable: ! templateLock.has( 'remove' ),
+			canInsert: ! templateLock.has( 'insert' ),
 			isReadOnly: templateLock.has( 'attributes' ),
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,

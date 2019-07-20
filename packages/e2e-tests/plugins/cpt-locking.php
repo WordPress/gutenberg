@@ -28,7 +28,7 @@ function gutenberg_test_cpt_locking() {
 			'label'         => 'Locked Readonly Post',
 			'show_in_rest'  => true,
 			'template'      => $template,
-			'template_lock' => 'readonly',
+			'template_lock' => [ 'insert', 'remove', 'move', 'attributes' ],
 		)
 	);
 	register_post_type(

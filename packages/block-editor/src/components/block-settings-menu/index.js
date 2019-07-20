@@ -59,7 +59,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											clientId={ firstBlockClientId }
 										/>
 									) }
-									{ templateLock.has( 'insert' ) && canDuplicate && (
+									{ ! templateLock.has( 'insert' ) && canDuplicate && (
 										<MenuItem
 											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onDuplicate ) }
@@ -69,7 +69,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											{ __( 'Duplicate' ) }
 										</MenuItem>
 									) }
-									{ templateLock.has( 'insert' ) && (
+									{ ! templateLock.has( 'insert' ) && (
 										<>
 											<MenuItem
 												className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
@@ -100,7 +100,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 									/>
 								</MenuGroup>
 								<MenuGroup>
-									{ templateLock.has( 'remove' ) && (
+									{ ! templateLock.has( 'remove' ) && (
 										<MenuItem
 											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onRemove ) }

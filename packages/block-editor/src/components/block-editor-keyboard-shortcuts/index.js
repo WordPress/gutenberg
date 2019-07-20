@@ -91,27 +91,35 @@ class BlockEditorKeyboardShortcuts extends Component {
 				/>
 				{ selectedBlockClientIds.length > 0 && (
 					<BlockActions clientIds={ selectedBlockClientIds }>
-						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore } ) => (
-							<KeyboardShortcuts
-								bindGlobal
-								shortcuts={ {
-									// Prevents bookmark all Tabs shortcut in Chrome when devtools are closed.
-									// Prevents reposition Chrome devtools pane shortcut when devtools are open.
-									[ shortcuts.duplicate.raw ]: flow( preventDefault, onDuplicate ),
+						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, templateLock } ) => {
+							const list = {};
 
-									// Does not clash with any known browser/native shortcuts, but preventDefault
-									// is used to prevent any obscure unknown shortcuts from triggering.
-									[ shortcuts.removeBlock.raw ]: flow( preventDefault, onRemove ),
+							if ( ! templateLock.has( 'insert' ) ) {
+								// Prevents bookmark all Tabs shortcut in Chrome when devtools are closed.
+								// Prevents reposition Chrome devtools pane shortcut when devtools are open.
+								list[ shortcuts.duplicate.raw ] = flow( preventDefault, onDuplicate );
 
-									// Prevent 'view recently closed tabs' in Opera using preventDefault.
-									[ shortcuts.insertBefore.raw ]: flow( preventDefault, onInsertBefore ),
+								// Prevent 'view recently closed tabs' in Opera using preventDefault.
+								list[ shortcuts.insertBefore.raw ] = flow( preventDefault, onInsertBefore );
 
-									// Does not clash with any known browser/native shortcuts, but preventDefault
-									// is used to prevent any obscure unknown shortcuts from triggering.
-									[ shortcuts.insertAfter.raw ]: flow( preventDefault, onInsertAfter ),
-								} }
-							/>
-						) }
+								// Does not clash with any known browser/native shortcuts, but preventDefault
+								// is used to prevent any obscure unknown shortcuts from triggering.
+								list[ shortcuts.insertAfter.raw ] = flow( preventDefault, onInsertAfter );
+							}
+
+							if ( ! templateLock.has( 'remove' ) ) {
+								// Does not clash with any known browser/native shortcuts, but preventDefault
+								// is used to prevent any obscure unknown shortcuts from triggering.
+								list[ shortcuts.removeBlock.raw ] = flow( preventDefault, onRemove );
+							}
+
+							return (
+								<KeyboardShortcuts
+									bindGlobal
+									shortcuts={ list }
+								/>
+							);
+						} }
 					</BlockActions>
 				) }
 			</>
