@@ -319,6 +319,7 @@ class RichTextWraper extends Component {
 		} = this.props;
 
 		const adjustedAllowedFormats = this.getAllowedFormats();
+		const showToolbar = ! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
 		let adjustedValue = originalValue;
 		let adjustedOnChange = originalOnChange;
 
@@ -369,12 +370,12 @@ class RichTextWraper extends Component {
 								onChange={ onChange }
 							/>
 						) }
-						{ isSelected && ! inlineToolbar && adjustedAllowedFormats.length > 0 && (
+						{ isSelected && ! inlineToolbar && showToolbar && (
 							<BlockFormatControls>
 								<FormatToolbar />
 							</BlockFormatControls>
 						) }
-						{ isSelected && inlineToolbar && adjustedAllowedFormats.length > 0 && (
+						{ isSelected && inlineToolbar && showToolbar && (
 							<IsolatedEventContainer
 								className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar"
 							>
