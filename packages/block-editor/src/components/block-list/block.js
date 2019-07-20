@@ -671,7 +671,12 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 
 	return {
 		setAttributes( newAttributes ) {
-			const { clientId } = ownProps;
+			const { clientId, isReadOnly } = ownProps;
+
+			if ( isReadOnly ) {
+				return;
+			}
+
 			updateBlockAttributes( clientId, newAttributes );
 		},
 		onSelect( clientId = ownProps.clientId, initialPosition ) {
