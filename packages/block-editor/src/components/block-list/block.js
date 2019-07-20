@@ -396,8 +396,11 @@ function BlockListBlock( {
 	// Insertion point can only be made visible if the block is at the
 	// the extent of a multi-selection, or not in a multi-selection.
 	const shouldShowInsertionPoint =
-		( isPartOfMultiSelection && isFirstMultiSelected ) ||
-		! isPartOfMultiSelection;
+		! noInserters &&
+		(
+			( isPartOfMultiSelection && isFirstMultiSelected ) ||
+			! isPartOfMultiSelection
+		);
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.

@@ -34,7 +34,10 @@ export const withViewEditMode = createHigherOrderComponent( ( BlockListBlock ) =
 		}
 
 		if ( name === 'core/post-content' ) {
-			return <BlockListBlock { ...props } noMovers={ true } />;
+			return <BlockListBlock { ...props }
+				noMovers={ true }
+				noInserters={ true }
+			/>;
 		}
 
 		if ( isDescendantOfPostContent ) {
