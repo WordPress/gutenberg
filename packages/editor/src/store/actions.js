@@ -509,6 +509,28 @@ export function* savePost( options = {} ) {
 			const postContentBlock = ( yield select( STORE_KEY, 'getBlocksForSerialization' ) ).find( ( block ) => block.name === 'core/post-content' );
 			editedPostContent = postContentBlock ? serialize( postContentBlock.innerBlocks ) : '';
 		}
+		const allBlocks = yield select(
+			'core/block-editor',
+			'getBlocksByClientId',
+			yield select( 'core/block-editor', 'getClientIdsWithDescendants' )
+		);
+		for ( const block of allBlocks ) {
+			if ( block.name === 'core/template-part' ) {
+				const { innerBlocks, attributes } = block;
+				if ( ! attributes.id ) {
+					continue;
+				}
+				const templatePartContent = serialize( innerBlocks );
+				yield apiFetch( {
+					path: `/wp/v2/${ templatePost.post_type }/${ attributes.id }`,
+					method: 'PUT',
+					data: {
+						content: templatePartContent,
+						id: attributes.id,
+					},
+				} );
+			}
+		}
 	}
 
 	const shouldSaveSiteOptions = yield select( 'core', 'isSiteOptionsDirty' );
