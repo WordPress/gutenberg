@@ -125,6 +125,54 @@ function gutenberg_filter_block_editor_settings( $editor_settings, $post ) {
 add_filter( 'block_editor_settings', 'gutenberg_filter_block_editor_settings', 10, 2 );
 
 /**
+ * Returns an array of paths to template parts that should be preloaded, based on what template part blocks exist in the blocks passed.
+ *
+ * @param array $blocks Array of block objects.
+ *
+ * @return array Array of paths to template parts posts.
+ */
+function get_template_part_preload_paths( $blocks ) {
+	if ( empty( $blocks ) ) {
+		return array();
+	}
+	$parts = array();
+	foreach ( $blocks as $block ) {
+		if ( 'core/template-part' === $block['blockName'] &&
+			isset( $block['attrs']['id'] )
+		) {
+			$parts[] = sprintf( '/wp/v2/wp_template/%s?context=edit', $block['attrs']['id'] );
+		}
+		$parts = array_merge(
+			$parts,
+			get_template_part_preload_paths( $block['innerBlocks'] )
+		);
+	}
+	return $parts;
+}
+
+/**
+ * Filter the  preload_paths to include paths to template part posts referenced in the current post template.
+ *
+ * @param array $preload_paths Array of paths to preload.
+ *
+ * @return array Array of paths to preload with template part paths added.
+ */
+function gutenberg_preload_template_parts( $preload_paths ) {
+	global $post;
+	$post_type_object = get_post_type_object( get_post_type( $post ) );
+	if ( ! empty( $post_type_object->template_post ) ) {
+		$blocks = parse_blocks( $post_type_object->template_post->post_content );
+		return array_merge(
+			$preload_paths,
+			get_template_part_preload_paths( $blocks )
+		);
+	}
+	return $preload_paths;
+}
+
+add_filter( 'block_editor_preload_paths', 'gutenberg_preload_template_parts' );
+
+/**
  * Filters template inclusion in pages to hijack the `single.php` template
  * and load the Gutenberg editable counterpart instead.
  *
