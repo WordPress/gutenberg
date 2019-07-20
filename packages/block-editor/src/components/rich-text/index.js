@@ -275,6 +275,7 @@ class RichTextWraper extends Component {
 			onCreateUndoLevel,
 			placeholder,
 			keepPlaceholderOnFocus,
+			allowedFormats,
 			withoutInteractiveFormatting,
 			// eslint-disable-next-line no-unused-vars
 			onRemove,
@@ -318,6 +319,7 @@ class RichTextWraper extends Component {
 				className={ classnames( classes, className ) }
 				placeholder={ placeholder }
 				keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
+				allowedFormats={ allowedFormats }
 				withoutInteractiveFormatting={ withoutInteractiveFormatting }
 				onEnter={ this.onEnter }
 				onDelete={ this.onDelete }
@@ -343,12 +345,12 @@ class RichTextWraper extends Component {
 								onChange={ onChange }
 							/>
 						) }
-						{ isSelected && ! inlineToolbar && (
+						{ isSelected && ! inlineToolbar && allowedFormats.length > 0 && (
 							<BlockFormatControls>
 								<FormatToolbar />
 							</BlockFormatControls>
 						) }
-						{ isSelected && inlineToolbar && (
+						{ isSelected && inlineToolbar && allowedFormats.length > 0 && (
 							<IsolatedEventContainer
 								className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar"
 							>

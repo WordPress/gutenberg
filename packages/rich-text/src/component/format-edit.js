@@ -28,56 +28,55 @@ const interactiveContentTags = new Set( [
 	'video',
 ] );
 
-const FormatEdit = ( { formatTypes, onChange, value, withoutInteractiveFormatting } ) => {
-	return (
-		<>
-			{ formatTypes.map( ( {
-				name,
-				edit: Edit,
-				tagName,
-			} ) => {
-				if ( ! Edit ) {
-					return null;
+const FormatEdit = ( {
+	formatTypes,
+	onChange,
+	value,
+	allowedFormats,
+	withoutInteractiveFormatting,
+} ) =>
+	formatTypes.map( ( {
+		name,
+		edit: Edit,
+		tagName,
+	} ) => {
+		if ( ! Edit ) {
+			return null;
+		}
+
+		if ( allowedFormats && allowedFormats.indexOf( name ) === -1 ) {
+			return null;
+		}
+
+		if (
+			withoutInteractiveFormatting &&
+			interactiveContentTags.has( tagName )
+		) {
+			return null;
+		}
+
+		const activeFormat = getActiveFormat( value, name );
+		const isActive = activeFormat !== undefined;
+		const activeObject = getActiveObject( value );
+		const isObjectActive = activeObject !== undefined;
+
+		return (
+			<Edit
+				key={ name }
+				isActive={ isActive }
+				activeAttributes={
+					isActive ? activeFormat.attributes || {} : {}
 				}
-
-				if (
-					withoutInteractiveFormatting &&
-					interactiveContentTags.has( tagName )
-				) {
-					return null;
+				isObjectActive={ isObjectActive }
+				activeObjectAttributes={
+					isObjectActive ? activeObject.attributes || {} : {}
 				}
+				value={ value }
+				onChange={ onChange }
+			/>
+		);
+	} );
 
-				const activeFormat = getActiveFormat( value, name );
-				const isActive = activeFormat !== undefined;
-				const activeObject = getActiveObject( value );
-				const isObjectActive = activeObject !== undefined;
-
-				return (
-					<Edit
-						key={ name }
-						isActive={ isActive }
-						activeAttributes={
-							isActive ? activeFormat.attributes || {} : {}
-						}
-						isObjectActive={ isObjectActive }
-						activeObjectAttributes={
-							isObjectActive ? activeObject.attributes || {} : {}
-						}
-						value={ value }
-						onChange={ onChange }
-					/>
-				);
-			} ) }
-		</>
-	);
-};
-
-export default withSelect(
-	( select ) => {
-		const { getFormatTypes } = select( 'core/rich-text' );
-
-		return {
-			formatTypes: getFormatTypes(),
-		};
-	}
-)( FormatEdit );
+export default withSelect( ( select ) => ( {
+	formatTypes: select( 'core/rich-text' ).getFormatTypes(),
+} ) )( FormatEdit );

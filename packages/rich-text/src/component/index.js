@@ -864,6 +864,7 @@ class RichText extends Component {
 			__unstableAutocompleters: autocompleters,
 			__unstableAutocomplete: Autocomplete = ( { children: ch } ) => ch( {} ),
 			__unstableOnReplace: onReplace,
+			allowedFormats,
 			withoutInteractiveFormatting,
 		} = this.props;
 
@@ -910,6 +911,7 @@ class RichText extends Component {
 					</Tagname>
 				}
 				{ isSelected && <FormatEdit
+					allowedFormats={ allowedFormats }
 					withoutInteractiveFormatting={ withoutInteractiveFormatting }
 					value={ record }
 					onChange={ this.onChange }
