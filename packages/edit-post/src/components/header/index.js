@@ -39,8 +39,8 @@ function Header( {
 				<FullscreenModeClose />
 				<HeaderToolbar />
 			</div>
+			<ViewEditingModePicker />
 			<div className="edit-post-header__settings">
-				<ViewEditingModePicker />
 				<PublishControls />
 				<div>
 					<IconButton
