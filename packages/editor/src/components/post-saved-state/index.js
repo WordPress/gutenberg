@@ -55,6 +55,7 @@ export class PostSavedState extends Component {
 			isAutosaving,
 			isPending,
 			isLargeViewport,
+			viewEditingMode,
 		} = this.props;
 		const { forceSavedMessage } = this.state;
 		if ( isSaving ) {
@@ -97,7 +98,10 @@ export class PostSavedState extends Component {
 			return null;
 		}
 
-		const label = isPending ? __( 'Save as Pending' ) : __( 'Save Draft' );
+		let label = isPending ? __( 'Save Draft as Pending' ) : __( 'Save Draft' );
+		if ( viewEditingMode ) {
+			label += ' & Template';
+		}
 		if ( ! isLargeViewport ) {
 			return (
 				<IconButton
@@ -135,6 +139,7 @@ export default compose( [
 			getCurrentPost,
 			isAutosavingPost,
 			getEditedPostAttribute,
+			getViewEditingMode,
 		} = select( 'core/editor' );
 		return {
 			post: getCurrentPost(),
@@ -146,6 +151,7 @@ export default compose( [
 			isSaveable: isEditedPostSaveable(),
 			isAutosaving: isAutosavingPost(),
 			isPending: 'pending' === getEditedPostAttribute( 'status' ),
+			viewEditingMode: getViewEditingMode(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
