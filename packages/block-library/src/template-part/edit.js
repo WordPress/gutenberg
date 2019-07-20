@@ -23,10 +23,12 @@ export default function TemplatePartEdit( { attributes, clientId, setAttributes 
 		hasInnerBlocks,
 	} = useSelect( ( select ) => {
 		const template = id && select( 'core' ).getEntityRecord( 'postType', 'wp_template', id );
+		const blocks = select( 'core/block-editor' ).getBlocks( clientId );
 		return {
 			rawTemplatePartContent: get( template, [ 'content', 'raw' ] ),
-			newBlocks: select( 'core/block-editor' ).getBlocks( clientId ),
+			newBlocks: blocks,
 			templatePartTitle: get( template, [ 'title', 'raw' ] ),
+			hasInnerBlocks: blocks && blocks.length > 0,
 		};
 	}, [ id, clientId ] );
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
