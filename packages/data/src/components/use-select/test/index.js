@@ -136,7 +136,7 @@ describe( 'useSelect', () => {
 		const getComponent = ( mapSelectSpy, dependencyKey ) => ( props ) => {
 			const dependencies = props[ dependencyKey ];
 			mapSelectSpy.mockImplementation(
-				( select ) => select( 'testStore' ).testSelector( props.keyName )
+				( select ) => select( 'testStore' ).testSelector()
 			);
 			const data = useSelect( mapSelectSpy, [ dependencies ] );
 			return <div data={ data } />;
