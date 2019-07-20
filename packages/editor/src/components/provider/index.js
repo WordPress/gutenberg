@@ -54,12 +54,14 @@ class EditorProvider extends Component {
 			return;
 		}
 
+		const viewEditingMode = getModeConfig( props.viewEditingMode );
+		props.updateViewEditingMode( viewEditingMode.value );
 		props.updatePostLock( props.settings.postLock );
 		props.setupEditor(
 			props.post,
 			props.initialEdits,
 			props.settings.template,
-			getModeConfig( props.viewEditingMode ).showTemplate && props.settings.templatePost
+			viewEditingMode.showTemplate && props.settings.templatePost
 		);
 
 		if ( props.settings.autosave ) {
@@ -204,6 +206,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
+			updateViewEditingMode,
 			setupEditor,
 			updatePostLock,
 			resetEditorBlocks,
@@ -213,6 +216,7 @@ export default compose( [
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
 		return {
+			updateViewEditingMode,
 			setupEditor,
 			updatePostLock,
 			createWarningNotice,

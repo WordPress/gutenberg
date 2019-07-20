@@ -16,11 +16,8 @@ export const modes = [
 	{ value: 'design', label: __( 'Design' ), showTemplate: true },
 	{ value: 'template', label: __( 'Template' ), showTemplate: true },
 	{ value: '---', label: __( '---' ), showTemplate: true },
-	{ value: 'header', label: __( 'Header' ), showTemplate: true },
-	{ value: 'sidebar', label: __( 'Sidebar' ), showTemplate: true },
-	{ value: 'footer', label: __( 'Footer' ), showTemplate: true },
 ];
 
-export const getModeConfig = ( modeId ) => {
-	return find( modes, ( mode ) => mode.value === modeId );
+export const getModeConfig = ( modeId, dynamicModes = [] ) => {
+	return find( [ ...modes, ...dynamicModes ], ( mode ) => mode.value === modeId ) || modes[ 0 ];
 };

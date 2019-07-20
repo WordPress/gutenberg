@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { SelectControl } from '@wordpress/components';
 
 /**
@@ -30,8 +30,8 @@ export default function ViewEditingModePicker() {
 	const { setupEditor, updateViewEditingMode } = useDispatch( 'core/editor' );
 
 	const updateViewEditingModeCallback = useCallback( ( newViewEditingMode ) => {
-		const currentModeConfig = getModeConfig( viewEditingMode );
-		const newModeConfig = getModeConfig( newViewEditingMode );
+		const currentModeConfig = getModeConfig( viewEditingMode, settings.templateParts );
+		const newModeConfig = getModeConfig( newViewEditingMode, settings.templateParts );
 		updateViewEditingMode( newViewEditingMode );
 
 		let newBlocks = blocks;
@@ -46,7 +46,8 @@ export default function ViewEditingModePicker() {
 				blocks: newBlocks,
 			},
 			settings.template,
-			newModeConfig.showTemplate && settings.templatePost
+			newModeConfig.showTemplate && settings.templatePost,
+			newModeConfig.id
 		);
 	}, [ post, blocks, settings.template, settings.templatePost, viewEditingMode ] );
 
@@ -55,7 +56,7 @@ export default function ViewEditingModePicker() {
 			className="editor-view-editing-mode-picker"
 			label={ __( 'View Editing Mode' ) }
 			hideLabelFromVision
-			options={ modes }
+			options={ useMemo( () => [ ...modes, ...( settings.templateParts || [] ) ], [ settings.templateParts ] ) }
 			value={ viewEditingMode }
 			onChange={ updateViewEditingModeCallback }
 		/>

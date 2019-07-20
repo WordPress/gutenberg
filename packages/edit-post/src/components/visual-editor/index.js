@@ -50,8 +50,10 @@ function VisualEditor( { hasPostTitle } ) {
 }
 
 export default withSelect( ( select ) => {
-	const viewEditingMode = select( 'core/editor' ).getViewEditingMode();
+	const { getViewEditingMode, getEditorSettings } = select( 'core/editor' );
+	const viewEditingMode = getViewEditingMode();
+	const templateParts = getEditorSettings().templateParts;
 	return {
-		hasPostTitle: ! getModeConfig( viewEditingMode ).showTemplate,
+		hasPostTitle: ! getModeConfig( viewEditingMode, templateParts ).showTemplate,
 	};
 } )( VisualEditor );

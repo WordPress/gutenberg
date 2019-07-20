@@ -6,9 +6,7 @@
 			"type": "number"
 		},
 		"name": {
-			"type": "string",
-			"source": "html",
-			"selector": "none"
+			"type": "string"
 		}
 	}
 }

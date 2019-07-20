@@ -37,7 +37,7 @@ import {
 import { awaitNextStateChange, getRegistry } from './controls';
 import * as sources from './block-sources';
 import { getModeConfig } from '../editor-modes';
-import { findDeepBlock } from '../utils';
+import { findDeepBlock, findDeepBlocks } from '../utils';
 
 /**
  * Map of Registry instance to WeakMap of dependencies by custom source.
@@ -159,8 +159,9 @@ function* resetLastBlockSourceDependencies( sourcesToUpdate = Object.values( sou
  * @param {Object}  edits        Initial edited attributes object.
  * @param {Array?}  template     Block Template.
  * @param {Object?} templatePost Post's template post object.
+ * @param {string?} templatePartId
  */
-export function* setupEditor( post, edits, template, templatePost ) {
+export function* setupEditor( post, edits, template, templatePost, templatePartId ) {
 	// In order to ensure maximum of a single parse during setup, edits are
 	// included as part of editor setup action. Assume edited content as
 	// canonical if provided, falling back to post.
@@ -177,6 +178,11 @@ export function* setupEditor( post, edits, template, templatePost ) {
 	if ( templatePost ) { // Apply template post.
 		const postContentInnerBlocks = blocks;
 		blocks = parse( templatePost.post_content );
+
+		if ( templatePartId ) {
+			const templatePartBlocks = findDeepBlocks( blocks, 'core/template-part' );
+			blocks = [ templatePartBlocks.find( ( block ) => block.attributes.id === templatePartId ) ];
+		}
 
 		// Post content is nested inside a post content block.
 		const postContentBlock = findDeepBlock( blocks, 'core/post-content' );
@@ -528,20 +534,19 @@ export function* savePost( options = {} ) {
 		'getEditedPostContent'
 	);
 
-	if ( getModeConfig( viewEditingMode ).showTemplate ) {
-		const { templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
-		if ( templatePost ) {
-			yield apiFetch( {
-				path: `/wp/v2/${ templatePost.post_type }/${ templatePost.ID }`,
-				method: 'PUT',
-				data: {
-					content: editedPostContent,
-					id: templatePost.ID,
-				},
-			} );
-			const postContentBlock = allBlocks.find( ( block ) => block.name === 'core/post-content' );
-			editedPostContent = postContentBlock ? serialize( postContentBlock.innerBlocks ) : '';
-		}
+	const { templateParts, templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
+	const viewEditingModeObject = getModeConfig( viewEditingMode, templateParts );
+	if ( viewEditingModeObject.showTemplate && ! viewEditingModeObject.id && templatePost ) {
+		yield apiFetch( {
+			path: `/wp/v2/${ templatePost.post_type }/${ templatePost.ID }`,
+			method: 'PUT',
+			data: {
+				content: editedPostContent,
+				id: templatePost.ID,
+			},
+		} );
+		const postContentBlock = allBlocks.find( ( block ) => block.name === 'core/post-content' );
+		editedPostContent = postContentBlock ? serialize( postContentBlock.innerBlocks ) : '';
 	}
 
 	const shouldSaveSiteOptions = yield select( 'core', 'isSiteOptionsDirty' );
@@ -1044,6 +1049,21 @@ export function* resetEditorBlocks( blocks, options = {} ) {
  * @return {Object} Action object
  */
 export function updateEditorSettings( settings ) {
+	if ( settings.templatePost ) {
+		const templatePartBlocks = findDeepBlocks(
+			parse( settings.templatePost.post_content ),
+			'core/template-part'
+		);
+		settings = {
+			...settings,
+			templateParts: templatePartBlocks.map( ( block ) => ( {
+				value: block.attributes.name.toLowerCase(),
+				label: block.attributes.name,
+				showTemplate: true,
+				id: block.attributes.id,
+			} ) ),
+		};
+	}
 	return {
 		type: 'UPDATE_EDITOR_SETTINGS',
 		settings,

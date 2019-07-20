@@ -13,3 +13,15 @@ export const findDeepBlock = ( blocksToSearch, blockName ) => {
 		}
 	}
 };
+
+export const findDeepBlocks = ( blocksToSearch, blockName, foundBlocks = [] ) => {
+	foundBlocks.push( ...blocksToSearch.filter( ( block ) => block.name === blockName ) );
+
+	for ( const block of blocksToSearch ) {
+		if ( block.innerBlocks ) {
+			foundBlocks.push( ...findDeepBlocks( block.innerBlocks, blockName ) );
+		}
+	}
+
+	return foundBlocks;
+};

@@ -61,6 +61,7 @@ export class PostSavedState extends Component {
 			isPending,
 			isLargeViewport,
 			viewEditingMode,
+			templateParts,
 		} = this.props;
 		const { forceSavedMessage } = this.state;
 		if ( isSaving ) {
@@ -104,8 +105,11 @@ export class PostSavedState extends Component {
 		}
 
 		let label = isPending ? __( 'Save Draft as Pending' ) : __( 'Save Draft' );
-		if ( getModeConfig( viewEditingMode ).showTemplate ) {
-			label += ' & Template';
+		const viewEditingModeObject = getModeConfig( viewEditingMode, templateParts );
+		if ( viewEditingModeObject.showTemplate ) {
+			label = viewEditingModeObject.id ?
+				`Save ${ viewEditingModeObject.label }` :
+				`${ label } & Template`;
 		}
 		if ( ! isLargeViewport ) {
 			return (
@@ -145,6 +149,7 @@ export default compose( [
 			isAutosavingPost,
 			getEditedPostAttribute,
 			getViewEditingMode,
+			getEditorSettings,
 		} = select( 'core/editor' );
 		return {
 			post: getCurrentPost(),
@@ -157,6 +162,7 @@ export default compose( [
 			isAutosaving: isAutosavingPost(),
 			isPending: 'pending' === getEditedPostAttribute( 'status' ),
 			viewEditingMode: getViewEditingMode(),
+			templateParts: getEditorSettings().templateParts,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

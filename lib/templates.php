@@ -85,7 +85,7 @@ function gutenberg_register_templates() {
 				<!-- /wp:group --></div>
 				<!-- /wp:column --></div>
 				<!-- /wp:columns -->
-				<!-- wp:template-part {"id":' . $footer_template_part_id . '} /-->',
+				<!-- wp:template-part {"id":' . $footer_template_part_id . ',"name":"Footer"} /-->',
 			)
 		);
 		$template    = get_post( $template_id );
