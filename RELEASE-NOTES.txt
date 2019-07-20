@@ -2,6 +2,7 @@
 ------
 * Adding a block from the post title now shows the add block here indicator.
 * Deselect post title any time a block is added
+* Fix merging of empty paragraph blocks when added from a post's title
 
 1.9.0
 ------
