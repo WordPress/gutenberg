@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -26,15 +31,19 @@ import {
 import BlockInspectorButton from './block-inspector-button';
 import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-settings-menu-group';
 
-function VisualEditor( { hasPostTitle } ) {
+function VisualEditor( { viewEditingMode } ) {
 	return (
-		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
+		<BlockSelectionClearer
+			className={ classnames( 'edit-post-visual-editor editor-styles-wrapper', {
+				'is-mode-template-part': Boolean( viewEditingMode.id ),
+			} ) }
+		>
 			<VisualEditorGlobalKeyboardShortcuts />
 			<MultiSelectScrollIntoView />
 			<WritingFlow>
 				<ObserveTyping>
 					<CopyHandler>
-						{ hasPostTitle && <PostTitle /> }
+						{ viewEditingMode.showTemplate && <PostTitle /> }
 						<BlockList />
 					</CopyHandler>
 				</ObserveTyping>
@@ -54,6 +63,6 @@ export default withSelect( ( select ) => {
 	const viewEditingMode = getViewEditingMode();
 	const templateParts = getEditorSettings().templateParts;
 	return {
-		hasPostTitle: ! getModeConfig( viewEditingMode, templateParts ).showTemplate,
+		viewEditingMode: getModeConfig( viewEditingMode, templateParts ),
 	};
 } )( VisualEditor );

@@ -8,5 +8,8 @@
 		"name": {
 			"type": "string"
 		}
+	},
+	"supports": {
+		"align": ["full"]
 	}
 }

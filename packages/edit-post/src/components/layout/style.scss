@@ -233,6 +233,14 @@
 	}
 }
 
+.is-mode-template-part {
+	background: $light-gray-500;
+
+	& > div > div:first-child {
+		background: $white;
+	}
+}
+
 .is-mode-focus .block-editor-block-list__block {
 	opacity: 0.2;
 }

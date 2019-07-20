@@ -548,6 +548,8 @@ export function* savePost( options = {} ) {
 		} );
 		const postContentBlock = allBlocks.find( ( block ) => block.name === 'core/post-content' );
 		editedPostContent = postContentBlock ? serialize( postContentBlock.innerBlocks ) : '';
+	} else if ( viewEditingModeObject.id ) {
+		editedPostContent = post.content;
 	}
 
 	const shouldSaveSiteOptions = yield select( 'core', 'isSiteOptionsDirty' );
