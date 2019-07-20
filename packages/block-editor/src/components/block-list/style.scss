@@ -8,9 +8,16 @@
 }
 
 .block-editor-block-list__layout .block-editor-block-list__block.is-disabled {
-	background-color: rgba(200, 200, 200, 0.5);
+	background-color: rgba(200, 200, 200, 0.2);
 	> .block-editor-block-list__block-edit {
-		opacity: 0.5;
+		// opacity: 0.5;
+	}
+	// &::before {
+	// 	content: 'h';
+	// }
+
+	.editor-rich-text {
+		background: #ccc !important;
 	}
 }
 
