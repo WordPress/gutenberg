@@ -407,7 +407,8 @@ const RichTextContainer = compose( [
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 
-		const isReadOnly = getTemplateLock( getBlockRootClientId( clientId ) ) === 'readonly';
+		const rootClientId = getBlockRootClientId( clientId );
+		const isReadOnly = getTemplateLock( rootClientId ).has( 'attributes' );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 		const { __experimentalCanUserUseUnfilteredHTML } = getSettings();

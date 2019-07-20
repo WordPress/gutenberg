@@ -68,8 +68,6 @@ function BlockListBlock( {
 	mode,
 	isFocusMode,
 	hasFixedToolbar,
-	isLocked,
-	isReadOnly,
 	clientId,
 	rootClientId,
 	isSelected,
@@ -79,6 +77,9 @@ function BlockListBlock( {
 	isCaretWithinFormattedText,
 	isEmptyDefaultBlock,
 	isMovable,
+	isRemovable,
+	canInsert,
+	isReadOnly,
 	isParentOfSelectedBlock,
 	isDraggable,
 	isSelectionEnabled,
@@ -281,27 +282,27 @@ function BlockListBlock( {
 
 		// These block shortcuts should only trigger if the wrapper of the block is selected
 		// And when it's not a multi-selection to avoid conflicting with RichText/Inputs and multiselection.
-		if (
-			! isSelected ||
-			target !== wrapper.current ||
-			isLocked
-		) {
+		if ( ! isSelected || target !== wrapper.current ) {
 			return;
 		}
 
 		switch ( keyCode ) {
 			case ENTER:
-				// Insert default block after current block if enter and event
-				// not already handled by descendant.
-				onInsertDefaultBlockAfter();
-				event.preventDefault();
+				if ( canInsert ) {
+					// Insert default block after current block if enter and
+					// event not already handled by descendant.
+					onInsertDefaultBlockAfter();
+					event.preventDefault();
+				}
 				break;
 
 			case BACKSPACE:
 			case DELETE:
-				// Remove block on backspace.
-				onRemove( clientId );
-				event.preventDefault();
+				if ( isRemovable ) {
+					// Remove block on backspace.
+					onRemove( clientId );
+					event.preventDefault();
+				}
 				break;
 		}
 	};
@@ -431,9 +432,9 @@ function BlockListBlock( {
 			isSelected={ isSelected }
 			attributes={ attributes }
 			setAttributes={ setAttributes }
-			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
-			onReplace={ isLocked ? undefined : onReplace }
-			mergeBlocks={ isLocked ? undefined : onMerge }
+			insertBlocksAfter={ canInsert ? undefined : onInsertBlocksAfter }
+			onReplace={ isRemovable && canInsert ? undefined : onReplace }
+			mergeBlocks={ isRemovable ? undefined : onMerge }
 			isReadOnly={ isReadOnly }
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
@@ -634,9 +635,10 @@ const applyWithSelect = withSelect(
 			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
-			isMovable: templateLock !== 'all' && templateLock !== 'readonly',
-			isLocked: !! templateLock,
-			isReadOnly: templateLock === 'readonly',
+			isMovable: templateLock.has( 'move' ),
+			isRemovable: templateLock.has( 'remove' ),
+			canInsert: templateLock.has( 'insert' ),
+			isReadOnly: templateLock.has( 'attributes' ),
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 			isLast: index === blockOrder.length - 1,

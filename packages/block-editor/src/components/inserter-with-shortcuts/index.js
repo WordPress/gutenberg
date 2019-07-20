@@ -52,7 +52,7 @@ export default compose(
 		const { getInserterItems, getTemplateLock } = select( 'core/block-editor' );
 		return {
 			items: getInserterItems( rootClientId ),
-			isLocked: !! getTemplateLock( rootClientId ),
+			isLocked: getTemplateLock( rootClientId ).has( 'insert' ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

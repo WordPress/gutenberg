@@ -327,7 +327,9 @@ Undocumented declaration.
 
 <a name="PlainText" href="#PlainText">#</a> **PlainText**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/plain-text/README.md>
 
 <a name="PreserveScrollInReorder" href="#PreserveScrollInReorder">#</a> **PreserveScrollInReorder**
 

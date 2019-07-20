@@ -18,7 +18,7 @@ export default compose( [
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		const rootClientId = getBlockRootClientId( clientId );
-		const isReadOnly = getTemplateLock( rootClientId ) === 'readonly';
+		const isReadOnly = getTemplateLock( rootClientId ).has( 'attributes' );
 		return { isReadOnly };
 	} ),
 	ifCondition( ( { isReadOnly } ) => ! isReadOnly ),

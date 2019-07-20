@@ -109,7 +109,7 @@ export default withSelect(
 		const blockType = selectedBlockClientId && getBlockType( selectedBlockName );
 		const blockStyles = selectedBlockClientId && getBlockStyles( selectedBlockName );
 		const rootClientId = getBlockRootClientId( selectedBlockClientId );
-		const isReadOnly = getTemplateLock( rootClientId ) === 'readonly';
+		const isReadOnly = getTemplateLock( rootClientId ).has( 'attributes' );
 		return {
 			count: getSelectedBlockCount(),
 			hasBlockStyles: blockStyles && blockStyles.length > 0,

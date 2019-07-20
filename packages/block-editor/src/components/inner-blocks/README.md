@@ -161,17 +161,27 @@ If true when child blocks in the template are inserted the selection is updated.
 If false the selection should not be updated when child blocks specified in the template are inserted.
 
 ### `templateLock`
-* **Type:** `String|Boolean`
+* **Type:** `Array|String|Boolean`
 
 Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/developers/block-api/block-templates.md#locking).
 
 Template locking allows locking the `InnerBlocks` area for the current template.
-*Options:*
 
-- `'readonly'` — prevents all operations. It is not possible to edit any blocks, insert new blocks, or move or delete existing blocks.
-- `'all'` — prevents all block operations. It is not possible to insert new blocks. Move existing blocks or delete them.
-- `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
-- `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
+*Array options:*
+
+- `'insert'` — prevents new blocks from being inserted.
+- `'move'` — prevents blocks form being moved.
+- `'remove'` — prevents blocks from being removed.
+- `'attributes'` - prevents block attributes from being edited.
+
+*String options:*
+
+- `'all'` = `[ 'insert', 'move', 'remove' ]`.
+- `'insert'` = `[ 'insert', 'remove' ]`.
+
+*Boolean options:*
+
+- `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block is locked.
 
 If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.
 

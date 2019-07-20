@@ -32,7 +32,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 
 	return (
 		<BlockActions clientIds={ clientIds }>
-			{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, canDuplicate, isLocked } ) => (
+			{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, canDuplicate, templateLock } ) => (
 				<Toolbar>
 					<DropdownMenu
 						icon="ellipsis"
@@ -59,7 +59,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											clientId={ firstBlockClientId }
 										/>
 									) }
-									{ ! isLocked && canDuplicate && (
+									{ templateLock.has( 'insert' ) && canDuplicate && (
 										<MenuItem
 											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onDuplicate ) }
@@ -69,7 +69,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 											{ __( 'Duplicate' ) }
 										</MenuItem>
 									) }
-									{ ! isLocked && (
+									{ templateLock.has( 'insert' ) && (
 										<>
 											<MenuItem
 												className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
@@ -100,7 +100,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 									/>
 								</MenuGroup>
 								<MenuGroup>
-									{ ! isLocked && (
+									{ templateLock.has( 'remove' ) && (
 										<MenuItem
 											className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
 											onClick={ flow( onClose, onRemove ) }

@@ -2370,7 +2370,7 @@ describe( 'selectors', () => {
 				settings: { templateLock: 'all' },
 			};
 
-			expect( getTemplateLock( state ) ).toBe( 'all' );
+			expect( getTemplateLock( state ) ).toEqual( new Set( [ 'insert', 'move', 'remove' ] ) );
 		} );
 
 		it( 'should return null if the specified clientId was not found ', () => {
@@ -2383,7 +2383,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getTemplateLock( state, 'ribs' ) ).toBe( null );
+			expect( getTemplateLock( state, 'ribs' ) ).toEqual( new Set( [] ) );
 		} );
 
 		it( 'should return null if template lock was not set on the specified block', () => {
@@ -2396,7 +2396,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getTemplateLock( state, 'ribs' ) ).toBe( null );
+			expect( getTemplateLock( state, 'ribs' ) ).toEqual( new Set( [] ) );
 		} );
 
 		it( 'should return the template lock for the specified clientId', () => {
@@ -2409,7 +2409,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getTemplateLock( state, 'chicken' ) ).toBe( 'insert' );
+			expect( getTemplateLock( state, 'chicken' ) ).toEqual( new Set( [ 'insert', 'remove' ] ) );
 		} );
 	} );
 

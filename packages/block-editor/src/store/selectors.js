@@ -983,25 +983,50 @@ export function getTemplate( state ) {
 }
 
 /**
+ * Converts a template lock a Set.
+ *
+ * @param {*} templateLock A template lock.
+ *
+ * @return {Set} A template lock Set.
+ */
+function templateLockSet( templateLock ) {
+	let iterable = [];
+
+	if ( Array.isArray( templateLock ) ) {
+		iterable = templateLock;
+	}
+
+	if ( templateLock === 'all' ) {
+		iterable = [ 'insert', 'move', 'remove' ];
+	}
+
+	if ( templateLock === 'insert' ) {
+		iterable = [ 'insert', 'remove' ];
+	}
+
+	return new Set( iterable );
+}
+
+/**
  * Returns the defined block template lock. Optionally accepts a root block
  * client ID as context, otherwise defaulting to the global context.
  *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional block root client ID.
  *
- * @return {?string} Block Template Lock
+ * @return {Set} Block Template Lock
  */
 export function getTemplateLock( state, rootClientId ) {
 	if ( ! rootClientId ) {
-		return state.settings.templateLock;
+		return templateLockSet( state.settings.templateLock );
 	}
 
 	const blockListSettings = getBlockListSettings( state, rootClientId );
 	if ( ! blockListSettings ) {
-		return null;
+		return templateLockSet();
 	}
 
-	return blockListSettings.templateLock;
+	return templateLockSet( blockListSettings.templateLock );
 }
 
 /**
@@ -1038,7 +1063,7 @@ const canInsertBlockTypeUnmemoized = ( state, blockName, rootClientId = null ) =
 		return false;
 	}
 
-	const isLocked = !! getTemplateLock( state, rootClientId );
+	const isLocked = getTemplateLock( state, rootClientId ).has( 'insert' );
 	if ( isLocked ) {
 		return false;
 	}

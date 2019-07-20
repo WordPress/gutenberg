@@ -45,8 +45,16 @@ class InnerBlocks extends Component {
 
 	componentDidMount() {
 		const { innerBlocks } = this.props.block;
+		const templateLock = this.getTemplateLock();
 		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
-		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+		if (
+			innerBlocks.length === 0 ||
+			(
+				templateLock.has( 'move' ) &&
+				templateLock.has( 'remove' ) &&
+				templateLock.has( 'insert' )
+			)
+		) {
 			this.synchronizeBlocksWithTemplate();
 		}
 
@@ -60,10 +68,18 @@ class InnerBlocks extends Component {
 	componentDidUpdate( prevProps ) {
 		const { template, block } = this.props;
 		const { innerBlocks } = block;
+		const templateLock = this.getTemplateLock();
 
 		this.updateNestedSettings();
 		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
-		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+		if (
+			innerBlocks.length === 0 ||
+			(
+				templateLock.has( 'move' ) &&
+				templateLock.has( 'remove' ) &&
+				templateLock.has( 'insert' )
+			)
+		) {
 			const hasTemplateChanged = ! isEqual( template, prevProps.template );
 			if ( hasTemplateChanged ) {
 				this.synchronizeBlocksWithTemplate();

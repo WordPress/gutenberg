@@ -129,13 +129,12 @@ export default compose( [
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
-
 		return {
 			rootBlocksClientIds: getBlockOrder(),
 			hasMultiSelection: hasMultiSelection(),
 			isLocked: some(
 				selectedBlockClientIds,
-				( clientId ) => !! getTemplateLock( getBlockRootClientId( clientId ) )
+				( clientId ) => getTemplateLock( getBlockRootClientId( clientId ) ).has( 'remove' )
 			),
 			selectedBlockClientIds,
 		};
