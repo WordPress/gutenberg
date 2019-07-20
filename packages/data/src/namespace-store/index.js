@@ -51,16 +51,12 @@ export default function createNamespace( key, options, registry ) {
 		...mapValues( metadataSelectors, ( selector ) => ( state, ...args ) => selector( state.metadata, ...args ) ),
 		...mapValues( options.selectors, ( selector ) => {
 			if ( selector.isRegistrySelector ) {
-				const mappedSelector = ( reg ) => ( state, ...args ) => {
-					return selector( reg )( state.root, ...args );
-				};
-				mappedSelector.isRegistrySelector = selector.isRegistrySelector;
-				return mappedSelector;
+				selector.registry = registry;
 			}
 
 			return ( state, ...args ) => selector( state.root, ...args );
 		} ),
-	}, store, registry );
+	}, store );
 	if ( options.resolvers ) {
 		const result = mapResolvers( options.resolvers, selectors, store );
 		resolvers = result.resolvers;
@@ -161,12 +157,8 @@ function createReduxStore( key, options, registry ) {
  *
  * @return {Object} Selectors mapped to the provided store.
  */
-function mapSelectors( selectors, store, registry ) {
-	const createStateSelector = ( registeredSelector ) => {
-		const registrySelector = registeredSelector.isRegistrySelector ?
-			registeredSelector( registry.select ) :
-			registeredSelector;
-
+function mapSelectors( selectors, store ) {
+	const createStateSelector = ( registrySelector ) => {
 		const selector = function runSelector() {
 			// This function is an optimized implementation of:
 			//
