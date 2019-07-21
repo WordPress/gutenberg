@@ -1,15 +1,15 @@
 /**
+ * External dependencies
+ */
+import { filter } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { visibilityOptions } from './utils';
 
 export class PostVisibility extends Component {
 	constructor( props ) {
@@ -26,9 +26,9 @@ export class PostVisibility extends Component {
 	}
 
 	setPublic() {
-		const { visibility, onUpdateVisibility, status } = this.props;
+		const { postVisibility, onUpdateVisibility, status } = this.props;
 
-		onUpdateVisibility( visibility === 'private' ? 'draft' : status );
+		onUpdateVisibility( postVisibility === 'private' ? 'draft' : status );
 		this.setState( { hasPassword: false } );
 	}
 
@@ -45,9 +45,9 @@ export class PostVisibility extends Component {
 	}
 
 	setPasswordProtected() {
-		const { visibility, onUpdateVisibility, status, password } = this.props;
+		const { postVisibility, onUpdateVisibility, status, password } = this.props;
 
-		onUpdateVisibility( visibility === 'private' ? 'draft' : status, password || '' );
+		onUpdateVisibility( postVisibility === 'private' ? 'draft' : status, password || '' );
 		this.setState( { hasPassword: true } );
 	}
 
@@ -57,16 +57,17 @@ export class PostVisibility extends Component {
 	}
 
 	render() {
-		const { visibility, password, instanceId } = this.props;
+		const { postVisibility, password, statuses, instanceId } = this.props;
+		const statusVisibilities = filter( statuses, ( status ) => status.visibility.value );
 
 		const visibilityHandlers = {
 			public: {
 				onSelect: this.setPublic,
-				checked: visibility === 'public' && ! this.state.hasPassword,
+				checked: postVisibility === 'public' && ! this.state.hasPassword,
 			},
 			private: {
 				onSelect: this.setPrivate,
-				checked: visibility === 'private',
+				checked: postVisibility === 'private',
 			},
 			password: {
 				onSelect: this.setPasswordProtected,
@@ -79,25 +80,25 @@ export class PostVisibility extends Component {
 				<legend className="editor-post-visibility__dialog-legend">
 					{ __( 'Post Visibility' ) }
 				</legend>
-				{ visibilityOptions.map( ( { value, label, info } ) => (
-					<div key={ value } className="editor-post-visibility__choice">
+				{ statusVisibilities.map( ( { visibility } ) => (
+					<div key={ visibility.value } className="editor-post-visibility__choice">
 						<input
 							type="radio"
 							name={ `editor-post-visibility__setting-${ instanceId }` }
-							value={ value }
-							onChange={ visibilityHandlers[ value ].onSelect }
-							checked={ visibilityHandlers[ value ].checked }
-							id={ `editor-post-${ value }-${ instanceId }` }
-							aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
+							value={ visibility.value }
+							onChange={ visibilityHandlers[ visibility.value ].onSelect }
+							checked={ visibilityHandlers[ visibility.value ].checked }
+							id={ `editor-post-${ visibility.value }-${ instanceId }` }
+							aria-describedby={ `editor-post-${ visibility.value }-${ instanceId }-description` }
 							className="editor-post-visibility__dialog-radio"
 						/>
 						<label
-							htmlFor={ `editor-post-${ value }-${ instanceId }` }
+							htmlFor={ `editor-post-${ visibility.value }-${ instanceId }` }
 							className="editor-post-visibility__dialog-label"
 						>
-							{ label }
+							{ visibility.label }
 						</label>
-						{ <p id={ `editor-post-${ value }-${ instanceId }-description` } className="editor-post-visibility__dialog-info">{ info }</p> }
+						{ <p id={ `editor-post-${ visibility.value }-${ instanceId }-description` } className="editor-post-visibility__dialog-info">{ visibility.info }</p> }
 					</div>
 				) ) }
 			</fieldset>,
@@ -131,8 +132,9 @@ export default compose( [
 		} = select( 'core/editor' );
 		return {
 			status: getEditedPostAttribute( 'status' ),
-			visibility: getEditedPostVisibility(),
+			postVisibility: getEditedPostVisibility(),
 			password: getEditedPostAttribute( 'password' ),
+			statuses: select( 'core' ).getStatuses(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

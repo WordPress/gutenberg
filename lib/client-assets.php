@@ -655,6 +655,9 @@ function gutenberg_extend_block_editor_preload_paths( $preload_paths, $post ) {
 		$preload_paths[] = $blocks_path;
 	}
 
+	// Preload registered Post Stati.
+	$preload_paths[] = '/wp/v2/statuses?context=edit';
+
 	return $preload_paths;
 }
 add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload_paths', 10, 2 );

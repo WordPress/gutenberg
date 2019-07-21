@@ -15,12 +15,14 @@ export const defaultEntities = [
 	{ name: 'postType', kind: 'root', key: 'slug', baseURL: '/wp/v2/types' },
 	{ name: 'media', kind: 'root', baseURL: '/wp/v2/media', plural: 'mediaItems' },
 	{ name: 'taxonomy', kind: 'root', key: 'slug', baseURL: '/wp/v2/taxonomies', plural: 'taxonomies' },
+	{ name: 'status', kind: 'root', key: 'slug', baseURL: '/wp/v2/statuses', plural: 'statuses' },
 	{ name: 'widgetArea', kind: 'root', baseURL: '/__experimental/widget-areas', plural: 'widgetAreas' },
 ];
 
 export const kinds = [
 	{ name: 'postType', loadEntities: loadPostTypeEntities },
 	{ name: 'taxonomy', loadEntities: loadTaxonomyEntities },
+	{ name: 'status', loadEntities: loadStatusEntities },
 ];
 
 /**
@@ -51,6 +53,22 @@ function* loadTaxonomyEntities() {
 			kind: 'taxonomy',
 			baseURL: '/wp/v2/' + taxonomy.rest_base,
 			name,
+		};
+	} );
+}
+
+/**
+ * Returns the list of the status entities.
+ *
+ * @return {Promise} Entities promise
+ */
+function* loadStatusEntities() {
+	const statuses = yield apiFetch( { path: '/wp/v2/statuses?context=edit' } );
+	return map( statuses, ( status, slug ) => {
+		return {
+			kind: 'status',
+			baseURL: '/wp/v2/' + status.rest_base,
+			slug,
 		};
 	} );
 }

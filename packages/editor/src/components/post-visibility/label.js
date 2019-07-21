@@ -8,17 +8,20 @@ import { find } from 'lodash';
  */
 import { withSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { visibilityOptions } from './utils';
+function PostVisibilityLabel( { postVisibility, statuses } ) {
+	const statusVisibibilies = null !== statuses ? statuses.map( ( { visibility } ) => visibility ) : [];
+	const getVisibilityLabel = () => {
+		if ( ! statusVisibibilies.length ) {
+			return '';
+		}
 
-function PostVisibilityLabel( { visibility } ) {
-	const getVisibilityLabel = () => find( visibilityOptions, { value: visibility } ).label;
+		return find( statusVisibibilies, { value: postVisibility } ).label;
+	};
 
-	return getVisibilityLabel( visibility );
+	return getVisibilityLabel( postVisibility );
 }
 
 export default withSelect( ( select ) => ( {
-	visibility: select( 'core/editor' ).getEditedPostVisibility(),
+	postVisibility: select( 'core/editor' ).getEditedPostVisibility(),
+	statuses: select( 'core' ).getStatuses(),
 } ) )( PostVisibilityLabel );
