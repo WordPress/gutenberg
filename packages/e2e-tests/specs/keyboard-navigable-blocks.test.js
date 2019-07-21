@@ -5,67 +5,13 @@ import {
 	createNewPost,
 	insertAndPopulateBlock,
 	navigateToContentEditorTop,
-	tabThroughBlockMoverControl,
-	tabThroughBlockToolbar,
-	tabThroughPlaceholderButtons,
-	textContentAreas,
+	tabThroughTextBlock,
+	tabThroughFileBlock,
 } from '@wordpress/e2e-test-utils';
 
 /**
  * External dependencies
  */
-
-const externalWrapperHasFocus = async ( blockType ) => {
-	const activeElementDataType = await page.evaluate( () => document.activeElement.dataset.type );
-	await expect( activeElementDataType ).toEqual( blockType );
-};
-
-const inserterToggleHasFocus = async () => {
-	const isFocusedInserterToggle = await page.evaluate( () => document.activeElement.classList.contains( 'block-editor-inserter__toggle' ) );
-	await expect( isFocusedInserterToggle ).toBe( true );
-};
-
-const textContentAreasHaveFocus = async ( content ) => {
-	const blocks = await textContentAreas( { empty: false } );
-	const isFocusedTextContentArea = await page.evaluate( () => document.activeElement.contentEditable );
-	const textContentAreaContent = await page.evaluate( () => document.activeElement.innerHTML );
-
-	for ( let i = 0; i < blocks.length; i++ ) {
-		if ( i > 0 ) {
-			await page.keyboard.press( 'Tab' );
-		}
-
-		// The value of 'contentEditable' should be the string 'true'
-		await expect( isFocusedTextContentArea ).toBe( 'true' );
-		await expect( textContentAreaContent ).toContain( content );
-	}
-};
-
-const tabThroughBlock = async ( content, blockType ) => {
-	// Tab to the next block
-	await page.keyboard.press( 'Tab' );
-	await externalWrapperHasFocus( blockType );
-
-	// Tab causes 'add block' button to receive focus
-	await page.keyboard.press( 'Tab' );
-	await inserterToggleHasFocus();
-
-	await tabThroughBlockMoverControl();
-	await tabThroughBlockToolbar();
-};
-
-const tabThroughTextBlock = async ( content, blockType ) => {
-	await tabThroughBlock( content, blockType );
-
-	// Tab causes the block text content to receive focus
-	await page.keyboard.press( 'Tab' );
-	await textContentAreasHaveFocus( content );
-};
-
-const tabThroughFileBlock = async ( content, blockType ) => {
-	await tabThroughBlock( content, blockType );
-	await tabThroughPlaceholderButtons();
-};
 
 describe( 'Order of block keyboard navigation', () => {
 	beforeEach( async () => {
@@ -93,28 +39,5 @@ describe( 'Order of block keyboard navigation', () => {
 		await tabThroughFileBlock( 'Audio Block Content', 'core/audio' );
 		await tabThroughFileBlock( 'Cover Block Content', 'core/cover' );
 		await tabThroughFileBlock( 'File Block Content', 'core/file' );
-	} );
-
-	it( 'permits tabbing through paragraph blocks in the expected order', async () => {
-		const paragraphBlocks = [ 'Paragraph 0', 'Paragraph 1', 'Paragraph 2' ];
-
-		// create 3 paragraphs blocks with some content
-		for ( const paragraphBlock of paragraphBlocks ) {
-			await insertAndPopulateBlock( 'Paragraph', paragraphBlock );
-		}
-
-		await navigateToContentEditorTop();
-
-		for ( const paragraphBlock of paragraphBlocks ) {
-			await tabThroughTextBlock( paragraphBlock, 'core/paragraph' );
-		}
-
-		// Repeat the same steps to ensure that there is no change introduced in how the focus is handled.
-		// This prevents the previous regression explained in: https://github.com/WordPress/gutenberg/issues/11773.
-		await navigateToContentEditorTop();
-
-		for ( const paragraphBlock of paragraphBlocks ) {
-			await tabThroughTextBlock( paragraphBlock, 'core/paragraph' );
-		}
 	} );
 } );
