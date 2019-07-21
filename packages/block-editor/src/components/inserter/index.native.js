@@ -14,12 +14,13 @@ import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import styles from './style.scss';
 import InserterMenu from './menu';
 
-const defaultRenderToggle = ( { onToggle } ) => (
+const defaultRenderToggle = ( { onToggle, disabled } ) => (
 	<ToolbarButton
 		title={ __( 'Add block' ) }
 		icon={ ( <Dashicon icon="plus-alt" style={ styles.addBlockButton } color={ styles.addBlockButton.color } /> ) }
 		onClick={ onToggle }
 		extraProps={ { hint: __( 'Double tap to add a block' ) } }
+		isDisabled={ disabled }
 	/>
 );
 
