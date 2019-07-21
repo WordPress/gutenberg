@@ -88,10 +88,12 @@
 		@include formatting-button-style__focus();
 	}
 }
-
+// we double the max-width for it to fit both the preview & content
+// but we keep the min width the same for the border to work.
 .components-popover:not(.is-mobile).block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;
-	max-width: 340px;
+	max-width: calc(340px * 2);
+	max-height: 500px;
 }
 
 .block-editor-block-switcher__popover .components-popover__content {
@@ -99,15 +101,16 @@
 		position: relative;
 
 		.block-editor-block-preview {
-			border: $border-width solid $light-gray-500;
+			border-left: $border-width solid $light-gray-500;
 			box-shadow: $shadow-popover;
 			background: $white;
-			position: absolute;
-			left: 100%;
-			top: -1px;
-			bottom: -1px;
 			width: 300px;
 			height: auto;
+			// sticky helps us keep the preview at the top when scrolling
+			position: sticky;
+			align-self: stretch;
+			// for sticky to work we need top
+			top: 0;
 		}
 	}
 
@@ -123,11 +126,6 @@
 	.components-panel__body + .components-panel__body {
 		border-top: $border-width solid $light-gray-500;
 	}
-}
-
-.block-editor-block-switcher__popover:not(.is-mobile) > .components-popover__content {
-	// Reset overflow to allow showing the preview on the left once an item is hovered.
-	overflow-y: visible;
 }
 
 .block-editor-block-switcher__popover .block-editor-block-styles {

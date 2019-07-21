@@ -134,16 +134,21 @@ $arrow-size: 8px;
 }
 
 .components-popover__content {
-	box-shadow: $shadow-popover;
-	border: $border-width solid $light-gray-500;
-	background: $white;
 	height: 100%;
+	display: flex;
+	border: $border-width solid $light-gray-500;
 
 	.components-popover.is-mobile & {
 		height: calc(100% - #{ $panel-header-height });
 		border-top: 0;
 	}
-
+	.components-popover__container {
+		box-shadow: $shadow-popover;
+		background: $white;
+		min-width: 300px;
+		max-width: 340px;
+		width: 50%;
+	}
 	.components-popover:not(.is-mobile) & {
 		position: absolute;
 		height: auto;

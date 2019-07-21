@@ -4,12 +4,11 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { useLayoutEffect, useState } from '@wordpress/element';
+import { useLayoutEffect, useState, createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,15 +31,15 @@ function BlockPreview( props ) {
 		</div>
 	);
 }
-
-export function BlockPreviewContent( { name, attributes, innerBlocks, settings, srcWidth, srcHeight } = {} ) {
+// 400x300 is provided as a 4:3 aspect ratio fallback.
+export function BlockPreviewContent( { name, attributes, innerBlocks, settings, srcWidth = 400, srcHeight = 300 } = {} ) {
 	// Calculated the destination width.
-	const previewRef = React.createRef();
+	const previewRef = createRef();
 
 	// Fallback dimensions.
 	const [ previewDimensions, setPreviewDimensions ] = useState( {
-		width: 400,
-		height: 300,
+		width: srcWidth,
+		height: srcHeight,
 		transform: 'scale(1)',
 	} );
 
@@ -55,8 +54,8 @@ export function BlockPreviewContent( { name, attributes, innerBlocks, settings, 
 		const scale = Math.min( destWidth / srcWidth ) || 1;
 
 		setPreviewDimensions( {
-			width: srcWidth ? srcWidth : 400 + 'px', // 400x300 is provided as a 4:3 aspect ratio fallback.
-			height: srcHeight ? srcHeight : 300 + 'px',
+			width: srcWidth + 'px',
+			height: srcHeight + 'px',
 			transform: 'scale(' + scale + ')',
 		} );
 
@@ -66,7 +65,7 @@ export function BlockPreviewContent( { name, attributes, innerBlocks, settings, 
 		setPreviewAspect( {
 			paddingTop: aspectPadding + '%',
 		} );
-	}, [] );
+	}, [ srcHeight, srcWidth ] );
 
 	const block = createBlock( name, attributes, innerBlocks );
 	return (
