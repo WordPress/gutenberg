@@ -70,7 +70,7 @@ export class InserterMenu extends Component {
 	render() {
 		const { isOpen } = this.props;
 		const numberOfColumns = this.calculateNumberOfColumns();
-		const bottomPadding = this.props.addExtraBottomPadding && styles.contentBottomPadding;
+		const bottomPadding = styles.contentBottomPadding;
 
 		return (
 			<BottomSheet

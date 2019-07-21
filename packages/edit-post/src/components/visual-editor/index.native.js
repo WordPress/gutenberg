@@ -77,6 +77,7 @@ class VisualEditor extends Component {
 				isFullyBordered={ isFullyBordered }
 				rootViewHeight={ rootViewHeight }
 				safeAreaBottomInset={ safeAreaBottomInset }
+				isPostTitleSelected={ this.state.isPostTitleSelected }
 			/>
 		);
 	}
