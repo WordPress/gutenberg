@@ -22,12 +22,14 @@ export default function save( { attributes } ) {
 		id,
 		linkTarget,
 		sizeSlug,
+		fullScreen,
 	} = attributes;
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
+		'full-screen': fullScreen,
 	} );
 
 	const image = (
@@ -56,7 +58,7 @@ export default function save( { attributes } ) {
 		</>
 	);
 
-	if ( 'left' === align || 'right' === align || 'center' === align ) {
+	if ( 'left' === align || 'right' === align || 'center' === align || fullScreen ) {
 		return (
 			<div>
 				<figure className={ classes }>
