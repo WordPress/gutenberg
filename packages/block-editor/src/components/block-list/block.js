@@ -105,9 +105,6 @@ function BlockListBlock( {
 	animateOnChange,
 	enableAnimation,
 	isAncestorOfPostBlock,
-	noInserters,
-	noMovers,
-	noToolbars,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -361,12 +358,8 @@ function BlockListBlock( {
 
 	// If the block is selected and we're typing the block should not appear.
 	// Empty paragraph blocks should always show up as unselected.
-	const showInserterShortcuts =
-		! noInserters &&
-		( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
-	const showEmptyBlockSideInserter =
-		! noInserters &&
-		( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
+	const showInserterShortcuts = ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
+	const showEmptyBlockSideInserter = ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
 		! isFocusMode &&
 		! showEmptyBlockSideInserter &&
@@ -379,7 +372,6 @@ function BlockListBlock( {
 		! isEmptyDefaultBlock;
 	// We render block movers and block settings to keep them tabbale even if hidden
 	const shouldRenderMovers =
-		! noMovers &&
 		( isSelected || hoverArea === ( isRTL ? 'right' : 'left' ) ) &&
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
@@ -387,23 +379,19 @@ function BlockListBlock( {
 	const shouldShowBreadcrumb =
 		! isFocusMode && isHovered && ! isEmptyDefaultBlock;
 	const shouldShowContextualToolbar =
-		! noToolbars &&
 		! hasFixedToolbar &&
 		! showEmptyBlockSideInserter &&
 		(
 			( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
 			isFirstMultiSelected
 		);
-	const shouldShowMobileToolbar = ! noToolbars && shouldAppearSelected;
+	const shouldShowMobileToolbar = shouldAppearSelected;
 
 	// Insertion point can only be made visible if the block is at the
 	// the extent of a multi-selection, or not in a multi-selection.
 	const shouldShowInsertionPoint =
-		! noInserters &&
-		(
-			( isPartOfMultiSelection && isFirstMultiSelected ) ||
-			! isPartOfMultiSelection
-		);
+		( isPartOfMultiSelection && isFirstMultiSelected ) ||
+		! isPartOfMultiSelection;
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the block.
@@ -514,7 +502,7 @@ function BlockListBlock( {
 						}
 						onDragStart={ onDragStart }
 						onDragEnd={ onDragEnd }
-						isReadOnly
+						isReadOnly={ isReadOnly }
 					/>
 				) }
 				{ shouldShowBreadcrumb && (
@@ -644,9 +632,9 @@ const applyWithSelect = withSelect(
 			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
-			isMovable: templateLock !== 'all' && templateLock !== 'readonly',
-			isLocked: !! templateLock,
-			isReadOnly: isReadOnly === undefined && templateLock === 'readonly',
+			isMovable: isReadOnly === undefined ? templateLock !== 'all' && templateLock !== 'readonly' : ! isReadOnly,
+			isLocked: isReadOnly === undefined ? !! templateLock : isReadOnly,
+			isReadOnly: isReadOnly === undefined ? templateLock === 'readonly' : isReadOnly,
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 			isLast: index === blockOrder.length - 1,

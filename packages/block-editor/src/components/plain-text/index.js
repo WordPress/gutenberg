@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -32,5 +33,16 @@ const PlainText = forwardRef( ( { onChange, className, isReadOnly, ...props }, r
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/plain-text/README.md
  */
 export default compose( [
-	withBlockEditContext( ( { isReadOnly } ) => ( { isReadOnly } ) ),
+	withBlockEditContext( ( { clientId, isReadOnly } ) => ( { clientId, isReadOnly } ) ),
+	withSelect( ( select, { clientId, isReadOnly } ) => {
+		const {
+			getBlockRootClientId,
+			getTemplateLock,
+		} = select( 'core/block-editor' );
+		const rootClientId = getBlockRootClientId( clientId );
+		const templateLock = getTemplateLock( rootClientId );
+		return {
+			isReadOnly: isReadOnly === undefined ? templateLock === 'readonly' : isReadOnly,
+		};
+	} ),
 ] )( PlainText );

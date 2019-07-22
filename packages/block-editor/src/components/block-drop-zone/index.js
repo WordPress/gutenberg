@@ -111,8 +111,8 @@ class BlockDropZone extends Component {
 	}
 
 	render() {
-		const { isReadOnly, index } = this.props;
-		if ( isReadOnly ) {
+		const { isLockedAll, index } = this.props;
+		if ( isLockedAll ) {
 			return null;
 		}
 		const isAppender = index === undefined;
@@ -155,10 +155,12 @@ export default compose(
 			},
 		};
 	} ),
-	withSelect( ( select ) => {
-		const { getClientIdsOfDescendants, getBlockIndex } = select( 'core/block-editor' );
+	withSelect( ( select, { rootClientId, isReadOnly } ) => {
+		const { getClientIdsOfDescendants, getTemplateLock, getBlockIndex } = select( 'core/block-editor' );
+		const templateLock = getTemplateLock( rootClientId );
 
 		return {
+			isLockedAll: isReadOnly ? templateLock === 'all' || templateLock === 'readonly' : isReadOnly,
 			getClientIdsOfDescendants,
 			getBlockIndex,
 		};

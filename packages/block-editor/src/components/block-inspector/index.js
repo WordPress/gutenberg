@@ -21,7 +21,6 @@ import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
-import { withBlockEditContext } from '../block-edit/context';
 
 const BlockInspector = ( {
 	blockType,
@@ -30,12 +29,7 @@ const BlockInspector = ( {
 	selectedBlockClientId,
 	selectedBlockName,
 	showNoBlockSelectedMessage = true,
-	isReadOnly,
 } ) => {
-	if ( isReadOnly ) {
-		return __( 'The selected block is read-only.' );
-	}
-
 	if ( count > 1 ) {
 		return <MultiSelectionInspector />;
 	}
@@ -98,7 +92,6 @@ const BlockInspector = ( {
 };
 
 export default compose( [
-	withBlockEditContext( ( { isReadOnly } ) => ( { isReadOnly } ) ),
 	withSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,

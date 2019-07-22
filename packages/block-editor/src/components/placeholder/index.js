@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Placeholder } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -10,7 +11,7 @@ import { compose } from '@wordpress/compose';
 import { withBlockEditContext } from '../block-edit/context';
 
 function PlaceholderInBlockContext( { isReadOnly, ...props } ) {
-	if ( ! isReadOnly ) {
+	if ( isReadOnly ) {
 		return null;
 	}
 
@@ -20,5 +21,17 @@ function PlaceholderInBlockContext( { isReadOnly, ...props } ) {
 }
 
 export default compose( [
-	withBlockEditContext( ( { isReadOnly } ) => ( { isReadOnly } ) ),
+	withBlockEditContext( ( { clientId, isReadOnly } ) => ( { clientId, isReadOnly } ) ),
+	withSelect( ( select, { clientId, isReadOnly } ) => {
+		const {
+			getBlockRootClientId,
+			getTemplateLock,
+		} = select( 'core/block-editor' );
+		const rootClientId = getBlockRootClientId( clientId );
+		const templateLock = getTemplateLock( rootClientId );
+
+		return {
+			isReadOnly: isReadOnly === undefined ? templateLock === 'readonly' : isReadOnly,
+		};
+	} ),
 ] )( PlaceholderInBlockContext );
