@@ -524,7 +524,6 @@ Tabs through a content block with file upload buttons, such as an Image, Gallery
 
 _Parameters_
 
--   _content_ `string`: The expected title of the block
 -   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
 
 <a name="tabThroughPlaceholderButtons" href="#tabThroughPlaceholderButtons">#</a> **tabThroughPlaceholderButtons**
@@ -537,8 +536,8 @@ Tabs through a content block with text content areas, such as a Heading, Quote, 
 
 _Parameters_
 
--   _content_ `string`: The expected title of the block
 -   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
+-   _content_ `string`: The expected title of the block
 
 <a name="textContentAreas" href="#textContentAreas">#</a> **textContentAreas**
 
