@@ -97,7 +97,7 @@ export default compose(
 			isSelected: isPostTitleSelected(),
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps ) => {
+	withDispatch( ( dispatch ) => {
 		const {
 			undo,
 			redo,
@@ -105,6 +105,7 @@ export default compose(
 		} = dispatch( 'core/editor' );
 
 		const {
+			clearSelectedBlock,
 			insertDefaultBlock,
 		} = dispatch( 'core/block-editor' );
 
@@ -116,11 +117,10 @@ export default compose(
 			onRedo: redo,
 			onSelect() {
 				togglePostTitleSelection( true );
-				ownProps.onSelect();
+				clearSelectedBlock();
 			},
 			onUnselect() {
 				togglePostTitleSelection( false );
-				ownProps.onUnselect();
 			},
 		};
 	} ),
