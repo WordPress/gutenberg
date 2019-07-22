@@ -280,6 +280,7 @@ export class ImageEdit extends Component {
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.getFilename = this.getFilename.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
+		this.toggleFullScreen = this.toggleFullScreen.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 		this.onImageError = this.onImageError.bind( this );
 		this.getLinkDestinations = this.getLinkDestinations.bind( this );
@@ -287,6 +288,7 @@ export class ImageEdit extends Component {
 		this.state = {
 			captionFocused: false,
 			isEditing: ! attributes.url,
+			fullScreen: attributes.fullScreen,
 		};
 	}
 
@@ -535,6 +537,16 @@ export class ImageEdit extends Component {
 		];
 	}
 
+	toggleFullScreen() {
+		this.setState( {
+			fullScreen: ! this.state.fullScreen,
+		} );
+
+		this.props.setAttributes( {
+			fullScreen: ! this.state.fullScreen,
+		} );
+	}
+
 	toggleIsEditing() {
 		this.setState( {
 			isEditing: ! this.state.isEditing,
@@ -564,6 +576,7 @@ export class ImageEdit extends Component {
 			toggleSelection,
 			isRTL,
 		} = this.props;
+
 		const {
 			url,
 			alt,
@@ -588,6 +601,16 @@ export class ImageEdit extends Component {
 					value={ align }
 					onChange={ this.updateAlignment }
 				/>
+				{
+					<Toolbar>
+						<IconButton
+							className={ classnames( 'components-icon-button components-toolbar__control', { 'is-active': this.state.fullScreen } ) }
+							icon="editor-expand"
+							label={ __( 'Full screen' ) }
+							onClick={ this.toggleFullScreen }
+						/>
+					</Toolbar>
+				}
 				{ url && (
 					<>
 						<Toolbar>
