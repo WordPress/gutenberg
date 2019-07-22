@@ -482,27 +482,22 @@ function BlockListBlock( {
 					rootClientId={ rootClientId }
 				/>
 			) }
-			<BlockDropZone
+			{ isLocked && <BlockDropZone
 				clientId={ clientId }
 				rootClientId={ rootClientId }
-				isReadOnly={ isReadOnly }
-			/>
+			/> }
 			{ isFirstMultiSelected && (
 				<BlockMultiControls rootClientId={ rootClientId } />
 			) }
 			<div className="editor-block-list__block-edit block-editor-block-list__block-edit">
-				{ shouldRenderMovers && (
+				{ isMovable && shouldRenderMovers && (
 					<BlockMover
 						clientIds={ clientId }
 						blockElementId={ blockElementId }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== ( isRTL ? 'right' : 'left' ) }
-						isDraggable={
-							isDraggable !== false &&
-							( ! isPartOfMultiSelection && isMovable )
-						}
+						isDraggable={ isDraggable !== false && ! isPartOfMultiSelection }
 						onDragStart={ onDragStart }
 						onDragEnd={ onDragEnd }
-						isReadOnly={ isReadOnly }
 					/>
 				) }
 				{ shouldShowBreadcrumb && (
@@ -585,8 +580,23 @@ function BlockListBlock( {
 	/* eslint-enable jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 }
 
+const applyWithSelectAfterFilters = withSelect(
+	( select, { rootClientId, isReadOnly } ) => {
+		const {
+			getTemplateLock,
+		} = select( 'core/block-editor' );
+		const templateLock = getTemplateLock( rootClientId );
+
+		return {
+			isMovable: isReadOnly === undefined ? templateLock !== 'all' && templateLock !== 'readonly' : ! isReadOnly,
+			isLocked: isReadOnly === undefined ? !! templateLock : isReadOnly,
+			isReadOnly: isReadOnly === undefined ? templateLock === 'readonly' : isReadOnly,
+		};
+	}
+);
+
 const applyWithSelect = withSelect(
-	( select, { clientId, rootClientId, isLargeViewport, isReadOnly } ) => {
+	( select, { clientId, rootClientId, isLargeViewport } ) => {
 		const {
 			isBlockSelected,
 			isAncestorMultiSelected,
@@ -599,7 +609,6 @@ const applyWithSelect = withSelect(
 			getSelectedBlocksInitialCaretPosition,
 			getSettings,
 			hasSelectedInnerBlock,
-			getTemplateLock,
 			getBlockIndex,
 			getBlockOrder,
 			__unstableGetBlockWithoutInnerBlocks,
@@ -608,7 +617,6 @@ const applyWithSelect = withSelect(
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
 		const { hasFixedToolbar, focusMode, isRTL } = getSettings();
-		const templateLock = getTemplateLock( rootClientId );
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 		const index = getBlockIndex( clientId, rootClientId );
 		const blockOrder = getBlockOrder( rootClientId );
@@ -632,9 +640,6 @@ const applyWithSelect = withSelect(
 			initialPosition: isSelected ? getSelectedBlocksInitialCaretPosition() : null,
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
-			isMovable: isReadOnly === undefined ? templateLock !== 'all' && templateLock !== 'readonly' : ! isReadOnly,
-			isLocked: isReadOnly === undefined ? !! templateLock : isReadOnly,
-			isReadOnly: isReadOnly === undefined ? templateLock === 'readonly' : isReadOnly,
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 			isLast: index === blockOrder.length - 1,
@@ -753,4 +758,5 @@ export default compose(
 	applyWithSelect,
 	applyWithDispatch,
 	withFilters( 'editor.BlockListBlock' ),
+	applyWithSelectAfterFilters,
 )( BlockListBlock );

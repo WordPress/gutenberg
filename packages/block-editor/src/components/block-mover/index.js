@@ -44,11 +44,11 @@ export class BlockMover extends Component {
 	}
 
 	render() {
-		const { onMoveUp, onMoveDown, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, blockType, firstIndex, isLocked, instanceId, isHidden, rootClientId } = this.props;
+		const { onMoveUp, onMoveDown, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, blockType, firstIndex, instanceId, isHidden, rootClientId } = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
 
-		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
+		if ( isFirst && isLast && ! rootClientId ) {
 			return null;
 		}
 
@@ -117,8 +117,8 @@ export class BlockMover extends Component {
 }
 
 export default compose(
-	withSelect( ( select, { clientIds, isReadOnly } ) => {
-		const { getBlock, getBlockIndex, getTemplateLock, getBlockRootClientId, getBlockOrder } = select( 'core/block-editor' );
+	withSelect( ( select, { clientIds } ) => {
+		const { getBlock, getBlockIndex, getBlockRootClientId, getBlockOrder } = select( 'core/block-editor' );
 		const normalizedClientIds = castArray( clientIds );
 		const firstClientId = first( normalizedClientIds );
 		const block = getBlock( firstClientId );
@@ -126,11 +126,9 @@ export default compose(
 		const blockOrder = getBlockOrder( rootClientId );
 		const firstIndex = getBlockIndex( firstClientId, rootClientId );
 		const lastIndex = getBlockIndex( last( normalizedClientIds ), rootClientId );
-		const templateLock = getTemplateLock( rootClientId );
 
 		return {
 			blockType: block ? getBlockType( block.name ) : null,
-			isLocked: isReadOnly === undefined ? templateLock === 'all' || templateLock === 'readonly' : isReadOnly,
 			rootClientId,
 			firstIndex,
 			isFirst: firstIndex === 0,
