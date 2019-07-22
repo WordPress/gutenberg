@@ -46,6 +46,8 @@ import { findDeepBlock, findDeepBlocks } from '../utils';
  */
 const lastBlockSourceDependenciesByRegistry = new WeakMap;
 
+const templatePartsBlocksCache = {};
+
 /**
  * Given a blocks array, returns a blocks array with sourced attribute values
  * applied. The reference will remain consistent with the original argument if
@@ -169,19 +171,25 @@ export function* setupEditor( post, edits, template, templatePost, templatePartI
 	if ( has( edits, [ 'content' ] ) ) {
 		content = edits.content;
 	} else {
-		content = post.content.raw;
+		content = post.content.raw || post.content;
 	}
 
-	let blocks = ( edits && edits.blocks ) || parse( content );
+	let blocks = templatePartsBlocksCache[ 'post-content' ] || parse( content );
 	const isNewPost = 'auto-draft' === post.status;
 
 	if ( templatePost ) { // Apply template post.
 		const postContentInnerBlocks = blocks;
-		blocks = parse( templatePost.post_content );
+		blocks = templatePartsBlocksCache.template || parse( templatePost.post_content );
+
+		const templatePartBlocks = findDeepBlocks( blocks, 'core/template-part' );
+		templatePartBlocks.forEach( ( block ) => {
+			if ( templatePartsBlocksCache[ block.attributes.id ] ) {
+				block.innerBlocks = templatePartsBlocksCache[ block.attributes.id ];
+			}
+		} );
 
 		if ( templatePartId ) {
-			const templatePartBlocks = findDeepBlocks( blocks, 'core/template-part' );
-			blocks = [ templatePartBlocks.find( ( block ) => block.attributes.id === templatePartId ) ];
+			blocks = templatePartBlocks.find( ( block ) => block.attributes.id === templatePartId ).innerBlocks;
 		}
 
 		// Post content is nested inside a post content block.
@@ -496,6 +504,16 @@ export function* savePost( options = {} ) {
 		yield select( 'core/block-editor', 'getClientIdsWithDescendants' )
 	);
 
+	const post = yield select(
+		STORE_KEY,
+		'getCurrentPost'
+	);
+
+	let editedPostContent = yield select(
+		STORE_KEY,
+		'getEditedPostContent'
+	);
+
 	const viewEditingMode = yield select( STORE_KEY, 'getViewEditingMode' );
 	const { templateParts, templatePost } = yield select( STORE_KEY, 'getEditorSettings' );
 	const viewEditingModeObject = getModeConfig( viewEditingMode, templateParts );
@@ -524,17 +542,21 @@ export function* savePost( options = {} ) {
 				}
 			}
 		}
+
+		if ( viewEditingModeObject.id ) {
+			const templatePartContent = editedPostContent;
+			yield dispatch(
+				'core',
+				'saveEntityRecord',
+				'postType',
+				'wp_template', {
+					content: templatePartContent,
+					id: viewEditingModeObject.id,
+					title: viewEditingModeObject.label,
+				}
+			);
+		}
 	}
-
-	const post = yield select(
-		STORE_KEY,
-		'getCurrentPost'
-	);
-
-	let editedPostContent = yield select(
-		STORE_KEY,
-		'getEditedPostContent'
-	);
 
 	if ( viewEditingModeObject.showTemplate && ! viewEditingModeObject.id && templatePost ) {
 		yield apiFetch( {
@@ -1036,9 +1058,32 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		yield* resetLastBlockSourceDependencies( Array.from( updatedSources ) );
 	}
 
+	const newBlocks = yield* getBlocksWithSourcedAttributes( blocks );
+
+	const viewEditingMode = yield select( STORE_KEY, 'getViewEditingMode' );
+	const viewEditingModeObject = getModeConfig(
+		viewEditingMode,
+		( yield select( STORE_KEY, 'getEditorSettings' ) ).templateParts
+	);
+	const cacheKey =
+		viewEditingModeObject.id ||
+		( viewEditingModeObject.showTemplate && 'template' ) ||
+		viewEditingMode;
+	templatePartsBlocksCache[ cacheKey ] = newBlocks;
+
+	if ( cacheKey === 'template' ) {
+		const postContentBlock = findDeepBlock( newBlocks, 'core/post-content' );
+		if ( postContentBlock ) {
+			templatePartsBlocksCache[ 'post-content' ] = postContentBlock.innerBlocks;
+		}
+
+		const templatePartBlocks = findDeepBlocks( newBlocks, 'core/template-part' );
+		templatePartBlocks.forEach( ( block ) => templatePartsBlocksCache[ block.attributes.id ] = block.innerBlocks );
+	}
+
 	return {
 		type: 'RESET_EDITOR_BLOCKS',
-		blocks: yield* getBlocksWithSourcedAttributes( blocks ),
+		blocks: newBlocks,
 		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
 	};
 }

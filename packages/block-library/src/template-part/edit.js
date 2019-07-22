@@ -34,7 +34,7 @@ export default function TemplatePartEdit( { attributes, clientId, setAttributes 
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 	useEffect(
 		() => {
-			if ( ! rawTemplatePartContent ) {
+			if ( ! rawTemplatePartContent || hasInnerBlocks ) {
 				return;
 			}
 			replaceInnerBlocks( clientId, parse( rawTemplatePartContent ), false );
