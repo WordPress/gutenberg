@@ -1,8 +1,12 @@
 // @format
 
 .video {
-	background-color: $gray-lighten-30;
 	width: 100%;
+}
+
+.videoContainer {
+	flex: 1;
+	background-color: #000;
 }
 
 .placeholder {
@@ -55,8 +59,12 @@
 
 .icon {
 	fill: $gray-dark;
+	width: 100%;
+	height: 100%;
 }
 
 .iconUploading {
 	fill: $gray-lighten-20;
+	width: 100%;
+	height: 100%;
 }

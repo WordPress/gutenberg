@@ -59,7 +59,7 @@ Extending blocks can involve more than just providing alternative styles, in thi
 
 #### `blocks.registerBlockType`
 
-Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
+Used to filter the block settings. It receives the block settings and the name of the registered block as arguments. Since v6.1.0 this filter is also applied to each of a block's deprecated settings.
 
 _Example:_
 

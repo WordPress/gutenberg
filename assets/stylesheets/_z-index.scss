@@ -9,7 +9,6 @@ $z-layers: (
 	".block-library-classic__toolbar": 10,
 	".block-editor-block-list__layout .reusable-block-indicator": 1,
 	".block-editor-block-list__breadcrumb": 2,
-	".editor-inner-blocks .block-editor-block-list__breadcrumb": 22,
 	".components-form-toggle__input": 1,
 	".components-panel__header.edit-post-sidebar__panel-tabs": -1,
 	".edit-post-sidebar .components-panel": -2,
@@ -19,7 +18,6 @@ $z-layers: (
 	".components-modal__header": 10,
 	".edit-post-meta-boxes-area.is-loading::before": 1,
 	".edit-post-meta-boxes-area .spinner": 5,
-	".block-editor-block-contextual-toolbar": 21,
 	".components-popover__close": 5,
 	".block-editor-block-list__insertion-point": 6,
 	".block-editor-inserter-with-shortcuts": 5,
@@ -51,16 +49,21 @@ $z-layers: (
 	".components-drop-zone": 100,
 	".components-drop-zone__content": 110,
 
-	// The block mover, particularly in nested contexts,
-	// should overlap most block content.
-	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 80,
-
 	// The block mover for floats should overlap the controls of adjacent blocks.
 	".block-editor-block-list__block {core/image aligned left or right}": 81,
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
-	".block-editor-inner-blocks__small-screen-overlay:after": 120,
+	".block-editor-inner-blocks.has-overlay::after": 120,
+
+	// The toolbar, when contextual, should be above any adjacent nested block click overlays.
+	".block-editor-block-list__layout .reusable-block-edit-panel": 121,
+	".block-editor-block-contextual-toolbar": 121,
+	".editor-inner-blocks .block-editor-block-list__breadcrumb": 122,
+
+	// The block mover, particularly in nested contexts,
+	// should overlap most block content.
+	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 121,
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
@@ -75,6 +78,10 @@ $z-layers: (
 	// Show notices below expanded editor bar
 	// .edit-post-header { z-index: 30 }
 	".components-notice-list": 29,
+
+
+	// Show snackbars above everything (similar to popovers)
+	".components-snackbar-list": 100000,
 
 	// Show modal under the wp-admin menus and the popover
 	".components-modal__screen-overlay": 100000,

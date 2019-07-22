@@ -40,11 +40,12 @@ export default function save( { attributes } ) {
 			<Tag>
 				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
-						{ cells.map( ( { content, tag }, cellIndex ) =>
+						{ cells.map( ( { content, tag, scope }, cellIndex ) =>
 							<RichText.Content
 								tagName={ tag }
 								value={ content }
 								key={ cellIndex }
+								scope={ tag === 'th' ? scope : undefined }
 							/>
 						) }
 					</tr>
@@ -54,10 +55,12 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<table className={ classes }>
-			<Section type="head" rows={ head } />
-			<Section type="body" rows={ body } />
-			<Section type="foot" rows={ foot } />
-		</table>
+		<figure>
+			<table className={ classes }>
+				<Section type="head" rows={ head } />
+				<Section type="body" rows={ body } />
+				<Section type="foot" rows={ foot } />
+			</table>
+		</figure>
 	);
 }

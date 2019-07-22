@@ -30,7 +30,7 @@ class DatePicker extends Component {
 		const momentTime = {
 			hours: momentDate.hours(),
 			minutes: momentDate.minutes(),
-			seconds: momentDate.seconds(),
+			seconds: 0,
 		};
 
 		onChange( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );

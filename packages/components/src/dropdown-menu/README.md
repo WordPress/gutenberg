@@ -91,6 +91,47 @@ const MyDropdownMenu = () => (
 );
 ```
 
+Alternatively, specify a `children` function which returns elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`.
+
+```jsx
+import { Fragment } from '@wordpress/element';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+
+const MyDropdownMenu = () => (
+	<DropdownMenu
+		icon="move"
+		label="Select a direction"
+	>
+		{ ( { onClose } ) => (
+			<Fragment>
+				<MenuGroup>
+					<MenuItem
+						icon="arrow-up-alt"
+						onClick={ onClose }
+					>
+						Move Up
+					</MenuItem>
+					<MenuItem
+						icon="arrow-down-alt"
+						onClick={ onClose }
+					>
+						Move Down
+					</MenuItem>
+				</MenuGroup>
+				<MenuGroup>
+					<MenuItem
+						icon="trash"
+						onClick={ onClose }
+					>
+						Remove
+					</MenuItem>
+				</MenuGroup>
+			</Fragment>
+		) }
+	</DropdownMenu>
+);
+```
+
 ### Props
 
 The component accepts the following props:
@@ -112,13 +153,46 @@ A human-readable label to present as accessibility text on the focused collapsed
 - Type: `String`
 - Required: Yes
 
+#### menuLabel
+
+A human-readable label to present as accessibility text on the expanded menu container.
+
+- Type: `String`
+- Required: No
+
+#### position
+
+The direction in which the menu should open. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+
+- Type: `String`
+- Required: No
+- Default: `"top center"`
+
 #### controls
 
 An array of objects describing the options to be shown in the expanded menu.
 
 Each object should include an `icon` [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug string, a human-readable `title` string, `isDisabled` boolean flag and an `onClick` function callback to invoke when the option is selected.
 
+A valid DropdownMenu must specify one or the other of a `controls` or `children` prop.
+
 - Type: `Array`
-- Required: Yes
+- Required: No
+
+#### children
+
+A [function render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) which should return an element or elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`. Its first argument is a props object including the same values as given to a [`Dropdown`'s `renderContent`](/packages/components/src/dropdown#rendercontent) (`isOpen`, `onToggle`, `onClose`).
+
+A valid DropdownMenu must specify one or the other of a `controls` or `children` prop.
+
+- Type: `Function`
+- Required: No
 
 See also: [https://developer.wordpress.org/resource/dashicons/](https://developer.wordpress.org/resource/dashicons/)
+
+#### className
+
+A class name to apply to the dropdown wrapper element.
+
+- Type: `String`
+- Required: No

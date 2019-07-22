@@ -4,6 +4,7 @@
 import {
 	getChildBlockNames,
 	isMatchingSearchTerm,
+	getGroupingBlockName,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -197,6 +198,16 @@ describe( 'selectors', () => {
 
 				expect( result ).toBe( true );
 			} );
+		} );
+	} );
+
+	describe( 'getGroupingBlockName', () => {
+		it( 'returns the grouping block name from state', () => {
+			const state = {
+				groupingBlockName: 'core/group',
+			};
+
+			expect( getGroupingBlockName( state ) ).toEqual( 'core/group' );
 		} );
 	} );
 } );

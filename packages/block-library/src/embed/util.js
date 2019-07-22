@@ -15,7 +15,7 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 
 /**
  * Returns true if any of the regular expressions match the URL.
@@ -81,6 +81,10 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 	}
 
 	const matchingBlock = findBlock( url );
+
+	if ( ! getBlockType( matchingBlock ) ) {
+		return;
+	}
 
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.

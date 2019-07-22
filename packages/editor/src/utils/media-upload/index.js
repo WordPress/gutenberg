@@ -7,11 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { mediaUpload } from './media-upload';
+import { uploadMedia } from '@wordpress/media-utils';
 
 /**
  * Upload a media file when the file upload button is activated.
@@ -37,7 +33,7 @@ export default function( {
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	maxUploadFileSize = maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 
-	mediaUpload( {
+	uploadMedia( {
 		allowedTypes,
 		filesList,
 		onFileChange,

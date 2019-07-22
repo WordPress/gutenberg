@@ -5,7 +5,8 @@ set -e
 
 npm ci
 
-npm run build
+# Force reduced motion in e2e tests
+FORCE_REDUCED_MOTION=true npm run build
 
 # Set up environment variables
 . "$(dirname "$0")/bootstrap-env.sh"

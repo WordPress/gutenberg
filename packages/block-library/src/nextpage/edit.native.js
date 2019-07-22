@@ -33,6 +33,8 @@ export default function NextPageEdit( { attributes, isSelected, onFocus } ) {
 			onAccessibilityTap={ onFocus }
 		>
 			<Hr text={ customText }
+				marginLeft={ 0 }
+				marginRight={ 0 }
 				textStyle={ styles[ 'block-library-nextpage__text' ] }
 				lineStyle={ styles[ 'block-library-nextpage__line' ] } />
 		</View>

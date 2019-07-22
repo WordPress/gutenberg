@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"private": true,
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
@@ -25,7 +25,8 @@
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n"
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/notices": "file:../notices"
 	},
 	"publishConfig": {
 		"access": "public"

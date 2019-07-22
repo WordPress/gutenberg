@@ -6,12 +6,6 @@ exports[`RichText should apply formatting when selection is collapsed 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`RichText should apply formatting with access shortcut 1`] = `
-"<!-- wp:paragraph -->
-<p><s>test</s></p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`RichText should apply formatting with primary shortcut 1`] = `
 "<!-- wp:paragraph -->
 <p><strong>test</strong></p>

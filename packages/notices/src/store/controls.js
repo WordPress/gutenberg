@@ -5,6 +5,6 @@ import { speak } from '@wordpress/a11y';
 
 export default {
 	SPEAK( action ) {
-		speak( action.message, 'assertive' );
+		speak( action.message, action.ariaLive || 'assertive' );
 	},
 };

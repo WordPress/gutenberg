@@ -1,5 +1,7 @@
+@import "./components/customizer-edit-widgets-initializer/style.scss";
 @import "./components/header/style.scss";
 @import "./components/layout/style.scss";
+@import "./components/notices/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/widget-area/style.scss";
 
@@ -39,6 +41,11 @@ body.gutenberg_page_gutenberg-widgets {
 
 	> .components-navigate-regions {
 		height: 100%;
+	}
+
+	&.is-in-customizer {
+		min-height: initial;
+		position: initial;
 	}
 }
 

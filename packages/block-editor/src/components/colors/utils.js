@@ -12,7 +12,7 @@ import tinycolor from 'tinycolor2';
  * @param {?string} definedColor A string containing the color slug.
  * @param {?string} customColor  A string containing the customColor value.
  *
- * @return {?string} If definedColor is passed and the name is found in colors,
+ * @return {?Object} If definedColor is passed and the name is found in colors,
  *                   the color object exactly as set by the theme or editor defaults is returned.
  *                   Otherwise, an object that just sets the color is defined.
  */
@@ -35,7 +35,7 @@ export const getColorObjectByAttributeValues = ( colors, definedColor, customCol
 * @param {Array}   colors      Array of color objects as set by the theme or by the editor defaults.
 * @param {?string} colorValue  A string containing the color value.
 *
-* @return {?string} Returns the color object included in the colors array whose color property equals colorValue.
+* @return {?Object} Color object included in the colors array whose color property equals colorValue.
 *                   Returns undefined if no color object matches this requirement.
 */
 export const getColorObjectByColorValue = ( colors, colorValue ) => {
@@ -48,11 +48,12 @@ export const getColorObjectByColorValue = ( colors, colorValue ) => {
  * @param {string} colorContextName Context/place where color is being used e.g: background, text etc...
  * @param {string} colorSlug        Slug of the color.
  *
- * @return {string} String with the class corresponding to the color in the provided context.
+ * @return {?string} String with the class corresponding to the color in the provided context.
+ *                   Returns undefined if either colorContextName or colorSlug are not provided.
  */
 export function getColorClassName( colorContextName, colorSlug ) {
 	if ( ! colorContextName || ! colorSlug ) {
-		return;
+		return undefined;
 	}
 
 	return `has-${ kebabCase( colorSlug ) }-${ colorContextName }`;

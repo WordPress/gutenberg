@@ -29,6 +29,11 @@
 							"type": "string",
 							"default": "td",
 							"source": "tag"
+						},
+						"scope": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "scope"
 						}
 					}
 				}
@@ -54,6 +59,11 @@
 							"type": "string",
 							"default": "td",
 							"source": "tag"
+						},
+						"scope": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "scope"
 						}
 					}
 				}
@@ -79,6 +89,11 @@
 							"type": "string",
 							"default": "td",
 							"source": "tag"
+						},
+						"scope": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "scope"
 						}
 					}
 				}

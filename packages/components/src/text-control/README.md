@@ -96,7 +96,7 @@ Type of the input element to render. Defaults to "text".
 #### value
 The current value of the input.
 
-- Type: `Number`
+- Type: `String | Number`
 - Required: Yes
 
 #### className

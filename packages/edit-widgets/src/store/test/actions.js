@@ -181,6 +181,24 @@ describe( 'actions', () => {
 			expect(
 				saveWidgetAreasGen.next()
 			).toEqual( {
+				done: false,
+				value: {
+					type: 'DISPATCH',
+					storeKey: 'core/notices',
+					actionName: 'createSuccessNotice',
+					args: [
+						'Block areas saved succesfully.',
+						{
+							id: 'WIDGET_AREAS_SAVE_NOTICE_ID',
+							type: 'snackbar',
+						},
+					],
+				},
+			} );
+
+			expect(
+				saveWidgetAreasGen.next()
+			).toEqual( {
 				done: true,
 				value: undefined,
 			} );

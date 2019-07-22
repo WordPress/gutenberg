@@ -49,7 +49,7 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 			'description'       => __( 'The sidebar’s ID.', 'gutenberg' ),
 			'type'              => 'string',
 			'required'          => true,
-			'validate_callback' => array( $this, 'is_valid_sidabar_id' ),
+			'validate_callback' => 'Experimental_WP_Widget_Blocks_Manager::is_valid_sidabar_id',
 		);
 
 		$content_argument = array(

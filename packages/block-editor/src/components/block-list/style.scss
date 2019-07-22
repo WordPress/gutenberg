@@ -109,8 +109,9 @@
 			border: $border-width solid transparent;
 			border-left: none;
 			box-shadow: none;
-			transition: border-color 0.1s linear, box-shadow 0.1s linear;
 			pointer-events: none;
+			transition: border-color 0.1s linear, box-shadow 0.1s linear;
+			@include reduce-motion("transition");
 
 			// Include a transparent outline for Windows High Contrast mode.
 			outline: $border-width solid transparent;
@@ -160,6 +161,7 @@
 	&.is-focus-mode:not(.is-multi-selected) {
 		opacity: 0.5;
 		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
 
 		&:not(.is-focused) .block-editor-block-list__block,
 		&.is-focused {
@@ -272,13 +274,11 @@
 	}
 
 	// Appender
-	&.is-typing .block-editor-block-list__empty-block-inserter,
 	&.is-typing .block-editor-block-list__side-inserter {
 		opacity: 0;
 		animation: none;
 	}
 
-	.block-editor-block-list__empty-block-inserter,
 	.block-editor-block-list__side-inserter {
 		@include edit-post__fade-in-animation;
 	}
@@ -302,6 +302,20 @@
 			border-left-color: transparent;
 		}
 	}
+
+	// Reusable Blocks clickthrough overlays
+	&.is-reusable > .block-editor-block-list__block-edit .block-editor-inner-blocks.has-overlay {
+		// Remove only the top click overlay.
+		&::after {
+			display: none;
+		}
+
+		// Restore it for subsequent.
+		.block-editor-inner-blocks.has-overlay::after {
+			display: block;
+		}
+	}
+
 
 	// Alignments
 	&[data-align="left"],
@@ -425,19 +439,6 @@
 			float: left;
 		}
 
-		// Hide mover until wide breakpoints, or it might be covered by toolbar
-		&.is-multi-selected > .block-editor-block-mover,
-		> .block-editor-block-list__block-edit > .block-editor-block-mover {
-			display: none;
-		}
-
-		@include break-wide() {
-			&.is-multi-selected > .block-editor-block-mover,
-			> .block-editor-block-list__block-edit > .block-editor-block-mover {
-				display: block;
-			}
-		}
-
 		// Beyond the mobile breakpoint, wide images stretch outside of the column.
 		// To center the toolbar, we make it inline-flex so the toolbar is not full-wide.
 		@include break-small () {
@@ -449,6 +450,23 @@
 		// If the block movers are visible, push the breadcrumb down to make room for them.
 		.block-editor-block-mover.is-visible + .block-editor-block-list__breadcrumb {
 			top: (-$block-padding - $block-left-border-width - ($grid-size-small / 2));
+		}
+
+		// Align block toolbar to floated content.
+		@include break-mobile() {
+			.block-editor-block-toolbar {
+				/*!rtl:begin:ignore*/
+				left: $block-side-ui-width * 3 + ($grid-size-small * 1.5);
+				/*!rtl:end:ignore*/
+			}
+		}
+
+		@include break-xlarge() {
+			.block-editor-block-toolbar {
+				/*!rtl:begin:ignore*/
+				left: $block-padding;
+				/*!rtl:end:ignore*/
+			}
 		}
 	}
 
@@ -752,6 +770,7 @@
 	// Hide both the button until hovered.
 	opacity: 0;
 	transition: opacity 0.1s linear;
+	@include reduce-motion("transition");
 
 	&:hover,
 	&.is-visible {
@@ -815,6 +834,7 @@
 	font-size: $text-editor-font-size;
 	line-height: 150%;
 	transition: padding 0.2s linear;
+	@include reduce-motion("transition");
 
 	&:focus {
 		box-shadow: none;

@@ -57,7 +57,7 @@ const MyIcon = () => (
 
 ## Props
 
-The component accepts the following props:
+The component accepts the following props. Any additional props are passed through to the underlying icon element.
 
 ### icon
 
@@ -74,11 +74,3 @@ The size (width and height) of the icon.
 - Type: `Number`
 - Required: No
 - Default: `20` when a Dashicon is rendered, `24` for all other icons.
-
-### className
-
-An optional additional class name to apply to the rendered icon.
-
-- Type: `String`
-- Required: No
-- Default: `null`

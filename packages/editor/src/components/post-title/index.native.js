@@ -8,12 +8,13 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { RichText } from '@wordpress/block-editor';
+import { RichText } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
+import { pasteHandler } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -21,18 +22,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import styles from './style.scss';
 
 class PostTitle extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.onSelect = this.onSelect.bind( this );
-		this.onUnselect = this.onUnselect.bind( this );
-		this.titleViewRef = null;
-
-		this.state = {
-			isSelected: false,
-		};
-	}
-
 	componentDidMount() {
 		if ( this.props.innerRef ) {
 			this.props.innerRef( this );
@@ -40,23 +29,11 @@ class PostTitle extends Component {
 	}
 
 	handleFocusOutside() {
-		this.onUnselect();
+		this.props.onUnselect();
 	}
 
 	focus() {
-		if ( this.titleViewRef ) {
-			this.titleViewRef.focus();
-			this.setState( { isSelected: true } );
-		}
-	}
-
-	onSelect() {
-		this.setState( { isSelected: true } );
-		this.props.clearSelectedBlock();
-	}
-
-	onUnselect() {
-		this.setState( { isSelected: false } );
+		this.props.onSelect();
 	}
 
 	render() {
@@ -69,12 +46,12 @@ class PostTitle extends Component {
 		} = this.props;
 
 		const decodedPlaceholder = decodeEntities( placeholder );
-		const borderColor = this.state.isSelected ? focusedBorderColor : 'transparent';
+		const borderColor = this.props.isSelected ? focusedBorderColor : 'transparent';
 
 		return (
 			<View
 				style={ [ styles.titleContainer, borderStyle, { borderColor } ] }
-				accessible={ ! this.state.isSelected }
+				accessible={ ! this.props.isSelected }
 				accessibilityLabel={
 					isEmpty( title ) ?
 						/* translators: accessibility text. empty post title. */
@@ -89,22 +66,24 @@ class PostTitle extends Component {
 				<RichText
 					tagName={ 'p' }
 					rootTagsToEliminate={ [ 'strong' ] }
-					onFocus={ this.onSelect }
+					unstableOnFocus={ this.props.onSelect }
 					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					multiline={ false }
 					style={ style }
+					styles={ styles }
 					fontSize={ 24 }
 					fontWeight={ 'bold' }
+					deleteEnter={ true }
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
 					placeholder={ decodedPlaceholder }
 					value={ title }
-					onSplit={ this.props.onEnterPress }
+					onSelectionChange={ () => { } }
+					onEnter={ this.props.onEnterPress }
 					disableEditingMenu={ true }
-					setRef={ ( ref ) => {
-						this.titleViewRef = ref;
-					} }
+					__unstablePasteHandler={ pasteHandler }
+					__unstableIsSelected={ this.props.isSelected }
 				>
 				</RichText>
 			</View>
@@ -120,7 +99,6 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 
 	const {
 		insertDefaultBlock,
-		clearSelectedBlock,
 	} = dispatch( 'core/block-editor' );
 
 	return {
@@ -129,7 +107,6 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 		},
 		onUndo: undo,
 		onRedo: redo,
-		clearSelectedBlock,
 	};
 } );
 

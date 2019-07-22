@@ -10,7 +10,7 @@ import { first } from 'lodash';
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
 	await expect( page ).toClick(
-		'.edit-post-more-menu [aria-label="Show more tools & options"]'
+		'.edit-post-more-menu [aria-label="More tools & options"]'
 	);
 	const moreMenuContainerSelector =
 		'//*[contains(concat(" ", @class, " "), " edit-post-more-menu__content ")]';

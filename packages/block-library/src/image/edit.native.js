@@ -16,6 +16,7 @@ import { isEmpty } from 'lodash';
  */
 import {
 	BottomSheet,
+	Icon,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -97,12 +98,12 @@ class ImageEdit extends React.Component {
 		}
 	}
 
-	componentWillReceiveProps( nextProps ) {
+	static getDerivedStateFromProps( props, state ) {
 		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
 		// is updated immediately any time the isSelected prop becomes false
-		this.setState( ( state ) => ( {
-			isCaptionSelected: nextProps.isSelected && state.isCaptionSelected,
-		} ) );
+		return {
+			isCaptionSelected: props.isSelected && state.isCaptionSelected,
+		};
 	}
 
 	onImagePressed() {
@@ -193,10 +194,10 @@ class ImageEdit extends React.Component {
 
 	getIcon( isRetryIcon ) {
 		if ( isRetryIcon ) {
-			return <SvgIconRetry fill={ styles.iconRetry.fill } />;
+			return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 		}
 
-		return <SvgIcon fill={ styles.icon.fill } />;
+		return <Icon icon={ SvgIcon } { ...styles.icon } />;
 	}
 
 	render() {
@@ -273,13 +274,6 @@ class ImageEdit extends React.Component {
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
 				accessible={ ! isSelected }
-				accessibilityLabel={ sprintf(
-					/* translators: accessibility text. 1: image alt text. 2: image caption. */
-					__( 'Image block. %1$s. %2$s' ),
-					alt,
-					caption
-				) }
-				accessibilityRole={ 'button' }
 				onPress={ this.onImagePressed }
 				onLongPress={ openMediaOptions }
 				disabled={ ! isSelected }
@@ -367,9 +361,10 @@ class ImageEdit extends React.Component {
 								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
 								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-								onFocus={ this.onFocusCaption }
+								unstableOnFocus={ this.onFocusCaption }
 								onBlur={ this.props.onBlur } // always assign onBlur as props
 								isSelected={ this.state.isCaptionSelected }
+								__unstableMobileNoFocusOnMount
 								fontSize={ 14 }
 								underlineColorAndroid="transparent"
 								textAlign={ 'center' }

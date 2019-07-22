@@ -131,3 +131,14 @@ This list is manually curated to include valuable contributions by volunteers th
 | @melchoyce | @melchoyce |
 | @sarahmonster | @tinkerbelly |
 | @kjellr | @kjellr |
+| @etoledom | |
+| @hypest | |
+| @koke | |
+| @pinarol | |
+| @daniloercoli | |
+| @marecar3 | |
+| @Tug | |
+| @diegoreymendez | |
+| @mkevins | |
+| @SergioEstevao | |
+| @mzorz | @mzorz |
