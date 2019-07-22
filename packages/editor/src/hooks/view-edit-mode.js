@@ -13,7 +13,35 @@ import { addFilter } from '@wordpress/hooks';
 
 const postBlockTypes = [ 'core/post-content', 'core/post-date', 'core/post-title' ];
 
-export const withViewEditingMode = createHigherOrderComponent( ( BlockListBlock ) => {
+export const withViewEditingModeForBlockEdit = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		const { clientId, name } = props;
+
+		const {
+			viewEditingMode,
+		} = useSelect( ( select ) => {
+			const { getViewEditingMode } = select( 'core/editor' );
+
+			return {
+				viewEditingMode: getViewEditingMode(),
+			};
+		}, [ clientId ] );
+
+		if ( viewEditingMode === 'template' && postBlockTypes.includes( name ) ) {
+			return (
+				<Disabled>
+					<BlockEdit { ...props } />
+				</Disabled>
+			);
+		}
+
+		return (
+			<BlockEdit { ...props } />
+		);
+	};
+}, 'withViewEditingMode' );
+
+export const withViewEditingModeForBlockListBlock = createHigherOrderComponent( ( BlockListBlock ) => {
 	return ( props ) => {
 		const { clientId, name } = props;
 
@@ -85,4 +113,5 @@ export const withViewEditingMode = createHigherOrderComponent( ( BlockListBlock 
 	};
 }, 'withViewEditingMode' );
 
-addFilter( 'editor.BlockListBlock', 'core/editor/with-view-edit-mode', withViewEditingMode );
+addFilter( 'editor.BlockEdit', 'core/editor/block-edit/with-view-edit-mode', withViewEditingModeForBlockEdit );
+addFilter( 'editor.BlockListBlock', 'core/editor/block-list-block/with-view-edit-mode', withViewEditingModeForBlockListBlock );
