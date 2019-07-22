@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -20,6 +21,8 @@ import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
+import { withBlockEditContext } from '../block-edit/context';
+
 const BlockInspector = ( {
 	blockType,
 	count,
@@ -94,29 +97,25 @@ const BlockInspector = ( {
 	);
 };
 
-export default withSelect(
-	( select ) => {
+export default compose( [
+	withBlockEditContext( ( { isReadOnly } ) => ( { isReadOnly } ) ),
+	withSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
 			getSelectedBlockCount,
 			getBlockName,
-			getTemplateLock,
-			getBlockRootClientId,
 		} = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectedBlockName = selectedBlockClientId && getBlockName( selectedBlockClientId );
 		const blockType = selectedBlockClientId && getBlockType( selectedBlockName );
 		const blockStyles = selectedBlockClientId && getBlockStyles( selectedBlockName );
-		const rootClientId = getBlockRootClientId( selectedBlockClientId );
-		const isReadOnly = getTemplateLock( rootClientId ) === 'readonly';
 		return {
 			count: getSelectedBlockCount(),
 			hasBlockStyles: blockStyles && blockStyles.length > 0,
 			selectedBlockName,
 			selectedBlockClientId,
 			blockType,
-			isReadOnly,
 		};
-	}
-)( BlockInspector );
+	} ),
+] )( BlockInspector );

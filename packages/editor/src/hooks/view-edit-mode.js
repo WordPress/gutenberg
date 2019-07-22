@@ -6,7 +6,6 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Disabled } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
@@ -28,15 +27,11 @@ export const withViewEditingModeForBlockEdit = createHigherOrderComponent( ( Blo
 		}, [ clientId ] );
 
 		if ( viewEditingMode === 'template' && postBlockTypes.includes( name ) ) {
-			return (
-				<Disabled>
-					<BlockEdit { ...props } />
-				</Disabled>
-			);
+			return <BlockEdit { ...props } isReadOnly />;
 		}
 
 		return (
-			<BlockEdit { ...props } />
+			<BlockEdit { ...props } isReadOnly={ false } />
 		);
 	};
 }, 'withViewEditingMode' );
@@ -62,54 +57,29 @@ export const withViewEditingModeForBlockListBlock = createHigherOrderComponent( 
 
 		if ( viewEditingMode === 'focus' ) {
 			if ( isAncestorOfPostBlock ) {
-				return (
-					<BlockListBlock { ...props }
-						noInserters={ true }
-						noMovers={ true }
-						noToolbars={ true }
-					/>
-				);
+				return <BlockListBlock { ...props } isReadOnly />;
 			}
 
 			if ( postBlockTypes.includes( name ) ) {
-				return (
-					<BlockListBlock { ...props }
-						noInserters={ true }
-						noMovers={ true }
-					/>
-				);
+				return <BlockListBlock { ...props } isReadOnly />;
 			}
 
 			if ( isDescendantOfPostBlock ) {
-				return <BlockListBlock { ...props } />;
+				return <BlockListBlock { ...props } isReadOnly={ false } />;
 			}
 
-			return (
-				<Disabled>
-					<BlockListBlock { ...props } />
-				</Disabled>
-			);
+			return <BlockListBlock { ...props } isReadOnly />;
 		}
 
 		if ( viewEditingMode === 'preview' ) {
-			return (
-				<Disabled>
-					<BlockListBlock { ...props } />
-				</Disabled>
-			);
+			return <BlockListBlock { ...props } isReadOnly />;
 		}
 
 		if ( viewEditingMode === 'template' && isDescendantOfPostBlock ) {
-			return (
-				<Disabled>
-					<BlockListBlock { ...props } />
-				</Disabled>
-			);
+			return <BlockListBlock { ...props } isReadOnly />;
 		}
 
-		return (
-			<BlockListBlock { ...props } />
-		);
+		return <BlockListBlock { ...props } isReadOnly={ false } />;
 	};
 }, 'withViewEditingMode' );
 

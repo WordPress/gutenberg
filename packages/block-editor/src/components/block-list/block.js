@@ -497,6 +497,7 @@ function BlockListBlock( {
 			<BlockDropZone
 				clientId={ clientId }
 				rootClientId={ rootClientId }
+				isReadOnly={ isReadOnly }
 			/>
 			{ isFirstMultiSelected && (
 				<BlockMultiControls rootClientId={ rootClientId } />
@@ -513,6 +514,7 @@ function BlockListBlock( {
 						}
 						onDragStart={ onDragStart }
 						onDragEnd={ onDragEnd }
+						isReadOnly
 					/>
 				) }
 				{ shouldShowBreadcrumb && (
@@ -596,7 +598,7 @@ function BlockListBlock( {
 }
 
 const applyWithSelect = withSelect(
-	( select, { clientId, rootClientId, isLargeViewport } ) => {
+	( select, { clientId, rootClientId, isLargeViewport, isReadOnly } ) => {
 		const {
 			isBlockSelected,
 			isAncestorMultiSelected,
@@ -644,7 +646,7 @@ const applyWithSelect = withSelect(
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
 			isMovable: templateLock !== 'all' && templateLock !== 'readonly',
 			isLocked: !! templateLock,
-			isReadOnly: templateLock === 'readonly',
+			isReadOnly: isReadOnly === undefined && templateLock === 'readonly',
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 			isLast: index === blockOrder.length - 1,

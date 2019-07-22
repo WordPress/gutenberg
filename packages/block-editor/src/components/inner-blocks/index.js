@@ -39,7 +39,13 @@ class InnerBlocks extends Component {
 		const {
 			templateLock,
 			parentLock,
+			isReadOnly,
 		} = this.props;
+
+		if ( isReadOnly !== null ) {
+			return isReadOnly ? 'readonly' : false;
+		}
+
 		return templateLock === undefined ? parentLock : templateLock;
 	}
 
@@ -145,7 +151,7 @@ class InnerBlocks extends Component {
 }
 
 InnerBlocks = compose( [
-	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
+	withBlockEditContext( ( context ) => pick( context, [ 'clientId', 'isReadOnly' ] ) ),
 	withSelect( ( select, ownProps ) => {
 		const {
 			isBlockSelected,

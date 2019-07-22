@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { Placeholder } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -21,14 +20,5 @@ function PlaceholderInBlockContext( { isReadOnly, ...props } ) {
 }
 
 export default compose( [
-	withBlockEditContext( ( { clientId } ) => ( { clientId } ) ),
-	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlockRootClientId,
-			getTemplateLock,
-		} = select( 'core/block-editor' );
-		const rootClientId = getBlockRootClientId( clientId );
-		const isReadOnly = getTemplateLock( rootClientId ) === 'readonly';
-		return { isReadOnly };
-	} ),
+	withBlockEditContext( ( { isReadOnly } ) => ( { isReadOnly } ) ),
 ] )( PlaceholderInBlockContext );

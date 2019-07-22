@@ -365,7 +365,7 @@ class RichTextWraper extends Component {
 
 const RichTextContainer = compose( [
 	withInstanceId,
-	withBlockEditContext( ( { clientId } ) => ( { clientId } ) ),
+	withBlockEditContext( ( { clientId, isReadOnly } ) => ( { clientId, isReadOnly } ) ),
 	withSelect( ( select, {
 		clientId,
 		instanceId,
@@ -377,11 +377,8 @@ const RichTextContainer = compose( [
 			getSelectionStart,
 			getSelectionEnd,
 			getSettings,
-			getBlockRootClientId,
-			getTemplateLock,
 		} = select( 'core/block-editor' );
 
-		const isReadOnly = getTemplateLock( getBlockRootClientId( clientId ) ) === 'readonly';
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 		const { __experimentalCanUserUseUnfilteredHTML } = getSettings();
@@ -398,7 +395,6 @@ const RichTextContainer = compose( [
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
-			isReadOnly,
 		};
 	} ),
 	withDispatch( ( dispatch, {
