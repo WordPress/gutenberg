@@ -237,10 +237,11 @@
 :root {
 	--color: hsla(204, 80%, 72%, 0.15);
 	/* The following is hard-coded for `gutenberg-theme` */
-	--background-columns: linear-gradient(to right, transparent, transparent 15px, var(--color) 16px, var(--color) 200px, transparent 200px, transparent 215px, var(--color) 215px, var(--color) 985px, transparent 985px, transparent 1000px, var(--color) 1000px, var(--color) 1184px, transparent 1184px, transparent 1200px, var(--color) 1200px);
+	--background-columns: linear-gradient(to right, #fff, #fff 15px, var(--color) 16px, var(--color) 200px, #fff 200px, #fff 215px, var(--color) 215px, var(--color) 985px, #fff 985px, #fff 1000px, var(--color) 1000px, var(--color) 1184px, #fff 1184px, #fff 1200px, var(--color) 1200px);
 }
 
 .edit-post-layout.is-mode-design {
+	background-color: var(--color);
 	background-image: var(--background-columns);
 	background-size: 1200px 100%;
 	background-repeat: no-repeat;
