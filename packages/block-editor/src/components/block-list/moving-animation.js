@@ -6,7 +6,7 @@ import { useSpring, interpolate } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import { useState, useLayoutEffect } from '@wordpress/element';
+import { useState, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 
 /**
@@ -29,18 +29,16 @@ import { useReducedMotion } from '@wordpress/compose';
  */
 function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationOnChange ) {
 	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
-	const [ resetAnimation, setResetAnimation ] = useState( false );
+	const [ triggeredAnimation, triggerAnimation ] = useReducer( ( state = 0 ) => state + 1 );
+	const [ finishedAnimation, endAnimation ] = useReducer( ( state = 0 ) => state + 1 );
 	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
 	const previous = ref.current ? ref.current.getBoundingClientRect() : null;
 
-	// This effect should be before the animation computation effect
-	// otherwise we might have a race condition causing the animation
-	// to not run.
 	useLayoutEffect( () => {
-		if ( resetAnimation ) {
-			setResetAnimation( false );
+		if ( triggeredAnimation ) {
+			endAnimation();
 		}
-	}, [ resetAnimation ] );
+	}, [ triggeredAnimation ] );
 	useLayoutEffect( () => {
 		if ( prefersReducedMotion ) {
 			return;
@@ -54,7 +52,7 @@ function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationO
 		ref.current.style.transform = newTransform.x === 0 && newTransform.y === 0 ?
 			undefined :
 			`translate3d(${ newTransform.x }px,${ newTransform.y }px,0)`;
-		setResetAnimation( true );
+		triggerAnimation();
 		setTransform( newTransform );
 	}, [ triggerAnimationOnChange ] );
 	const animationProps = useSpring( {
@@ -63,7 +61,7 @@ function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationO
 			x: 0,
 			y: 0,
 		},
-		reset: resetAnimation,
+		reset: triggeredAnimation !== finishedAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
 		immediate: prefersReducedMotion,
 	} );
