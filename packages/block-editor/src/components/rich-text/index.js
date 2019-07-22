@@ -255,6 +255,7 @@ class RichTextWraper extends Component {
 
 	render() {
 		const {
+			isReadOnly,
 			tagName,
 			value: originalValue,
 			onChange: originalOnChange,
@@ -307,6 +308,7 @@ class RichTextWraper extends Component {
 		return (
 			<RichText
 				{ ...experimentalProps }
+				isReadOnly={ isReadOnly }
 				value={ adjustedValue }
 				onChange={ adjustedOnChange }
 				selectionStart={ selectionStart }
@@ -375,8 +377,11 @@ const RichTextContainer = compose( [
 			getSelectionStart,
 			getSelectionEnd,
 			getSettings,
+			getBlockRootClientId,
+			getTemplateLock,
 		} = select( 'core/block-editor' );
 
+		const isReadOnly = getTemplateLock( getBlockRootClientId( clientId ) ) === 'readonly';
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 		const { __experimentalCanUserUseUnfilteredHTML } = getSettings();
@@ -393,6 +398,7 @@ const RichTextContainer = compose( [
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
+			isReadOnly,
 		};
 	} ),
 	withDispatch( ( dispatch, {

@@ -69,3 +69,31 @@ exports[`cpt locking template_lock insert should allow blocks to be moved 1`] = 
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
 <!-- /wp:quote -->"
 `;
+
+exports[`cpt locking template_lock readonly should only allow block selection 1`] = `
+"<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`cpt locking template_lock readonly should only allow block selection 2`] = `
+"<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
+<!-- /wp:quote -->"
+`;

@@ -22,6 +22,16 @@ function gutenberg_test_cpt_locking() {
 		array( 'core/quote' ),
 	);
 	register_post_type(
+		'locked-readonly-post',
+		array(
+			'public'        => true,
+			'label'         => 'Locked Readonly Post',
+			'show_in_rest'  => true,
+			'template'      => $template,
+			'template_lock' => 'readonly',
+		)
+	);
+	register_post_type(
 		'locked-all-post',
 		array(
 			'public'        => true,

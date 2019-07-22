@@ -23,6 +23,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import FormatEdit from './format-edit';
 import Editable from './editable';
+import ReadOnly from './read-only';
 import { pickAriaProps } from './aria';
 import { isEmpty } from '../is-empty';
 import { create } from '../create';
@@ -852,6 +853,7 @@ class RichText extends Component {
 
 	render() {
 		const {
+			isReadOnly,
 			tagName: Tagname = 'div',
 			style,
 			wrapperClassName,
@@ -871,10 +873,41 @@ class RichText extends Component {
 		// prevent Editable component updates.
 		const key = Tagname;
 		const MultilineTag = this.multilineTag;
-		const ariaProps = pickAriaProps( this.props );
 		const record = this.getRecord();
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && isEmpty( record );
+		const isPlaceholderVisible = (
+			placeholder &&
+			( ! isSelected || keepPlaceholderOnFocus ) &&
+			isEmpty( record )
+		);
+		const classes = classnames( 'rich-text', className );
 
+		const Placeholder = isPlaceholderVisible && (
+			<Tagname className={ classes } style={ style }>
+				{ MultilineTag ?
+					<MultilineTag>{ placeholder }</MultilineTag> :
+					placeholder
+				}
+			</Tagname>
+		);
+
+		if ( isReadOnly ) {
+			return (
+				<>
+					<ReadOnly
+						tagName={ Tagname }
+						style={ style }
+						record={ record }
+						valueToEditableHTML={ this.valueToEditableHTML }
+						isPlaceholderVisible={ isPlaceholderVisible }
+						className={ classes }
+						key={ key }
+					/>
+					{ Placeholder }
+				</>
+			);
+		}
+
+		const ariaProps = pickAriaProps( this.props );
 		const autoCompleteContent = ( { listBoxId, activeId } ) => (
 			<>
 				<Editable
@@ -888,7 +921,7 @@ class RichText extends Component {
 					aria-owns={ listBoxId }
 					aria-activedescendant={ activeId }
 					{ ...ariaProps }
-					className={ classnames( 'rich-text', className ) }
+					className={ classes }
 					key={ key }
 					onPaste={ this.onPaste }
 					onInput={ this.onInput }
@@ -900,14 +933,7 @@ class RichText extends Component {
 					onTouchStart={ this.onPointerDown }
 					setRef={ this.setRef }
 				/>
-				{ isPlaceholderVisible &&
-					<Tagname
-						className={ classnames( 'rich-text', className ) }
-						style={ style }
-					>
-						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
-					</Tagname>
-				}
+				{ Placeholder }
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
 			</>
 		);
