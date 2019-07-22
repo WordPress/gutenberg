@@ -235,25 +235,25 @@
 
 /* Settings */
 :root {
-	--offset: 2rem;
-	--max_width: 72rem;
-	--columns: 5;
-	--gutter: 1rem;
-	--color: hsla(204, 80%, 72%, 0.15);
-}
-
-/* Helper variables */
-:root {
-	--repeating-width: calc(100% / var(--columns));
-	--column-width: calc((100% / var(--columns)) - var(--gutter));
-	--background-width: calc(100% + var(--gutter));
-	--background-columns: repeating-linear-gradient(to right, var(--color), var(--color) var(--column-width), transparent var(--column-width), transparent var(--repeating-width));
+	--color: #000;
+	/* The following is hard-coded for `gutenberg-theme` */
+	--background-columns: linear-gradient(to right, var(--color), var(--color) 1px, transparent 1px, transparent 245px, var(--color) 245px, var(--color) 246px, transparent 246px, transparent 854px, var(--color) 854px, var(--color) 855px, transparent 855px, transparent 1099px, var(--color) 1099px, var(--color) 1100px, transparent 1100px);
 }
 
 .edit-post-layout.is-mode-design {
 	background-image: var(--background-columns);
-	background-size: var(--background-width) 100%;
+	background-size: 1100px 100%;
+	background-repeat: no-repeat;
+	background-position-x: center;
 	z-index: 1000;
+
+	.block-editor-block-list__block {
+		background-color: rgba(200, 200, 200, 0.2);
+	}
+
+	.editor-rich-text {
+		background: #ccc !important;
+	}
 }
 
 .is-mode-template-part {

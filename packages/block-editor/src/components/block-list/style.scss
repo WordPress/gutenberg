@@ -7,21 +7,6 @@
 	}
 }
 
-// TODO: move to edit-post//components/layout along with the other modes
-.block-editor-block-list__layout .block-editor-block-list__block.is-disabled {
-	background-color: rgba(200, 200, 200, 0.2);
-	> .block-editor-block-list__block-edit {
-		// opacity: 0.5;
-	}
-	// &::before {
-	// 	content: 'h';
-	// }
-
-	.editor-rich-text {
-		background: #ccc !important;
-	}
-}
-
 .block-editor-block-list__layout .block-editor-block-list__block.is-selected { // Needs specificity to override inherited styles.
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {
