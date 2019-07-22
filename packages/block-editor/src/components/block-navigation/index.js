@@ -35,6 +35,11 @@ function BlockNavigationList( {
 				const blockType = getBlockType( block.name );
 				const isSelected = block.clientId === selectedBlockClientId;
 
+				let blockDisplayName = blockType.title;
+				if ( block.name === 'core/template-part' && block.attributes.name ) {
+					blockDisplayName = `Template: ${ block.attributes.name }`;
+				}
+
 				return (
 					<li key={ block.clientId }>
 						<div className="editor-block-navigation__item block-editor-block-navigation__item">
@@ -45,7 +50,7 @@ function BlockNavigationList( {
 								onClick={ () => selectBlock( block.clientId ) }
 							>
 								<BlockIcon icon={ blockType.icon } showColors />
-								{ blockType.title }
+								{ blockDisplayName }
 								{ isSelected && <span className="screen-reader-text">{ __( '(selected block)' ) }</span> }
 							</Button>
 						</div>
