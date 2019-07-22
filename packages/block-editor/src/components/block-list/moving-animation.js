@@ -31,8 +31,16 @@ function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationO
 	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
 	const [ resetAnimation, setResetAnimation ] = useState( false );
 	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
-
 	const previous = ref.current ? ref.current.getBoundingClientRect() : null;
+
+	// This effect should be before the animation computation effect
+	// otherwise we might have a race condition causing the animation
+	// to not run.
+	useLayoutEffect( () => {
+		if ( resetAnimation ) {
+			setResetAnimation( false );
+		}
+	}, [ resetAnimation ] );
 	useLayoutEffect( () => {
 		if ( prefersReducedMotion ) {
 			return;
@@ -49,11 +57,6 @@ function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationO
 		setResetAnimation( true );
 		setTransform( newTransform );
 	}, [ triggerAnimationOnChange ] );
-	useLayoutEffect( () => {
-		if ( resetAnimation ) {
-			setResetAnimation( false );
-		}
-	}, [ resetAnimation ] );
 	const animationProps = useSpring( {
 		from: transform,
 		to: {
