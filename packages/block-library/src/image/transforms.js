@@ -45,7 +45,7 @@ function getFirstAnchorAttributeFormHTML( html, attributeName ) {
 const imageSchema = {
 	img: {
 		attributes: [ 'src', 'alt' ],
-		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/ ],
+		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/, 'full-screen' ],
 	},
 };
 
