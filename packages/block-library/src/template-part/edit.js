@@ -37,7 +37,7 @@ export default function TemplatePartEdit( { attributes, clientId, setAttributes 
 			if ( ! rawTemplatePartContent ) {
 				return;
 			}
-			replaceInnerBlocks( clientId, parse( rawTemplatePartContent ) );
+			replaceInnerBlocks( clientId, parse( rawTemplatePartContent ), false );
 		},
 		[ rawTemplatePartContent, replaceInnerBlocks ]
 	);
