@@ -71,7 +71,7 @@ milestone="Gutenberg $major.$minor"
 
 reference_major=5
 reference_minor=0
-reference_date=1549238400
+reference_date=1564358400
 num_versions_elapsed=$(((major-reference_major)*10+(minor-reference_minor)))
 weeks=$((num_versions_elapsed*2))
 due=$(date -u --iso-8601=seconds -d "$(date -d @$(echo $reference_date)) + $(echo $weeks) weeks")
