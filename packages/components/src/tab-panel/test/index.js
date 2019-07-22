@@ -120,11 +120,11 @@ describe( 'TabPanel', () => {
 		} );
 	} );
 
-	it( 'should render with a tab initially selected by prop initialTabIndex', () => {
+	it( 'should render with a tab initially selected by prop controlledTabName', () => {
 		const props = {
 			className: 'test-panel',
 			activeClass: 'active-tab',
-			initialTabName: 'beta',
+			controlledTabName: 'beta',
 			tabs: [
 				{
 					name: 'alpha',

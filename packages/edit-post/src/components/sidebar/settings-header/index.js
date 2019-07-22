@@ -32,11 +32,13 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 	const tabs = [
 		{
 			name: documentSettingsName,
+			className: 'edit-post-sidebar__panel-tab',
 			title: __( 'Document' ),
 			ariaLabel: `${ documentAriaLabel }`,
 		},
 		{
 			name: blockSettingsName,
+			className: 'edit-post-sidebar__panel-tab',
 			title: __( 'Block' ),
 			ariaLabel: `${ blockAriaLabel }`,
 		},
@@ -53,7 +55,7 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 
 	useEffect(
 		() => {
-			if ( documentSettingsName ) {
+			if ( documentSettingsActive ) {
 				setSelectedTabName( documentSettingsName );
 			}
 		}, [ documentSettingsActive ]
@@ -73,10 +75,9 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 			closeLabel={ __( 'Close settings' ) }
 		>
 			<TabPanel
-				key={ selectedTabName }
 				tabs={ tabs }
 				onSelect={ onSelect }
-				selectedTabName={ selectedTabName }
+				controlledTabName={ selectedTabName }
 			>
 				{ () => { } }
 			</TabPanel>
