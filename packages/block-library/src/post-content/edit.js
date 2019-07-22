@@ -22,7 +22,7 @@ export default function PostContentEdit( { clientId } ) {
 
 	return (
 		<InnerBlocks
-			templateLock="readonly"
+			templateLock={ false }
 			allowedBlocks={ allowedBlocks }
 			renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
 		/>
