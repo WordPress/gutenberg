@@ -113,6 +113,15 @@
 	}
 }
 
+
+[data-type="core/image"][data-full-screen="true"] {
+	figure img {
+		height: 100vh;
+		min-height: 100vh;
+		width: auto;
+	}
+}
+
 // This is similar to above but for resized unfloated images only, where the markup is different.
 [data-type="core/image"] .block-editor-block-list__block-edit figure.is-resized {
 	margin: 0;

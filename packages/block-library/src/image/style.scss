@@ -18,6 +18,11 @@
 		width: 100%;
 	}
 
+	.full-screen img {
+		height: 100vh;
+		min-height: 100vh;
+	}
+
 	// This resets the intrinsic margin on the figure in non-floated, wide, and full-wide alignments.
 	margin-left: 0;
 	margin-right: 0;
