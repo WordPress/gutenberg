@@ -8,7 +8,13 @@ import {
 	tabThroughBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
-export async function tabThroughBlock( content, blockType ) {
+/**
+ * Tabs through a content block and asserts that the external wrapper, inserter toggle, mover controls, and toolbar buttons all receive keyboard focus.
+ *
+ * @param {string} blockType  The expected value of the data-type attribute of the block's external wrapper
+ */
+
+export async function tabThroughBlock( blockType ) {
 	// Tab to the next block
 	await page.keyboard.press( 'Tab' );
 	await externalWrapperHasFocus( blockType );

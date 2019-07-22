@@ -17,7 +17,7 @@ describe( 'Order of block keyboard navigation', () => {
 		await createNewPost();
 	} );
 
-	it( 'permits tabbing through paragraph blocks in the expected order', async () => {
+	it( 'permits tabbing through paragraph blocks and the top of the content editor in the expected order', async () => {
 		const paragraphBlocks = [ 'Paragraph 0', 'Paragraph 1', 'Paragraph 2' ];
 
 		// create 3 paragraphs blocks with some content
