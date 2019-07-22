@@ -235,14 +235,14 @@
 
 /* Settings */
 :root {
-	--color: #000;
+	--color: hsla(204, 80%, 72%, 0.15);
 	/* The following is hard-coded for `gutenberg-theme` */
-	--background-columns: linear-gradient(to right, var(--color), var(--color) 15px, transparent 16px, transparent 200px, var(--color) 200px, var(--color) 215px, transparent 215px, transparent 985px, var(--color) 985px, var(--color) 1000px, transparent 1000px, transparent 1184px, var(--color) 1184px, var(--color) 1200px, transparent 1200px);
+	--background-columns: linear-gradient(to right, transparent, transparent 15px, var(--color) 16px, var(--color) 200px, transparent 200px, transparent 215px, var(--color) 215px, var(--color) 985px, transparent 985px, transparent 1000px, var(--color) 1000px, var(--color) 1184px, transparent 1184px, transparent 1200px, var(--color) 1200px);
 }
 
 .edit-post-layout.is-mode-design {
 	background-image: var(--background-columns);
-	background-size: 1100px 100%;
+	background-size: 1200px 100%;
 	background-repeat: no-repeat;
 	background-position-x: center;
 	z-index: 1000;
