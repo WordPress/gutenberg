@@ -412,6 +412,25 @@ export function postSavingLock( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the post title state.
+ *
+ * @param {PostTitleState} state  Current state.
+ * @param {Object}         action Dispatched action.
+ *
+ * @return {string?} Updated state.
+ */
+export const postTitle = combineReducers( {
+	isSelected( state = false, action ) {
+		switch ( action.type ) {
+			case 'TOGGLE_POST_TITLE_SELECTION':
+				return action.isSelected;
+		}
+
+		return state;
+	},
+} );
+
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
@@ -593,6 +612,7 @@ export default optimist( combineReducers( {
 	preferences,
 	saving,
 	postLock,
+	postTitle,
 	reusableBlocks,
 	template,
 	previewLink,

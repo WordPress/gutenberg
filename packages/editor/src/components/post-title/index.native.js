@@ -10,7 +10,7 @@ import { isEmpty } from 'lodash';
 import { Component } from '@wordpress/element';
 import { RichText } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -30,10 +30,6 @@ class PostTitle extends Component {
 
 	handleFocusOutside() {
 		this.props.onUnselect();
-	}
-
-	focus() {
-		this.props.onSelect();
 	}
 
 	render() {
@@ -91,27 +87,43 @@ class PostTitle extends Component {
 	}
 }
 
-const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const {
-		undo,
-		redo,
-	} = dispatch( 'core/editor' );
-
-	const {
-		insertDefaultBlock,
-	} = dispatch( 'core/block-editor' );
-
-	return {
-		onEnterPress() {
-			insertDefaultBlock( undefined, undefined, 0 );
-		},
-		onUndo: undo,
-		onRedo: redo,
-	};
-} );
-
 export default compose(
-	applyWithDispatch,
+	withSelect( ( dispatch ) => {
+		const {
+			isPostTitleSelected,
+		} = dispatch( 'core/editor' );
+
+		return {
+			isSelected: isPostTitleSelected(),
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => {
+		const {
+			undo,
+			redo,
+			togglePostTitleSelection,
+		} = dispatch( 'core/editor' );
+
+		const {
+			insertDefaultBlock,
+		} = dispatch( 'core/block-editor' );
+
+		return {
+			onEnterPress() {
+				insertDefaultBlock( undefined, undefined, 0 );
+			},
+			onUndo: undo,
+			onRedo: redo,
+			onSelect() {
+				togglePostTitleSelection( true );
+				ownProps.onSelect();
+			},
+			onUnselect() {
+				togglePostTitleSelection( false );
+				ownProps.onUnselect();
+			},
+		};
+	} ),
 	withInstanceId,
 	withFocusOutside
 )( PostTitle );

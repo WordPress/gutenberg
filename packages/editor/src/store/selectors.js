@@ -1098,6 +1098,17 @@ export function getActivePostLock( state ) {
 }
 
 /**
+ * Returns true if post title is selected.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether current post title is selected.
+ */
+export function isPostTitleSelected( state ) {
+	return state.postTitle.isSelected;
+}
+
+/**
  * Returns whether or not the user has the unfiltered_html capability.
  *
  * @param {Object} state Editor state.
