@@ -4,6 +4,11 @@
 import { __ } from '@wordpress/i18n';
 
 /**
+ * External dependencies
+ */
+import { includes } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import deprecated from './deprecated';
@@ -14,6 +19,8 @@ import save from './save';
 import transforms from './transforms';
 
 const { name } = metadata;
+
+const ALL_ALIGNMENTS = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 export { metadata, name };
 
@@ -27,9 +34,14 @@ export const settings = {
 	],
 	transforms,
 	getEditWrapperProps( attributes ) {
-		const { align, width } = attributes;
-		if ( 'left' === align || 'center' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align, 'data-resized': !! width };
+		const { align, width, fullScreen } = attributes;
+
+		if ( includes( ALL_ALIGNMENTS, align ) ) {
+			return {
+				'data-align': align,
+				'data-resized': !! width,
+				'data-full-screen': fullScreen ? 'true' : 'false',
+			};
 		}
 	},
 	edit,
