@@ -19,17 +19,19 @@ export class PostVisibility extends Component {
 		this.setPrivate = this.setPrivate.bind( this );
 		this.setPasswordProtected = this.setPasswordProtected.bind( this );
 		this.updatePassword = this.updatePassword.bind( this );
+		this.setCustomVisibility = this.setCustomVisibility.bind( this );
 
 		this.state = {
 			hasPassword: !! props.password,
+			currentVisibility: props.postVisibility,
 		};
 	}
 
 	setPublic() {
-		const { postVisibility, onUpdateVisibility, status } = this.props;
+		const { postVisibility, onUpdateVisibility } = this.props;
 
-		onUpdateVisibility( postVisibility === 'private' ? 'draft' : status );
-		this.setState( { hasPassword: false } );
+		onUpdateVisibility( postVisibility === 'private' ? 'draft' : 'publish' );
+		this.setState( { currentVisibility: 'public', hasPassword: false } );
 	}
 
 	setPrivate() {
@@ -40,15 +42,15 @@ export class PostVisibility extends Component {
 		const { onUpdateVisibility, onSave } = this.props;
 
 		onUpdateVisibility( 'private' );
-		this.setState( { hasPassword: false } );
+		this.setState( { currentVisibility: 'private', hasPassword: false } );
 		onSave();
 	}
 
 	setPasswordProtected() {
-		const { postVisibility, onUpdateVisibility, status, password } = this.props;
+		const { postVisibility, onUpdateVisibility, password } = this.props;
 
-		onUpdateVisibility( postVisibility === 'private' ? 'draft' : status, password || '' );
-		this.setState( { hasPassword: true } );
+		onUpdateVisibility( postVisibility === 'private' ? 'draft' : 'publish', password || '' );
+		this.setState( { currentVisibility: 'password', hasPassword: true } );
 	}
 
 	updatePassword( event ) {
@@ -56,18 +58,31 @@ export class PostVisibility extends Component {
 		onUpdateVisibility( status, event.target.value );
 	}
 
+	setCustomVisibility( event ) {
+		const { onUpdateVisibility } = this.props;
+
+		if ( event.target.value !== this.state.currentVisibility ) {
+			onUpdateVisibility( event.target.value );
+			this.setState( { currentVisibility: event.target.value, hasPassword: false } );
+		}
+	}
+
+	isChecked( statusVisibility ) {
+		return this.state.currentVisibility === statusVisibility;
+	}
+
 	render() {
-		const { postVisibility, password, statuses, instanceId } = this.props;
+		const { password, statuses, instanceId } = this.props;
 		const statusVisibilities = filter( statuses, ( status ) => status.visibility.value );
 
 		const visibilityHandlers = {
 			public: {
 				onSelect: this.setPublic,
-				checked: postVisibility === 'public' && ! this.state.hasPassword,
+				checked: this.state.currentVisibility === 'public' && ! this.state.hasPassword,
 			},
 			private: {
 				onSelect: this.setPrivate,
-				checked: postVisibility === 'private',
+				checked: this.state.currentVisibility === 'private',
 			},
 			password: {
 				onSelect: this.setPasswordProtected,
@@ -86,8 +101,8 @@ export class PostVisibility extends Component {
 							type="radio"
 							name={ `editor-post-visibility__setting-${ instanceId }` }
 							value={ visibility.value }
-							onChange={ visibilityHandlers[ visibility.value ].onSelect }
-							checked={ visibilityHandlers[ visibility.value ].checked }
+							onChange={ visibilityHandlers[ visibility.value ] ? visibilityHandlers[ visibility.value ].onSelect : this.setCustomVisibility }
+							checked={ visibilityHandlers[ visibility.value ] ? visibilityHandlers[ visibility.value ].checked : this.isChecked( visibility.value ) }
 							id={ `editor-post-${ visibility.value }-${ instanceId }` }
 							aria-describedby={ `editor-post-${ visibility.value }-${ instanceId }-description` }
 							className="editor-post-visibility__dialog-radio"

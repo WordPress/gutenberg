@@ -366,11 +366,13 @@ export const getAutosaveAttribute = createRegistrySelector( ( select ) => ( stat
  */
 export function getEditedPostVisibility( state ) {
 	const status = getEditedPostAttribute( state, 'status' );
-	if ( status === 'private' ) {
-		return 'private';
+	const password = getEditedPostAttribute( state, 'password' );
+	const publicStatuses = [ 'auto-draft', 'draft', 'future', 'pending', 'publish', 'trash' ];
+
+	if ( ! password && ! includes( publicStatuses, status ) ) {
+		return status;
 	}
 
-	const password = getEditedPostAttribute( state, 'password' );
 	if ( password ) {
 		return 'password';
 	}
@@ -399,7 +401,7 @@ export function isCurrentPostPending( state ) {
 export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
-	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
+	return [ 'auto-draft', 'draft', 'future', 'pending' ].indexOf( post.status ) === -1 ||
 		( post.status === 'future' && ! isInTheFuture( new Date( Number( getDate( post.date ) ) - ONE_MINUTE_IN_MS ) ) );
 }
 
@@ -429,7 +431,7 @@ export function isEditedPostPublishable( state ) {
 	//
 	//  See: <PostPublishButton /> (`isButtonEnabled` assigned by `isSaveable`)
 
-	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
+	return isEditedPostDirty( state ) || [ 'auto-draft', 'draft', 'pending' ].indexOf( post.status ) !== -1;
 }
 
 /**

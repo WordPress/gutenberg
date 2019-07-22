@@ -28,6 +28,12 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 		return [];
 	}
 
+	const builtInStatuses = [ 'publish', 'private', 'future', 'pending', 'draft', 'trash' ];
+	// For now custom statuses are not shown a notice.
+	if ( ! includes( builtInStatuses, post.status ) ) {
+		return [];
+	}
+
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = includes( publishStatus, previousPost.status );
 	const willPublish = includes( publishStatus, post.status );

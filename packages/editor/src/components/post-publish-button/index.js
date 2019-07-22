@@ -68,6 +68,8 @@ export class PostPublishButton extends Component {
 			publishStatus = 'future';
 		} else if ( visibility === 'private' ) {
 			publishStatus = 'private';
+		} else if ( visibility && visibility !== 'public' && visibility !== 'password' ) {
+			publishStatus = visibility;
 		} else {
 			publishStatus = 'publish';
 		}
