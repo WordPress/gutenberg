@@ -481,7 +481,7 @@ export class TableEdit extends Component {
 					isCaptionSelected: true,
 				} ) }
 				// Only show inlineToolbar when caption is at the bottom,
-				// otherwise it's overlaped by the main block toolbar.
+				// otherwise it's overlapped by the main block toolbar.
 				inlineToolbar={ isCaptionBottom }
 			/>
 		);
