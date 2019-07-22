@@ -30,14 +30,14 @@ describe( 'Order of block keyboard navigation', () => {
 
 		await navigateToContentEditorTop();
 
-		await tabThroughTextBlock( 'Heading Block Content', 'core/heading' );
-		await tabThroughTextBlock( 'Quote Block Content', 'core/quote' );
-		await tabThroughTextBlock( 'List Block Content', 'core/list' );
-		await tabThroughTextBlock( 'Paragraph Block Content', 'core/paragraph' );
-		await tabThroughFileBlock( 'Image Block Content', 'core/image' );
-		await tabThroughFileBlock( 'Gallery Block Content', 'core/gallery' );
-		await tabThroughFileBlock( 'Audio Block Content', 'core/audio' );
-		await tabThroughFileBlock( 'Cover Block Content', 'core/cover' );
-		await tabThroughFileBlock( 'File Block Content', 'core/file' );
+		await tabThroughTextBlock( 'core/heading', 'Heading Block Content' );
+		await tabThroughTextBlock( 'core/quote', 'Quote Block Content' );
+		await tabThroughTextBlock( 'core/list', 'List Block Content' );
+		await tabThroughTextBlock( 'core/paragraph', 'Paragraph Block Content' );
+		await tabThroughFileBlock( 'core/image' );
+		await tabThroughFileBlock( 'core/gallery' );
+		await tabThroughFileBlock( 'core/audio' );
+		await tabThroughFileBlock( 'core/cover' );
+		await tabThroughFileBlock( 'core/file' );
 	} );
 } );
