@@ -1285,6 +1285,29 @@ export const hasInserterItems = createSelector(
 );
 
 /**
+ * Determines whether there is only one item that may be inserted.
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} True if there is one item available, false if zero or more than one.
+ */
+export const hasOneAllowedItem = createSelector(
+	( state, rootClientId = null ) => {
+		if ( rootClientId ) {
+			const parentBlockListSettings = getBlockListSettings( state, rootClientId );
+			return ( !! get( parentBlockListSettings, [ 'allowedBlocks' ] ) &&
+				get( parentBlockListSettings, [ 'allowedBlocks' ] ).length === 1 );
+		}
+
+		return false;
+	},
+	( state, rootClientId ) => [
+		state,
+		rootClientId,
+	],
+);
+
+/**
  * Returns the Block List settings of a block, if any exist.
  *
  * @param {Object}  state    Editor state.
