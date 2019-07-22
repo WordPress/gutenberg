@@ -418,7 +418,7 @@ export function postSavingLock( state = {}, action ) {
  * @param {PostTitleState} state  Current state.
  * @param {Object}         action Dispatched action.
  *
- * @return {string?} Updated state.
+ * @return {Object} Updated state.
  */
 export const postTitle = combineReducers( {
 	isSelected( state = false, action ) {
