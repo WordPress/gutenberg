@@ -158,6 +158,14 @@ _Returns_
 
 -   `Promise`: Promise resolving once the edit post sidebar is opened.
 
+<a name="externalWrapperHasFocus" href="#externalWrapperHasFocus">#</a> **externalWrapperHasFocus**
+
+Asserts that the element with keyboard focus is a block's external wrapper
+
+_Parameters_
+
+-   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
+
 <a name="findSidebarPanelToggleButtonWithTitle" href="#findSidebarPanelToggleButtonWithTitle">#</a> **findSidebarPanelToggleButtonWithTitle**
 
 Finds a sidebar panel with the provided title.
@@ -228,6 +236,14 @@ _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
 
+<a name="getElementSelectorList" href="#getElementSelectorList">#</a> **getElementSelectorList**
+
+Returns an array of classnames that match a given selector on the current page
+
+_Parameters_
+
+-   _selector_ `string`: The selector to query on the page
+
 <a name="hasBlockSwitcher" href="#hasBlockSwitcher">#</a> **hasBlockSwitcher**
 
 Returns a boolean indicating if the current selected block has a block switcher or not.
@@ -235,6 +251,15 @@ Returns a boolean indicating if the current selected block has a block switcher 
 _Returns_
 
 -   `Promise`: Promise resolving with a boolean.
+
+<a name="insertAndPopulateBlock" href="#insertAndPopulateBlock">#</a> **insertAndPopulateBlock**
+
+Inserts a content block and then, if it has text content areas, fills them with text
+
+_Parameters_
+
+-   _blockName_ `string`: The type of block to insert
+-   _content_ `string`: The text to enter into each contenteditable area
 
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 
@@ -245,6 +270,10 @@ _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
 -   _panelName_ `string`: The inserter panel to open (if it's closed by default).
+
+<a name="inserterToggleHasFocus" href="#inserterToggleHasFocus">#</a> **inserterToggleHasFocus**
+
+Asserts that a content block's inserter toggle has keyboard focus
 
 <a name="installPlugin" href="#installPlugin">#</a> **installPlugin**
 
@@ -458,6 +487,14 @@ running the test is not already the admin user).
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
 
+<a name="tabThroughBlock" href="#tabThroughBlock">#</a> **tabThroughBlock**
+
+Tabs through a content block and asserts that the external wrapper, inserter toggle, mover controls, and toolbar buttons all receive keyboard focus.
+
+_Parameters_
+
+-   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
+
 <a name="tabThroughBlockMoverControl" href="#tabThroughBlockMoverControl">#</a> **tabThroughBlockMoverControl**
 
 Navigates through the block mover control using the keyboard. Asserts that the 'move up' and 'move down' controls receive focus.
@@ -465,6 +502,44 @@ Navigates through the block mover control using the keyboard. Asserts that the '
 <a name="tabThroughBlockToolbar" href="#tabThroughBlockToolbar">#</a> **tabThroughBlockToolbar**
 
 Navigate through a block's toolbar using the keyboard. Asserts that each button receives focus.
+
+<a name="tabThroughFileBlock" href="#tabThroughFileBlock">#</a> **tabThroughFileBlock**
+
+Tabs through a content block with file upload buttons, such as an Image, Gallery, Audio, or Cover block
+
+_Parameters_
+
+-   _content_ `string`: The expected title of the block
+-   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
+
+<a name="tabThroughPlaceholderButtons" href="#tabThroughPlaceholderButtons">#</a> **tabThroughPlaceholderButtons**
+
+Tabs through the file upload buttons that appear in a file content block's placeholder area
+
+<a name="tabThroughTextBlock" href="#tabThroughTextBlock">#</a> **tabThroughTextBlock**
+
+Tabs through a content block with text content areas, such as a Heading, Quote, or Paragraph block. Asserts that the text content areas all receive focus.
+
+_Parameters_
+
+-   _content_ `string`: The expected title of the block
+-   _blockType_ `string`: The expected value of the data-type attribute of the block's external wrapper
+
+<a name="textContentAreas" href="#textContentAreas">#</a> **textContentAreas**
+
+Returns a list of a block's contenteditable elements.
+
+_Parameters_
+
+-   _empty_ `boolean`: When true, restricts the list to contenteditable elements with no value
+
+<a name="textContentAreasHaveFocus" href="#textContentAreasHaveFocus">#</a> **textContentAreasHaveFocus**
+
+Tabs through the text content areas of a block and asserts the expected values
+
+_Parameters_
+
+-   _content_ `string`: The expected value of the block's contenteditable elements
 
 <a name="toggleScreenOption" href="#toggleScreenOption">#</a> **toggleScreenOption**
 
