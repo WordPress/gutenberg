@@ -1,4 +1,5 @@
 .block-editor-block-list__layout .components-draggable__clone {
+
 	// Hide the Block UI when dragging the block.
 	// This ensures the page scroll properly (no sticky elements).
 	.block-editor-block-contextual-toolbar {
@@ -7,7 +8,9 @@
 	}
 }
 
-.block-editor-block-list__layout .block-editor-block-list__block.is-selected { // Needs specificity to override inherited styles.
+.block-editor-block-list__layout .block-editor-block-list__block.is-selected {
+
+	// Needs specificity to override inherited styles.
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {
 		.block-editor-block-list__block-edit::before {
@@ -39,6 +42,7 @@
  */
 
 .block-editor-block-list__layout {
+
 	// Make room in the main content column for the side UI.
 	// The side UI uses negative margins to position itself so as to not affect the block width.
 	@include break-small() {
@@ -212,11 +216,12 @@
 
 .block-editor-block-list__layout .block-editor-block-list__block {
 	&.has-warning {
-		min-height: ( $block-padding + $block-spacing ) * 2;
+		min-height: ($block-padding + $block-spacing) * 2;
 	}
 
 	// Warnings
 	&.has-warning .block-editor-block-list__block-edit {
+
 		// When a block has a warning, you shouldn't be able to manipulate the contents.
 		> * {
 			pointer-events: none;
@@ -266,7 +271,7 @@
 	}
 
 	&.has-warning.is-selected .block-editor-block-list__block-edit::after {
-		bottom: ( $block-toolbar-height - $block-padding - $border-width );
+		bottom: ($block-toolbar-height - $block-padding - $border-width);
 
 		@include break-small() {
 			bottom: -$block-padding;
@@ -305,6 +310,7 @@
 
 	// Reusable Blocks clickthrough overlays
 	&.is-reusable > .block-editor-block-list__block-edit .block-editor-inner-blocks.has-overlay {
+
 		// Remove only the top click overlay.
 		&::after {
 			display: none;
@@ -363,6 +369,7 @@
 
 	// Position the sticky toolbar correctly beyond the mobile breakpoint.
 	@include break-small() {
+
 		&[data-align="right"] .block-editor-block-contextual-toolbar,
 		&[data-align="left"] .block-editor-block-contextual-toolbar {
 			top: $block-padding;
@@ -371,6 +378,7 @@
 
 	// Left
 	&[data-align="left"] {
+
 		// This is in the editor only; the image should be floated on the frontend.
 		.block-editor-block-list__block-edit {
 			/*!rtl:begin:ignore*/
@@ -392,6 +400,7 @@
 
 	// Right
 	&[data-align="right"] {
+
 		// Right: This is in the editor only; the image should be floated on the frontend.
 		> .block-editor-block-list__block-edit {
 			/*!rtl:begin:ignore*/
@@ -446,6 +455,7 @@
 		}
 
 		@include break-wide() {
+
 			&.is-multi-selected > .block-editor-block-mover,
 			> .block-editor-block-list__block-edit > .block-editor-block-mover {
 				display: block;
@@ -468,6 +478,7 @@
 
 	// Wide
 	&[data-align="wide"] {
+
 		// Position mover
 		&.is-multi-selected > .block-editor-block-mover,
 		> .block-editor-block-list__block-edit > .block-editor-block-mover {
@@ -477,6 +488,7 @@
 
 	// Full-wide
 	&[data-align="full"] {
+
 		// Position hover label on the left for the top level block.
 		> .block-editor-block-list__block-edit > .block-editor-block-list__breadcrumb {
 			left: 0;
@@ -572,6 +584,7 @@
 
 	// Elevate when block is selected or hovered.
 	@include break-small() {
+
 		&.is-multi-selected,
 		&.is-selected,
 		&.is-hovered {
@@ -591,6 +604,7 @@
 
 		// Hide on mobile, as mobile has a separate solution.
 		display: none;
+
 		@include break-small() {
 			display: block;
 		}
@@ -603,10 +617,12 @@
 	// For floats, show block mover when block is selected, and never on hover.
 	&[data-align="left"],
 	&[data-align="right"] {
+
 		// Show always when the block is selected.
 		&.is-selected > .block-editor-block-list__block-edit > .block-editor-block-mover {
 			// Don't show on mobile, allow the special mobile toolbar to work there.
 			display: none;
+
 			@include break-small() {
 				display: block;
 				opacity: 1;
@@ -661,6 +677,7 @@
 
 		// Show a shadow below the selected block to imply separation.
 		box-shadow: $shadow-below-only;
+
 		@include break-small() {
 			box-shadow: none;
 		}
@@ -738,6 +755,7 @@
 .block-editor-block-list__insertion-point-inserter {
 	// Don't show on mobile.
 	display: none;
+
 	@include break-mobile() {
 		display: flex;
 	}
@@ -747,7 +765,7 @@
 	left: 0;
 	right: 0;
 	justify-content: center;
-	height: $block-padding + 8px;
+	height: $block-padding+8px;
 
 	// Show a clickable plus.
 	.block-editor-inserter__toggle {
@@ -776,6 +794,7 @@
 
 // Don't show the sibling inserter before the selected block.
 .edit-post-layout:not(.has-fixed-toolbar) {
+
 	// The child selector is necessary for this to work properly in nested contexts.
 	.is-selected > .block-editor-block-list__insertion-point > .block-editor-block-list__insertion-point-inserter,
 	.is-focused > .block-editor-block-list__insertion-point > .block-editor-block-list__insertion-point-inserter {
@@ -857,6 +876,7 @@
 
 		// Paint the borders on the toolbar itself on mobile.
 		border-top: $border-width solid $light-gray-800;
+
 		.components-toolbar {
 			border-top: none;
 			border-bottom: none;
@@ -864,6 +884,7 @@
 
 		@include break-small() {
 			border-top: none;
+
 			.components-toolbar {
 				border-top: $border-width solid $light-gray-800;
 				border-bottom: $border-width solid $light-gray-800;
@@ -879,6 +900,7 @@
 
 		// Display the box-shadow on the parent element.
 		box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
+
 		.is-dark-theme & {
 			box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
 		}
@@ -896,6 +918,7 @@
 	.block-editor-block-contextual-toolbar {
 		margin-left: 0;
 		margin-right: 0;
+
 		@include break-small() {
 			margin-left: -$block-padding - $border-width;
 			margin-right: -$block-padding - $border-width;
@@ -927,6 +950,7 @@
 
 // Enable toolbar footprint collapsing
 .block-editor-block-contextual-toolbar {
+
 	// Position the contextual toolbar above the block.
 	.block-editor-block-list__block & {
 		@include break-small() {
@@ -1048,6 +1072,7 @@
 
 .block-editor-block-list__block {
 	@include break-small {
+
 		// Increase the hover and selection area around blocks.
 		// This makes the blue hover line and the settings button appear even if
 		// the mouse cursor is technically outside the block.
@@ -1090,7 +1115,27 @@
 
 	// Bigger padding on mobile where blocks are edge to edge.
 	padding: 10px $block-padding;
+
 	@include break-small() {
 		padding: 10px $block-padding;
 	}
+}
+
+
+/**
+ * Grid columns
+ */
+
+.block-editor-block-list__layout .grid__line {
+	width: 2px;
+	height: 0;
+	position: absolute;
+	background: $blue-medium-highlight;
+	/*z-index: 100;*/
+	transition: height ease-in 400ms;
+}
+
+.block-editor-block-list__layout--grid-visible .grid__line {
+	height: 100vh;
+	transition: height ease-out 400ms;
 }

@@ -551,6 +551,7 @@ class ImageEdit extends Component {
 			noticeUI,
 			toggleSelection,
 			isRTL,
+			snap,
 		} = this.props;
 		const {
 			url,
@@ -876,6 +877,8 @@ class ImageEdit extends Component {
 											} );
 											toggleSelection( true );
 										} }
+										snap={ { x: snap.gridStops } }
+										snapGap={ snap.gap }
 									>
 										{ img }
 									</ResizableBox>
@@ -912,6 +915,7 @@ export default compose( [
 			imageSizes,
 			isRTL,
 			maxWidth,
+			snap,
 		} = getSettings();
 
 		return {
@@ -919,6 +923,7 @@ export default compose( [
 			maxWidth,
 			isRTL,
 			imageSizes,
+			snap,
 			mediaUpload: __experimentalMediaUpload,
 		};
 	} ),

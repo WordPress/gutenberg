@@ -680,6 +680,28 @@ export function updateSettings( settings ) {
 }
 
 /**
+ * Returns an action object used in signalling that the grid should be shown.
+ *
+ * @return {Object} Action object.
+ */
+export function showGrid() {
+	return {
+		type: 'SHOW_GRID',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the grid should be hidden.
+ *
+ * @return {Object} Action object.
+ */
+export function hideGrid() {
+	return {
+		type: 'HIDE_GRID',
+	};
+}
+
+/**
  * Returns an action object used in signalling that a temporary reusable blocks have been saved
  * in order to switch its temporary id with the real id.
  *

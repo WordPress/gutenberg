@@ -36,10 +36,7 @@ export const SETTINGS_DEFAULTS = {
 			slug: 'pale-pink',
 			color: '#f78da7',
 		},
-		{	name: __( 'Vivid red' ),
-			slug: 'vivid-red',
-			color: '#cf2e2e',
-		},
+		{ name: __( 'Vivid red' ), slug: 'vivid-red', color: '#cf2e2e' },
 		{
 			name: __( 'Luminous vivid orange' ),
 			slug: 'luminous-vivid-orange',
@@ -137,5 +134,13 @@ export const SETTINGS_DEFAULTS = {
 
 	availableLegacyWidgets: {},
 	hasPermissionsToManageWidgets: false,
-};
 
+	snap: {
+		// The snap grid lines that the image will snap to
+		// those should be overridden by themes later
+		gridStops: [ 100, 175, 250, 375, 450, 525, 600, 675, 750, 825 ],
+
+		// snap gap is sued to snap the image to the line when it sizes approach this point
+		gap: 20,
+	},
+};

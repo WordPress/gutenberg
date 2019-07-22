@@ -195,6 +195,20 @@ class BlockList extends Component {
 		}
 	}
 
+	generateGridLines() {
+		const gridLines = [];
+		for ( let i = 0; i <= this.props.snap.gridStops; i++ ) {
+			gridLines.push(
+				<div
+					key={ `grid__line-${ i }` }
+					className="grid__line"
+					style={ { left: this.props.snap.gridStops[ i ] } }
+				/>
+			);
+		}
+		return gridLines;
+	}
+
 	render() {
 		const {
 			blockClientIds,
@@ -208,7 +222,10 @@ class BlockList extends Component {
 		} = this.props;
 
 		return (
-			<div className="editor-block-list__layout block-editor-block-list__layout">
+			<div className="editor-block-list__layout block-editor-block-list__layout block-editor-block-list__layout--grid-visible">
+
+				<generateGridLines />
+
 				{ blockClientIds.map( ( clientId ) => {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :
@@ -262,8 +279,10 @@ export default compose( [
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
 			getGlobalBlockCount,
+			getSettings,
 		} = select( 'core/block-editor' );
 
+		const { snap } = getSettings();
 		const { rootClientId } = ownProps;
 
 		return {
@@ -276,6 +295,7 @@ export default compose( [
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
 			enableAnimation: getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+			snap,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
