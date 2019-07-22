@@ -28,13 +28,14 @@
 /packages/edit-widgets                          @youknowriad
 
 # Tooling
-/bin                                            @youknowriad @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/bin                                            @youknowriad @aduth @ntwb @nerrad @ajitbohra
+/bin/update-readmes.js                          @youknowriad @aduth @ntwb @nerrad @ajitbohra @nosolosw
 /docs/tool                                      @youknowriad @chrisvanpatten @ajitbohra @nosolosw
-/packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/babel-plugin-import-jsx-pragma        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @youknowriad @aduth @ntwb @nerrad @ajitbohra
-/packages/babel-preset-default                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
-/packages/browserslist-config                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
-/packages/custom-templated-path-webpack-plugin  @youknowriad @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/babel-preset-default                  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/browserslist-config                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/custom-templated-path-webpack-plugin  @youknowriad @aduth @ntwb @nerrad @ajitbohra
 /packages/docgen                                @nosolosw
 /packages/e2e-test-utils                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @talldan
@@ -42,9 +43,9 @@
 /packages/jest-console                          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/jest-puppeteer-axe                    @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/library-export-default-webpack-plugin @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
-/packages/npm-package-json-lint-config          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
-/packages/postcss-themes                        @youknowriad @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/library-export-default-webpack-plugin @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/npm-package-json-lint-config          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/postcss-themes                        @youknowriad @aduth @ntwb @nerrad @ajitbohra
 /packages/scripts                               @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
 
 # UI Components
@@ -60,7 +61,7 @@
 /packages/blob                                  @youknowriad @aduth
 /packages/date                                  @youknowriad @aduth
 /packages/deprecated                            @youknowriad @aduth
-/packages/dom                                   @youknowriad @aduth @nosolosw @ellatrix
+/packages/dom                                   @youknowriad @aduth @ellatrix
 /packages/dom-ready                             @youknowriad @aduth
 /packages/escape-html                           @youknowriad @aduth
 /packages/html-entities                         @youknowriad @aduth
