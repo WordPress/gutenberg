@@ -34,7 +34,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
-		await page.keyboard.type( '1st col' );
+		await page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
 		// TODO: ArrowDown should traverse into the second column. In slower
 		// CPUs, it can sometimes remain in the first column paragraph. This
@@ -45,7 +45,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
-		await page.keyboard.type( '2nd col' );
+		await page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
 
 		// Arrow down from last of layouts exits nested context to default
 		// appender of root level.
