@@ -1405,6 +1405,16 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
 function getReusableBlocks( state ) {
 	return get( state, [ 'settings', '__experimentalReusableBlocks' ], EMPTY_ARRAY );
 }
+/**
+ * Returns true if application is requesting for discover blocks.
+ *
+ * @param {Object} state       Global application state.
+ *
+ * @return {Array} Discoverable blocks
+ */
+export function isRequestingDiscoverBlocks( state ) {
+	return state.discoverBlocks.isRequestingDiscoverBlocks;
+}
 
 /**
  * Returns the available uninstalled blocks

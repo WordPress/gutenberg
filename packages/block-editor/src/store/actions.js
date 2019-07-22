@@ -705,14 +705,22 @@ export function __unstableMarkLastChangeAsPersistent() {
 	return { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' };
 }
 
+/** Returns an action object used in signalling that the discover blocks have been requested and is loading.
+ *
+ * @return {Object} Action object.
+ */
+export function fetchDiscoverBlocks() {
+	return { type: 'FETCH_DISCOVER_BLOCKS' };
+}
+
 /** Returns an action object used in signalling that the discover blocks have been updated.
  * @param {Array} discoverBlocks Discoverable blocks.
  * @param {string} filterValue Search string.
  *
  * @return {Object} Action object.
  */
-export function setDiscoverBlocks( discoverBlocks, filterValue ) {
-	return { type: 'SET_DISCOVER_BLOCKS', discoverBlocks, filterValue };
+export function receiveDiscoverBlocks( discoverBlocks, filterValue ) {
+	return { type: 'RECEIVE_DISCOVER_BLOCKS', discoverBlocks, filterValue };
 }
 
 /** Returns an action object used in signalling that the user does not have permission to install blocks.

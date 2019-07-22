@@ -11,7 +11,15 @@ import { __ } from '@wordpress/i18n';
  */
 import DiscoverBlocksList from '../discover-blocks-list';
 
-function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission } ) {
+function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission, isLoading } ) {
+	if ( isLoading ) {
+		return (
+			<p className="block-editor-discover-blocks-panel__description has-no-results">
+				{ __( 'Loading' ) }
+			</p>
+		);
+	}
+
 	if ( ! hasPermission ) {
 		return (
 			<p className="block-editor-discover-blocks-panel__description has-no-results">
@@ -45,14 +53,17 @@ export default compose( [
 		const {
 			getDiscoverBlocks,
 			hasInstallBlocksPermission,
+			isRequestingDiscoverBlocks,
 		} = select( 'core/block-editor' );
 
 		const discoverItems = getDiscoverBlocks( filterValue );
 		const hasPermission = hasInstallBlocksPermission();
+		const isLoading = isRequestingDiscoverBlocks();
 
 		return {
 			discoverItems,
 			hasPermission,
+			isLoading,
 		};
 	} ),
 ] )( DiscoverBlocksPanel );

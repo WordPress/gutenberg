@@ -2,18 +2,19 @@
  * Internal dependencies
  */
 import { apiFetch } from './controls';
-import { setDiscoverBlocks, setInstallBlocksPermission } from './actions';
+import { fetchDiscoverBlocks, receiveDiscoverBlocks, setInstallBlocksPermission } from './actions';
 
 export default {
 	* getDiscoverBlocks( filterValue ) {
 		try {
+			yield fetchDiscoverBlocks( filterValue );
 			const blocks = yield apiFetch( {
 				path: `__experimental/blocks?search=${ filterValue }`,
 			} );
-			return setDiscoverBlocks( blocks, filterValue );
+			yield receiveDiscoverBlocks( blocks, filterValue );
 		} catch ( error ) {
 			if ( error.code === 'rest_user_cannot_view' ) {
-				return setInstallBlocksPermission( false );
+				yield setInstallBlocksPermission( false );
 			}
 		}
 	},
