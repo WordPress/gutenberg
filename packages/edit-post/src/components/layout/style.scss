@@ -237,7 +237,7 @@
 :root {
 	--color: #000;
 	/* The following is hard-coded for `gutenberg-theme` */
-	--background-columns: linear-gradient(to right, var(--color), var(--color) 1px, transparent 1px, transparent 245px, var(--color) 245px, var(--color) 246px, transparent 246px, transparent 854px, var(--color) 854px, var(--color) 855px, transparent 855px, transparent 1099px, var(--color) 1099px, var(--color) 1100px, transparent 1100px);
+	--background-columns: linear-gradient(to right, var(--color), var(--color) 15px, transparent 16px, transparent 200px, var(--color) 200px, var(--color) 215px, transparent 215px, transparent 985px, var(--color) 985px, var(--color) 1000px, transparent 1000px, transparent 1184px, var(--color) 1184px, var(--color) 1200px, transparent 1200px);
 }
 
 .edit-post-layout.is-mode-design {
