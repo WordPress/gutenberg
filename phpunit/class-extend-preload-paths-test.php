@@ -25,8 +25,9 @@ class Extend_Preload_Paths_Test extends WP_UnitTestCase {
 
 		$expected_blocks_path    = array( '/wp/v2/blocks', 'OPTIONS' );
 		$expected_autosaves_path = sprintf( '/wp/v2/%s/%d/autosaves?context=edit', 'posts', self::$post->ID );
+		$expected_statuses_path  = '/wp/v2/statuses?context=edit';
 
-		$this->assertEquals( array( $expected_autosaves_path, $expected_blocks_path ), $preload_paths );
+		$this->assertEquals( array( $expected_autosaves_path, $expected_blocks_path, $expected_statuses_path ), $preload_paths );
 	}
 
 	/**
@@ -35,7 +36,8 @@ class Extend_Preload_Paths_Test extends WP_UnitTestCase {
 	function test_replaces_registered_properties() {
 		$existing_blocks_path    = array( '/wp/v2/blocks', 'OPTIONS' );
 		$existing_autosaves_path = sprintf( '/wp/v2/%s/%d/autosaves?context=edit', 'posts', self::$post->ID );
-		$existing_preload_paths  = array( $existing_blocks_path, $existing_autosaves_path );
+		$expected_statuses_path  = '/wp/v2/statuses?context=edit';
+		$existing_preload_paths  = array( $existing_blocks_path, $existing_autosaves_path, $expected_statuses_path );
 
 		$preload_paths = gutenberg_extend_block_editor_preload_paths( $existing_preload_paths, self::$post );
 
