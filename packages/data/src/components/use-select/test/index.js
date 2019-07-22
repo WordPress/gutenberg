@@ -133,12 +133,11 @@ describe( 'useSelect', () => {
 		} );
 	} );
 	describe( 'rerenders as expected with various mapSelect return types', () => {
-		const getComponent = ( mapSelectSpy, dependencyKey ) => ( props ) => {
-			const dependencies = props[ dependencyKey ];
-			mapSelectSpy.mockImplementation(
+		const getComponent = ( selectSpy ) => () => {
+			selectSpy.mockImplementation(
 				( select ) => select( 'testStore' ).testSelector()
 			);
-			const data = useSelect( mapSelectSpy, [ dependencies ] );
+			const data = useSelect( selectSpy, [] );
 			return <div data={ data } />;
 		};
 		let selectorSpy,
@@ -159,7 +158,7 @@ describe( 'useSelect', () => {
 			} );
 			registry.subscribe = subscriberSpy;
 			selectSpy = jest.fn();
-			TestComponent = getComponent( selectSpy, 'keyName' );
+			TestComponent = getComponent( selectSpy );
 		} );
 		[
 			[
@@ -199,7 +198,7 @@ describe( 'useSelect', () => {
 					act( () => {
 						renderer = TestRenderer.create(
 							<RegistryProvider value={ registry }>
-								<TestComponent keyName="foo" />
+								<TestComponent />
 							</RegistryProvider>
 						);
 					} );
