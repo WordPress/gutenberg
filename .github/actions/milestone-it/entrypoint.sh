@@ -1,7 +1,21 @@
 #!/bin/bash
 set -e
 
-# 1. Proceed only when merge occurs to `master` base branch.
+# 1. Proceed only when acting on a merge action on the master branch.
+
+action=$(jq -r '.action' $GITHUB_EVENT_PATH)
+
+if [ "$action" != 'closed' ]; then
+	echo "Action '$action' not a close action. Aborting."
+	exit 78;
+fi
+
+merged=$(jq -r '.pull_request.merged' $GITHUB_EVENT_PATH)
+
+if [ "$merged" != 'true' ]; then
+	echo "Pull request closed without merge. Aborting."
+	exit 78;
+fi
 
 base=$(jq -r '.pull_request.base.ref' $GITHUB_EVENT_PATH)
 
