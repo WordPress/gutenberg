@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { first, last } from 'lodash';
+import { first, last, some } from 'lodash';
 import { animated } from 'react-spring/web.cjs';
 
 /**
@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { Disabled, KeyboardShortcuts, withFilters } from '@wordpress/components';
+import { KeyboardShortcuts, withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	withDispatch,
@@ -52,6 +52,8 @@ import Inserter from '../inserter';
 import useHoveredArea from './hover-area';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
+
+const postBlockTypes = [ 'core/post-content', 'core/post-date', 'core/post-title' ];
 
 /**
  * Prevents default dragging behavior within a block to allow for multi-
@@ -102,7 +104,7 @@ function BlockListBlock( {
 	onSelectionStart,
 	animateOnChange,
 	enableAnimation,
-	isAncestorOfPostContent,
+	isAncestorOfPostBlock,
 	noInserters,
 	noMovers,
 	noToolbars,
@@ -417,7 +419,8 @@ function BlockListBlock( {
 			'is-typing': isTypingWithinBlock,
 			'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
-			'is-ancestor-of-post-content': isAncestorOfPostContent,
+			'is-ancestor-of-post-block': isAncestorOfPostBlock,
+			'is-post-block': postBlockTypes.includes( name ),
 		},
 		className
 	);
@@ -612,9 +615,6 @@ const applyWithSelect = withSelect(
 			__unstableGetBlockWithoutInnerBlocks,
 			isAncestorOfBlockTypeName,
 		} = select( 'core/block-editor' );
-		const {
-			getViewEditingMode,
-		} = select( 'core/editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
 		const { hasFixedToolbar, focusMode, isRTL } = getSettings();
@@ -660,8 +660,7 @@ const applyWithSelect = withSelect(
 			isValid,
 			isSelected,
 			isParentOfSelectedBlock,
-			isAncestorOfPostContent: isAncestorOfBlockTypeName( clientId, 'core/post-content' ),
-			viewEditingMode: getViewEditingMode(),
+			isAncestorOfPostBlock: some( postBlockTypes, ( blockTypeName ) => isAncestorOfBlockTypeName( clientId, blockTypeName ) ),
 		};
 	}
 );
@@ -758,18 +757,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	};
 } );
 
-const applyDisabled = ( WrappedComponent ) => ( props ) =>
-	props.viewEditingMode === 'design' ?
-		<Disabled><WrappedComponent { ...props }
-			className={ ( props.className || '' ) + ' is-disabled' }
-		/></Disabled> :
-		<WrappedComponent { ...props } />;
-
 export default compose(
 	pure,
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	applyWithSelect,
 	applyWithDispatch,
 	withFilters( 'editor.BlockListBlock' ),
-	applyDisabled,
 )( BlockListBlock );
