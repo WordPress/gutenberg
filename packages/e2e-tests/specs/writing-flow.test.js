@@ -60,7 +60,6 @@ describe( 'adding blocks', () => {
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
 		// (2) text fields.
 		await page.keyboard.press( 'ArrowUp' );
-		await page.waitForSelector( '.is-selected[data-type="core/column"]:focus' );
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
 		expect( activeElementText ).toBe( '1st col' );
