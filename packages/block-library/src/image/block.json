@@ -62,6 +62,9 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"fullScreen": {
+			"type": "boolean"
 		}
 	}
 }
