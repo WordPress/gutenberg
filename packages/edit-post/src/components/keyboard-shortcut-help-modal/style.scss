@@ -2,6 +2,10 @@
 
 	&__section {
 		margin: 0 0 2rem 0;
+
+		&:nth-child(2) { // Push the shortcut to be flush with top modal header.
+			margin-top: -17px;
+		}
 	}
 
 
