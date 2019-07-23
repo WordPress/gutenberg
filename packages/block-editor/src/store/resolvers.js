@@ -6,6 +6,10 @@ import { fetchDiscoverBlocks, receiveDiscoverBlocks, setInstallBlocksPermission 
 
 export default {
 	* getDiscoverBlocks( filterValue ) {
+		if ( ! filterValue ) {
+			return;
+		}
+
 		try {
 			yield fetchDiscoverBlocks( filterValue );
 			const blocks = yield apiFetch( {
