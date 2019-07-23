@@ -5,7 +5,7 @@ BlockPreview allows you to preview any arbitrary HTML and CSS content, with a pe
 
 ## Usage
 
-In a block's `edit` implementation, render `InnerBlocks`. Then, in the `save` implementation, render `InnerBlocks.Content`. This will be replaced automatically with the content of the nested blocks.
+Render the component passing in the required props:
 
 ```jsx
 <BlockPreviewContent
@@ -21,4 +21,51 @@ In a block's `edit` implementation, render `InnerBlocks`. Then, in the `save` im
 />
 ```
 
-_Note:_ `srcWidth` and `srcHeight` refer to the _unscaled dimensions of what you mean to preview. Think of the preview as a big sourc image, say 800x600 that's scaled down. So if the HTML you mean to preview looks good at 800x600, those are your source dimensionss. A calculated `transform: scale( ...  )` value will be assigned to the thumbnail, so that it fits your destination dimensions, which you set in CSS.
+## A note on source dimensions
+
+Please note that `srcWidth` and `srcHeight` refer to the _unscaled dimensions_ of what you mean to preview. 
+
+Think of the preview as a big source image, say 800x600 that's scaled down. So if the HTML you mean to preview looks good at 800x600, those are your source dimensionss. 
+
+A calculated `transform: scale( ...  )` value will be assigned to the thumbnail, so that it fits your _destination_ dimensions, which you set in CSS.
+
+
+## Props
+
+### `name`
+* **Type:** `String`
+* **Default:** `undefined`
+
+The name of the Block you would like to render a preview of (eg: `core/paragraph`). Note this will be passed through as an argument to `createBlock()`.
+
+
+### `attributes`
+* **Type:** `Object`
+* **Default:** `{}`
+
+Any attributes for the `name`d Block. Note this will be passed through as an argument to `createBlock()`.
+
+```jsx
+attributes={ {
+	className: 'some-class-name-here',
+} }
+```
+
+### `innerBlocks`
+* **Type:** `Object`
+* **Default:** `{}`
+
+Any innerBlocks for the `name`d Block. Note this will be passed through as an argument to `createBlock()`.
+
+### `srcWidth`
+* **Type:** `Integer`
+* **Default:** `400`
+
+The unscaled dimension of the Block you are looking to preview. For example, if the Block looks good at `700x450` then you should set this value to `750`. See also `A note on source dimensions` above.
+
+### `srcHeight`
+* **Type:** `Integer`
+* **Default:** `300`
+
+The unscaled dimension of the Block you are looking to preview. For example, if the Block looks good at `700x450` then you should set this value to `450`. See also `A note on source dimensions` above.
+
