@@ -9,7 +9,7 @@ import { castArray } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { useLayoutEffect, useState, createRef } from '@wordpress/element';
+import { useLayoutEffect, useState, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -39,7 +39,7 @@ export function BlockPreviewContent( { blocks, settings, srcWidth = 400, srcHeig
 	}
 
 	// Calculated the destination width.
-	const previewRef = createRef();
+	const previewRef = useRef( null );
 
 	// Fallback dimensions.
 	const [ previewDimensions, setPreviewDimensions ] = useState( {
