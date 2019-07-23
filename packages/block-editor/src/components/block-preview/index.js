@@ -28,12 +28,22 @@ function BlockPreview( props ) {
 	);
 }
 
-export function BlockPreviewContent( { name, attributes, innerBlocks, settings } ) {
-	const block = createBlock( name, attributes, innerBlocks );
+export function BlockPreviewContent( { blocks, settings } ) {
+	if ( ! blocks ) {
+		return null;
+	}
+
+	const theBlocks = Array.isArray( blocks ) ? blocks : [ blocks ];
+
+	// Create new "clone" Blocks to show in the preview
+	const blocksToPreview = theBlocks.map( ( { name, attributes, innerBlocks } ) => {
+		return createBlock( name, attributes, innerBlocks );
+	} );
+
 	return (
 		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
 			<BlockEditorProvider
-				value={ [ block ] }
+				value={ blocksToPreview }
 				settings={ settings }
 			>
 				<BlockList />

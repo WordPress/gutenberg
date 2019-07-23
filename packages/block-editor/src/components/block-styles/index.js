@@ -68,8 +68,6 @@ function BlockStyles( {
 	styles,
 	className,
 	onChangeClassName,
-	name,
-	attributes,
 	type,
 	block,
 	onSwitch = noop,
@@ -125,12 +123,15 @@ function BlockStyles( {
 					>
 						<div className="editor-block-styles__item-preview block-editor-block-styles__item-preview">
 							<BlockPreviewContent
-								name={ name }
-								attributes={ {
-									...attributes,
-									className: styleClassName,
-								} }
-								innerBlocks={ block.innerBlocks }
+								blocks={
+									{
+										...block,
+										attributes: {
+											...block.attributes,
+											className: styleClassName,
+										},
+									}
+								}
 							/>
 						</div>
 						<div className="editor-block-styles__item-label block-editor-block-styles__item-label">
@@ -152,8 +153,6 @@ export default compose( [
 
 		return {
 			block,
-			name: block.name,
-			attributes: block.attributes,
 			className: block.attributes.className || '',
 			styles: getBlockStyles( block.name ),
 			type: blockType,

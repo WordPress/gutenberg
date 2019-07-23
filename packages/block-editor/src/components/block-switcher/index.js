@@ -161,9 +161,14 @@ export class BlockSwitcher extends Component {
 
 						{ ( hoveredClassName !== null ) &&
 							<BlockPreview
-								name={ blocks[ 0 ].name }
-								attributes={ { ...blocks[ 0 ].attributes, className: hoveredClassName } }
-								innerBlocks={ blocks[ 0 ].innerBlocks }
+								blocks={ {
+									...blocks[ 0 ],
+									attributes: {
+										...blocks[ 0 ].attributes,
+										className: hoveredClassName,
+									},
+								} }
+
 							/>
 						}
 					</>
