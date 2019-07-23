@@ -73,8 +73,8 @@ export function BlockPreviewContent( { blocks, settings, srcWidth = 400, srcHeig
 	}, [] );
 
 	return (
-		<div ref={ previewRef } style={ previewAspect } className="editor-block-preview__container" aria-hidden>
-			<Disabled style={ previewDimensions } className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper">
+		<div ref={ previewRef } style={ previewAspect } className="block-editor-block-preview__container" aria-hidden>
+			<Disabled style={ previewDimensions } className="block-editor-block-preview__content editor-styles-wrapper">
 				<BlockEditorProvider
 					value={ castArray( blocks ) }
 					settings={ settings }
