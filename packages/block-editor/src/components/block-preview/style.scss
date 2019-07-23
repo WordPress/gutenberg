@@ -26,7 +26,7 @@
 }
 
 // These rules ensure the preview scales smoothly regardless of the container size.
-.block-editor-block-preview__container {
+.editor-block-preview__container {
 	// In the component, a top padding is provided as an inline style to provid an aspect-ratio.
 	// This positioning enables the content to sit on top of that padding to fit.
 	position: relative;
