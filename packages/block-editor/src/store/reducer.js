@@ -275,11 +275,12 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			};
 			break;
 		case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
+			const parentClientIds = fillKeysWithEmptyObject( getBlocksWithParentsClientIds( action.replacedClientIds ) );
+
 			newState.cache = {
 				...omit( newState.cache, action.replacedClientIds ),
-				...fillKeysWithEmptyObject(
-					getBlocksWithParentsClientIds( action.replacedClientIds )
-				),
+				...omit( parentClientIds, action.replacedClientIds ),
+				...fillKeysWithEmptyObject( keys( flattenBlocks( action.blocks ) ) ),
 			};
 			break;
 		case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
