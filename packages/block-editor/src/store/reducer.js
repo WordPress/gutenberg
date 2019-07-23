@@ -225,6 +225,17 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 	}
 	newState.cache = state.cache ? state.cache : {};
 
+	/**
+	 * For each clientId provided, traverses up parents, adding the provided clientIds
+	 * and each parent's clientId to the returned array.
+	 *
+	 * When calling this function consider that it uses the old state, so any state
+	 * modifications made by the `reducer` will not be present.
+	 *
+	 * @param {Array} clientIds an Array of block clientIds.
+	 *
+	 * @return {Array} The provided clientIds and all of their parent clientIds.
+	 */
 	const getBlocksWithParentsClientIds = ( clientIds ) => {
 		return clientIds.reduce( ( result, clientId ) => {
 			let current = clientId;
