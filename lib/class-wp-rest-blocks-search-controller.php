@@ -106,7 +106,23 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 		$request  = wp_remote_get( $url, $http_args );
 		$response = json_decode( wp_remote_retrieve_body( $request ), true );
 
-		return rest_ensure_response( array_map( 'parse_block_metadata', $response[ 'plugins' ] ) );
+
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$result = array();
+
+		foreach ( $response[ 'plugins' ] as $plugin ) {
+			$installed_plugins = get_plugins( '/' . $plugin[ 'slug' ] );
+
+			// Only show uninstalled blocks.
+			if ( empty( $installed_plugins ) ) {
+				$result[] = parse_block_metadata( $plugin );
+			}
+		}
+
+		return rest_ensure_response( $result );
 	}
 }
 
