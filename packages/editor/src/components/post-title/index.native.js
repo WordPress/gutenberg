@@ -32,6 +32,10 @@ class PostTitle extends Component {
 		this.props.onUnselect();
 	}
 
+	focus() {
+		this.props.onSelect();
+	}
+
 	render() {
 		const {
 			placeholder,

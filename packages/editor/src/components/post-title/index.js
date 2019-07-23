@@ -172,7 +172,6 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 		},
 		onUndo: undo,
 		onRedo: redo,
-		clearSelectedBlock,
 		onSelect() {
 			togglePostTitleSelection( true );
 			clearSelectedBlock();
