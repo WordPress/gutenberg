@@ -66,7 +66,7 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves all blocks.
+	 * Search and retrieve blocks metadata
 	 *
 	 * @since 5.7.0
 	 *
@@ -130,25 +130,23 @@ function parse_block_metadata( $plugin ) {
 	$block     = new stdClass();
 	$block->id = $plugin[ 'slug' ];
 
-	// AMBIGUOUS: Only the first element in blocks is mapped
+	// AMBIGUOUS: There might be multiple blocks. Only the first element in blocks is mapped
 	$block->name  = reset( $plugin[ 'blocks' ] )[ 'name' ];
 	$block->title = reset( $plugin[ 'blocks' ] )[ 'title' ];
 
-	// AMBIGUOUS: Plugin's description or description in block.json
+	// AMBIGUOUS: Plugin's description, not description in block.json
 	$block->description = wp_strip_all_tags( $plugin[ 'description' ] );
 
 	$block->rating         = $plugin[ 'rating' ];
 	$block->ratingCount    = $plugin[ 'num_ratings' ];
 	$block->activeInstalls = $plugin[ 'active_installs' ];
 
-	// AMBIGUOUS: Plugin's author or author in block.json
+	// AMBIGUOUS: Plugin's author, not author in block.json
 	$block->author = wp_strip_all_tags( $plugin[ 'author' ] );
 
 	// AMBIGUOUS: Plugin's icons or icon in block.json
 	$block->icon = isset( $plugin[ 'icons' ][ '1x' ] ) ? $plugin[ 'icons' ][ '1x' ] : 'block-default';
 
-	// TODO: map to assets in block.json 
-	// Note: asset property with dependencies proposal: https://github.com/WordPress/gutenberg/pull/13693#issuecomment-491814028
 	$block->assets = array_map( function( $asset ) use ( $plugin ) { 
 		return 'https://plugins.svn.wordpress.org/' . $plugin[ 'slug' ] . $asset;
 	}, $plugin[ 'block_assets' ] );
