@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isInTheFuture, getDate, setSettings, __experimentalGetSettings } from '../';
+import { isInTheFuture, getDate, format, setSettings, __experimentalGetSettings } from '../';
 
 describe( 'isInTheFuture', () => {
 	it( 'should return true if the date is in the future', () => {
@@ -36,5 +36,12 @@ describe( 'isInTheFuture', () => {
 
 		// Restore default settings
 		setSettings( settings );
+	} );
+} );
+
+describe( 'format', () => {
+	it( 'should map ordinal suffix to moment.js equivalent', () => {
+		expect( format( 'S', '2019-04-26' ) ).toBe( 'th' );
+		expect( format( 'l, F jS', '2019-04-26' ) ).toBe( 'Friday, April 26th' );
 	} );
 } );
