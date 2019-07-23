@@ -70,7 +70,7 @@ export function BlockPreviewContent( { blocks, settings, srcWidth = 400, srcHeig
 		setPreviewAspect( {
 			paddingTop: aspectPadding + '%',
 		} );
-	}, [] );
+	}, [ srcWidth, srcHeight ] );
 
 	return (
 		<div ref={ previewRef } style={ previewAspect } className="block-editor-block-preview__container" aria-hidden>
