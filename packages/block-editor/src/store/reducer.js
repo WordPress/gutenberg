@@ -267,7 +267,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			newState.cache = {
 				...omit( newState.cache, action.replacedClientIds ),
 				...fillKeysWithEmptyObject(
-					getBlocksWithParentsClientIds( keys( flattenBlocks( action.blocks ) ) ),
+					getBlocksWithParentsClientIds( action.replacedClientIds )
 				),
 			};
 			break;
