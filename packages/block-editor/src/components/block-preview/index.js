@@ -54,7 +54,7 @@ export function BlockPreview( { blocks, settings, srcWidth, srcHeight } ) {
 		setPreviewAspect( {
 			paddingTop: aspectPadding + '%',
 		} );
-	}, [] );
+	}, [ srcWidth, srcHeight ] );
 
 	return (
 		<div ref={ previewRef } style={ previewAspect } className="block-editor-block-preview__container" aria-hidden>
