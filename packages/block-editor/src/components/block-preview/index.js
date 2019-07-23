@@ -27,8 +27,8 @@ export function BlockPreview( { blocks, settings, srcWidth, srcHeight } ) {
 
 	// Fallback dimensions.
 	const [ previewDimensions, setPreviewDimensions ] = useState( {
-		width: 400,
-		height: 300,
+		width: srcWidth,
+		height: srcHeight,
 		transform: 'scale(1)',
 	} );
 
@@ -43,8 +43,8 @@ export function BlockPreview( { blocks, settings, srcWidth, srcHeight } ) {
 		const scale = Math.min( destWidth / srcWidth ) || 1;
 
 		setPreviewDimensions( {
-			width: srcWidth ? srcWidth : 400 + 'px', // 400x300 is provided as a 4:3 aspect ratio fallback.
-			height: srcHeight ? srcHeight : 300 + 'px',
+			width: `${ srcWidth }px`, // 400x300 is provided as a 4:3 aspect ratio fallback.
+			height: `${ srcHeight }px`,
 			transform: 'scale(' + scale + ')',
 		} );
 
