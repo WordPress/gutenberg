@@ -66,9 +66,11 @@ const ShortcutList = ( { shortcuts } ) => (
 
 const ShortcutSection = ( { title, shortcuts } ) => (
 	<section className="edit-post-keyboard-shortcut-help__section">
-		<h2 className="edit-post-keyboard-shortcut-help__section-title">
-			{ title }
-		</h2>
+		{ !! title && (
+			<h2 className="edit-post-keyboard-shortcut-help__section-title">
+				{ title }
+			</h2>
+		) }
 		<ShortcutList shortcuts={ shortcuts } />
 	</section>
 );
