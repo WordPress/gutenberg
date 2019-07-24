@@ -13,4 +13,7 @@
 	margin-top: 100px;
 	text-align: center;
 	color: $dark-gray-400;
+	.components-spinner {
+		float: inherit;
+	}
 }

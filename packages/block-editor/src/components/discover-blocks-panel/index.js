@@ -5,6 +5,7 @@ import { Fragment } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { Spinner } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -15,7 +16,7 @@ function DiscoverBlocksPanel( { discoverItems, onSelect, onHover, hasPermission,
 	if ( isLoading ) {
 		return (
 			<p className="block-editor-discover-blocks-panel__description has-no-results">
-				{ __( 'Loading' ) }
+				<Spinner />
 			</p>
 		);
 	}
