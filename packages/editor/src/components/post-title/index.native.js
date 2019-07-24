@@ -92,13 +92,16 @@ class PostTitle extends Component {
 }
 
 export default compose(
-	withSelect( ( dispatch ) => {
+	withSelect( ( select ) => {
 		const {
 			isPostTitleSelected,
-		} = dispatch( 'core/editor' );
+		} = select( 'core/editor' );
+
+		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+		const isAnyBlockSelected = !! getSelectedBlockClientId();
 
 		return {
-			isSelected: isPostTitleSelected(),
+			isSelected: ! isAnyBlockSelected && isPostTitleSelected(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -79,12 +79,9 @@ export default compose( [
 			isPostTitleSelected,
 		} = select( 'core/editor' );
 
-		const { getSelectedBlockClientId } = select( 'core/block-editor' );
-
 		return {
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
-			isAnyBlockSelected: !! getSelectedBlockClientId(),
 			isPostTitleSelected: isPostTitleSelected(),
 		};
 	} ),
