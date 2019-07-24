@@ -9,10 +9,6 @@
 			// Ensure the table element is not full-width when aligned.
 			width: auto;
 		}
-		td,
-		th {
-			word-break: break-all;
-		}
 	}
 
 	&[data-align="center"] {

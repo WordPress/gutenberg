@@ -14,11 +14,6 @@
 	.has-fixed-layout {
 		table-layout: fixed;
 		width: 100%;
-
-		td,
-		th {
-			word-break: break-all;
-		}
 	}
 
 	&.alignleft,
@@ -31,12 +26,6 @@
 		// Table cannot be 100% width if it is aligned, so set
 		// width as auto.
 		width: auto;
-
-		td,
-		th {
-			// Aligned tables shouldn't scroll horizontally so we need their contents to wrap.
-			word-break: break-all;
-		}
 	}
 
 	.has-subtle-light-gray-background-color {
