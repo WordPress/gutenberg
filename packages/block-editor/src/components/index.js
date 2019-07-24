@@ -7,6 +7,7 @@ export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
+export { default as BlockExpandToolbar } from './block-expand-toolbar';
 export { default as BlockControls } from './block-controls';
 export { default as BlockEdit } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
