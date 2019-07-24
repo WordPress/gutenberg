@@ -18,7 +18,6 @@ import {
  */
 import Popover from '../popover';
 import Shortcut from '../shortcut';
-import { KeyboardShortcuts } from '../';
 
 /**
  * Time over children to wait before showing tooltip
@@ -72,6 +71,11 @@ class Tooltip extends Component {
 				return;
 			}
 
+			// If pressed key is escape, no further actions are needed.
+			if ( event.keyCode === 27 ) { // 27 is the keyCode for escape
+				return;
+			}
+
 			// Needed in case unsetting is over while delayed set pending, i.e.
 			// quickly blur/mouseleave before delayedSetIsOver is called
 			this.delayedSetIsOver.cancel();
@@ -111,14 +115,7 @@ class Tooltip extends Component {
 			onFocus: this.createToggleIsOver( 'onFocus' ),
 			onBlur: this.createToggleIsOver( 'onBlur' ),
 			children: concatChildren(
-				<KeyboardShortcuts
-					shortcuts={ {
-						escape: this.createToggleIsOver,
-					} }
-				>
-					{ child.props.children }
-				</KeyboardShortcuts>
-				,
+				child.props.children,
 				isOver && (
 					<Popover
 						focusOnMount={ false }
