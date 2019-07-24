@@ -8,6 +8,9 @@ import {
 	Tooltip,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	Fragment,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -61,6 +64,23 @@ function DimensionControl( { title, property, attributes, setAttributes, clientI
 					const visualName = size.name.substring( 0, 1 );
 					const hiddenName = size.name.substring( 1 );
 					const isSelected = attributes[ `${ property }Size` ] === size.slug;
+
+					let innerButton = (
+						<Fragment>
+							{ visualName }
+							<span className="screen-reader-text">{ hiddenName }</span>
+						</Fragment>
+					);
+
+					// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr
+					if ( size.abbr ) {
+						innerButton = (
+							<abbr title={ size.abbr }>
+								{ innerButton }
+							</abbr>
+						);
+					}
+
 					return (
 						<Tooltip key={ size.slug } text={ size.name }>
 							<Button
@@ -71,7 +91,7 @@ function DimensionControl( { title, property, attributes, setAttributes, clientI
 								onClick={ onChangeSpacingSize }
 								aria-pressed={ isSelected }
 							>
-								{ visualName }<span className="screen-reader-text">{ hiddenName }</span>
+								{ innerButton }
 							</Button>
 						</Tooltip>
 					);

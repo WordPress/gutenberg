@@ -17,4 +17,8 @@
 .block-editor-dimension-control__button {
 	flex: 1;
 	justify-content: center;
+
+	abbr {
+		pointer-events: none;
+	}
 }

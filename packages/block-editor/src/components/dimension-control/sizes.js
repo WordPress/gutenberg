@@ -33,8 +33,9 @@ export default [
 		size: 34,
 		slug: 'large',
 	}, {
-		name: __( 'Huge' ),
+		name: __( 'XLarge' ),
+		abbr: __( 'Extra Large' ), // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr
 		size: 60,
-		slug: 'huge',
+		slug: 'xlarge',
 	},
 ];
