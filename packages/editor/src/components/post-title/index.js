@@ -32,12 +32,27 @@ class PostTitle extends Component {
 		super( ...arguments );
 
 		this.onChange = this.onChange.bind( this );
+		this.onSelect = this.onSelect.bind( this );
+		this.onUnselect = this.onUnselect.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.redirectHistory = this.redirectHistory.bind( this );
+
+		this.state = {
+			isSelected: false,
+		};
 	}
 
 	handleFocusOutside() {
-		this.props.onUnselect();
+		this.onUnselect();
+	}
+
+	onSelect() {
+		this.setState( { isSelected: true } );
+		this.props.clearSelectedBlock();
+	}
+
+	onUnselect() {
+		this.setState( { isSelected: false } );
 	}
 
 	onChange( event ) {
@@ -78,11 +93,11 @@ class PostTitle extends Component {
 			isCleanNewPost,
 			isFocusMode,
 			isPostTypeViewable,
-			isSelected,
 			instanceId,
 			placeholder,
 			title,
 		} = this.props;
+		const { isSelected } = this.state;
 
 		// The wp-block className is important for editor styles.
 		const className = classnames( 'wp-block editor-post-title__block', {
@@ -111,9 +126,9 @@ class PostTitle extends Component {
 								value={ title }
 								onChange={ this.onChange }
 								placeholder={ decodedPlaceholder || __( 'Add title' ) }
-								onFocus={ this.props.onSelect }
+								onFocus={ this.onSelect }
 								onKeyDown={ this.onKeyDown }
-								onKeyPress={ this.props.onUnselect }
+								onKeyPress={ this.onUnselect }
 								/*
 									Only autofocus the title when the post is entirely empty.
 									This should only happen for a new post, which means we
@@ -134,7 +149,7 @@ class PostTitle extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute, isCleanNewPost, isPostTitleSelected } = select( 'core/editor' );
+	const { getEditedPostAttribute, isCleanNewPost } = select( 'core/editor' );
 	const { getSettings } = select( 'core/block-editor' );
 	const { getPostType } = select( 'core' );
 	const postType = getPostType( getEditedPostAttribute( 'type' ) );
@@ -142,7 +157,6 @@ const applyWithSelect = withSelect( ( select ) => {
 
 	return {
 		isCleanNewPost: isCleanNewPost(),
-		isSelected: isPostTitleSelected(),
 		title: getEditedPostAttribute( 'title' ),
 		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 		placeholder: titlePlaceholder,
@@ -160,7 +174,6 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 		editPost,
 		undo,
 		redo,
-		togglePostTitleSelection,
 	} = dispatch( 'core/editor' );
 
 	return {
@@ -172,13 +185,7 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 		},
 		onUndo: undo,
 		onRedo: redo,
-		onSelect() {
-			togglePostTitleSelection( true );
-			clearSelectedBlock();
-		},
-		onUnselect() {
-			togglePostTitleSelection( false );
-		},
+		clearSelectedBlock,
 	};
 } );
 
