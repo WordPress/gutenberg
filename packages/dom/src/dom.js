@@ -390,7 +390,7 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	const x = rect.left;
 	const y = isReverse ? ( editableRect.bottom - buffer ) : ( editableRect.top + buffer );
 
-	let range = hiddenCaretRangeFromPoint( document, x, y, container );
+	const range = hiddenCaretRangeFromPoint( document, x, y, container );
 
 	if ( ! range || ! container.contains( range.startContainer ) ) {
 		if ( mayUseScroll && (
@@ -405,20 +405,6 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 
 		placeCaretAtHorizontalEdge( container, isReverse );
 		return;
-	}
-
-	// Check if the closest text node is actually further away.
-	// If so, attempt to get the range again with the y position adjusted to get the right offset.
-	if ( range.startContainer.nodeType === TEXT_NODE ) {
-		const parentNode = range.startContainer.parentNode;
-		const parentRect = parentNode.getBoundingClientRect();
-		const side = isReverse ? 'bottom' : 'top';
-		const padding = parseInt( getComputedStyle( parentNode ).getPropertyValue( `padding-${ side }` ), 10 ) || 0;
-		const actualY = isReverse ? ( parentRect.bottom - padding - buffer ) : ( parentRect.top + padding + buffer );
-
-		if ( y !== actualY ) {
-			range = hiddenCaretRangeFromPoint( document, x, actualY, container );
-		}
 	}
 
 	const selection = window.getSelection();
