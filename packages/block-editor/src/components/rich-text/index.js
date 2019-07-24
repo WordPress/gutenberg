@@ -261,16 +261,13 @@ class RichTextWraper extends Component {
 			return;
 		}
 
-		if ( formattingControls ) {
-			deprecated( 'wp.blockEditor.RichText formattingControls prop', {
-				version: 'the future',
-				alternative: 'allowedFormats',
-			} );
-		}
-
 		if ( allowedFormats ) {
 			return allowedFormats;
 		}
+
+		deprecated( 'wp.blockEditor.RichText formattingControls prop', {
+			alternative: 'allowedFormats',
+		} );
 
 		return formattingControls.map( ( name ) => `core/${ name }` );
 	}
@@ -319,7 +316,7 @@ class RichTextWraper extends Component {
 		} = this.props;
 
 		const adjustedAllowedFormats = this.getAllowedFormats();
-		const showToolbar = ! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
+		const hasFormats = ! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
 		let adjustedValue = originalValue;
 		let adjustedOnChange = originalOnChange;
 
@@ -370,12 +367,12 @@ class RichTextWraper extends Component {
 								onChange={ onChange }
 							/>
 						) }
-						{ isSelected && ! inlineToolbar && showToolbar && (
+						{ isSelected && ! inlineToolbar && hasFormats && (
 							<BlockFormatControls>
 								<FormatToolbar />
 							</BlockFormatControls>
 						) }
-						{ isSelected && inlineToolbar && showToolbar && (
+						{ isSelected && inlineToolbar && hasFormats && (
 							<IsolatedEventContainer
 								className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar"
 							>
