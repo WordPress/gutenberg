@@ -10,38 +10,16 @@ import {
 	Button,
 	ButtonGroup,
 	BaseControl,
+	Tooltip,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import sizesTable from './sizes';
 
 function DimensionControl( { type, attributes, setAttributes, clientId } ) {
-	const humanType = startCase( type );
-
-	const sizesTable = [
-		{
-			name: __( 'None' ),
-			size: 0,
-			slug: 'none',
-		},
-		{
-			name: __( 'Small' ),
-			size: 14,
-			slug: 'small',
-		},
-		{
-			name: __( 'Medium' ),
-			size: 24,
-			slug: 'medium',
-		},
-		{
-			name: __( 'Large' ),
-			size: 34,
-			slug: 'large',
-		}, {
-			name: __( 'Huge' ),
-			size: 60,
-			slug: 'huge',
-		},
-	];
+	const humanTypeName = startCase( type );
 
 	const onChangeSpacingSize = ( event ) => {
 		const theSize = sizesTable.find( ( size ) => event.target.value === size.slug );
@@ -79,7 +57,7 @@ function DimensionControl( { type, attributes, setAttributes, clientId } ) {
 			className="block-editor-dimension-control"
 		>
 			<BaseControl.VisualLabel>
-				{ humanType }
+				{ humanTypeName }
 			</BaseControl.VisualLabel>
 			<ButtonGroup
 				id={ controlId }
@@ -90,16 +68,17 @@ function DimensionControl( { type, attributes, setAttributes, clientId } ) {
 					const hiddenName = size.name.substring( 1 );
 					const isSelected = attributes[ `${ type }Size` ] === size.slug;
 					return (
-						<Button
-							className="block-editor-dimension-control__button"
-							key={ size.slug }
-							isDefault={ ! isSelected }
-							isPrimary={ isSelected }
-							value={ size.slug }
-							onClick={ onChangeSpacingSize }
-						>
-							{ visualName }<span className="screen-reader-text">{ hiddenName }</span>
-						</Button>
+						<Tooltip key={ size.slug } text={ size.name }>
+							<Button
+								className="block-editor-dimension-control__button"
+								isDefault={ ! isSelected }
+								isPrimary={ isSelected }
+								value={ size.slug }
+								onClick={ onChangeSpacingSize }
+							>
+								{ visualName }<span className="screen-reader-text">{ hiddenName }</span>
+							</Button>
+						</Tooltip>
 					);
 				} ) }
 			</ButtonGroup>
