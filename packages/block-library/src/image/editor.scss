@@ -113,6 +113,26 @@
 	}
 }
 
+// Joint behavior between align and expand.
+[data-type="core/image"][data-expand="screen"] {
+	&:not([data-align="wide"]):not([data-align="full"]) {
+		figure {
+			img {
+				height: 100vh;
+				width: auto;
+			}
+		}
+	}
+
+	&[data-align="wide"],
+	&[data-align="full"] {
+		figure {
+			height: 100vh;
+			overflow: hidden;
+		}
+	}
+}
+
 // This is similar to above but for resized unfloated images only, where the markup is different.
 [data-type="core/image"] .block-editor-block-list__block-edit figure.is-resized {
 	margin: 0;
