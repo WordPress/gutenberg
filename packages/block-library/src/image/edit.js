@@ -906,12 +906,15 @@ export class ImageEdit extends Component {
 											bottom: true,
 											left: showLeftHandle,
 										} }
+
 										onResizeStart={ onResizeStart }
+
 										onResizeStop={ ( event, direction, elt, delta ) => {
 											onResizeStop();
 											setAttributes( {
 												width: parseInt( currentWidth + delta.width, 10 ),
 												height: parseInt( currentHeight + delta.height, 10 ),
+												expand: false,
 											} );
 										} }
 									>
