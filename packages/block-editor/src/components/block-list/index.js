@@ -12,7 +12,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	withSelect,
 	withDispatch,
@@ -50,6 +50,8 @@ class BlockList extends Component {
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
+		this.parentRef = createRef();
+		this.GenerateGridLines = this.GenerateGridLines.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
@@ -195,18 +197,18 @@ class BlockList extends Component {
 		}
 	}
 
-	generateGridLines() {
-		const gridLines = [];
-		for ( let i = 0; i <= this.props.snap.gridStops; i++ ) {
-			gridLines.push(
-				<div
-					key={ `grid__line-${ i }` }
-					className="grid__line"
-					style={ { left: this.props.snap.gridStops[ i ] } }
-				/>
-			);
+	GenerateGridLines() {
+		if ( this.parentRef.current ) {
+			const computed = window.getComputedStyle( this.parentRef.current ).getPropertyValue( 'padding-left' );
+			// we need the parent padding offset + the image margin offset, which is 14
+			const offset = parseInt( computed ) + 14;
+			return this.props.snap.gridStops.map( ( stop, i ) => <div
+				key={ `grid__line-${ i }` }
+				className="grid__line"
+				style={ { left: stop + offset } }
+			/> );
 		}
-		return gridLines;
+		return null;
 	}
 
 	render() {
@@ -219,12 +221,13 @@ class BlockList extends Component {
 			hasMultiSelection,
 			renderAppender,
 			enableAnimation,
+			isGridVisible,
 		} = this.props;
 
 		return (
-			<div className="editor-block-list__layout block-editor-block-list__layout block-editor-block-list__layout--grid-visible">
+			<div ref={ this.parentRef } className="editor-block-list__layout block-editor-block-list__layout block-editor-block-list__layout--grid-visible">
 
-				<generateGridLines />
+				{ isGridVisible && this.GenerateGridLines() }
 
 				{ blockClientIds.map( ( clientId ) => {
 					const isBlockInSelection = hasMultiSelection ?
@@ -280,6 +283,7 @@ export default compose( [
 			hasMultiSelection,
 			getGlobalBlockCount,
 			getSettings,
+			isGridVisible,
 		} = select( 'core/block-editor' );
 
 		const { snap } = getSettings();
@@ -295,6 +299,7 @@ export default compose( [
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			hasMultiSelection: hasMultiSelection(),
 			enableAnimation: getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+			isGridVisible: isGridVisible(),
 			snap,
 		};
 	} ),

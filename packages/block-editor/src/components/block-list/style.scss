@@ -43,6 +43,10 @@
 
 .block-editor-block-list__layout {
 
+
+	// we need this div to be relative in order to position the grid lines
+	position: relative;
+
 	// Make room in the main content column for the side UI.
 	// The side UI uses negative margins to position itself so as to not affect the block width.
 	@include break-small() {

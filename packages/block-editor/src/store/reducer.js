@@ -679,6 +679,26 @@ export function isTyping( state = false, action ) {
 }
 
 /**
+ * Reducer returning grid visiblity state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isGridVisible( state = false, action ) {
+	switch ( action.type ) {
+		case 'SHOW_GRID':
+			return true;
+
+		case 'HIDE_GRID':
+			return false;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning whether the caret is within formatted text.
  *
  * @param {boolean} state  Current state.
@@ -956,7 +976,7 @@ export const blockListSettings = ( state = {}, action ) => {
 	switch ( action.type ) {
 		// Even if the replaced blocks have the same client ID, our logic
 		// should correct the state.
-		case 'REPLACE_BLOCKS' :
+		case 'REPLACE_BLOCKS':
 		case 'REMOVE_BLOCKS': {
 			return omit( state, action.clientIds );
 		}
@@ -986,6 +1006,7 @@ export const blockListSettings = ( state = {}, action ) => {
 export default combineReducers( {
 	blocks,
 	isTyping,
+	isGridVisible,
 	isCaretWithinFormattedText,
 	blockSelection,
 	blocksMode,

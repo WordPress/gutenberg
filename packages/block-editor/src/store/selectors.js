@@ -987,6 +987,17 @@ export function isTyping( state ) {
 }
 
 /**
+ * Returns true if the grid is visible, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether grid is visible.
+ */
+export function isGridVisible( state ) {
+	return state.isGridVisible;
+}
+
+/**
  * Returns true if the caret is within formatted text, or false otherwise.
  *
  * @param {Object} state Global application state.

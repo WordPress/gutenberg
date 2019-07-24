@@ -44,7 +44,7 @@ import {
 	BACKSPACE,
 	ENTER,
 } from '@wordpress/keycodes';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	BlockAlignmentToolbar,
 	BlockControls,
@@ -868,6 +868,7 @@ class ImageEdit extends Component {
 											left: showLeftHandle,
 										} }
 										onResizeStart={ () => {
+											this.props.showGrid();
 											toggleSelection( false );
 										} }
 										onResizeStop={ ( event, direction, elt, delta ) => {
@@ -876,6 +877,7 @@ class ImageEdit extends Component {
 												height: parseInt( currentHeight + delta.height, 10 ),
 											} );
 											toggleSelection( true );
+											this.props.hideGrid();
 										} }
 										snap={ { x: snap.gridStops } }
 										snapGap={ snap.gap }
@@ -908,7 +910,7 @@ class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings, isGridVisible } = select( 'core/block-editor' );
 		const { id } = props.attributes;
 		const {
 			__experimentalMediaUpload,
@@ -924,7 +926,23 @@ export default compose( [
 			isRTL,
 			imageSizes,
 			snap,
+			isGridVisible,
 			mediaUpload: __experimentalMediaUpload,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const {
+			showGrid,
+			hideGrid,
+		} = dispatch( 'core/block-editor' );
+
+		return {
+			showGrid() {
+				showGrid();
+			},
+			hideGrid() {
+				hideGrid();
+			},
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),

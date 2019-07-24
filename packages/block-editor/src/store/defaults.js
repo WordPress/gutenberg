@@ -138,7 +138,7 @@ export const SETTINGS_DEFAULTS = {
 	snap: {
 		// The snap grid lines that the image will snap to
 		// those should be overridden by themes later
-		gridStops: [ 100, 175, 250, 375, 450, 525, 600, 675, 750, 825 ],
+		gridStops: [ 0, 75, 150, 225, 300, 375, 450, 525, 600, 675 ],
 
 		// snap gap is sued to snap the image to the line when it sizes approach this point
 		gap: 20,
