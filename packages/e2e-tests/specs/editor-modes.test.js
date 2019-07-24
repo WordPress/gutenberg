@@ -56,7 +56,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// The font size picker for the paragraph block should appear, even in
 		// HTML editing mode.
-		const fontSizePicker = await page.$$( '.edit-post-sidebar .components-font-size-picker__buttons' );
+		const fontSizePicker = await page.$$( '.edit-post-sidebar .components-font-size-picker__controls' );
 		expect( fontSizePicker ).toHaveLength( 1 );
 	} );
 
@@ -74,9 +74,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
 
 		// Change the font size using the sidebar.
-		await page.click( '.components-font-size-picker__selector' );
-		const changeSizeButton = await page.waitForSelector( '.components-button.is-font-large' );
-		await changeSizeButton.click();
+		await page.select( '.components-font-size-picker__select .components-select-control__input', 'large' );
 
 		// Make sure the HTML content updated.
 		htmlBlockContent = await page.$eval( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea', ( node ) => node.textContent );

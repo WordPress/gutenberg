@@ -1,9 +1,12 @@
-## Next release
+## Master
 
 ### New Features
 
 - Added a new `popoverProps` prop to the `Dropdown` component which allows users of the `Dropdown` component to pass props directly to the `PopOver` component.
 
+### Bug Fixes
+
+- The `Button` component will no longer assign default styling (`is-default` class) when explicitly assigned as primary (the `isPrimary` prop). This should resolve potential conflicts affecting a combination of `isPrimary`, `isDefault`, and `isLarge` / `isSmall`, where the busy animation would appear with incorrect coloring.
 
 ## 8.0.0 (2019-06-12)
 

@@ -29,7 +29,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.11"
+		"lodash": "^4.17.14"
 	},
 	"publishConfig": {
 		"access": "public"

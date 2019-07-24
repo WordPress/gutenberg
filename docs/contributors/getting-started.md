@@ -88,3 +88,4 @@ The Gutenberg repository also includes a static Gutenberg playground that allows
 
 You can launch the playground by running `npm run playground:start` locally. The playground should be available on [http://localhost:1234](http://localhost:1234).
 
+You can also test the playground version of the current master branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
