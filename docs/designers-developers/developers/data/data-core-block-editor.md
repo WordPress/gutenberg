@@ -1085,7 +1085,15 @@ _Parameters_
 
 <a name="setKeyboardMode" href="#setKeyboardMode">#</a> **setKeyboardMode**
 
-Undocumented declaration.
+Returns an action object used to set the keyboard mode
+
+_Parameters_
+
+-   _mode_ `string`: Keyboard mode
+
+_Returns_
+
+-   `Object`: Action object
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 

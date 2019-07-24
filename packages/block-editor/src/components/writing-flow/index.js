@@ -265,16 +265,14 @@ class WritingFlow extends Component {
 		if ( keyboardMode === 'navigation' ) {
 			const navigateUp = ( isTab && isShift ) || isUp;
 			const navigateDown = ( isTab && ! isShift ) || isDown;
+			const focusedBlockUid = navigateUp ? selectionBeforeEndClientId : selectionAfterEndClientId;
 
 			if (
-				( navigateDown && selectionAfterEndClientId ) ||
-				( navigateUp && selectionBeforeEndClientId )
+				( navigateDown || navigateUp ) &&
+				focusedBlockUid
 			) {
 				event.preventDefault();
-				const focusedBlockUid = navigateUp ? selectionBeforeEndClientId : selectionAfterEndClientId;
-				if ( focusedBlockUid ) {
-					this.props.onSelectBlock( focusedBlockUid );
-				}
+				this.props.onSelectBlock( focusedBlockUid );
 			}
 
 			// Special case when reaching the end of the blocks (navigate to the next tabbable outside of the writing flow)
