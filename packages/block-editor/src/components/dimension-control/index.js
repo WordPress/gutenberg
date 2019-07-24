@@ -43,26 +43,30 @@ function DimensionControl( { type, attributes, setAttributes, clientId } ) {
 		},
 	];
 
-	const onChangeSpacing = ( event ) => {
+	const onChangeSpacingSize = ( event ) => {
 		const theSize = sizesTable.find( ( size ) => event.target.value === size.slug );
 
 		if ( ! theSize ) {
 			return;
 		}
 
-		const size = theSize.size;
-
-		// if ( value === '' || value === 'none' ) {
-		// 	// resetValue();
-		// 	return;
-		// }
-
-		setAttributes( {
-			[ `${ type }Top` ]: size,
-			[ `${ type }Right` ]: size,
-			[ `${ type }Left` ]: size,
-			[ `${ type }Bottom` ]: size,
-		} );
+		if ( attributes[ `${ type }Size` ] === theSize.slug ) {
+			setAttributes( {
+				[ `${ type }Size` ]: '',
+				[ `${ type }Top` ]: 0,
+				[ `${ type }Right` ]: 0,
+				[ `${ type }Left` ]: 0,
+				[ `${ type }Bottom` ]: 0,
+			} );
+		} else {
+			setAttributes( {
+				[ `${ type }Size` ]: theSize.slug,
+				[ `${ type }Top` ]: theSize.size,
+				[ `${ type }Right` ]: theSize.size,
+				[ `${ type }Left` ]: theSize.size,
+				[ `${ type }Bottom` ]: theSize.size,
+			} );
+		}
 	};
 
 	// Todo - update with unique Block instance ID?
@@ -72,27 +76,27 @@ function DimensionControl( { type, attributes, setAttributes, clientId } ) {
 		<BaseControl
 			id={ controlId }
 			help={ `Select the ${ type } for this Block` }
-			className="block-dimension-control"
+			className="block-editor-dimension-control"
 		>
 			<BaseControl.VisualLabel>
 				{ humanType }
 			</BaseControl.VisualLabel>
 			<ButtonGroup
 				id={ controlId }
-				className="block-dimension-control__buttons"
+				className="block-editor-dimension-control__buttons"
 			>
 				{ sizesTable.map( function( size ) {
 					const visualName = size.name.substring( 0, 1 );
 					const hiddenName = size.name.substring( 1 );
-					const isSelected = attributes[ `${ type }Top` ] === size.size;
+					const isSelected = attributes[ `${ type }Size` ] === size.slug;
 					return (
 						<Button
-							className="block-dimension-control__button"
+							className="block-editor-dimension-control__button"
 							key={ size.slug }
 							isDefault={ ! isSelected }
 							isPrimary={ isSelected }
 							value={ size.slug }
-							onClick={ onChangeSpacing }
+							onClick={ onChangeSpacingSize }
 						>
 							{ visualName }<span className="screen-reader-text">{ hiddenName }</span>
 						</Button>

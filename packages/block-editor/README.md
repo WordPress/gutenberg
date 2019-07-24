@@ -231,6 +231,10 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="DimensionControl" href="#DimensionControl">#</a> **DimensionControl**
+
+Undocumented declaration.
+
 <a name="FontSizePicker" href="#FontSizePicker">#</a> **FontSizePicker**
 
 Undocumented declaration.

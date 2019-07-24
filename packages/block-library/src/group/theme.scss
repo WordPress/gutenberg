@@ -6,4 +6,44 @@
 		margin-top: 0;
 		margin-bottom: 0;
 	}
+
+	&.padding-none {
+		padding: 0;
+	}
+
+	&.padding-small {
+		padding: $block-padding;
+	}
+
+	&.padding-medium {
+		padding: $block-padding*2;
+	}
+
+	&.padding-large {
+		padding: $block-padding*3;
+	}
+
+	&.padding-huge {
+		padding: $block-padding*4;
+	}
+
+	&.margin-none {
+		margin: 0;
+	}
+
+	&.margin-small {
+		margin: $block-padding;
+	}
+
+	&.margin-medium {
+		margin: $block-padding*2;
+	}
+
+	&.margin-large {
+		margin: $block-padding*3;
+	}
+
+	&.margin-huge {
+		margin: $block-padding*4;
+	}
 }

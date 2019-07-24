@@ -1,0 +1,20 @@
+.block-editor-dimension-control {
+	margin-bottom: 1em;
+
+	.components-base-control__label {
+		margin-bottom: 1em;
+	}
+
+	.components-base-control__help {
+		margin-top: -5px;
+	}
+}
+
+.block-editor-dimension-control__buttons {
+	display: flex;
+}
+
+.block-editor-dimension-control__button {
+	flex: 1;
+	justify-content: center;
+}
