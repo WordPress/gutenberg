@@ -50,7 +50,7 @@ class NavigableToolbar extends Component {
 			return;
 		}
 
-		// We need to stop propagation to avoid triggering the keybaord mode
+		// We need to stop propagation to avoid triggering the keyboard mode
 		// in BlockListBlock component.
 		event.stopPropagation();
 
