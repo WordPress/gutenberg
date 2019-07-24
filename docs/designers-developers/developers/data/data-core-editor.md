@@ -932,18 +932,6 @@ _Returns_
 
 -   `boolean`: Is locked.
 
-<a name="isPostTitleSelected" href="#isPostTitleSelected">#</a> **isPostTitleSelected**
-
-Returns true if post title is selected.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether current post title is selected.
-
 <a name="isPreviewingPost" href="#isPreviewingPost">#</a> **isPreviewingPost**
 
 Returns true if the post is being previewed, or false otherwise.
@@ -1325,18 +1313,6 @@ _Related_
 _Related_
 
 -   toggleBlockMode in core/block-editor store.
-
-<a name="togglePostTitleSelection" href="#togglePostTitleSelection">#</a> **togglePostTitleSelection**
-
-Returns an action object that enables or disables post title selection.
-
-_Parameters_
-
--   _isSelected_ `[boolean]`: Whether post title is currently selected.
-
-_Returns_
-
--   `Object`: Action object.
 
 <a name="toggleSelection" href="#toggleSelection">#</a> **toggleSelection**
 
