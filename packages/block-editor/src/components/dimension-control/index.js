@@ -6,6 +6,7 @@ import {
 	ButtonGroup,
 	BaseControl,
 	Tooltip,
+	IconButton,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -18,6 +19,8 @@ import {
 import sizesTable from './sizes';
 
 function DimensionControl( { title, property, attributes, setAttributes, clientId } ) {
+	const controlId = `block-spacing-${ property }-${ clientId }`;
+
 	const onChangeSpacingSize = ( event ) => {
 		const theSize = sizesTable.find( ( size ) => event.target.value === size.slug );
 
@@ -26,13 +29,7 @@ function DimensionControl( { title, property, attributes, setAttributes, clientI
 		}
 
 		if ( attributes[ `${ property }Size` ] === theSize.slug ) {
-			setAttributes( {
-				[ `${ property }Size` ]: '',
-				[ `${ property }Top` ]: 0,
-				[ `${ property }Right` ]: 0,
-				[ `${ property }Left` ]: 0,
-				[ `${ property }Bottom` ]: 0,
-			} );
+			resetSpacing();
 		} else {
 			setAttributes( {
 				[ `${ property }Size` ]: theSize.slug,
@@ -44,8 +41,15 @@ function DimensionControl( { title, property, attributes, setAttributes, clientI
 		}
 	};
 
-	// Todo - update with unique Block instance ID?
-	const controlId = `block-spacing-${ property }-${ clientId }`;
+	const resetSpacing = () => {
+		setAttributes( {
+			[ `${ property }Size` ]: '',
+			[ `${ property }Top` ]: 0,
+			[ `${ property }Right` ]: 0,
+			[ `${ property }Left` ]: 0,
+			[ `${ property }Bottom` ]: 0,
+		} );
+	};
 
 	return (
 		<BaseControl
@@ -53,9 +57,19 @@ function DimensionControl( { title, property, attributes, setAttributes, clientI
 			help={ sprintf( __( 'Select the %s for this Block' ), property ) }
 			className="block-editor-dimension-control"
 		>
-			<BaseControl.VisualLabel>
-				{ title }
-			</BaseControl.VisualLabel>
+			<div className="block-editor-dimension-control__header">
+				<BaseControl.VisualLabel>
+					{ title }
+				</BaseControl.VisualLabel>
+
+				<IconButton
+					icon="controls-repeat"
+					label={ sprintf( __( 'Reset %s' ), property ) }
+					isDefault
+					isSmall
+					onClick={ resetSpacing }
+				/>
+			</div>
 			<ButtonGroup
 				id={ controlId }
 				className="block-editor-dimension-control__buttons"

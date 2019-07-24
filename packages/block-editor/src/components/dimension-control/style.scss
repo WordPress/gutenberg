@@ -2,7 +2,7 @@
 	margin-bottom: 1em;
 
 	.components-base-control__label {
-		margin-bottom: 1em;
+		margin-bottom: 0;
 	}
 
 	.components-base-control__help {
@@ -21,4 +21,11 @@
 	abbr {
 		pointer-events: none;
 	}
+}
+
+.block-editor-dimension-control__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 0.75em;
 }
