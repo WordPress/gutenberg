@@ -88,6 +88,48 @@ export const settings = {
 		anchor: true,
 		html: false,
 	},
+	attributes: {
+		paddingUnit: {
+			type: 'string',
+			default: 'px',
+		},
+		marginUnit: {
+			type: 'string',
+			default: 'px',
+		},
+		paddingTop: {
+			type: 'number',
+			default: 0,
+		},
+		paddingRight: {
+			type: 'number',
+			default: 0,
+		},
+		paddingBottom: {
+			type: 'number',
+			default: 0,
+		},
+		paddingLeft: {
+			type: 'number',
+			default: 0,
+		},
+		marginTop: {
+			type: 'number',
+			default: 0,
+		},
+		marginRight: {
+			type: 'number',
+			default: 0,
+		},
+		marginBottom: {
+			type: 'number',
+			default: 0,
+		},
+		marginLeft: {
+			type: 'number',
+			default: 0,
+		},
+	},
 	transforms: {
 		from: [
 			{
