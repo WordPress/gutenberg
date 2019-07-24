@@ -41,7 +41,7 @@ class NavigableToolbar extends Component {
 	 * Programmatically shifts focus to the element where the current selection
 	 * exists, if there is a selection.
 	 *
-	 * @param {Event} event KeyDown Event.
+	 * @param {SyntheticEvent} event SyntheticEvent `keydown` event.
 	 */
 	focusSelection( event ) {
 		// Ensure that a selection exists.
