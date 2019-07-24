@@ -1,0 +1,16 @@
+exports[`BlockExpandControl should match snapshot 1`] = `
+<Toolbar
+  controls={
+    Array [
+      Object {
+        "icon": "align-wide",
+        "isActive": true,
+        "onClick": [Function],
+        "title": "Expand to viewport",
+      },
+    ]
+  }
+  icon="align-wide"
+  label="Change expansibility"
+/>
+`;
