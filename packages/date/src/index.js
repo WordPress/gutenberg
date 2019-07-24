@@ -17,7 +17,22 @@ let settings = {
 		weekdays: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
 		weekdaysShort: [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ],
 		meridiem: { am: 'am', pm: 'pm', AM: 'AM', PM: 'PM' },
-		relative: { future: ' % s from now', past: '% s ago' },
+		relative: {
+			future: '%s from now',
+			past: '%s ago',
+			s: 'a few seconds',
+			ss: '%d seconds',
+			m: 'a minute',
+			mm: '%d minutes',
+			h: 'an hour',
+			hh: '%d hours',
+			d: 'a day',
+			dd: '%d days',
+			M: 'a month',
+			MM: '%d months',
+			y: 'a year',
+			yy: '%d years',
+		},
 	},
 	formats: {
 		time: 'g: i a',
@@ -61,21 +76,7 @@ export function setSettings( dateSettings ) {
 		},
 		// From human_time_diff?
 		// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
-		relativeTime: {
-			future: dateSettings.l10n.relative.future,
-			past: dateSettings.l10n.relative.past,
-			s: 'seconds',
-			m: 'a minute',
-			mm: '%d minutes',
-			h: 'an hour',
-			hh: '%d hours',
-			d: 'a day',
-			dd: '%d days',
-			M: 'a month',
-			MM: '%d months',
-			y: 'a year',
-			yy: '%d years',
-		},
+		relativeTime: dateSettings.l10n.relative,
 	} );
 	momentLib.locale( currentLocale );
 
