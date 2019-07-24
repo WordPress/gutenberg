@@ -1,12 +1,22 @@
-.block-editor-dimension-control {
-	margin-bottom: $block-padding;
+.block-editor-responsive-controls {
+	margin-bottom: $block-padding*2;
 	border-bottom: 1px solid $light-gray-600;
-	padding-bottom: $block-padding/2;
+	padding-bottom: $block-padding;
 
 	&:last-child {
 		padding-bottom: 0;
 		border-bottom: 0;
 	}
+}
+
+.block-editor-responsive-controls__label {
+	font-weight: 600;
+	margin-bottom: 0.6em;
+	margin-left: -1px;
+}
+
+.block-editor-dimension-control {
+
 
 	.components-base-control__label {
 		margin-bottom: 0;

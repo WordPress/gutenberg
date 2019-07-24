@@ -15,37 +15,27 @@ import sizesTable from './sizes';
 import DimensionButtons from './buttons';
 
 function DimensionControl( props ) {
-	const { title, property, attributes, setAttributes, clientId } = props;
+	const { title, property, device, deviceIcon, clientId, currentSize, onSpacingChange, onReset } = props;
+
+	const dimensionSize = `${ property }Size`;
+
+	const findSizeBySlug = ( sizes, slug ) => sizes.find( ( size ) => slug === size.slug );
 
 	const onChangeSpacingSize = ( event ) => {
-		const theSize = sizesTable.find( ( size ) => event.target.value === size.slug );
+		const theSize = findSizeBySlug( sizesTable, event.target.value );
 
 		if ( ! theSize ) {
 			return;
 		}
 
-		if ( attributes[ `${ property }Size` ] === theSize.slug ) {
+		if ( currentSize === theSize.slug ) {
 			resetSpacing();
 		} else {
-			setAttributes( {
-				[ `${ property }Size` ]: theSize.slug,
-				[ `${ property }Top` ]: theSize.size,
-				[ `${ property }Right` ]: theSize.size,
-				[ `${ property }Left` ]: theSize.size,
-				[ `${ property }Bottom` ]: theSize.size,
-			} );
+			onSpacingChange( dimensionSize, theSize.slug );
 		}
 	};
 
-	const resetSpacing = () => {
-		setAttributes( {
-			[ `${ property }Size` ]: '',
-			[ `${ property }Top` ]: 0,
-			[ `${ property }Right` ]: 0,
-			[ `${ property }Left` ]: 0,
-			[ `${ property }Bottom` ]: 0,
-		} );
-	};
+	const resetSpacing = () => onReset( dimensionSize );
 
 	return (
 		<BaseControl
@@ -56,10 +46,10 @@ function DimensionControl( props ) {
 			<div className="block-editor-dimension-control__header">
 				<BaseControl.VisualLabel className="block-editor-dimension-control__header-label">
 					<Icon
-						icon="desktop"
-						label="Desktop"
+						icon={ deviceIcon || device }
+						label={ device }
 					/>
-					{ sprintf( __( '%s on all devices' ), title ) }
+					{ sprintf( __( '%s (%s devices)' ), title, device ) }
 				</BaseControl.VisualLabel>
 
 				<IconButton
@@ -73,7 +63,8 @@ function DimensionControl( props ) {
 
 			<DimensionButtons
 				{ ...props }
-				device="desktop"
+				device={ device }
+				currentSize={ currentSize }
 				onChangeSpacingSize={ onChangeSpacingSize }
 			/>
 

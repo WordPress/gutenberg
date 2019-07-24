@@ -18,7 +18,7 @@ import {
  */
 import sizesTable from './sizes';
 
-function DimensionButtons( { controlId, attributes, property, onChangeSpacingSize } ) {
+function DimensionButtons( { controlId, currentSize, onChangeSpacingSize } ) {
 	return (
 		<Fragment>
 
@@ -29,7 +29,7 @@ function DimensionButtons( { controlId, attributes, property, onChangeSpacingSiz
 				{ sizesTable.map( function( size ) {
 					const visualName = size.name.substring( 0, 1 );
 					const hiddenName = size.name.substring( 1 );
-					const isSelected = attributes[ `${ property }Size` ] === size.slug;
+					const isSelected = currentSize === size.slug;
 
 					let innerButton = (
 						<Fragment>

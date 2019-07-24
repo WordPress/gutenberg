@@ -3,6 +3,14 @@
  * @type {Object}
  */
 const DimensionsAttributes = {
+	responsivePadding: {
+		type: 'boolean',
+		default: false,
+	},
+	responsiveMargin: {
+		type: 'boolean',
+		default: false,
+	},
 	paddingUnit: {
 		type: 'string',
 		default: 'px',
@@ -10,21 +18,11 @@ const DimensionsAttributes = {
 	paddingSize: {
 		type: 'string',
 	},
-	paddingTop: {
-		type: 'number',
-		default: 0,
+	paddingSizeMobile: {
+		type: 'string',
 	},
-	paddingRight: {
-		type: 'number',
-		default: 0,
-	},
-	paddingBottom: {
-		type: 'number',
-		default: 0,
-	},
-	paddingLeft: {
-		type: 'number',
-		default: 0,
+	paddingSizeTablet: {
+		type: 'string',
 	},
 	marginUnit: {
 		type: 'string',
@@ -33,21 +31,11 @@ const DimensionsAttributes = {
 	marginSize: {
 		type: 'string',
 	},
-	marginTop: {
-		type: 'number',
-		default: 0,
+	marginSizeTablet: {
+		type: 'string',
 	},
-	marginRight: {
-		type: 'number',
-		default: 0,
-	},
-	marginBottom: {
-		type: 'number',
-		default: 0,
-	},
-	marginLeft: {
-		type: 'number',
-		default: 0,
+	marginSizeMobile: {
+		type: 'string',
 	},
 };
 
