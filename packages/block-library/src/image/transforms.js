@@ -45,7 +45,7 @@ function getFirstAnchorAttributeFormHTML( html, attributeName ) {
 const imageSchema = {
 	img: {
 		attributes: [ 'src', 'alt' ],
-		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/ ],
+		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/, 'expandscreen' ],
 	},
 };
 
@@ -72,11 +72,13 @@ const transforms = {
 			isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
 			schema,
 			transform: ( node ) => {
-				// Search both figure and image classes. Alignment could be
+				// Search both figure and image classes. Alignment and Expansion could be
 				// set on either. ID is set on the image.
 				const className = node.className + ' ' + node.querySelector( 'img' ).className;
 				const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec( className );
 				const align = alignMatches ? alignMatches[ 1 ] : undefined;
+				const expandMatches = /(?:^|\s)expand(screen)(?:$|\s)/.exec( className );
+				const expand = expandMatches ? expandMatches[ 1 ] : undefined;
 				const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec( className );
 				const id = idMatches ? Number( idMatches[ 1 ] ) : undefined;
 				const anchorElement = node.querySelector( 'a' );
@@ -84,7 +86,11 @@ const transforms = {
 				const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
 				const rel = anchorElement && anchorElement.rel ? anchorElement.rel : undefined;
 				const linkClass = anchorElement && anchorElement.className ? anchorElement.className : undefined;
-				const attributes = getBlockAttributes( 'core/image', node.outerHTML, { align, id, linkDestination, href, rel, linkClass } );
+				const attributes = getBlockAttributes(
+					'core/image',
+					node.outerHTML, {
+						align, id, linkDestination, href, rel, linkClass, expand,
+					} );
 				return createBlock( 'core/image', attributes );
 			},
 		},
@@ -151,6 +157,12 @@ const transforms = {
 					type: 'string',
 					shortcode: ( { named: { align = 'alignnone' } } ) => {
 						return align.replace( 'align', '' );
+					},
+				},
+				expand: {
+					type: 'string',
+					shortcode: ( { named: { expand = '' } } ) => {
+						return expand.replace( 'expand', '' );
 					},
 				},
 			},
