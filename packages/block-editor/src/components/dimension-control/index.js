@@ -75,6 +75,7 @@ function DimensionControl( { type, attributes, setAttributes, clientId } ) {
 								isPrimary={ isSelected }
 								value={ size.slug }
 								onClick={ onChangeSpacingSize }
+								aria-pressed={ isSelected }
 							>
 								{ visualName }<span className="screen-reader-text">{ hiddenName }</span>
 							</Button>
