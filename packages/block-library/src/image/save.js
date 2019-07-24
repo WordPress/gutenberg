@@ -22,12 +22,14 @@ export default function save( { attributes } ) {
 		id,
 		linkTarget,
 		sizeSlug,
+		expand,
 	} = attributes;
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
+		[ `expand${ expand }` ]: expand ? expand : false,
 	} );
 
 	const image = (
