@@ -104,7 +104,7 @@ If this property is added, a label will be generated using label property as the
 - Type: `String`
 - Required: No
 
-### hideLabelFromVision
+#### hideLabelFromVision
 
 If true, the label will only be visible to screen readers.
 
