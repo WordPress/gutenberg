@@ -261,7 +261,7 @@ class WritingFlow extends Component {
 		const hasModifier = isShift || event.ctrlKey || event.altKey || event.metaKey;
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
-		// In navigation mode, tab and arrows navigate from block to blocks
+		// In navigation mode, tab and arrows navigate from block to block.
 		if ( keyboardMode === 'navigation' ) {
 			const navigateUp = ( isTab && isShift ) || isUp;
 			const navigateDown = ( isTab && ! isShift ) || isDown;
