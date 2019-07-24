@@ -21,6 +21,7 @@ const {
 } = displayShortcutList;
 
 const mainShortcut = {
+	className: 'edit-post-keyboard-shortcut-help__main-shortcuts',
 	shortcuts: [
 		{
 			keyCombination: access( 'h' ),
