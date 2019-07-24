@@ -1231,7 +1231,7 @@ export function lastBlockAttributesChange( state, action ) {
  *
  * @return {Object} Updated state.
  */
-export const discoverBlocks = ( state = { results: {}, hasPermission: undefined, filterValue: undefined, isRequestingDiscoverBlocks: false }, action ) => {
+export const discoverBlocks = ( state = { results: {}, hasPermission: undefined, filterValue: undefined, isRequestingDiscoverBlocks: true }, action ) => {
 	switch ( action.type ) {
 		case 'FETCH_DISCOVER_BLOCKS' :
 			return {

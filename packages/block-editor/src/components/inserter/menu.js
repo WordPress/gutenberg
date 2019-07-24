@@ -15,6 +15,7 @@ import {
 	includes,
 	deburr,
 	forEach,
+	debounce,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -172,11 +173,13 @@ export class InserterMenu extends Component {
 			reusableItems: [],
 			itemsPerCategory: {},
 			openPanels: [ 'suggested' ],
+			debouncedFilterValue: '',
 		};
 		this.onChangeSearchInput = this.onChangeSearchInput.bind( this );
 		this.onHover = this.onHover.bind( this );
 		this.panels = {};
 		this.inserterResults = createRef();
+		this.debouncedSetState = debounce( this.setState, 500 );
 	}
 
 	componentDidMount() {
@@ -192,6 +195,9 @@ export class InserterMenu extends Component {
 	}
 
 	onChangeSearchInput( event ) {
+		this.debouncedSetState( {
+			debouncedFilterValue: event.target.value,
+		} );
 		this.filter( event.target.value );
 	}
 
@@ -419,7 +425,7 @@ export class InserterMenu extends Component {
 					{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
 						SHOW_DISCOVER_BLOCKS ?
 							(
-								<DiscoverBlocksPanel onSelect={ onSelect } onHover={ this.onHover } filterValue={ this.state.filterValue } />
+								<DiscoverBlocksPanel onSelect={ onSelect } onHover={ this.onHover } filterValue={ this.state.debouncedFilterValue } />
 							) :
 							( <p className="editor-inserter__no-results block-editor-inserter__no-results">{ __( 'No blocks found.' ) }</p> )
 					) }
