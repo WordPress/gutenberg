@@ -35,7 +35,7 @@ const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
 					<span className="editor-block-list__descendant-arrow block-editor-block-list__descendant-arrow" />
 				</>
 				) }
-				<Button ref={ ref }onClick={ () => setKeyboardMode( 'edit' ) }>
+				<Button ref={ ref } onClick={ () => setKeyboardMode( 'edit' ) }>
 					<BlockTitle clientId={ clientId } />
 				</Button>
 			</Toolbar>
