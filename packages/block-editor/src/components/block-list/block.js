@@ -368,7 +368,7 @@ function BlockListBlock( {
 		! isEmptyDefaultBlock;
 	// We render block movers and block settings to keep them tabbale even if hidden
 	const shouldRenderMovers =
-		( isSelected || hoverArea === ( isRTL ? 'right' : 'left' ) ) &&
+		isSelected &&
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
