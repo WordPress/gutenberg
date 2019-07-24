@@ -24,6 +24,11 @@ export const settings = {
 	supports: {
 		align: true,
 	},
+	getEditWrapperProps( attributes ) {
+		if ( 'screen' === attributes.expand ) {
+			return { 'data-expand': attributes.expand };
+		}
+	},
 	transforms,
 	save,
 	edit,
