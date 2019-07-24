@@ -5,6 +5,9 @@
 		"align": {
 			"type": "string"
 		},
+        "expand": {
+			"type": "string"
+        },
 		"url": {
 			"type": "string",
 			"source": "attribute",
