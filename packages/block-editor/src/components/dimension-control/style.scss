@@ -1,5 +1,12 @@
 .block-editor-dimension-control {
-	margin-bottom: 1em;
+	margin-bottom: $block-padding;
+	border-bottom: 1px solid $light-gray-600;
+	padding-bottom: $block-padding/2;
+
+	&:last-child {
+		padding-bottom: 0;
+		border-bottom: 0;
+	}
 
 	.components-base-control__label {
 		margin-bottom: 0;
@@ -28,4 +35,14 @@
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 0.75em;
+
+	.block-editor-dimension-control__header-label {
+		display: flex;
+		align-items: center;
+
+		.dashicon {
+			margin-right: 0.5em;
+		}
+	}
 }
+

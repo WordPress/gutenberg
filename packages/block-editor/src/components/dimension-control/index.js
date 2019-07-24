@@ -2,24 +2,20 @@
  * WordPress dependencies
  */
 import {
-	Button,
-	ButtonGroup,
 	BaseControl,
-	Tooltip,
 	IconButton,
+	Icon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	Fragment,
-} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import sizesTable from './sizes';
+import DimensionButtons from './buttons';
 
-function DimensionControl( { title, property, attributes, setAttributes, clientId } ) {
-	const controlId = `block-spacing-${ property }-${ clientId }`;
+function DimensionControl( props ) {
+	const { title, property, attributes, setAttributes, clientId } = props;
 
 	const onChangeSpacingSize = ( event ) => {
 		const theSize = sizesTable.find( ( size ) => event.target.value === size.slug );
@@ -53,64 +49,34 @@ function DimensionControl( { title, property, attributes, setAttributes, clientI
 
 	return (
 		<BaseControl
-			id={ controlId }
+			id={ `block-spacing-${ property }-desktop-${ clientId }` }
 			help={ sprintf( __( 'Select the %s for this Block' ), property ) }
 			className="block-editor-dimension-control"
 		>
 			<div className="block-editor-dimension-control__header">
-				<BaseControl.VisualLabel>
-					{ title }
+				<BaseControl.VisualLabel className="block-editor-dimension-control__header-label">
+					<Icon
+						icon="desktop"
+						label="Desktop"
+					/>
+					{ sprintf( __( '%s on all devices' ), title ) }
 				</BaseControl.VisualLabel>
 
 				<IconButton
 					icon="controls-repeat"
-					label={ sprintf( __( 'Reset %s' ), property ) }
+					label={ sprintf( __( 'Reset %s' ), title ) }
 					isDefault
 					isSmall
 					onClick={ resetSpacing }
 				/>
 			</div>
-			<ButtonGroup
-				id={ controlId }
-				className="block-editor-dimension-control__buttons"
-			>
-				{ sizesTable.map( function( size ) {
-					const visualName = size.name.substring( 0, 1 );
-					const hiddenName = size.name.substring( 1 );
-					const isSelected = attributes[ `${ property }Size` ] === size.slug;
 
-					let innerButton = (
-						<Fragment>
-							{ visualName }
-							<span className="screen-reader-text">{ hiddenName }</span>
-						</Fragment>
-					);
+			<DimensionButtons
+				{ ...props }
+				device="desktop"
+				onChangeSpacingSize={ onChangeSpacingSize }
+			/>
 
-					// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr
-					if ( size.abbr ) {
-						innerButton = (
-							<abbr title={ size.abbr }>
-								{ innerButton }
-							</abbr>
-						);
-					}
-
-					return (
-						<Tooltip key={ size.slug } text={ size.name }>
-							<Button
-								className="block-editor-dimension-control__button"
-								isDefault={ ! isSelected }
-								isPrimary={ isSelected }
-								value={ size.slug }
-								onClick={ onChangeSpacingSize }
-								aria-pressed={ isSelected }
-							>
-								{ innerButton }
-							</Button>
-						</Tooltip>
-					);
-				} ) }
-			</ButtonGroup>
 		</BaseControl>
 	);
 }
