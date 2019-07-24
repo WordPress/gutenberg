@@ -58,6 +58,22 @@
 		margin-left: auto;
 		margin-right: auto;
 	}
+
+	&.expandscreen:not(.alignfull):not(.alignwide) img,
+	.expandscreen:not(.alignfull):not(.alignwide) img {
+		height: 100vh;
+		min-height: 100vh;
+	}
+}
+
+// doing selector stronger to set `max-width`.
+.entry .entry-content .wp-block-image {
+	&.alignfull.expandscreen,
+	&.alignwide.expandscreen {
+		height: 100vh;
+		overflow: hidden;
+		max-width: 100vw;
+	}
 }
 
 // Variations
