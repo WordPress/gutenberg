@@ -337,7 +337,15 @@ _Returns_
 
 <a name="getKeyboardMode" href="#getKeyboardMode">#</a> **getKeyboardMode**
 
-Undocumented declaration.
+Returns the current keyboard mode.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `string`: Keyboard Mode
 
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 

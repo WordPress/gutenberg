@@ -1406,7 +1406,7 @@ function getReusableBlocks( state ) {
 	return get( state, [ 'settings', '__experimentalReusableBlocks' ], EMPTY_ARRAY );
 }
 
-/*
+/**
  * Returns the current keyboard mode.
  *
  * @param {Object} state Editor state.

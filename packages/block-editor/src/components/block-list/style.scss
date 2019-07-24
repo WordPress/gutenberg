@@ -147,7 +147,7 @@
 			}
 		}
 
-		&.is-navigation > .block-editor-block-list__block-edit::before {
+		&.is-navigate-mode > .block-editor-block-list__block-edit::before {
 			border-color: $blue-medium-focus;
 			box-shadow: inset $block-left-border-width 0 0 0 $blue-medium-focus;
 
@@ -158,7 +158,7 @@
 	}
 
 	// Hover style.
-	&.is-hovered:not(.is-navigation) > .block-editor-block-list__block-edit::before {
+	&.is-hovered:not(.is-navigate-mode) > .block-editor-block-list__block-edit::before {
 		box-shadow: -$block-left-border-width 0 0 0 $dark-opacity-light-500;
 
 		.is-dark-theme & {
@@ -1083,7 +1083,7 @@
 	}
 
 	// In navigation mode, this should appear similarly to the block toolbar.
-	.is-navigation & {
+	.is-navigate-mode & {
 
 		// Position in the top left of the border.
 		left: -$block-padding;
