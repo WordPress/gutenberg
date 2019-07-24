@@ -22,6 +22,13 @@ import { pasteHandler } from '@wordpress/blocks';
 import styles from './style.scss';
 
 class PostTitle extends Component {
+	componentDidUpdate( prevProps ) {
+		// Unselect if any other block is selected
+		if ( this.props.isSelected && ! prevProps.isAnyBlockSelected && this.props.isAnyBlockSelected ) {
+			this.props.onUnselect();
+		}
+	}
+
 	componentDidMount() {
 		if ( this.props.innerRef ) {
 			this.props.innerRef( this );
@@ -98,10 +105,10 @@ export default compose(
 		} = select( 'core/editor' );
 
 		const { getSelectedBlockClientId } = select( 'core/block-editor' );
-		const isAnyBlockSelected = !! getSelectedBlockClientId();
 
 		return {
-			isSelected: ! isAnyBlockSelected && isPostTitleSelected(),
+			isAnyBlockSelected: !! getSelectedBlockClientId(),
+			isSelected: isPostTitleSelected(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
