@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, find } from 'lodash';
+import { castArray, find, mapValues } from 'lodash';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import {
 	receiveQueriedItems,
 } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import { apiFetch } from './controls';
+import { select, apiFetch } from './controls';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -121,8 +121,6 @@ export function receiveEmbedPreview( url, preview ) {
  * @param {string} kind    Kind of the received entity.
  * @param {string} name    Name of the received entity.
  * @param {Object} record  Record to be saved.
- *
- * @return {Object} Updated record.
  */
 export function* saveEntityRecord( kind, name, record ) {
 	const entities = yield getKindEntities( kind );
@@ -132,14 +130,76 @@ export function* saveEntityRecord( kind, name, record ) {
 	}
 	const key = entity.key || DEFAULT_ENTITY_KEY;
 	const recordId = record[ key ];
+	yield { type: 'SAVE_ENTITY_RECORD_START', kind, name, recordId };
 	const updatedRecord = yield apiFetch( {
 		path: `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`,
 		method: recordId ? 'PUT' : 'POST',
 		data: record,
 	} );
-	yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
+	let error;
+	try {
+		yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
+	} catch ( _error ) {
+		error = _error;
+	}
+	yield { type: 'SAVE_ENTITY_RECORD_FINISH', kind, name, recordId, error };
+}
 
-	return updatedRecord;
+export function* editEntityRecord( kind, name, recordId, edits ) {
+	const record = yield select( 'getEditedEntityRecord', kind, name, recordId );
+
+	return {
+		type: 'EDIT_ENTITY_RECORD',
+		kind,
+		name,
+		recordId,
+		edits,
+		meta: {
+			undo: {
+				type: 'EDIT_ENTITY_RECORD',
+				kind,
+				name,
+				recordId,
+				edits: mapValues( edits, ( value, key ) => record[ key ] ),
+			},
+		},
+	};
+}
+
+export function* undo() {
+	if ( ! ( yield select( 'hasUndo' ) ) ) {
+		return;
+	}
+
+	const [ kind, name, recordId, edits ] = yield select( 'getUndoEdit' );
+	yield {
+		type: 'EDIT_ENTITY_RECORD',
+		kind,
+		name,
+		recordId,
+		edits,
+		meta: {
+			isUndo: true,
+		},
+	};
+}
+
+export function* redo() {
+	if ( ! ( yield select( 'hasRedo' ) ) ) {
+		return;
+	}
+
+	const [ kind, name, recordId, edits ] = yield select( 'getRedoEdit' );
+	yield {
+		type: 'EDIT_ENTITY_RECORD',
+		kind,
+		name,
+		recordId,
+		edits,
+		meta: {
+			isRedo: true,
+		},
+	};
 }
 
 /**

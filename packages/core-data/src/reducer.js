@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, map, groupBy, flowRight } from 'lodash';
+import { keyBy, reduce, map, groupBy, flowRight, isEqual, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,13 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { ifMatchingAction, replaceAction } from './utils';
+import {
+	assignPropertyDescriptors,
+	getRawValue,
+	ifMatchingAction,
+	hasEnumerableProperties,
+	replaceAction,
+} from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { defaultEntities, DEFAULT_ENTITY_KEY } from './entities';
 
@@ -118,6 +124,25 @@ export function themeSupports( state = {}, action ) {
 	return state;
 }
 
+const ifMatchingEntityConfig = ( reducer ) => ( entityConfig ) => flowRight( [
+	// Limit to matching action type so we don't attempt to replace action on
+	// an unhandled action.
+	ifMatchingAction( ( action ) => (
+		action.name &&
+		action.kind &&
+		action.name === entityConfig.name &&
+		action.kind === entityConfig.kind
+	) ),
+
+	// Inject the entity config into the action.
+	replaceAction( ( action ) => {
+		return {
+			...action,
+			key: entityConfig.key || DEFAULT_ENTITY_KEY,
+		};
+	} ),
+] )( reducer );
+
 /**
  * Higher Order Reducer for a given entity config. It supports:
  *
@@ -127,26 +152,82 @@ export function themeSupports( state = {}, action ) {
  *
  * @return {Function} Reducer.
  */
-function entity( entityConfig ) {
-	return flowRight( [
-		// Limit to matching action type so we don't attempt to replace action on
-		// an unhandled action.
-		ifMatchingAction( ( action ) => (
-			action.name &&
-			action.kind &&
-			action.name === entityConfig.name &&
-			action.kind === entityConfig.kind
-		) ),
+const data = ifMatchingEntityConfig( queriedDataReducer );
 
-		// Inject the entity config into the action.
-		replaceAction( ( action ) => {
+const edits = ifMatchingEntityConfig( ( state = {}, action ) => {
+	switch ( action.type ) {
+		case 'EDIT_ENTITY_RECORD':
+			// TODO: When assigning an edit which is equal to the current data
+			// value, the edit should be omitted. This ensures that Undo to the
+			// last save point is treated as non-dirty.
 			return {
-				...action,
-				key: entityConfig.key || DEFAULT_ENTITY_KEY,
+				...state,
+				[ action.recordId ]: assignPropertyDescriptors(
+					{},
+					state[ action.recordId ],
+					action.edits,
+				),
 			};
-		} ),
-	] )( queriedDataReducer );
-}
+
+		case 'RECEIVE_ITEMS':
+			let nextState = state;
+			for ( const record of action.items ) {
+				const recordId = record[ action.key ];
+				if ( ! nextState.hasOwnProperty( recordId ) ) {
+					continue;
+				}
+
+				const nextEdits = reduce( nextState[ recordId ], ( result, value, key ) => {
+					// Deep equality avoids changing reference to a top-level
+					// key if all its properties match.
+					if ( ! isEqual( result[ key ], getRawValue( record[ key ] ) ) ) {
+						return result;
+					}
+
+					if ( result === nextState[ recordId ] ) {
+						result = assignPropertyDescriptors( {}, nextState[ recordId ] );
+					}
+
+					delete result[ key ];
+					return result;
+				}, nextState[ recordId ] );
+
+				if ( nextEdits === nextState[ recordId ] ) {
+					continue;
+				}
+
+				if ( nextState === state ) {
+					nextState = { ...state };
+				}
+
+				if ( Object.getOwnPropertyNames( nextEdits ).length ) {
+					nextState[ recordId ] = nextEdits;
+				} else {
+					delete nextState[ recordId ];
+				}
+			}
+
+			return nextState;
+	}
+
+	return state;
+} );
+
+const saving = ifMatchingEntityConfig( ( state = {}, action ) => {
+	switch ( action.type ) {
+		case 'SAVE_ENTITY_RECORD_START':
+		case 'SAVE_ENTITY_RECORD_FINISH':
+			return {
+				...state,
+				[ action.recordId ]: {
+					pending: action.type === 'SAVE_ENTITY_RECORD_START',
+					error: action.error,
+				},
+			};
+	}
+
+	return state;
+} );
 
 /**
  * Reducer keeping track of the registered entities.
@@ -176,43 +257,54 @@ export function entitiesConfig( state = defaultEntities, action ) {
  *
  * @return {Object} Updated state.
  */
-export const entities = ( state = {}, action ) => {
-	const newConfig = entitiesConfig( state.config, action );
+export function entities( state = {}, action ) {
+	let { reducer, config } = state;
 
-	// Generates a dynamic reducer for the entities
-	let entitiesDataReducer = state.reducer;
-	if ( ! entitiesDataReducer || newConfig !== state.config ) {
-		const entitiesByKind = groupBy( newConfig, 'kind' );
-		entitiesDataReducer = combineReducers( Object.entries( entitiesByKind ).reduce( ( memo, [ kind, subEntities ] ) => {
-			const kindReducer = combineReducers( subEntities.reduce(
-				( kindMemo, entityConfig ) => ( {
-					...kindMemo,
-					[ entityConfig.name ]: entity( entityConfig ),
-				} ),
-				{}
-			) );
+	const nextConfig = entitiesConfig( state.config, action );
+	if ( nextConfig !== config ) {
+		config = nextConfig;
 
-			memo[ kind ] = kindReducer;
-			return memo;
-		}, {} ) );
+		const entitiesByKind = groupBy( nextConfig, 'kind' );
+
+		reducer = combineReducers( mapValues( {
+			data,
+			edits,
+			saving,
+		}, ( keyReducer ) => combineReducers(
+			mapValues( entitiesByKind, ( subEntities ) => {
+				return combineReducers( subEntities.reduce(
+					( result, entityConfig ) => {
+						result[ entityConfig.name ] = keyReducer( entityConfig );
+						return result;
+					},
+					{}
+				) );
+			} )
+		) ) );
+
+		return {
+			...state,
+			reducer,
+			config,
+			...reducer( state, action ),
+		};
 	}
 
-	const newData = entitiesDataReducer( state.data, action );
+	const nextReducerResult = reducer( state, action );
 
 	if (
-		newData === state.data &&
-		newConfig === state.config &&
-		entitiesDataReducer === state.reducer
+		nextReducerResult.data !== state.data ||
+		nextReducerResult.edits !== state.edits ||
+		nextReducerResult.saving !== state.saving
 	) {
-		return state;
+		return {
+			...state,
+			...nextReducerResult,
+		};
 	}
 
-	return {
-		reducer: entitiesDataReducer,
-		data: newData,
-		config: newConfig,
-	};
-};
+	return state;
+}
 
 /**
  * Reducer managing embed preview data.
@@ -277,6 +369,82 @@ export function autosaves( state = {}, action ) {
 	return state;
 }
 
+export const undo = combineReducers( {
+	stack( state = [], action ) {
+		switch ( action.type ) {
+			case 'EDIT_ENTITY_RECORD':
+				// If editing in the context of a history operation, avoid
+				// modifying the stack since there is no change to track.
+				if ( action.meta.isUndo || action.meta.isRedo ) {
+					return state;
+				}
+
+				// Non-enumerable properties are treated not as having their
+				// own undo, but are reachable as of the next meaningful edit
+				// to which they are merged.
+				if ( ! hasEnumerableProperties( action.edits ) ) {
+					state = [ ...state ];
+					state.flattenedUndo = assignPropertyDescriptors(
+						{},
+						state.flattenedUndo,
+						action.edits
+					);
+
+					return state;
+				}
+
+				let nextState;
+				if ( state.length ) {
+					nextState = [ ...state ];
+				} else {
+					// For the first, include an entry for the original values,
+					// since  otherwise they would not be reachable for undo.
+					nextState = [
+						[
+							action.meta.undo.kind,
+							action.meta.undo.name,
+							action.meta.undo.recordId,
+							assignPropertyDescriptors(
+								{},
+								state.flattenedUndo,
+								action.meta.undo.edits,
+							),
+						],
+					];
+				}
+
+				nextState.push( [
+					action.kind,
+					action.name,
+					action.recordId,
+					assignPropertyDescriptors(
+						{},
+						state.flattenedUndo,
+						action.edits,
+					),
+				] );
+
+				return nextState;
+		}
+
+		return state;
+	},
+	currentOffset( state = -1, action ) {
+		switch ( action.type ) {
+			case 'EDIT_ENTITY_RECORD':
+				if ( action.meta.isUndo ) {
+					return state - 1;
+				} else if ( action.meta.isRedo ) {
+					return state + 1;
+				}
+
+				return -1;
+		}
+
+		return state;
+	},
+} );
+
 export default combineReducers( {
 	terms,
 	users,
@@ -287,4 +455,5 @@ export default combineReducers( {
 	embedPreviews,
 	userPermissions,
 	autosaves,
+	undo,
 } );

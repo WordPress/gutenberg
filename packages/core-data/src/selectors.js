@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { map, find, get, filter, compact, defaultTo } from 'lodash';
+import { map, find, get, filter, compact, defaultTo, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { REDUCER_KEY } from './name';
 import { getQueriedItems } from './queried-data';
+import { flattenRawProperties, assignPropertyDescriptors } from './utils';
 
 /**
  * Returns true if a request is in progress for embed preview data, or false
@@ -123,6 +124,34 @@ export function getEntityRecords( state, kind, name, query ) {
 		return [];
 	}
 	return getQueriedItems( queriedState, query );
+}
+
+export function getEntityRecordEdits( state, kind, name, recordId ) {
+	return get( state.entities.edits, [ kind, name, recordId ] );
+}
+
+export const getEditedEntityRecord = createSelector(
+	( state, kind, name, recordId ) => assignPropertyDescriptors(
+		{},
+		flattenRawProperties( getEntityRecord( state, kind, name, recordId ) ),
+		getEntityRecordEdits( state, kind, name, recordId ),
+	),
+	( state ) => [
+		state.entities.data,
+		state.entities.edits,
+	],
+);
+
+export function hasEditsForEntityRecord( state, kind, name, recordId ) {
+	return ! isEmpty( getEntityRecordEdits( state, kind, name, recordId ) );
+}
+
+export function isSavingEntityRecord( state, kind, name, recordId ) {
+	return get( state.entities.saving, [ kind, name, recordId, 'pending' ], false );
+}
+
+export function getLastEntitySaveError( state, kind, name, recordId ) {
+	return get( state.entities.saving, [ kind, name, recordId, 'error' ] );
 }
 
 /**
@@ -261,3 +290,23 @@ export function getAutosave( state, postType, postId, authorId ) {
 export const hasFetchedAutosaves = createRegistrySelector( ( select ) => ( state, postType, postId ) => {
 	return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [ postType, postId ] );
 } );
+
+export function getCurrentUndoOffset( state ) {
+	return state.undo.currentOffset;
+}
+
+export function getUndoEdit( state ) {
+	return state.undo.stack[ state.undo.stack.length - 1 + getCurrentUndoOffset( state ) ];
+}
+
+export function getRedoEdit( state ) {
+	return state.undo.stack[ state.undo.stack.length + 1 + getCurrentUndoOffset( state ) ];
+}
+
+export function hasUndo( state ) {
+	return state.undo.stack.length - 1 + getCurrentUndoOffset( state ) >= 0;
+}
+
+export function hasRedo( state ) {
+	return getCurrentUndoOffset( state ) !== -1;
+}
