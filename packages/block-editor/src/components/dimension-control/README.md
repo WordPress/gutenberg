@@ -109,7 +109,6 @@ A dashicon for the device type (see `device` above).
 * **Default:** `undefined`
 * **Required:** Yes
 * **Arguments:**:
-  - `dimensionSize` - the Block attribute to be updated
   - `size` - a string representing the selected size (eg: `medium`)
 
 A callback which is triggered when a spacing size value changes (is selected/clicked).
@@ -120,7 +119,6 @@ A callback which is triggered when a spacing size value changes (is selected/cli
 * **Default:** `undefined`
 * **Required:** Yes
 * **Arguments:**:
-  - `dimensionSize` - the Block attribute to be updated
 
 A callback which is triggered when the "reset" UI is activated.
 

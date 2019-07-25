@@ -56,7 +56,7 @@ describe( 'DimensionControl', () => {
 			wrapper.find( 'button[value="small"]' ).simulate( 'click' );
 
 			expect( onChangeHandler ).toHaveBeenCalledTimes( 1 );
-			expect( onChangeHandler ).toHaveBeenCalledWith( 'paddingSize', 'small' );
+			expect( onChangeHandler ).toHaveBeenCalledWith( 'small' );
 		} );
 
 		it( 'should call onReset handler with correct args on reset button click', () => {
@@ -72,7 +72,6 @@ describe( 'DimensionControl', () => {
 			wrapper.find( 'button[aria-label="Reset Padding"]' ).simulate( 'click' );
 
 			expect( onResetHandler ).toHaveBeenCalledTimes( 1 );
-			expect( onResetHandler ).toHaveBeenCalledWith( 'paddingSize' );
 		} );
 	} );
 } );

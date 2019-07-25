@@ -62,12 +62,12 @@ export default function Inspector( props ) {
 	/**
 	 * Updates the spacing attribute for a given dimension
 	 * (and optionally a given device)
-	 * @param  {string} dimension the dimension property (eg: `padding`)
 	 * @param  {string} size      a slug representing a dimension size (eg: `medium`)
+	 * @param  {string} dimension the dimension property (eg: `padding`)
 	 * @param  {string} device    the device which this dimension applies to (eg: `mobile`, `tablet`)
 	 * @return {void}
 	 */
-	const updateSpacing = ( dimension, size, device = '' ) => {
+	const updateSpacing = ( size, dimension, device = '' ) => {
 		setAttributes( {
 			[ `${ dimension }${ device }` ]: size,
 		} );
@@ -121,8 +121,8 @@ export default function Inspector( props ) {
 							title={ __( 'Padding' ) }
 							property="padding"
 							id={ clientId }
-							onReset={ resetSpacingDimension }
-							onSpacingChange={ updateSpacing }
+							onReset={ partialRight( resetSpacingDimension, 'paddingSize' ) }
+							onSpacingChange={ partialRight( updateSpacing, 'paddingSize' ) }
 							currentSize={ attributes.paddingSize }
 							device="all"
 							deviceIcon="desktop"
@@ -135,8 +135,8 @@ export default function Inspector( props ) {
 								title={ __( 'Padding' ) }
 								property="padding"
 								id={ clientId }
-								onReset={ resetSpacingDimension }
-								onSpacingChange={ updateSpacing }
+								onReset={ partialRight( resetSpacingDimension, 'paddingSize' ) }
+								onSpacingChange={ partialRight( updateSpacing, 'paddingSize' ) }
 								currentSize={ attributes.paddingSize }
 								device="desktop"
 							/>
@@ -145,8 +145,8 @@ export default function Inspector( props ) {
 								title={ __( 'Padding' ) }
 								property="padding"
 								id={ clientId }
-								onReset={ partialRight( resetSpacingDimension, 'Tablet' ) }
-								onSpacingChange={ partialRight( updateSpacing, 'Tablet' ) }
+								onReset={ partialRight( resetSpacingDimension, 'paddingSize', 'Tablet' ) }
+								onSpacingChange={ partialRight( updateSpacing, 'paddingSize', 'Tablet' ) }
 								currentSize={ attributes.paddingSizeTablet }
 								device="tablet"
 								deviceIcon="tablet"
@@ -156,8 +156,8 @@ export default function Inspector( props ) {
 								title={ __( 'Padding' ) }
 								property="padding"
 								id={ clientId }
-								onReset={ partialRight( resetSpacingDimension, 'Mobile' ) }
-								onSpacingChange={ partialRight( updateSpacing, 'Mobile' ) }
+								onReset={ partialRight( resetSpacingDimension, 'paddingSize', 'Mobile' ) }
+								onSpacingChange={ partialRight( updateSpacing, 'paddingSize', 'Mobile' ) }
 								currentSize={ attributes.paddingSizeMobile }
 								device="mobile"
 								deviceIcon="smartphone"
@@ -180,8 +180,8 @@ export default function Inspector( props ) {
 							title={ __( 'Margin' ) }
 							property="margin"
 							id={ clientId }
-							onReset={ resetSpacingDimension }
-							onSpacingChange={ updateSpacing }
+							onReset={ partialRight( resetSpacingDimension, 'marginSize' ) }
+							onSpacingChange={ partialRight( updateSpacing, 'marginSize' ) }
 							currentSize={ attributes.marginSize }
 							device="all"
 							deviceIcon="desktop"
@@ -194,8 +194,8 @@ export default function Inspector( props ) {
 								title={ __( 'Margin' ) }
 								property="margin"
 								id={ clientId }
-								onReset={ resetSpacingDimension }
-								onSpacingChange={ updateSpacing }
+								onReset={ partialRight( resetSpacingDimension, 'marginSize' ) }
+								onSpacingChange={ partialRight( updateSpacing, 'marginSize' ) }
 								currentSize={ attributes.marginSize }
 								device="desktop"
 							/>
@@ -204,8 +204,8 @@ export default function Inspector( props ) {
 								title={ __( 'Margin' ) }
 								property="margin"
 								id={ clientId }
-								onReset={ partialRight( resetSpacingDimension, 'Tablet' ) }
-								onSpacingChange={ partialRight( updateSpacing, 'Tablet' ) }
+								onReset={ partialRight( resetSpacingDimension, 'marginSize', 'Tablet' ) }
+								onSpacingChange={ partialRight( updateSpacing, 'marginSize', 'Tablet' ) }
 								currentSize={ attributes.marginSizeTablet }
 								device="tablet"
 								deviceIcon="tablet"
@@ -215,8 +215,8 @@ export default function Inspector( props ) {
 								title={ __( 'Margin' ) }
 								property="margin"
 								id={ clientId }
-								onReset={ partialRight( resetSpacingDimension, 'Mobile' ) }
-								onSpacingChange={ partialRight( updateSpacing, 'Mobile' ) }
+								onReset={ partialRight( resetSpacingDimension, 'marginSize', 'Mobile' ) }
+								onSpacingChange={ partialRight( updateSpacing, 'marginSize', 'Mobile' ) }
 								currentSize={ attributes.marginSizeMobile }
 								device="mobile"
 								deviceIcon="smartphone"

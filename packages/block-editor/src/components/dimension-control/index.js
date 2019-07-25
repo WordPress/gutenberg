@@ -17,8 +17,6 @@ import DimensionButtons from './buttons';
 function DimensionControl( props ) {
 	const { title, property, device = 'all', deviceIcon = 'desktop', id, currentSize, onSpacingChange, onReset } = props;
 
-	const dimensionSize = `${ property }Size`;
-
 	/**
 	 * Determines the size from the size slug (eg: `medium`)
 	 * and decides whether to call the change or reset callback
@@ -36,7 +34,7 @@ function DimensionControl( props ) {
 		if ( currentSize === theSize.slug ) {
 			resetSpacing();
 		} else {
-			onSpacingChange( dimensionSize, theSize.slug );
+			onSpacingChange( theSize.slug );
 		}
 	};
 
@@ -45,7 +43,7 @@ function DimensionControl( props ) {
 	 * a dimension spacing values
 	 * @return {void}
 	 */
-	const resetSpacing = () => onReset( dimensionSize );
+	const resetSpacing = () => onReset();
 
 	return (
 		<BaseControl
