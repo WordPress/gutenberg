@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Dashicon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,6 +15,7 @@ import { default as VideoPlayer } from 'react-native-video';
  * Internal dependencies
  */
 import styles from './video-player.scss';
+import PlayIcon from './gridicon-play';
 
 class Video extends Component {
 	constructor() {
@@ -92,10 +93,9 @@ class Video extends Component {
 				{ showPlayButton &&
 				// If we add the play icon as a subview to VideoPlayer then react-native-video decides to show control buttons
 				// even if we set controls={ false }, so we are adding our play button as a sibling overlay view.
-				<TouchableOpacity disabled={ ! isSelected } onPress={ this.onPressPlay } style={ [ style, styles.overlay ] }>
-					<View style={ styles.playIcon }>
-						<Dashicon icon={ 'controls-play' } ariaPressed={ 'dashicon-active' } size={ styles.playIcon.width } />
-					</View>
+				<TouchableOpacity disabled={ ! isSelected } onPress={ this.onPressPlay } style={ [ style, styles.overlayContainer ] }>
+					<View style={ styles.blackOverlay } />
+					<Icon icon={ PlayIcon } style={ styles.playIcon } size={ styles.playIcon.size } />
 				</TouchableOpacity>
 				}
 			</View>
