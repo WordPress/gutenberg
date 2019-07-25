@@ -46,7 +46,7 @@ class BlockList extends Component {
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
 		this.parentRef = createRef();
-		this.GenerateGridLines = this.GenerateGridLines.bind( this );
+		this.generateGridLines = this.generateGridLines.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
@@ -199,7 +199,8 @@ class BlockList extends Component {
 		}
 	}
 
-	GenerateGridLines() {
+	generateGridLines() {
+		// we wait for the parent to render in order to access the ref
 		if ( this.parentRef.current ) {
 			const computed = window
 				.getComputedStyle( this.parentRef.current )
@@ -239,7 +240,7 @@ class BlockList extends Component {
 					{ 'block-editor-block-list__layout--grid-visible': isGridVisible }
 				) }
 			>
-				{ isGridVisible && this.GenerateGridLines() }
+				{ this.generateGridLines() }
 
 				{ blockClientIds.map( ( clientId ) => {
 					const isBlockInSelection = hasMultiSelection ?
