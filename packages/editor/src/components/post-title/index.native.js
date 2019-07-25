@@ -10,7 +10,7 @@ import { isEmpty } from 'lodash';
 import { Component } from '@wordpress/element';
 import { RichText } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -22,10 +22,11 @@ import { pasteHandler } from '@wordpress/blocks';
 import styles from './style.scss';
 
 class PostTitle extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.titleViewRef = null;
+	componentDidUpdate( prevProps ) {
+		// Unselect if any other block is selected
+		if ( this.props.isSelected && ! prevProps.isAnyBlockSelected && this.props.isAnyBlockSelected ) {
+			this.props.onUnselect();
+		}
 	}
 
 	componentDidMount() {
@@ -39,10 +40,7 @@ class PostTitle extends Component {
 	}
 
 	focus() {
-		if ( this.titleViewRef ) {
-			this.titleViewRef.focus();
-			this.props.onSelect();
-		}
+		this.props.onSelect();
 	}
 
 	render() {
@@ -91,10 +89,8 @@ class PostTitle extends Component {
 					onSelectionChange={ () => { } }
 					onEnter={ this.props.onEnterPress }
 					disableEditingMenu={ true }
-					setRef={ ( ref ) => {
-						this.titleViewRef = ref;
-					} }
 					__unstablePasteHandler={ pasteHandler }
+					__unstableIsSelected={ this.props.isSelected }
 				>
 				</RichText>
 			</View>
@@ -102,27 +98,46 @@ class PostTitle extends Component {
 	}
 }
 
-const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const {
-		undo,
-		redo,
-	} = dispatch( 'core/editor' );
-
-	const {
-		insertDefaultBlock,
-	} = dispatch( 'core/block-editor' );
-
-	return {
-		onEnterPress() {
-			insertDefaultBlock( undefined, undefined, 0 );
-		},
-		onUndo: undo,
-		onRedo: redo,
-	};
-} );
-
 export default compose(
-	applyWithDispatch,
+	withSelect( ( select ) => {
+		const {
+			isPostTitleSelected,
+		} = select( 'core/editor' );
+
+		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+
+		return {
+			isAnyBlockSelected: !! getSelectedBlockClientId(),
+			isSelected: isPostTitleSelected(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const {
+			undo,
+			redo,
+			togglePostTitleSelection,
+		} = dispatch( 'core/editor' );
+
+		const {
+			clearSelectedBlock,
+			insertDefaultBlock,
+		} = dispatch( 'core/block-editor' );
+
+		return {
+			onEnterPress() {
+				insertDefaultBlock( undefined, undefined, 0 );
+			},
+			onUndo: undo,
+			onRedo: redo,
+			onSelect() {
+				togglePostTitleSelection( true );
+				clearSelectedBlock();
+			},
+			onUnselect() {
+				togglePostTitleSelection( false );
+			},
+		};
+	} ),
 	withInstanceId,
 	withFocusOutside
 )( PostTitle );

@@ -322,7 +322,10 @@ function BlockListBlock( {
 				onShiftSelection();
 				event.preventDefault();
 			}
-		} else {
+
+		// Avoid triggering multi-selection if we click toolbars/inspectors
+		// and all elements that are outside the Block Edit DOM tree.
+		} else if ( blockNodeRef.current.contains( event.target ) ) {
 			onSelectionStart( clientId );
 
 			// Allow user to escape out of a multi-selection to a singular

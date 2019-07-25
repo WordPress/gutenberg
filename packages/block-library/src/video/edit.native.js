@@ -237,6 +237,7 @@ class VideoEdit extends React.Component {
 								underlineColorAndroid="transparent"
 								value={ caption }
 								placeholder={ __( 'Write caption…' ) }
+								placeholderTextColor={ style.captionPlaceholder.color }
 								onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 								onFocus={ this.props.onFocus }
 							/>

@@ -129,10 +129,8 @@ export class BlockList extends Component {
 	}
 
 	renderItem( { item: clientId } ) {
-		const shouldReverseContent = this.isReplaceable( this.props.selectedBlock );
-
 		return (
-			<ReadableContentView reversed={ shouldReverseContent }>
+			<ReadableContentView>
 				{ this.props.shouldShowInsertionPoint( clientId ) && this.renderAddBlockSeparator() }
 				<BlockListBlock
 					key={ clientId }
