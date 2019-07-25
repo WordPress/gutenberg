@@ -1076,16 +1076,22 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
- * Reducer returning whether selection is enabled.
+ * Reducer returning the intial block selection.
+ *
+ * Currently this in only used to restore the selection after block deletion.
+ * This reducer should eventually be removed in favour of setting selection
+ * directly.
  *
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {?number} Initial position: -1 or undefined.
  */
 export function initialPosition( state, action ) {
 	if ( action.type === 'SELECT_BLOCK' ) {
 		return action.initialPosition;
+	} else if ( action.type === 'REMOVE_BLOCKS' ) {
+		return state;
 	}
 }
 
