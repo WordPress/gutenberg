@@ -49,10 +49,19 @@ export function resetBlocks( blocks ) {
 }
 
 /**
+ * @typedef {WPBlockSelection} A block selection object.
+ *
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       A block attribute offset.
+ */
+
+/**
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
  *
- * @param {Array} selection Selection.
+ * @param {Array.<WPBlockSelection>} selection The block selection start and end
+ *                                             as a pair of `WPBlockSelection`.
  *
  * @return {Object} Action object.
  */

@@ -943,25 +943,26 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		yield* resetLastBlockSourceDependencies( Array.from( updatedSources ) );
 	}
 
-	const {
-		selectionStart,
-		selectionEnd,
-		__unstableShouldCreateUndoLevel,
-	} = options;
-
 	return {
 		type: 'RESET_EDITOR_BLOCKS',
 		blocks: yield* getBlocksWithSourcedAttributes( blocks ),
-		selectionStart,
-		selectionEnd,
-		shouldCreateUndoLevel: __unstableShouldCreateUndoLevel !== false,
+		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
 	};
 }
 
 /**
+ * @typedef {WPBlockSelection} A block selection object.
+ *
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       A block attribute offset.
+ */
+
+/**
  * Returns an action object used to signal that the selection has been updated.
  *
- * @param {Array} selection Selection.
+ * @param {Array.<WPBlockSelection>} selection The block selection start and end
+ *                                             as a pair of `WPBlockSelection`.
  *
  * @return {Object} Action object
  */

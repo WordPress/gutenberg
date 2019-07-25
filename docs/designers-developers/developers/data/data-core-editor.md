@@ -368,7 +368,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: Selection.
+-   `Array<WPBlockSelection>`: The block selection start and end as a pair of `WPBlockSelection`.
 
 <a name="getEditorSettings" href="#getEditorSettings">#</a> **getEditorSettings**
 
@@ -1227,7 +1227,7 @@ Returns an action object used to signal that the selection has been updated.
 
 _Parameters_
 
--   _selection_ `Array`: Selection.
+-   _selection_ `Array<WPBlockSelection>`: The block selection start and end as a pair of `WPBlockSelection`.
 
 _Returns_
 

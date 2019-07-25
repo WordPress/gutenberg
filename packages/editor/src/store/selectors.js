@@ -1134,10 +1134,19 @@ export function getEditorBlocks( state ) {
 }
 
 /**
+ * @typedef {WPBlockSelection} A block selection object.
+ *
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       A block attribute offset.
+ */
+
+/**
  * Return the current selection.
  *
  * @param {Object} state
- * @return {Array} Selection.
+ * @return {Array.<WPBlockSelection>} The block selection start and end as a
+ *                                    pair of `WPBlockSelection`.
  */
 export function getEditorSelection( state ) {
 	return state.editor.present.selection;

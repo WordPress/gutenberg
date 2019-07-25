@@ -281,9 +281,9 @@ export function getBlockCount( state, rootClientId ) {
 /**
  * @typedef {WPBlockSelection} A block selection object.
  *
- * @property {string} clientId     The selected block client ID.
- * @property {string} attributeKey The selected block attribute key.
- * @property {number} offset       The selected block attribute offset.
+ * @property {string} clientId     A block client ID.
+ * @property {string} attributeKey A block attribute key.
+ * @property {number} offset       A block attribute offset.
  */
 
 /**
@@ -380,14 +380,11 @@ export function getSelectedBlockClientId( state ) {
 	const { selectionStart, selectionEnd } = state;
 	const { clientId } = selectionStart;
 
-	// We need to check the block exists because the current blockSelection
-	// reducer doesn't take into account when blocks are reset via undo. To be
-	// removed when that's fixed.
-	return (
-		clientId &&
-		clientId === selectionEnd.clientId &&
-		!! state.blocks.byClientId[ clientId ] ? clientId : null
-	);
+	if ( ! clientId || clientId !== selectionEnd.clientId ) {
+		return null;
+	}
+
+	return clientId;
 }
 
 /**

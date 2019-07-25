@@ -691,7 +691,7 @@ _Returns_
 Returns true if the block corresponding to the specified client ID is
 currently selected but isn't the last of the selected blocks. Here "last"
 refers to the block sequence in the document, _not_ the sequence of
-multi-selection, which is why `state.blockSelection.end` isn't used.
+multi-selection, which is why `state.selectionEnd` isn't used.
 
 _Parameters_
 
@@ -1040,7 +1040,7 @@ reset to the specified selection.
 
 _Parameters_
 
--   _selection_ `Array`: Selection.
+-   _selection_ `Array<WPBlockSelection>`: The block selection start and end as a pair of `WPBlockSelection`.
 
 _Returns_
 
