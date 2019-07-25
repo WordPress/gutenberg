@@ -28,10 +28,10 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
 	</Button>
 );
 
-const TabPanel = ( { tabs, controlledTabName, className, onSelect = noop, activeClass = 'is-active', orientation = 'horizontal', instanceId, children } ) => {
-	const [ selectedTabName, setSelectedTabName ] = useState( controlledTabName || tabs[ 0 ].name );
+const TabPanel = ( { tabs, initialTabName, controlledTabName, className, onSelect = noop, activeClass = 'is-active', orientation = 'horizontal', instanceId, children = noop } ) => {
+	const [ selectedTabName, setSelectedTabName ] = useState( initialTabName || controlledTabName || tabs[ 0 ].name );
 	const selectedTab = find( tabs, { name: selectedTabName } );
-	const selectedId = instanceId + '-' + selectedTab.name;
+	const selectedId = selectedTab ? instanceId + '-' + selectedTab.name : '';
 
 	const onClick = ( tabName ) => {
 		setSelectedTabName( tabName );
@@ -44,7 +44,9 @@ const TabPanel = ( { tabs, controlledTabName, className, onSelect = noop, active
 
 	useEffect(
 		() => {
-			setSelectedTabName( controlledTabName );
+			if ( controlledTabName ) {
+				setSelectedTabName( controlledTabName );
+			}
 		}, [ controlledTabName ]
 	);
 

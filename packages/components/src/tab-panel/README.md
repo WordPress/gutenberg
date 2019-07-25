@@ -135,7 +135,17 @@ The class to add to the active tab
 
 #### controlledTabName
 
-Provide a tab name for the selected tab to be initially set and controlled by a prop. If this prop is not set, the first tab will be selected by default.
+Provide a tab name for a tab to be selected upon mounting and controlled throughout the component's lifecycle. If this prop is not set, the first tab will be selected by default.
+
+- Type: `String`
+- Required: No
+- Default: none
+
+#### *initialTabName (To be deprecated)*
+
+*Note: This prop is considered legacy. Please use `controlledTabName` instead. Using this prop in conjunction with `controlledTabName` will result in this prop's value being ignored / overwritten.*
+
+Optionally provide a tab name for a tab to be selected upon mounting of component. If this prop is not set, the first tab will be selected by default.
 
 - Type: `String`
 - Required: No
