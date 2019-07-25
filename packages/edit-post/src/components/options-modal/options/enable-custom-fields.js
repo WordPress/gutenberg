@@ -42,7 +42,7 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 		<BaseOption
 			label={ label }
 			isChecked={ isChecked }
-			onChange={ ( nextIsChecked ) => setIsChecked( nextIsChecked ) }
+			onChange={ setIsChecked }
 		>
 			{ isChecked !== areCustomFieldsEnabled && <CustomFieldsConfirmation /> }
 		</BaseOption>
