@@ -17,7 +17,7 @@ export function CustomFieldsConfirmation() {
 	return (
 		<>
 			<p className="edit-post-options-modal__custom-fields-confirmation-message">
-				{ __( 'Page reload is required for this change.' ) }
+				{ __( 'A page reload is required for this change.' ) }
 			</p>
 			<Button
 				className="edit-post-options-modal__custom-fields-confirmation-button"
