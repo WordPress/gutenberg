@@ -11,7 +11,7 @@ const WP_ZONE = 'WP';
 // well because it uses the `setSettings()` function to change these settings.
 let settings = {
 	l10n: {
-		locale: 'en_US',
+		locale: 'en',
 		months: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
 		monthsShort: [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ],
 		weekdays: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
@@ -378,6 +378,17 @@ export function isInTheFuture( dateValue ) {
 	const momentObject = momentLib.tz( dateValue, WP_ZONE );
 
 	return momentObject.isAfter( now );
+}
+
+/**
+ * Get the moment object from date.
+ *
+ * @param {string} dateValue Date String or Date object in the Defined WP Timezone.
+ *
+ * @return {Moment} The Moment object.
+ */
+export function getMomemt( dateValue ) {
+	return momentLib.tz( dateValue, WP_ZONE );
 }
 
 /**
