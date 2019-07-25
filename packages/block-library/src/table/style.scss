@@ -14,6 +14,11 @@
 	.has-fixed-layout {
 		table-layout: fixed;
 		width: 100%;
+
+		td,
+		th {
+			overflow-wrap: break-word;
+		}
 	}
 
 	&.alignleft,
@@ -26,6 +31,11 @@
 		// Table cannot be 100% width if it is aligned, so set
 		// width as auto.
 		width: auto;
+
+		td,
+		th {
+			overflow-wrap: break-word;
+		}
 	}
 
 	.has-subtle-light-gray-background-color {
