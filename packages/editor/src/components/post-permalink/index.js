@@ -18,7 +18,7 @@ import { safeDecodeURI, safeDecodeURIComponent } from '@wordpress/url';
  * Internal dependencies
  */
 import PostPermalinkEditor from './editor.js';
-import { getWPAdminURL, cleanForSlug } from '../../utils/url';
+import { cleanForSlug } from '../../utils/url';
 
 class PostPermalink extends Component {
 	constructor() {
@@ -120,18 +120,6 @@ class PostPermalink extends Component {
 						onClick={ () => this.setState( { isEditingPermalink: true } ) }
 					>
 						{ __( 'Edit' ) }
-					</Button>
-				}
-
-				{ ! isEditable &&
-					<Button
-						className="editor-post-permalink__change"
-						isLarge
-						href={ getWPAdminURL( 'options-permalink.php' ) }
-						onClick={ this.addVisibilityCheck }
-						target="_blank"
-					>
-						{ __( 'Change Permalinks' ) }
 					</Button>
 				}
 			</div>
