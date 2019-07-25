@@ -1,5 +1,4 @@
 .block-editor-block-list__layout .components-draggable__clone {
-
 	// Hide the Block UI when dragging the block.
 	// This ensures the page scroll properly (no sticky elements).
 	.block-editor-block-contextual-toolbar {
@@ -9,7 +8,6 @@
 }
 
 .block-editor-block-list__layout .block-editor-block-list__block.is-selected {
-
 	// Needs specificity to override inherited styles.
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {
@@ -42,8 +40,6 @@
  */
 
 .block-editor-block-list__layout {
-
-
 	// we need this div to be relative in order to position the grid lines
 	position: relative;
 
@@ -225,7 +221,6 @@
 
 	// Warnings
 	&.has-warning .block-editor-block-list__block-edit {
-
 		// When a block has a warning, you shouldn't be able to manipulate the contents.
 		> * {
 			pointer-events: none;
@@ -314,7 +309,6 @@
 
 	// Reusable Blocks clickthrough overlays
 	&.is-reusable > .block-editor-block-list__block-edit .block-editor-inner-blocks.has-overlay {
-
 		// Remove only the top click overlay.
 		&::after {
 			display: none;
@@ -382,7 +376,6 @@
 
 	// Left
 	&[data-align="left"] {
-
 		// This is in the editor only; the image should be floated on the frontend.
 		.block-editor-block-list__block-edit {
 			/*!rtl:begin:ignore*/
@@ -404,7 +397,6 @@
 
 	// Right
 	&[data-align="right"] {
-
 		// Right: This is in the editor only; the image should be floated on the frontend.
 		> .block-editor-block-list__block-edit {
 			/*!rtl:begin:ignore*/
@@ -459,7 +451,6 @@
 		}
 
 		@include break-wide() {
-
 			&.is-multi-selected > .block-editor-block-mover,
 			> .block-editor-block-list__block-edit > .block-editor-block-mover {
 				display: block;
@@ -482,7 +473,6 @@
 
 	// Wide
 	&[data-align="wide"] {
-
 		// Position mover
 		&.is-multi-selected > .block-editor-block-mover,
 		> .block-editor-block-list__block-edit > .block-editor-block-mover {
@@ -568,7 +558,6 @@
  */
 
 .block-editor-block-list__block {
-
 	// Left and right block settings and mover.
 	&.is-multi-selected > .block-editor-block-mover,
 	> .block-editor-block-list__block-edit > .block-editor-block-mover {
@@ -588,7 +577,6 @@
 
 	// Elevate when block is selected or hovered.
 	@include break-small() {
-
 		&.is-multi-selected,
 		&.is-selected,
 		&.is-hovered {
@@ -626,19 +614,16 @@
 		&.is-selected > .block-editor-block-list__block-edit > .block-editor-block-mover {
 			// Don't show on mobile, allow the special mobile toolbar to work there.
 			display: none;
-
 			@include break-small() {
 				display: block;
 				opacity: 1;
 				animation: none;
-
 				// Make wider and taller to make "safe" hover area bigger.
 				// The intent is to make it less likely that you hover float-adjacent
 				// blocks that visually appear below the block.
 				width: $block-side-ui-width + $block-side-ui-clearance + $block-padding + $border-width;
 				height: auto;
 				padding-bottom: $block-padding;
-
 				// Unset the negative top margin, or it might overlap the block toolbar.
 				margin-top: 0;
 			}
@@ -663,7 +648,6 @@
 	.block-editor-block-list__block-mobile-toolbar {
 		display: flex;
 		flex-direction: row;
-
 		// Make room for the height of the block toolbar above.
 		transform: translateY($block-padding + $border-width);
 		margin-top: $block-toolbar-height;
@@ -671,7 +655,6 @@
 		margin-left: -$block-padding;
 		border-top: $border-width solid $light-gray-800;
 		height: $block-toolbar-height;
-
 		@include break-small() {
 			display: none;
 		}

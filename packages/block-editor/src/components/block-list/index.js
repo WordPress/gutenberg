@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { findLast, invert, mapValues, sortBy, throttle } from 'lodash';
+import {
+	findLast,
+	invert,
+	mapValues,
+	sortBy,
+	throttle,
+} from 'lodash';
 
 import classnames from 'classnames';
 /**
@@ -94,16 +100,11 @@ class BlockList extends Component {
 			this.props.onStartMultiSelect();
 		}
 
-		const blockContentBoundaries = getBlockDOMNode(
-			this.selectionAtStart
-		).getBoundingClientRect();
+		const blockContentBoundaries = getBlockDOMNode( this.selectionAtStart ).getBoundingClientRect();
 
 		// prevent multi-selection from triggering when the selected block is a float
 		// and the cursor is still between the top and the bottom of the block.
-		if (
-			clientY >= blockContentBoundaries.top &&
-			clientY <= blockContentBoundaries.bottom
-		) {
+		if ( clientY >= blockContentBoundaries.top && clientY <= blockContentBoundaries.bottom ) {
 			return;
 		}
 
@@ -129,9 +130,8 @@ class BlockList extends Component {
 		const boundaries = this.nodes[ clientId ].getBoundingClientRect();
 
 		// Create a clientId to Y coördinate map.
-		const clientIdToCoordMap = mapValues(
-			this.nodes,
-			( node ) => node.getBoundingClientRect().top - boundaries.top
+		const clientIdToCoordMap = mapValues( this.nodes, ( node ) =>
+			node.getBoundingClientRect().top - boundaries.top
 		);
 
 		// Cache a Y coördinate to clientId map for use in `onPointerMove`.
@@ -316,7 +316,11 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { startMultiSelect, stopMultiSelect, multiSelect } = dispatch(
+		const {
+			startMultiSelect,
+			stopMultiSelect,
+			multiSelect,
+		} = dispatch(
 			'core/block-editor'
 		);
 
