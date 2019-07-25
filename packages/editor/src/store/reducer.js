@@ -2,14 +2,7 @@
  * External dependencies
  */
 import optimist from 'redux-optimist';
-import {
-	flow,
-	reduce,
-	omit,
-	mapValues,
-	keys,
-	isEqual,
-} from 'lodash';
+import { reduce, omit, keys, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,14 +13,7 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	PREFERENCES_DEFAULTS,
-	INITIAL_EDITS_DEFAULTS,
-	EDITOR_SETTINGS_DEFAULTS,
-} from './defaults';
-import { EDIT_MERGE_PROPERTIES } from './constants';
-import withChangeDetection from '../utils/with-change-detection';
-import withHistory from '../utils/with-history';
+import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -114,165 +100,23 @@ export function shouldOverwriteState( action, previousAction ) {
 	return isUpdatingSamePostProperty( action, previousAction );
 }
 
-/**
- * Undoable reducer returning the editor post state, including blocks parsed
- * from current HTML markup.
- *
- * Handles the following state keys:
- *  - edits: an object describing changes to be made to the current post, in
- *           the format accepted by the WP REST API
- *  - blocks: post content blocks
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export const editor = flow( [
-	combineReducers,
-
-	withHistory( {
-		resetTypes: [ 'SETUP_EDITOR_STATE' ],
-		ignoreTypes: [
-			'RESET_POST',
-			'UPDATE_POST',
-		],
-		shouldOverwriteState,
-	} ),
-] )( {
-	// Track whether changes exist, resetting at each post save. Relies on
-	// editor initialization firing post reset as an effect.
-	blocks: withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
-	} )( ( state = { value: [] }, action ) => {
-		switch ( action.type ) {
-			case 'RESET_EDITOR_BLOCKS':
-				if ( action.blocks === state.value ) {
-					return state;
-				}
-				return { value: action.blocks };
-		}
-
-		return state;
-	} ),
-	edits( state = {}, action ) {
-		switch ( action.type ) {
-			case 'EDIT_POST':
-				return reduce( action.edits, ( result, value, key ) => {
-					// Only assign into result if not already same value
-					if ( value !== state[ key ] ) {
-						result = getMutateSafeObject( state, result );
-
-						if ( EDIT_MERGE_PROPERTIES.has( key ) ) {
-							// Merge properties should assign to current value.
-							result[ key ] = { ...result[ key ], ...value };
-						} else {
-							// Otherwise override.
-							result[ key ] = value;
-						}
-					}
-
-					return result;
-				}, state );
-			case 'UPDATE_POST':
-			case 'RESET_POST':
-				const getCanonicalValue = action.type === 'UPDATE_POST' ?
-					( key ) => action.edits[ key ] :
-					( key ) => getPostRawValue( action.post[ key ] );
-
-				return reduce( state, ( result, value, key ) => {
-					if ( ! isEqual( value, getCanonicalValue( key ) ) ) {
-						return result;
-					}
-
-					result = getMutateSafeObject( state, result );
-					delete result[ key ];
-					return result;
-				}, state );
-			case 'RESET_EDITOR_BLOCKS':
-				if ( 'content' in state ) {
-					return omit( state, 'content' );
-				}
-
-				return state;
-		}
-
-		return state;
-	},
-} );
-
-/**
- * Reducer returning the initial edits state. With matching shape to that of
- * `editor.edits`, the initial edits are those applied programmatically, are
- * not considered in prompting the user for unsaved changes, and are included
- * in (and reset by) the next save payload.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Action object.
- *
- * @return {Object} Next state.
- */
-export function initialEdits( state = INITIAL_EDITS_DEFAULTS, action ) {
+export function postId( state = null, action ) {
 	switch ( action.type ) {
-		case 'SETUP_EDITOR':
-			if ( ! action.edits ) {
-				break;
-			}
-
-			return action.edits;
-
 		case 'SETUP_EDITOR_STATE':
-			if ( 'content' in state ) {
-				return omit( state, 'content' );
-			}
-
-			return state;
-
-		case 'UPDATE_POST':
-			return reduce( action.edits, ( result, value, key ) => {
-				if ( ! result.hasOwnProperty( key ) ) {
-					return result;
-				}
-
-				result = getMutateSafeObject( state, result );
-				delete result[ key ];
-				return result;
-			}, state );
-
 		case 'RESET_POST':
-			return INITIAL_EDITS_DEFAULTS;
+		case 'UPDATE_POST':
+			return action.post.id;
 	}
 
 	return state;
 }
 
-/**
- * Reducer returning the last-known state of the current post, in the format
- * returned by the WP REST API.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function currentPost( state = {}, action ) {
+export function postType( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
 		case 'UPDATE_POST':
-			let post;
-			if ( action.post ) {
-				post = action.post;
-			} else if ( action.edits ) {
-				post = {
-					...state,
-					...action.edits,
-				};
-			} else {
-				return state;
-			}
-
-			return mapValues( post, getPostRawValue );
+			return action.post.type;
 	}
 
 	return state;
@@ -337,25 +181,6 @@ export function saving( state = {}, action ) {
 	switch ( action.type ) {
 		case 'REQUEST_POST_UPDATE_START':
 			return {
-				requesting: true,
-				successful: false,
-				error: null,
-				options: action.options || {},
-			};
-
-		case 'REQUEST_POST_UPDATE_SUCCESS':
-			return {
-				requesting: false,
-				successful: true,
-				error: null,
-				options: action.options || {},
-			};
-
-		case 'REQUEST_POST_UPDATE_FAILURE':
-			return {
-				requesting: false,
-				successful: false,
-				error: action.error,
 				options: action.options || {},
 			};
 	}
@@ -587,9 +412,8 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 }
 
 export default optimist( combineReducers( {
-	editor,
-	initialEdits,
-	currentPost,
+	postId,
+	postType,
 	preferences,
 	saving,
 	postLock,
