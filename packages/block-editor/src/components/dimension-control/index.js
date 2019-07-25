@@ -11,22 +11,13 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import sizesTable from './sizes';
+import sizesTable, { findSizeBySlug } from './sizes';
 import DimensionButtons from './buttons';
 
 function DimensionControl( props ) {
-	const { title, property, device, deviceIcon, id, currentSize, onSpacingChange, onReset } = props;
+	const { title, property, device = 'all', deviceIcon = 'desktop', id, currentSize, onSpacingChange, onReset } = props;
 
 	const dimensionSize = `${ property }Size`;
-
-	/**
-	 * Finds the correct size object from the provided sizes
-	 * table by size slug (eg: `medium`)
-	 * @param  {Array} sizes containing objects for each size definition
-	 * @param  {string} slug a string representation of the size (eg: `medium`)
-	 * @return {Object}       the matching size definition
-	 */
-	const findSizeBySlug = ( sizes, slug ) => sizes.find( ( size ) => slug === size.slug );
 
 	/**
 	 * Determines the size from the size slug (eg: `medium`)
