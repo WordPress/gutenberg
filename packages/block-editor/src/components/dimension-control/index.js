@@ -76,6 +76,7 @@ function DimensionControl( props ) {
 				device={ device }
 				currentSize={ currentSize }
 				onChangeSpacingSize={ onChangeSpacingSize }
+				sizes={ sizesTable }
 			/>
 
 		</BaseControl>

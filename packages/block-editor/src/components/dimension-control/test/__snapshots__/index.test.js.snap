@@ -1,0 +1,133 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DimensionControl rendering correctly for different properties renders correctly for "margin" property 1`] = `
+<BaseControl
+  className="block-editor-dimension-control"
+  help="Select the margin for this Block"
+  id="block-spacing-margin-desktop-2"
+>
+  <div
+    className="block-editor-dimension-control__header"
+  >
+    <Component
+      className="block-editor-dimension-control__header-label"
+    >
+      <Icon
+        icon="desktop"
+        label="all"
+      />
+      Margin (all devices)
+    </Component>
+    <ForwardRef(IconButton)
+      icon="controls-repeat"
+      isDefault={true}
+      isSmall={true}
+      label="Reset Margin"
+      onClick={[Function]}
+    />
+  </div>
+  <DimensionButtons
+    device="all"
+    id="2"
+    onChangeSpacingSize={[Function]}
+    property="margin"
+    sizes={
+      Array [
+        Object {
+          "name": "None",
+          "size": 0,
+          "slug": "none",
+        },
+        Object {
+          "name": "Small",
+          "size": 14,
+          "slug": "small",
+        },
+        Object {
+          "name": "Medium",
+          "size": 24,
+          "slug": "medium",
+        },
+        Object {
+          "name": "Large",
+          "size": 34,
+          "slug": "large",
+        },
+        Object {
+          "abbr": "Extra Large",
+          "name": "XLarge",
+          "size": 60,
+          "slug": "xlarge",
+        },
+      ]
+    }
+    title="Margin"
+  />
+</BaseControl>
+`;
+
+exports[`DimensionControl rendering correctly for different properties renders correctly for "padding" property 1`] = `
+<BaseControl
+  className="block-editor-dimension-control"
+  help="Select the padding for this Block"
+  id="block-spacing-padding-desktop-1"
+>
+  <div
+    className="block-editor-dimension-control__header"
+  >
+    <Component
+      className="block-editor-dimension-control__header-label"
+    >
+      <Icon
+        icon="desktop"
+        label="all"
+      />
+      Padding (all devices)
+    </Component>
+    <ForwardRef(IconButton)
+      icon="controls-repeat"
+      isDefault={true}
+      isSmall={true}
+      label="Reset Padding"
+      onClick={[Function]}
+    />
+  </div>
+  <DimensionButtons
+    device="all"
+    id="1"
+    onChangeSpacingSize={[Function]}
+    property="padding"
+    sizes={
+      Array [
+        Object {
+          "name": "None",
+          "size": 0,
+          "slug": "none",
+        },
+        Object {
+          "name": "Small",
+          "size": 14,
+          "slug": "small",
+        },
+        Object {
+          "name": "Medium",
+          "size": 24,
+          "slug": "medium",
+        },
+        Object {
+          "name": "Large",
+          "size": 34,
+          "slug": "large",
+        },
+        Object {
+          "abbr": "Extra Large",
+          "name": "XLarge",
+          "size": 60,
+          "slug": "xlarge",
+        },
+      ]
+    }
+    title="Padding"
+  />
+</BaseControl>
+`;

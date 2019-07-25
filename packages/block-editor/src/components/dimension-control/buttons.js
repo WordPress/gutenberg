@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -16,17 +21,24 @@ import {
 /**
  * Internal dependencies
  */
-import sizesTable from './sizes';
 
-function DimensionButtons( { controlId, currentSize, onChangeSpacingSize } ) {
+function DimensionButtons( { id, sizes, currentSize, onChangeSpacingSize } ) {
+	if ( ! id || ! id.length ) {
+		return null;
+	}
+
+	if ( ! sizes || ! isArray( sizes ) || ! sizes.length ) {
+		return null;
+	}
+
 	return (
 		<Fragment>
 
 			<ButtonGroup
-				id={ controlId }
+				id={ `block-editor-dimension-control-buttons-${ id }` }
 				className="block-editor-dimension-control__buttons"
 			>
-				{ sizesTable.map( function( size ) {
+				{ sizes.map( function( size ) {
 					const visualName = size.name.substring( 0, 1 );
 					const hiddenName = size.name.substring( 1 );
 					const isSelected = currentSize === size.slug;
