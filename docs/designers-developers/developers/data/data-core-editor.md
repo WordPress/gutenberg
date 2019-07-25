@@ -192,6 +192,8 @@ _Related_
 
 <a name="getBlocksForSerialization" href="#getBlocksForSerialization">#</a> **getBlocksForSerialization**
 
+> **Deprecated** since Gutenberg 6.2.0.
+
 Returns a set of blocks which are to be used in consideration of the post's
 generated save content.
 
@@ -1041,10 +1043,6 @@ _Parameters_
 
 -   _edits_ `Object`: Post attributes to edit.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="enablePublishSidebar" href="#enablePublishSidebar">#</a> **enablePublishSidebar**
 
 Returns an action object used in signalling that the user has enabled the
@@ -1143,10 +1141,6 @@ _Related_
 Returns an action object used in signalling that undo history should
 restore last popped state.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="refreshPost" href="#refreshPost">#</a> **refreshPost**
 
 Action generator for handling refreshing the current post.
@@ -1204,10 +1198,6 @@ _Parameters_
 
 -   _blocks_ `Array`: Block Array.
 -   _options_ `?Object`: Optional options.
-
-_Returns_
-
--   `Object`: Action object
 
 <a name="resetPost" href="#resetPost">#</a> **resetPost**
 
@@ -1321,10 +1311,6 @@ Action generator for trashing the current post in the editor.
 <a name="undo" href="#undo">#</a> **undo**
 
 Returns an action object used in signalling that undo history should pop.
-
-_Returns_
-
--   `Object`: Action object.
 
 <a name="unlockPostSaving" href="#unlockPostSaving">#</a> **unlockPostSaving**
 
