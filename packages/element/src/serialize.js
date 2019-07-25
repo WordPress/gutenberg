@@ -417,6 +417,8 @@ export function renderElement( element, context, legacyContext = {} ) {
 					const tagName = props.tagName;
 					const otherProps = omit( props, 'tagName' );
 					return renderNativeComponent( tagName, otherProps, context, legacyContext );
+				} else if ( type.displayName === 'Text' ) {
+					throw new Error('text');
 				} else if ( type.displayName === 'Image' ) {
 					const src = props.source && props.source.uri;
 					const otherProps = {

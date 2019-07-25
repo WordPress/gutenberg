@@ -114,6 +114,7 @@ class GalleryImage extends Component {
 					tabIndex="0"
 					aria-label={ ariaLabel }
 					ref={ this.bindContainer }
+					style={ { width: '100%', height: 200 } }
 				/>
 				{ isBlobURL( url ) && <Spinner /> }
 			</>

@@ -3,17 +3,38 @@
  */
 import { isString } from 'lodash';
 import { createElement as createReactElement } from 'react';
-import { Image, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 
 const containerHTMLTags = [
     'div',
     'figure',
     'figcaption',
+    'label',
     'li',
     'ol',
     'span',
     'ul',
 ];
+
+const createHTMLElement = ( tagName, props, children ) => {
+    const renderChild = ( child ) => {
+        if ( ! isString( child ) || child === '' ) {
+            return child;
+        }
+        return (
+            <Text>{ child }</Text>
+        );
+    };
+
+    return (
+        <View
+            { ...props }
+            tagName={ tagName }
+        >
+            { children.map( renderChild ) }
+        </View>
+    );
+};
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -31,14 +52,7 @@ function createElement( type, props, ...children ) {
     if ( ! isString( type ) ) {
         return createReactElement( type, props, ...children );
     } else if ( containerHTMLTags.includes( type ) ) {
-        return createElement(
-            View,
-            {
-                ...props,
-                tagName: type,
-            },
-            ...children
-        );
+        return createHTMLElement( type, props, children );
     } else if ( type === 'img' ) {
         const { src: uri, ...otherProps } = props;
         return createElement(
