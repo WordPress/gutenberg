@@ -1,14 +1,9 @@
 /**
  * External dependencies
  */
-import {
-	findLast,
-	invert,
-	mapValues,
-	sortBy,
-	throttle,
-} from 'lodash';
+import { findLast, invert, mapValues, sortBy, throttle } from 'lodash';
 
+import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
@@ -99,11 +94,16 @@ class BlockList extends Component {
 			this.props.onStartMultiSelect();
 		}
 
-		const blockContentBoundaries = getBlockDOMNode( this.selectionAtStart ).getBoundingClientRect();
+		const blockContentBoundaries = getBlockDOMNode(
+			this.selectionAtStart
+		).getBoundingClientRect();
 
 		// prevent multi-selection from triggering when the selected block is a float
 		// and the cursor is still between the top and the bottom of the block.
-		if ( clientY >= blockContentBoundaries.top && clientY <= blockContentBoundaries.bottom ) {
+		if (
+			clientY >= blockContentBoundaries.top &&
+			clientY <= blockContentBoundaries.bottom
+		) {
 			return;
 		}
 
@@ -129,8 +129,10 @@ class BlockList extends Component {
 		const boundaries = this.nodes[ clientId ].getBoundingClientRect();
 
 		// Create a clientId to Y coördinate map.
-		const clientIdToCoordMap = mapValues( this.nodes, ( node ) =>
-			node.getBoundingClientRect().top - boundaries.top );
+		const clientIdToCoordMap = mapValues(
+			this.nodes,
+			( node ) => node.getBoundingClientRect().top - boundaries.top
+		);
 
 		// Cache a Y coördinate to clientId map for use in `onPointerMove`.
 		this.coordMap = invert( clientIdToCoordMap );
@@ -199,14 +201,18 @@ class BlockList extends Component {
 
 	GenerateGridLines() {
 		if ( this.parentRef.current ) {
-			const computed = window.getComputedStyle( this.parentRef.current ).getPropertyValue( 'padding-left' );
+			const computed = window
+				.getComputedStyle( this.parentRef.current )
+				.getPropertyValue( 'padding-left' );
 			// we need the parent padding offset + the image margin offset, which is 14
 			const offset = parseInt( computed ) + 14;
-			return this.props.snap.gridStops.map( ( stop, i ) => <div
-				key={ `grid__line-${ i }` }
-				className="grid__line"
-				style={ { left: stop + offset } }
-			/> );
+			return this.props.snap.gridStops.map( ( stop, i ) => (
+				<div
+					key={ `grid__line-${ i }` }
+					className="grid__line"
+					style={ { left: stop + offset } }
+				/>
+			) );
 		}
 		return null;
 	}
@@ -225,8 +231,14 @@ class BlockList extends Component {
 		} = this.props;
 
 		return (
-			<div ref={ this.parentRef } className="editor-block-list__layout block-editor-block-list__layout block-editor-block-list__layout--grid-visible">
-
+			<div
+				ref={ this.parentRef }
+				className={ classnames(
+					'editor-block-list__layout',
+					'block-editor-block-list__layout',
+					{ 'block-editor-block-list__layout--grid-visible': isGridVisible }
+				) }
+			>
 				{ isGridVisible && this.GenerateGridLines() }
 
 				{ blockClientIds.map( ( clientId ) => {
@@ -246,7 +258,6 @@ class BlockList extends Component {
 								blockRef={ this.setBlockRef }
 								onSelectionStart={ this.onSelectionStart }
 								isDraggable={ isDraggable }
-
 								// This prop is explicitely computed and passed down
 								// to avoid being impacted by the async mode
 								// otherwise there might be a small delay to trigger the animation.
@@ -304,11 +315,9 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const {
-			startMultiSelect,
-			stopMultiSelect,
-			multiSelect,
-		} = dispatch( 'core/block-editor' );
+		const { startMultiSelect, stopMultiSelect, multiSelect } = dispatch(
+			'core/block-editor'
+		);
 
 		return {
 			onStartMultiSelect: startMultiSelect,
