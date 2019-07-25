@@ -79,7 +79,6 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 				onSelect={ onSelect }
 				controlledTabName={ selectedTabName }
 			>
-				{ () => { } }
 			</TabPanel>
 		</SidebarHeader>
 	);

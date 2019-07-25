@@ -157,4 +157,4 @@ A function which renders the tabviews given the selected tab. The function is pa
 The element to which the tooltip should anchor.
 
 - Type: (`Object`) => `Element`
-- Required: Yes
+- Required: No

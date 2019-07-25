@@ -28,7 +28,7 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
 	</Button>
 );
 
-const TabPanel = ( { tabs, initialTabName, controlledTabName, className, onSelect = noop, activeClass = 'is-active', orientation = 'horizontal', instanceId, children = noop } ) => {
+const TabPanel = ( { tabs, initialTabName, controlledTabName, className, onSelect = noop, activeClass = 'is-active', orientation = 'horizontal', instanceId, children } ) => {
 	const [ selectedTabName, setSelectedTabName ] = useState( initialTabName || controlledTabName || tabs[ 0 ].name );
 	const selectedTab = find( tabs, { name: selectedTabName } );
 	const selectedId = selectedTab ? instanceId + '-' + selectedTab.name : '';
@@ -71,7 +71,7 @@ const TabPanel = ( { tabs, initialTabName, controlledTabName, className, onSelec
 					</TabButton>
 				) ) }
 			</NavigableMenu>
-			{ selectedTab && (
+			{ children && selectedTab && (
 				<div aria-labelledby={ selectedId }
 					role="tabpanel"
 					id={ selectedId + '-view' }
