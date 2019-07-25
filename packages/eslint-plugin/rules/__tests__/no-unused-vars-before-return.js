@@ -27,6 +27,18 @@ function example( number ) {
 	return number + foo;
 }`,
 		},
+		{
+			code: `
+function example() {
+	const foo = doSomeCostlyOperation();
+	if ( number > 10 ) {
+		return number + 1;
+	}
+
+	return number + foo;
+}`,
+			options: [ { excludePattern: '^do' } ],
+		},
 	],
 	invalid: [
 		{
@@ -39,6 +51,19 @@ function example( number ) {
 
 	return number + foo;
 }`,
+			errors: [ { message: 'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.' } ],
+		},
+		{
+			code: `
+function example() {
+	const foo = doSomeCostlyOperation();
+	if ( number > 10 ) {
+		return number + 1;
+	}
+
+	return number + foo;
+}`,
+			options: [ { excludePattern: '^run' } ],
 			errors: [ { message: 'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.' } ],
 		},
 	],

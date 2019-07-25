@@ -1,9 +1,22 @@
 module.exports = {
 	meta: {
 		type: 'problem',
-		schema: [],
+		schema: [
+			{
+				type: 'object',
+				properties: {
+					excludePattern: {
+						type: 'string',
+					},
+				},
+				additionalProperties: false,
+			},
+		],
 	},
 	create( context ) {
+		const options = context.options[ 0 ] || {};
+		const { excludePattern } = options;
+
 		return {
 			ReturnStatement( node ) {
 				let functionScope = context.getScope();
@@ -32,6 +45,13 @@ module.exports = {
 
 					if ( ! declaratorCandidate ) {
 						continue;
+					}
+
+					if (
+						excludePattern !== undefined &&
+						new RegExp( excludePattern ).test( declaratorCandidate.node.init.callee.name )
+					) {
+						return;
 					}
 
 					// The first entry in `references` is the declaration

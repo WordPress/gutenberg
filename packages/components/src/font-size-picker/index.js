@@ -35,7 +35,6 @@ function FontSizePicker( {
 	value,
 	withSlider = false,
 } ) {
-	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const [ currentSelectValue, setCurrentSelectValue ] = useState( getSelectValueFromFontSize( fontSizes, value ) );
 
 	if ( disableCustomFontSizes && ! fontSizes.length ) {
