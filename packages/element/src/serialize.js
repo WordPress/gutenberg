@@ -412,7 +412,22 @@ export function renderElement( element, context, legacyContext = {} ) {
 			return renderElement( props.children( context || type._currentValue ), context, legacyContext );
 
 		case ForwardRef.$$typeof:
-			return renderElement( type.render( props ), context, legacyContext );
+			{
+				if ( type.displayName === 'View' && props.hasOwnProperty( 'tagName' ) ) {
+					const tagName = props.tagName;
+					const otherProps = omit( props, 'tagName' );
+					return renderNativeComponent( tagName, otherProps, context, legacyContext );
+				} else if ( type.displayName === 'Image' ) {
+					const src = props.source && props.source.uri;
+					const otherProps = {
+						...omit( props, 'source' ),
+						src,
+					};
+					return renderNativeComponent( 'img', otherProps, context, legacyContext );
+				} else {
+					return renderElement( type.render( props ), context, legacyContext );
+				}
+			}
 	}
 
 	return '';
