@@ -4,6 +4,8 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
+import { withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -11,7 +13,7 @@ import { Fragment } from '@wordpress/element';
 import BlockIcon from '../block-icon';
 import BlockRatings from '../block-ratings';
 
-function DiscoverBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
+function DiscoverBlockHeader( { slug, icon, title, rating, ratingCount, onClick, installBlock } ) {
 	return (
 		<Fragment>
 			<div className="block-editor-discover-block-header__row">
@@ -33,6 +35,7 @@ function DiscoverBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
 					isDefault
 					onClick={ ( event ) => {
 						event.preventDefault();
+						installBlock( slug );
 						onClick();
 					} }
 				>
@@ -43,4 +46,12 @@ function DiscoverBlockHeader( { icon, title, rating, ratingCount, onClick } ) {
 	);
 }
 
-export default DiscoverBlockHeader;
+export default compose(
+	withDispatch( ( dispatch ) => {
+		const { installBlock } = dispatch( 'core/block-editor' );
+
+		return {
+			installBlock: ( slug ) => installBlock( slug ),
+		};
+	} ),
+)( DiscoverBlockHeader );

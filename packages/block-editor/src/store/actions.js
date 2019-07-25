@@ -11,7 +11,7 @@ import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { select } from './controls';
+import { select, apiFetch } from './controls';
 
 /**
  * Generator which will yield a default block insert action if there
@@ -730,5 +730,24 @@ export function receiveDiscoverBlocks( discoverBlocks, filterValue ) {
  */
 export function setInstallBlocksPermission( hasPermission ) {
 	return { type: 'SET_INSTALL_BLOCKS_PERMISSION', hasPermission };
+}
+
+/** Action triggered to install a block plugin
+* @param {string} slug The plugin slug for block.
+*
+ * @return {Object} Action object.
+ */
+export function* installBlock( slug ) {
+	yield apiFetch( {
+		path: '__experimental/blocks/install',
+		data: {
+			slug,
+		},
+		method: 'POST',
+	} );
+	return {
+		type: 'INSTALL_BLOCK',
+		slug,
+	};
 }
 
