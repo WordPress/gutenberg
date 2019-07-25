@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, pick, mapValues, has } from 'lodash';
-import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
+import { has, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,25 +11,22 @@ import { dispatch, select, apiFetch } from '@wordpress/data-controls';
 import {
 	parse,
 	synchronizeBlocksWithTemplate,
+	serialize,
+	isUnmodifiedDefaultBlock,
+	getFreeformContentHandlerName,
 } from '@wordpress/blocks';
+import { removep } from '@wordpress/autop';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
 import {
-	getPostRawValue,
-} from './reducer';
-import {
 	STORE_KEY,
 	POST_UPDATE_TRANSACTION_ID,
-	SAVE_POST_NOTICE_ID,
 	TRASH_POST_NOTICE_ID,
-	AUTOSAVE_PROPERTIES,
 } from './constants';
 import {
-	getNotificationArgumentsForSaveSuccess,
-	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import { awaitNextStateChange, getRegistry } from './controls';
@@ -183,7 +179,7 @@ export function* setupEditor( post, edits, template ) {
 		edits,
 		template,
 	};
-	yield resetEditorBlocks( blocks );
+	yield resetEditorBlocks( blocks, { __unstableShouldCreateUndoLevel: false } );
 	yield setupEditorState( post );
 	yield* __experimentalSubscribeSources();
 }
@@ -295,73 +291,6 @@ export function* resetAutosave( newAutosave ) {
 export function __experimentalRequestPostUpdateStart( options = {} ) {
 	return {
 		type: 'REQUEST_POST_UPDATE_START',
-		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
-		options,
-	};
-}
-
-/**
- * Optimistic action for indicating that the request post update has completed
- * successfully.
- *
- * @param {Object}  data                The data for the action.
- * @param {Object}  data.previousPost   The previous post prior to update.
- * @param {Object}  data.post           The new post after update
- * @param {boolean} data.isRevision     Whether the post is a revision or not.
- * @param {Object}  data.options        Options passed through from the original
- *                                      action dispatch.
- * @param {Object}  data.postType       The post type object.
- *
- * @return {Object}	Action object.
- */
-export function __experimentalRequestPostUpdateSuccess( {
-	previousPost,
-	post,
-	isRevision,
-	options,
-	postType,
-} ) {
-	return {
-		type: 'REQUEST_POST_UPDATE_SUCCESS',
-		previousPost,
-		post,
-		optimist: {
-			// Note: REVERT is not a failure case here. Rather, it
-			// is simply reversing the assumption that the updates
-			// were applied to the post proper, such that the post
-			// treated as having unsaved changes.
-			type: isRevision ? REVERT : COMMIT,
-			id: POST_UPDATE_TRANSACTION_ID,
-		},
-		options,
-		postType,
-	};
-}
-
-/**
- * Optimistic action for indicating that the request post update has completed
- * with a failure.
- *
- * @param {Object}  data          The data for the action
- * @param {Object}  data.post     The post that failed updating.
- * @param {Object}  data.edits    The fields that were being updated.
- * @param {*}       data.error    The error from the failed call.
- * @param {Object}  data.options  Options passed through from the original
- *                                action dispatch.
- * @return {Object} An action object
- */
-export function __experimentalRequestPostUpdateFailure( {
-	post,
-	edits,
-	error,
-	options,
-} ) {
-	return {
-		type: 'REQUEST_POST_UPDATE_FAILURE',
-		optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-		post,
-		edits,
-		error,
 		options,
 	};
 }
@@ -402,13 +331,11 @@ export function setupEditorState( post ) {
  *
  * @param {Object} edits Post attributes to edit.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object or control.
  */
-export function editPost( edits ) {
-	return {
-		type: 'EDIT_POST',
-		edits,
-	};
+export function* editPost( edits ) {
+	const { id, type } = yield select( 'core/editor', 'getCurrentPost' );
+	yield dispatch( 'core', 'editEntityRecord', 'postType', type, id, edits );
 }
 
 /**
@@ -432,175 +359,17 @@ export function __experimentalOptimisticUpdatePost( edits ) {
  * @param {Object} options
  */
 export function* savePost( options = {} ) {
-	const isEditedPostSaveable = yield select(
-		STORE_KEY,
-		'isEditedPostSaveable'
-	);
-	if ( ! isEditedPostSaveable ) {
-		return;
-	}
-	let edits = yield select(
-		STORE_KEY,
-		'getPostEdits'
-	);
-	const isAutosave = !! options.isAutosave;
-
-	if ( isAutosave ) {
-		edits = pick( edits, AUTOSAVE_PROPERTIES );
-	}
-
-	const isEditedPostNew = yield select(
-		STORE_KEY,
-		'isEditedPostNew',
-	);
-
-	// New posts (with auto-draft status) must be explicitly assigned draft
-	// status if there is not already a status assigned in edits (publish).
-	// Otherwise, they are wrongly left as auto-draft. Status is not always
-	// respected for autosaves, so it cannot simply be included in the pick
-	// above. This behavior relies on an assumption that an auto-draft post
-	// would never be saved by anyone other than the owner of the post, per
-	// logic within autosaves REST controller to save status field only for
-	// draft/auto-draft by current user.
-	//
-	// See: https://core.trac.wordpress.org/ticket/43316#comment:88
-	// See: https://core.trac.wordpress.org/ticket/43316#comment:89
-	if ( isEditedPostNew ) {
-		edits = { status: 'draft', ...edits };
-	}
-
-	const post = yield select(
-		STORE_KEY,
-		'getCurrentPost'
-	);
-
-	const editedPostContent = yield select(
-		STORE_KEY,
-		'getEditedPostContent'
-	);
-
-	let toSend = {
-		...edits,
-		content: editedPostContent,
-		id: post.id,
-	};
-
-	const currentPostType = yield select(
-		STORE_KEY,
-		'getCurrentPostType'
-	);
-
-	const postType = yield select(
+	yield __experimentalRequestPostUpdateStart( options );
+	const postType = yield select( 'core/editor', 'getCurrentPostType' );
+	const postId = yield select( 'core/editor', 'getCurrentPostId' );
+	yield dispatch(
 		'core',
-		'getPostType',
-		currentPostType
+		'saveEditedEntityRecord',
+		'postType',
+		postType,
+		postId,
+		options
 	);
-
-	yield dispatch(
-		STORE_KEY,
-		'__experimentalRequestPostUpdateStart',
-		options,
-	);
-
-	// Optimistically apply updates under the assumption that the post
-	// will be updated. See below logic in success resolution for revert
-	// if the autosave is applied as a revision.
-	yield dispatch(
-		STORE_KEY,
-		'__experimentalOptimisticUpdatePost',
-		toSend
-	);
-
-	let path = `/wp/v2/${ postType.rest_base }/${ post.id }`;
-	let method = 'PUT';
-	if ( isAutosave ) {
-		const currentUser = yield select( 'core', 'getCurrentUser' );
-		const currentUserId = currentUser ? currentUser.id : undefined;
-		const autosavePost = yield select( 'core', 'getAutosave', post.type, post.id, currentUserId );
-		const mappedAutosavePost = mapValues( pick( autosavePost, AUTOSAVE_PROPERTIES ), getPostRawValue );
-
-		// Ensure autosaves contain all expected fields, using autosave or
-		// post values as fallback if not otherwise included in edits.
-		toSend = {
-			...pick( post, AUTOSAVE_PROPERTIES ),
-			...mappedAutosavePost,
-			...toSend,
-		};
-		path += '/autosaves';
-		method = 'POST';
-	} else {
-		yield dispatch(
-			'core/notices',
-			'removeNotice',
-			SAVE_POST_NOTICE_ID
-		);
-		yield dispatch(
-			'core/notices',
-			'removeNotice',
-			'autosave-exists'
-		);
-	}
-
-	try {
-		const newPost = yield apiFetch( {
-			path,
-			method,
-			data: toSend,
-		} );
-
-		if ( isAutosave ) {
-			yield dispatch( 'core', 'receiveAutosaves', post.id, newPost );
-		} else {
-			yield dispatch( STORE_KEY, 'resetPost', newPost );
-		}
-
-		yield dispatch(
-			STORE_KEY,
-			'__experimentalRequestPostUpdateSuccess',
-			{
-				previousPost: post,
-				post: newPost,
-				options,
-				postType,
-				// An autosave may be processed by the server as a regular save
-				// when its update is requested by the author and the post was
-				// draft or auto-draft.
-				isRevision: newPost.id !== post.id,
-			}
-		);
-
-		const notifySuccessArgs = getNotificationArgumentsForSaveSuccess( {
-			previousPost: post,
-			post: newPost,
-			postType,
-			options,
-		} );
-		if ( notifySuccessArgs.length > 0 ) {
-			yield dispatch(
-				'core/notices',
-				'createSuccessNotice',
-				...notifySuccessArgs
-			);
-		}
-	} catch ( error ) {
-		yield dispatch(
-			STORE_KEY,
-			'__experimentalRequestPostUpdateFailure',
-			{ post, edits, error, options }
-		);
-		const notifyFailArgs = getNotificationArgumentsForSaveFail( {
-			post,
-			edits,
-			error,
-		} );
-		if ( notifyFailArgs.length > 0 ) {
-			yield dispatch(
-				'core/notices',
-				'createErrorNotice',
-				...notifyFailArgs
-			);
-		}
-	}
 }
 
 /**
@@ -698,19 +467,19 @@ export function* autosave( options ) {
  * Returns an action object used in signalling that undo history should
  * restore last popped state.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function redo() {
-	return { type: 'REDO' };
+export function* redo() {
+	yield dispatch( 'core', 'redo' );
 }
 
 /**
  * Returns an action object used in signalling that undo history should pop.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function undo() {
-	return { type: 'UNDO' };
+export function* undo() {
+	yield dispatch( 'core', 'undo' );
 }
 
 /**
@@ -946,7 +715,7 @@ export function unlockPostSaving( lockName ) {
  * @param {Array}   blocks  Block Array.
  * @param {?Object} options Optional options.
  *
- * @return {Object} Action object
+ * @yield {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
 	const lastBlockAttributesChange = yield select( 'core/block-editor', '__experimentalGetLastBlockAttributeChanges' );
@@ -985,11 +754,38 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		yield* resetLastBlockSourceDependencies( Array.from( updatedSources ) );
 	}
 
-	return {
-		type: 'RESET_EDITOR_BLOCKS',
-		blocks: yield* getBlocksWithSourcedAttributes( blocks ),
-		shouldCreateUndoLevel: options.__unstableShouldCreateUndoLevel !== false,
-	};
+	const edits = { blocks: yield* getBlocksWithSourcedAttributes( blocks ) };
+
+	if ( options.__unstableShouldCreateUndoLevel !== false ) {
+		edits.content = ( () => {
+			let blocksForSerialization = edits.blocks;
+
+			// A single unmodified default block is assumed to
+			// be equivalent to an empty post.
+			if (
+				blocksForSerialization.length === 1 &&
+				isUnmodifiedDefaultBlock( blocksForSerialization[ 0 ] )
+			) {
+				blocksForSerialization = [];
+			}
+
+			let content = serialize( blocksForSerialization );
+
+			// For compatibility, treat a post consisting of a
+			// single freeform block as legacy content and apply
+			// pre-block-editor removep'd content formatting.
+			if (
+				blocksForSerialization.length === 1 &&
+				blocksForSerialization[ 0 ].name === getFreeformContentHandlerName()
+			) {
+				content = removep( content );
+			}
+
+			return content;
+		} )();
+	}
+
+	yield* editPost( edits );
 }
 
 /*
