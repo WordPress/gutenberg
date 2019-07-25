@@ -11,7 +11,7 @@ import { withSelect } from '@wordpress/data';
  */
 import BaseOption from './base';
 
-export function CustomFieldsConfirmation() {
+export function CustomFieldsConfirmation( { nextState } ) {
 	const [ isReloading, setIsReloading ] = useState( false );
 
 	return (
@@ -29,7 +29,7 @@ export function CustomFieldsConfirmation() {
 					document.getElementById( 'toggle-custom-fields-form' ).submit();
 				} }
 			>
-				{ __( 'Save & Reload' ) }
+				{ nextState === true ? __( 'Enable & Reload' ) : __( 'Disable & Reload' ) }
 			</Button>
 		</>
 	);
@@ -44,7 +44,7 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 			isChecked={ isChecked }
 			onChange={ setIsChecked }
 		>
-			{ isChecked !== areCustomFieldsEnabled && <CustomFieldsConfirmation /> }
+			{ isChecked !== areCustomFieldsEnabled && <CustomFieldsConfirmation nextState={ isChecked } /> }
 		</BaseOption>
 	);
 }
