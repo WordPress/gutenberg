@@ -958,6 +958,20 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	};
 }
 
+/**
+ * Returns an action object used to signal that the selection has been updated.
+ *
+ * @param {Object} selection Selection object.
+ *
+ * @return {Object} Action object
+ */
+export function resetEditorSelection( selection ) {
+	return {
+		type: 'RESET_EDITOR_SELECTION',
+		selection,
+	};
+}
+
 /*
  * Returns an action object used in signalling that the post editor settings have been updated.
  *

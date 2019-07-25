@@ -1016,12 +1016,8 @@ export function blockSelection( state = { start: {}, end: {} }, action ) {
 					offset: action.endOffset,
 				},
 			};
-		case 'RESET_BLOCKS': {
-			const {
-				selectionStart: start = {},
-				selectionEnd: end = {},
-			} = action;
-
+		case 'RESET_SELECTION': {
+			const { selection: [ start = {}, end = {} ] } = action;
 			return { start, end };
 		}
 	}
