@@ -49,3 +49,24 @@ function gutenberg_update_post_autodraft_to_draft( $data, $postarr ) {
 	return $data;
 }
 add_filter( 'wp_insert_post_data', 'gutenberg_update_post_autodraft_to_draft', 10, 2 );
+
+/**
+ * Filters auto-draft post creation to unset any assigned post title. The status
+ * of an auto-draft should be ready from its `post_status` and not inferred via
+ * title. A post with an explicit title should be created as 'draft' status, not
+ * as 'auto-draft'.
+ *
+ * @param array $data    An array of slashed post data.
+ * @param array $postarr An array of sanitized, but otherwise unmodified post
+ *                       data.
+ *
+ * @return array Filtered post data.
+ */
+function gutenberg_set_empty_auto_draft_title( $data ) {
+	if ( $data['post_status'] === 'auto-draft' ) {
+		$data['post_title'] = '';
+	}
+
+	return $data;
+}
+add_filter( 'wp_insert_post_data', 'gutenberg_set_empty_auto_draft_title' );
