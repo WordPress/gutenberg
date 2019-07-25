@@ -1028,8 +1028,19 @@ content reflected as an edit in state.
 _Parameters_
 
 -   _blocks_ `Array`: Array of blocks.
--   _selectionStart_ `Array`: Selection start object.
--   _selectionEnd_ `Array`: Selection end object.
+
+_Returns_
+
+-   `Object`: Action object.
+
+<a name="resetSelection" href="#resetSelection">#</a> **resetSelection**
+
+Returns an action object used in signalling that selection state should be
+reset to the specified selection.
+
+_Parameters_
+
+-   _selection_ `Array`: Selection.
 
 _Returns_
 

@@ -961,7 +961,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 /**
  * Returns an action object used to signal that the selection has been updated.
  *
- * @param {Object} selection Selection object.
+ * @param {Array} selection Selection.
  *
  * @return {Object} Action object
  */
