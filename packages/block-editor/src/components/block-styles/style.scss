@@ -11,19 +11,22 @@
 	cursor: pointer;
 	overflow: hidden;
 	border-radius: $radius-round-rectangle;
-	padding: $grid-size-small;
-
-	&.is-active {
-		@include block-style__focus-active();
-		box-shadow: 0 0 0 2px $dark-gray-500;
-	}
+	padding: $grid-size-small * 1.5;
 
 	&:focus {
-		@include block-style__focus-active();
+		@include block-style__focus();
 	}
 
 	&:hover {
 		@include block-style__hover;
+	}
+
+	&.is-active {
+		@include block-style__is-active();
+
+		&:focus {
+			@include block-style__is-active-focus();
+		}
 	}
 }
 

@@ -20,6 +20,7 @@ import {
 } from '../constants';
 
 jest.mock( '@wordpress/data-controls' );
+jest.mock( '../block-sources' );
 
 select.mockImplementation( ( ...args ) => {
 	const { select: actualSelect } = jest
@@ -640,15 +641,24 @@ describe( 'Post generator actions', () => {
 
 describe( 'Editor actions', () => {
 	describe( 'setupEditor()', () => {
+		const post = { content: { raw: '' }, status: 'publish' };
+
 		let fulfillment;
-		const reset = ( post, edits, template ) => fulfillment = actions
+		const reset = ( edits, template ) => fulfillment = actions
 			.setupEditor(
 				post,
 				edits,
 				template,
 			);
+		beforeAll( () => {
+			reset();
+		} );
+
+		it( 'should yield action object for resetPost', () => {
+			const { value } = fulfillment.next();
+			expect( value ).toEqual( actions.resetPost( post ) );
+		} );
 		it( 'should yield the SETUP_EDITOR action', () => {
-			reset( { content: { raw: '' }, status: 'publish' } );
 			const { value } = fulfillment.next();
 			expect( value ).toEqual( {
 				type: 'SETUP_EDITOR',

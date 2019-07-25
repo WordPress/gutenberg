@@ -363,7 +363,7 @@ export class TableEdit extends Component {
 			<Tag>
 				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
-						{ cells.map( ( { content, tag: CellTag }, columnIndex ) => {
+						{ cells.map( ( { content, tag: CellTag, scope }, columnIndex ) => {
 							const isSelected = selectedCell && (
 								type === selectedCell.section &&
 								rowIndex === selectedCell.rowIndex &&
@@ -382,6 +382,7 @@ export class TableEdit extends Component {
 								<CellTag
 									key={ columnIndex }
 									className={ cellClasses }
+									scope={ CellTag === 'th' ? scope : undefined }
 								>
 									<RichText
 										className="wp-block-table__cell-content"
@@ -450,7 +451,7 @@ export class TableEdit extends Component {
 			);
 		}
 
-		const classes = classnames( className, backgroundColor.class, {
+		const tableClasses = classnames( backgroundColor.class, {
 			'has-fixed-layout': hasFixedLayout,
 			'has-background': !! backgroundColor.color,
 		} );
@@ -498,11 +499,13 @@ export class TableEdit extends Component {
 						] }
 					/>
 				</InspectorControls>
-				<table className={ classes }>
-					<Section type="head" rows={ head } />
-					<Section type="body" rows={ body } />
-					<Section type="foot" rows={ foot } />
-				</table>
+				<figure className={ className }>
+					<table className={ tableClasses }>
+						<Section type="head" rows={ head } />
+						<Section type="body" rows={ body } />
+						<Section type="foot" rows={ foot } />
+					</table>
+				</figure>
 			</>
 		);
 	}

@@ -439,6 +439,13 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/react-dom@16.8.4/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
+
+	// TODO: This is necessarily only so long as core ships with v4.17.11, and
+	// can be removed at such time a newer version is available.
+	gutenberg_register_vendor_script(
+		'lodash',
+		'https://unpkg.com/lodash@4.17.14/lodash' . $suffix . '.js'
+	);
 }
 
 /**

@@ -22,7 +22,7 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.4.4",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.14",
 		"memize": "^1.0.5"
 	},
 	"publishConfig": {

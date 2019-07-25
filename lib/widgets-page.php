@@ -9,10 +9,21 @@
  * The main entry point for the Gutenberg widgets page.
  *
  * @since 5.2.0
+ *
+ * @param string $page The page name the function is being called for, `'gutenberg_customizer'` for the Customizer.
  */
-function the_gutenberg_widgets() {
+function the_gutenberg_widgets( $page = 'gutenberg_page_gutenberg-widgets' ) {
 	?>
-	<div id="widgets-editor" class="blocks-widgets-container">
+	<div
+		id="widgets-editor"
+		class="blocks-widgets-container
+		<?php
+		echo 'gutenberg_customizer' === $page
+			? ' is-in-customizer'
+			: '';
+		?>
+		"
+	>
 	</div>
 	<?php
 }
@@ -25,9 +36,13 @@ function the_gutenberg_widgets() {
  * @param string $hook Page.
  */
 function gutenberg_widgets_init( $hook ) {
-	if ( 'gutenberg_page_gutenberg-widgets' !== $hook ) {
+	if ( 'gutenberg_page_gutenberg-widgets' !== $hook && 'gutenberg_customizer' !== $hook ) {
 			return;
 	}
+
+	$initializer_name = 'gutenberg_page_gutenberg-widgets' === $hook
+		? 'initialize'
+		: 'customizerInitialize';
 
 	// Media settings.
 	$max_upload_size = wp_max_upload_size();
@@ -58,15 +73,20 @@ function gutenberg_widgets_init( $hook ) {
 	wp_add_inline_script(
 		'wp-edit-widgets',
 		sprintf(
-			'wp.editWidgets.initialize( "widgets-editor", %s );',
+			'wp.domReady( function() {
+				wp.editWidgets.%s( "widgets-editor", %s );
+			} );',
+			$initializer_name,
 			wp_json_encode( $settings )
 		)
 	);
+
 	// Preload server-registered block schemas.
 	wp_add_inline_script(
 		'wp-blocks',
 		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
 	);
+
 	wp_enqueue_script( 'wp-edit-widgets' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-edit-widgets' );

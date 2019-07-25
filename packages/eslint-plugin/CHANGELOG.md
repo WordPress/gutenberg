@@ -1,3 +1,13 @@
+## 2.4.0 (Unreleased)
+
+### New Features
+
+- [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) now supports an `excludePattern` option to exempt function calls by name.
+
+### Improvements
+
+- The recommended `react` configuration specifies an option to [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/react-unused-vars-before-return.md) to exempt React hooks usage, by convention of hooks beginning with "use" prefix.
+
 ## 2.3.0 (2019-06-12)
 
 ### Bug Fix
