@@ -12,6 +12,7 @@ import {
 	unregisterBlockType,
 	createBlock,
 } from '@wordpress/blocks';
+import { combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -22,7 +23,9 @@ import {
 	blocks,
 	isTyping,
 	isCaretWithinFormattedText,
-	blockSelection,
+	selectionStart,
+	selectionEnd,
+	initialPosition,
 	isMultiSelecting,
 	preferences,
 	blocksMode,
@@ -31,6 +34,12 @@ import {
 	blockListSettings,
 	lastBlockAttributesChange,
 } from '../reducer';
+
+const blockSelection = combineReducers( {
+	start: selectionStart,
+	end: selectionEnd,
+	initialPosition,
+} );
 
 describe( 'state', () => {
 	describe( 'hasSameKeys()', () => {
