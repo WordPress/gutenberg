@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, map, flowRight } from 'lodash';
+import { map, flowRight, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -59,6 +59,41 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 }
 
 /**
+ * Given the current and next item entity, returns the minimally "modified"
+ * result of the next item, preferring value references from the original item
+ * if equal. If all values match, the original item is returned.
+ *
+ * @param {Object} item     Original item.
+ * @param {Object} nextItem Next item.
+ *
+ * @return {Object} Minimally modified merged item.
+ */
+export function mapItem( item, nextItem ) {
+	// Return next item in its entirety if there is no original item.
+	if ( ! item ) {
+		return nextItem;
+	}
+
+	let hasChanges = false;
+
+	const result = {};
+	for ( const key in nextItem ) {
+		if ( isEqual( nextItem[ key ], item[ key ] ) ) {
+			result[ key ] = item[ key ];
+		} else {
+			hasChanges = true;
+			result[ key ] = nextItem[ key ];
+		}
+	}
+
+	if ( ! hasChanges ) {
+		return item;
+	}
+
+	return result;
+}
+
+/**
  * Reducer tracking items state, keyed by ID. Items are assumed to be normal,
  * where identifiers are common across all queries.
  *
@@ -70,9 +105,14 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 function items( state = {}, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_ITEMS':
+			const key = action.key || DEFAULT_ENTITY_KEY;
 			return {
 				...state,
-				...keyBy( action.items, action.key || DEFAULT_ENTITY_KEY ),
+				...action.items.reduce( ( result, value ) => {
+					const itemId = value[ key ];
+					result[ itemId ] = mapItem( state[ itemId ], value );
+					return result;
+				}, {} ),
 			};
 	}
 

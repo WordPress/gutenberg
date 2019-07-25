@@ -8,6 +8,7 @@ import deepFreeze from 'deep-freeze';
  */
 import reducer, {
 	getMergedItemIds,
+	mapItem,
 } from '../reducer';
 
 describe( 'getMergedItemIds', () => {
@@ -89,6 +90,35 @@ describe( 'getMergedItemIds', () => {
 	} );
 } );
 
+describe( 'mapItem', () => {
+	it( 'returns the next item if no current item against which to compare', () => {
+		const item = undefined;
+		const nextItem = {};
+		const result = mapItem( item, nextItem );
+
+		expect( result ).toBe( nextItem );
+	} );
+
+	it( 'returns the original item if all property values are the same, deeply', () => {
+		const item = { a: [ {} ] };
+		const nextItem = { a: [ {} ] };
+		const result = mapItem( item, nextItem );
+
+		expect( result ).toBe( item );
+	} );
+
+	it( 'preserves original references of property values when unchanged', () => {
+		const item = { a: [ {} ], b: [ 1 ] };
+		const nextItem = { a: [ {} ], b: [ 2 ] };
+		const result = mapItem( item, nextItem );
+
+		expect( result ).not.toBe( item );
+		expect( result.a ).toBe( item.a );
+		expect( result.b ).not.toBe( item.b );
+		expect( result ).toEqual( { a: [ {} ], b: [ 2 ] } );
+	} );
+} );
+
 describe( 'reducer', () => {
 	it( 'returns a default value of its combined keys defaults', () => {
 		const state = reducer( undefined, {} );
@@ -140,5 +170,39 @@ describe( 'reducer', () => {
 			},
 			queries: {},
 		} );
+	} );
+
+	it( 'avoids updating unchanged item value references', () => {
+		const original = deepFreeze( {
+			items: {
+				1: { id: 1, name: 'abc', keys: [] },
+			},
+			queries: {},
+		} );
+		const state = reducer( original, {
+			type: 'RECEIVE_ITEMS',
+			items: [
+				{ id: 1, name: 'def', keys: [] },
+			],
+		} );
+
+		expect( state.items[ '1' ].keys ).toBe( original.items[ '1' ].keys );
+	} );
+
+	it( 'avoids updating unchanged item references', () => {
+		const original = deepFreeze( {
+			items: {
+				1: { id: 1, name: 'abc', keys: [] },
+			},
+			queries: {},
+		} );
+		const state = reducer( original, {
+			type: 'RECEIVE_ITEMS',
+			items: [
+				{ id: 1, name: 'abc', keys: [] },
+			],
+		} );
+
+		expect( state.items[ '1' ] ).toBe( original.items[ '1' ] );
 	} );
 } );
