@@ -4,15 +4,28 @@ exports[`MoreMenu should match snapshot 1`] = `
 <MoreMenu>
   <DropdownMenu
     className="edit-post-more-menu"
-    contentClassName="edit-post-more-menu__content"
     icon="ellipsis"
     label="More tools & options"
-    position="bottom left"
+    popoverProps={
+      Object {
+        "className": "edit-post-more-menu__content",
+        "position": "bottom left",
+      }
+    }
+    toggleProps={
+      Object {
+        "labelPosition": "bottom",
+      }
+    }
   >
     <Dropdown
       className="components-dropdown-menu edit-post-more-menu"
-      contentClassName="components-dropdown-menu__popover edit-post-more-menu__content"
-      position="bottom left"
+      popoverProps={
+        Object {
+          "className": "edit-post-more-menu__content components-dropdown-menu__popover",
+          "position": "bottom left",
+        }
+      }
       renderContent={[Function]}
       renderToggle={[Function]}
     >
@@ -25,13 +38,12 @@ exports[`MoreMenu should match snapshot 1`] = `
           className="components-dropdown-menu__toggle"
           icon="ellipsis"
           label="More tools & options"
-          labelPosition="bottom left"
+          labelPosition="bottom"
           onClick={[Function]}
           onKeyDown={[Function]}
-          tooltip="More tools & options"
         >
           <Tooltip
-            position="bottom left"
+            position="bottom"
             text="More tools & options"
           >
             <ForwardRef(Button)

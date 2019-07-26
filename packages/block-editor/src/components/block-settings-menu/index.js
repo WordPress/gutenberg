@@ -25,6 +25,11 @@ import BlockUnknownConvertButton from './block-unknown-convert-button';
 import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import __experimentalBlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
 
+const POPOVER_PROPS = {
+	className: 'block-editor-block-settings-menu__popover editor-block-settings-menu__popover',
+	position: 'bottom right',
+};
+
 export function BlockSettingsMenu( { clientIds } ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
@@ -45,9 +50,8 @@ export function BlockSettingsMenu( { clientIds } ) {
 					<DropdownMenu
 						icon="ellipsis"
 						label={ __( 'More options' ) }
-						position="bottom right"
 						className="block-editor-block-settings-menu"
-						contentClassName="block-editor-block-settings-menu__popover editor-block-settings-menu__popover"
+						popoverProps={ POPOVER_PROPS }
 					>
 						{ ( { onClose } ) => (
 							<>

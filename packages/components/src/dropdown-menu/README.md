@@ -163,21 +163,6 @@ A human-readable label to present as accessibility text on the focused collapsed
 - Type: `String`
 - Required: Yes
 
-#### menuLabel
-
-A human-readable label to present as accessibility text on the expanded menu container.
-
-- Type: `String`
-- Required: No
-
-#### position
-
-The direction in which the menu should open. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
-
-- Type: `String`
-- Required: No
-- Default: `"top center"`
-
 #### controls
 
 An array of objects describing the options to be shown in the expanded menu.
@@ -207,9 +192,26 @@ A class name to apply to the dropdown menu's toggle element wrapper.
 - Type: `String`
 - Required: No
 
-#### contentClassName
-
-If you want to target the dropdown menu's popover for styling purposes, you need to provide a `contentClassName` because it's not being rendered as a children of the container node.
-
-- Type: `String`
-- Required: No
+#### popoverProps
+ 
+Properties of `popoverProps` object will be passed as props to the nested `Popover` component.
+Use this object to modify props available for the `Popover` component that are not already exposed in the `DropdownMenu` component, e.g.: the direction in which the popover should open relative to its parent node set with `position` prop. 
+ 
+ - Type: `Object`
+ - Required: No
+ 
+#### toggleProps
+  
+Properties of `toggleProps` object will be passed as props to the nested `IconButton` component in the `renderToggle` implementation of the `Dropdown` component used internally.
+Use this object to modify props available for the `IconButton` component that are not already exposed in the `DropdownMenu` component, e.g.: the tooltip text displayed on hover set with `tooltip` prop. 
+  
+ - Type: `Object`
+ - Required: No
+ 
+#### menuProps
+   
+Properties of `menuProps` object will be passed as props to the nested `NavigableMenu` component in the `renderContent` implementation of the `Dropdown` component used internally.
+Use this object to modify props available for the `NavigableMenu` component that are not already exposed in the `DropdownMenu` component, e.g.: the orientation of the menu set with `orientation` prop. 
+   
+ - Type: `Object`
+ - Required: No
