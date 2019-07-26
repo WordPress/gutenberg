@@ -10,6 +10,14 @@ import { useState, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 
 /**
+ * Simple reducer used to increment a counter.
+ *
+ * @param {number} state  Previous counter value.
+ * @return {number} New state value.
+ */
+const counterReducer = ( state ) => state + 1;
+
+/**
  * Hook used to compute the styles required to move a div into a new position.
  *
  * The way this animation works is the following:
@@ -29,8 +37,8 @@ import { useReducedMotion } from '@wordpress/compose';
  */
 function useMovingAnimation( ref, isSelected, enableAnimation, triggerAnimationOnChange ) {
 	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
-	const [ triggeredAnimation, triggerAnimation ] = useReducer( ( state = 0 ) => state + 1 );
-	const [ finishedAnimation, endAnimation ] = useReducer( ( state = 0 ) => state + 1 );
+	const [ triggeredAnimation, triggerAnimation ] = useReducer( counterReducer, 0 );
+	const [ finishedAnimation, endAnimation ] = useReducer( counterReducer, 0 );
 	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
 
 	const previous = ref.current ? ref.current.getBoundingClientRect() : null;
