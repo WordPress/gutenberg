@@ -58,7 +58,7 @@ class ParagraphBlock extends Component {
 	}
 
 	getDropCapHelp( checked ) {
-		return checked ? __( 'Showing large initial letter.' ) : __( 'Toggle to show a large initial letter.' );
+		return checked ? __( 'Showing large initial letter. Drop Cap is hidden when text is not aligned with reading direction.' ) : __( 'Toggle to show a large initial letter.' );
 	}
 
 	render() {
@@ -87,6 +87,8 @@ class ParagraphBlock extends Component {
 			placeholder,
 			direction,
 		} = attributes;
+
+		const showDropCap = align === undefined || align === ( isRTL ? 'right' : 'left' );
 
 		return (
 			<>
@@ -162,7 +164,7 @@ class ParagraphBlock extends Component {
 					className={ classnames( 'wp-block-paragraph', className, {
 						'has-text-color': textColor.color,
 						'has-background': backgroundColor.color,
-						'has-drop-cap': dropCap,
+						'has-drop-cap': showDropCap && dropCap,
 						[ backgroundColor.class ]: backgroundColor.class,
 						[ textColor.class ]: textColor.class,
 						[ fontSize.class ]: fontSize.class,
