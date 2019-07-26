@@ -8,6 +8,7 @@ import {
 	sortBy,
 	throttle,
 } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -197,6 +198,7 @@ class BlockList extends Component {
 
 	render() {
 		const {
+			className,
 			blockClientIds,
 			rootClientId,
 			isDraggable,
@@ -208,7 +210,12 @@ class BlockList extends Component {
 		} = this.props;
 
 		return (
-			<div className="editor-block-list__layout block-editor-block-list__layout">
+			<div className={
+				classnames(
+					'editor-block-list__layout block-editor-block-list__layout',
+					className
+				)
+			}>
 				{ blockClientIds.map( ( clientId ) => {
 					const isBlockInSelection = hasMultiSelection ?
 						multiSelectedBlockClientIds.includes( clientId ) :
