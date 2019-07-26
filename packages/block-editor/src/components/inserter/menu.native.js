@@ -157,7 +157,15 @@ export default compose(
 				getBlockSelectionEnd,
 				getBlockOrder,
 			} = select( 'core/block-editor' );
+			const {
+				isPostTitleSelected,
+			} = select( 'core/editor' );
 			const { clientId, destinationRootClientId, isAppender } = ownProps;
+
+			// if post title is selected insert as first block
+			if ( isPostTitleSelected() ) {
+				return 0;
+			}
 
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
