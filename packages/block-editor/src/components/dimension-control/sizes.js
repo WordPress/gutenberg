@@ -24,26 +24,30 @@ export const findSizeBySlug = ( sizes, slug ) => sizes.find( ( size ) => slug ==
 export default [
 	{
 		name: __( 'None' ),
+		abbr: __( 'No' ),
 		size: 0,
 		slug: 'none',
 	},
 	{
 		name: __( 'Small' ),
+		abbr: __( 'S' ),
 		size: 14,
 		slug: 'small',
 	},
 	{
 		name: __( 'Medium' ),
+		abbr: __( 'M' ),
 		size: 24,
 		slug: 'medium',
 	},
 	{
 		name: __( 'Large' ),
+		abbr: __( 'L' ),
 		size: 34,
 		slug: 'large',
 	}, {
-		name: __( 'XLarge' ),
-		abbr: __( 'Extra Large' ), // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr
+		name: __( 'Extra Large' ),
+		abbr: __( 'XL' ),
 		size: 60,
 		slug: 'xlarge',
 	},

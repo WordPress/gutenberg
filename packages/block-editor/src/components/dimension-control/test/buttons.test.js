@@ -15,26 +15,30 @@ describe( 'DimensionButtons', () => {
 	const sizesTable = [
 		{
 			name: 'None',
+			abbr: 'No',
 			size: 0,
 			slug: 'none',
 		},
 		{
 			name: 'Small',
+			abbr: 'S',
 			size: 14,
 			slug: 'small',
 		},
 		{
 			name: 'Medium',
+			abbr: 'M',
 			size: 24,
 			slug: 'medium',
 		},
 		{
 			name: 'Large',
+			abbr: 'L',
 			size: 34,
 			slug: 'large',
 		}, {
-			name: 'XLarge',
-			abbr: 'Extra Large',
+			name: 'Extra Large',
+			abbr: 'XL',
 			size: 60,
 			slug: 'xlarge',
 		},

@@ -17,12 +17,11 @@ exports[`DimensionButtons renders correctly with defaults 1`] = `
         isPrimary={false}
         value="none"
       >
-        N
-        <span
-          className="screen-reader-text"
+        <abbr
+          title="None"
         >
-          one
-        </span>
+          No
+        </abbr>
       </ForwardRef(Button)>
     </Tooltip>
     <Tooltip
@@ -36,12 +35,11 @@ exports[`DimensionButtons renders correctly with defaults 1`] = `
         isPrimary={false}
         value="small"
       >
-        S
-        <span
-          className="screen-reader-text"
+        <abbr
+          title="Small"
         >
-          mall
-        </span>
+          S
+        </abbr>
       </ForwardRef(Button)>
     </Tooltip>
     <Tooltip
@@ -55,12 +53,11 @@ exports[`DimensionButtons renders correctly with defaults 1`] = `
         isPrimary={false}
         value="medium"
       >
-        M
-        <span
-          className="screen-reader-text"
+        <abbr
+          title="Medium"
         >
-          edium
-        </span>
+          M
+        </abbr>
       </ForwardRef(Button)>
     </Tooltip>
     <Tooltip
@@ -74,17 +71,16 @@ exports[`DimensionButtons renders correctly with defaults 1`] = `
         isPrimary={false}
         value="large"
       >
-        L
-        <span
-          className="screen-reader-text"
+        <abbr
+          title="Large"
         >
-          arge
-        </span>
+          L
+        </abbr>
       </ForwardRef(Button)>
     </Tooltip>
     <Tooltip
       key="xlarge"
-      text="XLarge"
+      text="Extra Large"
     >
       <ForwardRef(Button)
         aria-pressed={false}
@@ -96,12 +92,7 @@ exports[`DimensionButtons renders correctly with defaults 1`] = `
         <abbr
           title="Extra Large"
         >
-          X
-          <span
-            className="screen-reader-text"
-          >
-            Large
-          </span>
+          XL
         </abbr>
       </ForwardRef(Button)>
     </Tooltip>

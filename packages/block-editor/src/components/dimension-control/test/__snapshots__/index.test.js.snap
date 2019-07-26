@@ -35,28 +35,32 @@ exports[`DimensionControl rendering correctly for different properties renders c
     sizes={
       Array [
         Object {
+          "abbr": "No",
           "name": "None",
           "size": 0,
           "slug": "none",
         },
         Object {
+          "abbr": "S",
           "name": "Small",
           "size": 14,
           "slug": "small",
         },
         Object {
+          "abbr": "M",
           "name": "Medium",
           "size": 24,
           "slug": "medium",
         },
         Object {
+          "abbr": "L",
           "name": "Large",
           "size": 34,
           "slug": "large",
         },
         Object {
-          "abbr": "Extra Large",
-          "name": "XLarge",
+          "abbr": "XL",
+          "name": "Extra Large",
           "size": 60,
           "slug": "xlarge",
         },
@@ -102,28 +106,32 @@ exports[`DimensionControl rendering correctly for different properties renders c
     sizes={
       Array [
         Object {
+          "abbr": "No",
           "name": "None",
           "size": 0,
           "slug": "none",
         },
         Object {
+          "abbr": "S",
           "name": "Small",
           "size": 14,
           "slug": "small",
         },
         Object {
+          "abbr": "M",
           "name": "Medium",
           "size": 24,
           "slug": "medium",
         },
         Object {
+          "abbr": "L",
           "name": "Large",
           "size": 34,
           "slug": "large",
         },
         Object {
-          "abbr": "Extra Large",
-          "name": "XLarge",
+          "abbr": "XL",
+          "name": "Extra Large",
           "size": 60,
           "slug": "xlarge",
         },

@@ -33,25 +33,7 @@ export function DimensionButtons( { id, sizes, currentSize, onChangeSpacingSize 
 				className="block-editor-dimension-control__buttons"
 			>
 				{ sizes.map( function( size ) {
-					const visualName = size.name.substring( 0, 1 );
-					const hiddenName = size.name.substring( 1 );
 					const isSelected = currentSize === size.slug;
-
-					let innerButton = (
-						<Fragment>
-							{ visualName }
-							<span className="screen-reader-text">{ hiddenName }</span>
-						</Fragment>
-					);
-
-					// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr
-					if ( size.abbr ) {
-						innerButton = (
-							<abbr title={ size.abbr }>
-								{ innerButton }
-							</abbr>
-						);
-					}
 
 					return (
 						<Tooltip key={ size.slug } text={ size.name }>
@@ -63,7 +45,9 @@ export function DimensionButtons( { id, sizes, currentSize, onChangeSpacingSize 
 								onClick={ onChangeSpacingSize }
 								aria-pressed={ isSelected }
 							>
-								{ innerButton }
+								<abbr title={ size.name }>
+									{ size.abbr }
+								</abbr>
 							</Button>
 						</Tooltip>
 					);
