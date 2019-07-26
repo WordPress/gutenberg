@@ -526,7 +526,7 @@ export const isEditedPostAutosaveable = createRegistrySelector( ( select ) => fu
 	}
 
 	// A post is not autosavable when there is a post autosave lock.
-	if ( isPostAutosavingLocked() ) {
+	if ( isPostAutosavingLocked( state ) ) {
 		return false;
 	}
 
