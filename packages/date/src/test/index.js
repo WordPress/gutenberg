@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isInTheFuture, getDate, getMoment, setSettings, __experimentalGetSettings } from '../';
+import { isInTheFuture, getDate, setSettings, __experimentalGetSettings } from '../';
 
 describe( 'isInTheFuture', () => {
 	it( 'should return true if the date is in the future', () => {
@@ -56,24 +56,15 @@ describe( 'Moment.js Localization', () => {
 			},
 		} );
 
-		// Test the unchanged locale strings.
-		// Create a Date object 8 days in the past.
-		date = new Date( Number( getDate() ) - ( 1000 * 60 * 60 * 24 * 8 ) );
-		expect( getMoment( date ).fromNow() ).toBe( '8 days ago' );
-		// Test withoutSuffix
-		expect( getMoment( date ).fromNow( true ) ).toBe( '8 days' );
+		// Get the freshly changed setings.
+		const newSettings = __experimentalGetSettings();
 
-		// Create a Date object 5 minutes in the past.
-		let date = new Date( Number( getDate() ) - ( 1000 * 60 * 5 ) );
-		expect( getMoment( date ).fromNow() ).toBe( '5 localized minutes ago' );
-		// Test withoutSuffix
-		expect( getMoment( date ).fromNow( true ) ).toBe( '5 localized minutes' );
+		// Test the unchanged values.
+		expect( newSettings.l10n.locale ).toBe( settings.l10n.locale );
 
-		// Create a Date object 10 hours in the future.
-		date = new Date( Number( getDate() ) + ( 1000 * 60 * 60 * 10 ) );
-		expect( getMoment( date ).fromNow() ).toBe( '10 localized hours from now' );
-		// Test withoutSuffix
-		expect( getMoment( date ).fromNow( true ) ).toBe( '10 localized hours' );
+		// Test the changed values.
+		expect( newSettings.l10n.relative.mm ).toBe( '%d localized minutes' );
+		expect( newSettings.l10n.relative.hh ).toBe( '%d localized hours' );
 
 		// Restore default settings
 		setSettings( settings );
