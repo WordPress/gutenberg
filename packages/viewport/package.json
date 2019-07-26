@@ -25,7 +25,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
-		"lodash": "^4.17.11"
+		"lodash": "^4.17.14"
 	},
 	"publishConfig": {
 		"access": "public"

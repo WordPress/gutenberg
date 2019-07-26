@@ -21,7 +21,8 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
 
 // Mobile Components
 export { default as BottomSheet } from './mobile/bottom-sheet';
-export { default as Picker } from './mobile/picker';
+export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
+export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';

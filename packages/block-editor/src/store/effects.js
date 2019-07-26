@@ -12,6 +12,7 @@ import {
 	doBlocksMatchTemplate,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
+	cloneBlock,
 } from '@wordpress/blocks';
 import { _n, sprintf } from '@wordpress/i18n';
 import { create, toHTMLString, insert, remove } from '@wordpress/rich-text';
@@ -83,15 +84,23 @@ export default {
 		const blockB = getBlock( state, clientIdB );
 		const blockBType = getBlockType( blockB.name );
 		const { clientId, attributeKey, offset } = getSelectionStart( state );
-		const hasSelection = clientId === clientIdA || clientId === clientIdB;
-		const selectedBlock = clientId === clientIdA ? blockA : blockB;
-		const html = selectedBlock.attributes[ attributeKey ];
+		const hasTextSelection = (
+			( clientId === clientIdA || clientId === clientIdB ) &&
+			attributeKey !== undefined &&
+			offset !== undefined
+		);
 
 		// A robust way to retain selection position through various transforms
 		// is to insert a special character at the position and then recover it.
 		const START_OF_SELECTED_AREA = '\u0086';
 
-		if ( hasSelection ) {
+		// Clone the blocks so we don't insert the character in a "live" block.
+		const cloneA = cloneBlock( blockA );
+		const cloneB = cloneBlock( blockB );
+
+		if ( hasTextSelection ) {
+			const selectedBlock = clientId === clientIdA ? cloneA : cloneB;
+			const html = selectedBlock.attributes[ attributeKey ];
 			const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
 			const multilineTag = selectedBlockType.attributes[ attributeKey ].multiline;
 			const value = insert( create( {
@@ -108,8 +117,8 @@ export default {
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
 		const blocksWithTheSameType = blockA.name === blockB.name ?
-			[ blockB ] :
-			switchToBlockType( blockB, blockA.name );
+			[ cloneB ] :
+			switchToBlockType( cloneB, blockA.name );
 
 		// If the block types can not match, do nothing
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
@@ -118,11 +127,11 @@ export default {
 
 		// Calling the merge to update the attributes and remove the block to be merged
 		const updatedAttributes = blockAType.merge(
-			blockA.attributes,
+			cloneA.attributes,
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		if ( hasSelection ) {
+		if ( hasTextSelection ) {
 			const newAttributeKey = findKey( updatedAttributes, ( v ) =>
 				typeof v === 'string' && v.indexOf( START_OF_SELECTED_AREA ) !== -1
 			);
@@ -134,7 +143,6 @@ export default {
 			const newHtml = toHTMLString( { value: newValue, multilineTag } );
 
 			updatedAttributes[ newAttributeKey ] = newHtml;
-			selectedBlock.attributes[ attributeKey ] = html;
 
 			dispatch( selectionChange(
 				blockA.clientId,

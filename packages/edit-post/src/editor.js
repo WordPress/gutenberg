@@ -21,6 +21,7 @@ import {
  */
 import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
+import EditorInitialization from './components/editor-initialization';
 
 class Editor extends Component {
 	constructor() {
@@ -70,6 +71,7 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			post,
+			postId,
 			initialEdits,
 			onError,
 			hiddenBlockTypes,
@@ -101,6 +103,7 @@ class Editor extends Component {
 							{ ...props }
 						>
 							<ErrorBoundary onError={ onError }>
+								<EditorInitialization postId={ postId } />
 								<Layout />
 								<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
 							</ErrorBoundary>

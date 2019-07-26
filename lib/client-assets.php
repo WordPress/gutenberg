@@ -439,6 +439,13 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/react-dom@16.8.4/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
+
+	// TODO: This is necessarily only so long as core ships with v4.17.11, and
+	// can be removed at such time a newer version is available.
+	gutenberg_register_vendor_script(
+		'lodash',
+		'https://unpkg.com/lodash@4.17.14/lodash' . $suffix . '.js'
+	);
 }
 
 /**
@@ -628,7 +635,7 @@ function gutenberg_extend_block_editor_preload_paths( $preload_paths, $post ) {
 		$rest_base      = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
 		$autosaves_path = sprintf( '/wp/v2/%s/%d/autosaves?context=edit', $rest_base, $post->ID );
 
-		if ( ! in_array( $autosaves_path, $preload_paths ) ) {
+		if ( ! in_array( $autosaves_path, $preload_paths, true ) ) {
 			$preload_paths[] = $autosaves_path;
 		}
 	}
@@ -644,7 +651,7 @@ function gutenberg_extend_block_editor_preload_paths( $preload_paths, $post ) {
 	 */
 	$blocks_path = array( '/wp/v2/blocks', 'OPTIONS' );
 
-	if ( ! in_array( $blocks_path, $preload_paths ) ) {
+	if ( ! in_array( $blocks_path, $preload_paths, true ) ) {
 		$preload_paths[] = $blocks_path;
 	}
 

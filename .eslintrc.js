@@ -34,6 +34,10 @@ module.exports = {
 				message: 'Path access on WordPress dependencies is not allowed.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb\.cjs)/]',
+				message: 'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
+			},
+			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},
@@ -52,6 +56,10 @@ module.exports = {
 			{
 				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
 				message: 'Use ellipsis character (…) in place of three dots',
+			},
+			{
+				selector: 'ImportDeclaration[source.value="redux"] Identifier.imported[name="combineReducers"]',
+				message: 'Use `combineReducers` from `@wordpress/data`',
 			},
 			{
 				selector: 'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',

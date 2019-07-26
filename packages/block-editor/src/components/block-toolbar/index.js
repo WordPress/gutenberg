@@ -31,8 +31,8 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 			{ mode === 'visual' && isValid && (
 				<>
 					<BlockSwitcher clientIds={ blockClientIds } />
-					<BlockControls.Slot />
-					<BlockFormatControls.Slot />
+					<BlockControls.Slot bubblesVirtually className="block-editor-block-toolbar__slot" />
+					<BlockFormatControls.Slot bubblesVirtually className="block-editor-block-toolbar__slot" />
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />

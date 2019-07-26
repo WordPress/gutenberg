@@ -431,7 +431,7 @@ export function isEqualTagAttributePairs( actual, expected ) {
 	// avoids us needing to check both attributes sets, since if A has any keys
 	// which do not exist in B, we know the sets to be different.
 	if ( actual.length !== expected.length ) {
-		log.warning( 'Expected attributes %o, instead saw %o.', expected, actual );
+		log.warning( 'Expected attributes %j, instead saw %j.', expected, actual );
 		return false;
 	}
 
@@ -573,13 +573,13 @@ export function isEquivalentHTML( actual, expected ) {
 
 		// Inequal if exhausted all expected tokens
 		if ( ! expectedToken ) {
-			log.warning( 'Expected end of content, instead saw %o.', actualToken );
+			log.warning( 'Expected end of content, instead saw %j.', actualToken );
 			return false;
 		}
 
 		// Inequal if next non-whitespace token of each set are not same type
 		if ( actualToken.type !== expectedToken.type ) {
-			log.warning( 'Expected token of type `%s` (%o), instead saw `%s` (%o).', expectedToken.type, expectedToken, actualToken.type, actualToken );
+			log.warning( 'Expected token of type `%s` (%j), instead saw `%s` (%j).', expectedToken.type, expectedToken, actualToken.type, actualToken );
 			return false;
 		}
 
@@ -606,7 +606,7 @@ export function isEquivalentHTML( actual, expected ) {
 	if ( ( expectedToken = getNextNonWhitespaceToken( expectedTokens ) ) ) {
 		// If any non-whitespace tokens remain in expected token set, this
 		// indicates inequality
-		log.warning( 'Expected %o, instead saw end of content.', expectedToken );
+		log.warning( 'Expected %j, instead saw end of content.', expectedToken );
 		return false;
 	}
 

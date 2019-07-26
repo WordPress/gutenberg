@@ -24,6 +24,7 @@ import DefaultBlockAppender from './default-block-appender';
  */
 import BlockList from '../block-list';
 import { withBlockEditContext } from '../block-edit/context';
+import TemplatePicker from './template-picker';
 
 class InnerBlocks extends Component {
 	constructor() {
@@ -48,6 +49,7 @@ class InnerBlocks extends Component {
 		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
 			this.synchronizeBlocksWithTemplate();
 		}
+
 		if ( this.state.templateInProcess ) {
 			this.setState( {
 				templateInProcess: false,
@@ -107,20 +109,32 @@ class InnerBlocks extends Component {
 			clientId,
 			hasOverlay,
 			renderAppender,
+			template,
+			__experimentalTemplateOptions: templateOptions,
+			__experimentalOnSelectTemplateOption: onSelectTemplateOption,
+			__experimentalAllowTemplateOptionSkip: allowTemplateOptionSkip,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
+		const isPlaceholder = template === null && !! templateOptions;
+
 		const classes = classnames( 'editor-inner-blocks block-editor-inner-blocks', {
-			'has-overlay': hasOverlay,
+			'has-overlay': hasOverlay && ! isPlaceholder,
 		} );
 
 		return (
 			<div className={ classes }>
 				{ ! templateInProcess && (
-					<BlockList
-						rootClientId={ clientId }
-						renderAppender={ renderAppender }
-					/>
+					isPlaceholder ?
+						<TemplatePicker
+							options={ templateOptions }
+							onSelect={ onSelectTemplateOption }
+							allowSkip={ allowTemplateOptionSkip }
+						/> :
+						<BlockList
+							rootClientId={ clientId }
+							renderAppender={ renderAppender }
+						/>
 				) }
 			</div>
 		);

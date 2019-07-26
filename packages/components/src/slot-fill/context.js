@@ -6,16 +6,18 @@ import { sortBy, forEach, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createContext } from '@wordpress/element';
+import { Component, createContext, useContext, useState, useEffect } from '@wordpress/element';
 
-const { Provider, Consumer } = createContext( {
+const SlotFillContext = createContext( {
 	registerSlot: () => {},
 	unregisterSlot: () => {},
 	registerFill: () => {},
 	unregisterFill: () => {},
 	getSlot: () => {},
 	getFills: () => {},
+	subscribe: () => {},
 } );
+const { Provider, Consumer } = SlotFillContext;
 
 class SlotFillProvider extends Component {
 	constructor() {
@@ -27,23 +29,26 @@ class SlotFillProvider extends Component {
 		this.unregisterFill = this.unregisterFill.bind( this );
 		this.getSlot = this.getSlot.bind( this );
 		this.getFills = this.getFills.bind( this );
+		this.subscribe = this.subscribe.bind( this );
 
 		this.slots = {};
 		this.fills = {};
-		this.state = {
+		this.listeners = [];
+		this.contextValue = {
 			registerSlot: this.registerSlot,
 			unregisterSlot: this.unregisterSlot,
 			registerFill: this.registerFill,
 			unregisterFill: this.unregisterFill,
 			getSlot: this.getSlot,
 			getFills: this.getFills,
+			subscribe: this.subscribe,
 		};
 	}
 
 	registerSlot( name, slot ) {
 		const previousSlot = this.slots[ name ];
 		this.slots[ name ] = slot;
-		this.forceUpdateFills( name );
+		this.triggerListeners();
 
 		// Sometimes the fills are registered after the initial render of slot
 		// But before the registerSlot call, we need to rerender the slot
@@ -75,7 +80,7 @@ class SlotFillProvider extends Component {
 		}
 
 		delete this.slots[ name ];
-		this.forceUpdateFills( name );
+		this.triggerListeners();
 	}
 
 	unregisterFill( name, instance ) {
@@ -106,12 +111,6 @@ class SlotFillProvider extends Component {
 		} );
 	}
 
-	forceUpdateFills( name ) {
-		forEach( this.fills[ name ], ( instance ) => {
-			instance.forceUpdate();
-		} );
-	}
-
 	forceUpdateSlot( name ) {
 		const slot = this.getSlot( name );
 
@@ -120,14 +119,48 @@ class SlotFillProvider extends Component {
 		}
 	}
 
+	triggerListeners() {
+		this.listeners.forEach( ( listener ) => listener() );
+	}
+
+	subscribe( listener ) {
+		this.listeners.push( listener );
+
+		return () => {
+			this.listeners = without( this.listeners, listener );
+		};
+	}
+
 	render() {
 		return (
-			<Provider value={ this.state }>
+			<Provider value={ this.contextValue }>
 				{ this.props.children }
 			</Provider>
 		);
 	}
 }
+
+/**
+ * React hook returning the active slot given a name.
+ *
+ * @param {string} name Slot name.
+ * @return {Object} Slot object.
+ */
+export const useSlot = ( name ) => {
+	const { getSlot, subscribe } = useContext( SlotFillContext );
+	const [ slot, setSlot ] = useState( getSlot( name ) );
+
+	useEffect( () => {
+		setSlot( getSlot( name ) );
+		const unsubscribe = subscribe( () => {
+			setSlot( getSlot( name ) );
+		} );
+
+		return unsubscribe;
+	}, [ name ] );
+
+	return slot;
+};
 
 export default SlotFillProvider;
 export { Consumer };

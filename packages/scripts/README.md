@@ -236,9 +236,9 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
-* `npm run test:e2e` - runs all unit tests.
-* `npm run test:e2e:help` - prints all available options to configure unit tests runner.
-* `npm run test-e2e -- --puppeteer-interactive` - runs all unit tests interactively.
+* `npm run test:e2e` - runs all e2e tests.
+* `npm run test:e2e:help` - prints all available options to configure e2e test runner.
+* `npm run test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
 * `npm run test-e2e FILE_NAME -- --puppeteer-interactive ` - runs one test file interactively.
 * `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
 
@@ -312,7 +312,7 @@ To extend the provided webpack config, or replace subsections within the provide
 In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://github.com/webpack-contrib/url-loader):
 
 ```javascript
-const defaultConfig = require("./node_modules/@wordpress/scripts/config/webpack.config");
+const defaultConfig = require("@wordpress/scripts/config/webpack.config");
 
 module.exports = {
   ...defaultConfig,

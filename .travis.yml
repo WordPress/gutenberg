@@ -61,6 +61,16 @@ jobs:
         - npx lerna run build
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
+    - name: JavaScript native mobile tests
+      install:
+        - npm ci
+      script:
+        # It's not necessary to run the full build, since Jest can interpret
+        # source files with `babel-jest`. Some packages have their own custom
+        # build tasks, however. These must be run.
+        - npx lerna run build
+        - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+
     - name: PHP unit tests (Docker)
       env: WP_VERSION=latest DOCKER=true
       script:
@@ -150,6 +160,7 @@ jobs:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
   allow_failures:
+    - name: JavaScript native mobile tests
     - name: PHP unit tests (PHP 5.3)
       env: WP_VERSION=latest SWITCH_TO_PHP=5.3
       script:
@@ -160,3 +171,16 @@ jobs:
       env: WP_VERSION=latest SWITCH_TO_PHP=5.2
       script:
         - ./bin/run-wp-unit-tests.sh
+
+before_deploy:
+  - npm install
+  - npm run playground:build -- --public-url '/gutenberg'
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  local_dir: playground/dist
+  on:
+    branch: master

@@ -56,11 +56,11 @@ function PostPublishPanelPrepublish( {
 					] }>
 						<PostSchedule />
 					</PanelBody>
-					<MaybePostFormatPanel />
-					<MaybeTagsPanel />
-					{ children }
 				</>
 			) }
+			<MaybePostFormatPanel />
+			<MaybeTagsPanel />
+			{ children }
 		</div>
 	);
 }
