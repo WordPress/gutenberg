@@ -41,6 +41,7 @@ exports[`MoreMenu should match snapshot 1`] = `
           labelPosition="bottom"
           onClick={[Function]}
           onKeyDown={[Function]}
+          tooltip="More tools & options"
         >
           <Tooltip
             position="bottom"

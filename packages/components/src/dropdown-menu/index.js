@@ -8,6 +8,7 @@ import { flatMap, isEmpty, isFunction } from 'lodash';
  * WordPress dependencies
  */
 import { DOWN } from '@wordpress/keycodes';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -43,6 +44,20 @@ function DropdownMenu( {
 	menuLabel,
 	position,
 } ) {
+	if ( menuLabel ) {
+		deprecated( '`menuLabel` prop in `DropdownComponent`', {
+			alternative: '`menuProps` object and its `aria-label` property',
+			plugin: 'Gutenberg',
+		} );
+	}
+
+	if ( position ) {
+		deprecated( '`position` prop in `DropdownComponent`', {
+			alternative: '`popoverProps` object and its `position` property',
+			plugin: 'Gutenberg',
+		} );
+	}
+
 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
 	}
@@ -76,6 +91,7 @@ function DropdownMenu( {
 					className: classnames( 'components-dropdown-menu__toggle', {
 						'is-opened': isOpen,
 					} ),
+					tooltip: label,
 				} );
 
 				return (
