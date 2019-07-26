@@ -153,6 +153,7 @@ export default compose(
 		// eslint-disable-next-line no-restricted-syntax
 		function getInsertionIndex() {
 			const {
+				getBlock,
 				getBlockIndex,
 				getBlockSelectionEnd,
 				getBlockOrder,
@@ -172,9 +173,15 @@ export default compose(
 				return getBlockIndex( clientId, destinationRootClientId );
 			}
 
-			// If there a selected block, we insert after the selected block.
+			// If there a selected block,
 			const end = getBlockSelectionEnd();
 			if ( ! isAppender && end ) {
+				// and the last selected block is unmodified (empty), it will be replaced
+				if ( isUnmodifiedDefaultBlock( getBlock( end ) ) ) {
+					return getBlockIndex( end, destinationRootClientId );
+				}
+
+				// we insert after the selected block.
 				return getBlockIndex( end, destinationRootClientId ) + 1;
 			}
 

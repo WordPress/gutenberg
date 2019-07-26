@@ -181,23 +181,13 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 		} = select( 'core/block-editor' );
-		const { isPostTitleSelected } = select( 'core/editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const shouldShowInsertionPoint = ( clientId ) => {
-			if ( ! isBlockInsertionPointVisible() ) {
-				return false;
-			}
-
-			// if post title is selected, show insertion point on the first block
-			if ( isPostTitleSelected() && clientId === blockClientIds[ 0 ] ) {
-				return true;
-			}
-
 			return (
+				isBlockInsertionPointVisible() &&
 				insertionPoint.rootClientId === rootClientId &&
 				blockClientIds[ insertionPoint.index ] === clientId
 			);
