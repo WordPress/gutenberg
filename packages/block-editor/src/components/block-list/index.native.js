@@ -35,6 +35,7 @@ export class BlockList extends Component {
 		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.getNewBlockInsertionIndex = this.getNewBlockInsertionIndex.bind( this );
+		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
 	}
 
 	finishInsertingOrReplacingBlock( newBlock ) {
@@ -74,6 +75,10 @@ export class BlockList extends Component {
 
 	scrollViewInnerRef( ref ) {
 		this.scrollViewRef = ref;
+	}
+
+	shouldFlatListPreventAutomaticScroll() {
+		return this.props.isBlockInsertionPointVisible;
 	}
 
 	renderDefaultBlockAppender() {
@@ -198,6 +203,7 @@ export default compose( [
 			blockCount: getBlockCount( rootClientId ),
 			getBlockName,
 			isBlockSelected,
+			isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
 			shouldShowInsertionPoint,
 			selectedBlock: getSelectedBlock(),
 			firstBlock: getBlock( blockClientIds[ 0 ] ),
