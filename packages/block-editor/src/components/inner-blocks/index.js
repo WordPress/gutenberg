@@ -35,12 +35,32 @@ class InnerBlocks extends Component {
 		this.updateNestedSettings();
 	}
 
+	/**
+	 * Returns the template lock as a Set.
+	 *
+	 * @return {Set} The template lock.
+	 */
 	getTemplateLock() {
 		const {
 			templateLock,
 			parentLock,
 		} = this.props;
-		return templateLock === undefined ? parentLock : templateLock;
+
+		const lock = templateLock === undefined ? parentLock : templateLock;
+
+		if ( lock === 'all' ) {
+			return new Set( [ 'insert', 'move', 'remove' ] );
+		}
+
+		if ( lock === 'insert' ) {
+			return new Set( [ 'insert', 'remove' ] );
+		}
+
+		if ( Array.isArray( lock ) ) {
+			return new Set( lock );
+		}
+
+		return new Set;
 	}
 
 	componentDidMount() {
@@ -112,7 +132,7 @@ class InnerBlocks extends Component {
 
 		const newSettings = {
 			allowedBlocks,
-			templateLock: this.getTemplateLock(),
+			templateLock: [ ...this.getTemplateLock() ],
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
