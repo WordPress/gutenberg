@@ -11,7 +11,7 @@ import { compose } from '@wordpress/compose';
 import { withBlockEditContext } from '../block-edit/context';
 
 function PlaceholderInBlockContext( { isReadOnly, ...props } ) {
-	if ( ! isReadOnly ) {
+	if ( isReadOnly ) {
 		return null;
 	}
 
@@ -28,7 +28,8 @@ export default compose( [
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		const rootClientId = getBlockRootClientId( clientId );
-		const isReadOnly = getTemplateLock( rootClientId ) === 'readonly';
-		return { isReadOnly };
+		return {
+			isReadOnly: getTemplateLock( rootClientId ).has( 'attributes' ),
+		};
 	} ),
 ] )( PlaceholderInBlockContext );
