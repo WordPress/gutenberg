@@ -726,6 +726,7 @@ class RichText extends Component {
 			value,
 			selectionStart,
 			selectionEnd,
+			placeholder,
 			__unstableIsSelected: isSelected,
 		} = this.props;
 
@@ -752,6 +753,10 @@ class RichText extends Component {
 		// Check if any format props changed.
 		shouldReapply = shouldReapply ||
 			! isShallowEqual( prepareProps, prevPrepareProps );
+
+		// Rerender if the placeholder changed.
+		shouldReapply = shouldReapply ||
+			placeholder !== prevProps.placeholder;
 
 		const { activeFormats = [] } = this.record;
 
