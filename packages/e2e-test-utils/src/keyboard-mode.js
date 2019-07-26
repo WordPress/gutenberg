@@ -4,5 +4,9 @@
  * @return {Promise} Promise resolving after enabling the keyboard edit mode.
  */
 export async function switchToEditMode() {
-	await page.click( '.edit-post-layout__content' );
+	const focusedElement = await page.$( ':focus' );
+	await page.click( '.editor-post-title' );
+	if ( focusedElement ) {
+		await focusedElement.focus();
+	}
 }
