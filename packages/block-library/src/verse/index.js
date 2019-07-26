@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import deprecated from './deprecated';
 import edit from './edit';
 import icon from './icon';
 import metadata from './block.json';
@@ -22,11 +23,12 @@ export const settings = {
 	icon,
 	keywords: [ __( 'poetry' ) ],
 	transforms,
-	edit,
-	save,
+	deprecated,
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: attributes.content + attributesToMerge.content,
 		};
 	},
+	edit,
+	save,
 };
