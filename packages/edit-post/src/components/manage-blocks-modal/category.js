@@ -27,27 +27,30 @@ function BlockManagerCategory( {
 } ) {
 	const settings = useContext( EditPostSettings );
 	const { allowedBlockTypes } = settings;
-	blockTypes = useMemo( () => {
-		if ( allowedBlockTypes === true ) {
-			return blockTypes;
-		}
-		return blockTypes.filter( ( { name } ) => {
-			return includes( allowedBlockTypes || [], name );
-		} );
-	} );
+	const filteredBlockTypes = useMemo(
+		() => {
+			if ( allowedBlockTypes === true ) {
+				return blockTypes;
+			}
+			return blockTypes.filter( ( { name } ) => {
+				return includes( allowedBlockTypes || [], name );
+			} );
+		},
+		[ allowedBlockTypes, blockTypes ]
+	);
 
-	if ( ! blockTypes.length ) {
+	if ( ! filteredBlockTypes.length ) {
 		return null;
 	}
 
 	const checkedBlockNames = without(
-		map( blockTypes, 'name' ),
+		map( filteredBlockTypes, 'name' ),
 		...hiddenBlockTypes
 	);
 
 	const titleId = 'edit-post-manage-blocks-modal__category-title-' + instanceId;
 
-	const isAllChecked = checkedBlockNames.length === blockTypes.length;
+	const isAllChecked = checkedBlockNames.length === filteredBlockTypes.length;
 
 	let ariaChecked;
 	if ( isAllChecked ) {
@@ -72,7 +75,7 @@ function BlockManagerCategory( {
 				label={ <span id={ titleId }>{ category.title }</span> }
 			/>
 			<BlockTypesChecklist
-				blockTypes={ blockTypes }
+				blockTypes={ filteredBlockTypes }
 				value={ checkedBlockNames }
 				onItemChange={ toggleVisible }
 			/>
