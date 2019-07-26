@@ -31,7 +31,12 @@ describe( 'RootComponent', () => {
 	it( 'renders without crashing with a block focused', () => {
 		const app = renderer.create( <RootComponent /> );
 		const blocks = select( 'core/block-editor' ).getBlocks();
-		dispatch( 'core/block-editor' ).selectBlock( blocks[ 0 ].clientId );
+
+		// Methods that modify state are required to be called inside `act`
+		renderer.act( () => {
+			dispatch( 'core/block-editor' ).selectBlock( blocks[ 0 ].clientId );
+		} );
+
 		const rendered = app.toJSON();
 		expect( rendered ).toBeTruthy();
 		app.unmount();

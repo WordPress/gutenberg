@@ -41,12 +41,6 @@ nvm install --latest-npm
 yarn install
 ```
 
-Note: using node v9.x currently produces the following error:
-```
-error sane@3.1.0: The engine "node" is incompatible with this module. Expected version "6.* || 8.* || >= 10.*".
-```
-To be revisited, as we don't need to impose a limit in version per se.
-
 ## Run
 
 ```
@@ -141,7 +135,7 @@ and for android run,
 
 Note, you might experience problems that seem to be related to the tests starting the Appium server, for example errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. Sorry about that this is still a WIP, you can manually start the Appium server via [appium desktop](https://github.com/appium/appium-desktop) or the cli, then change the port number in the tests while optionally commenting out related code in the `beforeAll` and `afterAll` block. 
 
-For a more detailed outline of the UI tests and how to get started writing one please visit the [Project Wiki](https://github.com/wordpress-mobile/gutenberg-mobile/wiki/Getting-started-with-UI-tests)
+For a more detailed outline of the UI tests and how to get started writing one please visit the [UI Test documentation](https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/__device-tests__/README.md) and our [contributing guide](https://github.com/wordpress-mobile/gutenberg-mobile/blob/develop/__device-tests__/CONTRIBUTING.md).
 
 ## Static analysis and code style
 

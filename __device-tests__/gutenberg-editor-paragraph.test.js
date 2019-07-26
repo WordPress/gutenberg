@@ -16,7 +16,7 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 250000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 300000;
 
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	let driver;
