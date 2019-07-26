@@ -43,7 +43,7 @@
 	}
 
 	// Could be unset for individual rich text instances.
-	&:focus [data-rich-text-placeholder]::after {
+	&.is-selected [data-rich-text-placeholder]::after {
 		display: none;
 	}
 }

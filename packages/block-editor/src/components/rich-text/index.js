@@ -337,7 +337,7 @@ class RichTextWrapper extends Component {
 				onSelectionChange={ onSelectionChange }
 				tagName={ tagName }
 				wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
-				className={ classnames( classes, className ) }
+				className={ classnames( classes, className, { 'is-selected': originalIsSelected } ) }
 				placeholder={ placeholder }
 				allowedFormats={ adjustedAllowedFormats }
 				withoutInteractiveFormatting={ withoutInteractiveFormatting }
