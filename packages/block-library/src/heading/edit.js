@@ -13,38 +13,14 @@ import HeadingToolbar from './heading-toolbar';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
 	RichText,
-	withColors,
-	PanelColorSettings,
+	useColors,
 } from '@wordpress/block-editor';
-import { memo } from '@wordpress/element';
-
-const HeadingColorUI = memo(
-	function( {
-		textColorValue,
-		setTextColor,
-	} ) {
-		return (
-			<PanelColorSettings
-				title={ __( 'Color Settings' ) }
-				initialOpen={ false }
-				colorSettings={ [
-					{
-						value: textColorValue,
-						onChange: setTextColor,
-						label: __( 'Text Color' ),
-					},
-				] }
-			/>
-		);
-	}
-);
 
 function HeadingEdit( {
 	attributes,
@@ -52,9 +28,9 @@ function HeadingEdit( {
 	mergeBlocks,
 	onReplace,
 	className,
-	textColor,
-	setTextColor,
 } ) {
+	const { TextColor, InspectorControlsColorPanel } = useColors( [ { name: 'textColor', attribute: 'color' } ], [] );
+
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
 
@@ -71,43 +47,36 @@ function HeadingEdit( {
 					<p>{ __( 'Level' ) }</p>
 					<HeadingToolbar isCollapsed={ false } minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 				</PanelBody>
-				<HeadingColorUI
-					setTextColor={ setTextColor }
-					textColorValue={ textColor.color }
-				/>
 			</InspectorControls>
-			<RichText
-				identifier="content"
-				tagName={ tagName }
-				value={ content }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
-				onMerge={ mergeBlocks }
-				onSplit={ ( value ) => {
-					if ( ! value ) {
-						return createBlock( 'core/paragraph' );
-					}
+			{ InspectorControlsColorPanel }
+			<TextColor>
+				<RichText
+					identifier="content"
+					tagName={ tagName }
+					value={ content }
+					onChange={ ( value ) => setAttributes( { content: value } ) }
+					onMerge={ mergeBlocks }
+					onSplit={ ( value ) => {
+						if ( ! value ) {
+							return createBlock( 'core/paragraph' );
+						}
 
-					return createBlock( 'core/heading', {
-						...attributes,
-						content: value,
-					} );
-				} }
-				onReplace={ onReplace }
-				onRemove={ () => onReplace( [] ) }
-				className={ classnames( className, {
-					[ `has-text-align-${ align }` ]: align,
-					'has-text-color': textColor.color,
-					[ textColor.class ]: textColor.class,
-				} ) }
-				placeholder={ placeholder || __( 'Write heading…' ) }
-				style={ {
-					color: textColor.color,
-				} }
-			/>
+						return createBlock( 'core/heading', {
+							...attributes,
+							content: value,
+						} );
+					} }
+					onReplace={ onReplace }
+					onRemove={ () => onReplace( [] ) }
+					className={ classnames( className, {
+						[ `has-text-align-${ align }` ]: align,
+						'has-text-color': TextColor.color,
+					} ) }
+					placeholder={ placeholder || __( 'Write heading…' ) }
+				/>
+			</TextColor>
 		</>
 	);
 }
 
-export default compose( [
-	withColors( 'backgroundColor', { textColor: 'color' } ),
-] )( HeadingEdit );
+export default HeadingEdit;
