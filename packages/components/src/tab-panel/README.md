@@ -119,6 +119,7 @@ An array of objects containing the following properties:
 - `name`: `(string)` Defines the key for the tab.
 - `title`:`(string)` Defines the translated text for the tab.
 - `className`:`(string)` Optional. Defines the class to put on the tab.
+- `onSelect`:`(function)` Optional. The function called when the tab is selected
 
 >> **Note:** Other fields may be added to the object and accessed from the child function if desired.
 
@@ -136,16 +137,6 @@ The class to add to the active tab
 #### controlledTabName
 
 Provide a tab name for a tab to be selected upon mounting and controlled throughout the component's lifecycle. If this prop is not set, the first tab will be selected by default.
-
-- Type: `String`
-- Required: No
-- Default: none
-
-#### *initialTabName (To be deprecated)*
-
-*Note: This prop is considered legacy. Please use `controlledTabName` instead. Using this prop in conjunction with `controlledTabName` will result in this prop's value being ignored / overwritten.*
-
-Optionally provide a tab name for a tab to be selected upon mounting of component. If this prop is not set, the first tab will be selected by default.
 
 - Type: `String`
 - Required: No

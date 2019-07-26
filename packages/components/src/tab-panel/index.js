@@ -33,9 +33,12 @@ const TabPanel = ( { tabs, initialTabName, controlledTabName, className, onSelec
 	const selectedTab = find( tabs, { name: selectedTabName } );
 	const selectedId = selectedTab ? instanceId + '-' + selectedTab.name : '';
 
-	const onClick = ( tabName ) => {
-		setSelectedTabName( tabName );
-		onSelect( tabName );
+	const onClick = ( tab ) => {
+		onSelect( tab.name );
+		setSelectedTabName( tab.name );
+		if ( tab.onSelect ) {
+			tab.onSelect();
+		}
 	};
 
 	const onNavigate = ( childIndex, child ) => {
@@ -65,7 +68,7 @@ const TabPanel = ( { tabs, initialTabName, controlledTabName, className, onSelec
 						aria-label={ tab.ariaLabel }
 						selected={ tab.name === selectedTabName }
 						key={ tab.name }
-						onClick={ () => onClick( tab.name ) }
+						onClick={ () => onClick( tab ) }
 					>
 						{ tab.title }
 					</TabButton>
