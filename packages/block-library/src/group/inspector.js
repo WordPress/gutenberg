@@ -110,7 +110,7 @@ export default function Inspector( props ) {
 				<fieldset className="block-editor-responsive-controls">
 					<legend className="block-editor-responsive-controls__label">{ __( 'Padding' ) } </legend>
 					<ToggleControl
-						label={ __( 'Manually adjust Padding based on screensize?' ) }
+						label={ __( 'Manually adjust padding based on screensize.' ) }
 						checked={ attributes.responsivePadding }
 						onChange={ () => onToggleResponsiveSpacing( 'padding' ) }
 					/>
@@ -168,7 +168,7 @@ export default function Inspector( props ) {
 				<fieldset className="block-editor-responsive-controls">
 					<legend className="block-editor-responsive-controls__label">{ __( 'Margin' ) }</legend>
 					<ToggleControl
-						label={ __( 'Manually adjust Margin based on screensize?' ) }
+						label={ __( 'Manually adjust margin based on screensize.' ) }
 						checked={ attributes.responsiveMargin }
 						onChange={ () => onToggleResponsiveSpacing( 'margin' ) }
 					/>

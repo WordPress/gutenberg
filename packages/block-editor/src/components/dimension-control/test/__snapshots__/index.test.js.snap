@@ -3,7 +3,6 @@
 exports[`DimensionControl rendering correctly for different properties renders correctly for "margin" property 1`] = `
 <BaseControl
   className="block-editor-dimension-control"
-  help="Select the margin for this Block"
   id="block-spacing-margin-all-2"
 >
   <div
@@ -16,15 +15,17 @@ exports[`DimensionControl rendering correctly for different properties renders c
         icon="desktop"
         label="all"
       />
-      Margin (all devices)
+      All
     </Component>
-    <ForwardRef(IconButton)
-      icon="controls-repeat"
+    <ForwardRef(Button)
+      aria-label="Reset Margin for all"
+      disabled={true}
       isDefault={true}
       isSmall={true}
-      label="Reset Margin"
       onClick={[Function]}
-    />
+    >
+      Reset
+    </ForwardRef(Button)>
   </div>
   <DimensionButtons
     device="all"
@@ -74,7 +75,6 @@ exports[`DimensionControl rendering correctly for different properties renders c
 exports[`DimensionControl rendering correctly for different properties renders correctly for "padding" property 1`] = `
 <BaseControl
   className="block-editor-dimension-control"
-  help="Select the padding for this Block"
   id="block-spacing-padding-all-1"
 >
   <div
@@ -87,15 +87,17 @@ exports[`DimensionControl rendering correctly for different properties renders c
         icon="desktop"
         label="all"
       />
-      Padding (all devices)
+      All
     </Component>
-    <ForwardRef(IconButton)
-      icon="controls-repeat"
+    <ForwardRef(Button)
+      aria-label="Reset Padding for all"
+      disabled={true}
       isDefault={true}
       isSmall={true}
-      label="Reset Padding"
       onClick={[Function]}
-    />
+    >
+      Reset
+    </ForwardRef(Button)>
   </div>
   <DimensionButtons
     device="all"

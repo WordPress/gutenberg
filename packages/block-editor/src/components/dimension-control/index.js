@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import { startCase } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
 	BaseControl,
-	IconButton,
+	Button,
 	Icon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -50,7 +55,6 @@ export function DimensionControl( props ) {
 	return (
 		<BaseControl
 			id={ `block-spacing-${ property }-${ device }-${ instanceId }` }
-			help={ sprintf( __( 'Select the %s for this Block' ), property ) }
 			className="block-editor-dimension-control"
 		>
 			<div className="block-editor-dimension-control__header">
@@ -59,16 +63,19 @@ export function DimensionControl( props ) {
 						icon={ deviceIcon || device }
 						label={ device }
 					/>
-					{ sprintf( __( '%s (%s devices)' ), title, device ) }
+					{ startCase( device ) }
 				</BaseControl.VisualLabel>
 
-				<IconButton
-					icon="controls-repeat"
-					label={ sprintf( __( 'Reset %s' ), title ) }
+				<Button
+					disabled={ !!! currentSize }
 					isDefault
 					isSmall
 					onClick={ resetSpacing }
-				/>
+					aria-label={ sprintf( __( 'Reset %s for %s' ), title, device ) }
+				>
+					{ __( 'Reset' ) }
+				</Button>
+
 			</div>
 
 			<DimensionButtons

@@ -66,10 +66,12 @@ describe( 'DimensionControl', () => {
 					title={ 'Padding' }
 					property={ 'padding' }
 					onReset={ onResetHandler }
+					device="desktop"
+					currentSize={ 'medium' }
 				/>
 			);
 
-			wrapper.find( 'button[aria-label="Reset Padding"]' ).simulate( 'click' );
+			wrapper.find( 'button[aria-label="Reset Padding for desktop"]' ).simulate( 'click' );
 
 			expect( onResetHandler ).toHaveBeenCalledTimes( 1 );
 		} );
