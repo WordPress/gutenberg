@@ -25,7 +25,6 @@ import {
 
 export default function Inspector( props ) {
 	const {
-		clientId,
 		setBackgroundColor,
 		backgroundColor,
 		attributes,
@@ -120,7 +119,6 @@ export default function Inspector( props ) {
 						<DimensionControl
 							title={ __( 'Padding' ) }
 							property="padding"
-							id={ clientId }
 							onReset={ partialRight( resetSpacingDimension, 'paddingSize' ) }
 							onSpacingChange={ partialRight( updateSpacing, 'paddingSize' ) }
 							currentSize={ attributes.paddingSize }
@@ -134,7 +132,7 @@ export default function Inspector( props ) {
 							<DimensionControl
 								title={ __( 'Padding' ) }
 								property="padding"
-								id={ clientId }
+
 								onReset={ partialRight( resetSpacingDimension, 'paddingSize' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'paddingSize' ) }
 								currentSize={ attributes.paddingSize }
@@ -144,7 +142,7 @@ export default function Inspector( props ) {
 							<DimensionControl
 								title={ __( 'Padding' ) }
 								property="padding"
-								id={ clientId }
+
 								onReset={ partialRight( resetSpacingDimension, 'paddingSize', 'Tablet' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'paddingSize', 'Tablet' ) }
 								currentSize={ attributes.paddingSizeTablet }
@@ -155,7 +153,7 @@ export default function Inspector( props ) {
 							<DimensionControl
 								title={ __( 'Padding' ) }
 								property="padding"
-								id={ clientId }
+
 								onReset={ partialRight( resetSpacingDimension, 'paddingSize', 'Mobile' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'paddingSize', 'Mobile' ) }
 								currentSize={ attributes.paddingSizeMobile }
@@ -179,7 +177,6 @@ export default function Inspector( props ) {
 						<DimensionControl
 							title={ __( 'Margin' ) }
 							property="margin"
-							id={ clientId }
 							onReset={ partialRight( resetSpacingDimension, 'marginSize' ) }
 							onSpacingChange={ partialRight( updateSpacing, 'marginSize' ) }
 							currentSize={ attributes.marginSize }
@@ -193,7 +190,7 @@ export default function Inspector( props ) {
 							<DimensionControl
 								title={ __( 'Margin' ) }
 								property="margin"
-								id={ clientId }
+
 								onReset={ partialRight( resetSpacingDimension, 'marginSize' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'marginSize' ) }
 								currentSize={ attributes.marginSize }
@@ -203,7 +200,7 @@ export default function Inspector( props ) {
 							<DimensionControl
 								title={ __( 'Margin' ) }
 								property="margin"
-								id={ clientId }
+
 								onReset={ partialRight( resetSpacingDimension, 'marginSize', 'Tablet' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'marginSize', 'Tablet' ) }
 								currentSize={ attributes.marginSizeTablet }
@@ -214,7 +211,7 @@ export default function Inspector( props ) {
 							<DimensionControl
 								title={ __( 'Margin' ) }
 								property="margin"
-								id={ clientId }
+
 								onReset={ partialRight( resetSpacingDimension, 'marginSize', 'Mobile' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'marginSize', 'Mobile' ) }
 								currentSize={ attributes.marginSizeMobile }

@@ -49,8 +49,8 @@ registerBlockType( 'my-plugin/my-block', {
 				title={ __( 'Padding' ) }
 				property="padding"
 				id={ clientId }
-				onReset={ resetSpacingDimension }
-				onSpacingChange={ updateSpacing }
+				onReset={ partialRight( resetSpacingDimension, 'paddingSize' ) }
+				onSpacingChange={ partialRight( updateSpacing, 'paddingSize' ) }
 				currentSize={ paddingSize }
 			/>
 		);
@@ -58,16 +58,11 @@ registerBlockType( 'my-plugin/my-block', {
 } );
 ```
 
+_Note:_ it is recommend to partially apply the value of the Block attribute to be updated (eg: `paddingSize`, `marginSize`...etc) to your callback functions. This avoids the need to unecessarily couple the component to the Block attribute schema.
+
 _Note:_ by default if you do not provide an initial `currentSize` prop for the current dimension value, then no value will be selected (ie: there is no default dimension set). 
 
 ## Props
-
-### `id`
-* **Type:** `Int|String`
-* **Default:** `undefined`
-* **Required:** Yes
-
-A unique ID used to identify the control.
 
 ### `title`
 * **Type:** `String`

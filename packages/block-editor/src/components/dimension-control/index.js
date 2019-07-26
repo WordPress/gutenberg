@@ -8,14 +8,16 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
+import { withInstanceId } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
 import sizesTable, { findSizeBySlug } from './sizes';
 import DimensionButtons from './buttons';
 
-function DimensionControl( props ) {
-	const { title, property, device = 'all', deviceIcon = 'desktop', id, currentSize, onSpacingChange, onReset } = props;
+export function DimensionControl( props ) {
+	const { title, property, device = 'all', deviceIcon = 'desktop', instanceId, currentSize, onSpacingChange, onReset } = props;
 
 	/**
 	 * Determines the size from the size slug (eg: `medium`)
@@ -47,7 +49,7 @@ function DimensionControl( props ) {
 
 	return (
 		<BaseControl
-			id={ `block-spacing-${ property }-desktop-${ id }` }
+			id={ `block-spacing-${ property }-${ device }-${ instanceId }` }
 			help={ sprintf( __( 'Select the %s for this Block' ), property ) }
 			className="block-editor-dimension-control"
 		>
@@ -71,6 +73,7 @@ function DimensionControl( props ) {
 
 			<DimensionButtons
 				{ ...props }
+				id={ instanceId }
 				device={ device }
 				currentSize={ currentSize }
 				onChangeSpacingSize={ onChangeSpacingSize }
@@ -81,4 +84,4 @@ function DimensionControl( props ) {
 	);
 }
 
-export default DimensionControl;
+export default withInstanceId( DimensionControl );

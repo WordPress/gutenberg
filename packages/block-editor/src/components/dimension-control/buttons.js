@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isArray } from 'lodash';
+import { isArray, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,25 +9,19 @@ import { isArray } from 'lodash';
 import {
 	Button,
 	ButtonGroup,
-
 	Tooltip,
-
 } from '@wordpress/components';
 
 import {
 	Fragment,
 } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-
-function DimensionButtons( { id, sizes, currentSize, onChangeSpacingSize } ) {
-	if ( ! id || ! id.length ) {
+export function DimensionButtons( { id, sizes, currentSize, onChangeSpacingSize } ) {
+	if ( ! id ) {
 		return null;
 	}
 
-	if ( ! sizes || ! isArray( sizes ) || ! sizes.length ) {
+	if ( ! sizes || ! isArray( sizes ) || isEmpty( sizes ) ) {
 		return null;
 	}
 

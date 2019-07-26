@@ -58,7 +58,7 @@ describe( 'DimensionButtons', () => {
 		it( 'does not render without a "id" prop', () => {
 			const wrapper = shallow(
 				<DimensionButtons
-					sizes={ sizesTable } // provide the other required prop
+					sizes={ sizesTable } // providethe other required prop
 				/>
 			);
 
@@ -68,7 +68,7 @@ describe( 'DimensionButtons', () => {
 		it( 'does not render without a "sizes" prop', () => {
 			const wrapper = shallow(
 				<DimensionButtons
-					id={ uniqueId() } // provide the other required prop
+					id={ uniqueId() } // providethe other required prop
 				/>
 			);
 

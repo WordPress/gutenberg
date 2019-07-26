@@ -7,7 +7,7 @@ import { uniqueId } from 'lodash';
 /**
  * Internal dependencies
  */
-import DimensionControl from '../';
+import { DimensionControl } from '../';
 
 describe( 'DimensionControl', () => {
 	const onChangeHandler = jest.fn();
@@ -22,7 +22,7 @@ describe( 'DimensionControl', () => {
 		it( 'renders correctly for "padding" property', () => {
 			const wrapper = shallow(
 				<DimensionControl
-					id={ uniqueId() }
+					instanceId={ uniqueId() }
 					title={ 'Padding' }
 					property={ 'padding' }
 				/>
@@ -33,7 +33,7 @@ describe( 'DimensionControl', () => {
 		it( 'renders correctly for "margin" property', () => {
 			const wrapper = shallow(
 				<DimensionControl
-					id={ uniqueId() }
+					instanceId={ uniqueId() }
 					title={ 'Margin' }
 					property={ 'margin' }
 				/>
@@ -46,7 +46,7 @@ describe( 'DimensionControl', () => {
 		it( 'should call onSpacingChange handler with correct args on size button click', () => {
 			const wrapper = mount(
 				<DimensionControl
-					id={ uniqueId() }
+					instanceId={ uniqueId() }
 					title={ 'Padding' }
 					property={ 'padding' }
 					onSpacingChange={ onChangeHandler }
@@ -62,7 +62,7 @@ describe( 'DimensionControl', () => {
 		it( 'should call onReset handler with correct args on reset button click', () => {
 			const wrapper = mount(
 				<DimensionControl
-					id={ uniqueId() }
+					instanceId={ uniqueId() }
 					title={ 'Padding' }
 					property={ 'padding' }
 					onReset={ onResetHandler }
