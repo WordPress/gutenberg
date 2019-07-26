@@ -134,6 +134,8 @@ describe( 'Table', () => {
 		await headerSwitch[ 0 ].click();
 		await footerSwitch[ 0 ].click();
 
+		await page.click( '.wp-block-table__cell-content' );
+
 		// Add a column.
 		await clickBlockToolbarButton( 'Edit table' );
 		const addColumnAfterButton = await page.$x( "//button[text()='Add Column After']" );

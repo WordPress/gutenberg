@@ -461,6 +461,7 @@ export class TableEdit extends Component {
 				<BlockControls>
 					<Toolbar>
 						<DropdownMenu
+							hasArrowIndicator
 							icon="editor-table"
 							label={ __( 'Edit table' ) }
 							controls={ this.getTableControls() }

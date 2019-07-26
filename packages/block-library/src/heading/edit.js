@@ -69,6 +69,7 @@ function HeadingEdit( {
 					<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 					<p>{ __( 'Text Alignment' ) }</p>
 					<AlignmentToolbar
+						isCollapsed={ false }
 						value={ align }
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
