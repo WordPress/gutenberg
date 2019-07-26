@@ -142,6 +142,20 @@ exports[`adding blocks should navigate contenteditable with padding 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`adding blocks should navigate contenteditable with side padding 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`adding blocks should navigate empty paragraph 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>

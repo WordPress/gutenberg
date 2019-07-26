@@ -7,6 +7,7 @@ import { getFormatType } from './get-format-type';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
+	ZWNBSP,
 } from './special-characters';
 
 /**
@@ -68,14 +69,6 @@ function fromFormat( { type, attributes, unregisteredAttributes, object, boundar
 		attributes: elementAttributes,
 	};
 }
-
-const padding = {
-	type: 'br',
-	attributes: {
-		'data-rich-text-padding': 'true',
-	},
-	object: true,
-};
 
 export function toTree( {
 	value,
@@ -145,8 +138,7 @@ export function toTree( {
 				node = getLastChild( node );
 			}
 
-			append( getParent( node ), padding );
-			append( getParent( node ), '' );
+			append( getParent( node ), ZWNBSP );
 		}
 
 		// Set selection for the start of line.
@@ -255,7 +247,7 @@ export function toTree( {
 		}
 
 		if ( shouldInsertPadding && i === text.length ) {
-			append( getParent( pointer ), padding );
+			append( getParent( pointer ), ZWNBSP );
 		}
 
 		lastCharacterFormats = characterFormats;
