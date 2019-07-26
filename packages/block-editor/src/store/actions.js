@@ -11,7 +11,7 @@ import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { select, apiFetch } from './controls';
+import { select, dispatch, apiFetch } from './controls';
 
 /**
  * Generator which will yield a default block insert action if there
@@ -726,8 +726,8 @@ export function receiveDiscoverBlocks( discoverBlocks, filterValue ) {
 /** Returns an action object used in signalling that the user does not have permission to install blocks.
 * @param {boolean} hasPermission User has permission to install blocks.
 *
- * @return {Object} Action object.
- */
+* @return {Object} Action object.
+*/
 export function setInstallBlocksPermission( hasPermission ) {
 	return { type: 'SET_INSTALL_BLOCKS_PERMISSION', hasPermission };
 }
@@ -735,19 +735,39 @@ export function setInstallBlocksPermission( hasPermission ) {
 /** Action triggered to install a block plugin
 * @param {string} slug The plugin slug for block.
 *
- * @return {Object} Action object.
- */
+*/
 export function* installBlock( slug ) {
-	yield apiFetch( {
-		path: '__experimental/blocks/install',
-		data: {
-			slug,
-		},
-		method: 'POST',
-	} );
-	return {
-		type: 'INSTALL_BLOCK',
-		slug,
-	};
+	try {
+		const response = yield apiFetch( {
+			path: '__experimental/blocks/install',
+			data: {
+				slug,
+			},
+			method: 'POST',
+		} );
+		if ( response.success === false ) {
+			yield dispatch(
+				'core/notices',
+				'createErrorNotice',
+				[ 'Block can\'t install.' ]
+			);
+			return;
+		}
+	} catch ( error ) {
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			[ 'Block previews can\'t install.', {
+				id: 'block-preview-error',
+				actions: [
+					{
+						label: 'Retry',
+						onClick: () => {
+						},
+					},
+				],
+			} ]
+		);
+	}
 }
 

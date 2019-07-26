@@ -22,6 +22,15 @@ export function select( storeName, selectorName, ...args ) {
 	};
 }
 
+export function dispatch( storeName, selectorName, ...args ) {
+	return {
+		type: 'DISPATCH',
+		storeName,
+		selectorName,
+		args,
+	};
+}
+
 /**
  * Trigger an API Fetch request.
  *
@@ -38,6 +47,9 @@ export function apiFetch( request ) {
 const controls = {
 	SELECT: createRegistryControl( ( registry ) => ( { storeName, selectorName, args } ) => {
 		return registry.select( storeName )[ selectorName ]( ...args );
+	} ),
+	DISPATCH: createRegistryControl( ( registry ) => ( { storeName, selectorName, args } ) => {
+		return registry.dispatch( storeName )[ selectorName ]( ...args );
 	} ),
 	API_FETCH( { request } ) {
 		return wpApiFetch( { ... request } );

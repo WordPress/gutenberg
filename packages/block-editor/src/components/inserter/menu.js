@@ -179,7 +179,7 @@ export class InserterMenu extends Component {
 		this.onHover = this.onHover.bind( this );
 		this.panels = {};
 		this.inserterResults = createRef();
-		this.debouncedSetState = debounce( this.setState, 250 );
+		this.debouncedSetState = debounce( this.setState, 400 );
 	}
 
 	componentDidMount() {
