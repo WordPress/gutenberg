@@ -18,6 +18,7 @@
 		] },
 		{"docs/designers-developers/developers/slotfills/README.md": [
 			{ "docs/designers-developers/developers/slotfills/plugin-block-settings-menu-item.md": []  },
+			{ "docs/designers-developers/developers/slotfills/plugin-document-setting-panel.md": []  },
 			{ "docs/designers-developers/developers/slotfills/plugin-more-menu-item.md": []  },
 			{ "docs/designers-developers/developers/slotfills/plugin-post-publish-panel.md": []  },
 			{ "docs/designers-developers/developers/slotfills/plugin-post-status-info.md": []  },
