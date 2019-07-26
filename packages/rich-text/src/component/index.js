@@ -181,6 +181,7 @@ class RichText extends Component {
 			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
 			__unstableDomOnly: domOnly,
+			placeholder: this.props.placeholder,
 		} );
 	}
 
@@ -808,6 +809,7 @@ class RichText extends Component {
 			value,
 			multilineTag: this.multilineTag,
 			prepareEditableTree: createPrepareEditableTree( this.props, 'format_prepare_functions' ),
+			placeholder: this.props.placeholder,
 		} ).body.innerHTML;
 	}
 
@@ -857,7 +859,6 @@ class RichText extends Component {
 			wrapperClassName,
 			className,
 			placeholder,
-			keepPlaceholderOnFocus = false,
 			__unstableIsSelected: isSelected,
 			children,
 			// To do: move autocompletion logic to rich-text.
@@ -872,10 +873,8 @@ class RichText extends Component {
 		// changes, we replace the relevant element. This is needed because we
 		// prevent Editable component updates.
 		const key = Tagname;
-		const MultilineTag = this.multilineTag;
 		const ariaProps = pickAriaProps( this.props );
 		const record = this.getRecord();
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && isEmpty( record );
 
 		const autoCompleteContent = ( { listBoxId, activeId } ) => (
 			<>
@@ -884,7 +883,6 @@ class RichText extends Component {
 					style={ style }
 					record={ record }
 					valueToEditableHTML={ this.valueToEditableHTML }
-					isPlaceholderVisible={ isPlaceholderVisible }
 					aria-label={ placeholder }
 					aria-autocomplete={ listBoxId ? 'list' : undefined }
 					aria-owns={ listBoxId }
@@ -902,14 +900,6 @@ class RichText extends Component {
 					onTouchStart={ this.onPointerDown }
 					setRef={ this.setRef }
 				/>
-				{ isPlaceholderVisible &&
-					<Tagname
-						className={ classnames( 'rich-text', className ) }
-						style={ style }
-					>
-						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
-					</Tagname>
-				}
 				{ isSelected && <FormatEdit
 					allowedFormats={ allowedFormats }
 					withoutInteractiveFormatting={ withoutInteractiveFormatting }

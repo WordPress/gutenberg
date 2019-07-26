@@ -35,11 +35,6 @@ ul.wp-block-gallery {
 		overflow-y: auto;
 	}
 
-	.block-editor-rich-text figcaption:not([data-is-placeholder-visible="true"]) {
-		position: relative;
-		overflow: hidden;
-	}
-
 	.is-selected .block-editor-rich-text {
 		// IE calculates this incorrectly, so leave it to modern browsers.
 		@supports (position: sticky) {

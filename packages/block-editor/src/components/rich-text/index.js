@@ -293,7 +293,6 @@ class RichTextWrapper extends Component {
 			isSelected: originalIsSelected,
 			onCreateUndoLevel,
 			placeholder,
-			keepPlaceholderOnFocus,
 			// eslint-disable-next-line no-unused-vars
 			allowedFormats,
 			withoutInteractiveFormatting,
@@ -340,7 +339,6 @@ class RichTextWrapper extends Component {
 				wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
 				className={ classnames( classes, className ) }
 				placeholder={ placeholder }
-				keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
 				allowedFormats={ adjustedAllowedFormats }
 				withoutInteractiveFormatting={ withoutInteractiveFormatting }
 				onEnter={ this.onEnter }

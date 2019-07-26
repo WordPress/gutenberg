@@ -333,11 +333,12 @@ function createFromElement( {
 			continue;
 		}
 
-		if (
-			isEditableTree &&
-			type === 'br' &&
-			! node.getAttribute( 'data-rich-text-line-break' )
-		) {
+		if ( isEditableTree && (
+			// Ignore any placeholders.
+			node.getAttribute( 'data-rich-text-placeholder' ) ||
+			// Ignore any line breaks that are not inserted by us.
+			( type === 'br' && ! node.getAttribute( 'data-rich-text-line-break' ) )
+		) ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
 		}
