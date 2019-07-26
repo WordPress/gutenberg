@@ -381,17 +381,6 @@ export function isInTheFuture( dateValue ) {
 }
 
 /**
- * Get the moment object from date.
- *
- * @param {string} dateValue Date String or Date object in the Defined WP Timezone.
- *
- * @return {Moment} The Moment object.
- */
-export function getMoment( dateValue ) {
-	return momentLib.tz( dateValue, WP_ZONE );
-}
-
-/**
  * Create and return a JavaScript Date Object from a date string in the WP timezone.
  *
  * @param {string?} dateString Date formatted in the WP timezone.
