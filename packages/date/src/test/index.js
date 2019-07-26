@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isInTheFuture, getDate, getMomemt, setSettings, __experimentalGetSettings } from '../';
+import { isInTheFuture, getDate, getMoment, setSettings, __experimentalGetSettings } from '../';
 
 describe( 'isInTheFuture', () => {
 	it( 'should return true if the date is in the future', () => {
@@ -59,21 +59,21 @@ describe( 'Moment.js Localization', () => {
 		// Test the unchanged locale strings.
 		// Create a Date object 8 days in the past.
 		date = new Date( Number( getDate() ) - ( 1000 * 60 * 60 * 24 * 8 ) );
-		expect( getMomemt( date ).fromNow() ).toBe( '8 days ago' );
+		expect( getMoment( date ).fromNow() ).toBe( '8 days ago' );
 		// Test withoutSuffix
-		expect( getMomemt( date ).fromNow( true ) ).toBe( '8 days' );
+		expect( getMoment( date ).fromNow( true ) ).toBe( '8 days' );
 
 		// Create a Date object 5 minutes in the past.
 		let date = new Date( Number( getDate() ) - ( 1000 * 60 * 5 ) );
-		expect( getMomemt( date ).fromNow() ).toBe( '5 localized minutes ago' );
+		expect( getMoment( date ).fromNow() ).toBe( '5 localized minutes ago' );
 		// Test withoutSuffix
-		expect( getMomemt( date ).fromNow( true ) ).toBe( '5 localized minutes' );
+		expect( getMoment( date ).fromNow( true ) ).toBe( '5 localized minutes' );
 
 		// Create a Date object 10 hours in the future.
 		date = new Date( Number( getDate() ) + ( 1000 * 60 * 60 * 10 ) );
-		expect( getMomemt( date ).fromNow() ).toBe( '10 localized hours from now' );
+		expect( getMoment( date ).fromNow() ).toBe( '10 localized hours from now' );
 		// Test withoutSuffix
-		expect( getMomemt( date ).fromNow( true ) ).toBe( '10 localized hours' );
+		expect( getMoment( date ).fromNow( true ) ).toBe( '10 localized hours' );
 
 		// Restore default settings
 		setSettings( settings );

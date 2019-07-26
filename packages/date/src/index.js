@@ -387,7 +387,7 @@ export function isInTheFuture( dateValue ) {
  *
  * @return {Moment} The Moment object.
  */
-export function getMomemt( dateValue ) {
+export function getMoment( dateValue ) {
 	return momentLib.tz( dateValue, WP_ZONE );
 }
 
