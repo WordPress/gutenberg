@@ -15,7 +15,7 @@ import createCoreDataStore from './store';
 /**
  * An isolated orchestrator of store registrations.
  *
- * @typedef {WPDataRegistry}
+ * @typedef {Object} WPDataRegistry
  *
  * @property {Function} registerGenericStore Given a namespace key and settings
  *                                           object, registers a new generic
