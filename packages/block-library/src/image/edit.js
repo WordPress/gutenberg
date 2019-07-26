@@ -497,7 +497,7 @@ export class ImageEdit extends Component {
 	}
 
 	updateExpansion( nextExpand ) {
-		this.props.setAttributes( { expand: nextExpand } );
+		this.props.setAttributes( { width: undefined, height: undefined, expand: nextExpand } );
 	}
 
 	updateImage( sizeSlug ) {
@@ -706,7 +706,7 @@ export class ImageEdit extends Component {
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 		} );
 
-		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
+		const isResizable = ( [ 'wide', 'full' ].indexOf( align ) === -1 && 'screen' !== expand ) && isLargeViewport;
 
 		const imageSizeOptions = this.getImageSizeOptions();
 
@@ -816,11 +816,14 @@ export class ImageEdit extends Component {
 								defaultedAlt = __( 'This image has an empty alt attribute' );
 							}
 
-							const img = (
+							const imgContainer = (
 								// Disable reason: Image itself is not meant to be interactive, but
 								// should direct focus to block.
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-								<>
+								<div
+									className="wp-block-image__image-wrapper"
+									style={ { backgroundImage: `url(${ url })` } }
+								>
 									<img
 										src={ url }
 										alt={ defaultedAlt }
@@ -829,7 +832,7 @@ export class ImageEdit extends Component {
 										onError={ () => this.onImageError( url ) }
 									/>
 									{ isBlobURL( url ) && <Spinner /> }
-								</>
+								</div>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 							);
 
@@ -838,7 +841,7 @@ export class ImageEdit extends Component {
 									<>
 										{ getInspectorControls( imageWidth, imageHeight ) }
 										<div style={ { width, height } }>
-											{ img }
+											{ imgContainer }
 										</div>
 									</>
 								);
@@ -914,11 +917,11 @@ export class ImageEdit extends Component {
 											setAttributes( {
 												width: parseInt( currentWidth + delta.width, 10 ),
 												height: parseInt( currentHeight + delta.height, 10 ),
-												expand: false,
+												// expand: false,
 											} );
 										} }
 									>
-										{ img }
+										{ imgContainer }
 									</ResizableBox>
 								</>
 							);

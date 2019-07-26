@@ -1,12 +1,24 @@
 .wp-block-image {
 	position: relative;
 
-	&.is-transient img {
+	&.is-transient .wp-block-image__image-wrapper {
 		opacity: 0.3;
 	}
 
 	figcaption img {
 		display: inline;
+	}
+
+	.wp-block-image__image-wrapper {
+		-webkit-background-size: cover;
+		background-size: cover;
+		background-repeat: no-repeat;
+		background-position: 50% 50%;
+		img {
+			opacity: 0;
+			margin: 0;
+			padding: 0;
+		}
 	}
 
 	// Shown while image is being uploaded
@@ -115,22 +127,28 @@
 
 // Joint behavior between align and expand.
 [data-type="core/image"][data-expand="screen"] {
-	&:not([data-align="wide"]):not([data-align="full"]) {
-		figure {
-			img {
-				height: 100vh;
-				width: auto;
-			}
-		}
+	.wp-block-image__image-wrapper,
+	.wp-block-image__image-wrapper img {
+		height: 100vh;
+		display: inline-block;
 	}
 
-	&[data-align="wide"],
-	&[data-align="full"] {
-		figure {
-			height: 100vh;
-			overflow: hidden;
-		}
-	}
+	//&:not([data-align="wide"]):not([data-align="full"]) {
+	//	figure {
+	//		img {
+	//			height: 100vh;
+	//			width: auto;
+	//		}
+	//	}
+	//}
+	//
+	//&[data-align="wide"],
+	//&[data-align="full"] {
+	//	figure {
+	//		height: 100vh;
+	//		overflow: hidden;
+	//	}
+	//}
 }
 
 // This is similar to above but for resized unfloated images only, where the markup is different.
