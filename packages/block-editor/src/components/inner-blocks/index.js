@@ -35,18 +35,46 @@ class InnerBlocks extends Component {
 		this.updateNestedSettings();
 	}
 
+	/**
+	 * Returns the template lock as a Set.
+	 *
+	 * @return {Set} The template lock.
+	 */
 	getTemplateLock() {
 		const {
 			templateLock,
 			parentLock,
 		} = this.props;
-		return templateLock === undefined ? parentLock : templateLock;
+
+		const lock = templateLock === undefined ? parentLock : templateLock;
+
+		if ( lock === 'all' ) {
+			return new Set( [ 'insert', 'move', 'remove' ] );
+		}
+
+		if ( lock === 'insert' ) {
+			return new Set( [ 'insert', 'remove' ] );
+		}
+
+		if ( Array.isArray( lock ) ) {
+			return new Set( lock );
+		}
+
+		return new Set;
 	}
 
 	componentDidMount() {
 		const { innerBlocks } = this.props.block;
+		const templateLock = this.getTemplateLock();
 		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
-		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+		if (
+			innerBlocks.length === 0 ||
+			(
+				templateLock.has( 'move' ) &&
+				templateLock.has( 'remove' ) &&
+				templateLock.has( 'insert' )
+			)
+		) {
 			this.synchronizeBlocksWithTemplate();
 		}
 
@@ -60,10 +88,18 @@ class InnerBlocks extends Component {
 	componentDidUpdate( prevProps ) {
 		const { template, block } = this.props;
 		const { innerBlocks } = block;
+		const templateLock = this.getTemplateLock();
 
 		this.updateNestedSettings();
 		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
-		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+		if (
+			innerBlocks.length === 0 ||
+			(
+				templateLock.has( 'move' ) &&
+				templateLock.has( 'remove' ) &&
+				templateLock.has( 'insert' )
+			)
+		) {
 			const hasTemplateChanged = ! isEqual( template, prevProps.template );
 			if ( hasTemplateChanged ) {
 				this.synchronizeBlocksWithTemplate();
@@ -96,7 +132,7 @@ class InnerBlocks extends Component {
 
 		const newSettings = {
 			allowedBlocks,
-			templateLock: this.getTemplateLock(),
+			templateLock: [ ...this.getTemplateLock() ],
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {

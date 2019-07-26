@@ -566,7 +566,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Block Template Lock
+-   `Set`: Block Template Lock
 
 <a name="hasInserterItems" href="#hasInserterItems">#</a> **hasInserterItems**
 

@@ -57,7 +57,11 @@ export function validateBlocksToTemplate( action, store ) {
 	// as default values only.
 	const isBlocksValidToTemplate = (
 		! template ||
-		templateLock !== 'all' ||
+		! (
+			templateLock.has( 'move' ) &&
+			templateLock.has( 'remove' ) &&
+			templateLock.has( 'insert' )
+		) ||
 		doBlocksMatchTemplate( action.blocks, template )
 	);
 

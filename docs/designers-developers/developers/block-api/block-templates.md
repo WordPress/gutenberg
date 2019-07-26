@@ -105,10 +105,17 @@ function myplugin_register_template() {
 add_action( 'init', 'myplugin_register_template' );
 ```
 
-*Options:*
+*Array options:*
 
-- `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
-- `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
+- `'insert'` — prevents new blocks from being inserted.
+- `'move'` — prevents blocks form being moved.
+- `'remove'` — prevents blocks from being removed.
+- `'attributes'` - prevents block attributes from being edited.
+
+*String options:*
+
+- `'all'` = `[ 'insert', 'move', 'remove' ]`.
+- `'insert'` = `[ 'insert', 'remove' ]`.
 
 ## Nested Templates
 

@@ -16,7 +16,6 @@ import classnames from 'classnames';
 import {
 	Button,
 	FormFileUpload,
-	Placeholder,
 	DropZone,
 	IconButton,
 	withFilters,
@@ -32,6 +31,7 @@ import { withSelect } from '@wordpress/data';
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
+import Placeholder from '../placeholder';
 
 const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 	<URLPopover onClose={ onClose }>

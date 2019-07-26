@@ -84,7 +84,7 @@ export default compose(
 		return {
 			isVisible: isEmpty || ! isLastBlockDefault || ! isLastBlockValid,
 			showPrompt: isEmpty,
-			isLocked: !! getTemplateLock( ownProps.rootClientId ),
+			isLocked: getTemplateLock( ownProps.rootClientId ).has( 'insert' ),
 			placeholder: bodyPlaceholder,
 		};
 	} ),

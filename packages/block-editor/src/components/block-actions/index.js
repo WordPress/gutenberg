@@ -17,7 +17,7 @@ function BlockActions( {
 	onInsertAfter,
 	onGroup,
 	onUngroup,
-	isLocked,
+	templateLock,
 	canDuplicate,
 	children,
 } ) {
@@ -28,7 +28,7 @@ function BlockActions( {
 		onInsertBefore,
 		onGroup,
 		onUngroup,
-		isLocked,
+		templateLock,
 		canDuplicate,
 	} );
 }
@@ -48,7 +48,7 @@ export default compose( [
 		const rootClientId = getBlockRootClientId( props.clientIds[ 0 ] );
 
 		return {
-			isLocked: !! getTemplateLock( rootClientId ),
+			templateLock: getTemplateLock( rootClientId ),
 			blocks,
 			canDuplicate,
 			rootClientId,

@@ -314,7 +314,7 @@ export function* moveBlockToPosition( clientId, fromRootClientId = '', toRootCli
 
 	// If locking is equal to all on the original clientId (fromRootClientId),
 	// it is not possible to move the block to any other position.
-	if ( templateLock === 'all' ) {
+	if ( templateLock.has( 'move' ) ) {
 		return;
 	}
 
@@ -704,4 +704,3 @@ export function __unstableSaveReusableBlock( id, updatedId ) {
 export function __unstableMarkLastChangeAsPersistent() {
 	return { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' };
 }
-

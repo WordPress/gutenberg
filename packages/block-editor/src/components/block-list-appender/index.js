@@ -71,7 +71,7 @@ export default withSelect( ( select, { rootClientId } ) => {
 	} = select( 'core/block-editor' );
 
 	return {
-		isLocked: !! getTemplateLock( rootClientId ),
+		isLocked: getTemplateLock( rootClientId ).has( 'insert' ),
 		blockClientIds: getBlockOrder( rootClientId ),
 		canInsertDefaultBlock: canInsertBlockType( getDefaultBlockName(), rootClientId ),
 	};

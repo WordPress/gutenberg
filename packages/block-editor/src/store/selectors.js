@@ -989,19 +989,34 @@ export function getTemplate( state ) {
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional block root client ID.
  *
- * @return {?string} Block Template Lock
+ * @return {Set} Block Template Lock
  */
 export function getTemplateLock( state, rootClientId ) {
-	if ( ! rootClientId ) {
-		return state.settings.templateLock;
+	let templateLock;
+
+	if ( rootClientId ) {
+		const blockListSettings = getBlockListSettings( state, rootClientId );
+
+		if ( blockListSettings ) {
+			templateLock = blockListSettings.templateLock;
+		}
+	} else {
+		templateLock = state.settings.templateLock;
 	}
 
-	const blockListSettings = getBlockListSettings( state, rootClientId );
-	if ( ! blockListSettings ) {
-		return null;
+	if ( templateLock === 'all' ) {
+		return new Set( [ 'insert', 'move', 'remove' ] );
 	}
 
-	return blockListSettings.templateLock;
+	if ( templateLock === 'insert' ) {
+		return new Set( [ 'insert', 'remove' ] );
+	}
+
+	if ( Array.isArray( templateLock ) ) {
+		return new Set( templateLock );
+	}
+
+	return new Set;
 }
 
 /**
@@ -1038,7 +1053,7 @@ const canInsertBlockTypeUnmemoized = ( state, blockName, rootClientId = null ) =
 		return false;
 	}
 
-	const isLocked = !! getTemplateLock( state, rootClientId );
+	const isLocked = getTemplateLock( state, rootClientId ).has( 'insert' );
 	if ( isLocked ) {
 		return false;
 	}

@@ -53,7 +53,7 @@ export default compose(
 
 		return {
 			isVisible: isEmpty,
-			isLocked: !! getTemplateLock( ownProps.rootClientId ),
+			isLocked: getTemplateLock( ownProps.rootClientId ).has( 'insert' ),
 			placeholder: bodyPlaceholder,
 		};
 	} ),
