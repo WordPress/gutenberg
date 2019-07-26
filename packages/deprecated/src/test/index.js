@@ -18,8 +18,8 @@ describe( 'deprecated', () => {
 	it( 'should show a deprecation warning', () => {
 		deprecated( 'Eating meat' );
 
-		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed.'
+		expect( console ).toHaveInformedWith(
+			'Eating meat is deprecated.'
 		);
 	} );
 
@@ -81,15 +81,15 @@ describe( 'deprecated', () => {
 		deprecated( 'Eating meat' );
 		deprecated( 'Eating meat' );
 
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveInformed();
 		// eslint-disable-next-line no-console
-		expect( console.warn ).toHaveBeenCalledTimes( 1 );
+		expect( console.info ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should do an action', () => {
 		deprecated( 'turkey', { alternative: 'tofurky' } );
 
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveInformed();
 		expect( didAction( 'deprecated' ) ).toBeTruthy();
 	} );
 } );
