@@ -350,7 +350,7 @@ class RichTextWrapper extends Component {
 			) );
 		}
 
-		return (
+		const content = (
 			<RichText
 				{ ...experimentalProps }
 				value={ adjustedValue }
@@ -359,7 +359,6 @@ class RichTextWrapper extends Component {
 				selectionEnd={ selectionEnd }
 				onSelectionChange={ onSelectionChange }
 				tagName={ tagName }
-				wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
 				className={ classnames( classes, className, { 'is-selected': originalIsSelected } ) }
 				placeholder={ placeholder }
 				allowedFormats={ adjustedAllowedFormats }
@@ -404,6 +403,12 @@ class RichTextWrapper extends Component {
 					</>
 				}
 			</RichText>
+		);
+
+		return (
+			<div className={ classnames( wrapperClasses, wrapperClassName ) }>
+				{ content }
+			</div>
 		);
 	}
 }

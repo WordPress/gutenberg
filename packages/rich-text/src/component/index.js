@@ -23,7 +23,6 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import FormatEdit from './format-edit';
 import Editable from './editable';
 import { pickAriaProps } from './aria';
-import { isEmpty } from '../is-empty';
 import { create } from '../create';
 import { apply, toDom } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
@@ -890,12 +889,10 @@ class RichText extends Component {
 		const {
 			tagName: Tagname = 'div',
 			style,
-			wrapperClassName,
 			className,
 			placeholder,
 			__unstableIsSelected: isSelected,
 			children,
-			__unstableMultilineTag: multilineTag,
 			// To do: move autocompletion logic to rich-text.
 			__unstableAutocompleters: autocompleters,
 			__unstableAutocomplete: Autocomplete = ( { children: ch } ) => ch( {} ),
@@ -912,43 +909,35 @@ class RichText extends Component {
 		const record = this.record;
 
 		const autoCompleteContent = ( { listBoxId, activeId } ) => (
-			<>
-				<Editable
-					tagName={ Tagname }
-					style={ style }
-					record={ record }
-					valueToEditableHTML={ this.valueToEditableHTML }
-					aria-label={ placeholder }
-					aria-autocomplete={ listBoxId ? 'list' : undefined }
-					aria-owns={ listBoxId }
-					aria-activedescendant={ activeId }
-					{ ...ariaProps }
-					className={ classnames( 'rich-text', className ) }
-					key={ key }
-					onPaste={ this.onPaste }
-					onInput={ this.onInput }
-					onCompositionEnd={ this.onCompositionEnd }
-					onKeyDown={ this.onKeyDown }
-					onFocus={ this.onFocus }
-					onBlur={ this.onBlur }
-					onMouseDown={ this.onPointerDown }
-					onTouchStart={ this.onPointerDown }
-					setRef={ this.setRef }
-					// Selection updates must be done at these events as they
-					// happen before the `selectionchange` event. In some cases,
-					// the `selectionchange` event may not even fire, for
-					// example when the window receives focus again on click.
-					onKeyUp={ this.onSelectionChange }
-					onMouseUp={ this.onSelectionChange }
-					onTouchEnd={ this.onSelectionChange }
-				/>
-				{ isSelected && <FormatEdit
-					allowedFormats={ allowedFormats }
-					withoutInteractiveFormatting={ withoutInteractiveFormatting }
-					value={ record }
-					onChange={ this.onChange }
-				/> }
-			</>
+			<Editable
+				tagName={ Tagname }
+				style={ style }
+				record={ record }
+				valueToEditableHTML={ this.valueToEditableHTML }
+				aria-label={ placeholder }
+				aria-autocomplete={ listBoxId ? 'list' : undefined }
+				aria-owns={ listBoxId }
+				aria-activedescendant={ activeId }
+				{ ...ariaProps }
+				className={ classnames( 'rich-text', className ) }
+				key={ key }
+				onPaste={ this.onPaste }
+				onInput={ this.onInput }
+				onCompositionEnd={ this.onCompositionEnd }
+				onKeyDown={ this.onKeyDown }
+				onFocus={ this.onFocus }
+				onBlur={ this.onBlur }
+				onMouseDown={ this.onPointerDown }
+				onTouchStart={ this.onPointerDown }
+				setRef={ this.setRef }
+				// Selection updates must be done at these events as they
+				// happen before the `selectionchange` event. In some cases,
+				// the `selectionchange` event may not even fire, for
+				// example when the window receives focus again on click.
+				onKeyUp={ this.onSelectionChange }
+				onMouseUp={ this.onSelectionChange }
+				onTouchEnd={ this.onSelectionChange }
+			/>
 		);
 
 		const content = (
@@ -962,19 +951,21 @@ class RichText extends Component {
 			</Autocomplete>
 		);
 
-		if ( ! children ) {
-			return content;
-		}
-
 		return (
-			<div className={ wrapperClassName }>
-				{ children( {
+			<>
+				{ children && children( {
 					isSelected,
 					value: record,
 					onChange: this.onChange,
 				} ) }
+				{ isSelected && <FormatEdit
+					allowedFormats={ allowedFormats }
+					withoutInteractiveFormatting={ withoutInteractiveFormatting }
+					value={ record }
+					onChange={ this.onChange }
+				/> }
 				{ content }
-			</div>
+			</>
 		);
 	}
 }
