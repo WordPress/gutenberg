@@ -84,6 +84,7 @@ export function toTree( {
 	onStartIndex,
 	onEndIndex,
 	isEditableTree,
+	placeholder,
 } ) {
 	const { formats, replacements, text, start, end } = value;
 	const formatsLength = formats.length + 1;
@@ -248,6 +249,15 @@ export function toTree( {
 
 		if ( shouldInsertPadding && i === text.length ) {
 			append( getParent( pointer ), ZWNBSP );
+
+			if ( placeholder && text.length === 0 ) {
+				append( getParent( pointer ), {
+					type: 'span',
+					attributes: {
+						'data-rich-text-placeholder': placeholder,
+					},
+				} );
+			}
 		}
 
 		lastCharacterFormats = characterFormats;

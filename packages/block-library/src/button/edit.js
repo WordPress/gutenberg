@@ -127,7 +127,6 @@ class ButtonEdit extends Component {
 						backgroundColor: backgroundColor.color,
 						color: textColor.color,
 					} }
-					keepPlaceholderOnFocus
 				/>
 				<BaseControl
 					label={ __( 'Link' ) }

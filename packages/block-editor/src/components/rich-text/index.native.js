@@ -49,7 +49,6 @@ function RichTextWraper( {
 	isSelected: originalIsSelected,
 	onCreateUndoLevel,
 	placeholder,
-	keepPlaceholderOnFocus,
 	// From experimental filter.
 	...experimentalProps
 } ) {
@@ -68,7 +67,6 @@ function RichTextWraper( {
 			wrapperClassName={ classnames( wrapperClasses, wrapperClassName ) }
 			className={ classnames( classes, className ) }
 			placeholder={ placeholder }
-			keepPlaceholderOnFocus={ keepPlaceholderOnFocus }
 			__unstableIsSelected={ originalIsSelected }
 			//__unstablePatterns={ getPatterns() }
 			//__unstableEnterPatterns={ getEnterPatterns() }

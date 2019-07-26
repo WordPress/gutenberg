@@ -212,7 +212,6 @@ class FileEdit extends Component {
 							tagName="div" // must be block-level or else cursor disappears
 							value={ fileName }
 							placeholder={ __( 'Write file name…' ) }
-							keepPlaceholderOnFocus
 							withoutInteractiveFormatting
 							onChange={ ( text ) => setAttributes( { fileName: text } ) }
 						/>
@@ -225,7 +224,6 @@ class FileEdit extends Component {
 									value={ downloadButtonText }
 									withoutInteractiveFormatting
 									placeholder={ __( 'Add text…' ) }
-									keepPlaceholderOnFocus
 									onChange={ ( text ) => setAttributes( { downloadButtonText: text } ) }
 								/>
 							</div>
