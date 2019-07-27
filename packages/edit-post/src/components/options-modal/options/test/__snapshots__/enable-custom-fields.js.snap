@@ -27,7 +27,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   <p
     className="edit-post-options-modal__custom-fields-confirmation-message"
   >
-    Page reload is required for this change.
+    A page reload is required for this change. Make sure your content is saved before reloading.
   </p>
   <button
     className="components-button edit-post-options-modal__custom-fields-confirmation-button is-button is-default"
@@ -35,7 +35,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
     onClick={[Function]}
     type="button"
   >
-    Save & Reload
+    Enable & Reload
   </button>
 </div>
 `;
@@ -94,7 +94,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   <p
     className="edit-post-options-modal__custom-fields-confirmation-message"
   >
-    Page reload is required for this change.
+    A page reload is required for this change. Make sure your content is saved before reloading.
   </p>
   <button
     className="components-button edit-post-options-modal__custom-fields-confirmation-button is-button is-default"
@@ -102,7 +102,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
     onClick={[Function]}
     type="button"
   >
-    Save & Reload
+    Disable & Reload
   </button>
 </div>
 `;
