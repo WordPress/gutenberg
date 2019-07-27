@@ -34,5 +34,8 @@
 		@include break-medium() {
 			margin-left: 38px;
 		}
+		@include break-small() {
+			max-width: 300px;
+		}
 	}
 }
