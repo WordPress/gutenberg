@@ -17,7 +17,7 @@
 
 		&::before {
 			content: "\00b7 \00b7 \00b7";
-			color: $dark-gray-900;
+			color: currentColor;
 			font-size: 20px;
 			letter-spacing: 2em;
 			padding-left: 2em;
