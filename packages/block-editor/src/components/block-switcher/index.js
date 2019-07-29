@@ -26,7 +26,7 @@ export class BlockSwitcher extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
-			hoveredClassName: 'is-style-large',
+			hoveredClassName: null,
 		};
 		this.onHoverClassName = this.onHoverClassName.bind( this );
 	}
