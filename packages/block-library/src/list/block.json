@@ -6,6 +6,9 @@
 			"type": "boolean",
 			"default": false
 		},
+		"textAlign": {
+			"type": "string"
+		},
 		"values": {
 			"type": "string",
 			"source": "html",

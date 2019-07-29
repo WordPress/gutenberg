@@ -1,10 +1,14 @@
 ## Master (unreleased)
 
+### New Features
+
+- Added text align support to List block which can be styled with `has-text-align-*` class names.
+
 ### Enhancements
 
 - Heading block uses `has-text-align-*` class names rather than inline style for text alignment.
 - Verse block uses `has-text-align-*` class names rather than inline style for text alignment.
-
+ 
 ### Bug Fixes
 
 - Fixed insertion of columns in the table block, which now inserts columns for all table sections ([#16410](https://github.com/WordPress/gutenberg/pull/16410))
