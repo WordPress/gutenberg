@@ -67,12 +67,12 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( $request ) {
-		if ( ! ( current_user_can( 'install_plugins' ) && current_user_can( 'activate_plugins' ) ) ) {
-			return new WP_Error(
-				'rest_user_cannot_view',
-				__( 'Sorry, you are not allowed to install blocks.', 'gutenberg' )
-			);
-		}
+		// if ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) {
+		// 	return new WP_Error(
+		// 		'rest_user_cannot_view',
+		// 		__( 'Sorry, you are not allowed to install blocks.', 'gutenberg' )
+		// 	);
+		// }
 
 		return true;
 	}
@@ -86,61 +86,62 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function install_block( $request ) {
-		
+
 		include_once( ABSPATH . 'wp-admin/includes/file.php' );
 		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
 		include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
 
-
 		$api = plugins_api(
 			'plugin_information',
 			array(
-				'slug'   => sanitize_key( wp_unslash( $request->get_param( 'slug' ) ) ),
+				'slug'   => $request->get_param( 'slug' ),
 				'fields' => array(
 					'sections' => false,
 				),
 			)
 		);
+
 		if ( is_wp_error( $api ) ) {
-			$status['errorMessage'] = $api->get_error_message();
-			wp_send_json_error( $status );
+			return WP_Error( $api->get_error_code(), $api->get_error_message() );
 		}
 		$status['pluginName'] = $api->name;
+
 		$skin     = new WP_Ajax_Upgrader_Skin();
+
 		$upgrader = new Plugin_Upgrader( $skin );
+
+		//TODO: Handle if FS_METHOD is not direct. file.php is trying to display FTP credentials modal dialog as part of the request, causing malformed JSON.
 		$result   = $upgrader->install( $api->download_link );
 	
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			$status['debug'] = $skin->get_upgrade_messages();
 		}
+
 		if ( is_wp_error( $result ) ) {
-			$status['errorCode']    = $result->get_error_code();
-			$status['errorMessage'] = $result->get_error_message();
-			wp_send_json_error( $status );
-		} elseif ( is_wp_error( $skin->result ) ) {
-			$status['errorCode']    = $skin->result->get_error_code();
-			$status['errorMessage'] = $skin->result->get_error_message();
-			wp_send_json_error( $status );
-		} elseif ( $skin->get_errors()->has_errors() ) {
-			$status['errorMessage'] = $skin->get_error_messages();
-			wp_send_json_error( $status );
-		} elseif ( is_null( $result ) ) {
+			return WP_Error( $result->get_error_code(), $result->get_error_message() );
+		} 
+		if ( is_wp_error( $skin->result ) ) {
+			return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_message() );
+		}
+		if ( $skin->get_errors()->has_errors() ) {
+			return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_messages() );
+		}
+
+		if ( is_null( $result ) ) {
 			global $wp_filesystem;
-			$status['errorCode']    = 'unable_to_connect_to_filesystem';
-			$status['errorMessage'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.' );
 			// Pass through the error from WP_Filesystem if one was raised.
 			if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->has_errors() ) {
-				$status['errorMessage'] = esc_html( $wp_filesystem->errors->get_error_message() );
+				return WP_Error( 'unable_to_connect_to_filesystem', esc_html( $wp_filesystem->errors->get_error_message() ) );
 			}
-			wp_send_json_error( $status );
+			return WP_Error( 'unable_to_connect_to_filesystem', __( 'Unable to connect to the filesystem. Please confirm your credentials.' ) );
 		}
 
 		$install_status = install_plugin_install_status( $api );
 
 		activate_plugin( $install_status['file'] );
-		
-		wp_send_json_success( $status );
+
+		return rest_ensure_response( $status );
 	}
 
 	/**
@@ -153,11 +154,11 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 
-		if ( ! isset($_REQUEST[ 'search' ] ) ) {
+		$search_string = $request->get_param( 'search' );
+
+		if ( empty( $search_string ) ){
 			return rest_ensure_response( array() );
 		}
-
-		$search_string = preg_quote( $_REQUEST[ 'search' ] );
 
 		include( ABSPATH . WPINC . '/version.php' );
 
