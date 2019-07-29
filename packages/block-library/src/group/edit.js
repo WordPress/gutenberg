@@ -14,7 +14,12 @@ import {
 	InnerBlocks,
 	PanelColorSettings,
 	withColors,
+	DimensionControl,
 } from '@wordpress/block-editor';
+
+import {
+	PanelBody,
+} from '@wordpress/components';
 
 function GroupEdit( {
 	className,
@@ -43,6 +48,13 @@ function GroupEdit( {
 						},
 					] }
 				/>
+				<PanelBody title={ __( 'Spacing' ) }>
+					<DimensionControl
+						label={ 'Padding' }
+						icon={ 'desktop' }
+						iconLabel={ 'All Devices' }
+					/>
+				</PanelBody>
 			</InspectorControls>
 			<div className={ classes } style={ styles }>
 				<div className="wp-block-group__inner-container">
