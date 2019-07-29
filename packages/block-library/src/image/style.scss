@@ -1,5 +1,7 @@
 .wp-block-image {
-	max-width: 100%;
+	&:not(.alignfull) {
+		max-width: 100%;
+	}
 
 	// The image block is in a `figure` element, and many themes zero this out.
 	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
@@ -7,15 +9,6 @@
 
 	img {
 		max-width: 100%;
-	}
-
-	&.aligncenter {
-		text-align: center;
-	}
-
-	&.alignfull img,
-	&.alignwide img {
-		width: 100%;
 	}
 
 	// This resets the intrinsic margin on the figure in non-floated, wide, and full-wide alignments.
@@ -26,7 +19,7 @@
 	.alignleft,
 	.alignright,
 	.aligncenter,
-	&.is-resized {
+	.is-resized {
 		display: table;
 
 		// The figure is born with left and right margin.
@@ -57,22 +50,39 @@
 	.aligncenter {
 		margin-left: auto;
 		margin-right: auto;
+		text-align: center;
 	}
 
-	&.expandscreen:not(.alignfull):not(.alignwide) img,
-	.expandscreen:not(.alignfull):not(.alignwide) img {
-		height: 100vh;
-		min-height: 100vh;
+	&.alignfull img,
+	&.alignwide img {
+		width: 100%;
 	}
 }
 
-// doing selector stronger to set `max-width`.
-.entry .entry-content .wp-block-image {
-	&.alignfull.expandscreen,
-	&.alignwide.expandscreen {
+.entry .entry-content .wp-block-image .wp-block-image__image-wrapper {
+	-webkit-background-size: cover;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+}
+
+.entry .entry-content .wp-block-image.expandscreen,
+.entry .entry-content .wp-block-image .expandscreen {
+	&.alignnone {
+		display: inline-block;
+	}
+
+	&.aligncenter .wp-block-image__image-wrapper {
+		display: inline-block;
+	}
+
+	&.alignfull .wp-block-image__image-wrapper {
+		width: 100vw;
+	}
+
+	img {
 		height: 100vh;
-		overflow: hidden;
-		max-width: 100vw;
+		opacity: 0;
 	}
 }
 
