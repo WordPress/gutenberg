@@ -12,9 +12,9 @@ exports[`Table allows adding and deleting columns across the table header, body 
 <!-- /wp:table -->"
 `;
 
-exports[`Table allows cells to be aligned 1`] = `
+exports[`Table allows columns to be aligned 1`] = `
 "<!-- wp:table -->
-<figure class=\\"wp-block-table\\"><table class=\\"\\"><tbody><tr><td>None</td><td class=\\"has-text-align-left\\" data-align=\\"left\\">To the left</td></tr><tr><td class=\\"has-text-align-center\\" data-align=\\"center\\">Centered</td><td class=\\"has-text-align-right\\" data-align=\\"right\\">To the right</td></tr></tbody></table></figure>
+<figure class=\\"wp-block-table\\"><table class=\\"\\"><tbody><tr><td>None</td><td class=\\"has-text-align-left\\" data-align=\\"left\\">To the left</td><td class=\\"has-text-align-center\\" data-align=\\"center\\">Centered</td><td class=\\"has-text-align-right\\" data-align=\\"right\\">Right aligned</td></tr><tr><td></td><td class=\\"has-text-align-left\\" data-align=\\"left\\"></td><td class=\\"has-text-align-center\\" data-align=\\"center\\"></td><td class=\\"has-text-align-right\\" data-align=\\"right\\"></td></tr></tbody></table></figure>
 <!-- /wp:table -->"
 `;
 

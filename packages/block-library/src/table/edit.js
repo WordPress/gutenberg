@@ -32,8 +32,7 @@ import {
  */
 import {
 	createTable,
-	updateCellContent,
-	updateCellAttribute,
+	updateSelectedCell,
 	getCellAttribute,
 	insertRow,
 	deleteRow,
@@ -41,6 +40,7 @@ import {
 	deleteColumn,
 	toggleSection,
 	isEmptyTableSection,
+	isCellSelected,
 } from './state';
 import icon from './icon';
 
@@ -108,6 +108,8 @@ export class TableEdit extends Component {
 		this.onDeleteColumn = this.onDeleteColumn.bind( this );
 		this.onToggleHeaderSection = this.onToggleHeaderSection.bind( this );
 		this.onToggleFooterSection = this.onToggleFooterSection.bind( this );
+		this.onChangeColumnAlignment = this.onChangeColumnAlignment.bind( this );
+		this.getCellAlignment = this.getCellAlignment.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
@@ -177,35 +179,47 @@ export class TableEdit extends Component {
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex, columnIndex } = selectedCell;
 
-		setAttributes( updateCellContent( attributes, {
-			section,
-			rowIndex,
-			columnIndex,
-			content,
-		} ) );
+		setAttributes( updateSelectedCell(
+			attributes,
+			selectedCell,
+			( cellAttributes ) => ( { ...cellAttributes, content } ),
+		) );
 	}
 
-	onChangeCellAlignment( value ) {
+	/**
+	 * Align text within the a column.
+	 *
+	 * @param {string} align The new alignment to apply to the column.
+	 */
+	onChangeColumnAlignment( align ) {
 		const { selectedCell } = this.state;
 
 		if ( ! selectedCell ) {
 			return;
 		}
 
-		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex, columnIndex } = selectedCell;
+		// Convert the cell selection to a column selection so that alignment
+		// is applied to the entire column.
+		const columnSelection = {
+			type: 'column',
+			columnIndex: selectedCell.columnIndex,
+		};
 
-		setAttributes( updateCellAttribute( attributes, {
-			section,
-			rowIndex,
-			columnIndex,
-			attributeName: 'align',
-			value,
-		} ) );
+		const { attributes, setAttributes } = this.props;
+		const newAttributes = updateSelectedCell(
+			attributes,
+			columnSelection,
+			( cellAttributes ) => ( { ...cellAttributes, align } ),
+		);
+		setAttributes( newAttributes );
 	}
 
+	/**
+	 * Get the alignment of the currently selected cell.
+	 *
+	 * @return {string} The new alignment to apply to the column.
+	 */
 	getCellAlignment() {
 		const { selectedCell } = this.state;
 
@@ -216,6 +230,22 @@ export class TableEdit extends Component {
 		const { attributes } = this.props;
 
 		return getCellAttribute( attributes, { ...selectedCell, attributeName: 'align' } );
+	}
+
+	/**
+	 * Add or remove a `head` table section.
+	 */
+	onToggleHeaderSection() {
+		const { attributes, setAttributes } = this.props;
+		setAttributes( toggleSection( attributes, 'head' ) );
+	}
+
+	/**
+	 * Add or remove a `foot` table section.
+	 */
+	onToggleFooterSection() {
+		const { attributes, setAttributes } = this.props;
+		setAttributes( toggleSection( attributes, 'foot' ) );
 	}
 
 	/**
@@ -231,11 +261,11 @@ export class TableEdit extends Component {
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex } = selectedCell;
+		const { sectionName, rowIndex } = selectedCell;
 
 		this.setState( { selectedCell: null } );
 		setAttributes( insertRow( attributes, {
-			section,
+			sectionName,
 			rowIndex: rowIndex + delta,
 		} ) );
 	}
@@ -254,16 +284,6 @@ export class TableEdit extends Component {
 		this.onInsertRow( 1 );
 	}
 
-	onToggleHeaderSection() {
-		const { attributes, setAttributes } = this.props;
-		setAttributes( toggleSection( attributes, 'head' ) );
-	}
-
-	onToggleFooterSection() {
-		const { attributes, setAttributes } = this.props;
-		setAttributes( toggleSection( attributes, 'foot' ) );
-	}
-
 	/**
 	 * Deletes the currently selected row.
 	 */
@@ -275,10 +295,10 @@ export class TableEdit extends Component {
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, rowIndex } = selectedCell;
+		const { sectionName, rowIndex } = selectedCell;
 
 		this.setState( { selectedCell: null } );
-		setAttributes( deleteRow( attributes, { section, rowIndex } ) );
+		setAttributes( deleteRow( attributes, { sectionName, rowIndex } ) );
 	}
 
 	/**
@@ -327,23 +347,28 @@ export class TableEdit extends Component {
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, columnIndex } = selectedCell;
+		const { sectionName, columnIndex } = selectedCell;
 
 		this.setState( { selectedCell: null } );
-		setAttributes( deleteColumn( attributes, { section, columnIndex } ) );
+		setAttributes( deleteColumn( attributes, { sectionName, columnIndex } ) );
 	}
 
 	/**
 	 * Creates an onFocus handler for a specified cell.
 	 *
-	 * @param {Object} selectedCell Object with `section`, `rowIndex`, and
+	 * @param {Object} cellLocation Object with `section`, `rowIndex`, and
 	 *                              `columnIndex` properties.
 	 *
 	 * @return {Function} Function to call on focus.
 	 */
-	createOnFocus( selectedCell ) {
+	createOnFocus( cellLocation ) {
 		return () => {
-			this.setState( { selectedCell } );
+			this.setState( {
+				selectedCell: {
+					...cellLocation,
+					type: 'cell',
+				},
+			} );
 		};
 	}
 
@@ -403,12 +428,12 @@ export class TableEdit extends Component {
 	 *
 	 * @return {Object} React element for the section.
 	 */
-	renderSection( { type, rows } ) {
+	renderSection( { name, rows } ) {
 		if ( isEmptyTableSection( rows ) ) {
 			return null;
 		}
 
-		const Tag = `t${ type }`;
+		const Tag = `t${ name }`;
 		const { selectedCell } = this.state;
 
 		return (
@@ -416,19 +441,15 @@ export class TableEdit extends Component {
 				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
 						{ cells.map( ( { content, tag: CellTag, scope, align }, columnIndex ) => {
-							const isSelected = selectedCell && (
-								type === selectedCell.section &&
-								rowIndex === selectedCell.rowIndex &&
-								columnIndex === selectedCell.columnIndex
-							);
-
-							const cell = {
-								section: type,
+							const cellLocation = {
+								sectionName: name,
 								rowIndex,
 								columnIndex,
 							};
 
-							const cellClasses = classnames( {
+							const isSelected = isCellSelected( cellLocation, selectedCell );
+
+							const cellClasses = classnames(	{
 								'is-selected': isSelected,
 								[ `has-text-align-${ align }` ]: align,
 							} );
@@ -443,7 +464,7 @@ export class TableEdit extends Component {
 										className="wp-block-table__cell-content"
 										value={ content }
 										onChange={ this.onChange }
-										unstableOnFocus={ this.createOnFocus( cell ) }
+										unstableOnFocus={ this.createOnFocus( cellLocation ) }
 									/>
 								</CellTag>
 							);
@@ -523,10 +544,11 @@ export class TableEdit extends Component {
 						/>
 					</Toolbar>
 					<AlignmentToolbar
+						label={ __( 'Change column alignment' ) }
 						alignmentControls={ ALIGNMENT_CONTROLS }
 						value={ this.getCellAlignment() }
-						onChange={ ( nextAlign ) => this.onChangeCellAlignment( nextAlign ) }
-						isCollapsed
+						onChange={ ( nextAlign ) => this.onChangeColumnAlignment( nextAlign ) }
+						onHover={ this.onHoverAlignment }
 					/>
 				</BlockControls>
 				<InspectorControls>
@@ -563,9 +585,9 @@ export class TableEdit extends Component {
 				</InspectorControls>
 				<figure className={ className }>
 					<table className={ tableClasses }>
-						<Section type="head" rows={ head } />
-						<Section type="body" rows={ body } />
-						<Section type="foot" rows={ foot } />
+						<Section name="head" rows={ head } />
+						<Section name="body" rows={ body } />
+						<Section name="foot" rows={ foot } />
 					</table>
 				</figure>
 			</>
