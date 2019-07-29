@@ -10,27 +10,32 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function separatorSave( { attributes } ) {
 	const {
-		backgroundColor,
-		customBackgroundColor,
+		color,
+		customColor,
 	} = attributes;
 
-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-	const textClass = getColorClassName( 'color', backgroundColor );
+	// the hr support changing color using border-color, since border-color
+	// is not yet supported in the color palette, we use background-color
+	const backgroundClass = getColorClassName( 'background-color', color );
+	// the dots styles uses text for the dots, to change those dots color is
+	// using color, not backgroundColor
+	const colorClass = getColorClassName( 'color', color );
 
 	const separatorClasses = classnames( {
-		'has-text-color has-background': backgroundColor || customBackgroundColor,
+		'has-text-color has-background': color || customColor,
 		[ backgroundClass ]: backgroundClass,
-		[ textClass ]: textClass,
+		[ colorClass ]: colorClass,
 	} );
 
 	const separatorStyle = {
-		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
-		color: textClass ? undefined : customBackgroundColor,
+		backgroundColor: backgroundClass ? undefined : customColor,
+		color: colorClass ? undefined : customColor,
 	};
-	return <hr
+
+	return ( <hr
 		className={ separatorClasses }
 		style={ separatorStyle }
-	/>;
+	/> );
 }

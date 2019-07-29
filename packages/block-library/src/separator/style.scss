@@ -8,8 +8,9 @@
 
 	// Dots style
 	&.is-style-dots {
-		background: none !important; // Override any background themes often set on the hr tag for this style.
-		// also override the color set on the editor
+		// Override any background themes often set on the hr tag for this style.
+		// also override the color set in the editor since it's intented for normal HR
+		background: none !important;
 		border: none;
 		text-align: center;
 		max-width: none;
