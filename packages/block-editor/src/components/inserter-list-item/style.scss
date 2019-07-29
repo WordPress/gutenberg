@@ -53,7 +53,7 @@
 		&:active,
 		&:focus {
 			position: relative;
-			@include block-style__focus-active();
+			@include block-style__focus();
 
 			.block-editor-block-types-list__item-icon,
 			.block-editor-block-types-list__item-title {
