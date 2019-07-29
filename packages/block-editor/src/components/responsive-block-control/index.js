@@ -21,15 +21,17 @@ function ResponsiveBlockControl( props ) {
 		<fieldset className="block-editor-responsive-block-control">
 			<legend className="block-editor-responsive-block-control__label">{ legend }</legend>
 
-			{ ! isOpen && renderDefaultControl() }
+			<div className="block-editor-responsive-block-control__inner">
+				{ ! isOpen && renderDefaultControl() }
 
-			{ isOpen && renderResponsiveControl() }
+				{ isOpen && renderResponsiveControl() }
 
-			<ToggleControl
-				label={ toggleControlLabel }
-				checked={ isOpen }
-				onChange={ onToggleResponsive }
-			/>
+				<ToggleControl
+					label={ toggleControlLabel }
+					checked={ isOpen }
+					onChange={ onToggleResponsive }
+				/>
+			</div>
 		</fieldset>
 
 	);
