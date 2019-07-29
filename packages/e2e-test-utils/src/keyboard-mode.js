@@ -1,5 +1,5 @@
 /**
- * Move the mouse to trigger Edit Mode
+ * Triggers edit mode if not already active.
  *
  * @return {Promise} Promise resolving after enabling the keyboard edit mode.
  */
