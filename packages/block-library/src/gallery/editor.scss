@@ -64,6 +64,12 @@ ul.wp-block-gallery {
 			width: $icon-button-size-small;
 			height: $icon-button-size-small;
 
+			// Remove hover/focus box shadows, since they clash with the blue background.
+			&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
+			&:focus:not(:disabled) {
+				box-shadow: none;
+			}
+
 			@include break-small() {
 				// Use smaller buttons to fit when there are many columns.
 				.columns-7 &,
