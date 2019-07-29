@@ -1,8 +1,13 @@
-## 2.4.0 (Unreleased)
+## Unreleased
+
+### Breaking Changes
+
+- The recommended ruleset now includes `@wordpress/no-unjustified-disable` by default as an error.
 
 ### New Features
 
 - [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) now supports an `excludePattern` option to exempt function calls by name.
+- New Rule: [`@wordpress/no-unjustified-disable`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unjustified-disable.md)
 
 ### Improvements
 
