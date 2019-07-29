@@ -98,7 +98,7 @@
 	@include break-medium {
 		position: relative;
 
-		.block-editor-block-preview {
+		.block-editor-block-switcher__preview {
 			border: $border-width solid $light-gray-500;
 			box-shadow: $shadow-popover;
 			background: $white;
@@ -136,4 +136,24 @@
 
 .block-editor-block-switcher__popover .block-editor-block-types-list {
 	margin: 8px -8px -8px;
+}
+
+.block-editor-block-switcher__preview {
+	pointer-events: none;
+	padding: 10px;
+	overflow: hidden;
+	display: none;
+
+	@include break-medium {
+		display: block;
+	}
+}
+
+.block-editor-block-switcher__preview-title {
+	margin-bottom: 10px;
+	color: $dark-gray-300;
+}
+
+.block-editor-block-switcher__preview-content {
+	border: $border-width solid $light-gray-500;
 }

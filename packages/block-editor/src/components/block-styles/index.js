@@ -123,6 +123,7 @@ function BlockStyles( {
 					>
 						<div className="editor-block-styles__item-preview block-editor-block-styles__item-preview">
 							<UnifiedBlockPreview
+								isScaled
 								blocks={ cloneBlock( block, {
 									className: styleClassName,
 								} ) }

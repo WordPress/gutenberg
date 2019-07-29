@@ -19,14 +19,14 @@ import { compose } from '@wordpress/compose';
  */
 import BlockIcon from '../block-icon';
 import BlockStyles from '../block-styles';
-import BlockPreview from '../block-preview';
+import { UnifiedBlockPreview } from '../block-preview';
 import BlockTypesList from '../block-types-list';
 
 export class BlockSwitcher extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
-			hoveredClassName: null,
+			hoveredClassName: 'is-style-large',
 		};
 		this.onHoverClassName = this.onHoverClassName.bind( this );
 	}
@@ -160,14 +160,17 @@ export class BlockSwitcher extends Component {
 						}
 
 						{ ( hoveredClassName !== null ) &&
-							<BlockPreview
-								blocks={
-									cloneBlock( blocks[ 0 ], {
-										className: hoveredClassName,
-									} )
-								}
-
-							/>
+							<div className="block-editor-block-switcher__preview">
+								<div className="block-editor-block-switcher__preview-title">{ __( 'Preview' ) }</div>
+								<UnifiedBlockPreview
+									className="block-editor-block-switcher__preview-content"
+									blocks={
+										cloneBlock( blocks[ 0 ], {
+											className: hoveredClassName,
+										} )
+									}
+								/>
+							</div>
 						}
 					</>
 				) }

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { castArray } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -59,10 +60,21 @@ export const UnifiedBlockPreview = withSelect( ( select ) => {
 	return {
 		settings: select( 'core/block-editor' ).getSettings(),
 	};
-} )( ( { name, attributes, innerBlocks, settings } ) => {
+} )( ( { name, attributes, innerBlocks, settings, className, isScaled } ) => {
 	const block = createBlock( name, attributes, innerBlocks );
 	return (
-		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
+		<Disabled
+			aria-hidden
+			className={ classnames(
+				'editor-block-preview__unified',
+				'block-editor-block-preview__unified',
+				'editor-styles-wrapper',
+				className,
+				{
+					'is-scaled': isScaled,
+				}
+			) }
+		>
 			<BlockEditorProvider
 				value={ [ block ] }
 				settings={ settings }
