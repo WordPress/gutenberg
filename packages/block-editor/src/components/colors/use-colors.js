@@ -7,8 +7,8 @@ import { kebabCase, startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useMemo, Children, cloneElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,23 +16,6 @@ import { __ } from '@wordpress/i18n';
 import InspectorControls from '../inspector-controls';
 import PanelColorSettings from '../panel-color-settings';
 import { useBlockEditContext } from '../block-edit';
-
-const createComponent = memoize( ( attribute, color ) => ( { children } ) =>
-	// Clone children, setting the style attribute from the color configuration,
-	// if not already set explicitly through props.
-	Children.map( children, ( child ) =>
-		cloneElement( child, {
-			className: color ?
-				`${ child.props.className } has-${ kebabCase( attribute ) }` :
-				child.props.className,
-			style: { [ attribute ]: color, ...child.props.style },
-		} )
-	)
-);
-
-const createSetColor = memoize( ( setAttributes, name ) => ( newColor ) =>
-	setAttributes( { [ name ]: newColor } )
-);
 
 const InspectorControlsColorPanel = ( { title, colorSettings } ) => (
 	<InspectorControls>
@@ -50,6 +33,32 @@ export default function useColors(
 	panelTitle = __( 'Color Settings' )
 ) {
 	const { attributes, setAttributes } = useBlockEditContext();
+
+	const createComponent = useMemo(
+		() =>
+			memoize(
+				( attribute, color ) => ( { children } ) =>
+					// Clone children, setting the style attribute from the color configuration,
+					// if not already set explicitly through props.
+					Children.map( children, ( child ) =>
+						cloneElement( child, {
+							className: color ?
+								`${ child.props.className } has-${ kebabCase( attribute ) }` :
+								child.props.className,
+							style: { [ attribute ]: color, ...child.props.style },
+						} )
+					),
+				{ maxSize: colorConfigs.length }
+			),
+		[ colorConfigs.length ]
+	);
+	const createSetColor = useMemo(
+		() =>
+			memoize( ( name ) => ( newColor ) => setAttributes( { [ name ]: newColor } ), {
+				maxSize: colorConfigs.length,
+			} ),
+		[ setAttributes, colorConfigs.length ]
+	);
 
 	return useMemo( () => {
 		const colorSettings = [];
@@ -75,7 +84,7 @@ export default function useColors(
 			// when they are used as props for other components.
 			acc[ componentName ] = createComponent( attribute, color );
 			acc[ componentName ].color = color;
-			acc[ componentName ].setColor = createSetColor( setAttributes, name );
+			acc[ componentName ].setColor = createSetColor( name );
 
 			colorSettings.push( {
 				value: color,
