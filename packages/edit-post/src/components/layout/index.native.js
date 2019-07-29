@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, View } from 'react-native';
 import SafeArea from 'react-native-safe-area';
 import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
@@ -107,6 +107,9 @@ class Layout extends Component {
 		return (
 			<SafeAreaView style={ styles.container } onLayout={ this.onRootViewLayout }>
 				{ mode === 'text' ? this.renderHTML() : this.renderVisual() }
+				<SafeAreaView>
+					<View style={ { height: 44 } } />
+				</SafeAreaView>
 				<KeyboardAvoidingView
 					style={ styles.toolbarKeyboardAvoidingView }
 					parentHeight={ this.state.rootViewHeight }>
