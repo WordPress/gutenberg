@@ -33,6 +33,7 @@
     "eslint-plugin-react-native": "^3.6.0",
     "eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#552af1454d175e15f6d25aadc2ccde30a1922d4f",
     "flow-bin": "0.92.0",
+    "husky": "^3.0.2",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.1.0",
     "jest-junit": "^6.3.0",
@@ -49,6 +50,11 @@
     "rungen": "^0.3.2",
     "sprintf-js": "^1.1.1",
     "wd": "^1.11.1"
+  },
+  "husky": {
+      "hooks": {
+          "pre-commit": "yarn prettier:check || { echo '\nERROR: `yarn prettier:check` found a problem\n'; exit 1; }"
+      }
   },
   "scripts": {
     "start": "react-native start",
