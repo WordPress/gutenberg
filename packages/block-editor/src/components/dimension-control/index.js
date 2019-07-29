@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
+import { isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,7 @@ import {
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {
-	const { label, icon, iconLabel = 'all', currentSize, onSpacingChange = noop, onReset = noop, className = '' } = props;
+	const { label, icon, iconLabel = 'all', currentSize, onSpacingChange, onReset, className = '' } = props;
 
 	/**
 	 * Determines the size from the size slug (eg: `medium`)
@@ -39,7 +39,7 @@ export function DimensionControl( props ) {
 
 		if ( ! theSize || currentSize === theSize.slug ) {
 			resetSpacing();
-		} else {
+		} else if ( isFunction( onSpacingChange ) ) {
 			onSpacingChange( theSize.slug );
 		}
 	};
@@ -49,7 +49,11 @@ export function DimensionControl( props ) {
 	 * a dimension spacing values
 	 * @return {void}
 	 */
-	const resetSpacing = () => onReset();
+	const resetSpacing = () => {
+		if ( isFunction( onReset ) ) {
+			onReset();
+		}
+	};
 
 	/**
 	 * Converts the sizes lookup tablet
