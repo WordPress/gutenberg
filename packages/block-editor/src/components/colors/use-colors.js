@@ -13,36 +13,39 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import InspectorControls from '../inspector-controls';
 import PanelColorSettings from '../panel-color-settings';
 import ContrastChecker from '../contrast-checker';
+import InspectorControls from '../inspector-controls';
 import { useBlockEditContext } from '../block-edit';
 
-const InspectorControlsColorPanel = ( {
+const ColorPanel = ( {
 	title,
 	colorSettings,
 	contrastCheckerProps,
 	components,
 	panelChildren,
 } ) => (
+	<PanelColorSettings
+		title={ title }
+		initialOpen={ false }
+		colorSettings={ colorSettings }
+	>
+		{ contrastCheckerProps &&
+			components.map( ( Component ) => (
+				<ContrastChecker
+					key={ Component.displayName }
+					textColor={ Component.color }
+					{ ...contrastCheckerProps }
+				/>
+			) ) }
+		{ typeof panelChildren === 'function' ?
+			panelChildren( components ) :
+			panelChildren }
+	</PanelColorSettings>
+);
+const InspectorControlsColorPanel = ( props ) => (
 	<InspectorControls>
-		<PanelColorSettings
-			title={ title }
-			initialOpen={ false }
-			colorSettings={ colorSettings }
-		>
-			{ contrastCheckerProps &&
-				components.map( ( Component ) => (
-					<ContrastChecker
-						key={ Component.displayName }
-						textColor={ Component.color }
-						{ ...contrastCheckerProps }
-					/>
-				) ) }
-			{ typeof panelChildren === 'function' ?
-				panelChildren( components ) :
-				panelChildren }
-		</PanelColorSettings>
+		<ColorPanel { ...props } />
 	</InspectorControls>
 );
 
@@ -117,16 +120,18 @@ export default function useColors(
 			return acc;
 		}, {} );
 
+		const colorPanelProps = {
+			title: panelTitle,
+			colorSettings,
+			contrastCheckerProps,
+			components: Object.values( components ),
+			panelChildren,
+		};
 		return {
 			...components,
+			ColorPanel: <ColorPanel { ...colorPanelProps } />,
 			InspectorControlsColorPanel: (
-				<InspectorControlsColorPanel
-					title={ panelTitle }
-					colorSettings={ colorSettings }
-					contrastCheckerProps={ contrastCheckerProps }
-					components={ Object.values( components ) }
-					panelChildren={ panelChildren }
-				/>
+				<InspectorControlsColorPanel { ...colorPanelProps } />
 			),
 		};
 	}, [ attributes, setAttributes, ...deps ] );
