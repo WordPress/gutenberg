@@ -12,6 +12,11 @@
  * Filters allowed CSS attributes to include `flex-basis`, included in saved
  * markup of the Column block.
  *
+ * This can be removed when plugin support requires WordPress 5.3.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/47281
+ * @see https://core.trac.wordpress.org/changeset/45363
+ *
  * @since 5.7.0
  *
  * @param string[] $attr Array of allowed CSS attributes.

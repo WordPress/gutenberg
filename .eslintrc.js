@@ -58,6 +58,10 @@ module.exports = {
 				message: 'Use ellipsis character (…) in place of three dots',
 			},
 			{
+				selector: 'ImportDeclaration[source.value="redux"] Identifier.imported[name="combineReducers"]',
+				message: 'Use `combineReducers` from `@wordpress/data`',
+			},
+			{
 				selector: 'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
 				message: 'Use memize instead of Lodash’s memoize',
 			},

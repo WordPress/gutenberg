@@ -58,6 +58,7 @@ function Toolbar( { controls = [], children, className, isCollapsed, icon, label
 	if ( isCollapsed ) {
 		return (
 			<DropdownMenu
+				hasArrowIndicator
 				icon={ icon }
 				label={ label }
 				controls={ controlSets }

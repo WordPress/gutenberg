@@ -368,6 +368,7 @@ class ImageEdit extends React.Component {
 								fontSize={ 14 }
 								underlineColorAndroid="transparent"
 								textAlign={ 'center' }
+								tagName={ '' }
 							/>
 						</View>
 					) }

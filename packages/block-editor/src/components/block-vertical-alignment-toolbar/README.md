@@ -66,6 +66,11 @@ _Note:_ the user can repeatedly click on the toolbar buttons to toggle the align
 
 The current value of the alignment setting. You may only choose from the `Options` listed above.
 
+### `isCollapsed`
+* **Type:** `Boolean`
+* **Default:** `true`
+
+Whether to display toolbar options in the dropdown menu. This toolbar is collapsed by default.
 
 ### `onChange`
 * **Type:** `Function`

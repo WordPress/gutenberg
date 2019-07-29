@@ -50,10 +50,30 @@ function gutenberg_widgets_init( $hook ) {
 		$max_upload_size = 0;
 	}
 
+	/** This filter is documented in wp-admin/includes/media.php */
+	$image_size_names = apply_filters(
+		'image_size_names_choose',
+		array(
+			'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
+			'medium'    => __( 'Medium', 'gutenberg' ),
+			'large'     => __( 'Large', 'gutenberg' ),
+			'full'      => __( 'Full Size', 'gutenberg' ),
+		)
+	);
+
+	$available_image_sizes = array();
+	foreach ( $image_size_names as $image_size_slug => $image_size_name ) {
+		$available_image_sizes[] = array(
+			'slug' => $image_size_slug,
+			'name' => $image_size_name,
+		);
+	}
+
 	$settings = array_merge(
 		array(
 			'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
 			'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
+			'imageSizes'             => $available_image_sizes,
 			'maxUploadFileSize'      => $max_upload_size,
 		),
 		gutenberg_get_legacy_widget_settings()

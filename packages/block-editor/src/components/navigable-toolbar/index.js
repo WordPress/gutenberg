@@ -65,6 +65,17 @@ class NavigableToolbar extends Component {
 		if ( this.props.focusOnMount ) {
 			this.focusToolbar();
 		}
+
+		// We use DOM event listeners instead of React event listeners
+		// because we want to catch events from the underlying DOM tree
+		// The React Tree can be different from the DOM tree when using
+		// portals. Block Toolbars for instance are rendered in a separate
+		// React Tree.
+		this.toolbar.current.addEventListener( 'keydown', this.switchOnKeyDown );
+	}
+
+	componentwillUnmount() {
+		this.toolbar.current.removeEventListener( 'keydown', this.switchOnKeyDown );
 	}
 
 	render() {
@@ -74,7 +85,6 @@ class NavigableToolbar extends Component {
 				orientation="horizontal"
 				role="toolbar"
 				ref={ this.toolbar }
-				onKeyDown={ this.switchOnKeyDown }
 				{ ...omit( props, [
 					'focusOnMount',
 				] ) }

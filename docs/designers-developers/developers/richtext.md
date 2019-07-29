@@ -49,7 +49,6 @@ wp.blocks.registerBlockType( /* ... */, {
 				props.setAttributes( { content: content } ); // Store updated content as a block attribute
 			},
 			placeholder: __( 'Heading...' ), // Display this text before any content has been added by the user
-			keepPlaceholderOnFocus: true // Keep the placeholder text showing even when the field is focused (leave this property off to remove placeholder content on focus)
 		} );
 	},
 
@@ -85,7 +84,6 @@ registerBlockType( /* ... */, {
 				formattingControls={ [ 'bold', 'italic' ] } // Allow the content to be made bold or italic, but do not allow other formatting options
 				onChange={ ( content ) => setAttributes( { content } ) } // Store updated content as a block attribute
 				placeholder={ __( 'Heading...' ) } // Display this text before any content has been added by the user
-				keepPlaceholderOnFocus // Keep the placeholder text showing even when the field is focused (leave this property off to remove placeholder content on focus)
 			/>
 		);
 	},

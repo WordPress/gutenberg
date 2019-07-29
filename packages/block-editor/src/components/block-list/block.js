@@ -252,7 +252,7 @@ function BlockListBlock( {
 	}, [ isFirstMultiSelected ] );
 
 	// Block Reordering animation
-	const style = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, enableAnimation, animateOnChange );
+	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, enableAnimation, animateOnChange );
 
 	// Other event handlers
 
@@ -322,7 +322,10 @@ function BlockListBlock( {
 				onShiftSelection();
 				event.preventDefault();
 			}
-		} else {
+
+		// Avoid triggering multi-selection if we click toolbars/inspectors
+		// and all elements that are outside the Block Edit DOM tree.
+		} else if ( blockNodeRef.current.contains( event.target ) ) {
 			onSelectionStart( clientId );
 
 			// Allow user to escape out of a multi-selection to a singular
@@ -466,8 +469,15 @@ function BlockListBlock( {
 			aria-label={ blockLabel }
 			childHandledEvents={ [ 'onDragStart', 'onMouseDown' ] }
 			tagName={ animated.div }
-			style={ style }
 			{ ...blockWrapperProps }
+			style={
+				wrapperProps && wrapperProps.style ?
+					{
+						...wrapperProps.style,
+						...animationStyle,
+					} :
+					animationStyle
+			}
 		>
 			{ shouldShowInsertionPoint && (
 				<BlockInsertionPoint
