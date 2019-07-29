@@ -443,7 +443,7 @@ const RichTextContainer = compose( [
 	withFilters( 'experimentalRichText' ),
 ] )( RichTextWrapper );
 
-RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
+RichTextContainer.Content = ( { value, tagName: Tag, multiline, className, ...props } ) => {
 	let html = value;
 	let MultilineTag;
 
@@ -463,7 +463,7 @@ RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => 
 	const content = <RawHTML>{ html }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
+		return <Tag className={ className || undefined } { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
 	}
 
 	return content;
