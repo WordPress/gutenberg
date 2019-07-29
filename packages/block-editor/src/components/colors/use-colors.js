@@ -49,7 +49,7 @@ const InspectorControlsColorPanel = ( props ) => (
 	</InspectorControls>
 );
 
-export default function useColors(
+export default function __experimentalUseColors(
 	colorConfigs,
 	{ panelTitle = __( 'Color Settings' ), contrastCheckerProps, panelChildren } = {
 		panelTitle: __( 'Color Settings' ),

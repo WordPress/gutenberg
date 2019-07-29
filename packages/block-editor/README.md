@@ -450,10 +450,6 @@ _Related_
 
 Undocumented declaration.
 
-<a name="useColors" href="#useColors">#</a> **useColors**
-
-Undocumented declaration.
-
 <a name="Warning" href="#Warning">#</a> **Warning**
 
 Undocumented declaration.

@@ -19,7 +19,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	useColors,
+	__experimentalUseColors,
 } from '@wordpress/block-editor';
 
 function HeadingEdit( {
@@ -29,7 +29,7 @@ function HeadingEdit( {
 	onReplace,
 	className,
 } ) {
-	const { TextColor, InspectorControlsColorPanel } = useColors(
+	const { TextColor, InspectorControlsColorPanel } = __experimentalUseColors(
 		[ { name: 'textColor', attribute: 'color' } ],
 		{
 			contrastCheckerProps: { backgroundColor: 'white', isLargeText: true },
