@@ -1,5 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`DimensionControl rendering renders with custom sizes 1`] = `
+<WithInstanceId(SelectControl)
+  className="block-editor-dimension-control"
+  hideLabelFromVision={false}
+  label={
+    <React.Fragment>
+      Custom Dimension
+    </React.Fragment>
+  }
+  onChange={[Function]}
+  options={
+    Array [
+      Object {
+        "label": "Please select…",
+        "value": "",
+      },
+      Object {
+        "label": "Mini",
+        "value": "mini",
+      },
+      Object {
+        "label": "Middle",
+        "value": "middle",
+      },
+      Object {
+        "label": "Giant",
+        "value": "giant",
+      },
+    ]
+  }
+/>
+`;
+
 exports[`DimensionControl rendering renders with defaults 1`] = `
 <WithInstanceId(SelectControl)
   className="block-editor-dimension-control"

@@ -25,7 +25,7 @@ import {
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {
-	const { label, icon, iconLabel = 'all', currentSize, onSpacingChange, onReset, className = '' } = props;
+	const { label, icon, iconLabel = 'all', sizes = sizesTable, currentSize, onSpacingChange, onReset, className = '' } = props;
 
 	/**
 	 * Determines the size from the size slug (eg: `medium`)
@@ -35,7 +35,7 @@ export function DimensionControl( props ) {
 	 * @return {void}
 	 */
 	const onChangeSpacingSize = ( val ) => {
-		const theSize = findSizeBySlug( sizesTable, val );
+		const theSize = findSizeBySlug( sizes, val );
 
 		if ( ! theSize || currentSize === theSize.slug ) {
 			resetSpacing();
@@ -59,11 +59,11 @@ export function DimensionControl( props ) {
 	 * Converts the sizes lookup tablet
 	 * to a format suitable for use in the
 	 * <SelectControl /> options prop
-	 * @param  {Array} sizes the sizes
-	 * @return {Array}       the array of options
+	 * @param  {Array} theSizes the array of sizes objects
+	 * @return {Array}       the array of options with default option prepended
 	 */
-	const formatSizesAsOptions = ( sizes ) => {
-		const options = sizes.map( ( { name, slug } ) => ( {
+	const formatSizesAsOptions = ( theSizes ) => {
+		const options = theSizes.map( ( { name, slug } ) => ( {
 			label: name,
 			value: slug,
 		} ) );
@@ -93,7 +93,7 @@ export function DimensionControl( props ) {
 			hideLabelFromVision={ false }
 			value={ currentSize }
 			onChange={ onChangeSpacingSize }
-			options={ formatSizesAsOptions( sizesTable ) }
+			options={ formatSizesAsOptions( sizes ) }
 		/>
 	);
 }

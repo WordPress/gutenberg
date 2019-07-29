@@ -51,6 +51,35 @@ describe( 'DimensionControl', () => {
 			);
 			expect( wrapper ).toMatchSnapshot();
 		} );
+
+		it( 'renders with custom sizes', () => {
+			const customSizes = [
+				{
+					name: 'Mini',
+					size: 1,
+					slug: 'mini',
+				},
+				{
+					name: 'Middle',
+					size: 5,
+					slug: 'middle',
+				},
+				{
+					name: 'Giant',
+					size: 10,
+					slug: 'giant',
+				},
+			];
+
+			const wrapper = shallow(
+				<DimensionControl
+					instanceId={ uniqueId() }
+					label={ 'Custom Dimension' }
+					sizes={ customSizes }
+				/>
+			);
+			expect( wrapper ).toMatchSnapshot();
+		} );
 	} );
 
 	describe( 'callbacks', () => {

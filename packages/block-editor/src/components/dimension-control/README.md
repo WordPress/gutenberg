@@ -78,6 +78,31 @@ The human readable label for the control.
 
 The current value of the dimension the UI controls. If provided the UI with automatically highlight the control representing the current value.
 
+### `sizes`
+* **Type:** `Array`
+* **Default:** See `packages/block-editor/src/components/dimension-control/sizes.js`
+* **Required:** No
+
+An optional array of size objects in the following shape:
+
+```
+[
+	{
+		name: __( 'Small' ),
+		size: 14,
+		slug: 'small',
+	},
+		{
+		name: __( 'Medium' ),
+		size: 14,
+		slug: 'small',
+	},
+	// ...etc
+]
+```
+
+By default a set of relative sizes (`small`, `medium`...etc) are provided. See `packages/block-editor/src/components/dimension-control/sizes.js`.
+
 ### `icon`
 * **Type:** `String`
 * **Default:** `undefined`
