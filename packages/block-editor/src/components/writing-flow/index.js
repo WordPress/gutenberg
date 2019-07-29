@@ -91,6 +91,11 @@ class WritingFlow extends Component {
 		 */
 		this.verticalRect = null;
 
+		/**
+		 * Reference of the writing flow appender element.
+		 * The reference is used to focus the first tabbable element after the block list
+		 * once we hit `tab` on the last block in navigation mode.
+		 */
 		this.appender = createRef();
 	}
 
