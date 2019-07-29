@@ -59,15 +59,19 @@
 	}
 }
 
-.entry .entry-content .wp-block-image .wp-block-image__image-wrapper {
+.wp-block-image .wp-block-image__image-wrapper {
 	-webkit-background-size: cover;
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: 50% 50%;
 }
 
-.entry .entry-content .wp-block-image.expandscreen,
-.entry .entry-content .wp-block-image .expandscreen {
+.wp-block-image.expandscreen,
+.wp-block-image .expandscreen {
+	.wp-block-image__image-wrapper {
+		height: 100vh;
+	}
+
 	&.alignnone {
 		display: inline-block;
 	}
