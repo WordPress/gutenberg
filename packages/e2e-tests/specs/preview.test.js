@@ -71,7 +71,7 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 
 	if ( isChecked !== shouldBeChecked ) {
 		await checkboxHandle.click();
-		const [ saveButton ] = await page.$x( '//button[text()="Save & Reload"]' );
+		const [ saveButton ] = await page.$x( shouldBeChecked ? '//button[text()="Enable & Reload"]' : '//button[text()="Disable & Reload"]' );
 		const navigationCompleted = page.waitForNavigation();
 		saveButton.click();
 		await navigationCompleted;
