@@ -25,10 +25,12 @@
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 
+	<file>./bin</file>
+	<file>./gutenberg.php</file>
 	<file>./lib</file>
 	<file>./packages</file>
 	<file>./phpunit</file>
-	<file>./gutenberg.php</file>
+	<file>./post-content.php</file>
 
 	<!-- Exclude generated files -->
 	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
