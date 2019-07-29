@@ -19,7 +19,7 @@ ul.wp-block-gallery {
 		outline: none;
 	}
 
-	.is-selected {
+	> .is-selected {
 		outline: 4px solid theme(primary);
 	}
 
