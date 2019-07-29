@@ -13,10 +13,10 @@ function DiscoverBlockInfo( { description, activeInstalls, humanizedUpdated } ) 
 			</span>
 			<div className="block-editor-discover-block-info__row">
 				<div className="block-editor-discover-block-info__column">
-					<Icon icon={ 'chart-line' }></Icon>{ sprintf( _n( '%d active installation', '%d active installations', activeInstalls ), activeInstalls ) }
+					<Icon icon="chart-line"></Icon>{ sprintf( _n( '%d active installation', '%d active installations', activeInstalls ), activeInstalls ) }
 				</div>
 				<div className="block-editor-discover-block-info__column">
-					<Icon icon={ 'update' }></Icon>{ humanizedUpdated }
+					<Icon icon="update"></Icon>{ humanizedUpdated }
 				</div>
 			</div>
 		</Fragment>
