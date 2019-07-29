@@ -27,7 +27,7 @@ const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
 	} );
 
 	return (
-		<div className={ 'editor-block-list__breadcrumb block-editor-block-list__breadcrumb' }>
+		<div className="editor-block-list__breadcrumb block-editor-block-list__breadcrumb">
 			<Toolbar>
 				{ rootClientId && (
 				<>
