@@ -5,6 +5,10 @@
 		"automaticallyAdd": {
 			"type": "boolean",
 			"default": false
+		},
+		"hierarchy": {
+			"type": "array",
+			"default": []
 		}
 	}
 }
