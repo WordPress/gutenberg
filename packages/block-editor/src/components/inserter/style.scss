@@ -43,17 +43,6 @@ $block-inserter-search-height: 38px;
 	@include break-medium {
 		width: 400px;
 		position: relative;
-
-		.block-editor-block-preview {
-			border: $border-width solid $light-gray-500;
-			box-shadow: $shadow-popover;
-			background: $white;
-			position: absolute;
-			left: 100%;
-			top: -1px;
-			bottom: -1px;
-			width: 300px;
-		}
 	}
 }
 
@@ -139,4 +128,31 @@ $block-inserter-search-height: 38px;
 	.block-editor-block-icon {
 		margin-right: $grid-size;
 	}
+}
+
+.block-editor-inserter__preview {
+	border: $border-width solid $light-gray-500;
+	box-shadow: $shadow-popover;
+	background: $white;
+	position: absolute;
+	left: 100%;
+	top: -1px;
+	bottom: -1px;
+	width: 300px;
+	height: auto;
+	padding: 10px;
+	display: none;
+
+	@include break-medium {
+		display: block;
+	}
+}
+
+.block-editor-inserter__preview-title {
+	margin-bottom: 10px;
+	color: $dark-gray-300;
+}
+
+.block-editor-inserter__preview-content {
+	border: $border-width solid $light-gray-500;
 }

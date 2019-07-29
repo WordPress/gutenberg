@@ -97,18 +97,6 @@
 .block-editor-block-switcher__popover .components-popover__content {
 	@include break-medium {
 		position: relative;
-
-		.block-editor-block-switcher__preview {
-			border: $border-width solid $light-gray-500;
-			box-shadow: $shadow-popover;
-			background: $white;
-			position: absolute;
-			left: 100%;
-			top: -1px;
-			bottom: -1px;
-			width: 300px;
-			height: auto;
-		}
 	}
 
 	// Hide the bottom border on the last panel so it stacks with the popover.
@@ -139,9 +127,16 @@
 }
 
 .block-editor-block-switcher__preview {
-	pointer-events: none;
+	border: $border-width solid $light-gray-500;
+	box-shadow: $shadow-popover;
+	background: $white;
+	position: absolute;
+	left: 100%;
+	top: -1px;
+	bottom: -1px;
+	width: 300px;
+	height: auto;
 	padding: 10px;
-	overflow: hidden;
 	display: none;
 
 	@include break-medium {
