@@ -25,7 +25,7 @@ import BlockList from '../block-list';
  */
 function BlockPreview( props ) {
 	return (
-		<div className="editor-block-preview block-editor-block-preview">
+		<div style={{background:'red'}} className="editor-block-preview block-editor-block-preview">
 			<div className="editor-block-preview__title block-editor-block-preview__title">{ __( 'Preview' ) }</div>
 			<BlockPreviewContent { ...props } />
 		</div>
@@ -38,7 +38,7 @@ export function BlockPreviewContent( { blocks, settings } ) {
 	}
 
 	return (
-		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
+		<Disabled style={{background:'red'}} className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
 			<BlockEditorProvider
 				value={ castArray( blocks ) }
 				settings={ settings }
