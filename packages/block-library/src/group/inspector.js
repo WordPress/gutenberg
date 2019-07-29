@@ -109,16 +109,10 @@ export default function Inspector( props ) {
 
 				<fieldset className="block-editor-responsive-controls">
 					<legend className="block-editor-responsive-controls__label">{ __( 'Padding' ) } </legend>
-					<ToggleControl
-						label={ __( 'Manually adjust padding based on screensize.' ) }
-						checked={ attributes.responsivePadding }
-						onChange={ () => onToggleResponsiveSpacing( 'padding' ) }
-					/>
 
 					{ ! attributes.responsivePadding && (
 						<DimensionControl
-							title={ __( 'Padding' ) }
-							property="padding"
+							label={ __( 'All' ) }
 							onReset={ partialRight( resetSpacingDimension, 'paddingSize' ) }
 							onSpacingChange={ partialRight( updateSpacing, 'paddingSize' ) }
 							currentSize={ attributes.paddingSize }
@@ -130,9 +124,7 @@ export default function Inspector( props ) {
 					{ attributes.responsivePadding && (
 						<Fragment>
 							<DimensionControl
-								title={ __( 'Padding' ) }
-								property="padding"
-
+								label={ __( 'Desktop' ) }
 								onReset={ partialRight( resetSpacingDimension, 'paddingSize' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'paddingSize' ) }
 								currentSize={ attributes.paddingSize }
@@ -140,9 +132,7 @@ export default function Inspector( props ) {
 							/>
 
 							<DimensionControl
-								title={ __( 'Padding' ) }
-								property="padding"
-
+								label={ __( 'Tablet' ) }
 								onReset={ partialRight( resetSpacingDimension, 'paddingSize', 'Tablet' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'paddingSize', 'Tablet' ) }
 								currentSize={ attributes.paddingSizeTablet }
@@ -151,9 +141,7 @@ export default function Inspector( props ) {
 							/>
 
 							<DimensionControl
-								title={ __( 'Padding' ) }
-								property="padding"
-
+								label={ __( 'Mobile' ) }
 								onReset={ partialRight( resetSpacingDimension, 'paddingSize', 'Mobile' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'paddingSize', 'Mobile' ) }
 								currentSize={ attributes.paddingSizeMobile }
@@ -163,19 +151,20 @@ export default function Inspector( props ) {
 
 						</Fragment>
 					) }
+
+					<ToggleControl
+						label={ __( 'Manually adjust padding based on screensize.' ) }
+						checked={ attributes.responsivePadding }
+						onChange={ () => onToggleResponsiveSpacing( 'padding' ) }
+					/>
 				</fieldset>
 
 				<fieldset className="block-editor-responsive-controls">
 					<legend className="block-editor-responsive-controls__label">{ __( 'Margin' ) }</legend>
-					<ToggleControl
-						label={ __( 'Manually adjust margin based on screensize.' ) }
-						checked={ attributes.responsiveMargin }
-						onChange={ () => onToggleResponsiveSpacing( 'margin' ) }
-					/>
 
 					{ ! attributes.responsiveMargin && (
 						<DimensionControl
-							title={ __( 'Margin' ) }
+							label={ __( 'All' ) }
 							property="margin"
 							onReset={ partialRight( resetSpacingDimension, 'marginSize' ) }
 							onSpacingChange={ partialRight( updateSpacing, 'marginSize' ) }
@@ -188,9 +177,7 @@ export default function Inspector( props ) {
 					{ attributes.responsiveMargin && (
 						<Fragment>
 							<DimensionControl
-								title={ __( 'Margin' ) }
-								property="margin"
-
+								label={ __( 'Desktop' ) }
 								onReset={ partialRight( resetSpacingDimension, 'marginSize' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'marginSize' ) }
 								currentSize={ attributes.marginSize }
@@ -198,9 +185,7 @@ export default function Inspector( props ) {
 							/>
 
 							<DimensionControl
-								title={ __( 'Margin' ) }
-								property="margin"
-
+								label={ __( 'Tablet' ) }
 								onReset={ partialRight( resetSpacingDimension, 'marginSize', 'Tablet' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'marginSize', 'Tablet' ) }
 								currentSize={ attributes.marginSizeTablet }
@@ -209,9 +194,7 @@ export default function Inspector( props ) {
 							/>
 
 							<DimensionControl
-								title={ __( 'Margin' ) }
-								property="margin"
-
+								label={ __( 'Mobile' ) }
 								onReset={ partialRight( resetSpacingDimension, 'marginSize', 'Mobile' ) }
 								onSpacingChange={ partialRight( updateSpacing, 'marginSize', 'Mobile' ) }
 								currentSize={ attributes.marginSizeMobile }
@@ -221,6 +204,12 @@ export default function Inspector( props ) {
 
 						</Fragment>
 					) }
+
+					<ToggleControl
+						label={ __( 'Manually adjust margin based on screensize.' ) }
+						checked={ attributes.responsiveMargin }
+						onChange={ () => onToggleResponsiveSpacing( 'margin' ) }
+					/>
 				</fieldset>
 
 			</PanelBody>

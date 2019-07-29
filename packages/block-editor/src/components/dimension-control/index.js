@@ -1,44 +1,42 @@
 /**
  * External dependencies
  */
-import { startCase } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import {
-	BaseControl,
-	Button,
 	Icon,
+	SelectControl,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 import { withInstanceId } from '@wordpress/compose';
+
+import {
+	Fragment,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import sizesTable, { findSizeBySlug } from './sizes';
-import DimensionButtons from './buttons';
 
 export function DimensionControl( props ) {
-	const { title, property, device = 'all', deviceIcon = 'desktop', instanceId, currentSize, onSpacingChange, onReset } = props;
+	const { label, device = 'all', deviceIcon = 'desktop', currentSize, onSpacingChange, onReset } = props;
 
 	/**
 	 * Determines the size from the size slug (eg: `medium`)
 	 * and decides whether to call the change or reset callback
 	 * handlers
-	 * @param  {Object} event the click event for size buttons
+	 * @param  {string} val the DOMEvent event.target
 	 * @return {void}
 	 */
-	const onChangeSpacingSize = ( event ) => {
-		const theSize = findSizeBySlug( sizesTable, event.target.value );
+	const onChangeSpacingSize = ( val ) => {
+		const theSize = findSizeBySlug( sizesTable, val );
 
-		if ( ! theSize ) {
-			return;
-		}
-
-		if ( currentSize === theSize.slug ) {
+		if ( ! theSize || currentSize === theSize.slug ) {
 			resetSpacing();
 		} else {
 			onSpacingChange( theSize.slug );
@@ -52,42 +50,44 @@ export function DimensionControl( props ) {
 	 */
 	const resetSpacing = () => onReset();
 
-	return (
-		<BaseControl
-			id={ `block-spacing-${ property }-${ device }-${ instanceId }` }
-			className="block-editor-dimension-control"
-		>
-			<div className="block-editor-dimension-control__header">
-				<BaseControl.VisualLabel className="block-editor-dimension-control__header-label">
-					<Icon
-						icon={ deviceIcon || device }
-						label={ device }
-					/>
-					{ startCase( device ) }
-				</BaseControl.VisualLabel>
+	/**
+	 * Converts the sizes lookup tablet
+	 * to a format suitable for use in the
+	 * <SelectControl /> options prop
+	 * @param  {Array} sizes the sizes
+	 * @return {Array}       the array of options
+	 */
+	const formatSizesAsOptions = ( sizes ) => {
+		const options = sizes.map( ( { name, slug } ) => ( {
+			label: name,
+			value: slug,
+		} ) );
 
-				<Button
-					disabled={ !!! currentSize }
-					isDefault
-					isSmall
-					onClick={ resetSpacing }
-					aria-label={ sprintf( __( 'Reset %s for %s' ), title, device ) }
-				>
-					{ __( 'Reset' ) }
-				</Button>
+		return [ {
+			label: __( 'Please select…' ),
+			value: '',
+		} ].concat( options );
+	};
 
-			</div>
-
-			<DimensionButtons
-				{ ...props }
-				id={ instanceId }
-				device={ device }
-				currentSize={ currentSize }
-				onChangeSpacingSize={ onChangeSpacingSize }
-				sizes={ sizesTable }
+	const selectLabel = (
+		<Fragment>
+			<Icon
+				icon={ deviceIcon || device }
+				label={ device }
 			/>
+			{ label }
+		</Fragment>
+	);
 
-		</BaseControl>
+	return (
+		<SelectControl
+			className={ classnames( 'block-editor-dimension-control', { 'is-manual': 'all' !== device } ) }
+			label={ selectLabel }
+			hideLabelFromVision={ false }
+			value={ currentSize }
+			onChange={ onChangeSpacingSize }
+			options={ formatSizesAsOptions( sizesTable ) }
+		/>
 	);
 }
 

@@ -12,18 +12,30 @@
 .block-editor-responsive-controls__label {
 	font-weight: 600;
 	margin-bottom: 0.6em;
-	margin-left: -1px;
+	margin-left: -3px; // visual compensation
 }
 
 .block-editor-dimension-control {
+	margin-left: -3px; // visual compensation
 
-
-	.components-base-control__label {
-		margin-bottom: 0;
+	.components-base-control__field {
+		display: flex;
+		align-items: center;
 	}
 
-	.components-base-control__help {
-		margin-top: -5px;
+	.components-base-control__label {
+		display: flex;
+		align-items: center;
+		margin-right: 1em;
+		margin-bottom: 0;
+
+		.dashicon {
+			margin-right: 0.5em;
+		}
+	}
+
+	&.is-manual .components-base-control__label {
+		width: 10em;
 	}
 }
 
