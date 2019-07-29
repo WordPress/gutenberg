@@ -24,22 +24,23 @@ import BlockList from '../block-list';
  *
  * @return {WPElement} Rendered element.
  */
-function BlockPreview( props ) {
-	return (
-		<div style={{background:'red'}} className="editor-block-preview block-editor-block-preview">
-			<div className="editor-block-preview__title block-editor-block-preview__title">{ __( 'Preview' ) }</div>
-			<BlockPreviewContent { ...props } />
-		</div>
-	);
-}
-
-export function BlockPreviewContent( { blocks, settings } ) {
+function BlockPreview( { blocks, settings, className, isScaled } ) {
 	if ( ! blocks ) {
 		return null;
 	}
-
 	return (
-		<Disabled style={{background:'red'}} className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
+		<Disabled
+			aria-hidden
+			className={ classnames(
+				'editor-block-preview__unified',
+				'block-editor-block-preview__unified',
+				'editor-styles-wrapper',
+				className,
+				{
+					'is-scaled': isScaled,
+				}
+			) }
+		>
 			<BlockEditorProvider
 				value={ castArray( blocks ) }
 				settings={ settings }
@@ -55,32 +56,3 @@ export default withSelect( ( select ) => {
 		settings: select( 'core/block-editor' ).getSettings(),
 	};
 } )( BlockPreview );
-
-export const UnifiedBlockPreview = withSelect( ( select ) => {
-	return {
-		settings: select( 'core/block-editor' ).getSettings(),
-	};
-} )( ( { name, attributes, innerBlocks, settings, className, isScaled } ) => {
-	const block = createBlock( name, attributes, innerBlocks );
-	return (
-		<Disabled
-			aria-hidden
-			className={ classnames(
-				'editor-block-preview__unified',
-				'block-editor-block-preview__unified',
-				'editor-styles-wrapper',
-				className,
-				{
-					'is-scaled': isScaled,
-				}
-			) }
-		>
-			<BlockEditorProvider
-				value={ [ block ] }
-				settings={ settings }
-			>
-				<BlockList />
-			</BlockEditorProvider>
-		</Disabled>
-	);
-} );

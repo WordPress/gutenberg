@@ -19,7 +19,7 @@ import { compose } from '@wordpress/compose';
  */
 import BlockIcon from '../block-icon';
 import BlockStyles from '../block-styles';
-import { UnifiedBlockPreview } from '../block-preview';
+import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 
 export class BlockSwitcher extends Component {
@@ -162,7 +162,7 @@ export class BlockSwitcher extends Component {
 						{ ( hoveredClassName !== null ) &&
 							<div className="block-editor-block-switcher__preview">
 								<div className="block-editor-block-switcher__preview-title">{ __( 'Preview' ) }</div>
-								<UnifiedBlockPreview
+								<BlockPreview
 									className="block-editor-block-switcher__preview-content"
 									blocks={
 										cloneBlock( blocks[ 0 ], {
