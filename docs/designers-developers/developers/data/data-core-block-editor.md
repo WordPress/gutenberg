@@ -335,18 +335,6 @@ _Returns_
 
 -   `Array<Editor.InserterItem>`: Items that appear in inserter.
 
-<a name="getKeyboardMode" href="#getKeyboardMode">#</a> **getKeyboardMode**
-
-Returns the current keyboard mode.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `string`: Keyboard Mode
-
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
 Returns the client ID of the last block in the multi-selection set, or null
@@ -773,6 +761,18 @@ _Returns_
 
 -   `boolean`: True if multi-selecting, false if not.
 
+<a name="isNavigationMode" href="#isNavigationMode">#</a> **isNavigationMode**
+
+Returns whether the navigation mode is enabled.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `boolean`: Is navigation mode enabled.
+
 <a name="isSelectionEnabled" href="#isSelectionEnabled">#</a> **isSelectionEnabled**
 
 Selector that returns if multi-selection is enabled or not.
@@ -1083,18 +1083,6 @@ _Parameters_
 
 -   _clientId_ `string`: Block client ID.
 
-<a name="setKeyboardMode" href="#setKeyboardMode">#</a> **setKeyboardMode**
-
-Returns an action object used to set the keyboard mode
-
-_Parameters_
-
--   _mode_ `string`: Keyboard mode
-
-_Returns_
-
--   `Object`: Action object
-
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
 Returns an action object resetting the template validity.
@@ -1173,6 +1161,18 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+<a name="toggleNavigationMode" href="#toggleNavigationMode">#</a> **toggleNavigationMode**
+
+Returns an action object used to enable or disable the navigation mode.
+
+_Parameters_
+
+-   _isNavigationMode_ `string`: Enable/Disable navigation mode.
+
+_Returns_
+
+-   `Object`: Action object
 
 <a name="toggleSelection" href="#toggleSelection">#</a> **toggleSelection**
 

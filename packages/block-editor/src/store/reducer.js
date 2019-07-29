@@ -1208,16 +1208,16 @@ export const blockListSettings = ( state = {}, action ) => {
 };
 
 /**
- * Reducer returning the current keyboard mode (navigation or edit).
+ * Reducer returning whether the navigation mode is enabled or not.
  *
  * @param {string} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {string} Updated state.
  */
-export function keyboardMode( state = 'navigation', action ) {
-	if ( action.type === 'SET_KEYBOARD_MODE' ) {
-		return action.mode;
+export function isNavigationMode( state = true, action ) {
+	if ( action.type === 'TOGGLE_NAVIGATION_MODE' ) {
+		return action.isNavigationMode;
 	}
 
 	return state;
@@ -1263,5 +1263,5 @@ export default combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
-	keyboardMode,
+	isNavigationMode,
 } );

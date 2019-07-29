@@ -101,8 +101,8 @@ function BlockListBlock( {
 	onSelectionStart,
 	animateOnChange,
 	enableAnimation,
-	keyboardMode,
-	onChangeKeyboardMode,
+	isNavigationMode,
+	enableNavigationMode,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -219,7 +219,7 @@ function BlockListBlock( {
 			return;
 		}
 
-		if ( keyboardMode === 'navigation' ) {
+		if ( isNavigationMode ) {
 			breadcrumb.current.focus();
 			return;
 		}
@@ -267,13 +267,13 @@ function BlockListBlock( {
 	// Focus the first editable or the wrapper if edit mode.
 	useLayoutEffect( () => {
 		if ( isSelected ) {
-			if ( keyboardMode === 'navigation' ) {
+			if ( isNavigationMode ) {
 				breadcrumb.current.focus();
 			} else {
 				focusTabbable( true );
 			}
 		}
-	}, [ isSelected, keyboardMode ] );
+	}, [ isSelected, isNavigationMode ] );
 
 	// Other event handlers
 
@@ -306,7 +306,7 @@ function BlockListBlock( {
 				! isLocked &&
 				( target === wrapper.current || target === breadcrumb.current )
 		);
-		const isEditMode = keyboardMode === 'edit';
+		const isEditMode = ! isNavigationMode;
 
 		switch ( keyCode ) {
 			case ENTER:
@@ -330,7 +330,7 @@ function BlockListBlock( {
 					isSelected &&
 					isEditMode
 				) {
-					onChangeKeyboardMode( 'navigation' );
+					enableNavigationMode();
 					wrapper.current.focus();
 				}
 				break;
@@ -389,9 +389,8 @@ function BlockListBlock( {
 
 	// If the block is selected and we're typing the block should not appear.
 	// Empty paragraph blocks should always show up as unselected.
-	const isKeyboardEditMode = keyboardMode === 'edit';
-	const showInserterShortcuts = isKeyboardEditMode && ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
-	const showEmptyBlockSideInserter = isKeyboardEditMode && ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
+	const showInserterShortcuts = ! isNavigationMode && ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
+	const showEmptyBlockSideInserter = ! isNavigationMode && ( isSelected || isHovered || isLast ) && isEmptyDefaultBlock && isValid;
 	const shouldAppearSelected =
 		! isFocusMode &&
 		! showEmptyBlockSideInserter &&
@@ -404,23 +403,23 @@ function BlockListBlock( {
 		! isEmptyDefaultBlock;
 	// We render block movers and block settings to keep them tabbale even if hidden
 	const shouldRenderMovers =
-		isKeyboardEditMode &&
+		! isNavigationMode &&
 		( isSelected || hoverArea === ( isRTL ? 'right' : 'left' ) ) &&
 		! showEmptyBlockSideInserter &&
 		! isPartOfMultiSelection &&
 		! isTypingWithinBlock;
 	const shouldShowBreadcrumb =
-		( isSelected && ! isKeyboardEditMode ) ||
-		( isKeyboardEditMode && ! isFocusMode && isHovered && ! isEmptyDefaultBlock );
+		( isSelected && isNavigationMode ) ||
+		( ! isNavigationMode && ! isFocusMode && isHovered && ! isEmptyDefaultBlock );
 	const shouldShowContextualToolbar =
-		isKeyboardEditMode &&
+		! isNavigationMode &&
 		! hasFixedToolbar &&
 		! showEmptyBlockSideInserter &&
 		(
 			( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
 			isFirstMultiSelected
 		);
-	const shouldShowMobileToolbar = isKeyboardEditMode && shouldAppearSelected;
+	const shouldShowMobileToolbar = ! isNavigationMode && shouldAppearSelected;
 
 	// Insertion point can only be made visible if the block is at the
 	// the extent of a multi-selection, or not in a multi-selection.
@@ -435,7 +434,7 @@ function BlockListBlock( {
 		{
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': shouldAppearSelected,
-			'is-navigate-mode': ! isKeyboardEditMode,
+			'is-navigate-mode': isNavigationMode,
 			'is-multi-selected': isPartOfMultiSelection,
 			'is-hovered': shouldAppearHovered,
 			'is-reusable': isReusableBlock( blockType ),
@@ -557,7 +556,7 @@ function BlockListBlock( {
 					/>
 				) }
 				{
-					isKeyboardEditMode &&
+					! isNavigationMode &&
 					! shouldShowContextualToolbar &&
 					isSelected &&
 					! hasFixedToolbar &&
@@ -640,7 +639,7 @@ const applyWithSelect = withSelect(
 			getBlockIndex,
 			getBlockOrder,
 			__unstableGetBlockWithoutInnerBlocks,
-			getKeyboardMode,
+			isNavigationMode,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
@@ -674,7 +673,7 @@ const applyWithSelect = withSelect(
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 			isLast: index === blockOrder.length - 1,
-			keyboardMode: getKeyboardMode(),
+			isNavigationMode: isNavigationMode(),
 			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to access the block prop
@@ -702,7 +701,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		mergeBlocks,
 		replaceBlocks,
 		toggleSelection,
-		setKeyboardMode,
+		toggleNavigationMode,
 	} = dispatch( 'core/block-editor' );
 
 	return {
@@ -776,8 +775,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );
 		},
-		onChangeKeyboardMode( mode ) {
-			setKeyboardMode( mode );
+		enableNavigationMode() {
+			toggleNavigationMode( true );
 		},
 	};
 } );

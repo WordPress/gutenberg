@@ -1407,12 +1407,12 @@ function getReusableBlocks( state ) {
 }
 
 /**
- * Returns the current keyboard mode.
+ * Returns whether the navigation mode is enabled.
  *
  * @param {Object} state Editor state.
  *
- * @return {string}      Keyboard Mode
+ * @return {boolean}     Is navigation mode enabled.
  */
-export function getKeyboardMode( state ) {
-	return state.keyboardMode;
+export function isNavigationMode( state ) {
+	return state.isNavigationMode;
 }

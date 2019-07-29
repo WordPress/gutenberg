@@ -706,15 +706,15 @@ export function __unstableMarkLastChangeAsPersistent() {
 }
 
 /**
- * Returns an action object used to set the keyboard mode
+ * Returns an action object used to enable or disable the navigation mode.
  *
- * @param {string} mode Keyboard mode
+ * @param {string} isNavigationMode Enable/Disable navigation mode.
  *
  * @return {Object} Action object
  */
-export function setKeyboardMode( mode ) {
+export function toggleNavigationMode( isNavigationMode = true ) {
 	return {
-		type: 'SET_KEYBOARD_MODE',
-		mode,
+		type: 'TOGGLE_NAVIGATION_MODE',
+		isNavigationMode,
 	};
 }

@@ -111,8 +111,8 @@ class WritingFlow extends Component {
 	}
 
 	switchToEditMode() {
-		if ( this.props.keyboardMode !== 'edit' ) {
-			this.props.setKeyboardMode( 'edit' );
+		if ( this.props.isNavigationMode ) {
+			this.props.disableNavigationMode();
 		}
 	}
 
@@ -244,7 +244,7 @@ class WritingFlow extends Component {
 			selectedBlockClientId,
 			selectionBeforeEndClientId,
 			selectionAfterEndClientId,
-			keyboardMode,
+			isNavigationMode,
 		} = this.props;
 
 		const { keyCode, target } = event;
@@ -262,7 +262,7 @@ class WritingFlow extends Component {
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
 		// In navigation mode, tab and arrows navigate from block to block.
-		if ( keyboardMode === 'navigation' ) {
+		if ( isNavigationMode ) {
 			const navigateUp = ( isTab && isShift ) || isUp;
 			const navigateDown = ( isTab && ! isShift ) || isDown;
 			const focusedBlockUid = navigateUp ? selectionBeforeEndClientId : selectionAfterEndClientId;
@@ -427,7 +427,7 @@ export default compose( [
 			getLastMultiSelectedBlockClientId,
 			hasMultiSelection,
 			getBlockOrder,
-			getKeyboardMode,
+			isNavigationMode,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -443,15 +443,15 @@ export default compose( [
 			selectedLastClientId: getLastMultiSelectedBlockClientId(),
 			hasMultiSelection: hasMultiSelection(),
 			blocks: getBlockOrder(),
-			keyboardMode: getKeyboardMode(),
+			isNavigationMode: isNavigationMode(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { multiSelect, selectBlock, setKeyboardMode, clearSelectedBlock } = dispatch( 'core/block-editor' );
+		const { multiSelect, selectBlock, toggleNavigationMode, clearSelectedBlock } = dispatch( 'core/block-editor' );
 		return {
 			onMultiSelect: multiSelect,
 			onSelectBlock: selectBlock,
-			setKeyboardMode,
+			disableNavigationMode: () => toggleNavigationMode( false ),
 			clearSelectedBlock,
 		};
 	} ),

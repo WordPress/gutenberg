@@ -19,7 +19,7 @@ import BlockTitle from '../block-title';
  * @return {WPElement} Block Breadcrumb.
  */
 const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
-	const { setKeyboardMode } = useDispatch( 'core/block-editor' );
+	const { toggleNavigationMode } = useDispatch( 'core/block-editor' );
 	const { rootClientId } = useSelect( ( select ) => {
 		return {
 			rootClientId: select( 'core/block-editor' ).getBlockRootClientId( clientId ),
@@ -30,12 +30,12 @@ const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
 		<div className="editor-block-list__breadcrumb block-editor-block-list__breadcrumb">
 			<Toolbar>
 				{ rootClientId && (
-				<>
-					<BlockTitle clientId={ rootClientId } />
-					<span className="editor-block-list__descendant-arrow block-editor-block-list__descendant-arrow" />
-				</>
+					<>
+						<BlockTitle clientId={ rootClientId } />
+						<span className="editor-block-list__descendant-arrow block-editor-block-list__descendant-arrow" />
+					</>
 				) }
-				<Button ref={ ref } onClick={ () => setKeyboardMode( 'edit' ) }>
+				<Button ref={ ref } onClick={ () => toggleNavigationMode( false ) }>
 					<BlockTitle clientId={ clientId } />
 				</Button>
 			</Toolbar>

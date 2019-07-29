@@ -461,7 +461,7 @@ _Parameters_
 
 <a name="switchToEditMode" href="#switchToEditMode">#</a> **switchToEditMode**
 
-Move the mouse to trigger Edit Mode
+Triggers edit mode if not already active.
 
 _Returns_
 
