@@ -62,8 +62,8 @@ export default compose(
 		const { removeNotice } = dispatch( 'core/notices' );
 
 		return {
-			installBlock: ( slug, retry, remove ) => installBlock( slug, retry, remove ),
-			removeNotice: ( id ) => removeNotice( id ),
+			installBlock,
+			removeNotice,
 		};
 	} ),
 )( DiscoverBlockHeader );
