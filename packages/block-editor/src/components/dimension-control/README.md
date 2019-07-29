@@ -46,9 +46,9 @@ registerBlockType( 'my-plugin/my-block', {
 
 		return (
 			<DimensionControl
-				title={ __( 'Padding' ) }
-				property="padding"
-				id={ clientId }
+				label={ __( 'Padding' ) }
+				icon={ 'desktop' }
+				iconLabel={ 'Desktop Devices' }
 				onReset={ partialRight( resetSpacingDimension, 'paddingSize' ) }
 				onSpacingChange={ partialRight( updateSpacing, 'paddingSize' ) }
 				currentSize={ paddingSize }
@@ -64,19 +64,12 @@ _Note:_ by default if you do not provide an initial `currentSize` prop for the c
 
 ## Props
 
-### `title`
+### `label`
 * **Type:** `String`
 * **Default:** `undefined`
 * **Required:** Yes
 
-The human readable title for the control. 
-
-### `property`
-* **Type:** `String`
-* **Default:** `undefined`
-* **Required:** Yes
-
-The spacing/dimension property which this UI is to control. Common examples are `padding` and `margin`.
+The human readable label for the control. 
 
 ### `currentSize`
 * **Type:** `String`
@@ -85,24 +78,24 @@ The spacing/dimension property which this UI is to control. Common examples are 
 
 The current value of the dimension the UI controls. If provided the UI with automatically highlight the control representing the current value.
 
-### `device`
+### `icon`
 * **Type:** `String`
-* **Default:** `all`
+* **Default:** `undefined`
 * **Required:** No
 
-The device type to which this spacing applies. By default this is set to `all`. Useful when rendering multiple `DimensionControl` components for each device type supported by your Block.
+An optional dashicon to display before to the control label.
 
-### `deviceIcon`
+### `iconLabel`
 * **Type:** `String`
-* **Default:** `desktop`
+* **Default:** `''`
 * **Required:** No
 
-A dashicon for the device type (see `device` above).
+A label for the icon (see above).
 
 ### `onSpacingChange`
 * **Type:** `Function`
 * **Default:** `undefined`
-* **Required:** Yes
+* **Required:** No
 * **Arguments:**:
   - `size` - a string representing the selected size (eg: `medium`)
 
@@ -112,7 +105,7 @@ A callback which is triggered when a spacing size value changes (is selected/cli
 ### `onReset`
 * **Type:** `Function`
 * **Default:** `undefined`
-* **Required:** Yes
+* **Required:** No
 * **Arguments:**:
 
 A callback which is triggered when the "reset" UI is activated.
