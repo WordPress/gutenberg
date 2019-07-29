@@ -1,6 +1,6 @@
 # Spinner
 
-Spinners are used to notify users that their action is being processed.
+Spinners notify users that their action is being processed.
 
 ![Spinner component](https://wordpress.org/gutenberg/files/2019/07/spinner.png)
 
@@ -8,8 +8,8 @@ Spinners are used to notify users that their action is being processed.
 
 The spinner component should:
 
-- Notify users that their request has been received and the action will soon complete.
-- The spinner component should be avoided to load a page or data.
+- Signal to users that the processing of their request is underway and will soon complete.
+- Not appear when pages or data are loading.
 
 ## Usage
 
