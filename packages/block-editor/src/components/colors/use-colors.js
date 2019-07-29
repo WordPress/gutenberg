@@ -15,22 +15,43 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
  */
 import InspectorControls from '../inspector-controls';
 import PanelColorSettings from '../panel-color-settings';
+import ContrastChecker from '../contrast-checker';
 import { useBlockEditContext } from '../block-edit';
 
-const InspectorControlsColorPanel = ( { title, colorSettings } ) => (
+const InspectorControlsColorPanel = ( {
+	title,
+	colorSettings,
+	contrastCheckerProps,
+	components,
+	panelChildren,
+} ) => (
 	<InspectorControls>
 		<PanelColorSettings
 			title={ title }
 			initialOpen={ false }
 			colorSettings={ colorSettings }
-		/>
+		>
+			{ contrastCheckerProps &&
+				components.map( ( Component ) => (
+					<ContrastChecker
+						key={ Component.displayName }
+						textColor={ Component.color }
+						{ ...contrastCheckerProps }
+					/>
+				) ) }
+			{ typeof panelChildren === 'function' ?
+				panelChildren( components ) :
+				panelChildren }
+		</PanelColorSettings>
 	</InspectorControls>
 );
 
 export default function useColors(
 	colorConfigs,
-	deps = [],
-	panelTitle = __( 'Color Settings' )
+	{ panelTitle = __( 'Color Settings' ), contrastCheckerProps, panelChildren } = {
+		panelTitle: __( 'Color Settings' ),
+	},
+	deps = []
 ) {
 	const { attributes, setAttributes } = useBlockEditContext();
 
@@ -83,6 +104,7 @@ export default function useColors(
 			// We memoize the non-primitives to avoid unnecessary updates
 			// when they are used as props for other components.
 			acc[ componentName ] = createComponent( attribute, color );
+			acc[ componentName ].displayName = componentName;
 			acc[ componentName ].color = color;
 			acc[ componentName ].setColor = createSetColor( name );
 
@@ -101,6 +123,9 @@ export default function useColors(
 				<InspectorControlsColorPanel
 					title={ panelTitle }
 					colorSettings={ colorSettings }
+					contrastCheckerProps={ contrastCheckerProps }
+					components={ Object.values( components ) }
+					panelChildren={ panelChildren }
 				/>
 			),
 		};

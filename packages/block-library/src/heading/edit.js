@@ -29,7 +29,13 @@ function HeadingEdit( {
 	onReplace,
 	className,
 } ) {
-	const { TextColor, InspectorControlsColorPanel } = useColors( [ { name: 'textColor', attribute: 'color' } ], [] );
+	const { TextColor, InspectorControlsColorPanel } = useColors(
+		[ { name: 'textColor', attribute: 'color' } ],
+		{
+			contrastCheckerProps: { backgroundColor: 'white', isLargeText: true },
+		},
+		[]
+	);
 
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
