@@ -54,3 +54,21 @@ export default withSelect( ( select ) => {
 		settings: select( 'core/block-editor' ).getSettings(),
 	};
 } )( BlockPreview );
+
+export const UnifiedBlockPreview = withSelect( ( select ) => {
+	return {
+		settings: select( 'core/block-editor' ).getSettings(),
+	};
+} )( ( { name, attributes, innerBlocks, settings } ) => {
+	const block = createBlock( name, attributes, innerBlocks );
+	return (
+		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
+			<BlockEditorProvider
+				value={ [ block ] }
+				settings={ settings }
+			>
+				<BlockList />
+			</BlockEditorProvider>
+		</Disabled>
+	);
+} );
