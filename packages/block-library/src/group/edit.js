@@ -71,6 +71,7 @@ function GroupEdit( {
 				<PanelBody title={ __( 'Spacing' ) }>
 					<ResponsiveBlockControl
 						legend="Padding"
+						property="padding"
 						isOpen={ showResponsiveControls }
 						onToggleResponsive={ ( isOpen ) => {
 							setState( {

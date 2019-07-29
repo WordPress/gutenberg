@@ -1,14 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import {
 	ToggleControl,
 } from '@wordpress/components';
 
 function ResponsiveBlockControl( props ) {
-	const { legend = '', isOpen = false, onToggleResponsive, renderDefaultControl, renderResponsiveControl } = props;
+	const { legend = '', property, toggleLabel, isOpen = false, onToggleResponsive, renderDefaultControl, renderResponsiveControl } = props;
+
+	if ( ! legend || ! property ) {
+		return null;
+	}
+
+	const toggleControlLabel = toggleLabel || sprintf( __( 'Manually adjust %s based on screensize.' ), property );
 
 	return (
 
@@ -20,7 +26,7 @@ function ResponsiveBlockControl( props ) {
 			{ isOpen && renderResponsiveControl() }
 
 			<ToggleControl
-				label={ __( 'Manually adjust padding based on screensize.' ) }
+				label={ toggleControlLabel }
 				checked={ isOpen }
 				onChange={ onToggleResponsive }
 			/>
