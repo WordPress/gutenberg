@@ -66,8 +66,9 @@ describe( 'block deletion -', () => {
 			// The blocks can't be empty to trigger the toolbar
 			await page.keyboard.type( 'Paragraph to remove' );
 
-			// Press Escape to show the block toolbar
-			await page.keyboard.press( 'Escape' );
+			// Move the mouse to show the block toolbar
+			await page.mouse.move( 0, 0 );
+			await page.mouse.move( 10, 10 );
 
 			await clickOnBlockSettingsMenuRemoveBlockButton();
 
@@ -154,7 +155,9 @@ describe( 'deleting all blocks', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph' );
 
-		await page.keyboard.press( 'Escape' );
+		// Move the mouse to show the block toolbar
+		await page.mouse.move( 0, 0 );
+		await page.mouse.move( 10, 10 );
 
 		await clickOnBlockSettingsMenuRemoveBlockButton();
 
