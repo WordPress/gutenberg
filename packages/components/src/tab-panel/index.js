@@ -7,6 +7,7 @@ import { noop, find } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/compose';
 import { useState, useEffect } from '@wordpress/element';
 
@@ -65,7 +66,7 @@ const TabPanel = ( { tabs, initialTabName, controlledTabName, className, onSelec
 					<TabButton className={ classnames( 'components-tab-panel__tabs-item', tab.className, { [ activeClass ]: tab.name === selectedTabName } ) }
 						tabId={ instanceId + '-' + tab.name }
 						aria-controls={ instanceId + '-' + tab.name + '-view' }
-						aria-label={ tab.ariaLabel }
+						aria-label={ tab.name === selectedTabName ? tab.ariaLabel + __( ' (selected)' ) : tab.ariaLabel }
 						selected={ tab.name === selectedTabName }
 						key={ tab.name }
 						onClick={ () => onClick( tab ) }

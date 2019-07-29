@@ -11,31 +11,19 @@ import { TabPanel } from '@wordpress/components';
 import SidebarHeader from '../sidebar-header';
 
 const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName } ) => {
-	const documentAriaLabel = sidebarName === 'edit-post/document' ?
-		// translators: ARIA label for the Document sidebar tab, selected.
-		__( 'Document (selected)' ) :
-		// translators: ARIA label for the Document sidebar tab, not selected.
-		( 'Document' );
-
-	const blockAriaLabel = sidebarName === 'edit-post/block' ?
-		// translators: ARIA label for the Settings Sidebar tab, selected.
-		__( 'Block (selected)' ) :
-		// translators: ARIA label for the Settings Sidebar tab, not selected.
-		__( 'Block' );
-
 	const tabs = [
 		{
-			name: 'edit-post/document__panel-tab',
+			name: 'edit-post/document',
 			className: 'edit-post-sidebar__panel-tab',
 			title: __( 'Document' ),
-			ariaLabel: `${ documentAriaLabel }`,
+			ariaLabel: __( 'Document' ),
 			onSelect: openDocumentSettings,
 		},
 		{
-			name: 'edit-post/block__panel-tab',
+			name: 'edit-post/block',
 			className: 'edit-post-sidebar__panel-tab',
 			title: __( 'Block' ),
-			ariaLabel: `${ blockAriaLabel }`,
+			ariaLabel: __( 'Block' ),
 			onSelect: openBlockSettings,
 		},
 	];
@@ -47,7 +35,7 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 		>
 			<TabPanel
 				tabs={ tabs }
-				controlledTabName={ sidebarName + '__panel-tab' }
+				controlledTabName={ sidebarName }
 			>
 			</TabPanel>
 		</SidebarHeader>
