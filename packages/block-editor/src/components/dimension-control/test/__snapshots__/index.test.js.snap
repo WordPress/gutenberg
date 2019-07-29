@@ -1,145 +1,132 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DimensionControl rendering correctly for different properties renders correctly for "margin" property 1`] = `
-<BaseControl
+exports[`DimensionControl rendering renders with defaults 1`] = `
+<WithInstanceId(SelectControl)
   className="block-editor-dimension-control"
-  id="block-spacing-margin-all-2"
->
-  <div
-    className="block-editor-dimension-control__header"
-  >
-    <Component
-      className="block-editor-dimension-control__header-label"
-    >
-      <Icon
-        icon="desktop"
-        label="all"
-      />
-      All
-    </Component>
-    <ForwardRef(Button)
-      aria-label="Reset Margin for all"
-      disabled={true}
-      isDefault={true}
-      isSmall={true}
-      onClick={[Function]}
-    >
-      Reset
-    </ForwardRef(Button)>
-  </div>
-  <DimensionButtons
-    device="all"
-    id="2"
-    instanceId="2"
-    onChangeSpacingSize={[Function]}
-    property="margin"
-    sizes={
-      Array [
-        Object {
-          "abbr": "No",
-          "name": "None",
-          "size": 0,
-          "slug": "none",
-        },
-        Object {
-          "abbr": "S",
-          "name": "Small",
-          "size": 14,
-          "slug": "small",
-        },
-        Object {
-          "abbr": "M",
-          "name": "Medium",
-          "size": 24,
-          "slug": "medium",
-        },
-        Object {
-          "abbr": "L",
-          "name": "Large",
-          "size": 34,
-          "slug": "large",
-        },
-        Object {
-          "abbr": "XL",
-          "name": "Extra Large",
-          "size": 60,
-          "slug": "xlarge",
-        },
-      ]
-    }
-    title="Margin"
-  />
-</BaseControl>
+  hideLabelFromVision={false}
+  label={
+    <React.Fragment>
+      Padding
+    </React.Fragment>
+  }
+  onChange={[Function]}
+  options={
+    Array [
+      Object {
+        "label": "Please select…",
+        "value": "",
+      },
+      Object {
+        "label": "None",
+        "value": "none",
+      },
+      Object {
+        "label": "Small",
+        "value": "small",
+      },
+      Object {
+        "label": "Medium",
+        "value": "medium",
+      },
+      Object {
+        "label": "Large",
+        "value": "large",
+      },
+      Object {
+        "label": "Extra Large",
+        "value": "xlarge",
+      },
+    ]
+  }
+/>
 `;
 
-exports[`DimensionControl rendering correctly for different properties renders correctly for "padding" property 1`] = `
-<BaseControl
+exports[`DimensionControl rendering renders with icon and custom icon label 1`] = `
+<WithInstanceId(SelectControl)
   className="block-editor-dimension-control"
-  id="block-spacing-padding-all-1"
->
-  <div
-    className="block-editor-dimension-control__header"
-  >
-    <Component
-      className="block-editor-dimension-control__header-label"
-    >
+  hideLabelFromVision={false}
+  label={
+    <React.Fragment>
       <Icon
-        icon="desktop"
+        icon="tablet"
+        label="Tablet Devices"
+      />
+      Margin
+    </React.Fragment>
+  }
+  onChange={[Function]}
+  options={
+    Array [
+      Object {
+        "label": "Please select…",
+        "value": "",
+      },
+      Object {
+        "label": "None",
+        "value": "none",
+      },
+      Object {
+        "label": "Small",
+        "value": "small",
+      },
+      Object {
+        "label": "Medium",
+        "value": "medium",
+      },
+      Object {
+        "label": "Large",
+        "value": "large",
+      },
+      Object {
+        "label": "Extra Large",
+        "value": "xlarge",
+      },
+    ]
+  }
+/>
+`;
+
+exports[`DimensionControl rendering renders with icon and default icon label 1`] = `
+<WithInstanceId(SelectControl)
+  className="block-editor-dimension-control"
+  hideLabelFromVision={false}
+  label={
+    <React.Fragment>
+      <Icon
+        icon="tablet"
         label="all"
       />
-      All
-    </Component>
-    <ForwardRef(Button)
-      aria-label="Reset Padding for all"
-      disabled={true}
-      isDefault={true}
-      isSmall={true}
-      onClick={[Function]}
-    >
-      Reset
-    </ForwardRef(Button)>
-  </div>
-  <DimensionButtons
-    device="all"
-    id="1"
-    instanceId="1"
-    onChangeSpacingSize={[Function]}
-    property="padding"
-    sizes={
-      Array [
-        Object {
-          "abbr": "No",
-          "name": "None",
-          "size": 0,
-          "slug": "none",
-        },
-        Object {
-          "abbr": "S",
-          "name": "Small",
-          "size": 14,
-          "slug": "small",
-        },
-        Object {
-          "abbr": "M",
-          "name": "Medium",
-          "size": 24,
-          "slug": "medium",
-        },
-        Object {
-          "abbr": "L",
-          "name": "Large",
-          "size": 34,
-          "slug": "large",
-        },
-        Object {
-          "abbr": "XL",
-          "name": "Extra Large",
-          "size": 60,
-          "slug": "xlarge",
-        },
-      ]
-    }
-    title="Padding"
-  />
-</BaseControl>
+      Margin
+    </React.Fragment>
+  }
+  onChange={[Function]}
+  options={
+    Array [
+      Object {
+        "label": "Please select…",
+        "value": "",
+      },
+      Object {
+        "label": "None",
+        "value": "none",
+      },
+      Object {
+        "label": "Small",
+        "value": "small",
+      },
+      Object {
+        "label": "Medium",
+        "value": "medium",
+      },
+      Object {
+        "label": "Large",
+        "value": "large",
+      },
+      Object {
+        "label": "Extra Large",
+        "value": "xlarge",
+      },
+    ]
+  }
+/>
 `;

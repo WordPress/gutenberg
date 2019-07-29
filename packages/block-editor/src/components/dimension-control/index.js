@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,7 +25,7 @@ import {
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {
-	const { label, device = 'all', deviceIcon = 'desktop', currentSize, onSpacingChange, onReset } = props;
+	const { label, icon, iconLabel = 'all', currentSize, onSpacingChange = noop, onReset = noop, className = '' } = props;
 
 	/**
 	 * Determines the size from the size slug (eg: `medium`)
@@ -71,17 +72,19 @@ export function DimensionControl( props ) {
 
 	const selectLabel = (
 		<Fragment>
-			<Icon
-				icon={ deviceIcon || device }
-				label={ device }
-			/>
+			{ icon && (
+				<Icon
+					icon={ icon }
+					label={ iconLabel || '' }
+				/>
+			) }
 			{ label }
 		</Fragment>
 	);
 
 	return (
 		<SelectControl
-			className={ classnames( 'block-editor-dimension-control', { 'is-manual': 'all' !== device } ) }
+			className={ classnames( className, 'block-editor-dimension-control' ) }
 			label={ selectLabel }
 			hideLabelFromVision={ false }
 			value={ currentSize }

@@ -18,24 +18,35 @@ describe( 'DimensionControl', () => {
 		onResetHandler.mockClear();
 	} );
 
-	describe( 'rendering correctly for different properties', () => {
-		it( 'renders correctly for "padding" property', () => {
+	describe( 'rendering', () => {
+		it( 'renders with defaults', () => {
 			const wrapper = shallow(
 				<DimensionControl
 					instanceId={ uniqueId() }
-					title={ 'Padding' }
-					property={ 'padding' }
+					label={ 'Padding' }
 				/>
 			);
 			expect( wrapper ).toMatchSnapshot();
 		} );
 
-		it( 'renders correctly for "margin" property', () => {
+		it( 'renders with icon and default icon label', () => {
 			const wrapper = shallow(
 				<DimensionControl
 					instanceId={ uniqueId() }
-					title={ 'Margin' }
-					property={ 'margin' }
+					label={ 'Margin' }
+					icon={ 'tablet' }
+				/>
+			);
+			expect( wrapper ).toMatchSnapshot();
+		} );
+
+		it( 'renders with icon and custom icon label', () => {
+			const wrapper = shallow(
+				<DimensionControl
+					instanceId={ uniqueId() }
+					label={ 'Margin' }
+					icon={ 'tablet' }
+					iconLabel={ 'Tablet Devices' }
 				/>
 			);
 			expect( wrapper ).toMatchSnapshot();
@@ -43,35 +54,46 @@ describe( 'DimensionControl', () => {
 	} );
 
 	describe( 'callbacks', () => {
-		it( 'should call onSpacingChange handler with correct args on size button click', () => {
+		it( 'should call onSpacingChange handler with correct args on size change', () => {
 			const wrapper = mount(
 				<DimensionControl
 					instanceId={ uniqueId() }
-					title={ 'Padding' }
-					property={ 'padding' }
+					label={ 'Padding' }
 					onSpacingChange={ onChangeHandler }
 				/>
 			);
 
-			wrapper.find( 'button[value="small"]' ).simulate( 'click' );
+			wrapper.find( 'select' ).at( 0 ).simulate( 'change', {
+				target: {
+					value: 'small',
+				},
+			} );
 
-			expect( onChangeHandler ).toHaveBeenCalledTimes( 1 );
-			expect( onChangeHandler ).toHaveBeenCalledWith( 'small' );
+			wrapper.find( 'select' ).at( 0 ).simulate( 'change', {
+				target: {
+					value: 'medium',
+				},
+			} );
+
+			expect( onChangeHandler ).toHaveBeenCalledTimes( 2 );
+			expect( onChangeHandler.mock.calls[ 0 ][ 0 ] ).toEqual( 'small' );
+			expect( onChangeHandler.mock.calls[ 1 ][ 0 ] ).toEqual( 'medium' );
 		} );
 
-		it( 'should call onReset handler with correct args on reset button click', () => {
+		it( 'should call onReset handler with when no size is provided on change', () => {
 			const wrapper = mount(
 				<DimensionControl
 					instanceId={ uniqueId() }
-					title={ 'Padding' }
-					property={ 'padding' }
+					label={ 'Padding' }
 					onReset={ onResetHandler }
-					device="desktop"
-					currentSize={ 'medium' }
 				/>
 			);
 
-			wrapper.find( 'button[aria-label="Reset Padding for desktop"]' ).simulate( 'click' );
+			wrapper.find( 'select' ).at( 0 ).simulate( 'change', {
+				target: {
+					value: '', // this happens when you select the "default" <option />
+				},
+			} );
 
 			expect( onResetHandler ).toHaveBeenCalledTimes( 1 );
 		} );
