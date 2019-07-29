@@ -22,11 +22,11 @@ export function select( storeName, selectorName, ...args ) {
 	};
 }
 
-export function dispatch( storeName, selectorName, ...args ) {
+export function dispatch( storeName, dispatcherName, ...args ) {
 	return {
 		type: 'DISPATCH',
 		storeName,
-		selectorName,
+		dispatcherName,
 		args,
 	};
 }
@@ -48,8 +48,8 @@ const controls = {
 	SELECT: createRegistryControl( ( registry ) => ( { storeName, selectorName, args } ) => {
 		return registry.select( storeName )[ selectorName ]( ...args );
 	} ),
-	DISPATCH: createRegistryControl( ( registry ) => ( { storeName, selectorName, args } ) => {
-		return registry.dispatch( storeName )[ selectorName ]( ...args );
+	DISPATCH: createRegistryControl( ( registry ) => ( { storeName, dispatcherName, args } ) => {
+		return registry.dispatch( storeName )[ dispatcherName ]( ...args );
 	} ),
 	API_FETCH( { request } ) {
 		return wpApiFetch( { ... request } );

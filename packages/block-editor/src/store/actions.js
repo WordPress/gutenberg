@@ -7,6 +7,7 @@ import { castArray, first } from 'lodash';
  * WordPress dependencies
  */
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -734,9 +735,11 @@ export function setInstallBlocksPermission( hasPermission ) {
 
 /** Action triggered to install a block plugin
 * @param {string} slug The plugin slug for block.
+* @param {function} retry The callback function when user clicks Retry button on error notice.
+* @param {function} remove The callback function when user clicks Remove button on error notice.
 *
-*/
-export function* installBlock( slug ) {
+ */
+export function* installBlock( slug, retry, remove ) {
 	try {
 		const response = yield apiFetch( {
 			path: '__experimental/blocks/install',
@@ -746,27 +749,29 @@ export function* installBlock( slug ) {
 			method: 'POST',
 		} );
 		if ( response.success === false ) {
-			yield dispatch(
-				'core/notices',
-				'createErrorNotice',
-				[ 'Block can\'t install.' ]
-			);
-			return;
+			throw new Error( response.errorMessage );
 		}
 	} catch ( error ) {
 		yield dispatch(
 			'core/notices',
 			'createErrorNotice',
-			[ 'Block previews can\'t install.', {
-				id: 'block-preview-error',
+			__( 'Block previews can\'t install.' ),
+			{ id: 'block-install-error',
 				actions: [
 					{
 						label: 'Retry',
 						onClick: () => {
+							retry();
+						},
+					},
+					{
+						label: 'Remove',
+						onClick: () => {
+							remove();
 						},
 					},
 				],
-			} ]
+			}
 		);
 	}
 }

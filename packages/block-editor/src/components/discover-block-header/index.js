@@ -13,7 +13,17 @@ import { compose } from '@wordpress/compose';
 import BlockIcon from '../block-icon';
 import BlockRatings from '../block-ratings';
 
-function DiscoverBlockHeader( { slug, icon, title, rating, ratingCount, onClick, installBlock } ) {
+function DiscoverBlockHeader( { slug, icon, title, rating, ratingCount, onClick, installBlock, removeNotice } ) {
+	const retryIfFailed = () => {
+		removeNotice( 'block-install-error' );
+		installBlock( slug, retryIfFailed, removeIfFailed );
+	};
+
+	const removeIfFailed = () => {
+		removeNotice( 'block-install-error' );
+		//TODO: remove block and unregister block type from editor;
+	};
+
 	return (
 		<Fragment>
 			<div className="block-editor-discover-block-header__row">
@@ -35,7 +45,7 @@ function DiscoverBlockHeader( { slug, icon, title, rating, ratingCount, onClick,
 					isDefault
 					onClick={ ( event ) => {
 						event.preventDefault();
-						installBlock( slug );
+						installBlock( slug, retryIfFailed, removeIfFailed );
 						onClick();
 					} }
 				>
@@ -49,9 +59,11 @@ function DiscoverBlockHeader( { slug, icon, title, rating, ratingCount, onClick,
 export default compose(
 	withDispatch( ( dispatch ) => {
 		const { installBlock } = dispatch( 'core/block-editor' );
+		const { removeNotice } = dispatch( 'core/notices' );
 
 		return {
-			installBlock: ( slug ) => installBlock( slug ),
+			installBlock: ( slug, retry, remove ) => installBlock( slug, retry, remove ),
+			removeNotice: ( id ) => removeNotice( id ),
 		};
 	} ),
 )( DiscoverBlockHeader );
