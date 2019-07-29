@@ -2,7 +2,7 @@
  * External dependencies
  */
 import memoize from 'memize';
-import { startCase } from 'lodash';
+import { kebabCase, startCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,6 +22,9 @@ const createComponent = memoize( ( attribute, color ) => ( { children } ) =>
 	// if not already set explicitly through props.
 	Children.map( children, ( child ) =>
 		cloneElement( child, {
+			className: color ?
+				`${ child.props.className } has-${ kebabCase( attribute ) }` :
+				child.props.className,
 			style: { [ attribute ]: color, ...child.props.style },
 		} )
 	)
