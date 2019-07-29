@@ -34,37 +34,24 @@
 		}
 	}
 
-	&[data-is-placeholder-visible="true"] {
-		position: absolute;
-		top: 0;
-		width: 100%;
-		margin-top: 0;
-
-		& > p {
-			margin-top: 0;
-		}
-
-		// Ensure that if placeholder wraps (mobile/nested contexts) the clickable area is full-height.
-		height: 100%;
-	}
-
-	// Placeholder text.
-	& + .block-editor-rich-text__editable {
+	[data-rich-text-placeholder]::after {
+		content: attr(data-rich-text-placeholder);
 		pointer-events: none;
-
 		// Use opacity to work in various editor styles.
 		// We don't specify the color here, because blocks or editor styles might provide their own.
-		&,
-		p {
-			opacity: 0.62;
-		}
+		opacity: 0.62;
 	}
 
-	// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
-	// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
-	&[data-is-placeholder-visible="true"] + figcaption.block-editor-rich-text__editable {
-		opacity: 0.8;
+	// Could be unset for individual rich text instances.
+	&.is-selected [data-rich-text-placeholder]::after {
+		display: none;
 	}
+}
+
+// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
+// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
+figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before {
+	opacity: 0.8;
 }
 
 .block-editor-rich-text__inline-toolbar {

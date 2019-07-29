@@ -1169,11 +1169,6 @@ function getBlockEditorSelector( name ) {
 }
 
 /**
- * @see getBlockDependantsCacheBust in core/block-editor store.
- */
-export const getBlockDependantsCacheBust = getBlockEditorSelector( 'getBlockDependantsCacheBust' );
-
-/**
  * @see getBlockName in core/block-editor store.
  */
 export const getBlockName = getBlockEditorSelector( 'getBlockName' );

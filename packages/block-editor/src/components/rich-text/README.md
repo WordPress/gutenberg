@@ -53,10 +53,6 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 *Optional.* Whether to show the input is selected or not in order to show the formatting controls. By default it renders the controls when the block is selected.
 
-### `keepPlaceholderOnFocus: Boolean`
-
-*Optional.* By default, the placeholder will hide as soon as the editable field receives focus. With this setting it can be be kept while the field is focussed and empty.
-
 ### `autocompleters: Array<Completer>`
 
 *Optional.* A list of autocompleters to use instead of the default.
