@@ -21,6 +21,7 @@ import { useBlockEditContext } from '../block-edit';
 const ColorPanel = ( {
 	title,
 	colorSettings,
+	colorPanelProps,
 	contrastCheckerProps,
 	components,
 	panelChildren,
@@ -29,6 +30,7 @@ const ColorPanel = ( {
 		title={ title }
 		initialOpen={ false }
 		colorSettings={ colorSettings }
+		{ ...colorPanelProps }
 	>
 		{ contrastCheckerProps &&
 			components.map( ( Component ) => (
@@ -51,7 +53,12 @@ const InspectorControlsColorPanel = ( props ) => (
 
 export default function __experimentalUseColors(
 	colorConfigs,
-	{ panelTitle = __( 'Color Settings' ), contrastCheckerProps, panelChildren } = {
+	{
+		panelTitle = __( 'Color Settings' ),
+		colorPanelProps,
+		contrastCheckerProps,
+		panelChildren,
+	} = {
 		panelTitle: __( 'Color Settings' ),
 	},
 	deps = []
@@ -99,6 +106,7 @@ export default function __experimentalUseColors(
 				componentName = panelLabel.replace( /\s/g, '' ), // E.g. 'BackgroundColor'.
 
 				color = colorConfig.color,
+				colors,
 			} = {
 				...colorConfig,
 				color: attributes[ colorConfig.name ],
@@ -111,27 +119,37 @@ export default function __experimentalUseColors(
 			acc[ componentName ].color = color;
 			acc[ componentName ].setColor = createSetColor( name );
 
-			colorSettings.push( {
-				value: color,
-				onChange: acc[ componentName ].setColor,
-				label: panelLabel,
-			} );
+			const newSettingIndex =
+				colorSettings.push( {
+					value: color,
+					onChange: acc[ componentName ].setColor,
+					label: panelLabel,
+					colors,
+				} ) - 1;
+			// These settings will be spread over the `colors` in
+			// `colorPanelProps`, so we need to unset the key here,
+			// if not set to an actual value, to avoid overwriting
+			// an actual value in `colorPanelProps`.
+			if ( ! colors ) {
+				delete colorSettings[ newSettingIndex ].colors;
+			}
 
 			return acc;
 		}, {} );
 
-		const colorPanelProps = {
+		const wrappedColorPanelProps = {
 			title: panelTitle,
 			colorSettings,
+			colorPanelProps,
 			contrastCheckerProps,
 			components: Object.values( components ),
 			panelChildren,
 		};
 		return {
 			...components,
-			ColorPanel: <ColorPanel { ...colorPanelProps } />,
+			ColorPanel: <ColorPanel { ...wrappedColorPanelProps } />,
 			InspectorControlsColorPanel: (
-				<InspectorControlsColorPanel { ...colorPanelProps } />
+				<InspectorControlsColorPanel { ...wrappedColorPanelProps } />
 			),
 		};
 	}, [ attributes, setAttributes, ...deps ] );
