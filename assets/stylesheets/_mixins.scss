@@ -143,7 +143,6 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-	outline-offset: -2px;
 }
 
 // Switch.
@@ -173,7 +172,6 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-	outline-offset: -2px;
 }
 
 // Tabs, Inputs, Square buttons.
@@ -192,7 +190,6 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-	outline-offset: -2px;
 }
 
 // Square buttons.
@@ -244,7 +241,6 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-	outline-offset: -2px;
 }
 
 @mixin block-style__is-active() {
