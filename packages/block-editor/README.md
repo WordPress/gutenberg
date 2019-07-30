@@ -122,10 +122,6 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-<a name="BlockPreview" href="#BlockPreview">#</a> **BlockPreview**
-
-Undocumented declaration.
-
 <a name="BlockSelectionClearer" href="#BlockSelectionClearer">#</a> **BlockSelectionClearer**
 
 Undocumented declaration.
