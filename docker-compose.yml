@@ -4,7 +4,6 @@ services:
 
   wordpress:
     image: wordpress
-    restart: always
     ports:
       - 8888:80
     environment:
@@ -24,7 +23,6 @@ services:
 
   cli:
     image: wordpress:cli
-    restart: always
     user: xfs
     volumes:
       - wordpress_data:/var/www/html
@@ -35,14 +33,12 @@ services:
 
   mysql:
     image: mysql:5.7
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: wordpress_test
 
   wordpress_phpunit:
     image: chriszarate/wordpress-phpunit
-    restart: always
     environment:
       PHPUNIT_DB_HOST: mysql
     volumes:
@@ -53,13 +49,11 @@ services:
 
   composer:
     image: composer
-    restart: always
     volumes:
       - .:/app
 
   wordpress_e2e_tests:
     image: wordpress
-    restart: always
     ports:
       - 8889:80
     environment:
@@ -80,7 +74,6 @@ services:
 
   cli_e2e_tests:
     image: wordpress:cli
-    restart: always
     user: xfs
     volumes:
       - wordpress_e2e_tests_data:/var/www/html

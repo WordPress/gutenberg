@@ -9,7 +9,6 @@ import RNReactNativeGutenbergBridge, {
 	subscribeSetTitle,
 	sendNativeEditorDidLayout,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -135,10 +134,8 @@ class Editor extends Component {
 		if ( ! prevProps.isReady && this.props.isReady ) {
 			const blocks = this.props.getEditorBlocks();
 			const isUnsupportedBlock = ( { name } ) => name === getUnregisteredTypeHandlerName();
-			const unsupportedBlocks = blocks.filter( isUnsupportedBlock );
-			const hasUnsupportedBlocks = ! isEmpty( unsupportedBlocks );
-
-			RNReactNativeGutenbergBridge.editorDidMount( hasUnsupportedBlocks );
+			const unsupportedBlockNames = blocks.filter( isUnsupportedBlock ).map( ( block ) => block.attributes.originalName );
+			RNReactNativeGutenbergBridge.editorDidMount( unsupportedBlockNames );
 		}
 	}
 

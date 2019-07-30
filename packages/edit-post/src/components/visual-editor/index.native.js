@@ -63,6 +63,8 @@ class VisualEditor extends Component {
 					isFullyBordered={ isFullyBordered }
 					rootViewHeight={ rootViewHeight }
 					safeAreaBottomInset={ safeAreaBottomInset }
+					isPostTitleSelected={ this.props.isPostTitleSelected }
+					onBlockTypeSelected={ this.onPostTitleUnselect }
 				/>
 			</BlockEditorProvider>
 		);
@@ -74,11 +76,13 @@ export default compose( [
 		const {
 			getEditorBlocks,
 			getEditedPostAttribute,
+			isPostTitleSelected,
 		} = select( 'core/editor' );
 
 		return {
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
+			isPostTitleSelected: isPostTitleSelected(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -87,7 +91,10 @@ export default compose( [
 			resetEditorBlocks,
 		} = dispatch( 'core/editor' );
 
+		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
+
 		return {
+			clearSelectedBlock,
 			editTitle( title ) {
 				editPost( { title } );
 			},

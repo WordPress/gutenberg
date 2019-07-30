@@ -20,6 +20,7 @@ function onClick( event ) {
 }
 
 export function DotTip( {
+	position = 'middle right',
 	children,
 	isVisible,
 	hasNextTip,
@@ -33,7 +34,7 @@ export function DotTip( {
 	return (
 		<Popover
 			className="nux-dot-tip"
-			position="middle right"
+			position={ position }
 			noArrow
 			focusOnMount="container"
 			getAnchorRect={ getAnchorRect }

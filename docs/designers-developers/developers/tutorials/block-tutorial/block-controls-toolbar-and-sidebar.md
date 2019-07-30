@@ -4,7 +4,7 @@ To simplify block customization and ensure a consistent experience for users, th
 
 ## Block Toolbar
 
-![Screenshot of the rich text toolbar applied to a paragraph block inside the block editor](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/toolbar-text.png)
+![Screenshot of the rich text toolbar applied to a Paragraph block inside the block editor](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/toolbar-text.png)
 
 When the user selects a block, a number of control buttons may be shown in a toolbar above the selected block. Some of these block-level controls are included automatically if the editor is able to transform the block to another type, or if the focused element is a RichText component.
 
@@ -167,7 +167,7 @@ Note that `BlockControls` is only visible when the block is currently selected a
 
 ## Inspector
 
-![Screenshot of the inspector panel focused on the settings for a paragraph block](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/inspector.png)
+![Screenshot of the inspector panel focused on the settings for a Paragraph block](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/inspector.png)
 
 The Settings Sidebar is used to display less-often-used settings or settings that require more screen space. The Settings Sidebar should be used for **block-level settings only**.
 

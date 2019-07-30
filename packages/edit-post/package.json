@@ -41,7 +41,7 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.14",
 		"refx": "^3.0.0"
 	},
 	"publishConfig": {

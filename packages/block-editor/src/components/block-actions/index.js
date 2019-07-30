@@ -117,8 +117,14 @@ export default compose( [
 					return;
 				}
 
+				const {
+					getGroupingBlockName,
+				} = select( 'core/blocks' );
+
+				const groupingBlockName = getGroupingBlockName();
+
 				// Activate the `transform` on `core/group` which does the conversion
-				const newBlocks = switchToBlockType( blocks, 'core/group' );
+				const newBlocks = switchToBlockType( blocks, groupingBlockName );
 
 				if ( ! newBlocks ) {
 					return;

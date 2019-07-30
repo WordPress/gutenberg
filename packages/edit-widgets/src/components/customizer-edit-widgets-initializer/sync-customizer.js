@@ -78,9 +78,19 @@ const updateSettingInputValue = throttle( ( nextWidgetAreas ) => {
 
 // Check that all the necessary globals are present.
 if ( window.wp && window.wp.customize && window.wp.data ) {
+	let ran = false;
 	// Wait for the Customizer to finish bootstrapping.
 	window.wp.customize.bind( 'ready', () =>
 		window.wp.customize.previewer.bind( 'ready', () => {
+			// The Customizer will call this on every preview refresh,
+			// but we only want to run it once to avoid running another
+			// store setup that would set changeset edits and save
+			// widget blocks unintentionally.
+			if ( ran ) {
+				return;
+			}
+			ran = true;
+
 			// Try to parse a previous changeset from the hidden input.
 			let widgetAreas;
 			try {

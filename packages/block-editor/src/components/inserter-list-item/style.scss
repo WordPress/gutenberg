@@ -51,17 +51,21 @@
 		}
 
 		&:active,
-		&.is-active,
 		&:focus {
 			position: relative;
-
-			// Show the focus style in the icon inside instead.
-			outline: none;
-			@include block-style__focus-active();
+			@include block-style__focus();
 
 			.block-editor-block-types-list__item-icon,
 			.block-editor-block-types-list__item-title {
 				color: inherit;
+			}
+		}
+
+		&.is-active {
+			@include block-style__is-active();
+
+			&:focus {
+				@include block-style__is-active-focus();
 			}
 		}
 	}

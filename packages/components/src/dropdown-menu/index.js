@@ -20,6 +20,7 @@ function DropdownMenu( {
 	children,
 	className,
 	controls,
+	hasArrowIndicator = false,
 	icon = 'menu',
 	label,
 	menuLabel,
@@ -70,7 +71,7 @@ function DropdownMenu( {
 						labelPosition={ __unstableLabelPosition }
 						tooltip={ label }
 					>
-						{ ! icon && <span className="components-dropdown-menu__indicator" /> }
+						{ ( ! icon || hasArrowIndicator ) && <span className="components-dropdown-menu__indicator" /> }
 					</IconButton>
 				);
 			} }
