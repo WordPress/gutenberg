@@ -100,16 +100,16 @@
 }
 
 .block-editor-block-switcher__popover .components-popover__content {
+	.block-editor-block-switcher__container {
+		box-shadow: $shadow-popover;
+		background: $white;
+		min-width: 300px;
+		max-width: 340px;
+		width: 50%;
+	}
+
 	@include break-medium {
 		position: relative;
-
-		.block-editor-block-switcher__container {
-			box-shadow: $shadow-popover;
-			background: $white;
-			min-width: 300px;
-			max-width: 340px;
-			width: 50%;
-		}
 
 		.block-editor-block-preview {
 			border-left: $border-width solid $light-gray-500;
