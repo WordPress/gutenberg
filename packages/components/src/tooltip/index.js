@@ -38,6 +38,8 @@ class Tooltip extends Component {
 		/**
 		 * Prebound `isInMouseDown` handler, created as a constant reference to
 		 * assure ability to remove in component unmount.
+		 *
+		 * @type {Function}
 		 */
 		this.cancelIsMouseDown = this.createSetIsMouseDown( false );
 
