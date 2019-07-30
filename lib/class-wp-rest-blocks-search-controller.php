@@ -41,7 +41,7 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
-				'schema' => array( $this, 'get_public_item_schema' ),
+				'schema' => array( $this, 'get_item_schema' ),
 			)
 		);
 		register_rest_route(
@@ -49,11 +49,11 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 			'/' . $this->rest_base . '/install',
 			array(
 				array(
-					'methods'             => WP_REST_Server::EDITABLE,
+					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'install_block' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
-				'schema' => array( $this, 'get_public_item_schema' ),
+				'schema' => array( $this, 'get_item_schema' ),
 			)
 		);
 	}
@@ -67,12 +67,12 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( $request ) {
-		// if ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) {
-		// 	return new WP_Error(
-		// 		'rest_user_cannot_view',
-		// 		__( 'Sorry, you are not allowed to install blocks.', 'gutenberg' )
-		// 	);
-		// }
+		if ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) {
+			return new WP_Error(
+				'rest_user_cannot_view',
+				__( 'Sorry, you are not allowed to install blocks.', 'gutenberg' )
+			);
+		}
 
 		return true;
 	}
@@ -108,12 +108,11 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 		$status['pluginName'] = $api->name;
 
 		$skin     = new WP_Ajax_Upgrader_Skin();
-
 		$upgrader = new Plugin_Upgrader( $skin );
 
 		//TODO: Handle if FS_METHOD is not direct. file.php is trying to display FTP credentials modal dialog as part of the request, causing malformed JSON.
 		$result   = $upgrader->install( $api->download_link );
-	
+
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			$status['debug'] = $skin->get_upgrade_messages();
 		}
@@ -121,9 +120,11 @@ class WP_REST_Blocks_Search_Controller extends WP_REST_Controller {
 		if ( is_wp_error( $result ) ) {
 			return WP_Error( $result->get_error_code(), $result->get_error_message() );
 		} 
+		
 		if ( is_wp_error( $skin->result ) ) {
 			return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_message() );
 		}
+
 		if ( $skin->get_errors()->has_errors() ) {
 			return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_messages() );
 		}
