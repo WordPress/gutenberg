@@ -218,8 +218,8 @@ function parse_block_metadata( $plugin ) {
 	$block->description = wp_strip_all_tags( $plugin[ 'description' ] );
 
 	$block->rating         = $plugin[ 'rating' ];
-	$block->ratingCount    = $plugin[ 'num_ratings' ];
-	$block->activeInstalls = $plugin[ 'active_installs' ];
+	$block->rating_count    = $plugin[ 'num_ratings' ];
+	$block->active_installs = $plugin[ 'active_installs' ];
 
 	// AMBIGUOUS: Plugin's author, not author in block.json
 	$block->author = wp_strip_all_tags( $plugin[ 'author' ] );
@@ -231,12 +231,12 @@ function parse_block_metadata( $plugin ) {
 		return 'https://plugins.svn.wordpress.org/' . $plugin[ 'slug' ] . $asset;
 	}, $plugin[ 'block_assets' ] );
 
-	$block->humanizedUpdated = human_time_diff( strtotime( $plugin[ 'last_updated' ] ), current_time( 'timestamp' ) ) . __( ' ago' );
+	$block->humanized_updated = human_time_diff( strtotime( $plugin[ 'last_updated' ] ), current_time( 'timestamp' ) ) . __( ' ago' );
 
 	// TODO: calculate these values
-	$block->authorAverageRating = null;
-	$block->authorBlocksCount   = null;
-	$block->authorSupportTime   = null;
+	$block->author_average_rating = null;
+	$block->author_blocks_count   = null;
+	$block->author_support_time   = null;
 
 	return $block;
 }

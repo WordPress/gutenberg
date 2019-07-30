@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { camelCase, mapKeys } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { apiFetch } from './controls';
@@ -12,9 +17,13 @@ export default {
 
 		try {
 			yield fetchDiscoverBlocks( filterValue );
-			const blocks = yield apiFetch( {
+			const results = yield apiFetch( {
 				path: `__experimental/blocks?search=${ filterValue }`,
 			} );
+			const blocks = results.map( ( result ) => mapKeys( result, ( value, key ) => {
+				return camelCase( key );
+			} ) );
+
 			yield receiveDiscoverBlocks( blocks, filterValue );
 		} catch ( error ) {
 			if ( error.code === 'rest_user_cannot_view' ) {
