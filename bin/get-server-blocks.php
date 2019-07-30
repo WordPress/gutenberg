@@ -24,10 +24,10 @@ wp_initial_constants();
 require_once ABSPATH . WPINC . '/functions.php';
 wp_load_translations_early();
 wp_set_lang_dir();
-require_once dirname( dirname( __FILE__ ) ) . '/lib/blocks.php';
-require_once dirname( dirname( __FILE__ ) ) . '/lib/class-wp-block-type-registry.php';
-require_once dirname( dirname( __FILE__ ) ) . '/lib/class-wp-block-type.php';
-require_once dirname( dirname( __FILE__ ) ) . '/lib/client-assets.php';
+require_once ABSPATH . WPINC . '/blocks.php';
+require_once ABSPATH . WPINC . '/class-wp-block-type-registry.php';
+require_once ABSPATH . WPINC . '/class-wp-block-type.php';
+require_once ABSPATH . '/wp-admin/includes/post.php';
 
 // Register server-side code for individual blocks.
 foreach ( glob( dirname( dirname( __FILE__ ) ) . '/packages/block-library/src/*/index.php' ) as $block_logic ) {
@@ -36,4 +36,4 @@ foreach ( glob( dirname( dirname( __FILE__ ) ) . '/packages/block-library/src/*/
 
 do_action( 'init' );
 
-echo json_encode( gutenberg_prepare_blocks_for_js() );
+echo json_encode( get_block_editor_server_block_settings() );

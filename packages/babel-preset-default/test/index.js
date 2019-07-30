@@ -3,7 +3,7 @@
  */
 import path from 'path';
 import { readFileSync } from 'fs';
-import { transform } from 'babel-core';
+import { transform } from '@babel/core';
 
 /**
  * Internal dependencies

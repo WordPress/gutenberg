@@ -12,9 +12,19 @@ import withViewportMatch from './with-viewport-match';
  * Higher-order component creator, creating a new component which renders if
  * the viewport query is satisfied.
  *
+ * @see withViewportMatches
+ *
  * @param {string} query Viewport query.
  *
- * @see withViewportMatches
+ * @example
+ *
+ * ```jsx
+ * function MyMobileComponent() {
+ * 	return <div>I'm only rendered on mobile viewports!</div>;
+ * }
+ *
+ * MyMobileComponent = ifViewportMatches( '< small' )( MyMobileComponent );
+ * ```
  *
  * @return {Function} Higher-order component.
  */

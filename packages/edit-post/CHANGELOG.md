@@ -1,3 +1,34 @@
+## Master
+
+### Refactor
+
+- Create EditorInitializer component and implement for various things to initialize as the editor is loaded. This replaces the `__unstableInitialize` refactor done in #14740. ([#15444](https://github.com/WordPress/gutenberg/pull/15444))
+
+## 3.4.0 (2019-05-21)
+
+### New Feature
+
+- Implement the `addToGallery` option in the `MediaUpload` hook. The option allows users to open the media modal in the `gallery-library`instead of `gallery-edit` state.
+
+### Refactor
+
+- convert `INIT` effect to controls & actions [#14740](https://github.com/WordPress/gutenberg/pull/14740)
+
+## 3.2.0 (2019-03-06)
+
+### Polish
+
+* Expose the `className` property to style the `PluginSidebar` component.
+
+### Bug Fixes
+
+- Fix 'save' keyboard shortcut not functioning in the Code Editor.
+- Prevent `ClipboardButton` from incorrectly copying a serialized block string instead of the intended text in Safari.
+
+## 3.1.7 (2019-01-03)
+
+## 3.1.6 (2018-12-18)
+
 ## 3.1.5 (2018-12-12)
 
 ### Bug Fixes

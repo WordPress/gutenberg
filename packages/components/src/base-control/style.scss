@@ -18,6 +18,9 @@
 	.components-base-control__help {
 		margin-top: -$grid-size;
 		font-style: italic;
-		margin-bottom: 0;
 	}
+}
+
+.components-base-control + .components-base-control {
+	margin-bottom: $grid-size-large;
 }

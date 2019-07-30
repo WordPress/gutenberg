@@ -1,0 +1,47 @@
+// @format
+
+.imageContainer {
+	justify-content: center;
+	align-items: center;
+	background-color: $gray-lighten-30;
+}
+
+.uploadFailedText {
+	color: #fff;
+	font-size: 14;
+	margin-top: 5;
+}
+
+.uploadFailedContainer {
+	position: absolute;
+	flex-direction: column;
+	align-items: center;
+}
+
+.clearSettingsButton {
+	color: $alert-red;
+}
+
+.mediaUploadProgress {
+	flex: 1;
+	background-color: $gray-lighten-30;
+}
+
+.modalIcon {
+	width: 80px;
+	height: 80px;
+	justify-content: center;
+	align-items: center;
+}
+
+.iconRetry {
+	fill: #fff;
+	width: 100%;
+	height: 100%;
+}
+
+.icon {
+	fill: $gray-dark;
+	width: 100%;
+	height: 100%;
+}

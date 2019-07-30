@@ -1,0 +1,82 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`URLPopover matches the snapshot in its default state 1`] = `
+<Popover
+  className="editor-url-popover block-editor-url-popover"
+  focusOnMount="firstElement"
+  position="bottom center"
+>
+  <div
+    className="block-editor-url-popover__input-container"
+  >
+    <div
+      className="editor-url-popover__row block-editor-url-popover__row"
+    >
+      <div>
+        Editor
+      </div>
+      <ForwardRef(IconButton)
+        aria-expanded={false}
+        className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
+        icon="arrow-down-alt2"
+        label="Link Settings"
+        onClick={[Function]}
+      />
+    </div>
+  </div>
+</Popover>
+`;
+
+exports[`URLPopover matches the snapshot when the settings are toggled open 1`] = `
+<Popover
+  className="editor-url-popover block-editor-url-popover"
+  focusOnMount="firstElement"
+  position="bottom center"
+>
+  <div
+    className="block-editor-url-popover__input-container"
+  >
+    <div
+      className="editor-url-popover__row block-editor-url-popover__row"
+    >
+      <div>
+        Editor
+      </div>
+      <ForwardRef(IconButton)
+        aria-expanded={true}
+        className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
+        icon="arrow-down-alt2"
+        label="Link Settings"
+        onClick={[Function]}
+      />
+    </div>
+    <div
+      className="editor-url-popover__row block-editor-url-popover__row editor-url-popover__settings block-editor-url-popover__settings"
+    >
+      <div>
+        Settings
+      </div>
+    </div>
+  </div>
+</Popover>
+`;
+
+exports[`URLPopover matches the snapshot when there are no settings 1`] = `
+<Popover
+  className="editor-url-popover block-editor-url-popover"
+  focusOnMount="firstElement"
+  position="bottom center"
+>
+  <div
+    className="block-editor-url-popover__input-container"
+  >
+    <div
+      className="editor-url-popover__row block-editor-url-popover__row"
+    >
+      <div>
+        Editor
+      </div>
+    </div>
+  </div>
+</Popover>
+`;

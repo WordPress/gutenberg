@@ -1,19 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { wrap, unwrap, replaceTag } from '@wordpress/dom';
+import { wrap, replaceTag } from '@wordpress/dom';
 
-/**
- * Internal dependencies
- */
-import { isPhrasingContent } from './phrasing-content';
-
-function isBlockContent( node, schema = {} ) {
-	return schema.hasOwnProperty( node.nodeName.toLowerCase() );
-}
-
-export default function( node, doc, schema ) {
-	if ( node.nodeName === 'SPAN' ) {
+export default function( node, doc ) {
+	// In jsdom-jscore, 'node.style' can be null.
+	// TODO: Explore fixing this by patching jsdom-jscore.
+	if ( node.nodeName === 'SPAN' && node.style ) {
 		const {
 			fontWeight,
 			fontStyle,
@@ -30,7 +23,7 @@ export default function( node, doc, schema ) {
 		}
 
 		if ( textDecorationLine === 'line-through' ) {
-			wrap( doc.createElement( 'del' ), node );
+			wrap( doc.createElement( 's' ), node );
 		}
 
 		if ( verticalAlign === 'super' ) {
@@ -43,19 +36,13 @@ export default function( node, doc, schema ) {
 	} else if ( node.nodeName === 'I' ) {
 		node = replaceTag( node, 'em' );
 	} else if ( node.nodeName === 'A' ) {
-		if ( node.target.toLowerCase() === '_blank' ) {
+		// In jsdom-jscore, 'node.target' can be null.
+		// TODO: Explore fixing this by patching jsdom-jscore.
+		if ( node.target && node.target.toLowerCase() === '_blank' ) {
 			node.rel = 'noreferrer noopener';
 		} else {
 			node.removeAttribute( 'target' );
 			node.removeAttribute( 'rel' );
 		}
-	}
-
-	if (
-		isPhrasingContent( node ) &&
-		node.hasChildNodes() &&
-		Array.from( node.childNodes ).some( ( child ) => isBlockContent( child, schema ) )
-	) {
-		unwrap( node );
 	}
 }

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,13 +12,13 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { ClipboardButton, Button, ExternalLink } from '@wordpress/components';
-import { safeDecodeURI } from '@wordpress/url';
+import { safeDecodeURI, safeDecodeURIComponent } from '@wordpress/url';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import PostPermalinkEditor from './editor.js';
-import { getWPAdminURL, cleanForSlug } from '../../utils/url';
+import { cleanForSlug } from '../../utils/url';
 
 class PostPermalink extends Component {
 	constructor() {
@@ -57,9 +58,19 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, postLink, permalinkParts, postSlug, postTitle, postID, isEditable, isPublished } = this.props;
+		const {
+			isEditable,
+			isNew,
+			isPublished,
+			isViewable,
+			permalinkParts,
+			postLink,
+			postSlug,
+			postID,
+			postTitle,
+		} = this.props;
 
-		if ( isNew || ! postLink ) {
+		if ( isNew || ! isViewable || ! permalinkParts || ! postLink ) {
 			return null;
 		}
 
@@ -67,7 +78,7 @@ class PostPermalink extends Component {
 		const ariaLabel = isCopied ? __( 'Permalink copied' ) : __( 'Copy the permalink' );
 
 		const { prefix, suffix } = permalinkParts;
-		const slug = postSlug || cleanForSlug( postTitle ) || postID;
+		const slug = safeDecodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID;
 		const samplePermalink = ( isEditable ) ? prefix + slug + suffix : prefix;
 
 		return (
@@ -111,18 +122,6 @@ class PostPermalink extends Component {
 						{ __( 'Edit' ) }
 					</Button>
 				}
-
-				{ ! isEditable &&
-					<Button
-						className="editor-post-permalink__change"
-						isLarge
-						href={ getWPAdminURL( 'options-permalink.php' ) }
-						onClick={ this.addVisibilityCheck }
-						target="_blank"
-					>
-						{ __( 'Change Permalinks' ) }
-					</Button>
-				}
 			</div>
 		);
 	}
@@ -138,8 +137,14 @@ export default compose( [
 			getEditedPostAttribute,
 			isCurrentPostPublished,
 		} = select( 'core/editor' );
+		const {
+			getPostType,
+		} = select( 'core' );
 
 		const { id, link } = getCurrentPost();
+
+		const postTypeName = getEditedPostAttribute( 'type' );
+		const postType = getPostType( postTypeName );
 
 		return {
 			isNew: isEditedPostNew(),
@@ -150,6 +155,7 @@ export default compose( [
 			isPublished: isCurrentPostPublished(),
 			postTitle: getEditedPostAttribute( 'title' ),
 			postID: id,
+			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

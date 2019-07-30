@@ -9,6 +9,14 @@ import {
 	escapeHTML,
 	isValidAttributeName,
 } from '../';
+import __unstableEscapeGreaterThan from '../escape-greater';
+
+function testUnstableEscapeGreaterThan( implementation ) {
+	it( 'should escape greater than', () => {
+		const result = implementation( 'Chicken > Ribs' );
+		expect( result ).toBe( 'Chicken &gt; Ribs' );
+	} );
+}
 
 function testEscapeAmpersand( implementation ) {
 	it( 'should escape ampersand', () => {
@@ -46,9 +54,14 @@ describe( 'escapeLessThan', () => {
 	testEscapeLessThan( escapeLessThan );
 } );
 
+describe( 'escapeGreaterThan', () => {
+	testUnstableEscapeGreaterThan( __unstableEscapeGreaterThan );
+} );
+
 describe( 'escapeAttribute', () => {
 	testEscapeAmpersand( escapeAttribute );
 	testEscapeQuotationMark( escapeAttribute );
+	testUnstableEscapeGreaterThan( escapeAttribute );
 } );
 
 describe( 'escapeHTML', () => {

@@ -1,16 +1,17 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import classnames from 'classnames';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { rawShortcut } from '@wordpress/keycodes';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import KeyboardShortcuts from '../../keyboard-shortcuts';
 
@@ -67,9 +68,9 @@ export default createHigherOrderComponent(
 							bindGlobal
 							shortcuts={ {
 								'ctrl+`': this.focusNextRegion,
-								'shift+alt+n': this.focusNextRegion,
+								[ rawShortcut.access( 'n' ) ]: this.focusNextRegion,
 								'ctrl+shift+`': this.focusPreviousRegion,
-								'shift+alt+p': this.focusPreviousRegion,
+								[ rawShortcut.access( 'p' ) ]: this.focusPreviousRegion,
 							} }
 						/>
 						<WrappedComponent { ...this.props } />

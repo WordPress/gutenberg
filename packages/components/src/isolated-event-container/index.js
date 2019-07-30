@@ -1,5 +1,5 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 
@@ -28,6 +28,7 @@ class IsolatedEventContainer extends Component {
 				{ children }
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

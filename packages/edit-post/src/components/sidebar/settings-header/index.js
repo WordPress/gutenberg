@@ -18,9 +18,9 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 		[ __( 'Document' ), '' ];
 
 	const [ blockAriaLabel, blockActiveClass ] = sidebarName === 'edit-post/block' ?
-		// translators: ARIA label for the Block sidebar tab, selected.
+		// translators: ARIA label for the Settings Sidebar tab, selected.
 		[ __( 'Block (selected)' ), 'is-active' ] :
-		// translators: ARIA label for the Block sidebar tab, not selected.
+		// translators: ARIA label for the Settings Sidebar tab, not selected.
 		[ __( 'Block' ), '' ];
 
 	return (
@@ -57,7 +57,7 @@ const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName 
 
 export default withDispatch( ( dispatch ) => {
 	const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-	const { clearSelectedBlock } = dispatch( 'core/editor' );
+	const { clearSelectedBlock } = dispatch( 'core/block-editor' );
 	return {
 		openDocumentSettings() {
 			openGeneralSidebar( 'edit-post/document' );

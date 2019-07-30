@@ -8,8 +8,6 @@ import { shallow } from 'enzyme';
  */
 import { PostPublishButton } from '../';
 
-jest.mock( '../../../../../components/src/button' );
-
 describe( 'PostPublishButton', () => {
 	describe( 'aria-disabled', () => {
 		it( 'should be true if post is currently saving', () => {
@@ -103,7 +101,10 @@ describe( 'PostPublishButton', () => {
 				<PostPublishButton
 					hasPublishAction={ false }
 					onStatusChange={ onStatusChange }
-					onSave={ onSave } />
+					onSave={ onSave }
+					isSaveable={ true }
+					isPublishable={ true }
+				/>
 			);
 
 			wrapper.simulate( 'click' );
@@ -119,7 +120,9 @@ describe( 'PostPublishButton', () => {
 					hasPublishAction={ true }
 					onStatusChange={ onStatusChange }
 					onSave={ onSave }
-					isBeingScheduled />
+					isBeingScheduled
+					isSaveable={ true }
+					isPublishable={ true } />
 			);
 
 			wrapper.simulate( 'click' );
@@ -135,7 +138,9 @@ describe( 'PostPublishButton', () => {
 					hasPublishAction={ true }
 					onStatusChange={ onStatusChange }
 					onSave={ onSave }
-					visibility="private" />
+					visibility="private"
+					isSaveable={ true }
+					isPublishable={ true } />
 			);
 
 			wrapper.simulate( 'click' );
@@ -150,7 +155,9 @@ describe( 'PostPublishButton', () => {
 				<PostPublishButton
 					hasPublishAction={ true }
 					onStatusChange={ onStatusChange }
-					onSave={ onSave } />
+					onSave={ onSave }
+					isSaveable={ true }
+					isPublishable={ true } />
 			);
 
 			wrapper.simulate( 'click' );
@@ -167,7 +174,9 @@ describe( 'PostPublishButton', () => {
 				<PostPublishButton
 					hasPublishAction={ true }
 					onStatusChange={ onStatusChange }
-					onSave={ onSave } />
+					onSave={ onSave }
+					isSaveable={ true }
+					isPublishable={ true } />
 			);
 
 			wrapper.simulate( 'click' );
@@ -185,6 +194,6 @@ describe( 'PostPublishButton', () => {
 			/>
 		);
 
-		expect( wrapper.find( 'Button' ).prop( 'isBusy' ) ).toBe( true );
+		expect( wrapper.find( 'ForwardRef(Button)' ).prop( 'isBusy' ) ).toBe( true );
 	} );
 } );

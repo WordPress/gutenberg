@@ -13,6 +13,7 @@ import {
 	defaultBlockName,
 	freeformFallbackBlockName,
 	unregisteredFallbackBlockName,
+	groupingBlockName,
 	DEFAULT_CATEGORIES,
 } from '../reducer';
 
@@ -177,6 +178,30 @@ describe( 'freeformFallbackBlockName', () => {
 		const state = freeformFallbackBlockName( 'core/code', {
 			type: 'REMOVE_BLOCK_TYPES',
 			names: [ 'core/code' ],
+		} );
+
+		expect( state ).toBeNull();
+	} );
+} );
+
+describe( 'groupingBlockName', () => {
+	it( 'should return null as default state', () => {
+		expect( groupingBlockName( undefined, {} ) ).toBeNull();
+	} );
+
+	it( 'should set the grouping block name', () => {
+		const state = groupingBlockName( null, {
+			type: 'SET_GROUPING_BLOCK_NAME',
+			name: 'core/group',
+		} );
+
+		expect( state ).toBe( 'core/group' );
+	} );
+
+	it( 'should reset the group fallback block name', () => {
+		const state = groupingBlockName( 'core/group', {
+			type: 'REMOVE_BLOCK_TYPES',
+			names: [ 'core/group' ],
 		} );
 
 		expect( state ).toBeNull();

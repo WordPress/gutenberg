@@ -11,10 +11,26 @@ import {
 	forwardRef,
 	Fragment,
 	isValidElement,
+	memo,
 	StrictMode,
+	useState,
+	useEffect,
+	useContext,
+	useReducer,
+	useCallback,
+	useMemo,
+	useRef,
+	useImperativeHandle,
+	useLayoutEffect,
+	useDebugValue,
+	lazy,
+	Suspense,
 } from 'react';
 import { isString } from 'lodash';
 
+/**
+ * Object that provides utilities for dealing with React children.
+ */
 export { Children };
 
 /**
@@ -91,7 +107,75 @@ export { Fragment };
  */
 export { isValidElement };
 
+/**
+ * @see https://reactjs.org/docs/react-api.html#reactmemo
+ */
+export { memo };
+
+/**
+ * Component that activates additional checks and warnings for its descendants.
+ */
 export { StrictMode };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usecallback
+ */
+export { useCallback };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usecontext
+ */
+export { useContext };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usedebugvalue
+ */
+export { useDebugValue };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#useeffect
+ */
+export { useEffect };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#useimperativehandle
+ */
+export { useImperativeHandle };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#uselayouteffect
+ */
+export { useLayoutEffect };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usememo
+ */
+export { useMemo };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usereducer
+ */
+export { useReducer };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#useref
+ */
+export { useRef };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usestate
+ */
+export { useState };
+
+/**
+ * @see https://reactjs.org/docs/react-api.html#reactlazy
+ */
+export { lazy };
+
+/**
+ * @see https://reactjs.org/docs/react-api.html#reactsuspense
+ */
+export { Suspense };
 
 /**
  * Concatenate two or more React children objects.
@@ -101,7 +185,7 @@ export { StrictMode };
  * @return {Array} The concatenated value.
  */
 export function concatChildren( ...childrenArguments ) {
-	return childrenArguments.reduce( ( memo, children, i ) => {
+	return childrenArguments.reduce( ( result, children, i ) => {
 		Children.forEach( children, ( child, j ) => {
 			if ( child && 'string' !== typeof child ) {
 				child = cloneElement( child, {
@@ -109,10 +193,10 @@ export function concatChildren( ...childrenArguments ) {
 				} );
 			}
 
-			memo.push( child );
+			result.push( child );
 		} );
 
-		return memo;
+		return result;
 	}, [] );
 }
 

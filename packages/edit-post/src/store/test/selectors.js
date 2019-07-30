@@ -273,6 +273,15 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditorPanelOpened', () => {
+		it( 'is tolerant to an undefined panels preference', () => {
+			// See: https://github.com/WordPress/gutenberg/issues/14580
+			const state = {
+				preferences: {},
+			};
+
+			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( false );
+		} );
+
 		it( 'should return false by default', () => {
 			const state = {
 				preferences: {
@@ -333,6 +342,15 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isFeatureActive', () => {
+		it( 'is tolerant to an undefined features preference', () => {
+			// See: https://github.com/WordPress/gutenberg/issues/14580
+			const state = {
+				preferences: {},
+			};
+
+			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
+		} );
+
 		it( 'should return true if feature is active', () => {
 			const state = {
 				preferences: {

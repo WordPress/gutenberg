@@ -1,0 +1,102 @@
+{
+	"type": "ExportNamedDeclaration",
+	"start": 0,
+	"end": 63,
+	"loc": {
+		"start": {
+			"line": 1,
+			"column": 0
+		},
+		"end": {
+			"line": 1,
+			"column": 63
+		}
+	},
+	"range": [
+		0,
+		63
+	],
+	"declaration": null,
+	"specifiers": [
+		{
+			"type": "ExportSpecifier",
+			"start": 9,
+			"end": 28,
+			"loc": {
+				"start": {
+					"line": 1,
+					"column": 9
+				},
+				"end": {
+					"line": 1,
+					"column": 28
+				}
+			},
+			"range": [
+				9,
+				28
+			],
+			"local": {
+				"type": "Identifier",
+				"start": 9,
+				"end": 16,
+				"loc": {
+					"start": {
+						"line": 1,
+						"column": 9
+					},
+					"end": {
+						"line": 1,
+						"column": 16
+					}
+				},
+				"range": [
+					9,
+					16
+				],
+				"name": "default"
+			},
+			"exported": {
+				"type": "Identifier",
+				"start": 20,
+				"end": 28,
+				"loc": {
+					"start": {
+						"line": 1,
+						"column": 20
+					},
+					"end": {
+						"line": 1,
+						"column": 28
+					}
+				},
+				"range": [
+					20,
+					28
+				],
+				"name": "controls"
+			}
+		}
+	],
+	"source": {
+		"type": "Literal",
+		"start": 36,
+		"end": 62,
+		"loc": {
+			"start": {
+				"line": 1,
+				"column": 36
+			},
+			"end": {
+				"line": 1,
+				"column": 62
+			}
+		},
+		"range": [
+			36,
+			62
+		],
+		"value": "./default-function-named",
+		"raw": "'./default-function-named'"
+	}
+}

@@ -1,6 +1,11 @@
+.cache
 build
 build-module
 node_modules
-test/e2e/test-plugins
-vendor
 packages/block-serialization-spec-parser/parser.js
+packages/e2e-tests/plugins
+playground/dist
+vendor
+wordpress
+
+!.eslintrc.js

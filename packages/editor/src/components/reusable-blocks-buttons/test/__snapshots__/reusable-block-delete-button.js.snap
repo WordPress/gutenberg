@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ReusableBlockDeleteButton matches the snapshot 1`] = `
+<MenuItem
+  className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+  disabled={false}
+  icon="no"
+  onClick={[Function]}
+>
+  Remove from Reusable Blocks
+</MenuItem>
+`;

@@ -15,7 +15,7 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
 
 	return (
 		<Button className="editor-post-trash button-link-delete" onClick={ onClick } isDefault isLarge>
-			{ __( 'Move to trash' ) }
+			{ __( 'Move to Trash' ) }
 		</Button>
 	);
 }

@@ -107,15 +107,15 @@ function getNodeAsString( node ) {
 }
 
 /**
- * Returns translator comment for a given AST traversal path if one exists.
+ * Returns the extracted comment for a given AST traversal path if one exists.
  *
  * @param {Object} path              Traversal path.
  * @param {number} _originalNodeLine Private: In recursion, line number of
  *                                     the original node passed.
  *
- * @return {?string} Translator comment.
+ * @return {?string} Extracted comment.
  */
-function getTranslatorComment( path, _originalNodeLine ) {
+function getExtractedComment( path, _originalNodeLine ) {
 	const { node, parent, parentPath } = path;
 
 	// Assign original node line so we can keep track in recursion whether a
@@ -152,7 +152,7 @@ function getTranslatorComment( path, _originalNodeLine ) {
 	// Only recurse as long as parent node is on the same or previous line
 	const { line } = parent.loc.start;
 	if ( line >= _originalNodeLine - 1 && line <= _originalNodeLine ) {
-		return getTranslatorComment( parentPath, _originalNodeLine );
+		return getExtractedComment( parentPath, _originalNodeLine );
 	}
 }
 
@@ -246,7 +246,7 @@ module.exports = function() {
 					// Attempt to exract nplurals from header
 					const pluralsMatch = ( baseData.headers[ 'plural-forms' ] || '' ).match( /nplurals\s*=\s*(\d+);/ );
 					if ( pluralsMatch ) {
-						nplurals = pluralsMatch[ 1 ];
+						nplurals = parseInt( pluralsMatch[ 1 ], 10 );
 					}
 				}
 
@@ -266,9 +266,9 @@ module.exports = function() {
 				};
 
 				// If exists, also assign translator comment
-				const translator = getTranslatorComment( path );
+				const translator = getExtractedComment( path );
 				if ( translator ) {
-					translation.comments.translator = translator;
+					translation.comments.extracted = translator;
 				}
 
 				// Create context grouping for translation if not yet exists
@@ -340,6 +340,6 @@ module.exports = function() {
 };
 
 module.exports.getNodeAsString = getNodeAsString;
-module.exports.getTranslatorComment = getTranslatorComment;
+module.exports.getExtractedComment = getExtractedComment;
 module.exports.isValidTranslationKey = isValidTranslationKey;
 module.exports.isSameTranslation = isSameTranslation;

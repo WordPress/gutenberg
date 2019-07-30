@@ -1,0 +1,11 @@
+.edit-widgets-layout__content {
+	min-height: 100%;
+	background: #f1f1f1;
+	padding: 30px 0;
+
+	// Temporarily disable the sidebar on mobile
+	@include break-small() {
+		margin-right: $sidebar-width;
+		margin-top: $header-height;
+	}
+}

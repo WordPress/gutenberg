@@ -14,7 +14,7 @@ import { Component } from '@wordpress/element';
 import Disabled from '../';
 
 jest.mock( '@wordpress/dom', () => {
-	const focus = require.requireActual( '@wordpress/dom' ).focus;
+	const focus = require.requireActual( '../../../../dom/src' ).focus;
 
 	return {
 		focus: {

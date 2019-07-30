@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times } from 'lodash';
+import { times, get, mapValues, every } from 'lodash';
 
 /**
  * Creates a table state.
@@ -76,8 +76,9 @@ export function updateCellContent( state, {
 export function insertRow( state, {
 	section,
 	rowIndex,
+	columnCount,
 } ) {
-	const cellCount = state[ section ][ 0 ].cells.length;
+	const cellCount = columnCount || state[ section ][ 0 ].cells.length;
 
 	return {
 		[ section ]: [
@@ -85,7 +86,7 @@ export function insertRow( state, {
 			{
 				cells: times( cellCount, () => ( {
 					content: '',
-					tag: 'td',
+					tag: section === 'head' ? 'th' : 'td',
 				} ) ),
 			},
 			...state[ section ].slice( rowIndex ),
@@ -121,21 +122,33 @@ export function deleteRow( state, {
  * @return {Object} New table state.
  */
 export function insertColumn( state, {
-	section,
 	columnIndex,
 } ) {
-	return {
-		[ section ]: state[ section ].map( ( row ) => ( {
-			cells: [
-				...row.cells.slice( 0, columnIndex ),
-				{
-					content: '',
-					tag: 'td',
-				},
-				...row.cells.slice( columnIndex ),
-			],
-		} ) ),
-	};
+	return mapValues( state, ( section, sectionName ) => {
+		// Bail early if the table section is empty.
+		if ( isEmptyTableSection( section ) ) {
+			return section;
+		}
+
+		return section.map( ( row ) => {
+			// Bail early if the row is empty or it's an attempt to insert past
+			// the last possible index of the array.
+			if ( isEmptyRow( row ) || row.cells.length < columnIndex ) {
+				return row;
+			}
+
+			return {
+				cells: [
+					...row.cells.slice( 0, columnIndex ),
+					{
+						content: '',
+						tag: sectionName === 'head' ? 'th' : 'td',
+					},
+					...row.cells.slice( columnIndex ),
+				],
+			};
+		} );
+	} );
 }
 
 /**
@@ -148,12 +161,59 @@ export function insertColumn( state, {
  * @return {Object} New table state.
  */
 export function deleteColumn( state, {
-	section,
 	columnIndex,
 } ) {
-	return {
-		[ section ]: state[ section ].map( ( row ) => ( {
-			cells: row.cells.filter( ( cell, index ) => index !== columnIndex ),
-		} ) ).filter( ( row ) => row.cells.length ),
-	};
+	return mapValues( state, ( section ) => {
+		// Bail early if the table section is empty.
+		if ( isEmptyTableSection( section ) ) {
+			return section;
+		}
+
+		return section.map( ( row ) => ( {
+			cells: row.cells.length >= columnIndex ? row.cells.filter( ( cell, index ) => index !== columnIndex ) : row.cells,
+		} ) ).filter( ( row ) => row.cells.length );
+	} );
+}
+
+/**
+ * Toggles the existance of a section.
+ *
+ * @param {Object} state   Current table state.
+ * @param {string} section Name of the section to toggle.
+ *
+ * @return {Object} New table state.
+ */
+export function toggleSection( state, section ) {
+	// Section exists, replace it with an empty row to remove it.
+	if ( ! isEmptyTableSection( state[ section ] ) ) {
+		return { [ section ]: [] };
+	}
+
+	// Get the length of the first row of the body to use when creating the header.
+	const columnCount = get( state, [ 'body', 0, 'cells', 'length' ], 1 );
+
+	// Section doesn't exist, insert an empty row to create the section.
+	return insertRow( state, { section, rowIndex: 0, columnCount } );
+}
+
+/**
+ * Determines whether a table section is empty.
+ *
+ * @param {Object} sectionRows Table section state.
+ *
+ * @return {boolean} True if the table section is empty, false otherwise.
+ */
+export function isEmptyTableSection( sectionRows ) {
+	return ! sectionRows || ! sectionRows.length || every( sectionRows, isEmptyRow );
+}
+
+/**
+ * Determines whether a table row is empty.
+ *
+ * @param {Object} row Table row state.
+ *
+ * @return {boolean} True if the table section is empty, false otherwise.
+ */
+export function isEmptyRow( row ) {
+	return ! ( row.cells && row.cells.length );
 }

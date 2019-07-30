@@ -1,3 +1,15 @@
+## 2.3.0 (2019-05-21)
+
+### New features
+- The `getAutosave`, `getAutosaves` and `getCurrentUser` selectors have been added.
+- The `receiveAutosaves` and `receiveCurrentUser` actions have been added.
+
+## 2.0.16 (2019-01-03)
+
+### Bug Fixes
+
+- Fixed the `hasUploadPermissions` selector to always return a boolean. Previously, it may have returned an empty object. This should have no impact for most consumers, assuming usage as a [truthy value](https://developer.mozilla.org/en-US/docs/Glossary/Truthy) in conditions.
+
 ## 2.0.15 (2018-12-12)
 
 ## 2.0.14 (2018-11-20)

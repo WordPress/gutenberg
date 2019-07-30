@@ -9,6 +9,11 @@ import { noop } from 'lodash';
 import { withGlobalEvents } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { calculatePreferedImageSize } from './utils';
+
 class ImageSize extends Component {
 	constructor() {
 		super( ...arguments );
@@ -55,11 +60,7 @@ class ImageSize extends Component {
 	}
 
 	calculateSize() {
-		const maxWidth = this.container.clientWidth;
-		const exceedMaxWidth = this.image.width > maxWidth;
-		const ratio = this.image.height / this.image.width;
-		const width = exceedMaxWidth ? maxWidth : this.image.width;
-		const height = exceedMaxWidth ? maxWidth * ratio : this.image.height;
+		const { width, height } = calculatePreferedImageSize( this.image, this.container );
 		this.setState( { width, height } );
 	}
 

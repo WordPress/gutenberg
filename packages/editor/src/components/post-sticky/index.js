@@ -15,7 +15,7 @@ export function PostSticky( { onUpdateSticky, postSticky = false } ) {
 	return (
 		<PostStickyCheck>
 			<CheckboxControl
-				label={ __( 'Stick to the Front Page' ) }
+				label={ __( 'Stick to the top of the blog' ) }
 				checked={ postSticky }
 				onChange={ () => onUpdateSticky( ! postSticky ) }
 			/>

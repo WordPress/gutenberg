@@ -1,6 +1,7 @@
 module.exports = {
 	rules: {
 		'array-bracket-spacing': [ 'error', 'always' ],
+		'array-callback-return': 'error',
 		'brace-style': [ 'error', '1tbs' ],
 		camelcase: [ 'error', {
 			properties: 'never',

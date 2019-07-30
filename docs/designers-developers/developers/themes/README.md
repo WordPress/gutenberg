@@ -1,4 +1,4 @@
-# Theming for Gutenberg
+# Theming for the Block Editor
 
 The new editor provides a number of options for theme designers and developers, including theme-defined color settings, font size control, and much more.
 

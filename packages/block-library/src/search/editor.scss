@@ -1,0 +1,26 @@
+.wp-block-search {
+	.wp-block-search__input {
+		border-radius: $radius-round-rectangle;
+		border: 1px solid $dark-gray-150;
+		color: $dark-opacity-300;
+		font-family: $default-font;
+		font-size: $default-font-size;
+
+		&:focus {
+			outline: none;
+		}
+	}
+
+	.wp-block-search__button {
+		background: #f7f7f7;
+		border-radius: $radius-round-rectangle;
+		border: 1px solid #ccc;
+		box-shadow: inset 0 -1px 0 #ccc;
+		font-family: $default-font;
+		font-size: $default-font-size;
+
+		.wp-block-search__button-rich-text {
+			padding: 6px 10px;
+		}
+	}
+}

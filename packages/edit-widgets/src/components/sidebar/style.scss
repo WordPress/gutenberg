@@ -1,0 +1,46 @@
+.edit-widgets-sidebar {
+	position: fixed;
+	z-index: z-index(".edit-widgets-sidebar");
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: $sidebar-width;
+	border-left: $border-width solid $light-gray-500;
+	background: $white;
+	color: $dark-gray-500;
+	height: 100vh;
+	overflow: hidden;
+
+	@include break-small() {
+		top: $admin-bar-height-big + $header-height;
+		z-index: z-index(".edit-post-sidebar {greater than small}");
+		height: auto;
+		overflow: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	@include break-medium() {
+		top: $admin-bar-height + $header-height;
+	}
+
+	// Temporarily disable the sidebar on mobile
+	display: none;
+	@include break-small() {
+		display: block;
+	}
+
+	> .components-panel {
+		margin-top: -1px;
+		margin-bottom: -1px;
+		border-left: 0;
+		border-right: 0;
+
+		> .components-panel__header {
+			background: $light-gray-200;
+		}
+	}
+
+	.block-editor-block-inspector__card {
+		margin: 0;
+	}
+}

@@ -12,6 +12,7 @@ import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
 import { ifCondition, compose } from '@wordpress/compose';
+import { applyFilters } from '@wordpress/hooks';
 
 function writeInterstitialMessage( targetDocument ) {
 	let markup = renderToString(
@@ -78,6 +79,13 @@ function writeInterstitialMessage( targetDocument ) {
 			}
 		</style>
 	`;
+
+	/**
+	 * Filters the interstitial message shown when generating previews.
+	 *
+	 * @param {String} markup The preview interstitial markup.
+	 */
+	markup = applyFilters( 'editor.PostPreview.interstitialMarkup', markup );
 
 	targetDocument.write( markup );
 	targetDocument.title = __( 'Generating preview…' );
@@ -207,6 +215,7 @@ export default compose( [
 
 		const previewLink = getEditedPostPreviewLink();
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+
 		return {
 			postId: getCurrentPostId(),
 			currentPostLink: getCurrentPostAttribute( 'link' ),

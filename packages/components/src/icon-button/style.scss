@@ -19,10 +19,10 @@
 	svg {
 		fill: currentColor;
 		outline: none;
+	}
 
-		&:not:only-child {
-			margin-right: 4px;
-		}
+	&.has-text svg {
+		margin-right: 4px;
 	}
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {

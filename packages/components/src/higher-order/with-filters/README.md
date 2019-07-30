@@ -7,26 +7,26 @@ Wrapping a component with `withFilters` provides a filtering capability controll
 ## Usage
 
 ```jsx
-import { Fragment, withFilters } from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
 
 const MyComponent = ( { title } ) => <h1>{ title }</h1>;
 
 const ComponentToAppend = () => <div>Appended component</div>;
 
-function withComponentApended( FilteredComponent ) {
+function withComponentAppended( FilteredComponent ) {
 	return ( props ) => (
-		<Fragment>
+		<>
 			<FilteredComponent { ...props } />
 			<ComponentToAppend />
-		</Fragment>
+		</>
 	);
 }
 
 addFilter(
 	'MyHookName',
 	'my-plugin/with-component-appended',
-	withComponentApended
+	withComponentAppended
 );
 
 const MyComponentWithFilters = withFilters( 'MyHookName' )( MyComponent );
@@ -37,29 +37,29 @@ const MyComponentWithFilters = withFilters( 'MyHookName' )( MyComponent );
 It is also possible to override props by implementing a higher-order component which works as follows:
 
 ```jsx
-import { Fragment, withFilters } from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
 
 const MyComponent = ( { hint, title } ) => (
-	<Fragment>
+	<>
 		<h1>{ title }</h1>
 		<p>{ hint }</p>
-	</Fragment> 
+	</>
 );
 
-function withHintOverriden( FilteredComponent ) {
+function withHintOverridden( FilteredComponent ) {
 	return ( props ) => (
 		<FilteredComponent
 			{ ...props }
-			hint="Overriden hint"
+			hint="Overridden hint"
 		/>
 	);
  }
 
 addFilter(
 	'MyHookName',
-	'my-plugin/with-hint-overriden',
-	withHintOverriden
+	'my-plugin/with-hint-overridden',
+	withHintOverridden
 );
 
 const MyComponentWithFilters = withFilters( 'MyHookName' )( MyComponent );

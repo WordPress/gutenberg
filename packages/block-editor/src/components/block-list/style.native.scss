@@ -1,0 +1,79 @@
+.container {
+	flex: 1;
+	justify-content: flex-start;
+	background-color: #fff;
+}
+
+.list {
+	flex: 1;
+}
+
+.switch {
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	margin: 10px;
+}
+
+.switchLabel {
+	margin-left: 10px;
+}
+
+.lineStyleAddHere {
+	flex: 1;
+	background-color: #0087be; // blue_wordpress
+	align-self: center;
+	height: 2px;
+}
+
+.labelStyleAddHere {
+	flex: 1;
+	text-align: center;
+	font-family: $default-monospace-font;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.containerStyleAddHere {
+	flex: 1;
+	flex-direction: row;
+	background-color: $white;
+}
+
+.blockToolbarKeyboardAvoidingView {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	left: 0;
+}
+
+.blockHolderSemiBordered {
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 0;
+	border-right-width: 0;
+}
+
+.blockHolderFullBordered {
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-right-width: 1px;
+}
+
+
+.blockContainerFocused {
+	background-color: $white;
+	padding-left: 16;
+	padding-right: 16;
+	padding-top: 12;
+	padding-bottom: 0; // will be flushed into inline toolbar height
+}
+
+.blockHolderFocused {
+	border-color: $gray-lighten-30;
+}
+
+.blockListFooter {
+	height: 80px;
+}

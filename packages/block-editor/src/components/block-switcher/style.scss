@@ -1,0 +1,139 @@
+.block-editor-block-switcher {
+	position: relative;
+	height: $icon-button-size;
+}
+
+.components-icon-button.block-editor-block-switcher__toggle,
+.components-icon-button.block-editor-block-switcher__no-switcher-icon {
+	margin: 0;
+	display: block;
+	height: $icon-button-size;
+	padding: 3px;
+}
+
+.components-icon-button.block-editor-block-switcher__no-switcher-icon {
+	width: $icon-button-size + 6px + 6px;
+
+	.block-editor-block-icon {
+		margin-right: auto;
+		margin-left: auto;
+	}
+}
+
+// When the block switcher does not have any transformations, we show it but as disabled.
+// The background and opacity change helps make the icon legible, despite being disabled.
+.components-button.block-editor-block-switcher__no-switcher-icon:disabled {
+	border-radius: 0;
+	opacity: 0.84;
+
+	// Also make the icon monochrome to further imply disabled state.
+	// We use !important here because icon colors are set as inline styles,
+	// and should be overridden when disabled.
+	.block-editor-block-icon.has-colors {
+		color: $dark-gray-500 !important;
+		background: $light-gray-200 !important;
+	}
+}
+
+// Style this the same as the block buttons in the library.
+// Needs specificiity to override the icon button.
+.components-icon-button.block-editor-block-switcher__toggle {
+	width: auto;
+	// Unset icon button styles.
+	&:active,
+	&:not(:disabled):not([aria-disabled="true"]):hover,
+	&:not([aria-disabled="true"]):focus {
+		outline: none;
+		box-shadow: none;
+		background: none;
+		border: none;
+	}
+
+	.block-editor-block-icon,
+	.block-editor-block-switcher__transform {
+		width: $icon-button-size + 3px + 3px;
+		height: $icon-button-size-small + 6px;
+		position: relative;
+		margin: 0 auto;
+		padding: 3px;
+		display: flex;
+		align-items: center;
+		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
+		@include reduce-motion("transition");
+	}
+
+	// Add a dropdown arrow indicator.
+	.block-editor-block-icon::after {
+		@include dropdown-arrow();
+	}
+
+	.block-editor-block-switcher__transform {
+		margin-top: 6px;
+		border-radius: $radius-round-rectangle;
+	}
+
+	// Block hover and focus style.
+	&[aria-expanded="true"] .block-editor-block-icon,
+	&[aria-expanded="true"] .block-editor-block-switcher__transform,
+	&:not(:disabled):hover .block-editor-block-icon,
+	&:not(:disabled):hover .block-editor-block-switcher__transform,
+	&:not(:disabled):focus .block-editor-block-icon,
+	&:not(:disabled):focus .block-editor-block-switcher__transform {
+		transform: translateY(-$icon-button-size);
+	}
+
+	// Block focus style.
+	&:not(:disabled):focus .block-editor-block-icon,
+	&:not(:disabled):focus .block-editor-block-switcher__transform {
+		@include formatting-button-style__focus();
+	}
+}
+
+.components-popover:not(.is-mobile).block-editor-block-switcher__popover .components-popover__content {
+	min-width: 300px;
+	max-width: 340px;
+}
+
+.block-editor-block-switcher__popover .components-popover__content {
+	@include break-medium {
+		position: relative;
+
+		.block-editor-block-preview {
+			border: $border-width solid $light-gray-500;
+			box-shadow: $shadow-popover;
+			background: $white;
+			position: absolute;
+			left: 100%;
+			top: -1px;
+			bottom: -1px;
+			width: 300px;
+			height: auto;
+		}
+	}
+
+	// Hide the bottom border on the last panel so it stacks with the popover.
+	.components-panel__body {
+		border: 0;
+
+		// Elevate this so the hover style is visible.
+		position: relative;
+		z-index: 1;
+	}
+
+	.components-panel__body + .components-panel__body {
+		border-top: $border-width solid $light-gray-500;
+	}
+}
+
+.block-editor-block-switcher__popover:not(.is-mobile) > .components-popover__content {
+	// Reset overflow to allow showing the preview on the left once an item is hovered.
+	overflow-y: visible;
+}
+
+.block-editor-block-switcher__popover .block-editor-block-styles {
+	margin: 0 -3px; // Remove the panel body padding while keeping it for the title.
+}
+
+.block-editor-block-switcher__popover .block-editor-block-types-list {
+	margin: 8px -8px -8px;
+}

@@ -9,8 +9,6 @@ import { noop } from 'lodash';
  */
 import { DotTip } from '..';
 
-jest.mock( '../../../../../components/src/button' );
-
 describe( 'DotTip', () => {
 	it( 'should not render anything if invisible', () => {
 		const wrapper = shallow(
@@ -37,7 +35,7 @@ describe( 'DotTip', () => {
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
-		wrapper.find( 'Button[children="Got it"]' ).first().simulate( 'click' );
+		wrapper.find( 'ForwardRef(Button)[children="Got it"]' ).first().simulate( 'click' );
 		expect( onDismiss ).toHaveBeenCalled();
 	} );
 
@@ -48,7 +46,7 @@ describe( 'DotTip', () => {
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
-		wrapper.find( 'IconButton[label="Disable tips"]' ).first().simulate( 'click' );
+		wrapper.find( 'ForwardRef(IconButton)[label="Disable tips"]' ).first().simulate( 'click' );
 		expect( onDisable ).toHaveBeenCalled();
 	} );
 } );

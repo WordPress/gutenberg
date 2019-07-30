@@ -16,6 +16,7 @@ import {
 	embedVimeoIcon,
 	embedRedditIcon,
 	embedTumbrIcon,
+	embedAmazonIcon,
 } from './icons';
 
 /**
@@ -145,6 +146,25 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?collegehumor\.com\/.+/i ],
 	},
 	{
+		name: 'core-embed/crowdsignal',
+		settings: {
+			title: 'Crowdsignal',
+			icon: embedContentIcon,
+			keywords: [ 'polldaddy' ],
+			transform: [ {
+				type: 'block',
+				blocks: [ 'core-embed/polldaddy' ],
+				transform: ( content ) => {
+					return createBlock( 'core-embed/crowdsignal', {
+						content,
+					} );
+				},
+			} ],
+			description: __( 'Embed Crowdsignal (formerly Polldaddy) content.' ),
+		},
+		patterns: [ /^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i ],
+	},
+	{
 		name: 'core-embed/dailymotion',
 		settings: {
 			title: 'Dailymotion',
@@ -152,15 +172,6 @@ export const others = [
 			description: __( 'Embed a Dailymotion video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
-	},
-	{
-		name: 'core-embed/funnyordie',
-		settings: {
-			title: 'Funny or Die',
-			icon: embedVideoIcon,
-			description: __( 'Embed Funny or Die content.' ),
-		},
-		patterns: [ /^https?:\/\/(www\.)?funnyordie\.com\/.+/i ],
 	},
 	{
 		name: 'core-embed/hulu',
@@ -218,22 +229,17 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
 	},
 	{
-		name: 'core-embed/photobucket',
-		settings: {
-			title: 'Photobucket',
-			icon: embedPhotoIcon,
-			description: __( 'Embed a Photobucket image.' ),
-		},
-		patterns: [ /^http:\/\/g?i*\.photobucket\.com\/.+/i ],
-	},
-	{
+		// Deprecated in favour of the core-embed/crowdsignal block
 		name: 'core-embed/polldaddy',
 		settings: {
 			title: 'Polldaddy',
 			icon: embedContentIcon,
 			description: __( 'Embed Polldaddy content.' ),
+			supports: {
+				inserter: false,
+			},
 		},
-		patterns: [ /^https?:\/\/(www\.)?polldaddy\.com\/.+/i ],
+		patterns: [],
 	},
 	{
 		name: 'core-embed/reddit',
@@ -355,5 +361,19 @@ export const others = [
 			description: __( 'Embed a WordPress.tv video.' ),
 		},
 		patterns: [ /^https?:\/\/wordpress\.tv\/.+/i ],
+	},
+	{
+		name: 'core-embed/amazon-kindle',
+		settings: {
+			title: 'Amazon Kindle',
+			icon: embedAmazonIcon,
+			keywords: [ __( 'ebook' ) ],
+			responsive: false,
+			description: __( 'Embed Amazon Kindle content.' ),
+		},
+		patterns: [
+			/^https?:\/\/([a-z0-9-]+\.)?(amazon|amzn)(\.[a-z]{2,4})+\/.+/i,
+			/^https?:\/\/(www\.)?(a\.co|z\.cn)\/.+/i,
+		],
 	},
 ];

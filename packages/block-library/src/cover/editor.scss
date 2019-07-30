@@ -1,27 +1,31 @@
 .wp-block-cover-image,
 .wp-block-cover {
-	.editor-rich-text__tinymce[data-is-empty="true"]::before {
-		position: inherit;
-	}
-
-	.editor-rich-text__tinymce:focus a[data-mce-selected] {
-		padding: 0 2px;
-		margin: 0 -2px;
-		border-radius: 2px;
-		box-shadow: none;
-		background: rgba(255, 255, 255, 0.3);
-	}
-
 	&.components-placeholder h2 {
 		color: inherit;
 	}
 
-	&.has-left-content .editor-rich-text__inline-toolbar {
-		justify-content: flex-start;
+	&.has-right-content .block-editor-rich-text__inline-toolbar,
+	&.has-left-content .block-editor-rich-text__inline-toolbar {
+		display: inline-block;
 	}
 
-	&.has-right-content .editor-rich-text__inline-toolbar {
-		justify-content: flex-end;
+	.block-editor-block-list__layout {
+		width: 100%;
+	}
+
+	.block-editor-block-list__block {
+		color: $light-gray-100;
+	}
+
+	// wp-block-cover class is used just to increase selector specificity
+	.wp-block-cover__inner-container {
+		// avoid text align inherit from cover image align.
+		text-align: left;
+	}
+
+	.wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout {
+		margin-left: 0;
+		margin-right: 0;
 	}
 
 	&.components-placeholder {

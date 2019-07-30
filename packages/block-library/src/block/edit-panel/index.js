@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { Component, Fragment, createRef } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 import { withInstanceId } from '@wordpress/compose';
@@ -53,10 +53,10 @@ class ReusableBlockEditPanel extends Component {
 	}
 
 	render() {
-		const { isEditing, title, isSaving, onEdit, instanceId } = this.props;
+		const { isEditing, title, isSaving, isEditDisabled, onEdit, instanceId } = this.props;
 
 		return (
-			<Fragment>
+			<>
 				{ ( ! isEditing && ! isSaving ) && (
 					<div className="reusable-block-edit-panel">
 						<b className="reusable-block-edit-panel__info">
@@ -66,6 +66,7 @@ class ReusableBlockEditPanel extends Component {
 							ref={ this.editButton }
 							isLarge
 							className="reusable-block-edit-panel__button"
+							disabled={ isEditDisabled }
 							onClick={ onEdit }
 						>
 							{ __( 'Edit' ) }
@@ -101,7 +102,7 @@ class ReusableBlockEditPanel extends Component {
 						</Button>
 					</form>
 				) }
-			</Fragment>
+			</>
 		);
 	}
 }

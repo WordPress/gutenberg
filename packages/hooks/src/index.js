@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import createHooks from './createHooks';
 
 const {

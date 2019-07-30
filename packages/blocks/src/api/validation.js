@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import Tokenizer from 'simple-html-tokenizer/dist/es6/tokenizer';
+import { Tokenizer } from 'simple-html-tokenizer';
 import {
 	identity,
 	xor,
@@ -154,24 +154,91 @@ const TEXT_NORMALIZATIONS = [
 ];
 
 /**
- * Subsitute EntityParser class for `simple-html-tokenizer` which bypasses
- * entity substitution in favor of validator's internal normalization.
+ * Regular expression matching a named character reference. In lieu of bundling
+ * a full set of references, the pattern covers the minimal necessary to test
+ * positively against the full set.
+ *
+ * "The ampersand must be followed by one of the names given in the named
+ * character references section, using the same case."
+ *
+ * Tested aginst "12.5 Named character references":
+ *
+ * ```
+ * const references = [ ...document.querySelectorAll(
+ *     '#named-character-references-table tr[id^=entity-] td:first-child'
+ * ) ].map( ( code ) => code.textContent )
+ * references.every( ( reference ) => /^[\da-z]+$/i.test( reference ) )
+ * ```
+ *
+ * @see https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ * @see https://html.spec.whatwg.org/multipage/named-characters.html#named-character-references
+ *
+ * @type {RegExp}
+ */
+const REGEXP_NAMED_CHARACTER_REFERENCE = /^[\da-z]+$/i;
+
+/**
+ * Regular expression matching a decimal character reference.
+ *
+ * "The ampersand must be followed by a U+0023 NUMBER SIGN character (#),
+ * followed by one or more ASCII digits, representing a base-ten integer"
+ *
+ * @see https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ *
+ * @type {RegExp}
+ */
+const REGEXP_DECIMAL_CHARACTER_REFERENCE = /^#\d+$/;
+
+/**
+ * Regular expression matching a hexadecimal character reference.
+ *
+ * "The ampersand must be followed by a U+0023 NUMBER SIGN character (#), which
+ * must be followed by either a U+0078 LATIN SMALL LETTER X character (x) or a
+ * U+0058 LATIN CAPITAL LETTER X character (X), which must then be followed by
+ * one or more ASCII hex digits, representing a hexadecimal integer"
+ *
+ * @see https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ *
+ * @type {RegExp}
+ */
+const REGEXP_HEXADECIMAL_CHARACTER_REFERENCE = /^#x[\da-f]+$/i;
+
+/**
+ * Returns true if the given string is a valid character reference segment, or
+ * false otherwise. The text should be stripped of `&` and `;` demarcations.
+ *
+ * @param {string} text Text to test.
+ *
+ * @return {boolean} Whether text is valid character reference.
+ */
+export function isValidCharacterReference( text ) {
+	return (
+		REGEXP_NAMED_CHARACTER_REFERENCE.test( text ) ||
+		REGEXP_DECIMAL_CHARACTER_REFERENCE.test( text ) ||
+		REGEXP_HEXADECIMAL_CHARACTER_REFERENCE.test( text )
+	);
+}
+
+/**
+ * Subsitute EntityParser class for `simple-html-tokenizer` which uses the
+ * implementation of `decodeEntities` from `html-entities`, in order to avoid
+ * bundling a massive named character reference.
  *
  * @see https://github.com/tildeio/simple-html-tokenizer/tree/master/src/entity-parser.ts
  */
-export class IdentityEntityParser {
+export class DecodeEntityParser {
 	/**
 	 * Returns a substitute string for an entity string sequence between `&`
 	 * and `;`, or undefined if no substitution should occur.
-	 *
-	 * In this implementation, undefined is always returned.
 	 *
 	 * @param {string} entity Entity fragment discovered in HTML.
 	 *
 	 * @return {?string} Entity substitute value.
 	 */
 	parse( entity ) {
-		return decodeEntities( '&' + entity + ';' );
+		if ( isValidCharacterReference( entity ) ) {
+			return decodeEntities( '&' + entity + ';' );
+		}
 	}
 }
 
@@ -364,7 +431,7 @@ export function isEqualTagAttributePairs( actual, expected ) {
 	// avoids us needing to check both attributes sets, since if A has any keys
 	// which do not exist in B, we know the sets to be different.
 	if ( actual.length !== expected.length ) {
-		log.warning( 'Expected attributes %o, instead saw %o.', expected, actual );
+		log.warning( 'Expected attributes %j, instead saw %j.', expected, actual );
 		return false;
 	}
 
@@ -451,7 +518,7 @@ export function getNextNonWhitespaceToken( tokens ) {
  */
 function getHTMLTokens( html ) {
 	try {
-		return new Tokenizer( new IdentityEntityParser() ).tokenize( html );
+		return new Tokenizer( new DecodeEntityParser() ).tokenize( html );
 	} catch ( e ) {
 		log.warning( 'Malformed HTML detected: %s', html );
 	}
@@ -506,13 +573,13 @@ export function isEquivalentHTML( actual, expected ) {
 
 		// Inequal if exhausted all expected tokens
 		if ( ! expectedToken ) {
-			log.warning( 'Expected end of content, instead saw %o.', actualToken );
+			log.warning( 'Expected end of content, instead saw %j.', actualToken );
 			return false;
 		}
 
 		// Inequal if next non-whitespace token of each set are not same type
 		if ( actualToken.type !== expectedToken.type ) {
-			log.warning( 'Expected token of type `%s` (%o), instead saw `%s` (%o).', expectedToken.type, expectedToken, actualToken.type, actualToken );
+			log.warning( 'Expected token of type `%s` (%j), instead saw `%s` (%j).', expectedToken.type, expectedToken, actualToken.type, actualToken );
 			return false;
 		}
 
@@ -539,7 +606,7 @@ export function isEquivalentHTML( actual, expected ) {
 	if ( ( expectedToken = getNextNonWhitespaceToken( expectedTokens ) ) ) {
 		// If any non-whitespace tokens remain in expected token set, this
 		// indicates inequality
-		log.warning( 'Expected %o, instead saw end of content.', expectedToken );
+		log.warning( 'Expected %j, instead saw end of content.', expectedToken );
 		return false;
 	}
 
@@ -553,30 +620,30 @@ export function isEquivalentHTML( actual, expected ) {
  *
  * Logs to console in development environments when invalid.
  *
- * @param {string|Object} blockTypeOrName Block type.
- * @param {Object}        attributes      Parsed block attributes.
- * @param {string}        innerHTML       Original block content.
+ * @param {string|Object} blockTypeOrName      Block type.
+ * @param {Object}        attributes           Parsed block attributes.
+ * @param {string}        originalBlockContent Original block content.
  *
  * @return {boolean} Whether block is valid.
  */
-export function isValidBlockContent( blockTypeOrName, attributes, innerHTML ) {
+export function isValidBlockContent( blockTypeOrName, attributes, originalBlockContent ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
-	let saveContent;
+	let generatedBlockContent;
 	try {
-		saveContent = getSaveContent( blockType, attributes );
+		generatedBlockContent = getSaveContent( blockType, attributes );
 	} catch ( error ) {
 		log.error( 'Block validation failed because an error occurred while generating block content:\n\n%s', error.toString() );
 		return false;
 	}
 
-	const isValid = isEquivalentHTML( innerHTML, saveContent );
+	const isValid = isEquivalentHTML( originalBlockContent, generatedBlockContent );
 	if ( ! isValid ) {
 		log.error(
-			'Block validation failed for `%s` (%o).\n\nExpected:\n\n%s\n\nActual:\n\n%s',
+			'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
 			blockType.name,
 			blockType,
-			saveContent,
-			innerHTML
+			generatedBlockContent,
+			originalBlockContent
 		);
 	}
 

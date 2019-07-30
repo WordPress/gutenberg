@@ -40,18 +40,18 @@ describe( 'PageAttributesCheck', () => {
 	it( 'should render if page attributes support is true and no available templates exist', () => {
 		const wrapper = shallow( <PageAttributesCheck postType={ postType }>content</PageAttributesCheck> );
 
-		expect( wrapper ).toHaveText( 'content' );
+		expect( wrapper.text() ).toContain( 'content' );
 	} );
 
 	it( 'should render if page attributes support is false/unknown and available templates exist', () => {
 		const wrapper = shallow( <PageAttributesCheck availableTemplates={ { 'example.php': 'Example template' } } >content</PageAttributesCheck> );
 
-		expect( wrapper ).toHaveText( 'content' );
+		expect( wrapper.text() ).toContain( 'content' );
 	} );
 
 	it( 'should render if page attributes support is true and available templates exist', () => {
 		const wrapper = shallow( <PageAttributesCheck availableTemplates={ { 'example.php': 'Example template' } } postType={ postType }>content</PageAttributesCheck> );
 
-		expect( wrapper ).toHaveText( 'content' );
+		expect( wrapper.text() ).toContain( 'content' );
 	} );
 } );

@@ -11,7 +11,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { PlainText } from '@wordpress/editor';
+import { PlainText } from '@wordpress/block-editor';
+import { escape, unescape } from './utils';
 
 /**
  * Block code style
@@ -26,16 +27,17 @@ export default function CodeEdit( props ) {
 	return (
 		<View>
 			<PlainText
-				value={ attributes.content }
+				value={ unescape( attributes.content ) }
 				style={ [ style, styles.blockCode ] }
 				multiline={ true }
 				underlineColorAndroid="transparent"
-				onChange={ ( content ) => setAttributes( { content } ) }
+				onChange={ ( content ) => setAttributes( { content: escape( content ) } ) }
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
 				isSelected={ props.isSelected }
 				onFocus={ onFocus }
 				onBlur={ onBlur }
+				fontFamily={ ( styles.blockCode.fontFamily ) }
 			/>
 		</View>
 	);

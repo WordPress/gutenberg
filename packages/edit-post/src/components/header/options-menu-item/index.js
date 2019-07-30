@@ -1,5 +1,5 @@
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';

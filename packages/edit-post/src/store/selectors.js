@@ -139,7 +139,10 @@ export function isEditorPanelEnabled( state, panelName ) {
  */
 export function isEditorPanelOpened( state, panelName ) {
 	const panels = getPreference( state, 'panels' );
-	return panels[ panelName ] === true || get( panels, [ panelName, 'opened' ], false );
+	return (
+		get( panels, [ panelName ] ) === true ||
+		get( panels, [ panelName, 'opened' ] ) === true
+	);
 }
 
 /**
@@ -163,7 +166,7 @@ export function isModalActive( state, modalName ) {
  * @return {boolean} Is active.
  */
 export function isFeatureActive( state, feature ) {
-	return !! state.preferences.features[ feature ];
+	return get( state.preferences.features, [ feature ], false );
 }
 
 /**

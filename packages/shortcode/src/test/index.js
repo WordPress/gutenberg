@@ -59,7 +59,7 @@ describe( 'shortcode', () => {
 			expect( result2.index ).toBe( 14 );
 		} );
 
-		it( 'should still work when there are not equal ammounts of square brackets', () => {
+		it( 'should still work when there are not equal amounts of square brackets', () => {
 			const result1 = next( 'foo', 'this has the [[foo] shortcode' );
 			expect( result1.index ).toBe( 14 );
 
@@ -88,6 +88,13 @@ describe( 'shortcode', () => {
 
 			const result2 = replace( 'foo', 'this has the [foo param="foo"] shortcode', () => 'bar' );
 			expect( result2 ).toBe( 'this has the bar shortcode' );
+		} );
+
+		it( 'should replace the shortcode with data from an attribute', () => {
+			const result1 = replace( 'foo', 'this [foo param="replacement text"] came from a shortcode attribute', ( match ) => {
+				return match.attrs.named.param || '';
+			} );
+			expect( result1 ).toBe( 'this replacement text came from a shortcode attribute' );
 		} );
 
 		it( 'should not replace the shortcode when it does not match', () => {

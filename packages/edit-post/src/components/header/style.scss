@@ -4,26 +4,28 @@
 	border-bottom: $border-width solid $light-gray-500;
 	background: $white;
 	display: flex;
-	flex-direction: row;
-	align-items: stretch;
+	flex-wrap: wrap;
 	justify-content: space-between;
+	align-items: center;
+	// The header should never be wider than the viewport, or buttons might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
+	max-width: 100vw;
 	z-index: z-index(".edit-post-header");
 	left: 0;
 	right: 0;
 
-	// Stick the toolbar to the top, because the admin bar is not fixed on mobile.
-	top: 0;
-	position: sticky;
+	// Make toolbar sticky on larger breakpoints
+	@include break-zoomed-in {
+		height: $header-height;
+		top: 0;
+		position: sticky;
+		flex-wrap: nowrap;
+	}
 
 	// On mobile the main content area has to scroll, otherwise you can invoke the overscroll bounce on the non-scrolling container.
 	@include break-small {
 		position: fixed;
 		padding: $grid-size;
 		top: $admin-bar-height-big;
-
-		body.is-fullscreen-mode & {
-			top: 0;
-		}
 	}
 
 	@include break-medium() {
@@ -31,14 +33,6 @@
 
 		body.is-fullscreen-mode & {
 			top: 0;
-		}
-	}
-
-	.editor-post-switch-to-draft + .editor-post-preview {
-		display: none;
-
-		@include break-small {
-			display: inline-flex;
 		}
 	}
 
@@ -63,35 +57,31 @@
 
 @include editor-left(".edit-post-header");
 
+.edit-post-header__toolbar {
+	display: flex;
+}
+
 .edit-post-header__settings {
 	display: inline-flex;
 	align-items: center;
+	flex-wrap: wrap;
 }
 
 .edit-post-header .components-button {
 	// Header toggle buttons.
 	&.is-toggled {
 		color: $white;
-	}
-
-	// Put the gray background on a separate layer, so as to match the size of the publish button (34px).
-	&.is-toggled::before {
-		content: "";
-		border-radius: $radius-round-rectangle;
-		position: absolute;
-		z-index: -1;
 		background: $dark-gray-500;
-		top: 1px;
-		right: 1px;
-		bottom: 1px;
-		left: 1px;
+		margin: 1px;
+		padding: 7px;
 	}
 
+	// The !important in this ruleset need to override the pile of :not() selectors used in the icon-button.
 	&.is-toggled:hover,
 	&.is-toggled:focus {
-		box-shadow: 0 0 0 $border-width $dark-gray-500, inset 0 0 0 $border-width $white;
-		color: $white;
-		background: $dark-gray-500;
+		box-shadow: 0 0 0 $border-width $dark-gray-500, inset 0 0 0 $border-width $white !important;
+		color: $white !important;
+		background: $dark-gray-500 !important;
 	}
 
 	// Make editor header bar buttons bigger to match IconButtons.

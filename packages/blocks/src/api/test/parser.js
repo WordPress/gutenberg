@@ -10,7 +10,6 @@ import deepFreeze from 'deep-freeze';
 import {
 	getBlockAttribute,
 	getBlockAttributes,
-	asType,
 	createBlockWithFallback,
 	getMigratedBlock,
 	default as parsePegjs,
@@ -18,6 +17,9 @@ import {
 	toBooleanAttributeMatcher,
 	isOfType,
 	isOfTypes,
+	isValidByType,
+	isValidByEnum,
+	serializeBlockNode,
 } from '../parser';
 import {
 	registerBlockType,
@@ -102,44 +104,6 @@ describe( 'block parser', () => {
 		} );
 	} );
 
-	describe( 'asType()', () => {
-		it( 'gracefully handles undefined type', () => {
-			expect( asType( 5 ) ).toBe( 5 );
-		} );
-
-		it( 'gracefully handles unhandled type', () => {
-			expect( asType( 5, '__UNHANDLED__' ) ).toBe( 5 );
-		} );
-
-		it( 'returns expected coerced values', () => {
-			const arr = [];
-			const obj = {};
-
-			expect( asType( '5', 'string' ) ).toBe( '5' );
-			expect( asType( 5, 'string' ) ).toBe( '5' );
-
-			expect( asType( 5, 'integer' ) ).toBe( 5 );
-			expect( asType( '5', 'integer' ) ).toBe( 5 );
-
-			expect( asType( 5, 'number' ) ).toBe( 5 );
-			expect( asType( '5', 'number' ) ).toBe( 5 );
-
-			expect( asType( true, 'boolean' ) ).toBe( true );
-			expect( asType( false, 'boolean' ) ).toBe( false );
-			expect( asType( '5', 'boolean' ) ).toBe( true );
-			expect( asType( 0, 'boolean' ) ).toBe( false );
-
-			expect( asType( null, 'null' ) ).toBe( null );
-			expect( asType( 0, 'null' ) ).toBe( null );
-
-			expect( asType( arr, 'array' ) ).toBe( arr );
-			expect( asType( new Set( [ 1, 2, 3 ] ), 'array' ) ).toEqual( [ 1, 2, 3 ] );
-
-			expect( asType( obj, 'object' ) ).toBe( obj );
-			expect( asType( {}, 'object' ) ).toEqual( {} );
-		} );
-	} );
-
 	describe( 'isOfType()', () => {
 		it( 'gracefully handles unhandled type', () => {
 			expect( isOfType( 5, '__UNHANDLED__' ) ).toBe( true );
@@ -177,6 +141,42 @@ describe( 'block parser', () => {
 
 		it( 'returns true if value is one of types', () => {
 			expect( isOfTypes( null, [ 'string', 'null' ] ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isValidByType', () => {
+		it( 'returns true if type undefined', () => {
+			expect( isValidByType( null ) ).toBe( true );
+		} );
+
+		it( 'returns false if value is not one of types array', () => {
+			expect( isValidByType( null, [ 'string' ] ) ).toBe( false );
+		} );
+
+		it( 'returns true if value is one of types array', () => {
+			expect( isValidByType( null, [ 'string', 'null' ] ) ).toBe( true );
+		} );
+
+		it( 'returns false if value is not of type string', () => {
+			expect( isValidByType( null, 'string' ) ).toBe( false );
+		} );
+
+		it( 'returns true if value is type string', () => {
+			expect( isValidByType( null, 'null' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isValidByEnum', () => {
+		it( 'returns true if enum set undefined', () => {
+			expect( isValidByEnum( 2 ) ).toBe( true );
+		} );
+
+		it( 'returns false if value is not of enum set', () => {
+			expect( isValidByEnum( 2, [ 1, 3 ] ) ).toBe( false );
+		} );
+
+		it( 'returns true if value is of enum set', () => {
+			expect( isValidByEnum( 2, [ 1, 2, 3 ] ) ).toBe( true );
 		} );
 	} );
 
@@ -244,6 +244,32 @@ describe( 'block parser', () => {
 			);
 			expect( value ).toBe( false );
 		} );
+
+		describe( 'source: tag', () => {
+			it( 'returns tag name of matching selector', () => {
+				const value = parseWithAttributeSchema(
+					'<div></div>',
+					{
+						source: 'tag',
+						selector: ':nth-child(1)',
+					}
+				);
+
+				expect( value ).toBe( 'div' );
+			} );
+
+			it( 'returns undefined when no element matches selector', () => {
+				const value = parseWithAttributeSchema(
+					'<div></div>',
+					{
+						source: 'tag',
+						selector: ':nth-child(2)',
+					}
+				);
+
+				expect( value ).toBe( undefined );
+			} );
+		} );
 	} );
 
 	describe( 'getBlockAttribute', () => {
@@ -258,6 +284,62 @@ describe( 'block parser', () => {
 			);
 
 			expect( value ).toBe( 10 );
+		} );
+
+		it( 'should reject type-invalid value, with default', () => {
+			const value = getBlockAttribute(
+				'number',
+				{
+					type: 'string',
+					default: 5,
+				},
+				'',
+				{ number: 10 }
+			);
+
+			expect( value ).toBe( 5 );
+		} );
+
+		it( 'should reject type-invalid value, without default', () => {
+			const value = getBlockAttribute(
+				'number',
+				{
+					type: 'string',
+				},
+				'',
+				{ number: 10 }
+			);
+
+			expect( value ).toBe( undefined );
+		} );
+
+		it( 'should reject enum-invalid value, with default', () => {
+			const value = getBlockAttribute(
+				'number',
+				{
+					type: 'number',
+					enum: [ 4, 5, 6 ],
+					default: 5,
+				},
+				'',
+				{ number: 10 }
+			);
+
+			expect( value ).toBe( 5 );
+		} );
+
+		it( 'should reject enum-invalid value, without default', () => {
+			const value = getBlockAttribute(
+				'number',
+				{
+					type: 'number',
+					enum: [ 4, 5, 6 ],
+				},
+				'',
+				{ number: 10 }
+			);
+
+			expect( value ).toBe( undefined );
 		} );
 
 		it( "should return the matcher's attribute value", () => {
@@ -367,23 +449,25 @@ describe( 'block parser', () => {
 
 	describe( 'getMigratedBlock', () => {
 		it( 'should return the original block if it has no deprecated versions', () => {
+			const parsedAttributes = {};
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {},
+				attributes: parsedAttributes,
 				originalContent: '<span class="wp-block-test-block">Bananas</span>',
 				isValid: false,
 			} );
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock ).toBe( block );
 		} );
 
 		it( 'should return the original block if no valid deprecated version found', () => {
+			const parsedAttributes = {};
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {},
+				attributes: parsedAttributes,
 				originalContent: '<span class="wp-block-test-block">Bananas</span>',
 				isValid: false,
 			} );
@@ -398,7 +482,7 @@ describe( 'block parser', () => {
 				],
 			} );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock ).toBe( block );
 			expect( console ).toHaveErrored();
@@ -406,12 +490,14 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should return with attributes parsed by the deprecated version', () => {
+			const parsedAttributes = {};
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {},
+				attributes: parsedAttributes,
 				originalContent: '<span>Bananas</span>',
 				isValid: false,
 			} );
+
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				save: ( props ) => <div>{ props.attributes.fruit }</div>,
@@ -429,15 +515,16 @@ describe( 'block parser', () => {
 				],
 			} );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 
 		it( 'should be able to migrate attributes and innerBlocks', () => {
+			const parsedAttributes = {};
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {},
+				attributes: parsedAttributes,
 				originalContent: '<span>Bananas</span>',
 				isValid: false,
 			} );
@@ -467,7 +554,7 @@ describe( 'block parser', () => {
 				],
 			} );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock.attributes ).toEqual( { newFruit: 'Bananas' } );
 			expect( migratedBlock.innerBlocks ).toHaveLength( 1 );
@@ -476,11 +563,10 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should ignore valid uneligible blocks', () => {
+			const parsedAttributes = { fruit: 'Bananas' };
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {
-					fruit: 'Bananas',
-				},
+				attributes: parsedAttributes,
 				originalContent: 'Bananas',
 				isValid: true,
 			} );
@@ -499,17 +585,16 @@ describe( 'block parser', () => {
 				],
 			} );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 
 		it( 'should allow opt-in eligibility of valid block', () => {
+			const parsedAttributes = { fruit: 'Bananas' };
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {
-					fruit: 'Bananas',
-				},
+				attributes: parsedAttributes,
 				originalContent: 'Bananas',
 				isValid: true,
 			} );
@@ -529,9 +614,52 @@ describe( 'block parser', () => {
 				],
 			} );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas!' } );
+		} );
+
+		it( 'allows a default attribute to be deprecated', () => {
+			// The block's default fruit attribute has been changed from 'Bananas' to 'Oranges'.
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						default: 'Oranges',
+					},
+				},
+				deprecated: [
+					{
+						attributes: {
+							fruit: {
+								type: 'string',
+								default: 'Bananas',
+							},
+						},
+						save: defaultBlockSettings.save,
+					},
+				],
+			} );
+
+			// Because the fruits attribute is not sourced, when the block content was parsed no value for the
+			// fruit attribute was found.
+			const parsedAttributes = {};
+
+			// When the block was created, it was given the new default value for the fruit attribute of 'Oranges'.
+			// This is because unchanged default values are not saved to the comment delimeter attributes.
+			// Validation failed because this block was saved when the old default was 'Bananas' as reflected by the originalContent.
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: { fruit: 'Oranges' },
+				originalContent: 'Bananas',
+				isValid: false,
+			} );
+
+			// The migrated block successfully falls back to the old value of 'Bananas', allowing the block to
+			// continue to be used.
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
+			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 	} );
 
@@ -627,6 +755,111 @@ describe( 'block parser', () => {
 			expect( block.isValid ).toBe( true );
 			expect( console ).toHaveErrored();
 			expect( console ).toHaveWarned();
+		} );
+	} );
+
+	describe( 'serializeBlockNode', () => {
+		it( 'reserializes block nodes', () => {
+			const expected = `<!-- wp:columns -->
+				<div class="wp-block-columns has-2-columns">
+					<!-- wp:column -->
+					<div class="wp-block-column">
+						<!-- wp:paragraph -->
+						<p>A</p>
+						<!-- /wp:paragraph -->
+					</div>
+					<!-- /wp:column -->
+					<!-- wp:column -->
+					<div class="wp-block-column">
+						<!-- wp:group -->
+						<div class="wp-block-group"><div class="wp-block-group__inner-container">
+							<!-- wp:list -->
+							<ul><li>B</li><li>C</li></ul>
+							<!-- /wp:list -->
+							<!-- wp:paragraph -->
+							<p>D</p>
+							<!-- /wp:paragraph -->
+						</div></div>
+						<!-- /wp:group -->
+					</div>
+					<!-- /wp:column -->
+				</div>
+				<!-- /wp:columns -->`.replace( /\t/g, '' );
+			const input = {
+				blockName: 'core/columns',
+				attrs: {},
+				innerBlocks: [
+					{
+						blockName: 'core/column',
+						attrs: {},
+						innerBlocks: [
+							{
+								blockName: 'core/paragraph',
+								attrs: {},
+								innerBlocks: [],
+								innerHTML: '<p>A</p>',
+								innerContent: [ '<p>A</p>' ],
+							},
+						],
+						innerHTML: '<div class="wp-block-column"></div>',
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
+					},
+					{
+						blockName: 'core/column',
+						attrs: {},
+						innerBlocks: [
+							{
+								blockName: 'core/group',
+								attrs: {},
+								innerBlocks: [
+									{
+										blockName: 'core/list',
+										attrs: {},
+										innerBlocks: [],
+										innerHTML: '<ul><li>B</li><li>C</li></ul>',
+										innerContent: [ '<ul><li>B</li><li>C</li></ul>' ],
+									},
+									{
+										blockName: 'core/paragraph',
+										attrs: {},
+										innerBlocks: [],
+										innerHTML: '<p>D</p>',
+										innerContent: [ '<p>D</p>' ],
+									},
+								],
+								innerHTML: '<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+								innerContent: [
+									'<div class="wp-block-group"><div class="wp-block-group__inner-container">',
+									null,
+									'',
+									null,
+									'</div></div>' ],
+							},
+						],
+						innerHTML: '<div class="wp-block-column"></div>',
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
+					},
+				],
+				innerHTML: '<div class="wp-block-columns has-2-columns"></div>',
+				innerContent: [
+					'<div class="wp-block-columns has-2-columns">',
+					null,
+					'',
+					null,
+					'</div>',
+				],
+			};
+			const actual = serializeBlockNode( input );
+
+			expect( actual ).toEqual( expected );
 		} );
 	} );
 

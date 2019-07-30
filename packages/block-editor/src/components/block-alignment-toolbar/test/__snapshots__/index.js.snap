@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BlockAlignmentToolbar should match snapshot 1`] = `
+<Toolbar
+  controls={
+    Array [
+      Object {
+        "icon": "align-left",
+        "isActive": true,
+        "onClick": [Function],
+        "title": "Align Left",
+      },
+      Object {
+        "icon": "align-center",
+        "isActive": false,
+        "onClick": [Function],
+        "title": "Align Center",
+      },
+      Object {
+        "icon": "align-right",
+        "isActive": false,
+        "onClick": [Function],
+        "title": "Align Right",
+      },
+    ]
+  }
+  icon="align-left"
+  isCollapsed={true}
+  label="Change alignment"
+/>
+`;

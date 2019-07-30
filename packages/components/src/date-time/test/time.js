@@ -9,18 +9,24 @@ import { shallow } from 'enzyme';
 import TimePicker from '../time';
 
 describe( 'TimePicker', () => {
-	it( 'should have the correct CSS class if 12-hour clock is specified', () => {
-		const onChangeSpy = jest.fn();
-		const picker = shallow( <TimePicker currentTime="1986-10-18T11:00:00" onChange={ onChangeSpy } is12Hour={ true } /> );
-		expect( picker.hasClass( 'is-12-hour' ) ).toBe( true );
+	it( 'matches the snapshot when the is12hour prop is true', () => {
+		const wrapper = shallow( <TimePicker currentTime="1986-10-18T23:00:00" is12Hour={ true } /> );
+		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'should have the correct CSS class if 24-hour clock is specified', () => {
-		const onChangeSpy = jest.fn();
-		const picker = shallow(
-			<TimePicker currentTime="1986-10-18T11:00:00" onChange={ onChangeSpy } is12Hour={ false } />
-		);
-		expect( picker.hasClass( 'is-24-hour' ) ).toBe( true );
+	it( 'matches the snapshot when the is12hour prop is false', () => {
+		const wrapper = shallow( <TimePicker currentTime="1986-10-18T23:00:00" is12Hour={ false } /> );
+		expect( wrapper ).toMatchSnapshot();
+	} );
+
+	it( 'matches the snapshot when the is12hour prop is specified', () => {
+		const wrapper = shallow( <TimePicker currentTime="1986-10-18T23:00:00" is12Hour /> );
+		expect( wrapper ).toMatchSnapshot();
+	} );
+
+	it( 'matches the snapshot when the is12hour prop is undefined', () => {
+		const wrapper = shallow( <TimePicker currentTime="1986-10-18T23:00:00" /> );
+		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	it( 'should call onChange with an updated day', () => {

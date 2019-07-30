@@ -1,0 +1,61 @@
+.block-editor-block-styles {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.block-editor-block-styles__item {
+	width: calc(50% - #{ $grid-size-small });
+	margin: $grid-size-small 0;
+	flex-shrink: 0;
+	cursor: pointer;
+	overflow: hidden;
+	border-radius: $radius-round-rectangle;
+	padding: $grid-size-small * 1.5;
+
+	&:focus {
+		@include block-style__focus();
+	}
+
+	&:hover {
+		@include block-style__hover;
+	}
+
+	&.is-active {
+		@include block-style__is-active();
+
+		&:focus {
+			@include block-style__is-active-focus();
+		}
+	}
+}
+
+.block-editor-block-styles__item-preview {
+	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
+	border: 1px solid rgba($dark-gray-900, 0.2);
+	overflow: hidden;
+	padding: 0;
+	text-align: initial;
+	border-radius: $radius-round-rectangle;
+	display: flex;
+	height: 60px;
+	background: $white;
+
+	// Actual preview contents.
+	.block-editor-block-preview__content {
+		transform: scale(0.7);
+		transform-origin: center center;
+		width: 100%;
+
+		// Unset some of the styles that might be inherited from the editor style.
+		margin: 0;
+		padding: 0;
+		overflow: visible;
+		min-height: auto;
+	}
+}
+
+.block-editor-block-styles__item-label {
+	text-align: center;
+	padding: 4px 2px;
+}

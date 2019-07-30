@@ -6,7 +6,7 @@ import postcss from 'postcss';
 /**
  * Internal dependencies
  */
-import plugin from '../src';
+import plugin from '../';
 
 /**
  * Module constants

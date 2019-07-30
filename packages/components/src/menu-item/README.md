@@ -1,6 +1,6 @@
 # MenuItem
 
-MenuItem is a component which renders a button intended to be used in combination with the [DropdownMenu component](../dropdown-menu).
+MenuItem is a component which renders a button intended to be used in combination with the [DropdownMenu component](/packages/components/src/dropdown-menu/README.md).
 
 ## Usage
 
@@ -23,7 +23,7 @@ const MyMenuItem = withState( {
 
 ## Props
 
-MenuItem supports the following props. Any additional props are passed through to the underlying [Button](../button) or [IconButton](../icon-button) component.
+MenuItem supports the following props. Any additional props are passed through to the underlying [Button](/packages/components/src/button/README.md) or [IconButton](/packages/components/src/icon-button/README.md) component.
 
 ### `children`
 
@@ -31,17 +31,6 @@ MenuItem supports the following props. Any additional props are passed through t
 - Required: No
 
 Element to render as child of button.
-
-Element
-
-### `label`
-
-- Type: `string`
-- Required: No
-
-String to use as primary button label text, applied as `aria-label`. Useful in cases where an `info` prop is passed, where `label` should be the minimal text of the button, described in further detail by `info`.
-
-Defaults to the value of `children`, if `children` is passed as a string.
 
 ### `info`
 
@@ -57,14 +46,21 @@ Refer to documentation for [`label`](#label).
 - Type: `string`
 - Required: No
 
-Refer to documentation for [IconButton's `icon` prop](../icon-button/README.md#icon).
+Refer to documentation for [IconButton's `icon` prop](/packages/components/src/icon-button/README.md#icon).
+
+### `isSelected`
+
+- Type: `boolean`
+- Required: No
+
+Whether or not the menu item is currently selected.
 
 ### `shortcut`
 
 - Type: `string`
 - Required: No
 
-Refer to documentation for [Shortcut's `shortcut` prop](../shortcut/README.md#shortcut).
+Refer to documentation for [Shortcut's `shortcut` prop](/packages/components/src/shortcut/README.md#shortcut).
 
 ### `role`
 

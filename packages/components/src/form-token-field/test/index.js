@@ -49,7 +49,7 @@ describe( 'FormTokenField', function() {
 		TestUtils.Simulate.keyDown(
 			wrapperElement(),
 			{
-				keyCode: keyCode,
+				keyCode,
 				shiftKey: ! ! shiftKey,
 			}
 		);
@@ -58,7 +58,7 @@ describe( 'FormTokenField', function() {
 	function sendKeyPress( charCode ) {
 		TestUtils.Simulate.keyPress(
 			wrapperElement(),
-			{ charCode: charCode }
+			{ charCode }
 		);
 	}
 

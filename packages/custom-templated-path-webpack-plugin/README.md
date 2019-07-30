@@ -51,3 +51,5 @@ module.exports = {
 ```
 
 For more examples, refer to Webpack's own [`TemplatedPathPlugin.js`](https://github.com/webpack/webpack/blob/v4.1.1/lib/TemplatedPathPlugin.js), which implements the base set of template tags.
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

@@ -1,10 +1,10 @@
 # Block Filters
 
-To modify the behavior of existing blocks, Gutenberg exposes several APIs:
+To modify the behavior of existing blocks, WordPress exposes several APIs:
 
 ### Block Style Variations
 
-Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected.
+Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected. See the [Getting Started with JavaScript tutorial](/docs/designers-developers/developers/tutorials/javascript/) for a full example.
 
 _Example:_
 
@@ -17,17 +17,41 @@ wp.blocks.registerBlockStyle( 'core/quote', {
 
 The example above registers a block style variation named `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
 
-By adding `isDefault: true`, you can make registered style variation to be active by default when a block is inserted.
+By adding `isDefault: true` you can mark the registered style variation as the one that is recognized as active when no custom class name is provided. It also means that there will be no custom class name added to the HTML output for the style that is marked as default.
 
 To remove a block style variation use `wp.blocks.unregisterBlockStyle()`.
 
 _Example:_
 
 ```js
-wp.blocks.unregisterBlockStyle( 'core/quote', 'fancy-quote' );
+wp.blocks.unregisterBlockStyle( 'core/quote', 'large' );
 ```
 
-The above removes the variation named `fancy-quote` from the `core/quote` block.
+The above removes the variation named `large` from the `core/quote` block.
+
+**Important:** When unregistering a block style, there can be a [race condition](https://en.wikipedia.org/wiki/Race_condition) on which code runs first: registering the style, or unregistering the style. You want your unregister code to run last. The way to do that is specify the component that is registering the style as a dependency, in this case `wp-edit-post`. Additionally, using `wp.domReady()` ensures the unregister code runs once the dom is loaded.
+
+Enqueue your JavaScript with the following PHP code:
+
+```php
+function myguten_enqueue() {
+	wp_enqueue_script(
+		'myguten-script',
+		plugins_url( 'myguten.js', __FILE__ ),
+		array( 'wp-blocks', 'wp-dom-ready', 'wp-edit-post' ),
+		filemtime( plugin_dir_path( __FILE__ ) . '/myguten.js' )
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
+```
+
+The JavaScript code in `myguten.js`:
+
+```js
+wp.domReady( function() {
+	wp.blocks.unregisterBlockStyle( 'core/quote', 'large' );
+} );
+```
 
 ### Filters
 
@@ -35,7 +59,7 @@ Extending blocks can involve more than just providing alternative styles, in thi
 
 #### `blocks.registerBlockType`
 
-Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
+Used to filter the block settings. It receives the block settings and the name of the registered block as arguments. Since v6.1.0 this filter is also applied to each of a block's deprecated settings.
 
 _Example:_
 
@@ -89,7 +113,7 @@ wp.hooks.addFilter(
 );
 ```
 
-_Note:_ This filter must always be run on every page load, and not in your browser's developer tools console. Otherwise, a [block validation](../../../../docs/designers-developers/developers/block-api/block-edit-save.md#validation) error will occur the next time the post is edited. This is due to the fact that block validation occurs by verifying that the saved output matches what is stored in the post's content during editor initialization. So, if this filter does not exist when the editor loads, the block will be marked as invalid.
+_Note:_ This filter must always be run on every page load, and not in your browser's developer tools console. Otherwise, a [block validation](/docs/designers-developers/developers/block-api/block-edit-save.md#validation) error will occur the next time the post is edited. This is due to the fact that block validation occurs by verifying that the saved output matches what is stored in the post's content during editor initialization. So, if this filter does not exist when the editor loads, the block will be marked as invalid.
 
 #### `blocks.getBlockDefaultClassName`
 
@@ -237,8 +261,9 @@ Adding blocks is easy enough, removing them is as easy. Plugin or theme authors 
 
 ```js
 // my-plugin.js
-
-wp.blocks.unregisterBlockType( 'core/verse' );
+wp.domReady( function() {
+	wp.blocks.unregisterBlockType( 'core/verse' );
+} );
 ```
 
 and load this script in the Editor
@@ -251,7 +276,7 @@ function my_plugin_blacklist_blocks() {
 	wp_enqueue_script(
 		'my-plugin-blacklist-blocks',
 		plugins_url( 'my-plugin.js', __FILE__ ),
-		array( 'wp-blocks' )
+		array( 'wp-blocks', 'wp-dom-ready', 'wp-edit-post' )
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'my_plugin_blacklist_blocks' );

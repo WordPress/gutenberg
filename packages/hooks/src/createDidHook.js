@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import validateHookName from './validateHookName.js';
 
 /**

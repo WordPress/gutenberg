@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { pick, flow } from 'lodash';
+import { merge, isPlainObject, get } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import defaultStorage from './storage/default';
+import { combineReducers } from '../../';
 
 /**
  * Persistence plugin options.
@@ -34,18 +35,21 @@ const DEFAULT_STORAGE = defaultStorage;
 const DEFAULT_STORAGE_KEY = 'WP_DATA';
 
 /**
- * Higher-order reducer to provides an initial value when state is undefined.
+ * Higher-order reducer which invokes the original reducer only if state is
+ * inequal from that of the action's `nextState` property, otherwise returning
+ * the original state reference.
  *
- * @param {Function} reducer      Original reducer.
- * @param {*}         initialState Value to use as initial state.
+ * @param {Function} reducer Original reducer.
  *
  * @return {Function} Enhanced reducer.
  */
-export function withInitialState( reducer, initialState ) {
-	return ( state = initialState, action ) => {
-		return reducer( state, action );
-	};
-}
+export const withLazySameState = ( reducer ) => ( state, action ) => {
+	if ( action.nextState === state ) {
+		return state;
+	}
+
+	return reducer( state, action );
+};
 
 /**
  * Creates a persistence interface, exposing getter and setter methods (`get`
@@ -68,7 +72,7 @@ export function createPersistenceInterface( options ) {
 	 *
 	 * @return {Object} Persisted data.
 	 */
-	function get() {
+	function getData() {
 		if ( data === undefined ) {
 			// If unset, getItem is expected to return null. Fall back to
 			// empty object.
@@ -95,12 +99,15 @@ export function createPersistenceInterface( options ) {
 	 * @param {string} key   Key to update.
 	 * @param {*}      value Updated value.
 	 */
-	function set( key, value ) {
+	function setData( key, value ) {
 		data = { ...data, [ key ]: value };
 		storage.setItem( storageKey, JSON.stringify( data ) );
 	}
 
-	return { get, set };
+	return {
+		get: getData,
+		set: setData,
+	};
 }
 
 /**
@@ -111,7 +118,7 @@ export function createPersistenceInterface( options ) {
  *
  * @return {WPDataPlugin} Data plugin.
  */
-export default function( registry, pluginOptions ) {
+const persistencePlugin = function( registry, pluginOptions ) {
 	const persistence = createPersistenceInterface( pluginOptions );
 
 	/**
@@ -125,20 +132,30 @@ export default function( registry, pluginOptions ) {
 	 * @return {Function} Enhanced dispatch function.
 	 */
 	function createPersistOnChange( getState, reducerKey, keys ) {
-		let lastState = getState();
+		let getPersistedState;
+		if ( Array.isArray( keys ) ) {
+			// Given keys, the persisted state should by produced as an object
+			// of the subset of keys. This implementation uses combineReducers
+			// to leverage its behavior of returning the same object when none
+			// of the property values changes. This allows a strict reference
+			// equality to bypass a persistence set on an unchanging state.
+			const reducers = keys.reduce( ( result, key ) => Object.assign( result, {
+				[ key ]: ( state, action ) => action.nextState[ key ],
+			} ), {} );
 
-		return ( result ) => {
-			let state = getState();
+			getPersistedState = withLazySameState( combineReducers( reducers ) );
+		} else {
+			getPersistedState = ( state, action ) => action.nextState;
+		}
+
+		let lastState = getPersistedState( undefined, { nextState: getState() } );
+
+		return () => {
+			const state = getPersistedState( lastState, { nextState: getState() } );
 			if ( state !== lastState ) {
-				if ( Array.isArray( keys ) ) {
-					state = pick( state, keys );
-				}
-
 				persistence.set( reducerKey, state );
 				lastState = state;
 			}
-
-			return result;
 		};
 	}
 
@@ -148,25 +165,66 @@ export default function( registry, pluginOptions ) {
 				return registry.registerStore( reducerKey, options );
 			}
 
-			const initialState = persistence.get()[ reducerKey ];
+			// Load from persistence to use as initial state.
+			const persistedState = persistence.get()[ reducerKey ];
+			if ( persistedState !== undefined ) {
+				let initialState = options.reducer( undefined, {
+					type: '@@WP/PERSISTENCE_RESTORE',
+				} );
 
-			options = {
-				...options,
-				reducer: withInitialState( options.reducer, initialState ),
-			};
+				if ( isPlainObject( initialState ) && isPlainObject( persistedState ) ) {
+					// If state is an object, ensure that:
+					// - Other keys are left intact when persisting only a
+					//   subset of keys.
+					// - New keys in what would otherwise be used as initial
+					//   state are deeply merged as base for persisted value.
+					initialState = merge( {}, initialState, persistedState );
+				} else {
+					// If there is a mismatch in object-likeness of default
+					// initial or persisted state, defer to persisted value.
+					initialState = persistedState;
+				}
+
+				options = {
+					...options,
+					initialState,
+				};
+			}
 
 			const store = registry.registerStore( reducerKey, options );
 
-			store.dispatch = flow( [
-				store.dispatch,
-				createPersistOnChange(
-					store.getState,
-					reducerKey,
-					options.persist
-				),
-			] );
+			store.subscribe( createPersistOnChange(
+				store.getState,
+				reducerKey,
+				options.persist
+			) );
 
 			return store;
 		},
 	};
-}
+};
+
+/**
+ * Deprecated: Remove this function once WordPress 5.3 is released.
+ */
+
+persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
+	const persistence = createPersistenceInterface( pluginOptions );
+
+	// Preferences migration to introduce the block editor module
+	const insertUsage = get( persistence.get(), [
+		'core/editor',
+		'preferences',
+		'insertUsage',
+	] );
+
+	if ( insertUsage ) {
+		persistence.set( 'core/block-editor', {
+			preferences: {
+				insertUsage,
+			},
+		} );
+	}
+};
+
+export default persistencePlugin;

@@ -1,5 +1,5 @@
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { registerStore } from '@wordpress/data';
 

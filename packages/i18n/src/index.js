@@ -13,7 +13,7 @@ import sprintfjs from 'sprintf-js';
  */
 const DEFAULT_LOCALE_DATA = {
 	'': {
-		plural_forms: 'plural=(n!=1)',
+		plural_forms: ( n ) => n === 1 ? 0 : 1,
 	},
 };
 
@@ -150,7 +150,7 @@ export function _nx( single, plural, number, context, domain ) {
  * original format string is returned.
  *
  * @param {string}   format  The format of the string to generate.
- * @param {string[]} ...args Arguments to apply to the format.
+ * @param {...string} args Arguments to apply to the format.
  *
  * @see http://www.diveintojavascript.com/projects/javascript-sprintf
  *

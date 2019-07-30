@@ -6,8 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment, Component } from '@wordpress/element';
-import { InspectorControls, BlockControls, RichText } from '@wordpress/editor';
+import { Component } from '@wordpress/element';
+import {
+	InspectorControls,
+	BlockControls,
+	RichText,
+	PanelColorSettings,
+	createCustomColorsHOC,
+	BlockIcon,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
@@ -16,6 +23,7 @@ import {
 	Button,
 	Toolbar,
 	DropdownMenu,
+	Placeholder,
 } from '@wordpress/components';
 
 /**
@@ -28,9 +36,37 @@ import {
 	deleteRow,
 	insertColumn,
 	deleteColumn,
+	toggleSection,
+	isEmptyTableSection,
 } from './state';
+import icon from './icon';
 
-export default class TableEdit extends Component {
+const BACKGROUND_COLORS = [
+	{
+		color: '#f3f4f5',
+		name: 'Subtle light gray',
+		slug: 'subtle-light-gray',
+	},
+	{
+		color: '#e9fbe5',
+		name: 'Subtle pale green',
+		slug: 'subtle-pale-green',
+	},
+	{
+		color: '#e7f5fe',
+		name: 'Subtle pale blue',
+		slug: 'subtle-pale-blue',
+	},
+	{
+		color: '#fcf0ef',
+		name: 'Subtle pale pink',
+		slug: 'subtle-pale-pink',
+	},
+];
+
+const withCustomBackgroundColors = createCustomColorsHOC( BACKGROUND_COLORS );
+
+export class TableEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -49,6 +85,8 @@ export default class TableEdit extends Component {
 		this.onInsertColumnBefore = this.onInsertColumnBefore.bind( this );
 		this.onInsertColumnAfter = this.onInsertColumnAfter.bind( this );
 		this.onDeleteColumn = this.onDeleteColumn.bind( this );
+		this.onToggleHeaderSection = this.onToggleHeaderSection.bind( this );
+		this.onToggleFooterSection = this.onToggleFooterSection.bind( this );
 
 		this.state = {
 			initialRowCount: 2,
@@ -164,6 +202,16 @@ export default class TableEdit extends Component {
 		this.onInsertRow( 1 );
 	}
 
+	onToggleHeaderSection() {
+		const { attributes, setAttributes } = this.props;
+		setAttributes( toggleSection( attributes, 'head' ) );
+	}
+
+	onToggleFooterSection() {
+		const { attributes, setAttributes } = this.props;
+		setAttributes( toggleSection( attributes, 'foot' ) );
+	}
+
 	/**
 	 * Deletes the currently selected row.
 	 */
@@ -194,11 +242,10 @@ export default class TableEdit extends Component {
 		}
 
 		const { attributes, setAttributes } = this.props;
-		const { section, columnIndex } = selectedCell;
+		const { columnIndex } = selectedCell;
 
 		this.setState( { selectedCell: null } );
 		setAttributes( insertColumn( attributes, {
-			section,
 			columnIndex: columnIndex + delta,
 		} ) );
 	}
@@ -305,7 +352,7 @@ export default class TableEdit extends Component {
 	 * @return {Object} React element for the section.
 	 */
 	renderSection( { type, rows } ) {
-		if ( ! rows.length ) {
+		if ( isEmptyTableSection( rows ) ) {
 			return null;
 		}
 
@@ -314,9 +361,9 @@ export default class TableEdit extends Component {
 
 		return (
 			<Tag>
-				{ rows.map( ( { cells }, rowIndex ) =>
+				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
-						{ cells.map( ( { content, tag: CellTag }, columnIndex ) => {
+						{ cells.map( ( { content, tag: CellTag, scope }, columnIndex ) => {
 							const isSelected = selectedCell && (
 								type === selectedCell.section &&
 								rowIndex === selectedCell.rowIndex &&
@@ -329,12 +376,14 @@ export default class TableEdit extends Component {
 								columnIndex,
 							};
 
-							const classes = classnames( {
-								'is-selected': isSelected,
-							} );
+							const cellClasses = classnames( { 'is-selected': isSelected } );
 
 							return (
-								<CellTag key={ columnIndex } className={ classes }>
+								<CellTag
+									key={ columnIndex }
+									className={ cellClasses }
+									scope={ CellTag === 'th' ? scope : undefined }
+								>
 									<RichText
 										className="wp-block-table__cell-content"
 										value={ content }
@@ -345,7 +394,7 @@ export default class TableEdit extends Component {
 							);
 						} ) }
 					</tr>
-				) }
+				) ) }
 			</Tag>
 		);
 	}
@@ -360,45 +409,61 @@ export default class TableEdit extends Component {
 	}
 
 	render() {
-		const { attributes, className } = this.props;
+		const {
+			attributes,
+			className,
+			backgroundColor,
+			setBackgroundColor,
+		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const { hasFixedLayout, head, body, foot } = attributes;
-		const isEmpty = ! head.length && ! body.length && ! foot.length;
+		const isEmpty = isEmptyTableSection( head ) && isEmptyTableSection( body ) && isEmptyTableSection( foot );
 		const Section = this.renderSection;
 
 		if ( isEmpty ) {
 			return (
-				<form onSubmit={ this.onCreateTable }>
-					<TextControl
-						type="number"
-						label={ __( 'Column Count' ) }
-						value={ initialColumnCount }
-						onChange={ this.onChangeInitialColumnCount }
-						min="1"
-					/>
-					<TextControl
-						type="number"
-						label={ __( 'Row Count' ) }
-						value={ initialRowCount }
-						onChange={ this.onChangeInitialRowCount }
-						min="1"
-					/>
-					<Button isPrimary type="submit">{ __( 'Create' ) }</Button>
-				</form>
+				<Placeholder
+					label={ __( 'Table' ) }
+					icon={ <BlockIcon icon={ icon } showColors /> }
+					instructions={ __( 'Insert a table for sharing data.' ) }
+					isColumnLayout
+				>
+					<form className="wp-block-table__placeholder-form" onSubmit={ this.onCreateTable }>
+						<TextControl
+							type="number"
+							label={ __( 'Column Count' ) }
+							value={ initialColumnCount }
+							onChange={ this.onChangeInitialColumnCount }
+							min="1"
+							className="wp-block-table__placeholder-input"
+						/>
+						<TextControl
+							type="number"
+							label={ __( 'Row Count' ) }
+							value={ initialRowCount }
+							onChange={ this.onChangeInitialRowCount }
+							min="1"
+							className="wp-block-table__placeholder-input"
+						/>
+						<Button className="wp-block-table__placeholder-button" isDefault type="submit">{ __( 'Create Table' ) }</Button>
+					</form>
+				</Placeholder>
 			);
 		}
 
-		const classes = classnames( className, {
+		const tableClasses = classnames( backgroundColor.class, {
 			'has-fixed-layout': hasFixedLayout,
+			'has-background': !! backgroundColor.color,
 		} );
 
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<Toolbar>
 						<DropdownMenu
+							hasArrowIndicator
 							icon="editor-table"
-							label={ __( 'Edit Table' ) }
+							label={ __( 'Edit table' ) }
 							controls={ this.getTableControls() }
 						/>
 					</Toolbar>
@@ -410,14 +475,41 @@ export default class TableEdit extends Component {
 							checked={ !! hasFixedLayout }
 							onChange={ this.onChangeFixedLayout }
 						/>
+						<ToggleControl
+							label={ __( 'Header section' ) }
+							checked={ !! ( head && head.length ) }
+							onChange={ this.onToggleHeaderSection }
+						/>
+						<ToggleControl
+							label={ __( 'Footer section' ) }
+							checked={ !! ( foot && foot.length ) }
+							onChange={ this.onToggleFooterSection }
+						/>
 					</PanelBody>
+					<PanelColorSettings
+						title={ __( 'Color Settings' ) }
+						initialOpen={ false }
+						colorSettings={ [
+							{
+								value: backgroundColor.color,
+								onChange: setBackgroundColor,
+								label: __( 'Background Color' ),
+								disableCustomColors: true,
+								colors: BACKGROUND_COLORS,
+							},
+						] }
+					/>
 				</InspectorControls>
-				<table className={ classes }>
-					<Section type="head" rows={ head } />
-					<Section type="body" rows={ body } />
-					<Section type="foot" rows={ foot } />
-				</table>
-			</Fragment>
+				<figure className={ className }>
+					<table className={ tableClasses }>
+						<Section type="head" rows={ head } />
+						<Section type="body" rows={ body } />
+						<Section type="foot" rows={ foot } />
+					</table>
+				</figure>
+			</>
 		);
 	}
 }
+
+export default withCustomBackgroundColors( 'backgroundColor' )( TableEdit );

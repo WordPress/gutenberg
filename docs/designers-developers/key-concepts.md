@@ -18,7 +18,7 @@ Blocks can be static or dynamic. Static blocks contain rendered content and an o
 
 Each block contains Attributes or configuration settings, which can be sourced from raw HTML in the content, via meta or other customizable origins.
 
-The Paragraph is the default Block. Instead of a new line upon typing return on a keyboard, try to think of it as an empty paragraph block (type / to trigger an autocompleting Slash Inserter -- /image will pull up Images as well as Instagram embeds).
+The Paragraph is the default block. Instead of a new line upon typing return on a keyboard, try to think of it as an empty Paragraph block (type / to trigger an autocompleting Slash Inserter -- /image will pull up Images as well as Instagram embeds).
 
 Users insert new blocks by clicking the plus button for the Block Inserter, typing / for the Slash Inserter or typing return for a blank Paragraph block.
 
@@ -109,7 +109,7 @@ Thus, the serialization process converts the tree into HTML using HTML comments 
 
 This is one end of the process. The other is how to recreate the internal data tree of the collection of blocks whenever a post is to be edited again. A formal grammar defines how the serialized representation of a Gutenberg post should be loaded just as some basic rules define how to turn the tree into an HTML-like string. Gutenberg posts aren't designed to be edited by hand; they aren't designed to be edited as HTML documents because Gutenberg posts aren't HTML in essence.
 
-They just happen, incidentally, to be stored inside of `post_content` in a way in which they require no transformation in order to be viewable by any legacy system. It's true that loading the stored HTML into a browser without the corresponding machinery that the experience might degrade if it included dynamic blocks of content: dynamic elements may not load, server-generated content may not appear, interactive content may remain static. However, it at least protects against viewing Gutenberg posts on themes and installations which are Gutenberg-unaware, and provides the most accessible way to the content.
+They just happen, incidentally, to be stored inside of `post_content` in a way in which they require no transformation in order to be viewable by any legacy system. It's true that loading the stored HTML into a browser without the corresponding machinery might degrade the experience, also if it included dynamic blocks of content: dynamic elements may not load, server-generated content may not appear, interactive content may remain static. However, it at least protects against not being able to view Gutenberg posts on themes and installations which are Gutenberg-unaware, and provides the most accessible way to the content. In other words the post remains mostly intact even if the Gutenberg is not supported on the installation.
 
 ## Delimiters and Parsing Expression Grammar
 
@@ -117,13 +117,13 @@ We chose instead to try and find a way to keep the formality and explicitness an
 
 Of these options a novel approach was suggested that by storing data in HTML comments we would know that we wouldn't break the rest of the HTML in the document, that browsers should ignore it, and that we could simplify our approach to parsing the document.
 
-Unique to comments is that they cannot legitimately exist in ambiguous places, such as inside of HTML attributes like `<img alt='data-id="14"'>`. Comments are also quite permissive. Whereas HTML attributes are complicated to parse properly, comments are quite easily described by a leading `<!--` followed by anything except `--` until the first `-->`. This simplicity and permisiveness means that the parser can be implemented in several ways without needing to understand HTML properly and we have the liberty to use more convenient syntax inside of the comment—we only need to escape double-hyphen sequences. We take advantage of this in how we store block attributes: JSON literals inside the comment.
+Unique to comments is that they cannot legitimately exist in ambiguous places, such as inside of HTML attributes like `<img alt='data-id="14"'>`. Comments are also quite permissive. Whereas HTML attributes are complicated to parse properly, comments are quite easily described by a leading `<!--` followed by anything except `--` until the first `-->`. This simplicity and permissiveness means that the parser can be implemented in several ways without needing to understand HTML properly and we have the liberty to use more convenient syntax inside of the comment—we only need to escape double-hyphen sequences. We take advantage of this in how we store block attributes: JSON literals inside the comment.
 
 After running this through the parser we're left with a simple object we can manipulate idiomatically and we don't have to worry about escaping or unescaping the data. It's handled for us through the serialization process. Because the comments are so different from other HTML tags and because we can perform a first-pass to extract the top-level blocks, we don't actually depend on having fully valid HTML!
 
 This has dramatic implications for how simple and performant we can make our parser. These explicit boundaries also protect damage in a single block from bleeding into other blocks or tarnishing the entire document. It also allows the system to identify unrecognized blocks before rendering them.
 
-_N.B.:_ The defining aspect of blocks are their semantics and the isolation mechanism they provide; in other words, their identity. On the other hand, where their data is stored is a more liberal aspect. Blocks support more than just static local data (via JSON literals inside the HTML comment or within the block's HTML), and more mechanisms (_e.g._, global blocks or otherwise resorting to storage in complementary `WP_Post` objects) are expected. See [attributes](../../docs/designers-developers/developers/block-api/block-attributes.md) for details.
+_N.B.:_ The defining aspect of blocks are their semantics and the isolation mechanism they provide; in other words, their identity. On the other hand, where their data is stored is a more liberal aspect. Blocks support more than just static local data (via JSON literals inside the HTML comment or within the block's HTML), and more mechanisms (_e.g._, global blocks or otherwise resorting to storage in complementary `WP_Post` objects) are expected. See [attributes](/docs/designers-developers/developers/block-api/block-attributes.md) for details.
 
 ## The Anatomy of a Serialized Block
 
@@ -143,4 +143,6 @@ A purely dynamic block that is to be server rendered before display could look l
 
 ## The Gutenberg Lifecycle
 
-In summary, the workflow for editing a Gutenberg post starts with taking the persisted version of the document and generating the in-memory tree, aided by the presence of token delimiters. It ends with the reverse: serialization of blocks into `post_content`. During editing, all manipulations happen within the block tree. In summary, a Gutenberg post is built upon an in-memory data structure which gets persisted somehow in an fully-isomorphic way. Right now that persistence is via a serialization/parser pair but could just as easily be replaced through a plugin to store the data structure as a JSON blob somewhere else.
+In summary, the Gutenberg workflow parses the saved document to an in-memory tree of blocks, using token delimiters to help. During editing, all manipulations happen within the block tree. The process ends by serializing the blocks back to the `post_content`.
+
+The workflow process relies on a serialization/parser pair to persist posts. Hypothetically, the post data structure could be stored using a plugin or retrieved from a remote JSON file to be converted to the block tree.

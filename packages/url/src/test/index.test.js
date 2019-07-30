@@ -8,6 +8,7 @@ import { every } from 'lodash';
  */
 import {
 	isURL,
+	isEmail,
 	getProtocol,
 	isValidProtocol,
 	getAuthority,
@@ -50,6 +51,38 @@ describe( 'isURL', () => {
 		];
 
 		expect( every( urls, isURL ) ).toBe( false );
+	} );
+} );
+
+describe( 'isEmail', () => {
+	it( 'returns true when given things that look like an email', () => {
+		const emails = [
+			'simple@wordpress.org',
+			'very.common@wordpress.org',
+			'disposable.style.email.with+symbol@wordpress.org',
+			'other.email-with-hyphen@wordpress.org',
+			'fully-qualified-domain@wordpress.org',
+			'user.name+tag+sorting@wordpress.org',
+			'x@wordpress.org',
+			'wordpress-indeed@strange-wordpress.org',
+			'wordpress@s.wordpress',
+		];
+
+		expect( every( emails, isEmail ) ).toBe( true );
+	} );
+
+	it( 'returns false when given things that don\'t look like an email', () => {
+		const emails = [
+			'Abc.wordpress.org',
+			'A@b@c@wordpress.org',
+			'a"b(c)d,e:f;g<h>i[j\k]l@wordpress.org',
+			'just"not"right@wordpress.org',
+			'this is"not\allowed@wordpress.org',
+			'this\ still\"not\\allowed@wordpress.org',
+			'1234567890123456789012345678901234567890123456789012345678901234+x@wordpress.org',
+		];
+
+		expect( every( emails, isEmail ) ).toBe( false );
 	} );
 } );
 
@@ -285,14 +318,14 @@ describe( 'isValidFragment', () => {
 } );
 
 describe( 'addQueryArgs', () => {
-	it( 'should append args to an URL without query string', () => {
+	it( 'should append args to a URL without query string', () => {
 		const url = 'https://andalouses.example/beach';
 		const args = { sun: 'true', sand: 'false' };
 
 		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?sun=true&sand=false' );
 	} );
 
-	it( 'should append args to an URL with query string', () => {
+	it( 'should append args to a URL with query string', () => {
 		const url = 'https://andalouses.example/beach?night=false';
 		const args = { sun: 'true', sand: 'false' };
 
@@ -325,6 +358,21 @@ describe( 'addQueryArgs', () => {
 		const args = { activity: 'fun in the sun' };
 
 		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?activity=fun%20in%20the%20sun' );
+	} );
+
+	it( 'should return only querystring when passed undefined url', () => {
+		const url = undefined;
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe( '?sun=true' );
+	} );
+
+	it( 'should return URL argument unaffected if no query arguments to append', () => {
+		[ '', 'https://example.com', 'https://example.com?' ].forEach( ( url ) => {
+			[ undefined, {} ].forEach( ( args ) => {
+				expect( addQueryArgs( url, args ) ).toBe( url );
+			} );
+		} );
 	} );
 } );
 

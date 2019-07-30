@@ -4,7 +4,7 @@ Babel transform plugin for automatically injecting an import to be used as the p
 
 [JSX](https://reactjs.org/docs/jsx-in-depth.html) is merely a syntactic sugar for a function call, typically to `React.createElement` when used with [React](https://reactjs.org/). As such, it requires that the function referenced by this transform be within the scope of the file where the JSX occurs. In a typical React project, this means React must be imported in any file where JSX exists.
 
-**Babel Plugin Import JSX Pragma** automates this process by introducing the necessary import automatically wherever JSX exists, allowing you to use JSX in your code without thinking to ensure the transformed function is within scope.
+**Babel Plugin Import JSX Pragma** automates this process by introducing the necessary import automatically wherever JSX exists, allowing you to use JSX in your code without thinking to ensure the transformed function is within scope. It respects existing import statements, as well as scope variable declarations.
 
 ## Installation
 
@@ -30,6 +30,8 @@ module.exports = {
 };
 ```
 
+_Note:_ `@wordpress/babel-plugin-import-jsx-pragma` is included in `@wordpress/babel-preset-default` (default preset for WordPress development) starting from `v4.0.0`. If you are using this preset, you shouldn't include this plugin in your Babel config. 
+
 ## Options
 
 As the `@babel/transform-react-jsx` plugin offers options to customize the `pragma` to which the transform references, there are equivalent options to assign for customizing the imports generated.
@@ -42,11 +44,13 @@ module.exports = {
 	plugins: [
 		[ '@wordpress/babel-plugin-import-jsx-pragma', {
 			scopeVariable: 'createElement',
+			scopeVariableFrag: 'Fragment',
 			source: '@wordpress/element',
 			isDefault: false,
 		} ],
 		[ '@babel/transform-react-jsx', {
 			pragma: 'createElement',
+			pragmaFrag: 'Fragment',
 		} ],
 	],
 };
@@ -58,6 +62,13 @@ _Type:_ String
 
 Name of variable required to be in scope for use by the JSX pragma. For the default pragma of React.createElement, the React variable must be within scope.
 
+### `scopeVariableFrag`
+
+_Type:_ String
+
+Name of variable required to be in scope for `<></>` `Fragment` JSX. Named `<Fragment />` elements
+expect Fragment to be in scope and will not add the import.
+
 ### `source`
 
 _Type:_ String
@@ -68,6 +79,7 @@ The module from which the scope variable is to be imported when missing.
 
 _Type:_ Boolean
 
-Whether the scopeVariable is the default import of the source module.
+Whether the scopeVariable is the default import of the source module. Note that this has no impact
+on `scopeVariableFrag`.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

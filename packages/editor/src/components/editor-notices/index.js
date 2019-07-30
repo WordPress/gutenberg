@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import { filter } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { NoticeList } from '@wordpress/components';
+import { NoticeList, SnackbarList } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -10,11 +15,38 @@ import { compose } from '@wordpress/compose';
  */
 import TemplateValidationNotice from '../template-validation-notice';
 
-function EditorNotices( props ) {
+export function EditorNotices( { notices, onRemove } ) {
+	const dismissibleNotices = filter( notices, {
+		isDismissible: true,
+		type: 'default',
+	} );
+	const nonDismissibleNotices = filter( notices, {
+		isDismissible: false,
+		type: 'default',
+	} );
+	const snackbarNotices = filter( notices, {
+		type: 'snackbar',
+	} );
+
 	return (
-		<NoticeList { ...props }>
-			<TemplateValidationNotice />
-		</NoticeList>
+		<>
+			<NoticeList
+				notices={ nonDismissibleNotices }
+				className="components-editor-notices__pinned"
+			/>
+			<NoticeList
+				notices={ dismissibleNotices }
+				className="components-editor-notices__dismissible"
+				onRemove={ onRemove }
+			>
+				<TemplateValidationNotice />
+			</NoticeList>
+			<SnackbarList
+				notices={ snackbarNotices }
+				className="components-editor-notices__snackbar"
+				onRemove={ onRemove }
+			/>
+		</>
 	);
 }
 

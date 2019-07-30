@@ -1,71 +1,38 @@
-/**
- * External dependencies
- */
-const { get, map } = require( 'lodash' );
-const babel = require( '@babel/core' );
-
-/**
- * WordPress dependencies
- */
-const { options: babelDefaultConfig } = babel.loadPartialConfig( {
-	configFile: '@wordpress/babel-preset-default',
-} );
-const plugins = babelDefaultConfig.plugins;
-if ( ! process.env.SKIP_JSX_PRAGMA_TRANSFORM ) {
-	plugins.push( [ '@wordpress/babel-plugin-import-jsx-pragma', {
-		scopeVariable: 'createElement',
-		source: '@wordpress/element',
-		isDefault: false,
-	} ] );
-}
-
-const overrideOptions = ( target, targetName, options ) => {
-	if ( get( target, [ 'file', 'request' ] ) === targetName ) {
-		return [ targetName, Object.assign(
-			{},
-			target.options,
-			options
-		) ];
+module.exports = function( environment = '', file ) {
+	/*
+	 * Specific options to be passed using the caller config option:
+	 * https://babeljs.io/docs/en/options#caller
+	 *
+	 * The caller options can only be 'boolean', 'string', or 'number' by design:
+	 * https://github.com/babel/babel/blob/bd0c62dc0c30cf16a4d4ef0ddf21d386f673815c/packages/babel-core/src/config/validation/option-assertions.js#L122
+	 */
+	const callerOpts = { caller: {
+		name: `WP_BUILD_${ environment.toUpperCase() }`,
+	} };
+	switch ( environment ) {
+		case 'main':
+			// to be merged as a presetEnv option
+			callerOpts.caller.modules = 'commonjs';
+			break;
+		case 'module':
+			// to be merged as a presetEnv option
+			callerOpts.caller.modules = false;
+			// to be merged as a pluginTransformRuntime option
+			callerOpts.caller.useESModules = true;
+			break;
+		default:
+			// preventing measure, this shouldn't happen ever
+			delete callerOpts.caller;
 	}
-	return target;
+
+	// Sourcemaps options
+	const sourceMapsOpts = {
+		sourceMaps: true,
+		sourceFileName: file,
+	};
+
+	return {
+		...callerOpts,
+		...sourceMapsOpts,
+	};
 };
-
-const babelConfigs = {
-	main: Object.assign(
-		{},
-		babelDefaultConfig,
-		{
-			plugins,
-			presets: map(
-				babelDefaultConfig.presets,
-				( preset ) => overrideOptions( preset, '@babel/preset-env', {
-					modules: 'commonjs',
-				} )
-			),
-		}
-	),
-	module: Object.assign(
-		{},
-		babelDefaultConfig,
-		{
-			plugins: map(
-				plugins,
-				( plugin ) => overrideOptions( plugin, '@babel/plugin-transform-runtime', {
-					useESModules: true,
-				} )
-			),
-			presets: map(
-				babelDefaultConfig.presets,
-				( preset ) => overrideOptions( preset, '@babel/preset-env', {
-					modules: false,
-				} )
-			),
-		}
-	),
-};
-
-function getBabelConfig( environment ) {
-	return babelConfigs[ environment ];
-}
-
-module.exports = getBabelConfig;

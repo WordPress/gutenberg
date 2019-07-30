@@ -1,0 +1,125 @@
+{
+	"type": "ExportNamedDeclaration",
+	"start": 35,
+	"end": 69,
+	"loc": {
+		"start": {
+			"line": 4,
+			"column": 0
+		},
+		"end": {
+			"line": 4,
+			"column": 34
+		}
+	},
+	"range": [
+		35,
+		69
+	],
+	"declaration": {
+		"type": "VariableDeclaration",
+		"start": 42,
+		"end": 69,
+		"loc": {
+			"start": {
+				"line": 4,
+				"column": 7
+			},
+			"end": {
+				"line": 4,
+				"column": 34
+			}
+		},
+		"range": [
+			42,
+			69
+		],
+		"declarations": [
+			{
+				"type": "VariableDeclarator",
+				"start": 48,
+				"end": 68,
+				"loc": {
+					"start": {
+						"line": 4,
+						"column": 13
+					},
+					"end": {
+						"line": 4,
+						"column": 33
+					}
+				},
+				"range": [
+					48,
+					68
+				],
+				"id": {
+					"type": "Identifier",
+					"start": 48,
+					"end": 61,
+					"loc": {
+						"start": {
+							"line": 4,
+							"column": 13
+						},
+						"end": {
+							"line": 4,
+							"column": 26
+						}
+					},
+					"range": [
+						48,
+						61
+					],
+					"name": "myDeclaration"
+				},
+				"init": {
+					"type": "Literal",
+					"start": 64,
+					"end": 68,
+					"loc": {
+						"start": {
+							"line": 4,
+							"column": 29
+						},
+						"end": {
+							"line": 4,
+							"column": 33
+						}
+					},
+					"range": [
+						64,
+						68
+					],
+					"value": true,
+					"raw": "true"
+				}
+			}
+		],
+		"kind": "const"
+	},
+	"specifiers": [],
+	"source": null,
+	"leadingComments": [
+		{
+			"type": "Block",
+			"value": "*\n * My declaration example.\n ",
+			"start": 0,
+			"end": 34,
+			"range": [
+				0,
+				34
+			],
+			"loc": {
+				"start": {
+					"line": 1,
+					"column": 0
+				},
+				"end": {
+					"line": 3,
+					"column": 3
+				}
+			}
+		}
+	]
+}

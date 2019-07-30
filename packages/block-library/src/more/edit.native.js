@@ -1,41 +1,44 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
+import Hr from 'react-native-hr';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { PlainText } from '@wordpress/editor';
 import styles from './editor.scss';
 
-export default function MoreEdit( props ) {
-	const { attributes, setAttributes, onFocus, onBlur } = props;
-	const { customText } = attributes;
-	const defaultText = __( 'Read more' );
-	const value = customText !== undefined ? customText : defaultText;
+export default class MoreEdit extends Component {
+	constructor() {
+		super( ...arguments );
 
-	return (
-		<View className={ styles[ 'block-library-more__container' ] }>
-			<View className={ styles[ 'block-library-more__sub-container' ] }>
-				<Text className={ styles[ 'block-library-more__left-marker' ] }>&lt;!--</Text>
-				<PlainText
-					className={ styles[ 'block-library-more__plain-text' ] }
-					value={ value }
-					multiline={ true }
-					underlineColorAndroid="transparent"
-					onChange={ ( newValue ) => setAttributes( { customText: newValue } ) }
-					placeholder={ defaultText }
-					isSelected={ props.isSelected }
-					onFocus={ onFocus }
-					onBlur={ onBlur }
+		this.state = {
+			defaultText: __( 'Read more' ),
+		};
+	}
+
+	render() {
+		const { customText } = this.props.attributes;
+		const { defaultText } = this.state;
+		const content = customText || defaultText;
+
+		return (
+			<View>
+				<Hr
+					text={ content }
+					marginLeft={ 0 }
+					marginRight={ 0 }
+					textStyle={ styles[ 'block-library-more__text' ] }
+					lineStyle={ styles[ 'block-library-more__line' ] }
 				/>
-				<Text className={ styles[ 'block-library-more__right-marker' ] }>--&gt;</Text>
 			</View>
-		</View> );
+		);
+	}
 }

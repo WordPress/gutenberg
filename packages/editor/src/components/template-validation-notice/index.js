@@ -31,10 +31,10 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isValid: select( 'core/editor' ).isValidTemplate(),
+		isValid: select( 'core/block-editor' ).isValidTemplate(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { setTemplateValidity, synchronizeTemplate } = dispatch( 'core/editor' );
+		const { setTemplateValidity, synchronizeTemplate } = dispatch( 'core/block-editor' );
 		return {
 			resetTemplateValidity: () => setTemplateValidity( true ),
 			synchronizeTemplate,

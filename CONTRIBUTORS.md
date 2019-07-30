@@ -54,7 +54,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @pento | @pento |
 | @karmatosed | @karmatosed |
 | @nitrajka | @nitrajka |
-| @sirreal | |
+| @sirreal | @jonsurrell |
 | @inhil | |
 | @georgeolaru | @babbardel |
 | @martinlugton | @martinlugton |
@@ -124,3 +124,21 @@ This list is manually curated to include valuable contributions by volunteers th
 | @designsimply | @designsimply |
 | @aldavigdis | @aldavigdis |
 | @miya0001 | @miyauchi |
+| @naogify | @naoki0h |
+| @gutendev | @gutendev |
+| @drdogbot7 | @drdogbot7 |
+| @m-e-h | @m-e-h |
+| @melchoyce | @melchoyce |
+| @sarahmonster | @tinkerbelly |
+| @kjellr | @kjellr |
+| @etoledom | |
+| @hypest | |
+| @koke | |
+| @pinarol | |
+| @daniloercoli | |
+| @marecar3 | |
+| @Tug | |
+| @diegoreymendez | |
+| @mkevins | |
+| @SergioEstevao | |
+| @mzorz | @mzorz |

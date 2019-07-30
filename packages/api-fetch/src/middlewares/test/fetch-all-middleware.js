@@ -3,7 +3,7 @@
  */
 import fetchAllMiddleware from '../fetch-all-middleware';
 
-describe( 'Fetch All Middleware', async () => {
+describe( 'Fetch All Middleware', () => {
 	it( 'should defer with the same options to the next middleware', async () => {
 		expect.hasAssertions();
 		const originalOptions = { path: '/posts' };

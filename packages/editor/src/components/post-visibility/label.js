@@ -9,7 +9,7 @@ import { find } from 'lodash';
 import { withSelect } from '@wordpress/data';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import { visibilityOptions } from './utils';
 

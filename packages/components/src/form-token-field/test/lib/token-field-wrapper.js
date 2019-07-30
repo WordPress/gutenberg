@@ -1,8 +1,12 @@
 /**
+ * External dependencies
+ */
+import { unescape } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { unescape } from 'lodash';
 
 /**
  * Internal dependencies

@@ -342,7 +342,7 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
 }
 
 /**
- * Formats a date (like `dateI18n()` in PHP).
+ * Formats a date (like `date_i18n()` in PHP).
  *
  * @param {string}                    dateFormat PHP-style formatting string.
  *                                               See php.net/date.

@@ -1,0 +1,85 @@
+{
+	"type": "ExportDefaultDeclaration",
+	"start": 41,
+	"end": 69,
+	"loc": {
+		"start": {
+			"line": 4,
+			"column": 0
+		},
+		"end": {
+			"line": 4,
+			"column": 28
+		}
+	},
+	"range": [
+		41,
+		69
+	],
+	"declaration": {
+		"type": "FunctionDeclaration",
+		"start": 56,
+		"end": 69,
+		"loc": {
+			"start": {
+				"line": 4,
+				"column": 15
+			},
+			"end": {
+				"line": 4,
+				"column": 28
+			}
+		},
+		"range": [
+			56,
+			69
+		],
+		"id": null,
+		"generator": false,
+		"expression": false,
+		"async": false,
+		"params": [],
+		"body": {
+			"type": "BlockStatement",
+			"start": 67,
+			"end": 69,
+			"loc": {
+				"start": {
+					"line": 4,
+					"column": 26
+				},
+				"end": {
+					"line": 4,
+					"column": 28
+				}
+			},
+			"range": [
+				67,
+				69
+			],
+			"body": []
+		}
+	},
+	"leadingComments": [
+		{
+			"type": "Block",
+			"value": "*\n * Function declaration example.\n ",
+			"start": 0,
+			"end": 40,
+			"range": [
+				0,
+				40
+			],
+			"loc": {
+				"start": {
+					"line": 1,
+					"column": 0
+				},
+				"end": {
+					"line": 3,
+					"column": 3
+				}
+			}
+		}
+	]
+}

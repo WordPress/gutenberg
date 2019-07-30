@@ -1,20 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { InspectorControls } from '@wordpress/block-editor';
 import {
 	Disabled,
 	PanelBody,
 	RangeControl,
 	ToggleControl,
 } from '@wordpress/components';
+import ServerSideRender from '@wordpress/server-side-render';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	InspectorControls,
-	BlockAlignmentToolbar,
-	BlockControls,
-	ServerSideRender,
-} from '@wordpress/editor';
 
 /**
  * Minimum number of comments a user can show using this block.
@@ -33,7 +29,6 @@ class LatestComments extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.setAlignment = this.setAlignment.bind( this );
 		this.setCommentsToShow = this.setCommentsToShow.bind( this );
 
 		// Create toggles for each attribute; we create them here rather than
@@ -53,17 +48,12 @@ class LatestComments extends Component {
 		};
 	}
 
-	setAlignment( align ) {
-		this.props.setAttributes( { align } );
-	}
-
 	setCommentsToShow( commentsToShow ) {
 		this.props.setAttributes( { commentsToShow } );
 	}
 
 	render() {
 		const {
-			align,
 			commentsToShow,
 			displayAvatar,
 			displayDate,
@@ -71,13 +61,7 @@ class LatestComments extends Component {
 		} = this.props.attributes;
 
 		return (
-			<Fragment>
-				<BlockControls>
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ this.setAlignment }
-					/>
-				</BlockControls>
+			<>
 				<InspectorControls>
 					<PanelBody title={ __( 'Latest Comments Settings' ) }>
 						<ToggleControl
@@ -101,6 +85,7 @@ class LatestComments extends Component {
 							onChange={ this.setCommentsToShow }
 							min={ MIN_COMMENTS }
 							max={ MAX_COMMENTS }
+							required
 						/>
 					</PanelBody>
 				</InspectorControls>
@@ -110,7 +95,7 @@ class LatestComments extends Component {
 						attributes={ this.props.attributes }
 					/>
 				</Disabled>
-			</Fragment>
+			</>
 		);
 	}
 }

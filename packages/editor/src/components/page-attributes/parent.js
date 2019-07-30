@@ -31,6 +31,7 @@ export function PageAttributesParent( { parent, postType, items, onUpdateParent 
 	} ) ) );
 	return (
 		<TreeSelect
+			className="editor-page-attributes__parent"
 			label={ parentPageLabel }
 			noOptionLabel={ `(${ __( 'no parent' ) })` }
 			tree={ pagesTree }

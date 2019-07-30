@@ -3,12 +3,12 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, get, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { addFilter, removeFilter } from '@wordpress/hooks';
+import { addFilter, removeAllFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -22,13 +22,18 @@ import {
 	getUnregisteredTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	getGroupingBlockName,
+	setGroupingBlockName,
 	getBlockType,
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
+	serverSideBlockDefinitions,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+	DEFAULT_BLOCK_TYPE_SETTINGS,
 } from '../registration';
+import { DEPRECATED_ENTRY_KEYS } from '../constants';
 
 describe( 'blocks', () => {
 	const defaultBlockSettings = { save: noop, category: 'common', title: 'block title' };
@@ -93,6 +98,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
+				keywords: [],
 				save: noop,
 				category: 'common',
 				title: 'block title',
@@ -106,9 +113,14 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
-		it( 'should reject blocks without a save function', () => {
-			const block = registerBlockType( 'my-plugin/fancy-block-5' );
-			expect( console ).toHaveErroredWith( 'The "save" property must be specified and must be a valid function.' );
+		it( 'should reject blocks with invalid save function', () => {
+			const block = registerBlockType( 'my-plugin/fancy-block-5', {
+				...defaultBlockSettings,
+				attributes: {},
+				keywords: [],
+				save: 'invalid',
+			} );
+			expect( console ).toHaveErroredWith( 'The "save" property must be a valid function.' );
 			expect( block ).toBeUndefined();
 		} );
 
@@ -116,13 +128,6 @@ describe( 'blocks', () => {
 			const blockType = { save: noop, edit: 'not-a-function', category: 'common', title: 'block title' },
 				block = registerBlockType( 'my-plugin/fancy-block-6', blockType );
 			expect( console ).toHaveErroredWith( 'The "edit" property must be a valid function.' );
-			expect( block ).toBeUndefined();
-		} );
-
-		it( 'should reject blocks with more than 3 keywords', () => {
-			const blockType = { save: noop, keywords: [ 'apple', 'orange', 'lemon', 'pineapple' ], category: 'common', title: 'block title' },
-				block = registerBlockType( 'my-plugin/fancy-block-7', blockType );
-			expect( console ).toHaveErroredWith( 'The block "my-plugin/fancy-block-7" can have a maximum of 3 keywords.' );
 			expect( block ).toBeUndefined();
 		} );
 
@@ -161,6 +166,25 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
+		it( 'should assign default settings', () => {
+			registerBlockType( 'core/test-block-with-defaults', {
+				title: 'block title',
+				category: 'common',
+			} );
+
+			expect( getBlockType( 'core/test-block-with-defaults' ) ).toEqual( {
+				name: 'core/test-block-with-defaults',
+				title: 'block title',
+				category: 'common',
+				icon: {
+					src: 'block-default',
+				},
+				attributes: {},
+				keywords: [],
+				save: expect.any( Function ),
+			} );
+		} );
+
 		it( 'should default to browser-initialized global attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
 			unstable__bootstrapServerSideBlockDefinitions( {
@@ -183,6 +207,7 @@ describe( 'blocks', () => {
 						type: 'boolean',
 					},
 				},
+				keywords: [],
 			} );
 		} );
 
@@ -220,6 +245,8 @@ describe( 'blocks', () => {
 							fill="red" stroke="blue" strokeWidth="10" />
 					</svg> ),
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
@@ -239,6 +266,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'foo',
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
@@ -264,6 +293,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: MyTestIcon,
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
@@ -295,6 +326,8 @@ describe( 'blocks', () => {
 							fill="red" stroke="blue" strokeWidth="10" />
 					</svg> ),
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
@@ -311,12 +344,14 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
 		describe( 'applyFilters', () => {
 			afterEach( () => {
-				removeFilter( 'blocks.registerBlockType', 'core/blocks/without-title' );
+				removeAllFilters( 'blocks.registerBlockType' );
 			} );
 
 			it( 'should reject valid blocks when they become invalid after executing filter', () => {
@@ -329,6 +364,74 @@ describe( 'blocks', () => {
 				const block = registerBlockType( 'my-plugin/fancy-block-12', defaultBlockSettings );
 				expect( console ).toHaveErroredWith( 'The block "my-plugin/fancy-block-12" must have a title.' );
 				expect( block ).toBeUndefined();
+			} );
+
+			it( 'should reject blocks which become invalid after executing filter which does not return a plain object', () => {
+				addFilter( 'blocks.registerBlockType', 'core/blocks/without-save', ( settings ) => {
+					return [ settings ];
+				} );
+				const block = registerBlockType( 'my-plugin/fancy-block-13', defaultBlockSettings );
+				expect( console ).toHaveErroredWith( 'Block settings must be a valid object.' );
+				expect( block ).toBeUndefined();
+			} );
+
+			it( 'should apply the blocks.registerBlockType filter to each of the deprecated settings as well as the main block settings', () => {
+				const name = 'my-plugin/fancy-block-13';
+				const blockSettingsWithDeprecations = {
+					...defaultBlockSettings,
+					deprecated: [
+						{
+							save() {
+								return 1;
+							},
+						},
+						{
+							save() {
+								return 2;
+							},
+						},
+					],
+				};
+
+				let i = 0;
+				addFilter( 'blocks.registerBlockType', 'core/blocks/without-title', ( settings ) => {
+					// Verify that for deprecations, the filter is called with a merge of pre-filter
+					// settings with deprecation keys omitted and the deprecation entry.
+					if ( i > 0 ) {
+						expect( settings ).toEqual( {
+							...omit(
+								{
+									name,
+									...DEFAULT_BLOCK_TYPE_SETTINGS,
+									...get( serverSideBlockDefinitions, name ),
+									...blockSettingsWithDeprecations,
+								},
+								DEPRECATED_ENTRY_KEYS
+							),
+							...blockSettingsWithDeprecations.deprecated[ i - 1 ],
+						} );
+					}
+					i++;
+
+					return {
+						...settings,
+						attributes: {
+							...settings.attributes,
+							id: {
+								type: 'string',
+							},
+						},
+					};
+				} );
+
+				const block = registerBlockType( name, blockSettingsWithDeprecations );
+
+				expect( block.attributes.id ).toEqual( { type: 'string' } );
+				block.deprecated.forEach( ( deprecation ) => {
+					expect( deprecation.attributes.id ).toEqual( { type: 'string' } );
+					// Verify that the deprecation's keys are a subset of deprecation keys.
+					expect( deprecation ).toEqual( pick( deprecation, DEPRECATED_ENTRY_KEYS ) );
+				} );
 			} );
 		} );
 	} );
@@ -351,6 +454,8 @@ describe( 'blocks', () => {
 					icon: {
 						src: 'block-default',
 					},
+					attributes: {},
+					keywords: [],
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
@@ -363,6 +468,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
+				keywords: [],
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -410,6 +517,20 @@ describe( 'blocks', () => {
 		} );
 	} );
 
+	describe( 'getGroupingBlockName()', () => {
+		it( 'defaults to undefined', () => {
+			expect( getGroupingBlockName() ).toBeNull();
+		} );
+	} );
+
+	describe( 'setGroupingBlockName()', () => {
+		it( 'assigns default block name', () => {
+			setGroupingBlockName( 'core/test-block' );
+
+			expect( getGroupingBlockName() ).toBe( 'core/test-block' );
+		} );
+	} );
+
 	describe( 'getBlockType()', () => {
 		it( 'should return { name, save } for blocks with minimum settings', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
@@ -421,6 +542,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 
@@ -436,6 +559,8 @@ describe( 'blocks', () => {
 				icon: {
 					src: 'block-default',
 				},
+				attributes: {},
+				keywords: [],
 			} );
 		} );
 	} );
@@ -458,6 +583,8 @@ describe( 'blocks', () => {
 					icon: {
 						src: 'block-default',
 					},
+					attributes: {},
+					keywords: [],
 				},
 				{
 					name: 'core/test-block-with-settings',
@@ -468,6 +595,8 @@ describe( 'blocks', () => {
 					icon: {
 						src: 'block-default',
 					},
+					attributes: {},
+					keywords: [],
 				},
 			] );
 		} );

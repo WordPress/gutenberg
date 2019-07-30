@@ -10,7 +10,7 @@ set -e
 
 # Check that Docker is installed.
 if ! command_exists "docker"; then
-	echo -e $(error_message "Docker doesn't seem to be installed. Please head on over to the Docker site to download it: $(action_format "https://www.docker.com/community-edition#/download")")
+	echo -e $(error_message "Docker doesn't seem to be installed. Please head on over to the Docker site to download it: $(action_format "https://www.docker.com/products/docker-desktop")")
 	exit 1
 fi
 
@@ -31,16 +31,3 @@ docker-compose $DOCKER_COMPOSE_FILE_OPTIONS pull
 # Launch the containers.
 echo -e $(status_message "Starting Docker containers...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS up -d >/dev/null
-
-# Set up WordPress Development site.
-# Note: we don't bother installing the test site right now, because that's
-# done on every time `npm run test-e2e` is run.
-. "$(dirname "$0")/install-wordpress.sh"
-
-# Install the PHPUnit test scaffolding.
-echo -e $(status_message "Installing PHPUnit test scaffolding...")
-docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root example mysql $WP_VERSION false > /dev/null
-
-# Install Composer. This is only used to run WordPress Coding Standards checks.
-echo -e $(status_message "Installing and updating Composer modules...")
-docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm composer install

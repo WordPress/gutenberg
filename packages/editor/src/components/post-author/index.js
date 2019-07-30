@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -41,7 +42,7 @@ export class PostAuthor extends Component {
 					className="editor-post-author__select"
 				>
 					{ authors.map( ( author ) => (
-						<option key={ author.id } value={ author.id }>{ author.name }</option>
+						<option key={ author.id } value={ author.id }>{ decodeEntities( author.name ) }</option>
 					) ) }
 				</select>
 			</PostAuthorCheck>

@@ -10,4 +10,5 @@ export const PREFERENCES_DEFAULTS = {
 		fixedToolbar: false,
 	},
 	pinnedPluginItems: {},
+	hiddenBlockTypes: [],
 };

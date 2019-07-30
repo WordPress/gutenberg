@@ -28,6 +28,20 @@ const MyDropZone = withState( {
 
 The component accepts the following props:
 
+### className
+
+A CSS `class` to be _appended_ after the default `components-drop-zone` class.
+
+- Type: `String`
+- Default: `undefined`
+
+### label
+
+A string to be shown within the drop zone area.
+
+- Type: `String`
+- Default: `Drop files to upload`
+
 ### onFilesDrop
 
 The function is called when dropping a file into the `DropZone`. It receives two arguments: an array of dropped files and a position object which the following shape: `{ x: 'left|right', y: 'top|bottom' }`. The position object indicates whether the drop event happened closer to the top or bottom edges and left or right ones.

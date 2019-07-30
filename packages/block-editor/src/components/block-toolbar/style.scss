@@ -1,0 +1,48 @@
+.block-editor-block-toolbar {
+	display: flex;
+	flex-grow: 1;
+	width: 100%;
+	overflow: auto; // Allow horizontal scrolling on mobile.
+	position: relative;
+	border-left: $border-width solid $light-gray-800;
+	transition: border-color 0.1s linear, box-shadow 0.1s linear;
+	@include reduce-motion("transition");
+
+	@include break-small() {
+		// Allow overflow on desktop.
+		overflow: inherit;
+
+		// Show a left border on the parent container.
+		border-left: none;
+		box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
+
+		// Show a lighter version for dark themes.
+		.is-dark-theme & {
+			box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
+		}
+	}
+
+	// The component is born with a border, but we only need some of them.
+	.components-toolbar {
+		border: 0;
+		border-top: $border-width solid $light-gray-800;
+		border-bottom: $border-width solid $light-gray-800;
+
+		// Add a right border to show as separator in the block toolbar.
+		border-right: $border-width solid $light-gray-800;
+	}
+
+	// Add a left border and adjust the color for Top Toolbar mode.
+	.has-fixed-toolbar & {
+		box-shadow: none;
+		border-left: $border-width solid $light-gray-500;
+
+		.components-toolbar {
+			border-color: $light-gray-500;
+		}
+	}
+}
+
+.block-editor-block-toolbar__slot {
+	display: inline-flex;
+}

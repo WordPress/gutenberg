@@ -53,7 +53,7 @@ describe( 'element', () => {
 			}, '<"WordPress" & Friends>' ) );
 
 			expect( result ).toBe(
-				'<a href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;>" style="background-color:red">' +
+				'<a href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;" style="background-color:red">' +
 				'&lt;"WordPress" &amp; Friends>' +
 				'</a>'
 			);

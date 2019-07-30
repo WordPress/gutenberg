@@ -1,5 +1,5 @@
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { MenuItem } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
@@ -20,7 +20,7 @@ export function KeyboardShortcutsHelpMenuItem( { openModal, onSelect } ) {
 	);
 }
 
-export default withDispatch( ( dispatch, ) => {
+export default withDispatch( ( dispatch ) => {
 	const {
 		openModal,
 	} = dispatch( 'core/edit-post' );

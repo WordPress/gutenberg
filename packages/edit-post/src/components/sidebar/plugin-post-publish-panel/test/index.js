@@ -9,8 +9,6 @@ import { render } from '@wordpress/element';
  */
 import PluginPostPublishPanel from '../';
 
-jest.mock( '../../../../../../components/src/button' );
-
 describe( 'PluginPostPublishPanel', () => {
 	test( 'renders fill properly', () => {
 		const div = document.createElement( 'div' );

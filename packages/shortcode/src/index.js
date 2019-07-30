@@ -1,5 +1,5 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
 import { extend, pick, isString, isEqual, forEach, isNumber } from 'lodash';
 import memize from 'memize';
@@ -90,7 +90,7 @@ export function next( tag, text, index = 0 ) {
  * @return {string} Text with shortcodes replaced.
  */
 export function replace( tag, text, callback ) {
-	return text.replace( regexp( tag ), ( match, left, $3, attrs, slash, content, closing, right ) => {
+	return text.replace( regexp( tag ), function( match, left, $3, attrs, slash, content, closing, right ) {
 		// If both extra brackets exist, the shortcode has been properly
 		// escaped.
 		if ( left === '[' && right === ']' ) {

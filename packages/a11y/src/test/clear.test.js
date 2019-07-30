@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import clear from '../clear';
 
 describe( 'clear', () => {

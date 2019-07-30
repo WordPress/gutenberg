@@ -1,0 +1,10 @@
+{
+	"name": "core/freeform",
+	"category": "formatting",
+	"attributes": {
+		"content": {
+			"type": "string",
+			"source": "html"
+		}
+	}
+}

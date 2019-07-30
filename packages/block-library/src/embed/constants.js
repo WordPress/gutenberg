@@ -1,5 +1,5 @@
 // These embeds do not work in sandboxes due to the iframe's security restrictions.
-export const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
+export const HOSTS_NO_PREVIEWS = [ 'facebook.com', 'smugmug.com' ];
 
 export const ASPECT_RATIOS = [
 	// Common video resolutions.

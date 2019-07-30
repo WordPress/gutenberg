@@ -9,6 +9,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { withSafeTimeout } from '@wordpress/compose';
 
 class SuggestionsList extends Component {
 	constructor() {
@@ -26,7 +27,7 @@ class SuggestionsList extends Component {
 				onlyScrollIfNeeded: true,
 			} );
 
-			setTimeout( () => {
+			this.props.setTimeout( () => {
 				this.scrollingIntoView = false;
 			}, 100 );
 		}
@@ -131,4 +132,4 @@ SuggestionsList.defaultProps = {
 	suggestions: Object.freeze( [] ),
 };
 
-export default SuggestionsList;
+export default withSafeTimeout( SuggestionsList );

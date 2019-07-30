@@ -1,0 +1,15 @@
+// These styles are only applied to the appender when it appears inside of a block.
+// Otherwise the default appender may be improperly positioned in some themes.
+.block-editor-block-list__block .block-list-appender {
+	margin: $block-padding;
+
+	// Add additional margin to the appender when inside a group with a background color.
+	// If changing this, be sure to sync up with group/editor.scss line 13.
+	.has-background & {
+		margin: ($block-padding*2 + $block-spacing) $block-padding;
+	}
+}
+
+.block-list-appender > .block-editor-inserter {
+	display: block;
+}

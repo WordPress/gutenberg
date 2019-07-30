@@ -41,7 +41,7 @@ import ToolbarContainer from './toolbar-container';
  *
  * @return {ReactElement} The rendered toolbar.
  */
-function Toolbar( { controls = [], children, className, isCollapsed, icon, label } ) {
+function Toolbar( { controls = [], children, className, isCollapsed, icon, label, ...otherProps } ) {
 	if (
 		( ! controls || ! controls.length ) &&
 		! children
@@ -58,6 +58,7 @@ function Toolbar( { controls = [], children, className, isCollapsed, icon, label
 	if ( isCollapsed ) {
 		return (
 			<DropdownMenu
+				hasArrowIndicator
 				icon={ icon }
 				label={ label }
 				controls={ controlSets }
@@ -67,7 +68,7 @@ function Toolbar( { controls = [], children, className, isCollapsed, icon, label
 	}
 
 	return (
-		<ToolbarContainer className={ classnames( 'components-toolbar', className ) }>
+		<ToolbarContainer className={ classnames( 'components-toolbar', className ) } { ...otherProps }>
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 				controlSet.map( ( control, indexOfControl ) => (
 					<ToolbarButton

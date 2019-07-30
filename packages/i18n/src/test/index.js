@@ -68,6 +68,8 @@ describe( 'i18n', () => {
 
 	describe( 'sprintf()', () => {
 		it( 'absorbs errors', () => {
+			// Disable reason: Failing case is the purpose of the test.
+			// eslint-disable-next-line @wordpress/valid-sprintf
 			const result = sprintf( 'Hello %(placeholder-not-provided)s' );
 
 			expect( console ).toHaveErrored();

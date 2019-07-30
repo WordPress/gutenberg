@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PostPreviewButton render() should render currentPostLink otherwise 1`] = `
-<Button
+<ForwardRef(Button)
   className="editor-post-preview"
   disabled={false}
   href="https://wordpress.org/?p=1"
@@ -20,11 +20,11 @@ exports[`PostPreviewButton render() should render currentPostLink otherwise 1`] 
   >
     Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.
   </WithSelect(WithDispatch(DotTip))>
-</Button>
+</ForwardRef(Button)>
 `;
 
 exports[`PostPreviewButton render() should render previewLink if provided 1`] = `
-<Button
+<ForwardRef(Button)
   className="editor-post-preview"
   disabled={false}
   href="https://wordpress.org/?p=1&preview=true"
@@ -43,5 +43,5 @@ exports[`PostPreviewButton render() should render previewLink if provided 1`] = 
   >
     Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.
   </WithSelect(WithDispatch(DotTip))>
-</Button>
+</ForwardRef(Button)>
 `;

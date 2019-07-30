@@ -1,18 +1,31 @@
 /**
- * WordPress Dependencies
+ * External dependencies
+ */
+import { flow } from 'lodash';
+
+/**
+ * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { MenuItem } from '@wordpress/components';
+import { MenuItem, withSpokenMessages } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-function FeatureToggle( { onToggle, isActive, label, info } ) {
+function FeatureToggle( { onToggle, isActive, label, info, messageActivated, messageDeactivated, speak } ) {
+	const speakMessage = () => {
+		if ( isActive ) {
+			speak( messageDeactivated || __( 'Feature deactivated' ) );
+		} else {
+			speak( messageActivated || __( 'Feature activated' ) );
+		}
+	};
+
 	return (
 		<MenuItem
 			icon={ isActive && 'yes' }
 			isSelected={ isActive }
-			onClick={ onToggle }
+			onClick={ flow( onToggle, speakMessage ) }
 			role="menuitemcheckbox"
-			label={ label }
 			info={ info }
 		>
 			{ label }
@@ -27,7 +40,7 @@ export default compose( [
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onToggle() {
 			dispatch( 'core/edit-post' ).toggleFeature( ownProps.feature );
-			ownProps.onToggle();
 		},
 	} ) ),
+	withSpokenMessages,
 ] )( FeatureToggle );

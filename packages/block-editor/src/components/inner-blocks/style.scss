@@ -1,0 +1,94 @@
+// Add clickable overlay to blocks with nesting.
+// This makes it easy to select all layers of the block.
+.block-editor-inner-blocks.has-overlay {
+	&::after {
+		content: "";
+		position: absolute;
+		top: -$block-padding;
+		right: -$block-padding;
+		bottom: -$block-padding;
+		left: -$block-padding;
+		z-index: z-index(".block-editor-inner-blocks.has-overlay::after");
+	}
+}
+
+// On fullwide blocks, don't go beyond the canvas.
+[data-align="full"] > .editor-block-list__block-edit > [data-block] .has-overlay::after {
+	right: 0;
+	left: 0;
+}
+
+.block-editor-inner-blocks__template-picker {
+	.components-placeholder__instructions {
+		// Defer to vertical margins applied by template picker options.
+		margin-bottom: 0;
+	}
+
+	.components-placeholder__fieldset {
+		// Options will render horizontally, but the immediate children of the
+		// fieldset are the options and the skip button, oriented vertically.
+		flex-direction: column;
+	}
+
+	&.has-many-options .components-placeholder__fieldset {
+		// Allow options to occupy a greater amount of the available space if
+		// many options exist.
+		max-width: 90%;
+	}
+}
+
+.block-editor-inner-blocks__template-picker-options.block-editor-inner-blocks__template-picker-options {
+	display: flex;
+	justify-content: center;
+	flex-direction: row;
+	flex-wrap: wrap;
+	width: 100%;
+	margin: $grid-size-small 0;
+	list-style: none;
+
+	> li {
+		list-style: none;
+		margin: $grid-size;
+		flex-shrink: 1;
+		max-width: 100px;
+	}
+
+	.block-editor-inner-blocks__template-picker-option {
+		padding: $grid-size;
+	}
+}
+
+.block-editor-inner-blocks__template-picker-option {
+	width: 100%;
+
+	&.components-icon-button {
+		// Override default styles inherited from <IconButton /> to center
+		// icon horizontally.
+		justify-content: center;
+
+		&.is-default {
+			background-color: $white;
+		}
+	}
+
+	&.components-button {
+		// Override default styles inherited from <Button /> to allow button
+		// to grow vertically.
+		height: auto;
+		padding: 0;
+	}
+
+	&::before {
+		// Use `padding-bottom` trick to style element as perfect square.
+		content: "";
+		padding-bottom: 100%;
+	}
+
+	&:first-child {
+		margin-left: 0;
+	}
+
+	&:last-child {
+		margin-right: 0;
+	}
+}

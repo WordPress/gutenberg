@@ -1,8 +1,24 @@
 .wp-block-table {
+	$subtle-light-gray: #f3f4f5;
+	$subtle-pale-green: #e9fbe5;
+	$subtle-pale-blue: #e7f5fe;
+	$subtle-pale-pink: #fcf0ef;
+
+	overflow-x: auto;
+
+	table {
+		width: 100%;
+	}
+
 	// Fixed layout toggle
-	&.has-fixed-layout {
+	.has-fixed-layout {
 		table-layout: fixed;
 		width: 100%;
+
+		td,
+		th {
+			word-break: break-all;
+		}
 	}
 
 	&.alignleft,
@@ -12,21 +28,68 @@
 		// The table element needs to be kept as display table
 		// for table features to work reliably.
 		display: table;
-
 		// Table cannot be 100% width if it is aligned, so set
 		// width as auto.
 		width: auto;
+
+		td,
+		th {
+			// Aligned tables shouldn't scroll horizontally so we need their contents to wrap.
+			word-break: break-all;
+		}
+	}
+
+	.has-subtle-light-gray-background-color {
+		background-color: $subtle-light-gray;
+	}
+
+	.has-subtle-pale-green-background-color {
+		background-color: $subtle-pale-green;
+	}
+
+	.has-subtle-pale-blue-background-color {
+		background-color: $subtle-pale-blue;
+	}
+
+	.has-subtle-pale-pink-background-color {
+		background-color: $subtle-pale-pink;
 	}
 
 	// "Stripes" style variation.
 	&.is-style-stripes {
 		border-spacing: 0;
 		border-collapse: inherit;
+		background-color: transparent;
 
-		tr:nth-child(odd) {
+		tbody tr:nth-child(odd) {
 			background-color: $light-gray-200;
 		}
 
+		&.has-subtle-light-gray-background-color {
+			tbody tr:nth-child(odd) {
+				background-color: $subtle-light-gray;
+			}
+		}
+
+		&.has-subtle-pale-green-background-color {
+			tbody tr:nth-child(odd) {
+				background-color: $subtle-pale-green;
+			}
+		}
+
+		&.has-subtle-pale-blue-background-color {
+			tbody tr:nth-child(odd) {
+				background-color: $subtle-pale-blue;
+			}
+		}
+
+		&.has-subtle-pale-pink-background-color {
+			tbody tr:nth-child(odd) {
+				background-color: $subtle-pale-pink;
+			}
+		}
+
+		th,
 		td {
 			border-color: transparent;
 		}

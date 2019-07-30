@@ -1,0 +1,57 @@
+{
+	"name": "@wordpress/block-editor",
+	"version": "2.2.0",
+	"description": "Generic block editor.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"editor",
+		"blocks"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/block-editor"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.4.4",
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/blob": "file:../blob",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
+		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/rich-text": "file:../rich-text",
+		"@wordpress/token-list": "file:../token-list",
+		"@wordpress/url": "file:../url",
+		"@wordpress/viewport": "file:../viewport",
+		"@wordpress/wordcount": "file:../wordcount",
+		"classnames": "^2.2.5",
+		"dom-scroll-into-view": "^1.2.1",
+		"lodash": "^4.17.10",
+		"react-spring": "^8.0.19",
+		"redux-multi": "^0.1.12",
+		"refx": "^3.0.0",
+		"rememo": "^3.0.0",
+		"tinycolor2": "^1.4.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

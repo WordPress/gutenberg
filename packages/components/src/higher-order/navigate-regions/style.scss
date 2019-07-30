@@ -1,4 +1,5 @@
 .components-navigate-regions.is-focusing-regions [role="region"] {
+	// For browsers that don't support outline-offset (IE11).
 	&:focus::after {
 		content: "";
 		position: absolute;
@@ -8,16 +9,19 @@
 		right: 0;
 		pointer-events: none;
 		outline: 4px solid transparent; // Shown in Windows High Contrast mode.
-		animation: editor-animation__region-focus 0.2s ease-out;
-		animation-fill-mode: forwards;
-	}
-}
-
-@keyframes editor-animation__region-focus {
-	from {
-		box-shadow: inset 0 0 0 0 $blue-medium-400;
-	}
-	to {
 		box-shadow: inset 0 0 0 4px $blue-medium-400;
+	}
+
+	@supports ( outline-offset: 1px ) {
+		&:focus::after {
+			content: none;
+		}
+
+		&:focus {
+			outline-style: solid;
+			outline-color: $blue-medium-400;
+			outline-width: 4px;
+			outline-offset: -4px;
+		}
 	}
 }

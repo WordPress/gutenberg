@@ -3,7 +3,7 @@ Persistence Plugin
 
 The persistence plugin enhances a registry to enable registered stores to opt in to persistent storage.
 
-By default, persistence occurs by [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage). This can be changed using the [`setStorage` function](#api) defined on the plugin. Unless set otherwise, state will be persisted on the `WP_DATA` key in storage.
+By default, persistence occurs by [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage). In environments where `localStorage` is not available, it will gracefully fall back to an in-memory object storage which will not persist between sessions. You can provide your own storage implementation by providing the [`storage` option](#options). Unless set otherwise, state will be persisted on the `WP_DATA` key in storage.
 
 ## Usage
 

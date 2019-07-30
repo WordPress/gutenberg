@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { partial, noop, find } from 'lodash';
 
 /**
@@ -13,9 +14,10 @@ import { withInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import { NavigableMenu } from '../navigable-container';
+import Button from '../button';
 
 const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
-	<button role="tab"
+	<Button role="tab"
 		tabIndex={ selected ? null : -1 }
 		aria-selected={ selected }
 		id={ tabId }
@@ -23,7 +25,7 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
 		{ ...rest }
 	>
 		{ children }
-	</button>
+	</Button>
 );
 
 class TabPanel extends Component {
@@ -73,7 +75,7 @@ class TabPanel extends Component {
 					className="components-tab-panel__tabs"
 				>
 					{ tabs.map( ( tab ) => (
-						<TabButton className={ `${ tab.className } ${ tab.name === selected ? activeClass : '' }` }
+						<TabButton className={ classnames( tab.className, { [ activeClass ]: tab.name === selected } ) }
 							tabId={ instanceId + '-' + tab.name }
 							aria-controls={ instanceId + '-' + tab.name + '-view' }
 							selected={ tab.name === selected }

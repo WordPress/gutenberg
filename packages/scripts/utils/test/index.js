@@ -1,3 +1,24 @@
+/**
+ * External dependencies
+ */
+import crossSpawn from 'cross-spawn';
+
+/**
+ * Internal dependencies
+ */
+import {
+	hasArgInCLI,
+	hasProjectFile,
+	spawnScript,
+} from '../';
+import {
+	getPackagePath as getPackagePathMock,
+} from '../package';
+import {
+	exit as exitMock,
+	getArgsFromCLI as getArgsFromCLIMock,
+} from '../process';
+
 jest.mock( '../package', () => {
 	const module = require.requireActual( '../package' );
 
@@ -9,53 +30,37 @@ jest.mock( '../process', () => {
 	const module = require.requireActual( '../process' );
 
 	jest.spyOn( module, 'exit' );
-	jest.spyOn( module, 'getCliArgs' );
+	jest.spyOn( module, 'getArgsFromCLI' );
 
 	return module;
 } );
-/**
- * Internal dependencies
- */
-import crossSpawn from 'cross-spawn';
-import {
-	hasCliArg,
-	hasProjectFile,
-	spawnScript,
-} from '../';
-import {
-	getPackagePath as getPackagePathMock,
-} from '../package';
-import {
-	exit as exitMock,
-	getCliArgs as getCliArgsMock,
-} from '../process';
 
 describe( 'utils', () => {
 	const crossSpawnMock = jest.spyOn( crossSpawn, 'sync' );
 
-	describe( 'hasCliArg', () => {
+	describe( 'hasArgInCLI', () => {
 		beforeAll( () => {
-			getCliArgsMock.mockReturnValue( [ '-a', '--b', '--config=test' ] );
+			getArgsFromCLIMock.mockReturnValue( [ '-a', '--b', '--config=test' ] );
 		} );
 
 		afterAll( () => {
-			getCliArgsMock.mockReset();
+			getArgsFromCLIMock.mockReset();
 		} );
 
 		test( 'should return false when no args passed', () => {
-			getCliArgsMock.mockReturnValueOnce( [] );
+			getArgsFromCLIMock.mockReturnValueOnce( [] );
 
-			expect( hasCliArg( '--no-args' ) ).toBe( false );
+			expect( hasArgInCLI( '--no-args' ) ).toBe( false );
 		} );
 
 		test( 'should return false when checking for unrecognized arg', () => {
-			expect( hasCliArg( '--non-existent' ) ).toBe( false );
+			expect( hasArgInCLI( '--non-existent' ) ).toBe( false );
 		} );
 
 		test( 'should return true when CLI arg found', () => {
-			expect( hasCliArg( '-a' ) ).toBe( true );
-			expect( hasCliArg( '--b' ) ).toBe( true );
-			expect( hasCliArg( '--config' ) ).toBe( true );
+			expect( hasArgInCLI( '-a' ) ).toBe( true );
+			expect( hasArgInCLI( '--b' ) ).toBe( true );
+			expect( hasArgInCLI( '--config' ) ).toBe( true );
 		} );
 	} );
 

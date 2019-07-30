@@ -1,26 +1,26 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import classnames from 'classnames';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
-import { RichText } from '@wordpress/editor';
+import { RichText } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 
 class GalleryImage extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onImageClick = this.onImageClick.bind( this );
+		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectCaption = this.onSelectCaption.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 
 		this.state = {
@@ -44,7 +44,7 @@ class GalleryImage extends Component {
 		}
 	}
 
-	onImageClick() {
+	onSelectImage() {
 		if ( ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
@@ -56,7 +56,7 @@ class GalleryImage extends Component {
 		}
 	}
 
-	onKeyDown( event ) {
+	onRemoveImage( event ) {
 		if (
 			this.container === document.activeElement &&
 			this.props.isSelected && [ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
@@ -86,7 +86,7 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isSelected, caption, onRemove, setAttributes, 'aria-label': ariaLabel } = this.props;
+		const { url, alt, id, linkTo, link, isFirstItem, isLastItem, isSelected, caption, onRemove, onMoveForward, onMoveBackward, setAttributes, 'aria-label': ariaLabel } = this.props;
 
 		let href;
 
@@ -103,18 +103,20 @@ class GalleryImage extends Component {
 			// Disable reason: Image itself is not meant to be interactive, but should
 			// direct image selection and unfocus caption fields.
 			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-			<Fragment>
+			<>
 				<img
 					src={ url }
 					alt={ alt }
 					data-id={ id }
-					onClick={ this.onImageClick }
+					onClick={ this.onSelectImage }
+					onFocus={ this.onSelectImage }
+					onKeyDown={ this.onRemoveImage }
 					tabIndex="0"
-					onKeyDown={ this.onImageClick }
 					aria-label={ ariaLabel }
+					ref={ this.bindContainer }
 				/>
 				{ isBlobURL( url ) && <Spinner /> }
-			</Fragment>
+			</>
 			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 		);
 
@@ -123,35 +125,47 @@ class GalleryImage extends Component {
 			'is-transient': isBlobURL( url ),
 		} );
 
-		// Disable reason: Each block can be selected by clicking on it and we should keep the same saved markup
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<figure className={ className } tabIndex="-1" onKeyDown={ this.onKeyDown } ref={ this.bindContainer }>
-				{ isSelected &&
-					<div className="block-library-gallery-item__inline-menu">
-						<IconButton
-							icon="no-alt"
-							onClick={ onRemove }
-							className="blocks-gallery-item__remove"
-							label={ __( 'Remove Image' ) }
-						/>
-					</div>
-				}
+			<figure className={ className }>
 				{ href ? <a href={ href }>{ img }</a> : img }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) ? (
-					<RichText
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
-						isSelected={ this.state.captionSelected }
-						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-						unstableOnFocus={ this.onSelectCaption }
-						inlineToolbar
+				<div className="block-library-gallery-item__move-menu">
+					<IconButton
+						icon="arrow-left"
+						onClick={ isFirstItem ? undefined : onMoveBackward }
+						className="blocks-gallery-item__move-backward"
+						label={ __( 'Move Image Backward' ) }
+						aria-disabled={ isFirstItem }
+						disabled={ ! isSelected }
 					/>
-				) : null }
+					<IconButton
+						icon="arrow-right"
+						onClick={ isLastItem ? undefined : onMoveForward }
+						className="blocks-gallery-item__move-forward"
+						label={ __( 'Move Image Forward' ) }
+						aria-disabled={ isLastItem }
+						disabled={ ! isSelected }
+					/>
+				</div>
+				<div className="block-library-gallery-item__inline-menu">
+					<IconButton
+						icon="no-alt"
+						onClick={ onRemove }
+						className="blocks-gallery-item__remove"
+						label={ __( 'Remove Image' ) }
+						disabled={ ! isSelected }
+					/>
+				</div>
+				<RichText
+					tagName="figcaption"
+					placeholder={ isSelected ? __( 'Write caption…' ) : null }
+					value={ caption }
+					isSelected={ this.state.captionSelected }
+					onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+					unstableOnFocus={ this.onSelectCaption }
+					inlineToolbar
+				/>
 			</figure>
 		);
-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 

@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AlignmentToolbar should allow custom alignment controls to be specified 1`] = `
+<Toolbar
+  controls={
+    Array [
+      Object {
+        "align": "custom-left",
+        "icon": "editor-alignleft",
+        "isActive": false,
+        "onClick": [Function],
+        "title": "My custom left",
+      },
+      Object {
+        "align": "custom-right",
+        "icon": "editor-aligncenter",
+        "isActive": true,
+        "onClick": [Function],
+        "title": "My custom right",
+      },
+    ]
+  }
+  icon="editor-aligncenter"
+  isCollapsed={true}
+  label="Change text alignment"
+/>
+`;
+
+exports[`AlignmentToolbar should match snapshot 1`] = `
+<Toolbar
+  controls={
+    Array [
+      Object {
+        "align": "left",
+        "icon": "editor-alignleft",
+        "isActive": true,
+        "onClick": [Function],
+        "title": "Align Text Left",
+      },
+      Object {
+        "align": "center",
+        "icon": "editor-aligncenter",
+        "isActive": false,
+        "onClick": [Function],
+        "title": "Align Text Center",
+      },
+      Object {
+        "align": "right",
+        "icon": "editor-alignright",
+        "isActive": false,
+        "onClick": [Function],
+        "title": "Align Text Right",
+      },
+    ]
+  }
+  icon="editor-alignleft"
+  isCollapsed={true}
+  label="Change text alignment"
+/>
+`;

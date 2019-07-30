@@ -1,22 +1,13 @@
 // @format
 
-.block-library-more__container {
-	align-items: center;
-	padding-left: 4;
-	padding-right: 4;
-	padding-top: 4;
-	padding-bottom: 4;
+.block-library-more__line {
+	background-color: $gray-lighten-20;
+	height: 2;
 }
 
-.block-library-more__sub-container {
-	align-items: center;
-	flex-direction: row;
+.block-library-more__text {
+	color: $gray;
+	text-decoration-style: solid;
+	text-transform: uppercase;
 }
 
-.block-library-more__left-marker {
-	padding-right: 4;
-}
-
-.block-library-more__right-marker {
-	padding-left: 4;
-}

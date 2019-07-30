@@ -6,7 +6,7 @@ import { uniq, compact, without } from 'lodash';
 /**
  * A set of tokens.
  *
- * @link https://dom.spec.whatwg.org/#domtokenlist
+ * @see https://dom.spec.whatwg.org/#domtokenlist
  */
 export default class TokenList {
 	/**
@@ -27,7 +27,7 @@ export default class TokenList {
 	/**
 	 * Returns the associated set as string.
 	 *
-	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-value
+	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-value
 	 *
 	 * @return {string} Token set as string.
 	 */
@@ -38,7 +38,7 @@ export default class TokenList {
 	/**
 	 * Replaces the associated set with a new string value.
 	 *
-	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-value
+	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-value
 	 *
 	 * @param {string} value New token set as string.
 	 */
@@ -51,7 +51,7 @@ export default class TokenList {
 	/**
 	 * Returns the number of tokens.
 	 *
-	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-length
+	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-length
 	 *
 	 * @return {number} Number of tokens.
 	 */
@@ -62,8 +62,8 @@ export default class TokenList {
 	/**
 	 * Returns the stringified form of the TokenList.
 	 *
-	 * @link https://dom.spec.whatwg.org/#DOMTokenList-stringification-behavior
-	 * @link https://www.ecma-international.org/ecma-262/9.0/index.html#sec-tostring
+	 * @see https://dom.spec.whatwg.org/#DOMTokenList-stringification-behavior
+	 * @see https://www.ecma-international.org/ecma-262/9.0/index.html#sec-tostring
 	 *
 	 * @return {string} Token set as string.
 	 */
@@ -74,7 +74,7 @@ export default class TokenList {
 	/**
 	 * Returns an iterator for the TokenList, iterating items of the set.
 	 *
-	 * @link https://dom.spec.whatwg.org/#domtokenlist
+	 * @see https://dom.spec.whatwg.org/#domtokenlist
 	 *
 	 * @return {Generator} TokenList iterator.
 	 */
@@ -85,7 +85,7 @@ export default class TokenList {
 	/**
 	 * Returns the token with index `index`.
 	 *
-	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-item
+	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-item
 	 *
 	 * @param {number} index Index at which to return token.
 	 *
@@ -98,7 +98,7 @@ export default class TokenList {
 	/**
 	 * Returns true if `token` is present, and false otherwise.
 	 *
-	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-contains
+	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-contains
 	 *
 	 * @param {string} item Token to test.
 	 *
@@ -111,7 +111,7 @@ export default class TokenList {
 	/**
 	 * Adds all arguments passed, except those already present.
 	 *
-	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-add
+	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-add
 	 *
 	 * @param {...string} items Items to add.
 	 */
@@ -122,7 +122,7 @@ export default class TokenList {
 	/**
 	 * Removes arguments passed, if they are present.
 	 *
-	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-remove
+	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-remove
 	 *
 	 * @param {...string} items Items to remove.
 	 */
@@ -136,7 +136,7 @@ export default class TokenList {
 	 * as add()). If force is false, removes token (same as remove()). Returns
 	 * true if `token` is now present, and false otherwise.
 	 *
-	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-toggle
+	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-toggle
 	 *
 	 * @param {string}   token Token to toggle.
 	 * @param {?boolean} force Presence to force.
@@ -161,7 +161,7 @@ export default class TokenList {
 	 * Replaces `token` with `newToken`. Returns true if `token` was replaced
 	 * with `newToken`, and false otherwise.
 	 *
-	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-replace
+	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-replace
 	 *
 	 * @param {string} token    Token to replace with `newToken`.
 	 * @param {string} newToken Token to use in place of `token`.
@@ -185,7 +185,7 @@ export default class TokenList {
 	 *
 	 * Always returns `true` in this implementation.
 	 *
-	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-supports
+	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-supports
 	 *
 	 * @return {boolean} Whether token is supported.
 	 */

@@ -15,6 +15,7 @@ export const defaultEntities = [
 	{ name: 'postType', kind: 'root', key: 'slug', baseURL: '/wp/v2/types' },
 	{ name: 'media', kind: 'root', baseURL: '/wp/v2/media', plural: 'mediaItems' },
 	{ name: 'taxonomy', kind: 'root', key: 'slug', baseURL: '/wp/v2/taxonomies', plural: 'taxonomies' },
+	{ name: 'widgetArea', kind: 'root', baseURL: '/__experimental/widget-areas', plural: 'widgetAreas' },
 ];
 
 export const kinds = [

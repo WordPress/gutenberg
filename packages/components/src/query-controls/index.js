@@ -79,6 +79,7 @@ export default function QueryControls( {
 				onChange={ onNumberOfItemsChange }
 				min={ minItems }
 				max={ maxItems }
+				required
 			/>
 		),
 	];

@@ -1,0 +1,70 @@
+.block-editor-rich-text {
+	// This is needed to position the formatting toolbar.
+	position: relative;
+}
+
+.block-editor-rich-text__editable {
+	> p:first-child {
+		margin-top: 0;
+	}
+
+	a {
+		color: $blue-medium-700;
+	}
+
+	code {
+		padding: 2px;
+		border-radius: 2px;
+		color: $dark-gray-800;
+		background: $light-gray-200;
+		font-family: $editor-html-font;
+		font-size: inherit; // This is necessary to override upstream CSS.
+
+		.is-multi-selected & {
+			background: darken($blue-medium-highlight, 15%);
+		}
+	}
+
+	&:focus {
+		// Removes outline added by the browser.
+		outline: none;
+
+		*[data-rich-text-format-boundary] {
+			border-radius: 2px;
+		}
+	}
+
+	[data-rich-text-placeholder]::after {
+		content: attr(data-rich-text-placeholder);
+		pointer-events: none;
+		// Use opacity to work in various editor styles.
+		// We don't specify the color here, because blocks or editor styles might provide their own.
+		opacity: 0.62;
+	}
+
+	// Could be unset for individual rich text instances.
+	&.is-selected [data-rich-text-placeholder]::after {
+		display: none;
+	}
+}
+
+// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
+// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
+figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before {
+	opacity: 0.8;
+}
+
+.block-editor-rich-text__inline-toolbar {
+	display: flex;
+	justify-content: center;
+	position: absolute;
+	top: -$block-controls-height - 4px;
+	line-height: 0;
+	left: 0;
+	right: 0;
+	z-index: 1;
+
+	ul.components-toolbar {
+		box-shadow: $shadow-toolbar;
+	}
+}

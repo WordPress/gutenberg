@@ -1,4 +1,186 @@
-## 9.0.6 (Unreleased)
+## 9.4.0 (2019-06-12)
+
+### Deprecations
+
+- The following components are deprecated as moved to the `@wordpress/block-editor` package:
+  - Autocomplete,
+  - AlignmentToolbar,
+  - BlockAlignmentToolbar,
+  - BlockControls,
+  - BlockEdit,
+  - BlockEditorKeyboardShortcuts,
+  - BlockFormatControls,
+  - BlockIcon,
+  - BlockInspector,
+  - BlockList,
+  - BlockMover,
+  - BlockNavigationDropdown,
+  - BlockSelectionClearer,
+  - BlockSettingsMenu,
+  - BlockTitle,
+  - BlockToolbar,
+  - ColorPalette,
+  - ContrastChecker,
+  - CopyHandler,
+  - createCustomColorsHOC,
+  - DefaultBlockAppender,
+  - FontSizePicker,
+  - getColorClassName,
+  - getColorObjectByAttributeValues,
+  - getColorObjectByColorValue,
+  - getFontSize,
+  - getFontSizeClass,
+  - Inserter,
+  - InnerBlocks,
+  - InspectorAdvancedControls,
+  - InspectorControls,
+  - PanelColorSettings,
+  - PlainText,
+  - RichText,
+  - RichTextShortcut,
+  - RichTextToolbarButton,
+  - RichTextInserterItem,
+  - MediaPlaceholder,
+  - MediaUpload,
+  - MediaUploadCheck,
+  - MultiBlocksSwitcher,
+  - MultiSelectScrollIntoView,
+  - NavigableToolbar,
+  - ObserveTyping,
+  - PreserveScrollInReorder,
+  - SkipToSelectedBlock,
+  - URLInput,
+  - URLInputButton,
+  - URLPopover,
+  - Warning,
+  - WritingFlow,
+  - withColorContext,
+  - withColors,
+  - withFontSizes.
+- The following actions are deprecated as moved to the `core/block-editor` store:
+  - resetBlocks,
+  - receiveBlocks,
+  - updateBlock,
+  - updateBlockAttributes,
+  - selectBlock,
+  - startMultiSelect,
+  - stopMultiSelect,
+  - multiSelect,
+  - clearSelectedBlock,
+  - toggleSelection,
+  - replaceBlocks,
+  - replaceBlock,
+  - moveBlocksDown,
+  - moveBlocksUp,
+  - moveBlockToPosition,
+  - insertBlock,
+  - insertBlocks,
+  - showInsertionPoint,
+  - hideInsertionPoint,
+  - setTemplateValidity,
+  - synchronizeTemplate,
+  - mergeBlocks,
+  - removeBlocks,
+  - removeBlock,
+  - toggleBlockMode,
+  - startTyping,
+  - stopTyping,
+  - enterFormattedText,
+  - exitFormattedText,
+  - insertDefaultBlock,
+  - updateBlockListSettings.
+- The following selectors are deprecated as moved to the `core/block-editor` store:
+  - getBlockDependantsCacheBust,
+  - getBlockName,
+  - isBlockValid,
+  - getBlockAttributes,
+  - getBlock,
+  - getBlocks,
+  - getClientIdsOfDescendants,
+  - getClientIdsWithDescendants,
+  - getGlobalBlockCount,
+  - getBlocksByClientId,
+  - getBlockCount,
+  - getBlockSelectionStart,
+  - getBlockSelectionEnd,
+  - getSelectedBlockCount,
+  - hasSelectedBlock,
+  - getSelectedBlockClientId,
+  - getSelectedBlock,
+  - getBlockRootClientId,
+  - getBlockHierarchyRootClientId,
+  - getAdjacentBlockClientId,
+  - getPreviousBlockClientId,
+  - getNextBlockClientId,
+  - getSelectedBlocksInitialCaretPosition,
+  - getMultiSelectedBlockClientIds,
+  - getMultiSelectedBlocks,
+  - getFirstMultiSelectedBlockClientId,
+  - getLastMultiSelectedBlockClientId,
+  - isFirstMultiSelectedBlock,
+  - isBlockMultiSelected,
+  - isAncestorMultiSelected,
+  - getMultiSelectedBlocksStartClientId,
+  - getMultiSelectedBlocksEndClientId,
+  - getBlockOrder,
+  - getBlockIndex,
+  - isBlockSelected,
+  - hasSelectedInnerBlock,
+  - isBlockWithinSelection,
+  - hasMultiSelection,
+  - isMultiSelecting,
+  - isSelectionEnabled,
+  - getBlockMode =,
+  - isTyping,
+  - isCaretWithinFormattedText,
+  - getBlockInsertionPoint,
+  - isBlockInsertionPointVisible,
+  - isValidTemplate,
+  - getTemplate,
+  - getTemplateLock,
+  - canInsertBlockType,
+  - getInserterItems,
+  - hasInserterItems,
+  - getBlockListSettings.
+
+## 9.3.0 (2019-05-21)
+
+### Deprecations
+- The `getAutosave`, `getAutosaveAttribute`, and `hasAutosave` selectors are deprecated. Please use the `getAutosave` selector in the `@wordpress/core-data` package.
+- The `resetAutosave` action is deprecated. An equivalent action `receiveAutosaves` has been added to the `@wordpress/core-data` package.
+- `ServerSideRender` component was deprecated. The component is now available in `@wordpress/server-side-render`.
+
+### Internal
+
+- Refactor setupEditor effects to action-generator using controls ([#14513](https://github.com/WordPress/gutenberg/pull/14513))
+- Remove redux-multi dependency (no longer needed/used with above refactor)
+- Replace internal controls definitions with usage of new @wordpress/data-controls package (see [#15435](https://github.com/WordPress/gutenberg/pull/15435)
+
+## 9.1.0 (2019-03-06)
+
+### New Features
+
+- Added `createCustomColorsHOC` for creating a higher order `withCustomColors` component.
+- Added a new `TextEditorGlobalKeyboardShortcuts` component.
+
+### Deprecations
+
+- `EditorGlobalKeyboardShortcuts` has been deprecated in favor of `VisualEditorGlobalKeyboardShortcuts`.
+
+### Bug Fixes
+
+- BlockSwitcher will now consistently render an icon for block multi-selections.
+
+### Internal
+
+- Removed `jQuery` dependency.
+- Removed `TinyMCE` dependency.
+- RichText: improve format boundaries.
+- Refactor all post effects to action-generators using controls ([#13716](https://github.com/WordPress/gutenberg/pull/13716))
+
+## 9.0.7 (2019-01-03)
+
+## 9.0.6 (2018-12-18)
 
 ### Bug Fixes
 
@@ -9,6 +191,7 @@
 ### Bug Fixes
 
 - `getEditedPostAttribute` now correctly returns the merged result of edits as a partial change when given `'meta'` as the `attributeName`.
+- Fixes an error and unrecoverable state which occurs on autosave completion for a `'publicly_queryable' => false` post type.
 
 ## 9.0.4 (2018-11-30)
 

@@ -19,9 +19,9 @@ When writing tests consider the following:
 
 ## JavaScript Testing
 
-Tests for JavaScript use [Jest](http://facebook.github.io/jest/) as the test runner and its API for [globals](https://facebook.github.io/jest/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](http://facebook.github.io/jest/docs/en/expect.html), [mocks](http://facebook.github.io/jest/docs/en/mock-functions.html), [spies](http://facebook.github.io/jest/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://facebook.github.io/jest/docs/en/mock-function-api.html). If needed, you can also use [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
+Tests for JavaScript use [Jest](https://jestjs.io/) as the test runner and its API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
 
-Assuming you've followed the [instructions](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
+Assuming you've followed the [instructions](/docs/contributors/getting-started.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
 ```
 npm test
@@ -88,9 +88,9 @@ describe( 'CheckboxWithLabel', () => {
 
 ### Setup and Teardown methods
 
-The Jest API includes some nifty [setup and teardown methods](https://facebook.github.io/jest/docs/en/setup-teardown.html) that allow you to perform tasks *before* and *after* each or all of your tests, or tests within a specific `describe` block.
+The Jest API includes some nifty [setup and teardown methods](https://jestjs.io/docs/en/setup-teardown.html) that allow you to perform tasks *before* and *after* each or all of your tests, or tests within a specific `describe` block.
 
-These methods can handle asynchronous code to allow setup that you normally cannot do inline. As with [individual test cases](https://facebook.github.io/jest/docs/en/asynchronous.html#promises), you can return a Promise and Jest will wait for it to resolve:
+These methods can handle asynchronous code to allow setup that you normally cannot do inline. As with [individual test cases](https://jestjs.io/docs/en/asynchronous.html#promises), you can return a Promise and Jest will wait for it to resolve:
 
 ```javascript
 // one-time setup for *all* tests
@@ -188,7 +188,7 @@ describe( 'The bilbo module', () => {
 
 ### Testing globals
 
-We can use [Jest spies](http://facebook.github.io/jest/docs/en/jest-object.html#jestspyonobject-methodname) to test code that calls global methods.
+We can use [Jest spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) to test code that calls global methods.
 
 ```javascript
 import { myModuleFunctionThatOpensANewWindow } from '../my-module';
@@ -220,7 +220,7 @@ However, if the change was intentional, follow these steps to update the snapsho
    npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
    ```
 1. Review the diff and ensure the changes are expected and intentional.
-1. Commit.
+2. Commit.
 
 #### What are snapshots?
 
@@ -286,7 +286,7 @@ describe( 'SolarSystem', () => {
 } );
 ```
 
-Reducer tests are also be a great fit for snapshots. They are often large, complex data structures that shouldn't change unexpectedly, exactly what snapshots excel at!
+Reducer tests are also a great fit for snapshots. They are often large, complex data structures that shouldn't change unexpectedly, exactly what snapshots excel at!
 
 #### Working with snapshots
 
@@ -344,7 +344,7 @@ It's tempting to snapshot deep renders, but that makes for huge snapshots. Addit
 
 ## End to end Testing
 
-If you're using the built-in [local environment](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#local-environment), you can run the e2e tests locally using this command:
+If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the e2e tests locally using this command:
 
 ```bash
 npm run test-e2e
@@ -356,6 +356,12 @@ or interactively
 npm run test-e2e:watch
 ```
 
+Sometimes it's useful to observe the browser while running tests. To do so you can use these environment variables:
+
+```bash
+PUPPETEER_HEADLESS=false PUPPETEER_SLOWMO=80 npm run test-e2e:watch
+```
+
 If you're using a different setup, you can provide the base URL, username and password like this:
 
 ```bash
@@ -364,7 +370,7 @@ WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run
 
 ## PHP Testing
 
-Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#local-environment), you can run the PHP tests locally using this command:
+Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the PHP tests locally using this command:
 
 ```bash
 npm run test-php
@@ -374,5 +380,5 @@ Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizla
 
 To run unit tests only, without the linter, use `npm run test-unit-php` instead.
 
-[snapshot testing]: https://facebook.github.io/jest/docs/en/snapshot-testing.html
-[update snapshots]: https://facebook.github.io/jest/docs/en/snapshot-testing.html#updating-snapshots
+[snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
+[update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
