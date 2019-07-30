@@ -831,8 +831,8 @@ export function isBlockWithinSelection( state, clientId ) {
  * @return {boolean} Whether multi-selection has been made.
  */
 export function hasMultiSelection( state ) {
-	const { start, end } = state.blockSelection;
-	return start.clientId !== end.clientId;
+	const { clientIds } = state.blockSelection;
+	return clientIds.length > 1;
 }
 
 /**
