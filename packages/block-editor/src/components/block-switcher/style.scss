@@ -93,7 +93,6 @@
 .components-popover:not(.is-mobile).block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;
 	max-width: calc(340px * 2);
-	max-height: 500px;
 	display: flex;
 	// we need to differ those styles to popover__container so we reset them here
 	box-shadow: none;
