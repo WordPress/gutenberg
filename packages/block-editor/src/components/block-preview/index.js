@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -35,15 +34,10 @@ export function BlockPreviewContent( { blocks, settings } ) {
 
 	const theBlocks = Array.isArray( blocks ) ? blocks : [ blocks ];
 
-	// Create new "clone" Blocks to show in the preview
-	const blocksToPreview = theBlocks.map( ( { name, attributes, innerBlocks } ) => {
-		return createBlock( name, attributes, innerBlocks );
-	} );
-
 	return (
 		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
 			<BlockEditorProvider
-				value={ blocksToPreview }
+				value={ theBlocks }
 				settings={ settings }
 			>
 				<BlockList />
