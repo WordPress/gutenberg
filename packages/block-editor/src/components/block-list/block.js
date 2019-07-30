@@ -406,6 +406,7 @@ function BlockListBlock( {
 			'is-typing': isTypingWithinBlock,
 			'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
+			'has-child-selected': isParentOfSelectedBlock,
 		},
 		className
 	);
