@@ -107,6 +107,7 @@ class RichText extends Component {
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.formatToValue = this.formatToValue.bind( this );
+		this.Editable = this.Editable.bind( this );
 
 		this.onKeyDown = ( event ) => {
 			this.handleDelete( event );
@@ -858,24 +859,19 @@ class RichText extends Component {
 		return toHTMLString( { value, multilineTag } );
 	}
 
-	render() {
+	Editable( props ) {
 		const {
 			tagName: Tagname = 'div',
 			style,
 			className,
 			placeholder,
-			__unstableIsSelected: isSelected,
-			children,
-			allowedFormats,
-			withoutInteractiveFormatting,
 		} = this.props;
-
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we replace the relevant element. This is needed because we
 		// prevent Editable component updates.
 		const key = Tagname;
 
-		const EditableWrapper = ( props ) => (
+		return (
 			<Editable
 				{ ...props }
 				tagName={ Tagname }
@@ -897,6 +893,15 @@ class RichText extends Component {
 				setRef={ this.setRef }
 			/>
 		);
+	}
+
+	render() {
+		const {
+			__unstableIsSelected: isSelected,
+			children,
+			allowedFormats,
+			withoutInteractiveFormatting,
+		} = this.props;
 
 		return (
 			<>
@@ -910,9 +915,9 @@ class RichText extends Component {
 					isSelected,
 					value: this.record,
 					onChange: this.onChange,
-					Editable: EditableWrapper,
+					Editable: this.Editable,
 				} ) }
-				{ ! children && <EditableWrapper /> }
+				{ ! children && <this.Editable /> }
 			</>
 		);
 	}
