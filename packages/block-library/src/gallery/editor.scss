@@ -19,11 +19,11 @@ ul.wp-block-gallery {
 		outline: none;
 	}
 
-	> .is-selected {
+	figure.is-selected {
 		outline: 4px solid theme(primary);
 	}
 
-	.is-transient img {
+	figure.is-transient img {
 		opacity: 0.3;
 	}
 
