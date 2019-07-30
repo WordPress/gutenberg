@@ -14,6 +14,17 @@ import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 import { select } from './controls';
 
 /**
+ * Value describing a selected block's initial position, either a number as the
+ * offset (-1 for reverse), or an object of properties `isReverse`, `caretRect`.
+ *
+ * @typedef {(number|Object)} WPBlockInitialPosition
+ *
+ * @property {boolean} isReverse Whether initial position should be placed at
+ *                               the end of the selected block.
+ * @property {DOMRect} caretRect Rect describing offset of initial position.
+ */
+
+/**
  * Generator which will yield a default block insert action if there
  * are no other blocks at the root of the editor. This generator should be used
  * in actions which may result in no blocks remaining in the editor (removal,
@@ -104,9 +115,8 @@ export function updateBlock( clientId, updates ) {
  * value reflecting its selection directionality. An initialPosition of -1
  * reflects a reverse selection.
  *
- * @param {string}  clientId        Block client ID.
- * @param {?number} initialPosition Optional initial position. Pass as -1 to
- *                                  reflect reverse selection.
+ * @param {string}                  clientId        Block client ID.
+ * @param {?WPBlockInitialPosition} initialPosition Optional initial position.
  *
  * @return {Object} Action object.
  */
@@ -122,9 +132,10 @@ export function selectBlock( clientId, initialPosition = null ) {
  * Yields action objects used in signalling that the block preceding the given
  * clientId should be selected.
  *
- * @param {string} clientId Block client ID.
+ * @param {string}                  clientId        Block client ID.
+ * @param {?WPBlockInitialPosition} initialPosition Optional initial position.
  */
-export function* selectPreviousBlock( clientId ) {
+export function* selectPreviousBlock( clientId, initialPosition = -1 ) {
 	const previousBlockClientId = yield select(
 		'core/block-editor',
 		'getPreviousBlockClientId',
@@ -132,7 +143,7 @@ export function* selectPreviousBlock( clientId ) {
 	);
 
 	if ( previousBlockClientId ) {
-		yield selectBlock( previousBlockClientId, -1 );
+		yield selectBlock( previousBlockClientId, initialPosition );
 	}
 }
 
@@ -140,9 +151,10 @@ export function* selectPreviousBlock( clientId ) {
  * Yields action objects used in signalling that the block following the given
  * clientId should be selected.
  *
- * @param {string} clientId Block client ID.
+ * @param {string}                  clientId        Block client ID.
+ * @param {?WPBlockInitialPosition} initialPosition Optional initial position.
  */
-export function* selectNextBlock( clientId ) {
+export function* selectNextBlock( clientId, initialPosition ) {
 	const nextBlockClientId = yield select(
 		'core/block-editor',
 		'getNextBlockClientId',
@@ -150,7 +162,7 @@ export function* selectNextBlock( clientId ) {
 	);
 
 	if ( nextBlockClientId ) {
-		yield selectBlock( nextBlockClientId );
+		yield selectBlock( nextBlockClientId, initialPosition );
 	}
 }
 

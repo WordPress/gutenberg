@@ -12,7 +12,7 @@ import { useRef, useEffect, useState } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
-	placeCaretAtHorizontalEdge,
+	placeCaretAtVerticalEdge,
 } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
@@ -224,7 +224,7 @@ function BlockListBlock( {
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
-		const isReverse = -1 === initialPosition;
+		const isReverse = -1 === initialPosition || initialPosition.isReverse;
 		const target = ( isReverse ? last : first )( textInputs );
 
 		if ( ! target ) {
@@ -232,7 +232,7 @@ function BlockListBlock( {
 			return;
 		}
 
-		placeCaretAtHorizontalEdge( target, isReverse );
+		placeCaretAtVerticalEdge( target, isReverse, initialPosition.caretRect );
 	};
 
 	// Focus the selected block's wrapper or inner input on mount and update
