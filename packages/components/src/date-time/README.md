@@ -9,7 +9,6 @@ DateTimePicker is a React component that renders a calendar and clock for date a
 Date pickers should:
 
 - Use smart defaults and highlight the current date.
-- Prevent the ability to enter dates more than a year in the future or past.
 
 ## Usage
 
