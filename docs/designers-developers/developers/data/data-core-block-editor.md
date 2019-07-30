@@ -1031,7 +1031,7 @@ reflects a reverse selection.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
--   _initialPosition_ `?number`: Optional initial position. Pass as -1 to reflect reverse selection.
+-   _initialPosition_ `?WPBlockInitialPosition`: Optional initial position.
 
 _Returns_
 
@@ -1061,6 +1061,7 @@ clientId should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+-   _initialPosition_ `?WPBlockInitialPosition`: Optional initial position.
 
 <a name="selectPreviousBlock" href="#selectPreviousBlock">#</a> **selectPreviousBlock**
 
@@ -1070,6 +1071,7 @@ clientId should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+-   _initialPosition_ `?WPBlockInitialPosition`: Optional initial position.
 
 <a name="setTemplateValidity" href="#setTemplateValidity">#</a> **setTemplateValidity**
 
