@@ -132,9 +132,18 @@
  * vertical to ensure there is equal visual spacing around the inserter. Note there
  * is no formal API for a "passthrough" Block so this is an edge case overide
  */
-[data-type="core/columns"] .block-list-appender {
-	margin-top: $block-padding*2;
-	margin-bottom: $block-padding*2;
+[data-type="core/columns"] {
+
+	.block-list-appender {
+		margin-top: $block-padding*2;
+		margin-bottom: $block-padding*2;
+	}
+
+	// When the individual column block is selected, the nested padding overrules
+	// some of this margin. We need to adjust the appender spacing again as a result.
+	[data-type="core/column"].is-selected .block-list-appender {
+		margin: $block-padding 0;
+	}
 }
 
 /**
@@ -158,13 +167,11 @@ div.block-core-columns.is-vertically-aligned-bottom {
 	justify-content: flex-end;
 }
 
-
 /**
- * Fixes single Column breadcrumb to RHS of Block boundary
+ * Fixes single Column breadcrumb position.
  */
 [data-type="core/column"] > .editor-block-list__block-edit > .editor-block-list__breadcrumb {
-	right: 0;
-	left: auto;
+	left: -$block-left-border-width;
 }
 
 /**
@@ -173,4 +180,20 @@ div.block-core-columns.is-vertically-aligned-bottom {
 .block-core-columns > .block-editor-inner-blocks.has-overlay::after {
 	left: 0;
 	right: 0;
+}
+
+/**
+ * Add extra padding when the parent block is selected, for easier interaction.
+ */
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/columns"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/columns"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/column"].is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks,
+.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/column"].has-child-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks {
+	padding: $block-padding;
+
+	// Negate this padding for the placeholder.
+	> .components-placeholder {
+		margin: -$block-padding;
+		width: calc(100% + #{$block-padding * 2});
+	}
 }
