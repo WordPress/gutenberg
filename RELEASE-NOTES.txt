@@ -2,8 +2,8 @@
 ------
 * Adding a block from the post title now shows the add block here indicator.
 * Deselect post title any time a block is added
+* Fix loss of center alignment in image captions on Android
 * Fix merging of empty paragraph blocks when added from a post's title
-* Fix loss of center alignment in image captions
 
 1.9.0
 ------
