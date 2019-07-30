@@ -224,7 +224,10 @@ function BlockListBlock( {
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
-		const isReverse = -1 === initialPosition || initialPosition.isReverse;
+		const { isReverse, caretRect } = {
+			isReverse: initialPosition === -1,
+			...initialPosition,
+		};
 		const target = ( isReverse ? last : first )( textInputs );
 
 		if ( ! target ) {
@@ -232,7 +235,7 @@ function BlockListBlock( {
 			return;
 		}
 
-		placeCaretAtVerticalEdge( target, isReverse, initialPosition.caretRect );
+		placeCaretAtVerticalEdge( target, isReverse, caretRect );
 	};
 
 	// Focus the selected block's wrapper or inner input on mount and update
