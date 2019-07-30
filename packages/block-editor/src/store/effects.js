@@ -67,6 +67,13 @@ export function validateBlocksToTemplate( action, store ) {
 	}
 }
 
+const announceSelectedBlockCount = ( action, { getState } ) => {
+	const blockCount = getSelectedBlockCount( getState() );
+
+	/* translators: %s: number of selected blocks */
+	speak( sprintf( _n( '%s block selected.', '%s blocks selected.', blockCount ), blockCount ), 'assertive' );
+};
+
 export default {
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
@@ -169,12 +176,9 @@ export default {
 	RESET_BLOCKS: [
 		validateBlocksToTemplate,
 	],
-	MULTI_SELECT: ( action, { getState } ) => {
-		const blockCount = getSelectedBlockCount( getState() );
-
-		/* translators: %s: number of selected blocks */
-		speak( sprintf( _n( '%s block selected.', '%s blocks selected.', blockCount ), blockCount ), 'assertive' );
-	},
+	MULTI_SELECT: announceSelectedBlockCount,
+	ADD_BLOCK_TO_MULTI_SELECTION: announceSelectedBlockCount,
+	REMOVE_BLOCK_FROM_MULTI_SELECTION: announceSelectedBlockCount,
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
 		const state = getState();
 		const blocks = getBlocks( state );
