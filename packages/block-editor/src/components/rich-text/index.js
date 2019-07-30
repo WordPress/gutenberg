@@ -36,7 +36,6 @@ import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 import { withBlockEditContext } from '../block-edit/context';
-import { ListEdit } from './list-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
 const wrapperClasses = 'editor-rich-text block-editor-rich-text';
@@ -296,6 +295,7 @@ class RichTextWrapper extends Component {
 
 	render() {
 		const {
+			children,
 			tagName,
 			value: originalValue,
 			onChange: originalOnChange,
@@ -303,7 +303,6 @@ class RichTextWrapper extends Component {
 			selectionEnd,
 			onSelectionChange,
 			multiline,
-			onTagNameChange,
 			inlineToolbar,
 			wrapperClassName,
 			className,
@@ -376,14 +375,7 @@ class RichTextWrapper extends Component {
 			>
 				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
-						{ isSelected && multilineTag === 'li' && (
-							<ListEdit
-								onTagNameChange={ onTagNameChange }
-								tagName={ tagName }
-								value={ value }
-								onChange={ onChange }
-							/>
-						) }
+						{ isSelected && children && children( { value, onChange } ) }
 						{ isSelected && ! inlineToolbar && hasFormats && (
 							<BlockFormatControls>
 								<FormatToolbar />
