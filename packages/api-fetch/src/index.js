@@ -49,6 +49,21 @@ function registerMiddleware( middleware ) {
 	middlewares.unshift( middleware );
 }
 
+function unregisterMiddleware( middleware ) {
+	// Change middleware to function that only skips to the next middleware
+	// This prevents bugs that happen when trying to splice multiple middlewares in succession
+	const skip = ( options, next ) => next( options );
+	middlewares.forEach( ( mw, index ) => {
+		if ( mw === middleware ) {
+			middlewares[ index ] = skip;
+		}
+	} );
+}
+
+function getMiddlewares() {
+	return middlewares;
+}
+
 const defaultFetchHandler = ( nextOptions ) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
 	let { body, headers } = nextOptions;
@@ -152,6 +167,8 @@ function apiFetch( options ) {
 }
 
 apiFetch.use = registerMiddleware;
+apiFetch.remove = unregisterMiddleware;
+apiFetch.getMiddlewares = getMiddlewares;
 apiFetch.setFetchHandler = setFetchHandler;
 
 apiFetch.createNonceMiddleware = createNonceMiddleware;

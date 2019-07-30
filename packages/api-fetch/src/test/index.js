@@ -198,6 +198,22 @@ describe( 'apiFetch', () => {
 		} );
 	} );
 
+	it( 'should not use unregistred middleware', () => {
+		const customFetchHandler = jest.fn();
+
+		apiFetch.setFetchHandler( customFetchHandler );
+
+		apiFetch.getMiddlewares()
+			.filter( ( mw ) => mw.name === 'userLocaleMiddleware' )
+			.forEach( apiFetch.remove );
+
+		apiFetch( { path: '/random' } );
+
+		expect( customFetchHandler ).toHaveBeenCalledWith( {
+			path: '/random',
+		} );
+	} );
+
 	it( 'should run the last-registered user-defined middleware first', () => {
 		// This could potentially impact other tests in that a lingering
 		// middleware is left. For the purposes of this test, it is sufficient
