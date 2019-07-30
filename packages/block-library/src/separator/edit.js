@@ -25,7 +25,7 @@ function SeparatorEdit( { color, setColor, className } ) {
 					}
 				) }
 				style={ {
-					borderColor: color.color,
+					backgroundColor: color.color,
 					color: color.color,
 				} }
 			/>
