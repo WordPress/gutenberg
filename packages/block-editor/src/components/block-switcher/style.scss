@@ -103,6 +103,27 @@
 .block-editor-block-switcher__popover .components-popover__content {
 	@include break-medium {
 		position: relative;
+
+		.block-editor-block-switcher__container {
+			box-shadow: $shadow-popover;
+			background: $white;
+			min-width: 300px;
+			max-width: 340px;
+			width: 50%;
+		}
+
+		.block-editor-block-preview {
+			border-left: $border-width solid $light-gray-500;
+			box-shadow: $shadow-popover;
+			background: $white;
+			width: 300px;
+			height: auto;
+			// sticky helps us keep the preview at the top when scrolling
+			position: sticky;
+			align-self: stretch;
+			// for sticky to work we need top
+			top: 0;
+		}
 	}
 
 	// Hide the bottom border on the last panel so it stacks with the popover.
