@@ -15,6 +15,7 @@ export async function deactivatePlugin( slug ) {
 	await visitAdminPage( 'plugins.php' );
 	const deleteLink = await page.$( `tr[data-slug="${ slug }"] .delete a` );
 	if ( deleteLink ) {
+		await switchUserToTest();
 		return;
 	}
 	await page.click( `tr[data-slug="${ slug }"] .deactivate a` );
