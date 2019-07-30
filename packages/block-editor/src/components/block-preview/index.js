@@ -9,7 +9,7 @@ import { castArray } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
@@ -37,12 +37,10 @@ export function BlockPreviewContent( { blocks, settings } ) {
 		return null;
 	}
 
-	const theBlocks = castArray( blocks ).map( ( { name, attributes, innerBlocks } ) => createBlock( name, attributes, innerBlocks ) );
-
 	return (
 		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
 			<BlockEditorProvider
-				value={ theBlocks }
+				value={ castArray( blocks ) }
 				settings={ settings }
 			>
 				<BlockList />
