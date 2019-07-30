@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { InnerBlocks } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { verticalAlignment } = attributes;
+	const { verticalAlignment, url } = attributes;
 	const wrapperClasses = classnames( {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );

@@ -16,10 +16,10 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Social link' ),
+	title: __( 'Social links' ),
 	parent: [ 'core/social-links' ],
 	icon,
-	description: __( 'A single column within a columns block.' ),
+	description: __( 'Social links.' ),
 	supports: {
 		inserter: false,
 		reusable: false,

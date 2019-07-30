@@ -19,18 +19,26 @@ import { Icon } from '@wordpress/components';
 
 import PlaceholderIcon from './PlaceholderIcon';
 
-const SocialLinkEdit = ( { attributes, setUrl } ) => {
+const SocialLinkEdit = ( { attributes, setUrl, isSelected } ) => {
+	const { url } = attributes;
+
 	return (
 		<Fragment>
 			<Icon icon={ PlaceholderIcon } />
-			<form >
-				<input
-					type="url"
-					value={ ( attributes && attributes.url ) || '' }
-					onChange={ ( event ) => setUrl( event.target.value ) }
-					placeholder={ __( 'example.com/username' ) }
-				/>
-			</form>
+			{
+				isSelected && (
+					<form >
+						<input
+							type="url"
+							value={ ( attributes && url ) || '' }
+							onChange={ ( event ) => setUrl( event.target.value ) }
+							placeholder={ __( 'example.com/username' ) }
+						/>
+					</form>
+				)
+			}
+
+			{ ! isSelected && url }
 		</Fragment>
 	);
 };
