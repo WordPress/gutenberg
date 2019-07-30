@@ -5,22 +5,22 @@ set -e
 author=$(jq -r '.pull_request.user.login' $GITHUB_EVENT_PATH)
 pr_number=$(jq -r '.number' $GITHUB_EVENT_PATH)
 
-if [ $pr_number = "null" ] || [ $author = "null" ]; then
+if [ "$pr_number" = "null" ] || [ "$author" = "null" ]; then
     echo "Could not find PR number or author. $pr_number / $author"
 	exit 78
 fi
 
-# 2. Fetch the author's commits list for the repo to determine if they're a first-time contributor.
-echo "Fetching commits for using the url https://github.com/$GITHUB_REPOSITORY/commits?author=$author"
-html=$(
+# 2. Fetch the author's commit count for the repo to determine if they're a first-time contributor.
+commit_count=$(
 	curl \
 		--silent \
-		"https://github.com/$GITHUB_REPOSITORY/commits?author=$author"
+		-H "Accept: application/vnd.github.cloak-preview" \
+		"https://api.github.com/search/commits?q=repo:$GITHUB_REPOSITORY+author:$author" \
+		| jq -r '.total_count'
 )
 
-# 3. Run a regular expression against the html to check for the 'No commits found' message.
-regex='\<p\>[[:space:]]*No[[:space:]]+commits[[:space:]]+found[[:space:]]+for[[:space:]]+"'$author'"[[:space:]]*\<\/p\>'
-if ! [[ "$html" =~ $regex ]]; then
+# 3. If the response has a commit count of zero, exit early, the author is not a first time contributor.
+if [ "$commit_count" != "0" ]; then
 	echo "Pull request #$pr_number was not created by a first-time contributor ($author)."
 	exit 78
 fi
