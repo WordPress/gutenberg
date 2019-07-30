@@ -110,7 +110,7 @@
 			border-left: none;
 			box-shadow: none;
 			pointer-events: none;
-			transition: border-color 0.1s linear, box-shadow 0.1s linear;
+			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
 			@include reduce-motion("transition");
 
 			// Include a transparent outline for Windows High Contrast mode.
@@ -181,13 +181,29 @@
 		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before {
 			border: $border-width dashed $dark-opacity-light-800;
 		}
+
+		&.is-hovered > .block-editor-block-list__block-edit::before {
+			border-style: solid;
+			border-color: $dark-opacity-light-700;
+		}
 	}
 
 	// Add extra border to child blocks when they are selected.
-	&.is-selected > .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before,
-	&.is-selected > .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before,
-	&.is-selected > .block-editor-block-list__block-edit > [data-block] > div > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block-edit::before {
-		border: $border-width dashed $dark-opacity-light-800;
+	&.is-selected {
+
+		> .block-editor-block-list__block-edit > [data-block] > div > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected),
+		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected),
+		> .block-editor-block-list__block-edit > [data-block] > div > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-editor-block-list__block:not(.is-selected) {
+
+			> .block-editor-block-list__block-edit::before {
+				border: $border-width dashed $dark-opacity-light-800;
+			}
+
+			&.is-hovered > .block-editor-block-list__block-edit::before {
+				border-style: solid;
+				border-color: $dark-opacity-light-700;
+			}
+		}
 	}
 }
 
