@@ -1037,14 +1037,14 @@ export function blockSelection( state = BLOCK_SELECTION_INITIAL_STATE, action ) 
 			if (
 				! action.clientIds ||
 				! action.clientIds.length ||
-				action.clientIds.indexOf( state.start.clientId ) === -1
+				! action.clientIds.every( ( clientId ) => state.clientIds.indexOf( clientId ) !== -1 )
 			) {
 				return state;
 			}
 
 			return BLOCK_SELECTION_INITIAL_STATE;
 		case 'REPLACE_BLOCKS': {
-			if ( action.clientIds.indexOf( state.start.clientId ) === -1 ) {
+			if ( ! action.clientIds.every( ( clientId ) => state.clientIds.indexOf( clientId ) !== -1 ) ) {
 				return state;
 			}
 

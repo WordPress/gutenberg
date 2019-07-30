@@ -236,7 +236,7 @@ export function* multiSelect( start, end ) {
 	let clientIds = [];
 
 	if ( startIndex > endIndex ) {
-		clientIds = blockOrder.slice( endIndex, startIndex + 1 );
+		clientIds = blockOrder.slice( endIndex, startIndex + 1 ).reverse();
 	} else {
 		clientIds = blockOrder.slice( startIndex, endIndex + 1 );
 	}
