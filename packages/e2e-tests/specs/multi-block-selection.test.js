@@ -203,4 +203,62 @@ describe( 'Multi-block selection', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should allow non-consecutive selection of multiple blocks', async () => {
+		const firstBlockSelector = '[data-type="core/paragraph"]';
+		const secondBlockSelector = '[data-type="core/image"]';
+		const thirdBlockSelector = '[data-type="core/quote"]';
+		const multiSelectedCssClass = 'is-multi-selected';
+
+		// Creating test blocks
+		await clickBlockAppender();
+		await page.keyboard.type( 'First Paragraph' );
+		await insertBlock( 'Image' );
+		await insertBlock( 'Quote' );
+		await page.keyboard.type( 'Quote Block' );
+
+		const blocks = [ firstBlockSelector, secondBlockSelector, thirdBlockSelector ];
+		const expectMultiSelected = async ( selectors, areMultiSelected ) => {
+			for ( const selector of selectors ) {
+				const className = await page.$eval( selector, ( element ) => element.className );
+				if ( areMultiSelected ) {
+					expect( className ).toEqual( expect.stringContaining( multiSelectedCssClass ) );
+				} else {
+					expect( className ).not.toEqual( expect.stringContaining( multiSelectedCssClass ) );
+				}
+			}
+		};
+
+		// Default: No selection
+		await expectMultiSelected( blocks, false );
+
+		// Multi-select via CMD + click.
+		await page.mouse.move( 200, 300 );
+		await page.click( firstBlockSelector );
+		await page.keyboard.down( 'Meta' );
+		await page.click( thirdBlockSelector );
+		await page.keyboard.up( 'Meta' );
+
+		// Verify selection of blocks 1 and 3.
+		await expectMultiSelected( [ firstBlockSelector, thirdBlockSelector ], true );
+
+		// Multi-select second block.
+		await page.keyboard.down( 'Meta' );
+		await page.click( secondBlockSelector );
+
+		// Verify selection of all blocks.
+		await expectMultiSelected( blocks, true );
+
+		// Unselect
+		await page.click( firstBlockSelector );
+
+		// Verify selection of blocks 2 and 3.
+		await expectMultiSelected( [ secondBlockSelector, thirdBlockSelector ], true );
+
+		await page.click( secondBlockSelector );
+		await page.keyboard.up( 'Meta' );
+
+		// No selection
+		await expectMultiSelected( blocks, false );
+	} );
 } );
