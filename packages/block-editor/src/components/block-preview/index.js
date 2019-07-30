@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { castArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -32,7 +37,7 @@ export function BlockPreviewContent( { blocks, settings } ) {
 		return null;
 	}
 
-	const theBlocks = Array.isArray( blocks ) ? blocks : [ blocks ];
+	const theBlocks = castArray( blocks );
 
 	return (
 		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
