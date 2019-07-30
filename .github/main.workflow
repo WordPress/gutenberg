@@ -24,14 +24,9 @@ action "Assign Fixed Issues" {
   secrets = ["GITHUB_TOKEN"]
 }
 
-workflow "Add the First-time Contributor label to issues opened by first-time contributors" {
+workflow "Add the First-time Contributor label to PRs opened by first-time contributors" {
   on = "pull_request"
   resolves = ["First Time Contributor"]
-}
-
-action "Filter opened" {
-  uses = "actions/bin/filter@0dbb077f64d0ec1068a644d25c71b1db66148a24"
-  args = "action opened"
 }
 
 action "First Time Contributor" {

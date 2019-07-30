@@ -5,7 +5,7 @@ LABEL "maintainer"="The WordPress Contributors"
 LABEL "version"="1.0.0"
 
 LABEL "com.github.actions.name"="First Time Contributor"
-LABEL "com.github.actions.description"="Assigns the first time contributor label to pull requests and issues"
+LABEL "com.github.actions.description"="Assigns the first time contributor label to pull requests"
 LABEL "com.github.actions.icon"="award"
 LABEL "com.github.actions.color"="green"
 
