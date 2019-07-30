@@ -128,7 +128,7 @@ export class BlockSwitcher extends Component {
 				renderContent={ ( { onClose } ) => (
 					<>
 						{ ( hasBlockStyles || possibleBlockTransformations.length !== 0 ) &&
-							<div className="components-popover__container">
+							<div className="block-editor-block-switcher__container">
 								{ hasBlockStyles &&
 									<PanelBody
 										title={ __( 'Block Styles' ) }
