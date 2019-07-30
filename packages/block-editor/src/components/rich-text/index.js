@@ -9,7 +9,7 @@ import { omit } from 'lodash';
  */
 import { RawHTML, Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
+import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
 	RichText,
@@ -344,8 +344,8 @@ class RichTextWrapper extends Component {
 
 		// Handle deprecated format.
 		if ( Array.isArray( originalValue ) ) {
-			adjustedValue = children.toHTML( originalValue );
-			adjustedOnChange = ( newValue ) => originalOnChange( children.fromDOM(
+			adjustedValue = childrenSource.toHTML( originalValue );
+			adjustedOnChange = ( newValue ) => originalOnChange( childrenSource.fromDOM(
 				__unstableCreateElement( document, newValue ).childNodes
 			) );
 		}
@@ -368,16 +368,13 @@ class RichTextWrapper extends Component {
 				onPaste={ this.onPaste }
 				__unstableIsSelected={ originalIsSelected }
 				__unstableInputRule={ this.inputRule }
-				__unstableAutocomplete={ Autocomplete }
-				__unstableAutocompleters={ autocompleters }
-				__unstableOnReplace={ onReplace }
 				__unstableMultilineTag={ multilineTag }
 				__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
 				__unstableOnEnterFormattedText={ onEnterFormattedText }
 				__unstableOnExitFormattedText={ onExitFormattedText }
 				__unstableOnCreateUndoLevel={ onCreateUndoLevel }
 			>
-				{ ( { isSelected, value, onChange } ) =>
+				{ ( { isSelected, value, onChange, children } ) =>
 					<>
 						{ isSelected && multilineTag === 'li' && (
 							<ListEdit
@@ -400,6 +397,20 @@ class RichTextWrapper extends Component {
 							</IsolatedEventContainer>
 						) }
 						{ isSelected && <RemoveBrowserShortcuts /> }
+						<Autocomplete
+							onReplace={ onReplace }
+							completers={ autocompleters }
+							record={ value }
+							onChange={ onChange }
+						>
+							{ ( { listBoxId, activeId } ) =>
+								children( {
+									'aria-autocomplete': listBoxId ? 'list' : undefined,
+									'aria-owns': listBoxId,
+									'aria-activedescendant': activeId,
+								} )
+							}
+						</Autocomplete>
 					</>
 				}
 			</RichText>
@@ -474,7 +485,7 @@ const RichTextContainer = compose( [
 RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
-		value = children.toHTML( value );
+		value = childrenSource.toHTML( value );
 	}
 
 	const MultilineTag = getMultilineTag( multiline );

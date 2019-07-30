@@ -893,10 +893,6 @@ class RichText extends Component {
 			placeholder,
 			__unstableIsSelected: isSelected,
 			children,
-			// To do: move autocompletion logic to rich-text.
-			__unstableAutocompleters: autocompleters,
-			__unstableAutocomplete: Autocomplete = ( { children: ch } ) => ch( {} ),
-			__unstableOnReplace: onReplace,
 			allowedFormats,
 			withoutInteractiveFormatting,
 		} = this.props;
@@ -905,20 +901,16 @@ class RichText extends Component {
 		// changes, we replace the relevant element. This is needed because we
 		// prevent Editable component updates.
 		const key = Tagname;
-		const ariaProps = pickAriaProps( this.props );
-		const record = this.record;
 
-		const autoCompleteContent = ( { listBoxId, activeId } ) => (
+		const Content = ( props ) => (
 			<Editable
+				{ ...props }
 				tagName={ Tagname }
 				style={ style }
-				record={ record }
+				record={ this.record }
 				valueToEditableHTML={ this.valueToEditableHTML }
 				aria-label={ placeholder }
-				aria-autocomplete={ listBoxId ? 'list' : undefined }
-				aria-owns={ listBoxId }
-				aria-activedescendant={ activeId }
-				{ ...ariaProps }
+				{ ...pickAriaProps( this.props ) }
 				className={ classnames( 'rich-text', className ) }
 				key={ key }
 				onPaste={ this.onPaste }
@@ -940,31 +932,21 @@ class RichText extends Component {
 			/>
 		);
 
-		const content = (
-			<Autocomplete
-				onReplace={ onReplace }
-				completers={ autocompleters }
-				record={ record }
-				onChange={ this.onChange }
-			>
-				{ autoCompleteContent }
-			</Autocomplete>
-		);
-
 		return (
 			<>
-				{ children && children( {
-					isSelected,
-					value: record,
-					onChange: this.onChange,
-				} ) }
 				{ isSelected && <FormatEdit
 					allowedFormats={ allowedFormats }
 					withoutInteractiveFormatting={ withoutInteractiveFormatting }
-					value={ record }
+					value={ this.record }
 					onChange={ this.onChange }
 				/> }
-				{ content }
+				{ children && children( {
+					isSelected,
+					value: this.record,
+					onChange: this.onChange,
+					children: Content,
+				} ) }
+				{ ! children && <Content /> }
 			</>
 		);
 	}
