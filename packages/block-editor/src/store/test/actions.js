@@ -17,6 +17,8 @@ import {
 	replaceInnerBlocks,
 	resetBlocks,
 	selectBlock,
+	addBlockToMultiSelection,
+	removeBlockFromMultiSelection,
 	selectPreviousBlock,
 	showInsertionPoint,
 	startMultiSelect,
@@ -81,8 +83,30 @@ describe( 'actions', () => {
 		} );
 	} );
 
+	describe( 'addBlockToMultiSelection', () => {
+		it( 'should return the ADD_BLOCK_TO_MULTI_SELECTION action', () => {
+			const clientId = 'myclientid';
+			const result = addBlockToMultiSelection( clientId );
+			expect( result ).toEqual( {
+				type: 'ADD_BLOCK_TO_MULTI_SELECTION',
+				clientId,
+			} );
+		} );
+	} );
+
+	describe( 'removeBlockFromMultiSelection', () => {
+		it( 'should return the REMOVE_BLOCK_FROM_MULTI_SELECTION action', () => {
+			const clientId = 'myclientid';
+			const result = removeBlockFromMultiSelection( clientId );
+			expect( result ).toEqual( {
+				type: 'REMOVE_BLOCK_FROM_MULTI_SELECTION',
+				clientId,
+			} );
+		} );
+	} );
+
 	describe( 'startMultiSelect', () => {
-		it( 'should return the START_MULTI_SELECT', () => {
+		it( 'should return the START_MULTI_SELECT action', () => {
 			expect( startMultiSelect() ).toEqual( {
 				type: 'START_MULTI_SELECT',
 			} );
@@ -90,20 +114,51 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'stopMultiSelect', () => {
-		it( 'should return the Stop_MULTI_SELECT', () => {
+		it( 'should return the STOP_MULTI_SELECT action', () => {
 			expect( stopMultiSelect() ).toEqual( {
 				type: 'STOP_MULTI_SELECT',
 			} );
 		} );
 	} );
 	describe( 'multiSelect', () => {
-		it( 'should return MULTI_SELECT action', () => {
+		it( 'should yield the MULTI_SELECT action', () => {
 			const start = 'start';
 			const end = 'end';
-			expect( multiSelect( start, end ) ).toEqual( {
-				type: 'MULTI_SELECT',
-				start,
-				end,
+
+			const multiSelectGenerator = multiSelect( start, end );
+			expect(
+				multiSelectGenerator.next( '' ).value
+			).toEqual( {
+				args: [ start ],
+				selectorName: 'getBlockRootClientId',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				multiSelectGenerator.next( [ start, end ] ).value
+			).toEqual( {
+				args: [ [ start, end ] ],
+				selectorName: 'getBlockOrder',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				multiSelectGenerator.next( [ start, end ] ),
+			).toEqual( {
+				done: false,
+				value: {
+					type: 'MULTI_SELECT',
+					clientIds: [ start, end ],
+				},
+			} );
+
+			expect(
+				multiSelectGenerator.next( [ start, end ] ),
+			).toEqual( {
+				done: true,
+				value: undefined,
 			} );
 		} );
 	} );

@@ -1797,6 +1797,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				start: { clientId: 'kumquat' },
 				end: { clientId: 'kumquat' },
+				clientIds: [ 'kumquat' ],
 				initialPosition: -1,
 				isMultiSelecting: false,
 				isEnabled: true,
@@ -1807,13 +1808,13 @@ describe( 'state', () => {
 			const original = deepFreeze( { isMultiSelecting: false } );
 			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
-				start: 'ribs',
-				end: 'chicken',
+				clientIds: [ 'ribs', 'chicken' ],
 			} );
 
 			expect( state ).toEqual( {
-				start: { clientId: 'ribs' },
-				end: { clientId: 'chicken' },
+				start: {},
+				end: {},
+				clientIds: [ 'ribs', 'chicken' ],
 				initialPosition: null,
 				isMultiSelecting: false,
 				isEnabled: true,
@@ -1824,13 +1825,13 @@ describe( 'state', () => {
 			const original = deepFreeze( { isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
-				start: 'ribs',
-				end: 'chicken',
+				clientIds: [ 'ribs', 'chicken' ],
 			} );
 
 			expect( state ).toEqual( {
-				start: { clientId: 'ribs' },
-				end: { clientId: 'chicken' },
+				start: {},
+				end: {},
+				clientIds: [ 'ribs', 'chicken' ],
 				initialPosition: null,
 				isMultiSelecting: true,
 				isEnabled: true,
@@ -1918,6 +1919,7 @@ describe( 'state', () => {
 			expect( state1 ).toEqual( {
 				start: {},
 				end: {},
+				clientIds: [],
 				initialPosition: null,
 				isMultiSelecting: false,
 				isEnabled: true,
@@ -1949,6 +1951,7 @@ describe( 'state', () => {
 			expect( state3 ).toEqual( {
 				start: { clientId: 'ribs' },
 				end: { clientId: 'ribs' },
+				clientIds: [ 'ribs' ],
 				initialPosition: null,
 				isMultiSelecting: false,
 				isEnabled: true,
@@ -1997,6 +2000,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				start: { clientId: 'wings' },
 				end: { clientId: 'wings' },
+				clientIds: [ 'wings' ],
 				initialPosition: null,
 				isEnabled: true,
 				isMultiSelecting: false,
@@ -2041,6 +2045,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				start: { clientId: 'wings' },
 				end: { clientId: 'wings' },
+				clientIds: [ 'wings' ],
 				initialPosition: null,
 				isMultiSelecting: false,
 				isEnabled: true,
@@ -2058,6 +2063,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				start: {},
 				end: {},
+				clientIds: [],
 				initialPosition: null,
 				isMultiSelecting: false,
 				isEnabled: true,
@@ -2093,6 +2099,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				start: {},
 				end: {},
+				clientIds: [],
 				initialPosition: null,
 				isMultiSelecting: false,
 				isEnabled: true,
@@ -2136,6 +2143,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				start: { clientId: 'another-block' },
 				end: { clientId: 'another-block' },
+				clientIds: [ 'another-block' ],
 				initialPosition: null,
 				isMultiSelecting: false,
 				isEnabled: true,

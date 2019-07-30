@@ -94,6 +94,7 @@ function BlockListBlock( {
 	onInsertBlocksAfter,
 	onMerge,
 	onSelect,
+	onMultiSelect,
 	onRemove,
 	onInsertDefaultBlockAfter,
 	toggleSelection,
@@ -322,6 +323,9 @@ function BlockListBlock( {
 				onShiftSelection();
 				event.preventDefault();
 			}
+		} else if ( event.ctrlKey || event.metaKey ) {
+			onMultiSelect();
+			event.preventDefault();
 
 		// Avoid triggering multi-selection if we click toolbars/inspectors
 		// and all elements that are outside the Block Edit DOM tree.
@@ -330,8 +334,8 @@ function BlockListBlock( {
 
 			// Allow user to escape out of a multi-selection to a singular
 			// selection of a block via click. This is handled here since
-			// onFocus excludes blocks involved in a multiselection, as
-			// focus can be incurred by starting a multiselection (focus
+			// onFocus excludes blocks involved in a multi-selection, as
+			// focus can be incurred by starting a multi-selection (focus
 			// moved to first block's multi-controls).
 			if ( isPartOfMultiSelection ) {
 				onSelect();
@@ -658,6 +662,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		updateBlockAttributes,
 		selectBlock,
 		multiSelect,
+		addBlockToMultiSelection,
+		removeBlockFromMultiSelection,
 		insertBlocks,
 		insertDefaultBlock,
 		removeBlock,
@@ -673,6 +679,13 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onSelect( clientId = ownProps.clientId, initialPosition ) {
 			selectBlock( clientId, initialPosition );
+		},
+		onMultiSelect( clientId = ownProps.clientId ) {
+			if ( ownProps.isPartOfMultiSelection ) {
+				removeBlockFromMultiSelection( clientId );
+			} else {
+				addBlockToMultiSelection( clientId );
+			}
 		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;

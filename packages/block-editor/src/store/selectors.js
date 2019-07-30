@@ -320,7 +320,7 @@ export function getSelectionEnd( state ) {
  * @return {?string} Client ID of block selection start.
  */
 export function getBlockSelectionStart( state ) {
-	return state.blockSelection.start.clientId;
+	return hasSelectedBlock( state ) ? state.blockSelection[ 0 ] : null;
 }
 
 /**
@@ -333,7 +333,8 @@ export function getBlockSelectionStart( state ) {
  * @return {?string} Client ID of block selection end.
  */
 export function getBlockSelectionEnd( state ) {
-	return state.blockSelection.end.clientId;
+	const { clientIds } = state.blockSelection;
+	return clientIds.length ? clientIds[ clientIds.length - 1 ] : null;
 }
 
 /**
@@ -344,13 +345,7 @@ export function getBlockSelectionEnd( state ) {
  * @return {number} Number of blocks selected in the post.
  */
 export function getSelectedBlockCount( state ) {
-	const multiSelectedBlockCount = getMultiSelectedBlockClientIds( state ).length;
-
-	if ( multiSelectedBlockCount ) {
-		return multiSelectedBlockCount;
-	}
-
-	return state.blockSelection.start.clientId ? 1 : 0;
+	return state.blockSelection.clientIds.length;
 }
 
 /**
@@ -361,8 +356,7 @@ export function getSelectedBlockCount( state ) {
  * @return {boolean} Whether a single block is selected.
  */
 export function hasSelectedBlock( state ) {
-	const { start, end } = state.blockSelection;
-	return !! start.clientId && start.clientId === end.clientId;
+	return state.blockSelection.clientIds.length === 1;
 }
 
 /**
@@ -544,38 +538,17 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
  */
 export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
-		const { start, end } = state.blockSelection;
+		const { clientIds } = state.blockSelection;
 
-		if ( start.clientId === undefined || end.clientId === undefined ) {
+		if ( clientIds.length === 0 ) {
 			return EMPTY_ARRAY;
 		}
 
-		if ( start.clientId === end.clientId ) {
-			return [ start.clientId ];
-		}
-
-		// Retrieve root client ID to aid in retrieving relevant nested block
-		// order, being careful to allow the falsey empty string top-level root
-		// by explicitly testing against null.
-		const rootClientId = getBlockRootClientId( state, start.clientId );
-		if ( rootClientId === null ) {
-			return EMPTY_ARRAY;
-		}
-
-		const blockOrder = getBlockOrder( state, rootClientId );
-		const startIndex = blockOrder.indexOf( start.clientId );
-		const endIndex = blockOrder.indexOf( end.clientId );
-
-		if ( startIndex > endIndex ) {
-			return blockOrder.slice( endIndex, startIndex + 1 );
-		}
-
-		return blockOrder.slice( startIndex, endIndex + 1 );
+		return clientIds;
 	},
 	( state ) => [
 		state.blocks.order,
-		state.blockSelection.start.clientId,
-		state.blockSelection.end.clientId,
+		state.blockSelection.clientIds,
 	],
 );
 
@@ -588,9 +561,9 @@ export const getSelectedBlockClientIds = createSelector(
  * @return {Array} Multi-selected block client IDs.
  */
 export function getMultiSelectedBlockClientIds( state ) {
-	const { start, end } = state.blockSelection;
+	const { clientIds } = state.blockSelection;
 
-	if ( start.clientId === end.clientId ) {
+	if ( clientIds.length <= 1 ) {
 		return EMPTY_ARRAY;
 	}
 
@@ -718,8 +691,7 @@ export const isAncestorMultiSelected = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
-		state.blockSelection.start.clientId,
-		state.blockSelection.end.clientId,
+		state.blockSelection.clientIds,
 	],
 );
 /**
@@ -735,11 +707,11 @@ export const isAncestorMultiSelected = createSelector(
  * @return {?string} Client ID of block beginning multi-selection.
  */
 export function getMultiSelectedBlocksStartClientId( state ) {
-	const { start, end } = state.blockSelection;
-	if ( start.clientId === end.clientId ) {
+	const { clientIds } = state.blockSelection;
+	if ( clientIds.length === 0 ) {
 		return null;
 	}
-	return start.clientId || null;
+	return clientIds[ 0 ];
 }
 
 /**
@@ -755,11 +727,11 @@ export function getMultiSelectedBlocksStartClientId( state ) {
  * @return {?string} Client ID of block ending multi-selection.
  */
 export function getMultiSelectedBlocksEndClientId( state ) {
-	const { start, end } = state.blockSelection;
-	if ( start.clientId === end.clientId ) {
+	const { clientIds } = state.blockSelection;
+	if ( clientIds.length === 0 ) {
 		return null;
 	}
-	return end.clientId || null;
+	return clientIds[ clientIds.length - 1 ];
 }
 
 /**
