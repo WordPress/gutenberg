@@ -163,12 +163,12 @@ describe( 'getFirstRow', () => {
 
 describe( 'getCellAttribute', () => {
 	it( 'should get the cell attribute', () => {
-		const state = getCellAttribute( tableWithAttribute, {
+		const cellLocation = {
 			sectionName: 'body',
 			rowIndex: 1,
 			columnIndex: 1,
-			attributeName: 'testAttr',
-		} );
+		};
+		const state = getCellAttribute( tableWithAttribute, cellLocation, 'testAttr' );
 
 		expect( state ).toBe( 'testVal' );
 	} );
@@ -368,6 +368,26 @@ describe( 'insertRow', () => {
 		};
 
 		expect( state ).toEqual( expected );
+	} );
+
+	it( 'should have no effect if `columnCount` is not provided and the table has no existing rows', () => {
+		const existingState = { body: {} };
+		const newState = insertRow( existingState, {
+			sectionName: 'body',
+			rowIndex: 0,
+		} );
+
+		expect( newState ).toBe( existingState );
+	} );
+
+	it( 'should have no effect if `columnCount` is `0`', () => {
+		const state = insertRow( tableWithHead, {
+			sectionName: 'head',
+			rowIndex: 1,
+			columnCount: 0,
+		} );
+
+		expect( state ).toBe( tableWithHead );
 	} );
 } );
 

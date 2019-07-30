@@ -49,20 +49,18 @@ export function getFirstRow( state ) {
 /**
  * Gets an attribute for a cell.
  *
- * @param {Object} state 			   	 Current table state.
- * @param {string} options.sectionName	 Section of the cell to update.
- * @param {number} options.rowIndex    	 Row index of the cell to update.
- * @param {number} options.columnIndex 	 Column index of the cell to update.
- * @param {number} options.attributeName The name of the attribute to get the value of.
+ * @param {Object} state 		 Current table state.
+ * @param {Object} cellLocation  The location of the cell
+ * @param {string} attributeName The name of the attribute to get the value of.
  *
  * @return {*} The attribute value.
  */
-export function getCellAttribute( state, {
-	sectionName,
-	rowIndex,
-	columnIndex,
-	attributeName,
-} ) {
+export function getCellAttribute( state, cellLocation, attributeName ) {
+	const {
+		sectionName,
+		rowIndex,
+		columnIndex,
+	} = cellLocation;
 	return get( state, [ sectionName, rowIndex, 'cells', columnIndex, attributeName ] );
 }
 
@@ -142,9 +140,9 @@ export function isCellSelected( cellLocation, selection ) {
 /**
  * Inserts a row in the table state.
  *
- * @param {Object} state                Current table state.
- * @param {string} options.sectionName  Section in which to insert the row.
- * @param {number} options.rowIndex     Row index at which to insert the row.
+ * @param {Object} state               Current table state.
+ * @param {string} options.sectionName Section in which to insert the row.
+ * @param {number} options.rowIndex    Row index at which to insert the row.
  *
  * @return {Object} New table state.
  */
@@ -154,7 +152,12 @@ export function insertRow( state, {
 	columnCount,
 } ) {
 	const firstRow = getFirstRow( state );
-	const cellCount = columnCount || get( firstRow, [ 'cells', 'length' ], 2 );
+	const cellCount = columnCount === undefined ? get( firstRow, [ 'cells', 'length' ] ) : columnCount;
+
+	// Bail early if the function cannot determine how many cells to add.
+	if ( ! cellCount ) {
+		return state;
+	}
 
 	return {
 		[ sectionName ]: [

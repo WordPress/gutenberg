@@ -229,7 +229,7 @@ export class TableEdit extends Component {
 
 		const { attributes } = this.props;
 
-		return getCellAttribute( attributes, { ...selectedCell, attributeName: 'align' } );
+		return getCellAttribute( attributes, selectedCell, 'align' );
 	}
 
 	/**
