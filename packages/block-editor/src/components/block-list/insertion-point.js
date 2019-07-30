@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useState, useCallback } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -45,8 +45,36 @@ function BlockInsertionPoint( { rootClientId, clientId } ) {
 		};
 	}, [ clientId, rootClientId ] );
 
+	const { selectBlock, selectPreviousBlock } = useDispatch( 'core/block-editor' );
+
+	const selectAdjacentBlock = useCallback( ( event ) => {
+		const { currentTarget } = event;
+		const targetRect = currentTarget.getBoundingClientRect();
+		const yPercent = ( event.clientY - targetRect.top ) / targetRect.height;
+
+		selectBlock( null );
+
+		const caretRect = new window.DOMRect( event.clientX, targetRect.top, 0, 28 );
+		if ( yPercent > 0.5 ) {
+			selectBlock( clientId, { caretRect } );
+		} else {
+			selectPreviousBlock( clientId, { isReverse: true, caretRect } );
+		}
+
+		// Prevent the `focus` event from firing, which would otherwise trigger
+		// the block's fallback focus handling selection.
+		event.preventDefault();
+	}, [ clientId ] );
+
+	// Disable reason: The mouse interaction is not an essential interaction,
+	// and merely serves as convenience redirect to select the adjacent block.
+
+	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div className="editor-block-list__insertion-point block-editor-block-list__insertion-point">
+		<div
+			onMouseDown={ selectAdjacentBlock }
+			className="editor-block-list__insertion-point block-editor-block-list__insertion-point"
+		>
 			{ showInsertionPoint && (
 				<div className="editor-block-list__insertion-point-indicator block-editor-block-list__insertion-point-indicator" />
 			) }
@@ -73,6 +101,7 @@ function BlockInsertionPoint( { rootClientId, clientId } ) {
 			</div>
 		</div>
 	);
+	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
 
 export default BlockInsertionPoint;
