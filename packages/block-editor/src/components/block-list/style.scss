@@ -849,11 +849,16 @@
 // This is the edge-to-edge hover area that contains the plus.
 .block-editor-block-list__block {
 	> .block-editor-block-list__insertion-point {
+		display: flex;
+		align-items: center;
+
+		cursor: text;
+
 		position: absolute;
 		top: -$block-padding - $block-spacing / 2;
 
 		// Matches the whole empty space between two blocks.
-		height: $block-padding * 2;
+		height: $block-padding * 2 + $block-spacing;
 		bottom: auto;
 
 		// Go edge to edge on mobile.
