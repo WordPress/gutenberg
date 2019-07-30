@@ -7,3 +7,9 @@
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
 }
+
+@mixin edit-post__inner-blocks-padding-animation($speed: 0.1s, $delay: 0s) {
+	animation: edit-post__inner-blocks-padding-animation $speed ease-out $delay;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+}
