@@ -22,12 +22,17 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
-import { withSpokenMessages, PanelBody } from '@wordpress/components';
+import {
+	PanelBody,
+	ToggleControl,
+	withSpokenMessages,
+} from '@wordpress/components';
 import {
 	getCategories,
 	isReusableBlock,
 	createBlock,
 	isUnmodifiedDefaultBlock,
+	getBlockType,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -39,6 +44,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
+import BlockCard from '../block-card';
 import ChildBlocks from './child-blocks';
 
 const MAX_SUGGESTED_ITEMS = 9;
@@ -102,9 +108,11 @@ export class InserterMenu extends Component {
 			reusableItems: [],
 			itemsPerCategory: {},
 			openPanels: [ 'suggested' ],
+			showHelpPanel: true,
 		};
 		this.onChangeSearchInput = this.onChangeSearchInput.bind( this );
 		this.onHover = this.onHover.bind( this );
+		this.onToggleHelpPanel = this.onToggleHelpPanel.bind( this );
 		this.panels = {};
 		this.inserterResults = createRef();
 	}
@@ -123,6 +131,12 @@ export class InserterMenu extends Component {
 
 	onChangeSearchInput( event ) {
 		this.filter( event.target.value );
+	}
+
+	onToggleHelpPanel() {
+		this.setState( ( state ) => ( {
+			showHelpPanel: ! state.showHelpPanel,
+		} ) );
 	}
 
 	onHover( item ) {
@@ -254,6 +268,7 @@ export class InserterMenu extends Component {
 			openPanels,
 			reusableItems,
 			suggestedItems,
+			showHelpPanel,
 		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 
@@ -349,15 +364,29 @@ export class InserterMenu extends Component {
 					) }
 				</div>
 
-				{ hoveredItem && isReusableBlock( hoveredItem ) &&
-					<div className="block-editor-inserter__preview">
-						<div className="block-editor-inserter__preview-title">{ __( 'Preview' ) }</div>
-						<BlockPreview
-							className="block-editor-inserter__preview-content"
-							blocks={ createBlock( hoveredItem.name, hoveredItem.initialAttributes ) }
-						/>
+				<div className="block-editor-inserter__menu-footer">
+					<ToggleControl
+						label={ __( 'Show Help' ) }
+						onChange={ this.onToggleHelpPanel }
+						checked={ showHelpPanel }
+					/>
+				</div>
+
+				{ showHelpPanel && hoveredItem && (
+					<div className="block-editor-inserter__menu-help-panel">
+						<BlockCard blockType={ getBlockType( hoveredItem.name ) } />
+						{
+							isReusableBlock( hoveredItem ) &&
+							<div className="block-editor-inserter__preview">
+								<div className="block-editor-inserter__preview-title">{ __( 'Preview' ) }</div>
+								<BlockPreview
+									className="block-editor-inserter__preview-content"
+									blocks={ createBlock( hoveredItem.name, hoveredItem.initialAttributes ) }
+								/>
+							</div>
+						}
 					</div>
-				}
+				) }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
