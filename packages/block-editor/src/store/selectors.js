@@ -320,7 +320,8 @@ export function getSelectionEnd( state ) {
  * @return {?string} Client ID of block selection start.
  */
 export function getBlockSelectionStart( state ) {
-	return hasSelectedBlock( state ) ? state.blockSelection[ 0 ] : null;
+	const { clientIds } = state.blockSelection;
+	return clientIds.length ? clientIds[ 0 ] : null;
 }
 
 /**
