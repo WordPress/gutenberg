@@ -352,7 +352,7 @@ export class InserterMenu extends Component {
 				</div>
 
 				{ hoveredItem && isReusableBlock( hoveredItem ) &&
-					<BlockPreview blocks={ cloneBlock( hoveredItem, { ...hoveredItem.initialAttributes } ) } />
+					<BlockPreview blocks={ cloneBlock( hoveredItem, hoveredItem.initialAttributes ) } />
 				}
 			</div>
 		);
