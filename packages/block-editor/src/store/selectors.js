@@ -27,6 +27,10 @@ import {
 	hasChildBlocksWithInserterSupport,
 } from '@wordpress/blocks';
 
+/**
+ * @typedef {import('./actions').WPBlockInitialPosition} WPBlockInitialPosition
+ */
+
 // Module constants
 
 /**
@@ -523,7 +527,7 @@ export function getNextBlockClientId( state, startClientId ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {?Object} Selected block.
+ * @return {?WPBlockInitialPosition} Initial position.
  */
 export function getSelectedBlocksInitialCaretPosition( state ) {
 	const { start, end } = state.blockSelection;
