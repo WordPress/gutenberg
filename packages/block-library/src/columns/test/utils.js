@@ -3,7 +3,7 @@
  */
 import {
 	toWidthPrecision,
-	getAdjacentBlocks,
+	getAdjacentBlock,
 	getEffectiveColumnWidth,
 	getTotalColumnsWidth,
 	getColumnWidths,
@@ -25,22 +25,22 @@ describe( 'toWidthPrecision', () => {
 	} );
 } );
 
-describe( 'getAdjacentBlocks', () => {
+describe( 'getAdjacentBlock', () => {
 	const blockA = { clientId: 'a' };
 	const blockB = { clientId: 'b' };
 	const blockC = { clientId: 'c' };
 	const blocks = [ blockA, blockB, blockC ];
 
-	it( 'should return blocks after clientId', () => {
-		const result = getAdjacentBlocks( blocks, 'b' );
+	it( 'should return block after clientId', () => {
+		const result = getAdjacentBlock( blocks, 'b' );
 
-		expect( result ).toEqual( [ blockC ] );
+		expect( result ).toBe( blockC );
 	} );
 
-	it( 'should return blocks before clientId if clientId is last', () => {
-		const result = getAdjacentBlocks( blocks, 'c' );
+	it( 'should return block before clientId if clientId is last', () => {
+		const result = getAdjacentBlock( blocks, 'c' );
 
-		expect( result ).toEqual( [ blockA, blockB ] );
+		expect( result ).toBe( blockB );
 	} );
 } );
 

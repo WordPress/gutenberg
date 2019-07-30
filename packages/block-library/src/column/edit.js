@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { forEach, find, difference } from 'lodash';
+import { forEach, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,10 +23,9 @@ import { __ } from '@wordpress/i18n';
  */
 import {
 	toWidthPrecision,
-	getTotalColumnsWidth,
 	getColumnWidths,
-	getAdjacentBlocks,
-	getRedistributedColumnWidths,
+	getAdjacentBlock,
+	getEffectiveColumnWidth,
 } from '../columns/utils';
 
 function ColumnEdit( {
@@ -116,18 +115,17 @@ export default compose(
 				// Constrain or expand siblings to account for gain or loss of
 				// total columns area.
 				const columns = getBlocks( getBlockRootClientId( clientId ) );
-				const adjacentColumns = getAdjacentBlocks( columns, clientId );
-
-				// The occupied width is calculated as the sum of the new width
-				// and the total width of blocks _not_ in the adjacent set.
-				const occupiedWidth =
-					width +
-					getTotalColumnsWidth(
-						difference( columns, [
-							find( columns, { clientId } ),
-							...adjacentColumns,
-						] )
-					);
+				const column = find( columns, { clientId } );
+				const adjacentColumn = getAdjacentBlock( columns, clientId );
+				const adjacentColumnWidth = getEffectiveColumnWidth(
+					adjacentColumn,
+					columns.length
+				);
+				const previousWidth = getEffectiveColumnWidth(
+					column,
+					columns.length
+				);
+				const difference = width - previousWidth;
 
 				// Compute _all_ next column widths, in case the updated column
 				// is in the middle of a set of columns which don't yet have
@@ -136,10 +134,8 @@ export default compose(
 				const nextColumnWidths = {
 					...getColumnWidths( columns, columns.length ),
 					[ clientId ]: toWidthPrecision( width ),
-					...getRedistributedColumnWidths(
-						adjacentColumns,
-						100 - occupiedWidth,
-						columns.length
+					[ adjacentColumn.clientId ]: toWidthPrecision(
+						adjacentColumnWidth - difference
 					),
 				};
 

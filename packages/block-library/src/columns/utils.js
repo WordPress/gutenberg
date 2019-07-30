@@ -23,13 +23,13 @@ export const toWidthPrecision = ( value ) =>
  * @param {WPBlock[]} blocks   Block objects.
  * @param {string}    clientId Client ID to consider for adjacent blocks.
  *
- * @return {WPBlock[]} Adjacent block objects.
+ * @return {WPBlock} Adjacent block object.
  */
-export function getAdjacentBlocks( blocks, clientId ) {
+export function getAdjacentBlock( blocks, clientId ) {
 	const index = findIndex( blocks, { clientId } );
 	const isLastBlock = index === blocks.length - 1;
 
-	return isLastBlock ? blocks.slice( 0, index ) : blocks.slice( index + 1 );
+	return isLastBlock ? blocks[ index - 1 ] : blocks[ index + 1 ];
 }
 
 /**
