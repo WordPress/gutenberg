@@ -374,7 +374,7 @@ class RichTextWrapper extends Component {
 				__unstableOnExitFormattedText={ onExitFormattedText }
 				__unstableOnCreateUndoLevel={ onCreateUndoLevel }
 			>
-				{ ( { isSelected, value, onChange, children } ) =>
+				{ ( { isSelected, value, onChange, Editable } ) =>
 					<>
 						{ isSelected && multilineTag === 'li' && (
 							<ListEdit
@@ -404,11 +404,11 @@ class RichTextWrapper extends Component {
 							onChange={ onChange }
 						>
 							{ ( { listBoxId, activeId } ) =>
-								children( {
-									'aria-autocomplete': listBoxId ? 'list' : undefined,
-									'aria-owns': listBoxId,
-									'aria-activedescendant': activeId,
-								} )
+								<Editable
+									aria-autocomplete={ listBoxId ? 'list' : undefined }
+									aria-owns={ listBoxId }
+									aria-activedescendant={ activeId }
+								/>
 							}
 						</Autocomplete>
 					</>
