@@ -411,10 +411,9 @@ function BlockListBlock( {
 	);
 
 	// Determine whether the block has props to apply to the wrapper.
-	let blockWrapperProps = wrapperProps;
 	if ( blockType.getEditWrapperProps ) {
-		blockWrapperProps = {
-			...blockWrapperProps,
+		wrapperProps = {
+			...wrapperProps,
 			...blockType.getEditWrapperProps( attributes ),
 		};
 	}
@@ -469,7 +468,7 @@ function BlockListBlock( {
 			aria-label={ blockLabel }
 			childHandledEvents={ [ 'onDragStart', 'onMouseDown' ] }
 			tagName={ animated.div }
-			{ ...blockWrapperProps }
+			{ ...wrapperProps }
 			style={
 				wrapperProps && wrapperProps.style ?
 					{
