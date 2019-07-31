@@ -1,5 +1,5 @@
-.editor-styles-wrapper .block-library-list ul,
-.editor-styles-wrapper .block-library-list ol {
+.editor-styles-wrapper .block-library-list ul:not([class*="has-text-align-"]),
+.editor-styles-wrapper .block-library-list ol:not([class*="has-text-align-"]) {
 	padding-left: 1.3em;
 	margin-left: 1.3em;
 }
