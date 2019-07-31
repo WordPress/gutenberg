@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "6.1.1",
+	"version": "6.2.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -95,7 +95,6 @@
 		"commander": "2.20.0",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "4.5.2",
-		"core-js": "3.0.1",
 		"cross-env": "3.2.4",
 		"cssnano": "4.1.10",
 		"deep-freeze": "0.0.1",
@@ -188,7 +187,7 @@
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
-		"docs:build": "node ./docs/tool && node ./bin/update-readmes",
+		"docs:build": "node ./docs/tool/index.js && node ./bin/update-readmes.js",
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:server-registered": "docker-compose run -w /var/www/html/wp-content/plugins/gutenberg --rm wordpress ./bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
@@ -233,10 +232,10 @@
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
-			"node ./docs/tool"
+			"node ./docs/tool/index.js"
 		],
 		"packages/**/*.js": [
-			"node ./bin/update-readmes"
+			"node ./bin/update-readmes.js"
 		]
 	}
 }

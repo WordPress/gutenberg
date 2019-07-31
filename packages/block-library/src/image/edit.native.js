@@ -270,6 +270,12 @@ class ImageEdit extends React.Component {
 			);
 		}
 
+		// We still want to render the caption so that the soft keyboard is not forced to close on Android
+		const shouldCaptionDisplay = () => {
+			const isCaptionEmpty = RichText.isEmpty( caption ) > 0;
+			return ! isCaptionEmpty || isSelected;
+		};
+
 		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
@@ -338,39 +344,38 @@ class ImageEdit extends React.Component {
 							);
 						} }
 					/>
-					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-						<View style={ { padding: 12, flex: 1 } }
-							accessible={ true }
-							accessibilityLabel={
-								isEmpty( caption ) ?
-									/* translators: accessibility text. Empty image caption. */
-									__( 'Image caption. Empty' ) :
-									sprintf(
-										/* translators: accessibility text. %s: image caption. */
-										__( 'Image caption. %s' ),
-										caption
-									)
-							}
-							accessibilityRole={ 'button' }
-						>
-							<RichText
-								setRef={ ( ref ) => {
-									this._caption = ref;
-								} }
-								rootTagsToEliminate={ [ 'p' ] }
-								placeholder={ __( 'Write caption…' ) }
-								value={ caption }
-								onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-								unstableOnFocus={ this.onFocusCaption }
-								onBlur={ this.props.onBlur } // always assign onBlur as props
-								isSelected={ this.state.isCaptionSelected }
-								__unstableMobileNoFocusOnMount
-								fontSize={ 14 }
-								underlineColorAndroid="transparent"
-								textAlign={ 'center' }
-							/>
-						</View>
-					) }
+					<View style={ { padding: 12, flex: 1, display: shouldCaptionDisplay() ? 'flex' : 'none' } }
+						accessible={ true }
+						accessibilityLabel={
+							isEmpty( caption ) ?
+							/* translators: accessibility text. Empty image caption. */
+								__( 'Image caption. Empty' ) :
+								sprintf(
+									/* translators: accessibility text. %s: image caption. */
+									__( 'Image caption. %s' ),
+									caption
+								)
+						}
+						accessibilityRole={ 'button' }
+					>
+						<RichText
+							setRef={ ( ref ) => {
+								this._caption = ref;
+							} }
+							rootTagsToEliminate={ [ 'p' ] }
+							placeholder={ __( 'Write caption…' ) }
+							value={ caption }
+							onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+							unstableOnFocus={ this.onFocusCaption }
+							onBlur={ this.props.onBlur } // always assign onBlur as props
+							isSelected={ this.state.isCaptionSelected }
+							__unstableMobileNoFocusOnMount
+							fontSize={ 14 }
+							underlineColorAndroid="transparent"
+							textAlign={ 'center' }
+							tagName={ '' }
+						/>
+					</View>
 				</View>
 			</TouchableWithoutFeedback>
 		);

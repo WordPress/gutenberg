@@ -35,7 +35,7 @@ const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
 
 	let isRemoveButton = false;
 
-	let numButtons = await page.$$eval( '.block-editor-block-toolbar button', ( btns ) => btns.length );
+	let numButtons = await page.$$eval( '.block-editor-block-settings-menu__content button', ( btns ) => btns.length );
 
 	// Limit by the number of buttons available
 	while ( --numButtons ) {
