@@ -2,6 +2,7 @@
 	padding: $block-padding;
 	font-family: $editor-font;
 	overflow: hidden;
+	width: 100%;
 
 	// Resetting the block editor paddings and margins
 	.block-editor-block-list__layout,
