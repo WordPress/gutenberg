@@ -4,6 +4,7 @@
 
 import { castArray } from 'lodash';
 import classnames from 'classnames';
+import root from 'react-shadow';
 
 /**
  * WordPress dependencies
@@ -20,9 +21,9 @@ import BlockList from '../block-list';
 
 const ScaledPreview = forwardRef( ( props, ref ) => {
 	return (
-		<div className="special-wrapper-element" ref={ ref }>
+		<root.div className="special-wrapper-element" ref={ ref }>
 			<BlockList />
-		</div>
+		</root.div>
 	);
 } );
 

@@ -61,7 +61,8 @@
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"react-shadow": "17.1.2"
 	},
 	"devDependencies": {
 		"@babel/core": "7.4.4",
