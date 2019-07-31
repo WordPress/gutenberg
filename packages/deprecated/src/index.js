@@ -46,7 +46,7 @@ export default function deprecated( feature, options = {} ) {
 	} = options;
 
 	const pluginMessage = plugin ? ` from ${ plugin }` : '';
-	const versionMessage = version ? ` and will be removed${ pluginMessage } in ${ version }` : '';
+	const versionMessage = version ? ` and will be removed${ pluginMessage } in version ${ version }` : '';
 	const useInsteadMessage = alternative ? ` Please use ${ alternative } instead.` : '';
 	const linkMessage = link ? ` See: ${ link }` : '';
 	const hintMessage = hint ? ` Note: ${ hint }` : '';
@@ -71,13 +71,8 @@ export default function deprecated( feature, options = {} ) {
 	 */
 	doAction( 'deprecated', feature, options, message );
 
-	if ( version ) {
-		// eslint-disable-next-line no-console
-		console.warn( message );
-	} else {
-		// eslint-disable-next-line no-console
-		console.info( message );
-	}
+	// eslint-disable-next-line no-console
+	console.warn( message );
 
 	logged[ message ] = true;
 }

@@ -1,8 +1,8 @@
 ## Master
 
-### Breaking Change
+### Bug Fix
 
-- When there is no `options.version` param provided `deprecated` method outputs an informational message to the Web Console rather than warns as previously.
+- When there is no `options.version` param provided `deprecated` method warns with more relaxed tone.
 
 ## 2.0.4 (2019-01-03)
 

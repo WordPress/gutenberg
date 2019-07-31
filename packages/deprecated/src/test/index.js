@@ -18,7 +18,7 @@ describe( 'deprecated', () => {
 	it( 'should show a deprecation warning', () => {
 		deprecated( 'Eating meat' );
 
-		expect( console ).toHaveInformedWith(
+		expect( console ).toHaveWarnedWith(
 			'Eating meat is deprecated.'
 		);
 	} );
@@ -27,7 +27,7 @@ describe( 'deprecated', () => {
 		deprecated( 'Eating meat', { version: 'the future' } );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed in the future.'
+			'Eating meat is deprecated and will be removed in version the future.'
 		);
 	} );
 
@@ -35,7 +35,7 @@ describe( 'deprecated', () => {
 		deprecated( 'Eating meat', { version: 'the future', alternative: 'vegetables' } );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed in the future. Please use vegetables instead.'
+			'Eating meat is deprecated and will be removed in version the future. Please use vegetables instead.'
 		);
 	} );
 
@@ -47,7 +47,7 @@ describe( 'deprecated', () => {
 		} );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead.'
+			'Eating meat is deprecated and will be removed from the earth in version the future. Please use vegetables instead.'
 		);
 	} );
 
@@ -60,7 +60,7 @@ describe( 'deprecated', () => {
 		} );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead. See: https://en.wikipedia.org/wiki/Vegetarianism'
+			'Eating meat is deprecated and will be removed from the earth in version the future. Please use vegetables instead. See: https://en.wikipedia.org/wiki/Vegetarianism'
 		);
 	} );
 
@@ -73,7 +73,7 @@ describe( 'deprecated', () => {
 		} );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
+			'Eating meat is deprecated and will be removed from the earth in version the future. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
 		);
 	} );
 
@@ -81,15 +81,15 @@ describe( 'deprecated', () => {
 		deprecated( 'Eating meat' );
 		deprecated( 'Eating meat' );
 
-		expect( console ).toHaveInformed();
+		expect( console ).toHaveWarned();
 		// eslint-disable-next-line no-console
-		expect( console.info ).toHaveBeenCalledTimes( 1 );
+		expect( console.warn ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should do an action', () => {
 		deprecated( 'turkey', { alternative: 'tofurky' } );
 
-		expect( console ).toHaveInformed();
+		expect( console ).toHaveWarned();
 		expect( didAction( 'deprecated' ) ).toBeTruthy();
 	} );
 } );
