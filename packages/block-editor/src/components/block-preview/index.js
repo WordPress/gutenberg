@@ -23,7 +23,7 @@ import BlockList from '../block-list';
  *
  * @return {WPElement} Rendered element.
  */
-function BlockPreview( { blocks, settings, className, isScaled } ) {
+export function BlockPreview( { blocks, settings, className, isScaled } ) {
 	if ( ! blocks ) {
 		return null;
 	}
