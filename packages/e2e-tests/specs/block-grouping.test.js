@@ -78,7 +78,7 @@ describe( 'Block Grouping', () => {
 
 			await clickBlockToolbarButton( 'More options' );
 
-			const groupButton = await page.waitForXPath( '//button[text()="Group"]' );
+			const groupButton = await page.waitForXPath( '//button[text()="Create a Group Block"]' );
 			await groupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -92,14 +92,14 @@ describe( 'Block Grouping', () => {
 
 			// Group
 			await clickBlockToolbarButton( 'More options' );
-			const groupButton = await page.waitForXPath( '//button[text()="Group"]' );
+			const groupButton = await page.waitForXPath( '//button[text()="Create a Group Block"]' );
 			await groupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
 			// UnGroup
 			await clickBlockToolbarButton( 'More options' );
-			const unGroupButton = await page.waitForXPath( '//button[text()="Ungroup"]' );
+			const unGroupButton = await page.waitForXPath( '//button[text()="Ungroup Blocks"]' );
 			await unGroupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -108,7 +108,7 @@ describe( 'Block Grouping', () => {
 		it( 'does not allow ungrouping a group block that has no children', async () => {
 			await insertBlock( 'Group' );
 			await clickBlockToolbarButton( 'More options' );
-			const ungroupButtons = await page.$x( '//button[text()="Ungroup"]' );
+			const ungroupButtons = await page.$x( '//button[text()="Ungroup Blocks"]' );
 			expect( ungroupButtons ).toHaveLength( 0 );
 		} );
 	} );
@@ -148,7 +148,7 @@ describe( 'Block Grouping', () => {
 
 			const blockOptionsDropdownHTML = await page.evaluate( () => document.querySelector( '.block-editor-block-settings-menu__content' ).innerHTML );
 
-			expect( blockOptionsDropdownHTML ).not.toContain( 'Group' );
+			expect( blockOptionsDropdownHTML ).not.toContain( 'Create a Group Block' );
 		} );
 	} );
 
@@ -211,7 +211,7 @@ describe( 'Block Grouping', () => {
 			// as opposed to "transformTo()" which uses whatever is passed to it. To
 			// ensure this test is meaningful we must rely on what is registered.
 			await clickBlockToolbarButton( 'More options' );
-			const groupButton = await page.waitForXPath( '//button[text()="Group"]' );
+			const groupButton = await page.waitForXPath( '//button[text()="Create a Group Block"]' );
 			await groupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
