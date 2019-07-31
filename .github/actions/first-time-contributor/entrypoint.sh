@@ -6,7 +6,7 @@ author=$(jq -r '.pull_request.user.login' $GITHUB_EVENT_PATH)
 pr_number=$(jq -r '.number' $GITHUB_EVENT_PATH)
 
 if [ "$pr_number" = "null" ] || [ "$author" = "null" ]; then
-    echo "Could not find PR number or author. $pr_number / $author"
+	echo "Could not find PR number or author. $pr_number / $author"
 	exit 78
 fi
 
