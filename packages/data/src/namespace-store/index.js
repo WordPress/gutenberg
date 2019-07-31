@@ -148,12 +148,10 @@ function createReduxStore( key, options, registry ) {
 /**
  * Maps selectors to a store.
  *
- * @param {Object}         selectors Selectors to register. Keys will be used as
- *                                   the public facing API. Selectors will get
- *                                   passed the state as first argument.
- * @param {Object}         store     The store to which the selectors should be
- *                                   mapped.
- * @param {WPDataRegistry} registry  Registry reference.
+ * @param {Object} selectors Selectors to register. Keys will be used as the
+ *                           public facing API. Selectors will get passed the
+ *                           state as first argument.
+ * @param {Object} store     The store to which the selectors should be mapped.
  *
  * @return {Object} Selectors mapped to the provided store.
  */
