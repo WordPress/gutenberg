@@ -203,7 +203,43 @@ describe( 'Table', () => {
 		await page.keyboard.type( 'Right aligned' );
 		await changeCellAlignment( 'right' );
 
-		// Expect the post to have the correct written content inside the table.
+		// Expect the post to have the correct alignment classes inside the table.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	// Testing for regressions of https://github.com/WordPress/gutenberg/issues/14904.
+	it( 'allows cells to be selected when the cell area outside of the RichText is clicked', async () => {
+		await insertBlock( 'Table' );
+
+		// Create the table.
+		const createButton = await page.$x( createButtonSelector );
+		await createButton[ 0 ].click();
+
+		// Enable fixed width as it exascerbates the amount of empty space around the RichText.
+		const fixedWidthSwitch = await page.$x( "//label[text()='Fixed width table cells']" );
+		await fixedWidthSwitch[ 0 ].click();
+
+		// Add lots of text to the first cell.
+		await page.click( '.wp-block-table__cell-content' );
+		await page.keyboard.type(
+			`Some long text that will wrap onto multiple lines.`
+		);
+
+		// Get the bounding client rect for the second cell.
+		const { x: secondCellX, y: secondCellY } = await page.evaluate( () => {
+			const secondCell = document.querySelectorAll( '.wp-block-table td' )[ 1 ];
+			// Page.evaluate can only return a non-serializable value to the
+			// parent process, so destructure and restructure the result
+			// into an object.
+			const { x, y } = secondCell.getBoundingClientRect();
+			return { x, y };
+		} );
+
+		// Click in the top left corner of the second cell and type some text.
+		await page.mouse.click( secondCellX, secondCellY );
+		await page.keyboard.type( 'This content is in the second cell.' );
+
+		// Expect that the snapshot shows the text in the second cell.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
