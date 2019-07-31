@@ -28,7 +28,6 @@ import {
 	isReusableBlock,
 	createBlock,
 	isUnmodifiedDefaultBlock,
-	cloneBlock,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -352,7 +351,7 @@ export class InserterMenu extends Component {
 				</div>
 
 				{ hoveredItem && isReusableBlock( hoveredItem ) &&
-					<BlockPreview blocks={ cloneBlock( hoveredItem, hoveredItem.initialAttributes ) } />
+					<BlockPreview blocks={ createBlock( hoveredItem.name, hoveredItem.initialAttributes ) } />
 				}
 			</div>
 		);
