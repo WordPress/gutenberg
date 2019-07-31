@@ -16,12 +16,12 @@ import { isEmpty } from 'lodash';
  */
 import {
 	BottomSheet,
-	Caption,
 	Icon,
 	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
 import {
+	Caption,
 	MediaPlaceholder,
 	MediaUpload,
 	MEDIA_TYPE_IMAGE,
