@@ -104,7 +104,7 @@ class FormTokenField extends Component {
 
 	onBlur() {
 		if ( this.inputHasValidValue() ) {
-			this.setState( { isActive: false } );
+			this.setState( { isActive: false }, this.addCurrentToken );
 		} else {
 			this.setState( initialState );
 		}
