@@ -32,12 +32,14 @@ export class InserterMenu extends Component {
 				},
 			} );
 		} );
+		this.onOpen();
 	}
 
 	componentWillUnmount() {
 		if ( this.subscriptionParentMediaAppend ) {
 			this.subscriptionParentMediaAppend.remove();
 		}
+		this.onClose();
 	}
 
 	calculateNumberOfColumns() {
@@ -50,15 +52,6 @@ export class InserterMenu extends Component {
 		return Math.floor( containerTotalWidth / itemTotalWidth );
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( ! prevProps.isOpen && this.props.isOpen ) {
-			this.onOpen();
-		}
-		if ( prevProps.isOpen && ! this.props.isOpen ) {
-			this.onClose();
-		}
-	}
-
 	onOpen() {
 		this.props.showInsertionPoint();
 	}
@@ -68,13 +61,12 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { isOpen } = this.props;
 		const numberOfColumns = this.calculateNumberOfColumns();
 		const bottomPadding = styles.contentBottomPadding;
 
 		return (
 			<BottomSheet
-				isVisible={ isOpen }
+				isVisible={ true }
 				onClose={ this.props.onDismiss }
 				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader

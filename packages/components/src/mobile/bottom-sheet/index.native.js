@@ -125,7 +125,7 @@ class BottomSheet extends Component {
 				animationIn={ animationIn }
 				animationInTiming={ 600 }
 				animationOut={ animationOut }
-				animationOutTiming={ 1 }
+				animationOutTiming={ 250 }
 				backdropTransitionInTiming={ 50 }
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 0.2 }

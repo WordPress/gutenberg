@@ -53,7 +53,7 @@ class Dropdown extends Component {
 		return (
 			<>
 				{ renderToggle( args ) }
-				{ renderContent( args ) }
+				{ isOpen && renderContent( args ) }
 			</>
 		);
 	}
