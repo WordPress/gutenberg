@@ -1,8 +1,12 @@
 /**
+ * External dependencies
+ */
+import { castArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -28,12 +32,15 @@ function BlockPreview( props ) {
 	);
 }
 
-export function BlockPreviewContent( { name, attributes, innerBlocks, settings } ) {
-	const block = createBlock( name, attributes, innerBlocks );
+export function BlockPreviewContent( { blocks, settings } ) {
+	if ( ! blocks ) {
+		return null;
+	}
+
 	return (
 		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
 			<BlockEditorProvider
-				value={ [ block ] }
+				value={ castArray( blocks ) }
 				settings={ settings }
 			>
 				<BlockList />
