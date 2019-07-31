@@ -255,6 +255,7 @@ export function toTree( {
 					type: 'span',
 					attributes: {
 						'data-rich-text-placeholder': placeholder,
+						contenteditable: 'false',
 					},
 				} );
 			}
