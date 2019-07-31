@@ -91,13 +91,6 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 	const clientId = uuid();
 
-	// Check for innerBlocks on block before attempting
-	// to map them. There are edge cases where they can
-	// be `undefined`
-	if ( ! newInnerBlocks && block.innerBlocks ) {
-		newInnerBlocks = block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) );
-	}
-
 	return {
 		...block,
 		clientId,
@@ -105,7 +98,8 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 			...block.attributes,
 			...mergeAttributes,
 		},
-		innerBlocks: newInnerBlocks,
+		innerBlocks: newInnerBlocks ||
+			block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) ),
 	};
 }
 
