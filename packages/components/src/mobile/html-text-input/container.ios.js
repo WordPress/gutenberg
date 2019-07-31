@@ -35,7 +35,7 @@ class HTMLInputContainer extends Component {
 	render() {
 		return (
 			<KeyboardAvoidingView
-				style={ styles.keyboardAvoidingView }
+				style={ styles.container }
 				{ ...this.panResponder.panHandlers }
 				parentHeight={ this.props.parentHeight }
 			>
