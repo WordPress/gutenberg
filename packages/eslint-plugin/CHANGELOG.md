@@ -1,3 +1,9 @@
+## Master
+
+### Breaking Changes
+
+- The [`@wordpress/no-unused-vars-before-return` rule](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) has been improved to exempt object destructuring only if destructuring to more than one property.
+
 ## 2.4.0 (2019-08-05)
 
 ### New Features
