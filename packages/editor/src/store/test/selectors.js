@@ -44,7 +44,7 @@ const {
 	isCurrentPostScheduled,
 	isEditedPostPublishable,
 	isEditedPostSaveable,
-	isEditedPostAutosaveable: isEditedPostAutosaveableRegistrySelector,
+	isEditedPostAutosaveable: _isEditedPostAutosaveableRegistrySelector,
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
 	isEditedPostDateFloating,
@@ -71,9 +71,14 @@ const {
 
 describe( 'selectors', () => {
 	let cachedSelectors;
+	let isEditedPostAutosaveableRegistrySelector;
 
 	beforeAll( () => {
 		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
+		isEditedPostAutosaveableRegistrySelector = ( select ) => {
+			_isEditedPostAutosaveableRegistrySelector.registry = { select };
+			return _isEditedPostAutosaveableRegistrySelector;
+		};
 	} );
 
 	beforeEach( () => {

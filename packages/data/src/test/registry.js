@@ -464,6 +464,38 @@ describe( 'createRegistry', () => {
 
 			expect( registry.select( 'reducer2' ).selector2() ).toEqual( 'result1' );
 		} );
+
+		it( 'should run the registry selector from a non-registry selector', () => {
+			const selector1 = () => 'result1';
+			const selector2 = createRegistrySelector( ( select ) => () =>
+				select( 'reducer1' ).selector1()
+			);
+			const selector3 = () => selector2();
+			registry.registerStore( 'reducer1', {
+				reducer: () => 'state1',
+				selectors: {
+					selector1,
+				},
+			} );
+			registry.registerStore( 'reducer2', {
+				reducer: () => 'state1',
+				selectors: {
+					selector2,
+					selector3,
+				},
+			} );
+
+			expect( registry.select( 'reducer2' ).selector3() ).toEqual( 'result1' );
+		} );
+
+		it( 'gracefully stubs select on selector calls', () => {
+			const selector = createRegistrySelector( ( select ) => () => select );
+
+			const maybeSelect = selector();
+
+			expect( maybeSelect ).toEqual( expect.any( Function ) );
+			expect( maybeSelect() ).toEqual( expect.any( Object ) );
+		} );
 	} );
 
 	describe( 'subscribe', () => {
