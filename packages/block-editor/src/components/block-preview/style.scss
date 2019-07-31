@@ -27,6 +27,11 @@
 
 // These rules ensure the preview scales smoothly regardless of the container size.
 .editor-block-preview__container {
+	.special-wrapper-element::shadow .editor-block-list__layout {
+		border: 1px solid $dark-gray-300;
+		box-shadow: 2px 2px 5px $dark-gray-300;
+	}
+
 	// In the component, a top padding is provided as an inline style to provid an aspect-ratio.
 	// This positioning enables the content to sit on top of that padding to fit.
 	position: relative;
