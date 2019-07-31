@@ -1,24 +1,18 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import {
-	ExternalLink,
 	IconButton,
 	Popover,
 } from '@wordpress/components';
-import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import URLInput from '../url-input';
+import LinkViewer from './link-viewer';
+import LinkEditor from './link-editor';
 
 class URLPopover extends Component {
 	constructor() {
@@ -91,75 +85,9 @@ class URLPopover extends Component {
 	}
 }
 
-const LinkEditor = ( {
-	autocompleteRef,
-	className,
-	onChangeInputValue,
-	value,
-	...props
-} ) => (
-	<form
-		className={ classnames(
-			'block-editor-url-popover__link-editor',
-			className
-		) }
-		{ ...props }
-	>
-		<URLInput
-			value={ value }
-			onChange={ onChangeInputValue }
-			autocompleteRef={ autocompleteRef }
-		/>
-		<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+URLPopover.LinkEditor = LinkEditor;
 
-	</form>
-);
-
-URLPopover.__experimentalLinkEditor = LinkEditor;
-
-const LinkViewerUrl = ( { url, urlLabel, className } ) => {
-	const linkClassName = classnames(
-		className,
-		'block-editor-url-popover__link-viewer-url'
-	);
-
-	if ( ! url ) {
-		return <span className={ linkClassName }></span>;
-	}
-
-	return (
-		<ExternalLink
-			className={ linkClassName }
-			href={ url }
-		>
-			{ urlLabel || filterURLForDisplay( safeDecodeURI( url ) ) }
-		</ExternalLink>
-	);
-};
-
-const LinkViewer = ( {
-	className,
-	url,
-	urlLabel,
-	editLink,
-	linkClassName,
-	...props
-} ) => {
-	return (
-		<div
-			className={ classnames(
-				'block-editor-url-popover__link-viewer',
-				className
-			) }
-			{ ...props }
-		>
-			<LinkViewerUrl url={ url } urlLabel={ urlLabel } className={ linkClassName } />
-			<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
-		</div>
-	);
-};
-
-URLPopover.__experimentalLinkViewer = LinkViewer;
+URLPopover.LinkViewer = LinkViewer;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md
