@@ -108,7 +108,7 @@ class Layout extends Component {
 			<SafeAreaView style={ styles.container } onLayout={ this.onRootViewLayout }>
 				{ mode === 'text' ? this.renderHTML() : this.renderVisual() }
 				<SafeAreaView>
-					<View style={ { height: 44 } } />
+					<View style={ { height: styles.toolbarKeyboardAvoidingView.height } } />
 				</SafeAreaView>
 				<KeyboardAvoidingView
 					style={ styles.toolbarKeyboardAvoidingView }
