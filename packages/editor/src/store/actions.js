@@ -195,7 +195,7 @@ export function* setupEditor( post, edits, template ) {
 		edits,
 		template,
 	};
-	yield resetEditorBlocks( blocks, { validate: true } );
+	yield resetEditorBlocks( blocks, { validate: ! isNewPost } );
 	yield setupEditorState( post );
 	yield* __experimentalSubscribeSources();
 }
