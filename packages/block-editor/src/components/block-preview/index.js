@@ -89,16 +89,28 @@ export function BlockPreviewContent( { blocks, settings, srcWidth = 400, srcHeig
 
 		if ( allowZoom && blocksRef && blocksRef.current ) {
 			timeout = setTimeout( () => {
-				let targetElements = Array.from( blocksRef.current.querySelectorAll( '[data-block] > div > div > *' ) );
+				let targetElements = Array.from( blocksRef.current.querySelectorAll( '[data-block] *' ) );
 
 				if ( ! targetElements ) {
 					return;
 				}
 
-				targetElements = targetElements.filter( ( el ) => ! el.classList.contains( 'components-base-control' ) );
+				targetElements = targetElements.filter( ( el ) => {
+					return Array.from( el.classList ).filter( ( theClass ) => theClass.includes( 'wp-block-' ) ).length;
+				} );
 
 				const largestBlockElWidth = targetElements.reduce( ( largestWidth, currrentEl ) => {
-					const elWidth = currrentEl.offsetWidth;
+					// const elWidth = currrentEl.offsetWidth;
+					let elWidth = 0;
+					const computed = window.getComputedStyle( currrentEl );
+
+					elWidth += parseFloat( computed.width );
+					elWidth += parseFloat( computed.paddingLeft );
+					elWidth += parseFloat( computed.paddingRight );
+					elWidth += parseFloat( computed.marginLeft );
+					elWidth += parseFloat( computed.marginRight );
+					elWidth += parseFloat( computed.borderLeftWidth );
+					elWidth += parseFloat( computed.borderRightWidth );
 
 					largestWidth = ( elWidth > largestWidth ) ? elWidth : largestWidth;
 
