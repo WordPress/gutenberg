@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { capitalize } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -9,6 +14,17 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const createButtonSelector = "//div[@data-type='core/table']//button[text()='Create Table']";
+
+/**
+ * Utility function for changing the selected cell alignment.
+ *
+ * @param {string} align The alignment (one of 'left', 'center', or 'right').
+ */
+async function changeCellAlignment( align ) {
+	await clickBlockToolbarButton( 'Change column alignment' );
+	const alignButton = await page.$x( `//button[text()='Align Column ${ capitalize( align ) }']` );
+	await alignButton[ 0 ].click();
+}
 
 describe( 'Table', () => {
 	beforeEach( async () => {
@@ -29,22 +45,22 @@ describe( 'Table', () => {
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '5' );
 
-		// // Check for existence of the row count field.
+		// Check for existence of the row count field.
 		const rowCountLabel = await page.$x( "//div[@data-type='core/table']//label[text()='Row Count']" );
 		expect( rowCountLabel ).toHaveLength( 1 );
 
-		// // Modify the row count.
+		// Modify the row count.
 		await rowCountLabel[ 0 ].click();
 		const currentRowCount = await page.evaluate( () => document.activeElement.value );
 		expect( currentRowCount ).toBe( '2' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '10' );
 
-		// // Create the table.
+		// Create the table.
 		const createButton = await page.$x( createButtonSelector );
 		await createButton[ 0 ].click();
 
-		// // Expect the post content to have a correctly sized table.
+		// Expect the post content to have a correctly sized table.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -152,6 +168,42 @@ describe( 'Table', () => {
 		await deleteColumnButton[ 0 ].click();
 
 		// Expect the table to have 2 columns across the header, body and footer.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'allows columns to be aligned', async () => {
+		await insertBlock( 'Table' );
+
+		const [ columnCountLabel ] = await page.$x( "//div[@data-type='core/table']//label[text()='Column Count']" );
+		await columnCountLabel.click();
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '4' );
+
+		// Create the table.
+		const [ createButton ] = await page.$x( createButtonSelector );
+		await createButton.click();
+
+		// Click the first cell and add some text. Don't align.
+		const cells = await page.$$( '.wp-block-table__cell-content' );
+		await cells[ 0 ].click();
+		await page.keyboard.type( 'None' );
+
+		// Click to the next cell and add some text. Align left.
+		await cells[ 1 ].click();
+		await page.keyboard.type( 'To the left' );
+		await changeCellAlignment( 'left' );
+
+		// Click the next cell and add some text. Align center.
+		await cells[ 2 ].click();
+		await page.keyboard.type( 'Centered' );
+		await changeCellAlignment( 'center' );
+
+		// Tab to the next cell and add some text. Align right.
+		await cells[ 3 ].click();
+		await page.keyboard.type( 'Right aligned' );
+		await changeCellAlignment( 'right' );
+
+		// Expect the post to have the correct written content inside the table.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
