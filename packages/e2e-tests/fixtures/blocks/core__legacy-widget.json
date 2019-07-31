@@ -1,10 +1,14 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/legacy-widget",
+        "name": "core/missing",
         "isValid": true,
-        "attributes": {},
+        "attributes": {
+            "originalName": "core/legacy-widget",
+            "originalUndelimitedContent": "",
+            "originalContent": "<!-- wp:legacy-widget /-->"
+        },
         "innerBlocks": [],
-        "originalContent": ""
+        "originalContent": "<!-- wp:legacy-widget /-->"
     }
 ]

@@ -65,8 +65,9 @@ export function reinitializeEditor( postType, postId, target, settings, initialE
 export function initializeEditor( id, postType, postId, settings, initialEdits ) {
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, initialEdits );
-
-	registerCoreBlocks();
+	const enableLegacyWidgets = settings.__experimentalEnableLegacyWidgetBlock;
+	const enableMenu = settings.__experimentalEnableMenuBlock;
+	registerCoreBlocks( enableLegacyWidgets, enableMenu );
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode = document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks';

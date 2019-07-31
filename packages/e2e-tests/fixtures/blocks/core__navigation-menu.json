@@ -1,26 +1,27 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/navigation-menu",
+        "name": "core/missing",
         "isValid": true,
         "attributes": {
-            "automaticallyAdd": false
+            "originalName": "core/navigation-menu",
+            "originalUndelimitedContent": "<nav class=\"wp-block-navigation-menu\">\n\t\n<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>\n</nav>",
+            "originalContent": "<!-- wp:navigation-menu -->\n<nav class=\"wp-block-navigation-menu\">\n\t\n<!-- wp:navigation-menu-item {\"label\":\"WordPress\",\"destination\":\"https://wordpress.org/\"} -->\n<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>\n<!-- /wp:navigation-menu-item -->\n</nav>\n<!-- /wp:navigation-menu -->"
         },
         "innerBlocks": [
             {
                 "clientId": "_clientId_0",
-                "name": "core/navigation-menu-item",
+                "name": "core/missing",
                 "isValid": true,
                 "attributes": {
-                    "label": "WordPress",
-                    "destination": "https://wordpress.org/",
-                    "nofollow": false,
-                    "opensInNewTab": false
+                    "originalName": "core/navigation-menu-item",
+                    "originalUndelimitedContent": "<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>",
+                    "originalContent": "<!-- wp:navigation-menu-item {\"label\":\"WordPress\",\"destination\":\"https://wordpress.org/\"} -->\n<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>\n<!-- /wp:navigation-menu-item -->"
                 },
                 "innerBlocks": [],
-                "originalContent": "<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>"
+                "originalContent": "<!-- wp:navigation-menu-item {\"label\":\"WordPress\",\"destination\":\"https://wordpress.org/\"} -->\n<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>\n<!-- /wp:navigation-menu-item -->"
             }
         ],
-        "originalContent": "<nav class=\"wp-block-navigation-menu\">\n\t\n</nav>"
+        "originalContent": "<!-- wp:navigation-menu -->\n<nav class=\"wp-block-navigation-menu\">\n\t\n<!-- wp:navigation-menu-item {\"label\":\"WordPress\",\"destination\":\"https://wordpress.org/\"} -->\n<a class=\"wp-block-navigation-menu-item\" href=\"https://wordpress.org/\">WordPress</a>\n<!-- /wp:navigation-menu-item -->\n</nav>\n<!-- /wp:navigation-menu -->"
     }
 ]

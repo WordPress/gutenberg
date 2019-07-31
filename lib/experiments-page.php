@@ -43,25 +43,25 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments'
 	);
 	add_settings_field(
-		'gutenberg-widgets-screen',
-		__( 'Enable Widgets Screen', 'gutenberg' ),
+		'gutenberg-widget-experiments',
+		__( 'Widgets', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label_for' => 'gutenberg-widgets-screen',
-			'id'        => 'gutenberg-widgets-screen',
+			'label' => 'Enable Widgets Screen and Legacy Widget Block',
+			'id'    => 'gutenberg-widget-experiments',
 		)
 	);
 	add_settings_field(
-		'gutenberg-legacy-widget-block',
-		__( 'Enable Legacy Widget Block', 'gutenberg' ),
+		'gutenberg-menu-block',
+		__( 'Menu Block', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label_for' => 'gutenberg-legacy-widget-block',
-			'id'        => 'gutenberg-legacy-widget-block',
+			'label' => 'Enable Navigation Menu Block',
+			'id'    => 'gutenberg-menu-block',
 		)
 	);
 	register_setting(
@@ -77,13 +77,16 @@ add_action( 'admin_init', 'gutenberg_initialize_experiments_settings' );
  *
  * @since 5.2.3
  *
- * @param array $args ( $label_for, $id ).
+ * @param array $args ( $label, $id ).
  */
 function gutenberg_display_experiment_field( $args ) {
 	$options = get_option( 'gutenberg-experiments' );
 	$value   = isset( $options[ $args['id'] ] ) ? 1 : 0;
 	?>
-		<input type="checkbox" name="<?php echo 'gutenberg-experiments[' . $args['id'] . ']'; ?>" id="<?php echo $args['id']; ?>" value="1" <?php checked( 1, $value ); ?> />
+		<label for="<?php echo $args['id']; ?>">
+			<input type="checkbox" name="<?php echo 'gutenberg-experiments[' . $args['id'] . ']'; ?>" id="<?php echo $args['id']; ?>" value="1" <?php checked( 1, $value ); ?> />
+			<?php echo $args['label']; ?>
+		</label>
 	<?php
 }
 
@@ -93,8 +96,22 @@ function gutenberg_display_experiment_field( $args ) {
  * @since 5.2.3
  */
 function gutenberg_display_experiment_section() {
-
-	$markup = '<p>' . __( 'Gutenberg has some experimental features you can turn on. Simply select each you would like to use.', 'gutenberg' ) . '</p>';
-	echo $markup;
-
+	?>
+	<p><?php echo __( 'Gutenberg has some experimental features you can turn on. Simply select each you would like to use.', 'gutenberg' ); ?></p>
+	<?php
 }
+
+/**
+ * Extends default editor settings with experiments settings.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_experiments_editor_settings( $settings ) {
+	return array(
+		'__experimentalEnableLegacyWidgetBlock' => array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ),
+		'__experimentalEnableMenuBlock'         => array_key_exists( 'gutenberg-menu-block', get_option( 'gutenberg-experiments' ) ),
+	);
+}
+add_filter( 'block_editor_settings', 'gutenberg_experiments_editor_settings' );

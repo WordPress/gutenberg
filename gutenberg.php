@@ -43,14 +43,16 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	add_submenu_page(
-		'gutenberg',
-		__( 'Widgets (beta)', 'gutenberg' ),
-		__( 'Widgets (beta)', 'gutenberg' ),
-		'edit_theme_options',
-		'gutenberg-widgets',
-		'the_gutenberg_widgets'
-	);
+	if ( array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) ) {
+		add_submenu_page(
+			'gutenberg',
+			__( 'Widgets (beta)', 'gutenberg' ),
+			__( 'Widgets (beta)', 'gutenberg' ),
+			'edit_theme_options',
+			'gutenberg-widgets',
+			'the_gutenberg_widgets'
+		);
+	}
 
 	if ( current_user_can( 'edit_posts' ) ) {
 		$submenu['gutenberg'][] = array(

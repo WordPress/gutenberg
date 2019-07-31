@@ -65,6 +65,9 @@ import * as classic from './classic';
 /**
  * Function to register core blocks provided by the block editor.
  *
+ * @param {boolean} enableLegacyWidgets     Optional. Editor setting to enable Legacy Widget Block.
+ * @param {boolean} enableMenu              Optional. Editor setting to enable Menu Block.
+ *
  * @example
  * ```js
  * import { registerCoreBlocks } from '@wordpress/block-library';
@@ -72,7 +75,7 @@ import * as classic from './classic';
  * registerCoreBlocks();
  * ```
  */
-export const registerCoreBlocks = () => {
+export const registerCoreBlocks = ( enableLegacyWidgets, enableMenu ) => {
 	[
 		// Common blocks are grouped at the top to prioritize their display
 		// in various contexts — like the inserter and auto-complete components.
@@ -104,11 +107,11 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		latestComments,
 		latestPosts,
-		process.env.GUTENBERG_PHASE === 2 ? legacyWidget : null,
+		enableLegacyWidgets ? legacyWidget : null,
 		missing,
 		more,
-		process.env.GUTENBERG_PHASE === 2 ? navigationMenu : null,
-		process.env.GUTENBERG_PHASE === 2 ? navigationMenuItem : null,
+		enableMenu ? navigationMenu : null,
+		enableMenu ? navigationMenuItem : null,
 		nextpage,
 		preformatted,
 		pullquote,
