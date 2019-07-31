@@ -103,7 +103,7 @@ export class PostSavedState extends Component {
 				<IconButton
 					className="editor-post-save-draft"
 					label={ label }
-					onClick={ onSave }
+					onClick={ () => onSave() }
 					shortcut={ displayShortcut.primary( 's' ) }
 					icon="cloud-upload"
 				/>
@@ -113,7 +113,7 @@ export class PostSavedState extends Component {
 		return (
 			<Button
 				className="editor-post-save-draft"
-				onClick={ onSave }
+				onClick={ () => onSave() }
 				shortcut={ displayShortcut.primary( 's' ) }
 				isTertiary
 			>

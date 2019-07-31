@@ -140,11 +140,21 @@ The component accepts the following props:
 
 The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug to be shown in the collapsed menu button.
 
-- Type: `String`
+- Type: `String|null`
 - Required: No
 - Default: `"menu"`
 
 See also: [https://developer.wordpress.org/resource/dashicons/](https://developer.wordpress.org/resource/dashicons/)
+
+#### hasArrowIndicator
+
+Whether to display an arrow indicator next to the icon.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+
+For backward compatibility, when `icon` is explicitly set to `null` then the arrow indicator will be displayed even when this flag is set to `false`.
 
 #### label
 

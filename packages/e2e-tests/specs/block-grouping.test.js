@@ -157,13 +157,15 @@ describe( 'Block Grouping', () => {
 			await insertBlock( 'Heading' );
 			await page.keyboard.type( 'Group Heading' );
 
-			// Full width image
+			// Full width image.
 			await insertBlock( 'Image' );
-			await clickBlockToolbarButton( 'Full width' );
+			await clickBlockToolbarButton( 'Change alignment' );
+			await page.click( '.components-dropdown-menu__menu button svg.dashicons-align-full-width' );
 
-			// Wide width image)
+			// Wide width image.
 			await insertBlock( 'Image' );
-			await clickBlockToolbarButton( 'Wide width' );
+			await clickBlockToolbarButton( 'Change alignment' );
+			await page.click( '.components-dropdown-menu__menu button svg.dashicons-align-wide' );
 
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( 'Some paragraph' );

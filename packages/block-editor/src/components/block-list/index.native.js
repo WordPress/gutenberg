@@ -61,19 +61,15 @@ export class BlockList extends Component {
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue );
 
-		this.finishInsertingOrReplacingBlock( newBlock );
+		this.finishBlockAppendingOrReplacing( newBlock );
 	}
 
-	finishInsertingOrReplacingBlock( newBlock ) {
+	finishBlockAppendingOrReplacing( newBlock ) {
+		// now determine whether we need to replace the currently selected block (if it's empty)
+		// or just add a new block as usual
 		if ( this.isReplaceable( this.props.selectedBlock ) ) {
-			// replace selected block
+			// do replace here
 			this.props.replaceBlock( this.props.selectedBlockClientId, newBlock );
-		} else if ( this.props.isPostTitleSelected && this.isReplaceable( this.props.firstBlock ) ) {
-			// replace first block in post: there is no selected block when the post title is selected,
-			// so replaceBlock does not select the new block and we need to manually select the new block
-			const { clientId: firstBlockId } = this.props.firstBlock;
-			this.props.replaceBlock( firstBlockId, newBlock );
-			this.props.selectBlock( newBlock.clientId );
 		} else {
 			this.props.insertBlock( newBlock, this.getNewBlockInsertionIndex() );
 		}
@@ -114,7 +110,7 @@ export class BlockList extends Component {
 			newMediaBlock.attributes.id = payload.mediaId;
 
 			// finally append or replace as appropriate
-			this.finishInsertingOrReplacingBlock( newMediaBlock );
+			this.finishBlockAppendingOrReplacing( newMediaBlock );
 		} );
 	}
 
@@ -264,7 +260,7 @@ export class BlockList extends Component {
 		const paragraphBlock = createBlock( 'core/paragraph' );
 		return (
 			<TouchableWithoutFeedback onPress={ () => {
-				this.finishInsertingOrReplacingBlock( paragraphBlock );
+				this.finishBlockAppendingOrReplacing( paragraphBlock );
 			} } >
 				<View style={ styles.blockListFooter } />
 			</TouchableWithoutFeedback>
@@ -281,7 +277,6 @@ export class BlockList extends Component {
 export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
-			getBlock,
 			getBlockCount,
 			getBlockName,
 			getBlockIndex,
@@ -292,15 +287,13 @@ export default compose( [
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const blockClientIds = getBlockOrder( rootClientId );
 
 		return {
-			blockClientIds,
+			blockClientIds: getBlockOrder( rootClientId ),
 			blockCount: getBlockCount( rootClientId ),
 			getBlockName,
 			isBlockSelected,
 			selectedBlock: getSelectedBlock(),
-			firstBlock: getBlock( blockClientIds[ 0 ] ),
 			selectedBlockClientId,
 			selectedBlockOrder: getBlockIndex( selectedBlockClientId ),
 		};
@@ -310,14 +303,12 @@ export default compose( [
 			insertBlock,
 			replaceBlock,
 			clearSelectedBlock,
-			selectBlock,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
-			selectBlock,
 		};
 	} ),
 ] )( BlockList );

@@ -54,7 +54,6 @@ const INNER_BLOCKS_TEMPLATE = [
 		placeholder: __( 'Write title…' ),
 	} ],
 ];
-const INNER_BLOCKS_ALLOWED_BLOCKS = [ 'core/button', 'core/heading', 'core/paragraph' ];
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -299,7 +298,6 @@ class CoverEdit extends Component {
 					<div className="wp-block-cover__inner-container">
 						<InnerBlocks
 							template={ INNER_BLOCKS_TEMPLATE }
-							allowedBlocks={ INNER_BLOCKS_ALLOWED_BLOCKS }
 						/>
 					</div>
 				</div>
