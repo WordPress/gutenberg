@@ -51,6 +51,8 @@ export const SocialLinksEdit = function( { attributes, setAttributes, className,
 		updateAlignment( alignment );
 	};
 
+
+
 	return (
 		<Fragment>
 			<InspectorControls>
@@ -74,6 +76,7 @@ export const SocialLinksEdit = function( { attributes, setAttributes, className,
 					value={ verticalAlignment }
 				/>
 			</BlockControls>
+
 			<div className={ classes }>
 				<InnerBlocks
 					template={ getColumnsTemplate( columns ) }

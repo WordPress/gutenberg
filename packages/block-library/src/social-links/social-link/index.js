@@ -19,7 +19,7 @@ export const settings = {
 	title: __( 'Social links' ),
 	parent: [ 'core/social-links' ],
 	icon,
-	description: __( 'Social links.' ),
+	description: __( 'Display a row of icons of your social media accounts.' ),
 	supports: {
 		inserter: false,
 		reusable: false,

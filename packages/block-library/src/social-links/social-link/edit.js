@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,9 +21,20 @@ import PlaceholderIcon from './PlaceholderIcon';
 const SocialLinkEdit = ( { attributes, setUrl, isSelected } ) => {
 	const { url } = attributes;
 
+	const getDashiconsIconName = () => {
+		const isFacebook = url.includes( 'fb.com' ) || url.includes( 'facebook.com' );
+
+		if ( isFacebook ) {
+			return 'facebook';
+		}
+	};
+
+	const dashiconsIconName = getDashiconsIconName();
+
 	return (
 		<Fragment>
-			<Icon icon={ PlaceholderIcon } />
+			<div className={ `dashicons-before dashicons-${ dashiconsIconName }` } />
+
 			{
 				isSelected && (
 					<form >
