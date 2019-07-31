@@ -20,6 +20,7 @@ import { compose } from '@wordpress/compose';
 import BlockIcon from '../block-icon';
 import BlockStyles from '../block-styles';
 import BlockPreview from '../block-preview';
+import BlockPreviewDropdownWrapper from '../block-preview/dropdown-wrapper';
 import BlockTypesList from '../block-types-list';
 
 export class BlockSwitcher extends Component {
@@ -160,17 +161,15 @@ export class BlockSwitcher extends Component {
 						}
 
 						{ ( hoveredClassName !== null ) &&
-							<div className="block-editor-block-switcher__preview">
-								<div className="block-editor-block-switcher__preview-title">{ __( 'Preview' ) }</div>
+							<BlockPreviewDropdownWrapper>
 								<BlockPreview
-									className="block-editor-block-switcher__preview-content"
 									blocks={
 										cloneBlock( blocks[ 0 ], {
 											className: hoveredClassName,
 										} )
 									}
 								/>
-							</div>
+							</BlockPreviewDropdownWrapper>
 						}
 					</>
 				) }
