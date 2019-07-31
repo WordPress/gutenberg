@@ -17,6 +17,7 @@ import { HTMLTextInput, KeyboardAvoidingView, ReadableContentView } from '@wordp
  * Internal dependencies
  */
 import styles from './style.scss';
+import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
 
@@ -108,7 +109,7 @@ class Layout extends Component {
 			<SafeAreaView style={ styles.container } onLayout={ this.onRootViewLayout }>
 				{ mode === 'text' ? this.renderHTML() : this.renderVisual() }
 				<SafeAreaView>
-					<View style={ { height: styles.toolbarKeyboardAvoidingView.height } } />
+					<View style={ { height: headerToolbarStyles.height } } />
 				</SafeAreaView>
 				<KeyboardAvoidingView
 					style={ styles.toolbarKeyboardAvoidingView }
