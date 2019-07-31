@@ -1,5 +1,10 @@
 ## 2.7.0 (2019-08-05)
 
+### Enhancements
+
+- Heading block uses `has-text-align-*` class names rather than inline style for text alignment.
+- Verse block uses `has-text-align-*` class names rather than inline style for text alignment.
+
 ### Bug Fixes
 
 - Fixed insertion of columns in the table block, which now inserts columns for all table sections ([#16410](https://github.com/WordPress/gutenberg/pull/16410))
