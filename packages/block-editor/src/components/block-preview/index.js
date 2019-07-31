@@ -39,7 +39,7 @@ export function BlockPreview( { blocks, settings, srcWidth, srcHeight } ) {
 	const previewStyles = {
 		width: `${ srcWidth }px`,
 		height: `${ srcHeight }px`,
-		transform: 'scale(' + previewScale + ')',
+		transform: `scale(${ previewScale })`,
 	};
 
 	// Dynamically calculate the scale factor
