@@ -31,7 +31,7 @@
 		"@wordpress/redux-routine": "file:../redux-routine",
 		"equivalent-key-map": "^0.2.2",
 		"is-promise": "^2.1.0",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.14",
 		"redux": "^4.0.0",
 		"turbo-combine-reducers": "^1.0.2"
 	},

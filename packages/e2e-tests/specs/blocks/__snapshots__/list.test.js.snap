@@ -212,6 +212,12 @@ exports[`List should outdent with children 2`] = `
 <!-- /wp:list -->"
 `;
 
+exports[`List should place the caret in the right place with nested list 1`] = `
+"<!-- wp:list -->
+<ul><li>1</li><li>2<ul><li>a</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`List should split indented list item 1`] = `
 "<!-- wp:list -->
 <ul><li>one<ul><li>two</li><li>three</li></ul></li></ul>

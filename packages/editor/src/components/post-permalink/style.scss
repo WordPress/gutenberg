@@ -1,8 +1,9 @@
 .editor-post-permalink {
 	display: inline-flex;
 	align-items: center;
+	flex-wrap: wrap;
 	background: $white;
-	padding: 5px;
+	padding: $grid-size $grid-size 0;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	height: 40px;
@@ -25,11 +26,21 @@
 	// Put toolbar snugly to edge on mobile.
 	margin-left: -$block-padding - $border-width; // This hides the border off the edge of the screen.
 	margin-right: -$block-padding - $border-width;
+	@include break-mobile() {
+		padding: $grid-size-small;
+	}
 	@include break-small() {
 		margin-left: -$border-width;
 		margin-right: -$border-width;
 	}
+	// Increase specificity to override margins set on label element.
+	&.editor-post-permalink > * {
+		margin-bottom: $grid-size;
 
+		@include break-mobile() {
+			margin-bottom: 0;
+		}
+	}
 	button {
 		// Prevent button shrinking in IE11 when other items have a 100% flex basis.
 		// This should be safe to apply in all browsers because we don't want these
@@ -56,7 +67,7 @@
 	color: $dark-gray-200;
 	text-decoration: underline;
 	margin-right: 10px;
-	width: 100%;
+	flex-grow: 1;
 	overflow: hidden;
 	position: relative;
 	white-space: nowrap;

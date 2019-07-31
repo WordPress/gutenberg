@@ -37,6 +37,7 @@
 		"@wordpress/eslint-plugin": "file:../eslint-plugin",
 		"@wordpress/jest-preset-default": "file:../jest-preset-default",
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
+		"babel-jest": "^24.7.1",
 		"babel-loader": "^8.0.5",
 		"chalk": "^2.4.1",
 		"check-node-version": "^3.1.1",

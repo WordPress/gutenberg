@@ -28,6 +28,7 @@ import {
 	insertionPoint,
 	template,
 	blockListSettings,
+	lastBlockAttributesChange,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -193,27 +194,35 @@ describe( 'state', () => {
 			it( 'can replace a child block', () => {
 				const existingState = deepFreeze( {
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
 						},
-						'clicken-child': {
+						'chicken-child': {
 							clientId: 'chicken-child',
 							name: 'core/test-child-block',
 							isValid: true,
 						},
 					},
 					attributes: {
-						clicken: {},
-						'clicken-child': {
+						chicken: {},
+						'chicken-child': {
 							attr: true,
 						},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ 'clicken-child' ],
-						'clicken-child': [],
+						'': [ 'chicken' ],
+						chicken: [ 'chicken-child' ],
+						'chicken-child': [],
+					},
+					parents: {
+						chicken: '',
+						'chicken-child': 'chicken',
+					},
+					cache: {
+						chicken: {},
+						'chicken-child': {},
 					},
 				} );
 
@@ -226,7 +235,7 @@ describe( 'state', () => {
 
 				const action = {
 					type: 'REPLACE_INNER_BLOCKS',
-					rootClientId: 'clicken',
+					rootClientId: 'chicken',
 					blocks: [ newChildBlock ],
 				};
 
@@ -236,7 +245,7 @@ describe( 'state', () => {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
@@ -248,35 +257,50 @@ describe( 'state', () => {
 						},
 					},
 					attributes: {
-						clicken: {},
+						chicken: {},
 						[ newChildBlockId ]: {
 							attr: false,
 							attr2: 'perfect',
 						},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ newChildBlockId ],
+						'': [ 'chicken' ],
+						chicken: [ newChildBlockId ],
 						[ newChildBlockId ]: [],
 					},
+					parents: {
+						[ newChildBlockId ]: 'chicken',
+						chicken: '',
+					},
+					cache: {
+						chicken: {},
+						[ newChildBlockId ]: {},
+					},
 				} );
+				expect( state.cache.chicken ).not.toBe( existingState.cache.chicken );
 			} );
 
 			it( 'can insert a child block', () => {
 				const existingState = deepFreeze( {
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
 						},
 					},
 					attributes: {
-						clicken: {},
+						chicken: {},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [],
+						'': [ 'chicken' ],
+						chicken: [],
+					},
+					parents: {
+						chicken: '',
+					},
+					cache: {
+						chicken: {},
 					},
 				} );
 
@@ -289,7 +313,7 @@ describe( 'state', () => {
 
 				const action = {
 					type: 'REPLACE_INNER_BLOCKS',
-					rootClientId: 'clicken',
+					rootClientId: 'chicken',
 					blocks: [ newChildBlock ],
 				};
 
@@ -299,7 +323,7 @@ describe( 'state', () => {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
@@ -311,53 +335,72 @@ describe( 'state', () => {
 						},
 					},
 					attributes: {
-						clicken: {},
+						chicken: {},
 						[ newChildBlockId ]: {
 							attr: false,
 							attr2: 'perfect',
 						},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ newChildBlockId ],
+						'': [ 'chicken' ],
+						chicken: [ newChildBlockId ],
 						[ newChildBlockId ]: [],
 					},
+					parents: {
+						[ newChildBlockId ]: 'chicken',
+						chicken: '',
+					},
+					cache: {
+						chicken: {},
+						[ newChildBlockId ]: {},
+					},
 				} );
+				expect( state.cache.chicken ).not.toBe( existingState.cache.chicken );
 			} );
 
 			it( 'can replace multiple child blocks', () => {
 				const existingState = deepFreeze( {
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
 						},
-						'clicken-child': {
+						'chicken-child': {
 							clientId: 'chicken-child',
 							name: 'core/test-child-block',
 							isValid: true,
 						},
-						'clicken-child-2': {
+						'chicken-child-2': {
 							clientId: 'chicken-child',
 							name: 'core/test-child-block',
 							isValid: true,
 						},
 					},
 					attributes: {
-						clicken: {},
-						'clicken-child': {
+						chicken: {},
+						'chicken-child': {
 							attr: true,
 						},
-						'clicken-child-2': {
+						'chicken-child-2': {
 							attr2: 'ok',
 						},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ 'clicken-child', 'clicken-child-2' ],
-						'clicken-child': [],
-						'clicken-child-2': [],
+						'': [ 'chicken' ],
+						chicken: [ 'chicken-child', 'chicken-child-2' ],
+						'chicken-child': [],
+						'chicken-child-2': [],
+					},
+					parents: {
+						chicken: '',
+						'chicken-child': 'chicken',
+						'chicken-child-2': 'chicken',
+					},
+					cache: {
+						chicken: {},
+						'chicken-child': {},
+						'chicken-child-2': {},
 					},
 				} );
 
@@ -381,7 +424,7 @@ describe( 'state', () => {
 
 				const action = {
 					type: 'REPLACE_INNER_BLOCKS',
-					rootClientId: 'clicken',
+					rootClientId: 'chicken',
 					blocks: [ newChildBlock1, newChildBlock2, newChildBlock3 ],
 				};
 
@@ -391,7 +434,7 @@ describe( 'state', () => {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
@@ -413,7 +456,7 @@ describe( 'state', () => {
 						},
 					},
 					attributes: {
-						clicken: {},
+						chicken: {},
 						[ newChildBlockId1 ]: {
 							attr: false,
 							attr2: 'perfect',
@@ -427,11 +470,23 @@ describe( 'state', () => {
 						},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ newChildBlockId1, newChildBlockId2, newChildBlockId3 ],
+						'': [ 'chicken' ],
+						chicken: [ newChildBlockId1, newChildBlockId2, newChildBlockId3 ],
 						[ newChildBlockId1 ]: [],
 						[ newChildBlockId2 ]: [],
 						[ newChildBlockId3 ]: [],
+					},
+					parents: {
+						chicken: '',
+						[ newChildBlockId1 ]: 'chicken',
+						[ newChildBlockId2 ]: 'chicken',
+						[ newChildBlockId3 ]: 'chicken',
+					},
+					cache: {
+						chicken: {},
+						[ newChildBlockId1 ]: {},
+						[ newChildBlockId2 ]: {},
+						[ newChildBlockId3 ]: {},
 					},
 				} );
 			} );
@@ -439,32 +494,42 @@ describe( 'state', () => {
 			it( 'can replace a child block that has other children', () => {
 				const existingState = deepFreeze( {
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
 						},
-						'clicken-child': {
+						'chicken-child': {
 							clientId: 'chicken-child',
 							name: 'core/test-child-block',
 							isValid: true,
 						},
-						'clicken-grand-child': {
+						'chicken-grand-child': {
 							clientId: 'chicken-child',
 							name: 'core/test-block',
 							isValid: true,
 						},
 					},
 					attributes: {
-						clicken: {},
-						'clicken-child': {},
-						'clicken-grand-child': {},
+						chicken: {},
+						'chicken-child': {},
+						'chicken-grand-child': {},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ 'clicken-child' ],
-						'clicken-child': [ 'clicken-grand-child' ],
-						'clicken-grand-child': [],
+						'': [ 'chicken' ],
+						chicken: [ 'chicken-child' ],
+						'chicken-child': [ 'chicken-grand-child' ],
+						'chicken-grand-child': [],
+					},
+					parents: {
+						chicken: '',
+						'chicken-child': 'chicken',
+						'chicken-grand-child': 'chicken-child',
+					},
+					cache: {
+						chicken: {},
+						'chicken-child': {},
+						'chicken-grand-child': {},
 					},
 				} );
 
@@ -474,7 +539,7 @@ describe( 'state', () => {
 
 				const action = {
 					type: 'REPLACE_INNER_BLOCKS',
-					rootClientId: 'clicken',
+					rootClientId: 'chicken',
 					blocks: [ newChildBlock ],
 				};
 
@@ -484,7 +549,7 @@ describe( 'state', () => {
 					isPersistentChange: true,
 					isIgnoredChange: false,
 					byClientId: {
-						clicken: {
+						chicken: {
 							clientId: 'chicken',
 							name: 'core/test-parent-block',
 							isValid: true,
@@ -496,15 +561,26 @@ describe( 'state', () => {
 						},
 					},
 					attributes: {
-						clicken: {},
+						chicken: {},
 						[ newChildBlockId ]: {},
 					},
 					order: {
-						'': [ 'clicken' ],
-						clicken: [ newChildBlockId ],
+						'': [ 'chicken' ],
+						chicken: [ newChildBlockId ],
 						[ newChildBlockId ]: [],
 					},
+					parents: {
+						chicken: '',
+						[ newChildBlockId ]: 'chicken',
+					},
+					cache: {
+						chicken: {},
+						[ newChildBlockId ]: {},
+					},
 				} );
+
+				// the cache key of the parent should be updated
+				expect( existingState.cache.chicken ).not.toBe( state.cache.chicken );
 			} );
 		} );
 
@@ -515,8 +591,10 @@ describe( 'state', () => {
 				byClientId: {},
 				attributes: {},
 				order: {},
+				parents: {},
 				isPersistentChange: true,
 				isIgnoredChange: false,
+				cache: {},
 			} );
 		} );
 
@@ -536,6 +614,9 @@ describe( 'state', () => {
 					'': [ 'bananas' ],
 					bananas: [],
 				} );
+				expect( state.cache ).toEqual( {
+					bananas: {},
+				} );
 			} );
 		} );
 
@@ -554,6 +635,10 @@ describe( 'state', () => {
 				'': [ 'bananas' ],
 				apples: [],
 				bananas: [ 'apples' ],
+			} );
+			expect( state.cache ).toEqual( {
+				bananas: {},
+				apples: {},
 			} );
 		} );
 
@@ -583,6 +668,12 @@ describe( 'state', () => {
 				chicken: [],
 				ribs: [],
 			} );
+			expect( state.cache ).toEqual( {
+				chicken: {},
+				ribs: {},
+			} );
+			// The cache key is the same because the block has not been modified.
+			expect( original.cache.chicken ).toBe( state.cache.chicken );
 		} );
 
 		it( 'should replace the block', () => {
@@ -612,6 +703,51 @@ describe( 'state', () => {
 				'': [ 'wings' ],
 				wings: [],
 			} );
+			expect( state.parents ).toEqual( {
+				wings: '',
+			} );
+			expect( state.cache ).toEqual( {
+				wings: {},
+			} );
+		} );
+		it( 'should replace the block and remove references to its inner blocks', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					clientId: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [
+						{
+							clientId: 'child',
+							name: 'core/test-block',
+							attributes: {},
+							innerBlocks: [],
+						},
+					],
+				} ],
+			} );
+			const state = blocks( original, {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken' ],
+				blocks: [ {
+					clientId: 'wings',
+					name: 'core/freeform',
+					innerBlocks: [],
+				} ],
+			} );
+
+			expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
+			expect( state.order ).toEqual( {
+				'': [ 'wings' ],
+				wings: [],
+			} );
+			expect( state.parents ).toEqual( {
+				wings: '',
+			} );
+			expect( state.cache ).toEqual( {
+				wings: {},
+			} );
 		} );
 
 		it( 'should replace the nested block', () => {
@@ -623,16 +759,32 @@ describe( 'state', () => {
 				blocks: [ wrapperBlock ],
 			} );
 
+			const originalWrapperBlockCacheKey = original.cache[ wrapperBlock.clientId ];
+
 			const state = blocks( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ nestedBlock.clientId ],
 				blocks: [ replacementBlock ],
 			} );
 
+			const newWrapperBlockCacheKey = state.cache[ wrapperBlock.clientId ];
+
+			expect( newWrapperBlockCacheKey ).not.toBe( originalWrapperBlockCacheKey );
+
 			expect( state.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ replacementBlock.clientId ],
 				[ replacementBlock.clientId ]: [],
+			} );
+
+			expect( state.parents ).toEqual( {
+				[ wrapperBlock.clientId ]: '',
+				[ replacementBlock.clientId ]: wrapperBlock.clientId,
+			} );
+
+			expect( state.cache ).toEqual( {
+				[ wrapperBlock.clientId ]: {},
+				[ replacementBlock.clientId ]: {},
 			} );
 		} );
 
@@ -664,6 +816,10 @@ describe( 'state', () => {
 				'': [ 'chicken' ],
 				chicken: [],
 			} );
+			expect( replacedState.cache ).toEqual( {
+				chicken: {},
+			} );
+			expect( originalState.cache.chicken ).not.toBe( replacedState.cache.chicken );
 
 			const nestedBlock = {
 				clientId: 'chicken',
@@ -729,6 +885,11 @@ describe( 'state', () => {
 			expect( state.attributes.chicken ).toEqual( {
 				content: 'ribs',
 			} );
+
+			expect( state.cache ).toEqual( {
+				chicken: {},
+			} );
+			expect( state.cache.chicken ).not.toBe( original.cache.chicken );
 		} );
 
 		it( 'should update the reusable block reference if the temporary id is swapped', () => {
@@ -760,6 +921,10 @@ describe( 'state', () => {
 			expect( state.attributes.chicken ).toEqual( {
 				ref: 3,
 			} );
+			expect( state.cache ).toEqual( {
+				chicken: {},
+			} );
+			expect( state.cache.chicken ).not.toBe( original.cache.chicken );
 		} );
 
 		it( 'should move the block up', () => {
@@ -783,6 +948,8 @@ describe( 'state', () => {
 			} );
 
 			expect( state.order[ '' ] ).toEqual( [ 'ribs', 'chicken' ] );
+			expect( state.cache.ribs ).toBe( original.cache.ribs );
+			expect( state.cache.chicken ).toBe( original.cache.chicken );
 		} );
 
 		it( 'should move the nested block up', () => {
@@ -805,6 +972,9 @@ describe( 'state', () => {
 				[ movedBlock.clientId ]: [],
 				[ siblingBlock.clientId ]: [],
 			} );
+			expect( state.cache[ wrapperBlock.clientId ] ).not.toBe( original.cache[ wrapperBlock.clientId ] );
+			expect( state.cache[ movedBlock.clientId ] ).toBe( original.cache[ movedBlock.clientId ] );
+			expect( state.cache[ siblingBlock.clientId ] ).toBe( original.cache[ siblingBlock.clientId ] );
 		} );
 
 		it( 'should move multiple blocks up', () => {
@@ -1024,6 +1194,9 @@ describe( 'state', () => {
 
 			expect( state.order[ '' ] ).toEqual( [ 'ribs' ] );
 			expect( state.order ).not.toHaveProperty( 'chicken' );
+			expect( state.parents ).toEqual( {
+				ribs: '',
+			} );
 			expect( state.byClientId ).toEqual( {
 				ribs: {
 					clientId: 'ribs',
@@ -1031,6 +1204,9 @@ describe( 'state', () => {
 				},
 			} );
 			expect( state.attributes ).toEqual( {
+				ribs: {},
+			} );
+			expect( state.cache ).toEqual( {
 				ribs: {},
 			} );
 		} );
@@ -1063,6 +1239,9 @@ describe( 'state', () => {
 			expect( state.order[ '' ] ).toEqual( [ 'ribs' ] );
 			expect( state.order ).not.toHaveProperty( 'chicken' );
 			expect( state.order ).not.toHaveProperty( 'veggies' );
+			expect( state.parents ).toEqual( {
+				ribs: '',
+			} );
 			expect( state.byClientId ).toEqual( {
 				ribs: {
 					clientId: 'ribs',
@@ -1095,6 +1274,7 @@ describe( 'state', () => {
 			expect( state.order ).toEqual( {
 				'': [],
 			} );
+			expect( state.parents ).toEqual( {} );
 		} );
 
 		it( 'should insert at the specified index', () => {
@@ -1521,7 +1701,8 @@ describe( 'state', () => {
 
 			describe( 'isIgnoredChange', () => {
 				it( 'should consider received blocks as ignored change', () => {
-					const state = blocks( undefined, {
+					const resetState = blocks( undefined, { type: 'random action' } );
+					const state = blocks( resetState, {
 						type: 'RECEIVE_BLOCKS',
 						blocks: [ {
 							clientId: 'kumquat',
@@ -2216,6 +2397,72 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'lastBlockAttributesChange', () => {
+		it( 'defaults to null', () => {
+			const state = lastBlockAttributesChange( undefined, {} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'does not return updated value when block update does not include attributes', () => {
+			const original = null;
+
+			const state = lastBlockAttributesChange( original, {
+				type: 'UPDATE_BLOCK',
+				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				updates: {},
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
+		it( 'returns updated value when block update includes attributes', () => {
+			const original = null;
+
+			const state = lastBlockAttributesChange( original, {
+				type: 'UPDATE_BLOCK',
+				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				updates: {
+					attributes: {
+						food: 'banana',
+					},
+				},
+			} );
+
+			expect( state ).toEqual( {
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
+			} );
+		} );
+
+		it( 'returns updated value when explicit block attributes update', () => {
+			const original = null;
+
+			const state = lastBlockAttributesChange( original, {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					food: 'banana',
+				},
+			} );
+
+			expect( state ).toEqual( {
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
+			} );
+		} );
+
+		it( 'returns null on anything other than block attributes update', () => {
+			const original = deepFreeze( {
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
+			} );
+
+			const state = lastBlockAttributesChange( original, {
+				type: '__INERT__',
+			} );
+
+			expect( state ).toBe( null );
 		} );
 	} );
 } );

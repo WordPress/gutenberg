@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, reduce, size, first, last } from 'lodash';
+import { first, last } from 'lodash';
+import { animated } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies
@@ -50,6 +51,7 @@ import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import useHoveredArea from './hover-area';
 import { isInsideRootBlock } from '../../utils/dom';
+import useMovingAnimation from './moving-animation';
 
 /**
  * Prevents default dragging behavior within a block to allow for multi-
@@ -97,6 +99,8 @@ function BlockListBlock( {
 	toggleSelection,
 	onShiftSelection,
 	onSelectionStart,
+	animateOnChange,
+	enableAnimation,
 } ) {
 	// Random state used to rerender the component if needed, ideally we don't need this
 	const [ , updateRerenderState ] = useState( {} );
@@ -247,6 +251,9 @@ function BlockListBlock( {
 		}
 	}, [ isFirstMultiSelected ] );
 
+	// Block Reordering animation
+	const animationStyle = useMovingAnimation( wrapper, isSelected || isPartOfMultiSelection, enableAnimation, animateOnChange );
+
 	// Other event handlers
 
 	/**
@@ -315,7 +322,10 @@ function BlockListBlock( {
 				onShiftSelection();
 				event.preventDefault();
 			}
-		} else {
+
+		// Avoid triggering multi-selection if we click toolbars/inspectors
+		// and all elements that are outside the Block Edit DOM tree.
+		} else if ( blockNodeRef.current.contains( event.target ) ) {
 			onSelectionStart( clientId );
 
 			// Allow user to escape out of a multi-selection to a singular
@@ -396,15 +406,15 @@ function BlockListBlock( {
 			'is-typing': isTypingWithinBlock,
 			'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
+			'has-child-selected': isParentOfSelectedBlock,
 		},
 		className
 	);
 
 	// Determine whether the block has props to apply to the wrapper.
-	let blockWrapperProps = wrapperProps;
 	if ( blockType.getEditWrapperProps ) {
-		blockWrapperProps = {
-			...blockWrapperProps,
+		wrapperProps = {
+			...wrapperProps,
 			...blockType.getEditWrapperProps( attributes ),
 		};
 	}
@@ -458,7 +468,16 @@ function BlockListBlock( {
 			tabIndex="0"
 			aria-label={ blockLabel }
 			childHandledEvents={ [ 'onDragStart', 'onMouseDown' ] }
-			{ ...blockWrapperProps }
+			tagName={ animated.div }
+			{ ...wrapperProps }
+			style={
+				wrapperProps && wrapperProps.style ?
+					{
+						...wrapperProps.style,
+						...animationStyle,
+					} :
+					animationStyle
+			}
 		>
 			{ shouldShowInsertionPoint && (
 				<BlockInsertionPoint
@@ -649,42 +668,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 
 	return {
 		setAttributes( newAttributes ) {
-			const { name, clientId } = ownProps;
-			const type = getBlockType( name );
-
-			function isMetaAttribute( key ) {
-				return get( type, [ 'attributes', key, 'source' ] ) === 'meta';
-			}
-
-			// Partition new attributes to delegate update behavior by source.
-			//
-			// TODO: A consolidated approach to external attributes sourcing
-			// should be devised to avoid specific handling for meta, enable
-			// additional attributes sources.
-			//
-			// See: https://github.com/WordPress/gutenberg/issues/2759
-			const {
-				blockAttributes,
-				metaAttributes,
-			} = reduce( newAttributes, ( result, value, key ) => {
-				if ( isMetaAttribute( key ) ) {
-					result.metaAttributes[ type.attributes[ key ].meta ] = value;
-				} else {
-					result.blockAttributes[ key ] = value;
-				}
-
-				return result;
-			}, { blockAttributes: {}, metaAttributes: {} } );
-
-			if ( size( blockAttributes ) ) {
-				updateBlockAttributes( clientId, blockAttributes );
-			}
-
-			if ( size( metaAttributes ) ) {
-				const { getSettings } = select( 'core/block-editor' );
-				const onChangeMeta = getSettings().__experimentalMetaSource.onChange;
-				onChangeMeta( metaAttributes );
-			}
+			const { clientId } = ownProps;
+			updateBlockAttributes( clientId, newAttributes );
 		},
 		onSelect( clientId = ownProps.clientId, initialPosition ) {
 			selectBlock( clientId, initialPosition );

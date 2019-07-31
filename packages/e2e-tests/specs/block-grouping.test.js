@@ -10,6 +10,8 @@ import {
 	transformBlockTo,
 	getAllBlocks,
 	getAvailableBlockTransforms,
+	activatePlugin,
+	deactivatePlugin,
 } from '@wordpress/e2e-test-utils';
 
 async function insertBlocksOfSameType() {
@@ -102,9 +104,16 @@ describe( 'Block Grouping', () => {
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
+
+		it( 'does not allow ungrouping a group block that has no children', async () => {
+			await insertBlock( 'Group' );
+			await clickBlockToolbarButton( 'More options' );
+			const ungroupButtons = await page.$x( '//button[text()="Ungroup"]' );
+			expect( ungroupButtons ).toHaveLength( 0 );
+		} );
 	} );
 
-	describe( 'Container Block availability', () => {
+	describe( 'Grouping Block availability', () => {
 		beforeEach( async () => {
 			// Disable the Group block
 			await page.evaluate( () => {
@@ -126,7 +135,7 @@ describe( 'Block Grouping', () => {
 			} );
 		} );
 
-		it( 'does not show group transform if container block is disabled', async () => {
+		it( 'does not show group transform if Grouping block is disabled', async () => {
 			const availableTransforms = await getAvailableBlockTransforms();
 
 			expect(
@@ -134,7 +143,7 @@ describe( 'Block Grouping', () => {
 			).not.toContain( 'Group' );
 		} );
 
-		it( 'does not show group option in the options toolbar if container block is disabled ', async () => {
+		it( 'does not show group option in the options toolbar if Grouping block is disabled ', async () => {
 			await clickBlockToolbarButton( 'More options' );
 
 			const blockOptionsDropdownHTML = await page.evaluate( () => document.querySelector( '.block-editor-block-settings-menu__content' ).innerHTML );
@@ -148,13 +157,15 @@ describe( 'Block Grouping', () => {
 			await insertBlock( 'Heading' );
 			await page.keyboard.type( 'Group Heading' );
 
-			// Full width image
+			// Full width image.
 			await insertBlock( 'Image' );
-			await clickBlockToolbarButton( 'Full width' );
+			await clickBlockToolbarButton( 'Change alignment' );
+			await page.click( '.components-dropdown-menu__menu button svg.dashicons-align-full-width' );
 
-			// Wide width image)
+			// Wide width image.
 			await insertBlock( 'Image' );
-			await clickBlockToolbarButton( 'Wide width' );
+			await clickBlockToolbarButton( 'Change alignment' );
+			await page.click( '.components-dropdown-menu__menu button svg.dashicons-align-wide' );
 
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( 'Some paragraph' );
@@ -169,6 +180,39 @@ describe( 'Block Grouping', () => {
 			// We expect Group block align setting to match that
 			// of the widest of it's "child" innerBlocks
 			expect( allBlocks[ 0 ].attributes.align ).toBe( 'full' );
+
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+	} );
+
+	describe( 'Registering alternative Blocks to handle Grouping interactions', () => {
+		beforeAll( async () => {
+			await activatePlugin( 'gutenberg-test-custom-grouping-block' );
+		} );
+
+		afterAll( async () => {
+			await deactivatePlugin( 'gutenberg-test-custom-grouping-block' );
+		} );
+
+		it( 'should use registered grouping block for grouping interactions', async () => {
+			// Set custom Block as the Block to use for Grouping
+			await page.evaluate( () => {
+				window.wp.blocks.setGroupingBlockName( 'test/alternative-group-block' );
+			} );
+
+			// Creating test blocks
+			await insertBlocksOfSameType();
+
+			// Multiselect via keyboard.
+			await pressKeyWithModifier( 'primary', 'a' );
+			await pressKeyWithModifier( 'primary', 'a' );
+
+			// Group - this will use whichever Block is registered as the Grouping Block
+			// as opposed to "transformTo()" which uses whatever is passed to it. To
+			// ensure this test is meaningful we must rely on what is registered.
+			await clickBlockToolbarButton( 'More options' );
+			const groupButton = await page.waitForXPath( '//button[text()="Group"]' );
+			await groupButton.click();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
