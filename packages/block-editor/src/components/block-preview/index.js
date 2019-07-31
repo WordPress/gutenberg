@@ -22,43 +22,42 @@ export function BlockPreview( { blocks, settings, srcWidth, srcHeight } ) {
 		return null;
 	}
 
-	// Calculated the destination width.
+	// Used to dynamically retrieve the width of the element
+	// which wraps the preview
 	const previewRef = useRef( null );
 
-	// Fallback dimensions.
-	const [ previewDimensions, setPreviewDimensions ] = useState( {
-		width: srcWidth,
-		height: srcHeight,
-		transform: 'scale(1)',
-	} );
+	const [ previewScale, setPreviewScale ] = useState( 1 );
 
-	const [ previewAspect, setPreviewAspect ] = useState( {
-		paddingTop: '75%',
-	} );
+	// We use a top-padding to create a responsively sized element with the same aspect ratio as the preview.
+	// The preview is then absolutely positioned on top of this, creating a visual unit.
+	const aspectPadding = {
+		paddingTop: Math.round( srcHeight / srcWidth * 100 ) + '%',
+	};
 
+	// Set the predefined optimal width/height for displaying the preview
+	// and scale down to fit within the preview wrapper
+	const previewStyles = {
+		width: `${ srcWidth }px`,
+		height: `${ srcHeight }px`,
+		transform: 'scale(' + previewScale + ')',
+	};
+
+	// Dynamically calculate the scale factor
 	useLayoutEffect( () => {
+		// Retrieve the actual width of the element which wraps the preview
+		// note: this is not the preview itself, but the wrapper element
 		const destWidth = previewRef.current.offsetWidth;
 
-		// Calculate the scale factor necessary to size down the preview thumbnail.
+		// Calculate the scale factor necessary to size down the preview thumbnail
+		// so that it fits within the preview wrapper element
 		const scale = Math.min( destWidth / srcWidth ) || 1;
 
-		setPreviewDimensions( {
-			width: `${ srcWidth }px`, // 400x300 is provided as a 4:3 aspect ratio fallback.
-			height: `${ srcHeight }px`,
-			transform: 'scale(' + scale + ')',
-		} );
-
-		// We use a top-padding to create a responsively sized element with the same aspect ratio as the preview.
-		// The preview is then absolutely positioned on top of this, creating a visual unit.
-		const aspectPadding = Math.round( srcHeight / srcWidth * 100 );
-		setPreviewAspect( {
-			paddingTop: aspectPadding + '%',
-		} );
+		setPreviewScale( scale );
 	}, [ srcWidth, srcHeight ] );
 
 	return (
-		<div ref={ previewRef } style={ previewAspect } className="editor-block-preview__container" aria-hidden>
-			<Disabled style={ previewDimensions } className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper">
+		<div ref={ previewRef } style={ aspectPadding } className="editor-block-preview__container" aria-hidden>
+			<Disabled style={ previewStyles } className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper">
 				<BlockEditorProvider
 					value={ castArray( blocks ) }
 					settings={ settings }
