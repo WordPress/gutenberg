@@ -55,7 +55,7 @@
 	// Resetting paddings, margins, and other.
 	text-align: initial;
 	margin: 0;
-	padding: 0;
+	padding: $block-padding;
 	overflow: visible;
 	min-height: auto;
 
