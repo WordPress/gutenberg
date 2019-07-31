@@ -9,7 +9,6 @@ Spinners notify users that their action is being processed.
 The spinner component should:
 
 - Signal to users that the processing of their request is underway and will soon complete.
-- Not appear when pages or data are loading.
 
 ## Usage
 
