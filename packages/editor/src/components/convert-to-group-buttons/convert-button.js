@@ -32,7 +32,7 @@ export function ConvertToGroupButton( {
 					icon={ Group }
 					onClick={ onConvertToGroup }
 				>
-					{ _x( 'Create a Group Block', 'Creates a new Group block containing the selected blocks in the Editor' ) }
+					{ _x( 'Create a Group Block', 'Creates a new Group block containing the selected blocks' ) }
 				</MenuItem>
 			) }
 			{ isUngroupable && (
@@ -41,7 +41,7 @@ export function ConvertToGroupButton( {
 					icon={ Ungroup }
 					onClick={ onConvertFromGroup }
 				>
-					{ _x( 'Ungroup Blocks', 'Ungrouping blocks from within a Group block back into individual blocks within the Editor ' ) }
+					{ _x( 'Ungroup Blocks', 'Ungroups blocks from within a Group block back into individual blocks ' ) }
 				</MenuItem>
 			) }
 		</Fragment>
