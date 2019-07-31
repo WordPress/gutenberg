@@ -53,6 +53,7 @@ export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
 export { default as Spinner } from './spinner';
+export { StylesheetProvider, withStylesheets, withStyles } from './styles-provider';
 export { default as TabPanel } from './tab-panel';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';

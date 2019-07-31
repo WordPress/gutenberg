@@ -23,7 +23,7 @@ export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
 export { default as SelectControl } from './select-control';
 export { default as Spinner } from './spinner';
-export { default as TabPanel } from './tab-panel';
+export { StylesheetProvider, withStylesheets, withStyles } from './styles-provider';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as ToggleControl } from './toggle-control';
@@ -33,7 +33,6 @@ export { default as TreeSelect } from './tree-select';
 export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
-export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
 export { default as withFocusOutside } from './higher-order/with-focus-outside';

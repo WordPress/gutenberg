@@ -16,6 +16,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	withNotices,
+	withStylesheets,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -35,6 +36,8 @@ import { withSelect } from '@wordpress/data';
 import GalleryImage from './gallery-image';
 import icon from './icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
+import style from './style.scss';
+import editorStyle from './editor.scss';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -341,4 +344,5 @@ export default compose( [
 		};
 	} ),
 	withNotices,
+	withStylesheets( [ style, editorStyle ] ),
 ] )( GalleryEdit );

@@ -5,6 +5,12 @@ import { isString } from 'lodash';
 import { createElement as createReactElement } from 'react';
 import { Image, Text, View } from 'react-native';
 
+/**
+ * Internal dependencies
+ */
+import { withStyles } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
+
 const containerHTMLTags = [
     'div',
     'figure',
@@ -16,24 +22,21 @@ const containerHTMLTags = [
     'ul',
 ];
 
-const createHTMLElement = ( tagName, props, children ) => {
-    const renderChild = ( child ) => {
-        if ( ! isString( child ) || child === '' ) {
-            return child;
-        }
-        return (
-            <Text>{ child }</Text>
-        );
-    };
+const createHTMLElement = ( tagName, props, ...children ) => {
+    const HTMLElement = compose( [
+        withStyles,
+    ] )( View );
+
+    const { stylesheet, ...otherProps } = props;
 
     return (
-        <View
-            { ...props }
+        <HTMLElement
+            { ...otherProps }
             tagName={ tagName }
         >
-            { children.map( renderChild ) }
-        </View>
-    );
+            { children }
+        </HTMLElement>
+    )
 };
 
 /**
@@ -52,7 +55,7 @@ function createElement( type, props, ...children ) {
     if ( ! isString( type ) ) {
         return createReactElement( type, props, ...children );
     } else if ( containerHTMLTags.includes( type ) ) {
-        return createHTMLElement( type, props, children );
+        return createHTMLElement( type, props, ...children );
     } else if ( type === 'img' ) {
         const { src: uri, ...otherProps } = props;
         return createElement(
@@ -61,7 +64,8 @@ function createElement( type, props, ...children ) {
                 ...otherProps,
                 source: {
                     uri,
-                }
+                },
+                tagName: 'img',
             },
             ...children,
         )
