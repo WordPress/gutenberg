@@ -9,12 +9,7 @@ Render the component passing in the required props:
 
 ```jsx
 <BlockPreviewContent
-	name={ name }
-	attributes={ {
-		...attributes,
-		className: styleClassName,
-	} }
-	innerBlocks={ block.innerBlocks }
+	blocks={ blocks }
 	srcWidth={ 400 }
 	srcHeight={ 300 }
 
@@ -32,30 +27,11 @@ A calculated `transform: scale( ...  )` value will be assigned to the thumbnail,
 
 ## Props
 
-### `name`
-* **Type:** `String`
+### `blocks`
+* **Type:** `array|object`
 * **Default:** `undefined`
 
-The name of the Block you would like to render a preview of (eg: `core/paragraph`). Note this will be passed through as an argument to `createBlock()`.
-
-
-### `attributes`
-* **Type:** `Object`
-* **Default:** `{}`
-
-Any attributes for the `name`d Block. Note this will be passed through as an argument to `createBlock()`.
-
-```jsx
-attributes={ {
-	className: 'some-class-name-here',
-} }
-```
-
-### `innerBlocks`
-* **Type:** `Object`
-* **Default:** `{}`
-
-Any innerBlocks for the `name`d Block. Note this will be passed through as an argument to `createBlock()`.
+A block instance (object) or a blocks array you would like to render a preview.
 
 ### `srcWidth`
 * **Type:** `Integer`
@@ -68,4 +44,12 @@ The unscaled dimension of the Block you are looking to preview. For example, if 
 * **Default:** `300`
 
 The unscaled dimension of the Block you are looking to preview. For example, if the Block looks good at `700x450` then you should set this value to `450`. See also `A note on source dimensions` above.
+
+### `scaleFactor`
+* **Type**: `number`
+* **Default**: `0.9`
+
+### `scaleToFit`
+* **Type**: `bool`
+* **Default**: `false`
 
