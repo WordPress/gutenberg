@@ -10,7 +10,7 @@ import classnames from 'classnames';
  */
 import { Disabled } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { useLayoutEffect, useState, useRef, forwardRef } from '@wordpress/element';
+import { useLayoutEffect, useState, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,16 +18,7 @@ import { useLayoutEffect, useState, useRef, forwardRef } from '@wordpress/elemen
 import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 
-const ScaledPreview = forwardRef( ( props, ref ) => {
-	return (
-		<div className="special-wrapper-element" ref={ ref }>
-			<BlockList />
-		</div>
-	);
-} );
-
-export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 300, allowZoom = true } ) {
-
+export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 300 } ) {
 	if ( ! blocks ) {
 		return null;
 	}
@@ -35,11 +26,8 @@ export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 30
 	// Used to dynamically retrieve the width of the element
 	// which wraps the preview
 	const previewRef = useRef( null );
-	const blocksRef = useRef( null );
 
 	const [ previewScale, setPreviewScale ] = useState( 1 );
-
-	const [ isPreviewZoomed, setIsPreviewZoomed ] = useState( false );
 
 	// We use a top-padding to create a responsively sized element with the same aspect ratio as the preview.
 	// The preview is then absolutely positioned on top of this, creating a visual unit.
@@ -68,58 +56,8 @@ export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 30
 		setPreviewScale( scale );
 	}, [ srcWidth, srcHeight ] );
 
-	useLayoutEffect( () => {
-		let timeout;
-
-		if ( allowZoom && blocksRef && blocksRef.current ) {
-			timeout = setTimeout( () => {
-				let targetElements = Array.from( blocksRef.current.querySelectorAll( '[data-block] *' ) );
-
-				if ( ! targetElements ) {
-					return;
-				}
-
-				targetElements = targetElements.filter( ( el ) => {
-					return Array.from( el.classList ).filter( ( theClass ) => theClass.includes( 'wp-block-' ) ).length;
-				} );
-
-				const largestBlockElWidth = targetElements.reduce( ( largestWidth, currrentEl ) => {
-					// const elWidth = currrentEl.offsetWidth;
-					let elWidth = 0;
-					const computed = window.getComputedStyle( currrentEl );
-
-					elWidth += parseFloat( computed.width );
-					elWidth += parseFloat( computed.paddingLeft );
-					elWidth += parseFloat( computed.paddingRight );
-					elWidth += parseFloat( computed.marginLeft );
-					elWidth += parseFloat( computed.marginRight );
-					elWidth += parseFloat( computed.borderLeftWidth );
-					elWidth += parseFloat( computed.borderRightWidth );
-
-					largestWidth = ( elWidth > largestWidth ) ? elWidth : largestWidth;
-
-					return largestWidth;
-				}, 0 );
-
-				if ( largestBlockElWidth ) {
-					const destWidth = previewRef.current.offsetWidth;
-					const scale = Math.min( destWidth / largestBlockElWidth ) || 1;
-
-					setPreviewScale( scale );
-					setIsPreviewZoomed( true );
-				}
-			}, 2000 );
-		}
-
-		return () => {
-			if ( timeout ) {
-				clearTimeout( timeout );
-			}
-		};
-	} );
-
 	const contentClassNames = classnames( 'editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper', {
-		'is-zoomed': isPreviewZoomed,
+		'is-scaled': previewScale !== 1,
 	} );
 
 	return (
@@ -129,7 +67,7 @@ export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 30
 					value={ castArray( blocks ) }
 					settings={ settings }
 				>
-					<ScaledPreview ref={ blocksRef } />
+					<BlockList />
 				</BlockEditorProvider>
 			</Disabled>
 		</div>
