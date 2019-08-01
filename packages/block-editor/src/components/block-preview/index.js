@@ -18,7 +18,7 @@ import { useLayoutEffect, useState, useRef } from '@wordpress/element';
 import BlockEditorProvider from '../provider';
 import BlockList from '../block-list';
 
-export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 300 } ) {
+export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 300, scaleToFit = false } ) {
 	if ( ! blocks ) {
 		return null;
 	}
@@ -45,6 +45,9 @@ export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 30
 
 	// Dynamically calculate the scale factor
 	useLayoutEffect( () => {
+		if ( ! scaleToFit ) {
+			return;
+		}
 		// Retrieve the actual width of the element which wraps the preview
 		// note: this is not the preview itself, but the wrapper element
 		const destWidth = previewRef.current.offsetWidth;
