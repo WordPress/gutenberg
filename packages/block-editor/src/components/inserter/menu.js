@@ -396,16 +396,18 @@ export class InserterMenu extends Component {
 						) }
 						{ ! hoveredItem && (
 							<div className="block-editor-inserter__menu-help-panel-no-block">
-								<h4>Tip</h4>
-								<Notice isDismissible={ false }>
+								<h4>Content Blocks</h4>
+								<p>
 									{ __(
-										'Blocks are the basis of all content within the editor.' +
+										'Blocks are the basis of all content within the editor. ' +
 										'This library contains blocks for text, headings, images, lists and more!'
 									) }
+								</p>
+								<Notice isDismissible={ false }>
+									{ __(
+										'You can quickly insert blocks by typing "/" in the editor.'
+									) }
 								</Notice>
-								<div className="block-editor-inserter__menu-help-panel-hover-area">
-									{ __( 'Hover over a block in the inserter for more details.' ) }
-								</div>
 							</div>
 						) }
 					</div>
