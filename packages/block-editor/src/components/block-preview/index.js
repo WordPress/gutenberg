@@ -32,8 +32,9 @@ function BlockPreview( { blocks, settings, className, isScaled } ) {
 			aria-hidden
 			className={
 				classnames(
-					'editor-block-preview', 'block-editor-block-preview',
-					'editor-styles-wrapper', className,
+					className,
+					'block-editor-block-preview',
+					'editor-styles-wrapper',
 					{
 						'is-scaled': isScaled,
 					}
