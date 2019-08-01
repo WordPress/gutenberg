@@ -358,9 +358,9 @@ _Returns_
 
 -   `Array`: Block list.
 
-<a name="getEditorSelection" href="#getEditorSelection">#</a> **getEditorSelection**
+<a name="getEditorSelectionEnd" href="#getEditorSelectionEnd">#</a> **getEditorSelectionEnd**
 
-Return the current selection.
+Return the current selection end.
 
 _Parameters_
 
@@ -368,7 +368,19 @@ _Parameters_
 
 _Returns_
 
--   `Array<WPBlockSelection>`: The block selection start and end as a pair of `WPBlockSelection`.
+-   `WPBlockSelection`: The selection end.
+
+<a name="getEditorSelectionStart" href="#getEditorSelectionStart">#</a> **getEditorSelectionStart**
+
+Return the current selection start.
+
+_Parameters_
+
+-   _state_ `Object`: 
+
+_Returns_
+
+-   `WPBlockSelection`: The selection start.
 
 <a name="getEditorSettings" href="#getEditorSettings">#</a> **getEditorSettings**
 
@@ -1227,7 +1239,8 @@ Returns an action object used to signal that the selection has been updated.
 
 _Parameters_
 
--   _selection_ `Array<WPBlockSelection>`: The block selection start and end as a pair of `WPBlockSelection`.
+-   _selectionStart_ `WPBlockSelection`: The selection start.
+-   _selectionEnd_ `WPBlockSelection`: The selection end.
 
 _Returns_
 

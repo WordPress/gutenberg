@@ -60,15 +60,16 @@ export function resetBlocks( blocks ) {
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
  *
- * @param {Array.<WPBlockSelection>} selection The block selection start and end
- *                                             as a pair of `WPBlockSelection`.
+ * @param {WPBlockSelection} selectionStart The selection start.
+ * @param {WPBlockSelection} selectionEnd   The selection end.
  *
  * @return {Object} Action object.
  */
-export function resetSelection( selection ) {
+export function resetSelection( selectionStart, selectionEnd ) {
 	return {
 		type: 'RESET_SELECTION',
-		selection,
+		selectionStart,
+		selectionEnd,
 	};
 }
 

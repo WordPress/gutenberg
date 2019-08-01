@@ -23,7 +23,8 @@ class BlockEditorProvider extends Component {
 			updateSettings,
 			value,
 			resetBlocks,
-			selection,
+			selectionStart,
+			selectionEnd,
 			resetSelection,
 			registry,
 		} = this.props;
@@ -52,7 +53,7 @@ class BlockEditorProvider extends Component {
 			this.isSyncingOutcomingValue = null;
 			this.isSyncingIncomingValue = value;
 			resetBlocks( value );
-			resetSelection( selection );
+			resetSelection( selectionStart, selectionEnd );
 		}
 	}
 
@@ -127,10 +128,12 @@ class BlockEditorProvider extends Component {
 				isPersistent = newIsPersistent;
 
 				// Selection must be updated first, so it is recorded in history when the content change happens.
-				onChangeSelection( [
-					getSelectionStart(),
-					getSelectionEnd(),
-				] );
+				if ( onChangeSelection ) {
+					onChangeSelection(
+						getSelectionStart(),
+						getSelectionEnd()
+					);
+				}
 
 				if ( isPersistent ) {
 					onChange( blocks );

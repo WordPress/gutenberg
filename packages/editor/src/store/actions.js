@@ -961,15 +961,16 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 /**
  * Returns an action object used to signal that the selection has been updated.
  *
- * @param {Array.<WPBlockSelection>} selection The block selection start and end
- *                                             as a pair of `WPBlockSelection`.
+ * @param {WPBlockSelection} selectionStart The selection start.
+ * @param {WPBlockSelection} selectionEnd   The selection end.
  *
  * @return {Object} Action object
  */
-export function resetEditorSelection( selection ) {
+export function resetEditorSelection( selectionStart, selectionEnd ) {
 	return {
 		type: 'RESET_EDITOR_SELECTION',
-		selection,
+		selectionStart,
+		selectionEnd,
 	};
 }
 

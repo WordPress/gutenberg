@@ -1142,14 +1142,23 @@ export function getEditorBlocks( state ) {
  */
 
 /**
- * Return the current selection.
+ * Return the current selection start.
  *
  * @param {Object} state
- * @return {Array.<WPBlockSelection>} The block selection start and end as a
- *                                    pair of `WPBlockSelection`.
+ * @return {WPBlockSelection} The selection start.
  */
-export function getEditorSelection( state ) {
-	return state.editor.present.selection;
+export function getEditorSelectionStart( state ) {
+	return state.editor.present.selectionStart;
+}
+
+/**
+ * Return the current selection end.
+ *
+ * @param {Object} state
+ * @return {WPBlockSelection} The selection end.
+ */
+export function getEditorSelectionEnd( state ) {
+	return state.editor.present.selectionEnd;
 }
 
 /**

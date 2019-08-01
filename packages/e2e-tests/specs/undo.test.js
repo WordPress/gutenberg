@@ -24,12 +24,13 @@ const getSelection = async () => {
 
 		const editables = Array.from( document.querySelectorAll( '[contenteditable]' ) );
 		const editableIndex = editables.indexOf( document.activeElement );
+		const selection = window.getSelection();
 
-		if ( editableIndex === -1 ) {
+		if ( editableIndex === -1 || ! selection.rangeCount ) {
 			return { blockIndex };
 		}
 
-		const { startOffset, endOffset } = window.getSelection().getRangeAt( 0 );
+		const { startOffset, endOffset } = selection.getRangeAt( 0 );
 
 		return {
 			blockIndex,

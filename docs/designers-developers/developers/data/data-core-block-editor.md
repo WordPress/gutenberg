@@ -1040,7 +1040,8 @@ reset to the specified selection.
 
 _Parameters_
 
--   _selection_ `Array<WPBlockSelection>`: The block selection start and end as a pair of `WPBlockSelection`.
+-   _selectionStart_ `WPBlockSelection`: The selection start.
+-   _selectionEnd_ `WPBlockSelection`: The selection end.
 
 _Returns_
 

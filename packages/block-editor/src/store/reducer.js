@@ -1005,7 +1005,7 @@ export function selectionStart( state = {}, action ) {
 				offset: action.startOffset,
 			};
 		case 'RESET_SELECTION':
-			return action.selection[ 0 ];
+			return action.selectionStart;
 		case 'MULTI_SELECT':
 			return { clientId: action.start };
 	}
@@ -1030,7 +1030,7 @@ export function selectionEnd( state = {}, action ) {
 				offset: action.endOffset,
 			};
 		case 'RESET_SELECTION':
-			return action.selection[ 1 ];
+			return action.selectionEnd;
 		case 'MULTI_SELECT':
 			return { clientId: action.end };
 	}

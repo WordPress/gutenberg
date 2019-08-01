@@ -12,6 +12,20 @@ BlockEditorProvider is a component which establishes a new block editing context
 
 The current array of blocks.
 
+### `selectionStart`
+
+* **Type:** `WPBlockSelection`
+* **Required** `no`
+
+The current selection start.
+
+### `selectionEnd`
+
+* **Type:** `WPBlockSelection`
+* **Required** `no`
+
+The current selection end.
+
 ### `onChange`
 
 * **Type:** `Function`
@@ -31,6 +45,13 @@ In the context of an editor, an example usage of this distinction is for managin
 * **Required** `no`
 
 A callback invoked when the blocks have been modified in a non-persistent manner. Contrasted with `onChange`, a "non-persistent" change is one which is part of a composed input. Any sequence of updates to the same block attribute are treated as non-persistent, except for the first.
+
+### `onChangeSelection`
+
+* **Type:** `Function`
+* **Required** `no`
+
+A callback invoked when the block selection has been modified.
 
 ### `children`
 
