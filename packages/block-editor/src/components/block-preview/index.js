@@ -52,13 +52,19 @@ export function BlockPreview( { blocks, settings, srcWidth = 400, srcHeight = 30
 		paddingTop: Math.round( srcHeight / srcWidth * 100 ) + '%',
 	};
 
-	// Set the predefined optimal width/height for displaying the preview
-	// and scale down to fit within the preview wrapper
-	const previewStyles = {
-		width: `${ srcWidth }px`,
-		height: `${ srcHeight }px`,
+	let previewStyles = {
 		transform: `scale(${ previewScale })`,
 	};
+
+	if ( scaleToFit ) {
+		// Set the predefined optimal width/height for displaying the preview
+		// and scale down to fit within the preview wrapper
+		previewStyles = {
+			...previewStyles,
+			width: `${ srcWidth }px`,
+			height: `${ srcHeight }px`,
+		};
+	}
 
 	const contentClassNames = classnames( 'editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper', {
 		'is-scaled': previewScale !== 1,
