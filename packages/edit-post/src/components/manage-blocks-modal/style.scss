@@ -54,6 +54,7 @@
 	top: 0;
 	padding: $panel-padding 0;
 	background-color: $white;
+	z-index: 1;
 
 	.components-base-control__field {
 		margin-bottom: 0;
@@ -86,6 +87,14 @@
 		align-items: center;
 		display: flex;
 		margin: 0;
+		svg.dashicon.components-checkbox-control__checked {
+			bottom: 5px;
+			left: -37px;
+			@include break-small() {
+				bottom: 10px;
+				left: -27px;
+			}
+		}
 	}
 
 	.components-modal__content & input[type="checkbox"] {

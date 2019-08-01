@@ -19,6 +19,12 @@
 			align-items: center;
 			display: flex;
 			margin: 0;
+			svg.dashicon.components-checkbox-control__checked {
+				bottom: 0;
+				@include break-small() {
+					bottom: 5px;
+				}
+			}
 		}
 
 		&.components-base-control + &.components-base-control {
