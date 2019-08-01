@@ -132,7 +132,7 @@ class Modal extends Component {
 			>
 				<ModalFrame
 					className={ classnames(
-						'components-modal__frame block-editor-styles-reset',
+						'components-modal__frame',
 						className
 					) }
 					onRequestClose={ onRequestClose }

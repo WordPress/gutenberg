@@ -61,8 +61,12 @@ body.block-editor-page {
 	@include wp-admin-reset( ".block-editor" );
 }
 
-// Target the editor UI but exclude the metaboxes and custom fields areas.
-.block-editor-styles-reset {
+// Target the editor UI excluding the metaboxes and custom fields areas.
+.editor-styles-wrapper,
+.edit-post-sidebar,
+.editor-post-publish-panel,
+.components-popover,
+.components-modal__frame {
 	@include reset;
 }
 
