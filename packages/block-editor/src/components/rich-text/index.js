@@ -7,8 +7,8 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, Component } from '@wordpress/element';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { RawHTML } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { pasteHandler, children as childrenSource, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
@@ -56,132 +56,80 @@ function getMultilineTag( multiline ) {
 	return multiline === true ? 'p' : multiline;
 }
 
-class RichTextWrapper extends Component {
-	constructor() {
-		super( ...arguments );
-		this.onEnter = this.onEnter.bind( this );
-		this.onSplit = this.onSplit.bind( this );
-		this.onPaste = this.onPaste.bind( this );
-		this.onDelete = this.onDelete.bind( this );
-		this.inputRule = this.inputRule.bind( this );
-	}
-
-	onEnter( { value, onChange, shiftKey } ) {
-		const { onReplace, onSplit, multiline } = this.props;
-		const canSplit = onReplace && onSplit;
-
-		if ( onReplace ) {
-			const transforms = getBlockTransforms( 'from' )
-				.filter( ( { type } ) => type === 'enter' );
-			const transformation = findTransform( transforms, ( item ) => {
-				return item.regExp.test( value.text );
-			} );
-
-			if ( transformation ) {
-				onReplace( [
-					transformation.transform( { content: value.text } ),
-				] );
-			}
-		}
-
-		if ( multiline ) {
-			if ( shiftKey ) {
-				onChange( insert( value, '\n' ) );
-			} else if ( canSplit && isEmptyLine( value ) ) {
-				this.onSplit( value );
-			} else {
-				onChange( insertLineSeparator( value ) );
-			}
-		} else if ( shiftKey || ! canSplit ) {
-			onChange( insert( value, '\n' ) );
-		} else {
-			this.onSplit( value );
-		}
-	}
-
-	onDelete( { isReverse, value } ) {
-		const { onMerge, onRemove } = this.props;
-
-		if ( onMerge ) {
-			onMerge( ! isReverse );
-		}
-
-		// Only handle remove on Backspace. This serves dual-purpose of being
-		// an intentional user interaction distinguishing between Backspace and
-		// Delete to remove the empty field, but also to avoid merge & remove
-		// causing destruction of two fields (merge, then removed merged).
-		if ( onRemove && isEmpty( value ) && isReverse ) {
-			onRemove( ! isReverse );
-		}
-	}
-
-	onPaste( { value, onChange, html, plainText, image } ) {
+function RichTextWrapper( {
+	children,
+	tagName,
+	value: originalValue,
+	onChange: originalOnChange,
+	multiline,
+	inlineToolbar,
+	wrapperClassName,
+	className,
+	autocompleters,
+	onReplace,
+	isSelected: originalIsSelected,
+	placeholder,
+	formattingControls,
+	allowedFormats,
+	withoutInteractiveFormatting,
+	onRemove,
+	onMerge,
+	onSplit,
+	__unstableOnSplitMiddle: onSplitMiddle,
+	clientId,
+	instanceId,
+	identifier = instanceId,
+	// From experimental filter. To do: pick props instead.
+	...experimentalProps
+} ) {
+	const selector = ( select ) => {
 		const {
-			onReplace,
-			onSplit,
-			tagName,
-			canUserUseUnfilteredHTML,
-			multiline,
-		} = this.props;
+			isCaretWithinFormattedText,
+			getSelectionStart,
+			getSelectionEnd,
+			getSettings,
+		} = select( 'core/block-editor' );
+		const { __experimentalCanUserUseUnfilteredHTML } = getSettings();
+		return {
+			canUserUseUnfilteredHTML: __experimentalCanUserUseUnfilteredHTML,
+			isCaretWithinFormattedText: isCaretWithinFormattedText(),
+			selectionStartObject: getSelectionStart(),
+			selectionEndObject: getSelectionEnd(),
+		};
+	};
 
-		if ( image && ! html ) {
-			const file = image.getAsFile ? image.getAsFile() : image;
-			const content = pasteHandler( {
-				HTML: `<img src="${ createBlobURL( file ) }">`,
-				mode: 'BLOCKS',
-				tagName,
-			} );
-			const shouldReplace = onReplace && isEmpty( value );
+	const {
+		canUserUseUnfilteredHTML,
+		isCaretWithinFormattedText,
+		selectionStartObject,
+		selectionEndObject,
+	} = useSelect( selector );
 
-			// Allows us to ask for this information when we get a report.
-			window.console.log( 'Received item:\n\n', file );
+	const {
+		__unstableMarkLastChangeAsPersistent: onCreateUndoLevel,
+		enterFormattedText: onEnterFormattedText,
+		exitFormattedText: onExitFormattedText,
+		selectionChange,
+	} = useDispatch( 'core/block-editor' );
 
-			if ( shouldReplace ) {
-				onReplace( content );
-			} else {
-				this.onSplit( value, content );
-			}
-
-			return;
-		}
-
-		const canReplace = onReplace && isEmpty( value );
-		const canSplit = onReplace && onSplit;
-
-		let mode = 'INLINE';
-
-		if ( canReplace ) {
-			mode = 'BLOCKS';
-		} else if ( canSplit ) {
-			mode = 'AUTO';
-		}
-
-		const content = pasteHandler( {
-			HTML: html,
-			plainText,
-			mode,
-			tagName,
-			canUserUseUnfilteredHTML,
-		} );
-
-		if ( typeof content === 'string' ) {
-			let valueToInsert = create( { html: content } );
-
-			// If the content should be multiline, we should process text
-			// separated by a line break as separate lines.
-			if ( multiline ) {
-				valueToInsert = replace( valueToInsert, /\n+/g, LINE_SEPARATOR );
-			}
-
-			onChange( insert( value, valueToInsert ) );
-		} else if ( content.length > 0 ) {
-			if ( canReplace ) {
-				onReplace( content );
-			} else {
-				this.onSplit( value, content );
-			}
-		}
+	if ( originalIsSelected === undefined ) {
+		originalIsSelected = (
+			selectionStartObject.clientId === clientId &&
+			selectionStartObject.attributeKey === identifier
+		);
 	}
+
+	let selectionStart;
+	let selectionEnd;
+
+	if ( originalIsSelected ) {
+		selectionStart = selectionStartObject.offset;
+		selectionEnd = selectionEndObject.offset;
+	}
+
+	const onSelectionChange = ( start, end ) => {
+		selectionChange( clientId, identifier, start, end );
+	};
 
 	/**
 	 * Signals to the RichText owner that the block can be replaced with two
@@ -192,14 +140,7 @@ class RichTextWrapper extends Component {
 	 * @param  {Object} record       The rich text value to split.
 	 * @param  {Array}  pastedBlocks The pasted blocks to insert, if any.
 	 */
-	onSplit( record, pastedBlocks = [] ) {
-		const {
-			onReplace,
-			onSplit,
-			__unstableOnSplitMiddle: onSplitMiddle,
-			multiline,
-		} = this.props;
-
+	const _onSplit = ( record, pastedBlocks = [] ) => {
 		if ( ! onReplace || ! onSplit ) {
 			return;
 		}
@@ -242,11 +183,115 @@ class RichTextWrapper extends Component {
 		const indexToSelect = hasPastedBlocks ? blocks.length - 1 : 1;
 
 		onReplace( blocks, indexToSelect );
-	}
+	};
 
-	inputRule( value, valueToFormat ) {
-		const { onReplace } = this.props;
+	const onEnter = ( { value, onChange, shiftKey } ) => {
+		const canSplit = onReplace && onSplit;
 
+		if ( onReplace ) {
+			const transforms = getBlockTransforms( 'from' )
+				.filter( ( { type } ) => type === 'enter' );
+			const transformation = findTransform( transforms, ( item ) => {
+				return item.regExp.test( value.text );
+			} );
+
+			if ( transformation ) {
+				onReplace( [
+					transformation.transform( { content: value.text } ),
+				] );
+			}
+		}
+
+		if ( multiline ) {
+			if ( shiftKey ) {
+				onChange( insert( value, '\n' ) );
+			} else if ( canSplit && isEmptyLine( value ) ) {
+				_onSplit( value );
+			} else {
+				onChange( insertLineSeparator( value ) );
+			}
+		} else if ( shiftKey || ! canSplit ) {
+			onChange( insert( value, '\n' ) );
+		} else {
+			_onSplit( value );
+		}
+	};
+
+	const onDelete = ( { isReverse, value } ) => {
+		if ( onMerge ) {
+			onMerge( ! isReverse );
+		}
+
+		// Only handle remove on Backspace. This serves dual-purpose of being
+		// an intentional user interaction distinguishing between Backspace and
+		// Delete to remove the empty field, but also to avoid merge & remove
+		// causing destruction of two fields (merge, then removed merged).
+		if ( onRemove && isEmpty( value ) && isReverse ) {
+			onRemove( ! isReverse );
+		}
+	};
+
+	const onPaste = ( { value, onChange, html, plainText, image } ) => {
+		if ( image && ! html ) {
+			const file = image.getAsFile ? image.getAsFile() : image;
+			const content = pasteHandler( {
+				HTML: `<img src="${ createBlobURL( file ) }">`,
+				mode: 'BLOCKS',
+				tagName,
+			} );
+			const shouldReplace = onReplace && isEmpty( value );
+
+			// Allows us to ask for this information when we get a report.
+			window.console.log( 'Received item:\n\n', file );
+
+			if ( shouldReplace ) {
+				onReplace( content );
+			} else {
+				_onSplit( value, content );
+			}
+
+			return;
+		}
+
+		const canReplace = onReplace && isEmpty( value );
+		const canSplit = onReplace && onSplit;
+
+		let mode = 'INLINE';
+
+		if ( canReplace ) {
+			mode = 'BLOCKS';
+		} else if ( canSplit ) {
+			mode = 'AUTO';
+		}
+
+		const content = pasteHandler( {
+			HTML: html,
+			plainText,
+			mode,
+			tagName,
+			canUserUseUnfilteredHTML,
+		} );
+
+		if ( typeof content === 'string' ) {
+			let valueToInsert = create( { html: content } );
+
+			// If the content should be multiline, we should process text
+			// separated by a line break as separate lines.
+			if ( multiline ) {
+				valueToInsert = replace( valueToInsert, /\n+/g, LINE_SEPARATOR );
+			}
+
+			onChange( insert( value, valueToInsert ) );
+		} else if ( content.length > 0 ) {
+			if ( canReplace ) {
+				onReplace( content );
+			} else {
+				_onSplit( value, content );
+			}
+		}
+	};
+
+	const inputRule = ( value, valueToFormat ) => {
 		if ( ! onReplace ) {
 			return;
 		}
@@ -273,11 +318,9 @@ class RichTextWrapper extends Component {
 		const block = transformation.transform( content );
 
 		onReplace( [ block ] );
-	}
+	};
 
-	getAllowedFormats() {
-		const { allowedFormats, formattingControls } = this.props;
-
+	const getAllowedFormats = () => {
 		if ( ! allowedFormats && ! formattingControls ) {
 			return;
 		}
@@ -291,186 +334,91 @@ class RichTextWrapper extends Component {
 		} );
 
 		return formattingControls.map( ( name ) => `core/${ name }` );
+	};
+
+	const multilineTag = getMultilineTag( multiline );
+	const adjustedAllowedFormats = getAllowedFormats();
+	const hasFormats = ! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
+	let adjustedValue = originalValue;
+	let adjustedOnChange = originalOnChange;
+
+	// Handle deprecated format.
+	if ( Array.isArray( originalValue ) ) {
+		adjustedValue = childrenSource.toHTML( originalValue );
+		adjustedOnChange = ( newValue ) => originalOnChange( childrenSource.fromDOM(
+			__unstableCreateElement( document, newValue ).childNodes
+		) );
 	}
 
-	render() {
-		const {
-			children,
-			tagName,
-			value: originalValue,
-			onChange: originalOnChange,
-			selectionStart,
-			selectionEnd,
-			onSelectionChange,
-			multiline,
-			inlineToolbar,
-			wrapperClassName,
-			className,
-			autocompleters,
-			onReplace,
-			isCaretWithinFormattedText,
-			onEnterFormattedText,
-			onExitFormattedText,
-			isSelected: originalIsSelected,
-			onCreateUndoLevel,
-			placeholder,
-			// eslint-disable-next-line no-unused-vars
-			allowedFormats,
-			withoutInteractiveFormatting,
-			// eslint-disable-next-line no-unused-vars
-			onRemove,
-			// eslint-disable-next-line no-unused-vars
-			onMerge,
-			// eslint-disable-next-line no-unused-vars
-			onSplit,
-			// eslint-disable-next-line no-unused-vars
-			canUserUseUnfilteredHTML,
-			// eslint-disable-next-line no-unused-vars
-			clientId,
-			// eslint-disable-next-line no-unused-vars
-			identifier,
-			// eslint-disable-next-line no-unused-vars
-			instanceId,
-			// From experimental filter. To do: pick props instead.
-			...experimentalProps
-		} = this.props;
-		const multilineTag = getMultilineTag( multiline );
-
-		const adjustedAllowedFormats = this.getAllowedFormats();
-		const hasFormats = ! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
-		let adjustedValue = originalValue;
-		let adjustedOnChange = originalOnChange;
-
-		// Handle deprecated format.
-		if ( Array.isArray( originalValue ) ) {
-			adjustedValue = childrenSource.toHTML( originalValue );
-			adjustedOnChange = ( newValue ) => originalOnChange( childrenSource.fromDOM(
-				__unstableCreateElement( document, newValue ).childNodes
-			) );
-		}
-
-		const content = (
-			<RichText
-				{ ...experimentalProps }
-				value={ adjustedValue }
-				onChange={ adjustedOnChange }
-				selectionStart={ selectionStart }
-				selectionEnd={ selectionEnd }
-				onSelectionChange={ onSelectionChange }
-				tagName={ tagName }
-				className={ classnames( classes, className, { 'is-selected': originalIsSelected } ) }
-				placeholder={ placeholder }
-				allowedFormats={ adjustedAllowedFormats }
-				withoutInteractiveFormatting={ withoutInteractiveFormatting }
-				onEnter={ this.onEnter }
-				onDelete={ this.onDelete }
-				onPaste={ this.onPaste }
-				__unstableIsSelected={ originalIsSelected }
-				__unstableInputRule={ this.inputRule }
-				__unstableMultilineTag={ multilineTag }
-				__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
-				__unstableOnEnterFormattedText={ onEnterFormattedText }
-				__unstableOnExitFormattedText={ onExitFormattedText }
-				__unstableOnCreateUndoLevel={ onCreateUndoLevel }
-			>
-				{ ( { isSelected, value, onChange, Editable } ) =>
-					<>
-						{ isSelected && children && children( { value, onChange } ) }
-						{ isSelected && ! inlineToolbar && hasFormats && (
-							<BlockFormatControls>
-								<FormatToolbar />
-							</BlockFormatControls>
-						) }
-						{ isSelected && inlineToolbar && hasFormats && (
-							<IsolatedEventContainer
-								className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar"
-							>
-								<FormatToolbar />
-							</IsolatedEventContainer>
-						) }
-						{ isSelected && <RemoveBrowserShortcuts /> }
-						<Autocomplete
-							onReplace={ onReplace }
-							completers={ autocompleters }
-							record={ value }
-							onChange={ onChange }
+	const content = (
+		<RichText
+			{ ...experimentalProps }
+			value={ adjustedValue }
+			onChange={ adjustedOnChange }
+			selectionStart={ selectionStart }
+			selectionEnd={ selectionEnd }
+			onSelectionChange={ onSelectionChange }
+			tagName={ tagName }
+			className={ classnames( classes, className, { 'is-selected': originalIsSelected } ) }
+			placeholder={ placeholder }
+			allowedFormats={ adjustedAllowedFormats }
+			withoutInteractiveFormatting={ withoutInteractiveFormatting }
+			onEnter={ onEnter }
+			onDelete={ onDelete }
+			onPaste={ onPaste }
+			__unstableIsSelected={ originalIsSelected }
+			__unstableInputRule={ inputRule }
+			__unstableMultilineTag={ multilineTag }
+			__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
+			__unstableOnEnterFormattedText={ onEnterFormattedText }
+			__unstableOnExitFormattedText={ onExitFormattedText }
+			__unstableOnCreateUndoLevel={ onCreateUndoLevel }
+		>
+			{ ( { isSelected, value, onChange, Editable } ) =>
+				<>
+					{ isSelected && children && children( { value, onChange } ) }
+					{ isSelected && ! inlineToolbar && hasFormats && (
+						<BlockFormatControls>
+							<FormatToolbar />
+						</BlockFormatControls>
+					) }
+					{ isSelected && inlineToolbar && hasFormats && (
+						<IsolatedEventContainer
+							className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar"
 						>
-							{ ( { listBoxId, activeId } ) =>
-								<Editable
-									aria-autocomplete={ listBoxId ? 'list' : undefined }
-									aria-owns={ listBoxId }
-									aria-activedescendant={ activeId }
-								/>
-							}
-						</Autocomplete>
-					</>
-				}
-			</RichText>
-		);
+							<FormatToolbar />
+						</IsolatedEventContainer>
+					) }
+					{ isSelected && <RemoveBrowserShortcuts /> }
+					<Autocomplete
+						onReplace={ onReplace }
+						completers={ autocompleters }
+						record={ value }
+						onChange={ onChange }
+					>
+						{ ( { listBoxId, activeId } ) =>
+							<Editable
+								aria-autocomplete={ listBoxId ? 'list' : undefined }
+								aria-owns={ listBoxId }
+								aria-activedescendant={ activeId }
+							/>
+						}
+					</Autocomplete>
+				</>
+			}
+		</RichText>
+	);
 
-		return (
-			<div className={ classnames( wrapperClasses, wrapperClassName ) }>
-				{ content }
-			</div>
-		);
-	}
+	return (
+		<div className={ classnames( wrapperClasses, wrapperClassName ) }>
+			{ content }
+		</div>
+	);
 }
 
 const RichTextContainer = compose( [
 	withInstanceId,
 	withBlockEditContext( ( { clientId } ) => ( { clientId } ) ),
-	withSelect( ( select, {
-		clientId,
-		instanceId,
-		identifier = instanceId,
-		isSelected,
-	} ) => {
-		const {
-			isCaretWithinFormattedText,
-			getSelectionStart,
-			getSelectionEnd,
-			getSettings,
-		} = select( 'core/block-editor' );
-
-		const selectionStart = getSelectionStart();
-		const selectionEnd = getSelectionEnd();
-		const { __experimentalCanUserUseUnfilteredHTML } = getSettings();
-		if ( isSelected === undefined ) {
-			isSelected = (
-				selectionStart.clientId === clientId &&
-				selectionStart.attributeKey === identifier
-			);
-		}
-
-		return {
-			canUserUseUnfilteredHTML: __experimentalCanUserUseUnfilteredHTML,
-			isCaretWithinFormattedText: isCaretWithinFormattedText(),
-			selectionStart: isSelected ? selectionStart.offset : undefined,
-			selectionEnd: isSelected ? selectionEnd.offset : undefined,
-			isSelected,
-		};
-	} ),
-	withDispatch( ( dispatch, {
-		clientId,
-		instanceId,
-		identifier = instanceId,
-	} ) => {
-		const {
-			__unstableMarkLastChangeAsPersistent,
-			enterFormattedText,
-			exitFormattedText,
-			selectionChange,
-		} = dispatch( 'core/block-editor' );
-
-		return {
-			onCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
-			onEnterFormattedText: enterFormattedText,
-			onExitFormattedText: exitFormattedText,
-			onSelectionChange( start, end ) {
-				selectionChange( clientId, identifier, start, end );
-			},
-		};
-	} ),
 	withFilters( 'experimentalRichText' ),
 ] )( RichTextWrapper );
 
