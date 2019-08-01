@@ -101,6 +101,7 @@ class EditorProvider extends Component {
 				'titlePlaceholder',
 				'__experimentalEnableLegacyWidgetBlock',
 				'__experimentalEnableMenuBlock',
+				'showInserterHelpPanel',
 			] ),
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalMediaUpload: hasUploadPermissions ? mediaUpload : undefined,

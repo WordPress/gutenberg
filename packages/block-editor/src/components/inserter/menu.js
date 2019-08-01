@@ -24,7 +24,6 @@ import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import {
 	PanelBody,
-	ToggleControl,
 	withSpokenMessages,
 	Notice,
 } from '@wordpress/components';
@@ -109,11 +108,9 @@ export class InserterMenu extends Component {
 			reusableItems: [],
 			itemsPerCategory: {},
 			openPanels: [ 'suggested' ],
-			showHelpPanel: true,
 		};
 		this.onChangeSearchInput = this.onChangeSearchInput.bind( this );
 		this.onHover = this.onHover.bind( this );
-		this.onToggleHelpPanel = this.onToggleHelpPanel.bind( this );
 		this.panels = {};
 		this.inserterResults = createRef();
 	}
@@ -132,13 +129,6 @@ export class InserterMenu extends Component {
 
 	onChangeSearchInput( event ) {
 		this.filter( event.target.value );
-	}
-
-	onToggleHelpPanel() {
-		this.setState( ( state ) => ( {
-			showHelpPanel: ! state.showHelpPanel,
-			hoveredItem: null,
-		} ) );
 	}
 
 	onHover( item ) {
@@ -266,7 +256,7 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootClientId } = this.props;
+		const { instanceId, onSelect, rootClientId, showInserterHelpPanel } = this.props;
 		const {
 			childItems,
 			hoveredItem,
@@ -274,7 +264,6 @@ export class InserterMenu extends Component {
 			openPanels,
 			reusableItems,
 			suggestedItems,
-			showHelpPanel,
 		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 
@@ -370,15 +359,7 @@ export class InserterMenu extends Component {
 					) }
 				</div>
 
-				<div className="block-editor-inserter__menu-footer">
-					<ToggleControl
-						label={ __( 'Show Help' ) }
-						onChange={ this.onToggleHelpPanel }
-						checked={ showHelpPanel }
-					/>
-				</div>
-
-				{ showHelpPanel && (
+				{ showInserterHelpPanel && (
 					<div className="block-editor-inserter__menu-help-panel">
 						{ hoveredItem && (
 							<>
@@ -425,6 +406,7 @@ export default compose(
 			getBlockName,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
+			getSettings,
 		} = select( 'core/block-editor' );
 		const {
 			getChildBlockNames,
@@ -442,6 +424,7 @@ export default compose(
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
 			items: getInserterItems( destinationRootClientId ),
+			showInserterHelpPanel: getSettings().showInserterHelpPanel,
 			destinationRootClientId,
 		};
 	} ),

@@ -130,25 +130,6 @@ $block-inserter-search-height: 38px;
 	}
 }
 
-.block-editor-inserter__menu-footer {
-	display: none;
-	justify-content: flex-end;
-	padding: 15px 10px;
-	border-top: $border-width solid $light-gray-500;
-
-	@include break-medium {
-		display: flex;
-	}
-
-	.components-base-control__field {
-		margin: 0;
-		flex-direction: row-reverse;
-		label {
-			margin-right: 10px;
-		}
-	}
-}
-
 .block-editor-inserter__menu-help-panel {
 	display: none;
 	border: $border-width solid $light-gray-500;

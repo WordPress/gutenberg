@@ -387,6 +387,7 @@ The default editor settings
  bodyPlaceholder                        string        Empty post placeholder
  titlePlaceholder                       string        Empty title placeholder
  codeEditingEnabled                     string        Whether or not the user can switch to the code editor
+ showInserterHelpPanel                  boolean       Whether or not the inserter help panel is shown
  **experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
  **experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
  \_\_experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
