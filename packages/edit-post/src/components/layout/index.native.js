@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { SafeAreaView, View } from 'react-native';
+import { Platform, SafeAreaView, View } from 'react-native';
 import SafeArea from 'react-native-safe-area';
 import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
@@ -30,7 +30,7 @@ class Layout extends Component {
 
 		this.state = {
 			rootViewHeight: 0,
-			safeAreaBottomInset: 0,
+			safeAreaInsets: { top: 0, bottom: 0, right: 0, left: 0 },
 			isFullyBordered: true,
 		};
 
@@ -49,8 +49,8 @@ class Layout extends Component {
 
 	onSafeAreaInsetsUpdate( result ) {
 		const { safeAreaInsets } = result;
-		if ( this._isMounted && this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
-			this.setState( { safeAreaBottomInset: safeAreaInsets.bottom } );
+		if ( this._isMounted ) {
+			this.setState( { safeAreaInsets } );
 		}
 	}
 
@@ -75,9 +75,7 @@ class Layout extends Component {
 
 	renderHTML() {
 		return (
-			<HTMLTextInput
-				parentHeight={ this.state.rootViewHeight }
-			/>
+			<HTMLTextInput />
 		);
 	}
 
@@ -93,8 +91,6 @@ class Layout extends Component {
 		return (
 			<VisualEditor
 				isFullyBordered={ this.state.isFullyBordered }
-				rootViewHeight={ this.state.rootViewHeight }
-				safeAreaBottomInset={ this.state.safeAreaBottomInset }
 				setTitleRef={ this.props.setTitleRef }
 			/>
 		);
@@ -105,15 +101,26 @@ class Layout extends Component {
 			mode,
 		} = this.props;
 
+		// add a margin view at the bottom for the header
+		const marginBottom = Platform.OS === 'android' ? headerToolbarStyles.container.height : 0;
+
+		const toolbarKeyboardAvoidingViewStyle = {
+			...styles.toolbarKeyboardAvoidingView,
+			left: this.state.safeAreaInsets.left,
+			right: this.state.safeAreaInsets.right,
+		};
+
 		return (
 			<SafeAreaView style={ styles.container } onLayout={ this.onRootViewLayout }>
-				{ mode === 'text' ? this.renderHTML() : this.renderVisual() }
-				<SafeAreaView>
-					<View style={ { height: headerToolbarStyles.height } } />
-				</SafeAreaView>
+				<View style={ { flex: 1 } }>
+					{ mode === 'text' ? this.renderHTML() : this.renderVisual() }
+				</View>
+				<View style={ { flex: 0, flexBasis: marginBottom, height: marginBottom } }>
+				</View>
 				<KeyboardAvoidingView
-					style={ styles.toolbarKeyboardAvoidingView }
-					parentHeight={ this.state.rootViewHeight }>
+					parentHeight={ this.state.rootViewHeight }
+					style={ toolbarKeyboardAvoidingViewStyle }
+				>
 					<Header />
 				</KeyboardAvoidingView>
 			</SafeAreaView>

@@ -44,7 +44,6 @@ class VisualEditor extends Component {
 	render() {
 		const {
 			isFullyBordered,
-			rootViewHeight,
 			safeAreaBottomInset,
 		} = this.props;
 
@@ -52,7 +51,6 @@ class VisualEditor extends Component {
 			<BlockList
 				header={ this.renderHeader() }
 				isFullyBordered={ isFullyBordered }
-				rootViewHeight={ rootViewHeight }
 				safeAreaBottomInset={ safeAreaBottomInset }
 			/>
 		);

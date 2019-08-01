@@ -22,7 +22,6 @@ import BlockListBlock from './block';
 import DefaultBlockAppender from '../default-block-appender';
 
 const innerToolbarHeight = 44;
-const headerToolbarHeight = 44;
 
 export class BlockList extends Component {
 	constructor() {
@@ -102,10 +101,7 @@ export class BlockList extends Component {
 					{ ...( Platform.OS === 'android' ? { removeClippedSubviews: false } : {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
 					innerRef={ this.scrollViewInnerRef }
-					headerToolbarHeight={ headerToolbarHeight }
-					extraScrollHeight={ innerToolbarHeight }
-					safeAreaBottomInset={ this.props.safeAreaBottomInset }
-					parentHeight={ this.props.rootViewHeight }
+					extraScrollHeight={ innerToolbarHeight + 10 }
 					keyboardShouldPersistTaps="always"
 					style={ styles.list }
 					data={ this.props.blockClientIds }
