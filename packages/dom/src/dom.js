@@ -255,14 +255,16 @@ export function computeCaretRect() {
 /**
  * Places the caret at start or end of a given element.
  *
- * @param {Element} container Focusable element.
- * @param {boolean} isReverse True for end, false for start.
- * @param {Object} focusOptions options that get passed to the focus() call.
+ * @param {Element} container    Focusable element.
+ * @param {boolean} isReverse    True for end, false for start.
+ * @param {Object}  options      options for configuring this behavior.
  */
-export function placeCaretAtHorizontalEdge( container, isReverse, focusOptions = {} ) {
+export function placeCaretAtHorizontalEdge( container, isReverse, options = {} ) {
 	if ( ! container ) {
 		return;
 	}
+
+	const { focusOptions } = options;
 
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		container.focus( focusOptions );
