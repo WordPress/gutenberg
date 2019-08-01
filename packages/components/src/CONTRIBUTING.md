@@ -58,12 +58,12 @@ To ensure quality, each component should be tested. The testing process should b
 - **Accessibility**: Has the design and implementation accounted for accessibility? Please use the [WordPress accessibility guidelines](https://make.wordpress.org/accessibility/handbook/best-practices/). You must use the "Needs Accessibility Feedback" label and get a review from the accessibility team. It's best to request a review early (at the documentation stage) in order to ensure the component is designed inclusively from the outset.
 - **Visual quality**: Does the component apply visual style — color, typography, icons, space, borders, and more — using appropriate variables, and does it follow [visual guidelines](https://make.wordpress.org/design/handbook/design-guide/)? You must use the "Needs Design Feedback" label and get a review from the design team.
 - **Documentation**: Ensure that the component has proper documentation for development, design, and accessibility.
-- **Sufficient states & variations**: Does it cover all the necessary variations (primary, secondary, dense, etc.) and states (default, hover, active, disabled, loading, etc.), given the intended scope?
+- **Sufficient states & variations**: Does it cover all the necessary variations (primary, secondary, dense, etc.) and states (default, hover, active, disabled, loading, etc.), within the intended scope?
 - **Functionality**: Do all behaviors function as expected?
-- **Responsiveness**: Does it incorporate responsive display patterns and behaviors as needed? Is the component designed from a mobile-first perspective? Do all touch interactions work as expected?
+- **Responsiveness**: Does it incorporate responsive behaviors as needed? Is the component designed from a mobile-first perspective? Do all touch interactions work as expected?
 - **Content resilience**: Is each dynamic word or image element resilient to too much, too little, and no content at all, respectively? How long can labels be, and what happens when you run out of space?
 - **Composability**: Does it fit well when placed next to or layered with other components to form a larger composition?
-- **Browser support**: Has the component visual quality and accuracy been assessed across Safari, Chrome, Firefox, IE, and other browsers across relevant devices? Please adhere to our [browser support requirements](https://github.com/WordPress/gutenberg/blob/master/packages/browserslist-config/index.js).
+- **Browser support**: Has the component visual quality and accuracy been checked across Safari, Chrome, Firefox, IE, etc? Please adhere to our [browser support requirements](https://github.com/WordPress/gutenberg/blob/master/packages/browserslist-config/index.js).
 
 ## Deprecation
 
