@@ -36,29 +36,11 @@ function BlockPreview( props ) {
 }
 
 export function BlockPreviewContent( { blocks, settings, srcWidth = 400, srcHeight = 300, scaleFactor = 0.9, scaleToFit = false } ) {
-	if ( ! blocks ) {
-		return null;
-	}
-
 	// Used to dynamically retrieve the width of the element
 	// which wraps the preview
 	const previewRef = useRef( null );
 
 	const [ previewScale, setPreviewScale ] = useState( scaleFactor );
-
-	// We use a top-padding to create a responsively sized element with the same aspect ratio as the preview.
-	// The preview is then absolutely positioned on top of this, creating a visual unit.
-	const aspectPadding = {
-		paddingTop: Math.round( srcHeight / srcWidth * 100 ) + '%',
-	};
-
-	// Set the predefined optimal width/height for displaying the preview
-	// and scale down to fit within the preview wrapper
-	const previewStyles = {
-		width: `${ srcWidth }px`,
-		height: `${ srcHeight }px`,
-		transform: `scale(${ previewScale })`,
-	};
 
 	// Dynamically calculate the scale factor
 	useLayoutEffect( () => {
@@ -76,8 +58,27 @@ export function BlockPreviewContent( { blocks, settings, srcWidth = 400, srcHeig
 		setPreviewScale( scale );
 	}, [ srcWidth, srcHeight ] );
 
+	if ( ! blocks ) {
+		return null;
+	}
+
+	// We use a top-padding to create a responsively sized element with the same aspect ratio as the preview.
+	// The preview is then absolutely positioned on top of this, creating a visual unit.
+	const aspectPadding = {
+		paddingTop: Math.round( srcHeight / srcWidth * 100 ) + '%',
+	};
+
+	// Set the predefined optimal width/height for displaying the preview
+	// and scale down to fit within the preview wrapper
+	const previewStyles = {
+		width: `${ srcWidth }px`,
+		height: `${ srcHeight }px`,
+		transform: `scale(${ previewScale })`,
+	};
+
 	const contentClassNames = classnames( 'editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper', {
 		'is-scaled': previewScale !== 1,
+		'is-dynamically-scaled': scaleToFit && previewScale !== scaleFactor,
 	} );
 
 	return (
