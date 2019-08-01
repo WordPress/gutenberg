@@ -15,6 +15,7 @@
 ### Internal
 
 - The `Dropdown` component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
+- The `MenuItem` component will now always use an `IconButton`. This prevents a focus loss when clicking a menu item.
 
 ## 8.0.0 (2019-06-12)
 
